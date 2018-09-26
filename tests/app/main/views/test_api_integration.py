@@ -1,15 +1,15 @@
 import uuid
 from collections import OrderedDict
 from unittest.mock import call
+from uuid import uuid4
 
 import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
 
-from tests import validate_route_permission
+from tests import sample_uuid, validate_route_permission
 from tests.conftest import (
     SERVICE_ONE_ID,
-    fake_uuid,
     mock_get_empty_service_callback_api,
     mock_get_empty_service_inbound_api,
     mock_get_live_service,
@@ -515,7 +515,7 @@ def test_callback_forms_validation(
     ((
         mock_get_valid_service_callback_api,
         mock_get_valid_service_inbound_api,
-    ), [fake_uuid()], True),
+    ), [uuid4()], True),
     ((
         mock_get_empty_service_callback_api,
         mock_get_empty_service_inbound_api,
@@ -793,7 +793,7 @@ def test_update_delivery_status_and_receive_text_message_callbacks_without_chang
         'Callbacks for delivery receipts Not set Change'
     ),
     (
-        fake_uuid(), {'url': 'https://delivery.receipts'},
+        sample_uuid(), {'url': 'https://delivery.receipts'},
         'Callbacks for delivery receipts https://delivery.receipts Change'
     ),
 ])
@@ -803,7 +803,7 @@ def test_update_delivery_status_and_receive_text_message_callbacks_without_chang
         'Callbacks for received text messages Not set Change'
     ),
     (
-        fake_uuid(), {'url': 'https://inbound.sms'},
+        sample_uuid(), {'url': 'https://inbound.sms'},
         'Callbacks for received text messages https://inbound.sms Change'
     ),
 ])

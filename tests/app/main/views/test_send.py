@@ -6,6 +6,7 @@ from glob import glob
 from io import BytesIO
 from itertools import repeat
 from os import path
+from uuid import uuid4
 from zipfile import BadZipFile
 
 import pytest
@@ -3006,15 +3007,15 @@ def test_send_notification_shows_email_error_in_trial_mode(
 
 @pytest.mark.parametrize('endpoint, extra_args', [
     ('main.check_messages', {
-        'template_id': fake_uuid(), 'upload_id': fake_uuid(), 'original_file_name': 'example.csv'
+        'template_id': uuid4(), 'upload_id': uuid4(), 'original_file_name': 'example.csv'
     }),
     ('main.send_one_off_step', {
-        'template_id': fake_uuid(), 'step_index': 0
+        'template_id': uuid4(), 'step_index': 0
     }),
 ])
 @pytest.mark.parametrize('reply_to_address', [
     None,
-    fake_uuid(),
+    uuid4(),
 ])
 def test_reply_to_is_previewed_if_chosen(
     client_request,
@@ -3059,12 +3060,12 @@ def test_reply_to_is_previewed_if_chosen(
 
 
 @pytest.mark.parametrize('endpoint, extra_args', [
-    ('main.check_messages', {'template_id': fake_uuid(), 'upload_id': fake_uuid()}),
-    ('main.send_one_off_step', {'template_id': fake_uuid(), 'step_index': 0}),
+    ('main.check_messages', {'template_id': uuid4(), 'upload_id': uuid4()}),
+    ('main.send_one_off_step', {'template_id': uuid4(), 'step_index': 0}),
 ])
 @pytest.mark.parametrize('sms_sender', [
     None,
-    fake_uuid(),
+    uuid4(),
 ])
 def test_sms_sender_is_previewed(
     client_request,

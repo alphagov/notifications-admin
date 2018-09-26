@@ -4,9 +4,10 @@ import pytest
 
 from app import invite_api_client, service_api_client, user_api_client
 from app.notify_client.models import User
-from tests.conftest import SERVICE_ONE_ID, api_user_pending, fake_uuid
+from tests import sample_uuid
+from tests.conftest import SERVICE_ONE_ID, api_user_pending
 
-user_id = fake_uuid()
+user_id = sample_uuid()
 
 
 def test_client_gets_all_users_for_service(
@@ -236,7 +237,7 @@ def test_returns_value_from_cache(
 
 
 @pytest.mark.parametrize('client, method, extra_args, extra_kwargs', [
-    (user_api_client, 'add_user_to_service', [SERVICE_ONE_ID, fake_uuid(), []], {}),
+    (user_api_client, 'add_user_to_service', [SERVICE_ONE_ID, sample_uuid(), []], {}),
     (user_api_client, 'update_user_attribute', [user_id], {}),
     (user_api_client, 'reset_failed_login_count', [user_id], {}),
     (user_api_client, 'update_user_attribute', [user_id], {}),
@@ -244,11 +245,11 @@ def test_returns_value_from_cache(
     (user_api_client, 'verify_password', [user_id, 'hunter2'], {}),
     (user_api_client, 'check_verify_code', [user_id, '', ''], {}),
     (user_api_client, 'add_user_to_service', [SERVICE_ONE_ID, user_id, []], {}),
-    (user_api_client, 'add_user_to_organisation', [fake_uuid(), user_id], {}),
+    (user_api_client, 'add_user_to_organisation', [sample_uuid(), user_id], {}),
     (user_api_client, 'set_user_permissions', [user_id, SERVICE_ONE_ID, []], {}),
-    (user_api_client, 'activate_user', [api_user_pending(fake_uuid())], {}),
+    (user_api_client, 'activate_user', [api_user_pending(sample_uuid())], {}),
     (service_api_client, 'remove_user_from_service', [SERVICE_ONE_ID, user_id], {}),
-    (service_api_client, 'create_service', ['', '', 0, False, user_id, fake_uuid()], {}),
+    (service_api_client, 'create_service', ['', '', 0, False, user_id, sample_uuid()], {}),
     (invite_api_client, 'accept_invite', [SERVICE_ONE_ID, user_id], {}),
 ])
 def test_deletes_user_cache(

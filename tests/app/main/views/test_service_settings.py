@@ -2,6 +2,7 @@ import uuid
 from functools import partial
 from unittest.mock import ANY, PropertyMock, call
 from urllib.parse import parse_qs, urlparse
+from uuid import uuid4
 
 import pytest
 from bs4 import BeautifulSoup
@@ -11,13 +12,12 @@ from notifications_utils.clients.zendesk.zendesk_client import ZendeskClient
 
 import app
 from app.utils import email_safe
-from tests import service_json, validate_route_permission
+from tests import sample_uuid, service_json, validate_route_permission
 from tests.conftest import (
     SERVICE_ONE_ID,
     active_user_no_api_key_permission,
     active_user_no_settings_permission,
     active_user_with_permissions,
-    fake_uuid,
     get_default_letter_contact_block,
     get_default_reply_to_email_address,
     get_default_sms_sender,
@@ -741,7 +741,7 @@ def test_should_check_for_mou_on_request_to_go_live(
         return_value=[],
     )
 
-    user = active_user_with_permissions(fake_uuid())
+    user = active_user_with_permissions(uuid4())
     user.email_address = email_address
     client_request.login(user)
 
@@ -1008,11 +1008,11 @@ def test_ready_to_go_live(
         ).return_value = locals()[prop]
 
     assert app.notify_client.models.Service({
-        'id': fake_uuid()
+        'id': SERVICE_ONE_ID
     }).go_live_checklist_completed_as_yes_no == expected_readyness
 
     assert list(app.main.views.service_settings._get_request_to_go_live_tags(
-        app.notify_client.models.Service({'id': fake_uuid()}),
+        app.notify_client.models.Service({'id': SERVICE_ONE_ID}),
         agreement_signed,
     )) == expected_tags
 
@@ -1541,14 +1541,11 @@ def test_edit_reply_to_email_address(
     )
 
 
-fixed_fake_uuid = fake_uuid()
-
-
 @pytest.mark.parametrize('fixture, expected_link_text, partial_href', [
     (
         get_non_default_reply_to_email_address,
         'Delete',
-        partial(url_for, 'main.service_confirm_delete_email_reply_to', reply_to_email_id=fixed_fake_uuid),
+        partial(url_for, 'main.service_confirm_delete_email_reply_to', reply_to_email_id=sample_uuid()),
     ),
     (
         get_default_reply_to_email_address,
@@ -1570,7 +1567,7 @@ def test_shows_delete_link_for_email_reply_to_address(
     page = client_request.get(
         'main.service_edit_email_reply_to',
         service_id=SERVICE_ONE_ID,
-        reply_to_email_id=fixed_fake_uuid,
+        reply_to_email_id=sample_uuid(),
     )
 
     last_link = page.select('.page-footer a')[-1]
@@ -1760,7 +1757,7 @@ def test_default_box_shows_on_non_default_sender_details_while_editing(
     (
         get_non_default_sms_sender,
         'Delete',
-        partial(url_for, 'main.service_confirm_delete_sms_sender', sms_sender_id=fixed_fake_uuid),
+        partial(url_for, 'main.service_confirm_delete_sms_sender', sms_sender_id=sample_uuid()),
     ),
     (
         get_default_sms_sender,
@@ -1782,7 +1779,7 @@ def test_shows_delete_link_for_sms_sender(
     page = client_request.get(
         'main.service_edit_sms_sender',
         service_id=SERVICE_ONE_ID,
-        sms_sender_id=fixed_fake_uuid,
+        sms_sender_id=sample_uuid(),
     )
 
     last_link = page.select('.page-footer a')[-1]
