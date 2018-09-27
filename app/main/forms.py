@@ -769,7 +769,10 @@ class ServiceUpdateEmailBranding(StripWhitespaceForm):
 class PDFUploadForm(StripWhitespaceForm):
     file = FileField_wtf(
         'Upload a letter in PDF format to check if it fits in the printable area',
-        validators=[FileAllowed(['pdf'], 'PDF documents only!')]
+        validators=[
+            FileAllowed(['pdf'], 'PDF documents only!'),
+            DataRequired(message="You need to upload a file to submit")
+        ]
     )
 
 

@@ -248,13 +248,19 @@ def platform_admin_letter_validation_preview():
     message, pages, result = None, [], None
     form = PDFUploadForm()
 
-    if request.method == "POST":
+    if form.validate_on_submit():
         pdf_file = form.file.data
-        response = validate_letter(pdf_file)
-        if response.status_code == 200:
-            pages=response.json()["pages"]
-            message = response.json()["message"]
-            result = response.json()["result"]
+        try:
+            response = validate_letter(pdf_file)
+            if response.status_code == 200:
+                pages=response.json()["pages"]
+                message = response.json()["message"]
+                result = response.json()["result"]
+        except HTTPError as error:
+            if error.status_code == 400:
+                flash("Something was wrong with the file you tried to upload. Please upload a valid PDF file.")
+            else:
+                raise e
 
     return render_template(
         'views/platform-admin/letter-validation-preview.html',
