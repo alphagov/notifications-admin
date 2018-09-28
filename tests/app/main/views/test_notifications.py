@@ -141,7 +141,7 @@ def test_notification_page_shows_page_for_letter_notification(
 
     count_of_pages = 3
 
-    mock_get_notification(mocker, fake_uuid, template_type='letter')
+    mock_get_notification(mocker, fake_uuid, template_type='letter', postage='second')
     mocker.patch(
         'app.main.views.notifications.get_page_count_for_letter',
         return_value=count_of_pages
@@ -172,6 +172,25 @@ def test_notification_page_shows_page_for_letter_notification(
         assert page.select('img')[index]['src'].endswith(
             '.png?page={}'.format(index)
         )
+
+
+@freeze_time("2016-01-01 01:01")
+def test_notification_page_shows_page_for_first_class_letter_notification(
+    client_request,
+    mocker,
+    fake_uuid,
+):
+    mock_get_notification(mocker, fake_uuid, template_type='letter', postage='first')
+    mocker.patch('app.main.views.notifications.get_page_count_for_letter', return_value=3)
+
+    page = client_request.get(
+        'main.view_notification',
+        service_id=SERVICE_ONE_ID,
+        notification_id=fake_uuid,
+    )
+
+    assert normalize_spaces(page.select('main p:nth-of-type(2)')[0].text) == 'Postage: first class'
+    assert normalize_spaces(page.select('main p:nth-of-type(3)')[0].text) == 'Estimated delivery date: 5 January'
 
 
 @pytest.mark.parametrize('filetype', [

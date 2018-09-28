@@ -90,7 +90,10 @@ def view_notification(service_id, notification_id):
         created_by=notification.get('created_by'),
         created_at=notification['created_at'],
         help=get_help_argument(),
-        estimated_letter_delivery_date=get_letter_timings(notification['created_at']).earliest_delivery,
+        estimated_letter_delivery_date=get_letter_timings(
+            notification['created_at'],
+            postage=notification['postage']
+        ).earliest_delivery,
         notification_id=notification['id'],
         postage=notification['postage'],
         can_receive_inbound=(current_service.has_permission('inbound_sms')),
