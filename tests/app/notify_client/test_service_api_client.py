@@ -1,29 +1,28 @@
 from unittest.mock import call
+from uuid import uuid4
 
 import pytest
 
 from app import invite_api_client, service_api_client, user_api_client
 from app.notify_client.service_api_client import ServiceAPIClient
-from tests.conftest import SERVICE_ONE_ID, fake_uuid
+from tests.conftest import SERVICE_ONE_ID
 
-FAKE_TEMPLATE_ID = fake_uuid()
+FAKE_TEMPLATE_ID = uuid4()
 
 
 def test_client_posts_archived_true_when_deleting_template(mocker):
-    service_id = fake_uuid()
-    template_id = fake_uuid()
     mocker.patch('app.notify_client.current_user', id='1')
 
     expected_data = {
         'archived': True,
         'created_by': '1'
     }
-    expected_url = '/service/{}/template/{}'.format(service_id, template_id)
+    expected_url = '/service/{}/template/{}'.format(SERVICE_ONE_ID, FAKE_TEMPLATE_ID)
 
     client = ServiceAPIClient()
     mock_post = mocker.patch('app.notify_client.service_api_client.ServiceAPIClient.post')
 
-    client.delete_service_template(service_id, template_id)
+    client.delete_service_template(SERVICE_ONE_ID, FAKE_TEMPLATE_ID)
     mock_post.assert_called_once_with(expected_url, data=expected_data)
 
 
@@ -361,8 +360,8 @@ def test_returns_value_from_cache(
     (service_api_client, 'delete_sms_sender', [SERVICE_ONE_ID, ''], {}),
     (service_api_client, 'update_service_callback_api', [SERVICE_ONE_ID] + [''] * 4, {}),
     (service_api_client, 'create_service_callback_api', [SERVICE_ONE_ID] + [''] * 3, {}),
-    (user_api_client, 'add_user_to_service', [SERVICE_ONE_ID, fake_uuid(), []], {}),
-    (invite_api_client, 'accept_invite', [SERVICE_ONE_ID, fake_uuid()], {}),
+    (user_api_client, 'add_user_to_service', [SERVICE_ONE_ID, uuid4(), []], {}),
+    (invite_api_client, 'accept_invite', [SERVICE_ONE_ID, uuid4()], {}),
 ])
 def test_deletes_service_cache(
     app_,

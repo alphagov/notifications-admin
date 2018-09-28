@@ -1430,7 +1430,7 @@ def mock_register_user(mocker, api_user_pending):
 @pytest.fixture(scope='function')
 def mock_get_non_govuser(mocker, user=None):
     if user is None:
-        user = api_user_active(fake_uuid(), email_address='someuser@notonwhitelist.com')
+        user = api_user_active(sample_uuid(), email_address='someuser@notonwhitelist.com')
 
     def _get_user(id_):
         user.id = id_
@@ -1443,7 +1443,7 @@ def mock_get_non_govuser(mocker, user=None):
 @pytest.fixture(scope='function')
 def mock_get_user(mocker, user=None):
     if user is None:
-        user = api_user_active(fake_uuid())
+        user = api_user_active(sample_uuid())
 
     def _get_user(id_):
         user.id = id_
@@ -1456,7 +1456,7 @@ def mock_get_user(mocker, user=None):
 @pytest.fixture(scope='function')
 def mock_get_organisation_user(mocker, user=None):
     if user is None:
-        user = api_user_active(fake_uuid())
+        user = api_user_active(sample_uuid())
 
     def _get_user(id_):
         user.id = id_
@@ -1486,7 +1486,7 @@ def mock_get_user_pending(mocker, api_user_pending):
 @pytest.fixture(scope='function')
 def mock_get_user_by_email(mocker, user=None):
     if user is None:
-        user = api_user_active(fake_uuid())
+        user = api_user_active(sample_uuid())
 
     def _get_user(email_address):
         user.email_address = email_address
@@ -2096,7 +2096,7 @@ def mock_get_users_by_service(mocker):
 @pytest.fixture(scope='function')
 def mock_s3_upload(mocker):
     def _upload(service_id, filedata, region):
-        return fake_uuid()
+        return sample_uuid()
 
     return mocker.patch('app.main.views.send.s3upload', side_effect=_upload)
 
