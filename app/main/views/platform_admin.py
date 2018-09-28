@@ -13,7 +13,7 @@ from app import (
     service_api_client,
 )
 from app.main import main
-from app.main.forms import DateFilterForm, ReturnedLettersForm, PDFUploadForm
+from app.main.forms import DateFilterForm, PDFUploadForm, ReturnedLettersForm
 from app.statistics_utils import (
     get_formatted_percentage,
     get_formatted_percentage_two_dp,
@@ -247,20 +247,19 @@ def platform_admin_returned_letters():
 def platform_admin_letter_validation_preview():
     message, pages, result = None, [], None
     form = PDFUploadForm()
-
     if form.validate_on_submit():
         pdf_file = form.file.data
         try:
             response = validate_letter(pdf_file)
             if response.status_code == 200:
-                pages=response.json()["pages"]
+                pages = response.json()["pages"]
                 message = response.json()["message"]
                 result = response.json()["result"]
         except HTTPError as error:
             if error.status_code == 400:
                 flash("Something was wrong with the file you tried to upload. Please upload a valid PDF file.")
             else:
-                raise e
+                raise error
 
     return render_template(
         'views/platform-admin/letter-validation-preview.html',
@@ -269,6 +268,7 @@ def platform_admin_letter_validation_preview():
         pages=pages,
         result=result
     )
+
 
 def sum_service_usage(service):
     total = 0
