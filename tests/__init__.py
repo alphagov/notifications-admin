@@ -390,7 +390,7 @@ def notification_json(
         status = 'delivered'
     links = {}
     if template_type == 'letter':
-        postage = 'second'
+        postage = postage or 'second'
 
     if with_links:
         links = {

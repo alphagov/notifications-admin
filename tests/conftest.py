@@ -1838,6 +1838,7 @@ def mock_get_notifications(
     is_precompiled_letter=False,
     client_reference=None,
     noti_status=None,
+    postage=None,
 ):
     def _get_notifications(
         service_id,
@@ -1882,6 +1883,7 @@ def mock_get_notifications(
             client_reference=client_reference,
             status=noti_status,
             created_by_name='Firstname Lastname',
+            postage=postage
         )
 
     return mocker.patch(

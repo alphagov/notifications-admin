@@ -380,10 +380,16 @@ def get_job_partials(job, template):
     )
 
     if template['template_type'] == 'letter':
+        # there might be no notifications if the job has only just been created and the tasks haven't run yet
+        if notifications['notifications']:
+            postage = notifications['notifications'][0]['postage']
+        else:
+            postage = current_service.postage
+
         counts = render_template(
             'partials/jobs/count-letters.html',
             total=job.get('notification_count', 0),
-            delivery_estimate=get_letter_timings(job['created_at']).earliest_delivery,
+            delivery_estimate=get_letter_timings(job['created_at'], postage=postage).earliest_delivery,
         )
     else:
         counts = render_template(

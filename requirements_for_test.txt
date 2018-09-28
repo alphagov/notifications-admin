@@ -4,7 +4,7 @@ pytest==3.8.1
 pytest-env==0.6.2
 pytest-mock==1.10.0
 pytest-cov==2.6.0
-pytest-xdist==1.23.1
+pytest-xdist==1.23.2
 coveralls==1.5.1
 httpretty==0.9.5
 beautifulsoup4==4.6.3
