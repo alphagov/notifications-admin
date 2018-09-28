@@ -16,6 +16,7 @@ from flask import (
 )
 from flask_login import login_required
 from notifications_python_client.errors import APIError
+from notifications_utils.letter_timings import get_letter_timings
 from notifications_utils.pdf import pdf_page_count
 
 from app import (
@@ -33,7 +34,6 @@ from app.utils import (
     FAILURE_STATUSES,
     generate_notifications_csv,
     get_help_argument,
-    get_letter_timings,
     get_template,
     parse_filter_args,
     set_status_filters,

@@ -12,6 +12,7 @@ from flask import (
     url_for,
 )
 from flask_login import current_user, login_required
+from notifications_utils.letter_timings import get_letter_timings
 from notifications_utils.template import Template, WithSubjectTemplate
 
 from app import (
@@ -28,7 +29,6 @@ from app.utils import (
     generate_next_dict,
     generate_notifications_csv,
     generate_previous_dict,
-    get_letter_timings,
     get_page_from_request,
     get_time_left,
     parse_filter_args,
