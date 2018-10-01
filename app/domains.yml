@@ -2864,7 +2864,7 @@ matlock.gov.uk:
 medway.gov.uk:
   owner: Medway Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 melthamtowncouncil.gov.uk:
   owner: Meltham Town Council
   crown: false
