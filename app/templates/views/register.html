@@ -1,6 +1,7 @@
 {% extends "withoutnav_template.html" %}
 {% from "components/textbox.html" import textbox %}
 {% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
 
 {% block per_page_title %}
 Create an account
@@ -11,7 +12,7 @@ Create an account
 <div class="grid-row">
   <div class="column-two-thirds">
     <h1 class="heading-large">Create an account</h1>
-    <form method="post" novalidate>
+    {% call form_wrapper(autocomplete=True) %}
       {{ textbox(form.name, width='3-4') }}
       {{ textbox(form.email_address, hint="Must be from a government organisation", width='3-4', safe_error_message=True) }}
       <div class="extra-tracking">
@@ -21,7 +22,7 @@ Create an account
       {{ textbox(form.password, hint="At least 8 characters", width='3-4') }}
       {{form.auth_type}}
       {{ page_footer("Continue") }}
-    </form>
+    {% endcall %}
   </div>
 </div>
 

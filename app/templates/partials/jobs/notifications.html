@@ -1,5 +1,6 @@
 {% from "components/table.html" import list_table, field, right_aligned_field_heading, row_heading, notification_status_field %}
 {% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
 
 <div class="ajax-block-container" aria-labelledby='pill-selected-item'>
   {% if job.job_status == 'scheduled' %}
@@ -10,12 +11,12 @@
       {{ job.scheduled_for|format_datetime_relative }}
     </p>
     <div class="page-footer">
-      <form method="post">
+      {% call form_wrapper() %}
         {{ page_footer(
           button_text="Cancel sending",
           destructive=True
         ) }}
-      </form>
+      {% endcall %}
     </div>
 
   {% else %}

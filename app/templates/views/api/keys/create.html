@@ -3,6 +3,7 @@
 {% from "components/textbox.html" import textbox %}
 {% from "components/radios.html" import radios %}
 {% from "components/banner.html" import banner_wrapper %}
+{% from "components/form.html" import form_wrapper %}
 
 {% block service_page_title %}
   Create an API key
@@ -14,10 +15,10 @@
     Create an API key
   </h1>
 
-  <form method="post">
+  {% call form_wrapper() %}
     {{ textbox(form.key_name, label='Name for this key') }}
     {{ radios(form.key_type, disable=disabled_options, option_hints=option_hints) }}
     {{ page_footer('Continue') }}
-  </form>
+  {% endcall %}
 
 {% endblock %}

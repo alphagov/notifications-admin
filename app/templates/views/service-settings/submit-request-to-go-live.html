@@ -4,6 +4,7 @@
 {% from "components/radios.html" import radios %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/banner.html" import banner_wrapper %}
+{% from "components/form.html" import form_wrapper %}
 
 {% block service_page_title %}
   Request to go live
@@ -13,7 +14,7 @@
 
       <h1 class="heading-large">Request to go live</h1>
 
-      <form method="post">
+      {% call form_wrapper() %}
         <div class="form-group">
           {{ textbox(form.volume_email, width='1-2', hint='For example, 1,000,000') }}
           {{ textbox(form.volume_sms, width='1-2', hint='For example, 500,000') }}
@@ -29,6 +30,6 @@
           By requesting to go live you’re agreeing to our <a href="{{ url_for('.terms') }}">terms of use</a>.
         </p>
         {{ page_footer('Request to go live') }}
-      </form>
+      {% endcall %}
 
 {% endblock %}

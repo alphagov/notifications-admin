@@ -3,6 +3,7 @@
 {% from "components/message-count-label.html" import message_count_label, recipient_count_label %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/textbox.html" import textbox %}
+{% from "components/form.html" import form_wrapper %}
 
 {% set page_title = (
   message_count_label(99, message_type, suffix='') | capitalize
@@ -27,11 +28,10 @@
       'counts'
     ) }}
 
-    <form
-      method="post"
-      action="{{ url_for('.view_notifications', service_id=current_service.id, message_type=message_type) }}"
+    {% call form_wrapper(
+      action=url_for('.view_notifications', service_id=current_service.id, message_type=message_type),
       class="grid-row"
-    >
+    ) %}
       <div class="column-three-quarters {% if message_type == 'sms' %}extra-tracking{% endif %}">
         {{ textbox(
           search_form.to,
@@ -42,16 +42,16 @@
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <button type="submit" class="button">Search</button>
       </div>
-    </form>
+    {% endcall %}
 
-    <form id="search-form" method="post">
+    {% call form_wrapper(id="search-form") %}
       <input type="hidden" name="to" value="{{ search_form.to.data }}">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    </form>
+    {% endcall %}
   {% else %}
-    <form id="search-form" method="post">
+    {% call form_wrapper(id="search-form") %}
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-    </form>
+    {% endcall %}
   {% endif %}
 
   {% if current_user.has_permissions('view_activity') %}

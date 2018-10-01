@@ -1,6 +1,7 @@
 {% extends "withoutnav_template.html" %}
 {% from "components/radios.html" import radios %}
 {% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
 
 {% block per_page_title %}
   Support
@@ -13,10 +14,11 @@
 
     <h1 class="heading-large">Support</h1>
 
-    <form method="post" class="bottom-gutter-2">
+    {% call form_wrapper(class="bottom-gutter-2") %}
       {{ radios(form.support_type) }}
       {{ page_footer('Continue') }}
-    </form>
+    {% endcall %}
+
     <p>If something’s wrong, you can <a href="https://status.notifications.service.gov.uk/"> check the GOV.UK Notify system status page</a> to see if we’re already aware of it.</p>
 
     <h2 class="heading-medium">24-hour support</h2>

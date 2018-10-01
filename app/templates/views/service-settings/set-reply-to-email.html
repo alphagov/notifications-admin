@@ -1,6 +1,7 @@
 {% extends "withnav_template.html" %}
 {% from "components/textbox.html" import textbox %}
 {% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
 
 {% block service_page_title %}
   Email reply-to address
@@ -26,7 +27,7 @@
       Your service can’t go live until you’ve done this.
     </p>
   {% endif %}
-  <form method="post">
+  {% call form () %}
     {{ textbox(
       form.email_address,
       width='2-3',
@@ -36,7 +37,7 @@
       'Save',
       back_link=url_for('.service_settings', service_id=current_service.id),
       back_link_text='Back to settings'
-  ) }}
-  </form>
+    ) }}
+  {% endcall %}
 
 {% endblock %}

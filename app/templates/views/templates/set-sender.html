@@ -1,6 +1,7 @@
 {% extends "withnav_template.html" %}
 {% from "components/radios.html" import radios %}
 {% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
 
 {% block service_page_title %}
   {{sender_context['title']}}
@@ -11,7 +12,7 @@
   <h1 class="heading-large">{{sender_context['title']}}</h1>
   <div class="grid-row">
     <div class="column-three-quarters">
-      <form method="post">
+      {% call form_wrapper() %}
         {{ radios(
           form.sender,
           option_hints=option_hints,
@@ -22,7 +23,7 @@
           back_link=url_for('.view_template', service_id=current_service.id, template_id=template_id),
           back_link_text='Back to template'
         ) }}
-      </form>
+      {% endcall %}
     </div>
   </div>
 

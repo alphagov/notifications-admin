@@ -1,6 +1,7 @@
 {% extends "withoutnav_template.html" %}
 {% from "components/textbox.html" import textbox %}
 {% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
 
 {% block per_page_title %}
   Sign in
@@ -30,11 +31,11 @@
       </p>
     {% endif %}
 
-    <form method="post" novalidate>
+    {% call form_wrapper(autocomplete=True) %}
       {{ textbox(form.email_address) }}
       {{ textbox(form.password) }}
       {{ page_footer("Continue", secondary_link=url_for('.forgot_password'), secondary_link_text="Forgot your password?") }}
-    </form>
+    {% endcall %}
   </div>
 </div>
 

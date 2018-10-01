@@ -1,6 +1,7 @@
 {% extends "org_template.html" %}
 {% from "components/textbox.html" import textbox %}
 {% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
 
 {% block org_page_title %}
   Confirm organisation name change
@@ -13,7 +14,7 @@
   <div class="grid-row">
     <div class="column-three-quarters">
 
-    <form autocomplete="off" method="post">
+    {% call form_wrapper() %}
       {{ textbox(form.password) }}
       <p> Your organisation name will be changed from {{ current_org.name }} to {{ new_name }} </p>
       {{ page_footer(
@@ -21,7 +22,7 @@
         destructive=destructive,
         back_link=url_for('.organisation_settings', org_id=current_org.id)
       ) }}
-    </form>
+    {% endcall %}
     </div>
   </div>
 

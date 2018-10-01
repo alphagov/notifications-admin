@@ -2,6 +2,7 @@
 
 {% from "components/textbox.html" import textbox %}
 {% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
 
 {% block service_page_title %}
   Invite a team member
@@ -13,7 +14,7 @@
     Invite a team member
   </h1>
   <div class="grid-row">
-	  <form method="post" class="column-three-quarters" novalidate>
+    {% call form_wrapper(class="column-three-quarters") %}
 	    {{ textbox(form.email_address, width='1-1', safe_error_message=True) }}
 
 	    <div class="bottom-gutter">
@@ -27,7 +28,7 @@
 			</div>
 
 	    {{ page_footer('Send invitation email') }}
-	  </form>
+	  {% endcall %}
   </div>
 
 {% endblock %}

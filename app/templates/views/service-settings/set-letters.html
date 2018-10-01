@@ -1,6 +1,7 @@
 {% extends "withnav_template.html" %}
 {% from "components/radios.html" import radios %}
 {% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
 
 {% block service_page_title %}
   Send letters
@@ -18,14 +19,14 @@
         See <a href="{{ url_for(".pricing", _anchor="letters") }}">pricing</a> for the list
         of rates.
       </p>
-      <form method="post">
+      {% call form_wrapper() %}
         {{ radios(form.enabled) }}
         {{ page_footer(
           'Save',
           back_link=url_for('.service_settings', service_id=current_service.id),
           back_link_text='Back to settings'
         ) }}
-      </form>
+      {% endcall %}
     </div>
   </div>
 

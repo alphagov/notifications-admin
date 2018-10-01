@@ -2,6 +2,7 @@
 {% from "components/radios.html" import radios %}
 {% from "components/textbox.html" import textbox %}
 {% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
 
 {% block per_page_title %}
   {{ heading }}
@@ -16,7 +17,7 @@
       About your service
     </h1>
 
-    <form autocomplete="off" method="post">
+    {% call form_wrapper() %}
 
       {{ textbox(form.name, hint="You can change this later") }}
 
@@ -24,7 +25,7 @@
 
       {{ page_footer('Add service') }}
 
-    </form>
+    {% endcall %}
 
   </div>
 </div>

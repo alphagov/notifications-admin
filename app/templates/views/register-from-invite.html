@@ -1,6 +1,7 @@
 {% extends "withoutnav_template.html" %}
 {% from "components/textbox.html" import textbox %}
 {% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
 
 {% block per_page_title %}
 Create an account
@@ -15,7 +16,7 @@ Create an account
       Your account will be created with this email address:
       <span class="nowrap">{{invited_user.email_address}}</span>
     </p>
-    <form method="post" autocomplete="off">
+    {% call form_wrapper() %}
       {{ textbox(form.name, width='3-4') }}
       {% if invited_user.auth_type == 'sms_auth' %}
         <div class="extra-tracking">
@@ -27,7 +28,7 @@ Create an account
       {{form.service}}
       {{form.email_address}}
       {{form.auth_type}}
-    </form>
+    {% endcall %}
   </div>
 </div>
 

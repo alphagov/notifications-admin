@@ -1,6 +1,7 @@
 {% extends "withnav_template.html" %}
 {% from "components/radios.html" import radios %}
 {% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
 
 {% block service_page_title %}
   Set letter contact block
@@ -11,7 +12,7 @@
   <h1 class="heading-large">Set letter contact block</h1>
   <div class="grid-row">
     <div class="column-three-quarters">
-      <form method="post">
+      {% call form_wrapper() %}
         {{ radios(
           form.sender,
           option_hints=option_hints,
@@ -25,7 +26,7 @@
         {% if no_senders %}
           <a href="{{ url_for('.service_add_letter_contact', service_id=current_service.id, from_template=template_id) }}">Add new sender</a>
         {% endif %}
-      </form>
+      {% endcall %}
     </div>
   </div>
 

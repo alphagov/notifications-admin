@@ -1,6 +1,7 @@
 {% extends "withnav_template.html" %}
 {% from "components/textbox.html" import textbox %}
 {% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
 
 {% block service_page_title %}
   Letter contact details
@@ -12,7 +13,7 @@
     Letter contact details
   </h1>
   <div class="grid-row">
-    <form method="post" class="column-half">
+    {% call form_wrapper(class="column-half") %}
       {{ textbox(
         form.letter_contact_block,
         label='How should users contact your service?<br>This applies to all the letters you send.'|safe,
@@ -26,7 +27,7 @@
         back_link=None if request.args.get('from_template') else url_for('.service_settings', service_id=current_service.id),
         back_link_text='Back to settings'
       ) }}
-    </form>
+    {% endcall %}
   </div>
 
 {% endblock %}
