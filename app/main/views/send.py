@@ -547,6 +547,7 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
         ) if not letters_as_pdf else None,
         email_reply_to=email_reply_to,
         sms_sender=sms_sender,
+        page_count=get_page_count_for_letter(db_template),
     )
     recipients = RecipientCSV(
         contents,
@@ -661,7 +662,7 @@ def check_messages_preview(service_id, template_id, upload_id, filetype, row_ind
     template = _check_messages(
         service_id, template_id, upload_id, row_index, letters_as_pdf=True
     )['template']
-    return TemplatePreview.from_utils_template(template, filetype)
+    return TemplatePreview.from_utils_template(template, filetype, page=request.args.get('page', 1))
 
 
 @main.route("/services/<service_id>/start-job/<upload_id>", methods=['POST'])
