@@ -440,3 +440,48 @@ def test_should_show_updates_for_one_job_as_json(
 @freeze_time("2016-01-10 12:00:00.000000")
 def test_time_left(job_created_at, expected_message):
     assert get_time_left(job_created_at) == expected_message
+
+
+@freeze_time("2016-01-01 11:09:00.061258")
+def test_should_show_letter_job_with_first_class_if_notifications_are_first_class(
+    client_request,
+    mock_get_service_letter_template,
+    mock_get_job,
+    fake_uuid,
+    active_user_with_permissions,
+    mocker,
+):
+    mock_get_notifications(
+        mocker,
+        active_user_with_permissions,
+        diff_template_type='letter',
+        postage='first'
+    )
+
+    page = client_request.get(
+        'main.view_job',
+        service_id=SERVICE_ONE_ID,
+        job_id=fake_uuid,
+    )
+
+    assert normalize_spaces(page.select('.keyline-block')[1].text) == '5 January Estimated delivery date'
+
+
+@freeze_time("2016-01-01 11:09:00.061258")
+def test_should_show_letter_job_with_first_class_if_no_notifications(
+    client_request,
+    mock_get_service_letter_template,
+    mock_get_job,
+    fake_uuid,
+    mock_get_notifications_with_no_notifications,
+    mocker
+):
+    mocker.patch('app.main.views.jobs.current_service', postage='first')
+
+    page = client_request.get(
+        'main.view_job',
+        service_id=SERVICE_ONE_ID,
+        job_id=fake_uuid,
+    )
+
+    assert normalize_spaces(page.select('.keyline-block')[1].text) == '5 January Estimated delivery date'

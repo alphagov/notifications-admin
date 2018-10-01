@@ -16,6 +16,7 @@ from flask import (
 )
 from flask_login import login_required
 from notifications_python_client.errors import APIError
+from notifications_utils.letter_timings import get_letter_timings
 from notifications_utils.pdf import pdf_page_count
 
 from app import (
@@ -33,7 +34,6 @@ from app.utils import (
     FAILURE_STATUSES,
     generate_notifications_csv,
     get_help_argument,
-    get_letter_timings,
     get_template,
     parse_filter_args,
     set_status_filters,
@@ -90,7 +90,10 @@ def view_notification(service_id, notification_id):
         created_by=notification.get('created_by'),
         created_at=notification['created_at'],
         help=get_help_argument(),
-        estimated_letter_delivery_date=get_letter_timings(notification['created_at']).earliest_delivery,
+        estimated_letter_delivery_date=get_letter_timings(
+            notification['created_at'],
+            postage=notification['postage']
+        ).earliest_delivery,
         notification_id=notification['id'],
         postage=notification['postage'],
         can_receive_inbound=(current_service.has_permission('inbound_sms')),

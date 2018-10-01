@@ -1838,6 +1838,7 @@ def mock_get_notifications(
     is_precompiled_letter=False,
     client_reference=None,
     noti_status=None,
+    postage=None,
 ):
     def _get_notifications(
         service_id,
@@ -1882,6 +1883,7 @@ def mock_get_notifications(
             client_reference=client_reference,
             status=noti_status,
             created_by_name='Firstname Lastname',
+            postage=postage
         )
 
     return mocker.patch(
@@ -2643,6 +2645,7 @@ def mock_get_notification(
     template_name='sample template',
     is_precompiled_letter=False,
     key_type=None,
+    postage=None
 ):
     def _get_notification(
         service_id,
@@ -2653,6 +2656,7 @@ def mock_get_notification(
             rows=1,
             status=notification_status,
             template_type=template_type,
+            postage=postage
         )['notifications'][0]
 
         noti['id'] = notification_id
