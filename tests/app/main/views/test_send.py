@@ -712,6 +712,10 @@ def test_upload_valid_csv_only_sets_meta_if_filename_known(
         House       , 1 Street    , SW1A 1AA
     """)
     mocker.patch(
+        'app.main.views.send.get_page_count_for_letter',
+        return_value=5,
+    )
+    mocker.patch(
         'app.main.views.send.TemplatePreview.from_utils_template',
         return_value='foo'
     )
@@ -2304,7 +2308,14 @@ def test_check_messages_back_link(
     extra_args,
     expected_url
 ):
+
     template_mock(mocker)
+
+    mocker.patch(
+        'app.main.views.send.get_page_count_for_letter',
+        return_value=5,
+    )
+
     with logged_in_client.session_transaction() as session:
         session['file_uploads'] = {
             fake_uuid: {
@@ -2493,6 +2504,10 @@ def test_check_messages_shows_trial_mode_error_for_letters(
         ['address_line_1,address_line_2,postcode,'] +
         ['First Last,    123 Street,    SW1 1AA'] * number_of_rows
     ))
+    mocker.patch(
+        'app.main.views.send.get_page_count_for_letter',
+        return_value=3,
+    )
 
     with client_request.session_transaction() as session:
         session['file_uploads'] = {
@@ -2520,6 +2535,8 @@ def test_check_messages_shows_trial_mode_error_for_letters(
     else:
         assert not error
 
+    assert len(page.select('.letter img')) == 3
+
     if number_of_rows > 1:
         assert page.select_one('.table-field-index a').text == '3'
 
@@ -2540,6 +2557,11 @@ def test_check_messages_shows_data_errors_before_trial_mode_errors_for_letters(
         ['              ,              ,11SW1 1AA'] +
         ['              ,              ,11SW1 1AA']
     ))
+
+    mocker.patch(
+        'app.main.views.send.get_page_count_for_letter',
+        return_value=5,
+    )
 
     with client_request.session_transaction() as session:
         session['file_uploads'] = {
@@ -2582,6 +2604,11 @@ def test_check_messages_column_error_doesnt_show_optional_columns(
         ['First Lastname,1 Example Road,SW1 1AA']
     ))
 
+    mocker.patch(
+        'app.main.views.send.get_page_count_for_letter',
+        return_value=5,
+    )
+
     with client_request.session_transaction() as session:
         session['file_uploads'] = {
             fake_uuid: {
@@ -2623,6 +2650,11 @@ def test_generate_test_letter_doesnt_block_in_trial_mode(
         First Last,    123 Street,    SW1 1AA
     """)
 
+    mocker.patch(
+        'app.main.views.send.get_page_count_for_letter',
+        return_value=5,
+    )
+
     with client_request.session_transaction() as session:
         session['file_uploads'] = {
             fake_uuid: {
@@ -2641,6 +2673,7 @@ def test_generate_test_letter_doesnt_block_in_trial_mode(
 
     assert not page.select('.banner-dangerous')
 
+    assert len(page.select('.letter img')) == 5
     assert page.select_one('a.button').text == 'Download as a printable PDF'
 
 
