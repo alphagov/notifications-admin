@@ -59,3 +59,18 @@ def test_set_inbound_sms_when_service_already_has_sms(
     )
 
     assert normalize_spaces(page.select_one('main p').text) == "This service already has an inbound number"
+
+
+def test_set_inbound_sms_when_service_does_not_have_sms(
+    client_request,
+    service_one,
+    multiple_available_inbound_numbers,
+    mock_no_inbound_number_for_service,
+):
+
+    page = client_request.get(
+        'main.service_set_inbound_number',
+        service_id=service_one['id']
+    )
+
+    assert normalize_spaces(page.select_one('input')['name']) == "inbound_number"
