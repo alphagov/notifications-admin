@@ -418,8 +418,8 @@ def get_months_for_year(start, end, year):
 
 def get_sum_billing_units(billing_units, month=None):
     if month:
-        return sum(b['billing_units'] * b.get('rate_multiplier', 1) for b in billing_units if b['month'] == month)
-    return sum(b['billing_units'] * b.get('rate_multiplier', 1) for b in billing_units)
+        return sum(b['billing_units'] for b in billing_units if b['month'] == month)
+    return sum(b['billing_units'] for b in billing_units)
 
 
 def get_free_paid_breakdown_for_billable_units(year, free_sms_fragment_limit, billing_units):
