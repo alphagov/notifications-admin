@@ -113,7 +113,7 @@
              <ul>
               {% for letter in month.letters%}
                 {% if letter[0] %}
-                <li class="tabular-numbers">{{ "{:,}".format(letter[0])}} letters at {{ '{:.0f}p'.format(letter[1] * 100) }}
+                <li class="tabular-numbers">{{ "{:,} {}".format(letter[0], letter[3])}} class letters at {{ '{:.0f}p'.format(letter[1] * 100) }}
                 </li>
                 {% endif %}
               {% endfor %}
