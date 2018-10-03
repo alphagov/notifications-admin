@@ -25,6 +25,7 @@ from functools import partial
 
 from notifications_python_client.errors import HTTPError
 from notifications_utils import logging, request_helper, formatters
+from notifications_utils.clients.antivirus.antivirus_client import AntivirusClient
 from notifications_utils.clients.zendesk.zendesk_client import ZendeskClient
 from notifications_utils.clients.statsd.statsd_client import StatsdClient
 from notifications_utils.recipients import (
@@ -86,6 +87,7 @@ email_branding_client = EmailBrandingClient()
 organisations_client = OrganisationsClient()
 org_invite_api_client = OrgInviteApiClient()
 asset_fingerprinter = AssetFingerprinter()
+antivirus_client = AntivirusClient()
 statsd_client = StatsdClient()
 zendesk_client = ZendeskClient()
 letter_jobs_client = LetterJobsClient()
@@ -121,6 +123,7 @@ def create_app(application):
     application.config.from_object(configs[notify_environment])
 
     init_app(application)
+    antivirus_client.init_app(application)
     statsd_client.init_app(application)
     zendesk_client.init_app(application)
     logging.init_app(application, statsd_client)

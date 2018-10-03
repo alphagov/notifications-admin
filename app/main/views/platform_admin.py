@@ -5,8 +5,12 @@ from datetime import datetime
 from flask import abort, flash, redirect, render_template, request, url_for
 from flask_login import login_required
 from notifications_python_client.errors import HTTPError
+from notifications_utils.clients.antivirus.antivirus_client import (
+    AntivirusError,
+)
 
 from app import (
+    antivirus_client,
     complaint_api_client,
     letter_jobs_client,
     platform_stats_api_client,
@@ -247,14 +251,24 @@ def platform_admin_returned_letters():
 def platform_admin_letter_validation_preview():
     message, pages, result = None, [], None
     form = PDFUploadForm()
+
     if form.validate_on_submit():
         pdf_file = form.file.data
+
+        try:
+            virus_free = antivirus_client.scan(pdf_file)
+        except AntivirusError:
+            flash("Antivirus API error")
+            abort(503)
+
+        if not virus_free:
+            flash("Document didn't pass the virus scan")
+            abort(400)
+
         try:
             response = validate_letter(pdf_file)
             if response.status_code == 200:
-                pages = response.json()["pages"]
-                message = response.json()["message"]
-                result = response.json()["result"]
+                pages, message, result = response.json()["pages"], response.json()["message"], response.json()["result"]
         except HTTPError as error:
             if error.status_code == 400:
                 flash("Something was wrong with the file you tried to upload. Please upload a valid PDF file.")
@@ -263,10 +277,7 @@ def platform_admin_letter_validation_preview():
 
     return render_template(
         'views/platform-admin/letter-validation-preview.html',
-        form=form,
-        message=message,
-        pages=pages,
-        result=result
+        form=form, message=message, pages=pages, result=result
     )
 
 
