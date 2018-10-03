@@ -808,8 +808,8 @@ def test_usage_page_with_letters(
     assert '140 free text messages' in table
     assert '£20.30' in table
     assert '1,230 text messages at 1.65p' in table
-    assert '10 second class letters at 31p' in table
-    assert '5 first class letters at 33p' in table
+    assert '10 second class letters at 31p' in normalize_spaces(table)
+    assert '5 first class letters at 33p' in normalize_spaces(table)
 
 
 @freeze_time("2012-04-30 12:12:12")
@@ -834,9 +834,9 @@ def test_usage_page_displays_letters_ordered_by_postage(
     postage_details = row_for_april.find_all('li', class_='tabular-numbers')
 
     assert len(postage_details) == 3
-    assert normalize_spaces(postage_details[0].text) == '1 first class letters at 50p'
+    assert normalize_spaces(postage_details[0].text) == '1 first class letter at 50p'
     assert normalize_spaces(postage_details[1].text) == '3 second class letters at 30p'
-    assert normalize_spaces(postage_details[2].text) == '1 second class letters at 50p'
+    assert normalize_spaces(postage_details[2].text) == '1 second class letter at 50p'
 
 
 def test_usage_page_with_year_argument(

@@ -1,4 +1,5 @@
 {% from "components/big-number.html" import big_number %}
+{% from "components/message-count-label.html" import message_count_label %}
 {% from "components/table.html" import list_table, field, hidden_field_heading, row_heading, text_field %}
 {% from "components/pill.html" import pill %}
 
@@ -83,10 +84,10 @@
               ) }}
               <ul>
               {% if month.free %}
-                <li class="tabular-numbers">{{ "{:,}".format(month.free) }} free text messages</li>
+                <li class="tabular-numbers">{{ "{:,}".format(month.free) }} free {{ message_count_label(month.free, 'sms', '') }}</li>
               {% endif %}
               {% if month.paid %}
-                <li class="tabular-numbers">{{ "{:,}".format(month.paid) }} text messages at
+                <li class="tabular-numbers">{{ "{:,}".format(month.paid) }} {{ message_count_label(month.free, 'sms', '') }}at
                 {{- ' {:.2f}p'.format(sms_rate * 100) }}</li>
               {% endif %}
               {% if not (month.free or month.paid) %}
