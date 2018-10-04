@@ -2035,7 +2035,7 @@ gwynedd.gov.uk:
 hackney.gov.uk:
   owner: Hackney London Borough Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 hailsham-tc.gov.uk:
   owner: Hailsham Town Council
   crown: false
