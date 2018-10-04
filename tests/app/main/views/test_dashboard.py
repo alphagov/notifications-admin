@@ -808,8 +808,35 @@ def test_usage_page_with_letters(
     assert '140 free text messages' in table
     assert '£20.30' in table
     assert '1,230 text messages at 1.65p' in table
-    assert '10 letters at 31p' in table
-    assert '5 letters at 33p' in table
+    assert '10 second class letters at 31p' in normalize_spaces(table)
+    assert '5 first class letters at 33p' in normalize_spaces(table)
+
+
+@freeze_time("2012-04-30 12:12:12")
+def test_usage_page_displays_letters_ordered_by_postage(
+    mocker,
+    logged_in_client,
+    service_one,
+    mock_get_usage,
+    mock_get_free_sms_fragment_limit
+):
+    billable_units_resp = [
+        {'month': 'April', 'notification_type': 'letter', 'rate': 0.5, 'billing_units': 1, 'postage': 'second'},
+        {'month': 'April', 'notification_type': 'letter', 'rate': 0.3, 'billing_units': 3, 'postage': 'second'},
+        {'month': 'April', 'notification_type': 'letter', 'rate': 0.5, 'billing_units': 1, 'postage': 'first'},
+    ]
+    mocker.patch('app.billing_api_client.get_billable_units_ft', return_value=billable_units_resp)
+    service_one['permissions'].append('letter')
+    response = logged_in_client.get(url_for('main.usage', service_id=SERVICE_ONE_ID))
+
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    row_for_april = page.find('table').find('tr', class_='table-row')
+    postage_details = row_for_april.find_all('li', class_='tabular-numbers')
+
+    assert len(postage_details) == 3
+    assert normalize_spaces(postage_details[0].text) == '1 first class letter at 50p'
+    assert normalize_spaces(postage_details[1].text) == '3 second class letters at 30p'
+    assert normalize_spaces(postage_details[2].text) == '1 second class letter at 50p'
 
 
 def test_usage_page_with_year_argument(

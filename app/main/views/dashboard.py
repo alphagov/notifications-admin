@@ -418,8 +418,8 @@ def get_months_for_year(start, end, year):
 
 def get_sum_billing_units(billing_units, month=None):
     if month:
-        return sum(b['billing_units'] * b.get('rate_multiplier', 1) for b in billing_units if b['month'] == month)
-    return sum(b['billing_units'] * b.get('rate_multiplier', 1) for b in billing_units)
+        return sum(b['billing_units'] for b in billing_units if b['month'] == month)
+    return sum(b['billing_units'] for b in billing_units)
 
 
 def get_free_paid_breakdown_for_billable_units(year, free_sms_fragment_limit, billing_units):
@@ -435,8 +435,12 @@ def get_free_paid_breakdown_for_billable_units(year, free_sms_fragment_limit, bi
             free_sms_fragment_limit, cumulative, previous_cumulative,
             [billing_month for billing_month in sms_units if billing_month['month'] == month]
         )
-        letter_billing = [(x['billing_units'], x['rate'], (x['billing_units'] * x['rate']))
+        letter_billing = [(x['billing_units'], x['rate'], (x['billing_units'] * x['rate']), x['postage'])
                           for x in letter_units if x['month'] == month]
+
+        if letter_billing:
+            letter_billing.sort(key=lambda x: (x[3], x[1]))
+
         letter_total = 0
         for x in letter_billing:
             letter_total += x[2]

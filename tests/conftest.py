@@ -2278,16 +2278,11 @@ def mock_get_template_statistics_for_template(mocker, service_one):
 def mock_get_usage(mocker, service_one, fake_uuid):
     def _get_usage(service_id, year=None):
         return [
-            {"international": False, "rate": 0.00, "notification_type": "email",
-             "rate_multiplier": None, "billing_units": 1000},
-            {"international": False, "rate": 0.0165, "rate_multiplier": 1,
-             "notification_type": "sms", "billing_units": 251500},
-            {"international": True, "rate": 0.0165, "rate_multiplier": 1,
-             "notification_type": "sms", "billing_units": 300},
-            {"international": True, "rate": 0.0165, "rate_multiplier": 2,
-             "notification_type": "sms", "billing_units": 150},
-            {"international": True, "rate": 0.0165, "rate_multiplier": 3,
-             "notification_type": "sms", "billing_units": 30},
+            {"notification_type": "email", "billing_units": 1000, "rate": 0.00, "letter_total": 0},
+            {"notification_type": "sms", "billing_units": 251500, "rate": 0.0165, "letter_total": 0},
+            {"notification_type": "sms", "billing_units": 300, "rate": 0.0165, "letter_total": 0},
+            {"notification_type": "sms", "billing_units": 300, "rate": 0.0165, "letter_total": 0},
+            {"notification_type": "sms", "billing_units": 90, "rate": 0.0165, "letter_total": 0}
         ]
 
     return mocker.patch(
@@ -2300,99 +2295,87 @@ def mock_get_billable_units(mocker):
         return [
             {
                 'month': 'April',
-                'international': False,
-                'rate_multiplier': 1,
                 'notification_type': 'sms',
                 'rate': 0.0165,
-                'billing_units': 249500
+                'billing_units': 249500,
+                'postage': 'none',
             },
             {
                 'month': 'April',
-                'international': True,
-                'rate_multiplier': 1,
                 'notification_type': 'sms',
                 'rate': 0.0165,
-                'billing_units': 100
+                'billing_units': 100,
+                'postage': 'none',
             },
             {
                 'month': 'April',
-                'international': True,
-                'rate_multiplier': 2,
                 'notification_type': 'sms',
                 'rate': 0.0165,
-                'billing_units': 100
+                'billing_units': 200,
+                'postage': 'none',
             },
             {
                 'month': 'April',
-                'international': True,
-                'rate_multiplier': 3,
                 'notification_type': 'sms',
                 'rate': 0.0165,
-                'billing_units': 20
+                'billing_units': 60,
+                'postage': 'none',
             },
             {
                 'month': 'March',
-                'international': False,
-                'rate_multiplier': 1,
                 'notification_type': 'sms',
                 'rate': 0.0165,
-                'billing_units': 1000
+                'billing_units': 1000,
+                'postage': 'none',
             },
             {
                 'month': 'March',
-                'international': True,
-                'rate_multiplier': 1,
                 'notification_type': 'sms',
                 'rate': 0.0165,
-                'billing_units': 100
+                'billing_units': 100,
+                'postage': 'none',
             },
             {
                 'month': 'March',
-                'international': True,
-                'rate_multiplier': 2,
                 'notification_type': 'sms',
                 'rate': 0.0165,
-                'billing_units': 50
+                'billing_units': 100,
+                'postage': 'none',
             },
             {
                 'month': 'March',
-                'international': True,
-                'rate_multiplier': 3,
                 'notification_type': 'sms',
                 'rate': 0.0165,
-                'billing_units': 10
+                'billing_units': 30,
+                'postage': 'none',
             },
             {
                 'month': 'February',
-                'international': False,
-                'rate_multiplier': 1,
                 'notification_type': 'sms',
                 'rate': 0.0165,
-                'billing_units': 1000
+                'billing_units': 1000,
+                'postage': 'none',
             },
             {
                 'month': 'February',
-                'international': True,
-                'rate_multiplier': 1,
                 'notification_type': 'sms',
                 'rate': 0.0165,
-                'billing_units': 100
+                'billing_units': 100,
+                'postage': 'none',
             },
             {
                 'month': 'February',
-                'international': False,
-                'rate_multiplier': 1,
                 'notification_type': 'letter',
                 'rate': 0.31,
-                'billing_units': 10
+                'billing_units': 10,
+                'postage': 'second',
             },
             {
                 'month': 'February',
-                'international': False,
-                'rate_multiplier': 1,
                 'notification_type': 'letter',
                 'rate': 0.33,
-                'billing_units': 5
+                'billing_units': 5,
+                'postage': 'first',
             }
         ]
 
@@ -2405,12 +2388,12 @@ def mock_get_future_usage(mocker, service_one, fake_uuid):
     def _get_usage(service_id, year=None):
         return [
             {
-                'notification_type': 'sms', 'international': False,
-                'credits': 0, 'rate_multiplier': 1, 'rate': 0.0158, 'billing_units': 0
+                'notification_type': 'sms', 'billing_units': 0,
+                'rate': 0.0158, 'letter_total': 0
             },
             {
-                'notification_type': 'email', 'international': False,
-                'credits': 0, 'rate_multiplier': 1, 'rate': 0, 'billing_units': 0
+                'notification_type': 'email', 'billing_units': 0,
+                'rate': 0.0, 'letter_total': 0
             }
         ]
 
