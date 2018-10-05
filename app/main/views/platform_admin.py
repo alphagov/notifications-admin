@@ -5,9 +5,7 @@ from datetime import datetime
 from flask import abort, flash, redirect, render_template, request, url_for
 from flask_login import login_required
 from notifications_python_client.errors import HTTPError
-from notifications_utils.clients.antivirus.antivirus_client import (
-    AntivirusError,
-)
+from requests import RequestException
 
 from app import (
     antivirus_client,
@@ -254,24 +252,26 @@ def platform_admin_letter_validation_preview():
 
     if form.validate_on_submit():
         pdf_file = form.file.data
-
-        try:
-            virus_free = antivirus_client.scan(pdf_file)
-        except AntivirusError:
-            flash("Antivirus API error")
-            abort(503)
+        virus_free = antivirus_client.scan(pdf_file)
 
         if not virus_free:
-            flash("Document didn't pass the virus scan")
-            abort(400)
+            return render_template(
+                'views/platform-admin/letter-validation-preview.html',
+                form=form, message="Document didn't pass the virus scan", pages=pages, result=result
+            ), 400
 
         try:
             response = validate_letter(pdf_file)
+            response.raise_for_status()
             if response.status_code == 200:
                 pages, message, result = response.json()["pages"], response.json()["message"], response.json()["result"]
-        except HTTPError as error:
-            if error.status_code == 400:
-                flash("Something was wrong with the file you tried to upload. Please upload a valid PDF file.")
+        except RequestException as error:
+            if error.response.status_code == 400:
+                message = "Something was wrong with the file you tried to upload. Please upload a valid PDF file."
+                return render_template(
+                    'views/platform-admin/letter-validation-preview.html',
+                    form=form, message=message, pages=pages, result=result
+                ), 400
             else:
                 raise error
 
