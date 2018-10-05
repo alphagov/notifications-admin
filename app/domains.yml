@@ -847,7 +847,7 @@ Brierfield.gov.uk:
 brighton-hove.gov.uk:
   owner: Brighton & Hove City Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 bristol-city.gov.uk:
   owner: Bristol City Council
   crown: false
