@@ -89,25 +89,25 @@
     </details>
 
     <h2 class="heading-medium" id="letters">Letters</h2>
-    <p>The cost of sending a letter depends on how many sheets of paper you need.</p>
+    <p>The cost of sending a letter depends on how many sheets of paper you need and the class of postage.</p>
     <div class="bottom-gutter-3-2">
       {% call mapping_table(
         caption='Letter pricing',
-        field_headings=['', 'Current price', 'Price from 1 October 2018'],
+        field_headings=['', 'Second class', 'First class'],
         field_headings_visible=True,
         caption_visible=False
       ) %}
-        {% for sheets, current, future in [
-          ('1 sheet', '30', '30'),
-          ('2 sheets', '33', '35'),
-          ('3 sheets', '36', '40'),
-          ('4 sheets', '39', '45'),
-          ('5 sheets', '42', '50'),
+        {% for sheets, second, first in [
+          ('1 sheet', '30', '56'),
+          ('2 sheets', '35', '61'),
+          ('3 sheets', '40', '66'),
+          ('4 sheets', '45', '71'),
+          ('5 sheets', '50', '76'),
         ] %}
           {% call row() %}
             {% call row_heading() %} {{ sheets }} (double-sided) {% endcall %}
-            {{ text_field(current + 'p + VAT') }}
-            {{ text_field(future + 'p + VAT') }}
+            {{ text_field(second + 'p + VAT') }}
+            {{ text_field(first + 'p + VAT') }}
           {% endcall %}
         {% endfor %}
       {% endcall %}
@@ -117,7 +117,7 @@
       <li>paper</li>
       <li>double-sided colour printing</li>
       <li>envelopes</li>
-      <li>2nd Class postage</li>
+      <li>postage</li>
     </ul>
 
     <h2 class="heading-medium" id="paying">How to pay</h2>
