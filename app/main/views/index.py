@@ -108,7 +108,8 @@ def email_template():
         colour = email_branding['colour']
         brand_name = email_branding['text']
         brand_colour = colour
-        brand_logo = 'https://{}/{}'.format(get_cdn_domain(), email_branding['logo'])
+        brand_logo = ('https://{}/{}'.format(get_cdn_domain(), email_branding['logo'])
+                      if email_branding['logo'] else None)
         govuk_banner = branding_type in ['govuk', 'both']
         brand_banner = branding_type == 'org_banner'
 
