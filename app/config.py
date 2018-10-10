@@ -28,6 +28,10 @@ class Config(object):
     NOTIFY_LOG_PATH = os.getenv('NOTIFY_LOG_PATH')
 
     ADMIN_CLIENT_USER_NAME = 'notify-admin'
+
+    ANTIVIRUS_API_HOST = os.environ.get('ANTIVIRUS_API_HOST')
+    ANTIVIRUS_API_KEY = os.environ.get('ANTIVIRUS_API_KEY')
+
     ASSETS_DEBUG = False
     AWS_REGION = 'eu-west-1'
     DEFAULT_SERVICE_LIMIT = 50
@@ -85,6 +89,8 @@ class Development(Config):
     API_HOST_NAME = 'http://localhost:6011'
     DANGEROUS_SALT = 'dev-notify-salt'
     SECRET_KEY = 'dev-notify-secret-key'
+    ANTIVIRUS_API_HOST = 'http://localhost:6016'
+    ANTIVIRUS_API_KEY = 'test-key'
 
 
 class Test(Development):
@@ -98,6 +104,8 @@ class Test(Development):
     NOTIFY_ENVIRONMENT = 'test'
     API_HOST_NAME = 'http://you-forgot-to-mock-an-api-call-to'
     TEMPLATE_PREVIEW_API_HOST = 'http://localhost:9999'
+    ANTIVIRUS_API_HOST = 'https://test-antivirus'
+    ANTIVIRUS_API_KEY = 'test-antivirus-secret'
 
 
 class Preview(Config):

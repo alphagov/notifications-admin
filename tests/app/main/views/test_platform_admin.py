@@ -5,8 +5,9 @@ from functools import partial
 from unittest.mock import ANY
 
 import pytest
+import requests_mock
 from bs4 import BeautifulSoup
-from flask import url_for
+from flask import current_app, url_for
 from freezegun import freeze_time
 
 from app.main.views.platform_admin import (
@@ -758,3 +759,102 @@ def test_platform_admin_submit_empty_returned_letters(mocker, client, platform_a
 
     assert response.status_code == 200
     assert "Can’t be empty" in response.get_data(as_text=True)
+
+
+def test_letter_validation_preview_renders_correctly(mocker, client, platform_admin_user):
+    mock_get_user(mocker, user=platform_admin_user)
+    client.login(platform_admin_user)
+    response = client.get(url_for('main.platform_admin_letter_validation_preview'))
+    assert response.status_code == 200
+
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert page.find('h1').text.strip() == "Letter Validation Preview"
+    assert page.find_all('input', class_='file-upload-field')
+
+
+@pytest.mark.parametrize("result,expected_class", [(True, 'banner-with-tick'), (False, "banner-dangerous")])
+def test_letter_validation_preview_calls_template_preview_when_data_correct_and_displays_correct_message(
+    mocker, client, platform_admin_user, result, expected_class
+):
+    mock_get_user(mocker, user=platform_admin_user)
+    client.login(platform_admin_user)
+    endpoint = '{}/precompiled/validate?include_preview=true'.format(current_app.config['TEMPLATE_PREVIEW_API_HOST'])
+    mocker.patch('app.main.views.platform_admin.antivirus_client.scan', return_value=True)
+
+    with requests_mock.mock() as rmock:
+        rmock.request(
+            "POST",
+            endpoint,
+            json={"pages": [], "message": "bazinga!", "result": result},
+            status_code=200
+        )
+        with open('tests/test_pdf_files/multi_page_pdf.pdf', 'rb') as file:
+            response = client.post(
+                url_for('main.platform_admin_letter_validation_preview'),
+                data={"file": file},
+                content_type='multipart/form-data'
+            )
+        assert response.status_code == 200
+        assert rmock.called
+        assert rmock.request_history[0].url == endpoint
+
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert page.find('div', class_=expected_class).text.strip() == "bazinga!"
+
+
+def test_letter_validation_preview_doesnt_call_template_preview_when_no_file(mocker, client, platform_admin_user):
+    mock_get_user(mocker, user=platform_admin_user)
+    client.login(platform_admin_user)
+    antivirus_scan = mocker.patch('app.main.views.platform_admin.antivirus_client.scan')
+    validate_letter = mocker.patch('app.main.views.platform_admin.validate_letter')
+    response = client.post(
+        url_for('main.platform_admin_letter_validation_preview'),
+        data={"file": ""},
+        content_type='multipart/form-data'
+    )
+    assert response.status_code == 200
+    antivirus_scan.assert_not_called()
+    validate_letter.assert_not_called()
+
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert page.find('span', class_='error-message').text.strip() == "You need to upload a file to submit"
+
+
+def test_letter_validation_preview_doesnt_call_template_preview_when_file_not_pdf(mocker, client, platform_admin_user):
+    mock_get_user(mocker, user=platform_admin_user)
+    client.login(platform_admin_user)
+    antivirus_scan = mocker.patch('app.main.views.platform_admin.antivirus_client.scan')
+    validate_letter = mocker.patch('app.main.views.platform_admin.validate_letter')
+    with open('tests/non_spreadsheet_files/actually_a_png.csv', 'rb') as file:
+        response = client.post(
+            url_for('main.platform_admin_letter_validation_preview'),
+            data={"file": file},
+            content_type='multipart/form-data'
+        )
+    assert response.status_code == 200
+    antivirus_scan.assert_not_called()
+    validate_letter.assert_not_called()
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert page.find('span', class_='error-message').text.strip() == "PDF documents only!"
+
+
+def test_letter_validation_preview_doesnt_call_template_preview_when_file_doesnt_pass_virus_scan(
+    mocker, client, platform_admin_user
+):
+    mock_get_user(mocker, user=platform_admin_user)
+    client.login(platform_admin_user)
+    antivirus_scan = mocker.patch('app.main.views.platform_admin.antivirus_client.scan', return_value=False)
+    validate_letter = mocker.patch('app.main.views.platform_admin.validate_letter')
+
+    with open('tests/test_pdf_files/multi_page_pdf.pdf', 'rb') as file:
+        response = client.post(
+            url_for('main.platform_admin_letter_validation_preview'),
+            data={"file": file},
+            content_type='multipart/form-data'
+        )
+    assert response.status_code == 400
+    assert antivirus_scan.called is True
+    validate_letter.assert_not_called()
+
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert page.find('div', class_='banner-dangerous').text.strip() == "Document didn't pass the virus scan"

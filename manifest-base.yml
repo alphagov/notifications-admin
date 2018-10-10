@@ -29,6 +29,9 @@ env:
   AWS_ACCESS_KEY_ID: null
   AWS_SECRET_ACCESS_KEY: null
 
+  ANTIVIRUS_API_HOST: null
+  ANTIVIRUS_API_KEY: null
+
   STATSD_PREFIX: null
 
   ZENDESK_API_KEY: null

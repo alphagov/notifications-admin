@@ -43,3 +43,11 @@ def get_page_count_for_letter(template, values=None):
     page_count = json.loads(page_count.decode('utf-8'))['count']
 
     return page_count
+
+
+def validate_letter(pdf_file):
+    return requests.post(
+        '{}/precompiled/validate?include_preview=true'.format(current_app.config['TEMPLATE_PREVIEW_API_HOST']),
+        data=pdf_file,
+        headers={'Authorization': 'Token {}'.format(current_app.config['TEMPLATE_PREVIEW_API_KEY'])}
+    )

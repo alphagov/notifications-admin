@@ -5,19 +5,22 @@ from datetime import datetime
 from flask import abort, flash, redirect, render_template, request, url_for
 from flask_login import login_required
 from notifications_python_client.errors import HTTPError
+from requests import RequestException
 
 from app import (
+    antivirus_client,
     complaint_api_client,
     letter_jobs_client,
     platform_stats_api_client,
     service_api_client,
 )
 from app.main import main
-from app.main.forms import DateFilterForm, ReturnedLettersForm
+from app.main.forms import DateFilterForm, PDFUploadForm, ReturnedLettersForm
 from app.statistics_utils import (
     get_formatted_percentage,
     get_formatted_percentage_two_dp,
 )
+from app.template_previews import validate_letter
 from app.utils import (
     generate_next_dict,
     generate_previous_dict,
@@ -237,6 +240,44 @@ def platform_admin_returned_letters():
     return render_template(
         'views/platform-admin/returned-letters.html',
         form=form,
+    )
+
+
+@main.route("/platform-admin/letter-validation-preview", methods=["GET", "POST"])
+@login_required
+@user_is_platform_admin
+def platform_admin_letter_validation_preview():
+    message, pages, result = None, [], None
+    form = PDFUploadForm()
+
+    if form.validate_on_submit():
+        pdf_file = form.file.data
+        virus_free = antivirus_client.scan(pdf_file)
+
+        if not virus_free:
+            return render_template(
+                'views/platform-admin/letter-validation-preview.html',
+                form=form, message="Document didn't pass the virus scan", pages=pages, result=result
+            ), 400
+
+        try:
+            response = validate_letter(pdf_file)
+            response.raise_for_status()
+            if response.status_code == 200:
+                pages, message, result = response.json()["pages"], response.json()["message"], response.json()["result"]
+        except RequestException as error:
+            if error.response.status_code == 400:
+                message = "Something was wrong with the file you tried to upload. Please upload a valid PDF file."
+                return render_template(
+                    'views/platform-admin/letter-validation-preview.html',
+                    form=form, message=message, pages=pages, result=result
+                ), 400
+            else:
+                raise error
+
+    return render_template(
+        'views/platform-admin/letter-validation-preview.html',
+        form=form, message=message, pages=pages, result=result
     )
 
 

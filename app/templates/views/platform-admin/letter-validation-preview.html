@@ -1,0 +1,38 @@
+{% extends "views/platform-admin/_base_template.html" %}
+{% from "components/banner.html" import banner %}
+{% from "components/textbox.html" import textbox %}
+{% from "components/file-upload.html" import file_upload %}
+{% from "components/page-footer.html" import page_footer %}
+
+{% block per_page_title %}
+  {{ page_title|capitalize }}
+{% endblock %}
+
+{% block platform_admin_content %}
+
+<div class="grid-row">
+  <div class="column-whole">
+    <h1 class="heading-large">Letter Validation Preview</h1>
+
+    {{ file_upload(
+        form.file,
+        action = url_for('main.platform_admin_letter_validation_preview'),
+        button_text='Upload a PDF document',
+    )}}
+  </div>
+  <div class="column-whole template-container">
+    {% if result %}
+      {{ banner(message, with_tick=True) }}
+    {% elif message %}
+      {{ banner(message, 'dangerous')}}
+    {% endif %}
+
+    {% for page in pages %}
+    <div class="letter">
+      <img src="data:image/png;base64,{{ page }}">
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+{% endblock %}
