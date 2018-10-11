@@ -143,6 +143,9 @@
 
 
 {% macro notification_status_field(notification) %}
+
+  {% set displayed_on_single_line = notification.status in ['created', 'pending', 'sending', 'delivered'] %}
+
   {% if not notification %}
     {% call field(align='right') %}{% endcall %}
   {% else %}
@@ -150,7 +153,7 @@
       status=notification.status|format_notification_status_as_field_status(notification.notification_type),
       align='right'
     ) %}
-      {% if notification.status in ['created', 'sending', 'delivered'] %}<span class="align-with-message-body">{% endif %}
+      {% if displayed_on_single_line %}<span class="align-with-message-body">{% endif %}
       {% if notification.status|format_notification_status_as_url %}
         <a href="{{ notification.status|format_notification_status_as_url }}">
       {% endif %}
@@ -172,7 +175,7 @@
           ) }}
         {% endif %}
       </span>
-      {% if notification.status in ['created', 'sending', 'delivered'] %}</span>{% endif %}
+      {% if displayed_on_single_line %}</span>{% endif %}
     {% endcall %}
   {% endif %}
 {% endmacro %}
