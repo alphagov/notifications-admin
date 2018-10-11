@@ -49,7 +49,7 @@ foodstandards.gov.uk:
 gchq.gov.uk:
   owner: Government Communications Headquarters
   crown: true
-  agreement_signed: true    
+  agreement_signed: true
 gla.gsi.gov.uk: gla.gov.uk
 gla.gov.uk:
   owner: The Gangmasters and Labour Abuse Authority
@@ -75,8 +75,8 @@ digital.nhs.uk:
   agreement_signed: true
 ofgem.gov.uk:
   owner: Ofgem
-  crown: true  
-  agreement_signed: true  
+  crown: true
+  agreement_signed: true
 ofsted.gsi.gov.uk: ofsted.gov.uk
 ofsted.gov.uk:
   owner: Ofsted
@@ -213,8 +213,8 @@ vca.gov.uk:
 vca.gsi.gov.uk: vca.gov.uk
 olev.gov.uk: dft.gov.uk
 olev.gsi.gov.uk: olev.gov.uk
-  
-# Crown bodies who haven’t signed the MOU  
+
+# Crown bodies who haven’t signed the MOU
 acas.org.uk:
   owner: Advisory, Conciliation and Arbitration Service
   crown: true
@@ -222,7 +222,7 @@ acas.org.uk:
 charitycommission.gsi.gov.uk:
 charitycommission.gov.uk:
   owner: Charity Commission
-  crown: true  
+  crown: true
   agreement_signed: false
 cps.gov.uk:
   owner: The Crown Prosecution Service
@@ -233,7 +233,7 @@ culture.gov.uk:
   crown: true
   agreement_signed: true
 culture.gsi.gov.uk: culture.gov.uk
-dexeu.gov.uk:  
+dexeu.gov.uk:
   owner: Department for Exiting the European Union
   crown: true
   agreement_signed: false
@@ -266,13 +266,13 @@ ukexportfinance.gov.uk:
   owner: UK Export Finance
   crown: true
   agreement_signed: false
-  
+
 # Other non-crown
 bl.uk:
   owner: British Library
   crown: false
   agreement_signed: false
-  
+
 # Local Government
 aberdeencityandshire-sdpa.gov.uk:
   owner: Aberdeen City Council
@@ -537,7 +537,7 @@ BarnardCastleTownCouncil.gov.uk:
 barnet.gov.uk:
   owner: Barnet London Borough Council
   crown: false
-  agreement_signed: false  
+  agreement_signed: false
 barnoldswicktowncouncil.gov.uk:
   owner: Barnoldswick Town Council
   crown: false
@@ -550,10 +550,7 @@ barrowbc.gov.uk:
   owner: Barrow in Furness Borough Council
   crown: false
   agreement_signed: false
-barrytowncouncil.gov.uk:
-  owner: Vale of Glamorgan Council
-  crown: false
-  agreement_signed: true
+barrytowncouncil.gov.uk: valeofglamorgan.gov.uk
 basildon.gov.uk:
   owner: Basildon District Council
   crown: false
@@ -880,10 +877,7 @@ brockenhurst.gov.uk:
   owner: New Forest District Council
   crown: false
   agreement_signed: false
-bromorgannwg.gov.uk:
-  owner: Vale of Glamorgan Council
-  crown: false
-  agreement_signed: false
+bromorgannwg.gov.uk: valeofglamorgan.gov.uk
 bromsgroveandredditch.gov.uk:
   owner: Bromsgrove District Council
   crown: false
@@ -1430,10 +1424,7 @@ cyngortrefrhuthun.gov.uk:
   owner: Ruthin Town Council
   crown: false
   agreement_signed: false
-cyngortrefybarri.gov.uk:
-  owner: Vale of Glamorgan Council
-  crown: false
-  agreement_signed: false
+cyngortrefybarri.gov.uk: valeofglamorgan.gov.uk
 dab-vjb.gov.uk:
   owner: West Dunbartonshire Council
   crown: false
@@ -1774,7 +1765,7 @@ erewash.gov.uk:
 esfrs.org.uk:
   owner: East Sussex Fire and Rescue Service
   crown: false
-  agreement_signed: true  
+  agreement_signed: true
 essexcc.gov.uk:
   owner: Essex County Council
   crown: false
@@ -3916,10 +3907,7 @@ sevenoakstown.gov.uk:
   owner: Sevenoaks Town Council
   crown: false
   agreement_signed: false
-sewta.gov.uk:
-  owner: Vale of Glamorgan Council
-  crown: false
-  agreement_signed: false
+sewta.gov.uk: valeofglamorgan.gov.uk
 shaftesbury-tc.gov.uk:
   owner: Shaftesbury Town Council
   crown: false
@@ -4737,7 +4725,7 @@ uttlesford.gov.uk:
 valeofglamorgan.gov.uk:
   owner: Vale of Glamorgan Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 verwood.gov.uk:
   owner: Verwood Town Council
   crown: false
