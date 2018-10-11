@@ -76,6 +76,7 @@ def view_notification(service_id, notification_id):
     return render_template(
         'views/notifications/notification.html',
         finished=(notification['status'] in (DELIVERED_STATUSES + FAILURE_STATUSES)),
+        notification_status=notification['status'],
         uploaded_file_name='Report',
         template=template,
         job=job,
@@ -89,6 +90,7 @@ def view_notification(service_id, notification_id):
         partials=get_single_notification_partials(notification),
         created_by=notification.get('created_by'),
         created_at=notification['created_at'],
+        updated_at=notification['updated_at'],
         help=get_help_argument(),
         estimated_letter_delivery_date=get_letter_timings(
             notification['created_at'],
