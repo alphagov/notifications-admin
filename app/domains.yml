@@ -553,7 +553,7 @@ barrowbc.gov.uk:
 barrytowncouncil.gov.uk:
   owner: Vale of Glamorgan Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 basildon.gov.uk:
   owner: Basildon District Council
   crown: false
