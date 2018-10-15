@@ -656,13 +656,17 @@ def check_messages(service_id, template_id, upload_id, row_index=2):
 @login_required
 @user_has_permissions('send_messages')
 def check_messages_preview(service_id, template_id, upload_id, filetype, row_index=2):
-    if filetype not in ('pdf', 'png'):
+    if filetype == 'pdf':
+        page = None
+    elif filetype == 'png':
+        page = request.args.get('page', 1)
+    else:
         abort(404)
 
     template = _check_messages(
         service_id, template_id, upload_id, row_index, letters_as_pdf=True
     )['template']
-    return TemplatePreview.from_utils_template(template, filetype, page=request.args.get('page', 1))
+    return TemplatePreview.from_utils_template(template, filetype, page=page)
 
 
 @main.route("/services/<service_id>/start-job/<upload_id>", methods=['POST'])
