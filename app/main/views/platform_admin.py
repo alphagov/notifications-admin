@@ -266,7 +266,7 @@ def platform_admin_letter_validation_preview():
             if response.status_code == 200:
                 pages, message, result = response.json()["pages"], response.json()["message"], response.json()["result"]
         except RequestException as error:
-            if error.response.status_code == 400:
+            if error.response and error.response.status_code == 400:
                 message = "Something was wrong with the file you tried to upload. Please upload a valid PDF file."
                 return render_template(
                     'views/platform-admin/letter-validation-preview.html',

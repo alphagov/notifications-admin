@@ -2060,19 +2060,43 @@ def test_can_start_letters_job(
     assert 'just_sent=yes' in response.location
 
 
-@pytest.mark.parametrize('filetype', ['pdf', 'png'])
-@pytest.mark.parametrize('extra_args, expected_values', [
+@pytest.mark.parametrize('filetype, extra_args, expected_values, expected_page', [
     (
+        'png',
         {},
         {'postcode': 'abc123', 'addressline1': '123 street'},
+        1
     ),
     (
+        'pdf',
+        {},
+        {'postcode': 'abc123', 'addressline1': '123 street'},
+        None
+    ),
+    (
+        'png',
         {'row_index': 2},
         {'postcode': 'abc123', 'addressline1': '123 street'},
+        1
     ),
     (
+        'png',
         {'row_index': 3},
         {'postcode': 'cba321', 'addressline1': '321 avenue'},
+        1
+    ),
+    (
+        'png',
+        {'row_index': 3, 'page': 2},
+        {'postcode': 'cba321', 'addressline1': '321 avenue'},
+        '2'
+    ),
+    (
+        # pdf expected page is always None
+        'pdf',
+        {'row_index': 3, 'page': 2},
+        {'postcode': 'cba321', 'addressline1': '321 avenue'},
+        None
     ),
 ])
 def test_should_show_preview_letter_message(
@@ -2087,6 +2111,7 @@ def test_should_show_preview_letter_message(
     mocker,
     extra_args,
     expected_values,
+    expected_page
 ):
     service_one['permissions'] = ['letter']
     mocker.patch('app.service_api_client.get_service', return_value={"data": service_one})
@@ -2135,6 +2160,7 @@ def test_should_show_preview_letter_message(
     assert type(mocked_preview.call_args[0][0]) == LetterPreviewTemplate
     assert mocked_preview.call_args[0][1] == filetype
     assert mocked_preview.call_args[0][0].values == expected_values
+    assert mocked_preview.call_args[1] == {'page': expected_page}
 
 
 def test_dont_show_preview_letter_templates_for_bad_filetype(
