@@ -2795,7 +2795,7 @@ maiden.gov.uk:
 maidstone.gov.uk:
   owner: Maidstone Borough Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 maldon.gov.uk:
   owner: Maldon District Council
   crown: false
