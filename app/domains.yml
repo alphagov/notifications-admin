@@ -213,13 +213,13 @@ vca.gov.uk:
 vca.gsi.gov.uk: vca.gov.uk
 olev.gov.uk: dft.gov.uk
 olev.gsi.gov.uk: olev.gov.uk
-
-# Crown bodies who haven’t signed the MOU
 apha.gsi.gov.uk: apha.gov.uk
 apha.gov.uk:
   owner: Animal & Plant Health Agency
   crown: true
-  agreement_signed: false
+  agreement_signed: true
+
+# Crown bodies who haven’t signed the MOU
 acas.org.uk:
   owner: Advisory, Conciliation and Arbitration Service
   crown: true
