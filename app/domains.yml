@@ -3755,7 +3755,7 @@ rushdentowncouncil.gov.uk:
 rushmoor.gov.uk:
   owner: Rushmoor Borough Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 ruthintowncouncil.gov.uk:
   owner: Ruthin Town Council
   crown: false
