@@ -1,7 +1,12 @@
 from bs4 import BeautifulSoup
 from flask import url_for
 
-from tests.conftest import SERVICE_ONE_ID, normalize_spaces, set_config
+from tests.conftest import (
+    SERVICE_ONE_ID,
+    normalize_spaces,
+    set_config,
+    url_for_endpoint_with_token,
+)
 
 
 def test_should_render_two_factor_page(
@@ -206,7 +211,7 @@ def test_valid_two_factor_email_link_logs_in_user(
     mocker.patch('app.user_api_client.check_verify_code', return_value=(True, ''))
 
     response = client.get(
-        url_for('main.two_factor_email', token=valid_token),
+        url_for_endpoint_with_token('main.two_factor_email', token=valid_token),
     )
 
     assert response.status_code == 302
@@ -223,7 +228,7 @@ def test_two_factor_email_link_has_expired(
 
     with set_config(app_, 'EMAIL_2FA_EXPIRY_SECONDS', -1):
         response = client.get(
-            url_for('main.two_factor_email', token=valid_token),
+            url_for_endpoint_with_token('main.two_factor_email', token=valid_token),
             follow_redirects=True,
         )
 
@@ -262,7 +267,7 @@ def test_two_factor_email_link_is_already_used(
     mocker.patch('app.user_api_client.check_verify_code', return_value=(False, 'Code has expired'))
 
     response = client.get(
-        url_for('main.two_factor_email', token=valid_token),
+        url_for_endpoint_with_token('main.two_factor_email', token=valid_token),
         follow_redirects=True
     )
 
@@ -282,7 +287,7 @@ def test_two_factor_email_link_when_user_is_locked_out(
     mocker.patch('app.user_api_client.check_verify_code', return_value=(False, 'Code not found'))
 
     response = client.get(
-        url_for('main.two_factor_email', token=valid_token),
+        url_for_endpoint_with_token('main.two_factor_email', token=valid_token),
         follow_redirects=True
     )
 
@@ -298,7 +303,7 @@ def test_two_factor_email_link_used_when_user_already_logged_in(
     valid_token
 ):
     response = logged_in_client.get(
-        url_for('main.two_factor_email', token=valid_token)
+        url_for_endpoint_with_token('main.two_factor_email', token=valid_token)
     )
     assert response.status_code == 302
     assert response.location == url_for('main.show_accounts_or_dashboard', _external=True)

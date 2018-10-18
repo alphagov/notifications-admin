@@ -3227,3 +3227,8 @@ def mock_create_event(mocker):
         return
 
     return mocker.patch('app.events_api_client.create_event', side_effect=_add_event)
+
+
+def url_for_endpoint_with_token(endpoint, token):
+    token = token.replace('%2E', '.')
+    return url_for(endpoint, token=token)
