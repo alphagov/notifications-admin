@@ -6,6 +6,7 @@ from flask import url_for
 from notifications_utils.url_safe_token import generate_token
 
 from tests.conftest import api_user_active as create_user
+from tests.conftest import url_for_endpoint_with_token
 
 
 def test_should_show_overview_page(
@@ -104,7 +105,8 @@ def test_should_redirect_to_user_profile_when_user_confirms_email_link(
 
     token = generate_token(payload=json.dumps({'user_id': api_user_active.id, 'email': 'new_email@gov.uk'}),
                            secret=app_.config['SECRET_KEY'], salt=app_.config['DANGEROUS_SALT'])
-    response = logged_in_client.get(url_for('main.user_profile_email_confirm', token=token))
+    response = logged_in_client.get(url_for_endpoint_with_token('main.user_profile_email_confirm',
+                                                                token=token))
 
     assert response.status_code == 302
     assert response.location == url_for('main.user_profile', _external=True)
