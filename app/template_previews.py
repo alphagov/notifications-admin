@@ -12,7 +12,6 @@ class TemplatePreview:
             'template': template,
             'values': values,
             'filename': current_service.letter_logo_filename,
-            'dvla_org_id': current_service.dvla_organisation,
         }
         resp = requests.post(
             '{}/preview.{}{}'.format(

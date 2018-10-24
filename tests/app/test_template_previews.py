@@ -49,9 +49,7 @@ def test_from_database_object_makes_request(
 ):
     resp = Mock(content='a', status_code='b', headers={'c': 'd'})
     request_mock = mocker.patch('app.template_previews.requests.post', return_value=resp)
-    mocker.patch('app.template_previews.current_service',
-                 dvla_organisation='123',
-                 letter_logo_filename='hm-government')
+    mocker.patch('app.template_previews.current_service', letter_logo_filename='hm-government')
     template = mock_get_service_letter_template('123', '456')['data']
 
     ret = partial_call(template=template)
@@ -65,7 +63,6 @@ def test_from_database_object_makes_request(
         'template': template,
         'values': None,
         'filename': 'hm-government',
-        'dvla_org_id': '123',
     }
     headers = {'Authorization': 'Token my-secret-key'}
 
