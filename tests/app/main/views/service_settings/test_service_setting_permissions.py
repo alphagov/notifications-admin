@@ -45,6 +45,9 @@ def get_service_settings_page(
     ({'permissions': []},
         '.service_switch_can_upload_document', {}, 'Allow to upload documents'),
 
+    ({'permissions': ['edit_folders']}, '.service_switch_can_edit_folders', {}, 'Stop editing folders'),
+    ({'permissions': []}, '.service_switch_can_edit_folders', {}, 'Allow to edit folders'),
+
     ({'permissions': ['sms']}, '.service_set_inbound_number', {'set_inbound_sms': True}, 'Allow inbound sms'),
 
     ({'active': True}, '.archive_service', {}, 'Archive service'),
