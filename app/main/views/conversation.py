@@ -4,7 +4,7 @@ from notifications_python_client.errors import HTTPError
 from notifications_utils.recipients import format_phone_number_human_readable
 from notifications_utils.template import SMSPreviewTemplate
 
-from app import notification_api_client, service_api_client
+from app import current_service, notification_api_client, service_api_client
 from app.main import main
 from app.main.forms import SearchTemplatesForm
 from app.utils import user_has_permissions
@@ -44,13 +44,7 @@ def conversation_reply(
     service_id,
     notification_id,
 ):
-
-    templates = [
-        template
-        for template in service_api_client.get_service_templates(service_id)['data']
-        if template['template_type'] == 'sms'
-    ]
-
+    templates = current_service.templates_by_type('sms')
     return render_template(
         'views/templates/choose-reply.html',
         templates=templates,

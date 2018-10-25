@@ -319,25 +319,47 @@ class Service(dict):
         ) > 1
 
     @property
-    def has_templates(self):
+    def templates(self):
+
         from app import service_api_client
-        return service_api_client.count_service_templates(
-            self.id
-        ) > 0
+
+        templates = service_api_client.get_service_templates(self.id)['data']
+
+        return [
+            template for template in templates
+            if template['template_type'] in self.available_template_types
+        ]
+
+    def templates_by_type(self, template_type):
+        return [
+            template for template in self.templates
+            if template_type in {'all', template['template_type']}
+        ]
+
+    @property
+    def available_template_types(self):
+        return [
+            channel for channel in ('email', 'sms', 'letter')
+            if self.has_permission(channel)
+        ]
+
+    @property
+    def has_templates(self):
+        return len(self.templates) > 0
+
+    @property
+    def has_multiple_template_types(self):
+        return len({
+            template['template_type'] for template in self.templates
+        }) > 1
 
     @property
     def has_email_templates(self):
-        from app import service_api_client
-        return service_api_client.count_service_templates(
-            self.id, template_type='email'
-        ) > 0
+        return len(self.templates_by_type('email')) > 0
 
     @property
     def has_sms_templates(self):
-        from app import service_api_client
-        return service_api_client.count_service_templates(
-            self.id, template_type='sms'
-        ) > 0
+        return len(self.templates_by_type('sms')) > 0
 
     @property
     def has_email_reply_to_address(self):

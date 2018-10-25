@@ -551,20 +551,28 @@ def test_should_show_request_to_go_live_checklist(
     expected_reply_to_checklist_item,
 ):
 
-    def _count_templates(service_id, template_type=None):
+    def _templates_by_type(template_type):
         return {
-            'email': count_of_email_templates,
-            'sms': 0,
-        }.get(template_type, count_of_templates)
+            'email': list(range(0, count_of_email_templates)),
+            'sms': [],
+        }.get(template_type)
 
     mock_count_users = mocker.patch(
         'app.main.views.service_settings.user_api_client.get_count_of_users_with_permission',
         return_value=count_of_users_with_manage_service
     )
-    mock_count_templates = mocker.patch(
-        'app.main.views.service_settings.service_api_client.count_service_templates',
-        side_effect=_count_templates
+
+    mock_templates = mocker.patch(
+        'app.notify_client.models.Service.templates',
+        new_callable=PropertyMock,
+        return_value=list(range(0, count_of_templates)),
     )
+
+    mock_templates_by_type = mocker.patch(
+        'app.notify_client.models.Service.templates_by_type',
+        side_effect=_templates_by_type,
+    )
+
     mock_get_reply_to_email_addresses = mocker.patch(
         'app.main.views.service_settings.service_api_client.get_reply_to_email_addresses',
         return_value=reply_to_email_addresses
@@ -587,10 +595,12 @@ def test_should_show_request_to_go_live_checklist(
     )
 
     mock_count_users.assert_called_once_with(SERVICE_ONE_ID, 'manage_service')
-    assert mock_count_templates.call_args_list == [
-        call(SERVICE_ONE_ID),
-        call(SERVICE_ONE_ID, template_type='email'),
-        call(SERVICE_ONE_ID, template_type='sms'),
+    assert mock_templates.call_args_list == [
+        call(),
+    ]
+    assert mock_templates_by_type.call_args_list == [
+        call('email'),
+        call('sms'),
     ]
 
     if count_of_email_templates:
@@ -662,20 +672,26 @@ def test_should_check_for_sms_sender_on_go_live(
 
     service_one['organisation_type'] = organisation_type
 
-    def _count_templates(service_id, template_type=None):
-        return {
+    def _templates_by_type(template_type):
+        return list(range(0, {
             'email': 0,
             'sms': count_of_sms_templates,
-        }.get(template_type, count_of_sms_templates)
+        }.get(template_type, count_of_sms_templates)))
 
     mocker.patch(
         'app.main.views.service_settings.user_api_client.get_count_of_users_with_permission',
         return_value=99,
     )
-    mock_count_templates = mocker.patch(
-        'app.main.views.service_settings.service_api_client.count_service_templates',
-        side_effect=_count_templates,
+    mock_templates = mocker.patch(
+        'app.notify_client.models.Service.templates',
+        new_callable=PropertyMock,
+        side_effect=partial(_templates_by_type, 'all'),
     )
+    mock_templates_by_type = mocker.patch(
+        'app.notify_client.models.Service.templates_by_type',
+        side_effect=_templates_by_type,
+    )
+
     mock_get_sms_senders = mocker.patch(
         'app.main.views.service_settings.service_api_client.get_sms_senders',
         return_value=sms_senders,
@@ -693,10 +709,12 @@ def test_should_check_for_sms_sender_on_go_live(
     checklist_items = page.select('.task-list .task-list-item')
     assert normalize_spaces(checklist_items[2].text) == expected_sms_sender_checklist_item
 
-    assert mock_count_templates.call_args_list == [
-        call(SERVICE_ONE_ID),
-        call(SERVICE_ONE_ID, template_type='email'),
-        call(SERVICE_ONE_ID, template_type='sms'),
+    assert mock_templates.call_args_list == [
+        call(),
+    ]
+    assert mock_templates_by_type.call_args_list == [
+        call('email'),
+        call('sms'),
     ]
 
     mock_get_sms_senders.assert_called_once_with(SERVICE_ONE_ID)
@@ -729,8 +747,9 @@ def test_should_check_for_mou_on_request_to_go_live(
         return_value=0,
     )
     mocker.patch(
-        'app.main.views.service_settings.service_api_client.count_service_templates',
-        return_value=0,
+        'app.notify_client.models.Service.templates',
+        new_callable=PropertyMock,
+        return_value=[],
     )
     mocker.patch(
         'app.main.views.service_settings.service_api_client.get_sms_senders',
