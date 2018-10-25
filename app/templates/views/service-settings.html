@@ -378,6 +378,11 @@
              {{ 'Stop uploading documents' if 'upload_document' in current_service.permissions else 'Allow to upload documents' }}
            </a>
         </li>
+        <li class="bottom-gutter">
+           <a href="{{ url_for('.service_switch_can_edit_folders', service_id=current_service.id) }}" class="button">
+             {{ 'Stop editing folders' if 'edit_folders' in current_service.permissions else 'Allow to edit folders' }}
+           </a>
+        </li>
         {% if current_service.active %}
           <li class="bottom-gutter">
             <a href="{{ url_for('.archive_service', service_id=current_service.id) }}" class="button">
