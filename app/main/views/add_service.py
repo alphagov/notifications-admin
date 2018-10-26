@@ -12,7 +12,7 @@ from app import (
 )
 from app.main import main
 from app.main.forms import CreateServiceForm
-from app.notify_client.models import InvitedUser
+from app.models.user import InvitedUser
 from app.utils import AgreementInfo, email_safe, is_gov_user
 
 

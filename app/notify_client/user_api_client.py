@@ -2,12 +2,12 @@ from itertools import chain
 
 from notifications_python_client.errors import HTTPError
 
-from app.notify_client import NotifyAdminAPIClient, cache
-from app.notify_client.models import (
+from app.models.user import (
     User,
     roles,
     translate_permissions_from_admin_roles_to_db,
 )
+from app.notify_client import NotifyAdminAPIClient, cache
 
 ALLOWED_ATTRIBUTES = {
     'name',

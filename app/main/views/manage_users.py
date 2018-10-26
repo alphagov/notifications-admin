@@ -10,7 +10,7 @@ from app import (
 )
 from app.main import main
 from app.main.forms import InviteUserForm, PermissionsForm, SearchUsersForm
-from app.notify_client.models import permissions
+from app.models.user import permissions
 from app.utils import user_has_permissions
 
 

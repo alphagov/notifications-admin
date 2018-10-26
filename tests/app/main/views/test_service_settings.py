@@ -563,13 +563,13 @@ def test_should_show_request_to_go_live_checklist(
     )
 
     mock_templates = mocker.patch(
-        'app.notify_client.models.Service.templates',
+        'app.models.service.Service.templates',
         new_callable=PropertyMock,
         return_value=list(range(0, count_of_templates)),
     )
 
     mock_templates_by_type = mocker.patch(
-        'app.notify_client.models.Service.templates_by_type',
+        'app.models.service.Service.templates_by_type',
         side_effect=_templates_by_type,
     )
 
@@ -683,12 +683,12 @@ def test_should_check_for_sms_sender_on_go_live(
         return_value=99,
     )
     mock_templates = mocker.patch(
-        'app.notify_client.models.Service.templates',
+        'app.models.service.Service.templates',
         new_callable=PropertyMock,
         side_effect=partial(_templates_by_type, 'all'),
     )
     mock_templates_by_type = mocker.patch(
-        'app.notify_client.models.Service.templates_by_type',
+        'app.models.service.Service.templates_by_type',
         side_effect=_templates_by_type,
     )
 
@@ -747,7 +747,7 @@ def test_should_check_for_mou_on_request_to_go_live(
         return_value=0,
     )
     mocker.patch(
-        'app.notify_client.models.Service.templates',
+        'app.models.service.Service.templates',
         new_callable=PropertyMock,
         return_value=[],
     )
@@ -1022,16 +1022,16 @@ def test_ready_to_go_live(
         'sms_sender_is_govuk',
     }:
         mocker.patch(
-            'app.notify_client.models.Service.{}'.format(prop),
+            'app.models.service.Service.{}'.format(prop),
             new_callable=PropertyMock
         ).return_value = locals()[prop]
 
-    assert app.notify_client.models.Service({
+    assert app.models.service.Service({
         'id': SERVICE_ONE_ID
     }).go_live_checklist_completed_as_yes_no == expected_readyness
 
     assert list(app.main.views.service_settings._get_request_to_go_live_tags(
-        app.notify_client.models.Service({'id': SERVICE_ONE_ID}),
+        app.models.service.Service({'id': SERVICE_ONE_ID}),
         agreement_signed,
     )) == expected_tags
 

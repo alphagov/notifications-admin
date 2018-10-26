@@ -41,7 +41,8 @@ from werkzeug.local import LocalProxy
 from app import proxy_fix
 from app.config import configs
 from app.asset_fingerprinter import asset_fingerprinter
-from app.notify_client.models import Service
+from app.models.service import Service
+from app.models.user import AnonymousUser
 from app.navigation import (
     CaseworkNavigation,
     HeaderNavigation,
@@ -59,7 +60,6 @@ from app.notify_client.user_api_client import user_api_client
 from app.notify_client.events_api_client import events_api_client
 from app.notify_client.provider_client import provider_client
 from app.notify_client.email_branding_client import email_branding_client
-from app.notify_client.models import AnonymousUser
 from app.notify_client.organisations_api_client import organisations_client
 from app.notify_client.org_invite_api_client import org_invite_api_client
 from app.notify_client.letter_jobs_client import letter_jobs_client

@@ -11,7 +11,7 @@ from notifications_python_client.errors import HTTPError
 from notifications_utils.url_safe_token import generate_token
 
 from app import create_app
-from app.notify_client.models import InvitedOrgUser, InvitedUser, User
+from app.models.user import InvitedOrgUser, InvitedUser, User
 
 from . import (
     TestClient,

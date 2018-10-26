@@ -4,8 +4,8 @@ from unittest.mock import patch
 import pytest
 import werkzeug
 
+from app.models.service import Service
 from app.notify_client import NotifyAdminAPIClient
-from app.notify_client.models import Service
 from tests import service_json
 from tests.conftest import api_user_active, platform_admin_user, set_config
 

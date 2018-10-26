@@ -3,7 +3,7 @@ from unittest.mock import call
 import pytest
 
 from app import invite_api_client, service_api_client, user_api_client
-from app.notify_client.models import User
+from app.models.user import User
 from tests import sample_uuid
 from tests.conftest import SERVICE_ONE_ID, api_user_pending
 
@@ -51,7 +51,7 @@ def test_client_returns_count_of_users_with_manage_service(
     )
 
     mocker.patch(
-        'app.notify_client.models._get_service_id_from_view_args',
+        'app.models.user._get_service_id_from_view_args',
         return_value=SERVICE_ONE_ID,
     )
 
@@ -221,7 +221,7 @@ def test_returns_value_from_cache(
         'app.notify_client.RedisClient.set',
     )
     mock_model = mocker.patch(
-        'app.notify_client.models.User.__init__',
+        'app.models.user.User.__init__',
         return_value=None,
     )
 

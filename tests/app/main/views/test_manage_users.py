@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 from flask import url_for
 
 import app
-from app.notify_client.models import InvitedUser
+from app.models.user import InvitedUser
 from app.utils import is_gov_user
 from tests.conftest import (
     SERVICE_ONE_ID,

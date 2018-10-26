@@ -1,7 +1,7 @@
 import pytest
 from flask import url_for
 
-from app.notify_client.models import User
+from app.models.user import User
 from tests import user_json
 
 

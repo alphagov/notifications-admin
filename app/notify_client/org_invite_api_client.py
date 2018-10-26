@@ -1,5 +1,5 @@
+from app.models.user import InvitedOrgUser
 from app.notify_client import NotifyAdminAPIClient, _attach_current_user
-from app.notify_client.models import InvitedOrgUser
 
 
 class OrgInviteApiClient(NotifyAdminAPIClient):
