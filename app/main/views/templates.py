@@ -25,6 +25,7 @@ from app.main.forms import (
     SMSTemplateForm,
 )
 from app.main.views.send import get_example_csv_rows, get_sender_details
+from app.models.service import Service
 from app.template_previews import TemplatePreview, get_page_count_for_letter
 from app.utils import (
     email_or_sms_not_enabled,
@@ -231,15 +232,10 @@ def add_template_by_type(service_id):
 def choose_template_to_copy(service_id):
     return render_template(
         'views/templates/copy.html',
-        services=[{
-            'name': service['name'],
-            'id': service['id'],
-            'templates': [
-                template for template in
-                service_api_client.get_service_templates(service['id'])['data']
-                if current_service.has_permission(template['template_type'])
-            ],
-        } for service in user_api_client.get_services_for_user(current_user)],
+        services=[
+            Service(service)
+            for service in user_api_client.get_services_for_user(current_user)
+        ],
     )
 
 

@@ -81,9 +81,11 @@ class Service():
         ]
 
     def templates_by_type(self, template_type):
+        if isinstance(template_type, str):
+            template_type = [template_type]
         return [
             template for template in self.templates
-            if template_type in {'all', template['template_type']}
+            if set(template_type) & {'all', template['template_type']}
         ]
 
     @property
