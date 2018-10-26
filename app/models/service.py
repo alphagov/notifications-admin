@@ -1,5 +1,8 @@
 from werkzeug.utils import cached_property
 
+from app.notify_client.job_api_client import job_api_client
+from app.notify_client.service_api_client import service_api_client
+from app.notify_client.user_api_client import user_api_client
 from app.utils import get_default_sms_sender
 
 
@@ -59,21 +62,16 @@ class Service():
 
     @cached_property
     def has_jobs(self):
-        # Can’t import at top-level because app isn’t yet initialised
-        from app import job_api_client
         return job_api_client.has_jobs(self.id)
 
     @cached_property
     def has_team_members(self):
-        from app import user_api_client
         return user_api_client.get_count_of_users_with_permission(
             self.id, 'manage_service'
         ) > 1
 
     @cached_property
     def templates(self):
-
-        from app import service_api_client
 
         templates = service_api_client.get_service_templates(self.id)['data']
 
@@ -115,7 +113,6 @@ class Service():
 
     @cached_property
     def has_email_reply_to_address(self):
-        from app import service_api_client
         return bool(service_api_client.get_reply_to_email_addresses(
             self.id
         ))
@@ -130,7 +127,6 @@ class Service():
 
     @cached_property
     def sms_sender_is_govuk(self):
-        from app import service_api_client
         return get_default_sms_sender(
             service_api_client.get_sms_senders(self.id)
         ) in {'GOVUK', 'None'}
