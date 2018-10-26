@@ -99,7 +99,7 @@ platform_stats_api_client = PlatformStatsAPIClient()
 
 # The current service attached to the request stack.
 def _get_current_service():
-    return Service(_lookup_req_object('service'))
+    return _lookup_req_object('service')
 
 
 current_service = LocalProxy(_get_current_service)
@@ -465,7 +465,9 @@ def load_service_before_request():
 
         if service_id:
             try:
-                _request_ctx_stack.top.service = service_api_client.get_service(service_id)['data']
+                _request_ctx_stack.top.service = Service(
+                    service_api_client.get_service(service_id)['data']
+                )
             except HTTPError as exc:
                 # if service id isn't real, then 404 rather than 500ing later because we expect service to be set
                 if exc.status_code == 404:
