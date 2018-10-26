@@ -12,3 +12,6 @@ class EventsApiClient(NotifyAdminAPIClient):
         }
         resp = self.post(url='/events', data=data)
         return resp['data']
+
+
+events_api_client = EventsApiClient()

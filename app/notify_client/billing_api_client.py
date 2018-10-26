@@ -41,3 +41,6 @@ class BillingAPIClient(NotifyAdminAPIClient):
             url='/service/{0}/billing/free-sms-fragment-limit'.format(service_id),
             data=data
         )
+
+
+billing_api_client = BillingAPIClient()

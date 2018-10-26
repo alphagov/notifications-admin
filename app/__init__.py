@@ -40,7 +40,7 @@ from werkzeug.local import LocalProxy
 
 from app import proxy_fix
 from app.config import configs
-from app.asset_fingerprinter import AssetFingerprinter
+from app.asset_fingerprinter import asset_fingerprinter
 from app.notify_client.models import Service
 from app.navigation import (
     CaseworkNavigation,
@@ -48,54 +48,33 @@ from app.navigation import (
     MainNavigation,
     OrgNavigation
 )
-from app.notify_client.service_api_client import ServiceAPIClient
-from app.notify_client.api_key_api_client import ApiKeyApiClient
-from app.notify_client.invite_api_client import InviteApiClient
-from app.notify_client.job_api_client import JobApiClient
-from app.notify_client.notification_api_client import NotificationApiClient
-from app.notify_client.status_api_client import StatusApiClient
-from app.notify_client.template_statistics_api_client import TemplateStatisticsApiClient
-from app.notify_client.user_api_client import UserApiClient
-from app.notify_client.events_api_client import EventsApiClient
-from app.notify_client.provider_client import ProviderClient
-from app.notify_client.email_branding_client import EmailBrandingClient
+from app.notify_client.service_api_client import service_api_client
+from app.notify_client.api_key_api_client import api_key_api_client
+from app.notify_client.invite_api_client import invite_api_client
+from app.notify_client.job_api_client import job_api_client
+from app.notify_client.notification_api_client import notification_api_client
+from app.notify_client.status_api_client import status_api_client
+from app.notify_client.template_statistics_api_client import template_statistics_client
+from app.notify_client.user_api_client import user_api_client
+from app.notify_client.events_api_client import events_api_client
+from app.notify_client.provider_client import provider_client
+from app.notify_client.email_branding_client import email_branding_client
 from app.notify_client.models import AnonymousUser
-from app.notify_client.organisations_api_client import OrganisationsClient
-from app.notify_client.org_invite_api_client import OrgInviteApiClient
-from app.notify_client.letter_jobs_client import LetterJobsClient
-from app.notify_client.inbound_number_client import InboundNumberClient
-from app.notify_client.billing_api_client import BillingAPIClient
-from app.notify_client.complaint_api_client import ComplaintApiClient
-from app.notify_client.platform_stats_api_client import PlatformStatsAPIClient
+from app.notify_client.organisations_api_client import organisations_client
+from app.notify_client.org_invite_api_client import org_invite_api_client
+from app.notify_client.letter_jobs_client import letter_jobs_client
+from app.notify_client.inbound_number_client import inbound_number_client
+from app.notify_client.billing_api_client import billing_api_client
+from app.notify_client.complaint_api_client import complaint_api_client
+from app.notify_client.platform_stats_api_client import platform_stats_api_client
 from app.commands import setup_commands
 from app.utils import get_cdn_domain, gmt_timezones, id_safe
 
 login_manager = LoginManager()
 csrf = CSRFProtect()
-
-asset_fingerprinter = AssetFingerprinter()
 antivirus_client = AntivirusClient()
 statsd_client = StatsdClient()
 zendesk_client = ZendeskClient()
-
-service_api_client = ServiceAPIClient()
-user_api_client = UserApiClient()
-api_key_api_client = ApiKeyApiClient()
-job_api_client = JobApiClient()
-notification_api_client = NotificationApiClient()
-status_api_client = StatusApiClient()
-invite_api_client = InviteApiClient()
-template_statistics_client = TemplateStatisticsApiClient()
-events_api_client = EventsApiClient()
-provider_client = ProviderClient()
-email_branding_client = EmailBrandingClient()
-organisations_client = OrganisationsClient()
-org_invite_api_client = OrgInviteApiClient()
-letter_jobs_client = LetterJobsClient()
-inbound_number_client = InboundNumberClient()
-billing_api_client = BillingAPIClient()
-complaint_api_client = ComplaintApiClient()
-platform_stats_api_client = PlatformStatsAPIClient()
 
 
 # The current service attached to the request stack.

@@ -49,3 +49,6 @@ class OrgInviteApiClient(NotifyAdminAPIClient):
             invited_user = InvitedOrgUser(**invite)
             invited_users.append(invited_user)
         return invited_users
+
+
+org_invite_api_client = OrgInviteApiClient()

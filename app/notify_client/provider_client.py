@@ -27,3 +27,6 @@ class ProviderClient(NotifyAdminAPIClient):
         }
         data = _attach_current_user(data)
         return self.post(url='/provider-details/{}'.format(provider_id), data=data)
+
+
+provider_client = ProviderClient()

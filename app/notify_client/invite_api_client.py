@@ -57,3 +57,6 @@ class InviteApiClient(NotifyAdminAPIClient):
             invited_user = InvitedUser(**invite)
             invited_users.append(invited_user)
         return invited_users
+
+
+invite_api_client = InviteApiClient()
