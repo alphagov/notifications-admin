@@ -176,6 +176,7 @@ def service_json(
         'service_callback_api': service_callback_api,
         'prefix_sms': prefix_sms,
         'postage': postage,
+        'contact_link': None,
     }
 
 

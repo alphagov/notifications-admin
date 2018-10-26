@@ -273,6 +273,7 @@ class Service():
 
     ALLOWED_PROPERTIES = {
         'active',
+        'contact_link',
         'dvla_organisation',
         'email_branding',
         'email_from',
@@ -305,7 +306,9 @@ class Service():
         raise AttributeError('`{}` is not a service attribute'.format(attr))
 
     def __getitem__(self, attr):
-        return self.__getattr__(attr)
+        raise NotImplementedError(
+            'Use current_service.{} instead of current_service[\'{}\']'.format(attr, attr)
+        )
 
     def get(self, attr, default=None):
         try:

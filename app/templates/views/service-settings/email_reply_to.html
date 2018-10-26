@@ -58,7 +58,7 @@
       <p>
         Set up separate email addresses to receive replies
         from your users.
-        {% if current_service.restricted and not reply_to_email_addresses %}
+        {% if current_service.trial_mode and not reply_to_email_addresses %}
           Your service can’t go live until you’ve added at least one
           reply-to address.
         {% endif %}

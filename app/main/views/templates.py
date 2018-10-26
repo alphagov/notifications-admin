@@ -237,7 +237,7 @@ def choose_template_to_copy(service_id):
             'templates': [
                 template for template in
                 service_api_client.get_service_templates(service['id'])['data']
-                if template['template_type'] in current_service['permissions']
+                if current_service.has_permission(template['template_type'])
             ],
         } for service in user_api_client.get_services_for_user(current_user)],
     )

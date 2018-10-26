@@ -346,7 +346,7 @@ def service_switch_can_upload_document(service_id):
 
     # If turning the permission off, or turning it on and the service already has a contact_link,
     # don't show the form to add the link
-    if current_service.has_permission('upload_document') or current_service.get('contact_link'):
+    if current_service.has_permission('upload_document') or current_service.contact_link:
         switch_service_permissions(service_id, 'upload_document')
         return redirect(url_for('.service_settings', service_id=service_id))
 
@@ -415,7 +415,7 @@ def service_set_contact_link(service_id):
     form = ServiceContactDetailsForm()
 
     if request.method == 'GET':
-        contact_details = current_service.get('contact_link')
+        contact_details = current_service.contact_link
         contact_type = check_contact_details_type(contact_details)
         field_to_update = getattr(form, contact_type)
 
