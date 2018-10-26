@@ -2,6 +2,7 @@ from itertools import chain
 
 from flask import request, session
 from flask_login import AnonymousUserMixin, UserMixin
+from werkzeug.utils import cached_property
 
 from app.utils import get_default_sms_sender
 
@@ -319,20 +320,20 @@ class Service():
     def has_permission(self, permission):
         return permission in self.permissions
 
-    @property
+    @cached_property
     def has_jobs(self):
         # Can’t import at top-level because app isn’t yet initialised
         from app import job_api_client
         return job_api_client.has_jobs(self.id)
 
-    @property
+    @cached_property
     def has_team_members(self):
         from app import user_api_client
         return user_api_client.get_count_of_users_with_permission(
             self.id, 'manage_service'
         ) > 1
 
-    @property
+    @cached_property
     def templates(self):
 
         from app import service_api_client
@@ -375,7 +376,7 @@ class Service():
     def has_sms_templates(self):
         return len(self.templates_by_type('sms')) > 0
 
-    @property
+    @cached_property
     def has_email_reply_to_address(self):
         from app import service_api_client
         return bool(service_api_client.get_reply_to_email_addresses(
@@ -390,7 +391,7 @@ class Service():
     def shouldnt_use_govuk_as_sms_sender(self):
         return self.organisation_type in {'local', 'nhs'}
 
-    @property
+    @cached_property
     def sms_sender_is_govuk(self):
         from app import service_api_client
         return get_default_sms_sender(
