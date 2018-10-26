@@ -60,7 +60,7 @@ def mock_get_service_settings_page_common(
 
         'Label Value Action',
         'Send text messages On Change',
-        'Text message sender GOVUK Manage',
+        'Text message sender GOVUK Change',
         'Text messages start with service name On Change',
         'International text messages Off Change',
         'Receive text messages Off Change',
@@ -82,7 +82,7 @@ def mock_get_service_settings_page_common(
 
         'Label Value Action',
         'Send text messages On Change',
-        'Text message sender GOVUK Manage',
+        'Text message sender GOVUK Change',
         'Text messages start with service name On Change',
         'International text messages Off Change',
         'Receive text messages Off Change',
@@ -143,7 +143,7 @@ def test_should_show_overview(
 
         'Label Value Action',
         'Send text messages On Change',
-        'Text message sender GOVUK Manage',
+        'Text message sender GOVUK Change',
         'Text messages start with service name On Change',
         'International text messages On Change',
         'Receive text messages On Change',
@@ -164,7 +164,7 @@ def test_should_show_overview(
 
         'Label Value Action',
         'Send text messages On Change',
-        'Text message sender GOVUK Manage',
+        'Text message sender GOVUK Change',
         'Text messages start with service name On Change',
         'International text messages Off Change',
         'Receive text messages Off Change',

@@ -13,7 +13,6 @@ from flask import (
 )
 from flask_login import current_user, login_required
 from notifications_python_client.errors import HTTPError
-from notifications_utils.field import Field
 
 from app import (
     billing_api_client,
@@ -56,7 +55,6 @@ from app.utils import (
     AgreementInfo,
     email_safe,
     get_cdn_domain,
-    get_default_sms_sender,
     user_has_permissions,
     user_is_platform_admin,
 )
@@ -66,50 +64,7 @@ from app.utils import (
 @login_required
 @user_has_permissions('manage_service', 'manage_api_keys')
 def service_settings(service_id):
-    letter_branding_organisations = email_branding_client.get_letter_email_branding()
-    organisation = organisations_client.get_service_organisation(service_id).get('name', None)
-
-    if current_service.email_branding:
-        email_branding = email_branding_client.get_email_branding(current_service.email_branding)['email_branding']
-    else:
-        email_branding = None
-
-    inbound_number = inbound_number_client.get_inbound_sms_number_for_service(service_id)
-    disp_inbound_number = inbound_number['data'].get('number', '')
-    reply_to_email_addresses = service_api_client.get_reply_to_email_addresses(service_id)
-    reply_to_email_address_count = len(reply_to_email_addresses)
-    default_reply_to_email_address = next(
-        (x['email_address'] for x in reply_to_email_addresses if x['is_default']), "Not set"
-    )
-    letter_contact_details = service_api_client.get_letter_contacts(service_id)
-    letter_contact_details_count = len(letter_contact_details)
-    default_letter_contact_block = next(
-        (Field(x['contact_block'], html='escape') for x in letter_contact_details if x['is_default']), "Not set"
-    )
-    sms_senders = service_api_client.get_sms_senders(service_id)
-
-    free_sms_fragment_limit = billing_api_client.get_free_sms_fragment_limit_for_year(service_id)
-    data_retention = service_api_client.get_service_data_retention(service_id)
-
-    return render_template(
-        'views/service-settings.html',
-        email_branding=email_branding,
-        letter_branding=letter_branding_organisations.get(
-            current_service.get('dvla_organisation', '001')
-        ),
-        can_receive_inbound=(current_service.has_permission('inbound_sms')),
-        inbound_number=disp_inbound_number,
-        default_reply_to_email_address=default_reply_to_email_address,
-        reply_to_email_address_count=reply_to_email_address_count,
-        default_letter_contact_block=default_letter_contact_block,
-        letter_contact_details_count=letter_contact_details_count,
-        default_sms_sender=get_default_sms_sender(sms_senders),
-        sms_sender_count=len(sms_senders),
-        free_sms_fragment_limit=free_sms_fragment_limit,
-        prefix_sms=current_service.prefix_sms,
-        organisation=organisation,
-        data_retention=data_retention,
-    )
+    return render_template('views/service-settings.html')
 
 
 @main.route("/services/<service_id>/service-settings/name", methods=['GET', 'POST'])
@@ -454,10 +409,7 @@ def service_set_reply_to_email(service_id):
 @login_required
 @user_has_permissions('manage_service', 'manage_api_keys')
 def service_email_reply_to(service_id):
-    reply_to_email_addresses = service_api_client.get_reply_to_email_addresses(service_id)
-    return render_template(
-        'views/service-settings/email_reply_to.html',
-        reply_to_email_addresses=reply_to_email_addresses)
+    return render_template('views/service-settings/email_reply_to.html')
 
 
 @main.route("/services/<service_id>/service-settings/email-reply-to/add", methods=['GET', 'POST'])
@@ -465,8 +417,7 @@ def service_email_reply_to(service_id):
 @user_has_permissions('manage_service')
 def service_add_email_reply_to(service_id):
     form = ServiceReplyToEmailForm()
-    reply_to_email_address_count = len(service_api_client.get_reply_to_email_addresses(service_id))
-    first_email_address = reply_to_email_address_count == 0
+    first_email_address = current_service.count_email_reply_to_addresses == 0
     if form.validate_on_submit():
         service_api_client.add_reply_to_email_address(
             current_service.id,
@@ -494,7 +445,7 @@ def service_add_email_reply_to(service_id):
 @user_has_permissions('manage_service')
 def service_edit_email_reply_to(service_id, reply_to_email_id):
     form = ServiceReplyToEmailForm()
-    reply_to_email_address = service_api_client.get_reply_to_email_address(service_id, reply_to_email_id)
+    reply_to_email_address = current_service.get_email_reply_to_address(reply_to_email_id)
     if request.method == 'GET':
         form.email_address.data = reply_to_email_address['email_address']
         form.is_default.data = reply_to_email_address['is_default']
@@ -530,7 +481,6 @@ def service_delete_email_reply_to(service_id, reply_to_email_id):
 @user_has_permissions('manage_service')
 def service_set_inbound_number(service_id):
     available_inbound_numbers = inbound_number_client.get_available_inbound_sms_numbers()
-    service_has_inbound_number = inbound_number_client.get_inbound_sms_number_for_service(service_id)['data'] != {}
     inbound_numbers_value_and_label = [
         (number['id'], number['number']) for number in available_inbound_numbers['data']
     ]
@@ -551,7 +501,6 @@ def service_set_inbound_number(service_id):
         'views/service-settings/set-inbound-number.html',
         form=form,
         no_available_numbers=no_available_numbers,
-        service_has_inbound_number=service_has_inbound_number
     )
 
 
@@ -614,10 +563,8 @@ def service_set_international_sms(service_id):
 @login_required
 @user_has_permissions('manage_service')
 def service_set_inbound_sms(service_id):
-    number = inbound_number_client.get_inbound_sms_number_for_service(service_id)['data'].get('number', '')
     return render_template(
         'views/service-settings/set-inbound-sms.html',
-        inbound_number=number,
     )
 
 
@@ -680,8 +627,7 @@ def service_letter_contact_details(service_id):
 @user_has_permissions('manage_service')
 def service_add_letter_contact(service_id):
     form = ServiceLetterContactBlockForm()
-    letter_contact_blocks_count = len(service_api_client.get_letter_contacts(service_id))
-    first_contact_block = letter_contact_blocks_count == 0
+    first_contact_block = current_service.count_letter_contact_details == 0
     if form.validate_on_submit():
         service_api_client.add_letter_contact(
             current_service.id,
@@ -696,15 +642,18 @@ def service_add_letter_contact(service_id):
     return render_template(
         'views/service-settings/letter-contact/add.html',
         form=form,
-        first_contact_block=first_contact_block)
+        first_contact_block=first_contact_block,
+    )
 
 
 @main.route("/services/<service_id>/service-settings/letter-contact/<letter_contact_id>/edit", methods=['GET', 'POST'])
 @login_required
 @user_has_permissions('manage_service')
 def service_edit_letter_contact(service_id, letter_contact_id):
-    letter_contact_block = service_api_client.get_letter_contact(service_id, letter_contact_id)
-    form = ServiceLetterContactBlockForm(letter_contact_block=letter_contact_block['contact_block'])
+    letter_contact_block = current_service.get_letter_contact_block(letter_contact_id)
+    form = ServiceLetterContactBlockForm(
+        letter_contact_block=letter_contact_block['contact_block']
+    )
     if request.method == 'GET':
         form.is_default.data = letter_contact_block['is_default']
     if form.validate_on_submit():
@@ -725,24 +674,8 @@ def service_edit_letter_contact(service_id, letter_contact_id):
 @login_required
 @user_has_permissions('manage_service', 'manage_api_keys')
 def service_sms_senders(service_id):
-
-    def attach_hint(sender):
-        hints = []
-        if sender['is_default']:
-            hints += ["default"]
-        if sender['inbound_number_id']:
-            hints += ["receives replies"]
-        if hints:
-            sender['hint'] = "(" + " and ".join(hints) + ")"
-
-    sms_senders = service_api_client.get_sms_senders(service_id)
-
-    for sender in sms_senders:
-        attach_hint(sender)
-
     return render_template(
         'views/service-settings/sms-senders.html',
-        sms_senders=sms_senders
     )
 
 
@@ -751,8 +684,7 @@ def service_sms_senders(service_id):
 @user_has_permissions('manage_service')
 def service_add_sms_sender(service_id):
     form = ServiceSmsSenderForm()
-    sms_sender_count = len(service_api_client.get_sms_senders(service_id))
-    first_sms_sender = sms_sender_count == 0
+    first_sms_sender = current_service.count_sms_senders == 0
     if form.validate_on_submit():
         service_api_client.add_sms_sender(
             current_service.id,
@@ -779,7 +711,7 @@ def service_add_sms_sender(service_id):
 @login_required
 @user_has_permissions('manage_service')
 def service_edit_sms_sender(service_id, sms_sender_id):
-    sms_sender = service_api_client.get_sms_sender(service_id, sms_sender_id)
+    sms_sender = current_service.get_sms_sender(sms_sender_id)
     is_inbound_number = sms_sender['inbound_number_id']
     if is_inbound_number:
         form = ServiceEditInboundNumberForm(is_default=sms_sender['is_default'])
@@ -875,7 +807,7 @@ def set_organisation_type(service_id):
 @user_is_platform_admin
 def set_free_sms_allowance(service_id):
 
-    form = FreeSMSAllowance(free_sms_allowance=billing_api_client.get_free_sms_fragment_limit_for_year(service_id))
+    form = FreeSMSAllowance(free_sms_allowance=current_service.free_sms_fragment_limit)
 
     if form.validate_on_submit():
         billing_api_client.create_or_update_free_sms_fragment_limit(service_id, form.free_sms_allowance.data)
@@ -896,7 +828,7 @@ def service_set_email_branding(service_id):
 
     form = ServiceSetBranding(
         all_email_brandings=get_branding_as_value_and_label(email_branding),
-        current_email_branding=current_service.email_branding,
+        current_email_branding=current_service.email_branding_id,
     )
 
     if form.validate_on_submit():
@@ -967,9 +899,6 @@ def set_letter_branding(service_id):
 def request_letter_branding(service_id):
     return render_template(
         'views/service-settings/request-letter-branding.html',
-        letter_branding=email_branding_client.get_letter_email_branding()[
-            current_service.get('dvla_organisation', '001')
-        ]
     )
 
 
@@ -1009,9 +938,7 @@ def branding_request(service_id):
     branding_type = 'govuk'
 
     if current_service.email_branding:
-        email_branding = email_branding_client.get_email_branding(
-            current_service.email_branding)['email_branding']
-        branding_type = email_branding['brand_type']
+        branding_type = current_service.email_branding['brand_type']
 
     form = BrandingOptionsEmail(
         options=branding_type
@@ -1054,9 +981,9 @@ def branding_request(service_id):
 @login_required
 @user_is_platform_admin
 def data_retention(service_id):
-    results = service_api_client.get_service_data_retention(service_id)
-    return render_template('views/service-settings/data-retention.html',
-                           data_retention_settings=results)
+    return render_template(
+        'views/service-settings/data-retention.html',
+    )
 
 
 @main.route("/services/<service_id>/data-retention/add", methods=['GET', 'POST'])
@@ -1079,7 +1006,7 @@ def add_data_retention(service_id):
 @login_required
 @user_is_platform_admin
 def edit_data_retention(service_id, data_retention_id):
-    data_retention_item = service_api_client.get_service_data_retention_by_id(service_id, data_retention_id)
+    data_retention_item = current_service.get_data_retention_item(data_retention_id)
     form = ServiceDataRetentionEditForm(days_of_retention=data_retention_item['days_of_retention'])
     if form.validate_on_submit():
         service_api_client.update_service_data_retention(service_id, data_retention_id, form.days_of_retention.data)

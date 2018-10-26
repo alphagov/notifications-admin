@@ -13,7 +13,7 @@
       <h1 class="heading-large">Receive text messages</h1>
       {% if 'inbound_sms' in current_service.permissions %}
         <p>
-          Your service can receive text messages sent to {{ inbound_number }}.
+          Your service can receive text messages sent to {{ current_service.inbound_number }}.
         </p>
         <p>
           If you want to turn this feature off,

@@ -12,7 +12,7 @@
   <div class="grid-row">
     <div class="column-three-quarters">
       <p>
-        Your letters have the {{ letter_branding }} logo.
+        Your letters have the {{ current_service.letter_branding }} logo.
       </p>
       <p>
         <a href="{{ url_for('main.feedback', ticket_type='ask-question-give-feedback', body='letter-branding') }}">Contact support</a>

@@ -10,7 +10,7 @@
 
 {% block maincolumn_content %}
     <h1 class="heading-large">Set Inbound Number</h1>
-    {% if service_has_inbound_number %}
+    {% if current_service.has_inbound_number %}
     <p> This service already has an inbound number </p>
     {{ page_footer(
 	    back_link=url_for('.service_settings', service_id=current_service.id),
