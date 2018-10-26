@@ -268,7 +268,7 @@ class AnonymousUser(AnonymousUserMixin):
         return False
 
 
-class Service(dict):
+class Service():
 
     ALLOWED_PROPERTIES = {
         'active',
@@ -291,16 +291,30 @@ class Service(dict):
 
     def __init__(self, _dict):
         # in the case of a bad request current service may be `None`
-        super().__init__(_dict or {})
+        self._dict = _dict or {}
+        if 'permissions' not in self._dict:
+            self.permissions = {'email', 'sms', 'letter'}
+
+    def __bool__(self):
+        return self._dict != {}
 
     def __getattr__(self, attr):
         if attr in self.ALLOWED_PROPERTIES:
-            return self[attr]
+            return self._dict[attr]
         raise AttributeError('`{}` is not a service attribute'.format(attr))
+
+    def __getitem__(self, attr):
+        return self.__getattr__(attr)
+
+    def get(self, attr, default=None):
+        try:
+            return self._dict[attr]
+        except KeyError:
+            return default
 
     @property
     def trial_mode(self):
-        return self['restricted']
+        return self._dict['restricted']
 
     def has_permission(self, permission):
         return permission in self.permissions

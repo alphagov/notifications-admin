@@ -7,7 +7,7 @@
 </h1>
 <p>
   You can only send {{ current_service.message_limit }} messages per day
-  {%- if current_service.restricted %}
+  {%- if current_service.trial_mode %}
     in <a href="{{ url_for('.using_notify')}}#trial-mode">trial mode</a>
   {%- endif -%}
   .

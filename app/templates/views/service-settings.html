@@ -253,7 +253,7 @@
       {% endcall %}
     </div>
 
-    {% if current_service.restricted %}
+    {% if current_service.trial_mode %}
       <h2 class="heading-medium">Your service is in trial mode</h2>
 
       <ul class='list list-bullet'>
@@ -334,7 +334,7 @@
       <ul>
         <li class="bottom-gutter">
           <a href="{{ url_for('.service_switch_live', service_id=current_service.id) }}" class="button">
-            {{ 'Make service live' if current_service.restricted else 'Revert service to trial mode' }}
+            {{ 'Make service live' if current_service.trial_mode else 'Revert service to trial mode' }}
           </a>
         </li>
         <li class="bottom-gutter">
