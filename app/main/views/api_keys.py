@@ -151,12 +151,12 @@ def get_apis():
     if current_service.service_callback_api:
         callback_api = service_api_client.get_service_callback_api(
             current_service.id,
-            current_service.get('service_callback_api')[0]
+            current_service.service_callback_api[0]
         )
     if current_service.inbound_api:
         inbound_api = service_api_client.get_service_inbound_api(
             current_service.id,
-            current_service.get('inbound_api')[0]
+            current_service.inbound_api[0]
         )
 
     return (callback_api, inbound_api)
@@ -251,7 +251,7 @@ def get_received_text_messages_callback():
     if current_service.inbound_api:
         return service_api_client.get_service_inbound_api(
             current_service.id,
-            current_service.get('inbound_api')[0]
+            current_service.inbound_api[0]
         )
 
 

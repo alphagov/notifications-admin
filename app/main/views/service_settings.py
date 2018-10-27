@@ -782,7 +782,7 @@ def service_set_letter_contact_block(service_id):
 @user_is_platform_admin
 def set_organisation_type(service_id):
 
-    form = OrganisationTypeForm(organisation_type=current_service.get('organisation_type'))
+    form = OrganisationTypeForm(organisation_type=current_service.organisation_type)
 
     if form.validate_on_submit():
         free_sms_fragment_limit = current_app.config['DEFAULT_FREE_SMS_FRAGMENT_LIMITS'].get(
@@ -885,7 +885,7 @@ def set_letter_branding(service_id):
         )
         return redirect(url_for('.service_settings', service_id=service_id))
 
-    form.dvla_org_id.data = current_service.get('dvla_organisation', '001')
+    form.dvla_org_id.data = current_service.dvla_organisation
 
     return render_template(
         'views/service-settings/set-letter-branding.html',

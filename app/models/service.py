@@ -53,10 +53,9 @@ class Service():
         )
 
     def get(self, attr, default=None):
-        try:
-            return self._dict[attr]
-        except KeyError:
-            return default
+        raise NotImplementedError(
+            'Use current_service.{} instead of current_service.get(\'{}\')'.format(attr, attr)
+        )
 
     @property
     def trial_mode(self):
