@@ -547,6 +547,7 @@ def test_big_numbers_and_search_dont_show_for_letters(
         ('sms', 'delivered', 'Delivered 27 September at 5:31pm', True),
         ('letter', 'delivered', '27 September at 5:30pm', True),
         ('letter', 'permanent-failure', 'Cancelled 27 September at 5:31pm', False),
+        ('letter', 'validation-failed', 'Cancelled 27 September at 5:30pm', False),
     ]
 )
 def test_sending_status_hint_does_not_include_status_for_letters(
