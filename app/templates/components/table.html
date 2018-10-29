@@ -154,7 +154,7 @@
       align='right'
     ) %}
       {% if displayed_on_single_line %}<span class="align-with-message-body">{% endif %}
-      {% if notification.status|format_notification_status_as_url %}
+      {% if notification.status|format_notification_status_as_url(notification.notification_type) %}
         <a href="{{ notification.status|format_notification_status_as_url }}">
       {% endif %}
       {% if notification['notification_type'] != "letter" or notification.status == 'virus-scan-failed' %}
@@ -162,12 +162,19 @@
           notification.template.template_type
         ) }}
       {% endif %}
-      {% if notification.status|format_notification_status_as_url %}
+      {% if notification.notification_type == "letter" and notification.status in ['permanent-failure', 'validation-failed'] %}
+        Cancelled
+      {% endif %}
+      {% if notification.status|format_notification_status_as_url(notification.notification_type) %}
         </a>
       {% endif %}
       <span class="status-hint">
         {% if notification['notification_type'] == "letter" %}
-          {{ notification.created_at|format_datetime_short }}
+          {% if notification.status == 'permanent-failure' %}
+            {{ (notification.updated_at)|format_datetime_short }}
+          {% else %}
+            {{ (notification.created_at)|format_datetime_short }}
+          {% endif %}
         {% else %}
           {{ notification.status|format_notification_status_as_time(
             notification.created_at|format_datetime_short,

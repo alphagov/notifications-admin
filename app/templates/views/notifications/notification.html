@@ -35,15 +35,26 @@
     </p>
 
     {% if template.template_type == 'letter' %}
-      <p>
-        Postage: {{ postage }} class
-      </p>
-      <p>
-        Estimated delivery date: {{ estimated_letter_delivery_date|string|format_date_short }}
-      </p>
-      <p class="bottom-gutter">
-        <a href="{{ url_for('main.view_letter_notification_as_preview', service_id=current_service.id, notification_id=notification_id, filetype='pdf') }}" download>Download as a PDF</a>
-      </p>
+      {% if notification_status == 'permanent-failure' %}
+        <p class="notification-status-cancelled">
+          Cancelled {{ updated_at|format_datetime_short }}
+        </p>
+      {% elif notification_status == 'validation-failed' %}
+        <p class="notification-status-cancelled">
+          Cancelled {{ updated_at|format_datetime_short }}
+          (letter has content outside the printable area)
+        </p>
+      {% else %}
+        <p>
+          Postage: {{ postage }} class
+        </p>
+        <p>
+          Estimated delivery date: {{ estimated_letter_delivery_date|string|format_date_short }}
+        </p>
+        <p class="bottom-gutter">
+          <a href="{{ url_for('main.view_letter_notification_as_preview', service_id=current_service.id, notification_id=notification_id, filetype='pdf') }}" download>Download as a PDF</a>
+        </p>
+      {% endif %}
     {% endif %}
 
     {{ template|string }}

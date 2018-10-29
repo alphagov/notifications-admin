@@ -34,7 +34,8 @@
   link=None,
   show_failures=True,
   smaller=False,
-  smallest=False
+  smallest=False,
+  failed_as_cancelled=False
 ) %}
   <div class="big-number-with-status">
     {{ big_number(number, label, link=link, smaller=smaller, smallest=smallest) }}
@@ -43,13 +44,27 @@
         {% if failures %}
           {% if failure_link %}
             <a href="{{ failure_link }}">
-              {{ "{:,}".format(failures) }} failed – {{ failure_percentage }}%
+              {{ "{:,}".format(failures) }}
+              {% if failed_as_cancelled %}
+                cancelled
+              {% else %}
+                failed – {{ failure_percentage }}%
+              {% endif %}
             </a>
           {% else %}
-            {{ "{:,}".format(failures) }} failed – {{ failure_percentage }}%
+            {{ "{:,}".format(failures) }}
+            {% if failed_as_cancelled %}
+              cancelled
+            {% else %}
+              failed – {{ failure_percentage }}%
+            {% endif %}
           {% endif %}
         {% else %}
-          No failures
+          {% if failed_as_cancelled %}
+            0 cancelled
+          {% else %}
+            No failures
+          {% endif %}
         {% endif %}
       </div>
     {% endif %}

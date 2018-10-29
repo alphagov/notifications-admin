@@ -542,10 +542,12 @@ def test_big_numbers_and_search_dont_show_for_letters(
 
 @freeze_time("2017-09-27 16:30:00.000000")
 @pytest.mark.parametrize(
-    "message_type, hint_status_visible", [
-        ('email', True),
-        ('sms', True),
-        ('letter', False)
+    "message_type, status, expected_hint_status, single_line", [
+        ('email', 'delivered', 'Delivered 27 September at 5:31pm', True),
+        ('sms', 'delivered', 'Delivered 27 September at 5:31pm', True),
+        ('letter', 'delivered', '27 September at 5:30pm', True),
+        ('letter', 'permanent-failure', 'Cancelled 27 September at 5:31pm', False),
+        ('letter', 'validation-failed', 'Cancelled 27 September at 5:30pm', False),
     ]
 )
 def test_sending_status_hint_does_not_include_status_for_letters(
@@ -555,10 +557,12 @@ def test_sending_status_hint_does_not_include_status_for_letters(
     mock_get_service_statistics,
     mock_get_service_data_retention_by_notification_type,
     message_type,
-    hint_status_visible,
+    status,
+    expected_hint_status,
+    single_line,
     mocker
 ):
-    mock_get_notifications(mocker, True, diff_template_type=message_type)
+    mock_get_notifications(mocker, True, diff_template_type=message_type, noti_status=status)
 
     page = client_request.get(
         'main.view_notifications',
@@ -566,10 +570,8 @@ def test_sending_status_hint_does_not_include_status_for_letters(
         message_type=message_type
     )
 
-    if message_type == 'letter':
-        assert normalize_spaces(page.select(".align-with-message-body")[0].text) == "27 September at 5:30pm"
-    else:
-        assert normalize_spaces(page.select(".align-with-message-body")[0].text) == "Delivered 27 September at 5:31pm"
+    assert normalize_spaces(page.select(".table-field-right-aligned")[0].text) == expected_hint_status
+    assert bool(page.select('.align-with-message-body')) is single_line
 
 
 @pytest.mark.parametrize("is_precompiled_letter,expected_hint", [

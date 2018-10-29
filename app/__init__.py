@@ -431,7 +431,9 @@ def format_notification_status_as_field_status(status, notification_type):
     ).get(status, 'error')
 
 
-def format_notification_status_as_url(status):
+def format_notification_status_as_url(status, notification_type):
+    if notification_type == 'letter':
+        return None
     url = partial(url_for, "main.using_notify")
     return {
         'technical-failure': url(_anchor='technical-failure'),

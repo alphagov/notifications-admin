@@ -15,4 +15,9 @@
 
   }
 
+  &-cancelled {
+    @include bold-19;
+    color: $error-colour;
+  }
+
 }

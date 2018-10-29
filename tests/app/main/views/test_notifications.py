@@ -174,6 +174,53 @@ def test_notification_page_shows_page_for_letter_notification(
         )
 
 
+@pytest.mark.parametrize('notification_status, expected_message', (
+    (
+        'permanent-failure',
+        'Cancelled 1 January at 1:02am',
+    ),
+    (
+        'validation-failed',
+        'Cancelled 1 January at 1:02am (letter has content outside the printable area)',
+    ),
+))
+@freeze_time("2016-01-01 01:01")
+def test_notification_page_shows_cancelled_letter(
+    client_request,
+    mocker,
+    fake_uuid,
+    notification_status,
+    expected_message,
+):
+
+    mock_get_notification(
+        mocker,
+        fake_uuid,
+        template_type='letter',
+        notification_status=notification_status,
+    )
+    mocker.patch(
+        'app.main.views.notifications.get_page_count_for_letter',
+        return_value=1
+    )
+
+    page = client_request.get(
+        'main.view_notification',
+        service_id=SERVICE_ONE_ID,
+        notification_id=fake_uuid,
+    )
+
+    assert normalize_spaces(page.select('main p')[0].text) == (
+        'sample template sent by Test User on 1 January at 1:01am'
+    )
+    assert normalize_spaces(page.select('main p')[1].text) == (
+        expected_message
+    )
+    assert not page.select('p.notification-status')
+
+    assert page.select_one('main img')['src'].endswith('.png?page=1')
+
+
 @freeze_time("2016-01-01 01:01")
 def test_notification_page_shows_page_for_first_class_letter_notification(
     client_request,
