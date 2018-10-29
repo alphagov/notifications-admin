@@ -22,7 +22,7 @@ notifications-python-client==5.2.0
 
 # PaaS
 awscli-cwlogs>=1.4,<1.5
-awscli==1.15.82
+awscli==1.16.43
 botocore<1.11.0
 
 
