@@ -14,7 +14,7 @@ pyexcel-io==0.5.9.1
 pyexcel-xls==0.5.8
 pyexcel-xlsx==0.5.6
 pyexcel-ods3==0.5.2
-pytz==2018.5
+pytz==2018.7
 gunicorn==19.7.1  # >19.8 stops eventlet workers after a timeout
 whitenoise==4.1  #manages static assets
 eventlet==0.24.1
