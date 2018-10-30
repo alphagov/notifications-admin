@@ -32,17 +32,4 @@
 
     </div>
 
-    <h2 class='heading-medium'>For older API clients</h2>
-
-    <p>
-      If the client you’re using needs a service ID and an API key,
-      use these values:
-    </p>
-
-    <div class="bottom-gutter">
-      {{ api_key(service_id, 'Service ID', thing='service ID') }}
-    </div>
-
-    {{ api_key(secret, 'API key') }}
-
 {% endblock %}
