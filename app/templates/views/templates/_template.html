@@ -17,13 +17,8 @@
         {% if template.template_type == 'letter' %}
           {% if current_user.has_permissions('send_messages', restrict_admin_usage=True) %}
             <div class="column-half">
-              <a href="{{ url_for(".send_messages", service_id=current_service.id, template_id=template.id) }}" class="pill-separate-item">
-                Upload a list of addresses
-              </a>
-            </div>
-            <div class="column-half">
               <a href="{{ url_for(".set_sender", service_id=current_service.id, template_id=template.id) }}" class="pill-separate-item">
-                Print a test letter
+                Send
               </a>
             </div>
           {% endif %}

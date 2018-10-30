@@ -1074,13 +1074,13 @@ def test_send_one_off_does_not_send_without_the_correct_permissions(
     (
         mock_get_service_letter_template,
         partial(url_for, 'main.send_test'),
-        'Print a test letter',
+        'Send ‘Two week reminder’',
         False,
     ),
     (
         mock_get_service_letter_template,
         partial(url_for, 'main.send_one_off'),
-        'Print a test letter',
+        'Send ‘Two week reminder’',
         False,
     ),
 ])
@@ -1595,10 +1595,9 @@ def test_send_test_letter_redirects_to_right_url(
 
     assert response.status_code == 302
     assert response.location.startswith(url_for(
-        'main.check_messages',
+        'main.check_notification',
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
-        upload_id=fake_uuid,
         _external=True,
     ))
 
@@ -2875,27 +2874,50 @@ def test_check_notification_shows_help(
     )
 
 
+@pytest.mark.parametrize('template, recipient, placeholders, expected_personalisation', (
+    (
+        mock_get_service_template,
+        '07700900001',
+        {'a': 'b'},
+        {'a': 'b'},
+    ),
+    (
+        mock_get_service_email_template,
+        'test@example.com',
+        {},
+        {},
+    ),
+    (
+        mock_get_service_letter_template,
+        'foo',
+        {},
+        {},
+    ),
+))
 def test_send_notification_submits_data(
     client_request,
-    service_one,
     fake_uuid,
     mock_send_notification,
+    template,
+    recipient,
+    placeholders,
+    expected_personalisation,
 ):
     with client_request.session_transaction() as session:
-        session['recipient'] = '07700900001'
-        session['placeholders'] = {'a': 'b'}
+        session['recipient'] = recipient
+        session['placeholders'] = placeholders
 
     client_request.post(
         'main.send_notification',
-        service_id=service_one['id'],
+        service_id=SERVICE_ONE_ID,
         template_id=fake_uuid
     )
 
     mock_send_notification.assert_called_once_with(
-        service_one['id'],
+        SERVICE_ONE_ID,
         template_id=fake_uuid,
-        recipient='07700900001',
-        personalisation={'a': 'b'},
+        recipient=recipient,
+        personalisation=expected_personalisation,
         sender_id=None
     )
 
