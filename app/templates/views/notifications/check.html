@@ -50,13 +50,12 @@
       )}}" class='page-footer'>
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
       {% if not error %}
-        {% if template.template_type != 'letter' or not request.args.from_test %}
         <button type="submit" class="button">Send 1 {{ message_count_label(1, template.template_type, suffix='') }}</button>
-        {% else %}
-          <a href="{{ url_for('main.check_messages_preview', service_id=current_service.id, template_id=template.id, upload_id=upload_id, filetype='pdf') }}" download class="button">Download as a printable PDF</a>
-        {% endif %}
       {% endif %}
       <a href="{{ back_link }}" class="page-footer-back-link">Back</a>
+      {% if template.template_type == 'letter' %}
+        <a href="{{ url_for('main.check_notification_preview', service_id=current_service.id, template_id=template.id, filetype='pdf') }}" download>Download as a printable PDF</a>
+      {% endif %}
     </form>
   </div>
 

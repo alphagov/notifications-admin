@@ -592,7 +592,6 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
         trying_to_send_letters_in_trial_mode=all((
             current_service.trial_mode,
             template.template_type == 'letter',
-            not request.args.get('from_test'),
         )),
         required_recipient_columns=OrderedSet(recipients.recipient_column_headers) - optional_address_columns,
         preview_row=preview_row,
