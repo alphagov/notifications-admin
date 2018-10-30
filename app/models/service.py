@@ -47,16 +47,6 @@ class Service():
             return self._dict[attr]
         raise AttributeError('`{}` is not a service attribute'.format(attr))
 
-    def __getitem__(self, attr):
-        raise NotImplementedError(
-            'Use current_service.{} instead of current_service[\'{}\']'.format(attr, attr)
-        )
-
-    def get(self, attr, default=None):
-        raise NotImplementedError(
-            'Use current_service.{} instead of current_service.get(\'{}\')'.format(attr, attr)
-        )
-
     @property
     def trial_mode(self):
         return self._dict['restricted']
