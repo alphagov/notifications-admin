@@ -485,6 +485,26 @@ def test_html_contains_notification_id(
         assert uuid.UUID(tr.attrs['id'])
 
 
+def test_html_contains_links_for_failed_notifications(
+    client_request,
+    active_user_with_permissions,
+    mock_get_service_statistics,
+    mock_get_service_data_retention_by_notification_type,
+    mocker,
+):
+    mock_get_notifications(mocker, active_user_with_permissions, noti_status='technical-failure')
+    response = client_request.get(
+        'main.view_notifications',
+        service_id=SERVICE_ONE_ID,
+        message_type='sms',
+        status='sending%2Cdelivered%2Cfailed'
+    )
+    notifications = response.tbody.find_all('tr')
+    for tr in notifications:
+        link_text = tr.find('div', class_='table-field-status-error').find('a').text
+        assert normalize_spaces(link_text) == 'Technical failure'
+
+
 def test_redacts_templates_that_should_be_redacted(
     client_request,
     mocker,
