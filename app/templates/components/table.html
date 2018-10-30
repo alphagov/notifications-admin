@@ -155,7 +155,7 @@
     ) %}
       {% if displayed_on_single_line %}<span class="align-with-message-body">{% endif %}
       {% if notification.status|format_notification_status_as_url(notification.notification_type) %}
-        <a href="{{ notification.status|format_notification_status_as_url }}">
+        <a href="{{ notification.status|format_notification_status_as_url(notification.notification_type) }}">
       {% endif %}
       {% if notification['notification_type'] != "letter" or notification.status == 'virus-scan-failed' %}
         {{ notification.status|format_notification_status(
