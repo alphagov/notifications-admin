@@ -109,14 +109,15 @@
 
       {% elif trying_to_send_letters_in_trial_mode %}
 
-        <h1 class='banner-title' data-module="track-error" data-error-type="Trying to send letters in trial mode" data-error-label="{{ upload_id }}">
-          You can’t send
-          {{ 'this letter' if count_of_recipients == 1 else 'these letters' }}
-        </h1>
-        <p>
-          In <a href="{{ url_for('.using_notify') }}#trial-mode">trial mode</a> you
-          can only preview how your letters will look
-        </p>
+        <div class="bottom-gutter">
+          {% with
+            count_of_recipients=count_of_recipients
+          %}
+            {% call banner_wrapper(type='dangerous') %}
+              {% include "partials/check/trying-to-send-letters-in-trial-mode.html" %}
+            {% endcall %}
+          {% endwith %}
+        </div>
 
       {% elif recipients.more_rows_than_can_send %}
 

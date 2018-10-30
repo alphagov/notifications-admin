@@ -7,7 +7,18 @@
 {% endblock %}
 
 {% block maincolumn_content %}
-  {% if error == 'not-allowed-to-send-to' %}
+  {% if template.template_type == 'letter' and current_service.trial_mode %}
+    {% set error = 'trial-mode-letters' %}
+    <div class="bottom-gutter">
+      {% with
+        count_of_recipients=1
+      %}
+        {% call banner_wrapper(type='dangerous') %}
+          {% include "partials/check/trying-to-send-letters-in-trial-mode.html" %}
+        {% endcall %}
+      {% endwith %}
+    </div>
+  {% elif error == 'not-allowed-to-send-to' %}
     <div class="bottom-gutter">
       {% call banner_wrapper(type='dangerous') %}
         {% with

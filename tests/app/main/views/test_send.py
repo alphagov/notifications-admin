@@ -1976,14 +1976,19 @@ def test_letter_can_only_be_sent_now(
     mocker.patch('app.main.views.send.set_metadata_on_csv_upload')
     mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=1)
 
-    content = client_request.get(
+    page = client_request.get(
         'main.check_messages',
         service_id=SERVICE_ONE_ID,
         upload_id=fake_uuid,
         template_id=fake_uuid,
     )
 
-    assert 'name="scheduled_for"' not in content
+    assert 'name="scheduled_for"' not in page
+    assert normalize_spaces(
+        page.select_one('[type=submit]').text
+    ) == (
+        'Send 1 letter'
+    )
 
 
 @pytest.mark.parametrize('when', [
@@ -2758,6 +2763,51 @@ def test_one_off_letters_have_download_link(
         template_id=fake_uuid,
         filetype='pdf',
     )
+    assert page.select_one('a[download]').text == 'Download as a printable PDF'
+
+
+def test_send_one_off_letter_errors_in_trial_mode(
+    client_request,
+    mocker,
+    mock_get_service,
+    mock_get_service_letter_template,
+    mock_has_permissions,
+    fake_uuid,
+    mock_get_users_by_service,
+    mock_get_service_statistics,
+    mock_get_job_doesnt_exist,
+    mock_s3_set_metadata,
+):
+
+    mocker.patch(
+        'app.main.views.send.get_page_count_for_letter',
+        return_value=5,
+    )
+
+    with client_request.session_transaction() as session:
+        session['recipient'] = None
+        session['placeholders'] = {
+            'address_line_1': 'First Last',
+            'address_line_2': '123 Street',
+            'postcode': 'SW1 1AA',
+        }
+
+    page = client_request.get(
+        'main.check_notification',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _test_page_title=False,
+    )
+
+    assert normalize_spaces(page.select('.banner-dangerous')) == normalize_spaces(
+        'You can’t send this letter '
+        'In trial mode you can only preview how your letters will look'
+    )
+
+    assert len(page.select('.letter img')) == 5
+
+    assert not page.select('[type=submit]')
+    assert page.select_one('.page-footer-back-link').text == 'Back'
     assert page.select_one('a[download]').text == 'Download as a printable PDF'
 
 
