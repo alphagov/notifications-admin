@@ -14,15 +14,14 @@
     Invite a team member
   </h1>
 
-  <div class="grid-row">
-    {% call form_wrapper() %}
+  {% call form_wrapper() %}
 
-      {{ textbox(form.email_address, width='1-1', safe_error_message=True) }}
+    {{ textbox(form.email_address, width='1-1', safe_error_message=True) }}
 
-      {% include 'views/manage-users/permissions.html' %}
+    {% include 'views/manage-users/permissions.html' %}
 
-      {{ page_footer('Send invitation email') }}
+    {{ page_footer('Send invitation email') }}
 
-    {% endcall %}
-  </div>
+  {% endcall %}
+
 {% endblock %}
