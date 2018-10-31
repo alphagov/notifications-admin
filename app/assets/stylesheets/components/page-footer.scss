@@ -1,5 +1,6 @@
 .page-footer {
 
+  position: relative;
   margin-bottom: 30px;
 
   &-back-link {
@@ -48,6 +49,12 @@
   &-secondary-link {
     display: block;
     margin-top: $gutter;
+  }
+
+  &-right-aligned-link {
+    position: absolute;
+    right: 0;
+    top: 10px;  // align baseline with buttons
   }
 
   .button,
