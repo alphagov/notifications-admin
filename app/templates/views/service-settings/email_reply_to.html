@@ -22,12 +22,12 @@
   {% endif %}
   </div>
   <div class="user-list">
-    {% if not reply_to_email_addresses %}
+    {% if not current_service.email_reply_to_addresses %}
       <div class="user-list-item">
         <span class="hint">You haven’t added any email reply-to addresses yet</span>
       </div>
     {% endif %}
-    {% for item in reply_to_email_addresses %}
+    {% for item in current_service.email_reply_to_addresses %}
       <div class="user-list-item">
         <h3>
           <span class="heading-small">{{ item.email_address }}</span>&ensp;<span class="hint">
@@ -39,7 +39,7 @@
         {% if current_user.has_permissions('manage_service') %}
           <a class="user-list-edit-link" href="{{ url_for('.service_edit_email_reply_to', service_id =current_service.id, reply_to_email_id = item.id) }}">Change</a>
         {% endif %}
-        {% if reply_to_email_addresses|length  > 1 %}
+        {% if current_service.count_email_reply_to_addresses > 1 %}
           {{ api_key(item.id, thing="ID") }}
         {% endif %}
       </div>
@@ -58,7 +58,7 @@
       <p>
         Set up separate email addresses to receive replies
         from your users.
-        {% if current_service.restricted and not reply_to_email_addresses %}
+        {% if current_service.trial_mode and not current_service.has_email_reply_to_address %}
           Your service can’t go live until you’ve added at least one
           reply-to address.
         {% endif %}

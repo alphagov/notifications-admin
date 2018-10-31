@@ -30,3 +30,6 @@ class ApiKeyApiClient(NotifyAdminAPIClient):
         return self.post(
             url='/service/{0}/api-key/revoke/{1}'.format(service_id, key_id),
             data=data)
+
+
+api_key_api_client = ApiKeyApiClient()

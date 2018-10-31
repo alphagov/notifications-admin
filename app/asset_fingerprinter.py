@@ -44,3 +44,6 @@ class AssetFingerprinter(object):
         with codecs.open(asset_file_path, encoding='utf-8') as asset_file:
             contents = asset_file.read()
         return contents
+
+
+asset_fingerprinter = AssetFingerprinter()

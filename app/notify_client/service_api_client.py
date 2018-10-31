@@ -506,3 +506,6 @@ class ServiceAPIClient(NotifyAdminAPIClient):
 
     def get_service_data_retention_by_id(self, service_id, data_retention_id):
         return self.get("service/{}/data-retention/{}".format(service_id, data_retention_id))
+
+
+service_api_client = ServiceAPIClient()

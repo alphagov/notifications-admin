@@ -2,12 +2,12 @@ from itertools import chain
 
 from notifications_python_client.errors import HTTPError
 
-from app.notify_client import NotifyAdminAPIClient, cache
-from app.notify_client.models import (
+from app.models.user import (
     User,
     roles,
     translate_permissions_from_admin_roles_to_db,
 )
+from app.notify_client import NotifyAdminAPIClient, cache
 
 ALLOWED_ATTRIBUTES = {
     'name',
@@ -226,3 +226,6 @@ class UserApiClient(NotifyAdminAPIClient):
 
     def user_belongs_to_service(self, user, service_id):
         return service_id in self.get_service_ids_for_user(user)
+
+
+user_api_client = UserApiClient()

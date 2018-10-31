@@ -25,7 +25,7 @@
       </div>
   </div>
   <div class="user-list">
-    {% if not data_retention_settings %}
+    {% if not current_service.data_retention %}
       <div class="user-list-item">
         <span class="hint">You haven’t added any data retention</span>
       </div>
@@ -36,7 +36,7 @@
         field_headings_visible=False,
         caption_visible=False
       ) %}
-        {% for item in data_retention_settings %}
+        {% for item in current_service.data_retention %}
             {% call row() %}
               {{ text_field(item.notification_type | format_notification_type)}}
               {{ text_field(item.days_of_retention) }}

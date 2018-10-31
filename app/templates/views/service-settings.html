@@ -81,17 +81,16 @@
 
         {% call settings_row(if_has_permission='email') %}
           {{ text_field('Email reply-to addresses') }}
-          {% call field(status='default' if default_reply_to_email_address == "Not set" else '') %}
-
-            {{ default_reply_to_email_address }}
-            {% if reply_to_email_address_count > 1 %}
+          {% call field(status='default' if default_reply_to_email_address == None else '') %}
+            {{ current_service.default_email_reply_to_address or 'Not set' }}
+            {% if current_service.count_email_reply_to_addresses > 1 %}
               <div class="hint">
-                {{ '…and %d more' | format(reply_to_email_address_count - 1) }}
+                {{ '…and %d more' | format(current_service.count_email_reply_to_addresses - 1) }}
               </div>
             {% endif %}
           {% endcall %}
           {{ edit_field(
-              'Manage' if reply_to_email_address_count else 'Change',
+              'Manage' if current_service.count_email_reply_to_addresses else 'Change',
               url_for('.service_email_reply_to',
               service_id=current_service.id),
               permissions=['manage_service','manage_api_keys']
@@ -101,7 +100,7 @@
 
         {% call settings_row(if_has_permission='email') %}
           {{ text_field('Email branding') }}
-          {{ text_field('Your branding' if email_branding else 'GOV.UK') }}
+          {{ text_field('Your branding' if current_service.email_branding else 'GOV.UK') }}
           {{ edit_field(
             'Change',
             url_for('.branding_request', service_id=current_service.id),
@@ -132,16 +131,16 @@
 
         {% call settings_row(if_has_permission='sms') %}
           {{ text_field('Text message sender') }}
-          {% call field(status='default' if default_sms_sender == "None" else '') %}
-            {{ default_sms_sender | string | nl2br | safe if default_sms_sender else 'None'}}
-            {% if sms_sender_count > 1 %}
+          {% call field(status='default' if current_service.default_sms_sender == "None" else '') %}
+            {{ current_service.default_sms_sender | string | nl2br | safe if current_service.default_sms_sender else 'None'}}
+            {% if current_service.count_sms_senders > 1 %}
               <div class="hint">
-                {{ '…and %d more' | format(sms_sender_count - 1) }}
+                {{ '…and %d more' | format(current_service.count_sms_senders - 1) }}
               </div>
             {% endif %}
           {% endcall %}
           {{ edit_field(
-              'Manage' if sms_sender_count else 'Change',
+              'Manage' if current_service.count_sms_senders > 1 else 'Change',
               url_for('.service_sms_senders',
               service_id=current_service.id),
               permissions=['manage_service','manage_api_keys']
@@ -151,7 +150,7 @@
 
         {% call settings_row(if_has_permission='sms') %}
           {{ text_field('Text messages start with service name') }}
-          {{ boolean_field(prefix_sms) }}
+          {{ boolean_field(current_service.prefix_sms) }}
           {{ edit_field(
               'Change',
               url_for('.service_set_sms_prefix',
@@ -208,16 +207,16 @@
 
         {% call settings_row(if_has_permission='letter') %}
           {{ text_field('Sender addresses') }}
-          {% call field(status='default' if default_letter_contact_block == "Not set" else '') %}
-            {{ default_letter_contact_block | string | nl2br | safe if default_letter_contact_block else 'Not set'}}
-            {% if letter_contact_details_count > 1 %}
+          {% call field(status='default' if current_service.default_letter_contact_block == None else '') %}
+            {{ current_service.default_letter_contact_block | string | nl2br | safe if current_service.default_letter_contact_block else 'Not set'}}
+            {% if current_service.count_letter_contact_details > 1 %}
               <div class="hint">
-                {{ '…and %d more' | format(letter_contact_details_count - 1) }}
+                {{ '…and %d more' | format(current_service.count_letter_contact_details - 1) }}
               </div>
             {% endif %}
           {% endcall %}
           {{ edit_field(
-              'Manage' if letter_contact_details_count else 'Change',
+              'Manage' if current_service.count_letter_contact_details else 'Change',
               url_for('.service_letter_contact_details',
               service_id=current_service.id),
               permissions=['manage_service','manage_api_keys']
@@ -227,7 +226,7 @@
 
         {% call settings_row(if_has_permission='letter') %}
           {{ text_field('Letter branding') }}
-          {{ text_field(letter_branding) }}
+          {{ text_field(current_service.letter_branding) }}
           {{ edit_field(
             'Change',
             url_for('.request_letter_branding', service_id=current_service.id),
@@ -253,7 +252,7 @@
       {% endcall %}
     </div>
 
-    {% if current_service.restricted %}
+    {% if current_service.trial_mode %}
       <h2 class="heading-medium">Your service is in trial mode</h2>
 
       <ul class='list list-bullet'>
@@ -297,7 +296,7 @@
       ) %}
         {% call row() %}
           {{ text_field('Organisation')}}
-          {{ optional_text_field(organisation or None) }}
+          {{ optional_text_field(current_service.organisation_name) }}
           {{ edit_field('Change', url_for('.link_service_to_organisation', service_id=current_service.id)) }}
         {% endcall %}
         {% call row() %}
@@ -309,23 +308,23 @@
         {% endcall %}
         {% call row() %}
           {{ text_field('Free text message allowance')}}
-          {{ text_field('{:,}'.format(free_sms_fragment_limit or 0)) }}
+          {{ text_field('{:,}'.format(current_service.free_sms_fragment_limit)) }}
           {{ edit_field('Change', url_for('.set_free_sms_allowance', service_id=current_service.id)) }}
         {% endcall %}
         {% call row() %}
           {{ text_field('Email branding' )}}
-          {{ text_field(email_branding.name or 'GOV.UK') }}
+          {{ text_field(current_service.email_branding.name or 'GOV.UK') }}
           {{ edit_field('Change', url_for('.service_set_email_branding', service_id=current_service.id)) }}
         {% endcall %}
         {% call row() %}
           {{ text_field('Letter branding')}}
-          {{ text_field(letter_branding) }}
+          {{ text_field(current_service.letter_branding) }}
           {{ edit_field('Change', url_for('.set_letter_branding', service_id=current_service.id)) }}
         {% endcall %}
         {% call row() %}
           {{ text_field('Data retention')}}
           {% call field() %}
-              {{ data_retention | join(', ', attribute='notification_type') }}
+              {{ current_service.data_retention | join(', ', attribute='notification_type') }}
           {% endcall %}
           {{ edit_field('Change', url_for('.data_retention', service_id=current_service.id)) }}
         {% endcall %}
@@ -334,7 +333,7 @@
       <ul>
         <li class="bottom-gutter">
           <a href="{{ url_for('.service_switch_live', service_id=current_service.id) }}" class="button">
-            {{ 'Make service live' if current_service.restricted else 'Revert service to trial mode' }}
+            {{ 'Make service live' if current_service.trial_mode else 'Revert service to trial mode' }}
           </a>
         </li>
         <li class="bottom-gutter">
@@ -354,7 +353,7 @@
         </li>
         {% if 'sms' in current_service.permissions %}
           <li class="bottom-gutter">
-          {% if not can_receive_inbound %}
+          {% if not current_service.has_permission('inbound_sms') %}
             <a href="{{ url_for('.service_set_inbound_number', service_id=current_service.id, set_inbound_sms=True) }}" class="button">
               Allow inbound sms
             </a>

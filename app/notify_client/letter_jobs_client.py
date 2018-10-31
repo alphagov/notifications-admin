@@ -20,3 +20,6 @@ class LetterJobsClient(NotifyAdminAPIClient):
             url='/letters/returned',
             data={'references': references}
         )
+
+
+letter_jobs_client = LetterJobsClient()

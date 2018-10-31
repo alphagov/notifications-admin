@@ -6,9 +6,7 @@ from datetime import datetime, timedelta, timezone
 from flask.testing import FlaskClient
 from flask import url_for
 from flask_login import login_user
-from app.notify_client.models import (
-    InvitedOrgUser,
-)
+from app.models.user import InvitedOrgUser
 
 
 class TestClient(FlaskClient):
@@ -176,6 +174,7 @@ def service_json(
         'service_callback_api': service_callback_api,
         'prefix_sms': prefix_sms,
         'postage': postage,
+        'contact_link': None,
     }
 
 

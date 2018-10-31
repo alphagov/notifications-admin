@@ -11,7 +11,7 @@ from notifications_python_client.errors import HTTPError
 from notifications_utils.url_safe_token import generate_token
 
 from app import create_app
-from app.notify_client.models import InvitedOrgUser, InvitedUser, User
+from app.models.user import InvitedOrgUser, InvitedUser, User
 
 from . import (
     TestClient,
@@ -79,7 +79,10 @@ def multiple_reply_to_email_addresses(mocker):
             }
         ]
 
-    return mocker.patch('app.service_api_client.get_reply_to_email_addresses', side_effect=_get)
+    return mocker.patch(
+        'app.notify_client.service_api_client.service_api_client.get_reply_to_email_addresses',
+        side_effect=_get,
+    )
 
 
 @pytest.fixture(scope='function')
@@ -303,7 +306,7 @@ def multiple_sms_senders(mocker):
             }
         ]
 
-    return mocker.patch('app.service_api_client.get_sms_senders', side_effect=_get)
+    return mocker.patch('app.notify_client.service_api_client.service_api_client.get_sms_senders', side_effect=_get)
 
 
 @pytest.fixture(scope='function')
@@ -337,7 +340,7 @@ def multiple_sms_senders_with_diff_default(mocker):
             }
         ]
 
-    return mocker.patch('app.service_api_client.get_sms_senders', side_effect=_get)
+    return mocker.patch('app.notify_client.service_api_client.service_api_client.get_sms_senders', side_effect=_get)
 
 
 @pytest.fixture(scope='function')
@@ -363,7 +366,7 @@ def multiple_sms_senders_no_inbound(mocker):
             }
         ]
 
-    return mocker.patch('app.service_api_client.get_sms_senders', side_effect=_get)
+    return mocker.patch('app.notify_client.service_api_client.service_api_client.get_sms_senders', side_effect=_get)
 
 
 @pytest.fixture(scope='function')
@@ -389,7 +392,7 @@ def single_sms_sender(mocker):
             }
         ]
 
-    return mocker.patch('app.service_api_client.get_sms_senders', side_effect=_get)
+    return mocker.patch('app.notify_client.service_api_client.service_api_client.get_sms_senders', side_effect=_get)
 
 
 @pytest.fixture(scope='function')
@@ -405,7 +408,7 @@ def get_default_sms_sender(mocker):
             'updated_at': None
         }
 
-    return mocker.patch('app.service_api_client.get_sms_sender', side_effect=_get)
+    return mocker.patch('app.notify_client.service_api_client.service_api_client.get_sms_sender', side_effect=_get)
 
 
 @pytest.fixture(scope='function')
@@ -2456,7 +2459,8 @@ def mock_get_all_email_branding(mocker):
         return create_email_brandings(5, non_standard_values=non_standard_values, shuffle=shuffle)
 
     return mocker.patch(
-        'app.email_branding_client.get_all_email_branding', side_effect=_get_all_email_branding
+        'app.notify_client.email_branding_client.email_branding_client.get_all_email_branding',
+        side_effect=_get_all_email_branding,
     )
 
 

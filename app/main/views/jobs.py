@@ -324,7 +324,7 @@ def get_status_filters(service, message_type, statistics):
             option,
             url_for(
                 '.view_notifications',
-                service_id=service['id'],
+                service_id=service.id,
                 message_type=message_type,
                 status=option
             ),

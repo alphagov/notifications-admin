@@ -15,7 +15,7 @@
   <div class="dashboard">
 
     <h1 class="visuallyhidden">Dashboard</h1>
-    {% if current_user.has_permissions('manage_templates') and not templates %}
+    {% if current_user.has_permissions('manage_templates') and not current_service.templates %}
       {% include 'views/dashboard/write-first-messages.html' %}
     {% endif %}
 

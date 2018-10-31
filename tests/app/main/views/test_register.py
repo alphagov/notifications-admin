@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 from flask import session, url_for
 from flask_login import current_user
 
-from app.notify_client.models import InvitedUser
+from app.models.user import InvitedUser
 
 
 def test_render_register_returns_template_with_form(client):

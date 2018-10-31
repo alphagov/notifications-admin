@@ -359,9 +359,9 @@ def send_test_step(service_id, template_id, step_index):
     email_reply_to = None
     sms_sender = None
     if db_template['template_type'] == 'email':
-        email_reply_to = get_email_reply_to_address_from_session(service_id)
+        email_reply_to = get_email_reply_to_address_from_session()
     elif db_template['template_type'] == 'sms':
-        sms_sender = get_sms_sender_from_session(service_id)
+        sms_sender = get_sms_sender_from_session()
     template = get_template(
         db_template,
         current_service,
@@ -530,9 +530,9 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
     email_reply_to = None
     sms_sender = None
     if db_template['template_type'] == 'email':
-        email_reply_to = get_email_reply_to_address_from_session(service_id)
+        email_reply_to = get_email_reply_to_address_from_session()
     elif db_template['template_type'] == 'sms':
-        sms_sender = get_sms_sender_from_session(service_id)
+        sms_sender = get_sms_sender_from_session()
     template = get_template(
         db_template,
         current_service,
@@ -815,9 +815,9 @@ def _check_notification(service_id, template_id, exception=None):
     email_reply_to = None
     sms_sender = None
     if db_template['template_type'] == 'email':
-        email_reply_to = get_email_reply_to_address_from_session(service_id)
+        email_reply_to = get_email_reply_to_address_from_session()
     elif db_template['template_type'] == 'sms':
-        sms_sender = get_sms_sender_from_session(service_id)
+        sms_sender = get_sms_sender_from_session()
     template = get_template(
         db_template,
         current_service,
@@ -903,17 +903,17 @@ def send_notification(service_id, template_id):
     ))
 
 
-def get_email_reply_to_address_from_session(service_id):
+def get_email_reply_to_address_from_session():
     if session.get('sender_id'):
-        return service_api_client.get_reply_to_email_address(
-            service_id, session['sender_id']
+        return current_service.get_email_reply_to_address(
+            session['sender_id']
         )['email_address']
 
 
-def get_sms_sender_from_session(service_id):
+def get_sms_sender_from_session():
     if session.get('sender_id'):
-        return service_api_client.get_sms_sender(
-            service_id=service_id, sms_sender_id=session['sender_id']
+        return current_service.get_sms_sender(
+            session['sender_id']
         )['sms_sender']
 
 

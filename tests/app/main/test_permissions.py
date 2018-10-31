@@ -3,7 +3,7 @@ from flask import request
 from werkzeug.exceptions import Forbidden, Unauthorized
 
 from app.main.views.index import index
-from app.notify_client.models import (
+from app.models.user import (
     translate_permissions_from_admin_roles_to_db,
     translate_permissions_from_db_to_admin_roles,
 )

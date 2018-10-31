@@ -1,8 +1,8 @@
-from app.notify_client import NotifyAdminAPIClient, _attach_current_user, cache
-from app.notify_client.models import (
+from app.models.user import (
     InvitedUser,
     translate_permissions_from_admin_roles_to_db,
 )
+from app.notify_client import NotifyAdminAPIClient, _attach_current_user, cache
 
 
 class InviteApiClient(NotifyAdminAPIClient):
@@ -57,3 +57,6 @@ class InviteApiClient(NotifyAdminAPIClient):
             invited_user = InvitedUser(**invite)
             invited_users.append(invited_user)
         return invited_users
+
+
+invite_api_client = InviteApiClient()

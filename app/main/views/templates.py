@@ -25,6 +25,7 @@ from app.main.forms import (
     SMSTemplateForm,
 )
 from app.main.views.send import get_example_csv_rows, get_sender_details
+from app.models.service import Service
 from app.template_previews import TemplatePreview, get_page_count_for_letter
 from app.utils import (
     email_or_sms_not_enabled,
@@ -101,24 +102,6 @@ def start_tour(service_id, template_id):
 @login_required
 @user_has_permissions()
 def choose_template(service_id, template_type='all'):
-    templates = service_api_client.get_service_templates(service_id)['data']
-
-    letters_available = current_service.has_permission('letter')
-
-    available_template_types = list(filter(None, (
-        'email',
-        'sms',
-        'letter' if letters_available else None,
-    )))
-
-    templates = [
-        template for template in templates
-        if template['template_type'] in available_template_types
-    ]
-
-    has_multiple_template_types = len({
-        template['template_type'] for template in templates
-    }) > 1
 
     template_nav_items = [
         (label, key, url_for('.choose_template', service_id=current_service.id, template_type=key), '')
@@ -126,23 +109,18 @@ def choose_template(service_id, template_type='all'):
             ('All', 'all'),
             ('Text message', 'sms'),
             ('Email', 'email'),
-            ('Letter', 'letter') if letters_available else None,
+            ('Letter', 'letter') if current_service.has_permission('letter') else None,
         ])
-    ]
-
-    templates_on_page = [
-        template for template in templates
-        if (
-            template_type in ['all', template['template_type']] and
-            template['template_type'] in available_template_types
-        )
     ]
 
     return render_template(
         'views/templates/choose.html',
-        templates=templates_on_page,
-        show_search_box=(len(templates_on_page) > 7),
-        show_template_nav=has_multiple_template_types and (len(templates) > 2),
+        templates=current_service.templates_by_type(template_type),
+        show_search_box=(len(current_service.templates_by_type(template_type)) > 7),
+        show_template_nav=(
+            current_service.has_multiple_template_types
+            and (len(current_service.templates) > 2)
+        ),
         template_nav_items=template_nav_items,
         template_type=template_type,
         search_form=SearchTemplatesForm(),
@@ -254,15 +232,10 @@ def add_template_by_type(service_id):
 def choose_template_to_copy(service_id):
     return render_template(
         'views/templates/copy.html',
-        services=[{
-            'name': service['name'],
-            'id': service['id'],
-            'templates': [
-                template for template in
-                service_api_client.get_service_templates(service['id'])['data']
-                if template['template_type'] in current_service['permissions']
-            ],
-        } for service in user_api_client.get_services_for_user(current_user)],
+        services=[
+            Service(service)
+            for service in user_api_client.get_services_for_user(current_user)
+        ],
     )
 
 

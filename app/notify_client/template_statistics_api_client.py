@@ -26,3 +26,6 @@ class TemplateStatisticsApiClient(NotifyAdminAPIClient):
         return self.get(
             url='/service/{}/template-statistics/{}'.format(service_id, template_id)
         )['data']
+
+
+template_statistics_client = TemplateStatisticsApiClient()

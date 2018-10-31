@@ -43,7 +43,7 @@ from app.main.validators import (
     ValidEmail,
     ValidGovEmail,
 )
-from app.notify_client.models import permissions, roles
+from app.models.user import permissions, roles
 from app.utils import AgreementInfo, guess_name_from_email_address
 
 

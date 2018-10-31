@@ -9,6 +9,7 @@ from flask import url_for
 from freezegun import freeze_time
 
 from app.main.views.jobs import get_status_filters, get_time_left
+from app.models.service import Service
 from tests.conftest import (
     SERVICE_ONE_ID,
     active_caseworking_user,
@@ -438,7 +439,7 @@ STATISTICS = {
 
 
 def test_get_status_filters_calculates_stats(client):
-    ret = get_status_filters({'id': 'foo'}, 'sms', STATISTICS)
+    ret = get_status_filters(Service({'id': 'foo'}), 'sms', STATISTICS)
 
     assert {label: count for label, _option, _link, count in ret} == {
         'total': 6,
@@ -449,7 +450,7 @@ def test_get_status_filters_calculates_stats(client):
 
 
 def test_get_status_filters_in_right_order(client):
-    ret = get_status_filters({'id': 'foo'}, 'sms', STATISTICS)
+    ret = get_status_filters(Service({'id': 'foo'}), 'sms', STATISTICS)
 
     assert [label for label, _option, _link, _count in ret] == [
         'total', 'sending', 'delivered', 'failed'
@@ -457,7 +458,7 @@ def test_get_status_filters_in_right_order(client):
 
 
 def test_get_status_filters_constructs_links(client):
-    ret = get_status_filters({'id': 'foo'}, 'sms', STATISTICS)
+    ret = get_status_filters(Service({'id': 'foo'}), 'sms', STATISTICS)
 
     link = ret[0][2]
     assert link == '/services/foo/notifications/sms?status={}'.format(quote('sending,delivered,failed'))

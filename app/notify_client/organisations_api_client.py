@@ -52,3 +52,6 @@ class OrganisationsClient(NotifyAdminAPIClient):
             url="/organisations/unique",
             params={"org_id": org_id, "name": name}
         )["result"]
+
+
+organisations_client = OrganisationsClient()

@@ -21,12 +21,12 @@
     {% endif %}
   </div>
   <div class="user-list">
-    {% if not sms_senders %}
+    {% if not current_service.sms_senders %}
       <div class="user-list-item">
         <span class="hint">You haven’t added any text message senders yet</span>
       </div>
     {% endif %}
-    {% for item in sms_senders %}
+    {% for item in current_service.sms_senders_with_hints %}
       <div class="user-list-item">
         <h3>
           <span class="heading-small">{{ item.sms_sender }}</span>
@@ -40,7 +40,7 @@
         {% if current_user.has_permissions('manage_service') %}
           <a class="user-list-edit-link" href="{{ url_for('.service_edit_sms_sender', service_id=current_service.id, sms_sender_id = item.id) }}">Change</a>
         {% endif %}
-        {% if sms_senders|length  > 1 %}
+        {% if current_service.count_sms_senders > 1 %}
           {{ api_key(item.id, thing="ID") }}
         {% endif %}
       </div>

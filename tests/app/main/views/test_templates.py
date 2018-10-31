@@ -131,7 +131,7 @@ def test_should_show_page_for_choosing_a_template(
     for index, expected_template in enumerate(expected_templates):
         assert template_links[index].text.strip() == expected_template
 
-    mock_get_service_templates.assert_called_with(SERVICE_ONE_ID)
+    mock_get_service_templates.assert_called_once_with(SERVICE_ONE_ID)
 
 
 def test_should_not_show_template_nav_if_only_one_type_of_template(

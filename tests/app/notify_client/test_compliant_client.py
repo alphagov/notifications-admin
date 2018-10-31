@@ -1,4 +1,4 @@
-from app import ComplaintApiClient
+from app.notify_client.complaint_api_client import ComplaintApiClient
 
 
 def test_get_all_complaints(mocker):

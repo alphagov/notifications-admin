@@ -19,7 +19,7 @@
     <p>When you create a GOV.UK Notify account, you’ll start in trial mode. This lets you try out the service, but has some restrictions in place.</p>
     <p>
       You can remove these restrictions by
-      {% if current_service and current_service.restricted %}
+      {% if current_service and current_service.trial_mode %}
         <a href="{{ url_for('.request_to_go_live', service_id=current_service.id) }}">requesting to go live</a>.
       {% else %}
         going live.
