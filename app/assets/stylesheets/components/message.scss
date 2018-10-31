@@ -2,7 +2,7 @@
 
   &-name {
     @include bold-24;
-    margin: 20px 0 5px 0;
+    margin: 0;
 
     a {
       display: block;
@@ -14,8 +14,12 @@
 
   &-type {
     color: $secondary-text-colour;
-    margin-bottom: $gutter / 3;
+    margin: 0 0 $gutter-two-thirds 0;
     pointer-events: none;
   }
 
+}
+
+#template-list {
+  margin-top: $gutter;
 }
