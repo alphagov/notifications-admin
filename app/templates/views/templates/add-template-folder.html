@@ -1,0 +1,20 @@
+
+{% extends "withnav_template.html" %}
+{% from "components/textbox.html" import textbox %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+
+{% block service_page_title %}
+  Add a folder
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <h1 class="heading-large">Add a folder</h1>
+
+  {% call form_wrapper() %}
+    {{ textbox(form.name) }}
+    {{ page_footer('Save') }}
+  {% endcall %}
+
+{% endblock %}

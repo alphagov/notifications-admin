@@ -1,6 +1,7 @@
+from flask import url_for
 
 
-def test_add_folder(
+def test_add_page_shows_option_for_folder(
     client_request,
     service_one,
     mocker,
@@ -26,3 +27,35 @@ def test_add_folder(
         'Copy of an existing template',
         'Folder'
     ]
+
+
+def test_get_add_template_folder_page(client_request, service_one):
+    service_one['permissions'] += ['edit_folders']
+
+    page = client_request.get('main.add_template_folder', service_id=service_one['id'])
+
+    assert page.find('input', attrs={'name': 'name'}) is not None
+
+
+def test_add_template_folder_page_rejects_if_service_doesnt_have_permission(client_request, service_one):
+    client_request.get('main.add_template_folder', service_id=service_one['id'], _expected_status=403)
+    client_request.post('main.add_template_folder', service_id=service_one['id'], _expected_status=403)
+
+
+def test_post_add_template_folder_page(client_request, service_one, mocker):
+    mock_create = mocker.patch('app.template_folder_api_client.create_template_folder')
+
+    service_one['permissions'] += ['edit_folders']
+
+    client_request.post(
+        'main.add_template_folder',
+        service_id=service_one['id'],
+        _data={'name': 'foo'},
+        _expected_redirect=url_for(
+            'main.choose_template',
+            service_id=service_one['id'],
+            _external=True,
+        )
+    )
+
+    mock_create.assert_called_once_with(service_one['id'], name='foo', parent_id=None)

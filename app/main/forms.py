@@ -1100,3 +1100,7 @@ class ReturnedLettersForm(StripWhitespaceForm):
             DataRequired(message="Can’t be empty"),
         ]
     )
+
+
+class TemplateFolderForm(StripWhitespaceForm):
+    name = StringField('Folder name', validators=[DataRequired(message='Can’t be empty')])

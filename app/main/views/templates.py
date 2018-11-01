@@ -14,6 +14,7 @@ from app import (
     service_api_client,
     template_statistics_client,
     user_api_client,
+    template_folder_api_client
 )
 from app.main import main
 from app.main.forms import (
@@ -23,6 +24,7 @@ from app.main.forms import (
     SearchTemplatesForm,
     SetTemplateSenderForm,
     SMSTemplateForm,
+    TemplateFolderForm
 )
 from app.main.views.send import get_example_csv_rows, get_sender_details
 from app.models.service import Service
@@ -290,17 +292,22 @@ def action_blocked(service_id, notification_type, return_to, template_id):
 
 
 @main.route("/services/<service_id>/templates/add-folder", methods=['GET', 'POST'])
-def add_folder(service_id):
+def add_template_folder(service_id):
     if not current_service.has_permission('edit_folders'):
         abort(403)
 
-    form = NewFolderForm()
+    form = TemplateFolderForm()
 
     if form.validate_on_submit():
-        folder_api_client.create_template_folder(form.name.data, current_service.id, parent_id=None)
+        template_folder_api_client.create_template_folder(current_service.id, name=form.name.data, parent_id=None)
         return redirect(
-            url_for('.view_templates', service_id=service_id)
+            url_for('.choose_template', service_id=service_id)
         )
+
+    return render_template(
+        'views/templates/add-template-folder.html',
+        form=form
+    )
 
 
 @main.route("/services/<service_id>/templates/add-<template_type>", methods=['GET', 'POST'])
