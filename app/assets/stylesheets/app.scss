@@ -179,7 +179,13 @@ details summary {
   }
 
   .fullscreen-fixed-table {
+
     z-index: 1000;
+
+    .table-field-heading-first {
+      background: $grey-4;
+    }
+
   }
 
 }
