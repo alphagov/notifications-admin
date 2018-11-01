@@ -7,8 +7,10 @@ from app.notify_client.inbound_number_client import inbound_number_client
 from app.notify_client.job_api_client import job_api_client
 from app.notify_client.organisations_api_client import organisations_client
 from app.notify_client.service_api_client import service_api_client
+from app.notify_client.template_folder_api_client import (
+    template_folder_api_client,
+)
 from app.notify_client.user_api_client import user_api_client
-from app.notify_client.template_folder_api_client import template_folder_api_client
 from app.utils import get_default_sms_sender
 
 

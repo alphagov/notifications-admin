@@ -1,3 +1,4 @@
+import uuid
 import json
 import os
 from contextlib import contextmanager
@@ -3236,3 +3237,10 @@ def mock_create_event(mocker):
 def url_for_endpoint_with_token(endpoint, token):
     token = token.replace('%2E', '.')
     return url_for(endpoint, token=token)
+
+
+@pytest.fixture
+def mock_get_template_folders(mocker):
+    return mocker.patch('app.template_folder_api_client.get_template_folders', return_value=[
+        {'id': uuid.uuid4(), 'name': 'Template Folder', 'parent_id': None}
+    ])

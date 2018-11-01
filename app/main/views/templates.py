@@ -12,9 +12,9 @@ from notifications_utils.recipients import first_column_headings
 from app import (
     current_service,
     service_api_client,
+    template_folder_api_client,
     template_statistics_client,
     user_api_client,
-    template_folder_api_client
 )
 from app.main import main
 from app.main.forms import (
@@ -24,7 +24,7 @@ from app.main.forms import (
     SearchTemplatesForm,
     SetTemplateSenderForm,
     SMSTemplateForm,
-    TemplateFolderForm
+    TemplateFolderForm,
 )
 from app.main.views.send import get_example_csv_rows, get_sender_details
 from app.models.service import Service
@@ -117,6 +117,7 @@ def choose_template(service_id, template_type='all'):
 
     return render_template(
         'views/templates/choose.html',
+        template_folders=current_service.template_folders,
         templates=current_service.templates_by_type(template_type),
         show_search_box=(len(current_service.templates_by_type(template_type)) > 7),
         show_template_nav=(

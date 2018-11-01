@@ -2186,7 +2186,6 @@ def test_dont_show_preview_letter_templates_for_bad_filetype(
 
 
 @pytest.mark.parametrize('route, response_code', [
-    ('main.choose_template', 200),
     ('main.send_messages', 200),
     ('main.get_example_csv', 200),
     ('main.send_test', 302)
@@ -2259,7 +2258,6 @@ def test_route_permissions_send_check_notifications(
 
 
 @pytest.mark.parametrize('route, expected_status', [
-    ('main.choose_template', 200),
     ('main.send_messages', 403),
     ('main.get_example_csv', 403),
     ('main.send_test', 403),

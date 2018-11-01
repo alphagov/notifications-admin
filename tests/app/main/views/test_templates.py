@@ -96,6 +96,7 @@ from tests.conftest import single_letter_contact_block
 def test_should_show_page_for_choosing_a_template(
     client_request,
     mock_get_service_templates,
+    mock_get_template_folders,
     mock_has_no_jobs,
     extra_args,
     expected_nav_links,
@@ -136,6 +137,7 @@ def test_should_show_page_for_choosing_a_template(
 
 def test_should_not_show_template_nav_if_only_one_type_of_template(
     client_request,
+    mock_get_template_folders,
     mock_get_service_templates_with_only_one_template,
 ):
 
@@ -149,6 +151,7 @@ def test_should_not_show_template_nav_if_only_one_type_of_template(
 
 def test_should_not_show_live_search_if_list_of_templates_fits_onscreen(
     client_request,
+    mock_get_template_folders,
     mock_get_service_templates
 ):
 
@@ -162,6 +165,7 @@ def test_should_not_show_live_search_if_list_of_templates_fits_onscreen(
 
 def test_should_show_live_search_if_list_of_templates_taller_than_screen(
     client_request,
+    mock_get_template_folders,
     mock_get_more_service_templates_than_can_fit_onscreen
 ):
 
@@ -1213,6 +1217,7 @@ def test_route_permissions_for_choose_template(
     app_,
     client,
     api_user_active,
+    mock_get_template_folders,
     service_one,
     mock_get_service_templates,
 ):

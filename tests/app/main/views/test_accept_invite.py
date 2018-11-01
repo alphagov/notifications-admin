@@ -139,6 +139,7 @@ def test_accepting_invite_removes_invite_from_session(
     mock_get_template_statistics,
     mock_get_jobs,
     mock_get_service_statistics,
+    mock_get_template_folders,
     mock_get_usage,
     mock_get_inbound_sms_summary,
     fake_uuid,

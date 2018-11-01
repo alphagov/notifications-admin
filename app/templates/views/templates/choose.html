@@ -59,6 +59,16 @@
     {{ live_search(target_selector='#template-list .column-whole', show=show_search_box, form=search_form) }}
 
     <nav class="grid-row" id=template-list>
+      {% for template_folder in template_folders %}
+        <div class="column-whole">
+          <h2 class="message-name">
+            {# <a href="{{ url_for('.view_template_folder', service_id=current_service.id, template_folder_id=template_folder.id) }}"> #}
+              {{ template_folder.name }}
+            {# </a> #}
+          </h2>
+          <p class="message-type">Folder containing {{ template_count }} template{% if template_count != 1 %}s{% endif %}</p>
+        </div>
+      {% endfor %}
       {% for template in templates %}
         <div class="column-whole">
           <h2 class="message-name">

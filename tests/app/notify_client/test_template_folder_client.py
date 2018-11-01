@@ -1,5 +1,6 @@
-import pytest
 import uuid
+
+import pytest
 
 from app.notify_client.template_folder_api_client import TemplateFolderAPIClient
 
@@ -24,8 +25,11 @@ def test_create_template_folder_calls_correct_api_endpoint(mocker, api_user_acti
 
 def test_get_template_folders_calls_correct_api_endpoint(mocker, api_user_active):
     mock_redis_get = mocker.patch('app.notify_client.RedisClient.get', return_value=None)
-    mock_api_get = mocker.patch('app.notify_client.NotifyAdminAPIClient.get', return_value={'data': {'a': 'b'}})
     mock_redis_set = mocker.patch('app.notify_client.RedisClient.set')
+    mock_api_get = mocker.patch(
+        'app.notify_client.NotifyAdminAPIClient.get',
+        return_value={'template_folders': {'a': 'b'}}
+    )
 
     some_service_id = uuid.uuid4()
     expected_url = '/service/{}/template-folder'.format(some_service_id)

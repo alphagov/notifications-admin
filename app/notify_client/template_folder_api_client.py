@@ -22,7 +22,7 @@ class TemplateFolderAPIClient(NotifyAdminAPIClient):
 
     @cache.set('service-{service_id}-template-folders')
     def get_template_folders(self, service_id):
-        return self.get('/service/{}/template-folder'.format(service_id))['data']
+        return self.get('/service/{}/template-folder'.format(service_id))['template_folders']
 
 
 template_folder_api_client = TemplateFolderAPIClient()

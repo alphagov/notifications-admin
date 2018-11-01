@@ -104,6 +104,7 @@ def test_a_page_should_nave_selected_navigation_item(
     mock_get_service_templates,
     mock_get_users_by_service,
     mock_get_invites_for_service,
+    mock_get_template_folders,
     endpoint,
     selected_nav_item,
 ):
@@ -151,6 +152,7 @@ def test_caseworkers_get_caseworking_navigation(
     client_request,
     mocker,
     fake_uuid,
+    mock_get_template_folders,
     mock_get_service_templates,
     mock_has_no_jobs,
 ):
@@ -169,6 +171,7 @@ def test_caseworkers_see_jobs_nav_if_jobs_exist(
     mocker,
     fake_uuid,
     mock_get_service_templates,
+    mock_get_template_folders,
     mock_has_jobs,
 ):
     mocker.patch(
