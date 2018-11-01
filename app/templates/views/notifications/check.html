@@ -10,13 +10,13 @@
   {% if template.template_type == 'letter' and current_service.trial_mode %}
     {% set error = 'trial-mode-letters' %}
     <div class="bottom-gutter">
-      {% with
-        count_of_recipients=1
-      %}
-        {% call banner_wrapper(type='dangerous') %}
+      {% call banner_wrapper(type='dangerous') %}
+        {% with
+          count_of_recipients=1
+        %}
           {% include "partials/check/trying-to-send-letters-in-trial-mode.html" %}
-        {% endcall %}
-      {% endwith %}
+        {% endwith %}
+      {% endcall %}
     </div>
   {% elif error == 'not-allowed-to-send-to' %}
     <div class="bottom-gutter">

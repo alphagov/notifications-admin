@@ -113,9 +113,7 @@
           {% with
             count_of_recipients=count_of_recipients
           %}
-            {% call banner_wrapper(type='dangerous') %}
-              {% include "partials/check/trying-to-send-letters-in-trial-mode.html" %}
-            {% endcall %}
+            {% include "partials/check/trying-to-send-letters-in-trial-mode.html" %}
           {% endwith %}
         </div>
 
