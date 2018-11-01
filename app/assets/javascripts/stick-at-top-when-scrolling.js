@@ -31,6 +31,12 @@
       if ($els.length > 0) {
         sticky.$els = $els
 
+        $els.each(function (i, el) {
+          var $el = $(el)
+          
+          $el.data('scrolled-from', sticky.getElementOffset($el).top)
+        })
+
         if (sticky._scrollTimeout === false) {
           $(global).scroll(sticky.onScroll)
           sticky._scrollTimeout = global.setInterval(sticky.checkScroll, 50)
@@ -62,11 +68,14 @@
     onResize: function () {
       sticky._hasResized = true
     },
+    scrolledFromInsideWindow: function (scrolledFrom) {
+      var windowVerticalPosition = sticky.getWindowPositions().scrollTop
+
+      return windowVerticalPosition < scrolledFrom
+    },
     checkScroll: function () {
       if (sticky._hasScrolled === true) {
         sticky._hasScrolled = false
-
-        var windowVerticalPosition = sticky.getWindowPositions().scrollTop
 
         var windowDimensions = sticky.getWindowDimensions()
 
@@ -74,9 +83,9 @@
           var $el = $(el)
           var scrolledFrom = $el.data('scrolled-from')
 
-          if (scrolledFrom && windowVerticalPosition < scrolledFrom) {
+          if (scrolledFrom && sticky.scrolledFromInsideWindow(scrolledFrom)) {
             sticky.release($el)
-          } else if (windowDimensions.width > 768 && windowVerticalPosition >= sticky.getElementOffset($el).top) {
+          } else if (windowDimensions.width > 768 && !sticky.scrolledFromInsideWindow(scrolledFrom)) {
             sticky.stick($el)
           }
         })
@@ -106,18 +115,20 @@
         })
       }
     },
+    addShimForEl: function ($el, width, height) {
+      $el.before('<div class="shim" style="width: ' + width + 'px; height: ' + height + 'px">&nbsp;</div>')
+    },
     stick: function ($el) {
       if (!$el.hasClass('content-fixed')) {
-        $el.data('scrolled-from', sticky.getElementOffset($el).top)
         var height = Math.max($el.height(), 1)
         var width = $el.width()
-        $el.before('<div class="shim" style="width: ' + width + 'px; height: ' + height + 'px">&nbsp;</div>')
+
+        sticky.addShimForEl($el, width, height)
         $el.css('width', width + 'px').addClass('content-fixed')
       }
     },
     release: function ($el) {
       if ($el.hasClass('content-fixed')) {
-        $el.data('scrolled-from', false)
         $el.removeClass('content-fixed').css('width', '')
         $el.siblings('.shim').remove()
       }
