@@ -183,6 +183,7 @@ def add_template_by_type(service_id):
             service_api_client.count_service_templates(service_id) > 0,
             len(user_api_client.get_service_ids_for_user(current_user)) > 1,
         )),
+        include_folder=current_service.has_permission('edit_folders')
     )
 
     if form.validate_on_submit():
@@ -286,6 +287,20 @@ def action_blocked(service_id, notification_type, return_to, template_id):
         return_to=return_to,
         template_id=template_id
     )
+
+
+@main.route("/services/<service_id>/templates/add-folder", methods=['GET', 'POST'])
+def add_folder(service_id):
+    if not current_service.has_permission('edit_folders'):
+        abort(403)
+
+    form = NewFolderForm()
+
+    if form.validate_on_submit():
+        folder_api_client.create_template_folder(form.name.data, current_service.id, parent_id=None)
+        return redirect(
+            url_for('.view_templates', service_id=service_id)
+        )
 
 
 @main.route("/services/<service_id>/templates/add-<template_type>", methods=['GET', 'POST'])

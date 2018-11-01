@@ -8,6 +8,7 @@ from app.notify_client.job_api_client import job_api_client
 from app.notify_client.organisations_api_client import organisations_client
 from app.notify_client.service_api_client import service_api_client
 from app.notify_client.user_api_client import user_api_client
+from app.notify_client.template_folder_client import template_folder_client
 from app.utils import get_default_sms_sender
 
 
@@ -252,3 +253,7 @@ class Service():
     @property
     def has_inbound_number(self):
         return bool(self.inbound_number)
+
+    @cached_property
+    def template_folders(self):
+        return template_folder_client.get_template_folders(self.id)
