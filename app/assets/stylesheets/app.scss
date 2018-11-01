@@ -147,6 +147,10 @@ details summary {
 
   margin-bottom: -$gutter;
 
+  .table {
+    margin-bottom: 0;
+  }
+
   th,
   .table-field-index {
     background: $grey-4;
@@ -161,7 +165,21 @@ details summary {
   }
 
   td {
+
     border-top: 0;
+    // 194 is the width of the table * 1/3.5, so the overflow cuts off
+    // at 3.5 columns wide.
+    // 11 accounts for the padding of the table cell
+    min-width: 194px - 11px;
+
+    &:first-child {
+      min-width: auto;
+    }
+
+  }
+
+  .fullscreen-fixed-table {
+    z-index: 1000;
   }
 
 }
