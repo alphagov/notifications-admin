@@ -5,3 +5,14 @@
   min-height: 200px;
   margin-bottom: $gutter
 }
+
+#logo-img {
+  background-color: $grey-4;
+  background-image: linear-gradient(45deg, $grey-3 25%, transparent 25%), linear-gradient(-45deg, $grey-3 25%, transparent 25%), linear-gradient(45deg, transparent 75%, $grey-3 75%), linear-gradient(-45deg, transparent 75%, $grey-3 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+  
+  img {
+    display: block;
+  }
+}
