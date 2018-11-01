@@ -30,6 +30,8 @@
         window.GOVUK.stopScrollingAtFooter.updateFooterTop();
       }
 
+      this.maintainWidth();
+
     };
 
     this.insertShims = () => {
