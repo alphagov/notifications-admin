@@ -142,7 +142,7 @@ def test_notification_page_shows_page_for_letter_notification(
     count_of_pages = 3
 
     mock_get_notification(mocker, fake_uuid, template_type='letter', postage='second')
-    mocker.patch(
+    mock_page_count = mocker.patch(
         'app.main.views.notifications.get_page_count_for_letter',
         return_value=count_of_pages
     )
@@ -172,6 +172,10 @@ def test_notification_page_shows_page_for_letter_notification(
         assert page.select('img')[index]['src'].endswith(
             '.png?page={}'.format(index)
         )
+
+    assert len(mock_page_count.call_args_list) == 1
+    assert mock_page_count.call_args_list[0][0][0]['name'] == 'sample template'
+    assert mock_page_count.call_args_list[0][1]['values'] == {'name': 'Jo'}
 
 
 @pytest.mark.parametrize('notification_status, expected_message', (

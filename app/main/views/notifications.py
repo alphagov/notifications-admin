@@ -48,11 +48,13 @@ def view_notification(service_id, notification_id):
     notification = notification_api_client.get_notification(service_id, str(notification_id))
     notification['template'].update({'reply_to_text': notification['reply_to_text']})
 
+    personalisation = get_all_personalisation_from_notification(notification)
+
     if notification['template']['is_precompiled_letter']:
         file_contents = view_letter_notification_as_preview(service_id, notification_id, "pdf")
         page_count = pdf_page_count(io.BytesIO(file_contents))
     else:
-        page_count = get_page_count_for_letter(notification['template'])
+        page_count = get_page_count_for_letter(notification['template'], values=personalisation)
 
     template = get_template(
         notification['template'],
@@ -67,7 +69,7 @@ def view_notification(service_id, notification_id):
         show_recipient=True,
         redact_missing_personalisation=True,
     )
-    template.values = get_all_personalisation_from_notification(notification)
+    template.values = personalisation
     if notification['job']:
         job = job_api_client.get_job(service_id, notification['job']['id'])['data']
     else:
