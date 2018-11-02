@@ -317,16 +317,13 @@ def send_test(service_id, template_id):
 
 
 def get_notification_check_endpoint(service_id, template):
-    if template.template_type == 'letter':
-        return make_and_upload_csv_file(service_id, template)
-    else:
-        return redirect(url_for(
-            'main.check_notification',
-            service_id=service_id,
-            template_id=template.id,
-            # at check phase we should move to help stage 2 ("the template pulls in the data you provide")
-            help='2' if 'help' in request.args else None
-        ))
+    return redirect(url_for(
+        'main.check_notification',
+        service_id=service_id,
+        template_id=template.id,
+        # at check phase we should move to help stage 2 ("the template pulls in the data you provide")
+        help='2' if 'help' in request.args else None
+    ))
 
 
 @main.route(
@@ -595,7 +592,6 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
         trying_to_send_letters_in_trial_mode=all((
             current_service.trial_mode,
             template.template_type == 'letter',
-            not request.args.get('from_test'),
         )),
         required_recipient_columns=OrderedSet(recipients.recipient_column_headers) - optional_address_columns,
         preview_row=preview_row,
@@ -665,6 +661,26 @@ def check_messages_preview(service_id, template_id, upload_id, filetype, row_ind
 
     template = _check_messages(
         service_id, template_id, upload_id, row_index, letters_as_pdf=True
+    )['template']
+    return TemplatePreview.from_utils_template(template, filetype, page=page)
+
+
+@main.route(
+    "/services/<service_id>/<uuid:template_id>/check.<filetype>",
+    methods=['GET'],
+)
+@login_required
+@user_has_permissions('send_messages')
+def check_notification_preview(service_id, template_id, filetype):
+    if filetype == 'pdf':
+        page = None
+    elif filetype == 'png':
+        page = request.args.get('page', 1)
+    else:
+        abort(404)
+
+    template = _check_notification(
+        service_id, template_id,
     )['template']
     return TemplatePreview.from_utils_template(template, filetype, page=page)
 
@@ -762,8 +778,6 @@ def all_placeholders_in_session(placeholders):
 def get_send_test_page_title(template_type, help_argument, entering_recipient, name=None):
     if help_argument:
         return 'Example text message'
-    if template_type == 'letter':
-        return 'Print a test letter'
     if entering_recipient:
         return 'Send ‘{}’'.format(name)
     return 'Personalise this message'
@@ -807,7 +821,10 @@ def get_back_link(service_id, template, step_index):
 @login_required
 @user_has_permissions('send_messages', restrict_admin_usage=True)
 def check_notification(service_id, template_id):
-    return _check_notification(service_id, template_id)
+    return render_template(
+        'views/notifications/check.html',
+        **_check_notification(service_id, template_id),
+    )
 
 
 def _check_notification(service_id, template_id, exception=None):
@@ -823,25 +840,33 @@ def _check_notification(service_id, template_id, exception=None):
         current_service,
         show_recipient=True,
         email_reply_to=email_reply_to,
-        sms_sender=sms_sender
+        sms_sender=sms_sender,
+        letter_preview_url=url_for(
+            '.check_notification_preview',
+            service_id=service_id,
+            template_id=template_id,
+            filetype='png',
+        ),
+        page_count=get_page_count_for_letter(db_template),
     )
 
     back_link = get_back_link(service_id, template, len(fields_to_fill_in(template)))
 
     if (
-        not session.get('recipient') or
-        not all_placeholders_in_session(template.placeholders)
+        (
+            not session.get('recipient')
+            and db_template['template_type'] != 'letter'
+        )
+        or not all_placeholders_in_session(template.placeholders)
     ):
-        return redirect(back_link)
+        raise RequestRedirect(back_link)
 
     template.values = get_recipient_and_placeholders_from_session(template.template_type)
-    return render_template(
-        'views/notifications/check.html',
+    return dict(
         template=template,
         back_link=back_link,
         help=get_help_argument(),
-
-        **(get_template_error_dict(exception) if exception else {})
+        **(get_template_error_dict(exception) if exception else {}),
     )
 
 
@@ -880,7 +905,7 @@ def send_notification(service_id, template_id):
         noti = notification_api_client.send_notification(
             service_id,
             template_id=template_id,
-            recipient=session['recipient'],
+            recipient=session['recipient'] or session['placeholders']['address line 1'],
             personalisation=session['placeholders'],
             sender_id=session['sender_id'] if 'sender_id' in session else None
         )
@@ -889,7 +914,10 @@ def send_notification(service_id, template_id):
             current_service.id,
             exception.message
         ))
-        return _check_notification(service_id, template_id, exception)
+        return render_template(
+            'views/notifications/check.html',
+            **_check_notification(service_id, template_id, exception),
+        )
 
     session.pop('placeholders')
     session.pop('recipient')

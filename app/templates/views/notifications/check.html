@@ -7,7 +7,18 @@
 {% endblock %}
 
 {% block maincolumn_content %}
-  {% if error == 'not-allowed-to-send-to' %}
+  {% if template.template_type == 'letter' and current_service.trial_mode %}
+    {% set error = 'trial-mode-letters' %}
+    <div class="bottom-gutter">
+      {% call banner_wrapper(type='dangerous') %}
+        {% with
+          count_of_recipients=1
+        %}
+          {% include "partials/check/trying-to-send-letters-in-trial-mode.html" %}
+        {% endwith %}
+      {% endcall %}
+    </div>
+  {% elif error == 'not-allowed-to-send-to' %}
     <div class="bottom-gutter">
       {% call banner_wrapper(type='dangerous') %}
         {% with
@@ -50,13 +61,12 @@
       )}}" class='page-footer'>
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
       {% if not error %}
-        {% if template.template_type != 'letter' or not request.args.from_test %}
         <button type="submit" class="button">Send 1 {{ message_count_label(1, template.template_type, suffix='') }}</button>
-        {% else %}
-          <a href="{{ url_for('main.check_messages_preview', service_id=current_service.id, template_id=template.id, upload_id=upload_id, filetype='pdf') }}" download class="button">Download as a printable PDF</a>
-        {% endif %}
       {% endif %}
       <a href="{{ back_link }}" class="page-footer-back-link">Back</a>
+      {% if template.template_type == 'letter' %}
+        <a href="{{ url_for('main.check_notification_preview', service_id=current_service.id, template_id=template.id, filetype='pdf') }}" download class="page-footer-right-aligned-link">Download as a printable PDF</a>
+      {% endif %}
     </form>
   </div>
 
