@@ -10,6 +10,7 @@
     _scrollTimeout: false,
     _hasResized: false,
     _resizeTimeout: false,
+    _els: [],
 
     getWindowDimensions: function () {
       return {
@@ -25,15 +26,35 @@
     getElementOffset: function ($el) {
       return $el.offset()
     },
+    setElHeight: function (el) {
+      var fixedOffset = parseInt(el.$fixedEl.css('top'), 10)
+      var $el = el.$fixedEl
+      var $img = $el.find('img')
+
+      fixedOffset = isNaN(fixedOffset) ? 0 : fixedOffset
+
+      if ($img.length > 0) {
+        var image = new global.Image()
+        image.onload = function () {
+          el.height = $el.outerHeight() + fixedOffset
+        }
+        image.src = $img.attr('src')
+      } else {
+        el.height = $el.outerHeight() + fixedOffset
+      }
+    },
     init: function () {
       var $els = $('.js-stick-at-top-when-scrolling')
 
       if ($els.length > 0) {
-        sticky.$els = $els
-
         $els.each(function (i, el) {
           var $el = $(el)
-          
+          var el = {
+            $fixedEl: $el
+          }
+
+          sticky.setElHeight(el)
+          sticky._els.push(el)
           $el.data('scrolled-from', sticky.getElementOffset($el).top)
         })
 
@@ -46,20 +67,6 @@
           $(global).resize(sticky.onResize)
           sticky._resizeTimeout = global.setInterval(sticky.checkResize, 50)
         }
-      }
-      if (GOVUK.stopScrollingAtFooter) {
-        $els.each(function (i, el) {
-          var $img = $(el).find('img')
-          if ($img.length > 0) {
-            var image = new global.Image()
-            image.onload = function () {
-              GOVUK.stopScrollingAtFooter.addEl($(el), $(el).outerHeight())
-            }
-            image.src = $img.attr('src')
-          } else {
-            GOVUK.stopScrollingAtFooter.addEl($(el), $(el).outerHeight())
-          }
-        })
       }
     },
     onScroll: function () {
@@ -79,8 +86,8 @@
 
         var windowDimensions = sticky.getWindowDimensions()
 
-        sticky.$els.each(function (i, el) {
-          var $el = $(el)
+        $.each(sticky._els, function (i, el) {
+          var $el = el.$fixedEl
           var scrolledFrom = $el.data('scrolled-from')
 
           if (scrolledFrom && sticky.scrolledFromInsideWindow(scrolledFrom)) {
@@ -97,8 +104,8 @@
 
         var windowDimensions = sticky.getWindowDimensions()
 
-        sticky.$els.each(function (i, el) {
-          var $el = $(el)
+        $.each(sticky._els, function (i, el) {
+          var $el = el.$fixedEl
 
           var elResize = $el.hasClass('js-sticky-resize')
           if (elResize) {
