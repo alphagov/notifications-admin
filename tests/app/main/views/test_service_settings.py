@@ -2088,6 +2088,7 @@ def test_set_letter_branding_platform_admin_only(
 @pytest.mark.parametrize('current_dvla_org_id, expected_selected', [
     (None, '001'),
     ('500', '500'),
+    ('999', '999'),
 ])
 def test_set_letter_branding_prepopulates(
     logged_in_platform_admin_client,
@@ -2101,6 +2102,20 @@ def test_set_letter_branding_prepopulates(
     response = logged_in_platform_admin_client.get(url_for('main.set_letter_branding', service_id=service_one['id']))
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    for element in {'label', 'input[type=radio]'}:
+        assert len(page.select(element)) == 3
+
+    assert normalize_spaces(page.select('label')[0].text) == 'Animal and Plant Health Agency'
+    assert page.select('input')[0]['value'] == '999'
+
+    assert normalize_spaces(page.select('label')[1].text) == 'HM Government'
+    assert page.select('input')[1]['value'] == '001'
+
+    assert normalize_spaces(page.select('label')[2].text) == 'Land Registry'
+    assert page.select('input')[2]['value'] == '500'
+
+    assert len(page.select('input[checked]')) == 1
     assert page.select('input[checked]')[0]['value'] == expected_selected
 
 

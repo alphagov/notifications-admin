@@ -1,6 +1,7 @@
 import weakref
 from datetime import datetime, timedelta
 from itertools import chain
+from operator import itemgetter
 
 import pytz
 from flask_wtf import FlaskForm as Form
@@ -785,7 +786,10 @@ class LetterBranding(StripWhitespaceForm):
 
     def __init__(self, choices=[], *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.dvla_org_id.choices = choices
+        self.dvla_org_id.choices = list(sorted(
+            choices,
+            key=itemgetter(1),
+        ))
 
     dvla_org_id = RadioField(
         'Which logo should this service’s letter have?',
