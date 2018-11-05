@@ -53,6 +53,31 @@ class Service():
     def update_with_properties(self, properties):
         return service_api_client.update_service_with_properties(self.id, properties)
 
+    def switch_permission(self, permission, sms_sender=None):
+        return self.force_permission(
+            permission,
+            on=not self.has_permission(permission),
+            sms_sender=sms_sender
+        )
+
+    def force_permission(self, permission, on=False, sms_sender=None):
+
+        permissions, permission = set(self.permissions), {permission}
+
+        return self.update_permissions(
+            permissions | permission if on else permissions - permission,
+            sms_sender=sms_sender
+        )
+
+    def update_permissions(self, permissions, sms_sender=None):
+
+        data = {'permissions': list(permissions)}
+
+        if sms_sender:
+            data['sms_sender'] = sms_sender
+
+        self.update_with_properties(data)
+
     @property
     def trial_mode(self):
         return self._dict['restricted']
