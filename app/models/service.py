@@ -50,9 +50,6 @@ class Service():
     def update(self, **kwargs):
         return service_api_client.update_service(self.id, **kwargs)
 
-    def update_with_properties(self, properties):
-        return service_api_client.update_service_with_properties(self.id, properties)
-
     def switch_permission(self, permission):
         return self.force_permission(
             permission,
@@ -68,12 +65,10 @@ class Service():
         )
 
     def update_permissions(self, permissions):
-        return self.update_with_properties({'permissions': list(permissions)})
+        return self.update(permissions=list(permissions))
 
     def toggle_research_mode(self):
-        self.update_with_properties({
-            'research_mode': not self.research_mode,
-        })
+        self.update(research_mode=not self.research_mode)
 
     @property
     def trial_mode(self):

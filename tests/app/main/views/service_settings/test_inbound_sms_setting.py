@@ -12,7 +12,7 @@ def test_set_inbound_sms_sets_a_number_for_service(
     mock_no_inbound_number_for_service,
     mocker
 ):
-    mocker.patch('app.service_api_client.update_service_with_properties')
+    mocker.patch('app.service_api_client.update_service')
     data = {
         "inbound_number": "781d9c60-7a7e-46b7-9896-7b045b992fa5",
     }
