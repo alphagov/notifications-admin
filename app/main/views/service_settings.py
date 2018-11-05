@@ -108,8 +108,7 @@ def service_name_change_confirm(service_id):
 
     if form.validate_on_submit():
         try:
-            service_api_client.update_service(
-                current_service.id,
+            current_service.update(
                 name=session['service_name_change'],
                 email_from=email_safe(session['service_name_change'])
             )
@@ -209,8 +208,7 @@ def submit_request_to_go_live(service_id):
 @login_required
 @user_is_platform_admin
 def service_switch_live(service_id):
-    service_api_client.update_service(
-        current_service.id,
+    current_service.update(
         # TODO This limit should be set depending on the agreement signed by
         # with Notify.
         message_limit=250000 if current_service.trial_mode else 50,
@@ -223,9 +221,8 @@ def service_switch_live(service_id):
 @login_required
 @user_is_platform_admin
 def service_switch_research_mode(service_id):
-    service_api_client.update_service_with_properties(
-        service_id,
-        {"research_mode": not current_service.research_mode}
+    current_service.update_with_properties(
+        {'research_mode': not current_service.research_mode}
     )
     return redirect(url_for('.service_settings', service_id=service_id))
 
@@ -258,7 +255,7 @@ def update_service_permissions(service_id, permissions, sms_sender=None):
     if sms_sender:
         data['sms_sender'] = sms_sender
 
-    service_api_client.update_service_with_properties(service_id, data)
+    current_service.update_with_properties(data)
 
 
 @main.route("/services/<service_id>/service-settings/can-send-email")
@@ -308,8 +305,7 @@ def service_switch_can_upload_document(service_id):
     if form.validate_on_submit():
         contact_type = form.contact_details_type.data
 
-        service_api_client.update_service(
-            current_service.id,
+        current_service.update(
             contact_link=form.data[contact_type]
         )
         switch_service_permissions(service_id, 'upload_document')
@@ -380,8 +376,7 @@ def service_set_contact_link(service_id):
     if form.validate_on_submit():
         contact_type = form.contact_details_type.data
 
-        service_api_client.update_service(
-            current_service.id,
+        current_service.update(
             contact_link=form.data[contact_type]
         )
         return redirect(url_for('.service_settings', service_id=current_service.id))
@@ -525,8 +520,7 @@ def service_set_sms_prefix(service_id):
     form.enabled.label.text = 'Start all text messages with ‘{}:’'.format(current_service.name)
 
     if form.validate_on_submit():
-        service_api_client.update_service(
-            current_service.id,
+        current_service.update(
             prefix_sms=(form.enabled.data == 'on')
         )
         return redirect(url_for('.service_settings', service_id=service_id))
@@ -597,7 +591,7 @@ def service_set_postage(service_id):
     form = ServicePostageForm(postage=current_service.postage)
 
     if form.validate_on_submit():
-        service_api_client.update_service(service_id, postage=form.postage.data)
+        current_service.update(postage=form.postage.data)
         return redirect(url_for(".service_settings", service_id=service_id))
 
     return render_template('views/service-settings/set-postage.html', form=form)
@@ -762,8 +756,7 @@ def service_set_letter_contact_block(service_id):
 
     form = ServiceLetterContactBlockForm(letter_contact_block=current_service.letter_contact_block)
     if form.validate_on_submit():
-        service_api_client.update_service(
-            current_service.id,
+        current_service.update(
             letter_contact_block=form.letter_contact_block.data.replace('\r', '') or None
         )
         if request.args.get('from_template'):
@@ -788,8 +781,7 @@ def set_organisation_type(service_id):
         free_sms_fragment_limit = current_app.config['DEFAULT_FREE_SMS_FRAGMENT_LIMITS'].get(
             form.organisation_type.data)
 
-        service_api_client.update_service(
-            service_id,
+        current_service.update(
             organisation_type=form.organisation_type.data,
         )
         billing_api_client.create_or_update_free_sms_fragment_limit(service_id, free_sms_fragment_limit)
@@ -857,8 +849,7 @@ def service_preview_email_branding(service_id):
 
     if form.validate_on_submit():
         branding_style = None if form.branding_style.data == 'None' else form.branding_style.data
-        service_api_client.update_service(
-            service_id,
+        current_service.update(
             email_branding=branding_style
         )
         return redirect(url_for('.service_settings', service_id=service_id))
@@ -879,8 +870,7 @@ def set_letter_branding(service_id):
     form = LetterBranding(choices=email_branding_client.get_letter_email_branding().items())
 
     if form.validate_on_submit():
-        service_api_client.update_service(
-            service_id,
+        current_service.update(
             dvla_organisation=form.dvla_org_id.data
         )
         return redirect(url_for('.service_settings', service_id=service_id))

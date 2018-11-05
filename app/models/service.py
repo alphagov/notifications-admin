@@ -47,6 +47,12 @@ class Service():
             return self._dict[attr]
         raise AttributeError('`{}` is not a service attribute'.format(attr))
 
+    def update(self, **kwargs):
+        return service_api_client.update_service(self.id, **kwargs)
+
+    def update_with_properties(self, properties):
+        return service_api_client.update_service_with_properties(self.id, properties)
+
     @property
     def trial_mode(self):
         return self._dict['restricted']
