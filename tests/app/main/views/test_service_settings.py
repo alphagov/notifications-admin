@@ -563,13 +563,13 @@ def test_should_show_request_to_go_live_checklist(
     )
 
     mock_templates = mocker.patch(
-        'app.models.service.Service.templates',
+        'app.models.service.Service.all_templates',
         new_callable=PropertyMock,
         return_value=list(range(0, count_of_templates)),
     )
 
-    mock_templates_by_type = mocker.patch(
-        'app.models.service.Service.templates_by_type',
+    mock_get_templates = mocker.patch(
+        'app.models.service.Service.get_templates',
         side_effect=_templates_by_type,
     )
 
@@ -598,7 +598,7 @@ def test_should_show_request_to_go_live_checklist(
     assert mock_templates.call_args_list == [
         call(),
     ]
-    assert mock_templates_by_type.call_args_list == [
+    assert mock_get_templates.call_args_list == [
         call('email'),
         call('sms'),
     ]
@@ -683,12 +683,12 @@ def test_should_check_for_sms_sender_on_go_live(
         return_value=99,
     )
     mock_templates = mocker.patch(
-        'app.models.service.Service.templates',
+        'app.models.service.Service.all_templates',
         new_callable=PropertyMock,
         side_effect=partial(_templates_by_type, 'all'),
     )
-    mock_templates_by_type = mocker.patch(
-        'app.models.service.Service.templates_by_type',
+    mock_get_templates = mocker.patch(
+        'app.models.service.Service.get_templates',
         side_effect=_templates_by_type,
     )
 
@@ -712,7 +712,7 @@ def test_should_check_for_sms_sender_on_go_live(
     assert mock_templates.call_args_list == [
         call(),
     ]
-    assert mock_templates_by_type.call_args_list == [
+    assert mock_get_templates.call_args_list == [
         call('email'),
         call('sms'),
     ]
@@ -747,7 +747,7 @@ def test_should_check_for_mou_on_request_to_go_live(
         return_value=0,
     )
     mocker.patch(
-        'app.models.service.Service.templates',
+        'app.models.service.Service.all_templates',
         new_callable=PropertyMock,
         return_value=[],
     )

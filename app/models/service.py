@@ -68,7 +68,7 @@ class Service():
         ) > 1
 
     @cached_property
-    def templates(self):
+    def all_templates(self):
 
         templates = service_api_client.get_service_templates(self.id)['data']
 
@@ -77,12 +77,14 @@ class Service():
             if template['template_type'] in self.available_template_types
         ]
 
-    def templates_by_type(self, template_type):
+    def get_templates(self, template_type='all', template_folder_id=None):
         if isinstance(template_type, str):
             template_type = [template_type]
+
         return [
-            template for template in self.templates
-            if set(template_type) & {'all', template['template_type']}
+            template for template in self.all_templates
+            if (set(template_type) & {'all', template['template_type']})
+            and template.get('folder_id') == template_folder_id
         ]
 
     @property
@@ -94,21 +96,21 @@ class Service():
 
     @property
     def has_templates(self):
-        return len(self.templates) > 0
+        return len(self.all_templates) > 0
 
     @property
     def has_multiple_template_types(self):
         return len({
-            template['template_type'] for template in self.templates
+            template['template_type'] for template in self.all_templates
         }) > 1
 
     @property
     def has_email_templates(self):
-        return len(self.templates_by_type('email')) > 0
+        return len(self.get_templates('email')) > 0
 
     @property
     def has_sms_templates(self):
-        return len(self.templates_by_type('sms')) > 0
+        return len(self.get_templates('sms')) > 0
 
     @cached_property
     def email_reply_to_addresses(self):

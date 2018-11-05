@@ -44,7 +44,7 @@ def conversation_reply(
     service_id,
     notification_id,
 ):
-    templates = current_service.templates_by_type('sms')
+    templates = current_service.get_templates('sms')
     return render_template(
         'views/templates/choose-reply.html',
         templates=templates,

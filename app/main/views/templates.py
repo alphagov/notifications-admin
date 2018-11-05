@@ -118,11 +118,11 @@ def choose_template(service_id, template_type='all'):
     return render_template(
         'views/templates/choose.html',
         template_folders=current_service.template_folders,
-        templates=current_service.templates_by_type(template_type),
-        show_search_box=(len(current_service.templates_by_type(template_type)) > 7),
+        templates=current_service.get_templates(template_type),
+        show_search_box=(len(current_service.get_templates(template_type)) > 7),
         show_template_nav=(
             current_service.has_multiple_template_types
-            and (len(current_service.templates) > 2)
+            and (len(current_service.all_templates) > 2)
         ),
         template_nav_items=template_nav_items,
         template_type=template_type,
