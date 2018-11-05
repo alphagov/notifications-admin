@@ -2106,11 +2106,11 @@ def test_set_letter_branding_prepopulates(
     for element in {'label', 'input[type=radio]'}:
         assert len(page.select(element)) == 3
 
-    assert normalize_spaces(page.select('label')[0].text) == 'Animal and Plant Health Agency'
-    assert page.select('input')[0]['value'] == '999'
+    assert normalize_spaces(page.select('label')[0].text) == 'HM Government'
+    assert page.select('input')[0]['value'] == '001'
 
-    assert normalize_spaces(page.select('label')[1].text) == 'HM Government'
-    assert page.select('input')[1]['value'] == '001'
+    assert normalize_spaces(page.select('label')[1].text) == 'Animal and Plant Health Agency'
+    assert page.select('input')[1]['value'] == '999'
 
     assert normalize_spaces(page.select('label')[2].text) == 'Land Registry'
     assert page.select('input')[2]['value'] == '500'
