@@ -2085,10 +2085,22 @@ def test_set_letter_branding_platform_admin_only(
     assert response.status_code == 403
 
 
-@pytest.mark.parametrize('current_dvla_org_id, expected_selected', [
-    (None, '001'),
-    ('500', '500'),
-    ('999', '999'),
+@pytest.mark.parametrize('current_dvla_org_id, expected_selected, expected_items', [
+    (None, '001', (
+        ('001', 'HM Government'),
+        ('999', 'Animal and Plant Health Agency'),
+        ('500', 'Land Registry'),
+    )),
+    ('500', '500', (
+        ('500', 'Land Registry'),
+        ('001', 'HM Government'),
+        ('999', 'Animal and Plant Health Agency'),
+    )),
+    ('999', '999', (
+        ('999', 'Animal and Plant Health Agency'),
+        ('001', 'HM Government'),
+        ('500', 'Land Registry'),
+    )),
 ])
 def test_set_letter_branding_prepopulates(
     logged_in_platform_admin_client,
@@ -2096,6 +2108,7 @@ def test_set_letter_branding_prepopulates(
     mock_get_letter_email_branding,
     current_dvla_org_id,
     expected_selected,
+    expected_items,
 ):
     if current_dvla_org_id:
         service_one['dvla_organisation'] = current_dvla_org_id
@@ -2104,16 +2117,12 @@ def test_set_letter_branding_prepopulates(
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
     for element in {'label', 'input[type=radio]'}:
-        assert len(page.select(element)) == 3
+        assert len(page.select(element)) == len(expected_items)
 
-    assert normalize_spaces(page.select('label')[0].text) == 'HM Government'
-    assert page.select('input')[0]['value'] == '001'
-
-    assert normalize_spaces(page.select('label')[1].text) == 'Animal and Plant Health Agency'
-    assert page.select('input')[1]['value'] == '999'
-
-    assert normalize_spaces(page.select('label')[2].text) == 'Land Registry'
-    assert page.select('input')[2]['value'] == '500'
+    for index, expected_item in enumerate(expected_items):
+        expected_value, expected_label = expected_item
+        assert normalize_spaces(page.select('label')[index].text) == expected_label
+        assert page.select('input')[index]['value'] == expected_value
 
     assert len(page.select('input[checked]')) == 1
     assert page.select('input[checked]')[0]['value'] == expected_selected

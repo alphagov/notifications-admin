@@ -788,6 +788,7 @@ class LetterBranding(StripWhitespaceForm):
         self.dvla_org_id.choices = list(sorted(
             choices,
             key=lambda choice: (
+                choice[0] != kwargs.get('dvla_org_id'),
                 choice[0] != '001',
                 choice[1],
             ),
