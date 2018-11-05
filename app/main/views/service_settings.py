@@ -221,9 +221,7 @@ def service_switch_live(service_id):
 @login_required
 @user_is_platform_admin
 def service_switch_research_mode(service_id):
-    current_service.update_with_properties(
-        {'research_mode': not current_service.research_mode}
-    )
+    current_service.toggle_research_mode()
     return redirect(url_for('.service_settings', service_id=service_id))
 
 

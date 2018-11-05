@@ -78,6 +78,11 @@ class Service():
 
         self.update_with_properties(data)
 
+    def toggle_research_mode(self):
+        self.update_with_properties({
+            'research_mode': not self.research_mode,
+        })
+
     @property
     def trial_mode(self):
         return self._dict['restricted']
