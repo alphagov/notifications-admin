@@ -59,7 +59,6 @@ gulp.task('javascripts', () => gulp
   .src([
     paths.toolkit + 'javascripts/govuk/modules.js',
     paths.toolkit + 'javascripts/govuk/show-hide-content.js',
-    paths.toolkit + 'javascripts/govuk/stop-scrolling-at-footer.js',
     paths.src + 'javascripts/stick-at-top-when-scrolling.js',
     paths.src + 'javascripts/detailsPolyfill.js',
     paths.src + 'javascripts/apiKey.js',
