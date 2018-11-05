@@ -876,7 +876,10 @@ def service_preview_email_branding(service_id):
 @user_is_platform_admin
 def set_letter_branding(service_id):
 
-    form = LetterBranding(choices=email_branding_client.get_letter_email_branding().items())
+    form = LetterBranding(
+        choices=email_branding_client.get_letter_email_branding().items(),
+        dvla_org_id=current_service.dvla_organisation,
+    )
 
     if form.validate_on_submit():
         service_api_client.update_service(
@@ -884,8 +887,6 @@ def set_letter_branding(service_id):
             dvla_organisation=form.dvla_org_id.data
         )
         return redirect(url_for('.service_settings', service_id=service_id))
-
-    form.dvla_org_id.data = current_service.dvla_organisation
 
     return render_template(
         'views/service-settings/set-letter-branding.html',
