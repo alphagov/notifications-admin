@@ -9,13 +9,18 @@
 
 {% block service_page_title %}
   {{ page_title }}
+  {% for folder in template_folder_path %}
+    / {{ folder.name }}
+  {% endfor %}
 {% endblock %}
 
 {% block maincolumn_content %}
 
   {% if (not templates) and (not template_folder_path) %}
 
-    <h1 class="heading-large">{{ page_title }}</h1>
+    <h1 class="heading-large">
+      {{ page_title }}
+    </h1>
     {% if current_user.has_permissions('manage_templates') %}
        <p class="bottom-gutter">
          You need a template before you can send
@@ -41,7 +46,21 @@
 
     <div class="grid-row bottom-gutter-2-3">
       <div class="column-two-thirds">
-        <h1 class="heading-large">{{ page_title }}</h1>
+        <h1 class="heading-large">
+          {% if template_folder_path %}
+            <a href="{{ url_for('.choose_template', service_id=current_service.id, template_type=template_type) }}">{{ page_title }}</a>
+          {% else %}
+            {{ page_title }}
+          {% endif %}
+          {% for folder in template_folder_path %}
+            /
+            {% if loop.last %}
+              {{ folder.name }}
+            {% else %}
+              <a href="{{ url_for('.choose_template', service_id=current_service.id, template_type=template_type, template_folder_id=folder.id) }}">{{ folder.name }}</a>
+            {% endif %}
+          {% endfor %}
+        </h1>
       </div>
       {% if current_user.has_permissions('manage_templates') %}
         <div class="column-one-third">

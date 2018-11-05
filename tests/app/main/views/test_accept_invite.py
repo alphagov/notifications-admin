@@ -158,7 +158,7 @@ def test_accepting_invite_removes_invite_from_session(
         token='thisisnotarealtoken',
         _follow_redirects=True,
     )
-    assert page.h1.string == landing_page_title
+    assert normalize_spaces(page.h1.string) == landing_page_title
 
     with client_request.session_transaction() as session:
         assert 'invited_user' not in session
