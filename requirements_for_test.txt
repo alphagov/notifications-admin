@@ -6,7 +6,6 @@ pytest-mock==1.10.0
 pytest-cov==2.6.0
 pytest-xdist==1.24.0
 coveralls==1.5.1
-httpretty==0.9.5
 beautifulsoup4==4.6.3
 freezegun==0.3.11
 flake8==3.5.0
