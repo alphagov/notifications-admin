@@ -891,6 +891,7 @@ def set_letter_branding(service_id):
     return render_template(
         'views/service-settings/set-letter-branding.html',
         form=form,
+        search_form=SearchTemplatesForm(),
     )
 
 
