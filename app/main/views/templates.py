@@ -100,10 +100,12 @@ def start_tour(service_id, template_id):
 
 
 @main.route("/services/<service_id>/templates")
+@main.route("/services/<service_id>/templates/folders/<template_folder_id>")
 @main.route("/services/<service_id>/templates/<template_type>")
+@main.route("/services/<service_id>/templates/<template_type>/folders/<template_folder_id>")
 @login_required
 @user_has_permissions()
-def choose_template(service_id, template_type='all'):
+def choose_template(service_id, template_type='all', template_folder_id=None):
 
     template_nav_items = [
         (label, key, url_for('.choose_template', service_id=current_service.id, template_type=key), '')
@@ -117,8 +119,9 @@ def choose_template(service_id, template_type='all'):
 
     return render_template(
         'views/templates/choose.html',
-        template_folders=current_service.template_folders,
-        templates=current_service.get_templates(template_type),
+        template_folder_path=current_service.get_template_folder_path(template_folder_id),
+        template_folders=current_service.get_template_folders(template_folder_id),
+        templates=current_service.get_templates(template_type, template_folder_id),
         show_search_box=(len(current_service.get_templates(template_type)) > 7),
         show_template_nav=(
             current_service.has_multiple_template_types

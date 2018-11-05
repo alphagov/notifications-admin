@@ -259,5 +259,26 @@ class Service():
         return bool(self.inbound_number)
 
     @cached_property
-    def template_folders(self):
+    def all_template_folders(self):
         return template_folder_api_client.get_template_folders(self.id)
+
+    def get_template_folders(self, parent_folder_id=None):
+        return [
+            folder for folder in self.all_template_folders
+            if folder['parent_id'] == parent_folder_id
+        ]
+
+    def get_template_folder_path(self, template_folder_id):
+        if template_folder_id is None:
+            return []
+
+        id_to_folder = {folder['id']: folder for folder in self.all_template_folders}
+
+        folder = id_to_folder[template_folder_id]
+        path = [folder]
+
+        while folder['parent_id']:
+            folder = id_to_folder[folder['parent_id']]
+            path.append(folder)
+
+        return list(reversed(path))

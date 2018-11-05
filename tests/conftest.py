@@ -1,4 +1,3 @@
-import uuid
 import json
 import os
 from contextlib import contextmanager
@@ -3241,6 +3240,4 @@ def url_for_endpoint_with_token(endpoint, token):
 
 @pytest.fixture
 def mock_get_template_folders(mocker):
-    return mocker.patch('app.template_folder_api_client.get_template_folders', return_value=[
-        {'id': uuid.uuid4(), 'name': 'Template Folder', 'parent_id': None}
-    ])
+    return mocker.patch('app.template_folder_api_client.get_template_folders', return_value=[])
