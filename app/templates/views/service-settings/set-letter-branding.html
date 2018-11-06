@@ -13,7 +13,7 @@
   <h1 class="heading-large">Set letter branding</h1>
   {% call form_wrapper() %}
     {{ live_search(target_selector='.multiple-choice', show=True, form=search_form, label='Search by name') }}
-    {{ radios(form.dvla_org_id) }}
+    {{ radios(form.dvla_org_id, hide_legend=True) }}
     {{ page_footer(
       'Save',
       back_link=url_for('.service_settings', service_id=current_service.id),
