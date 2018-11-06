@@ -178,7 +178,7 @@ def documentation():
 
 @main.route('/integration-testing')
 def integration_testing():
-    return render_template('views/integration-testing.html')
+    return render_template('views/integration-testing.html'), 410
 
 
 @main.route('/callbacks')

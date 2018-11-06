@@ -55,7 +55,7 @@ def test_robots(client):
 
 
 @pytest.mark.parametrize('view', [
-    'cookies', 'privacy', 'using_notify', 'pricing', 'terms', 'integration_testing', 'roadmap',
+    'cookies', 'privacy', 'using_notify', 'pricing', 'terms', 'roadmap',
     'features', 'callbacks', 'documentation', 'security'
 ])
 def test_static_pages(
@@ -103,6 +103,23 @@ def test_old_static_pages_redirect(
     assert response.location == url_for(
         'main.{}'.format(expected_view),
         _external=True
+    )
+
+
+def test_old_integration_testing_page(
+    client_request,
+):
+    page = client_request.get(
+        'main.integration_testing',
+        _expected_status=410,
+    )
+    assert normalize_spaces(page.select_one('.grid-row').text) == (
+        'Integration testing '
+        'This information has moved. '
+        'Refer to the documentation for the client library you are using.'
+    )
+    assert page.select_one('.grid-row a')['href'] == url_for(
+        'main.documentation'
     )
 
 
