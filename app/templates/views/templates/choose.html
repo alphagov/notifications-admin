@@ -64,7 +64,7 @@
       </div>
       {% if current_user.has_permissions('manage_templates') %}
         <div class="column-one-third">
-          <a href="{{ url_for('.add_template_by_type', service_id=current_service.id) }}" class="button align-with-heading">Add new template</a>
+          <a href="{{ url_for('.add_template_by_type', service_id=current_service.id, template_folder_id=current_template_folder_id) }}" class="button align-with-heading">Add new template</a>
         </div>
       {% endif %}
     </div>

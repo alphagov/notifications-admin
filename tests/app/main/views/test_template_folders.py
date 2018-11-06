@@ -9,9 +9,11 @@ PARENT_FOLDER_ID = '7e979e79-d970-43a5-ac69-b625a8d147b0'
 CHILD_FOLDER_ID = '92ee1ee0-e4ee-4dcc-b1a7-a5da9ebcfa2b'
 
 
+@pytest.mark.parametrize('parent_folder_id', [None, PARENT_FOLDER_ID])
 def test_add_page_shows_option_for_folder(
     client_request,
     service_one,
+    parent_folder_id,
     mocker,
     mock_get_service_templates,
     mock_get_organisations_and_services_for_user,
@@ -22,6 +24,7 @@ def test_add_page_shows_option_for_folder(
     page = client_request.get(
         'main.add_template_by_type',
         service_id=service_one['id'],
+        template_folder_id=parent_folder_id,
         _test_page_title=False
     )
 
@@ -37,10 +40,15 @@ def test_add_page_shows_option_for_folder(
     ]
 
 
-def test_get_add_template_folder_page(client_request, service_one):
+@pytest.mark.parametrize('parent_folder_id', [None, PARENT_FOLDER_ID])
+def test_get_add_template_folder_page(client_request, service_one, parent_folder_id):
     service_one['permissions'] += ['edit_folders']
 
-    page = client_request.get('main.add_template_folder', service_id=service_one['id'])
+    page = client_request.get(
+        'main.add_template_folder',
+        service_id=service_one['id'],
+        template_folder_id=parent_folder_id
+    )
 
     assert page.find('input', attrs={'name': 'name'}) is not None
 
@@ -50,7 +58,8 @@ def test_add_template_folder_page_rejects_if_service_doesnt_have_permission(clie
     client_request.post('main.add_template_folder', service_id=service_one['id'], _expected_status=403)
 
 
-def test_post_add_template_folder_page(client_request, service_one, mocker):
+@pytest.mark.parametrize('parent_folder_id', [None, PARENT_FOLDER_ID])
+def test_post_add_template_folder_page(client_request, service_one, mocker, parent_folder_id):
     mock_create = mocker.patch('app.template_folder_api_client.create_template_folder')
 
     service_one['permissions'] += ['edit_folders']
@@ -58,15 +67,17 @@ def test_post_add_template_folder_page(client_request, service_one, mocker):
     client_request.post(
         'main.add_template_folder',
         service_id=service_one['id'],
+        template_folder_id=parent_folder_id,
         _data={'name': 'foo'},
         _expected_redirect=url_for(
             'main.choose_template',
             service_id=service_one['id'],
+            template_folder_id=parent_folder_id,
             _external=True,
         )
     )
 
-    mock_create.assert_called_once_with(service_one['id'], name='foo', parent_id=None)
+    mock_create.assert_called_once_with(service_one['id'], name='foo', parent_id=parent_folder_id)
 
 
 @pytest.mark.parametrize(
