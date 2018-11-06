@@ -47,6 +47,29 @@ class Service():
             return self._dict[attr]
         raise AttributeError('`{}` is not a service attribute'.format(attr))
 
+    def update(self, **kwargs):
+        return service_api_client.update_service(self.id, **kwargs)
+
+    def switch_permission(self, permission):
+        return self.force_permission(
+            permission,
+            on=not self.has_permission(permission),
+        )
+
+    def force_permission(self, permission, on=False):
+
+        permissions, permission = set(self.permissions), {permission}
+
+        return self.update_permissions(
+            permissions | permission if on else permissions - permission,
+        )
+
+    def update_permissions(self, permissions):
+        return self.update(permissions=list(permissions))
+
+    def toggle_research_mode(self):
+        self.update(research_mode=not self.research_mode)
+
     @property
     def trial_mode(self):
         return self._dict['restricted']

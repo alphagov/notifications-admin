@@ -1170,7 +1170,10 @@ def test_enabling_and_disabling_email_and_sms(
         mock_get_inbound_number_for_service
 ):
     service_one['permissions'] = permissions_before_switch
-    mocked_fn = mocker.patch('app.service_api_client.update_service_with_properties', return_value=service_one)
+    mocked_fn = mocker.patch(
+        'app.notify_client.service_api_client.service_api_client.update_service',
+        return_value=service_one,
+    )
 
     response = logged_in_platform_admin_client.get(
         url_for('main.service_switch_can_send_{}'.format(notification_type), service_id=service_one['id'])
@@ -1178,7 +1181,7 @@ def test_enabling_and_disabling_email_and_sms(
 
     assert response.status_code == 302
     assert response.location == url_for('main.service_settings', service_id=service_one['id'], _external=True)
-    assert mocked_fn.call_args == call(service_one['id'], {'permissions': permissions_after_switch})
+    assert mocked_fn.call_args == call(service_one['id'], permissions=permissions_after_switch)
 
 
 def test_and_more_hint_appears_on_settings_with_more_than_just_a_single_sender(
@@ -1930,7 +1933,7 @@ def test_switch_service_from_research_mode_to_normal(
         research_mode=True
     )
     mocker.patch('app.service_api_client.get_service', return_value={"data": service})
-    update_service_mock = mocker.patch('app.service_api_client.update_service_with_properties', return_value=service)
+    update_service_mock = mocker.patch('app.service_api_client.update_service', return_value=service)
 
     response = logged_in_platform_admin_client.get(
         url_for('main.service_switch_research_mode', service_id=service['id'])
@@ -1938,7 +1941,7 @@ def test_switch_service_from_research_mode_to_normal(
     assert response.status_code == 302
     assert response.location == url_for('main.service_settings', service_id=service['id'], _external=True)
     update_service_mock.assert_called_with(
-        service['id'], {"research_mode": False}
+        service['id'], research_mode=False
     )
 
 
@@ -1953,7 +1956,7 @@ def test_shows_research_mode_indicator(
     mock_get_service_settings_page_common,
 ):
     service_one['research_mode'] = True
-    mocker.patch('app.service_api_client.update_service_with_properties', return_value=service_one)
+    mocker.patch('app.service_api_client.update_service', return_value=service_one)
 
     response = logged_in_client.get(url_for('main.service_settings', service_id=service_one['id']))
     assert response.status_code == 200
@@ -2441,7 +2444,7 @@ def test_switch_service_enable_letters(
     initial_permissions,
     expected_updated_permissions,
 ):
-    mocked_fn = mocker.patch('app.service_api_client.update_service_with_properties', return_value=service_one)
+    mocked_fn = mocker.patch('app.service_api_client.update_service', return_value=service_one)
     service_one['permissions'] = initial_permissions
 
     page = client_request.get(
@@ -2462,8 +2465,7 @@ def test_switch_service_enable_letters(
             _external=True
         )
     )
-
-    assert set(mocked_fn.call_args[0][1]['permissions']) == set(expected_updated_permissions)
+    assert set(mocked_fn.call_args[1]['permissions']) == set(expected_updated_permissions)
     assert mocked_fn.call_args[0][0] == service_one['id']
 
 
@@ -2502,7 +2504,7 @@ def test_switch_service_enable_international_sms(
     post_value,
     international_sms_permission_expected_in_api_call,
 ):
-    mocked_fn = mocker.patch('app.service_api_client.update_service_with_properties', return_value=service_one)
+    mocked_fn = mocker.patch('app.service_api_client.update_service', return_value=service_one)
     client_request.post(
         'main.service_set_international_sms',
         service_id=service_one['id'],
@@ -2513,9 +2515,9 @@ def test_switch_service_enable_international_sms(
     )
 
     if international_sms_permission_expected_in_api_call:
-        assert 'international_sms' in mocked_fn.call_args[0][1]['permissions']
+        assert 'international_sms' in mocked_fn.call_args[1]['permissions']
     else:
-        assert 'international_sms' not in mocked_fn.call_args[0][1]['permissions']
+        assert 'international_sms' not in mocked_fn.call_args[1]['permissions']
 
     assert mocked_fn.call_args[0][0] == service_one['id']
 
