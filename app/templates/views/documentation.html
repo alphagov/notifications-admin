@@ -9,17 +9,21 @@
 <div class="grid-row">
   <div class="column-two-thirds">
 
-	<h1 class="heading-large"> Documentation </h1>
-	<p>Integrate with the GOV.UK Notify API using one of our clients (links open in a new tab):</p>
-	<ul class="list list-bullet">
-      <li><a href="https://docs.notifications.service.gov.uk/java.html" target="_blank" rel="noopener">Java</a></li>
-      <li><a href="https://github.com/alphagov/notifications-net-client" target="_blank" rel="noopener">.NET</a></li>
-      <li><a href="https://github.com/alphagov/notifications-node-client" target="_blank" rel="noopener">Node JS</a></li>
-      <li><a href="https://github.com/alphagov/notifications-php-client" target="_blank" rel="noopener">PHP</a></li>
-      <li><a href="https://docs.notifications.service.gov.uk/python.html" target="_blank" rel="noopener">Python</a></li>
-      <li><a href="https://docs.notifications.service.gov.uk/ruby.html" target="_blank" rel="noopener">Ruby</a></li>
-    </ul>
-    <p>You can also find out about <a href="{{ url_for('main.integration_testing')}}">integration testing</a> and the different types of API keys that you can use.</p>
+  <h1 class="heading-large"> Documentation </h1>
+  <p>Integrate with the GOV.UK Notify API using one of our clients (links open in a new tab):</p>
+  <ul class="list list-bullet">
+    {% for key, label in [
+      ('java', 'Java'),
+      ('net', '.NET'),
+      ('node', 'Node JS'),
+      ('php', 'PHP'),
+      ('python', 'Python'),
+      ('ruby', 'Ruby'),
+    ] %}
+      <li><a href="https://docs.notifications.service.gov.uk/{{ key }}.html" target="_blank" rel="noopener">{{ label }}</a></li>
+    {% endfor %}
+  </ul>
+  <p>You can also find out about <a href="{{ url_for('main.integration_testing')}}">integration testing</a> and the different types of API keys that you can use.</p>
   </div>
 </div>
 
