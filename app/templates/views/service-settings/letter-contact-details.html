@@ -17,7 +17,7 @@
     </div>
     {% if current_user.has_permissions('manage_service') %}
       <div class="column-one-third">
-        <a href="{{ url_for('.service_add_letter_contact', service_id=current_service.id) }}" class="button align-with-heading">Add a new address</a>
+        <a href="{{ current_service.url_for('.service_add_letter_contact') }}" class="button align-with-heading">Add a new address</a>
       </div>
     {% endif %}
   </div>

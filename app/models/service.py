@@ -1,5 +1,6 @@
 from notifications_utils.field import Field
 from werkzeug.utils import cached_property
+from flask import url_for
 
 from app.notify_client.billing_api_client import billing_api_client
 from app.notify_client.email_branding_client import email_branding_client
@@ -252,3 +253,6 @@ class Service():
     @property
     def has_inbound_number(self):
         return bool(self.inbound_number)
+
+    def url_for(self, *args, **kwargs):
+        return url_for(*args, service_id=self.id, **kwargs)

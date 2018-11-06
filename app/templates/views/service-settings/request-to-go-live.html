@@ -18,25 +18,25 @@
         {{ task_list_item(
           current_service.has_team_members,
           'Add a team member who can manage settings, team and usage',
-          url_for('main.manage_users', service_id=current_service.id),
+          current_service.url_for('main.manage_users'),
         ) }}
         {{ task_list_item(
           current_service.has_templates,
           'Add templates with examples of the content you plan to send',
-          url_for('main.choose_template', service_id=current_service.id),
+          current_service.url_for('main.choose_template'),
         ) }}
         {% if current_service.has_email_templates %}
           {{ task_list_item(
             current_service.has_email_reply_to_address,
             'Add an email reply-to address',
-            url_for('main.service_email_reply_to', service_id=current_service.id),
+            current_service.url_for('main.service_email_reply_to'),
           ) }}
         {% endif %}
         {% if current_service.has_sms_templates and current_service.shouldnt_use_govuk_as_sms_sender %}
           {{ task_list_item(
             not current_service.sms_sender_is_govuk,
             'Change your text message sender name',
-            url_for('main.service_sms_senders', service_id=current_service.id),
+            current_service.url_for('main.service_sms_senders'),
           ) }}
         {% endif %}
         {% if show_agreement %}
@@ -51,7 +51,7 @@
         You also need to accept our <a href="{{ url_for('.terms') }}">terms of use</a>.
       </p>
       <p>
-        <a href="{{ url_for('main.submit_request_to_go_live', service_id=current_service.id) }}" class="button">Continue</a>
+        <a href="{{ current_service.url_for('main.submit_request_to_go_live') }}" class="button">Continue</a>
       </p>
     </div>
   </div>

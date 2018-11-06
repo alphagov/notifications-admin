@@ -29,14 +29,14 @@
 
     {{ ajax_block(partials, updates_url, 'totals', interval=5) }}
     {{ show_more(
-      url_for('.monthly', service_id=current_service.id),
+      current_service.url_for('.monthly'),
       'See messages sent per month'
     ) }}
 
     {% if partials['has_template_statistics'] %}
       {{ ajax_block(partials, updates_url, 'template-statistics', interval=5) }}
       {{ show_more(
-        url_for('.template_usage', service_id=current_service.id),
+        current_service.url_for('.template_usage'),
         'See templates used by month'
       ) }}
     {% endif %}
@@ -44,7 +44,7 @@
     {% if partials['has_jobs'] %}
       {{ ajax_block(partials, updates_url, 'jobs', interval=5) }}
       {{ show_more(
-        url_for('.view_jobs', service_id=current_service.id),
+        current_service.url_for('.view_jobs'),
         'See all uploaded files'
       ) }}
     {% endif %}

@@ -44,7 +44,7 @@
       </p>
       {{ page_footer(
         'Save',
-        back_link=None if request.args.get('from_template') else url_for('.service_sms_senders', service_id=current_service.id),
+        back_link=None if request.args.get('from_template') else current_service.url_for('.service_sms_senders'),
         back_link_text='Back'
       ) }}
     {% else %}
@@ -54,15 +54,15 @@
       {% if inbound_number %}
         {{ page_footer(
           'Save',
-          back_link=None if request.args.get('from_template') else url_for('.service_sms_senders', service_id=current_service.id),
+          back_link=None if request.args.get('from_template') else current_service.url_for('.service_sms_senders'),
           back_link_text='Back'
         ) }}
       {% else %}
         {{ page_footer(
           'Save',
-          back_link=None if request.args.get('from_template') else url_for('.service_sms_senders', service_id=current_service.id),
+          back_link=None if request.args.get('from_template') else current_service.url_for('.service_sms_senders'),
           back_link_text='Back',
-          delete_link=url_for('.service_confirm_delete_sms_sender', service_id=current_service.id, sms_sender_id=sms_sender_id),
+          delete_link=current_service.url_for('.service_confirm_delete_sms_sender', sms_sender_id=sms_sender_id),
           delete_link_text='Delete'
         ) }}
       {% endif %}

@@ -7,7 +7,7 @@
         big_number_with_status(
           inbound_sms_summary.count,
           'text messages received',
-          link=url_for('.inbox', service_id=current_service.id),
+          link=current_service.url_for('.inbox'),
           show_failures=False
         )
       }}

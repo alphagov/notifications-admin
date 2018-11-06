@@ -23,7 +23,7 @@
         {{ radios(form.enabled) }}
         {{ page_footer(
           'Save',
-          back_link=url_for('.service_settings', service_id=current_service.id),
+          back_link=current_service.url_for('.service_settings'),
           back_link_text='Back to settings'
         ) }}
       {% endcall %}

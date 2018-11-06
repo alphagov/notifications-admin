@@ -31,7 +31,7 @@
     </div>
     {% if link_to_upload %}
       <p>
-        <a href="{{ url_for('.send_messages', service_id=current_service.id, template_id=template.id) }}">
+        <a href="{{ current_service.url_for('.send_messages', template_id=template.id) }}">
           Upload a list of {{ recipient_count_label(999, template.template_type) }}
         </a>
       </p>

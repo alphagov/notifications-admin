@@ -16,7 +16,7 @@
     </div>
     {% if current_user.has_permissions('manage_service') %}
   	<div class="column-one-third">
-  	  <a href="{{ url_for('.service_add_sms_sender', service_id=current_service.id) }}" class="button align-with-heading">Add text message sender</a>
+  	  <a href="{{ current_service.url_for('.service_add_sms_sender') }}" class="button align-with-heading">Add text message sender</a>
   	</div>
     {% endif %}
   </div>
@@ -38,7 +38,7 @@
           {% endif %}
         </h3>
         {% if current_user.has_permissions('manage_service') %}
-          <a class="user-list-edit-link" href="{{ url_for('.service_edit_sms_sender', service_id=current_service.id, sms_sender_id = item.id) }}">Change</a>
+          <a class="user-list-edit-link" href="{{ current_service.url_for('.service_edit_sms_sender', sms_sender_id = item.id) }}">Change</a>
         {% endif %}
         {% if current_service.count_sms_senders > 1 %}
           {{ api_key(item.id, thing="ID") }}

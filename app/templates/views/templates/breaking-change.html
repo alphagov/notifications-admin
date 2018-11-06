@@ -35,7 +35,7 @@
     <input type="hidden" name="confirm" value="true" />
     {{ page_footer(
       'Save changes to template',
-      back_link=url_for(".edit_service_template", service_id=current_service.id, template_id=new_template.id),
+      back_link=current_service.url_for(".edit_service_template", template_id=new_template.id),
       back_link_text="Back"
     ) }}
   {% endcall %}

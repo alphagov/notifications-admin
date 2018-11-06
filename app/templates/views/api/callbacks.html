@@ -20,18 +20,18 @@
 	    {% call row() %}
 	      {{ text_field('Callbacks for delivery receipts') }}
 	      {{ optional_text_field(delivery_status_callback, truncate=true) }}
-	      {{ edit_field('Change', url_for('.delivery_status_callback', service_id=current_service.id)) }}
+	      {{ edit_field('Change', current_service.url_for('.delivery_status_callback')) }}
 	    {% endcall %}
 
 	    {% call row() %}
 	      {{ text_field('Callbacks for received text messages') }}
           {{ optional_text_field(received_text_messages_callback, truncate=true) }}
-	   	  {{ edit_field('Change', url_for('.received_text_messages_callback', service_id=current_service.id)) }}
+	   	  {{ edit_field('Change', current_service.url_for('.received_text_messages_callback')) }}
 	    {% endcall %}
 	  {% endcall %}
 	</div>
   {{ page_footer(
-    secondary_link=url_for('.api_integration', service_id=current_service.id),
+    secondary_link=current_service.url_for('.api_integration'),
     secondary_link_text='Back to API integration'
   ) }}
 {% endblock %}

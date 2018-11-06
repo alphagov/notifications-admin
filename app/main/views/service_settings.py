@@ -179,7 +179,7 @@ def submit_request_to_go_live(service_id):
                 '{volume_letter}'
             ).format(
                 service_name=current_service.name,
-                service_dashboard=url_for('main.service_dashboard', service_id=current_service.id, _external=True),
+                service_dashboard=current_service.url_for('main.service_dashboard', _external=True),
                 organisation_type=str(current_service.organisation_type).title(),
                 agreement=AgreementInfo.from_current_user().as_human_readable,
                 checklist=current_service.go_live_checklist_completed_as_yes_no,
@@ -384,7 +384,7 @@ def service_set_contact_link(service_id):
             current_service.id,
             contact_link=form.data[contact_type]
         )
-        return redirect(url_for('.service_settings', service_id=current_service.id))
+        return redirect(current_service.url_for('.service_settings'))
 
     return render_template('views/service-settings/contact_link.html', form=form)
 
@@ -956,7 +956,7 @@ def branding_request(service_id):
             ).format(
                 AgreementInfo.from_current_user().as_info_for_branding_request,
                 current_service.name,
-                url_for('main.service_dashboard', service_id=current_service.id, _external=True),
+                current_service.url_for('main.service_dashboard', _external=True),
                 branding_options_dict[form.options.data],
             ),
             ticket_type=zendesk_client.TYPE_QUESTION,

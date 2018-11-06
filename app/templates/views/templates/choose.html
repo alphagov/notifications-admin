@@ -25,7 +25,7 @@
            emails or text messages
          {%- endif %}.
        </p>
-      <a href="{{ url_for('.add_template_by_type', service_id=current_service.id) }}" class="button">Add a new template</a>
+      <a href="{{ current_service.url_for('.add_template_by_type') }}" class="button">Add a new template</a>
     {% else %}
       <p>
         You need to ask your service manager to add templates before you can send
@@ -45,7 +45,7 @@
       </div>
       {% if current_user.has_permissions('manage_templates') %}
         <div class="column-one-third">
-          <a href="{{ url_for('.add_template_by_type', service_id=current_service.id) }}" class="button align-with-heading">Add new template</a>
+          <a href="{{ current_service.url_for('.add_template_by_type') }}" class="button align-with-heading">Add new template</a>
         </div>
       {% endif %}
     </div>
@@ -62,7 +62,7 @@
       {% for template in templates %}
         <div class="column-whole">
           <h2 class="message-name">
-            <a href="{{ url_for('.view_template', service_id=current_service.id, template_id=template.id) }}">{{ template.name }}</a>
+            <a href="{{ current_service.url_for('.view_template', template_id=template.id) }}">{{ template.name }}</a>
           </h2>
           <p class="message-type">
             {{ message_count_label(1, template.template_type, suffix='')|capitalize }} template

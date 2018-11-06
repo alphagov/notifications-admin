@@ -19,7 +19,7 @@
        <p class="bottom-gutter">
          You need a template before you can send text messages.
        </p>
-      <a href="{{ url_for('.add_template_by_type', service_id=current_service.id) }}" class="button">Add a new template</a>
+      <a href="{{ current_service.url_for('.add_template_by_type') }}" class="button">Add a new template</a>
     {% else %}
       <p>
         You need to ask your service manager to add templates before you
@@ -35,7 +35,7 @@
       {% for template in templates %}
         <div class="column-whole">
           <h2 class="message-name">
-            <a href="{{ url_for('.conversation_reply_with_template', service_id=current_service.id, template_id=template.id, notification_id=notification_id) }}">{{ template.name }}</a>
+            <a href="{{ current_service.url_for('.conversation_reply_with_template', template_id=template.id, notification_id=notification_id) }}">{{ template.name }}</a>
           </h2>
           <p class="message-type">
             {{ message_count_label(1, template.template_type, suffix='')|capitalize }} template

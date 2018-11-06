@@ -39,7 +39,7 @@
 
   <p>
     You and members of
-    <a href="{{ url_for('main.manage_users', service_id=current_service.id) }}">your team</a>
+    <a href="{{ current_service.url_for('main.manage_users') }}">your team</a>
     are included in the whitelist automatically.
   </p>
 
@@ -65,7 +65,7 @@
 
     {{ page_footer(
       'Save',
-      secondary_link=url_for('.api_integration', service_id=current_service.id),
+      secondary_link=current_service.url_for('.api_integration'),
       secondary_link_text='Back to API integration'
     ) }}
 

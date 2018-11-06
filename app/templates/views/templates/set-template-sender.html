@@ -20,11 +20,11 @@
         ) }}
         {{ page_footer(
           'Continue',
-          back_link=url_for('.view_template', service_id=current_service.id, template_id=template_id),
+          back_link=current_service.url_for('.view_template', template_id=template_id),
           back_link_text='Back to template'
         ) }}
         {% if no_senders %}
-          <a href="{{ url_for('.service_add_letter_contact', service_id=current_service.id, from_template=template_id) }}">Add new sender</a>
+          <a href="{{ current_service.url_for('.service_add_letter_contact', from_template=template_id) }}">Add new sender</a>
         {% endif %}
       {% endcall %}
     </div>

@@ -187,9 +187,8 @@ def view_notifications(service_id, message_type=None):
             message_type=message_type,
             to=request.form.get('to', ''),
         ),
-        download_link=url_for(
+        download_link=current_service.url_for(
             '.download_notifications_csv',
-            service_id=current_service.id,
             message_type=message_type,
             status=request.args.get('status')
         )
@@ -257,9 +256,8 @@ def get_notifications(service_id, message_type, status_override=None):
         next_page = generate_next_dict('main.view_notifications', service_id, page, url_args)
 
     if message_type:
-        download_link = url_for(
+        download_link = current_service.url_for(
             '.view_notifications_csv',
-            service_id=current_service.id,
             message_type=message_type,
             status=request.args.get('status')
         )
@@ -407,9 +405,8 @@ def get_job_partials(job, template):
             ),
             more_than_one_page=bool(notifications.get('links', {}).get('next')),
             percentage_complete=(job['notifications_requested'] / job['notification_count'] * 100),
-            download_link=url_for(
+            download_link=current_service.url_for(
                 '.view_job_csv',
-                service_id=current_service.id,
                 job_id=job['id'],
                 status=request.args.get('status')
             ),

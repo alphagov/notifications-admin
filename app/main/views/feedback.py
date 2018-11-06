@@ -108,7 +108,7 @@ def feedback(ticket_type):
         if current_service:
             service_string = 'Service: "{name}"\n{url}\n'.format(
                 name=current_service.name,
-                url=url_for('main.service_dashboard', service_id=current_service.id, _external=True)
+                url=current_service.url_for('main.service_dashboard', _external=True)
             )
         else:
             service_string = ''

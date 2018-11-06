@@ -20,7 +20,7 @@
         ) }}
         {{ page_footer(
           'Continue',
-          back_link=url_for('.view_template', service_id=current_service.id, template_id=template_id),
+          back_link=current_service.url_for('.view_template', template_id=template_id),
           back_link_text='Back to template'
         ) }}
       {% endcall %}

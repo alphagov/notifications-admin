@@ -22,7 +22,7 @@
         {% if current_user.has_permissions('manage_api_keys') %}
           <p>
             You can set up callbacks for received text messages on the
-            <a href="{{ url_for('.api_callbacks', service_id=current_service.id) }}">API integration page</a>.
+            <a href="{{ current_service.url_for('.api_callbacks') }}">API integration page</a>.
           </p>
         {% endif %}
       {% else %}
@@ -39,7 +39,7 @@
         </p>
       {% endif %}
       {{ page_footer(
-        back_link=url_for('.service_settings', service_id=current_service.id),
+        back_link=current_service.url_for('.service_settings'),
         back_link_text='Back to settings'
       ) }}
     </div>

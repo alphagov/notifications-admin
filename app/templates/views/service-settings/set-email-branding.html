@@ -26,7 +26,7 @@
       <div class="column-three-quarters">
         {{ page_footer(
           'Preview',
-          back_link=url_for('.service_settings', service_id=current_service.id),
+          back_link=current_service.url_for('.service_settings'),
           back_link_text='Back to settings'
         ) }}
       </div>

@@ -30,7 +30,7 @@
         </h1>
       </div>
       <div class="column-one-third">
-        <a href="{{ url_for('.create_api_key', service_id=current_service.id) }}" class="button align-with-heading">Create an API key</a>
+        <a href="{{ current_service.url_for('.create_api_key') }}" class="button align-with-heading">Create an API key</a>
       </div>
     </div>
   {% endif %}
@@ -67,14 +67,14 @@
         {% endcall %}
       {% else %}
         {% call field(align='right', status='error') %}
-          <a href='{{ url_for('.revoke_api_key', service_id=current_service.id, key_id=item.id) }}'>Revoke</a>
+          <a href='{{ current_service.url_for('.revoke_api_key', key_id=item.id) }}'>Revoke</a>
         {% endcall %}
       {% endif %}
     {% endcall %}
   </div>
 
   {{ page_footer(
-    secondary_link=url_for('.api_integration', service_id=current_service.id),
+    secondary_link=current_service.url_for('.api_integration'),
     secondary_link_text='Back to API integration'
   ) }}
 

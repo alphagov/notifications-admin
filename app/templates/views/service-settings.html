@@ -24,7 +24,7 @@
           {{ text_field(current_service.name) }}
           {{ edit_field(
               'Change',
-              url_for('.service_name_change', service_id=current_service.id),
+              current_service.url_for('.service_name_change'),
               permissions=['manage_service']
             )
           }}
@@ -39,8 +39,7 @@
           ) }}
           {{ edit_field(
               'Change',
-              url_for('.service_set_auth_type',
-              service_id=current_service.id),
+              current_service.url_for('.service_set_auth_type'),
               permissions=['manage_service']
             )
           }}
@@ -51,8 +50,7 @@
           {{ text_field(current_service.contact_link, truncate=true) }}
           {{ edit_field(
               'Change',
-              url_for('.service_set_contact_link',
-              service_id=current_service.id),
+              current_service.url_for('.service_set_contact_link'),
               permissions=['manage_service']
             )
           }}
@@ -72,8 +70,7 @@
           {{ boolean_field('email' in current_service.permissions) }}
           {{ edit_field(
               'Change',
-              url_for('.service_set_email',
-              service_id=current_service.id),
+              current_service.url_for('.service_set_email'),
               permissions=['manage_service']
               )
           }}
@@ -91,8 +88,7 @@
           {% endcall %}
           {{ edit_field(
               'Manage' if current_service.count_email_reply_to_addresses else 'Change',
-              url_for('.service_email_reply_to',
-              service_id=current_service.id),
+              current_service.url_for('.service_email_reply_to'),
               permissions=['manage_service','manage_api_keys']
             )
           }}
@@ -103,7 +99,7 @@
           {{ text_field('Your branding' if current_service.email_branding else 'GOV.UK') }}
           {{ edit_field(
             'Change',
-            url_for('.branding_request', service_id=current_service.id),
+            current_service.url_for('.branding_request'),
             permissions=['manage_service'],
           )}}
         {% endcall %}
@@ -122,8 +118,7 @@
           {{ boolean_field('sms' in current_service.permissions) }}
           {{ edit_field(
               'Change',
-              url_for('.service_set_sms',
-              service_id=current_service.id),
+              current_service.url_for('.service_set_sms'),
               permissions=['manage_service']
             )
           }}
@@ -141,8 +136,7 @@
           {% endcall %}
           {{ edit_field(
               'Manage' if current_service.count_sms_senders > 1 else 'Change',
-              url_for('.service_sms_senders',
-              service_id=current_service.id),
+              current_service.url_for('.service_sms_senders'),
               permissions=['manage_service','manage_api_keys']
           )
           }}
@@ -153,8 +147,7 @@
           {{ boolean_field(current_service.prefix_sms) }}
           {{ edit_field(
               'Change',
-              url_for('.service_set_sms_prefix',
-              service_id=current_service.id),
+              current_service.url_for('.service_set_sms_prefix'),
               permissions=['manage_service']
           )
           }}
@@ -165,8 +158,7 @@
           {{ boolean_field('international_sms' in current_service.permissions) }}
           {{ edit_field(
               'Change',
-              url_for('.service_set_international_sms',
-              service_id=current_service.id),
+              current_service.url_for('.service_set_international_sms'),
               permissions=['manage_service']
           )
           }}
@@ -177,8 +169,7 @@
           {{ boolean_field('inbound_sms' in current_service.permissions) }}
           {{ edit_field(
               'Change',
-              url_for('.service_set_inbound_sms',
-              service_id=current_service.id),
+              current_service.url_for('.service_set_inbound_sms'),
               permissions=['manage_service']
           )
           }}
@@ -198,8 +189,7 @@
           {{ boolean_field('letter' in current_service.permissions) }}
           {{ edit_field(
               'Change',
-              url_for('.service_set_letters',
-              service_id=current_service.id),
+              current_service.url_for('.service_set_letters'),
               permissions=['manage_service']
           )
           }}
@@ -217,8 +207,7 @@
           {% endcall %}
           {{ edit_field(
               'Manage' if current_service.count_letter_contact_details else 'Change',
-              url_for('.service_letter_contact_details',
-              service_id=current_service.id),
+              current_service.url_for('.service_letter_contact_details'),
               permissions=['manage_service','manage_api_keys']
           )
           }}
@@ -229,7 +218,7 @@
           {{ text_field(current_service.letter_branding) }}
           {{ edit_field(
             'Change',
-            url_for('.request_letter_branding', service_id=current_service.id),
+            current_service.url_for('.request_letter_branding'),
             permissions=['manage_service']
           )}}
         {% endcall %}
@@ -241,8 +230,7 @@
               {{ text_field(postage[current_service.postage]) }}
             {{ edit_field(
                 'Change',
-                url_for('.service_set_postage',
-                service_id=current_service.id),
+                current_service.url_for('.service_set_postage'),
                 permissions=['manage_service']
             )
             }}
@@ -264,7 +252,7 @@
       <p>
         {% if current_user.has_permissions('manage_service') %}
           To remove these restrictions
-          <a href="{{ url_for('.request_to_go_live', service_id=current_service.id) }}">request to go live</a>.
+          <a href="{{ current_service.url_for('.request_to_go_live') }}">request to go live</a>.
         {% else %}
           Your service manager can ask to have these restrictions removed.
         {% endif %}
@@ -297,64 +285,64 @@
         {% call row() %}
           {{ text_field('Organisation')}}
           {{ optional_text_field(current_service.organisation_name) }}
-          {{ edit_field('Change', url_for('.link_service_to_organisation', service_id=current_service.id)) }}
+          {{ edit_field('Change', current_service.url_for('.link_service_to_organisation')) }}
         {% endcall %}
         {% call row() %}
           {{ text_field('Organisation type')}}
           {{ optional_text_field(
             (current_service.organisation_type or '')|title
           ) }}
-          {{ edit_field('Change', url_for('.set_organisation_type', service_id=current_service.id)) }}
+          {{ edit_field('Change', current_service.url_for('.set_organisation_type')) }}
         {% endcall %}
         {% call row() %}
           {{ text_field('Free text message allowance')}}
           {{ text_field('{:,}'.format(current_service.free_sms_fragment_limit)) }}
-          {{ edit_field('Change', url_for('.set_free_sms_allowance', service_id=current_service.id)) }}
+          {{ edit_field('Change', current_service.url_for('.set_free_sms_allowance')) }}
         {% endcall %}
         {% call row() %}
           {{ text_field('Email branding' )}}
           {{ text_field(current_service.email_branding.name or 'GOV.UK') }}
-          {{ edit_field('Change', url_for('.service_set_email_branding', service_id=current_service.id)) }}
+          {{ edit_field('Change', current_service.url_for('.service_set_email_branding')) }}
         {% endcall %}
         {% call row() %}
           {{ text_field('Letter branding')}}
           {{ text_field(current_service.letter_branding) }}
-          {{ edit_field('Change', url_for('.set_letter_branding', service_id=current_service.id)) }}
+          {{ edit_field('Change', current_service.url_for('.set_letter_branding')) }}
         {% endcall %}
         {% call row() %}
           {{ text_field('Data retention')}}
           {% call field() %}
               {{ current_service.data_retention | join(', ', attribute='notification_type') }}
           {% endcall %}
-          {{ edit_field('Change', url_for('.data_retention', service_id=current_service.id)) }}
+          {{ edit_field('Change', current_service.url_for('.data_retention')) }}
         {% endcall %}
       {% endcall %}
 
       <ul>
         <li class="bottom-gutter">
-          <a href="{{ url_for('.service_switch_live', service_id=current_service.id) }}" class="button">
+          <a href="{{ current_service.url_for('.service_switch_live') }}" class="button">
             {{ 'Make service live' if current_service.trial_mode else 'Revert service to trial mode' }}
           </a>
         </li>
         <li class="bottom-gutter">
-          <a href="{{ url_for('.service_switch_research_mode', service_id=current_service.id) }}" class="button">
+          <a href="{{ current_service.url_for('.service_switch_research_mode') }}" class="button">
             {{ 'Take service out of research mode' if current_service.research_mode else 'Put into research mode' }}
           </a>
         </li>
         <li class="bottom-gutter">
-          <a href="{{ url_for('.service_switch_can_send_email', service_id=current_service.id) }}" class="button">
+          <a href="{{ current_service.url_for('.service_switch_can_send_email') }}" class="button">
             {{ 'Stop sending emails' if 'email' in current_service.permissions else 'Allow to send emails' }}
           </a>
         </li>
         <li class="bottom-gutter">
-          <a href="{{ url_for('.service_switch_can_send_sms', service_id=current_service.id) }}" class="button">
+          <a href="{{ current_service.url_for('.service_switch_can_send_sms') }}" class="button">
             {{ 'Stop sending sms' if 'sms' in current_service.permissions else 'Allow to send sms' }}
           </a>
         </li>
         {% if 'sms' in current_service.permissions %}
           <li class="bottom-gutter">
           {% if not current_service.has_permission('inbound_sms') %}
-            <a href="{{ url_for('.service_set_inbound_number', service_id=current_service.id, set_inbound_sms=True) }}" class="button">
+            <a href="{{ current_service.url_for('.service_set_inbound_number', set_inbound_sms=True) }}" class="button">
               Allow inbound sms
             </a>
           {% endif %}
@@ -362,40 +350,40 @@
         {% endif %}
         {% if 'letter' in current_service.permissions %}
           <li class="bottom-gutter">
-            <a href="{{ url_for('.service_switch_can_send_precompiled_letter', service_id=current_service.id) }}" class="button">
+            <a href="{{ current_service.url_for('.service_switch_can_send_precompiled_letter') }}" class="button">
               {{ 'Stop sending precompiled letters' if 'precompiled_letter' in current_service.permissions else 'Allow to send precompiled letters' }}
             </a>
           </li>
         {% endif %}
         <li class="bottom-gutter">
-          <a href="{{ url_for('.service_switch_email_auth', service_id=current_service.id) }}" class="button">
+          <a href="{{ current_service.url_for('.service_switch_email_auth') }}" class="button">
             {{ 'Stop user auth type editing' if 'email_auth' in current_service.permissions else 'Allow user auth type editing' }}
           </a>
         </li>
         <li class="bottom-gutter">
-           <a href="{{ url_for('.service_switch_can_upload_document', service_id=current_service.id) }}" class="button">
+           <a href="{{ current_service.url_for('.service_switch_can_upload_document') }}" class="button">
              {{ 'Stop uploading documents' if 'upload_document' in current_service.permissions else 'Allow to upload documents' }}
            </a>
         </li>
         <li class="bottom-gutter">
-           <a href="{{ url_for('.service_switch_can_edit_folders', service_id=current_service.id) }}" class="button">
+           <a href="{{ current_service.url_for('.service_switch_can_edit_folders') }}" class="button">
              {{ 'Stop editing folders' if 'edit_folders' in current_service.permissions else 'Allow to edit folders' }}
            </a>
         </li>
         {% if current_service.active %}
           <li class="bottom-gutter">
-            <a href="{{ url_for('.archive_service', service_id=current_service.id) }}" class="button">
+            <a href="{{ current_service.url_for('.archive_service') }}" class="button">
               Archive service
             </a>
           </li>
           <li class="bottom-gutter">
-            <a href="{{ url_for('.suspend_service', service_id=current_service.id) }}" class="button">
+            <a href="{{ current_service.url_for('.suspend_service') }}" class="button">
               Suspend service
             </a>
           </li>
         {% else %}
           <li class="bottom-gutter">
-            <a href="{{ url_for('.resume_service', service_id=current_service.id) }}" class="button">
+            <a href="{{ current_service.url_for('.resume_service') }}" class="button">
               Resume service
             </a>
           </li>

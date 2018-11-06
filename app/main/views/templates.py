@@ -104,7 +104,7 @@ def start_tour(service_id, template_id):
 def choose_template(service_id, template_type='all'):
 
     template_nav_items = [
-        (label, key, url_for('.choose_template', service_id=current_service.id, template_type=key), '')
+        (label, key, current_service.url_for('.choose_template', template_type=key), '')
         for label, key in filter(None, [
             ('All', 'all'),
             ('Text message', 'sms'),
