@@ -1,5 +1,9 @@
 .api-key {
 
+  position: relative;
+  padding-bottom: 38px;  // height of button
+  display: flex;
+
   &-name {
     @include bold-19;
     margin-bottom: 5px;
@@ -8,12 +12,21 @@
   &-key {
     font-family: monospace;
     display: block;
-    margin-bottom: 10px;
+    padding: 0 0 10px 0;
+    margin: auto 0;
   }
 
   &-button-show,
   &-button-copy {
+
     @include button($grey-3);
+    position: absolute;
+    bottom: 2px;
+
+    &:active {
+      top: auto;
+    }
+
   }
 
 }

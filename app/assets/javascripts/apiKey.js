@@ -34,6 +34,8 @@
             thing = $component.data('thing');
 
       $component
+        .addClass('api-key')
+        .css('min-height', $component.height())
         .html(states.keyVisible(key, thing))
         .attr('aria-live', 'polite')
         .on(
