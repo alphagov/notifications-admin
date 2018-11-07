@@ -430,7 +430,7 @@ ashfield-dc.gov.uk:
 ashfield.gov.uk:
   owner: Ashfield District Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 ashford.gov.uk:
   owner: Ashford Borough Council
   crown: false
