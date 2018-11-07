@@ -80,7 +80,6 @@ def whitelist(service_id):
 def api_keys(service_id):
     return render_template(
         'views/api/keys.html',
-        keys=api_key_api_client.get_api_keys(service_id=service_id)['apiKeys']
     )
 
 
@@ -88,10 +87,7 @@ def api_keys(service_id):
 @login_required
 @user_has_permissions('manage_api_keys', restrict_admin_usage=True)
 def create_api_key(service_id):
-    key_names = [
-        key['name'] for key in api_key_api_client.get_api_keys(service_id=service_id)['apiKeys']
-    ]
-    form = CreateKeyForm(key_names)
+    form = CreateKeyForm(current_service.api_key_names)
     form.key_type.choices = [
         (KEY_TYPE_NORMAL, 'Live – sends to anyone'),
         (KEY_TYPE_TEAM, 'Team and whitelist – limits who you can send to'),
@@ -137,7 +133,6 @@ def revoke_api_key(service_id, key_id):
         return render_template(
             'views/api/keys.html',
             revoke_key=key_name,
-            keys=api_key_api_client.get_api_keys(service_id=service_id)['apiKeys'],
         )
     elif request.method == 'POST':
         api_key_api_client.revoke_api_key(service_id=service_id, key_id=key_id)

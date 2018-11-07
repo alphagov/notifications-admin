@@ -186,7 +186,7 @@ def test_should_show_empty_api_keys_page(
     assert response.status_code == 200
     assert 'You haven’t created any API keys yet' in response.get_data(as_text=True)
     assert 'Create an API key' in response.get_data(as_text=True)
-    mock_get_no_api_keys.assert_called_once_with(service_id=service_id)
+    mock_get_no_api_keys.assert_called_once_with(service_id)
 
 
 def test_should_show_api_keys_page(
@@ -205,7 +205,7 @@ def test_should_show_api_keys_page(
     assert 'some key name' in resp_data
     assert 'another key name' in resp_data
     assert 'Revoked 1 January at 1:00am' in resp_data
-    mock_get_api_keys.assert_called_once_with(service_id=fake_uuid)
+    mock_get_api_keys.assert_called_once_with(fake_uuid)
 
 
 @pytest.mark.parametrize('service_mock, expected_options', [
@@ -323,7 +323,7 @@ def test_should_show_confirm_revoke_api_key(
             service_id='596364a0-858e-42c8-9062-a8fe822260eb',
         ),
         call(
-            service_id='596364a0-858e-42c8-9062-a8fe822260eb'
+            '596364a0-858e-42c8-9062-a8fe822260eb'
         ),
     ]
 
