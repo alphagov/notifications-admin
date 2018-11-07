@@ -752,7 +752,7 @@ class ServiceUpdateEmailBranding(StripWhitespaceForm):
     colour = StringField(
         'Colour',
         validators=[
-            Regexp(regex="^$|^#(?:[0-9a-fA-F]{3}){1,2}$", message='Must be a valid color hex code')
+            Regexp(regex="^$|^#(?:[0-9a-fA-F]{3}){1,2}$", message='Must be a valid color hex code (starting with #)')
         ]
     )
     file = FileField_wtf('Upload a PNG logo', validators=[FileAllowed(['png'], 'PNG Images only!')])
