@@ -2492,6 +2492,7 @@ def mock_get_letter_email_branding(mocker):
         return {
             '001': 'HM Government',
             '500': 'Land Registry',
+            '999': 'Animal and Plant Health Agency',
         }
 
     return mocker.patch(
