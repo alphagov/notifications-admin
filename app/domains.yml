@@ -275,6 +275,7 @@ ppf.gsi.gov.uk: ppf.gov.uk:
 ppf.gov.uk: pensionprotectionfund.org.uk
 pensionprotectionfund.org.uk:
   owner: Pension Protection Fund
+  crown: true
   agreement_signed: false  
 
 # Other non-crown
