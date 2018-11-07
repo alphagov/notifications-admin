@@ -190,22 +190,17 @@ def test_should_show_empty_api_keys_page(
 
 
 def test_should_show_api_keys_page(
-    logged_in_client,
-    api_user_active,
-    mock_login,
+    client_request,
     mock_get_api_keys,
-    mock_get_service,
-    mock_has_permissions,
-    fake_uuid,
 ):
-    response = logged_in_client.get(url_for('main.api_keys', service_id=fake_uuid))
+    page = client_request.get('main.api_keys', service_id=SERVICE_ONE_ID)
+    rows = [normalize_spaces(row.text) for row in page.select('main tr')]
 
-    assert response.status_code == 200
-    resp_data = response.get_data(as_text=True)
-    assert 'some key name' in resp_data
-    assert 'another key name' in resp_data
-    assert 'Revoked 1 January at 1:00am' in resp_data
-    mock_get_api_keys.assert_called_once_with(fake_uuid)
+    assert rows[0] == 'API keys Action'
+    assert rows[1] == 'another key name Revoked 1 January at 1:00am'
+    assert rows[2] == 'some key name Revoke'
+
+    mock_get_api_keys.assert_called_once_with(SERVICE_ONE_ID)
 
 
 @pytest.mark.parametrize('service_mock, expected_options', [

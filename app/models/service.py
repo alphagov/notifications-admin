@@ -340,7 +340,10 @@ class Service():
 
     @cached_property
     def api_keys(self):
-        return api_key_api_client.get_api_keys(self.id)['apiKeys']
+        return sorted(
+            api_key_api_client.get_api_keys(self.id)['apiKeys'],
+            key=lambda key: key['name'].lower(),
+        )
 
     @property
     def api_key_names(self):
