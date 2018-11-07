@@ -128,7 +128,7 @@ def create_api_key(service_id):
 @login_required
 @user_has_permissions('manage_api_keys')
 def revoke_api_key(service_id, key_id):
-    key_name = api_key_api_client.get_api_keys(service_id=service_id, key_id=key_id)['apiKeys'][0]['name']
+    key_name = current_service.get_api_key(key_id)['name']
     if request.method == 'GET':
         return render_template(
             'views/api/keys.html',

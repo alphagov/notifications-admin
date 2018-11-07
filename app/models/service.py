@@ -1,3 +1,4 @@
+from flask import abort
 from notifications_utils.field import Field
 from werkzeug.utils import cached_property
 
@@ -344,3 +345,9 @@ class Service():
     @property
     def api_key_names(self):
         return [key['name'] for key in self.api_keys]
+
+    def get_api_key(self, id):
+        try:
+            return next(key for key in self.api_keys if key['id'] == id)
+        except StopIteration:
+            abort(404)

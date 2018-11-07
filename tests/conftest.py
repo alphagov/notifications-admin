@@ -1639,10 +1639,12 @@ def mock_revoke_api_key(mocker):
 
 
 @pytest.fixture(scope='function')
-def mock_get_api_keys(mocker):
+def mock_get_api_keys(mocker, fake_uuid):
     def _get_keys(service_id, key_id=None):
-        keys = {'apiKeys': [api_key_json(service_id, 'some key name'),
-                            api_key_json(service_id, 'another key name', expiry_date=str(date.fromtimestamp(0)))]}
+        keys = {'apiKeys': [
+            api_key_json(id_=fake_uuid, name='some key name',),
+            api_key_json(id_='1234567', name='another key name', expiry_date=str(date.fromtimestamp(0)))
+        ]}
         return keys
 
     return mocker.patch('app.api_key_api_client.get_api_keys', side_effect=_get_keys)

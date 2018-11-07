@@ -319,13 +319,19 @@ def test_should_show_confirm_revoke_api_key(
     )
     assert mock_get_api_keys.call_args_list == [
         call(
-            key_id=fake_uuid,
-            service_id='596364a0-858e-42c8-9062-a8fe822260eb',
-        ),
-        call(
             '596364a0-858e-42c8-9062-a8fe822260eb'
         ),
     ]
+
+
+def test_should_404_for_api_key_that_doesnt_exist(
+    client_request,
+    mock_get_api_keys,
+):
+    client_request.get(
+        'main.revoke_api_key', service_id=SERVICE_ONE_ID, key_id='key-doesn’t-exist',
+        _expected_status=404,
+    )
 
 
 def test_should_redirect_after_revoking_api_key(
@@ -338,12 +344,12 @@ def test_should_redirect_after_revoking_api_key(
     mock_has_permissions,
     fake_uuid,
 ):
-    response = logged_in_client.post(url_for('main.revoke_api_key', service_id=fake_uuid, key_id=fake_uuid))
+    response = logged_in_client.post(url_for('main.revoke_api_key', service_id=SERVICE_ONE_ID, key_id=fake_uuid))
 
     assert response.status_code == 302
-    assert response.location == url_for('.api_keys', service_id=fake_uuid, _external=True)
-    mock_revoke_api_key.assert_called_once_with(service_id=fake_uuid, key_id=fake_uuid)
-    mock_get_api_keys.assert_called_once_with(service_id=fake_uuid, key_id=fake_uuid)
+    assert response.location == url_for('.api_keys', service_id=SERVICE_ONE_ID, _external=True)
+    mock_revoke_api_key.assert_called_once_with(service_id=SERVICE_ONE_ID, key_id=fake_uuid)
+    mock_get_api_keys.assert_called_once_with(SERVICE_ONE_ID,)
 
 
 @pytest.mark.parametrize('route', [
@@ -354,6 +360,7 @@ def test_should_redirect_after_revoking_api_key(
 def test_route_permissions(
     mocker,
     app_,
+    fake_uuid,
     api_user_active,
     service_one,
     mock_get_api_keys,
@@ -365,7 +372,7 @@ def test_route_permissions(
             app_,
             "GET",
             200,
-            url_for(route, service_id=service_one['id'], key_id=123),
+            url_for(route, service_id=service_one['id'], key_id=fake_uuid),
             ['manage_api_keys'],
             api_user_active,
             service_one)
@@ -379,6 +386,7 @@ def test_route_permissions(
 def test_route_invalid_permissions(
     mocker,
     app_,
+    fake_uuid,
     api_user_active,
     service_one,
     mock_get_api_keys,
@@ -390,7 +398,7 @@ def test_route_invalid_permissions(
             app_,
             "GET",
             403,
-            url_for(route, service_id=service_one['id'], key_id=123),
+            url_for(route, service_id=service_one['id'], key_id=fake_uuid),
             ['view_activity'],
             api_user_active,
             service_one)
