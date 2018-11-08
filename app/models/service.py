@@ -325,3 +325,9 @@ class Service():
             path.append(folder)
 
         return list(reversed(path))
+
+    def get_template_folders_and_templates(self, template_type, template_folder_id):
+        return (
+            self.get_templates(template_type, template_folder_id) +
+            self.get_template_folders(template_folder_id)
+        )

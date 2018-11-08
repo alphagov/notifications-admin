@@ -23,3 +23,18 @@
 #template-list {
   margin-top: $gutter;
 }
+
+.template-list-item,
+.template-list-item-with-checkbox {
+  position: relative;
+}
+
+.template-list-item-with-checkbox {
+
+  padding-left: $gutter * 2;
+
+  .multiple-choice {
+    position: absolute;
+    left: 0;
+  }
+}

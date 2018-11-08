@@ -22,6 +22,7 @@ from tests.conftest import (
     TEMPLATE_ONE_ID,
     active_caseworking_user,
     active_user_view_permissions,
+    active_user_with_permissions,
     mock_get_service_email_template,
     mock_get_service_letter_template,
     mock_get_service_template,
@@ -135,6 +136,58 @@ def test_should_show_page_for_choosing_a_template(
     mock_get_service_templates.assert_called_once_with(SERVICE_ONE_ID)
 
 
+@pytest.mark.parametrize('user', [
+    pytest.param(
+        active_user_with_permissions
+    ),
+    pytest.param(
+        active_user_view_permissions,
+        marks=pytest.mark.xfail(raises=AssertionError)
+    ),
+    pytest.param(
+        active_caseworking_user,
+        marks=pytest.mark.xfail(raises=AssertionError)
+    ),
+])
+@pytest.mark.parametrize('extra_service_permissions', [
+    pytest.param(
+        ['edit_folders']
+    ),
+    pytest.param(
+        [],
+        marks=pytest.mark.xfail(raises=AssertionError)
+    ),
+])
+def test_should_show_checkboxes_for_selecting_templates(
+    client_request,
+    mocker,
+    service_one,
+    mock_get_service_templates,
+    mock_get_template_folders,
+    mock_has_no_jobs,
+    fake_uuid,
+    user,
+    extra_service_permissions,
+):
+    mocker.patch('app.user_api_client.get_user', return_value=user(fake_uuid))
+    service_one['permissions'] = service_one['permissions'] + extra_service_permissions
+
+    page = client_request.get(
+        'main.choose_template',
+        service_id=SERVICE_ONE_ID,
+    )
+    checkboxes = page.select('input[name=templates_and_folders]')
+
+    assert len(checkboxes) == 4
+
+    assert checkboxes[0]['value'] == TEMPLATE_ONE_ID
+    assert checkboxes[0]['id'] == 'templates-or-folder-{}'.format(TEMPLATE_ONE_ID)
+
+    for index in (1, 2, 3):
+        assert checkboxes[index]['value'] != TEMPLATE_ONE_ID
+        assert TEMPLATE_ONE_ID not in checkboxes[index]['id']
+
+
 def test_should_not_show_template_nav_if_only_one_type_of_template(
     client_request,
     mock_get_template_folders,
@@ -176,7 +229,7 @@ def test_should_show_live_search_if_list_of_templates_taller_than_screen(
     search = page.select_one('.live-search')
 
     assert search['data-module'] == 'live-search'
-    assert search['data-targets'] == '#template-list .column-whole'
+    assert search['data-targets'] == '#template-list .template-list-item'
 
     assert len(page.select(search['data-targets'])) == len(page.select('.message-name')) == 14
 

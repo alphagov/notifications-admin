@@ -24,6 +24,7 @@ from app.main.forms import (
     SearchTemplatesForm,
     SetTemplateSenderForm,
     SMSTemplateForm,
+    TemplateAndFoldersSelectionForm,
     TemplateFolderForm,
 )
 from app.main.views.send import get_example_csv_rows, get_sender_details
@@ -123,6 +124,10 @@ def choose_template(service_id, template_type='all', template_folder_id=None):
     return render_template(
         'views/templates/choose.html',
         current_template_folder_id=template_folder_id,
+        can_manage_folders=(
+            current_service.has_permission('edit_folders') and
+            current_user.has_permissions('manage_templates')
+        ),
         template_folder_path=current_service.get_template_folder_path(template_folder_id),
         template_folders=current_service.get_template_folders(template_folder_id),
         templates=current_service.get_templates(template_type, template_folder_id),
@@ -134,6 +139,11 @@ def choose_template(service_id, template_type='all', template_folder_id=None):
         template_nav_items=template_nav_items,
         template_type=template_type,
         search_form=SearchTemplatesForm(),
+        templates_and_folders_form=TemplateAndFoldersSelectionForm(
+            service=current_service,
+            template_type=template_type,
+            current_folder_id=template_folder_id,
+        )
     )
 
 
