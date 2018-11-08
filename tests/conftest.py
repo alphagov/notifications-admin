@@ -3242,3 +3242,8 @@ def url_for_endpoint_with_token(endpoint, token):
 @pytest.fixture
 def mock_get_template_folders(mocker):
     return mocker.patch('app.template_folder_api_client.get_template_folders', return_value=[])
+
+
+@pytest.fixture
+def mock_move_to_template_folder(mocker):
+    return mocker.patch('app.template_folder_api_client.move_to_folder')

@@ -331,3 +331,14 @@ class Service():
             self.get_templates(template_type, template_folder_id) +
             self.get_template_folders(template_folder_id)
         )
+
+    def move_to_folder(self, ids_to_move, move_to):
+
+        ids_to_move = set(ids_to_move)
+
+        template_folder_api_client.move_to_folder(
+            service_id=self.id,
+            folder_id=move_to,
+            template_ids=ids_to_move & self.all_template_ids,
+            folder_ids=ids_to_move & self.all_template_folder_ids,
+        )

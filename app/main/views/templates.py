@@ -100,10 +100,10 @@ def start_tour(service_id, template_id):
     )
 
 
-@main.route("/services/<service_id>/templates")
-@main.route("/services/<service_id>/templates/folders/<template_folder_id>")
-@main.route("/services/<service_id>/templates/<template_type>")
-@main.route("/services/<service_id>/templates/<template_type>/folders/<template_folder_id>")
+@main.route("/services/<service_id>/templates", methods=['GET', 'POST'])
+@main.route("/services/<service_id>/templates/folders/<template_folder_id>", methods=['GET', 'POST'])
+@main.route("/services/<service_id>/templates/<template_type>", methods=['GET', 'POST'])
+@main.route("/services/<service_id>/templates/<template_type>/folders/<template_folder_id>", methods=['GET', 'POST'])
 @login_required
 @user_has_permissions()
 def choose_template(service_id, template_type='all', template_folder_id=None):
@@ -114,13 +114,17 @@ def choose_template(service_id, template_type='all', template_folder_id=None):
         current_folder_id=template_folder_id,
     )
 
+    if template_operation('move', templates_and_folders_form):
+        current_service.move_to_folder(
+            ids_to_move=templates_and_folders_form.templates_and_folders.data,
+            move_to=templates_and_folders_form.move_to.data,
+        )
+        return redirect(request.url)
+
     return render_template(
         'views/templates/choose.html',
         current_template_folder_id=template_folder_id,
-        can_manage_folders=(
-            current_service.has_permission('edit_folders') and
-            current_user.has_permissions('manage_templates')
-        ),
+        can_manage_folders=can_manage_folders(),
         template_folder_path=current_service.get_template_folder_path(template_folder_id),
         template_folders=current_service.get_template_folders(template_folder_id),
         templates=current_service.get_templates(template_type, template_folder_id),
@@ -136,6 +140,17 @@ def choose_template(service_id, template_type='all', template_folder_id=None):
     )
 
 
+def template_operation(operation_name, form):
+
+    if (
+        can_manage_folders() and
+        request.method == 'POST' and
+        request.form.get('operation') == operation_name and
+        form.validate_on_submit()
+    ):
+        return True
+
+
 def get_template_nav_items(template_folder_id):
     return [
         (
@@ -149,6 +164,13 @@ def get_template_nav_items(template_folder_id):
         )
         for label, key in [('All', 'all')] + current_service.available_template_types_as_tuples
     ]
+
+
+def can_manage_folders():
+    return (
+        current_service.has_permission('edit_folders') and
+        current_user.has_permissions('manage_templates')
+    )
 
 
 @main.route("/services/<service_id>/templates/<template_id>.<filetype>")

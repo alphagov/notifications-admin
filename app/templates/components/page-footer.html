@@ -16,6 +16,8 @@
       <button
         type="submit"
         class="button{% if destructive %}-destructive{% endif %}"
+        {% if button_name %}name="{{ button_name }}"{% endif %}
+        {% if button_value %}value="{{ button_value }}"{% endif %}
       >
         {{- button_text -}}
       </button>

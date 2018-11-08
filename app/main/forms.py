@@ -702,7 +702,7 @@ class ServicePostageForm(StripWhitespaceForm):
     )
 
 
-class BrandingStyle(RadioField):
+class RadioFieldWithNoneOption(RadioField):
 
     def post_validate(self, form, validation_stopped):
         if self.data == 'None':
@@ -711,7 +711,7 @@ class BrandingStyle(RadioField):
 
 class ServiceSetBranding(StripWhitespaceForm):
 
-    branding_style = BrandingStyle(
+    branding_style = RadioFieldWithNoneOption(
         'Branding style',
         validators=[
             DataRequired()
@@ -1124,7 +1124,7 @@ class TemplateAndFoldersSelectionForm(Form):
 
     ALL_TEMPLATES_FOLDER = {
         'name': 'All templates',
-        'id': None,
+        'id': 'None',
     }
 
     def __init__(
@@ -1151,8 +1151,8 @@ class TemplateAndFoldersSelectionForm(Form):
     def ids_and_names(items, exclude=None):
         return [
             (item['id'], item['name']) for item in items
-            if item['id'] != exclude
+            if item['id'] != str(exclude)
         ]
 
     templates_and_folders = MultiCheckboxField('Choose templates or folders')
-    move_to = RadioField('Choose a folder')
+    move_to = RadioFieldWithNoneOption('Choose a folder')
