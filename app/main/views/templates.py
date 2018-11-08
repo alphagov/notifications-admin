@@ -117,12 +117,7 @@ def choose_template(service_id, template_type='all', template_folder_id=None):
             ),
             ''
         )
-        for label, key in filter(None, [
-            ('All', 'all'),
-            ('Text message', 'sms'),
-            ('Email', 'email'),
-            ('Letter', 'letter') if current_service.has_permission('letter') else None,
-        ])
+        for label, key in [('All', 'all')] + current_service.available_template_types_as_tuples
     ]
 
     return render_template(

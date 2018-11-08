@@ -36,6 +36,12 @@ class Service():
         'service_callback_api',
     }
 
+    TEMPLATE_TYPES = (
+        ('sms', 'Text message'),
+        ('email', 'Email'),
+        ('letter', 'Letter'),
+    )
+
     def __init__(self, _dict):
         # in the case of a bad request current service may be `None`
         self._dict = _dict or {}
@@ -116,8 +122,15 @@ class Service():
     @property
     def available_template_types(self):
         return [
-            channel for channel in ('email', 'sms', 'letter')
+            channel for channel, _ in self.TEMPLATE_TYPES
             if self.has_permission(channel)
+        ]
+
+    @property
+    def available_template_types_as_tuples(self):
+        return [
+            (label, value) for value, label in self.TEMPLATE_TYPES
+            if self.has_permission(value)
         ]
 
     @property
