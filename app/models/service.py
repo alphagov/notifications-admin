@@ -100,6 +100,10 @@ class Service():
             if template['template_type'] in self.available_template_types
         ]
 
+    @cached_property
+    def all_template_ids(self):
+        return {template['id'] for template in self.all_templates}
+
     def get_templates(self, template_type='all', template_folder_id=None):
         if isinstance(template_type, str):
             template_type = [template_type]
@@ -283,6 +287,10 @@ class Service():
     @cached_property
     def all_template_folders(self):
         return template_folder_api_client.get_template_folders(self.id)
+
+    @cached_property
+    def all_template_folder_ids(self):
+        return {folder['id'] for folder in self.all_template_folders}
 
     def get_template_folders(self, parent_folder_id=None):
         return [
