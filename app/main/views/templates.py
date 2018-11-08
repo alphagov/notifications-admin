@@ -108,18 +108,11 @@ def start_tour(service_id, template_id):
 @user_has_permissions()
 def choose_template(service_id, template_type='all', template_folder_id=None):
 
-    template_nav_items = [
-        (
-            label,
-            key,
-            url_for(
-                '.choose_template', service_id=current_service.id,
-                template_type=key, template_folder_id=template_folder_id
-            ),
-            ''
-        )
-        for label, key in [('All', 'all')] + current_service.available_template_types_as_tuples
-    ]
+    templates_and_folders_form = TemplateAndFoldersSelectionForm(
+        service=current_service,
+        template_type=template_type,
+        current_folder_id=template_folder_id,
+    )
 
     return render_template(
         'views/templates/choose.html',
@@ -136,15 +129,26 @@ def choose_template(service_id, template_type='all', template_folder_id=None):
             current_service.has_multiple_template_types
             and (len(current_service.all_templates) > 2)
         ),
-        template_nav_items=template_nav_items,
+        template_nav_items=get_template_nav_items(template_folder_id),
         template_type=template_type,
         search_form=SearchTemplatesForm(),
-        templates_and_folders_form=TemplateAndFoldersSelectionForm(
-            service=current_service,
-            template_type=template_type,
-            current_folder_id=template_folder_id,
-        )
+        templates_and_folders_form=templates_and_folders_form,
     )
+
+
+def get_template_nav_items(template_folder_id):
+    return [
+        (
+            label,
+            key,
+            url_for(
+                '.choose_template', service_id=current_service.id,
+                template_type=key, template_folder_id=template_folder_id
+            ),
+            ''
+        )
+        for label, key in [('All', 'all')] + current_service.available_template_types_as_tuples
+    ]
 
 
 @main.route("/services/<service_id>/templates/<template_id>.<filetype>")
