@@ -164,3 +164,47 @@ def test_should_show_templates_folder_page(
         assert page_links[index].text.strip() == expected_link
 
     mock_get_service_templates.assert_called_once_with(SERVICE_ONE_ID)
+
+
+@pytest.mark.parametrize("template_type", ["email", "sms"])
+def test_add_template_by_type_should_redirect_to_add_service_template(
+    client_request,
+    service_one,
+    template_type,
+    mock_get_service_templates,
+    mock_get_organisations_and_services_for_user,
+):
+    service_one['permissions'] += ['edit_folders']
+    client_request.post(
+        'main.add_template_by_type',
+        service_id=SERVICE_ONE_ID,
+        template_folder_id=PARENT_FOLDER_ID,
+        _data={'template_type': template_type},
+        _expected_redirect=url_for('main.add_service_template',
+                                   service_id=SERVICE_ONE_ID,
+                                   template_type=template_type,
+                                   template_folder_id=PARENT_FOLDER_ID,
+                                   _external=True),
+    )
+
+
+def test_add_template_by_type_should_redirect_to_view_template_for_letter(
+        client_request,
+        service_one,
+        mock_get_service_templates,
+        mock_get_organisations_and_services_for_user,
+        fake_uuid,
+        mock_create_service_template
+):
+    service_one['permissions'] += ['edit_folders']
+    service_one['permissions'] += ['letter']
+    client_request.post(
+        'main.add_template_by_type',
+        service_id=SERVICE_ONE_ID,
+        template_folder_id=PARENT_FOLDER_ID,
+        _data={'template_type': 'letter'},
+        _expected_redirect=url_for('main.view_template',
+                                   service_id=SERVICE_ONE_ID,
+                                   template_id='Untitled',
+                                   _external=True),
+    )

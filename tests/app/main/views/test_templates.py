@@ -1393,7 +1393,8 @@ def test_should_create_sms_template_without_downgrading_unicode_characters(
         msg,  # content
         ANY,  # service_id
         ANY,  # subject
-        ANY  # process_type
+        ANY,  # process_type
+        ANY,  # parent_folder_id
     )
     assert resp.status_code == 302
 
