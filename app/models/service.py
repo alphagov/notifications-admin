@@ -7,6 +7,9 @@ from app.notify_client.inbound_number_client import inbound_number_client
 from app.notify_client.job_api_client import job_api_client
 from app.notify_client.organisations_api_client import organisations_client
 from app.notify_client.service_api_client import service_api_client
+from app.notify_client.template_folder_api_client import (
+    template_folder_api_client,
+)
 from app.notify_client.user_api_client import user_api_client
 from app.utils import get_default_sms_sender
 
@@ -88,7 +91,7 @@ class Service():
         ) > 1
 
     @cached_property
-    def templates(self):
+    def all_templates(self):
 
         templates = service_api_client.get_service_templates(self.id)['data']
 
@@ -97,12 +100,14 @@ class Service():
             if template['template_type'] in self.available_template_types
         ]
 
-    def templates_by_type(self, template_type):
+    def get_templates(self, template_type='all', template_folder_id=None):
         if isinstance(template_type, str):
             template_type = [template_type]
+
         return [
-            template for template in self.templates
-            if set(template_type) & {'all', template['template_type']}
+            template for template in self.all_templates
+            if (set(template_type) & {'all', template['template_type']})
+            and template.get('folder_id') == template_folder_id
         ]
 
     @property
@@ -114,21 +119,21 @@ class Service():
 
     @property
     def has_templates(self):
-        return len(self.templates) > 0
+        return len(self.all_templates) > 0
 
     @property
     def has_multiple_template_types(self):
         return len({
-            template['template_type'] for template in self.templates
+            template['template_type'] for template in self.all_templates
         }) > 1
 
     @property
     def has_email_templates(self):
-        return len(self.templates_by_type('email')) > 0
+        return len(self.get_templates('email')) > 0
 
     @property
     def has_sms_templates(self):
-        return len(self.templates_by_type('sms')) > 0
+        return len(self.get_templates('sms')) > 0
 
     @cached_property
     def email_reply_to_addresses(self):
@@ -275,3 +280,28 @@ class Service():
     @property
     def has_inbound_number(self):
         return bool(self.inbound_number)
+
+    @cached_property
+    def all_template_folders(self):
+        return template_folder_api_client.get_template_folders(self.id)
+
+    def get_template_folders(self, parent_folder_id=None):
+        return [
+            folder for folder in self.all_template_folders
+            if folder['parent_id'] == parent_folder_id
+        ]
+
+    def get_template_folder_path(self, template_folder_id):
+        if template_folder_id is None:
+            return []
+
+        id_to_folder = {folder['id']: folder for folder in self.all_template_folders}
+
+        folder = id_to_folder[template_folder_id]
+        path = [folder]
+
+        while folder['parent_id']:
+            folder = id_to_folder[folder['parent_id']]
+            path.append(folder)
+
+        return list(reversed(path))

@@ -857,21 +857,22 @@ class DateFilterForm(StripWhitespaceForm):
 class ChooseTemplateType(StripWhitespaceForm):
 
     template_type = RadioField(
-        'What kind of template do you want to add?',
+        '',
         validators=[
             DataRequired()
         ]
     )
 
-    def __init__(self, include_letters=False, include_copy=False, *args, **kwargs):
+    def __init__(self, include_letters=False, include_copy=False, include_folder=False, *args, **kwargs):
 
         super().__init__(*args, **kwargs)
 
         self.template_type.choices = filter(None, [
-            ('email', 'Email'),
-            ('sms', 'Text message'),
-            ('letter', 'Letter') if include_letters else None,
+            ('email', 'Email template'),
+            ('sms', 'Text message template'),
+            ('letter', 'Letter template') if include_letters else None,
             ('copy-existing', 'Copy of an existing template') if include_copy else None,
+            ('folder', 'Folder') if include_folder else None,
         ])
 
 
@@ -1106,3 +1107,7 @@ class ReturnedLettersForm(StripWhitespaceForm):
             DataRequired(message="Can’t be empty"),
         ]
     )
+
+
+class TemplateFolderForm(StripWhitespaceForm):
+    name = StringField('Folder name', validators=[DataRequired(message='Can’t be empty')])

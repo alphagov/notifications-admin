@@ -12,6 +12,7 @@ from notifications_utils.recipients import first_column_headings
 from app import (
     current_service,
     service_api_client,
+    template_folder_api_client,
     template_statistics_client,
     user_api_client,
 )
@@ -23,6 +24,7 @@ from app.main.forms import (
     SearchTemplatesForm,
     SetTemplateSenderForm,
     SMSTemplateForm,
+    TemplateFolderForm,
 )
 from app.main.views.send import get_example_csv_rows, get_sender_details
 from app.models.service import Service
@@ -98,13 +100,23 @@ def start_tour(service_id, template_id):
 
 
 @main.route("/services/<service_id>/templates")
+@main.route("/services/<service_id>/templates/folders/<template_folder_id>")
 @main.route("/services/<service_id>/templates/<template_type>")
+@main.route("/services/<service_id>/templates/<template_type>/folders/<template_folder_id>")
 @login_required
 @user_has_permissions()
-def choose_template(service_id, template_type='all'):
+def choose_template(service_id, template_type='all', template_folder_id=None):
 
     template_nav_items = [
-        (label, key, url_for('.choose_template', service_id=current_service.id, template_type=key), '')
+        (
+            label,
+            key,
+            url_for(
+                '.choose_template', service_id=current_service.id,
+                template_type=key, template_folder_id=template_folder_id
+            ),
+            ''
+        )
         for label, key in filter(None, [
             ('All', 'all'),
             ('Text message', 'sms'),
@@ -115,11 +127,14 @@ def choose_template(service_id, template_type='all'):
 
     return render_template(
         'views/templates/choose.html',
-        templates=current_service.templates_by_type(template_type),
-        show_search_box=(len(current_service.templates_by_type(template_type)) > 7),
+        current_template_folder_id=template_folder_id,
+        template_folder_path=current_service.get_template_folder_path(template_folder_id),
+        template_folders=current_service.get_template_folders(template_folder_id),
+        templates=current_service.get_templates(template_type, template_folder_id),
+        show_search_box=(len(current_service.get_templates(template_type)) > 7),
         show_template_nav=(
             current_service.has_multiple_template_types
-            and (len(current_service.templates) > 2)
+            and (len(current_service.all_templates) > 2)
         ),
         template_nav_items=template_nav_items,
         template_type=template_type,
@@ -173,9 +188,10 @@ def view_template_version_preview(service_id, template_id, version, filetype):
 
 
 @main.route("/services/<service_id>/templates/add", methods=['GET', 'POST'])
+@main.route("/services/<service_id>/templates/folders/<template_folder_id>/add", methods=['GET', 'POST'])
 @login_required
 @user_has_permissions('manage_templates')
-def add_template_by_type(service_id):
+def add_template_by_type(service_id, template_folder_id=None):
 
     form = ChooseTemplateType(
         include_letters=current_service.has_permission('letter'),
@@ -183,6 +199,7 @@ def add_template_by_type(service_id):
             service_api_client.count_service_templates(service_id) > 0,
             len(user_api_client.get_service_ids_for_user(current_user)) > 1,
         )),
+        include_folder=current_service.has_permission('edit_folders')
     )
 
     if form.validate_on_submit():
@@ -221,6 +238,7 @@ def add_template_by_type(service_id):
                 '.add_service_template',
                 service_id=service_id,
                 template_type=form.template_type.data,
+                template_folder_id=template_folder_id,
             ))
 
     return render_template('views/templates/add.html', form=form)
@@ -288,10 +306,34 @@ def action_blocked(service_id, notification_type, return_to, template_id):
     )
 
 
+@main.route("/services/<service_id>/templates/add-folder", methods=['GET', 'POST'])
+@main.route("/services/<service_id>/templates/folders/<template_folder_id>/add-folder", methods=['GET', 'POST'])
+def add_template_folder(service_id, template_folder_id=None):
+    if not current_service.has_permission('edit_folders'):
+        abort(403)
+
+    form = TemplateFolderForm()
+
+    if form.validate_on_submit():
+        template_folder_api_client.create_template_folder(
+            current_service.id, name=form.name.data, parent_id=template_folder_id
+        )
+        return redirect(
+            url_for('.choose_template', service_id=service_id, template_folder_id=template_folder_id)
+        )
+
+    return render_template(
+        'views/templates/add-template-folder.html',
+        form=form
+    )
+
+
 @main.route("/services/<service_id>/templates/add-<template_type>", methods=['GET', 'POST'])
+@main.route("/services/<service_id>/templates/folders/<template_folder_id>/add-<template_type>",
+            methods=['GET', 'POST'])
 @login_required
 @user_has_permissions('manage_templates')
-def add_service_template(service_id, template_type):
+def add_service_template(service_id, template_type, template_folder_id=None):
 
     if template_type not in ['sms', 'email', 'letter']:
         abort(404)

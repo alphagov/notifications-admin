@@ -13,7 +13,7 @@
     </div>
     <nav>
       {% for service in services %}
-        {% set templates = service.templates_by_type(current_service.permissions) %}
+        {% set templates = service.get_templates(current_service.permissions) %}
         {% if templates and services|length > 1 %}
           <h2 class="">
             {{ service.name }}

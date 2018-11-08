@@ -56,11 +56,11 @@ def test_letters_lets_in_without_permission(
 @pytest.mark.parametrize('permissions, choices', [
     (
         ['email', 'sms', 'letter'],
-        ['Email', 'Text message', 'Letter', 'Copy of an existing template']
+        ['Email template', 'Text message template', 'Letter template', 'Copy of an existing template']
     ),
     (
         ['email', 'sms'],
-        ['Email', 'Text message', 'Copy of an existing template']
+        ['Email template', 'Text message template', 'Copy of an existing template']
     ),
 ])
 def test_given_option_to_add_letters_if_allowed(

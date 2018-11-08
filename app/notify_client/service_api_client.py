@@ -1,4 +1,3 @@
-from __future__ import unicode_literals
 
 from app.notify_client import NotifyAdminAPIClient, _attach_current_user, cache
 

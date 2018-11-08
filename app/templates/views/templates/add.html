@@ -5,12 +5,12 @@
 {% extends "withnav_template.html" %}
 
 {% block service_page_title %}
-  Add new template
+  Add new template or folder
 {% endblock %}
 
 {% block maincolumn_content %}
 
-    <h1 class="heading-large">Add new template</h1>
+    <h1 class="heading-large">What do you want to add?</h1>
 
     {% call form_wrapper() %}
       {{ radios(form.template_type) }}

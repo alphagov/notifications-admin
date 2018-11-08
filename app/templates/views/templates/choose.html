@@ -9,13 +9,18 @@
 
 {% block service_page_title %}
   {{ page_title }}
+  {% for folder in template_folder_path %}
+    / {{ folder.name }}
+  {% endfor %}
 {% endblock %}
 
 {% block maincolumn_content %}
 
-  {% if not templates %}
+  {% if (not templates) and (not template_folder_path) %}
 
-    <h1 class="heading-large">{{ page_title }}</h1>
+    <h1 class="heading-large">
+      {{ page_title }}
+    </h1>
     {% if current_user.has_permissions('manage_templates') %}
        <p class="bottom-gutter">
          You need a template before you can send
@@ -41,11 +46,25 @@
 
     <div class="grid-row bottom-gutter-2-3">
       <div class="column-two-thirds">
-        <h1 class="heading-large">{{ page_title }}</h1>
+        <h1 class="heading-large">
+          {% if template_folder_path %}
+            <a href="{{ url_for('.choose_template', service_id=current_service.id, template_type=template_type) }}">{{ page_title }}</a>
+          {% else %}
+            {{ page_title }}
+          {% endif %}
+          {% for folder in template_folder_path %}
+            /
+            {% if loop.last %}
+              {{ folder.name }}
+            {% else %}
+              <a href="{{ url_for('.choose_template', service_id=current_service.id, template_type=template_type, template_folder_id=folder.id) }}">{{ folder.name }}</a>
+            {% endif %}
+          {% endfor %}
+        </h1>
       </div>
       {% if current_user.has_permissions('manage_templates') %}
         <div class="column-one-third">
-          <a href="{{ url_for('.add_template_by_type', service_id=current_service.id) }}" class="button align-with-heading">Add new template</a>
+          <a href="{{ url_for('.add_template_by_type', service_id=current_service.id, template_folder_id=current_template_folder_id) }}" class="button align-with-heading">Add new template</a>
         </div>
       {% endif %}
     </div>
@@ -59,6 +78,16 @@
     {{ live_search(target_selector='#template-list .column-whole', show=show_search_box, form=search_form) }}
 
     <nav class="grid-row" id=template-list>
+      {% for template_folder in template_folders %}
+        <div class="column-whole">
+          <h2 class="message-name">
+            <a href="{{ url_for('.choose_template', service_id=current_service.id, template_type=template_type, template_folder_id=template_folder.id) }}">
+              {{ template_folder.name }}
+            </a>
+          </h2>
+          <p class="message-type">Folder containing {{ template_count }} template{% if template_count != 1 %}s{% endif %}</p>
+        </div>
+      {% endfor %}
       {% for template in templates %}
         <div class="column-whole">
           <h2 class="message-name">
