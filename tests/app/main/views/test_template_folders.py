@@ -50,7 +50,7 @@ def test_get_add_template_folder_page(client_request, service_one, parent_folder
         template_folder_id=parent_folder_id
     )
 
-    assert page.find('input', attrs={'name': 'name'}) is not None
+    assert page.select_one('input[name=name]') is not None
 
 
 def test_add_template_folder_page_rejects_if_service_doesnt_have_permission(client_request, service_one):
