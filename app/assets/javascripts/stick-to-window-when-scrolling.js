@@ -6,13 +6,14 @@
 
   // Stick elements to top of screen when you scroll past, documentation is in the README.md
   var Sticky = function (selector) {
-    this._hasScrolled: false
-    this._scrollTimeout: false
-    this._hasResized: false
-    this._resizeTimeout: false
-    this._els: []
+    this._hasScrolled = false
+    this._scrollTimeout = false
+    this._hasResized = false
+    this._resizeTimeout = false
+    this._elsLoaded = false
+    this._els = []
 
-    this.CSS_SELECTOR: selector
+    this.CSS_SELECTOR = selector
   }
   Sticky.prototype.getWindowDimensions = function () {
     return {
@@ -41,17 +42,22 @@
 
     fixedOffset = isNaN(fixedOffset) ? 0 : fixedOffset
 
-    if ($img.length > 0) {
+    if ((!self._elsLoaded) && ($img.length > 0)) {
       var image = new global.Image()
       image.onload = function () {
         el.height = $el.outerHeight() + fixedOffset
         el.scrolledTo = self.getScrollingTo(el)
+        self.checkElementsLoaded()
       }
       image.src = $img.attr('src')
     } else {
       el.height = $el.outerHeight() + fixedOffset
       el.scrolledTo = self.getScrollingTo(el)
+      self.checkElementsLoaded()
     }
+  }
+  Sticky.prototype.checkElementsLoaded = function () {
+    this._elsLoaded = $.grep(this._els, function (el) { return ('height' in el) }).length === this._els.length
   }
   Sticky.prototype.init = function () {
     var self = this
@@ -80,6 +86,10 @@
         $(global).resize(function (e) { self.onResize() })
         self._resizeTimeout = global.setInterval(function (e) { self.checkResize() }, 50)
       }
+
+      // fake scrolling to allow us to check the position of the elements
+      self._hasScrolled = true
+      self.checkScroll()
     }
   }
   Sticky.prototype.onScroll = function () {
@@ -135,9 +145,10 @@
           var elParentWidth = $elParent.width()
           $shim.css('width', elParentWidth)
           $el.css('width', elParentWidth)
+          self.setElHeight(el)
         }
 
-        if (windowDimensions.width <= 768) {
+        if (!self.viewportIsWideEnough(windowDimensions.width)) {
           self.release($el)
         }
       })
