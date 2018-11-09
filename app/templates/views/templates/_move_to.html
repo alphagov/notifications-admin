@@ -1,7 +1,7 @@
 {% from "components/radios.html" import radios %}
 {% from "components/page-footer.html" import page_footer %}
 
-{% if templates_and_folders_form.move_to.choices %}
+{% if templates_and_folders_form.move_to.choices and (templates or template_folders) %}
   {{ radios(templates_and_folders_form.move_to) }}
   {{ page_footer('Move selected', button_name='operation', button_value='move') }}
 {% endif %}

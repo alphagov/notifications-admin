@@ -82,7 +82,7 @@
         {% with templates=templates, template_folders=template_folders %}
           {% include 'views/templates/_template_list.html' %}
         {% endwith %}
-        {% with templates_and_folders_form=templates_and_folders_form %}
+        {% with templates=templates, template_folders=template_folders, templates_and_folders_form=templates_and_folders_form %}
           {% include 'views/templates/_move_to.html' %}
         {% endwith %}
       </form>
