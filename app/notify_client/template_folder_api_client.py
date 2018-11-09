@@ -29,9 +29,9 @@ class TemplateFolderAPIClient(NotifyAdminAPIClient):
     def move_to_folder(self, service_id, folder_id, template_ids, folder_ids):
 
         if folder_id:
-            url = '/service/{}/template-folder/move-to-folder/{}'.format(service_id, folder_id)
+            url = '/service/{}/template-folder/{}/contents'.format(service_id, folder_id)
         else:
-            url = '/service/{}/template-folder/move-to-folder'.format(service_id)
+            url = '/service/{}/template-folder/contents'.format(service_id)
 
         self.post(url, {
             'templates': list(template_ids),

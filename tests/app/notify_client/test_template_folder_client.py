@@ -64,7 +64,7 @@ def test_move_templates_and_folders(mocker, api_user_active):
     )
 
     mock_api_post.assert_called_once_with(
-        '/service/{}/template-folder/move-to-folder/{}'.format(
+        '/service/{}/template-folder/{}/contents'.format(
             some_service_id, some_folder_id
         ),
         {
@@ -97,7 +97,7 @@ def test_move_templates_and_folders_to_root(mocker, api_user_active):
     )
 
     mock_api_post.assert_called_once_with(
-        '/service/{}/template-folder/move-to-folder'.format(some_service_id),
+        '/service/{}/template-folder/contents'.format(some_service_id),
         {
             'folders': ['1', '2', '3'],
             'templates': ['a', 'b', 'c'],
