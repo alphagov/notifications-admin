@@ -252,10 +252,10 @@ def test_should_show_radio_buttons_for_move_destination(
     assert radios == page.select('input[name=move_to]')
 
     assert [x['value'] for x in radios] == [
-        PARENT_FOLDER_ID, FOLDER_TWO_ID, CHILD_FOLDER_ID, FOLDER_ONE_TWO_ID
+        PARENT_FOLDER_ID, CHILD_FOLDER_ID, FOLDER_ONE_TWO_ID, FOLDER_TWO_ID,
     ]
     assert [x.text.strip() for x in labels] == [
-        'folder_one', 'folder_two', 'folder_one_one', 'folder_one_two'
+        'folder_one', 'folder_one_one', 'folder_one_two', 'folder_two',
     ]
     assert page.select_one('button[name=operation]')['value'] == 'move'
 
