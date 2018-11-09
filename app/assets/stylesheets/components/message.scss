@@ -24,17 +24,22 @@
   margin-top: $gutter;
 }
 
-.template-list-item,
-.template-list-item-with-checkbox {
-  position: relative;
-}
+.template-list {
 
-.template-list-item-with-checkbox {
+  &-item {
 
-  padding-left: $gutter * 2;
+    &-with-checkbox {
 
-  .multiple-choice {
-    position: absolute;
-    left: 0;
+      position: relative;
+      padding-left: $gutter * 2;
+
+      .multiple-choice {
+        position: absolute;
+        left: 0;
+      }
+
+    }
+
   }
+
 }
