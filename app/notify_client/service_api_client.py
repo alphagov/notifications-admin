@@ -126,7 +126,8 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         return self.delete(endpoint, data)
 
     @cache.delete('service-{service_id}-templates')
-    def create_service_template(self, name, type_, content, service_id, subject=None, process_type='normal'):
+    def create_service_template(self, name, type_, content, service_id, subject=None, process_type='normal',
+                                parent_folder_id=None):
         """
         Create a service template.
         """
@@ -135,11 +136,15 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             "template_type": type_,
             "content": content,
             "service": service_id,
-            "process_type": process_type
+            "process_type": process_type,
         }
         if subject:
             data.update({
                 'subject': subject
+            })
+        if parent_folder_id:
+            data.update({
+                'parent_folder_id': parent_folder_id
             })
         data = _attach_current_user(data)
         endpoint = "/service/{0}/template".format(service_id)

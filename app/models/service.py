@@ -103,11 +103,10 @@ class Service():
     def get_templates(self, template_type='all', template_folder_id=None):
         if isinstance(template_type, str):
             template_type = [template_type]
-
         return [
             template for template in self.all_templates
             if (set(template_type) & {'all', template['template_type']})
-            and template.get('folder_id') == template_folder_id
+            and template.get('folder') == template_folder_id
         ]
 
     @property

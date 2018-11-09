@@ -218,6 +218,7 @@ def add_template_by_type(service_id, template_folder_id=None):
                 service_id,
                 'Main heading',
                 'normal',
+                template_folder_id
             )
             return redirect(url_for(
                 '.view_template',
@@ -351,7 +352,8 @@ def add_service_template(service_id, template_type, template_folder_id=None):
                 form.template_content.data,
                 service_id,
                 form.subject.data if hasattr(form, 'subject') else None,
-                form.process_type.data
+                form.process_type.data,
+                template_folder_id
             )
         except HTTPError as e:
             if (
