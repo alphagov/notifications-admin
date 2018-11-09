@@ -42,4 +42,16 @@
 
   }
 
+  &-folder {
+
+    a {
+      text-indent: 40px;
+      background-image: file-url('folder-blue-bold.svg');
+      background-repeat: no-repeat;
+      background-size: auto 20px;
+      background-position: 0px 2px;
+    }
+
+  }
+
 }
