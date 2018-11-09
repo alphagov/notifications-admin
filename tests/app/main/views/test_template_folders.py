@@ -208,3 +208,44 @@ def test_add_template_by_type_should_redirect_to_view_template_for_letter(
                                    template_id='Untitled',
                                    _external=True),
     )
+    mock_create_service_template.assert_called_once_with('Untitled',
+                                                         'letter',
+                                                         'Body',
+                                                         SERVICE_ONE_ID,
+                                                         'Main heading',
+                                                         'normal',
+                                                         PARENT_FOLDER_ID)
+
+
+def test_can_create_email_template_with_parent_folder(
+        client_request,
+        service_one,
+        mock_create_service_template
+):
+    data = {
+        'name': "new name",
+        'subject': "Food incoming!",
+        'template_content': "here's a burrito 🌯",
+        'template_type': 'email',
+        'service': service_one['id'],
+        'process_type': 'normal',
+        'parent_folder_id': PARENT_FOLDER_ID
+    }
+    client_request.post('.add_service_template',
+                        service_id=service_one['id'],
+                        template_type='email',
+                        template_folder_id=PARENT_FOLDER_ID,
+                        _data=data,
+                        _expected_redirect=url_for("main.view_template",
+                                                   service_id=SERVICE_ONE_ID,
+                                                   template_id="new%20name",
+                                                   _external=True)
+                        )
+    mock_create_service_template.assert_called_once_with(
+        data['name'],
+        data['template_type'],
+        data['template_content'],
+        SERVICE_ONE_ID,
+        data['subject'],
+        data['process_type'],
+        data['parent_folder_id'])
