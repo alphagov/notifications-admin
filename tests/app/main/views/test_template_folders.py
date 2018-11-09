@@ -219,7 +219,6 @@ def test_add_template_by_type_should_redirect_to_view_template_for_letter(
 
 def test_can_create_email_template_with_parent_folder(
         client_request,
-        service_one,
         mock_create_service_template
 ):
     data = {
@@ -227,12 +226,12 @@ def test_can_create_email_template_with_parent_folder(
         'subject': "Food incoming!",
         'template_content': "here's a burrito 🌯",
         'template_type': 'email',
-        'service': service_one['id'],
+        'service': SERVICE_ONE_ID,
         'process_type': 'normal',
         'parent_folder_id': PARENT_FOLDER_ID
     }
     client_request.post('.add_service_template',
-                        service_id=service_one['id'],
+                        service_id=SERVICE_ONE_ID,
                         template_type='email',
                         template_folder_id=PARENT_FOLDER_ID,
                         _data=data,
