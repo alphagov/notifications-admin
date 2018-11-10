@@ -173,8 +173,12 @@ def test_should_show_live_search_if_list_of_templates_taller_than_screen(
         'main.choose_template',
         service_id=SERVICE_ONE_ID,
     )
+    search = page.select_one('.live-search')
 
-    assert page.select('.live-search')
+    assert search['data-module'] == 'live-search'
+    assert search['data-targets'] == '#template-list .column-whole'
+
+    assert len(page.select(search['data-targets'])) == len(page.select('.message-name')) == 14
 
 
 def test_should_show_page_for_one_template(
