@@ -114,7 +114,7 @@ def choose_template(service_id, template_type='all', template_folder_id=None):
         current_folder_id=template_folder_id,
     )
 
-    if template_operation('move', templates_and_folders_form):
+    if is_valid_template_operation('move', templates_and_folders_form):
         current_service.move_to_folder(
             ids_to_move=templates_and_folders_form.templates_and_folders.data,
             move_to=templates_and_folders_form.move_to.data,
@@ -140,7 +140,7 @@ def choose_template(service_id, template_type='all', template_folder_id=None):
     )
 
 
-def template_operation(operation_name, form):
+def is_valid_template_operation(operation_name, form):
 
     if (
         can_manage_folders() and
