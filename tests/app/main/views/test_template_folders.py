@@ -9,6 +9,14 @@ PARENT_FOLDER_ID = '7e979e79-d970-43a5-ac69-b625a8d147b0'
 CHILD_FOLDER_ID = '92ee1ee0-e4ee-4dcc-b1a7-a5da9ebcfa2b'
 
 
+def _folder(name, folder_id=None, parent=None):
+    return {
+        'name': name,
+        'id': folder_id or str(uuid.uuid4()),
+        'parent_id': parent,
+    }
+
+
 @pytest.mark.parametrize('parent_folder_id', [None, PARENT_FOLDER_ID])
 def test_add_page_shows_option_for_folder(
     client_request,
@@ -133,10 +141,10 @@ def test_should_show_templates_folder_page(
 ):
 
     mock_get_template_folders.return_value = [
-        {'id': str(uuid.uuid4()), 'name': 'folder_two', 'parent_id': None},
-        {'id': PARENT_FOLDER_ID, 'name': 'folder_one', 'parent_id': None},
-        {'id': str(uuid.uuid4()), 'name': 'folder_one_two', 'parent_id': PARENT_FOLDER_ID},
-        {'id': CHILD_FOLDER_ID, 'name': 'folder_one_one', 'parent_id': PARENT_FOLDER_ID},
+        _folder('folder_two'),
+        _folder('folder_one', PARENT_FOLDER_ID),
+        _folder('folder_one_two', parent=PARENT_FOLDER_ID),
+        _folder('folder_one_one', CHILD_FOLDER_ID, parent=PARENT_FOLDER_ID),
     ]
 
     service_one['permissions'] += ['letter', 'edit_folders']
