@@ -22,6 +22,7 @@ from wtforms import (
     IntegerField,
     PasswordField,
     RadioField,
+    SelectMultipleField,
     StringField,
     TextAreaField,
     ValidationError,
@@ -30,6 +31,7 @@ from wtforms import (
 )
 from wtforms.fields.html5 import EmailField, SearchField, TelField
 from wtforms.validators import URL, DataRequired, Length, Optional, Regexp
+from wtforms.widgets import CheckboxInput, ListWidget
 
 from app.main.validators import (
     Blacklist,
@@ -100,6 +102,11 @@ def get_next_days_until(until):
         )
         for i in range(0, days + 1)
     ]
+
+
+class MultiCheckboxField(SelectMultipleField):
+    widget = ListWidget(prefix_label=False)
+    option_widget = CheckboxInput()
 
 
 def email_address(label='Email address', gov_user=True):
@@ -695,23 +702,35 @@ class ServicePostageForm(StripWhitespaceForm):
     )
 
 
-class BrandingStyle(RadioField):
+class FieldWithNoneOption():
+
+    # This needs to match the data the browser will post from
+    # <input value='None'>
+    NONE_OPTION_VALUE = 'None'
 
     def post_validate(self, form, validation_stopped):
-        if self.data == 'None':
+        if self.data == self.NONE_OPTION_VALUE:
             self.data = None
+
+
+class RadioFieldWithNoneOption(FieldWithNoneOption, RadioField):
+    pass
+
+
+class HiddenFieldWithNoneOption(FieldWithNoneOption, HiddenField):
+    pass
 
 
 class ServiceSetBranding(StripWhitespaceForm):
 
-    branding_style = BrandingStyle(
+    branding_style = RadioFieldWithNoneOption(
         'Branding style',
         validators=[
             DataRequired()
         ]
     )
 
-    DEFAULT = ('None', 'GOV.UK')
+    DEFAULT = (FieldWithNoneOption.NONE_OPTION_VALUE, 'GOV.UK')
 
     def __init__(self, all_email_brandings, current_email_branding):
 
@@ -729,7 +748,7 @@ class ServiceSetBranding(StripWhitespaceForm):
 
 class ServicePreviewBranding(StripWhitespaceForm):
 
-    branding_style = HiddenField('branding_style')
+    branding_style = HiddenFieldWithNoneOption('branding_style')
 
 
 class GovernmentDomainField(StringField):
@@ -1111,3 +1130,41 @@ class ReturnedLettersForm(StripWhitespaceForm):
 
 class TemplateFolderForm(StripWhitespaceForm):
     name = StringField('Folder name', validators=[DataRequired(message='Can’t be empty')])
+
+
+class TemplateAndFoldersSelectionForm(Form):
+
+    ALL_TEMPLATES_FOLDER = {
+        'name': 'All templates',
+        'id': RadioFieldWithNoneOption.NONE_OPTION_VALUE,
+    }
+
+    def __init__(
+        self,
+        service,
+        template_type,
+        current_folder_id,
+        *args,
+        **kwargs
+    ):
+
+        super().__init__(*args, **kwargs)
+
+        self.templates_and_folders.choices = self.ids_and_names(
+            service.get_template_folders_and_templates(template_type, current_folder_id)
+        )
+
+        self.move_to.choices = self.ids_and_names(
+            [self.ALL_TEMPLATES_FOLDER] + service.all_template_folders,
+            exclude=current_folder_id,
+        )
+
+    @staticmethod
+    def ids_and_names(items, exclude=None):
+        return [
+            (item['id'], item['name']) for item in items
+            if item['id'] != str(exclude)
+        ]
+
+    templates_and_folders = MultiCheckboxField('Choose templates or folders')
+    move_to = RadioFieldWithNoneOption('Choose a folder')

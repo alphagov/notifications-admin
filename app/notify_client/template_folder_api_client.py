@@ -24,5 +24,24 @@ class TemplateFolderAPIClient(NotifyAdminAPIClient):
     def get_template_folders(self, service_id):
         return self.get('/service/{}/template-folder'.format(service_id))['template_folders']
 
+    @cache.delete('service-{service_id}-template-folders')
+    @cache.delete('service-{service_id}-templates')
+    def move_to_folder(self, service_id, folder_id, template_ids, folder_ids):
+
+        if folder_id:
+            url = '/service/{}/template-folder/{}/contents'.format(service_id, folder_id)
+        else:
+            url = '/service/{}/template-folder/contents'.format(service_id)
+
+        self.post(url, {
+            'templates': list(template_ids),
+            'folders': list(folder_ids),
+        })
+
+        self.redis_client.delete(*map(
+            'template-{}-version-None'.format,
+            template_ids,
+        ))
+
 
 template_folder_api_client = TemplateFolderAPIClient()

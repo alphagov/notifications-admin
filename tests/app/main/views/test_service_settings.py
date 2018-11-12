@@ -2304,17 +2304,23 @@ def test_should_preview_email_branding(
     app.service_api_client.get_service.assert_called_once_with(service_one['id'])
 
 
+@pytest.mark.parametrize('posted_value, submitted_value', (
+    ('1', '1'),
+    ('None', None),
+))
 def test_should_set_branding_and_organisations(
     logged_in_platform_admin_client,
     service_one,
     mock_update_service,
+    posted_value,
+    submitted_value,
 ):
     response = logged_in_platform_admin_client.post(
         url_for(
             'main.service_preview_email_branding', service_id=service_one['id']
         ),
         data={
-            'branding_style': '1'
+            'branding_style': posted_value
         }
     )
     assert response.status_code == 302
@@ -2323,7 +2329,7 @@ def test_should_set_branding_and_organisations(
 
     mock_update_service.assert_called_once_with(
         service_one['id'],
-        email_branding='1'
+        email_branding=submitted_value
     )
 
 

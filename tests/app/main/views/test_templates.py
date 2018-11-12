@@ -1,3 +1,4 @@
+import uuid
 from datetime import datetime
 from unittest.mock import ANY, Mock
 
@@ -16,12 +17,18 @@ from tests import (
     template_json,
     validate_route_permission,
 )
+from tests.app.main.views.test_template_folders import (
+    CHILD_FOLDER_ID,
+    PARENT_FOLDER_ID,
+)
 from tests.conftest import (
     SERVICE_ONE_ID,
     SERVICE_TWO_ID,
     TEMPLATE_ONE_ID,
     active_caseworking_user,
     active_user_view_permissions,
+    active_user_with_permissions,
+    fake_uuid,
     mock_get_service_email_template,
     mock_get_service_letter_template,
     mock_get_service_template,
@@ -107,12 +114,12 @@ def test_should_show_page_for_choosing_a_template(
     user,
     expected_page_title,
 ):
-    mocker.patch('app.user_api_client.get_user', return_value=user(fake_uuid))
     service_one['permissions'].append('letter')
+    client_request.login(user(fake_uuid))
 
     page = client_request.get(
         'main.choose_template',
-        service_id=SERVICE_ONE_ID,
+        service_id=service_one['id'],
         **extra_args
     )
 
@@ -133,6 +140,231 @@ def test_should_show_page_for_choosing_a_template(
         assert template_links[index].text.strip() == expected_template
 
     mock_get_service_templates.assert_called_once_with(SERVICE_ONE_ID)
+
+
+@pytest.mark.parametrize('user', [
+    pytest.param(
+        active_user_with_permissions
+    ),
+    pytest.param(
+        active_user_view_permissions,
+        marks=pytest.mark.xfail(raises=AssertionError)
+    ),
+    pytest.param(
+        active_caseworking_user,
+        marks=pytest.mark.xfail(raises=AssertionError)
+    ),
+])
+@pytest.mark.parametrize('extra_service_permissions', [
+    pytest.param(
+        ['edit_folders']
+    ),
+    pytest.param(
+        [],
+        marks=pytest.mark.xfail(raises=AssertionError)
+    ),
+])
+def test_should_show_checkboxes_for_selecting_templates(
+    client_request,
+    mocker,
+    service_one,
+    mock_get_service_templates,
+    mock_get_template_folders,
+    mock_has_no_jobs,
+    fake_uuid,
+    user,
+    extra_service_permissions,
+):
+    service_one['permissions'] += extra_service_permissions
+    client_request.login(user(fake_uuid))
+
+    page = client_request.get(
+        'main.choose_template',
+        service_id=SERVICE_ONE_ID,
+    )
+    checkboxes = page.select('input[name=templates_and_folders]')
+
+    assert len(checkboxes) == 4
+
+    assert checkboxes[0]['value'] == TEMPLATE_ONE_ID
+    assert checkboxes[0]['id'] == 'templates-or-folder-{}'.format(TEMPLATE_ONE_ID)
+
+    for index in (1, 2, 3):
+        assert checkboxes[index]['value'] != TEMPLATE_ONE_ID
+        assert TEMPLATE_ONE_ID not in checkboxes[index]['id']
+
+
+@pytest.mark.parametrize('user', [
+    pytest.param(
+        active_user_with_permissions
+    ),
+    pytest.param(
+        active_user_view_permissions,
+        marks=pytest.mark.xfail(raises=AssertionError)
+    ),
+    pytest.param(
+        active_caseworking_user,
+        marks=pytest.mark.xfail(raises=AssertionError)
+    ),
+])
+@pytest.mark.parametrize('extra_service_permissions', [
+    pytest.param(
+        ['edit_folders']
+    ),
+    pytest.param(
+        [],
+        marks=pytest.mark.xfail(raises=AssertionError)
+    ),
+])
+@pytest.mark.parametrize('folder_id, expected_destinations', [
+    (None, []),
+    (fake_uuid(), []),
+])
+def test_should_show_radio_buttons_for_move_destination(
+    client_request,
+    mocker,
+    service_one,
+    mock_get_service_templates,
+    mock_get_template_folders,
+    mock_has_no_jobs,
+    fake_uuid,
+    user,
+    extra_service_permissions,
+    folder_id,
+    expected_destinations,
+):
+    service_one['permissions'] += extra_service_permissions
+    client_request.login(user(fake_uuid))
+    FOLDER_TWO_ID = str(uuid.uuid4())
+    FOLDER_ONE_TWO_ID = str(uuid.uuid4())
+    mock_get_template_folders.return_value = [
+        {'id': PARENT_FOLDER_ID, 'name': 'folder_one', 'parent_id': None},
+        {'id': FOLDER_TWO_ID, 'name': 'folder_two', 'parent_id': None},
+        {'id': CHILD_FOLDER_ID, 'name': 'folder_one_one', 'parent_id': PARENT_FOLDER_ID},
+        {'id': FOLDER_ONE_TWO_ID, 'name': 'folder_one_two', 'parent_id': PARENT_FOLDER_ID},
+    ]
+    page = client_request.get(
+        'main.choose_template',
+        service_id=SERVICE_ONE_ID,
+    )
+    radios = page.select('input[type=radio]')
+    labels = page.select('label[for^=move_to]')
+    assert radios == page.select('input[name=move_to]')
+
+    assert [x['value'] for x in radios] == [
+        PARENT_FOLDER_ID, FOLDER_TWO_ID, CHILD_FOLDER_ID, FOLDER_ONE_TWO_ID
+    ]
+    assert [x.text.strip() for x in labels] == [
+        'folder_one', 'folder_two', 'folder_one_one', 'folder_one_two'
+    ]
+    assert page.select_one('button[name=operation]')['value'] == 'move'
+
+
+@pytest.mark.parametrize('user', [
+    pytest.param(
+        active_user_with_permissions
+    ),
+    pytest.param(
+        active_user_view_permissions,
+        marks=pytest.mark.xfail(raises=AssertionError)
+    ),
+    pytest.param(
+        active_caseworking_user,
+        marks=pytest.mark.xfail(raises=AssertionError)
+    ),
+])
+@pytest.mark.parametrize('extra_service_permissions', [
+    pytest.param(
+        ['edit_folders']
+    ),
+    pytest.param(
+        [],
+        marks=pytest.mark.xfail(raises=AssertionError)
+    ),
+])
+@pytest.mark.parametrize('folder_id, expected_destinations', [
+    (None, []),
+    (fake_uuid(), []),
+])
+def test_should_post_move_to_api(
+    client_request,
+    service_one,
+    fake_uuid,
+    mock_get_service_templates,
+    mock_get_template_folders,
+    mock_move_to_template_folder,
+    user,
+    extra_service_permissions,
+    folder_id,
+    expected_destinations,
+):
+    service_one['permissions'] += extra_service_permissions
+    client_request.login(user(fake_uuid))
+    FOLDER_TWO_ID = str(uuid.uuid4())
+    mock_get_template_folders.return_value = [
+        {'id': PARENT_FOLDER_ID, 'name': 'folder_one', 'parent_id': None},
+        {'id': FOLDER_TWO_ID, 'name': 'folder_two', 'parent_id': None},
+    ]
+    client_request.post(
+        'main.choose_template',
+        service_id=SERVICE_ONE_ID,
+        _data={
+            'operation': 'move',
+            'move_to': PARENT_FOLDER_ID,
+            'templates_and_folders': [
+                FOLDER_TWO_ID,
+                TEMPLATE_ONE_ID,
+            ],
+        },
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.choose_template',
+            service_id=SERVICE_ONE_ID,
+            _external=True,
+        ),
+    )
+    mock_move_to_template_folder.assert_called_once_with(
+        service_id=SERVICE_ONE_ID,
+        folder_id=PARENT_FOLDER_ID,
+        folder_ids={FOLDER_TWO_ID},
+        template_ids={TEMPLATE_ONE_ID},
+    )
+
+
+@pytest.mark.parametrize('thing_to_move', [
+    PARENT_FOLDER_ID,  # Can’t move a folder inside itself
+    CHILD_FOLDER_ID,  # Can’t move a folder which doesn’t belong to the service
+])
+def test_should_validate_illegal_moves(
+    client_request,
+    service_one,
+    fake_uuid,
+    mock_get_service_templates,
+    mock_get_template_folders,
+    mock_move_to_template_folder,
+    thing_to_move,
+):
+    service_one['permissions'] += 'edit_folders'
+
+    FOLDER_TWO_ID = str(uuid.uuid4())
+    mock_get_template_folders.return_value = [
+        {'id': PARENT_FOLDER_ID, 'name': 'folder_one', 'parent_id': None},
+        {'id': FOLDER_TWO_ID, 'name': 'folder_two', 'parent_id': None},
+    ]
+    client_request.post(
+        'main.choose_template',
+        service_id=SERVICE_ONE_ID,
+        _data={
+            'operation': 'move',
+            'move_to': PARENT_FOLDER_ID,
+            'templates_and_folders': [
+                thing_to_move,
+            ],
+        },
+        _expected_status=200,
+        _expected_redirect=None,
+    )
+    assert mock_move_to_template_folder.called is False
 
 
 def test_should_not_show_template_nav_if_only_one_type_of_template(
@@ -173,8 +405,12 @@ def test_should_show_live_search_if_list_of_templates_taller_than_screen(
         'main.choose_template',
         service_id=SERVICE_ONE_ID,
     )
+    search = page.select_one('.live-search')
 
-    assert page.select('.live-search')
+    assert search['data-module'] == 'live-search'
+    assert search['data-targets'] == '#template-list .template-list-item'
+
+    assert len(page.select(search['data-targets'])) == len(page.select('.message-name')) == 14
 
 
 def test_should_show_page_for_one_template(

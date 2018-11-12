@@ -4,12 +4,7 @@
   width='2-3'
 ) %}
   <div class="multiple-choice">
-    <input
-      id="{{ field.id }}" name="{{ field.name }}" type="checkbox" value="y"
-      {% if field.data %}
-        checked
-      {% endif %}
-    >
+    {{ checkbox_input(field.id, field.name, field.data) }}
     <label for="{{ field.id }}">
       {{ field.label.text }}
       {% if hint %}
@@ -21,6 +16,22 @@
   </div>
 {% endmacro %}
 
+
+{% macro checkbox_input(id, name, data=None, value="y") %}
+  <input
+    id="{{ id }}" name="{{ name }}" type="checkbox" value="{{ value }}"
+    {% if data %}
+      checked
+    {% endif %}
+  >
+{% endmacro %}
+
+{% macro unlabelled_checkbox(id, name, data=None, value="y") %}
+  <div class="multiple-choice">
+    {{ checkbox_input(id, name, data, value) }}
+    <label></label>
+  </div>
+{% endmacro %}
 
 {% macro checkbox_group(
   legend,

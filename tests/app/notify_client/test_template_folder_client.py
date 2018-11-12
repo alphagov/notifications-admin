@@ -1,6 +1,8 @@
 import uuid
+from unittest.mock import call
 
 import pytest
+from orderedset import OrderedSet
 
 from app.notify_client.template_folder_api_client import TemplateFolderAPIClient
 
@@ -44,3 +46,60 @@ def test_get_template_folders_calls_correct_api_endpoint(mocker, api_user_active
     mock_redis_get.assert_called_once_with(redis_key)
     mock_api_get.assert_called_once_with(expected_url)
     mock_redis_set.assert_called_once_with(redis_key, '{"a": "b"}', ex=604800)
+
+
+def test_move_templates_and_folders(mocker, api_user_active):
+
+    mock_redis_delete = mocker.patch('app.notify_client.RedisClient.delete')
+    mock_api_post = mocker.patch('app.notify_client.NotifyAdminAPIClient.post')
+
+    some_service_id = uuid.uuid4()
+    some_folder_id = uuid.uuid4()
+
+    TemplateFolderAPIClient().move_to_folder(
+        some_service_id,
+        some_folder_id,
+        template_ids=OrderedSet(('a', 'b', 'c')),
+        folder_ids=OrderedSet(('1', '2', '3')),
+    )
+
+    mock_api_post.assert_called_once_with(
+        '/service/{}/template-folder/{}/contents'.format(
+            some_service_id, some_folder_id
+        ),
+        {
+            'folders': ['1', '2', '3'],
+            'templates': ['a', 'b', 'c'],
+        },
+    )
+    assert mock_redis_delete.call_args_list == [
+        call('service-{}-template-folders'.format(some_service_id)),
+        call('service-{}-templates'.format(some_service_id)),
+        call(
+            'template-a-version-None',
+            'template-b-version-None',
+            'template-c-version-None',
+        ),
+    ]
+
+
+def test_move_templates_and_folders_to_root(mocker, api_user_active):
+
+    mock_api_post = mocker.patch('app.notify_client.NotifyAdminAPIClient.post')
+
+    some_service_id = uuid.uuid4()
+
+    TemplateFolderAPIClient().move_to_folder(
+        some_service_id,
+        None,
+        template_ids=OrderedSet(('a', 'b', 'c')),
+        folder_ids=OrderedSet(('1', '2', '3')),
+    )
+
+    mock_api_post.assert_called_once_with(
+        '/service/{}/template-folder/contents'.format(some_service_id),
+        {
+            'folders': ['1', '2', '3'],
+            'templates': ['a', 'b', 'c'],
+        },
+    )

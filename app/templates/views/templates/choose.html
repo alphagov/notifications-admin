@@ -16,7 +16,7 @@
 
 {% block maincolumn_content %}
 
-  {% if (not templates) and (not template_folder_path) %}
+  {% if (not templates) and (not template_folders) and (not template_folder_path) %}
 
     <h1 class="heading-large">
       {{ page_title }}
@@ -75,30 +75,22 @@
       </div>
     {% endif %}
 
-    {{ live_search(target_selector='#template-list .column-whole', show=show_search_box, form=search_form) }}
+    {{ live_search(target_selector='#template-list .template-list-item', show=show_search_box, form=search_form) }}
 
-    <nav class="grid-row" id=template-list>
-      {% for template_folder in template_folders %}
-        <div class="column-whole">
-          <h2 class="message-name">
-            <a href="{{ url_for('.choose_template', service_id=current_service.id, template_type=template_type, template_folder_id=template_folder.id) }}">
-              {{ template_folder.name }}
-            </a>
-          </h2>
-          <p class="message-type">Folder containing {{ template_count }} template{% if template_count != 1 %}s{% endif %}</p>
-        </div>
-      {% endfor %}
-      {% for template in templates %}
-        <div class="column-whole">
-          <h2 class="message-name">
-            <a href="{{ url_for('.view_template', service_id=current_service.id, template_id=template.id) }}">{{ template.name }}</a>
-          </h2>
-          <p class="message-type">
-            {{ message_count_label(1, template.template_type, suffix='')|capitalize }} template
-          </p>
-        </div>
-      {% endfor %}
-    </nav>
+    {% if can_manage_folders %}
+      <form method="post">
+        {% with templates=templates, template_folders=template_folders %}
+          {% include 'views/templates/_template_list.html' %}
+        {% endwith %}
+        {% with templates=templates, template_folders=template_folders, templates_and_folders_form=templates_and_folders_form %}
+          {% include 'views/templates/_move_to.html' %}
+        {% endwith %}
+      </form>
+    {% else %}
+      {% with templates=templates, template_folders=template_folders %}
+        {% include 'views/templates/_template_list.html' %}
+      {% endwith %}
+    {% endif %}
   {% endif %}
 
 {% endblock %}

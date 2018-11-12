@@ -36,6 +36,12 @@ class Service():
         'service_callback_api',
     }
 
+    TEMPLATE_TYPES = (
+        'sms',
+        'email',
+        'letter',
+    )
+
     def __init__(self, _dict):
         # in the case of a bad request current service may be `None`
         self._dict = _dict or {}
@@ -100,6 +106,10 @@ class Service():
             if template['template_type'] in self.available_template_types
         ]
 
+    @cached_property
+    def all_template_ids(self):
+        return {template['id'] for template in self.all_templates}
+
     def get_templates(self, template_type='all', template_folder_id=None):
         if isinstance(template_type, str):
             template_type = [template_type]
@@ -111,10 +121,7 @@ class Service():
 
     @property
     def available_template_types(self):
-        return [
-            channel for channel in ('email', 'sms', 'letter')
-            if self.has_permission(channel)
-        ]
+        return list(filter(self.has_permission, self.TEMPLATE_TYPES))
 
     @property
     def has_templates(self):
@@ -284,6 +291,10 @@ class Service():
     def all_template_folders(self):
         return template_folder_api_client.get_template_folders(self.id)
 
+    @cached_property
+    def all_template_folder_ids(self):
+        return {folder['id'] for folder in self.all_template_folders}
+
     def get_template_folders(self, parent_folder_id=None):
         return [
             folder for folder in self.all_template_folders
@@ -304,3 +315,20 @@ class Service():
             path.append(folder)
 
         return list(reversed(path))
+
+    def get_template_folders_and_templates(self, template_type, template_folder_id):
+        return (
+            self.get_templates(template_type, template_folder_id) +
+            self.get_template_folders(template_folder_id)
+        )
+
+    def move_to_folder(self, ids_to_move, move_to):
+
+        ids_to_move = set(ids_to_move)
+
+        template_folder_api_client.move_to_folder(
+            service_id=self.id,
+            folder_id=move_to,
+            template_ids=ids_to_move & self.all_template_ids,
+            folder_ids=ids_to_move & self.all_template_folder_ids,
+        )

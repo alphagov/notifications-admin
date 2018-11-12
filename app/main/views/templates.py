@@ -24,6 +24,7 @@ from app.main.forms import (
     SearchTemplatesForm,
     SetTemplateSenderForm,
     SMSTemplateForm,
+    TemplateAndFoldersSelectionForm,
     TemplateFolderForm,
 )
 from app.main.views.send import get_example_csv_rows, get_sender_details
@@ -99,35 +100,31 @@ def start_tour(service_id, template_id):
     )
 
 
-@main.route("/services/<service_id>/templates")
-@main.route("/services/<service_id>/templates/folders/<template_folder_id>")
-@main.route("/services/<service_id>/templates/<template_type>")
-@main.route("/services/<service_id>/templates/<template_type>/folders/<template_folder_id>")
+@main.route("/services/<service_id>/templates", methods=['GET', 'POST'])
+@main.route("/services/<service_id>/templates/folders/<template_folder_id>", methods=['GET', 'POST'])
+@main.route("/services/<service_id>/templates/<template_type>", methods=['GET', 'POST'])
+@main.route("/services/<service_id>/templates/<template_type>/folders/<template_folder_id>", methods=['GET', 'POST'])
 @login_required
 @user_has_permissions()
 def choose_template(service_id, template_type='all', template_folder_id=None):
 
-    template_nav_items = [
-        (
-            label,
-            key,
-            url_for(
-                '.choose_template', service_id=current_service.id,
-                template_type=key, template_folder_id=template_folder_id
-            ),
-            ''
+    templates_and_folders_form = TemplateAndFoldersSelectionForm(
+        service=current_service,
+        template_type=template_type,
+        current_folder_id=template_folder_id,
+    )
+
+    if is_valid_template_operation('move', templates_and_folders_form):
+        current_service.move_to_folder(
+            ids_to_move=templates_and_folders_form.templates_and_folders.data,
+            move_to=templates_and_folders_form.move_to.data,
         )
-        for label, key in filter(None, [
-            ('All', 'all'),
-            ('Text message', 'sms'),
-            ('Email', 'email'),
-            ('Letter', 'letter') if current_service.has_permission('letter') else None,
-        ])
-    ]
+        return redirect(request.url)
 
     return render_template(
         'views/templates/choose.html',
         current_template_folder_id=template_folder_id,
+        can_manage_folders=can_manage_folders(),
         template_folder_path=current_service.get_template_folder_path(template_folder_id),
         template_folders=current_service.get_template_folders(template_folder_id),
         templates=current_service.get_templates(template_type, template_folder_id),
@@ -136,9 +133,52 @@ def choose_template(service_id, template_type='all', template_folder_id=None):
             current_service.has_multiple_template_types
             and (len(current_service.all_templates) > 2)
         ),
-        template_nav_items=template_nav_items,
+        template_nav_items=get_template_nav_items(template_folder_id),
         template_type=template_type,
         search_form=SearchTemplatesForm(),
+        templates_and_folders_form=templates_and_folders_form,
+    )
+
+
+def is_valid_template_operation(operation_name, form):
+
+    if (
+        can_manage_folders() and
+        request.method == 'POST' and
+        request.form.get('operation') == operation_name and
+        form.validate_on_submit()
+    ):
+        return True
+
+
+def get_template_nav_label(value):
+    return {
+        'all': 'All',
+        'sms': 'Text message',
+        'email': 'Email',
+        'letter': 'Letter',
+    }[value]
+
+
+def get_template_nav_items(template_folder_id):
+    return [
+        (
+            get_template_nav_label(key),
+            key,
+            url_for(
+                '.choose_template', service_id=current_service.id,
+                template_type=key, template_folder_id=template_folder_id
+            ),
+            ''
+        )
+        for key in ['all'] + current_service.available_template_types
+    ]
+
+
+def can_manage_folders():
+    return (
+        current_service.has_permission('edit_folders') and
+        current_user.has_permissions('manage_templates')
     )
 
 
