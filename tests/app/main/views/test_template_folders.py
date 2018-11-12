@@ -89,21 +89,21 @@ def test_post_add_template_folder_page(client_request, service_one, mocker, pare
 
 
 @pytest.mark.parametrize(
-    'expected_page_title, extra_args, expected_nav_links, expected_links',
+    'expected_page_title, extra_args, expected_nav_links, expected_items',
     [
         (
             'Templates',
             {},
             ['Text message', 'Email', 'Letter'],
             [
-                'folder_one',
-                'folder_two',
-                'sms_template_one',
-                'sms_template_two',
-                'email_template_one',
-                'email_template_two',
-                'letter_template_one',
-                'letter_template_two',
+                'folder_one Folder containing templates',
+                'folder_two Folder containing templates',
+                'sms_template_one Text message template',
+                'sms_template_two Text message template',
+                'email_template_one Email template',
+                'email_template_two Email template',
+                'letter_template_one Letter template',
+                'letter_template_two Letter template',
             ]
         ),
         (
@@ -111,10 +111,10 @@ def test_post_add_template_folder_page(client_request, service_one, mocker, pare
             {'template_type': 'sms'},
             ['All', 'Email', 'Letter'],
             [
-                'folder_one',
-                'folder_two',
-                'sms_template_one',
-                'sms_template_two',
+                'folder_one Folder containing templates',
+                'folder_two Folder containing templates',
+                'sms_template_one Text message template',
+                'sms_template_two Text message template',
             ],
         ),
         (
@@ -122,8 +122,8 @@ def test_post_add_template_folder_page(client_request, service_one, mocker, pare
             {'template_type': 'sms', 'template_folder_id': PARENT_FOLDER_ID},
             ['All', 'Email', 'Letter'],
             [
-                'folder_one_one',
-                'folder_one_two',
+                'folder_one_one Folder containing templates',
+                'folder_one_two Folder containing templates',
             ],
         ),
         (
@@ -145,7 +145,7 @@ def test_should_show_templates_folder_page(
     expected_page_title,
     extra_args,
     expected_nav_links,
-    expected_links,
+    expected_items,
 ):
 
     mock_get_template_folders.return_value = [
@@ -172,12 +172,12 @@ def test_should_show_templates_folder_page(
     for index, expected_link in enumerate(expected_nav_links):
         assert links_in_page[index].text.strip() == expected_link
 
-    page_links = page.select('.message-name a')
+    page_items = page.select('.template-list-item')
 
-    assert len(page_links) == len(expected_links)
+    assert len(page_items) == len(expected_items)
 
-    for index, expected_link in enumerate(expected_links):
-        assert page_links[index].text.strip() == expected_link
+    for index, expected_item in enumerate(expected_items):
+        assert normalize_spaces(page_items[index].text) == expected_item
 
     mock_get_service_templates.assert_called_once_with(SERVICE_ONE_ID)
 
