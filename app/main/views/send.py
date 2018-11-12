@@ -115,8 +115,15 @@ def send_messages(service_id, template_id):
             session['file_uploads'].keys())
         )
 
-    session['sender_id'] = None
     db_template = service_api_client.get_service_template(service_id, template_id)['data']
+
+    email_reply_to = None
+    sms_sender = None
+
+    if db_template['template_type'] == 'email':
+        email_reply_to = get_email_reply_to_address_from_session()
+    elif db_template['template_type'] == 'sms':
+        sms_sender = get_sms_sender_from_session()
 
     if email_or_sms_not_enabled(db_template['template_type'], current_service.permissions):
         return redirect(url_for(
@@ -139,6 +146,8 @@ def send_messages(service_id, template_id):
             filetype='png',
             page_count=get_page_count_for_letter(db_template),
         ),
+        email_reply_to=email_reply_to,
+        sms_sender=sms_sender,
     )
 
     form = CsvUploadForm()
@@ -626,17 +635,20 @@ def check_messages(service_id, template_id, upload_id, row_index=2):
 
     data['original_file_name'] = SanitiseASCII.encode(data.get('original_file_name', ''))
 
-    set_metadata_on_csv_upload(
-        service_id,
-        upload_id,
-        notification_count=data['count_of_recipients'],
-        template_id=str(template_id),
-        valid=True,
-        original_file_name=unicode_truncate(
+    metadata_kwargs = {
+        'notification_count': data['count_of_recipients'],
+        'template_id': str(template_id),
+        'valid': True,
+        'original_file_name': unicode_truncate(
             data['original_file_name'],
             1600,
         ),
-    )
+    }
+
+    if session.get('sender_id'):
+        metadata_kwargs['sender_id'] = session['sender_id']
+
+    set_metadata_on_csv_upload(service_id, upload_id, **metadata_kwargs)
 
     return render_template('views/check/ok.html', **data)
 
@@ -695,6 +707,8 @@ def start_job(service_id, upload_id):
         service_id,
         scheduled_for=request.form.get('scheduled_for', '')
     )
+
+    session.pop('sender_id', None)
 
     return redirect(
         url_for(

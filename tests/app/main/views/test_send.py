@@ -2659,6 +2659,48 @@ def test_check_messages_column_error_doesnt_show_optional_columns(
     )
 
 
+def test_check_messages_adds_sender_id_in_session_to_metadata(
+    client_request,
+    mocker,
+    mock_get_live_service,
+    mock_get_service_template,
+    mock_get_users_by_service,
+    mock_get_service_statistics,
+    mock_get_job_doesnt_exist,
+    mock_s3_set_metadata,
+    fake_uuid,
+):
+    mocker.patch('app.main.views.send.s3download', return_value=(
+        'phone number,\n07900900321'
+    ))
+    mocker.patch('app.main.views.send.get_sms_sender_from_session')
+
+    with client_request.session_transaction() as session:
+        session['file_uploads'] = {
+            fake_uuid: {'template_id': fake_uuid}
+        }
+        session['sender_id'] = 'fake-sender'
+
+    client_request.get(
+        'main.check_messages',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        upload_id=fake_uuid,
+        original_file_name='example.csv',
+        _test_page_title=False,
+    )
+
+    mock_s3_set_metadata.assert_called_once_with(
+        SERVICE_ONE_ID,
+        fake_uuid,
+        notification_count=1,
+        template_id=fake_uuid,
+        sender_id='fake-sender',
+        valid=True,
+        original_file_name='example.csv',
+    )
+
+
 @pytest.mark.parametrize('extra_args', (
     {},
     {'from_test': True},
