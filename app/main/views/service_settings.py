@@ -813,9 +813,8 @@ def service_preview_email_branding(service_id):
     form = ServicePreviewBranding(branding_style=branding_style)
 
     if form.validate_on_submit():
-        branding_style = None if form.branding_style.data == 'None' else form.branding_style.data
         current_service.update(
-            email_branding=branding_style
+            email_branding=form.branding_style.data
         )
         return redirect(url_for('.service_settings', service_id=service_id))
 

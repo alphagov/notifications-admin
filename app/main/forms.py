@@ -702,11 +702,23 @@ class ServicePostageForm(StripWhitespaceForm):
     )
 
 
-class RadioFieldWithNoneOption(RadioField):
+class FieldWithNoneOption():
+
+    # This needs to match the data the browser will post from
+    # <input value='None'>
+    NONE_OPTION_VALUE = 'None'
 
     def post_validate(self, form, validation_stopped):
-        if self.data == 'None':
+        if self.data == self.NONE_OPTION_VALUE:
             self.data = None
+
+
+class RadioFieldWithNoneOption(FieldWithNoneOption, RadioField):
+    pass
+
+
+class HiddenFieldWithNoneOption(FieldWithNoneOption, HiddenField):
+    pass
 
 
 class ServiceSetBranding(StripWhitespaceForm):
@@ -718,7 +730,7 @@ class ServiceSetBranding(StripWhitespaceForm):
         ]
     )
 
-    DEFAULT = ('None', 'GOV.UK')
+    DEFAULT = (FieldWithNoneOption.NONE_OPTION_VALUE, 'GOV.UK')
 
     def __init__(self, all_email_brandings, current_email_branding):
 
@@ -736,7 +748,7 @@ class ServiceSetBranding(StripWhitespaceForm):
 
 class ServicePreviewBranding(StripWhitespaceForm):
 
-    branding_style = HiddenField('branding_style')
+    branding_style = HiddenFieldWithNoneOption('branding_style')
 
 
 class GovernmentDomainField(StringField):
@@ -1124,7 +1136,7 @@ class TemplateAndFoldersSelectionForm(Form):
 
     ALL_TEMPLATES_FOLDER = {
         'name': 'All templates',
-        'id': 'None',
+        'id': RadioFieldWithNoneOption.NONE_OPTION_VALUE,
     }
 
     def __init__(
