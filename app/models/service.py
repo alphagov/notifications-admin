@@ -298,11 +298,30 @@ class Service():
     def all_template_folder_ids(self):
         return {folder['id'] for folder in self.all_template_folders}
 
-    def get_template_folders(self, parent_folder_id=None):
+    def get_template_folders(self, parent_folder_id=None, template_type='all'):
         return [
             folder for folder in self.all_template_folders
-            if folder['parent_id'] == parent_folder_id
+            if (
+                folder['parent_id'] == parent_folder_id and
+                self.show_folder(folder['id'], template_type)
+            )
         ]
+
+    def show_folder(self, template_folder_id, template_type='all'):
+
+        if template_type == 'all':
+            return True
+
+        if self.get_templates(template_type, template_folder_id):
+            return True
+
+        if any(
+            self.show_folder(child_folder['id'], template_type)
+            for child_folder in self.get_template_folders(template_folder_id, template_type)
+        ):
+            return True
+
+        return False
 
     def get_template_folder_path(self, template_folder_id):
         if template_folder_id is None:
@@ -322,7 +341,7 @@ class Service():
     def get_template_folders_and_templates(self, template_type, template_folder_id):
         return (
             self.get_templates(template_type, template_folder_id) +
-            self.get_template_folders(template_folder_id)
+            self.get_template_folders(template_folder_id, template_type)
         )
 
     def move_to_folder(self, ids_to_move, move_to):

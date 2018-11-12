@@ -111,8 +111,6 @@ def test_post_add_template_folder_page(client_request, service_one, mocker, pare
             {'template_type': 'sms'},
             ['All', 'Email', 'Letter'],
             [
-                'folder_one Folder containing templates',
-                'folder_two Folder containing templates',
                 'sms_template_one Text message template',
                 'sms_template_two Text message template',
             ],
@@ -122,8 +120,6 @@ def test_post_add_template_folder_page(client_request, service_one, mocker, pare
             {'template_type': 'sms', 'template_folder_id': PARENT_FOLDER_ID},
             ['All', 'Email', 'Letter'],
             [
-                'folder_one_one Folder containing templates',
-                'folder_one_two Folder containing templates',
             ],
         ),
         (
