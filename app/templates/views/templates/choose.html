@@ -65,6 +65,10 @@
       {% if current_user.has_permissions('manage_templates') %}
         <div class="column-one-third">
           <a href="{{ url_for('.add_template_by_type', service_id=current_service.id, template_folder_id=current_template_folder_id) }}" class="button align-with-heading">Add new template</a>
+
+        {% if can_manage_folders and template_folder_path %}
+          <a href="{{ url_for('.manage_template_folder', service_id=current_service.id, template_folder_id=current_template_folder_id) }}" class="align-with-heading">Manage</a>
+        {% endif %}
         </div>
       {% endif %}
     </div>
