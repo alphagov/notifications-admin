@@ -17,6 +17,14 @@ def _folder(name, folder_id=None, parent=None):
     }
 
 
+def _template(template_type, name):
+    return {
+        'id': str(uuid.uuid4()),
+        'name': name,
+        'template_type': template_type,
+    }
+
+
 @pytest.mark.parametrize('parent_folder_id', [None, PARENT_FOLDER_ID])
 def test_add_page_shows_option_for_folder(
     client_request,
@@ -149,6 +157,14 @@ def test_should_show_templates_folder_page(
         _folder('folder_one', PARENT_FOLDER_ID),
         _folder('folder_one_two', parent=PARENT_FOLDER_ID),
         _folder('folder_one_one', CHILD_FOLDER_ID, parent=PARENT_FOLDER_ID),
+    ]
+    mock_get_service_templates.return_value = [
+        _template('sms', 'sms_template_one'),
+        _template('sms', 'sms_template_two'),
+        _template('email', 'email_template_one'),
+        _template('email', 'email_template_two'),
+        _template('letter', 'letter_template_one'),
+        _template('letter', 'letter_template_two'),
     ]
 
     service_one['permissions'] += ['letter', 'edit_folders']
