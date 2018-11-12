@@ -133,10 +133,10 @@ def test_should_show_templates_folder_page(
 ):
 
     mock_get_template_folders.return_value = [
-        {'id': PARENT_FOLDER_ID, 'name': 'folder_one', 'parent_id': None},
         {'id': str(uuid.uuid4()), 'name': 'folder_two', 'parent_id': None},
-        {'id': CHILD_FOLDER_ID, 'name': 'folder_one_one', 'parent_id': PARENT_FOLDER_ID},
+        {'id': PARENT_FOLDER_ID, 'name': 'folder_one', 'parent_id': None},
         {'id': str(uuid.uuid4()), 'name': 'folder_one_two', 'parent_id': PARENT_FOLDER_ID},
+        {'id': CHILD_FOLDER_ID, 'name': 'folder_one_one', 'parent_id': PARENT_FOLDER_ID},
     ]
 
     service_one['permissions'] += ['letter', 'edit_folders']

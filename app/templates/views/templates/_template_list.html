@@ -10,7 +10,7 @@
           value=template_folder.id,
         ) }}
       {% endif %}
-      <h2 class="message-name">
+      <h2 class="message-name template-list-folder">
         <a href="{{ url_for('.choose_template', service_id=current_service.id, template_type=template_type, template_folder_id=template_folder.id) }}">
           {{ template_folder.name }}
         </a>

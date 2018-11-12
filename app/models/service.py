@@ -289,7 +289,10 @@ class Service():
 
     @cached_property
     def all_template_folders(self):
-        return template_folder_api_client.get_template_folders(self.id)
+        return sorted(
+            template_folder_api_client.get_template_folders(self.id),
+            key=lambda folder: folder['name'].lower(),
+        )
 
     @cached_property
     def all_template_folder_ids(self):
