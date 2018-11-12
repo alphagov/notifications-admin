@@ -106,8 +106,8 @@ def test_post_add_template_folder_page(client_request, service_one, mocker, pare
             {},
             ['Text message', 'Email', 'Letter'],
             [
-                'folder_one Folder containing templates',
-                'folder_two Folder containing templates',
+                'folder_one 2 folders',
+                'folder_two Empty',
                 'sms_template_one Text message template',
                 'sms_template_two Text message template',
                 'email_template_one Email template',
@@ -121,9 +121,18 @@ def test_post_add_template_folder_page(client_request, service_one, mocker, pare
             {'template_type': 'sms'},
             ['All', 'Email', 'Letter'],
             [
-                'folder_one Folder containing templates',
+                'folder_one 1 folder',
                 'sms_template_one Text message template',
                 'sms_template_two Text message template',
+            ],
+        ),
+        (
+            'Templates / folder_one',
+            {'template_folder_id': PARENT_FOLDER_ID},
+            ['Text message', 'Email', 'Letter'],
+            [
+                'folder_one_one 1 template, 1 folder',
+                'folder_one_two Empty',
             ],
         ),
         (
@@ -131,15 +140,22 @@ def test_post_add_template_folder_page(client_request, service_one, mocker, pare
             {'template_type': 'sms', 'template_folder_id': PARENT_FOLDER_ID},
             ['All', 'Email', 'Letter'],
             [
-                'folder_one_one Folder containing templates',
+                'folder_one_one 1 folder',
             ],
+        ),
+        (
+            'Templates / folder_one',
+            {'template_type': 'email', 'template_folder_id': PARENT_FOLDER_ID},
+            ['All', 'Text message', 'Letter'],
+            [],
         ),
         (
             'Templates / folder_one / folder_one_one',
             {'template_folder_id': CHILD_FOLDER_ID},
             ['Text message', 'Email', 'Letter'],
             [
-                'folder_one_one_one Folder containing templates',
+                'folder_one_one_one 1 template',
+                'letter_template_nested Letter template',
             ],
         ),
         (
@@ -164,7 +180,6 @@ def test_should_show_templates_folder_page(
     expected_nav_links,
     expected_items,
 ):
-
     mock_get_template_folders.return_value = [
         _folder('folder_two'),
         _folder('folder_one', PARENT_FOLDER_ID),
@@ -181,7 +196,8 @@ def test_should_show_templates_folder_page(
             _template('email', 'email_template_two'),
             _template('letter', 'letter_template_one'),
             _template('letter', 'letter_template_two'),
-            _template('sms', 'sms_template_nested', parent=GRANDCHILD_FOLDER_ID)
+            _template('letter', 'letter_template_nested', parent=CHILD_FOLDER_ID),
+            _template('sms', 'sms_template_nested', parent=GRANDCHILD_FOLDER_ID),
         ]}
     )
 
