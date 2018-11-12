@@ -7,6 +7,7 @@ from tests.conftest import SERVICE_ONE_ID, normalize_spaces
 
 PARENT_FOLDER_ID = '7e979e79-d970-43a5-ac69-b625a8d147b0'
 CHILD_FOLDER_ID = '92ee1ee0-e4ee-4dcc-b1a7-a5da9ebcfa2b'
+GRANDCHILD_FOLDER_ID = 'fafe723f-1d39-4a10-865f-e551e03d8886'
 
 
 def _folder(name, folder_id=None, parent=None):
@@ -17,11 +18,12 @@ def _folder(name, folder_id=None, parent=None):
     }
 
 
-def _template(template_type, name):
+def _template(template_type, name, parent=None):
     return {
         'id': str(uuid.uuid4()),
         'name': name,
         'template_type': template_type,
+        'folder': parent,
     }
 
 
@@ -119,6 +121,7 @@ def test_post_add_template_folder_page(client_request, service_one, mocker, pare
             {'template_type': 'sms'},
             ['All', 'Email', 'Letter'],
             [
+                'folder_one Folder containing templates',
                 'sms_template_one Text message template',
                 'sms_template_two Text message template',
             ],
@@ -128,19 +131,29 @@ def test_post_add_template_folder_page(client_request, service_one, mocker, pare
             {'template_type': 'sms', 'template_folder_id': PARENT_FOLDER_ID},
             ['All', 'Email', 'Letter'],
             [
+                'folder_one_one Folder containing templates',
             ],
         ),
         (
             'Templates / folder_one / folder_one_one',
             {'template_folder_id': CHILD_FOLDER_ID},
             ['Text message', 'Email', 'Letter'],
-            [],
+            [
+                'folder_one_one_one Folder containing templates',
+            ],
+        ),
+        (
+            'Templates / folder_one / folder_one_one / folder_one_one_one',
+            {'template_folder_id': GRANDCHILD_FOLDER_ID},
+            ['Text message', 'Email', 'Letter'],
+            [
+                'sms_template_nested Text message template',
+            ],
         ),
     ]
 )
 def test_should_show_templates_folder_page(
     client_request,
-    mock_get_service_templates,
     mock_get_template_folders,
     mock_has_no_jobs,
     service_one,
@@ -157,15 +170,20 @@ def test_should_show_templates_folder_page(
         _folder('folder_one', PARENT_FOLDER_ID),
         _folder('folder_one_two', parent=PARENT_FOLDER_ID),
         _folder('folder_one_one', CHILD_FOLDER_ID, parent=PARENT_FOLDER_ID),
+        _folder('folder_one_one_one', GRANDCHILD_FOLDER_ID, parent=CHILD_FOLDER_ID),
     ]
-    mock_get_service_templates.return_value = [
-        _template('sms', 'sms_template_one'),
-        _template('sms', 'sms_template_two'),
-        _template('email', 'email_template_one'),
-        _template('email', 'email_template_two'),
-        _template('letter', 'letter_template_one'),
-        _template('letter', 'letter_template_two'),
-    ]
+    mock_get_service_templates = mocker.patch(
+        'app.service_api_client.get_service_templates',
+        return_value={'data': [
+            _template('sms', 'sms_template_one'),
+            _template('sms', 'sms_template_two'),
+            _template('email', 'email_template_one'),
+            _template('email', 'email_template_two'),
+            _template('letter', 'letter_template_one'),
+            _template('letter', 'letter_template_two'),
+            _template('sms', 'sms_template_nested', parent=GRANDCHILD_FOLDER_ID)
+        ]}
+    )
 
     service_one['permissions'] += ['letter', 'edit_folders']
 
