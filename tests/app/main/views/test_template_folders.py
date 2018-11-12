@@ -110,13 +110,21 @@ def test_post_add_template_folder_page(client_request, service_one, mocker, pare
             'Templates',
             {'template_type': 'sms'},
             ['All', 'Email', 'Letter'],
-            ['folder_one', 'folder_two', 'sms_template_one', 'sms_template_two'],
+            [
+                'folder_one',
+                'folder_two',
+                'sms_template_one',
+                'sms_template_two',
+            ],
         ),
         (
             'Templates / folder_one',
             {'template_type': 'sms', 'template_folder_id': PARENT_FOLDER_ID},
             ['All', 'Email', 'Letter'],
-            ['folder_one_one', 'folder_one_two'],
+            [
+                'folder_one_one',
+                'folder_one_two',
+            ],
         ),
         (
             'Templates / folder_one / folder_one_one',
