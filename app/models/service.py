@@ -37,9 +37,9 @@ class Service():
     }
 
     TEMPLATE_TYPES = (
-        ('sms', 'Text message'),
-        ('email', 'Email'),
-        ('letter', 'Letter'),
+        'sms',
+        'email',
+        'letter',
     )
 
     def __init__(self, _dict):
@@ -121,17 +121,7 @@ class Service():
 
     @property
     def available_template_types(self):
-        return [
-            channel for channel, _ in self.TEMPLATE_TYPES
-            if self.has_permission(channel)
-        ]
-
-    @property
-    def available_template_types_as_tuples(self):
-        return [
-            (label, value) for value, label in self.TEMPLATE_TYPES
-            if self.has_permission(value)
-        ]
+        return list(filter(self.has_permission, self.TEMPLATE_TYPES))
 
     @property
     def has_templates(self):

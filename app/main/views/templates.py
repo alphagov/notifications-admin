@@ -151,10 +151,19 @@ def template_operation(operation_name, form):
         return True
 
 
+def get_template_nav_label(value):
+    return {
+        'all': 'All',
+        'sms': 'Text message',
+        'email': 'Email',
+        'letter': 'Letter',
+    }[value]
+
+
 def get_template_nav_items(template_folder_id):
     return [
         (
-            label,
+            get_template_nav_label(key),
             key,
             url_for(
                 '.choose_template', service_id=current_service.id,
@@ -162,7 +171,7 @@ def get_template_nav_items(template_folder_id):
             ),
             ''
         )
-        for label, key in [('All', 'all')] + current_service.available_template_types_as_tuples
+        for key in ['all'] + current_service.available_template_types
     ]
 
 
