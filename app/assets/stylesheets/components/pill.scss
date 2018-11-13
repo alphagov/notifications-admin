@@ -6,6 +6,14 @@
     width: 25%;
     flex-grow: 1;
     text-align: left;
+
+    /*
+      For browsers that don’t support flexbox, use float instead.
+      Float does not create floating of flex item, and do not take it
+      out-of-flow. So this is ignored by browsers that support flexbox.
+      See: https://www.w3.org/TR/css-flexbox-1/#flex-containers
+    */
+    float: left;
   }
 
   a,
