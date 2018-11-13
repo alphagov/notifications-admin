@@ -303,11 +303,11 @@ class Service():
             folder for folder in self.all_template_folders
             if (
                 folder['parent_id'] == parent_folder_id and
-                self.show_folder(folder['id'], template_type)
+                self.is_folder_visible(folder['id'], template_type)
             )
         ]
 
-    def show_folder(self, template_folder_id, template_type='all'):
+    def is_folder_visible(self, template_folder_id, template_type='all'):
 
         if template_type == 'all':
             return True
@@ -316,7 +316,7 @@ class Service():
             return True
 
         if any(
-            self.show_folder(child_folder['id'], template_type)
+            self.is_folder_visible(child_folder['id'], template_type)
             for child_folder in self.get_template_folders(template_type, template_folder_id)
         ):
             return True
