@@ -324,7 +324,11 @@ def test_get_manage_folder_page(client_request, service_one, mock_get_template_f
         service_id=service_one['id'],
         template_folder_id=folder_id
     )
-    assert page.select_one('input[name=name]')['value'] == 'folder_two'
+    assert page.select_one('input[name=name]') is not None
+    delete_link = page.find('a', string="Delete this folder")
+    expected_delete_url = "/services/{}/templates/folders/{}/delete".format(service_one['id'], folder_id)
+
+    assert expected_delete_url in delete_link["href"]
 
 
 def test_manage_folder_page_404s(client_request, service_one, mock_get_template_folders):

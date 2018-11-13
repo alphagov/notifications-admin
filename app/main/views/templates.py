@@ -390,7 +390,16 @@ def manage_template_folder(service_id, template_folder_id):
         'views/templates/manage-template-folder.html',
         form=form,
         template_folder_path=current_service.get_template_folder_path(template_folder_id),
+        current_service_id=current_service.id,
+        template_folder_id=template_folder_id
     )
+
+
+@main.route("/services/<service_id>/templates/folders/<template_folder_id>/delete", methods=['POST'])
+def delete_template_folder(service_id, template_folder_id):
+    if not current_service.has_permission('edit_folders'):
+        abort(403)
+    pass
 
 
 @main.route("/services/<service_id>/templates/add-<template_type>", methods=['GET', 'POST'])
