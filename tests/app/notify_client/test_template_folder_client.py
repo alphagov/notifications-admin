@@ -121,3 +121,20 @@ def test_update_template_folder_calls_correct_api_endpoint(mocker, api_user_acti
 
     mock_post.assert_called_once_with(expected_url, data)
     mock_redis_delete.assert_called_once_with('service-{}-template-folders'.format(some_service_id))
+
+
+def test_delete_template_folder_calls_correct_api_endpoint(mocker, api_user_active):
+    mock_redis_delete = mocker.patch('app.notify_client.RedisClient.delete')
+
+    some_service_id = uuid.uuid4()
+    template_folder_id = uuid.uuid4()
+    expected_url = '/service/{}/template-folder/{}/delete'.format(some_service_id, template_folder_id)
+
+    client = TemplateFolderAPIClient()
+
+    mock_post = mocker.patch('app.notify_client.template_folder_api_client.TemplateFolderAPIClient.post')
+
+    client.delete_template_folder(some_service_id, template_folder_id)
+
+    mock_post.assert_called_once_with(expected_url)
+    mock_redis_delete.assert_called_once_with('service-{}-template-folders'.format(some_service_id))
