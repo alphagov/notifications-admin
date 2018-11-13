@@ -18,7 +18,7 @@
       </h2>
       <p class="message-type">
         {{ folder_contents_count(
-          current_service.get_template_folders(template_folder.id, template_type)|length,
+          current_service.get_template_folders(template_type, template_folder.id)|length,
           current_service.get_templates(template_type, template_folder.id)|length,
         ) }}
       </p>
