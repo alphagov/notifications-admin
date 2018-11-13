@@ -369,6 +369,27 @@ def add_template_folder(service_id, template_folder_id=None):
     )
 
 
+@main.route("/services/<service_id>/templates/folders/<template_folder_id>/manage", methods=['GET', 'POST'])
+def manage_template_folder(service_id, template_folder_id):
+    if not current_service.has_permission('edit_folders'):
+        abort(403)
+
+    form = TemplateFolderForm()
+    if form.validate_on_submit():
+        template_folder_api_client.update_template_folder(
+            current_service.id, template_folder_id, name=form.name.data
+        )
+        return redirect(
+            url_for('.choose_template', service_id=service_id, template_folder_id=template_folder_id)
+        )
+
+    return render_template(
+        'views/templates/manage-template-folder.html',
+        form=form,
+        template_folder_path=current_service.get_template_folder_path(template_folder_id),
+    )
+
+
 @main.route("/services/<service_id>/templates/add-<template_type>", methods=['GET', 'POST'])
 @main.route("/services/<service_id>/templates/folders/<template_folder_id>/add-<template_type>",
             methods=['GET', 'POST'])

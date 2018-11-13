@@ -248,3 +248,55 @@ def test_can_create_email_template_with_parent_folder(
         data['subject'],
         data['process_type'],
         data['parent_folder_id'])
+
+
+def test_get_manage_folder_page(client_request, service_one, mock_get_template_folders):
+    folder_id = str(uuid.uuid4())
+    mock_get_template_folders.return_value = [
+        {'id': folder_id, 'name': 'folder_two', 'parent_id': None},
+    ]
+    service_one['permissions'] += ['edit_folders']
+
+    page = client_request.get(
+        'main.manage_template_folder',
+        service_id=service_one['id'],
+        template_folder_id=folder_id
+    )
+    assert page.select_one('input[name=name]') is not None
+
+
+def test_get_manage_folder_page_no_permissions(client_request, service_one, mock_get_template_folders):
+    folder_id = str(uuid.uuid4())
+
+    client_request.get(
+        'main.manage_template_folder',
+        service_id=service_one['id'],
+        template_folder_id=folder_id,
+        _expected_status=403
+    )
+
+
+def test_rename_folder(client_request, service_one, mock_get_template_folders, mocker):
+    mock_update = mocker.patch('app.template_folder_api_client.update_template_folder')
+    folder_id = str(uuid.uuid4())
+    mock_get_template_folders.return_value = [
+        {'id': folder_id, 'name': 'folder_two', 'parent_id': None},
+    ]
+    service_one['permissions'] += ['edit_folders']
+
+    client_request.post(
+        'main.manage_template_folder',
+        service_id=service_one['id'],
+        template_folder_id=folder_id,
+        _data={"name": "new beautiful name"},
+        _expected_redirect=url_for("main.choose_template",
+                                   service_id=service_one['id'],
+                                   template_folder_id=folder_id,
+                                   _external=True)
+    )
+
+    mock_update.assert_called_once_with(
+        service_one['id'],
+        folder_id,
+        name="new beautiful name"
+    )

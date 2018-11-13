@@ -43,5 +43,11 @@ class TemplateFolderAPIClient(NotifyAdminAPIClient):
             template_ids,
         ))
 
+    def update_template_folder(self, service_id, template_folder_id, name):
+        self.post(
+            '/service/{}/template-folder/{}'.format(service_id, template_folder_id),
+            {"name": name}
+        )
+
 
 template_folder_api_client = TemplateFolderAPIClient()
