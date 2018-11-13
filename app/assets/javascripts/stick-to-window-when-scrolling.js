@@ -4,6 +4,39 @@
   var $ = global.jQuery;
   var GOVUK = global.GOVUK || {};
 
+  var StickyElement = function ($el, sticky) {
+    this._sticky = sticky;
+    this.$fixedEl = $el;
+    this._initialFixedClass = 'content-fixed-onload';
+    this._fixedClass = 'content-fixed';
+    this._appliedClass = null;
+    this._stopped = false;
+    this.scrolledFrom = this._sticky.getScrolledFrom($el);
+  };
+  StickyElement.prototype.stickyClass = function () {
+    return (this._sticky._initialPositionsSet) ? this._fixedClass : this._initialFixedClass;
+  };
+  StickyElement.prototype.appliedClass = function () {
+    return this._appliedClass;
+  };
+  StickyElement.prototype.isStuck = function () {
+    return this._appliedClass !== null;
+  };
+  StickyElement.prototype.stick = function () {
+    this._appliedClass = this.stickyClass();
+    this._hasBeenCalled = true;
+  };
+  StickyElement.prototype.release = function () {
+    this._appliedClass = null;
+    this._hasBeenCalled = true;
+  };
+  StickyElement.prototype.stop = function () {
+    this._stopped = true;
+  };
+  StickyElement.prototype.unstop = function () {
+    this._stopped = false;
+  };
+
   // Stick elements to top of screen when you scroll past, documentation is in the README.md
   var Sticky = function (selector) {
     this._hasScrolled = false;
@@ -11,6 +44,7 @@
     this._hasResized = false;
     this._resizeTimeout = false;
     this._elsLoaded = false;
+    this._initialPositionsSet = false;
     this._els = [];
 
     this.CSS_SELECTOR = selector;
@@ -25,6 +59,30 @@
     return {
       scrollTop: $(global).scrollTop()
     };
+  };
+  Sticky.prototype.setElementPositions = function () {
+    var self = this;
+
+    $.each(self._els, function (i, el) {
+      var $el = el.$fixedEl;
+
+      var windowDimensions = self.getWindowDimensions();
+
+      if (self.scrolledFromInsideWindow(el.scrolledFrom)) {
+        self.release(el);
+      } else {
+        if (self.scrolledToOutsideWindow(el, windowDimensions.height)) {
+          self.stop(el);
+        } else if (self.viewportIsWideEnough(windowDimensions.width)) {
+          if (el.stopped) {
+            self.unstop(el);
+          }
+          self.stick(el);
+        }
+      }
+    });
+
+    if (self._initialPositionsSet === false) { self._initialPositionsSet = true; }
   };
   Sticky.prototype.setFixedTop = function (el) {
     var $siblingEl = $('<div></div>');
@@ -66,16 +124,15 @@
     if ($els.length > 0) {
       $els.each(function (i, el) {
         var $el = $(el);
-        var elObj = {
-          $fixedEl: $el,
-          scrolledFrom: self.getScrolledFrom($el),
-          stopped: false
-        };
+        var elObj = new StickyElement($el, self);
 
         self.setFixedTop(elObj);
         self.setElHeight(elObj);
         self._els.push(elObj);
       });
+
+      // set element positions based on page scroll position on load
+      self.setElementPositions();
 
       if (self._scrollTimeout === false) {
         $(global).scroll(function (e) { self.onScroll(); });
@@ -86,10 +143,6 @@
         $(global).resize(function (e) { self.onResize(); });
         self._resizeTimeout = global.setInterval(function (e) { self.checkResize(); }, 50);
       }
-
-      // fake scrolling to allow us to check the position of the elements
-      self._hasScrolled = true;
-      self.checkScroll();
     }
   };
   Sticky.prototype.onScroll = function () {
@@ -106,25 +159,7 @@
 
     if (self._hasScrolled === true) {
       self._hasScrolled = false;
-
-      $.each(self._els, function (i, el) {
-        var $el = el.$fixedEl;
-
-        var windowDimensions = self.getWindowDimensions();
-
-        if (self.scrolledFromInsideWindow(el.scrolledFrom)) {
-          self.release($el);
-        } else {
-          if (self.scrolledToOutsideWindow(el, windowDimensions.height)) {
-            self.stop(el);
-          } else if (self.viewportIsWideEnough(windowDimensions.width)) {
-            if (el.stopped) {
-              self.unstop(el);
-            }
-            self.stick($el);
-          }
-        }
-      });
+      self.setElementPositions(true);
     }
   };
   Sticky.prototype.checkResize = function () {
@@ -154,19 +189,24 @@
       });
     }
   };
-  Sticky.prototype.stick = function ($el) {
-    if (!$el.hasClass('content-fixed')) {
+  Sticky.prototype.stick = function (el) {
+    if (!el.isStuck()) {
+      var $el = el.$fixedEl;
       var height = Math.max($el.height(), 1);
       var width = $el.width();
 
       this.addShimForEl($el, width, height);
-      $el.css('width', width + 'px').addClass('content-fixed');
+      $el.css('width', width + 'px').addClass(el.stickyClass());
+      el.stick();
     }
   };
-  Sticky.prototype.release = function ($el) {
-    if ($el.hasClass('content-fixed')) {
-      $el.removeClass('content-fixed').css('width', '');
+  Sticky.prototype.release = function (el) {
+    if (el.isStuck()) {
+      var $el = el.$fixedEl;
+
+      $el.removeClass(el.appliedClass()).css('width', '');
       $el.siblings('.shim').remove();
+      el.release();
     }
   };
 
@@ -195,15 +235,15 @@
     $el.before('<div class="shim" style="width: ' + width + 'px height: ' + height + 'px">&nbsp</div>');
   };
   stickAtTop.stop = function (el) {
-    if (!el.stopped) {
+    if (!el.stopped()) {
       el.$fixedEl.css({ 'position': 'absolute', 'top': el.scrolledTo });
-      el.stopped = true;
+      el.stop();
     }
   };
   stickAtTop.unstop = function (el) {
-    if (el.stopped) {
+    if (el.stopped()) {
       el.$fixedEl.css({ 'position': '', 'top': '' });
-      el.stopped = false;
+      el.unstop();
     }
   };
 
@@ -232,23 +272,23 @@
     $el.after('<div class="shim" style="width: ' + width + 'px height: ' + height + 'px">&nbsp</div>');
   };
   stickAtBottom.stop = function (el) {
-    if (!el.stopped) {
+    if (!el.stopped()) {
       el.$fixedEl.css({
         'position': 'absolute',
         'top': (el.scrolledTo - el.height),
         'bottom': 'auto'
       });
-      el.stopped = true;
+      el.stop();
     }
   };
   stickAtBottom.unstop = function (el) {
-    if (el.stopped) {
+    if (el.stopped()) {
       el.$fixedEl.css({
         'position': '',
         'top': '',
         'bottom': ''
       });
-      el.stopped = false;
+      el.unstop();
     }
   };
 

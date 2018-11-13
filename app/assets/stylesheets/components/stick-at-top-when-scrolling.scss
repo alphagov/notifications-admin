@@ -44,7 +44,8 @@
 
 }
 
-.content-fixed {
+.content-fixed,
+.content-fixed-onload {
 
   position: fixed;
   background: $white;
@@ -58,23 +59,41 @@
 
 }
 
-.js-stick-at-top-when-scrolling.content-fixed {
+.js-stick-at-top-when-scrolling.content-fixed,
+.js-stick-at-top-when-scrolling.content-fixed-onload {
 
   top: 0;
   margin-top: 0;
   border-bottom: 1px solid $border-colour;
   box-shadow: 0 2px 0 0 rgba($border-colour, 0.2);
+
+}
+
+.js-stick-at-top-when-scrolling.content-fixed {
+
   transition: background 0.6s ease-in-out, margin-top 0.4s ease-out;
 
 }
 
-.js-stick-at-bottom-when-scrolling.content-fixed {
+.js-stick-at-bottom-when-scrolling.content-fixed,
+.js-stick-at-bottom-when-scrolling.content-fixed-onload {
 
   top: auto; // cancel `top: 0;` inherited from govuk-template
   bottom: 0;
   border-top: 1px solid $border-colour;
   box-shadow: 0 -2px 0 0 rgba($border-colour, 0.2);
+
+}
+
+.js-stick-at-bottom-when-scrolling.content-fixed {
+
   transition: background 0.6s ease-in-out;
+
+}
+
+.js-stick-at-bottom-when-scrolling-loaded.content-fixed-onload {
+
+  transition: none;
 
 }
 
