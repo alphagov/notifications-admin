@@ -345,10 +345,6 @@ class Service():
             key=lambda key: key['name'].lower(),
         )
 
-    @property
-    def api_key_names(self):
-        return [key['name'] for key in self.api_keys]
-
     def get_api_key(self, id):
         try:
             return next(key for key in self.api_keys if key['id'] == id)

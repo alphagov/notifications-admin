@@ -87,7 +87,7 @@ def api_keys(service_id):
 @login_required
 @user_has_permissions('manage_api_keys', restrict_admin_usage=True)
 def create_api_key(service_id):
-    form = CreateKeyForm(current_service.api_key_names)
+    form = CreateKeyForm(current_service.api_keys)
     form.key_type.choices = [
         (KEY_TYPE_NORMAL, 'Live – sends to anyone'),
         (KEY_TYPE_TEAM, 'Team and whitelist – limits who you can send to'),
