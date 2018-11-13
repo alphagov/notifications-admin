@@ -785,11 +785,44 @@ def test_choose_a_template_to_copy(
     )
 
 
+@pytest.mark.parametrize('existing_template_names, expected_name', (
+    (
+        ['Two week reminder'],
+        'Two week reminder (copy)'
+    ),
+    (
+        ['Two week reminder (copy)'],
+        'Two week reminder (copy 2)'
+    ),
+    (
+        ['Two week reminder', 'Two week reminder (copy)'],
+        'Two week reminder (copy 2)'
+    ),
+    (
+        ['Two week reminder (copy 8)', 'Two week reminder (copy 9)'],
+        'Two week reminder (copy 10)'
+    ),
+    (
+        ['Two week reminder (copy)', 'Two week reminder (copy 9)'],
+        'Two week reminder (copy 10)'
+    ),
+    (
+        ['Two week reminder (copy)', 'Two week reminder (copy 10)'],
+        'Two week reminder (copy 2)'
+    ),
+))
 def test_load_edit_template_with_copy_of_template(
     client_request,
+    mock_get_service_templates,
     mock_get_service_email_template,
     mock_get_non_empty_organisations_and_services_for_user,
+    existing_template_names,
+    expected_name,
 ):
+    mock_get_service_templates.side_effect = lambda service_id: {'data': [
+        {'name': existing_template_name, 'template_type': 'sms'}
+        for existing_template_name in existing_template_names
+    ]}
     page = client_request.get(
         'main.copy_template',
         service_id=SERVICE_ONE_ID,
@@ -800,7 +833,7 @@ def test_load_edit_template_with_copy_of_template(
     assert page.select_one('form')['method'] == 'post'
 
     assert page.select_one('input')['value'] == (
-        'Copy of ‘Two week reminder’'
+        expected_name
     )
     assert page.select_one('textarea').text == (
         'Your ((thing)) is due soon'

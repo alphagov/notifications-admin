@@ -317,7 +317,7 @@ def copy_template(service_id, template_id):
         return add_service_template(service_id, template['template_type'])
 
     template['template_content'] = template['content']
-    template['name'] = 'Copy of ‘{}’'.format(template['name'])
+    template['name'] = _get_template_copy_name(template, current_service.all_templates)
     form = form_objects[template['template_type']](**template)
 
     return render_template(
@@ -327,6 +327,20 @@ def copy_template(service_id, template_id):
         heading_action='Add',
         services=user_api_client.get_service_ids_for_user(current_user),
     )
+
+
+def _get_template_copy_name(template, existing_templates):
+
+    template_names = [existing['name'] for existing in existing_templates]
+
+    for index in reversed(range(1, 10)):
+        if '{} (copy {})'.format(template['name'], index) in template_names:
+            return '{} (copy {})'.format(template['name'], index + 1)
+
+    if '{} (copy)'.format(template['name']) in template_names:
+        return '{} (copy 2)'.format(template['name'])
+
+    return '{} (copy)'.format(template['name'])
 
 
 @main.route("/services/<service_id>/templates/action-blocked/<notification_type>/<return_to>/<template_id>")
