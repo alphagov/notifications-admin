@@ -349,6 +349,8 @@ def action_blocked(service_id, notification_type, return_to, template_id):
 
 @main.route("/services/<service_id>/templates/add-folder", methods=['GET', 'POST'])
 @main.route("/services/<service_id>/templates/folders/<template_folder_id>/add-folder", methods=['GET', 'POST'])
+@login_required
+@user_has_permissions('manage_templates')
 def add_template_folder(service_id, template_folder_id=None):
     if not current_service.has_permission('edit_folders'):
         abort(403)
@@ -370,6 +372,8 @@ def add_template_folder(service_id, template_folder_id=None):
 
 
 @main.route("/services/<service_id>/templates/folders/<template_folder_id>/manage", methods=['GET', 'POST'])
+@login_required
+@user_has_permissions('manage_templates')
 def manage_template_folder(service_id, template_folder_id):
     if not current_service.has_permission('edit_folders'):
         abort(403)
@@ -395,11 +399,19 @@ def manage_template_folder(service_id, template_folder_id):
     )
 
 
-@main.route("/services/<service_id>/templates/folders/<template_folder_id>/delete", methods=['POST'])
+@main.route("/services/<service_id>/templates/folders/<template_folder_id>/delete", methods=['GET', 'POST'])
+@login_required
+@user_has_permissions('manage_templates')
 def delete_template_folder(service_id, template_folder_id):
     if not current_service.has_permission('edit_folders'):
         abort(403)
-    pass
+    form = TemplateFolderForm()
+
+    template_folder_api_client.delete_template_folder(current_service.id, template_folder_id)
+
+    return redirect(
+        url_for('.choose_template', service_id=service_id)
+    )
 
 
 @main.route("/services/<service_id>/templates/add-<template_type>", methods=['GET', 'POST'])

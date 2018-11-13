@@ -376,3 +376,23 @@ def test_rename_folder(client_request, service_one, mock_get_template_folders, m
         folder_id,
         name="new beautiful name"
     )
+
+
+def test_delete_folder(client_request, service_one, mock_get_template_folders, mocker):
+    mock_delete = mocker.patch('app.template_folder_api_client.delete_template_folder')
+    folder_id = str(uuid.uuid4())
+    mock_get_template_folders.return_value = [
+        {'id': folder_id, 'name': 'folder_two', 'parent_id': None},
+    ]
+    service_one['permissions'] += ['edit_folders']
+
+    client_request.post(
+        'main.delete_template_folder',
+        service_id=service_one['id'],
+        template_folder_id=folder_id,
+        _expected_redirect=url_for("main.choose_template",
+                                   service_id=service_one['id'],
+                                   _external=True)
+    )
+
+    mock_delete.assert_called_once_with(service_one['id'], folder_id)
