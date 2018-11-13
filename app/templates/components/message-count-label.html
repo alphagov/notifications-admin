@@ -55,3 +55,26 @@
     {%- endif -%}
   {%- endif %}
 {%- endmacro %}
+
+
+{% macro folder_contents_count(number_of_folders, number_of_templates) %}
+
+  {% if number_of_folders == number_of_templates == 0 %}
+    Empty
+  {% endif %}
+
+  {% if number_of_templates == 1 %}
+      {{ number_of_templates }} template
+  {%- elif number_of_templates > 1 -%}
+      {{ number_of_templates }} templates
+  {%- endif -%}
+
+  {%- if number_of_folders and number_of_templates %}, {% endif -%}
+
+  {%- if number_of_folders == 1 -%}
+      {{ number_of_folders }} folder
+  {%- elif number_of_folders > 1 -%}
+      {{ number_of_folders }} folders
+  {% endif %}
+
+{%- endmacro %}

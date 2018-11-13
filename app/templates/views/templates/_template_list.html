@@ -1,4 +1,5 @@
 {% from "components/checkbox.html" import unlabelled_checkbox %}
+{% from "components/message-count-label.html" import folder_contents_count %}
 
 <nav id=template-list>
   {% for template_folder in template_folders %}
@@ -15,7 +16,12 @@
           {{ template_folder.name }}
         </a>
       </h2>
-      <p class="message-type">Folder containing {{ template_count }} template{% if template_count != 1 %}s{% endif %}</p>
+      <p class="message-type">
+        {{ folder_contents_count(
+          current_service.get_template_folders(template_type, template_folder.id)|length,
+          current_service.get_templates(template_type, template_folder.id)|length,
+        ) }}
+      </p>
     </div>
   {% endfor %}
   {% for template in templates %}

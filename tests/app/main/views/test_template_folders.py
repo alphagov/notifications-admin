@@ -7,6 +7,24 @@ from tests.conftest import SERVICE_ONE_ID, normalize_spaces
 
 PARENT_FOLDER_ID = '7e979e79-d970-43a5-ac69-b625a8d147b0'
 CHILD_FOLDER_ID = '92ee1ee0-e4ee-4dcc-b1a7-a5da9ebcfa2b'
+GRANDCHILD_FOLDER_ID = 'fafe723f-1d39-4a10-865f-e551e03d8886'
+
+
+def _folder(name, folder_id=None, parent=None):
+    return {
+        'name': name,
+        'id': folder_id or str(uuid.uuid4()),
+        'parent_id': parent,
+    }
+
+
+def _template(template_type, name, parent=None):
+    return {
+        'id': str(uuid.uuid4()),
+        'name': name,
+        'template_type': template_type,
+        'folder': parent,
+    }
 
 
 @pytest.mark.parametrize('parent_folder_id', [None, PARENT_FOLDER_ID])
@@ -81,46 +99,77 @@ def test_post_add_template_folder_page(client_request, service_one, mocker, pare
 
 
 @pytest.mark.parametrize(
-    'expected_page_title, extra_args, expected_nav_links, expected_links',
+    'expected_page_title, extra_args, expected_nav_links, expected_items',
     [
         (
             'Templates',
             {},
             ['Text message', 'Email', 'Letter'],
             [
-                'folder_one',
-                'folder_two',
-                'sms_template_one',
-                'sms_template_two',
-                'email_template_one',
-                'email_template_two',
-                'letter_template_one',
-                'letter_template_two',
+                'folder_one 2 folders',
+                'folder_two Empty',
+                'sms_template_one Text message template',
+                'sms_template_two Text message template',
+                'email_template_one Email template',
+                'email_template_two Email template',
+                'letter_template_one Letter template',
+                'letter_template_two Letter template',
             ]
         ),
         (
             'Templates',
             {'template_type': 'sms'},
             ['All', 'Email', 'Letter'],
-            ['folder_one', 'folder_two', 'sms_template_one', 'sms_template_two'],
+            [
+                'folder_one 1 folder',
+                'sms_template_one Text message template',
+                'sms_template_two Text message template',
+            ],
+        ),
+        (
+            'Templates / folder_one',
+            {'template_folder_id': PARENT_FOLDER_ID},
+            ['Text message', 'Email', 'Letter'],
+            [
+                'folder_one_one 1 template, 1 folder',
+                'folder_one_two Empty',
+            ],
         ),
         (
             'Templates / folder_one',
             {'template_type': 'sms', 'template_folder_id': PARENT_FOLDER_ID},
             ['All', 'Email', 'Letter'],
-            ['folder_one_one', 'folder_one_two'],
+            [
+                'folder_one_one 1 folder',
+            ],
+        ),
+        (
+            'Templates / folder_one',
+            {'template_type': 'email', 'template_folder_id': PARENT_FOLDER_ID},
+            ['All', 'Text message', 'Letter'],
+            [],
         ),
         (
             'Templates / folder_one / folder_one_one',
             {'template_folder_id': CHILD_FOLDER_ID},
             ['Text message', 'Email', 'Letter'],
-            [],
+            [
+                'folder_one_one_one 1 template',
+                'letter_template_nested Letter template',
+            ],
+        ),
+        (
+            'Templates / folder_one / folder_one_one / folder_one_one_one',
+            {'template_folder_id': GRANDCHILD_FOLDER_ID},
+            ['Text message', 'Email', 'Letter'],
+            [
+                'sms_template_nested Text message template',
+            ],
         ),
     ]
 )
 def test_should_show_templates_folder_page(
     client_request,
-    mock_get_service_templates,
     mock_get_template_folders,
     mock_has_no_jobs,
     service_one,
@@ -129,15 +178,28 @@ def test_should_show_templates_folder_page(
     expected_page_title,
     extra_args,
     expected_nav_links,
-    expected_links,
+    expected_items,
 ):
-
     mock_get_template_folders.return_value = [
-        {'id': str(uuid.uuid4()), 'name': 'folder_two', 'parent_id': None},
-        {'id': PARENT_FOLDER_ID, 'name': 'folder_one', 'parent_id': None},
-        {'id': str(uuid.uuid4()), 'name': 'folder_one_two', 'parent_id': PARENT_FOLDER_ID},
-        {'id': CHILD_FOLDER_ID, 'name': 'folder_one_one', 'parent_id': PARENT_FOLDER_ID},
+        _folder('folder_two'),
+        _folder('folder_one', PARENT_FOLDER_ID),
+        _folder('folder_one_two', parent=PARENT_FOLDER_ID),
+        _folder('folder_one_one', CHILD_FOLDER_ID, parent=PARENT_FOLDER_ID),
+        _folder('folder_one_one_one', GRANDCHILD_FOLDER_ID, parent=CHILD_FOLDER_ID),
     ]
+    mock_get_service_templates = mocker.patch(
+        'app.service_api_client.get_service_templates',
+        return_value={'data': [
+            _template('sms', 'sms_template_one'),
+            _template('sms', 'sms_template_two'),
+            _template('email', 'email_template_one'),
+            _template('email', 'email_template_two'),
+            _template('letter', 'letter_template_one'),
+            _template('letter', 'letter_template_two'),
+            _template('letter', 'letter_template_nested', parent=CHILD_FOLDER_ID),
+            _template('sms', 'sms_template_nested', parent=GRANDCHILD_FOLDER_ID),
+        ]}
+    )
 
     service_one['permissions'] += ['letter', 'edit_folders']
 
@@ -156,12 +218,12 @@ def test_should_show_templates_folder_page(
     for index, expected_link in enumerate(expected_nav_links):
         assert links_in_page[index].text.strip() == expected_link
 
-    page_links = page.select('.message-name a')
+    page_items = page.select('.template-list-item')
 
-    assert len(page_links) == len(expected_links)
+    assert len(page_items) == len(expected_items)
 
-    for index, expected_link in enumerate(expected_links):
-        assert page_links[index].text.strip() == expected_link
+    for index, expected_item in enumerate(expected_items):
+        assert normalize_spaces(page_items[index].text) == expected_item
 
     mock_get_service_templates.assert_called_once_with(SERVICE_ONE_ID)
 
