@@ -382,7 +382,7 @@ def test_delete_folder(client_request, service_one, mock_get_template_folders, m
     mock_delete = mocker.patch('app.template_folder_api_client.delete_template_folder')
     folder_id = str(uuid.uuid4())
     mock_get_template_folders.return_value = [
-        {'id': folder_id, 'name': 'folder_two', 'parent_id': None},
+        {'id': folder_id, 'name': 'sacrifice', 'parent_id': None},
     ]
     service_one['permissions'] += ['edit_folders']
 
