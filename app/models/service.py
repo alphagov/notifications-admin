@@ -1,3 +1,4 @@
+from flask import abort
 from notifications_utils.field import Field
 from werkzeug.utils import cached_property
 
@@ -306,6 +307,15 @@ class Service():
                 self.is_folder_visible(folder['id'], template_type)
             )
         ]
+
+    def get_template_folder(self, folder_id):
+        try:
+            return next(
+                folder for folder in self.all_template_folders
+                if folder['id'] == folder_id
+            )
+        except StopIteration:
+            abort(404)
 
     def is_folder_visible(self, template_folder_id, template_type='all'):
 

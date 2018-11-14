@@ -374,7 +374,10 @@ def manage_template_folder(service_id, template_folder_id):
     if not current_service.has_permission('edit_folders'):
         abort(403)
 
-    form = TemplateFolderForm()
+    form = TemplateFolderForm(
+        name=current_service.get_template_folder(template_folder_id)['name']
+    )
+
     if form.validate_on_submit():
         template_folder_api_client.update_template_folder(
             current_service.id, template_folder_id, name=form.name.data

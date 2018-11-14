@@ -324,7 +324,17 @@ def test_get_manage_folder_page(client_request, service_one, mock_get_template_f
         service_id=service_one['id'],
         template_folder_id=folder_id
     )
-    assert page.select_one('input[name=name]') is not None
+    assert page.select_one('input[name=name]')['value'] == 'folder_two'
+
+
+def test_manage_folder_page_404s(client_request, service_one, mock_get_template_folders):
+    service_one['permissions'] += ['edit_folders']
+    client_request.get(
+        'main.manage_template_folder',
+        service_id=service_one['id'],
+        template_folder_id=str(uuid.uuid4()),
+        _expected_status=404,
+    )
 
 
 def test_get_manage_folder_page_no_permissions(client_request, service_one, mock_get_template_folders):
