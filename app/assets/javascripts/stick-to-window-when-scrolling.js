@@ -36,6 +36,9 @@
   StickyElement.prototype.unstop = function () {
     this._stopped = false;
   };
+  StickyElement.prototype.stopped = function () {
+    return this._stopped;
+  };
 
   // Stick elements to top of screen when you scroll past, documentation is in the README.md
   var Sticky = function (selector) {
