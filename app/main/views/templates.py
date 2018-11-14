@@ -117,6 +117,7 @@ def choose_template(service_id, template_type='all', template_folder_id=None):
         template_type=template_type,
         current_folder_id=template_folder_id,
     )
+    add_folder_form = TemplateFolderForm()
 
     if is_valid_template_operation('move', templates_and_folders_form):
         current_service.move_to_folder(
@@ -124,6 +125,16 @@ def choose_template(service_id, template_type='all', template_folder_id=None):
             move_to=templates_and_folders_form.move_to.data,
         )
         return redirect(request.url)
+
+    if is_valid_template_operation('add_new_folder', add_folder_form):
+        template_folder_api_client.create_template_folder(
+            current_service.id,
+            name=add_folder_form.name.data,
+            parent_id=template_folder_id
+        )
+        return redirect(
+            url_for('.choose_template', service_id=service_id, template_folder_id=template_folder_id)
+        )
 
     return render_template(
         'views/templates/choose.html',
@@ -140,6 +151,7 @@ def choose_template(service_id, template_type='all', template_folder_id=None):
         template_type=template_type,
         search_form=SearchTemplatesForm(),
         templates_and_folders_form=templates_and_folders_form,
+        add_folder_form=add_folder_form,
     )
 
 
