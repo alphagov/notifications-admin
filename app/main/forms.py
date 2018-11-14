@@ -525,9 +525,11 @@ class ChooseTimeForm(StripWhitespaceForm):
 
 
 class CreateKeyForm(StripWhitespaceForm):
-    def __init__(self, existing_key_names=[], *args, **kwargs):
-        self.existing_key_names = [x.lower() for x in existing_key_names]
-        super(CreateKeyForm, self).__init__(*args, **kwargs)
+    def __init__(self, existing_keys, *args, **kwargs):
+        self.existing_key_names = [
+            key['name'].lower() for key in existing_keys
+        ]
+        super().__init__(*args, **kwargs)
 
     key_type = RadioField(
         'Type of key',

@@ -5,10 +5,12 @@ from app.main.forms import CreateKeyForm
 
 
 def test_return_validation_error_when_key_name_exists(client):
-    def _get_names():
-        return ['some key', 'another key']
+    _existing_keys = [
+        {'name': 'some key'},
+        {'name': 'another key'},
+    ]
 
-    form = CreateKeyForm(_get_names(),
+    form = CreateKeyForm(_existing_keys,
                          formdata=MultiDict([('key_name', 'Some key')]))
     form.key_type.choices = [('a', 'a'), ('b', 'b')]
     form.validate()

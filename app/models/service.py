@@ -2,6 +2,7 @@ from flask import abort
 from notifications_utils.field import Field
 from werkzeug.utils import cached_property
 
+from app.notify_client.api_key_api_client import api_key_api_client
 from app.notify_client.billing_api_client import billing_api_client
 from app.notify_client.email_branding_client import email_branding_client
 from app.notify_client.inbound_number_client import inbound_number_client
@@ -364,3 +365,16 @@ class Service():
             template_ids=ids_to_move & self.all_template_ids,
             folder_ids=ids_to_move & self.all_template_folder_ids,
         )
+
+    @cached_property
+    def api_keys(self):
+        return sorted(
+            api_key_api_client.get_api_keys(self.id)['apiKeys'],
+            key=lambda key: key['name'].lower(),
+        )
+
+    def get_api_key(self, id):
+        try:
+            return next(key for key in self.api_keys if key['id'] == id)
+        except StopIteration:
+            abort(404)
