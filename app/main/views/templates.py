@@ -408,6 +408,14 @@ def delete_template_folder(service_id, template_folder_id):
     form = TemplateFolderForm()
     template_folder_path = current_service.get_template_folder_path(template_folder_id)
     template_folder_name = template_folder_path[-1]["name"]
+    if len(current_service.get_template_folders_and_templates(
+        template_type="all", template_folder_id=template_folder_id
+    )) > 0:
+        flash("'{}' folder is not empty".format(template_folder_name), 'info')
+        return redirect(url_for(
+            '.manage_template_folder', service_id, template_folder_id
+        ))
+
     if request.method == 'POST':
         try:
             template_folder_api_client.delete_template_folder(current_service.id, template_folder_id)

@@ -381,9 +381,13 @@ def test_rename_folder(client_request, service_one, mock_get_template_folders, m
 def test_delete_folder(client_request, service_one, mock_get_template_folders, mocker):
     mock_delete = mocker.patch('app.template_folder_api_client.delete_template_folder')
     folder_id = str(uuid.uuid4())
-    mock_get_template_folders.return_value = [
+    mock_get_template_folders.side_effect = [[
         {'id': folder_id, 'name': 'sacrifice', 'parent_id': None},
-    ]
+    ], []]
+    mocker.patch(
+        'app.models.service.Service.get_templates',
+        return_value=[],
+    )
     service_one['permissions'] += ['edit_folders']
 
     client_request.post(
