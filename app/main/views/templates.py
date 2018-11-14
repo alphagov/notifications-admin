@@ -408,31 +408,40 @@ def delete_template_folder(service_id, template_folder_id):
     form = TemplateFolderForm()
     template_folder_path = current_service.get_template_folder_path(template_folder_id)
     template_folder_name = template_folder_path[-1]["name"]
+
     if len(current_service.get_template_folders_and_templates(
         template_type="all", template_folder_id=template_folder_id
     )) > 0:
-        flash("'{}' folder is not empty".format(template_folder_name), 'info')
-        return redirect(url_for(
-            '.manage_template_folder', service_id, template_folder_id
-        ))
+        flash("You must empty this folder before you can delete it".format(template_folder_name), 'info')
+        return redirect(
+            url_for(
+                '.choose_template', service_id=service_id, template_type="all", template_folder_id=template_folder_id
+            )
+        )
 
     if request.method == 'POST':
         try:
             template_folder_api_client.delete_template_folder(current_service.id, template_folder_id)
 
-            flash("'{}' folder has been removed".format(template_folder_name), 'info')
             return redirect(
                 url_for('.choose_template', service_id=service_id)
             )
         except HTTPError as e:
             msg = "Folder is not empty"
             if e.status_code == 400 and msg in e.message:
-                flash("'{}' folder is not empty".format(template_folder_name), 'info')
-                return redirect(url_for('.choose_template', service_id=service_id))
+                flash("You must empty this folder before you can delete it".format(template_folder_name), 'info')
+                return redirect(
+                    url_for(
+                        '.choose_template',
+                        service_id=service_id,
+                        template_type="all",
+                        template_folder_id=template_folder_id
+                    )
+                )
             else:
                 abort(500, e)
 
-    flash("Are you sure you want to remove '{}' folder?".format(template_folder_name), 'remove')
+    flash("Are you sure you want to delete the '{}' folder?".format(template_folder_name), 'delete')
     return render_template(
         'views/templates/manage-template-folder.html',
         form=form,
