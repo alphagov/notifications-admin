@@ -58,6 +58,12 @@ class Service():
             return self._dict[attr]
         raise AttributeError('`{}` is not a service attribute'.format(attr))
 
+    def _get_by_id(self, things, id):
+        try:
+            return next(thing for thing in things if thing['id'] == id)
+        except StopIteration:
+            abort(404)
+
     def update(self, **kwargs):
         return service_api_client.update_service(self.id, **kwargs)
 
@@ -310,13 +316,7 @@ class Service():
         ]
 
     def get_template_folder(self, folder_id):
-        try:
-            return next(
-                folder for folder in self.all_template_folders
-                if folder['id'] == folder_id
-            )
-        except StopIteration:
-            abort(404)
+        return self._get_by_id(self.all_template_folders, folder_id)
 
     def is_folder_visible(self, template_folder_id, template_type='all'):
 
@@ -374,7 +374,4 @@ class Service():
         )
 
     def get_api_key(self, id):
-        try:
-            return next(key for key in self.api_keys if key['id'] == id)
-        except StopIteration:
-            abort(404)
+        return self._get_by_id(self.api_keys, id)
