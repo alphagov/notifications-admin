@@ -1,16 +1,13 @@
 // CSS adapted from
 // https://github.com/alphagov/govuk_frontend_toolkit/blob/d9489a987086471fe30b4b925a81c12cd198c91d/docs/javascript.md#stick-at-top-when-scrolling
 
-.js-stick-at-top-when-scrolling {
+.js-stick-at-top-when-scrolling,
+.js-stick-at-bottom-when-scrolling {
 
   overflow: hidden;
   margin-left: -$gutter-half;
-  margin-top: -10px;
-  margin-bottom: 5px;
   padding: 10px 0 0 $gutter-half;
   position: relative;
-  top: 5px;
-  transition: top 0.1s ease-out, box-shadow 1s ease-in-out;
 
   .form-group {
     margin-bottom: 20px;
@@ -32,22 +29,71 @@
 
 }
 
-.content-fixed {
+.js-stick-at-top-when-scrolling {
+
+  margin-top: -10px;
+  margin-bottom: 5px;
+  top: 5px;
+  transition: top 0.1s ease-out, box-shadow 1s ease-in-out;
+
+}
+
+.js-stick-at-bottom-when-scrolling {
+
+  transition: bottom 0.1s ease-out, box-shadow 1s ease-in-out;
+
+}
+
+.content-fixed,
+.content-fixed-onload {
 
   position: fixed;
-  top: 0;
   background: $white;
   z-index: 100;
-  margin-top: 0;
   padding-right: $gutter-half;
-  border-bottom: 1px solid $border-colour;
-  box-shadow: 0 2px 0 0 rgba($border-colour, 0.2);
-  transition: background 0.6s ease-in-out, margin-top 0.4s ease-out;
 
   .back-to-top-link {
     opacity: 1;
     transition: opacity 0.6s ease-in-out;
   }
+
+}
+
+.js-stick-at-top-when-scrolling.content-fixed,
+.js-stick-at-top-when-scrolling.content-fixed-onload {
+
+  top: 0;
+  margin-top: 0;
+  border-bottom: 1px solid $border-colour;
+  box-shadow: 0 2px 0 0 rgba($border-colour, 0.2);
+
+}
+
+.js-stick-at-top-when-scrolling.content-fixed {
+
+  transition: background 0.6s ease-in-out, margin-top 0.4s ease-out;
+
+}
+
+.js-stick-at-bottom-when-scrolling.content-fixed,
+.js-stick-at-bottom-when-scrolling.content-fixed-onload {
+
+  top: auto; // cancel `top: 0;` inherited from govuk-template
+  bottom: 0;
+  border-top: 1px solid $border-colour;
+  box-shadow: 0 -2px 0 0 rgba($border-colour, 0.2);
+
+}
+
+.js-stick-at-bottom-when-scrolling.content-fixed {
+
+  transition: background 0.6s ease-in-out;
+
+}
+
+.js-stick-at-bottom-when-scrolling-loaded.content-fixed-onload {
+
+  transition: none;
 
 }
 
