@@ -10,30 +10,16 @@
 
 {% block maincolumn_content %}
 
-  {% if revoke_key %}
-    <div class="bottom-gutter">
-      {% call banner_wrapper(type='dangerous', subhead='Are you sure you want to revoke this API key?') %}
-        <p>
-          ‘{{ revoke_key }}’ will no longer let you connect to GOV.UK Notify.
-        </p>
-        <form method='post'>
-          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-          <button type="submit" class="button" name="delete">Confirm</button>
-        </form>
-      {% endcall %}
+  <div class="grid-row">
+    <div class="column-two-thirds">
+      <h1 class="heading-large">
+        API keys
+      </h1>
     </div>
-  {% else %}
-    <div class="grid-row">
-      <div class="column-two-thirds">
-        <h1 class="heading-large">
-          API keys
-        </h1>
-      </div>
-      <div class="column-one-third">
-        <a href="{{ url_for('.create_api_key', service_id=current_service.id) }}" class="button align-with-heading">Create an API key</a>
-      </div>
+    <div class="column-one-third">
+      <a href="{{ url_for('.create_api_key', service_id=current_service.id) }}" class="button align-with-heading">Create an API key</a>
     </div>
-  {% endif %}
+  </div>
 
   <div class="body-copy-table">
     {% call(item, row_number) list_table(

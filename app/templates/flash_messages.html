@@ -4,10 +4,11 @@
     {% for category, message in messages %}
       <div class="bottom-gutter">
         {{ banner(
-          message,
+          message if message is string else message[0],
           'default' if ((category == 'default') or (category == 'default_with_tick')) else 'dangerous',
-          delete_button="Yes, {}".format(category) if category in ['delete', 'suspend', 'resume', 'remove'] else None,
-          with_tick=True if category == 'default_with_tick' else False
+          delete_button="Yes, {}".format(category) if category in ['delete', 'suspend', 'resume', 'remove', 'revoke'] else None,
+          with_tick=True if category == 'default_with_tick' else False,
+          context=message[1] if message is not string
         )}}
       </div>
     {% endfor %}

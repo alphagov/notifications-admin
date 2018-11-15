@@ -27,20 +27,6 @@
         </form>
       {% endcall %}
     </div>
-  {% elif template_delete_confirmation_message %}
-    <div class="bottom-gutter">
-      {% call banner_wrapper(type='dangerous', subhead=template_delete_confirmation_message[0]) %}
-        {% if template_delete_confirmation_message[1] %}
-          <p>
-            {{ template_delete_confirmation_message[1] }}
-          </p>
-        {% endif %}
-        <form method='post'>
-          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-          <button type="submit" class="button" name="delete">Confirm</button>
-        </form>
-      {% endcall %}
-    </div>
   {% else %}
     <h1 class="heading-large">{{ template.name }}</h1>
   {% endif %}

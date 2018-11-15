@@ -1,4 +1,4 @@
-{% macro banner(body, type=None, with_tick=False, delete_button=None, subhead=None) %}
+{% macro banner(body, type=None, with_tick=False, delete_button=None, subhead=None, context=None) %}
   <div
     class='banner{% if type %}-{{ type }}{% endif %}{% if with_tick %}-with-tick{% endif %}'
     {% if type == 'dangerous' %}
@@ -10,6 +10,11 @@
       <h1 class="banner-title">{{ subhead }}</h1>
     {%- endif -%}
     {{ body }}
+    {% if context %}
+    <p>
+      {{ context }}
+    </p>
+    {% endif %}
     {% if delete_button %}
       <form method='post'>
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
