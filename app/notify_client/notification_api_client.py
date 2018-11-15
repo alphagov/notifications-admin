@@ -93,5 +93,10 @@ class NotificationApiClient(NotifyAdminAPIClient):
 
         return self.get(url=get_url)
 
+    def update_notification_to_cancelled(self, service_id, notification_id):
+        return self.post(
+            url='/service/{}/notifications/{}/cancel'.format(service_id, notification_id),
+            data={})
+
 
 notification_api_client = NotificationApiClient()
