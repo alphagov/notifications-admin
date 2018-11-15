@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from itertools import chain
 
 import pytz
+from flask import request
 from flask_wtf import FlaskForm as Form
 from flask_wtf.file import FileAllowed
 from flask_wtf.file import FileField as FileField_wtf
@@ -1154,11 +1155,33 @@ class TemplateAndFoldersSelectionForm(Form):
 
         self.templates_and_folders.choices = template_list.as_id_and_name
 
+        self.is_move_op = self.is_add_op = False
+
         self.move_to.choices = [
             (item['id'], item['name'])
             for item in ([self.ALL_TEMPLATES_FOLDER] + all_template_folders)
             if item['id'] != str(current_folder_id)
         ]
 
+    def validate(self):
+        op = request.form.get('operation')
+
+        self.is_move_op = op in {'move_to_existing_folder', 'move_to_new_folder'}
+        self.is_add_op = op in {'add_new_folder', 'move_to_new_folder'}
+
+        if not (self.is_add_op or self.is_move_op):
+            return False
+
+        return super().validate()
+
+    def validate_move_to(self, field):
+        if self.is_move_op and not field.data:
+            raise ValidationError('Can’t be empty')
+
+    def validate_new_folder_name(self, field):
+        if self.is_add_op and not field.data:
+            raise ValidationError('Can’t be empty')
+
     templates_and_folders = MultiCheckboxField('Choose templates or folders')
-    move_to = RadioFieldWithNoneOption('Choose a folder')
+    move_to = RadioFieldWithNoneOption('Choose a folder', validators=[Optional()])
+    new_folder_name = StringField('Folder name')

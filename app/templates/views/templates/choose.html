@@ -85,11 +85,6 @@
         {% endwith %}
       {% endcall %}
 
-      {% call form_wrapper() %}
-        {{ textbox(add_folder_form.name) }}
-        {{ page_footer('New folder', button_name='operation', button_value='add_new_folder') }}
-      {% endcall %}
-
     {% else %}
       {% include 'views/templates/_template_list.html' %}
     {% endif %}

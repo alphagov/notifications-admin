@@ -117,24 +117,9 @@ def choose_template(service_id, template_type='all', template_folder_id=None):
         template_type=template_type,
         current_folder_id=template_folder_id,
     )
-    add_folder_form = TemplateFolderForm()
 
-    if is_valid_template_operation('move', templates_and_folders_form):
-        current_service.move_to_folder(
-            ids_to_move=templates_and_folders_form.templates_and_folders.data,
-            move_to=templates_and_folders_form.move_to.data,
-        )
-        return redirect(request.url)
-
-    if is_valid_template_operation('add_new_folder', add_folder_form):
-        template_folder_api_client.create_template_folder(
-            current_service.id,
-            name=add_folder_form.name.data,
-            parent_id=template_folder_id
-        )
-        return redirect(
-            url_for('.choose_template', service_id=service_id, template_folder_id=template_folder_id)
-        )
+    if request.method == 'POST' and can_manage_folders() and templates_and_folders_form.validate_on_submit():
+        return process_folder_management_form(templates_and_folders_form, template_folder_id)
 
     return render_template(
         'views/templates/choose.html',
@@ -150,20 +135,30 @@ def choose_template(service_id, template_type='all', template_folder_id=None):
         template_nav_items=get_template_nav_items(template_folder_id),
         template_type=template_type,
         search_form=SearchTemplatesForm(),
-        templates_and_folders_form=templates_and_folders_form,
-        add_folder_form=add_folder_form,
+        templates_and_folders_form=templates_and_folders_form
     )
 
 
-def is_valid_template_operation(operation_name, form):
+def process_folder_management_form(form, current_folder_id):
+    new_folder_id = None
 
-    if (
-        can_manage_folders() and
-        request.method == 'POST' and
-        request.form.get('operation') == operation_name and
-        form.validate_on_submit()
-    ):
-        return True
+    if form.is_add_op:
+        new_folder_id = template_folder_api_client.create_template_folder(
+            current_service.id,
+            name=form.new_folder_name.data,
+            parent_id=current_folder_id
+        )
+
+    if form.is_move_op:
+        # if we've just made a folder, we also want to move there
+        move_to_id = new_folder_id or form.move_to.data
+
+        current_service.move_to_folder(
+            ids_to_move=form.templates_and_folders.data,
+            move_to=move_to_id
+        )
+
+    return redirect(request.url)
 
 
 def get_template_nav_label(value):
