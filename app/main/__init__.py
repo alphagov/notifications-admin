@@ -28,7 +28,6 @@ from app.main.views import (  # noqa
     providers,
     find_users,
     platform_admin,
-    letter_jobs,
     email_branding,
     conversation,
     organisations,
