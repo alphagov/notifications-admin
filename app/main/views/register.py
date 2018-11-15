@@ -16,7 +16,7 @@ from app.main.views.verify import activate_user
 @main.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user and current_user.is_authenticated:
-        return redirect(url_for('main.choose_account'))
+        return redirect(url_for('main.show_accounts_or_dashboard'))
 
     form = RegisterUserForm()
     if form.validate_on_submit():

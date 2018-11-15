@@ -37,7 +37,7 @@ def test_logged_in_user_redirects_to_choose_account(
     assert response.status_code == 302
 
     response = logged_in_client.get(url_for('main.sign_in', follow_redirects=True))
-    assert response.location == url_for('main.choose_account', _external=True)
+    assert response.location == url_for('main.show_accounts_or_dashboard', _external=True)
 
 
 def test_robots(client):
