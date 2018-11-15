@@ -18,7 +18,7 @@ from app.main.forms import LoginForm
 @main.route('/sign-in', methods=(['GET', 'POST']))
 def sign_in():
     if current_user and current_user.is_authenticated:
-        return redirect(url_for('main.choose_account'))
+        return redirect(url_for('main.show_accounts_or_dashboard'))
 
     form = LoginForm()
 

@@ -18,18 +18,14 @@ def test_render_register_returns_template_with_form(client):
     assert 'Create an account' in response.get_data(as_text=True)
 
 
-def test_logged_in_user_redirects_to_choose_account(
-    logged_in_client,
-    api_user_active,
-    mock_get_user_by_email,
-    mock_send_verify_code,
-    mock_login,
+def test_logged_in_user_redirects_to_account(
+    client_request,
 ):
-    response = logged_in_client.get(url_for('main.register'))
-    assert response.status_code == 302
-
-    response = logged_in_client.get(url_for('main.sign_in', follow_redirects=True))
-    assert response.location == url_for('main.choose_account', _external=True)
+    client_request.get(
+        'main.register',
+        _expected_status=302,
+        _expected_redirect=url_for('main.show_accounts_or_dashboard', _external=True),
+    )
 
 
 @pytest.mark.parametrize('phone_number_to_register_with', [

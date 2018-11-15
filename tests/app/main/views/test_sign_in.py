@@ -73,11 +73,14 @@ def test_redirect_to_sign_in_if_logged_in_from_other_browser(
     assert response.location == url_for('main.sign_in', next='/accounts', _external=True)
 
 
-def test_logged_in_user_redirects_to_choose_account(
-    logged_in_client
+def test_logged_in_user_redirects_to_account(
+    client_request
 ):
-    response = logged_in_client.get(url_for('main.sign_in'))
-    assert response.location == url_for('main.choose_account', _external=True)
+    client_request.get(
+        'main.sign_in',
+        _expected_status=302,
+        _expected_redirect=url_for('main.show_accounts_or_dashboard', _external=True),
+    )
 
 
 @pytest.mark.parametrize('email_address, password', [
