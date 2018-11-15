@@ -25,7 +25,15 @@ Templates
 
   {% call form_wrapper() %}
     {{ textbox(form.name) }}
-    {{ page_footer('Save') }}
+    {{ page_footer(
+      'Save',
+      delete_link=url_for(
+        '.delete_template_folder',
+        service_id=current_service_id,
+        template_folder_id=template_folder_id
+      ),
+      delete_link_text="Delete this folder") }}
+
   {% endcall %}
 
 {% endblock %}

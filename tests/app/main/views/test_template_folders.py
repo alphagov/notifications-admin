@@ -324,7 +324,11 @@ def test_get_manage_folder_page(client_request, service_one, mock_get_template_f
         service_id=service_one['id'],
         template_folder_id=folder_id
     )
-    assert page.select_one('input[name=name]')['value'] == 'folder_two'
+    assert page.select_one('input[name=name]') is not None
+    delete_link = page.find('a', string="Delete this folder")
+    expected_delete_url = "/services/{}/templates/folders/{}/delete".format(service_one['id'], folder_id)
+
+    assert expected_delete_url in delete_link["href"]
 
 
 def test_manage_folder_page_404s(client_request, service_one, mock_get_template_folders):
@@ -372,3 +376,27 @@ def test_rename_folder(client_request, service_one, mock_get_template_folders, m
         folder_id,
         name="new beautiful name"
     )
+
+
+def test_delete_folder(client_request, service_one, mock_get_template_folders, mocker):
+    mock_delete = mocker.patch('app.template_folder_api_client.delete_template_folder')
+    folder_id = str(uuid.uuid4())
+    mock_get_template_folders.side_effect = [[
+        {'id': folder_id, 'name': 'sacrifice', 'parent_id': None},
+    ], []]
+    mocker.patch(
+        'app.models.service.Service.get_templates',
+        return_value=[],
+    )
+    service_one['permissions'] += ['edit_folders']
+
+    client_request.post(
+        'main.delete_template_folder',
+        service_id=service_one['id'],
+        template_folder_id=folder_id,
+        _expected_redirect=url_for("main.choose_template",
+                                   service_id=service_one['id'],
+                                   _external=True)
+    )
+
+    mock_delete.assert_called_once_with(service_one['id'], folder_id)

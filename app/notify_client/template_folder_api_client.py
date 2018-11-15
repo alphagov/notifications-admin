@@ -50,5 +50,9 @@ class TemplateFolderAPIClient(NotifyAdminAPIClient):
             {"name": name}
         )
 
+    @cache.delete('service-{service_id}-template-folders')
+    def delete_template_folder(self, service_id, template_folder_id):
+        self.delete('/service/{}/template-folder/{}'.format(service_id, template_folder_id), {})
+
 
 template_folder_api_client = TemplateFolderAPIClient()
