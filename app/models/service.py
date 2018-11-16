@@ -316,6 +316,12 @@ class Service():
         ]
 
     def get_template_folder(self, folder_id):
+        if folder_id is None:
+            return {
+                'id': None,
+                'name': 'Templates',
+                'parent_id': None,
+            }
         return self._get_by_id(self.all_template_folders, folder_id)
 
     def is_folder_visible(self, template_folder_id, template_type='all'):
@@ -335,19 +341,16 @@ class Service():
         return False
 
     def get_template_folder_path(self, template_folder_id):
-        if template_folder_id is None:
-            return []
 
-        id_to_folder = {folder['id']: folder for folder in self.all_template_folders}
+        folder = self.get_template_folder(template_folder_id)
 
-        folder = id_to_folder[template_folder_id]
-        path = [folder]
+        if folder['id'] is None:
+            return [folder]
 
-        while folder['parent_id']:
-            folder = id_to_folder[folder['parent_id']]
-            path.append(folder)
-
-        return list(reversed(path))
+        return [
+            self.get_template_folder(folder['parent_id']),
+            folder,
+        ]
 
     def get_template_folders_and_templates(self, template_type, template_folder_id):
         return (

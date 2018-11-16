@@ -99,10 +99,19 @@ def test_post_add_template_folder_page(client_request, service_one, mocker, pare
 
 
 @pytest.mark.parametrize(
-    'expected_page_title, extra_args, expected_nav_links, expected_items',
+    (
+        'expected_title_tag,'
+        'expected_page_title,'
+        'expected_parent_link_args,'
+        'extra_args,'
+        'expected_nav_links,'
+        'expected_items'
+    ),
     [
         (
+            'Templates – service one – GOV.UK Notify',
             'Templates',
+            None,
             {},
             ['Text message', 'Email', 'Letter'],
             [
@@ -117,7 +126,9 @@ def test_post_add_template_folder_page(client_request, service_one, mocker, pare
             ]
         ),
         (
+            'Templates – service one – GOV.UK Notify',
             'Templates',
+            None,
             {'template_type': 'sms'},
             ['All', 'Email', 'Letter'],
             [
@@ -127,7 +138,9 @@ def test_post_add_template_folder_page(client_request, service_one, mocker, pare
             ],
         ),
         (
+            'folder_one – Templates – service one – GOV.UK Notify',
             'Templates / folder_one',
+            {'template_type': 'all'},
             {'template_folder_id': PARENT_FOLDER_ID},
             ['Text message', 'Email', 'Letter'],
             [
@@ -136,7 +149,9 @@ def test_post_add_template_folder_page(client_request, service_one, mocker, pare
             ],
         ),
         (
+            'folder_one – Templates – service one – GOV.UK Notify',
             'Templates / folder_one',
+            {'template_type': 'sms'},
             {'template_type': 'sms', 'template_folder_id': PARENT_FOLDER_ID},
             ['All', 'Email', 'Letter'],
             [
@@ -144,13 +159,17 @@ def test_post_add_template_folder_page(client_request, service_one, mocker, pare
             ],
         ),
         (
+            'folder_one – Templates – service one – GOV.UK Notify',
             'Templates / folder_one',
+            {'template_type': 'email'},
             {'template_type': 'email', 'template_folder_id': PARENT_FOLDER_ID},
             ['All', 'Text message', 'Letter'],
             [],
         ),
         (
-            'Templates / folder_one / folder_one_one',
+            'folder_one_one – folder_one – service one – GOV.UK Notify',
+            'folder_one / folder_one_one',
+            {'template_type': 'all', 'template_folder_id': PARENT_FOLDER_ID},
             {'template_folder_id': CHILD_FOLDER_ID},
             ['Text message', 'Email', 'Letter'],
             [
@@ -159,7 +178,9 @@ def test_post_add_template_folder_page(client_request, service_one, mocker, pare
             ],
         ),
         (
-            'Templates / folder_one / folder_one_one / folder_one_one_one',
+            'folder_one_one_one – folder_one_one – service one – GOV.UK Notify',
+            'folder_one_one / folder_one_one_one',
+            {'template_type': 'all', 'template_folder_id': CHILD_FOLDER_ID},
             {'template_folder_id': GRANDCHILD_FOLDER_ID},
             ['Text message', 'Email', 'Letter'],
             [
@@ -175,7 +196,9 @@ def test_should_show_templates_folder_page(
     service_one,
     mocker,
     fake_uuid,
+    expected_title_tag,
     expected_page_title,
+    expected_parent_link_args,
     extra_args,
     expected_nav_links,
     expected_items,
@@ -206,10 +229,22 @@ def test_should_show_templates_folder_page(
     page = client_request.get(
         'main.choose_template',
         service_id=SERVICE_ONE_ID,
+        _test_page_title=False,
         **extra_args
     )
 
+    assert normalize_spaces(page.select_one('title').text) == expected_title_tag
     assert normalize_spaces(page.select_one('h1').text) == expected_page_title
+
+    if expected_parent_link_args:
+        assert len(page.select('h1 a')) == 1
+        assert page.select_one('h1 a')['href'] == url_for(
+            'main.choose_template',
+            service_id=SERVICE_ONE_ID,
+            **expected_parent_link_args
+        )
+    else:
+        assert page.select_one('h1 a') is None
 
     links_in_page = page.select('.pill a')
 
@@ -312,7 +347,11 @@ def test_can_create_email_template_with_parent_folder(
         data['parent_folder_id'])
 
 
-def test_get_manage_folder_page(client_request, service_one, mock_get_template_folders):
+def test_get_manage_folder_page(
+    client_request,
+    service_one,
+    mock_get_template_folders,
+):
     folder_id = str(uuid.uuid4())
     mock_get_template_folders.return_value = [
         {'id': folder_id, 'name': 'folder_two', 'parent_id': None},

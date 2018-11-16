@@ -1,0 +1,50 @@
+{% macro folder_path(
+  folders,
+  service_id,
+  template_type,
+  fallback_page_title=None,
+  show_fallback_page_title=False
+) %}
+  {% if show_fallback_page_title %}
+    <h1 class="heading-large">
+      {{ fallback_page_title }}
+    </h1>
+  {% else %}
+    <h1 class="heading-medium folder-heading">
+      {% for folder in folders %}
+        {% if loop.last %}
+          <span class="folder-heading-folder">{{ folder.name }}</span>
+        {% else %}
+          {% if folder.id %}
+            <a href="{{ url_for('.choose_template', service_id=service_id, template_type=template_type, template_folder_id=folder.id) }}">{{ folder.name }}</a> {{ folder_path_separator() }}
+          {% else %}
+            <a href="{{ url_for('.choose_template', service_id=service_id, template_type=template_type) }}">Templates</a> {{ folder_path_separator() }}
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+    </h1>
+  {% endif %}
+{% endmacro %}
+
+
+{% macro page_title_folder_path(
+  folders,
+  fallback_page_title=None,
+  show_fallback_page_title=False
+) %}
+  {% if show_fallback_page_title %}
+    {{ fallback_page_title }}
+  {% else %}
+    {% for folder in folders|reverse %}
+      {{ folder.name }}
+      {% if not loop.last %}
+        –
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+{% endmacro %}
+
+
+{% macro folder_path_separator() %}
+  <span class="folder-heading-separator">/</span>
+{% endmacro %}
