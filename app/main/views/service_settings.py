@@ -419,11 +419,12 @@ def service_edit_email_reply_to(service_id, reply_to_email_id):
             is_default=True if reply_to_email_address['is_default'] else form.is_default.data
         )
         return redirect(url_for('.service_email_reply_to', service_id=service_id))
+    if (request.endpoint == "main.service_confirm_delete_email_reply_to"):
+        flash("Are you sure you want to delete this email reply-to address?", 'delete')
     return render_template(
         'views/service-settings/email-reply-to/edit.html',
         form=form,
         reply_to_email_address_id=reply_to_email_id,
-        confirm_delete=(request.endpoint == "main.service_confirm_delete_email_reply_to"),
     )
 
 
@@ -687,13 +688,14 @@ def service_edit_sms_sender(service_id, sms_sender_id):
         return redirect(url_for('.service_sms_senders', service_id=service_id))
 
     form.is_default.data = sms_sender['is_default']
+    if (request.endpoint == "main.service_confirm_delete_sms_sender"):
+        flash("Are you sure you want to delete this text message sender?", 'delete')
     return render_template(
         'views/service-settings/sms-sender/edit.html',
         form=form,
         sms_sender=sms_sender,
         inbound_number=is_inbound_number,
-        sms_sender_id=sms_sender_id,
-        confirm_delete=(request.endpoint == "main.service_confirm_delete_sms_sender")
+        sms_sender_id=sms_sender_id
     )
 
 
