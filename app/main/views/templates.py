@@ -395,7 +395,8 @@ def manage_template_folder(service_id, template_folder_id):
         form=form,
         template_folder_path=current_service.get_template_folder_path(template_folder_id),
         current_service_id=current_service.id,
-        template_folder_id=template_folder_id
+        template_folder_id=template_folder_id,
+        template_type="all"
     )
 
 
@@ -447,7 +448,8 @@ def delete_template_folder(service_id, template_folder_id):
         form=form,
         template_folder_path=template_folder_path,
         current_service_id=current_service.id,
-        template_folder_id=template_folder_id
+        template_folder_id=template_folder_id,
+        template_type="all"
     )
 
 
