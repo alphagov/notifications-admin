@@ -216,10 +216,12 @@ def get_notifications(service_id, message_type, status_override=None):
         abort(404)
     filter_args = parse_filter_args(request.args)
     filter_args['status'] = set_status_filters(filter_args)
+    service_data_retention_days = None
 
-    service_data_retention_days = service_api_client.get_service_data_retention_by_notification_type(
-        service_id, message_type
-    ).get('days_of_retention', current_app.config['ACTIVITY_STATS_LIMIT_DAYS'])
+    if message_type is not None:
+        service_data_retention_days = service_api_client.get_service_data_retention_by_notification_type(
+            service_id, message_type
+        ).get('days_of_retention', current_app.config['ACTIVITY_STATS_LIMIT_DAYS'])
 
     if request.path.endswith('csv') and current_user.has_permissions('view_activity'):
         return Response(

@@ -21,10 +21,28 @@ from tests.conftest import (
 
 
 @pytest.mark.parametrize(
-    "user,extra_args,expected_update_endpoint,page_title", [
-        (active_user_view_permissions, {'message_type': 'email'}, '/email.json', 'Emails'),
-        (active_user_view_permissions, {'message_type': 'sms'}, '/sms.json', 'Text messages'),
-        (active_caseworking_user, {}, '.json', 'Sent messages'),
+    "user,extra_args,expected_update_endpoint,expected_limit_days,page_title", [
+        (
+            active_user_view_permissions,
+            {'message_type': 'email'},
+            '/email.json',
+            7,
+            'Emails',
+        ),
+        (
+            active_user_view_permissions,
+            {'message_type': 'sms'},
+            '/sms.json',
+            7,
+            'Text messages',
+        ),
+        (
+            active_caseworking_user,
+            {},
+            '.json',
+            None,
+            'Sent messages',
+        ),
     ]
 )
 @pytest.mark.parametrize(
@@ -76,6 +94,7 @@ def test_can_show_notifications(
     user,
     extra_args,
     expected_update_endpoint,
+    expected_limit_days,
     page_title,
     status_argument,
     expected_api_call,
@@ -131,7 +150,7 @@ def test_can_show_notifications(
     assert 'to' not in query_dict
 
     mock_get_notifications.assert_called_with(
-        limit_days=7,
+        limit_days=expected_limit_days,
         page=expected_page_argument,
         service_id=service_one['id'],
         status=expected_api_call,
@@ -147,6 +166,20 @@ def test_can_show_notifications(
     ))
     json_content = json.loads(json_response.get_data(as_text=True))
     assert json_content.keys() == {'counts', 'notifications', 'service_data_retention_days'}
+
+
+def test_can_show_notifications_if_data_retention_not_available(
+    client_request,
+    mock_get_notifications,
+    mock_get_service_statistics,
+    mock_has_no_jobs,
+):
+    page = client_request.get(
+        'main.view_notifications',
+        service_id=SERVICE_ONE_ID,
+        status='sending,delivered,failed',
+    )
+    assert page.h1.text.strip() == 'Messages'
 
 
 @pytest.mark.parametrize('user, query_parameters, expected_download_link', [
