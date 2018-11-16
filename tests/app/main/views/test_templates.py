@@ -1283,7 +1283,7 @@ def test_should_show_delete_template_page_with_time_block(
         )
     assert "Are you sure you want to delete ‘Two week reminder’?" in page.select('.banner-dangerous')[0].text
     assert normalize_spaces(page.select('.banner-dangerous p')[0].text) == (
-        'It was last used 10 minutes ago'
+        'This template was last used 10 minutes ago.'
     )
     assert normalize_spaces(page.select('.sms-message-wrapper')[0].text) == (
         'service one: Template <em>content</em> with & entity'
@@ -1312,7 +1312,7 @@ def test_should_show_delete_template_page_with_time_block_for_empty_notification
         )
     assert "Are you sure you want to delete ‘Two week reminder’?" in page.select('.banner-dangerous')[0].text
     assert normalize_spaces(page.select('.banner-dangerous p')[0].text) == (
-        'It was last used more than seven days ago'
+        'This template was last used more than seven days ago.'
     )
     assert normalize_spaces(page.select('.sms-message-wrapper')[0].text) == (
         'service one: Template <em>content</em> with & entity'
