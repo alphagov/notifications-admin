@@ -409,27 +409,27 @@ def test_delete_template_folder_should_detect_non_empty_folder_on_get(
 ):
     service_one['permissions'] += ['edit_folders']
     folder_id = str(uuid.uuid4())
-    child_folder_id = str(uuid.uuid4())
-    mock_get_template_folders.side_effect = [[
-        {'id': folder_id, 'name': 'sacrifice', 'parent_id': None},
-    ], [{'id': child_folder_id, 'name': 'sacrifice', 'parent_id': None}]]
+    template_id = str(uuid.uuid4())
+    mock_get_template_folders.side_effect = [
+        [{'id': folder_id, 'name': "can't touch me", 'parent_id': None}],
+        []
+    ]
     mocker.patch(
         'app.models.service.Service.get_templates',
-        return_value=[],
+        return_value=[{'id': template_id, 'name': 'template'}],
     )
-    page = client_request.get(
+    client_request.get(
         'main.delete_template_folder', service_id=service_one['id'],
-        template_folder_id=folder_id
+        template_folder_id=folder_id,
+        _expected_redirect=url_for(
+            "main.choose_template",
+            template_type="all",
+            service_id=service_one['id'],
+            template_folder_id=folder_id,
+            _external=True
+        ),
+        _expected_status=302
     )
-    import pdb; pdb.set_trace()
-    assert normalize_spaces(page.select('.banner-dangerous')[0].text) == (
-        'Are you sure you want to delete the ‘sacrifice’ folder? '
-        'Yes, delete'
-    )
-
-    assert len(page.select('label')) == 0
-    assert len(page.select('button')) == 1
-    assert "Back to manage folder page" in page.text
 
 
 def test_delete_folder(client_request, service_one, mock_get_template_folders, mocker):
