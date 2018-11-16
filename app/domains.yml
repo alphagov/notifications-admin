@@ -423,10 +423,7 @@ ashbournetowncouncil.gov.uk:
   owner: Ashbourne Town Council
   crown: false
   agreement_signed: false
-ashfield-dc.gov.uk:
-  owner: Ashfield District Council
-  crown: false
-  agreement_signed: false
+ashfield-dc.gov.uk: ashfield.gov.uk
 ashfield.gov.uk:
   owner: Ashfield District Council
   crown: false
@@ -1537,7 +1534,7 @@ dorchester-tc.gov.uk:
 dorsetcc.gov.uk:
   owner: Dorset County Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 dorsetforyou.gov.uk:
   owner: Weymouth and Portland Borough Council
   crown: false
@@ -3715,7 +3712,7 @@ rosstc-herefordshire.gov.uk:
 rother.gov.uk:
   owner: Rother District Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 rotherham.gov.uk:
   owner: Rotherham Borough Council
   crown: false
@@ -5120,15 +5117,9 @@ worcester.gov.uk:
 worcestershire.gov.uk:
   owner: Worcestershire County Council
   crown: false
-  agreement_signed: false
-worcestershirehub.gov.uk:
-  owner: Worcestershire County Council
-  crown: false
-  agreement_signed: false
-worcestershirets.gov.uk:
-  owner: Worcestershire County Council
-  crown: false
-  agreement_signed: false
+  agreement_signed: true
+worcestershirehub.gov.uk: worcestershire.gov.uk
+worcestershirets.gov.uk: worcestershire.gov.uk
 worcsregservices.gov.uk:
   owner: Bromsgrove District Council
   crown: false
