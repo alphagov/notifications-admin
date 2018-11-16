@@ -22,18 +22,21 @@ Templates
   {% endfor %}
 </h1>
 
+  {% if not delete_folder %}
+    {% call form_wrapper() %}
+      {{ textbox(form.name) }}
+      {{ page_footer(
+        'Save',
+        delete_link=url_for(
+          '.delete_template_folder',
+          service_id=current_service_id,
+          template_folder_id=template_folder_id
+        ),
+        delete_link_text="Delete this folder") }}
 
-  {% call form_wrapper() %}
-    {{ textbox(form.name) }}
-    {{ page_footer(
-      'Save',
-      delete_link=url_for(
-        '.delete_template_folder',
-        service_id=current_service_id,
-        template_folder_id=template_folder_id
-      ),
-      delete_link_text="Delete this folder") }}
-
-  {% endcall %}
+    {% endcall %}
+  {% else %}
+    <a href="{{url_for('.manage_template_folder', service_id=current_service.id, template_folder_id=template_folder_id)}}">Back to manage folder page</a>
+  {% endif %}
 
 {% endblock %}

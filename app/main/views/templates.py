@@ -442,14 +442,15 @@ def delete_template_folder(service_id, template_folder_id):
             else:
                 abort(500, e)
 
-    flash("Are you sure you want to delete the '{}' folder?".format(template_folder_name), 'delete')
+    flash("Are you sure you want to delete the ‘{}’ folder?".format(template_folder_name), 'delete')
     return render_template(
         'views/templates/manage-template-folder.html',
         form=form,
         template_folder_path=template_folder_path,
         current_service_id=current_service.id,
         template_folder_id=template_folder_id,
-        template_type="all"
+        template_type="all",
+        delete_folder=True
     )
 
 
