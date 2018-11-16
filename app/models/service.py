@@ -352,6 +352,12 @@ class Service():
             folder,
         ]
 
+    def get_template_path(self, template):
+        return [
+            self.get_template_folder(template['folder']),
+            template,
+        ]
+
     def get_template_folders_and_templates(self, template_type, template_folder_id):
         return (
             self.get_templates(template_type, template_folder_id) +

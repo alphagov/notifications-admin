@@ -361,7 +361,11 @@ def test_get_manage_folder_page(
     page = client_request.get(
         'main.manage_template_folder',
         service_id=service_one['id'],
-        template_folder_id=folder_id
+        template_folder_id=folder_id,
+        _test_page_title=False,
+    )
+    assert normalize_spaces(page.select_one('title').text) == (
+        'folder_two – Templates – service one – GOV.UK Notify'
     )
     assert page.select_one('input[name=name]') is not None
     delete_link = page.find('a', string="Delete this folder")
@@ -431,7 +435,8 @@ def test_delete_template_folder_should_request_confirmation(
     )
     page = client_request.get(
         'main.delete_template_folder', service_id=service_one['id'],
-        template_folder_id=folder_id
+        template_folder_id=folder_id,
+        _test_page_title=False,
     )
     assert normalize_spaces(page.select('.banner-dangerous')[0].text) == (
         'Are you sure you want to delete the ‘sacrifice’ folder? '
