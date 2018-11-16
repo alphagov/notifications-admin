@@ -67,7 +67,7 @@
   white-space: nowrap;
 
 
-  a,
+  a:first-child,
   &-folder {
 
     display: inline-block;
@@ -81,10 +81,16 @@
 
   a {
 
-    background-image: file-url('folder-blue.svg');
-    max-width: 33%;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    padding-top: 5px;
+    display: inline-block;
+    vertical-align: top;
+
+    &:first-child {
+      background-image: file-url('folder-blue.svg');
+      max-width: 33%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
 
   }
 
