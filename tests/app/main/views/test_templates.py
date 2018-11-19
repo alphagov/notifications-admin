@@ -39,6 +39,38 @@ from tests.conftest import service_one as create_sample_service
 from tests.conftest import single_letter_contact_block
 
 
+@pytest.mark.parametrize('extra_permissions', (
+    [],
+    ['edit_folders'],
+))
+def test_should_show_empty_page_when_no_templates(
+    client_request,
+    service_one,
+    mock_get_service_templates_when_no_templates_exist,
+    mock_get_template_folders,
+    extra_permissions,
+):
+
+    service_one['permissions'] += extra_permissions
+
+    page = client_request.get(
+        'main.choose_template',
+        service_id=service_one['id'],
+    )
+
+    assert normalize_spaces(page.select_one('h1').text) == (
+        'Templates'
+    )
+    assert normalize_spaces(page.select_one('main p').text) == (
+        'You need a template before you can send emails or text messages.'
+    )
+    assert page.select_one('main a')['href'] == url_for(
+        'main.add_template_by_type',
+        service_id=service_one['id'],
+    )
+    assert len(page.select('main a')) == 1
+
+
 @pytest.mark.parametrize(
     'user, expected_page_title, extra_args, expected_nav_links, expected_templates',
     [
@@ -140,6 +172,7 @@ def test_should_show_page_for_choosing_a_template(
         assert template_links[index].text.strip() == expected_template
 
     mock_get_service_templates.assert_called_once_with(SERVICE_ONE_ID)
+    mock_get_template_folders.assert_called_once_with(SERVICE_ONE_ID)
 
 
 @pytest.mark.parametrize('user', [

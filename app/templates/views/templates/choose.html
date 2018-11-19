@@ -18,7 +18,7 @@
 
 {% block maincolumn_content %}
 
-  {% if (not templates) and (not template_folders) and (not template_folder_path) %}
+  {% if (not current_service.all_templates) and (not current_service.all_template_folders) %}
 
     <h1 class="heading-large">
       {{ page_title }}
