@@ -119,7 +119,6 @@ class User(UserMixin):
 
     def has_permissions(self, *permissions, restrict_admin_usage=False):
         unknown_permissions = set(permissions) - all_permissions
-
         if unknown_permissions:
             raise TypeError('{} are not valid permissions'.format(list(unknown_permissions)))
 
@@ -139,7 +138,7 @@ class User(UserMixin):
         if org_id:
             return org_id in self.organisations
         if not permissions:
-            return service_id in self._permissions
+            return service_id in self.services
         if service_id:
             return any(x in self._permissions.get(service_id, []) for x in permissions)
 

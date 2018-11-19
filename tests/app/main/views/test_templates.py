@@ -1498,7 +1498,7 @@ def test_route_permissions_for_choose_template(
     api_user_active,
     mock_get_template_folders,
     service_one,
-    mock_get_service_templates,
+    mock_get_service_templates
 ):
     mocker.patch('app.job_api_client.get_job')
     validate_route_permission(
@@ -1510,7 +1510,7 @@ def test_route_permissions_for_choose_template(
             'main.choose_template',
             service_id=service_one['id'],
         ),
-        ['view_activity'],
+        [],
         api_user_active,
         service_one)
 
