@@ -133,7 +133,10 @@ class Service():
 
     @property
     def has_templates(self):
-        return len(self.all_templates) > 0
+        return bool(self.all_templates)
+
+    def has_folders(self):
+        return bool(self.all_template_folders)
 
     @property
     def has_multiple_template_types(self):

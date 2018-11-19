@@ -1,44 +1,50 @@
 {% from "components/checkbox.html" import unlabelled_checkbox %}
-{% from "components/message-count-label.html" import folder_contents_count %}
+{% from "components/message-count-label.html" import folder_contents_count, message_count_label %}
 
-<nav id=template-list>
-  {% for template_folder in template_folders %}
-    <div class="template-list-item {% if can_manage_folders %}template-list-item-with-checkbox{% endif %}">
-      {% if can_manage_folders %}
-        {{ unlabelled_checkbox(
-          id='templates-or-folder-{}'.format(template_folder.id),
-          name='templates_and_folders',
-          value=template_folder.id,
-        ) }}
-      {% endif %}
-      <h2 class="message-name template-list-folder">
-        <a href="{{ url_for('.choose_template', service_id=current_service.id, template_type=template_type, template_folder_id=template_folder.id) }}">
-          {{ template_folder.name }}
-        </a>
-      </h2>
-      <p class="message-type">
-        {{ folder_contents_count(
-          current_service.get_template_folders(template_type, template_folder.id)|length,
-          current_service.get_templates(template_type, template_folder.id)|length,
-        ) }}
-      </p>
-    </div>
-  {% endfor %}
-  {% for template in templates %}
-    <div class="template-list-item {% if can_manage_folders %}template-list-item-with-checkbox{% endif %}">
-      {% if can_manage_folders %}
-        {{ unlabelled_checkbox(
-          id='templates-or-folder-{}'.format(template.id),
-          name='templates_and_folders',
-          value=template.id,
-        ) }}
-      {% endif %}
-      <h2 class="message-name">
-        <a href="{{ url_for('.view_template', service_id=current_service.id, template_id=template.id) }}">{{ template.name }}</a>
-      </h2>
-      <p class="message-type">
-        {{ message_count_label(1, template.template_type, suffix='')|capitalize }} template
-      </p>
-    </div>
-  {% endfor %}
-</nav>
+{% if service_has_templates_or_folders and not templates and not template_folders %}
+  <p class="template-list-empty">
+    No {{ message_count_label(1, template_type, suffix='') }} templates in this folder
+  </p>
+{% else %}
+  <nav id=template-list>
+    {% for template_folder in template_folders %}
+      <div class="template-list-item {% if can_manage_folders %}template-list-item-with-checkbox{% endif %}">
+        {% if can_manage_folders %}
+          {{ unlabelled_checkbox(
+            id='templates-or-folder-{}'.format(template_folder.id),
+            name='templates_and_folders',
+            value=template_folder.id,
+          ) }}
+        {% endif %}
+        <h2 class="message-name template-list-folder">
+          <a href="{{ url_for('.choose_template', service_id=current_service.id, template_type=template_type, template_folder_id=template_folder.id) }}">
+            {{ template_folder.name }}
+          </a>
+        </h2>
+        <p class="message-type">
+          {{ folder_contents_count(
+            current_service.get_template_folders(template_type, template_folder.id)|length,
+            current_service.get_templates(template_type, template_folder.id)|length,
+          ) }}
+        </p>
+      </div>
+    {% endfor %}
+    {% for template in templates %}
+      <div class="template-list-item {% if can_manage_folders %}template-list-item-with-checkbox{% endif %}">
+        {% if can_manage_folders %}
+          {{ unlabelled_checkbox(
+            id='templates-or-folder-{}'.format(template.id),
+            name='templates_and_folders',
+            value=template.id,
+          ) }}
+        {% endif %}
+        <h2 class="message-name">
+          <a href="{{ url_for('.view_template', service_id=current_service.id, template_id=template.id) }}">{{ template.name }}</a>
+        </h2>
+        <p class="message-type">
+          {{ message_count_label(1, template.template_type, suffix='')|capitalize }} template
+        </p>
+      </div>
+    {% endfor %}
+  </nav>
+{% endif %}

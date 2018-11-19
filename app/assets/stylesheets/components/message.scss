@@ -54,6 +54,11 @@
 
   }
 
+  &-empty {
+    color: $secondary-text-colour;
+    padding: $gutter-half 0 $gutter-one-third 0;
+  }
+
 }
 
 .folder-heading {

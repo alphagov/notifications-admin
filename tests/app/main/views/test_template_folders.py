@@ -8,6 +8,7 @@ from tests.conftest import SERVICE_ONE_ID, normalize_spaces
 PARENT_FOLDER_ID = '7e979e79-d970-43a5-ac69-b625a8d147b0'
 CHILD_FOLDER_ID = '92ee1ee0-e4ee-4dcc-b1a7-a5da9ebcfa2b'
 GRANDCHILD_FOLDER_ID = 'fafe723f-1d39-4a10-865f-e551e03d8886'
+FOLDER_TWO_ID = 'bbbb222b-2b22-2b22-222b-b222b22b2222'
 
 
 def _folder(name, folder_id=None, parent=None):
@@ -105,7 +106,8 @@ def test_post_add_template_folder_page(client_request, service_one, mocker, pare
         'expected_parent_link_args,'
         'extra_args,'
         'expected_nav_links,'
-        'expected_items'
+        'expected_items, '
+        'expected_empty_message '
     ),
     [
         (
@@ -123,7 +125,8 @@ def test_post_add_template_folder_page(client_request, service_one, mocker, pare
                 'email_template_two Email template',
                 'letter_template_one Letter template',
                 'letter_template_two Letter template',
-            ]
+            ],
+            None,
         ),
         (
             'Templates – service one – GOV.UK Notify',
@@ -136,6 +139,7 @@ def test_post_add_template_folder_page(client_request, service_one, mocker, pare
                 'sms_template_one Text message template',
                 'sms_template_two Text message template',
             ],
+            None,
         ),
         (
             'folder_one – Templates – service one – GOV.UK Notify',
@@ -147,6 +151,7 @@ def test_post_add_template_folder_page(client_request, service_one, mocker, pare
                 'folder_one_one 1 template, 1 folder',
                 'folder_one_two Empty',
             ],
+            None,
         ),
         (
             'folder_one – Templates – service one – GOV.UK Notify',
@@ -157,6 +162,7 @@ def test_post_add_template_folder_page(client_request, service_one, mocker, pare
             [
                 'folder_one_one 1 folder',
             ],
+            None,
         ),
         (
             'folder_one – Templates – service one – GOV.UK Notify',
@@ -165,6 +171,7 @@ def test_post_add_template_folder_page(client_request, service_one, mocker, pare
             {'template_type': 'email', 'template_folder_id': PARENT_FOLDER_ID},
             ['All', 'Text message', 'Letter'],
             [],
+            'No email templates in this folder',
         ),
         (
             'folder_one_one – folder_one – service one – GOV.UK Notify',
@@ -176,6 +183,7 @@ def test_post_add_template_folder_page(client_request, service_one, mocker, pare
                 'folder_one_one_one 1 template',
                 'letter_template_nested Letter template',
             ],
+            None,
         ),
         (
             'folder_one_one_one – folder_one_one – service one – GOV.UK Notify',
@@ -186,6 +194,16 @@ def test_post_add_template_folder_page(client_request, service_one, mocker, pare
             [
                 'sms_template_nested Text message template',
             ],
+            None,
+        ),
+        (
+            'folder_two – Templates – service one – GOV.UK Notify',
+            'Templates / folder_two',
+            {'template_type': 'all'},
+            {'template_folder_id': FOLDER_TWO_ID},
+            ['Text message', 'Email', 'Letter'],
+            [],
+            'No templates in this folder',
         ),
     ]
 )
@@ -202,9 +220,10 @@ def test_should_show_templates_folder_page(
     extra_args,
     expected_nav_links,
     expected_items,
+    expected_empty_message,
 ):
     mock_get_template_folders.return_value = [
-        _folder('folder_two'),
+        _folder('folder_two', FOLDER_TWO_ID),
         _folder('folder_one', PARENT_FOLDER_ID),
         _folder('folder_one_two', parent=PARENT_FOLDER_ID),
         _folder('folder_one_one', CHILD_FOLDER_ID, parent=PARENT_FOLDER_ID),
@@ -259,6 +278,13 @@ def test_should_show_templates_folder_page(
 
     for index, expected_item in enumerate(expected_items):
         assert normalize_spaces(page_items[index].text) == expected_item
+
+    if expected_empty_message:
+        assert normalize_spaces(page.select_one('.template-list-empty').text) == (
+            expected_empty_message
+        )
+    else:
+        assert not page.select('.template-list-empty')
 
     mock_get_service_templates.assert_called_once_with(SERVICE_ONE_ID)
 
