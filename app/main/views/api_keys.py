@@ -130,9 +130,12 @@ def create_api_key(service_id):
 def revoke_api_key(service_id, key_id):
     key_name = current_service.get_api_key(key_id)['name']
     if request.method == 'GET':
+        flash([
+            "Are you sure you want to revoke ‘{}’?".format(key_name),
+            "You will not be able to use this API key to connect to GOV.UK Notify."
+        ], 'revoke this API key')
         return render_template(
             'views/api/keys.html',
-            revoke_key=key_name,
         )
     elif request.method == 'POST':
         api_key_api_client.revoke_api_key(service_id=service_id, key_id=key_id)

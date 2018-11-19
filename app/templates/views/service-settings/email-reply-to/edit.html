@@ -11,20 +11,9 @@
 
 {% block maincolumn_content %}
 
-  {% if confirm_delete %}
-    <div class="bottom-gutter">
-      {% call banner_wrapper(type='dangerous', subhead="Are you sure you want to delete this email reply-to address?") %}
-        <form method='post'>
-          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-          <input type="submit" class="button" name="delete" value="Confirm" />
-        </form>
-      {% endcall %}
-    </div>
-  {% else %}
-    <h1 class="heading-large">
-      Edit email reply to address
-    </h1>
-  {% endif %}
+  <h1 class="heading-large">
+    Edit email reply to address
+  </h1>
   {% call form_wrapper() %}
     {{ textbox(
       form.email_address,

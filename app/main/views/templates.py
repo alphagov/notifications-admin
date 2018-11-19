@@ -441,7 +441,7 @@ def delete_template_folder(service_id, template_folder_id):
             else:
                 abort(500, e)
 
-    flash("Are you sure you want to delete the '{}' folder?".format(template_folder_name), 'delete')
+    flash("Are you sure you want to delete the ‘{}’ folder?".format(template_folder_name), 'delete')
     return render_template(
         'views/templates/manage-template-folder.html',
         form=form,
@@ -615,7 +615,7 @@ def delete_service_template(service_id, template_id):
         last_used_notification = template_statistics_client.get_template_statistics_for_template(
             service_id, template['id']
         )
-        message = 'It was last used {} ago'.format(
+        message = 'This template was last used {} ago.'.format(
             'more than seven days' if not last_used_notification else get_human_readable_delta(
                 parse(last_used_notification['created_at']).replace(tzinfo=None),
                 datetime.utcnow()
@@ -628,12 +628,9 @@ def delete_service_template(service_id, template_id):
         else:
             raise e
 
+    flash(["Are you sure you want to delete ‘{}’?".format(template['name']), message], 'delete')
     return render_template(
         'views/templates/template.html',
-        template_delete_confirmation_message=(
-            'Are you sure you want to delete {}?'.format(template['name']),
-            message,
-        ),
         template=get_template(
             template,
             current_service,

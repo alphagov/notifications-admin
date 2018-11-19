@@ -11,20 +11,9 @@
 
 {% block maincolumn_content %}
 
-  {% if confirm_delete %}
-    <div class="bottom-gutter">
-      {% call banner_wrapper(type='dangerous', subhead="Are you sure you want to delete this text message sender?") %}
-        <form method='post'>
-          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-          <input type="submit" class="button" name="delete" value="Confirm" />
-        </form>
-      {% endcall %}
-    </div>
-  {% else %}
-    <h1 class="heading-large">
-      Edit text message sender
-    </h1>
-  {% endif %}
+  <h1 class="heading-large">
+    Edit text message sender
+  </h1>
   {% call form_wrapper() %}
     {% if inbound_number %}
       <p>

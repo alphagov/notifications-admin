@@ -1612,7 +1612,8 @@ def test_confirm_delete_reply_to_email_address(
     )
 
     assert normalize_spaces(page.select_one('.banner-dangerous').text) == (
-        'Are you sure you want to delete this email reply-to address?'
+        'Are you sure you want to delete this email reply-to address? '
+        'Yes, delete'
     )
     assert 'action' not in page.select_one('.banner-dangerous form')
     assert page.select_one('.banner-dangerous form')['method'] == 'post'
@@ -1824,7 +1825,8 @@ def test_confirm_delete_sms_sender(
     )
 
     assert normalize_spaces(page.select_one('.banner-dangerous').text) == (
-        'Are you sure you want to delete this text message sender?'
+        'Are you sure you want to delete this text message sender? '
+        'Yes, delete'
     )
     assert 'action' not in page.select_one('.banner-dangerous form')
     assert page.select_one('.banner-dangerous form')['method'] == 'post'

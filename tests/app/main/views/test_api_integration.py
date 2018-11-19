@@ -308,9 +308,9 @@ def test_should_show_confirm_revoke_api_key(
         _test_page_title=False,
     )
     assert normalize_spaces(page.select('.banner-dangerous')[0].text) == (
-        'Are you sure you want to revoke this API key? '
-        '‘some key name’ will no longer let you connect to GOV.UK Notify. '
-        'Confirm'
+        'Are you sure you want to revoke ‘some key name’? '
+        'You will not be able to use this API key to connect to GOV.UK Notify. '
+        'Yes, revoke this API key'
     )
     assert mock_get_api_keys.call_args_list == [
         call(
