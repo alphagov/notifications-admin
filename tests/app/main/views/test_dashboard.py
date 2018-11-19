@@ -875,6 +875,7 @@ def _test_dashboard_menu(mocker, app_, usr, service, permissions):
     with app_.test_request_context():
         with app_.test_client() as client:
             usr._permissions[str(service['id'])] = permissions
+            usr.services = [service['id']]
             mocker.patch('app.user_api_client.check_verify_code', return_value=(True, ''))
             mocker.patch('app.service_api_client.get_services', return_value={'data': [service]})
             mocker.patch('app.user_api_client.get_user', return_value=usr)

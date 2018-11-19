@@ -211,6 +211,22 @@ def test_user_doesnt_have_permissions_for_organisation(
         index()
 
 
+def test_user_with_no_permissions_to_service_goes_to_templates(
+        client,
+        mocker
+):
+    user = _user_with_permissions()
+    mocker.patch('app.user_api_client.get_user', return_value=user)
+    client.login(user)
+    request.view_args = {'service_id': 'bar'}
+
+    @user_has_permissions()
+    def index():
+        pass
+
+    index()
+
+
 def _user_with_permissions():
     from app.notify_client.user_api_client import User
 
@@ -224,6 +240,7 @@ def _user_with_permissions():
                  'permissions': {'foo': ['manage_users', 'manage_templates', 'manage_settings']},
                  'platform_admin': False,
                  'organisations': ['org_1', 'org_2'],
+                 'services': ['foo', 'bar']
                  }
     user = User(user_data)
     return user

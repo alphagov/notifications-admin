@@ -1178,7 +1178,8 @@ def active_user_with_permissions(fake_uuid):
                                                   'view_activity']},
                  'platform_admin': False,
                  'auth_type': 'sms_auth',
-                 'organisations': [ORGANISATION_ID]
+                 'organisations': [ORGANISATION_ID],
+                 'services': [SERVICE_ONE_ID]
                  }
     user = User(user_data)
     return user
@@ -1205,6 +1206,7 @@ def active_caseworking_user(fake_uuid):
         'platform_admin': False,
         'auth_type': 'sms_auth',
         'organisations': [],
+        'services': [SERVICE_ONE_ID]
     }
     user = User(user_data)
     return user
@@ -1232,7 +1234,8 @@ def active_user_no_mobile(fake_uuid):
                                                   'view_activity']},
                  'platform_admin': False,
                  'auth_type': 'email_auth',
-                 'organisations': []
+                 'organisations': [],
+                 'services': [SERVICE_ONE_ID]
                  }
     user = User(user_data)
     return user
@@ -1253,7 +1256,8 @@ def active_user_view_permissions(fake_uuid):
                  'permissions': {SERVICE_ONE_ID: ['view_activity']},
                  'platform_admin': False,
                  'auth_type': 'sms_auth',
-                 'organisations': []
+                 'organisations': [],
+                 'services': [SERVICE_ONE_ID]
                  }
     user = User(user_data)
     return user
@@ -1271,10 +1275,11 @@ def active_user_empty_permissions(fake_uuid):
                  'mobile_number': '07700 900763',
                  'state': 'active',
                  'failed_login_count': 0,
-                 'permissions': {SERVICE_ONE_ID: []},
+                 'permissions': {},
                  'platform_admin': False,
                  'auth_type': 'sms_auth',
-                 'organisations': []
+                 'organisations': [],
+                 'services': [SERVICE_ONE_ID]
                  }
     user = User(user_data)
     return user
@@ -1299,7 +1304,8 @@ def active_user_manage_template_permission(fake_uuid):
         ]},
         'platform_admin': False,
         'auth_type': 'sms_auth',
-        'organisations': []
+        'organisations': [],
+        'services': [SERVICE_ONE_ID]
     }
     user = User(user_data)
     return user

@@ -484,6 +484,7 @@ def validate_route_permission(mocker,
                               usr,
                               service):
     usr._permissions[str(service['id'])] = permissions
+    usr.services = [service['id']]
     mocker.patch(
         'app.user_api_client.check_verify_code',
         return_value=(True, ''))
