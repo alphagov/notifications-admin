@@ -543,6 +543,7 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
         db_template,
         current_service,
         show_recipient=True,
+        expand_emails=True,
         letter_preview_url=url_for(
             '.check_messages_preview',
             service_id=service_id,

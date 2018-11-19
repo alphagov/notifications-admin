@@ -52,7 +52,7 @@
 
   {{ template|string }}
 
-  <div class="bottom-gutter-3-2">
+  <div class="js-stick-at-bottom-when-scrolling">
     <form method="post" enctype="multipart/form-data" action="{{url_for(
         'main.send_notification',
         service_id=current_service.id,
