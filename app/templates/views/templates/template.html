@@ -1,5 +1,6 @@
 {% extends "withnav_template.html" %}
 {% from "components/banner.html" import banner_wrapper %}
+{% from "components/folder-path.html" import folder_path %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/textbox.html" import textbox %}
 {% from "components/api-key.html" import api_key %}
@@ -28,7 +29,17 @@
       {% endcall %}
     </div>
   {% else %}
-    <h1 class="heading-large">{{ template.name }}</h1>
+    <div class="grid-row bottom-gutter-1-2">
+      <div class="column-whole">
+        {{ folder_path(
+          folders=current_service.get_template_path(template._template),
+          service_id=current_service.id,
+          template_type='all',
+          fallback_page_title=template.name,
+          show_fallback_page_title=not current_service.all_template_folders
+        ) }}
+      </div>
+    </div>
   {% endif %}
 
   <div class="grid-row">

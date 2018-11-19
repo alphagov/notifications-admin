@@ -229,6 +229,7 @@ def template_json(service_id,
         'reply_to': reply_to,
         'reply_to_text': reply_to_text,
         'is_precompiled_letter': is_precompiled_letter,
+        'folder': None,
     }
     if content is None:
         template['content'] = "template content"

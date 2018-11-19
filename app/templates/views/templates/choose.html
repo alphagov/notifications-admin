@@ -1,3 +1,4 @@
+{% from "components/folder-path.html" import folder_path, page_title_folder_path %}
 {% from "components/pill.html" import pill %}
 {% from "components/message-count-label.html" import message_count_label %}
 {% from "components/textbox.html" import textbox %}
@@ -8,10 +9,11 @@
 {% set page_title = 'Templates' %}
 
 {% block service_page_title %}
-  {{ page_title }}
-  {% for folder in template_folder_path %}
-    / {{ folder.name }}
-  {% endfor %}
+  {{ page_title_folder_path(
+    template_folder_path,
+    fallback_page_title=page_title,
+    show_fallback_page_title=not current_service.all_template_folders
+  ) }}
 {% endblock %}
 
 {% block maincolumn_content %}
@@ -44,29 +46,21 @@
 
   {% else %}
 
-    <div class="grid-row bottom-gutter-2-3">
+    <div class="grid-row {% if current_service.all_template_folders %}bottom-gutter-1-2{% else %}bottom-gutter-2-3{% endif %}">
       <div class="column-two-thirds">
-        <h1 class="heading-large">
-          {% if template_folder_path %}
-            <a href="{{ url_for('.choose_template', service_id=current_service.id, template_type=template_type) }}">{{ page_title }}</a>
-          {% else %}
-            {{ page_title }}
-          {% endif %}
-          {% for folder in template_folder_path %}
-            /
-            {% if loop.last %}
-              {{ folder.name }}
-            {% else %}
-              <a href="{{ url_for('.choose_template', service_id=current_service.id, template_type=template_type, template_folder_id=folder.id) }}">{{ folder.name }}</a>
-            {% endif %}
-          {% endfor %}
-        </h1>
+        {{ folder_path(
+          folders=template_folder_path,
+          service_id=current_service.id,
+          template_type=template_type,
+          fallback_page_title=page_title,
+          show_fallback_page_title=not current_service.all_template_folders
+        ) }}
       </div>
       {% if current_user.has_permissions('manage_templates') %}
         <div class="column-one-third">
           <a href="{{ url_for('.add_template_by_type', service_id=current_service.id, template_folder_id=current_template_folder_id) }}" class="button align-with-heading">Add new template</a>
 
-        {% if can_manage_folders and template_folder_path %}
+        {% if can_manage_folders and current_template_folder_id %}
           <a href="{{ url_for('.manage_template_folder', service_id=current_service.id, template_folder_id=current_template_folder_id) }}" class="align-with-heading">Manage</a>
         {% endif %}
         </div>

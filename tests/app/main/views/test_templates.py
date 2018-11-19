@@ -492,6 +492,7 @@ def test_user_with_only_send_and_view_redirected_to_one_off(
 def test_user_with_only_send_and_view_sees_letter_page(
     client_request,
     mock_get_service_templates,
+    mock_get_template_folders,
     mock_get_service_letter_template,
     single_letter_contact_block,
     mock_has_jobs,
@@ -536,6 +537,7 @@ def test_user_with_only_send_and_view_sees_letter_page(
 def test_should_be_able_to_view_a_template_with_links(
     client,
     mock_get_service_template,
+    mock_get_template_folders,
     active_user_with_permissions,
     single_letter_contact_block,
     mocker,
@@ -575,6 +577,7 @@ def test_should_be_able_to_view_a_template_with_links(
 def test_should_show_template_id_on_template_page(
     logged_in_client,
     mock_get_service_template,
+    mock_get_template_folders,
     service_one,
     fake_uuid,
 ):
@@ -595,6 +598,7 @@ def test_should_show_sms_template_with_downgraded_unicode_characters(
     mocker,
     service_one,
     single_letter_contact_block,
+    mock_get_template_folders,
     fake_uuid,
 ):
     msg = 'here:\tare some “fancy quotes” and zero\u200Bwidth\u200Bspaces'
@@ -618,6 +622,7 @@ def test_should_show_sms_template_with_downgraded_unicode_characters(
 def test_should_let_letter_contact_block_be_changed_for_the_template(
     mocker,
     mock_get_service_letter_template,
+    mock_get_template_folders,
     no_letter_contact_blocks,
     client_request,
     service_one,
@@ -1264,6 +1269,7 @@ def test_should_redirect_when_saving_a_template_email(
 def test_should_show_delete_template_page_with_time_block(
     client_request,
     mock_get_service_template,
+    mock_get_template_folders,
     mocker,
     fake_uuid
 ):
@@ -1294,6 +1300,7 @@ def test_should_show_delete_template_page_with_time_block(
 def test_should_show_delete_template_page_with_time_block_for_empty_notification(
     client_request,
     mock_get_service_template,
+    mock_get_template_folders,
     mocker,
     fake_uuid
 ):
@@ -1323,6 +1330,7 @@ def test_should_show_delete_template_page_with_time_block_for_empty_notification
 def test_should_show_delete_template_page_with_never_used_block(
     client_request,
     mock_get_service_template,
+    mock_get_template_folders,
     fake_uuid,
     mocker,
 ):
@@ -1390,6 +1398,7 @@ def test_should_show_page_for_a_deleted_template(
     api_user_active,
     mock_login,
     mock_get_service,
+    mock_get_template_folders,
     mock_get_deleted_template,
     single_letter_contact_block,
     mock_get_user,
@@ -1430,6 +1439,7 @@ def test_route_permissions(
     api_user_active,
     service_one,
     mock_get_service_template,
+    mock_get_template_folders,
     mock_get_template_statistics_for_template,
     fake_uuid,
 ):
@@ -1713,6 +1723,7 @@ def test_should_show_message_before_redacting_template(
 def test_should_show_redact_template(
     client_request,
     mock_get_service_template,
+    mock_get_template_folders,
     mock_redact_template,
     single_letter_contact_block,
     service_one,
@@ -1737,6 +1748,7 @@ def test_should_show_hint_once_template_redacted(
     client_request,
     mocker,
     service_one,
+    mock_get_template_folders,
     fake_uuid,
 ):
 
@@ -1756,6 +1768,7 @@ def test_should_not_show_redaction_stuff_for_letters(
     mocker,
     fake_uuid,
     mock_get_service_letter_template,
+    mock_get_template_folders,
     single_letter_contact_block,
 ):
 

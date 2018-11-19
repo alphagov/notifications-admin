@@ -1,26 +1,25 @@
 {% extends "withnav_template.html" %}
+{% from "components/folder-path.html" import folder_path, page_title_folder_path %}
 {% from "components/textbox.html" import textbox %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 
 {% block service_page_title %}
-Templates
-{% for folder in template_folder_path %}
-  /
-    {{ folder.name }}
-{% endfor %}
-  - Manage folder
+  {{ page_title_folder_path(template_folder_path) }}
 {% endblock %}
 
 {% block maincolumn_content %}
 
-<h1 class="heading-large">
-  <a href="{{ url_for('.choose_template', service_id=current_service.id, template_type=template_type) }}">Templates</a>
-  {% for folder in template_folder_path %}
-    /
-      <a href="{{ url_for('.choose_template', service_id=current_service.id, template_type=template_type, template_folder_id=folder.id) }}">{{ folder.name }}</a>
-  {% endfor %}
-</h1>
+  <div class="grid-row bottom-gutter-1-2">
+    <div class="column-whole">
+      {{ folder_path(
+        folders=template_folder_path,
+        service_id=current_service.id,
+        template_type='all',
+        link_current_item=True
+      ) }}
+    </div>
+  </div>
 
   {% if not delete_folder %}
     {% call form_wrapper() %}
@@ -33,7 +32,6 @@ Templates
           template_folder_id=template_folder_id
         ),
         delete_link_text="Delete this folder") }}
-
     {% endcall %}
   {% else %}
     <a href="{{url_for('.manage_template_folder', service_id=current_service.id, template_folder_id=template_folder_id)}}">Back to manage folder page</a>
