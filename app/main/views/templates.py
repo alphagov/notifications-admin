@@ -406,7 +406,9 @@ def manage_template_folder(service_id, template_folder_id):
 def delete_template_folder(service_id, template_folder_id):
     if not current_service.has_permission('edit_folders'):
         abort(403)
-    form = TemplateFolderForm()
+    form = TemplateFolderForm(
+        name=current_service.get_template_folder(template_folder_id)['name']
+    )
     template_folder_path = current_service.get_template_folder_path(template_folder_id)
     template_folder_name = template_folder_path[-1]["name"]
 
@@ -450,7 +452,6 @@ def delete_template_folder(service_id, template_folder_id):
         current_service_id=current_service.id,
         template_folder_id=template_folder_id,
         template_type="all",
-        delete_folder=True
     )
 
 

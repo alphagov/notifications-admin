@@ -367,7 +367,7 @@ def test_get_manage_folder_page(
     assert normalize_spaces(page.select_one('title').text) == (
         'folder_two – Templates – service one – GOV.UK Notify'
     )
-    assert page.select_one('input[name=name]') is not None
+    assert page.select_one('input[name=name]')['value'] == 'folder_two'
     delete_link = page.find('a', string="Delete this folder")
     expected_delete_url = "/services/{}/templates/folders/{}/delete".format(service_one['id'], folder_id)
 
@@ -443,9 +443,20 @@ def test_delete_template_folder_should_request_confirmation(
         'Yes, delete'
     )
 
-    assert len(page.select('label')) == 0
-    assert len(page.select('button')) == 1
-    assert "Back to manage folder page" in page.text
+    assert page.select_one('input[name=name]')['value'] == 'sacrifice'
+
+    assert len(page.select('form')) == 2
+    assert len(page.select('button')) == 2
+
+    assert 'action' not in page.select('form')[0]
+    assert page.select('form button')[0].text == 'Yes, delete'
+
+    assert page.select('form')[1]['action'] == url_for(
+        'main.manage_template_folder',
+        service_id=service_one['id'],
+        template_folder_id=folder_id,
+    )
+    assert page.select('form button')[1].text == 'Save'
 
 
 def test_delete_template_folder_should_detect_non_empty_folder_on_get(
