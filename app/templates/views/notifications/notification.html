@@ -60,7 +60,13 @@
     {{ template|string }}
 
     {% if template.template_type != 'letter' %}
+
+      {% if template.template_type == 'email' %}<div class="js-stick-at-bottom-when-scrolling">{% endif %}
+
       {{ ajax_block(partials, updates_url, 'status', finished=finished) }}
+
+      {% if template.template_type == 'email' %}</div>{% endif %}
+
     {% endif %}
 
     {% if current_user.has_permissions('send_messages') and current_user.has_permissions('view_activity') and template.template_type == 'sms' and can_receive_inbound %}
