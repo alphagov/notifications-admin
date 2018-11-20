@@ -369,7 +369,7 @@ class Service():
 
     @property
     def count_of_templates_and_folders(self):
-        return len(self.get_template_folders_and_templates('all', None))
+        return len(self.all_templates + self.all_template_folders)
 
     def move_to_folder(self, ids_to_move, move_to):
 
