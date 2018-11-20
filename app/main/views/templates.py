@@ -128,6 +128,7 @@ def choose_template(service_id, template_type='all', template_folder_id=None):
         current_template_folder_id=template_folder_id,
         can_manage_folders=can_manage_folders(),
         template_folder_path=current_service.get_template_folder_path(template_folder_id),
+        template_folder_has_contents=current_service.get_template_folders_and_templates('all', template_folder_id),
         template_folders=current_service.get_template_folders(template_type, template_folder_id),
         templates=templates_on_page,
         show_search_box=(len(templates_on_page) > 7),

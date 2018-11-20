@@ -81,7 +81,8 @@
           templates=templates,
           template_folders=template_folders,
           service_has_templates_or_folders=(current_service.has_templates or current_service.has_folders),
-          template_type=template_type
+          template_type=template_type,
+          template_folder_has_contents=template_folder_has_contents
         %}
           {% include 'views/templates/_template_list.html' %}
         {% endwith %}
@@ -94,7 +95,8 @@
         templates=templates,
         template_folders=template_folders,
         service_has_templates_or_folders=(current_service.has_templates or current_service.has_folders),
-        template_type=template_type
+        template_type=template_type,
+        template_folder_has_contents=template_folder_has_contents
       %}
         {% include 'views/templates/_template_list.html' %}
       {% endwith %}

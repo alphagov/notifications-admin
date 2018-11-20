@@ -3,7 +3,11 @@
 
 {% if service_has_templates_or_folders and not templates and not template_folders %}
   <p class="template-list-empty">
-    No {{ message_count_label(1, template_type, suffix='') }} templates in this folder
+    {% if template_folder_has_contents %}
+      There are no {{ message_count_label(1, template_type, suffix='') }} templates in this folder
+    {% else %}
+      This folder is empty
+    {% endif %}
   </p>
 {% else %}
   <nav id=template-list>

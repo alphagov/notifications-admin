@@ -171,7 +171,7 @@ def test_post_add_template_folder_page(client_request, service_one, mocker, pare
             {'template_type': 'email', 'template_folder_id': PARENT_FOLDER_ID},
             ['All', 'Text message', 'Letter'],
             [],
-            'No email templates in this folder',
+            'There are no email templates in this folder',
         ),
         (
             'folder_one_one – folder_one – service one – GOV.UK Notify',
@@ -203,7 +203,16 @@ def test_post_add_template_folder_page(client_request, service_one, mocker, pare
             {'template_folder_id': FOLDER_TWO_ID},
             ['Text message', 'Email', 'Letter'],
             [],
-            'No templates in this folder',
+            'This folder is empty',
+        ),
+        (
+            'folder_two – Templates – service one – GOV.UK Notify',
+            'Templates / folder_two',
+            {'template_type': 'sms'},
+            {'template_folder_id': FOLDER_TWO_ID, 'template_type': 'sms'},
+            ['All', 'Email', 'Letter'],
+            [],
+            'This folder is empty',
         ),
     ]
 )
