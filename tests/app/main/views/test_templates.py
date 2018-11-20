@@ -20,6 +20,7 @@ from tests import (
 from tests.app.main.views.test_template_folders import (
     CHILD_FOLDER_ID,
     PARENT_FOLDER_ID,
+    _folder,
 )
 from tests.conftest import (
     SERVICE_ONE_ID,
@@ -444,6 +445,33 @@ def test_should_show_live_search_if_list_of_templates_taller_than_screen(
     assert search['data-targets'] == '#template-list .template-list-item'
 
     assert len(page.select(search['data-targets'])) == len(page.select('.message-name')) == 14
+
+
+def test_should_show_live_search_if_service_has_lots_of_folders(
+    client_request,
+    mock_get_template_folders,
+    mock_get_service_templates,  # returns 4 templates
+):
+
+    mock_get_template_folders.return_value = [
+        _folder('one', PARENT_FOLDER_ID),
+        _folder('two', None, parent=PARENT_FOLDER_ID),
+        _folder('three', None, parent=PARENT_FOLDER_ID),
+        _folder('four', None, parent=PARENT_FOLDER_ID),
+    ]
+
+    page = client_request.get(
+        'main.choose_template',
+        service_id=SERVICE_ONE_ID,
+    )
+
+    count_of_templates_and_folders = len(page.select('.message-name'))
+    count_of_folders = len(page.select('.template-list-folder'))
+    count_of_templates = count_of_templates_and_folders - count_of_folders
+
+    assert len(page.select('.live-search')) == 1
+    assert count_of_folders == 1
+    assert count_of_templates == 4
 
 
 def test_should_show_page_for_one_template(
