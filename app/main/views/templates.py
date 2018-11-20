@@ -404,18 +404,18 @@ def manage_template_folder(service_id, template_folder_id):
 @login_required
 @user_has_permissions('manage_templates')
 def delete_template_folder(service_id, template_folder_id):
+
     if not current_service.has_permission('edit_folders'):
         abort(403)
-    form = TemplateFolderForm(
-        name=current_service.get_template_folder(template_folder_id)['name']
-    )
-    template_folder_path = current_service.get_template_folder_path(template_folder_id)
-    template_folder_name = template_folder_path[-1]["name"]
+
+    template_folder = current_service.get_template_folder(template_folder_id)
+
+    form = TemplateFolderForm(name=template_folder['name'])
 
     if len(current_service.get_template_folders_and_templates(
         template_type="all", template_folder_id=template_folder_id
     )) > 0:
-        flash("You must empty this folder before you can delete it".format(template_folder_name), 'info')
+        flash("You must empty this folder before you can delete it".format(template_folder['name']), 'info')
         return redirect(
             url_for(
                 '.choose_template', service_id=service_id, template_type="all", template_folder_id=template_folder_id
@@ -432,7 +432,7 @@ def delete_template_folder(service_id, template_folder_id):
         except HTTPError as e:
             msg = "Folder is not empty"
             if e.status_code == 400 and msg in e.message:
-                flash("You must empty this folder before you can delete it".format(template_folder_name), 'info')
+                flash("You must empty this folder before you can delete it", 'info')
                 return redirect(
                     url_for(
                         '.choose_template',
@@ -444,11 +444,11 @@ def delete_template_folder(service_id, template_folder_id):
             else:
                 abort(500, e)
 
-    flash("Are you sure you want to delete the ‘{}’ folder?".format(template_folder_name), 'delete')
+    flash("Are you sure you want to delete the ‘{}’ folder?".format(template_folder['name']), 'delete')
     return render_template(
         'views/templates/manage-template-folder.html',
         form=form,
-        template_folder_path=template_folder_path,
+        template_folder_path=current_service.get_template_folder_path(template_folder_id),
         current_service_id=current_service.id,
         template_folder_id=template_folder_id,
         template_type="all",
