@@ -427,7 +427,7 @@ def delete_template_folder(service_id, template_folder_id):
             template_folder_api_client.delete_template_folder(current_service.id, template_folder_id)
 
             return redirect(
-                url_for('.choose_template', service_id=service_id)
+                url_for('.choose_template', service_id=service_id, template_folder_id=template_folder['parent_id'])
             )
         except HTTPError as e:
             msg = "Folder is not empty"
