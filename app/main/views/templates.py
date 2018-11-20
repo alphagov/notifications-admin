@@ -118,7 +118,9 @@ def choose_template(service_id, template_type='all', template_folder_id=None):
         current_folder_id=template_folder_id,
     )
 
-    if request.method == 'POST' and can_manage_folders() and templates_and_folders_form.validate_on_submit():
+    if request.method == 'POST' and templates_and_folders_form.validate_on_submit():
+        if not can_manage_folders():
+            abort(403)
         return process_folder_management_form(templates_and_folders_form, template_folder_id)
 
     return render_template(
@@ -145,7 +147,7 @@ def process_folder_management_form(form, current_folder_id):
     if form.is_add_op:
         new_folder_id = template_folder_api_client.create_template_folder(
             current_service.id,
-            name=form.new_folder_name.data,
+            name=form.get_folder_name(),
             parent_id=current_folder_id
         )
 

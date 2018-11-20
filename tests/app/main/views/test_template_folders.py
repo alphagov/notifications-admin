@@ -3,7 +3,6 @@ import uuid
 import pytest
 from flask import url_for
 
-from tests import sample_uuid
 from tests.conftest import (
     SERVICE_ONE_ID,
     TEMPLATE_ONE_ID,
@@ -727,13 +726,12 @@ def test_should_show_checkboxes_for_selecting_templates(
         assert TEMPLATE_ONE_ID not in checkboxes[index]['id']
 
 
-@pytest.mark.parametrize('user,extra_service_permissions,should_show_radio_buttons', [
-    (active_user_with_permissions, ['edit_folders'], True),
-    (active_user_with_permissions, [], False),
-    (active_user_view_permissions, ['edit_folders'], False),
-    (active_caseworking_user, ['edit_folders'], False),
+@pytest.mark.parametrize('user,extra_service_permissions', [
+    (active_user_with_permissions, []),
+    (active_user_view_permissions, ['edit_folders']),
+    (active_caseworking_user, ['edit_folders']),
 ])
-def test_should_show_radios_and_buttons_for_move_destination_if_correct_permissions(
+def test_should_not_show_radios_and_buttons_for_move_destination_if_incorrect_permissions(
     client_request,
     mocker,
     service_one,
@@ -743,11 +741,37 @@ def test_should_show_radios_and_buttons_for_move_destination_if_correct_permissi
     fake_uuid,
     user,
     extra_service_permissions,
-    should_show_radio_buttons,
 ):
     service_one['permissions'] += extra_service_permissions
 
     client_request.login(user(fake_uuid))
+
+    page = client_request.get(
+        'main.choose_template',
+        service_id=SERVICE_ONE_ID,
+    )
+    radios = page.select('input[type=radio]')
+    radio_div = page.find('div', {'id': 'move_to_folder_radios'})
+    assert radios == page.select('input[name=move_to]')
+
+    assert not radios
+    assert not radio_div
+    assert page.find_all('button', {'name': 'operation'}) == []
+
+
+def test_should_show_radios_and_buttons_for_move_destination_if_correct_permissions(
+    client_request,
+    mocker,
+    service_one,
+    mock_get_service_templates,
+    mock_get_template_folders,
+    mock_has_no_jobs,
+    fake_uuid,
+    active_user_with_permissions
+):
+    service_one['permissions'] += ['edit_folders']
+
+    client_request.login(active_user_with_permissions)
 
     FOLDER_TWO_ID = str(uuid.uuid4())
     FOLDER_ONE_TWO_ID = str(uuid.uuid4())
@@ -762,26 +786,21 @@ def test_should_show_radios_and_buttons_for_move_destination_if_correct_permissi
         service_id=SERVICE_ONE_ID,
     )
     radios = page.select('input[type=radio]')
-    labels = page.select('label[for^=move_to]')
+    radio_div = page.find('div', {'id': 'move_to_folder_radios'})
     assert radios == page.select('input[name=move_to]')
 
-    if should_show_radio_buttons:
-        assert [x['value'] for x in radios] == [
-            PARENT_FOLDER_ID, CHILD_FOLDER_ID, FOLDER_ONE_TWO_ID, FOLDER_TWO_ID,
-        ]
-        assert [x.text.strip() for x in labels] == [
-            'folder_one', 'folder_one_one', 'folder_one_two', 'folder_two',
-        ]
-        assert set(x['value'] for x in page.find_all('button', {'name': 'operation'})) == {
-            'unknown',
-            'move_to_existing_folder',
-            'move_to_new_folder',
-            'add_new_folder'
-        }
-    else:
-        assert not radios
-        assert not labels
-        assert page.find_all('button', {'name': 'operation'}) == []
+    assert [x['value'] for x in radios] == [
+        PARENT_FOLDER_ID, CHILD_FOLDER_ID, FOLDER_ONE_TWO_ID, FOLDER_TWO_ID,
+    ]
+    assert [x.text.strip() for x in radio_div.select('label')] == [
+        'folder_one', 'folder_one_one', 'folder_one_two', 'folder_two',
+    ]
+    assert set(x['value'] for x in page.find_all('button', {'name': 'operation'})) == {
+        'unknown',
+        'move_to_existing_folder',
+        'move_to_new_folder',
+        'add_new_folder'
+    }
 
 
 def test_should_be_able_to_move_to_existing_folder(
@@ -855,8 +874,7 @@ def test_should_not_be_able_to_move_to_existing_folder_if_dont_have_permission(
                 TEMPLATE_ONE_ID,
             ],
         },
-        # it's just returned the form. Should this have a 400 because there were errors?
-        _expected_status=200
+        _expected_status=403
     )
     assert mock_move_to_template_folder.called is False
 
@@ -881,7 +899,7 @@ def test_should_be_able_to_move_a_sub_item(
         service_id=SERVICE_ONE_ID,
         template_folder_id=PARENT_FOLDER_ID,
         _data={
-            'operation': 'move',
+            'operation': 'move_to_existing_folder',
             'move_to': 'None',
             'templates_and_folders': [GRANDCHILD_FOLDER_ID],
         },
@@ -895,36 +913,129 @@ def test_should_be_able_to_move_a_sub_item(
     )
 
 
-@pytest.mark.parametrize('thing_to_move', [
-    PARENT_FOLDER_ID,  # Can’t move a folder inside itself
-    CHILD_FOLDER_ID,  # Can’t move a folder which doesn’t belong to the service
+@pytest.mark.parametrize('data', [
+    # move to existing, but add new folder name given
+    {
+        'operation': 'move_to_existing_folder',
+        'templates_and_folders': [],
+        'add_new_folder_name': 'foo',
+        'move_to': PARENT_FOLDER_ID
+    },
+    # move to existing, but move to new folder name given
+    {
+        'operation': 'move_to_existing_folder',
+        'templates_and_folders': [TEMPLATE_ONE_ID],
+        'move_to_new_folder_name': 'foo',
+        'move_to': PARENT_FOLDER_ID
+    },
+    # move to new, but nothing selected to move
+    {
+        'operation': 'move_to_new_folder',
+        'templates_and_folders': [],
+        'move_to_new_folder_name': 'foo',
+        'move_to': None
+    }
 ])
-def test_should_validate_illegal_moves(
+def test_no_action_if_user_fills_in_ambiguous_fields(
     client_request,
     service_one,
     mock_get_service_templates,
     mock_get_template_folders,
     mock_move_to_template_folder,
-    thing_to_move,
+    mock_create_template_folder,
+    data,
 ):
-    service_one['permissions'] += 'edit_folders'
+    service_one['permissions'] += ['edit_folders']
 
-    FOLDER_TWO_ID = str(uuid.uuid4())
-    mock_get_template_folders.return_value = [
-        {'id': PARENT_FOLDER_ID, 'name': 'folder_one', 'parent_id': None},
-        {'id': FOLDER_TWO_ID, 'name': 'folder_two', 'parent_id': None},
-    ]
     client_request.post(
         'main.choose_template',
         service_id=SERVICE_ONE_ID,
-        _data={
-            'operation': 'move',
-            'move_to': PARENT_FOLDER_ID,
-            'templates_and_folders': [
-                thing_to_move,
-            ],
-        },
+        _data=data,
         _expected_status=200,
         _expected_redirect=None,
     )
+
     assert mock_move_to_template_folder.called is False
+    assert mock_create_template_folder.called is False
+
+
+def test_new_folder_is_created_if_only_new_folder_is_filled_out(
+    client_request,
+    service_one,
+    mock_get_service_templates,
+    mock_get_template_folders,
+    mock_move_to_template_folder,
+    mock_create_template_folder
+):
+    data = {
+        'move_to_new_folder_name': '',
+        'add_new_folder_name': 'new folder',
+        'operation': 'add_new_folder'
+    }
+
+    service_one['permissions'] += ['edit_folders']
+
+    client_request.post(
+        'main.choose_template',
+        service_id=SERVICE_ONE_ID,
+        _data=data,
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.choose_template',
+            service_id=service_one['id'],
+            template_folder_id=None,
+            _external=True,
+        ),
+    )
+
+    assert mock_move_to_template_folder.called is False
+    mock_create_template_folder.assert_called_once_with(
+        SERVICE_ONE_ID,
+        name='new folder',
+        parent_id=None
+    )
+
+
+def test_should_be_able_to_move_to_new_folder(
+    client_request,
+    service_one,
+    mock_get_service_templates,
+    mock_get_template_folders,
+    mock_move_to_template_folder,
+    mock_create_template_folder,
+):
+    service_one['permissions'] += ['edit_folders']
+    new_folder_id = mock_create_template_folder.return_value
+    FOLDER_TWO_ID = str(uuid.uuid4())
+    mock_get_template_folders.return_value = [
+        {'id': PARENT_FOLDER_ID, 'name': 'parent folder', 'parent_id': None},
+        {'id': FOLDER_TWO_ID, 'name': 'folder_two', 'parent_id': None},
+    ]
+
+    client_request.post(
+        'main.choose_template',
+        service_id=SERVICE_ONE_ID,
+        template_folder_id=None,
+        _data={
+            'operation': 'move_to_new_folder',
+            'move_to_new_folder_name': 'new folder',
+            'templates_and_folders': [
+                FOLDER_TWO_ID,
+                TEMPLATE_ONE_ID,
+            ],
+        },
+        _expected_status=302,
+        _expected_redirect=url_for('main.choose_template', service_id=SERVICE_ONE_ID, _external=True),
+    )
+
+    mock_create_template_folder.assert_called_once_with(
+        SERVICE_ONE_ID,
+        name='new folder',
+        parent_id=None
+    )
+    mock_move_to_template_folder.assert_called_once_with(
+        service_id=SERVICE_ONE_ID,
+        folder_id=new_folder_id,
+        folder_ids={FOLDER_TWO_ID},
+        template_ids={TEMPLATE_ONE_ID},
+    )

@@ -1135,6 +1135,18 @@ class TemplateFolderForm(StripWhitespaceForm):
     name = StringField('Folder name', validators=[DataRequired(message='Can’t be empty')])
 
 
+def required_for_ops(*operations):
+    operations = set(operations)
+
+    def validate(form, field):
+        if form.op not in operations and field.data:
+            # super weird
+            raise ValidationError('Must be empty')
+        if form.op in operations and not field.data:
+            raise ValidationError('Can’t be empty')
+    return validate
+
+
 class TemplateAndFoldersSelectionForm(Form):
 
     ALL_TEMPLATES_FOLDER = {
@@ -1155,6 +1167,7 @@ class TemplateAndFoldersSelectionForm(Form):
 
         self.templates_and_folders.choices = template_list.as_id_and_name
 
+        self.op = None
         self.is_move_op = self.is_add_op = False
 
         self.move_to.choices = [
@@ -1164,24 +1177,29 @@ class TemplateAndFoldersSelectionForm(Form):
         ]
 
     def validate(self):
-        op = request.form.get('operation')
+        self.op = request.form.get('operation')
 
-        self.is_move_op = op in {'move_to_existing_folder', 'move_to_new_folder'}
-        self.is_add_op = op in {'add_new_folder', 'move_to_new_folder'}
+        self.is_move_op = self.op in {'move_to_existing_folder', 'move_to_new_folder'}
+        self.is_add_op = self.op in {'add_new_folder', 'move_to_new_folder'}
 
         if not (self.is_add_op or self.is_move_op):
             return False
 
         return super().validate()
 
-    def validate_move_to(self, field):
-        if self.is_move_op and not field.data:
-            raise ValidationError('Can’t be empty')
+    def get_folder_name(self):
+        if self.op == 'add_new_folder':
+            return self.add_new_folder_name.data
+        elif self.op == 'move_to_new_folder':
+            return self.move_to_new_folder_name.data
+        return None
 
-    def validate_new_folder_name(self, field):
-        if self.is_add_op and not field.data:
-            raise ValidationError('Can’t be empty')
-
-    templates_and_folders = MultiCheckboxField('Choose templates or folders')
-    move_to = RadioFieldWithNoneOption('Choose a folder', validators=[Optional()])
-    new_folder_name = StringField('Folder name')
+    templates_and_folders = MultiCheckboxField('Choose templates or folders', validators=[
+        required_for_ops('move_to_new_folder', 'move_to_existing_folder')
+    ])
+    move_to = RadioFieldWithNoneOption('Choose a folder', validators=[
+        Optional(),
+        required_for_ops('move_to_new_folder', 'move_to_existing_folder')
+    ])
+    add_new_folder_name = StringField('Folder name', validators=[required_for_ops('add_new_folder')])
+    move_to_new_folder_name = StringField('Folder name', validators=[required_for_ops('move_to_new_folder')])

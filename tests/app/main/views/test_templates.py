@@ -16,11 +16,7 @@ from tests import (
     template_json,
     validate_route_permission,
 )
-from tests.app.main.views.test_template_folders import (
-    CHILD_FOLDER_ID,
-    PARENT_FOLDER_ID,
-    _folder,
-)
+from tests.app.main.views.test_template_folders import PARENT_FOLDER_ID, _folder
 from tests.conftest import (
     SERVICE_ONE_ID,
     SERVICE_TWO_ID,

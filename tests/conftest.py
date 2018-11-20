@@ -3255,3 +3255,8 @@ def mock_get_template_folders(mocker):
 @pytest.fixture
 def mock_move_to_template_folder(mocker):
     return mocker.patch('app.template_folder_api_client.move_to_folder')
+
+
+@pytest.fixture
+def mock_create_template_folder(mocker):
+    return mocker.patch('app.template_folder_api_client.create_template_folder', return_value=sample_uuid())
