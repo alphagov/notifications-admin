@@ -2629,7 +2629,7 @@ lincoln.gov.uk:
 lincolnshire.gov.uk:
   owner: Lincolnshire County Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 lincsbc.gov.uk:
   owner: East Lindsey District Council
   crown: false
@@ -3246,7 +3246,7 @@ northtyneside.gov.uk:
 northumberland.gov.uk:
   owner: Northumberland County Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 northwalesadoption.gov.uk:
   owner: Wrexham County Borough Council
   crown: false
