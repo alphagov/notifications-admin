@@ -367,6 +367,10 @@ class Service():
             self.get_template_folders(template_type, template_folder_id)
         )
 
+    @property
+    def count_of_templates_and_folders(self):
+        return len(self.get_template_folders_and_templates('all', None))
+
     def move_to_folder(self, ids_to_move, move_to):
 
         ids_to_move = set(ids_to_move)

@@ -121,8 +121,6 @@ def choose_template(service_id, template_type='all', template_folder_id=None):
         )
         return redirect(request.url)
 
-    templates_on_page = current_service.get_templates(template_type, template_folder_id)
-
     return render_template(
         'views/templates/choose.html',
         current_template_folder_id=template_folder_id,
@@ -130,8 +128,8 @@ def choose_template(service_id, template_type='all', template_folder_id=None):
         template_folder_path=current_service.get_template_folder_path(template_folder_id),
         template_folder_has_contents=current_service.get_template_folders_and_templates('all', template_folder_id),
         template_folders=current_service.get_template_folders(template_type, template_folder_id),
-        templates=templates_on_page,
-        show_search_box=(len(templates_on_page) > 7),
+        templates=current_service.get_templates(template_type, template_folder_id),
+        show_search_box=current_service.count_of_templates_and_folders > 7,
         show_template_nav=(
             current_service.has_multiple_template_types
             and (len(current_service.all_templates) > 2)
