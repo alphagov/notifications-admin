@@ -124,7 +124,7 @@ class Staging(Config):
     HTTP_PROTOCOL = 'https'
     HEADER_COLOUR = '#6F72AF'  # $mauve
     STATSD_ENABLED = True
-    CSV_UPLOAD_BUCKET_NAME = 'staging-notify-csv-upload'
+    CSV_UPLOAD_BUCKET_NAME = 'staging-notifications-csv-upload'
     LOGO_UPLOAD_BUCKET_NAME = 'public-logos-staging'
     MOU_BUCKET_NAME = 'staging-notify.works-mou'
     NOTIFY_ENVIRONMENT = 'staging'
