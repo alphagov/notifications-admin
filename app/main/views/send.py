@@ -543,6 +543,7 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
         db_template,
         current_service,
         show_recipient=True,
+        expand_emails=True,
         letter_preview_url=url_for(
             '.check_messages_preview',
             service_id=service_id,
@@ -853,6 +854,7 @@ def _check_notification(service_id, template_id, exception=None):
         db_template,
         current_service,
         show_recipient=True,
+        expand_emails=True,
         email_reply_to=email_reply_to,
         sms_sender=sms_sender,
         letter_preview_url=url_for(

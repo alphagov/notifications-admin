@@ -40,7 +40,15 @@
 
 .js-stick-at-bottom-when-scrolling {
 
+  $vertical-padding: $gutter * 2 / 3;
+
   transition: bottom 0.1s ease-out, box-shadow 1s ease-in-out;
+  padding: $vertical-padding 0 $vertical-padding $gutter-half;
+  margin-top: -$vertical-padding;
+
+  .page-footer {
+    margin-bottom: 0;
+  }
 
 }
 
