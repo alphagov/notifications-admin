@@ -160,7 +160,7 @@ def password(label='Password'):
 class SMSCode(StringField):
     validators = [
         DataRequired(message='Can’t be empty'),
-        Regexp(regex='^\d+$', message='Numbers only'),
+        Regexp(regex=r'^\d+$', message='Numbers only'),
         Length(min=5, message='Not enough numbers'),
         Length(max=5, message='Too many numbers'),
     ]

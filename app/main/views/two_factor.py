@@ -41,7 +41,7 @@ def two_factor_email(token):
             current_app.config['DANGEROUS_SALT'],
             current_app.config['EMAIL_2FA_EXPIRY_SECONDS']
         ))
-    except SignatureExpired as exc:
+    except SignatureExpired:
         # lets decode again, without the expiry, to get the user id out
         orig_data = json.loads(check_token(
             token,
