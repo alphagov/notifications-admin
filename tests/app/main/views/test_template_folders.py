@@ -118,6 +118,11 @@ def test_post_add_template_folder_page(client_request, service_one, mocker, pare
             ['Text message', 'Email', 'Letter'],
             [
                 'folder_one 2 folders',
+                'folder_one_one 1 template, 1 folder',
+                'folder_one_one_one 1 template',
+                'sms_template_nested Text message template',
+                'letter_template_nested Letter template',
+                'folder_one_two Empty',
                 'folder_two Empty',
                 'sms_template_one Text message template',
                 'sms_template_two Text message template',
@@ -136,6 +141,9 @@ def test_post_add_template_folder_page(client_request, service_one, mocker, pare
             ['All', 'Email', 'Letter'],
             [
                 'folder_one 1 folder',
+                'folder_one_one 1 folder',
+                'folder_one_one_one 1 template',
+                'sms_template_nested Text message template',
                 'sms_template_one Text message template',
                 'sms_template_two Text message template',
             ],
@@ -149,6 +157,9 @@ def test_post_add_template_folder_page(client_request, service_one, mocker, pare
             ['Text message', 'Email', 'Letter'],
             [
                 'folder_one_one 1 template, 1 folder',
+                'folder_one_one_one 1 template',
+                'sms_template_nested Text message template',
+                'letter_template_nested Letter template',
                 'folder_one_two Empty',
             ],
             None,
@@ -161,6 +172,8 @@ def test_post_add_template_folder_page(client_request, service_one, mocker, pare
             ['All', 'Email', 'Letter'],
             [
                 'folder_one_one 1 folder',
+                'folder_one_one_one 1 template',
+                'sms_template_nested Text message template',
             ],
             None,
         ),
@@ -181,6 +194,7 @@ def test_post_add_template_folder_page(client_request, service_one, mocker, pare
             ['Text message', 'Email', 'Letter'],
             [
                 'folder_one_one_one 1 template',
+                'sms_template_nested Text message template',
                 'letter_template_nested Letter template',
             ],
             None,
@@ -282,7 +296,6 @@ def test_should_show_templates_folder_page(
         assert links_in_page[index].text.strip() == expected_link
 
     page_items = page.select('.template-list-item')
-
     assert len(page_items) == len(expected_items)
 
     for index, expected_item in enumerate(expected_items):

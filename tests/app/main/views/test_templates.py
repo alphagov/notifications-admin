@@ -470,7 +470,7 @@ def test_should_show_live_search_if_service_has_lots_of_folders(
     count_of_templates = count_of_templates_and_folders - count_of_folders
 
     assert len(page.select('.live-search')) == 1
-    assert count_of_folders == 1
+    assert count_of_folders == 4
     assert count_of_templates == 4
 
 
