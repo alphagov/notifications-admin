@@ -12,7 +12,7 @@
 {% else %}
   <nav id=template-list>
     {% for item in template_list %}
-      <div class="template-list-item {% if can_manage_folders %}template-list-item-with-checkbox{% endif %}">
+      <div class="template-list-item {% if can_manage_folders %}template-list-item-with-checkbox{% endif %} {% if item.ancestors %}template-list-item-hidden-by-default{% endif %}">
         {% if can_manage_folders %}
           {{ unlabelled_checkbox(
             id='templates-or-folder-{}'.format(item.id),
@@ -20,17 +20,22 @@
             value=item.id,
           ) }}
         {% endif %}
-        {% if item.is_folder %}
-          <h2 class="message-name template-list-folder">
+        <h2 class="message-name {% if item.is_folder or (item.ancestors and not item.is_folder) %}template-list-folder{% endif %}">
+          {% for ancestor in item.ancestors %}
+            <a href="{{ url_for('.choose_template', service_id=current_service.id, template_type=template_type, template_folder_id=ancestor.id) }}">
+              {{ ancestor.name }}
+            </a> <span class="message-name-separator">/</span>
+          {% endfor %}
+          {% if item.is_folder %}
             <a href="{{ url_for('.choose_template', service_id=current_service.id, template_type=template_type, template_folder_id=item.id) }}">
               {{ item.name }}
             </a>
-          </h2>
-        {% else %}
-          <h2 class="message-name">
-            <a href="{{ url_for('.view_template', service_id=current_service.id, template_id=item.id) }}">{{ item.name }}</a>
-          </h2>
-        {% endif %}
+          {% else %}
+            <a href="{{ url_for('.view_template', service_id=current_service.id, template_id=item.id) }}">
+              {{ item.name }}
+            </a>
+          {% endif %}
+        </h2>
         <p class="message-type">
           {{ item.hint }}
         </p>
