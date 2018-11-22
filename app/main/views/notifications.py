@@ -65,6 +65,7 @@ def view_notification(service_id, notification_id):
             notification_id=notification_id,
             filetype='png',
         ),
+        expand_emails=True,
         page_count=page_count,
         show_recipient=True,
         redact_missing_personalisation=True,
