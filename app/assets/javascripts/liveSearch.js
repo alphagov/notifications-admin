@@ -11,6 +11,11 @@
 
       let content = $(this).text();
 
+      if (query == '') {
+        $(this).css('display', '');
+        return;
+      }
+
       $(this).toggle(
         normalize(content).indexOf(normalize(query)) > -1
       );
