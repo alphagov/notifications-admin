@@ -4659,7 +4659,7 @@ towcester-tc.gov.uk:
 towerhamlets.gov.uk:
   owner: Tower Hamlets London Borough Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 towynkinmelbay-tc.gov.uk:
   owner: Towyn and Kinmel Bay Town Council
   crown: false
