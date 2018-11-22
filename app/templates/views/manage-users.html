@@ -33,7 +33,7 @@
   <div class="user-list">
     {% for user in users %}
       <div class="user-list-item">
-        <h3>
+        <h3 title="{{ user.email_address }}">
           {%- if user.name -%}
             <span class="heading-small">{{ user.name }}</span>&ensp;
           {%- endif -%}

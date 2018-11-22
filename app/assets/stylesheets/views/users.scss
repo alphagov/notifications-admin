@@ -11,6 +11,19 @@ $item-top-padding: $gutter-half;
     border-top: 1px solid $border-colour;
     position: relative;
 
+    h3 {
+
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: $secondary-text-colour;  // So the ellipsis is grey
+
+      .heading-small {
+        color: $black;
+      }
+
+    }
+
     &:last-child {
       border-bottom: 1px solid $border-colour;
     }
