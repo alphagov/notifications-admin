@@ -3494,11 +3494,8 @@ pkc.gov.uk:
 plymouth.gov.uk:
   owner: Plymouth City Council
   crown: false
-  agreement_signed: false
-plymouthmuseum.gov.uk:
-  owner: Plymouth City Council
-  crown: false
-  agreement_signed: false
+  agreement_signed: true
+plymouthmuseum.gov.uk: plymouth.gov.uk
 pocklington.gov.uk:
   owner: Pocklington Town Council
   crown: false
