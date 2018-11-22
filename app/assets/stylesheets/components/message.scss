@@ -5,7 +5,7 @@
     margin: 0;
 
     a {
-      display: inline-block;
+      display: inline;
       margin-bottom: -$gutter;
       padding-bottom: $gutter;
     }
@@ -57,6 +57,7 @@
   &-folder {
 
     a:first-child {
+      display: inline-block;
       text-indent: 40px;
       background-image: file-url('folder-blue-bold.svg');
       background-repeat: no-repeat;
