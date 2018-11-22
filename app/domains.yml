@@ -2374,7 +2374,7 @@ internalauditscotland.gov.uk:
 inverclyde.gov.uk:
   owner: Inverclyde Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 iow.gov.uk:
   owner: Isle of Wight Council
   crown: false
