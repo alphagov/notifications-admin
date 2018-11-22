@@ -107,6 +107,7 @@ def test_post_add_template_folder_page(client_request, service_one, mocker, pare
         'extra_args,'
         'expected_nav_links,'
         'expected_items, '
+        'expected_displayed_items, '
         'expected_empty_message '
     ),
     [
@@ -131,6 +132,16 @@ def test_post_add_template_folder_page(client_request, service_one, mocker, pare
                 'letter_template_one Letter template',
                 'letter_template_two Letter template',
             ],
+            [
+                'folder_one 2 folders',
+                'folder_two Empty',
+                'sms_template_one Text message template',
+                'sms_template_two Text message template',
+                'email_template_one Email template',
+                'email_template_two Email template',
+                'letter_template_one Letter template',
+                'letter_template_two Letter template',
+            ],
             None,
         ),
         (
@@ -144,6 +155,11 @@ def test_post_add_template_folder_page(client_request, service_one, mocker, pare
                 'folder_one / folder_one_one 1 folder',
                 'folder_one / folder_one_one / folder_one_one_one 1 template',
                 'folder_one / folder_one_one / folder_one_one_one / sms_template_nested Text message template',
+                'sms_template_one Text message template',
+                'sms_template_two Text message template',
+            ],
+            [
+                'folder_one 1 folder',
                 'sms_template_one Text message template',
                 'sms_template_two Text message template',
             ],
@@ -162,6 +178,10 @@ def test_post_add_template_folder_page(client_request, service_one, mocker, pare
                 'folder_one_one / letter_template_nested Letter template',
                 'folder_one_two Empty',
             ],
+            [
+                'folder_one_one 1 template, 1 folder',
+                'folder_one_two Empty',
+            ],
             None,
         ),
         (
@@ -175,6 +195,9 @@ def test_post_add_template_folder_page(client_request, service_one, mocker, pare
                 'folder_one_one / folder_one_one_one 1 template',
                 'folder_one_one / folder_one_one_one / sms_template_nested Text message template',
             ],
+            [
+                'folder_one_one 1 folder',
+            ],
             None,
         ),
         (
@@ -183,6 +206,7 @@ def test_post_add_template_folder_page(client_request, service_one, mocker, pare
             {'template_type': 'email'},
             {'template_type': 'email', 'template_folder_id': PARENT_FOLDER_ID},
             ['All', 'Text message', 'Letter'],
+            [],
             [],
             'There are no email templates in this folder',
         ),
@@ -197,6 +221,10 @@ def test_post_add_template_folder_page(client_request, service_one, mocker, pare
                 'folder_one_one_one / sms_template_nested Text message template',
                 'letter_template_nested Letter template',
             ],
+            [
+                'folder_one_one_one 1 template',
+                'letter_template_nested Letter template',
+            ],
             None,
         ),
         (
@@ -205,6 +233,9 @@ def test_post_add_template_folder_page(client_request, service_one, mocker, pare
             {'template_type': 'all', 'template_folder_id': CHILD_FOLDER_ID},
             {'template_folder_id': GRANDCHILD_FOLDER_ID},
             ['Text message', 'Email', 'Letter'],
+            [
+                'sms_template_nested Text message template',
+            ],
             [
                 'sms_template_nested Text message template',
             ],
@@ -217,6 +248,7 @@ def test_post_add_template_folder_page(client_request, service_one, mocker, pare
             {'template_folder_id': FOLDER_TWO_ID},
             ['Text message', 'Email', 'Letter'],
             [],
+            [],
             'This folder is empty',
         ),
         (
@@ -225,6 +257,7 @@ def test_post_add_template_folder_page(client_request, service_one, mocker, pare
             {'template_type': 'sms'},
             {'template_folder_id': FOLDER_TWO_ID, 'template_type': 'sms'},
             ['All', 'Email', 'Letter'],
+            [],
             [],
             'This folder is empty',
         ),
@@ -243,6 +276,7 @@ def test_should_show_templates_folder_page(
     extra_args,
     expected_nav_links,
     expected_items,
+    expected_displayed_items,
     expected_empty_message,
 ):
     mock_get_template_folders.return_value = [
@@ -295,11 +329,22 @@ def test_should_show_templates_folder_page(
     for index, expected_link in enumerate(expected_nav_links):
         assert links_in_page[index].text.strip() == expected_link
 
-    page_items = page.select('.template-list-item')
-    assert len(page_items) == len(expected_items)
+    all_page_items = page.select('.template-list-item')
+    assert len(all_page_items) == len(expected_items)
 
     for index, expected_item in enumerate(expected_items):
-        assert normalize_spaces(page_items[index].text) == expected_item
+        assert normalize_spaces(all_page_items[index].text) == expected_item
+
+    displayed_page_items = page.find_all(lambda tag: (
+        tag.has_attr('class')
+        and 'template-list-item' in tag['class']
+        and 'template-list-item-hidden-by-default' not in tag['class']
+    ))
+    assert len(displayed_page_items) == len(expected_displayed_items)
+
+    for index, expected_item in enumerate(expected_displayed_items):
+        assert '/' not in expected_item  # Yo dawg I heard you like tests…
+        assert normalize_spaces(displayed_page_items[index].text) == expected_item
 
     if expected_empty_message:
         assert normalize_spaces(page.select_one('.template-list-empty').text) == (
