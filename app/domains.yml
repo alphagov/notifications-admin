@@ -4659,7 +4659,7 @@ towcester-tc.gov.uk:
 towerhamlets.gov.uk:
   owner: Tower Hamlets London Borough Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 towynkinmelbay-tc.gov.uk:
   owner: Towyn and Kinmel Bay Town Council
   crown: false
@@ -5070,6 +5070,10 @@ wixford-pc.gov.uk:
   owner: Stratford-on-Avon District Council
   crown: false
   agreement_signed: false
+wmfs.net:
+  owner: West Midlands Fire Service
+  crown: false
+  agreement_signed: true
 woking.gov.uk:
   owner: Woking Borough Council
   crown: false
