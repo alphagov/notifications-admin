@@ -28,11 +28,11 @@
           {% endfor %}
           {% if item.is_folder %}
             <a href="{{ url_for('.choose_template', service_id=current_service.id, template_type=template_type, template_folder_id=item.id) }}">
-              {{ item.name }}
+              <span class="live-search-relevant">{{ item.name }}</span>
             </a>
           {% else %}
             <a href="{{ url_for('.view_template', service_id=current_service.id, template_id=item.id) }}">
-              {{ item.name }}
+              <span class="live-search-relevant">{{ item.name }}</span>
             </a>
           {% endif %}
         </h2>
