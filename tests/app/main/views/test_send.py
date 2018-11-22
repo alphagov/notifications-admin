@@ -2803,7 +2803,7 @@ def test_one_off_letters_have_download_link(
         template_id=fake_uuid,
         filetype='pdf',
     )
-    assert page.select_one('a[download]').text == 'Download as a printable PDF'
+    assert page.select_one('a[download]').text == 'Download as a PDF'
 
 
 def test_send_one_off_letter_errors_in_trial_mode(
@@ -2848,7 +2848,7 @@ def test_send_one_off_letter_errors_in_trial_mode(
 
     assert not page.select('[type=submit]')
     assert page.select_one('.page-footer-back-link').text == 'Back'
-    assert page.select_one('a[download]').text == 'Download as a printable PDF'
+    assert page.select_one('a[download]').text == 'Download as a PDF'
 
 
 def test_check_messages_shows_over_max_row_error(
