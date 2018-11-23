@@ -45,6 +45,10 @@ class TemplateList():
             )
 
     @property
+    def as_id_and_name(self):
+        return [(item.id, item.name) for item in self]
+
+    @property
     def templates_to_show(self):
         return any(self)
 

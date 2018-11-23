@@ -365,6 +365,40 @@ def test_should_post_move_to_api(
     )
 
 
+def test_should_be_able_to_move_a_sub_item(
+    client_request,
+    service_one,
+    fake_uuid,
+    mock_get_service_templates,
+    mock_get_template_folders,
+    mock_move_to_template_folder,
+):
+    service_one['permissions'] += ['edit_folders']
+    GRANDCHILD_FOLDER_ID = str(uuid.uuid4())
+    mock_get_template_folders.return_value = [
+        {'id': PARENT_FOLDER_ID, 'name': 'folder_one', 'parent_id': None},
+        {'id': CHILD_FOLDER_ID, 'name': 'folder_one_one', 'parent_id': PARENT_FOLDER_ID},
+        {'id': GRANDCHILD_FOLDER_ID, 'name': 'folder_one_one_one', 'parent_id': CHILD_FOLDER_ID},
+    ]
+    client_request.post(
+        'main.choose_template',
+        service_id=SERVICE_ONE_ID,
+        template_folder_id=PARENT_FOLDER_ID,
+        _data={
+            'operation': 'move',
+            'move_to': 'None',
+            'templates_and_folders': [GRANDCHILD_FOLDER_ID],
+        },
+        _expected_status=302,
+    )
+    mock_move_to_template_folder.assert_called_once_with(
+        service_id=SERVICE_ONE_ID,
+        folder_id=None,
+        folder_ids={GRANDCHILD_FOLDER_ID},
+        template_ids=set(),
+    )
+
+
 @pytest.mark.parametrize('thing_to_move', [
     PARENT_FOLDER_ID,  # Can’t move a folder inside itself
     CHILD_FOLDER_ID,  # Can’t move a folder which doesn’t belong to the service

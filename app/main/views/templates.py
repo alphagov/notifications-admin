@@ -109,8 +109,11 @@ def start_tour(service_id, template_id):
 @user_has_permissions()
 def choose_template(service_id, template_type='all', template_folder_id=None):
 
+    template_list = TemplateList(current_service, template_type, template_folder_id)
+
     templates_and_folders_form = TemplateAndFoldersSelectionForm(
-        service=current_service,
+        all_template_folders=current_service.all_template_folders,
+        template_list=template_list,
         template_type=template_type,
         current_folder_id=template_folder_id,
     )
@@ -127,7 +130,7 @@ def choose_template(service_id, template_type='all', template_folder_id=None):
         current_template_folder_id=template_folder_id,
         can_manage_folders=can_manage_folders(),
         template_folder_path=current_service.get_template_folder_path(template_folder_id),
-        template_list=TemplateList(current_service, template_type, template_folder_id),
+        template_list=template_list,
         show_search_box=current_service.count_of_templates_and_folders > 7,
         show_template_nav=(
             current_service.has_multiple_template_types
