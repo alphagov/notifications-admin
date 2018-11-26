@@ -338,12 +338,14 @@ def get_current_financial_year():
     return current_year if current_month > 3 else current_year - 1
 
 
-def get_time_left(created_at):
+def get_time_left(created_at, service_data_retention_days=7):
     return ago.human(
         (
-            datetime.now(timezone.utc).replace(hour=23, minute=59, second=59)
+            datetime.now(timezone.utc)
         ) - (
-            dateutil.parser.parse(created_at) + timedelta(days=8)
+            dateutil.parser.parse(created_at).replace(hour=0, minute=0, second=0) + timedelta(
+                days=service_data_retention_days + 1
+            )
         ),
         future_tense='Data available for {}',
         past_tense='Data no longer available',  # No-one should ever see this

@@ -399,6 +399,9 @@ def get_job_partials(job, template):
             counts=_get_job_counts(job),
             status=filter_args['status']
         )
+    service_data_retention_days = service_api_client.get_service_data_retention_by_notification_type(
+        current_service.id, template['template_type']
+    ).get('days_of_retention', current_app.config['ACTIVITY_STATS_LIMIT_DAYS'])
 
     return {
         'counts': counts,
@@ -415,7 +418,7 @@ def get_job_partials(job, template):
                 job_id=job['id'],
                 status=request.args.get('status')
             ),
-            time_left=get_time_left(job['created_at']),
+            time_left=get_time_left(job['created_at'], service_data_retention_days=service_data_retention_days),
             job=job,
             template=template,
             template_version=job['template_version'],
