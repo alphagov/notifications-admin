@@ -52,6 +52,22 @@
       display: none;
     }
 
+    &-without-ancestors {
+
+      .message-name {
+
+        a {
+          display: block;
+
+          &:first-child {
+            display: block;
+          }
+        }
+
+      }
+
+    }
+
   }
 
   &-folder {
