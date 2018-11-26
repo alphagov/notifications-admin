@@ -9,7 +9,12 @@
 
     $targets.each(function() {
 
-      let content = $(this).text();
+      let content = $('.live-search-relevant', this).text() || $(this).text();
+
+      if (query == '') {
+        $(this).css('display', '');
+        return;
+      }
 
       $(this).toggle(
         normalize(content).indexOf(normalize(query)) > -1

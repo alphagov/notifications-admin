@@ -29,6 +29,7 @@ from app.main.forms import (
 )
 from app.main.views.send import get_example_csv_rows, get_sender_details
 from app.models.service import Service
+from app.models.template_list import TemplateList
 from app.template_previews import TemplatePreview, get_page_count_for_letter
 from app.utils import (
     email_or_sms_not_enabled,
@@ -108,8 +109,11 @@ def start_tour(service_id, template_id):
 @user_has_permissions()
 def choose_template(service_id, template_type='all', template_folder_id=None):
 
+    template_list = TemplateList(current_service, template_type, template_folder_id)
+
     templates_and_folders_form = TemplateAndFoldersSelectionForm(
-        service=current_service,
+        all_template_folders=current_service.all_template_folders,
+        template_list=template_list,
         template_type=template_type,
         current_folder_id=template_folder_id,
     )
@@ -126,9 +130,7 @@ def choose_template(service_id, template_type='all', template_folder_id=None):
         current_template_folder_id=template_folder_id,
         can_manage_folders=can_manage_folders(),
         template_folder_path=current_service.get_template_folder_path(template_folder_id),
-        template_folder_has_contents=current_service.get_template_folders_and_templates('all', template_folder_id),
-        template_folders=current_service.get_template_folders(template_type, template_folder_id),
-        templates=current_service.get_templates(template_type, template_folder_id),
+        template_list=template_list,
         show_search_box=current_service.count_of_templates_and_folders > 7,
         show_template_nav=(
             current_service.has_multiple_template_types

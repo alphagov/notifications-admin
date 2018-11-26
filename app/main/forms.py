@@ -1143,8 +1143,8 @@ class TemplateAndFoldersSelectionForm(Form):
 
     def __init__(
         self,
-        service,
-        template_type,
+        all_template_folders,
+        template_list,
         current_folder_id,
         *args,
         **kwargs
@@ -1152,20 +1152,12 @@ class TemplateAndFoldersSelectionForm(Form):
 
         super().__init__(*args, **kwargs)
 
-        self.templates_and_folders.choices = self.ids_and_names(
-            service.get_template_folders_and_templates(template_type, current_folder_id)
-        )
+        self.templates_and_folders.choices = template_list.as_id_and_name
 
-        self.move_to.choices = self.ids_and_names(
-            [self.ALL_TEMPLATES_FOLDER] + service.all_template_folders,
-            exclude=current_folder_id,
-        )
-
-    @staticmethod
-    def ids_and_names(items, exclude=None):
-        return [
-            (item['id'], item['name']) for item in items
-            if item['id'] != str(exclude)
+        self.move_to.choices = [
+            (item['id'], item['name'])
+            for item in ([self.ALL_TEMPLATES_FOLDER] + all_template_folders)
+            if item['id'] != str(current_folder_id)
         ]
 
     templates_and_folders = MultiCheckboxField('Choose templates or folders')
