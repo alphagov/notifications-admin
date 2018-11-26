@@ -216,7 +216,7 @@ def test_should_show_overview_for_service_with_more_things_set(
 
 
 def test_if_cant_send_letters_then_cant_see_postage(
-    logged_in_platform_admin_client,
+    client_request,
     service_one,
     single_reply_to_email_address,
     single_letter_contact_block,
@@ -224,8 +224,7 @@ def test_if_cant_send_letters_then_cant_see_postage(
     single_sms_sender,
     mock_get_service_settings_page_common,
 ):
-    response = logged_in_platform_admin_client.get(url_for('main.service_settings', service_id=SERVICE_ONE_ID))
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    page = client_request.get('main.service_settings', service_id=SERVICE_ONE_ID)
 
     letter_table = page.find_all('table')[3]
     rows = letter_table.find_all('tr')
@@ -2148,35 +2147,42 @@ def test_set_letter_branding_saves(
     mock_update_service.assert_called_once_with(service_one['id'], dvla_organisation='500')
 
 
-def test_set_postage_platform_admin_only(
-    logged_in_client,
-    service_one,
+def test_set_postage_only_for_letter_services(
+    client_request,
 ):
-    response = logged_in_client.get(url_for('main.service_set_postage', service_id=SERVICE_ONE_ID))
-    assert response.status_code == 403
+    client_request.get(
+        'main.service_set_postage',
+        service_id=SERVICE_ONE_ID,
+        _expected_status=404,
+    )
 
 
 def test_set_postage_prepopulates(
-    logged_in_platform_admin_client,
+    client_request,
     service_one,
 ):
-    response = logged_in_platform_admin_client.get(url_for('main.service_set_postage', service_id=SERVICE_ONE_ID))
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    service_one['permissions'] += ['letter']
+    page = client_request.get('main.service_set_postage', service_id=SERVICE_ONE_ID)
     assert page.select('input[checked]')[0]['value'] == 'second'
 
 
 def test_set_postage_saves(
-    logged_in_platform_admin_client,
+    client_request,
     service_one,
     mock_update_service,
 ):
-    response = logged_in_platform_admin_client.post(
-        url_for('main.service_set_postage', service_id=SERVICE_ONE_ID),
-        data={'postage': 'first'}
+    service_one['permissions'] += ['letter']
+    client_request.post(
+        'main.service_set_postage',
+        service_id=SERVICE_ONE_ID,
+        _data={'postage': 'first'},
+        _expected_status=302,
+        expected_redirect=url_for(
+            'main.service_settings',
+            service_id=SERVICE_ONE_ID,
+            _external=True,
+        )
     )
-    assert response.status_code == 302
-    assert response.location == url_for('main.service_settings', service_id=SERVICE_ONE_ID, _external=True)
     mock_update_service.assert_called_once_with(SERVICE_ONE_ID, postage='first')
 
 
