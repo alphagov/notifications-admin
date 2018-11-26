@@ -35,6 +35,7 @@ from notifications_utils.recipients import (
 )
 from notifications_utils.formatters import formatted_list
 from notifications_utils.sanitise_text import SanitiseASCII
+from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
 from werkzeug.exceptions import abort, HTTPException as WerkzeugHTTPException
 from werkzeug.local import LocalProxy
 
@@ -69,7 +70,7 @@ from app.notify_client.complaint_api_client import complaint_api_client
 from app.notify_client.platform_stats_api_client import platform_stats_api_client
 from app.notify_client.template_folder_api_client import template_folder_api_client
 from app.commands import setup_commands
-from app.utils import get_cdn_domain, gmt_timezones, id_safe
+from app.utils import get_cdn_domain, id_safe
 
 login_manager = LoginManager()
 csrf = CSRFProtect()
@@ -256,17 +257,17 @@ def format_datetime_numeric(date):
 
 
 def format_date_numeric(date):
-    return gmt_timezones(date).strftime('%Y-%m-%d')
+    return utc_string_to_aware_gmt_datetime(date).strftime('%Y-%m-%d')
 
 
 def format_time_24h(date):
-    return gmt_timezones(date).strftime('%H:%M')
+    return utc_string_to_aware_gmt_datetime(date).strftime('%H:%M')
 
 
 def get_human_day(time):
 
     #  Add 1 minute to transform 00:00 into ‘midnight today’ instead of ‘midnight tomorrow’
-    date = (gmt_timezones(time) - timedelta(minutes=1)).date()
+    date = (utc_string_to_aware_gmt_datetime(time) - timedelta(minutes=1)).date()
     if date == (datetime.utcnow() + timedelta(days=1)).date():
         return 'tomorrow'
     if date == datetime.utcnow().date():
@@ -281,21 +282,21 @@ def format_time(date):
         '12:00AM': 'Midnight',
         '12:00PM': 'Midday'
     }.get(
-        gmt_timezones(date).strftime('%-I:%M%p'),
-        gmt_timezones(date).strftime('%-I:%M%p')
+        utc_string_to_aware_gmt_datetime(date).strftime('%-I:%M%p'),
+        utc_string_to_aware_gmt_datetime(date).strftime('%-I:%M%p')
     ).lower()
 
 
 def format_date(date):
-    return gmt_timezones(date).strftime('%A %d %B %Y')
+    return utc_string_to_aware_gmt_datetime(date).strftime('%A %d %B %Y')
 
 
 def format_date_normal(date):
-    return gmt_timezones(date).strftime('%d %B %Y').lstrip('0')
+    return utc_string_to_aware_gmt_datetime(date).strftime('%d %B %Y').lstrip('0')
 
 
 def format_date_short(date):
-    return _format_datetime_short(gmt_timezones(date))
+    return _format_datetime_short(utc_string_to_aware_gmt_datetime(date))
 
 
 def _format_datetime_short(datetime):
@@ -306,7 +307,7 @@ def format_delta(date):
     delta = (
         datetime.now(timezone.utc)
     ) - (
-        gmt_timezones(date)
+        utc_string_to_aware_gmt_datetime(date)
     )
     if delta < timedelta(seconds=30):
         return "just now"

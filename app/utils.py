@@ -12,7 +12,6 @@ from urllib.parse import urlparse
 import ago
 import dateutil
 import pyexcel
-import pytz
 import yaml
 from flask import (
     Markup,
@@ -353,12 +352,6 @@ def get_time_left(created_at):
 
 def email_or_sms_not_enabled(template_type, permissions):
     return (template_type in ['email', 'sms']) and (template_type not in permissions)
-
-
-def gmt_timezones(date):
-    date = dateutil.parser.parse(date)
-    forced_utc = date.replace(tzinfo=pytz.utc)
-    return forced_utc.astimezone(pytz.timezone('Europe/London'))
 
 
 def get_cdn_domain():
