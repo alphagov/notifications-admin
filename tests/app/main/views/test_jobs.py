@@ -221,6 +221,29 @@ def test_should_show_page_for_one_job(
     )
 
 
+@freeze_time("2016-01-01 11:09:00.061258")
+def test_should_show_page_for_one_job_with_flexible_data_retention(
+    client_request,
+    active_user_with_permissions,
+    mock_get_service_template,
+    mock_get_job,
+    mocker,
+    mock_get_notifications,
+    mock_get_service_data_retention_by_notification_type,
+    fake_uuid,
+):
+
+    mock_get_service_data_retention_by_notification_type.side_effect = [{"days_of_retention": 10}]
+    page = client_request.get(
+        'main.view_job',
+        service_id=SERVICE_ONE_ID,
+        job_id=fake_uuid,
+        status='delivered'
+    )
+
+    assert page.find('span', {'id': 'time-left'}).text == 'Data available for 10 days'
+
+
 def test_get_jobs_should_tell_user_if_more_than_one_page(
     logged_in_client,
     fake_uuid,
