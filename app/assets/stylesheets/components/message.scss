@@ -8,6 +8,20 @@
       display: inline;
       margin-bottom: -$gutter;
       padding-bottom: $gutter;
+
+      &:focus {
+
+        // Use box shadow instead of outline to avoid buggy outline
+        // rendering in Firefox
+        outline: none;
+        box-shadow: 0 0 0 3px $yellow;
+
+        @include ie-lte(8) {
+          // Box shadow is not supported in IE8
+          outline: 3px solid $yellow;
+        }
+
+      }
     }
 
     &-separator {
