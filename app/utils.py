@@ -2,7 +2,7 @@ import csv
 import os
 import re
 import unicodedata
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, time, timedelta, timezone
 from functools import wraps
 from io import StringIO
 from itertools import chain
@@ -33,6 +33,7 @@ from notifications_utils.template import (
     LetterPreviewTemplate,
     SMSPreviewTemplate,
 )
+from notifications_utils.timezones import convert_utc_to_bst
 from orderedset._orderedset import OrderedSet
 from werkzeug.datastructures import MultiDict
 
@@ -643,3 +644,13 @@ def get_default_sms_sender(sms_senders):
         Field(x['sms_sender'], html='escape')
         for x in sms_senders if x['is_default']
     ), "None"))
+
+
+def printing_today_or_tomorrow():
+    now_utc = datetime.utcnow()
+    now_bst = convert_utc_to_bst(now_utc)
+
+    if now_bst.time() < time(17, 30):
+        return 'today'
+    else:
+        return 'tomorrow'

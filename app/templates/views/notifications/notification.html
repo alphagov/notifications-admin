@@ -19,14 +19,16 @@
       Provided as PDF, sent
       {% else %}
         {% if help %}
-          {{ template.name }}
+          ‘{{ template.name }}’
         {% else %}
-          <a href="{{ url_for('.view_template', service_id=current_service.id, template_id=template.id) }}">{{ template.name }}</a>
+          <a href="{{ url_for('.view_template', service_id=current_service.id, template_id=template.id) }}">‘{{ template.name }}’</a>
         {% endif %}
-        sent
+        was sent
       {% endif %}
       {% if job and job.original_file_name != 'Report' %}
-        from
+        {% set destination =
+          {'letter': 'an address', 'email': 'an email address', 'sms': 'a phone number'} %}
+        to {{ destination[template.template_type] }} from
         <a href="{{ url_for('.view_job', service_id=current_service.id, job_id=job.id) }}">{{ job.original_file_name }}</a>
       {% elif created_by %}
         by {{ created_by.name }}
@@ -45,6 +47,9 @@
           (letter has content outside the printable area)
         </p>
       {% else %}
+        <p>
+          {{ letter_print_day }}
+        </p>
         <p>
           Postage: {{ postage }} class
         </p>

@@ -32,6 +32,7 @@ from app.utils import (
     get_page_from_request,
     get_time_left,
     parse_filter_args,
+    printing_today_or_tomorrow,
     set_status_filters,
     user_has_permissions,
 )
@@ -108,7 +109,8 @@ def view_job(service_id, job_id):
         just_sent=bool(
             request.args.get('just_sent') == 'yes' and
             template['template_type'] == 'letter'
-        )
+        ),
+        printing_day=printing_today_or_tomorrow()
     )
 
 
