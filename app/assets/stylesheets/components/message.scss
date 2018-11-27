@@ -5,9 +5,31 @@
     margin: 0;
 
     a {
-      display: block;
+      display: inline;
       margin-bottom: -$gutter;
       padding-bottom: $gutter;
+
+      &:focus {
+
+        // Use box shadow instead of outline to avoid buggy outline
+        // rendering in Firefox
+        outline: none;
+        box-shadow: 0 0 0 3px $yellow;
+
+        @include ie-lte(8) {
+          // Box shadow is not supported in IE8
+          outline: 3px solid $yellow;
+        }
+
+      }
+    }
+
+    &-separator {
+      display: inline-block;
+      vertical-align: top;
+      color: $secondary-text-colour;
+      padding: 0 4px 0 5px;
+      font-weight: normal;
     }
 
   }
@@ -40,11 +62,32 @@
 
     }
 
+    &-hidden-by-default {
+      display: none;
+    }
+
+    &-without-ancestors {
+
+      .message-name {
+
+        a {
+          display: block;
+
+          &:first-child {
+            display: block;
+          }
+        }
+
+      }
+
+    }
+
   }
 
   &-folder {
 
-    a {
+    a:first-child {
+      display: inline-block;
       text-indent: 40px;
       background-image: file-url('folder-blue-bold.svg');
       background-repeat: no-repeat;

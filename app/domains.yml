@@ -2374,7 +2374,7 @@ internalauditscotland.gov.uk:
 inverclyde.gov.uk:
   owner: Inverclyde Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 iow.gov.uk:
   owner: Isle of Wight Council
   crown: false
@@ -2629,7 +2629,7 @@ lincoln.gov.uk:
 lincolnshire.gov.uk:
   owner: Lincolnshire County Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 lincsbc.gov.uk:
   owner: East Lindsey District Council
   crown: false
@@ -3246,7 +3246,7 @@ northtyneside.gov.uk:
 northumberland.gov.uk:
   owner: Northumberland County Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 northwalesadoption.gov.uk:
   owner: Wrexham County Borough Council
   crown: false
@@ -3494,11 +3494,8 @@ pkc.gov.uk:
 plymouth.gov.uk:
   owner: Plymouth City Council
   crown: false
-  agreement_signed: false
-plymouthmuseum.gov.uk:
-  owner: Plymouth City Council
-  crown: false
-  agreement_signed: false
+  agreement_signed: true
+plymouthmuseum.gov.uk: plymouth.gov.uk
 pocklington.gov.uk:
   owner: Pocklington Town Council
   crown: false
@@ -4659,7 +4656,7 @@ towcester-tc.gov.uk:
 towerhamlets.gov.uk:
   owner: Tower Hamlets London Borough Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 towynkinmelbay-tc.gov.uk:
   owner: Towyn and Kinmel Bay Town Council
   crown: false
@@ -5070,6 +5067,10 @@ wixford-pc.gov.uk:
   owner: Stratford-on-Avon District Council
   crown: false
   agreement_signed: false
+wmfs.net:
+  owner: West Midlands Fire Service
+  crown: false
+  agreement_signed: true
 woking.gov.uk:
   owner: Woking Borough Council
   crown: false

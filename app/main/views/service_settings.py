@@ -552,8 +552,12 @@ def service_set_letters(service_id):
 
 @main.route("/services/<service_id>/service-settings/set-postage", methods=['GET', 'POST'])
 @login_required
-@user_is_platform_admin
+@user_has_permissions('manage_service')
 def service_set_postage(service_id):
+
+    if not current_service.has_permission('letter'):
+        abort(404)
+
     form = ServicePostageForm(postage=current_service.postage)
 
     if form.validate_on_submit():

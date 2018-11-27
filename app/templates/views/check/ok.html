@@ -39,7 +39,7 @@
       {% if template.template_type != 'letter' or not request.args.from_test %}
       <button type="submit" class="button">Send {{ count_of_recipients }} {{ message_count_label(count_of_recipients, template.template_type, suffix='') }}</button>
       {% else %}
-        <a href="{{ url_for('main.check_messages_preview', service_id=current_service.id, template_id=template.id, upload_id=upload_id, filetype='pdf') }}" download class="button">Download as a printable PDF</a>
+        <a href="{{ url_for('main.check_messages_preview', service_id=current_service.id, template_id=template.id, upload_id=upload_id, filetype='pdf') }}" download class="button">Download as a PDF</a>
       {% endif %}
       <a href="{{ back_link }}" class="page-footer-back-link">Back</a>
     </form>

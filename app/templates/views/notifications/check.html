@@ -65,7 +65,7 @@
       {% endif %}
       <a href="{{ back_link }}" class="page-footer-back-link">Back</a>
       {% if template.template_type == 'letter' %}
-        <a href="{{ url_for('main.check_notification_preview', service_id=current_service.id, template_id=template.id, filetype='pdf') }}" download class="page-footer-right-aligned-link">Download as a printable PDF</a>
+        <a href="{{ url_for('main.check_notification_preview', service_id=current_service.id, template_id=template.id, filetype='pdf') }}" download class="page-footer-right-aligned-link">Download as a PDF</a>
       {% endif %}
     </form>
   </div>

@@ -29,6 +29,7 @@ from app.main.forms import (
 )
 from app.main.views.send import get_example_csv_rows, get_sender_details
 from app.models.service import Service
+from app.models.template_list import TemplateList
 from app.template_previews import TemplatePreview, get_page_count_for_letter
 from app.utils import (
     email_or_sms_not_enabled,
@@ -108,8 +109,11 @@ def start_tour(service_id, template_id):
 @user_has_permissions()
 def choose_template(service_id, template_type='all', template_folder_id=None):
 
+    template_list = TemplateList(current_service, template_type, template_folder_id)
+
     templates_and_folders_form = TemplateAndFoldersSelectionForm(
-        service=current_service,
+        all_template_folders=current_service.all_template_folders,
+        template_list=template_list,
         template_type=template_type,
         current_folder_id=template_folder_id,
     )
@@ -126,9 +130,7 @@ def choose_template(service_id, template_type='all', template_folder_id=None):
         current_template_folder_id=template_folder_id,
         can_manage_folders=can_manage_folders(),
         template_folder_path=current_service.get_template_folder_path(template_folder_id),
-        template_folder_has_contents=current_service.get_template_folders_and_templates('all', template_folder_id),
-        template_folders=current_service.get_template_folders(template_type, template_folder_id),
-        templates=current_service.get_templates(template_type, template_folder_id),
+        template_list=template_list,
         show_search_box=current_service.count_of_templates_and_folders > 7,
         show_template_nav=(
             current_service.has_multiple_template_types
@@ -318,7 +320,7 @@ def copy_template(service_id, template_id):
         return add_service_template(service_id, template['template_type'])
 
     template['template_content'] = template['content']
-    template['name'] = 'Copy of ‘{}’'.format(template['name'])
+    template['name'] = _get_template_copy_name(template, current_service.all_templates)
     form = form_objects[template['template_type']](**template)
 
     return render_template(
@@ -328,6 +330,20 @@ def copy_template(service_id, template_id):
         heading_action='Add',
         services=user_api_client.get_service_ids_for_user(current_user),
     )
+
+
+def _get_template_copy_name(template, existing_templates):
+
+    template_names = [existing['name'] for existing in existing_templates]
+
+    for index in reversed(range(1, 10)):
+        if '{} (copy {})'.format(template['name'], index) in template_names:
+            return '{} (copy {})'.format(template['name'], index + 1)
+
+    if '{} (copy)'.format(template['name']) in template_names:
+        return '{} (copy 2)'.format(template['name'])
+
+    return '{} (copy)'.format(template['name'])
 
 
 @main.route("/services/<service_id>/templates/action-blocked/<notification_type>/<return_to>/<template_id>")
@@ -405,16 +421,18 @@ def manage_template_folder(service_id, template_folder_id):
 @login_required
 @user_has_permissions('manage_templates')
 def delete_template_folder(service_id, template_folder_id):
+
     if not current_service.has_permission('edit_folders'):
         abort(403)
-    form = TemplateFolderForm()
-    template_folder_path = current_service.get_template_folder_path(template_folder_id)
-    template_folder_name = template_folder_path[-1]["name"]
+
+    template_folder = current_service.get_template_folder(template_folder_id)
+
+    form = TemplateFolderForm(name=template_folder['name'])
 
     if len(current_service.get_template_folders_and_templates(
         template_type="all", template_folder_id=template_folder_id
     )) > 0:
-        flash("You must empty this folder before you can delete it".format(template_folder_name), 'info')
+        flash("You must empty this folder before you can delete it".format(template_folder['name']), 'info')
         return redirect(
             url_for(
                 '.choose_template', service_id=service_id, template_type="all", template_folder_id=template_folder_id
@@ -426,12 +444,12 @@ def delete_template_folder(service_id, template_folder_id):
             template_folder_api_client.delete_template_folder(current_service.id, template_folder_id)
 
             return redirect(
-                url_for('.choose_template', service_id=service_id)
+                url_for('.choose_template', service_id=service_id, template_folder_id=template_folder['parent_id'])
             )
         except HTTPError as e:
             msg = "Folder is not empty"
             if e.status_code == 400 and msg in e.message:
-                flash("You must empty this folder before you can delete it".format(template_folder_name), 'info')
+                flash("You must empty this folder before you can delete it", 'info')
                 return redirect(
                     url_for(
                         '.choose_template',
@@ -443,15 +461,14 @@ def delete_template_folder(service_id, template_folder_id):
             else:
                 abort(500, e)
 
-    flash("Are you sure you want to delete the ‘{}’ folder?".format(template_folder_name), 'delete')
+    flash("Are you sure you want to delete the ‘{}’ folder?".format(template_folder['name']), 'delete')
     return render_template(
         'views/templates/manage-template-folder.html',
         form=form,
-        template_folder_path=template_folder_path,
+        template_folder_path=current_service.get_template_folder_path(template_folder_id),
         current_service_id=current_service.id,
         template_folder_id=template_folder_id,
         template_type="all",
-        delete_folder=True
     )
 
 

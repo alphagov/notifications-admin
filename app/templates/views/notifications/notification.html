@@ -51,15 +51,23 @@
         <p>
           Estimated delivery date: {{ estimated_letter_delivery_date|string|format_date_short }}
         </p>
-        <p class="bottom-gutter">
-          <a href="{{ url_for('main.view_letter_notification_as_preview', service_id=current_service.id, notification_id=notification_id, filetype='pdf') }}" download>Download as a PDF</a>
-        </p>
       {% endif %}
     {% endif %}
 
     {{ template|string }}
 
-    {% if template.template_type != 'letter' %}
+    {% if template.template_type == 'letter' %}
+      <div class="js-stick-at-bottom-when-scrolling">
+        <div class="page-footer">
+          <div>&nbsp;</div>
+          <a class="page-footer-right-aligned-link" href="{{ url_for('main.view_letter_notification_as_preview', service_id=current_service.id, notification_id=notification_id, filetype='pdf') }}" download>Download as a PDF</a>
+        </div>
+      </div>
+    {% elif template.template_type == 'email' %}
+      <div class="js-stick-at-bottom-when-scrolling">
+        {{ ajax_block(partials, updates_url, 'status', finished=finished) }}
+      </div>
+    {% elif template.template_type == 'sms' %}
       {{ ajax_block(partials, updates_url, 'status', finished=finished) }}
     {% endif %}
 

@@ -20,6 +20,7 @@ from tests import (
 from tests.app.main.views.test_template_folders import (
     CHILD_FOLDER_ID,
     PARENT_FOLDER_ID,
+    _folder,
 )
 from tests.conftest import (
     SERVICE_ONE_ID,
@@ -364,6 +365,40 @@ def test_should_post_move_to_api(
     )
 
 
+def test_should_be_able_to_move_a_sub_item(
+    client_request,
+    service_one,
+    fake_uuid,
+    mock_get_service_templates,
+    mock_get_template_folders,
+    mock_move_to_template_folder,
+):
+    service_one['permissions'] += ['edit_folders']
+    GRANDCHILD_FOLDER_ID = str(uuid.uuid4())
+    mock_get_template_folders.return_value = [
+        {'id': PARENT_FOLDER_ID, 'name': 'folder_one', 'parent_id': None},
+        {'id': CHILD_FOLDER_ID, 'name': 'folder_one_one', 'parent_id': PARENT_FOLDER_ID},
+        {'id': GRANDCHILD_FOLDER_ID, 'name': 'folder_one_one_one', 'parent_id': CHILD_FOLDER_ID},
+    ]
+    client_request.post(
+        'main.choose_template',
+        service_id=SERVICE_ONE_ID,
+        template_folder_id=PARENT_FOLDER_ID,
+        _data={
+            'operation': 'move',
+            'move_to': 'None',
+            'templates_and_folders': [GRANDCHILD_FOLDER_ID],
+        },
+        _expected_status=302,
+    )
+    mock_move_to_template_folder.assert_called_once_with(
+        service_id=SERVICE_ONE_ID,
+        folder_id=None,
+        folder_ids={GRANDCHILD_FOLDER_ID},
+        template_ids=set(),
+    )
+
+
 @pytest.mark.parametrize('thing_to_move', [
     PARENT_FOLDER_ID,  # Can’t move a folder inside itself
     CHILD_FOLDER_ID,  # Can’t move a folder which doesn’t belong to the service
@@ -444,6 +479,33 @@ def test_should_show_live_search_if_list_of_templates_taller_than_screen(
     assert search['data-targets'] == '#template-list .template-list-item'
 
     assert len(page.select(search['data-targets'])) == len(page.select('.message-name')) == 14
+
+
+def test_should_show_live_search_if_service_has_lots_of_folders(
+    client_request,
+    mock_get_template_folders,
+    mock_get_service_templates,  # returns 4 templates
+):
+
+    mock_get_template_folders.return_value = [
+        _folder('one', PARENT_FOLDER_ID),
+        _folder('two', None, parent=PARENT_FOLDER_ID),
+        _folder('three', None, parent=PARENT_FOLDER_ID),
+        _folder('four', None, parent=PARENT_FOLDER_ID),
+    ]
+
+    page = client_request.get(
+        'main.choose_template',
+        service_id=SERVICE_ONE_ID,
+    )
+
+    count_of_templates_and_folders = len(page.select('.message-name'))
+    count_of_folders = len(page.select('.template-list-folder'))
+    count_of_templates = count_of_templates_and_folders - count_of_folders
+
+    assert len(page.select('.live-search')) == 1
+    assert count_of_folders == 4
+    assert count_of_templates == 4
 
 
 def test_should_show_page_for_one_template(
@@ -823,11 +885,44 @@ def test_choose_a_template_to_copy(
     )
 
 
+@pytest.mark.parametrize('existing_template_names, expected_name', (
+    (
+        ['Two week reminder'],
+        'Two week reminder (copy)'
+    ),
+    (
+        ['Two week reminder (copy)'],
+        'Two week reminder (copy 2)'
+    ),
+    (
+        ['Two week reminder', 'Two week reminder (copy)'],
+        'Two week reminder (copy 2)'
+    ),
+    (
+        ['Two week reminder (copy 8)', 'Two week reminder (copy 9)'],
+        'Two week reminder (copy 10)'
+    ),
+    (
+        ['Two week reminder (copy)', 'Two week reminder (copy 9)'],
+        'Two week reminder (copy 10)'
+    ),
+    (
+        ['Two week reminder (copy)', 'Two week reminder (copy 10)'],
+        'Two week reminder (copy 2)'
+    ),
+))
 def test_load_edit_template_with_copy_of_template(
     client_request,
+    mock_get_service_templates,
     mock_get_service_email_template,
     mock_get_non_empty_organisations_and_services_for_user,
+    existing_template_names,
+    expected_name,
 ):
+    mock_get_service_templates.side_effect = lambda service_id: {'data': [
+        {'name': existing_template_name, 'template_type': 'sms'}
+        for existing_template_name in existing_template_names
+    ]}
     page = client_request.get(
         'main.copy_template',
         service_id=SERVICE_ONE_ID,
@@ -838,7 +933,7 @@ def test_load_edit_template_with_copy_of_template(
     assert page.select_one('form')['method'] == 'post'
 
     assert page.select_one('input')['value'] == (
-        'Copy of ‘Two week reminder’'
+        expected_name
     )
     assert page.select_one('textarea').text == (
         'Your ((thing)) is due soon'

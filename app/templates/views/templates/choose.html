@@ -77,29 +77,11 @@
 
     {% if can_manage_folders %}
       <form method="post">
-        {% with
-          templates=templates,
-          template_folders=template_folders,
-          service_has_templates_or_folders=(current_service.has_templates or current_service.has_folders),
-          template_type=template_type,
-          template_folder_has_contents=template_folder_has_contents
-        %}
-          {% include 'views/templates/_template_list.html' %}
-        {% endwith %}
-        {% with templates=templates, template_folders=template_folders, templates_and_folders_form=templates_and_folders_form %}
-          {% include 'views/templates/_move_to.html' %}
-        {% endwith %}
+        {% include 'views/templates/_template_list.html' %}
+        {% include 'views/templates/_move_to.html' %}
       </form>
     {% else %}
-      {% with
-        templates=templates,
-        template_folders=template_folders,
-        service_has_templates_or_folders=(current_service.has_templates or current_service.has_folders),
-        template_type=template_type,
-        template_folder_has_contents=template_folder_has_contents
-      %}
-        {% include 'views/templates/_template_list.html' %}
-      {% endwith %}
+      {% include 'views/templates/_template_list.html' %}
     {% endif %}
   {% endif %}
 
