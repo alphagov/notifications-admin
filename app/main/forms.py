@@ -1148,6 +1148,21 @@ def required_for_ops(*operations):
 
 
 class TemplateAndFoldersSelectionForm(Form):
+    """
+    This form also expects the form data to include an operation, based on which submit button is clicked.
+    If enter is pressed, unknown will be sent by a hidden submit button at the top of the form.
+    The value of this operation affects which fields are required, expected to be empty, or optional.
+
+    * unknown
+        currently not implemented, but in the future will try and work out if there are any obvious commands that can be
+        assumed based on which fields are empty vs populated.
+    * move_to_existing_folder
+        must have data for templates_and_folders checkboxes, and move_to radios
+    * move_to_new_folder
+        must have data for move_to_new_folder_name, cannot have data for move_to_existing_folder_name
+    * add_new_folder
+        must have data for move_to_existing_folder_name, cannot have data for move_to_new_folder_name
+    """
 
     ALL_TEMPLATES_FOLDER = {
         'name': 'All templates',
