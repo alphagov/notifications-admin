@@ -78,7 +78,7 @@
     {{ live_search(target_selector='#template-list .template-list-item', show=show_search_box, form=search_form) }}
 
     {% if can_manage_folders %}
-      {% call form_wrapper() %}
+      {% call form_wrapper(module='template-folder-form') %}
         {% include 'views/templates/_template_list.html' %}
         {% with templates=templates, template_folders=template_folders, templates_and_folders_form=templates_and_folders_form %}
           {% include 'views/templates/_move_to.html' %}

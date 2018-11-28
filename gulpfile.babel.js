@@ -75,6 +75,7 @@ gulp.task('javascripts', () => gulp
     paths.src + 'javascripts/fullscreenTable.js',
     paths.src + 'javascripts/emailPreviewPane.js',
     paths.src + 'javascripts/colourPreview.js',
+    paths.src + 'javascripts/templateFolderForm.js',
     paths.src + 'javascripts/main.js'
   ])
   .pipe(plugins.prettyerror())
