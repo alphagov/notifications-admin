@@ -3,6 +3,8 @@
 {% from "components/message-count-label.html" import message_count_label %}
 {% from "components/textbox.html" import textbox %}
 {% from "components/live-search.html" import live_search %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/page-footer.html" import page_footer %}
 
 {% extends "withnav_template.html" %}
 
@@ -76,10 +78,13 @@
     {{ live_search(target_selector='#template-list .template-list-item', show=show_search_box, form=search_form) }}
 
     {% if can_manage_folders %}
-      <form method="post">
+      {% call form_wrapper() %}
         {% include 'views/templates/_template_list.html' %}
-        {% include 'views/templates/_move_to.html' %}
-      </form>
+        {% with templates=templates, template_folders=template_folders, templates_and_folders_form=templates_and_folders_form %}
+          {% include 'views/templates/_move_to.html' %}
+        {% endwith %}
+      {% endcall %}
+
     {% else %}
       {% include 'views/templates/_template_list.html' %}
     {% endif %}

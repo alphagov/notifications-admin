@@ -2,6 +2,23 @@
 {% from "components/page-footer.html" import page_footer %}
 
 {% if templates_and_folders_form.move_to.choices and template_list.templates_to_show %}
-  {{ radios(templates_and_folders_form.move_to) }}
-  {{ page_footer('Move selected', button_name='operation', button_value='move') }}
+  <button type="submit" name="operation" value="unknown" hidden></button>
+  <div id="move_to_folder_radios">
+    {{ radios(templates_and_folders_form.move_to) }}
+    {{ page_footer('Move', button_name='operation', button_value='move_to_existing_folder') }}
+  </div>
+  <div id="move_to_new_folder_form">
+    <fieldset>
+      <legend class="visuallyhidden">Move to a new folder</legend>
+      {{ textbox(templates_and_folders_form.move_to_new_folder_name) }}
+      {{ page_footer('Move to a new folder', button_name='operation', button_value='move_to_new_folder') }}
+    </fieldset>
+  </div>
+  <div id="add_new_folder_form">
+    <fieldset>
+      <legend class="visuallyhidden">Add a new folder</legend>
+      {{ textbox(templates_and_folders_form.add_new_folder_name) }}
+      {{ page_footer('New folder', button_name='operation', button_value='add_new_folder') }}
+    </fieldset>
+  </div>
 {% endif %}
