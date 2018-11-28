@@ -785,7 +785,7 @@ def test_should_show_radios_and_buttons_for_move_destination_if_correct_permissi
         'main.choose_template',
         service_id=SERVICE_ONE_ID,
     )
-    radios = page.select('input[type=radio]')
+    radios = page.select('#move_to_folder_radios input[type=radio]')
     radio_div = page.find('div', {'id': 'move_to_folder_radios'})
     assert radios == page.select('input[name=move_to]')
 
@@ -799,7 +799,8 @@ def test_should_show_radios_and_buttons_for_move_destination_if_correct_permissi
         'unknown',
         'move_to_existing_folder',
         'move_to_new_folder',
-        'add_new_folder'
+        'add_new_folder',
+        'add_template',
     }
 
 

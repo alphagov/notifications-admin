@@ -717,7 +717,14 @@ class FieldWithNoneOption():
 
 
 class RadioFieldWithNoneOption(FieldWithNoneOption, RadioField):
-    pass
+
+    def validate(self, *args, **kwargs):
+
+        if self.data == self.NONE_OPTION_VALUE:
+            self.data = None
+            return True
+
+        return super().validate(*args, **kwargs)
 
 
 class HiddenFieldWithNoneOption(FieldWithNoneOption, HiddenField):
@@ -1174,6 +1181,8 @@ class TemplateAndFoldersSelectionForm(Form):
         all_template_folders,
         template_list,
         current_folder_id,
+        allow_adding_letter_template,
+        allow_adding_copy_of_template,
         *args,
         **kwargs
     ):
@@ -1183,7 +1192,7 @@ class TemplateAndFoldersSelectionForm(Form):
         self.templates_and_folders.choices = template_list.as_id_and_name
 
         self.op = None
-        self.is_move_op = self.is_add_op = False
+        self.is_move_op = self.is_add_folder_op = self.is_add_template_op = False
 
         self.move_to.choices = [
             (item['id'], item['name'])
@@ -1191,13 +1200,21 @@ class TemplateAndFoldersSelectionForm(Form):
             if item['id'] != str(current_folder_id)
         ]
 
+        self.add_template_by_template_type.choices = filter(None, [
+            ('email', 'Email template'),
+            ('sms', 'Text message template'),
+            ('letter', 'Letter template') if allow_adding_letter_template else None,
+            ('copy-existing', 'Copy of an existing template') if allow_adding_copy_of_template else None,
+        ])
+
     def validate(self):
         self.op = request.form.get('operation')
 
         self.is_move_op = self.op in {'move_to_existing_folder', 'move_to_new_folder'}
-        self.is_add_op = self.op in {'add_new_folder', 'move_to_new_folder'}
+        self.is_add_folder_op = self.op in {'add_new_folder', 'move_to_new_folder'}
+        self.is_add_template_op = self.op in {'add_template'}
 
-        if not (self.is_add_op or self.is_move_op):
+        if not (self.is_add_folder_op or self.is_move_op or self.is_add_template_op):
             return False
 
         return super().validate()
@@ -1218,3 +1235,7 @@ class TemplateAndFoldersSelectionForm(Form):
     ])
     add_new_folder_name = StringField('Folder name', validators=[required_for_ops('add_new_folder')])
     move_to_new_folder_name = StringField('Folder name', validators=[required_for_ops('move_to_new_folder')])
+
+    add_template_by_template_type = RadioFieldWithNoneOption('Add new', validators=[
+        required_for_ops('add_template')
+    ])
