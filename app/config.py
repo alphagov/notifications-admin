@@ -74,6 +74,8 @@ class Config(object):
     REDIS_URL = os.environ.get('REDIS_URL')
     REDIS_ENABLED = os.environ.get('REDIS_ENABLED') == '1'
 
+    ASSET_PATH = '/static/'
+
 
 class Development(Config):
     NOTIFY_LOG_PATH = 'application.log'
@@ -117,6 +119,7 @@ class Preview(Config):
     MOU_BUCKET_NAME = 'notify.works-mou'
     NOTIFY_ENVIRONMENT = 'preview'
     CHECK_PROXY_HEADER = False
+    ASSET_PATH = 'https://static.notify.works/'
 
 
 class Staging(Config):
@@ -129,6 +132,7 @@ class Staging(Config):
     MOU_BUCKET_NAME = 'staging-notify.works-mou'
     NOTIFY_ENVIRONMENT = 'staging'
     CHECK_PROXY_HEADER = False
+    ASSET_PATH = 'https://static.staging-notify.works/'
 
 
 class Live(Config):
@@ -141,6 +145,7 @@ class Live(Config):
     MOU_BUCKET_NAME = 'notifications.service.gov.uk-mou'
     NOTIFY_ENVIRONMENT = 'live'
     CHECK_PROXY_HEADER = False
+    ASSET_PATH = 'https://static.notifications.service.gov.uk/'
 
 
 class CloudFoundryConfig(Config):
