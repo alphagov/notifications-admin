@@ -26,7 +26,7 @@
         {% for option in form.options %}
           <div class="column-one-quarter">
             <label for="{{ option.id }}">
-              <img src="/static/images/branding-options/{{ option.data }}.png" alt="" class="bordered-image bottom-gutter-1-3">
+              <img src="{{ asset_path }}images/branding-options/{{ option.data }}.png" alt="" class="bordered-image bottom-gutter-1-3">
             </label>
             {{ radio(option) }}
           </div>
