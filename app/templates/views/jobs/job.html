@@ -14,9 +14,7 @@
     </h1>
 
     {% if just_sent %}
-      {{ banner('Your letter has been sent. Printing starts {} at 5.30pm.'.format(printing_day),
-        type='default',
-        with_tick=True) }}
+      {{ banner(just_sent_message, type='default', with_tick=True) }}
     {% else %}
       {{ ajax_block(partials, updates_url, 'status', finished=finished) }}
     {% endif %}

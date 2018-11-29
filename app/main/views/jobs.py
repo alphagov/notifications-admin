@@ -93,6 +93,11 @@ def view_job(service_id, job_id):
         version=job['template_version']
     )['data']
 
+    just_sent_message = 'Your {} been sent. Printing starts {} at 5.30pm.'.format(
+        'letter has' if job['notification_count'] == 1 else 'letters have',
+        printing_today_or_tomorrow()
+    )
+
     return render_template(
         'views/jobs/job.html',
         finished=(total_notifications == processed_notifications),
@@ -110,7 +115,7 @@ def view_job(service_id, job_id):
             request.args.get('just_sent') == 'yes' and
             template['template_type'] == 'letter'
         ),
-        printing_day=printing_today_or_tomorrow()
+        just_sent_message=just_sent_message,
     )
 
 

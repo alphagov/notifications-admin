@@ -366,6 +366,29 @@ def test_should_show_letter_job_with_banner_after_sending_before_1730(
     )
 
 
+@freeze_time("2016-01-01 11:09:00")
+def test_should_show_letter_job_with_banner_when_there_are_multiple_CSV_rows(
+    client_request,
+    mock_get_service_letter_template,
+    mock_get_job_in_progress,
+    mock_get_notifications,
+    mock_get_service_data_retention_by_notification_type,
+    fake_uuid,
+):
+
+    page = client_request.get(
+        'main.view_job',
+        service_id=SERVICE_ONE_ID,
+        job_id=fake_uuid,
+        just_sent='yes',
+    )
+
+    assert page.select('p.bottom-gutter') == []
+    assert normalize_spaces(page.select('.banner-default-with-tick')[0].text) == (
+        'Your letters have been sent. Printing starts today at 5.30pm.'
+    )
+
+
 @freeze_time("2016-01-01 18:09:00")
 def test_should_show_letter_job_with_banner_after_sending_after_1730(
     client_request,
