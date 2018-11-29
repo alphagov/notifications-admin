@@ -10,7 +10,7 @@ class TestAssetFingerprint(object):
             body {
                 font-family: nta;
             }
-        """
+        """.encode('utf-8')
         asset_fingerprinter = AssetFingerprinter(
             asset_root='/suppliers/static/'
         )
@@ -27,7 +27,7 @@ class TestAssetFingerprint(object):
         get_file_content_mock = mocker.patch.object(AssetFingerprinter, 'get_asset_file_contents')
         get_file_content_mock.return_value = """
             document.write('Hello world!');
-        """
+        """.encode('utf-8')
         fingerprinter = AssetFingerprinter()
         fingerprinter.get_url('javascripts/application.js')
         fingerprinter.get_asset_file_contents.assert_called_with(
@@ -40,7 +40,7 @@ class TestAssetFingerprint(object):
             body {
                 font-family: nta;
             }
-        """
+        """.encode('utf-8')
         asset_fingerprinter = AssetFingerprinter()
         assert (
             asset_fingerprinter.get_asset_fingerprint('application.css') ==
@@ -56,11 +56,11 @@ class TestAssetFingerprint(object):
             body {
                 font-family: nta;
             }
-        """
+        """.encode('utf-8')
         css_hash = asset_fingerprinter.get_asset_fingerprint('application.css')
         get_file_content_mock.return_value = """
             document.write('Hello world!');
-        """
+        """.encode('utf-8')
         js_hash = asset_fingerprinter.get_asset_fingerprint('application.js')
         assert (
             js_hash != css_hash
@@ -72,7 +72,7 @@ class TestAssetFingerprint(object):
             body {
                 font-family: nta;
             }
-        """
+        """.encode('utf-8')
         fingerprinter = AssetFingerprinter()
         assert (
             fingerprinter.get_url('application.css') ==

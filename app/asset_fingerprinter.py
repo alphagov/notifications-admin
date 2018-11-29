@@ -1,4 +1,3 @@
-import codecs
 import hashlib
 
 
@@ -37,11 +36,11 @@ class AssetFingerprinter(object):
 
     def get_asset_fingerprint(self, asset_file_path):
         return hashlib.md5(
-            self.get_asset_file_contents(asset_file_path).encode('utf-8')
+            self.get_asset_file_contents(asset_file_path)
         ).hexdigest()
 
     def get_asset_file_contents(self, asset_file_path):
-        with codecs.open(asset_file_path, encoding='utf-8') as asset_file:
+        with open(asset_file_path, 'rb') as asset_file:
             contents = asset_file.read()
         return contents
 
