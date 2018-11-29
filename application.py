@@ -9,7 +9,8 @@ PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 STATIC_ROOT = os.path.join(PROJECT_ROOT, 'app', 'static')
 STATIC_URL = 'static/'
 
-app = Flask('app')
+flask_app = Flask('app')
 
-create_app(app)
-app.wsgi_app = WhiteNoise(app.wsgi_app, STATIC_ROOT, STATIC_URL, max_age=WhiteNoise.FOREVER)
+create_app(flask_app)
+
+application = WhiteNoise(flask_app.wsgi_app, STATIC_ROOT, STATIC_URL, max_age=WhiteNoise.FOREVER)
