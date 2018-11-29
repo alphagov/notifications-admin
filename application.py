@@ -12,4 +12,4 @@ STATIC_URL = 'static/'
 app = Flask('app')
 
 create_app(app)
-application = WhiteNoise(app, STATIC_ROOT, STATIC_URL)
+app.wsgi_app = WhiteNoise(app.wsgi_app, STATIC_ROOT, STATIC_URL, max_age=WhiteNoise.FOREVER)
