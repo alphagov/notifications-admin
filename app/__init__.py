@@ -496,7 +496,6 @@ def save_service_or_org_after_request(response):
 
 #  https://www.owasp.org/index.php/List_of_useful_HTTP_headers
 def useful_headers_after_request(response):
-    notify_environment = os.environ['NOTIFY_ENVIRONMENT']
     response.headers.add('X-Frame-Options', 'deny')
     response.headers.add('X-Content-Type-Options', 'nosniff')
     response.headers.add('X-XSS-Protection', '1; mode=block')
@@ -508,7 +507,7 @@ def useful_headers_after_request(response):
         "font-src 'self' {asset_domain} data:;"
         "img-src 'self' {asset_domain} *.google-analytics.com *.notifications.service.gov.uk {logo_domain} data:;"
         "frame-src 'self' www.youtube.com;".format(
-            asset_domain=configs[notify_environment].ASSET_DOMAIN,
+            asset_domain=current_app.config['ASSET_DOMAIN'],
             logo_domain=get_logo_cdn_domain(),
         )
     ))
