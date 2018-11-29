@@ -19,6 +19,22 @@
         addNewFolderName: this.$form.find('#add_new_folder_form'),
         moveToNewFolderName: this.$form.find('#move_to_new_folder_form'),
       };
+      // first off show the new template / new folder buttons
+      this.currentState = 'nothingSelectedButtons';
+
+      this.$form.on('change', 'input[type=checkbox]', () => this.templateFolderCheckboxChanged());
+
+      this.render();
+    };
+
+    this.templateFolderCheckboxChanged = function(event) {
+      let numSelected = this.countSelectedCheckboxes();
+
+      if (this.currentState === 'nothingSelectedButtons' && numSelected !== 0) {
+        this.currentState = 'itemsSelectedButtons';
+      } else if (this.currentState === 'itemsSelectedButtons' && numSelected === 0) {
+        this.currentState = 'nothingSelectedButtons';
+      }
 
       this.render();
     };
@@ -30,10 +46,8 @@
     this.render = function() {
       let numSelected = this.countSelectedCheckboxes();
 
-      // hide everything
-      Object.values(this.states).forEach($el => $el.hide());
-
-      this.states.nothingSelectedButtons.show();
+      // hide everything, unless they are the currentState
+      Object.entries(this.states).forEach(([state, $el]) => (state === this.currentState ? $el.show() : $el.hide()));
     };
 
     this.nothingSelectedButtons = function() {
