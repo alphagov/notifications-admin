@@ -16,7 +16,7 @@ from app.utils import (
     generate_next_dict,
     generate_notifications_csv,
     generate_previous_dict,
-    get_cdn_domain,
+    get_logo_cdn_domain,
 )
 from tests.conftest import fake_uuid
 
@@ -278,13 +278,13 @@ def test_generate_notifications_csv_calls_twice_if_next_link(
 
 def test_get_cdn_domain_on_localhost(client, mocker):
     mocker.patch.dict('app.current_app.config', values={'ADMIN_BASE_URL': 'http://localhost:6012'})
-    domain = get_cdn_domain()
+    domain = get_logo_cdn_domain()
     assert domain == 'static-logos.notify.tools'
 
 
 def test_get_cdn_domain_on_non_localhost(client, mocker):
     mocker.patch.dict('app.current_app.config', values={'ADMIN_BASE_URL': 'https://some.admintest.com'})
-    domain = get_cdn_domain()
+    domain = get_logo_cdn_domain()
     assert domain == 'static-logos.admintest.com'
 
 

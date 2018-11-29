@@ -11,7 +11,7 @@ from app.main.s3_client import (
     persist_logo,
     upload_logo,
 )
-from app.utils import AgreementInfo, get_cdn_domain, user_is_platform_admin
+from app.utils import AgreementInfo, get_logo_cdn_domain, user_is_platform_admin
 
 
 @main.route("/email-branding", methods=['GET', 'POST'])
@@ -81,7 +81,7 @@ def update_email_branding(branding_id, logo=None):
         'views/email-branding/manage-branding.html',
         form=form,
         email_branding=email_branding,
-        cdn_url=get_cdn_domain(),
+        cdn_url=get_logo_cdn_domain(),
         logo=logo
     )
 
@@ -126,7 +126,7 @@ def create_email_branding(logo=None):
     return render_template(
         'views/email-branding/manage-branding.html',
         form=form,
-        cdn_url=get_cdn_domain(),
+        cdn_url=get_logo_cdn_domain(),
         logo=logo
     )
 
