@@ -37,7 +37,7 @@ gulp.task('copy:govuk_template:css', () => gulp.src(paths.template + 'assets/sty
   }))
   .on('error', plugins.sass.logError)
   .pipe(plugins.cssUrlAdjuster({
-    prependRelative: '/static/',
+    prependRelative: process.env.NOTIFY_ENVIRONMENT == 'development' ? '/static/' : '/',
   }))
   .pipe(gulp.dest(paths.dist + 'stylesheets/'))
 );

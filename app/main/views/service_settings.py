@@ -54,7 +54,7 @@ from app.main.forms import (
 from app.utils import (
     AgreementInfo,
     email_safe,
-    get_cdn_domain,
+    get_logo_cdn_domain,
     user_has_permissions,
     user_is_platform_admin,
 )
@@ -991,7 +991,7 @@ def get_branding_as_value_and_label(email_branding):
 def get_branding_as_dict(email_branding):
     return {
         branding['id']: {
-            'logo': 'https://{}/{}'.format(get_cdn_domain(), branding['logo']),
+            'logo': 'https://{}/{}'.format(get_logo_cdn_domain(), branding['logo']),
             'colour': branding['colour']
         } for branding in email_branding
     }

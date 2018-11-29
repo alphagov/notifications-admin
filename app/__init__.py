@@ -70,7 +70,7 @@ from app.notify_client.complaint_api_client import complaint_api_client
 from app.notify_client.platform_stats_api_client import platform_stats_api_client
 from app.notify_client.template_folder_api_client import template_folder_api_client
 from app.commands import setup_commands
-from app.utils import get_cdn_domain, id_safe
+from app.utils import get_logo_cdn_domain, id_safe
 
 login_manager = LoginManager()
 csrf = CSRFProtect()
@@ -500,13 +500,16 @@ def useful_headers_after_request(response):
     response.headers.add('X-Content-Type-Options', 'nosniff')
     response.headers.add('X-XSS-Protection', '1; mode=block')
     response.headers.add('Content-Security-Policy', (
-        "default-src 'self' 'unsafe-inline';"
-        "script-src 'self' *.google-analytics.com 'unsafe-inline' 'unsafe-eval' data:;"
+        "default-src 'self' {asset_domain} 'unsafe-inline';"
+        "script-src 'self' {asset_domain} *.google-analytics.com 'unsafe-inline' 'unsafe-eval' data:;"
         "connect-src 'self' *.google-analytics.com;"
         "object-src 'self';"
-        "font-src 'self' data:;"
-        "img-src 'self' *.google-analytics.com *.notifications.service.gov.uk {} data:;"
-        "frame-src 'self' www.youtube.com;".format(get_cdn_domain())
+        "font-src 'self' {asset_domain} data:;"
+        "img-src 'self' {asset_domain} *.google-analytics.com *.notifications.service.gov.uk {logo_domain} data:;"
+        "frame-src 'self' www.youtube.com;".format(
+            asset_domain=current_app.config['ASSET_DOMAIN'],
+            logo_domain=get_logo_cdn_domain(),
+        )
     ))
     if 'Cache-Control' in response.headers:
         del response.headers['Cache-Control']
