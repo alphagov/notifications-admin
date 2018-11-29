@@ -241,3 +241,18 @@ def test_terms_tells_logged_in_users_what_we_know_about_their_agreement(
     else:
         assert not terms_page.select_one('main p').select('a')
     assert normalize_spaces(pricing_page.select('main p')[-1].text) == expected_pricing_paragraph
+
+
+def test_css_is_served_from_correct_path(client_request):
+
+    page = client_request.get('main.pricing')  # easy static page
+
+    for index, link in enumerate(
+        page.select('link[rel=stylesheet]')
+    ):
+        assert link['href'].startswith([
+            'https://static.example.com/stylesheets/govuk-template.css?',
+            'https://static.example.com/stylesheets/govuk-template-print.css?',
+            'https://static.example.com/stylesheets/fonts.css?',
+            'https://static.example.com/stylesheets/main.css?',
+        ][index])
