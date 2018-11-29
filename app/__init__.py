@@ -496,17 +496,24 @@ def save_service_or_org_after_request(response):
 
 #  https://www.owasp.org/index.php/List_of_useful_HTTP_headers
 def useful_headers_after_request(response):
+    notify_environment = os.environ['NOTIFY_ENVIRONMENT']
     response.headers.add('X-Frame-Options', 'deny')
     response.headers.add('X-Content-Type-Options', 'nosniff')
     response.headers.add('X-XSS-Protection', '1; mode=block')
     response.headers.add('Content-Security-Policy', (
-        "default-src 'self' 'unsafe-inline';"
-        "script-src 'self' *.google-analytics.com 'unsafe-inline' 'unsafe-eval' data:;"
+        "default-src 'self' {} 'unsafe-inline';"
+        "script-src 'self' {} *.google-analytics.com 'unsafe-inline' 'unsafe-eval' data:;"
         "connect-src 'self' *.google-analytics.com;"
         "object-src 'self';"
-        "font-src 'self' data:;"
-        "img-src 'self' *.google-analytics.com *.notifications.service.gov.uk {} data:;"
-        "frame-src 'self' www.youtube.com;".format(get_cdn_domain())
+        "font-src 'self' {} data:;"
+        "img-src 'self' {} *.google-analytics.com *.notifications.service.gov.uk {} data:;"
+        "frame-src 'self' www.youtube.com;".format(
+            configs[notify_environment].ASSET_DOMAIN,
+            configs[notify_environment].ASSET_DOMAIN,
+            configs[notify_environment].ASSET_DOMAIN,
+            configs[notify_environment].ASSET_DOMAIN,
+            get_cdn_domain(),
+        )
     ))
     if 'Cache-Control' in response.headers:
         del response.headers['Cache-Control']
