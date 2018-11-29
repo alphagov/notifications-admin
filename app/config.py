@@ -113,6 +113,7 @@ class Test(Development):
     ANTIVIRUS_API_KEY = 'test-antivirus-secret'
 
     ASSET_DOMAIN = 'static.example.com'
+    ASSET_PATH = 'https://static.example.com/'
 
 
 class Preview(Config):
