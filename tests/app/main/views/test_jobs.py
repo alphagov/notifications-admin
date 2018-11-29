@@ -181,6 +181,7 @@ def test_should_show_page_for_one_job(
     mock_get_job,
     mocker,
     mock_get_notifications,
+    mock_get_service_data_retention_by_notification_type,
     fake_uuid,
     status_argument,
     expected_api_call,
@@ -220,6 +221,29 @@ def test_should_show_page_for_one_job(
     )
 
 
+@freeze_time("2016-01-01 11:09:00.061258")
+def test_should_show_page_for_one_job_with_flexible_data_retention(
+    client_request,
+    active_user_with_permissions,
+    mock_get_service_template,
+    mock_get_job,
+    mocker,
+    mock_get_notifications,
+    mock_get_service_data_retention_by_notification_type,
+    fake_uuid,
+):
+
+    mock_get_service_data_retention_by_notification_type.side_effect = [{"days_of_retention": 10}]
+    page = client_request.get(
+        'main.view_job',
+        service_id=SERVICE_ONE_ID,
+        job_id=fake_uuid,
+        status='delivered'
+    )
+
+    assert page.find('span', {'id': 'time-left'}).text == 'Data available for 10 days'
+
+
 def test_get_jobs_should_tell_user_if_more_than_one_page(
     logged_in_client,
     fake_uuid,
@@ -227,6 +251,7 @@ def test_get_jobs_should_tell_user_if_more_than_one_page(
     mock_get_job,
     mock_get_service_template,
     mock_get_notifications_with_previous_next,
+    mock_get_service_data_retention_by_notification_type,
 ):
     response = logged_in_client.get(url_for(
         'main.view_job',
@@ -248,6 +273,7 @@ def test_should_show_job_in_progress(
     mock_get_job_in_progress,
     mocker,
     mock_get_notifications,
+    mock_get_service_data_retention_by_notification_type,
     fake_uuid,
 ):
 
@@ -267,6 +293,7 @@ def test_should_show_letter_job(
     client_request,
     mock_get_service_letter_template,
     mock_get_job,
+    mock_get_service_data_retention_by_notification_type,
     fake_uuid,
     active_user_with_permissions,
     mocker,
@@ -322,6 +349,7 @@ def test_should_show_letter_job_with_banner_after_sending(
     mock_get_service_letter_template,
     mock_get_job,
     mock_get_notifications,
+    mock_get_service_data_retention_by_notification_type,
     fake_uuid,
 ):
 
@@ -344,6 +372,7 @@ def test_should_show_scheduled_job(
     active_user_with_permissions,
     mock_get_service_template,
     mock_get_scheduled_job,
+    mock_get_service_data_retention_by_notification_type,
     mocker,
     mock_get_notifications,
     fake_uuid,
@@ -411,6 +440,7 @@ def test_should_show_updates_for_one_job_as_json(
     mock_get_notifications,
     mock_get_service_template,
     mock_get_job,
+    mock_get_service_data_retention_by_notification_type,
     mocker,
     fake_uuid,
 ):
@@ -433,7 +463,7 @@ def test_should_show_updates_for_one_job_as_json(
     "job_created_at, expected_message", [
         ("2016-01-10 11:09:00.000000+00:00", "Data available for 7 days"),
         ("2016-01-04 11:09:00.000000+00:00", "Data available for 1 day"),
-        ("2016-01-03 11:09:00.000000+00:00", "Data available for 11 hours"),
+        ("2016-01-03 11:09:00.000000+00:00", "Data available for 12 hours"),
         ("2016-01-02 23:59:59.000000+00:00", "Data no longer available")
     ]
 )
@@ -447,6 +477,7 @@ def test_should_show_letter_job_with_first_class_if_notifications_are_first_clas
     client_request,
     mock_get_service_letter_template,
     mock_get_job,
+    mock_get_service_data_retention_by_notification_type,
     fake_uuid,
     active_user_with_permissions,
     mocker,
@@ -474,6 +505,7 @@ def test_should_show_letter_job_with_first_class_if_no_notifications(
     mock_get_job,
     fake_uuid,
     mock_get_notifications_with_no_notifications,
+    mock_get_service_data_retention_by_notification_type,
     mocker
 ):
     mocker.patch('app.main.views.jobs.current_service', postage='first')

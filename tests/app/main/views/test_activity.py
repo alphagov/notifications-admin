@@ -453,7 +453,7 @@ def test_should_show_notifications_for_a_service_with_next_previous(
     "job_created_at, expected_message", [
         ("2016-01-10 11:09:00.000000+00:00", "Data available for 7 days"),
         ("2016-01-04 11:09:00.000000+00:00", "Data available for 1 day"),
-        ("2016-01-03 11:09:00.000000+00:00", "Data available for 11 hours"),
+        ("2016-01-03 11:09:00.000000+00:00", "Data available for 12 hours"),
         ("2016-01-02 23:59:59.000000+00:00", "Data no longer available")
     ]
 )
