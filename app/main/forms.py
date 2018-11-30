@@ -1212,6 +1212,9 @@ class TemplateAndFoldersSelectionForm(Form):
             ('copy-existing', 'Copy of an existing template') if allow_adding_copy_of_template else None,
         ]))
 
+    def is_selected(self, template_folder_id):
+        return template_folder_id in (self.templates_and_folders.data or [])
+
     def validate(self):
         self.op = request.form.get('operation')
 
