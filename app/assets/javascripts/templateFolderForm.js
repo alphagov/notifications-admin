@@ -24,6 +24,12 @@
 
       };
 
+      // cancel buttons only relevant if JS enabled, so
+      this.addCancelButton(this.states.moveToFolderRadios);
+      this.addCancelButton(this.states.moveToNewFolderForm);
+      this.addCancelButton(this.states.addNewFolderForm);
+      this.addCancelButton(this.states.addNewTemplateForm);
+
       // first off show the new template / new folder buttons
       this.currentState = 'nothingSelectedButtons';
 
@@ -31,6 +37,26 @@
       this.$form.on('change', 'input[type=checkbox]', () => this.templateFolderCheckboxChanged());
 
       this.render();
+    };
+
+    this.addCancelButton = function($el) {
+      let $cancel =  $('<a></a>')
+          // .addClass('api-key')
+          // .css('min-height', $component.height())
+          .html('Cancel')
+          .click((event) => {
+            event.preventDefault();
+            // clear existing data
+            $el.find('input:radio').prop('checked', false);
+            $el.find('input:text').val('');
+
+            // gross hack - pretend we're in the choose actions state, then pretend a checkbox was clicked to work out
+            // whether to show zero or non-zero options. This calls a render at the end
+            this.currentState = 'nothingSelectedButtons';
+            this.templateFolderCheckboxChanged();
+          });
+
+      $el.append($cancel);
     };
 
     this.actionButtonClicked = function(event) {
