@@ -2174,10 +2174,10 @@ def mock_get_invites_for_service(mocker, service_one, sample_invite):
         for i in range(0, 5):
             invite = copy.copy(sample_invite)
             invite['email_address'] = 'user_{}@testnotify.gov.uk'.format(i)
-            data.append(InvitedUser(**invite))
+            data.append(invite)
         return data
 
-    return mocker.patch('app.invite_api_client.get_invites_for_service', side_effect=_get_invites)
+    return mocker.patch('app.invite_api_client._get_invites_for_service', side_effect=_get_invites)
 
 
 @pytest.fixture(scope='function')

@@ -19,10 +19,10 @@ from app.utils import user_has_permissions
 @user_has_permissions()
 def manage_users(service_id):
     users = sorted(
-        user_api_client.get_users_for_service(service_id=service_id) + [
-            invite for invite in invite_api_client.get_invites_for_service(service_id=service_id)
-            if invite.status != 'accepted'
-        ],
+        (
+            user_api_client.get_users_for_service(service_id=service_id) +
+            invite_api_client.get_invites_for_service(service_id=service_id)
+        ),
         key=lambda user: user.email_address,
     )
 
