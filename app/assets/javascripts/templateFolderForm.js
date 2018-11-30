@@ -41,8 +41,6 @@
 
     this.addCancelButton = function($el) {
       let $cancel =  $('<a></a>')
-          // .addClass('api-key')
-          // .css('min-height', $component.height())
           .html('Cancel')
           .click((event) => {
             event.preventDefault();
@@ -70,8 +68,10 @@
       let numSelected = this.countSelectedCheckboxes();
 
       if (this.currentState === 'nothingSelectedButtons' && numSelected !== 0) {
+        // user has just selected first item
         this.currentState = 'itemsSelectedButtons';
       } else if (this.currentState === 'itemsSelectedButtons' && numSelected === 0) {
+        // user has just deselected last item
         this.currentState = 'nothingSelectedButtons';
       }
 
@@ -79,35 +79,29 @@
     };
 
     this.countSelectedCheckboxes = function() {
-      return this.$form.find('input[type=checkbox]:checked').length;
+      return this.$form.find('input:checkbox:checked').length;
     };
 
     this.render = function() {
-      let numSelected = this.countSelectedCheckboxes();
-
       // detach everything, unless they are the currentState
       Object.entries(this.states).forEach(
         ([state, $el]) => (state === this.currentState ? this.$stickyBottom.append($el) : $el.detach())
       );
     };
 
-    this.nothingSelectedButtons = function() {
-      return `
-        <div id="nothing_selected">
-          <button class="button-secondary" value="addNewTemplateForm">New template</button>
-          <button class="button-secondary" value="addNewFolderForm">New folder</button>
-        </div>
-      `;
-    };
+    this.nothingSelectedButtons = `
+      <div id="nothing_selected">
+        <button class="button-secondary" value="addNewTemplateForm">New template</button>
+        <button class="button-secondary" value="addNewFolderForm">New folder</button>
+      </div>
+    `;
 
-    this.itemsSelectedButtons = function() {
-      return `
-        <div id="items_selected">
-          <button class="button-secondary" value="moveToFolderRadios">Move</button>
-          <button class="button-secondary" value="moveToNewFolderForm">Add to a new folder</button>
-        </div>
-      `;
-    };
+    this.itemsSelectedButtons = `
+      <div id="items_selected">
+        <button class="button-secondary" value="moveToFolderRadios">Move</button>
+        <button class="button-secondary" value="moveToNewFolderForm">Add to a new folder</button>
+      </div>
+    `;
   };
 
 })(window.GOVUK.Modules);

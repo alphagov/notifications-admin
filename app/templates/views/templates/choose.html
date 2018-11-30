@@ -60,8 +60,9 @@
       </div>
       {% if current_user.has_permissions('manage_templates') %}
         <div class="column-one-third">
+        {% if not can_manage_folders %}
           <a href="{{ url_for('.add_template_by_type', service_id=current_service.id, template_folder_id=current_template_folder_id) }}" class="button align-with-heading">Add new template</a>
-
+        {% endif %}
         {% if can_manage_folders and current_template_folder_id %}
           <a href="{{ url_for('.manage_template_folder', service_id=current_service.id, template_folder_id=current_template_folder_id) }}" class="align-with-heading">Manage</a>
         {% endif %}
@@ -80,9 +81,7 @@
     {% if can_manage_folders %}
       {% call form_wrapper(module='template-folder-form') %}
         {% include 'views/templates/_template_list.html' %}
-        {% with templates=templates, template_folders=template_folders, templates_and_folders_form=templates_and_folders_form %}
-          {% include 'views/templates/_move_to.html' %}
-        {% endwith %}
+        {% include 'views/templates/_move_to.html' %}
       {% endcall %}
 
     {% else %}
