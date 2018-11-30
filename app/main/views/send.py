@@ -390,7 +390,11 @@ def send_test_step(service_id, template_id, step_index):
     )
 
     try:
-        current_placeholder = placeholders[step_index]
+        if request.endpoint == 'main.send_test_step':
+            current_placeholder = placeholders[step_index - 1]
+        else:
+            current_placeholder = placeholders[step_index]
+
     except IndexError:
         if all_placeholders_in_session(placeholders):
             return get_notification_check_endpoint(service_id, template)
@@ -450,7 +454,7 @@ def send_test_step(service_id, template_id, step_index):
     ):
         skip_link = (
             'Use my {}'.format(first_column_headings[template.template_type][0]),
-            url_for('.send_test', service_id=service_id, template_id=template.id),
+            url_for('.send_test_step', service_id=service_id, template_id=template.id, step_index=1),
         )
     else:
         skip_link = None
@@ -798,6 +802,12 @@ def get_send_test_page_title(template_type, help_argument, entering_recipient, n
     return 'Personalise this message'
 
 
+def is_current_user_the_recipient():
+    if hasattr(current_user, 'phone_number'):
+        return session['recipient'] in {current_user.email_address, current_user.phone_number}
+    return session['recipient'] == current_user.email_address
+
+
 def get_back_link(service_id, template, step_index):
     if get_help_argument():
         # if we're on the check page, redirect back to the beginning. anywhere else, don't return the back link
@@ -821,6 +831,13 @@ def get_back_link(service_id, template, step_index):
                 '.view_template',
                 service_id=service_id,
                 template_id=template.id,
+            )
+    elif is_current_user_the_recipient() and step_index > 1:
+            return url_for(
+                'main.send_test_step',
+                service_id=service_id,
+                template_id=template.id,
+                step_index=step_index - 1,
             )
 
     else:
