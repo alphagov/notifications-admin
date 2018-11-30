@@ -935,7 +935,15 @@ def test_should_be_able_to_move_a_sub_item(
         'templates_and_folders': [],
         'move_to_new_folder_name': 'foo',
         'move_to': None
-    }
+    },
+    # add a new template, but also select move destination
+    {
+        'operation': 'add_template',
+        'templates_and_folders': [],
+        'move_to_new_folder_name': '',
+        'move_to': PARENT_FOLDER_ID,
+        'add_template_by_template_type': 'email',
+    },
 ])
 def test_no_action_if_user_fills_in_ambiguous_fields(
     client_request,
@@ -946,9 +954,14 @@ def test_no_action_if_user_fills_in_ambiguous_fields(
     mock_create_template_folder,
     data,
 ):
-    service_one['permissions'] += ['edit_folders']
+    service_one['permissions'] += ['edit_folders', 'letter']
 
-    client_request.post(
+    mock_get_template_folders.return_value = [
+        {'id': PARENT_FOLDER_ID, 'name': 'parent folder', 'parent_id': None},
+        {'id': FOLDER_TWO_ID, 'name': 'folder_two', 'parent_id': None},
+    ]
+
+    page = client_request.post(
         'main.choose_template',
         service_id=SERVICE_ONE_ID,
         _data=data,
@@ -958,6 +971,26 @@ def test_no_action_if_user_fills_in_ambiguous_fields(
 
     assert mock_move_to_template_folder.called is False
     assert mock_create_template_folder.called is False
+
+    assert page.select_one('button[value={}]'.format(data['operation']))
+
+    assert [
+        'email',
+        'sms',
+        'letter',
+        'copy-existing',
+    ] == [
+        radio['value']
+        for radio in page.select('#add_new_template_form input[type=radio]')
+    ]
+
+    assert [
+        FOLDER_TWO_ID,
+        PARENT_FOLDER_ID,
+    ] == [
+        radio['value']
+        for radio in page.select('#move_to_folder_radios input[type=radio]')
+    ]
 
 
 def test_new_folder_is_created_if_only_new_folder_is_filled_out(

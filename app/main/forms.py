@@ -1200,12 +1200,12 @@ class TemplateAndFoldersSelectionForm(Form):
             if item['id'] != str(current_folder_id)
         ]
 
-        self.add_template_by_template_type.choices = filter(None, [
+        self.add_template_by_template_type.choices = list(filter(None, [
             ('email', 'Email template'),
             ('sms', 'Text message template'),
             ('letter', 'Letter template') if allow_adding_letter_template else None,
             ('copy-existing', 'Copy of an existing template') if allow_adding_copy_of_template else None,
-        ])
+        ]))
 
     def validate(self):
         self.op = request.form.get('operation')
