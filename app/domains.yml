@@ -3294,7 +3294,7 @@ nottscc.gov.uk:
 npt.gov.uk:
   owner: Neath Port Talbot County Borough Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 n-somerset.gov.uk:
   owner: North Somerset Council
   crown: false
