@@ -18,19 +18,11 @@ from app.utils import user_has_permissions
 @login_required
 @user_has_permissions()
 def manage_users(service_id):
-    users = sorted(
-        (
-            user_api_client.get_users_for_service(service_id=service_id) +
-            invite_api_client.get_invites_for_service(service_id=service_id)
-        ),
-        key=lambda user: user.email_address,
-    )
-
     return render_template(
         'views/manage-users.html',
-        users=users,
+        users=current_service.team_members,
         current_user=current_user,
-        show_search_box=(len(users) > 7),
+        show_search_box=(len(current_service.team_members) > 7),
         form=SearchUsersForm(),
         permissions=permissions,
     )
