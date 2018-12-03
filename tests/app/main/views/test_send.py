@@ -1117,13 +1117,13 @@ def test_send_one_off_or_test_has_correct_page_titles(
         active_user_with_permissions,
         mock_get_service_template,
         'Use my phone number',
-        partial(url_for, 'main.send_test')
+        partial(url_for, 'main.send_test_step')
     ),
     (
         active_user_with_permissions,
         mock_get_service_email_template,
         'Use my email address',
-        partial(url_for, 'main.send_test')
+        partial(url_for, 'main.send_test_step')
     ),
     (
         active_user_with_permissions,
@@ -1166,6 +1166,7 @@ def test_send_one_off_has_skip_link(
         assert skip_links[0]['href'] == expected_link_url(
             service_id=service_one['id'],
             template_id=fake_uuid,
+            step_index=1
         )
     else:
         assert not skip_links
@@ -1679,7 +1680,7 @@ def test_send_test_indicates_optional_address_columns(
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
     assert normalize_spaces(page.select('label')[0].text) == (
-        'address line 4 '
+        'address line 3 '
         'Optional'
     )
     assert page.select('.page-footer-back-link')[0]['href'] == url_for(
