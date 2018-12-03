@@ -805,8 +805,8 @@ def get_send_test_page_title(template_type, help_argument, entering_recipient, n
 def is_current_user_the_recipient():
     if 'recipient' not in session:
         return False
-    if hasattr(current_user, 'phone_number'):
-        return session['recipient'] in {current_user.email_address, current_user.phone_number}
+    if hasattr(current_user, 'mobile_number'):
+        return session['recipient'] in {current_user.email_address, current_user.mobile_number}
     return session['recipient'] == current_user.email_address
 
 
