@@ -17,6 +17,7 @@ from app.utils import (
     generate_notifications_csv,
     generate_previous_dict,
     get_logo_cdn_domain,
+    printing_today_or_tomorrow,
 )
 from tests.conftest import fake_uuid
 
@@ -452,3 +453,27 @@ def test_validate_email_domain_data():
 def test_format_datetime_relative(time, human_readable_datetime):
     with freeze_time('2018-03-21 12:00'):
         assert format_datetime_relative(time) == human_readable_datetime
+
+
+@pytest.mark.parametrize('utc_datetime', [
+    '2018-08-01 23:00',
+    '2018-08-01 16:29',
+    '2018-11-01 00:00',
+    '2018-11-01 10:00',
+    '2018-11-01 17:29',
+])
+def test_printing_today_or_tomorrow_returns_today(utc_datetime):
+    with freeze_time(utc_datetime):
+        assert printing_today_or_tomorrow() == 'today'
+
+
+@pytest.mark.parametrize('datetime', [
+    '2018-08-01 22:59',
+    '2018-08-01 16:30',
+    '2018-11-01 17:30',
+    '2018-11-01 21:00',
+    '2018-11-01 23:59',
+])
+def test_printing_today_or_tomorrow_returns_tomorrow(datetime):
+    with freeze_time(datetime):
+        assert printing_today_or_tomorrow() == 'tomorrow'

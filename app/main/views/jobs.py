@@ -32,6 +32,7 @@ from app.utils import (
     get_page_from_request,
     get_time_left,
     parse_filter_args,
+    printing_today_or_tomorrow,
     set_status_filters,
     user_has_permissions,
 )
@@ -92,6 +93,11 @@ def view_job(service_id, job_id):
         version=job['template_version']
     )['data']
 
+    just_sent_message = 'Your {} been sent. Printing starts {} at 5.30pm.'.format(
+        'letter has' if job['notification_count'] == 1 else 'letters have',
+        printing_today_or_tomorrow()
+    )
+
     return render_template(
         'views/jobs/job.html',
         finished=(total_notifications == processed_notifications),
@@ -108,7 +114,8 @@ def view_job(service_id, job_id):
         just_sent=bool(
             request.args.get('just_sent') == 'yes' and
             template['template_type'] == 'letter'
-        )
+        ),
+        just_sent_message=just_sent_message,
     )
 
 

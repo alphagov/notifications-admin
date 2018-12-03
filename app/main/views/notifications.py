@@ -2,8 +2,9 @@
 import base64
 import io
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 
+from dateutil import parser
 from flask import (
     Response,
     abort,
@@ -16,10 +17,15 @@ from flask import (
 )
 from flask_login import login_required
 from notifications_python_client.errors import APIError
-from notifications_utils.letter_timings import get_letter_timings
+from notifications_utils.letter_timings import (
+    get_letter_timings,
+    letter_can_be_cancelled,
+)
 from notifications_utils.pdf import pdf_page_count
+from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
 
 from app import (
+    _format_datetime_short,
     current_service,
     format_date_numeric,
     job_api_client,
@@ -36,6 +42,7 @@ from app.utils import (
     get_help_argument,
     get_template,
     parse_filter_args,
+    printing_today_or_tomorrow,
     set_status_filters,
     user_has_permissions,
 )
@@ -76,6 +83,8 @@ def view_notification(service_id, notification_id):
     else:
         job = None
 
+    letter_print_day = get_letter_printing_statement(notification['status'], notification['created_at'])
+
     return render_template(
         'views/notifications/notification.html',
         finished=(notification['status'] in (DELIVERED_STATUSES + FAILURE_STATUSES)),
@@ -102,8 +111,21 @@ def view_notification(service_id, notification_id):
         notification_id=notification['id'],
         postage=notification['postage'],
         can_receive_inbound=(current_service.has_permission('inbound_sms')),
-        is_precompiled_letter=notification['template']['is_precompiled_letter']
+        is_precompiled_letter=notification['template']['is_precompiled_letter'],
+        letter_print_day=letter_print_day
     )
+
+
+def get_letter_printing_statement(status, created_at):
+    created_at_dt = parser.parse(created_at).replace(tzinfo=None)
+
+    if letter_can_be_cancelled(status, created_at_dt):
+        return 'Printing starts {} at 5.30pm'.format(printing_today_or_tomorrow())
+    else:
+        printed_datetime = utc_string_to_aware_gmt_datetime(created_at) + timedelta(hours=6, minutes=30)
+        printed_date = _format_datetime_short(printed_datetime)
+
+        return 'Printed on {}'.format(printed_date)
 
 
 def get_preview_error_image():
