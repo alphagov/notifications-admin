@@ -901,7 +901,7 @@ def test_should_be_able_to_move_a_sub_item(
         template_folder_id=PARENT_FOLDER_ID,
         _data={
             'operation': 'move_to_existing_folder',
-            'move_to': 'None',
+            'move_to': '__NONE__',
             'templates_and_folders': [GRANDCHILD_FOLDER_ID],
         },
         _expected_status=302,
@@ -929,6 +929,13 @@ def test_should_be_able_to_move_a_sub_item(
         'move_to_new_folder_name': 'foo',
         'move_to': PARENT_FOLDER_ID
     },
+    # move to existing, but no templates to move
+    {
+        'operation': 'move_to_existing_folder',
+        'templates_and_folders': [],
+        'move_to_new_folder_name': '',
+        'move_to': PARENT_FOLDER_ID
+    },
     # move to new, but nothing selected to move
     {
         'operation': 'move_to_new_folder',
@@ -942,6 +949,14 @@ def test_should_be_able_to_move_a_sub_item(
         'templates_and_folders': [],
         'move_to_new_folder_name': '',
         'move_to': PARENT_FOLDER_ID,
+        'add_template_by_template_type': 'email',
+    },
+    # add a new template, but also move to root folder
+    {
+        'operation': 'add_template',
+        'templates_and_folders': [],
+        'move_to_new_folder_name': '',
+        'move_to': '__NONE__',
         'add_template_by_template_type': 'email',
     },
 ])
