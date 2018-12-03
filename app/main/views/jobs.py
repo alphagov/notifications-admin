@@ -3,7 +3,6 @@
 from flask import (
     Response,
     abort,
-    current_app,
     jsonify,
     redirect,
     render_template,
@@ -226,9 +225,7 @@ def get_notifications(service_id, message_type, status_override=None):
     service_data_retention_days = None
 
     if message_type is not None:
-        service_data_retention_days = current_service.get_data_retention_by_type(
-            message_type
-        ).get('days_of_retention', current_app.config['ACTIVITY_STATS_LIMIT_DAYS'])
+        service_data_retention_days = current_service.get_days_of_retention(message_type)
 
     if request.path.endswith('csv') and current_user.has_permissions('view_activity'):
         return Response(
@@ -406,9 +403,7 @@ def get_job_partials(job, template):
             counts=_get_job_counts(job),
             status=filter_args['status']
         )
-    service_data_retention_days = current_service.get_data_retention_by_type(
-        template['template_type']
-    ).get('days_of_retention', current_app.config['ACTIVITY_STATS_LIMIT_DAYS'])
+    service_data_retention_days = current_service.get_days_of_retention(template['template_type'])
 
     return {
         'counts': counts,
