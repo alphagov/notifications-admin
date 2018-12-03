@@ -258,10 +258,10 @@ def add_template_by_type(service_id, template_folder_id=None):
 
     form = ChooseTemplateType(
         include_letters=current_service.has_permission('letter'),
-        include_copy=any((
-            len(current_service.all_templates) > 0,
-            len(user_api_client.get_service_ids_for_user(current_user)) > 1,
-        )),
+        include_copy=(
+            current_service.all_templates or
+            len(user_api_client.get_service_ids_for_user(current_user)) > 1
+        ),
         include_folder=current_service.has_permission('edit_folders')
     )
 
