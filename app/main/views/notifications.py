@@ -30,7 +30,6 @@ from app import (
     format_date_numeric,
     job_api_client,
     notification_api_client,
-    service_api_client,
 )
 from app.main import main
 from app.notify_client.api_key_api_client import KEY_TYPE_TEST
@@ -198,8 +197,8 @@ def download_notifications_csv(service_id):
     filter_args = parse_filter_args(request.args)
     filter_args['status'] = set_status_filters(filter_args)
 
-    service_data_retention_days = service_api_client.get_service_data_retention_by_notification_type(
-        service_id, filter_args.get('message_type')[0]
+    service_data_retention_days = current_service.get_data_retention_by_type(
+        filter_args.get('message_type')[0]
     ).get('days_of_retention', current_app.config['ACTIVITY_STATS_LIMIT_DAYS'])
     return Response(
         stream_with_context(
