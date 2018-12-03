@@ -1678,7 +1678,7 @@ east-northamptonshire.gov.uk:
 eastrenfrewshire.gov.uk:
   owner: East Renfrewshire Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 eastriding.gov.uk:
   owner: East Riding of Yorkshire Council
   crown: false
