@@ -50,7 +50,7 @@
 
             // gross hack - pretend we're in the choose actions state, then pretend a checkbox was clicked to work out
             // whether to show zero or non-zero options. This calls a render at the end
-            this.currentState = 'nothingSelectedButtons';
+            this.currentState = 'nothing-selected-buttons';
             this.templateFolderCheckboxChanged();
           });
 
@@ -67,12 +67,12 @@
     this.templateFolderCheckboxChanged = function() {
       let numSelected = this.countSelectedCheckboxes();
 
-      if (this.currentState === 'nothingSelectedButtons' && numSelected !== 0) {
+      if (this.currentState === 'nothing-selected-buttons' && numSelected !== 0) {
         // user has just selected first item
-        this.currentState = 'itemsSelectedButtons';
-      } else if (this.currentState === 'itemsSelectedButtons' && numSelected === 0) {
+        this.currentState = 'items-selected-buttons';
+      } else if (this.currentState === 'items-selected-buttons' && numSelected === 0) {
         // user has just deselected last item
-        this.currentState = 'nothingSelectedButtons';
+        this.currentState = 'nothing-selected-buttons';
       }
 
       this.render();
@@ -91,15 +91,15 @@
 
     this.nothingSelectedButtons = `
       <div id="nothing_selected">
-        <button class="button-secondary" value="addNewTemplateForm">New template</button>
-        <button class="button-secondary" value="addNewFolderForm">New folder</button>
+        <button class="button-secondary" value="add-new-template">New template</button>
+        <button class="button-secondary" value="add-new-folder">New folder</button>
       </div>
     `;
 
     this.itemsSelectedButtons = `
       <div id="items_selected">
-        <button class="button-secondary" value="moveToFolderRadios">Move</button>
-        <button class="button-secondary" value="moveToNewFolderForm">Add to a new folder</button>
+        <button class="button-secondary" value="move-to-existing-folder">Move</button>
+        <button class="button-secondary" value="move-to-new-folder">Add to a new folder</button>
       </div>
     `;
   };
