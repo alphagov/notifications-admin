@@ -48,21 +48,15 @@
   <div class="grid-row">
     <div class="column-five-sixths">
       <p>
-        Your emails will be sent from
-        {{ current_service.email_from }}@notifications.service.gov.uk
+        You need to add at least one reply-to address so recipients can reply to your messages.
       </p>
       <p>
-        This is so they have the best chance of being delivered.
-        This email address can’t receive replies.
+        Emails with a reply-to address:
       </p>
-      <p>
-        Set up separate email addresses to receive replies
-        from your users.
-        {% if current_service.trial_mode and not current_service.has_email_reply_to_address %}
-          Your service can’t go live until you’ve added at least one
-          reply-to address.
-        {% endif %}
-      </p>
+      <ul class="list list-bullet">
+        <li>are less likely to be labelled as spam</li>
+        <li>appear more trustworthy</li>
+      </ul>
     </div>
   </div>
 {% endblock %}
