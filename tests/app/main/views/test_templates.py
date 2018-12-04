@@ -21,6 +21,7 @@ from tests.conftest import (
     SERVICE_ONE_ID,
     SERVICE_TWO_ID,
     TEMPLATE_ONE_ID,
+    ElementNotFound,
     active_caseworking_user,
     active_user_view_permissions,
     mock_get_service_email_template,
@@ -40,6 +41,7 @@ from tests.conftest import single_letter_contact_block
 def test_should_show_empty_page_when_no_templates(
     client_request,
     service_one,
+    mock_get_organisations_and_services_for_user,
     mock_get_service_templates_when_no_templates_exist,
     mock_get_template_folders,
     extra_permissions,
@@ -128,6 +130,7 @@ def test_should_show_empty_page_when_no_templates(
 )
 def test_should_show_page_for_choosing_a_template(
     client_request,
+    mock_get_organisations_and_services_for_user,
     mock_get_service_templates,
     mock_get_template_folders,
     mock_has_no_jobs,
@@ -240,6 +243,63 @@ def test_should_show_live_search_if_service_has_lots_of_folders(
     assert len(page.select('.live-search')) == 1
     assert count_of_folders == 4
     assert count_of_templates == 4
+
+
+@pytest.mark.parametrize('extra_permissions, expected_values, expected_labels', (
+    pytest.param(['edit_folders'], [
+        'email',
+        'sms',
+        'copy-existing',
+    ], [
+        'Email template',
+        'Text message template',
+        'Copy of an existing template',
+    ]),
+    pytest.param(['edit_folders', 'letter'], [
+        'email',
+        'sms',
+        'letter',
+        'copy-existing',
+    ], [
+        'Email template',
+        'Text message template',
+        'Letter template',
+        'Copy of an existing template',
+    ]),
+    pytest.param(
+        [], [], [],
+        marks=pytest.mark.xfail(raises=ElementNotFound)
+    ),
+))
+def test_should_show_new_template_choices_if_service_has_folder_permission(
+    client_request,
+    service_one,
+    mock_get_organisations_and_services_for_user,
+    mock_get_service_templates,
+    mock_get_template_folders,
+    extra_permissions,
+    expected_values,
+    expected_labels,
+):
+    service_one['permissions'] += extra_permissions
+
+    page = client_request.get(
+        'main.choose_template',
+        service_id=SERVICE_ONE_ID,
+    )
+
+    if not page.select('#add_new_template_form'):
+        raise ElementNotFound()
+
+    assert normalize_spaces(page.select_one('#add_new_template_form fieldset fieldset legend').text) == (
+        'Add new'
+    )
+    assert [
+        choice['value'] for choice in page.select('#add_new_template_form input[type=radio]')
+    ] == expected_values
+    assert [
+        normalize_spaces(choice.text) for choice in page.select('#add_new_template_form label')
+    ] == expected_labels
 
 
 def test_should_show_page_for_one_template(
@@ -551,15 +611,35 @@ def test_dont_show_preview_letter_templates_for_bad_filetype(
     assert mock_get_service_template.called is False
 
 
+@pytest.mark.parametrize('endpoint, data', (
+    ('main.add_template_by_type', {
+        'template_type': 'copy-existing'
+    }),
+    ('main.choose_template', {
+        'operation': 'add_template',
+        'add_template_by_template_type': 'copy-existing'
+    }),
+))
 def test_choosing_to_copy_redirects(
     client_request,
+    service_one,
     mock_get_service_templates,
+    mock_get_template_folders,
     mock_get_organisations_and_services_for_user,
+    endpoint,
+    data,
 ):
+    service_one['permissions'] += ['edit_folders']
     client_request.post(
-        'main.add_template_by_type',
+        endpoint,
         service_id=SERVICE_ONE_ID,
-        _data={'template_type': 'copy-existing'}
+        _data=data,
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.choose_template_to_copy',
+            service_id=SERVICE_ONE_ID,
+            _external=True,
+        ),
     )
 
 
@@ -693,29 +773,56 @@ def test_cant_copy_template_from_non_member_service(
     assert mock_get_service_email_template.call_args_list == []
 
 
-@pytest.mark.parametrize('type_of_template', ['email', 'sms'])
+@pytest.mark.parametrize('endpoint, data, expected_error', (
+    (
+        'main.add_template_by_type',
+        {
+            'template_type': 'email',
+        },
+        "Sending emails has been disabled for your service."
+    ),
+    (
+        'main.add_template_by_type',
+        {
+            'template_type': 'sms',
+        },
+        "Sending text messages has been disabled for your service."
+    ),
+    (
+        'main.choose_template',
+        {
+            'operation': 'add_template',
+            'add_template_by_template_type': 'email',
+        },
+        "Sending emails has been disabled for your service."
+    ),
+    (
+        'main.choose_template',
+        {
+            'operation': 'add_template',
+            'add_template_by_template_type': 'sms',
+        },
+        "Sending text messages has been disabled for your service."
+    ),
+))
 def test_should_not_allow_creation_of_template_through_form_without_correct_permission(
-    logged_in_client,
+    client_request,
     service_one,
-    mocker,
     mock_get_service_templates,
+    mock_get_template_folders,
     mock_get_organisations_and_services_for_user,
-    type_of_template,
+    endpoint,
+    data,
+    expected_error,
 ):
-    service_one['permissions'] = []
-    template_description = {'sms': 'text messages', 'email': 'emails'}
-
-    response = logged_in_client.post(url_for(
-        '.add_template_by_type',
-        service_id=service_one['id']),
-        data={'template_type': type_of_template},
-        follow_redirects=True)
-
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-
-    assert response.status_code == 200
-    assert page.select('main p')[0].text.strip() == \
-        "Sending {} has been disabled for your service.".format(template_description[type_of_template])
+    service_one['permissions'] = ['edit_folders']
+    page = client_request.post(
+        endpoint,
+        service_id=SERVICE_ONE_ID,
+        _data=data,
+        _follow_redirects=True,
+    )
+    assert normalize_spaces(page.select('main p')[0].text) == expected_error
     assert page.select(".page-footer-back-link")[0].text == "Back to add new template"
     assert page.select(".page-footer-back-link")[0]['href'] == url_for(
         '.add_template_by_type',

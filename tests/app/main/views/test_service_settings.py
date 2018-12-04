@@ -2188,12 +2188,12 @@ def test_set_postage_saves(
 
 @pytest.mark.parametrize('current_branding, expected_values, expected_labels', [
     (None, [
-        'None', '1', '2', '3', '4', '5',
+        '__NONE__', '1', '2', '3', '4', '5',
     ], [
         'GOV.UK', 'org 1', 'org 2', 'org 3', 'org 4', 'org 5'
     ]),
     ('5', [
-        '5', 'None', '1', '2', '3', '4',
+        '5', '__NONE__', '1', '2', '3', '4',
     ], [
         'org 5', 'GOV.UK', 'org 1', 'org 2', 'org 3', 'org 4',
     ]),
@@ -2314,7 +2314,8 @@ def test_should_preview_email_branding(
 
 @pytest.mark.parametrize('posted_value, submitted_value', (
     ('1', '1'),
-    ('None', None),
+    ('__NONE__', None),
+    pytest.param('None', None, marks=pytest.mark.xfail(raises=AssertionError)),
 ))
 def test_should_set_branding_and_organisations(
     logged_in_platform_admin_client,

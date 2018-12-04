@@ -1,19 +1,20 @@
 {% from "components/radios.html" import radios %}
 {% from "components/page-footer.html" import page_footer %}
 
-{% if templates_and_folders_form.move_to.choices and template_list.templates_to_show %}
   <button type="submit" name="operation" value="unknown" hidden></button>
-  <div id="move_to_folder_radios">
-    {{ radios(templates_and_folders_form.move_to) }}
-    {{ page_footer('Move', button_name='operation', button_value='move_to_existing_folder') }}
-  </div>
-  <div id="move_to_new_folder_form">
-    <fieldset>
-      <legend class="visuallyhidden">Move to a new folder</legend>
-      {{ textbox(templates_and_folders_form.move_to_new_folder_name) }}
-      {{ page_footer('Move to a new folder', button_name='operation', button_value='move_to_new_folder') }}
-    </fieldset>
-  </div>
+  {% if templates_and_folders_form.move_to.choices and template_list.templates_to_show %}
+    <div id="move_to_folder_radios">
+      {{ radios(templates_and_folders_form.move_to) }}
+      {{ page_footer('Move', button_name='operation', button_value='move_to_existing_folder') }}
+    </div>
+    <div id="move_to_new_folder_form">
+      <fieldset>
+        <legend class="visuallyhidden">Move to a new folder</legend>
+        {{ textbox(templates_and_folders_form.move_to_new_folder_name) }}
+        {{ page_footer('Move to a new folder', button_name='operation', button_value='move_to_new_folder') }}
+      </fieldset>
+    </div>
+  {% endif %}
   <div id="add_new_folder_form">
     <fieldset>
       <legend class="visuallyhidden">Add a new folder</legend>
@@ -21,4 +22,10 @@
       {{ page_footer('New folder', button_name='operation', button_value='add_new_folder') }}
     </fieldset>
   </div>
-{% endif %}
+  <div id="add_new_template_form">
+    <fieldset>
+      <legend class="visuallyhidden">Add a new template</legend>
+      {{ radios(templates_and_folders_form.add_template_by_template_type) }}
+      {{ page_footer('Continue', button_name='operation', button_value='add_template') }}
+    </fieldset>
+  </div>

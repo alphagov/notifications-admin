@@ -707,12 +707,21 @@ class ServicePostageForm(StripWhitespaceForm):
 
 class FieldWithNoneOption():
 
-    # This needs to match the data the browser will post from
-    # <input value='None'>
-    NONE_OPTION_VALUE = 'None'
+    # This is a special value that is specific to our forms. This is
+    # more expicit than casting `None` to a string `'None'` which can
+    # have unexpected edge cases
+    NONE_OPTION_VALUE = '__NONE__'
 
+    # When receiving Python data, eg when instantiating the form object
+    # we want to convert that data to our special value, so that it gets
+    # recognised as being one of the valid choices
+    def process_data(self, value):
+        self.data = self.NONE_OPTION_VALUE if value is None else value
+
+    # After validation we want to convert it back to a Python `None` for
+    # use elsewhere, eg posting to the API
     def post_validate(self, form, validation_stopped):
-        if self.data == self.NONE_OPTION_VALUE:
+        if self.data == self.NONE_OPTION_VALUE and not validation_stopped:
             self.data = None
 
 
@@ -1174,6 +1183,8 @@ class TemplateAndFoldersSelectionForm(Form):
         all_template_folders,
         template_list,
         current_folder_id,
+        allow_adding_letter_template,
+        allow_adding_copy_of_template,
         *args,
         **kwargs
     ):
@@ -1183,21 +1194,32 @@ class TemplateAndFoldersSelectionForm(Form):
         self.templates_and_folders.choices = template_list.as_id_and_name
 
         self.op = None
-        self.is_move_op = self.is_add_op = False
+        self.is_move_op = self.is_add_folder_op = self.is_add_template_op = False
+
+        if current_folder_id is None:
+            current_folder_id = RadioFieldWithNoneOption.NONE_OPTION_VALUE
 
         self.move_to.choices = [
             (item['id'], item['name'])
             for item in ([self.ALL_TEMPLATES_FOLDER] + all_template_folders)
-            if item['id'] != str(current_folder_id)
+            if item['id'] != current_folder_id
         ]
+
+        self.add_template_by_template_type.choices = list(filter(None, [
+            ('email', 'Email template'),
+            ('sms', 'Text message template'),
+            ('letter', 'Letter template') if allow_adding_letter_template else None,
+            ('copy-existing', 'Copy of an existing template') if allow_adding_copy_of_template else None,
+        ]))
 
     def validate(self):
         self.op = request.form.get('operation')
 
         self.is_move_op = self.op in {'move_to_existing_folder', 'move_to_new_folder'}
-        self.is_add_op = self.op in {'add_new_folder', 'move_to_new_folder'}
+        self.is_add_folder_op = self.op in {'add_new_folder', 'move_to_new_folder'}
+        self.is_add_template_op = self.op in {'add_template'}
 
-        if not (self.is_add_op or self.is_move_op):
+        if not (self.is_add_folder_op or self.is_move_op or self.is_add_template_op):
             return False
 
         return super().validate()
@@ -1218,3 +1240,8 @@ class TemplateAndFoldersSelectionForm(Form):
     ])
     add_new_folder_name = StringField('Folder name', validators=[required_for_ops('add_new_folder')])
     move_to_new_folder_name = StringField('Folder name', validators=[required_for_ops('move_to_new_folder')])
+
+    add_template_by_template_type = RadioFieldWithNoneOption('Add new', validators=[
+        Optional(),
+        required_for_ops('add_template')
+    ])

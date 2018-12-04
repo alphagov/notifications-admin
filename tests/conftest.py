@@ -32,6 +32,10 @@ from . import (
 )
 
 
+class ElementNotFound(Exception):
+    pass
+
+
 @pytest.fixture
 def app_(request):
     app = Flask('app')

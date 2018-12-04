@@ -116,6 +116,11 @@ def choose_template(service_id, template_type='all', template_folder_id=None):
         template_list=template_list,
         template_type=template_type,
         current_folder_id=template_folder_id,
+        allow_adding_letter_template=current_service.has_permission('letter'),
+        allow_adding_copy_of_template=(
+            current_service.all_templates or
+            len(user_api_client.get_service_ids_for_user(current_user)) > 1
+        ),
     )
 
     if request.method == 'POST' and templates_and_folders_form.validate_on_submit():
@@ -144,7 +149,13 @@ def choose_template(service_id, template_type='all', template_folder_id=None):
 def process_folder_management_form(form, current_folder_id):
     new_folder_id = None
 
-    if form.is_add_op:
+    if form.is_add_template_op:
+        return _add_template_by_type(
+            form.add_template_by_template_type.data,
+            current_folder_id,
+        )
+
+    if form.is_add_folder_op:
         new_folder_id = template_folder_api_client.create_template_folder(
             current_service.id,
             name=form.get_folder_name(),
@@ -247,54 +258,58 @@ def add_template_by_type(service_id, template_folder_id=None):
 
     form = ChooseTemplateType(
         include_letters=current_service.has_permission('letter'),
-        include_copy=any((
-            service_api_client.count_service_templates(service_id) > 0,
-            len(user_api_client.get_service_ids_for_user(current_user)) > 1,
-        )),
+        include_copy=(
+            current_service.all_templates or
+            len(user_api_client.get_service_ids_for_user(current_user)) > 1
+        ),
         include_folder=current_service.has_permission('edit_folders')
     )
 
     if form.validate_on_submit():
-
-        if form.template_type.data == 'copy-existing':
-            return redirect(url_for(
-                '.choose_template_to_copy',
-                service_id=service_id,
-            ))
-
-        if form.template_type.data == 'letter':
-            blank_letter = service_api_client.create_service_template(
-                'Untitled',
-                'letter',
-                'Body',
-                service_id,
-                'Main heading',
-                'normal',
-                template_folder_id
-            )
-            return redirect(url_for(
-                '.view_template',
-                service_id=service_id,
-                template_id=blank_letter['data']['id'],
-            ))
-
-        if email_or_sms_not_enabled(form.template_type.data, current_service.permissions):
-            return redirect(url_for(
-                '.action_blocked',
-                service_id=service_id,
-                notification_type=form.template_type.data,
-                return_to='add_new_template',
-                template_id='0'
-            ))
-        else:
-            return redirect(url_for(
-                '.add_service_template',
-                service_id=service_id,
-                template_type=form.template_type.data,
-                template_folder_id=template_folder_id,
-            ))
+        return _add_template_by_type(form.template_type.data, template_folder_id)
 
     return render_template('views/templates/add.html', form=form)
+
+
+def _add_template_by_type(template_type, template_folder_id):
+
+    if template_type == 'copy-existing':
+        return redirect(url_for(
+            '.choose_template_to_copy',
+            service_id=current_service.id,
+        ))
+
+    if template_type == 'letter':
+        blank_letter = service_api_client.create_service_template(
+            'Untitled',
+            'letter',
+            'Body',
+            current_service.id,
+            'Main heading',
+            'normal',
+            template_folder_id
+        )
+        return redirect(url_for(
+            '.view_template',
+            service_id=current_service.id,
+            template_id=blank_letter['data']['id'],
+        ))
+
+    if email_or_sms_not_enabled(template_type, current_service.permissions):
+        return redirect(url_for(
+            '.action_blocked',
+            service_id=current_service.id,
+            notification_type=template_type,
+            return_to='add_new_template',
+            template_id='0'
+        ))
+    else:
+        return redirect(url_for(
+            '.add_service_template',
+            service_id=current_service.id,
+            template_type=template_type,
+            template_folder_id=template_folder_id,
+        ))
 
 
 @main.route("/services/<service_id>/templates/copy")
