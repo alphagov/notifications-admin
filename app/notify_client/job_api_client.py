@@ -25,7 +25,8 @@ class JobApiClient(NotifyAdminAPIClient):
     def __convert_statistics(job):
         results = defaultdict(int)
         for outcome in job['statistics']:
-            if outcome['status'] in ['failed', 'technical-failure', 'temporary-failure', 'permanent-failure']:
+            if outcome['status'] in ['failed', 'technical-failure', 'temporary-failure',
+                                     'permanent-failure', 'cancelled']:
                 results['failed'] += outcome['count']
             if outcome['status'] in ['sending', 'pending', 'created']:
                 results['sending'] += outcome['count']

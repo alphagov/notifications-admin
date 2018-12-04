@@ -196,6 +196,10 @@ def test_notification_page_shows_page_for_letter_notification(
         'Cancelled 1 January at 1:02am',
     ),
     (
+        'cancelled',
+        'Cancelled 1 January at 1:02am',
+    ),
+    (
         'validation-failed',
         'Cancelled 1 January at 1:02am (letter has content outside the printable area)',
     ),
