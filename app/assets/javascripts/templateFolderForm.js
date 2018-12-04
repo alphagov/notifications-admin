@@ -12,26 +12,21 @@
       this.$stickyBottom.append(this.itemsSelectedButtons);
 
       // all the diff states that we want to show or hide
-      this.states = {
-        nothingSelectedButtons: this.$form.find('#nothing_selected'),
-        itemsSelectedButtons: this.$form.find('#items_selected'),
-
-        moveToFolderRadios: this.$form.find('#move_to_folder_radios'),
-        moveToNewFolderForm: this.$form.find('#move_to_new_folder_form'),
-
-        addNewFolderForm: this.$form.find('#add_new_folder_form'),
-        addNewTemplateForm: this.$form.find('#add_new_template_form'),
-
-      };
+      this.states = [
+        {key: 'nothing-selected-buttons', $el: this.$form.find('#nothing_selected'), cancellable: false},
+        {key: 'items-selected-buttons', $el: this.$form.find('#items_selected'), cancellable: false},
+        {key: 'move-to-existing-folder', $el: this.$form.find('#move_to_folder_radios'), cancellable: true},
+        {key: 'move-to-new-folder', $el: this.$form.find('#move_to_new_folder_form'), cancellable: true},
+        {key: 'add-new-folder', $el: this.$form.find('#add_new_folder_form'), cancellable: true},
+        {key: 'add-new-template', $el: this.$form.find('#add_new_template_form'), cancellable: true}
+      ];
 
       // cancel buttons only relevant if JS enabled, so
-      this.addCancelButton(this.states.moveToFolderRadios);
-      this.addCancelButton(this.states.moveToNewFolderForm);
-      this.addCancelButton(this.states.addNewFolderForm);
-      this.addCancelButton(this.states.addNewTemplateForm);
+      this.states.filter(state => state.cancellable).forEach((x) => this.addCancelButton(x));
 
       // first off show the new template / new folder buttons
-      this.currentState = 'nothingSelectedButtons';
+      let prevState = this.$form.data('prev-state') || 'unknown';
+      this.currentState = (prevState === 'unknown') ? 'nothing-selected-buttons' : prevState;
 
       this.$form.on('click', 'button.button-secondary', (event) => this.actionButtonClicked(event));
       this.$form.on('change', 'input[type=checkbox]', () => this.templateFolderCheckboxChanged());
@@ -39,14 +34,14 @@
       this.render();
     };
 
-    this.addCancelButton = function($el) {
+    this.addCancelButton = function(state) {
       let $cancel =  $('<a></a>')
           .html('Cancel')
           .click((event) => {
             event.preventDefault();
             // clear existing data
-            $el.find('input:radio').prop('checked', false);
-            $el.find('input:text').val('');
+            state.$el.find('input:radio').prop('checked', false);
+            state.$el.find('input:text').val('');
 
             // gross hack - pretend we're in the choose actions state, then pretend a checkbox was clicked to work out
             // whether to show zero or non-zero options. This calls a render at the end
@@ -54,7 +49,7 @@
             this.templateFolderCheckboxChanged();
           });
 
-      $el.append($cancel);
+      state.$el.append($cancel);
     };
 
     this.actionButtonClicked = function(event) {
@@ -84,8 +79,8 @@
 
     this.render = function() {
       // detach everything, unless they are the currentState
-      Object.entries(this.states).forEach(
-        ([state, $el]) => (state === this.currentState ? this.$stickyBottom.append($el) : $el.detach())
+      this.states.forEach(
+        state => (state.key === this.currentState ? this.$stickyBottom.append(state.$el) : state.$el.detach())
       );
     };
 
