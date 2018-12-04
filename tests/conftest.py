@@ -537,14 +537,6 @@ def mock_get_service_statistics(mocker, api_user_active):
 
 
 @pytest.fixture(scope='function')
-def mock_get_service_data_retention_by_notification_type(mocker, api_user_active):
-    def _get(service_id, notification_type):
-        return {}
-
-    return mocker.patch('app.service_api_client.get_service_data_retention_by_notification_type', side_effect=_get)
-
-
-@pytest.fixture(scope='function')
 def mock_get_detailed_services(mocker, fake_uuid):
     service_one = service_json(
         id_=SERVICE_ONE_ID,
@@ -2831,30 +2823,16 @@ def normalize_spaces(input):
 
 @pytest.fixture(scope='function')
 def mock_get_service_data_retention(mocker):
-    data = {"id": str(fake_uuid),
-            "service_id": str(fake_uuid),
+    data = {"id": str(sample_uuid()),
+            "service_id": str(sample_uuid()),
             "service_name": "service name",
             "notification_type": "email",
-            "days_of_retention": 5,
+            "days_of_retention": 7,
             "created_at": datetime.now(),
             "updated_at": None,
             }
     return mocker.patch('app.service_api_client.get_service_data_retention',
                         return_value=[data])
-
-
-@pytest.fixture(scope='function')
-def mock_get_service_data_retention_by_id(mocker):
-    data = {"id": str(fake_uuid),
-            "service_id": str(fake_uuid),
-            "service_name": "service name",
-            "notification_type": "email",
-            "days_of_retention": 5,
-            "created_at": datetime.now(),
-            "updated_at": None,
-            }
-    return mocker.patch('app.service_api_client.get_service_data_retention_by_id',
-                        return_value=data)
 
 
 @pytest.fixture(scope='function')

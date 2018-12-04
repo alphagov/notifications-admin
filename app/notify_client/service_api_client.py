@@ -488,6 +488,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         }
         return self.post("/service/{}/delivery-receipt-api".format(service_id), data)
 
+    @cache.delete('service-{service_id}-data-retention')
     def create_service_data_retention(self, service_id, notification_type, days_of_retention):
         data = {
             "notification_type": notification_type,
@@ -496,20 +497,16 @@ class ServiceAPIClient(NotifyAdminAPIClient):
 
         return self.post("/service/{}/data-retention".format(service_id), data)
 
+    @cache.delete('service-{service_id}-data-retention')
     def update_service_data_retention(self, service_id, data_retention_id, days_of_retention):
         data = {
             "days_of_retention": days_of_retention
         }
         return self.post("/service/{}/data-retention/{}".format(service_id, data_retention_id), data)
 
+    @cache.set('service-{service_id}-data-retention')
     def get_service_data_retention(self, service_id):
         return self.get("/service/{}/data-retention".format(service_id))
-
-    def get_service_data_retention_by_notification_type(self, service_id, notification_type):
-        return self.get("/service/{}/data-retention/notification-type/{}".format(service_id, notification_type))
-
-    def get_service_data_retention_by_id(self, service_id, data_retention_id):
-        return self.get("service/{}/data-retention/{}".format(service_id, data_retention_id))
 
 
 service_api_client = ServiceAPIClient()

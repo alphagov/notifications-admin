@@ -181,7 +181,7 @@ def test_should_show_page_for_one_job(
     mock_get_job,
     mocker,
     mock_get_notifications,
-    mock_get_service_data_retention_by_notification_type,
+    mock_get_service_data_retention,
     fake_uuid,
     status_argument,
     expected_api_call,
@@ -229,11 +229,11 @@ def test_should_show_page_for_one_job_with_flexible_data_retention(
     mock_get_job,
     mocker,
     mock_get_notifications,
-    mock_get_service_data_retention_by_notification_type,
+    mock_get_service_data_retention,
     fake_uuid,
 ):
 
-    mock_get_service_data_retention_by_notification_type.side_effect = [{"days_of_retention": 10}]
+    mock_get_service_data_retention.side_effect = [[{"days_of_retention": 10, "notification_type": "sms"}]]
     page = client_request.get(
         'main.view_job',
         service_id=SERVICE_ONE_ID,
@@ -251,7 +251,7 @@ def test_get_jobs_should_tell_user_if_more_than_one_page(
     mock_get_job,
     mock_get_service_template,
     mock_get_notifications_with_previous_next,
-    mock_get_service_data_retention_by_notification_type,
+    mock_get_service_data_retention,
 ):
     response = logged_in_client.get(url_for(
         'main.view_job',
@@ -273,7 +273,7 @@ def test_should_show_job_in_progress(
     mock_get_job_in_progress,
     mocker,
     mock_get_notifications,
-    mock_get_service_data_retention_by_notification_type,
+    mock_get_service_data_retention,
     fake_uuid,
 ):
 
@@ -293,7 +293,7 @@ def test_should_show_letter_job(
     client_request,
     mock_get_service_letter_template,
     mock_get_job,
-    mock_get_service_data_retention_by_notification_type,
+    mock_get_service_data_retention,
     fake_uuid,
     active_user_with_permissions,
     mocker,
@@ -349,7 +349,7 @@ def test_should_show_letter_job_with_banner_after_sending_before_1730(
     mock_get_service_letter_template,
     mock_get_job,
     mock_get_notifications,
-    mock_get_service_data_retention_by_notification_type,
+    mock_get_service_data_retention,
     fake_uuid,
 ):
 
@@ -372,7 +372,7 @@ def test_should_show_letter_job_with_banner_when_there_are_multiple_CSV_rows(
     mock_get_service_letter_template,
     mock_get_job_in_progress,
     mock_get_notifications,
-    mock_get_service_data_retention_by_notification_type,
+    mock_get_service_data_retention,
     fake_uuid,
 ):
 
@@ -395,7 +395,7 @@ def test_should_show_letter_job_with_banner_after_sending_after_1730(
     mock_get_service_letter_template,
     mock_get_job,
     mock_get_notifications,
-    mock_get_service_data_retention_by_notification_type,
+    mock_get_service_data_retention,
     fake_uuid,
 ):
 
@@ -418,7 +418,7 @@ def test_should_show_scheduled_job(
     active_user_with_permissions,
     mock_get_service_template,
     mock_get_scheduled_job,
-    mock_get_service_data_retention_by_notification_type,
+    mock_get_service_data_retention,
     mocker,
     mock_get_notifications,
     fake_uuid,
@@ -486,7 +486,7 @@ def test_should_show_updates_for_one_job_as_json(
     mock_get_notifications,
     mock_get_service_template,
     mock_get_job,
-    mock_get_service_data_retention_by_notification_type,
+    mock_get_service_data_retention,
     mocker,
     fake_uuid,
 ):
@@ -523,7 +523,7 @@ def test_should_show_letter_job_with_first_class_if_notifications_are_first_clas
     client_request,
     mock_get_service_letter_template,
     mock_get_job,
-    mock_get_service_data_retention_by_notification_type,
+    mock_get_service_data_retention,
     fake_uuid,
     active_user_with_permissions,
     mocker,
@@ -547,14 +547,16 @@ def test_should_show_letter_job_with_first_class_if_notifications_are_first_clas
 @freeze_time("2016-01-01 11:09:00.061258")
 def test_should_show_letter_job_with_first_class_if_no_notifications(
     client_request,
+    service_one,
     mock_get_service_letter_template,
     mock_get_job,
     fake_uuid,
     mock_get_notifications_with_no_notifications,
-    mock_get_service_data_retention_by_notification_type,
+    mock_get_service_data_retention,
     mocker
 ):
-    mocker.patch('app.main.views.jobs.current_service', postage='first')
+
+    service_one['postage'] = 'first'
 
     page = client_request.get(
         'main.view_job',

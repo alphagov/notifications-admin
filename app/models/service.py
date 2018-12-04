@@ -1,4 +1,4 @@
-from flask import abort
+from flask import abort, current_app
 from notifications_utils.field import Field
 from werkzeug.utils import cached_property
 
@@ -268,7 +268,16 @@ class Service():
         return service_api_client.get_service_data_retention(self.id)
 
     def get_data_retention_item(self, id):
-        return service_api_client.get_service_data_retention_by_id(self.id, id)
+        return next(
+            (dr for dr in self.data_retention if dr['id'] == id),
+            None
+        )
+
+    def get_days_of_retention(self, notification_type):
+        return next(
+            (dr for dr in self.data_retention if dr['notification_type'] == notification_type),
+            {}
+        ).get('days_of_retention', current_app.config['ACTIVITY_STATS_LIMIT_DAYS'])
 
     @property
     def email_branding_id(self):

@@ -89,7 +89,7 @@ def test_can_show_notifications(
     service_one,
     mock_get_notifications,
     mock_get_service_statistics,
-    mock_get_service_data_retention_by_notification_type,
+    mock_get_service_data_retention,
     mock_has_no_jobs,
     user,
     extra_args,
@@ -229,7 +229,7 @@ def test_link_to_download_notifications(
     fake_uuid,
     mock_get_notifications,
     mock_get_service_statistics,
-    mock_get_service_data_retention_by_notification_type,
+    mock_get_service_data_retention,
     mock_has_no_jobs,
     user,
     query_parameters,
@@ -265,7 +265,7 @@ def test_letters_with_status_virus_scan_failed_shows_a_failure_description(
     logged_in_client,
     service_one,
     mock_get_service_statistics,
-    mock_get_service_data_retention_by_notification_type,
+    mock_get_service_data_retention,
 ):
     mock_get_notifications(
         mocker,
@@ -295,7 +295,7 @@ def test_should_not_show_preview_link_for_precompiled_letters_in_virus_states(
     logged_in_client,
     service_one,
     mock_get_service_statistics,
-    mock_get_service_data_retention_by_notification_type,
+    mock_get_service_data_retention,
     letter_status,
 ):
     mock_get_notifications(
@@ -318,7 +318,7 @@ def test_should_not_show_preview_link_for_precompiled_letters_in_virus_states(
 def test_shows_message_when_no_notifications(
     client_request,
     mock_get_service_statistics,
-    mock_get_service_data_retention_by_notification_type,
+    mock_get_service_data_retention,
     mock_get_notifications_with_no_notifications,
 ):
 
@@ -380,7 +380,7 @@ def test_search_recipient_form(
     logged_in_client,
     mock_get_notifications,
     mock_get_service_statistics,
-    mock_get_service_data_retention_by_notification_type,
+    mock_get_service_data_retention,
     initial_query_arguments,
     form_post_data,
     expected_search_box_label,
@@ -422,7 +422,7 @@ def test_should_show_notifications_for_a_service_with_next_previous(
     active_user_with_permissions,
     mock_get_notifications_with_previous_next,
     mock_get_service_statistics,
-    mock_get_service_data_retention_by_notification_type,
+    mock_get_service_data_retention,
     mocker,
 ):
     response = logged_in_client.get(url_for(
@@ -503,7 +503,7 @@ def test_html_contains_notification_id(
     active_user_with_permissions,
     mock_get_notifications,
     mock_get_service_statistics,
-    mock_get_service_data_retention_by_notification_type,
+    mock_get_service_data_retention,
     mocker,
 ):
     response = logged_in_client.get(url_for(
@@ -523,7 +523,7 @@ def test_html_contains_links_for_failed_notifications(
     client_request,
     active_user_with_permissions,
     mock_get_service_statistics,
-    mock_get_service_data_retention_by_notification_type,
+    mock_get_service_data_retention,
     mocker,
 ):
     mock_get_notifications(mocker, active_user_with_permissions, noti_status='technical-failure')
@@ -544,7 +544,7 @@ def test_redacts_templates_that_should_be_redacted(
     mocker,
     active_user_with_permissions,
     mock_get_service_statistics,
-    mock_get_service_data_retention_by_notification_type,
+    mock_get_service_data_retention,
 ):
     mock_get_notifications(
         mocker,
@@ -577,7 +577,7 @@ def test_big_numbers_and_search_dont_show_for_letters(
     mock_get_notifications,
     active_user_with_permissions,
     mock_get_service_statistics,
-    mock_get_service_data_retention_by_notification_type,
+    mock_get_service_data_retention,
     message_type,
     tablist_visible,
     search_bar_visible
@@ -609,7 +609,7 @@ def test_sending_status_hint_does_not_include_status_for_letters(
     service_one,
     active_user_with_permissions,
     mock_get_service_statistics,
-    mock_get_service_data_retention_by_notification_type,
+    mock_get_service_data_retention,
     message_type,
     status,
     expected_hint_status,
@@ -637,7 +637,7 @@ def test_should_expected_hint_for_letters(
     service_one,
     active_user_with_permissions,
     mock_get_service_statistics,
-    mock_get_service_data_retention_by_notification_type,
+    mock_get_service_data_retention,
     mocker,
     fake_uuid,
     is_precompiled_letter,
