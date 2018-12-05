@@ -6,6 +6,10 @@
     this.start = function(templateFolderForm) {
       this.$form = $(templateFolderForm);
 
+      // remove the hidden unknown button - if you've got JS enabled then the action you want to do is implied by
+      // which field is visible.
+      this.$form.find('button[value=unknown]').remove();
+
       this.$stickyBottom = this.$form.find('#sticky_template_forms');
 
       this.$stickyBottom.append(this.nothingSelectedButtons);
