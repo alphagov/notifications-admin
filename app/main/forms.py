@@ -1241,7 +1241,7 @@ class TemplateAndFoldersSelectionForm(Form):
     add_new_folder_name = StringField('Folder name', validators=[required_for_ops('add_new_folder')])
     move_to_new_folder_name = StringField('Folder name', validators=[required_for_ops('move_to_new_folder')])
 
-    add_template_by_template_type = RadioFieldWithNoneOption('Add new', validators=[
+    add_template_by_template_type = RadioField('Add new', validators=[
         Optional(),
         required_for_ops('add_template')
     ])
