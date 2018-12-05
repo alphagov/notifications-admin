@@ -49,7 +49,7 @@
   {% else %}
 
     <div class="grid-row {% if current_service.all_template_folders %}bottom-gutter-1-2{% else %}bottom-gutter-2-3{% endif %}">
-      <div class="column-two-thirds">
+      <div class="{% if can_manage_folders %} column-five-sixths {% else %} column-two-thirds {% endif %}">
         {{ folder_path(
           folders=template_folder_path,
           service_id=current_service.id,
@@ -59,14 +59,16 @@
         ) }}
       </div>
       {% if current_user.has_permissions('manage_templates') %}
-        <div class="column-one-third">
         {% if not can_manage_folders %}
-          <a href="{{ url_for('.add_template_by_type', service_id=current_service.id, template_folder_id=current_template_folder_id) }}" class="button align-with-heading">Add new template</a>
+          <div class="column-one-third">
+            <a href="{{ url_for('.add_template_by_type', service_id=current_service.id, template_folder_id=current_template_folder_id) }}" class="button align-with-heading">Add new template</a>
+          </div>
         {% endif %}
         {% if can_manage_folders and current_template_folder_id %}
-          <a href="{{ url_for('.manage_template_folder', service_id=current_service.id, template_folder_id=current_template_folder_id) }}" class="align-with-heading">Manage</a>
+          <div class="column-one-sixth">
+            <a href="{{ url_for('.manage_template_folder', service_id=current_service.id, template_folder_id=current_template_folder_id) }}" class="folder-heading-manage-link">Manage</a>
+          </div>
         {% endif %}
-        </div>
       {% endif %}
     </div>
 

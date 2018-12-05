@@ -86,3 +86,21 @@
   }
 
 }
+
+.page-footer-js-cancel {
+
+  text-decoration: underline;
+  color: $govuk-blue;
+  cursor: pointer;
+
+  &:hover {
+    color: $link-hover-colour;
+  }
+
+  &:focus,
+  &:active, {
+    background: $yellow;
+    color: $govuk-blue;
+    outline: 3px solid $yellow;
+  }
+}
