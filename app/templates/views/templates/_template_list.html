@@ -17,6 +17,7 @@
           {{ unlabelled_checkbox(
             id='templates-or-folder-{}'.format(item.id),
             name='templates_and_folders',
+            data=templates_and_folders_form.is_selected(item.id),
             value=item.id,
           ) }}
         {% endif %}

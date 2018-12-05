@@ -1165,11 +1165,11 @@ class TemplateAndFoldersSelectionForm(Form):
     * unknown
         currently not implemented, but in the future will try and work out if there are any obvious commands that can be
         assumed based on which fields are empty vs populated.
-    * move_to_existing_folder
+    * move-to-existing-folder
         must have data for templates_and_folders checkboxes, and move_to radios
-    * move_to_new_folder
+    * move-to-new-folder
         must have data for move_to_new_folder_name, cannot have data for move_to_existing_folder_name
-    * add_new_folder
+    * add-new-folder
         must have data for move_to_existing_folder_name, cannot have data for move_to_new_folder_name
     """
 
@@ -1212,12 +1212,15 @@ class TemplateAndFoldersSelectionForm(Form):
             ('copy-existing', 'Copy of an existing template') if allow_adding_copy_of_template else None,
         ]))
 
+    def is_selected(self, template_folder_id):
+        return template_folder_id in (self.templates_and_folders.data or [])
+
     def validate(self):
         self.op = request.form.get('operation')
 
-        self.is_move_op = self.op in {'move_to_existing_folder', 'move_to_new_folder'}
-        self.is_add_folder_op = self.op in {'add_new_folder', 'move_to_new_folder'}
-        self.is_add_template_op = self.op in {'add_template'}
+        self.is_move_op = self.op in {'move-to-existing-folder', 'move-to-new-folder'}
+        self.is_add_folder_op = self.op in {'add-new-folder', 'move-to-new-folder'}
+        self.is_add_template_op = self.op in {'add-new-template'}
 
         if not (self.is_add_folder_op or self.is_move_op or self.is_add_template_op):
             return False
@@ -1225,23 +1228,23 @@ class TemplateAndFoldersSelectionForm(Form):
         return super().validate()
 
     def get_folder_name(self):
-        if self.op == 'add_new_folder':
+        if self.op == 'add-new-folder':
             return self.add_new_folder_name.data
-        elif self.op == 'move_to_new_folder':
+        elif self.op == 'move-to-new-folder':
             return self.move_to_new_folder_name.data
         return None
 
     templates_and_folders = MultiCheckboxField('Choose templates or folders', validators=[
-        required_for_ops('move_to_new_folder', 'move_to_existing_folder')
+        required_for_ops('move-to-new-folder', 'move-to-existing-folder')
     ])
     move_to = RadioFieldWithNoneOption('Choose a folder', validators=[
         Optional(),
-        required_for_ops('move_to_new_folder', 'move_to_existing_folder')
+        required_for_ops('move-to-new-folder', 'move-to-existing-folder')
     ])
-    add_new_folder_name = StringField('Folder name', validators=[required_for_ops('add_new_folder')])
-    move_to_new_folder_name = StringField('Folder name', validators=[required_for_ops('move_to_new_folder')])
+    add_new_folder_name = StringField('Folder name', validators=[required_for_ops('add-new-folder')])
+    move_to_new_folder_name = StringField('Folder name', validators=[required_for_ops('move-to-new-folder')])
 
     add_template_by_template_type = RadioField('Add new', validators=[
         Optional(),
-        required_for_ops('add_template')
+        required_for_ops('add-new-template')
     ])

@@ -616,7 +616,7 @@ def test_dont_show_preview_letter_templates_for_bad_filetype(
         'template_type': 'copy-existing'
     }),
     ('main.choose_template', {
-        'operation': 'add_template',
+        'operation': 'add-new-template',
         'add_template_by_template_type': 'copy-existing'
     }),
 ))
@@ -791,7 +791,7 @@ def test_cant_copy_template_from_non_member_service(
     (
         'main.choose_template',
         {
-            'operation': 'add_template',
+            'operation': 'add-new-template',
             'add_template_by_template_type': 'email',
         },
         "Sending emails has been disabled for your service."
@@ -799,7 +799,7 @@ def test_cant_copy_template_from_non_member_service(
     (
         'main.choose_template',
         {
-            'operation': 'add_template',
+            'operation': 'add-new-template',
             'add_template_by_template_type': 'sms',
         },
         "Sending text messages has been disabled for your service."

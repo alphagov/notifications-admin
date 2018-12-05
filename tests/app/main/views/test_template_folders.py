@@ -797,10 +797,10 @@ def test_should_show_radios_and_buttons_for_move_destination_if_correct_permissi
     ]
     assert set(x['value'] for x in page.find_all('button', {'name': 'operation'})) == {
         'unknown',
-        'move_to_existing_folder',
-        'move_to_new_folder',
-        'add_new_folder',
-        'add_template',
+        'move-to-existing-folder',
+        'move-to-new-folder',
+        'add-new-folder',
+        'add-new-template',
     }
 
 
@@ -821,7 +821,7 @@ def test_should_be_able_to_move_to_existing_folder(
         'main.choose_template',
         service_id=SERVICE_ONE_ID,
         _data={
-            'operation': 'move_to_existing_folder',
+            'operation': 'move-to-existing-folder',
             'move_to': PARENT_FOLDER_ID,
             'templates_and_folders': [
                 FOLDER_TWO_ID,
@@ -868,7 +868,7 @@ def test_should_not_be_able_to_move_to_existing_folder_if_dont_have_permission(
         'main.choose_template',
         service_id=SERVICE_ONE_ID,
         _data={
-            'operation': 'move_to_existing_folder',
+            'operation': 'move-to-existing-folder',
             'move_to': PARENT_FOLDER_ID,
             'templates_and_folders': [
                 FOLDER_TWO_ID,
@@ -900,7 +900,7 @@ def test_should_be_able_to_move_a_sub_item(
         service_id=SERVICE_ONE_ID,
         template_folder_id=PARENT_FOLDER_ID,
         _data={
-            'operation': 'move_to_existing_folder',
+            'operation': 'move-to-existing-folder',
             'move_to': '__NONE__',
             'templates_and_folders': [GRANDCHILD_FOLDER_ID],
         },
@@ -917,35 +917,35 @@ def test_should_be_able_to_move_a_sub_item(
 @pytest.mark.parametrize('data', [
     # move to existing, but add new folder name given
     {
-        'operation': 'move_to_existing_folder',
+        'operation': 'move-to-existing-folder',
         'templates_and_folders': [],
         'add_new_folder_name': 'foo',
         'move_to': PARENT_FOLDER_ID
     },
     # move to existing, but move to new folder name given
     {
-        'operation': 'move_to_existing_folder',
+        'operation': 'move-to-existing-folder',
         'templates_and_folders': [TEMPLATE_ONE_ID],
         'move_to_new_folder_name': 'foo',
         'move_to': PARENT_FOLDER_ID
     },
     # move to existing, but no templates to move
     {
-        'operation': 'move_to_existing_folder',
+        'operation': 'move-to-existing-folder',
         'templates_and_folders': [],
         'move_to_new_folder_name': '',
         'move_to': PARENT_FOLDER_ID
     },
     # move to new, but nothing selected to move
     {
-        'operation': 'move_to_new_folder',
+        'operation': 'move-to-new-folder',
         'templates_and_folders': [],
         'move_to_new_folder_name': 'foo',
         'move_to': None
     },
     # add a new template, but also select move destination
     {
-        'operation': 'add_template',
+        'operation': 'add-new-template',
         'templates_and_folders': [],
         'move_to_new_folder_name': '',
         'move_to': PARENT_FOLDER_ID,
@@ -953,7 +953,7 @@ def test_should_be_able_to_move_a_sub_item(
     },
     # add a new template, but also move to root folder
     {
-        'operation': 'add_template',
+        'operation': 'add-new-template',
         'templates_and_folders': [],
         'move_to_new_folder_name': '',
         'move_to': '__NONE__',
@@ -1019,7 +1019,7 @@ def test_new_folder_is_created_if_only_new_folder_is_filled_out(
     data = {
         'move_to_new_folder_name': '',
         'add_new_folder_name': 'new folder',
-        'operation': 'add_new_folder'
+        'operation': 'add-new-folder'
     }
 
     service_one['permissions'] += ['edit_folders']
@@ -1066,7 +1066,7 @@ def test_should_be_able_to_move_to_new_folder(
         service_id=SERVICE_ONE_ID,
         template_folder_id=None,
         _data={
-            'operation': 'move_to_new_folder',
+            'operation': 'move-to-new-folder',
             'move_to_new_folder_name': 'new folder',
             'templates_and_folders': [
                 FOLDER_TWO_ID,
