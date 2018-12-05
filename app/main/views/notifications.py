@@ -8,7 +8,9 @@ from dateutil import parser
 from flask import (
     Response,
     abort,
+    flash,
     jsonify,
+    redirect,
     render_template,
     request,
     stream_with_context,
@@ -83,6 +85,11 @@ def view_notification(service_id, notification_id):
 
     letter_print_day = get_letter_printing_statement(notification['status'], notification['created_at'])
 
+    notification_created = parser.parse(notification['created_at']).replace(tzinfo=None)
+
+    show_cancel_button = notification['notification_type'] == 'letter' and \
+        letter_can_be_cancelled(notification['status'], notification_created)
+
     return render_template(
         'views/notifications/notification.html',
         finished=(notification['status'] in (DELIVERED_STATUSES + FAILURE_STATUSES)),
@@ -110,8 +117,22 @@ def view_notification(service_id, notification_id):
         postage=notification['postage'],
         can_receive_inbound=(current_service.has_permission('inbound_sms')),
         is_precompiled_letter=notification['template']['is_precompiled_letter'],
-        letter_print_day=letter_print_day
+        letter_print_day=letter_print_day,
+        show_cancel_button=show_cancel_button
     )
+
+
+@main.route("/services/<service_id>/notification/<uuid:notification_id>/cancel", methods=['GET', 'POST'])
+@login_required
+@user_has_permissions('view_activity', 'send_messages')
+def cancel_letter(service_id, notification_id):
+
+    if request.method == 'POST':
+        notification_api_client.update_notification_to_cancelled(current_service.id, notification_id)
+        return redirect(url_for('main.view_notification', service_id=service_id, notification_id=notification_id))
+
+    flash("Are you sure you want to cancel sending this letter?", 'cancel')
+    return view_notification(service_id, notification_id)
 
 
 def get_letter_printing_statement(status, created_at):
