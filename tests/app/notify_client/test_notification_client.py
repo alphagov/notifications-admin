@@ -85,3 +85,12 @@ def test_get_api_notifications_changes_letter_statuses(mocker):
     assert ret['notifications'][0]['status'] == 'created'
     assert ret['notifications'][1]['status'] == 'created'
     assert ret['notifications'][2]['status'] == 'accepted'
+
+
+def test_update_notification_to_cancelled(mocker):
+    mock_post = mocker.patch('app.notify_client.notification_api_client.NotificationApiClient.post')
+    NotificationApiClient().update_notification_to_cancelled('foo', 'bar')
+    mock_post.assert_called_once_with(
+        url='/service/foo/notifications/bar/cancel',
+        data={},
+    )

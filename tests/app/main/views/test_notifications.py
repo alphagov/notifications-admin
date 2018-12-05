@@ -196,6 +196,10 @@ def test_notification_page_shows_page_for_letter_notification(
         'Cancelled 1 January at 1:02am',
     ),
     (
+        'cancelled',
+        'Cancelled 1 January at 1:02am',
+    ),
+    (
         'validation-failed',
         'Cancelled 1 January at 1:02am (letter has content outside the printable area)',
     ),
@@ -235,6 +239,82 @@ def test_notification_page_shows_cancelled_letter(
     assert not page.select('p.notification-status')
 
     assert page.select_one('main img')['src'].endswith('.png?page=1')
+
+
+@pytest.mark.parametrize('notification_type', ['email', 'sms'])
+@freeze_time('2016-01-01 15:00')
+def test_notification_page_does_not_show_cancel_link_for_sms_or_email_notifications(
+    client_request,
+    mocker,
+    fake_uuid,
+    notification_type,
+):
+    mock_get_notification(
+        mocker,
+        fake_uuid,
+        template_type=notification_type,
+        notification_status='created',
+    )
+
+    page = client_request.get(
+        'main.view_notification',
+        service_id=SERVICE_ONE_ID,
+        notification_id=fake_uuid,
+    )
+
+    assert 'Cancel sending this letter' not in normalize_spaces(page.text)
+
+
+@freeze_time('2016-01-01 15:00')
+def test_notification_page_shows_cancel_link_for_letter_which_can_be_cancelled(
+    client_request,
+    mocker,
+    fake_uuid,
+):
+    mock_get_notification(
+        mocker,
+        fake_uuid,
+        template_type='letter',
+        notification_status='created',
+    )
+    mocker.patch(
+        'app.main.views.notifications.get_page_count_for_letter',
+        return_value=1
+    )
+
+    page = client_request.get(
+        'main.view_notification',
+        service_id=SERVICE_ONE_ID,
+        notification_id=fake_uuid,
+    )
+
+    assert 'Cancel sending this letter' in normalize_spaces(page.text)
+
+
+@freeze_time('2016-01-01 15:00')
+def test_notification_page_does_not_show_cancel_link_for_letter_which_cannot_be_cancelled(
+    client_request,
+    mocker,
+    fake_uuid,
+):
+    mock_get_notification(
+        mocker,
+        fake_uuid,
+        template_type='letter',
+        notification_status='delivered',
+    )
+    mocker.patch(
+        'app.main.views.notifications.get_page_count_for_letter',
+        return_value=1
+    )
+
+    page = client_request.get(
+        'main.view_notification',
+        service_id=SERVICE_ONE_ID,
+        notification_id=fake_uuid,
+    )
+
+    assert 'Cancel sending this letter' not in normalize_spaces(page.text)
 
 
 @freeze_time("2016-01-01 18:00")
@@ -527,3 +607,62 @@ def test_get_letter_printing_statement_for_letter_that_has_been_sent(created_at,
     statement = get_letter_printing_statement('delivered', created_at)
 
     assert statement == 'Printed on {}'.format(print_day)
+
+
+@freeze_time('2016-01-01 15:00')
+def test_show_cancel_letter_confirmation(
+    client_request,
+    mocker,
+    fake_uuid,
+):
+    mock_get_notification(
+        mocker,
+        fake_uuid,
+        template_type='letter',
+        notification_status='created',
+    )
+    mocker.patch(
+        'app.main.views.notifications.get_page_count_for_letter',
+        return_value=1
+    )
+
+    page = client_request.get(
+        'main.cancel_letter',
+        service_id=SERVICE_ONE_ID,
+        notification_id=fake_uuid,
+    )
+
+    flash_message = normalize_spaces(page.find('div', class_='banner-dangerous').text)
+
+    assert 'Are you sure you want to cancel sending this letter?' in flash_message
+
+
+@freeze_time('2016-01-01 15:00')
+def test_cancelling_a_letter_calls_the_api(
+    client_request,
+    mocker,
+    fake_uuid,
+):
+    mock_get_notification(
+        mocker,
+        fake_uuid,
+        template_type='letter',
+        notification_status='created',
+    )
+    mocker.patch(
+        'app.main.views.notifications.get_page_count_for_letter',
+        return_value=1
+    )
+    cancel_endpoint = mocker.patch(
+        'app.main.views.notifications.notification_api_client.update_notification_to_cancelled'
+    )
+
+    client_request.post(
+        'main.cancel_letter',
+        service_id=SERVICE_ONE_ID,
+        notification_id=fake_uuid,
+        _follow_redirects=True,
+        _expected_redirect=None,
+    )
+
+    assert cancel_endpoint.called

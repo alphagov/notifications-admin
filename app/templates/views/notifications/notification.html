@@ -37,7 +37,7 @@
     </p>
 
     {% if template.template_type == 'letter' %}
-      {% if notification_status == 'permanent-failure' %}
+      {% if notification_status in ('permanent-failure', 'cancelled') %}
         <p class="notification-status-cancelled">
           Cancelled {{ updated_at|format_datetime_short }}
         </p>
@@ -64,7 +64,13 @@
     {% if template.template_type == 'letter' %}
       <div class="js-stick-at-bottom-when-scrolling">
         <div class="page-footer">
-          <div>&nbsp;</div>
+          {% if show_cancel_button %}
+            <span class="page-footer-delete-link page-footer-delete-link-without-button">
+              <a href="{{ url_for('main.cancel_letter', service_id=current_service.id, notification_id=notification_id) }}">Cancel sending this letter</a>
+            </span>
+          {% else %}
+            <div>&nbsp;</div>
+          {% endif %}
           <a class="page-footer-right-aligned-link" href="{{ url_for('main.view_letter_notification_as_preview', service_id=current_service.id, notification_id=notification_id, filetype='pdf') }}" download>Download as a PDF</a>
         </div>
       </div>

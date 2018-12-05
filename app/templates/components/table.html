@@ -162,7 +162,7 @@
           notification.template.template_type
         ) }}
       {% endif %}
-      {% if notification.notification_type == "letter" and notification.status in ['permanent-failure', 'validation-failed'] %}
+      {% if notification.notification_type == "letter" and notification.status in ['permanent-failure', 'validation-failed', 'cancelled'] %}
         Cancelled
       {% endif %}
       {% if notification.status|format_notification_status_as_url(notification.notification_type) %}
