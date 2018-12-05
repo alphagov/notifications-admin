@@ -14,7 +14,7 @@ from notifications_utils.template import HTMLEmailTemplate
 
 from app import email_branding_client
 from app.main import main
-from app.main.forms import SearchTemplatesForm
+from app.main.forms import FieldWithNoneOption, SearchTemplatesForm
 from app.main.views.sub_navigation_dictionaries import features_nav
 from app.utils import AgreementInfo, get_logo_cdn_domain
 
@@ -92,9 +92,12 @@ def design_content():
 @main.route('/_email')
 def email_template():
     branding_type = 'govuk'
-    branding_style = request.args.get('branding_style', 'None')
+    branding_style = request.args.get('branding_style', None)
 
-    if branding_style != 'None':
+    if branding_style == FieldWithNoneOption.NONE_OPTION_VALUE:
+        branding_style = None
+
+    if branding_style is not None:
         email_branding = email_branding_client.get_email_branding(branding_style)['email_branding']
         branding_type = email_branding['brand_type']
 

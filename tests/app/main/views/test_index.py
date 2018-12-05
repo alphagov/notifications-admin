@@ -4,7 +4,11 @@ import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
 
-from tests.conftest import active_user_with_permissions, normalize_spaces
+from tests.conftest import (
+    active_user_with_permissions,
+    normalize_spaces,
+    sample_uuid,
+)
 
 
 def test_non_logged_in_user_can_see_homepage(
@@ -256,3 +260,31 @@ def test_css_is_served_from_correct_path(client_request):
             'https://static.example.com/stylesheets/fonts.css?',
             'https://static.example.com/stylesheets/main.css?',
         ][index])
+
+
+@pytest.mark.parametrize('extra_args, email_branding_retrieved', (
+    (
+        {},
+        False,
+    ),
+    (
+        {'branding_style': '__NONE__'},
+        False,
+    ),
+    (
+        {'branding_style': sample_uuid()},
+        True,
+    ),
+))
+def test_email_branding_preview(
+    client_request,
+    mock_get_email_branding,
+    extra_args,
+    email_branding_retrieved,
+):
+    client_request.get(
+        'main.email_template',
+        _test_page_title=False,
+        **extra_args
+    )
+    assert mock_get_email_branding.called is email_branding_retrieved
