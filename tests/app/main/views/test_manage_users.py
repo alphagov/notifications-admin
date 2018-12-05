@@ -1,4 +1,5 @@
 import copy
+import uuid
 
 import pytest
 from bs4 import BeautifulSoup
@@ -641,24 +642,19 @@ def test_manage_users_shows_invited_user(
 
 
 def test_manage_users_does_not_show_accepted_invite(
-    logged_in_client,
+    client_request,
     mocker,
     active_user_with_permissions,
     sample_invite,
 ):
-    import uuid
     invited_user_id = uuid.uuid4()
     sample_invite['id'] = invited_user_id
     sample_invite['status'] = 'accepted'
-    data = [InvitedUser(**sample_invite)]
-    service = create_sample_service(active_user_with_permissions)
     mocker.patch('app.user_api_client.get_users_for_service', return_value=[active_user_with_permissions])
-    mocker.patch('app.invite_api_client.get_invites_for_service', return_value=data)
+    mocker.patch('app.invite_api_client._get_invites_for_service', return_value=[sample_invite])
 
-    response = logged_in_client.get(url_for('main.manage_users', service_id=service['id']))
+    page = client_request.get('main.manage_users', service_id=SERVICE_ONE_ID)
 
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert page.h1.string.strip() == 'Team members'
     user_lists = page.find_all('div', {'class': 'user-list'})
     assert len(user_lists) == 1

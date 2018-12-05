@@ -35,17 +35,17 @@
       <div class="user-list-item">
         <h3 title="{{ user.email_address }}">
           {%- if user.name -%}
-            <span class="heading-small">{{ user.name }}</span>&ensp;
+            <span class="heading-small live-search-relevant">{{ user.name }}</span>&ensp;
           {%- endif -%}
           <span class="hint">
             {%- if user.status == 'pending' -%}
-              {{ user.email_address }} (invited)
+              <span class="live-search-relevant">{{ user.email_address }}</span> (invited)
             {%- elif user.status == 'cancelled' -%}
-              {{ user.email_address }} (cancelled invite)
+              <span class="live-search-relevant">{{ user.email_address }}</span> (cancelled invite)
             {%- elif user.id == current_user.id -%}
-              (you)
+              <span class="live-search-relevant">(you)</span>
             {% else %}
-              {{ user.email_address }}
+              <span class="live-search-relevant">{{ user.email_address }}</span>
             {% endif %}
           </span>
         </h3>

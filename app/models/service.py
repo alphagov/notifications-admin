@@ -6,6 +6,7 @@ from app.notify_client.api_key_api_client import api_key_api_client
 from app.notify_client.billing_api_client import billing_api_client
 from app.notify_client.email_branding_client import email_branding_client
 from app.notify_client.inbound_number_client import inbound_number_client
+from app.notify_client.invite_api_client import invite_api_client
 from app.notify_client.job_api_client import job_api_client
 from app.notify_client.organisations_api_client import organisations_client
 from app.notify_client.service_api_client import service_api_client
@@ -97,6 +98,16 @@ class Service():
     @cached_property
     def has_jobs(self):
         return job_api_client.has_jobs(self.id)
+
+    @cached_property
+    def team_members(self):
+        return sorted(
+            (
+                invite_api_client.get_invites_for_service(service_id=self.id) +
+                user_api_client.get_users_for_service(service_id=self.id)
+            ),
+            key=lambda user: user.email_address,
+        )
 
     @cached_property
     def has_team_members(self):

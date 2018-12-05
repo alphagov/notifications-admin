@@ -28,11 +28,16 @@ class InviteApiClient(NotifyAdminAPIClient):
         return InvitedUser(**resp['data'])
 
     def get_invites_for_service(self, service_id):
-        endpoint = '/service/{}/invite'.format(service_id)
-        resp = self.get(endpoint)
-        invites = resp['data']
-        invited_users = self._get_invited_users(invites)
-        return invited_users
+        return [
+            InvitedUser(**invite)
+            for invite in self._get_invites_for_service(service_id)
+            if invite['status'] != 'accepted'
+        ]
+
+    def _get_invites_for_service(self, service_id):
+        return self.get(
+            '/service/{}/invite'.format(service_id)
+        )['data']
 
     def check_token(self, token):
         resp = self.get(url='/invite/service/{}'.format(token))
@@ -50,13 +55,6 @@ class InviteApiClient(NotifyAdminAPIClient):
         data = {'status': 'accepted'}
         self.post(url='/service/{0}/invite/{1}'.format(service_id, invited_user_id),
                   data=data)
-
-    def _get_invited_users(self, invites):
-        invited_users = []
-        for invite in invites:
-            invited_user = InvitedUser(**invite)
-            invited_users.append(invited_user)
-        return invited_users
 
 
 invite_api_client = InviteApiClient()
