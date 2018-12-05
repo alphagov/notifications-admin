@@ -11,6 +11,11 @@
 
       let content = $('.live-search-relevant', this).text() || $(this).text();
 
+      if ($(this).has(':checked').length) {
+        $(this).show();
+        return;
+      }
+
       if (query == '') {
         $(this).css('display', '');
         return;
