@@ -43,7 +43,9 @@
     this.addCancelButton = function(state) {
       let $cancel =  $('<a></a>')
           .html('Cancel')
-          .click((event) => {
+          .attr('class', 'page-footer-js-cancel')
+          .attr('tabindex', '0')
+          .on('click keydown', (event) => {
             event.preventDefault();
             // clear existing data
             state.$el.find('input:radio').prop('checked', false);
