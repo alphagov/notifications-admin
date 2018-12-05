@@ -101,13 +101,13 @@ class Service():
 
     @cached_property
     def team_members(self):
-        return list(sorted(
+        return sorted(
             (
                 invite_api_client.get_invites_for_service(service_id=self.id) +
                 user_api_client.get_users_for_service(service_id=self.id)
             ),
             key=lambda user: user.email_address,
-        ))
+        )
 
     @cached_property
     def has_team_members(self):
