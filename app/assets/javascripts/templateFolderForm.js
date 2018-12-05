@@ -25,8 +25,10 @@
       this.states.filter(state => state.cancellable).forEach((x) => this.addCancelButton(x));
 
       // first off show the new template / new folder buttons
-      let prevState = this.$form.data('prev-state') || 'unknown';
-      this.currentState = (prevState === 'unknown') ? 'nothing-selected-buttons' : prevState;
+      this.currentState = this.$form.data('prev-state') || 'unknown';
+      if (this.currentState === 'unknown') {
+        this.selectActionButtons();
+      }
 
       this.$form.on('click', 'button.button-secondary', (event) => this.actionButtonClicked(event));
       this.$form.on('change', 'input[type=checkbox]', () => this.templateFolderCheckboxChanged());
@@ -43,13 +45,19 @@
             state.$el.find('input:radio').prop('checked', false);
             state.$el.find('input:text').val('');
 
-            // gross hack - pretend we're in the choose actions state, then pretend a checkbox was clicked to work out
-            // whether to show zero or non-zero options. This calls a render at the end
-            this.currentState = 'nothing-selected-buttons';
-            this.templateFolderCheckboxChanged();
+            // go back to action buttons
+            this.selectActionButtons();
           });
 
       state.$el.append($cancel);
+    };
+
+    this.selectActionButtons = function () {
+      // If we want to show one of the grey choose actions state, we can pretend we're in the choose actions state,
+      // and then pretend a checkbox was clicked to work out whether to show zero or non-zero options.
+      // This calls a render at the end
+      this.currentState = 'nothing-selected-buttons';
+      this.templateFolderCheckboxChanged();
     };
 
     this.actionButtonClicked = function(event) {
