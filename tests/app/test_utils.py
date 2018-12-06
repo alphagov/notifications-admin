@@ -29,11 +29,12 @@ def _get_notifications_csv(
     template_type='sms',
     job_name='bar.csv',
     status='Delivered',
-    created_at='Thursday 19 April at 12:00',
+    created_at='1943-04-19 12:00:00',
     rows=1,
     with_links=False,
     job_id=fake_uuid,
     created_by_name=None,
+    created_by_email_address=None,
 ):
 
     def _get(
@@ -63,6 +64,7 @@ def _get_notifications_csv(
                 "created_at": created_at,
                 "updated_at": None,
                 "created_by_name": created_by_name,
+                "created_by_email_address": created_by_email_address,
             } for i in range(rows)],
             'total': rows,
             'page_size': 50,
@@ -144,14 +146,14 @@ def test_can_create_spreadsheet_from_dict_with_filename():
 @pytest.mark.parametrize('created_by_name, expected_content', [
     (
         None, [
-            'Recipient,Template,Type,Sent by,Job,Status,Time\n',
-            'foo@bar.com,foo,sms,,,Delivered,Thursday 19 April at 12:00\r\n',
+            'Recipient,Template,Type,Sent by,Sent by email,Job,Status,Time\n',
+            'foo@bar.com,foo,sms,,sender@email.gov.uk,,Delivered,1943-04-19 12:00:00\r\n',
         ]
     ),
     (
         'Anne Example', [
-            'Recipient,Template,Type,Sent by,Job,Status,Time\n',
-            'foo@bar.com,foo,sms,Anne Example,,Delivered,Thursday 19 April at 12:00\r\n',
+            'Recipient,Template,Type,Sent by,Sent by email,Job,Status,Time\n',
+            'foo@bar.com,foo,sms,Anne Example,sender@email.gov.uk,,Delivered,1943-04-19 12:00:00\r\n',
         ]
     ),
 ])
@@ -165,6 +167,7 @@ def test_generate_notifications_csv_without_job(
         'app.notification_api_client.get_notifications_for_service',
         side_effect=_get_notifications_csv(
             created_by_name=created_by_name,
+            created_by_email_address="sender@email.gov.uk",
             job_id=None,
             job_name=None,
         )
@@ -179,7 +182,7 @@ def test_generate_notifications_csv_without_job(
             07700900123
         """,
         ['Row number', 'phone_number', 'Template', 'Type', 'Job', 'Status', 'Time'],
-        ['1', '07700900123', 'foo', 'sms', 'bar.csv', 'Delivered', 'Thursday 19 April at 12:00'],
+        ['1', '07700900123', 'foo', 'sms', 'bar.csv', 'Delivered', '1943-04-19 12:00:00'],
     ),
     (
         """
@@ -187,7 +190,7 @@ def test_generate_notifications_csv_without_job(
             07700900123,  🐜,🐝,🦀
         """,
         ['Row number', 'phone_number', 'a', 'b', 'c', 'Template', 'Type', 'Job', 'Status', 'Time'],
-        ['1', '07700900123', '🐜', '🐝', '🦀', 'foo', 'sms', 'bar.csv', 'Delivered', 'Thursday 19 April at 12:00'],
+        ['1', '07700900123', '🐜', '🐝', '🦀', 'foo', 'sms', 'bar.csv', 'Delivered', '1943-04-19 12:00:00'],
     ),
     (
         """
@@ -195,7 +198,7 @@ def test_generate_notifications_csv_without_job(
             "07700900123","🐜,🐜","🐝,🐝","🦀"
         """,
         ['Row number', 'phone_number', 'a', 'b', 'c', 'Template', 'Type', 'Job', 'Status', 'Time'],
-        ['1', '07700900123', '🐜,🐜', '🐝,🐝', '🦀', 'foo', 'sms', 'bar.csv', 'Delivered', 'Thursday 19 April at 12:00'],
+        ['1', '07700900123', '🐜,🐜', '🐝,🐝', '🦀', 'foo', 'sms', 'bar.csv', 'Delivered', '1943-04-19 12:00:00'],
     ),
 ])
 def test_generate_notifications_csv_returns_correct_csv_file(
