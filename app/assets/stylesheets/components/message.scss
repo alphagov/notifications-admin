@@ -121,12 +121,13 @@
   white-space: nowrap;
 
 
-  a:first-child,
-  &-folder {
+  a,
+  &-folder,
+  &-subfolder {
 
     display: inline-block;
     vertical-align: top;
-    padding: 5px 0 0 60px;
+    padding: 5px 0 0 0;
     background-repeat: no-repeat;
     background-size: 38px auto;
     background-position: 0 1px;
@@ -139,8 +140,9 @@
     display: inline-block;
     vertical-align: top;
 
-    &:first-child {
+    &.folder-heading-folder {
 
+      padding: 5px 0 0 60px;
       background-image: file-url('folder-blue.svg');
       max-width: 33%;
       overflow: hidden;
@@ -148,23 +150,6 @@
 
       @include ie-lte(8) {
         background-image: file-url('folder-blue.png');
-      }
-
-    }
-
-  }
-
-  &-folder {
-
-    padding-left: 0;
-
-    &:first-child {
-
-      background-image: file-url('folder-black.svg');
-      padding-left: $gutter * 2;
-
-      @include ie-lte(8) {
-        background-image: file-url('folder-black.png');
       }
 
     }

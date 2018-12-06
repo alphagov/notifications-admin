@@ -17,7 +17,7 @@
           <span class="folder-heading-folder">{{ folder.name }}</span>
         {% else %}
           {% if folder.id %}
-            <a href="{{ url_for('.choose_template', service_id=service_id, template_type=template_type, template_folder_id=folder.id) }}">{{ folder.name }}</a> {% if not loop.last %}{{ folder_path_separator() }}{% endif %}
+            <a href="{{ url_for('.choose_template', service_id=service_id, template_type=template_type, template_folder_id=folder.id) }}" class="folder-heading-folder">{{ folder.name }}</a> {% if not loop.last %}{{ folder_path_separator() }}{% endif %}
           {% else %}
             <a href="{{ url_for('.choose_template', service_id=service_id, template_type=template_type) }}">Templates</a> {% if not loop.last %}{{ folder_path_separator() }}{% endif %}
           {% endif %}
