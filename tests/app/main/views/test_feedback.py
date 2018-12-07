@@ -17,6 +17,7 @@ from tests.conftest import (
     mock_get_services,
     mock_get_services_with_no_services,
     mock_get_services_with_one_service,
+    normalize_spaces,
 )
 
 
@@ -222,6 +223,30 @@ def test_email_address_required_for_problems(
         assert thing in response.location
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert isinstance(page.find('span', {'class': 'error-message'}), expected_error)
+
+
+@freeze_time('2016-12-12 12:00:00.000000')
+@pytest.mark.parametrize('ticket_type', (
+    PROBLEM_TICKET_TYPE, QUESTION_TICKET_TYPE
+))
+def test_email_address_must_be_valid_if_provided_to_support_form(
+    client,
+    mocker,
+    ticket_type,
+):
+    response = client.post(
+        url_for('main.feedback', ticket_type=ticket_type),
+        data={
+            'feedback': 'blah',
+            'email_address': 'not valid',
+        },
+    )
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    assert normalize_spaces(page.select_one('span.error-message').text) == (
+        'Enter a valid email address'
+    )
 
 
 @pytest.mark.parametrize('ticket_type, severe, is_in_business_hours, is_urgent, is_p1', [

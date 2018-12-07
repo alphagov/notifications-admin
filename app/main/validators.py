@@ -38,6 +38,10 @@ class CsvFileValidator:
 class ValidGovEmail:
 
     def __call__(self, form, field):
+
+        if field.data == '':
+            return
+
         from flask import url_for
         message = (
             'Enter a government email address.'
@@ -53,10 +57,15 @@ class ValidEmail(Email):
         super().__init__('Enter a valid email address')
 
     def __call__(self, form, field):
+
+        if field.data == '':
+            return
+
         try:
             validate_email_address(field.data)
         except InvalidEmailError:
             raise ValidationError(self.message)
+
         return super().__call__(form, field)
 
 
