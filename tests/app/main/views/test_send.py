@@ -1172,6 +1172,33 @@ def test_send_one_off_has_skip_link(
         assert not skip_links
 
 
+@pytest.mark.parametrize('template_mock, expected_sticky', [
+    (mock_get_service_template, False),
+    (mock_get_service_email_template, True),
+    (mock_get_service_letter_template, True),
+])
+def test_send_one_off_has_sticky_header_for_email_and_letter(
+    mocker,
+    client_request,
+    fake_uuid,
+    mock_has_no_jobs,
+    template_mock,
+    expected_sticky,
+):
+    template_mock(mocker)
+    mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=99)
+
+    page = client_request.get(
+        'main.send_one_off_step',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        step_index=0,
+        _follow_redirects=True,
+    )
+
+    assert bool(page.select('.js-stick-at-top-when-scrolling')) == expected_sticky
+
+
 @pytest.mark.parametrize('user', (
     active_user_with_permissions,
     active_caseworking_user,

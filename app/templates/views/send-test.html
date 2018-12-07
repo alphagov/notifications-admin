@@ -14,7 +14,10 @@
     {{ page_title }}
   </h1>
 
-  {% call form_wrapper(class="js-stick-at-top-when-scrolling", module="autofocus") %}
+  {% call form_wrapper(
+    class="js-stick-at-top-when-scrolling" if template.template_type != 'sms' else '',
+    module="autofocus"
+  ) %}
     <div class="grid-row">
       <div class="column-two-thirds {% if form.placeholder_value.label.text == 'phone number' %}extra-tracking{% endif %}">
         {{ textbox(
