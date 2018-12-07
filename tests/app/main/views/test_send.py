@@ -1458,7 +1458,7 @@ def test_send_test_redirects_to_start_if_index_out_of_bounds_and_some_placeholde
     ('main.send_test', 'main.send_test_step'),
     ('main.send_one_off', 'main.send_one_off_step'),
 ])
-def _redirects_with_help_argument(
+def test_send_test_sms_message_redirects_with_help_argument(
     logged_in_client,
     mocker,
     service_one,
