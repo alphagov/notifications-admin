@@ -959,6 +959,10 @@ def test_should_be_able_to_move_a_sub_item(
         'move_to': '__NONE__',
         'add_template_by_template_type': 'email',
     },
+    # add a new template, but don't select anything
+    {
+        'operation': 'add-new-template',
+    },
 ])
 def test_no_action_if_user_fills_in_ambiguous_fields(
     client_request,

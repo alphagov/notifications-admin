@@ -1151,17 +1151,17 @@ def required_for_ops(*operations):
     operations = set(operations)
 
     def validate(form, field):
-        if form.op not in operations and field.data:
+        if form.op not in operations and any(field.raw_data):
             # super weird
-            raise ValidationError('Must be empty')
-        if form.op in operations and not field.data:
-            raise ValidationError('Can’t be empty')
+            raise validators.StopValidation('Must be empty')
+        if form.op in operations and not any(field.raw_data):
+            raise validators.StopValidation('Can’t be empty')
     return validate
 
 
 class TemplateAndFoldersSelectionForm(Form):
     """
-    This form also expects the form data to include an operation, based on which submit button is clicked.
+    This form expects the form data to include an operation, based on which submit button is clicked.
     If enter is pressed, unknown will be sent by a hidden submit button at the top of the form.
     The value of this operation affects which fields are required, expected to be empty, or optional.
 
@@ -1248,6 +1248,6 @@ class TemplateAndFoldersSelectionForm(Form):
     move_to_new_folder_name = StringField('Folder name', validators=[required_for_ops('move-to-new-folder')])
 
     add_template_by_template_type = RadioField('Add new', validators=[
+        required_for_ops('add-new-template'),
         Optional(),
-        required_for_ops('add-new-template')
     ])
