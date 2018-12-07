@@ -110,15 +110,18 @@ class MultiCheckboxField(SelectMultipleField):
     option_widget = CheckboxInput()
 
 
-def email_address(label='Email address', gov_user=True):
+def email_address(label='Email address', gov_user=True, required=True):
+
     validators = [
-        Length(min=5, max=255),
-        DataRequired(message='Can’t be empty'),
-        ValidEmail()
+        ValidEmail(),
     ]
 
     if gov_user:
         validators.append(ValidGovEmail())
+
+    if required:
+        validators.append(DataRequired(message='Can’t be empty'))
+
     return EmailField(label, validators)
 
 
@@ -561,7 +564,7 @@ class SupportType(StripWhitespaceForm):
 
 class Feedback(StripWhitespaceForm):
     name = StringField('Name')
-    email_address = StringField('Email address')
+    email_address = email_address(label='Email address', gov_user=False, required=False)
     feedback = TextAreaField('Your message', validators=[DataRequired(message="Can’t be empty")])
 
 
