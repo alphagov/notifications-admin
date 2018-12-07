@@ -736,6 +736,18 @@ class HiddenFieldWithNoneOption(FieldWithNoneOption, HiddenField):
     pass
 
 
+class RadioFieldWithRequiredMessage(RadioField):
+    def __init__(self, *args, required_message='Not a valid choice', **kwargs):
+        self.required_message = required_message
+        super().__init__(*args, **kwargs)
+
+    def pre_validate(self, form):
+        try:
+            return super().pre_validate(form)
+        except ValueError:
+            raise ValueError(self.required_message)
+
+
 class ServiceSetBranding(StripWhitespaceForm):
 
     branding_style = RadioFieldWithNoneOption(
@@ -1247,7 +1259,7 @@ class TemplateAndFoldersSelectionForm(Form):
     add_new_folder_name = StringField('Folder name', validators=[required_for_ops('add-new-folder')])
     move_to_new_folder_name = StringField('Folder name', validators=[required_for_ops('move-to-new-folder')])
 
-    add_template_by_template_type = RadioField('Add new', validators=[
+    add_template_by_template_type = RadioFieldWithRequiredMessage('Add new', validators=[
         required_for_ops('add-new-template'),
         Optional(),
-    ])
+    ], required_message='Select the type of template you want to add')
