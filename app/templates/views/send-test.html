@@ -15,7 +15,7 @@
   </h1>
 
   {% call form_wrapper(
-    class="js-stick-at-top-when-scrolling" if template.template_type != 'sms' else '',
+    class='js-stick-at-top-when-scrolling send-one-off-form' if template.template_type != 'sms' else 'send-one-off-form',
     module="autofocus"
   ) %}
     <div class="grid-row">
