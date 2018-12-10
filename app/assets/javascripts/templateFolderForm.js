@@ -74,8 +74,11 @@
       .addClass('js-cancel')
       .attr('tabindex', '0')
       .on('click keydown', event => {
-        event.preventDefault();
-        fn();
+        // space, enter or no keyCode (must be mouse input)
+        if ([13, 32, undefined].indexOf(event.keyCode) > -1) {
+          event.preventDefault();
+          fn();
+        }
       });
 
     this.selectActionButtons = function () {
