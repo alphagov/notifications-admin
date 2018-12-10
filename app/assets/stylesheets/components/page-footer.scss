@@ -67,6 +67,10 @@
     padding: 0.52632em 0.78947em 0.26316em 0.78947em;
   }
 
+  .js-cancel {
+    margin: 0;
+  }
+
 }
 
 .align-button-with-textbox {
@@ -85,22 +89,4 @@
 
   }
 
-}
-
-.page-footer-js-cancel {
-
-  text-decoration: underline;
-  color: $govuk-blue;
-  cursor: pointer;
-
-  &:hover {
-    color: $link-hover-colour;
-  }
-
-  &:focus,
-  &:active, {
-    background: $yellow;
-    color: $govuk-blue;
-    outline: 3px solid $yellow;
-  }
 }

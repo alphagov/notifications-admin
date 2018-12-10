@@ -122,3 +122,26 @@
   display: block;
   margin-bottom: 5px;
 }
+
+.js-cancel {
+
+  display: inline-block;
+  padding: 10px 10px 5px 10px;
+  margin-top: -10px;
+  margin-right: -10px;
+  text-decoration: underline;
+  color: $govuk-blue;
+  cursor: pointer;
+
+  &:hover {
+    color: $link-hover-colour;
+  }
+
+  &:focus,
+  &:active, {
+    background: $yellow;
+    color: $govuk-blue;
+    outline: none;
+  }
+
+}

@@ -52,7 +52,7 @@
         this.selectActionButtons();
       });
 
-      state.$el.append($cancel);
+      state.$el.find('[type=submit]').after($cancel);
     };
 
     this.addClearButton = function(state) {
@@ -71,7 +71,7 @@
 
     this.makeButton = (text, fn) => $('<a></a>')
       .html(text)
-      .addClass('page-footer-js-cancel')
+      .addClass('js-cancel')
       .attr('tabindex', '0')
       .on('click keydown', event => {
         event.preventDefault();
@@ -136,7 +136,7 @@
         <button class="button-secondary" value="move-to-existing-folder">Move</button>
         <button class="button-secondary" value="move-to-new-folder">Add to a new folder</button>
         <div class="template-list-selected-counter">
-          <span class="template-list-selected-counter-count">1</span> selected &ensp;
+          <span class="template-list-selected-counter-count">1</span> selected
         </div>
       </div>
     `;
