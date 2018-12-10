@@ -235,7 +235,7 @@
     return windowTop > el.scrolledTo;
   };
   stickAtTop.addShimForEl = function ($el, width, height) {
-    $el.before('<div class="shim" style="width: ' + width + 'px height: ' + height + 'px">&nbsp</div>');
+    $el.before('<div class="shim" style="width: ' + width + 'px; height: ' + height + 'px">&nbsp;</div>');
   };
   stickAtTop.stop = function (el) {
     if (!el.stopped()) {
