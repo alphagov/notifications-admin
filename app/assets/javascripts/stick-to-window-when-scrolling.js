@@ -10,6 +10,7 @@
     this._initialFixedClass = 'content-fixed-onload';
     this._fixedClass = 'content-fixed';
     this._appliedClass = null;
+    this._$shim = null;
     this._stopped = false;
     this.scrolledFrom = this._sticky.getScrolledFrom($el);
   };
@@ -29,6 +30,14 @@
   StickyElement.prototype.release = function () {
     this._appliedClass = null;
     this._hasBeenCalled = true;
+  };
+  StickyElement.prototype.addShim = function (position) {
+    this._$shim = $('<div class="shim" style="width: ' + this.horizontalSpace + 'px; height: ' + this.verticalSpace + 'px">&nbsp</div>');
+    this.$fixedEl[position](this._$shim);
+  };
+  StickyElement.prototype.removeShim = function () {
+    this._$shim.remove();
+    this._$shim = null;
   };
   StickyElement.prototype.stop = function () {
     this._stopped = true;
@@ -87,6 +96,19 @@
 
     if (self._initialPositionsSet === false) { self._initialPositionsSet = true; }
   };
+  Sticky.prototype.setElementDimensions = function (el, callback) {
+    var self = this;
+    var onHeightSet = function () {
+      el.scrolledTo = self.getScrollingTo(el);
+      if (callback !== undefined) {
+        callback();
+      }
+    };
+
+    this.setFixedTop(el);
+    this.setElWidth(el);
+    this.setElHeight(el, onHeightSet);
+  };
   Sticky.prototype.setFixedTop = function (el) {
     var $siblingEl = $('<div></div>');
     $siblingEl.insertBefore(el.$fixedEl);
@@ -95,7 +117,10 @@
 
     el.fixedTop = fixedTop;
   };
-  Sticky.prototype.setElHeight = function (el) {
+  Sticky.prototype.setElWidth = function (el) {
+    el.horizontalSpace = el.$fixedEl.outerWidth(true);
+  };
+  Sticky.prototype.setElHeight = function (el, callback) {
     var self = this;
     var fixedOffset = parseInt(el.$fixedEl.css('top'), 10);
     var $el = el.$fixedEl;
@@ -106,36 +131,39 @@
     if ((!self._elsLoaded) && ($img.length > 0)) {
       var image = new global.Image();
       image.onload = function () {
-        el.height = $el.outerHeight() + fixedOffset;
-        el.scrolledTo = self.getScrollingTo(el);
-        self.checkElementsLoaded();
+        el.verticalSpace = $el.outerHeight(true) + fixedOffset;
+        el.height = $el.outerHeight();
+        callback();
       };
       image.src = $img.attr('src');
     } else {
-      el.height = $el.outerHeight() + fixedOffset;
-      el.scrolledTo = self.getScrollingTo(el);
-      self.checkElementsLoaded();
+      el.verticalSpace = $el.outerHeight() + fixedOffset;
+      el.height = $el.outerHeight();
+      callback();
     }
   };
-  Sticky.prototype.checkElementsLoaded = function () {
-    this._elsLoaded = $.grep(this._els, function (el) { return ('height' in el); }).length === this._els.length;
+  Sticky.prototype.allElementsLoaded = function (totalEls) {
+    return this._els.length === totalEls;
   };
   Sticky.prototype.init = function () {
     var self = this;
     var $els = $(self.CSS_SELECTOR);
+    var numOfEls = $els.length;
 
-    if ($els.length > 0) {
+    if (numOfEls > 0) {
       $els.each(function (i, el) {
         var $el = $(el);
         var elObj = new StickyElement($el, self);
 
-        self.setFixedTop(elObj);
-        self.setElHeight(elObj);
-        self._els.push(elObj);
+        self.setElementDimensions(elObj, function () {
+          self._els.push(elObj);
+          // set positions based on initial scroll positionu
+          if (self._els.length === numOfEls) {
+            self._elsLoaded = true;
+            self.setElementPositions();
+          }
+        });
       });
-
-      // set element positions based on page scroll position on load
-      self.setElementPositions();
 
       if (self._scrollTimeout === false) {
         $(global).scroll(function (e) { self.onScroll(); });
@@ -192,23 +220,12 @@
       });
     }
   };
-  Sticky.prototype.stick = function (el) {
-    if (!el.isStuck()) {
-      var $el = el.$fixedEl;
-      var height = Math.max($el.height(), 1);
-      var width = $el.width();
-
-      this.addShimForEl($el, width, height);
-      $el.css('width', width + 'px').addClass(el.stickyClass());
-      el.stick();
-    }
-  };
   Sticky.prototype.release = function (el) {
     if (el.isStuck()) {
       var $el = el.$fixedEl;
 
       $el.removeClass(el.appliedClass()).css('width', '');
-      $el.siblings('.shim').remove();
+      el.removeShim();
       el.release();
     }
   };
@@ -234,8 +251,15 @@
   
     return windowTop > el.scrolledTo;
   };
-  stickAtTop.addShimForEl = function ($el, width, height) {
-    $el.before('<div class="shim" style="width: ' + width + 'px; height: ' + height + 'px">&nbsp;</div>');
+  stickAtTop.stick = function (el) {
+    if (!el.isStuck()) {
+      var $el = el.$fixedEl;
+
+      el.addShim('before');
+      // element will be absolutely positioned so cannot rely on parent element for width
+      $el.css('width', $el.width() + 'px').addClass(el.stickyClass());
+      el.stick();
+    }
   };
   stickAtTop.stop = function (el) {
     if (!el.stopped()) {
@@ -271,8 +295,15 @@
 
     return windowBottom < el.scrolledTo;
   };
-  stickAtBottom.addShimForEl = function ($el, width, height) {
-    $el.after('<div class="shim" style="width: ' + width + 'px height: ' + height + 'px">&nbsp</div>');
+  stickAtBottom.stick = function (el) {
+    if (!el.isStuck()) {
+      var $el = el.$fixedEl;
+
+      el.addShim('after');
+      // element will be absolutely positioned so cannot rely on parent element for width
+      el.$fixedEl.css('width', $el.width() + 'px').addClass(el.stickyClass());
+      el.stick();
+    }
   };
   stickAtBottom.stop = function (el) {
     if (!el.stopped()) {
