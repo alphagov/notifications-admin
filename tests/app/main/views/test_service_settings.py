@@ -816,9 +816,9 @@ def test_should_redirect_after_request_to_go_live(
         'main.submit_request_to_go_live',
         service_id=SERVICE_ONE_ID,
         _data={
-            'volume_email': '111',
-            'volume_sms': '222',
-            'volume_letter': '333',
+            'volume_email': '111,111',
+            'volume_sms': '222,222',
+            'volume_letter': '333,333',
             'research_consent': 'yes',
         },
         _follow_redirects=True
@@ -845,13 +845,13 @@ def test_should_redirect_after_request_to_go_live(
         'Organisation type: Central\n'
         'Agreement signed: Can’t tell (domain is user.gov.uk)\n'
         'Checklist completed: No\n'
-        'Emails in next year: 111\n'
-        'Text messages in next year: 222\n'
-        'Letters in next year: 333\n'
+        'Emails in next year: 111,111\n'
+        'Text messages in next year: 222,222\n'
+        'Letters in next year: 333,333\n'
         'Consent to research: Yes\n'
         '\n'
         '---\n'
-        '{}, None, service one, Test User, test@user.gov.uk, -, 21/12/2012, 222, 111, 333'
+        '{}, None, service one, Test User, test@user.gov.uk, -, 21/12/2012, 222222, 111111, 333333'
     ).format(SERVICE_ONE_ID, SERVICE_ONE_ID)
 
     assert normalize_spaces(page.select_one('.banner-default').text) == (
