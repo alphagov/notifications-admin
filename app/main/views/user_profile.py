@@ -33,7 +33,7 @@ NEW_MOBILE_PASSWORD_CONFIRMED = 'new-mob-password-confirmed'
 def user_profile():
     return render_template(
         'views/user-profile.html',
-        can_see_edit=is_gov_user(current_user.email_address)
+        can_see_edit=current_user.is_gov_user,
     )
 
 
@@ -58,7 +58,7 @@ def user_profile_name():
 @login_required
 def user_profile_email():
 
-    if not is_gov_user(current_user.email_address):
+    if not current_user.is_gov_user:
         abort(403)
 
     def _is_email_already_in_use(email):

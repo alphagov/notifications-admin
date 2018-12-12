@@ -3,6 +3,9 @@ from itertools import chain
 from flask import request, session
 from flask_login import AnonymousUserMixin, UserMixin
 
+from app.utils import is_gov_user
+
+
 roles = {
     'send_messages': ['send_texts', 'send_emails', 'send_letters'],
     'manage_templates': ['manage_templates'],
@@ -101,6 +104,10 @@ class User(UserMixin):
     @property
     def is_active(self):
         return self.state == 'active'
+
+    @property
+    def is_gov_user(self):
+        return is_gov_user(self.email_address)
 
     @property
     def is_authenticated(self):

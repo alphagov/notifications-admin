@@ -26,7 +26,7 @@ def choose_account():
         'views/choose-account.html',
         organisations=orgs_and_services['organisations'],
         services_without_organisations=orgs_and_services['services_without_organisations'],
-        can_add_service=is_gov_user(current_user.email_address)
+        can_add_service=current_user.is_gov_user,
     )
 
 

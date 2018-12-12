@@ -75,7 +75,7 @@ def add_service():
         service_id = _add_invited_user_to_service(invited_user)
         return redirect(url_for('main.service_dashboard', service_id=service_id))
 
-    if not is_gov_user(current_user.email_address):
+    if not current_user.is_gov_user:
         abort(403)
 
     form = CreateServiceForm()
