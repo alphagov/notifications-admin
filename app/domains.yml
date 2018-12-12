@@ -2055,14 +2055,11 @@ halewoodtowncouncil.gov.uk:
   owner: Halewood Town Council
   crown: false
   agreement_signed: false
-halton-borough.gov.uk:
-  owner: Halton Borough Council
-  crown: false
-  agreement_signed: false
+halton-borough.gov.uk: halton.gov.uk
 halton.gov.uk:
   owner: Halton Borough Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 haltwhistle-tc.gov.uk:
   owner: Haltwhistle Town Council
   crown: false
