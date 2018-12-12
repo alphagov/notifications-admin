@@ -47,12 +47,18 @@
           ) }}
         {% endif %}
       {% endcall %}
-      <p>
-        You also need to accept our <a href="{{ url_for('.terms') }}">terms of use</a>.
-      </p>
-      <p>
-        <a href="{{ url_for('main.submit_request_to_go_live', service_id=current_service.id) }}" class="button">Continue</a>
-      </p>
+      {% if current_user.is_gov_user %}
+        <p>
+          You also need to accept our <a href="{{ url_for('.terms') }}">terms of use</a>.
+        </p>
+        <p>
+          <a href="{{ url_for('main.submit_request_to_go_live', service_id=current_service.id) }}" class="button">Continue</a>
+        </p>
+      {% else %}
+        <p>
+          Only team members with a government email address can request to go live.
+        </p>
+      {% endif %}
     </div>
   </div>
 {% endblock %}

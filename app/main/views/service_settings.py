@@ -147,6 +147,10 @@ def request_to_go_live(service_id):
 @login_required
 @user_has_permissions('manage_service')
 def submit_request_to_go_live(service_id):
+
+    if not current_user.is_gov_user:
+        abort(403)
+
     form = RequestToGoLiveForm()
 
     if form.validate_on_submit():
