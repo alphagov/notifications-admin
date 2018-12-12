@@ -4,7 +4,6 @@ from werkzeug.routing import RequestRedirect
 
 from app import user_api_client
 from app.main import main
-from app.utils import is_gov_user
 
 
 @main.route("/services")

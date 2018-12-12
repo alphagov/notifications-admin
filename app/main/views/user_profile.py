@@ -1,13 +1,6 @@
 import json
 
-from flask import (
-    abort,
-    current_app,
-    redirect,
-    render_template,
-    session,
-    url_for,
-)
+from flask import current_app, redirect, render_template, session, url_for
 from flask_login import current_user, login_required
 from notifications_utils.url_safe_token import check_token
 
@@ -21,7 +14,7 @@ from app.main.forms import (
     ConfirmPasswordForm,
     TwoFactorForm,
 )
-from app.utils import is_gov_user
+from app.utils import user_is_gov_user
 
 NEW_EMAIL = 'new-email'
 NEW_MOBILE = 'new-mob'
@@ -56,10 +49,8 @@ def user_profile_name():
 
 @main.route("/user-profile/email", methods=['GET', 'POST'])
 @login_required
+@user_is_gov_user
 def user_profile_email():
-
-    if not current_user.is_gov_user:
-        abort(403)
 
     def _is_email_already_in_use(email):
         return user_api_client.is_email_already_in_use(email)

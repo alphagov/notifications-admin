@@ -5,7 +5,6 @@ from flask_login import AnonymousUserMixin, UserMixin
 
 from app.utils import is_gov_user
 
-
 roles = {
     'send_messages': ['send_texts', 'send_emails', 'send_letters'],
     'manage_templates': ['manage_templates'],
