@@ -163,6 +163,7 @@ def submit_request_to_go_live(service_id):
                 '\nText messages in next year: {volume_sms}'
                 '\nLetters in next year: {volume_letter}'
                 '\nConsent to research: {research_consent}'
+                '\nOther live services: {existing_live}'
                 '\n'
                 '\n---'
                 '\n'
@@ -189,6 +190,7 @@ def submit_request_to_go_live(service_id):
                 volume_letter=form.volume_letter.data,
                 volume_letter_normalised=form.volume_letter.data.replace(',', ''),
                 research_consent=form.research_consent.data.title(),
+                existing_live='Yes' if user_api_client.user_has_live_services(current_user) else 'No',
                 service_id=current_service.id,
                 organisation=AgreementInfo.from_current_user().owner,
                 user_name=current_user.name,
