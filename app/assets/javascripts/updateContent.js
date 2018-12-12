@@ -21,7 +21,7 @@
 
   var poll = function(renderer, resource, queue, interval, form) {
 
-    if (queue.push(renderer) === 1) $.ajax(
+    if (document.visibilityState !== "hidden" && queue.push(renderer) === 1) $.ajax(
       resource,
       {
         'method': form ? 'post' : 'get',
@@ -36,7 +36,6 @@
     setTimeout(
       () => poll(...arguments), interval
     );
-
   };
 
   Modules.UpdateContent = function() {
