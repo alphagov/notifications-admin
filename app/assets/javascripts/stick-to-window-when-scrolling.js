@@ -4,6 +4,7 @@
   var $ = global.jQuery;
   var GOVUK = global.GOVUK || {};
 
+  // Constructor for objects holding data for each element to have sticky behaviour
   var StickyElement = function ($el, sticky) {
     this._sticky = sticky;
     this.$fixedEl = $el;
@@ -30,6 +31,8 @@
     this._appliedClass = null;
     this._hasBeenCalled = true;
   };
+  // When a sticky element is moved into the 'stuck' state, a shim is inserted into the
+  // page to preserve the space the element occupies in the flow.
   StickyElement.prototype.addShim = function (position) {
     this._$shim = $('<div class="shim" style="width: ' + this.horizontalSpace + 'px; height: ' + this.verticalSpace + 'px">&nbsp</div>');
     this.$fixedEl[position](this._$shim);
@@ -38,6 +41,7 @@
     this._$shim.remove();
     this._$shim = null;
   };
+  // Changes to the dimensions of a sticky element with a shim need to be passed on to the shim
   StickyElement.prototype.updateShim = function () {
     if (this._$shim) {
       this._$shim.css({
@@ -56,7 +60,8 @@
     return this._stopped;
   };
 
-  // Stick elements to top of screen when you scroll past, documentation is in the README.md
+  // Constructor for objects collecting together all generic behaviour for controlling the state of
+  // sticky elements
   var Sticky = function (selector) {
     this._hasScrolled = false;
     this._scrollTimeout = false;
@@ -79,6 +84,7 @@
       scrollTop: $(global).scrollTop()
     };
   };
+  // Change state of sticky elements based on their position relative to the window
   Sticky.prototype.setElementPositions = function () {
     var self = this;
 
@@ -103,6 +109,7 @@
 
     if (self._initialPositionsSet === false) { self._initialPositionsSet = true; }
   };
+  // Store all the dimensions for a sticky element to limit DOM queries
   Sticky.prototype.setElementDimensions = function (el, callback) {
     var self = this;
     var $el = el.$fixedEl;
@@ -122,6 +129,7 @@
     this.setElWidth(el);
     this.setElHeight(el, onHeightSet);
   };
+  // Recalculate stored dimensions for all sticky elements
   Sticky.prototype.recalculate = function () {
     var self = this;
 
@@ -175,11 +183,14 @@
         });
       });
 
+      // flag when scrolling takes place and check (and re-position) sticky elements relative to
+      // window position
       if (self._scrollTimeout === false) {
         $(global).scroll(function (e) { self.onScroll(); });
         self._scrollTimeout = global.setInterval(function (e) { self.checkScroll(); }, 50);
       }
 
+      // Recalculate all dimensions when the window resizes
       if (self._resizeTimeout === false) {
         $(global).resize(function (e) { self.onResize(); });
         self._resizeTimeout = global.setInterval(function (e) { self.checkResize(); }, 50);
@@ -240,10 +251,13 @@
     }
   };
 
+  // Extension of sticky object to add behaviours specific to sticking to top of window
   var stickAtTop = new Sticky('.js-stick-at-top-when-scrolling');
+  // Store top of sticky elements while unstuck
   stickAtTop.getScrolledFrom = function ($el) {
     return $el.offset().top;
   };
+  // Store furthest point top of sticky element is allowed
   stickAtTop.getScrollingTo = function (el) {
     var footer = $('.js-footer:eq(0)');
     if (footer.length === 0) {
@@ -284,10 +298,13 @@
     }
   };
 
+  // Extension of sticky object to add behaviours specific to sticking to bottom of window
   var stickAtBottom = new Sticky('.js-stick-at-bottom-when-scrolling');
+  // Store bottom of sticky elements while unstuck
   stickAtBottom.getScrolledFrom = function ($el) {
     return $el.offset().top + $el.outerHeight();
   };
+  // Store furthest point bottom of sticky element is allowed
   stickAtBottom.getScrollingTo = function (el) {
     var header = $('.js-header:eq(0)');
     if (header.length === 0) {
