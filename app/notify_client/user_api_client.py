@@ -220,8 +220,8 @@ class UserApiClient(NotifyAdminAPIClient):
         return sorted(all_services, key=lambda service: service['name'])
 
     def user_has_live_services(self, user):
-        return not all(
-            service['restricted'] for service in self.get_services_for_user(user)
+        return any(
+            not service['restricted'] for service in self.get_services_for_user(user)
         )
 
     def get_service_ids_for_user(self, user):
