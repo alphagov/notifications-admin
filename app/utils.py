@@ -62,6 +62,15 @@ def user_has_permissions(*permissions, **permission_kwargs):
     return wrap
 
 
+def user_is_gov_user(f):
+    @wraps(f)
+    def wrapped(*args, **kwargs):
+        if not current_user.is_gov_user:
+            abort(403)
+        return f(*args, **kwargs)
+    return wrapped
+
+
 def user_is_platform_admin(f):
     @wraps(f)
     def wrapped(*args, **kwargs):

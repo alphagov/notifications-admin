@@ -56,6 +56,7 @@ from app.utils import (
     email_safe,
     get_logo_cdn_domain,
     user_has_permissions,
+    user_is_gov_user,
     user_is_platform_admin,
 )
 
@@ -146,7 +147,9 @@ def request_to_go_live(service_id):
 @main.route("/services/<service_id>/service-settings/submit-request-to-go-live", methods=['GET', 'POST'])
 @login_required
 @user_has_permissions('manage_service')
+@user_is_gov_user
 def submit_request_to_go_live(service_id):
+
     form = RequestToGoLiveForm()
 
     if form.validate_on_submit():

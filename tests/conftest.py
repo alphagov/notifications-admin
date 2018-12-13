@@ -1135,19 +1135,29 @@ def api_user_active_email_auth(fake_uuid, email_address='test@user.gov.uk'):
 @pytest.fixture(scope='function')
 def api_nongov_user_active(fake_uuid):
     from app.notify_client.user_api_client import User
-    user_data = {'id': fake_uuid,
-                 'name': 'Test User',
-                 'password': 'somepassword',
-                 'email_address': 'someuser@notonwhitelist.com',
-                 'mobile_number': '07700 900762',
-                 'state': 'active',
-                 'failed_login_count': 0,
-                 'permissions': {},
-                 'platform_admin': False,
-                 'auth_type': 'sms_auth',
-                 'password_changed_at': str(datetime.utcnow()),
-                 'organisations': []
-                 }
+    user_data = {
+        'id': fake_uuid,
+        'name': 'Test User',
+        'password': 'somepassword',
+        'email_address': 'someuser@notonwhitelist.com',
+        'mobile_number': '07700 900762',
+        'state': 'active',
+        'failed_login_count': 0,
+        'permissions': {SERVICE_ONE_ID: [
+            'send_texts',
+            'send_emails',
+            'send_letters',
+            'manage_users',
+            'manage_templates',
+            'manage_settings',
+            'manage_api_keys',
+            'view_activity',
+        ]},
+        'platform_admin': False,
+        'auth_type': 'sms_auth',
+        'password_changed_at': str(datetime.utcnow()),
+        'organisations': []
+    }
     user = User(user_data)
     return user
 

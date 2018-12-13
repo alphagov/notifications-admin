@@ -772,6 +772,38 @@ def test_should_check_for_mou_on_request_to_go_live(
     assert normalize_spaces(checklist_items[2].text) == expected_item
 
 
+def test_non_gov_user_is_told_they_cant_go_live(
+    client_request,
+    api_nongov_user_active,
+    mocker,
+):
+    mocker.patch(
+        'app.main.views.service_settings.user_api_client.get_count_of_users_with_permission',
+        return_value=0,
+    )
+    mocker.patch(
+        'app.models.service.Service.all_templates',
+        new_callable=PropertyMock,
+        return_value=[],
+    )
+    mocker.patch(
+        'app.main.views.service_settings.service_api_client.get_sms_senders',
+        return_value=[],
+    )
+    mocker.patch(
+        'app.main.views.service_settings.service_api_client.get_reply_to_email_addresses',
+        return_value=[],
+    )
+    client_request.login(api_nongov_user_active)
+    page = client_request.get(
+        'main.request_to_go_live', service_id=SERVICE_ONE_ID
+    )
+    assert normalize_spaces(page.select_one('main p').text) == (
+        'Only team members with a government email address can request to go live.'
+    )
+    assert page.select('.button') == []
+
+
 def test_should_show_request_to_go_live(
     client_request,
 ):
@@ -796,6 +828,20 @@ def test_should_show_request_to_go_live(
         assert normalize_spaces(
             page.select_one('label[for=volume_{}]'.format(channel)).text
         ) == label
+
+
+@pytest.mark.parametrize('method', ('get', 'post'))
+def test_non_gov_users_cant_request_to_go_live(
+    client_request,
+    api_nongov_user_active,
+    method,
+):
+    client_request.login(api_nongov_user_active)
+    getattr(client_request, method)(
+        'main.submit_request_to_go_live',
+        service_id=SERVICE_ONE_ID,
+        _expected_status=403,
+    )
 
 
 @freeze_time("2012-12-21")

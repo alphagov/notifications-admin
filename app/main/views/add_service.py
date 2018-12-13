@@ -1,7 +1,6 @@
 from flask import current_app, redirect, render_template, session, url_for
-from flask_login import current_user, login_required
+from flask_login import login_required
 from notifications_python_client.errors import HTTPError
-from werkzeug.exceptions import abort
 
 from app import (
     billing_api_client,
@@ -13,7 +12,7 @@ from app import (
 from app.main import main
 from app.main.forms import CreateServiceForm
 from app.models.user import InvitedUser
-from app.utils import AgreementInfo, email_safe, is_gov_user
+from app.utils import AgreementInfo, email_safe, user_is_gov_user
 
 
 def _add_invited_user_to_service(invited_user):
@@ -69,14 +68,12 @@ def _create_example_template(service_id):
 
 @main.route("/add-service", methods=['GET', 'POST'])
 @login_required
+@user_is_gov_user
 def add_service():
     invited_user = session.get('invited_user')
     if invited_user:
         service_id = _add_invited_user_to_service(invited_user)
         return redirect(url_for('main.service_dashboard', service_id=service_id))
-
-    if not is_gov_user(current_user.email_address):
-        abort(403)
 
     form = CreateServiceForm()
     heading = 'About your service'
