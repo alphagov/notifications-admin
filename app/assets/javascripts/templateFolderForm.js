@@ -36,8 +36,6 @@
 
       this.$form.on('click', 'button.button-secondary', (event) => this.actionButtonClicked(event));
       this.$form.on('change', 'input[type=checkbox]', () => this.templateFolderCheckboxChanged());
-
-      this.render();
     };
 
     this.addCancelButton = function(state) {
@@ -96,6 +94,11 @@
       this.states.forEach(
         state => (state.key === this.currentState ? this.$stickyBottom.append(state.$el) : state.$el.detach())
       );
+
+      // make sticky JS recalculate its cache of the element's position
+      if ('stickAtBottomWhenScrolling' in GOVUK) {
+        GOVUK.stickAtBottomWhenScrolling.recalculate();
+      }
     };
 
     this.nothingSelectedButtons = `

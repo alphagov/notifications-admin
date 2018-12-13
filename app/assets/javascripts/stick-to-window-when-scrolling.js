@@ -12,7 +12,6 @@
     this._appliedClass = null;
     this._$shim = null;
     this._stopped = false;
-    this.scrolledFrom = this._sticky.getScrolledFrom($el);
   };
   StickyElement.prototype.stickyClass = function () {
     return (this._sticky._initialPositionsSet) ? this._fixedClass : this._initialFixedClass;
@@ -106,9 +105,15 @@
   };
   Sticky.prototype.setElementDimensions = function (el, callback) {
     var self = this;
+    var $el = el.$fixedEl;
     var onHeightSet = function () {
       el.scrolledTo = self.getScrollingTo(el);
-      el.updateShim(el);
+      // if element is shim'ed, pass changes in dimension on to the shim
+      if (el._$shim) {
+        el.updateShim();
+        $el = el._$shim;
+      }
+      el.scrolledFrom = self.getScrolledFrom($el);
       if (callback !== undefined) {
         callback();
       }
