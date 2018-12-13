@@ -4077,7 +4077,7 @@ south-derbys.gov.uk:
 southend.gov.uk:
   owner: Southend-on-Sea Borough Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 southernuplandway.gov.uk:
   owner: Dumfries and Galloway Council
   crown: false
