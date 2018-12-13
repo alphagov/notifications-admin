@@ -852,6 +852,7 @@ def test_should_redirect_after_request_to_go_live(
     single_reply_to_email_address,
     single_letter_contact_block,
     mock_get_service_organisation,
+    mock_get_organisations_and_services_for_user,
     single_sms_sender,
     mock_get_service_settings_page_common,
     mock_get_service_templates,
@@ -895,6 +896,7 @@ def test_should_redirect_after_request_to_go_live(
         'Text messages in next year: 222,222\n'
         'Letters in next year: 333,333\n'
         'Consent to research: Yes\n'
+        'Other live services: No\n'
         '\n'
         '---\n'
         '{}, None, service one, Test User, test@user.gov.uk, -, 21/12/2012, 222222, 111111, 333333'
