@@ -39,6 +39,14 @@
     this._$shim.remove();
     this._$shim = null;
   };
+  StickyElement.prototype.updateShim = function () {
+    if (this._$shim) {
+      this._$shim.css({
+        'height': this.verticalSpace,
+        'width': this.horizontalSpace
+      });
+    }
+  };
   StickyElement.prototype.stop = function () {
     this._stopped = true;
   };
@@ -100,6 +108,7 @@
     var self = this;
     var onHeightSet = function () {
       el.scrolledTo = self.getScrollingTo(el);
+      el.updateShim(el);
       if (callback !== undefined) {
         callback();
       }
@@ -108,6 +117,14 @@
     this.setFixedTop(el);
     this.setElWidth(el);
     this.setElHeight(el, onHeightSet);
+  };
+  Sticky.prototype.recalculate = function () {
+    var self = this;
+
+    $.each(self._els, function (i, el) {
+      self.setElementDimensions(el);
+    });
+    self.setElementPositions();
   };
   Sticky.prototype.setFixedTop = function (el) {
     var $siblingEl = $('<div></div>');
@@ -122,22 +139,19 @@
   };
   Sticky.prototype.setElHeight = function (el, callback) {
     var self = this;
-    var fixedOffset = parseInt(el.$fixedEl.css('top'), 10);
     var $el = el.$fixedEl;
     var $img = $el.find('img');
-
-    fixedOffset = isNaN(fixedOffset) ? 0 : fixedOffset;
 
     if ((!self._elsLoaded) && ($img.length > 0)) {
       var image = new global.Image();
       image.onload = function () {
-        el.verticalSpace = $el.outerHeight(true) + fixedOffset;
+        el.verticalSpace = $el.outerHeight(true);
         el.height = $el.outerHeight();
         callback();
       };
       image.src = $img.attr('src');
     } else {
-      el.verticalSpace = $el.outerHeight() + fixedOffset;
+      el.verticalSpace = $el.outerHeight(true);
       el.height = $el.outerHeight();
       callback();
     }
