@@ -176,9 +176,9 @@ def submit_request_to_go_live(service_id):
                 '{user_email}, '
                 '-, '
                 '{date}, '
-                '{volume_sms}, '
-                '{volume_email}, '
-                '{volume_letter}'
+                '{volume_sms_normalised}, '
+                '{volume_email_normalised}, '
+                '{volume_letter_normalised}'
             ).format(
                 service_name=current_service.name,
                 service_dashboard=url_for('main.service_dashboard', service_id=current_service.id, _external=True),
@@ -186,8 +186,11 @@ def submit_request_to_go_live(service_id):
                 agreement=AgreementInfo.from_current_user().as_human_readable,
                 checklist=current_service.go_live_checklist_completed_as_yes_no,
                 volume_email=form.volume_email.data,
+                volume_email_normalised=form.volume_email.data.replace(',', ''),
                 volume_sms=form.volume_sms.data,
+                volume_sms_normalised=form.volume_sms.data.replace(',', ''),
                 volume_letter=form.volume_letter.data,
+                volume_letter_normalised=form.volume_letter.data.replace(',', ''),
                 research_consent=form.research_consent.data.title(),
                 service_id=current_service.id,
                 organisation=AgreementInfo.from_current_user().owner,
