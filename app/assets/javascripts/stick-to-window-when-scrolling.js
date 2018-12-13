@@ -119,7 +119,6 @@
       }
     };
 
-    this.setFixedTop(el);
     this.setElWidth(el);
     this.setElHeight(el, onHeightSet);
   };
@@ -130,14 +129,6 @@
       self.setElementDimensions(el);
     });
     self.setElementPositions();
-  };
-  Sticky.prototype.setFixedTop = function (el) {
-    var $siblingEl = $('<div></div>');
-    $siblingEl.insertBefore(el.$fixedEl);
-    var fixedTop = $siblingEl.offset().top - $siblingEl.position().top;
-    $siblingEl.remove();
-
-    el.fixedTop = fixedTop;
   };
   Sticky.prototype.setElWidth = function (el) {
     el.horizontalSpace = el.$fixedEl.outerWidth(true);
