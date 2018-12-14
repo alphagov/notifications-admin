@@ -758,7 +758,7 @@ boston.gov.uk:
 bournemouth.gov.uk:
   owner: Bournemouth Borough Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 boveytracey.gov.uk:
   owner: Bovey Tracey Town Council
   crown: false
