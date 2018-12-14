@@ -51,13 +51,13 @@
     }
   };
   StickyElement.prototype.stop = function () {
-    this._stopped = true;
+    this._isStopped = true;
   };
   StickyElement.prototype.unstop = function () {
-    this._stopped = false;
+    this._isStopped = false;
   };
-  StickyElement.prototype.stopped = function () {
-    return this._stopped;
+  StickyElement.prototype.isStopped = function () {
+    return this._isStopped;
   };
 
   // Constructor for objects collecting together all generic behaviour for controlling the state of
@@ -89,21 +89,30 @@
     var self = this;
 
     $.each(self._els, function (i, el) {
-      var $el = el.$fixedEl;
+      var $el = el.$fixedEl,
+          windowDimensions = self.getWindowDimensions();
 
-      var windowDimensions = self.getWindowDimensions();
+      if (self.viewportIsWideEnough(windowDimensions.width)) {
 
-      if (self.scrolledFromInsideWindow(el.scrolledFrom)) {
-        self.release(el);
-      } else {
-        if (self.scrolledToOutsideWindow(el, windowDimensions.height)) {
-          self.stop(el);
-        } else if (self.viewportIsWideEnough(windowDimensions.width)) {
-          if (el.stopped) {
-            self.unstop(el);
+        if (self.windowNotPastScrolledFrom(el.scrolledFrom)) {
+          self.release(el);
+        } else {
+          if (self.windowNotPastScrolledTo(el, windowDimensions.height)) {
+            self.stick(el);
+            if (el.isStopped()) {
+              self.unstop(el);
+            }
+          } else { // window past scrolledTo position
+            if (!el.isStopped()) {
+              self.stop(el);
+            }
           }
-          self.stick(el);
         }
+
+      } else {
+
+        self.reset(el);
+
       }
     });
 
@@ -129,6 +138,15 @@
     this.setElWidth(el);
     this.setElHeight(el, onHeightSet);
   };
+  // Reset element to original state in the page
+  Sticky.prototype.reset = function (el) {
+    if (el.isStuck()) {
+      this.release(el);
+    }
+    if (el.isStopped()) {
+      this.unstop(el);
+    }
+  };
   // Recalculate stored dimensions for all sticky elements
   Sticky.prototype.recalculate = function () {
     var self = this;
@@ -139,7 +157,14 @@
     self.setElementPositions();
   };
   Sticky.prototype.setElWidth = function (el) {
-    el.horizontalSpace = el.$fixedEl.outerWidth(true);
+    var $el = el.$fixedEl;
+    var width = $el.parent().width();
+
+    el.horizontalSpace = width;
+    // if stuck, element won't inherit width from parent so set explicitly
+    if (el._$shim) {
+      $el.width(width);
+    }
   };
   Sticky.prototype.setElHeight = function (el, callback) {
     var self = this;
@@ -197,14 +222,14 @@
       }
     }
   };
+  Sticky.prototype.viewportIsWideEnough = function (windowWidth) {
+    return windowWidth > 768;
+  };
   Sticky.prototype.onScroll = function () {
     this._hasScrolled = true;
   };
   Sticky.prototype.onResize = function () {
     this._hasResized = true;
-  };
-  Sticky.prototype.viewportIsWideEnough = function (windowWidth) {
-    return windowWidth > 768;
   };
   Sticky.prototype.checkScroll = function () {
     var self = this;
@@ -215,30 +240,23 @@
     }
   };
   Sticky.prototype.checkResize = function () {
-    var self = this;
+    var self = this,
+        windowWidth = self.getWindowDimensions().width;
 
     if (self._hasResized === true) {
       self._hasResized = false;
 
-      var windowDimensions = self.getWindowDimensions();
-
       $.each(self._els, function (i, el) {
-        var $el = el.$fixedEl;
-
-        var elResize = $el.hasClass('js-self-resize');
-        if (elResize) {
-          var $shim = $('.shim');
-          var $elParent = $el.parent('div');
-          var elParentWidth = $elParent.width();
-          $shim.css('width', elParentWidth);
-          $el.css('width', elParentWidth);
-          self.setElHeight(el);
-        }
-
-        if (!self.viewportIsWideEnough(windowDimensions.width)) {
-          self.release($el);
+        if (!self.viewportIsWideEnough(windowWidth)) {
+          self.reset(el);
+        } else {
+          self.setElementDimensions(el);
         }
       });
+
+      if (self.viewportIsWideEnough(windowWidth)) {
+        self.setElementPositions();
+      }
     }
   };
   Sticky.prototype.release = function (el) {
@@ -265,15 +283,15 @@
     }
     return (footer.offset().top - 10) - el.height;
   };
-  stickAtTop.scrolledFromInsideWindow = function (scrolledFrom) {
+  stickAtTop.windowNotPastScrolledFrom = function (scrolledFrom) {
     var windowTop = this.getWindowPositions().scrollTop;
 
     return scrolledFrom > windowTop;
   };
-  stickAtTop.scrolledToOutsideWindow = function (el, windowHeight) {
+  stickAtTop.windowNotPastScrolledTo = function (el, windowHeight) {
     var windowTop = this.getWindowPositions().scrollTop;
   
-    return windowTop > el.scrolledTo;
+    return windowTop < el.scrolledTo;
   };
   stickAtTop.stick = function (el) {
     if (!el.isStuck()) {
@@ -286,16 +304,12 @@
     }
   };
   stickAtTop.stop = function (el) {
-    if (!el.stopped()) {
-      el.$fixedEl.css({ 'position': 'absolute', 'top': el.scrolledTo });
-      el.stop();
-    }
+    el.$fixedEl.css({ 'position': 'absolute', 'top': el.scrolledTo });
+    el.stop();
   };
   stickAtTop.unstop = function (el) {
-    if (el.stopped()) {
-      el.$fixedEl.css({ 'position': '', 'top': '' });
-      el.unstop();
-    }
+    el.$fixedEl.css({ 'position': '', 'top': '' });
+    el.unstop();
   };
 
   // Extension of sticky object to add behaviours specific to sticking to bottom of window
@@ -312,15 +326,15 @@
     }
     return (header.offset().top + header.outerHeight() + 10) + el.height;
   };
-  stickAtBottom.scrolledFromInsideWindow = function (scrolledFrom) {
+  stickAtBottom.windowNotPastScrolledFrom = function (scrolledFrom) {
     var windowBottom = this.getWindowPositions().scrollTop + this.getWindowDimensions().height;
 
     return scrolledFrom < windowBottom;
   };
-  stickAtBottom.scrolledToOutsideWindow = function (el, windowHeight) {
+  stickAtBottom.windowNotPastScrolledTo = function (el, windowHeight) {
     var windowBottom = this.getWindowPositions().scrollTop + this.getWindowDimensions().height;
 
-    return windowBottom < el.scrolledTo;
+    return windowBottom > el.scrolledTo;
   };
   stickAtBottom.stick = function (el) {
     if (!el.isStuck()) {
@@ -333,24 +347,20 @@
     }
   };
   stickAtBottom.stop = function (el) {
-    if (!el.stopped()) {
-      el.$fixedEl.css({
-        'position': 'absolute',
-        'top': (el.scrolledTo - el.height),
-        'bottom': 'auto'
-      });
-      el.stop();
-    }
+    el.$fixedEl.css({
+      'position': 'absolute',
+      'top': (el.scrolledTo - el.height),
+      'bottom': 'auto'
+    });
+    el.stop();
   };
   stickAtBottom.unstop = function (el) {
-    if (el.stopped()) {
-      el.$fixedEl.css({
-        'position': '',
-        'top': '',
-        'bottom': ''
-      });
-      el.unstop();
-    }
+    el.$fixedEl.css({
+      'position': '',
+      'top': '',
+      'bottom': ''
+    });
+    el.unstop();
   };
 
   GOVUK.stickAtTopWhenScrolling = stickAtTop;
