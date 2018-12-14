@@ -4037,7 +4037,7 @@ soham-tc.gov.uk:
 solihull.gov.uk:
   owner: Solihull Metropolitan Borough Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 somerset.gov.uk:
   owner: Somerset County Council
   crown: false
