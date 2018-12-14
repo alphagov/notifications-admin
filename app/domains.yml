@@ -1100,10 +1100,11 @@ centralbedfordshire.gov.uk:
   owner: Central Bedfordshire Council
   crown: false
   agreement_signed: false
+ceredigion.llyw.cymru: ceredigion.gov.uk
 ceredigion.gov.uk:
   owner: Ceredigion County Council
   crown: false
-  agreement_signed: false
+  agreement_signed: false  
 chalford-pc.gov.uk:
   owner: Stroud District Council
   crown: false
