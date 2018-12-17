@@ -4,14 +4,15 @@
   var $ = global.jQuery;
   var GOVUK = global.GOVUK || {};
 
+  // Constructor for objects holding data for each element to have sticky behaviour
   var StickyElement = function ($el, sticky) {
     this._sticky = sticky;
     this.$fixedEl = $el;
     this._initialFixedClass = 'content-fixed-onload';
     this._fixedClass = 'content-fixed';
     this._appliedClass = null;
+    this._$shim = null;
     this._stopped = false;
-    this.scrolledFrom = this._sticky.getScrolledFrom($el);
   };
   StickyElement.prototype.stickyClass = function () {
     return (this._sticky._initialPositionsSet) ? this._fixedClass : this._initialFixedClass;
@@ -30,17 +31,37 @@
     this._appliedClass = null;
     this._hasBeenCalled = true;
   };
+  // When a sticky element is moved into the 'stuck' state, a shim is inserted into the
+  // page to preserve the space the element occupies in the flow.
+  StickyElement.prototype.addShim = function (position) {
+    this._$shim = $('<div class="shim" style="width: ' + this.horizontalSpace + 'px; height: ' + this.verticalSpace + 'px">&nbsp</div>');
+    this.$fixedEl[position](this._$shim);
+  };
+  StickyElement.prototype.removeShim = function () {
+    this._$shim.remove();
+    this._$shim = null;
+  };
+  // Changes to the dimensions of a sticky element with a shim need to be passed on to the shim
+  StickyElement.prototype.updateShim = function () {
+    if (this._$shim) {
+      this._$shim.css({
+        'height': this.verticalSpace,
+        'width': this.horizontalSpace
+      });
+    }
+  };
   StickyElement.prototype.stop = function () {
-    this._stopped = true;
+    this._isStopped = true;
   };
   StickyElement.prototype.unstop = function () {
-    this._stopped = false;
+    this._isStopped = false;
   };
-  StickyElement.prototype.stopped = function () {
-    return this._stopped;
+  StickyElement.prototype.isStopped = function () {
+    return this._isStopped;
   };
 
-  // Stick elements to top of screen when you scroll past, documentation is in the README.md
+  // Constructor for objects collecting together all generic behaviour for controlling the state of
+  // sticky elements
   var Sticky = function (selector) {
     this._hasScrolled = false;
     this._scrollTimeout = false;
@@ -63,99 +84,152 @@
       scrollTop: $(global).scrollTop()
     };
   };
+  // Change state of sticky elements based on their position relative to the window
   Sticky.prototype.setElementPositions = function () {
     var self = this;
 
     $.each(self._els, function (i, el) {
-      var $el = el.$fixedEl;
+      var $el = el.$fixedEl,
+          windowDimensions = self.getWindowDimensions();
 
-      var windowDimensions = self.getWindowDimensions();
+      if (self.viewportIsWideEnough(windowDimensions.width)) {
 
-      if (self.scrolledFromInsideWindow(el.scrolledFrom)) {
-        self.release(el);
-      } else {
-        if (self.scrolledToOutsideWindow(el, windowDimensions.height)) {
-          self.stop(el);
-        } else if (self.viewportIsWideEnough(windowDimensions.width)) {
-          if (el.stopped) {
-            self.unstop(el);
+        if (self.windowNotPastScrolledFrom(el.scrolledFrom)) {
+          self.release(el);
+        } else {
+          if (self.windowNotPastScrolledTo(el, windowDimensions.height)) {
+            self.stick(el);
+            if (el.isStopped()) {
+              self.unstop(el);
+            }
+          } else { // window past scrolledTo position
+            if (!el.isStopped()) {
+              self.stop(el);
+            }
           }
-          self.stick(el);
         }
+
+      } else {
+
+        self.reset(el);
+
       }
     });
 
     if (self._initialPositionsSet === false) { self._initialPositionsSet = true; }
   };
-  Sticky.prototype.setFixedTop = function (el) {
-    var $siblingEl = $('<div></div>');
-    $siblingEl.insertBefore(el.$fixedEl);
-    var fixedTop = $siblingEl.offset().top - $siblingEl.position().top;
-    $siblingEl.remove();
-
-    el.fixedTop = fixedTop;
-  };
-  Sticky.prototype.setElHeight = function (el) {
+  // Store all the dimensions for a sticky element to limit DOM queries
+  Sticky.prototype.setElementDimensions = function (el, callback) {
     var self = this;
-    var fixedOffset = parseInt(el.$fixedEl.css('top'), 10);
+    var $el = el.$fixedEl;
+    var onHeightSet = function () {
+      el.scrolledTo = self.getScrollingTo(el);
+      // if element is shim'ed, pass changes in dimension on to the shim
+      if (el._$shim) {
+        el.updateShim();
+        $el = el._$shim;
+      }
+      el.scrolledFrom = self.getScrolledFrom($el);
+      if (callback !== undefined) {
+        callback();
+      }
+    };
+
+    this.setElWidth(el);
+    this.setElHeight(el, onHeightSet);
+  };
+  // Reset element to original state in the page
+  Sticky.prototype.reset = function (el) {
+    if (el.isStuck()) {
+      this.release(el);
+    }
+    if (el.isStopped()) {
+      this.unstop(el);
+    }
+  };
+  // Recalculate stored dimensions for all sticky elements
+  Sticky.prototype.recalculate = function () {
+    var self = this;
+
+    $.each(self._els, function (i, el) {
+      self.setElementDimensions(el);
+    });
+    self.setElementPositions();
+  };
+  Sticky.prototype.setElWidth = function (el) {
+    var $el = el.$fixedEl;
+    var width = $el.parent().width();
+
+    el.horizontalSpace = width;
+    // if stuck, element won't inherit width from parent so set explicitly
+    if (el._$shim) {
+      $el.width(width);
+    }
+  };
+  Sticky.prototype.setElHeight = function (el, callback) {
+    var self = this;
     var $el = el.$fixedEl;
     var $img = $el.find('img');
-
-    fixedOffset = isNaN(fixedOffset) ? 0 : fixedOffset;
 
     if ((!self._elsLoaded) && ($img.length > 0)) {
       var image = new global.Image();
       image.onload = function () {
-        el.height = $el.outerHeight() + fixedOffset;
-        el.scrolledTo = self.getScrollingTo(el);
-        self.checkElementsLoaded();
+        el.verticalSpace = $el.outerHeight(true);
+        el.height = $el.outerHeight();
+        callback();
       };
       image.src = $img.attr('src');
     } else {
-      el.height = $el.outerHeight() + fixedOffset;
-      el.scrolledTo = self.getScrollingTo(el);
-      self.checkElementsLoaded();
+      el.verticalSpace = $el.outerHeight(true);
+      el.height = $el.outerHeight();
+      callback();
     }
   };
-  Sticky.prototype.checkElementsLoaded = function () {
-    this._elsLoaded = $.grep(this._els, function (el) { return ('height' in el); }).length === this._els.length;
+  Sticky.prototype.allElementsLoaded = function (totalEls) {
+    return this._els.length === totalEls;
   };
   Sticky.prototype.init = function () {
     var self = this;
     var $els = $(self.CSS_SELECTOR);
+    var numOfEls = $els.length;
 
-    if ($els.length > 0) {
+    if (numOfEls > 0) {
       $els.each(function (i, el) {
         var $el = $(el);
         var elObj = new StickyElement($el, self);
 
-        self.setFixedTop(elObj);
-        self.setElHeight(elObj);
-        self._els.push(elObj);
+        self.setElementDimensions(elObj, function () {
+          self._els.push(elObj);
+          // set positions based on initial scroll positionu
+          if (self._els.length === numOfEls) {
+            self._elsLoaded = true;
+            self.setElementPositions();
+          }
+        });
       });
 
-      // set element positions based on page scroll position on load
-      self.setElementPositions();
-
+      // flag when scrolling takes place and check (and re-position) sticky elements relative to
+      // window position
       if (self._scrollTimeout === false) {
         $(global).scroll(function (e) { self.onScroll(); });
         self._scrollTimeout = global.setInterval(function (e) { self.checkScroll(); }, 50);
       }
 
+      // Recalculate all dimensions when the window resizes
       if (self._resizeTimeout === false) {
         $(global).resize(function (e) { self.onResize(); });
         self._resizeTimeout = global.setInterval(function (e) { self.checkResize(); }, 50);
       }
     }
   };
+  Sticky.prototype.viewportIsWideEnough = function (windowWidth) {
+    return windowWidth > 768;
+  };
   Sticky.prototype.onScroll = function () {
     this._hasScrolled = true;
   };
   Sticky.prototype.onResize = function () {
     this._hasResized = true;
-  };
-  Sticky.prototype.viewportIsWideEnough = function (windowWidth) {
-    return windowWidth > 768;
   };
   Sticky.prototype.checkScroll = function () {
     var self = this;
@@ -166,41 +240,23 @@
     }
   };
   Sticky.prototype.checkResize = function () {
-    var self = this;
+    var self = this,
+        windowWidth = self.getWindowDimensions().width;
 
     if (self._hasResized === true) {
       self._hasResized = false;
 
-      var windowDimensions = self.getWindowDimensions();
-
       $.each(self._els, function (i, el) {
-        var $el = el.$fixedEl;
-
-        var elResize = $el.hasClass('js-self-resize');
-        if (elResize) {
-          var $shim = $('.shim');
-          var $elParent = $el.parent('div');
-          var elParentWidth = $elParent.width();
-          $shim.css('width', elParentWidth);
-          $el.css('width', elParentWidth);
-          self.setElHeight(el);
-        }
-
-        if (!self.viewportIsWideEnough(windowDimensions.width)) {
-          self.release($el);
+        if (!self.viewportIsWideEnough(windowWidth)) {
+          self.reset(el);
+        } else {
+          self.setElementDimensions(el);
         }
       });
-    }
-  };
-  Sticky.prototype.stick = function (el) {
-    if (!el.isStuck()) {
-      var $el = el.$fixedEl;
-      var height = Math.max($el.height(), 1);
-      var width = $el.width();
 
-      this.addShimForEl($el, width, height);
-      $el.css('width', width + 'px').addClass(el.stickyClass());
-      el.stick();
+      if (self.viewportIsWideEnough(windowWidth)) {
+        self.setElementPositions();
+      }
     }
   };
   Sticky.prototype.release = function (el) {
@@ -208,15 +264,18 @@
       var $el = el.$fixedEl;
 
       $el.removeClass(el.appliedClass()).css('width', '');
-      $el.siblings('.shim').remove();
+      el.removeShim();
       el.release();
     }
   };
 
+  // Extension of sticky object to add behaviours specific to sticking to top of window
   var stickAtTop = new Sticky('.js-stick-at-top-when-scrolling');
+  // Store top of sticky elements while unstuck
   stickAtTop.getScrolledFrom = function ($el) {
     return $el.offset().top;
   };
+  // Store furthest point top of sticky element is allowed
   stickAtTop.getScrollingTo = function (el) {
     var footer = $('.js-footer:eq(0)');
     if (footer.length === 0) {
@@ -224,36 +283,42 @@
     }
     return (footer.offset().top - 10) - el.height;
   };
-  stickAtTop.scrolledFromInsideWindow = function (scrolledFrom) {
+  stickAtTop.windowNotPastScrolledFrom = function (scrolledFrom) {
     var windowTop = this.getWindowPositions().scrollTop;
 
     return scrolledFrom > windowTop;
   };
-  stickAtTop.scrolledToOutsideWindow = function (el, windowHeight) {
+  stickAtTop.windowNotPastScrolledTo = function (el, windowHeight) {
     var windowTop = this.getWindowPositions().scrollTop;
   
-    return windowTop > el.scrolledTo;
+    return windowTop < el.scrolledTo;
   };
-  stickAtTop.addShimForEl = function ($el, width, height) {
-    $el.before('<div class="shim" style="width: ' + width + 'px; height: ' + height + 'px">&nbsp;</div>');
+  stickAtTop.stick = function (el) {
+    if (!el.isStuck()) {
+      var $el = el.$fixedEl;
+
+      el.addShim('before');
+      // element will be absolutely positioned so cannot rely on parent element for width
+      $el.css('width', $el.width() + 'px').addClass(el.stickyClass());
+      el.stick();
+    }
   };
   stickAtTop.stop = function (el) {
-    if (!el.stopped()) {
-      el.$fixedEl.css({ 'position': 'absolute', 'top': el.scrolledTo });
-      el.stop();
-    }
+    el.$fixedEl.css({ 'position': 'absolute', 'top': el.scrolledTo });
+    el.stop();
   };
   stickAtTop.unstop = function (el) {
-    if (el.stopped()) {
-      el.$fixedEl.css({ 'position': '', 'top': '' });
-      el.unstop();
-    }
+    el.$fixedEl.css({ 'position': '', 'top': '' });
+    el.unstop();
   };
 
+  // Extension of sticky object to add behaviours specific to sticking to bottom of window
   var stickAtBottom = new Sticky('.js-stick-at-bottom-when-scrolling');
+  // Store bottom of sticky elements while unstuck
   stickAtBottom.getScrolledFrom = function ($el) {
     return $el.offset().top + $el.outerHeight();
   };
+  // Store furthest point bottom of sticky element is allowed
   stickAtBottom.getScrollingTo = function (el) {
     var header = $('.js-header:eq(0)');
     if (header.length === 0) {
@@ -261,38 +326,41 @@
     }
     return (header.offset().top + header.outerHeight() + 10) + el.height;
   };
-  stickAtBottom.scrolledFromInsideWindow = function (scrolledFrom) {
+  stickAtBottom.windowNotPastScrolledFrom = function (scrolledFrom) {
     var windowBottom = this.getWindowPositions().scrollTop + this.getWindowDimensions().height;
 
     return scrolledFrom < windowBottom;
   };
-  stickAtBottom.scrolledToOutsideWindow = function (el, windowHeight) {
+  stickAtBottom.windowNotPastScrolledTo = function (el, windowHeight) {
     var windowBottom = this.getWindowPositions().scrollTop + this.getWindowDimensions().height;
 
-    return windowBottom < el.scrolledTo;
+    return windowBottom > el.scrolledTo;
   };
-  stickAtBottom.addShimForEl = function ($el, width, height) {
-    $el.after('<div class="shim" style="width: ' + width + 'px height: ' + height + 'px">&nbsp</div>');
+  stickAtBottom.stick = function (el) {
+    if (!el.isStuck()) {
+      var $el = el.$fixedEl;
+
+      el.addShim('after');
+      // element will be absolutely positioned so cannot rely on parent element for width
+      el.$fixedEl.css('width', $el.width() + 'px').addClass(el.stickyClass());
+      el.stick();
+    }
   };
   stickAtBottom.stop = function (el) {
-    if (!el.stopped()) {
-      el.$fixedEl.css({
-        'position': 'absolute',
-        'top': (el.scrolledTo - el.height),
-        'bottom': 'auto'
-      });
-      el.stop();
-    }
+    el.$fixedEl.css({
+      'position': 'absolute',
+      'top': (el.scrolledTo - el.height),
+      'bottom': 'auto'
+    });
+    el.stop();
   };
   stickAtBottom.unstop = function (el) {
-    if (el.stopped()) {
-      el.$fixedEl.css({
-        'position': '',
-        'top': '',
-        'bottom': ''
-      });
-      el.unstop();
-    }
+    el.$fixedEl.css({
+      'position': '',
+      'top': '',
+      'bottom': ''
+    });
+    el.unstop();
   };
 
   GOVUK.stickAtTopWhenScrolling = stickAtTop;
