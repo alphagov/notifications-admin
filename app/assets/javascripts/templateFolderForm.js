@@ -25,8 +25,9 @@
         {key: 'add-new-template', $el: this.$form.find('#add_new_template_form'), cancellable: true}
       ];
 
-      // cancel buttons only relevant if JS enabled, so
+      // cancel/clear buttons only relevant if JS enabled, so
       this.states.filter(state => state.cancellable).forEach((x) => this.addCancelButton(x));
+      this.states.filter(state => state.key === 'items-selected-buttons').forEach(x => this.addClearButton(x));
 
       // first off show the new template / new folder buttons
       this.currentState = this.$form.data('prev-state') || 'unknown';
@@ -41,22 +42,44 @@
     };
 
     this.addCancelButton = function(state) {
-      let $cancel =  $('<a></a>')
-          .html('Cancel')
-          .attr('class', 'page-footer-js-cancel')
-          .attr('tabindex', '0')
-          .on('click keydown', (event) => {
-            event.preventDefault();
-            // clear existing data
-            state.$el.find('input:radio').prop('checked', false);
-            state.$el.find('input:text').val('');
+      let $cancel = this.makeButton('Cancel', () => {
 
-            // go back to action buttons
-            this.selectActionButtons();
-          });
+        // clear existing data
+        state.$el.find('input:radio').prop('checked', false);
+        state.$el.find('input:text').val('');
 
-      state.$el.append($cancel);
+        // go back to action buttons
+        this.selectActionButtons();
+      });
+
+      state.$el.find('[type=submit]').after($cancel);
     };
+
+    this.addClearButton = function(state) {
+
+      let $clear = this.makeButton('Clear', () => {
+
+        // uncheck all templates and folders
+        this.$form.find('input:checkbox').prop('checked', false);
+
+        // go back to action buttons
+        this.selectActionButtons();
+      });
+
+      state.$el.find('.template-list-selected-counter').append($clear);
+    };
+
+    this.makeButton = (text, fn) => $('<a></a>')
+      .html(text)
+      .addClass('js-cancel')
+      .attr('tabindex', '0')
+      .on('click keydown', event => {
+        // space, enter or no keyCode (must be mouse input)
+        if ([13, 32, undefined].indexOf(event.keyCode) > -1) {
+          event.preventDefault();
+          fn();
+        }
+      });
 
     this.selectActionButtons = function () {
       // If we want to show one of the grey choose actions state, we can pretend we're in the choose actions state,
@@ -85,6 +108,9 @@
       }
 
       this.render();
+
+      $('.template-list-selected-counter-count').html(numSelected);
+
     };
 
     this.countSelectedCheckboxes = function() {
@@ -102,6 +128,9 @@
       <div id="nothing_selected">
         <button class="button-secondary" value="add-new-template">New template</button>
         <button class="button-secondary" value="add-new-folder">New folder</button>
+        <div class="template-list-selected-counter">
+          Nothing selected
+        </div>
       </div>
     `;
 
@@ -109,6 +138,9 @@
       <div id="items_selected">
         <button class="button-secondary" value="move-to-existing-folder">Move</button>
         <button class="button-secondary" value="move-to-new-folder">Add to a new folder</button>
+        <div class="template-list-selected-counter">
+          <span class="template-list-selected-counter-count">1</span> selected
+        </div>
       </div>
     `;
   };

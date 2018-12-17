@@ -108,6 +108,13 @@
     padding: $gutter-half 0 $gutter-one-third 0;
   }
 
+  &-selected-counter {
+    position: absolute;
+    right: $gutter-half;
+    top: $gutter - 1px;
+    color: $secondary-text-colour;
+  }
+
 }
 
 .folder-heading {
