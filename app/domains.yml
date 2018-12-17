@@ -3548,14 +3548,11 @@ portlandtowncouncil.gov.uk:
   owner: Portland Town Council
   crown: false
   agreement_signed: false
-portsmouthcc.gov.uk:
-  owner: Portsmouth City Council
-  crown: false
-  agreement_signed: false
+portsmouthcc.gov.uk: portsmouth.gov.uk
 portsmouth.gov.uk:
   owner: Portsmouth City Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 powys.gov.uk:
   owner: Powys County Council
   crown: false
