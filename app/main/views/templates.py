@@ -127,7 +127,7 @@ def choose_template(service_id, template_type='all', template_folder_id=None):
             abort(403)
         try:
             return process_folder_management_form(templates_and_folders_form, template_folder_id)
-        except Exception as e:
+        except HTTPError as e:
             flash(e.message)
 
     if 'templates_and_folders' in templates_and_folders_form.errors:
