@@ -276,7 +276,7 @@ ppf.gov.uk: pensionprotectionfund.org.uk
 pensionprotectionfund.org.uk:
   owner: Pension Protection Fund
   crown: true
-  agreement_signed: true  
+  agreement_signed: true
 
 # Other non-crown
 bl.uk:
@@ -1104,7 +1104,7 @@ ceredigion.llyw.cymru: ceredigion.gov.uk
 ceredigion.gov.uk:
   owner: Ceredigion County Council
   crown: false
-  agreement_signed: false  
+  agreement_signed: false
 chalford-pc.gov.uk:
   owner: Stroud District Council
   crown: false
@@ -2392,9 +2392,9 @@ irthlingborough-tc.gov.uk:
   crown: false
   agreement_signed: false
 islington.gov.uk:
-  owner: Islington London Borough Council 
+  owner: Islington London Borough Council
   crown: false
-  agreement_signed: false  
+  agreement_signed: false
 isycoedcommunitycouncil.gov.uk:
   owner: Isycoed Community Council
   crown: false
@@ -2608,6 +2608,10 @@ lewes.gov.uk:
   agreement_signed: false
 lewes-tc.gov.uk:
   owner: Lewes Town Council
+  crown: false
+  agreement_signed: false
+lewisham.gov.uk:
+  owner: Lewisham London Borough Council
   crown: false
   agreement_signed: false
 lg-em.gov.uk:
@@ -3628,6 +3632,10 @@ readydumgal.gov.uk:
   owner: Dumfries and Galloway Council
   crown: false
   agreement_signed: false
+redbridge.gov.uk:
+  owner: Redbridge London Borough Council
+  crown: false
+  agreement_signed: true
 redcar-cleveland.gov.uk:
   owner: Redcar and Cleveland Borough Council
   crown: false
