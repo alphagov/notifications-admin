@@ -2999,10 +2999,7 @@ mumbles.gov.uk:
   owner: Mumbles Community Council
   crown: false
   agreement_signed: false
-mynottingham.gov.uk:
-  owner: Nottingham City Council
-  crown: false
-  agreement_signed: false
+mynottingham.gov.uk: nottingham.gov.uk
 myoxfordshire.gov.uk:
   owner: Oxfordshire County Council
   crown: false
@@ -3287,14 +3284,11 @@ norwich.gov.uk:
   owner: Norwich City Council
   crown: false
   agreement_signed: false
-nottinghamcity.gov.uk:
-  owner: Nottingham City Council
-  crown: false
-  agreement_signed: false
+nottinghamcity.gov.uk: nottingham.gov.uk
 nottingham.gov.uk:
   owner: Nottingham City Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 nottinghamshire.gov.uk:
   owner: Nottinghamshire County Council
   crown: false
