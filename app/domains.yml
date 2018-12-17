@@ -2613,7 +2613,7 @@ lewes-tc.gov.uk:
 lewisham.gov.uk:
   owner: Lewisham London Borough Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 lg-em.gov.uk:
   owner: East Midlands Councils
   crown: false
