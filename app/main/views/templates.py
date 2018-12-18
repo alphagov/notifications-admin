@@ -76,6 +76,7 @@ def view_template(service_id, template_id):
             show_recipient=True,
             page_count=get_page_count_for_letter(template),
         ),
+        template_postage=template["postage"],
         default_letter_contact_block_id=default_letter_contact_block_id,
     )
 
