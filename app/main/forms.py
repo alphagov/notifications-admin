@@ -447,6 +447,16 @@ class EmailTemplateForm(BaseTemplateForm):
 
 
 class LetterTemplateForm(EmailTemplateForm):
+    postage = RadioField(
+        'Choose postage',
+        choices=[
+            ('first', 'First class'),
+            ('second', 'Second class'),
+            ('service_default', "Service default"),
+        ],
+        validators=[DataRequired()],
+        default='service_default'
+    )
 
     subject = TextAreaField(
         u'Main heading',

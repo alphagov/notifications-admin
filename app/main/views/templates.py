@@ -571,15 +571,27 @@ def edit_service_template(service_id, template_id):
             abort_403_if_not_admin_user()
 
         subject = form.subject.data if hasattr(form, 'subject') else None
-        new_template = get_template({
+
+        new_template_data = {
             'name': form.name.data,
             'content': form.template_content.data,
             'subject': subject,
             'template_type': template['template_type'],
             'id': template['id'],
             'process_type': form.process_type.data,
-            'reply_to_text': template['reply_to_text']
-        }, current_service)
+            'reply_to_text': template['reply_to_text'],
+        }
+        if (
+            current_service.has_permission("choose_postage") and template["template_type"] == "letter"
+        ) and form.postage.data in ["first", "second"]:
+            postage = {"postage": form.postage.data }
+
+        else:
+            postage = {}
+
+        new_template_data.update(postage)
+
+        new_template = get_template(new_template_data, current_service)
         template_change = get_template(template, current_service).compare_to(new_template)
         if template_change.placeholders_added and not request.form.get('confirm'):
             example_column_headings = (
@@ -606,7 +618,8 @@ def edit_service_template(service_id, template_id):
                 form.template_content.data,
                 service_id,
                 subject,
-                form.process_type.data
+                form.process_type.data,
+                postage=postage.get("postage")
             )
         except HTTPError as e:
             if e.status_code == 400:
@@ -637,6 +650,7 @@ def edit_service_template(service_id, template_id):
         return render_template(
             'views/edit-{}-template.html'.format(template['template_type']),
             form=form,
+            can_choose_postage=current_service.has_permission("choose_postage"),
             template_id=template_id,
             template_type=template['template_type'],
             heading_action='Edit',
