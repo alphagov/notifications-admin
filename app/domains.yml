@@ -4273,7 +4273,7 @@ stharmoncommunitycouncil.gov.uk:
 sthelens.gov.uk:
   owner: St Helens Metropolitan Borough Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 stirling.gov.uk:
   owner: Stirling Council
   crown: false
