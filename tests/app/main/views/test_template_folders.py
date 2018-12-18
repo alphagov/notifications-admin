@@ -13,6 +13,7 @@ from tests.conftest import (
     normalize_spaces,
 )
 
+ROOT_FOLDER_ID = '__NONE__'
 PARENT_FOLDER_ID = '7e979e79-d970-43a5-ac69-b625a8d147b0'
 CHILD_FOLDER_ID = '92ee1ee0-e4ee-4dcc-b1a7-a5da9ebcfa2b'
 GRANDCHILD_FOLDER_ID = 'fafe723f-1d39-4a10-865f-e551e03d8886'
@@ -791,10 +792,10 @@ def test_should_show_radios_and_buttons_for_move_destination_if_correct_permissi
     assert radios == page.select('input[name=move_to]')
 
     assert [x['value'] for x in radios] == [
-        PARENT_FOLDER_ID, CHILD_FOLDER_ID, FOLDER_ONE_TWO_ID, FOLDER_TWO_ID,
+        ROOT_FOLDER_ID, PARENT_FOLDER_ID, CHILD_FOLDER_ID, FOLDER_ONE_TWO_ID, FOLDER_TWO_ID,
     ]
     assert [x.text.strip() for x in radio_div.select('label')] == [
-        'folder_one', 'folder_one_one', 'folder_one_two', 'folder_two',
+        'All templates', 'folder_one', 'folder_one_one', 'folder_one_two', 'folder_two',
     ]
     assert set(x['value'] for x in page.find_all('button', {'name': 'operation'})) == {
         'unknown',
@@ -902,7 +903,7 @@ def test_should_be_able_to_move_a_sub_item(
         template_folder_id=PARENT_FOLDER_ID,
         _data={
             'operation': 'move-to-existing-folder',
-            'move_to': '__NONE__',
+            'move_to': ROOT_FOLDER_ID,
             'templates_and_folders': [GRANDCHILD_FOLDER_ID],
         },
         _expected_status=302,
@@ -957,7 +958,7 @@ def test_should_be_able_to_move_a_sub_item(
         'operation': 'add-new-template',
         'templates_and_folders': [],
         'move_to_new_folder_name': '',
-        'move_to': '__NONE__',
+        'move_to': 'ROOT_FOLDER_ID',
         'add_template_by_template_type': 'email',
     },
     # add a new template, but don't select anything
@@ -1005,6 +1006,7 @@ def test_no_action_if_user_fills_in_ambiguous_fields(
     ]
 
     assert [
+        ROOT_FOLDER_ID,
         FOLDER_TWO_ID,
         PARENT_FOLDER_ID,
     ] == [

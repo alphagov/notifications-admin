@@ -14,6 +14,43 @@
   {% endcall %}
 {% endmacro %}
 
+
+{% macro radio_list(
+    options,
+    child_map,
+    disable=[],
+    option_hints={}
+) %}
+    <ul>
+    {% for option in options %}
+      {% if child_map[option.data] %}
+        {% call radio(option, disable, option_hints, as_list_item=True) %}
+          {{ radio_list(child_map[option.data], child_map, disable, option_hints) }}
+        {% endcall %}
+      {% else %}
+          {{ radio(option, disable, option_hints, as_list_item=True) }}
+      {% endif %}
+    {% endfor %}
+    </ul>
+{% endmacro %}
+
+
+{% macro radios_nested(
+  field,
+  child_map,
+  hint=None,
+  disable=[],
+  option_hints={},
+  hide_legend=False
+) %}
+  {% set disable = [current_option_id] %}
+  {% call radios_wrapper(
+    field, hint, disable, option_hints, hide_legend
+  ) %}
+    {{ radio_list(child_map[None], child_map, disable) }}
+  {% endcall %}
+{% endmacro %}
+
 {% macro radios_wrapper(field, hint=None, disable=[], option_hints={}, hide_legend=False) %}
   <div class="form-group {% if field.errors %} form-group-error{% endif %}">
     <fieldset>
@@ -37,8 +74,12 @@
   </div>
 {% endmacro %}
 
-{% macro radio(option, disable=[], option_hints={}, data_target=None) %}
+{% macro radio(option, disable=[], option_hints={}, data_target=None, as_list_item=False) %}
+  {% if as_list_item %}
+  <li class="multiple-choice" {% if data_target %}data-target="{{ data_target }}"{% endif %}>
+  {% else %}
   <div class="multiple-choice" {% if data_target %}data-target="{{ data_target }}"{% endif %}>
+  {% endif %}
     <input
       id="{{ option.id }}" name="{{ option.name }}" type="radio" value="{{ option.data }}"
       {% if option.data in disable %}
@@ -56,7 +97,14 @@
         </div>
       {% endif %}
     </label>
+    {% if caller %}
+        {{ caller() }}
+    {% endif %}
+  {% if as_list_item %}
+  </li>
+  {% else %}
   </div>
+  {% endif %}
 {% endmacro %}
 
 

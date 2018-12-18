@@ -116,13 +116,13 @@ def choose_template(service_id, template_type='all', template_folder_id=None):
         all_template_folders=current_service.all_template_folders,
         template_list=template_list,
         template_type=template_type,
-        current_folder_id=template_folder_id,
         allow_adding_letter_template=current_service.has_permission('letter'),
         allow_adding_copy_of_template=(
             current_service.all_templates or
             len(user_api_client.get_service_ids_for_user(current_user)) > 1
         ),
     )
+
     if request.method == 'POST' and templates_and_folders_form.validate_on_submit():
         if not can_manage_folders():
             abort(403)
@@ -149,6 +149,7 @@ def choose_template(service_id, template_type='all', template_folder_id=None):
         template_type=template_type,
         search_form=SearchTemplatesForm(),
         templates_and_folders_form=templates_and_folders_form,
+        move_to_children=templates_and_folders_form.move_to.children()
     )
 
 
