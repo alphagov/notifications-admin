@@ -203,7 +203,7 @@ generate-manifest:
 	    <(${DECRYPT_CMD} ${NOTIFY_CREDENTIALS}/credentials/${CF_SPACE}/paas/environment-variables.gpg)
 
 .PHONY: cf-deploy
-cf-deploy: upload-static ## Deploys the app to Cloud Foundry
+cf-deploy: ## Deploys the app to Cloud Foundry
 	$(if ${CF_SPACE},,$(error Must specify CF_SPACE))
 	@cf app --guid notify-admin || exit 1
 	cf rename notify-admin notify-admin-rollback
