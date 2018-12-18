@@ -97,6 +97,10 @@ upload-paas-artifact:
 	$(if ${JENKINS_S3_BUCKET},,$(error Must specify JENKINS_S3_BUCKET))
 	aws s3 cp --region eu-west-1 --sse AES256 target/notifications-admin.zip s3://${JENKINS_S3_BUCKET}/build/notifications-admin/${DEPLOY_BUILD_NUMBER}.zip
 
+.PHONY: upload-static ## Upload the static files to be served from S3
+upload-static:
+	aws s3 cp --region eu-west-1 --recursive ./app/static s3://${DNS_NAME}-static
+
 .PHONY: test
 test: venv ## Run tests
 	./scripts/run_tests.sh
@@ -199,7 +203,7 @@ generate-manifest:
 	    <(${DECRYPT_CMD} ${NOTIFY_CREDENTIALS}/credentials/${CF_SPACE}/paas/environment-variables.gpg)
 
 .PHONY: cf-deploy
-cf-deploy: ## Deploys the app to Cloud Foundry
+cf-deploy: upload-static ## Deploys the app to Cloud Foundry
 	$(if ${CF_SPACE},,$(error Must specify CF_SPACE))
 	@cf app --guid notify-admin || exit 1
 	cf rename notify-admin notify-admin-rollback
