@@ -125,7 +125,13 @@ def choose_template(service_id, template_type='all', template_folder_id=None):
     if request.method == 'POST' and templates_and_folders_form.validate_on_submit():
         if not can_manage_folders():
             abort(403)
-        return process_folder_management_form(templates_and_folders_form, template_folder_id)
+        try:
+            return process_folder_management_form(templates_and_folders_form, template_folder_id)
+        except HTTPError as e:
+            flash(e.message)
+
+    if 'templates_and_folders' in templates_and_folders_form.errors:
+        flash('Select at least one template or folder')
 
     return render_template(
         'views/templates/choose.html',

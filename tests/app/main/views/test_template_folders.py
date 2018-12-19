@@ -2,6 +2,7 @@ import uuid
 
 import pytest
 from flask import url_for
+from notifications_python_client.errors import HTTPError
 
 from tests.conftest import (
     SERVICE_ONE_ID,
@@ -959,6 +960,10 @@ def test_should_be_able_to_move_a_sub_item(
         'move_to': '__NONE__',
         'add_template_by_template_type': 'email',
     },
+    # add a new template, but don't select anything
+    {
+        'operation': 'add-new-template',
+    },
 ])
 def test_no_action_if_user_fills_in_ambiguous_fields(
     client_request,
@@ -1088,3 +1093,72 @@ def test_should_be_able_to_move_to_new_folder(
         folder_ids={FOLDER_TWO_ID},
         template_ids={TEMPLATE_ONE_ID},
     )
+
+
+def test_radio_button_with_no_value_shows_custom_error_message(
+    client_request,
+    service_one,
+    mock_get_service_templates,
+    mock_get_template_folders,
+    mock_move_to_template_folder,
+    mock_create_template_folder,
+):
+    service_one['permissions'] += ['edit_folders']
+
+    page = client_request.post(
+        'main.choose_template',
+        service_id=SERVICE_ONE_ID,
+        _data={'operation': 'add-new-template'},
+        _expected_status=200,
+        _expected_redirect=None,
+    )
+
+    assert mock_move_to_template_folder.called is False
+    assert mock_create_template_folder.called is False
+
+    assert page.select_one('span.error-message').text.strip() == 'Select the type of template you want to add'
+
+
+@pytest.mark.parametrize('data, error_msg', [
+    # nothing selected when moving
+    (
+        {'operation': 'move-to-new-folder', 'templates_and_folders': [], 'move_to_new_folder_name': 'foo'},
+        'Select at least one template or folder'
+    ),
+    (
+        {'operation': 'move-to-existing-folder', 'templates_and_folders': [], 'move_to': PARENT_FOLDER_ID},
+        'Select at least one template or folder'
+    ),
+    # api error (eg moving folder to itself)
+    (
+        {'operation': 'move-to-existing-folder', 'templates_and_folders': [FOLDER_TWO_ID], 'move_to': FOLDER_TWO_ID},
+        'Some api error msg'
+    )
+
+])
+def test_show_custom_error_message(
+        client_request,
+        service_one,
+        mock_get_service_templates,
+        mock_get_template_folders,
+        mock_move_to_template_folder,
+        mock_create_template_folder,
+        data,
+        error_msg,
+):
+    service_one['permissions'] += ['edit_folders']
+    mock_get_template_folders.return_value = [
+        {'id': PARENT_FOLDER_ID, 'name': 'folder_one', 'parent_id': None},
+        {'id': FOLDER_TWO_ID, 'name': 'folder_two', 'parent_id': None},
+    ]
+    mock_move_to_template_folder.side_effect = HTTPError(message='Some api error msg')
+
+    page = client_request.post(
+        'main.choose_template',
+        service_id=SERVICE_ONE_ID,
+        _data=data,
+        _expected_status=200,
+        _expected_redirect=None,
+    )
+
+    assert page.select_one('div.banner-dangerous').text.strip() == error_msg

@@ -736,6 +736,18 @@ class HiddenFieldWithNoneOption(FieldWithNoneOption, HiddenField):
     pass
 
 
+class RadioFieldWithRequiredMessage(RadioField):
+    def __init__(self, *args, required_message='Not a valid choice', **kwargs):
+        self.required_message = required_message
+        super().__init__(*args, **kwargs)
+
+    def pre_validate(self, form):
+        try:
+            return super().pre_validate(form)
+        except ValueError:
+            raise ValueError(self.required_message)
+
+
 class ServiceSetBranding(StripWhitespaceForm):
 
     branding_style = RadioFieldWithNoneOption(
@@ -1151,17 +1163,17 @@ def required_for_ops(*operations):
     operations = set(operations)
 
     def validate(form, field):
-        if form.op not in operations and field.data:
+        if form.op not in operations and any(field.raw_data):
             # super weird
-            raise ValidationError('Must be empty')
-        if form.op in operations and not field.data:
-            raise ValidationError('Can’t be empty')
+            raise validators.StopValidation('Must be empty')
+        if form.op in operations and not any(field.raw_data):
+            raise validators.StopValidation('Can’t be empty')
     return validate
 
 
 class TemplateAndFoldersSelectionForm(Form):
     """
-    This form also expects the form data to include an operation, based on which submit button is clicked.
+    This form expects the form data to include an operation, based on which submit button is clicked.
     If enter is pressed, unknown will be sent by a hidden submit button at the top of the form.
     The value of this operation affects which fields are required, expected to be empty, or optional.
 
@@ -1247,7 +1259,7 @@ class TemplateAndFoldersSelectionForm(Form):
     add_new_folder_name = StringField('Folder name', validators=[required_for_ops('add-new-folder')])
     move_to_new_folder_name = StringField('Folder name', validators=[required_for_ops('move-to-new-folder')])
 
-    add_template_by_template_type = RadioField('Add new', validators=[
+    add_template_by_template_type = RadioFieldWithRequiredMessage('Add new', validators=[
+        required_for_ops('add-new-template'),
         Optional(),
-        required_for_ops('add-new-template')
-    ])
+    ], required_message='Select the type of template you want to add')
