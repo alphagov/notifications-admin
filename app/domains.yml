@@ -2398,7 +2398,7 @@ irthlingborough-tc.gov.uk:
 islington.gov.uk:
   owner: Islington London Borough Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 isycoedcommunitycouncil.gov.uk:
   owner: Isycoed Community Council
   crown: false
