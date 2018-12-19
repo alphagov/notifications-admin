@@ -581,11 +581,8 @@ def edit_service_template(service_id, template_id):
             'process_type': form.process_type.data,
             'reply_to_text': template['reply_to_text'],
         }
-        if (
-            current_service.has_permission("choose_postage") and template["template_type"] == "letter"
-        ) and form.postage.data in ["first", "second"]:
-            postage = {"postage": form.postage.data }
-
+        if current_service.has_permission("choose_postage") and template["template_type"] == "letter":
+            postage = {"postage": form.postage.data}
         else:
             postage = {}
 
