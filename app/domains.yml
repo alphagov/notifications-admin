@@ -2251,6 +2251,10 @@ highworthtowncouncil.gov.uk:
   owner: Highworth Town Council
   crown: false
   agreement_signed: false
+hillingdon.gov.uk:
+  owner: London Borough of Hillingdon
+  crown: false
+  agreement_signed: true
 hinckley-bosworth.gov.uk:
   owner: Hinckley & Bosworth Borough Council
   crown: false
