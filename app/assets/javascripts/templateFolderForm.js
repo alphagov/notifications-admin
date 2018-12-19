@@ -33,6 +33,8 @@
       this.currentState = this.$form.data('prev-state') || 'unknown';
       if (this.currentState === 'unknown') {
         this.selectActionButtons();
+      } else {
+        this.render();
       }
 
       this.$form.on('click', 'button.button-secondary', (event) => this.actionButtonClicked(event));
