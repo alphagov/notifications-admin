@@ -915,7 +915,7 @@ def test_should_redirect_when_saving_a_template(
     assert response.location == url_for(
         '.view_template', service_id=service['id'], template_id=template_id, _external=True)
     mock_update_service_template.assert_called_with(
-        template_id, name, 'sms', content, service['id'], None, 'normal')
+        template_id, name, 'sms', content, service['id'], None, 'normal', postage=None)
 
 
 def test_should_edit_content_when_process_type_is_priority_not_platform_admin(
@@ -951,7 +951,8 @@ def test_should_edit_content_when_process_type_is_priority_not_platform_admin(
         "new template <em>content</em> with & entity",
         service['id'],
         None,
-        'priority'
+        'priority',
+        postage=None
     )
 
 
@@ -1037,9 +1038,10 @@ def test_should_403_when_create_template_with_process_type_of_priority_for_non_p
     mock_update_service_template.called == 0
 
 
-@pytest.mark.parametrize('template_mock, expected_paragraphs', [
+@pytest.mark.parametrize('template_mock, template_type, expected_paragraphs', [
     (
         mock_get_service_email_template,
+        "email",
         [
             'You removed ((date))',
             'You added ((name))',
@@ -1048,6 +1050,7 @@ def test_should_403_when_create_template_with_process_type_of_priority_for_non_p
     ),
     (
         mock_get_service_letter_template,
+        "letter",
         [
             'You removed ((date))',
             'You added ((name))',
@@ -1067,6 +1070,7 @@ def test_should_show_interstitial_when_making_breaking_change(
     fake_uuid,
     mocker,
     template_mock,
+    template_type,
     expected_paragraphs,
 ):
     template_mock(
@@ -1076,17 +1080,22 @@ def test_should_show_interstitial_when_making_breaking_change(
     )
     service_id = fake_uuid
     template_id = fake_uuid
+    data = {
+        'id': template_id,
+        'name': "new name",
+        'template_content': "hello lets talk about ((thing))",
+        'template_type': template_type,
+        'subject': 'reminder \'" <span> & ((name))',
+        'service': service_id,
+        'process_type': 'normal'
+    }
+
+    if template_type == "letter":
+        data.update({"postage": "service_default"})
+
     response = logged_in_client.post(
         url_for('.edit_service_template', service_id=service_id, template_id=template_id),
-        data={
-            'id': template_id,
-            'name': "new name",
-            'template_content': "hello lets talk about ((thing))",
-            'template_type': 'email',
-            'subject': 'reminder \'" <span> & ((name))',
-            'service': service_id,
-            'process_type': 'normal'
-        }
+        data=data
     )
 
     assert response.status_code == 200
@@ -1232,7 +1241,7 @@ def test_should_redirect_when_saving_a_template_email(
         template_id=template_id,
         _external=True)
     mock_update_service_template.assert_called_with(
-        template_id, name, 'email', content, service_id, subject, 'normal')
+        template_id, name, 'email', content, service_id, subject, 'normal', postage=None)
 
 
 def test_should_show_delete_template_page_with_time_block(

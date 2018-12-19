@@ -881,7 +881,7 @@ def mock_get_service_email_template_without_placeholders(mocker):
 
 @pytest.fixture(scope='function')
 def mock_get_service_letter_template(mocker, content=None, subject=None):
-    def _get(service_id, template_id, version=None):
+    def _get(service_id, template_id, version=None, postage=None):
         template = template_json(
             service_id,
             template_id,
@@ -889,6 +889,7 @@ def mock_get_service_letter_template(mocker, content=None, subject=None):
             "letter",
             content or "Template <em>content</em> with & entity",
             subject or "Subject",
+            postage=postage,
         )
         return {'data': template}
 
@@ -910,8 +911,8 @@ def mock_create_service_template(mocker, fake_uuid):
 
 @pytest.fixture(scope='function')
 def mock_update_service_template(mocker):
-    def _update(id_, name, type_, content, service, subject=None, process_type=None):
-        template = template_json(service, id_, name, type_, content, subject, process_type)
+    def _update(id_, name, type_, content, service, subject=None, process_type=None, postage=None):
+        template = template_json(service, id_, name, type_, content, subject, process_type, postage)
         return {'data': template}
 
     return mocker.patch(
@@ -939,7 +940,7 @@ def mock_create_service_template_content_too_big(mocker):
 
 @pytest.fixture(scope='function')
 def mock_update_service_template_400_content_too_big(mocker):
-    def _update(id_, name, type_, content, service, subject=None, process_type=None):
+    def _update(id_, name, type_, content, service, subject=None, process_type=None, postage=None):
         json_mock = Mock(return_value={
             'message': {'content': ["Content has a character count greater than the limit of 459"]},
             'result': 'error'
