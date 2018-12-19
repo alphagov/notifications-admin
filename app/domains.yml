@@ -1637,7 +1637,7 @@ eastcambs.gov.uk:
 eastdevon.gov.uk:
   owner: East Devon District Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 eastdorsetdc.gov.uk:
   owner: East Dorset District Council
   crown: false
