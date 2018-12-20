@@ -3622,7 +3622,7 @@ rctcbc.gov.uk:
 reading.gov.uk:
   owner: Reading Borough Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 readydumgal.gov.uk:
   owner: Dumfries and Galloway Council
   crown: false
