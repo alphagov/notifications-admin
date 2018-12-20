@@ -452,10 +452,10 @@ class LetterTemplateForm(EmailTemplateForm):
         choices=[
             ('first', 'First class'),
             ('second', 'Second class'),
-            ('service_default', "Service default"),
+            ('None', "Service default"),
         ],
         validators=[DataRequired()],
-        default='service_default'
+        default='None'
     )
 
     subject = TextAreaField(

@@ -178,7 +178,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             data.update({
                 'postage': postage
             })
-        elif postage == "service_default":
+        elif postage == 'None':
             data.update({
                 'postage': None
             })

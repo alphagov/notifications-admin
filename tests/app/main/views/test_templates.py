@@ -1091,7 +1091,7 @@ def test_should_show_interstitial_when_making_breaking_change(
     }
 
     if template_type == "letter":
-        data.update({"postage": "service_default"})
+        data["postage"] = 'None'
 
     response = logged_in_client.post(
         url_for('.edit_service_template', service_id=service_id, template_id=template_id),
