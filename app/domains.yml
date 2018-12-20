@@ -3008,10 +3008,7 @@ myoxfordshire.gov.uk:
   owner: Oxfordshire County Council
   crown: false
   agreement_signed: false
-nafn.gov.uk:
-  owner: Tameside Metropolitan Borough Council
-  crown: false
-  agreement_signed: false
+nafn.gov.uk: tameside.gov.uk
 nailseatowncouncil.gov.uk:
   owner: Nailsea Town Council
   crown: false
@@ -4483,7 +4480,7 @@ tadleytowncouncil.gov.uk:
 tameside.gov.uk:
   owner: Tameside Metropolitan Borough Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 tamworth.gov.uk:
   owner: Tamworth Borough Council
   crown: false
