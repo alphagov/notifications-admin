@@ -5204,7 +5204,7 @@ ynysmon.gov.uk:
 york.gov.uk:
   owner: City of York Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 yorkshirelca.gov.uk:
   owner: Yorkshire Local Councils Associations
   crown: false
