@@ -9,6 +9,10 @@ import gulp from 'gulp';
 import loadPlugins from 'gulp-load-plugins';
 import stylish from 'jshint-stylish';
 
+if (process.env.NOTIFY_ENVIRONMENT === undefined) {
+  throw 'NOTIFY_ENVIRONMENT is undefined – you need to source environment.sh';
+}
+
 const plugins = loadPlugins(),
 
 // 2. CONFIGURATION
