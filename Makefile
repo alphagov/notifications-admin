@@ -99,7 +99,7 @@ upload-paas-artifact:
 
 .PHONY: upload-static ## Upload the static files to be served from S3
 upload-static:
-	aws s3 cp --region eu-west-1 --recursive ./app/static s3://${DNS_NAME}-static
+	aws s3 cp --region eu-west-1 --recursive --cache-control max-age=315360000,immutable ./app/static s3://${DNS_NAME}-static
 
 .PHONY: test
 test: venv ## Run tests
