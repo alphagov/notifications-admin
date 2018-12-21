@@ -255,17 +255,6 @@ details .arrow {
   display: inline-block;
 }
 
-.branding-radio {
-
-  img {
-    background: linear-gradient(45deg, $black 25%, transparent 25%, transparent 75%, $black 75%, $black 0), linear-gradient(45deg, $black 25%, transparent 25%, transparent 75%, $black 75%, $black 0), $white;
-    background-repeat: repeat, repeat;
-    background-position: 0px 0, 5px 5px;
-    background-size: 2px 2px, 2px 2px;
-  }
-
-}
-
 .bordered-image {
   padding: 5px;
   outline: 1px solid $border-colour;
