@@ -2,6 +2,7 @@ from datetime import datetime
 from unittest.mock import ANY, Mock
 
 import pytest
+import re
 from bs4 import BeautifulSoup
 from flask import url_for
 from freezegun import freeze_time
@@ -451,6 +452,34 @@ def test_view_non_letter_template_does_not_display_postage(
 
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert "Postage" not in page.text
+
+
+@pytest.mark.parametrize("permissions, expected_result", [
+    (["choose_postage", "letter"], True),
+    (["letter"], False),
+])
+def test_edit_letter_templates_postage_choice_visibility_and_default(
+    client_request,
+    service_one,
+    active_user_with_permissions,
+    mocker,
+    fake_uuid,
+    permissions,
+    expected_result
+):
+    mocker.patch('app.main.views.templates.get_page_count_for_letter', return_value=1)
+    service_one['permissions'] = permissions
+    client_request.login(active_user_with_permissions)
+    mock_get_service_letter_template(mocker)
+    page = client_request.get(
+        'main.edit_service_template',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+    )
+    assert bool(page.find(string=re.compile("Choose postage"))) is expected_result
+
+    if expected_result:
+        assert page.select('input[checked]')[0].attrs["value"] == 'None'
 
 
 @pytest.mark.parametrize('permissions, links_to_be_shown, permissions_warning_to_be_shown', [
