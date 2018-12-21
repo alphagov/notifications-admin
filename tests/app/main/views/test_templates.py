@@ -12,6 +12,7 @@ from app.main.views.templates import (
     get_last_use_message,
 )
 from tests import (
+    service_json,
     single_notification_json,
     template_json,
     validate_route_permission,
@@ -399,6 +400,72 @@ def test_user_with_only_send_and_view_sees_letter_page(
         template_id=fake_uuid,
     )
     assert page.select_one('h1').text.strip() == 'Two week reminder'
+
+
+def test_view_letter_template_displays_postage(
+    client_request,
+    mock_get_service_templates,
+    mock_get_template_folders,
+    mock_get_service_letter_template,
+    single_letter_contact_block,
+    mock_has_jobs,
+    active_user_with_permissions,
+    mocker,
+    fake_uuid,
+):
+    mocker.patch('app.main.views.templates.get_page_count_for_letter', return_value=1)
+    client_request.login(active_user_with_permissions)
+    import pdb; pdb.set_trace()
+    page = client_request.get(
+        'main.view_template',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+    )
+
+    assert "Postage: second class" in page.text
+
+
+def test_view_letter_template_displays_postage_from_template_if_service_has_choose_postage_permission(
+    client_request,
+    service_one,
+    mock_get_service_templates,
+    mock_get_template_folders,
+    single_letter_contact_block,
+    mock_has_jobs,
+    active_user_with_permissions,
+    mocker,
+    fake_uuid,
+):
+    mocker.patch('app.main.views.templates.get_page_count_for_letter', return_value=1)
+    service_one['permissions'] = ["choose_postage", "letter"]
+    client_request.login(active_user_with_permissions)
+    mock_get_service_letter_template(mocker, postage="first")
+    page = client_request.get(
+        'main.view_template',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+    )
+
+    assert "Postage: first class" in page.text
+
+
+def test_view_non_letter_template_does_not_display_postage(
+    logged_in_client,
+    mock_get_service_template,
+    mock_get_template_folders,
+    service_one,
+    fake_uuid,
+):
+
+    response = logged_in_client.get(url_for(
+        '.view_template',
+        service_id=service_one['id'],
+        template_id=fake_uuid))
+
+    assert response.status_code == 200
+
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert "Postage" not in page.text
 
 
 @pytest.mark.parametrize('permissions, links_to_be_shown, permissions_warning_to_be_shown', [
