@@ -4076,7 +4076,7 @@ southernuplandway.gov.uk:
 southglos.gov.uk:
   owner: South Gloucestershire Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 south-hams-dc.gov.uk:
   owner: South Hams District Council
   crown: false
