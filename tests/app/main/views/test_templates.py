@@ -1,8 +1,8 @@
+import re
 from datetime import datetime
 from unittest.mock import ANY, Mock
 
 import pytest
-import re
 from bs4 import BeautifulSoup
 from flask import url_for
 from freezegun import freeze_time
@@ -13,7 +13,6 @@ from app.main.views.templates import (
     get_last_use_message,
 )
 from tests import (
-    service_json,
     single_notification_json,
     template_json,
     validate_route_permission,
@@ -480,6 +479,48 @@ def test_edit_letter_templates_postage_choice_visibility_and_default(
 
     if expected_result:
         assert page.select('input[checked]')[0].attrs["value"] == 'None'
+
+
+@pytest.mark.parametrize("permissions, expected_result", [
+    (["choose_postage", "letter"], "first"),
+    (["letter"], None),
+])
+def test_edit_letter_templates_postage_permissions(
+    logged_in_client,
+    service_one,
+    mocker,
+    fake_uuid,
+    mock_update_service_template,
+    permissions,
+    expected_result
+):
+    service_one['permissions'] = permissions
+    mock_get_service_letter_template(mocker)
+    template_id = fake_uuid
+
+    logged_in_client.post(
+        url_for(
+            'main.edit_service_template',
+            service_id=SERVICE_ONE_ID,
+            template_id=template_id
+        ),
+        data={
+            'name': 'Two week reminder',
+            'template_content': "Some content",
+            'subject': 'Subject',
+            'postage': 'first'
+        }
+    )
+    mock_update_service_template.assert_called_with(
+        template_id,
+        'Two week reminder',
+        'letter',
+        "Some content",
+        SERVICE_ONE_ID,
+        'Subject',
+        'normal',
+        postage=expected_result
+    )
 
 
 @pytest.mark.parametrize('permissions, links_to_be_shown, permissions_warning_to_be_shown', [

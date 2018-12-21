@@ -565,7 +565,6 @@ def edit_service_template(service_id, template_id):
     template = service_api_client.get_service_template(service_id, template_id)['data']
     template['template_content'] = template['content']
     form = form_objects[template['template_type']](**template)
-
     if form.validate_on_submit():
         if form.process_type.data != template['process_type']:
             abort_403_if_not_admin_user()
