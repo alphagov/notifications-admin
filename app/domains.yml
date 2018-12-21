@@ -2,7 +2,6 @@
 # Central and NHS
 slc.co.uk:
   owner: Student Loans Company
-  agreement_signed: true
 dclgdatamart.co.uk: communities.gov.uk
 communities.gsi.gov.uk: communities.gov.uk
 communities.gov.uk:
@@ -1506,22 +1505,13 @@ devizes-tc.gov.uk:
   owner: Devizes Town Council
   crown: false
   agreement_signed: false
-devonaudit.gov.uk:
-  owner: Devon County Council
-  crown: false
-  agreement_signed: false
-devonebiz.gov.uk:
-  owner: Devon County Council
-  crown: false
-  agreement_signed: false
+devonaudit.gov.uk: devon.gov.uk
+devonebiz.gov.uk: devon.gov.uk
 devon.gov.uk:
   owner: Devon County Council
   crown: false
-  agreement_signed: false
-devonjobs.gov.uk:
-  owner: Devon County Council
-  crown: false
-  agreement_signed: false
+  agreement_signed: true
+devonjobs.gov.uk: devon.gov.uk
 didcot.gov.uk:
   owner: Didcot Town Council
   crown: false
