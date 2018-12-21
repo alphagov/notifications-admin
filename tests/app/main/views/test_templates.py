@@ -402,30 +402,12 @@ def test_user_with_only_send_and_view_sees_letter_page(
     assert page.select_one('h1').text.strip() == 'Two week reminder'
 
 
-def test_view_letter_template_displays_postage(
-    client_request,
-    mock_get_service_templates,
-    mock_get_template_folders,
-    mock_get_service_letter_template,
-    single_letter_contact_block,
-    mock_has_jobs,
-    active_user_with_permissions,
-    mocker,
-    fake_uuid,
-):
-    mocker.patch('app.main.views.templates.get_page_count_for_letter', return_value=1)
-    client_request.login(active_user_with_permissions)
-    import pdb; pdb.set_trace()
-    page = client_request.get(
-        'main.view_template',
-        service_id=SERVICE_ONE_ID,
-        template_id=fake_uuid,
-    )
-
-    assert "Postage: second class" in page.text
-
-
-def test_view_letter_template_displays_postage_from_template_if_service_has_choose_postage_permission(
+@pytest.mark.parametrize("permissions,template_postage,expected_result", [
+    (["choose_postage", "letter"], "first", "first"),
+    (["choose_postage", "letter"], None, "second"),
+    (["letter"], "first", "second"),
+])
+def test_view_letter_template_displays_postage_dynamically_based_on_service_permissions_and_template_postage(
     client_request,
     service_one,
     mock_get_service_templates,
@@ -435,18 +417,21 @@ def test_view_letter_template_displays_postage_from_template_if_service_has_choo
     active_user_with_permissions,
     mocker,
     fake_uuid,
+    permissions,
+    template_postage,
+    expected_result
 ):
     mocker.patch('app.main.views.templates.get_page_count_for_letter', return_value=1)
-    service_one['permissions'] = ["choose_postage", "letter"]
+    service_one['permissions'] = permissions
     client_request.login(active_user_with_permissions)
-    mock_get_service_letter_template(mocker, postage="first")
+    mock_get_service_letter_template(mocker, postage=template_postage)
     page = client_request.get(
         'main.view_template',
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
     )
 
-    assert "Postage: first class" in page.text
+    assert "Postage: {} class".format(expected_result) in page.text
 
 
 def test_view_non_letter_template_does_not_display_postage(
