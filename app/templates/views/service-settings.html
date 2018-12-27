@@ -380,6 +380,11 @@
              {{ 'Stop editing folders' if 'edit_folders' in current_service.permissions else 'Allow to edit folders' }}
            </a>
         </li>
+        <li class="bottom-gutter">
+           <a href="{{ url_for('.service_switch_can_choose_postage', service_id=current_service.id) }}" class="button">
+             {{ 'Stop choosing postage per template' if 'choose_postage' in current_service.permissions else 'Allow to choose postage per template' }}
+           </a>
+        </li>
         {% if current_service.active %}
           <li class="bottom-gutter">
             <a href="{{ url_for('.archive_service', service_id=current_service.id) }}" class="button">
