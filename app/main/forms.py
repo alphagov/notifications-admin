@@ -747,18 +747,25 @@ class NestedRadioField(RadioFieldWithNoneOption):
         super().__init__(*args, **kwargs)
 
     def children(self):
-        child_map = {}
-        child_ids = [
-            folder['id'] for folder in self.all_template_folders
-            if folder['parent_id'] is None]
+        # start map with root option as a single child entry
+        child_map = {None: [option for option in self
+                            if option.data == self.NONE_OPTION_VALUE]}
 
-        child_map[None] = [option for idx, option in enumerate(self) if option.data in child_ids or idx == 0]
-
+        # add entries for all other children
         for option in self:
-            child_ids = [
-                folder['id'] for folder in self.all_template_folders
-                if folder['parent_id'] == option.data]
-            child_map[option.data] = [option for option in self if option.data in child_ids]
+            if option.data == self.NONE_OPTION_VALUE:
+                child_ids = [
+                    folder['id'] for folder in self.all_template_folders
+                    if folder['parent_id'] is None]
+                key = self.NONE_OPTION_VALUE
+            else:
+                child_ids = [
+                    folder['id'] for folder in self.all_template_folders
+                    if folder['parent_id'] == option.data]
+                key = option.data
+
+            child_map[key] = [option for option in self if option.data in child_ids]
+
         return child_map
 
 
