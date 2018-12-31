@@ -174,10 +174,7 @@ def test_cant_create_new_email_branding_with_unknown_domain(
         'southend.essex.gov.uk',
         'Not an organisation-level domain (use essex.gov.uk if appropriate)',
     ),
-    pytest.mark.xfail(
-        ('voa.gov.uk', ''),
-        raises=AssertionError
-    ),
+    pytest.param('voa.gov.uk', '', marks=pytest.mark.xfail(raises=AssertionError)),
 ])
 def test_rejects_non_canonical_domain_when_adding_email_branding(
     client_request,
