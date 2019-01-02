@@ -651,10 +651,10 @@ def test_upload_valid_csv_shows_preview_and_table(
 
     for row_index, row in enumerate([
         (
-            '<td class="table-field-center-aligned "> <div class=""> 07700900001 </div> </td>',
-            '<td class="table-field-center-aligned "> <div class=""> A </div> </td>',
+            '<td class="table-field-center-aligned"> <div class=""> 07700900001 </div> </td>',
+            '<td class="table-field-center-aligned"> <div class=""> A </div> </td>',
             (
-                '<td class="table-field-center-aligned "> '
+                '<td class="table-field-center-aligned"> '
                 '<div class="table-field-status-default"> '
                 '<ul class="list list-bullet"> '
                 '<li>foo</li> <li>foo</li> <li>foo</li> '
@@ -664,10 +664,10 @@ def test_upload_valid_csv_shows_preview_and_table(
             )
         ),
         (
-            '<td class="table-field-center-aligned "> <div class=""> 07700900002 </div> </td>',
-            '<td class="table-field-center-aligned "> <div class=""> B </div> </td>',
+            '<td class="table-field-center-aligned"> <div class=""> 07700900002 </div> </td>',
+            '<td class="table-field-center-aligned"> <div class=""> B </div> </td>',
             (
-                '<td class="table-field-center-aligned "> '
+                '<td class="table-field-center-aligned"> '
                 '<div class="table-field-status-default"> '
                 '<ul class="list list-bullet"> '
                 '<li>foo</li> <li>foo</li> <li>foo</li> '
@@ -677,10 +677,10 @@ def test_upload_valid_csv_shows_preview_and_table(
             )
         ),
         (
-            '<td class="table-field-center-aligned "> <div class=""> 07700900003 </div> </td>',
-            '<td class="table-field-center-aligned "> <div class=""> C </div> </td>',
+            '<td class="table-field-center-aligned"> <div class=""> 07700900003 </div> </td>',
+            '<td class="table-field-center-aligned"> <div class=""> C </div> </td>',
             (
-                '<td class="table-field-center-aligned "> '
+                '<td class="table-field-center-aligned"> '
                 '<div class="table-field-status-default"> '
                 '<ul class="list list-bullet"> '
                 '<li>foo</li> <li>foo</li> '
