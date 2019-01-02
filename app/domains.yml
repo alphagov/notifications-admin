@@ -2827,7 +2827,7 @@ malvernhills.gov.uk:
 manchester.gov.uk:
   owner: Manchester City Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 mansfield-dc.gov.uk:
   owner: Mansfield District Council
   crown: false
@@ -3259,10 +3259,7 @@ northwarks.gov.uk:
   owner: North Warwickshire Borough Council
   crown: false
   agreement_signed: false
-northwestvotes.gov.uk:
-  owner: Manchester City Council
-  crown: false
-  agreement_signed: false
+northwestvotes.gov.uk: manchester.gov.uk
 northwichtowncouncil.gov.uk:
   owner: Northwich Town Council
   crown: false
