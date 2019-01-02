@@ -3095,6 +3095,10 @@ newforest.gov.uk:
   owner: New Forest District Council
   crown: false
   agreement_signed: false
+newham.gov.uk:
+  owner: Newhaven London Borough Council
+  crown: false
+  agreement_signed: true  
 newhaventowncouncil.gov.uk:
   owner: Newhaven Town Council
   crown: false
