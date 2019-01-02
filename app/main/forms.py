@@ -1287,6 +1287,7 @@ class TemplateAndFoldersSelectionForm(Form):
     ])
     move_to = NestedRadioField(
         'Choose a folder',
+        default='',
         validators=[
             Optional(),
             required_for_ops('move-to-new-folder', 'move-to-existing-folder')

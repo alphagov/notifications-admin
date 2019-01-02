@@ -882,6 +882,61 @@ def test_should_not_be_able_to_move_to_existing_folder_if_dont_have_permission(
     assert mock_move_to_template_folder.called is False
 
 
+def test_move_folder_form_shows_current_folder_hint_when_in_a_folder(
+    client_request,
+    service_one,
+    mock_get_service_templates,
+    mock_get_template_folders,
+):
+    service_one['permissions'] += ['edit_folders']
+    mock_get_template_folders.return_value = [
+        {'id': PARENT_FOLDER_ID, 'name': 'parent_folder', 'parent_id': None},
+        {'id': CHILD_FOLDER_ID, 'name': 'child_folder', 'parent_id': PARENT_FOLDER_ID},
+    ]
+    page = client_request.get(
+        'main.choose_template',
+        service_id=SERVICE_ONE_ID,
+        template_folder_id=PARENT_FOLDER_ID,
+        _test_page_title=False
+    )
+
+    page.find("input", attrs={"name": "move_to", "value": PARENT_FOLDER_ID})
+
+    move_form_labels = page.find('div', id='move_to_folder_radios').find_all('label')
+
+    assert len(move_form_labels) == 3
+    assert normalize_spaces(move_form_labels[0].text) == 'All templates'
+    assert normalize_spaces(move_form_labels[1].text) == 'parent_folder current folder'
+    assert normalize_spaces(move_form_labels[2].text) == 'child_folder'
+
+
+def test_move_folder_form_does_not_show_current_folder_hint_at_the_top_level(
+    client_request,
+    service_one,
+    mock_get_service_templates,
+    mock_get_template_folders,
+):
+    service_one['permissions'] += ['edit_folders']
+    mock_get_template_folders.return_value = [
+        {'id': PARENT_FOLDER_ID, 'name': 'parent_folder', 'parent_id': None},
+        {'id': CHILD_FOLDER_ID, 'name': 'child_folder', 'parent_id': PARENT_FOLDER_ID},
+    ]
+    page = client_request.get(
+        'main.choose_template',
+        service_id=SERVICE_ONE_ID,
+        _test_page_title=False
+    )
+
+    page.find("input", attrs={"name": "move_to", "value": PARENT_FOLDER_ID})
+
+    move_form_labels = page.find('div', id='move_to_folder_radios').find_all('label')
+
+    assert len(move_form_labels) == 3
+    assert normalize_spaces(move_form_labels[0].text) == 'All templates'
+    assert normalize_spaces(move_form_labels[1].text) == 'parent_folder'
+    assert normalize_spaces(move_form_labels[2].text) == 'child_folder'
+
+
 def test_should_be_able_to_move_a_sub_item(
     client_request,
     service_one,

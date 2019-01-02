@@ -122,6 +122,7 @@ def choose_template(service_id, template_type='all', template_folder_id=None):
             len(user_api_client.get_service_ids_for_user(current_user)) > 1
         ),
     )
+    option_hints = {template_folder_id: 'current folder'}
 
     if request.method == 'POST' and templates_and_folders_form.validate_on_submit():
         if not can_manage_folders():
@@ -149,7 +150,8 @@ def choose_template(service_id, template_type='all', template_folder_id=None):
         template_type=template_type,
         search_form=SearchTemplatesForm(),
         templates_and_folders_form=templates_and_folders_form,
-        move_to_children=templates_and_folders_form.move_to.children()
+        move_to_children=templates_and_folders_form.move_to.children(),
+        option_hints=option_hints
     )
 
 

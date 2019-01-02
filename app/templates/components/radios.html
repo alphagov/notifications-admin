@@ -43,11 +43,10 @@
   option_hints={},
   hide_legend=False
 ) %}
-  {% set disable = [current_option_id] %}
   {% call radios_wrapper(
     field, hint, disable, option_hints, hide_legend
   ) %}
-    {{ radio_list(child_map[None], child_map, disable) }}
+    {{ radio_list(child_map[None], child_map, disable, option_hints) }}
   {% endcall %}
 {% endmacro %}
 
