@@ -1,3 +1,4 @@
+import re
 from datetime import datetime
 from unittest.mock import ANY, Mock
 
@@ -399,6 +400,127 @@ def test_user_with_only_send_and_view_sees_letter_page(
         template_id=fake_uuid,
     )
     assert page.select_one('h1').text.strip() == 'Two week reminder'
+
+
+@pytest.mark.parametrize("permissions,template_postage,expected_result", [
+    (["choose_postage", "letter"], "first", "first"),
+    (["choose_postage", "letter"], None, "second"),
+    (["letter"], "first", "second"),
+])
+def test_view_letter_template_displays_postage_dynamically_based_on_service_permissions_and_template_postage(
+    client_request,
+    service_one,
+    mock_get_service_templates,
+    mock_get_template_folders,
+    single_letter_contact_block,
+    mock_has_jobs,
+    active_user_with_permissions,
+    mocker,
+    fake_uuid,
+    permissions,
+    template_postage,
+    expected_result
+):
+    mocker.patch('app.main.views.templates.get_page_count_for_letter', return_value=1)
+    service_one['permissions'] = permissions
+    client_request.login(active_user_with_permissions)
+    mock_get_service_letter_template(mocker, postage=template_postage)
+    page = client_request.get(
+        'main.view_template',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+    )
+
+    assert "Postage: {} class".format(expected_result) in page.text
+
+
+def test_view_non_letter_template_does_not_display_postage(
+    logged_in_client,
+    mock_get_service_template,
+    mock_get_template_folders,
+    service_one,
+    fake_uuid,
+):
+
+    response = logged_in_client.get(url_for(
+        '.view_template',
+        service_id=service_one['id'],
+        template_id=fake_uuid))
+
+    assert response.status_code == 200
+
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert "Postage" not in page.text
+
+
+@pytest.mark.parametrize("permissions, expected_result", [
+    (["choose_postage", "letter"], True),
+    (["letter"], False),
+])
+def test_edit_letter_templates_postage_choice_visibility_and_default(
+    client_request,
+    service_one,
+    active_user_with_permissions,
+    mocker,
+    fake_uuid,
+    permissions,
+    expected_result
+):
+    mocker.patch('app.main.views.templates.get_page_count_for_letter', return_value=1)
+    service_one['permissions'] = permissions
+    client_request.login(active_user_with_permissions)
+    mock_get_service_letter_template(mocker)
+    page = client_request.get(
+        'main.edit_service_template',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+    )
+    assert bool(page.find(string=re.compile("Choose postage"))) is expected_result
+
+    if expected_result:
+        assert page.select('input[checked]')[0].attrs["value"] == 'None'
+
+
+@pytest.mark.parametrize("permissions, expected_result", [
+    (["choose_postage", "letter"], "first"),
+    (["letter"], None),
+])
+def test_edit_letter_templates_postage_permissions(
+    logged_in_client,
+    service_one,
+    mocker,
+    fake_uuid,
+    mock_update_service_template,
+    permissions,
+    expected_result
+):
+    service_one['permissions'] = permissions
+    mock_get_service_letter_template(mocker)
+    template_id = fake_uuid
+
+    logged_in_client.post(
+        url_for(
+            'main.edit_service_template',
+            service_id=SERVICE_ONE_ID,
+            template_id=template_id
+        ),
+        data={
+            'name': 'Two week reminder',
+            'template_content': "Some content",
+            'subject': 'Subject',
+            'postage': 'first'
+        }
+    )
+    mock_update_service_template.assert_called_with(
+        template_id,
+        'Two week reminder',
+        'letter',
+        "Some content",
+        SERVICE_ONE_ID,
+        'Subject',
+        'normal',
+        postage=expected_result
+    )
 
 
 @pytest.mark.parametrize('permissions, links_to_be_shown, permissions_warning_to_be_shown', [
@@ -915,7 +1037,7 @@ def test_should_redirect_when_saving_a_template(
     assert response.location == url_for(
         '.view_template', service_id=service['id'], template_id=template_id, _external=True)
     mock_update_service_template.assert_called_with(
-        template_id, name, 'sms', content, service['id'], None, 'normal')
+        template_id, name, 'sms', content, service['id'], None, 'normal', postage=None)
 
 
 def test_should_edit_content_when_process_type_is_priority_not_platform_admin(
@@ -951,7 +1073,8 @@ def test_should_edit_content_when_process_type_is_priority_not_platform_admin(
         "new template <em>content</em> with & entity",
         service['id'],
         None,
-        'priority'
+        'priority',
+        postage=None
     )
 
 
@@ -1037,9 +1160,10 @@ def test_should_403_when_create_template_with_process_type_of_priority_for_non_p
     mock_update_service_template.called == 0
 
 
-@pytest.mark.parametrize('template_mock, expected_paragraphs', [
+@pytest.mark.parametrize('template_mock, template_type, expected_paragraphs', [
     (
         mock_get_service_email_template,
+        "email",
         [
             'You removed ((date))',
             'You added ((name))',
@@ -1048,6 +1172,7 @@ def test_should_403_when_create_template_with_process_type_of_priority_for_non_p
     ),
     (
         mock_get_service_letter_template,
+        "letter",
         [
             'You removed ((date))',
             'You added ((name))',
@@ -1067,6 +1192,7 @@ def test_should_show_interstitial_when_making_breaking_change(
     fake_uuid,
     mocker,
     template_mock,
+    template_type,
     expected_paragraphs,
 ):
     template_mock(
@@ -1076,17 +1202,22 @@ def test_should_show_interstitial_when_making_breaking_change(
     )
     service_id = fake_uuid
     template_id = fake_uuid
+    data = {
+        'id': template_id,
+        'name': "new name",
+        'template_content': "hello lets talk about ((thing))",
+        'template_type': template_type,
+        'subject': 'reminder \'" <span> & ((name))',
+        'service': service_id,
+        'process_type': 'normal'
+    }
+
+    if template_type == "letter":
+        data["postage"] = 'None'
+
     response = logged_in_client.post(
         url_for('.edit_service_template', service_id=service_id, template_id=template_id),
-        data={
-            'id': template_id,
-            'name': "new name",
-            'template_content': "hello lets talk about ((thing))",
-            'template_type': 'email',
-            'subject': 'reminder \'" <span> & ((name))',
-            'service': service_id,
-            'process_type': 'normal'
-        }
+        data=data
     )
 
     assert response.status_code == 200
@@ -1232,7 +1363,7 @@ def test_should_redirect_when_saving_a_template_email(
         template_id=template_id,
         _external=True)
     mock_update_service_template.assert_called_with(
-        template_id, name, 'email', content, service_id, subject, 'normal')
+        template_id, name, 'email', content, service_id, subject, 'normal', postage=None)
 
 
 def test_should_show_delete_template_page_with_time_block(

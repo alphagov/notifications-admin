@@ -297,6 +297,14 @@ def service_switch_can_edit_folders(service_id):
     return redirect(url_for('.service_settings', service_id=service_id))
 
 
+@main.route("/services/<service_id>/service-settings/can-choose-postage")
+@login_required
+@user_is_platform_admin
+def service_switch_can_choose_postage(service_id):
+    current_service.switch_permission('choose_postage')
+    return redirect(url_for('.service_settings', service_id=service_id))
+
+
 @main.route("/services/<service_id>/service-settings/archive", methods=['GET', 'POST'])
 @login_required
 @user_has_permissions('manage_service')

@@ -21,6 +21,13 @@
                 Send
               </a>
             </div>
+            <div class="column-whole">
+            {% if current_service.has_permission("choose_postage") and template_postage %}
+              <h2 class="heading-small heading-inline">Postage</h2>: {{ template_postage }} class
+            {% elif (current_service.has_permission("choose_postage") and not template_postage) or not current_service.has_permission("choose_postage") %}
+              <h2 class="heading-small heading-inline">Postage</h2>: {{ current_service.postage }} class
+            {% endif %}
+            </div>
           {% endif %}
         {% else %}
           {% if current_user.has_permissions('send_messages', restrict_admin_usage=True) %}
