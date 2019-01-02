@@ -2482,7 +2482,7 @@ KnaresboroughTownCouncil.gov.uk:
 knowsley.gov.uk:
   owner: Knowsley Metropolitan Borough Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 knowsleytowncouncil.gov.uk:
   owner: Knowsley Town Council
   crown: false
@@ -2664,10 +2664,7 @@ littlehampton-tc.gov.uk:
   owner: Littlehampton Town Council
   crown: false
   agreement_signed: false
-liverpoolcityregion-ca.gov.uk:
-  owner: Knowsley Metropolitan Borough Council
-  crown: false
-  agreement_signed: false
+liverpoolcityregion-ca.gov.uk: knowsley.gov.uk
 liverpool.gov.uk:
   owner: Liverpool City Council
   crown: false
