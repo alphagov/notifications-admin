@@ -4176,19 +4176,10 @@ staffordbc.gov.uk:
 staffordshire.gov.uk:
   owner: Staffordshire County Council
   crown: false
-  agreement_signed: false
-staffordshireprepared.gov.uk:
-  owner: Staffordshire County Council
-  crown: false
-  agreement_signed: false
-staffs.gov.uk:
-  owner: Staffordshire County Council
-  crown: false
-  agreement_signed: false
-staffslc.gov.uk:
-  owner: Staffordshire County Council
-  crown: false
-  agreement_signed: false
+  agreement_signed: true
+staffordshireprepared.gov.uk: staffordshire.gov.uk
+staffs.gov.uk: staffordshire.gov.uk
+staffslc.gov.uk: staffordshire.gov.uk
 staffsmoorlands.gov.uk:
   owner: Staffordshire Moorlands District Council
   crown: false
