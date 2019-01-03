@@ -4298,7 +4298,7 @@ stockton-warks-pc.gov.uk:
 stoke.gov.uk:
   owner: Stoke-on-Trent City Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 stonetowncouncil.gov.uk:
   owner: Stone Town Council
   crown: false
