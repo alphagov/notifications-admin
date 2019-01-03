@@ -403,9 +403,13 @@ def test_user_with_only_send_and_view_sees_letter_page(
 
 
 @pytest.mark.parametrize("permissions,template_postage,expected_result", [
-    (["choose_postage", "letter"], "first", "first"),
-    (["choose_postage", "letter"], None, "second"),
-    (["letter"], "first", "second"),
+    (["choose_postage", "letter"], "first", "Postage: first class"),
+    (["choose_postage", "letter"], "second", "Postage: second class"),
+    (["choose_postage", "letter"], None, "Postage: second class"),
+    pytest.param(
+        ["letter"], None, "Postage: second class",
+        marks=pytest.mark.xfail(raises=AttributeError)
+    ),
 ])
 def test_view_letter_template_displays_postage_dynamically_based_on_service_permissions_and_template_postage(
     client_request,
@@ -431,7 +435,7 @@ def test_view_letter_template_displays_postage_dynamically_based_on_service_perm
         template_id=fake_uuid,
     )
 
-    assert "Postage: {} class".format(expected_result) in page.text
+    assert normalize_spaces(page.select_one('#postage').text) == expected_result
 
 
 def test_view_non_letter_template_does_not_display_postage(
