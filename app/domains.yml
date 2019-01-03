@@ -2916,7 +2916,7 @@ midkent.gov.uk:
 midlothian.gov.uk:
   owner: Midlothian Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 midsuffolk.gov.uk:
   owner: Mid Suffolk District Council
   crown: false
@@ -4298,7 +4298,7 @@ stockton-warks-pc.gov.uk:
 stoke.gov.uk:
   owner: Stoke-on-Trent City Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 stonetowncouncil.gov.uk:
   owner: Stone Town Council
   crown: false
