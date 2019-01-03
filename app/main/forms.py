@@ -1285,12 +1285,15 @@ class TemplateAndFoldersSelectionForm(Form):
     templates_and_folders = MultiCheckboxField('Choose templates or folders', validators=[
         required_for_ops('move-to-new-folder', 'move-to-existing-folder')
     ])
+    # if no default set, it is set to None, which process_data transforms to '__NONE__'
+    # this means '__NONE__' (self.ALL_TEMPLATES option) is selected when no form data has been submitted
+    # set default to empty string so process_data method doesn't perform any transformation
     move_to = NestedRadioField(
         'Choose a folder',
         default='',
         validators=[
-            Optional(),
-            required_for_ops('move-to-new-folder', 'move-to-existing-folder')
+            required_for_ops('move-to-existing-folder'),
+            Optional()
         ])
     add_new_folder_name = StringField('Folder name', validators=[required_for_ops('add-new-folder')])
     move_to_new_folder_name = StringField('Folder name', validators=[required_for_ops('move-to-new-folder')])
