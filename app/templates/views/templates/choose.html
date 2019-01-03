@@ -34,7 +34,6 @@
            emails or text messages
          {%- endif %}.
        </p>
-      <a href="{{ url_for('.add_template_by_type', service_id=current_service.id) }}" class="button">Add a new template</a>
     {% else %}
       <p>
         You need to ask your service manager to add templates before you can send
@@ -71,7 +70,7 @@
         {% endif %}
       {% endif %}
     </div>
-
+  {% endif %}
     {% if show_template_nav %}
       <div class="bottom-gutter">
         {{ pill(template_nav_items, current_value=template_type, show_count=False) }}
@@ -91,7 +90,10 @@
 
     {% else %}
       {% include 'views/templates/_template_list.html' %}
+      {% if (not current_service.all_templates) and (not current_service.all_template_folders) and current_user.has_permissions('manage_templates') %}
+        <a href="{{ url_for('.add_template_by_type', service_id=current_service.id) }}" class="button">Add a new template</a>
+      {% endif %}
     {% endif %}
-  {% endif %}
+
 
 {% endblock %}
