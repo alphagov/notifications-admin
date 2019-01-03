@@ -111,6 +111,12 @@
 
       $('.template-list-selected-counter-count').html(numSelected);
 
+      $('.template-list-selected-counter').toggle(this.hasCheckboxes());
+
+    };
+
+    this.hasCheckboxes = function() {
+      return !!this.$form.find('input:checkbox').length;
     };
 
     this.countSelectedCheckboxes = function() {
