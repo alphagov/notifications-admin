@@ -26,7 +26,7 @@
       {{ page_title }}
     </h1>
     {% if current_user.has_permissions('manage_templates') %}
-       <p class="bottom-gutter">
+       <p class="bottom-gutter top-gutter">
          You need a template before you can send
          {% if 'letter' in current_service.permissions %}
            emails, text messages or letters
@@ -35,7 +35,7 @@
          {%- endif %}.
        </p>
     {% else %}
-      <p>
+      <p class="top-gutter">
         You need to ask your service manager to add templates before you can send
         {% if 'letter' in current_service.permissions %}
           emails, text messages or letters
