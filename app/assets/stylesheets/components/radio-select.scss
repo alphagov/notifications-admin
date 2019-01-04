@@ -57,3 +57,60 @@
   }
 
 }
+
+.radios-nested {
+
+  margin-bottom: 10px;
+
+  .multiple-choice {
+
+    $circle-diameter: 39px;
+    $border-thickness: 4px;
+    $border-indent: ($circle-diameter / 2) - ($border-thickness / 2);
+
+    float: none;
+    position: relative;
+
+    &:before {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: $border-indent;
+      width: $border-thickness;
+      height: 100%;
+      background: $border-colour;
+    }
+
+    label {
+      float: none;
+    }
+
+    [type=radio]+label::before {
+      // To overlap the grey inset line
+      background: $white;
+    }
+
+    ul {
+      // To equalise the spacing between the line and the top/bottom of
+      // the radio
+      margin-top: 5px;
+      margin-bottom: -5px;
+    }
+
+    .block-label-hint {
+      &:after {
+        // Adds an little extra segment of line alongside the ‘current folder’
+        // hint so that it extends all the way down to the next radio
+        content: "";
+        position: absolute;
+        bottom: -5px;
+        left: $border-indent;
+        width: $border-thickness;
+        height: 25px;
+        background: $border-colour;
+      }
+    }
+
+  }
+
+}

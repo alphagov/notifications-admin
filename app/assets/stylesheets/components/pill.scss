@@ -57,11 +57,11 @@
     border: 2px solid $black;
     outline: 1px solid rgba($white, 0.1);
     position: relative;
-    z-index: 1000;
+    z-index: 10;
     color: $text-colour;
 
     &:focus {
-      z-index: 10;
+      z-index: 1000;
       outline: 3px solid $yellow;
     }
 
