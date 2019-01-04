@@ -1,9 +1,6 @@
-import uuid
-
 import pytest
 
 from app.notify_client.notification_api_client import NotificationApiClient
-from tests import notification_json, single_notification_json
 
 
 @pytest.mark.parametrize("arguments,expected_call", [
@@ -65,26 +62,6 @@ def test_get_notification(mocker):
     mock_get.assert_called_once_with(
         url='/service/foo/notifications/bar'
     )
-
-
-def test_get_api_notifications_changes_letter_statuses(mocker):
-    service_id = str(uuid.uuid4())
-    sms_notification = single_notification_json(service_id, notification_type='sms', status='created')
-    email_notification = single_notification_json(service_id, notification_type='email', status='created')
-    letter_notification = single_notification_json(service_id, notification_type='letter', status='created')
-    notis = notification_json(service_id=service_id, rows=0)
-    notis['notifications'] = [sms_notification, email_notification, letter_notification]
-
-    mocker.patch('app.notify_client.notification_api_client.NotificationApiClient.get', return_value=notis)
-
-    ret = NotificationApiClient().get_api_notifications_for_service(service_id)
-
-    assert ret['notifications'][0]['notification_type'] == 'sms'
-    assert ret['notifications'][1]['notification_type'] == 'email'
-    assert ret['notifications'][2]['notification_type'] == 'letter'
-    assert ret['notifications'][0]['status'] == 'created'
-    assert ret['notifications'][1]['status'] == 'created'
-    assert ret['notifications'][2]['status'] == 'accepted'
 
 
 def test_update_notification_to_cancelled(mocker):

@@ -67,20 +67,12 @@ class NotificationApiClient(NotifyAdminAPIClient):
         return self.get(url='/service/{}/notifications/{}'.format(service_id, notification_id))
 
     def get_api_notifications_for_service(self, service_id):
-        ret = self.get_notifications_for_service(
+        return self.get_notifications_for_service(
             service_id,
             include_jobs=False,
             include_from_test_key=True,
             include_one_off=False
         )
-        return self.map_letters_to_accepted(ret)
-
-    @staticmethod
-    def map_letters_to_accepted(notifications):
-        for notification in notifications['notifications']:
-            if notification['notification_type'] == 'letter' and notification['status'] in ('created', 'sending'):
-                notification['status'] = 'accepted'
-        return notifications
 
     def get_notification_letter_preview(self, service_id, notification_id, file_type, page=None):
 
