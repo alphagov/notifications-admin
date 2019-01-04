@@ -1013,7 +1013,7 @@ def test_should_be_able_to_move_a_sub_item(
         'operation': 'add-new-template',
         'templates_and_folders': [],
         'move_to_new_folder_name': '',
-        'move_to': 'ROOT_FOLDER_ID',
+        'move_to': ROOT_FOLDER_ID,
         'add_template_by_template_type': 'email',
     },
     # add a new template, but don't select anything
