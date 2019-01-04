@@ -1226,7 +1226,7 @@ class TemplateAndFoldersSelectionForm(Form):
     """
 
     ALL_TEMPLATES_FOLDER = {
-        'name': 'All templates',
+        'name': 'Templates',
         'id': RadioFieldWithNoneOption.NONE_OPTION_VALUE,
     }
 

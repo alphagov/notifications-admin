@@ -795,7 +795,7 @@ def test_should_show_radios_and_buttons_for_move_destination_if_correct_permissi
         ROOT_FOLDER_ID, PARENT_FOLDER_ID, CHILD_FOLDER_ID, FOLDER_ONE_TWO_ID, FOLDER_TWO_ID,
     ]
     assert [x.text.strip() for x in radio_div.select('label')] == [
-        'All templates', 'folder_one', 'folder_one_one', 'folder_one_two', 'folder_two',
+        'Templates', 'folder_one', 'folder_one_one', 'folder_one_two', 'folder_two',
     ]
     assert set(x['value'] for x in page.find_all('button', {'name': 'operation'})) == {
         'unknown',
@@ -905,7 +905,7 @@ def test_move_folder_form_shows_current_folder_hint_when_in_a_folder(
     move_form_labels = page.find('div', id='move_to_folder_radios').find_all('label')
 
     assert len(move_form_labels) == 3
-    assert normalize_spaces(move_form_labels[0].text) == 'All templates'
+    assert normalize_spaces(move_form_labels[0].text) == 'Templates'
     assert normalize_spaces(move_form_labels[1].text) == 'parent_folder current folder'
     assert normalize_spaces(move_form_labels[2].text) == 'child_folder'
 
@@ -932,7 +932,7 @@ def test_move_folder_form_does_not_show_current_folder_hint_at_the_top_level(
     move_form_labels = page.find('div', id='move_to_folder_radios').find_all('label')
 
     assert len(move_form_labels) == 3
-    assert normalize_spaces(move_form_labels[0].text) == 'All templates'
+    assert normalize_spaces(move_form_labels[0].text) == 'Templates'
     assert normalize_spaces(move_form_labels[1].text) == 'parent_folder'
     assert normalize_spaces(move_form_labels[2].text) == 'child_folder'
 
