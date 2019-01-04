@@ -19,9 +19,10 @@
     options,
     child_map,
     disable=[],
-    option_hints={}
+    option_hints={},
+    top_level=False
 ) %}
-    <ul>
+    <ul{% if not top_level %} class="panel panel-border-narrow"{% endif %}>
     {% for option in options %}
       {% if child_map[option.data] %}
         {% call radio(option, disable, option_hints, as_list_item=True) %}
@@ -46,7 +47,7 @@
   {% call radios_wrapper(
     field, hint, disable, option_hints, hide_legend
   ) %}
-    {{ radio_list(child_map[None], child_map, disable, option_hints) }}
+    {{ radio_list(child_map[None], child_map, disable, option_hints, top_level=True) }}
   {% endcall %}
 {% endmacro %}
 

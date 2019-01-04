@@ -251,6 +251,11 @@ details .arrow {
   cursor: default;
 }
 
+.multiple-choice > .panel {
+  border-left: none;
+  padding: 0 0 0 12px;
+}
+
 .heading-inline {
   display: inline-block;
 }
