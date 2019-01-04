@@ -67,6 +67,7 @@
     $circle-diameter: 39px;
     $border-thickness: 4px;
     $border-indent: ($circle-diameter / 2) - ($border-thickness / 2);
+    $border-colour: $border-colour;
 
     float: none;
     position: relative;
@@ -95,6 +96,7 @@
       // the radio
       margin-top: 5px;
       margin-bottom: -5px;
+      padding-left: 12px;
     }
 
     .block-label-hint {
@@ -103,7 +105,7 @@
         // hint so that it extends all the way down to the next radio
         content: "";
         position: absolute;
-        bottom: -5px;
+        top: $circle-diameter + 5px;
         left: $border-indent;
         width: $border-thickness;
         height: 25px;
