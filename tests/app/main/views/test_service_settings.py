@@ -532,8 +532,8 @@ def test_should_raise_duplicate_name_handled(
     (2, 'Add templates with examples of the content you plan to send Completed'),
 ])
 @pytest.mark.parametrize('count_of_email_templates, reply_to_email_addresses, expected_reply_to_checklist_item', [
-    pytest.mark.xfail((0, [], ''), raises=IndexError),
-    pytest.mark.xfail((0, [{}], ''), raises=IndexError),
+    pytest.param(0, [], '', marks=pytest.mark.xfail(raises=IndexError)),
+    pytest.param(0, [{}], '', marks=pytest.mark.xfail(raises=IndexError)),
     (1, [], 'Add an email reply-to address Not completed'),
     (1, [{}], 'Add an email reply-to address Completed'),
 ])
@@ -607,30 +607,34 @@ def test_should_show_request_to_go_live_checklist(
 
 
 @pytest.mark.parametrize('organisation_type,count_of_sms_templates, sms_senders, expected_sms_sender_checklist_item', [
-    pytest.mark.xfail((
+    pytest.param(
         'local',
         0,
         [],
         '',
-    ), raises=IndexError),
-    pytest.mark.xfail((
+        marks=pytest.mark.xfail(raises=IndexError)
+    ),
+    pytest.param(
         'local',
         0,
         [{'is_default': True, 'sms_sender': 'GOVUK'}],
         '',
-    ), raises=IndexError),
-    pytest.mark.xfail((
+        marks=pytest.mark.xfail(raises=IndexError)
+    ),
+    pytest.param(
         None,
         99,
         [{'is_default': True, 'sms_sender': 'GOVUK'}],
         '',
-    ), raises=IndexError),
-    pytest.mark.xfail((
+        marks=pytest.mark.xfail(raises=IndexError)
+    ),
+    pytest.param(
         'central',
         99,
         [{'is_default': True, 'sms_sender': 'GOVUK'}],
         '',
-    ), raises=IndexError),
+        marks=pytest.mark.xfail(raises=IndexError)
+    ),
     (
         'local',
         1,
@@ -2437,7 +2441,7 @@ def test_should_show_page_to_set_organisation_type(
     ('central', 250000),
     ('local', 25000),
     ('nhs', 25000),
-    pytest.mark.xfail(('private sector', 1000))
+    pytest.param('private sector', 1000, marks=pytest.mark.xfail)
 ])
 def test_should_set_organisation_type(
     logged_in_platform_admin_client,
@@ -2485,7 +2489,7 @@ def test_should_show_page_to_set_sms_allowance(
 @pytest.mark.parametrize('given_allowance, expected_api_argument', [
     ('1', 1),
     ('250000', 250000),
-    pytest.mark.xfail(('foo', 'foo')),
+    pytest.param('foo', 'foo', marks=pytest.mark.xfail),
 ])
 def test_should_set_sms_allowance(
     logged_in_platform_admin_client,
@@ -3322,7 +3326,7 @@ def test_show_email_branding_request_page_when_email_branding_is_set(
     ('both', 'GOV.UK and logo'),
     ('org', 'Your logo'),
     ('org_banner', 'Your logo on a colour'),
-    pytest.mark.xfail(('foo', 'Nope'), raises=AssertionError),
+    pytest.param('foo', 'Nope', marks=pytest.mark.xfail(raises=AssertionError)),
 ))
 def test_submit_email_branding_request(
     client_request,
