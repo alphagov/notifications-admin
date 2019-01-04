@@ -806,6 +806,33 @@ def test_should_show_radios_and_buttons_for_move_destination_if_correct_permissi
     }
 
 
+def test_move_to_shouldnt_select_a_folder_by_default(
+    client_request,
+    mocker,
+    service_one,
+    mock_get_service_templates,
+    mock_get_template_folders,
+    mock_has_no_jobs,
+    fake_uuid,
+    active_user_with_permissions
+):
+    service_one['permissions'] += ['edit_folders']
+
+    client_request.login(active_user_with_permissions)
+
+    FOLDER_TWO_ID = str(uuid.uuid4())
+    mock_get_template_folders.return_value = [
+        {'id': PARENT_FOLDER_ID, 'name': 'folder_one', 'parent_id': None},
+        {'id': FOLDER_TWO_ID, 'name': 'folder_two', 'parent_id': None},
+    ]
+    page = client_request.get(
+        'main.choose_template',
+        service_id=SERVICE_ONE_ID,
+    )
+    checked_radio = page.find('input', attrs={'name': 'move_to', 'checked': 'checked'})
+    assert checked_radio is None
+
+
 def test_should_be_able_to_move_to_existing_folder(
     client_request,
     service_one,
