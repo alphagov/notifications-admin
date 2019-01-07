@@ -13,6 +13,7 @@ from tests.conftest import (
     normalize_spaces,
 )
 
+ROOT_FOLDER_ID = '__NONE__'
 PARENT_FOLDER_ID = '7e979e79-d970-43a5-ac69-b625a8d147b0'
 CHILD_FOLDER_ID = '92ee1ee0-e4ee-4dcc-b1a7-a5da9ebcfa2b'
 GRANDCHILD_FOLDER_ID = 'fafe723f-1d39-4a10-865f-e551e03d8886'
@@ -791,10 +792,10 @@ def test_should_show_radios_and_buttons_for_move_destination_if_correct_permissi
     assert radios == page.select('input[name=move_to]')
 
     assert [x['value'] for x in radios] == [
-        PARENT_FOLDER_ID, CHILD_FOLDER_ID, FOLDER_ONE_TWO_ID, FOLDER_TWO_ID,
+        ROOT_FOLDER_ID, PARENT_FOLDER_ID, CHILD_FOLDER_ID, FOLDER_ONE_TWO_ID, FOLDER_TWO_ID,
     ]
     assert [x.text.strip() for x in radio_div.select('label')] == [
-        'folder_one', 'folder_one_one', 'folder_one_two', 'folder_two',
+        'Templates', 'folder_one', 'folder_one_one', 'folder_one_two', 'folder_two',
     ]
     assert set(x['value'] for x in page.find_all('button', {'name': 'operation'})) == {
         'unknown',
@@ -803,6 +804,33 @@ def test_should_show_radios_and_buttons_for_move_destination_if_correct_permissi
         'add-new-folder',
         'add-new-template',
     }
+
+
+def test_move_to_shouldnt_select_a_folder_by_default(
+    client_request,
+    mocker,
+    service_one,
+    mock_get_service_templates,
+    mock_get_template_folders,
+    mock_has_no_jobs,
+    fake_uuid,
+    active_user_with_permissions
+):
+    service_one['permissions'] += ['edit_folders']
+
+    client_request.login(active_user_with_permissions)
+
+    FOLDER_TWO_ID = str(uuid.uuid4())
+    mock_get_template_folders.return_value = [
+        {'id': PARENT_FOLDER_ID, 'name': 'folder_one', 'parent_id': None},
+        {'id': FOLDER_TWO_ID, 'name': 'folder_two', 'parent_id': None},
+    ]
+    page = client_request.get(
+        'main.choose_template',
+        service_id=SERVICE_ONE_ID,
+    )
+    checked_radio = page.find('input', attrs={'name': 'move_to', 'checked': 'checked'})
+    assert checked_radio is None
 
 
 def test_should_be_able_to_move_to_existing_folder(
@@ -881,6 +909,61 @@ def test_should_not_be_able_to_move_to_existing_folder_if_dont_have_permission(
     assert mock_move_to_template_folder.called is False
 
 
+def test_move_folder_form_shows_current_folder_hint_when_in_a_folder(
+    client_request,
+    service_one,
+    mock_get_service_templates,
+    mock_get_template_folders,
+):
+    service_one['permissions'] += ['edit_folders']
+    mock_get_template_folders.return_value = [
+        {'id': PARENT_FOLDER_ID, 'name': 'parent_folder', 'parent_id': None},
+        {'id': CHILD_FOLDER_ID, 'name': 'child_folder', 'parent_id': PARENT_FOLDER_ID},
+    ]
+    page = client_request.get(
+        'main.choose_template',
+        service_id=SERVICE_ONE_ID,
+        template_folder_id=PARENT_FOLDER_ID,
+        _test_page_title=False
+    )
+
+    page.find("input", attrs={"name": "move_to", "value": PARENT_FOLDER_ID})
+
+    move_form_labels = page.find('div', id='move_to_folder_radios').find_all('label')
+
+    assert len(move_form_labels) == 3
+    assert normalize_spaces(move_form_labels[0].text) == 'Templates'
+    assert normalize_spaces(move_form_labels[1].text) == 'parent_folder current folder'
+    assert normalize_spaces(move_form_labels[2].text) == 'child_folder'
+
+
+def test_move_folder_form_does_not_show_current_folder_hint_at_the_top_level(
+    client_request,
+    service_one,
+    mock_get_service_templates,
+    mock_get_template_folders,
+):
+    service_one['permissions'] += ['edit_folders']
+    mock_get_template_folders.return_value = [
+        {'id': PARENT_FOLDER_ID, 'name': 'parent_folder', 'parent_id': None},
+        {'id': CHILD_FOLDER_ID, 'name': 'child_folder', 'parent_id': PARENT_FOLDER_ID},
+    ]
+    page = client_request.get(
+        'main.choose_template',
+        service_id=SERVICE_ONE_ID,
+        _test_page_title=False
+    )
+
+    page.find("input", attrs={"name": "move_to", "value": PARENT_FOLDER_ID})
+
+    move_form_labels = page.find('div', id='move_to_folder_radios').find_all('label')
+
+    assert len(move_form_labels) == 3
+    assert normalize_spaces(move_form_labels[0].text) == 'Templates'
+    assert normalize_spaces(move_form_labels[1].text) == 'parent_folder'
+    assert normalize_spaces(move_form_labels[2].text) == 'child_folder'
+
+
 def test_should_be_able_to_move_a_sub_item(
     client_request,
     service_one,
@@ -902,7 +985,7 @@ def test_should_be_able_to_move_a_sub_item(
         template_folder_id=PARENT_FOLDER_ID,
         _data={
             'operation': 'move-to-existing-folder',
-            'move_to': '__NONE__',
+            'move_to': ROOT_FOLDER_ID,
             'templates_and_folders': [GRANDCHILD_FOLDER_ID],
         },
         _expected_status=302,
@@ -957,7 +1040,7 @@ def test_should_be_able_to_move_a_sub_item(
         'operation': 'add-new-template',
         'templates_and_folders': [],
         'move_to_new_folder_name': '',
-        'move_to': '__NONE__',
+        'move_to': ROOT_FOLDER_ID,
         'add_template_by_template_type': 'email',
     },
     # add a new template, but don't select anything
@@ -1005,6 +1088,7 @@ def test_no_action_if_user_fills_in_ambiguous_fields(
     ]
 
     assert [
+        ROOT_FOLDER_ID,
         FOLDER_TWO_ID,
         PARENT_FOLDER_ID,
     ] == [

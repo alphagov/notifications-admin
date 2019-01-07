@@ -742,6 +742,33 @@ class RadioFieldWithNoneOption(FieldWithNoneOption, RadioField):
     pass
 
 
+class NestedRadioField(RadioFieldWithNoneOption):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def children(self):
+        # start map with root option as a single child entry
+        child_map = {None: [option for option in self
+                            if option.data == self.NONE_OPTION_VALUE]}
+
+        # add entries for all other children
+        for option in self:
+            if option.data == self.NONE_OPTION_VALUE:
+                child_ids = [
+                    folder['id'] for folder in self.all_template_folders
+                    if folder['parent_id'] is None]
+                key = self.NONE_OPTION_VALUE
+            else:
+                child_ids = [
+                    folder['id'] for folder in self.all_template_folders
+                    if folder['parent_id'] == option.data]
+                key = option.data
+
+            child_map[key] = [option for option in self if option.data in child_ids]
+
+        return child_map
+
+
 class HiddenFieldWithNoneOption(FieldWithNoneOption, HiddenField):
     pass
 
@@ -1199,7 +1226,7 @@ class TemplateAndFoldersSelectionForm(Form):
     """
 
     ALL_TEMPLATES_FOLDER = {
-        'name': 'All templates',
+        'name': 'Templates',
         'id': RadioFieldWithNoneOption.NONE_OPTION_VALUE,
     }
 
@@ -1207,7 +1234,6 @@ class TemplateAndFoldersSelectionForm(Form):
         self,
         all_template_folders,
         template_list,
-        current_folder_id,
         allow_adding_letter_template,
         allow_adding_copy_of_template,
         *args,
@@ -1221,13 +1247,10 @@ class TemplateAndFoldersSelectionForm(Form):
         self.op = None
         self.is_move_op = self.is_add_folder_op = self.is_add_template_op = False
 
-        if current_folder_id is None:
-            current_folder_id = RadioFieldWithNoneOption.NONE_OPTION_VALUE
-
+        self.move_to.all_template_folders = all_template_folders
         self.move_to.choices = [
             (item['id'], item['name'])
             for item in ([self.ALL_TEMPLATES_FOLDER] + all_template_folders)
-            if item['id'] != current_folder_id
         ]
 
         self.add_template_by_template_type.choices = list(filter(None, [
@@ -1262,10 +1285,16 @@ class TemplateAndFoldersSelectionForm(Form):
     templates_and_folders = MultiCheckboxField('Choose templates or folders', validators=[
         required_for_ops('move-to-new-folder', 'move-to-existing-folder')
     ])
-    move_to = RadioFieldWithNoneOption('Choose a folder', validators=[
-        Optional(),
-        required_for_ops('move-to-new-folder', 'move-to-existing-folder')
-    ])
+    # if no default set, it is set to None, which process_data transforms to '__NONE__'
+    # this means '__NONE__' (self.ALL_TEMPLATES option) is selected when no form data has been submitted
+    # set default to empty string so process_data method doesn't perform any transformation
+    move_to = NestedRadioField(
+        'Choose a folder',
+        default='',
+        validators=[
+            required_for_ops('move-to-existing-folder'),
+            Optional()
+        ])
     add_new_folder_name = StringField('Folder name', validators=[required_for_ops('add-new-folder')])
     move_to_new_folder_name = StringField('Folder name', validators=[required_for_ops('move-to-new-folder')])
 

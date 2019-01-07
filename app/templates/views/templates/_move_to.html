@@ -1,4 +1,4 @@
-{% from "components/radios.html" import radios %}
+{% from "components/radios.html" import radios, radios_nested %}
 {% from "components/page-footer.html" import page_footer %}
 
 <div id="sticky_template_forms" class="js-stick-at-bottom-when-scrolling">
@@ -6,7 +6,7 @@
   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
   {% if templates_and_folders_form.move_to.choices and template_list.templates_to_show %}
     <div id="move_to_folder_radios">
-      {{ radios(templates_and_folders_form.move_to) }}
+      {{ radios_nested(templates_and_folders_form.move_to, move_to_children, option_hints=option_hints) }}
       {{ page_footer('Move', button_name='operation', button_value='move-to-existing-folder') }}
     </div>
     <div id="move_to_new_folder_form">

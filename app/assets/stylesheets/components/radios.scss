@@ -1,0 +1,118 @@
+.radio-select {
+
+  min-height: 39px;
+
+  &-column {
+
+    display: inline-block;
+    vertical-align: top;
+
+    .multiple-choice {
+      margin-right: 5px;
+      padding-right: 10px;
+      padding-left: 54px - 10px;
+    }
+
+  }
+
+  .js-reset-button,
+  .js-category-button {
+
+    background: none;
+    text-decoration: underline;
+    color: $link-colour;
+    border: none;
+    display: inline-block;
+    vertical-align: top;
+    width: auto;
+    padding: 7px 20px 7px 10px;
+    margin-right: 5px;
+    cursor: pointer;
+
+    &:hover {
+      color: $link-hover-colour;
+    }
+
+  }
+
+  .js-reset-button-block {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 20px 20px $gutter 57px;
+  }
+
+  .js-enabled & {
+
+    overflow: visible;
+
+    .multiple-choice {
+      display: none;
+    }
+
+    .js-multiple-choice {
+      display: block;
+    }
+
+  }
+
+}
+
+.radios-nested {
+
+  margin-bottom: 10px;
+
+  .multiple-choice {
+
+    $circle-diameter: 39px;
+    $border-thickness: 4px;
+    $border-indent: ($circle-diameter / 2) - ($border-thickness / 2);
+    $border-colour: $border-colour;
+
+    float: none;
+    position: relative;
+
+    &:before {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: $border-indent;
+      width: $border-thickness;
+      height: 100%;
+      background: $border-colour;
+    }
+
+    label {
+      float: none;
+    }
+
+    [type=radio]+label::before {
+      // To overlap the grey inset line
+      background: $white;
+    }
+
+    ul {
+      // To equalise the spacing between the line and the top/bottom of
+      // the radio
+      margin-top: 5px;
+      margin-bottom: -5px;
+      padding-left: 12px;
+    }
+
+    .block-label-hint {
+      &:after {
+        // Adds an little extra segment of line alongside the ‘current folder’
+        // hint so that it extends all the way down to the next radio
+        content: "";
+        position: absolute;
+        top: $circle-diameter + 5px;
+        left: $border-indent;
+        width: $border-thickness;
+        height: 25px;
+        background: $border-colour;
+      }
+    }
+
+  }
+
+}
