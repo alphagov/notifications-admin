@@ -373,7 +373,8 @@ def format_notification_status(status, template_type):
             'pending-virus-check': 'Pending virus check',
             'virus-scan-failed': 'Virus detected',
             'returned-letter': 'Delivered',
-            'cancelled': 'Cancelled,'
+            'cancelled': 'Cancelled,',
+            'validation-failed': 'Validation failed',
         }
     }[template_type].get(status, status)
 
