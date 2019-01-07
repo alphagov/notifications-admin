@@ -1523,7 +1523,7 @@ diss.gov.uk:
 doncaster.gov.uk:
   owner: Doncaster Metropolitan Borough Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 dorchester-tc.gov.uk:
   owner: Dorchester Town Council
   crown: false
