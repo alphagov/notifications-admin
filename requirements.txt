@@ -14,7 +14,7 @@ pyexcel-io==0.5.11
 pyexcel-xls==0.5.8
 pyexcel-xlsx==0.5.6
 pyexcel-ods3==0.5.3
-pytz==2018.7
+pytz==2018.9
 gunicorn==19.7.1  # >19.8 stops eventlet workers after a timeout
 eventlet==0.24.1
 notifications-python-client==5.2.0
@@ -28,10 +28,10 @@ itsdangerous==0.24  # pyup: <1.0.0
 git+https://github.com/alphagov/notifications-utils.git@30.7.3#egg=notifications-utils==30.7.3
 
 ## The following requirements were added by pip freeze:
-awscli==1.16.83
+awscli==1.16.84
 bleach==2.1.3
 boto3==1.6.16
-botocore==1.12.73
+botocore==1.12.74
 certifi==2018.11.29
 chardet==3.0.4
 Click==7.0
@@ -48,8 +48,8 @@ idna==2.8
 jdcal==1.4
 Jinja2==2.10
 jmespath==0.9.3
-lml==0.0.7
-lxml==4.2.6
+lml==0.0.9
+lxml==4.3.0
 MarkupSafe==1.1.0
 mistune==0.8.3
 monotonic==1.5
