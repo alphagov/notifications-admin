@@ -17,7 +17,13 @@ from tests import (
     template_json,
     validate_route_permission,
 )
-from tests.app.main.views.test_template_folders import PARENT_FOLDER_ID, _folder
+from tests.app.main.views.test_template_folders import (
+    CHILD_FOLDER_ID,
+    FOLDER_TWO_ID,
+    PARENT_FOLDER_ID,
+    _folder,
+    _template,
+)
 from tests.conftest import (
     SERVICE_ONE_ID,
     SERVICE_TWO_ID,
@@ -772,6 +778,7 @@ def test_choosing_to_copy_redirects(
 def test_choose_a_template_to_copy(
     client_request,
     mock_get_service_templates,
+    mock_get_template_folders,
     mock_get_non_empty_organisations_and_services_for_user,
 ):
     page = client_request.get(
@@ -779,49 +786,299 @@ def test_choose_a_template_to_copy(
         service_id=SERVICE_ONE_ID,
     )
 
-    assert normalize_spaces(
-        page.select_one('main nav').text
-    ) == normalize_spaces(
-        'Org 1 service 1 '
-        '    sms_template_one'
-        '    Text message template'
-        '    sms_template_two'
-        '    Text message template'
-        '    email_template_one'
-        '    Email template'
-        '    email_template_two'
-        '    Email template '
-        'Org 1 service 2 '
-        '    sms_template_one'
-        '    Text message template'
-        '    sms_template_two'
-        '    Text message template'
-        '    email_template_one'
-        '    Email template'
-        '    email_template_two'
-        '    Email template '
-        'Service 1 '
-        '    sms_template_one '
-        '    Text message template'
-        '    sms_template_two Text message template'
-        '    email_template_one Email template'
-        '    email_template_two Email template '
-        'Service 2 '
-        '    sms_template_one'
-        '    Text message template'
-        '    sms_template_two'
-        '    Text message template'
-        '    email_template_one'
-        '    Email template'
-        '    email_template_two'
-        '    Email template'
-    )
+    assert page.select('.folder-heading') == []
 
-    assert page.select_one('main nav a')['href'] == url_for(
+    expected = [
+        (
+            'Org 1 service 1 '
+            '6 templates'
+        ),
+        (
+            'Org 1 service 1 / sms_template_one '
+            'Text message template'
+        ),
+        (
+            'Org 1 service 1 / sms_template_two '
+            'Text message template'
+        ),
+        (
+            'Org 1 service 1 / email_template_one '
+            'Email template'
+        ),
+        (
+            'Org 1 service 1 / email_template_two '
+            'Email template'
+        ),
+        (
+            'Org 1 service 1 / letter_template_one '
+            'Letter template'
+        ),
+        (
+            'Org 1 service 1 / letter_template_two '
+            'Letter template'
+        ),
+        (
+            'Org 1 service 2 '
+            '6 templates'
+        ),
+        (
+            'Org 1 service 2 / sms_template_one '
+            'Text message template'
+        ),
+        (
+            'Org 1 service 2 / sms_template_two '
+            'Text message template'
+        ),
+        (
+            'Org 1 service 2 / email_template_one '
+            'Email template'
+        ),
+        (
+            'Org 1 service 2 / email_template_two '
+            'Email template'
+        ),
+        (
+            'Org 1 service 2 / letter_template_one '
+            'Letter template'
+        ),
+        (
+            'Org 1 service 2 / letter_template_two '
+            'Letter template'
+        ),
+        (
+            'Service 1 '
+            '6 templates'
+        ),
+        (
+            'Service 1 / sms_template_one '
+            'Text message template'
+        ),
+        (
+            'Service 1 / sms_template_two '
+            'Text message template'
+        ),
+        (
+            'Service 1 / email_template_one '
+            'Email template'
+        ),
+        (
+            'Service 1 / email_template_two '
+            'Email template'
+        ),
+        (
+            'Service 1 / letter_template_one '
+            'Letter template'
+        ),
+        (
+            'Service 1 / letter_template_two '
+            'Letter template'
+        ),
+        (
+            'Service 2 '
+            '6 templates'
+        ),
+        (
+            'Service 2 / sms_template_one '
+            'Text message template'
+        ),
+        (
+            'Service 2 / sms_template_two '
+            'Text message template'
+        ),
+        (
+            'Service 2 / email_template_one '
+            'Email template'
+        ),
+        (
+            'Service 2 / email_template_two '
+            'Email template'
+        ),
+        (
+            'Service 2 / letter_template_one '
+            'Letter template'
+        ),
+        (
+            'Service 2 / letter_template_two '
+            'Letter template'
+        ),
+    ]
+    actual = page.select('.template-list-item')
+
+    assert len(actual) == len(expected)
+
+    for actual, expected in zip(actual, expected):
+        assert normalize_spaces(actual.text) == expected
+
+    links = page.select('main nav a')
+    assert links[0]['href'] == url_for(
+        'main.choose_template_to_copy',
+        service_id=SERVICE_ONE_ID,
+        from_service=SERVICE_TWO_ID,
+    )
+    assert links[1]['href'] == url_for(
+        'main.choose_template_to_copy',
+        service_id=SERVICE_ONE_ID,
+        from_service=SERVICE_TWO_ID,
+    )
+    assert links[2]['href'] == url_for(
         'main.copy_template',
         service_id=SERVICE_ONE_ID,
         template_id=TEMPLATE_ONE_ID,
         from_service=SERVICE_TWO_ID,
+    )
+
+
+def test_choose_a_template_to_copy_when_user_has_one_service(
+    client_request,
+    mock_get_service_templates,
+    mock_get_template_folders,
+    mock_get_empty_organisations_and_one_service_for_user,
+):
+    page = client_request.get(
+        'main.choose_template_to_copy',
+        service_id=SERVICE_ONE_ID,
+    )
+
+    assert page.select('.folder-heading') == []
+
+    expected = [
+        (
+            'sms_template_one '
+            'Text message template'
+        ),
+        (
+            'sms_template_two '
+            'Text message template'
+        ),
+        (
+            'email_template_one '
+            'Email template'
+        ),
+        (
+            'email_template_two '
+            'Email template'
+        ),
+        (
+            'letter_template_one '
+            'Letter template'
+        ),
+        (
+            'letter_template_two '
+            'Letter template'
+        ),
+    ]
+    actual = page.select('.template-list-item')
+
+    assert len(actual) == len(expected)
+
+    for actual, expected in zip(actual, expected):
+        assert normalize_spaces(actual.text) == expected
+
+    assert page.select('main nav a')[0]['href'] == url_for(
+        'main.copy_template',
+        service_id=SERVICE_ONE_ID,
+        template_id=TEMPLATE_ONE_ID,
+        from_service=SERVICE_TWO_ID,
+    )
+
+
+def test_choose_a_template_to_copy_from_folder_within_service(
+    mocker,
+    client_request,
+    mock_get_template_folders,
+    mock_get_non_empty_organisations_and_services_for_user,
+):
+    mock_get_template_folders.return_value = [
+        _folder('Parent folder', PARENT_FOLDER_ID),
+        _folder('Child folder empty', CHILD_FOLDER_ID, parent=PARENT_FOLDER_ID),
+        _folder('Child folder non-empty', FOLDER_TWO_ID, parent=PARENT_FOLDER_ID),
+    ]
+    mocker.patch(
+        'app.service_api_client.get_service_templates',
+        return_value={'data': [
+            _template(
+                'sms',
+                'Should not appear in list (at service root)',
+            ),
+            _template(
+                'sms',
+                'Should appear in list (at same level)',
+                parent=PARENT_FOLDER_ID,
+            ),
+            _template(
+                'sms',
+                'Should appear in list (nested)',
+                parent=FOLDER_TWO_ID,
+                template_id=TEMPLATE_ONE_ID,
+            ),
+        ]}
+    )
+    page = client_request.get(
+        'main.choose_template_to_copy',
+        service_id=SERVICE_ONE_ID,
+        from_service=SERVICE_ONE_ID,
+        from_folder=PARENT_FOLDER_ID,
+    )
+
+    assert normalize_spaces(page.select_one('.folder-heading').text) == (
+        'service one / Parent folder'
+    )
+    breadcrumb_links = page.select('.folder-heading a')
+    assert len(breadcrumb_links) == 1
+    assert breadcrumb_links[0]['href'] == url_for(
+        'main.choose_template_to_copy',
+        service_id=SERVICE_ONE_ID,
+        from_service=SERVICE_ONE_ID,
+    )
+
+    expected = [
+        (
+            'Child folder empty '
+            'Empty'
+        ),
+        (
+            'Child folder non-empty '
+            '1 template'
+        ),
+        (
+            'Child folder non-empty / Should appear in list (nested) '
+            'Text message template'
+        ),
+        (
+            'Should appear in list (at same level) '
+            'Text message template'
+        ),
+    ]
+    actual = page.select('.template-list-item')
+
+    assert len(actual) == len(expected)
+
+    for actual, expected in zip(actual, expected):
+        assert normalize_spaces(actual.text) == expected
+
+    links = page.select('main nav a')
+    assert links[0]['href'] == url_for(
+        'main.choose_template_to_copy',
+        service_id=SERVICE_ONE_ID,
+        from_service=SERVICE_ONE_ID,
+        from_folder=CHILD_FOLDER_ID,
+    )
+    assert links[1]['href'] == url_for(
+        'main.choose_template_to_copy',
+        service_id=SERVICE_ONE_ID,
+        from_service=SERVICE_ONE_ID,
+        from_folder=FOLDER_TWO_ID,
+    )
+    assert links[2]['href'] == url_for(
+        'main.choose_template_to_copy',
+        service_id=SERVICE_ONE_ID,
+        from_folder=FOLDER_TWO_ID,
+    )
+    assert links[3]['href'] == url_for(
+        'main.copy_template',
+        service_id=SERVICE_ONE_ID,
+        template_id=TEMPLATE_ONE_ID,
+        from_service=SERVICE_ONE_ID,
     )
 
 
@@ -853,6 +1110,7 @@ def test_choose_a_template_to_copy(
 ))
 def test_load_edit_template_with_copy_of_template(
     client_request,
+    active_user_with_permission_to_two_services,
     mock_get_service_templates,
     mock_get_service_email_template,
     mock_get_non_empty_organisations_and_services_for_user,
@@ -863,6 +1121,7 @@ def test_load_edit_template_with_copy_of_template(
         {'name': existing_template_name, 'template_type': 'sms'}
         for existing_template_name in existing_template_names
     ]}
+    client_request.login(active_user_with_permission_to_two_services)
     page = client_request.get(
         'main.copy_template',
         service_id=SERVICE_ONE_ID,

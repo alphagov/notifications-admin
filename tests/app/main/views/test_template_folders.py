@@ -28,9 +28,9 @@ def _folder(name, folder_id=None, parent=None):
     }
 
 
-def _template(template_type, name, parent=None):
+def _template(template_type, name, parent=None, template_id=None):
     return {
-        'id': str(uuid.uuid4()),
+        'id': template_id or str(uuid.uuid4()),
         'name': name,
         'template_type': template_type,
         'folder': parent,

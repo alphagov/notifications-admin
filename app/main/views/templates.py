@@ -29,7 +29,7 @@ from app.main.forms import (
 )
 from app.main.views.send import get_example_csv_rows, get_sender_details
 from app.models.service import Service
-from app.models.template_list import TemplateList
+from app.models.template_list import TemplateList, TemplateLists
 from app.template_previews import TemplatePreview, get_page_count_for_letter
 from app.utils import (
     email_or_sms_not_enabled,
@@ -322,16 +322,44 @@ def _add_template_by_type(template_type, template_folder_id):
 
 
 @main.route("/services/<service_id>/templates/copy")
+@main.route("/services/<service_id>/templates/copy/from-folder/<uuid:from_folder>")
+@main.route("/services/<service_id>/templates/copy/from-service/<uuid:from_service>")
+@main.route("/services/<service_id>/templates/copy/from-service/<uuid:from_service>/from-folder/<uuid:from_folder>")
 @login_required
 @user_has_permissions('manage_templates')
-def choose_template_to_copy(service_id):
-    return render_template(
-        'views/templates/copy.html',
-        services=[
-            Service(service)
-            for service in user_api_client.get_services_for_user(current_user)
-        ],
-    )
+def choose_template_to_copy(
+    service_id,
+    from_service=None,
+    from_folder=None,
+):
+
+    if from_service:
+
+        current_user.belongs_to_service_or_403(from_service)
+        service = Service(
+            service_api_client.get_service(from_service)['data']
+        )
+
+        return render_template(
+            'views/templates/copy.html',
+            services_templates_and_folders=TemplateList(
+                service,
+                template_folder_id=from_folder,
+            ),
+            template_folder_path=service.get_template_folder_path(from_folder),
+            from_service=service,
+            search_form=SearchTemplatesForm(),
+        )
+
+    else:
+        return render_template(
+            'views/templates/copy.html',
+            services_templates_and_folders=TemplateLists([
+                Service(service) for service in
+                user_api_client.get_services_for_user(current_user)
+            ]),
+            search_form=SearchTemplatesForm(),
+        )
 
 
 @main.route("/services/<service_id>/templates/copy/<uuid:template_id>", methods=['GET', 'POST'])
@@ -339,10 +367,7 @@ def choose_template_to_copy(service_id):
 @user_has_permissions('manage_templates')
 def copy_template(service_id, template_id):
 
-    if not user_api_client.user_belongs_to_service(
-        current_user, request.args.get('from_service')
-    ):
-        abort(403)
+    current_user.belongs_to_service_or_403(request.args.get('from_service'))
 
     template = service_api_client.get_service_template(
         request.args.get('from_service'),

@@ -230,7 +230,7 @@ class UserApiClient(NotifyAdminAPIClient):
         }
 
     def user_belongs_to_service(self, user, service_id):
-        return service_id in self.get_service_ids_for_user(user)
+        return str(service_id) in self.get_service_ids_for_user(user)
 
 
 user_api_client = UserApiClient()

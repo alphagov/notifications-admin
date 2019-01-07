@@ -30,6 +30,7 @@ class TemplateList():
                     self.template_type, item['id']
                 ),
                 ancestors=ancestors,
+                service_id=self.service.id,
             )
             for sub_item in self.get_templates_and_folders(
                 template_type, item['id'], ancestors + [item]
@@ -42,6 +43,7 @@ class TemplateList():
             yield TemplateListTemplate(
                 item,
                 ancestors=ancestors,
+                service_id=self.service.id,
             )
 
     @property
@@ -59,7 +61,46 @@ class TemplateList():
         ))
 
 
+class TemplateLists():
+
+    def __init__(self, services):
+        self.services = sorted(
+            services,
+            key=lambda service: service.name.lower(),
+        )
+
+    def __iter__(self):
+
+        if len(self.services) == 1:
+
+            for template_or_folder in TemplateList(self.services[0]):
+                yield template_or_folder
+
+            return
+
+        for service in self.services:
+
+            template_list_service = TemplateListService(service)
+
+            yield template_list_service
+
+            for service_templates_and_folders in TemplateList(
+                service
+            ).get_templates_and_folders(
+                template_type='all',
+                template_folder_id=None,
+                ancestors=[template_list_service],
+            ):
+                yield service_templates_and_folders
+
+    @property
+    def templates_to_show(self):
+        return bool(self.services)
+
+
 class TemplateListItem():
+
+    is_service = False
 
     def __init__(
         self,
@@ -79,8 +120,10 @@ class TemplateListTemplate(TemplateListItem):
         self,
         template,
         ancestors,
+        service_id,
     ):
         super().__init__(template, ancestors)
+        self.service_id = service_id
         self.hint = {
             'email': 'Email template',
             'sms': 'Text message template',
@@ -98,8 +141,10 @@ class TemplateListFolder(TemplateListItem):
         templates,
         folders,
         ancestors,
+        service_id,
     ):
         super().__init__(folder, ancestors)
+        self.service_id = service_id
         self.number_of_templates = len(templates)
         self.number_of_folders = len(folders)
 
@@ -122,3 +167,24 @@ class TemplateListFolder(TemplateListItem):
     @property
     def hint(self):
         return ', '.join(self._hint_parts)
+
+
+class TemplateListService(TemplateListFolder):
+
+    is_service = True
+
+    def __init__(
+        self,
+        service,
+    ):
+        super().__init__(
+            folder=service._dict,
+            templates=service.get_templates(
+                template_folder_id=None,
+            ),
+            folders=service.get_template_folders(
+                parent_folder_id=None,
+            ),
+            ancestors=[],
+            service_id=service.id,
+        )

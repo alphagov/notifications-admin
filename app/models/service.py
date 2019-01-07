@@ -61,7 +61,7 @@ class Service():
 
     def _get_by_id(self, things, id):
         try:
-            return next(thing for thing in things if thing['id'] == id)
+            return next(thing for thing in things if thing['id'] == str(id))
         except StopIteration:
             abort(404)
 
@@ -132,6 +132,8 @@ class Service():
     def get_templates(self, template_type='all', template_folder_id=None):
         if isinstance(template_type, str):
             template_type = [template_type]
+        if template_folder_id:
+            template_folder_id = str(template_folder_id)
         return [
             template for template in self.all_templates
             if (set(template_type) & {'all', template['template_type']})
@@ -330,6 +332,10 @@ class Service():
         return {folder['id'] for folder in self.all_template_folders}
 
     def get_template_folders(self, template_type='all', parent_folder_id=None):
+
+        if parent_folder_id:
+            parent_folder_id = str(parent_folder_id)
+
         return [
             folder for folder in self.all_template_folders
             if (

@@ -966,7 +966,7 @@ def create_service_templates(service_id, number_of_templates=6):
 
         service_templates.append(template_json(
             service_id,
-            TEMPLATE_ONE_ID if _ == 1 else str(generate_uuid),
+            TEMPLATE_ONE_ID if _ == 1 else str(generate_uuid()),
             "{}_template_{}".format(template_type, template_number),
             template_type,
             "{} template {} content".format(template_type, template_number),
@@ -1190,6 +1190,41 @@ def active_user_with_permissions(fake_uuid):
                  }
     user = User(user_data)
     return user
+
+
+@pytest.fixture(scope='function')
+def active_user_with_permission_to_two_services(fake_uuid):
+    from app.notify_client.user_api_client import User
+
+    permissions = [
+        'send_texts',
+        'send_emails',
+        'send_letters',
+        'manage_users',
+        'manage_templates',
+        'manage_settings',
+        'manage_api_keys',
+        'view_activity',
+    ]
+
+    return User({
+        'id': fake_uuid,
+        'name': 'Test User',
+        'password': 'somepassword',
+        'password_changed_at': str(datetime.utcnow()),
+        'email_address': 'test@user.gov.uk',
+        'mobile_number': '07700 900762',
+        'state': 'active',
+        'failed_login_count': 0,
+        'permissions': {
+            SERVICE_ONE_ID: permissions,
+            SERVICE_TWO_ID: permissions,
+        },
+        'platform_admin': False,
+        'auth_type': 'sms_auth',
+        'organisations': [ORGANISATION_ID],
+        'services': [SERVICE_ONE_ID, SERVICE_TWO_ID],
+    })
 
 
 @pytest.fixture(scope='function')
@@ -3216,6 +3251,24 @@ def mock_get_non_empty_organisations_and_services_for_user(mocker, organisation_
                 {'name': 'Org 2', 'services': _make_services('Org 2 service')},
             ],
             'services_without_organisations': _make_services('Service')
+        }
+
+    return mocker.patch(
+        'app.user_api_client.get_organisations_and_services_for_user',
+        side_effect=_get_orgs_and_services
+    )
+
+
+@pytest.fixture
+def mock_get_empty_organisations_and_one_service_for_user(mocker, organisation_one, api_user_active):
+
+    def _get_orgs_and_services(user_id):
+        return {
+            'organisations': [],
+            'services_without_organisations': [{
+                'name': 'Only service',
+                'id': SERVICE_TWO_ID,
+            }]
         }
 
     return mocker.patch(
