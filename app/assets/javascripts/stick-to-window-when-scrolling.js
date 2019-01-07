@@ -188,24 +188,38 @@
   Sticky.prototype.allElementsLoaded = function (totalEls) {
     return this._els.length === totalEls;
   };
+  Sticky.prototype.add = function (el, setPositions, cb) {
+    var self = this;
+    var $el = $(el);
+    var elObj = new StickyElement($el, self);
+
+    self.setElementDimensions(elObj, function () {
+      self._els.push(elObj);
+      if (setPositions) {
+        self.setElementPositions();
+      }
+      if (cb !== undefined) {
+        cb();
+      }
+    });
+  }; 
   Sticky.prototype.init = function () {
     var self = this;
     var $els = $(self.CSS_SELECTOR);
     var numOfEls = $els.length;
+    var onAllLoaded = function () {
+      if (self._els.length === numOfEls) {
+        self._elsLoaded = true;
+
+        // set positions based on initial scroll position
+        self.setElementPositions();
+      }
+    };
 
     if (numOfEls > 0) {
       $els.each(function (i, el) {
-        var $el = $(el);
-        var elObj = new StickyElement($el, self);
-
-        self.setElementDimensions(elObj, function () {
-          self._els.push(elObj);
-          // set positions based on initial scroll positionu
-          if (self._els.length === numOfEls) {
-            self._elsLoaded = true;
-            self.setElementPositions();
-          }
-        });
+        // delay setting position until all stickys are loaded
+        self.add(el, false, onAllLoaded);
       });
 
       // flag when scrolling takes place and check (and re-position) sticky elements relative to
