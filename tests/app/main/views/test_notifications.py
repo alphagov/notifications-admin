@@ -202,7 +202,11 @@ def test_notification_page_shows_page_for_letter_notification(
     ),
     (
         'validation-failed',
+<<<<<<< HEAD
         'Validation failed – content is outside the printable area',
+=======
+        'Can’t print this letter – content is outside the printable area.',
+>>>>>>> Cancelled notifications do not show as failures on dashboard stats
     ),
 ))
 @freeze_time("2016-01-01 01:01")
