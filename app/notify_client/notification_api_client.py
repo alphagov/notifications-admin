@@ -78,8 +78,12 @@ class NotificationApiClient(NotifyAdminAPIClient):
     @staticmethod
     def map_letters_to_accepted(notifications):
         for notification in notifications['notifications']:
-            if notification['notification_type'] == 'letter' and notification['status'] in ('created', 'sending'):
-                notification['status'] = 'accepted'
+            if notification['notification_type'] == 'letter':
+                if notification['status'] in ('created', 'sending'):
+                    notification['status'] = 'accepted'
+
+                if notification['status'] in ('delivered', 'returned-letter'):
+                    notification['status'] = 'received'
         return notifications
 
     def get_notification_letter_preview(self, service_id, notification_id, file_type, page=None):
