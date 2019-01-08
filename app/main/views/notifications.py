@@ -24,6 +24,7 @@ from notifications_utils.letter_timings import (
 )
 from notifications_utils.pdf import pdf_page_count
 from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
+from PyPDF2.utils import PdfReadError
 
 from app import (
     _format_datetime_short,
@@ -58,8 +59,14 @@ def view_notification(service_id, notification_id):
     personalisation = get_all_personalisation_from_notification(notification)
 
     if notification['template']['is_precompiled_letter']:
-        file_contents = view_letter_notification_as_preview(service_id, notification_id, "pdf")
-        page_count = pdf_page_count(io.BytesIO(file_contents))
+        try:
+            file_contents = view_letter_notification_as_preview(service_id, notification_id, "pdf")
+            page_count = pdf_page_count(io.BytesIO(file_contents))
+        except PdfReadError:
+            return render_template(
+                'views/notifications/invalid_precompiled_letter.html',
+                created_at=notification['created_at']
+            )
     else:
         page_count = get_page_count_for_letter(notification['template'], values=personalisation)
 
