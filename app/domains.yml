@@ -295,7 +295,7 @@ aberdeencity.gov.uk:
 aberdeenshire.gov.uk:
   owner: Aberdeenshire Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 AbergavennyTownCouncil.gov.uk:
   owner: Abergavenny Town Council
   crown: false
@@ -489,14 +489,8 @@ aylsham-tc.gov.uk:
   owner: Aylsham Town Council
   crown: false
   agreement_signed: false
-ayrshire.gov.uk:
-  owner: South Ayrshire Council
-  crown: false
-  agreement_signed: false
-ayrshire-jsu.gov.uk:
-  owner: South Ayrshire Council
-  crown: false
-  agreement_signed: false
+ayrshire.gov.uk: south-ayrshire.gov.uk
+ayrshire-jsu.gov.uk: south-ayrshire.gov.uk
 babergh.gov.uk:
   owner: Babergh District Council
   crown: false
@@ -1639,7 +1633,7 @@ eastdorset.gov.uk:
 eastdunbarton.gov.uk:
   owner: East Dunbartonshire Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 eastgrinstead.gov.uk:
   owner: East Grinstead Town Council
   crown: false
@@ -1982,10 +1976,7 @@ goytre.gov.uk:
   owner: Goetre Fawr Community Council
   crown: false
   agreement_signed: false
-grampiancaredata.gov.uk:
-  owner: Aberdeenshire Council
-  crown: false
-  agreement_signed: false
+grampiancaredata.gov.uk: aberdeenshire.gov.uk
 grangeoversandstowncouncil.gov.uk:
   owner: Grange Over Sands Town Council
   crown: false
@@ -3099,7 +3090,7 @@ newforest.gov.uk:
 newham.gov.uk:
   owner: Newham London Borough Council
   crown: false
-  agreement_signed: true  
+  agreement_signed: true
 newhaventowncouncil.gov.uk:
   owner: Newhaven Town Council
   crown: false
@@ -3235,7 +3226,7 @@ northleach.gov.uk:
 northlincs.gov.uk:
   owner: North Lincolnshire Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 north-norfolk.gov.uk:
   owner: North Norfolk District Council
   crown: false
@@ -4058,7 +4049,7 @@ southandvale.gov.uk:
 south-ayrshire.gov.uk:
   owner: South Ayrshire Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 southbucks.gov.uk:
   owner: South Buckinghamshire District Council
   crown: false
@@ -4743,7 +4734,7 @@ wallingfordtowncouncil.gov.uk:
 walsall.gov.uk:
   owner: Walsall Metropolitan Borough Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 walthamabbey-tc.gov.uk:
   owner: Waltham Abbey Town Council
   crown: false
