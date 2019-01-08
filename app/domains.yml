@@ -4055,7 +4055,7 @@ southandvale.gov.uk:
 south-ayrshire.gov.uk:
   owner: South Ayrshire Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 southbucks.gov.uk:
   owner: South Buckinghamshire District Council
   crown: false
