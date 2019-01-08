@@ -3,6 +3,7 @@
 
   var $ = global.jQuery;
   var GOVUK = global.GOVUK || {};
+  var _mode = 'default';
 
   // Constructor for objects holding data for each element to have sticky behaviour
   var StickyElement = function ($el, sticky) {
@@ -13,6 +14,7 @@
     this._appliedClass = null;
     this._$shim = null;
     this._stopped = false;
+    this._canBeStuck = true;
   };
   StickyElement.prototype.stickyClass = function () {
     return (this._sticky._initialPositionsSet) ? this._fixedClass : this._initialFixedClass;
@@ -25,6 +27,7 @@
   };
   StickyElement.prototype.stick = function () {
     this._appliedClass = this.stickyClass();
+    this.$fixedEl.addClass(this._appliedClass);
     this._hasBeenCalled = true;
   };
   StickyElement.prototype.release = function () {
@@ -34,7 +37,7 @@
   // When a sticky element is moved into the 'stuck' state, a shim is inserted into the
   // page to preserve the space the element occupies in the flow.
   StickyElement.prototype.addShim = function (position) {
-    this._$shim = $('<div class="shim" style="width: ' + this.horizontalSpace + 'px; height: ' + this.verticalSpace + 'px">&nbsp</div>');
+    this._$shim = $('<div class="shim" style="width: ' + this.horizontalSpace + 'px; height: ' + this.inPageVerticalSpace + 'px">&nbsp</div>');
     this.$fixedEl[position](this._$shim);
   };
   StickyElement.prototype.removeShim = function () {
@@ -45,7 +48,7 @@
   StickyElement.prototype.updateShim = function () {
     if (this._$shim) {
       this._$shim.css({
-        'height': this.verticalSpace,
+        'height': this.inPageVerticalSpace,
         'width': this.horizontalSpace
       });
     }
@@ -58,6 +61,143 @@
   };
   StickyElement.prototype.isStopped = function () {
     return this._isStopped;
+  };
+  StickyElement.prototype.canBeStuck = function (val) {
+    if (val !== undefined) {
+      this._canBeStuck = val;
+    } else {
+      return this._canBeStuck;
+    }
+  };
+  StickyElement.prototype.hasLoaded = function (val) {
+    if (val !== undefined) {
+      this._hasLoaded = val;
+    } else {
+      return this._hasLoaded;
+    }
+  };
+
+  // Object collecting together methods for treating sticky elements as if they
+  // were wrapped by a dialog component
+  var dialog = {
+    _hasResized: false,
+    _getTotalHeight: function (els) {
+      var reducer = function (accumulator, currentValue) {
+        return accumulator + currentValue;
+      };
+      return $.map(els, function (el) { return el.height; }).reduce(reducer);
+    },
+    _elsThatCanBeStuck: function (els) {
+      return $.grep(els, function (el) { return el.canBeStuck(); });
+    },
+    hasOppositeEdge: function (el, sticky) {
+      var els = this._elsThatCanBeStuck(sticky._els);
+      var idx;
+      
+      if (els.length < 2) { return true; }
+
+      idx = els.indexOf(el);
+
+      return (sticky.edge === 'top') ? idx === (els.length - 1) : idx === 0;
+    },
+    getOffsetFromEdge: function (el, sticky) {
+      var els = this._elsThatCanBeStuck(sticky._els).slice();
+      var elIdx;
+
+      // els must be arranged furtherest from window edge is stuck to first
+      // default direction is order in document
+      if (sticky.edge === 'top') {
+        els.reverse();
+      }
+
+      elIdx = els.indexOf(el);
+
+      // if next to window edge the dialog is stuck to, no offset
+      if (elIdx === (els.length - 1)) { return 0; }
+
+      // get all els between this one and the window edge
+      els = els.slice(elIdx + 1);
+
+      return this._getTotalHeight(els);
+    },
+    getOffsetFromEnd: function (el, sticky) {
+      var els = this._elsThatCanBeStuck(sticky._els).slice();
+      var elIdx;
+
+      // els must be arranged furtherest from window edge is stuck to first
+      // default direction is order in document
+      if (sticky.edge === 'bottom') {
+        els.reverse();
+      }
+
+      elIdx = els.indexOf(el);
+
+      // if next to opposite edge to the one the dialog is stuck to, no offset
+      if (elIdx === (els.length - 1)) { return 0; }
+
+      // get all els between this one and the opposite edge
+      els = els.slice(elIdx + 1);
+
+      return this._getTotalHeight(els);
+    },
+    // checks total height of all this._sticky elements against a height
+    // unsticks each that won't fit and marks them as unstickable
+    fitToHeight: function (sticky) {
+      var self = this;
+      var els = sticky._els.slice();
+      var height = sticky.getWindowDimensions().height;
+      var elsThatCanBeStuck = function () {
+        return $.grep(els, function (el) { return el.canBeStuck(); });
+      };
+      var totalStickyHeight = function () {
+        return self._getTotalHeight(elsThatCanBeStuck());
+      };
+      var dialogFitsHeight = function () {
+        return totalStickyHeight() <= height;
+      };
+
+      // els must be arranged furtherest from window edge is stuck to first
+      // default direction is order in document
+      if (sticky.edge === 'top') {
+        els.reverse();
+      }
+
+      // reset elements
+      $.each(els, function (i, el) { el.canBeStuck(true); });
+
+      while (elsThatCanBeStuck().length && !dialogFitsHeight()) {
+        var currentEl = elsThatCanBeStuck()[0];
+
+        sticky.reset(currentEl);
+        currentEl.canBeStuck(false);
+
+        if (!sticky._hasResized) { sticky._hasResized = true; }
+      }
+
+      return this._getTotalHeight(els);
+    },
+    getInPageEdgePosition: function (sticky) {
+      var idx = (sticky.edge === 'top') ? 0 : sticky._els.length - 1;
+
+      return sticky._els[idx].inPageEdgePosition;
+    },
+    getHeight: function (els) {
+      return this._getTotalHeight(this._elsThatCanBeStuck(els));
+    },
+    adjustForResize: function (sticky) {
+      var windowHeight = sticky.getWindowDimensions().height;
+
+      if (sticky.edge === 'top') {
+        $(window).scrollTop(this.getInPageEdgePosition(sticky));
+      } else {
+        $(window).scrollTop(this.getInPageEdgePosition(sticky) - windowHeight);
+      }
+
+      sticky._hasResized = false;
+    },
+    releaseEl: function (el, sticky) {
+      el.$fixedEl.css(sticky.edge, '');
+    }
   };
 
   // Constructor for objects collecting together all generic behaviour for controlling the state of
@@ -72,6 +212,7 @@
     this._els = [];
 
     this.CSS_SELECTOR = selector;
+    this.STOP_PADDING = 10;
   };
   Sticky.prototype.getWindowDimensions = function () {
     return {
@@ -94,7 +235,7 @@
           'bottom':  windowTop + windowDimensions.height
         };
 
-    $.each(self._els, function (i, el) {
+    var _setElementPosition = function (el) {
       if (self.viewportIsWideEnough(windowDimensions.width)) {
 
         if (self.windowNotPastScrolledFrom(windowPositions, self.getScrolledFrom(el))) {
@@ -118,6 +259,12 @@
         self.reset(el);
 
       }
+    };
+
+    $.each(self._els, function (i, el) {
+      if (el.canBeStuck()) {
+        _setElementPosition(el);
+      }
     });
 
     if (self._initialPositionsSet === false) { self._initialPositionsSet = true; }
@@ -127,13 +274,10 @@
     var self = this;
     var $el = el.$fixedEl;
     var onHeightSet = function () {
-      el.scrolledTo = self.getScrollingTo(el);
       // if element is shim'ed, pass changes in dimension on to the shim
       if (el._$shim) {
         el.updateShim();
-        $el = el._$shim;
       }
-      el.scrolledFrom = self.getScrolledFrom($el);
       if (callback !== undefined) {
         callback();
       }
@@ -152,13 +296,21 @@
     }
   };
   // Recalculate stored dimensions for all sticky elements
-  Sticky.prototype.recalculate = function () {
+  Sticky.prototype.recalculate = function (opts) {
     var self = this;
+    var onDimensionsSet = function () {
+      if (_mode === 'dialog') {
+        dialog.fitToHeight(self);
+        dialog.adjustForResize(self);
+      }
+      self.setElementPositions();
+    };
+
+    if ((opts !== undefined) && ('mode' in opts)) { _mode = opts.mode; }
 
     $.each(self._els, function (i, el) {
-      self.setElementDimensions(el);
+      self.setElementDimensions(el, onDimensionsSet);
     });
-    self.setElementPositions();
   };
   Sticky.prototype.setElWidth = function (el) {
     var $el = el.$fixedEl;
@@ -178,14 +330,16 @@
     if ((!self._elsLoaded) && ($img.length > 0)) {
       var image = new global.Image();
       image.onload = function () {
-        el.verticalSpace = $el.outerHeight(true);
+        el.inPageVerticalSpace = $el.outerHeight(true);
         el.height = $el.outerHeight();
+        el.inPageEdgePosition = self.getInPageEdgePosition(el);
         callback();
       };
       image.src = $img.attr('src');
     } else {
-      el.verticalSpace = $el.outerHeight(true);
+      el.inPageVerticalSpace = $el.outerHeight(true);
       el.height = $el.outerHeight();
+      el.inPageEdgePosition = self.getInPageEdgePosition(el);
       callback();
     }
   };
@@ -207,18 +361,21 @@
       }
     });
   }; 
-  Sticky.prototype.init = function () {
+  Sticky.prototype.init = function (opts) {
     var self = this;
     var $els = $(self.CSS_SELECTOR);
     var numOfEls = $els.length;
     var onAllLoaded = function () {
       if (self._els.length === numOfEls) {
         self._elsLoaded = true;
+        self.endOfScrollArea = self.getEndOfScrollArea();
 
         // set positions based on initial scroll position
         self.setElementPositions();
       }
     };
+
+    if ((opts !== undefined) && ('mode' in opts)) { _mode = opts.mode; }
 
     if (numOfEls > 0) {
       $els.each(function (i, el) {
@@ -273,6 +430,10 @@
       });
 
       if (self.viewportIsWideEnough(windowWidth)) {
+        if (_mode === 'dialog') {
+          dialog.fitToHeight(self);
+          dialog.adjustForResize(self);
+        }
         self.setElementPositions();
       }
     }
@@ -282,6 +443,9 @@
       var $el = el.$fixedEl;
 
       $el.removeClass(el.appliedClass()).css('width', '');
+      if (_mode === 'dialog') {
+        dialog.releaseEl(el, this);
+      }
       el.removeShim();
       el.release();
     }
@@ -289,17 +453,43 @@
 
   // Extension of sticky object to add behaviours specific to sticking to top of window
   var stickAtTop = new Sticky('.js-stick-at-top-when-scrolling');
-  // Store top of sticky elements while unstuck
-  stickAtTop.getScrolledFrom = function ($el) {
-    return $el.offset().top;
-  };
-  // Store furthest point top of sticky element is allowed
-  stickAtTop.getScrollingTo = function (el) {
+  stickAtTop.edge = 'top';
+  // Store furthest point sticky elements are allowed
+  stickAtTop.getEndOfScrollArea = function () {
     var footer = $('.js-footer:eq(0)');
     if (footer.length === 0) {
       return 0;
     }
-    return (footer.offset().top - 10) - el.height;
+    return footer.offset().top - this.STOP_PADDING;
+  };
+  // position of the bottom edge when in the page flow
+  stickAtTop.getInPageEdgePosition = function (el) {
+    return el.$fixedEl.offset().top;
+  };
+  stickAtTop.getScrolledFrom = function (el) {
+    if (_mode === 'dialog') {
+      return dialog.getInPageEdgePosition(this);
+    } else {
+      return el.inPageEdgePosition;
+    }
+  };
+  stickAtTop.getScrollingTo = function (el) {
+    var height = el.height;
+
+    if (_mode === 'dialog') {
+      height = dialog.getHeight(this._els);
+    }
+
+    return this.endOfScrollArea - height;
+  };
+  stickAtTop.getStoppingPosition = function (el) {
+    var offset = 0;
+
+    if (_mode === 'dialog') {
+      offset = dialog.getOffsetFromEnd(el, this);
+    }
+
+    return (this.endOfScrollArea - offset) - el.height;
   };
   stickAtTop.windowNotPastScrolledFrom = function (windowPositions, scrolledFrom) {
     return scrolledFrom > windowPositions.top;
@@ -310,10 +500,18 @@
   stickAtTop.stick = function (el) {
     if (!el.isStuck()) {
       var $el = el.$fixedEl;
+      var offset = 0;
+
+      if (_mode === 'dialog') {
+        offset = dialog.getOffsetFromEdge(el, this);
+      }
 
       el.addShim('before');
-      // element will be absolutely positioned so cannot rely on parent element for width
-      $el.css('width', $el.width() + 'px').addClass(el.stickyClass());
+      $el.css({
+        // element will be absolutely positioned so cannot rely on parent element for width
+        'width': $el.width() + 'px',
+        'top': offset + 'px'
+      });
       el.stick();
     }
   };
@@ -321,29 +519,58 @@
     if (!el.isStopped()) {
       el.$fixedEl.css({
         'position': 'absolute',
-        'top': el.scrolledTo
+        'top': this.getStoppingPosition(el)
       });
       el.stop();
     }
   };
   stickAtTop.unstop = function (el) {
-    el.$fixedEl.css({ 'position': '', 'top': '' });
+    el.$fixedEl.css({
+      'position': '',
+      'top': ''
+    });
     el.unstop();
   };
 
   // Extension of sticky object to add behaviours specific to sticking to bottom of window
   var stickAtBottom = new Sticky('.js-stick-at-bottom-when-scrolling');
-  // Store bottom of sticky elements while unstuck
-  stickAtBottom.getScrolledFrom = function ($el) {
-    return $el.offset().top + $el.outerHeight();
-  };
-  // Store furthest point bottom of sticky element is allowed
-  stickAtBottom.getScrollingTo = function (el) {
+  stickAtBottom.edge = 'bottom';
+  // Store furthest point sticky elements are allowed
+  stickAtBottom.getEndOfScrollArea = function () {
     var header = $('.js-header:eq(0)');
     if (header.length === 0) {
       return 0;
     }
-    return (header.offset().top + header.outerHeight() + 10) + el.height;
+    return (header.offset().top + header.outerHeight()) + this.STOP_PADDING;
+  };
+  // position of the bottom edge when in the page flow
+  stickAtBottom.getInPageEdgePosition = function (el) {
+    return el.$fixedEl.offset().top + el.height;
+  };
+  stickAtBottom.getScrolledFrom = function (el) {
+    if (_mode === 'dialog') {
+      return dialog.getInPageEdgePosition(this);
+    } else {
+      return el.inPageEdgePosition;
+    }
+  };
+  stickAtBottom.getScrollingTo = function (el) {
+    var height = el.height;
+
+    if (_mode === 'dialog') {
+      height = dialog.getHeight(this._els);
+    }
+
+    return this.endOfScrollArea + height;
+  };
+  stickAtBottom.getStoppingPosition = function (el) {
+    var offset = 0;
+
+    if (_mode === 'dialog') {
+      offset = dialog.getOffsetFromEnd(el, this);
+    }
+
+    return this.endOfScrollArea + offset;
   };
   stickAtBottom.windowNotPastScrolledFrom = function (windowPositions, scrolledFrom) {
     return scrolledFrom < windowPositions.bottom;
@@ -354,10 +581,18 @@
   stickAtBottom.stick = function (el) {
     if (!el.isStuck()) {
       var $el = el.$fixedEl;
+      var offset = 0;
+
+      if (_mode === 'dialog') {
+        offset = dialog.getOffsetFromEdge(el, this);
+      }
 
       el.addShim('after');
-      // element will be absolutely positioned so cannot rely on parent element for width
-      el.$fixedEl.css('width', $el.width() + 'px').addClass(el.stickyClass());
+      $el.css({
+        // element will be absolutely positioned so cannot rely on parent element for width
+        'width': $el.width() + 'px',
+        'bottom': offset + 'px'
+      });
       el.stick();
     }
   };
@@ -365,17 +600,23 @@
     if (!el.isStopped()) {
       el.$fixedEl.css({
         'position': 'absolute',
-        'top': (el.scrolledTo - el.height),
+        'top': this.getStoppingPosition(el),
         'bottom': 'auto'
       });
       el.stop();
     }
   };
   stickAtBottom.unstop = function (el) {
+    var offset = 0;
+
+    if (_mode === 'dialog') {
+      offset = dialog.getOffsetFromEdge(el, this);
+    }
+
     el.$fixedEl.css({
       'position': '',
       'top': '',
-      'bottom': ''
+      'bottom': offset + 'px'
     });
     el.unstop();
   };

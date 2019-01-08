@@ -31,15 +31,6 @@
       this.states.filter(state => state.cancellable).forEach((x) => this.addCancelButton(x));
       this.states.filter(state => state.key === 'items-selected-buttons').forEach(x => this.addClearButton(x));
 
-      // add all sticky elements from states
-      this.states.forEach(state => {
-        if (state.isStickyGroup) {
-          state.$el.find(".js-stick-at-bottom-when-scrolling").each((idx, el) => {
-            GOVUK.stickAtBottomWhenScrolling.add(el, false);
-          });
-        }
-      });
-
       // first off show the new template / new folder buttons
       this.currentState = this.$form.data('prev-state') || 'unknown';
       if (this.currentState === 'unknown') {
@@ -141,7 +132,10 @@
       );
 
       // make sticky JS recalculate its cache of the element's position
-      if ('stickAtBottomWhenScrolling' in GOVUK) {
+      // use dialog mode for states which contain more than one form control
+      if (['move-to-existing-folder', 'add-new-template'].includes(this.currentState)) {
+        GOVUK.stickAtBottomWhenScrolling.recalculate({ 'mode': 'dialog' });
+      } else {
         GOVUK.stickAtBottomWhenScrolling.recalculate();
       }
     };
