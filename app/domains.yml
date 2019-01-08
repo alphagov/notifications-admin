@@ -489,14 +489,8 @@ aylsham-tc.gov.uk:
   owner: Aylsham Town Council
   crown: false
   agreement_signed: false
-ayrshire.gov.uk:
-  owner: South Ayrshire Council
-  crown: false
-  agreement_signed: false
-ayrshire-jsu.gov.uk:
-  owner: South Ayrshire Council
-  crown: false
-  agreement_signed: false
+ayrshire.gov.uk: south-ayrshire.gov.uk
+ayrshire-jsu.gov.uk: south-ayrshire.gov.uk
 babergh.gov.uk:
   owner: Babergh District Council
   crown: false
@@ -3096,7 +3090,7 @@ newforest.gov.uk:
 newham.gov.uk:
   owner: Newham London Borough Council
   crown: false
-  agreement_signed: true  
+  agreement_signed: true
 newhaventowncouncil.gov.uk:
   owner: Newhaven Town Council
   crown: false
