@@ -295,7 +295,7 @@ aberdeencity.gov.uk:
 aberdeenshire.gov.uk:
   owner: Aberdeenshire Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 AbergavennyTownCouncil.gov.uk:
   owner: Abergavenny Town Council
   crown: false
@@ -1982,10 +1982,7 @@ goytre.gov.uk:
   owner: Goetre Fawr Community Council
   crown: false
   agreement_signed: false
-grampiancaredata.gov.uk:
-  owner: Aberdeenshire Council
-  crown: false
-  agreement_signed: false
+grampiancaredata.gov.uk: aberdeenshire.gov.uk
 grangeoversandstowncouncil.gov.uk:
   owner: Grange Over Sands Town Council
   crown: false
