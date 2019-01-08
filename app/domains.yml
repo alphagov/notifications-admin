@@ -1639,7 +1639,7 @@ eastdorset.gov.uk:
 eastdunbarton.gov.uk:
   owner: East Dunbartonshire Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 eastgrinstead.gov.uk:
   owner: East Grinstead Town Council
   crown: false
@@ -3235,7 +3235,7 @@ northleach.gov.uk:
 northlincs.gov.uk:
   owner: North Lincolnshire Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 north-norfolk.gov.uk:
   owner: North Norfolk District Council
   crown: false
@@ -4743,7 +4743,7 @@ wallingfordtowncouncil.gov.uk:
 walsall.gov.uk:
   owner: Walsall Metropolitan Borough Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 walthamabbey-tc.gov.uk:
   owner: Waltham Abbey Town Council
   crown: false
