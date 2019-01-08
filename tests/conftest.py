@@ -1863,6 +1863,7 @@ def mock_get_notifications(
         job_id=None,
         page=1,
         page_size=50,
+        count_pages=None,
         template_type=None,
         status=None,
         limit_days=None,
@@ -1896,6 +1897,7 @@ def mock_get_notifications(
             template=template,
             rows=rows,
             job=job,
+            with_links=True if count_pages is None else count_pages,
             personalisation=personalisation,
             template_type=diff_template_type,
             client_reference=client_reference,
@@ -1915,6 +1917,7 @@ def mock_get_notifications_with_previous_next(mocker):
     def _get_notifications(service_id,
                            job_id=None,
                            page=1,
+                           count_pages=None,
                            template_type=None,
                            status=None,
                            limit_days=None,
@@ -1923,7 +1926,7 @@ def mock_get_notifications_with_previous_next(mocker):
                            to=None,
                            include_one_off=None
                            ):
-        return notification_json(service_id, with_links=True)
+        return notification_json(service_id, rows=50, with_links=True if count_pages is None else count_pages)
 
     return mocker.patch(
         'app.notification_api_client.get_notifications_for_service',
@@ -1936,6 +1939,7 @@ def mock_get_notifications_with_no_notifications(mocker):
     def _get_notifications(service_id,
                            job_id=None,
                            page=1,
+                           count_pages=None,
                            template_type=None,
                            status=None,
                            limit_days=None,
