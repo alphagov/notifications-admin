@@ -351,12 +351,14 @@ def test_get_valid_agreement_info_some_known_details():
 
 
 def test_get_valid_local_agreement_info_some_known_details():
-    agreement_info = AgreementInfo("aberdeenshire.gov.uk")
+    # This example may need to be updated to use a different council if
+    # Babergh every sign the agreement
+    agreement_info = AgreementInfo("babergh.gov.uk")
     assert agreement_info.crown_status is False
-    assert agreement_info.owner == "Aberdeenshire Council"
+    assert agreement_info.owner == "Babergh District Council"
     assert agreement_info.agreement_signed is False
     assert agreement_info.as_human_readable == (
-        'No (organisation is Aberdeenshire Council, a non-crown body)'
+        'No (organisation is Babergh District Council, a non-crown body)'
     )
 
 
