@@ -13,21 +13,32 @@
       this.$stickyBottom = this.$form.find('#sticky_template_forms');
 
       this.$stickyBottom.append(this.nothingSelectedButtons);
+      GOVUK.stickAtBottomWhenScrolling.add(this.nothingSelectedButtons, true);
       this.$stickyBottom.append(this.itemsSelectedButtons);
+      GOVUK.stickAtBottomWhenScrolling.add(this.itemsSelectedButtons, true);
 
       // all the diff states that we want to show or hide
       this.states = [
-        {key: 'nothing-selected-buttons', $el: this.$form.find('#nothing_selected'), cancellable: false},
-        {key: 'items-selected-buttons', $el: this.$form.find('#items_selected'), cancellable: false},
-        {key: 'move-to-existing-folder', $el: this.$form.find('#move_to_folder_radios'), cancellable: true},
-        {key: 'move-to-new-folder', $el: this.$form.find('#move_to_new_folder_form'), cancellable: true},
-        {key: 'add-new-folder', $el: this.$form.find('#add_new_folder_form'), cancellable: true},
-        {key: 'add-new-template', $el: this.$form.find('#add_new_template_form'), cancellable: true}
+        {key: 'nothing-selected-buttons', $el: this.$form.find('#nothing_selected'), cancellable: false, isStickyGroup: false},
+        {key: 'items-selected-buttons', $el: this.$form.find('#items_selected'), cancellable: false, isStickyGroup: false},
+        {key: 'move-to-existing-folder', $el: this.$form.find('#move_to_folder_radios'), cancellable: true, isStickyGroup: true},
+        {key: 'move-to-new-folder', $el: this.$form.find('#move_to_new_folder_form'), cancellable: true, isStickyGroup: false},
+        {key: 'add-new-folder', $el: this.$form.find('#add_new_folder_form'), cancellable: true, isStickyGroup: false},
+        {key: 'add-new-template', $el: this.$form.find('#add_new_template_form'), cancellable: true, isStickyGroup: true}
       ];
 
       // cancel/clear buttons only relevant if JS enabled, so
       this.states.filter(state => state.cancellable).forEach((x) => this.addCancelButton(x));
       this.states.filter(state => state.key === 'items-selected-buttons').forEach(x => this.addClearButton(x));
+
+      // add all sticky elements from states
+      this.states.forEach(state => {
+        if (state.isStickyGroup) {
+          state.$el.find(".js-stick-at-bottom-when-scrolling").each((idx, el) => {
+            GOVUK.stickAtBottomWhenScrolling.add(el, false);
+          });
+        }
+      });
 
       // first off show the new template / new folder buttons
       this.currentState = this.$form.data('prev-state') || 'unknown';
@@ -135,25 +146,25 @@
       }
     };
 
-    this.nothingSelectedButtons = `
-      <div id="nothing_selected">
+    this.nothingSelectedButtons = $(`
+      <div id="nothing_selected" class="js-stick-at-bottom-when-scrolling">
         <button class="button-secondary" value="add-new-template">New template</button>
         <button class="button-secondary" value="add-new-folder">New folder</button>
         <div class="template-list-selected-counter">
           Nothing selected
         </div>
       </div>
-    `;
+    `).get(0);
 
-    this.itemsSelectedButtons = `
-      <div id="items_selected">
+    this.itemsSelectedButtons = $(`
+      <div id="items_selected" class="js-stick-at-bottom-when-scrolling">
         <button class="button-secondary" value="move-to-existing-folder">Move</button>
         <button class="button-secondary" value="move-to-new-folder">Add to a new folder</button>
         <div class="template-list-selected-counter">
           <span class="template-list-selected-counter-count">1</span> selected
         </div>
       </div>
-    `;
+    `).get(0);
   };
 
 })(window.GOVUK.Modules);

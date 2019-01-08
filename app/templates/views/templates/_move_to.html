@@ -1,15 +1,19 @@
 {% from "components/radios.html" import radios, radios_nested %}
 {% from "components/page-footer.html" import page_footer %}
 
-<div id="sticky_template_forms" class="js-stick-at-bottom-when-scrolling">
+<div id="sticky_template_forms">
   <button type="submit" name="operation" value="unknown" hidden></button>
   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
   {% if templates_and_folders_form.move_to.choices and template_list.templates_to_show %}
     <div id="move_to_folder_radios">
+      <div class="js-stick-at-bottom-when-scrolling">
       {{ radios_nested(templates_and_folders_form.move_to, move_to_children, option_hints=option_hints) }}
+      </div>
+      <div class="js-stick-at-bottom-when-scrolling">
       {{ page_footer('Move', button_name='operation', button_value='move-to-existing-folder') }}
+      </div>
     </div>
-    <div id="move_to_new_folder_form">
+    <div id="move_to_new_folder_form" class="js-stick-at-bottom-when-scrolling">
       <fieldset>
         <legend class="visuallyhidden">Move to a new folder</legend>
         {{ textbox(templates_and_folders_form.move_to_new_folder_name) }}
@@ -17,7 +21,7 @@
       </fieldset>
     </div>
   {% endif %}
-  <div id="add_new_folder_form">
+  <div id="add_new_folder_form" class="js-stick-at-bottom-when-scrolling">
     <fieldset>
       <legend class="visuallyhidden">Add a new folder</legend>
       {{ textbox(templates_and_folders_form.add_new_folder_name) }}
@@ -27,8 +31,12 @@
   <div id="add_new_template_form">
     <fieldset>
       <legend class="visuallyhidden">Add a new template</legend>
+      <div class="js-stick-at-bottom-when-scrolling">
       {{ radios(templates_and_folders_form.add_template_by_template_type) }}
+      </div>
+      <div class="js-stick-at-bottom-when-scrolling">
       {{ page_footer('Continue', button_name='operation', button_value='add-new-template') }}
+      </div>
     </fieldset>
   </div>
 </div>
