@@ -1,6 +1,6 @@
 from itertools import chain
 
-from flask import request, session
+from flask import abort, request, session
 from flask_login import AnonymousUserMixin, UserMixin
 
 from app.utils import is_gov_user
@@ -150,6 +150,10 @@ class User(UserMixin):
 
     def has_permission_for_service(self, service_id, permission):
         return permission in self._permissions.get(service_id, [])
+
+    def belongs_to_service_or_403(self, service_id):
+        if str(service_id) not in self.services:
+            abort(403)
 
     def is_locked(self):
         return self.failed_login_count >= self.max_failed_login_count
