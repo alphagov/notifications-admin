@@ -5,8 +5,13 @@
 {% from "components/textbox.html" import textbox %}
 {% from "components/form.html" import form_wrapper %}
 
+{% set title_status = (
+  'Failed '
+  if status == 'failed' and message_type == 'letter'
+  else ''
+) %}
 {% set page_title = (
-  message_count_label(99, message_type, suffix='') | capitalize
+  (title_status + message_count_label(99, message_type, suffix='')) | capitalize
   if current_user.has_permissions('view_activity')
   else 'Sent messages'
 ) %}
