@@ -16,7 +16,7 @@
 
     <p>
       {% if is_precompiled_letter %}
-      Provided as PDF, sent
+      Provided as PDF
       {% else %}
         {% if help %}
           ‘{{ template.name }}’
@@ -43,8 +43,7 @@
         </p>
       {% elif notification_status == 'validation-failed' %}
         <p class="notification-status-cancelled">
-          Cancelled {{ updated_at|format_datetime_short }}
-          (letter has content outside the printable area)
+          Validation failed – content is outside the printable area
         </p>
       {% else %}
         <p>
