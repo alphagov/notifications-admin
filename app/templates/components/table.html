@@ -157,12 +157,12 @@
       {% if notification.status|format_notification_status_as_url(notification.notification_type) %}
         <a href="{{ notification.status|format_notification_status_as_url(notification.notification_type) }}">
       {% endif %}
-      {% if notification['notification_type'] != "letter" or notification.status == 'virus-scan-failed' %}
+      {% if notification['notification_type'] != "letter" or notification.status in ('virus-scan-failed', 'validation-failed') %}
         {{ notification.status|format_notification_status(
           notification.template.template_type
         ) }}
       {% endif %}
-      {% if notification.notification_type == "letter" and notification.status in ['permanent-failure', 'validation-failed', 'cancelled'] %}
+      {% if notification.notification_type == "letter" and notification.status in ['permanent-failure', 'cancelled'] %}
         Cancelled
       {% endif %}
       {% if notification.status|format_notification_status_as_url(notification.notification_type) %}

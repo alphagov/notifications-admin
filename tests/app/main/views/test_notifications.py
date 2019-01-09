@@ -7,6 +7,7 @@ import pytest
 from flask import url_for
 from freezegun import freeze_time
 from notifications_python_client.errors import APIError
+from PyPDF2.utils import PdfReadError
 
 from app.main.views.notifications import get_letter_printing_statement
 from tests.conftest import (
@@ -201,7 +202,7 @@ def test_notification_page_shows_page_for_letter_notification(
     ),
     (
         'validation-failed',
-        'Cancelled 1 January at 1:02am (letter has content outside the printable area)',
+        'Validation failed – content is outside the printable area',
     ),
 ))
 @freeze_time("2016-01-01 01:01")
@@ -396,6 +397,36 @@ def test_should_show_preview_error_image_letter_notification_on_preview_error(
 
     assert response.status_code == 200
     assert response.get_data(as_text=True) == 'preview error image'
+
+
+def test_notifification_page_shows_error_message_if_precompiled_letter_cannot_be_opened(
+    client_request,
+    mocker,
+    fake_uuid,
+):
+    mock_get_notification(
+        mocker,
+        fake_uuid,
+        notification_status='validation-failed',
+        template_type='letter',
+        is_precompiled_letter=True,
+    )
+    mocker.patch(
+        'app.main.views.notifications.view_letter_notification_as_preview',
+        side_effect=PdfReadError()
+    )
+    mocker.patch(
+        'app.main.views.notifications.pdf_page_count',
+        side_effect=PdfReadError()
+    )
+    page = client_request.get(
+        'main.view_notification',
+        service_id=SERVICE_ONE_ID,
+        notification_id=fake_uuid,
+    )
+
+    error_message = page.find('p', class_='notification-status-cancelled').text
+    assert normalize_spaces(error_message) == "Validation failed – this isn’t a PDF file that Notify can read"
 
 
 def test_should_404_for_unknown_extension(
