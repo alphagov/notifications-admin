@@ -13,6 +13,7 @@ class NotificationApiClient(NotifyAdminAPIClient):
         status=None,
         page=None,
         page_size=None,
+        count_pages=None,
         limit_days=None,
         include_jobs=None,
         include_from_test_key=None,
@@ -20,25 +21,22 @@ class NotificationApiClient(NotifyAdminAPIClient):
         to=None,
         include_one_off=None,
     ):
-        params = {}
-        if page is not None:
-            params['page'] = page
-        if page_size is not None:
-            params['page_size'] = page_size
-        if template_type is not None:
-            params['template_type'] = template_type
-        if status is not None:
-            params['status'] = status
-        if include_jobs is not None:
-            params['include_jobs'] = include_jobs
-        if include_from_test_key is not None:
-            params['include_from_test_key'] = include_from_test_key
-        if format_for_csv is not None:
-            params['format_for_csv'] = format_for_csv
-        if to is not None:
-            params['to'] = to
-        if include_one_off is not None:
-            params['include_one_off'] = include_one_off
+
+        params = {
+            'page': page,
+            'page_size': page_size,
+            'template_type': template_type,
+            'status': status,
+            'include_jobs': include_jobs,
+            'include_from_test_key': include_from_test_key,
+            'format_for_csv': format_for_csv,
+            'to': to,
+            'include_one_off': include_one_off,
+            'count_pages': count_pages,
+        }
+
+        params = {k: v for k, v in params.items() if v is not None}
+
         if job_id:
             return self.get(
                 url='/service/{}/job/{}/notifications'.format(service_id, job_id),
@@ -71,7 +69,8 @@ class NotificationApiClient(NotifyAdminAPIClient):
             service_id,
             include_jobs=False,
             include_from_test_key=True,
-            include_one_off=False
+            include_one_off=False,
+            count_pages=False
         )
         return self.map_letters_to_accepted(ret)
 

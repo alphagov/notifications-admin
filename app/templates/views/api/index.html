@@ -83,7 +83,7 @@
     {% endfor %}
     {% if api_notifications.notifications %}
       <div class="api-notifications-item">
-        {% if api_notifications.links %}
+        {% if api_notifications.notifications|length == 50 %}
           <p class="api-notifications-item-meta">
             Only showing the first 50 messages.
           </p>
