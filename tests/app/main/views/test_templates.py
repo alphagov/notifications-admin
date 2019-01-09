@@ -35,20 +35,13 @@ from tests.conftest import service_one as create_sample_service
 from tests.conftest import single_letter_contact_block
 
 
-@pytest.mark.parametrize('extra_permissions', (
-    [],
-    ['edit_folders'],
-))
 def test_should_show_empty_page_when_no_templates(
     client_request,
     service_one,
     mock_get_organisations_and_services_for_user,
     mock_get_service_templates_when_no_templates_exist,
     mock_get_template_folders,
-    extra_permissions,
 ):
-
-    service_one['permissions'] += extra_permissions
 
     page = client_request.get(
         'main.choose_template',
@@ -66,6 +59,36 @@ def test_should_show_empty_page_when_no_templates(
         service_id=service_one['id'],
     )
     assert len(page.select('main a')) == 1
+
+
+def test_should_show_add_template_form_if_service_has_folder_permission(
+    client_request,
+    service_one,
+    mock_get_organisations_and_services_for_user,
+    mock_get_service_templates_when_no_templates_exist,
+    mock_get_template_folders,
+):
+
+    service_one['permissions'] += ['edit_folders']
+
+    page = client_request.get(
+        'main.choose_template',
+        service_id=service_one['id'],
+    )
+
+    assert normalize_spaces(page.select_one('h1').text) == (
+        'Templates'
+    )
+    assert normalize_spaces(page.select_one('main p').text) == (
+        'You need a template before you can send emails or text messages.'
+    )
+    assert [
+        (item['name'], item['value']) for item in page.select('[type=radio]')
+    ] == [
+        ('add_template_by_template_type', 'email'),
+        ('add_template_by_template_type', 'sms'),
+    ]
+    assert not page.select('main a')
 
 
 @pytest.mark.parametrize(

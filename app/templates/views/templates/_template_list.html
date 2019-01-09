@@ -1,7 +1,7 @@
 {% from "components/checkbox.html" import unlabelled_checkbox %}
 {% from "components/message-count-label.html" import folder_contents_count, message_count_label %}
 
-{% if not template_list.templates_to_show %}
+{% if template_list.template_folder_id and not template_list.templates_to_show %}
   <p class="template-list-empty">
     {% if template_list.folder_is_empty %}
       This folder is empty
