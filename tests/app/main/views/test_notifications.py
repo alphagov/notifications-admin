@@ -191,24 +191,11 @@ def test_notification_page_shows_page_for_letter_notification(
     assert mock_page_count.call_args_list[0][1]['values'] == {'name': 'Jo'}
 
 
-@pytest.mark.parametrize('notification_status, expected_message', (
-    (
-        'permanent-failure',
-        'Cancelled 1 January at 1:02am',
-    ),
-    (
-        'cancelled',
-        'Cancelled 1 January at 1:02am',
-    ),
-    (
-        'validation-failed',
-<<<<<<< HEAD
-        'Validation failed – content is outside the printable area',
-=======
-        'Can’t print this letter – content is outside the printable area.',
->>>>>>> Cancelled notifications do not show as failures on dashboard stats
-    ),
-))
+@pytest.mark.parametrize('notification_status, expected_message', [
+    ('permanent-failure', 'Cancelled 1 January at 1:02am'),
+    ('cancelled', 'Cancelled 1 January at 1:02am'),
+    ('validation-failed', 'Validation failed – content is outside the printable area'),
+])
 @freeze_time("2016-01-01 01:01")
 def test_notification_page_shows_cancelled_letter(
     client_request,
