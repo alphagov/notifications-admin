@@ -40,7 +40,7 @@ from werkzeug.datastructures import MultiDict
 SENDING_STATUSES = ['created', 'pending', 'sending', 'pending-virus-check']
 DELIVERED_STATUSES = ['delivered', 'sent', 'returned-letter']
 FAILURE_STATUSES = ['failed', 'temporary-failure', 'permanent-failure',
-                    'technical-failure', 'virus-scan-failed']
+                    'technical-failure', 'virus-scan-failed', 'validation-failed']
 REQUESTED_STATUSES = SENDING_STATUSES + DELIVERED_STATUSES + FAILURE_STATUSES
 
 
