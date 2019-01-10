@@ -1285,7 +1285,7 @@ colwyn-tc.gov.uk:
 cne-siar.gov.uk:
   owner: Comhairle nan Eilean Siar 
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 congleton-tc.gov.uk:
   owner: Congleton Town Council
   crown: false
