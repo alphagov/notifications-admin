@@ -45,6 +45,11 @@
         <p class="notification-status-cancelled">
           Validation failed – content is outside the printable area
         </p>
+      {% elif notification_status == 'technical-failure' %}
+        <p class="notification-status-cancelled">
+          Technical failure – Notify will resend once the team have
+          fixed the problem
+        </p>
       {% else %}
         <p>
           {{ letter_print_day }}
