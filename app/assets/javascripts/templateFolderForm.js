@@ -13,9 +13,7 @@
       this.$stickyBottom = this.$form.find('#sticky_template_forms');
 
       this.$stickyBottom.append(this.nothingSelectedButtons);
-      GOVUK.stickAtBottomWhenScrolling.add(this.nothingSelectedButtons, true);
       this.$stickyBottom.append(this.itemsSelectedButtons);
-      GOVUK.stickAtBottomWhenScrolling.add(this.itemsSelectedButtons, true);
 
       // all the diff states that we want to show or hide
       this.states = [

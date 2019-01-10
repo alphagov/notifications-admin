@@ -22,6 +22,9 @@
   StickyElement.prototype.appliedClass = function () {
     return this._appliedClass;
   };
+  StickyElement.prototype.removeStickyClasses = function () {
+    this.$fixedEl.removeClass([this._initialFixedClass, this._fixedClass].join(' '));
+  };
   StickyElement.prototype.isStuck = function () {
     return this._appliedClass !== null;
   };
@@ -41,8 +44,10 @@
     this.$fixedEl[position](this._$shim);
   };
   StickyElement.prototype.removeShim = function () {
-    this._$shim.remove();
-    this._$shim = null;
+    if (this._$shim !== null) {
+      this._$shim.remove();
+      this._$shim = null;
+    }
   };
   // Changes to the dimensions of a sticky element with a shim need to be passed on to the shim
   StickyElement.prototype.updateShim = function () {
@@ -54,13 +59,18 @@
     }
   };
   StickyElement.prototype.stop = function () {
-    this._isStopped = true;
+    this._stopped = true;
   };
   StickyElement.prototype.unstop = function () {
-    this._isStopped = false;
+    this._stopped = false;
   };
   StickyElement.prototype.isStopped = function () {
-    return this._isStopped;
+    return this._stopped;
+  };
+  StickyElement.prototype.isInPage = function () {
+    var node = this.$fixedEl.get(0);
+
+    return (node === document.body) ? false : document.body.contains(node);
   };
   StickyElement.prototype.canBeStuck = function (val) {
     if (val !== undefined) {
@@ -346,10 +356,18 @@
   Sticky.prototype.allElementsLoaded = function (totalEls) {
     return this._els.length === totalEls;
   };
+  Sticky.prototype.hasEl = function (node) {
+    return !!$.grep(this._els, function (el) { return el.$fixedEl.is(node); }).length;
+  };
   Sticky.prototype.add = function (el, setPositions, cb) {
     var self = this;
     var $el = $(el);
-    var elObj = new StickyElement($el, self);
+    var elObj;
+
+    // guard against adding elements already stored
+    if (this.hasEl(el)) { return; }
+
+    elObj= new StickyElement($el, self);
 
     self.setElementDimensions(elObj, function () {
       self._els.push(elObj);
@@ -361,6 +379,16 @@
       }
     });
   }; 
+  Sticky.prototype.remove = function (el) {
+    if ($.inArray(el, this._els) !== -1) {
+
+      // reset DOM node to original state
+      this.reset(el);
+
+      // remove sticky element object
+      this._els = $.grep(this._els, function (_el) { return _el !== el; });
+    }
+  };
   Sticky.prototype.init = function (opts) {
     var self = this;
     var $els = $(self.CSS_SELECTOR);
@@ -411,7 +439,7 @@
 
     if (self._hasScrolled === true) {
       self._hasScrolled = false;
-      self.setElementPositions(true);
+      self.setElementPositions();
     }
   };
   Sticky.prototype.checkResize = function () {
@@ -442,7 +470,8 @@
     if (el.isStuck()) {
       var $el = el.$fixedEl;
 
-      $el.removeClass(el.appliedClass()).css('width', '');
+      el.removeStickyClasses();
+      $el.css('width', '');
       if (_mode === 'dialog') {
         dialog.releaseEl(el, this);
       }
