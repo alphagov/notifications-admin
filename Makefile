@@ -124,6 +124,18 @@ test-requirements:
 	         echo "Run 'make freeze-requirements' to update."; exit 1; } \
 || { echo "requirements.txt is up to date"; exit 0; }
 
+# Usage:
+# BRANCH=pyup-update-foobar make freeze-requirements-on-branch
+.PHONY: freeze-requirements-on-branch
+freeze-requirements-on-branch:
+	git fetch
+	git checkout $(BRANCH)
+	git reset --hard origin/$(BRANCH)
+	git rebase origin/master
+	make freeze-requirements
+	git commit -am "Freeze requirements"
+	git push origin -f $(BRANCH)
+
 .PHONY: coverage
 coverage: venv ## Create coverage report
 	. venv/bin/activate && coveralls
