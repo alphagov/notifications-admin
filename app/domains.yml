@@ -1763,18 +1763,12 @@ esfrs.org.uk:
   owner: East Sussex Fire and Rescue Service
   crown: false
   agreement_signed: true
-essexcc.gov.uk:
-  owner: Essex County Council
-  crown: false
-  agreement_signed: false
+essexcc.gov.uk: essex.gov.uk
 essex.gov.uk:
   owner: Essex County Council
   crown: false
-  agreement_signed: false
-essexlegalservices.gov.uk:
-  owner: Essex County Council
-  crown: false
-  agreement_signed: false
+  agreement_signed: true
+essexlegalservices.gov.uk: essex.gov.uk
 eveshamtowncouncil.gov.uk:
   owner: Evesham Town Council
   crown: false
