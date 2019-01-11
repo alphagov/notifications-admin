@@ -777,7 +777,7 @@ bracknelltowncouncil.gov.uk:
 bradford.gov.uk:
   owner: City of Bradford Metropolitan District Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 bradfordonavontowncouncil.gov.uk:
   owner: Bradford on Avon Town Council
   crown: false
