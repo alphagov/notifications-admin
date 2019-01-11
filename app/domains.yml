@@ -4904,7 +4904,7 @@ west-lindsey.gov.uk:
 westlothian.gov.uk:
   owner: West Lothian Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 westmidlandsca.gov.uk:
   owner: Wolverhampton City Council
   crown: false
