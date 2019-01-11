@@ -37,8 +37,7 @@
           statistics['letter']['show_warning'],
           failure_link=url_for(".view_notifications", service_id=service_id, message_type='letter', status='failed'),
           link=url_for(".view_notifications", service_id=service_id, message_type='letter', status=''),
-          smaller=smaller_font_size,
-          failed_as_cancelled=True
+          smaller=smaller_font_size
         ) }}
       </div>
     {% endif %}

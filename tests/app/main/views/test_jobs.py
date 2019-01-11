@@ -157,7 +157,7 @@ def test_jobs_page_doesnt_show_scheduled_on_page_2(
                 'created', 'pending', 'sending', 'pending-virus-check',
                 'delivered', 'sent', 'returned-letter',
                 'failed', 'temporary-failure', 'permanent-failure', 'technical-failure',
-                'virus-scan-failed', 'cancelled',
+                'virus-scan-failed', 'validation-failed'
             ]
         ),
         (
@@ -170,7 +170,10 @@ def test_jobs_page_doesnt_show_scheduled_on_page_2(
         ),
         (
             'failed',
-            ['failed', 'temporary-failure', 'permanent-failure', 'technical-failure', 'virus-scan-failed', 'cancelled']
+            [
+                'failed', 'temporary-failure', 'permanent-failure', 'technical-failure', 'virus-scan-failed',
+                'validation-failed'
+            ]
         )
     ]
 )
@@ -340,7 +343,7 @@ def test_should_show_letter_job(
             'permanent-failure',
             'technical-failure',
             'virus-scan-failed',
-            'cancelled',
+            'validation-failed'
         ],
     )
 
