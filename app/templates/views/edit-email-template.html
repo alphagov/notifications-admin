@@ -1,6 +1,6 @@
 {% extends "withnav_template.html" %}
 {% from "components/textbox.html" import textbox %}
-{% from "components/page-footer.html" import page_footer %}
+{% from "components/page-footer.html" import sticky_page_footer %}
 {% from "components/radios.html" import radios %}
 {% from "components/form.html" import form_wrapper %}
 
@@ -23,11 +23,9 @@
           {% if current_user.platform_admin %}
              {{ radios(form.process_type) }}
           {% endif %}
-          <div class="js-stick-at-bottom-when-scrolling">
-            {{ page_footer(
-              'Save'
-            ) }}
-          </div>
+          {{ sticky_page_footer(
+            'Save'
+          ) }}
         </div>
         <aside class="column-whole">
           {% include "partials/templates/guidance-formatting.html" %}

@@ -1,6 +1,6 @@
 {% extends "withnav_template.html" %}
 {% from "components/textbox.html" import textbox %}
-{% from "components/page-footer.html" import page_footer %}
+{% from "components/page-footer.html" import sticky_page_footer %}
 {% from "components/radios.html" import radios %}
 {% from "components/form.html" import form_wrapper %}
 
@@ -23,11 +23,9 @@
           {% endif %}
           {{ textbox(form.subject, width='1-1', highlight_tags=True, rows=2) }}
           {{ textbox(form.template_content, highlight_tags=True, width='1-1', rows=8) }}
-          <div class="js-stick-at-bottom-when-scrolling">
-            {{ page_footer(
-              'Save'
-            ) }}
-          </div>
+          {{ sticky_page_footer(
+            'Save'
+          ) }}
         </div>
         <aside class="column-three-quarters">
           {% include "partials/templates/guidance-formatting-letters.html" %}
