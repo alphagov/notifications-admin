@@ -3612,7 +3612,7 @@ redbridge.gov.uk:
 redcar-cleveland.gov.uk:
   owner: Redcar and Cleveland Borough Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 redditchbc.gov.uk:
   owner: Redditch Borough Council
   crown: false
