@@ -23,9 +23,11 @@
           {% endif %}
           {{ textbox(form.subject, width='1-1', highlight_tags=True, rows=2) }}
           {{ textbox(form.template_content, highlight_tags=True, width='1-1', rows=8) }}
-          {{ page_footer(
-            'Save'
-          ) }}
+          <div class="js-stick-at-bottom-when-scrolling">
+            {{ page_footer(
+              'Save'
+            ) }}
+          </div>
         </div>
         <aside class="column-three-quarters">
           {% include "partials/templates/guidance-formatting-letters.html" %}

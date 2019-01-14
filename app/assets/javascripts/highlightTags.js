@@ -32,12 +32,20 @@
 
     };
 
-    this.resize = () => this.$textbox.height(
-      Math.max(
-        this.initialHeight,
-        this.$background.outerHeight()
-      )
-    );
+    this.resize = () => {
+
+      this.$textbox.height(
+        Math.max(
+          this.initialHeight,
+          this.$background.outerHeight()
+        )
+      );
+
+      if ('stickAtBottomWhenScrolling' in GOVUK) {
+        GOVUK.stickAtBottomWhenScrolling.recalculate();
+      }
+
+    };
 
     this.escapedMessage = () => $('<div/>').text(this.$textbox.val()).html();
 

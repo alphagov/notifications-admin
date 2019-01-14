@@ -23,9 +23,11 @@
           {% if current_user.platform_admin %}
              {{ radios(form.process_type) }}
           {% endif %}
-          {{ page_footer(
-            'Save'
-          ) }}
+          <div class="js-stick-at-bottom-when-scrolling">
+            {{ page_footer(
+              'Save'
+            ) }}
+          </div>
         </div>
         <aside class="column-whole">
           {% include "partials/templates/guidance-formatting.html" %}
