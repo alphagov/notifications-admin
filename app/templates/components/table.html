@@ -144,7 +144,7 @@
 
 {% macro notification_status_field(notification) %}
 
-  {% set displayed_on_single_line = notification.status in ['created', 'pending', 'sending', 'delivered'] %}
+  {% set displayed_on_single_line = notification.status in ['created', 'pending', 'pending-virus-check', 'sending', 'sent', 'delivered', 'returned-letter', 'accepted', 'received', 'permanent-failure'] %}
 
   {% if not notification %}
     {% call field(align='right') %}{% endcall %}
@@ -157,14 +157,7 @@
       {% if notification.status|format_notification_status_as_url(notification.notification_type) %}
         <a href="{{ notification.status|format_notification_status_as_url(notification.notification_type) }}">
       {% endif %}
-      {% if notification['notification_type'] != "letter" or notification.status in ('virus-scan-failed', 'validation-failed') %}
-        {{ notification.status|format_notification_status(
-          notification.template.template_type
-        ) }}
-      {% endif %}
-      {% if notification.notification_type == "letter" and notification.status in ['permanent-failure', 'cancelled'] %}
-        Cancelled
-      {% endif %}
+      {{ notification.status|format_notification_status(notification.template.template_type) }}
       {% if notification.status|format_notification_status_as_url(notification.notification_type) %}
         </a>
       {% endif %}

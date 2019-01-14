@@ -191,13 +191,26 @@ def test_notification_page_shows_page_for_letter_notification(
     assert mock_page_count.call_args_list[0][1]['values'] == {'name': 'Jo'}
 
 
-@pytest.mark.parametrize('notification_status, expected_message', [
-    ('permanent-failure', 'Cancelled 1 January at 1:02am'),
-    ('cancelled', 'Cancelled 1 January at 1:02am'),
-    ('validation-failed', 'Validation failed – content is outside the printable area'),
-])
+@pytest.mark.parametrize('notification_status, expected_message', (
+    (
+        'permanent-failure',
+        'Cancelled 1 January at 1:02am',
+    ),
+    (
+        'cancelled',
+        'Cancelled 1 January at 1:02am',
+    ),
+    (
+        'validation-failed',
+        'Validation failed – content is outside the printable area',
+    ),
+    (
+        'technical-failure',
+        'Technical failure – Notify will resend once the team have fixed the problem',
+    ),
+))
 @freeze_time("2016-01-01 01:01")
-def test_notification_page_shows_cancelled_letter(
+def test_notification_page_shows_cancelled_or_failed_letter(
     client_request,
     mocker,
     fake_uuid,

@@ -603,9 +603,15 @@ def test_big_numbers_and_search_dont_show_for_letters(
     "message_type, status, expected_hint_status, single_line", [
         ('email', 'delivered', 'Delivered 27 September at 5:31pm', True),
         ('sms', 'delivered', 'Delivered 27 September at 5:31pm', True),
+        ('letter', 'created', '27 September at 5:30pm', True),
+        ('letter', 'sending', '27 September at 5:30pm', True),
         ('letter', 'delivered', '27 September at 5:30pm', True),
-        ('letter', 'permanent-failure', 'Cancelled 27 September at 5:31pm', False),
+        ('letter', 'received', '27 September at 5:30pm', True),
+        ('letter', 'accepted', '27 September at 5:30pm', True),
+        ('letter', 'permanent-failure', '27 September at 5:31pm', True),
+        ('letter', 'virus-scan-failed', 'Virus detected 27 September at 5:30pm', False),
         ('letter', 'validation-failed', 'Validation failed 27 September at 5:30pm', False),
+        ('letter', 'technical-failure', 'Technical failure 27 September at 5:30pm', False),
     ]
 )
 def test_sending_status_hint_displays_correctly_on_notifications_page(
