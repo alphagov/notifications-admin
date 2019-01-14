@@ -144,7 +144,7 @@
 
 {% macro notification_status_field(notification) %}
 
-  {% set displayed_on_single_line = notification.status in ['created', 'pending', 'pending-virus-check', 'sending', 'sent', 'delivered', 'returned-letter', 'accepted', 'received'] %}
+  {% set displayed_on_single_line = notification.status in ['created', 'pending', 'pending-virus-check', 'sending', 'sent', 'delivered', 'returned-letter', 'accepted', 'received', 'permanent-failure'] %}
 
   {% if not notification %}
     {% call field(align='right') %}{% endcall %}

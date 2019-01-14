@@ -365,7 +365,7 @@ def format_notification_status(status, template_type):
             'failed': '',
             'technical-failure': 'Technical failure',
             'temporary-failure': '',
-            'permanent-failure': 'Cancelled',
+            'permanent-failure': '',
             'delivered': '',
             'received': '',
             'accepted': '',

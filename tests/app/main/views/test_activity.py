@@ -608,8 +608,8 @@ def test_big_numbers_and_search_dont_show_for_letters(
         ('letter', 'delivered', '27 September at 5:30pm', True),
         ('letter', 'received', '27 September at 5:30pm', True),
         ('letter', 'accepted', '27 September at 5:30pm', True),
+        ('letter', 'permanent-failure', '27 September at 5:31pm', True),
         ('letter', 'virus-scan-failed', 'Virus detected 27 September at 5:30pm', False),
-        ('letter', 'permanent-failure', 'Cancelled 27 September at 5:31pm', False),
         ('letter', 'validation-failed', 'Validation failed 27 September at 5:30pm', False),
         ('letter', 'technical-failure', 'Technical failure 27 September at 5:30pm', False),
     ]
