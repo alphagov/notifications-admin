@@ -555,7 +555,7 @@ barrytowncouncil.gov.uk: valeofglamorgan.gov.uk
 basildon.gov.uk:
   owner: Basildon District Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 basingstoke.gov.uk:
   owner: Basingstoke and Deane Borough Council
   crown: false
