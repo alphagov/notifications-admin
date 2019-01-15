@@ -699,7 +699,7 @@ blackburn.gov.uk:
 blackpool.gov.uk:
   owner: Blackpool Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 blackwaterandhawleytowncouncil.gov.uk:
   owner: Blackwater and Hawley Town Council
   crown: false
