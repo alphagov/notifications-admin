@@ -2,7 +2,6 @@ import json
 
 from flask import (
     current_app,
-    flash,
     redirect,
     render_template,
     request,
@@ -42,25 +41,14 @@ def two_factor_email(token):
             current_app.config['EMAIL_2FA_EXPIRY_SECONDS']
         ))
     except SignatureExpired:
-        # lets decode again, without the expiry, to get the user id out
-        orig_data = json.loads(check_token(
-            token,
-            current_app.config['SECRET_KEY'],
-            current_app.config['DANGEROUS_SALT'],
-            None
-        ))
-        session['user_details'] = {'id': orig_data['user_id']}
-        flash("The link in the email we sent you has expired. We’ve sent you a new one.")
-        return redirect(url_for('.resend_email_link'))
+        return render_template('views/email-link-invalid.html')
 
     user_id = token_data['user_id']
     # checks if code was already used
     logged_in, msg = user_api_client.check_verify_code(user_id, token_data['secret_code'], "email")
 
     if not logged_in:
-        flash("This link has already been used")
-        session['user_details'] = {'id': user_id}
-        return redirect(url_for('.resend_email_link'))
+        return render_template('views/email-link-invalid.html')
     return log_in_user(user_id)
 
 
