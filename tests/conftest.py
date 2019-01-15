@@ -56,6 +56,11 @@ def service_one(api_user_active):
 
 
 @pytest.fixture(scope='function')
+def service_two(api_user_active):
+    return service_json(SERVICE_TWO_ID, 'service two', [api_user_active.id])
+
+
+@pytest.fixture(scope='function')
 def multiple_reply_to_email_addresses(mocker):
     def _get(service_id):
         return [
