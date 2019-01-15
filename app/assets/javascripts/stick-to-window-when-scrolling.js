@@ -14,6 +14,7 @@
     this._appliedClass = null;
     this._$shim = null;
     this._stopped = false;
+    this._hasLoaded = false;
     this._canBeStuck = true;
   };
   StickyElement.prototype.stickyClass = function () {
@@ -308,7 +309,7 @@
   // Recalculate stored dimensions for all sticky elements
   Sticky.prototype.recalculate = function (opts) {
     var self = this;
-    var onDimensionsSet = function () {
+    var onSyncComplete = function () {
       if (_mode === 'dialog') {
         dialog.fitToHeight(self);
         dialog.adjustForResize(self);
@@ -318,9 +319,7 @@
 
     if ((opts !== undefined) && ('mode' in opts)) { _mode = opts.mode; }
 
-    $.each(self._els, function (i, el) {
-      self.setElementDimensions(el, onDimensionsSet);
-    });
+    this.syncWithDOM(onSyncComplete);
   };
   Sticky.prototype.setElWidth = function (el) {
     var $el = el.$fixedEl;
@@ -336,21 +335,21 @@
     var self = this;
     var $el = el.$fixedEl;
     var $img = $el.find('img');
-
-    if ((!self._elsLoaded) && ($img.length > 0)) {
-      var image = new global.Image();
-      image.onload = function () {
-        el.inPageVerticalSpace = $el.outerHeight(true);
-        el.height = $el.outerHeight();
-        el.inPageEdgePosition = self.getInPageEdgePosition(el);
-        callback();
-      };
-      image.src = $img.attr('src');
-    } else {
+    var onload = function () {
       el.inPageVerticalSpace = $el.outerHeight(true);
       el.height = $el.outerHeight();
       el.inPageEdgePosition = self.getInPageEdgePosition(el);
       callback();
+    };
+
+    if ((!el.hasLoaded()) && ($img.length > 0)) {
+      var image = new global.Image();
+      image.onload = function () {
+        onload();
+      };
+      image.src = $img.attr('src');
+    } else {
+      onload();
     }
   };
   Sticky.prototype.allElementsLoaded = function (totalEls) {
@@ -362,14 +361,14 @@
   Sticky.prototype.add = function (el, setPositions, cb) {
     var self = this;
     var $el = $(el);
+    var onDimensionsSet;
     var elObj;
 
     // guard against adding elements already stored
     if (this.hasEl(el)) { return; }
 
-    elObj= new StickyElement($el, self);
-
-    self.setElementDimensions(elObj, function () {
+    onDimensionsSet = function () {
+      elObj.hasLoaded(true);
       self._els.push(elObj);
       if (setPositions) {
         self.setElementPositions();
@@ -377,7 +376,11 @@
       if (cb !== undefined) {
         cb();
       }
-    });
+    };
+
+    elObj = new StickyElement($el, self);
+
+    self.setElementDimensions(elObj, onDimensionsSet);
   }; 
   Sticky.prototype.remove = function (el) {
     if ($.inArray(el, this._els) !== -1) {
@@ -389,28 +392,42 @@
       this._els = $.grep(this._els, function (_el) { return _el !== el; });
     }
   };
-  Sticky.prototype.init = function (opts) {
+  // gets all sticky elements in the DOM and removes any in this._els no longer in attached to it
+  Sticky.prototype.syncWithDOM = function (callback) {
     var self = this;
     var $els = $(self.CSS_SELECTOR);
     var numOfEls = $els.length;
-    var onAllLoaded = function () {
-      if (self._els.length === numOfEls) {
-        self._elsLoaded = true;
-        self.endOfScrollArea = self.getEndOfScrollArea();
+    var onLoaded;
 
-        // set positions based on initial scroll position
-        self.setElementPositions();
+    onLoaded = function () {
+      if (self._els.length === numOfEls) {
+        self.endOfScrollArea = self.getEndOfScrollArea();
+        if (callback !== undefined) {
+          callback();
+        }
       }
     };
 
-    if ((opts !== undefined) && ('mode' in opts)) { _mode = opts.mode; }
+    // remove any els no longer in the DOM
+    if (this._els.length) {
+      $.each(this._els, function (i, el) {
+        if (!el.isInPage()) {
+          self.remove(el);
+        }
+      });
+    }
 
-    if (numOfEls > 0) {
+    if (numOfEls) {
       $els.each(function (i, el) {
         // delay setting position until all stickys are loaded
-        self.add(el, false, onAllLoaded);
+        self.add(el, false, onLoaded);
       });
+    }
+  };
+  Sticky.prototype.init = function (opts) {
+    var self = this;
 
+    if (this._els.length) {
       // flag when scrolling takes place and check (and re-position) sticky elements relative to
       // window position
       if (self._scrollTimeout === false) {
@@ -424,6 +441,8 @@
         self._resizeTimeout = global.setInterval(function (e) { self.checkResize(); }, 50);
       }
     }
+
+    this.recalculate(opts);
   };
   Sticky.prototype.viewportIsWideEnough = function (windowWidth) {
     return windowWidth > 768;
