@@ -35,13 +35,15 @@ stub_template_stats = [
         'template_type': 'sms',
         'template_name': 'one',
         'template_id': 'id-1',
-        'count': 100,
+        'status': 'created',
+        'count': 50,
         'is_precompiled_letter': False
     },
     {
         'template_type': 'email',
         'template_name': 'two',
         'template_id': 'id-2',
+        'status': 'created',
         'count': 200,
         'is_precompiled_letter': False
     },
@@ -49,16 +51,42 @@ stub_template_stats = [
         'template_type': 'letter',
         'template_name': 'three',
         'template_id': 'id-3',
+        'status': 'delivered',
         'count': 300,
+        'is_precompiled_letter': False
+    },
+    {
+        'template_type': 'sms',
+        'template_name': 'one',
+        'template_id': 'id-1',
+        'status': 'delivered',
+        'count': 50,
         'is_precompiled_letter': False
     },
     {
         'template_type': 'letter',
         'template_name': 'four',
         'template_id': 'id-4',
+        'status': 'delivered',
         'count': 400,
         'is_precompiled_letter': True
-    }
+    },
+    {
+        'template_type': 'letter',
+        'template_name': 'four',
+        'template_id': 'id-4',
+        'status': 'cancelled',
+        'count': 5,
+        'is_precompiled_letter': True
+    },
+    {
+        'template_type': 'letter',
+        'template_name': 'thirty-three',
+        'template_id': 'id-33',
+        'status': 'cancelled',
+        'count': 5,
+        'is_precompiled_letter': False
+    },
 ]
 
 

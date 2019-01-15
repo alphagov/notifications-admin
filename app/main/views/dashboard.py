@@ -268,7 +268,7 @@ def get_inbox_partials(service_id):
 
 def aggregate_template_usage(template_statistics, sort_key='count'):
     templates = []
-    template_statistics = [s for s in template_statistics if s.get("status") != "cancelled"]
+    template_statistics = [s for s in template_statistics if s["status"] != "cancelled"]
     for k, v in groupby(sorted(template_statistics, key=lambda x: x['template_id']), key=lambda x: x['template_id']):
         template_stats = list(v)
 
