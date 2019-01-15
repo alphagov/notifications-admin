@@ -571,7 +571,7 @@ def service_set_letters(service_id):
 @user_has_permissions('manage_service')
 def service_set_postage(service_id):
 
-    if not current_service.has_permission('letter'):
+    if (not current_service.has_permission('letter')) or current_service.has_permission('choose_postage'):
         abort(404)
 
     form = ServicePostageForm(postage=current_service.postage)
