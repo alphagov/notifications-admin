@@ -293,7 +293,7 @@ def aggregate_notifications_stats(template_statistics):
     notifications = {
         template_type: {
             status: 0 for status in ('requested', 'delivered', 'failed')
-        } for template_type in current_service.TEMPLATE_TYPES
+        } for template_type in ["sms", "email", "letter"]
     }
     for stat in template_statistics:
         notifications[stat["template_type"]]["requested"] += stat["count"]
