@@ -35,3 +35,9 @@
     {% endif %}
   </div>
 {% endmacro %}
+
+{% macro sticky_page_footer(button_text=None) %}
+  <div class="js-stick-at-bottom-when-scrolling">
+    {{ page_footer(button_text) }}
+  </div>
+{% endmacro %}
