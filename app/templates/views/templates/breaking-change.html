@@ -46,7 +46,7 @@
     column{{ 's' if column_headings|length > 1 else '' }} of data:
   </p>
 
-  <div class="spreadsheet">
+  <div class="spreadsheet fullscreen-content" data-module="fullscreen-table"">
     {% call(item, row_number) list_table(
       example_rows,
       caption="Example",
@@ -64,6 +64,6 @@
     {% endcall %}
   </div>
 
-  <p>Developers, you’ll need to update your API calls</p>
+  <p class="top-gutter">Developers, you’ll need to update your API calls</p>
 
 {% endblock %}
