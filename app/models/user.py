@@ -151,8 +151,11 @@ class User(UserMixin):
     def has_permission_for_service(self, service_id, permission):
         return permission in self._permissions.get(service_id, [])
 
+    def belongs_to_service(self, service_id):
+        return str(service_id) in self.services
+
     def belongs_to_service_or_403(self, service_id):
-        if str(service_id) not in self.services:
+        if not self.belongs_to_service(service_id):
             abort(403)
 
     def is_locked(self):

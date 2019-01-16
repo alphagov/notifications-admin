@@ -2,7 +2,12 @@ import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
 
-from tests.conftest import SERVICE_ONE_ID, normalize_spaces
+from tests.conftest import (
+    SERVICE_ONE_ID,
+    normalize_spaces,
+    service_one,
+    service_two,
+)
 
 SAMPLE_DATA = {
     'organisations': [
@@ -137,3 +142,44 @@ def test_choose_account_should_not_show_back_to_service_link_if_not_signed_in(
 
     assert page.select_one('h1').text == 'Sign in'  # We’re not signed in
     assert page.select_one('.navigation-service a') is None
+
+
+@pytest.mark.parametrize('service, expected_status, page_text', (
+    (service_one, 200, (
+        'Test Service   Switch service '
+        ''
+        'Dashboard '
+        'Templates '
+        'Team members'
+    )),
+    (service_two, 403, (
+        # Page has no ‘back to’ link
+        '403 '
+        'You do not have permission to view this page.'
+    )),
+))
+def test_should_not_show_back_to_service_if_user_doesnt_belong_to_service(
+    client_request,
+    api_user_active,
+    fake_uuid,
+    mock_get_service,
+    mock_get_service_template,
+    mock_get_template_folders,
+    service,
+    expected_status,
+    page_text,
+):
+    mock_get_service.return_value = service(api_user_active)
+
+    page = client_request.get(
+        'main.view_template',
+        service_id=mock_get_service.return_value['id'],
+        template_id=fake_uuid,
+        _expected_status=expected_status,
+    )
+
+    assert normalize_spaces(
+        page.select_one('#content').text
+    ).startswith(
+        normalize_spaces(page_text)
+    )
