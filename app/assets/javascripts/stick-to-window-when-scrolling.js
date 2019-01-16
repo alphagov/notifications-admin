@@ -462,6 +462,9 @@
     }
 
     if (numOfEls) {
+      // reset flag marking page load
+      this._initialPositionsSet = false;
+
       $els.each(function (i, el) {
         // delay setting position until all stickys are loaded
         self.add(el, false, onLoaded);
