@@ -125,7 +125,10 @@ def view_notification(service_id, notification_id):
         can_receive_inbound=(current_service.has_permission('inbound_sms')),
         is_precompiled_letter=notification['template']['is_precompiled_letter'],
         letter_print_day=letter_print_day,
-        show_cancel_button=show_cancel_button
+        show_cancel_button=show_cancel_button,
+        sent_with_test_key=(
+            notification.get('key_type') == KEY_TYPE_TEST
+        ),
     )
 
 

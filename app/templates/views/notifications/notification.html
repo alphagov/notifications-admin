@@ -16,7 +16,7 @@
 
     <p>
       {% if is_precompiled_letter %}
-      Provided as PDF
+        Provided as PDF
       {% else %}
         {% if help %}
           ‘{{ template.name }}’
@@ -51,15 +51,31 @@
           fixed the problem
         </p>
       {% else %}
-        <p>
-          {{ letter_print_day }}
-        </p>
-        <p>
-          Postage: {{ postage }} class
-        </p>
-        <p>
-          Estimated delivery date: {{ estimated_letter_delivery_date|string|format_date_short }}
-        </p>
+        {% if sent_with_test_key %}
+          <p>
+            Postage: {{ postage }} class
+          </p>
+          {% if is_precompiled_letter %}
+            <p>
+              This letter has passed our checks, but it won’t be printed
+              because you used a test key
+            </p>
+          {% else %}
+            <p>
+              This letter won’t be printed because you used a test key
+            </p>
+          {% endif %}
+        {% else %}
+          <p>
+            {{ letter_print_day }}
+          </p>
+          <p>
+            Postage: {{ postage }} class
+          </p>
+          <p>
+            Estimated delivery date: {{ estimated_letter_delivery_date|string|format_date_short }}
+          </p>
+        {% endif %}
       {% endif %}
     {% endif %}
 
