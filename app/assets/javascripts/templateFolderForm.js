@@ -29,6 +29,9 @@
       this.states.filter(state => state.cancellable).forEach((x) => this.addCancelButton(x));
       this.states.filter(state => state.key === 'items-selected-buttons').forEach(x => this.addClearButton(x));
 
+      // activate stickiness of elements in each state
+      this.activateStickyElements();
+
       // first off show the new template / new folder buttons
       this.currentState = this.$form.data('prev-state') || 'unknown';
       if (this.currentState === 'unknown') {
@@ -39,6 +42,18 @@
 
       this.$form.on('click', 'button.button-secondary', (event) => this.actionButtonClicked(event));
       this.$form.on('change', 'input[type=checkbox]', () => this.templateFolderCheckboxChanged());
+    };
+
+    this.activateStickyElements = function() {
+      var oldClass = '.js-will-stick-at-bottom-when-scrolling';
+      var newClass = 'js-stick-at-bottom-when-scrolling';
+
+      this.states.forEach(state => {
+        state.$el
+          .find(oldClass)
+          .removeClass(oldClass)
+          .addClass(newClass);
+      });
     };
 
     this.addCancelButton = function(state) {
