@@ -1314,14 +1314,11 @@ corby.gov.uk:
   owner: Corby Borough Council
   crown: false
   agreement_signed: true
-cornwall-aonb.gov.uk:
-  owner: Cornwall Council
-  crown: false
-  agreement_signed: false
+cornwall-aonb.gov.uk: cornwall.gov.uk
 cornwall.gov.uk:
   owner: Cornwall Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 corsham.gov.uk:
   owner: Corsham Town Council
   crown: false
@@ -2408,10 +2405,7 @@ kent.gov.uk:
   crown: false
   agreement_signed: true
 kentparishes.gov.uk: kent.gov.uk
-kerrier.gov.uk:
-  owner: Cornwall Council
-  crown: false
-  agreement_signed: false
+kerrier.gov.uk: cornwall.gov.uk
 kerrycommunitycouncil.gov.uk:
   owner: Kerry Community Council
   crown: false
