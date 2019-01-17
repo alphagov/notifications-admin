@@ -1,6 +1,7 @@
 import calendar
 from datetime import datetime
 from functools import partial
+from itertools import groupby
 
 from flask import (
     Response,
@@ -265,16 +266,25 @@ def get_inbox_partials(service_id):
     )}
 
 
-def aggregate_usage(template_statistics, sort_key='count'):
-    return sorted(
-        template_statistics,
-        key=lambda template_statistic: template_statistic[sort_key],
-        reverse=True
-    )
+def aggregate_template_usage(template_statistics, sort_key='count'):
+    templates = []
+    template_statistics = [s for s in template_statistics if s.get("status") != "cancelled"]
+    for k, v in groupby(sorted(template_statistics, key=lambda x: x['template_id']), key=lambda x: x['template_id']):
+        template_stats = list(v)
+
+        templates.append({
+            "template_id": k,
+            "template_name": template_stats[0]['template_name'],
+            "template_type": template_stats[0]['template_type'],
+            "is_precompiled_letter": template_stats[0]['is_precompiled_letter'],
+            "count": sum(s['count'] for s in template_stats)
+        })
+
+    return sorted(templates, key=lambda x: x[sort_key], reverse=True)
 
 
 def get_dashboard_partials(service_id):
-    template_statistics = aggregate_usage(
+    template_statistics = aggregate_template_usage(
         template_statistics_client.get_template_statistics_for_service(service_id, limit_days=7)
     )
 

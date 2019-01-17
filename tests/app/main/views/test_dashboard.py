@@ -35,19 +35,22 @@ stub_template_stats = [
         'template_type': 'sms',
         'template_name': 'one',
         'template_id': 'id-1',
-        'count': 100
+        'count': 100,
+        'is_precompiled_letter': False
     },
     {
         'template_type': 'email',
         'template_name': 'two',
         'template_id': 'id-2',
-        'count': 200
+        'count': 200,
+        'is_precompiled_letter': False
     },
     {
         'template_type': 'letter',
         'template_name': 'three',
         'template_id': 'id-3',
-        'count': 300
+        'count': 300,
+        'is_precompiled_letter': False
     },
     {
         'template_type': 'letter',
@@ -1033,8 +1036,8 @@ def test_route_for_service_permissions(
 
 
 def test_aggregate_template_stats():
-    from app.main.views.dashboard import aggregate_usage
-    expected = aggregate_usage(copy.deepcopy(stub_template_stats))
+    from app.main.views.dashboard import aggregate_template_usage
+    expected = aggregate_template_usage(copy.deepcopy(stub_template_stats))
 
     assert len(expected) == 4
     assert expected[0]['template_name'] == 'four'

@@ -2273,7 +2273,7 @@ def mock_get_template_statistics(mocker, service_one, fake_uuid):
         "template_name": template['name'],
         "template_type": template['template_type'],
         "template_id": template['id'],
-        "day": "2016-04-04"
+        "is_precompiled_letter": False
     }
 
     def _get_stats(service_id, limit_days=None):
