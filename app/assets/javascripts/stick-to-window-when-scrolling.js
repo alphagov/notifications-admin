@@ -310,6 +310,7 @@
   Sticky.prototype.recalculate = function (opts) {
     var self = this;
     var onSyncComplete = function () {
+      self.setEvents();
       if (_mode === 'dialog') {
         dialog.fitToHeight(self);
         dialog.adjustForResize(self);
@@ -425,24 +426,23 @@
     }
   };
   Sticky.prototype.init = function (opts) {
+    this.recalculate(opts);
+  };
+  Sticky.prototype.setEvents = function () {
     var self = this;
 
-    if (this._els.length) {
-      // flag when scrolling takes place and check (and re-position) sticky elements relative to
-      // window position
-      if (self._scrollTimeout === false) {
-        $(global).scroll(function (e) { self.onScroll(); });
-        self._scrollTimeout = global.setInterval(function (e) { self.checkScroll(); }, 50);
-      }
-
-      // Recalculate all dimensions when the window resizes
-      if (self._resizeTimeout === false) {
-        $(global).resize(function (e) { self.onResize(); });
-        self._resizeTimeout = global.setInterval(function (e) { self.checkResize(); }, 50);
-      }
+    // flag when scrolling takes place and check (and re-position) sticky elements relative to
+    // window position
+    if (self._scrollTimeout === false) {
+      $(global).scroll(function (e) { self.onScroll(); });
+      self._scrollTimeout = global.setInterval(function (e) { self.checkScroll(); }, 50);
     }
 
-    this.recalculate(opts);
+    // Recalculate all dimensions when the window resizes
+    if (self._resizeTimeout === false) {
+      $(global).resize(function (e) { self.onResize(); });
+      self._resizeTimeout = global.setInterval(function (e) { self.checkResize(); }, 50);
+    }
   };
   Sticky.prototype.viewportIsWideEnough = function (windowWidth) {
     return windowWidth > 768;
