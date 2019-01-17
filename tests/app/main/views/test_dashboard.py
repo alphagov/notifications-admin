@@ -10,7 +10,9 @@ from flask import url_for
 from freezegun import freeze_time
 
 from app.main.views.dashboard import (
+    aggregate_notifications_stats,
     aggregate_status_types,
+    aggregate_template_usage,
     format_monthly_stats_to_list,
     format_template_stats_to_list,
     get_dashboard_totals,
@@ -35,6 +37,15 @@ stub_template_stats = [
         'template_type': 'sms',
         'template_name': 'one',
         'template_id': 'id-1',
+        'status': 'created',
+        'count': 50,
+        'is_precompiled_letter': False
+    },
+    {
+        'template_type': 'email',
+        'template_name': 'two',
+        'template_id': 'id-2',
+        'status': 'created',
         'count': 100,
         'is_precompiled_letter': False
     },
@@ -42,23 +53,50 @@ stub_template_stats = [
         'template_type': 'email',
         'template_name': 'two',
         'template_id': 'id-2',
-        'count': 200,
+        'status': 'technical-failure',
+        'count': 100,
         'is_precompiled_letter': False
     },
     {
         'template_type': 'letter',
         'template_name': 'three',
         'template_id': 'id-3',
+        'status': 'delivered',
         'count': 300,
+        'is_precompiled_letter': False
+    },
+    {
+        'template_type': 'sms',
+        'template_name': 'one',
+        'template_id': 'id-1',
+        'status': 'delivered',
+        'count': 50,
         'is_precompiled_letter': False
     },
     {
         'template_type': 'letter',
         'template_name': 'four',
         'template_id': 'id-4',
+        'status': 'delivered',
         'count': 400,
         'is_precompiled_letter': True
-    }
+    },
+    {
+        'template_type': 'letter',
+        'template_name': 'four',
+        'template_id': 'id-4',
+        'status': 'cancelled',
+        'count': 5,
+        'is_precompiled_letter': True
+    },
+    {
+        'template_type': 'letter',
+        'template_name': 'thirty-three',
+        'template_id': 'id-33',
+        'status': 'cancelled',
+        'count': 5,
+        'is_precompiled_letter': False
+    },
 ]
 
 
@@ -1036,9 +1074,7 @@ def test_route_for_service_permissions(
 
 
 def test_aggregate_template_stats():
-    from app.main.views.dashboard import aggregate_template_usage
     expected = aggregate_template_usage(copy.deepcopy(stub_template_stats))
-
     assert len(expected) == 4
     assert expected[0]['template_name'] == 'four'
     assert expected[0]['count'] == 400
@@ -1056,6 +1092,15 @@ def test_aggregate_template_stats():
     assert expected[3]['count'] == 100
     assert expected[3]['template_id'] == 'id-1'
     assert expected[3]['template_type'] == 'sms'
+
+
+def test_aggregate_notifications_stats():
+    expected = aggregate_notifications_stats(copy.deepcopy(stub_template_stats))
+    assert expected == {
+        "sms": {"requested": 100, "delivered": 50, "failed": 0},
+        "letter": {"requested": 700, "delivered": 700, "failed": 0},
+        "email": {"requested": 200, "delivered": 0, "failed": 100}
+    }
 
 
 def test_service_dashboard_updates_gets_dashboard_totals(

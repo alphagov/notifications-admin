@@ -28,6 +28,7 @@ from app import (
 from app.main import main
 from app.statistics_utils import add_rate_to_job, get_formatted_percentage
 from app.utils import (
+    DELIVERED_STATUSES,
     FAILURE_STATUSES,
     REQUESTED_STATUSES,
     Spreadsheet,
@@ -266,9 +267,13 @@ def get_inbox_partials(service_id):
     )}
 
 
+def filter_out_cancelled_stats(template_statistics):
+    return [s for s in template_statistics if s["status"] != "cancelled"]
+
+
 def aggregate_template_usage(template_statistics, sort_key='count'):
+    template_statistics = filter_out_cancelled_stats(template_statistics)
     templates = []
-    template_statistics = [s for s in template_statistics if s.get("status") != "cancelled"]
     for k, v in groupby(sorted(template_statistics, key=lambda x: x['template_id']), key=lambda x: x['template_id']):
         template_stats = list(v)
 
@@ -283,10 +288,26 @@ def aggregate_template_usage(template_statistics, sort_key='count'):
     return sorted(templates, key=lambda x: x[sort_key], reverse=True)
 
 
+def aggregate_notifications_stats(template_statistics):
+    template_statistics = filter_out_cancelled_stats(template_statistics)
+    notifications = {
+        template_type: {
+            status: 0 for status in ('requested', 'delivered', 'failed')
+        } for template_type in ["sms", "email", "letter"]
+    }
+    for stat in template_statistics:
+        notifications[stat["template_type"]]["requested"] += stat["count"]
+        if stat["status"] in DELIVERED_STATUSES:
+            notifications[stat["template_type"]]["delivered"] += stat["count"]
+        elif stat["status"] in FAILURE_STATUSES:
+            notifications[stat["template_type"]]["failed"] += stat["count"]
+
+    return notifications
+
+
 def get_dashboard_partials(service_id):
-    template_statistics = aggregate_template_usage(
-        template_statistics_client.get_template_statistics_for_service(service_id, limit_days=7)
-    )
+    all_statistics = template_statistics_client.get_template_statistics_for_service(service_id, limit_days=7)
+    template_statistics = aggregate_template_usage(all_statistics)
 
     scheduled_jobs, immediate_jobs = [], []
     if job_api_client.has_jobs(service_id):
@@ -296,7 +317,7 @@ def get_dashboard_partials(service_id):
             for job in job_api_client.get_immediate_jobs(service_id)
         ]
 
-    stats = service_api_client.get_service_statistics(service_id, today_only=False)
+    stats = aggregate_notifications_stats(all_statistics)
     column_width, max_notifiction_count = get_column_properties(
         number_of_columns=(
             3 if current_service.has_permission('letter') else 2
