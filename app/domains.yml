@@ -2812,14 +2812,11 @@ manchester.gov.uk:
   owner: Manchester City Council
   crown: false
   agreement_signed: true
-mansfield-dc.gov.uk:
-  owner: Mansfield District Council
-  crown: false
-  agreement_signed: false
+mansfield-dc.gov.uk: mansfield.gov.uk
 mansfield.gov.uk:
   owner: Mansfield District Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 marchtowncouncil.gov.uk:
   owner: March Town Council
   crown: false
