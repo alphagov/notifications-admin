@@ -5104,6 +5104,10 @@ worthing.gov.uk:
   owner: Worthing Borough Council
   crown: false
   agreement_signed: false
+wra.gov.wales:
+  owner: Welsh Revenue Authority
+  crown: false
+  agreement_signed: true
 wrecsam.gov.uk:
   owner: Wrexham County Borough Council
   crown: false
