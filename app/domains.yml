@@ -1739,7 +1739,7 @@ encor.gov.uk:
 enfield.gov.uk:
   owner: Enfield London Borough Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 eppingforestdc.gov.uk:
   owner: Epping Forest District Council
   crown: false
