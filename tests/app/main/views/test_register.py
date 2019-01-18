@@ -271,6 +271,7 @@ def test_register_from_invite_when_user_registers_in_another_browser(
     assert response.location == url_for('main.verify', _external=True)
 
 
+@pytest.mark.parametrize('invite_email_address', ['gov-user@gov.uk', 'non-gov-user@example.com'])
 def test_register_from_email_auth_invite(
     client,
     sample_invite,
@@ -281,8 +282,11 @@ def test_register_from_email_auth_invite(
     mock_send_verify_code,
     mock_accept_invite,
     mock_create_event,
+    mock_add_user_to_service,
+    invite_email_address,
 ):
     sample_invite['auth_type'] = 'email_auth'
+    sample_invite['email_address'] = invite_email_address
     with client.session_transaction() as session:
         session['invited_user'] = sample_invite
     assert not current_user.is_authenticated
@@ -298,7 +302,7 @@ def test_register_from_email_auth_invite(
 
     resp = client.post(url_for('main.register_from_invite'), data=data)
     assert resp.status_code == 302
-    assert resp.location == url_for('main.add_service', first='first', _external=True)
+    assert resp.location == url_for('main.service_dashboard', service_id=sample_invite['service'], _external=True)
 
     # doesn't send any 2fa code
     assert not mock_send_verify_email.called
@@ -314,6 +318,7 @@ def test_register_from_email_auth_invite(
     mock_accept_invite.assert_called_once_with(sample_invite['service'], sample_invite['id'])
     # just logs them in
     assert current_user.is_authenticated
+    assert mock_add_user_to_service.called
 
     with client.session_transaction() as session:
         # invited user details are still there so they can get added to the service
@@ -330,6 +335,7 @@ def test_can_register_email_auth_without_phone_number(
     mock_send_verify_code,
     mock_accept_invite,
     mock_create_event,
+    mock_add_user_to_service,
 ):
     sample_invite['auth_type'] = 'email_auth'
     with client.session_transaction() as session:
@@ -346,7 +352,7 @@ def test_can_register_email_auth_without_phone_number(
 
     resp = client.post(url_for('main.register_from_invite'), data=data)
     assert resp.status_code == 302
-    assert resp.location == url_for('main.add_service', first='first', _external=True)
+    assert resp.location == url_for('main.service_dashboard', service_id=sample_invite['service'], _external=True)
 
     mock_register_user.assert_called_once_with(
         ANY,

@@ -68,7 +68,6 @@ def register_from_org_invite():
             abort(400)
         _do_registration(form, send_email=False, send_sms=True, organisation_id=invited_org_user['organisation'])
         org_invite_api_client.accept_invite(invited_org_user['organisation'], invited_org_user['id'])
-        user_api_client.add_user_to_organisation(invited_org_user['organisation'], session['user_details']['id'])
 
         return redirect(url_for('main.verify'))
     return render_template('views/register-from-org-invite.html', invited_org_user=invited_org_user, form=form)

@@ -16,6 +16,7 @@ from notifications_utils.url_safe_token import check_token
 from app import user_api_client
 from app.main import main
 from app.main.forms import TwoFactorForm
+from app.models.user import InvitedUser
 from app.utils import redirect_to_sign_in
 
 
@@ -70,10 +71,28 @@ def activate_user(user_id):
     user = user_api_client.get_user(user_id)
     # the user will have a new current_session_id set by the API - store it in the cookie for future requests
     session['current_session_id'] = user.current_session_id
-    organisation_id = session.get('organisation_id', None)
+    organisation_id = session.get('organisation_id')
     activated_user = user_api_client.activate_user(user)
     login_user(activated_user)
+
+    invited_user = session.get('invited_user')
+    if invited_user:
+        service_id = _add_invited_user_to_service(invited_user)
+        return redirect(url_for('main.service_dashboard', service_id=service_id))
+
+    invited_org_user = session.get('invited_org_user')
+    if invited_org_user:
+        user_api_client.add_user_to_organisation(invited_org_user['organisation'], session['user_details']['id'])
+
     if organisation_id:
         return redirect(url_for('main.organisation_dashboard', org_id=organisation_id))
     else:
         return redirect(url_for('main.add_service', first='first'))
+
+
+def _add_invited_user_to_service(invited_user):
+    invitation = InvitedUser(**invited_user)
+    user = user_api_client.get_user(session['user_id'])
+    service_id = invited_user['service']
+    user_api_client.add_user_to_service(service_id, user.id, invitation.permissions)
+    return service_id

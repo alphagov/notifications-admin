@@ -2,27 +2,10 @@ from flask import current_app, redirect, render_template, session, url_for
 from flask_login import login_required
 from notifications_python_client.errors import HTTPError
 
-from app import (
-    billing_api_client,
-    email_branding_client,
-    invite_api_client,
-    service_api_client,
-    user_api_client,
-)
+from app import billing_api_client, email_branding_client, service_api_client
 from app.main import main
 from app.main.forms import CreateServiceForm
-from app.models.user import InvitedUser
 from app.utils import AgreementInfo, email_safe, user_is_gov_user
-
-
-def _add_invited_user_to_service(invited_user):
-    invitation = InvitedUser(**invited_user)
-    # if invited user add to service and redirect to dashboard
-    user = user_api_client.get_user(session['user_id'])
-    service_id = invited_user['service']
-    user_api_client.add_user_to_service(service_id, user.id, invitation.permissions)
-    invite_api_client.accept_invite(service_id, invitation.id)
-    return service_id
 
 
 def _create_service(service_name, organisation_type, email_from, form):
@@ -70,11 +53,6 @@ def _create_example_template(service_id):
 @login_required
 @user_is_gov_user
 def add_service():
-    invited_user = session.get('invited_user')
-    if invited_user:
-        service_id = _add_invited_user_to_service(invited_user)
-        return redirect(url_for('main.service_dashboard', service_id=service_id))
-
     form = CreateServiceForm()
     heading = 'About your service'
 
