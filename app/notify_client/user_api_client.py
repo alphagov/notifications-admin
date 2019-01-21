@@ -129,7 +129,13 @@ class UserApiClient(NotifyAdminAPIClient):
             return True, ''
         except HTTPError as e:
             if e.status_code == 400 or e.status_code == 404:
-                return False, e.message
+                if 'Code not found' in e.message:
+                    return False, 'Code not found'
+                elif 'Code has expired' in e.message:
+                    return False, 'Code has expired'
+                else:
+                    # TODO what is the default message?
+                    return False, 'Code not found'
             raise e
 
     def get_users_for_service(self, service_id):
