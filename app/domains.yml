@@ -4014,7 +4014,7 @@ solihull.gov.uk:
 somerset.gov.uk:
   owner: Somerset County Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 somertontowncouncil.gov.uk:
   owner: Somerton Town Council
   crown: false
