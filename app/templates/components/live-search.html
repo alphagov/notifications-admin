@@ -9,7 +9,7 @@
     {%- set search_label = label or form.search.label.text %}
     {% if show %}
       <div data-module="autofocus">
-        <div class="live-search" data-module="live-search" data-targets="{{ target_selector }}">
+        <div class="live-search js-header" data-module="live-search" data-targets="{{ target_selector }}">
           {{ textbox(
             form.search,
             width='1-1',
