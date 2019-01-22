@@ -197,13 +197,13 @@ def test_notification_page_shows_page_for_letter_notification(
         True,
         'Provided as PDF on 1 January at 1:01am',
         'Postage: second class',
-        'This letter has passed our checks, but it won’t be printed because you used a test key',
+        'This letter passed our checks, but we will not print it because you used a test key.',
     ),
     (
         False,
         '‘sample template’ was sent on 1 January at 1:01am',
         'Postage: second class',
-        'This letter won’t be printed because you used a test key',
+        'We will not print this letter because you used a test key.',
     ),
 ))
 def test_notification_page_shows_page_for_letter_sent_with_test_key(
