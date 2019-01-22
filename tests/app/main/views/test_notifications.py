@@ -191,6 +191,76 @@ def test_notification_page_shows_page_for_letter_notification(
     assert mock_page_count.call_args_list[0][1]['values'] == {'name': 'Jo'}
 
 
+@freeze_time("2016-01-01 01:01")
+@pytest.mark.parametrize('is_precompiled_letter, expected_p1, expected_p2, expected_p3', (
+    (
+        True,
+        'Provided as PDF on 1 January at 1:01am',
+        'Postage: second class',
+        'This letter passed our checks, but we will not print it because you used a test key.',
+    ),
+    (
+        False,
+        '‘sample template’ was sent on 1 January at 1:01am',
+        'Postage: second class',
+        'We will not print this letter because you used a test key.',
+    ),
+))
+def test_notification_page_shows_page_for_letter_sent_with_test_key(
+    client_request,
+    mocker,
+    fake_uuid,
+    is_precompiled_letter,
+    expected_p1,
+    expected_p2,
+    expected_p3,
+):
+
+    mocker.patch(
+        'app.main.views.notifications.view_letter_notification_as_preview',
+        return_value=b'foo'
+    )
+
+    mocker.patch(
+        'app.main.views.notifications.pdf_page_count',
+        return_value=1
+    )
+
+    mocker.patch(
+        'app.main.views.notifications.get_page_count_for_letter',
+        return_value=1,
+    )
+
+    notification = mock_get_notification(
+        mocker,
+        fake_uuid,
+        notification_status='created',
+        template_type='letter',
+        is_precompiled_letter=is_precompiled_letter,
+        postage='second',
+        key_type='test',
+        sent_one_off=False,
+    )
+    notification.created_at = datetime.utcnow()
+
+    page = client_request.get(
+        'main.view_notification',
+        service_id=SERVICE_ONE_ID,
+        notification_id=fake_uuid,
+    )
+
+    assert normalize_spaces(page.select('main p:nth-of-type(1)')[0].text) == (
+        expected_p1
+    )
+    assert normalize_spaces(page.select('main p:nth-of-type(2)')[0].text) == (
+        expected_p2
+    )
+    assert normalize_spaces(page.select('main p:nth-of-type(3)')[0].text) == (
+        expected_p3
+    )
+    assert page.select('p.notification-status') == []
+
+
 @pytest.mark.parametrize('notification_status, expected_message', (
     (
         'permanent-failure',

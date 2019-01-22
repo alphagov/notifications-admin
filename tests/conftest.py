@@ -2693,7 +2693,8 @@ def mock_get_notification(
     template_name='sample template',
     is_precompiled_letter=False,
     key_type=None,
-    postage=None
+    postage=None,
+    sent_one_off=True,
 ):
     def _get_notification(
         service_id,
@@ -2708,11 +2709,12 @@ def mock_get_notification(
         )['notifications'][0]
 
         noti['id'] = notification_id
-        noti['created_by'] = {
-            'id': fake_uuid,
-            'name': 'Test User',
-            'email_address': 'test@user.gov.uk'
-        }
+        if sent_one_off:
+            noti['created_by'] = {
+                'id': fake_uuid,
+                'name': 'Test User',
+                'email_address': 'test@user.gov.uk'
+            }
         noti['personalisation'] = {'name': 'Jo'}
         noti['template'] = template_json(
             service_id,
