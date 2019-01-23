@@ -22,7 +22,7 @@ def email_branding():
 
     return render_template(
         'views/email-branding/select-branding.html',
-        email_brandings=_add_domain_info(brandings),
+        email_brandings=brandings,
         search_form=SearchTemplatesForm(),
         show_search_box=len(brandings) > 9,
         agreement_info=AgreementInfo,
@@ -129,11 +129,3 @@ def create_email_branding(logo=None):
         cdn_url=get_logo_cdn_domain(),
         logo=logo
     )
-
-
-def _add_domain_info(email_brands):
-    for brand in email_brands:
-        yield dict(
-            domain_owner=AgreementInfo(brand.get('domain') or '').owner,
-            **brand
-        )
