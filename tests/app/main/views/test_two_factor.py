@@ -235,11 +235,8 @@ def test_two_factor_email_link_has_expired(
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
-    assert normalize_spaces(
-        page.select_one('.banner-dangerous').text
-    ) == "The link in the email we sent you has expired. We’ve sent you a new one."
-    assert page.h1.text.strip() == 'Email resent'
-    mock_send_verify_code.assert_called_once_with(fake_uuid, 'email', None)
+    assert page.h1.text.strip() == 'The link has expired'
+    mock_send_verify_code.assert_not_called
 
 
 def test_two_factor_email_link_is_invalid(
@@ -272,10 +269,10 @@ def test_two_factor_email_link_is_already_used(
     )
 
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    assert normalize_spaces(
-        page.select_one('.banner-dangerous').text
-    ) == "This link has already been used"
     assert response.status_code == 200
+
+    assert page.h1.text.strip() == 'The link has expired'
+    mock_send_verify_code.assert_not_called
 
 
 def test_two_factor_email_link_when_user_is_locked_out(
@@ -292,10 +289,10 @@ def test_two_factor_email_link_when_user_is_locked_out(
     )
 
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    assert normalize_spaces(
-        page.select_one('.banner-dangerous').text
-    ) == "This link has already been used"
     assert response.status_code == 200
+
+    assert page.h1.text.strip() == 'The link has expired'
+    mock_send_verify_code.assert_not_called
 
 
 def test_two_factor_email_link_used_when_user_already_logged_in(
