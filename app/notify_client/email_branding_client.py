@@ -23,9 +23,6 @@ class EmailBrandingClient(NotifyAdminAPIClient):
                 return branding['id']
         return None
 
-    def get_letter_email_branding(self):
-        return self.get(url='/dvla_organisations')
-
     @cache.delete('email_branding')
     def create_email_branding(self, logo, name, text, colour, domain, brand_type):
         data = {

@@ -51,14 +51,6 @@ def test_get_all_email_branding(mocker):
     )
 
 
-def test_get_letter_email_branding(mocker):
-    mock_get = mocker.patch('app.notify_client.email_branding_client.EmailBrandingClient.get')
-    EmailBrandingClient().get_letter_email_branding()
-    mock_get.assert_called_once_with(
-        url='/dvla_organisations'
-    )
-
-
 def test_create_email_branding(mocker):
     org_data = {'logo': 'test.png', 'name': 'test name', 'text': 'test name', 'colour': 'red',
                 'domain': 'sample.com', 'brand_type': 'org'}
