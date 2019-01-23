@@ -51,6 +51,18 @@
     this._stopped = false;
     this._hasLoaded = false;
     this._canBeStuck = true;
+    this.verticalMargins = {
+      'top': parseInt(this.$fixedEl.css('margin-top'), 10),
+      'bottom': parseInt(this.$fixedEl.css('margin-bottom'), 10),
+    };
+  };
+  StickyElement.prototype._getShimCSS = function () {
+    return {
+      'width': this.horizontalSpace + 'px',
+      'height': this.height + 'px',
+      'margin-top': this.verticalMargins.top + 'px',
+      'margin-bottom': this.verticalMargins.bottom + 'px'
+    };
   };
   StickyElement.prototype.stickyClass = function () {
     return (this._sticky._initialPositionsSet) ? this._fixedClass : this._initialFixedClass;
@@ -80,7 +92,8 @@
   // When a sticky element is moved into the 'stuck' state, a shim is inserted into the
   // page to preserve the space the element occupies in the flow.
   StickyElement.prototype.addShim = function (position) {
-    this._$shim = $('<div class="shim" style="width: ' + this.horizontalSpace + 'px; height: ' + this.inPageVerticalSpace + 'px">&nbsp</div>');
+    this._$shim = $('<div class="shim">&nbsp</div>');
+    this._$shim.css(this._getShimCSS());
     this.$fixedEl[position](this._$shim);
   };
   StickyElement.prototype.removeShim = function () {
@@ -92,10 +105,7 @@
   // Changes to the dimensions of a sticky element with a shim need to be passed on to the shim
   StickyElement.prototype.updateShim = function () {
     if (this._$shim) {
-      this._$shim.css({
-        'height': this.inPageVerticalSpace,
-        'width': this.horizontalSpace
-      });
+      this._$shim.css(this._getShimCSS());
     }
   };
   StickyElement.prototype.stop = function () {
@@ -380,9 +390,13 @@
     var $el = el.$fixedEl;
     var $img = $el.find('img');
     var onload = function () {
-      el.inPageVerticalSpace = $el.outerHeight(true);
       el.height = $el.outerHeight();
-      el.inPageEdgePosition = self.getInPageEdgePosition(el);
+      // if element has a shim, the shim's offset represents the element's in-page position
+      if (el._$shim) {
+        el.inPageEdgePosition = self.getInPageEdgePosition(el._$shim);
+      } else {
+        el.inPageEdgePosition = self.getInPageEdgePosition($el);
+      }
       callback();
     };
 
@@ -557,8 +571,8 @@
     return footer.offset().top - this.STOP_PADDING;
   };
   // position of the bottom edge when in the page flow
-  stickAtTop.getInPageEdgePosition = function (el) {
-    return el.$fixedEl.offset().top;
+  stickAtTop.getInPageEdgePosition = function ($el) {
+    return $el.offset().top;
   };
   stickAtTop.getScrolledFrom = function (el) {
     if (_mode === 'dialog') {
@@ -638,8 +652,8 @@
     return (header.offset().top + header.outerHeight()) + this.STOP_PADDING;
   };
   // position of the bottom edge when in the page flow
-  stickAtBottom.getInPageEdgePosition = function (el) {
-    return el.$fixedEl.offset().top + el.height;
+  stickAtBottom.getInPageEdgePosition = function ($el) {
+    return $el.offset().top + $el.outerHeight();
   };
   stickAtBottom.getScrolledFrom = function (el) {
     if (_mode === 'dialog') {
