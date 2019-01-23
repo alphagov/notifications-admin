@@ -45,3 +45,9 @@
   top: 51px; // aligns bottom edge to bottom of postmark
   right: 145px; // Aligns right edge to midpoint of postmark and fold
 }
+
+.edit-template-link-letter-branding {
+  @extend %edit-template-link;
+  top: 51px; // aligns with ‘change postage’ link
+  left: 66px; // Aligns to left of logo area
+}

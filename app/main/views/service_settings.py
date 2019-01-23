@@ -829,6 +829,7 @@ def service_set_letter_branding(service_id):
 def request_letter_branding(service_id):
     return render_template(
         'views/service-settings/request-letter-branding.html',
+        from_template=request.args.get('from_template'),
     )
 
 
