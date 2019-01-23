@@ -3345,7 +3345,7 @@ orchardpark.gov.uk:
 orkney.gov.uk:
   owner: Orkney Islands Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 oswestry-tc.gov.uk:
   owner: Oswestry Town Council
   crown: false
