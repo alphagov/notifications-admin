@@ -1,4 +1,5 @@
 from datetime import datetime
+from functools import partial
 from unittest.mock import ANY, Mock
 
 import pytest
@@ -428,6 +429,45 @@ def test_user_with_only_send_and_view_sees_letter_page(
         template_id=fake_uuid,
     )
     assert page.select_one('h1').text.strip() == 'Two week reminder'
+
+
+@pytest.mark.parametrize('letter_branding, expected_link, expected_link_text', (
+    (
+        None,
+        partial(url_for, 'main.request_letter_branding', from_template=TEMPLATE_ONE_ID),
+        'Add logo',
+    ),
+    (
+        TEMPLATE_ONE_ID,
+        partial(url_for, 'main.edit_template_postage', template_id=TEMPLATE_ONE_ID),
+        'Change',
+    ),
+))
+def test_letter_with_default_branding_has_add_logo_button(
+    mocker,
+    fake_uuid,
+    client_request,
+    service_one,
+    mock_get_template_folders,
+    mock_get_service_letter_template,
+    single_letter_contact_block,
+    letter_branding,
+    expected_link,
+    expected_link_text,
+):
+    mocker.patch('app.main.views.templates.get_page_count_for_letter', return_value=1)
+    service_one['permissions'] += ['letter']
+    service_one['letter_branding'] = letter_branding
+
+    page = client_request.get(
+        'main.view_template',
+        service_id=SERVICE_ONE_ID,
+        template_id=TEMPLATE_ONE_ID,
+    )
+
+    first_edit_link = page.select_one('.template-container a')
+    assert first_edit_link['href'] == expected_link(service_id=SERVICE_ONE_ID)
+    assert first_edit_link.text == expected_link_text
 
 
 @pytest.mark.parametrize("template_postage,expected_result", [
