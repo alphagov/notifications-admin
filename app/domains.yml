@@ -2888,7 +2888,7 @@ middevon.gov.uk:
 middlesbrough.gov.uk:
   owner: Middlesbrough Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 midhurst-tc.gov.uk:
   owner: Midhurst Town Council
   crown: false
