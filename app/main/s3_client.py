@@ -31,7 +31,9 @@ def delete_s3_object(filename):
     get_s3_object(bucket_name, filename).delete()
 
 
-def rename_s3_object(old_name, new_name):
+def persist_logo(old_name, new_name):
+    if old_name == new_name:
+        return
     bucket_name = current_app.config['LOGO_UPLOAD_BUCKET_NAME']
     get_s3_object(bucket_name, new_name).copy_from(
         CopySource='{}/{}'.format(bucket_name, old_name))
@@ -110,16 +112,11 @@ def upload_logo(filename, filedata, region, user_id):
     return upload_file_name
 
 
-def persist_logo(filename, user_id):
+def permanent_logo_name(filename, user_id):
     if filename.startswith(TEMP_TAG.format(user_id=user_id)):
-        persisted_filename = get_temp_truncated_filename(
-            filename=filename, user_id=user_id)
+        return get_temp_truncated_filename(filename=filename, user_id=user_id)
     else:
         return filename
-
-    rename_s3_object(filename, persisted_filename)
-
-    return persisted_filename
 
 
 def delete_temp_files_created_by(user_id):

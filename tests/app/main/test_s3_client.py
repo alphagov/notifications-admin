@@ -8,7 +8,7 @@ from app.main.s3_client import (
     TEMP_TAG,
     delete_temp_file,
     delete_temp_files_created_by,
-    get_temp_truncated_filename,
+    permanent_logo_name,
     persist_logo,
     set_metadata_on_csv_upload,
     upload_logo,
@@ -44,24 +44,39 @@ def test_upload_logo_calls_correct_args(client, mocker, fake_uuid, upload_filena
 
 def test_persist_logo(client, mocker, fake_uuid, upload_filename):
     mocker.patch.dict('flask.current_app.config', {'LOGO_UPLOAD_BUCKET_NAME': bucket})
-    mocked_rename_s3_object = mocker.patch('app.main.s3_client.rename_s3_object')
+    mocked_get_s3_object = mocker.patch('app.main.s3_client.get_s3_object')
+    mocked_delete_s3_object = mocker.patch('app.main.s3_client.delete_s3_object')
 
-    persisted_filename = persist_logo(filename=upload_filename, user_id=fake_uuid)
+    new_filename = permanent_logo_name(upload_filename, fake_uuid)
 
-    assert mocked_rename_s3_object.called_once_with(
-        upload_filename, get_temp_truncated_filename(upload_filename, fake_uuid))
-    assert persisted_filename == get_temp_truncated_filename(upload_filename, fake_uuid)
+    persist_logo(upload_filename, new_filename)
+
+    assert mocked_get_s3_object.called_once_with(bucket, new_filename)
+    assert mocked_delete_s3_object.called_once_with(bucket, upload_filename)
 
 
 def test_persist_logo_returns_if_not_temp(client, mocker, fake_uuid):
     filename = 'logo.png'
-    mocker.patch.dict('flask.current_app.config', {'LOGO_UPLOAD_BUCKET_NAME': bucket})
-    mocked_rename_s3_object = mocker.patch('app.main.s3_client.rename_s3_object')
+    persist_logo(filename, filename)
 
-    persisted_filename = persist_logo(filename=filename, user_id=fake_uuid)
+    mocked_get_s3_object = mocker.patch('app.main.s3_client.get_s3_object')
+    mocked_delete_s3_object = mocker.patch('app.main.s3_client.delete_s3_object')
 
-    assert not mocked_rename_s3_object.called
-    assert persisted_filename == filename
+    mocked_get_s3_object.assert_not_called()
+    mocked_delete_s3_object.assert_not_called()
+
+
+def test_permanent_logo_name_removes_temp_tag_from_filename(upload_filename, fake_uuid):
+    new_name = permanent_logo_name(upload_filename, fake_uuid)
+
+    assert new_name == 'test_uuid-test.png'
+
+
+def test_permanent_logo_name_does_not_change_filenames_with_no_temp_tag():
+    filename = 'logo.png'
+    new_name = permanent_logo_name(filename, filename)
+
+    assert new_name == filename
 
 
 def test_delete_temp_files_created_by_user(client, mocker, fake_uuid):

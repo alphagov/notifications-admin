@@ -8,6 +8,7 @@ from app.main.s3_client import (
     TEMP_TAG,
     delete_temp_file,
     delete_temp_files_created_by,
+    permanent_logo_name,
     persist_logo,
     upload_logo,
 )
@@ -60,20 +61,22 @@ def update_email_branding(branding_id, logo=None):
 
             return redirect(url_for('.update_email_branding', branding_id=branding_id, logo=upload_filename))
 
-        if logo:
-            logo = persist_logo(logo, session["user_id"])
-
-        delete_temp_files_created_by(session["user_id"])
+        updated_logo_name = permanent_logo_name(logo, session["user_id"]) if logo else None
 
         email_branding_client.update_email_branding(
             branding_id=branding_id,
-            logo=logo,
+            logo=updated_logo_name,
             name=form.name.data,
             text=form.text.data,
             colour=form.colour.data,
             domain=form.domain.data,
             brand_type=form.brand_type.data,
         )
+
+        if logo:
+            persist_logo(logo, updated_logo_name)
+
+        delete_temp_files_created_by(session["user_id"])
 
         return redirect(url_for('.email_branding', branding_id=branding_id))
 
@@ -107,19 +110,21 @@ def create_email_branding(logo=None):
 
             return redirect(url_for('.create_email_branding', logo=upload_filename))
 
-        if logo:
-            logo = persist_logo(logo, session["user_id"])
-
-        delete_temp_files_created_by(session["user_id"])
+        updated_logo_name = permanent_logo_name(logo, session["user_id"]) if logo else None
 
         email_branding_client.create_email_branding(
-            logo=logo,
+            logo=updated_logo_name,
             name=form.name.data,
             text=form.text.data,
             colour=form.colour.data,
             domain=form.domain.data,
             brand_type=form.brand_type.data,
         )
+
+        if logo:
+            persist_logo(logo, updated_logo_name)
+
+        delete_temp_files_created_by(session["user_id"])
 
         return redirect(url_for('.email_branding'))
 
