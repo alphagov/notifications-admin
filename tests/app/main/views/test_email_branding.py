@@ -218,6 +218,60 @@ def test_rejects_non_canonical_domain_when_adding_email_branding(
     assert mock_create_email_branding.called is False
 
 
+def test_create_email_branding_requires_a_name_when_submitting_logo_details(
+    client_request,
+    mocker,
+    fake_uuid,
+    mock_create_email_branding,
+):
+    mocker.patch('app.main.views.email_branding.persist_logo')
+    mocker.patch('app.main.views.email_branding.delete_temp_files_created_by')
+    data = {
+        'operation': 'email-branding-details',
+        'logo': '',
+        'colour': '#ff0000',
+        'text': 'new text',
+        'name': '',
+        'domain': '',
+        'brand_type': 'org',
+    }
+    client_request.login(platform_admin_user(fake_uuid))
+    page = client_request.post(
+        '.create_email_branding',
+        content_type='multipart/form-data',
+        _data=data,
+        _expected_status=200,
+    )
+
+    assert page.select_one('.error-message').text.strip() == 'This field is required'
+    assert mock_create_email_branding.called is False
+
+
+def test_create_email_branding_does_not_require_a_name_when_uploading_a_file(
+    client_request,
+    mocker,
+    fake_uuid,
+):
+    mocker.patch('app.main.views.email_branding.upload_logo', return_value='temp_filename')
+    data = {
+        'file': (BytesIO(''.encode('utf-8')), 'test.png'),
+        'colour': '',
+        'text': '',
+        'name': '',
+        'domain': '',
+        'brand_type': 'org',
+    }
+    client_request.login(platform_admin_user(fake_uuid))
+    page = client_request.post(
+        '.create_email_branding',
+        content_type='multipart/form-data',
+        _data=data,
+        _follow_redirects=True
+    )
+
+    assert not page.find('.error-message')
+
+
 def test_create_new_email_branding_when_branding_saved(
     logged_in_platform_admin_client,
     mocker,

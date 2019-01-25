@@ -848,6 +848,11 @@ class ServiceUpdateEmailBranding(StripWhitespaceForm):
         ]
     )
 
+    def validate_name(form, name):
+        op = request.form.get('operation')
+        if op == 'email-branding-details' and not form.name.data:
+            raise ValidationError('This field is required')
+
 
 class PDFUploadForm(StripWhitespaceForm):
     file = FileField_wtf(
