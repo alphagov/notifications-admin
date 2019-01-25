@@ -13,16 +13,16 @@
       {{ page_footer('Move', button_name='operation', button_value='move-to-existing-folder') }}
       </div>
     </div>
-    <div id="move_to_new_folder_form" class="js-will-stick-at-bottom-when-scrolling">
-      <fieldset>
+    <div id="move_to_new_folder_form">
+      <fieldset class="js-will-stick-at-bottom-when-scrolling">
         <legend class="visuallyhidden">Move to a new folder</legend>
         {{ textbox(templates_and_folders_form.move_to_new_folder_name) }}
         {{ page_footer('Move to a new folder', button_name='operation', button_value='move-to-new-folder') }}
       </fieldset>
     </div>
   {% endif %}
-  <div id="add_new_folder_form" class="js-will-stick-at-bottom-when-scrolling">
-    <fieldset>
+  <div id="add_new_folder_form">
+    <fieldset class="js-will-stick-at-bottom-when-scrolling">
       <legend class="visuallyhidden">Add a new folder</legend>
       {{ textbox(templates_and_folders_form.add_new_folder_name) }}
       {{ page_footer('New folder', button_name='operation', button_value='add-new-folder') }}

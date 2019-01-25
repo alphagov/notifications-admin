@@ -17,12 +17,12 @@
 
       // all the diff states that we want to show or hide
       this.states = [
-        {key: 'nothing-selected-buttons', $el: this.$form.find('#nothing_selected'), cancellable: false, isStickyGroup: false},
-        {key: 'items-selected-buttons', $el: this.$form.find('#items_selected'), cancellable: false, isStickyGroup: false},
-        {key: 'move-to-existing-folder', $el: this.$form.find('#move_to_folder_radios'), cancellable: true, isStickyGroup: true},
-        {key: 'move-to-new-folder', $el: this.$form.find('#move_to_new_folder_form'), cancellable: true, isStickyGroup: false},
-        {key: 'add-new-folder', $el: this.$form.find('#add_new_folder_form'), cancellable: true, isStickyGroup: false},
-        {key: 'add-new-template', $el: this.$form.find('#add_new_template_form'), cancellable: true, isStickyGroup: true}
+        {key: 'nothing-selected-buttons', $el: this.$form.find('#nothing_selected'), cancellable: false},
+        {key: 'items-selected-buttons', $el: this.$form.find('#items_selected'), cancellable: false},
+        {key: 'move-to-existing-folder', $el: this.$form.find('#move_to_folder_radios'), cancellable: true},
+        {key: 'move-to-new-folder', $el: this.$form.find('#move_to_new_folder_form'), cancellable: true},
+        {key: 'add-new-folder', $el: this.$form.find('#add_new_folder_form'), cancellable: true},
+        {key: 'add-new-template', $el: this.$form.find('#add_new_template_form'), cancellable: true}
       ];
 
       // cancel/clear buttons only relevant if JS enabled, so
@@ -45,12 +45,12 @@
     };
 
     this.activateStickyElements = function() {
-      var oldClass = '.js-will-stick-at-bottom-when-scrolling';
+      var oldClass = 'js-will-stick-at-bottom-when-scrolling';
       var newClass = 'js-stick-at-bottom-when-scrolling';
 
       this.states.forEach(state => {
         state.$el
-          .find(oldClass)
+          .find('.' + oldClass)
           .removeClass(oldClass)
           .addClass(newClass);
       });
@@ -146,29 +146,29 @@
 
       // make sticky JS recalculate its cache of the element's position
       // use dialog mode for states which contain more than one form control
-      if (['move-to-existing-folder', 'add-new-template'].includes(this.currentState)) {
-        GOVUK.stickAtBottomWhenScrolling.recalculate({ 'mode': 'dialog' });
-      } else {
-        GOVUK.stickAtBottomWhenScrolling.recalculate();
-      }
+      GOVUK.stickAtBottomWhenScrolling.recalculate({ 'mode': 'dialog' });
     };
 
     this.nothingSelectedButtons = $(`
-      <div id="nothing_selected" class="js-stick-at-bottom-when-scrolling">
-        <button class="button-secondary" value="add-new-template">New template</button>
-        <button class="button-secondary" value="add-new-folder">New folder</button>
-        <div class="template-list-selected-counter">
-          Nothing selected
+      <div id="nothing_selected">
+        <div class="js-stick-at-bottom-when-scrolling">
+          <button class="button-secondary" value="add-new-template">New template</button>
+          <button class="button-secondary" value="add-new-folder">New folder</button>
+          <div class="template-list-selected-counter">
+            Nothing selected
+          </div>
         </div>
       </div>
     `).get(0);
 
     this.itemsSelectedButtons = $(`
-      <div id="items_selected" class="js-stick-at-bottom-when-scrolling">
-        <button class="button-secondary" value="move-to-existing-folder">Move</button>
-        <button class="button-secondary" value="move-to-new-folder">Add to a new folder</button>
-        <div class="template-list-selected-counter">
-          <span class="template-list-selected-counter-count">1</span> selected
+      <div id="items_selected">
+        <div class="js-stick-at-bottom-when-scrolling">
+          <button class="button-secondary" value="move-to-existing-folder">Move</button>
+          <button class="button-secondary" value="move-to-new-folder">Add to a new folder</button>
+          <div class="template-list-selected-counter">
+            <span class="template-list-selected-counter-count">1</span> selected
+          </div>
         </div>
       </div>
     `).get(0);
