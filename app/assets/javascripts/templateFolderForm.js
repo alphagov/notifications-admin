@@ -29,6 +29,9 @@
       this.states.filter(state => state.cancellable).forEach((x) => this.addCancelButton(x));
       this.states.filter(state => state.key === 'items-selected-buttons').forEach(x => this.addClearButton(x));
 
+      // activate stickiness of elements in each state
+      this.activateStickyElements();
+
       // first off show the new template / new folder buttons
       this.currentState = this.$form.data('prev-state') || 'unknown';
       if (this.currentState === 'unknown') {
@@ -39,6 +42,18 @@
 
       this.$form.on('click', 'button.button-secondary', (event) => this.actionButtonClicked(event));
       this.$form.on('change', 'input[type=checkbox]', () => this.templateFolderCheckboxChanged());
+    };
+
+    this.activateStickyElements = function() {
+      var oldClass = 'js-will-stick-at-bottom-when-scrolling';
+      var newClass = 'js-stick-at-bottom-when-scrolling';
+
+      this.states.forEach(state => {
+        state.$el
+          .find('.' + oldClass)
+          .removeClass(oldClass)
+          .addClass(newClass);
+      });
     };
 
     this.addCancelButton = function(state) {
@@ -130,30 +145,33 @@
       );
 
       // make sticky JS recalculate its cache of the element's position
-      if ('stickAtBottomWhenScrolling' in GOVUK) {
-        GOVUK.stickAtBottomWhenScrolling.recalculate();
-      }
+      // use dialog mode for states which contain more than one form control
+      GOVUK.stickAtBottomWhenScrolling.recalculate({ 'mode': 'dialog' });
     };
 
-    this.nothingSelectedButtons = `
+    this.nothingSelectedButtons = $(`
       <div id="nothing_selected">
-        <button class="button-secondary" value="add-new-template">New template</button>
-        <button class="button-secondary" value="add-new-folder">New folder</button>
-        <div class="template-list-selected-counter">
-          Nothing selected
+        <div class="js-stick-at-bottom-when-scrolling">
+          <button class="button-secondary" value="add-new-template">New template</button>
+          <button class="button-secondary" value="add-new-folder">New folder</button>
+          <div class="template-list-selected-counter">
+            Nothing selected
+          </div>
         </div>
       </div>
-    `;
+    `).get(0);
 
-    this.itemsSelectedButtons = `
+    this.itemsSelectedButtons = $(`
       <div id="items_selected">
-        <button class="button-secondary" value="move-to-existing-folder">Move</button>
-        <button class="button-secondary" value="move-to-new-folder">Add to a new folder</button>
-        <div class="template-list-selected-counter">
-          <span class="template-list-selected-counter-count">1</span> selected
+        <div class="js-stick-at-bottom-when-scrolling">
+          <button class="button-secondary" value="move-to-existing-folder">Move</button>
+          <button class="button-secondary" value="move-to-new-folder">Add to a new folder</button>
+          <div class="template-list-selected-counter">
+            <span class="template-list-selected-counter-count">1</span> selected
+          </div>
         </div>
       </div>
-    `;
+    `).get(0);
   };
 
 })(window.GOVUK.Modules);
