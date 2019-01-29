@@ -3468,7 +3468,7 @@ pitchcombe-pc.gov.uk:
 pkc.gov.uk:
   owner: Perth & Kinross Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 plymouth.gov.uk:
   owner: Plymouth City Council
   crown: false
