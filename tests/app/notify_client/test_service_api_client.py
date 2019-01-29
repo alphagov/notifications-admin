@@ -401,6 +401,11 @@ def test_deletes_service_cache(
         'template-{}-version-None'.format(FAKE_TEMPLATE_ID),
         'template-{}-versions'.format(FAKE_TEMPLATE_ID),
     ]),
+    ('update_service_template_postage', [SERVICE_ONE_ID, FAKE_TEMPLATE_ID, 'first'], [
+        'service-{}-templates'.format(SERVICE_ONE_ID),
+        'template-{}-version-None'.format(FAKE_TEMPLATE_ID),
+        'template-{}-versions'.format(FAKE_TEMPLATE_ID),
+    ]),
     ('delete_service_template', [SERVICE_ONE_ID, FAKE_TEMPLATE_ID], [
         'service-{}-templates'.format(SERVICE_ONE_ID),
         'template-{}-version-None'.format(FAKE_TEMPLATE_ID),

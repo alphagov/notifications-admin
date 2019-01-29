@@ -471,6 +471,17 @@ class LetterTemplateForm(EmailTemplateForm):
     )
 
 
+class LetterTemplatePostageForm(StripWhitespaceForm):
+    postage = RadioField(
+        'Choose the postage for this letter template',
+        choices=[
+            ('first', 'First class'),
+            ('second', 'Second class'),
+        ],
+        validators=[DataRequired()]
+    )
+
+
 class ForgotPasswordForm(StripWhitespaceForm):
     email_address = email_address(gov_user=False)
 

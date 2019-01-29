@@ -885,7 +885,7 @@ def mock_get_service_email_template_without_placeholders(mocker):
 
 
 @pytest.fixture(scope='function')
-def mock_get_service_letter_template(mocker, content=None, subject=None, postage=None):
+def mock_get_service_letter_template(mocker, content=None, subject=None, postage='second'):
     def _get(service_id, template_id, version=None, postage=postage):
         template = template_json(
             service_id,

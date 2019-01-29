@@ -1,0 +1,29 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-footer.html" import sticky_page_footer %}
+{% from "components/radios.html" import radios %}
+{% from "components/form.html" import form_wrapper %}
+
+{% block service_page_title %}
+  Edit postage
+{% endblock %}
+
+{% block maincolumn_content %}
+
+    <h1 class="heading-large">
+      Edit postage
+    </h1>
+    {% call form_wrapper() %}
+      <div class="grid-row">
+        <div class="column-five-sixths">
+          {{ radios(form.postage) }}
+          {{ sticky_page_footer(
+            'Save'
+          ) }}
+        </div>
+        <aside class="column-three-quarters">
+          {% include "partials/templates/guidance-postage.html" %}
+        </aside>
+      </div>
+    {% endcall %}
+
+{% endblock %}

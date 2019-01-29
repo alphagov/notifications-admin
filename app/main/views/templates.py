@@ -21,6 +21,7 @@ from app.main.forms import (
     ChooseTemplateType,
     EmailTemplateForm,
     LetterTemplateForm,
+    LetterTemplatePostageForm,
     SearchTemplatesForm,
     SetTemplateSenderForm,
     SMSTemplateForm,
@@ -268,8 +269,7 @@ def add_template_by_type(service_id, template_folder_id=None):
     form = ChooseTemplateType(
         include_letters=current_service.has_permission('letter'),
         include_copy=(
-            current_service.all_templates or
-            len(user_api_client.get_service_ids_for_user(current_user)) > 1
+            current_service.all_templates or len(user_api_client.get_service_ids_for_user(current_user)) > 1
         ),
         include_folder=current_service.has_permission('edit_folders')
     )
@@ -558,9 +558,9 @@ def add_service_template(service_id, template_type, template_folder_id=None):
             )
         except HTTPError as e:
             if (
-                e.status_code == 400 and
-                'content' in e.message and
-                any(['character count greater than' in x for x in e.message['content']])
+                e.status_code == 400
+                and 'content' in e.message
+                and any(['character count greater than' in x for x in e.message['content']])
             ):
                 form.template_content.errors.extend(e.message['content'])
             else:
@@ -625,8 +625,7 @@ def edit_service_template(service_id, template_id):
         template_change = get_template(template, current_service).compare_to(new_template)
         if template_change.placeholders_added and not request.form.get('confirm'):
             example_column_headings = (
-                first_column_headings[new_template.template_type] +
-                list(new_template.placeholders)
+                first_column_headings[new_template.template_type] + list(new_template.placeholders)
             )
             return render_template(
                 'views/templates/breaking-change.html',
@@ -830,6 +829,29 @@ def set_template_sender(service_id, template_id):
         template_id=template_id,
         no_senders=no_senders,
         option_hints=option_hints
+    )
+
+
+@main.route('/services/<service_id>/templates/<template_id>/edit-postage', methods=['GET', 'POST'])
+@login_required
+@user_has_permissions('manage_templates')
+def edit_template_postage(service_id, template_id):
+    template = service_api_client.get_service_template(service_id, template_id)['data']
+    if template["template_type"] != "letter" or not current_service.has_permission("choose_postage"):
+        abort(404)
+    form = LetterTemplatePostageForm(**template)
+    if form.validate_on_submit():
+        postage = form.postage.data
+        service_api_client.update_service_template_postage(service_id, template_id, postage)
+
+        return redirect(url_for('.view_template', service_id=service_id, template_id=template_id))
+
+    return render_template(
+        'views/templates/edit-template-postage.html',
+        form=form,
+        service_id=service_id,
+        template_id=template_id,
+        template_postage=template["postage"]
     )
 
 

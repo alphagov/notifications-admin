@@ -1,4 +1,3 @@
-import re
 from datetime import datetime
 from unittest.mock import ANY, Mock
 
@@ -486,73 +485,71 @@ def test_view_non_letter_template_does_not_display_postage(
     assert "Postage" not in page.text
 
 
-@pytest.mark.parametrize("permissions, expected_result", [
-    (["choose_postage", "letter"], True),
-    (["letter"], False),
-])
-def test_edit_letter_templates_postage_choice_visibility_and_default(
+def test_edit_letter_template_postage_page_displays_correctly(
     client_request,
     service_one,
     active_user_with_permissions,
     mocker,
     fake_uuid,
-    permissions,
-    expected_result
 ):
-    mocker.patch('app.main.views.templates.get_page_count_for_letter', return_value=1)
-    service_one['permissions'] = permissions
+    service_one['permissions'] = ["choose_postage", "letter"]
     client_request.login(active_user_with_permissions)
     mock_get_service_letter_template(mocker)
     page = client_request.get(
-        'main.edit_service_template',
+        'main.edit_template_postage',
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
     )
-    assert bool(page.find(string=re.compile("Choose postage"))) is expected_result
 
-    if expected_result:
-        assert page.select('input[checked]')[0].attrs["value"] == 'None'
+    assert page.select_one('h1').text.strip() == 'Edit postage'
+    assert page.select('input[checked]')[0].attrs["value"] == 'second'
 
 
-@pytest.mark.parametrize("permissions, expected_result", [
-    (["choose_postage", "letter"], "first"),
-    (["letter"], None),
-])
-def test_edit_letter_templates_postage_permissions(
+def test_edit_letter_template_postage_page_404s_if_template_is_not_a_letter(
+    client_request,
+    service_one,
+    mock_get_service_template,
+    active_user_with_permissions,
+    mocker,
+    fake_uuid,
+):
+    service_one['permissions'] = ["choose_postage", "letter"]
+    client_request.login(active_user_with_permissions)
+    page = client_request.get(
+        'main.edit_template_postage',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _expected_status=404
+    )
+
+    assert page.select_one('h1').text.strip() != 'Edit postage'
+
+
+def test_edit_letter_templates_postage_updates_postage(
     logged_in_client,
     service_one,
     mocker,
-    fake_uuid,
-    mock_update_service_template,
-    permissions,
-    expected_result
+    fake_uuid
 ):
-    service_one['permissions'] = permissions
+    mock_update_template_postage = mocker.patch(
+        'app.main.views.templates.service_api_client.update_service_template_postage'
+    )
+    service_one['permissions'] = ["choose_postage", "letter"]
     mock_get_service_letter_template(mocker)
     template_id = fake_uuid
 
     logged_in_client.post(
         url_for(
-            'main.edit_service_template',
+            'main.edit_template_postage',
             service_id=SERVICE_ONE_ID,
             template_id=template_id
         ),
-        data={
-            'name': 'Two week reminder',
-            'template_content': "Some content",
-            'subject': 'Subject',
-            'postage': 'first'
-        }
+        data={'postage': 'first'}
     )
-    mock_update_service_template.assert_called_with(
-        template_id,
-        'Two week reminder',
-        'letter',
-        "Some content",
+    mock_update_template_postage.assert_called_with(
         SERVICE_ONE_ID,
-        'Subject',
-        'normal',
-        postage=expected_result
+        template_id,
+        "first"
     )
 
 

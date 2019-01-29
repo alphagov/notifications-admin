@@ -206,6 +206,15 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             data
         )
 
+    @cache.delete('service-{service_id}-templates')
+    @cache.delete('template-{template_id}-version-None')
+    @cache.delete('template-{template_id}-versions')
+    def update_service_template_postage(self, service_id, template_id, postage):
+        return self.post(
+            "/service/{0}/template/{1}".format(service_id, template_id),
+            _attach_current_user({'postage': postage})
+        )
+
     @cache.set('template-{template_id}-version-{version}')
     def get_service_template(self, service_id, template_id, version=None):
         """
