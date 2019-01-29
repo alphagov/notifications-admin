@@ -280,7 +280,7 @@ naturalresources.wales: cyfoethnaturiolcymru.gov.uk
 cyfoethnaturiolcymru.gov.uk:
   owner: Natural Resources Wales
   crown: true
-  agreement_signed: false  
+  agreement_signed: false
 
 # Other non-crown
 bl.uk:
@@ -1288,7 +1288,7 @@ colwyn-tc.gov.uk:
   crown: false
   agreement_signed: false
 cne-siar.gov.uk:
-  owner: Comhairle nan Eilean Siar 
+  owner: Comhairle nan Eilean Siar
   crown: false
   agreement_signed: true
 congleton-tc.gov.uk:
@@ -1433,10 +1433,7 @@ cyngortrefrhuthun.gov.uk:
   crown: false
   agreement_signed: false
 cyngortrefybarri.gov.uk: valeofglamorgan.gov.uk
-dab-vjb.gov.uk:
-  owner: West Dunbartonshire Council
-  crown: false
-  agreement_signed: false
+dab-vjb.gov.uk: west-dunbarton.gov.uk
 dacorum.gov.uk:
   owner: Dacorum Borough Council
   crown: false
@@ -2360,10 +2357,7 @@ immingham-tc.gov.uk:
   owner: Immingham Town Council
   crown: false
   agreement_signed: false
-internalauditscotland.gov.uk:
-  owner: West Dunbartonshire Council
-  crown: false
-  agreement_signed: false
+internalauditscotland.gov.uk: west-dunbarton.gov.uk
 inverclyde.gov.uk:
   owner: Inverclyde Council
   crown: false
@@ -4872,7 +4866,7 @@ westdorset-weymouth.gov.uk:
 west-dunbarton.gov.uk:
   owner: West Dunbartonshire Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 westerhamtowncouncil.gov.uk:
   owner: Westerham Town Council
   crown: false
