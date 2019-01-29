@@ -2547,8 +2547,8 @@ def mock_get_email_branding_that_can_fit_onscreen(mocker):
 
 
 @pytest.fixture(scope='function')
-def mock_get_letter_email_branding(mocker):
-    def _get_letter_email_branding():
+def mock_get_letter_branding(mocker):
+    def _get_letter_branding():
         return {
             '001': 'HM Government',
             '500': 'Land Registry',
@@ -2556,7 +2556,7 @@ def mock_get_letter_email_branding(mocker):
         }
 
     return mocker.patch(
-        'app.email_branding_client.get_letter_email_branding', side_effect=_get_letter_email_branding
+        'app.letter_branding_client.get_letter_branding', side_effect=_get_letter_branding
     )
 
 
@@ -2566,7 +2566,7 @@ def mock_no_email_branding(mocker):
         return []
 
     return mocker.patch(
-        'app.email_branding_client.get_letter_email_branding', side_effect=_get_email_branding
+        'app.email_branding_client.get_all_email_branding', side_effect=_get_email_branding
     )
 
 

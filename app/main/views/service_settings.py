@@ -19,6 +19,7 @@ from app import (
     current_service,
     email_branding_client,
     inbound_number_client,
+    letter_branding_client,
     organisations_client,
     service_api_client,
     user_api_client,
@@ -854,7 +855,7 @@ def service_preview_email_branding(service_id):
 def set_letter_branding(service_id):
 
     form = LetterBranding(
-        choices=email_branding_client.get_letter_email_branding().items(),
+        choices=letter_branding_client.get_letter_branding().items(),
         dvla_org_id=current_service.dvla_organisation,
     )
 

@@ -61,6 +61,7 @@ from app.notify_client.user_api_client import user_api_client
 from app.notify_client.events_api_client import events_api_client
 from app.notify_client.provider_client import provider_client
 from app.notify_client.email_branding_client import email_branding_client
+from app.notify_client.letter_branding_client import letter_branding_client
 from app.notify_client.organisations_api_client import organisations_client
 from app.notify_client.org_invite_api_client import org_invite_api_client
 from app.notify_client.letter_jobs_client import letter_jobs_client
@@ -125,6 +126,7 @@ def create_app(application):
     events_api_client.init_app(application)
     provider_client.init_app(application)
     email_branding_client.init_app(application)
+    letter_branding_client.init_app(application)
     organisations_client.init_app(application)
     letter_jobs_client.init_app(application)
     inbound_number_client.init_app(application)
