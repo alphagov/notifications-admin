@@ -150,7 +150,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
     @cache.delete('template-{id_}-version-None')
     @cache.delete('template-{id_}-versions')
     def update_service_template(
-        self, id_, name, type_, content, service_id, subject=None, process_type=None, postage=None
+        self, id_, name, type_, content, service_id, subject=None, process_type=None
     ):
         """
         Update a service template.
@@ -169,14 +169,6 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         if process_type:
             data.update({
                 'process_type': process_type
-            })
-        if postage in ["first", "second"]:
-            data.update({
-                'postage': postage
-            })
-        elif postage == 'None':
-            data.update({
-                'postage': None
             })
         data = _attach_current_user(data)
         endpoint = "/service/{0}/template/{1}".format(service_id, id_)

@@ -1320,7 +1320,7 @@ def test_should_redirect_when_saving_a_template(
     assert response.location == url_for(
         '.view_template', service_id=service['id'], template_id=template_id, _external=True)
     mock_update_service_template.assert_called_with(
-        template_id, name, 'sms', content, service['id'], None, 'normal', postage=None)
+        template_id, name, 'sms', content, service['id'], None, 'normal')
 
 
 def test_should_edit_content_when_process_type_is_priority_not_platform_admin(
@@ -1356,8 +1356,7 @@ def test_should_edit_content_when_process_type_is_priority_not_platform_admin(
         "new template <em>content</em> with & entity",
         service['id'],
         None,
-        'priority',
-        postage=None
+        'priority'
     )
 
 
@@ -1646,7 +1645,7 @@ def test_should_redirect_when_saving_a_template_email(
         template_id=template_id,
         _external=True)
     mock_update_service_template.assert_called_with(
-        template_id, name, 'email', content, service_id, subject, 'normal', postage=None)
+        template_id, name, 'email', content, service_id, subject, 'normal')
 
 
 def test_should_show_delete_template_page_with_time_block(

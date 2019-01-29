@@ -614,12 +614,6 @@ def edit_service_template(service_id, template_id):
             'process_type': form.process_type.data,
             'reply_to_text': template['reply_to_text'],
         }
-        if current_service.has_permission("choose_postage") and template["template_type"] == "letter":
-            postage = {"postage": form.postage.data}
-        else:
-            postage = {}
-
-        new_template_data.update(postage)
 
         new_template = get_template(new_template_data, current_service)
         template_change = get_template(template, current_service).compare_to(new_template)
@@ -648,7 +642,6 @@ def edit_service_template(service_id, template_id):
                 service_id,
                 subject,
                 form.process_type.data,
-                postage=postage.get("postage")
             )
         except HTTPError as e:
             if e.status_code == 400:
@@ -679,7 +672,6 @@ def edit_service_template(service_id, template_id):
         return render_template(
             'views/edit-{}-template.html'.format(template['template_type']),
             form=form,
-            can_choose_postage=current_service.has_permission("choose_postage"),
             template_id=template_id,
             template_type=template['template_type'],
             heading_action='Edit',

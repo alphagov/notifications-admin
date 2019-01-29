@@ -18,9 +18,6 @@
       <div class="grid-row">
         <div class="column-five-sixths">
           {{ textbox(form.name, width='1-1', hint='Your recipients won’t see this', rows=10) }}
-          {% if can_choose_postage %}
-            {{ radios(form.postage, hint='Go to Settings to change default postage for your service') }}
-          {% endif %}
           {{ textbox(form.subject, width='1-1', highlight_tags=True, rows=2) }}
           {{ textbox(form.template_content, highlight_tags=True, width='1-1', rows=8) }}
           {{ sticky_page_footer(
