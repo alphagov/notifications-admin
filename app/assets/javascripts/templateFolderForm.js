@@ -19,10 +19,10 @@
       this.states = [
         {key: 'nothing-selected-buttons', $el: this.$form.find('#nothing_selected'), cancellable: false},
         {key: 'items-selected-buttons', $el: this.$form.find('#items_selected'), cancellable: false},
-        {key: 'move-to-existing-folder', $el: this.$form.find('#move_to_folder_radios'), cancellable: true},
-        {key: 'move-to-new-folder', $el: this.$form.find('#move_to_new_folder_form'), cancellable: true},
-        {key: 'add-new-folder', $el: this.$form.find('#add_new_folder_form'), cancellable: true},
-        {key: 'add-new-template', $el: this.$form.find('#add_new_template_form'), cancellable: true}
+        {key: 'move-to-existing-folder', $el: this.$form.find('#move_to_folder_radios'), cancellable: true, setFocus: this.getFocusRoutine('#move_to_folder_radios fieldset', true)},
+        {key: 'move-to-new-folder', $el: this.$form.find('#move_to_new_folder_form'), cancellable: true, setFocus: this.getFocusRoutine('#move_to_new_folder_name', false)},
+        {key: 'add-new-folder', $el: this.$form.find('#add_new_folder_form'), cancellable: true, setFocus: this.getFocusRoutine('#add_new_folder_name', false)},
+        {key: 'add-new-template', $el: this.$form.find('#add_new_template_form'), cancellable: true, setFocus: this.getFocusRoutine('#add_new_template_form fieldset', true)}
       ];
 
       // cancel/clear buttons only relevant if JS enabled, so
@@ -42,6 +42,18 @@
 
       this.$form.on('click', 'button.button-secondary', (event) => this.actionButtonClicked(event));
       this.$form.on('change', 'input[type=checkbox]', () => this.templateFolderCheckboxChanged());
+    };
+
+    this.getFocusRoutine = function (selector, setTabindex) {
+      return function () {
+        let $el = $(selector);
+
+        if (setTabindex) {
+          $el.attr('tabindex', '-1');
+        }
+
+        $el.focus();
+      };
     };
 
     this.activateStickyElements = function() {
@@ -139,12 +151,15 @@
     };
 
     this.render = function() {
-      var mode = 'default';
+      let mode = 'default';
+      let currentStateObj = this.states.filter(state => { return (state.key === this.currentState); })[0];
 
       // detach everything, unless they are the currentState
       this.states.forEach(
         state => (state.key === this.currentState ? this.$stickyBottom.append(state.$el) : state.$el.detach())
       );
+
+      if (currentStateObj && ('setFocus' in currentStateObj)) { currentStateObj.setFocus(); }
 
       // use dialog mode for states which contain more than one form control
       if (['move-to-existing-folder', 'add-new-template'].indexOf(this.currentState) !== -1) {

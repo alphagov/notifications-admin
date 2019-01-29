@@ -4,10 +4,15 @@
 .js-stick-at-top-when-scrolling,
 .js-stick-at-bottom-when-scrolling {
 
-  overflow: hidden;
+  @extend %contain-floats;
   margin-left: -$gutter-half;
   padding: 10px 0 0 $gutter-half;
   position: relative;
+
+  fieldset:focus {
+    outline: solid 3px $focus-colour;
+    outline-offset: $gutter-half;
+  }
 
   .form-group {
     margin-bottom: 20px;
