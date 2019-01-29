@@ -4081,7 +4081,7 @@ southlakeland.gov.uk:
 southlanarkshire.gov.uk:
   owner: South Lanarkshire Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 south-norfolk.gov.uk:
   owner: South Norfolk Council
   crown: false
