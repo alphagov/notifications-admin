@@ -43,7 +43,6 @@ from app.main.forms import (
     ServiceEditInboundNumberForm,
     ServiceInboundNumberForm,
     ServiceLetterContactBlockForm,
-    ServicePostageForm,
     ServicePreviewBranding,
     ServiceReplyToEmailForm,
     ServiceSetBranding,
@@ -272,14 +271,6 @@ def service_switch_can_upload_document(service_id):
         return redirect(url_for('.service_settings', service_id=service_id))
 
     return render_template('views/service-settings/contact_link.html', form=form)
-
-
-@main.route("/services/<service_id>/service-settings/can-choose-postage")
-@login_required
-@user_is_platform_admin
-def service_switch_can_choose_postage(service_id):
-    current_service.switch_permission('choose_postage')
-    return redirect(url_for('.service_settings', service_id=service_id))
 
 
 @main.route("/services/<service_id>/service-settings/archive", methods=['GET', 'POST'])
@@ -544,23 +535,6 @@ def service_set_channel(service_id, channel):
         'views/service-settings/set-{}.html'.format(channel),
         form=form,
     )
-
-
-@main.route("/services/<service_id>/service-settings/set-postage", methods=['GET', 'POST'])
-@login_required
-@user_has_permissions('manage_service')
-def service_set_postage(service_id):
-
-    if (not current_service.has_permission('letter')) or current_service.has_permission('choose_postage'):
-        abort(404)
-
-    form = ServicePostageForm(postage=current_service.postage)
-
-    if form.validate_on_submit():
-        current_service.update(postage=form.postage.data)
-        return redirect(url_for(".service_settings", service_id=service_id))
-
-    return render_template('views/service-settings/set-postage.html', form=form)
 
 
 @main.route("/services/<service_id>/service-settings/set-auth-type", methods=['GET'])

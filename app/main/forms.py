@@ -715,17 +715,6 @@ class ServiceSwitchChannelForm(StripWhitespaceForm):
     )
 
 
-class ServicePostageForm(StripWhitespaceForm):
-
-    postage = RadioField(
-        'Choose your postage',
-        choices=[
-            ('first', 'First class only'),
-            ('second', 'Second class only'),
-        ],
-    )
-
-
 class FieldWithNoneOption():
 
     # This is a special value that is specific to our forms. This is
