@@ -1190,7 +1190,7 @@ chickerell-tc.gov.uk:
 chiltern.gov.uk:
   owner: Chiltern District Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 chiltondurham-tc.gov.uk:
   owner: Chilton Town Council
   crown: false
@@ -1567,7 +1567,7 @@ dronfield.gov.uk:
 dudley.gov.uk:
   owner: Dudley Metropolitan Borough Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 dumgal.gov.uk:
   owner: Dumfries and Galloway Council
   crown: false
@@ -1708,7 +1708,7 @@ eden.gov.uk:
 edinburgh.gov.uk:
   owner: The City of Edinburgh Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 eldc.gov.uk:
   owner: East Lindsey District Council
   crown: false
@@ -2075,7 +2075,7 @@ harborough.gov.uk:
 haringey.gov.uk:
   owner: Haringey London Borough Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 harlow.gov.uk:
   owner: Harlow District Council
   crown: false
@@ -3866,7 +3866,7 @@ sedgemoor.gov.uk:
 sefton.gov.uk:
   owner: Sefton Metropolitan Borough Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 selby.gov.uk:
   owner: Selby District Council
   crown: false
@@ -4047,7 +4047,7 @@ south-ayrshire.gov.uk:
 southbucks.gov.uk:
   owner: South Buckinghamshire District Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 south-derbys.gov.uk:
   owner: South Derbyshire District Council
   crown: false
