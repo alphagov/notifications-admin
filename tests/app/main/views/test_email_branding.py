@@ -27,6 +27,7 @@ def test_email_branding_page_shows_full_branding_list(
     links = page.select('.message-name a')
     brand_names = [normalize_spaces(link.text) for link in links]
     hrefs = [link['href'] for link in links]
+    brand_hints = [normalize_spaces(hint.text) for hint in page.select('.message-type')]
 
     assert normalize_spaces(
         page.select_one('h1').text
@@ -34,8 +35,14 @@ def test_email_branding_page_shows_full_branding_list(
 
     assert page.select_one('.column-three-quarters a')['href'] == url_for('main.create_email_branding')
 
-    assert brand_names == [
-        'org 1', 'org 2', 'org 3', 'org 4', 'org 5'
+    assert list(zip(
+        brand_names, brand_hints
+    )) == [
+        ('org 1', '–'),
+        ('org 2', '–'),
+        ('org 3', '–'),
+        ('org 4', 'Default for nhs.uk'),
+        ('org 5', 'Default for voa.gov.uk'),
     ]
     assert hrefs == [
         url_for('.update_email_branding', branding_id=1),

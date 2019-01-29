@@ -26,11 +26,13 @@
             {{ brand.name or 'Unnamed' }}
           </a>
         </div>
-        {% if brand.domain_owner %}
-          <p class="message-type">
-            Default for {{ brand.domain_owner }}
-          </p>
-        {% endif %}
+        <p class="message-type">
+          {% if brand.domain %}
+            Default for {{ brand.domain }}
+          {% else %}
+            –
+          {% endif %}
+        </p>
       </div>
     {% endfor %}
   </nav>
