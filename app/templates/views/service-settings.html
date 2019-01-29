@@ -81,7 +81,7 @@
 
         {% call settings_row(if_has_permission='email') %}
           {{ text_field('Email reply-to addresses') }}
-          {% call field(status='default' if default_reply_to_email_address == None else '') %}
+          {% call field(status='default' if current_service.count_email_reply_to_addresses == 0 else '') %}
             {{ current_service.default_email_reply_to_address or 'Not set' }}
             {% if current_service.count_email_reply_to_addresses > 1 %}
               <div class="hint">
