@@ -281,6 +281,10 @@ cyfoethnaturiolcymru.gov.uk:
   owner: Natural Resources Wales
   crown: true
   agreement_signed: false
+gov.wales:
+  owner: Welsh Government
+  crown: true
+  agreement_signed: false
 
 # Other non-crown
 bl.uk:
