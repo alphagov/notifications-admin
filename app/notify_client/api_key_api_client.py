@@ -7,8 +7,6 @@ KEY_TYPE_TEST = 'test'
 
 
 class ApiKeyApiClient(NotifyAdminAPIClient):
-    def __init__(self):
-        super().__init__("a" * 73, "b")
 
     def get_api_keys(self, service_id):
         return self.get(url='/service/{}/api-keys'.format(service_id))

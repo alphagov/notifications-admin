@@ -18,9 +18,6 @@ class JobApiClient(NotifyAdminAPIClient):
 
     NON_SCHEDULED_JOB_STATUSES = JOB_STATUSES - {'scheduled', 'cancelled'}
 
-    def __init__(self):
-        super().__init__("a" * 73, "b")
-
     @staticmethod
     def __convert_statistics(job):
         results = defaultdict(int)

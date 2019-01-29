@@ -3,8 +3,6 @@ from app.notify_client import NotifyAdminAPIClient, _attach_current_user
 
 
 class ProviderClient(NotifyAdminAPIClient):
-    def __init__(self):
-        super().__init__("a" * 73, "b")
 
     def get_all_providers(self):
         return self.get(
