@@ -48,7 +48,7 @@ from app.main.forms import (
     ServiceReplyToEmailForm,
     ServiceSetBranding,
     ServiceSmsSenderForm,
-    ServiceSwitchLettersForm,
+    ServiceSwitchChannelForm,
     SMSPrefixForm,
     branding_options_dict,
 )
@@ -368,15 +368,6 @@ def service_set_contact_link(service_id):
     return render_template('views/service-settings/contact_link.html', form=form)
 
 
-@main.route("/services/<service_id>/service-settings/set-email", methods=['GET'])
-@login_required
-@user_has_permissions('manage_service')
-def service_set_email(service_id):
-    return render_template(
-        'views/service-settings/set-email.html',
-    )
-
-
 @main.route("/services/<service_id>/service-settings/set-reply-to-email", methods=['GET'])
 @login_required
 @user_has_permissions('manage_service')
@@ -484,15 +475,6 @@ def service_set_inbound_number(service_id):
     )
 
 
-@main.route("/services/<service_id>/service-settings/set-sms", methods=['GET'])
-@login_required
-@user_has_permissions('manage_service')
-def service_set_sms(service_id):
-    return render_template(
-        'views/service-settings/set-sms.html',
-    )
-
-
 @main.route("/services/<service_id>/service-settings/sms-prefix", methods=['GET', 'POST'])
 @login_required
 @user_has_permissions('manage_service')
@@ -546,23 +528,41 @@ def service_set_inbound_sms(service_id):
     )
 
 
-@main.route("/services/<service_id>/service-settings/set-letters", methods=['GET', 'POST'])
+@main.route("/services/<service_id>/service-settings/set-letters", methods=['GET'])
 @login_required
 @user_has_permissions('manage_service')
 def service_set_letters(service_id):
-    form = ServiceSwitchLettersForm(
-        enabled='on' if current_service.has_permission('letter') else 'off'
+    return redirect(url_for(
+        '.service_set_channel',
+        service_id=current_service.id,
+        channel='letter',
+    ))
+
+
+@main.route("/services/<service_id>/service-settings/set-<channel>", methods=['GET', 'POST'])
+@login_required
+@user_has_permissions('manage_service')
+def service_set_channel(service_id, channel):
+
+    if channel not in {'email', 'sms', 'letter'}:
+        abort(404)
+
+    form = ServiceSwitchChannelForm(
+        channel=channel,
+        enabled='on' if current_service.has_permission(channel) else 'off'
     )
+
     if form.validate_on_submit():
         current_service.force_permission(
-            'letter',
+            channel,
             on=(form.enabled.data == 'on'),
         )
         return redirect(
             url_for(".service_settings", service_id=service_id)
         )
+
     return render_template(
-        'views/service-settings/set-letters.html',
+        'views/service-settings/set-{}.html'.format(channel),
         form=form,
     )
 

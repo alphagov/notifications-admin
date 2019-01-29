@@ -1,37 +1,37 @@
 {% extends "withnav_template.html" %}
-{% from "components/textbox.html" import textbox %}
+{% from "components/form.html" import form_wrapper %}
 {% from "components/page-footer.html" import page_footer %}
+{% from "components/radios.html" import radios %}
 
 {% block service_page_title %}
-  Text messages
+  Send text messages
 {% endblock %}
 
 {% block maincolumn_content %}
 
   <div class="grid-row">
     <div class="column-five-sixths">
-      <h1 class="heading-large">Text messages</h1>
-      {% if 'sms' in current_service.permissions %}
-        <p>
-          Your service can send text messages.
-        </p>
-        <p>
-          If you want to turn it off,
-          <a href="{{ url_for('.support') }}">get in touch with the GOV.UK Notify team</a>.
-        </p>
-      {% else %}
-        <p>
-          Sending text messages is an invitation&#8209;only feature.
-        </p>
-        <p>
-          If you want to try it out,
-          <a href="{{ url_for('.support') }}">get in touch with the GOV.UK Notify team</a>.
-        </p>
-      {% endif %}
-      {{ page_footer(
-        back_link=url_for('.service_settings', service_id=current_service.id),
-        back_link_text='Back to settings'
-      ) }}
+      <h1 class="heading-large">Send text messages</h1>
+      <p>
+        You have a free allowance of
+        {{ '{:,}'.format(current_service.free_sms_fragment_limit) }} text messages each
+        financial year.
+      </p>
+      <p>
+        It costs 1.58 pence (plus VAT) for each text message you send
+        after your free allowance.
+      </p>
+      <p>
+        See <a href="{{ url_for(".pricing", _anchor="letters") }}">pricing</a> for more details.
+      </p>
+      {% call form_wrapper() %}
+        {{ radios(form.enabled) }}
+        {{ page_footer(
+          'Save',
+          back_link=url_for('.service_settings', service_id=current_service.id),
+          back_link_text='Back to settings'
+        ) }}
+      {% endcall %}
     </div>
   </div>
 

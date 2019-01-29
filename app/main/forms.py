@@ -696,10 +696,18 @@ class ServiceLetterContactBlockForm(StripWhitespaceForm):
             )
 
 
-class ServiceSwitchLettersForm(StripWhitespaceForm):
+class ServiceSwitchChannelForm(StripWhitespaceForm):
+
+    def __init__(self, channel, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.enabled.label.text = 'Send {}'.format({
+            'email': 'emails',
+            'sms': 'text messages',
+            'letter': 'letters',
+        }.get(channel))
 
     enabled = RadioField(
-        'Send letters',
+        'Choices',
         choices=[
             ('on', 'On'),
             ('off', 'Off'),
