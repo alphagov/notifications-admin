@@ -110,9 +110,14 @@
 
   &-selected-counter {
     position: absolute;
-    right: $gutter-half;
+    right: 0;
     top: $gutter - 1px;
     color: $secondary-text-colour;
+
+    .content-fixed & {
+      right: $gutter-half;
+    }
+
   }
 
 }
