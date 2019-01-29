@@ -234,18 +234,20 @@
           )}}
         {% endcall %}
 
-        {% call settings_row(if_has_permission='letter') %}
-          {{ text_field('Postage') }}
+        {% if current_service.has_permission('letter') and not current_service.has_permission('choose_postage') %}
+          {% call settings_row() %}
+            {{ text_field('Postage') }}
             {% set postage = {'first': 'First class only', 'second': 'Second class only'} %}
             {{ text_field(postage[current_service.postage]) }}
-          {{ edit_field(
-              'Change',
-              url_for('.service_set_postage',
-              service_id=current_service.id),
-              permissions=['manage_service']
-          )
-          }}
-        {% endcall %}
+            {{ edit_field(
+                'Change',
+                url_for('.service_set_postage',
+                service_id=current_service.id),
+                permissions=['manage_service']
+            )
+            }}
+          {% endcall %}
+        {% endif %}
 
       {% endcall %}
     </div>

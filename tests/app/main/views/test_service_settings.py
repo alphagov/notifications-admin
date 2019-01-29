@@ -233,6 +233,31 @@ def test_if_cant_send_letters_then_cant_see_postage(
     assert 'Postage' not in letter_table
 
 
+def test_if_can_choose_postage_on_template_cant_choose_on_service(
+    client_request,
+    service_one,
+    single_reply_to_email_address,
+    single_letter_contact_block,
+    mock_get_service_organisation,
+    single_sms_sender,
+    mock_get_service_settings_page_common,
+):
+    service_one['permissions'] = ['letter', 'choose_postage']
+    page = client_request.get('main.service_settings', service_id=SERVICE_ONE_ID)
+
+    letter_table = page.find_all('table')[3]
+    rows = letter_table.select('tbody tr')
+
+    assert len(rows) == 3
+    assert 'Postage' not in letter_table
+
+    client_request.get(
+        'main.service_set_postage',
+        service_id=SERVICE_ONE_ID,
+        _expected_status=404,
+    )
+
+
 def test_if_cant_send_letters_then_cant_see_letter_contact_block(
         client_request,
         service_one,
