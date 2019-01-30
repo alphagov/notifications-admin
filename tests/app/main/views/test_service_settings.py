@@ -2548,7 +2548,7 @@ def test_old_set_letters_page_redirects(
     client_request.get(
         'main.service_set_letters',
         service_id=SERVICE_ONE_ID,
-        _expected_status=302,
+        _expected_status=301,
         _expected_redirect=url_for(
             'main.service_set_channel',
             service_id=SERVICE_ONE_ID,

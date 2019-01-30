@@ -532,11 +532,14 @@ def service_set_inbound_sms(service_id):
 @login_required
 @user_has_permissions('manage_service')
 def service_set_letters(service_id):
-    return redirect(url_for(
-        '.service_set_channel',
-        service_id=current_service.id,
-        channel='letter',
-    ))
+    return redirect(
+        url_for(
+            '.service_set_channel',
+            service_id=current_service.id,
+            channel='letter',
+        ),
+        code=301,
+    )
 
 
 @main.route("/services/<service_id>/service-settings/set-<channel>", methods=['GET', 'POST'])
