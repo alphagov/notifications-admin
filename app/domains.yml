@@ -1604,7 +1604,7 @@ dursleytowncouncil.gov.uk:
 ealing.gov.uk:
   owner: Ealing Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 earley-tc.gov.uk:
   owner: Earley Town Council
   crown: false
