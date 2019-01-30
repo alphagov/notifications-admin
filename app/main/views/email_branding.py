@@ -4,7 +4,7 @@ from flask_login import login_required
 from app import email_branding_client
 from app.main import main
 from app.main.forms import SearchTemplatesForm, ServiceUpdateEmailBranding
-from app.main.s3_client import (
+from app.s3_client.s3_logo_client import (
     TEMP_TAG,
     delete_temp_file,
     delete_temp_files_created_by,

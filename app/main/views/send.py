@@ -42,7 +42,11 @@ from app.main.forms import (
     SetSenderForm,
     get_placeholder_form_instance,
 )
-from app.main.s3_client import s3download, s3upload, set_metadata_on_csv_upload
+from app.s3_client.s3_csv_client import (
+    s3download,
+    s3upload,
+    set_metadata_on_csv_upload,
+)
 from app.template_previews import TemplatePreview, get_page_count_for_letter
 from app.utils import (
     Spreadsheet,

@@ -78,7 +78,7 @@ def test_downloading_agreement(
     expected_file_served,
 ):
     mock_get_s3_object = mocker.patch(
-        'app.main.s3_client.get_s3_object',
+        'app.s3_client.s3_mou_client.get_s3_object',
         return_value=_MockS3Object(b'foo')
     )
     user = active_user_with_permissions(fake_uuid)
@@ -100,7 +100,7 @@ def test_agreement_cant_be_downloaded_unknown_crown_status(
     fake_uuid,
 ):
     mock_get_s3_object = mocker.patch(
-        'app.main.s3_client.get_s3_object',
+        'app.s3_client.s3_mou_client.get_s3_object',
         return_value=_MockS3Object()
     )
     user = active_user_with_permissions(fake_uuid)
@@ -116,7 +116,7 @@ def test_agreement_requires_login(
     mocker,
 ):
     mock_get_s3_object = mocker.patch(
-        'app.main.s3_client.get_s3_object',
+        'app.s3_client.s3_mou_client.get_s3_object',
         return_value=_MockS3Object()
     )
     response = client.get(url_for('main.download_agreement'))
@@ -142,7 +142,7 @@ def test_show_public_agreement_page(
     expected_status,
 ):
     mocker.patch(
-        'app.main.s3_client.get_s3_object',
+        'app.s3_client.s3_mou_client.get_s3_object',
         return_value=_MockS3Object()
     )
     response = client.get(url_for(

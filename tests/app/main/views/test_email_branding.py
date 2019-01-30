@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 from flask import url_for
 from notifications_python_client.errors import HTTPError
 
-from app.main.s3_client import LOGO_LOCATION_STRUCTURE, TEMP_TAG
+from app.s3_client.s3_logo_client import LOGO_LOCATION_STRUCTURE, TEMP_TAG
 from tests.conftest import (
     mock_get_email_branding,
     normalize_spaces,
