@@ -320,7 +320,7 @@ def test_should_show_new_template_choices_if_service_has_folder_permission(
     if not page.select('#add_new_template_form'):
         raise ElementNotFound()
 
-    assert normalize_spaces(page.select_one('#add_new_template_form fieldset fieldset legend').text) == (
+    assert normalize_spaces(page.select_one('#add_new_template_form fieldset legend').text) == (
         'Add new'
     )
     assert [

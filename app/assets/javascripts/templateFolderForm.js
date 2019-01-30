@@ -19,10 +19,10 @@
       this.states = [
         {key: 'nothing-selected-buttons', $el: this.$form.find('#nothing_selected'), cancellable: false},
         {key: 'items-selected-buttons', $el: this.$form.find('#items_selected'), cancellable: false},
-        {key: 'move-to-existing-folder', $el: this.$form.find('#move_to_folder_radios'), cancellable: true, setFocus: this.getFocusRoutine('#move_to_folder_radios fieldset', true)},
+        {key: 'move-to-existing-folder', $el: this.$form.find('#move_to_folder_radios'), cancellable: true, setFocus: this.getFocusRoutine('#move_to_folder_radios legend', true)},
         {key: 'move-to-new-folder', $el: this.$form.find('#move_to_new_folder_form'), cancellable: true, setFocus: this.getFocusRoutine('#move_to_new_folder_name', false)},
         {key: 'add-new-folder', $el: this.$form.find('#add_new_folder_form'), cancellable: true, setFocus: this.getFocusRoutine('#add_new_folder_name', false)},
-        {key: 'add-new-template', $el: this.$form.find('#add_new_template_form'), cancellable: true, setFocus: this.getFocusRoutine('#add_new_template_form fieldset', true)}
+        {key: 'add-new-template', $el: this.$form.find('#add_new_template_form'), cancellable: true, setFocus: this.getFocusRoutine('#add_new_template_form legend', true)}
       ];
 
       // cancel/clear buttons only relevant if JS enabled, so
@@ -47,9 +47,15 @@
     this.getFocusRoutine = function (selector, setTabindex) {
       return function () {
         let $el = $(selector);
+        let removeTabindex = (e) => {
+          $(e.target)
+            .removeAttr('tabindex')
+            .off('blur', removeTabindex);
+        };
 
         if (setTabindex) {
           $el.attr('tabindex', '-1');
+          $el.on('blur', removeTabindex);
         }
 
         $el.focus();

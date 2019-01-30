@@ -29,14 +29,11 @@
     </fieldset>
   </div>
   <div id="add_new_template_form">
-    <fieldset>
-      <legend class="visuallyhidden">Add a new template</legend>
-      <div class="js-will-stick-at-bottom-when-scrolling">
-      {{ radios(templates_and_folders_form.add_template_by_template_type) }}
-      </div>
-      <div class="js-will-stick-at-bottom-when-scrolling">
-      {{ page_footer('Continue', button_name='operation', button_value='add-new-template') }}
-      </div>
-    </fieldset>
+    <div class="js-will-stick-at-bottom-when-scrolling">
+    {{ radios(templates_and_folders_form.add_template_by_template_type) }}
+    </div>
+    <div class="js-will-stick-at-bottom-when-scrolling">
+    {{ page_footer('Continue', button_name='operation', button_value='add-new-template') }}
+    </div>
   </div>
 </div>

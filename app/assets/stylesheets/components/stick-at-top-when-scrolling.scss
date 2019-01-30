@@ -4,18 +4,17 @@
 .js-stick-at-top-when-scrolling,
 .js-stick-at-bottom-when-scrolling {
 
-  @extend %contain-floats;
+  overflow: hidden;
   margin-left: -$gutter-half;
   padding: 10px 0 0 $gutter-half;
   position: relative;
 
-  fieldset:focus {
-    outline: solid 3px $focus-colour;
-    outline-offset: $gutter-half;
-  }
-
   .form-group {
     margin-bottom: 20px;
+
+    legend {
+      outline: none;
+    }
   }
 
   .back-to-top-link {
@@ -52,7 +51,7 @@
   margin-top: -$vertical-padding;
 
   & + .js-stick-at-bottom-when-scrolling {
-    margin-top: ($vertical-padding * 2) * -1;
+    margin-top: ($sticky-padding * 2) * -1;
   }
 
   .page-footer {
