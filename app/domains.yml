@@ -3226,7 +3226,7 @@ north-norfolk.gov.uk:
 northsomerset.gov.uk:
   owner: North Somerset Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 northtyneside.gov.uk:
   owner: North Tyneside Metropolitan Borough Council
   crown: false
@@ -3277,10 +3277,7 @@ npt.gov.uk:
   owner: Neath Port Talbot County Borough Council
   crown: false
   agreement_signed: true
-n-somerset.gov.uk:
-  owner: North Somerset Council
-  crown: false
-  agreement_signed: false
+n-somerset.gov.uk: northsomerset.gov.uk
 nuneatonandbedworth.gov.uk:
   owner: Nuneaton and Bedworth Borough Council
   crown: false
