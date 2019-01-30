@@ -1,37 +1,28 @@
 {% extends "withnav_template.html" %}
-{% from "components/textbox.html" import textbox %}
+{% from "components/form.html" import form_wrapper %}
 {% from "components/page-footer.html" import page_footer %}
+{% from "components/radios.html" import radios %}
 
 {% block service_page_title %}
-  Emails
+  Send emails
 {% endblock %}
 
 {% block maincolumn_content %}
 
   <div class="grid-row">
     <div class="column-five-sixths">
-      <h1 class="heading-large">Emails</h1>
-      {% if 'email' in current_service.permissions %}
-        <p>
-          Your service can send emails.
-        </p>
-        <p>
-          If you want to turn it off,
-          <a href="{{ url_for('.support') }}">get in touch with the GOV.UK Notify team</a>.
-        </p>
-      {% else %}
-        <p>
-          Sending emails is an invitation&#8209;only feature.
-        </p>
-        <p>
-          If you want to try it out,
-          <a href="{{ url_for('.support') }}">get in touch with the GOV.UK Notify team</a>.
-        </p>
-      {% endif %}
-      {{ page_footer(
-        back_link=url_for('.service_settings', service_id=current_service.id),
-        back_link_text='Back to settings'
-      ) }}
+      <h1 class="heading-large">Send emails</h1>
+      <p>
+        It’s free to send emails through GOV.UK Notify.
+      </p>
+      {% call form_wrapper() %}
+        {{ radios(form.enabled) }}
+        {{ page_footer(
+          'Save',
+          back_link=url_for('.service_settings', service_id=current_service.id),
+          back_link_text='Back to settings'
+        ) }}
+      {% endcall %}
     </div>
   </div>
 

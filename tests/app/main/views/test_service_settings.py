@@ -2542,19 +2542,91 @@ def test_should_set_sms_allowance(
     )
 
 
+def test_old_set_letters_page_redirects(
+    client_request,
+):
+    client_request.get(
+        'main.service_set_letters',
+        service_id=SERVICE_ONE_ID,
+        _expected_status=301,
+        _expected_redirect=url_for(
+            'main.service_set_channel',
+            service_id=SERVICE_ONE_ID,
+            channel='letter',
+            _external=True,
+        )
+    )
+
+
+def test_unknown_channel_404s(
+    client_request,
+):
+    client_request.get(
+        'main.service_set_channel',
+        service_id=SERVICE_ONE_ID,
+        channel='message-in-a-bottle',
+        _expected_status=404,
+    )
+
+
 @pytest.mark.parametrize((
+    'channel,'
+    'expected_first_para,'
+    'expected_legend,'
+    'initial_permissions,'
     'expected_initial_value,'
     'posted_value,'
-    'initial_permissions,'
     'expected_updated_permissions'
 ), [
-    ('off', 'on', ['email', 'sms'], ['email', 'sms', 'letter']),
-    ('on', 'off', ['email', 'sms', 'letter'], ['email', 'sms']),
+    (
+        'letter',
+        'It costs between 30p and 76p to send a letter using Notify.',
+        'Send letters',
+        ['email', 'sms'],
+        'off', 'on',
+        ['email', 'sms', 'letter'],
+    ),
+    (
+        'letter',
+        'It costs between 30p and 76p to send a letter using Notify.',
+        'Send letters',
+        ['email', 'sms', 'letter'],
+        'on', 'off',
+        ['email', 'sms'],
+    ),
+    (
+        'sms',
+        'You have a free allowance of 250,000 text messages each financial year.',
+        'Send text messages',
+        [],
+        'off', 'on',
+        ['sms'],
+    ),
+    (
+        'email',
+        'It’s free to send emails through GOV.UK Notify.',
+        'Send emails',
+        [],
+        'off', 'on',
+        ['email'],
+    ),
+    (
+        'email',
+        'It’s free to send emails through GOV.UK Notify.',
+        'Send emails',
+        ['email', 'sms', 'letter'],
+        'on', 'on',
+        ['email', 'sms', 'letter'],
+    ),
 ])
 def test_switch_service_enable_letters(
     client_request,
     service_one,
     mocker,
+    mock_get_free_sms_fragment_limit,
+    channel,
+    expected_first_para,
+    expected_legend,
     expected_initial_value,
     posted_value,
     initial_permissions,
@@ -2564,16 +2636,21 @@ def test_switch_service_enable_letters(
     service_one['permissions'] = initial_permissions
 
     page = client_request.get(
-        'main.service_set_letters',
+        'main.service_set_channel',
         service_id=service_one['id'],
+        channel=channel,
     )
+
+    assert normalize_spaces(page.select_one('main p').text) == expected_first_para
+    assert normalize_spaces(page.select_one('legend').text) == expected_legend
 
     assert page.select_one('input[checked]')['value'] == expected_initial_value
     assert len(page.select('input[checked]')) == 1
 
     client_request.post(
-        'main.service_set_letters',
+        'main.service_set_channel',
         service_id=service_one['id'],
+        channel=channel,
         _data={'enabled': posted_value},
         _expected_redirect=url_for(
             'main.service_settings',

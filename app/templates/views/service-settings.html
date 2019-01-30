@@ -71,12 +71,14 @@
           {{ text_field('Send emails') }}
           {{ boolean_field('email' in current_service.permissions) }}
           {{ edit_field(
-              'Change',
-              url_for('.service_set_email',
-              service_id=current_service.id),
-              permissions=['manage_service']
-              )
-          }}
+            'Change',
+            url_for(
+              '.service_set_channel',
+              channel='email',
+              service_id=current_service.id
+            ),
+            permissions=['manage_service']
+          )}}
         {% endcall %}
 
         {% call settings_row(if_has_permission='email') %}
@@ -121,12 +123,14 @@
           {{ text_field('Send text messages') }}
           {{ boolean_field('sms' in current_service.permissions) }}
           {{ edit_field(
-              'Change',
-              url_for('.service_set_sms',
-              service_id=current_service.id),
-              permissions=['manage_service']
-            )
-          }}
+            'Change',
+            url_for(
+              '.service_set_channel',
+              service_id=current_service.id,
+              channel='sms'
+            ),
+            permissions=['manage_service']
+          )}}
         {% endcall %}
 
         {% call settings_row(if_has_permission='sms') %}
@@ -197,12 +201,14 @@
           {{ text_field('Send letters') }}
           {{ boolean_field('letter' in current_service.permissions) }}
           {{ edit_field(
-              'Change',
-              url_for('.service_set_letters',
-              service_id=current_service.id),
-              permissions=['manage_service']
-          )
-          }}
+            'Change',
+            url_for(
+              '.service_set_channel',
+              channel='letter',
+              service_id=current_service.id
+            ),
+            permissions=['manage_service']
+          )}}
         {% endcall %}
 
         {% call settings_row(if_has_permission='letter') %}
