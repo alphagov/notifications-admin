@@ -1,5 +1,5 @@
 {% extends "withnav_template.html" %}
-{% from "components/page-footer.html" import sticky_page_footer %}
+{% from "components/page-footer.html" import page_footer %}
 {% from "components/radios.html" import radios %}
 {% from "components/form.html" import form_wrapper %}
 
@@ -16,8 +16,10 @@
       <div class="grid-row">
         <div class="column-five-sixths">
           {{ radios(form.postage) }}
-          {{ sticky_page_footer(
-            'Save'
+          {{ page_footer(
+            'Save',
+            back_link=url_for('.view_template', service_id=service_id, template_id=template_id),
+            back_link_text='Back to template'
           ) }}
         </div>
         <aside class="column-three-quarters">
