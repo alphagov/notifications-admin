@@ -109,33 +109,40 @@ def create_app(application):
     init_app(application)
 
     for client in (
-        antivirus_client,
-        statsd_client,
-        zendesk_client,
+
+        # Gubbins
         csrf,
-        request_helper,
-        service_api_client,
-        user_api_client,
-        api_key_api_client,
-        job_api_client,
-        notification_api_client,
-        status_api_client,
-        invite_api_client,
-        org_invite_api_client,
-        template_statistics_client,
-        events_api_client,
-        provider_client,
-        email_branding_client,
-        letter_branding_client,
-        organisations_client,
-        letter_jobs_client,
-        inbound_number_client,
-        billing_api_client,
-        complaint_api_client,
-        platform_stats_api_client,
-        template_folder_api_client,
         login_manager,
         proxy_fix,
+        request_helper,
+
+        # Internal API clients
+        antivirus_client,
+        api_key_api_client,
+        billing_api_client,
+        complaint_api_client,
+        email_branding_client,
+        events_api_client,
+        inbound_number_client,
+        invite_api_client,
+        job_api_client,
+        letter_branding_client,
+        letter_jobs_client,
+        notification_api_client,
+        org_invite_api_client,
+        organisations_client,
+        platform_stats_api_client,
+        provider_client,
+        service_api_client,
+        status_api_client,
+        template_folder_api_client,
+        template_statistics_client,
+        user_api_client,
+
+        # External API clients
+        statsd_client,
+        zendesk_client,
+
     ):
         client.init_app(application)
 
