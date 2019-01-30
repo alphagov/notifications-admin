@@ -141,6 +141,15 @@
   // were wrapped by a dialog component
   var dialog = {
     _hasResized: false,
+    // we add padding of 20px around each sticky to isolate it from the rest of the page
+    // it shouldn't apply between stickys when stacked
+    _getPaddingBetweenEls: function (els) {
+      var spaceBetween = 40;
+
+      if (els.length < 2) { return 0; }
+
+      return (els.length - 1) * spaceBetween;
+    },
     _getTotalHeight: function (els) {
       var reducer = function (accumulator, currentValue) {
         return accumulator + currentValue;
@@ -152,6 +161,7 @@
     },
     getOffsetFromEdge: function (el, sticky) {
       var els = this._elsThatCanBeStuck(sticky._els).slice();
+      var elsBetween;
       var elIdx;
 
       // els must be arranged furtherest from window edge is stuck to first
@@ -165,10 +175,12 @@
       // if next to window edge the dialog is stuck to, no offset
       if (elIdx === (els.length - 1)) { return 0; }
 
+      // make els all those from this one to the window edge
+      els = els.slice(elIdx);
       // get all els between this one and the window edge
-      els = els.slice(elIdx + 1);
+      elsBetween = els.slice(1);
 
-      return this._getTotalHeight(els);
+      return this._getTotalHeight(elsBetween) - this._getPaddingBetweenEls(els);
     },
     getOffsetFromEnd: function (el, sticky) {
       var els = this._elsThatCanBeStuck(sticky._els).slice();

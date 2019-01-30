@@ -46,6 +46,10 @@
   padding: $vertical-padding 0 $vertical-padding $gutter-half;
   margin-top: -$vertical-padding;
 
+  & + .js-stick-at-bottom-when-scrolling {
+    margin-top: ($vertical-padding * 2) * -1;
+  }
+
   .page-footer {
     margin-bottom: 0;
     min-height: 50px;
