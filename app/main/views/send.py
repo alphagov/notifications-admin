@@ -835,12 +835,12 @@ def get_back_link(service_id, template, step_index):
                 template_id=template.id,
             )
     elif is_current_user_the_recipient() and step_index > 1:
-            return url_for(
-                'main.send_test_step',
-                service_id=service_id,
-                template_id=template.id,
-                step_index=step_index - 1,
-            )
+        return url_for(
+            'main.send_test_step',
+            service_id=service_id,
+            template_id=template.id,
+            step_index=step_index - 1,
+        )
 
     else:
         return url_for(
