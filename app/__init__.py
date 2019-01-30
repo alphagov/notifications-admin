@@ -107,35 +107,47 @@ def create_app(application):
     asset_fingerprinter._asset_root = application.config['ASSET_PATH']
 
     init_app(application)
-    antivirus_client.init_app(application)
-    statsd_client.init_app(application)
-    zendesk_client.init_app(application)
+
+    for client in (
+
+        # Gubbins
+        csrf,
+        login_manager,
+        proxy_fix,
+        request_helper,
+
+        # Internal API clients
+        antivirus_client,
+        api_key_api_client,
+        billing_api_client,
+        complaint_api_client,
+        email_branding_client,
+        events_api_client,
+        inbound_number_client,
+        invite_api_client,
+        job_api_client,
+        letter_branding_client,
+        letter_jobs_client,
+        notification_api_client,
+        org_invite_api_client,
+        organisations_client,
+        platform_stats_api_client,
+        provider_client,
+        service_api_client,
+        status_api_client,
+        template_folder_api_client,
+        template_statistics_client,
+        user_api_client,
+
+        # External API clients
+        statsd_client,
+        zendesk_client,
+
+    ):
+        client.init_app(application)
+
     logging.init_app(application, statsd_client)
-    csrf.init_app(application)
-    request_helper.init_app(application)
 
-    service_api_client.init_app(application)
-    user_api_client.init_app(application)
-    api_key_api_client.init_app(application)
-    job_api_client.init_app(application)
-    notification_api_client.init_app(application)
-    status_api_client.init_app(application)
-    invite_api_client.init_app(application)
-    org_invite_api_client.init_app(application)
-    template_statistics_client.init_app(application)
-    events_api_client.init_app(application)
-    provider_client.init_app(application)
-    email_branding_client.init_app(application)
-    letter_branding_client.init_app(application)
-    organisations_client.init_app(application)
-    letter_jobs_client.init_app(application)
-    inbound_number_client.init_app(application)
-    billing_api_client.init_app(application)
-    complaint_api_client.init_app(application)
-    platform_stats_api_client.init_app(application)
-    template_folder_api_client.init_app(application)
-
-    login_manager.init_app(application)
     login_manager.login_view = 'main.sign_in'
     login_manager.login_message_category = 'default'
     login_manager.session_protection = None
@@ -146,8 +158,6 @@ def create_app(application):
 
     from .status import status as status_blueprint
     application.register_blueprint(status_blueprint)
-
-    proxy_fix.init_app(application)
 
     add_template_filters(application)
 

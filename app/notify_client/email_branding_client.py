@@ -3,9 +3,6 @@ from app.notify_client import NotifyAdminAPIClient, cache
 
 class EmailBrandingClient(NotifyAdminAPIClient):
 
-    def __init__(self):
-        super().__init__("a" * 73, "b")
-
     @cache.set('email_branding-{branding_id}')
     def get_email_branding(self, branding_id):
         return self.get(url='/email-branding/{}'.format(branding_id))
