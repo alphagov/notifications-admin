@@ -5,7 +5,7 @@ from flask import current_app
 from notifications_utils.s3 import s3upload as utils_s3upload
 
 TEMP_TAG = 'temp-{user_id}_'
-LOGO_LOCATION_STRUCTURE = '{temp}{unique_id}-{filename}'
+EMAIL_LOGO_LOCATION_STRUCTURE = '{temp}{unique_id}-{filename}'
 
 
 def get_s3_object(bucket_name, filename):
@@ -33,12 +33,12 @@ def get_s3_objects_filter_by_prefix(prefix):
     return s3.Bucket(bucket_name).objects.filter(Prefix=prefix)
 
 
-def get_temp_truncated_filename(filename, user_id):
+def get_temp_truncated_email_filename(filename, user_id):
     return filename[len(TEMP_TAG.format(user_id=user_id)):]
 
 
-def upload_logo(filename, filedata, region, user_id):
-    upload_file_name = LOGO_LOCATION_STRUCTURE.format(
+def upload_email_logo(filename, filedata, region, user_id):
+    upload_file_name = EMAIL_LOGO_LOCATION_STRUCTURE.format(
         temp=TEMP_TAG.format(user_id=user_id),
         unique_id=str(uuid.uuid4()),
         filename=filename
@@ -55,19 +55,19 @@ def upload_logo(filename, filedata, region, user_id):
     return upload_file_name
 
 
-def permanent_logo_name(filename, user_id):
+def permanent_email_logo_name(filename, user_id):
     if filename.startswith(TEMP_TAG.format(user_id=user_id)):
-        return get_temp_truncated_filename(filename=filename, user_id=user_id)
+        return get_temp_truncated_email_filename(filename=filename, user_id=user_id)
     else:
         return filename
 
 
-def delete_temp_files_created_by(user_id):
+def delete_email_temp_files_created_by(user_id):
     for obj in get_s3_objects_filter_by_prefix(TEMP_TAG.format(user_id=user_id)):
         delete_s3_object(obj.key)
 
 
-def delete_temp_file(filename):
+def delete_email_temp_file(filename):
     if not filename.startswith(TEMP_TAG[:5]):
         raise ValueError('Not a temp file: {}'.format(filename))
 

@@ -4,13 +4,13 @@ from unittest.mock import call
 import pytest
 
 from app.s3_client.s3_logo_client import (
-    LOGO_LOCATION_STRUCTURE,
+    EMAIL_LOGO_LOCATION_STRUCTURE,
     TEMP_TAG,
-    delete_temp_file,
-    delete_temp_files_created_by,
-    permanent_logo_name,
+    delete_email_temp_file,
+    delete_email_temp_files_created_by,
+    permanent_email_logo_name,
     persist_logo,
-    upload_logo,
+    upload_email_logo,
 )
 
 bucket = 'test_bucket'
@@ -22,16 +22,16 @@ region = 'eu-west1'
 
 @pytest.fixture
 def upload_filename(fake_uuid):
-    return LOGO_LOCATION_STRUCTURE.format(
+    return EMAIL_LOGO_LOCATION_STRUCTURE.format(
         temp=TEMP_TAG.format(user_id=fake_uuid), unique_id=upload_id, filename=filename)
 
 
-def test_upload_logo_calls_correct_args(client, mocker, fake_uuid, upload_filename):
+def test_upload_email_logo_calls_correct_args(client, mocker, fake_uuid, upload_filename):
     mocker.patch('uuid.uuid4', return_value=upload_id)
     mocker.patch.dict('flask.current_app.config', {'LOGO_UPLOAD_BUCKET_NAME': bucket})
     mocked_s3_upload = mocker.patch('app.s3_client.s3_logo_client.utils_s3upload')
 
-    upload_logo(filename=filename, user_id=fake_uuid, filedata=data, region=region)
+    upload_email_logo(filename=filename, user_id=fake_uuid, filedata=data, region=region)
 
     assert mocked_s3_upload.called_once_with(
         filedata=data,
@@ -46,7 +46,7 @@ def test_persist_logo(client, mocker, fake_uuid, upload_filename):
     mocked_get_s3_object = mocker.patch('app.s3_client.s3_logo_client.get_s3_object')
     mocked_delete_s3_object = mocker.patch('app.s3_client.s3_logo_client.delete_s3_object')
 
-    new_filename = permanent_logo_name(upload_filename, fake_uuid)
+    new_filename = permanent_email_logo_name(upload_filename, fake_uuid)
 
     persist_logo(upload_filename, new_filename)
 
@@ -65,27 +65,27 @@ def test_persist_logo_returns_if_not_temp(client, mocker, fake_uuid):
     mocked_delete_s3_object.assert_not_called()
 
 
-def test_permanent_logo_name_removes_temp_tag_from_filename(upload_filename, fake_uuid):
-    new_name = permanent_logo_name(upload_filename, fake_uuid)
+def test_permanent_email_logo_name_removes_TEMP_TAG_from_filename(upload_filename, fake_uuid):
+    new_name = permanent_email_logo_name(upload_filename, fake_uuid)
 
     assert new_name == 'test_uuid-test.png'
 
 
-def test_permanent_logo_name_does_not_change_filenames_with_no_temp_tag():
+def test_permanent_email_logo_name_does_not_change_filenames_with_no_TEMP_TAG():
     filename = 'logo.png'
-    new_name = permanent_logo_name(filename, filename)
+    new_name = permanent_email_logo_name(filename, filename)
 
     assert new_name == filename
 
 
-def test_delete_temp_files_created_by_user(client, mocker, fake_uuid):
+def test_delete_email_temp_files_created_by_user(client, mocker, fake_uuid):
     obj = namedtuple("obj", ["key"])
     objs = [obj(key='test1'), obj(key='test2')]
 
     mocker.patch('app.s3_client.s3_logo_client.get_s3_objects_filter_by_prefix', return_value=objs)
     mocked_delete_s3_object = mocker.patch('app.s3_client.s3_logo_client.delete_s3_object')
 
-    delete_temp_files_created_by(fake_uuid)
+    delete_email_temp_files_created_by(fake_uuid)
 
     assert mocked_delete_s3_object.called_with_args(objs[0].key)
     for index, arg in enumerate(mocked_delete_s3_object.call_args_list):
@@ -95,7 +95,7 @@ def test_delete_temp_files_created_by_user(client, mocker, fake_uuid):
 def test_delete_single_temp_file(client, mocker, fake_uuid, upload_filename):
     mocked_delete_s3_object = mocker.patch('app.s3_client.s3_logo_client.delete_s3_object')
 
-    delete_temp_file(upload_filename)
+    delete_email_temp_file(upload_filename)
 
     assert mocked_delete_s3_object.called_with_args(upload_filename)
 
@@ -105,7 +105,7 @@ def test_does_not_delete_non_temp_file(client, mocker, fake_uuid):
     mocked_delete_s3_object = mocker.patch('app.s3_client.s3_logo_client.delete_s3_object')
 
     with pytest.raises(ValueError) as error:
-        delete_temp_file(filename)
+        delete_email_temp_file(filename)
 
     assert mocked_delete_s3_object.called_with_args(filename)
     assert str(error.value) == 'Not a temp file: {}'.format(filename)
