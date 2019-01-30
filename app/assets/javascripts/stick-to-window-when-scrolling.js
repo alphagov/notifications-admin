@@ -413,30 +413,38 @@
   Sticky.prototype.allElementsLoaded = function (totalEls) {
     return this._els.length === totalEls;
   };
-  Sticky.prototype.hasEl = function (node) {
-    return !!$.grep(this._els, function (el) { return el.$fixedEl.is(node); }).length;
+  Sticky.prototype.getElForNode = function (node) {
+    var matches = $.grep(this._els, function (el) { return el.$fixedEl.is(node); });
+
+    return !!matches.length ? matches[0] : false;
   };
   Sticky.prototype.add = function (el, setPositions, cb) {
     var self = this;
     var $el = $(el);
     var onDimensionsSet;
-    var elObj;
-
-    // guard against adding elements already stored
-    if (this.hasEl(el)) { return; }
+    var elObj = this.getElForNode(el);
+    var exists = !!elObj;
 
     onDimensionsSet = function () {
       elObj.hasLoaded(true);
-      self._els.push(elObj);
+
+      // guard against adding elements already stored
+      if (!exists) {
+        self._els.push(elObj);
+      }
+
       if (setPositions) {
         self.setElementPositions();
       }
+
       if (cb !== undefined) {
         cb();
       }
     };
 
-    elObj = new StickyElement($el, self);
+    if (!exists) {
+      elObj = new StickyElement($el, self);
+    }
 
     self.setElementDimensions(elObj, onDimensionsSet);
   }; 
