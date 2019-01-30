@@ -272,6 +272,9 @@
     this.CSS_SELECTOR = selector;
     this.STOP_PADDING = 10;
   };
+  Sticky.prototype.setMode = function (mode) {
+    _mode = mode;
+  };
   Sticky.prototype.getWindowDimensions = function () {
     return {
       height: $(global).height(),
@@ -360,7 +363,7 @@
     }
   };
   // Recalculate stored dimensions for all sticky elements
-  Sticky.prototype.recalculate = function (opts) {
+  Sticky.prototype.recalculate = function () {
     var self = this;
     var onSyncComplete = function () {
       self.setEvents();
@@ -370,8 +373,6 @@
       }
       self.setElementPositions();
     };
-
-    if ((opts !== undefined) && ('mode' in opts)) { _mode = opts.mode; }
 
     this.syncWithDOM(onSyncComplete);
   };
@@ -493,8 +494,8 @@
       });
     }
   };
-  Sticky.prototype.init = function (opts) {
-    this.recalculate(opts);
+  Sticky.prototype.init = function () {
+    this.recalculate();
   };
   Sticky.prototype.setEvents = function () {
     var self = this;
