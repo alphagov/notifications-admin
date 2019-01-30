@@ -140,7 +140,7 @@
   // Object collecting together methods for treating sticky elements as if they
   // were wrapped by a dialog component
   var dialog = {
-    _hasResized: false,
+    hasResized: false,
     // we add padding of 20px around each sticky to isolate it from the rest of the page
     // it shouldn't apply between stickys when stacked
     _getPaddingBetweenEls: function (els) {
@@ -230,10 +230,8 @@
         sticky.reset(currentEl);
         currentEl.canBeStuck(false);
 
-        if (!sticky._hasResized) { sticky._hasResized = true; }
+        if (!self.hasResized) { self.hasResized = true; }
       }
-
-      return this._getTotalHeight(els);
     },
     getElementAtStickyEdge: function (sticky) {
       var els = this._elsThatCanBeStuck(sticky._els);
@@ -263,7 +261,7 @@
         $(window).scrollTop(this.getInPageEdgePosition(sticky) - windowHeight);
       }
 
-      sticky._hasResized = false;
+      self.hasResized = false;
     },
     releaseEl: function (el, sticky) {
       el.$fixedEl.css(sticky.edge, '');
@@ -275,7 +273,7 @@
   var Sticky = function (selector) {
     this._hasScrolled = false;
     this._scrollTimeout = false;
-    this._hasResized = false;
+    this._windowHasResized = false;
     this._resizeTimeout = false;
     this._elsLoaded = false;
     this._initialPositionsSet = false;
@@ -381,7 +379,9 @@
       self.setEvents();
       if (_mode === 'dialog') {
         dialog.fitToHeight(self);
-        dialog.adjustForResize(self);
+        if (dialog.hasResized) {
+          dialog.adjustForResize(self);
+        }
       }
       self.setElementPositions();
     };
@@ -532,7 +532,7 @@
     this._hasScrolled = true;
   };
   Sticky.prototype.onResize = function () {
-    this._hasResized = true;
+    this._windowHasResized = true;
   };
   Sticky.prototype.checkScroll = function () {
     var self = this;
@@ -546,8 +546,8 @@
     var self = this,
         windowWidth = self.getWindowDimensions().width;
 
-    if (self._hasResized === true) {
-      self._hasResized = false;
+    if (self._windowHasResized === true) {
+      self._windowHasResized = false;
 
       $.each(self._els, function (i, el) {
         if (!self.viewportIsWideEnough(windowWidth)) {
@@ -560,7 +560,9 @@
       if (self.viewportIsWideEnough(windowWidth)) {
         if (_mode === 'dialog') {
           dialog.fitToHeight(self);
-          dialog.adjustForResize(self);
+          if (dialog.hasResized) {
+            dialog.adjustForResize(self);
+          }
         }
         self.setElementPositions();
       }
