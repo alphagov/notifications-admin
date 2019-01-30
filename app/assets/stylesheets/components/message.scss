@@ -5,9 +5,12 @@
     margin: 0;
 
     a {
-      display: inline;
       margin-bottom: -$gutter;
       padding-bottom: $gutter;
+
+      &:hover {
+        color: $link-hover-colour;
+      }
 
       &:focus {
 
@@ -86,21 +89,33 @@
 
   &-folder {
 
-    a:first-child {
+    display: inline-block;
+    padding-left: 40px;
+    background-image: file-url('folder-blue-bold.svg');
+    background-repeat: no-repeat;
+    background-size: auto 20px;
+    background-position: 0px 2px;
 
-      display: inline-block;
-      text-indent: 40px;
-      background-image: file-url('folder-blue-bold.svg');
-      background-repeat: no-repeat;
-      background-size: auto 20px;
-      background-position: 0px 2px;
+    @include ie-lte(8) {
+      background-image: file-url('folder-blue-bold.png');
+    }
+
+    &:hover {
+
+      background-image: file-url('folder-blue-bold-hover.svg');
 
       @include ie-lte(8) {
-        background-image: file-url('folder-blue-bold.png');
+        background-image: file-url('folder-blue-bold-hover.png');
       }
 
     }
 
+  }
+
+  &-template {
+    a {
+      display: inline;
+    }
   }
 
   &-empty {
@@ -139,31 +154,60 @@
 
     display: inline-block;
     vertical-align: top;
-    padding: 5px 0 0 0;
     background-repeat: no-repeat;
-    background-size: 38px auto;
-    background-position: 0 1px;
+    background-size: auto 20px;
+    background-position: 0px 2px;
+    min-height: 30px;
 
+  }
+
+  &-folder {
+
+    padding: 0 0 0 40px;
+    background-image: file-url('folder-black-bold.svg');
+
+    @include ie-lte(8) {
+      background-image: file-url('folder-black-bold.png');
+    }
+
+  }
+
+  &-folder-truncated {
+    width: 0;
+    padding: 0 0 0 30px;
+    overflow: hidden;
+  }
+
+  &-folder-root-truncated {
+    max-width: 1.4em;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   a {
 
-    padding-top: 5px;
     display: inline-block;
     vertical-align: top;
 
     &.folder-heading-folder {
 
-      padding: 5px 0 0 60px;
-      background-image: file-url('folder-blue.svg');
+      background-image: file-url('folder-blue-bold.svg');
       max-width: 33%;
       overflow: hidden;
       text-overflow: ellipsis;
 
       @include ie-lte(8) {
-        background-image: file-url('folder-blue.png');
+        background-image: file-url('folder-blue-bold.png');
       }
 
+      &:hover {
+        background-image: file-url('folder-blue-bold-hover.svg');
+      }
+
+    }
+
+    &:hover {
+      color: $link-hover-colour;
     }
 
   }
@@ -173,7 +217,7 @@
     display: inline-block;
     vertical-align: top;
     color: $secondary-text-colour;
-    padding: 5px 4px 0 5px;
+    padding: 0 4px 0 5px;
     font-weight: normal;
 
   }
@@ -181,7 +225,7 @@
   &-manage-link {
     display: block;
     text-align: right;
-    padding: ($gutter - 2px) 0 0 0;
+    padding: ($gutter - 7px) 0 0 0;
   }
 
 }

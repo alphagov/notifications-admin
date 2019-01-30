@@ -14,13 +14,18 @@
     <h1 class="heading-medium folder-heading">
       {% for folder in folders %}
         {% if loop.last and not link_current_item %}
-          <span class="folder-heading-folder">{{ folder.name }}</span>
+          {% if folder.template_type or not folder.id %}
+            <span class="folder-heading-template">{{ folder.name }}</span>
+          {% else %}
+            <span class="folder-heading-folder">{{ folder.name }}</span>
+          {% endif %}
         {% else %}
           {% if folder.id %}
-            <a href="{{ url_for('.choose_template', service_id=service_id, template_type=template_type, template_folder_id=folder.id) }}" class="folder-heading-folder">{{ folder.name }}</a> {% if not loop.last %}{{ folder_path_separator() }}{% endif %}
+            <a href="{{ url_for('.choose_template', service_id=service_id, template_type=template_type, template_folder_id=folder.id) }}" class="folder-heading-folder {% if loop.index < (loop.length - 1) %}folder-heading-folder-truncated{% endif %}" title="{{ folder.name }}">{{ folder.name }}</a>
           {% else %}
-            <a href="{{ url_for('.choose_template', service_id=service_id, template_type=template_type) }}">Templates</a> {% if not loop.last %}{{ folder_path_separator() }}{% endif %}
+            <a href="{{ url_for('.choose_template', service_id=service_id, template_type=template_type) }}" class="{% if loop.length > 2 %}folder-heading-folder-root-truncated{% endif %}">Templates</a>
           {% endif %}
+          {% if not loop.last %}{{ folder_path_separator() }}{% endif %}
         {% endif %}
       {% endfor %}
     </h1>
