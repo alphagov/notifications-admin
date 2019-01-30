@@ -4193,10 +4193,7 @@ stannesonthesea-tc.gov.uk:
   owner: St. Annes on the Sea Town Council
   crown: false
   agreement_signed: false
-star-procurement.gov.uk:
-  owner: Trafford Metropolitan Borough Council
-  crown: false
-  agreement_signed: false
+star-procurement.gov.uk: trafford.gov.uk
 stasaphcitycouncil.gov.uk:
   owner: St Asaph City Council
   crown: false
@@ -4642,11 +4639,8 @@ tracc.gov.uk:
 trafford.gov.uk:
   owner: Trafford Metropolitan Borough Council
   crown: false
-  agreement_signed: false
-traffordparishes.gov.uk:
-  owner: Trafford Metropolitan Borough Council
-  crown: false
-  agreement_signed: false
+  agreement_signed: true
+traffordparishes.gov.uk: trafford.gov.uk
 tring.gov.uk:
   owner: Tring Town Council
   crown: false
