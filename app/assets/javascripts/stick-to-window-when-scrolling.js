@@ -197,10 +197,12 @@
       // if next to opposite edge to the one the dialog is stuck to, no offset
       if (elIdx === (els.length - 1)) { return 0; }
 
-      // get all els between this one and the opposite edge
-      els = els.slice(elIdx + 1);
+      // make els all those from this one to the window edge
+      els = els.slice(elIdx);
+      // get all els between this one and the window edge
+      elsBetween = els.slice(1);
 
-      return this._getTotalHeight(els);
+      return this._getTotalHeight(elsBetween) - this._getPaddingBetweenEls(els);
     },
     // checks total height of all this._sticky elements against a height
     // unsticks each that won't fit and marks them as unstickable
