@@ -33,11 +33,12 @@ def test_upload_email_logo_calls_correct_args(client, mocker, fake_uuid, upload_
 
     upload_email_logo(filename=filename, user_id=fake_uuid, filedata=data, region=region)
 
-    assert mocked_s3_upload.called_once_with(
+    mocked_s3_upload.assert_called_once_with(
         filedata=data,
         region=region,
         file_location=upload_filename,
-        bucket_name=bucket
+        bucket_name=bucket,
+        content_type='image/png'
     )
 
 
@@ -50,8 +51,8 @@ def test_persist_logo(client, mocker, fake_uuid, upload_filename):
 
     persist_logo(upload_filename, new_filename)
 
-    assert mocked_get_s3_object.called_once_with(bucket, new_filename)
-    assert mocked_delete_s3_object.called_once_with(bucket, upload_filename)
+    mocked_get_s3_object.assert_called_once_with(bucket, new_filename)
+    mocked_delete_s3_object.assert_called_once_with(upload_filename)
 
 
 def test_persist_logo_returns_if_not_temp(client, mocker, fake_uuid):
@@ -87,7 +88,6 @@ def test_delete_email_temp_files_created_by_user(client, mocker, fake_uuid):
 
     delete_email_temp_files_created_by(fake_uuid)
 
-    assert mocked_delete_s3_object.called_with_args(objs[0].key)
     for index, arg in enumerate(mocked_delete_s3_object.call_args_list):
         assert arg == call(objs[index].key)
 
@@ -97,7 +97,7 @@ def test_delete_single_temp_file(client, mocker, fake_uuid, upload_filename):
 
     delete_email_temp_file(upload_filename)
 
-    assert mocked_delete_s3_object.called_with_args(upload_filename)
+    mocked_delete_s3_object.assert_called_with(upload_filename)
 
 
 def test_does_not_delete_non_temp_file(client, mocker, fake_uuid):
@@ -107,5 +107,5 @@ def test_does_not_delete_non_temp_file(client, mocker, fake_uuid):
     with pytest.raises(ValueError) as error:
         delete_email_temp_file(filename)
 
-    assert mocked_delete_s3_object.called_with_args(filename)
+    mocked_delete_s3_object.assert_not_called
     assert str(error.value) == 'Not a temp file: {}'.format(filename)
