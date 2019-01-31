@@ -140,7 +140,16 @@
   // Object collecting together methods for treating sticky elements as if they
   // were wrapped by a dialog component
   var dialog = {
-    _hasResized: false,
+    hasResized: false,
+    // we add padding of 20px around each sticky to isolate it from the rest of the page
+    // it shouldn't apply between stickys when stacked
+    _getPaddingBetweenEls: function (els) {
+      var spaceBetween = 40;
+
+      if (els.length < 2) { return 0; }
+
+      return (els.length - 1) * spaceBetween;
+    },
     _getTotalHeight: function (els) {
       var reducer = function (accumulator, currentValue) {
         return accumulator + currentValue;
@@ -152,6 +161,7 @@
     },
     getOffsetFromEdge: function (el, sticky) {
       var els = this._elsThatCanBeStuck(sticky._els).slice();
+      var elsBetween;
       var elIdx;
 
       // els must be arranged furtherest from window edge is stuck to first
@@ -165,10 +175,12 @@
       // if next to window edge the dialog is stuck to, no offset
       if (elIdx === (els.length - 1)) { return 0; }
 
+      // make els all those from this one to the window edge
+      els = els.slice(elIdx);
       // get all els between this one and the window edge
-      els = els.slice(elIdx + 1);
+      elsBetween = els.slice(1);
 
-      return this._getTotalHeight(els);
+      return this._getTotalHeight(elsBetween) - this._getPaddingBetweenEls(els);
     },
     getOffsetFromEnd: function (el, sticky) {
       var els = this._elsThatCanBeStuck(sticky._els).slice();
@@ -218,10 +230,8 @@
         sticky.reset(currentEl);
         currentEl.canBeStuck(false);
 
-        if (!sticky._hasResized) { sticky._hasResized = true; }
+        if (!self.hasResized) { self.hasResized = true; }
       }
-
-      return this._getTotalHeight(els);
     },
     getElementAtStickyEdge: function (sticky) {
       var els = this._elsThatCanBeStuck(sticky._els);
@@ -251,7 +261,7 @@
         $(window).scrollTop(this.getInPageEdgePosition(sticky) - windowHeight);
       }
 
-      sticky._hasResized = false;
+      self.hasResized = false;
     },
     releaseEl: function (el, sticky) {
       el.$fixedEl.css(sticky.edge, '');
@@ -263,7 +273,7 @@
   var Sticky = function (selector) {
     this._hasScrolled = false;
     this._scrollTimeout = false;
-    this._hasResized = false;
+    this._windowHasResized = false;
     this._resizeTimeout = false;
     this._elsLoaded = false;
     this._initialPositionsSet = false;
@@ -271,6 +281,9 @@
 
     this.CSS_SELECTOR = selector;
     this.STOP_PADDING = 10;
+  };
+  Sticky.prototype.setMode = function (mode) {
+    _mode = mode;
   };
   Sticky.prototype.getWindowDimensions = function () {
     return {
@@ -360,18 +373,18 @@
     }
   };
   // Recalculate stored dimensions for all sticky elements
-  Sticky.prototype.recalculate = function (opts) {
+  Sticky.prototype.recalculate = function () {
     var self = this;
     var onSyncComplete = function () {
       self.setEvents();
       if (_mode === 'dialog') {
         dialog.fitToHeight(self);
-        dialog.adjustForResize(self);
+        if (dialog.hasResized) {
+          dialog.adjustForResize(self);
+        }
       }
       self.setElementPositions();
     };
-
-    if ((opts !== undefined) && ('mode' in opts)) { _mode = opts.mode; }
 
     this.syncWithDOM(onSyncComplete);
   };
@@ -413,30 +426,38 @@
   Sticky.prototype.allElementsLoaded = function (totalEls) {
     return this._els.length === totalEls;
   };
-  Sticky.prototype.hasEl = function (node) {
-    return !!$.grep(this._els, function (el) { return el.$fixedEl.is(node); }).length;
+  Sticky.prototype.getElForNode = function (node) {
+    var matches = $.grep(this._els, function (el) { return el.$fixedEl.is(node); });
+
+    return !!matches.length ? matches[0] : false;
   };
   Sticky.prototype.add = function (el, setPositions, cb) {
     var self = this;
     var $el = $(el);
     var onDimensionsSet;
-    var elObj;
-
-    // guard against adding elements already stored
-    if (this.hasEl(el)) { return; }
+    var elObj = this.getElForNode(el);
+    var exists = !!elObj;
 
     onDimensionsSet = function () {
       elObj.hasLoaded(true);
-      self._els.push(elObj);
+
+      // guard against adding elements already stored
+      if (!exists) {
+        self._els.push(elObj);
+      }
+
       if (setPositions) {
         self.setElementPositions();
       }
+
       if (cb !== undefined) {
         cb();
       }
     };
 
-    elObj = new StickyElement($el, self);
+    if (!exists) {
+      elObj = new StickyElement($el, self);
+    }
 
     self.setElementDimensions(elObj, onDimensionsSet);
   }; 
@@ -485,8 +506,8 @@
       });
     }
   };
-  Sticky.prototype.init = function (opts) {
-    this.recalculate(opts);
+  Sticky.prototype.init = function () {
+    this.recalculate();
   };
   Sticky.prototype.setEvents = function () {
     var self = this;
@@ -511,7 +532,7 @@
     this._hasScrolled = true;
   };
   Sticky.prototype.onResize = function () {
-    this._hasResized = true;
+    this._windowHasResized = true;
   };
   Sticky.prototype.checkScroll = function () {
     var self = this;
@@ -525,8 +546,8 @@
     var self = this,
         windowWidth = self.getWindowDimensions().width;
 
-    if (self._hasResized === true) {
-      self._hasResized = false;
+    if (self._windowHasResized === true) {
+      self._windowHasResized = false;
 
       $.each(self._els, function (i, el) {
         if (!self.viewportIsWideEnough(windowWidth)) {
@@ -539,7 +560,9 @@
       if (self.viewportIsWideEnough(windowWidth)) {
         if (_mode === 'dialog') {
           dialog.fitToHeight(self);
-          dialog.adjustForResize(self);
+          if (dialog.hasResized) {
+            dialog.adjustForResize(self);
+          }
         }
         self.setElementPositions();
       }

@@ -139,14 +139,20 @@
     };
 
     this.render = function() {
+      var mode = 'default';
+
       // detach everything, unless they are the currentState
       this.states.forEach(
         state => (state.key === this.currentState ? this.$stickyBottom.append(state.$el) : state.$el.detach())
       );
 
-      // make sticky JS recalculate its cache of the element's position
       // use dialog mode for states which contain more than one form control
-      GOVUK.stickAtBottomWhenScrolling.recalculate({ 'mode': 'dialog' });
+      if (['move-to-existing-folder', 'add-new-template'].includes(this.currentState)) {
+        mode = 'dialog';
+      }
+      GOVUK.stickAtBottomWhenScrolling.setMode(mode);
+      // make sticky JS recalculate its cache of the element's position
+      GOVUK.stickAtBottomWhenScrolling.recalculate();
     };
 
     this.nothingSelectedButtons = $(`
