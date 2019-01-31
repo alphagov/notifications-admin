@@ -79,6 +79,13 @@
           &:first-child {
             display: block;
           }
+
+          &.template-list-folder:first-child {
+            background-position: 0 2px;
+            padding-left: 0;
+            text-indent: 40px;
+          }
+
         }
 
       }
@@ -89,12 +96,12 @@
 
   &-folder {
 
-    display: inline-block;
+    display: inline;
     padding-left: 40px;
     background-image: file-url('folder-blue-bold.svg');
     background-repeat: no-repeat;
     background-size: auto 20px;
-    background-position: 0px 2px;
+    background-position: 0px 4px;
 
     @include ie-lte(8) {
       background-image: file-url('folder-blue-bold.png');
@@ -143,20 +150,15 @@
     margin-top: 18px;
   }
 
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-
-
   a,
   &-folder,
   &-subfolder {
 
-    display: inline-block;
+    display: inline;
     vertical-align: top;
     background-repeat: no-repeat;
     background-size: auto 20px;
-    background-position: 0px 2px;
+    background-position: 0px 4px;
     min-height: 30px;
 
   }
@@ -175,11 +177,13 @@
   &-folder-truncated {
     width: 0;
     padding: 0 0 0 30px;
+    white-space: nowrap;
     overflow: hidden;
   }
 
   &-folder-root-truncated {
     max-width: 1.4em;
+    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
@@ -191,8 +195,9 @@
 
     &.folder-heading-folder {
 
+      display: inline;
       background-image: file-url('folder-blue-bold.svg');
-      max-width: 33%;
+      background-position: 0px 4px;
       overflow: hidden;
       text-overflow: ellipsis;
 
@@ -204,6 +209,11 @@
         background-image: file-url('folder-blue-bold-hover.svg');
       }
 
+    }
+
+    &.folder-heading-folder-truncated {
+      display: inline-block;
+      background-position: 0px 2px;
     }
 
     &:hover {
