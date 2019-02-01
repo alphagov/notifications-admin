@@ -1250,7 +1250,7 @@ cityofworcester.gov.uk:
 clacks.gov.uk:
   owner: Clackmannanshire Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 clevedon.gov.uk:
   owner: Clevedon Town Council
   crown: false
