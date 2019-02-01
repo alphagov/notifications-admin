@@ -147,7 +147,7 @@
 .folder-heading {
 
   .column-main>.grid-row:first-child &.heading-medium {
-    margin-top: 18px;
+    margin-top: $gutter-half;
   }
 
   a,
@@ -235,7 +235,7 @@
   &-manage-link {
     display: block;
     text-align: right;
-    padding: ($gutter - 7px) 0 0 0;
+    padding: $gutter-two-thirds 0 0 0;
   }
 
 }
