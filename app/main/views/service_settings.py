@@ -45,7 +45,7 @@ from app.main.forms import (
     ServiceLetterContactBlockForm,
     ServicePreviewBranding,
     ServiceReplyToEmailForm,
-    ServiceSetBranding,
+    ServiceSetEmailBranding,
     ServiceSmsSenderForm,
     ServiceSwitchChannelForm,
     SMSPrefixForm,
@@ -759,9 +759,9 @@ def set_free_sms_allowance(service_id):
 def service_set_email_branding(service_id):
     email_branding = email_branding_client.get_all_email_branding()
 
-    form = ServiceSetBranding(
-        all_email_brandings=get_branding_as_value_and_label(email_branding),
-        current_email_branding=current_service.email_branding_id,
+    form = ServiceSetEmailBranding(
+        all_branding_options=get_branding_as_value_and_label(email_branding),
+        current_branding=current_service.email_branding_id,
     )
 
     if form.validate_on_submit():

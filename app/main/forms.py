@@ -782,7 +782,7 @@ class RadioFieldWithRequiredMessage(RadioField):
             raise ValueError(self.required_message)
 
 
-class ServiceSetBranding(StripWhitespaceForm):
+class ServiceSetEmailBranding(StripWhitespaceForm):
 
     branding_style = RadioFieldWithNoneOption(
         'Branding style',
@@ -793,14 +793,14 @@ class ServiceSetBranding(StripWhitespaceForm):
 
     DEFAULT = (FieldWithNoneOption.NONE_OPTION_VALUE, 'GOV.UK')
 
-    def __init__(self, all_email_brandings, current_email_branding):
+    def __init__(self, all_branding_options, current_branding):
 
-        super().__init__(branding_style=current_email_branding)
+        super().__init__(branding_style=current_branding)
 
         self.branding_style.choices = sorted(
-            all_email_brandings + [self.DEFAULT],
+            all_branding_options + [self.DEFAULT],
             key=lambda branding: (
-                branding[0] != current_email_branding,
+                branding[0] != current_branding,
                 branding[0] is not self.DEFAULT[0],
                 branding[1].lower(),
             ),
