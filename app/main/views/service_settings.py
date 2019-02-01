@@ -290,14 +290,6 @@ def service_switch_can_upload_document(service_id):
     return render_template('views/service-settings/contact_link.html', form=form)
 
 
-@main.route("/services/<service_id>/service-settings/can-edit-folders")
-@login_required
-@user_is_platform_admin
-def service_switch_can_edit_folders(service_id):
-    current_service.switch_permission('edit_folders')
-    return redirect(url_for('.service_settings', service_id=service_id))
-
-
 @main.route("/services/<service_id>/service-settings/can-choose-postage")
 @login_required
 @user_is_platform_admin
