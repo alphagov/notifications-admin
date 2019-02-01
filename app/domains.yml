@@ -2500,7 +2500,7 @@ lampeter-tc.gov.uk:
 lancashire.gov.uk:
   owner: Lancashire County Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 lancaster.gov.uk:
   owner: Lancaster County Council
   crown: false
@@ -3239,10 +3239,7 @@ northumberland.gov.uk:
   owner: Northumberland County Council
   crown: false
   agreement_signed: true
-northwalesadoption.gov.uk:
-  owner: Wrexham County Borough Council
-  crown: false
-  agreement_signed: false
+northwalesadoption.gov.uk: wrexham.gov.uk
 northwalesfostering.gov.uk:
   owner: Flintshire County Council
   crown: false
@@ -5106,14 +5103,11 @@ wra.gov.wales:
   owner: Welsh Revenue Authority
   crown: false
   agreement_signed: true
-wrecsam.gov.uk:
-  owner: Wrexham County Borough Council
-  crown: false
-  agreement_signed: false
+wrecsam.gov.uk: wrexham.gov.uk
 wrexham.gov.uk:
   owner: Wrexham County Borough Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 wsm-tc.gov.uk:
   owner: Weston-super-Mare Town Council
   crown: false
