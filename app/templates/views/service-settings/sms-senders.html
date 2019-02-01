@@ -8,18 +8,11 @@
 {% endblock %}
 
 {% block maincolumn_content %}
-  <div class="grid-row bottom-gutter">
-    <div class="column-two-thirds">
-      <h1 class="heading-large">
-        Text message senders
-      </h1>
-    </div>
-    {% if current_user.has_permissions('manage_service') %}
-  	<div class="column-one-third">
-  	  <a href="{{ url_for('.service_add_sms_sender', service_id=current_service.id) }}" class="button align-with-heading">Add text message sender</a>
-  	</div>
-    {% endif %}
-  </div>
+
+  <h1 class="heading-large">
+    Text message senders
+  </h1>
+
   <div class="user-list">
     {% if not current_service.sms_senders %}
       <div class="user-list-item">
@@ -46,6 +39,14 @@
       </div>
     {% endfor %}
   </div>
+
+  {% if current_user.has_permissions('manage_service') %}
+    <div class="grid-row bottom-gutter">
+      <div class="column-whole">
+        <a href="{{ url_for('.service_add_sms_sender', service_id=current_service.id) }}" class="button">Add text message sender</a>
+      </div>
+    </div>
+  {% endif %}
   <p>
     The text message sender tells your users who the message is from.
   </p>
