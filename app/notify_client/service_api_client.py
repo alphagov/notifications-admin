@@ -75,6 +75,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             'sms_sender',
             'created_by',
             'branding',
+            'letter_branding',
             'email_branding',
             'letter_contact_block',
             'dvla_organisation',

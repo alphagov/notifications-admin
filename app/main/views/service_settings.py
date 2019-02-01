@@ -46,6 +46,7 @@ from app.main.forms import (
     ServicePreviewBranding,
     ServiceReplyToEmailForm,
     ServiceSetEmailBranding,
+    ServiceSetLetterBranding,
     ServiceSmsSenderForm,
     ServiceSwitchChannelForm,
     SMSPrefixForm,
@@ -805,16 +806,17 @@ def service_preview_email_branding(service_id):
 @main.route("/services/<service_id>/service-settings/set-letter-branding", methods=['GET', 'POST'])
 @login_required
 @user_is_platform_admin
-def set_letter_branding(service_id):
+def service_set_letter_branding(service_id):
+    letter_branding = letter_branding_client.get_all_letter_branding()
 
-    form = LetterBranding(
-        choices=letter_branding_client.get_letter_branding().items(),
-        dvla_org_id=current_service.dvla_organisation,
+    form = ServiceSetLetterBranding(
+        all_branding_options=get_branding_as_value_and_label(letter_branding),
+        current_branding=current_service.letter_branding_id,
     )
 
     if form.validate_on_submit():
         current_service.update(
-            dvla_organisation=form.dvla_org_id.data
+            letter_branding=form.branding_style.data
         )
         return redirect(url_for('.service_settings', service_id=service_id))
 
@@ -822,6 +824,7 @@ def set_letter_branding(service_id):
         'views/service-settings/set-letter-branding.html',
         form=form,
         search_form=SearchTemplatesForm(),
+        show_search_box=(len(letter_branding) > 6)
     )
 
 

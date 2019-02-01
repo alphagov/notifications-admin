@@ -807,6 +807,11 @@ class ServiceSetEmailBranding(StripWhitespaceForm):
         )
 
 
+class ServiceSetLetterBranding(ServiceSetEmailBranding):
+    # form is the same, but instead of GOV.UK we have None as a valid option
+    DEFAULT = (FieldWithNoneOption.NONE_OPTION_VALUE, 'None')
+
+
 class ServicePreviewBranding(StripWhitespaceForm):
 
     branding_style = HiddenFieldWithNoneOption('branding_style')
