@@ -31,7 +31,6 @@ from app.main.forms import (
     ConfirmPasswordForm,
     FreeSMSAllowance,
     InternationalSMSForm,
-    LetterBranding,
     LinkOrganisationsForm,
     OrganisationTypeForm,
     RenameServiceForm,
@@ -55,7 +54,6 @@ from app.main.forms import (
 from app.utils import (
     AgreementInfo,
     email_safe,
-    get_logo_cdn_domain,
     user_has_permissions,
     user_is_gov_user,
     user_is_platform_admin,
@@ -775,7 +773,6 @@ def service_set_email_branding(service_id):
     return render_template(
         'views/service-settings/set-email-branding.html',
         form=form,
-        branding_dict=get_branding_as_dict(email_branding),
         search_form=SearchTemplatesForm(),
         show_search_box=(len(email_branding) > 6)
     )
@@ -959,15 +956,6 @@ def get_branding_as_value_and_label(email_branding):
         (branding['id'], branding['name'])
         for branding in email_branding
     ]
-
-
-def get_branding_as_dict(email_branding):
-    return {
-        branding['id']: {
-            'logo': 'https://{}/{}'.format(get_logo_cdn_domain(), branding['logo']),
-            'colour': branding['colour']
-        } for branding in email_branding
-    }
 
 
 def convert_dictionary_to_wtforms_choices_format(dictionary, value, label):

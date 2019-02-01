@@ -886,27 +886,6 @@ class CreateOrUpdateOrganisation(StripWhitespaceForm):
     name = StringField('Name', validators=[DataRequired()])
 
 
-class LetterBranding(StripWhitespaceForm):
-
-    def __init__(self, choices=[], *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.dvla_org_id.choices = list(sorted(
-            choices,
-            key=lambda choice: (
-                choice[0] != kwargs.get('dvla_org_id'),
-                choice[0] != '001',
-                choice[1],
-            ),
-        ))
-
-    dvla_org_id = RadioField(
-        'Which logo should this service’s letter have?',
-        validators=[
-            DataRequired()
-        ]
-    )
-
-
 class EmailFieldInWhitelist(EmailField, StripWhitespaceStringField):
     pass
 

@@ -14,12 +14,7 @@ class LetterBrandingClient(NotifyAdminAPIClient):
             brandings.sort(key=lambda branding: branding[sort_key].lower())
         return brandings
 
-    def get_letter_branding_id_for_domain(self, domain):
-        for branding in self.get_all_letter_branding():
-            if domain and branding.get('domain') == domain:
-                return branding['id']
-        return None
-
+    @cache.delete('letter_branding')
     def create_letter_branding(self, filename, name, domain):
         data = {
             "filename": filename,

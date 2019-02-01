@@ -23,7 +23,6 @@ class Service():
     ALLOWED_PROPERTIES = {
         'active',
         'contact_link',
-        'dvla_organisation',
         'email_branding',
         'email_from',
         'id',
