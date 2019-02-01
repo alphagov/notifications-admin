@@ -14,26 +14,28 @@
     Add a new address
   </h1>
   <div class="grid-row">
-    {% call form_wrapper() %}
-      {{ textbox(
-          form.letter_contact_block,
-          label='This will appear as the ‘sender’ address on your letters.'|safe,
-          hint='10 lines maximum',
-          width='1-1',
-          rows=10,
-          highlight_tags=True
+    <div class="column-whole">
+      {% call form_wrapper() %}
+        {{ textbox(
+            form.letter_contact_block,
+            label='This will appear as the ‘sender’ address on your letters.'|safe,
+            hint='10 lines maximum',
+            width='1-2',
+            rows=10,
+            highlight_tags=True
+          ) }}
+        {% if not first_contact_block %}
+          <div class="form-group">
+            {{ checkbox(form.is_default) }}
+          </div>
+        {% endif %}
+        {{ page_footer(
+          'Add',
+          back_link=None if request.args.get('from_template') else url_for('.service_letter_contact_details', service_id=current_service.id),
+          back_link_text='Back'
         ) }}
-      {% if not first_contact_block %}
-        <div class="form-group">
-          {{ checkbox(form.is_default) }}
-        </div>
-      {% endif %}
-      {{ page_footer(
-        'Add',
-        back_link=None if request.args.get('from_template') else url_for('.service_letter_contact_details', service_id=current_service.id),
-        back_link_text='Back'
-      ) }}
-    {% endcall %}
+      {% endcall %}
+    </div>
   </div>
 
 {% endblock %}
