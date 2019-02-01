@@ -50,6 +50,10 @@
             $component.html(states.keyVisible(key, thing))
         );
 
+      if ('stickAtBottomWhenScrolling' in GOVUK) {
+        GOVUK.stickAtBottomWhenScrolling.recalculate();
+      }
+
     };
   };
 
