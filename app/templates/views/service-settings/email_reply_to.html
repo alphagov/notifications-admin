@@ -9,18 +9,10 @@
 
 {% block maincolumn_content %}
 
-  <div class="grid-row bottom-gutter">
-    <div class="column-two-thirds">
-      <h1 class="heading-large">
-        Email reply-to addresses
-      </h1>
-    </div>
-  {% if current_user.has_permissions('manage_service') %}
-	  <div class="column-one-third">
-	    <a href="{{ url_for('.service_add_email_reply_to', service_id=current_service.id) }}" class="button align-with-heading">Add email address</a>
-	  </div>
-  {% endif %}
-  </div>
+  <h1 class="heading-large">
+    Email reply-to addresses
+  </h1>
+
   <div class="user-list">
     {% if not current_service.email_reply_to_addresses %}
       <div class="user-list-item">
@@ -46,6 +38,13 @@
     {% endfor %}
   </div>
   <div class="grid-row">
+    <div class="column-whole">
+      {% if current_user.has_permissions('manage_service') %}
+        <div class="js-stick-at-bottom-when-scrolling">
+          <a href="{{ url_for('.service_add_email_reply_to', service_id=current_service.id) }}" class="button">Add email reply-to address</a>
+        </div>
+      {% endif %}
+    </div>
     <div class="column-five-sixths">
       <p>
         You need to add at least one reply-to address so recipients can reply to your messages.
@@ -59,4 +58,5 @@
       </ul>
     </div>
   </div>
+
 {% endblock %}

@@ -11,18 +11,9 @@
 
 {% block maincolumn_content %}
 
-  <div class="grid-row bottom-gutter">
-    <div class="column-two-thirds">
-      <h1 class="heading-large">
-        Team members
-      </h1>
-    </div>
-    {% if current_user.has_permissions('manage_service') %}
-      <div class="column-one-third">
-        <a href="{{ url_for('.invite_user', service_id=current_service.id) }}" class="button align-with-heading">Invite team member</a>
-      </div>
-    {% endif %}
-  </div>
+  <h1 class="heading-large">
+    Team members
+  </h1>
 
   {% if show_search_box %}
     <div data-module="autofocus">
@@ -80,5 +71,11 @@
       </div>
     {% endfor %}
   </div>
+
+  {% if current_user.has_permissions('manage_service') %}
+    <div class="js-stick-at-bottom-when-scrolling">
+      <a href="{{ url_for('.invite_user', service_id=current_service.id) }}" class="button-secondary">Invite a team member</a>
+    </div>
+  {% endif %}
 
 {% endblock %}

@@ -3,7 +3,7 @@ $item-top-padding: $gutter-half;
 .user-list {
 
   @include core-19;
-  margin-bottom: $gutter * 1.5;
+  margin-bottom: $gutter;
 
   &-item {
 
