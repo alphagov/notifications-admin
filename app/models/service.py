@@ -377,14 +377,12 @@ class Service():
         if folder['id'] is None:
             return [folder]
 
-        return [
-            self.get_template_folder(folder['parent_id']),
-            folder,
+        return self.get_template_folder_path(folder['parent_id']) + [
+            self.get_template_folder(folder['id'])
         ]
 
     def get_template_path(self, template):
-        return [
-            self.get_template_folder(template['folder']),
+        return self.get_template_folder_path(template['folder']) + [
             template,
         ]
 

@@ -267,7 +267,7 @@ def test_should_show_live_search_if_service_has_lots_of_folders(
     )
 
     count_of_templates_and_folders = len(page.select('.message-name'))
-    count_of_folders = len(page.select('.template-list-folder'))
+    count_of_folders = len(page.select('.template-list-folder:first-child'))
     count_of_templates = count_of_templates_and_folders - count_of_folders
 
     assert len(page.select('.live-search')) == 1

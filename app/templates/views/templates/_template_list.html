@@ -21,18 +21,18 @@
             value=item.id,
           ) }}
         {% endif %}
-        <h2 class="message-name {% if item.is_folder or (item.ancestors and not item.is_folder) %}template-list-folder{% endif %}">
+        <h2 class="message-name">
           {% for ancestor in item.ancestors %}
-            <a href="{{ url_for('.choose_template', service_id=current_service.id, template_type=template_type, template_folder_id=ancestor.id) }}">
+            <a href="{{ url_for('.choose_template', service_id=current_service.id, template_type=template_type, template_folder_id=ancestor.id) }}" class="template-list-folder">
               {{ ancestor.name }}
             </a> <span class="message-name-separator">/</span>
           {% endfor %}
           {% if item.is_folder %}
-            <a href="{{ url_for('.choose_template', service_id=current_service.id, template_type=template_type, template_folder_id=item.id) }}">
+            <a href="{{ url_for('.choose_template', service_id=current_service.id, template_type=template_type, template_folder_id=item.id) }}" class="template-list-folder">
               <span class="live-search-relevant">{{ item.name }}</span>
             </a>
           {% else %}
-            <a href="{{ url_for('.view_template', service_id=current_service.id, template_id=item.id) }}">
+            <a href="{{ url_for('.view_template', service_id=current_service.id, template_id=item.id) }}" class="template-list-template">
               <span class="live-search-relevant">{{ item.name }}</span>
             </a>
           {% endif %}
