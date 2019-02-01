@@ -234,22 +234,6 @@ def service_switch_research_mode(service_id):
     return redirect(url_for('.service_settings', service_id=service_id))
 
 
-@main.route("/services/<service_id>/service-settings/can-send-email")
-@login_required
-@user_is_platform_admin
-def service_switch_can_send_email(service_id):
-    current_service.switch_permission('email')
-    return redirect(url_for('.service_settings', service_id=service_id))
-
-
-@main.route("/services/<service_id>/service-settings/can-send-sms")
-@login_required
-@user_is_platform_admin
-def service_switch_can_send_sms(service_id):
-    current_service.switch_permission('sms')
-    return redirect(url_for('.service_settings', service_id=service_id))
-
-
 @main.route("/services/<service_id>/service-settings/email-auth")
 @login_required
 @user_is_platform_admin

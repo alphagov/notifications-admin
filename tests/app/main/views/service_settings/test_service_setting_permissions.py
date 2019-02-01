@@ -29,12 +29,6 @@ def get_service_settings_page(
     ({'research_mode': True}, '.service_switch_research_mode', {}, 'Take service out of research mode'),
     ({'research_mode': False}, '.service_switch_research_mode', {}, 'Put into research mode'),
 
-    ({'permissions': ['email']}, '.service_switch_can_send_email', {}, 'Stop sending emails'),
-    ({'permissions': []}, '.service_switch_can_send_email', {}, 'Allow to send emails'),
-
-    ({'permissions': ['sms']}, '.service_switch_can_send_sms', {}, 'Stop sending sms'),
-    ({'permissions': []}, '.service_switch_can_send_sms', {}, 'Allow to send sms'),
-
     ({'permissions': ['letter', 'precompiled_letter']},
         '.service_switch_can_send_precompiled_letter', {}, 'Stop sending precompiled letters'),
     ({'permissions': ['letter']},
