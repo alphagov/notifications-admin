@@ -15,11 +15,6 @@
         Sender addresses
       </h1>
     </div>
-    {% if current_user.has_permissions('manage_service') %}
-      <div class="column-one-third">
-        <a href="{{ url_for('.service_add_letter_contact', service_id=current_service.id) }}" class="button align-with-heading">Add a new address</a>
-      </div>
-    {% endif %}
   </div>
   <div class="user-list">
     {% if not letter_contact_details %}
@@ -46,4 +41,13 @@
       </div>
     {% endfor %}
   </div>
+  {% if current_user.has_permissions('manage_service') %}
+    <div class="grid-row">
+      <div class="column-whole">
+        <div class="js-stick-at-bottom-when-scrolling">
+          <a href="{{ url_for('.service_add_letter_contact', service_id=current_service.id) }}" class="button">Add a new address</a>
+        </div>
+      </div>
+    </div>
+  {% endif %}
 {% endblock %}
