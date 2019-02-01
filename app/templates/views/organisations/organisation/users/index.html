@@ -11,16 +11,9 @@
 
 {% block maincolumn_content %}
 
-  <div class="grid-row bottom-gutter">
-    <div class="column-two-thirds">
-      <h1 class="heading-large">
-        Team members
-      </h1>
-    </div>
-    <div class="column-one-third">
-      <a href="{{ url_for('.invite_org_user', org_id=current_org.id) }}" class="button align-with-heading">Invite team member</a>
-    </div>
-  </div>
+  <h1 class="heading-large">
+    Team members
+  </h1>
 
   {% if show_search_box %}
     <div data-module="autofocus">
@@ -58,6 +51,8 @@
     {% endfor %}
   </div>
 
+  <div class="js-stick-at-bottom-when-scrolling">
+    <a href="{{ url_for('.invite_org_user', org_id=current_org.id) }}" class="button">Invite team member</a>
+  </div>
+
 {% endblock %}
-
-
