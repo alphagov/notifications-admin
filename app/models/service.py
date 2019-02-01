@@ -107,7 +107,7 @@ class Service():
                 invite_api_client.get_invites_for_service(service_id=self.id) +
                 user_api_client.get_users_for_service(service_id=self.id)
             ),
-            key=lambda user: user.email_address,
+            key=lambda user: user.email_address.lower(),
         )
 
     @cached_property
