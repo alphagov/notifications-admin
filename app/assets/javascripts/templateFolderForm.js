@@ -35,7 +35,7 @@
       // first off show the new template / new folder buttons
       this.currentState = this.$form.data('prev-state') || 'unknown';
       if (this.currentState === 'unknown') {
-        this.selectActionButtons();
+        this.selectActionButtons(false);
       } else {
         this.render();
       }
@@ -75,6 +75,7 @@
     };
 
     this.addCancelButton = function(state) {
+      let selector = `[value=${state.key}]`;
       let $cancel = this.makeButton('Cancel', () => {
 
         // clear existing data
@@ -82,8 +83,8 @@
         state.$el.find('input:text').val('');
 
         // go back to action buttons
-        this.selectActionButtons();
-      });
+        this.selectActionButtons(selector);
+      }, selector);
 
       state.$el.find('[type=submit]').after($cancel);
     };
@@ -91,7 +92,6 @@
     this.addClearButton = function(state) {
 
       let $clear = this.makeButton('Clear', () => {
-
         // uncheck all templates and folders
         this.$form.find('input:checkbox').prop('checked', false);
 
@@ -102,9 +102,10 @@
       state.$el.find('.template-list-selected-counter').append($clear);
     };
 
-    this.makeButton = (text, fn) => $('<a></a>')
+    this.makeButton = (text, fn, cancelSelector) => $('<a></a>')
       .html(text)
       .addClass('js-cancel')
+      .data('target', cancelSelector) // isn't set if cancelSelector is undefined
       .attr('tabindex', '0')
       .on('click keydown', event => {
         // space, enter or no keyCode (must be mouse input)
@@ -114,12 +115,16 @@
         }
       });
 
-    this.selectActionButtons = function () {
+    this.selectActionButtons = function (targetSelector) {
       // If we want to show one of the grey choose actions state, we can pretend we're in the choose actions state,
       // and then pretend a checkbox was clicked to work out whether to show zero or non-zero options.
       // This calls a render at the end
       this.currentState = 'nothing-selected-buttons';
       this.templateFolderCheckboxChanged();
+      if (targetSelector) {
+        let setFocus = this.getFocusRoutine(targetSelector, false);
+        setFocus();
+      }
     };
 
     this.actionButtonClicked = function(event) {
