@@ -38,15 +38,6 @@ def get_service_settings_page(
         '.service_switch_can_upload_document', {}, 'Stop uploading documents'),
     ({'permissions': []},
         '.service_switch_can_upload_document', {}, 'Allow to upload documents'),
-
-    (
-        {'permissions': ['choose_postage']},
-        '.service_switch_can_choose_postage',
-        {},
-        'Stop choosing postage per template'
-    ),
-    ({'permissions': []}, '.service_switch_can_choose_postage', {}, 'Allow to choose postage per template'),
-
     ({'permissions': ['sms']}, '.service_set_inbound_number', {'set_inbound_sms': True}, 'Allow inbound sms'),
 
     ({'active': True}, '.archive_service', {}, 'Archive service'),

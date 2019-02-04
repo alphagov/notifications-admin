@@ -215,49 +215,6 @@ def test_should_show_overview_for_service_with_more_things_set(
         assert row == " ".join(page.find_all('tr')[index + 1].text.split())
 
 
-def test_if_cant_send_letters_then_cant_see_postage(
-    client_request,
-    service_one,
-    single_reply_to_email_address,
-    single_letter_contact_block,
-    mock_get_service_organisation,
-    single_sms_sender,
-    mock_get_service_settings_page_common,
-):
-    page = client_request.get('main.service_settings', service_id=SERVICE_ONE_ID)
-
-    letter_table = page.find_all('table')[3]
-    rows = letter_table.find_all('tr')
-
-    assert len(rows) == 2
-    assert 'Postage' not in letter_table
-
-
-def test_if_can_choose_postage_on_template_cant_choose_on_service(
-    client_request,
-    service_one,
-    single_reply_to_email_address,
-    single_letter_contact_block,
-    mock_get_service_organisation,
-    single_sms_sender,
-    mock_get_service_settings_page_common,
-):
-    service_one['permissions'] = ['letter', 'choose_postage']
-    page = client_request.get('main.service_settings', service_id=SERVICE_ONE_ID)
-
-    letter_table = page.find_all('table')[3]
-    rows = letter_table.select('tbody tr')
-
-    assert len(rows) == 3
-    assert 'Postage' not in letter_table
-
-    client_request.get(
-        'main.service_set_postage',
-        service_id=SERVICE_ONE_ID,
-        _expected_status=404,
-    )
-
-
 def test_if_cant_send_letters_then_cant_see_letter_contact_block(
         client_request,
         service_one,
@@ -2192,45 +2149,6 @@ def test_set_letter_branding_saves(
     assert response.status_code == 302
     assert response.location == url_for('main.service_settings', service_id=service_one['id'], _external=True)
     mock_update_service.assert_called_once_with(service_one['id'], dvla_organisation='500')
-
-
-def test_set_postage_only_for_letter_services(
-    client_request,
-):
-    client_request.get(
-        'main.service_set_postage',
-        service_id=SERVICE_ONE_ID,
-        _expected_status=404,
-    )
-
-
-def test_set_postage_prepopulates(
-    client_request,
-    service_one,
-):
-    service_one['permissions'] += ['letter']
-    page = client_request.get('main.service_set_postage', service_id=SERVICE_ONE_ID)
-    assert page.select('input[checked]')[0]['value'] == 'second'
-
-
-def test_set_postage_saves(
-    client_request,
-    service_one,
-    mock_update_service,
-):
-    service_one['permissions'] += ['letter']
-    client_request.post(
-        'main.service_set_postage',
-        service_id=SERVICE_ONE_ID,
-        _data={'postage': 'first'},
-        _expected_status=302,
-        expected_redirect=url_for(
-            'main.service_settings',
-            service_id=SERVICE_ONE_ID,
-            _external=True,
-        )
-    )
-    mock_update_service.assert_called_once_with(SERVICE_ONE_ID, postage='first')
 
 
 @pytest.mark.parametrize('current_branding, expected_values, expected_labels', [

@@ -240,21 +240,6 @@
           )}}
         {% endcall %}
 
-        {% if current_service.has_permission('letter') and not current_service.has_permission('choose_postage') %}
-          {% call settings_row() %}
-            {{ text_field('Postage') }}
-            {% set postage = {'first': 'First class only', 'second': 'Second class only'} %}
-            {{ text_field(postage[current_service.postage]) }}
-            {{ edit_field(
-                'Change',
-                url_for('.service_set_postage',
-                service_id=current_service.id),
-                permissions=['manage_service']
-            )
-            }}
-          {% endcall %}
-        {% endif %}
-
       {% endcall %}
     </div>
 
@@ -371,11 +356,6 @@
         <li class="bottom-gutter">
            <a href="{{ url_for('.service_switch_can_upload_document', service_id=current_service.id) }}" class="button">
              {{ 'Stop uploading documents' if 'upload_document' in current_service.permissions else 'Allow to upload documents' }}
-           </a>
-        </li>
-        <li class="bottom-gutter">
-           <a href="{{ url_for('.service_switch_can_choose_postage', service_id=current_service.id) }}" class="button">
-             {{ 'Stop choosing postage per template' if 'choose_postage' in current_service.permissions else 'Allow to choose postage per template' }}
            </a>
         </li>
         {% if current_service.active %}

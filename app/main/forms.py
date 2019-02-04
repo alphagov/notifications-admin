@@ -447,17 +447,6 @@ class EmailTemplateForm(BaseTemplateForm):
 
 
 class LetterTemplateForm(EmailTemplateForm):
-    postage = RadioField(
-        'Choose postage',
-        choices=[
-            ('first', 'First class'),
-            ('second', 'Second class'),
-            ('None', "Service default"),
-        ],
-        validators=[DataRequired()],
-        default='None'
-    )
-
     subject = TextAreaField(
         u'Main heading',
         validators=[DataRequired(message="Can’t be empty")])
@@ -468,6 +457,17 @@ class LetterTemplateForm(EmailTemplateForm):
             DataRequired(message="Can’t be empty"),
             NoCommasInPlaceHolders()
         ]
+    )
+
+
+class LetterTemplatePostageForm(StripWhitespaceForm):
+    postage = RadioField(
+        'Choose the postage for this letter template',
+        choices=[
+            ('first', 'First class'),
+            ('second', 'Second class'),
+        ],
+        validators=[DataRequired()]
     )
 
 
@@ -711,17 +711,6 @@ class ServiceSwitchChannelForm(StripWhitespaceForm):
         choices=[
             ('on', 'On'),
             ('off', 'Off'),
-        ],
-    )
-
-
-class ServicePostageForm(StripWhitespaceForm):
-
-    postage = RadioField(
-        'Choose your postage',
-        choices=[
-            ('first', 'First class only'),
-            ('second', 'Second class only'),
         ],
     )
 

@@ -39,3 +39,9 @@
   top: 400px; // aligns to top of subject
   left: -5px;
 }
+
+.edit-template-link-letter-postage {
+  @extend %edit-template-link;
+  top: -20px; // aligns to top of subject
+  left: -5px;
+}

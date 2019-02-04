@@ -1,0 +1,31 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/radios.html" import radios %}
+{% from "components/form.html" import form_wrapper %}
+
+{% block service_page_title %}
+  Edit postage
+{% endblock %}
+
+{% block maincolumn_content %}
+
+    <h1 class="heading-large">
+      Edit postage
+    </h1>
+    {% call form_wrapper() %}
+      <div class="grid-row">
+        <div class="column-five-sixths">
+          {{ radios(form.postage) }}
+          {{ page_footer(
+            'Save',
+            back_link=url_for('.view_template', service_id=service_id, template_id=template_id),
+            back_link_text='Back to template'
+          ) }}
+        </div>
+        <aside class="column-three-quarters">
+          {% include "partials/templates/guidance-postage.html" %}
+        </aside>
+      </div>
+    {% endcall %}
+
+{% endblock %}
