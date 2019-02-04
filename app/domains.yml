@@ -4111,7 +4111,7 @@ southsomerset.gov.uk:
 southtyneside.gov.uk:
   owner: South Tyneside Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 southwark.gov.uk:
   owner: Southwark London Borough Council
   crown: false
@@ -4329,10 +4329,7 @@ sturminsternewton-tc.gov.uk:
   owner: Sturminster Newton Town Council
   crown: false
   agreement_signed: false
-s-tyneside-mbc.gov.uk:
-  owner: South Tyneside Council
-  crown: false
-  agreement_signed: false
+s-tyneside-mbc.gov.uk: southtyneside.gov.uk
 suffolkcc.gov.uk:
   owner: Suffolk County Council
   crown: false
