@@ -147,7 +147,7 @@
       );
 
       // use dialog mode for states which contain more than one form control
-      if ($.inArray(this.currentState, ['move-to-existing-folder', 'add-new-template']) !== -1) {
+      if (['move-to-existing-folder', 'add-new-template'].indexOf(this.currentState) !== -1) {
         mode = 'dialog';
       }
       GOVUK.stickAtBottomWhenScrolling.setMode(mode);
