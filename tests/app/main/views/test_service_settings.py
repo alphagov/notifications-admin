@@ -1230,36 +1230,6 @@ def test_route_for_platform_admin_update_service(
                               service_one)
 
 
-@pytest.mark.parametrize('notification_type, permissions_before_switch, permissions_after_switch', [
-    ('email', [], ['email']),
-    ('email', ['email'], []),
-    ('sms', [], ['sms']),
-    ('sms', ['sms'], [])
-])
-def test_enabling_and_disabling_email_and_sms(
-        logged_in_platform_admin_client,
-        service_one,
-        mocker,
-        notification_type,
-        permissions_before_switch,
-        permissions_after_switch,
-        mock_get_inbound_number_for_service
-):
-    service_one['permissions'] = permissions_before_switch
-    mocked_fn = mocker.patch(
-        'app.notify_client.service_api_client.service_api_client.update_service',
-        return_value=service_one,
-    )
-
-    response = logged_in_platform_admin_client.get(
-        url_for('main.service_switch_can_send_{}'.format(notification_type), service_id=service_one['id'])
-    )
-
-    assert response.status_code == 302
-    assert response.location == url_for('main.service_settings', service_id=service_one['id'], _external=True)
-    assert mocked_fn.call_args == call(service_one['id'], permissions=permissions_after_switch)
-
-
 def test_and_more_hint_appears_on_settings_with_more_than_just_a_single_sender(
         client_request,
         service_one,

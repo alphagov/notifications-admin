@@ -347,16 +347,6 @@
             {{ 'Take service out of research mode' if current_service.research_mode else 'Put into research mode' }}
           </a>
         </li>
-        <li class="bottom-gutter">
-          <a href="{{ url_for('.service_switch_can_send_email', service_id=current_service.id) }}" class="button">
-            {{ 'Stop sending emails' if 'email' in current_service.permissions else 'Allow to send emails' }}
-          </a>
-        </li>
-        <li class="bottom-gutter">
-          <a href="{{ url_for('.service_switch_can_send_sms', service_id=current_service.id) }}" class="button">
-            {{ 'Stop sending sms' if 'sms' in current_service.permissions else 'Allow to send sms' }}
-          </a>
-        </li>
         {% if 'sms' in current_service.permissions %}
           <li class="bottom-gutter">
           {% if not current_service.has_permission('inbound_sms') %}
@@ -381,11 +371,6 @@
         <li class="bottom-gutter">
            <a href="{{ url_for('.service_switch_can_upload_document', service_id=current_service.id) }}" class="button">
              {{ 'Stop uploading documents' if 'upload_document' in current_service.permissions else 'Allow to upload documents' }}
-           </a>
-        </li>
-        <li class="bottom-gutter">
-           <a href="{{ url_for('.service_switch_can_edit_folders', service_id=current_service.id) }}" class="button">
-             {{ 'Stop editing folders' if 'edit_folders' in current_service.permissions else 'Allow to edit folders' }}
            </a>
         </li>
         <li class="bottom-gutter">
