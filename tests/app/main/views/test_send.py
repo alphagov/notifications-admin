@@ -387,6 +387,7 @@ def test_upload_csvfile_with_errors_shows_check_page_with_errors(
     mock_get_users_by_service,
     mock_get_service_statistics,
     mock_get_job_doesnt_exist,
+    mock_get_jobs,
     fake_uuid,
 ):
 
@@ -512,6 +513,7 @@ def test_upload_csvfile_with_missing_columns_shows_error(
     mock_get_users_by_service,
     mock_get_service_statistics,
     mock_get_job_doesnt_exist,
+    mock_get_jobs,
     service_one,
     fake_uuid,
     file_contents,
@@ -593,6 +595,7 @@ def test_upload_valid_csv_shows_preview_and_table(
     mock_get_users_by_service,
     mock_get_service_statistics,
     mock_get_job_doesnt_exist,
+    mock_get_jobs,
     mock_s3_set_metadata,
     fake_uuid,
     extra_args,
@@ -703,6 +706,7 @@ def test_upload_valid_csv_only_sets_meta_if_filename_known(
     mock_get_users_by_service,
     mock_get_service_statistics,
     mock_get_job_doesnt_exist,
+    mock_get_jobs,
     mock_s3_set_metadata,
     fake_uuid,
 ):
@@ -740,6 +744,7 @@ def test_file_name_truncated_to_fit_in_s3_metadata(
     mock_get_users_by_service,
     mock_get_service_statistics,
     mock_get_job_doesnt_exist,
+    mock_get_jobs,
     mock_s3_set_metadata,
     fake_uuid,
 ):
@@ -781,6 +786,7 @@ def test_check_messages_replaces_invalid_characters_in_file_name(
     mock_get_users_by_service,
     mock_get_service_statistics,
     mock_get_job_doesnt_exist,
+    mock_get_jobs,
     mock_s3_set_metadata,
     fake_uuid,
 ):
@@ -822,6 +828,7 @@ def test_show_all_columns_if_there_are_duplicate_recipient_columns(
     mock_get_users_by_service,
     mock_get_service_statistics,
     mock_get_job_doesnt_exist,
+    mock_get_jobs,
     fake_uuid,
 ):
 
@@ -867,6 +874,7 @@ def test_404_for_previewing_a_row_out_of_range(
     mock_get_users_by_service,
     mock_get_service_statistics,
     mock_get_job_doesnt_exist,
+    mock_get_jobs,
     mock_s3_set_metadata,
     fake_uuid,
     row_index,
@@ -1887,6 +1895,7 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(
     mock_get_service_statistics,
     mock_get_live_service,
     mock_get_job_doesnt_exist,
+    mock_get_jobs,
     mock_s3_set_metadata,
     service_one,
     fake_uuid,
@@ -1943,6 +1952,7 @@ def test_upload_csvfile_with_international_validates(
     mock_get_users_by_service,
     mock_get_service_statistics,
     mock_get_job_doesnt_exist,
+    mock_get_jobs,
     fake_uuid,
     service_mock,
     should_allow_international,
@@ -1975,6 +1985,7 @@ def test_test_message_can_only_be_sent_now(
     mock_get_users_by_service,
     mock_get_service_statistics,
     mock_get_job_doesnt_exist,
+    mock_get_jobs,
     mock_s3_set_metadata,
     fake_uuid
 ):
@@ -1998,6 +2009,7 @@ def test_letter_can_only_be_sent_now(
     mock_get_service_statistics,
     mock_s3_set_metadata,
     mock_get_job_doesnt_exist,
+    mock_get_jobs,
     fake_uuid,
 ):
     mocker.patch('app.main.views.send.s3download', return_value="addressline1, addressline2, postcode\na,b,c")
@@ -2138,6 +2150,7 @@ def test_should_show_preview_letter_message(
     mock_get_users_by_service,
     mock_get_service_statistics,
     mock_get_job_doesnt_exist,
+    mock_get_jobs,
     service_one,
     fake_uuid,
     mocker,
@@ -2356,6 +2369,7 @@ def test_check_messages_back_link(
     mock_has_permissions,
     mock_get_service_statistics,
     mock_get_job_doesnt_exist,
+    mock_get_jobs,
     mock_s3_download,
     mock_s3_set_metadata,
     fake_uuid,
@@ -2449,6 +2463,7 @@ def test_check_messages_shows_too_many_messages_errors(
     mock_get_service,
     mock_get_service_template,
     mock_get_job_doesnt_exist,
+    mock_get_jobs,
     mock_has_permissions,
     fake_uuid,
     num_requested,
@@ -2498,6 +2513,7 @@ def test_check_messages_shows_trial_mode_error(
     mock_has_permissions,
     mock_get_service_statistics,
     mock_get_job_doesnt_exist,
+    mock_get_jobs,
     fake_uuid,
     mocker
 ):
@@ -2546,6 +2562,7 @@ def test_check_messages_shows_trial_mode_error_for_letters(
     mock_get_users_by_service,
     mock_get_service_statistics,
     mock_get_job_doesnt_exist,
+    mock_get_jobs,
     mock_s3_set_metadata,
     fake_uuid,
     mocker,
@@ -2605,6 +2622,7 @@ def test_check_messages_shows_data_errors_before_trial_mode_errors_for_letters(
     mock_get_users_by_service,
     mock_get_service_statistics,
     mock_get_job_doesnt_exist,
+    mock_get_jobs,
     fake_uuid,
 ):
 
@@ -2644,6 +2662,50 @@ def test_check_messages_shows_data_errors_before_trial_mode_errors_for_letters(
     assert not page.select('.table-field-index a')
 
 
+@pytest.mark.parametrize('uploaded_file_name', (
+    pytest.param('applicants.ods'),  # normal job
+    pytest.param('thisisatest.csv', marks=pytest.mark.xfail),  # different template version
+    pytest.param('send_me_later.csv'),  # should look at scheduled job
+    pytest.param('full_of_regret.csv', marks=pytest.mark.xfail),  # job is cancelled
+))
+def test_warns_if_file_sent_already(
+    client_request,
+    mock_get_users_by_service,
+    mock_get_live_service,
+    mock_get_service_template,
+    mock_has_permissions,
+    mock_get_service_statistics,
+    mock_get_job_doesnt_exist,
+    mock_get_jobs,
+    fake_uuid,
+    mocker,
+    uploaded_file_name,
+):
+    mocker.patch('app.main.views.send.s3download', return_value=(
+        'phone number,\n07900900321'
+    ))
+
+    page = client_request.get(
+        'main.check_messages',
+        service_id=SERVICE_ONE_ID,
+        template_id="5d729fbd-239c-44ab-b498-75a985f3198f",
+        upload_id=fake_uuid,
+        original_file_name=uploaded_file_name,
+        _test_page_title=False,
+    )
+
+    assert normalize_spaces(
+        page.select_one('.banner-dangerous').text
+    ) == (
+        'You already sent these messages '
+        'If you want to send the same messages again, rename the file '
+        'and re-upload it '
+        'Skip to file contents'
+    )
+
+    mock_get_jobs.assert_called_once_with(SERVICE_ONE_ID, limit_days=0)
+
+
 def test_check_messages_column_error_doesnt_show_optional_columns(
     mocker,
     client_request,
@@ -2653,6 +2715,7 @@ def test_check_messages_column_error_doesnt_show_optional_columns(
     mock_get_users_by_service,
     mock_get_service_statistics,
     mock_get_job_doesnt_exist,
+    mock_get_jobs,
 ):
 
     mocker.patch('app.main.views.send.s3download', return_value='\n'.join(
@@ -2696,6 +2759,7 @@ def test_check_messages_adds_sender_id_in_session_to_metadata(
     mock_get_users_by_service,
     mock_get_service_statistics,
     mock_get_job_doesnt_exist,
+    mock_get_jobs,
     mock_s3_set_metadata,
     fake_uuid,
 ):
@@ -2744,6 +2808,7 @@ def test_letters_from_csv_files_dont_have_download_link(
     mock_get_users_by_service,
     mock_get_service_statistics,
     mock_get_job_doesnt_exist,
+    mock_get_jobs,
     mock_s3_set_metadata,
     extra_args,
 ):
@@ -2890,6 +2955,7 @@ def test_check_messages_shows_over_max_row_error(
     mock_has_permissions,
     mock_get_service_statistics,
     mock_get_job_doesnt_exist,
+    mock_get_jobs,
     mock_s3_download,
     fake_uuid,
     mocker
@@ -3285,6 +3351,7 @@ def test_reply_to_is_previewed_if_chosen(
     mock_get_users_by_service,
     mock_get_service_statistics,
     mock_get_job_doesnt_exist,
+    mock_get_jobs,
     get_default_reply_to_email_address,
     fake_uuid,
     endpoint,
@@ -3335,6 +3402,7 @@ def test_sms_sender_is_previewed(
     mock_get_users_by_service,
     mock_get_service_statistics,
     mock_get_job_doesnt_exist,
+    mock_get_jobs,
     get_default_sms_sender,
     fake_uuid,
     endpoint,

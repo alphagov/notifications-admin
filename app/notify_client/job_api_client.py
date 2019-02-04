@@ -60,6 +60,17 @@ class JobApiClient(NotifyAdminAPIClient):
 
         return jobs
 
+    def has_sent_previously(self, service_id, template_id, template_version, original_file_name):
+        return (
+            template_id, template_version, original_file_name
+        ) in (
+            (
+                job['template'], job['template_version'], job['original_file_name'],
+            )
+            for job in self.get_jobs(service_id, limit_days=0)['data']
+            if job['job_status'] != 'cancelled'
+        )
+
     def get_page_of_jobs(self, service_id, page):
         return self.get_jobs(
             service_id,
