@@ -829,7 +829,7 @@ def set_template_sender(service_id, template_id):
 @user_has_permissions('manage_templates')
 def edit_template_postage(service_id, template_id):
     template = service_api_client.get_service_template(service_id, template_id)['data']
-    if template["template_type"] != "letter" or not current_service.has_permission("choose_postage"):
+    if template["template_type"] != "letter":
         abort(404)
     form = LetterTemplatePostageForm(**template)
     if form.validate_on_submit():
