@@ -12,7 +12,11 @@
   <div class="grid-row">
     <div class="column-three-quarters">
       <p>
-        Your letters have the {{ current_service.letter_branding }} logo.
+        {% if current_service.letter_branding_id %}
+          Your letters have the {{ current_service.letter_branding.name }} logo.
+        {% else %}
+          Your letters have no logo.
+        {% endif %}
       </p>
       <p>
         <a href="{{ url_for('main.feedback', ticket_type='ask-question-give-feedback', body='letter-branding') }}">Contact support</a>
