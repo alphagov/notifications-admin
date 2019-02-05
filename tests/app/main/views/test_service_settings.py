@@ -94,7 +94,7 @@ def mock_get_service_settings_page_common(
         'Organisation type Central Change',
         'Free text message allowance 250,000 Change',
         'Email branding GOV.UK Change',
-        'Letter branding Change',
+        'Letter branding Not set Change',
         'Data retention email Change'
 
     ]),
@@ -186,7 +186,7 @@ def test_should_show_overview(
         'Label Value Action',
         'Send letters On Change',
         'Sender addresses 1 Example Street Manage',
-        'Letter branding None Change',
+        'Letter branding Not set Change',
 
     ]),
 ])

@@ -232,7 +232,7 @@
 
         {% call settings_row(if_has_permission='letter') %}
           {{ text_field('Letter branding') }}
-          {{ text_field(current_service.letter_branding) }}
+          {{ optional_text_field(current_service.letter_branding.name) }}
           {{ edit_field(
             'Change',
             url_for('.request_letter_branding', service_id=current_service.id),
@@ -309,7 +309,7 @@
         {% endcall %}
         {% call row() %}
           {{ text_field('Letter branding')}}
-          {{ text_field(current_service.letter_branding.name) }}
+          {{ optional_text_field(current_service.letter_branding.name) }}
           {{ edit_field('Change', url_for('.service_set_letter_branding', service_id=current_service.id)) }}
         {% endcall %}
         {% call row() %}
