@@ -42,6 +42,6 @@
 
 .edit-template-link-letter-postage {
   @extend %edit-template-link;
-  top: -20px; // aligns to top of subject
-  left: -5px;
+  top: 51px; // aligns bottom edge to bottom of postmark
+  right: 145px; // Aligns right edge to midpoint of postmark and fold
 }
