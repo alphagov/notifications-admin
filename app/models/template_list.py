@@ -24,10 +24,10 @@ class TemplateList():
             yield TemplateListFolder(
                 item,
                 folders=self.service.get_template_folders(
-                    self.template_type, item['id']
+                    template_type, item['id']
                 ),
                 templates=self.service.get_templates(
-                    self.template_type, item['id']
+                    template_type, item['id']
                 ),
                 ancestors=ancestors,
                 service_id=self.service.id,
@@ -38,7 +38,7 @@ class TemplateList():
                 yield sub_item
 
         for item in self.service.get_templates(
-            self.template_type, template_folder_id
+            template_type, template_folder_id
         ):
             yield TemplateListTemplate(
                 item,

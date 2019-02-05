@@ -303,6 +303,24 @@ def test_post_add_template_folder_page(client_request, service_one, mocker, pare
             None,
         ),
         (
+            'folder_one_one_one – folder_one_one – folder_one – Templates – service one – GOV.UK Notify',
+            'Templates / folder_one / folder_one_one / folder_one_one_one',
+            [
+                {'template_type': 'email'},
+                {'template_type': 'email', 'template_folder_id': PARENT_FOLDER_ID},
+                {'template_type': 'email', 'template_folder_id': CHILD_FOLDER_ID},
+            ],
+            {
+                'template_type': 'email',
+                'template_folder_id': GRANDCHILD_FOLDER_ID,
+            },
+            ['All', 'Text message', 'Letter'],
+            [],
+            [],
+            [],
+            'There are no email templates in this folder',
+        ),
+        (
             'folder_two – Templates – service one – GOV.UK Notify',
             'Templates / folder_two',
             [{'template_type': 'all'}],
