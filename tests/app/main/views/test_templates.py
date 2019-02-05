@@ -456,7 +456,7 @@ def test_view_letter_template_displays_postage(
         template_id=fake_uuid,
     )
 
-    assert normalize_spaces(page.select_one('#postage').text) == expected_result
+    assert normalize_spaces(page.select_one('.letter-postage').text) == expected_result
 
 
 def test_view_non_letter_template_does_not_display_postage(

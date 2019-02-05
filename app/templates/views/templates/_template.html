@@ -22,10 +22,6 @@
               </a>
             </div>
           {% endif %}
-            <div class="column-whole" id="postage">
-              <h2 class="heading-small heading-inline">Postage</h2>:
-              {{ template_postage or current_service.postage }} class
-            </div>
         {% else %}
           {% if current_user.has_permissions('send_messages', restrict_admin_usage=True) %}
             <div class="column-half">
