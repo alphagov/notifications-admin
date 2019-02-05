@@ -609,6 +609,9 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
         )),
         required_recipient_columns=OrderedSet(recipients.recipient_column_headers) - optional_address_columns,
         preview_row=preview_row,
+        sent_previously=job_api_client.has_sent_previously(
+            service_id, template.id, db_template['version'], request.args.get('original_file_name', '')
+        )
     )
 
 
@@ -625,7 +628,8 @@ def check_messages(service_id, template_id, upload_id, row_index=2):
         not data['count_of_recipients'] or
         not data['recipients'].has_recipient_columns or
         data['recipients'].duplicate_recipient_column_headers or
-        data['recipients'].missing_column_headers
+        data['recipients'].missing_column_headers or
+        data['sent_previously']
     ):
         return render_template('views/check/column-errors.html', **data)
 

@@ -1854,7 +1854,7 @@ def mock_has_no_jobs(mocker):
 def mock_get_jobs(mocker, api_user_active):
     def _get_jobs(service_id, limit_days=None, statuses=None, page=1):
         if statuses is None:
-            statuses = ['', 'scheduled', 'pending', 'cancelled']
+            statuses = ['', 'scheduled', 'pending', 'cancelled', 'finished']
 
         jobs = [
             job_json(
@@ -1862,16 +1862,17 @@ def mock_get_jobs(mocker, api_user_active):
                 api_user_active,
                 original_file_name=filename,
                 scheduled_for=scheduled_for,
-                job_status=job_status
+                job_status=job_status,
+                template_version=template_version,
             )
-            for filename, scheduled_for, job_status in (
-                ('export 1/1/2016.xls', '', 'finished'),
-                ('all email addresses.xlsx', '', 'pending'),
-                ('applicants.ods', '', 'finished'),
-                ('thisisatest.csv', '', 'finished'),
-                ('send_me_later.csv', '2016-01-01 11:09:00.061258', 'scheduled'),
-                ('even_later.csv', '2016-01-01 23:09:00.061258', 'scheduled'),
-                ('full_of_regret.csv', '2016-01-01 23:09:00.061258', 'cancelled')
+            for filename, scheduled_for, job_status, template_version in (
+                ('export 1/1/2016.xls', '', 'finished', 1),
+                ('all email addresses.xlsx', '', 'pending', 1),
+                ('applicants.ods', '', 'finished', 1),
+                ('thisisatest.csv', '', 'finished', 2),
+                ('send_me_later.csv', '2016-01-01 11:09:00.061258', 'scheduled', 1),
+                ('even_later.csv', '2016-01-01 23:09:00.061258', 'scheduled', 1),
+                ('full_of_regret.csv', '2016-01-01 23:09:00.061258', 'cancelled', 1)
             )
         ]
         return {

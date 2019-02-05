@@ -98,6 +98,10 @@
           ) }}.
         </p>
 
+      {% elif sent_previously %}
+
+        {% include "partials/check/sent-previously.html" %}
+
       {% elif not recipients.allowed_to_send_to %}
 
         {% with
