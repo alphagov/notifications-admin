@@ -2697,9 +2697,8 @@ def test_warns_if_file_sent_already(
     assert normalize_spaces(
         page.select_one('.banner-dangerous').text
     ) == (
-        'You already sent these messages '
-        'If you want to send the same messages again, rename the file '
-        'and re-upload it '
+        'These messages have already been sent today '
+        'If you need to resend them, rename the file and upload it again. '
         'Skip to file contents'
     )
 
