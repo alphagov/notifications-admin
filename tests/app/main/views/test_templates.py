@@ -493,7 +493,7 @@ def test_edit_letter_template_postage_page_displays_correctly(
         template_id=fake_uuid,
     )
 
-    assert page.select_one('h1').text.strip() == 'Edit postage'
+    assert page.select_one('h1').text.strip() == 'Change postage'
     assert page.select('input[checked]')[0].attrs["value"] == 'second'
 
 
