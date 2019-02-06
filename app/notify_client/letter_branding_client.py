@@ -8,11 +8,8 @@ class LetterBrandingClient(NotifyAdminAPIClient):
         return self.get(url='/letter-branding/{}'.format(branding_id))
 
     @cache.set('letter_branding')
-    def get_all_letter_branding(self, sort_key=None):
-        brandings = self.get(url='/letter-branding')
-        if sort_key and sort_key in brandings[0]:
-            brandings.sort(key=lambda branding: branding[sort_key].lower())
-        return brandings
+    def get_all_letter_branding(self):
+        return self.get(url='/letter-branding')
 
     @cache.delete('letter_branding')
     def create_letter_branding(self, filename, name, domain):
