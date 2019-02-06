@@ -44,6 +44,7 @@
     "gulp-prettyerror": "1.2.1",
     "gulp-sass-lint": "1.2.0",
     "jshint": "2.9.5",
-    "jshint-stylish": "2.2.1"
+    "jshint-stylish": "2.2.1",
+    "run-sequence": "2.2.1"
   }
 }
