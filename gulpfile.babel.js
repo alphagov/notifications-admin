@@ -164,9 +164,9 @@ gulp.task('default',
     'copy:govuk_template:css',
     'copy:govuk_template:js',
     'copy:govuk_template:error_page',
+    'images',
     'javascripts',
-    'sass',
-    'images'
+    'sass'
   ]
 );
 
