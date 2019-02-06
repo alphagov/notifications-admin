@@ -8,6 +8,7 @@
 import gulp from 'gulp';
 import loadPlugins from 'gulp-load-plugins';
 import stylish from 'jshint-stylish';
+import runSequence from 'run-sequence';
 
 const plugins = loadPlugins(),
 
@@ -156,19 +157,23 @@ gulp.task('lint',
 );
 
 // Default: compile everything
-gulp.task('default',
-  [
-    'copy:govuk_template:template',
-    'copy:govuk_template:images',
-    'copy:govuk_template:fonts',
-    'copy:govuk_template:css',
-    'copy:govuk_template:js',
-    'copy:govuk_template:error_page',
-    'images',
-    'javascripts',
-    'sass'
-  ]
-);
+gulp.task('default', function() {
+  runSequence(
+    [
+      'copy:govuk_template:template',
+      'copy:govuk_template:images',
+      'copy:govuk_template:fonts',
+      'copy:govuk_template:css',
+      'copy:govuk_template:js',
+      'images',
+    ],
+    [
+      'copy:govuk_template:error_page',
+      'javascripts',
+      'sass'
+    ]
+  );
+});
 
 // Optional: recompile on changes
 gulp.task('watch',
