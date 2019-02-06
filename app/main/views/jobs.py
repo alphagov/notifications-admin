@@ -390,7 +390,7 @@ def get_job_partials(job, template):
         if notifications['notifications']:
             postage = notifications['notifications'][0]['postage']
         else:
-            postage = current_service.postage
+            postage = template['postage']
 
         counts = render_template(
             'partials/jobs/count-letters.html',

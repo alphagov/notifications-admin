@@ -430,16 +430,11 @@ def test_user_with_only_send_and_view_sees_letter_page(
     assert page.select_one('h1').text.strip() == 'Two week reminder'
 
 
-@pytest.mark.parametrize("permissions,template_postage,expected_result", [
-    (["choose_postage", "letter"], "first", "Postage: first class"),
-    (["choose_postage", "letter"], "second", "Postage: second class"),
-    (["choose_postage", "letter"], None, "Postage: second class"),
-    pytest.param(
-        ["letter"], None, "Postage: second class",
-        marks=pytest.mark.xfail(raises=AttributeError)
-    ),
+@pytest.mark.parametrize("template_postage,expected_result", [
+    ("first", "Postage: first class"),
+    ("second", "Postage: second class"),
 ])
-def test_view_letter_template_displays_postage_dynamically_based_on_service_permissions_and_template_postage(
+def test_view_letter_template_displays_postage(
     client_request,
     service_one,
     mock_get_service_templates,
@@ -449,12 +444,10 @@ def test_view_letter_template_displays_postage_dynamically_based_on_service_perm
     active_user_with_permissions,
     mocker,
     fake_uuid,
-    permissions,
     template_postage,
     expected_result
 ):
     mocker.patch('app.main.views.templates.get_page_count_for_letter', return_value=1)
-    service_one['permissions'] = permissions
     client_request.login(active_user_with_permissions)
     mock_get_service_letter_template(mocker, postage=template_postage)
     page = client_request.get(
@@ -492,7 +485,6 @@ def test_edit_letter_template_postage_page_displays_correctly(
     mocker,
     fake_uuid,
 ):
-    service_one['permissions'] = ["choose_postage", "letter"]
     client_request.login(active_user_with_permissions)
     mock_get_service_letter_template(mocker)
     page = client_request.get(
@@ -513,7 +505,6 @@ def test_edit_letter_template_postage_page_404s_if_template_is_not_a_letter(
     mocker,
     fake_uuid,
 ):
-    service_one['permissions'] = ["choose_postage", "letter"]
     client_request.login(active_user_with_permissions)
     page = client_request.get(
         'main.edit_template_postage',
@@ -534,7 +525,6 @@ def test_edit_letter_templates_postage_updates_postage(
     mock_update_template_postage = mocker.patch(
         'app.main.views.templates.service_api_client.update_service_template_postage'
     )
-    service_one['permissions'] = ["choose_postage", "letter"]
     mock_get_service_letter_template(mocker)
     template_id = fake_uuid
 

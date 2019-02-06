@@ -11,6 +11,7 @@ from tests.conftest import (
     active_caseworking_user,
     active_user_with_permissions,
     mock_get_notifications,
+    mock_get_service_letter_template,
     normalize_spaces,
 )
 
@@ -553,7 +554,6 @@ def test_should_show_letter_job_with_first_class_if_notifications_are_first_clas
 def test_should_show_letter_job_with_first_class_if_no_notifications(
     client_request,
     service_one,
-    mock_get_service_letter_template,
     mock_get_job,
     fake_uuid,
     mock_get_notifications_with_no_notifications,
@@ -561,7 +561,7 @@ def test_should_show_letter_job_with_first_class_if_no_notifications(
     mocker
 ):
 
-    service_one['postage'] = 'first'
+    mock_get_service_letter_template(mocker, postage="first")
 
     page = client_request.get(
         'main.view_job',
