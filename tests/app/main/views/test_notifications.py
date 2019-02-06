@@ -170,11 +170,15 @@ def test_notification_page_shows_page_for_letter_notification(
         'Printing starts today at 5.30pm'
     )
     assert normalize_spaces(page.select('main p:nth-of-type(3)')[0].text) == (
-        'Postage: second class'
-    )
-    assert normalize_spaces(page.select('main p:nth-of-type(4)')[0].text) == (
         'Estimated delivery date: 6 January'
     )
+    assert len(page.select('.letter-postage')) == 1
+    assert normalize_spaces(page.select_one('.letter-postage').text) == (
+        'Postage: second class'
+    )
+    assert page.select_one('.letter-postage')['class'] == [
+        'letter-postage', 'letter-postage-second'
+    ]
     assert page.select('p.notification-status') == []
 
     letter_images = page.select('main img')
@@ -192,18 +196,18 @@ def test_notification_page_shows_page_for_letter_notification(
 
 
 @freeze_time("2016-01-01 01:01")
-@pytest.mark.parametrize('is_precompiled_letter, expected_p1, expected_p2, expected_p3', (
+@pytest.mark.parametrize('is_precompiled_letter, expected_p1, expected_p2, expected_postage', (
     (
         True,
         'Provided as PDF on 1 January at 1:01am',
-        'Postage: second class',
         'This letter passed our checks, but we will not print it because you used a test key.',
+        'Postage: second class'
     ),
     (
         False,
         '‘sample template’ was sent on 1 January at 1:01am',
-        'Postage: second class',
         'We will not print this letter because you used a test key.',
+        'Postage: second class',
     ),
 ))
 def test_notification_page_shows_page_for_letter_sent_with_test_key(
@@ -213,7 +217,7 @@ def test_notification_page_shows_page_for_letter_sent_with_test_key(
     is_precompiled_letter,
     expected_p1,
     expected_p2,
-    expected_p3,
+    expected_postage,
 ):
 
     mocker.patch(
@@ -255,9 +259,9 @@ def test_notification_page_shows_page_for_letter_sent_with_test_key(
     assert normalize_spaces(page.select('main p:nth-of-type(2)')[0].text) == (
         expected_p2
     )
-    assert normalize_spaces(page.select('main p:nth-of-type(3)')[0].text) == (
-        expected_p3
-    )
+    assert normalize_spaces(
+        page.select_one('.letter-postage').text
+    ) == expected_postage
     assert page.select('p.notification-status') == []
 
 
@@ -413,8 +417,13 @@ def test_notification_page_shows_page_for_first_class_letter_notification(
     )
 
     assert normalize_spaces(page.select('main p:nth-of-type(2)')[0].text) == 'Printing starts tomorrow at 5.30pm'
-    assert normalize_spaces(page.select('main p:nth-of-type(3)')[0].text) == 'Postage: first class'
-    assert normalize_spaces(page.select('main p:nth-of-type(4)')[0].text) == 'Estimated delivery date: 5 January'
+    assert normalize_spaces(page.select('main p:nth-of-type(3)')[0].text) == 'Estimated delivery date: 5 January'
+    assert normalize_spaces(page.select_one('.letter-postage').text) == (
+        'Postage: first class'
+    )
+    assert page.select_one('.letter-postage')['class'] == [
+        'letter-postage', 'letter-postage-first'
+    ]
 
 
 @pytest.mark.parametrize('filetype', [

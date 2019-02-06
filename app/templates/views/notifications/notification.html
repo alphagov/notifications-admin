@@ -52,9 +52,6 @@
         </p>
       {% else %}
         {% if sent_with_test_key %}
-          <p>
-            Postage: {{ postage }} class
-          </p>
           {% if is_precompiled_letter %}
             <p>
               This letter passed our checks, but we will not print it because you used a test key.
@@ -67,9 +64,6 @@
         {% else %}
           <p>
             {{ letter_print_day }}
-          </p>
-          <p>
-            Postage: {{ postage }} class
           </p>
           <p>
             Estimated delivery date: {{ estimated_letter_delivery_date|string|format_date_short }}
