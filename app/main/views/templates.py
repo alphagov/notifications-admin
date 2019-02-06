@@ -22,7 +22,7 @@ from app.main.forms import (
     EmailTemplateForm,
     LetterTemplateForm,
     LetterTemplatePostageForm,
-    SearchTemplatesForm,
+    SearchByNameForm,
     SetTemplateSenderForm,
     SMSTemplateForm,
     TemplateAndFoldersSelectionForm,
@@ -149,7 +149,7 @@ def choose_template(service_id, template_type='all', template_folder_id=None):
         ),
         template_nav_items=get_template_nav_items(template_folder_id),
         template_type=template_type,
-        search_form=SearchTemplatesForm(),
+        search_form=SearchByNameForm(),
         templates_and_folders_form=templates_and_folders_form,
         move_to_children=templates_and_folders_form.move_to.children(),
         option_hints=option_hints
@@ -348,7 +348,7 @@ def choose_template_to_copy(
             ),
             template_folder_path=service.get_template_folder_path(from_folder),
             from_service=service,
-            search_form=SearchTemplatesForm(),
+            search_form=SearchByNameForm(),
         )
 
     else:
@@ -358,7 +358,7 @@ def choose_template_to_copy(
                 Service(service) for service in
                 user_api_client.get_services_for_user(current_user)
             ]),
-            search_form=SearchTemplatesForm(),
+            search_form=SearchByNameForm(),
         )
 
 

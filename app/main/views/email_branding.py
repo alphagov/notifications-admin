@@ -3,7 +3,7 @@ from flask_login import login_required
 
 from app import email_branding_client
 from app.main import main
-from app.main.forms import SearchTemplatesForm, ServiceUpdateEmailBranding
+from app.main.forms import SearchByNameForm, ServiceUpdateEmailBranding
 from app.s3_client.s3_logo_client import (
     TEMP_TAG,
     delete_email_temp_file,
@@ -24,8 +24,7 @@ def email_branding():
     return render_template(
         'views/email-branding/select-branding.html',
         email_brandings=brandings,
-        search_form=SearchTemplatesForm(),
-        show_search_box=len(brandings) > 9,
+        search_form=SearchByNameForm(),
         agreement_info=AgreementInfo,
     )
 

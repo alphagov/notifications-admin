@@ -2227,37 +2227,6 @@ def test_should_show_branding_styles(
     app.service_api_client.get_service.assert_called_once_with(service_one['id'])
 
 
-def test_should_show_live_search_if_list_of_brand_styles_fits_onscreen(
-    logged_in_platform_admin_client,
-    service_one,
-    mock_get_email_branding_that_can_fit_onscreen,
-):
-    response = logged_in_platform_admin_client.get(url_for(
-        'main.service_set_email_branding', service_id=service_one['id']
-    ))
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-
-    assert not page.select('.live-search')
-
-
-def test_should_show_live_search_if_list_of_brand_styles_taller_than_page(
-    logged_in_platform_admin_client,
-    service_one,
-    mock_get_more_email_branding_than_can_fit_onscreen,
-):
-    response = logged_in_platform_admin_client.get(url_for(
-        'main.service_set_email_branding', service_id=service_one['id']
-    ))
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-
-    assert page.select('.live-search')
-    search_target = page.select_one('.live-search')['data-targets']
-    assert search_target == '.multiple-choice'
-    assert len(page.select(search_target)) == 9
-
-
 def test_should_send_branding_and_organisations_to_preview(
     logged_in_platform_admin_client,
     service_one,

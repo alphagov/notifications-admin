@@ -960,7 +960,7 @@ class ChooseTemplateType(StripWhitespaceForm):
         ])
 
 
-class SearchTemplatesForm(StripWhitespaceForm):
+class SearchByNameForm(StripWhitespaceForm):
 
     search = SearchField('Search by name')
 

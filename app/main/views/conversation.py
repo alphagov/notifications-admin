@@ -6,7 +6,7 @@ from notifications_utils.template import SMSPreviewTemplate
 
 from app import current_service, notification_api_client, service_api_client
 from app.main import main
-from app.main.forms import SearchTemplatesForm
+from app.main.forms import SearchByNameForm
 from app.utils import user_has_permissions
 
 
@@ -50,7 +50,7 @@ def conversation_reply(
         templates=templates,
         show_search_box=(len(templates) > 7),
         template_type='sms',
-        search_form=SearchTemplatesForm(),
+        search_form=SearchByNameForm(),
         notification_id=notification_id,
     )
 

@@ -2527,28 +2527,6 @@ def mock_get_all_email_branding(mocker):
 
 
 @pytest.fixture(scope='function')
-def mock_get_more_email_branding_than_can_fit_onscreen(mocker):
-    def _get_more_email_branding_than_can_fit_onscreen():
-        return create_email_brandings(8)
-
-    return mocker.patch(
-        'app.email_branding_client.get_all_email_branding',
-        side_effect=_get_more_email_branding_than_can_fit_onscreen
-    )
-
-
-@pytest.fixture(scope='function')
-def mock_get_email_branding_that_can_fit_onscreen(mocker):
-    def _get_email_branding_that_can_fit_onscreen():
-        return create_email_brandings(4)
-
-    return mocker.patch(
-        'app.email_branding_client.get_all_email_branding',
-        side_effect=_get_email_branding_that_can_fit_onscreen
-    )
-
-
-@pytest.fixture(scope='function')
 def mock_get_all_letter_branding(mocker):
     def _get_letter_branding():
         return [

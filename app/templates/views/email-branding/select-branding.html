@@ -17,7 +17,7 @@
       <a href="{{ url_for('.create_email_branding') }}" class="button align-with-heading">Add new brand</a>
     </div>
   </div>
-  {{ live_search(target_selector='.email-brand', show=show_search_box, form=search_form) }}
+  {{ live_search(target_selector='.email-brand', show=True, form=search_form) }}
   <nav>
     {% for brand in email_brandings %}
       <div class="email-brand">

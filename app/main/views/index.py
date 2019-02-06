@@ -14,7 +14,7 @@ from notifications_utils.template import HTMLEmailTemplate
 
 from app import email_branding_client
 from app.main import main
-from app.main.forms import FieldWithNoneOption, SearchTemplatesForm
+from app.main.forms import FieldWithNoneOption, SearchByNameForm
 from app.main.views.sub_navigation_dictionaries import features_nav
 from app.utils import AgreementInfo, get_logo_cdn_domain
 
@@ -74,7 +74,7 @@ def pricing():
             (cc, country['names'], country['billable_units'])
             for cc, country in INTERNATIONAL_BILLING_RATES.items()
         ], key=lambda x: x[0]),
-        search_form=SearchTemplatesForm(),
+        search_form=SearchByNameForm(),
         agreement_info=AgreementInfo.from_current_user(),
     )
 
