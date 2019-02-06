@@ -2541,7 +2541,7 @@ ledburytowncouncil.gov.uk:
 leeds.gov.uk:
   owner: Leeds City Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 leek-tc.gov.uk:
   owner: Leek Town Council
   crown: false
