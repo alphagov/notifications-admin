@@ -7,6 +7,7 @@ from flask import (
     url_for,
 )
 from flask_login import login_required
+from notifications_python_client.errors import HTTPError
 from requests import get as requests_get
 
 from app import letter_branding_client
@@ -53,30 +54,30 @@ def create_letter_branding(logo=None):
     if details_form_submitted and letter_branding_details_form.validate_on_submit():
         if logo:
             db_filename = letter_filename_for_db(logo, session['user_id'])
-
-            letter_branding_client.create_letter_branding(
-                filename=db_filename,
-                name=letter_branding_details_form.name.data,
-                domain=letter_branding_details_form.domain.data,
-            )
-
             png_file = get_png_file_from_svg(logo)
 
-            persist_logo(logo, permanent_letter_logo_name(db_filename, 'svg'))
+            try:
+                letter_branding_client.create_letter_branding(
+                    filename=db_filename,
+                    name=letter_branding_details_form.name.data,
+                    domain=letter_branding_details_form.domain.data,
+                )
 
-            upload_letter_png_logo(
-                permanent_letter_logo_name(db_filename, 'png'),
-                png_file,
-                current_app.config['AWS_REGION'],
-            )
+                upload_letter_logos(logo, db_filename, png_file, session['user_id'])
 
-            delete_letter_temp_files_created_by(session['user_id'])
+                # TODO: redirect to all letter branding page once it exists
+                return redirect(url_for('main.platform_admin'))
 
-            # TODO: redirect to all letter branding page once it exists
-            return redirect(url_for('main.platform_admin'))
-
-        # Show error on upload form if trying to submit with no logo
-        file_upload_form.validate()
+            except HTTPError as e:
+                if 'domain' in e.message:
+                    letter_branding_details_form.domain.errors.append(e.message['domain'][0])
+                elif 'name' in e.message:
+                    letter_branding_details_form.name.errors.append(e.message['name'][0])
+                else:
+                    raise e
+        else:
+            # Show error on upload form if trying to submit with no logo
+            file_upload_form.validate()
 
     return render_template(
         'views/letter-branding/manage-letter-branding.html',
@@ -101,3 +102,15 @@ def get_png_file_from_svg(filename):
     )
 
     return response.content
+
+
+def upload_letter_logos(old_filename, new_filename, png_file, user_id):
+    persist_logo(old_filename, permanent_letter_logo_name(new_filename, 'svg'))
+
+    upload_letter_png_logo(
+        permanent_letter_logo_name(new_filename, 'png'),
+        png_file,
+        current_app.config['AWS_REGION'],
+    )
+
+    delete_letter_temp_files_created_by(user_id)

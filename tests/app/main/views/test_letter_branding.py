@@ -1,8 +1,10 @@
 from io import BytesIO
+from unittest.mock import Mock
 
 import pytest
 from bs4 import BeautifulSoup
 from flask import current_app, url_for
+from notifications_python_client.errors import HTTPError
 
 from app.main.views.letter_branding import get_png_file_from_svg
 from app.s3_client.s3_logo_client import LETTER_TEMP_LOGO_LOCATION
@@ -185,7 +187,7 @@ def test_create_letter_branding_persists_logo_when_all_data_is_valid(
     mock_delete_temp_files.assert_called_once_with(user_id)
 
 
-def test_create_letter_branding_shows_errors_on_name_and_domain_fields(
+def test_create_letter_branding_shows_form_errors_on_name_and_domain_fields(
     logged_in_platform_admin_client,
     fake_uuid
 ):
@@ -210,6 +212,50 @@ def test_create_letter_branding_shows_errors_on_name_and_domain_fields(
     assert len(error_messages) == 2
     assert error_messages[0].text.strip() == 'This field is required.'
     assert error_messages[1].text.strip() == 'Not a known government domain (you might need to update domains.yml)'
+
+
+@pytest.mark.parametrize('error_field', ['name', 'domain'])
+def test_create_letter_branding_shows_database_errors_on_name_and_domain_fields(
+    mocker,
+    logged_in_platform_admin_client,
+    fake_uuid,
+    error_field
+):
+    with logged_in_platform_admin_client.session_transaction() as session:
+        user_id = session["user_id"]
+
+    mocker.patch('app.main.views.letter_branding.get_png_file_from_svg')
+    mocker.patch('app.main.views.letter_branding.letter_branding_client.create_letter_branding', side_effect=HTTPError(
+        response=Mock(
+            status_code=400,
+            json={
+                'result': 'error',
+                'message': {
+                    error_field: {
+                        '{} already in use'.format(error_field)
+                    }
+                }
+            }
+        ),
+        message={error_field: ['{} already in use'.format(error_field)]}
+    ))
+
+    temp_logo = LETTER_TEMP_LOGO_LOCATION.format(user_id=user_id, unique_id=fake_uuid, filename='test.svg')
+
+    response = logged_in_platform_admin_client.post(
+        url_for('.create_letter_branding', logo=temp_logo),
+        data={
+            'name': 'my brand',
+            'domain': None,
+            'operation': 'branding-details'
+        }
+    )
+
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    error_message = page.find('span', class_='error-message').text.strip()
+
+    assert page.find('h1').text == 'Add letter branding'
+    assert error_message == '{} already in use'.format(error_field)
 
 
 def test_get_png_file_from_svg(client, mocker, fake_uuid):
