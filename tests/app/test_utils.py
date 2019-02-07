@@ -210,7 +210,7 @@ def test_generate_notifications_csv_returns_correct_csv_file(
     expected_1st_row,
 ):
     mocker.patch(
-        'app.main.s3_client.s3download',
+        'app.s3_client.s3_csv_client.s3download',
         return_value=original_file_contents,
     )
     csv_content = generate_notifications_csv(service_id='1234', job_id=fake_uuid, template_type='sms')
@@ -236,7 +236,7 @@ def test_generate_notifications_csv_calls_twice_if_next_link(
 ):
 
     mocker.patch(
-        'app.main.s3_client.s3download',
+        'app.s3_client.s3_csv_client.s3download',
         return_value="""
             phone_number
             07700900000

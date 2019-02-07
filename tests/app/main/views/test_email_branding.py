@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 from flask import url_for
 from notifications_python_client.errors import HTTPError
 
-from app.main.s3_client import LOGO_LOCATION_STRUCTURE, TEMP_TAG
+from app.s3_client.s3_logo_client import EMAIL_LOGO_LOCATION_STRUCTURE, TEMP_TAG
 from tests.conftest import (
     mock_get_email_branding,
     normalize_spaces,
@@ -114,7 +114,7 @@ def test_create_new_email_branding_without_logo(
     }
 
     mock_persist = mocker.patch('app.main.views.email_branding.persist_logo')
-    mocker.patch('app.main.views.email_branding.delete_temp_files_created_by')
+    mocker.patch('app.main.views.email_branding.delete_email_temp_files_created_by')
 
     logged_in_platform_admin_client.post(
         url_for('.create_email_branding'),
@@ -141,7 +141,7 @@ def test_cant_create_new_email_branding_with_unknown_domain(
     mock_create_email_branding
 ):
     mock_persist = mocker.patch('app.main.views.email_branding.persist_logo')
-    mocker.patch('app.main.views.email_branding.delete_temp_files_created_by')
+    mocker.patch('app.main.views.email_branding.delete_email_temp_files_created_by')
 
     client_request.login(platform_admin_user(fake_uuid))
     page = client_request.post(
@@ -197,7 +197,7 @@ def test_rejects_non_canonical_domain_when_adding_email_branding(
     expected_error,
 ):
     mocker.patch('app.main.views.email_branding.persist_logo')
-    mocker.patch('app.main.views.email_branding.delete_temp_files_created_by')
+    mocker.patch('app.main.views.email_branding.delete_email_temp_files_created_by')
     data = {
         'logo': None,
         'colour': '#ff0000',
@@ -225,7 +225,7 @@ def test_create_email_branding_requires_a_name_when_submitting_logo_details(
     mock_create_email_branding,
 ):
     mocker.patch('app.main.views.email_branding.persist_logo')
-    mocker.patch('app.main.views.email_branding.delete_temp_files_created_by')
+    mocker.patch('app.main.views.email_branding.delete_email_temp_files_created_by')
     data = {
         'operation': 'email-branding-details',
         'logo': '',
@@ -252,7 +252,7 @@ def test_create_email_branding_does_not_require_a_name_when_uploading_a_file(
     mocker,
     fake_uuid,
 ):
-    mocker.patch('app.main.views.email_branding.upload_logo', return_value='temp_filename')
+    mocker.patch('app.main.views.email_branding.upload_email_logo', return_value='temp_filename')
     data = {
         'file': (BytesIO(''.encode('utf-8')), 'test.png'),
         'colour': '',
@@ -290,14 +290,14 @@ def test_create_new_email_branding_when_branding_saved(
         'brand_type': 'org_banner'
     }
 
-    temp_filename = LOGO_LOCATION_STRUCTURE.format(
+    temp_filename = EMAIL_LOGO_LOCATION_STRUCTURE.format(
         temp=TEMP_TAG.format(user_id=user_id),
         unique_id=fake_uuid,
         filename=data['logo']
     )
 
     mocker.patch('app.main.views.email_branding.persist_logo')
-    mocker.patch('app.main.views.email_branding.delete_temp_files_created_by')
+    mocker.patch('app.main.views.email_branding.delete_email_temp_files_created_by')
 
     logged_in_platform_admin_client.post(
         url_for('.create_email_branding', logo=temp_filename),
@@ -342,24 +342,24 @@ def test_deletes_previous_temp_logo_after_uploading_logo(
     with logged_in_platform_admin_client.session_transaction() as session:
         user_id = session["user_id"]
 
-    temp_old_filename = LOGO_LOCATION_STRUCTURE.format(
+    temp_old_filename = EMAIL_LOGO_LOCATION_STRUCTURE.format(
         temp=TEMP_TAG.format(user_id=user_id),
         unique_id=fake_uuid,
         filename='old_test.png'
     )
 
-    temp_filename = LOGO_LOCATION_STRUCTURE.format(
+    temp_filename = EMAIL_LOGO_LOCATION_STRUCTURE.format(
         temp=TEMP_TAG.format(user_id=user_id),
         unique_id=fake_uuid,
         filename='test.png'
     )
 
-    mocked_upload_logo = mocker.patch(
-        'app.main.views.email_branding.upload_logo',
+    mocked_upload_email_logo = mocker.patch(
+        'app.main.views.email_branding.upload_email_logo',
         return_value=temp_filename
     )
 
-    mocked_delete_temp_file = mocker.patch('app.main.views.email_branding.delete_temp_file')
+    mocked_delete_email_temp_file = mocker.patch('app.main.views.email_branding.delete_email_temp_file')
 
     logged_in_platform_admin_client.post(
         url_for('main.create_email_branding', logo=temp_old_filename, branding_id=fake_uuid),
@@ -367,9 +367,9 @@ def test_deletes_previous_temp_logo_after_uploading_logo(
         content_type='multipart/form-data'
     )
 
-    assert mocked_upload_logo.called
-    assert mocked_delete_temp_file.called
-    assert mocked_delete_temp_file.call_args == call(temp_old_filename)
+    assert mocked_upload_email_logo.called
+    assert mocked_delete_email_temp_file.called
+    assert mocked_delete_email_temp_file.call_args == call(temp_old_filename)
 
 
 def test_update_existing_branding(
@@ -391,14 +391,14 @@ def test_update_existing_branding(
         'brand_type': 'both'
     }
 
-    temp_filename = LOGO_LOCATION_STRUCTURE.format(
+    temp_filename = EMAIL_LOGO_LOCATION_STRUCTURE.format(
         temp=TEMP_TAG.format(user_id=user_id),
         unique_id=fake_uuid,
         filename=data['logo']
     )
 
     mocker.patch('app.main.views.email_branding.persist_logo')
-    mocker.patch('app.main.views.email_branding.delete_temp_files_created_by')
+    mocker.patch('app.main.views.email_branding.delete_email_temp_files_created_by')
 
     logged_in_platform_admin_client.post(
         url_for('.update_email_branding', logo=temp_filename, branding_id=fake_uuid),
@@ -431,14 +431,14 @@ def test_temp_logo_is_shown_after_uploading_logo(
     with logged_in_platform_admin_client.session_transaction() as session:
         user_id = session["user_id"]
 
-    temp_filename = LOGO_LOCATION_STRUCTURE.format(
+    temp_filename = EMAIL_LOGO_LOCATION_STRUCTURE.format(
         temp=TEMP_TAG.format(user_id=user_id),
         unique_id=fake_uuid,
         filename='test.png'
     )
 
-    mocker.patch('app.main.views.email_branding.upload_logo', return_value=temp_filename)
-    mocker.patch('app.main.views.email_branding.delete_temp_file')
+    mocker.patch('app.main.views.email_branding.upload_email_logo', return_value=temp_filename)
+    mocker.patch('app.main.views.email_branding.delete_email_temp_file')
 
     response = logged_in_platform_admin_client.post(
         url_for('main.create_email_branding'),
@@ -463,12 +463,12 @@ def test_logo_persisted_when_organisation_saved(
     with logged_in_platform_admin_client.session_transaction() as session:
         user_id = session["user_id"]
 
-    temp_filename = LOGO_LOCATION_STRUCTURE.format(
+    temp_filename = EMAIL_LOGO_LOCATION_STRUCTURE.format(
         temp=TEMP_TAG.format(user_id=user_id), unique_id=fake_uuid, filename='test.png')
 
-    mocked_upload_logo = mocker.patch('app.main.views.email_branding.upload_logo')
+    mocked_upload_email_logo = mocker.patch('app.main.views.email_branding.upload_email_logo')
     mocked_persist_logo = mocker.patch('app.main.views.email_branding.persist_logo')
-    mocked_delete_temp_files_by = mocker.patch('app.main.views.email_branding.delete_temp_files_created_by')
+    mocked_delete_email_temp_files_by = mocker.patch('app.main.views.email_branding.delete_email_temp_files_created_by')
 
     resp = logged_in_platform_admin_client.post(
         url_for('.create_email_branding', logo=temp_filename),
@@ -476,10 +476,10 @@ def test_logo_persisted_when_organisation_saved(
     )
     assert resp.status_code == 302
 
-    assert not mocked_upload_logo.called
+    assert not mocked_upload_email_logo.called
     assert mocked_persist_logo.called
-    assert mocked_delete_temp_files_by.called
-    assert mocked_delete_temp_files_by.call_args == call(user_id)
+    assert mocked_delete_email_temp_files_by.called
+    assert mocked_delete_email_temp_files_by.call_args == call(user_id)
     assert mock_create_email_branding.called
 
 
@@ -492,11 +492,11 @@ def test_logo_does_not_get_persisted_if_updating_email_branding_client_throws_an
     with logged_in_platform_admin_client.session_transaction() as session:
         user_id = session["user_id"]
 
-    temp_filename = LOGO_LOCATION_STRUCTURE.format(
+    temp_filename = EMAIL_LOGO_LOCATION_STRUCTURE.format(
         temp=TEMP_TAG.format(user_id=user_id), unique_id=fake_uuid, filename='test.png')
 
     mocked_persist_logo = mocker.patch('app.main.views.email_branding.persist_logo')
-    mocked_delete_temp_files_by = mocker.patch('app.main.views.email_branding.delete_temp_files_created_by')
+    mocked_delete_email_temp_files_by = mocker.patch('app.main.views.email_branding.delete_email_temp_files_created_by')
     mocker.patch('app.main.views.email_branding.email_branding_client.create_email_branding', side_effect=HTTPError())
 
     logged_in_platform_admin_client.post(
@@ -505,7 +505,7 @@ def test_logo_does_not_get_persisted_if_updating_email_branding_client_throws_an
     )
 
     assert not mocked_persist_logo.called
-    assert not mocked_delete_temp_files_by.called
+    assert not mocked_delete_email_temp_files_by.called
 
 
 @pytest.mark.parametrize('colour_hex, expected_status_code', [
@@ -530,7 +530,7 @@ def test_colour_regex_validation(
         'brand_type': 'org'
     }
 
-    mocker.patch('app.main.views.email_branding.delete_temp_files_created_by')
+    mocker.patch('app.main.views.email_branding.delete_email_temp_files_created_by')
 
     response = logged_in_platform_admin_client.post(
         url_for('.create_email_branding'),

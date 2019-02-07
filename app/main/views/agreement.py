@@ -2,8 +2,8 @@ from flask import abort, render_template, request, send_file, url_for
 from flask_login import login_required
 
 from app.main import main
-from app.main.s3_client import get_mou
 from app.main.views.sub_navigation_dictionaries import features_nav
+from app.s3_client.s3_mou_client import get_mou
 from app.utils import AgreementInfo
 
 

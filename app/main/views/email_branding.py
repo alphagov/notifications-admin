@@ -4,13 +4,13 @@ from flask_login import login_required
 from app import email_branding_client
 from app.main import main
 from app.main.forms import SearchTemplatesForm, ServiceUpdateEmailBranding
-from app.main.s3_client import (
+from app.s3_client.s3_logo_client import (
     TEMP_TAG,
-    delete_temp_file,
-    delete_temp_files_created_by,
-    permanent_logo_name,
+    delete_email_temp_file,
+    delete_email_temp_files_created_by,
+    permanent_email_logo_name,
     persist_logo,
-    upload_logo,
+    upload_email_logo,
 )
 from app.utils import AgreementInfo, get_logo_cdn_domain, user_is_platform_admin
 
@@ -49,7 +49,7 @@ def update_email_branding(branding_id, logo=None):
 
     if form.validate_on_submit():
         if form.file.data:
-            upload_filename = upload_logo(
+            upload_filename = upload_email_logo(
                 form.file.data.filename,
                 form.file.data,
                 current_app.config['AWS_REGION'],
@@ -57,11 +57,11 @@ def update_email_branding(branding_id, logo=None):
             )
 
             if logo and logo.startswith(TEMP_TAG.format(user_id=session['user_id'])):
-                delete_temp_file(logo)
+                delete_email_temp_file(logo)
 
             return redirect(url_for('.update_email_branding', branding_id=branding_id, logo=upload_filename))
 
-        updated_logo_name = permanent_logo_name(logo, session["user_id"]) if logo else None
+        updated_logo_name = permanent_email_logo_name(logo, session["user_id"]) if logo else None
 
         email_branding_client.update_email_branding(
             branding_id=branding_id,
@@ -76,7 +76,7 @@ def update_email_branding(branding_id, logo=None):
         if logo:
             persist_logo(logo, updated_logo_name)
 
-        delete_temp_files_created_by(session["user_id"])
+        delete_email_temp_files_created_by(session["user_id"])
 
         return redirect(url_for('.email_branding', branding_id=branding_id))
 
@@ -98,7 +98,7 @@ def create_email_branding(logo=None):
 
     if form.validate_on_submit():
         if form.file.data:
-            upload_filename = upload_logo(
+            upload_filename = upload_email_logo(
                 form.file.data.filename,
                 form.file.data,
                 current_app.config['AWS_REGION'],
@@ -106,11 +106,11 @@ def create_email_branding(logo=None):
             )
 
             if logo and logo.startswith(TEMP_TAG.format(user_id=session['user_id'])):
-                delete_temp_file(logo)
+                delete_email_temp_file(logo)
 
             return redirect(url_for('.create_email_branding', logo=upload_filename))
 
-        updated_logo_name = permanent_logo_name(logo, session["user_id"]) if logo else None
+        updated_logo_name = permanent_email_logo_name(logo, session["user_id"]) if logo else None
 
         email_branding_client.create_email_branding(
             logo=updated_logo_name,
@@ -124,7 +124,7 @@ def create_email_branding(logo=None):
         if logo:
             persist_logo(logo, updated_logo_name)
 
-        delete_temp_files_created_by(session["user_id"])
+        delete_email_temp_files_created_by(session["user_id"])
 
         return redirect(url_for('.email_branding'))
 

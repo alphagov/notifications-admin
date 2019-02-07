@@ -126,7 +126,7 @@ def get_errors_for_csv(recipients, template_type):
 
 def generate_notifications_csv(**kwargs):
     from app import notification_api_client
-    from app.main.s3_client import s3download
+    from app.s3_client.s3_csv_client import s3download
     if 'page' not in kwargs:
         kwargs['page'] = 1
 

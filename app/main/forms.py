@@ -851,6 +851,21 @@ class ServiceUpdateEmailBranding(StripWhitespaceForm):
             raise ValidationError('This field is required')
 
 
+class SVGFileUpload(StripWhitespaceForm):
+    file = FileField_wtf(
+        'Upload an SVG logo',
+        validators=[
+            FileAllowed(['svg'], 'SVG Images only!'),
+            DataRequired(message="You need to upload a file to submit")
+        ]
+    )
+
+
+class ServiceLetterBrandingDetails(StripWhitespaceForm):
+    name = StringField('Name of brand', validators=[DataRequired()])
+    domain = GovernmentDomainField('Domain')
+
+
 class PDFUploadForm(StripWhitespaceForm):
     file = FileField_wtf(
         'Upload a letter in PDF format to check if it fits in the printable area',
