@@ -1,8 +1,7 @@
-import uuid
 from functools import partial
 from unittest.mock import ANY, PropertyMock, call
 from urllib.parse import parse_qs, urlparse
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 import pytest
 from bs4 import BeautifulSoup
@@ -38,7 +37,7 @@ from tests.conftest import (
 
 @pytest.fixture
 def mock_get_service_settings_page_common(
-    mock_get_letter_branding,
+    mock_get_all_letter_branding,
     mock_get_inbound_number_for_service,
     mock_get_free_sms_fragment_limit,
     mock_get_service_data_retention,
@@ -95,7 +94,7 @@ def mock_get_service_settings_page_common(
         'Organisation type Central Change',
         'Free text message allowance 250,000 Change',
         'Email branding GOV.UK Change',
-        'Letter branding HM Government Change',
+        'Letter branding Not set Change',
         'Data retention email Change'
 
     ]),
@@ -187,7 +186,7 @@ def test_should_show_overview(
         'Label Value Action',
         'Send letters On Change',
         'Sender addresses 1 Example Street Manage',
-        'Letter branding HM Government Change',
+        'Letter branding Not set Change',
 
     ]),
 ])
@@ -1173,7 +1172,7 @@ def test_route_for_platform_admin_update_service(
         client,
         platform_admin_user,
         service_one,
-        mock_get_letter_branding,
+        mock_get_all_letter_branding,
         route,
 ):
     mocker.patch('app.service_api_client.archive_service')
@@ -2033,7 +2032,7 @@ def test_set_letter_contact_block_redirects_to_template(
     mock_update_service,
 ):
     service_one['permissions'] = ['letter']
-    fake_template_id = uuid.uuid4()
+    fake_template_id = uuid4()
     response = logged_in_client.post(
         url_for(
             'main.service_set_letter_contact_block',
@@ -2069,15 +2068,14 @@ def test_set_letter_contact_block_has_max_10_lines(
 
 def test_request_letter_branding(
     client_request,
-    mock_get_letter_branding,
+    mock_get_letter_branding_by_id,
+    service_one
 ):
     request_page = client_request.get(
         'main.request_letter_branding',
         service_id=SERVICE_ONE_ID,
     )
-    assert request_page.select_one('main p').text.strip() == (
-        'Your letters have the HM Government logo.'
-    )
+    assert request_page.select_one('main p').text.strip() == 'Your letters have no logo.'
     link_href = request_page.select_one('main a')['href']
     feedback_page = client_request.get_url(link_href)
     assert feedback_page.select_one('textarea').text.strip() == (
@@ -2085,70 +2083,97 @@ def test_request_letter_branding(
     )
 
 
-def test_set_letter_branding_platform_admin_only(
+def test_request_letter_branding_if_already_have_branding(
+    client_request,
+    mock_get_letter_branding_by_id,
+    service_one,
+):
+    service_one['letter_branding'] = uuid4()
+
+    request_page = client_request.get(
+        'main.request_letter_branding',
+        service_id=SERVICE_ONE_ID,
+    )
+
+    mock_get_letter_branding_by_id.assert_called_once_with(service_one['letter_branding'])
+    assert request_page.select_one('main p').text.strip() == 'Your letters have the HM Government logo.'
+
+
+def test_service_set_letter_branding_platform_admin_only(
     logged_in_client,
     service_one,
 ):
-    response = logged_in_client.get(url_for('main.set_letter_branding', service_id=service_one['id']))
+    response = logged_in_client.get(url_for('main.service_set_letter_branding', service_id=service_one['id']))
     assert response.status_code == 403
 
 
-@pytest.mark.parametrize('current_dvla_org_id, expected_selected, expected_items', [
-    (None, '001', (
-        ('001', 'HM Government'),
-        ('999', 'Animal and Plant Health Agency'),
-        ('500', 'Land Registry'),
+@pytest.mark.parametrize('letter_branding, expected_selected, expected_items', [
+    # expected order: currently selected, then default, then rest alphabetically
+    (None, '__NONE__', (
+        ('__NONE__', 'None'),
+        (str(UUID(int=2)), 'Animal and Plant Health Agency'),
+        (str(UUID(int=0)), 'HM Government'),
+        (str(UUID(int=1)), 'Land Registry'),
     )),
-    ('500', '500', (
-        ('500', 'Land Registry'),
-        ('001', 'HM Government'),
-        ('999', 'Animal and Plant Health Agency'),
+    (str(UUID(int=1)), str(UUID(int=1)), (
+        (str(UUID(int=1)), 'Land Registry'),
+        ('__NONE__', 'None'),
+        (str(UUID(int=2)), 'Animal and Plant Health Agency'),
+        (str(UUID(int=0)), 'HM Government'),
     )),
-    ('999', '999', (
-        ('999', 'Animal and Plant Health Agency'),
-        ('001', 'HM Government'),
-        ('500', 'Land Registry'),
+    (str(UUID(int=2)), str(UUID(int=2)), (
+        (str(UUID(int=2)), 'Animal and Plant Health Agency'),
+        ('__NONE__', 'None'),
+        (str(UUID(int=0)), 'HM Government'),
+        (str(UUID(int=1)), 'Land Registry'),
     )),
 ])
-def test_set_letter_branding_prepopulates(
+def test_service_set_letter_branding_prepopulates(
     logged_in_platform_admin_client,
     service_one,
-    mock_get_letter_branding,
-    current_dvla_org_id,
+    mock_get_all_letter_branding,
+    letter_branding,
     expected_selected,
     expected_items,
 ):
-    if current_dvla_org_id:
-        service_one['dvla_organisation'] = current_dvla_org_id
-    response = logged_in_platform_admin_client.get(url_for('main.set_letter_branding', service_id=service_one['id']))
+    service_one['letter_branding'] = letter_branding
+    response = logged_in_platform_admin_client.get(
+        url_for('main.service_set_letter_branding', service_id=service_one['id'])
+    )
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-
-    for element in {'label[for^=dvla_org_id]', 'input[type=radio]'}:
-        assert len(page.select(element)) == len(expected_items)
-
-    for index, expected_item in enumerate(expected_items):
-        expected_value, expected_label = expected_item
-        assert normalize_spaces(page.select('label[for^=dvla_org_id]')[index].text) == expected_label
-        assert page.select('input[type=radio]')[index]['value'] == expected_value
 
     assert len(page.select('input[checked]')) == 1
     assert page.select('input[checked]')[0]['value'] == expected_selected
 
+    for element in {'label[for^=branding_style]', 'input[type=radio]'}:
+        assert len(page.select(element)) == len(expected_items)
 
-def test_set_letter_branding_saves(
+    for index, expected_item in enumerate(expected_items):
+        expected_value, expected_label = expected_item
+        assert normalize_spaces(page.select('label[for^=branding_style]')[index].text) == expected_label
+        assert page.select('input[type=radio]')[index]['value'] == expected_value
+
+
+@pytest.mark.parametrize('selected_letter_branding, expected_post_data', [
+    (str(UUID(int=1)), str(UUID(int=1))),
+    ('__NONE__', None),
+])
+def test_service_set_letter_branding_saves(
     logged_in_platform_admin_client,
     service_one,
     mock_update_service,
-    mock_get_letter_branding,
+    mock_get_all_letter_branding,
+    selected_letter_branding,
+    expected_post_data
 ):
     response = logged_in_platform_admin_client.post(
-        url_for('main.set_letter_branding', service_id=service_one['id']),
-        data={'dvla_org_id': '500'}
+        url_for('main.service_set_letter_branding', service_id=service_one['id']),
+        data={'branding_style': selected_letter_branding}
     )
     assert response.status_code == 302
     assert response.location == url_for('main.service_settings', service_id=service_one['id'], _external=True)
-    mock_update_service.assert_called_once_with(service_one['id'], dvla_organisation='500')
+    mock_update_service.assert_called_once_with(service_one['id'], letter_branding=expected_post_data)
 
 
 @pytest.mark.parametrize('current_branding, expected_values, expected_labels', [
@@ -2200,37 +2225,6 @@ def test_should_show_branding_styles(
 
     app.email_branding_client.get_all_email_branding.assert_called_once_with()
     app.service_api_client.get_service.assert_called_once_with(service_one['id'])
-
-
-def test_should_show_live_search_if_list_of_brand_styles_fits_onscreen(
-    logged_in_platform_admin_client,
-    service_one,
-    mock_get_email_branding_that_can_fit_onscreen,
-):
-    response = logged_in_platform_admin_client.get(url_for(
-        'main.service_set_email_branding', service_id=service_one['id']
-    ))
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-
-    assert not page.select('.live-search')
-
-
-def test_should_show_live_search_if_list_of_brand_styles_taller_than_page(
-    logged_in_platform_admin_client,
-    service_one,
-    mock_get_more_email_branding_than_can_fit_onscreen,
-):
-    response = logged_in_platform_admin_client.get(url_for(
-        'main.service_set_email_branding', service_id=service_one['id']
-    ))
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-
-    assert page.select('.live-search')
-    search_target = page.select_one('.live-search')['data-targets']
-    assert search_target == '.multiple-choice'
-    assert len(page.select(search_target)) == 9
 
 
 def test_should_send_branding_and_organisations_to_preview(
@@ -3063,7 +3057,7 @@ def test_service_settings_when_inbound_number_is_not_set(
     mock_get_service_organisation,
     single_sms_sender,
     mocker,
-    mock_get_letter_branding,
+    mock_get_all_letter_branding,
     mock_get_free_sms_fragment_limit,
     mock_get_service_data_retention,
 ):
@@ -3081,7 +3075,7 @@ def test_set_inbound_sms_when_inbound_number_is_not_set(
     single_reply_to_email_address,
     single_letter_contact_block,
     mocker,
-    mock_get_letter_branding,
+    mock_get_all_letter_branding,
 ):
     mocker.patch('app.inbound_number_client.get_inbound_sms_number_for_service',
                  return_value={'data': {}})

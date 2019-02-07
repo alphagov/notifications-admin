@@ -31,12 +31,11 @@ from app.main.forms import (
     ConfirmPasswordForm,
     FreeSMSAllowance,
     InternationalSMSForm,
-    LetterBranding,
     LinkOrganisationsForm,
     OrganisationTypeForm,
     RenameServiceForm,
     RequestToGoLiveForm,
-    SearchTemplatesForm,
+    SearchByNameForm,
     ServiceContactDetailsForm,
     ServiceDataRetentionEditForm,
     ServiceDataRetentionForm,
@@ -45,7 +44,8 @@ from app.main.forms import (
     ServiceLetterContactBlockForm,
     ServicePreviewBranding,
     ServiceReplyToEmailForm,
-    ServiceSetBranding,
+    ServiceSetEmailBranding,
+    ServiceSetLetterBranding,
     ServiceSmsSenderForm,
     ServiceSwitchChannelForm,
     SMSPrefixForm,
@@ -54,7 +54,6 @@ from app.main.forms import (
 from app.utils import (
     AgreementInfo,
     email_safe,
-    get_logo_cdn_domain,
     user_has_permissions,
     user_is_gov_user,
     user_is_platform_admin,
@@ -759,9 +758,9 @@ def set_free_sms_allowance(service_id):
 def service_set_email_branding(service_id):
     email_branding = email_branding_client.get_all_email_branding()
 
-    form = ServiceSetBranding(
-        all_email_brandings=get_branding_as_value_and_label(email_branding),
-        current_email_branding=current_service.email_branding_id,
+    form = ServiceSetEmailBranding(
+        all_branding_options=get_branding_as_value_and_label(email_branding),
+        current_branding=current_service.email_branding_id,
     )
 
     if form.validate_on_submit():
@@ -774,9 +773,7 @@ def service_set_email_branding(service_id):
     return render_template(
         'views/service-settings/set-email-branding.html',
         form=form,
-        branding_dict=get_branding_as_dict(email_branding),
-        search_form=SearchTemplatesForm(),
-        show_search_box=(len(email_branding) > 6)
+        search_form=SearchByNameForm()
     )
 
 
@@ -805,23 +802,24 @@ def service_preview_email_branding(service_id):
 @main.route("/services/<service_id>/service-settings/set-letter-branding", methods=['GET', 'POST'])
 @login_required
 @user_is_platform_admin
-def set_letter_branding(service_id):
+def service_set_letter_branding(service_id):
+    letter_branding = letter_branding_client.get_all_letter_branding()
 
-    form = LetterBranding(
-        choices=letter_branding_client.get_letter_branding().items(),
-        dvla_org_id=current_service.dvla_organisation,
+    form = ServiceSetLetterBranding(
+        all_branding_options=get_branding_as_value_and_label(letter_branding),
+        current_branding=current_service.letter_branding_id,
     )
 
     if form.validate_on_submit():
         current_service.update(
-            dvla_organisation=form.dvla_org_id.data
+            letter_branding=form.branding_style.data
         )
         return redirect(url_for('.service_settings', service_id=service_id))
 
     return render_template(
         'views/service-settings/set-letter-branding.html',
         form=form,
-        search_form=SearchTemplatesForm(),
+        search_form=SearchByNameForm()
     )
 
 
@@ -956,15 +954,6 @@ def get_branding_as_value_and_label(email_branding):
         (branding['id'], branding['name'])
         for branding in email_branding
     ]
-
-
-def get_branding_as_dict(email_branding):
-    return {
-        branding['id']: {
-            'logo': 'https://{}/{}'.format(get_logo_cdn_domain(), branding['logo']),
-            'colour': branding['colour']
-        } for branding in email_branding
-    }
 
 
 def convert_dictionary_to_wtforms_choices_format(dictionary, value, label):

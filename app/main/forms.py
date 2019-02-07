@@ -782,7 +782,7 @@ class RadioFieldWithRequiredMessage(RadioField):
             raise ValueError(self.required_message)
 
 
-class ServiceSetBranding(StripWhitespaceForm):
+class ServiceSetEmailBranding(StripWhitespaceForm):
 
     branding_style = RadioFieldWithNoneOption(
         'Branding style',
@@ -793,18 +793,23 @@ class ServiceSetBranding(StripWhitespaceForm):
 
     DEFAULT = (FieldWithNoneOption.NONE_OPTION_VALUE, 'GOV.UK')
 
-    def __init__(self, all_email_brandings, current_email_branding):
+    def __init__(self, all_branding_options, current_branding):
 
-        super().__init__(branding_style=current_email_branding)
+        super().__init__(branding_style=current_branding)
 
         self.branding_style.choices = sorted(
-            all_email_brandings + [self.DEFAULT],
+            all_branding_options + [self.DEFAULT],
             key=lambda branding: (
-                branding[0] != current_email_branding,
+                branding[0] != current_branding,
                 branding[0] is not self.DEFAULT[0],
                 branding[1].lower(),
             ),
         )
+
+
+class ServiceSetLetterBranding(ServiceSetEmailBranding):
+    # form is the same, but instead of GOV.UK we have None as a valid option
+    DEFAULT = (FieldWithNoneOption.NONE_OPTION_VALUE, 'None')
 
 
 class ServicePreviewBranding(StripWhitespaceForm):
@@ -881,27 +886,6 @@ class CreateOrUpdateOrganisation(StripWhitespaceForm):
     name = StringField('Name', validators=[DataRequired()])
 
 
-class LetterBranding(StripWhitespaceForm):
-
-    def __init__(self, choices=[], *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.dvla_org_id.choices = list(sorted(
-            choices,
-            key=lambda choice: (
-                choice[0] != kwargs.get('dvla_org_id'),
-                choice[0] != '001',
-                choice[1],
-            ),
-        ))
-
-    dvla_org_id = RadioField(
-        'Which logo should this service’s letter have?',
-        validators=[
-            DataRequired()
-        ]
-    )
-
-
 class EmailFieldInWhitelist(EmailField, StripWhitespaceStringField):
     pass
 
@@ -976,7 +960,7 @@ class ChooseTemplateType(StripWhitespaceForm):
         ])
 
 
-class SearchTemplatesForm(StripWhitespaceForm):
+class SearchByNameForm(StripWhitespaceForm):
 
     search = SearchField('Search by name')
 

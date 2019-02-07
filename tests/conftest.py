@@ -3,6 +3,7 @@ import os
 from contextlib import contextmanager
 from datetime import date, datetime, timedelta
 from unittest.mock import Mock
+from uuid import UUID
 
 import pytest
 from bs4 import BeautifulSoup
@@ -2526,38 +2527,45 @@ def mock_get_all_email_branding(mocker):
 
 
 @pytest.fixture(scope='function')
-def mock_get_more_email_branding_than_can_fit_onscreen(mocker):
-    def _get_more_email_branding_than_can_fit_onscreen():
-        return create_email_brandings(8)
-
-    return mocker.patch(
-        'app.email_branding_client.get_all_email_branding',
-        side_effect=_get_more_email_branding_than_can_fit_onscreen
-    )
-
-
-@pytest.fixture(scope='function')
-def mock_get_email_branding_that_can_fit_onscreen(mocker):
-    def _get_email_branding_that_can_fit_onscreen():
-        return create_email_brandings(4)
-
-    return mocker.patch(
-        'app.email_branding_client.get_all_email_branding',
-        side_effect=_get_email_branding_that_can_fit_onscreen
-    )
-
-
-@pytest.fixture(scope='function')
-def mock_get_letter_branding(mocker):
+def mock_get_all_letter_branding(mocker):
     def _get_letter_branding():
-        return {
-            '001': 'HM Government',
-            '500': 'Land Registry',
-            '999': 'Animal and Plant Health Agency',
-        }
+        return [
+            {
+                'id': str(UUID(int=0)),
+                'name': 'HM Government',
+                'filename': 'hm-government',
+                'domain': None,
+            },
+            {
+                'id': str(UUID(int=1)),
+                'name': 'Land Registry',
+                'filename': 'land-registry',
+                'domain': None,
+            },
+            {
+                'id': str(UUID(int=2)),
+                'name': 'Animal and Plant Health Agency',
+                'filename': 'animal',
+                'domain': None,
+            }
+        ]
 
     return mocker.patch(
-        'app.letter_branding_client.get_letter_branding', side_effect=_get_letter_branding
+        'app.letter_branding_client.get_all_letter_branding', side_effect=_get_letter_branding
+    )
+
+
+@pytest.fixture
+def mock_get_letter_branding_by_id(mocker):
+    def _get_branding_by_id(_id):
+        return {
+            'id': _id,
+            'name': 'HM Government',
+            'filename': 'hm-government',
+            'domain': None,
+        }
+    return mocker.patch(
+        'app.letter_branding_client.get_letter_branding', side_effect=_get_branding_by_id
     )
 
 

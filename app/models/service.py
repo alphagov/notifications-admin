@@ -23,11 +23,11 @@ class Service():
     ALLOWED_PROPERTIES = {
         'active',
         'contact_link',
-        'dvla_organisation',
         'email_branding',
         'email_from',
         'id',
         'inbound_api',
+        'letter_branding',
         'letter_contact_block',
         'letter_logo_filename',
         'message_limit',
@@ -303,11 +303,15 @@ class Service():
             return email_branding_client.get_email_branding(self.email_branding_id)['email_branding']
         return None
 
+    @property
+    def letter_branding_id(self):
+        return self._dict['letter_branding']
+
     @cached_property
     def letter_branding(self):
-        return letter_branding_client.get_letter_branding().get(
-            self.dvla_organisation, '001'
-        )
+        if self.letter_branding_id:
+            return letter_branding_client.get_letter_branding(self.letter_branding_id)
+        return None
 
     @cached_property
     def organisation_name(self):

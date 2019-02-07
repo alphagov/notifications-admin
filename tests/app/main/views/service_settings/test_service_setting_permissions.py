@@ -10,7 +10,7 @@ def get_service_settings_page(
     platform_admin_user,
     service_one,
     mock_get_inbound_number_for_service,
-    mock_get_letter_branding,
+    mock_get_all_letter_branding,
     mock_get_service_organisation,
     mock_get_free_sms_fragment_limit,
     no_reply_to_email_addresses,
@@ -94,7 +94,7 @@ def test_normal_user_doesnt_see_any_toggle_buttons(
     no_letter_contact_blocks,
     mock_get_service_organisation,
     single_sms_sender,
-    mock_get_letter_branding,
+    mock_get_all_letter_branding,
     mock_get_inbound_number_for_service,
     mock_get_free_sms_fragment_limit,
     mock_get_service_data_retention
