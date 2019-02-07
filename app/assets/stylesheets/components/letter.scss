@@ -82,6 +82,19 @@ $iso-paper-ratio: 141.42135624%;
 
     }
 
+    .letter-sent &:hover {
+
+      background-color: transparent;
+      border: none;
+      box-shadow: none;
+      background-image: file-url('envelope-fold.svg');
+
+      @include ie-lte(8) {
+        background-image: file-url('envelope-fold.png');
+      }
+
+    }
+
   }
 
   img {

@@ -72,7 +72,9 @@
       {% endif %}
     {% endif %}
 
-    {{ template|string }}
+    <div class="{{ 'letter-sent' if template.template_type == 'letter' else '' }}">
+      {{ template|string }}
+    </div>
 
     {% if template.template_type == 'letter' %}
       <div class="js-stick-at-bottom-when-scrolling">
