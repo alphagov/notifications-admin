@@ -85,7 +85,7 @@ $iso-paper-ratio: 141.42135624%;
     .letter-sent &:hover {
 
       background-color: transparent;
-      border: none;
+      border-color: transparent;
       box-shadow: none;
       background-image: file-url('envelope-fold.svg');
 
