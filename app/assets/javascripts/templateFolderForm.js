@@ -170,8 +170,6 @@
         state => (state.key === this.currentState ? this.$stickyBottom.append(state.$el) : state.$el.detach())
       );
 
-      if (currentStateObj && ('setFocus' in currentStateObj)) { currentStateObj.setFocus(); }
-
       // use dialog mode for states which contain more than one form control
       if (['move-to-existing-folder', 'add-new-template'].indexOf(this.currentState) !== -1) {
         mode = 'dialog';
@@ -179,6 +177,8 @@
       GOVUK.stickAtBottomWhenScrolling.setMode(mode);
       // make sticky JS recalculate its cache of the element's position
       GOVUK.stickAtBottomWhenScrolling.recalculate();
+
+      if (currentStateObj && ('setFocus' in currentStateObj)) { currentStateObj.setFocus(); }
     };
 
     this.nothingSelectedButtons = $(`
