@@ -40,6 +40,7 @@ def test_create_letter_branding(mocker):
     new_branding = {'filename': 'uuid-test', 'name': 'my letters', 'domain': 'example.com'}
 
     mock_post = mocker.patch('app.notify_client.letter_branding_client.LetterBrandingClient.post')
+    mock_redis_delete = mocker.patch('app.notify_client.RedisClient.delete')
 
     LetterBrandingClient().create_letter_branding(
         filename=new_branding['filename'], name=new_branding['name'], domain=new_branding['domain']
@@ -48,3 +49,5 @@ def test_create_letter_branding(mocker):
         url='/letter-branding',
         data=new_branding
     )
+
+    mock_redis_delete.assert_called_once_with('letter_branding')

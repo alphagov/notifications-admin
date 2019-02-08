@@ -12,7 +12,7 @@ from app.s3_client.s3_logo_client import (
     persist_logo,
     upload_email_logo,
 )
-from app.utils import AgreementInfo, get_logo_cdn_domain, user_is_platform_admin
+from app.utils import get_logo_cdn_domain, user_is_platform_admin
 
 
 @main.route("/email-branding", methods=['GET', 'POST'])
@@ -24,8 +24,7 @@ def email_branding():
     return render_template(
         'views/email-branding/select-branding.html',
         email_brandings=brandings,
-        search_form=SearchByNameForm(),
-        agreement_info=AgreementInfo,
+        search_form=SearchByNameForm()
     )
 
 

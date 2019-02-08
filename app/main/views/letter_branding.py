@@ -12,7 +12,11 @@ from requests import get as requests_get
 
 from app import letter_branding_client
 from app.main import main
-from app.main.forms import ServiceLetterBrandingDetails, SVGFileUpload
+from app.main.forms import (
+    SearchByNameForm,
+    ServiceLetterBrandingDetails,
+    SVGFileUpload,
+)
 from app.s3_client.s3_logo_client import (
     LETTER_TEMP_TAG,
     delete_letter_temp_file,
@@ -25,6 +29,20 @@ from app.s3_client.s3_logo_client import (
     upload_letter_temp_logo,
 )
 from app.utils import get_logo_cdn_domain, user_is_platform_admin
+
+
+@main.route("/letter-branding", methods=['GET'])
+@login_required
+@user_is_platform_admin
+def letter_branding():
+
+    brandings = letter_branding_client.get_all_letter_branding()
+
+    return render_template(
+        'views/letter-branding/select-letter-branding.html',
+        letter_brandings=brandings,
+        search_form=SearchByNameForm()
+    )
 
 
 @main.route("/letter-branding/create", methods=['GET', 'POST'])
@@ -65,8 +83,7 @@ def create_letter_branding(logo=None):
 
                 upload_letter_logos(logo, db_filename, png_file, session['user_id'])
 
-                # TODO: redirect to all letter branding page once it exists
-                return redirect(url_for('main.platform_admin'))
+                return redirect(url_for('main.letter_branding'))
 
             except HTTPError as e:
                 if 'domain' in e.message:

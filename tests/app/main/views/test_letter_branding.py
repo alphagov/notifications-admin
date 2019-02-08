@@ -8,6 +8,41 @@ from notifications_python_client.errors import HTTPError
 
 from app.main.views.letter_branding import get_png_file_from_svg
 from app.s3_client.s3_logo_client import LETTER_TEMP_LOGO_LOCATION
+from tests.conftest import normalize_spaces
+
+
+def test_letter_branding_page_shows_full_branding_list(
+    mocker,
+    logged_in_platform_admin_client,
+):
+    letter_brandings = [
+        {'id': '1', 'filename': '1-test', 'domain': None, 'name': 'test brand'},
+        {'id': '2', 'filename': '2-example', 'domain': 'cabinet-office.gov.uk', 'name': 'example brand'}
+    ]
+    mocker.patch('app.main.views.letter_branding.letter_branding_client.get_all_letter_branding',
+                 return_value=letter_brandings)
+
+    response = logged_in_platform_admin_client.get(
+        url_for('.letter_branding')
+    )
+
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    brand_names = [normalize_spaces(name.text) for name in page.select('.letter-brand .message-name')]
+    brand_hints = [normalize_spaces(hint.text) for hint in page.select('.letter-brand .message-type')]
+
+    assert normalize_spaces(
+        page.select_one('h1').text
+    ) == "Letter branding"
+
+    assert page.select_one('.column-three-quarters a')['href'] == url_for('main.create_letter_branding')
+
+    assert list(zip(
+        brand_names, brand_hints
+    )) == [
+        ('test brand', '–'),
+        ('example brand', 'Default for cabinet-office.gov.uk'),
+    ]
 
 
 def test_create_letter_branding_does_not_show_branding_info(logged_in_platform_admin_client):
@@ -154,11 +189,6 @@ def test_create_letter_branding_persists_logo_when_all_data_is_valid(
     mock_upload_png = mocker.patch('app.main.views.letter_branding.upload_letter_png_logo')
     mock_delete_temp_files = mocker.patch('app.main.views.letter_branding.delete_letter_temp_files_created_by')
 
-    # TODO: remove platform admin page mocks once we no longer redirect there
-    mocker.patch('app.main.views.platform_admin.make_columns')
-    mocker.patch('app.main.views.platform_admin.platform_stats_api_client.get_aggregate_platform_stats')
-    mocker.patch('app.main.views.platform_admin.complaint_api_client.get_complaint_count')
-
     response = logged_in_platform_admin_client.post(
         url_for('.create_letter_branding', logo=temp_logo),
         data={
@@ -168,8 +198,10 @@ def test_create_letter_branding_persists_logo_when_all_data_is_valid(
         },
         follow_redirects=True
     )
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
     assert response.status_code == 200
+    assert page.find('h1').text == 'Letter branding'
 
     mock_letter_client.create_letter_branding.assert_called_once_with(
         domain='bl.uk', filename='{}-test'.format(fake_uuid), name='Test brand'
