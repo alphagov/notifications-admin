@@ -20,5 +20,16 @@ class LetterBrandingClient(NotifyAdminAPIClient):
         }
         return self.post(url="/letter-branding", data=data)
 
+    @cache.delete('letter_branding')
+    @cache.delete('letter_branding-{branding_id}')
+    def update_letter_branding(self, branding_id, filename, name, domain):
+        data = {
+            "filename": filename,
+            "name": name,
+            "domain": domain,
+
+        }
+        return self.post(url="/letter-branding/{}".format(branding_id), data=data)
+
 
 letter_branding_client = LetterBrandingClient()
