@@ -11,7 +11,7 @@ class TemplatePreview:
             'letter_contact_block': template.get('reply_to_text', ''),
             'template': template,
             'values': values,
-            'filename': current_service.letter_logo_filename,
+            'filename': current_service.letter_branding and current_service.letter_branding['filename']
         }
         resp = requests.post(
             '{}/preview.{}{}'.format(
