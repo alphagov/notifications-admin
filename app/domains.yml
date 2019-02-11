@@ -1912,7 +1912,7 @@ frometowncouncil.gov.uk:
 fylde.gov.uk:
   owner: Fylde Borough Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 galwgofal.gov.uk:
   owner: Conwy County Borough Council
   crown: false
