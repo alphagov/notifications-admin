@@ -1920,7 +1920,7 @@ galwgofal.gov.uk:
 gateshead.gov.uk:
   owner: Gateshead Metropolitan Borough Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 gedling.gov.uk:
   owner: Gedling Borough Council
   crown: false
@@ -3195,10 +3195,7 @@ northeastcouncils.gov.uk:
   owner: Association of North East Councils Limited
   crown: false
   agreement_signed: false
-northeast-tadu.gov.uk:
-  owner: Gateshead Metropolitan Borough Council
-  crown: false
-  agreement_signed: false
+northeast-tadu.gov.uk: gateshead.gov.uk
 north-herts.gov.uk:
   owner: North Hertfordshire District Council
   crown: false
