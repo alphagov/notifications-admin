@@ -57,10 +57,23 @@
     }
 
     &-edit-link {
+
       text-align: right;
       position: absolute;
       top: -25px;
       right: -135px;
+
+      a {
+        border-top: 11px solid transparent;
+        border-bottom: 10px solid transparent;
+        border-left: 15px solid transparent;
+
+        &:hover {
+          color: $link-hover-colour;
+        }
+
+      }
+
     }
 
     &-hint {
