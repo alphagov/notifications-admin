@@ -938,28 +938,6 @@ class DateFilterForm(StripWhitespaceForm):
     include_from_test_key = BooleanField("Include test keys", default="checked", false_values={"N"})
 
 
-class ChooseTemplateType(StripWhitespaceForm):
-
-    template_type = RadioField(
-        '',
-        validators=[
-            DataRequired()
-        ]
-    )
-
-    def __init__(self, include_letters=False, include_copy=False, *args, **kwargs):
-
-        super().__init__(*args, **kwargs)
-
-        self.template_type.choices = filter(None, [
-            ('email', 'Email template'),
-            ('sms', 'Text message template'),
-            ('letter', 'Letter template') if include_letters else None,
-            ('copy-existing', 'Copy of an existing template') if include_copy else None,
-            ('folder', 'Folder'),
-        ])
-
-
 class SearchByNameForm(StripWhitespaceForm):
 
     search = SearchField('Search by name')

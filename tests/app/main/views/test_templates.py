@@ -743,28 +743,20 @@ def test_dont_show_preview_letter_templates_for_bad_filetype(
     assert mock_get_service_template.called is False
 
 
-@pytest.mark.parametrize('endpoint, data', (
-    ('main.add_template_by_type', {
-        'template_type': 'copy-existing'
-    }),
-    ('main.choose_template', {
-        'operation': 'add-new-template',
-        'add_template_by_template_type': 'copy-existing'
-    }),
-))
 def test_choosing_to_copy_redirects(
     client_request,
     service_one,
     mock_get_service_templates,
     mock_get_template_folders,
     mock_get_organisations_and_services_for_user,
-    endpoint,
-    data,
 ):
     client_request.post(
-        endpoint,
+        'main.choose_template',
         service_id=SERVICE_ONE_ID,
-        _data=data,
+        _data={
+            'operation': 'add-new-template',
+            'add_template_by_template_type': 'copy-existing'
+        },
         _expected_status=302,
         _expected_redirect=url_for(
             'main.choose_template_to_copy',
@@ -1159,20 +1151,6 @@ def test_cant_copy_template_from_non_member_service(
 
 @pytest.mark.parametrize('endpoint, data, expected_error', (
     (
-        'main.add_template_by_type',
-        {
-            'template_type': 'email',
-        },
-        "Sending emails has been disabled for your service."
-    ),
-    (
-        'main.add_template_by_type',
-        {
-            'template_type': 'sms',
-        },
-        "Sending text messages has been disabled for your service."
-    ),
-    (
         'main.choose_template',
         {
             'operation': 'add-new-template',
@@ -1207,10 +1185,10 @@ def test_should_not_allow_creation_of_template_through_form_without_correct_perm
         _follow_redirects=True,
     )
     assert normalize_spaces(page.select('main p')[0].text) == expected_error
-    assert page.select(".page-footer-back-link")[0].text == "Back to add new template"
+    assert page.select(".page-footer-back-link")[0].text == "Back to templates"
     assert page.select(".page-footer-back-link")[0]['href'] == url_for(
-        '.add_template_by_type',
-        service_id=service_one['id'],
+        '.choose_template',
+        service_id=SERVICE_ONE_ID,
         template_id='0',
     )
 
