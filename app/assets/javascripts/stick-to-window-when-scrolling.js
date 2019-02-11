@@ -576,9 +576,8 @@
 
       el.removeStickyClasses(this);
       $el.css('width', '');
-      if (_mode === 'dialog') {
-        dialog.releaseEl(el, this);
-      }
+      // clear styles from any elements stuck while in a dialog mode
+      dialog.releaseEl(el, this);
       el.removeShim();
       el.release(this);
     }
@@ -658,9 +657,15 @@
     }
   };
   stickAtTop.unstop = function (el) {
+    var offset = 0;
+
+    if (_mode === 'dialog') {
+      offset = dialog.getOffsetFromEdge(el, this);
+    }
+
     el.$fixedEl.css({
       'position': '',
-      'top': ''
+      'top': offset + 'px'
     });
     el.unstop();
   };
