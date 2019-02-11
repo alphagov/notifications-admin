@@ -13,7 +13,7 @@
   <nav id=template-list>
     {% for item in template_list %}
       <div class="template-list-item {% if can_manage_folders %}template-list-item-with-checkbox{% endif %} {% if item.ancestors %}template-list-item-hidden-by-default{% endif %} {% if not item.ancestors %}template-list-item-without-ancestors{% endif %}">
-        {% if can_manage_folders %}
+        {% if current_user.has_permissions('manage_templates') %}
           {{ unlabelled_checkbox(
             id='templates-or-folder-{}'.format(item.id),
             name='templates_and_folders',

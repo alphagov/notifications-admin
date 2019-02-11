@@ -126,7 +126,7 @@ def choose_template(service_id, template_type='all', template_folder_id=None):
     option_hints = {template_folder_id: 'current folder'}
 
     if request.method == 'POST' and templates_and_folders_form.validate_on_submit():
-        if not can_manage_folders():
+        if not current_user.has_permissions('manage_templates'):
             abort(403)
         try:
             return process_folder_management_form(templates_and_folders_form, template_folder_id)
@@ -139,7 +139,6 @@ def choose_template(service_id, template_type='all', template_folder_id=None):
     return render_template(
         'views/templates/choose.html',
         current_template_folder_id=template_folder_id,
-        can_manage_folders=can_manage_folders(),
         template_folder_path=current_service.get_template_folder_path(template_folder_id),
         template_list=template_list,
         show_search_box=current_service.count_of_templates_and_folders > 7,
@@ -208,13 +207,6 @@ def get_template_nav_items(template_folder_id):
     ]
 
 
-def can_manage_folders():
-    return (
-        current_service.has_permission('edit_folders') and
-        current_user.has_permissions('manage_templates')
-    )
-
-
 @main.route("/services/<service_id>/templates/<template_id>.<filetype>")
 @login_required
 @user_has_permissions()
@@ -271,7 +263,6 @@ def add_template_by_type(service_id, template_folder_id=None):
         include_copy=(
             current_service.all_templates or len(user_api_client.get_service_ids_for_user(current_user)) > 1
         ),
-        include_folder=current_service.has_permission('edit_folders')
     )
 
     if form.validate_on_submit():
@@ -427,8 +418,6 @@ def action_blocked(service_id, notification_type, return_to, template_id):
 @login_required
 @user_has_permissions('manage_templates')
 def add_template_folder(service_id, template_folder_id=None):
-    if not current_service.has_permission('edit_folders'):
-        abort(403)
 
     form = TemplateFolderForm()
 
@@ -450,8 +439,6 @@ def add_template_folder(service_id, template_folder_id=None):
 @login_required
 @user_has_permissions('manage_templates')
 def manage_template_folder(service_id, template_folder_id):
-    if not current_service.has_permission('edit_folders'):
-        abort(403)
 
     form = TemplateFolderForm(
         name=current_service.get_template_folder(template_folder_id)['name']
@@ -479,9 +466,6 @@ def manage_template_folder(service_id, template_folder_id):
 @login_required
 @user_has_permissions('manage_templates')
 def delete_template_folder(service_id, template_folder_id):
-
-    if not current_service.has_permission('edit_folders'):
-        abort(403)
 
     template_folder = current_service.get_template_folder(template_folder_id)
 

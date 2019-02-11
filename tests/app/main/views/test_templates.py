@@ -59,11 +59,8 @@ def test_should_show_empty_page_when_no_templates(
     assert normalize_spaces(page.select_one('main p').text) == (
         'You need a template before you can send emails or text messages.'
     )
-    assert page.select_one('main a')['href'] == url_for(
-        'main.add_template_by_type',
-        service_id=service_one['id'],
-    )
-    assert len(page.select('main a')) == 1
+    assert page.select_one('#add_new_folder_form')
+    assert page.select_one('#add_new_template_form')
 
 
 def test_should_show_add_template_form_if_service_has_folder_permission(
@@ -73,9 +70,6 @@ def test_should_show_add_template_form_if_service_has_folder_permission(
     mock_get_service_templates_when_no_templates_exist,
     mock_get_template_folders,
 ):
-
-    service_one['permissions'] += ['edit_folders']
-
     page = client_request.get(
         'main.choose_template',
         service_id=service_one['id'],
@@ -275,7 +269,7 @@ def test_should_show_live_search_if_service_has_lots_of_folders(
 
 
 @pytest.mark.parametrize('extra_permissions, expected_values, expected_labels', (
-    pytest.param(['edit_folders'], [
+    pytest.param([], [
         'email',
         'sms',
         'copy-existing',
@@ -284,7 +278,7 @@ def test_should_show_live_search_if_service_has_lots_of_folders(
         'Text message template',
         'Copy of an existing template',
     ]),
-    pytest.param(['edit_folders', 'letter'], [
+    pytest.param(['letter'], [
         'email',
         'sms',
         'letter',
@@ -295,10 +289,6 @@ def test_should_show_live_search_if_service_has_lots_of_folders(
         'Letter template',
         'Copy of an existing template',
     ]),
-    pytest.param(
-        [], [], [],
-        marks=pytest.mark.xfail(raises=ElementNotFound)
-    ),
 ))
 def test_should_show_new_template_choices_if_service_has_folder_permission(
     client_request,
@@ -771,7 +761,6 @@ def test_choosing_to_copy_redirects(
     endpoint,
     data,
 ):
-    service_one['permissions'] += ['edit_folders']
     client_request.post(
         endpoint,
         service_id=SERVICE_ONE_ID,
@@ -1210,7 +1199,7 @@ def test_should_not_allow_creation_of_template_through_form_without_correct_perm
     data,
     expected_error,
 ):
-    service_one['permissions'] = ['edit_folders']
+    service_one['permissions'] = []
     page = client_request.post(
         endpoint,
         service_id=SERVICE_ONE_ID,

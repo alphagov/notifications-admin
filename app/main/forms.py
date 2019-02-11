@@ -947,7 +947,7 @@ class ChooseTemplateType(StripWhitespaceForm):
         ]
     )
 
-    def __init__(self, include_letters=False, include_copy=False, include_folder=False, *args, **kwargs):
+    def __init__(self, include_letters=False, include_copy=False, *args, **kwargs):
 
         super().__init__(*args, **kwargs)
 
@@ -956,7 +956,7 @@ class ChooseTemplateType(StripWhitespaceForm):
             ('sms', 'Text message template'),
             ('letter', 'Letter template') if include_letters else None,
             ('copy-existing', 'Copy of an existing template') if include_copy else None,
-            ('folder', 'Folder') if include_folder else None,
+            ('folder', 'Folder'),
         ])
 
 
