@@ -393,28 +393,6 @@ def action_blocked(service_id, notification_type, return_to, template_id):
     )
 
 
-@main.route("/services/<service_id>/templates/add-folder", methods=['GET', 'POST'])
-@main.route("/services/<service_id>/templates/folders/<template_folder_id>/add-folder", methods=['GET', 'POST'])
-@login_required
-@user_has_permissions('manage_templates')
-def add_template_folder(service_id, template_folder_id=None):
-
-    form = TemplateFolderForm()
-
-    if form.validate_on_submit():
-        template_folder_api_client.create_template_folder(
-            current_service.id, name=form.name.data, parent_id=template_folder_id
-        )
-        return redirect(
-            url_for('.choose_template', service_id=service_id, template_folder_id=template_folder_id)
-        )
-
-    return render_template(
-        'views/templates/add-template-folder.html',
-        form=form
-    )
-
-
 @main.route("/services/<service_id>/templates/folders/<template_folder_id>/manage", methods=['GET', 'POST'])
 @login_required
 @user_has_permissions('manage_templates')

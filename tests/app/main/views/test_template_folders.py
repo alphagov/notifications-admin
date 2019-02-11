@@ -37,38 +37,6 @@ def _template(template_type, name, parent=None, template_id=None):
     }
 
 
-@pytest.mark.parametrize('parent_folder_id', [None, PARENT_FOLDER_ID])
-def test_get_add_template_folder_page(client_request, service_one, parent_folder_id):
-
-    page = client_request.get(
-        'main.add_template_folder',
-        service_id=service_one['id'],
-        template_folder_id=parent_folder_id
-    )
-
-    assert page.select_one('input[name=name]') is not None
-
-
-@pytest.mark.parametrize('parent_folder_id', [None, PARENT_FOLDER_ID])
-def test_post_add_template_folder_page(client_request, service_one, mocker, parent_folder_id):
-    mock_create = mocker.patch('app.template_folder_api_client.create_template_folder')
-
-    client_request.post(
-        'main.add_template_folder',
-        service_id=service_one['id'],
-        template_folder_id=parent_folder_id,
-        _data={'name': 'foo'},
-        _expected_redirect=url_for(
-            'main.choose_template',
-            service_id=service_one['id'],
-            template_folder_id=parent_folder_id,
-            _external=True,
-        )
-    )
-
-    mock_create.assert_called_once_with(service_one['id'], name='foo', parent_id=parent_folder_id)
-
-
 @pytest.mark.parametrize(
     (
         'expected_title_tag,'
