@@ -263,7 +263,7 @@
         $(window).scrollTop(this.getInPageEdgePosition(sticky) - windowHeight);
       }
 
-      self.hasResized = false;
+      this.hasResized = false;
     },
     releaseEl: function (el, sticky) {
       el.$fixedEl.css(sticky.edge, '');
