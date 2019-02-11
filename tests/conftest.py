@@ -2540,7 +2540,7 @@ def mock_get_all_letter_branding(mocker):
                 'id': str(UUID(int=1)),
                 'name': 'Land Registry',
                 'filename': 'land-registry',
-                'domain': None,
+                'domain': 'landregistry.gov.uk',
             },
             {
                 'id': str(UUID(int=2)),
@@ -2562,7 +2562,7 @@ def mock_get_letter_branding_by_id(mocker):
             'id': _id,
             'name': 'HM Government',
             'filename': 'hm-government',
-            'domain': None,
+            'domain': 'cabinet-office.gov.uk',
         }
     return mocker.patch(
         'app.letter_branding_client.get_letter_branding', side_effect=_get_branding_by_id
