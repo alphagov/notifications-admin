@@ -391,6 +391,11 @@ def test_get_domain_info_for_branding_request():
     )
 
 
+def test_domains_are_lowercased():
+    for domain in AgreementInfo.domains.keys():
+        assert domain == domain.lower()
+
+
 def test_validate_government_domain_data():
 
     for domain in AgreementInfo.domains.keys():

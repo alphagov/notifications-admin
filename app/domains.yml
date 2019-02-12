@@ -309,7 +309,7 @@ aberdeenshire.gov.uk:
   owner: Aberdeenshire Council
   crown: false
   agreement_signed: true
-AbergavennyTownCouncil.gov.uk:
+abergavennytowncouncil.gov.uk:
   owner: Abergavenny Town Council
   crown: false
   agreement_signed: false
@@ -544,7 +544,7 @@ barmouthtowncouncil.gov.uk:
   owner: Barmouth Town Council
   crown: false
   agreement_signed: false
-BarnardCastleTownCouncil.gov.uk:
+barnardcastletowncouncil.gov.uk:
   owner: Barnard Castle Town Council
   crown: false
   agreement_signed: false
@@ -859,7 +859,7 @@ bridport-tc.gov.uk:
   owner: Bridport Town Council
   crown: false
   agreement_signed: false
-Brierfield.gov.uk:
+brierfield.gov.uk:
   owner: Brierfield Town Council
   crown: false
   agreement_signed: false
@@ -1553,7 +1553,7 @@ dover.gov.uk:
   owner: Dover District Council
   crown: false
   agreement_signed: false
-DoverTownCouncil.gov.uk:
+dovertowncouncil.gov.uk:
   owner: Dover Town Council
   crown: false
   agreement_signed: false
@@ -1857,7 +1857,7 @@ fife.gov.uk:
   owner: Fife Council
   crown: false
   agreement_signed: false
-FiltonTownCouncil.gov.uk:
+filtontowncouncil.gov.uk:
   owner: Filton Town Council
   crown: false
   agreement_signed: false
@@ -1969,7 +1969,7 @@ goole-tc.gov.uk:
   owner: Goole Town Council
   crown: false
   agreement_signed: false
-GorseinonTownCouncil.gov.uk:
+gorseinontowncouncil.gov.uk:
   owner: Gorseinon Town Council
   crown: false
   agreement_signed: false
@@ -2018,7 +2018,7 @@ guildford.gov.uk:
   owner: Guildford Borough Council
   crown: false
   agreement_signed: false
-GwentArchives.gov.uk:
+gwentarchives.gov.uk:
   owner: Blaenau Gwent County Borough Council
   crown: false
   agreement_signed: false
@@ -2205,7 +2205,7 @@ hertsmere.gov.uk:
   owner: Hertsmere Borough Council
   crown: false
   agreement_signed: false
-Hertspartnership-ala.gov.uk:
+hertspartnership-ala.gov.uk:
   owner: East Herts District Council
   crown: false
   agreement_signed: false
@@ -2469,7 +2469,7 @@ kirtoninlindseytowncouncil.gov.uk:
   owner: Kirton in Lindsey Town Council
   crown: false
   agreement_signed: false
-KnaresboroughTownCouncil.gov.uk:
+knaresboroughtowncouncil.gov.uk:
   owner: Knaresborough Town Council
   crown: false
   agreement_signed: false
@@ -2703,7 +2703,7 @@ llantwitmajortowncouncil.gov.uk:
   owner: Llantwit Major Town Council
   crown: false
   agreement_signed: false
-LlwchwrTownCouncil.gov.uk:
+llwchwrtowncouncil.gov.uk:
   owner: Llwchwr Town Council
   crown: false
   agreement_signed: false
@@ -2965,7 +2965,7 @@ morley.gov.uk:
   owner: Morley Town Council
   crown: false
   agreement_signed: false
-Morpeth-tc.gov.uk:
+morpeth-tc.gov.uk:
   owner: Morpeth Town Council
   crown: false
   agreement_signed: false
@@ -3051,7 +3051,7 @@ newbury.gov.uk:
   owner: Newbury Town Council
   crown: false
   agreement_signed: false
-NewcastleEmlynTownCouncil.gov.uk:
+newcastleemlyntowncouncil.gov.uk:
   owner: Newcastle Emlyn Town Council
   crown: false
   agreement_signed: false
@@ -3151,7 +3151,7 @@ norfolkprepared.gov.uk:
   owner: Norfolk County Council
   crown: false
   agreement_signed: false
-NorthallertonTownCouncil.gov.uk:
+northallertontowncouncil.gov.uk:
   owner: Northallerton Town Council
   crown: false
   agreement_signed: false
@@ -3408,7 +3408,7 @@ pembrokeshire.gov.uk:
   owner: Pembrokeshire County Council
   crown: false
   agreement_signed: true
-PenarthTownCouncil.gov.uk:
+penarthtowncouncil.gov.uk:
   owner: Penarth Town Council
   crown: false
   agreement_signed: false
@@ -3436,7 +3436,7 @@ pershore-tc.gov.uk:
   owner: Pershore Town Council
   crown: false
   agreement_signed: false
-PershoreTownCouncil.gov.uk:
+pershoretowncouncil.gov.uk:
   owner: Pershore Town Council
   crown: false
   agreement_signed: false
@@ -3485,7 +3485,7 @@ polperrocommunitycouncil.gov.uk:
   owner: Polperro Community Council
   crown: false
   agreement_signed: false
-PontarddulaisTownCouncil.gov.uk:
+pontarddulaistowncouncil.gov.uk:
   owner: Pontarddulais Town Council
   crown: false
   agreement_signed: false
@@ -3522,7 +3522,7 @@ powys.gov.uk:
   owner: Powys County Council
   crown: false
   agreement_signed: false
-PoyntonTownCouncil.gov.uk:
+poyntontowncouncil.gov.uk:
   owner: Poynton Town Council
   crown: false
   agreement_signed: false
@@ -3558,7 +3558,7 @@ queensparkcommunitycouncil.gov.uk:
   owner: Queens Park Community Council
   crown: false
   agreement_signed: false
-Radstock-tc.gov.uk:
+radstock-tc.gov.uk:
   owner: Radstock Town Council
   crown: false
   agreement_signed: false
