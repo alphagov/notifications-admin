@@ -563,7 +563,10 @@ class AgreementInfo:
 
     def _get_info(self):
 
-        details = self.domains.get(self._match) or {}
+        details = self.domains.get(self._match)
+
+        if isinstance(details, None):
+            raise TypeError('Domain must have details ({})'.format(self._match))
 
         if isinstance(details, str):
             self.is_canonical = False
