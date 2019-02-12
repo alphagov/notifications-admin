@@ -49,7 +49,8 @@ def test_should_add_service_and_redirect_to_tour_when_no_services(
         message_limit=app_.config['DEFAULT_SERVICE_LIMIT'],
         restricted=True,
         user_id=api_user_active.id,
-        email_from='testing.the.post'
+        email_from='testing.the.post',
+        service_domain=None
     )
     mock_create_service_template.assert_called_once_with(
         'Example text message template',
@@ -71,10 +72,10 @@ def test_should_add_service_and_redirect_to_tour_when_no_services(
     mock_create_or_update_free_sms_fragment_limit.assert_called_once_with(101, 25000)
 
 
-@pytest.mark.parametrize('organisation_type, free_allowance', [
-    ('central', 250 * 1000),
-    ('local', 25 * 1000),
-    ('nhs', 25 * 1000),
+@pytest.mark.parametrize('organisation_type, free_allowance, service_domain', [
+    ('central', 250 * 1000, None),
+    ('local', 25 * 1000, None),
+    ('nhs', 25 * 1000, 'nhs.uk'),
 ])
 def test_should_add_service_and_redirect_to_dashboard_when_existing_service(
     app_,
@@ -86,6 +87,7 @@ def test_should_add_service_and_redirect_to_dashboard_when_existing_service(
     api_user_active,
     organisation_type,
     free_allowance,
+    service_domain,
     mock_create_or_update_free_sms_fragment_limit,
     mock_get_all_email_branding,
 ):
@@ -103,7 +105,8 @@ def test_should_add_service_and_redirect_to_dashboard_when_existing_service(
         message_limit=app_.config['DEFAULT_SERVICE_LIMIT'],
         restricted=True,
         user_id=api_user_active.id,
-        email_from='testing.the.post'
+        email_from='testing.the.post',
+        service_domain=service_domain
     )
     mock_create_or_update_free_sms_fragment_limit.assert_called_once_with(101, free_allowance)
     assert len(mock_create_service_template.call_args_list) == 0

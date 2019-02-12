@@ -13,6 +13,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         restricted,
         user_id,
         email_from,
+        service_domain,
     ):
         """
         Create a service and return the json.
@@ -24,7 +25,8 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             "message_limit": message_limit,
             "user_id": user_id,
             "restricted": restricted,
-            "email_from": email_from
+            "email_from": email_from,
+            "service_domain": service_domain
         }
         data = _attach_current_user(data)
         return self.post("/service", data)['data']['id']
