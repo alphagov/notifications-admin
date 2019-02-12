@@ -1306,7 +1306,7 @@ congleton-tc.gov.uk:
 conwy.gov.uk:
   owner: Conwy County Borough Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 conwytowncouncil.gov.uk:
   owner: Conwy Town Council
   crown: false
