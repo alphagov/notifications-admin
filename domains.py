@@ -3,9 +3,16 @@
 
 import os
 import yaml
+from itertools import chain
+from operator import itemgetter
+from sys import argv
 from app.utils import AgreementInfo
 
 _dir_path = os.path.dirname(os.path.realpath(__file__))
+
+
+if len(argv) < 2:
+    raise TypeError('Must specify `orgs` or `domains` as the first argument to this script')
 
 
 with open('{}/app/domains.yml'.format(_dir_path)) as source:
@@ -27,4 +34,19 @@ with open('{}/app/domains.yml'.format(_dir_path)) as source:
         if isinstance(details, dict)
     ]
 
-    print(yaml.dump(out_data))  # noqa
+    if argv[1] == 'orgs':
+        print(yaml.dump(out_data))  # noqa
+    elif argv[1] == 'domains':
+        print(  # noqa
+            sorted(
+                set(
+                    chain.from_iterable(
+                        map(
+                            itemgetter('domains'), out_data
+                        )
+                    )
+                )
+            )
+        )
+    else:
+        raise TypeError('Must specify `orgs` or `domains` as the first argument to this script')
