@@ -34,7 +34,6 @@ class Service():
         'name',
         'organisation_type',
         'permissions',
-        'postage',
         'prefix_sms',
         'research_mode',
         'service_callback_api',
