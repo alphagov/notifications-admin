@@ -223,7 +223,7 @@ acas.org.uk:
   owner: Advisory, Conciliation and Arbitration Service
   crown: true
   agreement_signed: false
-charitycommission.gsi.gov.uk:
+charitycommission.gsi.gov.uk: charitycommission.gov.uk
 charitycommission.gov.uk:
   owner: Charity Commission
   crown: true
@@ -257,7 +257,7 @@ hse.gov.uk:
   owner: Health and Safety Executive
   crown: true
   agreement_signed: false
-hmtreasury.gsi.gov.uk:
+hmtreasury.gsi.gov.uk: hmtreasury.gov.uk
 hmtreasury.gov.uk:
   owner: HM Treasury
   crown: true
@@ -5122,7 +5122,7 @@ wyrebc.gov.uk:
   owner: Wyre Borough Council
   crown: false
   agreement_signed: false
-wyreforestdc.gov.uk:
+wyreforestdc.gov.uk: wyreforest.gov.uk
 wyreforest.gov.uk:
   owner: Wyre Forest District Council
   crown: false

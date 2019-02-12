@@ -403,11 +403,7 @@ def test_validate_government_domain_data():
             True, False, None
         }
 
-        assert (
-            agreement_info.owner is None
-        ) or (
-            isinstance(agreement_info.owner, str)
-        )
+        assert isinstance(agreement_info.owner, str) and agreement_info.owner.strip()
 
         assert agreement_info.agreement_signed in {
             True, False, None
