@@ -19,10 +19,10 @@
       this.states = [
         {key: 'nothing-selected-buttons', $el: this.$form.find('#nothing_selected'), cancellable: false},
         {key: 'items-selected-buttons', $el: this.$form.find('#items_selected'), cancellable: false},
-        {key: 'move-to-existing-folder', $el: this.$form.find('#move_to_folder_radios'), cancellable: true},
-        {key: 'move-to-new-folder', $el: this.$form.find('#move_to_new_folder_form'), cancellable: true},
-        {key: 'add-new-folder', $el: this.$form.find('#add_new_folder_form'), cancellable: true},
-        {key: 'add-new-template', $el: this.$form.find('#add_new_template_form'), cancellable: true}
+        {key: 'move-to-existing-folder', $el: this.$form.find('#move_to_folder_radios'), cancellable: true, setFocus: this.getFocusRoutine('#move_to_folder_radios legend', true)},
+        {key: 'move-to-new-folder', $el: this.$form.find('#move_to_new_folder_form'), cancellable: true, setFocus: this.getFocusRoutine('#move_to_new_folder_name', false)},
+        {key: 'add-new-folder', $el: this.$form.find('#add_new_folder_form'), cancellable: true, setFocus: this.getFocusRoutine('#add_new_folder_name', false)},
+        {key: 'add-new-template', $el: this.$form.find('#add_new_template_form'), cancellable: true, setFocus: this.getFocusRoutine('#add_new_template_form legend', true)}
       ];
 
       // cancel/clear buttons only relevant if JS enabled, so
@@ -35,13 +35,31 @@
       // first off show the new template / new folder buttons
       this.currentState = this.$form.data('prev-state') || 'unknown';
       if (this.currentState === 'unknown') {
-        this.selectActionButtons();
+        this.selectActionButtons(false);
       } else {
         this.render();
       }
 
       this.$form.on('click', 'button.button-secondary', (event) => this.actionButtonClicked(event));
       this.$form.on('change', 'input[type=checkbox]', () => this.templateFolderCheckboxChanged());
+    };
+
+    this.getFocusRoutine = function (selector, setTabindex) {
+      return function () {
+        let $el = $(selector);
+        let removeTabindex = (e) => {
+          $(e.target)
+            .removeAttr('tabindex')
+            .off('blur', removeTabindex);
+        };
+
+        if (setTabindex) {
+          $el.attr('tabindex', '-1');
+          $el.on('blur', removeTabindex);
+        }
+
+        $el.focus();
+      };
     };
 
     this.activateStickyElements = function() {
@@ -57,6 +75,7 @@
     };
 
     this.addCancelButton = function(state) {
+      let selector = `[value=${state.key}]`;
       let $cancel = this.makeButton('Cancel', () => {
 
         // clear existing data
@@ -64,8 +83,8 @@
         state.$el.find('input:text').val('');
 
         // go back to action buttons
-        this.selectActionButtons();
-      });
+        this.selectActionButtons(selector);
+      }, selector);
 
       state.$el.find('[type=submit]').after($cancel);
     };
@@ -73,7 +92,6 @@
     this.addClearButton = function(state) {
 
       let $clear = this.makeButton('Clear', () => {
-
         // uncheck all templates and folders
         this.$form.find('input:checkbox').prop('checked', false);
 
@@ -84,9 +102,10 @@
       state.$el.find('.template-list-selected-counter').append($clear);
     };
 
-    this.makeButton = (text, fn) => $('<a></a>')
+    this.makeButton = (text, fn, cancelSelector) => $('<a></a>')
       .html(text)
       .addClass('js-cancel')
+      .data('target', cancelSelector) // isn't set if cancelSelector is undefined
       .attr('tabindex', '0')
       .on('click keydown', event => {
         // space, enter or no keyCode (must be mouse input)
@@ -96,12 +115,16 @@
         }
       });
 
-    this.selectActionButtons = function () {
+    this.selectActionButtons = function (targetSelector) {
       // If we want to show one of the grey choose actions state, we can pretend we're in the choose actions state,
       // and then pretend a checkbox was clicked to work out whether to show zero or non-zero options.
       // This calls a render at the end
       this.currentState = 'nothing-selected-buttons';
       this.templateFolderCheckboxChanged();
+      if (targetSelector) {
+        let setFocus = this.getFocusRoutine(targetSelector, false);
+        setFocus();
+      }
     };
 
     this.actionButtonClicked = function(event) {
@@ -139,7 +162,8 @@
     };
 
     this.render = function() {
-      var mode = 'default';
+      let mode = 'default';
+      let currentStateObj = this.states.filter(state => { return (state.key === this.currentState); })[0];
 
       // detach everything, unless they are the currentState
       this.states.forEach(
@@ -153,6 +177,8 @@
       GOVUK.stickAtBottomWhenScrolling.setMode(mode);
       // make sticky JS recalculate its cache of the element's position
       GOVUK.stickAtBottomWhenScrolling.recalculate();
+
+      if (currentStateObj && ('setFocus' in currentStateObj)) { currentStateObj.setFocus(); }
     };
 
     this.nothingSelectedButtons = $(`

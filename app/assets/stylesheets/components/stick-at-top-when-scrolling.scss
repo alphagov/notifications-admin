@@ -1,6 +1,8 @@
 // CSS adapted from
 // https://github.com/alphagov/govuk_frontend_toolkit/blob/d9489a987086471fe30b4b925a81c12cd198c91d/docs/javascript.md#stick-at-top-when-scrolling
 
+$sticky-padding: $gutter * 2 / 3;
+
 .js-stick-at-top-when-scrolling,
 .js-stick-at-bottom-when-scrolling {
 
@@ -11,6 +13,10 @@
 
   .form-group {
     margin-bottom: 20px;
+
+    legend {
+      outline: none;
+    }
   }
 
   .back-to-top-link {
@@ -40,14 +46,12 @@
 
 .js-stick-at-bottom-when-scrolling {
 
-  $vertical-padding: $gutter * 2 / 3;
-
   transition: bottom 0.1s ease-out, box-shadow 1s ease-in-out;
-  padding: $vertical-padding 0 $vertical-padding $gutter-half;
-  margin-top: -$vertical-padding;
+  padding: $sticky-padding 0 $sticky-padding $gutter-half;
+  margin-top: -$sticky-padding;
 
   & + .js-stick-at-bottom-when-scrolling {
-    margin-top: ($vertical-padding * 2) * -1;
+    margin-top: ($sticky-padding * 2) * -1;
   }
 
   .page-footer {
