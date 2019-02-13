@@ -64,12 +64,37 @@
       right: -135px;
 
       a {
-        border-top: 11px solid transparent;
-        border-bottom: 10px solid transparent;
-        border-left: 15px solid transparent;
+
+        &:before {
+          content: "";
+          display: block;
+
+          position: absolute;
+
+          top: -$gutter-half - 1;
+          right: 0;
+          bottom: -$gutter-half;
+          left: -$gutter-half;
+
+          background: transparent;
+        }
 
         &:hover {
           color: $link-hover-colour;
+        }
+
+        &:active,
+        &:focus {
+
+          color: $black;
+
+          &:before {
+            border-color: $yellow;
+            border-style: solid;
+            border-width: 15px 3px 15px 15px;
+            right: -3px;
+          }
+
         }
 
       }
