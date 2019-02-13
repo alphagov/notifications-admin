@@ -11,6 +11,7 @@
       this.$form.find('button[value=unknown]').remove();
 
       this.$stickyBottom = this.$form.find('#sticky_template_forms');
+      this.$liveRegionCounter = this.$form.find('.selection-counter');
 
       this.$stickyBottom.append(this.nothingSelectedButtons);
       this.$stickyBottom.append(this.itemsSelectedButtons);
@@ -135,6 +136,17 @@
       this.render();
     };
 
+    this.selectionStatus = {
+      'default': 'Nothing selected',
+      'selected': numSelected => `${numSelected} selected`,
+      'update': numSelected => {
+        let liveRegionHTML = (numSelected > 0) ? this.selectionStatus.selected(numSelected) : this.selectionStatus.default;
+
+        $('.template-list-selected-counter-count').html(numSelected);
+        this.$liveRegionCounter.html(liveRegionHTML);
+      }
+    };
+
     this.templateFolderCheckboxChanged = function() {
       let numSelected = this.countSelectedCheckboxes();
 
@@ -148,7 +160,7 @@
 
       this.render();
 
-      $('.template-list-selected-counter-count').html(numSelected);
+      this.selectionStatus.update(numSelected);
 
       $('.template-list-selected-counter').toggle(this.hasCheckboxes());
 
@@ -188,7 +200,7 @@
           <button class="button-secondary" value="add-new-template">New template</button>
           <button class="button-secondary" value="add-new-folder">New folder</button>
           <div class="template-list-selected-counter">
-            Nothing selected
+            ${this.selectionStatus.default}
           </div>
         </div>
       </div>
@@ -200,7 +212,7 @@
           <button class="button-secondary" value="move-to-existing-folder">Move</button>
           <button class="button-secondary" value="move-to-new-folder">Add to new folder</button>
           <div class="template-list-selected-counter">
-            <span class="template-list-selected-counter-count">1</span> selected
+            ${this.selectionStatus.selected(1)}
           </div>
         </div>
       </div>
