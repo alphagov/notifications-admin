@@ -35,7 +35,7 @@
       // first off show the new template / new folder buttons
       this.currentState = this.$form.data('prev-state') || 'unknown';
       if (this.currentState === 'unknown') {
-        this.selectActionButtons(false);
+        this.selectActionButtons();
       } else {
         this.render();
       }
@@ -90,13 +90,14 @@
     };
 
     this.addClearButton = function(state) {
-
+      let selector = 'button[value=add-new-template]';
       let $clear = this.makeButton('Clear', () => {
+
         // uncheck all templates and folders
         this.$form.find('input:checkbox').prop('checked', false);
 
         // go back to action buttons
-        this.selectActionButtons();
+        this.selectActionButtons(selector);
       });
 
       state.$el.find('.template-list-selected-counter').append($clear);
