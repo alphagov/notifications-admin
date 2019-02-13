@@ -141,27 +141,28 @@
   // were wrapped by a dialog component
   var dialog = {
     hasResized: false,
-    // we add padding of 20px around each sticky to isolate it from the rest of the page
-    // it shouldn't apply between stickys when stacked
+    spaceBetweenStickys: 40,
+    // we add padding of 20px around each sticky to give some space between it and the rest of the page
+    // this shouldn't apply between stickys in a stack
+    // (the in-page CSS handles this by each subsequent sticky in a sequence having margin: -40px)
     _getPaddingBetweenEls: function (els) {
-      var spaceBetween = 40;
+      if (els.length <= 1) { return 0; }
 
-      if (els.length < 2) { return 0; }
-
-      return (els.length - 1) * spaceBetween;
+      return (els.length - 1) * this.spaceBetweenStickys;
     },
     _getTotalHeight: function (els) {
       var reducer = function (accumulator, currentValue) {
         return accumulator + currentValue;
       };
-      return $.map(els, function (el) { return el.height; }).reduce(reducer);
+      var combinedHeight = $.map(els, function (el) { return el.height; }).reduce(reducer);
+
+      return combinedHeight - this._getPaddingBetweenEls(els);
     },
     _elsThatCanBeStuck: function (els) {
       return $.grep(els, function (el) { return el.canBeStuck(); });
     },
     getOffsetFromEdge: function (el, sticky) {
       var els = this._elsThatCanBeStuck(sticky._els).slice();
-      var elsBetween;
       var elIdx;
 
       // els must be arranged furtherest from window edge is stuck to first
@@ -176,11 +177,10 @@
       if (elIdx === (els.length - 1)) { return 0; }
 
       // make els all those from this one to the window edge
-      els = els.slice(elIdx);
-      // get all els between this one and the window edge
-      elsBetween = els.slice(1);
+      els = els.slice(elIdx + 1);
 
-      return this._getTotalHeight(elsBetween) - this._getPaddingBetweenEls(els);
+      // remove the space between those els and the one on the edge
+      return this._getTotalHeight(els) - this.spaceBetweenStickys;
     },
     getOffsetFromEnd: function (el, sticky) {
       var els = this._elsThatCanBeStuck(sticky._els).slice();
@@ -198,11 +198,9 @@
       if (elIdx === (els.length - 1)) { return 0; }
 
       // make els all those from this one to the window edge
-      els = els.slice(elIdx);
-      // get all els between this one and the window edge
-      elsBetween = els.slice(1);
+      els = els.slice(elIdx + 1);
 
-      return this._getTotalHeight(elsBetween) - this._getPaddingBetweenEls(els);
+      return this._getTotalHeight(els) - this.spaceBetweenStickys;
     },
     // checks total height of all this._sticky elements against a height
     // unsticks each that won't fit and marks them as unstickable
