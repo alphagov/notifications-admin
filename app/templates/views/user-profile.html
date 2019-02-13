@@ -10,40 +10,42 @@
 
   <h1 class="heading-large">Your profile</h1>
 
-  {% call mapping_table(
-    caption='Your profile',
-    field_headings=['Label', 'Value', 'Action'],
-    field_headings_visible=False,
-    caption_visible=False
-  ) %}
-    {% call row() %}
-      {{ text_field('Name') }}
-      {{ text_field(current_user.name) }}
-      {{ edit_field('Change', url_for('.user_profile_name')) }}
-    {% endcall %}
+  <div class="body-copy-table">
+    {% call mapping_table(
+      caption='Your profile',
+      field_headings=['Label', 'Value', 'Action'],
+      field_headings_visible=False,
+      caption_visible=False
+    ) %}
+      {% call row() %}
+        {{ text_field('Name') }}
+        {{ text_field(current_user.name) }}
+        {{ edit_field('Change', url_for('.user_profile_name')) }}
+      {% endcall %}
 
-    {% call row() %}
-      {{ text_field('Email address') }}
-      {{ text_field(current_user.email_address) }}
-      {% if can_see_edit %}
-        {{ edit_field('Change', url_for('.user_profile_email')) }}
-      {% else %}
-        {{ text_field('') }}
-      {% endif %}
-    {% endcall %}
+      {% call row() %}
+        {{ text_field('Email address') }}
+        {{ text_field(current_user.email_address) }}
+        {% if can_see_edit %}
+          {{ edit_field('Change', url_for('.user_profile_email')) }}
+        {% else %}
+          {{ text_field('') }}
+        {% endif %}
+      {% endcall %}
 
-    {% call row() %}
-      {{ text_field('Mobile number') }}
-      {{ optional_text_field(current_user.mobile_number) }}
-      {{ edit_field('Change', url_for('.user_profile_mobile_number')) }}
-    {% endcall %}
+      {% call row() %}
+        {{ text_field('Mobile number') }}
+        {{ optional_text_field(current_user.mobile_number) }}
+        {{ edit_field('Change', url_for('.user_profile_mobile_number')) }}
+      {% endcall %}
 
-    {% call row() %}
-      {{ text_field('Password') }}
-      {{ text_field('Last changed ' + current_user.password_changed_at|format_delta) }}
-      {{ edit_field('Change', url_for('.user_profile_password')) }}
-    {% endcall %}
+      {% call row() %}
+        {{ text_field('Password') }}
+        {{ text_field('Last changed ' + current_user.password_changed_at|format_delta) }}
+        {{ edit_field('Change', url_for('.user_profile_password')) }}
+      {% endcall %}
 
-  {% endcall %}
+    {% endcall %}
+  </div>
 
 {% endblock %}

@@ -23,6 +23,10 @@
       right: 0;
       padding: 13px 0 9px 15px;
 
+      &:hover {
+        color: $link-hover-colour;
+      }
+
       &:focus {
         outline: none;
         border-bottom: 4px solid $yellow;
