@@ -15,14 +15,14 @@
         Sending {{ notification_type }} has been disabled for your service.
       </p>
       <p>
-        If you need to send {{ notification_type }} 
+        If you need to send {{ notification_type }}
         <a href="{{ url_for('.support') }}">get in touch with the GOV.UK Notify team</a>.
       </p>
 
       {% set
         back_link_dict = {
           'add_new_template': {
-            'url' : '.add_template_by_type', 'text': 'Back to add new template'
+            'url' : '.choose_template', 'text': 'Back to templates'
           },
           'templates': {
             'url' : '.choose_template', 'text' : 'Back to templates'

@@ -37,77 +37,6 @@ def _template(template_type, name, parent=None, template_id=None):
     }
 
 
-@pytest.mark.parametrize('parent_folder_id', [None, PARENT_FOLDER_ID])
-def test_add_page_shows_option_for_folder(
-    client_request,
-    service_one,
-    parent_folder_id,
-    mocker,
-    mock_get_service_templates,
-    mock_get_organisations_and_services_for_user,
-):
-    service_one['permissions'] += ['edit_folders']
-    mocker.patch('app.service_api_client.get_service', return_value={"data": service_one})
-
-    page = client_request.get(
-        'main.add_template_by_type',
-        service_id=service_one['id'],
-        template_folder_id=parent_folder_id,
-        _test_page_title=False
-    )
-
-    radios = page.select('input[type=radio]')
-    labels = page.select('label')
-
-    assert [x['value'] for x in radios] == ['email', 'sms', 'copy-existing', 'folder']
-    assert [x.text.strip() for x in labels] == [
-        'Email template',
-        'Text message template',
-        'Copy of an existing template',
-        'Folder'
-    ]
-
-
-@pytest.mark.parametrize('parent_folder_id', [None, PARENT_FOLDER_ID])
-def test_get_add_template_folder_page(client_request, service_one, parent_folder_id):
-    service_one['permissions'] += ['edit_folders']
-
-    page = client_request.get(
-        'main.add_template_folder',
-        service_id=service_one['id'],
-        template_folder_id=parent_folder_id
-    )
-
-    assert page.select_one('input[name=name]') is not None
-
-
-def test_add_template_folder_page_rejects_if_service_doesnt_have_permission(client_request, service_one):
-    client_request.get('main.add_template_folder', service_id=service_one['id'], _expected_status=403)
-    client_request.post('main.add_template_folder', service_id=service_one['id'], _expected_status=403)
-
-
-@pytest.mark.parametrize('parent_folder_id', [None, PARENT_FOLDER_ID])
-def test_post_add_template_folder_page(client_request, service_one, mocker, parent_folder_id):
-    mock_create = mocker.patch('app.template_folder_api_client.create_template_folder')
-
-    service_one['permissions'] += ['edit_folders']
-
-    client_request.post(
-        'main.add_template_folder',
-        service_id=service_one['id'],
-        template_folder_id=parent_folder_id,
-        _data={'name': 'foo'},
-        _expected_redirect=url_for(
-            'main.choose_template',
-            service_id=service_one['id'],
-            template_folder_id=parent_folder_id,
-            _external=True,
-        )
-    )
-
-    mock_create.assert_called_once_with(service_one['id'], name='foo', parent_id=parent_folder_id)
-
-
 @pytest.mark.parametrize(
     (
         'expected_title_tag,'
@@ -381,7 +310,7 @@ def test_should_show_templates_folder_page(
         ]}
     )
 
-    service_one['permissions'] += ['letter', 'edit_folders']
+    service_one['permissions'] += ['letter']
 
     page = client_request.get(
         'main.choose_template',
@@ -446,56 +375,6 @@ def test_should_show_templates_folder_page(
     mock_get_service_templates.assert_called_once_with(SERVICE_ONE_ID)
 
 
-@pytest.mark.parametrize("template_type", ["email", "sms"])
-def test_add_template_by_type_should_redirect_to_add_service_template(
-    client_request,
-    service_one,
-    template_type,
-    mock_get_service_templates,
-    mock_get_organisations_and_services_for_user,
-):
-    service_one['permissions'] += ['edit_folders']
-    client_request.post(
-        'main.add_template_by_type',
-        service_id=SERVICE_ONE_ID,
-        template_folder_id=PARENT_FOLDER_ID,
-        _data={'template_type': template_type},
-        _expected_redirect=url_for('main.add_service_template',
-                                   service_id=SERVICE_ONE_ID,
-                                   template_type=template_type,
-                                   template_folder_id=PARENT_FOLDER_ID,
-                                   _external=True),
-    )
-
-
-def test_add_template_by_type_should_redirect_to_view_template_for_letter(
-        client_request,
-        service_one,
-        mock_get_service_templates,
-        mock_get_organisations_and_services_for_user,
-        mock_create_service_template
-):
-    service_one['permissions'] += ['edit_folders']
-    service_one['permissions'] += ['letter']
-    client_request.post(
-        'main.add_template_by_type',
-        service_id=SERVICE_ONE_ID,
-        template_folder_id=PARENT_FOLDER_ID,
-        _data={'template_type': 'letter'},
-        _expected_redirect=url_for('main.view_template',
-                                   service_id=SERVICE_ONE_ID,
-                                   template_id='Untitled',
-                                   _external=True),
-    )
-    mock_create_service_template.assert_called_once_with('Untitled',
-                                                         'letter',
-                                                         'Body',
-                                                         SERVICE_ONE_ID,
-                                                         'Main heading',
-                                                         'normal',
-                                                         PARENT_FOLDER_ID)
-
-
 def test_can_create_email_template_with_parent_folder(
         client_request,
         mock_create_service_template
@@ -538,7 +417,6 @@ def test_get_manage_folder_page(
     mock_get_template_folders.return_value = [
         {'id': folder_id, 'name': 'folder_two', 'parent_id': None},
     ]
-    service_one['permissions'] += ['edit_folders']
 
     page = client_request.get(
         'main.manage_template_folder',
@@ -557,7 +435,6 @@ def test_get_manage_folder_page(
 
 
 def test_manage_folder_page_404s(client_request, service_one, mock_get_template_folders):
-    service_one['permissions'] += ['edit_folders']
     client_request.get(
         'main.manage_template_folder',
         service_id=service_one['id'],
@@ -566,13 +443,15 @@ def test_manage_folder_page_404s(client_request, service_one, mock_get_template_
     )
 
 
-def test_get_manage_folder_page_no_permissions(client_request, service_one, mock_get_template_folders):
-    folder_id = str(uuid.uuid4())
-
+def test_get_manage_folder_page_no_permissions(
+    client_request,
+    active_user_view_permissions,
+):
+    client_request.login(active_user_view_permissions)
     client_request.get(
         'main.manage_template_folder',
-        service_id=service_one['id'],
-        template_folder_id=folder_id,
+        service_id=SERVICE_ONE_ID,
+        template_folder_id=PARENT_FOLDER_ID,
         _expected_status=403
     )
 
@@ -583,7 +462,6 @@ def test_rename_folder(client_request, service_one, mock_get_template_folders, m
     mock_get_template_folders.return_value = [
         {'id': folder_id, 'name': 'folder_two', 'parent_id': None},
     ]
-    service_one['permissions'] += ['edit_folders']
 
     client_request.post(
         'main.manage_template_folder',
@@ -606,7 +484,6 @@ def test_rename_folder(client_request, service_one, mock_get_template_folders, m
 def test_delete_template_folder_should_request_confirmation(
     client_request, service_one, mock_get_template_folders, mocker
 ):
-    service_one['permissions'] += ['edit_folders']
     folder_id = str(uuid.uuid4())
     mock_get_template_folders.side_effect = [[
         {'id': folder_id, 'name': 'sacrifice', 'parent_id': None},
@@ -644,7 +521,6 @@ def test_delete_template_folder_should_request_confirmation(
 def test_delete_template_folder_should_detect_non_empty_folder_on_get(
     client_request, service_one, mock_get_template_folders, mocker
 ):
-    service_one['permissions'] += ['edit_folders']
     folder_id = str(uuid.uuid4())
     template_id = str(uuid.uuid4())
     mock_get_template_folders.side_effect = [
@@ -683,7 +559,6 @@ def test_delete_folder(client_request, service_one, mock_get_template_folders, m
         'app.models.service.Service.get_templates',
         return_value=[],
     )
-    service_one['permissions'] += ['edit_folders']
 
     client_request.post(
         'main.delete_template_folder',
@@ -713,15 +588,6 @@ def test_delete_folder(client_request, service_one, mock_get_template_folders, m
         marks=pytest.mark.xfail(raises=AssertionError)
     ),
 ])
-@pytest.mark.parametrize('extra_service_permissions', [
-    pytest.param(
-        ['edit_folders']
-    ),
-    pytest.param(
-        [],
-        marks=pytest.mark.xfail(raises=AssertionError)
-    ),
-])
 def test_should_show_checkboxes_for_selecting_templates(
     client_request,
     mocker,
@@ -731,9 +597,7 @@ def test_should_show_checkboxes_for_selecting_templates(
     mock_has_no_jobs,
     fake_uuid,
     user,
-    extra_service_permissions,
 ):
-    service_one['permissions'] += extra_service_permissions
     client_request.login(user(fake_uuid))
 
     page = client_request.get(
@@ -752,10 +616,13 @@ def test_should_show_checkboxes_for_selecting_templates(
         assert TEMPLATE_ONE_ID not in checkboxes[index]['id']
 
 
-@pytest.mark.parametrize('user,extra_service_permissions', [
-    (active_user_with_permissions, []),
-    (active_user_view_permissions, ['edit_folders']),
-    (active_caseworking_user, ['edit_folders']),
+@pytest.mark.parametrize('user', [
+    active_user_view_permissions,
+    active_caseworking_user,
+    pytest.param(
+        active_user_with_permissions,
+        marks=pytest.mark.xfail(raises=AssertionError),
+    ),
 ])
 def test_should_not_show_radios_and_buttons_for_move_destination_if_incorrect_permissions(
     client_request,
@@ -766,10 +633,7 @@ def test_should_not_show_radios_and_buttons_for_move_destination_if_incorrect_pe
     mock_has_no_jobs,
     fake_uuid,
     user,
-    extra_service_permissions,
 ):
-    service_one['permissions'] += extra_service_permissions
-
     client_request.login(user(fake_uuid))
 
     page = client_request.get(
@@ -795,8 +659,6 @@ def test_should_show_radios_and_buttons_for_move_destination_if_correct_permissi
     fake_uuid,
     active_user_with_permissions
 ):
-    service_one['permissions'] += ['edit_folders']
-
     client_request.login(active_user_with_permissions)
 
     FOLDER_TWO_ID = str(uuid.uuid4())
@@ -840,8 +702,6 @@ def test_move_to_shouldnt_select_a_folder_by_default(
     fake_uuid,
     active_user_with_permissions
 ):
-    service_one['permissions'] += ['edit_folders']
-
     client_request.login(active_user_with_permissions)
 
     FOLDER_TWO_ID = str(uuid.uuid4())
@@ -864,7 +724,6 @@ def test_should_be_able_to_move_to_existing_folder(
     mock_get_template_folders,
     mock_move_to_template_folder,
 ):
-    service_one['permissions'] += ['edit_folders']
     FOLDER_TWO_ID = str(uuid.uuid4())
     mock_get_template_folders.return_value = [
         {'id': PARENT_FOLDER_ID, 'name': 'folder_one', 'parent_id': None},
@@ -896,9 +755,9 @@ def test_should_be_able_to_move_to_existing_folder(
     )
 
 
-@pytest.mark.parametrize('user,extra_service_permissions', [
-    (active_user_view_permissions, ['edit_folders']),
-    (active_user_with_permissions, [])
+@pytest.mark.parametrize('user, expected_status, expected_called', [
+    (active_user_view_permissions, 403, False),
+    (active_user_with_permissions, 302, True),
 ])
 def test_should_not_be_able_to_move_to_existing_folder_if_dont_have_permission(
     client_request,
@@ -908,9 +767,9 @@ def test_should_not_be_able_to_move_to_existing_folder_if_dont_have_permission(
     mock_get_template_folders,
     mock_move_to_template_folder,
     user,
-    extra_service_permissions,
+    expected_status,
+    expected_called,
 ):
-    service_one['permissions'] += extra_service_permissions
     client_request.login(user(fake_uuid))
     FOLDER_TWO_ID = str(uuid.uuid4())
     mock_get_template_folders.return_value = [
@@ -928,9 +787,9 @@ def test_should_not_be_able_to_move_to_existing_folder_if_dont_have_permission(
                 TEMPLATE_ONE_ID,
             ],
         },
-        _expected_status=403
+        _expected_status=expected_status
     )
-    assert mock_move_to_template_folder.called is False
+    assert mock_move_to_template_folder.called is expected_called
 
 
 def test_move_folder_form_shows_current_folder_hint_when_in_a_folder(
@@ -939,7 +798,6 @@ def test_move_folder_form_shows_current_folder_hint_when_in_a_folder(
     mock_get_service_templates,
     mock_get_template_folders,
 ):
-    service_one['permissions'] += ['edit_folders']
     mock_get_template_folders.return_value = [
         {'id': PARENT_FOLDER_ID, 'name': 'parent_folder', 'parent_id': None},
         {'id': CHILD_FOLDER_ID, 'name': 'child_folder', 'parent_id': PARENT_FOLDER_ID},
@@ -967,7 +825,6 @@ def test_move_folder_form_does_not_show_current_folder_hint_at_the_top_level(
     mock_get_service_templates,
     mock_get_template_folders,
 ):
-    service_one['permissions'] += ['edit_folders']
     mock_get_template_folders.return_value = [
         {'id': PARENT_FOLDER_ID, 'name': 'parent_folder', 'parent_id': None},
         {'id': CHILD_FOLDER_ID, 'name': 'child_folder', 'parent_id': PARENT_FOLDER_ID},
@@ -996,7 +853,6 @@ def test_should_be_able_to_move_a_sub_item(
     mock_get_template_folders,
     mock_move_to_template_folder,
 ):
-    service_one['permissions'] += ['edit_folders']
     GRANDCHILD_FOLDER_ID = str(uuid.uuid4())
     mock_get_template_folders.return_value = [
         {'id': PARENT_FOLDER_ID, 'name': 'folder_one', 'parent_id': None},
@@ -1081,7 +937,7 @@ def test_no_action_if_user_fills_in_ambiguous_fields(
     mock_create_template_folder,
     data,
 ):
-    service_one['permissions'] += ['edit_folders', 'letter']
+    service_one['permissions'] += ['letter']
 
     mock_get_template_folders.return_value = [
         {'id': PARENT_FOLDER_ID, 'name': 'parent folder', 'parent_id': None},
@@ -1135,8 +991,6 @@ def test_new_folder_is_created_if_only_new_folder_is_filled_out(
         'operation': 'add-new-folder'
     }
 
-    service_one['permissions'] += ['edit_folders']
-
     client_request.post(
         'main.choose_template',
         service_id=SERVICE_ONE_ID,
@@ -1166,7 +1020,6 @@ def test_should_be_able_to_move_to_new_folder(
     mock_move_to_template_folder,
     mock_create_template_folder,
 ):
-    service_one['permissions'] += ['edit_folders']
     new_folder_id = mock_create_template_folder.return_value
     FOLDER_TWO_ID = str(uuid.uuid4())
     mock_get_template_folders.return_value = [
@@ -1211,8 +1064,6 @@ def test_radio_button_with_no_value_shows_custom_error_message(
     mock_move_to_template_folder,
     mock_create_template_folder,
 ):
-    service_one['permissions'] += ['edit_folders']
-
     page = client_request.post(
         'main.choose_template',
         service_id=SERVICE_ONE_ID,
@@ -1254,7 +1105,6 @@ def test_show_custom_error_message(
         data,
         error_msg,
 ):
-    service_one['permissions'] += ['edit_folders']
     mock_get_template_folders.return_value = [
         {'id': PARENT_FOLDER_ID, 'name': 'folder_one', 'parent_id': None},
         {'id': FOLDER_TWO_ID, 'name': 'folder_two', 'parent_id': None},

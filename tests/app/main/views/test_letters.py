@@ -1,7 +1,6 @@
 from functools import partial
 
 import pytest
-from bs4 import BeautifulSoup
 from flask import url_for
 
 letters_urls = [
@@ -64,23 +63,21 @@ def test_letters_lets_in_without_permission(
     ),
 ])
 def test_given_option_to_add_letters_if_allowed(
-    logged_in_client,
+    client_request,
     service_one,
     mocker,
     mock_get_service_templates,
+    mock_get_template_folders,
     mock_get_organisations_and_services_for_user,
     permissions,
     choices,
 ):
     service_one['permissions'] = permissions
-    mocker.patch('app.service_api_client.get_service', return_value={"data": service_one})
 
-    response = logged_in_client.get(url_for('main.add_template_by_type', service_id=service_one['id']))
+    page = client_request.get('main.choose_template', service_id=service_one['id'])
 
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    radios = page.select('input[type=radio]')
-    labels = page.select('label')
+    radios = page.select('#add_new_template_form input[type=radio]')
+    labels = page.select('#add_new_template_form label')
 
     assert len(radios) == len(choices)
     assert len(labels) == len(choices)
