@@ -217,6 +217,24 @@ apha.gov.uk:
   owner: Animal & Plant Health Agency
   crown: true
   agreement_signed: true
+mil.uk: mod.gov.uk
+moduk.org: mod.gov.uk
+dera.gov.uk: mod.gov.uk
+dstl.gov.uk: mod.gov.uk  
+mod.gov.uk:
+  owner: Ministry of Defence
+  crown: true
+  agreement_signed:
+defra.gsi.gov.uk: defra.gov.uk
+defra.gov.uk:
+  owner: Department for Environment, Food & Rural Affairs
+  crown: true
+  agreement_signed:
+hmrc.gsi.gov.uk: hmrc.gov.uk
+hmrc.gov.uk:
+  owner: HM Revenue and Customs
+  crown: true
+  agreement_signed:
 
 # Crown bodies who haven’t signed the MOU
 acas.org.uk:
