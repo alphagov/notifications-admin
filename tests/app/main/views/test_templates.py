@@ -1731,44 +1731,41 @@ def test_should_show_delete_template_page_with_never_used_block(
     mock_get_service_template.assert_called_with(SERVICE_ONE_ID, fake_uuid)
 
 
+@pytest.mark.parametrize('parent', (
+    PARENT_FOLDER_ID, None
+))
 def test_should_redirect_when_deleting_a_template(
-    logged_in_client,
-    api_user_active,
-    mock_login,
-    mock_get_service,
-    mock_get_service_template,
+    mocker,
+    client_request,
     mock_delete_service_template,
-    mock_get_user,
-    mock_get_user_by_email,
-    mock_has_permissions,
-    fake_uuid,
+    parent,
 ):
-    service_id = fake_uuid
-    template_id = fake_uuid
-    name = "new name"
-    type_ = "sms"
-    content = "template content"
-    data = {
-        'id': str(template_id),
-        'name': name,
-        'template_type': type_,
-        'content': content,
-        'service': service_id
-    }
-    response = logged_in_client.post(url_for(
-        '.delete_service_template',
-        service_id=service_id,
-        template_id=template_id
-    ), data=data)
+    mock_get_service_template = mocker.patch(
+        'app.service_api_client.get_service_template',
+        return_value={'data': _template(
+            'sms', 'Hello', parent=parent,
+        )},
+    )
 
-    assert response.status_code == 302
-    assert response.location == url_for(
-        '.choose_template',
-        service_id=service_id, _external=True)
+    client_request.post(
+        '.delete_service_template',
+        service_id=SERVICE_ONE_ID,
+        template_id=TEMPLATE_ONE_ID,
+        _expected_status=302,
+        _expected_redirect=url_for(
+            '.choose_template',
+            service_id=SERVICE_ONE_ID,
+            template_folder_id=parent,
+            _external=True,
+        )
+    )
+
     mock_get_service_template.assert_called_with(
-        service_id, template_id)
+        SERVICE_ONE_ID, TEMPLATE_ONE_ID
+    )
     mock_delete_service_template.assert_called_with(
-        service_id, template_id)
+        SERVICE_ONE_ID, TEMPLATE_ONE_ID
+    )
 
 
 @freeze_time('2016-01-01T15:00')

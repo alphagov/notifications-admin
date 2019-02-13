@@ -631,6 +631,7 @@ def delete_service_template(service_id, template_id):
         return redirect(url_for(
             '.choose_template',
             service_id=service_id,
+            template_folder_id=template['folder'],
         ))
 
     try:
