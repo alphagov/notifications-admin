@@ -2089,7 +2089,7 @@ def test_request_letter_branding(
         service_id=SERVICE_ONE_ID,
         **extra_args
     )
-    assert request_page.select_one('main p').text.strip() == 'Your letters have no logo.'
+    assert request_page.select_one('main p').text.strip() == 'Your letters do not have a logo.'
     link_href = request_page.select_one('main a')['href']
     feedback_page = client_request.get_url(link_href)
     assert feedback_page.select_one('textarea').text.strip() == (

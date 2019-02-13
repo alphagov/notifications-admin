@@ -11,17 +11,23 @@
   <h1 class="heading-large">Letter branding</h1>
   <div class="grid-row">
     <div class="column-three-quarters">
-      <p>
-        {% if current_service.letter_branding_id %}
+      {% if current_service.letter_branding_id %}
+        <p>
           Your letters have the {{ current_service.letter_branding.name }} logo.
-        {% else %}
-          Your letters have no logo.
-        {% endif %}
-      </p>
-      <p>
-        <a href="{{ url_for('main.feedback', ticket_type='ask-question-give-feedback', body='letter-branding') }}">Contact support</a>
-        if you want to use a different logo.
-      </p>
+        </p>
+        <p>
+          <a href="{{ url_for('main.feedback', ticket_type='ask-question-give-feedback', body='letter-branding') }}">Contact support</a>
+          if you want to use a different logo.
+        </p>
+      {% else %}
+        <p>
+          Your letters do not have a logo.
+        </p>
+        <p>
+          <a href="{{ url_for('main.feedback', ticket_type='ask-question-give-feedback', body='letter-branding') }}">Contact support</a>
+          if you want to add your organisation’s logo.
+        </p>
+      {% endif %}
       {% if from_template %}
         {{ page_footer(
           back_link=url_for('.view_template', service_id=current_service.id, template_id=from_template),
