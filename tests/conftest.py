@@ -625,6 +625,7 @@ def mock_create_service(mocker):
         restricted,
         user_id,
         email_from,
+        service_domain,
     ):
         service = service_json(
             101, service_name, [user_id], message_limit=message_limit, restricted=restricted, email_from=email_from)
@@ -643,6 +644,7 @@ def mock_create_duplicate_service(mocker):
         restricted,
         user_id,
         email_from,
+        service_domain,
     ):
         json_mock = Mock(return_value={'message': {'name': ["Duplicate service name '{}'".format(service_name)]}})
         resp_mock = Mock(status_code=400, json=json_mock)
@@ -2540,7 +2542,7 @@ def mock_get_all_letter_branding(mocker):
                 'id': str(UUID(int=1)),
                 'name': 'Land Registry',
                 'filename': 'land-registry',
-                'domain': None,
+                'domain': 'landregistry.gov.uk',
             },
             {
                 'id': str(UUID(int=2)),
@@ -2562,7 +2564,7 @@ def mock_get_letter_branding_by_id(mocker):
             'id': _id,
             'name': 'HM Government',
             'filename': 'hm-government',
-            'domain': None,
+            'domain': 'cabinet-office.gov.uk',
         }
     return mocker.patch(
         'app.letter_branding_client.get_letter_branding', side_effect=_get_branding_by_id

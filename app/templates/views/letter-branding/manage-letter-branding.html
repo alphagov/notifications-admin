@@ -5,12 +5,12 @@
 {% from "components/form.html" import form_wrapper %}
 
 {% block per_page_title %}
-  Create letter branding
+  {{ '{} letter branding'.format('Update' if is_update else 'Create')}}
 {% endblock %}
 
 {% block platform_admin_content %}
 
-  <h1 class="heading-large">Add letter branding</h1>
+  <h1 class="heading-large">{{ '{} letter branding'.format('Update' if is_update else 'Add')}}</h1>
   <div class="grid-row">
     <div class="column-three-quarters">
       {% if logo %}
@@ -18,7 +18,7 @@
           <img src="https://{{ cdn_url }}/{{ logo }}"/>
         </div>
       {% endif %}
-      {{ file_upload(file_upload_form.file) }}
+      {{ file_upload(file_upload_form.file, button_text='{} logo'.format('Update' if is_update else 'Upload')) }}
       {% call form_wrapper() %}
         <div class="form-group">
           <div style='margin-top:15px;'>{{textbox(letter_branding_details_form.name)}}</div>

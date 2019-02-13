@@ -20,7 +20,9 @@
     {% for brand in letter_brandings %}
       <div class="letter-brand">
         <div class="message-name">
-          {{ brand.name }}
+          <a href="{{ url_for('.update_letter_branding', branding_id=brand.id) }}">
+            {{ brand.name }}
+          </a>
         </div>
         <p class="message-type">
           {% if brand.domain %}

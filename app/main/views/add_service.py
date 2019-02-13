@@ -10,10 +10,9 @@ from app.utils import AgreementInfo, email_safe, user_is_gov_user
 
 def _create_service(service_name, organisation_type, email_from, form):
     free_sms_fragment_limit = current_app.config['DEFAULT_FREE_SMS_FRAGMENT_LIMITS'].get(organisation_type)
-    email_branding = email_branding_client.get_email_branding_id_for_domain(
-        'nhs.uk' if organisation_type == 'nhs' else
-        AgreementInfo.from_current_user().canonical_domain
-    )
+
+    domain = 'nhs.uk' if organisation_type == 'nhs' else AgreementInfo.from_current_user().canonical_domain
+    email_branding = email_branding_client.get_email_branding_id_for_domain(domain)
     try:
         service_id = service_api_client.create_service(
             service_name=service_name,
@@ -22,6 +21,7 @@ def _create_service(service_name, organisation_type, email_from, form):
             restricted=True,
             user_id=session['user_id'],
             email_from=email_from,
+            service_domain=domain
         )
         session['service_id'] = service_id
 
