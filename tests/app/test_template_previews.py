@@ -40,16 +40,22 @@ def test_from_utils_template_calls_through(
         'http://localhost:9999/preview.bar?page=99',
     ),
 ])
+@pytest.mark.parametrize('letter_branding, expected_filename', [
+    ({'filename': 'hm-government'}, 'hm-government'),
+    (None, None)
+])
 def test_from_database_object_makes_request(
     mocker,
     client,
     partial_call,
     expected_url,
+    letter_branding,
+    expected_filename,
     mock_get_service_letter_template
 ):
     resp = Mock(content='a', status_code='b', headers={'c': 'd'})
     request_mock = mocker.patch('app.template_previews.requests.post', return_value=resp)
-    mocker.patch('app.template_previews.current_service', letter_logo_filename='hm-government')
+    mocker.patch('app.template_previews.current_service', letter_branding=letter_branding)
     template = mock_get_service_letter_template('123', '456')['data']
 
     ret = partial_call(template=template)
@@ -62,7 +68,7 @@ def test_from_database_object_makes_request(
         'letter_contact_block': None,
         'template': template,
         'values': None,
-        'filename': 'hm-government',
+        'filename': expected_filename,
     }
     headers = {'Authorization': 'Token my-secret-key'}
 

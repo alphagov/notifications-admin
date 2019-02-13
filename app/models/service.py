@@ -29,7 +29,6 @@ class Service():
         'inbound_api',
         'letter_branding',
         'letter_contact_block',
-        'letter_logo_filename',
         'message_limit',
         'name',
         'organisation_type',
