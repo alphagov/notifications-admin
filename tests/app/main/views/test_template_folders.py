@@ -339,6 +339,10 @@ def test_should_show_templates_folder_page(
         assert links_in_page[index].text.strip() == expected_link
 
     all_page_items = page.select('.template-list-item')
+    all_page_items_styled_with_checkboxes = page.select('.template-list-item-with-checkbox')
+
+    assert len(all_page_items) == len(all_page_items_styled_with_checkboxes)
+
     checkboxes = page.select('input[name=templates_and_folders]')
     unique_checkbox_values = set(item['value'] for item in checkboxes)
     assert len(all_page_items) == len(expected_items)
