@@ -34,6 +34,8 @@ from tests.conftest import (
     platform_admin_user,
 )
 
+FAKE_TEMPLATE_ID = uuid4()
+
 
 @pytest.fixture
 def mock_get_service_settings_page_common(
@@ -2032,12 +2034,12 @@ def test_set_letter_contact_block_redirects_to_template(
     mock_update_service,
 ):
     service_one['permissions'] = ['letter']
-    fake_template_id = uuid4()
+
     response = logged_in_client.post(
         url_for(
             'main.service_set_letter_contact_block',
             service_id=service_one['id'],
-            from_template=fake_template_id,
+            from_template=FAKE_TEMPLATE_ID,
         ),
         data={'letter_contact_block': '23 Whitechapel Road'},
     )
@@ -2045,7 +2047,7 @@ def test_set_letter_contact_block_redirects_to_template(
     assert response.location == url_for(
         'main.view_template',
         service_id=service_one['id'],
-        template_id=fake_template_id,
+        template_id=FAKE_TEMPLATE_ID,
         _external=True,
     )
 
@@ -2066,14 +2068,26 @@ def test_set_letter_contact_block_has_max_10_lines(
     assert error_message == 'Contains 11 lines, maximum is 10'
 
 
+@pytest.mark.parametrize('extra_args, expected_partial_url', (
+    (
+        {},
+        partial(url_for, 'main.service_settings')
+    ),
+    (
+        {'from_template': FAKE_TEMPLATE_ID},
+        partial(url_for, 'main.view_template', template_id=FAKE_TEMPLATE_ID)
+    ),
+))
 def test_request_letter_branding(
     client_request,
     mock_get_letter_branding_by_id,
-    service_one
+    extra_args,
+    expected_partial_url,
 ):
     request_page = client_request.get(
         'main.request_letter_branding',
         service_id=SERVICE_ONE_ID,
+        **extra_args
     )
     assert request_page.select_one('main p').text.strip() == 'Your letters have no logo.'
     link_href = request_page.select_one('main a')['href']
@@ -2081,6 +2095,8 @@ def test_request_letter_branding(
     assert feedback_page.select_one('textarea').text.strip() == (
         'I would like my own logo on my letter templates.'
     )
+    back_link_href = request_page.select('main a')[1]['href']
+    assert back_link_href == expected_partial_url(service_id=SERVICE_ONE_ID)
 
 
 def test_request_letter_branding_if_already_have_branding(

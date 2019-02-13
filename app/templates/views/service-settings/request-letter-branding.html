@@ -22,10 +22,17 @@
         <a href="{{ url_for('main.feedback', ticket_type='ask-question-give-feedback', body='letter-branding') }}">Contact support</a>
         if you want to use a different logo.
       </p>
-      {{ page_footer(
-        back_link=url_for('.service_settings', service_id=current_service.id),
-        back_link_text='Back to settings'
-      ) }}
+      {% if from_template %}
+        {{ page_footer(
+          back_link=url_for('.view_template', service_id=current_service.id, template_id=from_template),
+          back_link_text='Back to template'
+        ) }}
+      {% else %}
+        {{ page_footer(
+          back_link=url_for('.service_settings', service_id=current_service.id),
+          back_link_text='Back to settings'
+        ) }}
+      {% endif %}
     </div>
   </div>
 
