@@ -15,7 +15,7 @@
   const $form = $('form');
   const $previewPane = $('<iframe src="/_email?' +
                           buildQueryString(['branding_style', branding_style]) +
-                          '" class="email-branding-preview"></iframe>');
+                          '" class="branding-preview"></iframe>');
 
   function buildQueryString () {
     return $.map(arguments, (val, idx) => encodeURI(val[0]) + '=' + encodeURI(val[1])).join('&');

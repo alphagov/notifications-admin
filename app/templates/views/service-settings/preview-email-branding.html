@@ -9,7 +9,7 @@
   <h1 class="heading-large">Preview email branding</h1>
   <div class="grid-row">
     <div class="column-full">
-      <iframe src="{{ url_for('main.email_template', branding_style=form.branding_style.data) }}" class="email-branding-preview"></iframe>
+      <iframe src="{{ url_for('main.email_template', branding_style=form.branding_style.data) }}" class="branding-preview"></iframe>
       {% call form_wrapper(action=action) %}
         <div class="form-group">
           {{ form.hidden_tag() }}

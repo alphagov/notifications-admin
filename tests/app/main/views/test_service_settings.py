@@ -2276,7 +2276,7 @@ def test_should_preview_email_branding(
     ))
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    iframe = page.find('iframe', attrs={"class": "email-branding-preview"})
+    iframe = page.find('iframe', attrs={"class": "branding-preview"})
     iframeURLComponents = urlparse(iframe['src'])
     iframeQString = parse_qs(iframeURLComponents.query)
 
