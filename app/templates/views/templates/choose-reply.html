@@ -19,7 +19,7 @@
        <p class="bottom-gutter">
          You need a template before you can send text messages.
        </p>
-      <a href="{{ url_for('.add_template_by_type', service_id=current_service.id) }}" class="button">Add a new template</a>
+      <a href="{{ url_for('.choose_template', service_id=current_service.id, initial_state='add-new-template') }}" class="button">Add a new template</a>
     {% else %}
       <p>
         You need to ask your service manager to add templates before you

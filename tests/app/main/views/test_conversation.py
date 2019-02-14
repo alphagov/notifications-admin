@@ -251,6 +251,27 @@ def test_conversation_links_to_reply(
     )
 
 
+def test_conversation_reply_shows_link_to_add_templates_if_service_has_no_templates(
+    client_request,
+    fake_uuid,
+    mock_get_service_templates_when_no_templates_exist,
+):
+    page = client_request.get(
+        'main.conversation_reply',
+        service_id=SERVICE_ONE_ID,
+        notification_id=fake_uuid,
+    )
+    page_text = page.find('p', class_='bottom-gutter').text
+    link = page.find('a', text='Add a new template')['href']
+
+    assert normalize_spaces(page_text) == 'You need a template before you can send text messages.'
+    assert link == url_for(
+        'main.choose_template',
+        service_id=SERVICE_ONE_ID,
+        initial_state='add-new-template'
+    )
+
+
 def test_conversation_reply_shows_templates(
     client_request,
     fake_uuid,

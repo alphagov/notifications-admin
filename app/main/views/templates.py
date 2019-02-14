@@ -135,6 +135,10 @@ def choose_template(service_id, template_type='all', template_folder_id=None):
     if 'templates_and_folders' in templates_and_folders_form.errors:
         flash('Select at least one template or folder')
 
+    initial_state = request.args.get('initial_state')
+    if request.method == 'GET' and initial_state:
+        templates_and_folders_form.op = initial_state
+
     return render_template(
         'views/templates/choose.html',
         current_template_folder_id=template_folder_id,

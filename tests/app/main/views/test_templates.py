@@ -196,6 +196,21 @@ def test_should_show_page_for_choosing_a_template(
     mock_get_template_folders.assert_called_once_with(SERVICE_ONE_ID)
 
 
+def test_choose_template_can_pass_through_an_initial_state_to_templates_and_folders_selection_form(
+    client_request,
+    mock_get_template_folders,
+    mock_get_service_templates,
+):
+    page = client_request.get(
+        'main.choose_template',
+        service_id=SERVICE_ONE_ID,
+        initial_state='add-new-template'
+    )
+
+    templates_and_folders_form = page.find('form')
+    assert templates_and_folders_form['data-prev-state'] == 'add-new-template'
+
+
 def test_should_not_show_template_nav_if_only_one_type_of_template(
     client_request,
     mock_get_template_folders,
