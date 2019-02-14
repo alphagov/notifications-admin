@@ -42,8 +42,11 @@
 
   // Constructor for objects holding data for each element to have sticky behaviour
   var StickyElement = function ($el, sticky) {
+    var $scrollArea = $el.closest('.sticky-scroll-area');
+
     this._sticky = sticky;
     this.$fixedEl = $el;
+    this.$scrollArea = $scrollArea.length ? $scrollArea : $el.parent();
     this._initialFixedClass = 'content-fixed-onload';
     this._fixedClass = 'content-fixed';
     this._appliedClass = null;
@@ -390,7 +393,7 @@
   };
   Sticky.prototype.setElWidth = function (el) {
     var $el = el.$fixedEl;
-    var width = $el.parent().width();
+    var width = el.$scrollArea.width();
 
     el.horizontalSpace = width;
     // if stuck, element won't inherit width from parent so set explicitly
