@@ -330,6 +330,31 @@ class Service():
             key=lambda folder: folder['name'].lower(),
         )
 
+    def all_template_folders_for_team_member(self, user_id):
+        return [
+            folder for folder in
+            self.all_template_folders
+            if folder['id'] in self.folder_permissions[user_id]
+        ]
+
+    def team_members_who_can_see_folder(self, folder_id):
+        return [
+            user for user in self.team_members
+            if folder_id in self.folder_permissions[user['id']]
+        ]
+
+    @property
+    def folder_permissions(self):
+        # response to this API call gets cached as
+        # service-{service_id}-folder-permissions
+        return folder_permissions_api_client.get_folder_permissions(self.id)
+
+        # API response is structured like this
+        api_response = {
+            'user_1_id': ['folder_1_id', 'folder_2_id'],
+            'user_2_id': ['folder_1_id'],
+        }
+
     @cached_property
     def all_template_folder_ids(self):
         return {folder['id'] for folder in self.all_template_folders}
