@@ -23,8 +23,8 @@ from app import (
     organisations_client,
     service_api_client,
     user_api_client,
-    zendesk_client,
 )
+from app.extensions import zendesk_client
 from app.main import main
 from app.main.forms import (
     BrandingOptionsEmail,

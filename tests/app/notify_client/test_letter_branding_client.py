@@ -8,8 +8,8 @@ def test_get_letter_branding(mocker, fake_uuid):
         'app.notify_client.letter_branding_client.LetterBrandingClient.get',
         return_value={'foo': 'bar'}
     )
-    mock_redis_get = mocker.patch('app.notify_client.RedisClient.get', return_value=None)
-    mock_redis_set = mocker.patch('app.notify_client.RedisClient.set')
+    mock_redis_get = mocker.patch('app.extensions.RedisClient.get', return_value=None)
+    mock_redis_set = mocker.patch('app.extensions.RedisClient.set')
 
     LetterBrandingClient().get_letter_branding(fake_uuid)
 
@@ -24,8 +24,8 @@ def test_get_letter_branding(mocker, fake_uuid):
 
 def test_get_all_letter_branding(mocker):
     mock_get = mocker.patch('app.notify_client.letter_branding_client.LetterBrandingClient.get', return_value=[1, 2, 3])
-    mock_redis_get = mocker.patch('app.notify_client.RedisClient.get', return_value=None)
-    mock_redis_set = mocker.patch('app.notify_client.RedisClient.set')
+    mock_redis_get = mocker.patch('app.extensions.RedisClient.get', return_value=None)
+    mock_redis_set = mocker.patch('app.extensions.RedisClient.set')
 
     LetterBrandingClient().get_all_letter_branding()
 
@@ -42,7 +42,7 @@ def test_create_letter_branding(mocker):
     new_branding = {'filename': 'uuid-test', 'name': 'my letters', 'domain': 'example.com'}
 
     mock_post = mocker.patch('app.notify_client.letter_branding_client.LetterBrandingClient.post')
-    mock_redis_delete = mocker.patch('app.notify_client.RedisClient.delete')
+    mock_redis_delete = mocker.patch('app.extensions.RedisClient.delete')
 
     LetterBrandingClient().create_letter_branding(
         filename=new_branding['filename'], name=new_branding['name'], domain=new_branding['domain']
@@ -59,7 +59,7 @@ def test_update_letter_branding(mocker, fake_uuid):
     branding = {'filename': 'uuid-test', 'name': 'my letters', 'domain': 'example.com'}
 
     mock_post = mocker.patch('app.notify_client.letter_branding_client.LetterBrandingClient.post')
-    mock_redis_delete = mocker.patch('app.notify_client.RedisClient.delete')
+    mock_redis_delete = mocker.patch('app.extensions.RedisClient.delete')
     LetterBrandingClient().update_letter_branding(
         branding_id=fake_uuid, filename=branding['filename'], name=branding['name'], domain=branding['domain'])
 

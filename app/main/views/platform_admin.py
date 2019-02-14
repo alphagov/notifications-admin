@@ -8,12 +8,12 @@ from notifications_python_client.errors import HTTPError
 from requests import RequestException
 
 from app import (
-    antivirus_client,
     complaint_api_client,
     letter_jobs_client,
     platform_stats_api_client,
     service_api_client,
 )
+from app.extensions import antivirus_client
 from app.main import main
 from app.main.forms import DateFilterForm, PDFUploadForm, ReturnedLettersForm
 from app.statistics_utils import (

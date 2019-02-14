@@ -4,12 +4,8 @@ import pytz
 from flask import abort, redirect, render_template, request, session, url_for
 from flask_login import current_user
 
-from app import (
-    convert_to_boolean,
-    current_service,
-    service_api_client,
-    zendesk_client,
-)
+from app import convert_to_boolean, current_service, service_api_client
+from app.extensions import zendesk_client
 from app.main import main
 from app.main.forms import Feedback, Problem, SupportType, Triage
 

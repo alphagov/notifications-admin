@@ -1,3 +1,4 @@
+from app.extensions import redis_client
 from app.notify_client import NotifyAdminAPIClient, cache
 
 
@@ -35,7 +36,7 @@ class TemplateFolderAPIClient(NotifyAdminAPIClient):
         })
 
         if template_ids:
-            self.redis_client.delete(*map(
+            redis_client.delete(*map(
                 'template-{}-version-None'.format,
                 template_ids,
             ))
