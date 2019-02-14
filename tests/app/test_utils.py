@@ -1,4 +1,4 @@
-from collections import OrderedDict
+from collections import Counter, OrderedDict
 from csv import DictReader
 from io import StringIO
 from pathlib import Path
@@ -391,6 +391,11 @@ def test_get_domain_info_for_branding_request():
     )
 
 
+def test_domains_are_lowercased():
+    for domain in AgreementInfo.domains.keys():
+        assert domain == domain.lower()
+
+
 def test_validate_government_domain_data():
 
     for domain in AgreementInfo.domains.keys():
@@ -403,15 +408,23 @@ def test_validate_government_domain_data():
             True, False, None
         }
 
-        assert (
-            agreement_info.owner is None
-        ) or (
-            isinstance(agreement_info.owner, str)
-        )
+        assert isinstance(agreement_info.owner, str) and agreement_info.owner.strip()
 
         assert agreement_info.agreement_signed in {
             True, False, None
         }
+
+
+def test_domain_data_is_canonicalized():
+    for owner, count in Counter(
+        AgreementInfo(domain).owner
+        for domain in AgreementInfo.domains.keys()
+        if AgreementInfo(domain).is_canonical
+    ).most_common():
+        if count > 1:
+            raise ValueError(
+                '{} entries in domains.yml for {}'.format(count, owner)
+            )
 
 
 def test_validate_email_domain_data():
