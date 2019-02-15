@@ -76,45 +76,61 @@
 
     this.addCancelButton = function(state) {
       let selector = `[value=${state.key}]`;
-      let $cancel = this.makeButton('Cancel', () => {
+      let $cancel = this.makeButton('Cancel', {
+        'onclick': () => {
 
-        // clear existing data
-        state.$el.find('input:radio').prop('checked', false);
-        state.$el.find('input:text').val('');
+          // clear existing data
+          state.$el.find('input:radio').prop('checked', false);
+          state.$el.find('input:text').val('');
 
-        // go back to action buttons
-        this.selectActionButtons(selector);
-      }, selector);
+          // go back to action buttons
+          this.selectActionButtons(selector);
+        },
+        'cancelSelector': selector,
+        'nonvisualText': "this step"
+      });
 
       state.$el.find('[type=submit]').after($cancel);
     };
 
     this.addClearButton = function(state) {
       let selector = 'button[value=add-new-template]';
-      let $clear = this.makeButton('Clear', () => {
+      let $clear = this.makeButton('Clear', {
+        'onclick': () => {
 
-        // uncheck all templates and folders
-        this.$form.find('input:checkbox').prop('checked', false);
+          // uncheck all templates and folders
+          this.$form.find('input:checkbox').prop('checked', false);
 
-        // go back to action buttons
-        this.selectActionButtons(selector);
+          // go back to action buttons
+          this.selectActionButtons(selector);
+        },
+        'nonvisualText': "selection"
       });
 
       state.$el.find('.template-list-selected-counter').append($clear);
     };
 
-    this.makeButton = (text, fn, cancelSelector) => $('<a></a>')
-      .html(text)
-      .addClass('js-cancel')
-      .data('target', cancelSelector) // isn't set if cancelSelector is undefined
-      .attr('tabindex', '0')
-      .on('click keydown', event => {
-        // space, enter or no keyCode (must be mouse input)
-        if ([13, 32, undefined].indexOf(event.keyCode) > -1) {
-          event.preventDefault();
-          fn();
+    this.makeButton = (text, opts) => {
+      let $btn = $('<a href=""></a>')
+                    .html(text)
+                    .addClass('js-cancel')
+                    // isn't set if cancelSelector is undefined
+                    .data('target', opts.cancelSelector || undefined)
+                    .attr('tabindex', '0')
+                    .on('click keydown', event => {
+                      // space, enter or no keyCode (must be mouse input)
+                      if ([13, 32, undefined].indexOf(event.keyCode) > -1) {
+                        event.preventDefault();
+                        if (opts.hasOwnProperty('onclick')) { opts.onclick(); }
+                      }
+                    });
+
+        if (opts.hasOwnProperty('nonvisualText')) {
+          $btn.append(`<span class="visuallyhidden"> ${opts.nonvisualText}</span>`);
         }
-      });
+
+        return $btn;
+    };
 
     this.selectActionButtons = function (targetSelector) {
       // If we want to show one of the grey choose actions state, we can pretend we're in the choose actions state,
