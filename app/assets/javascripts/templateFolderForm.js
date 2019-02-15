@@ -139,10 +139,10 @@
       'default': 'Nothing selected',
       'selected': numSelected => `${numSelected} selected`,
       'update': numSelected => {
-        let liveRegionHTML = (numSelected > 0) ? this.selectionStatus.selected(numSelected) : this.selectionStatus.default;
+        let message = (numSelected > 0) ? this.selectionStatus.selected(numSelected) : this.selectionStatus.default;
 
-        $('.template-list-selected-counter-count').html(numSelected);
-        this.$liveRegionCounter.html(liveRegionHTML);
+        $('.template-list-selected-counter__count').html(message);
+        this.$liveRegionCounter.html(message);
       }
     };
 
@@ -198,8 +198,10 @@
         <div class="js-stick-at-bottom-when-scrolling">
           <button class="button-secondary" value="add-new-template">New template</button>
           <button class="button-secondary" value="add-new-folder">New folder</button>
-          <div class="template-list-selected-counter" aria-hidden="true">
-            ${this.selectionStatus.default}
+          <div class="template-list-selected-counter">
+            <span class="template-list-selected-counter__count" aria-hidden="true">
+              ${this.selectionStatus.default}
+            </span>
           </div>
         </div>
       </div>
@@ -211,7 +213,9 @@
           <button class="button-secondary" value="move-to-existing-folder">Move</button>
           <button class="button-secondary" value="move-to-new-folder">Add to new folder</button>
           <div class="template-list-selected-counter" aria-hidden="true">
-            ${this.selectionStatus.selected(1)}
+            <span class="template-list-selected-counter__count" aria-hidden="true">
+              ${this.selectionStatus.selected(1)}
+            </span>
           </div>
         </div>
       </div>
