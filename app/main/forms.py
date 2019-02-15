@@ -173,6 +173,52 @@ class SMSCode(StringField):
         return super().__call__(type='tel', pattern='[0-9]*', **kwargs)
 
 
+class ForgivingIntegerField(StringField):
+
+    POSTGRES_MAX_INT = 2147483647
+
+    def process_formdata(self, valuelist):
+
+        if valuelist:
+
+            valuelist[0] = valuelist[0].replace(',', '')
+
+            try:
+                valuelist[0] = int(valuelist[0])
+            except ValueError:
+                pass
+
+            if valuelist[0] == '':
+                valuelist[0] = 0
+
+        return super().process_formdata(valuelist)
+
+    def pre_validate(self, form):
+
+        if self.data:
+            error = None
+            try:
+                if int(self.data) > self.POSTGRES_MAX_INT:
+                    error = 'Must be less than {:,.0f}'.format(self.POSTGRES_MAX_INT)
+            except ValueError:
+                error = 'Must be a whole number'
+
+            if error:
+                raise ValidationError(error)
+
+        return super().pre_validate(form)
+
+    def __call__(self, **kwargs):
+
+        try:
+            value = int(self.data)
+            value = '{:,.0f}'.format(value)
+        except (ValueError, TypeError):
+            value = self.data if self.data is not None else ''
+
+        return super().__call__(value=value, **kwargs)
+
+
 def organisation_type():
     return RadioField(
         'Who runs this service?',
@@ -594,17 +640,15 @@ class Triage(StripWhitespaceForm):
 
 
 class EstimateUsageForm(StripWhitespaceForm):
-    volume_email = StringField(
+
+    volume_email = ForgivingIntegerField(
         'How many emails do you expect to send in the next year?',
-        validators=[DataRequired(message='Can’t be empty')]
     )
-    volume_sms = StringField(
+    volume_sms = ForgivingIntegerField(
         'How many text messages do you expect to send in the next year?',
-        validators=[DataRequired(message='Can’t be empty')]
     )
-    volume_letter = StringField(
+    volume_letter = ForgivingIntegerField(
         'How many letters do you expect to send in the next year?',
-        validators=[DataRequired(message='Can’t be empty')]
     )
     consent_to_research = RadioField(
         'Can we contact you when we’re doing user research?',
@@ -614,6 +658,16 @@ class EstimateUsageForm(StripWhitespaceForm):
         ],
         validators=[DataRequired()]
     )
+
+    at_least_one_volume_filled = True
+
+    def validate(self, *args, **kwargs):
+
+        if self.volume_email.data == self.volume_sms.data == self.volume_letter.data == 0:
+            self.at_least_one_volume_filled = False
+            return False
+
+        return super().validate(*args, **kwargs)
 
 
 class ProviderForm(StripWhitespaceForm):

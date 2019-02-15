@@ -1,4 +1,5 @@
 {% extends "withnav_template.html" %}
+{% from "components/banner.html" import banner_wrapper %}
 {% from "components/form.html" import form_wrapper %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/radios.html" import radios %}
@@ -11,8 +12,17 @@
 {% block maincolumn_content %}
   <div class="grid-row">
     <div class="column-whole">
-      {% call form_wrapper() %}
+      {% if not form.at_least_one_volume_filled %}
+        {% call banner_wrapper(type='dangerous') %}
+          <h1 class='banner-title'>
+            no things supplied
+          </h1>
+          <p>Tell us some things</p>
+        {% endcall %}
+      {% else %}
         <h1 class="heading-large">Estimate usage</h1>
+      {% endif %}
+      {% call form_wrapper() %}
         <div class="form-group">
           {{ textbox(form.volume_email, width='1-2', hint='For example, 1,000,000') }}
           {{ textbox(form.volume_sms, width='1-2', hint='For example, 500,000') }}

@@ -833,7 +833,7 @@ def test_non_gov_user_is_told_they_cant_go_live(
     ),
     (
         (('email', 1234), ('sms', 0), ('letter', 999)),
-        ('1234', '0', '999'),
+        ('1,234', '0', '999'),
     ),
 ))
 def test_should_show_estimate_volumes(
@@ -890,9 +890,9 @@ def test_should_show_persist_estimated_volumes(
         'main.estimate_usage',
         service_id=SERVICE_ONE_ID,
         _data={
-            'volume_email': '1234',
-            'volume_sms': '0',
-            'volume_letter': '9876',
+            'volume_email': '1,234,567',
+            'volume_sms': '',
+            'volume_letter': '098',
             'consent_to_research': consent_to_research,
         },
         _expected_status=302,
@@ -904,9 +904,9 @@ def test_should_show_persist_estimated_volumes(
     )
     mock_update_service.assert_called_once_with(
         SERVICE_ONE_ID,
-        volume_email='1234',
-        volume_sms='0',
-        volume_letter='9876',
+        volume_email=1234567,
+        volume_sms=0,
+        volume_letter=98,
         consent_to_research=expected_persisted_consent_to_research,
     )
 
@@ -914,15 +914,15 @@ def test_should_show_persist_estimated_volumes(
 @pytest.mark.parametrize('data, error_selector, expected_error_message', (
     (
         {
-            'volume_email': '',
-            'volume_sms': '0',
+            'volume_email': '1234',
+            'volume_sms': '2147483648',
             'volume_letter': '9876',
             'consent_to_research': 'yes',
         },
-        'label[for=volume_email]',
+        'label[for=volume_sms]',
         (
-            'How many emails do you expect to send in the next year? For example, 1,000,000 '
-            'Can’t be empty'
+            'How many text messages do you expect to send in the next year? For example, 500,000 '
+            'Must be less than 2,147,483,647'
         )
     ),
     (
@@ -949,8 +949,28 @@ def test_should_error_if_bad_estimations_given(
         _data=data,
         _expected_status=200,
     )
-    assert normalize_spaces(page.select_one(error_selector).text) == (
-        expected_error_message
+    assert normalize_spaces(page.select_one(error_selector).text) == expected_error_message
+    assert mock_update_service.called is False
+
+
+def test_should_error_if_all_volumes_zero(
+    client_request,
+    mock_update_service,
+):
+    page = client_request.post(
+        'main.estimate_usage',
+        service_id=SERVICE_ONE_ID,
+        _data={
+            'volume_email': '',
+            'volume_sms': '0',
+            'volume_letter': '0,000',
+            'consent_to_research': 'yes',
+        },
+        _expected_status=200,
+    )
+    assert normalize_spaces(page.select_one('.banner-dangerous').text) == (
+        'no things supplied '
+        'Tell us some things'
     )
     assert mock_update_service.called is False
 
