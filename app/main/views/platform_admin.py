@@ -15,7 +15,12 @@ from app import (
 )
 from app.extensions import antivirus_client, redis_client
 from app.main import main
-from app.main.forms import DateFilterForm, PDFUploadForm, ReturnedLettersForm, ClearCacheForm
+from app.main.forms import (
+    ClearCacheForm,
+    DateFilterForm,
+    PDFUploadForm,
+    ReturnedLettersForm,
+)
 from app.statistics_utils import (
     get_formatted_percentage,
     get_formatted_percentage_two_dp,

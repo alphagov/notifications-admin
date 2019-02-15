@@ -303,7 +303,6 @@ class MainNavigation(Navigation):
             'check_notification',
             'choose_template',
             'choose_template_to_copy',
-            'clear_cache',
             'confirm_redact_template',
             'conversation_reply',
             'copy_template',
