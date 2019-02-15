@@ -4,6 +4,7 @@ import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
 
+from app.main.forms import FieldWithNoneOption
 from tests.conftest import (
     active_user_with_permissions,
     normalize_spaces,
@@ -288,3 +289,41 @@ def test_email_branding_preview(
         **extra_args
     )
     assert mock_get_email_branding.called is email_branding_retrieved
+
+
+@pytest.mark.parametrize('branding_style, filename', [
+    ('hm-government', 'hm-government'),
+    (None, 'no-branding'),
+    (FieldWithNoneOption.NONE_OPTION_VALUE, 'no-branding')
+])
+def test_letter_template_preview_links_to_the_correct_image(
+    client_request,
+    mocker,
+    mock_get_letter_branding_by_id,
+    branding_style,
+    filename,
+):
+    page = client_request.get(
+        'main.letter_template',
+        _test_page_title=False,
+        branding_style=branding_style
+    )
+
+    image_link = page.find('img')['src']
+
+    assert image_link == url_for(
+        'main.letter_branding_preview_image',
+        filename=filename,
+        page=1
+    )
+
+
+def test_letter_template_preview_headers(
+    client,
+    mock_get_letter_branding_by_id,
+):
+    response = client.get(
+        url_for('main.letter_template', branding_style='hm-government')
+    )
+
+    assert response.headers.get('X-Frame-Options') == 'SAMEORIGIN'

@@ -10,9 +10,9 @@ from flask_login import current_user, login_required
 from notifications_utils.international_billing_rates import (
     INTERNATIONAL_BILLING_RATES,
 )
-from notifications_utils.template import HTMLEmailTemplate
+from notifications_utils.template import HTMLEmailTemplate, LetterImageTemplate
 
-from app import email_branding_client
+from app import email_branding_client, letter_branding_client
 from app.main import main
 from app.main.forms import FieldWithNoneOption, SearchByNameForm
 from app.main.views.sub_navigation_dictionaries import features_nav
@@ -169,6 +169,35 @@ def email_template():
             brand_logo=brand_logo,
             brand_banner=brand_banner,
         )))
+
+    resp.headers['X-Frame-Options'] = 'SAMEORIGIN'
+    return resp
+
+
+@main.route('/_letter')
+def letter_template():
+    branding_style = request.args.get('branding_style')
+
+    if branding_style == FieldWithNoneOption.NONE_OPTION_VALUE:
+        branding_style = None
+
+    if branding_style:
+        filename = letter_branding_client.get_letter_branding(branding_style)['filename']
+    else:
+        filename = 'no-branding'
+
+    template = {'subject': '', 'content': ''}
+    image_url = url_for('main.letter_branding_preview_image', filename=filename)
+
+    template_image = str(LetterImageTemplate(
+        template,
+        image_url=image_url,
+        page_count=1,
+    ))
+
+    resp = make_response(
+        render_template('views/service-settings/letter-preview.html', template=template_image)
+    )
 
     resp.headers['X-Frame-Options'] = 'SAMEORIGIN'
     return resp

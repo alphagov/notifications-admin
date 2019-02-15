@@ -811,15 +811,38 @@ def service_set_letter_branding(service_id):
     )
 
     if form.validate_on_submit():
+        return redirect(url_for(
+            '.service_preview_letter_branding',
+            service_id=service_id,
+            branding_style=form.branding_style.data,
+        ))
+
+    return render_template(
+        'views/service-settings/set-letter-branding.html',
+        form=form,
+        search_form=SearchByNameForm()
+    )
+
+
+@main.route("/services/<service_id>/service-settings/preview-letter-branding", methods=['GET', 'POST'])
+@login_required
+@user_is_platform_admin
+def service_preview_letter_branding(service_id):
+    branding_style = request.args.get('branding_style')
+
+    form = ServicePreviewBranding(branding_style=branding_style)
+
+    if form.validate_on_submit():
         current_service.update(
             letter_branding=form.branding_style.data
         )
         return redirect(url_for('.service_settings', service_id=service_id))
 
     return render_template(
-        'views/service-settings/set-letter-branding.html',
+        'views/service-settings/preview-letter-branding.html',
         form=form,
-        search_form=SearchByNameForm()
+        service_id=service_id,
+        action=url_for('main.service_preview_letter_branding', service_id=service_id),
     )
 
 

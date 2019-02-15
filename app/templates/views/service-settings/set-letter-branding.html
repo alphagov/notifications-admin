@@ -11,12 +11,20 @@
 {% block maincolumn_content %}
 
   <h1 class="heading-large">Set letter branding</h1>
-  {% call form_wrapper() %}
-    {{ live_search(target_selector='.multiple-choice', show=True, form=search_form, label='Search by name') }}
-    {{ radios(form.branding_style, hide_legend=True) }}
+  {% call form_wrapper(data_kwargs={'preview-type': 'letter'}) %}
+    <div class="grid-row">
+      <div class="column-full preview-pane">
+      </div>
+    </div>
+    <div class="grid-row">
+      <div class="column-full">
+        {{ live_search(target_selector='.multiple-choice', show=True, form=search_form, label='Search by name') }}
+        {{ radios(form.branding_style, hide_legend=True) }}
+      </div>
+    </div>
     <div class="js-stick-at-bottom-when-scrolling">
       {{ page_footer(
-        'Save',
+        'Preview',
         back_link=url_for('.service_settings', service_id=current_service.id),
         back_link_text='Back to settings'
       ) }}

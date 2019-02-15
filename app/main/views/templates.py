@@ -36,6 +36,7 @@ from app.utils import (
     get_template,
     should_skip_template_page,
     user_has_permissions,
+    user_is_platform_admin,
 )
 
 form_objects = {
@@ -220,6 +221,34 @@ def view_letter_template_preview(service_id, template_id, filetype):
     db_template = service_api_client.get_service_template(service_id, template_id)['data']
 
     return TemplatePreview.from_database_object(db_template, filetype, page=request.args.get('page'))
+
+
+@main.route("/templates/letter-preview-image/<filename>")
+@login_required
+@user_is_platform_admin
+def letter_branding_preview_image(filename):
+    template = {
+        'subject': 'An example letter',
+        'content': (
+            'Lorem Ipsum is simply dummy text of the printing and typesetting '
+            'industry.\n\nLorem Ipsum has been the industry’s standard dummy '
+            'text ever since the 1500s, when an unknown printer took a galley '
+            'of type and scrambled it to make a type specimen book.\n\n'
+            '# History\n\nIt has survived not only\n\n'
+            '* five centuries\n'
+            '* but also the leap into electronic typesetting\n\n'
+            'It was popularised in the 1960s with the release of Letraset '
+            'sheets containing Lorem Ipsum passages, and more recently with '
+            'desktop publishing software like Aldus PageMaker including '
+            'versions of Lorem Ipsum.\n\n'
+            'The point of using Lorem Ipsum is that it has a more-or-less '
+            'normal distribution of letters, as opposed to using ‘Content '
+            'here, content here’, making it look like readable English.'
+        )
+    }
+    filename = None if filename == 'no-branding' else filename
+
+    return TemplatePreview.from_example_template(template, filename)
 
 
 def _view_template_version(service_id, template_id, version, letters_as_pdf=False):
