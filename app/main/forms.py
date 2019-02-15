@@ -1281,3 +1281,15 @@ class TemplateAndFoldersSelectionForm(Form):
         required_for_ops('add-new-template'),
         Optional(),
     ], required_message='Select the type of template you want to add')
+
+
+class ClearCacheForm(StripWhitespaceForm):
+    model_type = RadioField(
+        'What do you want to clear today',
+        choices=[
+            ('user', 'Users'),
+            ('service', 'Services'),
+            ('template', 'Templates')
+        ],
+        validators=[DataRequired()]
+    )
