@@ -44,8 +44,6 @@
         style="width: 100%;"
     >
     <h2 class="heading-medium">Message statuses – emails and text messages</h2>
-    <h3 class="heading-small">Created (API only)</h3>
-    <p>GOV.UK Notify has placed the message in a queue, ready to be sent to the provider. It should only remain in this state for a few seconds.</p>
     <h3 class="heading-small">Sending</h3>
     <p>GOV.UK Notify has sent the message to the provider. The provider will try to deliver the message to the recipient. GOV.UK Notify is waiting for delivery information.</p>
     <h3 class="heading-small">Pending (text messages only)</h3>
@@ -70,13 +68,14 @@
     <p>You will not be charged for text messages that are affected by a technical failure.</p>
 
     <h2 class="heading-medium">Message statuses – letters</h2>
-    <h3 class="heading-small">Accepted (API only)</h3>
+    <h3 class="heading-small">Sent</h3>
     <p>GOV.UK Notify has sent the letter to the provider to be printed.</p>
-    <h3 class="heading-small">Received (API only)</h3>
-    <p>The provider has printed and dispatched the letter.</p>
-    <h3 class="heading-small">Failed (API only)</h3>
-    <p>The only failure status that applies to letters is technical-failure.</p>
+    <h3 class="heading-small">Cancelled</h3>
+    <p>Sending cancelled. Your letter will not be printed or dispatched.</p>
+    <h3 class="heading-small">Technical failure</h3>
     <p>GOV.UK Notify had an unexpected error while sending to our printing provider.</p>
+    
+    <p><a href="https://www.notifications.service.gov.uk/documentation">Read our documentation</a> for a detailed list of API statuses.</p>
     
     <h2 class="heading-medium">Receiving messages</h2>
     <h3 class="heading-small">Email replies</h3>
