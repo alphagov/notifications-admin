@@ -10,11 +10,10 @@
       // which field is visible.
       this.$form.find('button[value=unknown]').remove();
 
-      this.$stickyBottom = this.$form.find('#sticky_template_forms');
       this.$liveRegionCounter = this.$form.find('.selection-counter');
 
-      this.$stickyBottom.append(this.nothingSelectedButtons);
-      this.$stickyBottom.append(this.itemsSelectedButtons);
+      this.$liveRegionCounter.before(this.nothingSelectedButtons);
+      this.$liveRegionCounter.before(this.itemsSelectedButtons);
 
       // all the diff states that we want to show or hide
       this.states = [
@@ -180,7 +179,7 @@
 
       // detach everything, unless they are the currentState
       this.states.forEach(
-        state => (state.key === this.currentState ? this.$stickyBottom.append(state.$el) : state.$el.detach())
+        state => (state.key === this.currentState ? this.$liveRegionCounter.before(state.$el) : state.$el.detach())
       );
 
       // use dialog mode for states which contain more than one form control
@@ -199,7 +198,7 @@
         <div class="js-stick-at-bottom-when-scrolling">
           <button class="button-secondary" value="add-new-template">New template</button>
           <button class="button-secondary" value="add-new-folder">New folder</button>
-          <div class="template-list-selected-counter">
+          <div class="template-list-selected-counter" aria-hidden="true">
             ${this.selectionStatus.default}
           </div>
         </div>
@@ -211,7 +210,7 @@
         <div class="js-stick-at-bottom-when-scrolling">
           <button class="button-secondary" value="move-to-existing-folder">Move</button>
           <button class="button-secondary" value="move-to-new-folder">Add to new folder</button>
-          <div class="template-list-selected-counter">
+          <div class="template-list-selected-counter" aria-hidden="true">
             ${this.selectionStatus.selected(1)}
           </div>
         </div>
