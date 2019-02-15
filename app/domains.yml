@@ -538,7 +538,7 @@ barnoldswicktowncouncil.gov.uk:
 barnsley.gov.uk:
   owner: Barnsley Metropolitan Borough Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 barrowbc.gov.uk:
   owner: Barrow in Furness Borough Council
   crown: false
