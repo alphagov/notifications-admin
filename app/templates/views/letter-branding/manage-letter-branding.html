@@ -18,6 +18,9 @@
           <img src="https://{{ cdn_url }}/{{ logo }}"/>
         </div>
       {% endif %}
+      <p>
+        Logos should be SVG files, cropped to artwork bounds and with all fonts outlined.
+      </p>
       {{ file_upload(file_upload_form.file, button_text='{} logo'.format('Update' if is_update else 'Upload')) }}
       {% call form_wrapper() %}
         <div class="form-group">
