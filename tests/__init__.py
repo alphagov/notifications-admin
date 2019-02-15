@@ -173,6 +173,10 @@ def service_json(
         'service_callback_api': service_callback_api,
         'prefix_sms': prefix_sms,
         'contact_link': None,
+        'volume_email': 111111,
+        'volume_sms': 222222,
+        'volume_letter': 333333,
+        'consent_to_research': True,
     }
 
 

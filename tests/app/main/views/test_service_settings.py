@@ -515,6 +515,13 @@ def test_should_raise_duplicate_name_handled(
     assert mock_verify_password.called
 
 
+@pytest.mark.parametrize('volumes, consent_to_research, expected_estimated_volumes_item', [
+    ((0, 0, 0), None, 'Estimate usage Not completed'),
+    ((1, 0, 0), None, 'Estimate usage Not completed'),
+    ((1, 0, 0), False, 'Estimate usage Completed'),
+    ((1, 0, 0), True, 'Estimate usage Completed'),
+    ((9, 99, 999), True, 'Estimate usage Completed'),
+])
 @pytest.mark.parametrize('count_of_users_with_manage_service, expected_user_checklist_item', [
     (1, 'Add a team member who can manage settings, team and usage Not completed'),
     (2, 'Add a team member who can manage settings, team and usage Completed'),
@@ -541,6 +548,9 @@ def test_should_show_request_to_go_live_checklist(
     count_of_email_templates,
     reply_to_email_addresses,
     expected_reply_to_checklist_item,
+    volumes,
+    consent_to_research,
+    expected_estimated_volumes_item,
 ):
 
     def _templates_by_type(template_type):
@@ -570,6 +580,21 @@ def test_should_show_request_to_go_live_checklist(
         return_value=reply_to_email_addresses
     )
 
+    for volume, channel in zip(volumes, ('sms', 'email', 'letter')):
+        mocker.patch(
+            'app.models.service.Service.volume_{}'.format(channel),
+            create=True,
+            new_callable=PropertyMock,
+            return_value=volume,
+        )
+
+    mocker.patch(
+        'app.models.service.Service.consent_to_research',
+        create=True,
+        new_callable=PropertyMock,
+        return_value=consent_to_research,
+    )
+
     page = client_request.get(
         'main.request_to_go_live', service_id=SERVICE_ONE_ID
     )
@@ -577,14 +602,13 @@ def test_should_show_request_to_go_live_checklist(
 
     checklist_items = page.select('.task-list .task-list-item')
 
-    assert normalize_spaces(checklist_items[0].text) == expected_user_checklist_item
-    assert normalize_spaces(checklist_items[1].text) == expected_templates_checklist_item
-    assert normalize_spaces(checklist_items[2].text) == expected_reply_to_checklist_item
+    assert normalize_spaces(checklist_items[0].text) == expected_estimated_volumes_item
+    assert normalize_spaces(checklist_items[1].text) == expected_user_checklist_item
+    assert normalize_spaces(checklist_items[2].text) == expected_templates_checklist_item
+    assert normalize_spaces(checklist_items[3].text) == expected_reply_to_checklist_item
 
-    assert page.select_one('main .button')['href'] == url_for(
-        'main.submit_request_to_go_live',
-        service_id=SERVICE_ONE_ID,
-    )
+    assert page.select_one('form')['method'] == 'post'
+    assert 'action' not in page.select_one('form')
 
     mock_count_users.assert_called_once_with(SERVICE_ONE_ID, 'manage_service')
     assert mock_templates.call_args_list == [
@@ -703,7 +727,7 @@ def test_should_check_for_sms_sender_on_go_live(
     assert page.h1.text == 'Before you request to go live'
 
     checklist_items = page.select('.task-list .task-list-item')
-    assert normalize_spaces(checklist_items[2].text) == expected_sms_sender_checklist_item
+    assert normalize_spaces(checklist_items[3].text) == expected_sms_sender_checklist_item
 
     assert mock_templates.call_args_list == [
         call(),
@@ -766,7 +790,7 @@ def test_should_check_for_mou_on_request_to_go_live(
     assert page.h1.text == 'Before you request to go live'
 
     checklist_items = page.select('.task-list .task-list-item')
-    assert normalize_spaces(checklist_items[2].text) == expected_item
+    assert normalize_spaces(checklist_items[3].text) == expected_item
 
 
 def test_non_gov_user_is_told_they_cant_go_live(
@@ -798,44 +822,146 @@ def test_non_gov_user_is_told_they_cant_go_live(
     assert normalize_spaces(page.select_one('main p').text) == (
         'Only team members with a government email address can request to go live.'
     )
-    assert page.select('.button') == []
+    assert page.select('form') == []
+    assert page.select('button') == []
 
 
-def test_should_show_request_to_go_live(
+@pytest.mark.parametrize('volumes, displayed_volumes', (
+    (
+        (('email', None), ('sms', None), ('letter', None)),
+        ('', '', ''),
+    ),
+    (
+        (('email', 1234), ('sms', 0), ('letter', 999)),
+        ('1234', '0', '999'),
+    ),
+))
+def test_should_show_estimate_volumes(
+    mocker,
     client_request,
+    volumes,
+    displayed_volumes,
 ):
+    for channel, volume in volumes:
+        mocker.patch(
+            'app.models.service.Service.volume_{}'.format(channel),
+            create=True,
+            new_callable=PropertyMock,
+            return_value=volume,
+        )
     page = client_request.get(
-        'main.submit_request_to_go_live', service_id=SERVICE_ONE_ID
+        'main.estimate_usage', service_id=SERVICE_ONE_ID
     )
-    assert page.h1.text == 'Request to go live'
-    for channel, label in (
+    assert page.h1.text == 'Estimate usage'
+    for channel, label, value in (
         (
             'email',
-            'How many emails do you expect to send in the next year? For example, 1,000,000'
+            'How many emails do you expect to send in the next year? For example, 1,000,000',
+            displayed_volumes[0],
         ),
         (
             'sms',
-            'How many text messages do you expect to send in the next year? For example, 500,000'
+            'How many text messages do you expect to send in the next year? For example, 500,000',
+            displayed_volumes[1],
         ),
         (
             'letter',
-            'How many letters do you expect to send in the next year? For example, 5,000'
+            'How many letters do you expect to send in the next year? For example, 5,000',
+            displayed_volumes[2],
         ),
     ):
         assert normalize_spaces(
             page.select_one('label[for=volume_{}]'.format(channel)).text
         ) == label
+        assert page.select_one('#volume_{}'.format(channel))['value'] == value
 
 
-@pytest.mark.parametrize('method', ('get', 'post'))
+@pytest.mark.parametrize('consent_to_research, expected_persisted_consent_to_research', (
+    ('yes', True),
+    ('no', False),
+))
+def test_should_show_persist_estimated_volumes(
+    client_request,
+    mock_update_service,
+    consent_to_research,
+    expected_persisted_consent_to_research,
+):
+    client_request.post(
+        'main.estimate_usage',
+        service_id=SERVICE_ONE_ID,
+        _data={
+            'volume_email': '1234',
+            'volume_sms': '0',
+            'volume_letter': '9876',
+            'consent_to_research': consent_to_research,
+        },
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.request_to_go_live',
+            service_id=SERVICE_ONE_ID,
+            _external=True,
+        )
+    )
+    mock_update_service.assert_called_once_with(
+        SERVICE_ONE_ID,
+        volume_email='1234',
+        volume_sms='0',
+        volume_letter='9876',
+        consent_to_research=expected_persisted_consent_to_research,
+    )
+
+
+@pytest.mark.parametrize('data, error_selector, expected_error_message', (
+    (
+        {
+            'volume_email': '',
+            'volume_sms': '0',
+            'volume_letter': '9876',
+            'consent_to_research': 'yes',
+        },
+        'label[for=volume_email]',
+        (
+            'How many emails do you expect to send in the next year? For example, 1,000,000 '
+            'Can’t be empty'
+        )
+    ),
+    (
+        {
+            'volume_email': '1234',
+            'volume_sms': '0',
+            'volume_letter': '9876',
+            'consent_to_research': '',
+        },
+        '[data-error-label="consent_to_research"]',
+        'This field is required.'
+    ),
+))
+def test_should_error_if_bad_estimations_given(
+    client_request,
+    mock_update_service,
+    data,
+    error_selector,
+    expected_error_message,
+):
+    page = client_request.post(
+        'main.estimate_usage',
+        service_id=SERVICE_ONE_ID,
+        _data=data,
+        _expected_status=200,
+    )
+    assert normalize_spaces(page.select_one(error_selector).text) == (
+        expected_error_message
+    )
+    assert mock_update_service.called is False
+
+
 def test_non_gov_users_cant_request_to_go_live(
     client_request,
     api_nongov_user_active,
-    method,
 ):
     client_request.login(api_nongov_user_active)
-    getattr(client_request, method)(
-        'main.submit_request_to_go_live',
+    client_request.post(
+        'main.request_to_go_live',
         service_id=SERVICE_ONE_ID,
         _expected_status=403,
     )
@@ -857,14 +983,8 @@ def test_should_redirect_after_request_to_go_live(
 ):
     mock_post = mocker.patch('app.main.views.service_settings.zendesk_client.create_ticket', autospec=True)
     page = client_request.post(
-        'main.submit_request_to_go_live',
+        'main.request_to_go_live',
         service_id=SERVICE_ONE_ID,
-        _data={
-            'volume_email': '111,111',
-            'volume_sms': '222,222',
-            'volume_letter': '333,333',
-            'research_consent': 'yes',
-        },
         _follow_redirects=True
     )
     mock_post.assert_called_with(

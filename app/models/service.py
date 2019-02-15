@@ -36,6 +36,10 @@ class Service():
         'prefix_sms',
         'research_mode',
         'service_callback_api',
+        'volume_email',
+        'volume_sms',
+        'volume_letter',
+        'consent_to_research',
     }
 
     TEMPLATE_TYPES = (
@@ -177,6 +181,16 @@ class Service():
         return len({
             template['template_type'] for template in self.all_templates
         }) > 1
+
+    @property
+    def has_estimated_usage(self):
+        return (
+            self.consent_to_research is not None and any((
+                self.volume_email,
+                self.volume_sms,
+                self.volume_letter,
+            ))
+        )
 
     @property
     def has_email_templates(self):

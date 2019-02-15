@@ -593,7 +593,7 @@ class Triage(StripWhitespaceForm):
     )
 
 
-class RequestToGoLiveForm(StripWhitespaceForm):
+class EstimateUsageForm(StripWhitespaceForm):
     volume_email = StringField(
         'How many emails do you expect to send in the next year?',
         validators=[DataRequired(message='Can’t be empty')]
@@ -606,7 +606,7 @@ class RequestToGoLiveForm(StripWhitespaceForm):
         'How many letters do you expect to send in the next year?',
         validators=[DataRequired(message='Can’t be empty')]
     )
-    research_consent = RadioField(
+    consent_to_research = RadioField(
         'Can we contact you when we’re doing user research?',
         choices=[
             ('yes', 'Yes'),

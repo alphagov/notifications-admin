@@ -1,0 +1,26 @@
+{% extends "withnav_template.html" %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/radios.html" import radios %}
+{% from "components/textbox.html" import textbox %}
+
+{% block service_page_title %}
+  Estimate usage
+{% endblock %}
+
+{% block maincolumn_content %}
+  <div class="grid-row">
+    <div class="column-whole">
+      {% call form_wrapper() %}
+        <h1 class="heading-large">Estimate usage</h1>
+        <div class="form-group">
+          {{ textbox(form.volume_email, width='1-2', hint='For example, 1,000,000') }}
+          {{ textbox(form.volume_sms, width='1-2', hint='For example, 500,000') }}
+          {{ textbox(form.volume_letter, width='1-2', hint='For example, 5,000') }}
+        </div>
+        {{ radios(form.consent_to_research, hint='You don’t have to take part and you can unsubscribe at any time') }}
+        {{ page_footer('Continue') }}
+      {% endcall %}
+    </div>
+  </div>
+{% endblock %}

@@ -30,12 +30,12 @@ from app.main import main
 from app.main.forms import (
     BrandingOptionsEmail,
     ConfirmPasswordForm,
+    EstimateUsageForm,
     FreeSMSAllowance,
     InternationalSMSForm,
     LinkOrganisationsForm,
     OrganisationTypeForm,
     RenameServiceForm,
-    RequestToGoLiveForm,
     SearchByNameForm,
     ServiceContactDetailsForm,
     ServiceDataRetentionEditForm,
@@ -142,7 +142,37 @@ def service_name_change_confirm(service_id):
         form=form)
 
 
-@main.route("/services/<service_id>/service-settings/request-to-go-live")
+@main.route("/services/<service_id>/service-settings/request-to-go-live/estimate-usage", methods=['GET', 'POST'])
+@login_required
+@user_has_permissions('manage_service')
+def estimate_usage(service_id):
+
+    form = EstimateUsageForm(
+        volume_email=current_service.volume_email,
+        volume_sms=current_service.volume_sms,
+        volume_letter=current_service.volume_letter,
+        consent_to_research='yes' if current_service.consent_to_research else 'no',
+    )
+
+    if form.validate_on_submit():
+        current_service.update(
+            volume_email=form.volume_email.data,
+            volume_sms=form.volume_sms.data,
+            volume_letter=form.volume_letter.data,
+            consent_to_research=(form.consent_to_research.data == 'yes'),
+        )
+        return redirect(url_for(
+            'main.request_to_go_live',
+            service_id=service_id,
+        ))
+
+    return render_template(
+        'views/service-settings/estimate-usage.html',
+        form=form,
+    )
+
+
+@main.route("/services/<service_id>/service-settings/request-to-go-live", methods=['GET'])
 @login_required
 @user_has_permissions('manage_service')
 def request_to_go_live(service_id):
@@ -156,72 +186,64 @@ def request_to_go_live(service_id):
     )
 
 
-@main.route("/services/<service_id>/service-settings/submit-request-to-go-live", methods=['GET', 'POST'])
+@main.route("/services/<service_id>/service-settings/request-to-go-live", methods=['POST'])
 @login_required
 @user_has_permissions('manage_service')
 @user_is_gov_user
 def submit_request_to_go_live(service_id):
 
-    form = RequestToGoLiveForm()
-
-    if form.validate_on_submit():
-        zendesk_client.create_ticket(
-            subject='Request to go live - {}'.format(current_service.name),
-            message=(
-                'Service: {service_name}\n'
-                '{service_dashboard}\n'
-                '\n---'
-                '\nOrganisation type: {organisation_type}'
-                '\nAgreement signed: {agreement}'
-                '\nChecklist completed: {checklist}'
-                '\nEmails in next year: {volume_email}'
-                '\nText messages in next year: {volume_sms}'
-                '\nLetters in next year: {volume_letter}'
-                '\nConsent to research: {research_consent}'
-                '\nOther live services: {existing_live}'
-                '\n'
-                '\n---'
-                '\n'
-                '{service_id}, '
-                '{organisation}, '
-                '{service_name}, '
-                '{user_name}, '
-                '{user_email}, '
-                '-, '
-                '{date}, '
-                '{volume_sms_normalised}, '
-                '{volume_email_normalised}, '
-                '{volume_letter_normalised}'
-            ).format(
-                service_name=current_service.name,
-                service_dashboard=url_for('main.service_dashboard', service_id=current_service.id, _external=True),
-                organisation_type=str(current_service.organisation_type).title(),
-                agreement=AgreementInfo.from_current_user().as_human_readable,
-                checklist=current_service.go_live_checklist_completed_as_yes_no,
-                volume_email=form.volume_email.data,
-                volume_email_normalised=form.volume_email.data.replace(',', ''),
-                volume_sms=form.volume_sms.data,
-                volume_sms_normalised=form.volume_sms.data.replace(',', ''),
-                volume_letter=form.volume_letter.data,
-                volume_letter_normalised=form.volume_letter.data.replace(',', ''),
-                research_consent=form.research_consent.data.title(),
-                existing_live='Yes' if user_api_client.user_has_live_services(current_user) else 'No',
-                service_id=current_service.id,
-                organisation=AgreementInfo.from_current_user().owner,
-                user_name=current_user.name,
-                user_email=current_user.email_address,
-                date=datetime.now(tz=pytz.timezone('Europe/London')).strftime('%d/%m/%Y'),
-            ),
-            ticket_type=zendesk_client.TYPE_QUESTION,
-            user_email=current_user.email_address,
+    zendesk_client.create_ticket(
+        subject='Request to go live - {}'.format(current_service.name),
+        message=(
+            'Service: {service_name}\n'
+            '{service_dashboard}\n'
+            '\n---'
+            '\nOrganisation type: {organisation_type}'
+            '\nAgreement signed: {agreement}'
+            '\nChecklist completed: {checklist}'
+            '\nEmails in next year: {volume_email:,.0f}'
+            '\nText messages in next year: {volume_sms:,.0f}'
+            '\nLetters in next year: {volume_letter:,.0f}'
+            '\nConsent to research: {research_consent}'
+            '\nOther live services: {existing_live}'
+            '\n'
+            '\n---'
+            '\n'
+            '{service_id}, '
+            '{organisation}, '
+            '{service_name}, '
+            '{user_name}, '
+            '{user_email}, '
+            '-, '
+            '{date}, '
+            '{volume_sms}, '
+            '{volume_email}, '
+            '{volume_letter}'
+        ).format(
+            service_name=current_service.name,
+            service_dashboard=url_for('main.service_dashboard', service_id=current_service.id, _external=True),
+            organisation_type=str(current_service.organisation_type).title(),
+            agreement=AgreementInfo.from_current_user().as_human_readable,
+            checklist=current_service.go_live_checklist_completed_as_yes_no,
+            volume_email=current_service.volume_email,
+            volume_sms=current_service.volume_sms,
+            volume_letter=current_service.volume_letter,
+            research_consent='Yes' if current_service.consent_to_research else 'No',
+            existing_live='Yes' if user_api_client.user_has_live_services(current_user) else 'No',
+            service_id=current_service.id,
+            organisation=AgreementInfo.from_current_user().owner,
             user_name=current_user.name,
-            tags=get_request_to_go_live_tags(current_service, current_user),
-        )
+            user_email=current_user.email_address,
+            date=datetime.now(tz=pytz.timezone('Europe/London')).strftime('%d/%m/%Y'),
+        ),
+        ticket_type=zendesk_client.TYPE_QUESTION,
+        user_email=current_user.email_address,
+        user_name=current_user.name,
+        tags=get_request_to_go_live_tags(current_service, current_user),
+    )
 
-        flash('Thanks for your request to go live. We’ll get back to you within one working day.', 'default')
-        return redirect(url_for('.service_settings', service_id=service_id))
-
-    return render_template('views/service-settings/submit-request-to-go-live.html', form=form)
+    flash('Thanks for your request to go live. We’ll get back to you within one working day.', 'default')
+    return redirect(url_for('.service_settings', service_id=service_id))
 
 
 @main.route("/services/<service_id>/service-settings/switch-live", methods=["GET", "POST"])
