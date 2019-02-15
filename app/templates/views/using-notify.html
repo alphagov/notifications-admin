@@ -43,27 +43,41 @@
              temporary failures"
         style="width: 100%;"
     >
+    <h2 class="heading-medium">Message states – emails and text messages</h2>
+    <h3 class="heading-small">Created (API only)</h3>
+    <p>GOV.UK Notify has placed the message in a queue, ready to be sent to the provider. It should only remain in this state for a few seconds.</p>
     <h3 class="heading-small">Sending</h3>
-    <p>This means that we’ve sent the message to our providers and are waiting for delivery information.</p>
+    <p>GOV.UK Notify has sent the message to the provider. The provider will try to deliver the message to the recipient. GOV.UK Notify is waiting for delivery information.</p>
+    <h3 class="heading-small">Pending (text messages only)</h3>
+    <p>GOV.UK Notify is waiting for more delivery information.</p>
+    <h3 class="heading-small">Sent internationally (text messages only)</h3>
+    <p>The message was sent to an international number. The mobile networks in some countries do not provide any more delivery information.</p>
     <h3 class="heading-small">Delivered</h3>
-    <p>You’ll see this when Notify has successfully delivered a message to user’s email inbox or phone.</p>
-    <p>Notify won’t tell you if a user has opened or read a message.</p>
-    <h3 class="heading-small">Sent internationally</h3>
-    <p>You’ll see this when Notify sends a text message to an international number, but mobile networks in that country don’t provide delivery receipts.</p>
+    <p>The message was successfully delivered.</p>
+    <p>Notify will not tell you if a user has opened or read a message.</p>
     <h3 class="heading-small" id="does-not-exist">Phone number or email address does not exist</h3>
-    <p>You’ll see this when Notify couldn’t deliver a message because the email address or phone number was wrong.</p>
+    <p>The provider could not deliver the message because the email address or phone number was wrong.
     <p>You should remove these email addresses or phone numbers from your database.</p>
-    <p>You’ll still be charged for text messages to numbers that don’t exist.</p>
+    <p>You’ll still be charged for text messages to numbers that do not exist.</p>
     <h3 class="heading-small" id="not-accepting-messages">Inbox/phone not accepting messages right now</h3>
-    <p>You’ll see this if Notify can’t deliver an email or text message after trying for 72 hours.</p>
-    <p>This might happen for a number of reasons. For example, the user’s inbox might be full, or their phone might be turned off.</p>
-    <p>You can try sending the message again if you want.</p>
-    <p>You’ll still be charged for text messages to phones that aren’t accepting messages.</p>
+    <p>The provider could not deliver the message after trying for 72 hours.</p>
+    <p>This can happen when the recipient’s inbox is full or their phone is off.</p>
+    <p>You can try to send the message again.</p>
+    <p>ou’ll still be charged for text messages to phones that are not accepting messages.</p>
     <h3 class="heading-small" id="technical-failure">Technical failure</h3>
-    <p>A technical failure means there’s a problem between Notify and our delivery providers. </p>
-    <p>You’ll have to try sending your messages again. </p>
-    <p>You won’t be charged for text messages that are affected by a technical failure.</p>
+    <p>Your message was not sent because there was a problem between Notify and the provider.</p>
+    <p>You’ll have to try sending your messages again.</p>
+    <p>You will not be charged for text messages that are affected by a technical failure.</p>
 
+    <h2 class="heading-medium">Message states – letters</h2>
+    <h3 class="heading-small">Accepted (API only)</h3>
+    <p>GOV.UK Notify has sent the letter to the provider to be printed.</p>
+    <h3 class="heading-small">Received (API only)</h3>
+    <p>The provider has printed and dispatched the letter.</p>
+    <h3 class="heading-small">Failed (API only)</h3>
+    <p>The only failure status that applies to letters is technical-failure.</p>
+    <p>GOV.UK Notify had an unexpected error while sending to our printing provider.</p>
+    
     <h2 class="heading-medium">Receiving messages</h2>
     <h3 class="heading-small">Email replies</h3>
     <p>You can choose an email address you want replies to go to.</p>
