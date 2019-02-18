@@ -885,11 +885,11 @@ def test_clear_cache_submits_and_tells_you_how_many_things_were_deleted(client_r
         call('template-????????-????-????-????-????????????-versions'),
     ]
 
-    flash_banner = page.find('div', class_='banner-dangerous')
+    flash_banner = page.find('div', class_='banner-default')
     assert flash_banner.text.strip() == 'Removed 3 template objects from redis'
 
 
-def test_clear_cache_requires_option(client_request, platform_admin_user,mocker):
+def test_clear_cache_requires_option(client_request, platform_admin_user, mocker):
     redis = mocker.patch('app.main.views.platform_admin.redis_client')
     client_request.login(platform_admin_user)
 

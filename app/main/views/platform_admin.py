@@ -322,7 +322,7 @@ def clear_cache():
             for pattern in CACHE_KEYS[to_delete]
         )
 
-        flash('Removed {} {} objects from redis'.format(num_deleted, to_delete))
+        flash('Removed {} {} objects from redis'.format(num_deleted, to_delete), category='default')
 
     return render_template(
         'views/platform-admin/clear-cache.html',
