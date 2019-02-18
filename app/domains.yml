@@ -2921,7 +2921,7 @@ oundle.gov.uk:
 oxford.gov.uk:
   owner: Oxford City Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 oxfordshire.gov.uk:
   owner: Oxfordshire County Council
   crown: false
