@@ -404,7 +404,7 @@ antrimandnewtownabbey.gov.uk: antrim.gov.uk
 antrim.gov.uk:
   owner: Antrim Borough Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 archifaugwent.gov.uk: blaenau-gwent.gov.uk
 archifaumorgannwg.gov.uk: cardiff.gov.uk
 ardsandnorthdown.gov.uk:
@@ -1512,7 +1512,7 @@ eastrenfrewshire.gov.uk:
 eastriding.gov.uk:
   owner: East Riding of Yorkshire Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 eaststaffsbc.gov.uk:
   owner: East Staffordshire Borough Council
   crown: false
@@ -3226,7 +3226,7 @@ rugeleytowncouncil.gov.uk:
 runnymede.gov.uk:
   owner: Runnymede Borough Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 rushcliffe.gov.uk:
   owner: Rushcliffe Borough Council
   crown: false
