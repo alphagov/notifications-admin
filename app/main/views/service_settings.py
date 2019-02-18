@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from datetime import datetime
 
 import pytz
@@ -42,6 +43,7 @@ from app.main.forms import (
     ServiceEditInboundNumberForm,
     ServiceInboundNumberForm,
     ServiceLetterContactBlockForm,
+    ServiceOnOffSettingForm,
     ServicePreviewBranding,
     ServiceReplyToEmailForm,
     ServiceSetEmailBranding,
@@ -60,11 +62,22 @@ from app.utils import (
 )
 
 
+PLATFORM_ADMIN_SERVICE_PERMISSIONS = OrderedDict([
+    ('inbound_sms', {'title': 'Receive inbound SMS', 'requires': 'sms', 'endpoint': '.service_set_inbound_number'}),
+    ('precompiled_letter', {'title': 'Send precompiled letters', 'requires': 'letter'}),
+    ('email_auth', {'title': 'User auth type editing'}),
+    ('upload_document', {'title': 'Uploading documents', 'endpoint': '.service_switch_can_upload_document'}),
+])
+
+
 @main.route("/services/<service_id>/service-settings")
 @login_required
 @user_has_permissions('manage_service', 'manage_api_keys')
 def service_settings(service_id):
-    return render_template('views/service-settings.html')
+    return render_template(
+        'views/service-settings.html',
+        service_permissions=PLATFORM_ADMIN_SERVICE_PERMISSIONS
+    )
 
 
 @main.route("/services/<service_id>/service-settings/name", methods=['GET', 'POST'])
@@ -211,54 +224,64 @@ def submit_request_to_go_live(service_id):
     return render_template('views/service-settings/submit-request-to-go-live.html', form=form)
 
 
-@main.route("/services/<service_id>/service-settings/switch-live")
+@main.route("/services/<service_id>/service-settings/switch-live", methods=["GET", "POST"])
 @login_required
 @user_is_platform_admin
 def service_switch_live(service_id):
-    current_service.update(
-        # TODO This limit should be set depending on the agreement signed by
-        # with Notify.
-        message_limit=250000 if current_service.trial_mode else 50,
-        restricted=(not current_service.trial_mode)
+    form = ServiceOnOffSettingForm(
+        name="Make service live",
+        enabled=not current_service.trial_mode
     )
-    return redirect(url_for('.service_settings', service_id=service_id))
+
+    if form.validate_on_submit():
+        current_service.update(
+            # TODO This limit should be set depending on the agreement signed by
+            # with Notify.
+            message_limit=250000 if form.enabled.data else 50,
+            restricted=(not form.enabled.data)
+        )
+        return redirect(url_for('.service_settings', service_id=service_id))
+
+    return render_template(
+        'views/service-settings/set-service-setting.html',
+        title="Make service live",
+        form=form,
+    )
 
 
-@main.route("/services/<service_id>/service-settings/research-mode")
+@main.route("/services/<service_id>/service-settings/permissions/<permission>", methods=["GET", "POST"])
 @login_required
 @user_is_platform_admin
-def service_switch_research_mode(service_id):
-    current_service.toggle_research_mode()
-    return redirect(url_for('.service_settings', service_id=service_id))
+def service_set_permission(service_id, permission):
+    if permission not in PLATFORM_ADMIN_SERVICE_PERMISSIONS:
+        abort(404)
 
+    title = PLATFORM_ADMIN_SERVICE_PERMISSIONS[permission]['title']
+    form = ServiceOnOffSettingForm(
+        name=title,
+        enabled=current_service.has_permission(permission)
+    )
 
-@main.route("/services/<service_id>/service-settings/email-auth")
-@login_required
-@user_is_platform_admin
-def service_switch_email_auth(service_id):
-    current_service.switch_permission('email_auth')
-    return redirect(url_for('.service_settings', service_id=service_id))
+    if form.validate_on_submit():
+        current_service.force_permission(permission, on=form.enabled.data)
 
+        return redirect(url_for(".service_settings", service_id=service_id))
 
-@main.route("/services/<service_id>/service-settings/can-send-precompiled-letter")
-@login_required
-@user_is_platform_admin
-def service_switch_can_send_precompiled_letter(service_id):
-    current_service.switch_permission('precompiled_letter')
-    return redirect(url_for('.service_settings', service_id=service_id))
+    return render_template(
+        'views/service-settings/set-service-setting.html',
+        title=title,
+        form=form,
+    )
 
 
 @main.route("/services/<service_id>/service-settings/can-upload-document", methods=['GET', 'POST'])
 @login_required
 @user_is_platform_admin
 def service_switch_can_upload_document(service_id):
-    form = ServiceContactDetailsForm()
+    if current_service.contact_link:
+        return redirect(url_for('.service_set_permission', service_id=service_id, permission='upload_document'))
 
-    # If turning the permission off, or turning it on and the service already has a contact_link,
-    # don't show the form to add the link
-    if current_service.has_permission('upload_document') or current_service.contact_link:
-        current_service.switch_permission('upload_document')
-        return redirect(url_for('.service_settings', service_id=service_id))
+    form = ServiceContactDetailsForm()
 
     if form.validate_on_submit():
         contact_type = form.contact_details_type.data
@@ -266,8 +289,8 @@ def service_switch_can_upload_document(service_id):
         current_service.update(
             contact_link=form.data[contact_type]
         )
-        current_service.switch_permission('upload_document')
-        return redirect(url_for('.service_settings', service_id=service_id))
+
+        return redirect(url_for('.service_set_permission', service_id=service_id, permission='upload_document'))
 
     return render_template('views/service-settings/contact_link.html', form=form)
 
@@ -425,6 +448,7 @@ def service_set_inbound_number(service_id):
     form = ServiceInboundNumberForm(
         inbound_number_choices=inbound_numbers_value_and_label
     )
+
     if form.validate_on_submit():
         service_api_client.add_sms_sender(
             current_service.id,
@@ -434,6 +458,7 @@ def service_set_inbound_number(service_id):
         )
         current_service.force_permission('inbound_sms', on=True)
         return redirect(url_for('.service_settings', service_id=service_id))
+
     return render_template(
         'views/service-settings/set-inbound-number.html',
         form=form,

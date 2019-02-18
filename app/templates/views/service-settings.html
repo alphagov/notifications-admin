@@ -285,6 +285,13 @@
         field_headings_visible=False,
         caption_visible=False
       ) %}
+
+        {% call row() %}
+          {{ text_field('Live')}}
+          {{ boolean_field(not current_service.trial_mode) }}
+          {{ edit_field('Change', url_for('.service_switch_live', service_id=current_service.id)) }}
+        {% endcall %}
+
         {% call row() %}
           {{ text_field('Organisation')}}
           {{ optional_text_field(current_service.organisation_name) }}
@@ -319,45 +326,20 @@
           {% endcall %}
           {{ edit_field('Change', url_for('.data_retention', service_id=current_service.id)) }}
         {% endcall %}
+
+        {% for permission in service_permissions %}
+          {% if not service_permissions[permission].requires or current_service.has_permission(service_permissions[permission].requires) %}
+            {% call row() %}
+              {{ text_field(service_permissions[permission].title)}}
+              {{ boolean_field(current_service.has_permission(permission)) }}
+              {{ edit_field('Change', url_for(service_permissions[permission].endpoint or '.service_set_permission', service_id=current_service.id, permission=permission if not service_permissions[permission].endpoint else None)) }}
+            {% endcall %}
+          {% endif %}
+        {% endfor %}
+
       {% endcall %}
 
       <ul>
-        <li class="bottom-gutter">
-          <a href="{{ url_for('.service_switch_live', service_id=current_service.id) }}" class="button">
-            {{ 'Make service live' if current_service.trial_mode else 'Revert service to trial mode' }}
-          </a>
-        </li>
-        <li class="bottom-gutter">
-          <a href="{{ url_for('.service_switch_research_mode', service_id=current_service.id) }}" class="button">
-            {{ 'Take service out of research mode' if current_service.research_mode else 'Put into research mode' }}
-          </a>
-        </li>
-        {% if 'sms' in current_service.permissions %}
-          <li class="bottom-gutter">
-          {% if not current_service.has_permission('inbound_sms') %}
-            <a href="{{ url_for('.service_set_inbound_number', service_id=current_service.id, set_inbound_sms=True) }}" class="button">
-              Allow inbound sms
-            </a>
-          {% endif %}
-          </li>
-        {% endif %}
-        {% if 'letter' in current_service.permissions %}
-          <li class="bottom-gutter">
-            <a href="{{ url_for('.service_switch_can_send_precompiled_letter', service_id=current_service.id) }}" class="button">
-              {{ 'Stop sending precompiled letters' if 'precompiled_letter' in current_service.permissions else 'Allow to send precompiled letters' }}
-            </a>
-          </li>
-        {% endif %}
-        <li class="bottom-gutter">
-          <a href="{{ url_for('.service_switch_email_auth', service_id=current_service.id) }}" class="button">
-            {{ 'Stop user auth type editing' if 'email_auth' in current_service.permissions else 'Allow user auth type editing' }}
-          </a>
-        </li>
-        <li class="bottom-gutter">
-           <a href="{{ url_for('.service_switch_can_upload_document', service_id=current_service.id) }}" class="button">
-             {{ 'Stop uploading documents' if 'upload_document' in current_service.permissions else 'Allow to upload documents' }}
-           </a>
-        </li>
         {% if current_service.active %}
           <li class="bottom-gutter">
             <a href="{{ url_for('.archive_service', service_id=current_service.id) }}" class="button">
