@@ -3563,7 +3563,7 @@ southtyneside.gov.uk:
 southwark.gov.uk:
   owner: Southwark London Borough Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 southwell-tc.gov.uk:
   owner: Southwell Town Council
   crown: false
