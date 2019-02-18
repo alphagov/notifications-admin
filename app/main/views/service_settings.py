@@ -518,13 +518,13 @@ def service_set_channel(service_id, channel):
 
     form = ServiceSwitchChannelForm(
         channel=channel,
-        enabled='on' if current_service.has_permission(channel) else 'off'
+        enabled=current_service.has_permission(channel)
     )
 
     if form.validate_on_submit():
         current_service.force_permission(
             channel,
-            on=(form.enabled.data == 'on'),
+            on=form.enabled.data,
         )
         return redirect(
             url_for(".service_settings", service_id=service_id)

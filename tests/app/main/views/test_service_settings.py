@@ -2518,7 +2518,7 @@ def test_unknown_channel_404s(
         'It costs between 30p and 76p to send a letter using Notify.',
         'Send letters',
         ['email', 'sms'],
-        'off', 'on',
+        'False', 'True',
         ['email', 'sms', 'letter'],
     ),
     (
@@ -2526,7 +2526,7 @@ def test_unknown_channel_404s(
         'It costs between 30p and 76p to send a letter using Notify.',
         'Send letters',
         ['email', 'sms', 'letter'],
-        'on', 'off',
+        'True', 'False',
         ['email', 'sms'],
     ),
     (
@@ -2534,7 +2534,7 @@ def test_unknown_channel_404s(
         'You have a free allowance of 250,000 text messages each financial year.',
         'Send text messages',
         [],
-        'off', 'on',
+        'False', 'True',
         ['sms'],
     ),
     (
@@ -2542,7 +2542,7 @@ def test_unknown_channel_404s(
         'It’s free to send emails through GOV.UK Notify.',
         'Send emails',
         [],
-        'off', 'on',
+        'False', 'True',
         ['email'],
     ),
     (
@@ -2550,7 +2550,7 @@ def test_unknown_channel_404s(
         'It’s free to send emails through GOV.UK Notify.',
         'Send emails',
         ['email', 'sms', 'letter'],
-        'on', 'on',
+        'True', 'True',
         ['email', 'sms', 'letter'],
     ),
 ])
