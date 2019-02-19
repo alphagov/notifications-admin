@@ -1,0 +1,27 @@
+{% extends "withoutnav_template.html" %}
+{% from "components/textbox.html" import textbox %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+
+{% block per_page_title %}
+  Edit user email
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <h1 class="heading-large">Edit user email</h1>
+  <p id="user_name">for {{ user.name }}</p>
+  <div class="grid-row">
+    <div class="column-three-quarters">
+      {% call form_wrapper() %}
+        {{ textbox(form.email_address) }}
+        {{ page_footer(
+          'Save',
+          back_link=url_for('.manage_users', service_id=service_id),
+          back_link_text="Back to team members"
+        ) }}
+      {% endcall %}
+    </div>
+  </div>
+
+{% endblock %}

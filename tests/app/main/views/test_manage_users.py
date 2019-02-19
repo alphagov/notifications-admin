@@ -769,3 +769,23 @@ def test_can_invite_user_as_platform_admin(
     response = logged_in_client.get(url_for('main.manage_users', service_id=service_one['id']))
     resp_text = response.get_data(as_text=True)
     assert url_for('.invite_user', service_id=service_one['id']) in resp_text
+
+
+def test_edit_user_email_page(
+    client_request,
+    active_user_with_permissions,
+    service_one,
+    mocker
+):
+    user = active_user_with_permissions
+    test_user = mocker.patch('app.user_api_client.get_user', return_value=user)
+
+    page = client_request.get(
+        'main.edit_user_email',
+        service_id=service_one['id'],
+        user_id=test_user.id
+    )
+
+    assert page.find('h1').text == "Edit user email"
+    assert page.select('p[id=user_name]')[0].text == "for " + user.name
+    assert page.select('input[type=email]')[0].attrs["value"] == user.email_address

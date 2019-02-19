@@ -9,7 +9,7 @@ from app import (
     user_api_client,
 )
 from app.main import main
-from app.main.forms import InviteUserForm, PermissionsForm, SearchUsersForm
+from app.main.forms import InviteUserForm, PermissionsForm, SearchUsersForm, ChangeEmailForm
 from app.models.user import permissions
 from app.utils import user_has_permissions
 
@@ -119,6 +119,22 @@ def remove_user_from_service(service_id, user_id):
         'views/edit-user-permissions.html',
         user=user,
         form=form
+    )
+
+
+@main.route("/services/<service_id>/users/<user_id>/edit-email", methods=['GET'])
+@login_required
+@user_has_permissions('manage_service')
+def edit_user_email(service_id, user_id):
+    user = user_api_client.get_user(user_id)
+    user_email = user.email_address
+    form = ChangeEmailForm(user_api_client.is_email_already_in_use(user_email), email_address=user_email)
+
+    return render_template(
+        'views/manage-users/edit-user-email.html',
+        user=user,
+        form=form,
+        service_id=service_id
     )
 
 
