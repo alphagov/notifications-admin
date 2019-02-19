@@ -798,6 +798,28 @@ def test_dont_show_preview_letter_templates_for_bad_filetype(
     assert mock_get_service_template.called is False
 
 
+@pytest.mark.parametrize('original_filename, new_filename', [
+    ('geo', 'geo'),
+    ('no-branding', None)
+])
+def test_letter_branding_preview_image(
+    mocker,
+    logged_in_platform_admin_client,
+    original_filename,
+    new_filename,
+):
+    mocked_preview = mocker.patch(
+        'app.main.views.templates.TemplatePreview.from_example_template',
+        return_value='foo'
+    )
+    resp = logged_in_platform_admin_client.get(
+        url_for('.letter_branding_preview_image', filename=original_filename)
+    )
+
+    mocked_preview.assert_called_with(ANY, new_filename)
+    assert resp.get_data(as_text=True) == 'foo'
+
+
 def test_choosing_to_copy_redirects(
     client_request,
     service_one,

@@ -13,9 +13,8 @@
 
   const $paneWrapper = $('<div class="column-full"></div>');
   const $form = $('form');
-  const $previewPane = $('<iframe src="/_email?' +
-                          buildQueryString(['branding_style', branding_style]) +
-                          '" class="email-branding-preview"></iframe>');
+  const previewType = $form.data('previewType');
+  const $previewPane = $(`<iframe src="/_${previewType}?${buildQueryString(['branding_style', branding_style])}" class="branding-preview"></iframe>`);
 
   function buildQueryString () {
     return $.map(arguments, (val, idx) => encodeURI(val[0]) + '=' + encodeURI(val[1])).join('&');
@@ -26,12 +25,12 @@
     if ($target.attr('name') == 'branding_style') {
       branding_style = $target.val();
     }
-    $previewPane.attr('src', '/_email?' + buildQueryString(['branding_style', branding_style]));
+    $previewPane.attr('src', `/_${previewType}?${buildQueryString(['branding_style', branding_style])}`);
   }
 
   $paneWrapper.append($previewPane);
   $form.find('.grid-row').eq(0).prepend($paneWrapper);
-  $form.attr('action', location.pathname.replace(/set-email-branding$/, 'preview-email-branding'));
+  $form.attr('action', location.pathname.replace(new RegExp(`set-${previewType}-branding$`), `preview-${previewType}-branding`));
   $form.find('button[type="submit"]').text('Save');
 
   $('fieldset').on('change', 'input[name="branding_style"]', setPreviewPane);

@@ -2175,7 +2175,44 @@ def test_service_set_letter_branding_prepopulates(
     (str(UUID(int=1)), str(UUID(int=1))),
     ('__NONE__', None),
 ])
-def test_service_set_letter_branding_saves(
+def test_service_set_letter_branding_redirects_to_preview_page_when_form_submitted(
+    logged_in_platform_admin_client,
+    service_one,
+    mock_get_all_letter_branding,
+    selected_letter_branding,
+    expected_post_data
+):
+    response = logged_in_platform_admin_client.post(
+        url_for('main.service_set_letter_branding', service_id=service_one['id']),
+        data={'branding_style': selected_letter_branding},
+    )
+    assert response.status_code == 302
+    assert response.location == url_for(
+        'main.service_preview_letter_branding',
+        service_id=service_one['id'],
+        branding_style=expected_post_data,
+        _external=True)
+
+
+def test_service_preview_letter_branding_shows_preview_letter(
+    logged_in_platform_admin_client,
+    service_one,
+    mock_get_all_letter_branding,
+):
+    response = logged_in_platform_admin_client.get(
+        url_for('main.service_preview_letter_branding', service_id=service_one['id'], branding_style='hm-government')
+    )
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    assert response.status_code == 200
+    assert page.find('iframe')['src'] == url_for('main.letter_template', branding_style='hm-government')
+
+
+@pytest.mark.parametrize('selected_letter_branding, expected_post_data', [
+    (str(UUID(int=1)), str(UUID(int=1))),
+    ('__NONE__', None),
+])
+def test_service_preview_letter_branding_saves(
     logged_in_platform_admin_client,
     service_one,
     mock_update_service,
@@ -2184,7 +2221,7 @@ def test_service_set_letter_branding_saves(
     expected_post_data
 ):
     response = logged_in_platform_admin_client.post(
-        url_for('main.service_set_letter_branding', service_id=service_one['id']),
+        url_for('main.service_preview_letter_branding', service_id=service_one['id']),
         data={'branding_style': selected_letter_branding}
     )
     assert response.status_code == 302
@@ -2276,7 +2313,7 @@ def test_should_preview_email_branding(
     ))
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    iframe = page.find('iframe', attrs={"class": "email-branding-preview"})
+    iframe = page.find('iframe', attrs={"class": "branding-preview"})
     iframeURLComponents = urlparse(iframe['src'])
     iframeQString = parse_qs(iframeURLComponents.query)
 
