@@ -1,5 +1,6 @@
 from collections import defaultdict
 
+from app.extensions import redis_client
 from app.notify_client import NotifyAdminAPIClient, _attach_current_user, cache
 
 
@@ -96,8 +97,7 @@ class JobApiClient(NotifyAdminAPIClient):
         return bool(self.get_jobs(service_id)['data'])
 
     def create_job(self, job_id, service_id, scheduled_for=None):
-
-        self.redis_client.set(
+        redis_client.set(
             'has_jobs-{}'.format(service_id),
             b'true',
             ex=cache.TTL,

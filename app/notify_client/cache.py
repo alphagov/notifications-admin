@@ -4,6 +4,8 @@ from datetime import timedelta
 from functools import wraps
 from inspect import signature
 
+from app.extensions import redis_client
+
 TTL = int(timedelta(days=7).total_seconds())
 
 
@@ -38,11 +40,11 @@ def set(key_format):
         @wraps(client_method)
         def new_client_method(client_instance, *args, **kwargs):
             redis_key = _make_key(key_format, client_method, args, kwargs)
-            cached = client_instance.redis_client.get(redis_key)
+            cached = redis_client.get(redis_key)
             if cached:
                 return json.loads(cached.decode('utf-8'))
             api_response = client_method(client_instance, *args, **kwargs)
-            client_instance.redis_client.set(
+            redis_client.set(
                 redis_key,
                 json.dumps(api_response),
                 ex=TTL,
@@ -60,7 +62,7 @@ def delete(key_format):
         @wraps(client_method)
         def new_client_method(client_instance, *args, **kwargs):
             redis_key = _make_key(key_format, client_method, args, kwargs)
-            client_instance.redis_client.delete(redis_key)
+            redis_client.delete(redis_key)
             return client_method(client_instance, *args, **kwargs)
 
         return new_client_method

@@ -10,7 +10,7 @@ def test_client_creates_job_data_correctly(mocker, fake_uuid):
     job_id = fake_uuid
     service_id = fake_uuid
     mocker.patch('app.notify_client.current_user', id='1')
-    mock_redis_set = mocker.patch('app.notify_client.RedisClient.set')
+    mock_redis_set = mocker.patch('app.extensions.RedisClient.set')
 
     expected_data = {
         "id": job_id,
@@ -330,7 +330,7 @@ def test_has_jobs_sets_cache(
         'app.notify_client.job_api_client.JobApiClient.get',
         return_value={'data': job_data}
     )
-    mock_redis_set = mocker.patch('app.notify_client.RedisClient.set')
+    mock_redis_set = mocker.patch('app.extensions.RedisClient.set')
 
     JobApiClient().has_jobs(fake_uuid)
 
@@ -359,7 +359,7 @@ def test_has_jobs_returns_from_cache(
         'app.notify_client.job_api_client.JobApiClient.get'
     )
     mock_redis_get = mocker.patch(
-        'app.notify_client.RedisClient.get',
+        'app.extensions.RedisClient.get',
         return_value=cache_value,
     )
 

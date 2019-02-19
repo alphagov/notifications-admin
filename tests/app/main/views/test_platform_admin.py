@@ -2,7 +2,7 @@ import datetime
 import re
 import uuid
 from functools import partial
-from unittest.mock import ANY
+from unittest.mock import ANY, call
 
 import pytest
 import requests_mock
@@ -858,3 +858,42 @@ def test_letter_validation_preview_doesnt_call_template_preview_when_file_doesnt
 
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert page.find('div', class_='banner-dangerous').text.strip() == "Document didn't pass the virus scan"
+
+
+def test_clear_cache_shows_form(client_request, platform_admin_user, mocker):
+    redis = mocker.patch('app.main.views.platform_admin.redis_client')
+    client_request.login(platform_admin_user)
+
+    page = client_request.get('main.clear_cache')
+
+    assert page.select('input[type=radio]')[0]['value'] == 'user'
+    assert page.select('input[type=radio]')[1]['value'] == 'service'
+    assert page.select('input[type=radio]')[2]['value'] == 'template'
+    assert not redis.delete_cache_keys_by_pattern.called
+
+
+def test_clear_cache_submits_and_tells_you_how_many_things_were_deleted(client_request, platform_admin_user, mocker):
+    redis = mocker.patch('app.main.views.platform_admin.redis_client')
+    redis.delete_cache_keys_by_pattern.side_effect = [0, 3, 1]
+    client_request.login(platform_admin_user)
+
+    page = client_request.post('main.clear_cache', _data={'model_type': 'template'}, _expected_status=200)
+
+    assert redis.delete_cache_keys_by_pattern.call_args_list == [
+        call('service-????????-????-????-????-????????????-templates'),
+        call('template-????????-????-????-????-????????????-version-*'),
+        call('template-????????-????-????-????-????????????-versions'),
+    ]
+
+    flash_banner = page.find('div', class_='banner-default')
+    assert flash_banner.text.strip() == 'Removed 3 template objects from redis'
+
+
+def test_clear_cache_requires_option(client_request, platform_admin_user, mocker):
+    redis = mocker.patch('app.main.views.platform_admin.redis_client')
+    client_request.login(platform_admin_user)
+
+    page = client_request.post('main.clear_cache', _data={}, _expected_status=200)
+
+    assert normalize_spaces(page.find('span', class_='error-message').text) == 'Not a valid choice'
+    assert not redis.delete_cache_keys_by_pattern.called

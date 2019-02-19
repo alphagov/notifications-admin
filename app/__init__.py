@@ -25,9 +25,6 @@ from functools import partial
 
 from notifications_python_client.errors import HTTPError
 from notifications_utils import logging, request_helper, formatters
-from notifications_utils.clients.antivirus.antivirus_client import AntivirusClient
-from notifications_utils.clients.zendesk.zendesk_client import ZendeskClient
-from notifications_utils.clients.statsd.statsd_client import StatsdClient
 from notifications_utils.recipients import (
     validate_phone_number,
     InvalidPhoneError,
@@ -42,6 +39,12 @@ from werkzeug.local import LocalProxy
 from app import proxy_fix
 from app.config import configs
 from app.asset_fingerprinter import asset_fingerprinter
+from app.extensions import (
+    antivirus_client,
+    statsd_client,
+    zendesk_client,
+    redis_client,
+)
 from app.models.service import Service
 from app.models.user import AnonymousUser
 from app.navigation import (
@@ -75,9 +78,6 @@ from app.utils import get_logo_cdn_domain, id_safe
 
 login_manager = LoginManager()
 csrf = CSRFProtect()
-antivirus_client = AntivirusClient()
-statsd_client = StatsdClient()
-zendesk_client = ZendeskClient()
 
 
 # The current service attached to the request stack.
@@ -116,8 +116,7 @@ def create_app(application):
         proxy_fix,
         request_helper,
 
-        # Internal API clients
-        antivirus_client,
+        # API clients
         api_key_api_client,
         billing_api_client,
         complaint_api_client,
@@ -140,8 +139,10 @@ def create_app(application):
         user_api_client,
 
         # External API clients
+        antivirus_client,
         statsd_client,
         zendesk_client,
+        redis_client
 
     ):
         client.init_app(application)
@@ -152,6 +153,9 @@ def create_app(application):
     login_manager.login_message_category = 'default'
     login_manager.session_protection = None
     login_manager.anonymous_user = AnonymousUser
+
+    # make sure we handle unicode correctly
+    redis_client.redis_store.decode_responses = True
 
     from app.main import main as main_blueprint
     application.register_blueprint(main_blueprint)

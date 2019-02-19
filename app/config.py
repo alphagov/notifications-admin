@@ -97,6 +97,8 @@ class Development(Config):
 
     ASSET_PATH = '/static/'
 
+    REDIS_URL = 'redis://localhost:6379/0'
+
 
 class Test(Development):
     DEBUG = True

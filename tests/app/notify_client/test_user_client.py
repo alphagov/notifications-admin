@@ -210,7 +210,7 @@ def test_returns_value_from_cache(
 ):
 
     mock_redis_get = mocker.patch(
-        'app.notify_client.RedisClient.get',
+        'app.extensions.RedisClient.get',
         return_value=cache_value,
     )
     mock_api_get = mocker.patch(
@@ -218,7 +218,7 @@ def test_returns_value_from_cache(
         return_value={'data': 'from api'},
     )
     mock_redis_set = mocker.patch(
-        'app.notify_client.RedisClient.set',
+        'app.extensions.RedisClient.set',
     )
     mock_model = mocker.patch(
         'app.models.user.User.__init__',
@@ -262,7 +262,7 @@ def test_deletes_user_cache(
     extra_kwargs,
 ):
     mocker.patch('app.notify_client.current_user', id='1')
-    mock_redis_delete = mocker.patch('app.notify_client.RedisClient.delete')
+    mock_redis_delete = mocker.patch('app.extensions.RedisClient.delete')
     mock_request = mocker.patch('notifications_python_client.base.BaseAPIClient.request')
 
     getattr(client, method)(*extra_args, **extra_kwargs)

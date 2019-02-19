@@ -9,11 +9,11 @@ def test_get_email_branding(mocker, fake_uuid):
         return_value={'foo': 'bar'}
     )
     mock_redis_get = mocker.patch(
-        'app.notify_client.RedisClient.get',
+        'app.extensions.RedisClient.get',
         return_value=None,
     )
     mock_redis_set = mocker.patch(
-        'app.notify_client.RedisClient.set',
+        'app.extensions.RedisClient.set',
     )
     EmailBrandingClient().get_email_branding(fake_uuid)
     mock_get.assert_called_once_with(
@@ -33,11 +33,11 @@ def test_get_all_email_branding(mocker):
         return_value={'email_branding': [1, 2, 3]}
     )
     mock_redis_get = mocker.patch(
-        'app.notify_client.RedisClient.get',
+        'app.extensions.RedisClient.get',
         return_value=None,
     )
     mock_redis_set = mocker.patch(
-        'app.notify_client.RedisClient.set',
+        'app.extensions.RedisClient.set',
     )
     EmailBrandingClient().get_all_email_branding()
     mock_get.assert_called_once_with(
@@ -56,7 +56,7 @@ def test_create_email_branding(mocker):
                 'domain': 'sample.com', 'brand_type': 'org'}
 
     mock_post = mocker.patch('app.notify_client.email_branding_client.EmailBrandingClient.post')
-    mock_redis_delete = mocker.patch('app.notify_client.RedisClient.delete')
+    mock_redis_delete = mocker.patch('app.extensions.RedisClient.delete')
     EmailBrandingClient().create_email_branding(
         logo=org_data['logo'], name=org_data['name'], text=org_data['text'], colour=org_data['colour'],
         domain=org_data['domain'], brand_type='org'
@@ -75,7 +75,7 @@ def test_update_email_branding(mocker, fake_uuid):
                 'domain': 'sample.com', 'brand_type': 'org'}
 
     mock_post = mocker.patch('app.notify_client.email_branding_client.EmailBrandingClient.post')
-    mock_redis_delete = mocker.patch('app.notify_client.RedisClient.delete')
+    mock_redis_delete = mocker.patch('app.extensions.RedisClient.delete')
     EmailBrandingClient().update_email_branding(
         branding_id=fake_uuid, logo=org_data['logo'], name=org_data['name'], text=org_data['text'],
         colour=org_data['colour'], domain=org_data['domain'], brand_type='org')
