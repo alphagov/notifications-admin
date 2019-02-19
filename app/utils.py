@@ -440,6 +440,8 @@ class AgreementInfo:
 
     @property
     def as_human_readable(self):
+        if self.canonical_domain and 'dwp' in self.canonical_domain:
+            return 'DWP - Requires OED approval'
         if self.agreement_signed:
             return 'Yes, on behalf of {}'.format(self.owner)
         elif self.owner:

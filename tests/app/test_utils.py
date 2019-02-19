@@ -305,6 +305,18 @@ def test_get_valid_agreement_info_known_details(domain_or_email_address):
     )
 
 
+@pytest.mark.parametrize("domain_or_email_address", (
+    "test@dwp.gov.uk", "test@dwp.gsi.gov.uk",
+))
+def test_dwp_go_live_requests_are_flagged(domain_or_email_address):
+    agreement_info = AgreementInfo(domain_or_email_address)
+    assert agreement_info.owner == "Department for Work and Pensions"
+    assert agreement_info.agreement_signed is True
+    assert agreement_info.as_human_readable == (
+        'DWP - Requires OED approval'
+    )
+
+
 @pytest.mark.parametrize("domain_or_email_address, is_canonical", (
     ("test@dclgdatamart.co.uk", False),
     ("test@communities.gsi.gov.uk", False),
