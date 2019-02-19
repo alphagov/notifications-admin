@@ -1,4 +1,4 @@
-from flask import abort, flash, redirect, render_template, request, url_for
+from flask import abort, flash, redirect, render_template, request, url_for, session
 from flask_login import current_user, login_required
 from notifications_python_client.errors import HTTPError
 
@@ -122,13 +122,21 @@ def remove_user_from_service(service_id, user_id):
     )
 
 
-@main.route("/services/<service_id>/users/<user_id>/edit-email", methods=['GET'])
+@main.route("/services/<service_id>/users/<user_id>/edit-email", methods=['GET', 'POST'])
 @login_required
 @user_has_permissions('manage_service')
 def edit_user_email(service_id, user_id):
     user = user_api_client.get_user(user_id)
     user_email = user.email_address
-    form = ChangeEmailForm(user_api_client.is_email_already_in_use(user_email), email_address=user_email)
+
+    def _is_email_already_in_use(email):
+        return user_api_client.is_email_already_in_use(email)
+
+    form = ChangeEmailForm(_is_email_already_in_use, email_address=user_email)
+    if form.validate_on_submit():
+        session['team_member_email_change'] = form.email_address.data
+
+        return redirect(url_for('.confirm_edit_user_email', user_id=user.id, service_id=service_id))
 
     return render_template(
         'views/manage-users/edit-user-email.html',
@@ -137,6 +145,34 @@ def edit_user_email(service_id, user_id):
         service_id=service_id
     )
 
+
+@main.route("/services/<service_id>/users/<user_id>/edit-email/confirm", methods=['GET', 'POST'])
+@login_required
+@user_has_permissions('manage_service')
+def confirm_edit_user_email(service_id, user_id):
+    user = user_api_client.get_user(user_id)
+    new_email = session['team_member_email_change']
+    if request.method == 'POST':
+        try:
+            user_api_client.update_user_attribute(user_id, email_address=new_email)
+        except HTTPError as e:
+            if e.status_code == 403:
+                flash("You don't have permission to edit users emails for this service", 'info')
+                return redirect(url_for(
+                    '.manage_users',
+                    service_id=service_id))
+            else:
+                abort(500, e)
+
+        return redirect(url_for(
+            '.manage_users',
+            service_id=service_id
+        ))
+    return render_template(
+        'views/manage-users/confirm-edit-user-email.html',
+        user=user,
+        service_id=service_id
+    )
 
 @main.route("/services/<service_id>/cancel-invited-user/<invited_user_id>", methods=['GET'])
 @user_has_permissions('manage_service')

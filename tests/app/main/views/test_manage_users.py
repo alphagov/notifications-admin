@@ -789,3 +789,24 @@ def test_edit_user_email_page(
     assert page.find('h1').text == "Edit user email"
     assert page.select('p[id=user_name]')[0].text == "for " + user.name
     assert page.select('input[type=email]')[0].attrs["value"] == user.email_address
+
+
+def test_edit_user_email_redirects_to_confirmation(
+    logged_in_client,
+    active_user_with_permissions,
+    service_one,
+    mocker,
+    mock_get_user,
+):
+    response = logged_in_client.post(
+        url_for(
+            'main.edit_user_email',
+            service_id=service_one['id'],
+            user_id=active_user_with_permissions.id))
+    assert response.status_code == 302
+    assert response.location == url_for(
+        'main.confirm_edit_user_email',
+        service_id=service_one['id'],
+        user_id=active_user_with_permissions.id,
+        _external=True
+    )
