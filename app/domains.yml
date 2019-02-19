@@ -3955,7 +3955,7 @@ torpointtowncouncil.gov.uk:
 torridge.gov.uk:
   owner: Torridge District Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 totnestowncouncil.gov.uk:
   owner: Totnes Town Council
   crown: false
