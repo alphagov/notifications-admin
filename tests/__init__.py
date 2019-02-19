@@ -186,7 +186,10 @@ def organisation_json(
     users=None,
     active=True,
     created_at=None,
-    services=None
+    services=None,
+    letter_branding_id=None,
+    email_branding_id=None,
+    domains=None,
 ):
     if users is None:
         users = []
@@ -198,7 +201,15 @@ def organisation_json(
         'active': active,
         'users': users,
         'services': services,
-        'created_at': created_at or str(datetime.utcnow())
+        'created_at': created_at or str(datetime.utcnow()),
+        'email_branding_id': email_branding_id,
+        'letter_branding_id': letter_branding_id,
+        'organisation_type': '',
+        'crown': True,
+        'agreement_signed': False,
+        'agreement_signed_at': None,
+        'agreement_signed_by': None,
+        'domains': domains or [],
     }
 
 

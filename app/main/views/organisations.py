@@ -5,6 +5,8 @@ from werkzeug.exceptions import abort
 
 from app import (
     current_organisation,
+    email_branding_client,
+    letter_branding_client,
     org_invite_api_client,
     organisations_client,
     user_api_client,
@@ -14,9 +16,18 @@ from app.main.forms import (
     ConfirmPasswordForm,
     CreateOrUpdateOrganisation,
     InviteOrgUserForm,
+    OrganisationAgreementSignedForm,
+    OrganisationCrownStatusForm,
+    OrganisationDomainsForm,
+    OrganisationOrganisationTypeForm,
+    PreviewBranding,
     RenameOrganisationForm,
+    SearchByNameForm,
     SearchUsersForm,
+    SetEmailBranding,
+    SetLetterBranding,
 )
+from app.main.views.service_settings import get_branding_as_value_and_label
 from app.utils import user_has_permissions, user_is_platform_admin
 
 
@@ -165,8 +176,25 @@ def cancel_invited_org_user(org_id, invited_user_id):
 @login_required
 @user_has_permissions()
 def organisation_settings(org_id):
+
+    email_branding = 'GOV.UK'
+
+    if current_organisation['email_branding_id']:
+        email_branding = email_branding_client.get_email_branding(
+            current_organisation['email_branding_id']
+        )['email_branding']['name']
+
+    letter_branding = None
+
+    if current_organisation['letter_branding_id']:
+        letter_branding = letter_branding_client.get_letter_branding(
+            current_organisation['letter_branding_id']
+        )['name']
+
     return render_template(
         'views/organisations/organisation/settings/index.html',
+        email_branding=email_branding,
+        letter_branding=letter_branding,
     )
 
 
@@ -189,6 +217,212 @@ def edit_organisation_name(org_id):
 
     return render_template(
         'views/organisations/organisation/settings/edit-name/index.html',
+        form=form,
+    )
+
+
+@main.route("/organisations/<org_id>/settings/edit-type", methods=['GET', 'POST'])
+@login_required
+@user_has_permissions()
+@user_is_platform_admin
+def edit_organisation_type(org_id):
+
+    form = OrganisationOrganisationTypeForm(
+        organisation_type=current_organisation['organisation_type']
+    )
+
+    if form.validate_on_submit():
+        organisations_client.update_organisation(
+            current_organisation['id'],
+            organisation_type=form.organisation_type.data,
+        )
+        return redirect(url_for('.organisation_settings', org_id=org_id))
+
+    return render_template(
+        'views/organisations/organisation/settings/edit-type.html',
+        form=form,
+    )
+
+
+@main.route("/organisations/<org_id>/settings/edit-crown-status", methods=['GET', 'POST'])
+@login_required
+@user_has_permissions()
+@user_is_platform_admin
+def edit_organisation_crown_status(org_id):
+
+    form = OrganisationCrownStatusForm(
+        crown_status={
+            True: 'crown',
+            False: 'non-crown',
+            None: 'unknown',
+        }.get(current_organisation['crown'])
+    )
+
+    if form.validate_on_submit():
+        organisations_client.update_organisation(
+            current_organisation['id'],
+            crown={
+                'crown': True,
+                'non-crown': False,
+                'unknown': None,
+            }.get(form.crown_status.data),
+        )
+        return redirect(url_for('.organisation_settings', org_id=org_id))
+
+    return render_template(
+        'views/organisations/organisation/settings/edit-crown-status.html',
+        form=form,
+    )
+
+
+@main.route("/organisations/<org_id>/settings/edit-agreement", methods=['GET', 'POST'])
+@login_required
+@user_has_permissions()
+@user_is_platform_admin
+def edit_organisation_agreement(org_id):
+
+    form = OrganisationAgreementSignedForm(
+        agreement_signed={
+            True: 'yes',
+            False: 'no',
+            None: 'unknown',
+        }.get(current_organisation['agreement_signed'])
+    )
+
+    if form.validate_on_submit():
+        organisations_client.update_organisation(
+            current_organisation['id'],
+            agreement_signed={
+                'yes': True,
+                'no': False,
+                'unknown': None,
+            }.get(form.agreement_signed.data),
+        )
+        return redirect(url_for('.organisation_settings', org_id=org_id))
+
+    return render_template(
+        'views/organisations/organisation/settings/edit-agreement.html',
+        form=form,
+    )
+
+
+@main.route("/organisations/<org_id>/settings/set-email-branding", methods=['GET', 'POST'])
+@login_required
+@user_has_permissions()
+@user_is_platform_admin
+def edit_organisation_email_branding(org_id):
+
+    email_branding = email_branding_client.get_all_email_branding()
+
+    form = SetEmailBranding(
+        all_branding_options=get_branding_as_value_and_label(email_branding),
+        current_branding=current_organisation['email_branding_id'],
+    )
+
+    if form.validate_on_submit():
+        return redirect(url_for(
+            '.organisation_preview_email_branding',
+            org_id=org_id,
+            branding_style=form.branding_style.data,
+        ))
+
+    return render_template(
+        'views/organisations/organisation/settings/set-email-branding.html',
+        form=form,
+        search_form=SearchByNameForm()
+    )
+
+
+@main.route("/organisations/<org_id>/settings/preview-email-branding", methods=['GET', 'POST'])
+@login_required
+@user_has_permissions()
+@user_is_platform_admin
+def organisation_preview_email_branding(org_id):
+
+    branding_style = request.args.get('branding_style', None)
+
+    form = PreviewBranding(branding_style=branding_style)
+
+    if form.validate_on_submit():
+        organisations_client.update_organisation(
+            org_id,
+            email_branding_id=form.branding_style.data
+        )
+        return redirect(url_for('.organisation_settings', org_id=org_id))
+
+    return render_template(
+        'views/organisations/organisation/settings/preview-email-branding.html',
+        form=form,
+        action=url_for('main.organisation_preview_email_branding', org_id=org_id),
+    )
+
+
+@main.route("/organisations/<org_id>/settings/set-letter-branding", methods=['GET', 'POST'])
+@login_required
+@user_is_platform_admin
+def edit_organisation_letter_branding(org_id):
+    letter_branding = letter_branding_client.get_all_letter_branding()
+
+    form = SetLetterBranding(
+        all_branding_options=get_branding_as_value_and_label(letter_branding),
+        current_branding=current_organisation['letter_branding_id'],
+    )
+
+    if form.validate_on_submit():
+        return redirect(url_for(
+            '.organisation_preview_letter_branding',
+            org_id=org_id,
+            branding_style=form.branding_style.data,
+        ))
+
+    return render_template(
+        'views/organisations/organisation/settings/set-letter-branding.html',
+        form=form,
+        search_form=SearchByNameForm()
+    )
+
+
+@main.route("/organisations/<org_id>/settings/preview-letter-branding", methods=['GET', 'POST'])
+@login_required
+@user_is_platform_admin
+def organisation_preview_letter_branding(org_id):
+    branding_style = request.args.get('branding_style')
+
+    form = PreviewBranding(branding_style=branding_style)
+
+    if form.validate_on_submit():
+        organisations_client.update_organisation(
+            org_id,
+            letter_branding_id=form.branding_style.data
+        )
+        return redirect(url_for('.organisation_settings', org_id=org_id))
+
+    return render_template(
+        'views/organisations/organisation/settings/preview-letter-branding.html',
+        form=form,
+        action=url_for('main.organisation_preview_letter_branding', org_id=org_id),
+    )
+
+
+@main.route("/organisations/<org_id>/settings/edit-organisation-domains", methods=['GET', 'POST'])
+@login_required
+@user_has_permissions()
+@user_is_platform_admin
+def edit_organisation_domains(org_id):
+
+    form = OrganisationDomainsForm()
+
+    if form.validate_on_submit():
+        organisations_client.update_organisation(
+            org_id,
+            domains=list(filter(None, form.domains.data)),
+        )
+        return redirect(url_for('.organisation_settings', org_id=org_id))
+
+    form.populate(current_organisation.get('domains', []))
+
+    return render_template(
+        'views/organisations/organisation/settings/edit-domains.html',
         form=form,
     )
 

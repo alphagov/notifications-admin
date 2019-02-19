@@ -1,5 +1,5 @@
 {% extends "org_template.html" %}
-{% from "components/table.html" import mapping_table, row, text_field, edit_field with context %}
+{% from "components/table.html" import mapping_table, optional_text_field, row, text_field, edit_field with context %}
 
 {% block org_page_title %}
   Organisation settings
@@ -24,4 +24,92 @@
         }}
       {% endcall %}
     {% endcall %}
+  </div>
+
+
+  {% if current_user.platform_admin %}
+    <h2 class="heading-medium">Platform admin settings</h2>
+    <div class="bottom-gutter-3-2 dashboard-table body-copy-table">
+      {% call mapping_table(
+        caption='Platform admin settings',
+        field_headings=['Label', 'Value', 'Action'],
+        field_headings_visible=False,
+        caption_visible=False
+      ) %}
+        {% call row() %}
+          {{ text_field('Organisation type') }}
+          {{ optional_text_field({
+            'central': 'Central government',
+            'local': 'Local government',
+            'nhs': 'NHS',
+          }.get(current_org.organisation_type)) }}
+          {{ edit_field(
+              'Change',
+              url_for('.edit_organisation_type', org_id=current_org.id)
+            )
+          }}
+        {% endcall %}
+        {% call row() %}
+          {{ text_field('Crown organisation') }}
+          {{ optional_text_field(
+              {
+                True: 'Yes',
+                False: 'No',
+              }.get(current_org.crown),
+              default='Not sure'
+          ) }}
+          {{ edit_field(
+              'Change',
+              url_for('.edit_organisation_crown_status', org_id=current_org.id)
+            )
+          }}
+        {% endcall %}
+        {% call row() %}
+          {{ text_field('Data sharing and financial agreement') }}
+          {{ text_field(
+            {
+              True: 'Signed',
+              False: 'Not signed',
+              None: 'Not signed (but we have some service-specific agreements in place)'
+            }.get(current_org.agreement_signed)
+          ) }}
+          {{ edit_field(
+              'Change',
+              url_for('.edit_organisation_agreement', org_id=current_org.id)
+            )
+          }}
+        {% endcall %}
+        {% call row() %}
+          {{ text_field('Default email branding') }}
+          {{ text_field(email_branding) }}
+          {{ edit_field(
+              'Change',
+              url_for('.edit_organisation_email_branding', org_id=current_org.id)
+            )
+          }}
+        {% endcall %}
+        {% call row() %}
+          {{ text_field('Default letter branding') }}
+          {{ optional_text_field(
+            letter_branding,
+            default='No branding'
+          ) }}
+          {{ edit_field(
+              'Change',
+              url_for('.edit_organisation_letter_branding', org_id=current_org.id)
+            )
+          }}
+        {% endcall %}
+        {% call row() %}
+          {{ text_field('Known email domains') }}
+          {{ optional_text_field(current_org.domains or None, default='None') }}
+          {{ edit_field(
+              'Change',
+              url_for('.edit_organisation_domains', org_id=current_org.id)
+            )
+          }}
+        {% endcall %}
+      {% endcall %}
+    </div>
+  {% endif %}
 {% endblock %}

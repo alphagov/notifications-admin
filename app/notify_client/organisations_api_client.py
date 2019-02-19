@@ -15,11 +15,11 @@ class OrganisationsClient(NotifyAdminAPIClient):
         }
         return self.post(url="/organisations", data=data)
 
+    def update_organisation(self, org_id, **kwargs):
+        return self.post(url="/organisations/{}".format(org_id), data=kwargs)
+
     def update_organisation_name(self, org_id, name):
-        data = {
-            "name": name
-        }
-        return self.post(url="/organisations/{}".format(org_id), data=data)
+        return self.update_organisation(org_id, name=name)
 
     def get_service_organisation(self, service_id):
         return self.get(url="/service/{}/organisation".format(service_id))

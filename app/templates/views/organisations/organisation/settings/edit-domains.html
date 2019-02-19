@@ -1,0 +1,31 @@
+{% from "components/radios.html" import radios %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/list-entry.html" import list_entry %}
+{% from "components/form.html" import form_wrapper %}
+
+{% extends "org_template.html" %}
+
+{% block org_page_title %}
+  Known email domains
+{% endblock %}
+
+{% block maincolumn_content %}
+  <h1 class="heading-large">Known email domains</h1>
+  <div class="grid-row">
+    <div class="column-five-sixths">
+      <p>
+        If a user’s email addresses ends with one of these domains then
+        any services they create will be associated with this organisation.
+      </p>
+      {% call form_wrapper() %}
+        {{ list_entry(
+          form.domains,
+          item_name='domain',
+          autocomplete=False,
+          hint='For example cabinet-office.gov.uk'
+        ) }}
+        {{ page_footer('Save') }}
+      {% endcall %}
+    </div>
+  </div>
+{% endblock %}
