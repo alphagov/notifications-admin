@@ -1286,10 +1286,5 @@ class TemplateAndFoldersSelectionForm(Form):
 class ClearCacheForm(StripWhitespaceForm):
     model_type = RadioField(
         'What do you want to clear today',
-        choices=[
-            ('user', 'Users'),
-            ('service', 'Services'),
-            ('template', 'Templates')
-        ],
         validators=[DataRequired()]
     )
