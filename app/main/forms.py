@@ -1233,10 +1233,10 @@ class TemplateAndFoldersSelectionForm(Form):
         ]
 
         self.add_template_by_template_type.choices = list(filter(None, [
-            ('email', 'Email template'),
-            ('sms', 'Text message template'),
-            ('letter', 'Letter template') if allow_adding_letter_template else None,
-            ('copy-existing', 'Copy of an existing template') if allow_adding_copy_of_template else None,
+            ('email', 'Email'),
+            ('sms', 'Text message'),
+            ('letter', 'Letter') if allow_adding_letter_template else None,
+            ('copy-existing', 'Copy an existing template') if allow_adding_copy_of_template else None,
         ]))
 
     def is_selected(self, template_folder_id):
@@ -1277,7 +1277,7 @@ class TemplateAndFoldersSelectionForm(Form):
     add_new_folder_name = StringField('Folder name', validators=[required_for_ops('add-new-folder')])
     move_to_new_folder_name = StringField('Folder name', validators=[required_for_ops('move-to-new-folder')])
 
-    add_template_by_template_type = RadioFieldWithRequiredMessage('Add new', validators=[
+    add_template_by_template_type = RadioFieldWithRequiredMessage('New template', validators=[
         required_for_ops('add-new-template'),
         Optional(),
     ], required_message='Select the type of template you want to add')
