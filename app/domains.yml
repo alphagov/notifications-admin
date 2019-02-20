@@ -2804,7 +2804,7 @@ northsomerset.gov.uk:
 northtyneside.gov.uk:
   owner: North Tyneside Metropolitan Borough Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 northumberland.gov.uk:
   owner: Northumberland County Council
   crown: false
