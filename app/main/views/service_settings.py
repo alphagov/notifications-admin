@@ -848,7 +848,7 @@ def service_preview_letter_branding(service_id):
 
 @main.route("/services/<service_id>/service-settings/request-letter-branding", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions('manage_service')
+@user_has_permissions('manage_service', 'manage_templates')
 def request_letter_branding(service_id):
     return render_template(
         'views/service-settings/request-letter-branding.html',
