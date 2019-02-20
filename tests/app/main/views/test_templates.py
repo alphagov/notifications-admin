@@ -44,7 +44,6 @@ from tests.conftest import single_letter_contact_block
 def test_should_show_empty_page_when_no_templates(
     client_request,
     service_one,
-    mock_get_organisations_and_services_for_user,
     mock_get_service_templates_when_no_templates_exist,
     mock_get_template_folders,
 ):
@@ -67,7 +66,6 @@ def test_should_show_empty_page_when_no_templates(
 def test_should_show_add_template_form_if_service_has_folder_permission(
     client_request,
     service_one,
-    mock_get_organisations_and_services_for_user,
     mock_get_service_templates_when_no_templates_exist,
     mock_get_template_folders,
 ):
@@ -154,7 +152,6 @@ def test_should_show_add_template_form_if_service_has_folder_permission(
 )
 def test_should_show_page_for_choosing_a_template(
     client_request,
-    mock_get_organisations_and_services_for_user,
     mock_get_service_templates,
     mock_get_template_folders,
     mock_has_no_jobs,
@@ -309,7 +306,6 @@ def test_should_show_live_search_if_service_has_lots_of_folders(
 def test_should_show_new_template_choices_if_service_has_folder_permission(
     client_request,
     service_one,
-    mock_get_organisations_and_services_for_user,
     mock_get_service_templates,
     mock_get_template_folders,
     extra_permissions,
@@ -825,7 +821,6 @@ def test_choosing_to_copy_redirects(
     service_one,
     mock_get_service_templates,
     mock_get_template_folders,
-    mock_get_organisations_and_services_for_user,
 ):
     client_request.post(
         'main.choose_template',
@@ -1249,7 +1244,6 @@ def test_should_not_allow_creation_of_template_through_form_without_correct_perm
     service_one,
     mock_get_service_templates,
     mock_get_template_folders,
-    mock_get_organisations_and_services_for_user,
     endpoint,
     data,
     expected_error,

@@ -119,8 +119,7 @@ def choose_template(service_id, template_type='all', template_folder_id=None):
         template_type=template_type,
         allow_adding_letter_template=current_service.has_permission('letter'),
         allow_adding_copy_of_template=(
-            current_service.all_templates or
-            len(user_api_client.get_service_ids_for_user(current_user)) > 1
+            current_service.all_templates or len(current_user.services) > 1
         ),
     )
     option_hints = {template_folder_id: 'current folder'}
