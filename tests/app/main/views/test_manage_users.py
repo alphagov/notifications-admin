@@ -39,7 +39,7 @@ from tests.conftest import service_one as create_sample_service
             'Can’t Add and edit templates '
             'Can’t Manage settings, team and usage '
             'Can’t Manage API integration '
-            'Edit permissions Edit user email'
+            'Edit team member'
         )
     ),
     (
@@ -786,9 +786,10 @@ def test_edit_user_email_page(
         user_id=test_user.id
     )
 
-    assert page.find('h1').text == "Edit user email address"
-    assert page.select('p[id=user_name]')[0].text == "for " + user.name
+    assert page.find('h1').text == "Change team member’s email address"
+    assert page.select('p[id=user_name]')[0].text == "This will change the email address for {}.".format(user.name)
     assert page.select('input[type=email]')[0].attrs["value"] == user.email_address
+    assert page.select('button[type=submit]')[0].text == "Save"
 
 
 def test_edit_user_email_redirects_to_confirmation(
@@ -828,10 +829,13 @@ def test_confirm_edit_user_email_page(
         user_id=active_user_with_permissions.id
     ))
 
-    assert 'Confirm changes to user email' in response.get_data(as_text=True)
-    assert 'Email address for {} will be changed from "{}" to "{}".'.format(
-        active_user_with_permissions.name, active_user_with_permissions.email_address, new_email
-    ) in response.get_data(as_text=True)
+    assert 'Confirm change of email address' in response.get_data(as_text=True)
+    for text in [
+        'New email address:',
+        new_email,
+        'We will send {} an email to tell them about the change.'.format(active_user_with_permissions.name)
+    ]:
+        assert text in response.get_data(as_text=True)
     assert 'Confirm' in response.get_data(as_text=True)
     assert response.status_code == 200
 

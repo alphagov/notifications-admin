@@ -63,9 +63,7 @@
               {% if user.status == 'pending' %}
                 <a href="{{ url_for('.cancel_invited_user', service_id=current_service.id, invited_user_id=user.id)}}">Cancel invitation</a>
               {% elif user.state == 'active' and current_user.id != user.id %}
-                <a href="{{ url_for('.edit_user_permissions', service_id=current_service.id, user_id=user.id)}}">Edit permissions</a>
-                <br>
-                <a href="{{ url_for('.edit_user_email', service_id=current_service.id, user_id=user.id)}}">Edit user email</a>
+                <a href="{{ url_for('.edit_user_permissions', service_id=current_service.id, user_id=user.id)}}">Edit team member</a>
               {% endif %}
             </li>
           {% endif %}

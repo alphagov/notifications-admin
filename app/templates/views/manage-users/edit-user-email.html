@@ -1,24 +1,24 @@
-{% extends "org_template.html" %}
+{% extends "withnav_template.html" %}
 {% from "components/textbox.html" import textbox %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 
 {% block per_page_title %}
-  Edit user email address
+  Change team member’s email address
 {% endblock %}
 
 {% block maincolumn_content %}
 
-  <h1 class="heading-large">Edit user email address</h1>
-  <p id="user_name">for {{ user.name }}</p>
+  <h1 class="heading-large">Change team member’s email address</h1>
+  <p id="user_name">This will change the email address for {{ user.name }}.</p>
   <div class="grid-row">
     <div class="column-three-quarters">
       {% call form_wrapper() %}
         {{ textbox(form.email_address) }}
         {{ page_footer(
           'Save',
-          back_link=url_for('.manage_users', service_id=service_id),
-          back_link_text="Back to team members"
+          back_link=url_for('.edit_user_permissions', service_id=service_id, user_id=user.id),
+          back_link_text="Back"
         ) }}
       {% endcall %}
     </div>

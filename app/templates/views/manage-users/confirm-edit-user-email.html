@@ -1,20 +1,23 @@
-{% extends "org_template.html" %}
+{% extends "withnav_template.html" %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 
 {% block per_page_title %}
-  Confirm changes to user email
+  Confirm change of email address
 {% endblock %}
 
 {% block maincolumn_content %}
 
-<h1 class="heading-large">Confirm changes to user email</h1>
+<h1 class="heading-large">Confirm change of email address</h1>
 
 <div class="grid-row">
-  <div class="column-three-quarters">
-
+  <div class="column-whole">
   {% call form_wrapper() %}
-    <p> Email address for {{ user.name }} will be changed from "{{ user.email_address }}" to "{{ new_email }}".</p>
+    <p>New email address:</p>
+    <div class="panel panel-border-wide bottom-gutter">
+      <p>{{ new_email }}</p>
+    </div>
+    <p>We will send {{ user.name }} an email to tell them about the change.</p>
     {{ page_footer(
       'Confirm',
       destructive=destructive,
