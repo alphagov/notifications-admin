@@ -290,9 +290,9 @@ def test_should_show_live_search_if_service_has_lots_of_folders(
         'sms',
         'copy-existing',
     ], [
-        'Email template',
-        'Text message template',
-        'Copy of an existing template',
+        'Email',
+        'Text message',
+        'Copy an existing template',
     ]),
     pytest.param(['letter'], [
         'email',
@@ -300,10 +300,10 @@ def test_should_show_live_search_if_service_has_lots_of_folders(
         'letter',
         'copy-existing',
     ], [
-        'Email template',
-        'Text message template',
-        'Letter template',
-        'Copy of an existing template',
+        'Email',
+        'Text message',
+        'Letter',
+        'Copy an existing template',
     ]),
 ))
 def test_should_show_new_template_choices_if_service_has_folder_permission(
@@ -327,7 +327,7 @@ def test_should_show_new_template_choices_if_service_has_folder_permission(
         raise ElementNotFound()
 
     assert normalize_spaces(page.select_one('#add_new_template_form fieldset legend').text) == (
-        'Add new'
+        'New template'
     )
     assert [
         choice['value'] for choice in page.select('#add_new_template_form input[type=radio]')

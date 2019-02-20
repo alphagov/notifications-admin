@@ -197,7 +197,7 @@
       <div id="items_selected">
         <div class="js-stick-at-bottom-when-scrolling">
           <button class="button-secondary" value="move-to-existing-folder">Move</button>
-          <button class="button-secondary" value="move-to-new-folder">Add to a new folder</button>
+          <button class="button-secondary" value="move-to-new-folder">Add to new folder</button>
           <div class="template-list-selected-counter">
             <span class="template-list-selected-counter-count">1</span> selected
           </div>
