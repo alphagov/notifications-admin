@@ -4259,7 +4259,7 @@ wiltontowncouncil.gov.uk:
 wiltshire.gov.uk:
   owner: The Wiltshire Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 wimborne.gov.uk:
   owner: Wimborne Minster Town Council
   crown: false
