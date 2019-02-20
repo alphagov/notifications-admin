@@ -39,7 +39,7 @@ from tests.conftest import service_one as create_sample_service
             'Can’t Add and edit templates '
             'Can’t Manage settings, team and usage '
             'Can’t Manage API integration '
-            'Edit permissions'
+            'Edit permissions Edit user email'
         )
     ),
     (
@@ -786,7 +786,7 @@ def test_edit_user_email_page(
         user_id=test_user.id
     )
 
-    assert page.find('h1').text == "Edit user email"
+    assert page.find('h1').text == "Edit user email address"
     assert page.select('p[id=user_name]')[0].text == "for " + user.name
     assert page.select('input[type=email]')[0].attrs["value"] == user.email_address
 
@@ -810,3 +810,49 @@ def test_edit_user_email_redirects_to_confirmation(
         user_id=active_user_with_permissions.id,
         _external=True
     )
+
+
+def test_confirm_edit_user_email_page(
+    logged_in_client,
+    active_user_with_permissions,
+    service_one,
+    mocker,
+    mock_get_user,
+):
+    new_email = 'new_email@gov.uk'
+    with logged_in_client.session_transaction() as session:
+        session['team_member_email_change'] = new_email
+    response = logged_in_client.get(url_for(
+        'main.confirm_edit_user_email',
+        service_id=service_one['id'],
+        user_id=active_user_with_permissions.id
+    ))
+
+    assert 'Confirm changes to user email' in response.get_data(as_text=True)
+    assert 'Email address for {} will be changed from "{}" to "{}".'.format(
+        active_user_with_permissions.name, active_user_with_permissions.email_address, new_email
+    ) in response.get_data(as_text=True)
+    assert 'Confirm' in response.get_data(as_text=True)
+    assert response.status_code == 200
+
+
+def test_confirm_edit_user_email_changes_user_email(
+    logged_in_client,
+    active_user_with_permissions,
+    service_one,
+    mocker,
+    mock_get_user,
+    mock_update_user_attribute
+):
+    new_email = 'new_email@gov.uk'
+    with logged_in_client.session_transaction() as session:
+        session['team_member_email_change'] = new_email
+    response = logged_in_client.post(
+        url_for(
+            'main.confirm_edit_user_email',
+            service_id=service_one['id'],
+            user_id=active_user_with_permissions.id))
+    assert response.status_code == 302
+    assert response.location == url_for(
+        'main.manage_users', service_id=service_one['id'], _external=True)
+    mock_update_user_attribute.assert_called_once_with(active_user_with_permissions.id, email_address=new_email)

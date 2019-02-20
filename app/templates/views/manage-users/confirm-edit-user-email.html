@@ -1,0 +1,27 @@
+{% extends "org_template.html" %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+
+{% block per_page_title %}
+  Confirm changes to user email
+{% endblock %}
+
+{% block maincolumn_content %}
+
+<h1 class="heading-large">Confirm changes to user email</h1>
+
+<div class="grid-row">
+  <div class="column-three-quarters">
+
+  {% call form_wrapper() %}
+    <p> Email address for {{ user.name }} will be changed from "{{ user.email_address }}" to "{{ new_email }}".</p>
+    {{ page_footer(
+      'Confirm',
+      destructive=destructive,
+      back_link=url_for('.edit_user_email', service_id=service_id, user_id=user.id)
+    ) }}
+  {% endcall %}
+  </div>
+</div>
+
+{% endblock %}

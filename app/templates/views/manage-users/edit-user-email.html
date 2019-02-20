@@ -1,15 +1,15 @@
-{% extends "withoutnav_template.html" %}
+{% extends "org_template.html" %}
 {% from "components/textbox.html" import textbox %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 
 {% block per_page_title %}
-  Edit user email
+  Edit user email address
 {% endblock %}
 
 {% block maincolumn_content %}
 
-  <h1 class="heading-large">Edit user email</h1>
+  <h1 class="heading-large">Edit user email address</h1>
   <p id="user_name">for {{ user.name }}</p>
   <div class="grid-row">
     <div class="column-three-quarters">

@@ -1,4 +1,12 @@
-from flask import abort, flash, redirect, render_template, request, url_for, session
+from flask import (
+    abort,
+    flash,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
 from flask_login import current_user, login_required
 from notifications_python_client.errors import HTTPError
 
@@ -9,7 +17,12 @@ from app import (
     user_api_client,
 )
 from app.main import main
-from app.main.forms import InviteUserForm, PermissionsForm, SearchUsersForm, ChangeEmailForm
+from app.main.forms import (
+    ChangeEmailForm,
+    InviteUserForm,
+    PermissionsForm,
+    SearchUsersForm,
+)
 from app.models.user import permissions
 from app.utils import user_has_permissions
 
@@ -171,8 +184,10 @@ def confirm_edit_user_email(service_id, user_id):
     return render_template(
         'views/manage-users/confirm-edit-user-email.html',
         user=user,
-        service_id=service_id
+        service_id=service_id,
+        new_email=new_email
     )
+
 
 @main.route("/services/<service_id>/cancel-invited-user/<invited_user_id>", methods=['GET'])
 @user_has_permissions('manage_service')
