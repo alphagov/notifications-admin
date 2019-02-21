@@ -558,7 +558,7 @@ def add_service_template(service_id, template_type, template_folder_id=None):
             'views/edit-{}-template.html'.format(template_type),
             form=form,
             template_type=template_type,
-            heading_action='Add',
+            heading_action='New',
         )
 
 
