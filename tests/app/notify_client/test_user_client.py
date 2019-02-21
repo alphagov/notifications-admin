@@ -141,7 +141,7 @@ def test_client_converts_admin_permissions_to_db_permissions_on_edit(app_, mocke
 
     user_api_client.set_user_permissions('user_id', 'service_id', permissions={'send_messages', 'view_activity'})
 
-    assert sorted(mock_post.call_args[1]['data'], key=lambda x: x['permission']) == sorted([
+    assert sorted(mock_post.call_args[1]['data']['permissions'], key=lambda x: x['permission']) == sorted([
         {'permission': 'send_texts'},
         {'permission': 'send_emails'},
         {'permission': 'send_letters'},

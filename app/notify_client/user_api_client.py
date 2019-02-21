@@ -164,7 +164,10 @@ class UserApiClient(NotifyAdminAPIClient):
     @cache.delete('user-{user_id}')
     def set_user_permissions(self, user_id, service_id, permissions):
         # permissions passed in are the combined admin roles, not db permissions
-        data = [{'permission': x} for x in translate_permissions_from_admin_roles_to_db(permissions)]
+        data = {
+            'permissions': [{'permission': x} for x in translate_permissions_from_admin_roles_to_db(permissions)]
+        }
+
         endpoint = '/user/{}/service/{}/permission'.format(user_id, service_id)
         self.post(endpoint, data=data)
 
