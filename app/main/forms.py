@@ -696,23 +696,37 @@ class ServiceLetterContactBlockForm(StripWhitespaceForm):
             )
 
 
-class ServiceSwitchChannelForm(StripWhitespaceForm):
+class OnOffField(RadioField):
+    def __init__(self, label, *args, **kwargs):
+        super().__init__(label, choices=[
+            (True, 'On'),
+            (False, 'Off'),
+        ], *args, **kwargs)
 
-    def __init__(self, channel, *args, **kwargs):
+    def process_formdata(self, valuelist):
+        if valuelist:
+            value = valuelist[0]
+            self.data = (value == 'True') if value in ['True', 'False'] else value
+
+
+class ServiceOnOffSettingForm(StripWhitespaceForm):
+
+    def __init__(self, name, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.enabled.label.text = 'Send {}'.format({
+        self.enabled.label.text = name
+
+    enabled = OnOffField('Choices')
+
+
+class ServiceSwitchChannelForm(ServiceOnOffSettingForm):
+    def __init__(self, channel, *args, **kwargs):
+        name = 'Send {}'.format({
             'email': 'emails',
             'sms': 'text messages',
             'letter': 'letters',
         }.get(channel))
 
-    enabled = RadioField(
-        'Choices',
-        choices=[
-            ('on', 'On'),
-            ('off', 'Off'),
-        ],
-    )
+        super().__init__(name, *args, **kwargs)
 
 
 class FieldWithNoneOption():

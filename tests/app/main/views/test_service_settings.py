@@ -92,12 +92,17 @@ def mock_get_service_settings_page_common(
         'Send letters Off Change',
 
         'Label Value Action',
+        'Live Off Change',
         'Organisation Org 1 Change',
         'Organisation type Central Change',
         'Free text message allowance 250,000 Change',
         'Email branding GOV.UK Change',
         'Letter branding Not set Change',
-        'Data retention email Change'
+        'Data retention email Change',
+        'Receive inbound SMS Off Change',
+        'User auth type editing Off Change',
+        'Uploading documents Off Change',
+        'Folder permissions Off Change',
 
     ]),
 ])
@@ -382,8 +387,10 @@ def test_switch_service_to_live(
         mock_update_service,
         mock_get_inbound_number_for_service
 ):
-    response = logged_in_platform_admin_client.get(
-        url_for('main.service_switch_live', service_id=service_one['id']))
+    response = logged_in_platform_admin_client.post(
+        url_for('main.service_switch_live', service_id=service_one['id']),
+        data={'enabled': 'True'}
+    )
     assert response.status_code == 302
     assert response.location == url_for(
         'main.service_settings',
@@ -418,8 +425,11 @@ def test_switch_service_to_restricted(
         mock_update_service,
         mock_get_inbound_number_for_service,
 ):
-    response = logged_in_platform_admin_client.get(
-        url_for('main.service_switch_live', service_id=service_one['id']))
+    response = logged_in_platform_admin_client.post(
+        url_for('main.service_switch_live', service_id=service_one['id']),
+        data={'enabled': 'False'}
+
+    )
     assert response.status_code == 302
     assert response.location == url_for(
         'main.service_settings',
@@ -1110,7 +1120,6 @@ def test_route_permissions(
     'main.request_to_go_live',
     'main.submit_request_to_go_live',
     'main.service_switch_live',
-    'main.service_switch_research_mode',
     'main.archive_service',
 ])
 def test_route_invalid_permissions(
@@ -1158,30 +1167,6 @@ def test_route_for_platform_admin(
                               app_,
                               "GET",
                               200,
-                              url_for(route, service_id=service_one['id']),
-                              [],
-                              platform_admin_user,
-                              service_one)
-
-
-@pytest.mark.parametrize('route', [
-    'main.service_switch_live',
-    'main.service_switch_research_mode',
-])
-def test_route_for_platform_admin_update_service(
-        mocker,
-        app_,
-        client,
-        platform_admin_user,
-        service_one,
-        mock_get_all_letter_branding,
-        route,
-):
-    mocker.patch('app.service_api_client.archive_service')
-    validate_route_permission(mocker,
-                              app_,
-                              "GET",
-                              302,
                               url_for(route, service_id=service_one['id']),
                               [],
                               platform_admin_user,
@@ -1910,47 +1895,6 @@ def test_inbound_sms_sender_is_not_editable(
         ) == "GOVUK This phone number receives replies and can’t be changed"
 
 
-def test_switch_service_to_research_mode(
-    logged_in_platform_admin_client,
-    platform_admin_user,
-    service_one,
-    mocker,
-):
-    mocker.patch('app.service_api_client.post', return_value=service_one)
-    response = logged_in_platform_admin_client.get(
-        url_for('main.service_switch_research_mode', service_id=service_one['id'])
-    )
-    assert response.status_code == 302
-    assert response.location == url_for('main.service_settings', service_id=service_one['id'], _external=True)
-    app.service_api_client.post.assert_called_with(
-        '/service/{}'.format(service_one['id']),
-        {
-            'research_mode': True,
-            'created_by': platform_admin_user.id
-        }
-    )
-
-
-def test_switch_service_from_research_mode_to_normal(
-    logged_in_platform_admin_client,
-    mocker,
-):
-    service = service_json(
-        research_mode=True
-    )
-    mocker.patch('app.service_api_client.get_service', return_value={"data": service})
-    update_service_mock = mocker.patch('app.service_api_client.update_service', return_value=service)
-
-    response = logged_in_platform_admin_client.get(
-        url_for('main.service_switch_research_mode', service_id=service['id'])
-    )
-    assert response.status_code == 302
-    assert response.location == url_for('main.service_settings', service_id=service['id'], _external=True)
-    update_service_mock.assert_called_with(
-        service['id'], research_mode=False
-    )
-
-
 def test_shows_research_mode_indicator(
     logged_in_client,
     service_one,
@@ -2518,7 +2462,7 @@ def test_unknown_channel_404s(
         'It costs between 30p and 76p to send a letter using Notify.',
         'Send letters',
         ['email', 'sms'],
-        'off', 'on',
+        'False', 'True',
         ['email', 'sms', 'letter'],
     ),
     (
@@ -2526,7 +2470,7 @@ def test_unknown_channel_404s(
         'It costs between 30p and 76p to send a letter using Notify.',
         'Send letters',
         ['email', 'sms', 'letter'],
-        'on', 'off',
+        'True', 'False',
         ['email', 'sms'],
     ),
     (
@@ -2534,7 +2478,7 @@ def test_unknown_channel_404s(
         'You have a free allowance of 250,000 text messages each financial year.',
         'Send text messages',
         [],
-        'off', 'on',
+        'False', 'True',
         ['sms'],
     ),
     (
@@ -2542,7 +2486,7 @@ def test_unknown_channel_404s(
         'It’s free to send emails through GOV.UK Notify.',
         'Send emails',
         [],
-        'off', 'on',
+        'False', 'True',
         ['email'],
     ),
     (
@@ -2550,7 +2494,7 @@ def test_unknown_channel_404s(
         'It’s free to send emails through GOV.UK Notify.',
         'Send emails',
         ['email', 'sms', 'letter'],
-        'on', 'on',
+        'True', 'True',
         ['email', 'sms', 'letter'],
     ),
 ])
@@ -2652,10 +2596,9 @@ def test_switch_service_enable_international_sms(
 
 @pytest.mark.parametrize('start_permissions, contact_details, end_permissions', [
     (['upload_document'], 'http://example.com/', []),
-    (['upload_document'], None, []),
     ([], '0207 123 4567', ['upload_document']),
 ])
-def test_service_switch_can_upload_document_changes_the_permission_if_service_contact_details_exist(
+def test_service_switch_can_upload_document_shows_permission_page_if_service_contact_details_exist(
     logged_in_platform_admin_client,
     service_one,
     mock_update_service,
@@ -2676,11 +2619,7 @@ def test_service_switch_can_upload_document_changes_the_permission_if_service_co
         follow_redirects=True
     )
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    mock_update_service.assert_called_once_with(
-        SERVICE_ONE_ID,
-        permissions=end_permissions,
-    )
-    assert normalize_spaces(page.h1.text) == 'Settings'
+    assert normalize_spaces(page.h1.text) == 'Uploading documents'
 
 
 def test_service_switch_can_upload_document_turning_permission_on_with_no_contact_details_shows_form(
@@ -2707,7 +2646,7 @@ def test_service_switch_can_upload_document_turning_permission_on_with_no_contac
     ('email_address', 'old@example.com'),
     ('phone_number', '0207 12345'),
 ])
-def test_service_switch_can_upload_document_lets_contact_details_be_added_and_switches_permission(
+def test_service_switch_can_upload_document_lets_contact_details_be_added_and_shows_permission_page(
     logged_in_platform_admin_client,
     service_one,
     mock_update_service,
@@ -2728,8 +2667,7 @@ def test_service_switch_can_upload_document_lets_contact_details_be_added_and_sw
     )
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
-    assert 'upload_document' in mock_update_service.call_args[1]['permissions']
-    assert normalize_spaces(page.h1.text) == 'Settings'
+    assert normalize_spaces(page.h1.text) == 'Uploading documents'
 
 
 def test_archive_service_after_confirm(

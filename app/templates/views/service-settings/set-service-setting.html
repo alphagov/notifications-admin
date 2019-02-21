@@ -1,0 +1,26 @@
+{% extends "withnav_template.html" %}
+{% from "components/radios.html" import radios %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+
+{% block service_page_title %}
+  Send letters
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <div class="grid-row">
+    <div class="column-five-sixths">
+      <h1 class="heading-large">{{ title }}</h1>
+      {% call form_wrapper() %}
+        {{ radios(form.enabled, hide_legend=True) }}
+        {{ page_footer(
+          'Save',
+          back_link=url_for('.service_settings', service_id=current_service.id),
+          back_link_text='Back to settings'
+        ) }}
+      {% endcall %}
+    </div>
+  </div>
+
+{% endblock %}
