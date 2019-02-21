@@ -24,7 +24,7 @@ from app.main.forms import (
     SearchUsersForm,
 )
 from app.models.user import permissions
-from app.utils import user_has_permissions
+from app.utils import redact_mobile_number, user_has_permissions
 
 
 @main.route("/services/<service_id>/users")
@@ -78,7 +78,10 @@ def invite_user(service_id):
 def edit_user_permissions(service_id, user_id):
     service_has_email_auth = current_service.has_permission('email_auth')
     user = current_service.get_team_member(user_id)
-    user_has_no_mobile_number = user.mobile_number is None
+
+    mobile_number = None
+    if user.mobile_number:
+        mobile_number = redact_mobile_number(user.mobile_number)
 
     form = PermissionsForm.from_user(user, service_id)
 
@@ -96,7 +99,7 @@ def edit_user_permissions(service_id, user_id):
         user=user,
         form=form,
         service_has_email_auth=service_has_email_auth,
-        user_has_no_mobile_number=user_has_no_mobile_number
+        mobile_number=mobile_number
     )
 
 
@@ -198,6 +201,13 @@ def confirm_edit_user_email(service_id, user_id):
         service_id=service_id,
         new_email=new_email
     )
+
+
+@main.route("/services/<service_id>/users/<user_id>/edit-phone-number", methods=['GET', 'POST'])
+@login_required
+@user_has_permissions('manage_service')
+def edit_user_phone_number(service_id, user_id):
+    return True
 
 
 @main.route("/services/<service_id>/cancel-invited-user/<uuid:invited_user_id>", methods=['GET'])
