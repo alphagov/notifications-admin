@@ -10,10 +10,10 @@
       // which field is visible.
       this.$form.find('button[value=unknown]').remove();
 
-      this.$stickyBottom = this.$form.find('#sticky_template_forms');
+      this.$liveRegionCounter = this.$form.find('.selection-counter');
 
-      this.$stickyBottom.append(this.nothingSelectedButtons);
-      this.$stickyBottom.append(this.itemsSelectedButtons);
+      this.$liveRegionCounter.before(this.nothingSelectedButtons);
+      this.$liveRegionCounter.before(this.itemsSelectedButtons);
 
       // all the diff states that we want to show or hide
       this.states = [
@@ -35,7 +35,7 @@
       // first off show the new template / new folder buttons
       this.currentState = this.$form.data('prev-state') || 'unknown';
       if (this.currentState === 'unknown') {
-        this.selectActionButtons(false);
+        this.selectActionButtons();
       } else {
         this.render();
       }
@@ -76,44 +76,61 @@
 
     this.addCancelButton = function(state) {
       let selector = `[value=${state.key}]`;
-      let $cancel = this.makeButton('Cancel', () => {
+      let $cancel = this.makeButton('Cancel', {
+        'onclick': () => {
 
-        // clear existing data
-        state.$el.find('input:radio').prop('checked', false);
-        state.$el.find('input:text').val('');
+          // clear existing data
+          state.$el.find('input:radio').prop('checked', false);
+          state.$el.find('input:text').val('');
 
-        // go back to action buttons
-        this.selectActionButtons(selector);
-      }, selector);
+          // go back to action buttons
+          this.selectActionButtons(selector);
+        },
+        'cancelSelector': selector,
+        'nonvisualText': "this step"
+      });
 
       state.$el.find('[type=submit]').after($cancel);
     };
 
     this.addClearButton = function(state) {
+      let selector = 'button[value=add-new-template]';
+      let $clear = this.makeButton('Clear', {
+        'onclick': () => {
 
-      let $clear = this.makeButton('Clear', () => {
-        // uncheck all templates and folders
-        this.$form.find('input:checkbox').prop('checked', false);
+          // uncheck all templates and folders
+          this.$form.find('input:checkbox').prop('checked', false);
 
-        // go back to action buttons
-        this.selectActionButtons();
+          // go back to action buttons
+          this.selectActionButtons(selector);
+        },
+        'nonvisualText': "selection"
       });
 
       state.$el.find('.template-list-selected-counter').append($clear);
     };
 
-    this.makeButton = (text, fn, cancelSelector) => $('<a></a>')
-      .html(text)
-      .addClass('js-cancel')
-      .data('target', cancelSelector) // isn't set if cancelSelector is undefined
-      .attr('tabindex', '0')
-      .on('click keydown', event => {
-        // space, enter or no keyCode (must be mouse input)
-        if ([13, 32, undefined].indexOf(event.keyCode) > -1) {
-          event.preventDefault();
-          fn();
+    this.makeButton = (text, opts) => {
+      let $btn = $('<a href=""></a>')
+                    .html(text)
+                    .addClass('js-cancel')
+                    // isn't set if cancelSelector is undefined
+                    .data('target', opts.cancelSelector || undefined)
+                    .attr('tabindex', '0')
+                    .on('click keydown', event => {
+                      // space, enter or no keyCode (must be mouse input)
+                      if ([13, 32, undefined].indexOf(event.keyCode) > -1) {
+                        event.preventDefault();
+                        if (opts.hasOwnProperty('onclick')) { opts.onclick(); }
+                      }
+                    });
+
+        if (opts.hasOwnProperty('nonvisualText')) {
+          $btn.append(`<span class="visuallyhidden"> ${opts.nonvisualText}</span>`);
         }
-      });
+
+        return $btn;
+    };
 
     this.selectActionButtons = function (targetSelector) {
       // If we want to show one of the grey choose actions state, we can pretend we're in the choose actions state,
@@ -134,6 +151,17 @@
       this.render();
     };
 
+    this.selectionStatus = {
+      'default': 'Nothing selected',
+      'selected': numSelected => `${numSelected} selected`,
+      'update': numSelected => {
+        let message = (numSelected > 0) ? this.selectionStatus.selected(numSelected) : this.selectionStatus.default;
+
+        $('.template-list-selected-counter__count').html(message);
+        this.$liveRegionCounter.html(message);
+      }
+    };
+
     this.templateFolderCheckboxChanged = function() {
       let numSelected = this.countSelectedCheckboxes();
 
@@ -147,7 +175,7 @@
 
       this.render();
 
-      $('.template-list-selected-counter-count').html(numSelected);
+      this.selectionStatus.update(numSelected);
 
       $('.template-list-selected-counter').toggle(this.hasCheckboxes());
 
@@ -167,7 +195,7 @@
 
       // detach everything, unless they are the currentState
       this.states.forEach(
-        state => (state.key === this.currentState ? this.$stickyBottom.append(state.$el) : state.$el.detach())
+        state => (state.key === this.currentState ? this.$liveRegionCounter.before(state.$el) : state.$el.detach())
       );
 
       // use dialog mode for states which contain more than one form control
@@ -187,7 +215,9 @@
           <button class="button-secondary" value="add-new-template">New template</button>
           <button class="button-secondary" value="add-new-folder">New folder</button>
           <div class="template-list-selected-counter">
-            Nothing selected
+            <span class="template-list-selected-counter__count" aria-hidden="true">
+              ${this.selectionStatus.default}
+            </span>
           </div>
         </div>
       </div>
@@ -198,8 +228,10 @@
         <div class="js-stick-at-bottom-when-scrolling">
           <button class="button-secondary" value="move-to-existing-folder">Move</button>
           <button class="button-secondary" value="move-to-new-folder">Add to new folder</button>
-          <div class="template-list-selected-counter">
-            <span class="template-list-selected-counter-count">1</span> selected
+          <div class="template-list-selected-counter" aria-hidden="true">
+            <span class="template-list-selected-counter__count" aria-hidden="true">
+              ${this.selectionStatus.selected(1)}
+            </span>
           </div>
         </div>
       </div>
