@@ -10,9 +10,9 @@ Flask-Login==0.4.1
 
 blinker==1.4
 pyexcel==0.5.10
-pyexcel-io==0.5.11
+pyexcel-io==0.5.14
 pyexcel-xls==0.5.8
-pyexcel-xlsx==0.5.6
+pyexcel-xlsx==0.5.7
 pyexcel-ods3==0.5.3
 pytz==2018.9
 gunicorn==19.7.1  # >19.8 stops eventlet workers after a timeout
@@ -28,10 +28,10 @@ itsdangerous==0.24  # pyup: <1.0.0
 git+https://github.com/alphagov/notifications-utils.git@31.2.0#egg=notifications-utils==31.2.0
 
 ## The following requirements were added by pip freeze:
-awscli==1.16.105
+awscli==1.16.107
 bleach==3.0.2
 boto3==1.6.16
-botocore==1.12.95
+botocore==1.12.97
 certifi==2018.11.29
 chardet==3.0.4
 Click==7.0
@@ -52,7 +52,7 @@ lxml==4.3.1
 MarkupSafe==1.1.0
 mistune==0.8.4
 monotonic==1.5
-openpyxl==2.6.0
+openpyxl==2.5.14
 orderedset==2.0.1
 phonenumbers==8.10.2
 pyasn1==0.4.5
@@ -62,14 +62,14 @@ PyPDF2==1.26.0
 python-dateutil==2.8.0
 python-json-logger==0.1.10
 PyYAML==3.12
-redis==3.1.0
+redis==3.2.0
 requests==2.21.0
 rsa==3.4.2
 s3transfer==0.2.0
 six==1.12.0
 smartypants==2.0.1
 statsd==3.3.0
-texttable==1.6.0
+texttable==1.6.1
 urllib3==1.24.1
 webencodings==0.5.1
 Werkzeug==0.14.1
