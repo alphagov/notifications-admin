@@ -183,6 +183,8 @@ def confirm_edit_user_email(service_id, user_id):
                     service_id=service_id))
             else:
                 abort(500, e)
+        finally:
+            session.pop("team_member_email_change", None)
 
         return redirect(url_for(
             '.manage_users',
