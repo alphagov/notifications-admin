@@ -229,7 +229,15 @@ def edit_user_mobile_number(service_id, user_id):
 @login_required
 @user_has_permissions('manage_service')
 def confirm_edit_user_mobile_number(service_id, user_id):
-    return True
+    user = user_api_client.get_user(user_id)
+    new_number = session['team_member_mobile_change']
+
+    return render_template(
+        'views/manage-users/confirm-edit-user-mobile-number.html',
+        user=user,
+        service_id=service_id,
+        new_mobile_number=new_number
+    )
 
 
 @main.route("/services/<service_id>/cancel-invited-user/<uuid:invited_user_id>", methods=['GET'])

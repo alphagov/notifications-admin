@@ -1079,8 +1079,31 @@ def test_edit_user_mobile_number_redirects_to_confirmation(
     )
 
 
-def test_confirm_edit_user_mobile_number_page():
-    pass
+def test_confirm_edit_user_mobile_number_page(
+    logged_in_client,
+    active_user_with_permissions,
+    service_one,
+    mocker,
+    mock_get_user,
+):
+    new_number = '07554080636'
+    with logged_in_client.session_transaction() as session:
+        session['team_member_mobile_change'] = new_number
+    response = logged_in_client.get(url_for(
+        'main.confirm_edit_user_mobile_number',
+        service_id=service_one['id'],
+        user_id=active_user_with_permissions.id
+    ))
+
+    assert response.status_code == 200
+    assert 'Confirm change of mobile number' in response.get_data(as_text=True)
+    for text in [
+        'New mobile number:',
+        new_number,
+        'We will send {} an email to tell them about the change.'.format(active_user_with_permissions.name)
+    ]:
+        assert text in response.get_data(as_text=True)
+    assert 'Confirm' in response.get_data(as_text=True)
 
 
 def test_confirm_edit_user_mobile_number_changes_user_mobile_number():
