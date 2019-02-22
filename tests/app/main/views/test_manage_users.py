@@ -840,6 +840,22 @@ def test_confirm_edit_user_email_page(
     assert response.status_code == 200
 
 
+def test_confirm_edit_user_email_page_redirects_if_session_empty(
+    logged_in_client,
+    active_user_with_permissions,
+    service_one,
+    mocker,
+    mock_get_user,
+):
+    response = logged_in_client.get(url_for(
+        'main.confirm_edit_user_email',
+        service_id=service_one['id'],
+        user_id=active_user_with_permissions.id
+    ))
+    assert response.status_code == 302
+    assert 'Confirm change of email address' not in response.get_data(as_text=True)
+
+
 def test_confirm_edit_user_email_changes_user_email(
     logged_in_client,
     active_user_with_permissions,

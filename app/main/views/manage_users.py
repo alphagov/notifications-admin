@@ -164,7 +164,14 @@ def edit_user_email(service_id, user_id):
 @user_has_permissions('manage_service')
 def confirm_edit_user_email(service_id, user_id):
     user = user_api_client.get_user(user_id)
-    new_email = session['team_member_email_change']
+    if 'team_member_email_change' in session:
+        new_email = session['team_member_email_change']
+    else:
+        return redirect(url_for(
+            '.edit_user_email',
+            service_id=service_id,
+            user_id=user_id
+        ))
     if request.method == 'POST':
         try:
             user_api_client.update_user_attribute(user_id, email_address=new_email)
