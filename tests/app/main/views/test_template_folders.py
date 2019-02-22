@@ -55,7 +55,7 @@ def _template(template_type, name, parent=None, template_id=None):
             'Templates',
             [],
             {},
-            ['Text message', 'Email', 'Letter'],
+            ['Email', 'Text message', 'Letter'],
             [
                 'folder_one 2 folders',
                 'folder_one / folder_one_one 1 template, 1 folder',
@@ -132,7 +132,7 @@ def _template(template_type, name, parent=None, template_id=None):
             'Templates / folder_one',
             [{'template_type': 'all'}],
             {'template_folder_id': PARENT_FOLDER_ID},
-            ['Text message', 'Email', 'Letter'],
+            ['Email', 'Text message', 'Letter'],
             [
                 'folder_one_one 1 template, 1 folder',
                 'folder_one_one / folder_one_one_one 1 template',
@@ -193,7 +193,7 @@ def _template(template_type, name, parent=None, template_id=None):
                 {'template_type': 'all', 'template_folder_id': PARENT_FOLDER_ID},
             ],
             {'template_folder_id': CHILD_FOLDER_ID},
-            ['Text message', 'Email', 'Letter'],
+            ['Email', 'Text message', 'Letter'],
             [
                 'folder_one_one_one 1 template',
                 'folder_one_one_one / sms_template_nested Text message template',
@@ -219,7 +219,7 @@ def _template(template_type, name, parent=None, template_id=None):
                 {'template_type': 'all', 'template_folder_id': CHILD_FOLDER_ID},
             ],
             {'template_folder_id': GRANDCHILD_FOLDER_ID},
-            ['Text message', 'Email', 'Letter'],
+            ['Email', 'Text message', 'Letter'],
             [
                 'sms_template_nested Text message template',
             ],
@@ -254,7 +254,7 @@ def _template(template_type, name, parent=None, template_id=None):
             'Templates / folder_two',
             [{'template_type': 'all'}],
             {'template_folder_id': FOLDER_TWO_ID},
-            ['Text message', 'Email', 'Letter'],
+            ['Email', 'Text message', 'Letter'],
             [],
             [],
             [],
