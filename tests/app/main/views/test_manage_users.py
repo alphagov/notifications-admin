@@ -1011,7 +1011,7 @@ def test_confirm_edit_user_email_with_no_permission_aborts():
     pass
 
 
-def test_edit_user_permissions_page_displays_redacted_phone_number_and_change_link(
+def test_edit_user_permissions_page_displays_redacted_mobile_number_and_change_link(
     client_request,
     active_user_with_permissions,
     service_one,
@@ -1027,29 +1027,46 @@ def test_edit_user_permissions_page_displays_redacted_phone_number_and_change_li
     )
 
     assert user.name in page.find('h1').text
-    phone_number_paragraph = page.select('p[id=user_phone_number]')[0]
-    assert '0770****762' in phone_number_paragraph.text
-    change_link = phone_number_paragraph.findChild()
-    assert change_link.attrs['href'] == '/services/{}/users/{}/edit-phone-number'.format(
+    mobile_number_paragraph = page.select('p[id=user_mobile_number]')[0]
+    assert '0770****762' in mobile_number_paragraph.text
+    change_link = mobile_number_paragraph.findChild()
+    assert change_link.attrs['href'] == '/services/{}/users/{}/edit-mobile-number'.format(
         service_one['id'], user.id
     )
 
 
-def test_edit_user_phone_number_page():
+def test_edit_user_mobile_number_page(
+    client_request,
+    active_user_with_permissions,
+    service_one,
+    mocker
+):
+    user = active_user_with_permissions
+    mocker.patch('app.user_api_client.get_user', return_value=user)
+
+    page = client_request.get(
+        'main.edit_user_mobile_number',
+        service_id=service_one['id'],
+        user_id=user.id
+    )
+
+    assert page.find('h1').text == "Change team member’s mobile number"
+    assert page.select('p[id=user_name]')[0].text == "This will change the mobile number for {}.".format(user.name)
+    assert page.select('input[name=mobile_number]')[0].attrs["value"] == "0770****762"
+    assert page.select('button[type=submit]')[0].text == "Save"
+
+
+def test_edit_user_mobile_number_redirects_to_confirmation():
     pass
 
 
-def test_edit_user_phone_number_redirects_to_confirmation():
+def test_confirm_edit_user_mobile_number_page():
     pass
 
 
-def test_confirm_edit_user_phone_number_page():
+def test_confirm_edit_user_mobile_number_changes_user_mobile_number():
     pass
 
 
-def test_confirm_edit_user_phone_number_changes_user_mobile_number():
-    pass
-
-
-def test_confirm_edit_user_phone_number_with_no_permission_aborts():
+def test_confirm_edit_user_mobile_number_with_no_permission_aborts():
     pass

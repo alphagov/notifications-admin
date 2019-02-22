@@ -22,6 +22,7 @@ from app.main.forms import (
     InviteUserForm,
     PermissionsForm,
     SearchUsersForm,
+    ChangeMobileNumberForm
 )
 from app.models.user import permissions
 from app.utils import redact_mobile_number, user_has_permissions
@@ -203,11 +204,21 @@ def confirm_edit_user_email(service_id, user_id):
     )
 
 
-@main.route("/services/<service_id>/users/<user_id>/edit-phone-number", methods=['GET', 'POST'])
+@main.route("/services/<service_id>/users/<user_id>/edit-mobile-number", methods=['GET', 'POST'])
 @login_required
 @user_has_permissions('manage_service')
-def edit_user_phone_number(service_id, user_id):
-    return True
+def edit_user_mobile_number(service_id, user_id):
+    user = user_api_client.get_user(user_id)
+    user_mobile_number = redact_mobile_number(user.mobile_number)
+
+    form = ChangeMobileNumberForm(mobile_number=user_mobile_number)
+
+    return render_template(
+        'views/manage-users/edit-user-mobile.html',
+        user=user,
+        form=form,
+        service_id=service_id
+    )
 
 
 @main.route("/services/<service_id>/cancel-invited-user/<uuid:invited_user_id>", methods=['GET'])
