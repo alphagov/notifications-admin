@@ -212,6 +212,10 @@ def edit_user_mobile_number(service_id, user_id):
     user_mobile_number = redact_mobile_number(user.mobile_number)
 
     form = ChangeMobileNumberForm(mobile_number=user_mobile_number)
+    if form.validate_on_submit():
+        session['team_member_mobile_change'] = form.mobile_number.data
+
+        return redirect(url_for('.confirm_edit_user_mobile_number', user_id=user.id, service_id=service_id))
 
     return render_template(
         'views/manage-users/edit-user-mobile.html',
@@ -219,6 +223,13 @@ def edit_user_mobile_number(service_id, user_id):
         form=form,
         service_id=service_id
     )
+
+
+@main.route("/services/<service_id>/users/<user_id>/edit-mobile-number/confirm", methods=['GET', 'POST'])
+@login_required
+@user_has_permissions('manage_service')
+def confirm_edit_user_mobile_number(service_id, user_id):
+    return True
 
 
 @main.route("/services/<service_id>/cancel-invited-user/<uuid:invited_user_id>", methods=['GET'])

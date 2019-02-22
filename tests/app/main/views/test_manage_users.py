@@ -1056,8 +1056,27 @@ def test_edit_user_mobile_number_page(
     assert page.select('button[type=submit]')[0].text == "Save"
 
 
-def test_edit_user_mobile_number_redirects_to_confirmation():
-    pass
+def test_edit_user_mobile_number_redirects_to_confirmation(
+    logged_in_client,
+    active_user_with_permissions,
+    service_one,
+    mocker,
+    mock_get_user,
+):
+
+    data = {'mobile_number': '07554080636'}
+    response = logged_in_client.post(
+        url_for(
+            'main.edit_user_mobile_number',
+            service_id=service_one['id'],
+            user_id=active_user_with_permissions.id), data=data)
+    assert response.status_code == 302
+    assert response.location == url_for(
+        'main.confirm_edit_user_mobile_number',
+        service_id=service_one['id'],
+        user_id=active_user_with_permissions.id,
+        _external=True
+    )
 
 
 def test_confirm_edit_user_mobile_number_page():

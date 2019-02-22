@@ -1,0 +1,27 @@
+{% extends "withnav_template.html" %}
+{% from "components/textbox.html" import textbox %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+
+{% block per_page_title %}
+  Change team member’s mobile number
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <h1 class="heading-large">Change team member’s mobile number</h1>
+  <p id="user_name">This will change the mobile number for {{ user.name }}.</p>
+  <div class="grid-row">
+    <div class="column-three-quarters">
+      {% call form_wrapper() %}
+        {{ textbox(form.mobile_number) }}
+        {{ page_footer(
+          'Save',
+          back_link=url_for('.edit_user_permissions', service_id=service_id, user_id=user.id),
+          back_link_text="Back"
+        ) }}
+      {% endcall %}
+    </div>
+  </div>
+
+{% endblock %}
