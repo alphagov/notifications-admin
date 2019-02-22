@@ -19,10 +19,10 @@ from app import (
 from app.main import main
 from app.main.forms import (
     ChangeEmailForm,
+    ChangeMobileNumberForm,
     InviteUserForm,
     PermissionsForm,
     SearchUsersForm,
-    ChangeMobileNumberForm
 )
 from app.models.user import permissions
 from app.utils import redact_mobile_number, user_has_permissions
@@ -231,6 +231,22 @@ def edit_user_mobile_number(service_id, user_id):
 def confirm_edit_user_mobile_number(service_id, user_id):
     user = user_api_client.get_user(user_id)
     new_number = session['team_member_mobile_change']
+    if request.method == 'POST':
+        try:
+            user_api_client.update_user_attribute(user_id, mobile_number=new_number)
+        except HTTPError as e:
+            if e.status_code == 403:
+                flash("You don't have permission to edit users' mobile numbers for this service", 'info')
+                return redirect(url_for(
+                    '.manage_users',
+                    service_id=service_id))
+            else:
+                abort(500, e)
+
+        return redirect(url_for(
+            '.manage_users',
+            service_id=service_id
+        ))
 
     return render_template(
         'views/manage-users/confirm-edit-user-mobile-number.html',

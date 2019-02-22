@@ -1106,8 +1106,26 @@ def test_confirm_edit_user_mobile_number_page(
     assert 'Confirm' in response.get_data(as_text=True)
 
 
-def test_confirm_edit_user_mobile_number_changes_user_mobile_number():
-    pass
+def test_confirm_edit_user_mobile_number_changes_user_mobile_number(
+    logged_in_client,
+    active_user_with_permissions,
+    service_one,
+    mocker,
+    mock_get_user,
+    mock_update_user_attribute
+):
+    new_number = '07554080636'
+    with logged_in_client.session_transaction() as session:
+        session['team_member_mobile_change'] = new_number
+    response = logged_in_client.post(
+        url_for(
+            'main.confirm_edit_user_mobile_number',
+            service_id=service_one['id'],
+            user_id=active_user_with_permissions.id))
+    assert response.status_code == 302
+    assert response.location == url_for(
+        'main.manage_users', service_id=service_one['id'], _external=True)
+    mock_update_user_attribute.assert_called_once_with(active_user_with_permissions.id, mobile_number=new_number)
 
 
 def test_confirm_edit_user_mobile_number_with_no_permission_aborts():
