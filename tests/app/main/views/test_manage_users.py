@@ -813,6 +813,29 @@ def test_edit_user_email_redirects_to_confirmation(
     )
 
 
+def test_edit_user_email_without_changing_goes_back_to_team_members(
+    client_request,
+    active_user_with_permissions,
+    mock_get_user,
+    mock_update_user_attribute,
+):
+    client_request.post(
+        'main.edit_user_email',
+        service_id=SERVICE_ONE_ID,
+        user_id=active_user_with_permissions.id,
+        _data={
+            'email_address': active_user_with_permissions.email_address
+        },
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.manage_users',
+            service_id=SERVICE_ONE_ID,
+            _external=True
+        ),
+    )
+    assert mock_update_user_attribute.called is False
+
+
 def test_confirm_edit_user_email_page(
     logged_in_client,
     active_user_with_permissions,

@@ -146,6 +146,10 @@ def edit_user_email(service_id, user_id):
         return user_api_client.is_email_already_in_use(email)
 
     form = ChangeEmailForm(_is_email_already_in_use, email_address=user_email)
+
+    if request.form.get('email_address', '').strip() == user_email:
+        return redirect(url_for('.manage_users', service_id=current_service.id))
+
     if form.validate_on_submit():
         session['team_member_email_change'] = form.email_address.data
 
