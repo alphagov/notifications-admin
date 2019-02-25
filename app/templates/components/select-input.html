@@ -1,0 +1,92 @@
+{% macro select(field, hint=None, disable=[], option_hints={}, hide_legend=False, input="radio") %}
+  {% call select_wrapper(
+    field, hint, disable, option_hints, hide_legend
+  ) %}
+    {% for option in field %}
+      {{ select_input(option, disable, option_hints, input=input) }}
+    {% endfor %}
+  {% endcall %}
+{% endmacro %}
+
+
+{% macro select_list(options, child_map, disable=[], option_hints={}, input="radio") %}
+    <ul>
+    {% for option in options %}
+      {% if child_map[option.data] %}
+        {% call select_input(option, disable, option_hints, as_list_item=True, input=input) %}
+          {{ select_list(child_map[option.data], child_map, disable, option_hints, input=input) }}
+        {% endcall %}
+      {% else %}
+          {{ select_input(option, disable, option_hints, as_list_item=True, input=input) }}
+      {% endif %}
+    {% endfor %}
+    </ul>
+{% endmacro %}
+
+
+{% macro select_nested(field, child_map, hint=None, disable=[], option_hints={}, hide_legend=False, input="radio") %}
+  {% call select_wrapper(
+    field, hint, disable, option_hints, hide_legend
+  ) %}
+  <div class="{{ "radios" if input == "radio" else "checkboxes" }}-nested">
+      {{ select_list(child_map[None], child_map, disable, option_hints, input=input) }}
+    </div>
+  {% endcall %}
+{% endmacro %}
+
+
+{% macro select_wrapper(field, hint=None, disable=[], option_hints={}, hide_legend=False) %}
+  <div class="form-group {% if field.errors %} form-group-error{% endif %}">
+    <fieldset>
+      <legend class="{{ 'form-label' if not hide_legend else '' }}">
+        {% if hide_legend %}<span class="visually-hidden">{% endif %}
+          {{ field.label.text|safe }}
+        {% if hide_legend %}</span>{% endif %}
+        {% if hint %}
+          <span class="form-hint">
+            {{ hint }}
+          </span>
+        {% endif %}
+        {% if field.errors %}
+          <span class="error-message" data-module="track-error" data-error-type="{{ field.errors[0] }}" data-error-label="{{ field.name }}">
+            {{ field.errors[0] }}
+          </span>
+        {% endif %}
+      </legend>
+      {{ caller() }}
+    </fieldset>
+  </div>
+{% endmacro %}
+
+{% macro select_input(option, disable=[], option_hints={}, data_target=None, as_list_item=False, input="radio") %}
+  {% if as_list_item %}
+  <li class="multiple-choice" {% if data_target %}data-target="{{ data_target }}"{% endif %}>
+  {% else %}
+  <div class="multiple-choice" {% if data_target %}data-target="{{ data_target }}"{% endif %}>
+  {% endif %}
+    <input
+      id="{{ option.id }}" name="{{ option.name }}" type="{{ input }}" value="{{ option.data }}"
+      {% if option.data in disable %}
+        disabled
+      {% endif %}
+      {% if option.checked %}
+        checked
+      {% endif %}
+    >
+    <label class="block-label" for="{{ option.id }}">
+      {{ option.label.text }}
+      {% if option_hints[option.data] %}
+        <div class="block-label-hint">
+          {{ option_hints[option.data] }}
+        </div>
+      {% endif %}
+    </label>
+    {% if caller %}
+        {{ caller() }}
+    {% endif %}
+  {% if as_list_item %}
+  </li>
+  {% else %}
+  </div>
+  {% endif %}
+{% endmacro %}

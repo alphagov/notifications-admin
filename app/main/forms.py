@@ -837,10 +837,7 @@ class RadioFieldWithNoneOption(FieldWithNoneOption, RadioField):
     pass
 
 
-class NestedRadioField(RadioFieldWithNoneOption):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
+class NestedFieldMixin:
     def children(self):
         # start map with root option as a single child entry
         child_map = {None: [option for option in self
@@ -862,6 +859,14 @@ class NestedRadioField(RadioFieldWithNoneOption):
             child_map[key] = [option for option in self if option.data in child_ids]
 
         return child_map
+
+
+class NestedRadioField(RadioFieldWithNoneOption, NestedFieldMixin):
+    pass
+
+
+class NestedCheckboxesField(SelectMultipleField, NestedFieldMixin):
+    pass
 
 
 class HiddenFieldWithNoneOption(FieldWithNoneOption, HiddenField):
