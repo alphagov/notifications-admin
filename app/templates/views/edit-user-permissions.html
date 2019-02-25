@@ -14,7 +14,7 @@
   </h1>
 
   <p>
-    {{ user.email_address }}
+    {{ user.email_address }}&emsp;<a href="{{ url_for('.edit_user_email', service_id=current_service.id, user_id=user.id)}}">Change</a>
   </p>
 
   <div class="grid-row">

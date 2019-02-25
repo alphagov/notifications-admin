@@ -1,4 +1,12 @@
-from flask import abort, flash, redirect, render_template, request, url_for
+from flask import (
+    abort,
+    flash,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
 from flask_login import current_user, login_required
 from notifications_python_client.errors import HTTPError
 
@@ -9,7 +17,12 @@ from app import (
     user_api_client,
 )
 from app.main import main
-from app.main.forms import InviteUserForm, PermissionsForm, SearchUsersForm
+from app.main.forms import (
+    ChangeEmailForm,
+    InviteUserForm,
+    PermissionsForm,
+    SearchUsersForm,
+)
 from app.models.user import permissions
 from app.utils import user_has_permissions
 
@@ -119,6 +132,69 @@ def remove_user_from_service(service_id, user_id):
         'views/edit-user-permissions.html',
         user=user,
         form=form
+    )
+
+
+@main.route("/services/<service_id>/users/<user_id>/edit-email", methods=['GET', 'POST'])
+@login_required
+@user_has_permissions('manage_service')
+def edit_user_email(service_id, user_id):
+    user = user_api_client.get_user(user_id)
+    user_email = user.email_address
+
+    def _is_email_already_in_use(email):
+        return user_api_client.is_email_already_in_use(email)
+
+    form = ChangeEmailForm(_is_email_already_in_use, email_address=user_email)
+    if form.validate_on_submit():
+        session['team_member_email_change'] = form.email_address.data
+
+        return redirect(url_for('.confirm_edit_user_email', user_id=user.id, service_id=service_id))
+
+    return render_template(
+        'views/manage-users/edit-user-email.html',
+        user=user,
+        form=form,
+        service_id=service_id
+    )
+
+
+@main.route("/services/<service_id>/users/<user_id>/edit-email/confirm", methods=['GET', 'POST'])
+@login_required
+@user_has_permissions('manage_service')
+def confirm_edit_user_email(service_id, user_id):
+    user = user_api_client.get_user(user_id)
+    if 'team_member_email_change' in session:
+        new_email = session['team_member_email_change']
+    else:
+        return redirect(url_for(
+            '.edit_user_email',
+            service_id=service_id,
+            user_id=user_id
+        ))
+    if request.method == 'POST':
+        try:
+            user_api_client.update_user_attribute(user_id, email_address=new_email)
+        except HTTPError as e:
+            if e.status_code == 403:
+                flash("You don't have permission to edit users emails for this service", 'info')
+                return redirect(url_for(
+                    '.manage_users',
+                    service_id=service_id))
+            else:
+                abort(500, e)
+        finally:
+            session.pop("team_member_email_change", None)
+
+        return redirect(url_for(
+            '.manage_users',
+            service_id=service_id
+        ))
+    return render_template(
+        'views/manage-users/confirm-edit-user-email.html',
+        user=user,
+        service_id=service_id,
+        new_email=new_email
     )
 
 
