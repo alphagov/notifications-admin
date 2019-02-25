@@ -99,12 +99,17 @@ class Service():
         return job_api_client.has_jobs(self.id)
 
     @cached_property
+    def invited_users(self):
+        return invite_api_client.get_invites_for_service(service_id=self.id)
+
+    @cached_property
+    def active_users(self):
+        return user_api_client.get_users_for_service(service_id=self.id)
+
+    @cached_property
     def team_members(self):
         return sorted(
-            (
-                invite_api_client.get_invites_for_service(service_id=self.id) +
-                user_api_client.get_users_for_service(service_id=self.id)
-            ),
+            self.invited_users + self.active_users,
             key=lambda user: user.email_address.lower(),
         )
 
@@ -113,6 +118,23 @@ class Service():
         return user_api_client.get_count_of_users_with_permission(
             self.id, 'manage_service'
         ) > 1
+
+    def cancel_invite(self, invited_user_id):
+
+        if str(invited_user_id) not in {user.id for user in self.invited_users}:
+            abort(404)
+
+        return invite_api_client.cancel_invited_user(
+            service_id=self.id,
+            invited_user_id=str(invited_user_id),
+        )
+
+    def get_team_member(self, user_id):
+
+        if str(user_id) not in {user.id for user in self.active_users}:
+            abort(404)
+
+        return user_api_client.get_user(user_id)
 
     @cached_property
     def all_templates(self):

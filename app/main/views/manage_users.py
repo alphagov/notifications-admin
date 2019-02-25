@@ -77,9 +77,7 @@ def invite_user(service_id):
 @user_has_permissions('manage_service')
 def edit_user_permissions(service_id, user_id):
     service_has_email_auth = current_service.has_permission('email_auth')
-    # TODO we should probably using the service id here in the get user
-    # call as well. eg. /user/<user_id>?&service=service_id
-    user = user_api_client.get_user(user_id)
+    user = current_service.get_team_member(user_id)
     user_has_no_mobile_number = user.mobile_number is None
 
     form = PermissionsForm.from_user(user, service_id)
@@ -106,7 +104,7 @@ def edit_user_permissions(service_id, user_id):
 @login_required
 @user_has_permissions('manage_service')
 def remove_user_from_service(service_id, user_id):
-    user = user_api_client.get_user(user_id)
+    user = current_service.get_team_member(user_id)
     form = PermissionsForm.from_user(user, service_id)
 
     if request.method == 'POST':
@@ -135,11 +133,11 @@ def remove_user_from_service(service_id, user_id):
     )
 
 
-@main.route("/services/<service_id>/users/<user_id>/edit-email", methods=['GET', 'POST'])
+@main.route("/services/<service_id>/users/<uuid:user_id>/edit-email", methods=['GET', 'POST'])
 @login_required
 @user_has_permissions('manage_service')
 def edit_user_email(service_id, user_id):
-    user = user_api_client.get_user(user_id)
+    user = current_service.get_team_member(user_id)
     user_email = user.email_address
 
     def _is_email_already_in_use(email):
@@ -163,11 +161,11 @@ def edit_user_email(service_id, user_id):
     )
 
 
-@main.route("/services/<service_id>/users/<user_id>/edit-email/confirm", methods=['GET', 'POST'])
+@main.route("/services/<service_id>/users/<uuid:user_id>/edit-email/confirm", methods=['GET', 'POST'])
 @login_required
 @user_has_permissions('manage_service')
 def confirm_edit_user_email(service_id, user_id):
-    user = user_api_client.get_user(user_id)
+    user = current_service.get_team_member(user_id)
     if 'team_member_email_change' in session:
         new_email = session['team_member_email_change']
     else:
@@ -178,7 +176,7 @@ def confirm_edit_user_email(service_id, user_id):
         ))
     if request.method == 'POST':
         try:
-            user_api_client.update_user_attribute(user_id, email_address=new_email)
+            user_api_client.update_user_attribute(str(user_id), email_address=new_email)
         except HTTPError as e:
             if e.status_code == 403:
                 flash("You don't have permission to edit users emails for this service", 'info')
@@ -202,9 +200,9 @@ def confirm_edit_user_email(service_id, user_id):
     )
 
 
-@main.route("/services/<service_id>/cancel-invited-user/<invited_user_id>", methods=['GET'])
+@main.route("/services/<service_id>/cancel-invited-user/<uuid:invited_user_id>", methods=['GET'])
 @user_has_permissions('manage_service')
 def cancel_invited_user(service_id, invited_user_id):
-    invite_api_client.cancel_invited_user(service_id=service_id, invited_user_id=invited_user_id)
+    current_service.cancel_invite(invited_user_id)
 
     return redirect(url_for('main.manage_users', service_id=service_id))
