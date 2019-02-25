@@ -96,7 +96,7 @@ def test_should_show_add_template_form_if_service_has_folder_permission(
             active_user_view_permissions,
             'Templates',
             {},
-            ['Text message', 'Email', 'Letter'],
+            ['Email', 'Text message', 'Letter'],
             [
                 'sms_template_one',
                 'sms_template_two',
@@ -124,14 +124,14 @@ def test_should_show_add_template_form_if_service_has_folder_permission(
             active_user_view_permissions,
             'Templates',
             {'template_type': 'letter'},
-            ['All', 'Text message', 'Email'],
+            ['All', 'Email', 'Text message'],
             ['letter_template_one', 'letter_template_two'],
         ),
         (
             active_caseworking_user,
             'Templates',
             {},
-            ['Text message', 'Email', 'Letter'],
+            ['Email', 'Text message', 'Letter'],
             [
                 'sms_template_one',
                 'sms_template_two',

@@ -39,8 +39,8 @@ class Service():
     }
 
     TEMPLATE_TYPES = (
-        'sms',
         'email',
+        'sms',
         'letter',
     )
 
