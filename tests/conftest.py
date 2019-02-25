@@ -696,6 +696,7 @@ SERVICE_ONE_ID = "596364a0-858e-42c8-9062-a8fe822260eb"
 SERVICE_TWO_ID = "147ad62a-2951-4fa1-9ca0-093cd1a52c52"
 ORGANISATION_ID = "c011fa40-4cbe-4524-b415-dde2f421bd9c"
 TEMPLATE_ONE_ID = "b22d7d94-2197-4a7d-a8e7-fd5f9770bf48"
+USER_ONE_ID = "7b395b52-c6c1-469c-9d61-54166461c1ab"
 
 
 @pytest.fixture(scope='function')
@@ -1555,6 +1556,18 @@ def mock_get_user_by_email(mocker, user=None):
 
 
 @pytest.fixture(scope='function')
+def mock_get_unknown_user_by_email(mocker, user=None):
+    if user is None:
+        user = api_user_active(USER_ONE_ID)
+
+    def _get_user(email_address):
+        user.email_address = email_address
+        return user
+
+    return mocker.patch('app.user_api_client.get_user_by_email', side_effect=_get_user)
+
+
+@pytest.fixture(scope='function')
 def mock_get_locked_user_by_email(mocker, api_user_locked):
     return mock_get_user_by_email(mocker, user=api_user_locked)
 
@@ -2139,7 +2152,7 @@ def mock_has_permissions(mocker):
 @pytest.fixture(scope='function')
 def mock_get_users_by_service(mocker):
     def _get_users_for_service(service_id):
-        data = [{'id': 1,
+        data = [{'id': sample_uuid(),
                  'logged_in_at': None,
                  'mobile_number': '+447700900986',
                  'permissions': {SERVICE_ONE_ID: ['send_texts',
@@ -2191,7 +2204,7 @@ def mock_s3_set_metadata(mocker, content=None):
 
 @pytest.fixture(scope='function')
 def sample_invite(mocker, service_one, status='pending'):
-    id_ = str(generate_uuid())
+    id_ = str(sample_uuid())
     from_user = service_one['users'][0]
     email_address = 'invited_user@test.gov.uk'
     service_id = service_one['id']

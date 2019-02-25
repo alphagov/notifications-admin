@@ -10,6 +10,7 @@ from app.models.user import InvitedUser
 from app.utils import is_gov_user
 from tests.conftest import (
     SERVICE_ONE_ID,
+    USER_ONE_ID,
     active_caseworking_user,
     active_user_empty_permissions,
     active_user_manage_template_permission,
@@ -17,6 +18,7 @@ from tests.conftest import (
     active_user_view_permissions,
     active_user_with_permissions,
     normalize_spaces,
+    sample_uuid,
 )
 from tests.conftest import service_one as create_sample_service
 
@@ -195,13 +197,13 @@ def test_should_show_caseworker_on_overview_page(
 @pytest.mark.parametrize('endpoint, extra_args, service_has_email_auth, auth_options_hidden', [
     (
         'main.edit_user_permissions',
-        {'user_id': 0},
+        {'user_id': sample_uuid()},
         True,
         False
     ),
     (
         'main.edit_user_permissions',
-        {'user_id': 0},
+        {'user_id': sample_uuid()},
         False,
         True
     ),
@@ -224,7 +226,8 @@ def test_service_with_no_email_auth_hides_auth_type_options(
     extra_args,
     service_has_email_auth,
     auth_options_hidden,
-    service_one
+    service_one,
+    mock_get_users_by_service,
 ):
     if service_has_email_auth:
         service_one['permissions'].append('email_auth')
@@ -236,7 +239,7 @@ def test_service_with_no_email_auth_hides_auth_type_options(
 @pytest.mark.parametrize('endpoint, extra_args', [
     (
         'main.edit_user_permissions',
-        {'user_id': 0},
+        {'user_id': sample_uuid()},
     ),
     (
         'main.invite_user',
@@ -245,6 +248,7 @@ def test_service_with_no_email_auth_hides_auth_type_options(
 ])
 def test_service_without_caseworking_doesnt_show_admin_vs_caseworker(
     client_request,
+    mock_get_users_by_service,
     endpoint,
     service_has_caseworking,
     extra_args,
@@ -299,6 +303,7 @@ def test_manage_users_page_shows_member_auth_type_if_service_has_email_auth_acti
 ])
 def test_user_with_no_mobile_number_cant_be_set_to_sms_auth(
     client_request,
+    mock_get_users_by_service,
     user,
     sms_option_disabled,
     expected_label,
@@ -306,12 +311,12 @@ def test_user_with_no_mobile_number_cant_be_set_to_sms_auth(
     mocker
 ):
     service_one['permissions'].append('email_auth')
-    test_user = mocker.patch('app.user_api_client.get_user', return_value=user(mocker))
+    mocker.patch('app.user_api_client.get_user', return_value=user(mocker))
 
     page = client_request.get(
         'main.edit_user_permissions',
         service_id=service_one['id'],
-        user_id=test_user.id
+        user_id=sample_uuid(),
     )
 
     sms_auth_radio_button = page.select_one('input[value="sms_auth"]')
@@ -324,7 +329,7 @@ def test_user_with_no_mobile_number_cant_be_set_to_sms_auth(
 @pytest.mark.parametrize('endpoint, extra_args, expected_checkboxes', [
     (
         'main.edit_user_permissions',
-        {'user_id': 0},
+        {'user_id': sample_uuid()},
         [
             ('view_activity', True),
             ('send_messages', True),
@@ -347,6 +352,7 @@ def test_user_with_no_mobile_number_cant_be_set_to_sms_auth(
 ])
 def test_should_show_page_for_one_user(
     client_request,
+    mock_get_users_by_service,
     endpoint,
     extra_args,
     expected_checkboxes,
@@ -360,6 +366,18 @@ def test_should_show_page_for_one_user(
         expected_input_name, expected_checked = expected
         assert checkboxes[index]['name'] == expected_input_name
         assert checkboxes[index].has_attr('checked') == expected_checked
+
+
+def test_should_not_show_page_for_non_team_member(
+    client_request,
+    mock_get_users_by_service,
+):
+    client_request.get(
+        'main.edit_user_permissions',
+        service_id=SERVICE_ONE_ID,
+        user_id=USER_ONE_ID,
+        _expected_status=404,
+    )
 
 
 @pytest.mark.parametrize('submitted_permissions, permissions_sent_to_api', [
@@ -398,6 +416,7 @@ def test_should_show_page_for_one_user(
 def test_edit_user_permissions(
     client_request,
     mocker,
+    mock_get_users_by_service,
     mock_get_invites_for_service,
     mock_set_user_permissions,
     fake_uuid,
@@ -426,11 +445,31 @@ def test_edit_user_permissions(
     )
 
 
+def test_cant_edit_non_member_user_permissions(
+    client_request,
+    mocker,
+    mock_get_users_by_service,
+    mock_set_user_permissions,
+):
+    client_request.post(
+        'main.edit_user_permissions',
+        service_id=SERVICE_ONE_ID,
+        user_id=USER_ONE_ID,
+        _data={
+            'email_address': 'test@example.com',
+            'manage_service': 'y',
+        },
+        _expected_status=404,
+    )
+    assert mock_set_user_permissions.called is False
+
+
 @pytest.mark.parametrize('auth_type', ['email_auth', 'sms_auth'])
 def test_edit_user_permissions_including_authentication_with_email_auth_service(
     logged_in_client,
     active_user_with_permissions,
     mocker,
+    mock_get_users_by_service,
     mock_get_invites_for_service,
     mock_set_user_permissions,
     mock_update_user_attribute,
@@ -588,19 +627,40 @@ def test_invite_user_with_email_auth_service(
 
 
 def test_cancel_invited_user_cancels_user_invitations(
-    logged_in_client,
+    client_request,
+    mock_get_invites_for_service,
     active_user_with_permissions,
     mocker,
 ):
-    mocker.patch('app.invite_api_client.cancel_invited_user')
-    import uuid
-    invited_user_id = uuid.uuid4()
-    service = create_sample_service(active_user_with_permissions)
-    response = logged_in_client.get(url_for('main.cancel_invited_user', service_id=service['id'],
-                                    invited_user_id=invited_user_id))
+    mock_cancel = mocker.patch('app.invite_api_client.cancel_invited_user')
+    client_request.get(
+        'main.cancel_invited_user',
+        service_id=SERVICE_ONE_ID,
+        invited_user_id=sample_uuid(),
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.manage_users', service_id=SERVICE_ONE_ID, _external=True
+        ),
+    )
+    mock_cancel.assert_called_once_with(
+        service_id=SERVICE_ONE_ID,
+        invited_user_id=sample_uuid(),
+    )
 
-    assert response.status_code == 302
-    assert response.location == url_for('main.manage_users', service_id=service['id'], _external=True)
+
+def test_cancel_invited_user_doesnt_work_if_user_not_invited_to_this_service(
+    client_request,
+    mock_get_invites_for_service,
+    mocker,
+):
+    mock_cancel = mocker.patch('app.invite_api_client.cancel_invited_user')
+    client_request.get(
+        'main.cancel_invited_user',
+        service_id=SERVICE_ONE_ID,
+        invited_user_id=USER_ONE_ID,
+        _expected_status=404,
+    )
+    assert mock_cancel.called is False
 
 
 @pytest.mark.parametrize('invite_status, expected_text', [
@@ -702,6 +762,7 @@ def test_no_permission_manage_users_page(
 def test_get_remove_user_from_service(
     logged_in_client,
     active_user_with_permissions,
+    mock_get_users_by_service,
     service_one,
     mocker,
 ):
@@ -741,6 +802,7 @@ def test_can_remove_user_from_service_as_platform_admin(
     service_one,
     platform_admin_user,
     active_user_with_permissions,
+    mock_get_users_by_service,
     mock_remove_user_from_service,
     mocker,
 ):
@@ -775,15 +837,16 @@ def test_edit_user_email_page(
     client_request,
     active_user_with_permissions,
     service_one,
+    mock_get_users_by_service,
     mocker
 ):
     user = active_user_with_permissions
-    test_user = mocker.patch('app.user_api_client.get_user', return_value=user)
+    mocker.patch('app.user_api_client.get_user', return_value=user)
 
     page = client_request.get(
         'main.edit_user_email',
         service_id=service_one['id'],
-        user_id=test_user.id
+        user_id=sample_uuid()
     )
 
     assert page.find('h1').text == "Change team member’s email address"
@@ -792,9 +855,22 @@ def test_edit_user_email_page(
     assert page.select('button[type=submit]')[0].text == "Save"
 
 
+def test_edit_user_email_page_404_for_non_team_member(
+    client_request,
+    mock_get_users_by_service,
+):
+    client_request.get(
+        'main.edit_user_email',
+        service_id=SERVICE_ONE_ID,
+        user_id=USER_ONE_ID,
+        _expected_status=404,
+    )
+
+
 def test_edit_user_email_redirects_to_confirmation(
     logged_in_client,
     active_user_with_permissions,
+    mock_get_users_by_service,
     service_one,
     mocker,
     mock_get_user,
@@ -817,6 +893,7 @@ def test_edit_user_email_without_changing_goes_back_to_team_members(
     client_request,
     active_user_with_permissions,
     mock_get_user,
+    mock_get_users_by_service,
     mock_update_user_attribute,
 ):
     client_request.post(
@@ -839,6 +916,7 @@ def test_edit_user_email_without_changing_goes_back_to_team_members(
 def test_confirm_edit_user_email_page(
     logged_in_client,
     active_user_with_permissions,
+    mock_get_users_by_service,
     service_one,
     mocker,
     mock_get_user,
@@ -866,6 +944,7 @@ def test_confirm_edit_user_email_page(
 def test_confirm_edit_user_email_page_redirects_if_session_empty(
     logged_in_client,
     active_user_with_permissions,
+    mock_get_users_by_service,
     service_one,
     mocker,
     mock_get_user,
@@ -879,9 +958,22 @@ def test_confirm_edit_user_email_page_redirects_if_session_empty(
     assert 'Confirm change of email address' not in response.get_data(as_text=True)
 
 
+def test_confirm_edit_user_email_page_404s_for_non_team_member(
+    client_request,
+    mock_get_users_by_service,
+):
+    client_request.get(
+        'main.confirm_edit_user_email',
+        service_id=SERVICE_ONE_ID,
+        user_id=USER_ONE_ID,
+        _expected_status=404,
+    )
+
+
 def test_confirm_edit_user_email_changes_user_email(
     logged_in_client,
     active_user_with_permissions,
+    mock_get_users_by_service,
     service_one,
     mocker,
     mock_get_user,
@@ -899,3 +991,17 @@ def test_confirm_edit_user_email_changes_user_email(
     assert response.location == url_for(
         'main.manage_users', service_id=service_one['id'], _external=True)
     mock_update_user_attribute.assert_called_once_with(active_user_with_permissions.id, email_address=new_email)
+
+
+def test_confirm_edit_user_email_doesnt_change_user_email_for_non_team_member(
+    client_request,
+    mock_get_users_by_service,
+):
+    with client_request.session_transaction() as session:
+        session['team_member_email_change'] = 'new_email@gov.uk'
+    client_request.post(
+        'main.confirm_edit_user_email',
+        service_id=SERVICE_ONE_ID,
+        user_id=USER_ONE_ID,
+        _expected_status=404,
+    )
