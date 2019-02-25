@@ -228,6 +228,7 @@ def test_service_with_no_email_auth_hides_auth_type_options(
     auth_options_hidden,
     service_one,
     mock_get_users_by_service,
+    mock_get_template_folders
 ):
     if service_has_email_auth:
         service_one['permissions'].append('email_auth')
@@ -249,6 +250,7 @@ def test_service_with_no_email_auth_hides_auth_type_options(
 def test_service_without_caseworking_doesnt_show_admin_vs_caseworker(
     client_request,
     mock_get_users_by_service,
+    mock_get_template_folders,
     endpoint,
     service_has_caseworking,
     extra_args,
@@ -304,6 +306,7 @@ def test_manage_users_page_shows_member_auth_type_if_service_has_email_auth_acti
 def test_user_with_no_mobile_number_cant_be_set_to_sms_auth(
     client_request,
     mock_get_users_by_service,
+    mock_get_template_folders,
     user,
     sms_option_disabled,
     expected_label,
@@ -353,6 +356,7 @@ def test_user_with_no_mobile_number_cant_be_set_to_sms_auth(
 def test_should_show_page_for_one_user(
     client_request,
     mock_get_users_by_service,
+    mock_get_template_folders,
     endpoint,
     extra_args,
     expected_checkboxes,
@@ -419,6 +423,7 @@ def test_edit_user_permissions(
     mock_get_users_by_service,
     mock_get_invites_for_service,
     mock_set_user_permissions,
+    mock_get_template_folders,
     fake_uuid,
     submitted_permissions,
     permissions_sent_to_api,
@@ -474,7 +479,8 @@ def test_edit_user_permissions_including_authentication_with_email_auth_service(
     mock_set_user_permissions,
     mock_update_user_attribute,
     service_one,
-    auth_type
+    auth_type,
+    mock_get_template_folders
 ):
     service_one['permissions'].append('email_auth')
 

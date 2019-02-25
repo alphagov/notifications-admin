@@ -1,5 +1,5 @@
-{% from "components/checkbox.html" import checkbox %}
-{% from "components/radios.html" import radio, radios, radios_wrapper, conditional_radio_panel %}
+{% from "components/checkbox.html" import checkbox, checkboxes_nested %}
+{% from "components/radios.html" import radio, radios, conditional_radio_panel %}
 
 <fieldset class="form-group">
   <legend class="form-label">
@@ -13,6 +13,10 @@
 <p class="bottom-gutter">
   All team members can see sent messages.
 </p>
+
+{% if current_service.has_permission("edit_folder_permissions") %}
+  {{ checkboxes_nested(form.folder_permissions, form.folder_permissions.children()) }}
+{% endif %}
 
 {% if service_has_email_auth %}
   {% if not mobile_number %}

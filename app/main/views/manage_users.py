@@ -84,7 +84,11 @@ def edit_user_permissions(service_id, user_id):
     if user.mobile_number:
         mobile_number = redact_mobile_number(user.mobile_number, " ")
 
-    form = PermissionsForm.from_user(user, service_id)
+    form = PermissionsForm.from_user(
+        user,
+        service_id,
+        all_template_folders=current_service.all_template_folders
+    )
 
     if form.validate_on_submit():
         user_api_client.set_user_permissions(

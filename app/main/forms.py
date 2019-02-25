@@ -418,6 +418,15 @@ PermissionsAbstract = type("PermissionsAbstract", (StripWhitespaceForm,), {
 
 
 class PermissionsForm(PermissionsAbstract):
+    def __init__(self, all_template_folders=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if all_template_folders:
+            self.folder_permissions.all_template_folders = all_template_folders
+            self.folder_permissions.choices = [
+                (item['id'], item['name']) for item in ([{'name': 'Templates', 'id': None}] + all_template_folders)
+            ]
+
+    folder_permissions = NestedCheckboxesField('Folder permissions')
 
     login_authentication = RadioField(
         'Sign in using',
@@ -437,8 +446,9 @@ class PermissionsForm(PermissionsAbstract):
         return (getattr(self, permission) for permission, _ in permissions)
 
     @classmethod
-    def from_user(cls, user, service_id):
+    def from_user(cls, user, service_id, **kwargs):
         return cls(
+            **kwargs,
             **{
                 role: user.has_permission_for_service(service_id, role)
                 for role in roles.keys()
