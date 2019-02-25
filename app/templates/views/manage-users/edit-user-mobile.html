@@ -13,7 +13,7 @@
   <p id="user_name">This will change the mobile number for {{ user.name }}.</p>
   <div class="grid-row">
     <div class="column-three-quarters">
-      {% call form_wrapper() %}
+      {% call form_wrapper(class="extra-tracking") %}
         {{ textbox(form.mobile_number) }}
         {{ page_footer(
           'Save',

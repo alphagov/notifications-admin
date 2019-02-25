@@ -673,9 +673,10 @@ def printing_today_or_tomorrow():
         return 'tomorrow'
 
 
-def redact_mobile_number(mobile_number):
+def redact_mobile_number(mobile_number, spacing=""):
     indices = [-4, -5, -6, -7]
+    redact_character = spacing + "•" + spacing
     mobile_number_list = list(mobile_number.replace(" ", ""))
     for i in indices:
-        mobile_number_list[i] = "*"
+        mobile_number_list[i] = redact_character
     return "".join(mobile_number_list)

@@ -82,7 +82,7 @@ def edit_user_permissions(service_id, user_id):
 
     mobile_number = None
     if user.mobile_number:
-        mobile_number = redact_mobile_number(user.mobile_number)
+        mobile_number = redact_mobile_number(user.mobile_number, " ")
 
     form = PermissionsForm.from_user(user, service_id)
 
@@ -182,15 +182,9 @@ def confirm_edit_user_email(service_id, user_id):
         try:
             user_api_client.update_user_attribute(str(user_id), email_address=new_email)
         except HTTPError as e:
-            if e.status_code == 403:
-                flash("You don't have permission to edit users emails for this service", 'info')
-                return redirect(url_for(
-                    '.manage_users',
-                    service_id=service_id))
-            else:
-                abort(500, e)
+            abort(500, e)
         finally:
-            session.pop("team_member_email_change", None)
+            session.pop('team_member_email_change', None)
 
         return redirect(url_for(
             '.manage_users',
@@ -212,11 +206,15 @@ def edit_user_mobile_number(service_id, user_id):
     user_mobile_number = redact_mobile_number(user.mobile_number)
 
     form = ChangeMobileNumberForm(mobile_number=user_mobile_number)
+    if form.mobile_number.data == user_mobile_number and request.method == 'POST':
+        return redirect(url_for(
+            '.manage_users',
+            service_id=service_id
+        ))
     if form.validate_on_submit():
         session['team_member_mobile_change'] = form.mobile_number.data
 
         return redirect(url_for('.confirm_edit_user_mobile_number', user_id=user.id, service_id=service_id))
-
     return render_template(
         'views/manage-users/edit-user-mobile.html',
         user=user,
@@ -230,18 +228,21 @@ def edit_user_mobile_number(service_id, user_id):
 @user_has_permissions('manage_service')
 def confirm_edit_user_mobile_number(service_id, user_id):
     user = user_api_client.get_user(user_id)
-    new_number = session['team_member_mobile_change']
+    if 'team_member_mobile_change' in session:
+        new_number = session['team_member_mobile_change']
+    else:
+        return redirect(url_for(
+            '.edit_user_mobile_number',
+            service_id=service_id,
+            user_id=user_id
+        ))
     if request.method == 'POST':
         try:
             user_api_client.update_user_attribute(user_id, mobile_number=new_number)
         except HTTPError as e:
-            if e.status_code == 403:
-                flash("You don't have permission to edit users' mobile numbers for this service", 'info')
-                return redirect(url_for(
-                    '.manage_users',
-                    service_id=service_id))
-            else:
-                abort(500, e)
+            abort(500, e)
+        finally:
+            session.pop('team_member_mobile_change', None)
 
         return redirect(url_for(
             '.manage_users',
