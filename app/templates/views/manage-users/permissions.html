@@ -15,7 +15,7 @@
 </p>
 
 {% if service_has_email_auth %}
-  {% if user_has_no_mobile_number %}
+  {% if not mobile_number %}
     {{ radios(
       form.login_authentication,
       disable=['sms_auth'],

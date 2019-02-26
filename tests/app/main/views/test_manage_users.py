@@ -1005,3 +1005,176 @@ def test_confirm_edit_user_email_doesnt_change_user_email_for_non_team_member(
         user_id=USER_ONE_ID,
         _expected_status=404,
     )
+
+
+def test_edit_user_permissions_page_displays_redacted_mobile_number_and_change_link(
+    client_request,
+    active_user_with_permissions,
+    mock_get_users_by_service,
+    service_one,
+    mocker
+):
+    user = active_user_with_permissions
+    mocker.patch('app.user_api_client.get_user', return_value=user)
+
+    page = client_request.get(
+        'main.edit_user_permissions',
+        service_id=service_one['id'],
+        user_id=user.id
+    )
+
+    assert user.name in page.find('h1').text
+    mobile_number_paragraph = page.select('p[id=user_mobile_number]')[0]
+    assert '0770 •  •  •  • 762' in mobile_number_paragraph.text
+    change_link = mobile_number_paragraph.findChild()
+    assert change_link.attrs['href'] == '/services/{}/users/{}/edit-mobile-number'.format(
+        service_one['id'], user.id
+    )
+
+
+def test_edit_user_mobile_number_page(
+    client_request,
+    active_user_with_permissions,
+    mock_get_users_by_service,
+    service_one,
+    mocker
+):
+    user = active_user_with_permissions
+    mocker.patch('app.user_api_client.get_user', return_value=user)
+
+    page = client_request.get(
+        'main.edit_user_mobile_number',
+        service_id=service_one['id'],
+        user_id=user.id
+    )
+
+    assert page.find('h1').text == "Change team member’s mobile number"
+    assert page.select('p[id=user_name]')[0].text == "This will change the mobile number for {}.".format(user.name)
+    assert page.select('input[name=mobile_number]')[0].attrs["value"] == "0770••••762"
+    assert page.select('button[type=submit]')[0].text == "Save"
+
+
+def test_edit_user_mobile_number_redirects_to_confirmation(
+    logged_in_client,
+    active_user_with_permissions,
+    mock_get_users_by_service,
+    service_one,
+    mocker,
+    mock_get_user,
+):
+
+    data = {'mobile_number': '07554080636'}
+    response = logged_in_client.post(
+        url_for(
+            'main.edit_user_mobile_number',
+            service_id=service_one['id'],
+            user_id=active_user_with_permissions.id), data=data)
+    assert response.status_code == 302
+    assert response.location == url_for(
+        'main.confirm_edit_user_mobile_number',
+        service_id=service_one['id'],
+        user_id=active_user_with_permissions.id,
+        _external=True
+    )
+
+
+def test_edit_user_mobile_number_redirects_to_manage_users_if_number_not_changed(
+    logged_in_client,
+    active_user_with_permissions,
+    mock_get_users_by_service,
+    service_one,
+    mocker,
+    mock_get_user,
+):
+
+    data = {'mobile_number': '0770••••762'}
+    response = logged_in_client.post(
+        url_for(
+            'main.edit_user_mobile_number',
+            service_id=service_one['id'],
+            user_id=active_user_with_permissions.id), data=data)
+    assert response.status_code == 302
+    assert response.location == url_for(
+        'main.manage_users', service_id=service_one['id'], _external=True)
+
+
+def test_confirm_edit_user_mobile_number_page(
+    logged_in_client,
+    active_user_with_permissions,
+    mock_get_users_by_service,
+    service_one,
+    mocker,
+    mock_get_user,
+):
+    new_number = '07554080636'
+    with logged_in_client.session_transaction() as session:
+        session['team_member_mobile_change'] = new_number
+    response = logged_in_client.get(url_for(
+        'main.confirm_edit_user_mobile_number',
+        service_id=service_one['id'],
+        user_id=active_user_with_permissions.id
+    ))
+
+    assert response.status_code == 200
+    assert 'Confirm change of mobile number' in response.get_data(as_text=True)
+    for text in [
+        'New mobile number:',
+        new_number,
+        'We will send {} an email to tell them about the change.'.format(active_user_with_permissions.name)
+    ]:
+        assert text in response.get_data(as_text=True)
+    assert 'Confirm' in response.get_data(as_text=True)
+
+
+def test_confirm_edit_user_mobile_number_page_redirects_if_session_empty(
+    logged_in_client,
+    active_user_with_permissions,
+    mock_get_users_by_service,
+    service_one,
+    mocker,
+    mock_get_user,
+):
+    response = logged_in_client.get(url_for(
+        'main.confirm_edit_user_mobile_number',
+        service_id=service_one['id'],
+        user_id=active_user_with_permissions.id
+    ))
+    assert response.status_code == 302
+    assert 'Confirm change of mobile number' not in response.get_data(as_text=True)
+
+
+def test_confirm_edit_user_mobile_number_changes_user_mobile_number(
+    logged_in_client,
+    active_user_with_permissions,
+    mock_get_users_by_service,
+    service_one,
+    mocker,
+    mock_get_user,
+    mock_update_user_attribute
+):
+    new_number = '07554080636'
+    with logged_in_client.session_transaction() as session:
+        session['team_member_mobile_change'] = new_number
+    response = logged_in_client.post(
+        url_for(
+            'main.confirm_edit_user_mobile_number',
+            service_id=service_one['id'],
+            user_id=active_user_with_permissions.id))
+    assert response.status_code == 302
+    assert response.location == url_for(
+        'main.manage_users', service_id=service_one['id'], _external=True)
+    mock_update_user_attribute.assert_called_once_with(active_user_with_permissions.id, mobile_number=new_number)
+
+
+def test_confirm_edit_user_mobile_number_doesnt_change_user_mobile_for_non_team_member(
+    client_request,
+    mock_get_users_by_service,
+):
+    with client_request.session_transaction() as session:
+        session['team_member_mobile_change'] = '07554080636'
+    client_request.post(
+        'main.confirm_edit_user_mobile_number',
+        service_id=SERVICE_ONE_ID,
+        user_id=USER_ONE_ID,
+        _expected_status=404,
+    )

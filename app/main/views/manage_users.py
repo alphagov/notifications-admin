@@ -19,12 +19,13 @@ from app import (
 from app.main import main
 from app.main.forms import (
     ChangeEmailForm,
+    ChangeMobileNumberForm,
     InviteUserForm,
     PermissionsForm,
     SearchUsersForm,
 )
 from app.models.user import permissions
-from app.utils import user_has_permissions
+from app.utils import redact_mobile_number, user_has_permissions
 
 
 @main.route("/services/<service_id>/users")
@@ -78,7 +79,10 @@ def invite_user(service_id):
 def edit_user_permissions(service_id, user_id):
     service_has_email_auth = current_service.has_permission('email_auth')
     user = current_service.get_team_member(user_id)
-    user_has_no_mobile_number = user.mobile_number is None
+
+    mobile_number = None
+    if user.mobile_number:
+        mobile_number = redact_mobile_number(user.mobile_number, " ")
 
     form = PermissionsForm.from_user(user, service_id)
 
@@ -96,7 +100,7 @@ def edit_user_permissions(service_id, user_id):
         user=user,
         form=form,
         service_has_email_auth=service_has_email_auth,
-        user_has_no_mobile_number=user_has_no_mobile_number
+        mobile_number=mobile_number
     )
 
 
@@ -178,15 +182,9 @@ def confirm_edit_user_email(service_id, user_id):
         try:
             user_api_client.update_user_attribute(str(user_id), email_address=new_email)
         except HTTPError as e:
-            if e.status_code == 403:
-                flash("You don't have permission to edit users emails for this service", 'info')
-                return redirect(url_for(
-                    '.manage_users',
-                    service_id=service_id))
-            else:
-                abort(500, e)
+            abort(500, e)
         finally:
-            session.pop("team_member_email_change", None)
+            session.pop('team_member_email_change', None)
 
         return redirect(url_for(
             '.manage_users',
@@ -197,6 +195,65 @@ def confirm_edit_user_email(service_id, user_id):
         user=user,
         service_id=service_id,
         new_email=new_email
+    )
+
+
+@main.route("/services/<service_id>/users/<uuid:user_id>/edit-mobile-number", methods=['GET', 'POST'])
+@login_required
+@user_has_permissions('manage_service')
+def edit_user_mobile_number(service_id, user_id):
+    user = current_service.get_team_member(user_id)
+    user_mobile_number = redact_mobile_number(user.mobile_number)
+
+    form = ChangeMobileNumberForm(mobile_number=user_mobile_number)
+    if form.mobile_number.data == user_mobile_number and request.method == 'POST':
+        return redirect(url_for(
+            '.manage_users',
+            service_id=service_id
+        ))
+    if form.validate_on_submit():
+        session['team_member_mobile_change'] = form.mobile_number.data
+
+        return redirect(url_for('.confirm_edit_user_mobile_number', user_id=user.id, service_id=service_id))
+    return render_template(
+        'views/manage-users/edit-user-mobile.html',
+        user=user,
+        form=form,
+        service_id=service_id
+    )
+
+
+@main.route("/services/<service_id>/users/<uuid:user_id>/edit-mobile-number/confirm", methods=['GET', 'POST'])
+@login_required
+@user_has_permissions('manage_service')
+def confirm_edit_user_mobile_number(service_id, user_id):
+    user = current_service.get_team_member(user_id)
+    if 'team_member_mobile_change' in session:
+        new_number = session['team_member_mobile_change']
+    else:
+        return redirect(url_for(
+            '.edit_user_mobile_number',
+            service_id=service_id,
+            user_id=user_id
+        ))
+    if request.method == 'POST':
+        try:
+            user_api_client.update_user_attribute(str(user_id), mobile_number=new_number)
+        except HTTPError as e:
+            abort(500, e)
+        finally:
+            session.pop('team_member_mobile_change', None)
+
+        return redirect(url_for(
+            '.manage_users',
+            service_id=service_id
+        ))
+
+    return render_template(
+        'views/manage-users/confirm-edit-user-mobile-number.html',
+        user=user,
+        service_id=service_id,
+        new_mobile_number=new_number
     )
 
 

@@ -650,9 +650,9 @@ def guess_name_from_email_address(email_address):
 
 def should_skip_template_page(template_type):
     return (
-        current_user.has_permissions('send_messages') and
-        not current_user.has_permissions('manage_templates', 'manage_api_keys') and
-        template_type != 'letter'
+        current_user.has_permissions('send_messages')
+        and not current_user.has_permissions('manage_templates', 'manage_api_keys')
+        and template_type != 'letter'
     )
 
 
@@ -671,3 +671,12 @@ def printing_today_or_tomorrow():
         return 'today'
     else:
         return 'tomorrow'
+
+
+def redact_mobile_number(mobile_number, spacing=""):
+    indices = [-4, -5, -6, -7]
+    redact_character = spacing + "•" + spacing
+    mobile_number_list = list(mobile_number.replace(" ", ""))
+    for i in indices:
+        mobile_number_list[i] = redact_character
+    return "".join(mobile_number_list)
