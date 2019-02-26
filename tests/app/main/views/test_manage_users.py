@@ -990,7 +990,11 @@ def test_confirm_edit_user_email_changes_user_email(
     assert response.status_code == 302
     assert response.location == url_for(
         'main.manage_users', service_id=service_one['id'], _external=True)
-    mock_update_user_attribute.assert_called_once_with(active_user_with_permissions.id, email_address=new_email)
+    mock_update_user_attribute.assert_called_once_with(
+        active_user_with_permissions.id,
+        email_address=new_email,
+        updated_by=mocker.ANY
+    )
 
 
 def test_confirm_edit_user_email_doesnt_change_user_email_for_non_team_member(
@@ -1163,7 +1167,11 @@ def test_confirm_edit_user_mobile_number_changes_user_mobile_number(
     assert response.status_code == 302
     assert response.location == url_for(
         'main.manage_users', service_id=service_one['id'], _external=True)
-    mock_update_user_attribute.assert_called_once_with(active_user_with_permissions.id, mobile_number=new_number)
+    mock_update_user_attribute.assert_called_once_with(
+        active_user_with_permissions.id,
+        mobile_number=new_number,
+        updated_by=mocker.ANY
+    )
 
 
 def test_confirm_edit_user_mobile_number_doesnt_change_user_mobile_for_non_team_member(

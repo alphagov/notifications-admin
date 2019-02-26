@@ -180,7 +180,7 @@ def confirm_edit_user_email(service_id, user_id):
         ))
     if request.method == 'POST':
         try:
-            user_api_client.update_user_attribute(str(user_id), email_address=new_email)
+            user_api_client.update_user_attribute(str(user_id), email_address=new_email, updated_by=current_user.id)
         except HTTPError as e:
             abort(500, e)
         finally:
@@ -238,7 +238,7 @@ def confirm_edit_user_mobile_number(service_id, user_id):
         ))
     if request.method == 'POST':
         try:
-            user_api_client.update_user_attribute(str(user_id), mobile_number=new_number)
+            user_api_client.update_user_attribute(str(user_id), mobile_number=new_number, updated_by=current_user.id)
         except HTTPError as e:
             abort(500, e)
         finally:
