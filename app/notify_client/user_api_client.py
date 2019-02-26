@@ -14,6 +14,7 @@ ALLOWED_ATTRIBUTES = {
     'email_address',
     'mobile_number',
     'auth_type',
+    'updated_by'
 }
 
 
@@ -70,7 +71,6 @@ class UserApiClient(NotifyAdminAPIClient):
                 ", ".join(disallowed_attributes)
             ))
 
-        data = dict(**kwargs)
         url = "/user/{}".format(user_id)
         user_data = self.post(url, data=data)
         return User(user_data['data'], max_failed_login_count=self.max_failed_login_count)
