@@ -1007,10 +1007,6 @@ def test_confirm_edit_user_email_doesnt_change_user_email_for_non_team_member(
     )
 
 
-def test_confirm_edit_user_email_with_no_permission_aborts():
-    pass
-
-
 def test_edit_user_permissions_page_displays_redacted_mobile_number_and_change_link(
     client_request,
     active_user_with_permissions,
@@ -1039,6 +1035,7 @@ def test_edit_user_permissions_page_displays_redacted_mobile_number_and_change_l
 def test_edit_user_mobile_number_page(
     client_request,
     active_user_with_permissions,
+    mock_get_users_by_service,
     service_one,
     mocker
 ):
@@ -1060,6 +1057,7 @@ def test_edit_user_mobile_number_page(
 def test_edit_user_mobile_number_redirects_to_confirmation(
     logged_in_client,
     active_user_with_permissions,
+    mock_get_users_by_service,
     service_one,
     mocker,
     mock_get_user,
@@ -1083,6 +1081,7 @@ def test_edit_user_mobile_number_redirects_to_confirmation(
 def test_edit_user_mobile_number_redirects_to_manage_users_if_number_not_changed(
     logged_in_client,
     active_user_with_permissions,
+    mock_get_users_by_service,
     service_one,
     mocker,
     mock_get_user,
@@ -1102,6 +1101,7 @@ def test_edit_user_mobile_number_redirects_to_manage_users_if_number_not_changed
 def test_confirm_edit_user_mobile_number_page(
     logged_in_client,
     active_user_with_permissions,
+    mock_get_users_by_service,
     service_one,
     mocker,
     mock_get_user,
@@ -1129,6 +1129,7 @@ def test_confirm_edit_user_mobile_number_page(
 def test_confirm_edit_user_mobile_number_page_redirects_if_session_empty(
     logged_in_client,
     active_user_with_permissions,
+    mock_get_users_by_service,
     service_one,
     mocker,
     mock_get_user,
@@ -1145,6 +1146,7 @@ def test_confirm_edit_user_mobile_number_page_redirects_if_session_empty(
 def test_confirm_edit_user_mobile_number_changes_user_mobile_number(
     logged_in_client,
     active_user_with_permissions,
+    mock_get_users_by_service,
     service_one,
     mocker,
     mock_get_user,
@@ -1162,3 +1164,17 @@ def test_confirm_edit_user_mobile_number_changes_user_mobile_number(
     assert response.location == url_for(
         'main.manage_users', service_id=service_one['id'], _external=True)
     mock_update_user_attribute.assert_called_once_with(active_user_with_permissions.id, mobile_number=new_number)
+
+
+def test_confirm_edit_user_mobile_number_doesnt_change_user_mobile_for_non_team_member(
+    client_request,
+    mock_get_users_by_service,
+):
+    with client_request.session_transaction() as session:
+        session['team_member_mobile_change'] = '07554080636'
+    client_request.post(
+        'main.confirm_edit_user_mobile_number',
+        service_id=SERVICE_ONE_ID,
+        user_id=USER_ONE_ID,
+        _expected_status=404,
+    )

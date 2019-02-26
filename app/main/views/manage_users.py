@@ -198,11 +198,11 @@ def confirm_edit_user_email(service_id, user_id):
     )
 
 
-@main.route("/services/<service_id>/users/<user_id>/edit-mobile-number", methods=['GET', 'POST'])
+@main.route("/services/<service_id>/users/<uuid:user_id>/edit-mobile-number", methods=['GET', 'POST'])
 @login_required
 @user_has_permissions('manage_service')
 def edit_user_mobile_number(service_id, user_id):
-    user = user_api_client.get_user(user_id)
+    user = current_service.get_team_member(user_id)
     user_mobile_number = redact_mobile_number(user.mobile_number)
 
     form = ChangeMobileNumberForm(mobile_number=user_mobile_number)
@@ -223,11 +223,11 @@ def edit_user_mobile_number(service_id, user_id):
     )
 
 
-@main.route("/services/<service_id>/users/<user_id>/edit-mobile-number/confirm", methods=['GET', 'POST'])
+@main.route("/services/<service_id>/users/<uuid:user_id>/edit-mobile-number/confirm", methods=['GET', 'POST'])
 @login_required
 @user_has_permissions('manage_service')
 def confirm_edit_user_mobile_number(service_id, user_id):
-    user = user_api_client.get_user(user_id)
+    user = current_service.get_team_member(user_id)
     if 'team_member_mobile_change' in session:
         new_number = session['team_member_mobile_change']
     else:
@@ -238,7 +238,7 @@ def confirm_edit_user_mobile_number(service_id, user_id):
         ))
     if request.method == 'POST':
         try:
-            user_api_client.update_user_attribute(user_id, mobile_number=new_number)
+            user_api_client.update_user_attribute(str(user_id), mobile_number=new_number)
         except HTTPError as e:
             abort(500, e)
         finally:
