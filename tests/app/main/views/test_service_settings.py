@@ -1017,6 +1017,26 @@ def test_non_gov_users_cant_request_to_go_live(
     )
 
 
+@pytest.mark.parametrize('volumes, displayed_volumes, formatted_displayed_volumes', (
+    (
+        (('email', None), ('sms', None), ('letter', None)),
+        ', , ',
+        (
+            'Emails in next year: \n'
+            'Text messages in next year: \n'
+            'Letters in next year: \n'
+        ),
+    ),
+    (
+        (('email', 1234), ('sms', 0), ('letter', 999)),
+        '0, 1234, 999',  # This is a different order to match the spreadsheet
+        (
+            'Emails in next year: 1,234\n'
+            'Text messages in next year: 0\n'
+            'Letters in next year: 999\n'
+        ),
+    ),
+))
 @freeze_time("2012-12-21")
 def test_should_redirect_after_request_to_go_live(
     client_request,
@@ -1030,7 +1050,17 @@ def test_should_redirect_after_request_to_go_live(
     mock_get_service_settings_page_common,
     mock_get_service_templates,
     mock_get_users_by_service,
+    volumes,
+    displayed_volumes,
+    formatted_displayed_volumes,
 ):
+    for channel, volume in volumes:
+        mocker.patch(
+            'app.models.service.Service.volume_{}'.format(channel),
+            create=True,
+            new_callable=PropertyMock,
+            return_value=volume,
+        )
     mock_post = mocker.patch('app.main.views.service_settings.zendesk_client.create_ticket', autospec=True)
     page = client_request.post(
         'main.request_to_go_live',
@@ -1053,21 +1083,24 @@ def test_should_redirect_after_request_to_go_live(
     )
     assert mock_post.call_args[1]['message'] == (
         'Service: service one\n'
-        'http://localhost/services/{}\n'
+        'http://localhost/services/{service_id}\n'
         '\n'
         '---\n'
         'Organisation type: Central\n'
         'Agreement signed: Can’t tell (domain is user.gov.uk)\n'
         'Checklist completed: No\n'
-        'Emails in next year: 111,111\n'
-        'Text messages in next year: 222,222\n'
-        'Letters in next year: 333,333\n'
+        '{formatted_displayed_volumes}'
         'Consent to research: Yes\n'
         'Other live services: No\n'
         '\n'
         '---\n'
-        '{}, None, service one, Test User, test@user.gov.uk, -, 21/12/2012, 222222, 111111, 333333'
-    ).format(SERVICE_ONE_ID, SERVICE_ONE_ID)
+        '{service_id}, None, service one, Test User, test@user.gov.uk, -, 21/12/2012, '
+        '{displayed_volumes}'
+    ).format(
+        service_id=SERVICE_ONE_ID,
+        displayed_volumes=displayed_volumes,
+        formatted_displayed_volumes=formatted_displayed_volumes,
+    )
 
     assert normalize_spaces(page.select_one('.banner-default').text) == (
         'Thanks for your request to go live. We’ll get back to you within one working day.'
