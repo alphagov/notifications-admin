@@ -181,17 +181,17 @@ class ForgivingIntegerField(StringField):
 
         if valuelist:
 
-            valuelist[0] = valuelist[0].replace(',', '').replace(' ', '')
+            value = valuelist[0].replace(',', '').replace(' ', '')
 
             try:
-                valuelist[0] = int(valuelist[0])
+                value = int(value)
             except ValueError:
                 pass
 
-            if valuelist[0] == '':
-                valuelist[0] = 0
+            if value == '':
+                value = 0
 
-        return super().process_formdata(valuelist)
+        return super().process_formdata([value])
 
     def pre_validate(self, form):
 
@@ -209,6 +209,12 @@ class ForgivingIntegerField(StringField):
         return super().pre_validate(form)
 
     def __call__(self, **kwargs):
+
+        if self.get_form().is_submitted() and not self.get_form().validate():
+            return super().__call__(
+                value=(self.raw_data or [None])[0],
+                **kwargs
+            )
 
         try:
             value = int(self.data)

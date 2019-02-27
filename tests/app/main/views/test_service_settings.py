@@ -968,9 +968,40 @@ def test_should_error_if_all_volumes_zero(
         },
         _expected_status=200,
     )
+    assert page.select('input[type=text]')[0]['value'] == ''
+    assert page.select('input[type=text]')[1]['value'] == '0'
+    assert page.select('input[type=text]')[2]['value'] == '0,00 0'
     assert normalize_spaces(page.select_one('.banner-dangerous').text) == (
         'no things supplied '
         'Tell us some things'
+    )
+    assert mock_update_service.called is False
+
+
+def test_should_not_default_to_zero_if_some_fields_dont_validate(
+    client_request,
+    mock_update_service,
+):
+    page = client_request.post(
+        'main.estimate_usage',
+        service_id=SERVICE_ONE_ID,
+        _data={
+            'volume_email': '1234',
+            'volume_sms': '',
+            'volume_letter': 'aaaaaaaaaaaaa',
+            'consent_to_research': 'yes',
+        },
+        _expected_status=200,
+    )
+    assert page.select('input[type=text]')[0]['value'] == '1234'
+    assert page.select('input[type=text]')[1]['value'] == ''
+    assert page.select('input[type=text]')[2]['value'] == 'aaaaaaaaaaaaa'
+    assert normalize_spaces(
+        page.select_one('label[for=volume_letter]').text
+    ) == (
+        'How many letters do you expect to send in the next year? '
+        'For example, 5,000 '
+        'Must be a whole number'
     )
     assert mock_update_service.called is False
 
