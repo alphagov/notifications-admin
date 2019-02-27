@@ -1,0 +1,44 @@
+.checkboxes-nested {
+
+  margin-bottom: 10px;
+
+  .multiple-choice {
+
+    $circle-diameter: 39px;
+    $border-thickness: 4px;
+    $border-indent: ($circle-diameter / 2) - ($border-thickness / 2);
+    $border-colour: $border-colour;
+
+    float: none;
+    position: relative;
+
+    &:before {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: $border-indent;
+      width: $border-thickness;
+      height: 100%;
+      background: $border-colour;
+    }
+
+    label {
+      float: none;
+    }
+
+    [type=checkbox]+label::before {
+      // To overlap the grey inset line
+      background: $white;
+    }
+
+    ul {
+      // To equalise the spacing between the line and the top/bottom of
+      // the radio
+      margin-top: 5px;
+      margin-bottom: -5px;
+      padding-left: 12px;
+    }
+
+  }
+
+}
