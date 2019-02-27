@@ -927,7 +927,7 @@ def test_should_show_persist_estimated_volumes(
     ),
     (
         {
-            'volume_email': '1234',
+            'volume_email': '1 234',
             'volume_sms': '0',
             'volume_letter': '9876',
             'consent_to_research': '',
@@ -963,7 +963,7 @@ def test_should_error_if_all_volumes_zero(
         _data={
             'volume_email': '',
             'volume_sms': '0',
-            'volume_letter': '0,000',
+            'volume_letter': '0,00 0',
             'consent_to_research': 'yes',
         },
         _expected_status=200,

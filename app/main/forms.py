@@ -181,7 +181,7 @@ class ForgivingIntegerField(StringField):
 
         if valuelist:
 
-            valuelist[0] = valuelist[0].replace(',', '')
+            valuelist[0] = valuelist[0].replace(',', '').replace(' ', '')
 
             try:
                 valuelist[0] = int(valuelist[0])
