@@ -161,12 +161,16 @@ class UserApiClient(NotifyAdminAPIClient):
         resp = self.post('/organisations/{}/users/{}'.format(org_id, user_id), data={})
         return User(resp['data'], max_failed_login_count=self.max_failed_login_count)
 
+    @cache.delete('service-{service_id}-template-folders')
     @cache.delete('user-{user_id}')
-    def set_user_permissions(self, user_id, service_id, permissions):
+    def set_user_permissions(self, user_id, service_id, permissions, folder_permissions=None):
         # permissions passed in are the combined admin roles, not db permissions
         data = {
-            'permissions': [{'permission': x} for x in translate_permissions_from_admin_roles_to_db(permissions)]
+            'permissions': [{'permission': x} for x in translate_permissions_from_admin_roles_to_db(permissions)],
         }
+
+        if folder_permissions is not None:
+            data['folder_permissions'] = folder_permissions
 
         endpoint = '/user/{}/service/{}/permission'.format(user_id, service_id)
         self.post(endpoint, data=data)

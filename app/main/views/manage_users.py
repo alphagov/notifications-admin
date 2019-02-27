@@ -87,6 +87,10 @@ def edit_user_permissions(service_id, user_id):
     form = PermissionsForm.from_user(
         user,
         service_id,
+        folder_permissions=[
+            f['id'] for f in current_service.all_template_folders
+            if user_id in f.get('users_with_permission', [])
+        ],
         all_template_folders=current_service.all_template_folders
     )
 
@@ -94,6 +98,10 @@ def edit_user_permissions(service_id, user_id):
         user_api_client.set_user_permissions(
             user_id, service_id,
             permissions=form.permissions,
+            folder_permissions=(
+                form.folder_permissions.data
+                if current_service.has_permission('edit_folder_permissions') else None
+            ),
         )
         if service_has_email_auth:
             user_api_client.update_user_attribute(user_id, auth_type=form.login_authentication.data)

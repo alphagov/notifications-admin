@@ -447,6 +447,45 @@ def test_edit_user_permissions(
         fake_uuid,
         SERVICE_ONE_ID,
         permissions=permissions_sent_to_api,
+        folder_permissions=None
+    )
+
+
+def test_edit_user_folder_permissions(
+    client_request,
+    mocker,
+    service_one,
+    mock_get_users_by_service,
+    mock_get_invites_for_service,
+    mock_set_user_permissions,
+    mock_get_template_folders,
+    fake_uuid,
+):
+    service_one['permissions'] = ['edit_folder_permissions']
+    mock_get_template_folders.return_value = [
+        {'id': 'folder-id-1', 'name': 'folder_one', 'parent_id': None, 'users_with_permission': []},
+        {'id': 'folder-id-2', 'name': 'folder_one', 'parent_id': None, 'users_with_permission': []},
+        {'id': 'folder-id-3', 'name': 'folder_one', 'parent_id': 'folder-id-1', 'users_with_permission': []},
+    ]
+    client_request.post(
+        'main.edit_user_permissions',
+        service_id=SERVICE_ONE_ID,
+        user_id=fake_uuid,
+        _data=dict(
+            folder_permissions=['folder-id-1', 'folder-id-3']
+        ),
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.manage_users',
+            service_id=SERVICE_ONE_ID,
+            _external=True,
+        ),
+    )
+    mock_set_user_permissions.assert_called_with(
+        fake_uuid,
+        SERVICE_ONE_ID,
+        permissions=set(),
+        folder_permissions=['folder-id-1', 'folder-id-3']
     )
 
 
@@ -508,7 +547,8 @@ def test_edit_user_permissions_including_authentication_with_email_auth_service(
             'manage_templates',
             'manage_service',
             'manage_api_keys',
-        }
+        },
+        folder_permissions=None
     )
     mock_update_user_attribute.assert_called_with(
         str(active_user_with_permissions.id),
@@ -1021,6 +1061,7 @@ def test_edit_user_permissions_page_displays_redacted_mobile_number_and_change_l
     client_request,
     active_user_with_permissions,
     mock_get_users_by_service,
+    mock_get_template_folders,
     service_one,
     mocker
 ):
