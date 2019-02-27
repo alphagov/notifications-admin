@@ -201,9 +201,9 @@ def submit_request_to_go_live(service_id):
             '\nOrganisation type: {organisation_type}'
             '\nAgreement signed: {agreement}'
             '\nChecklist completed: {checklist}'
-            '\nEmails in next year: {volume_email:,.0f}'
-            '\nText messages in next year: {volume_sms:,.0f}'
-            '\nLetters in next year: {volume_letter:,.0f}'
+            '\nEmails in next year: {volume_email_formatted}'
+            '\nText messages in next year: {volume_sms_formatted}'
+            '\nLetters in next year: {volume_letter_formatted}'
             '\nConsent to research: {research_consent}'
             '\nOther live services: {existing_live}'
             '\n'
@@ -225,9 +225,12 @@ def submit_request_to_go_live(service_id):
             organisation_type=str(current_service.organisation_type).title(),
             agreement=AgreementInfo.from_current_user().as_human_readable,
             checklist=current_service.go_live_checklist_completed_as_yes_no,
-            volume_email=current_service.volume_email,
-            volume_sms=current_service.volume_sms,
-            volume_letter=current_service.volume_letter,
+            volume_email=print_if_number(current_service.volume_email),
+            volume_email_formatted=format_if_number(current_service.volume_email),
+            volume_sms=print_if_number(current_service.volume_sms),
+            volume_sms_formatted=format_if_number(current_service.volume_sms),
+            volume_letter=print_if_number(current_service.volume_letter),
+            volume_letter_formatted=format_if_number(current_service.volume_letter),
             research_consent='Yes' if current_service.consent_to_research else 'No',
             existing_live='Yes' if user_api_client.user_has_live_services(current_user) else 'No',
             service_id=current_service.id,
@@ -1061,6 +1064,7 @@ def _get_request_to_go_live_tags(service, agreement_signed):
 
     for test, tag in (
         (True, ''),
+        (not service.volumes, '_volumes'),
         (not service.go_live_checklist_completed, '_checklist'),
         (not agreement_signed, '_mou'),
         (service.needs_to_add_email_reply_to_address, '_email_reply_to'),
@@ -1070,3 +1074,11 @@ def _get_request_to_go_live_tags(service, agreement_signed):
     ):
         if test:
             yield BASE + '_incomplete' + tag
+
+
+def print_if_number(value):
+    return value if isinstance(value, int) else ''
+
+
+def format_if_number(value):
+    return '{:,.0f}'.format(value) if isinstance(value, int) else ''
