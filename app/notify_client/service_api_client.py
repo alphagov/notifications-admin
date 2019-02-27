@@ -84,6 +84,10 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             'free_sms_fragment_limit',
             'prefix_sms',
             'contact_link',
+            'volume_email',
+            'volume_sms',
+            'volume_letter',
+            'consent_to_research',
         }
         if disallowed_attributes:
             raise TypeError('Not allowed to update service attributes: {}'.format(

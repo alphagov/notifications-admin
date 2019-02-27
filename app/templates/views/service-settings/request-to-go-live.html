@@ -1,9 +1,6 @@
 {% extends "withnav_template.html" %}
-{% from "components/checkbox.html" import checkbox_group %}
-{% from "components/textbox.html" import textbox %}
-{% from "components/radios.html" import radios %}
+{% from "components/form.html" import form_wrapper %}
 {% from "components/page-footer.html" import page_footer %}
-{% from "components/banner.html" import banner_wrapper %}
 {% from "components/task-list.html" import task_list_wrapper, task_list_item %}
 
 {% block service_page_title %}
@@ -15,6 +12,11 @@
     <div class="column-whole">
       <h1 class="heading-large">Before you request to go live</h1>
       {% call task_list_wrapper() %}
+        {{ task_list_item(
+          current_service.has_estimated_usage,
+          'Tell us how many messages you expect to send',
+          url_for('main.estimate_usage', service_id=current_service.id),
+        ) }}
         {{ task_list_item(
           current_service.has_team_members,
           'Add a team member who can manage settings, team and usage',
@@ -49,11 +51,14 @@
       {% endcall %}
       {% if current_user.is_gov_user %}
         <p>
-          You also need to accept our <a href="{{ url_for('.terms') }}">terms of use</a>.
+          When we receive your request we’ll get back to you within one working day.
         </p>
-        <p>
-          <a href="{{ url_for('main.submit_request_to_go_live', service_id=current_service.id) }}" class="button">Continue</a>
+        <p class="bottom-gutter">
+          By requesting to go live you’re agreeing to our <a href="{{ url_for('.terms') }}">terms of use</a>.
         </p>
+        {% call form_wrapper() %}
+          {{ page_footer('Request to go live') }}
+        {% endcall %}
       {% else %}
         <p>
           Only team members with a government email address can request to go live.

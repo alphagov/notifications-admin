@@ -1,0 +1,35 @@
+{% extends "withnav_template.html" %}
+{% from "components/banner.html" import banner_wrapper %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/radios.html" import radios %}
+{% from "components/textbox.html" import textbox %}
+
+{% block service_page_title %}
+  Tell us how many messages you expect to send
+{% endblock %}
+
+{% block maincolumn_content %}
+  <div class="grid-row">
+    <div class="column-whole">
+      {% if not form.at_least_one_volume_filled %}
+        {% call banner_wrapper(type='dangerous') %}
+          <h1 class='banner-title'>
+            Enter the number of messages you expect to send in the next year
+          </h1>
+        {% endcall %}
+      {% else %}
+        <h1 class="heading-large">Tell us how many messages you expect to send</h1>
+      {% endif %}
+      {% call form_wrapper() %}
+        <div class="form-group">
+          {{ textbox(form.volume_email, width='1-2', hint='For example, 50,000') }}
+          {{ textbox(form.volume_sms, width='1-2', hint='For example, 50,000') }}
+          {{ textbox(form.volume_letter, width='1-2', hint='For example, 50,000') }}
+        </div>
+        {{ radios(form.consent_to_research, hint='You don’t have to take part and you can unsubscribe at any time') }}
+        {{ page_footer('Continue') }}
+      {% endcall %}
+    </div>
+  </div>
+{% endblock %}

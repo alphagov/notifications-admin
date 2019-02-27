@@ -173,6 +173,76 @@ class SMSCode(StringField):
         return super().__call__(type='tel', pattern='[0-9]*', **kwargs)
 
 
+class ForgivingIntegerField(StringField):
+
+    #  Actual value is 2147483647 but this is a scary looking arbitrary number
+    POSTGRES_MAX_INT = 2000000000
+
+    def __init__(
+        self,
+        label=None,
+        things='items',
+        format_error_suffix='',
+        **kwargs
+    ):
+        self.things = things
+        self.format_error_suffix = format_error_suffix
+        super().__init__(label, **kwargs)
+
+    def process_formdata(self, valuelist):
+
+        if valuelist:
+
+            value = valuelist[0].replace(',', '').replace(' ', '')
+
+            try:
+                value = int(value)
+            except ValueError:
+                pass
+
+            if value == '':
+                value = 0
+
+        return super().process_formdata([value])
+
+    def pre_validate(self, form):
+
+        if self.data:
+            error = None
+            try:
+                if int(self.data) > self.POSTGRES_MAX_INT:
+                    error = 'Number of {} must be {:,.0f} or less'.format(
+                        self.things,
+                        self.POSTGRES_MAX_INT,
+                    )
+            except ValueError:
+                error = 'Enter the number of {} {}'.format(
+                    self.things,
+                    self.format_error_suffix,
+                )
+
+            if error:
+                raise ValidationError(error)
+
+        return super().pre_validate(form)
+
+    def __call__(self, **kwargs):
+
+        if self.get_form().is_submitted() and not self.get_form().validate():
+            return super().__call__(
+                value=(self.raw_data or [None])[0],
+                **kwargs
+            )
+
+        try:
+            value = int(self.data)
+            value = '{:,.0f}'.format(value)
+        except (ValueError, TypeError):
+            value = self.data if self.data is not None else ''
+
+        return super().__call__(value=value, **kwargs)
+
+
 def organisation_type():
     return RadioField(
         'Who runs this service?',
@@ -593,20 +663,24 @@ class Triage(StripWhitespaceForm):
     )
 
 
-class RequestToGoLiveForm(StripWhitespaceForm):
-    volume_email = StringField(
+class EstimateUsageForm(StripWhitespaceForm):
+
+    volume_email = ForgivingIntegerField(
         'How many emails do you expect to send in the next year?',
-        validators=[DataRequired(message='Can’t be empty')]
+        things='emails',
+        format_error_suffix='you expect to send',
     )
-    volume_sms = StringField(
+    volume_sms = ForgivingIntegerField(
         'How many text messages do you expect to send in the next year?',
-        validators=[DataRequired(message='Can’t be empty')]
+        things='text messages',
+        format_error_suffix='you expect to send',
     )
-    volume_letter = StringField(
+    volume_letter = ForgivingIntegerField(
         'How many letters do you expect to send in the next year?',
-        validators=[DataRequired(message='Can’t be empty')]
+        things='letters',
+        format_error_suffix='you expect to send',
     )
-    research_consent = RadioField(
+    consent_to_research = RadioField(
         'Can we contact you when we’re doing user research?',
         choices=[
             ('yes', 'Yes'),
@@ -614,6 +688,16 @@ class RequestToGoLiveForm(StripWhitespaceForm):
         ],
         validators=[DataRequired()]
     )
+
+    at_least_one_volume_filled = True
+
+    def validate(self, *args, **kwargs):
+
+        if self.volume_email.data == self.volume_sms.data == self.volume_letter.data == 0:
+            self.at_least_one_volume_filled = False
+            return False
+
+        return super().validate(*args, **kwargs)
 
 
 class ProviderForm(StripWhitespaceForm):

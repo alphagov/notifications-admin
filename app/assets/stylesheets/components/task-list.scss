@@ -6,21 +6,44 @@ $indicator-colour: $black;
   padding: 3px 8px 1px 8px;
   position: absolute;
   right: 0;
-  top: 50%;
+  top: $gutter - 2px;
   margin-top: -15px;
   border: 2px solid $indicator-colour;
+  pointer-events: none;
+  z-index: 2;
+  min-width: 20%;
+  text-align: center;
 }
 
 .task-list {
 
-  border-bottom: 1px solid $border-colour;
+  border-top: 1px solid $border-colour;
   margin: $gutter 0;
 
   &-item {
-    border-top: 1px solid $border-colour;
-    padding: 15px 0;
-    padding-right: 20%;
+
     position: relative;
+
+    a {
+      border-bottom: 1px solid $border-colour;
+      display: block;
+      padding: $gutter-half 0;
+      padding-right: 20%;
+      position: relative;
+
+      &:focus {
+        outline: none;
+        color: $black;
+        box-shadow: -3px 0 0 0 $focus-colour, 3px 0 0 0 $focus-colour;
+        border-color: transparent;
+        top: -1px;
+        margin-bottom: -2px;
+        padding-top: $gutter-half + 1px;
+        padding-bottom: $gutter-half + 1px;
+      }
+
+    }
+
   }
 
   &-indicator-completed {
@@ -34,7 +57,7 @@ $indicator-colour: $black;
 
   &-indicator-not-completed {
     @extend %task-list-indicator;
-    background-color: transparent;
+    background-color: $white;
     color: $indicator-colour;
   }
 
