@@ -516,11 +516,11 @@ def test_should_raise_duplicate_name_handled(
 
 
 @pytest.mark.parametrize('volumes, consent_to_research, expected_estimated_volumes_item', [
-    ((0, 0, 0), None, 'Estimate usage Not completed'),
-    ((1, 0, 0), None, 'Estimate usage Not completed'),
-    ((1, 0, 0), False, 'Estimate usage Completed'),
-    ((1, 0, 0), True, 'Estimate usage Completed'),
-    ((9, 99, 999), True, 'Estimate usage Completed'),
+    ((0, 0, 0), None, 'Tell us how many messages you expect to send Not completed'),
+    ((1, 0, 0), None, 'Tell us how many messages you expect to send Not completed'),
+    ((1, 0, 0), False, 'Tell us how many messages you expect to send Completed'),
+    ((1, 0, 0), True, 'Tell us how many messages you expect to send Completed'),
+    ((9, 99, 999), True, 'Tell us how many messages you expect to send Completed'),
 ])
 @pytest.mark.parametrize('count_of_users_with_manage_service, expected_user_checklist_item', [
     (1, 'Add a team member who can manage settings, team and usage Not completed'),
@@ -852,21 +852,21 @@ def test_should_show_estimate_volumes(
     page = client_request.get(
         'main.estimate_usage', service_id=SERVICE_ONE_ID
     )
-    assert page.h1.text == 'Estimate usage'
+    assert page.h1.text == 'Tell us how many messages you expect to send'
     for channel, label, value in (
         (
             'email',
-            'How many emails do you expect to send in the next year? For example, 1,000,000',
+            'How many emails do you expect to send in the next year? For example, 50,000',
             displayed_volumes[0],
         ),
         (
             'sms',
-            'How many text messages do you expect to send in the next year? For example, 500,000',
+            'How many text messages do you expect to send in the next year? For example, 50,000',
             displayed_volumes[1],
         ),
         (
             'letter',
-            'How many letters do you expect to send in the next year? For example, 5,000',
+            'How many letters do you expect to send in the next year? For example, 50,000',
             displayed_volumes[2],
         ),
     ):
@@ -921,8 +921,8 @@ def test_should_show_persist_estimated_volumes(
         },
         'label[for=volume_sms]',
         (
-            'How many text messages do you expect to send in the next year? For example, 500,000 '
-            'Must be less than 2,147,483,647'
+            'How many text messages do you expect to send in the next year? For example, 50,000 '
+            'Number of text messages must be 2,147,483,647 or less'
         )
     ),
     (
@@ -972,8 +972,7 @@ def test_should_error_if_all_volumes_zero(
     assert page.select('input[type=text]')[1]['value'] == '0'
     assert page.select('input[type=text]')[2]['value'] == '0,00 0'
     assert normalize_spaces(page.select_one('.banner-dangerous').text) == (
-        'no things supplied '
-        'Tell us some things'
+        'Enter the number of messages you expect to send in the next year'
     )
     assert mock_update_service.called is False
 
@@ -1000,8 +999,8 @@ def test_should_not_default_to_zero_if_some_fields_dont_validate(
         page.select_one('label[for=volume_letter]').text
     ) == (
         'How many letters do you expect to send in the next year? '
-        'For example, 5,000 '
-        'Must be a whole number'
+        'For example, 50,000 '
+        'Number of letters must be in the correct format'
     )
     assert mock_update_service.called is False
 

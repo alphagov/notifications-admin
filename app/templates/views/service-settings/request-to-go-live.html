@@ -14,7 +14,7 @@
       {% call task_list_wrapper() %}
         {{ task_list_item(
           current_service.has_estimated_usage,
-          'Estimate usage',
+          'Tell us how many messages you expect to send',
           url_for('main.estimate_usage', service_id=current_service.id),
         ) }}
         {{ task_list_item(

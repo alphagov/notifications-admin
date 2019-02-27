@@ -177,6 +177,10 @@ class ForgivingIntegerField(StringField):
 
     POSTGRES_MAX_INT = 2147483647
 
+    def __init__(self, label=None, things='items', **kwargs):
+        self.things = things
+        super().__init__(label, **kwargs)
+
     def process_formdata(self, valuelist):
 
         if valuelist:
@@ -199,9 +203,12 @@ class ForgivingIntegerField(StringField):
             error = None
             try:
                 if int(self.data) > self.POSTGRES_MAX_INT:
-                    error = 'Must be less than {:,.0f}'.format(self.POSTGRES_MAX_INT)
+                    error = 'Number of {} must be {:,.0f} or less'.format(
+                        self.things,
+                        self.POSTGRES_MAX_INT,
+                    )
             except ValueError:
-                error = 'Must be a whole number'
+                error = 'Number of {} must be in the correct format'.format(self.things)
 
             if error:
                 raise ValidationError(error)
@@ -649,12 +656,15 @@ class EstimateUsageForm(StripWhitespaceForm):
 
     volume_email = ForgivingIntegerField(
         'How many emails do you expect to send in the next year?',
+        things='emails',
     )
     volume_sms = ForgivingIntegerField(
         'How many text messages do you expect to send in the next year?',
+        things='text messages',
     )
     volume_letter = ForgivingIntegerField(
         'How many letters do you expect to send in the next year?',
+        things='letters',
     )
     consent_to_research = RadioField(
         'Can we contact you when we’re doing user research?',

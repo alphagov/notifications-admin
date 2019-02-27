@@ -6,7 +6,7 @@
 {% from "components/textbox.html" import textbox %}
 
 {% block service_page_title %}
-  Estimate usage
+  Tell us how many messages you expect to send
 {% endblock %}
 
 {% block maincolumn_content %}
@@ -15,18 +15,17 @@
       {% if not form.at_least_one_volume_filled %}
         {% call banner_wrapper(type='dangerous') %}
           <h1 class='banner-title'>
-            no things supplied
+            Enter the number of messages you expect to send in the next year
           </h1>
-          <p>Tell us some things</p>
         {% endcall %}
       {% else %}
-        <h1 class="heading-large">Estimate usage</h1>
+        <h1 class="heading-large">Tell us how many messages you expect to send</h1>
       {% endif %}
       {% call form_wrapper() %}
         <div class="form-group">
-          {{ textbox(form.volume_email, width='1-2', hint='For example, 1,000,000') }}
-          {{ textbox(form.volume_sms, width='1-2', hint='For example, 500,000') }}
-          {{ textbox(form.volume_letter, width='1-2', hint='For example, 5,000') }}
+          {{ textbox(form.volume_email, width='1-2', hint='For example, 50,000') }}
+          {{ textbox(form.volume_sms, width='1-2', hint='For example, 50,000') }}
+          {{ textbox(form.volume_letter, width='1-2', hint='For example, 50,000') }}
         </div>
         {{ radios(form.consent_to_research, hint='You don’t have to take part and you can unsubscribe at any time') }}
         {{ page_footer('Continue') }}
