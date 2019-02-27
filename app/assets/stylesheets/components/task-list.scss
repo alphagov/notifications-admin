@@ -31,6 +31,10 @@ $indicator-colour: $black;
       padding-right: 20%;
       position: relative;
 
+      &:hover {
+        color: $link-hover-colour;
+      }
+
       &:focus {
         outline: none;
         color: $black;
