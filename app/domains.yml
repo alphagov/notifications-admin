@@ -163,6 +163,8 @@ ipo.gsi.gov.uk: ipo.gov.uk
 ipo.gov.uk:
   owner: Intellectual Property Office
   agreement_signed: true
+judicialappointments.digital: justice.gov.uk
+judicialappointments.gov.uk: justice.gov.uk
 justice.gsi.gov.uk: justice.gov.uk
 justice.gov.uk:
   owner: Ministry of Justice
