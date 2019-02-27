@@ -175,7 +175,8 @@ class SMSCode(StringField):
 
 class ForgivingIntegerField(StringField):
 
-    POSTGRES_MAX_INT = 2147483647
+    #  Actual value is 2147483647 but this is a scary looking arbitrary number
+    POSTGRES_MAX_INT = 2000000000
 
     def __init__(self, label=None, things='items', **kwargs):
         self.things = things

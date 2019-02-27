@@ -915,14 +915,14 @@ def test_should_show_persist_estimated_volumes(
     (
         {
             'volume_email': '1234',
-            'volume_sms': '2147483648',
+            'volume_sms': '2000000001',
             'volume_letter': '9876',
             'consent_to_research': 'yes',
         },
         'label[for=volume_sms]',
         (
             'How many text messages do you expect to send in the next year? For example, 50,000 '
-            'Number of text messages must be 2,147,483,647 or less'
+            'Number of text messages must be 2,000,000,000 or less'
         )
     ),
     (
