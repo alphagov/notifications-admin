@@ -1064,6 +1064,7 @@ def _get_request_to_go_live_tags(service, agreement_signed):
 
     for test, tag in (
         (True, ''),
+        (not service.volumes, '_volumes'),
         (not service.go_live_checklist_completed, '_checklist'),
         (not agreement_signed, '_mou'),
         (service.needs_to_add_email_reply_to_address, '_email_reply_to'),

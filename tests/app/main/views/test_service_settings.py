@@ -1017,7 +1017,7 @@ def test_non_gov_users_cant_request_to_go_live(
     )
 
 
-@pytest.mark.parametrize('volumes, displayed_volumes, formatted_displayed_volumes', (
+@pytest.mark.parametrize('volumes, displayed_volumes, formatted_displayed_volumes, extra_tags', (
     (
         (('email', None), ('sms', None), ('letter', None)),
         ', , ',
@@ -1026,6 +1026,7 @@ def test_non_gov_users_cant_request_to_go_live(
             'Text messages in next year: \n'
             'Letters in next year: \n'
         ),
+        ['notify_request_to_go_live_incomplete_volumes']
     ),
     (
         (('email', 1234), ('sms', 0), ('letter', 999)),
@@ -1035,6 +1036,7 @@ def test_non_gov_users_cant_request_to_go_live(
             'Text messages in next year: 0\n'
             'Letters in next year: 999\n'
         ),
+        [],
     ),
 ))
 @freeze_time("2012-12-21")
@@ -1053,6 +1055,7 @@ def test_should_redirect_after_request_to_go_live(
     volumes,
     displayed_volumes,
     formatted_displayed_volumes,
+    extra_tags,
 ):
     for channel, volume in volumes:
         mocker.patch(
@@ -1076,6 +1079,7 @@ def test_should_redirect_after_request_to_go_live(
         tags=[
             'notify_request_to_go_live',
             'notify_request_to_go_live_incomplete',
+        ] + extra_tags + [
             'notify_request_to_go_live_incomplete_checklist',
             'notify_request_to_go_live_incomplete_mou',
             'notify_request_to_go_live_incomplete_team_member',
@@ -1119,6 +1123,9 @@ def test_should_redirect_after_request_to_go_live(
         'has_email_reply_to_address,'
         'shouldnt_use_govuk_as_sms_sender,'
         'sms_sender_is_govuk,'
+        'volume_email,'
+        'volume_sms,'
+        'volume_letter,'
         'expected_readyness,'
         'agreement_signed,'
         'expected_tags,'
@@ -1132,6 +1139,7 @@ def test_should_redirect_after_request_to_go_live(
             True,
             True,
             True,
+            1, 1, 1,
             'Yes',
             True,
             [
@@ -1147,6 +1155,7 @@ def test_should_redirect_after_request_to_go_live(
             False,
             True,
             True,
+            1, 1, 1,
             'No',
             True,
             [
@@ -1164,6 +1173,7 @@ def test_should_redirect_after_request_to_go_live(
             True,
             True,
             False,
+            1, 1, 1,
             'Yes',
             True,
             [
@@ -1179,6 +1189,7 @@ def test_should_redirect_after_request_to_go_live(
             True,
             True,
             True,
+            1, 1, 1,
             'No',
             True,
             [
@@ -1196,6 +1207,7 @@ def test_should_redirect_after_request_to_go_live(
             True,
             True,
             False,
+            1, 1, 1,
             'No',
             True,
             [
@@ -1213,6 +1225,7 @@ def test_should_redirect_after_request_to_go_live(
             True,
             True,
             False,
+            1, 1, 1,
             'No',
             True,
             [
@@ -1230,11 +1243,13 @@ def test_should_redirect_after_request_to_go_live(
             False,
             True,
             True,
+            0, None, 0,
             'No',
             False,
             [
                 'notify_request_to_go_live',
                 'notify_request_to_go_live_incomplete',
+                'notify_request_to_go_live_incomplete_volumes',
                 'notify_request_to_go_live_incomplete_checklist',
                 'notify_request_to_go_live_incomplete_mou',
                 'notify_request_to_go_live_incomplete_email_reply_to',
@@ -1255,6 +1270,9 @@ def test_ready_to_go_live(
     has_email_reply_to_address,
     shouldnt_use_govuk_as_sms_sender,
     sms_sender_is_govuk,
+    volume_email,
+    volume_sms,
+    volume_letter,
     expected_readyness,
     agreement_signed,
     expected_tags,
@@ -1272,6 +1290,15 @@ def test_ready_to_go_live(
             'app.models.service.Service.{}'.format(prop),
             new_callable=PropertyMock
         ).return_value = locals()[prop]
+
+    mocker.patch(
+        'app.models.service.Service.__getattr__',
+        side_effect=lambda prop: {
+            'volume_email': volume_email,
+            'volume_sms': volume_sms,
+            'volume_letter': volume_letter,
+        }.get(prop)
+    )
 
     assert app.models.service.Service({
         'id': SERVICE_ONE_ID

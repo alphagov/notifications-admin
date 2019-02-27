@@ -295,8 +295,17 @@ class Service():
         return service_api_client.get_letter_contact(self.id, id)
 
     @property
+    def volumes(self):
+        return sum(filter(None, (
+            self.volume_email,
+            self.volume_sms,
+            self.volume_letter,
+        )))
+
+    @property
     def go_live_checklist_completed(self):
         return all((
+            bool(self.volumes),
             self.has_team_members,
             self.has_templates,
             not self.needs_to_add_email_reply_to_address,
