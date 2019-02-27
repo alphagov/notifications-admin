@@ -1000,7 +1000,7 @@ def test_should_not_default_to_zero_if_some_fields_dont_validate(
     ) == (
         'How many letters do you expect to send in the next year? '
         'For example, 50,000 '
-        'Number of letters must be in the correct format'
+        'Enter the number of letters you expect to send'
     )
     assert mock_update_service.called is False
 
