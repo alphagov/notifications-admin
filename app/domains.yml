@@ -3328,7 +3328,7 @@ scilly.gov.uk:
 scotborders.gov.uk:
   owner: Scottish Borders Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 seafordtowncouncil.gov.uk:
   owner: Seaford Town Council
   crown: false
