@@ -1859,7 +1859,7 @@ hart.gov.uk: hants.gov.uk
 hartlepool.gov.uk:
   owner: Hartlepool Borough Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 hastings.gov.uk:
   owner: Hastings Borough Council
   crown: false
