@@ -392,12 +392,15 @@ class Service():
                     "id": folder["id"], "name": folder["name"], "parent_id": folder["parent_id"],
                     "users_with_permission": folder["users_with_permission"]
                 }
-                while parent is not None:
+                while folder_attrs["parent_id"] is not None:
                     folder_attrs["name"] = parent["name"] + "/" + folder_attrs["name"]
-                    parent = self.get_template_folder(parent["parent_id"])
-                    folder_attrs["parent_id"] = parent.get("id", None)
-                    if user_id in parent.get("users_with_permission", []):
-                        break
+                    if parent["parent_id"] is None:
+                        folder_attrs["parent_id"] = None
+                    else:
+                        parent = self.get_template_folder(parent["parent_id"])
+                        folder_attrs["parent_id"] = parent.get("id", None)
+                        if user_id in parent.get("users_with_permission", []):
+                            break
                 user_folders.append(folder_attrs)
         return user_folders
 
