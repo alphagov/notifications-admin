@@ -151,7 +151,10 @@ def estimate_usage(service_id):
         volume_email=current_service.volume_email,
         volume_sms=current_service.volume_sms,
         volume_letter=current_service.volume_letter,
-        consent_to_research='yes' if current_service.consent_to_research else 'no',
+        consent_to_research={
+            True: 'yes',
+            False: 'no',
+        }.get(current_service.consent_to_research),
     )
 
     if form.validate_on_submit():
