@@ -826,6 +826,11 @@ def test_non_gov_user_is_told_they_cant_go_live(
     assert page.select('button') == []
 
 
+@pytest.mark.parametrize('consent_to_research, displayed_consent', (
+    (None, None),
+    (True, 'yes'),
+    (False, 'no'),
+))
 @pytest.mark.parametrize('volumes, displayed_volumes', (
     (
         (('email', None), ('sms', None), ('letter', None)),
@@ -841,6 +846,8 @@ def test_should_show_estimate_volumes(
     client_request,
     volumes,
     displayed_volumes,
+    consent_to_research,
+    displayed_consent,
 ):
     for channel, volume in volumes:
         mocker.patch(
@@ -849,6 +856,12 @@ def test_should_show_estimate_volumes(
             new_callable=PropertyMock,
             return_value=volume,
         )
+    mocker.patch(
+        'app.models.service.Service.consent_to_research',
+        create=True,
+        new_callable=PropertyMock,
+        return_value=consent_to_research,
+    )
     page = client_request.get(
         'main.estimate_usage', service_id=SERVICE_ONE_ID
     )
@@ -874,6 +887,14 @@ def test_should_show_estimate_volumes(
             page.select_one('label[for=volume_{}]'.format(channel)).text
         ) == label
         assert page.select_one('#volume_{}'.format(channel))['value'] == value
+
+    assert len(page.select('input[type=radio]')) == 2
+
+    if displayed_consent is None:
+        assert len(page.select('input[checked]')) == 0
+    else:
+        assert len(page.select('input[checked]')) == 1
+        assert page.select_one('input[checked]')['value'] == displayed_consent
 
 
 @pytest.mark.parametrize('consent_to_research, expected_persisted_consent_to_research', (
