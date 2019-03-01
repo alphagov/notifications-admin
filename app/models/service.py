@@ -379,16 +379,41 @@ class Service():
     def all_template_folder_ids(self):
         return {folder['id'] for folder in self.all_template_folders}
 
-    def get_template_folders(self, template_type='all', parent_folder_id=None):
+    def get_user_template_folders(self, user_id):
+        user_folders = []
+        for folder in self.all_template_folders:
+            if user_id not in folder.get("users_with_permission", []):
+                continue
+            parent = self.get_template_folder(folder["parent_id"])
+            if user_id in parent.get("users_with_permission", []):
+                user_folders.append(folder)
+            else:
+                folder_attrs = {
+                    "id": folder["id"], "name": folder["name"], "parent_id": folder["parent_id"],
+                    "users_with_permission": folder["users_with_permission"]
+                }
+                while parent is not None:
+                    folder_attrs["name"] = parent["name"] + "/" + folder_attrs["name"]
+                    parent = self.get_template_folder(parent["parent_id"])
+                    folder_attrs["parent_id"] = parent.get("id", None)
+                    if user_id in parent.get("users_with_permission", []):
+                        break
+                user_folders.append(folder_attrs)
+        return user_folders
 
+    def get_template_folders(self, template_type='all', parent_folder_id=None, user_id=None):
+        if user_id:
+            folders = self.get_user_template_folders(user_id)
+        else:
+            folders = self.all_template_folders
         if parent_folder_id:
             parent_folder_id = str(parent_folder_id)
 
         return [
-            folder for folder in self.all_template_folders
+            folder for folder in folders
             if (
-                folder['parent_id'] == parent_folder_id and
-                self.is_folder_visible(folder['id'], template_type)
+                folder['parent_id'] == parent_folder_id
+                and self.is_folder_visible(folder['id'], template_type)
             )
         ]
 
@@ -435,8 +460,8 @@ class Service():
 
     def get_template_folders_and_templates(self, template_type, template_folder_id):
         return (
-            self.get_templates(template_type, template_folder_id) +
-            self.get_template_folders(template_type, template_folder_id)
+            self.get_templates(template_type, template_folder_id)
+            + self.get_template_folders(template_type, template_folder_id)
         )
 
     @property
