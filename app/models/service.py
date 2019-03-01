@@ -269,7 +269,7 @@ class Service():
     @property
     def needs_to_change_sms_sender(self):
         return all((
-            self.has_sms_templates,
+            self.volume_sms,
             self.shouldnt_use_govuk_as_sms_sender,
             self.sms_sender_is_govuk,
         ))

@@ -1176,7 +1176,7 @@ def test_should_redirect_after_request_to_go_live(
             False,
             True,
             True,
-            1, 1, 1,
+            1, 0, 1,
             'No',
             True,
             [
@@ -1228,7 +1228,7 @@ def test_should_redirect_after_request_to_go_live(
             True,
             True,
             False,
-            1, 1, 1,
+            1, 0, 0,
             'No',
             True,
             [
@@ -1275,7 +1275,6 @@ def test_should_redirect_after_request_to_go_live(
                 'notify_request_to_go_live_incomplete_mou',
                 'notify_request_to_go_live_incomplete_team_member',
                 'notify_request_to_go_live_incomplete_template_content',
-                'notify_request_to_go_live_incomplete_sms_sender',
             ],
         ),
     ),
