@@ -300,7 +300,7 @@ naturalresources.wales: cyfoethnaturiolcymru.gov.uk
 cyfoethnaturiolcymru.gov.uk:
   owner: Natural Resources Wales
   crown: true
-  agreement_signed: false
+  agreement_signed: true
 gov.wales:
   owner: Welsh Government
   crown: true
