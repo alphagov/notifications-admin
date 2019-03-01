@@ -1160,7 +1160,7 @@ def test_should_redirect_after_request_to_go_live(
             True,
             True,
             True,
-            1, 1, 1,
+            1, 0, 0,
             'Yes',
             True,
             [
@@ -1194,7 +1194,7 @@ def test_should_redirect_after_request_to_go_live(
             True,
             True,
             False,
-            1, 1, 1,
+            0, 1, 0,
             'Yes',
             True,
             [
@@ -1210,7 +1210,7 @@ def test_should_redirect_after_request_to_go_live(
             True,
             True,
             True,
-            1, 1, 1,
+            0, 1, 0,
             'No',
             True,
             [
@@ -1246,7 +1246,7 @@ def test_should_redirect_after_request_to_go_live(
             True,
             True,
             False,
-            1, 1, 1,
+            0, 1, 0,
             'No',
             True,
             [
@@ -1256,7 +1256,7 @@ def test_should_redirect_after_request_to_go_live(
                 'notify_request_to_go_live_incomplete_template_content',
             ],
         ),
-        (  # Everything is wrong
+        (  # Not done anything yet
             False,
             False,
             True,
@@ -1273,7 +1273,6 @@ def test_should_redirect_after_request_to_go_live(
                 'notify_request_to_go_live_incomplete_volumes',
                 'notify_request_to_go_live_incomplete_checklist',
                 'notify_request_to_go_live_incomplete_mou',
-                'notify_request_to_go_live_incomplete_email_reply_to',
                 'notify_request_to_go_live_incomplete_team_member',
                 'notify_request_to_go_live_incomplete_template_content',
                 'notify_request_to_go_live_incomplete_sms_sender',
