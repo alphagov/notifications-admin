@@ -1124,7 +1124,7 @@ def test_confirm_edit_user_mobile_number_page(
     for text in [
         'New mobile number:',
         new_number,
-        'We will send {} an email to tell them about the change.'.format(active_user_with_permissions.name)
+        'We will send {} a text message to tell them about the change.'.format(active_user_with_permissions.name)
     ]:
         assert text in response.get_data(as_text=True)
     assert 'Confirm' in response.get_data(as_text=True)
