@@ -403,19 +403,25 @@ def test_switch_service_to_live(
 
 
 def test_show_live_service(
-        logged_in_client,
-        service_one,
-        mock_get_live_service,
-        single_reply_to_email_address,
-        single_letter_contact_block,
-        mock_get_service_organisation,
-        single_sms_sender,
-        mock_get_service_settings_page_common,
+    client_request,
+    mock_get_live_service,
+    single_reply_to_email_address,
+    single_letter_contact_block,
+    mock_get_service_organisation,
+    single_sms_sender,
+    mock_get_service_settings_page_common,
 ):
-    response = logged_in_client.get(url_for('main.service_settings', service_id=service_one['id']))
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    assert page.find('h1').text.strip() == 'Settings'
-    assert 'Your service is in trial mode' not in page.text
+    page = client_request.get(
+        'main.service_settings',
+        service_id=SERVICE_ONE_ID,
+    )
+    assert normalize_spaces(page.select_one('h1').text) == (
+        'Settings'
+    )
+    assert normalize_spaces(page.select_one('h2#service-is-live').text) == (
+        'Your service is live'
+    )
+    assert 'trial mode' not in page.text
 
 
 def test_switch_service_to_restricted(
@@ -824,6 +830,33 @@ def test_non_gov_user_is_told_they_cant_go_live(
     )
     assert page.select('form') == []
     assert page.select('button') == []
+
+
+@pytest.mark.parametrize('endpoint', (
+    'main.request_to_go_live',
+    'main.estimate_usage',
+))
+@pytest.mark.parametrize('method', (
+    'get',
+    'post',
+))
+def test_live_service_can_request_to_go_live_again(
+    client_request,
+    mock_get_live_service,
+    endpoint,
+    method
+):
+    getattr(client_request, method)(
+        endpoint,
+        service_id=SERVICE_ONE_ID,
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.service_settings',
+            service_id=SERVICE_ONE_ID,
+            _anchor='service-is-live',
+            _external=True,
+        ),
+    )
 
 
 @pytest.mark.parametrize('consent_to_research, displayed_consent', (

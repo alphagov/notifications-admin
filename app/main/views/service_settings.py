@@ -147,6 +147,13 @@ def service_name_change_confirm(service_id):
 @user_has_permissions('manage_service')
 def estimate_usage(service_id):
 
+    if not current_service.trial_mode:
+        return redirect(url_for(
+            'main.service_settings',
+            service_id=current_service.id,
+            _anchor='service-is-live',
+        ))
+
     form = EstimateUsageForm(
         volume_email=current_service.volume_email,
         volume_sms=current_service.volume_sms,
@@ -180,6 +187,13 @@ def estimate_usage(service_id):
 @user_has_permissions('manage_service')
 def request_to_go_live(service_id):
 
+    if not current_service.trial_mode:
+        return redirect(url_for(
+            'main.service_settings',
+            service_id=current_service.id,
+            _anchor='service-is-live',
+        ))
+
     agreement_signed = AgreementInfo.from_current_user().agreement_signed
 
     return render_template(
@@ -194,6 +208,13 @@ def request_to_go_live(service_id):
 @user_has_permissions('manage_service')
 @user_is_gov_user
 def submit_request_to_go_live(service_id):
+
+    if not current_service.trial_mode:
+        return redirect(url_for(
+            'main.service_settings',
+            service_id=current_service.id,
+            _anchor='service-is-live',
+        ))
 
     zendesk_client.create_ticket(
         subject='Request to go live - {}'.format(current_service.name),
