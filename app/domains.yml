@@ -4214,7 +4214,7 @@ westsuffolk.gov.uk:
 westsussex.gov.uk:
   owner: West Sussex County Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 westwey.gov.uk: weymouth.gov.uk
 westyorkshire-pcp.gov.uk: wakefield.gov.uk
 weymouth.gov.uk:
