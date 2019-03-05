@@ -426,7 +426,7 @@ class PermissionsForm(PermissionsAbstract):
                 (item['id'], item['name']) for item in ([{'name': 'Templates', 'id': None}] + all_template_folders)
             ]
 
-    folder_permissions = NestedCheckboxesField('Folder permissions')
+    folder_permissions = NestedCheckboxesField('Folders this team member can see')
 
     login_authentication = RadioField(
         'Sign in using',
