@@ -522,6 +522,45 @@ def test_should_raise_duplicate_name_handled(
     ((1, 0, 0), True, 'Tell us how many messages you expect to send Completed'),
     ((9, 99, 999), True, 'Tell us how many messages you expect to send Completed'),
 ])
+def test_should_check_if_estimated_volumes_provided(
+    client_request,
+    mocker,
+    single_sms_sender,
+    single_reply_to_email_address,
+    mock_get_service_templates,
+    mock_get_users_by_service,
+    volumes,
+    consent_to_research,
+    expected_estimated_volumes_item,
+):
+
+    for volume, channel in zip(volumes, ('sms', 'email', 'letter')):
+        mocker.patch(
+            'app.models.service.Service.volume_{}'.format(channel),
+            create=True,
+            new_callable=PropertyMock,
+            return_value=volume,
+        )
+
+    mocker.patch(
+        'app.models.service.Service.consent_to_research',
+        create=True,
+        new_callable=PropertyMock,
+        return_value=consent_to_research,
+    )
+
+    page = client_request.get(
+        'main.request_to_go_live', service_id=SERVICE_ONE_ID
+    )
+    assert page.h1.text == 'Before you request to go live'
+
+    assert normalize_spaces(
+        page.select_one('.task-list .task-list-item').text
+    ) == (
+        expected_estimated_volumes_item
+    )
+
+
 @pytest.mark.parametrize('count_of_users_with_manage_service, expected_user_checklist_item', [
     (1, 'Add a team member who can manage settings, team and usage Not completed'),
     (2, 'Add a team member who can manage settings, team and usage Completed'),
@@ -537,7 +576,7 @@ def test_should_raise_duplicate_name_handled(
     (1, [], 'Add an email reply-to address Not completed'),
     (1, [{}], 'Add an email reply-to address Completed'),
 ])
-def test_should_show_request_to_go_live_checklist(
+def test_should_check_for_sending_things_right(
     client_request,
     mocker,
     single_sms_sender,
@@ -548,9 +587,6 @@ def test_should_show_request_to_go_live_checklist(
     count_of_email_templates,
     reply_to_email_addresses,
     expected_reply_to_checklist_item,
-    volumes,
-    consent_to_research,
-    expected_estimated_volumes_item,
 ):
 
     def _templates_by_type(template_type):
@@ -580,20 +616,13 @@ def test_should_show_request_to_go_live_checklist(
         return_value=reply_to_email_addresses
     )
 
-    for volume, channel in zip(volumes, ('sms', 'email', 'letter')):
+    for channel, volume in (('email', 1), ('sms', 0), ('letter', 1)):
         mocker.patch(
             'app.models.service.Service.volume_{}'.format(channel),
             create=True,
             new_callable=PropertyMock,
-            return_value=volume,
+            return_value=1,
         )
-
-    mocker.patch(
-        'app.models.service.Service.consent_to_research',
-        create=True,
-        new_callable=PropertyMock,
-        return_value=consent_to_research,
-    )
 
     page = client_request.get(
         'main.request_to_go_live', service_id=SERVICE_ONE_ID
@@ -602,7 +631,6 @@ def test_should_show_request_to_go_live_checklist(
 
     checklist_items = page.select('.task-list .task-list-item')
 
-    assert normalize_spaces(checklist_items[0].text) == expected_estimated_volumes_item
     assert normalize_spaces(checklist_items[1].text) == expected_user_checklist_item
     assert normalize_spaces(checklist_items[2].text) == expected_templates_checklist_item
     assert normalize_spaces(checklist_items[3].text) == expected_reply_to_checklist_item
@@ -623,6 +651,11 @@ def test_should_show_request_to_go_live_checklist(
         mock_get_reply_to_email_addresses.assert_called_once_with(SERVICE_ONE_ID)
 
 
+@pytest.mark.parametrize('estimated_sms_volume', (
+    pytest.param(None),
+    pytest.param(1),
+    pytest.param(0, marks=pytest.mark.xfail(raises=IndexError)),
+))
 @pytest.mark.parametrize('organisation_type,count_of_sms_templates, sms_senders, expected_sms_sender_checklist_item', [
     pytest.param(
         'local',
@@ -688,6 +721,7 @@ def test_should_check_for_sms_sender_on_go_live(
     count_of_sms_templates,
     sms_senders,
     expected_sms_sender_checklist_item,
+    estimated_sms_volume,
 ):
 
     service_one['organisation_type'] = organisation_type
@@ -719,6 +753,13 @@ def test_should_check_for_sms_sender_on_go_live(
     mocker.patch(
         'app.main.views.service_settings.service_api_client.get_reply_to_email_addresses',
         return_value=[],
+    )
+
+    mocker.patch(
+        'app.models.service.Service.volume_sms',
+        create=True,
+        new_callable=PropertyMock,
+        return_value=estimated_sms_volume,
     )
 
     page = client_request.get(
