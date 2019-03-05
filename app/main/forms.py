@@ -255,6 +255,78 @@ def organisation_type():
     )
 
 
+class FieldWithNoneOption():
+
+    # This is a special value that is specific to our forms. This is
+    # more expicit than casting `None` to a string `'None'` which can
+    # have unexpected edge cases
+    NONE_OPTION_VALUE = '__NONE__'
+
+    # When receiving Python data, eg when instantiating the form object
+    # we want to convert that data to our special value, so that it gets
+    # recognised as being one of the valid choices
+    def process_data(self, value):
+        self.data = self.NONE_OPTION_VALUE if value is None else value
+
+    # After validation we want to convert it back to a Python `None` for
+    # use elsewhere, eg posting to the API
+    def post_validate(self, form, validation_stopped):
+        if self.data == self.NONE_OPTION_VALUE and not validation_stopped:
+            self.data = None
+
+
+class RadioFieldWithNoneOption(FieldWithNoneOption, RadioField):
+    pass
+
+
+class NestedFieldMixin:
+    def children(self):
+        # start map with root option as a single child entry
+        child_map = {None: [option for option in self
+                            if option.data == self.NONE_OPTION_VALUE]}
+
+        # add entries for all other children
+        for option in self:
+            if option.data == self.NONE_OPTION_VALUE:
+                child_ids = [
+                    folder['id'] for folder in self.all_template_folders
+                    if folder['parent_id'] is None]
+                key = self.NONE_OPTION_VALUE
+            else:
+                child_ids = [
+                    folder['id'] for folder in self.all_template_folders
+                    if folder['parent_id'] == option.data]
+                key = option.data
+
+            child_map[key] = [option for option in self if option.data in child_ids]
+
+        return child_map
+
+
+class NestedRadioField(RadioFieldWithNoneOption, NestedFieldMixin):
+    pass
+
+
+class NestedCheckboxesField(SelectMultipleField, NestedFieldMixin):
+    NONE_OPTION_VALUE = None
+
+
+class HiddenFieldWithNoneOption(FieldWithNoneOption, HiddenField):
+    pass
+
+
+class RadioFieldWithRequiredMessage(RadioField):
+    def __init__(self, *args, required_message='Not a valid choice', **kwargs):
+        self.required_message = required_message
+        super().__init__(*args, **kwargs)
+
+    def pre_validate(self, form):
+        try:
+            return super().pre_validate(form)
+        except ValueError:
+            raise ValueError(self.required_message)
+
+
 class StripWhitespaceForm(Form):
     class Meta:
         def bind_field(self, form, unbound_field, options):
@@ -346,6 +418,15 @@ PermissionsAbstract = type("PermissionsAbstract", (StripWhitespaceForm,), {
 
 
 class PermissionsForm(PermissionsAbstract):
+    def __init__(self, all_template_folders=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if all_template_folders is not None:
+            self.folder_permissions.all_template_folders = all_template_folders
+            self.folder_permissions.choices = [
+                (item['id'], item['name']) for item in ([{'name': 'Templates', 'id': None}] + all_template_folders)
+            ]
+
+    folder_permissions = NestedCheckboxesField('Folders this team member can see')
 
     login_authentication = RadioField(
         'Sign in using',
@@ -365,8 +446,9 @@ class PermissionsForm(PermissionsAbstract):
         return (getattr(self, permission) for permission, _ in permissions)
 
     @classmethod
-    def from_user(cls, user, service_id):
+    def from_user(cls, user, service_id, **kwargs):
         return cls(
+            **kwargs,
             **{
                 role: user.has_permission_for_service(service_id, role)
                 for role in roles.keys()
@@ -811,73 +893,6 @@ class ServiceSwitchChannelForm(ServiceOnOffSettingForm):
         }.get(channel))
 
         super().__init__(name, *args, **kwargs)
-
-
-class FieldWithNoneOption():
-
-    # This is a special value that is specific to our forms. This is
-    # more expicit than casting `None` to a string `'None'` which can
-    # have unexpected edge cases
-    NONE_OPTION_VALUE = '__NONE__'
-
-    # When receiving Python data, eg when instantiating the form object
-    # we want to convert that data to our special value, so that it gets
-    # recognised as being one of the valid choices
-    def process_data(self, value):
-        self.data = self.NONE_OPTION_VALUE if value is None else value
-
-    # After validation we want to convert it back to a Python `None` for
-    # use elsewhere, eg posting to the API
-    def post_validate(self, form, validation_stopped):
-        if self.data == self.NONE_OPTION_VALUE and not validation_stopped:
-            self.data = None
-
-
-class RadioFieldWithNoneOption(FieldWithNoneOption, RadioField):
-    pass
-
-
-class NestedRadioField(RadioFieldWithNoneOption):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-    def children(self):
-        # start map with root option as a single child entry
-        child_map = {None: [option for option in self
-                            if option.data == self.NONE_OPTION_VALUE]}
-
-        # add entries for all other children
-        for option in self:
-            if option.data == self.NONE_OPTION_VALUE:
-                child_ids = [
-                    folder['id'] for folder in self.all_template_folders
-                    if folder['parent_id'] is None]
-                key = self.NONE_OPTION_VALUE
-            else:
-                child_ids = [
-                    folder['id'] for folder in self.all_template_folders
-                    if folder['parent_id'] == option.data]
-                key = option.data
-
-            child_map[key] = [option for option in self if option.data in child_ids]
-
-        return child_map
-
-
-class HiddenFieldWithNoneOption(FieldWithNoneOption, HiddenField):
-    pass
-
-
-class RadioFieldWithRequiredMessage(RadioField):
-    def __init__(self, *args, required_message='Not a valid choice', **kwargs):
-        self.required_message = required_message
-        super().__init__(*args, **kwargs)
-
-    def pre_validate(self, form):
-        try:
-            return super().pre_validate(form)
-        except ValueError:
-            raise ValueError(self.required_message)
 
 
 class ServiceSetEmailBranding(StripWhitespaceForm):

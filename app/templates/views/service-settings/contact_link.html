@@ -1,7 +1,8 @@
 {% extends "withnav_template.html" %}
 {% from "components/textbox.html" import textbox %}
 {% from "components/page-footer.html" import page_footer %}
-{% from "components/radios.html" import radio, radios_wrapper %}
+{% from "components/radios.html" import radio %}
+{% from "components/select-input.html" import select_wrapper %}
 {% from "components/form.html" import form_wrapper %}
 
 {% block service_page_title %}
@@ -21,7 +22,7 @@
       </p>
       {% call form_wrapper() %}
 
-        {% call radios_wrapper(form.contact_details_type, hide_legend=true) %}
+        {% call select_wrapper(form.contact_details_type, hide_legend=true) %}
           {% for option in form.contact_details_type %}
             {% set data_target = option.data.replace('_', '-') ~ "-type" %}
 

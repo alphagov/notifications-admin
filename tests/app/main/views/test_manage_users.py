@@ -228,6 +228,7 @@ def test_service_with_no_email_auth_hides_auth_type_options(
     auth_options_hidden,
     service_one,
     mock_get_users_by_service,
+    mock_get_template_folders
 ):
     if service_has_email_auth:
         service_one['permissions'].append('email_auth')
@@ -249,6 +250,7 @@ def test_service_with_no_email_auth_hides_auth_type_options(
 def test_service_without_caseworking_doesnt_show_admin_vs_caseworker(
     client_request,
     mock_get_users_by_service,
+    mock_get_template_folders,
     endpoint,
     service_has_caseworking,
     extra_args,
@@ -304,6 +306,7 @@ def test_manage_users_page_shows_member_auth_type_if_service_has_email_auth_acti
 def test_user_with_no_mobile_number_cant_be_set_to_sms_auth(
     client_request,
     mock_get_users_by_service,
+    mock_get_template_folders,
     user,
     sms_option_disabled,
     expected_label,
@@ -353,6 +356,7 @@ def test_user_with_no_mobile_number_cant_be_set_to_sms_auth(
 def test_should_show_page_for_one_user(
     client_request,
     mock_get_users_by_service,
+    mock_get_template_folders,
     endpoint,
     extra_args,
     expected_checkboxes,
@@ -419,6 +423,7 @@ def test_edit_user_permissions(
     mock_get_users_by_service,
     mock_get_invites_for_service,
     mock_set_user_permissions,
+    mock_get_template_folders,
     fake_uuid,
     submitted_permissions,
     permissions_sent_to_api,
@@ -442,6 +447,45 @@ def test_edit_user_permissions(
         fake_uuid,
         SERVICE_ONE_ID,
         permissions=permissions_sent_to_api,
+        folder_permissions=None
+    )
+
+
+def test_edit_user_folder_permissions(
+    client_request,
+    mocker,
+    service_one,
+    mock_get_users_by_service,
+    mock_get_invites_for_service,
+    mock_set_user_permissions,
+    mock_get_template_folders,
+    fake_uuid,
+):
+    service_one['permissions'] = ['edit_folder_permissions']
+    mock_get_template_folders.return_value = [
+        {'id': 'folder-id-1', 'name': 'folder_one', 'parent_id': None, 'users_with_permission': []},
+        {'id': 'folder-id-2', 'name': 'folder_one', 'parent_id': None, 'users_with_permission': []},
+        {'id': 'folder-id-3', 'name': 'folder_one', 'parent_id': 'folder-id-1', 'users_with_permission': []},
+    ]
+    client_request.post(
+        'main.edit_user_permissions',
+        service_id=SERVICE_ONE_ID,
+        user_id=fake_uuid,
+        _data=dict(
+            folder_permissions=['folder-id-1', 'folder-id-3']
+        ),
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.manage_users',
+            service_id=SERVICE_ONE_ID,
+            _external=True,
+        ),
+    )
+    mock_set_user_permissions.assert_called_with(
+        fake_uuid,
+        SERVICE_ONE_ID,
+        permissions=set(),
+        folder_permissions=['folder-id-1', 'folder-id-3']
     )
 
 
@@ -474,7 +518,8 @@ def test_edit_user_permissions_including_authentication_with_email_auth_service(
     mock_set_user_permissions,
     mock_update_user_attribute,
     service_one,
-    auth_type
+    auth_type,
+    mock_get_template_folders
 ):
     service_one['permissions'].append('email_auth')
 
@@ -502,7 +547,8 @@ def test_edit_user_permissions_including_authentication_with_email_auth_service(
             'manage_templates',
             'manage_service',
             'manage_api_keys',
-        }
+        },
+        folder_permissions=None
     )
     mock_update_user_attribute.assert_called_with(
         str(active_user_with_permissions.id),
@@ -1015,6 +1061,7 @@ def test_edit_user_permissions_page_displays_redacted_mobile_number_and_change_l
     client_request,
     active_user_with_permissions,
     mock_get_users_by_service,
+    mock_get_template_folders,
     service_one,
     mocker
 ):
