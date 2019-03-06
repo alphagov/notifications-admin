@@ -24,11 +24,6 @@
           {% endif %}
         </label>
       </legend>
-      {% if hint %}
-        <span class="hint">
-          {{ hint }}
-        </span>
-      {% endif %}
       <div class="input-list" data-module="list-entry" data-list-item-name="{{ item_name }}" id="list-entry-{{ field.name }}">
         {% for index in range(0, field.entries|length) %}
           <div class="list-entry">
