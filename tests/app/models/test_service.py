@@ -79,13 +79,13 @@ def test_get_user_template_folders_only_returns_folders_visible_to_user(
     result = service.get_user_template_folders(active_user_with_permissions.id)
     assert result == [
         {
-            'name': "Parent 1 - invisible/1's Visible child",
+            'name': "Parent 1 - invisible / 1's Visible child",
             'id': mocker.ANY,
             'parent_id': None,
             'users_with_permission': [active_user_with_permissions.id]
         },
         {
-            'name': "Parent 1 - invisible/1's Invisible child/1's Visible grandchild",
+            'name': "Parent 1 - invisible / 1's Invisible child / 1's Visible grandchild",
             'id': mocker.ANY,
             'parent_id': None,
             'users_with_permission': [active_user_with_permissions.id]
@@ -97,7 +97,7 @@ def test_get_user_template_folders_only_returns_folders_visible_to_user(
             'users_with_permission': [active_user_with_permissions.id]
         },
         {
-            'name': "2's Invisible child/2's Visible grandchild",
+            'name': "2's Invisible child / 2's Visible grandchild",
             'id': mocker.ANY,
             'parent_id': VIS_PARENT_FOLDER_ID,
             'users_with_permission': [active_user_with_permissions.id]
@@ -123,13 +123,13 @@ def test_get_template_folders_shows_user_folders_when_user_id_passed_in(
     result = service.get_template_folders(user_id=active_user_with_permissions.id)
     assert result == [
         {
-            'name': "Parent 1 - invisible/1's Visible child",
+            'name': "Parent 1 - invisible / 1's Visible child",
             'id': mocker.ANY,
             'parent_id': None,
             'users_with_permission': [active_user_with_permissions.id]
         },
         {
-            'name': "Parent 1 - invisible/1's Invisible child/1's Visible grandchild",
+            'name': "Parent 1 - invisible / 1's Invisible child / 1's Visible grandchild",
             'id': mocker.ANY,
             'parent_id': None,
             'users_with_permission': [active_user_with_permissions.id]
