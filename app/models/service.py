@@ -380,6 +380,9 @@ class Service():
         return {folder['id'] for folder in self.all_template_folders}
 
     def get_user_template_folders(self, user_id):
+        if not self.has_permission("edit_folder_permissions"):
+            return self.all_template_folders
+
         user_folders = []
         for folder in self.all_template_folders:
             if user_id not in folder.get("users_with_permission", []):

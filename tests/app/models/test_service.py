@@ -74,6 +74,7 @@ def test_get_user_template_folders_only_returns_folders_visible_to_user(
     mocker
 ):
     mock_get_template_folders.return_value = _get_all_folders(active_user_with_permissions)
+    service_one['permissions'] = ['edit_folder_permissions']
     service = Service(service_one)
     result = service.get_user_template_folders(active_user_with_permissions.id)
     assert result == [
@@ -117,6 +118,7 @@ def test_get_template_folders_shows_user_folders_when_user_id_passed_in(
     mocker
 ):
     mock_get_template_folders.return_value = _get_all_folders(active_user_with_permissions)
+    service_one['permissions'] = ['edit_folder_permissions']
     service = Service(service_one)
     result = service.get_template_folders(user_id=active_user_with_permissions.id)
     assert result == [
