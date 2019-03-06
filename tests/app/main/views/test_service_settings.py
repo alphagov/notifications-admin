@@ -3662,7 +3662,8 @@ def test_submit_email_branding_request(
             'http://localhost/services/596364a0-858e-42c8-9062-a8fe822260eb',
             '',
             '---',
-            'Branding requested: {}'
+            'Current branding: GOV.UK',
+            'Branding requested: {}',
         ]).format(requested_branding),
         subject='Email branding request - service one',
         ticket_type='question',
