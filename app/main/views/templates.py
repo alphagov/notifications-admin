@@ -111,10 +111,10 @@ def start_tour(service_id, template_id):
 @user_has_permissions()
 def choose_template(service_id, template_type='all', template_folder_id=None):
 
-    template_list = TemplateList(current_service, template_type, template_folder_id)
+    template_list = TemplateList(current_service, template_type, template_folder_id, current_user.id)
 
     templates_and_folders_form = TemplateAndFoldersSelectionForm(
-        all_template_folders=current_service.all_template_folders,
+        all_template_folders=current_service.get_user_template_folders(current_user.id),
         template_list=template_list,
         template_type=template_type,
         allow_adding_letter_template=current_service.has_permission('letter'),
@@ -348,6 +348,7 @@ def choose_template_to_copy(
             services_templates_and_folders=TemplateList(
                 service,
                 template_folder_id=from_folder,
+                user_id=current_user.id
             ),
             template_folder_path=service.get_template_folder_path(from_folder),
             from_service=service,
@@ -360,7 +361,7 @@ def choose_template_to_copy(
             services_templates_and_folders=TemplateLists([
                 Service(service) for service in
                 user_api_client.get_services_for_user(current_user)
-            ]),
+            ], user_id=current_user.id),
             search_form=SearchByNameForm(),
         )
 
