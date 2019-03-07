@@ -3949,7 +3949,7 @@ torbay.gov.uk:
 torfaen.gov.uk:
   owner: Torfaen County Borough Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 torpointtowncouncil.gov.uk:
   owner: Torpoint Town Council
   crown: false
