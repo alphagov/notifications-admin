@@ -385,6 +385,19 @@ class Service():
         return {folder['id'] for folder in self.all_template_folders}
 
     def get_user_template_folders(self, user_id):
+        """Returns a modified list of folders a user has permission to view
+
+        For each folder, we do the following:
+        - if user has no permission to view the folder, skip it
+        - if folder is visible and its parent is visible, we add it to the list of folders
+        we later return without modifying anything
+        - if folder is visible, but the parent is not, we iterate through the parent until we
+        either find a visible parent or reach root folder. On each iteration we concatenate
+        invisible parent folder name to the front of our folder name, modifying the name, and we
+        change parent_folder_id attribute to a higher level parent. This flattens the path to the
+        folder making sure it displays in the closest visible parent.
+
+        """
         if not self.has_permission("edit_folder_permissions"):
             return self.all_template_folders
 
