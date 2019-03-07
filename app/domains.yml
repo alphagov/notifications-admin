@@ -1059,7 +1059,7 @@ cheshireeast.gov.uk:
 cheshire.gov.uk:
   owner: Cheshire West and Chester Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 cheshireprepared.gov.uk: cheshire.gov.uk
 cheshiresharedservices.gov.uk:
   owner: Crewe & Nantwich Borough Council
