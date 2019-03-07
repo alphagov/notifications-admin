@@ -18,13 +18,16 @@ PARENT_FOLDER_ID = '7e979e79-d970-43a5-ac69-b625a8d147b0'
 CHILD_FOLDER_ID = '92ee1ee0-e4ee-4dcc-b1a7-a5da9ebcfa2b'
 GRANDCHILD_FOLDER_ID = 'fafe723f-1d39-4a10-865f-e551e03d8886'
 FOLDER_TWO_ID = 'bbbb222b-2b22-2b22-222b-b222b22b2222'
+FOLDER_B_ID = 'dddb222b-2b22-2b22-222b-b222b22b6789'
+FOLDER_C_ID = 'ccbb222b-2b22-2b22-222b-b222b22b2345'
 
 
-def _folder(name, folder_id=None, parent=None):
+def _folder(name, folder_id=None, parent=None, users_with_permission=None):
     return {
         'name': name,
         'id': folder_id or str(uuid.uuid4()),
         'parent_id': parent,
+        'users_with_permission': users_with_permission or [],
     }
 
 
@@ -1124,3 +1127,151 @@ def test_show_custom_error_message(
     )
 
     assert page.select_one('div.banner-dangerous').text.strip() == error_msg
+
+
+@pytest.mark.parametrize(
+    (
+        'extra_args,'
+        'expected_displayed_items, '
+        'expected_items, '
+        'expected_empty_message '
+    ),
+    [
+        (
+            {},
+            [
+                ['folder_A', '1 template, 2 folders'],
+                ['folder_E / folder_F / folder_G', '1 template'],
+                ['email_template_root', 'Email template'],
+            ],
+            [
+                ['folder_A', '1 template, 2 folders'],
+                ['folder_A', '/', 'folder_C', '1 template'],
+                ['folder_A', '/', 'folder_C', '/', 'sms_template_C', 'Text message template'],
+                ['folder_A', '/', 'folder_D', 'Empty'],
+                ['folder_A', '/', 'sms_template_A', 'Text message template'],
+                ['folder_E / folder_F / folder_G', '1 template'],
+                ['folder_E / folder_F / folder_G', '/', 'email_template_G', 'Email template'],
+                ['email_template_root', 'Email template'],
+            ],
+            None,
+        ),
+        (
+            {'template_type': 'email'},
+            [
+                ['folder_E / folder_F / folder_G', '1 template'],
+                ['email_template_root', 'Email template'],
+            ],
+            [
+                ['folder_E / folder_F / folder_G', '1 template'],
+                ['folder_E / folder_F / folder_G', '/', 'email_template_G', 'Email template'],
+                ['email_template_root', 'Email template'],
+            ],
+            None,
+        ),
+        (
+            {'template_type': 'sms'},
+            [
+                ['folder_A', '1 template, 1 folder'],
+            ],
+            [
+                ['folder_A', '1 template, 1 folder'],
+                ['folder_A', '/', 'folder_C', '1 template'],
+                ['folder_A', '/', 'folder_C', '/', 'sms_template_C', 'Text message template'],
+                ['folder_A', '/', 'sms_template_A', 'Text message template'],
+            ],
+            None,
+        ),
+        (
+            {'template_type': 'letter'},
+            [],
+            [],
+            None,
+        ),
+        (
+            {
+                'template_type': 'email',
+                'template_folder_id': FOLDER_C_ID,
+            },
+            [],
+            [],
+            'There are no email templates in this folder',
+        ),
+        (
+            {'template_folder_id': CHILD_FOLDER_ID},
+            [],
+            [],
+            'This folder is empty',
+        ),
+        (
+            {'template_folder_id': CHILD_FOLDER_ID, 'template_type': 'sms'},
+            [],
+            [],
+            'This folder is empty',
+        ),
+    ]
+)
+def test_should_filter_templates_folder_page_based_on_user_permissions(
+    client_request,
+    mock_get_template_folders,
+    mock_has_no_jobs,
+    service_one,
+    mocker,
+    active_user_with_permissions,
+    extra_args,
+    expected_displayed_items,
+    expected_items,
+    expected_empty_message,
+):
+    service_one['permissions'] += ['edit_folder_permissions', 'letter']
+    mock_get_template_folders.return_value = [
+        _folder('folder_A', FOLDER_TWO_ID, None, [active_user_with_permissions.id]),
+        _folder('folder_B', FOLDER_B_ID, FOLDER_TWO_ID),
+        _folder('folder_C', FOLDER_C_ID, FOLDER_TWO_ID, [active_user_with_permissions.id]),
+        _folder('folder_D', None, FOLDER_TWO_ID, [active_user_with_permissions.id]),
+        _folder('folder_E', PARENT_FOLDER_ID),
+        _folder('folder_F', CHILD_FOLDER_ID, parent=PARENT_FOLDER_ID),
+        _folder('folder_G', GRANDCHILD_FOLDER_ID, CHILD_FOLDER_ID, [active_user_with_permissions.id]),
+    ]
+    mocker.patch(
+        'app.service_api_client.get_service_templates',
+        return_value={'data': [
+            _template('email', 'email_template_root'),
+            _template('sms', 'sms_template_A', parent=FOLDER_TWO_ID),
+            _template('sms', 'sms_template_C', parent=FOLDER_C_ID),
+            _template('email', 'email_template_B', parent=FOLDER_B_ID),
+            _template('email', 'email_template_G', parent=GRANDCHILD_FOLDER_ID),
+            _template('letter', 'letter_template_F', parent=CHILD_FOLDER_ID),
+        ]}
+    )
+
+    page = client_request.get(
+        'main.choose_template',
+        service_id=SERVICE_ONE_ID,
+        _test_page_title=False,
+        **extra_args
+    )
+
+    displayed_page_items = page.find_all(lambda tag: (
+        tag.has_attr('class')
+        and 'template-list-item' in tag['class']
+        and 'template-list-item-hidden-by-default' not in tag['class']
+    ))
+
+    assert [
+        [i.strip() for i in e.text.split("\n") if i.strip()]
+        for e in displayed_page_items
+    ] == expected_displayed_items
+
+    all_page_items = page.select('.template-list-item')
+    assert [
+        [i.strip() for i in e.text.split("\n") if i.strip()]
+        for e in all_page_items
+    ] == expected_items
+
+    if expected_empty_message:
+        assert normalize_spaces(page.select_one('.template-list-empty').text) == (
+            expected_empty_message
+        )
+    else:
+        assert not page.select('.template-list-empty')
