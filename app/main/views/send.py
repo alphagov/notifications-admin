@@ -60,14 +60,6 @@ from app.utils import (
 )
 
 
-def get_page_headings(template_type):
-    return {
-        'email': 'Email templates',
-        'sms': 'Text message templates',
-        'letter': 'Letter templates'
-    }[template_type]
-
-
 def get_example_csv_fields(column_headers, use_example_as_example, submitted_fields):
     if use_example_as_example:
         return ["example" for header in column_headers]
@@ -774,25 +766,6 @@ def get_recipient_and_placeholders_from_session(template_type):
         placeholders['email_address'] = session['recipient']
 
     return placeholders
-
-
-def make_and_upload_csv_file(service_id, template):
-    upload_id = s3upload(
-        service_id,
-        Spreadsheet.from_dict(
-            session['placeholders'],
-            filename=current_app.config['TEST_MESSAGE_FILENAME']
-        ).as_dict,
-        current_app.config['AWS_REGION'],
-    )
-    return redirect(url_for(
-        '.check_messages',
-        upload_id=upload_id,
-        service_id=service_id,
-        template_id=template.id,
-        from_test=True,
-        help=2 if get_help_argument() else 0
-    ))
 
 
 def all_placeholders_in_session(placeholders):
