@@ -650,7 +650,7 @@ bingleytowncouncil.gov.uk:
 birmingham.gov.uk:
   owner: Birmingham City Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 birminghamprepared.gov.uk: birmingham.gov.uk
 bishopauckland-tc.gov.uk:
   owner: Bishop Auckland Town Council
