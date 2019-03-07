@@ -424,7 +424,7 @@ class Service():
             folder for folder in folders
             if (
                 folder['parent_id'] == parent_folder_id
-                and self.is_folder_visible(folder['id'], template_type)
+                and self.is_folder_visible(folder['id'], template_type, user_id)
             )
         ]
 
@@ -437,7 +437,7 @@ class Service():
             }
         return self._get_by_id(self.all_template_folders, folder_id)
 
-    def is_folder_visible(self, template_folder_id, template_type='all'):
+    def is_folder_visible(self, template_folder_id, template_type='all', user_id=None):
 
         if template_type == 'all':
             return True
@@ -446,8 +446,8 @@ class Service():
             return True
 
         if any(
-            self.is_folder_visible(child_folder['id'], template_type)
-            for child_folder in self.get_template_folders(template_type, template_folder_id)
+            self.is_folder_visible(child_folder['id'], template_type, user_id)
+            for child_folder in self.get_template_folders(template_type, template_folder_id, user_id)
         ):
             return True
 
