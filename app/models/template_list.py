@@ -40,7 +40,7 @@ class TemplateList():
                 yield sub_item
 
         for item in self.service.get_templates(
-            template_type, template_folder_id
+            template_type, template_folder_id, user_id
         ):
             yield TemplateListTemplate(
                 item,

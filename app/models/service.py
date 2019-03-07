@@ -154,7 +154,12 @@ class Service():
     def all_template_ids(self):
         return {template['id'] for template in self.all_templates}
 
-    def get_templates(self, template_type='all', template_folder_id=None):
+    def get_templates(self, template_type='all', template_folder_id=None, user_id=None):
+        if user_id and template_folder_id and self.has_permission('edit_folder_permissions'):
+            folder = self.get_template_folder(template_folder_id)
+            if user_id not in folder.get("users_with_permission", []):
+                return []
+
         if isinstance(template_type, str):
             template_type = [template_type]
         if template_folder_id:
