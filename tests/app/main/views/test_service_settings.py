@@ -570,11 +570,20 @@ def test_should_check_if_estimated_volumes_provided(
     (1, 'Add templates with examples of the content you plan to send Completed'),
     (2, 'Add templates with examples of the content you plan to send Completed'),
 ])
-@pytest.mark.parametrize('count_of_email_templates, reply_to_email_addresses, expected_reply_to_checklist_item', [
-    pytest.param(0, [], '', marks=pytest.mark.xfail(raises=IndexError)),
-    pytest.param(0, [{}], '', marks=pytest.mark.xfail(raises=IndexError)),
-    (1, [], 'Add an email reply-to address Not completed'),
-    (1, [{}], 'Add an email reply-to address Completed'),
+@pytest.mark.parametrize((
+    'volume_email,'
+    'count_of_email_templates,'
+    'reply_to_email_addresses,'
+    'expected_reply_to_checklist_item'
+), [
+    pytest.param(None, 0, [], '', marks=pytest.mark.xfail(raises=IndexError)),
+    pytest.param(0, 0, [], '', marks=pytest.mark.xfail(raises=IndexError)),
+    (None, 1, [], 'Add an email reply-to address Not completed'),
+    (None, 1, [{}], 'Add an email reply-to address Completed'),
+    (1, 1, [], 'Add an email reply-to address Not completed'),
+    (1, 1, [{}], 'Add an email reply-to address Completed'),
+    (1, 0, [], 'Add an email reply-to address Not completed'),
+    (1, 0, [{}], 'Add an email reply-to address Completed'),
 ])
 def test_should_check_for_sending_things_right(
     client_request,
@@ -584,6 +593,7 @@ def test_should_check_for_sending_things_right(
     expected_user_checklist_item,
     count_of_templates,
     expected_templates_checklist_item,
+    volume_email,
     count_of_email_templates,
     reply_to_email_addresses,
     expected_reply_to_checklist_item,
@@ -606,7 +616,7 @@ def test_should_check_for_sending_things_right(
         return_value=list(range(0, count_of_templates)),
     )
 
-    mock_get_templates = mocker.patch(
+    mocker.patch(
         'app.models.service.Service.get_templates',
         side_effect=_templates_by_type,
     )
@@ -616,12 +626,12 @@ def test_should_check_for_sending_things_right(
         return_value=reply_to_email_addresses
     )
 
-    for channel, volume in (('email', 1), ('sms', 0), ('letter', 1)):
+    for channel, volume in (('email', volume_email), ('sms', 0), ('letter', 1)):
         mocker.patch(
             'app.models.service.Service.volume_{}'.format(channel),
             create=True,
             new_callable=PropertyMock,
-            return_value=1,
+            return_value=volume,
         )
 
     page = client_request.get(
@@ -642,22 +652,20 @@ def test_should_check_for_sending_things_right(
     assert mock_templates.call_args_list == [
         call(),
     ]
-    assert mock_get_templates.call_args_list == [
-        call('email'),
-        call('sms'),
-    ]
 
     if count_of_email_templates:
         mock_get_reply_to_email_addresses.assert_called_once_with(SERVICE_ONE_ID)
 
 
-@pytest.mark.parametrize('estimated_sms_volume', (
-    pytest.param(None),
-    pytest.param(1),
-    pytest.param(0, marks=pytest.mark.xfail(raises=IndexError)),
-))
-@pytest.mark.parametrize('organisation_type,count_of_sms_templates, sms_senders, expected_sms_sender_checklist_item', [
+@pytest.mark.parametrize((
+    'estimated_sms_volume,'
+    'organisation_type,'
+    'count_of_sms_templates,'
+    'sms_senders,'
+    'expected_sms_sender_checklist_item'
+), [
     pytest.param(
+        0,
         'local',
         0,
         [],
@@ -665,6 +673,7 @@ def test_should_check_for_sending_things_right(
         marks=pytest.mark.xfail(raises=IndexError)
     ),
     pytest.param(
+        None,
         'local',
         0,
         [{'is_default': True, 'sms_sender': 'GOVUK'}],
@@ -672,6 +681,7 @@ def test_should_check_for_sending_things_right(
         marks=pytest.mark.xfail(raises=IndexError)
     ),
     pytest.param(
+        1,
         None,
         99,
         [{'is_default': True, 'sms_sender': 'GOVUK'}],
@@ -679,6 +689,15 @@ def test_should_check_for_sending_things_right(
         marks=pytest.mark.xfail(raises=IndexError)
     ),
     pytest.param(
+        None,
+        'central',
+        99,
+        [{'is_default': True, 'sms_sender': 'GOVUK'}],
+        '',
+        marks=pytest.mark.xfail(raises=IndexError)
+    ),
+    pytest.param(
+        1,
         'central',
         99,
         [{'is_default': True, 'sms_sender': 'GOVUK'}],
@@ -686,18 +705,28 @@ def test_should_check_for_sending_things_right(
         marks=pytest.mark.xfail(raises=IndexError)
     ),
     (
+        None,
         'local',
         1,
         [],
         'Change your text message sender name Not completed',
     ),
     (
+        1,
+        'local',
+        0,
+        [],
+        'Change your text message sender name Not completed',
+    ),
+    (
+        None,
         'local',
         1,
         [{'is_default': True, 'sms_sender': 'GOVUK'}],
         'Change your text message sender name Not completed',
     ),
     (
+        None,
         'local',
         1,
         [
@@ -707,6 +736,7 @@ def test_should_check_for_sending_things_right(
         'Change your text message sender name Completed',
     ),
     (
+        None,
         'nhs',
         1,
         [{'is_default': True, 'sms_sender': 'KUVOG'}],
@@ -741,7 +771,7 @@ def test_should_check_for_sms_sender_on_go_live(
         new_callable=PropertyMock,
         side_effect=partial(_templates_by_type, 'all'),
     )
-    mock_get_templates = mocker.patch(
+    mocker.patch(
         'app.models.service.Service.get_templates',
         side_effect=_templates_by_type,
     )
@@ -755,12 +785,13 @@ def test_should_check_for_sms_sender_on_go_live(
         return_value=[],
     )
 
-    mocker.patch(
-        'app.models.service.Service.volume_sms',
-        create=True,
-        new_callable=PropertyMock,
-        return_value=estimated_sms_volume,
-    )
+    for channel, volume in (('email', 0), ('sms', estimated_sms_volume)):
+        mocker.patch(
+            'app.models.service.Service.volume_{}'.format(channel),
+            create=True,
+            new_callable=PropertyMock,
+            return_value=volume,
+        )
 
     page = client_request.get(
         'main.request_to_go_live', service_id=SERVICE_ONE_ID
@@ -772,10 +803,6 @@ def test_should_check_for_sms_sender_on_go_live(
 
     assert mock_templates.call_args_list == [
         call(),
-    ]
-    assert mock_get_templates.call_args_list == [
-        call('email'),
-        call('sms'),
     ]
 
     mock_get_sms_senders.assert_called_once_with(SERVICE_ONE_ID)
@@ -820,6 +847,13 @@ def test_should_check_for_mou_on_request_to_go_live(
         'app.main.views.service_settings.service_api_client.get_reply_to_email_addresses',
         return_value=[],
     )
+    for channel in {'email', 'sms', 'letter'}:
+        mocker.patch(
+            'app.models.service.Service.volume_{}'.format(channel),
+            create=True,
+            new_callable=PropertyMock,
+            return_value=None,
+        )
 
     user = active_user_with_permissions(uuid4())
     user.email_address = email_address
@@ -1300,12 +1334,12 @@ def test_should_redirect_after_request_to_go_live(
         (  # Not done anything yet
             False,
             False,
-            True,
-            True,
+            False,
+            False,
+            False,
             False,
             True,
-            True,
-            0, None, 0,
+            None, None, None,
             'No',
             False,
             [
@@ -1351,14 +1385,17 @@ def test_ready_to_go_live(
             new_callable=PropertyMock
         ).return_value = locals()[prop]
 
-    mocker.patch(
-        'app.models.service.Service.__getattr__',
-        side_effect=lambda prop: {
-            'volume_email': volume_email,
-            'volume_sms': volume_sms,
-            'volume_letter': volume_letter,
-        }.get(prop)
-    )
+    for channel, volume in (
+        ('sms', volume_sms),
+        ('email', volume_email),
+        ('letter', volume_letter),
+    ):
+        mocker.patch(
+            'app.models.service.Service.volume_{}'.format(channel),
+            create=True,
+            new_callable=PropertyMock,
+            return_value=volume,
+        )
 
     assert app.models.service.Service({
         'id': SERVICE_ONE_ID
