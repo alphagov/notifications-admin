@@ -27,10 +27,7 @@
           'Add templates with examples of the content you plan to send',
           url_for('main.choose_template', service_id=current_service.id),
         ) }}
-        {% if (
-          current_service.has_email_templates
-          and (current_service.volume_email != 0)
-        ) %}
+        {% if current_service.intending_to_send_email %}
           {{ task_list_item(
             current_service.has_email_reply_to_address,
             'Add an email reply-to address',
@@ -38,9 +35,8 @@
           ) }}
         {% endif %}
         {% if (
-          current_service.has_sms_templates
+          current_service.intending_to_send_sms
           and current_service.shouldnt_use_govuk_as_sms_sender
-          and (current_service.volume_sms != 0)
         ) %}
           {{ task_list_item(
             not current_service.sms_sender_is_govuk,

@@ -200,6 +200,18 @@ class Service():
     def has_sms_templates(self):
         return len(self.get_templates('sms')) > 0
 
+    @property
+    def intending_to_send_email(self):
+        if self.volume_email is None:
+            return self.has_email_templates
+        return self.volume_email > 0
+
+    @property
+    def intending_to_send_sms(self):
+        if self.volume_sms is None:
+            return self.has_sms_templates
+        return self.volume_sms > 0
+
     @cached_property
     def email_reply_to_addresses(self):
         return service_api_client.get_reply_to_email_addresses(self.id)
@@ -226,7 +238,7 @@ class Service():
 
     @property
     def needs_to_add_email_reply_to_address(self):
-        return self.volume_email and not self.has_email_reply_to_address
+        return self.intending_to_send_email and not self.has_email_reply_to_address
 
     @property
     def shouldnt_use_govuk_as_sms_sender(self):
@@ -269,7 +281,7 @@ class Service():
     @property
     def needs_to_change_sms_sender(self):
         return all((
-            self.volume_sms,
+            self.intending_to_send_sms,
             self.shouldnt_use_govuk_as_sms_sender,
             self.sms_sender_is_govuk,
         ))
