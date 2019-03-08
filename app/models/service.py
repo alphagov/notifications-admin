@@ -226,7 +226,7 @@ class Service():
 
     @property
     def needs_to_add_email_reply_to_address(self):
-        return self.has_email_templates and not self.has_email_reply_to_address
+        return self.volume_email and not self.has_email_reply_to_address
 
     @property
     def shouldnt_use_govuk_as_sms_sender(self):
@@ -269,7 +269,7 @@ class Service():
     @property
     def needs_to_change_sms_sender(self):
         return all((
-            self.has_sms_templates,
+            self.volume_sms,
             self.shouldnt_use_govuk_as_sms_sender,
             self.sms_sender_is_govuk,
         ))
