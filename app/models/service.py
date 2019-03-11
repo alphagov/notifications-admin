@@ -154,7 +154,12 @@ class Service():
     def all_template_ids(self):
         return {template['id'] for template in self.all_templates}
 
-    def get_templates(self, template_type='all', template_folder_id=None):
+    def get_templates(self, template_type='all', template_folder_id=None, user_id=None):
+        if user_id and template_folder_id and self.has_permission('edit_folder_permissions'):
+            folder = self.get_template_folder(template_folder_id)
+            if user_id not in folder.get("users_with_permission", []):
+                return []
+
         if isinstance(template_type, str):
             template_type = [template_type]
         if template_folder_id:
@@ -391,16 +396,60 @@ class Service():
     def all_template_folder_ids(self):
         return {folder['id'] for folder in self.all_template_folders}
 
-    def get_template_folders(self, template_type='all', parent_folder_id=None):
+    def get_user_template_folders(self, user_id):
+        """Returns a modified list of folders a user has permission to view
 
+        For each folder, we do the following:
+        - if user has no permission to view the folder, skip it
+        - if folder is visible and its parent is visible, we add it to the list of folders
+        we later return without modifying anything
+        - if folder is visible, but the parent is not, we iterate through the parent until we
+        either find a visible parent or reach root folder. On each iteration we concatenate
+        invisible parent folder name to the front of our folder name, modifying the name, and we
+        change parent_folder_id attribute to a higher level parent. This flattens the path to the
+        folder making sure it displays in the closest visible parent.
+
+        """
+        if not self.has_permission("edit_folder_permissions"):
+            return self.all_template_folders
+
+        user_folders = []
+        for folder in self.all_template_folders:
+            if user_id not in folder.get("users_with_permission", []):
+                continue
+            parent = self.get_template_folder(folder["parent_id"])
+            if user_id in parent.get("users_with_permission", []):
+                user_folders.append(folder)
+            else:
+                folder_attrs = {
+                    "id": folder["id"], "name": folder["name"], "parent_id": folder["parent_id"],
+                    "users_with_permission": folder["users_with_permission"]
+                }
+                while folder_attrs["parent_id"] is not None:
+                    folder_attrs["name"] = parent["name"] + " / " + folder_attrs["name"]
+                    if parent["parent_id"] is None:
+                        folder_attrs["parent_id"] = None
+                    else:
+                        parent = self.get_template_folder(parent["parent_id"])
+                        folder_attrs["parent_id"] = parent.get("id", None)
+                        if user_id in parent.get("users_with_permission", []):
+                            break
+                user_folders.append(folder_attrs)
+        return user_folders
+
+    def get_template_folders(self, template_type='all', parent_folder_id=None, user_id=None):
+        if user_id:
+            folders = self.get_user_template_folders(user_id)
+        else:
+            folders = self.all_template_folders
         if parent_folder_id:
             parent_folder_id = str(parent_folder_id)
 
         return [
-            folder for folder in self.all_template_folders
+            folder for folder in folders
             if (
-                folder['parent_id'] == parent_folder_id and
-                self.is_folder_visible(folder['id'], template_type)
+                folder['parent_id'] == parent_folder_id
+                and self.is_folder_visible(folder['id'], template_type, user_id)
             )
         ]
 
@@ -413,7 +462,7 @@ class Service():
             }
         return self._get_by_id(self.all_template_folders, folder_id)
 
-    def is_folder_visible(self, template_folder_id, template_type='all'):
+    def is_folder_visible(self, template_folder_id, template_type='all', user_id=None):
 
         if template_type == 'all':
             return True
@@ -422,8 +471,8 @@ class Service():
             return True
 
         if any(
-            self.is_folder_visible(child_folder['id'], template_type)
-            for child_folder in self.get_template_folders(template_type, template_folder_id)
+            self.is_folder_visible(child_folder['id'], template_type, user_id)
+            for child_folder in self.get_template_folders(template_type, template_folder_id, user_id)
         ):
             return True
 
@@ -447,8 +496,8 @@ class Service():
 
     def get_template_folders_and_templates(self, template_type, template_folder_id):
         return (
-            self.get_templates(template_type, template_folder_id) +
-            self.get_template_folders(template_type, template_folder_id)
+            self.get_templates(template_type, template_folder_id)
+            + self.get_template_folders(template_type, template_folder_id)
         )
 
     @property
