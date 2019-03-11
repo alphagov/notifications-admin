@@ -5,6 +5,96 @@
   var GOVUK = global.GOVUK || {};
   var _mode = 'default';
 
+  // Constructor to make objects representing the area sticky elements can scroll in
+  var ScrollArea = function (el, edge) {
+    var $el = el.$fixedEl;
+    var $scrollArea = $el.closest('.sticky-scroll-area');
+
+    $scrollArea = $scrollArea.length ? $scrollArea : $el.parent();
+    scrollArea = $scrollArea.get(0);
+
+    this._els = [el];
+    this.edge = edge;
+    this.node = scrollArea;
+  };
+  ScrollArea.prototype.addEl = function (el) {
+    this._els.push(el);
+  };
+  ScrollArea.prototype.hasEl = function (el) {
+    return $.inArray(el, this._els) !== -1;
+  };
+  ScrollArea.prototype.updateEls = function (usedEls) {
+    this._els = usedEls;
+  };
+
+  // Object collecting together methods for interacting with scrollareas
+  var scrollAreas = {
+    _scrollAreas: [],
+    getAreaForEl: function (el) {
+      var loopIdx = this._scrollAreas.length;
+
+      while(loopIdx--) {
+        if (this._scrollAreas[loopIdx].hasEl(el)) {
+          return this._scrollAreas[loopIdx];
+        }
+      }
+
+      return false;
+    },
+    getAreaByEl: function (el) {
+      var matches = $.grep(this._scrollAreas, function (area) {
+        return $.inArray(el, area.els) !== -1;
+      });
+
+      return matches[0] || false;
+    },
+    addEl: function (el, edge) {
+      var scrollArea = this.getAreaForEl(el);
+
+      if (!scrollArea) {
+        this._scrollAreas.push(new ScrollArea(el, edge));
+      } else {
+        scrollArea.addEl(el);
+      }
+    },
+    syncEls: function (elsInDOM) {
+      var self = this;
+      var unusedAreas = [];
+
+      var getUsed = function (area) {
+        var used = [];
+
+        $.each(elsInDOM, function (elIdx, el) {
+          if (area.hasEl(el)) {
+            used.push(el);
+          }
+        });
+
+        return used;
+      };
+
+      var deleteUnused = function (idx, areaIdx) {
+        // remove any events for overlap checking bound to the scrollArea
+        self._scrollAreas[areaIdx].destroy();
+        self._scrollAreas.splice(areaIdx, 1);
+      };
+
+      // update any scroll areas with els still in the DOM and track any with none
+      $.each(this._scrollAreas, function (areaIdx, area) {
+        var used = getUsed(area);
+
+        if (!used.length) {
+          unusedAreas.push(areaIdx);
+        }
+
+        area.updateEls(used);
+      });
+
+      // delete any scroll areas with no els still in DOM
+      $.each(unusedAreas, deleteUnused);
+    }
+  };
+
   // Object collecting together methods for dealing with marking the edge of a sticky, or group of
   // sticky elements (as seen in dialog mode)
   var oppositeEdge = {
@@ -42,11 +132,8 @@
 
   // Constructor for objects holding data for each element to have sticky behaviour
   var StickyElement = function ($el, sticky) {
-    var $scrollArea = $el.closest('.sticky-scroll-area');
-
     this._sticky = sticky;
     this.$fixedEl = $el;
-    this.$scrollArea = $scrollArea.length ? $scrollArea : $el.parent();
     this._initialFixedClass = 'content-fixed-onload';
     this._fixedClass = 'content-fixed';
     this._appliedClass = null;
@@ -379,6 +466,7 @@
   Sticky.prototype.recalculate = function () {
     var self = this;
     var onSyncComplete = function () {
+      scrollAreas.syncEls(self._els);
       self.setEvents();
       if (_mode === 'dialog') {
         dialog.fitToHeight(self);
@@ -393,7 +481,8 @@
   };
   Sticky.prototype.setElWidth = function (el) {
     var $el = el.$fixedEl;
-    var width = el.$scrollArea.width();
+    var scrollArea = scrollAreas.getAreaByEl(el);
+    var width = $(scrollArea.node).width();
 
     el.horizontalSpace = width;
     // if stuck, element won't inherit width from parent so set explicitly
@@ -460,6 +549,7 @@
 
     if (!exists) {
       elObj = new StickyElement($el, self);
+      scrollAreas.addEl(elObj, self.edge);
     }
 
     self.setElementDimensions(elObj, onDimensionsSet);
