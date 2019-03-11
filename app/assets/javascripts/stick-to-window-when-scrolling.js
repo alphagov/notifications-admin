@@ -16,6 +16,7 @@
     this._els = [el];
     this.edge = edge;
     this.node = scrollArea;
+    this.setEvents();
   };
   ScrollArea.prototype.addEl = function (el) {
     this._els.push(el);
@@ -25,6 +26,24 @@
   };
   ScrollArea.prototype.updateEls = function (usedEls) {
     this._els = usedEls;
+  };
+  ScrollArea.prototype.setEvents = function () {
+    this.node.addEventListener('focus', this.focusHandler.bind(this), true);
+  };
+  ScrollArea.prototype.removeEvents = function () {
+    this.node.removeEventListener('focus', this.focusHandler.bind(this));
+  };
+  ScrollArea.prototype.focusHandler = function (e) {
+    var $focusedElement = $(document.activeElement);
+    var endOfFurthestEl = focusOverlap.endOfFurthestEl(this._els, this.edge);
+    var overlap = focusOverlap.getOverlap($focusedElement, this.edge, endOfFurthestEl);
+
+    if (overlap > 0) {
+      $(window).scrollTop($(window).scrollTop() + overlap);
+    }
+  };
+  ScrollArea.prototype.destroy = function () {
+    this.removeEvents();
   };
 
   // Object collecting together methods for interacting with scrollareas
@@ -92,6 +111,44 @@
 
       // delete any scroll areas with no els still in DOM
       $.each(unusedAreas, deleteUnused);
+    }
+  };
+
+  // Object collecting together methods for stopping sticky overlapping focused elements
+  var focusOverlap = {
+    getOverlap: function ($focusedElement, edge, endOfFurthestEl) {
+      var topOfFocusedElement = $focusedElement.offset().top;
+
+      if (!endOfFurthestEl) { return 0; }
+
+      if (edge === 'top') {
+        return endOfFurthestEl - topOfFocusedElement;
+      } else {
+        return (topOfFocusedElement + $focusedElement.outerHeight()) - endOfFurthestEl;
+      }
+    },
+    endOfFurthestEl: function (els, edge) {
+      var stuckEls = $.grep(els, function (el) { return el.isStuck(); });
+      var edgeOfEl;
+      var offsets;
+
+      if (edge === 'bottom') {
+        edgeOfEl = function (el) {
+          return el.$fixedEl.offset().top;
+        };
+      } else {
+        edgeOfEl = function (el) {
+          return el.$fixedEl.offset().top + el.height;
+        };
+      }
+
+      if (!stuckEls.length) { return false; }
+
+      offsets = $.map(stuckEls, function (el) { return edgeOfEl(el); });
+
+      return offsets.reduce(function (accumulator, offset) {
+        return (accumulator < offset) ? offset: accumulator;
+      });
     }
   };
 
