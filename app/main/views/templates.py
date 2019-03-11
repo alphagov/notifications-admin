@@ -850,21 +850,6 @@ def get_template_sender_form_dict(service_id, template):
     return context
 
 
-def get_last_use_message(template_name, template_statistics):
-    try:
-        most_recent_use = max(
-            parse(template_stats['updated_at']).replace(tzinfo=None)
-            for template_stats in template_statistics
-        )
-    except ValueError:
-        return '{} has never been used'.format(template_name)
-
-    return '{} was last used {} ago'.format(
-        template_name,
-        get_human_readable_delta(most_recent_use, datetime.utcnow())
-    )
-
-
 def get_human_readable_delta(from_time, until_time):
     delta = until_time - from_time
     if delta < timedelta(seconds=60):
@@ -878,10 +863,3 @@ def get_human_readable_delta(from_time, until_time):
     else:
         days = delta.days
         return '{} day{}'.format(days, '' if days == 1 else 's')
-
-
-def should_show_template(template_type):
-    return (
-        template_type != 'letter' or
-        current_service.has_permission('letter')
-    )

@@ -8,10 +8,7 @@ from flask import url_for
 from freezegun import freeze_time
 from notifications_python_client.errors import HTTPError
 
-from app.main.views.templates import (
-    get_human_readable_delta,
-    get_last_use_message,
-)
+from app.main.views.templates import get_human_readable_delta
 from tests import (
     single_notification_json,
     template_json,
@@ -1918,23 +1915,6 @@ def test_route_invalid_permissions(
         ['view_activity'],
         api_user_active,
         service_one)
-
-
-def test_get_last_use_message_returns_no_template_message():
-    assert get_last_use_message('My Template', []) == 'My Template has never been used'
-
-
-@freeze_time('2000-01-01T15:00')
-def test_get_last_use_message_uses_most_recent_statistics():
-    template_statistics = [
-        {
-            'updated_at': '2000-01-01T12:00:00.000000+00:00'
-        },
-        {
-            'updated_at': '2000-01-01T09:00:00.000000+00:00'
-        },
-    ]
-    assert get_last_use_message('My Template', template_statistics) == 'My Template was last used 3 hours ago'
 
 
 @pytest.mark.parametrize('from_time, until_time, message', [

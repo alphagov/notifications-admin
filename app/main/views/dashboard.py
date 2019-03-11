@@ -523,20 +523,6 @@ def requested_and_current_financial_year(request):
         abort(404)
 
 
-def format_template_stats_to_list(stats_dict):
-    if not stats_dict:
-        return []
-    for template_id, template in stats_dict.items():
-        yield dict(
-            requested_count=sum(
-                template['counts'].get(status, 0)
-                for status in REQUESTED_STATUSES
-            ),
-            id=template_id,
-            **template
-        )
-
-
 def get_tuples_of_financial_years(
     partial_url,
     start=2015,

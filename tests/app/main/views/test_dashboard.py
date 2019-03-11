@@ -14,7 +14,6 @@ from app.main.views.dashboard import (
     aggregate_status_types,
     aggregate_template_usage,
     format_monthly_stats_to_list,
-    format_template_stats_to_list,
     get_dashboard_totals,
     get_free_paid_breakdown_for_billable_units,
     get_tuples_of_financial_years,
@@ -1267,48 +1266,6 @@ def test_get_free_paid_breakdown_for_billable_units(now, expected_number_of_mont
             {'free': 0, 'name': 'February', 'paid': 2000, 'letter_total': 0, 'letters': [], 'letter_cumulative': 0},
             {'free': 0, 'name': 'March', 'paid': 0, 'letter_total': 0, 'letters': [], 'letter_cumulative': 0}
         ][:expected_number_of_months]
-
-
-def test_format_template_stats_to_list_with_no_stats():
-    assert list(format_template_stats_to_list({})) == []
-
-
-def test_format_template_stats_to_list():
-    counts = {
-        'created': 1,
-        'pending': 1,
-        'delivered': 1,
-        'failed': 1,
-        'temporary-failure': 1,
-        'permanent-failure': 1,
-        'technical-failure': 1,
-        'do-not-count': 999,
-    }
-    stats_list = list(format_template_stats_to_list({
-        'template_2_id': {
-            'counts': {},
-            'name': 'bar',
-        },
-        'template_1_id': {
-            'counts': counts,
-            'name': 'foo',
-        },
-    }))
-
-    # we don’t care about the order of this function’s output
-    assert len(stats_list) == 2
-    assert {
-        'counts': counts,
-        'name': 'foo',
-        'requested_count': 7,
-        'id': 'template_1_id',
-    } in stats_list
-    assert {
-        'counts': {},
-        'name': 'bar',
-        'requested_count': 0,
-        'id': 'template_2_id',
-    } in stats_list
 
 
 def test_get_tuples_of_financial_years():
