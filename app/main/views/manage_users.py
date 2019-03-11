@@ -100,7 +100,7 @@ def edit_user_permissions(service_id, user_id):
         service_id,
         folder_permissions=[
             f['id'] for f in current_service.all_template_folders
-            if user_id in f.get('users_with_permission', [])
+            if user.has_template_folder_permission(f)
         ],
         all_template_folders=current_service.all_template_folders
     )

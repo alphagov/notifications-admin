@@ -151,6 +151,12 @@ class User(UserMixin):
     def has_permission_for_service(self, service_id, permission):
         return permission in self._permissions.get(service_id, [])
 
+    def has_template_folder_permission(self, template_folder):
+        if self.platform_admin:
+            return True
+
+        return self.id in template_folder.get("users_with_permission", [])
+
     def belongs_to_service(self, service_id):
         return str(service_id) in self.services
 
