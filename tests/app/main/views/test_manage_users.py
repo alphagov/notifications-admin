@@ -372,6 +372,19 @@ def test_should_show_page_for_one_user(
         assert checkboxes[index].has_attr('checked') == expected_checked
 
 
+def test_invite_user_allows_to_choose_auth(
+    client_request,
+    mock_get_users_by_service,
+    mock_get_template_folders,
+    service_one,
+):
+    service_one['permissions'].append('email_auth')
+    page = client_request.get('main.invite_user', service_id=SERVICE_ONE_ID)
+
+    sms_auth_radio_button = page.select_one('input[value="sms_auth"]')
+    assert sms_auth_radio_button.has_attr("disabled") is False
+
+
 def test_should_not_show_page_for_non_team_member(
     client_request,
     mock_get_users_by_service,

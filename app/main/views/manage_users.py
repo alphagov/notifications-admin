@@ -69,7 +69,8 @@ def invite_user(service_id):
     return render_template(
         'views/invite-user.html',
         form=form,
-        service_has_email_auth=service_has_email_auth
+        service_has_email_auth=service_has_email_auth,
+        mobile_number=True,
     )
 
 
