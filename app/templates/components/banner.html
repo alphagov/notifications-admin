@@ -1,4 +1,6 @@
-{% macro banner(body, type=None, with_tick=False, delete_button=None, subhead=None, context=None) %}
+{% from "components/form.html" import form_wrapper %}
+
+{% macro banner(body, type=None, with_tick=False, delete_button=None, subhead=None, context=None, action=None) %}
   <div
     class='banner{% if type %}-{{ type }}{% endif %}{% if with_tick %}-with-tick{% endif %}'
     {% if type == 'dangerous' %}
@@ -16,14 +18,14 @@
     </p>
     {% endif %}
     {% if delete_button %}
-      <form method='post'>
+      {% call form_wrapper(action=action) %}
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
         <button type="submit" class="button" name="delete">{{ delete_button }}</button>
-      </form>
+      {% endcall %}
     {% endif %}
   </div>
 {% endmacro %}
 
-{% macro banner_wrapper(type=None, with_tick=False, delete_button=None, subhead=None) %}
-  {{ banner(caller()|safe, type=type, with_tick=with_tick, delete_button=delete_button, subhead=subhead) }}
+{% macro banner_wrapper(type=None, with_tick=False, delete_button=None, subhead=None, action=None) %}
+  {{ banner(caller()|safe, type=type, with_tick=with_tick, delete_button=delete_button, subhead=subhead, action=action) }}
 {% endmacro %}
