@@ -415,11 +415,15 @@ def test_can_create_email_template_with_parent_folder(
         data['parent_folder_id'])
 
 
+@pytest.mark.parametrize("folder_permissions, expected_len", [(['edit_folder_permissions'], 1), ([], 0)])
 def test_get_manage_folder_page(
     client_request,
     service_one,
     mock_get_template_folders,
+    folder_permissions,
+    expected_len
 ):
+    service_one["permissions"] += folder_permissions
     folder_id = str(uuid.uuid4())
     mock_get_template_folders.return_value = [
         {'id': folder_id, 'name': 'folder_two', 'parent_id': None},
@@ -437,8 +441,11 @@ def test_get_manage_folder_page(
     assert page.select_one('input[name=name]')['value'] == 'folder_two'
     delete_link = page.find('a', string="Delete this folder")
     expected_delete_url = "/services/{}/templates/folders/{}/delete".format(service_one['id'], folder_id)
-
     assert expected_delete_url in delete_link["href"]
+
+    assert len(page.select('p[id=users-with-permissions]')) == expected_len
+    if expected_len == 1:
+        assert page.select('p[id=users-with-permissions]')[0].text == "Users who can see this folder:"
 
 
 def test_manage_folder_page_404s(client_request, service_one, mock_get_template_folders):
