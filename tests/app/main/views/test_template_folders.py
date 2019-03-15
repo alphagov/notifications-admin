@@ -454,7 +454,7 @@ def test_get_manage_folder_page(
         assert "Users who can see this folder:" in form_labels[0].text
         checkboxes = page.select('input[name=viewing_permissions]')
         assert len(checkboxes) == 1
-        assert checkboxes[0]['value'] == 'y'
+        assert checkboxes[0]['value'] == active_user_with_permissions.id
         assert "Test User" in page.findAll('label', {'for': 'viewing_permissions-0'})[0].text
 
 
@@ -494,7 +494,7 @@ def test_rename_folder(client_request, active_user_with_permissions, service_one
         'main.manage_template_folder',
         service_id=service_one['id'],
         template_folder_id=folder_id,
-        _data={"name": "new beautiful name"},
+        _data={"name": "new beautiful name", "viewing_permissions": [active_user_with_permissions.id]},
         _expected_redirect=url_for("main.choose_template",
                                    service_id=service_one['id'],
                                    template_folder_id=folder_id,
@@ -504,7 +504,39 @@ def test_rename_folder(client_request, active_user_with_permissions, service_one
     mock_update.assert_called_once_with(
         service_one['id'],
         folder_id,
-        name="new beautiful name"
+        name="new beautiful name",
+        users_with_permission=[active_user_with_permissions.id]
+    )
+
+
+def test_manage_folder_users(
+    client_request, active_user_with_permissions, service_one, mock_get_template_folders, mocker
+):
+    mock_update = mocker.patch('app.template_folder_api_client.update_template_folder')
+    folder_id = str(uuid.uuid4())
+    mock_get_template_folders.return_value = [
+        {'id': folder_id, 'name': 'folder_two', 'parent_id': None, 'users_with_permission': [
+            active_user_with_permissions.id
+        ]}
+    ]
+    mocker.patch('app.models.service.Service.get_team_member', return_value=active_user_with_permissions)
+
+    client_request.post(
+        'main.manage_template_folder',
+        service_id=service_one['id'],
+        template_folder_id=folder_id,
+        _data={"name": "new beautiful name", "viewing_permissions": []},
+        _expected_redirect=url_for("main.choose_template",
+                                   service_id=service_one['id'],
+                                   template_folder_id=folder_id,
+                                   _external=True)
+    )
+
+    mock_update.assert_called_once_with(
+        service_one['id'],
+        folder_id,
+        name="new beautiful name",
+        users_with_permission=[]
     )
 
 

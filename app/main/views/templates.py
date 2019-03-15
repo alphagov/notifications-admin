@@ -438,10 +438,12 @@ def manage_template_folder(service_id, template_folder_id):
         name=current_folder['name'],
         users_with_permission=users_with_folder_permission
     )
-
     if form.validate_on_submit():
         template_folder_api_client.update_template_folder(
-            current_service.id, template_folder_id, name=form.name.data
+            current_service.id,
+            template_folder_id,
+            name=form.name.data,
+            users_with_permission=form.viewing_permissions.data
         )
         return redirect(
             url_for('.choose_template', service_id=service_id, template_folder_id=template_folder_id)

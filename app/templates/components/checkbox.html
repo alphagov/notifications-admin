@@ -3,10 +3,11 @@
 {% macro checkbox(
   field,
   hint=False,
-  width='2-3'
+  width='2-3',
+  value='y'
 ) %}
   <div class="multiple-choice">
-    {{ checkbox_input(field.id, field.name, field.data) }}
+    {{ checkbox_input(field.id, field.name, field.data, value) }}
     <label for="{{ field.id }}">
       {{ field.label.text }}
       {% if hint %}
@@ -42,14 +43,17 @@
 
 {% macro checkbox_group(
   legend,
-  fields
+  fields,
+  set_value=False
 ) %}
   <fieldset class="form-group">
     <legend class="form-label">
       {{ legend }}
     </legend>
-    {% for field in fields %}
-      {{ checkbox(field) }}
-    {% endfor %}
+    {% if set_value %}
+      {% for field in fields %}
+        {{ checkbox(field, value=field.data) }}
+      {% endfor %}
+    {% endif %}
   </fieldset>
 {% endmacro %}

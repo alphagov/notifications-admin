@@ -42,10 +42,13 @@ class TemplateFolderAPIClient(NotifyAdminAPIClient):
             ))
 
     @cache.delete('service-{service_id}-template-folders')
-    def update_template_folder(self, service_id, template_folder_id, name):
+    def update_template_folder(self, service_id, template_folder_id, name, users_with_permission=None):
+        data = {"name": name}
+        if users_with_permission:
+            data["users_with_permission"] = users_with_permission
         self.post(
             '/service/{}/template-folder/{}'.format(service_id, template_folder_id),
-            {"name": name}
+            data
         )
 
     @cache.delete('service-{service_id}-template-folders')
