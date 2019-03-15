@@ -70,7 +70,8 @@ def accept_invite(token):
                 user_api_client.update_user_attribute(existing_user.id, auth_type=invited_user.auth_type)
             user_api_client.add_user_to_service(invited_user.service,
                                                 existing_user.id,
-                                                invited_user.permissions)
+                                                invited_user.permissions,
+                                                invited_user.folder_permissions)
             return redirect(url_for('main.service_dashboard', service_id=invited_user.service))
     else:
         return redirect(url_for('main.register_from_invite'))

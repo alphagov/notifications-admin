@@ -150,11 +150,12 @@ class UserApiClient(NotifyAdminAPIClient):
 
     @cache.delete('service-{service_id}')
     @cache.delete('user-{user_id}')
-    def add_user_to_service(self, service_id, user_id, permissions):
+    def add_user_to_service(self, service_id, user_id, permissions, folder_permissions):
         # permissions passed in are the combined admin roles, not db permissions
         endpoint = '/service/{}/users/{}'.format(service_id, user_id)
         data = {
-            'permissions': [{'permission': x} for x in translate_permissions_from_admin_roles_to_db(permissions)]
+            'permissions': [{'permission': x} for x in translate_permissions_from_admin_roles_to_db(permissions)],
+            'folder_permissions': folder_permissions,
         }
 
         self.post(endpoint, data=data)

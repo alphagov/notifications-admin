@@ -578,12 +578,37 @@ def test_should_show_page_for_inviting_user(
     logged_in_client,
     active_user_with_permissions,
     mocker,
+    mock_get_template_folders,
 ):
     service = create_sample_service(active_user_with_permissions)
     response = logged_in_client.get(url_for('main.invite_user', service_id=service['id']))
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
-    assert 'Invite a team member' in response.get_data(as_text=True)
+    assert 'Invite a team member' in page.find('h1').text.strip()
     assert response.status_code == 200
+    assert not page.find('div', class_='checkboxes-nested')
+
+
+def test_should_show_folder_permission_form_if_service_has_folder_permissions_enabled(
+    logged_in_client,
+    mocker,
+    mock_get_template_folders,
+    service_one
+):
+    service_one['permissions'].append('edit_folder_permissions')
+    mock_get_template_folders.return_value = [
+        {'id': 'folder-id-1', 'name': 'folder_one', 'parent_id': None, 'users_with_permission': []},
+        {'id': 'folder-id-2', 'name': 'folder_two', 'parent_id': None, 'users_with_permission': []},
+        {'id': 'folder-id-3', 'name': 'folder_three', 'parent_id': 'folder-id-1', 'users_with_permission': []},
+    ]
+    response = logged_in_client.get(url_for('main.invite_user', service_id=service_one['id']))
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    assert 'Invite a team member' in page.find('h1').text.strip()
+    assert response.status_code == 200
+
+    folder_checkboxes = page.find('div', class_='checkboxes-nested').find_all('li')
+    assert len(folder_checkboxes) == 3
 
 
 @pytest.mark.parametrize('email_address, gov_user', [
@@ -597,6 +622,7 @@ def test_invite_user(
     sample_invite,
     email_address,
     gov_user,
+    mock_get_template_folders,
 ):
     service = create_sample_service(active_user_with_permissions)
     sample_invite['email_address'] = 'test@example.gov.uk'
@@ -629,7 +655,8 @@ def test_invite_user(
                                                                 sample_invite['service'],
                                                                 email_address,
                                                                 expected_permissions,
-                                                                'sms_auth')
+                                                                'sms_auth',
+                                                                folder_permissions=sample_invite['folder_permissions'])
 
 
 @pytest.mark.parametrize('auth_type', [
@@ -648,7 +675,8 @@ def test_invite_user_with_email_auth_service(
     gov_user,
     mocker,
     service_one,
-    auth_type
+    auth_type,
+    mock_get_template_folders,
 ):
     service_one['permissions'].append('email_auth')
     sample_invite['email_address'] = 'test@example.gov.uk'
@@ -682,7 +710,8 @@ def test_invite_user_with_email_auth_service(
                                                                 sample_invite['service'],
                                                                 email_address,
                                                                 expected_permissions,
-                                                                auth_type)
+                                                                auth_type,
+                                                                folder_permissions=sample_invite['folder_permissions'])
 
 
 def test_cancel_invited_user_cancels_user_invitations(
@@ -785,6 +814,7 @@ def test_user_cant_invite_themselves(
     mocker,
     active_user_with_permissions,
     mock_create_invite,
+    mock_get_template_folders,
 ):
     service = create_sample_service(active_user_with_permissions)
     response = logged_in_client.post(

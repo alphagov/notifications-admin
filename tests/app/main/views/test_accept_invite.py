@@ -38,13 +38,13 @@ def test_existing_user_accept_invite_calls_api_and_redirects_to_dashboard(
     mock_check_invite_token.assert_called_with('thisisnotarealtoken')
     mock_get_unknown_user_by_email.assert_called_with('invited_user@test.gov.uk')
     assert mock_accept_invite.call_count == 1
-    mock_add_user_to_service.assert_called_with(expected_service, USER_ONE_ID, expected_permissions)
+    mock_add_user_to_service.assert_called_with(expected_service, USER_ONE_ID, expected_permissions, [])
 
     assert response.status_code == 302
     assert response.location == url_for('main.service_dashboard', service_id=expected_service, _external=True)
 
 
-def test_existing_user_with_no_permissions_accept_invite(
+def test_existing_user_with_no_permissions_or_folder_permissions_accept_invite(
     client,
     mocker,
     service_one,
@@ -59,10 +59,14 @@ def test_existing_user_with_no_permissions_accept_invite(
     expected_service = service_one['id']
     sample_invite['permissions'] = ''
     expected_permissions = set()
+    expected_folder_permissions = []
     mocker.patch('app.invite_api_client.accept_invite', return_value=sample_invite)
 
     response = client.get(url_for('main.accept_invite', token='thisisnotarealtoken'))
-    mock_add_user_to_service.assert_called_with(expected_service, USER_ONE_ID, expected_permissions)
+    mock_add_user_to_service.assert_called_with(expected_service,
+                                                USER_ONE_ID,
+                                                expected_permissions,
+                                                expected_folder_permissions)
 
     assert response.status_code == 302
 
@@ -212,7 +216,10 @@ def test_existing_signed_out_user_accept_invite_redirects_to_sign_in(
 
     mock_check_invite_token.assert_called_with('thisisnotarealtoken')
     mock_get_unknown_user_by_email.assert_called_with('invited_user@test.gov.uk')
-    mock_add_user_to_service.assert_called_with(expected_service, USER_ONE_ID, expected_permissions)
+    mock_add_user_to_service.assert_called_with(expected_service,
+                                                USER_ONE_ID,
+                                                expected_permissions,
+                                                sample_invite['folder_permissions'])
     assert mock_accept_invite.call_count == 1
 
     assert response.status_code == 200
@@ -490,7 +497,7 @@ def test_new_invited_user_verifies_and_added_to_service(
 
     with client.session_transaction() as session:
         new_user_id = session['user_id']
-        mock_add_user_to_service.assert_called_with(data['service'], new_user_id, expected_permissions)
+        mock_add_user_to_service.assert_called_with(data['service'], new_user_id, expected_permissions, [])
         mock_accept_invite.assert_called_with(data['service'], sample_invite['id'])
         mock_check_verify_code.assert_called_once_with(new_user_id, '12345', 'sms')
         assert service_one['id'] == session['service_id']
@@ -528,7 +535,7 @@ def test_existing_user_accepts_and_sets_email_auth(
 
     mock_get_unknown_user_by_email.assert_called_once_with('test@user.gov.uk')
     mock_update_user_attribute.assert_called_once_with(USER_ONE_ID, auth_type='email_auth')
-    mock_add_user_to_service.assert_called_once_with(ANY, USER_ONE_ID, ANY)
+    mock_add_user_to_service.assert_called_once_with(ANY, USER_ONE_ID, ANY, ANY)
 
 
 def test_existing_user_doesnt_get_auth_changed_by_service_without_permission(

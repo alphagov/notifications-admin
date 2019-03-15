@@ -152,7 +152,10 @@ def test_client_converts_admin_permissions_to_db_permissions_on_edit(app_, mocke
 def test_client_converts_admin_permissions_to_db_permissions_on_add_to_service(app_, mocker):
     mock_post = mocker.patch('app.notify_client.user_api_client.UserApiClient.post', return_value={'data': {}})
 
-    user_api_client.add_user_to_service('service_id', 'user_id', permissions={'send_messages', 'view_activity'})
+    user_api_client.add_user_to_service('service_id',
+                                        'user_id',
+                                        permissions={'send_messages', 'view_activity'},
+                                        folder_permissions=[])
 
     assert sorted(mock_post.call_args[1]['data']['permissions'], key=lambda x: x['permission']) == sorted([
         {'permission': 'send_texts'},
@@ -237,14 +240,14 @@ def test_returns_value_from_cache(
 
 
 @pytest.mark.parametrize('client, method, extra_args, extra_kwargs', [
-    (user_api_client, 'add_user_to_service', [SERVICE_ONE_ID, sample_uuid(), []], {}),
+    (user_api_client, 'add_user_to_service', [SERVICE_ONE_ID, sample_uuid(), [], []], {}),
     (user_api_client, 'update_user_attribute', [user_id], {}),
     (user_api_client, 'reset_failed_login_count', [user_id], {}),
     (user_api_client, 'update_user_attribute', [user_id], {}),
     (user_api_client, 'update_password', [user_id, 'hunter2'], {}),
     (user_api_client, 'verify_password', [user_id, 'hunter2'], {}),
     (user_api_client, 'check_verify_code', [user_id, '', ''], {}),
-    (user_api_client, 'add_user_to_service', [SERVICE_ONE_ID, user_id, []], {}),
+    (user_api_client, 'add_user_to_service', [SERVICE_ONE_ID, user_id, [], []], {}),
     (user_api_client, 'add_user_to_organisation', [sample_uuid(), user_id], {}),
     (user_api_client, 'set_user_permissions', [user_id, SERVICE_ONE_ID, []], {}),
     (user_api_client, 'activate_user', [api_user_pending(sample_uuid())], {}),

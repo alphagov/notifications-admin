@@ -47,7 +47,11 @@ def manage_users(service_id):
 @user_has_permissions('manage_service')
 def invite_user(service_id):
 
-    form = InviteUserForm(invalid_email_address=current_user.email_address)
+    form = InviteUserForm(
+        invalid_email_address=current_user.email_address,
+        all_template_folders=current_service.all_template_folders,
+        folder_permissions=[f['id'] for f in current_service.all_template_folders]
+    )
 
     service_has_email_auth = current_service.has_permission('email_auth')
     if not service_has_email_auth:
@@ -60,7 +64,11 @@ def invite_user(service_id):
             service_id,
             email_address,
             form.permissions,
-            form.login_authentication.data
+            form.login_authentication.data,
+            folder_permissions=(
+                form.folder_permissions.data
+                if current_service.has_permission('edit_folder_permissions') else []
+            ),
         )
 
         flash('Invite sent to {}'.format(invited_user.email_address), 'default_with_tick')

@@ -2211,7 +2211,7 @@ def sample_invite(mocker, service_one, status='pending'):
     permissions = 'view_activity,send_messages,manage_service,manage_api_keys'
     created_at = str(datetime.utcnow())
     auth_type = 'sms_auth'
-    folder_permissions = [str(sample_uuid())]
+    folder_permissions = []
 
     return invite_json(
         id_, from_user, service_id, email_address, permissions, created_at, status, auth_type, folder_permissions)
@@ -2224,12 +2224,13 @@ def sample_invited_user(mocker, sample_invite):
 
 @pytest.fixture(scope='function')
 def mock_create_invite(mocker, sample_invite):
-    def _create_invite(from_user, service_id, email_address, permissions):
+    def _create_invite(from_user, service_id, email_address, permissions, folder_permissions):
         sample_invite['from_user'] = from_user
         sample_invite['service'] = service_id
         sample_invite['email_address'] = email_address
         sample_invite['status'] = 'pending'
         sample_invite['permissions'] = permissions
+        sample_invite['folder_permissions'] = folder_permissions
         return InvitedUser(**sample_invite)
 
     return mocker.patch('app.invite_api_client.create_invite', side_effect=_create_invite)
@@ -2268,7 +2269,7 @@ def mock_accept_invite(mocker, sample_invite):
 
 @pytest.fixture(scope='function')
 def mock_add_user_to_service(mocker, service_one, api_user_active):
-    def _add_user(service_id, user_id, permissions):
+    def _add_user(service_id, user_id, permissions, folder_permissions):
         return
 
     return mocker.patch('app.user_api_client.add_user_to_service', side_effect=_add_user)
