@@ -2211,8 +2211,10 @@ def sample_invite(mocker, service_one, status='pending'):
     permissions = 'view_activity,send_messages,manage_service,manage_api_keys'
     created_at = str(datetime.utcnow())
     auth_type = 'sms_auth'
+    folder_permissions = [str(sample_uuid())]
 
-    return invite_json(id_, from_user, service_id, email_address, permissions, created_at, status, auth_type)
+    return invite_json(
+        id_, from_user, service_id, email_address, permissions, created_at, status, auth_type, folder_permissions)
 
 
 @pytest.fixture(scope='function')
