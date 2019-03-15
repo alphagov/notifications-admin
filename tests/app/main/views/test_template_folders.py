@@ -418,16 +418,21 @@ def test_can_create_email_template_with_parent_folder(
 @pytest.mark.parametrize("folder_permissions, expected_len", [(['edit_folder_permissions'], 1), ([], 0)])
 def test_get_manage_folder_page(
     client_request,
+    active_user_with_permissions,
     service_one,
     mock_get_template_folders,
+    mocker,
     folder_permissions,
-    expected_len
+    expected_len,
 ):
     service_one["permissions"] += folder_permissions
     folder_id = str(uuid.uuid4())
     mock_get_template_folders.return_value = [
-        {'id': folder_id, 'name': 'folder_two', 'parent_id': None},
+        {'id': folder_id, 'name': 'folder_two', 'parent_id': None, 'users_with_permission': [
+            active_user_with_permissions.id
+        ]},
     ]
+    mocker.patch('app.models.service.Service.get_team_member', return_value=active_user_with_permissions)
 
     page = client_request.get(
         'main.manage_template_folder',
@@ -443,9 +448,14 @@ def test_get_manage_folder_page(
     expected_delete_url = "/services/{}/templates/folders/{}/delete".format(service_one['id'], folder_id)
     assert expected_delete_url in delete_link["href"]
 
-    assert len(page.select('p[id=users-with-permissions]')) == expected_len
+    form_labels = page.select('legend[class=form-label]')
+    assert len(form_labels) == expected_len
     if expected_len == 1:
-        assert page.select('p[id=users-with-permissions]')[0].text == "Users who can see this folder:"
+        assert "Users who can see this folder:" in form_labels[0].text
+        checkboxes = page.select('input[name=viewing_permissions]')
+        assert len(checkboxes) == 1
+        assert checkboxes[0]['value'] == 'y'
+        assert "Test User" in page.findAll('label', {'for': 'viewing_permissions-0'})[0].text
 
 
 def test_manage_folder_page_404s(client_request, service_one, mock_get_template_folders):
@@ -470,12 +480,15 @@ def test_get_manage_folder_page_no_permissions(
     )
 
 
-def test_rename_folder(client_request, service_one, mock_get_template_folders, mocker):
+def test_rename_folder(client_request, active_user_with_permissions, service_one, mock_get_template_folders, mocker):
     mock_update = mocker.patch('app.template_folder_api_client.update_template_folder')
     folder_id = str(uuid.uuid4())
     mock_get_template_folders.return_value = [
-        {'id': folder_id, 'name': 'folder_two', 'parent_id': None},
+        {'id': folder_id, 'name': 'folder_two', 'parent_id': None, 'users_with_permission': [
+            active_user_with_permissions.id
+        ]}
     ]
+    mocker.patch('app.models.service.Service.get_team_member', return_value=active_user_with_permissions)
 
     client_request.post(
         'main.manage_template_folder',

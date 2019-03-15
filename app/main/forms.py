@@ -1285,6 +1285,15 @@ class ReturnedLettersForm(StripWhitespaceForm):
 
 
 class TemplateFolderForm(StripWhitespaceForm):
+    def __init__(self, users_with_permission=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if users_with_permission is not None:
+            self.viewing_permissions.users_with_permission = users_with_permission
+            self.viewing_permissions.choices = [
+                (item.id, item.name) for item in users_with_permission
+            ]
+
+    viewing_permissions = MultiCheckboxField('Users who can see this folder:')
     name = StringField('Folder name', validators=[DataRequired(message='Can’t be empty')])
 
 

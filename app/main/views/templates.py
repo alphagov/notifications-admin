@@ -430,9 +430,13 @@ def action_blocked(service_id, notification_type, return_to, template_id):
 @login_required
 @user_has_permissions('manage_templates')
 def manage_template_folder(service_id, template_folder_id):
-
+    current_folder = current_service.get_template_folder(template_folder_id)
+    users_with_folder_permission = [
+        current_service.get_team_member(user_id) for user_id in current_folder['users_with_permission']
+    ]
     form = TemplateFolderForm(
-        name=current_service.get_template_folder(template_folder_id)['name']
+        name=current_folder['name'],
+        users_with_permission=users_with_folder_permission
     )
 
     if form.validate_on_submit():
@@ -449,7 +453,7 @@ def manage_template_folder(service_id, template_folder_id):
         template_folder_path=current_service.get_template_folder_path(template_folder_id),
         current_service_id=current_service.id,
         template_folder_id=template_folder_id,
-        template_type="all"
+        template_type="all",
     )
 
 
