@@ -4328,7 +4328,7 @@ wokingham-tc.gov.uk:
 wolverhampton.gov.uk:
   owner: Wolverhampton City Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 wolvertonandgreenleystowncouncil.gov.uk:
   owner: Wolverton and Greenleys Town Council
   crown: false
