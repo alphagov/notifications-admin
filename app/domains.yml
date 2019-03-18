@@ -1706,7 +1706,7 @@ gateshead.gov.uk:
 gedling.gov.uk:
   owner: Gedling Borough Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 gillinghamdorset-tc.gov.uk:
   owner: Gillingham Town Council
   crown: false
@@ -4078,7 +4078,7 @@ warminster-tc.gov.uk:
 warrington.gov.uk:
   owner: Warrington Borough Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 warwick-dc.gov.uk: warwick.gov.uk
 warwickdc.gov.uk: warwick.gov.uk
 warwick.gov.uk:
