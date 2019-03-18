@@ -74,7 +74,6 @@
 
     {% if current_user.has_permissions('manage_templates') %}
       {% call form_wrapper(
-          class='sticky-scroll-area',
           module='template-folder-form',
           data_kwargs={'prev-state': templates_and_folders_form.op or None}
       ) %}

@@ -33,11 +33,10 @@
       this.activateStickyElements();
 
       // first off show the new template / new folder buttons
-      this._lastState = this.$form.data('prev-state');
-      if (this._lastState === undefined) {
+      this.currentState = this.$form.data('prev-state') || 'unknown';
+      if (this.currentState === 'unknown') {
         this.selectActionButtons();
       } else {
-        this.currentState = this._lastState;
         this.render();
       }
 
@@ -145,21 +144,11 @@
       }
     };
 
-    // method that checks the state against the last one, used prior to render() to see if needed
-    this.stateChanged = function() {
-      let changed = this.currentState !== this._lastState;
-
-      this._lastState = this.currentState;
-      return changed;
-    };
-
     this.actionButtonClicked = function(event) {
       event.preventDefault();
       this.currentState = $(event.currentTarget).val();
 
-      if (this.stateChanged()) {
-        this.render();
-      }
+      this.render();
     };
 
     this.selectionStatus = {
@@ -184,9 +173,7 @@
         this.currentState = 'nothing-selected-buttons';
       }
 
-      if (this.stateChanged()) {
-        this.render();
-      }
+      this.render();
 
       this.selectionStatus.update(numSelected);
 

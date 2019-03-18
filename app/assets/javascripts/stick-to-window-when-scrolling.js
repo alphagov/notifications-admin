@@ -5,153 +5,6 @@
   var GOVUK = global.GOVUK || {};
   var _mode = 'default';
 
-  // Constructor to make objects representing the area sticky elements can scroll in
-  var ScrollArea = function (el, edge) {
-    var $el = el.$fixedEl;
-    var $scrollArea = $el.closest('.sticky-scroll-area');
-
-    $scrollArea = $scrollArea.length ? $scrollArea : $el.parent();
-    scrollArea = $scrollArea.get(0);
-
-    this._els = [el];
-    this.edge = edge;
-    this.node = scrollArea;
-    this.setEvents();
-  };
-  ScrollArea.prototype.addEl = function (el) {
-    this._els.push(el);
-  };
-  ScrollArea.prototype.hasEl = function (el) {
-    return $.inArray(el, this._els) !== -1;
-  };
-  ScrollArea.prototype.updateEls = function (usedEls) {
-    this._els = usedEls;
-  };
-  ScrollArea.prototype.setEvents = function () {
-    this.node.addEventListener('focus', this.focusHandler.bind(this), true);
-  };
-  ScrollArea.prototype.removeEvents = function () {
-    this.node.removeEventListener('focus', this.focusHandler.bind(this));
-  };
-  ScrollArea.prototype.focusHandler = function (e) {
-    var $focusedElement = $(document.activeElement);
-    var endOfFurthestEl = focusOverlap.endOfFurthestEl(this._els, this.edge);
-    var overlap = focusOverlap.getOverlap($focusedElement, this.edge, endOfFurthestEl);
-
-    if (overlap > 0) {
-      $(window).scrollTop($(window).scrollTop() + overlap);
-    }
-  };
-  ScrollArea.prototype.destroy = function () {
-    this.removeEvents();
-  };
-
-  // Object collecting together methods for interacting with scrollareas
-  var scrollAreas = {
-    _scrollAreas: [],
-    getAreaForEl: function (el) {
-      var loopIdx = this._scrollAreas.length;
-
-      while(loopIdx--) {
-        if (this._scrollAreas[loopIdx].hasEl(el)) {
-          return this._scrollAreas[loopIdx];
-        }
-      }
-
-      return false;
-    },
-    getAreaByEl: function (el) {
-      var matches = $.grep(this._scrollAreas, function (area) {
-        return $.inArray(el, area.els) !== -1;
-      });
-
-      return matches[0] || false;
-    },
-    addEl: function (el, edge) {
-      var scrollArea = this.getAreaForEl(el);
-
-      if (!scrollArea) {
-        this._scrollAreas.push(new ScrollArea(el, edge));
-      } else {
-        scrollArea.addEl(el);
-      }
-    },
-    syncEls: function (elsInDOM) {
-      var self = this;
-      var unusedAreas = [];
-
-      var getUsed = function (area) {
-        var used = [];
-
-        $.each(elsInDOM, function (elIdx, el) {
-          if (area.hasEl(el)) {
-            used.push(el);
-          }
-        });
-
-        return used;
-      };
-
-      var deleteUnused = function (idx, areaIdx) {
-        // remove any events for overlap checking bound to the scrollArea
-        self._scrollAreas[areaIdx].destroy();
-        self._scrollAreas.splice(areaIdx, 1);
-      };
-
-      // update any scroll areas with els still in the DOM and track any with none
-      $.each(this._scrollAreas, function (areaIdx, area) {
-        var used = getUsed(area);
-
-        if (!used.length) {
-          unusedAreas.push(areaIdx);
-        }
-
-        area.updateEls(used);
-      });
-
-      // delete any scroll areas with no els still in DOM
-      $.each(unusedAreas, deleteUnused);
-    }
-  };
-
-  // Object collecting together methods for stopping sticky overlapping focused elements
-  var focusOverlap = {
-    getOverlap: function ($focusedElement, edge, endOfFurthestEl) {
-      var topOfFocusedElement = $focusedElement.offset().top;
-
-      if (!endOfFurthestEl) { return 0; }
-
-      if (edge === 'top') {
-        return endOfFurthestEl - topOfFocusedElement;
-      } else {
-        return (topOfFocusedElement + $focusedElement.outerHeight()) - endOfFurthestEl;
-      }
-    },
-    endOfFurthestEl: function (els, edge) {
-      var stuckEls = $.grep(els, function (el) { return el.isStuck(); });
-      var edgeOfEl;
-      var offsets;
-
-      if (edge === 'bottom') {
-        edgeOfEl = function (el) {
-          return el.$fixedEl.offset().top;
-        };
-      } else {
-        edgeOfEl = function (el) {
-          return el.$fixedEl.offset().top + el.height;
-        };
-      }
-
-      if (!stuckEls.length) { return false; }
-
-      offsets = $.map(stuckEls, function (el) { return edgeOfEl(el); });
-
-      return offsets.reduce(function (accumulator, offset) {
-        return (accumulator < offset) ? offset: accumulator;
-      });
-    }
-  };
-
   // Object collecting together methods for dealing with marking the edge of a sticky, or group of
   // sticky elements (as seen in dialog mode)
   var oppositeEdge = {
@@ -523,7 +376,6 @@
   Sticky.prototype.recalculate = function () {
     var self = this;
     var onSyncComplete = function () {
-      scrollAreas.syncEls(self._els);
       self.setEvents();
       if (_mode === 'dialog') {
         dialog.fitToHeight(self);
@@ -538,8 +390,7 @@
   };
   Sticky.prototype.setElWidth = function (el) {
     var $el = el.$fixedEl;
-    var scrollArea = scrollAreas.getAreaByEl(el);
-    var width = $(scrollArea.node).width();
+    var width = $el.parent().width();
 
     el.horizontalSpace = width;
     // if stuck, element won't inherit width from parent so set explicitly
@@ -606,7 +457,6 @@
 
     if (!exists) {
       elObj = new StickyElement($el, self);
-      scrollAreas.addEl(elObj, self.edge);
     }
 
     self.setElementDimensions(elObj, onDimensionsSet);
