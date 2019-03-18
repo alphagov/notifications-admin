@@ -967,7 +967,7 @@ cambridgeshire.gov.uk:
 camden.gov.uk:
   owner: Camden Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 camelford-tc.gov.uk:
   owner: Camelford Town Council
   crown: false
