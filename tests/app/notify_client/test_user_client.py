@@ -154,7 +154,7 @@ def test_client_converts_admin_permissions_to_db_permissions_on_add_to_service(a
 
     user_api_client.add_user_to_service('service_id', 'user_id', permissions={'send_messages', 'view_activity'})
 
-    assert sorted(mock_post.call_args[1]['data'], key=lambda x: x['permission']) == sorted([
+    assert sorted(mock_post.call_args[1]['data']['permissions'], key=lambda x: x['permission']) == sorted([
         {'permission': 'send_texts'},
         {'permission': 'send_emails'},
         {'permission': 'send_letters'},
