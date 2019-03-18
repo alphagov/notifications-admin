@@ -363,6 +363,12 @@ class Service():
             return email_branding_client.get_email_branding(self.email_branding_id)['email_branding']
         return None
 
+    @cached_property
+    def email_branding_name(self):
+        if self.email_branding is None:
+            return 'GOV.UK'
+        return self.email_branding['name']
+
     @property
     def letter_branding_id(self):
         return self._dict['letter_branding']

@@ -311,7 +311,7 @@
         {% endcall %}
         {% call row() %}
           {{ text_field('Email branding' )}}
-          {{ text_field(current_service.email_branding.name or 'GOV.UK') }}
+          {{ text_field(current_service.email_branding_name) }}
           {{ edit_field('Change', url_for('.service_set_email_branding', service_id=current_service.id)) }}
         {% endcall %}
         {% call row() %}

@@ -955,16 +955,18 @@ def branding_request(service_id):
         zendesk_client.create_ticket(
             subject='Email branding request - {}'.format(current_service.name),
             message=(
-                'Organisation: {}\n'
-                'Service: {}\n'
-                '{}\n'
+                'Organisation: {organisation}\n'
+                'Service: {service_name}\n'
+                '{dashboard_url}\n'
                 '\n---'
-                '\nBranding requested: {}'
+                '\nCurrent branding: {current_branding}'
+                '\nBranding requested: {branding_requested}'
             ).format(
-                AgreementInfo.from_current_user().as_info_for_branding_request,
-                current_service.name,
-                url_for('main.service_dashboard', service_id=current_service.id, _external=True),
-                branding_options_dict[form.options.data],
+                organisation=AgreementInfo.from_current_user().as_info_for_branding_request,
+                service_name=current_service.name,
+                dashboard_url=url_for('main.service_dashboard', service_id=current_service.id, _external=True),
+                current_branding=current_service.email_branding_name,
+                branding_requested=branding_options_dict[form.options.data],
             ),
             ticket_type=zendesk_client.TYPE_QUESTION,
             user_email=current_user.email_address,
