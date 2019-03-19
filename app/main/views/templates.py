@@ -430,14 +430,19 @@ def action_blocked(service_id, notification_type, return_to, template_id):
 @login_required
 @user_has_permissions('manage_templates')
 def manage_template_folder(service_id, template_folder_id):
-
+    current_folder = current_service.get_template_folder(template_folder_id)
     form = TemplateFolderForm(
-        name=current_service.get_template_folder(template_folder_id)['name']
+        name=current_folder['name'],
+        users_with_permission=current_folder.get('users_with_permission', None),
+        all_service_users=[user for user in current_service.active_users if user.id != current_user.id]
     )
-
     if form.validate_on_submit():
+        users_with_permission = form.users_with_permission.data + [current_user.id]
         template_folder_api_client.update_template_folder(
-            current_service.id, template_folder_id, name=form.name.data
+            current_service.id,
+            template_folder_id,
+            name=form.name.data,
+            users_with_permission=users_with_permission
         )
         return redirect(
             url_for('.choose_template', service_id=service_id, template_folder_id=template_folder_id)
@@ -449,7 +454,7 @@ def manage_template_folder(service_id, template_folder_id):
         template_folder_path=current_service.get_template_folder_path(template_folder_id),
         current_service_id=current_service.id,
         template_folder_id=template_folder_id,
-        template_type="all"
+        template_type="all",
     )
 
 

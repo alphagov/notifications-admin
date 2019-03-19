@@ -1,6 +1,7 @@
 {% extends "withnav_template.html" %}
 {% from "components/folder-path.html" import folder_path, page_title_folder_path %}
 {% from "components/textbox.html" import textbox %}
+{% from "components/checkbox.html" import checkbox, checkboxes %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 
@@ -23,6 +24,10 @@
 
   {% call form_wrapper(action=url_for('main.manage_template_folder', service_id=current_service.id, template_folder_id=template_folder_id)) %}
     {{ textbox(form.name) }}
+    {% if current_service.has_permission("edit_folder_permissions") %}
+      {{ checkboxes(form.users_with_permission) }}
+    {% endif %}
+
     {{ page_footer(
       'Save',
       delete_link=url_for(
