@@ -1,0 +1,37 @@
+{% extends "withnav_template.html" %}
+{% from "components/banner.html" import banner %}
+{% from "components/textbox.html" import textbox %}
+{% from "components/file-upload.html" import file_upload %}
+{% from "components/page-footer.html" import page_footer %}
+
+{% from "components/form.html" import form_wrapper %}
+{% block maincolumn_content %}
+
+<div class="grid-row">
+  <div class="column-whole">
+    {% if result %}
+      {{ banner(message, with_tick=True) }}
+    {% elif message %}
+      {{ banner(message, 'dangerous')}}
+    {% endif %}
+
+    <h1 class="heading-large">Letter Validation Preview</h1>
+    <div class="bottom-gutter">
+     {{ file_upload(
+          form.file,
+          action = url_for('main.services_letter_validation_preview', service_id=current_service.id),
+          button_text='Upload a PDF document',
+      )}}
+    </div>
+  </div>
+  <div class="column-whole template-container" >
+
+    {% for page in pages %}
+    <div class="letter">
+      <img src="data:image/png;base64,{{ page }}">
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+{% endblock %}

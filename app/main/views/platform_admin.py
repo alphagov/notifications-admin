@@ -253,8 +253,21 @@ def platform_admin_returned_letters():
 @login_required
 @user_is_platform_admin
 def platform_admin_letter_validation_preview():
+    return letter_validation_preview(from_platform_admin=True)
+
+
+@main.route("/services/<service_id>/letter-validation-preview", methods=["GET", "POST"])
+@login_required
+def service_letter_validation_preview(service_id):
+    return letter_validation_preview(from_platform_admin=False)
+
+
+def letter_validation_preview(from_platform_admin):
     message, pages, result = None, [], None
     form = PDFUploadForm()
+
+    view_location = 'views/platform-admin/letter-validation-preview.html' \
+        if from_platform_admin else'views/letter-validation-preview.html'
 
     if form.validate_on_submit():
         pdf_file = form.file.data
@@ -262,7 +275,7 @@ def platform_admin_letter_validation_preview():
 
         if not virus_free:
             return render_template(
-                'views/platform-admin/letter-validation-preview.html',
+                view_location,
                 form=form, message="Document didn't pass the virus scan", pages=pages, result=result
             ), 400
 
@@ -275,14 +288,14 @@ def platform_admin_letter_validation_preview():
             if error.response and error.response.status_code == 400:
                 message = "Something was wrong with the file you tried to upload. Please upload a valid PDF file."
                 return render_template(
-                    'views/platform-admin/letter-validation-preview.html',
+                    view_location,
                     form=form, message=message, pages=pages, result=result
                 ), 400
             else:
                 raise error
 
     return render_template(
-        'views/platform-admin/letter-validation-preview.html',
+        view_location,
         form=form, message=message, pages=pages, result=result
     )
 
