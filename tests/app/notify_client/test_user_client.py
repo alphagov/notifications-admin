@@ -1,3 +1,4 @@
+import uuid
 from unittest.mock import call
 
 import pytest
@@ -272,3 +273,25 @@ def test_deletes_user_cache(
 
     assert call('user-{}'.format(user_id)) in mock_redis_delete.call_args_list
     assert len(mock_request.call_args_list) == 1
+
+
+def test_add_user_to_service_calls_correct_endpoint_and_deletes_keys_from_cache(mocker):
+    mock_redis_delete = mocker.patch('app.extensions.RedisClient.delete')
+
+    service_id = uuid.uuid4()
+    user_id = uuid.uuid4()
+    folder_id = uuid.uuid4()
+
+    expected_url = '/service/{}/users/{}'.format(service_id, user_id)
+    data = {'permissions': [], 'folder_permissions': [folder_id]}
+
+    mock_post = mocker.patch('app.notify_client.user_api_client.UserApiClient.post')
+
+    user_api_client.add_user_to_service(service_id, user_id, [], [folder_id])
+
+    mock_post.assert_called_once_with(expected_url, data=data)
+    assert mock_redis_delete.call_args_list == [
+        call('service-{service_id}'.format(service_id=service_id)),
+        call('service-{service_id}-template-folders'.format(service_id=service_id)),
+        call('user-{user_id}'.format(user_id=user_id)),
+    ]

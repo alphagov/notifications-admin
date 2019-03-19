@@ -149,6 +149,7 @@ class UserApiClient(NotifyAdminAPIClient):
         return [User(data) for data in resp['data']]
 
     @cache.delete('service-{service_id}')
+    @cache.delete('service-{service_id}-template-folders')
     @cache.delete('user-{user_id}')
     def add_user_to_service(self, service_id, user_id, permissions, folder_permissions):
         # permissions passed in are the combined admin roles, not db permissions
