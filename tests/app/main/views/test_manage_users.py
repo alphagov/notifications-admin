@@ -656,7 +656,7 @@ def test_invite_user(
                                                                 email_address,
                                                                 expected_permissions,
                                                                 'sms_auth',
-                                                                folder_permissions=sample_invite['folder_permissions'])
+                                                                [])
 
 
 @pytest.mark.parametrize('auth_type', [
@@ -711,7 +711,38 @@ def test_invite_user_with_email_auth_service(
                                                                 email_address,
                                                                 expected_permissions,
                                                                 auth_type,
-                                                                folder_permissions=sample_invite['folder_permissions'])
+                                                                [])
+
+
+def test_invite_user_sends_invite_with_all_folders_if_folder_permissions_not_enabled(
+    logged_in_client,
+    mocker,
+    mock_get_template_folders,
+    service_one
+):
+    mocker.patch('app.invite_api_client.get_invites_for_service')
+    mocker.patch('app.user_api_client.get_users_for_service')
+    mock_get_template_folders.return_value = [
+        {'id': 'folder-id-1', 'name': 'folder_one', 'parent_id': None, 'users_with_permission': []},
+        {'id': 'folder-id-2', 'name': 'folder_two', 'parent_id': None, 'users_with_permission': []},
+        {'id': 'folder-id-3', 'name': 'folder_three', 'parent_id': 'folder-id-1', 'users_with_permission': []},
+    ]
+    invite_mock = mocker.patch('app.invite_api_client.create_invite')
+
+    response = logged_in_client.post(
+        url_for('main.invite_user', service_id=service_one['id']),
+        data={'email_address': 'user@example.com',
+              'send_messages': 'y'},
+        follow_redirects=True
+    )
+    assert response.status_code == 200
+
+    folder_data_sent = invite_mock.call_args[0][-1]
+
+    assert len(folder_data_sent) == 3
+    assert 'folder-id-1' in folder_data_sent
+    assert 'folder-id-2' in folder_data_sent
+    assert 'folder-id-3' in folder_data_sent
 
 
 def test_cancel_invited_user_cancels_user_invitations(
