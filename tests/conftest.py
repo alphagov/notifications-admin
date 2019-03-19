@@ -835,7 +835,7 @@ def mock_get_template_versions(mocker, fake_uuid, user=None):
 
 @pytest.fixture(scope='function')
 def mock_get_service_template_with_placeholders(mocker):
-    def _get(service_id, template_id):
+    def _get(service_id, template_id, version=None):
         template = template_json(
             service_id, template_id, "Two week reminder", "sms", "((name)), Template <em>content</em> with & entity"
         )
@@ -849,7 +849,7 @@ def mock_get_service_template_with_placeholders(mocker):
 
 @pytest.fixture(scope='function')
 def mock_get_service_template_with_placeholders_same_as_recipient(mocker):
-    def _get(service_id, template_id):
+    def _get(service_id, template_id, version=None):
         template = template_json(
             service_id, template_id, "Two week reminder", "sms", "((name)) ((date)) ((PHONENUMBER))"
         )

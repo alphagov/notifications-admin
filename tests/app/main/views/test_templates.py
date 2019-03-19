@@ -347,7 +347,7 @@ def test_should_show_page_for_one_template(
         page.select_one('textarea')
     )
     assert "priority" not in str(page.select_one('main'))
-    mock_get_service_template.assert_called_with(SERVICE_ONE_ID, template_id)
+    mock_get_service_template.assert_called_with(SERVICE_ONE_ID, template_id, None)
 
 
 def test_caseworker_redirected_to_one_off(
@@ -703,13 +703,14 @@ def test_should_show_page_template_with_priority_select_if_platform_admin(
     platform_admin_user,
     mocker,
     mock_get_service_template,
+    service_one,
     fake_uuid,
 ):
     mocker.patch('app.user_api_client.get_users_for_service', return_value=[platform_admin_user])
     template_id = fake_uuid
     response = logged_in_platform_admin_client.get(url_for(
         '.edit_service_template',
-        service_id='1234',
+        service_id=service_one['id'],
         template_id=template_id,
     ))
 
@@ -717,7 +718,7 @@ def test_should_show_page_template_with_priority_select_if_platform_admin(
     assert "Two week reminder" in response.get_data(as_text=True)
     assert "Template &lt;em&gt;content&lt;/em&gt; with &amp; entity" in response.get_data(as_text=True)
     assert "Use priority queue?" in response.get_data(as_text=True)
-    mock_get_service_template.assert_called_with('1234', template_id)
+    mock_get_service_template.assert_called_with(service_one['id'], template_id, None)
 
 
 @pytest.mark.parametrize('filetype', ['pdf', 'png'])
@@ -752,7 +753,7 @@ def test_should_show_preview_letter_templates(
 
     assert response.status_code == 200
     assert response.get_data(as_text=True) == 'foo'
-    mock_get_service_email_template.assert_called_with(service_id, template_id, **extra_view_args)
+    mock_get_service_email_template.assert_called_with(service_id, template_id, extra_view_args.get('version'))
     assert mocked_preview.call_args[0][0]['id'] == template_id
     assert mocked_preview.call_args[0][0]['service'] == service_id
     assert mocked_preview.call_args[0][1] == filetype
@@ -1661,7 +1662,7 @@ def test_should_show_delete_template_page_with_time_block(
     assert normalize_spaces(page.select('.sms-message-wrapper')[0].text) == (
         'service one: Template <em>content</em> with & entity'
     )
-    mock_get_service_template.assert_called_with(SERVICE_ONE_ID, fake_uuid)
+    mock_get_service_template.assert_called_with(SERVICE_ONE_ID, fake_uuid, None)
 
 
 def test_should_show_delete_template_page_with_time_block_for_empty_notification(
@@ -1691,7 +1692,7 @@ def test_should_show_delete_template_page_with_time_block_for_empty_notification
     assert normalize_spaces(page.select('.sms-message-wrapper')[0].text) == (
         'service one: Template <em>content</em> with & entity'
     )
-    mock_get_service_template.assert_called_with(SERVICE_ONE_ID, fake_uuid)
+    mock_get_service_template.assert_called_with(SERVICE_ONE_ID, fake_uuid, None)
 
 
 def test_should_show_delete_template_page_with_never_used_block(
@@ -1716,7 +1717,7 @@ def test_should_show_delete_template_page_with_never_used_block(
     assert normalize_spaces(page.select('.sms-message-wrapper')[0].text) == (
         'service one: Template <em>content</em> with & entity'
     )
-    mock_get_service_template.assert_called_with(SERVICE_ONE_ID, fake_uuid)
+    mock_get_service_template.assert_called_with(SERVICE_ONE_ID, fake_uuid, None)
 
 
 @pytest.mark.parametrize('parent', (
@@ -1749,7 +1750,7 @@ def test_should_redirect_when_deleting_a_template(
     )
 
     mock_get_service_template.assert_called_with(
-        SERVICE_ONE_ID, TEMPLATE_ONE_ID
+        SERVICE_ONE_ID, TEMPLATE_ONE_ID, None
     )
     mock_delete_service_template.assert_called_with(
         SERVICE_ONE_ID, TEMPLATE_ONE_ID
@@ -1780,7 +1781,7 @@ def test_should_show_page_for_a_deleted_template(
     assert page.select('p.hint')[0].text.strip() == 'This template was deleted today at 3:00pm.'
     assert 'Delete this template' not in page.select_one('main').text
 
-    mock_get_deleted_template.assert_called_with(SERVICE_ONE_ID, template_id)
+    mock_get_deleted_template.assert_called_with(SERVICE_ONE_ID, template_id, None)
 
 
 @pytest.mark.parametrize('route', [

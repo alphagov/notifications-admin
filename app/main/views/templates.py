@@ -50,7 +50,8 @@ form_objects = {
 @login_required
 @user_has_permissions()
 def view_template(service_id, template_id):
-    template = service_api_client.get_service_template(service_id, str(template_id))['data']
+    template = current_service.get_template(template_id)
+
     if should_skip_template_page(template['template_type']):
         return redirect(url_for(
             '.send_one_off', service_id=service_id, template_id=template_id
@@ -87,7 +88,7 @@ def view_template(service_id, template_id):
 @user_has_permissions('view_activity')
 def start_tour(service_id, template_id):
 
-    template = service_api_client.get_service_template(service_id, str(template_id))['data']
+    template = current_service.get_template(template_id)
 
     if template['template_type'] != 'sms':
         abort(404)
@@ -217,7 +218,7 @@ def view_letter_template_preview(service_id, template_id, filetype):
     if filetype not in ('pdf', 'png'):
         abort(404)
 
-    db_template = service_api_client.get_service_template(service_id, template_id)['data']
+    db_template = current_service.get_template(template_id)
 
     return TemplatePreview.from_database_object(db_template, filetype, page=request.args.get('page'))
 
@@ -252,7 +253,7 @@ def letter_branding_preview_image(filename):
 
 def _view_template_version(service_id, template_id, version, letters_as_pdf=False):
     return dict(template=get_template(
-        service_api_client.get_service_template(service_id, template_id, version=version)['data'],
+        current_service.get_template(template_id, version=version),
         current_service,
         expand_emails=True,
         letter_preview_url=url_for(
@@ -279,7 +280,7 @@ def view_template_version(service_id, template_id, version):
 @login_required
 @user_has_permissions()
 def view_template_version_preview(service_id, template_id, version, filetype):
-    db_template = service_api_client.get_service_template(service_id, template_id, version=version)['data']
+    db_template = current_service.get_template(template_id, version=version)
     return TemplatePreview.from_database_object(db_template, filetype)
 
 
@@ -567,7 +568,7 @@ def abort_403_if_not_admin_user():
 @login_required
 @user_has_permissions('manage_templates')
 def edit_service_template(service_id, template_id):
-    template = service_api_client.get_service_template(service_id, template_id)['data']
+    template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
     template['template_content'] = template['content']
     form = form_objects[template['template_type']](**template)
     if form.validate_on_submit():
@@ -629,13 +630,11 @@ def edit_service_template(service_id, template_id):
                 template_id=template_id
             ))
 
-    db_template = service_api_client.get_service_template(service_id, template_id)['data']
-
-    if email_or_sms_not_enabled(db_template['template_type'], current_service.permissions):
+    if email_or_sms_not_enabled(template['template_type'], current_service.permissions):
         return redirect(url_for(
             '.action_blocked',
             service_id=service_id,
-            notification_type=db_template['template_type'],
+            notification_type=template['template_type'],
             return_to='view_template',
             template_id=template_id
         ))
@@ -653,7 +652,7 @@ def edit_service_template(service_id, template_id):
 @login_required
 @user_has_permissions('manage_templates')
 def delete_service_template(service_id, template_id):
-    template = service_api_client.get_service_template(service_id, template_id)['data']
+    template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
 
     if request.method == 'POST':
         service_api_client.delete_service_template(service_id, template_id)
@@ -702,7 +701,7 @@ def delete_service_template(service_id, template_id):
 @login_required
 @user_has_permissions('manage_templates')
 def confirm_redact_template(service_id, template_id):
-    template = service_api_client.get_service_template(service_id, template_id)['data']
+    template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
 
     return render_template(
         'views/templates/template.html',
@@ -769,7 +768,7 @@ def view_template_versions(service_id, template_id):
 @login_required
 @user_has_permissions('manage_templates')
 def set_template_sender(service_id, template_id):
-    template = service_api_client.get_service_template(service_id, template_id)['data']
+    template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
     sender_details = get_template_sender_form_dict(service_id, template)
     no_senders = sender_details.get('no_senders', False)
 
@@ -800,7 +799,7 @@ def set_template_sender(service_id, template_id):
 @login_required
 @user_has_permissions('manage_templates')
 def edit_template_postage(service_id, template_id):
-    template = service_api_client.get_service_template(service_id, template_id)['data']
+    template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
     if template["template_type"] != "letter":
         abort(404)
     form = LetterTemplatePostageForm(**template)
