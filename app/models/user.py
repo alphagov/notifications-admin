@@ -155,6 +155,10 @@ class User(UserMixin):
         if self.platform_admin:
             return True
 
+        # Top-level templates are always visible
+        if template_folder is None:
+            return True
+
         return self.id in template_folder.get("users_with_permission", [])
 
     def belongs_to_service(self, service_id):
