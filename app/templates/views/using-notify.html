@@ -16,26 +16,36 @@
     <h1 class="heading-large">Using Notify</h1>
 
     <h2 id="trial-mode" class="heading-medium">Trial mode</h2>
-    <p>When you create a GOV.UK Notify account, you’ll start in trial mode. This lets you try out the service, but has some restrictions in place.</p>
+    <p>When you set up a new service it will start in trial mode. This lets you try out GOV.UK Notify, with a few restrictions.</p>
+    <p>A service in trial mode can only:</p>
+      <ul class="list list-bullet">
+       <li>send 50 text messages and emails per day</li>
+        <li>send messages to you and other people in your team</li>
+       <li>draft letters, but not send them</li>
+     </ul>
+    
     <p>
-      You can remove these restrictions by
+      To remove these restrictions, you can
       {% if current_service and current_service.trial_mode %}
-        <a href="{{ url_for('.request_to_go_live', service_id=current_service.id) }}">requesting to go live</a>.
+        <a href="{{ url_for('.request_to_go_live', service_id=current_service.id) }}">send us a request to go live</a>.
       {% else %}
-        going live.
+        send us a request to go live.
       {% endif %}
     </p>
 
-    <h3 class="heading-small">Restrictions in trial mode</h3>
-    <p>In trial mode, you can:</p>
-    <ul class="list list-bullet">
-      <li>send up to 50 text messages and emails per day</li>
-      <li>send messages to yourself and other people in your team</li>
-      <li>draft letters (but not send them)</li>
+    <p>Before you can request to go live, you must:</p>
+    <ul class="list bullet-list">
+      <li>sign our data sharing and financial agreement</li>
+      <li>accept our terms of use</li>
+      <li>set up your service so you're ready to send and receive messages</li>
     </ul>
-
+    
     <h2 id="messagedeliveryandfailure" class="heading-medium">Sending messages</h2>
-    <p>When you send a message, it moves through different states in Notify.</p>
+    <p>When you send a message using GOV.UK Notify, it moves through different states.</p>
+
+    <p>Notify’s real-time dashboard lets you check the current state of any message, to see when it was delivered. You can use our API to check the state of your messages too.</p>
+
+    <p><a href="https://www.notifications.service.gov.uk/documentation">Read our documentation</a> for a detailed list of API message states.</p>
     <img
         src="{{ asset_url('images/message-sending-flow.svg') }}"
         alt="A picture of the sending flow of messages in Notify, showing the three states of Sending, Delivered, And Failed. Also shows the next
@@ -43,7 +53,7 @@
              temporary failures"
         style="width: 100%;"
     >
-    <h2 class="heading-medium">Message statuses – emails and text messages</h2>
+    <h2 class="heading-medium">Message states – emails and text messages</h2>
     <h3 class="heading-small">Sending</h3>
     <p>GOV.UK Notify has sent the message to the provider. The provider will try to deliver the message to the recipient. GOV.UK Notify is waiting for delivery information.</p>
     <h3 class="heading-small">Sent internationally (text messages only)</h3>
@@ -65,16 +75,14 @@
     <p>You’ll have to try sending your messages again.</p>
     <p>You will not be charged for text messages that are affected by a technical failure.</p>
 
-    <h2 class="heading-medium">Message statuses – letters</h2>
+    <h2 class="heading-medium">Message states – letters</h2>
     <h3 class="heading-small">Sent</h3>
     <p>GOV.UK Notify has sent the letter to the provider to be printed.</p>
     <h3 class="heading-small">Cancelled</h3>
     <p>Sending cancelled. Your letter will not be printed or dispatched.</p>
     <h3 class="heading-small">Technical failure</h3>
     <p>GOV.UK Notify had an unexpected error while sending to our printing provider.</p>
-    
-    <p><a href="https://www.notifications.service.gov.uk/documentation">Read our documentation</a> for a detailed list of API statuses.</p>
-    
+        
     <h2 class="heading-medium">Receiving messages</h2>
     <h3 class="heading-small">Email replies</h3>
     <p>You can choose an email address you want replies to go to.</p>
