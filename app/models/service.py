@@ -142,7 +142,6 @@ class Service():
 
     @cached_property
     def all_templates(self):
-
         templates = service_api_client.get_service_templates(self.id)['data']
 
         return [
@@ -154,6 +153,13 @@ class Service():
     def all_template_ids(self):
         return {template['id'] for template in self.all_templates}
 
+    def get_templates_for_folder(self, template_type, all_templates, folder_id):
+        return [
+            template for template in all_templates
+            if (set([template_type]) & {'all', template['template_type']})
+            and (template.get('folder') == folder_id)
+        ]
+
     def get_templates(self, template_type='all', template_folder_id=None, user_id=None):
         if user_id and template_folder_id and self.has_permission('edit_folder_permissions'):
             folder = self.get_template_folder(template_folder_id)
@@ -164,11 +170,17 @@ class Service():
             template_type = [template_type]
         if template_folder_id:
             template_folder_id = str(template_folder_id)
-        return [
-            template for template in self.all_templates
-            if (set(template_type) & {'all', template['template_type']})
-            and template.get('folder') == template_folder_id
-        ]
+        return self.get_templates_for_folder(template_type, self.all_templates, template_folder_id)
+
+    def get_user_templates_across_folders(self, user_id, template_type='all'):
+        folders = self.all_template_folders
+        all_templates = self.all_templates
+        user_templates = []
+        for folder in folders:
+            if user_id in folder.get("users_with_permission", []):
+                user_templates += self.get_templates_for_folder(template_type, all_templates, folder["id"])
+        user_templates += self.get_templates_for_folder(template_type, all_templates, None)
+        return user_templates
 
     @property
     def available_template_types(self):

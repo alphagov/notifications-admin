@@ -67,6 +67,15 @@ def _get_all_folders(active_user_with_permissions):
     ]
 
 
+def _template(template_type, name, parent=None, template_id=None):
+    return {
+        'id': template_id or str(uuid.uuid4()),
+        'name': name,
+        'template_type': template_type,
+        'folder': parent,
+    }
+
+
 def test_get_user_template_folders_only_returns_folders_visible_to_user(
     mock_get_template_folders,
     service_one,
@@ -172,3 +181,49 @@ def test_get_template_folders_shows_all_folders_when_user_id_not_passed_in(
             'users_with_permission': [active_user_with_permissions.id]
         }
     ]
+
+
+def test_get_user_templates_across_folders(
+    mock_get_template_folders,
+    service_one,
+    active_user_with_permissions,
+    mocker
+):
+    all_templates = {'data': [
+        _template('sms', 'sms_template_one', parent=INV_CHILD_1_FOLDER_ID),
+        _template('sms', 'sms_template_two'),
+        _template('email', 'email_template_one', parent=VIS_PARENT_FOLDER_ID),
+        _template('letter', 'letter_template_one')
+    ]}
+    mock_get_template_folders.return_value = _get_all_folders(active_user_with_permissions)
+    mocker.patch('app.service_api_client.get_service_templates', return_value=all_templates)
+    service_one['permissions'] = ['edit_folder_permissions', 'letter', 'email', 'sms']
+    service = Service(service_one)
+    result = service.get_user_templates_across_folders(active_user_with_permissions.id)
+    assert result == [
+        {'folder': 'bbbb222b-2b22-2b22-222b-b222b22b2222', 'id': mocker.ANY,
+            'name': 'email_template_one', 'template_type': 'email'},
+        {'folder': None, 'id': mocker.ANY,
+            'name': 'sms_template_two', 'template_type': 'sms'},
+        {'folder': None, 'id': mocker.ANY,
+            'name': 'letter_template_one', 'template_type': 'letter'}]
+
+
+def test_get_user_templates_across_folders_sms_only(
+    mock_get_template_folders,
+    service_one,
+    active_user_with_permissions,
+    mocker
+):
+    all_templates = {'data': [
+        _template('sms', 'sms_template_one', parent=INV_CHILD_1_FOLDER_ID),
+        _template('sms', 'sms_template_two'),
+        _template('email', 'email_template_one', parent=VIS_PARENT_FOLDER_ID),
+        _template('letter', 'letter_template_one')
+    ]}
+    mock_get_template_folders.return_value = _get_all_folders(active_user_with_permissions)
+    mocker.patch('app.service_api_client.get_service_templates', return_value=all_templates)
+    service_one['permissions'] = ['edit_folder_permissions', 'letter', 'email', 'sms']
+    service = Service(service_one)
+    result = service.get_user_templates_across_folders(active_user_with_permissions.id, template_type='sms')
+    assert result == [{'folder': None, 'id': mocker.ANY, 'name': 'sms_template_two', 'template_type': 'sms'}]
