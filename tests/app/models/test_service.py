@@ -1,6 +1,7 @@
 import uuid
 
 from app.models.service import Service
+from tests.conftest import _template
 
 INV_PARENT_FOLDER_ID = '7e979e79-d970-43a5-ac69-b625a8d147b0'
 INV_CHILD_1_FOLDER_ID = '92ee1ee0-e4ee-4dcc-b1a7-a5da9ebcfa2b'
@@ -65,15 +66,6 @@ def _get_all_folders(active_user_with_permissions):
             'users_with_permission': [active_user_with_permissions.id]
         },
     ]
-
-
-def _template(template_type, name, parent=None, template_id=None):
-    return {
-        'id': template_id or str(uuid.uuid4()),
-        'name': name,
-        'template_type': template_type,
-        'folder': parent,
-    }
 
 
 def test_get_user_template_folders_only_returns_folders_visible_to_user(
@@ -201,12 +193,13 @@ def test_get_user_templates_across_folders(
     service = Service(service_one)
     result = service.get_user_templates_across_folders(active_user_with_permissions.id)
     assert result == [
-        {'folder': 'bbbb222b-2b22-2b22-222b-b222b22b2222', 'id': mocker.ANY,
-            'name': 'email_template_one', 'template_type': 'email'},
         {'folder': None, 'id': mocker.ANY,
             'name': 'sms_template_two', 'template_type': 'sms'},
         {'folder': None, 'id': mocker.ANY,
-            'name': 'letter_template_one', 'template_type': 'letter'}]
+            'name': 'letter_template_one', 'template_type': 'letter'},
+        {'folder': 'bbbb222b-2b22-2b22-222b-b222b22b2222', 'id': mocker.ANY,
+            'name': 'email_template_one', 'template_type': 'email'}
+    ]
 
 
 def test_get_user_templates_across_folders_sms_only(

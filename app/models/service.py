@@ -154,9 +154,11 @@ class Service():
         return {template['id'] for template in self.all_templates}
 
     def get_templates_for_folder(self, template_type, all_templates, folder_id):
+        if isinstance(template_type, str):
+            template_type = [template_type]
         return [
             template for template in all_templates
-            if (set([template_type]) & {'all', template['template_type']})
+            if (set(template_type) & {'all', template['template_type']})
             and (template.get('folder') == folder_id)
         ]
 
@@ -176,10 +178,10 @@ class Service():
         folders = self.all_template_folders
         all_templates = self.all_templates
         user_templates = []
+        user_templates += self.get_templates_for_folder(template_type, all_templates, None)
         for folder in folders:
             if user_id in folder.get("users_with_permission", []):
                 user_templates += self.get_templates_for_folder(template_type, all_templates, folder["id"])
-        user_templates += self.get_templates_for_folder(template_type, all_templates, None)
         return user_templates
 
     @property

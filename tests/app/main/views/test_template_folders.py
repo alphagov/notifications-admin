@@ -7,6 +7,7 @@ from notifications_python_client.errors import HTTPError
 from tests.conftest import (
     SERVICE_ONE_ID,
     TEMPLATE_ONE_ID,
+    _template,
     active_caseworking_user,
     active_user_view_permissions,
     active_user_with_permissions,
@@ -28,15 +29,6 @@ def _folder(name, folder_id=None, parent=None, users_with_permission=None):
         'id': folder_id or str(uuid.uuid4()),
         'parent_id': parent,
         'users_with_permission': users_with_permission or [],
-    }
-
-
-def _template(template_type, name, parent=None, template_id=None):
-    return {
-        'id': template_id or str(uuid.uuid4()),
-        'name': name,
-        'template_type': template_type,
-        'folder': parent,
     }
 
 

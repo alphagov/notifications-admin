@@ -1,5 +1,5 @@
 from flask import jsonify, redirect, render_template, session, url_for
-from flask_login import login_required
+from flask_login import current_user, login_required
 from notifications_python_client.errors import HTTPError
 from notifications_utils.recipients import format_phone_number_human_readable
 from notifications_utils.template import SMSPreviewTemplate
@@ -44,7 +44,7 @@ def conversation_reply(
     service_id,
     notification_id,
 ):
-    templates = current_service.get_templates('sms')
+    templates = current_service.get_user_templates_across_folders(current_user.id, template_type='sms')
     return render_template(
         'views/templates/choose-reply.html',
         templates=templates,
