@@ -379,6 +379,13 @@ def copy_template(service_id, template_id):
         str(template_id),
     )['data']
 
+    template_folder = template_folder_api_client.get_template_folder(service_id, template['folder'])
+    if (
+        current_service.has_permission('edit_folder_permissions') and
+        not current_user.has_template_folder_permission(template_folder)
+    ):
+        abort(403)
+
     if request.method == 'POST':
         return add_service_template(service_id, template['template_type'])
 
