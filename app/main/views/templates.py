@@ -51,6 +51,12 @@ form_objects = {
 @user_has_permissions()
 def view_template(service_id, template_id):
     template = current_service.get_template(template_id)
+    template_folder = current_service.get_template_folder(template['folder'])
+
+    if not current_service.has_permission("edit_folder_permissions"):
+        user_has_template_permission = True
+    else:
+        user_has_template_permission = current_user.has_template_folder_permission(template_folder)
 
     if should_skip_template_page(template['template_type']):
         return redirect(url_for(
@@ -79,6 +85,7 @@ def view_template(service_id, template_id):
             page_count=get_page_count_for_letter(template),
         ),
         template_postage=template["postage"],
+        user_has_template_permission=user_has_template_permission,
         default_letter_contact_block_id=default_letter_contact_block_id,
     )
 
@@ -111,6 +118,12 @@ def start_tour(service_id, template_id):
 @login_required
 @user_has_permissions()
 def choose_template(service_id, template_type='all', template_folder_id=None):
+    template_folder = current_service.get_template_folder(template_folder_id)
+
+    if not current_service.has_permission("edit_folder_permissions"):
+        user_has_template_folder_permission = True
+    else:
+        user_has_template_folder_permission = current_user.has_template_folder_permission(template_folder)
 
     template_list = TemplateList(current_service, template_type, template_folder_id, current_user)
 
@@ -155,6 +168,7 @@ def choose_template(service_id, template_type='all', template_folder_id=None):
         search_form=SearchByNameForm(),
         templates_and_folders_form=templates_and_folders_form,
         move_to_children=templates_and_folders_form.move_to.children(),
+        user_has_template_folder_permission=user_has_template_folder_permission,
         option_hints=option_hints
     )
 
@@ -702,6 +716,7 @@ def delete_service_template(service_id, template_id):
             ),
             show_recipient=True,
         ),
+        user_has_template_permission=True,
     )
 
 
@@ -725,6 +740,7 @@ def confirm_redact_template(service_id, template_id):
             ),
             show_recipient=True,
         ),
+        user_has_template_permission=True,
         show_redaction_message=True,
     )
 
