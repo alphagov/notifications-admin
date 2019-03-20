@@ -174,16 +174,21 @@ class Service():
     def get_template(self, template_id, version=None):
         return service_api_client.get_service_template(self.id, str(template_id), version)['data']
 
-    def get_template_with_user_permission_or_403(self, template_id, user):
-        template = self.get_template(template_id)
+    def get_template_folder_with_user_permission_or_403(self, folder_id, user):
+        template_folder = self.get_template_folder(folder_id)
 
         if not self.has_permission("edit_folder_permissions"):
-            return template
-
-        template_folder = self.get_template_folder(template["folder"])
+            return template_folder
 
         if not user.has_template_folder_permission(template_folder):
             abort(403)
+
+        return template_folder
+
+    def get_template_with_user_permission_or_403(self, template_id, user):
+        template = self.get_template(template_id)
+
+        self.get_template_folder_with_user_permission_or_403(template['folder'], user)
 
         return template
 

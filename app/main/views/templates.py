@@ -160,6 +160,7 @@ def choose_template(service_id, template_type='all', template_folder_id=None):
 
 
 def process_folder_management_form(form, current_folder_id):
+    current_service.get_template_folder_with_user_permission_or_403(current_folder_id, current_user)
     new_folder_id = None
 
     if form.is_add_template_op:
@@ -438,10 +439,10 @@ def action_blocked(service_id, notification_type, return_to, template_id):
 @login_required
 @user_has_permissions('manage_templates')
 def manage_template_folder(service_id, template_folder_id):
-    current_folder = current_service.get_template_folder(template_folder_id)
+    template_folder = current_service.get_template_folder_with_user_permission_or_403(template_folder_id, current_user)
     form = TemplateFolderForm(
-        name=current_folder['name'],
-        users_with_permission=current_folder.get('users_with_permission', None),
+        name=template_folder['name'],
+        users_with_permission=template_folder.get('users_with_permission', None),
         all_service_users=[user for user in current_service.active_users if user.id != current_user.id]
     )
     if form.validate_on_submit():
@@ -470,7 +471,7 @@ def manage_template_folder(service_id, template_folder_id):
 @login_required
 @user_has_permissions('manage_templates')
 def delete_template_folder(service_id, template_folder_id):
-    template_folder = current_service.get_template_folder(template_folder_id)
+    template_folder = current_service.get_template_folder_with_user_permission_or_403(template_folder_id, current_user)
 
     if len(current_service.get_template_folders_and_templates(
         template_type="all", template_folder_id=template_folder_id

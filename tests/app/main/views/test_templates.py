@@ -1727,8 +1727,13 @@ def test_should_redirect_when_deleting_a_template(
     mocker,
     client_request,
     mock_delete_service_template,
+    mock_get_template_folders,
     parent,
 ):
+
+    mock_get_template_folders.return_value = [
+        {'id': PARENT_FOLDER_ID, 'name': 'Folder', 'parent': None, 'users_with_permission': []}
+    ]
     mock_get_service_template = mocker.patch(
         'app.service_api_client.get_service_template',
         return_value={'data': _template(
