@@ -2012,7 +2012,7 @@ horsforthtowncouncil.gov.uk:
 horsham.gov.uk:
   owner: Horsham District Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 horwich.gov.uk:
   owner: Horwich Town Council
   crown: false
