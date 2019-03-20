@@ -280,6 +280,14 @@ def letter_validation_preview(from_platform_admin):
             ), 400
 
         try:
+            if len(pdf_file.read()) > (2 * 1024 * 1024):
+                return render_template(
+                    view_location,
+                    form=form,
+                    message="File must be less than 2MB",
+                    pages=pages, result=result
+                ), 400
+            pdf_file.seek(0)
             response = validate_letter(pdf_file)
             response.raise_for_status()
             if response.status_code == 200:

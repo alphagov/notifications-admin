@@ -761,6 +761,36 @@ def test_platform_admin_submit_empty_returned_letters(mocker, client, platform_a
     assert "Can’t be empty" in response.get_data(as_text=True)
 
 
+def test_service_letter_validation_preview_renders_correctly(
+        client_request,
+        mock_has_no_jobs
+
+):
+    page = client_request.get('main.service_letter_validation_preview', service_id="service_1")
+
+    assert page.find('h1').text.strip() == "Letter validation preview"
+    assert page.find_all('input', class_='file-upload-field')
+
+
+def test_service_letter_validation_preview_returns_400_if_file_is_too_big(
+        client_request,
+        mock_has_no_jobs,
+        mocker
+
+):
+    with open('tests/test_pdf_files/big.pdf', 'rb') as file:
+        page = client_request.post('main.service_letter_validation_preview', service_id="service_1",
+                                   _data=dict(
+                                       pdf_file=file,
+                                   ),
+                                   content_type='multipart/form-data',
+                                   _follow_redirects=True)
+
+    assert page.find('h1').text.strip() == "Letter validation preview"
+    assert page.find_all('input', class_='file-upload-field')
+    page.find('span', class_='error-message').text.strip() == "File must be less than 2MB"
+
+
 def test_letter_validation_preview_renders_correctly(mocker, client, platform_admin_user):
     mock_get_user(mocker, user=platform_admin_user)
     client.login(platform_admin_user)
