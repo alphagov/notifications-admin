@@ -7,6 +7,7 @@ from notifications_utils.template import SMSPreviewTemplate
 from app import current_service, notification_api_client, service_api_client
 from app.main import main
 from app.main.forms import SearchByNameForm
+from app.models.template_list import TemplateList
 from app.utils import user_has_permissions
 
 
@@ -38,20 +39,26 @@ def conversation_updates(service_id, notification_id):
 
 
 @main.route("/services/<service_id>/conversation/<notification_id>/reply-with")
+@main.route("/services/<service_id>/conversation/<notification_id>/reply-with/from-folder/<uuid:from_folder>")
 @login_required
 @user_has_permissions('send_messages')
 def conversation_reply(
     service_id,
     notification_id,
+    from_folder=None,
 ):
-    templates = current_service.get_user_templates_across_folders(current_user.id, template_type='sms')
     return render_template(
         'views/templates/choose-reply.html',
-        templates=templates,
-        show_search_box=(len(templates) > 7),
-        template_type='sms',
+        templates_and_folders=TemplateList(
+            current_service,
+            template_folder_id=from_folder,
+            user_id=current_user.id,
+            template_type='sms'
+        ),
+        template_folder_path=current_service.get_template_folder_path(from_folder),
         search_form=SearchByNameForm(),
         notification_id=notification_id,
+        template_type='sms'
     )
 
 

@@ -260,6 +260,7 @@ def test_conversation_reply_shows_link_to_add_templates_if_service_has_no_templa
     fake_uuid,
     mock_get_service_templates_when_no_templates_exist,
     mock_get_template_folders,
+    active_user_with_permissions
 ):
     page = client_request.get(
         'main.conversation_reply',
@@ -282,9 +283,11 @@ def test_conversation_reply_shows_templates(
     fake_uuid,
     mocker,
     mock_get_template_folders,
-    active_user_with_permissions
+    active_user_with_permissions,
+    service_one
 ):
 
+    service_one["permissions"] += ["edit_folder_permissions"]
     all_templates = {'data': [
         _template('sms', 'sms_template_one', parent=INV_PARENT_FOLDER_ID),
         _template('sms', 'sms_template_two'),
@@ -312,38 +315,30 @@ def test_conversation_reply_shows_templates(
         notification_id=fake_uuid,
     )
 
-    for index, expected in enumerate([
-        'sms_template_two',
-        'sms_template_three'
-    ]):
-        link = page.select('.message-name')[index]
-        assert normalize_spaces(link.text) == expected
-        assert link.select_one('a')['href'].startswith(
-            url_for(
-                'main.conversation_reply_with_template',
-                service_id=SERVICE_ONE_ID,
-                notification_id=fake_uuid,
-                template_id='',
-            )
+    link = page.select('.template-list-item-without-ancestors')
+    assert normalize_spaces(link[0].text) == "Parent 2 - visible 1 template"
+    assert normalize_spaces(link[1].text) == 'sms_template_two Text message template'
+
+    assert link[0].select_one('a')['href'].startswith(
+        url_for(
+            'main.conversation_reply',
+            service_id=SERVICE_ONE_ID,
+            notification_id=fake_uuid,
+            from_folder=VIS_PARENT_FOLDER_ID
         )
-
-
-def test_conversation_reply_shows_live_search_if_list_of_templates_taller_than_screen(
-    client_request,
-    fake_uuid,
-    mock_get_more_service_templates_than_can_fit_onscreen,
-    mock_get_template_folders,
-):
-    page = client_request.get(
-        'main.conversation_reply',
-        service_id=SERVICE_ONE_ID,
-        notification_id=fake_uuid,
     )
 
-    assert page.select('.live-search')
+    assert link[1].select_one('a')['href'].startswith(
+        url_for(
+            'main.conversation_reply_with_template',
+            service_id=SERVICE_ONE_ID,
+            notification_id=fake_uuid,
+            template_id='',
+        )
+    )
 
 
-def test_conversation_reply_shows_live_search_if_list_of_templates_fits_onscreen(
+def test_conversation_reply_shows_live_search(
     client_request,
     fake_uuid,
     mock_get_service_templates,
@@ -355,7 +350,7 @@ def test_conversation_reply_shows_live_search_if_list_of_templates_fits_onscreen
         notification_id=fake_uuid,
     )
 
-    assert not page.select('.live-search')
+    assert page.select('.live-search')
 
 
 def test_conversation_reply_redirects_with_phone_number_from_notification(
