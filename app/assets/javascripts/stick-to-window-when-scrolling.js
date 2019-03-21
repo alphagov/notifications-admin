@@ -29,17 +29,55 @@
   };
   ScrollArea.prototype.setEvents = function () {
     this.node.addEventListener('focus', this.focusHandler.bind(this), true);
+    $(this.node).on('keyup', 'textarea', this.focusHandler.bind(this));
   };
   ScrollArea.prototype.removeEvents = function () {
     this.node.removeEventListener('focus', this.focusHandler.bind(this));
+    $(this.node).find('textarea').off('keyup', 'textarea', this.focusHandler.bind(this));
+  };
+  ScrollArea.prototype.getFocusedDetails = {
+    forElement: function ($focusedElement) {
+      focused = {
+        'top': $focusedElement.offset().top,
+        'height': $focusedElement.outerHeight(),
+        'type': 'element'
+      };
+      focused.bottom = focused.top + focused.height;
+
+      return focused;
+    },
+    forCaret: function (evt) {
+      var textarea = evt.target;
+      var caretCoordinates = window.getCaretCoordinates(textarea, textarea.selectionEnd);
+      var focused = {
+        'top': $(textarea).offset().top + caretCoordinates.top,
+        'height': caretCoordinates.height,
+        'type': 'caret'
+      };
+
+      focused.bottom = focused.top + focused.height;
+
+      return focused;
+    }
   };
   ScrollArea.prototype.focusHandler = function (e) {
     var $focusedElement = $(document.activeElement);
+    var nodeName = $focusedElement.get(0).nodeName.toLowerCase();
     var endOfFurthestEl = focusOverlap.endOfFurthestEl(this._els, this.edge);
-    var overlap = focusOverlap.getOverlap($focusedElement, this.edge, endOfFurthestEl);
+    var focused;
+    var overlap;
+
+    // if textarea is focused, we care about checking the caret, not the whole element
+    if (nodeName === 'textarea') {
+      focused = this.getFocusedDetails.forCaret(e);
+    } else {
+      focused = this.getFocusedDetails.forElement($focusedElement);
+    }
+
+    overlap = focusOverlap.getOverlap(focused, this.edge, endOfFurthestEl);
 
     if (overlap > 0) {
-      $(window).scrollTop($(window).scrollTop() + overlap);
+      focusOverlap.adjustForOverlap(focused, this.edge, overlap);
     }
   };
   ScrollArea.prototype.destroy = function () {
@@ -116,15 +154,13 @@
 
   // Object collecting together methods for stopping sticky overlapping focused elements
   var focusOverlap = {
-    getOverlap: function ($focusedElement, edge, endOfFurthestEl) {
-      var topOfFocusedElement = $focusedElement.offset().top;
-
+    getOverlap: function (focused, edge, endOfFurthestEl) {
       if (!endOfFurthestEl) { return 0; }
 
       if (edge === 'top') {
-        return endOfFurthestEl - topOfFocusedElement;
+        return endOfFurthestEl - focused.top;
       } else {
-        return (topOfFocusedElement + $focusedElement.outerHeight()) - endOfFurthestEl;
+        return focused.bottom - endOfFurthestEl;
       }
     },
     endOfFurthestEl: function (els, edge) {
@@ -149,6 +185,16 @@
       return offsets.reduce(function (accumulator, offset) {
         return (accumulator < offset) ? offset: accumulator;
       });
+    },
+    adjustForOverlap: function (focused, edge, overlap) {
+      var scrollTop = $(window).scrollTop();
+
+      // scroll so element becomes visible
+      if (edge === 'top') {
+        $(window).scrollTop(scrollTop - overlap);
+      } else {
+        $(window).scrollTop(scrollTop + overlap);
+      }
     }
   };
 
