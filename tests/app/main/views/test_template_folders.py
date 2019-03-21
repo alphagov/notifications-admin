@@ -569,8 +569,9 @@ def test_manage_folder_users(
 
 
 def test_delete_template_folder_should_request_confirmation(
-    client_request, service_one, mock_get_template_folders, mocker
+    client_request, service_one, mock_get_template_folders, mocker,
 ):
+    mocker.patch('app.models.service.Service.active_users', [])
     folder_id = str(uuid.uuid4())
     mock_get_template_folders.side_effect = [[
         {'id': folder_id, 'name': 'sacrifice', 'parent_id': None},
