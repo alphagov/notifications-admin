@@ -24,7 +24,6 @@ from notifications_utils.recipients import (
 )
 from notifications_utils.sanitise_text import SanitiseASCII
 from orderedset import OrderedSet
-from werkzeug.routing import RequestRedirect
 from xlrd.biffh import XLRDError
 from xlrd.xldate import XLDateError
 
@@ -49,6 +48,7 @@ from app.s3_client.s3_csv_client import (
 )
 from app.template_previews import TemplatePreview, get_page_count_for_letter
 from app.utils import (
+    PermanentRedirect,
     Spreadsheet,
     email_or_sms_not_enabled,
     get_errors_for_csv,
@@ -512,7 +512,7 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
         # If we just return a `redirect` (302) object here, we'll get
         # errors when we try and unpack in the check_messages route.
         # Rasing a werkzeug.routing redirect means that doesn't happen.
-        raise RequestRedirect(url_for(
+        raise PermanentRedirect(url_for(
             '.send_messages',
             service_id=service_id,
             template_id=template_id
@@ -875,7 +875,7 @@ def _check_notification(service_id, template_id, exception=None):
         )
         or not all_placeholders_in_session(template.placeholders)
     ):
-        raise RequestRedirect(back_link)
+        raise PermanentRedirect(back_link)
 
     template.values = get_recipient_and_placeholders_from_session(template.template_type)
     return dict(

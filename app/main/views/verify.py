@@ -64,7 +64,7 @@ def verify_email(token):
 
     session['user_details'] = {"email": user.email_address, "id": user.id}
     user_api_client.send_verify_code(user.id, 'sms', user.mobile_number)
-    return redirect('verify')
+    return redirect(url_for('main.verify'))
 
 
 def activate_user(user_id):

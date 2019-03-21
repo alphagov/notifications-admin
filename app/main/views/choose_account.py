@@ -1,19 +1,19 @@
 from flask import redirect, render_template, session, url_for
 from flask_login import current_user, login_required
-from werkzeug.routing import RequestRedirect
 
 from app import user_api_client
 from app.main import main
+from app.utils import PermanentRedirect
 
 
 @main.route("/services")
 def choose_service():
-    raise RequestRedirect(url_for('.choose_account'))
+    raise PermanentRedirect(url_for('.choose_account'))
 
 
 @main.route("/services-or-dashboard")
 def services_or_dashboard():
-    raise RequestRedirect(url_for('.show_accounts_or_dashboard'))
+    raise PermanentRedirect(url_for('.show_accounts_or_dashboard'))
 
 
 @main.route("/accounts")

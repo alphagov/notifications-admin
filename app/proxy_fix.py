@@ -1,4 +1,4 @@
-from werkzeug.contrib.fixers import ProxyFix
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 
 class CustomProxyFix(object):

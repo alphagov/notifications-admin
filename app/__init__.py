@@ -634,7 +634,7 @@ def register_errorhandlers(application):  # noqa (C901 too complex)
     @application.errorhandler(WerkzeugHTTPException)
     def handle_http_error(error):
         if error.code == 301:
-            # RequestRedirect exception
+            # PermanentRedirect exception
             return error
 
         return _error_response(error.code)
