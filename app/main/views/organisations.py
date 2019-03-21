@@ -39,7 +39,8 @@ def organisations():
 
     return render_template(
         'views/organisations/index.html',
-        organisations=orgs
+        organisations=orgs,
+        search_form=SearchByNameForm(),
     )
 
 

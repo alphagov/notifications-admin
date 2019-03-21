@@ -44,7 +44,9 @@ def test_organisation_page_shows_all_organisations(
         assert page.select('a.browse-list-link')[index].text == org['name']
         if not org['active']:
             assert page.select_one('.table-field-status-default,heading-medium').text == '- archived'
-    assert normalize_spaces((page.select('a.browse-list-link')[-1]).text) == 'Create an organisation'
+    assert normalize_spaces(
+        page.select_one('a.button-secondary').text
+    ) == 'New organisation'
 
 
 def test_view_organisation_shows_the_correct_organisation(
@@ -66,7 +68,7 @@ def test_view_organisation_shows_the_correct_organisation(
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
-    assert normalize_spaces(page.select_one('.heading-large').text) == org['name']
+    assert normalize_spaces(page.select_one('.heading-large').text) == 'Services'
 
 
 def test_create_new_organisation(
@@ -484,7 +486,7 @@ def test_organisation_settings(
 
     page = client_request.get('.organisation_settings', org_id=organisation_one['id'])
 
-    assert page.find('h1').text == 'Organisation settings'
+    assert page.find('h1').text == 'Settings'
     rows = page.select('tr')
     assert len(rows) == len(expected_rows)
     for index, row in enumerate(expected_rows):
@@ -493,7 +495,8 @@ def test_organisation_settings(
 
 
 def test_organisation_settings_for_platform_admin(
-    logged_in_platform_admin_client,
+    client_request,
+    platform_admin_user,
     mock_get_organisation,
     organisation_one
 ):
@@ -504,18 +507,16 @@ def test_organisation_settings_for_platform_admin(
         'Label Value Action',
         'Organisation type Not set Change',
         'Crown organisation Yes Change',
-        'Data sharing and financial agreement Signed Change',
-        'Default email branding Not set Change',
-        'Default letter branding Not set Change',
+        'Data sharing and financial agreement Not signed Change',
+        'Default email branding GOV.UK Change',
+        'Default letter branding No branding Change',
         'Known email domains None Change',
     ]
 
-    response = logged_in_platform_admin_client.get(url_for('.organisation_settings', org_id=organisation_one['id']))
+    client_request.login(platform_admin_user)
+    page = client_request.get('.organisation_settings', org_id=organisation_one['id'])
 
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-
-    assert page.find('h1').text == 'Organisation settings'
+    assert page.find('h1').text == 'Settings'
     rows = page.select('tr')
     assert len(rows) == len(expected_rows)
     for index, row in enumerate(expected_rows):

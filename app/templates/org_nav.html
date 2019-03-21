@@ -1,6 +1,6 @@
 <nav class="navigation">
   <ul>
-  	<li><a href="{{ url_for('.organisation_dashboard', org_id=current_org.id) }}" {{ org_navigation.is_selected('dashboard') }}>Dashboard</a></li>
+  	<li><a href="{{ url_for('.organisation_dashboard', org_id=current_org.id) }}" {{ org_navigation.is_selected('dashboard') }}>Services</a></li>
     <li><a href="{{ url_for('.manage_org_users', org_id=current_org.id) }}" {{ org_navigation.is_selected('team-members') }}>Team members</a></li>
     <li><a href="{{ url_for('.organisation_settings', org_id=current_org.id) }}" {{ org_navigation.is_selected('settings') }}>Settings</a></li>
   </ul>
