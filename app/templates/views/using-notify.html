@@ -43,9 +43,9 @@
     <h2 id="messagedeliveryandfailure" class="heading-medium">Sending messages</h2>
     <p>When you send a message using GOV.UK Notify, it moves through different states.</p>
 
-    <p>Notify’s real-time dashboard lets you check the current state of any message, to see when it was delivered. You can use our API to check the state of your messages too.</p>
+    <p>Notify’s real-time dashboard lets you check the status of any message, to see when it was delivered. You can use our API to check the status of your messages too.</p>
 
-    <p><a href="https://www.notifications.service.gov.uk/documentation">Read our documentation</a> for a detailed list of API message states.</p>
+    <p><a href="https://www.notifications.service.gov.uk/documentation">Read our documentation</a> for a detailed list of API message statuses.</p>
     <img
         src="{{ asset_url('images/message-sending-flow.svg') }}"
         alt="A picture of the sending flow of messages in Notify, showing the three states of Sending, Delivered, And Failed. Also shows the next
@@ -53,7 +53,7 @@
              temporary failures"
         style="width: 100%;"
     >
-    <h2 class="heading-medium">Message states – emails and text messages</h2>
+    <h2 class="heading-medium">Message status – emails and text messages</h2>
     <h3 class="heading-small">Sending</h3>
     <p>GOV.UK Notify has sent the message to the provider. The provider will try to deliver the message to the recipient. GOV.UK Notify is waiting for delivery information.</p>
     <h3 class="heading-small">Sent internationally (text messages only)</h3>
@@ -75,7 +75,7 @@
     <p>You’ll have to try sending your messages again.</p>
     <p>You will not be charged for text messages that are affected by a technical failure.</p>
 
-    <h2 class="heading-medium">Message states – letters</h2>
+    <h2 class="heading-medium">Message status – letters</h2>
     <h3 class="heading-small">Sent</h3>
     <p>GOV.UK Notify has sent the letter to the provider to be printed.</p>
     <h3 class="heading-small">Cancelled</h3>
