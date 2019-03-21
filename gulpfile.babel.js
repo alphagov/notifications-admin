@@ -88,7 +88,8 @@ gulp.task('javascripts', () => gulp
     paths.npm + 'jquery/dist/jquery.min.js',
     paths.npm + 'query-command-supported/dist/queryCommandSupported.min.js',
     paths.npm + 'diff-dom/diffDOM.js',
-    paths.npm + 'timeago/jquery.timeago.js'
+    paths.npm + 'timeago/jquery.timeago.js',
+    paths.npm + 'textarea-caret/index.js'
   ]))
   .pipe(plugins.uglify())
   .pipe(plugins.concat('all.js'))
