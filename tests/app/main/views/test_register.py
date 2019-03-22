@@ -198,7 +198,7 @@ def test_shows_registration_page_from_invite(
             ["manage_users"],
             "pending",
             datetime.utcnow(),
-            'sms_auth',
+            'sms_auth', []
         ).serialize()
     page = client_request.get('main.register_from_invite')
     assert page.select_one('input[name=name]')['value'] == expected_value
@@ -217,7 +217,8 @@ def test_register_from_invite(
                                ["manage_users"],
                                "pending",
                                datetime.utcnow(),
-                               'sms_auth')
+                               'sms_auth',
+                               [])
     with client.session_transaction() as session:
         session['invited_user'] = invited_user.serialize()
     response = client.post(
@@ -253,7 +254,8 @@ def test_register_from_invite_when_user_registers_in_another_browser(
                                ["manage_users"],
                                "pending",
                                datetime.utcnow(),
-                               'sms_auth')
+                               'sms_auth',
+                               [])
     with client.session_transaction() as session:
         session['invited_user'] = invited_user.serialize()
     response = client.post(

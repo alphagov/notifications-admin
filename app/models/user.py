@@ -193,7 +193,7 @@ class InvitedUser(object):
                  status,
                  created_at,
                  auth_type,
-                 folder_permissions=None):
+                 folder_permissions):
         self.id = id
         self.service = str(service)
         self.from_user = from_user
@@ -209,6 +209,7 @@ class InvitedUser(object):
         self.created_at = created_at
         self.auth_type = auth_type
         self.permissions = translate_permissions_from_db_to_admin_roles(self.permissions)
+        self.folder_permissions = folder_permissions or []
 
     def has_permissions(self, *permissions):
         if self.status == 'cancelled':
@@ -240,7 +241,8 @@ class InvitedUser(object):
                 'email_address': self.email_address,
                 'status': self.status,
                 'created_at': str(self.created_at),
-                'auth_type': self.auth_type
+                'auth_type': self.auth_type,
+                'folder_permissions': self.folder_permissions
                 }
         if permissions_as_string:
             data['permissions'] = ','.join(self.permissions)

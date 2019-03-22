@@ -272,7 +272,15 @@ def api_key_json(id_, name, expiry_date=None):
             }
 
 
-def invite_json(id_, from_user, service_id, email_address, permissions, created_at, status, auth_type):
+def invite_json(id_,
+                from_user,
+                service_id,
+                email_address,
+                permissions,
+                created_at,
+                status,
+                auth_type,
+                folder_permissions):
     return {
         'id': id_,
         'from_user': from_user,
@@ -281,7 +289,8 @@ def invite_json(id_, from_user, service_id, email_address, permissions, created_
         'status': status,
         'permissions': permissions,
         'created_at': created_at,
-        'auth_type': auth_type
+        'auth_type': auth_type,
+        'folder_permissions': folder_permissions,
     }
 
 

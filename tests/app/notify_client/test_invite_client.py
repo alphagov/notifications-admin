@@ -16,12 +16,12 @@ def test_client_creates_invite(
         'app.invite_api_client.post',
         return_value={'data': dict.fromkeys({
             'id', 'service', 'from_user', 'email_address',
-            'permissions', 'status', 'created_at', 'auth_type'
+            'permissions', 'status', 'created_at', 'auth_type', 'folder_permissions'
         })}
     )
 
     invite_api_client.create_invite(
-        '12345', '67890', 'test@example.com', {'send_messages'}, 'sms_auth'
+        '12345', '67890', 'test@example.com', {'send_messages'}, 'sms_auth', [fake_uuid]
     )
 
     mock_post.assert_called_once_with(
@@ -34,6 +34,7 @@ def test_client_creates_invite(
             'created_by': ANY,
             'permissions': 'send_emails,send_letters,send_texts',
             'invite_link_host': 'http://localhost:6012',
+            'folder_permissions': [fake_uuid]
         }
     )
 
