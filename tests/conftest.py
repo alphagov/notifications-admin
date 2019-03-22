@@ -3100,34 +3100,27 @@ def organisation_one(api_user_active):
 def mock_get_organisations(mocker):
     def _get_organisations():
         return [
-            {
-                'name': 'Org 1',
-                'id': '7aa5d4e9-4385-4488-a489-07812ba13383',
-                'active': True
-            },
-            {
-                'name': 'Org 2',
-                'id': '7aa5d4e9-4385-4488-a489-07812ba13384',
-                'active': True
-            },
-            {
-                'name': 'Org 3',
-                'id': '7aa5d4e9-4385-4488-a489-07812ba13385',
-                'active': True
-            }
+            organisation_json('7aa5d4e9-4385-4488-a489-07812ba13383', 'Org 1'),
+            organisation_json('7aa5d4e9-4385-4488-a489-07812ba13384', 'Org 2'),
+            organisation_json('7aa5d4e9-4385-4488-a489-07812ba13385', 'Org 3'),
         ]
 
     return mocker.patch('app.organisations_client.get_organisations', side_effect=_get_organisations)
 
 
 @pytest.fixture(scope='function')
-def mock_get_organisation(mocker):
+def mock_get_organisation(
+    mocker,
+    email_branding_id=None,
+    letter_branding_id=None,
+):
     def _get_organisation(org_id):
-        return {
-            'name': 'Org 1',
-            'id': org_id,
-            'active': True
-        }
+        return organisation_json(
+            org_id,
+            'Org 1',
+            email_branding_id=email_branding_id,
+            letter_branding_id=letter_branding_id,
+        )
 
     return mocker.patch('app.organisations_client.get_organisation', side_effect=_get_organisation)
 
@@ -3135,11 +3128,7 @@ def mock_get_organisation(mocker):
 @pytest.fixture(scope='function')
 def mock_get_service_organisation(mocker):
     def _get_service_organisation(service_id):
-        return {
-            'name': 'Org 1',
-            'id': '7aa5d4e9-4385-4488-a489-07812ba13383',
-            'active': True
-        }
+        return organisation_json('7aa5d4e9-4385-4488-a489-07812ba13383', 'Org 1')
 
     return mocker.patch('app.organisations_client.get_service_organisation', side_effect=_get_service_organisation)
 
@@ -3267,6 +3256,14 @@ def mock_update_organisation_name(mocker):
         return
 
     return mocker.patch('app.organisations_client.update_organisation_name', side_effect=_update_org_name)
+
+
+@pytest.fixture(scope='function')
+def mock_update_organisation(mocker):
+    def _update_org(organisation_id, **kwargs):
+        return
+
+    return mocker.patch('app.organisations_client.update_organisation', side_effect=_update_org)
 
 
 @pytest.fixture

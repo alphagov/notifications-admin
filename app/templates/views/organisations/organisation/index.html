@@ -1,22 +1,18 @@
 {% extends "org_template.html" %}
 
-{% block per_page_title %}
-  {{ current_org.name }}
-{% endblock %}
-
 {% block org_page_title %}
-  {{ current_org.name }}
+  Services
 {% endblock %}
 
 {% block maincolumn_content %}
 
   <h1 class="heading-large">
-    {{ current_org.name }}
+    Services
   </h1>
   <ul>
   {% for service in organisation_services %}
     <li class="browse-list-item">
-      {% if service.has_permission_to_view %}
+      {% if service.has_permission_to_view or current_user.platform_admin %}
         <a href="{{ url_for('main.service_dashboard', service_id=service.id) }}" class="browse-list-link">{{ service['name'] }}</a>
       {% else %}
         {{ service['name'] }}

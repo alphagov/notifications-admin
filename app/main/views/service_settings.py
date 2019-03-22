@@ -35,6 +35,7 @@ from app.main.forms import (
     InternationalSMSForm,
     LinkOrganisationsForm,
     OrganisationTypeForm,
+    PreviewBranding,
     RenameServiceForm,
     SearchByNameForm,
     ServiceContactDetailsForm,
@@ -44,12 +45,11 @@ from app.main.forms import (
     ServiceInboundNumberForm,
     ServiceLetterContactBlockForm,
     ServiceOnOffSettingForm,
-    ServicePreviewBranding,
     ServiceReplyToEmailForm,
-    ServiceSetEmailBranding,
-    ServiceSetLetterBranding,
     ServiceSmsSenderForm,
     ServiceSwitchChannelForm,
+    SetEmailBranding,
+    SetLetterBranding,
     SMSPrefixForm,
     branding_options_dict,
 )
@@ -811,7 +811,7 @@ def set_free_sms_allowance(service_id):
 def service_set_email_branding(service_id):
     email_branding = email_branding_client.get_all_email_branding()
 
-    form = ServiceSetEmailBranding(
+    form = SetEmailBranding(
         all_branding_options=get_branding_as_value_and_label(email_branding),
         current_branding=current_service.email_branding_id,
     )
@@ -836,7 +836,7 @@ def service_set_email_branding(service_id):
 def service_preview_email_branding(service_id):
     branding_style = request.args.get('branding_style', None)
 
-    form = ServicePreviewBranding(branding_style=branding_style)
+    form = PreviewBranding(branding_style=branding_style)
 
     if form.validate_on_submit():
         current_service.update(
@@ -858,7 +858,7 @@ def service_preview_email_branding(service_id):
 def service_set_letter_branding(service_id):
     letter_branding = letter_branding_client.get_all_letter_branding()
 
-    form = ServiceSetLetterBranding(
+    form = SetLetterBranding(
         all_branding_options=get_branding_as_value_and_label(letter_branding),
         current_branding=current_service.letter_branding_id,
     )
@@ -883,7 +883,7 @@ def service_set_letter_branding(service_id):
 def service_preview_letter_branding(service_id):
     branding_style = request.args.get('branding_style')
 
-    form = ServicePreviewBranding(branding_style=branding_style)
+    form = PreviewBranding(branding_style=branding_style)
 
     if form.validate_on_submit():
         current_service.update(

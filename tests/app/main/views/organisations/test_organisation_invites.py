@@ -7,7 +7,13 @@ from flask import url_for
 from notifications_python_client.errors import HTTPError
 
 from app.models.user import InvitedOrgUser
-from tests.conftest import ORGANISATION_ID, normalize_spaces
+from tests import organisation_json
+from tests.conftest import (
+    ORGANISATION_ID,
+    active_user_with_permissions,
+    normalize_spaces,
+    platform_admin_user,
+)
 
 
 def test_organisation_page_shows_all_organisations(
@@ -38,7 +44,9 @@ def test_organisation_page_shows_all_organisations(
         assert page.select('a.browse-list-link')[index].text == org['name']
         if not org['active']:
             assert page.select_one('.table-field-status-default,heading-medium').text == '- archived'
-    assert normalize_spaces((page.select('a.browse-list-link')[-1]).text) == 'Create an organisation'
+    assert normalize_spaces(
+        page.select_one('a.button-secondary').text
+    ) == 'New organisation'
 
 
 def test_view_organisation_shows_the_correct_organisation(
@@ -60,7 +68,7 @@ def test_view_organisation_shows_the_correct_organisation(
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
-    assert normalize_spaces(page.select_one('.heading-large').text) == org['name']
+    assert normalize_spaces(page.select_one('.heading-large').text) == 'Services'
 
 
 def test_create_new_organisation(
@@ -467,7 +475,7 @@ def test_verified_org_user_redirects_to_dashboard(
 
 
 def test_organisation_settings(
-    logged_in_platform_admin_client,
+    client_request,
     mock_get_organisation,
     organisation_one
 ):
@@ -476,17 +484,327 @@ def test_organisation_settings(
         'Organisation name Org 1 Change',
     ]
 
-    response = logged_in_platform_admin_client.get(url_for('.organisation_settings', org_id=organisation_one['id']))
+    page = client_request.get('.organisation_settings', org_id=organisation_one['id'])
 
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-
-    assert page.find('h1').text == 'Organisation settings'
+    assert page.find('h1').text == 'Settings'
     rows = page.select('tr')
     assert len(rows) == len(expected_rows)
     for index, row in enumerate(expected_rows):
         assert row == " ".join(rows[index].text.split())
     mock_get_organisation.assert_called_with(organisation_one['id'])
+
+
+def test_organisation_settings_for_platform_admin(
+    client_request,
+    platform_admin_user,
+    mock_get_organisation,
+    organisation_one
+):
+    expected_rows = [
+        'Label Value Action',
+        'Organisation name Org 1 Change',
+
+        'Label Value Action',
+        'Organisation type Not set Change',
+        'Crown organisation Yes Change',
+        'Data sharing and financial agreement Not signed Change',
+        'Default email branding GOV.UK Change',
+        'Default letter branding No branding Change',
+        'Known email domains None Change',
+    ]
+
+    client_request.login(platform_admin_user)
+    page = client_request.get('.organisation_settings', org_id=organisation_one['id'])
+
+    assert page.find('h1').text == 'Settings'
+    rows = page.select('tr')
+    assert len(rows) == len(expected_rows)
+    for index, row in enumerate(expected_rows):
+        assert row == " ".join(rows[index].text.split())
+    mock_get_organisation.assert_called_with(organisation_one['id'])
+
+
+@pytest.mark.parametrize('endpoint, expected_options, expected_selected', (
+    (
+        '.edit_organisation_type',
+        (
+            ('central', 'Central government'),
+            ('local', 'Local government'),
+            ('nhs', 'NHS'),
+        ),
+        None,
+    ),
+    (
+        '.edit_organisation_crown_status',
+        (
+            ('crown', 'Yes'),
+            ('non-crown', 'No'),
+            ('unknown', 'Not sure'),
+        ),
+        'crown',
+    ),
+    (
+        '.edit_organisation_agreement',
+        (
+            ('yes', (
+                'Yes '
+                'Users will be told their organisation has already signed the agreement'
+            )),
+            ('no', (
+                'No '
+                'Users will be prompted to sign the agreement before they can go live'
+            )),
+            ('unknown', (
+                'No (but we have some service-specific agreements in place) '
+                'Users won’t be prompted to sign the agreement'
+            )),
+        ),
+        'no',
+    ),
+))
+@pytest.mark.parametrize('user', (
+    pytest.param(
+        platform_admin_user,
+    ),
+    pytest.param(
+        active_user_with_permissions,
+        marks=pytest.mark.xfail
+    ),
+))
+def test_view_organisation_settings(
+    client_request,
+    fake_uuid,
+    organisation_one,
+    mock_get_organisation,
+    endpoint,
+    expected_options,
+    expected_selected,
+    user,
+):
+    client_request.login(user(fake_uuid))
+
+    page = client_request.get(endpoint, org_id=organisation_one['id'])
+
+    radios = page.select('input[type=radio]')
+
+    for index, option in enumerate(expected_options):
+        label = page.select_one('label[for={}]'.format(radios[index]['id']))
+        assert (
+            radios[index]['value'],
+            normalize_spaces(label.text),
+        ) == option
+
+    if expected_selected:
+        assert page.select_one('input[checked]')['value'] == expected_selected
+    else:
+        assert not page.select_one('input[checked]')
+
+
+@pytest.mark.parametrize('endpoint, post_data, expected_persisted', (
+    (
+        '.edit_organisation_type',
+        {'organisation_type': 'central'},
+        {'organisation_type': 'central'},
+    ),
+    (
+        '.edit_organisation_type',
+        {'organisation_type': 'local'},
+        {'organisation_type': 'local'},
+    ),
+    (
+        '.edit_organisation_type',
+        {'organisation_type': 'nhs'},
+        {'organisation_type': 'nhs'},
+    ),
+    (
+        '.edit_organisation_crown_status',
+        {'crown_status': 'crown'},
+        {'crown': True},
+    ),
+    (
+        '.edit_organisation_crown_status',
+        {'crown_status': 'non-crown'},
+        {'crown': False},
+    ),
+    (
+        '.edit_organisation_crown_status',
+        {'crown_status': 'unknown'},
+        {'crown': None},
+    ),
+    (
+        '.edit_organisation_agreement',
+        {'agreement_signed': 'yes'},
+        {'agreement_signed': True},
+    ),
+    (
+        '.edit_organisation_agreement',
+        {'agreement_signed': 'no'},
+        {'agreement_signed': False},
+    ),
+    (
+        '.edit_organisation_agreement',
+        {'agreement_signed': 'unknown'},
+        {'agreement_signed': None},
+    ),
+))
+@pytest.mark.parametrize('user', (
+    pytest.param(
+        platform_admin_user,
+    ),
+    pytest.param(
+        active_user_with_permissions,
+        marks=pytest.mark.xfail
+    ),
+))
+def test_update_organisation_settings(
+    client_request,
+    fake_uuid,
+    organisation_one,
+    mock_get_organisation,
+    mock_update_organisation,
+    endpoint,
+    post_data,
+    expected_persisted,
+    user,
+):
+    client_request.login(user(fake_uuid))
+
+    client_request.post(
+        endpoint,
+        org_id=organisation_one['id'],
+        _data=post_data,
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.organisation_settings',
+            org_id=organisation_one['id'],
+            _external=True,
+        ),
+    )
+
+    mock_update_organisation.assert_called_once_with(
+        organisation_one['id'],
+        **expected_persisted,
+    )
+
+
+@pytest.mark.parametrize('user', (
+    pytest.param(
+        platform_admin_user,
+    ),
+    pytest.param(
+        active_user_with_permissions,
+        marks=pytest.mark.xfail
+    ),
+))
+def test_view_organisation_domains(
+    mocker,
+    client_request,
+    fake_uuid,
+    user,
+):
+    client_request.login(user(fake_uuid))
+
+    mocker.patch(
+        'app.organisations_client.get_organisation',
+        side_effect=lambda org_id: organisation_json(
+            org_id,
+            'Org 1',
+            domains=['example.gov.uk', 'test.example.gov.uk'],
+        )
+    )
+
+    page = client_request.get(
+        'main.edit_organisation_domains',
+        org_id=ORGANISATION_ID,
+    )
+
+    assert [textbox['value'] for textbox in page.select('input[type=text]')] == [
+        'example.gov.uk',
+        'test.example.gov.uk',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+    ]
+
+
+@pytest.mark.parametrize('post_data, expected_persisted', (
+    (
+        {
+            'domains-0': 'example.gov.uk',
+            'domains-2': 'example.gov.uk',
+            'domains-3': 'EXAMPLE.GOV.UK',
+            'domains-5': 'test.gov.uk',
+        },
+        {
+            'domains': [
+                'example.gov.uk',
+                'test.gov.uk',
+            ]
+        }
+    ),
+    (
+        {
+            'domains-0': '',
+            'domains-1': '',
+            'domains-2': '',
+        },
+        {
+            'domains': []
+        }
+    ),
+))
+@pytest.mark.parametrize('user', (
+    pytest.param(
+        platform_admin_user,
+    ),
+    pytest.param(
+        active_user_with_permissions,
+        marks=pytest.mark.xfail
+    ),
+))
+def test_update_organisation_domains(
+    client_request,
+    fake_uuid,
+    organisation_one,
+    mock_get_organisation,
+    mock_update_organisation,
+    post_data,
+    expected_persisted,
+    user,
+):
+    client_request.login(user(fake_uuid))
+
+    client_request.post(
+        'main.edit_organisation_domains',
+        org_id=ORGANISATION_ID,
+        _data=post_data,
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.organisation_settings',
+            org_id=organisation_one['id'],
+            _external=True,
+        ),
+    )
+
+    mock_update_organisation.assert_called_once_with(
+        ORGANISATION_ID,
+        **expected_persisted,
+    )
 
 
 def test_update_organisation_name(
@@ -553,7 +871,7 @@ def test_confirm_update_organisation(
     organisation_one,
     mock_get_organisation,
     mock_verify_password,
-    mock_update_organisation_name,
+    mock_update_organisation,
     mocker
 ):
     with logged_in_platform_admin_client.session_transaction() as session:
@@ -570,7 +888,7 @@ def test_confirm_update_organisation(
     assert response.status_code == 302
     assert response.location == url_for('.organisation_settings', org_id=organisation_one['id'], _external=True)
 
-    mock_update_organisation_name.assert_called_with(
+    mock_update_organisation.assert_called_with(
         organisation_one['id'],
         name=session['organisation_name_change']
     )

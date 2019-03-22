@@ -1,0 +1,28 @@
+{% from "components/radios.html" import radios %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+
+{% extends "org_template.html" %}
+
+{% block org_page_title %}
+  Data sharing and financial agreement
+{% endblock %}
+
+{% block maincolumn_content %}
+  <h1 class="heading-large">Data sharing and financial agreement</h1>
+  <div class="grid-row">
+    <div class="column-five-sixths">
+      {% call form_wrapper() %}
+        {{ radios(
+          form.agreement_signed,
+          option_hints={
+            'yes': 'Users will be told their organisation has already signed the agreement',
+            'no': 'Users will be prompted to sign the agreement before they can go live',
+            'unknown': 'Users won’t be prompted to sign the agreement'
+          }
+        ) }}
+        {{ page_footer('Save') }}
+      {% endcall %}
+    </div>
+  </div>
+{% endblock %}

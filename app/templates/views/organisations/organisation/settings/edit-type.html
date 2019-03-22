@@ -1,0 +1,21 @@
+{% from "components/radios.html" import radios %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+
+{% extends "org_template.html" %}
+
+{% block org_page_title %}
+  Organisation type
+{% endblock %}
+
+{% block maincolumn_content %}
+  <h1 class="heading-large">Organisation type</h1>
+  <div class="grid-row">
+    <div class="column-five-sixths">
+      {% call form_wrapper() %}
+        {{ radios(form.organisation_type) }}
+        {{ page_footer('Save') }}
+      {% endcall %}
+    </div>
+  </div>
+{% endblock %}

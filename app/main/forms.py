@@ -243,9 +243,9 @@ class ForgivingIntegerField(StringField):
         return super().__call__(value=value, **kwargs)
 
 
-def organisation_type():
+def organisation_type(label='Who runs this service?'):
     return RadioField(
-        'Who runs this service?',
+        label,
         choices=[
             ('central', 'Central government'),
             ('local', 'Local government'),
@@ -528,6 +528,62 @@ class RenameOrganisationForm(StripWhitespaceForm):
         validators=[
             DataRequired(message='Can’t be empty')
         ])
+
+
+class OrganisationOrganisationTypeForm(StripWhitespaceForm):
+    organisation_type = organisation_type(label='What type of organisation is this?')
+
+
+class OrganisationCrownStatusForm(StripWhitespaceForm):
+    crown_status = RadioField(
+        (
+            'Is this organisation a crown body?'
+        ),
+        choices=[
+            ('crown', 'Yes'),
+            ('non-crown', 'No'),
+            ('unknown', 'Not sure'),
+        ],
+        validators=[
+            DataRequired(message='Can’t be empty')
+        ],
+    )
+
+
+class OrganisationAgreementSignedForm(StripWhitespaceForm):
+    agreement_signed = RadioField(
+        (
+            'Has this organisation signed the agreement?'
+        ),
+        choices=[
+            ('yes', 'Yes'),
+            ('no', 'No'),
+            ('unknown', 'No (but we have some service-specific agreements in place)'),
+        ],
+        validators=[
+            DataRequired(message='Can’t be empty')
+        ],
+    )
+
+
+class OrganisationDomainsForm(StripWhitespaceForm):
+
+    def populate(self, domains_list):
+        for index, value in enumerate(domains_list):
+            self.domains[index].data = value
+
+    domains = FieldList(
+        StripWhitespaceStringField(
+            '',
+            validators=[
+                Optional(),
+            ],
+            default=''
+        ),
+        min_entries=20,
+        max_entries=20,
+        label="Domain names"
+    )
 
 
 class CreateServiceForm(StripWhitespaceForm):
@@ -895,7 +951,7 @@ class ServiceSwitchChannelForm(ServiceOnOffSettingForm):
         super().__init__(name, *args, **kwargs)
 
 
-class ServiceSetEmailBranding(StripWhitespaceForm):
+class SetEmailBranding(StripWhitespaceForm):
 
     branding_style = RadioFieldWithNoneOption(
         'Branding style',
@@ -920,12 +976,12 @@ class ServiceSetEmailBranding(StripWhitespaceForm):
         )
 
 
-class ServiceSetLetterBranding(ServiceSetEmailBranding):
+class SetLetterBranding(SetEmailBranding):
     # form is the same, but instead of GOV.UK we have None as a valid option
     DEFAULT = (FieldWithNoneOption.NONE_OPTION_VALUE, 'None')
 
 
-class ServicePreviewBranding(StripWhitespaceForm):
+class PreviewBranding(StripWhitespaceForm):
 
     branding_style = HiddenFieldWithNoneOption('branding_style')
 
