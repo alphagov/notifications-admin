@@ -580,8 +580,8 @@ class OrganisationDomainsForm(StripWhitespaceForm):
             ],
             default=''
         ),
-        min_entries=10,
-        max_entries=10,
+        min_entries=20,
+        max_entries=20,
         label="Domain names"
     )
 
