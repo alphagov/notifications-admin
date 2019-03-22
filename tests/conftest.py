@@ -3,7 +3,7 @@ import os
 from contextlib import contextmanager
 from datetime import date, datetime, timedelta
 from unittest.mock import Mock
-from uuid import UUID
+from uuid import UUID, uuid4
 
 import pytest
 from bs4 import BeautifulSoup
@@ -984,6 +984,15 @@ def create_service_templates(service_id, number_of_templates=6):
         ))
 
     return {'data': service_templates}
+
+
+def _template(template_type, name, parent=None, template_id=None):
+    return {
+        'id': template_id or str(uuid4()),
+        'name': name,
+        'template_type': template_type,
+        'folder': parent,
+    }
 
 
 @pytest.fixture(scope='function')

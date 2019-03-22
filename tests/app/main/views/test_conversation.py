@@ -10,9 +10,13 @@ from notifications_python_client.errors import HTTPError
 from app.main.views.conversation import get_user_number
 from tests.conftest import (
     SERVICE_ONE_ID,
+    _template,
     mock_get_notifications,
     normalize_spaces,
 )
+
+INV_PARENT_FOLDER_ID = '7e979e79-d970-43a5-ac69-b625a8d147b0'
+VIS_PARENT_FOLDER_ID = 'bbbb222b-2b22-2b22-222b-b222b22b2222'
 
 
 def test_get_user_phone_number_when_only_inbound_exists(mocker):
@@ -255,6 +259,8 @@ def test_conversation_reply_shows_link_to_add_templates_if_service_has_no_templa
     client_request,
     fake_uuid,
     mock_get_service_templates_when_no_templates_exist,
+    mock_get_template_folders,
+    active_user_with_permissions
 ):
     page = client_request.get(
         'main.conversation_reply',
@@ -275,34 +281,68 @@ def test_conversation_reply_shows_link_to_add_templates_if_service_has_no_templa
 def test_conversation_reply_shows_templates(
     client_request,
     fake_uuid,
-    mock_get_service_templates,
+    mocker,
+    mock_get_template_folders,
+    active_user_with_permissions,
+    service_one
 ):
+
+    service_one["permissions"] += ["edit_folder_permissions"]
+    all_templates = {'data': [
+        _template('sms', 'sms_template_one', parent=INV_PARENT_FOLDER_ID),
+        _template('sms', 'sms_template_two'),
+        _template('sms', 'sms_template_three', parent=VIS_PARENT_FOLDER_ID),
+        _template('letter', 'letter_template_one')
+    ]}
+    mocker.patch('app.service_api_client.get_service_templates', return_value=all_templates)
+    mock_get_template_folders.return_value = [
+        {
+            'name': "Parent 1 - invisible",
+            'id': INV_PARENT_FOLDER_ID,
+            'parent_id': None,
+            'users_with_permission': []
+        },
+        {
+            'name': "Parent 2 - visible",
+            'id': VIS_PARENT_FOLDER_ID,
+            'parent_id': None,
+            'users_with_permission': [active_user_with_permissions.id]
+        },
+    ]
     page = client_request.get(
         'main.conversation_reply',
         service_id=SERVICE_ONE_ID,
         notification_id=fake_uuid,
     )
 
-    for index, expected in enumerate([
-        'sms_template_one',
-        'sms_template_two',
-    ]):
-        link = page.select('.message-name')[index]
-        assert normalize_spaces(link.text) == expected
-        assert link.select_one('a')['href'].startswith(
-            url_for(
-                'main.conversation_reply_with_template',
-                service_id=SERVICE_ONE_ID,
-                notification_id=fake_uuid,
-                template_id='',
-            )
+    link = page.select('.template-list-item-without-ancestors')
+    assert normalize_spaces(link[0].text) == "Parent 2 - visible 1 template"
+    assert normalize_spaces(link[1].text) == 'sms_template_two Text message template'
+
+    assert link[0].select_one('a')['href'].startswith(
+        url_for(
+            'main.conversation_reply',
+            service_id=SERVICE_ONE_ID,
+            notification_id=fake_uuid,
+            from_folder=VIS_PARENT_FOLDER_ID
         )
+    )
+
+    assert link[1].select_one('a')['href'].startswith(
+        url_for(
+            'main.conversation_reply_with_template',
+            service_id=SERVICE_ONE_ID,
+            notification_id=fake_uuid,
+            template_id='',
+        )
+    )
 
 
-def test_conversation_reply_shows_live_search_if_list_of_templates_taller_than_screen(
+def test_conversation_reply_shows_live_search(
     client_request,
     fake_uuid,
-    mock_get_more_service_templates_than_can_fit_onscreen,
+    mock_get_service_templates,
+    mock_get_template_folders,
 ):
     page = client_request.get(
         'main.conversation_reply',
@@ -311,20 +351,6 @@ def test_conversation_reply_shows_live_search_if_list_of_templates_taller_than_s
     )
 
     assert page.select('.live-search')
-
-
-def test_conversation_reply_shows_live_search_if_list_of_templates_fits_onscreen(
-    client_request,
-    fake_uuid,
-    mock_get_service_templates,
-):
-    page = client_request.get(
-        'main.conversation_reply',
-        service_id=SERVICE_ONE_ID,
-        notification_id=fake_uuid,
-    )
-
-    assert not page.select('.live-search')
 
 
 def test_conversation_reply_redirects_with_phone_number_from_notification(

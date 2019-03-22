@@ -2,6 +2,7 @@
 {% from "components/message-count-label.html" import message_count_label %}
 {% from "components/textbox.html" import textbox %}
 {% from "components/live-search.html" import live_search %}
+{% from "components/folder-path.html" import folder_path %}
 
 {% extends "withnav_template.html" %}
 
@@ -11,9 +12,12 @@
 
 {% block maincolumn_content %}
 
+<div class="bottom-gutter-1-2">
   <h1 class="heading-large">Choose a template</h1>
+  {{ folder_path(template_folder_path, current_service.id, template_type) }}
+</div>
 
-  {% if not templates %}
+  {% if not templates_and_folders.templates_to_show %}
 
     {% if current_user.has_permissions('manage_templates') %}
        <p class="bottom-gutter">
@@ -29,20 +33,35 @@
 
   {% else %}
 
-    {{ live_search(target_selector='#template-list .column-whole', show=show_search_box, form=search_form) }}
+    {{ live_search(target_selector='#template-list .column-whole', show=True, form=search_form) }}
 
-    <nav class="grid-row" id=template-list>
-      {% for template in templates %}
-        <div class="column-whole">
+    <nav id="template-list">
+      {% for item in templates_and_folders %}
+        <div class="template-list-item {% if item.ancestors %}template-list-item-hidden-by-default{% endif %} {% if not item.ancestors %}template-list-item-without-ancestors{% endif %}">
           <h2 class="message-name">
-            <a href="{{ url_for('.conversation_reply_with_template', service_id=current_service.id, template_id=template.id, notification_id=notification_id) }}">{{ template.name }}</a>
+            {% for ancestor in item.ancestors %}
+                <a href="{{ url_for('.conversation_reply', service_id=current_service.id, notification_id=notification_id, from_folder=ancestor.id) }}" class="template-list-folder">
+                {{ ancestor.name }}
+              </a> <span class="message-name-separator">/</span>
+            {% endfor %}
+            {% if item.is_folder %}
+              <a href="{{ url_for('.conversation_reply', service_id=current_service.id, notification_id=notification_id, from_folder=item.id) }}" class="template-list-folder">
+                <span class="live-search-relevant">{{ item.name }}</span>
+              </a>
+            {% else %}
+              <a href="{{ url_for('.conversation_reply_with_template', service_id=current_service.id, template_id=item.id, notification_id=notification_id) }}">
+                <span class="live-search-relevant">{{ item.name }}</span>
+              </a>
+            {% endif %}
           </h2>
           <p class="message-type">
-            {{ message_count_label(1, template.template_type, suffix='')|capitalize }} template
+            {{ item.hint }}
           </p>
         </div>
       {% endfor %}
     </nav>
+
+
   {% endif %}
 
 {% endblock %}
