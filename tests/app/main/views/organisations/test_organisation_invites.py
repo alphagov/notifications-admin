@@ -736,6 +736,8 @@ def test_view_organisation_domains(
     (
         {
             'domains-0': 'example.gov.uk',
+            'domains-2': 'example.gov.uk',
+            'domains-3': 'EXAMPLE.GOV.UK',
             'domains-5': 'test.gov.uk',
         },
         {

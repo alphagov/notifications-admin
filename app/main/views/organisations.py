@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from flask import flash, redirect, render_template, request, session, url_for
 from flask_login import current_user, login_required
 from notifications_python_client.errors import HTTPError
@@ -416,7 +418,10 @@ def edit_organisation_domains(org_id):
     if form.validate_on_submit():
         organisations_client.update_organisation(
             org_id,
-            domains=list(filter(None, form.domains.data)),
+            domains=list(OrderedDict.fromkeys(
+                domain.lower()
+                for domain in filter(None, form.domains.data)
+            )),
         )
         return redirect(url_for('.organisation_settings', org_id=org_id))
 
