@@ -178,6 +178,7 @@ def service_json(
         'volume_sms': 222222,
         'volume_letter': 333333,
         'consent_to_research': True,
+        'count_as_live': True,
     }
 
 

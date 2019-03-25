@@ -933,9 +933,13 @@ class OnOffField(RadioField):
 
 class ServiceOnOffSettingForm(StripWhitespaceForm):
 
-    def __init__(self, name, *args, **kwargs):
+    def __init__(self, name, *args, truthy='On', falsey='Off', **kwargs):
         super().__init__(*args, **kwargs)
         self.enabled.label.text = name
+        self.enabled.choices = [
+            (True, truthy),
+            (False, falsey),
+        ]
 
     enabled = OnOffField('Choices')
 
