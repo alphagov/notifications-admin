@@ -293,6 +293,12 @@
         {% endcall %}
 
         {% call row() %}
+          {{ text_field('Count in list of live services')}}
+          {{ text_field('Yes' if current_service.count_as_live else 'No') }}
+          {{ edit_field('Change', url_for('.service_switch_count_as_live', service_id=current_service.id)) }}
+        {% endcall %}
+
+        {% call row() %}
           {{ text_field('Organisation')}}
           {{ optional_text_field(current_service.organisation_name) }}
           {{ edit_field('Change', url_for('.link_service_to_organisation', service_id=current_service.id)) }}

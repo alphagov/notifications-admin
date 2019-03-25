@@ -99,6 +99,7 @@ def mock_get_service_settings_page_common(
 
         'Label Value Action',
         'Live Off Change',
+        'Count in list of live services Yes Change',
         'Organisation Org 1 Change',
         'Organisation type Central Change',
         'Free text message allowance 250,000 Change',
@@ -444,6 +445,65 @@ def test_switch_service_to_restricted(
         service_one['id'],
         message_limit=50,
         restricted=True
+    )
+
+
+@pytest.mark.parametrize('count_as_live, selected, labelled', (
+    (True, 'True', 'Yes'),
+    (False, 'False', 'No'),
+))
+def test_show_switch_service_to_count_as_live_page(
+    mocker,
+    client_request,
+    platform_admin_user,
+    mock_update_service,
+    count_as_live,
+    selected,
+    labelled,
+):
+    mocker.patch(
+        'app.models.service.Service.count_as_live',
+        create=True,
+        new_callable=PropertyMock,
+        return_value=count_as_live,
+    )
+    client_request.login(platform_admin_user)
+    page = client_request.get(
+        'main.service_switch_count_as_live',
+        service_id=SERVICE_ONE_ID,
+    )
+    assert page.select_one('[checked]')['value'] == selected
+    assert page.select_one('label[for={}]'.format(
+        page.select_one('[checked]')['id']
+    )).text.strip() == labelled
+
+
+@pytest.mark.parametrize('post_data, expected_persisted_value', (
+    ('True', True),
+    ('False', False),
+))
+def test_switch_service_to_count_as_live(
+    client_request,
+    platform_admin_user,
+    mock_update_service,
+    post_data,
+    expected_persisted_value,
+):
+    client_request.login(platform_admin_user)
+    client_request.post(
+        'main.service_switch_count_as_live',
+        service_id=SERVICE_ONE_ID,
+        _data={'enabled': post_data},
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.service_settings',
+            service_id=SERVICE_ONE_ID,
+            _external=True,
+        )
+    )
+    mock_update_service.assert_called_with(
+        SERVICE_ONE_ID,
+        count_as_live=expected_persisted_value,
     )
 
 

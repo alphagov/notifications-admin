@@ -277,6 +277,29 @@ def service_switch_live(service_id):
     )
 
 
+@main.route("/services/<service_id>/service-settings/switch-count-as-live", methods=["GET", "POST"])
+@login_required
+@user_is_platform_admin
+def service_switch_count_as_live(service_id):
+
+    form = ServiceOnOffSettingForm(
+        name="Count in list of live services",
+        enabled=current_service.count_as_live,
+        truthy='Yes',
+        falsey='No',
+    )
+
+    if form.validate_on_submit():
+        current_service.update(count_as_live=form.enabled.data)
+        return redirect(url_for('.service_settings', service_id=service_id))
+
+    return render_template(
+        'views/service-settings/set-service-setting.html',
+        title="Count in list of live services",
+        form=form,
+    )
+
+
 @main.route("/services/<service_id>/service-settings/permissions/<permission>", methods=["GET", "POST"])
 @login_required
 @user_is_platform_admin

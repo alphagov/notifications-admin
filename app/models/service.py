@@ -40,6 +40,7 @@ class Service():
         'volume_sms',
         'volume_letter',
         'consent_to_research',
+        'count_as_live',
     }
 
     TEMPLATE_TYPES = (
