@@ -1,49 +1,50 @@
+import itertools
 import os
 import urllib
 from datetime import datetime, timedelta, timezone
+from functools import partial
 from time import monotonic
 
-import itertools
 import ago
-from itsdangerous import BadSignature
 from flask import (
-    session,
-    render_template,
-    make_response,
     current_app,
-    request,
+    flash,
     g,
+    make_response,
+    render_template,
+    request,
+    session,
     url_for,
-    flash
 )
 from flask._compat import string_types
 from flask.globals import _lookup_req_object, _request_ctx_stack
 from flask_login import LoginManager, current_user
 from flask_wtf import CSRFProtect
 from flask_wtf.csrf import CSRFError
-from functools import partial
-
+from itsdangerous import BadSignature
 from notifications_python_client.errors import HTTPError
-from notifications_utils import logging, request_helper, formatters
+from notifications_utils import formatters, logging, request_helper
+from notifications_utils.formatters import formatted_list
 from notifications_utils.recipients import (
-    validate_phone_number,
     InvalidPhoneError,
     format_phone_number_human_readable,
+    validate_phone_number,
 )
-from notifications_utils.formatters import formatted_list
 from notifications_utils.sanitise_text import SanitiseASCII
 from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
-from werkzeug.exceptions import abort, HTTPException as WerkzeugHTTPException
+from werkzeug.exceptions import HTTPException as WerkzeugHTTPException
+from werkzeug.exceptions import abort
 from werkzeug.local import LocalProxy
 
 from app import proxy_fix
-from app.config import configs
 from app.asset_fingerprinter import asset_fingerprinter
+from app.commands import setup_commands
+from app.config import configs
 from app.extensions import (
     antivirus_client,
+    redis_client,
     statsd_client,
     zendesk_client,
-    redis_client,
 )
 from app.models.service import Service
 from app.models.user import AnonymousUser
@@ -51,29 +52,34 @@ from app.navigation import (
     CaseworkNavigation,
     HeaderNavigation,
     MainNavigation,
-    OrgNavigation
+    OrgNavigation,
 )
-from app.notify_client.service_api_client import service_api_client
 from app.notify_client.api_key_api_client import api_key_api_client
-from app.notify_client.invite_api_client import invite_api_client
-from app.notify_client.job_api_client import job_api_client
-from app.notify_client.notification_api_client import notification_api_client
-from app.notify_client.status_api_client import status_api_client
-from app.notify_client.template_statistics_api_client import template_statistics_client
-from app.notify_client.user_api_client import user_api_client
-from app.notify_client.events_api_client import events_api_client
-from app.notify_client.provider_client import provider_client
-from app.notify_client.email_branding_client import email_branding_client
-from app.notify_client.letter_branding_client import letter_branding_client
-from app.notify_client.organisations_api_client import organisations_client
-from app.notify_client.org_invite_api_client import org_invite_api_client
-from app.notify_client.letter_jobs_client import letter_jobs_client
-from app.notify_client.inbound_number_client import inbound_number_client
 from app.notify_client.billing_api_client import billing_api_client
 from app.notify_client.complaint_api_client import complaint_api_client
-from app.notify_client.platform_stats_api_client import platform_stats_api_client
-from app.notify_client.template_folder_api_client import template_folder_api_client
-from app.commands import setup_commands
+from app.notify_client.email_branding_client import email_branding_client
+from app.notify_client.events_api_client import events_api_client
+from app.notify_client.inbound_number_client import inbound_number_client
+from app.notify_client.invite_api_client import invite_api_client
+from app.notify_client.job_api_client import job_api_client
+from app.notify_client.letter_branding_client import letter_branding_client
+from app.notify_client.letter_jobs_client import letter_jobs_client
+from app.notify_client.notification_api_client import notification_api_client
+from app.notify_client.org_invite_api_client import org_invite_api_client
+from app.notify_client.organisations_api_client import organisations_client
+from app.notify_client.platform_stats_api_client import (
+    platform_stats_api_client,
+)
+from app.notify_client.provider_client import provider_client
+from app.notify_client.service_api_client import service_api_client
+from app.notify_client.status_api_client import status_api_client
+from app.notify_client.template_folder_api_client import (
+    template_folder_api_client,
+)
+from app.notify_client.template_statistics_api_client import (
+    template_statistics_client,
+)
+from app.notify_client.user_api_client import user_api_client
 from app.utils import get_logo_cdn_domain, id_safe
 
 login_manager = LoginManager()
