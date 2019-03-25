@@ -6,7 +6,7 @@
   var _mode = 'default';
 
   // Constructor to make objects representing the area sticky elements can scroll in
-  var ScrollArea = function (el, edge) {
+  var ScrollArea = function (el, edge, selector) {
     var $el = el.$fixedEl;
     var $scrollArea = $el.closest('.sticky-scroll-area');
 
@@ -15,6 +15,7 @@
 
     this._els = [el];
     this.edge = edge;
+    this.selector = selector;
     this.node = scrollArea;
     this.setEvents();
   };
@@ -64,6 +65,9 @@
     var $focusedElement = $(document.activeElement);
     var nodeName = $focusedElement.get(0).nodeName.toLowerCase();
     var endOfFurthestEl = focusOverlap.endOfFurthestEl(this._els, this.edge);
+    var isInSticky = function () {
+      return $focusedElement.closest(this.selector).length > 0;
+    }.bind(this);
     var focused;
     var overlap;
 
@@ -71,6 +75,7 @@
     if (nodeName === 'textarea') {
       focused = this.getFocusedDetails.forCaret(e);
     } else {
+      if (isInSticky()) { return; }
       focused = this.getFocusedDetails.forElement($focusedElement);
     }
 
@@ -105,11 +110,11 @@
 
       return matches[0] || false;
     },
-    addEl: function (el, edge) {
+    addEl: function (el, edge, selector) {
       var scrollArea = this.getAreaForEl(el);
 
       if (!scrollArea) {
-        this._scrollAreas.push(new ScrollArea(el, edge));
+        this._scrollAreas.push(new ScrollArea(el, edge, selector));
       } else {
         scrollArea.addEl(el);
       }
@@ -652,7 +657,7 @@
 
     if (!exists) {
       elObj = new StickyElement($el, self);
-      scrollAreas.addEl(elObj, self.edge);
+      scrollAreas.addEl(elObj, self.edge, self.CSS_SELECTOR);
     }
 
     self.setElementDimensions(elObj, onDimensionsSet);
