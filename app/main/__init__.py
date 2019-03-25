@@ -1,6 +1,8 @@
 from flask import Blueprint
 
-from app.main.views import (  # noqa
+main = Blueprint('main', __name__)
+
+from app.main.views import (  # noqa isort:skip
     add_service,
     agreement,
     api_keys,
@@ -34,5 +36,3 @@ from app.main.views import (  # noqa
     user_profile,
     verify,
 )
-
-main = Blueprint('main', __name__)  # noqa
