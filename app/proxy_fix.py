@@ -3,7 +3,7 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 
 class CustomProxyFix(object):
     def __init__(self, app, forwarded_proto):
-        self.app = ProxyFix(app)
+        self.app = ProxyFix(app, x_for=1, x_proto=1, x_host=1, x_port=0, x_prefix=0)
         self.forwarded_proto = forwarded_proto
 
     def __call__(self, environ, start_response):
