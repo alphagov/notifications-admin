@@ -36,6 +36,7 @@ from notifications_utils.template import (
 from notifications_utils.timezones import convert_utc_to_bst
 from orderedset._orderedset import OrderedSet
 from werkzeug.datastructures import MultiDict
+from werkzeug.routing import RequestRedirect
 
 SENDING_STATUSES = ['created', 'pending', 'sending', 'pending-virus-check']
 DELIVERED_STATUSES = ['delivered', 'sent', 'returned-letter']
@@ -680,3 +681,12 @@ def redact_mobile_number(mobile_number, spacing=""):
     for i in indices:
         mobile_number_list[i] = redact_character
     return "".join(mobile_number_list)
+
+
+class PermanentRedirect(RequestRedirect):
+    """
+    In Werkzeug 0.15.0 the status code for RequestRedirect changed from 301 to 308.
+    308 status codes are not supported when Internet Explorer is used with Windows 7
+    and Windows 8.1, so this class keeps the original status code of 301.
+    """
+    code = 301
