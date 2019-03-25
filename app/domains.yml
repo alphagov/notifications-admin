@@ -3377,7 +3377,7 @@ sesplan.gov.uk: edinburgh.gov.uk
 sevenoaks.gov.uk:
   owner: Sevenoaks District Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 sevenoakstown.gov.uk:
   owner: Sevenoaks Town Council
   crown: false
