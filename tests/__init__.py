@@ -1,11 +1,12 @@
-from unittest.mock import patch
-import pytest
 import uuid
-
 from datetime import datetime, timedelta, timezone
-from flask.testing import FlaskClient
+from unittest.mock import patch
+
+import pytest
 from flask import url_for
+from flask.testing import FlaskClient
 from flask_login import login_user
+
 from app.models.user import InvitedOrgUser
 
 

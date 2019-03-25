@@ -28,10 +28,10 @@ itsdangerous==0.24  # pyup: <1.0.0
 git+https://github.com/alphagov/notifications-utils.git@31.2.2#egg=notifications-utils==31.2.2
 
 ## The following requirements were added by pip freeze:
-awscli==1.16.129
+awscli==1.16.130
 bleach==3.1.0
 boto3==1.6.16
-botocore==1.12.119
+botocore==1.12.120
 certifi==2019.3.9
 chardet==3.0.4
 Click==7.0
