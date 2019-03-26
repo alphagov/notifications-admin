@@ -4,7 +4,6 @@ from unittest.mock import call
 from uuid import uuid4
 
 import pytest
-from bs4 import BeautifulSoup
 from flask import url_for
 
 from tests import sample_uuid, validate_route_permission
@@ -23,16 +22,17 @@ from tests.conftest import (
 
 
 def test_should_show_api_page(
-    logged_in_client,
+    client_request,
     mock_login,
     api_user_active,
     mock_get_service,
     mock_has_permissions,
     mock_get_notifications
 ):
-    response = logged_in_client.get(url_for('main.api_integration', service_id=str(uuid.uuid4())))
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    page = client_request.get(
+        'main.api_integration',
+        service_id=SERVICE_ONE_ID,
+    )
     assert page.h1.string.strip() == 'API integration'
     rows = page.find_all('details')
     assert len(rows) == 5
@@ -41,15 +41,17 @@ def test_should_show_api_page(
 
 
 def test_should_show_api_page_with_lots_of_notifications(
-    logged_in_client,
+    client_request,
     mock_login,
     api_user_active,
     mock_get_service,
     mock_has_permissions,
     mock_get_notifications_with_previous_next
 ):
-    response = logged_in_client.get(url_for('main.api_integration', service_id=str(uuid.uuid4())))
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    page = client_request.get(
+        'main.api_integration',
+        service_id=SERVICE_ONE_ID,
+    )
     rows = page.find_all('div', {'class': 'api-notifications-item'})
     assert ' '.join(rows[len(rows) - 1].text.split()) == (
         'Only showing the first 50 messages. Notify deletes messages after 7 days.'
@@ -57,15 +59,17 @@ def test_should_show_api_page_with_lots_of_notifications(
 
 
 def test_should_show_api_page_with_no_notifications(
-    logged_in_client,
+    client_request,
     mock_login,
     api_user_active,
     mock_get_service,
     mock_has_permissions,
     mock_get_notifications_with_no_notifications
 ):
-    response = logged_in_client.get(url_for('main.api_integration', service_id=str(uuid.uuid4())))
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    page = client_request.get(
+        'main.api_integration',
+        service_id=SERVICE_ONE_ID,
+    )
     rows = page.find_all('div', {'class': 'api-notifications-item'})
     assert 'When you send messages via the API they’ll appear here.' in rows[len(rows) - 1].text.strip()
 
@@ -157,17 +161,20 @@ def test_should_show_api_page_for_live_service(
 
 
 def test_api_documentation_page_should_redirect(
-    logged_in_client,
+    client_request,
     mock_login,
     api_user_active,
     mock_get_service,
     mock_has_permissions
 ):
-    response = logged_in_client.get(url_for('main.api_documentation', service_id=str(uuid.uuid4())))
-    assert response.status_code == 301
-    assert response.location == url_for(
-        'main.documentation',
-        _external=True
+    client_request.get(
+        'main.api_documentation',
+        service_id=SERVICE_ONE_ID,
+        _expected_status=301,
+        _expected_redirect=url_for(
+            'main.documentation',
+            _external=True,
+        ),
     )
 
 
@@ -276,7 +283,7 @@ def test_should_create_api_key_with_type_normal(
 
 
 def test_cant_create_normal_api_key_in_trial_mode(
-    logged_in_client,
+    client_request,
     api_user_active,
     mock_login,
     mock_get_api_keys,
@@ -287,14 +294,15 @@ def test_cant_create_normal_api_key_in_trial_mode(
 ):
     mock_post = mocker.patch('app.notify_client.api_key_api_client.ApiKeyApiClient.post')
 
-    response = logged_in_client.post(
-        url_for('main.create_api_key', service_id=uuid.uuid4()),
-        data={
+    client_request.post(
+        'main.create_api_key',
+        service_id=SERVICE_ONE_ID,
+        _data={
             'key_name': 'some default key name',
             'key_type': 'normal'
-        }
+        },
+        _expected_status=400,
     )
-    assert response.status_code == 400
     mock_post.assert_not_called()
 
 
@@ -330,7 +338,7 @@ def test_should_404_for_api_key_that_doesnt_exist(
 
 
 def test_should_redirect_after_revoking_api_key(
-    logged_in_client,
+    client_request,
     api_user_active,
     mock_login,
     mock_revoke_api_key,
@@ -339,10 +347,17 @@ def test_should_redirect_after_revoking_api_key(
     mock_has_permissions,
     fake_uuid,
 ):
-    response = logged_in_client.post(url_for('main.revoke_api_key', service_id=SERVICE_ONE_ID, key_id=fake_uuid))
-
-    assert response.status_code == 302
-    assert response.location == url_for('.api_keys', service_id=SERVICE_ONE_ID, _external=True)
+    client_request.post(
+        'main.revoke_api_key',
+        service_id=SERVICE_ONE_ID,
+        key_id=fake_uuid,
+        _expected_status=302,
+        _expected_redirect=url_for(
+            '.api_keys',
+            service_id=SERVICE_ONE_ID,
+            _external=True,
+        ),
+    )
     mock_revoke_api_key.assert_called_once_with(service_id=SERVICE_ONE_ID, key_id=fake_uuid)
     mock_get_api_keys.assert_called_once_with(SERVICE_ONE_ID,)
 
@@ -400,15 +415,17 @@ def test_route_invalid_permissions(
 
 
 def test_should_show_whitelist_page(
-    logged_in_client,
+    client_request,
     mock_login,
     api_user_active,
     mock_get_service,
     mock_has_permissions,
     mock_get_whitelist,
 ):
-    response = logged_in_client.get(url_for('main.whitelist', service_id=str(uuid.uuid4())))
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    page = client_request.get(
+        'main.whitelist',
+        service_id=SERVICE_ONE_ID,
+    )
     textboxes = page.find_all('input', {'type': 'text'})
     for index, value in enumerate(
         ['test@example.com'] + [''] * 4 + ['07900900000'] + [''] * 4
@@ -417,14 +434,9 @@ def test_should_show_whitelist_page(
 
 
 def test_should_update_whitelist(
-    logged_in_client,
-    mock_login,
-    api_user_active,
-    mock_get_service,
-    mock_has_permissions,
-    mock_update_whitelist
+    client_request,
+    mock_update_whitelist,
 ):
-    service_id = str(uuid.uuid4())
     data = OrderedDict([
         ('email_addresses-1', 'test@example.com'),
         ('email_addresses-3', 'test@example.com'),
@@ -432,34 +444,32 @@ def test_should_update_whitelist(
         ('phone_numbers-2', '+1800-555-555'),
     ])
 
-    logged_in_client.post(
-        url_for('main.whitelist', service_id=service_id),
-        data=data
+    client_request.post(
+        'main.whitelist',
+        service_id=SERVICE_ONE_ID,
+        _data=data,
     )
 
-    mock_update_whitelist.assert_called_once_with(service_id, {
+    mock_update_whitelist.assert_called_once_with(SERVICE_ONE_ID, {
         'email_addresses': ['test@example.com', 'test@example.com'],
         'phone_numbers': ['07900900000', '+1800-555-555']})
 
 
 def test_should_validate_whitelist_items(
-    logged_in_client,
-    mock_login,
-    api_user_active,
-    mock_get_service,
-    mock_has_permissions,
-    mock_update_whitelist
+    client_request,
+    mock_update_whitelist,
 ):
 
-    response = logged_in_client.post(
-        url_for('main.whitelist', service_id=str(uuid.uuid4())),
-        data=OrderedDict([
+    page = client_request.post(
+        'main.whitelist',
+        service_id=SERVICE_ONE_ID,
+        _data=OrderedDict([
             ('email_addresses-1', 'abc'),
             ('phone_numbers-0', '123')
-        ])
+        ]),
+        _expected_status=200,
     )
 
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert page.h1.string.strip() == 'There was a problem with your whitelist'
     jump_links = page.select('.banner-dangerous a')
 
@@ -469,7 +479,7 @@ def test_should_validate_whitelist_items(
     assert jump_links[1].string.strip() == 'Enter valid phone numbers'
     assert jump_links[1]['href'] == '#phone_numbers'
 
-    mock_update_whitelist.assert_not_called()
+    assert mock_update_whitelist.called is False
 
 
 @pytest.mark.parametrize('endpoint', [

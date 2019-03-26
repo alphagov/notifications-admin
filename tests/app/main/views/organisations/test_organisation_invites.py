@@ -50,7 +50,7 @@ def test_organisation_page_shows_all_organisations(
 
 
 def test_view_organisation_shows_the_correct_organisation(
-    logged_in_client,
+    client_request,
     mocker
 ):
     org = {'id': ORGANISATION_ID, 'name': 'Test 1', 'active': True}
@@ -61,12 +61,10 @@ def test_view_organisation_shows_the_correct_organisation(
         'app.organisations_client.get_organisation_services', return_value=[]
     )
 
-    response = logged_in_client.get(
-        url_for('.organisation_dashboard', org_id=ORGANISATION_ID)
+    page = client_request.get(
+        '.organisation_dashboard',
+        org_id=ORGANISATION_ID,
     )
-
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
     assert normalize_spaces(page.select_one('.heading-large').text) == 'Services'
 
@@ -92,18 +90,16 @@ def test_create_new_organisation(
 
 
 def test_organisation_services_show(
-    logged_in_client,
+    client_request,
     mock_get_organisation,
     mock_get_organisation_services,
     mocker,
     fake_uuid,
 ):
-    response = logged_in_client.get(
-        url_for('.organisation_dashboard', org_id=ORGANISATION_ID),
+    page = client_request.get(
+        '.organisation_dashboard',
+        org_id=ORGANISATION_ID,
     )
-
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
     assert len(page.select('.browse-list-item')) == 3
 
@@ -121,19 +117,17 @@ def test_organisation_services_show(
 
 
 def test_view_team_members(
-    logged_in_client,
+    client_request,
     mocker,
     mock_get_organisation,
     mock_get_users_for_organisation,
     mock_get_invited_users_for_organisation,
     fake_uuid
 ):
-    response = logged_in_client.get(
-        url_for('.manage_org_users', org_id=ORGANISATION_ID),
+    page = client_request.get(
+        '.manage_org_users',
+        org_id=ORGANISATION_ID,
     )
-
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
     for i in range(0, 2):
         assert normalize_spaces(
@@ -146,7 +140,7 @@ def test_view_team_members(
 
 
 def test_invite_org_user(
-    logged_in_client,
+    client_request,
     mocker,
     mock_get_organisation,
     sample_org_invite,
@@ -157,9 +151,10 @@ def test_invite_org_user(
         return_value=InvitedOrgUser(**sample_org_invite)
     )
 
-    logged_in_client.post(
-        url_for('.invite_org_user', org_id=ORGANISATION_ID),
-        data={'email_address': 'test@example.gov.uk'}
+    client_request.post(
+        '.invite_org_user',
+        org_id=ORGANISATION_ID,
+        _data={'email_address': 'test@example.gov.uk'}
     )
 
     mock_invite_org_user.assert_called_once_with(
@@ -196,18 +191,18 @@ def test_invite_org_user_errors_when_same_email_as_inviter(
 
 
 def test_accepted_invite_when_user_already_logged_in(
-    logged_in_client,
+    client_request,
     mock_check_org_invite_token
 ):
-    response = logged_in_client.get(
-        url_for('main.accept_org_invite', token='thisisnotarealtoken'),
-        follow_redirects=True
+    page = client_request.get(
+        'main.accept_org_invite',
+        token='thisisnotarealtoken',
+        follow_redirects=True,
+        _expected_status=403,
     )
-
-    assert response.status_code == 403
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-
-    assert 'This invite is for another email address.' in normalize_spaces(page.select_one('.banner-dangerous').text)
+    assert 'This invite is for another email address.' in normalize_spaces(
+        page.select_one('.banner-dangerous').text
+    )
 
 
 def test_cancelled_invite_opened_by_user(

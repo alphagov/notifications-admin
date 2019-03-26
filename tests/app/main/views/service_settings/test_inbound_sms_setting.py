@@ -1,13 +1,10 @@
-from flask import url_for
-
-from tests.conftest import normalize_spaces
+from tests.conftest import SERVICE_ONE_ID, normalize_spaces
 
 
 def test_set_inbound_sms_sets_a_number_for_service(
-    logged_in_client,
+    client_request,
     mock_add_sms_sender,
     multiple_available_inbound_numbers,
-    service_one,
     fake_uuid,
     mock_no_inbound_number_for_service,
     mocker
@@ -17,14 +14,15 @@ def test_set_inbound_sms_sets_a_number_for_service(
         "inbound_number": "781d9c60-7a7e-46b7-9896-7b045b992fa5",
     }
 
-    response = logged_in_client.post(
-        url_for('main.service_set_inbound_number', service_id=service_one['id']),
-        data=data
+    client_request.post(
+        'main.service_set_inbound_number',
+        service_id=SERVICE_ONE_ID,
+        _data=data,
+        _expected_status=302,
     )
 
-    assert response.status_code == 302
     mock_add_sms_sender.assert_called_once_with(
-        service_one['id'],
+        SERVICE_ONE_ID,
         sms_sender="781d9c60-7a7e-46b7-9896-7b045b992fa5",
         is_default=True,
         inbound_number_id="781d9c60-7a7e-46b7-9896-7b045b992fa5"
