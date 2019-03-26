@@ -879,63 +879,22 @@ def test_no_permission_manage_users_page(
     assert "Team members" not in resp_text
 
 
-def test_get_remove_user_from_service(
-    logged_in_client,
-    active_user_with_permissions,
-    mock_get_users_by_service,
-    service_one,
-    mocker,
-):
-    response = logged_in_client.get(
-        url_for(
-            'main.remove_user_from_service',
-            service_id=service_one['id'],
-            user_id=active_user_with_permissions.id))
-    assert response.status_code == 200
-    assert "Are you sure you want to remove" in response.get_data(as_text=True)
-    assert "Remove user from service" in response.get_data(as_text=True)
-
-
 def test_remove_user_from_service(
-    logged_in_client,
+    client_request,
     active_user_with_permissions,
     service_one,
-    mocker,
-    mock_get_users_by_service,
-    mock_get_user,
     mock_remove_user_from_service,
 ):
-    response = logged_in_client.post(
-        url_for(
-            'main.remove_user_from_service',
-            service_id=service_one['id'],
-            user_id=active_user_with_permissions.id))
-    assert response.status_code == 302
-    assert response.location == url_for(
-        'main.manage_users', service_id=service_one['id'], _external=True)
-    mock_remove_user_from_service.assert_called_once_with(service_one['id'],
-                                                          str(active_user_with_permissions.id))
-
-
-def test_can_remove_user_from_service_as_platform_admin(
-    logged_in_client,
-    service_one,
-    platform_admin_user,
-    active_user_with_permissions,
-    mock_get_users_by_service,
-    mock_remove_user_from_service,
-    mocker,
-):
-    response = logged_in_client.post(
-        url_for(
-            'main.remove_user_from_service',
-            service_id=service_one['id'],
-            user_id=active_user_with_permissions.id))
-    assert response.status_code == 302
-    assert response.location == url_for(
-        'main.manage_users', service_id=service_one['id'], _external=True)
-    mock_remove_user_from_service.assert_called_once_with(service_one['id'],
-                                                          str(active_user_with_permissions.id))
+    client_request.post(
+        'main.remove_user_from_service',
+        service_id=service_one['id'],
+        user_id=active_user_with_permissions.id,
+        _expected_redirect=url_for('main.manage_users', service_id=service_one['id'], _external=True)
+    )
+    mock_remove_user_from_service.assert_called_once_with(
+        service_one['id'],
+        str(active_user_with_permissions.id)
+    )
 
 
 def test_can_invite_user_as_platform_admin(
@@ -1154,6 +1113,29 @@ def test_edit_user_permissions_page_displays_redacted_mobile_number_and_change_l
     change_link = mobile_number_paragraph.findChild()
     assert change_link.attrs['href'] == '/services/{}/users/{}/edit-mobile-number'.format(
         service_one['id'], user.id
+    )
+
+
+def test_edit_user_permissions_with_delete_query_shows_banner(
+    client_request,
+    active_user_with_permissions,
+    mock_get_users_by_service,
+    mock_get_template_folders,
+    service_one
+):
+    page = client_request.get(
+        'main.edit_user_permissions',
+        service_id=service_one['id'],
+        user_id=active_user_with_permissions.id,
+        delete=1
+    )
+
+    banner = page.find('div', class_='banner-dangerous')
+    assert banner.contents[0].strip() == "Are you sure you want to remove Test User?"
+    assert banner.form.attrs['action'] == url_for(
+        'main.remove_user_from_service',
+        service_id=service_one['id'],
+        user_id=active_user_with_permissions.id
     )
 
 

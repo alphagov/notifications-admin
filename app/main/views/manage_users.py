@@ -123,41 +123,31 @@ def edit_user_permissions(service_id, user_id):
         user=user,
         form=form,
         service_has_email_auth=service_has_email_auth,
-        mobile_number=mobile_number
+        mobile_number=mobile_number,
+        delete=request.args.get('delete'),
     )
 
 
-@main.route("/services/<service_id>/users/<user_id>/delete", methods=['GET', 'POST'])
+@main.route("/services/<service_id>/users/<user_id>/delete", methods=['POST'])
 @login_required
 @user_has_permissions('manage_service')
 def remove_user_from_service(service_id, user_id):
-    user = current_service.get_team_member(user_id)
-    form = PermissionsForm.from_user(user, service_id)
+    try:
+        service_api_client.remove_user_from_service(service_id, user_id)
+    except HTTPError as e:
+        msg = "You cannot remove the only user for a service"
+        if e.status_code == 400 and msg in e.message:
+            flash(msg, 'info')
+            return redirect(url_for(
+                '.manage_users',
+                service_id=service_id))
+        else:
+            abort(500, e)
 
-    if request.method == 'POST':
-        try:
-            service_api_client.remove_user_from_service(service_id, user_id)
-        except HTTPError as e:
-            msg = "You cannot remove the only user for a service"
-            if e.status_code == 400 and msg in e.message:
-                flash(msg, 'info')
-                return redirect(url_for(
-                    '.manage_users',
-                    service_id=service_id))
-            else:
-                abort(500, e)
-
-        return redirect(url_for(
-            '.manage_users',
-            service_id=service_id
-        ))
-
-    flash('Are you sure you want to remove {}?'.format(user.name), 'remove')
-    return render_template(
-        'views/edit-user-permissions.html',
-        user=user,
-        form=form
-    )
+    return redirect(url_for(
+        '.manage_users',
+        service_id=service_id
+    ))
 
 
 @main.route("/services/<service_id>/users/<uuid:user_id>/edit-email", methods=['GET', 'POST'])
