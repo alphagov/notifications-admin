@@ -128,22 +128,10 @@ def edit_user_permissions(service_id, user_id):
     )
 
 
-@main.route("/services/<service_id>/users/<user_id>/delete", methods=['GET'])
-@login_required
-@user_has_permissions('manage_service')
-def remove_user_from_service(service_id, user_id):
-    return redirect(url_for(
-        '.edit_user_permissions',
-        service_id=service_id,
-        user_id=user_id,
-        delete='yes'
-    ))
-
-
 @main.route("/services/<service_id>/users/<user_id>/delete", methods=['POST'])
 @login_required
 @user_has_permissions('manage_service')
-def confirm_remove_user_from_service(service_id, user_id):
+def remove_user_from_service(service_id, user_id):
     try:
         service_api_client.remove_user_from_service(service_id, user_id)
     except HTTPError as e:

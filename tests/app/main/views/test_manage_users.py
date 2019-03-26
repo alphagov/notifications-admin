@@ -879,37 +879,14 @@ def test_no_permission_manage_users_page(
     assert "Team members" not in resp_text
 
 
-def test_remove_user_from_service_redirects(
-    client_request,
-    active_user_with_permissions,
-    service_one,
-    mock_get_users_by_service,
-    mock_get_template_folders,
-    mocker,
-):
-    page = client_request.get(
-        'main.remove_user_from_service',
-        service_id=service_one['id'],
-        user_id=active_user_with_permissions.id,
-        _follow_redirects=True
-    )
-    banner = page.find('div', class_='banner-dangerous')
-    assert banner.contents[0].strip() == "Are you sure you want to remove Test User?"
-    assert banner.form.attrs['action'] == url_for(
-        'main.confirm_remove_user_from_service',
-        service_id=service_one['id'],
-        user_id=active_user_with_permissions.id
-    )
-
-
-def test_confirm_remove_user_from_service(
+def test_remove_user_from_service(
     client_request,
     active_user_with_permissions,
     service_one,
     mock_remove_user_from_service,
 ):
     client_request.post(
-        'main.confirm_remove_user_from_service',
+        'main.remove_user_from_service',
         service_id=service_one['id'],
         user_id=active_user_with_permissions.id,
         _expected_redirect=url_for('main.manage_users', service_id=service_one['id'], _external=True)
@@ -1136,6 +1113,29 @@ def test_edit_user_permissions_page_displays_redacted_mobile_number_and_change_l
     change_link = mobile_number_paragraph.findChild()
     assert change_link.attrs['href'] == '/services/{}/users/{}/edit-mobile-number'.format(
         service_one['id'], user.id
+    )
+
+
+def test_edit_user_permissions_with_delete_query_shows_banner(
+    client_request,
+    active_user_with_permissions,
+    mock_get_users_by_service,
+    mock_get_template_folders,
+    service_one
+):
+    page = client_request.get(
+        'main.edit_user_permissions',
+        service_id=service_one['id'],
+        user_id=active_user_with_permissions.id,
+        delete=1
+    )
+
+    banner = page.find('div', class_='banner-dangerous')
+    assert banner.contents[0].strip() == "Are you sure you want to remove Test User?"
+    assert banner.form.attrs['action'] == url_for(
+        'main.remove_user_from_service',
+        service_id=service_one['id'],
+        user_id=active_user_with_permissions.id
     )
 
 
