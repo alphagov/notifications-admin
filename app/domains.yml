@@ -401,7 +401,7 @@ angliarevenues.gov.uk: westsuffolk.gov.uk
 angus.gov.uk:
   owner: Angus Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 antrimandnewtownabbey.gov.uk: antrim.gov.uk
 antrim.gov.uk:
   owner: Antrim Borough Council
