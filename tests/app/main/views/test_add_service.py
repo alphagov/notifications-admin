@@ -18,16 +18,15 @@ def test_non_gov_user_cannot_see_add_service_button(
 
 
 def test_get_should_render_add_service_template(
-    logged_in_client
+    client_request
 ):
-    response = logged_in_client.get(url_for('main.add_service'))
-    assert response.status_code == 200
-    assert 'About your service' in response.get_data(as_text=True)
+    page = client_request.get('main.add_service')
+    assert 'About your service' in page.text
 
 
 def test_should_add_service_and_redirect_to_tour_when_no_services(
     app_,
-    logged_in_client,
+    client_request,
     mock_create_service,
     mock_create_service_template,
     mock_get_services_with_no_services,
@@ -35,12 +34,19 @@ def test_should_add_service_and_redirect_to_tour_when_no_services(
     mock_create_or_update_free_sms_fragment_limit,
     mock_get_all_email_branding,
 ):
-    response = logged_in_client.post(
-        url_for('main.add_service'),
-        data={
+    client_request.post(
+        'main.add_service',
+        _data={
             'name': 'testing the post',
             'organisation_type': 'local',
-        }
+        },
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.start_tour',
+            service_id=101,
+            template_id="Example%20text%20message%20template",
+            _external=True,
+        ),
     )
     assert mock_get_services_with_no_services.called
     mock_create_service.assert_called_once_with(
@@ -62,13 +68,6 @@ def test_should_add_service_and_redirect_to_tour_when_no_services(
         101,
     )
     assert session['service_id'] == 101
-    assert response.status_code == 302
-    assert response.location == url_for(
-        'main.start_tour',
-        service_id=101,
-        template_id="Example%20text%20message%20template",
-        _external=True
-    )
     mock_create_or_update_free_sms_fragment_limit.assert_called_once_with(101, 25000)
 
 
@@ -79,7 +78,7 @@ def test_should_add_service_and_redirect_to_tour_when_no_services(
 ])
 def test_should_add_service_and_redirect_to_dashboard_when_existing_service(
     app_,
-    logged_in_client,
+    client_request,
     mock_create_service,
     mock_create_service_template,
     mock_get_services,
@@ -91,12 +90,18 @@ def test_should_add_service_and_redirect_to_dashboard_when_existing_service(
     mock_create_or_update_free_sms_fragment_limit,
     mock_get_all_email_branding,
 ):
-    response = logged_in_client.post(
-        url_for('main.add_service'),
-        data={
+    client_request.post(
+        'main.add_service',
+        _data={
             'name': 'testing the post',
             'organisation_type': organisation_type,
-        }
+        },
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.service_dashboard',
+            service_id=101,
+            _external=True,
+        )
     )
     assert mock_get_services.called
     mock_create_service.assert_called_once_with(
@@ -111,8 +116,6 @@ def test_should_add_service_and_redirect_to_dashboard_when_existing_service(
     mock_create_or_update_free_sms_fragment_limit.assert_called_once_with(101, free_allowance)
     assert len(mock_create_service_template.call_args_list) == 0
     assert session['service_id'] == 101
-    assert response.status_code == 302
-    assert response.location == url_for('main.service_dashboard', service_id=101, _external=True)
 
 
 @pytest.mark.parametrize('organisation_type, email_address, expected_branding', [
@@ -159,45 +162,54 @@ def test_should_lookup_branding_for_known_domain(
 
 
 def test_should_return_form_errors_when_service_name_is_empty(
-    logged_in_client
+    client_request
 ):
-    response = logged_in_client.post(url_for('main.add_service'), data={})
-    assert response.status_code == 200
-    assert 'Can’t be empty' in response.get_data(as_text=True)
+    page = client_request.post(
+        'main.add_service',
+        data={},
+        _expected_status=200,
+    )
+    assert 'Can’t be empty' in page.text
 
 
 def test_should_return_form_errors_with_duplicate_service_name_regardless_of_case(
-    logged_in_client,
+    client_request,
     mock_create_duplicate_service,
     mock_get_all_email_branding,
 ):
-    response = logged_in_client.post(
-        url_for('main.add_service'),
-        data={
+    page = client_request.post(
+        'main.add_service',
+        _data={
             'name': 'SERVICE ONE',
             'organisation_type': 'central',
         },
+        _expected_status=200,
     )
-
-    assert response.status_code == 200
-    assert 'This service name is already in use' in response.get_data(as_text=True)
+    assert page.select_one('.error-message').text.strip() == (
+        'This service name is already in use'
+    )
 
 
 def test_non_whitelist_user_cannot_access_create_service_page(
-    logged_in_client,
+    client_request,
     mock_get_non_govuser,
     api_nongov_user_active,
 ):
     assert not is_gov_user(api_nongov_user_active.email_address)
-    response = logged_in_client.get(url_for('main.add_service'))
-    assert response.status_code == 403
+    client_request.get(
+        'main.add_service',
+        _expected_status=403,
+    )
 
 
 def test_non_whitelist_user_cannot_create_service(
-    logged_in_client,
+    client_request,
     mock_get_non_govuser,
     api_nongov_user_active,
 ):
     assert not is_gov_user(api_nongov_user_active.email_address)
-    response = logged_in_client.post(url_for('main.add_service'), data={'name': 'SERVICE TWO'})
-    assert response.status_code == 403
+    client_request.post(
+        'main.add_service',
+        _data={'name': 'SERVICE TWO'},
+        _expected_status=403,
+    )

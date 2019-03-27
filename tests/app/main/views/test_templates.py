@@ -331,22 +331,23 @@ def test_should_show_new_template_choices_if_service_has_folder_permission(
 
 
 def test_should_show_page_for_one_template(
-    logged_in_client,
+    client_request,
     mock_get_service_template,
-    service_one,
     fake_uuid,
 ):
     template_id = fake_uuid
-    response = logged_in_client.get(url_for(
+    page = client_request.get(
         '.edit_service_template',
-        service_id=service_one['id'],
-        template_id=template_id))
+        service_id=SERVICE_ONE_ID,
+        template_id=template_id,
+    )
 
-    assert response.status_code == 200
-    assert "Two week reminder" in response.get_data(as_text=True)
-    assert "Template &lt;em&gt;content&lt;/em&gt; with &amp; entity" in response.get_data(as_text=True)
-    assert "Use priority queue?" not in response.get_data(as_text=True)
-    mock_get_service_template.assert_called_with(service_one['id'], template_id)
+    assert page.select_one('input[type=text]')['value'] == "Two week reminder"
+    assert "Template &lt;em&gt;content&lt;/em&gt; with &amp; entity" in str(
+        page.select_one('textarea')
+    )
+    assert "priority" not in str(page.select_one('main'))
+    mock_get_service_template.assert_called_with(SERVICE_ONE_ID, template_id)
 
 
 def test_caseworker_redirected_to_one_off(
@@ -498,32 +499,25 @@ def test_view_letter_template_displays_postage(
 
 
 def test_view_non_letter_template_does_not_display_postage(
-    logged_in_client,
+    client_request,
     mock_get_service_template,
     mock_get_template_folders,
-    service_one,
     fake_uuid,
 ):
-
-    response = logged_in_client.get(url_for(
+    page = client_request.get(
         '.view_template',
-        service_id=service_one['id'],
-        template_id=fake_uuid))
-
-    assert response.status_code == 200
-
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+    )
     assert "Postage" not in page.text
 
 
 def test_edit_letter_template_postage_page_displays_correctly(
     client_request,
     service_one,
-    active_user_with_permissions,
-    mocker,
     fake_uuid,
+    mocker,
 ):
-    client_request.login(active_user_with_permissions)
     mock_get_service_letter_template(mocker)
     page = client_request.get(
         'main.edit_template_postage',
@@ -555,7 +549,7 @@ def test_edit_letter_template_postage_page_404s_if_template_is_not_a_letter(
 
 
 def test_edit_letter_templates_postage_updates_postage(
-    logged_in_client,
+    client_request,
     service_one,
     mocker,
     fake_uuid
@@ -564,19 +558,16 @@ def test_edit_letter_templates_postage_updates_postage(
         'app.main.views.templates.service_api_client.update_service_template_postage'
     )
     mock_get_service_letter_template(mocker)
-    template_id = fake_uuid
 
-    logged_in_client.post(
-        url_for(
-            'main.edit_template_postage',
-            service_id=SERVICE_ONE_ID,
-            template_id=template_id
-        ),
-        data={'postage': 'first'}
+    client_request.post(
+        'main.edit_template_postage',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _data={'postage': 'first'},
     )
     mock_update_template_postage.assert_called_with(
         SERVICE_ONE_ID,
-        template_id,
+        fake_uuid,
         "first"
     )
 
@@ -644,26 +635,21 @@ def test_should_be_able_to_view_a_template_with_links(
 
 
 def test_should_show_template_id_on_template_page(
-    logged_in_client,
+    client_request,
     mock_get_service_template,
     mock_get_template_folders,
-    service_one,
     fake_uuid,
 ):
-
-    response = logged_in_client.get(url_for(
+    page = client_request.get(
         '.view_template',
-        service_id=service_one['id'],
-        template_id=fake_uuid))
-
-    assert response.status_code == 200
-
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+    )
     assert page.select('.api-key-key')[0].text == fake_uuid
 
 
 def test_should_show_sms_template_with_downgraded_unicode_characters(
-    logged_in_client,
+    client_request,
     mocker,
     service_one,
     single_letter_contact_block,
@@ -678,14 +664,13 @@ def test_should_show_sms_template_with_downgraded_unicode_characters(
         return_value={'data': template_json(service_one['id'], fake_uuid, type_='sms', content=msg)}
     )
 
-    template_id = fake_uuid
-    response = logged_in_client.get(url_for(
+    page = client_request.get(
         '.view_template',
-        service_id=service_one['id'],
-        template_id=template_id))
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+    )
 
-    assert response.status_code == 200
-    assert rendered_msg in response.get_data(as_text=True)
+    assert rendered_msg in page.text
 
 
 def test_should_let_letter_contact_block_be_changed_for_the_template(
@@ -1263,7 +1248,7 @@ def test_should_not_allow_creation_of_template_through_form_without_correct_perm
 
 @pytest.mark.parametrize('type_of_template', ['email', 'sms'])
 def test_should_not_allow_creation_of_a_template_without_correct_permission(
-    logged_in_client,
+    client_request,
     service_one,
     mocker,
     type_of_template,
@@ -1271,15 +1256,12 @@ def test_should_not_allow_creation_of_a_template_without_correct_permission(
     service_one['permissions'] = []
     template_description = {'sms': 'text messages', 'email': 'emails'}
 
-    response = logged_in_client.get(url_for(
+    page = client_request.get(
         '.add_service_template',
-        service_id=service_one['id'],
-        template_type=type_of_template),
-        follow_redirects=True)
-
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-
-    assert response.status_code == 200
+        service_id=SERVICE_ONE_ID,
+        template_type=type_of_template,
+        _follow_redirects=True,
+    )
     assert page.select('main p')[0].text.strip() == \
         "Sending {} has been disabled for your service.".format(template_description[type_of_template])
     assert page.select(".page-footer-back-link")[0].text == "Back to templates"
@@ -1296,118 +1278,114 @@ def test_should_not_allow_creation_of_a_template_without_correct_permission(
     (mock_get_service_letter_template, 302),
 ])
 def test_should_redirect_to_one_off_if_template_type_is_letter(
-    logged_in_client,
-    active_user_with_permissions,
+    client_request,
     multiple_reply_to_email_addresses,
     multiple_sms_senders,
-    service_one,
     fake_uuid,
     mocker,
     fixture,
     expected_status_code
 ):
     fixture(mocker)
-
-    page = logged_in_client.get(
-        url_for('.set_sender', service_id=service_one['id'], template_id=fake_uuid)
+    client_request.get(
+        '.set_sender',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _expected_status=expected_status_code,
     )
-
-    assert page.status_code == expected_status_code
 
 
 def test_should_redirect_when_saving_a_template(
-    logged_in_client,
-    active_user_with_permissions,
-    mocker,
+    client_request,
     mock_get_service_template,
     mock_update_service_template,
     fake_uuid,
 ):
-    service = create_sample_service(active_user_with_permissions)
-    mocker.patch('app.user_api_client.get_users_for_service', return_value=[active_user_with_permissions])
-    template_id = fake_uuid
     name = "new name"
     content = "template <em>content</em> with & entity"
-    data = {
-        'id': template_id,
-        'name': name,
-        'template_content': content,
-        'template_type': 'sms',
-        'service': service['id'],
-        'process_type': 'normal'
-    }
-    response = logged_in_client.post(url_for(
+    client_request.post(
         '.edit_service_template',
-        service_id=service['id'],
-        template_id=template_id), data=data)
-
-    assert response.status_code == 302
-    assert response.location == url_for(
-        '.view_template', service_id=service['id'], template_id=template_id, _external=True)
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _data={
+            'id': fake_uuid,
+            'name': name,
+            'template_content': content,
+            'template_type': 'sms',
+            'service': SERVICE_ONE_ID,
+            'process_type': 'normal',
+        },
+        _expected_status=302,
+        _expected_redirect=url_for(
+            '.view_template',
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            _external=True,
+        ),
+    )
     mock_update_service_template.assert_called_with(
-        template_id, name, 'sms', content, service['id'], None, 'normal')
+        fake_uuid, name, 'sms', content, SERVICE_ONE_ID, None, 'normal',
+    )
 
 
 def test_should_edit_content_when_process_type_is_priority_not_platform_admin(
-    logged_in_client,
-    active_user_with_permissions,
-    mocker,
+    client_request,
     mock_get_service_template_with_priority,
     mock_update_service_template,
     fake_uuid,
 ):
-    service = create_sample_service(active_user_with_permissions)
-    mocker.patch('app.user_api_client.get_users_for_service', return_value=[active_user_with_permissions])
-    template_id = fake_uuid
-    data = {
-        'id': template_id,
-        'name': "new name",
-        'template_content': "new template <em>content</em> with & entity",
-        'template_type': 'sms',
-        'service': service['id'],
-        'process_type': 'priority'
-    }
-    response = logged_in_client.post(url_for(
+    client_request.post(
         '.edit_service_template',
-        service_id=service['id'],
-        template_id=template_id), data=data)
-    assert response.status_code == 302
-    assert response.location == url_for(
-        '.view_template', service_id=service['id'], template_id=template_id, _external=True)
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _data={
+            'id': fake_uuid,
+            'name': "new name",
+            'template_content': "new template <em>content</em> with & entity",
+            'template_type': 'sms',
+            'service': SERVICE_ONE_ID,
+            'process_type': 'priority',
+        },
+        _expected_status=302,
+        _expected_redirect=url_for(
+            '.view_template',
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            _external=True,
+        )
+    )
     mock_update_service_template.assert_called_with(
-        template_id,
+        fake_uuid,
         "new name",
         'sms',
         "new template <em>content</em> with & entity",
-        service['id'],
+        SERVICE_ONE_ID,
         None,
         'priority'
     )
 
 
 def test_should_not_allow_template_edits_without_correct_permission(
-    logged_in_client,
+    client_request,
     mock_get_service_template,
     service_one,
     fake_uuid,
 ):
-    template_id = fake_uuid
     service_one['permissions'] = ['email']
 
-    response = logged_in_client.get(url_for(
+    page = client_request.get(
         '.edit_service_template',
-        service_id=service_one['id'],
-        template_id=template_id),
-        follow_redirects=True)
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _follow_redirects=True,
+    )
 
-    assert response.status_code == 200
     assert page.select('main p')[0].text.strip() == "Sending text messages has been disabled for your service."
     assert page.select(".page-footer-back-link")[0].text == "Back to the template"
     assert page.select(".page-footer-back-link")[0]['href'] == url_for(
         '.view_template',
-        service_id=service_one['id'],
-        template_id=template_id,
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
     )
 
 
@@ -1488,14 +1466,9 @@ def test_should_403_when_create_template_with_process_type_of_priority_for_non_p
     ),
 ])
 def test_should_show_interstitial_when_making_breaking_change(
-    logged_in_client,
-    api_user_active,
-    mock_login,
+    client_request,
     mock_update_service_template,
-    mock_get_user,
-    mock_get_service,
     mock_get_user_by_email,
-    mock_has_permissions,
     fake_uuid,
     mocker,
     template_mock,
@@ -1507,32 +1480,33 @@ def test_should_show_interstitial_when_making_breaking_change(
         subject="Your ((thing)) is due soon",
         content="Your vehicle tax expires on ((date))",
     )
-    service_id = fake_uuid
-    template_id = fake_uuid
     data = {
-        'id': template_id,
+        'id': fake_uuid,
         'name': "new name",
         'template_content': "hello lets talk about ((thing))",
         'template_type': template_type,
         'subject': 'reminder \'" <span> & ((name))',
-        'service': service_id,
+        'service': SERVICE_ONE_ID,
         'process_type': 'normal'
     }
 
     if template_type == "letter":
         data["postage"] = 'None'
 
-    response = logged_in_client.post(
-        url_for('.edit_service_template', service_id=service_id, template_id=template_id),
-        data=data
+    page = client_request.post(
+        '.edit_service_template',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _data=data,
+        _expected_status=200,
     )
 
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert page.h1.string.strip() == "Confirm changes"
-    assert page.find('a', {'class': 'page-footer-back-link'})['href'] == url_for(".edit_service_template",
-                                                                                 service_id=service_id,
-                                                                                 template_id=template_id)
+    assert page.find('a', {'class': 'page-footer-back-link'})['href'] == url_for(
+        ".edit_service_template",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+    )
     for index, p in enumerate(expected_paragraphs):
         assert normalize_spaces(page.select('main p')[index].text) == p
 
@@ -1552,125 +1526,111 @@ def test_should_show_interstitial_when_making_breaking_change(
 
 
 def test_removing_placeholders_is_not_a_breaking_change(
-    logged_in_client,
+    client_request,
     mock_get_service_email_template,
     mock_update_service_template,
-    mock_has_permissions,
     fake_uuid,
 ):
-    service_id = fake_uuid
-    template_id = fake_uuid
     existing_template = mock_get_service_email_template(0, 0)['data']
-    response = logged_in_client.post(
-        url_for(
-            '.edit_service_template',
-            service_id=service_id,
-            template_id=template_id
-        ),
-        data={
+    client_request.post(
+        '.edit_service_template',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _data={
             'name': existing_template['name'],
             'template_content': "no placeholders",
             'subject': existing_template['subject'],
-        }
+        },
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.view_template',
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            _external=True,
+        ),
     )
-
-    assert response.status_code == 302
-    assert response.location == url_for(
-        'main.view_template',
-        service_id=service_id,
-        template_id=template_id,
-        _external=True,
-    )
+    assert mock_update_service_template.called is True
 
 
 def test_should_not_create_too_big_template(
-    logged_in_client,
-    service_one,
+    client_request,
     mock_get_service_template,
     mock_create_service_template_content_too_big,
     fake_uuid,
 ):
-    template_type = 'sms'
-    data = {
-        'name': "new name",
-        'template_content': "template content",
-        'template_type': template_type,
-        'service': service_one['id'],
-        'process_type': 'normal'
-    }
-    resp = logged_in_client.post(url_for(
+    page = client_request.post(
         '.add_service_template',
-        service_id=service_one['id'],
-        template_type=template_type
-    ), data=data)
-
-    assert resp.status_code == 200
-    assert "Content has a character count greater than the limit of 459" in resp.get_data(as_text=True)
+        service_id=SERVICE_ONE_ID,
+        template_type='sms',
+        _data={
+            'name': "new name",
+            'template_content': "template content",
+            'template_type': 'sms',
+            'service': SERVICE_ONE_ID,
+            'process_type': 'normal'
+        },
+        _expected_status=200,
+    )
+    assert "Content has a character count greater than the limit of 459" in page.text
 
 
 def test_should_not_update_too_big_template(
-    logged_in_client,
-    service_one,
+    client_request,
     mock_get_service_template,
     mock_update_service_template_400_content_too_big,
     fake_uuid,
 ):
-    template_id = fake_uuid
-    data = {
-        'id': fake_uuid,
-        'name': "new name",
-        'template_content': "template content",
-        'service': service_one['id'],
-        'template_type': 'sms',
-        'process_type': 'normal'
-    }
-    resp = logged_in_client.post(url_for(
+    page = client_request.post(
         '.edit_service_template',
-        service_id=service_one['id'],
-        template_id=template_id), data=data)
-
-    assert resp.status_code == 200
-    assert "Content has a character count greater than the limit of 459" in resp.get_data(as_text=True)
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _data={
+            'id': fake_uuid,
+            'name': "new name",
+            'template_content': "template content",
+            'service': SERVICE_ONE_ID,
+            'template_type': 'sms',
+            'process_type': 'normal',
+        },
+        _expected_status=200,
+    )
+    assert "Content has a character count greater than the limit of 459" in page.text
 
 
 def test_should_redirect_when_saving_a_template_email(
-    logged_in_client,
-    api_user_active,
-    mock_login,
+    client_request,
     mock_get_service_email_template,
     mock_update_service_template,
-    mock_get_user,
-    mock_get_service,
     mock_get_user_by_email,
-    mock_has_permissions,
     fake_uuid,
 ):
-    service_id = fake_uuid
-    template_id = fake_uuid
     name = "new name"
     content = "template <em>content</em> with & entity ((thing)) ((date))"
     subject = "subject & entity"
-    data = {
-        'id': template_id,
-        'name': name,
-        'template_content': content,
-        'template_type': 'email',
-        'service': service_id,
-        'subject': subject,
-        'process_type': 'normal'
-    }
-    response = logged_in_client.post(url_for(
+    client_request.post(
         '.edit_service_template',
-        service_id=service_id,
-        template_id=template_id), data=data)
-    assert response.status_code == 302
-    assert response.location == url_for(
-        '.view_template',
-        service_id=service_id,
-        template_id=template_id,
-        _external=True)
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _data={
+            'id': fake_uuid,
+            'name': name,
+            'template_content': content,
+            'template_type': 'email',
+            'service': SERVICE_ONE_ID,
+            'subject': subject,
+            'process_type': 'normal'
+        },
+        _expected_status=302,
+        _expected_redirect=url_for(
+            '.view_template',
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            _external=True,
+        ),
+    )
     mock_update_service_template.assert_called_with(
-        template_id, name, 'email', content, service_id, subject, 'normal')
+        fake_uuid, name, 'email', content, SERVICE_ONE_ID, subject, 'normal',
+    )
 
 
 def test_should_show_delete_template_page_with_time_block(
@@ -1798,10 +1758,7 @@ def test_should_redirect_when_deleting_a_template(
 
 @freeze_time('2016-01-01T15:00')
 def test_should_show_page_for_a_deleted_template(
-    logged_in_client,
-    api_user_active,
-    mock_login,
-    mock_get_service,
+    client_request,
     mock_get_template_folders,
     mock_get_deleted_template,
     single_letter_contact_block,
@@ -1810,24 +1767,20 @@ def test_should_show_page_for_a_deleted_template(
     mock_has_permissions,
     fake_uuid,
 ):
-    service_id = fake_uuid
     template_id = fake_uuid
-    response = logged_in_client.get(url_for(
+    page = client_request.get(
         '.view_template',
-        service_id=service_id,
-        template_id=template_id
-    ))
+        service_id=SERVICE_ONE_ID,
+        template_id=template_id,
+    )
 
-    assert response.status_code == 200
-
-    content = response.get_data(as_text=True)
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    assert url_for("main.edit_service_template", service_id=fake_uuid, template_id=fake_uuid) not in content
-    assert url_for("main.send_test", service_id=fake_uuid, template_id=fake_uuid) not in content
+    content = str(page)
+    assert url_for("main.edit_service_template", service_id=SERVICE_ONE_ID, template_id=fake_uuid) not in content
+    assert url_for("main.send_test", service_id=SERVICE_ONE_ID, template_id=fake_uuid) not in content
     assert page.select('p.hint')[0].text.strip() == 'This template was deleted today at 3:00pm.'
     assert 'Delete this template' not in page.select_one('main').text
 
-    mock_get_deleted_template.assert_called_with(service_id, template_id)
+    mock_get_deleted_template.assert_called_with(SERVICE_ONE_ID, template_id)
 
 
 @pytest.mark.parametrize('route', [
@@ -1933,92 +1886,91 @@ def test_get_human_readable_delta(from_time, until_time, message):
 
 
 def test_can_create_email_template_with_emoji(
-    logged_in_client,
-    service_one,
+    client_request,
     mock_create_service_template
 ):
-    data = {
-        'name': "new name",
-        'subject': "Food incoming!",
-        'template_content': "here's a burrito 🌯",
-        'template_type': 'email',
-        'service': service_one['id'],
-        'process_type': 'normal'
-    }
-    resp = logged_in_client.post(url_for(
+    client_request.post(
         '.add_service_template',
-        service_id=service_one['id'],
-        template_type='email'
-    ), data=data)
-
-    assert resp.status_code == 302
+        service_id=SERVICE_ONE_ID,
+        template_type='email',
+        _data={
+            'name': "new name",
+            'subject': "Food incoming!",
+            'template_content': "here's a burrito 🌯",
+            'template_type': 'email',
+            'service': SERVICE_ONE_ID,
+            'process_type': 'normal'
+        },
+        _expected_status=302,
+    )
+    assert mock_create_service_template.called is True
 
 
 def test_should_not_create_sms_template_with_emoji(
-    logged_in_client,
+    client_request,
     service_one,
-    mock_create_service_template
+    mock_create_service_template,
 ):
-    data = {
-        'name': "new name",
-        'template_content': "here are some noodles 🍜",
-        'template_type': 'sms',
-        'service': service_one['id'],
-        'process_type': 'normal'
-    }
-    resp = logged_in_client.post(url_for(
+    page = client_request.post(
         '.add_service_template',
-        service_id=service_one['id'],
-        template_type='sms'
-    ), data=data)
-
-    assert resp.status_code == 200
-    assert "You can’t use 🍜 in text messages." in resp.get_data(as_text=True)
+        service_id=SERVICE_ONE_ID,
+        template_type='sms',
+        _data={
+            'name': "new name",
+            'template_content': "here are some noodles 🍜",
+            'template_type': 'sms',
+            'service': SERVICE_ONE_ID,
+            'process_type': 'normal',
+        },
+        _expected_status=200,
+    )
+    assert "You can’t use 🍜 in text messages." in page.text
+    assert mock_create_service_template.called is False
 
 
 def test_should_not_update_sms_template_with_emoji(
-    logged_in_client,
-    service_one,
+    client_request,
     mock_get_service_template,
     mock_update_service_template,
     fake_uuid,
 ):
-    data = {
-        'id': fake_uuid,
-        'name': "new name",
-        'template_content': "here's a burger 🍔",
-        'service': service_one['id'],
-        'template_type': 'sms',
-        'process_type': 'normal'
-    }
-    resp = logged_in_client.post(url_for(
+    page = client_request.post(
         '.edit_service_template',
-        service_id=service_one['id'],
-        template_id=fake_uuid), data=data)
-
-    assert resp.status_code == 200
-    assert "You can’t use 🍔 in text messages." in resp.get_data(as_text=True)
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _data={
+            'id': fake_uuid,
+            'name': "new name",
+            'template_content': "here's a burger 🍔",
+            'service': SERVICE_ONE_ID,
+            'template_type': 'sms',
+            'process_type': 'normal'
+        },
+        _expected_status=200,
+    )
+    assert "You can’t use 🍔 in text messages." in page.text
+    assert mock_update_service_template.called is False
 
 
 def test_should_create_sms_template_without_downgrading_unicode_characters(
-    logged_in_client,
-    service_one,
+    client_request,
     mock_create_service_template
 ):
     msg = 'here:\tare some “fancy quotes” and non\u200Bbreaking\u200Bspaces'
 
-    data = {
-        'name': "new name",
-        'template_content': msg,
-        'template_type': 'sms',
-        'service': service_one['id'],
-        'process_type': 'normal'
-    }
-    resp = logged_in_client.post(url_for(
+    client_request.post(
         '.add_service_template',
-        service_id=service_one['id'],
-        template_type='sms'
-    ), data=data)
+        service_id=SERVICE_ONE_ID,
+        template_type='sms',
+        _data={
+            'name': "new name",
+            'template_content': msg,
+            'template_type': 'sms',
+            'service': SERVICE_ONE_ID,
+            'process_type': 'normal'
+        },
+        expected_status=302,
+    )
 
     mock_create_service_template.assert_called_with(
         ANY,  # name
@@ -2029,7 +1981,6 @@ def test_should_create_sms_template_without_downgrading_unicode_characters(
         ANY,  # process_type
         ANY,  # parent_folder_id
     )
-    assert resp.status_code == 302
 
 
 def test_should_show_template_as_first_page_of_tour(

@@ -396,7 +396,7 @@ def test_new_user_accept_invite_completes_new_registration_redirects_to_verify(
 
 
 def test_signed_in_existing_user_cannot_use_anothers_invite(
-    logged_in_client,
+    client_request,
     mocker,
     api_user_active,
     sample_invite,
@@ -408,9 +408,12 @@ def test_signed_in_existing_user_cannot_use_anothers_invite(
     mocker.patch('app.invite_api_client.check_token', return_value=invite)
     mocker.patch('app.user_api_client.get_users_for_service', return_value=[api_user_active])
 
-    response = logged_in_client.get(url_for('main.accept_invite', token='thisisnotarealtoken'), follow_redirects=True)
-    assert response.status_code == 403
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    page = client_request.get(
+        'main.accept_invite',
+        token='thisisnotarealtoken',
+        _follow_redirects=True,
+        _expected_status=403,
+    )
     assert page.h1.string.strip() == '403'
     flash_banners = page.find_all('div', class_='banner-dangerous')
     assert len(flash_banners) == 1
@@ -422,11 +425,10 @@ def test_signed_in_existing_user_cannot_use_anothers_invite(
 
 
 def test_accept_invite_does_not_treat_email_addresses_as_case_sensitive(
-    logged_in_client,
+    client_request,
     mocker,
     api_user_active,
     sample_invite,
-    service_one,
     mock_accept_invite,
     mock_get_user_by_email
 ):
@@ -436,10 +438,16 @@ def test_accept_invite_does_not_treat_email_addresses_as_case_sensitive(
     mocker.patch('app.invite_api_client.check_token', return_value=invite)
     mocker.patch('app.user_api_client.get_users_for_service', return_value=[api_user_active])
 
-    response = logged_in_client.get(url_for('main.accept_invite', token='thisisnotarealtoken'))
-
-    assert response.status_code == 302
-    assert response.location == url_for('main.service_dashboard', service_id=service_one['id'], _external=True)
+    client_request.get(
+        'main.accept_invite',
+        token='thisisnotarealtoken',
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.service_dashboard',
+            service_id=SERVICE_ONE_ID,
+            _external=True,
+        )
+    )
 
 
 def test_new_invited_user_verifies_and_added_to_service(

@@ -1,7 +1,6 @@
 import json
 
 import pytest
-from bs4 import BeautifulSoup
 from flask import url_for
 from freezegun import freeze_time
 
@@ -250,7 +249,7 @@ def test_should_show_page_for_one_job_with_flexible_data_retention(
 
 
 def test_get_jobs_should_tell_user_if_more_than_one_page(
-    logged_in_client,
+    client_request,
     fake_uuid,
     service_one,
     mock_get_job,
@@ -258,20 +257,17 @@ def test_get_jobs_should_tell_user_if_more_than_one_page(
     mock_get_notifications_with_previous_next,
     mock_get_service_data_retention,
 ):
-    response = logged_in_client.get(url_for(
+    page = client_request.get(
         'main.view_job',
         service_id=service_one['id'],
         job_id=fake_uuid,
-        status=''
-    ))
-
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+        status='',
+    )
     assert page.find('p', {'class': 'table-show-more-link'}).text.strip() == 'Only showing the first 50 rows'
 
 
 def test_should_show_job_in_progress(
-    logged_in_client,
+    client_request,
     service_one,
     active_user_with_permissions,
     mock_get_service_template,
@@ -281,15 +277,11 @@ def test_should_show_job_in_progress(
     mock_get_service_data_retention,
     fake_uuid,
 ):
-
-    response = logged_in_client.get(url_for(
+    page = client_request.get(
         'main.view_job',
         service_id=service_one['id'],
-        job_id=fake_uuid
-    ))
-
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+        job_id=fake_uuid,
+    )
     assert page.find('p', {'class': 'hint'}).text.strip() == 'Report is 50% complete…'
 
 
@@ -420,23 +412,19 @@ def test_should_show_letter_job_with_banner_after_sending_after_1730(
 
 @freeze_time("2016-01-01T00:00:00.061258")
 def test_should_show_scheduled_job(
-    logged_in_client,
-    active_user_with_permissions,
+    client_request,
     mock_get_service_template,
     mock_get_scheduled_job,
     mock_get_service_data_retention,
-    mocker,
     mock_get_notifications,
     fake_uuid,
 ):
-    response = logged_in_client.get(url_for(
+    page = client_request.get(
         'main.view_job',
         service_id=SERVICE_ONE_ID,
-        job_id=fake_uuid
-    ))
+        job_id=fake_uuid,
+    )
 
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert normalize_spaces(page.select('main p')[1].text) == (
         'Sending Two week reminder today at midnight'
     )
@@ -450,38 +438,38 @@ def test_should_show_scheduled_job(
 
 
 def test_should_cancel_job(
-    logged_in_client,
-    service_one,
+    client_request,
     fake_uuid,
     mocker,
 ):
     mock_cancel = mocker.patch('app.main.jobs.job_api_client.cancel_job')
-    response = logged_in_client.post(url_for(
+    client_request.post(
         'main.cancel_job',
-        service_id=service_one['id'],
-        job_id=fake_uuid
-    ))
+        service_id=SERVICE_ONE_ID,
+        job_id=fake_uuid,
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.service_dashboard',
+            service_id=SERVICE_ONE_ID,
+            _external=True,
+        )
+    )
 
-    mock_cancel.assert_called_once_with(service_one['id'], fake_uuid)
-    assert response.status_code == 302
-    assert response.location == url_for('main.service_dashboard', service_id=service_one['id'], _external=True)
+    mock_cancel.assert_called_once_with(SERVICE_ONE_ID, fake_uuid)
 
 
 def test_should_not_show_cancelled_job(
-    logged_in_client,
-    service_one,
+    client_request,
     active_user_with_permissions,
     mock_get_cancelled_job,
-    mocker,
     fake_uuid,
 ):
-    response = logged_in_client.get(url_for(
+    client_request.get(
         'main.view_job',
-        service_id=service_one['id'],
-        job_id=fake_uuid
-    ))
-
-    assert response.status_code == 404
+        service_id=SERVICE_ONE_ID,
+        job_id=fake_uuid,
+        _expected_status=404,
+    )
 
 
 @freeze_time("2016-01-01 00:00:00.000001")

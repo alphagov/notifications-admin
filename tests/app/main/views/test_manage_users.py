@@ -2,7 +2,6 @@ import copy
 import uuid
 
 import pytest
-from bs4 import BeautifulSoup
 from flask import url_for
 
 import app
@@ -20,7 +19,6 @@ from tests.conftest import (
     normalize_spaces,
     sample_uuid,
 )
-from tests.conftest import service_one as create_sample_service
 
 
 @pytest.mark.parametrize('user, expected_self_text, expected_coworker_text', [
@@ -523,38 +521,41 @@ def test_cant_edit_non_member_user_permissions(
 
 @pytest.mark.parametrize('auth_type', ['email_auth', 'sms_auth'])
 def test_edit_user_permissions_including_authentication_with_email_auth_service(
-    logged_in_client,
+    client_request,
+    service_one,
     active_user_with_permissions,
-    mocker,
     mock_get_users_by_service,
     mock_get_invites_for_service,
     mock_set_user_permissions,
     mock_update_user_attribute,
-    service_one,
     auth_type,
     mock_get_template_folders
 ):
     service_one['permissions'].append('email_auth')
 
-    response = logged_in_client.post(
-        url_for(
-            'main.edit_user_permissions',
-            service_id=service_one['id'],
-            user_id=active_user_with_permissions.id
-        ),
-        data={
+    client_request.post(
+        'main.edit_user_permissions',
+        service_id=SERVICE_ONE_ID,
+        user_id=active_user_with_permissions.id,
+        _data={
             'email_address': active_user_with_permissions.email_address,
             'send_messages': 'y',
             'manage_templates': 'y',
             'manage_service': 'y',
             'manage_api_keys': 'y',
-            'login_authentication': auth_type
-        }
+            'login_authentication': auth_type,
+        },
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.manage_users',
+            service_id=SERVICE_ONE_ID,
+            _external=True,
+        ),
     )
 
     mock_set_user_permissions.assert_called_with(
         str(active_user_with_permissions.id),
-        service_one['id'],
+        SERVICE_ONE_ID,
         permissions={
             'send_messages',
             'manage_templates',
@@ -568,29 +569,22 @@ def test_edit_user_permissions_including_authentication_with_email_auth_service(
         auth_type=auth_type
     )
 
-    assert response.status_code == 302
-    assert response.location == url_for(
-        'main.manage_users', service_id=service_one['id'], _external=True
-    )
-
 
 def test_should_show_page_for_inviting_user(
-    logged_in_client,
-    active_user_with_permissions,
-    mocker,
+    client_request,
     mock_get_template_folders,
 ):
-    service = create_sample_service(active_user_with_permissions)
-    response = logged_in_client.get(url_for('main.invite_user', service_id=service['id']))
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    page = client_request.get(
+        'main.invite_user',
+        service_id=SERVICE_ONE_ID,
+    )
 
     assert 'Invite a team member' in page.find('h1').text.strip()
-    assert response.status_code == 200
     assert not page.find('div', class_='checkboxes-nested')
 
 
 def test_should_show_folder_permission_form_if_service_has_folder_permissions_enabled(
-    logged_in_client,
+    client_request,
     mocker,
     mock_get_template_folders,
     service_one
@@ -601,11 +595,12 @@ def test_should_show_folder_permission_form_if_service_has_folder_permissions_en
         {'id': 'folder-id-2', 'name': 'folder_two', 'parent_id': None, 'users_with_permission': []},
         {'id': 'folder-id-3', 'name': 'folder_three', 'parent_id': 'folder-id-1', 'users_with_permission': []},
     ]
-    response = logged_in_client.get(url_for('main.invite_user', service_id=service_one['id']))
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    page = client_request.get(
+        'main.invite_user',
+        service_id=SERVICE_ONE_ID,
+    )
 
     assert 'Invite a team member' in page.find('h1').text.strip()
-    assert response.status_code == 200
 
     folder_checkboxes = page.find('div', class_='checkboxes-nested').find_all('li')
     assert len(folder_checkboxes) == 3
@@ -616,7 +611,7 @@ def test_should_show_folder_permission_form_if_service_has_folder_permissions_en
     ('test@nonwhitelist.com', False)
 ])
 def test_invite_user(
-    logged_in_client,
+    client_request,
     active_user_with_permissions,
     mocker,
     sample_invite,
@@ -624,7 +619,6 @@ def test_invite_user(
     gov_user,
     mock_get_template_folders,
 ):
-    service = create_sample_service(active_user_with_permissions)
     sample_invite['email_address'] = 'test@example.gov.uk'
 
     data = [InvitedUser(**sample_invite)]
@@ -632,19 +626,19 @@ def test_invite_user(
     mocker.patch('app.invite_api_client.get_invites_for_service', return_value=data)
     mocker.patch('app.user_api_client.get_users_for_service', return_value=[active_user_with_permissions])
     mocker.patch('app.invite_api_client.create_invite', return_value=InvitedUser(**sample_invite))
-    response = logged_in_client.post(
-        url_for('main.invite_user', service_id=service['id']),
-        data={'email_address': email_address,
-              'view_activity': 'y',
-              'send_messages': 'y',
-              'manage_templates': 'y',
-              'manage_service': 'y',
-              'manage_api_keys': 'y'},
-        follow_redirects=True
+    page = client_request.post(
+        'main.invite_user',
+        service_id=SERVICE_ONE_ID,
+        _data={
+            'email_address': email_address,
+            'view_activity': 'y',
+            'send_messages': 'y',
+            'manage_templates': 'y',
+            'manage_service': 'y',
+            'manage_api_keys': 'y',
+        },
+        _follow_redirects=True,
     )
-
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert page.h1.string.strip() == 'Team members'
     flash_banner = page.find('div', class_='banner-default-with-tick').string.strip()
     assert flash_banner == 'Invite sent to test@example.gov.uk'
@@ -668,13 +662,13 @@ def test_invite_user(
     ('test@nonwhitelist.com', False)
 ])
 def test_invite_user_with_email_auth_service(
-    logged_in_client,
+    client_request,
+    service_one,
     active_user_with_permissions,
     sample_invite,
     email_address,
     gov_user,
     mocker,
-    service_one,
     auth_type,
     mock_get_template_folders,
 ):
@@ -686,20 +680,22 @@ def test_invite_user_with_email_auth_service(
     mocker.patch('app.invite_api_client.get_invites_for_service', return_value=data)
     mocker.patch('app.user_api_client.get_users_for_service', return_value=[active_user_with_permissions])
     mocker.patch('app.invite_api_client.create_invite', return_value=InvitedUser(**sample_invite))
-    response = logged_in_client.post(
-        url_for('main.invite_user', service_id=service_one['id']),
-        data={'email_address': email_address,
-              'view_activity': 'y',
-              'send_messages': 'y',
-              'manage_templates': 'y',
-              'manage_service': 'y',
-              'manage_api_keys': 'y',
-              'login_authentication': auth_type},
-        follow_redirects=True
+    page = client_request.post(
+        'main.invite_user',
+        service_id=SERVICE_ONE_ID,
+        _data={
+            'email_address': email_address,
+            'view_activity': 'y',
+            'send_messages': 'y',
+            'manage_templates': 'y',
+            'manage_service': 'y',
+            'manage_api_keys': 'y',
+            'login_authentication': auth_type,
+        },
+        _follow_redirects=True,
+        _expected_status=200,
     )
 
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert page.h1.string.strip() == 'Team members'
     flash_banner = page.find('div', class_='banner-default-with-tick').string.strip()
     assert flash_banner == 'Invite sent to test@example.gov.uk'
@@ -715,7 +711,7 @@ def test_invite_user_with_email_auth_service(
 
 
 def test_invite_user_sends_invite_with_all_folders_if_folder_permissions_not_enabled(
-    logged_in_client,
+    client_request,
     mocker,
     mock_get_template_folders,
     service_one
@@ -729,13 +725,16 @@ def test_invite_user_sends_invite_with_all_folders_if_folder_permissions_not_ena
     ]
     invite_mock = mocker.patch('app.invite_api_client.create_invite')
 
-    response = logged_in_client.post(
-        url_for('main.invite_user', service_id=service_one['id']),
-        data={'email_address': 'user@example.com',
-              'send_messages': 'y'},
-        follow_redirects=True
+    client_request.post(
+        'main.invite_user',
+        service_id=SERVICE_ONE_ID,
+        _data={
+            'email_address': 'user@example.com',
+            'send_messages': 'y',
+        },
+        _follow_redirects=True,
+        _expected_status=200,
     )
-    assert response.status_code == 200
 
     folder_data_sent = invite_mock.call_args[0][-1]
 
@@ -841,24 +840,24 @@ def test_manage_users_does_not_show_accepted_invite(
 
 
 def test_user_cant_invite_themselves(
-    logged_in_client,
+    client_request,
     mocker,
     active_user_with_permissions,
     mock_create_invite,
     mock_get_template_folders,
 ):
-    service = create_sample_service(active_user_with_permissions)
-    response = logged_in_client.post(
-        url_for('main.invite_user', service_id=service['id']),
-        data={'email_address': active_user_with_permissions.email_address,
-              'send_messages': 'y',
-              'manage_service': 'y',
-              'manage_api_keys': 'y'},
-        follow_redirects=True
+    page = client_request.post(
+        'main.invite_user',
+        service_id=SERVICE_ONE_ID,
+        _data={
+            'email_address': active_user_with_permissions.email_address,
+            'send_messages': 'y',
+            'manage_service': 'y',
+            'manage_api_keys': 'y',
+        },
+        _follow_redirects=True,
+        _expected_status=200,
     )
-
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert page.h1.string.strip() == 'Invite a team member'
     form_error = page.find('span', class_='error-message').string.strip()
     assert form_error == "You can’t send an invitation to yourself"
@@ -898,7 +897,7 @@ def test_remove_user_from_service(
 
 
 def test_can_invite_user_as_platform_admin(
-    logged_in_client,
+    client_request,
     service_one,
     platform_admin_user,
     active_user_with_permissions,
@@ -907,9 +906,11 @@ def test_can_invite_user_as_platform_admin(
 ):
     mocker.patch('app.user_api_client.get_users_for_service', return_value=[active_user_with_permissions])
 
-    response = logged_in_client.get(url_for('main.manage_users', service_id=service_one['id']))
-    resp_text = response.get_data(as_text=True)
-    assert url_for('.invite_user', service_id=service_one['id']) in resp_text
+    page = client_request.get(
+        'main.manage_users',
+        service_id=SERVICE_ONE_ID,
+    )
+    assert url_for('.invite_user', service_id=service_one['id']) in str(page)
 
 
 def test_edit_user_email_page(
@@ -947,24 +948,21 @@ def test_edit_user_email_page_404_for_non_team_member(
 
 
 def test_edit_user_email_redirects_to_confirmation(
-    logged_in_client,
+    client_request,
     active_user_with_permissions,
     mock_get_users_by_service,
-    service_one,
-    mocker,
-    mock_get_user,
 ):
-    response = logged_in_client.post(
-        url_for(
-            'main.edit_user_email',
-            service_id=service_one['id'],
-            user_id=active_user_with_permissions.id))
-    assert response.status_code == 302
-    assert response.location == url_for(
-        'main.confirm_edit_user_email',
-        service_id=service_one['id'],
+    client_request.post(
+        'main.edit_user_email',
+        service_id=SERVICE_ONE_ID,
         user_id=active_user_with_permissions.id,
-        _external=True
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.confirm_edit_user_email',
+            service_id=SERVICE_ONE_ID,
+            user_id=active_user_with_permissions.id,
+            _external=True,
+        ),
     )
 
 
@@ -993,48 +991,43 @@ def test_edit_user_email_without_changing_goes_back_to_team_members(
 
 
 def test_confirm_edit_user_email_page(
-    logged_in_client,
+    client_request,
     active_user_with_permissions,
     mock_get_users_by_service,
-    service_one,
-    mocker,
     mock_get_user,
 ):
     new_email = 'new_email@gov.uk'
-    with logged_in_client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         session['team_member_email_change'] = new_email
-    response = logged_in_client.get(url_for(
-        'main.confirm_edit_user_email',
-        service_id=service_one['id'],
-        user_id=active_user_with_permissions.id
-    ))
 
-    assert 'Confirm change of email address' in response.get_data(as_text=True)
+    page = client_request.get(
+        'main.confirm_edit_user_email',
+        service_id=SERVICE_ONE_ID,
+        user_id=active_user_with_permissions.id,
+    )
+
+    assert 'Confirm change of email address' in page.text
     for text in [
         'New email address:',
         new_email,
         'We will send {} an email to tell them about the change.'.format(active_user_with_permissions.name)
     ]:
-        assert text in response.get_data(as_text=True)
-    assert 'Confirm' in response.get_data(as_text=True)
-    assert response.status_code == 200
+        assert text in page.text
+    assert 'Confirm' in page.text
 
 
 def test_confirm_edit_user_email_page_redirects_if_session_empty(
-    logged_in_client,
-    active_user_with_permissions,
+    client_request,
     mock_get_users_by_service,
-    service_one,
-    mocker,
-    mock_get_user,
+    active_user_with_permissions,
 ):
-    response = logged_in_client.get(url_for(
+    page = client_request.get(
         'main.confirm_edit_user_email',
-        service_id=service_one['id'],
-        user_id=active_user_with_permissions.id
-    ))
-    assert response.status_code == 302
-    assert 'Confirm change of email address' not in response.get_data(as_text=True)
+        service_id=SERVICE_ONE_ID,
+        user_id=active_user_with_permissions.id,
+        _follow_redirects=True,
+    )
+    assert 'Confirm change of email address' not in page.text
 
 
 def test_confirm_edit_user_email_page_404s_for_non_team_member(
@@ -1050,7 +1043,7 @@ def test_confirm_edit_user_email_page_404s_for_non_team_member(
 
 
 def test_confirm_edit_user_email_changes_user_email(
-    logged_in_client,
+    client_request,
     active_user_with_permissions,
     mock_get_users_by_service,
     service_one,
@@ -1059,16 +1052,19 @@ def test_confirm_edit_user_email_changes_user_email(
     mock_update_user_attribute
 ):
     new_email = 'new_email@gov.uk'
-    with logged_in_client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         session['team_member_email_change'] = new_email
-    response = logged_in_client.post(
-        url_for(
-            'main.confirm_edit_user_email',
-            service_id=service_one['id'],
-            user_id=active_user_with_permissions.id))
-    assert response.status_code == 302
-    assert response.location == url_for(
-        'main.manage_users', service_id=service_one['id'], _external=True)
+    client_request.post(
+        'main.confirm_edit_user_email',
+        service_id=service_one['id'],
+        user_id=active_user_with_permissions.id,
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.manage_users',
+            service_id=SERVICE_ONE_ID,
+            _external=True,
+        ),
+    )
     mock_update_user_attribute.assert_called_once_with(
         active_user_with_permissions.id,
         email_address=new_email,
@@ -1162,51 +1158,49 @@ def test_edit_user_mobile_number_page(
 
 
 def test_edit_user_mobile_number_redirects_to_confirmation(
-    logged_in_client,
+    client_request,
     active_user_with_permissions,
     mock_get_users_by_service,
-    service_one,
-    mocker,
-    mock_get_user,
 ):
-
-    data = {'mobile_number': '07554080636'}
-    response = logged_in_client.post(
-        url_for(
-            'main.edit_user_mobile_number',
-            service_id=service_one['id'],
-            user_id=active_user_with_permissions.id), data=data)
-    assert response.status_code == 302
-    assert response.location == url_for(
-        'main.confirm_edit_user_mobile_number',
-        service_id=service_one['id'],
+    client_request.post(
+        'main.edit_user_mobile_number',
+        service_id=SERVICE_ONE_ID,
         user_id=active_user_with_permissions.id,
-        _external=True
+        _data={'mobile_number': '07554080636'},
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.confirm_edit_user_mobile_number',
+            service_id=SERVICE_ONE_ID,
+            user_id=active_user_with_permissions.id,
+            _external=True,
+        ),
     )
 
 
 def test_edit_user_mobile_number_redirects_to_manage_users_if_number_not_changed(
-    logged_in_client,
+    client_request,
     active_user_with_permissions,
     mock_get_users_by_service,
     service_one,
     mocker,
     mock_get_user,
 ):
-
-    data = {'mobile_number': '0770••••762'}
-    response = logged_in_client.post(
-        url_for(
-            'main.edit_user_mobile_number',
-            service_id=service_one['id'],
-            user_id=active_user_with_permissions.id), data=data)
-    assert response.status_code == 302
-    assert response.location == url_for(
-        'main.manage_users', service_id=service_one['id'], _external=True)
+    client_request.post(
+        'main.edit_user_mobile_number',
+        service_id=SERVICE_ONE_ID,
+        user_id=active_user_with_permissions.id,
+        _data={'mobile_number': '0770••••762'},
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.manage_users',
+            service_id=SERVICE_ONE_ID,
+            _external=True,
+        ),
+    )
 
 
 def test_confirm_edit_user_mobile_number_page(
-    logged_in_client,
+    client_request,
     active_user_with_permissions,
     mock_get_users_by_service,
     service_one,
@@ -1214,44 +1208,43 @@ def test_confirm_edit_user_mobile_number_page(
     mock_get_user,
 ):
     new_number = '07554080636'
-    with logged_in_client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         session['team_member_mobile_change'] = new_number
-    response = logged_in_client.get(url_for(
+    page = client_request.get(
         'main.confirm_edit_user_mobile_number',
-        service_id=service_one['id'],
-        user_id=active_user_with_permissions.id
-    ))
+        service_id=SERVICE_ONE_ID,
+        user_id=active_user_with_permissions.id,
+    )
 
-    assert response.status_code == 200
-    assert 'Confirm change of mobile number' in response.get_data(as_text=True)
+    assert 'Confirm change of mobile number' in page.text
     for text in [
         'New mobile number:',
         new_number,
         'We will send {} a text message to tell them about the change.'.format(active_user_with_permissions.name)
     ]:
-        assert text in response.get_data(as_text=True)
-    assert 'Confirm' in response.get_data(as_text=True)
+        assert text in page.text
+    assert 'Confirm' in page.text
 
 
 def test_confirm_edit_user_mobile_number_page_redirects_if_session_empty(
-    logged_in_client,
+    client_request,
     active_user_with_permissions,
     mock_get_users_by_service,
     service_one,
     mocker,
     mock_get_user,
 ):
-    response = logged_in_client.get(url_for(
+    page = client_request.get(
         'main.confirm_edit_user_mobile_number',
-        service_id=service_one['id'],
-        user_id=active_user_with_permissions.id
-    ))
-    assert response.status_code == 302
-    assert 'Confirm change of mobile number' not in response.get_data(as_text=True)
+        service_id=SERVICE_ONE_ID,
+        user_id=active_user_with_permissions.id,
+        _expected_status=302,
+    )
+    assert 'Confirm change of mobile number' not in page.text
 
 
 def test_confirm_edit_user_mobile_number_changes_user_mobile_number(
-    logged_in_client,
+    client_request,
     active_user_with_permissions,
     mock_get_users_by_service,
     service_one,
@@ -1260,16 +1253,19 @@ def test_confirm_edit_user_mobile_number_changes_user_mobile_number(
     mock_update_user_attribute
 ):
     new_number = '07554080636'
-    with logged_in_client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         session['team_member_mobile_change'] = new_number
-    response = logged_in_client.post(
-        url_for(
-            'main.confirm_edit_user_mobile_number',
-            service_id=service_one['id'],
-            user_id=active_user_with_permissions.id))
-    assert response.status_code == 302
-    assert response.location == url_for(
-        'main.manage_users', service_id=service_one['id'], _external=True)
+    client_request.post(
+        'main.confirm_edit_user_mobile_number',
+        service_id=SERVICE_ONE_ID,
+        user_id=active_user_with_permissions.id,
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.manage_users',
+            service_id=SERVICE_ONE_ID,
+            _external=True,
+        ),
+    )
     mock_update_user_attribute.assert_called_once_with(
         active_user_with_permissions.id,
         mobile_number=new_number,

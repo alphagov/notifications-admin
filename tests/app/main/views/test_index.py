@@ -32,17 +32,21 @@ def test_non_logged_in_user_can_see_homepage(
 
 
 def test_logged_in_user_redirects_to_choose_account(
-    logged_in_client,
+    client_request,
     api_user_active,
     mock_get_user,
     mock_get_user_by_email,
     mock_login,
 ):
-    response = logged_in_client.get(url_for('main.index'))
-    assert response.status_code == 302
-
-    response = logged_in_client.get(url_for('main.sign_in', follow_redirects=True))
-    assert response.location == url_for('main.show_accounts_or_dashboard', _external=True)
+    client_request.get(
+        'main.index',
+        _expected_status=302,
+    )
+    client_request.get(
+        'main.sign_in',
+        _expected_status=302,
+        _expected_redirect=url_for('main.show_accounts_or_dashboard', _external=True)
+    )
 
 
 def test_robots(client):
@@ -76,16 +80,18 @@ def test_static_pages(
     ('trial_mode', 'trial-mode'),
 ])
 def test_old_static_pages_redirect_to_using_notify_with_anchor(
-    client,
+    client_request,
     view,
     expected_anchor,
 ):
-    response = client.get(url_for('main.{}'.format(view)))
-    assert response.status_code == 301
-    assert response.location == url_for(
-        'main.using_notify',
-        _anchor=expected_anchor,
-        _external=True
+    client_request.get(
+        'main.{}'.format(view),
+        _expected_status=301,
+        _expected_redirect=url_for(
+            'main.using_notify',
+            _anchor=expected_anchor,
+            _external=True
+        ),
     )
 
 

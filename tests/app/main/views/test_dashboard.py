@@ -1,11 +1,9 @@
 import copy
 import json
 from datetime import datetime
-from functools import partial
 from unittest.mock import call
 
 import pytest
-from bs4 import BeautifulSoup
 from flask import url_for
 from freezegun import freeze_time
 
@@ -138,7 +136,7 @@ def test_redirect_caseworkers_to_templates(
 
 
 def test_get_started(
-    logged_in_client,
+    client_request,
     mocker,
     mock_get_service_templates_when_no_templates_exist,
     mock_get_jobs,
@@ -151,15 +149,17 @@ def test_get_started(
         return_value=copy.deepcopy(stub_template_stats)
     )
 
-    response = logged_in_client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
+    page = client_request.get(
+        'main.service_dashboard',
+        service_id=SERVICE_ONE_ID,
+    )
 
-    # mock_get_service_templates_when_no_templates_exist.assert_called_once_with(SERVICE_ONE_ID)
-    assert response.status_code == 200
-    assert 'Get started' in response.get_data(as_text=True)
+    mock_get_service_templates_when_no_templates_exist.assert_called_once_with(SERVICE_ONE_ID)
+    assert 'Get started' in page.text
 
 
 def test_get_started_is_hidden_once_templates_exist(
-    logged_in_client,
+    client_request,
     mocker,
     mock_get_service_templates,
     mock_get_jobs,
@@ -171,15 +171,17 @@ def test_get_started_is_hidden_once_templates_exist(
         'app.template_statistics_client.get_template_statistics_for_service',
         return_value=copy.deepcopy(stub_template_stats)
     )
-    response = logged_in_client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
+    page = client_request.get(
+        'main.service_dashboard',
+        service_id=SERVICE_ONE_ID,
+    )
 
-    # mock_get_service_templates.assert_called_once_with(SERVICE_ONE_ID)
-    assert response.status_code == 200
-    assert 'Get started' not in response.get_data(as_text=True)
+    mock_get_service_templates.assert_called_once_with(SERVICE_ONE_ID)
+    assert 'Get started' not in page.text
 
 
 def test_inbound_messages_not_visible_to_service_without_permissions(
-    logged_in_client,
+    client_request,
     service_one,
     mock_get_service_templates_when_no_templates_exist,
     mock_get_jobs,
@@ -191,10 +193,11 @@ def test_inbound_messages_not_visible_to_service_without_permissions(
 
     service_one['permissions'] = []
 
-    response = logged_in_client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    page = client_request.get(
+        'main.service_dashboard',
+        service_id=SERVICE_ONE_ID,
+    )
 
-    assert response.status_code == 200
     assert not page.select('.big-number-meta-wrapper')
     assert mock_get_inbound_sms_summary.called is False
 
@@ -204,7 +207,7 @@ def test_inbound_messages_not_visible_to_service_without_permissions(
     (mock_get_inbound_sms_summary, '99 text messages received latest message just now'),
 ])
 def test_inbound_messages_shows_count_of_messages(
-    logged_in_client,
+    client_request,
     mocker,
     service_one,
     mock_get_service_templates_when_no_templates_exist,
@@ -219,10 +222,11 @@ def test_inbound_messages_shows_count_of_messages(
     service_one['permissions'] = ['inbound_sms']
     inbound_summary_mock(mocker)
 
-    response = logged_in_client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    page = client_request.get(
+        'main.service_dashboard',
+        service_id=SERVICE_ONE_ID,
+    )
 
-    assert response.status_code == 200
     assert normalize_spaces(page.select('.big-number-meta-wrapper')[0].text) == expected_text
     assert page.select('.big-number-meta-wrapper a')[0]['href'] == url_for(
         'main.inbox', service_id=SERVICE_ONE_ID
@@ -240,7 +244,7 @@ def test_inbound_messages_shows_count_of_messages(
     '07900 900008 message-8 9 hours ago',
 ]))
 def test_inbox_showing_inbound_messages(
-    logged_in_client,
+    client_request,
     service_one,
     mock_get_service_templates_when_no_templates_exist,
     mock_get_jobs,
@@ -254,10 +258,11 @@ def test_inbox_showing_inbound_messages(
 
     service_one['permissions'] = ['inbound_sms']
 
-    response = logged_in_client.get(url_for('main.inbox', service_id=SERVICE_ONE_ID))
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    page = client_request.get(
+        'main.inbox',
+        service_id=SERVICE_ONE_ID,
+    )
 
-    assert response.status_code == 200
     rows = page.select('tbody tr')
     assert len(rows) == 8
     assert normalize_spaces(rows[index].text) == expected_row
@@ -268,7 +273,7 @@ def test_inbox_showing_inbound_messages(
 
 
 def test_get_inbound_sms_shows_page_links(
-    logged_in_client,
+    client_request,
     service_one,
     mock_get_service_templates_when_no_templates_exist,
     mock_get_jobs,
@@ -280,16 +285,18 @@ def test_get_inbound_sms_shows_page_links(
 ):
     service_one['permissions'] = ['inbound_sms']
 
-    response = logged_in_client.get(url_for('main.inbox', service_id=SERVICE_ONE_ID, page=2))
+    page = client_request.get(
+        'main.inbox',
+        service_id=SERVICE_ONE_ID,
+        page=2,
+    )
 
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert 'Next page' in page.find('li', {'class': 'next-page'}).text
     assert 'Previous page' in page.find('li', {'class': 'previous-page'}).text
 
 
 def test_empty_inbox(
-    logged_in_client,
+    client_request,
     service_one,
     mock_get_service_templates_when_no_templates_exist,
     mock_get_jobs,
@@ -302,10 +309,11 @@ def test_empty_inbox(
 
     service_one['permissions'] = ['inbound_sms']
 
-    response = logged_in_client.get(url_for('main.inbox', service_id=SERVICE_ONE_ID))
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    page = client_request.get(
+        'main.inbox',
+        service_id=SERVICE_ONE_ID,
+    )
 
-    assert response.status_code == 200
     assert normalize_spaces(page.select('tbody tr')) == (
         'When users text your service’s phone number (0781239871) you’ll see the messages here'
     )
@@ -319,14 +327,16 @@ def test_empty_inbox(
     'main.inbox_updates',
 ])
 def test_inbox_not_accessible_to_service_without_permissions(
-    logged_in_client,
+    client_request,
     service_one,
     endpoint,
 ):
     service_one['permissions'] = []
-    response = logged_in_client.get(url_for(endpoint, service_id=SERVICE_ONE_ID))
-
-    assert response.status_code == 403
+    client_request.get(
+        endpoint,
+        service_id=SERVICE_ONE_ID,
+        _expected_status=403,
+    )
 
 
 def test_anyone_can_see_inbox(
@@ -441,7 +451,7 @@ def test_download_inbox_strips_formulae(
 
 
 def test_should_show_recent_templates_on_dashboard(
-    logged_in_client,
+    client_request,
     mocker,
     mock_get_service_templates,
     mock_get_jobs,
@@ -452,13 +462,13 @@ def test_should_show_recent_templates_on_dashboard(
     mock_template_stats = mocker.patch('app.template_statistics_client.get_template_statistics_for_service',
                                        return_value=copy.deepcopy(stub_template_stats))
 
-    response = logged_in_client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
+    page = client_request.get(
+        'main.service_dashboard',
+        service_id=SERVICE_ONE_ID,
+    )
 
-    assert response.status_code == 200
-    response.get_data(as_text=True)
     mock_template_stats.assert_called_once_with(SERVICE_ONE_ID, limit_days=7)
 
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     headers = [header.text.strip() for header in page.find_all('h2') + page.find_all('h1')]
     assert 'In the last 7 days' in headers
 
@@ -484,39 +494,40 @@ def test_should_show_recent_templates_on_dashboard(
 
 
 @freeze_time("2016-07-01 12:00")  # 4 months into 2016 financial year
-@pytest.mark.parametrize('partial_url', [
-    partial(url_for),
-    partial(url_for, year='2016'),
+@pytest.mark.parametrize('extra_args', [
+    {},
+    {'year': '2016'},
 ])
 def test_should_show_redirect_from_template_history(
-        logged_in_client,
-        partial_url,
+    client_request,
+    extra_args,
 ):
-    response = logged_in_client.get(
-        partial_url('main.template_history', service_id=SERVICE_ONE_ID, _external=True)
+    client_request.get(
+        'main.template_history',
+        service_id=SERVICE_ONE_ID,
+        _expected_status=301,
+        **extra_args,
     )
-
-    assert response.status_code == 301
 
 
 @freeze_time("2016-07-01 12:00")  # 4 months into 2016 financial year
-@pytest.mark.parametrize('partial_url', [
-    partial(url_for),
-    partial(url_for, year='2016'),
+@pytest.mark.parametrize('extra_args', [
+    {},
+    {'year': '2016'},
 ])
 def test_should_show_monthly_breakdown_of_template_usage(
-    logged_in_client,
+    client_request,
     mock_get_monthly_template_usage,
-    partial_url,
+    extra_args,
 ):
-    response = logged_in_client.get(
-        partial_url('main.template_usage', service_id=SERVICE_ONE_ID, _external=True)
+    page = client_request.get(
+        'main.template_usage',
+        service_id=SERVICE_ONE_ID,
+        **extra_args
     )
 
-    assert response.status_code == 200
     mock_get_monthly_template_usage.assert_called_once_with(SERVICE_ONE_ID, 2016)
 
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     table_rows = page.select('tbody tr')
 
     assert ' '.join(table_rows[0].text.split()) == (
@@ -603,7 +614,7 @@ def test_monthly_has_equal_length_tables(
 
 @freeze_time("2016-01-01 11:09:00.061258")
 def test_should_show_upcoming_jobs_on_dashboard(
-    logged_in_client,
+    client_request,
     mock_get_service_templates,
     mock_get_template_statistics,
     mock_get_service_statistics,
@@ -611,15 +622,14 @@ def test_should_show_upcoming_jobs_on_dashboard(
     mock_get_usage,
     mock_get_inbound_sms_summary
 ):
-    response = logged_in_client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
+    page = client_request.get(
+        'main.service_dashboard',
+        service_id=SERVICE_ONE_ID,
+    )
 
     second_call = mock_get_jobs.call_args_list[1]
     assert second_call[0] == (SERVICE_ONE_ID,)
     assert second_call[1]['statuses'] == ['scheduled']
-
-    assert response.status_code == 200
-
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
     table_rows = page.find_all('tbody')[0].find_all('tr')
     assert len(table_rows) == 2
@@ -732,7 +742,7 @@ def test_correct_font_size_for_big_numbers(
 
 @freeze_time("2016-01-01 11:09:00.061258")
 def test_should_show_recent_jobs_on_dashboard(
-    logged_in_client,
+    client_request,
     mock_get_service_templates,
     mock_get_template_statistics,
     mock_get_service_statistics,
@@ -740,16 +750,16 @@ def test_should_show_recent_jobs_on_dashboard(
     mock_get_usage,
     mock_get_inbound_sms_summary
 ):
-    response = logged_in_client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
+    page = client_request.get(
+        'main.service_dashboard',
+        service_id=SERVICE_ONE_ID,
+    )
 
     third_call = mock_get_jobs.call_args_list[2]
     assert third_call[0] == (SERVICE_ONE_ID,)
     assert third_call[1]['limit_days'] == 7
     assert 'scheduled' not in third_call[1]['statuses']
 
-    assert response.status_code == 200
-
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     table_rows = page.find_all('tbody')[2].find_all('tr')
 
     assert len(table_rows) == 4
@@ -768,20 +778,19 @@ def test_should_show_recent_jobs_on_dashboard(
 
 @freeze_time("2012-03-31 12:12:12")
 def test_usage_page(
-    logged_in_client,
+    client_request,
     mock_get_usage,
     mock_get_billable_units,
     mock_get_free_sms_fragment_limit
 ):
-    response = logged_in_client.get(url_for('main.usage', service_id=SERVICE_ONE_ID))
-
-    assert response.status_code == 200
+    page = client_request.get(
+        'main.usage',
+        service_id=SERVICE_ONE_ID,
+    )
 
     mock_get_billable_units.assert_called_once_with(SERVICE_ONE_ID, 2011)
     mock_get_usage.assert_called_once_with(SERVICE_ONE_ID, 2011)
     mock_get_free_sms_fragment_limit.assert_called_with(SERVICE_ONE_ID, 2011)
-
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
     cols = page.find_all('div', {'class': 'column-half'})
     nav = page.find('ul', {'class': 'pill', 'role': 'tablist'})
@@ -809,22 +818,21 @@ def test_usage_page(
 
 @freeze_time("2012-03-31 12:12:12")
 def test_usage_page_with_letters(
-    logged_in_client,
+    client_request,
     service_one,
     mock_get_usage,
     mock_get_billable_units,
     mock_get_free_sms_fragment_limit
 ):
     service_one['permissions'].append('letter')
-    response = logged_in_client.get(url_for('main.usage', service_id=SERVICE_ONE_ID))
-
-    assert response.status_code == 200
+    page = client_request.get(
+        'main.usage',
+        service_id=SERVICE_ONE_ID,
+    )
 
     mock_get_billable_units.assert_called_once_with(SERVICE_ONE_ID, 2011)
     mock_get_usage.assert_called_once_with(SERVICE_ONE_ID, 2011)
     mock_get_free_sms_fragment_limit.assert_called_with(SERVICE_ONE_ID, 2011)
-
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
     cols = page.find_all('div', {'class': 'column-one-third'})
     nav = page.find('ul', {'class': 'pill', 'role': 'tablist'})
@@ -855,7 +863,7 @@ def test_usage_page_with_letters(
 @freeze_time("2012-04-30 12:12:12")
 def test_usage_page_displays_letters_ordered_by_postage(
     mocker,
-    logged_in_client,
+    client_request,
     service_one,
     mock_get_usage,
     mock_get_free_sms_fragment_limit
@@ -867,9 +875,11 @@ def test_usage_page_displays_letters_ordered_by_postage(
     ]
     mocker.patch('app.billing_api_client.get_billable_units_ft', return_value=billable_units_resp)
     service_one['permissions'].append('letter')
-    response = logged_in_client.get(url_for('main.usage', service_id=SERVICE_ONE_ID))
+    page = client_request.get(
+        'main.usage',
+        service_id=SERVICE_ONE_ID,
+    )
 
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     row_for_april = page.find('table').find('tr', class_='table-row')
     postage_details = row_for_april.find_all('li', class_='tabular-numbers')
 
@@ -892,19 +902,28 @@ def test_usage_page_with_year_argument(
 
 
 def test_usage_page_for_invalid_year(
-    logged_in_client,
+    client_request,
 ):
-    assert logged_in_client.get(url_for('main.usage', service_id=SERVICE_ONE_ID, year='abcd')).status_code == 404
+    client_request.get(
+        'main.usage',
+        service_id=SERVICE_ONE_ID,
+        year='abcd',
+        _expected_status=404,
+    )
 
 
 @freeze_time("2012-03-31 12:12:12")
 def test_future_usage_page(
-    logged_in_client,
+    client_request,
     mock_get_future_usage,
     mock_get_future_billable_units,
     mock_get_free_sms_fragment_limit
 ):
-    assert logged_in_client.get(url_for('main.usage', service_id=SERVICE_ONE_ID, year=2014)).status_code == 200
+    client_request.get(
+        'main.usage',
+        service_id=SERVICE_ONE_ID,
+        year=2014,
+    )
 
     mock_get_future_billable_units.assert_called_once_with(SERVICE_ONE_ID, 2014)
     mock_get_future_usage.assert_called_once_with(SERVICE_ONE_ID, 2014)
@@ -1104,7 +1123,7 @@ def test_aggregate_notifications_stats():
 
 def test_service_dashboard_updates_gets_dashboard_totals(
     mocker,
-    logged_in_client,
+    client_request,
     mock_get_service_templates,
     mock_get_template_statistics,
     mock_get_service_statistics,
@@ -1117,11 +1136,11 @@ def test_service_dashboard_updates_gets_dashboard_totals(
         'sms': {'requested': 456, 'delivered': 0, 'failed': 0}
     })
 
-    response = logged_in_client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
+    page = client_request.get(
+        'main.service_dashboard',
+        service_id=SERVICE_ONE_ID,
+    )
 
-    assert response.status_code == 200
-
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     numbers = [number.text.strip() for number in page.find_all('div', class_='big-number-number')]
     assert '123' in numbers
     assert '456' in numbers

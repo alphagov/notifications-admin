@@ -39,15 +39,14 @@ def test_sign_in_explains_other_browser(logged_in_client, api_user_active, mocke
 
 
 def test_doesnt_redirect_to_sign_in_if_no_session_info(
-    logged_in_client, api_user_active
+    client_request, api_user_active
 ):
     assert api_user_active.current_session_id is None
 
-    with logged_in_client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         session['current_session_id'] = None
 
-    response = logged_in_client.get(url_for('main.add_service'))
-    assert response.status_code == 200
+    client_request.get('main.add_service')
 
 
 @pytest.mark.parametrize('db_sess_id, cookie_sess_id', [

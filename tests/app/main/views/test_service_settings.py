@@ -242,42 +242,41 @@ def test_if_cant_send_letters_then_cant_see_letter_contact_block(
 
 
 def test_letter_contact_block_shows_none_if_not_set(
-        logged_in_client,
-        service_one,
-        mocker,
-        single_reply_to_email_address,
-        no_letter_contact_blocks,
-        mock_get_service_organisation,
-        single_sms_sender,
-        mock_get_service_settings_page_common,
+    client_request,
+    service_one,
+    single_reply_to_email_address,
+    no_letter_contact_blocks,
+    mock_get_service_organisation,
+    single_sms_sender,
+    mock_get_service_settings_page_common,
 ):
     service_one['permissions'] = ['letter']
-    response = logged_in_client.get(url_for(
-        'main.service_settings', service_id=service_one['id']
-    ))
+    page = client_request.get(
+        'main.service_settings',
+        service_id=SERVICE_ONE_ID,
+    )
 
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     div = page.find_all('tr')[9].find_all('td')[1].div
     assert div.text.strip() == 'Not set'
     assert 'default' in div.attrs['class'][0]
 
 
 def test_escapes_letter_contact_block(
-        logged_in_client,
-        service_one,
-        mocker,
-        single_reply_to_email_address,
-        single_sms_sender,
-        mock_get_service_organisation,
-        injected_letter_contact_block,
-        mock_get_service_settings_page_common,
+    client_request,
+    service_one,
+    mocker,
+    single_reply_to_email_address,
+    single_sms_sender,
+    mock_get_service_organisation,
+    injected_letter_contact_block,
+    mock_get_service_settings_page_common,
 ):
     service_one['permissions'] = ['letter']
-    response = logged_in_client.get(url_for(
-        'main.service_settings', service_id=service_one['id']
-    ))
+    page = client_request.get(
+        'main.service_settings',
+        service_id=SERVICE_ONE_ID,
+    )
 
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     div = str(page.find_all('tr')[9].find_all('td')[1].div)
     assert 'foo<br/>bar' in div
     assert '<script>' not in div
@@ -308,20 +307,23 @@ def test_should_show_service_name_with_no_prefixing(
 
 
 def test_should_redirect_after_change_service_name(
-        logged_in_client,
-        service_one,
-        mock_update_service,
-        mock_service_name_is_unique
+    client_request,
+    mock_update_service,
+    mock_service_name_is_unique,
 ):
-    response = logged_in_client.post(
-        url_for('main.service_name_change', service_id=service_one['id']),
-        data={'name': "new name"})
+    client_request.post(
+        'main.service_name_change',
+        service_id=SERVICE_ONE_ID,
+        _data={'name': "new name"},
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.service_name_change_confirm',
+            service_id=SERVICE_ONE_ID,
+            _external=True,
+        )
+    )
 
-    assert response.status_code == 302
-    settings_url = url_for(
-        'main.service_name_change_confirm', service_id=service_one['id'], _external=True)
-    assert settings_url == response.location
-    assert mock_service_name_is_unique.called
+    assert mock_service_name_is_unique.called is True
 
 
 def test_should_not_hit_api_if_service_name_hasnt_changed(
@@ -357,10 +359,8 @@ def test_should_not_hit_api_if_service_name_hasnt_changed(
     ),
 ])
 def test_show_restricted_service(
-    client,
-    mocker,
+    client_request,
     fake_uuid,
-    service_one,
     single_reply_to_email_address,
     single_letter_contact_block,
     mock_get_service_organisation,
@@ -370,9 +370,12 @@ def test_show_restricted_service(
     expected_text,
     expected_link,
 ):
-    client.login(user(fake_uuid), mocker, service_one)
-    response = client.get(url_for('main.service_settings', service_id=service_one['id']))
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    client_request.login(user(fake_uuid))
+    page = client_request.get(
+        'main.service_settings',
+        service_id=SERVICE_ONE_ID,
+    )
+
     assert page.find('h1').text == 'Settings'
     assert page.find_all('h2')[0].text == 'Your service is in trial mode'
 
@@ -383,68 +386,76 @@ def test_show_restricted_service(
 
     if expected_link:
         assert request_to_live_link.text.strip() == 'request to go live'
-        assert request_to_live_link['href'] == url_for('main.request_to_go_live', service_id=service_one['id'])
+        assert request_to_live_link['href'] == url_for('main.request_to_go_live', service_id=SERVICE_ONE_ID)
     else:
         assert not request_to_live_link
 
 
 def test_switch_service_to_live(
-        logged_in_platform_admin_client,
-        service_one,
-        mock_update_service,
-        mock_get_inbound_number_for_service
+    client_request,
+    platform_admin_user,
+    mock_update_service,
+    mock_get_inbound_number_for_service
 ):
-    response = logged_in_platform_admin_client.post(
-        url_for('main.service_switch_live', service_id=service_one['id']),
-        data={'enabled': 'True'}
+    client_request.login(platform_admin_user)
+    client_request.post(
+        'main.service_switch_live',
+        service_id=SERVICE_ONE_ID,
+        _data={'enabled': 'True'},
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.service_settings',
+            service_id=SERVICE_ONE_ID,
+            _external=True,
+        )
     )
-    assert response.status_code == 302
-    assert response.location == url_for(
-        'main.service_settings',
-        service_id=service_one['id'], _external=True)
     mock_update_service.assert_called_with(
-        service_one['id'],
+        SERVICE_ONE_ID,
         message_limit=250000,
         restricted=False
     )
 
 
 def test_show_live_service(
-        logged_in_client,
-        service_one,
-        mock_get_live_service,
-        single_reply_to_email_address,
-        single_letter_contact_block,
-        mock_get_service_organisation,
-        single_sms_sender,
-        mock_get_service_settings_page_common,
+    client_request,
+    mock_get_live_service,
+    single_reply_to_email_address,
+    single_letter_contact_block,
+    mock_get_service_organisation,
+    single_sms_sender,
+    mock_get_service_settings_page_common,
 ):
-    response = logged_in_client.get(url_for('main.service_settings', service_id=service_one['id']))
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    page = client_request.get(
+        'main.service_settings',
+        service_id=SERVICE_ONE_ID,
+    )
     assert page.find('h1').text.strip() == 'Settings'
     assert 'Your service is in trial mode' not in page.text
 
 
 def test_switch_service_to_restricted(
-        logged_in_platform_admin_client,
-        service_one,
-        mock_get_live_service,
-        mock_update_service,
-        mock_get_inbound_number_for_service,
+    client_request,
+    platform_admin_user,
+    mock_get_live_service,
+    mock_update_service,
+    mock_get_inbound_number_for_service,
 ):
-    response = logged_in_platform_admin_client.post(
-        url_for('main.service_switch_live', service_id=service_one['id']),
-        data={'enabled': 'False'}
-
+    client_request.login(platform_admin_user)
+    client_request.post(
+        'main.service_switch_live',
+        service_id=SERVICE_ONE_ID,
+        _data={'enabled': 'False'},
+        _expected_status=302,
+        _expected_response=url_for(
+            'main.service_settings',
+            service_id=SERVICE_ONE_ID,
+            _external=True,
+        )
     )
-    assert response.status_code == 302
-    assert response.location == url_for(
-        'main.service_settings',
-        service_id=service_one['id'], _external=True)
     mock_update_service.assert_called_with(
-        service_one['id'],
+        SERVICE_ONE_ID,
         message_limit=50,
-        restricted=True
+        restricted=True,
     )
 
 
@@ -508,75 +519,83 @@ def test_switch_service_to_count_as_live(
 
 
 def test_should_not_allow_duplicate_names(
-        logged_in_client,
-        mock_service_name_is_not_unique,
-        service_one,
+    client_request,
+    mock_service_name_is_not_unique,
+    service_one,
 ):
-    service_id = service_one['id']
-    response = logged_in_client.post(
-        url_for('main.service_name_change', service_id=service_id),
-        data={'name': "SErvICE TWO"})
+    page = client_request.post(
+        'main.service_name_change',
+        service_id=SERVICE_ONE_ID,
+        _data={'name': "SErvICE TWO"},
+        _expected_status=200,
+    )
 
-    assert response.status_code == 200
-    resp_data = response.get_data(as_text=True)
-    assert 'This service name is already in use' in resp_data
-    app.service_api_client.is_service_name_unique.assert_called_once_with(service_id, 'SErvICE TWO', 'service.two')
+    assert 'This service name is already in use' in page.text
+    app.service_api_client.is_service_name_unique.assert_called_once_with(
+        SERVICE_ONE_ID,
+        'SErvICE TWO',
+        'service.two',
+    )
 
 
 def test_should_show_service_name_confirmation(
-        logged_in_client,
-        service_one,
+    client_request,
 ):
-    response = logged_in_client.get(url_for(
-        'main.service_name_change_confirm', service_id=service_one['id']))
-
-    assert response.status_code == 200
-    resp_data = response.get_data(as_text=True)
-    assert 'Change your service name' in resp_data
-    app.service_api_client.get_service.assert_called_with(service_one['id'])
+    page = client_request.get(
+        'main.service_name_change_confirm',
+        service_id=SERVICE_ONE_ID,
+    )
+    assert 'Change your service name' in page.text
+    app.service_api_client.get_service.assert_called_with(SERVICE_ONE_ID)
 
 
 def test_should_redirect_after_service_name_confirmation(
-        logged_in_client,
-        service_one,
-        mock_update_service,
-        mock_verify_password,
-        mock_get_inbound_number_for_service,
+    client_request,
+    mock_update_service,
+    mock_verify_password,
+    mock_get_inbound_number_for_service,
 ):
-    service_id = service_one['id']
     service_new_name = 'New Name'
-    with logged_in_client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         session['service_name_change'] = service_new_name
-    response = logged_in_client.post(url_for(
-        'main.service_name_change_confirm', service_id=service_id))
+    client_request.post(
+        'main.service_name_change_confirm',
+        service_id=SERVICE_ONE_ID,
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.service_settings',
+            service_id=SERVICE_ONE_ID,
+            _external=True,
+        ),
+    )
 
-    assert response.status_code == 302
-    settings_url = url_for('main.service_settings', service_id=service_id, _external=True)
-    assert settings_url == response.location
     mock_update_service.assert_called_once_with(
-        service_id,
+        SERVICE_ONE_ID,
         name=service_new_name,
         email_from=email_safe(service_new_name)
     )
-    assert mock_verify_password.called
+    assert mock_verify_password.called is True
 
 
 def test_should_raise_duplicate_name_handled(
-        logged_in_client,
-        service_one,
-        mock_update_service_raise_httperror_duplicate_name,
-        mock_verify_password
+    client_request,
+    mock_update_service_raise_httperror_duplicate_name,
+    mock_verify_password,
 ):
-    service_new_name = 'New Name'
-    with logged_in_client.session_transaction() as session:
-        session['service_name_change'] = service_new_name
-    response = logged_in_client.post(url_for(
-        'main.service_name_change_confirm', service_id=service_one['id']))
+    with client_request.session_transaction() as session:
+        session['service_name_change'] = 'New Name'
 
-    assert response.status_code == 302
-    name_change_url = url_for(
-        'main.service_name_change', service_id=service_one['id'], _external=True)
-    assert name_change_url == response.location
+    client_request.post(
+        'main.service_name_change_confirm',
+        service_id=SERVICE_ONE_ID,
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.service_name_change',
+            service_id=SERVICE_ONE_ID,
+            _external=True,
+        ),
+    )
+
     assert mock_update_service_raise_httperror_duplicate_name.called
     assert mock_verify_password.called
 
@@ -2289,7 +2308,7 @@ def test_inbound_sms_sender_is_not_editable(
 
 
 def test_shows_research_mode_indicator(
-    logged_in_client,
+    client_request,
     service_one,
     mocker,
     single_reply_to_email_address,
@@ -2301,106 +2320,112 @@ def test_shows_research_mode_indicator(
     service_one['research_mode'] = True
     mocker.patch('app.service_api_client.update_service', return_value=service_one)
 
-    response = logged_in_client.get(url_for('main.service_settings', service_id=service_one['id']))
-    assert response.status_code == 200
+    page = client_request.get(
+        'main.service_settings',
+        service_id=SERVICE_ONE_ID,
+    )
 
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     element = page.find('span', {"id": "research-mode"})
     assert element.text == 'research mode'
 
 
 def test_does_not_show_research_mode_indicator(
-    logged_in_client,
-    service_one,
+    client_request,
     single_reply_to_email_address,
     single_letter_contact_block,
     mock_get_service_organisation,
     single_sms_sender,
     mock_get_service_settings_page_common,
 ):
-    response = logged_in_client.get(url_for('main.service_settings', service_id=service_one['id']))
-    assert response.status_code == 200
+    page = client_request.get(
+        'main.service_settings',
+        service_id=SERVICE_ONE_ID,
+    )
 
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     element = page.find('span', {"id": "research-mode"})
     assert not element
 
 
 @pytest.mark.parametrize('method', ['get', 'post'])
 def test_cant_set_letter_contact_block_if_service_cant_send_letters(
-    logged_in_client,
+    client_request,
     service_one,
     method,
 ):
     assert 'letter' not in service_one['permissions']
-    response = getattr(logged_in_client, method)(
-        url_for('main.service_set_letter_contact_block', service_id=service_one['id'])
+    getattr(client_request, method)(
+        'main.service_set_letter_contact_block',
+        service_id=SERVICE_ONE_ID,
+        _expected_status=403,
     )
-    assert response.status_code == 403
 
 
 def test_set_letter_contact_block_prepopulates(
-    logged_in_client,
+    client_request,
     service_one,
 ):
     service_one['permissions'] = ['letter']
     service_one['letter_contact_block'] = 'foo bar baz waz'
-    response = logged_in_client.get(url_for('main.service_set_letter_contact_block', service_id=service_one['id']))
-    assert response.status_code == 200
-    assert 'foo bar baz waz' in response.get_data(as_text=True)
+    page = client_request.get(
+        'main.service_set_letter_contact_block',
+        service_id=SERVICE_ONE_ID,
+    )
+    assert 'foo bar baz waz' in page.text
 
 
 def test_set_letter_contact_block_saves(
-    logged_in_client,
+    client_request,
     service_one,
     mock_update_service,
 ):
     service_one['permissions'] = ['letter']
-    response = logged_in_client.post(
-        url_for('main.service_set_letter_contact_block', service_id=service_one['id']),
-        data={'letter_contact_block': 'foo bar baz waz'}
+    client_request.post(
+        'main.service_set_letter_contact_block',
+        service_id=SERVICE_ONE_ID,
+        _data={'letter_contact_block': 'foo bar baz waz'},
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.service_settings',
+            service_id=SERVICE_ONE_ID,
+            _external=True,
+        )
     )
-    assert response.status_code == 302
-    assert response.location == url_for('main.service_settings', service_id=service_one['id'], _external=True)
-    mock_update_service.assert_called_once_with(service_one['id'], letter_contact_block='foo bar baz waz')
+    mock_update_service.assert_called_once_with(SERVICE_ONE_ID, letter_contact_block='foo bar baz waz')
 
 
 def test_set_letter_contact_block_redirects_to_template(
-    logged_in_client,
+    client_request,
     service_one,
     mock_update_service,
 ):
     service_one['permissions'] = ['letter']
-
-    response = logged_in_client.post(
-        url_for(
-            'main.service_set_letter_contact_block',
+    client_request.post(
+        'main.service_set_letter_contact_block',
+        service_id=SERVICE_ONE_ID,
+        from_template=FAKE_TEMPLATE_ID,
+        _data={'letter_contact_block': '23 Whitechapel Road'},
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.view_template',
             service_id=service_one['id'],
-            from_template=FAKE_TEMPLATE_ID,
+            template_id=FAKE_TEMPLATE_ID,
+            _external=True,
         ),
-        data={'letter_contact_block': '23 Whitechapel Road'},
-    )
-    assert response.status_code == 302
-    assert response.location == url_for(
-        'main.view_template',
-        service_id=service_one['id'],
-        template_id=FAKE_TEMPLATE_ID,
-        _external=True,
     )
 
 
 def test_set_letter_contact_block_has_max_10_lines(
-    logged_in_client,
+    client_request,
     service_one,
     mock_update_service,
 ):
     service_one['permissions'] = ['letter']
-    response = logged_in_client.post(
-        url_for('main.service_set_letter_contact_block', service_id=service_one['id']),
-        data={'letter_contact_block': '\n'.join(map(str, range(0, 11)))}
+    page = client_request.post(
+        'main.service_set_letter_contact_block',
+        service_id=SERVICE_ONE_ID,
+        _data={'letter_contact_block': '\n'.join(map(str, range(0, 11)))},
+        _expected_status=200,
     )
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     error_message = page.find('span', class_='error-message').text.strip()
     assert error_message == 'Contains 11 lines, maximum is 10'
 
@@ -2453,11 +2478,13 @@ def test_request_letter_branding_if_already_have_branding(
 
 
 def test_service_set_letter_branding_platform_admin_only(
-    logged_in_client,
-    service_one,
+    client_request,
 ):
-    response = logged_in_client.get(url_for('main.service_set_letter_branding', service_id=service_one['id']))
-    assert response.status_code == 403
+    client_request.get(
+        'main.service_set_letter_branding',
+        service_id=SERVICE_ONE_ID,
+        _expected_status=403,
+    )
 
 
 @pytest.mark.parametrize('letter_branding, expected_selected, expected_items', [
@@ -3537,7 +3564,7 @@ def test_service_set_contact_link_does_not_update_invalid_contact_details(
 
 
 def test_contact_link_is_displayed_with_upload_document_permission(
-    logged_in_client,
+    client_request,
     service_one,
     mock_get_service_settings_page_common,
     mock_get_service_organisation,
@@ -3546,15 +3573,15 @@ def test_contact_link_is_displayed_with_upload_document_permission(
     single_sms_sender,
 ):
     service_one['permissions'] = ['upload_document']
-    response = logged_in_client.get(url_for('main.service_settings', service_id=service_one['id']))
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-
-    assert response.status_code == 200
+    page = client_request.get(
+        'main.service_settings',
+        service_id=SERVICE_ONE_ID,
+    )
     assert 'Contact details' in page.text
 
 
 def test_contact_link_is_not_displayed_without_the_upload_document_permission(
-    logged_in_client,
+    client_request,
     service_one,
     mock_get_service_settings_page_common,
     mock_get_service_organisation,
@@ -3562,10 +3589,10 @@ def test_contact_link_is_not_displayed_without_the_upload_document_permission(
     no_letter_contact_blocks,
     single_sms_sender,
 ):
-    response = logged_in_client.get(url_for('main.service_settings', service_id=service_one['id']))
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-
-    assert response.status_code == 200
+    page = client_request.get(
+        'main.service_settings',
+        service_id=SERVICE_ONE_ID,
+    )
     assert 'Contact details' not in page.text
 
 
@@ -3600,7 +3627,7 @@ def test_contact_link_is_not_displayed_without_the_upload_document_permission(
     ),
 ])
 def test_invitation_pages(
-    logged_in_client,
+    client_request,
     service_one,
     mock_get_inbound_number_for_service,
     endpoint,
@@ -3608,15 +3635,16 @@ def test_invitation_pages(
     expected_p,
 ):
     service_one['permissions'] = permissions
-    response = logged_in_client.get(url_for(endpoint, service_id=service_one['id']))
+    page = client_request.get(
+        endpoint,
+        service_id=SERVICE_ONE_ID,
+    )
 
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert normalize_spaces(page.select('main p')[0].text) == expected_p
 
 
 def test_service_settings_when_inbound_number_is_not_set(
-    logged_in_client,
+    client_request,
     service_one,
     single_reply_to_email_address,
     single_letter_contact_block,
@@ -3629,14 +3657,14 @@ def test_service_settings_when_inbound_number_is_not_set(
 ):
     mocker.patch('app.inbound_number_client.get_inbound_sms_number_for_service',
                  return_value={'data': {}})
-    response = logged_in_client.get(url_for(
-        'main.service_settings', service_id=service_one['id']
-    ))
-    assert response.status_code == 200
+    client_request.get(
+        'main.service_settings',
+        service_id=SERVICE_ONE_ID,
+    )
 
 
 def test_set_inbound_sms_when_inbound_number_is_not_set(
-    logged_in_client,
+    client_request,
     service_one,
     single_reply_to_email_address,
     single_letter_contact_block,
@@ -3645,10 +3673,10 @@ def test_set_inbound_sms_when_inbound_number_is_not_set(
 ):
     mocker.patch('app.inbound_number_client.get_inbound_sms_number_for_service',
                  return_value={'data': {}})
-    response = logged_in_client.get(url_for(
-        'main.service_set_inbound_sms', service_id=service_one['id']
-    ))
-    assert response.status_code == 200
+    client_request.get(
+        'main.service_set_inbound_sms',
+        service_id=SERVICE_ONE_ID,
+    )
 
 
 @pytest.mark.parametrize('user, expected_paragraphs', [
@@ -3663,7 +3691,7 @@ def test_set_inbound_sms_when_inbound_number_is_not_set(
     ]),
 ])
 def test_set_inbound_sms_when_inbound_number_is_set(
-    client,
+    client_request,
     service_one,
     mocker,
     fake_uuid,
@@ -3674,11 +3702,12 @@ def test_set_inbound_sms_when_inbound_number_is_set(
     mocker.patch('app.inbound_number_client.get_inbound_sms_number_for_service', return_value={
         'data': {'number': '07700900123'}
     })
-    client.login(user(fake_uuid), mocker, service_one)
-    response = client.get(url_for(
-        'main.service_set_inbound_sms', service_id=SERVICE_ONE_ID
-    ))
-    paragraphs = BeautifulSoup(response.data.decode('utf-8'), 'html.parser').select('main p')
+    client_request.login(user(fake_uuid))
+    page = client_request.get(
+        'main.service_set_inbound_sms',
+        service_id=SERVICE_ONE_ID,
+    )
+    paragraphs = page.select('main p')
 
     assert len(paragraphs) == len(expected_paragraphs)
 
@@ -3687,18 +3716,17 @@ def test_set_inbound_sms_when_inbound_number_is_set(
 
 
 def test_empty_letter_contact_block_returns_error(
-    logged_in_client,
+    client_request,
     service_one,
     mock_update_service,
 ):
     service_one['permissions'] = ['letter']
-    response = logged_in_client.post(
-        url_for('main.service_set_letter_contact_block', service_id=service_one['id']),
-        data={'letter_contact_block': None}
+    page = client_request.post(
+        'main.service_set_letter_contact_block',
+        service_id=SERVICE_ONE_ID,
+        _data={'letter_contact_block': None},
+        _expected_status=200,
     )
-
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     error_message = page.find('span', class_='error-message').text.strip()
     assert error_message == 'Can’t be empty'
 

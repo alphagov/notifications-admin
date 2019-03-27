@@ -185,7 +185,7 @@ def test_sms_sender_has_receives_replies_hint(
     )
 ])
 def test_sender_session_is_present_after_selected(
-    logged_in_client,
+    client_request,
     service_one,
     fake_uuid,
     template_mock,
@@ -194,12 +194,14 @@ def test_sender_session_is_present_after_selected(
 ):
     template_mock(mocker)
     sender_data(mocker)
-    logged_in_client.post(
-        url_for('.set_sender', service_id=service_one['id'], template_id=fake_uuid),
-        data={'sender': '1234'}
+    client_request.post(
+        '.set_sender',
+        service_id=service_one['id'],
+        template_id=fake_uuid,
+        _data={'sender': '1234'},
     )
 
-    with logged_in_client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         assert session['sender_id'] == '1234'
 
 
@@ -214,7 +216,7 @@ def test_sender_session_is_present_after_selected(
     )
 ])
 def test_set_sender_redirects_if_no_sender_data(
-    logged_in_client,
+    client_request,
     service_one,
     fake_uuid,
     template_mock,
@@ -223,17 +225,18 @@ def test_set_sender_redirects_if_no_sender_data(
 ):
     template_mock(mocker)
     sender_data(mocker)
-    response = logged_in_client.get(
-        url_for('.set_sender', service_id=service_one['id'], template_id=fake_uuid)
-    )
-    assert response.status_code == 302
-    expected_url = url_for(
-        '.send_one_off',
-        service_id=service_one['id'],
+    client_request.get(
+        '.set_sender',
+        service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
-        _external=True,
+        _expected_status=302,
+        _expected_url=url_for(
+            '.send_one_off',
+            service_id=service_one['id'],
+            template_id=fake_uuid,
+            _external=True,
+        )
     )
-    assert response.location == expected_url
 
 
 def test_that_test_files_exist():
@@ -242,7 +245,7 @@ def test_that_test_files_exist():
 
 
 def test_should_not_allow_files_to_be_uploaded_without_the_correct_permission(
-    logged_in_client,
+    client_request,
     mock_get_service_template,
     service_one,
     fake_uuid,
@@ -250,14 +253,13 @@ def test_should_not_allow_files_to_be_uploaded_without_the_correct_permission(
     template_id = fake_uuid
     service_one['permissions'] = []
 
-    response = logged_in_client.get(url_for(
+    page = client_request.get(
         '.send_messages',
-        service_id=service_one['id'],
-        template_id=template_id),
-        follow_redirects=True)
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+        service_id=SERVICE_ONE_ID,
+        template_id=template_id,
+        _follow_redirects=True,
+    )
 
-    assert response.status_code == 200
     assert page.select('main p')[0].text.strip() == "Sending text messages has been disabled for your service."
     assert page.select(".page-footer-back-link")[0].text == "Back to the template"
     assert page.select(".page-footer-back-link")[0]['href'] == url_for(
@@ -908,7 +910,7 @@ def test_404_for_previewing_a_row_out_of_range(
     active_caseworking_user,
 ))
 def test_send_test_doesnt_show_file_contents(
-    logged_in_client,
+    client_request,
     mocker,
     mock_get_service_template,
     mock_s3_upload,
@@ -925,13 +927,13 @@ def test_send_test_doesnt_show_file_contents(
         07700 900 986
     """)
 
-    response = logged_in_client.get(
-        url_for('main.send_test', service_id=service_one['id'], template_id=fake_uuid),
-        follow_redirects=True,
+    page = client_request.get(
+        'main.send_test',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _follow_redirects=True,
     )
 
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert page.select('h1')[0].text.strip() == 'Preview of ‘Two week reminder’'
     assert len(page.select('table')) == 0
     assert len(page.select('.banner-dangerous')) == 0
@@ -984,7 +986,7 @@ def test_send_test_doesnt_show_file_contents(
 ])
 def test_send_test_step_redirects_if_session_not_setup(
     mocker,
-    logged_in_client,
+    client_request,
     mock_get_service_statistics,
     mock_get_users_by_service,
     mock_has_no_jobs,
@@ -998,22 +1000,24 @@ def test_send_test_step_redirects_if_session_not_setup(
     template_mock(mocker)
     mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=99)
 
-    with logged_in_client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         assert 'recipient' not in session
         assert 'placeholders' not in session
 
-    response = logged_in_client.get(
-        url_for(endpoint, service_id=SERVICE_ONE_ID, template_id=fake_uuid, step_index=0),
-        follow_redirects=True
+    client_request.get(
+        endpoint,
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        step_index=0,
+        _follow_redirects=True,
     )
-    assert response.status_code == 200
 
-    with logged_in_client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         assert session['recipient'] == expected_recipient
 
 
 def test_send_one_off_does_not_send_without_the_correct_permissions(
-    logged_in_client,
+    client_request,
     mock_get_service_template,
     service_one,
     fake_uuid,
@@ -1021,14 +1025,13 @@ def test_send_one_off_does_not_send_without_the_correct_permissions(
     template_id = fake_uuid
     service_one['permissions'] = []
 
-    response = logged_in_client.get(url_for(
+    page = client_request.get(
         '.send_one_off',
-        service_id=service_one['id'],
-        template_id=template_id),
-        follow_redirects=True)
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+        service_id=SERVICE_ONE_ID,
+        template_id=template_id,
+        _follow_redirects=True,
+    )
 
-    assert response.status_code == 200
     assert page.select('main p')[0].text.strip() == "Sending text messages has been disabled for your service."
     assert page.select(".page-footer-back-link")[0].text == "Back to the template"
     assert page.select(".page-footer-back-link")[0]['href'] == url_for(
@@ -1145,7 +1148,7 @@ def test_send_one_off_or_test_has_correct_page_titles(
     ),
 ])
 def test_send_one_off_has_skip_link(
-    logged_in_client,
+    client_request,
     service_one,
     fake_uuid,
     mock_get_service_email_template,
@@ -1160,14 +1163,15 @@ def test_send_one_off_has_skip_link(
     template_mock(mocker)
     mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=99)
 
-    response = logged_in_client.get(
-        url_for('main.send_one_off_step', service_id=service_one['id'], template_id=fake_uuid, step_index=0),
-        follow_redirects=True
+    page = client_request.get(
+        'main.send_one_off_step',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        step_index=0,
+        _follow_redirects=True,
     )
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    skip_links = page.select('a.top-gutter-4-3')
 
-    assert response.status_code == 200
+    skip_links = page.select('a.top-gutter-4-3')
 
     if expected_link_text and expected_link_url:
         assert skip_links[0].text.strip() == expected_link_text
@@ -1212,7 +1216,7 @@ def test_send_one_off_has_sticky_header_for_email_and_letter(
     active_caseworking_user,
 ))
 def test_skip_link_will_not_show_on_sms_one_off_if_service_has_no_mobile_number(
-    logged_in_client,
+    client_request,
     service_one,
     fake_uuid,
     mock_get_service_template,
@@ -1223,11 +1227,13 @@ def test_skip_link_will_not_show_on_sms_one_off_if_service_has_no_mobile_number(
     user = user(fake_uuid)
     user.mobile_number = None
     mocker.patch('app.user_api_client.get_user', return_value=user)
-    response = logged_in_client.get(
-        url_for('main.send_one_off_step', service_id=service_one['id'], template_id=fake_uuid, step_index=0),
-        follow_redirects=True
+    page = client_request.get(
+        'main.send_one_off_step',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        step_index=0,
+        _follow_redirects=True,
     )
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     skip_links = page.select('a.top-gutter-4-3')
     assert not skip_links
 
@@ -1425,7 +1431,7 @@ def test_send_test_redirects_to_start_if_you_skip_steps(
     ('main.send_one_off_step', 'main.send_one_off'),
 ])
 def test_send_test_redirects_to_start_if_index_out_of_bounds_and_some_placeholders_empty(
-    logged_in_client,
+    client_request,
     service_one,
     fake_uuid,
     mock_get_service_email_template,
@@ -1439,22 +1445,21 @@ def test_send_test_redirects_to_start_if_index_out_of_bounds_and_some_placeholde
     user,
 ):
     mocker.patch('app.user_api_client.get_user', return_value=user(fake_uuid))
-    with logged_in_client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         session['placeholders'] = {'name': 'foo'}
 
-    response = logged_in_client.get(url_for(
+    client_request.get(
         endpoint,
-        service_id=service_one['id'],
+        service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
         step_index=999,
-    ))
-
-    assert response.status_code == 302
-    assert response.location == url_for(
-        expected_redirect,
-        service_id=service_one['id'],
-        template_id=fake_uuid,
-        _external=True,
+        _expected_status=302,
+        _expected_redirect=url_for(
+            expected_redirect,
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            _external=True,
+        ),
     )
 
 
@@ -1467,7 +1472,7 @@ def test_send_test_redirects_to_start_if_index_out_of_bounds_and_some_placeholde
     ('main.send_one_off', 'main.send_one_off_step'),
 ])
 def test_send_test_sms_message_redirects_with_help_argument(
-    logged_in_client,
+    client_request,
     mocker,
     service_one,
     fake_uuid,
@@ -1479,17 +1484,20 @@ def test_send_test_sms_message_redirects_with_help_argument(
     template = {'data': {'template_type': 'sms'}}
     mocker.patch('app.service_api_client.get_service_template', return_value=template)
 
-    response = logged_in_client.get(
-        url_for(endpoint, service_id=service_one['id'], template_id=fake_uuid, help=1)
-    )
-    assert response.status_code == 302
-    assert response.location == url_for(
-        expected_redirect,
-        service_id=service_one['id'],
+    client_request.get(
+        endpoint,
+        service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
-        step_index=0,
         help=1,
-        _external=True,
+        _expected_status=302,
+        _expected_response=url_for(
+            expected_redirect,
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            step_index=0,
+            help=1,
+            _external=True,
+        )
     )
 
 
@@ -1498,7 +1506,7 @@ def test_send_test_sms_message_redirects_with_help_argument(
     active_caseworking_user,
 ))
 def test_send_test_email_message_without_placeholders_redirects_to_check_page(
-    logged_in_client,
+    client_request,
     mocker,
     service_one,
     mock_get_service_email_template_without_placeholders,
@@ -1511,15 +1519,17 @@ def test_send_test_email_message_without_placeholders_redirects_to_check_page(
 ):
     mocker.patch('app.user_api_client.get_user', return_value=user(fake_uuid))
 
-    with logged_in_client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         session['recipient'] = 'foo@bar.com'
 
-    response = logged_in_client.get(
-        url_for('main.send_test', step_index=0, service_id=service_one['id'], template_id=fake_uuid),
-        follow_redirects=True
+    page = client_request.get(
+        'main.send_test',
+        step_index=0,
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _follow_redirects=True,
     )
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
     assert page.select('h1')[0].text.strip() == 'Preview of ‘Two week reminder’'
 
 
@@ -1639,7 +1649,7 @@ def test_send_test_letter_redirects_to_right_url(
 
 
 def test_send_test_populates_field_from_session(
-    logged_in_client,
+    client_request,
     mocker,
     service_one,
     mock_login,
@@ -1648,19 +1658,17 @@ def test_send_test_populates_field_from_session(
     fake_uuid,
 ):
 
-    with logged_in_client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         session['recipient'] = None
         session['placeholders'] = {}
         session['placeholders']['name'] = 'Jo'
 
-    response = logged_in_client.get(url_for(
+    page = client_request.get(
         'main.send_test_step',
-        service_id=service_one['id'],
+        service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
         step_index=0,
-    ))
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    )
 
     assert page.select('input')[0]['value'] == 'Jo'
 
@@ -1690,29 +1698,24 @@ def test_send_test_caches_page_count(
 
 
 def test_send_test_indicates_optional_address_columns(
-    logged_in_client,
+    client_request,
     mocker,
-    service_one,
-    mock_login,
-    mock_get_service,
     mock_get_service_letter_template,
     fake_uuid,
 ):
 
     mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=1)
 
-    with logged_in_client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         session['recipient'] = None
         session['placeholders'] = {}
 
-    response = logged_in_client.get(url_for(
+    page = client_request.get(
         'main.send_test_step',
-        service_id=service_one['id'],
+        service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
         step_index=3,
-    ))
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    )
 
     assert normalize_spaces(page.select('label')[0].text) == (
         'address line 3 '
@@ -1720,78 +1723,70 @@ def test_send_test_indicates_optional_address_columns(
     )
     assert page.select('.page-footer-back-link')[0]['href'] == url_for(
         'main.send_one_off_step',
-        service_id=service_one['id'],
+        service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
         step_index=2,
     )
 
 
 def test_send_test_allows_empty_optional_address_columns(
-    logged_in_client,
+    client_request,
     mocker,
-    service_one,
-    mock_login,
-    mock_get_service,
     mock_get_service_letter_template,
     fake_uuid,
 ):
 
     mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=1)
 
-    with logged_in_client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         session['recipient'] = None
         session['placeholders'] = {}
 
-    response = logged_in_client.post(
-        url_for(
-            'main.send_test_step',
-            service_id=service_one['id'],
-            template_id=fake_uuid,
-            step_index=3,
-        ),
-        # no data here
-    )
-
-    assert response.status_code == 302
-    assert response.location == url_for(
+    client_request.post(
         'main.send_test_step',
-        service_id=service_one['id'],
+        service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
-        step_index=4,
-        _external=True,
+        step_index=3,
+        # no data here
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.send_test_step',
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            step_index=4,
+            _external=True,
+        ),
     )
 
 
 def test_send_test_sms_message_puts_submitted_data_in_session(
-    logged_in_client,
+    client_request,
     service_one,
     mock_get_service_template_with_placeholders,
     mock_get_users_by_service,
     mock_get_service_statistics,
     fake_uuid,
 ):
-    with logged_in_client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         session['recipient'] = '07700 900762'
         session['placeholders'] = {}
 
-    response = logged_in_client.post(
-        url_for(
-            'main.send_test_step',
-            service_id=service_one['id'],
-            template_id=fake_uuid,
-            step_index=0,
-        ),
-        data={'placeholder_value': 'Jo'}
-    )
-    assert response.status_code == 302
-    assert response.location == url_for(
-        'main.check_notification',
+    client_request.post(
+        'main.send_test_step',
         service_id=service_one['id'],
         template_id=fake_uuid,
-        _external=True
+        step_index=0,
+        _data={'placeholder_value': 'Jo'},
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.check_notification',
+            service_id=service_one['id'],
+            template_id=fake_uuid,
+            _external=True,
+        )
     )
 
-    with logged_in_client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         assert session['recipient'] == '07700 900762'
         assert session['placeholders']['name'] == 'Jo'
 
@@ -1839,7 +1834,7 @@ def test_send_test_works_as_letter_preview(
 
 
 def test_send_test_clears_session(
-    logged_in_client,
+    client_request,
     mocker,
     service_one,
     fake_uuid,
@@ -1847,20 +1842,18 @@ def test_send_test_clears_session(
     template = {'data': {'template_type': 'sms'}}
     mocker.patch('app.service_api_client.get_service_template', return_value=template)
 
-    with logged_in_client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         session['recipient'] = '07700900001'
         session['placeholders'] = {'foo': 'bar'}
 
-    response = logged_in_client.get(
-        url_for(
-            'main.send_test',
-            service_id=service_one['id'],
-            template_id=fake_uuid,
-        ),
+    client_request.get(
+        'main.send_test',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _expected_status=302,
     )
-    assert response.status_code == 302
 
-    with logged_in_client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         assert session['recipient'] is None
         assert session['placeholders'] == {}
 
@@ -2035,8 +2028,7 @@ def test_letter_can_only_be_sent_now(
     '', '2016-08-25T13:04:21.767198'
 ])
 def test_create_job_should_call_api(
-    logged_in_client,
-    service_one,
+    client_request,
     mock_create_job,
     mock_get_job,
     mock_get_notifications,
@@ -2046,13 +2038,12 @@ def test_create_job_should_call_api(
     fake_uuid,
     when
 ):
-    service_id = service_one['id']
-    data = mock_get_job(service_one['id'], fake_uuid)['data']
+    data = mock_get_job(SERVICE_ONE_ID, fake_uuid)['data']
     job_id = data['id']
     original_file_name = data['original_file_name']
     template_id = data['template']
     notification_count = data['notification_count']
-    with logged_in_client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         session['file_uploads'] = {
             fake_uuid: {
                 'template_id': template_id,
@@ -2061,22 +2052,21 @@ def test_create_job_should_call_api(
             }
         }
 
-    response = logged_in_client.post(
-        url_for(
-            'main.start_job',
-            service_id=service_one['id'],
-            upload_id=job_id,
-            original_file_name=original_file_name
-        ),
-        data={'scheduled_for': when},
-        follow_redirects=True,
+    page = client_request.post(
+        'main.start_job',
+        service_id=SERVICE_ONE_ID,
+        upload_id=job_id,
+        original_file_name=original_file_name,
+        _data={'scheduled_for': when},
+        _follow_redirects=True,
+        _expected_status=200,
     )
 
-    assert response.status_code == 200
-    assert original_file_name in response.get_data(as_text=True)
+    assert original_file_name in page.text
+
     mock_create_job.assert_called_with(
         job_id,
-        service_id,
+        SERVICE_ONE_ID,
         scheduled_for=when,
     )
 
@@ -2360,12 +2350,9 @@ def test_route_permissions_sending(
     ]
 )
 def test_check_messages_back_link(
-    logged_in_client,
-    api_user_active,
-    mock_login,
+    client_request,
     mock_get_user_by_email,
     mock_get_users_by_service,
-    mock_get_service,
     mock_has_permissions,
     mock_get_service_statistics,
     mock_get_job_doesnt_exist,
@@ -2386,7 +2373,7 @@ def test_check_messages_back_link(
         return_value=5,
     )
 
-    with logged_in_client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         session['file_uploads'] = {
             fake_uuid: {
                 'original_file_name': 'valid.csv',
@@ -2396,18 +2383,18 @@ def test_check_messages_back_link(
             }
         }
 
-    response = logged_in_client.get(url_for(
+    page = client_request.get(
         'main.check_messages',
-        service_id=fake_uuid,
+        service_id=SERVICE_ONE_ID,
         upload_id=fake_uuid,
         template_id=fake_uuid,
+        _test_page_title=False,
         **extra_args
-    ))
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    )
+
     assert (
         page.findAll('a', {'class': 'page-footer-back-link'})[0]['href']
-    ) == expected_url(service_id=fake_uuid, template_id=fake_uuid)
+    ) == expected_url(service_id=SERVICE_ONE_ID, template_id=fake_uuid)
 
 
 def test_shows_link_to_end_tour(
@@ -2456,15 +2443,12 @@ def test_go_to_dashboard_after_tour_link(
 ], ids=['none_sent', 'some_sent'])
 def test_check_messages_shows_too_many_messages_errors(
     mocker,
-    logged_in_client,
-    api_user_active,
-    mock_login,
+    client_request,
+    mock_get_service,  # set message_limit to 50
     mock_get_users_by_service,
-    mock_get_service,
     mock_get_service_template,
     mock_get_job_doesnt_exist,
     mock_get_jobs,
-    mock_has_permissions,
     fake_uuid,
     num_requested,
     expected_msg
@@ -2478,7 +2462,7 @@ def test_check_messages_shows_too_many_messages_errors(
         'email': {'requested': 0, 'delivered': 0, 'failed': 0}
     })
 
-    with logged_in_client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         session['file_uploads'] = {
             fake_uuid: {
                 'template_id': fake_uuid,
@@ -2487,15 +2471,15 @@ def test_check_messages_shows_too_many_messages_errors(
             }
         }
 
-    response = logged_in_client.get(url_for(
+    page = client_request.get(
         'main.check_messages',
-        service_id=fake_uuid,
+        service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
         upload_id=fake_uuid,
         original_file_name='valid.csv',
-    ))
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+        _test_page_title=False,
+    )
+
     assert page.find('h1').text.strip() == 'Too many recipients'
     assert page.find('div', class_='banner-dangerous').find('a').text.strip() == 'trial mode'
 
@@ -2506,9 +2490,8 @@ def test_check_messages_shows_too_many_messages_errors(
 
 
 def test_check_messages_shows_trial_mode_error(
-    logged_in_client,
+    client_request,
     mock_get_users_by_service,
-    mock_get_service,
     mock_get_service_template,
     mock_has_permissions,
     mock_get_service_statistics,
@@ -2521,21 +2504,21 @@ def test_check_messages_shows_trial_mode_error(
         'phone number,\n07900900321'  # Not in team
     ))
 
-    with logged_in_client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         session['file_uploads'] = {
             fake_uuid: {
                 'template_id': '',
             }
         }
 
-    response = logged_in_client.get(url_for(
+    page = client_request.get(
         'main.check_messages',
-        service_id=uuid.uuid4(),
+        service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
-        upload_id=fake_uuid
-    ))
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+        upload_id=fake_uuid,
+        _test_page_title=False,
+    )
+
     assert ' '.join(
         page.find('div', class_='banner-dangerous').text.split()
     ) == (
@@ -2945,11 +2928,8 @@ def test_send_one_off_letter_errors_in_trial_mode(
 
 
 def test_check_messages_shows_over_max_row_error(
-    logged_in_client,
-    api_user_active,
-    mock_login,
+    client_request,
     mock_get_users_by_service,
-    mock_get_service,
     mock_get_service_template_with_placeholders,
     mock_has_permissions,
     mock_get_service_statistics,
@@ -2964,21 +2944,21 @@ def test_check_messages_shows_over_max_row_error(
     mock_recipients.__len__.return_value = 99999
     mock_recipients.too_many_rows.return_value = True
 
-    with logged_in_client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         session['file_uploads'] = {
             fake_uuid: {
                 'template_id': fake_uuid,
             }
         }
 
-    response = logged_in_client.get(url_for(
+    page = client_request.get(
         'main.check_messages',
-        service_id=fake_uuid,
+        service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
-        upload_id=fake_uuid
-    ))
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+        upload_id=fake_uuid,
+        _test_page_title=False,
+    )
+
     assert ' '.join(
         page.find('div', class_='banner-dangerous').text.split()
     ) == (
@@ -2995,27 +2975,27 @@ def test_check_messages_shows_over_max_row_error(
     {'name': 'Jo'}
 ])
 def test_check_notification_redirects_if_session_not_populated(
-    logged_in_client,
+    client_request,
     service_one,
     fake_uuid,
     existing_session_items,
     mock_get_service_template_with_placeholders
 ):
-    with logged_in_client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         session.update(existing_session_items)
 
-    resp = logged_in_client.get(url_for(
+    client_request.get(
         'main.check_notification',
-        service_id=service_one['id'],
-        template_id=fake_uuid
-    ))
-
-    assert resp.location == url_for(
-        'main.send_one_off_step',
-        service_id=service_one['id'],
+        service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
-        step_index=1,
-        _external=True
+        _expected_status=301,
+        _expected_redirect=url_for(
+            'main.send_one_off_step',
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            step_index=1,
+            _external=True,
+        )
     )
 
 
@@ -3187,23 +3167,23 @@ def test_send_notification_clears_session(
 
 
 def test_send_notification_redirects_if_missing_data(
-    logged_in_client,
-    service_one,
+    client_request,
     fake_uuid,
 ):
-    with logged_in_client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         session['placeholders'] = {'a': 'b'}
 
-    resp = logged_in_client.post(
-        url_for('main.send_notification', service_id=service_one['id'], template_id=fake_uuid)
-    )
-
-    assert resp.status_code == 302
-    assert resp.location == url_for(
-        '.send_one_off',
-        service_id=service_one['id'],
+    client_request.post(
+        'main.send_notification',
+        service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
-        _external=True
+        _expected_status=302,
+        _expected_redirect=url_for(
+            '.send_one_off',
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            _external=True,
+        ),
     )
 
 
@@ -3212,28 +3192,29 @@ def test_send_notification_redirects_if_missing_data(
     ({'help': '3'}, {'help': '3'})
 ])
 def test_send_notification_redirects_to_view_page(
-    logged_in_client,
-    service_one,
+    client_request,
     fake_uuid,
     mock_send_notification,
     extra_args,
     extra_redirect_args
 ):
-    with logged_in_client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         session['recipient'] = '07700900001'
         session['placeholders'] = {'a': 'b'}
 
-    resp = logged_in_client.post(
-        url_for('main.send_notification', service_id=service_one['id'], template_id=fake_uuid, **extra_args)
-    )
-
-    assert resp.status_code == 302
-    assert resp.location == url_for(
-        '.view_notification',
-        service_id=service_one['id'],
-        notification_id=fake_uuid,
-        _external=True,
-        **extra_redirect_args
+    client_request.post(
+        'main.send_notification',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _expected_status=302,
+        _expected_redirect=url_for(
+            '.view_notification',
+            service_id=SERVICE_ONE_ID,
+            notification_id=fake_uuid,
+            _external=True,
+            **extra_redirect_args
+        ),
+        **extra_args
     )
 
 

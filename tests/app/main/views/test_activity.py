@@ -4,7 +4,6 @@ from functools import partial
 from urllib.parse import parse_qs, quote, urlparse
 
 import pytest
-from bs4 import BeautifulSoup
 from flask import url_for
 from freezegun import freeze_time
 
@@ -113,7 +112,7 @@ def test_can_show_notifications(
     if expected_to_argument:
         page = client_request.post(
             'main.view_notifications',
-            service_id=service_one['id'],
+            service_id=SERVICE_ONE_ID,
             status=status_argument,
             page=page_argument,
             _data={
@@ -125,7 +124,7 @@ def test_can_show_notifications(
     else:
         page = client_request.get(
             'main.view_notifications',
-            service_id=service_one['id'],
+            service_id=SERVICE_ONE_ID,
             status=status_argument,
             page=page_argument,
             **extra_args
@@ -143,7 +142,7 @@ def test_can_show_notifications(
 
     url = urlparse(path_to_json)
     assert url.path == '/services/{}/notifications{}'.format(
-        service_one['id'],
+        SERVICE_ONE_ID,
         expected_update_endpoint,
     )
     query_dict = parse_qs(url.query)
@@ -156,7 +155,7 @@ def test_can_show_notifications(
     mock_get_notifications.assert_called_with(
         limit_days=expected_limit_days,
         page=expected_page_argument,
-        service_id=service_one['id'],
+        service_id=SERVICE_ONE_ID,
         status=expected_api_call,
         template_type=list(extra_args.values()),
         to=expected_to_argument,
@@ -266,7 +265,7 @@ def test_download_not_available_to_users_without_dashboard(
 def test_letters_with_status_virus_scan_failed_shows_a_failure_description(
     mocker,
     active_user_with_permissions,
-    logged_in_client,
+    client_request,
     service_one,
     mock_get_service_statistics,
     mock_get_service_data_retention,
@@ -277,15 +276,13 @@ def test_letters_with_status_virus_scan_failed_shows_a_failure_description(
         is_precompiled_letter=True,
         noti_status='virus-scan-failed'
     )
-    response = logged_in_client.get(url_for(
+    page = client_request.get(
         'main.view_notifications',
         service_id=service_one['id'],
         message_type='letter',
         status='',
-    ))
+    )
 
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     error_description = page.find('div', attrs={'class': 'table-field-status-error'}).text.strip()
     assert 'Virus detected\n' in error_description
 
@@ -296,7 +293,7 @@ def test_letters_with_status_virus_scan_failed_shows_a_failure_description(
 def test_should_not_show_preview_link_for_precompiled_letters_in_virus_states(
     mocker,
     active_user_with_permissions,
-    logged_in_client,
+    client_request,
     service_one,
     mock_get_service_statistics,
     mock_get_service_data_retention,
@@ -308,13 +305,12 @@ def test_should_not_show_preview_link_for_precompiled_letters_in_virus_states(
         is_precompiled_letter=True,
         noti_status=letter_status
     )
-    response = logged_in_client.get(url_for(
+    page = client_request.get(
         'main.view_notifications',
         service_id=service_one['id'],
         message_type='letter',
         status='',
-    ))
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    )
 
     assert not page.find('a', attrs={'class': 'file-list-filename'})
 
@@ -381,7 +377,7 @@ def test_shows_message_when_no_notifications(
     ),
 ])
 def test_search_recipient_form(
-    logged_in_client,
+    client_request,
     mock_get_notifications,
     mock_get_service_statistics,
     mock_get_service_data_retention,
@@ -390,16 +386,13 @@ def test_search_recipient_form(
     expected_search_box_label,
     expected_search_box_contents,
 ):
-    response = logged_in_client.post(
-        url_for(
-            'main.view_notifications',
-            service_id=SERVICE_ONE_ID,
-            **initial_query_arguments
-        ),
-        data=form_post_data
+    page = client_request.post(
+        'main.view_notifications',
+        service_id=SERVICE_ONE_ID,
+        _data=form_post_data,
+        _expected_status=200,
+        **initial_query_arguments
     )
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
     assert page.find("form")['method'] == 'post'
     action_url = page.find("form")['action']
@@ -421,7 +414,7 @@ def test_search_recipient_form(
 
 
 def test_should_show_notifications_for_a_service_with_next_previous(
-    logged_in_client,
+    client_request,
     service_one,
     active_user_with_permissions,
     mock_get_notifications_with_previous_next,
@@ -429,14 +422,13 @@ def test_should_show_notifications_for_a_service_with_next_previous(
     mock_get_service_data_retention,
     mocker,
 ):
-    response = logged_in_client.get(url_for(
+    page = client_request.get(
         'main.view_notifications',
         service_id=service_one['id'],
         message_type='sms',
         page=2
-    ))
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    )
+
     next_page_link = page.find('a', {'rel': 'next'})
     prev_page_link = page.find('a', {'rel': 'previous'})
     assert (
@@ -502,7 +494,7 @@ def test_get_status_filters_constructs_links(client):
 
 
 def test_html_contains_notification_id(
-    logged_in_client,
+    client_request,
     service_one,
     active_user_with_permissions,
     mock_get_notifications,
@@ -510,14 +502,13 @@ def test_html_contains_notification_id(
     mock_get_service_data_retention,
     mocker,
 ):
-    response = logged_in_client.get(url_for(
+    page = client_request.get(
         'main.view_notifications',
         service_id=service_one['id'],
         message_type='sms',
-        status='')
+        status='',
     )
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
     notifications = page.tbody.find_all('tr')
     for tr in notifications:
         assert uuid.UUID(tr.attrs['id'])
@@ -654,7 +645,7 @@ def test_sending_status_hint_displays_correctly_on_notifications_page(
     (False, "template subject")
 ])
 def test_should_expected_hint_for_letters(
-    logged_in_client,
+    client_request,
     service_one,
     active_user_with_permissions,
     mock_get_service_statistics,
@@ -667,10 +658,10 @@ def test_should_expected_hint_for_letters(
     mock_get_notifications(
         mocker, active_user_with_permissions, is_precompiled_letter=is_precompiled_letter)
 
-    response = logged_in_client.get(url_for(
+    page = client_request.get(
         'main.view_notifications',
         service_id=SERVICE_ONE_ID,
-        message_type='letter'
-    ))
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+        message_type='letter',
+    )
+
     assert page.find('p', {'class': 'file-list-hint'}).text.strip() == expected_hint

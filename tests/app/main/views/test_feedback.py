@@ -160,20 +160,26 @@ def test_passed_non_logged_in_user_details_through_flow(client, mocker, ticket_t
 ])
 @pytest.mark.parametrize('ticket_type', [PROBLEM_TICKET_TYPE, QUESTION_TICKET_TYPE])
 def test_passes_user_details_through_flow(
-    logged_in_client,
+    client_request,
     mocker,
     ticket_type,
     data
 ):
     mock_post = mocker.patch('app.main.views.feedback.zendesk_client.create_ticket')
 
-    resp = logged_in_client.post(
-        url_for('main.feedback', ticket_type=ticket_type),
-        data=data,
+    client_request.post(
+        'main.feedback',
+        ticket_type=ticket_type,
+        _data=data,
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.thanks',
+            urgent=True,
+            anonymous=False,
+            _external=True,
+        ),
     )
 
-    assert resp.status_code == 302
-    assert resp.location == url_for('main.thanks', urgent=True, anonymous=False, _external=True)
     mock_post.assert_called_with(
         subject='Notify feedback',
         message=ANY,
@@ -267,7 +273,7 @@ def test_email_address_must_be_valid_if_provided_to_support_form(
 
 ])
 def test_urgency(
-    logged_in_client,
+    client_request,
     mocker,
     ticket_type,
     severe,
@@ -277,12 +283,19 @@ def test_urgency(
 ):
     mocker.patch('app.main.views.feedback.in_business_hours', return_value=is_in_business_hours)
     mock_post = mocker.patch('app.main.views.feedback.zendesk_client.create_ticket')
-    response = logged_in_client.post(
-        url_for('main.feedback', ticket_type=ticket_type, severe=severe),
-        data={'feedback': 'blah', 'email_address': 'test@example.com'},
+    client_request.post(
+        'main.feedback',
+        ticket_type=ticket_type,
+        severe=severe,
+        _data={'feedback': 'blah', 'email_address': 'test@example.com'},
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.thanks',
+            urgent=is_urgent,
+            anonymous=False,
+            _external=True,
+        ),
     )
-    assert response.status_code == 302
-    assert response.location == url_for('main.thanks', urgent=is_urgent, anonymous=False, _external=True)
     assert mock_post.call_args[1]['p1'] == is_p1
 
 
@@ -340,28 +353,30 @@ def test_redirects_to_triage(
 
 
 def test_doesnt_lose_message_if_post_across_closing(
-    logged_in_client,
+    client_request,
     mocker,
 ):
 
     mocker.patch('app.main.views.feedback.has_live_services', return_value=True)
     mocker.patch('app.main.views.feedback.in_business_hours', return_value=False)
 
-    response = logged_in_client.post(
-        url_for('main.feedback', ticket_type=PROBLEM_TICKET_TYPE),
-        data={'feedback': 'foo'},
+    page = client_request.post(
+        'main.feedback',
+        ticket_type=PROBLEM_TICKET_TYPE,
+        _data={'feedback': 'foo'},
+        _expected_status=302,
+        _expected_redirect=url_for('.triage', _external=True),
     )
-    with logged_in_client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         assert session['feedback_message'] == 'foo'
-    assert response.status_code == 302
-    assert response.location == url_for('.triage', _external=True)
 
-    response = logged_in_client.get(
-        url_for('main.feedback', ticket_type=PROBLEM_TICKET_TYPE, severe='yes')
+    page = client_request.get(
+        'main.feedback',
+        ticket_type=PROBLEM_TICKET_TYPE,
+        severe='yes',
     )
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    with logged_in_client.session_transaction() as session:
+
+    with client_request.session_transaction() as session:
         assert page.find('textarea', {'name': 'feedback'}).text == 'foo'
         assert 'feedback_message' not in session
 
