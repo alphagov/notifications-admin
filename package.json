@@ -36,6 +36,7 @@
     "hogan": "1.0.2",
     "jquery": "1.12.4",
     "query-command-supported": "1.0.0",
+    "textarea-caret": "^3.1.0",
     "timeago": "1.6.1"
   },
   "devDependencies": {
