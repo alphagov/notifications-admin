@@ -203,7 +203,7 @@ def init_app(application):
 
     @application.context_processor
     def _attach_current_user():
-        return{'current_user': current_user}
+        return {'current_user': current_user}
 
     @application.context_processor
     def _nav_selected():
