@@ -14,7 +14,7 @@
 
 <div class="bottom-gutter-1-2">
   <h1 class="heading-large">Choose a template</h1>
-  {{ folder_path(template_folder_path, current_service.id, template_type) }}
+  {{ folder_path(template_folder_path, current_service.id, template_type, current_user) }}
 </div>
 
   {% if not templates_and_folders.templates_to_show %}
