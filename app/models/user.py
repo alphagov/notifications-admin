@@ -156,7 +156,7 @@ class User(UserMixin):
             return True
 
         # Top-level templates are always visible
-        if template_folder is None:
+        if template_folder is None or template_folder['id'] is None:
             return True
 
         return self.id in template_folder.get("users_with_permission", [])
