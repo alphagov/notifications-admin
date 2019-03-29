@@ -1,0 +1,17 @@
+{% extends "withoutnav_template.html" %}
+{% from "components/table.html" import mapping_table, row, text_field, edit_field, field with context %}
+{% from "components/sub-navigation.html" import sub_navigation %}
+
+{% block per_page_title %}
+  Features
+{% endblock %}
+
+{% block maincolumn_content %}
+
+<div class="grid-row">
+  <div class="column-one-third">
+    {{ sub_navigation(navigation_links) }}
+  </div>
+  <div class="column-two-thirds">
+    
+    <h1 class="heading heading-large">Text messages</h1>
