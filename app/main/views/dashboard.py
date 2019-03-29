@@ -20,7 +20,6 @@ from app import (
     current_service,
     format_date_numeric,
     format_datetime_numeric,
-    inbound_number_client,
     job_api_client,
     service_api_client,
     template_statistics_client,
@@ -244,9 +243,8 @@ def get_inbox_partials(service_id):
 
     inbound_messages_data = service_api_client.get_most_recent_inbound_sms(service_id, page=page)
     inbound_messages = inbound_messages_data['data']
-
     if not inbound_messages:
-        inbound_number = inbound_number_client.get_inbound_sms_number_for_service(service_id)['data']['number']
+        inbound_number = current_service.inbound_number
     else:
         inbound_number = None
 
@@ -263,7 +261,6 @@ def get_inbox_partials(service_id):
         inbound_number=inbound_number,
         prev_page=prev_page,
         next_page=next_page
-
     )}
 
 

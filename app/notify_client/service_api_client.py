@@ -291,15 +291,13 @@ class ServiceAPIClient(NotifyAdminAPIClient):
     def update_whitelist(self, service_id, data):
         return self.put(url='/service/{}/whitelist'.format(service_id), data=data)
 
-    def get_inbound_sms(self, service_id, user_number='', page=None):
-        return self.get(
+    def get_inbound_sms(self, service_id, user_number=''):
+        # POST prevents the user phone number leaking into our logs
+        return self.post(
             '/service/{}/inbound-sms'.format(
                 service_id,
             ),
-            params={
-                'user_number': user_number,
-                'page': page
-            }
+            data={'user_number': user_number}
         )
 
     def get_most_recent_inbound_sms(self, service_id, page=None):
