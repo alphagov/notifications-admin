@@ -1,3 +1,20 @@
+{% extends "withoutnav_template.html" %}
+{% from "components/table.html" import mapping_table, row, text_field, edit_field, field with context %}
+{% from "components/sub-navigation.html" import sub_navigation %}
+
+{% block per_page_title %}
+  Features
+{% endblock %}
+
+{% block maincolumn_content %}
+
+<div class="grid-row">
+  <div class="column-one-third">
+    {{ sub_navigation(navigation_links) }}
+  </div>
+  <div class="column-two-thirds">
+
+    <h1 class="heading-large">Features – email</h1>
 
 <h3 class="heading heading-small">Send files by email</h3>
 <p>You can use the GOV.UK Notify API to upload a file, then send the recipient an email with a secure link to download it.</p>
