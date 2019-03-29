@@ -443,10 +443,10 @@ class Service():
 
         user_folders = []
         for folder in self.all_template_folders:
-            if not user.has_template_folder_permission(folder):
+            if not user.has_template_folder_permission(folder, service=self):
                 continue
             parent = self.get_template_folder(folder["parent_id"])
-            if user.has_template_folder_permission(parent):
+            if user.has_template_folder_permission(parent, service=self):
                 user_folders.append(folder)
             else:
                 folder_attrs = {
@@ -460,7 +460,7 @@ class Service():
                     else:
                         parent = self.get_template_folder(parent["parent_id"])
                         folder_attrs["parent_id"] = parent.get("id", None)
-                        if user.has_template_folder_permission(parent):
+                        if user.has_template_folder_permission(parent, service=self):
                             break
                 user_folders.append(folder_attrs)
         return user_folders
