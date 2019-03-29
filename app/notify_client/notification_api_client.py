@@ -19,7 +19,7 @@ class NotificationApiClient(NotifyAdminAPIClient):
         to=None,
         include_one_off=None,
     ):
-
+        # TODO: if "to" is included, this should be a POST
         params = {
             'page': page,
             'page_size': page_size,
