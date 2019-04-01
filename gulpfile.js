@@ -90,7 +90,7 @@ const javascripts = () => {
     ])
     .pipe(plugins.prettyerror())
     .pipe(plugins.babel({
-      presets: ['es2015']
+      presets: ['@babel/preset-env']
     }))
     .pipe(plugins.addSrc.prepend([
       paths.npm + 'hogan.js/dist/hogan-3.0.2.js',
