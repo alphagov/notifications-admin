@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "Admin front end for GOV.UK Notify",
   "engines": {
-    "node": "5.0.0"
+    "node": "10.15.3"
   },
   "scripts": {
     "test": "gulp lint",
