@@ -1518,7 +1518,7 @@ eastriding.gov.uk:
 eaststaffsbc.gov.uk:
   owner: East Staffordshire Borough Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 eastsuffolk.gov.uk: waveney.gov.uk
 eastsussexcc.gov.uk: eastsussex.gov.uk
 eastsussex.gov.uk:
