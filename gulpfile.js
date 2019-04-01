@@ -138,7 +138,7 @@ const watchForChanges = () => {
   return watch(paths.src + 'javascripts/**/*', ['javascripts'])
     .watch(paths.src + 'stylesheets/**/*', ['sass'])
     .watch(paths.src + 'images/**/*', ['images'])
-    .watch('gulpfile.babel.js', ['default']);
+    .watch('gulpfile.js', ['default']);
 };
 
 const lint = {
