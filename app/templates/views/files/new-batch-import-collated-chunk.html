@@ -1,0 +1,23 @@
+{% extends "withnav_template.html" %}
+{% from "components/radios.html" import radios %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/page-footer.html" import page_footer %}
+
+{% block service_page_title %}
+  New batch one
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <h1 class="heading-large">
+    How many pages?
+  </h1>
+
+  1 2 3 4 5 6 7 8 9 10
+  <a class="button" href="{{ url_for('main.import_letters_collated', service_id=current_service.id) }}">
+    Continue
+  </a>
+
+
+
+{% endblock %}

@@ -1556,3 +1556,14 @@ class AcceptAgreementForm(StripWhitespaceForm):
             float(field.data)
         except (TypeError, ValueError):
             raise ValidationError("Must be a number")
+
+
+class NewBatchForm(StripWhitespaceForm):
+    batch_type = RadioField(
+        'How are your letters?',
+        choices=[
+            ('one', 'One'),
+            ('many', 'Many'),
+        ],
+        validators=[DataRequired()]
+    )

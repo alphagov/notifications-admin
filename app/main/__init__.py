@@ -35,4 +35,5 @@ from app.main.views import (  # noqa isort:skip
     two_factor,
     user_profile,
     verify,
+    files,
 )

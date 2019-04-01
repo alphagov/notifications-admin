@@ -42,6 +42,7 @@
     $border-thickness: 4px;
     $border-indent: ($circle-diameter / 2) - ($border-thickness / 2);
     $border-colour: $border-colour;
+    $foot-width: $gutter * 2 / 3;
 
     float: none;
     position: relative;
@@ -54,6 +55,7 @@
       width: $border-thickness;
       height: 100%;
       background: $border-colour;
+      box-shadow: inset 0 (-(($circle-diameter / 2))) 0 0 $white;
     }
 
     label {
@@ -71,6 +73,21 @@
       margin-top: 5px;
       margin-bottom: -5px;
       padding-left: 12px;
+
+      li {
+        positon: relative;
+      }
+
+      li:after {
+        content: "";
+        position: absolute;
+        top: ($circle-diameter / 2) - ($border-thickness / 2);
+        left: -$circle-diameter + ($foot-width / 2) - $border-thickness;
+        width: $foot-width;
+        height: $border-thickness;
+        background: $border-colour;
+      }
+
     }
 
   }

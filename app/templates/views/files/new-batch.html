@@ -1,0 +1,29 @@
+{% extends "withnav_template.html" %}
+{% from "components/radios.html" import radios %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/page-footer.html" import page_footer %}
+
+{% block service_page_title %}
+  New batch
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <h1 class="heading-large">
+    New batch of letters
+  </h1>
+
+  <p>
+    <a href="#">Manage</a>
+  </p>
+
+  <p class="hint">
+    No letters yet…
+  </p>
+
+  <div class="js-stick-at-bottom-when-scrolling">
+    <a href="{{ url_for('main.import_letters', service_id=current_service.id) }}" class="button-secondary">Import letters</a>
+  </div>
+
+
+{% endblock %}
