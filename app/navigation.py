@@ -359,6 +359,15 @@ class MainNavigation(Navigation):
             'view_template_version',
             'view_template_versions',
         },
+        'uploads': {
+            'files',
+            'new_contact_list',
+            'new_batch',
+            'import_letters',
+            'import_letters_collated_chunk',
+            'import_letters_collated',
+            'batch_one_file',
+        },
         'team-members': {
             'confirm_edit_user_email',
             'confirm_edit_user_mobile_number',

@@ -2,6 +2,7 @@
 {% from "components/radios.html" import radios %}
 {% from "components/form.html" import form_wrapper %}
 {% from "components/page-footer.html" import page_footer %}
+{% from "components/table.html" import list_table, row_heading, field %}
 
 {% block service_page_title %}
   New batch
@@ -9,20 +10,66 @@
 
 {% block maincolumn_content %}
 
-  <h1 class="heading-large">
-    New batch of letters
-  </h1>
+  <div class="grid-row">
+    <div class="column-five-sixths">
+      <h1 class="heading-large">
+        New batch of letters
+      </h1>
+    </div>
+    <div class="column-one-sixth">
+      <a href="#" class="folder-heading-manage-link">Manage</a>
+    </div>
+  </div>
 
-  <p>
-    <a href="#">Manage</a>
-  </p>
 
-  <p class="hint">
-    No letters yet…
-  </p>
+  <div data-module='fake-delay' data-timeout='3600' data-message='Checking your files' class="bottom-gutter top-gutter-1-3">
+    <a href="#" class="button">
+    {% if files|length == 1 %}
+      Send this letter
+    {% else %}
+      Send these {{ files|length }} letters
+    {% endif %}
+
+    </a>&emsp;<span style="display: inline-block;padding-top: 10px;">Next collection today at 5:30pm</span>
+  </div>
+
+  {% if not files %}
+
+    <p class="hint">
+      No letters yet…
+    </p>
+
+  {% else %}
+    {% call(item, row_number) list_table(
+      files,
+      caption=uploaded_file_name,
+      caption_visible=False,
+      empty_message="No messages to show",
+      field_headings=[
+        'Recipient',
+        'Status'
+      ],
+      field_headings_visible=False
+    ) %}
+      {% call row_heading() %}
+        <a class="file-list-filename" href="{{ url_for('.batch_one_file', service_id=current_service.id, filename=item) }}">{{ item }}</a>
+        <p class="file-list-hint">
+          Uploaded just now
+        </p>
+      {% endcall %}
+      {% call field(
+        status='',
+        align='right'
+      ) %}
+        <span data-module='fake-delay' data-timeout='{{ range(1200, 3600) | random }}' data-message='Checking'>
+          Ready to send
+        </span>
+      {% endcall %}
+    {% endcall %}
+  {% endif %}
 
   <div class="js-stick-at-bottom-when-scrolling">
-    <a href="{{ url_for('main.import_letters', service_id=current_service.id) }}" class="button-secondary">Import letters</a>
+    <a href="{{ url_for('main.import_letters', service_id=current_service.id) }}" class="button-secondary">Add more letters</a>
   </div>
 
 

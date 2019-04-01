@@ -2,6 +2,7 @@
 {% from "components/radios.html" import radios %}
 {% from "components/form.html" import form_wrapper %}
 {% from "components/page-footer.html" import page_footer %}
+{% from "components/file-upload.html" import file_upload %}
 
 {% block service_page_title %}
   New batch one
@@ -13,9 +14,9 @@
     Import letters
   </h1>
 
-  <p class="button">
-    Choose file(s)
-  </p>
+  <div class="bottom-gutter">
+    {{ file_upload(form.file, button_text='Choose one or more files', multiple=True) }}
+  </div>
 
   <h2 class="heading-medium">
     Check your files meet the letter specification
