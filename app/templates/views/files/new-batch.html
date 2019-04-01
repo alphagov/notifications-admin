@@ -17,12 +17,12 @@
       </h1>
     </div>
     <div class="column-one-sixth">
-      <a href="#" class="folder-heading-manage-link">Manage</a>
+      <a href="{{ manage_link }}" class="folder-heading-manage-link">Manage</a>
     </div>
   </div>
 
 
-  <div data-module='fake-delay' data-timeout='3600' data-message='Checking your files' class="bottom-gutter top-gutter-1-3">
+  <div data-module='fake-delay' data-timeout='{{ files|length * 1000 }}' data-message='Checking your files' class="bottom-gutter top-gutter-1-3">
     <a href="#" class="button">
     {% if files|length == 1 %}
       Send this letter
@@ -61,7 +61,7 @@
         status='',
         align='right'
       ) %}
-        <span data-module='fake-delay' data-timeout='{{ range(1200, 3600) | random }}' data-message='Checking'>
+        <span data-module='fake-delay' data-timeout='{{ range(800, files|length * 1000) | random }}' data-message='Checking'>
           Ready to send
         </span>
       {% endcall %}

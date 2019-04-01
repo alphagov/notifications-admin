@@ -3,7 +3,7 @@ from flask_login import current_user, login_required
 
 from app import current_service
 from app.main import main
-from app.main.forms import NewBatchForm, PageCountForm, PDFUploadForm
+from app.main.forms import BatchOptionsForm, NewBatchForm, PageCountForm, PDFUploadForm
 from app.utils import user_has_permissions
 
 
@@ -35,9 +35,34 @@ def new_batch(service_id):
         for i in range(10)
     )))
 
+    files_dict = {
+        'file{}'.format(i): request.args.get('file{}'.format(i))
+        for i in range(10)
+    }
+
     return render_template(
         'views/files/new-batch.html',
         files=files,
+        manage_link=url_for('.new_batch_manage', service_id=current_service.id, **files_dict),
+    )
+
+
+@main.route("/services/<service_id>/files/new-batch/manage", methods=['GET', 'POST'])
+@login_required
+@user_has_permissions()
+def new_batch_manage(service_id):
+
+    files_dict = {
+        'file{}'.format(i): request.args.get('file{}'.format(i))
+        for i in range(10)
+    }
+
+    form = BatchOptionsForm(name='New batch of letters')
+
+    return render_template(
+        'views/files/new-batch-manage.html',
+        form=form,
+        back_link=url_for('.new_batch', service_id=current_service.id, **files_dict),
     )
 
 

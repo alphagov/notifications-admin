@@ -1577,3 +1577,21 @@ class PageCountForm(StripWhitespaceForm):
         ],
         validators=[DataRequired()]
     )
+
+
+class BatchOptionsForm(StripWhitespaceForm):
+    name = StringField(
+        u'Batch name',
+        validators=[
+            DataRequired(message='Can’t be empty')
+        ]
+    )
+    postage = RadioField(
+        'Postage for this batch of letters',
+        choices=[
+            ('first', 'First class'),
+            ('second', 'Second class'),
+        ],
+        default='second',
+        validators=[DataRequired()]
+    )
