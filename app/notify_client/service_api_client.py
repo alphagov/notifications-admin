@@ -297,7 +297,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             '/service/{}/inbound-sms'.format(
                 service_id,
             ),
-            data={'user_number': user_number}
+            data={'phone_number': user_number}
         )
 
     def get_most_recent_inbound_sms(self, service_id, page=None):
