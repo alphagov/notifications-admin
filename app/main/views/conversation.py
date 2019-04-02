@@ -52,7 +52,7 @@ def conversation_reply(
         templates_and_folders=TemplateList(
             current_service,
             template_folder_id=from_folder,
-            user_id=current_user.id,
+            user=current_user,
             template_type='sms'
         ),
         template_folder_path=current_service.get_template_folder_path(from_folder),

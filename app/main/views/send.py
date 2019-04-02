@@ -111,7 +111,7 @@ def send_messages(service_id, template_id):
             session['file_uploads'].keys())
         )
 
-    db_template = service_api_client.get_service_template(service_id, template_id)['data']
+    db_template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
 
     email_reply_to = None
     sms_sender = None
@@ -209,7 +209,7 @@ def set_sender(service_id, template_id):
         url_for('.send_one_off', service_id=service_id, template_id=template_id)
     )
 
-    template = service_api_client.get_service_template(service_id, template_id)['data']
+    template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
 
     if template['template_type'] == 'letter':
         return redirect_to_one_off
@@ -297,7 +297,7 @@ def send_test(service_id, template_id):
     session['placeholders'] = {}
     session['send_test_letter_page_count'] = None
 
-    db_template = service_api_client.get_service_template(service_id, template_id)['data']
+    db_template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
     if db_template['template_type'] == 'letter':
         session['sender_id'] = None
 
@@ -354,7 +354,7 @@ def send_test_step(service_id, template_id, step_index):
             template_id=template_id,
         ))
 
-    db_template = service_api_client.get_service_template(service_id, template_id)['data']
+    db_template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
 
     if not session.get('send_test_letter_page_count'):
         session['send_test_letter_page_count'] = get_page_count_for_letter(db_template)
@@ -483,7 +483,7 @@ def send_test_preview(service_id, template_id, filetype):
     if filetype not in ('pdf', 'png'):
         abort(404)
 
-    db_template = service_api_client.get_service_template(service_id, template_id)['data']
+    db_template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
 
     template = get_template(
         db_template,
@@ -528,10 +528,7 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
 
     contents = s3download(service_id, upload_id)
 
-    db_template = service_api_client.get_service_template(
-        service_id,
-        str(template_id),
-    )['data']
+    db_template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
 
     email_reply_to = None
     sms_sender = None
@@ -843,7 +840,7 @@ def check_notification(service_id, template_id):
 
 
 def _check_notification(service_id, template_id, exception=None):
-    db_template = service_api_client.get_service_template(service_id, template_id)['data']
+    db_template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
     email_reply_to = None
     sms_sender = None
     if db_template['template_type'] == 'email':
@@ -917,10 +914,13 @@ def send_notification(service_id, template_id):
             service_id=service_id,
             template_id=template_id,
         ))
+
+    db_template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
+
     try:
         noti = notification_api_client.send_notification(
             service_id,
-            template_id=template_id,
+            template_id=db_template['id'],
             recipient=session['recipient'] or session['placeholders']['address line 1'],
             personalisation=session['placeholders'],
             sender_id=session['sender_id'] if 'sender_id' in session else None

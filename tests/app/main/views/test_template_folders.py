@@ -1,7 +1,7 @@
 import uuid
 
 import pytest
-from flask import url_for
+from flask import abort, url_for
 from notifications_python_client.errors import HTTPError
 
 from tests.conftest import (
@@ -497,6 +497,74 @@ def test_get_manage_folder_page_no_permissions(
         template_folder_id=PARENT_FOLDER_ID,
         _expected_status=403
     )
+
+
+@pytest.mark.parametrize('endpoint', [
+    'main.manage_template_folder',
+    'main.delete_template_folder',
+])
+def test_user_access_denied_to_template_folder_actions_without_folder_permission(
+    client_request,
+    active_user_with_permissions,
+    service_one,
+    mock_get_template_folders,
+    mocker,
+    endpoint
+):
+    service_one['permissions'] += ['edit_folder_permissions']
+
+    mock = mocker.patch(
+        'app.models.service.Service.get_template_folder_with_user_permission_or_403',
+        side_effect=lambda *args: abort(403)
+    )
+
+    folder_id = str(uuid.uuid4())
+    client_request.get(
+        endpoint,
+        service_id=service_one['id'],
+        template_folder_id=folder_id,
+        _expected_status=403,
+        _test_page_title=False,
+    )
+
+    mock.assert_called_once_with(folder_id, active_user_with_permissions)
+
+
+@pytest.mark.parametrize('endpoint', [
+    'main.check_notification',
+    'main.confirm_redact_template',
+    'main.delete_service_template',
+    'main.edit_service_template',
+    'main.edit_template_postage',
+    'main.send_messages',
+    'main.send_one_off',
+    'main.set_sender',
+    'main.set_template_sender',
+])
+def test_user_access_denied_to_template_actions_without_folder_permission(
+    client_request,
+    active_user_with_permissions,
+    service_one,
+    mocker,
+    endpoint
+):
+    service_one['permissions'] += ['edit_folder_permissions']
+
+    mock = mocker.patch(
+        'app.models.service.Service.get_template_with_user_permission_or_403',
+        side_effect=lambda *args: abort(403)
+    )
+
+    template_id = str(uuid.uuid4())
+    client_request.get(
+        endpoint,
+        service_id=service_one['id'],
+        template_id=template_id,
+        _expected_status=403,
+        _test_page_title=False,
+    )
+
+    mock.assert_called_once_with(template_id, active_user_with_permissions)
 
 
 def test_rename_folder(client_request, active_user_with_permissions, service_one, mock_get_template_folders, mocker):

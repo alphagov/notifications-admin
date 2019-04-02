@@ -11,7 +11,7 @@
 
     <div class="bottom-gutter-1-2">
       <h1 class="heading-large">Copy an existing template</h1>
-      {{ copy_folder_path(template_folder_path, current_service.id, from_service) }}
+      {{ copy_folder_path(template_folder_path, current_service.id, from_service, current_user) }}
     </div>
     {% if not services_templates_and_folders.templates_to_show %}
       <p class="template-list-empty">

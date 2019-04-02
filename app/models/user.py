@@ -151,6 +151,24 @@ class User(UserMixin):
     def has_permission_for_service(self, service_id, permission):
         return permission in self._permissions.get(service_id, [])
 
+    def has_template_folder_permission(self, template_folder, service=None):
+        from app import current_service
+
+        if service is None:
+            service = current_service
+
+        if not service.has_permission('edit_folder_permissions'):
+            return True
+
+        if self.platform_admin:
+            return True
+
+        # Top-level templates are always visible
+        if template_folder is None or template_folder['id'] is None:
+            return True
+
+        return self.id in template_folder.get("users_with_permission", [])
+
     def belongs_to_service(self, service_id):
         return str(service_id) in self.services
 

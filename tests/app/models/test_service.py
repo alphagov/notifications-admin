@@ -76,7 +76,7 @@ def test_get_user_template_folders_only_returns_folders_visible_to_user(
     mock_get_template_folders.return_value = _get_all_folders(active_user_with_permissions)
     service_one['permissions'] = ['edit_folder_permissions']
     service = Service(service_one)
-    result = service.get_user_template_folders(active_user_with_permissions.id)
+    result = service.get_user_template_folders(active_user_with_permissions)
     assert result == [
         {
             'name': "Parent 1 - invisible / 1's Visible child",
@@ -120,7 +120,7 @@ def test_get_template_folders_shows_user_folders_when_user_id_passed_in(
     mock_get_template_folders.return_value = _get_all_folders(active_user_with_permissions)
     service_one['permissions'] = ['edit_folder_permissions']
     service = Service(service_one)
-    result = service.get_template_folders(user_id=active_user_with_permissions.id)
+    result = service.get_template_folders(user=active_user_with_permissions)
     assert result == [
         {
             'name': "Parent 1 - invisible / 1's Visible child",

@@ -1481,7 +1481,7 @@ def test_send_test_sms_message_redirects_with_help_argument(
     user,
 ):
     mocker.patch('app.user_api_client.get_user', return_value=user(fake_uuid))
-    template = {'data': {'template_type': 'sms'}}
+    template = {'data': {'template_type': 'sms', 'folder': None}}
     mocker.patch('app.service_api_client.get_service_template', return_value=template)
 
     client_request.get(
@@ -1823,7 +1823,7 @@ def test_send_test_works_as_letter_preview(
         )
     )
 
-    mock_get_service_letter_template.assert_called_with(service_id, template_id)
+    mock_get_service_letter_template.assert_called_with(service_id, template_id, None)
 
     assert response.status_code == 200
     assert response.get_data(as_text=True) == 'foo'
@@ -1839,7 +1839,7 @@ def test_send_test_clears_session(
     service_one,
     fake_uuid,
 ):
-    template = {'data': {'template_type': 'sms'}}
+    template = {'data': {'template_type': 'sms', 'folder': None}}
     mocker.patch('app.service_api_client.get_service_template', return_value=template)
 
     with client_request.session_transaction() as session:
@@ -2187,7 +2187,7 @@ def test_should_show_preview_letter_message(
         )
     )
 
-    mock_get_service_letter_template.assert_called_with(service_id, template_id)
+    mock_get_service_letter_template.assert_called_with(service_id, template_id, None)
 
     assert response.status_code == 200
     assert response.get_data(as_text=True) == 'foo'
@@ -3121,6 +3121,7 @@ def test_send_notification_submits_data(
     client_request,
     fake_uuid,
     mock_send_notification,
+    mock_get_service_template,
     template,
     recipient,
     placeholders,
@@ -3150,6 +3151,7 @@ def test_send_notification_clears_session(
     service_one,
     fake_uuid,
     mock_send_notification,
+    mock_get_service_template,
 ):
     with client_request.session_transaction() as session:
         session['recipient'] = '07700900001'
@@ -3195,6 +3197,7 @@ def test_send_notification_redirects_to_view_page(
     client_request,
     fake_uuid,
     mock_send_notification,
+    mock_get_service_template,
     extra_args,
     extra_redirect_args
 ):

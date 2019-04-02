@@ -50,7 +50,14 @@ form_objects = {
 @login_required
 @user_has_permissions()
 def view_template(service_id, template_id):
-    template = service_api_client.get_service_template(service_id, str(template_id))['data']
+    template = current_service.get_template(template_id)
+    template_folder = current_service.get_template_folder(template['folder'])
+
+    if not current_service.has_permission("edit_folder_permissions"):
+        user_has_template_permission = True
+    else:
+        user_has_template_permission = current_user.has_template_folder_permission(template_folder)
+
     if should_skip_template_page(template['template_type']):
         return redirect(url_for(
             '.send_one_off', service_id=service_id, template_id=template_id
@@ -78,6 +85,7 @@ def view_template(service_id, template_id):
             page_count=get_page_count_for_letter(template),
         ),
         template_postage=template["postage"],
+        user_has_template_permission=user_has_template_permission,
         default_letter_contact_block_id=default_letter_contact_block_id,
     )
 
@@ -87,7 +95,7 @@ def view_template(service_id, template_id):
 @user_has_permissions('view_activity')
 def start_tour(service_id, template_id):
 
-    template = service_api_client.get_service_template(service_id, str(template_id))['data']
+    template = current_service.get_template(template_id)
 
     if template['template_type'] != 'sms':
         abort(404)
@@ -110,11 +118,17 @@ def start_tour(service_id, template_id):
 @login_required
 @user_has_permissions()
 def choose_template(service_id, template_type='all', template_folder_id=None):
+    template_folder = current_service.get_template_folder(template_folder_id)
 
-    template_list = TemplateList(current_service, template_type, template_folder_id, current_user.id)
+    if not current_service.has_permission("edit_folder_permissions"):
+        user_has_template_folder_permission = True
+    else:
+        user_has_template_folder_permission = current_user.has_template_folder_permission(template_folder)
+
+    template_list = TemplateList(current_service, template_type, template_folder_id, current_user)
 
     templates_and_folders_form = TemplateAndFoldersSelectionForm(
-        all_template_folders=current_service.get_user_template_folders(current_user.id),
+        all_template_folders=current_service.get_user_template_folders(current_user),
         template_list=template_list,
         template_type=template_type,
         allow_adding_letter_template=current_service.has_permission('letter'),
@@ -154,11 +168,13 @@ def choose_template(service_id, template_type='all', template_folder_id=None):
         search_form=SearchByNameForm(),
         templates_and_folders_form=templates_and_folders_form,
         move_to_children=templates_and_folders_form.move_to.children(),
+        user_has_template_folder_permission=user_has_template_folder_permission,
         option_hints=option_hints
     )
 
 
 def process_folder_management_form(form, current_folder_id):
+    current_service.get_template_folder_with_user_permission_or_403(current_folder_id, current_user)
     new_folder_id = None
 
     if form.is_add_template_op:
@@ -217,7 +233,7 @@ def view_letter_template_preview(service_id, template_id, filetype):
     if filetype not in ('pdf', 'png'):
         abort(404)
 
-    db_template = service_api_client.get_service_template(service_id, template_id)['data']
+    db_template = current_service.get_template(template_id)
 
     return TemplatePreview.from_database_object(db_template, filetype, page=request.args.get('page'))
 
@@ -252,7 +268,7 @@ def letter_branding_preview_image(filename):
 
 def _view_template_version(service_id, template_id, version, letters_as_pdf=False):
     return dict(template=get_template(
-        service_api_client.get_service_template(service_id, template_id, version=version)['data'],
+        current_service.get_template(template_id, version=version),
         current_service,
         expand_emails=True,
         letter_preview_url=url_for(
@@ -279,7 +295,7 @@ def view_template_version(service_id, template_id, version):
 @login_required
 @user_has_permissions()
 def view_template_version_preview(service_id, template_id, version, filetype):
-    db_template = service_api_client.get_service_template(service_id, template_id, version=version)['data']
+    db_template = current_service.get_template(template_id, version=version)
     return TemplatePreview.from_database_object(db_template, filetype)
 
 
@@ -348,7 +364,7 @@ def choose_template_to_copy(
             services_templates_and_folders=TemplateList(
                 service,
                 template_folder_id=from_folder,
-                user_id=current_user.id
+                user=current_user
             ),
             template_folder_path=service.get_template_folder_path(from_folder),
             from_service=service,
@@ -361,7 +377,7 @@ def choose_template_to_copy(
             services_templates_and_folders=TemplateLists([
                 Service(service) for service in
                 user_api_client.get_services_for_user(current_user)
-            ], user_id=current_user.id),
+            ], user=current_user),
             search_form=SearchByNameForm(),
         )
 
@@ -377,6 +393,13 @@ def copy_template(service_id, template_id):
         request.args.get('from_service'),
         str(template_id),
     )['data']
+
+    template_folder = template_folder_api_client.get_template_folder(service_id, template['folder'])
+    if (
+        current_service.has_permission('edit_folder_permissions') and
+        not current_user.has_template_folder_permission(template_folder)
+    ):
+        abort(403)
 
     if request.method == 'POST':
         return add_service_template(service_id, template['template_type'])
@@ -430,10 +453,10 @@ def action_blocked(service_id, notification_type, return_to, template_id):
 @login_required
 @user_has_permissions('manage_templates')
 def manage_template_folder(service_id, template_folder_id):
-    current_folder = current_service.get_template_folder(template_folder_id)
+    template_folder = current_service.get_template_folder_with_user_permission_or_403(template_folder_id, current_user)
     form = TemplateFolderForm(
-        name=current_folder['name'],
-        users_with_permission=current_folder.get('users_with_permission', None),
+        name=template_folder['name'],
+        users_with_permission=template_folder.get('users_with_permission', None),
         all_service_users=[user for user in current_service.active_users if user.id != current_user.id]
     )
     if form.validate_on_submit():
@@ -462,7 +485,7 @@ def manage_template_folder(service_id, template_folder_id):
 @login_required
 @user_has_permissions('manage_templates')
 def delete_template_folder(service_id, template_folder_id):
-    template_folder = current_service.get_template_folder(template_folder_id)
+    template_folder = current_service.get_template_folder_with_user_permission_or_403(template_folder_id, current_user)
 
     if len(current_service.get_template_folders_and_templates(
         template_type="all", template_folder_id=template_folder_id
@@ -567,7 +590,7 @@ def abort_403_if_not_admin_user():
 @login_required
 @user_has_permissions('manage_templates')
 def edit_service_template(service_id, template_id):
-    template = service_api_client.get_service_template(service_id, template_id)['data']
+    template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
     template['template_content'] = template['content']
     form = form_objects[template['template_type']](**template)
     if form.validate_on_submit():
@@ -629,13 +652,11 @@ def edit_service_template(service_id, template_id):
                 template_id=template_id
             ))
 
-    db_template = service_api_client.get_service_template(service_id, template_id)['data']
-
-    if email_or_sms_not_enabled(db_template['template_type'], current_service.permissions):
+    if email_or_sms_not_enabled(template['template_type'], current_service.permissions):
         return redirect(url_for(
             '.action_blocked',
             service_id=service_id,
-            notification_type=db_template['template_type'],
+            notification_type=template['template_type'],
             return_to='view_template',
             template_id=template_id
         ))
@@ -653,7 +674,7 @@ def edit_service_template(service_id, template_id):
 @login_required
 @user_has_permissions('manage_templates')
 def delete_service_template(service_id, template_id):
-    template = service_api_client.get_service_template(service_id, template_id)['data']
+    template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
 
     if request.method == 'POST':
         service_api_client.delete_service_template(service_id, template_id)
@@ -695,6 +716,7 @@ def delete_service_template(service_id, template_id):
             ),
             show_recipient=True,
         ),
+        user_has_template_permission=True,
     )
 
 
@@ -702,7 +724,7 @@ def delete_service_template(service_id, template_id):
 @login_required
 @user_has_permissions('manage_templates')
 def confirm_redact_template(service_id, template_id):
-    template = service_api_client.get_service_template(service_id, template_id)['data']
+    template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
 
     return render_template(
         'views/templates/template.html',
@@ -718,6 +740,7 @@ def confirm_redact_template(service_id, template_id):
             ),
             show_recipient=True,
         ),
+        user_has_template_permission=True,
         show_redaction_message=True,
     )
 
@@ -769,7 +792,7 @@ def view_template_versions(service_id, template_id):
 @login_required
 @user_has_permissions('manage_templates')
 def set_template_sender(service_id, template_id):
-    template = service_api_client.get_service_template(service_id, template_id)['data']
+    template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
     sender_details = get_template_sender_form_dict(service_id, template)
     no_senders = sender_details.get('no_senders', False)
 
@@ -800,7 +823,7 @@ def set_template_sender(service_id, template_id):
 @login_required
 @user_has_permissions('manage_templates')
 def edit_template_postage(service_id, template_id):
-    template = service_api_client.get_service_template(service_id, template_id)['data']
+    template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
     if template["template_type"] != "letter":
         abort(404)
     form = LetterTemplatePostageForm(**template)

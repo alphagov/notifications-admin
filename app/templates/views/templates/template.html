@@ -35,6 +35,7 @@
           folders=current_service.get_template_path(template._template),
           service_id=current_service.id,
           template_type='all',
+          current_user=current_user,
           fallback_page_title=template.name,
           show_fallback_page_title=not current_service.all_template_folders
         ) }}
@@ -64,7 +65,7 @@
       &emsp;
       <br/>
     {% endif %}
-    {% if current_user.has_permissions('manage_templates') %}
+    {% if current_user.has_permissions('manage_templates') and user_has_template_permission %}
       {% if not template._template.archived %}
         <span class="page-footer-delete-link page-footer-delete-link-without-button bottom-gutter-2-3">
           <a href="{{ url_for('.delete_service_template', service_id=current_service.id, template_id=template.id) }}">Delete this template</a>
