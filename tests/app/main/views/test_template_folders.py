@@ -464,7 +464,7 @@ def test_get_manage_folder_viewing_permissions_for_users(
         'folder_two – Templates – service one – GOV.UK Notify'
     )
     form_labels = page.select('legend[class=form-label]')
-    assert "Users who can see this folder:" in form_labels[0].text
+    assert normalize_spaces(form_labels[0].text) == "Team members who can see this folder"
     checkboxes = page.select('input[name=users_with_permission]')
 
     assert len(checkboxes) == 2
