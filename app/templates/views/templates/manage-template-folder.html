@@ -26,7 +26,9 @@
   {% call form_wrapper(action=url_for('main.manage_template_folder', service_id=current_service.id, template_folder_id=template_folder_id)) %}
     {{ textbox(form.name) }}
     {% if current_service.has_permission("edit_folder_permissions") %}
-      {{ checkboxes(form.users_with_permission) }}
+      {% if current_user.has_permissions("manage_service") %}
+        {{ checkboxes(form.users_with_permission) }}
+      {% endif %}
     {% endif %}
 
     {{ page_footer(

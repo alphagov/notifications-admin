@@ -477,6 +477,48 @@ def test_get_manage_folder_viewing_permissions_for_users(
     assert "Test User" in page.findAll('label', {'for': 'users_with_permission-0'})[0].text
 
 
+def test_get_manage_folder_viewing_permissions_for_users_not_visible_when_no_manage_users_permission(
+    client_request,
+    active_user_with_permissions,
+    service_one,
+    mock_get_template_folders,
+    mocker
+):
+    active_user_with_permissions.permissions[SERVICE_ONE_ID] = [
+        'send_texts',
+        'send_emails',
+        'send_letters',
+        'manage_templates',
+        'manage_settings',
+        'manage_api_keys',
+        'view_activity',
+    ]
+    folder_id = str(uuid.uuid4())
+    team_member = active_user_view_permissions(str(uuid.uuid4()))
+    team_member_2 = active_user_view_permissions(str(uuid.uuid4()))
+    service_one["permissions"] += ["edit_folder_permissions"]
+    mock_get_template_folders.return_value = [
+        {'id': folder_id, 'name': 'folder_two', 'parent_id': None, 'users_with_permission': [
+            active_user_with_permissions.id, team_member_2.id
+        ]},
+    ]
+    mocker.patch('app.models.service.Service.active_users', [active_user_with_permissions, team_member, team_member_2])
+
+    page = client_request.get(
+        'main.manage_template_folder',
+        service_id=service_one['id'],
+        template_folder_id=folder_id,
+        _test_page_title=False,
+    )
+    assert normalize_spaces(page.select_one('title').text) == (
+        'folder_two – Templates – service one – GOV.UK Notify'
+    )
+    form_labels = page.select('legend[class=form-label]')
+    assert len(form_labels) == 0
+    checkboxes = page.select('input[name=users_with_permission]')
+    assert len(checkboxes) == 0
+
+
 def test_manage_folder_page_404s(client_request, service_one, mock_get_template_folders):
     client_request.get(
         'main.manage_template_folder',
