@@ -460,7 +460,10 @@ def manage_template_folder(service_id, template_folder_id):
         all_service_users=[user for user in current_service.active_users if user.id != current_user.id]
     )
     if form.validate_on_submit():
-        users_with_permission = form.users_with_permission.data + [current_user.id]
+        if current_user.has_permissions("manage_service") and form.users_with_permission.all_service_users:
+            users_with_permission = form.users_with_permission.data + [current_user.id]
+        else:
+            users_with_permission = None
         template_folder_api_client.update_template_folder(
             current_service.id,
             template_folder_id,
