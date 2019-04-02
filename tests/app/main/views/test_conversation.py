@@ -287,7 +287,6 @@ def test_conversation_reply_shows_templates(
     service_one
 ):
 
-    service_one["permissions"] += ["edit_folder_permissions"]
     all_templates = {'data': [
         _template('sms', 'sms_template_one', parent=INV_PARENT_FOLDER_ID),
         _template('sms', 'sms_template_two'),

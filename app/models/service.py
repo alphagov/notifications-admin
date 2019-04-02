@@ -154,7 +154,7 @@ class Service(JSONModel):
         return {template['id'] for template in self.all_templates}
 
     def get_templates(self, template_type='all', template_folder_id=None, user=None):
-        if user and template_folder_id and self.has_permission('edit_folder_permissions'):
+        if user and template_folder_id:
             folder = self.get_template_folder(template_folder_id)
             if not user.has_template_folder_permission(folder):
                 return []
@@ -174,9 +174,6 @@ class Service(JSONModel):
 
     def get_template_folder_with_user_permission_or_403(self, folder_id, user):
         template_folder = self.get_template_folder(folder_id)
-
-        if not self.has_permission("edit_folder_permissions"):
-            return template_folder
 
         if not user.has_template_folder_permission(template_folder):
             abort(403)
@@ -438,9 +435,6 @@ class Service(JSONModel):
         folder making sure it displays in the closest visible parent.
 
         """
-        if not self.has_permission("edit_folder_permissions"):
-            return self.all_template_folders
-
         user_folders = []
         for folder in self.all_template_folders:
             if not user.has_template_folder_permission(folder, service=self):

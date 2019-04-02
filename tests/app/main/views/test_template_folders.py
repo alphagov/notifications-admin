@@ -4,6 +4,7 @@ import pytest
 from flask import abort, url_for
 from notifications_python_client.errors import HTTPError
 
+from tests import sample_uuid
 from tests.conftest import (
     SERVICE_ONE_ID,
     TEMPLATE_ONE_ID,
@@ -28,7 +29,7 @@ def _folder(name, folder_id=None, parent=None, users_with_permission=None):
         'name': name,
         'id': folder_id or str(uuid.uuid4()),
         'parent_id': parent,
-        'users_with_permission': users_with_permission or [],
+        'users_with_permission': users_with_permission if users_with_permission is not None else [sample_uuid()],
     }
 
 
@@ -416,9 +417,7 @@ def test_get_manage_folder_page(
 ):
     folder_id = str(uuid.uuid4())
     mock_get_template_folders.return_value = [
-        {'id': folder_id, 'name': 'folder_two', 'parent_id': None, 'users_with_permission': [
-            active_user_with_permissions.id
-        ]},
+        _folder('folder_two', folder_id, None, [active_user_with_permissions.id]),
     ]
     mocker.patch('app.models.service.Service.active_users', [active_user_with_permissions])
     page = client_request.get(
@@ -446,11 +445,8 @@ def test_get_manage_folder_viewing_permissions_for_users(
     folder_id = str(uuid.uuid4())
     team_member = active_user_view_permissions(str(uuid.uuid4()))
     team_member_2 = active_user_view_permissions(str(uuid.uuid4()))
-    service_one["permissions"] += ["edit_folder_permissions"]
     mock_get_template_folders.return_value = [
-        {'id': folder_id, 'name': 'folder_two', 'parent_id': None, 'users_with_permission': [
-            active_user_with_permissions.id, team_member_2.id
-        ]},
+        _folder('folder_two', folder_id, None, [active_user_with_permissions.id, team_member_2.id]),
     ]
     mocker.patch('app.models.service.Service.active_users', [active_user_with_permissions, team_member, team_member_2])
 
@@ -582,7 +578,6 @@ def test_user_access_denied_to_template_folder_actions_without_folder_permission
     mocker,
     endpoint
 ):
-    service_one['permissions'] += ['edit_folder_permissions']
 
     mock = mocker.patch(
         'app.models.service.Service.get_template_folder_with_user_permission_or_403',
@@ -619,7 +614,6 @@ def test_user_access_denied_to_template_actions_without_folder_permission(
     mocker,
     endpoint
 ):
-    service_one['permissions'] += ['edit_folder_permissions']
 
     mock = mocker.patch(
         'app.models.service.Service.get_template_with_user_permission_or_403',
@@ -642,9 +636,7 @@ def test_rename_folder(client_request, active_user_with_permissions, service_one
     mock_update = mocker.patch('app.template_folder_api_client.update_template_folder')
     folder_id = str(uuid.uuid4())
     mock_get_template_folders.return_value = [
-        {'id': folder_id, 'name': 'folder_two', 'parent_id': None, 'users_with_permission': [
-            active_user_with_permissions.id
-        ]}
+        _folder('folder_two', folder_id, None, [active_user_with_permissions.id])
     ]
     mocker.patch('app.models.service.Service.active_users', [active_user_with_permissions])
 
@@ -674,9 +666,7 @@ def test_manage_folder_users(
     mock_update = mocker.patch('app.template_folder_api_client.update_template_folder')
     folder_id = str(uuid.uuid4())
     mock_get_template_folders.return_value = [
-        {'id': folder_id, 'name': 'folder_two', 'parent_id': None, 'users_with_permission': [
-            active_user_with_permissions.id, team_member.id
-        ]}
+        _folder('folder_two', folder_id, None, [active_user_with_permissions.id, team_member.id])
     ]
     mocker.patch('app.models.service.Service.active_users', [active_user_with_permissions, team_member])
 
@@ -746,7 +736,7 @@ def test_delete_template_folder_should_request_confirmation(
     mocker.patch('app.models.service.Service.active_users', [])
     folder_id = str(uuid.uuid4())
     mock_get_template_folders.side_effect = [[
-        {'id': folder_id, 'name': 'sacrifice', 'parent_id': None},
+        _folder('sacrifice', folder_id, None),
     ], []]
     mocker.patch(
         'app.models.service.Service.get_templates',
@@ -784,7 +774,7 @@ def test_delete_template_folder_should_detect_non_empty_folder_on_get(
     folder_id = str(uuid.uuid4())
     template_id = str(uuid.uuid4())
     mock_get_template_folders.side_effect = [
-        [{'id': folder_id, 'name': "can't touch me", 'parent_id': None}],
+        [_folder("can't touch me", folder_id, None)],
         []
     ]
     mocker.patch(
@@ -813,7 +803,7 @@ def test_delete_folder(client_request, service_one, mock_get_template_folders, m
     mock_delete = mocker.patch('app.template_folder_api_client.delete_template_folder')
     folder_id = str(uuid.uuid4())
     mock_get_template_folders.side_effect = [[
-        {'id': folder_id, 'name': 'sacrifice', 'parent_id': parent_folder_id},
+        _folder('sacrifice', folder_id, parent_folder_id),
     ], []]
     mocker.patch(
         'app.models.service.Service.get_templates',
@@ -924,10 +914,10 @@ def test_should_show_radios_and_buttons_for_move_destination_if_correct_permissi
     FOLDER_TWO_ID = str(uuid.uuid4())
     FOLDER_ONE_TWO_ID = str(uuid.uuid4())
     mock_get_template_folders.return_value = [
-        {'id': PARENT_FOLDER_ID, 'name': 'folder_one', 'parent_id': None},
-        {'id': FOLDER_TWO_ID, 'name': 'folder_two', 'parent_id': None},
-        {'id': CHILD_FOLDER_ID, 'name': 'folder_one_one', 'parent_id': PARENT_FOLDER_ID},
-        {'id': FOLDER_ONE_TWO_ID, 'name': 'folder_one_two', 'parent_id': PARENT_FOLDER_ID},
+        _folder('folder_one', PARENT_FOLDER_ID, None),
+        _folder('folder_two', FOLDER_TWO_ID, None),
+        _folder('folder_one_one', CHILD_FOLDER_ID, PARENT_FOLDER_ID),
+        _folder('folder_one_two', FOLDER_ONE_TWO_ID, PARENT_FOLDER_ID),
     ]
     page = client_request.get(
         'main.choose_template',
@@ -966,8 +956,8 @@ def test_move_to_shouldnt_select_a_folder_by_default(
 
     FOLDER_TWO_ID = str(uuid.uuid4())
     mock_get_template_folders.return_value = [
-        {'id': PARENT_FOLDER_ID, 'name': 'folder_one', 'parent_id': None},
-        {'id': FOLDER_TWO_ID, 'name': 'folder_two', 'parent_id': None},
+        _folder('folder_one', PARENT_FOLDER_ID, None),
+        _folder('folder_two', FOLDER_TWO_ID, None),
     ]
     page = client_request.get(
         'main.choose_template',
@@ -986,8 +976,8 @@ def test_should_be_able_to_move_to_existing_folder(
 ):
     FOLDER_TWO_ID = str(uuid.uuid4())
     mock_get_template_folders.return_value = [
-        {'id': PARENT_FOLDER_ID, 'name': 'folder_one', 'parent_id': None},
-        {'id': FOLDER_TWO_ID, 'name': 'folder_two', 'parent_id': None},
+        _folder('folder_one', PARENT_FOLDER_ID, None),
+        _folder('folder_two', FOLDER_TWO_ID, None),
     ]
     client_request.post(
         'main.choose_template',
@@ -1033,8 +1023,8 @@ def test_should_not_be_able_to_move_to_existing_folder_if_dont_have_permission(
     client_request.login(user(fake_uuid))
     FOLDER_TWO_ID = str(uuid.uuid4())
     mock_get_template_folders.return_value = [
-        {'id': PARENT_FOLDER_ID, 'name': 'folder_one', 'parent_id': None},
-        {'id': FOLDER_TWO_ID, 'name': 'folder_two', 'parent_id': None},
+        _folder('folder_one', PARENT_FOLDER_ID, None),
+        _folder('folder_two', FOLDER_TWO_ID, None),
     ]
     client_request.post(
         'main.choose_template',
@@ -1059,8 +1049,8 @@ def test_move_folder_form_shows_current_folder_hint_when_in_a_folder(
     mock_get_template_folders,
 ):
     mock_get_template_folders.return_value = [
-        {'id': PARENT_FOLDER_ID, 'name': 'parent_folder', 'parent_id': None},
-        {'id': CHILD_FOLDER_ID, 'name': 'child_folder', 'parent_id': PARENT_FOLDER_ID},
+        _folder('parent_folder', PARENT_FOLDER_ID, None),
+        _folder('child_folder', CHILD_FOLDER_ID, PARENT_FOLDER_ID),
     ]
     page = client_request.get(
         'main.choose_template',
@@ -1086,8 +1076,8 @@ def test_move_folder_form_does_not_show_current_folder_hint_at_the_top_level(
     mock_get_template_folders,
 ):
     mock_get_template_folders.return_value = [
-        {'id': PARENT_FOLDER_ID, 'name': 'parent_folder', 'parent_id': None},
-        {'id': CHILD_FOLDER_ID, 'name': 'child_folder', 'parent_id': PARENT_FOLDER_ID},
+        _folder('parent_folder', PARENT_FOLDER_ID, None),
+        _folder('child_folder', CHILD_FOLDER_ID, PARENT_FOLDER_ID),
     ]
     page = client_request.get(
         'main.choose_template',
@@ -1115,9 +1105,9 @@ def test_should_be_able_to_move_a_sub_item(
 ):
     GRANDCHILD_FOLDER_ID = str(uuid.uuid4())
     mock_get_template_folders.return_value = [
-        {'id': PARENT_FOLDER_ID, 'name': 'folder_one', 'parent_id': None},
-        {'id': CHILD_FOLDER_ID, 'name': 'folder_one_one', 'parent_id': PARENT_FOLDER_ID},
-        {'id': GRANDCHILD_FOLDER_ID, 'name': 'folder_one_one_one', 'parent_id': CHILD_FOLDER_ID},
+        _folder('folder_one', PARENT_FOLDER_ID, None),
+        _folder('folder_one_one', CHILD_FOLDER_ID, PARENT_FOLDER_ID),
+        _folder('folder_one_one_one', GRANDCHILD_FOLDER_ID, CHILD_FOLDER_ID),
     ]
     client_request.post(
         'main.choose_template',
@@ -1200,8 +1190,8 @@ def test_no_action_if_user_fills_in_ambiguous_fields(
     service_one['permissions'] += ['letter']
 
     mock_get_template_folders.return_value = [
-        {'id': PARENT_FOLDER_ID, 'name': 'parent folder', 'parent_id': None},
-        {'id': FOLDER_TWO_ID, 'name': 'folder_two', 'parent_id': None},
+        _folder('parent_folder', PARENT_FOLDER_ID, None),
+        _folder('folder_two', FOLDER_TWO_ID, None),
     ]
 
     page = client_request.post(
@@ -1283,8 +1273,8 @@ def test_should_be_able_to_move_to_new_folder(
     new_folder_id = mock_create_template_folder.return_value
     FOLDER_TWO_ID = str(uuid.uuid4())
     mock_get_template_folders.return_value = [
-        {'id': PARENT_FOLDER_ID, 'name': 'parent folder', 'parent_id': None},
-        {'id': FOLDER_TWO_ID, 'name': 'folder_two', 'parent_id': None},
+        _folder('parent_folder', PARENT_FOLDER_ID, None),
+        _folder('folder_two', FOLDER_TWO_ID, None),
     ]
 
     client_request.post(
@@ -1366,8 +1356,8 @@ def test_show_custom_error_message(
         error_msg,
 ):
     mock_get_template_folders.return_value = [
-        {'id': PARENT_FOLDER_ID, 'name': 'folder_one', 'parent_id': None},
-        {'id': FOLDER_TWO_ID, 'name': 'folder_two', 'parent_id': None},
+        _folder('folder_one', PARENT_FOLDER_ID, None),
+        _folder('folder_two', FOLDER_TWO_ID, None),
     ]
     mock_move_to_template_folder.side_effect = HTTPError(message='Some api error msg')
 
@@ -1476,14 +1466,14 @@ def test_should_filter_templates_folder_page_based_on_user_permissions(
     expected_items,
     expected_empty_message,
 ):
-    service_one['permissions'] += ['edit_folder_permissions', 'letter']
+    service_one['permissions'] += ['letter']
     mock_get_template_folders.return_value = [
         _folder('folder_A', FOLDER_TWO_ID, None, [active_user_with_permissions.id]),
-        _folder('folder_B', FOLDER_B_ID, FOLDER_TWO_ID),
+        _folder('folder_B', FOLDER_B_ID, FOLDER_TWO_ID, []),
         _folder('folder_C', FOLDER_C_ID, FOLDER_TWO_ID, [active_user_with_permissions.id]),
         _folder('folder_D', None, FOLDER_TWO_ID, [active_user_with_permissions.id]),
-        _folder('folder_E', PARENT_FOLDER_ID),
-        _folder('folder_F', CHILD_FOLDER_ID, parent=PARENT_FOLDER_ID),
+        _folder('folder_E', PARENT_FOLDER_ID, users_with_permission=[]),
+        _folder('folder_F', CHILD_FOLDER_ID, PARENT_FOLDER_ID, []),
         _folder('folder_G', GRANDCHILD_FOLDER_ID, CHILD_FOLDER_ID, [active_user_with_permissions.id]),
     ]
     mocker.patch(

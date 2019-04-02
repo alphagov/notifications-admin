@@ -459,7 +459,7 @@ def test_edit_user_permissions(
         fake_uuid,
         SERVICE_ONE_ID,
         permissions=permissions_sent_to_api,
-        folder_permissions=None
+        folder_permissions=[]
     )
 
 
@@ -473,7 +473,6 @@ def test_edit_user_folder_permissions(
     mock_get_template_folders,
     fake_uuid,
 ):
-    service_one['permissions'] = ['edit_folder_permissions']
     mock_get_template_folders.return_value = [
         {'id': 'folder-id-1', 'name': 'folder_one', 'parent_id': None, 'users_with_permission': []},
         {'id': 'folder-id-2', 'name': 'folder_one', 'parent_id': None, 'users_with_permission': []},
@@ -626,7 +625,7 @@ def test_edit_user_permissions_including_authentication_with_email_auth_service(
             'manage_service',
             'manage_api_keys',
         },
-        folder_permissions=None
+        folder_permissions=[]
     )
     mock_update_user_attribute.assert_called_with(
         str(active_user_with_permissions.id),
@@ -653,7 +652,6 @@ def test_should_show_folder_permission_form_if_service_has_folder_permissions_en
     mock_get_template_folders,
     service_one
 ):
-    service_one['permissions'].append('edit_folder_permissions')
     mock_get_template_folders.return_value = [
         {'id': 'folder-id-1', 'name': 'folder_one', 'parent_id': None, 'users_with_permission': []},
         {'id': 'folder-id-2', 'name': 'folder_two', 'parent_id': None, 'users_with_permission': []},
@@ -772,40 +770,6 @@ def test_invite_user_with_email_auth_service(
                                                                 expected_permissions,
                                                                 auth_type,
                                                                 [])
-
-
-def test_invite_user_sends_invite_with_all_folders_if_folder_permissions_not_enabled(
-    client_request,
-    mocker,
-    mock_get_template_folders,
-    service_one
-):
-    mocker.patch('app.invite_api_client.get_invites_for_service')
-    mocker.patch('app.user_api_client.get_users_for_service')
-    mock_get_template_folders.return_value = [
-        {'id': 'folder-id-1', 'name': 'folder_one', 'parent_id': None, 'users_with_permission': []},
-        {'id': 'folder-id-2', 'name': 'folder_two', 'parent_id': None, 'users_with_permission': []},
-        {'id': 'folder-id-3', 'name': 'folder_three', 'parent_id': 'folder-id-1', 'users_with_permission': []},
-    ]
-    invite_mock = mocker.patch('app.invite_api_client.create_invite')
-
-    client_request.post(
-        'main.invite_user',
-        service_id=SERVICE_ONE_ID,
-        _data={
-            'email_address': 'user@example.com',
-            'send_messages': 'y',
-        },
-        _follow_redirects=True,
-        _expected_status=200,
-    )
-
-    folder_data_sent = invite_mock.call_args[0][-1]
-
-    assert len(folder_data_sent) == 3
-    assert 'folder-id-1' in folder_data_sent
-    assert 'folder-id-2' in folder_data_sent
-    assert 'folder-id-3' in folder_data_sent
 
 
 def test_cancel_invited_user_cancels_user_invitations(
