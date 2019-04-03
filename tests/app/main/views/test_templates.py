@@ -1189,6 +1189,42 @@ def test_load_edit_template_with_copy_of_template(
     )
 
 
+def test_copy_template_loads_template_from_within_subfolder(
+    client_request,
+    active_user_with_permission_to_two_services,
+    mock_get_service_templates,
+    mock_get_non_empty_organisations_and_services_for_user,
+    mocker
+):
+    template = template_json(
+        SERVICE_TWO_ID,
+        TEMPLATE_ONE_ID,
+        name='foo',
+        folder=PARENT_FOLDER_ID
+    )
+
+    mock_get_service_template = mocker.patch(
+        'app.service_api_client.get_service_template',
+        return_value={'data': template}
+    )
+    mock_get_template_folder = mocker.patch(
+        'app.template_folder_api_client.get_template_folder',
+        return_value=_folder('Parent folder', PARENT_FOLDER_ID),
+    )
+    client_request.login(active_user_with_permission_to_two_services)
+
+    page = client_request.get(
+        'main.copy_template',
+        service_id=SERVICE_ONE_ID,
+        template_id=TEMPLATE_ONE_ID,
+        from_service=SERVICE_TWO_ID,
+    )
+
+    assert page.select_one('input')['value'] == 'foo (copy)'
+    mock_get_service_template.assert_called_once_with(SERVICE_TWO_ID, TEMPLATE_ONE_ID)
+    mock_get_template_folder.assert_called_once_with(SERVICE_TWO_ID, PARENT_FOLDER_ID)
+
+
 def test_cant_copy_template_from_non_member_service(
     client_request,
     mock_get_service_email_template,

@@ -386,15 +386,13 @@ def choose_template_to_copy(
 @login_required
 @user_has_permissions('manage_templates')
 def copy_template(service_id, template_id):
+    from_service = request.args.get('from_service')
 
-    current_user.belongs_to_service_or_403(request.args.get('from_service'))
+    current_user.belongs_to_service_or_403(from_service)
 
-    template = service_api_client.get_service_template(
-        request.args.get('from_service'),
-        str(template_id),
-    )['data']
+    template = service_api_client.get_service_template(from_service, str(template_id))['data']
 
-    template_folder = template_folder_api_client.get_template_folder(service_id, template['folder'])
+    template_folder = template_folder_api_client.get_template_folder(from_service, template['folder'])
     if (
         current_service.has_permission('edit_folder_permissions') and
         not current_user.has_template_folder_permission(template_folder)
