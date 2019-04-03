@@ -3,18 +3,43 @@ from flask import request
 from app import events_api_client
 
 
-def on_user_logged_in(sender, user):
-    _send_event(sender, event_type='sucessful_login', user=user)
+def on_user_logged_in(_sender, user):
+    _send_event(event_type='sucessful_login', user_id=user.id)
 
 
-def _send_event(sender, **kwargs):
+def create_email_change_event(user_id, updated_by_id, original_email_address, new_email_address):
+    _send_event(
+        event_type='update_user_email',
+        user_id=user_id,
+        updated_by_id=updated_by_id,
+        original_email_address=original_email_address,
+        new_email_address=new_email_address)
+
+
+def create_mobile_number_change_event(user_id, updated_by_id, original_mobile_number, new_mobile_number):
+    _send_event(
+        event_type='update_user_mobile_number',
+        user_id=user_id,
+        updated_by_id=updated_by_id,
+        original_mobile_number=original_mobile_number,
+        new_mobile_number=new_mobile_number)
+
+
+def _send_event(**kwargs):
     if not kwargs.get('event_type'):
         return
 
     event_data = _construct_event_data(request)
+    event_fields = ('user_id',
+                    'updated_by_id',
+                    'original_email_address',
+                    'new_email_address',
+                    'original_mobile_number',
+                    'new_mobile_number')
 
-    if kwargs.get('user'):
-        event_data['user_id'] = kwargs.get('user').id
+    for field in event_fields:
+        if kwargs.get(field):
+            event_data[field] = kwargs[field]
 
     events_api_client.create_event(kwargs['event_type'], event_data)
 

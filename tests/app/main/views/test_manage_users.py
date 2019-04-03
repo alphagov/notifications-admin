@@ -1112,19 +1112,30 @@ def test_confirm_edit_user_email_page_404s_for_non_team_member(
 def test_confirm_edit_user_email_changes_user_email(
     client_request,
     active_user_with_permissions,
-    mock_get_users_by_service,
+    api_user_active,
     service_one,
     mocker,
-    mock_get_user,
-    mock_update_user_attribute
+    mock_update_user_attribute,
 ):
+    # We want active_user_with_permissions (the current user) to update the email address for api_user_active
+    # By default both users would have the same id, so we change the id of api_user_active
+    api_user_active.id = str(uuid.uuid4())
+    mocker.patch('app.user_api_client.get_users_for_service',
+                 return_value=[api_user_active, active_user_with_permissions])
+    # get_user gets called twice - first to check if current user can see the page, then to see if the team member
+    # whose email address we're changing belongs to the service
+    mocker.patch('app.models.service.user_api_client.get_user',
+                 side_effect=[active_user_with_permissions, api_user_active])
+    mock_event_handler = mocker.patch('app.main.views.manage_users.create_email_change_event')
+
     new_email = 'new_email@gov.uk'
     with client_request.session_transaction() as session:
         session['team_member_email_change'] = new_email
+
     client_request.post(
         'main.confirm_edit_user_email',
         service_id=service_one['id'],
-        user_id=active_user_with_permissions.id,
+        user_id=api_user_active.id,
         _expected_status=302,
         _expected_redirect=url_for(
             'main.manage_users',
@@ -1132,11 +1143,17 @@ def test_confirm_edit_user_email_changes_user_email(
             _external=True,
         ),
     )
+
     mock_update_user_attribute.assert_called_once_with(
-        active_user_with_permissions.id,
+        api_user_active.id,
         email_address=new_email,
-        updated_by=mocker.ANY
+        updated_by=active_user_with_permissions.id
     )
+    mock_event_handler.assert_called_once_with(
+        api_user_active.id,
+        active_user_with_permissions.id,
+        api_user_active.email_address,
+        new_email)
 
 
 def test_confirm_edit_user_email_doesnt_change_user_email_for_non_team_member(
@@ -1313,19 +1330,31 @@ def test_confirm_edit_user_mobile_number_page_redirects_if_session_empty(
 def test_confirm_edit_user_mobile_number_changes_user_mobile_number(
     client_request,
     active_user_with_permissions,
-    mock_get_users_by_service,
+    api_user_active,
     service_one,
     mocker,
-    mock_get_user,
     mock_update_user_attribute
 ):
+    # We want active_user_with_permissions (the current user) to update the mobile number for api_user_active
+    # By default both users would have the same id, so we change the id of api_user_active
+    api_user_active.id = str(uuid.uuid4())
+
+    mocker.patch('app.user_api_client.get_users_for_service',
+                 return_value=[api_user_active, active_user_with_permissions])
+    # get_user gets called twice - first to check if current user can see the page, then to see if the team member
+    # whose mobile number we're changing belongs to the service
+    mocker.patch('app.models.service.user_api_client.get_user',
+                 side_effect=[active_user_with_permissions, api_user_active])
+    mock_event_handler = mocker.patch('app.main.views.manage_users.create_mobile_number_change_event')
+
     new_number = '07554080636'
     with client_request.session_transaction() as session:
         session['team_member_mobile_change'] = new_number
+
     client_request.post(
         'main.confirm_edit_user_mobile_number',
         service_id=SERVICE_ONE_ID,
-        user_id=active_user_with_permissions.id,
+        user_id=api_user_active.id,
         _expected_status=302,
         _expected_redirect=url_for(
             'main.manage_users',
@@ -1334,10 +1363,15 @@ def test_confirm_edit_user_mobile_number_changes_user_mobile_number(
         ),
     )
     mock_update_user_attribute.assert_called_once_with(
-        active_user_with_permissions.id,
+        api_user_active.id,
         mobile_number=new_number,
-        updated_by=mocker.ANY
+        updated_by=active_user_with_permissions.id
     )
+    mock_event_handler.assert_called_once_with(
+        api_user_active.id,
+        active_user_with_permissions.id,
+        api_user_active.mobile_number,
+        new_number)
 
 
 def test_confirm_edit_user_mobile_number_doesnt_change_user_mobile_for_non_team_member(
