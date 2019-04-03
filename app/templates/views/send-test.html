@@ -16,7 +16,8 @@
 
   {% call form_wrapper(
     class='js-stick-at-top-when-scrolling send-one-off-form' if template.template_type != 'sms' else 'send-one-off-form',
-    module="autofocus"
+    module="autofocus",
+    data_kwargs={'force-focus': True}
   ) %}
     <div class="grid-row">
       <div class="column-two-thirds {% if form.placeholder_value.label.text == 'phone number' %}extra-tracking{% endif %}">
