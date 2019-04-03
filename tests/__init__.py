@@ -229,7 +229,8 @@ def template_json(service_id,
                   reply_to=None,
                   reply_to_text=None,
                   is_precompiled_letter=False,
-                  postage=None
+                  postage=None,
+                  folder=None
                   ):
     template = {
         'id': id_,
@@ -245,7 +246,7 @@ def template_json(service_id,
         'reply_to': reply_to,
         'reply_to_text': reply_to_text,
         'is_precompiled_letter': is_precompiled_letter,
-        'folder': None,
+        'folder': folder,
         'postage': postage
     }
     if content is None:
