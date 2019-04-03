@@ -11,12 +11,20 @@
 {% block maincolumn_content %}
 
   <h1 class="heading-large">
-    Import letters
+    Upload letters
   </h1>
 
+  <p>
+    Each letter must be saved as a separate file.
+  </p>
+
   <div class="bottom-gutter">
-    {{ file_upload(form.file, button_text='Choose one or more files', multiple=True) }}
+    {{ file_upload(form.file, button_text='Choose files', multiple=True) }}
   </div>
+
+  <p class="bottom-gutter">
+    Or <a href="{{ url_for('main.import_letters_collated_chunk', service_id=current_service.id) }}">upload all your letters in one file</a>.
+  </p>
 
   <h2 class="heading-medium">
     Check your files meet the letter specification
@@ -25,18 +33,15 @@
     Your files must be:
   </p>
   <ul class="list list-bullet">
-    <li>a PDF</li>
+    <li>saved as PDFs</li>
     <li>no more than 10 pages long</li>
-    <li>less than 2MB</li>
+    <li>less than 2MB each</li>
   </ul>
-  <p>
-    <a href="{{ url_for('main.import_letters_collated_chunk', service_id=current_service.id) }}">I want to upload a file that contains more than one letter</a>
-  </p>
   <p>
     The content of your letter must appear inside the printable area.
   </p>
   <p>
-    Download the letter specification for more information.
+    <a href="https://docs.notifications.service.gov.uk/documentation/images/notify-pdf-letter-spec-v2.3.pdf">Download the letter specification for more information</a>.
   </p>
 
 {% endblock %}

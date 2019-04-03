@@ -10,13 +10,29 @@
 {% block maincolumn_content %}
 
   <h1 class="heading-large">
-    Upload a file containing more than one letter
+    Upload all your letters in one file
   </h1>
 
   <p>
-    Each letter should be {{ page_count }} pages
+    Each letter should be {{ page_count }} pages long.
   </p>
 
-  {{ file_upload(form.file) }}
+  <div class="bottom-gutter">
+    {{ file_upload(form.file, button_text='Choose a file') }}
+  </div>
+
+  <h2 class="heading-medium">
+    Check your file meets the letter specification
+  </h2>
+
+  <p>
+    Your file must be a PDF.
+  </p>
+  <p>
+    The content of your letter must appear inside the printable area.
+  </p>
+  <p>
+    <a href="https://docs.notifications.service.gov.uk/documentation/images/notify-pdf-letter-spec-v2.3.pdf">Download the letter specification for more information</a>.
+  </p>
 
 {% endblock %}

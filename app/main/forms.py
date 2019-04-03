@@ -1581,13 +1581,13 @@ class PageCountForm(StripWhitespaceForm):
 
 class BatchOptionsForm(StripWhitespaceForm):
     name = StringField(
-        u'Batch name',
+        u'Upload name',
         validators=[
             DataRequired(message='Can’t be empty')
         ]
     )
     postage = RadioField(
-        'Postage for this batch of letters',
+        'Postage for this upload',
         choices=[
             ('first', 'First class'),
             ('second', 'Second class'),

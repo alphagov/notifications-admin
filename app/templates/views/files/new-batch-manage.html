@@ -5,13 +5,13 @@
 {% from "components/textbox.html" import textbox %}
 
 {% block service_page_title %}
-  New batch one
+  {{ heading }}
 {% endblock %}
 
 {% block maincolumn_content %}
 
   <h1 class="heading-large">
-    Manage
+    {{ heading }}
   </h1>
 
   {{ textbox(form.name) }}

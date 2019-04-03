@@ -1,10 +1,17 @@
 from flask import redirect, request, render_template, url_for
 from flask_login import current_user, login_required
+from datetime import datetime, timedelta
 
 from app import current_service
 from app.main import main
 from app.main.forms import BatchOptionsForm, NewBatchForm, PageCountForm, PDFUploadForm
 from app.utils import user_has_permissions
+
+
+def _get_batch_heading():
+    return 'Uploaded letters – {}'.format(
+        datetime.utcnow().strftime('%-d %B')
+    )
 
 
 @main.route("/services/<service_id>/files")
@@ -44,6 +51,10 @@ def new_batch(service_id):
         'views/files/new-batch.html',
         files=files,
         manage_link=url_for('.new_batch_manage', service_id=current_service.id, **files_dict),
+        heading=_get_batch_heading(),
+        time_now=datetime.utcnow().strftime('%-I:%M%p').lower(),
+        edd=(datetime.utcnow() + timedelta(days=3)).strftime('%-d %B'),
+        done=bool(request.args.get('done')),
     )
 
 
@@ -57,12 +68,13 @@ def new_batch_manage(service_id):
         for i in range(10)
     }
 
-    form = BatchOptionsForm(name='New batch of letters')
+    form = BatchOptionsForm(name=_get_batch_heading())
 
     return render_template(
         'views/files/new-batch-manage.html',
         form=form,
         back_link=url_for('.new_batch', service_id=current_service.id, **files_dict),
+        heading=_get_batch_heading(),
     )
 
 
