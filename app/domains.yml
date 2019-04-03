@@ -2211,7 +2211,7 @@ lancashire.gov.uk:
 lancaster.gov.uk:
   owner: Lancaster County Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 laugharnetownship-wcc.gov.uk:
   owner: Laugharne Township Community Council
   crown: false
