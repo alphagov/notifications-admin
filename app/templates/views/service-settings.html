@@ -102,7 +102,7 @@
 
         {% call settings_row(if_has_permission='email') %}
           {{ text_field('Email branding') }}
-          {{ text_field('Your branding' if current_service.email_branding else 'GOV.UK') }}
+          {{ text_field('Your branding<br> ({})'.format(current_service.email_branding_name)|safe if current_service.email_branding else current_service.email_branding_name) }}
           {{ edit_field(
             'Change',
             url_for('.branding_request', service_id=current_service.id),

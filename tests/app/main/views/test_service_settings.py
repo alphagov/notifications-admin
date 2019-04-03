@@ -152,7 +152,7 @@ def test_should_show_overview(
         'Label Value Action',
         'Send emails On Change',
         'Email reply-to addresses test@example.com Manage',
-        'Email branding GOV.UK Change',
+        'Email branding Your branding (Organisation name) Change',
 
         'Label Value Action',
         'Send text messages On Change',
@@ -173,7 +173,7 @@ def test_should_show_overview(
         'Label Value Action',
         'Send emails On Change',
         'Email reply-to addresses test@example.com Manage',
-        'Email branding GOV.UK Change',
+        'Email branding Your branding (Organisation name) Change',
 
         'Label Value Action',
         'Send text messages On Change',
@@ -220,6 +220,7 @@ def test_should_show_overview_for_service_with_more_things_set(
 ):
     client.login(active_user_with_permissions, mocker, service_one)
     service_one['permissions'] = permissions
+    service_one['email_branding'] = uuid4()
     response = client.get(url_for(
         'main.service_settings', service_id=service_one['id']
     ))
