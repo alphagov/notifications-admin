@@ -240,7 +240,7 @@ class InvitedUser(object):
         self.created_at = created_at
         self.auth_type = auth_type
         self.permissions = translate_permissions_from_db_to_admin_roles(self.permissions)
-        self.folder_permissions = folder_permissions or []
+        self.folder_permissions = folder_permissions
 
     def has_permissions(self, *permissions):
         if self.status == 'cancelled':
