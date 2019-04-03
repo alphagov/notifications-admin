@@ -222,7 +222,7 @@ apha.gov.uk:
 mil.uk: mod.gov.uk
 moduk.org: mod.gov.uk
 dera.gov.uk: mod.gov.uk
-dstl.gov.uk: mod.gov.uk  
+dstl.gov.uk: mod.gov.uk
 mod.gov.uk:
   owner: Ministry of Defence
   crown: true
@@ -1377,6 +1377,7 @@ dorchester-tc.gov.uk:
   owner: Dorchester Town Council
   crown: false
   agreement_signed: false
+dorsetcouncil.gov.uk: dorsetcc.gov.uk
 dorsetcc.gov.uk:
   owner: Dorset County Council
   crown: false
