@@ -543,3 +543,30 @@ class Service(JSONModel):
 
     def get_api_key(self, id):
         return self._get_by_id(self.api_keys, id)
+
+    @property
+    def request_to_go_live_tags(self):
+        return list(self._get_request_to_go_live_tags())
+
+    def _get_request_to_go_live_tags(self):
+
+        BASE = 'notify_request_to_go_live'
+
+        yield BASE
+
+        if self.go_live_checklist_completed and self.organisation.agreement_signed:
+            yield BASE + '_complete'
+            return
+
+        for test, tag in (
+            (True, ''),
+            (not self.volumes, '_volumes'),
+            (not self.go_live_checklist_completed, '_checklist'),
+            (not self.organisation.agreement_signed, '_mou'),
+            (self.needs_to_add_email_reply_to_address, '_email_reply_to'),
+            (not self.has_team_members, '_team_member'),
+            (not self.has_templates, '_template_content'),
+            (self.needs_to_change_sms_sender, '_sms_sender'),
+        ):
+            if test:
+                yield BASE + '_incomplete' + tag

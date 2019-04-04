@@ -1555,9 +1555,9 @@ def test_ready_to_go_live(
         'id': SERVICE_ONE_ID
     }).go_live_checklist_completed_as_yes_no == expected_readyness
 
-    assert list(app.main.views.service_settings._get_request_to_go_live_tags(
-        app.models.service.Service({'id': SERVICE_ONE_ID})
-    )) == expected_tags
+    assert app.models.service.Service(
+        {'id': SERVICE_ONE_ID}
+    ).request_to_go_live_tags == expected_tags
 
 
 @pytest.mark.parametrize('route', [

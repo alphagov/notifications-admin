@@ -244,7 +244,7 @@ def submit_request_to_go_live(service_id):
         ticket_type=zendesk_client.TYPE_QUESTION,
         user_email=current_user.email_address,
         user_name=current_user.name,
-        tags=get_request_to_go_live_tags(current_service),
+        tags=current_service.request_to_go_live_tags,
     )
 
     flash('Thanks for your request to go live. We’ll get back to you within one working day.', 'default')
@@ -1070,34 +1070,6 @@ def check_contact_details_type(contact_details):
         return 'email_address'
     else:
         return 'phone_number'
-
-
-def get_request_to_go_live_tags(service):
-    return list(_get_request_to_go_live_tags(service))
-
-
-def _get_request_to_go_live_tags(service):
-
-    BASE = 'notify_request_to_go_live'
-
-    yield BASE
-
-    if service.go_live_checklist_completed and service.organisation.agreement_signed:
-        yield BASE + '_complete'
-        return
-
-    for test, tag in (
-        (True, ''),
-        (not service.volumes, '_volumes'),
-        (not service.go_live_checklist_completed, '_checklist'),
-        (not service.organisation.agreement_signed, '_mou'),
-        (service.needs_to_add_email_reply_to_address, '_email_reply_to'),
-        (not service.has_team_members, '_team_member'),
-        (not service.has_templates, '_template_content'),
-        (service.needs_to_change_sms_sender, '_sms_sender'),
-    ):
-        if test:
-            yield BASE + '_incomplete' + tag
 
 
 def print_if_number(value):
