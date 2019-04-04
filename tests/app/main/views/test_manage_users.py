@@ -878,6 +878,73 @@ def test_no_permission_manage_users_page(
     assert "Team members" not in resp_text
 
 
+@pytest.mark.parametrize('folders_user_can_see, expected_message', [
+    (3, 'Can see all folders'),
+    (2, 'Can see 2 folders'),
+    (1, 'Can see 1 folder'),
+    (0, 'Cannot see any folders'),
+])
+def test_manage_user_page_shows_how_many_folders_user_can_view(
+    client_request,
+    service_one,
+    mock_get_template_folders,
+    mock_get_users_by_service,
+    mock_get_invites_for_service,
+    api_user_active,
+    folders_user_can_see,
+    expected_message
+):
+    service_one['permissions'] = ['edit_folder_permissions']
+    mock_get_template_folders.return_value = [
+        {'id': 'folder-id-1', 'name': 'f1', 'parent_id': None, 'users_with_permission': []},
+        {'id': 'folder-id-2', 'name': 'f2', 'parent_id': None, 'users_with_permission': []},
+        {'id': 'folder-id-3', 'name': 'f3', 'parent_id': None, 'users_with_permission': []},
+    ]
+    for i in range(folders_user_can_see):
+        mock_get_template_folders.return_value[i]['users_with_permission'].append(api_user_active.id)
+
+    page = client_request.get('main.manage_users', service_id=service_one['id'])
+
+    user_div = page.select_one("h3[title='notify@digital.cabinet-office.gov.uk']").parent
+    assert user_div.select_one('.tick-cross-list-hint:last-child').text.strip() == expected_message
+
+
+def test_manage_user_page_doesnt_show_folder_hint_if_service_has_no_folders(
+    client_request,
+    service_one,
+    mock_get_template_folders,
+    mock_get_users_by_service,
+    mock_get_invites_for_service,
+    api_user_active,
+):
+    service_one['permissions'] = ['edit_folder_permissions']
+    mock_get_template_folders.return_value = []
+
+    page = client_request.get('main.manage_users', service_id=service_one['id'])
+
+    user_div = page.select_one("h3[title='notify@digital.cabinet-office.gov.uk']").parent
+    assert user_div.find('.tick-cross-list-hint:last-child') is None
+
+
+def test_manage_user_page_doesnt_show_folder_hint_if_service_cant_edit_folder_permissions(
+    client_request,
+    service_one,
+    mock_get_template_folders,
+    mock_get_users_by_service,
+    mock_get_invites_for_service,
+    api_user_active
+):
+    service_one['permissions'] = []
+    mock_get_template_folders.return_value = [
+        {'id': 'folder-id-1', 'name': 'f1', 'parent_id': None, 'users_with_permission': [api_user_active.id]},
+    ]
+
+    page = client_request.get('main.manage_users', service_id=service_one['id'])
+
+    user_div = page.select_one("h3[title='notify@digital.cabinet-office.gov.uk']").parent
+    assert user_div.find('.tick-cross-list-hint:last-child') is None
+
+
 def test_remove_user_from_service(
     client_request,
     active_user_with_permissions,
