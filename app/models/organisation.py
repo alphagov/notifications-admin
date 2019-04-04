@@ -31,13 +31,12 @@ class Organisation(JSONModel):
     def crown_status(self):
         return self.crown
 
-    @property
-    def as_human_readable(self):
+    def as_human_readable(self, fallback_domain):
         if 'dwp.' in ''.join(self.domains):
             return 'DWP - Requires OED approval'
         if self.agreement_signed:
             return 'Yes, on behalf of {}'.format(self.name)
-        elif self.owner:
+        elif self.name:
             return '{} (organisation is {}, {})'.format(
                 {
                     False: 'No',
@@ -51,11 +50,10 @@ class Organisation(JSONModel):
                 }.get(self.crown_status),
             )
         else:
-            return 'Can’t tell (domain is {})'.format(self._domain)
+            return 'Can’t tell (domain is {})'.format(fallback_domain)
 
-    @property
-    def as_info_for_branding_request(self):
-        return self.owner or 'Can’t tell (domain is {})'.format(self._domain)
+    def as_info_for_branding_request(self, fallback_domain):
+        return self.name or 'Can’t tell (domain is {})'.format(fallback_domain)
 
     @property
     def as_jinja_template(self):

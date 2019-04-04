@@ -54,7 +54,6 @@ from app.main.forms import (
     branding_options_dict,
 )
 from app.utils import (
-    AgreementInfo,
     email_safe,
     user_has_permissions,
     user_is_gov_user,
@@ -180,7 +179,7 @@ def estimate_usage(service_id):
 @user_has_permissions('manage_service')
 def request_to_go_live(service_id):
 
-    agreement_signed = AgreementInfo.from_current_user().agreement_signed
+    agreement_signed = current_service.organisation.agreement_signed
 
     return render_template(
         'views/service-settings/request-to-go-live.html',
@@ -226,7 +225,7 @@ def submit_request_to_go_live(service_id):
             service_name=current_service.name,
             service_dashboard=url_for('main.service_dashboard', service_id=current_service.id, _external=True),
             organisation_type=str(current_service.organisation_type).title(),
-            agreement=AgreementInfo.from_current_user().as_human_readable,
+            agreement=current_service.organisation.as_human_readable(current_user.email_domain),
             checklist=current_service.go_live_checklist_completed_as_yes_no,
             volume_email=print_if_number(current_service.volume_email),
             volume_email_formatted=format_if_number(current_service.volume_email),
@@ -237,7 +236,7 @@ def submit_request_to_go_live(service_id):
             research_consent='Yes' if current_service.consent_to_research else 'No',
             existing_live='Yes' if user_api_client.user_has_live_services(current_user) else 'No',
             service_id=current_service.id,
-            organisation=AgreementInfo.from_current_user().owner,
+            organisation=current_service.organisation.name,
             user_name=current_user.name,
             user_email=current_user.email_address,
             date=datetime.now(tz=pytz.timezone('Europe/London')).strftime('%d/%m/%Y'),
@@ -245,7 +244,7 @@ def submit_request_to_go_live(service_id):
         ticket_type=zendesk_client.TYPE_QUESTION,
         user_email=current_user.email_address,
         user_name=current_user.name,
-        tags=get_request_to_go_live_tags(current_service, current_user),
+        tags=get_request_to_go_live_tags(current_service),
     )
 
     flash('Thanks for your request to go live. We’ll get back to you within one working day.', 'default')
@@ -985,7 +984,7 @@ def branding_request(service_id):
                 '\nCurrent branding: {current_branding}'
                 '\nBranding requested: {branding_requested}'
             ).format(
-                organisation=AgreementInfo.from_current_user().as_info_for_branding_request,
+                organisation=current_service.organisation.as_info_for_branding_request(current_user.email_domain),
                 service_name=current_service.name,
                 dashboard_url=url_for('main.service_dashboard', service_id=current_service.id, _external=True),
                 current_branding=current_service.email_branding_name,
@@ -1073,20 +1072,17 @@ def check_contact_details_type(contact_details):
         return 'phone_number'
 
 
-def get_request_to_go_live_tags(service, user):
-    return list(_get_request_to_go_live_tags(
-        service,
-        AgreementInfo.from_user(user).agreement_signed,
-    ))
+def get_request_to_go_live_tags(service):
+    return list(_get_request_to_go_live_tags(service))
 
 
-def _get_request_to_go_live_tags(service, agreement_signed):
+def _get_request_to_go_live_tags(service):
 
     BASE = 'notify_request_to_go_live'
 
     yield BASE
 
-    if service.go_live_checklist_completed and agreement_signed:
+    if service.go_live_checklist_completed and service.organisation.agreement_signed:
         yield BASE + '_complete'
         return
 
@@ -1094,7 +1090,7 @@ def _get_request_to_go_live_tags(service, agreement_signed):
         (True, ''),
         (not service.volumes, '_volumes'),
         (not service.go_live_checklist_completed, '_checklist'),
-        (not agreement_signed, '_mou'),
+        (not service.organisation.agreement_signed, '_mou'),
         (service.needs_to_add_email_reply_to_address, '_email_reply_to'),
         (not service.has_team_members, '_team_member'),
         (not service.has_templates, '_template_content'),

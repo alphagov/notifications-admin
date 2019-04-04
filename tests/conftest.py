@@ -3145,9 +3145,19 @@ def mock_get_organisation_by_domain(
 
 
 @pytest.fixture(scope='function')
-def mock_get_service_organisation(mocker):
+def mock_get_service_organisation(
+    mocker,
+    name=False,
+    crown=True,
+    agreement_signed=None,
+):
     def _get_service_organisation(service_id):
-        return organisation_json('7aa5d4e9-4385-4488-a489-07812ba13383', 'Org 1')
+        return organisation_json(
+            '7aa5d4e9-4385-4488-a489-07812ba13383',
+            name,
+            crown=crown,
+            agreement_signed=agreement_signed,
+        )
 
     return mocker.patch('app.organisations_client.get_service_organisation', side_effect=_get_service_organisation)
 
