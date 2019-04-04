@@ -123,7 +123,7 @@
     <h2 class="heading-medium" id="paying">How to pay</h2>
     <p>You can find details of how to pay for Notify in our data sharing and financial agreement.</p>
     <p>
-      {{ agreement_info.as_pricing_paragraph(
+      {{ current_user.default_organisation.as_pricing_paragraph(
         pricing_link=url_for('main.sign_in', next=url_for('main.pricing', _anchor='paying')),
         download_link=url_for('main.agreement'),
         support_link=url_for('.feedback', ticket_type='ask-question-give-feedback', body='agreement'),
