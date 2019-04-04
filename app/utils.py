@@ -13,15 +13,7 @@ import ago
 import dateutil
 import pyexcel
 import yaml
-from flask import (
-    Markup,
-    abort,
-    current_app,
-    redirect,
-    request,
-    session,
-    url_for,
-)
+from flask import abort, current_app, redirect, request, session, url_for
 from flask_login import current_user
 from notifications_utils.field import Field
 from notifications_utils.formatters import make_quotes_smart
@@ -409,143 +401,23 @@ def set_status_filters(filter_args):
 _dir_path = os.path.dirname(os.path.realpath(__file__))
 
 
-class AgreementInfo:
+class NotGovernmentEmailDomain(Exception):
+    pass
 
-    with open('{}/domains.yml'.format(_dir_path)) as domains:
-        domains = yaml.safe_load(domains)
-        domain_names = sorted(domains.keys(), key=len, reverse=True)
+
+class GovernmentEmailDomain():
+
+    with open('{}/email_domains.yml'.format(_dir_path)) as email_domains:
+        domain_names = yaml.safe_load(email_domains)
 
     def __init__(self, email_address_or_domain):
-
-        self._match = next(filter(
-            self.get_matching_function(email_address_or_domain),
-            self.domain_names,
-        ), None)
-
-        self._domain = email_address_or_domain.split('@')[-1]
-
-        (
-            self.owner,
-            self.crown_status,
-            self.agreement_signed,
-            self.canonical_domain,
-        ) = self._get_info()
-
-    @classmethod
-    def from_user(cls, user):
-        return cls(user.email_address if user.is_authenticated else '')
-
-    @classmethod
-    def from_current_user(cls):
-        return cls.from_user(current_user)
-
-    @property
-    def as_human_readable(self):
-        if self.canonical_domain and 'dwp' in self.canonical_domain:
-            return 'DWP - Requires OED approval'
-        if self.agreement_signed:
-            return 'Yes, on behalf of {}'.format(self.owner)
-        elif self.owner:
-            return '{} (organisation is {}, {})'.format(
-                {
-                    False: 'No',
-                    None: 'Can’t tell',
-                }.get(self.agreement_signed),
-                self.owner,
-                {
-                    True: 'a crown body',
-                    False: 'a non-crown body',
-                    None: 'crown status unknown',
-                }.get(self.crown_status),
-            )
-        else:
-            return 'Can’t tell (domain is {})'.format(self._domain)
-
-    @property
-    def as_info_for_branding_request(self):
-        return self.owner or 'Can’t tell (domain is {})'.format(self._domain)
-
-    @property
-    def as_jinja_template(self):
-        if self.crown_status is None:
-            return 'agreement-choose'
-        if self.agreement_signed:
-            return 'agreement-signed'
-        return 'agreement'
-
-    def as_terms_of_use_paragraph(self, **kwargs):
-        return Markup(self._as_terms_of_use_paragraph(**kwargs))
-
-    def _as_terms_of_use_paragraph(self, terms_link, download_link, support_link, signed_in):
-
-        if not signed_in:
-            return ((
-                '{} <a href="{}">Sign in</a> to download a copy '
-                'or find out if one is already in place.'
-            ).format(self._acceptance_required, terms_link))
-
-        if self.agreement_signed is None:
-            return ((
-                '{} <a href="{}">Download the agreement</a> or '
-                '<a href="{}">contact us</a> to find out if we already '
-                'have one in place with your organisation.'
-            ).format(self._acceptance_required, download_link, support_link))
-
-        if self.agreement_signed is False:
-            return ((
-                '{} <a href="{}">Download a copy</a>.'
-            ).format(self._acceptance_required, download_link))
-
-        return (
-            'Your organisation ({}) has already accepted the '
-            'GOV.UK&nbsp;Notify data sharing and financial '
-            'agreement.'.format(self.owner)
-        )
-
-    def as_pricing_paragraph(self, **kwargs):
-        return Markup(self._as_pricing_paragraph(**kwargs))
-
-    def _as_pricing_paragraph(self, pricing_link, download_link, support_link, signed_in):
-
-        if not signed_in:
-            return ((
-                '<a href="{}">Sign in</a> to download a copy or find '
-                'out if one is already in place with your organisation.'
-            ).format(pricing_link))
-
-        if self.agreement_signed is None:
-            return ((
-                '<a href="{}">Download the agreement</a> or '
-                '<a href="{}">contact us</a> to find out if we already '
-                'have one in place with your organisation.'
-            ).format(download_link, support_link))
-
-        return (
-            '<a href="{}">Download the agreement</a> '
-            '({} {}).'.format(
-                download_link,
-                self.owner,
-                {
-                    True: 'has already accepted it',
-                    False: 'hasn’t accepted it yet'
-                }.get(self.agreement_signed)
-            )
-        )
-
-    @property
-    def _acceptance_required(self):
-        return (
-            'Your organisation {} must also accept our data sharing '
-            'and financial agreement.'.format(
-                '({})'.format(self.owner) if self.owner else '',
-            )
-        )
-
-    @property
-    def crown_status_or_404(self):
-        if self.crown_status is None:
-            abort(404)
-        return self.crown_status
+        try:
+            self._match = next(filter(
+                self.get_matching_function(email_address_or_domain),
+                self.domain_names,
+            ))
+        except StopIteration:
+            raise NotGovernmentEmailDomain()
 
     @staticmethod
     def get_matching_function(email_address_or_domain):
@@ -563,45 +435,6 @@ class AgreementInfo:
             )
 
         return fn
-
-    def _get_info(self):
-
-        details = self.domains.get(self._match, {})
-
-        if details is None:
-            raise TypeError('Domain must have details ({})'.format(self._domain))
-
-        if isinstance(details, str):
-            self.is_canonical = False
-            return AgreementInfo(details)._get_info()
-
-        elif isinstance(details, dict):
-            self.is_canonical = bool(details)
-            return(
-                details.get("owner"),
-                details.get("crown"),
-                details.get("agreement_signed"),
-                self._match,
-            )
-
-
-class NotGovernmentEmailDomain(Exception):
-    pass
-
-
-class GovernmentEmailDomain(AgreementInfo):
-
-    with open('{}/email_domains.yml'.format(_dir_path)) as email_domains:
-        domain_names = yaml.safe_load(email_domains)
-
-    def __init__(self, email_address_or_domain):
-        try:
-            self._match = next(filter(
-                self.get_matching_function(email_address_or_domain),
-                self.domain_names,
-            ))
-        except StopIteration:
-            raise NotGovernmentEmailDomain()
 
 
 def unicode_truncate(s, length):

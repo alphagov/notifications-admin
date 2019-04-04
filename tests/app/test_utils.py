@@ -1,16 +1,13 @@
-from collections import Counter, OrderedDict
+from collections import OrderedDict
 from csv import DictReader
 from io import StringIO
 from pathlib import Path
 
 import pytest
 from freezegun import freeze_time
-from notifications_utils.recipients import validate_email_address
 
 from app import format_datetime_relative
 from app.utils import (
-    AgreementInfo,
-    GovernmentEmailDomain,
     Spreadsheet,
     email_safe,
     generate_next_dict,
@@ -290,159 +287,6 @@ def test_get_cdn_domain_on_non_localhost(client, mocker):
     mocker.patch.dict('app.current_app.config', values={'ADMIN_BASE_URL': 'https://some.admintest.com'})
     domain = get_logo_cdn_domain()
     assert domain == 'static-logos.admintest.com'
-
-
-@pytest.mark.parametrize("domain_or_email_address", (
-    "test@dclgdatamart.co.uk", "test@communities.gsi.gov.uk", "test@communities.gov.uk",
-))
-def test_get_valid_agreement_info_known_details(domain_or_email_address):
-    agreement_info = AgreementInfo(domain_or_email_address)
-    assert agreement_info.crown_status is None
-    assert agreement_info.owner == "Ministry of Housing, Communities & Local Government"
-    assert agreement_info.agreement_signed is True
-    assert agreement_info.as_human_readable == (
-        'Yes, on behalf of Ministry of Housing, Communities & Local Government'
-    )
-
-
-@pytest.mark.parametrize("domain_or_email_address", (
-    "test@dwp.gov.uk", "test@dwp.gsi.gov.uk",
-))
-def test_dwp_go_live_requests_are_flagged(domain_or_email_address):
-    agreement_info = AgreementInfo(domain_or_email_address)
-    assert agreement_info.owner == "Department for Work and Pensions"
-    assert agreement_info.agreement_signed is True
-    assert agreement_info.as_human_readable == (
-        'DWP - Requires OED approval'
-    )
-
-
-@pytest.mark.parametrize("domain_or_email_address, is_canonical", (
-    ("test@dclgdatamart.co.uk", False),
-    ("test@communities.gsi.gov.uk", False),
-    ("test@communities.gov.uk", True),
-))
-def test_get_canonical_domain(domain_or_email_address, is_canonical):
-    assert AgreementInfo(domain_or_email_address).canonical_domain == 'communities.gov.uk'
-    assert AgreementInfo(domain_or_email_address).is_canonical == is_canonical
-
-
-def test_get_canonical_domain_passes_through_unknown_domain():
-    assert AgreementInfo('example.com').canonical_domain is None
-    assert AgreementInfo('example.com').is_canonical is False
-
-
-@pytest.mark.parametrize("domain_or_email_address", (
-    "test@police.gov.uk", "police.gov.uk",
-))
-def test_get_valid_agreement_info_unknown_details(domain_or_email_address):
-    government_domain = AgreementInfo(domain_or_email_address)
-    assert government_domain.crown_status is None
-    assert government_domain.owner is None
-    assert government_domain.agreement_signed is None
-    assert government_domain.as_human_readable == 'Can’t tell (domain is police.gov.uk)'
-
-
-def test_get_valid_agreement_info_only_org_known():
-    agreement_info = AgreementInfo('nhs.net')
-    # Some parts of the NHS are Crown, some aren’t
-    assert agreement_info.crown_status is None
-    assert agreement_info.owner == 'NHS'
-    assert agreement_info.agreement_signed is None
-    assert agreement_info.as_human_readable == 'Can’t tell (organisation is NHS, crown status unknown)'
-
-
-def test_get_valid_agreement_info_some_known_details():
-    agreement_info = AgreementInfo("marinemanagement.org.uk")
-    assert agreement_info.crown_status is None
-    assert agreement_info.owner == "Marine Management Organisation"
-    assert agreement_info.agreement_signed is True
-    assert agreement_info.as_human_readable == (
-        'Yes, on behalf of Marine Management Organisation'
-    )
-
-
-def test_get_valid_local_agreement_info_some_known_details():
-    # This example may need to be updated to use a different council if
-    # Babergh every sign the agreement
-    agreement_info = AgreementInfo("babergh.gov.uk")
-    assert agreement_info.crown_status is False
-    assert agreement_info.owner == "Babergh District Council"
-    assert agreement_info.agreement_signed is False
-    assert agreement_info.as_human_readable == (
-        'No (organisation is Babergh District Council, a non-crown body)'
-    )
-
-
-def test_get_valid_government_domain_gets_most_specific_first():
-
-    generic = AgreementInfo("gov.uk")
-    assert generic.crown_status is None
-    assert generic.owner is None
-    assert generic.agreement_signed is None
-    assert generic.as_human_readable == (
-        'Can’t tell (domain is gov.uk)'
-    )
-
-    specific = AgreementInfo("dacorum.gov.uk")
-    assert specific.crown_status is False
-    assert specific.owner == 'Dacorum Borough Council'
-    assert specific.agreement_signed is True
-    assert specific.as_human_readable == (
-        'Yes, on behalf of Dacorum Borough Council'
-    )
-
-
-def test_get_domain_info_for_branding_request():
-
-    assert AgreementInfo("gov.uk").as_info_for_branding_request == (
-        'Can’t tell (domain is gov.uk)'
-    )
-    assert AgreementInfo("dacorum.gov.uk").as_info_for_branding_request == (
-        'Dacorum Borough Council'
-    )
-
-
-def test_domains_are_lowercased():
-    for domain in AgreementInfo.domains.keys():
-        assert domain == domain.lower()
-
-
-def test_validate_government_domain_data():
-
-    for domain in AgreementInfo.domains.keys():
-
-        validate_email_address('test@{}'.format(domain))
-
-        agreement_info = AgreementInfo(domain)
-
-        assert agreement_info.crown_status in {
-            True, False, None
-        }
-
-        assert isinstance(agreement_info.owner, str) and agreement_info.owner.strip()
-
-        assert agreement_info.agreement_signed in {
-            True, False, None
-        }
-
-
-def test_domain_data_is_canonicalized():
-    for owner, count in Counter(
-        AgreementInfo(domain).owner
-        for domain in AgreementInfo.domains.keys()
-        if AgreementInfo(domain).is_canonical
-    ).most_common():
-        if count > 1:
-            raise ValueError(
-                '{} entries in domains.yml for {}'.format(count, owner)
-            )
-
-
-def test_validate_email_domain_data():
-
-    for domain in GovernmentEmailDomain.domains.keys():
-        validate_email_address('test@{}'.format(domain))
 
 
 @pytest.mark.parametrize('time, human_readable_datetime', [
