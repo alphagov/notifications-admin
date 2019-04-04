@@ -2,6 +2,8 @@ from flask import abort, current_app
 from notifications_utils.field import Field
 from werkzeug.utils import cached_property
 
+from app.models import JSONModel
+from app.models.organisation import Organisation
 from app.notify_client.api_key_api_client import api_key_api_client
 from app.notify_client.billing_api_client import billing_api_client
 from app.notify_client.email_branding_client import email_branding_client
@@ -18,7 +20,7 @@ from app.notify_client.user_api_client import user_api_client
 from app.utils import get_default_sms_sender
 
 
-class Service():
+class Service(JSONModel):
 
     ALLOWED_PROPERTIES = {
         'active',
@@ -50,24 +52,11 @@ class Service():
     )
 
     def __init__(self, _dict):
-        # in the case of a bad request current service may be `None`
-        self._dict = _dict or {}
+
+        super().__init__(_dict)
+
         if 'permissions' not in self._dict:
             self.permissions = {'email', 'sms', 'letter'}
-
-    def __bool__(self):
-        return self._dict != {}
-
-    def __getattr__(self, attr):
-        if attr in self.ALLOWED_PROPERTIES:
-            return self._dict[attr]
-        raise AttributeError('`{}` is not a service attribute'.format(attr))
-
-    def _get_by_id(self, things, id):
-        try:
-            return next(thing for thing in things if thing['id'] == str(id))
-        except StopIteration:
-            abort(404)
 
     def update(self, **kwargs):
         return service_api_client.update_service(self.id, **kwargs)
@@ -402,8 +391,14 @@ class Service():
         return None
 
     @cached_property
+    def organisation(self):
+        return Organisation(
+            organisations_client.get_service_organisation(self.id)
+        )
+
+    @property
     def organisation_name(self):
-        return organisations_client.get_service_organisation(self.id).get('name', None)
+        return self.organisation.name
 
     @cached_property
     def inbound_number(self):
