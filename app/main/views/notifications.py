@@ -60,7 +60,9 @@ def view_notification(service_id, notification_id):
 
     if notification['template']['is_precompiled_letter']:
         try:
-            file_contents = view_letter_notification_as_preview(service_id, notification_id, "pdf")
+            file_contents = view_letter_notification_as_preview(
+                service_id, notification_id, "pdf"
+            )
             page_count = pdf_page_count(io.BytesIO(file_contents))
         except PdfReadError:
             return render_template(
@@ -72,7 +74,6 @@ def view_notification(service_id, notification_id):
 
     if notification.get('postage'):
         notification['template']['postage'] = notification['postage']
-
     template = get_template(
         notification['template'],
         current_service,
@@ -173,14 +174,22 @@ def view_letter_notification_as_preview(service_id, notification_id, filetype):
 
     if filetype not in ('pdf', 'png'):
         abort(404)
-
+    notification = notification_api_client.get_notification(service_id, str(notification_id))
     try:
-        preview = notification_api_client.get_notification_letter_preview(
-            service_id,
-            notification_id,
-            filetype,
-            page=request.args.get('page')
-        )
+        if notification['status'] == "validation-failed":
+            preview = notification_api_client.get_notification_letter_preview_with_overlay(
+                service_id,
+                notification_id,
+                filetype,
+                page=request.args.get('page')
+            )
+        else:
+            preview = notification_api_client.get_notification_letter_preview(
+                service_id,
+                notification_id,
+                filetype,
+                page=request.args.get('page')
+            )
 
         display_file = base64.b64decode(preview['content'])
     except APIError:
