@@ -456,6 +456,32 @@ def test_should_show_image_of_letter_notification(
     assert response.get_data(as_text=True) == 'foo'
 
 
+def test_should_show_image_of_letter_notification_that_failed_validation(
+    logged_in_client,
+    fake_uuid,
+    mocker
+):
+
+    mock_get_notification(mocker, fake_uuid, template_type='letter', notification_status='validation-failed')
+
+    mocker.patch(
+        'app.main.views.notifications.notification_api_client.get_notification_letter_preview_with_overlay',
+        return_value={
+            'content': base64.b64encode(b'foo').decode('utf-8')
+        }
+    )
+
+    response = logged_in_client.get(url_for(
+        'main.view_letter_notification_as_preview',
+        service_id=SERVICE_ONE_ID,
+        notification_id=fake_uuid,
+        filetype='png'
+    ))
+
+    assert response.status_code == 200
+    assert response.get_data(as_text=True) == 'foo'
+
+
 def test_should_show_preview_error_image_letter_notification_on_preview_error(
     logged_in_client,
     fake_uuid,
