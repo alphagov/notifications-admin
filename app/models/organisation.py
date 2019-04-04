@@ -27,10 +27,6 @@ class Organisation(JSONModel):
         if self._dict == {}:
             self.name, self.crown, self.agreement_signed = None, None, None
 
-    @property
-    def crown_status(self):
-        return self.crown
-
     def as_human_readable(self, fallback_domain):
         if 'dwp.' in ''.join(self.domains):
             return 'DWP - Requires OED approval'
@@ -47,7 +43,7 @@ class Organisation(JSONModel):
                     True: 'a crown body',
                     False: 'a non-crown body',
                     None: 'crown status unknown',
-                }.get(self.crown_status),
+                }.get(self.crown),
             )
         else:
             return 'Can’t tell (domain is {})'.format(fallback_domain)
@@ -57,7 +53,7 @@ class Organisation(JSONModel):
 
     @property
     def as_jinja_template(self):
-        if self.crown_status is None:
+        if self.crown is None:
             return 'agreement-choose'
         if self.agreement_signed:
             return 'agreement-signed'
@@ -133,6 +129,6 @@ class Organisation(JSONModel):
 
     @property
     def crown_status_or_404(self):
-        if self.crown_status is None:
+        if self.crown is None:
             abort(404)
-        return self.crown_status
+        return self.crown
