@@ -9,7 +9,9 @@ const { src, pipe, dest, series, parallel } = require('gulp');
 const loadPlugins = require('gulp-load-plugins');
 const stylish = require('jshint-stylish');
 
-const plugins = loadPlugins();
+const plugins = loadPlugins({
+  'rename': { 'gulp-base64-inline': 'base64' }
+});
 
 // 2. CONFIGURATION
 // - - - - - - - - - - - - - - -
@@ -116,7 +118,7 @@ const sass = () => {
         paths.toolkit + 'stylesheets/'
       ]
     }))
-    .pipe(plugins.base64({baseDir: 'app'}))
+    .pipe(plugins.base64('../..'))
     .pipe(dest(paths.dist + 'stylesheets/'))
 };
 
