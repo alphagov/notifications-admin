@@ -17,7 +17,7 @@
   <p class="hint">No uploads yet</p>
 
   <div class="js-stick-at-bottom-when-scrolling">
-    <a href="{{ url_for('main.new_contact_list', service_id=current_service.id) }}" class="button-secondary">New contact list</a>
+    <a href="{{ url_for('main.new_contact_list', service_id=current_service.id) }}" class="button-secondary">Upload a contact list</a>
     <a href="{{ url_for('main.import_letters', service_id=current_service.id) }}" class="button-secondary">Upload letters</a>
   </div>
 {% endblock %}
