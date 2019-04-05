@@ -169,6 +169,19 @@ class User(UserMixin):
 
         return self.id in template_folder.get("users_with_permission", [])
 
+    def template_folders_for_service(self, service=None):
+        """
+        Returns list of template folders that a user can view for a given service
+        """
+        if not service.has_permission('edit_folder_permissions'):
+            return service.all_template_folders
+
+        return [
+            template_folder
+            for template_folder in service.all_template_folders
+            if self.id in template_folder.get("users_with_permission", [])
+        ]
+
     def belongs_to_service(self, service_id):
         return str(service_id) in self.services
 
@@ -267,6 +280,10 @@ class InvitedUser(object):
         else:
             data['permissions'] = sorted(self.permissions)
         return data
+
+    def template_folders_for_service(self, service=None):
+        # only used on the manage users page to display the count, so okay to not be fully fledged for now
+        return [{'id': x} for x in self.folder_permissions]
 
 
 class InvitedOrgUser(object):
