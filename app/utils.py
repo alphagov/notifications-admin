@@ -36,6 +36,11 @@ FAILURE_STATUSES = ['failed', 'temporary-failure', 'permanent-failure',
                     'technical-failure', 'virus-scan-failed', 'validation-failed']
 REQUESTED_STATUSES = SENDING_STATUSES + DELIVERED_STATUSES + FAILURE_STATUSES
 
+with open('{}/email_domains.yml'.format(
+    os.path.dirname(os.path.realpath(__file__))
+)) as email_domains:
+    GOVERNMENT_EMAIL_DOMAIN_NAMES = yaml.safe_load(email_domains)
+
 
 def user_has_permissions(*permissions, **permission_kwargs):
     def wrap(func):
@@ -280,11 +285,13 @@ def get_help_argument():
 
 
 def is_gov_user(email_address):
-    try:
-        GovernmentEmailDomain(email_address)
-        return True
-    except NotGovernmentEmailDomain:
-        return False
+    return any(
+        email_address.lower().endswith((
+            "@{}".format(known),
+            ".{}".format(known),
+        ))
+        for known in GOVERNMENT_EMAIL_DOMAIN_NAMES
+    )
 
 
 def get_template(
@@ -396,45 +403,6 @@ def set_status_filters(filter_args):
         SENDING_STATUSES if 'sending' in status_filters else [],
         FAILURE_STATUSES if 'failed' in status_filters else []
     )))
-
-
-_dir_path = os.path.dirname(os.path.realpath(__file__))
-
-
-class NotGovernmentEmailDomain(Exception):
-    pass
-
-
-class GovernmentEmailDomain():
-
-    with open('{}/email_domains.yml'.format(_dir_path)) as email_domains:
-        domain_names = yaml.safe_load(email_domains)
-
-    def __init__(self, email_address_or_domain):
-        try:
-            self._match = next(filter(
-                self.get_matching_function(email_address_or_domain),
-                self.domain_names,
-            ))
-        except StopIteration:
-            raise NotGovernmentEmailDomain()
-
-    @staticmethod
-    def get_matching_function(email_address_or_domain):
-
-        email_address_or_domain = email_address_or_domain.lower()
-
-        def fn(domain):
-
-            return (
-                email_address_or_domain == domain
-            ) or (
-                email_address_or_domain.endswith("@{}".format(domain))
-            ) or (
-                email_address_or_domain.endswith(".{}".format(domain))
-            )
-
-        return fn
 
 
 def unicode_truncate(s, length):
