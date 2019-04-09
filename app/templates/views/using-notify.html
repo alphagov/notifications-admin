@@ -14,18 +14,18 @@
   <div class="column-two-thirds">
 
     <h1 class="heading-large">Using Notify</h1>
-    
+
     <p>The information on this page has moved.</p>
-    
+
     <p>Use the links below to find out more about:</p>
     <ul class="list list-bullet">
-      <li>trial mode</li>
-      <li>message statuses</li>
-      <li>email replies</li>
-      <li>text message replies</li>
-      <li>letters</li>
+      <li><a href="{{ url_for('main.trial_mode_new') }}">trial mode</a></li>
+      <li><a href="{{ url_for('main.message_status') }}">message statuses</a></li>
+      <li><a href="{{ url_for('main.features_email') }}">email replies</a></li>
+      <li><a href="{{ url_for('main.features_sms') }}">text message replies</a></li>
+      <li><a href="{{ url_for('main.features_letters') }}">letters</a></li>
     </ul>
-    
+
     <!-- <h2 id="trial-mode" class="heading-medium">Trial mode</h2>
     <p>When you set up a new service it will start in trial mode. This lets you try out GOV.UK Notify, with a few restrictions.</p>
     <p>A service in trial mode can only:</p>
@@ -34,7 +34,7 @@
         <li>send messages to you and other people in your team</li>
        <li>draft letters, but not send them</li>
      </ul>
-    
+
     <p>
       To remove these restrictions, you can
       {% if current_service and current_service.trial_mode %}
@@ -50,7 +50,7 @@
       <li>accept our terms of use</li>
       <li>set up your service so you're ready to send and receive messages</li>
     </ul>
-    
+
     <h2 id="messagedeliveryandfailure" class="heading-medium">Sending messages</h2>
     <p>When you send a message using GOV.UK Notify, it moves through different states.</p>
 
@@ -93,7 +93,7 @@
     <p>Sending cancelled. Your letter will not be printed or dispatched.</p>
     <h3 class="heading-small">Technical failure</h3>
     <p>GOV.UK Notify had an unexpected error while sending to our printing provider.</p>
-        
+
     <h2 class="heading-medium">Receiving messages</h2>
     <h3 class="heading-small">Email replies</h3>
     <p>You can choose an email address you want replies to go to.</p>

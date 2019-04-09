@@ -277,7 +277,7 @@ def using_notify():
     return render_template(
         'views/using-notify.html',
         navigation_links=features_nav()
-    )
+    ), 410
 
 
 @main.route('/features/messages-status')
