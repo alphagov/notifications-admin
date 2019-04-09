@@ -16,7 +16,9 @@
 
     <h1 class="heading heading-large">Letters</h1>
     <p>GOV.UK Notify will print, pack and post your letters for you.</p>
-    <p><a href="https://www.notifications.service.gov.uk/register">Create an account</a> and try Notify for yourself.</p>
+    {% if not current_user.is_authenticated %}
+      <p><a href="https://www.notifications.service.gov.uk/register">Create an account</a> and try Notify for yourself.</p>
+    {% endif %}
 
     <h2 class="heading heading-medium">Features</h2>
     <p>Notify makes it easy to:</p>

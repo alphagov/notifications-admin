@@ -13,11 +13,13 @@
     {{ sub_navigation(navigation_links) }}
   </div>
   <div class="column-two-thirds">
-    
+
     <h1 class="heading heading-large">Emails</h1>
-    <p>Send an unlimited number of emails for free with GOV.UK Notify.</p>   
-    <p><a href="https://www.notifications.service.gov.uk/register">Create an account</a> and try Notify for yourself.</p>
-   
+    <p>Send an unlimited number of emails for free with GOV.UK Notify.</p>
+    {% if not current_user.is_authenticated %}
+      <p><a href="https://www.notifications.service.gov.uk/register">Create an account</a> and try Notify for yourself.</p>
+    {% endif %}
+
     <h2 class="heading heading-medium">Features</h2>
     <p>Notify makes it easy to:</p>
     <ul class="list list-bullet">
@@ -42,17 +44,17 @@
     </ul>
     <p><a href="https://www.notifications.service.gov.uk/support/ask-question-give-feedback">Contact the team</a> and ask us to turn this feature on for your service.</p>
     <p><a href="https://www.notifications.service.gov.uk/documentation">Read the API documentation</a> for more information.</p>
-   
+
     <h3 class="heading heading-small">Add a reply-to address</h3>
     <p>Notify lets you choose the email address that users reply to.</p>
     <p>Emails with a reply-to address seem more trustworthy and are less likely to be labelled as spam.</p>
     <p>You can add reply-to addresses in your service settings.</p>
-            
+
     <h2 class="heading heading-medium">Pricing</h2>
     <p>It’s free to send emails through GOV.UK Notify.</p>
     <p><a href="https://www.notifications.service.gov.uk/pricing">See pricing</a> for more details.</p>
-          
+
   </div>
 </div>
-      
+
 {% endblock %}
