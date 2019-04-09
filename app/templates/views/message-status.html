@@ -1,5 +1,6 @@
 {% extends "withoutnav_template.html" %}
 {% from "components/sub-navigation.html" import sub_navigation %}
+{% from "components/table.html" import mapping_table, row, text_field %}
 
 {% block per_page_title %}
   What happens when you send a message OR Message states you’ll see in Notify
@@ -27,7 +28,7 @@
         style="width: 100%;"
     >
     <h2 id="messagestatus" class="heading-medium">Message statuses you’ll see in Notify</h2>
-    
+
     <h3 class="heading-small">Emails and text messages</h3>
     <div class="bottom-gutter-3-2">
       {% call mapping_table(
@@ -72,10 +73,10 @@
         {% endfor %}
       {% endcall %}
     </div>
-    
+
     <p><a href="https://www.notifications.service.gov.uk/documentation">Read our documentation</a> for a detailed list of API message statuses.</p>
 
-    
+
   </div>
 </div>
 

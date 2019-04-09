@@ -285,6 +285,14 @@ def using_notify():
     )
 
 
+@main.route('/features/messages-status')
+def message_status():
+    return render_template(
+        'views/message-status.html',
+        navigation_links=features_nav()
+    )
+
+
 # --- Redirects --- #
 
 @main.route('/roadmap', endpoint='old_roadmap')

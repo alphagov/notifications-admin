@@ -32,4 +32,8 @@ def features_nav():
             "name": "Using Notify",
             "link": "main.using_notify",
         },
+        {
+            "name": "Message status",
+            "link": "main.message_status",
+        },
     ]
