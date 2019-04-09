@@ -60,11 +60,6 @@ def privacy():
     return render_template('views/privacy.html')
 
 
-@main.route('/trial-mode')
-def trial_mode():
-    return redirect(url_for('.using_notify') + '#trial-mode', 301)
-
-
 @main.route('/pricing')
 def pricing():
     return render_template(
@@ -289,6 +284,19 @@ def using_notify():
 def message_status():
     return render_template(
         'views/message-status.html',
+        navigation_links=features_nav()
+    )
+
+
+@main.route('/trial-mode')
+def trial_mode():
+    return redirect(url_for('.trial_mode_new'), 301)
+
+
+@main.route('/features/trial-mode')
+def trial_mode_new():
+    return render_template(
+        'views/trial-mode.html',
         navigation_links=features_nav()
     )
 
