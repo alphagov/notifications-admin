@@ -236,6 +236,30 @@ def roadmap():
     )
 
 
+@main.route('/features/email')
+def features_email():
+    return render_template(
+        'views/features/emails.html',
+        navigation_links=features_nav()
+    )
+
+
+@main.route('/features/sms')
+def features_sms():
+    return render_template(
+        'views/features/text-messages.html',
+        navigation_links=features_nav()
+    )
+
+
+@main.route('/features/letters')
+def features_letters():
+    return render_template(
+        'views/features/letters.html',
+        navigation_links=features_nav()
+    )
+
+
 @main.route('/features/security', endpoint='security')
 def security():
     return render_template(

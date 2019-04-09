@@ -5,6 +5,18 @@ def features_nav():
             "link": "main.features",
         },
         {
+            "name": "Emails",
+            "link": "main.features_email",
+        },
+        {
+            "name": "Text messages",
+            "link": "main.features_sms",
+        },
+        {
+            "name": "Letters",
+            "link": "main.features_letters",
+        },
+        {
             "name": "Roadmap",
             "link": "main.roadmap",
         },
