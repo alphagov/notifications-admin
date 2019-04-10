@@ -21,6 +21,14 @@ def features_nav():
             "link": "main.roadmap",
         },
         {
+            "name": "Trial mode",
+            "link": "main.trial_mode_new",
+        },
+        {
+            "name": "Message statuses",
+            "link": "main.message_status",
+        },
+        {
             "name": "Security",
             "link": "main.security",
         },
@@ -31,13 +39,5 @@ def features_nav():
         {
             "name": "Using Notify",
             "link": "main.using_notify",
-        },
-        {
-            "name": "Message status",
-            "link": "main.message_status",
-        },
-        {
-            "name": "Trial mode",
-            "link": "main.trial_mode_new",
         },
     ]
