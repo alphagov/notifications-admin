@@ -15,13 +15,6 @@
     <h1 class="heading-large">Support</h1>
     <p>We provide 24-hour online support for teams with a live service on GOV.UK Notify.</p>
 
-    <div class="panel panel-border-wide">
-          <p>
-            Check our <a href="https://status.notifications.service.gov.uk">system status</a>
-            page to see if there are any known issues with Notify.
-          </p>
-        </div>
-    
     {% call form_wrapper(class="bottom-gutter-2") %}
       {{ radios(form.support_type) }}
       {{ page_footer('Continue') }}
