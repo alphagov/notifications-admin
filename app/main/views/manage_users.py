@@ -16,6 +16,10 @@ from app import (
     service_api_client,
     user_api_client,
 )
+from app.event_handlers import (
+    create_email_change_event,
+    create_mobile_number_change_event,
+)
 from app.main import main
 from app.main.forms import (
     ChangeEmailForm,
@@ -196,6 +200,8 @@ def confirm_edit_user_email(service_id, user_id):
             user_api_client.update_user_attribute(str(user_id), email_address=new_email, updated_by=current_user.id)
         except HTTPError as e:
             abort(500, e)
+        else:
+            create_email_change_event(user.id, current_user.id, user.email_address, new_email)
         finally:
             session.pop('team_member_email_change', None)
 
@@ -254,6 +260,8 @@ def confirm_edit_user_mobile_number(service_id, user_id):
             user_api_client.update_user_attribute(str(user_id), mobile_number=new_number, updated_by=current_user.id)
         except HTTPError as e:
             abort(500, e)
+        else:
+            create_mobile_number_change_event(user.id, current_user.id, user.mobile_number, new_number)
         finally:
             session.pop('team_member_mobile_change', None)
 
