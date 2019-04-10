@@ -3,7 +3,7 @@
 {% from "components/table.html" import mapping_table, row, text_field %}
 
 {% block per_page_title %}
-  What happens when you send a message OR Message states you’ll see in Notify
+  Message statuses
 {% endblock %}
 
 {% block maincolumn_content %}
@@ -14,7 +14,7 @@
   </div>
   <div class="column-two-thirds">
 
-    <h1 class="heading-large">What happens when you send a message</h1>
+    <h1 class="heading-large">Message statuses</h1>
 
     <p>When you send a message using GOV.UK Notify, it moves through different states.</p>
     <p>Notify’s real-time dashboard lets you check the status of any message, to see when it was delivered. You can also use our API to check the status of your messages.</p>
@@ -27,7 +27,9 @@
              temporary failures"
         style="width: 100%;"
     >
-    <h2 id="messagestatus" class="heading-medium">Message statuses you’ll see in Notify</h2>
+    <h2 id="messagestatus" class="heading-medium">List of message statuses</h2>
+    <p>These are the statuses you’ll see when you’re signed in to Notify.</p>
+    <p>Some API statuses are different to the ones you'll see when you're signed in to Notify. <a href="https://www.notifications.service.gov.uk/documentation">Read our documentation</a> for a detailed list of API message statuses.</p>
 
     <h3 class="heading-small">Emails</h3>
     <div class="bottom-gutter-3-2">
@@ -96,8 +98,6 @@
         {% endfor %}
       {% endcall %}
     </div>
-
-    <p><a href="https://www.notifications.service.gov.uk/documentation">Read our documentation</a> for a detailed list of API message statuses.</p>
 
 
   </div>
