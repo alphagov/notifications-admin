@@ -72,6 +72,9 @@ class Service():
     def update(self, **kwargs):
         return service_api_client.update_service(self.id, **kwargs)
 
+    def update_status(self, live):
+        return service_api_client.update_status(self.id, live=live)
+
     def switch_permission(self, permission):
         return self.force_permission(
             permission,

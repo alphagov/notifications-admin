@@ -262,12 +262,7 @@ def service_switch_live(service_id):
     )
 
     if form.validate_on_submit():
-        current_service.update(
-            # TODO This limit should be set depending on the agreement signed by
-            # with Notify.
-            message_limit=250000 if form.enabled.data else 50,
-            restricted=(not form.enabled.data)
-        )
+        current_service.update_status(live=form.enabled.data)
         return redirect(url_for('.service_settings', service_id=service_id))
 
     return render_template(
