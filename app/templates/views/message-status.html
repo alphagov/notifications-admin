@@ -14,7 +14,7 @@
   </div>
   <div class="column-two-thirds">
 
-    <h1 class="heading-large">Message statuses</h1>
+    <h1 class="heading-large">Message status</h1>
 
     <p>When you send a message using GOV.UK Notify, it moves through different states.</p>
     <p>Notify’s real-time dashboard lets you check the status of any message, to see when it was delivered. You can also use our API to check the status of your messages.</p>
@@ -22,16 +22,16 @@
 
     <img
         src="{{ asset_url('images/message-sending-flow.svg') }}"
-        alt="A picture of the sending flow of messages in Notify, showing the three states of Sending, Delivered, And Failed. Also shows the next
+        alt="A picture of the sending flow of messages in Notify, showing the three states of Sending, Delivered and Failed. Also shows the next
              steps when messages fail, deleting data and trying a new channel for permanent failures, and trying again or trying a new channel for
              temporary failures"
         style="width: 100%;"
     >
-    <h2 id="messagestatus" class="heading-medium">List of message statuses</h2>
-    <p>These are the statuses you’ll see when you’re signed in to Notify.</p>
-    <p>If you're using our API, some of the statuses you'll see will be different. <a href="https://www.notifications.service.gov.uk/documentation">Read our documentation</a> for a detailed list of API message statuses.</p>
+    <h2 id="messagestatus" class="heading-medium">Types of message status</h2>
+    <p>These are the types of message status you’ll see when you’re signed in to Notify.</p>
+    <p>If you're using our API, some of the statuses you'll see will be different. <a href="https://www.notifications.service.gov.uk/documentation">Read our documentation</a> for a detailed list of API message status types.</p>
 
-    <h3 class="heading-small">Emails</h3>
+    <h3 class="heading-small">Email</h3>
     <div class="bottom-gutter-3-2">
       {% call mapping_table(
         caption='Message statuses – emails',
@@ -40,7 +40,7 @@
         caption_visible=False
       ) %}
         {% for message_length, charge in [
-          ('Sending', 'GOV.UK Notify has sent the message to the provider. The provider will try to deliver the message to the recipient. GOV.UK Notify is waiting for delivery information.'),
+          ('Sending', 'Notify has sent the message to the provider. The provider will try to deliver the message to the recipient. Notify is waiting for delivery information.'),
           ('Delivered', 'The message was successfully delivered. Notify will not tell you if a user has opened or read a message.'),
           ('Email address does not exist', 'The provider could not deliver the message because the email address was wrong. You should remove these email addresses from your database.'),
           ('Inbox not accepting messages right now', 'The provider could not deliver the message after trying for 72 hours. This can happen when the recipient’s inbox is full. You can try to send the message again.'),
@@ -63,7 +63,7 @@
         caption_visible=False
       ) %}
         {% for message_length, charge in [
-          ('Sending', 'GOV.UK Notify has sent the message to the provider. The provider will try to deliver the message to the recipient. GOV.UK Notify is waiting for delivery information.'),
+          ('Sending', 'Notify has sent the message to the provider. The provider will try to deliver the message to the recipient. Notify is waiting for delivery information.'),
           ('Sent internationally', 'The message was sent to an international number. The mobile networks in some countries do not provide any more delivery information.'),
           ('Delivered', 'The message was successfully delivered. Notify will not tell you if a user has opened or read a message.'),
           ('Phone number does not exist', 'The provider could not deliver the message because the phone number was wrong. You should remove these phone numbers from your database. You’ll still be charged for text messages to numbers that do not exist.'),
@@ -87,9 +87,9 @@
         caption_visible=False
       ) %}
         {% for message_length, charge in [
-          ('Sent', 'GOV.UK Notify has sent the letter to the provider to be printed.'),
+          ('Sent', 'Notify has sent the letter to the provider to be printed.'),
           ('Cancelled', 'Sending cancelled. Your letter will not be printed or dispatched.'),
-          ('Technical failure', 'GOV.UK Notify had an unexpected error while sending to our printing provider.'),
+          ('Technical failure', 'Notify had an unexpected error while sending to our printing provider.'),
         ] %}
           {% call row() %}
             {{ text_field(message_length) }}
