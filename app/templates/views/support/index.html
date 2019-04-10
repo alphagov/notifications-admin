@@ -15,34 +15,34 @@
     <h1 class="heading-large">Support</h1>
     <p>We provide 24-hour online support for teams with a live service on GOV.UK Notify.</p>
 
+    <div class="panel panel-border-wide">
+          <p>
+            Check our <a href="https://status.notifications.service.gov.uk">system status</a>
+            page to see if there are any known issues with Notify.
+          </p>
+        </div>
+    
     {% call form_wrapper(class="bottom-gutter-2") %}
       {{ radios(form.support_type) }}
       {{ page_footer('Continue') }}
     {% endcall %}
 
-    <p>You can also <a href="https://ukgovernmentdigital.slack.com/messages/govuk-notify">get in touch with us on Slack.</a></p>
-    
-    <div class="panel panel-border-wide">
-          <p>
-            Check our <a href="https://status.notifications.service.gov.uk">system status</a>
-            page to see if there are any known issues with GOV.UK Notify.
-          </p>
-        </div>
+    <p>You can also <a href="https://ukgovernmentdigital.slack.com/messages/govuk-notify">get in touch with us on Slack</a>.</p>
     
     <h2 class="heading-medium">During office hours</h2>
     <p>Our office hours are 9.30am to 5.30pm, Monday to Friday.</p>
-    <p>Contact us using the form on this page or <a href="https://ukgovernmentdigital.slack.com/messages/govuk-notify">send us a message on Slack</a> and you’ll get a reply within 30 minutes.</p>
+    <p>When you report a problem during office hours we'll reply within 30 minutes.</p>
     
     <h2 class="heading-medium">Out-of-hours</h2>
-    <p>Outside office hours, response times depend on whether you’re reporting an emergency or not.</p>
+    <p>Outside office hours, response times depend on whether you’re reporting an emergency.</p>
     <p>If it’s an emergency, we’ll reply within 30 minutes and update you every hour until the problem’s fixed.</p>
+    <p>If your problem is not an emergency, we’ll reply during the next working day.</p>
     <p>A problem is only classed as an emergency if:</p>
     <ul class="list list-bullet">
       <li>nobody on your team can sign in</li>
       <li>a ‘technical difficulties’ error appears when you try to upload a file</li>
       <li>a 500 response code appears when you try to send messages using the API</li>
     </ul>
-    <p>We’ll reply during the next working day for any other problems.</p>
   </div>
 </div>
 
