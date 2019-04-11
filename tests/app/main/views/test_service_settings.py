@@ -1,3 +1,4 @@
+from collections import namedtuple
 from functools import partial
 from unittest.mock import ANY, PropertyMock, call
 from urllib.parse import parse_qs, urlparse
@@ -731,16 +732,76 @@ def test_should_check_for_sending_things_right(
     assert normalize_spaces(checklist_items[2].text) == expected_templates_checklist_item
     assert normalize_spaces(checklist_items[3].text) == expected_reply_to_checklist_item
 
-    assert page.select_one('form')['method'] == 'post'
-    assert 'action' not in page.select_one('form')
-
     mock_count_users.assert_called_once_with(SERVICE_ONE_ID, 'manage_service')
-    assert mock_templates.call_args_list == [
-        call(),
-    ]
+    assert mock_templates.called is True
 
     if count_of_email_templates:
         mock_get_reply_to_email_addresses.assert_called_once_with(SERVICE_ONE_ID)
+
+
+@pytest.mark.parametrize('checklist_completed, agreement_signed, expected_button', (
+    (True, True, True),
+    (True, None, True),
+    (True, False, False),
+    (False, True, False),
+    (False, None, False),
+))
+def test_should_not_show_go_live_button_if_checklist_not_complete(
+    client_request,
+    mocker,
+    mock_get_service_templates,
+    mock_get_users_by_service,
+    single_sms_sender,
+    checklist_completed,
+    agreement_signed,
+    expected_button,
+):
+
+    def _agreement_info():
+        return namedtuple(
+            'AgreementInfo', ['agreement_signed']
+        )(agreement_signed=agreement_signed)
+
+    mocker.patch(
+        'app.models.service.Service.go_live_checklist_completed',
+        new_callable=PropertyMock,
+        return_value=checklist_completed,
+    )
+    mocker.patch(
+        'app.utils.AgreementInfo.from_current_user',
+        side_effect=_agreement_info,
+    )
+
+    for channel in ('email', 'sms', 'letter'):
+        mocker.patch(
+            'app.models.service.Service.volume_{}'.format(channel),
+            create=True,
+            new_callable=PropertyMock,
+            return_value=0,
+        )
+
+    page = client_request.get(
+        'main.request_to_go_live', service_id=SERVICE_ONE_ID
+    )
+    assert page.h1.text == 'Before you request to go live'
+
+    if expected_button:
+        assert page.select_one('form')['method'] == 'post'
+        assert 'action' not in page.select_one('form')
+        assert normalize_spaces(page.select('main p')[0].text) == (
+            'When we receive your request we’ll get back to you within one working day.'
+        )
+        assert normalize_spaces(page.select('main p')[1].text) == (
+            'By requesting to go live you’re agreeing to our terms of use.'
+        )
+        page.select_one('[type=submit]').text.strip() == ('Request to go live')
+    else:
+        assert not page.select('form')
+        assert not page.select('[type=submit]')
+        assert len(page.select('main p')) == 1
+        assert normalize_spaces(page.select_one('main p').text) == (
+            'You must complete these steps before you can request to go live.'
+        )
 
 
 @pytest.mark.parametrize((
@@ -887,9 +948,7 @@ def test_should_check_for_sms_sender_on_go_live(
     checklist_items = page.select('.task-list .task-list-item')
     assert normalize_spaces(checklist_items[3].text) == expected_sms_sender_checklist_item
 
-    assert mock_templates.call_args_list == [
-        call(),
-    ]
+    assert mock_templates.called is True
 
     mock_get_sms_senders.assert_called_once_with(SERVICE_ONE_ID)
 
