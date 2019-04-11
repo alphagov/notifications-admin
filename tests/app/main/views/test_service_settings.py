@@ -800,7 +800,7 @@ def test_should_not_show_go_live_button_if_checklist_not_complete(
         assert not page.select('[type=submit]')
         assert len(page.select('main p')) == 1
         assert normalize_spaces(page.select_one('main p').text) == (
-            'No go'
+            'You must complete these steps before you can request to go live.'
         )
 
 
