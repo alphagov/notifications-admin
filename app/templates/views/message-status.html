@@ -3,7 +3,7 @@
 {% from "components/table.html" import mapping_table, row, text_field %}
 
 {% block per_page_title %}
-  Message statuses
+  Message status
 {% endblock %}
 
 {% block maincolumn_content %}
@@ -29,9 +29,9 @@
     >
     <h2 id="messagestatus" class="heading-medium">Types of message status</h2>
     <p>These are the types of message status you’ll see when you’re signed in to Notify.</p>
-    <p>If you're using our API, some of the statuses you'll see will be different. <a href="https://www.notifications.service.gov.uk/documentation">Read our documentation</a> for a detailed list of API message status types.</p>
+    <p>If you're using our API, some of the statuses you'll see will be different. <a href="https://www.notifications.service.gov.uk/documentation">Read our documentation</a> for a detailed list of API message statuses.</p>
 
-    <h3 class="heading-small">Email</h3>
+    <h3 class="heading-small">Emails</h3>
     <div class="bottom-gutter-3-2">
       {% call mapping_table(
         caption='Message statuses – emails',
@@ -89,7 +89,7 @@
         {% for message_length, charge in [
           ('Sent', 'Notify has sent the letter to the provider to be printed.'),
           ('Cancelled', 'Sending cancelled. Your letter will not be printed or dispatched.'),
-          ('Technical failure', 'Notify had an unexpected error while sending to our printing provider.'),
+          ('Technical failure', 'Notify had an unexpected error while sending the letter to our printing provider.'),
         ] %}
           {% call row() %}
             {{ text_field(message_length) }}
