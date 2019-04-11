@@ -20,13 +20,13 @@
       <li>no setup fee</li>
       <li>no procurement cost</li>
     </ul>
-    
+
     {% if not current_user.is_authenticated %}
       <p><a href="https://www.notifications.service.gov.uk/register">Create an account</a> then set up as many different services as you need to. Each service has its own free text message allowance.</p>
     {% endif %}
-    
+
     <p>When you set up a new service it will start in <a href="https://www.notifications.service.gov.uk/trial-mode">trial mode</a>.</p>
-    
+
     <h2 class="heading-medium">Emails</h2>
     <p>It’s free to send emails through Notify.</p>
 
@@ -130,18 +130,9 @@
       <li>sign our data sharing and financial agreement</li>
       <li>raise a Purchase Order (PO)</li>
     </ul>
-    
+
     <p>You may need to set up the Cabinet Office as a supplier before you can raise a PO.</p>
     <p>After you've done that, Notify will send you an invoice at the end of each quarter. If the value of an invoice is very small, we roll it into the next quarter to save time and effort.</p>
-    <!--<p>Read our data sharing and financial agreement for more information.</p>
-    <p>
-      {{ agreement_info.as_pricing_paragraph(
-        pricing_link=url_for('main.sign_in', next=url_for('main.pricing', _anchor='paying')),
-        download_link=url_for('main.agreement'),
-        support_link=url_for('.feedback', ticket_type='ask-question-give-feedback', body='agreement'),
-        signed_in=current_user.is_authenticated,
-      ) }}
-    </p>-->
   </div>
 </div>
 

@@ -64,7 +64,7 @@ def test_robots(client):
 
 
 @pytest.mark.parametrize('view', [
-    'cookies', 'privacy', 'using_notify', 'pricing', 'terms', 'roadmap',
+    'cookies', 'privacy', 'pricing', 'terms', 'roadmap',
     'features', 'callbacks', 'documentation', 'security'
 ])
 def test_static_pages(
@@ -75,26 +75,6 @@ def test_static_pages(
     assert not page.select_one('meta[name=description]')
 
 
-@pytest.mark.parametrize('view, expected_anchor', [
-    ('delivery_and_failure', 'messagedeliveryandfailure'),
-    ('trial_mode', 'trial-mode'),
-])
-def test_old_static_pages_redirect_to_using_notify_with_anchor(
-    client_request,
-    view,
-    expected_anchor,
-):
-    client_request.get(
-        'main.{}'.format(view),
-        _expected_status=301,
-        _expected_redirect=url_for(
-            'main.using_notify',
-            _anchor=expected_anchor,
-            _external=True
-        ),
-    )
-
-
 @pytest.mark.parametrize('view, expected_view', [
     ('information_risk_management', 'security'),
     ('old_integration_testing', 'integration_testing'),
@@ -103,6 +83,7 @@ def test_old_static_pages_redirect_to_using_notify_with_anchor(
     ('old_terms', 'terms'),
     ('information_security', 'using_notify'),
     ('old_using_notify', 'using_notify'),
+    ('delivery_and_failure', 'message_status'),
 ])
 def test_old_static_pages_redirect(
     client,
@@ -115,6 +96,10 @@ def test_old_static_pages_redirect(
         'main.{}'.format(expected_view),
         _external=True
     )
+
+
+def test_old_using_notify_page(client_request):
+    client_request.get('main.using_notify', _expected_status=410)
 
 
 def test_old_integration_testing_page(
@@ -148,28 +133,10 @@ def test_terms_is_generic_if_user_is_not_logged_in(
     )
 
 
-def test_pricing_is_generic_if_user_is_not_logged_in(
-    client
-):
-    response = client.get(url_for('main.pricing'))
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    last_paragraph = page.select('main p')[-1]
-    assert normalize_spaces(last_paragraph.text) == (
-        'Sign in to download a copy or find out if one is already '
-        'in place with your organisation.'
-    )
-    assert last_paragraph.select_one('a')['href'] == url_for(
-        'main.sign_in',
-        next=url_for('main.pricing', _anchor='paying'),
-    )
-
-
 @pytest.mark.parametrize((
     'email_address,'
     'expected_terms_paragraph,'
     'expected_terms_link,'
-    'expected_pricing_paragraph'
 ), [
     (
         'test@cabinet-office.gov.uk',
@@ -178,10 +145,6 @@ def test_pricing_is_generic_if_user_is_not_logged_in(
             'the GOV.UK Notify data sharing and financial agreement.'
         ),
         None,
-        (
-            'Download the agreement '
-            '(Cabinet Office has already accepted it).'
-        ),
     ),
     (
         'test@aylesburytowncouncil.gov.uk',
@@ -193,10 +156,6 @@ def test_pricing_is_generic_if_user_is_not_logged_in(
         partial(
             url_for,
             'main.agreement',
-        ),
-        (
-            'Download the agreement '
-            '(Aylesbury Town Council hasn’t accepted it yet).'
         ),
     ),
     (
@@ -211,10 +170,6 @@ def test_pricing_is_generic_if_user_is_not_logged_in(
             url_for,
             'main.agreement',
         ),
-        (
-            'Download the agreement or contact us to find out if '
-            'we already have one in place with your organisation.'
-        ),
     ),
     (
         'michael.fish@metoffice.gov.uk',
@@ -226,10 +181,6 @@ def test_pricing_is_generic_if_user_is_not_logged_in(
             url_for,
             'main.agreement',
         ),
-        (
-            'Download the agreement (Met Office hasn’t accepted it '
-            'yet).'
-        ),
     ),
 ])
 def test_terms_tells_logged_in_users_what_we_know_about_their_agreement(
@@ -239,19 +190,17 @@ def test_terms_tells_logged_in_users_what_we_know_about_their_agreement(
     email_address,
     expected_terms_paragraph,
     expected_terms_link,
-    expected_pricing_paragraph,
 ):
     user = active_user_with_permissions(fake_uuid)
     user.email_address = email_address
     mocker.patch('app.user_api_client.get_user', return_value=user)
     terms_page = client_request.get('main.terms')
-    pricing_page = client_request.get('main.pricing')
+
     assert normalize_spaces(terms_page.select('main p')[1].text) == expected_terms_paragraph
     if expected_terms_link:
         assert terms_page.select_one('main p a')['href'] == expected_terms_link()
     else:
         assert not terms_page.select_one('main p').select('a')
-    assert normalize_spaces(pricing_page.select('main p')[-1].text) == expected_pricing_paragraph
 
 
 def test_css_is_served_from_correct_path(client_request):

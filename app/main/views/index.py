@@ -76,7 +76,7 @@ def pricing():
 
 @main.route('/delivery-and-failure')
 def delivery_and_failure():
-    return redirect(url_for('.using_notify') + '#messagedeliveryandfailure', 301)
+    return redirect(url_for('.message_status'), 301)
 
 
 @main.route('/design-patterns-content-guidance')
