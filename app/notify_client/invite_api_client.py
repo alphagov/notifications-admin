@@ -1,5 +1,6 @@
 from app.models.user import (
     InvitedUser,
+    roles,
     translate_permissions_from_admin_roles_to_db,
 )
 from app.notify_client import NotifyAdminAPIClient, _attach_current_user, cache
@@ -43,6 +44,14 @@ class InviteApiClient(NotifyAdminAPIClient):
         return self.get(
             '/service/{}/invite'.format(service_id)
         )['data']
+
+    def get_count_of_invites_with_permission(self, service_id, permission):
+        if permission not in roles.keys():
+            raise TypeError('{} is not a valid permission'.format(permission))
+        return len([
+            invited_user for invited_user in self.get_invites_for_service(service_id)
+            if invited_user.has_permission_for_service(service_id, permission)
+        ])
 
     def check_token(self, token):
         resp = self.get(url='/invite/service/{}'.format(token))

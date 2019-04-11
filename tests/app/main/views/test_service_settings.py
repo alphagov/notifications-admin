@@ -617,6 +617,7 @@ def test_should_check_if_estimated_volumes_provided(
     mock_get_service_templates,
     mock_get_users_by_service,
     mock_get_service_organisation,
+    mock_get_invites_for_service,
     volumes,
     consent_to_research,
     expected_estimated_volumes_item,
@@ -649,9 +650,14 @@ def test_should_check_if_estimated_volumes_provided(
     )
 
 
-@pytest.mark.parametrize('count_of_users_with_manage_service, expected_user_checklist_item', [
-    (1, 'Add a team member who can manage settings, team and usage Not completed'),
-    (2, 'Add a team member who can manage settings, team and usage Completed'),
+@pytest.mark.parametrize((
+    'count_of_users_with_manage_service,'
+    'count_of_invites_with_manage_service,'
+    'expected_user_checklist_item'
+), [
+    (1, 0, 'Add a team member who can manage settings, team and usage Not completed'),
+    (2, 0, 'Add a team member who can manage settings, team and usage Completed'),
+    (1, 1, 'Add a team member who can manage settings, team and usage Completed'),
 ])
 @pytest.mark.parametrize('count_of_templates, expected_templates_checklist_item', [
     (0, 'Add templates with examples of the content you plan to send Not completed'),
@@ -679,6 +685,7 @@ def test_should_check_for_sending_things_right(
     mock_get_service_organisation,
     single_sms_sender,
     count_of_users_with_manage_service,
+    count_of_invites_with_manage_service,
     expected_user_checklist_item,
     count_of_templates,
     expected_templates_checklist_item,
@@ -694,8 +701,12 @@ def test_should_check_for_sending_things_right(
         }.get(template_type)
 
     mock_count_users = mocker.patch(
-        'app.main.views.service_settings.user_api_client.get_count_of_users_with_permission',
+        'app.models.service.user_api_client.get_count_of_users_with_permission',
         return_value=count_of_users_with_manage_service
+    )
+    mock_count_invites = mocker.patch(
+        'app.models.service.invite_api_client.get_count_of_invites_with_permission',
+        return_value=count_of_invites_with_manage_service
     )
 
     mock_templates = mocker.patch(
@@ -734,6 +745,7 @@ def test_should_check_for_sending_things_right(
     assert normalize_spaces(checklist_items[3].text) == expected_reply_to_checklist_item
 
     mock_count_users.assert_called_once_with(SERVICE_ONE_ID, 'manage_service')
+    mock_count_invites.assert_called_once_with(SERVICE_ONE_ID, 'manage_service')
     assert mock_templates.called is True
 
     if count_of_email_templates:
@@ -753,6 +765,7 @@ def test_should_not_show_go_live_button_if_checklist_not_complete(
     mock_get_service_templates,
     mock_get_users_by_service,
     mock_get_service_organisation,
+    mock_get_invites_for_service,
     single_sms_sender,
     checklist_completed,
     agreement_signed,
@@ -893,6 +906,7 @@ def test_should_check_for_sms_sender_on_go_live(
     service_one,
     mocker,
     mock_get_service_organisation,
+    mock_get_invites_for_service,
     organisation_type,
     count_of_sms_templates,
     sms_senders,
@@ -971,6 +985,7 @@ def test_should_check_for_mou_on_request_to_go_live(
     service_one,
     mocker,
     agreement_signed,
+    mock_get_invites_for_service,
     expected_item,
 ):
     mocker.patch(
@@ -1015,6 +1030,7 @@ def test_should_check_for_mou_on_request_to_go_live(
 def test_non_gov_user_is_told_they_cant_go_live(
     client_request,
     api_nongov_user_active,
+    mock_get_invites_for_service,
     mocker,
     mock_get_service_organisation,
 ):
@@ -1292,6 +1308,7 @@ def test_should_redirect_after_request_to_go_live(
     mock_get_service_settings_page_common,
     mock_get_service_templates,
     mock_get_users_by_service,
+    mock_get_invites_without_manage_permission,
     volumes,
     displayed_volumes,
     formatted_displayed_volumes,
@@ -1577,6 +1594,7 @@ def test_route_permissions(
         single_reply_to_email_address,
         single_letter_contact_block,
         mock_get_service_organisation,
+        mock_get_invites_for_service,
         single_sms_sender,
         route,
         mock_get_service_settings_page_common,
@@ -1610,6 +1628,7 @@ def test_route_invalid_permissions(
         service_one,
         route,
         mock_get_service_templates,
+        mock_get_invites_for_service,
 ):
     validate_route_permission(
         mocker,
@@ -1642,6 +1661,7 @@ def test_route_for_platform_admin(
         route,
         mock_get_service_settings_page_common,
         mock_get_service_templates,
+        mock_get_invites_for_service,
 ):
     validate_route_permission(mocker,
                               app_,
