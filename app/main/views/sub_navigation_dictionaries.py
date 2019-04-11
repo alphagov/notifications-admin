@@ -25,7 +25,7 @@ def features_nav():
             "link": "main.trial_mode_new",
         },
         {
-            "name": "Message statuses",
+            "name": "Message status",
             "link": "main.message_status",
         },
         {
