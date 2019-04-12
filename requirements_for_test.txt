@@ -11,3 +11,5 @@ freezegun==0.3.11
 flake8==3.7.7
 flake8-print==3.1.0
 requests-mock==1.5.2
+# used for creating manifest file locally
+jinja2-cli[yaml]==0.6.0
