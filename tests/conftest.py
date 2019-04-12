@@ -3351,3 +3351,11 @@ def mock_move_to_template_folder(mocker):
 @pytest.fixture
 def mock_create_template_folder(mocker):
     return mocker.patch('app.template_folder_api_client.create_template_folder', return_value=sample_uuid())
+
+
+@pytest.fixture(scope='function')
+def mock_get_service_and_organisation_counts(mocker):
+    return mocker.patch('app.status_api_client.get_count_of_live_services_and_organisations', return_value={
+        'organisations': 111,
+        'services': 9999,
+    })
