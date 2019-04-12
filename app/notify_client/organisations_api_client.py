@@ -1,3 +1,5 @@
+from notifications_python_client.errors import HTTPError
+
 from app.notify_client import NotifyAdminAPIClient, _attach_current_user, cache
 
 
@@ -8,6 +10,16 @@ class OrganisationsClient(NotifyAdminAPIClient):
 
     def get_organisation(self, org_id):
         return self.get(url='/organisations/{}'.format(org_id))
+
+    def get_organisation_by_domain(self, domain):
+        try:
+            return self.get(
+                url='/organisations/by-domain?domain={}'.format(domain),
+            )
+        except HTTPError as error:
+            if error.status_code == 404:
+                return None
+            raise error
 
     def create_organisation(self, name):
         data = {

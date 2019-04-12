@@ -2,7 +2,10 @@ from itertools import chain
 
 from flask import abort, request, session
 from flask_login import AnonymousUserMixin, UserMixin
+from werkzeug.utils import cached_property
 
+from app.models.organisation import Organisation
+from app.notify_client.organisations_api_client import organisations_client
 from app.utils import is_gov_user
 
 roles = {
@@ -192,6 +195,16 @@ class User(UserMixin):
     def is_locked(self):
         return self.failed_login_count >= self.max_failed_login_count
 
+    @property
+    def email_domain(self):
+        return self.email_address.split('@')[-1]
+
+    @cached_property
+    def default_organisation(self):
+        return Organisation(
+            organisations_client.get_organisation_by_domain(self.email_domain)
+        )
+
     def serialize(self):
         dct = {
             "id": self.id,
@@ -322,3 +335,7 @@ class AnonymousUser(AnonymousUserMixin):
     # set the anonymous user so that if a new browser hits us we don't error http://stackoverflow.com/a/19275188
     def logged_in_elsewhere(self):
         return False
+
+    @property
+    def default_organisation(self):
+        return Organisation(None)

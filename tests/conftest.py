@@ -625,7 +625,6 @@ def mock_create_service(mocker):
         restricted,
         user_id,
         email_from,
-        service_domain,
     ):
         service = service_json(
             101, service_name, [user_id], message_limit=message_limit, restricted=restricted, email_from=email_from)
@@ -644,7 +643,6 @@ def mock_create_duplicate_service(mocker):
         restricted,
         user_id,
         email_from,
-        service_domain,
     ):
         json_mock = Mock(return_value={'message': {'name': ["Duplicate service name '{}'".format(service_name)]}})
         resp_mock = Mock(status_code=400, json=json_mock)
@@ -2541,8 +2539,8 @@ def mock_get_all_email_branding(mocker):
         non_standard_values = [
             {'idx': 1, 'colour': 'red'},
             {'idx': 2, 'colour': 'orange'},
-            {'idx': 3, 'text': None, 'domain': 'nhs.uk'},
-            {'idx': 4, 'colour': 'blue', 'domain': 'voa.gov.uk'},
+            {'idx': 3, 'text': None},
+            {'idx': 4, 'colour': 'blue'},
         ]
         shuffle = sort_key is None
         return create_email_brandings(5, non_standard_values=non_standard_values, shuffle=shuffle)
@@ -2561,19 +2559,16 @@ def mock_get_all_letter_branding(mocker):
                 'id': str(UUID(int=0)),
                 'name': 'HM Government',
                 'filename': 'hm-government',
-                'domain': None,
             },
             {
                 'id': str(UUID(int=1)),
                 'name': 'Land Registry',
                 'filename': 'land-registry',
-                'domain': 'landregistry.gov.uk',
             },
             {
                 'id': str(UUID(int=2)),
                 'name': 'Animal and Plant Health Agency',
                 'filename': 'animal',
-                'domain': None,
             }
         ]
 
@@ -2589,7 +2584,6 @@ def mock_get_letter_branding_by_id(mocker):
             'id': _id,
             'name': 'HM Government',
             'filename': 'hm-government',
-            'domain': 'cabinet-office.gov.uk',
         }
     return mocker.patch(
         'app.letter_branding_client.get_letter_branding', side_effect=_get_branding_by_id
@@ -2613,7 +2607,6 @@ def create_email_branding(id, non_standard_values={}):
         'text': 'Organisation text',
         'id': id,
         'colour': '#f00',
-        'domain': 'sample.com',
         'brand_type': 'org',
     }
 
@@ -2676,7 +2669,7 @@ def mock_get_email_branding_without_brand_text(mocker, fake_uuid):
 
 @pytest.fixture(scope='function')
 def mock_create_email_branding(mocker):
-    def _create_email_branding(logo, name, text, colour, domain, brand_type):
+    def _create_email_branding(logo, name, text, colour, brand_type):
         return
 
     return mocker.patch(
@@ -2686,7 +2679,7 @@ def mock_create_email_branding(mocker):
 
 @pytest.fixture(scope='function')
 def mock_update_email_branding(mocker):
-    def _update_email_branding(branding_id, logo, name, text, colour, domain, brand_type):
+    def _update_email_branding(branding_id, logo, name, text, colour, brand_type):
         return
 
     return mocker.patch(
@@ -3126,9 +3119,40 @@ def mock_get_organisation(
 
 
 @pytest.fixture(scope='function')
-def mock_get_service_organisation(mocker):
+def mock_get_organisation_by_domain(
+    mocker,
+    name=False,
+    crown=True,
+    agreement_signed=False,
+):
+    def _get_organisation_by_domain(org_id):
+        return organisation_json(
+            org_id,
+            name,
+            crown=crown,
+            agreement_signed=agreement_signed,
+        )
+
+    return mocker.patch(
+        'app.organisations_client.get_organisation_by_domain',
+        side_effect=_get_organisation_by_domain,
+    )
+
+
+@pytest.fixture(scope='function')
+def mock_get_service_organisation(
+    mocker,
+    name=False,
+    crown=True,
+    agreement_signed=None,
+):
     def _get_service_organisation(service_id):
-        return organisation_json('7aa5d4e9-4385-4488-a489-07812ba13383', 'Org 1')
+        return organisation_json(
+            '7aa5d4e9-4385-4488-a489-07812ba13383',
+            name,
+            crown=crown,
+            agreement_signed=agreement_signed,
+        )
 
     return mocker.patch('app.organisations_client.get_service_organisation', side_effect=_get_service_organisation)
 

@@ -300,7 +300,7 @@
 
         {% call row() %}
           {{ text_field('Organisation')}}
-          {{ optional_text_field(current_service.organisation_name) }}
+          {{ optional_text_field(current_service.organisation.name) }}
           {{ edit_field('Change', url_for('.link_service_to_organisation', service_id=current_service.id)) }}
         {% endcall %}
         {% call row() %}

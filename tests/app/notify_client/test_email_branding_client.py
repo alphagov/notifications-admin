@@ -53,13 +53,13 @@ def test_get_all_email_branding(mocker):
 
 def test_create_email_branding(mocker):
     org_data = {'logo': 'test.png', 'name': 'test name', 'text': 'test name', 'colour': 'red',
-                'domain': 'sample.com', 'brand_type': 'org'}
+                'brand_type': 'org'}
 
     mock_post = mocker.patch('app.notify_client.email_branding_client.EmailBrandingClient.post')
     mock_redis_delete = mocker.patch('app.extensions.RedisClient.delete')
     EmailBrandingClient().create_email_branding(
         logo=org_data['logo'], name=org_data['name'], text=org_data['text'], colour=org_data['colour'],
-        domain=org_data['domain'], brand_type='org'
+        brand_type='org'
     )
 
     mock_post.assert_called_once_with(
@@ -72,13 +72,13 @@ def test_create_email_branding(mocker):
 
 def test_update_email_branding(mocker, fake_uuid):
     org_data = {'logo': 'test.png', 'name': 'test name', 'text': 'test name', 'colour': 'red',
-                'domain': 'sample.com', 'brand_type': 'org'}
+                'brand_type': 'org'}
 
     mock_post = mocker.patch('app.notify_client.email_branding_client.EmailBrandingClient.post')
     mock_redis_delete = mocker.patch('app.extensions.RedisClient.delete')
     EmailBrandingClient().update_email_branding(
         branding_id=fake_uuid, logo=org_data['logo'], name=org_data['name'], text=org_data['text'],
-        colour=org_data['colour'], domain=org_data['domain'], brand_type='org')
+        colour=org_data['colour'], brand_type='org')
 
     mock_post.assert_called_once_with(
         url='/email-branding/{}'.format(fake_uuid),

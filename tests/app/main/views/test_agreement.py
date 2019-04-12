@@ -4,7 +4,7 @@ from io import BytesIO
 import pytest
 from flask import url_for
 
-from tests.conftest import active_user_with_permissions
+from tests.conftest import mock_get_organisation_by_domain
 
 
 class _MockS3Object():
@@ -16,22 +16,22 @@ class _MockS3Object():
         return {'Body': BytesIO(self.data)}
 
 
-@pytest.mark.parametrize('email_address, expected_links', [
+@pytest.mark.parametrize('agreement_signed, crown, expected_links', [
     (
-        'test@cabinet-office.gov.uk',
+        True, True,
         [
             partial(url_for, 'main.download_agreement'),
         ]
     ),
     (
-        'test@aylesburytowncouncil.gov.uk',
+        False, False,
         [
             partial(url_for, 'main.download_agreement'),
             lambda: 'mailto:notify-support@digital.cabinet-office.gov.uk',
         ]
     ),
     (
-        'test@unknown.gov.uk',
+        None, None,
         [
             partial(url_for, 'main.public_download_agreement', variant='crown'),
             partial(url_for, 'main.public_download_agreement', variant='non-crown'),
@@ -44,12 +44,15 @@ def test_show_agreement_page(
     client_request,
     mocker,
     fake_uuid,
-    email_address,
+    agreement_signed,
+    crown,
     expected_links,
 ):
-    user = active_user_with_permissions(fake_uuid)
-    user.email_address = email_address
-    mocker.patch('app.user_api_client.get_user', return_value=user)
+    mock_get_organisation_by_domain(
+        mocker,
+        crown=crown,
+        agreement_signed=agreement_signed,
+    )
     page = client_request.get('main.agreement')
     links = page.select('main .column-two-thirds a')
     assert len(links) == len(expected_links)
@@ -57,14 +60,14 @@ def test_show_agreement_page(
         assert link['href'] == expected_links[index]()
 
 
-@pytest.mark.parametrize('email_address, expected_file_fetched, expected_file_served', [
+@pytest.mark.parametrize('crown, expected_file_fetched, expected_file_served', [
     (
-        'test@cabinet-office.gov.uk',
+        True,
         'crown.pdf',
         'GOV.UK Notify data sharing and financial agreement.pdf',
     ),
     (
-        'test@aylesburytowncouncil.gov.uk',
+        False,
         'non-crown.pdf',
         'GOV.UK Notify data sharing and financial agreement (non-crown).pdf',
     ),
@@ -73,7 +76,7 @@ def test_downloading_agreement(
     logged_in_client,
     mocker,
     fake_uuid,
-    email_address,
+    crown,
     expected_file_fetched,
     expected_file_served,
 ):
@@ -81,9 +84,10 @@ def test_downloading_agreement(
         'app.s3_client.s3_mou_client.get_s3_object',
         return_value=_MockS3Object(b'foo')
     )
-    user = active_user_with_permissions(fake_uuid)
-    user.email_address = email_address
-    mocker.patch('app.user_api_client.get_user', return_value=user)
+    mock_get_organisation_by_domain(
+        mocker,
+        crown=crown,
+    )
     response = logged_in_client.get(url_for('main.download_agreement'))
     assert response.status_code == 200
     assert response.get_data() == b'foo'
@@ -103,9 +107,10 @@ def test_agreement_cant_be_downloaded_unknown_crown_status(
         'app.s3_client.s3_mou_client.get_s3_object',
         return_value=_MockS3Object()
     )
-    user = active_user_with_permissions(fake_uuid)
-    user.email_address = 'test@unknown.gov.uk'
-    mocker.patch('app.user_api_client.get_user', return_value=user)
+    mock_get_organisation_by_domain(
+        mocker,
+        crown=None,
+    )
     response = logged_in_client.get(url_for('main.download_agreement'))
     assert response.status_code == 404
     assert mock_get_s3_object.call_args_list == []

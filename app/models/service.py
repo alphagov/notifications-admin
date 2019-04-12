@@ -2,6 +2,8 @@ from flask import abort, current_app
 from notifications_utils.field import Field
 from werkzeug.utils import cached_property
 
+from app.models import JSONModel
+from app.models.organisation import Organisation
 from app.notify_client.api_key_api_client import api_key_api_client
 from app.notify_client.billing_api_client import billing_api_client
 from app.notify_client.email_branding_client import email_branding_client
@@ -18,7 +20,7 @@ from app.notify_client.user_api_client import user_api_client
 from app.utils import get_default_sms_sender
 
 
-class Service():
+class Service(JSONModel):
 
     ALLOWED_PROPERTIES = {
         'active',
@@ -50,24 +52,11 @@ class Service():
     )
 
     def __init__(self, _dict):
-        # in the case of a bad request current service may be `None`
-        self._dict = _dict or {}
+
+        super().__init__(_dict)
+
         if 'permissions' not in self._dict:
             self.permissions = {'email', 'sms', 'letter'}
-
-    def __bool__(self):
-        return self._dict != {}
-
-    def __getattr__(self, attr):
-        if attr in self.ALLOWED_PROPERTIES:
-            return self._dict[attr]
-        raise AttributeError('`{}` is not a service attribute'.format(attr))
-
-    def _get_by_id(self, things, id):
-        try:
-            return next(thing for thing in things if thing['id'] == str(id))
-        except StopIteration:
-            abort(404)
 
     def update(self, **kwargs):
         return service_api_client.update_service(self.id, **kwargs)
@@ -405,8 +394,10 @@ class Service():
         return None
 
     @cached_property
-    def organisation_name(self):
-        return organisations_client.get_service_organisation(self.id).get('name', None)
+    def organisation(self):
+        return Organisation(
+            organisations_client.get_service_organisation(self.id)
+        )
 
     @cached_property
     def inbound_number(self):
@@ -555,3 +546,30 @@ class Service():
 
     def get_api_key(self, id):
         return self._get_by_id(self.api_keys, id)
+
+    @property
+    def request_to_go_live_tags(self):
+        return list(self._get_request_to_go_live_tags())
+
+    def _get_request_to_go_live_tags(self):
+
+        BASE = 'notify_request_to_go_live'
+
+        yield BASE
+
+        if self.go_live_checklist_completed and self.organisation.agreement_signed:
+            yield BASE + '_complete'
+            return
+
+        for test, tag in (
+            (True, ''),
+            (not self.volumes, '_volumes'),
+            (not self.go_live_checklist_completed, '_checklist'),
+            (not self.organisation.agreement_signed, '_mou'),
+            (self.needs_to_add_email_reply_to_address, '_email_reply_to'),
+            (not self.has_team_members, '_team_member'),
+            (not self.has_templates, '_template_content'),
+            (self.needs_to_change_sms_sender, '_sms_sender'),
+        ):
+            if test:
+                yield BASE + '_incomplete' + tag

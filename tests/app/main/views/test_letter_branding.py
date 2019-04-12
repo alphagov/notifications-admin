@@ -2,7 +2,6 @@ from io import BytesIO
 from unittest.mock import Mock, call
 from uuid import UUID
 
-import pytest
 from botocore.exceptions import ClientError as BotoClientError
 from bs4 import BeautifulSoup
 from flask import current_app, url_for
@@ -29,7 +28,6 @@ def test_letter_branding_page_shows_full_branding_list(
     links = page.select('.message-name a')
     brand_names = [normalize_spaces(link.text) for link in links]
     hrefs = [link['href'] for link in links]
-    brand_hints = [normalize_spaces(hint.text) for hint in page.select('.message-type')]
 
     assert normalize_spaces(
         page.select_one('h1').text
@@ -37,12 +35,10 @@ def test_letter_branding_page_shows_full_branding_list(
 
     assert page.select_one('.column-three-quarters a')['href'] == url_for('main.create_letter_branding')
 
-    assert list(zip(
-        brand_names, brand_hints
-    )) == [
-        ('HM Government', '–'),
-        ('Land Registry', 'Default for landregistry.gov.uk'),
-        ('Animal and Plant Health Agency', '–'),
+    assert brand_names == [
+        'HM Government',
+        'Land Registry',
+        'Animal and Plant Health Agency',
     ]
 
     assert hrefs == [
@@ -66,7 +62,6 @@ def test_update_letter_branding_shows_the_current_letter_brand(
     assert page.find('h1').text == 'Update letter branding'
     assert page.select_one('#logo-img > img')['src'].endswith('/hm-government.svg')
     assert page.select_one('#name').attrs.get('value') == 'HM Government'
-    assert page.select_one('#domain').attrs.get('value') == 'cabinet-office.gov.uk'
 
 
 def test_update_letter_branding_with_new_valid_file(
@@ -95,7 +90,6 @@ def test_update_letter_branding_with_new_valid_file(
 
     assert page.select_one('#logo-img > img')['src'].endswith(expected_temp_filename)
     assert page.select_one('#name').attrs.get('value') == 'HM Government'
-    assert page.select_one('#domain').attrs.get('value') == 'cabinet-office.gov.uk'
 
     assert mock_s3_upload.called
     mock_delete_temp_files.assert_not_called()
@@ -161,7 +155,6 @@ def test_update_letter_branding_with_original_file_and_new_details(
         url_for('.update_letter_branding', branding_id=fake_uuid),
         data={
             'name': 'Updated name',
-            'domain': 'bl.uk',
             'operation': 'branding-details'
         },
         follow_redirects=True
@@ -175,42 +168,12 @@ def test_update_letter_branding_with_original_file_and_new_details(
 
     mock_client_update.assert_called_once_with(
         branding_id=fake_uuid,
-        domain='bl.uk',
         filename='hm-government',
         name='Updated name'
     )
 
 
-def test_update_letter_branding_does_not_require_a_domain(
-    mocker,
-    logged_in_platform_admin_client,
-    mock_get_all_letter_branding,
-    mock_get_letter_branding_by_id,
-    fake_uuid
-):
-    mock_client_update = mocker.patch('app.main.views.letter_branding.letter_branding_client.update_letter_branding')
-    logo = permanent_letter_logo_name('hm-government', 'svg')
-
-    response = logged_in_platform_admin_client.post(
-        url_for('.update_letter_branding', branding_id=fake_uuid, logo=logo),
-        data={
-            'name': 'Updated name',
-            'domain': '',
-            'operation': 'branding-details'
-        },
-        follow_redirects=True
-    )
-    assert response.status_code == 200
-
-    mock_client_update.assert_called_once_with(
-        branding_id=fake_uuid,
-        domain=None,
-        filename='hm-government',
-        name='Updated name'
-    )
-
-
-def test_update_letter_branding_shows_form_errors_on_name_and_domain_fields(
+def test_update_letter_branding_shows_form_errors_on_name_fields(
     mocker,
     logged_in_platform_admin_client,
     mock_get_letter_branding_by_id,
@@ -224,7 +187,6 @@ def test_update_letter_branding_shows_form_errors_on_name_and_domain_fields(
         url_for('.update_letter_branding', branding_id=fake_uuid, logo=logo),
         data={
             'name': '',
-            'domain': 'example.com',
             'operation': 'branding-details'
         },
         follow_redirects=True
@@ -234,18 +196,15 @@ def test_update_letter_branding_shows_form_errors_on_name_and_domain_fields(
     error_messages = page.find_all('span', class_='error-message')
 
     assert page.find('h1').text == 'Update letter branding'
-    assert len(error_messages) == 2
+    assert len(error_messages) == 1
     assert error_messages[0].text.strip() == 'This field is required.'
-    assert error_messages[1].text.strip() == 'Not a known government domain (you might need to update domains.yml)'
 
 
-@pytest.mark.parametrize('error_field', ['name', 'domain'])
-def test_update_letter_branding_shows_database_errors_on_name_and_domain_fields(
+def test_update_letter_branding_shows_database_errors_on_name_field(
     mocker,
     logged_in_platform_admin_client,
     mock_get_letter_branding_by_id,
     fake_uuid,
-    error_field
 ):
     mocker.patch('app.main.views.letter_branding.get_png_file_from_svg')
     mocker.patch('app.main.views.letter_branding.letter_branding_client.update_letter_branding', side_effect=HTTPError(
@@ -254,20 +213,19 @@ def test_update_letter_branding_shows_database_errors_on_name_and_domain_fields(
             json={
                 'result': 'error',
                 'message': {
-                    error_field: {
-                        '{} already in use'.format(error_field)
+                    'name': {
+                        'name already in use'
                     }
                 }
             }
         ),
-        message={error_field: ['{} already in use'.format(error_field)]}
+        message={'name': ['name already in use']}
     ))
 
     response = logged_in_platform_admin_client.post(
         url_for('.update_letter_branding', branding_id='abc'),
         data={
             'name': 'my brand',
-            'domain': None,
             'operation': 'branding-details'
         }
     )
@@ -276,7 +234,7 @@ def test_update_letter_branding_shows_database_errors_on_name_and_domain_fields(
     error_message = page.find('span', class_='error-message').text.strip()
 
     assert page.find('h1').text == 'Update letter branding'
-    assert error_message == '{} already in use'.format(error_field)
+    assert error_message == 'name already in use'
 
 
 def test_update_letter_branding_with_new_file_and_new_details(
@@ -300,7 +258,6 @@ def test_update_letter_branding_with_new_file_and_new_details(
         url_for('.update_letter_branding', branding_id=fake_uuid, logo=temp_logo),
         data={
             'name': 'Updated name',
-            'domain': 'bl.uk',
             'operation': 'branding-details'
         },
         follow_redirects=True
@@ -312,7 +269,6 @@ def test_update_letter_branding_with_new_file_and_new_details(
     assert mock_template_preview.called
     mock_client_update.assert_called_once_with(
         branding_id=fake_uuid,
-        domain='bl.uk',
         filename='{}-new_file'.format(fake_uuid),
         name='Updated name'
     )
@@ -343,7 +299,6 @@ def test_update_letter_branding_rolls_back_db_changes_and_shows_error_if_saving_
         url_for('.update_letter_branding', branding_id=fake_uuid, logo=temp_logo),
         data={
             'name': 'Updated name',
-            'domain': 'bl.uk',
             'operation': 'branding-details'
         },
         follow_redirects=True
@@ -355,8 +310,8 @@ def test_update_letter_branding_rolls_back_db_changes_and_shows_error_if_saving_
 
     assert mock_client_update.call_count == 2
     assert mock_client_update.call_args_list == [
-        call(branding_id=fake_uuid, domain='bl.uk', filename='{}-new_file'.format(fake_uuid), name='Updated name'),
-        call(branding_id=fake_uuid, domain='cabinet-office.gov.uk', filename='hm-government', name='HM Government')
+        call(branding_id=fake_uuid, filename='{}-new_file'.format(fake_uuid), name='Updated name'),
+        call(branding_id=fake_uuid, filename='hm-government', name='HM Government')
     ]
 
 
@@ -370,7 +325,6 @@ def test_create_letter_branding_does_not_show_branding_info(logged_in_platform_a
 
     assert page.select_one('#logo-img > img') is None
     assert page.select_one('#name').attrs.get('value') == ''
-    assert page.select_one('#domain').attrs.get('value') == ''
 
 
 def test_create_letter_branding_when_uploading_valid_file(
@@ -472,7 +426,6 @@ def test_create_letter_branding_shows_an_error_when_submitting_details_with_no_l
         url_for('.create_letter_branding'),
         data={
             'name': 'Test brand',
-            'domain': 'bl.uk',
             'operation': 'branding-details'
         }
     )
@@ -506,7 +459,6 @@ def test_create_letter_branding_persists_logo_when_all_data_is_valid(
         url_for('.create_letter_branding', logo=temp_logo),
         data={
             'name': 'Test brand',
-            'domain': 'bl.uk',
             'operation': 'branding-details'
         },
         follow_redirects=True
@@ -517,7 +469,7 @@ def test_create_letter_branding_persists_logo_when_all_data_is_valid(
     assert page.find('h1').text == 'Letter branding'
 
     mock_letter_client.create_letter_branding.assert_called_once_with(
-        domain='bl.uk', filename='{}-test'.format(fake_uuid), name='Test brand'
+        filename='{}-test'.format(fake_uuid), name='Test brand'
     )
     assert mock_template_preview.called
     mock_persist_logo.assert_called_once_with(
@@ -532,7 +484,7 @@ def test_create_letter_branding_persists_logo_when_all_data_is_valid(
     mock_delete_temp_files.assert_called_once_with(user_id)
 
 
-def test_create_letter_branding_shows_form_errors_on_name_and_domain_fields(
+def test_create_letter_branding_shows_form_errors_on_name_field(
     logged_in_platform_admin_client,
     fake_uuid
 ):
@@ -545,7 +497,6 @@ def test_create_letter_branding_shows_form_errors_on_name_and_domain_fields(
         url_for('.create_letter_branding', logo=temp_logo),
         data={
             'name': '',
-            'domain': 'example.com',
             'operation': 'branding-details'
         }
     )
@@ -554,17 +505,14 @@ def test_create_letter_branding_shows_form_errors_on_name_and_domain_fields(
     error_messages = page.find_all('span', class_='error-message')
 
     assert page.find('h1').text == 'Add letter branding'
-    assert len(error_messages) == 2
+    assert len(error_messages) == 1
     assert error_messages[0].text.strip() == 'This field is required.'
-    assert error_messages[1].text.strip() == 'Not a known government domain (you might need to update domains.yml)'
 
 
-@pytest.mark.parametrize('error_field', ['name', 'domain'])
-def test_create_letter_branding_shows_database_errors_on_name_and_domain_fields(
+def test_create_letter_branding_shows_database_errors_on_name_fields(
     mocker,
     logged_in_platform_admin_client,
     fake_uuid,
-    error_field
 ):
     with logged_in_platform_admin_client.session_transaction() as session:
         user_id = session["user_id"]
@@ -576,13 +524,13 @@ def test_create_letter_branding_shows_database_errors_on_name_and_domain_fields(
             json={
                 'result': 'error',
                 'message': {
-                    error_field: {
-                        '{} already in use'.format(error_field)
+                    'name': {
+                        'name already in use'
                     }
                 }
             }
         ),
-        message={error_field: ['{} already in use'.format(error_field)]}
+        message={'name': ['name already in use']}
     ))
 
     temp_logo = LETTER_TEMP_LOGO_LOCATION.format(user_id=user_id, unique_id=fake_uuid, filename='test.svg')
@@ -591,7 +539,6 @@ def test_create_letter_branding_shows_database_errors_on_name_and_domain_fields(
         url_for('.create_letter_branding', logo=temp_logo),
         data={
             'name': 'my brand',
-            'domain': None,
             'operation': 'branding-details'
         }
     )
@@ -600,7 +547,7 @@ def test_create_letter_branding_shows_database_errors_on_name_and_domain_fields(
     error_message = page.find('span', class_='error-message').text.strip()
 
     assert page.find('h1').text == 'Add letter branding'
-    assert error_message == '{} already in use'.format(error_field)
+    assert error_message == 'name already in use'
 
 
 def test_get_png_file_from_svg(client, mocker, fake_uuid):

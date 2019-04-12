@@ -56,7 +56,6 @@ def update_letter_branding(branding_id, logo=None):
     file_upload_form = SVGFileUpload()
     letter_branding_details_form = ServiceLetterBrandingDetails(
         name=letter_branding['name'],
-        domain=letter_branding['domain']
     )
 
     file_upload_form_submitted = file_upload_form.file.data
@@ -87,7 +86,6 @@ def update_letter_branding(branding_id, logo=None):
                     branding_id=branding_id,
                     filename=db_filename,
                     name=letter_branding_details_form.name.data,
-                    domain=letter_branding_details_form.domain.data
                 )
 
                 return redirect(url_for('main.letter_branding'))
@@ -98,7 +96,6 @@ def update_letter_branding(branding_id, logo=None):
                     branding_id=branding_id,
                     filename=db_filename,
                     name=letter_branding_details_form.name.data,
-                    domain=letter_branding_details_form.domain.data
                 )
 
                 upload_letter_logos(logo, db_filename, png_file, session['user_id'])
@@ -106,9 +103,7 @@ def update_letter_branding(branding_id, logo=None):
                 return redirect(url_for('main.letter_branding'))
 
         except HTTPError as e:
-            if 'domain' in e.message:
-                letter_branding_details_form.domain.errors.append(e.message['domain'][0])
-            elif 'name' in e.message:
+            if 'name' in e.message:
                 letter_branding_details_form.name.errors.append(e.message['name'][0])
             else:
                 raise e
@@ -118,7 +113,6 @@ def update_letter_branding(branding_id, logo=None):
                 branding_id=branding_id,
                 filename=letter_branding['filename'],
                 name=letter_branding['name'],
-                domain=letter_branding['domain']
             )
             file_upload_form.file.errors = ['Error saving uploaded file - try uploading again']
 
@@ -165,7 +159,6 @@ def create_letter_branding(logo=None):
                 letter_branding_client.create_letter_branding(
                     filename=db_filename,
                     name=letter_branding_details_form.name.data,
-                    domain=letter_branding_details_form.domain.data,
                 )
 
                 upload_letter_logos(logo, db_filename, png_file, session['user_id'])
@@ -173,9 +166,7 @@ def create_letter_branding(logo=None):
                 return redirect(url_for('main.letter_branding'))
 
             except HTTPError as e:
-                if 'domain' in e.message:
-                    letter_branding_details_form.domain.errors.append(e.message['domain'][0])
-                elif 'name' in e.message:
+                if 'name' in e.message:
                     letter_branding_details_form.name.errors.append(e.message['name'][0])
                 else:
                     raise e

@@ -1,21 +1,17 @@
 from flask import abort, render_template, request, send_file, url_for
-from flask_login import login_required
+from flask_login import current_user, login_required
 
 from app.main import main
 from app.main.views.sub_navigation_dictionaries import features_nav
 from app.s3_client.s3_mou_client import get_mou
-from app.utils import AgreementInfo
 
 
 @main.route('/agreement')
 @login_required
 def agreement():
-
-    agreement_info = AgreementInfo.from_current_user()
-
     return render_template(
-        'views/{}.html'.format(agreement_info.as_jinja_template),
-        owner=agreement_info.owner,
+        'views/{}.html'.format(current_user.default_organisation.as_jinja_template),
+        owner=current_user.default_organisation.name,
         navigation_links=features_nav(),
     )
 
@@ -24,7 +20,7 @@ def agreement():
 @login_required
 def download_agreement():
     return send_file(**get_mou(
-        AgreementInfo.from_current_user().crown_status_or_404
+        current_user.default_organisation.crown_status_or_404
     ))
 
 
@@ -40,10 +36,8 @@ def public_agreement(variant):
             organisation_is_crown=(variant == 'crown')
         ))
 
-    agreement_info = AgreementInfo.from_current_user()
-
     return render_template(
         'views/agreement-public.html',
-        owner=agreement_info.owner,
+        owner=current_user.default_organisation.name,
         download_link=url_for('.public_download_agreement', variant=variant),
     )
