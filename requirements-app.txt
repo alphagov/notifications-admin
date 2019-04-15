@@ -8,7 +8,7 @@ Flask-Login==0.4.1
 
 blinker==1.4
 pyexcel==0.5.13
-pyexcel-io==0.5.16
+pyexcel-io==0.5.17
 pyexcel-xls==0.5.8
 pyexcel-xlsx==0.5.7
 pyexcel-ods3==0.5.3
