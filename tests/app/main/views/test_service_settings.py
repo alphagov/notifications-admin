@@ -144,6 +144,29 @@ def test_should_show_overview(
     app.service_api_client.get_service.assert_called_with(service_one['id'])
 
 
+def test_no_go_live_link_for_service_without_organisation(
+    client_request,
+    mocker,
+    no_reply_to_email_addresses,
+    no_letter_contact_blocks,
+    mock_get_service_organisation,
+    single_sms_sender,
+    platform_admin_user,
+    mock_get_service_settings_page_common,
+):
+    mocker.patch('app.organisations_client.get_service_organisation', return_value=None)
+    client_request.login(platform_admin_user)
+    page = client_request.get('main.service_settings', service_id=SERVICE_ONE_ID)
+
+    assert page.find('h1').text == 'Settings'
+    assert normalize_spaces(page.select('tr')[16].text) == (
+        'Live No (you need to assign this service to an organisation before you can make it live)'
+    )
+    assert normalize_spaces(page.select('tr')[18].text) == (
+        'Organisation Not set Change'
+    )
+
+
 @pytest.mark.parametrize('permissions, expected_rows', [
     (['email', 'sms', 'inbound_sms', 'international_sms'], [
 
