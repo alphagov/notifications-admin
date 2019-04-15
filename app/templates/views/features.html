@@ -44,7 +44,7 @@
 
     <h2 class="heading-medium">Reporting</h2>
     <p>Notify’s real-time dashboard lets you see the number of messages sent. You can also check the current status of any message to see when it was delivered.</p>
-    <p>Read more about how <a href="https://www.notifications.service.gov.uk/features/using-notify#messagestatus">message status</a> works.</p>
+    <p>Read more about how <a href="{{ url_for('main.message_status') }}">message status types</a>message status</a> works.</p>
 
     <h2 class="heading-medium">Permissions</h2>
     <p>Control which members of your team can see, create, edit and send messages.</p>
@@ -74,7 +74,7 @@
 
     <h3 class="heading-small">Two-factor authentication</h3>
     <p>Notify uses two-factor authentication (2FA) to keep your account secure. When you sign in, we'll send a unique one-time code to your phone and ask you to enter it before we let you use your account.</p>
-    <p>Read more about <a href="https://www.notifications.service.gov.uk/features/security">security</a>.
+    <p>Read more about <a href="{{ url_for('main.security') }}">security</a>.
 
     <h2 class="heading-medium">Support</h2>
     <p>Notify provides 24-hour online support. If you have an emergency outside office hours, we’ll reply within 30 minutes.</p>
