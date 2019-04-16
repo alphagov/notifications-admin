@@ -12,22 +12,19 @@ class LetterBrandingClient(NotifyAdminAPIClient):
         return self.get(url='/letter-branding')
 
     @cache.delete('letter_branding')
-    def create_letter_branding(self, filename, name, domain):
+    def create_letter_branding(self, filename, name):
         data = {
             "filename": filename,
             "name": name,
-            "domain": domain,
         }
         return self.post(url="/letter-branding", data=data)
 
     @cache.delete('letter_branding')
     @cache.delete('letter_branding-{branding_id}')
-    def update_letter_branding(self, branding_id, filename, name, domain):
+    def update_letter_branding(self, branding_id, filename, name):
         data = {
             "filename": filename,
             "name": name,
-            "domain": domain,
-
         }
         return self.post(url="/letter-branding/{}".format(branding_id), data=data)
 

@@ -6,7 +6,7 @@ from flask import url_for
 
 from app.main.forms import FieldWithNoneOption
 from tests.conftest import (
-    active_user_with_permissions,
+    mock_get_organisation_by_domain,
     normalize_spaces,
     sample_uuid,
 )
@@ -14,6 +14,7 @@ from tests.conftest import (
 
 def test_non_logged_in_user_can_see_homepage(
     client,
+    mock_get_service_and_organisation_counts,
 ):
     response = client.get(url_for('main.index'))
     assert response.status_code == 200
@@ -28,6 +29,18 @@ def test_non_logged_in_user_can_see_homepage(
         'GOV.UK Notify lets you send emails, text messages and letters '
         'to your users. Try it now if you work in central government, a '
         'local authority, or the NHS.'
+    )
+
+    assert normalize_spaces(page.select_one('#whos-using-notify').text) == (
+        'Who’s using GOV.UK Notify '
+        'Services '
+        '9999 services '
+        'Organisations '
+        '111 organisations '
+        'See the list of services and organisations.'
+    )
+    assert page.select_one('#whos-using-notify a')['href'] == (
+        'https://www.gov.uk/performance/govuk-notify/government-services'
     )
 
 
@@ -69,6 +82,7 @@ def test_robots(client):
 ])
 def test_static_pages(
     client_request,
+    mock_get_organisation_by_domain,
     view,
 ):
     page = client_request.get('main.{}'.format(view))
@@ -134,12 +148,14 @@ def test_terms_is_generic_if_user_is_not_logged_in(
 
 
 @pytest.mark.parametrize((
-    'email_address,'
+    'name,'
+    'agreement_signed,'
     'expected_terms_paragraph,'
     'expected_terms_link,'
 ), [
     (
-        'test@cabinet-office.gov.uk',
+        'Cabinet Office',
+        True,
         (
             'Your organisation (Cabinet Office) has already accepted '
             'the GOV.UK Notify data sharing and financial agreement.'
@@ -147,7 +163,8 @@ def test_terms_is_generic_if_user_is_not_logged_in(
         None,
     ),
     (
-        'test@aylesburytowncouncil.gov.uk',
+        'Aylesbury Town Council',
+        False,
         (
             'Your organisation (Aylesbury Town Council) must also '
             'accept our data sharing and financial agreement. Download '
@@ -159,7 +176,8 @@ def test_terms_is_generic_if_user_is_not_logged_in(
         ),
     ),
     (
-        'larry@downing-street.gov.uk',
+        None,
+        None,
         (
             'Your organisation must also accept our data sharing and '
             'financial agreement. Download the agreement or contact us '
@@ -172,7 +190,8 @@ def test_terms_is_generic_if_user_is_not_logged_in(
         ),
     ),
     (
-        'michael.fish@metoffice.gov.uk',
+        'Met Office',
+        False,
         (
             'Your organisation (Met Office) must also accept our data '
             'sharing and financial agreement. Download a copy.'
@@ -187,13 +206,16 @@ def test_terms_tells_logged_in_users_what_we_know_about_their_agreement(
     mocker,
     fake_uuid,
     client_request,
-    email_address,
+    name,
+    agreement_signed,
     expected_terms_paragraph,
     expected_terms_link,
 ):
-    user = active_user_with_permissions(fake_uuid)
-    user.email_address = email_address
-    mocker.patch('app.user_api_client.get_user', return_value=user)
+    mock_get_organisation_by_domain(
+        mocker,
+        name=name,
+        agreement_signed=agreement_signed,
+    )
     terms_page = client_request.get('main.terms')
 
     assert normalize_spaces(terms_page.select('main p')[1].text) == expected_terms_paragraph
@@ -205,7 +227,7 @@ def test_terms_tells_logged_in_users_what_we_know_about_their_agreement(
 
 def test_css_is_served_from_correct_path(client_request):
 
-    page = client_request.get('main.pricing')  # easy static page
+    page = client_request.get('main.documentation')  # easy static page
 
     for index, link in enumerate(
         page.select('link[rel=stylesheet]')

@@ -52,7 +52,15 @@
           ) }}
         {% endif %}
       {% endcall %}
-      {% if current_user.is_gov_user %}
+      {% if not current_user.is_gov_user %}
+        <p>
+          Only team members with a government email address can request to go live.
+        </p>
+      {% elif (not current_service.go_live_checklist_completed) or (show_agreement and not agreement_signed) %}
+        <p>
+          You must complete these steps before you can request to go live.
+        </p>
+      {% else %}
         <p>
           When we receive your request we’ll get back to you within one working day.
         </p>
@@ -62,10 +70,6 @@
         {% call form_wrapper() %}
           {{ page_footer('Request to go live') }}
         {% endcall %}
-      {% else %}
-        <p>
-          Only team members with a government email address can request to go live.
-        </p>
       {% endif %}
     </div>
   </div>

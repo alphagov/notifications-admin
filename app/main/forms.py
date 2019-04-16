@@ -36,10 +36,8 @@ from wtforms.widgets import CheckboxInput, ListWidget
 
 from app.main.validators import (
     Blacklist,
-    CanonicalGovernmentDomain,
     CsvFileValidator,
     DoesNotStartWithDoubleZero,
-    KnownGovernmentDomain,
     LettersNumbersAndFullStopsOnly,
     NoCommasInPlaceHolders,
     OnlyGSMCharacters,
@@ -47,7 +45,7 @@ from app.main.validators import (
     ValidGovEmail,
 )
 from app.models.user import permissions, roles
-from app.utils import AgreementInfo, guess_name_from_email_address
+from app.utils import guess_name_from_email_address
 
 
 def get_time_value_and_label(future_time):
@@ -990,23 +988,9 @@ class PreviewBranding(StripWhitespaceForm):
     branding_style = HiddenFieldWithNoneOption('branding_style')
 
 
-class GovernmentDomainField(StringField):
-    validators = [
-        KnownGovernmentDomain(),
-        CanonicalGovernmentDomain(),
-    ]
-
-    def post_validate(self, form, validation_stopped):
-        if self.data == '':
-            self.data = None
-        if self.data and not self.errors:
-            self.data = AgreementInfo(self.data).canonical_domain
-
-
 class ServiceUpdateEmailBranding(StripWhitespaceForm):
     name = StringField('Name of brand')
     text = StringField('Text')
-    domain = GovernmentDomainField('Domain')
     colour = StringField(
         'Colour',
         validators=[
@@ -1041,7 +1025,6 @@ class SVGFileUpload(StripWhitespaceForm):
 
 class ServiceLetterBrandingDetails(StripWhitespaceForm):
     name = StringField('Name of brand', validators=[DataRequired()])
-    domain = GovernmentDomainField('Domain')
 
 
 class PDFUploadForm(StripWhitespaceForm):

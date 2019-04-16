@@ -39,7 +39,6 @@ def update_email_branding(branding_id, logo=None):
         name=email_branding['name'],
         text=email_branding['text'],
         colour=email_branding['colour'],
-        domain=email_branding['domain'],
         brand_type=email_branding['brand_type']
     )
 
@@ -67,7 +66,6 @@ def update_email_branding(branding_id, logo=None):
             name=form.name.data,
             text=form.text.data,
             colour=form.colour.data,
-            domain=form.domain.data,
             brand_type=form.brand_type.data,
         )
 
@@ -115,7 +113,6 @@ def create_email_branding(logo=None):
             name=form.name.data,
             text=form.text.data,
             colour=form.colour.data,
-            domain=form.domain.data,
             brand_type=form.brand_type.data,
         )
 

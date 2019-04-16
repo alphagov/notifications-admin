@@ -2,7 +2,7 @@
   "use strict";
 
   var queues = {};
-  var dd = new diffDOM();
+  var dd = new diffDOM.DiffDOM();
 
   var getRenderer = $component => response => dd.apply(
     $component.get(0),

@@ -74,7 +74,6 @@ def test_client_creates_service_with_correct_data(
         True,
         fake_uuid,
         'test@example.com',
-        'nhs.uk'
     )
     mock_post.assert_called_once_with(
         '/service',
@@ -90,7 +89,6 @@ def test_client_creates_service_with_correct_data(
             restricted=True,
             user_id=fake_uuid,
             email_from='test@example.com',
-            service_domain='nhs.uk'
         ),
     )
 

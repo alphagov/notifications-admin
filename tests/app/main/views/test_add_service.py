@@ -56,7 +56,6 @@ def test_should_add_service_and_redirect_to_tour_when_no_services(
         restricted=True,
         user_id=api_user_active.id,
         email_from='testing.the.post',
-        service_domain=None
     )
     mock_create_service_template.assert_called_once_with(
         'Example text message template',
@@ -71,10 +70,10 @@ def test_should_add_service_and_redirect_to_tour_when_no_services(
     mock_create_or_update_free_sms_fragment_limit.assert_called_once_with(101, 25000)
 
 
-@pytest.mark.parametrize('organisation_type, free_allowance, service_domain', [
-    ('central', 250 * 1000, None),
-    ('local', 25 * 1000, None),
-    ('nhs', 25 * 1000, 'nhs.uk'),
+@pytest.mark.parametrize('organisation_type, free_allowance', [
+    ('central', 250 * 1000),
+    ('local', 25 * 1000),
+    ('nhs', 25 * 1000),
 ])
 def test_should_add_service_and_redirect_to_dashboard_when_existing_service(
     app_,
@@ -82,11 +81,9 @@ def test_should_add_service_and_redirect_to_dashboard_when_existing_service(
     mock_create_service,
     mock_create_service_template,
     mock_get_services,
-    mock_update_service,
     api_user_active,
     organisation_type,
     free_allowance,
-    service_domain,
     mock_create_or_update_free_sms_fragment_limit,
     mock_get_all_email_branding,
 ):
@@ -111,54 +108,10 @@ def test_should_add_service_and_redirect_to_dashboard_when_existing_service(
         restricted=True,
         user_id=api_user_active.id,
         email_from='testing.the.post',
-        service_domain=service_domain
     )
     mock_create_or_update_free_sms_fragment_limit.assert_called_once_with(101, free_allowance)
     assert len(mock_create_service_template.call_args_list) == 0
     assert session['service_id'] == 101
-
-
-@pytest.mark.parametrize('organisation_type, email_address, expected_branding', [
-    ('central', 'test@example.voa.gsi.gov.uk', '5'),
-    ('central', 'test@example.voa.gov.uk', '5'),
-    ('central', 'test@example.gov.uk', None),
-    # Anyone choosing ‘NHS’ for organisation type gets NHS branding no
-    # matter what their email domain is (but we look it up based on the
-    # `nhs.uk` domain to avoid hard-coding a branding ID anywhere)
-    ('nhs', 'test@example.voa.gov.uk', '4'),
-    ('nhs', 'test@nhs.uk', '4'),
-])
-def test_should_lookup_branding_for_known_domain(
-    app_,
-    client_request,
-    active_user_with_permissions,
-    mock_create_service,
-    mock_get_services,
-    mock_update_service,
-    mock_create_or_update_free_sms_fragment_limit,
-    mock_get_all_email_branding,
-    organisation_type,
-    email_address,
-    expected_branding,
-):
-    active_user_with_permissions.email_address = email_address
-    client_request.login(active_user_with_permissions)
-    client_request.post(
-        'main.add_service',
-        _data={
-            'name': 'testing the post',
-            'organisation_type': organisation_type,
-        }
-    )
-    mock_get_all_email_branding.assert_called_once_with()
-    assert mock_create_service.called is True
-    if expected_branding:
-        mock_update_service.assert_called_once_with(
-            101,
-            email_branding=expected_branding,
-        )
-    else:
-        assert mock_update_service.called is False
 
 
 def test_should_return_form_errors_when_service_name_is_empty(

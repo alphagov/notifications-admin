@@ -28,7 +28,6 @@ def test_email_branding_page_shows_full_branding_list(
     links = page.select('.message-name a')
     brand_names = [normalize_spaces(link.text) for link in links]
     hrefs = [link['href'] for link in links]
-    brand_hints = [normalize_spaces(hint.text) for hint in page.select('.message-type')]
 
     assert normalize_spaces(
         page.select_one('h1').text
@@ -36,14 +35,12 @@ def test_email_branding_page_shows_full_branding_list(
 
     assert page.select_one('.column-three-quarters a')['href'] == url_for('main.create_email_branding')
 
-    assert list(zip(
-        brand_names, brand_hints
-    )) == [
-        ('org 1', '–'),
-        ('org 2', '–'),
-        ('org 3', '–'),
-        ('org 4', 'Default for nhs.uk'),
-        ('org 5', 'Default for voa.gov.uk'),
+    assert brand_names == [
+        'org 1',
+        'org 2',
+        'org 3',
+        'org 4',
+        'org 5',
     ]
     assert hrefs == [
         url_for('.update_email_branding', branding_id=1),
@@ -70,7 +67,6 @@ def test_edit_email_branding_shows_the_correct_branding_info(
     assert page.select_one('#name').attrs.get('value') == 'Organisation name'
     assert page.select_one('#text').attrs.get('value') == 'Organisation text'
     assert page.select_one('#colour').attrs.get('value') == '#f00'
-    assert page.select_one('#domain').attrs.get('value') == 'sample.com'
 
 
 def test_create_email_branding_does_not_show_any_branding_info(
@@ -89,27 +85,19 @@ def test_create_email_branding_does_not_show_any_branding_info(
     assert page.select_one('#name').attrs.get('value') == ''
     assert page.select_one('#text').attrs.get('value') == ''
     assert page.select_one('#colour').attrs.get('value') == ''
-    assert page.select_one('#domain').attrs.get('value') == ''
 
 
-@pytest.mark.parametrize('posted_domain, persisted_domain', [
-    ('voa.gov.uk', 'voa.gov.uk'),
-    ('', None),
-])
 def test_create_new_email_branding_without_logo(
     logged_in_platform_admin_client,
     mocker,
     fake_uuid,
     mock_create_email_branding,
-    posted_domain,
-    persisted_domain,
 ):
     data = {
         'logo': None,
         'colour': '#ff0000',
         'text': 'new text',
         'name': 'new name',
-        'domain': posted_domain,
         'brand_type': 'org'
     }
 
@@ -128,94 +116,9 @@ def test_create_new_email_branding_without_logo(
         name=data['name'],
         text=data['text'],
         colour=data['colour'],
-        domain=persisted_domain,
         brand_type=data['brand_type']
     )
     assert mock_persist.call_args_list == []
-
-
-def test_cant_create_new_email_branding_with_unknown_domain(
-    client_request,
-    mocker,
-    fake_uuid,
-    mock_create_email_branding
-):
-    mock_persist = mocker.patch('app.main.views.email_branding.persist_logo')
-    mocker.patch('app.main.views.email_branding.delete_email_temp_files_created_by')
-
-    client_request.login(platform_admin_user(fake_uuid))
-    page = client_request.post(
-        '.create_email_branding',
-        content_type='multipart/form-data',
-        _data={
-            'logo': None,
-            'colour': '#ff0000',
-            'text': 'new text',
-            'name': 'new name',
-            'domain': 'example.gov.uk',
-            'brand_type': 'org',
-        },
-        _expected_status=200,
-    )
-
-    assert mock_create_email_branding.called is False
-    assert mock_persist.called is False
-
-    assert page.select_one('.error-message').text.strip() == (
-        'Not a known government domain (you might need to update domains.yml)'
-    )
-    assert page.select_one('input[name=domain]')['value'] == (
-        'example.gov.uk'
-    )
-
-
-@pytest.mark.parametrize('posted_domain, expected_error', [
-    (
-        'voa.gsi.gov.uk',
-        'Not a canonical domain (use voa.gov.uk if appropriate)',
-    ),
-    (
-        'hmcts.net',
-        'Not a canonical domain (use hmcts.gov.uk if appropriate)',
-    ),
-    (
-        'southend.essex.gov.uk',
-        'Not an organisation-level domain (use essex.gov.uk if appropriate)',
-    ),
-    pytest.param(
-        'voa.gov.uk',
-        '',
-        marks=pytest.mark.xfail(raises=AssertionError)
-    ),
-])
-def test_rejects_non_canonical_domain_when_adding_email_branding(
-    client_request,
-    mocker,
-    fake_uuid,
-    mock_create_email_branding,
-    posted_domain,
-    expected_error,
-):
-    mocker.patch('app.main.views.email_branding.persist_logo')
-    mocker.patch('app.main.views.email_branding.delete_email_temp_files_created_by')
-    data = {
-        'logo': None,
-        'colour': '#ff0000',
-        'text': 'new text',
-        'name': 'new name',
-        'domain': posted_domain,
-        'brand_type': 'org',
-    }
-    client_request.login(platform_admin_user(fake_uuid))
-    page = client_request.post(
-        '.create_email_branding',
-        content_type='multipart/form-data',
-        _data=data,
-        _expected_status=200,
-    )
-
-    assert page.select_one('.error-message').text.strip() == expected_error
-    assert mock_create_email_branding.called is False
 
 
 def test_create_email_branding_requires_a_name_when_submitting_logo_details(
@@ -232,7 +135,6 @@ def test_create_email_branding_requires_a_name_when_submitting_logo_details(
         'colour': '#ff0000',
         'text': 'new text',
         'name': '',
-        'domain': '',
         'brand_type': 'org',
     }
     client_request.login(platform_admin_user(fake_uuid))
@@ -258,7 +160,6 @@ def test_create_email_branding_does_not_require_a_name_when_uploading_a_file(
         'colour': '',
         'text': '',
         'name': '',
-        'domain': '',
         'brand_type': 'org',
     }
     client_request.login(platform_admin_user(fake_uuid))
@@ -286,7 +187,6 @@ def test_create_new_email_branding_when_branding_saved(
         'colour': '#ff0000',
         'text': 'new text',
         'name': 'new name',
-        'domain': 'voa.gov.uk',
         'brand_type': 'org_banner'
     }
 
@@ -307,7 +207,6 @@ def test_create_new_email_branding_when_branding_saved(
             'name': data['name'],
             'text': data['text'],
             'cdn_url': 'https://static-logos.cdn.com',
-            'domain': data['domain'],
             'brand_type': data['brand_type']
         }
     )
@@ -320,7 +219,6 @@ def test_create_new_email_branding_when_branding_saved(
         name=data['name'],
         text=data['text'],
         colour=data['colour'],
-        domain=data['domain'],
         brand_type=data['brand_type']
     )
 
@@ -387,7 +285,6 @@ def test_update_existing_branding(
         'colour': '#0000ff',
         'text': 'new text',
         'name': 'new name',
-        'domain': 'voa.gov.uk',
         'brand_type': 'both'
     }
 
@@ -405,7 +302,7 @@ def test_update_existing_branding(
         content_type='multipart/form-data',
         data={'colour': data['colour'], 'name': data['name'], 'text': data['text'],
               'cdn_url': 'https://static-logos.cdn.com',
-              'domain': data['domain'], 'brand_type': data['brand_type']
+              'brand_type': data['brand_type']
               }
     )
 
@@ -418,7 +315,6 @@ def test_update_existing_branding(
         name=data['name'],
         text=data['text'],
         colour=data['colour'],
-        domain=data['domain'],
         brand_type=data['brand_type']
     )
 
@@ -526,7 +422,6 @@ def test_colour_regex_validation(
         'colour': colour_hex,
         'text': 'new text',
         'name': 'new name',
-        'domain': 'voa.gov.uk',
         'brand_type': 'org'
     }
 

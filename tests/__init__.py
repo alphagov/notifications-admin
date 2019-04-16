@@ -184,7 +184,7 @@ def service_json(
 
 def organisation_json(
     id_='1234',
-    name='Test Organisation',
+    name=False,
     users=None,
     active=True,
     created_at=None,
@@ -192,6 +192,8 @@ def organisation_json(
     letter_branding_id=None,
     email_branding_id=None,
     domains=None,
+    crown=True,
+    agreement_signed=False,
 ):
     if users is None:
         users = []
@@ -199,7 +201,7 @@ def organisation_json(
         services = []
     return {
         'id': id_,
-        'name': name,
+        'name': 'Test Organisation' if name is False else name,
         'active': active,
         'users': users,
         'services': services,
@@ -207,8 +209,8 @@ def organisation_json(
         'email_branding_id': email_branding_id,
         'letter_branding_id': letter_branding_id,
         'organisation_type': '',
-        'crown': True,
-        'agreement_signed': False,
+        'crown': crown,
+        'agreement_signed': agreement_signed,
         'agreement_signed_at': None,
         'agreement_signed_by': None,
         'domains': domains or [],

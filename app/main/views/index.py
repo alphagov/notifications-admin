@@ -12,18 +12,23 @@ from notifications_utils.international_billing_rates import (
 )
 from notifications_utils.template import HTMLEmailTemplate, LetterImageTemplate
 
-from app import email_branding_client, letter_branding_client
+from app import email_branding_client, letter_branding_client, status_api_client
 from app.main import main
 from app.main.forms import FieldWithNoneOption, SearchByNameForm
 from app.main.views.sub_navigation_dictionaries import features_nav
-from app.utils import AgreementInfo, get_logo_cdn_domain
+from app.utils import get_logo_cdn_domain
 
 
 @main.route('/')
 def index():
+
     if current_user and current_user.is_authenticated:
         return redirect(url_for('main.choose_account'))
-    return render_template('views/signedout.html')
+
+    return render_template(
+        'views/signedout.html',
+        counts=status_api_client.get_count_of_live_services_and_organisations(),
+    )
 
 
 @main.route('/robots.txt')
@@ -70,7 +75,6 @@ def pricing():
             for cc, country in INTERNATIONAL_BILLING_RATES.items()
         ], key=lambda x: x[0]),
         search_form=SearchByNameForm(),
-        agreement_info=AgreementInfo.from_current_user(),
     )
 
 
@@ -268,7 +272,6 @@ def terms():
     return render_template(
         'views/terms-of-use.html',
         navigation_links=features_nav(),
-        agreement_info=AgreementInfo.from_current_user(),
     )
 
 

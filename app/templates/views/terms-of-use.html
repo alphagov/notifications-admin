@@ -21,7 +21,7 @@ Terms of use
     </p>
 
     <p>
-      {{ agreement_info.as_terms_of_use_paragraph(
+      {{ current_user.default_organisation.as_terms_of_use_paragraph(
         terms_link=url_for('main.sign_in', next=url_for('main.terms')),
         download_link=url_for('.agreement'),
         support_link=url_for('.feedback', ticket_type='ask-question-give-feedback', body='agreement'),

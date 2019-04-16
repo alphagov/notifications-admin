@@ -1,4 +1,10 @@
-def test_owasp_useful_headers_set(client, mocker):
+
+
+def test_owasp_useful_headers_set(
+    client,
+    mocker,
+    mock_get_service_and_organisation_counts,
+):
     mocker.patch('app.get_logo_cdn_domain', return_value='static-logos.test.com')
 
     response = client.get('/')
@@ -19,7 +25,11 @@ def test_owasp_useful_headers_set(client, mocker):
     )
 
 
-def test_headers_non_ascii_characters_are_replaced(client, mocker):
+def test_headers_non_ascii_characters_are_replaced(
+    client,
+    mocker,
+    mock_get_service_and_organisation_counts,
+):
     mocker.patch('app.get_logo_cdn_domain', return_value='static-logos€æ.test.com')
 
     response = client.get('/')

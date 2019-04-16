@@ -288,8 +288,13 @@
 
         {% call row() %}
           {{ text_field('Live')}}
-          {{ boolean_field(not current_service.trial_mode) }}
-          {{ edit_field('Change', url_for('.service_switch_live', service_id=current_service.id)) }}
+          {% if current_service.trial_mode and not current_service.organisation %}
+            {{ text_field('No (you need to assign this service to an organisation before you can make it live)') }}
+            {{ text_field('') }}
+          {% else %}
+            {{ boolean_field(not current_service.trial_mode) }}
+            {{ edit_field('Change', url_for('.service_switch_live', service_id=current_service.id)) }}
+          {% endif %}
         {% endcall %}
 
         {% call row() %}
@@ -300,7 +305,7 @@
 
         {% call row() %}
           {{ text_field('Organisation')}}
-          {{ optional_text_field(current_service.organisation_name) }}
+          {{ optional_text_field(current_service.organisation.name) }}
           {{ edit_field('Change', url_for('.link_service_to_organisation', service_id=current_service.id)) }}
         {% endcall %}
         {% call row() %}

@@ -13,7 +13,7 @@ pyexcel-xls==0.5.8
 pyexcel-xlsx==0.5.7
 pyexcel-ods3==0.5.3
 pytz==2018.9
-gunicorn==19.7.1  # >19.8 stops eventlet workers after a timeout
+gunicorn==19.7.1  # pyup: ignore, >19.8 breaks eventlet patching
 eventlet==0.24.1
 notifications-python-client==5.3.0
 

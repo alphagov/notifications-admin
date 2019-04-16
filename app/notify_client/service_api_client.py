@@ -13,7 +13,6 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         restricted,
         user_id,
         email_from,
-        service_domain,
     ):
         """
         Create a service and return the json.
@@ -26,7 +25,6 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             "user_id": user_id,
             "restricted": restricted,
             "email_from": email_from,
-            "service_domain": service_domain
         }
         data = _attach_current_user(data)
         return self.post("/service", data)['data']['id']
@@ -97,6 +95,14 @@ class ServiceAPIClient(NotifyAdminAPIClient):
 
         endpoint = "/service/{0}".format(service_id)
         return self.post(endpoint, data)
+
+    @cache.delete('live-service-and-organisation-counts')
+    def update_status(self, service_id, live):
+        return self.update_service(
+            service_id,
+            message_limit=250000 if live else 50,
+            restricted=(not live),
+        )
 
     # This method is not cached because it calls through to one which is
     def update_service_with_properties(self, service_id, properties):
