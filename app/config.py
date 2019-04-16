@@ -162,8 +162,8 @@ class Live(Config):
     MOU_BUCKET_NAME = 'notifications.service.gov.uk-mou'
     NOTIFY_ENVIRONMENT = 'live'
     CHECK_PROXY_HEADER = False
-    ASSET_DOMAIN = 'static.notifications.service.gov.uk'
-    ASSET_PATH = 'https://static.notifications.service.gov.uk/'
+    ASSET_DOMAIN = ''
+    ASSET_PATH = '/static/'
 
 
 class CloudFoundryConfig(Config):
