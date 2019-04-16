@@ -247,6 +247,8 @@ def submit_request_to_go_live(service_id):
         tags=current_service.request_to_go_live_tags,
     )
 
+    current_service.update(go_live_user=current_user.id)
+
     flash('Thanks for your request to go live. We’ll get back to you within one working day.', 'default')
     return redirect(url_for('.service_settings', service_id=service_id))
 
