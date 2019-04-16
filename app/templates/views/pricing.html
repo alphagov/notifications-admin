@@ -22,7 +22,7 @@
     </ul>
 
     {% if not current_user.is_authenticated %}
-      <p><a href="https://www.notifications.service.gov.uk/register">Create an account</a> then set up as many different services as you need to. Each service has its own free text message allowance.</p>
+      <p><a href="{{ url_for('main.register') }}">Create an account</a> then set up as many different services as you need to. Each service has its own free text message allowance.</p>
     {% endif %}
 
     <p>When you set up a new service it will start in <a href="{{ url_for('main.trial_mode_new') }}">trial mode</a>.</p>
