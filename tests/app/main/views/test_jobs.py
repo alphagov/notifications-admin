@@ -360,7 +360,7 @@ def test_should_show_letter_job_with_banner_after_sending_before_1730(
 
     assert page.select('p.bottom-gutter') == []
     assert normalize_spaces(page.select('.banner-default-with-tick')[0].text) == (
-        'Your letter has been sent. Printing starts today at 5.30pm.'
+        'Your letter has been sent. Printing starts today at 5:30pm.'
     )
 
 
@@ -383,7 +383,7 @@ def test_should_show_letter_job_with_banner_when_there_are_multiple_CSV_rows(
 
     assert page.select('p.bottom-gutter') == []
     assert normalize_spaces(page.select('.banner-default-with-tick')[0].text) == (
-        'Your letters have been sent. Printing starts today at 5.30pm.'
+        'Your letters have been sent. Printing starts today at 5:30pm.'
     )
 
 
@@ -406,7 +406,7 @@ def test_should_show_letter_job_with_banner_after_sending_after_1730(
 
     assert page.select('p.bottom-gutter') == []
     assert normalize_spaces(page.select('.banner-default-with-tick')[0].text) == (
-        'Your letter has been sent. Printing starts tomorrow at 5.30pm.'
+        'Your letter has been sent. Printing starts tomorrow at 5:30pm.'
     )
 
 
