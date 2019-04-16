@@ -153,7 +153,7 @@ def get_letter_printing_statement(status, created_at):
     created_at_dt = parser.parse(created_at).replace(tzinfo=None)
 
     if letter_can_be_cancelled(status, created_at_dt):
-        return 'Printing starts {} at 5.30pm'.format(printing_today_or_tomorrow())
+        return 'Printing starts {} at 5:30pm'.format(printing_today_or_tomorrow())
     else:
         printed_datetime = utc_string_to_aware_gmt_datetime(created_at) + timedelta(hours=6, minutes=30)
         printed_date = _format_datetime_short(printed_datetime)
