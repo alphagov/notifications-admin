@@ -3,18 +3,20 @@ def features_nav():
         {
             "name": "Features",
             "link": "main.features",
-        },
-        {
-            "name": "Emails",
-            "link": "main.features_email",
-        },
-        {
-            "name": "Text messages",
-            "link": "main.features_sms",
-        },
-        {
-            "name": "Letters",
-            "link": "main.features_letters",
+            "sub_navigation_items": [
+                {
+                    "name": "Emails",
+                    "link": "main.features_email",
+                },
+                {
+                    "name": "Text messages",
+                    "link": "main.features_sms",
+                },
+                {
+                    "name": "Letters",
+                    "link": "main.features_letters",
+                },
+            ]
         },
         {
             "name": "Roadmap",
