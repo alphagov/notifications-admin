@@ -38,8 +38,4 @@ def features_nav():
             "name": "Terms of use",
             "link": "main.terms",
         },
-        {
-            "name": "Using Notify",
-            "link": "main.using_notify",
-        },
     ]
