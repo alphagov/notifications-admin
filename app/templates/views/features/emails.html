@@ -42,7 +42,7 @@
       <!--<li>you can track when the recipient downloads your document</li>-->
       <li>email attachments are often marked as spam</li>
     </ul>
-    <p><a href="https://www.notifications.service.gov.uk/support/ask-question-give-feedback">Contact the team</a> and ask us to turn this feature on for your service.</p>
+    <p><a href="{{ url_for('.support', ticket_type='ask-question-give-feedback') }}">Contact the team</a> and ask us to turn this feature on for your service.</p>
     <p><a href="{{ url_for('.documentation') }}">Read the API documentation</a> for more information.</p>
 
     <h3 class="heading heading-small">Add a reply-to address</h3>
