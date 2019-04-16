@@ -22,7 +22,7 @@
       <li><a href="{{ url_for('main.features_sms') }}">text messages</a></li>
       <li><a href="{{ url_for('main.features_letters') }}">letters</a></li>
     </ul>
-    <p>You don’t need any technical knowledge to use Notify.</p>
+    <p>You do not need any technical knowledge to use Notify.</p>
     {% if not current_user.is_authenticated %}
       <p><a href="{{ url_for('main.register') }}">Create an account</a> for free and try it yourself.</p>
     {% endif %}
@@ -44,7 +44,7 @@
 
     <h2 class="heading-medium">Reporting</h2>
     <p>Notify’s real-time dashboard lets you see the number of messages sent. You can also check the current status of any message to see when it was delivered.</p>
-    <p>Read more about how <a href="{{ url_for('main.message_status') }}">message status types</a>message status</a> works.</p>
+    <p>Read more about how <a href="{{ url_for('main.message_status') }}">message status</a> works.</p>
 
     <h2 class="heading-medium">Permissions</h2>
     <p>Control which members of your team can see, create, edit and send messages.</p>
@@ -70,7 +70,7 @@
     <p>Notify protects and manages data to meet the needs of government services.</p>
 
     <h3 class="heading-small">Hide sensitive information</h3>
-    <p>Notify lets you redact personal information from your messages after they've been sent. This means that only the recipient can see that information.</p>
+    <p>Notify lets you redact personal information from your messages after they’ve been sent. This means that only the recipient can see that information.</p>
 
     <h3 class="heading-small">Two-factor authentication</h3>
     <p>Notify uses two-factor authentication (2FA) to keep your account secure. When you sign in, we'll send a unique one-time code to your phone and ask you to enter it before we let you use your account.</p>
