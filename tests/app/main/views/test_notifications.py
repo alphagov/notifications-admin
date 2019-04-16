@@ -416,7 +416,7 @@ def test_notification_page_shows_page_for_first_class_letter_notification(
         notification_id=fake_uuid,
     )
 
-    assert normalize_spaces(page.select('main p:nth-of-type(2)')[0].text) == 'Printing starts tomorrow at 5.30pm'
+    assert normalize_spaces(page.select('main p:nth-of-type(2)')[0].text) == 'Printing starts tomorrow at 5:30pm'
     assert normalize_spaces(page.select('main p:nth-of-type(3)')[0].text) == 'Estimated delivery date: 5 January'
     assert normalize_spaces(page.select_one('.letter-postage').text) == (
         'Postage: first class'
@@ -716,14 +716,14 @@ def test_should_show_image_of_precompiled_letter_notification(
 @pytest.mark.parametrize('created_at, current_datetime', [
     ('2017-07-07T12:00:00+00:00', '2017-07-07 16:29:00'),  # created today, summer
     ('2017-12-12T12:00:00+00:00', '2017-12-12 17:29:00'),  # created today, winter
-    ('2017-12-12T21:30:00+00:00', '2017-12-13 17:29:00'),  # created after 5.30 yesterday
+    ('2017-12-12T21:30:00+00:00', '2017-12-13 17:29:00'),  # created after 5:30 yesterday
     ('2017-03-25T17:30:00+00:00', '2017-03-26 16:29:00'),  # over clock change period on 2017-03-26
 ])
 def test_get_letter_printing_statement_when_letter_prints_today(created_at, current_datetime):
     with freeze_time(current_datetime):
         statement = get_letter_printing_statement('created', created_at)
 
-    assert statement == 'Printing starts today at 5.30pm'
+    assert statement == 'Printing starts today at 5:30pm'
 
 
 @pytest.mark.parametrize('created_at, current_datetime', [
@@ -734,7 +734,7 @@ def test_get_letter_printing_statement_when_letter_prints_tomorrow(created_at, c
     with freeze_time(current_datetime):
         statement = get_letter_printing_statement('created', created_at)
 
-    assert statement == 'Printing starts tomorrow at 5.30pm'
+    assert statement == 'Printing starts tomorrow at 5:30pm'
 
 
 @pytest.mark.parametrize('created_at, print_day', [
