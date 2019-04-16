@@ -167,7 +167,7 @@ def test_notification_page_shows_page_for_letter_notification(
         "‘sample template’ was sent by Test User on 1 January at 1:01am"
     )
     assert normalize_spaces(page.select('main p:nth-of-type(2)')[0].text) == (
-        'Printing starts today at 5.30pm'
+        'Printing starts today at 5:30pm'
     )
     assert normalize_spaces(page.select('main p:nth-of-type(3)')[0].text) == (
         'Estimated delivery date: 6 January'
