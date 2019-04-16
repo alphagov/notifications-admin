@@ -14,27 +14,30 @@
   <div class="column-two-thirds">
 
     <h1 class="heading-large">Pricing</h1>
-    <p> To use GOV.UK Notify, there’s:</p>
+    <p>To use GOV.UK Notify, there’s:</p>
     <ul class="list list-bullet">
-      <li>no procurement cost</li>
       <li>no monthly charge</li>
-      <li>no setup fee to use</li>
+      <li>no setup fee</li>
+      <li>no procurement cost</li>
     </ul>
 
+    {% if not current_user.is_authenticated %}
+      <p><a href="{{ url_for('main.register') }}">Create an account</a> then set up as many different services as you need to. Each service has its own free text message allowance.</p>
+    {% endif %}
+
+    <p>When you set up a new service it will start in <a href="{{ url_for('main.trial_mode_new') }}">trial mode</a>.</p>
+
     <h2 class="heading-medium">Emails</h2>
-    <p>It’s free to send emails through GOV.UK Notify.</p>
+    <p>It’s free to send emails through Notify.</p>
 
     <h2 class="heading-medium">Text messages</h2>
-    <p>You have a free allowance of text messages each financial year. You’ll get:</p>
+    <p>Each service you set up in Notify has a free annual allowance. The allowance is:</p>
     <ul class="list list-bullet">
       <li>250,000 free text messages for central government services</li>
       <li>25,000 free text messages for other public sector services</li>
     </ul>
     <p>It costs 1.58 pence (plus VAT) for each text message you send after your free allowance.</p>
-
-    <h3 class="heading-small">Multiple services</h3>
-    <p>If your organisation offers multiple services, you can have a different Notify account for each of them.</p>
-    <p>Each service will get its own free message allowance.</p>
+    <p>See <a href="#paying">how to pay</a>.
 
     <h3 class="heading-small">Long text messages</h3>
     <p>If a text message is beyond a certain length, it’ll be charged as more than one message:</p>
@@ -89,11 +92,11 @@
     </details>
 
     <h2 class="heading-medium" id="letters">Letters</h2>
-    <p>The cost of sending a letter depends on how many sheets of paper you need and the class of postage.</p>
+    <p>The cost of sending a letter depends on the postage you choose and how many sheets of paper you need.</p>
     <div class="bottom-gutter-3-2">
       {% call mapping_table(
         caption='Letter pricing',
-        field_headings=['', 'Second class', 'First class'],
+        field_headings=['Paper', 'Second class', 'First class'],
         field_headings_visible=True,
         caption_visible=False
       ) %}
@@ -112,24 +115,24 @@
         {% endfor %}
       {% endcall %}
     </div>
-    <p>Letter prices include:</p>
+    <p>Prices include:</p>
     <ul class="list list-bullet">
-      <li>paper</li>
-      <li>double-sided colour printing</li>
-      <li>envelopes</li>
-      <li>postage</li>
+       <li>paper</li>
+       <li>double-sided colour printing</li>
+       <li>C5 size envelopes with an address window</li>
+       <li>first or second class postage</li>
     </ul>
 
     <h2 class="heading-medium" id="paying">How to pay</h2>
-    <p>You can find details of how to pay for Notify in our data sharing and financial agreement.</p>
-    <p>
-      {{ current_user.default_organisation.as_pricing_paragraph(
-        pricing_link=url_for('main.sign_in', next=url_for('main.pricing', _anchor='paying')),
-        download_link=url_for('main.agreement'),
-        support_link=url_for('.feedback', ticket_type='ask-question-give-feedback', body='agreement'),
-        signed_in=current_user.is_authenticated,
-      ) }}
-    </p>
+    <p>Before you can use Notify to send letters or pay for text messages you’ll need to:</p>
+    <ul class="list list-bullet">
+      <li>send us a request to make your service live</li>
+      <li>sign our data sharing and financial agreement</li>
+      <li>raise a Purchase Order (PO)</li>
+    </ul>
+
+    <p>You may need to set up the Cabinet Office as a supplier before you can raise a PO.</p>
+    <p>After you’ve done that, Notify will send you an invoice at the end of each quarter. If the value of an invoice is very small, we roll it into the next quarter to save time and effort.</p>
   </div>
 </div>
 

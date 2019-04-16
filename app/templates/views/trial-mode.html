@@ -1,0 +1,45 @@
+{% extends "withoutnav_template.html" %}
+{% from "components/sub-navigation.html" import sub_navigation %}
+
+{% block per_page_title %}
+  Using Notify
+{% endblock %}
+
+{% block maincolumn_content %}
+
+<div class="grid-row">
+  <div class="column-one-third">
+    {{ sub_navigation(navigation_links) }}
+  </div>
+  <div class="column-two-thirds">
+
+    <h1 class="heading-large">Trial mode</h1>
+
+    <p>When you set up a new service it will start in trial mode. This lets you try out GOV.UK Notify, with a few restrictions.</p>
+    <p>A service in trial mode can only:</p>
+      <ul class="list list-bullet">
+       <li>send 50 text messages and emails per day</li>
+        <li>send messages to you and other people in your team</li>
+       <li>create letter templates, but not send them</li>
+     </ul>
+
+    <p>
+      To remove these restrictions, you can
+      {% if current_service and current_service.trial_mode %}
+        <a href="{{ url_for('.request_to_go_live', service_id=current_service.id) }}">send us a request to go live</a>.
+      {% else %}
+        send us a request to go live.
+      {% endif %}
+    </p>
+
+    <p>Before you can request to go live, you must:</p>
+    <ul class="list list-bullet">
+      <li>sign our data sharing and financial agreement</li>
+      <li>accept our terms of use</li>
+      <li>set up your service so you’re ready to send and receive messages</li>
+    </ul>
+
+
+  </div>
+
+{% endblock %}

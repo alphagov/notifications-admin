@@ -108,6 +108,10 @@
     a:active {
       text-decoration: underline;
     }
+
+    ol ol & {
+      padding-left: $gutter;
+    }
   }
 
   &__item--active {
