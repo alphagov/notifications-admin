@@ -34,7 +34,7 @@
     );
 
     setTimeout(
-      () => poll(...arguments), interval
+      () => poll.apply(window, arguments), interval
     );
   };
 
