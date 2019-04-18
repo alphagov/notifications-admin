@@ -504,10 +504,6 @@ class TwoFactorForm(StripWhitespaceForm):
         return True
 
 
-class EmailNotReceivedForm(StripWhitespaceForm):
-    email_address = email_address()
-
-
 class TextNotReceivedForm(StripWhitespaceForm):
     mobile_number = international_phone_number()
 
