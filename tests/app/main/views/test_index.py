@@ -78,7 +78,9 @@ def test_robots(client):
 
 @pytest.mark.parametrize('view', [
     'cookies', 'privacy', 'pricing', 'terms', 'roadmap',
-    'features', 'callbacks', 'documentation', 'security'
+    'features', 'callbacks', 'documentation', 'security',
+    'message_status', 'features_email', 'features_sms',
+    'features_letters',
 ])
 def test_static_pages(
     client_request,
