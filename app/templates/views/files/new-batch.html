@@ -118,7 +118,7 @@
         <a href="{{ url_for('main.cancel_letter', service_id=current_service.id, notification_id=notification_id) }}">Cancel sending these letters</a>
       </span>
     {% else %}
-      <a href="{{ url_for('main.import_letters', service_id=current_service.id) }}" class="button-secondary">Add more letters</a>
+      <a href="{{ url_for('main.import_letters', service_id=current_service.id) }}" class="button-secondary">Upload more letters</a>
     {% endif %}
   </div>
 
