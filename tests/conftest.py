@@ -3143,6 +3143,7 @@ def mock_get_organisation_by_domain(
     name=False,
     crown=True,
     agreement_signed=False,
+    organisation_type='',
 ):
     def _get_organisation_by_domain(org_id):
         return organisation_json(
@@ -3150,6 +3151,7 @@ def mock_get_organisation_by_domain(
             name,
             crown=crown,
             agreement_signed=agreement_signed,
+            organisation_type=organisation_type,
         )
 
     return mocker.patch(

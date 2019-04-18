@@ -39,7 +39,9 @@ def test_sign_in_explains_other_browser(logged_in_client, api_user_active, mocke
 
 
 def test_doesnt_redirect_to_sign_in_if_no_session_info(
-    client_request, api_user_active
+    client_request,
+    api_user_active,
+    mock_get_organisation_by_domain,
 ):
     assert api_user_active.current_session_id is None
 
