@@ -1057,6 +1057,79 @@ def test_edit_user_email_without_changing_goes_back_to_team_members(
     assert mock_update_user_attribute.called is False
 
 
+@pytest.mark.parametrize('original_email_address', ['test@gov.uk', 'test@example.com'])
+def test_edit_user_email_can_change_any_email_address_to_a_gov_email_address(
+    client_request,
+    active_user_with_permissions,
+    mock_get_user,
+    mock_get_users_by_service,
+    mock_update_user_attribute,
+    original_email_address
+):
+    active_user_with_permissions.email_address = original_email_address
+
+    client_request.post(
+        'main.edit_user_email',
+        service_id=SERVICE_ONE_ID,
+        user_id=active_user_with_permissions.id,
+        _data={
+            'email_address': 'new-email-address@gov.uk'
+        },
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.confirm_edit_user_email',
+            service_id=SERVICE_ONE_ID,
+            user_id=active_user_with_permissions.id,
+            _external=True
+        ),
+    )
+
+
+def test_edit_user_email_can_change_a_non_gov_email_address_to_another_non_gov_email_address(
+    client_request,
+    active_user_with_permissions,
+    mock_get_user,
+    mock_get_users_by_service,
+    mock_update_user_attribute,
+):
+    active_user_with_permissions.email_address = 'old@example.com'
+
+    client_request.post(
+        'main.edit_user_email',
+        service_id=SERVICE_ONE_ID,
+        user_id=active_user_with_permissions.id,
+        _data={
+            'email_address': 'new@example.com'
+        },
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.confirm_edit_user_email',
+            service_id=SERVICE_ONE_ID,
+            user_id=active_user_with_permissions.id,
+            _external=True
+        ),
+    )
+
+
+def test_edit_user_email_cannot_change_a_gov_email_address_to_a_non_gov_email_address(
+    client_request,
+    active_user_with_permissions,
+    mock_get_user,
+    mock_get_users_by_service,
+    mock_update_user_attribute,
+):
+    page = client_request.post(
+        'main.edit_user_email',
+        service_id=SERVICE_ONE_ID,
+        user_id=active_user_with_permissions.id,
+        _data={
+            'email_address': 'new_email@example.com'
+        },
+        _expected_status=200,
+    )
+    assert 'Enter a government email address.' in page.find('span', class_='error-message').text
+
+
 def test_confirm_edit_user_email_page(
     client_request,
     active_user_with_permissions,

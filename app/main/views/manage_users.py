@@ -24,12 +24,13 @@ from app.main import main
 from app.main.forms import (
     ChangeEmailForm,
     ChangeMobileNumberForm,
+    ChangeNonGovEmailForm,
     InviteUserForm,
     PermissionsForm,
     SearchUsersForm,
 )
 from app.models.user import permissions
-from app.utils import redact_mobile_number, user_has_permissions
+from app.utils import is_gov_user, redact_mobile_number, user_has_permissions
 
 
 @main.route("/services/<service_id>/users")
@@ -164,7 +165,10 @@ def edit_user_email(service_id, user_id):
     def _is_email_already_in_use(email):
         return user_api_client.is_email_already_in_use(email)
 
-    form = ChangeEmailForm(_is_email_already_in_use, email_address=user_email)
+    if is_gov_user(user_email):
+        form = ChangeEmailForm(_is_email_already_in_use, email_address=user_email)
+    else:
+        form = ChangeNonGovEmailForm(_is_email_already_in_use, email_address=user_email)
 
     if request.form.get('email_address', '').strip() == user_email:
         return redirect(url_for('.manage_users', service_id=current_service.id))

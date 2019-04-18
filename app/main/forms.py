@@ -716,6 +716,10 @@ class ChangeEmailForm(StripWhitespaceForm):
             raise ValidationError("The email address is already in use")
 
 
+class ChangeNonGovEmailForm(ChangeEmailForm):
+    email_address = email_address(gov_user=False)
+
+
 class ChangeMobileNumberForm(StripWhitespaceForm):
     mobile_number = international_phone_number()
 
