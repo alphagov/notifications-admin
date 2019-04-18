@@ -8,11 +8,11 @@ Flask-Login==0.4.1
 
 blinker==1.4
 pyexcel==0.5.13
-pyexcel-io==0.5.16
+pyexcel-io==0.5.17
 pyexcel-xls==0.5.8
 pyexcel-xlsx==0.5.7
 pyexcel-ods3==0.5.3
-pytz==2018.9
+pytz==2019.1
 gunicorn==19.7.1  # pyup: ignore, >19.8 breaks eventlet patching
 eventlet==0.24.1
 notifications-python-client==5.3.0
