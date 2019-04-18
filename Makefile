@@ -23,6 +23,7 @@ CF_API ?= api.cloud.service.gov.uk
 CF_ORG ?= govuk-notify
 CF_SPACE ?= ${DEPLOY_ENV}
 CF_HOME ?= ${HOME}
+CF_APP ?= notify-admin
 $(eval export CF_HOME)
 
 NOTIFY_CREDENTIALS ?= ~/.notify-credentials
