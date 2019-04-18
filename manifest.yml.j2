@@ -1,0 +1,57 @@
+{%- set apps = {
+  'notify-admin': {
+    'routes': {
+      'preview': ['www.notify.works'],
+      'staging': ['www.staging-notify.works'],
+      'production': ['www.notifications.service.gov.uk'],
+    }
+  },
+  'notify-admin-prototype': {},
+  'notify-admin-prototype-2': {}
+} -%}
+
+{%- set app = apps[CF_APP] -%}
+
+---
+applications:
+  - name: {{ CF_APP }}
+    buildpack: python_buildpack
+
+    memory: 1G
+
+    routes:
+      - route: {{ CF_APP }}-{{ environment }}.cloudapps.digital
+      {%- for route in app.get('routes', {}).get(environment, []) %}
+      - route: {{ route }}
+      {%- endfor %}
+
+    services:
+      - logit-ssl-syslog-drain
+
+    env:
+      NOTIFY_APP_NAME: admin
+
+      # Credentials variables
+      ADMIN_CLIENT_SECRET: {{ ADMIN_CLIENT_SECRET }}
+      ADMIN_BASE_URL: {{ ADMIN_BASE_URL }}
+      API_HOST_NAME: {{ API_HOST_NAME }}
+      DANGEROUS_SALT: {{ DANGEROUS_SALT }}
+      SECRET_KEY: {{ SECRET_KEY }}
+      ROUTE_SECRET_KEY_1: {{ ROUTE_SECRET_KEY_1 }}
+      ROUTE_SECRET_KEY_2: {{ ROUTE_SECRET_KEY_2 }}
+
+      AWS_ACCESS_KEY_ID: {{ AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: {{ AWS_SECRET_ACCESS_KEY }}
+
+      ANTIVIRUS_API_HOST: {{ ANTIVIRUS_API_HOST }}
+      ANTIVIRUS_API_KEY: {{ ANTIVIRUS_API_KEY }}
+
+      STATSD_PREFIX: {{ STATSD_PREFIX }}
+
+      ZENDESK_API_KEY: {{ ZENDESK_API_KEY }}
+
+      TEMPLATE_PREVIEW_API_HOST: {{ TEMPLATE_PREVIEW_API_HOST }}
+      TEMPLATE_PREVIEW_API_KEY: {{ TEMPLATE_PREVIEW_API_KEY }}
+
+      REDIS_ENABLED: {{ REDIS_ENABLED }}
+      REDIS_URL: {{ REDIS_URL }}
