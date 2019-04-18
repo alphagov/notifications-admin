@@ -2259,6 +2259,25 @@ def mock_get_invites_for_service(mocker, service_one, sample_invite):
 
 
 @pytest.fixture(scope='function')
+def mock_get_invites_without_manage_permission(mocker, service_one, sample_invite):
+
+    def _get_invites(service_id):
+        return [invite_json(
+            id_=str(sample_uuid()),
+            from_user=service_one['users'][0],
+            email_address='invited_user@test.gov.uk',
+            service_id=service_one['id'],
+            permissions='view_activity,send_messages,manage_api_keys',
+            created_at=str(datetime.utcnow()),
+            auth_type='sms_auth',
+            folder_permissions=[],
+            status='pending',
+        )]
+
+    return mocker.patch('app.invite_api_client._get_invites_for_service', side_effect=_get_invites)
+
+
+@pytest.fixture(scope='function')
 def mock_check_invite_token(mocker, sample_invite):
     def _check_token(token):
         return InvitedUser(**sample_invite)
