@@ -51,6 +51,44 @@
 
 }
 
+.settings-table {
+
+  table {
+    table-layout: fixed;
+  }
+
+  th {
+
+    &.table-field-heading-first {
+      width: 35%;  // 33.33% + fudge
+    }
+
+    &:last-child {
+      width: 17.5%  // 16.67% + fudge
+    }
+
+  }
+
+  td {
+
+    &:first-child {
+
+      div {
+        white-space: normal;
+      }
+
+    }
+
+    div {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+  }
+
+}
+
 %table-field,
 .table-field {
 
