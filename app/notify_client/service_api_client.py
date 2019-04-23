@@ -1,3 +1,4 @@
+from datetime import datetime
 
 from app.notify_client import NotifyAdminAPIClient, _attach_current_user, cache
 
@@ -87,6 +88,8 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             'volume_letter',
             'consent_to_research',
             'count_as_live',
+            'go_live_user',
+            'go_live_at'
         }
         if disallowed_attributes:
             raise TypeError('Not allowed to update service attributes: {}'.format(
@@ -102,6 +105,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             service_id,
             message_limit=250000 if live else 50,
             restricted=(not live),
+            go_live_at=str(datetime.utcnow()) if live else None
         )
 
     # This method is not cached because it calls through to one which is

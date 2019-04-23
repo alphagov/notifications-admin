@@ -416,6 +416,7 @@ def test_show_restricted_service(
         assert not request_to_live_link
 
 
+@freeze_time("2017-04-01 11:09:00.061258")
 def test_switch_service_to_live(
     client_request,
     platform_admin_user,
@@ -437,7 +438,8 @@ def test_switch_service_to_live(
     mock_update_service.assert_called_with(
         SERVICE_ONE_ID,
         message_limit=250000,
-        restricted=False
+        restricted=False,
+        go_live_at="2017-04-01 11:09:00.061258"
     )
 
 
@@ -481,6 +483,7 @@ def test_switch_service_to_restricted(
         SERVICE_ONE_ID,
         message_limit=50,
         restricted=True,
+        go_live_at=None
     )
 
 
@@ -1319,7 +1322,7 @@ def test_non_gov_users_cant_request_to_go_live(
         [],
     ),
 ))
-@freeze_time("2012-12-21")
+@freeze_time("2012-12-21 13:12:12.12354")
 def test_should_redirect_after_request_to_go_live(
     client_request,
     mocker,
@@ -1331,6 +1334,7 @@ def test_should_redirect_after_request_to_go_live(
     mock_get_service_settings_page_common,
     mock_get_service_templates,
     mock_get_users_by_service,
+    mock_update_service,
     mock_get_invites_without_manage_permission,
     volumes,
     displayed_volumes,
@@ -1396,6 +1400,10 @@ def test_should_redirect_after_request_to_go_live(
     )
     assert normalize_spaces(page.select_one('h1').text) == (
         'Settings'
+    )
+    mock_update_service.assert_called_once_with(
+        SERVICE_ONE_ID,
+        go_live_user=active_user_with_permissions.id
     )
 
 

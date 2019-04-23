@@ -43,6 +43,8 @@ class Service(JSONModel):
         'volume_letter',
         'consent_to_research',
         'count_as_live',
+        'go_live_user',
+        'go_live_at'
     }
 
     TEMPLATE_TYPES = (
