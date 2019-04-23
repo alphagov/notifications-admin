@@ -353,26 +353,29 @@
 
         {% endcall %}
 
-        <ul>
+        <p>
           {% if current_service.active %}
-            <li class="bottom-gutter">
-              <a href="{{ url_for('.archive_service', service_id=current_service.id) }}" class="button">
+            <span class="page-footer-delete-link page-footer-delete-link-without-button">
+              <a href="{{ url_for('.archive_service', service_id=current_service.id) }}">
                 Archive service
               </a>
-            </li>
-            <li class="bottom-gutter">
-              <a href="{{ url_for('.suspend_service', service_id=current_service.id) }}" class="button">
-                Suspend service
-              </a>
-            </li>
+            </span>
+            <span class="page-footer-delete-link">
+              <a href="{{ url_for('.suspend_service', service_id=current_service.id) }}" class="page-footer-delete-link">
+                  Suspend service
+                </a>
+            </span>
           {% else %}
-            <li class="bottom-gutter">
-              <a href="{{ url_for('.resume_service', service_id=current_service.id) }}" class="button">
+            <div class="hint bottom-gutter-1-2">
+              Service suspended
+            </div>
+            <span class="page-footer-delete-link page-footer-delete-link-without-button">
+              <a href="{{ url_for('.resume_service', service_id=current_service.id) }}">
                 Resume service
               </a>
-            </li>
+            </span>
           {% endif %}
-        </ul>
+        </p>
       </div>
 
     {% endif %}
