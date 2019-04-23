@@ -1407,6 +1407,42 @@ def test_should_redirect_after_request_to_go_live(
     )
 
 
+def test_should_be_able_to_request_to_go_live_with_no_organisation(
+    client_request,
+    mocker,
+    single_reply_to_email_address,
+    single_letter_contact_block,
+    mock_get_organisations_and_services_for_user,
+    single_sms_sender,
+    mock_get_service_settings_page_common,
+    mock_get_service_templates,
+    mock_get_users_by_service,
+    mock_update_service,
+    mock_get_invites_without_manage_permission,
+):
+    get_service_organisation = mocker.patch(
+        'app.organisations_client.get_service_organisation',
+        return_value=None,
+    )
+    for channel in {'email', 'sms', 'letter'}:
+        mocker.patch(
+            'app.models.service.Service.volume_{}'.format(channel),
+            create=True,
+            new_callable=PropertyMock,
+            return_value=1,
+        )
+    mock_post = mocker.patch('app.main.views.service_settings.zendesk_client.create_ticket', autospec=True)
+
+    client_request.post(
+        'main.request_to_go_live',
+        service_id=SERVICE_ONE_ID,
+        _follow_redirects=True
+    )
+
+    assert mock_post.called is True
+    get_service_organisation.assert_called_once_with(SERVICE_ONE_ID)
+
+
 @pytest.mark.parametrize(
     (
         'has_team_members,'
