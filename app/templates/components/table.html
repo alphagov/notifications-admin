@@ -90,7 +90,7 @@
 {% macro text_field(text, status='', truncate=false) -%}
   {% call field(status=status) %}
     {% if text is iterable and text is not string %}
-      <ul class="list list-bullet">
+      <ul>
         {% for item in text %}
           {% if item %}
             <li>{{ item }}</li>

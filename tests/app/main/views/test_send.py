@@ -661,7 +661,7 @@ def test_upload_valid_csv_shows_preview_and_table(
             (
                 '<td class="table-field-center-aligned"> '
                 '<div class="table-field-status-default"> '
-                '<ul class="list list-bullet"> '
+                '<ul> '
                 '<li>foo</li> <li>foo</li> <li>foo</li> '
                 '</ul> '
                 '</div> '
@@ -674,7 +674,7 @@ def test_upload_valid_csv_shows_preview_and_table(
             (
                 '<td class="table-field-center-aligned"> '
                 '<div class="table-field-status-default"> '
-                '<ul class="list list-bullet"> '
+                '<ul> '
                 '<li>foo</li> <li>foo</li> <li>foo</li> '
                 '</ul> '
                 '</div> '
@@ -687,7 +687,7 @@ def test_upload_valid_csv_shows_preview_and_table(
             (
                 '<td class="table-field-center-aligned"> '
                 '<div class="table-field-status-default"> '
-                '<ul class="list list-bullet"> '
+                '<ul> '
                 '<li>foo</li> <li>foo</li> '
                 '</ul> '
                 '</div> '
