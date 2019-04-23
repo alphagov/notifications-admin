@@ -2,7 +2,7 @@
   "use strict";
 
   var queues = {};
-  var dd = new diffDOM.DiffDOM();
+  var dd = new diffDOM();
 
   var getRenderer = $component => response => dd.apply(
     $component.get(0),
@@ -34,7 +34,7 @@
     );
 
     setTimeout(
-      () => poll(...arguments), interval
+      () => poll.apply(window, arguments), interval
     );
   };
 

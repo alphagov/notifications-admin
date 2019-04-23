@@ -1,0 +1,60 @@
+{% extends "withoutnav_template.html" %}
+{% from "components/table.html" import mapping_table, row, text_field, edit_field, field with context %}
+{% from "components/sub-navigation.html" import sub_navigation %}
+
+{% block per_page_title %}
+  Emails
+{% endblock %}
+
+{% block maincolumn_content %}
+
+<div class="grid-row">
+  <div class="column-one-third">
+    {{ sub_navigation(navigation_links) }}
+  </div>
+  <div class="column-two-thirds">
+
+    <h1 class="heading heading-large">Emails</h1>
+    <p>Send an unlimited number of emails for free with GOV.UK Notify.</p>
+    {% if not current_user.is_authenticated %}
+      <p><a href="{{ url_for('main.register') }}">Create an account</a> and try Notify for yourself.</p>
+    {% endif %}
+
+    <h2 class="heading heading-medium">Features</h2>
+    <p>Notify makes it easy to:</p>
+    <ul class="list list-bullet">
+      <li>create reusable email templates</li>
+      <li>personalise the content of your emails</li>
+      <li>send and schedule bulk messages</li>
+    </ul>
+    <p>You can also <a href="{{ url_for('.documentation') }}">integrate with our API</a> to send emails automatically.</p>
+
+    <h3 class="heading heading-small">Email branding</h3>
+    <p>Add your organisation’s logo and brand colour to email templates.</p>
+    <p>You can change your branding in your service settings.</p>
+
+    <h3 class="heading heading-small">Send files by email</h3>
+    <p>Notify offers a safe and reliable way to send files by email.</p>
+    <p>Upload a file using our API, then send your users an email with a link to download it.</p>
+    <p>Notify uses encrypted links instead of email attachments because:</p>
+    <ul class="list list-bullet">
+      <li>they’re more secure</li>
+      <!--<li>you can track when the recipient downloads your document</li>-->
+      <li>email attachments are often marked as spam</li>
+    </ul>
+    <p><a href="{{ url_for('.feedback', ticket_type='ask-question-give-feedback') }}">Contact the team</a> and ask us to turn this feature on for your service.</p>
+    <p>Read our <a href="{{ url_for('.documentation') }}">API documentation</a> for more information.</p>
+
+    <h3 class="heading heading-small">Add a reply-to address</h3>
+    <p>Notify lets you choose the email address that users reply to.</p>
+    <p>Emails with a reply-to address seem more trustworthy and are less likely to be labelled as spam.</p>
+    <p>You can add reply-to addresses in your service settings.</p>
+
+    <h2 class="heading heading-medium">Pricing</h2>
+    <p>It’s free to send emails through Notify.</p>
+    <p><a href="{{ url_for('.pricing') }}">See pricing</a> for more details.</p>
+
+  </div>
+</div>
+
+{% endblock %}

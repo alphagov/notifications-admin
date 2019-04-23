@@ -23,9 +23,9 @@ CF_API ?= api.cloud.service.gov.uk
 CF_ORG ?= govuk-notify
 CF_SPACE ?= ${DEPLOY_ENV}
 CF_HOME ?= ${HOME}
+CF_APP ?= notify-admin
 $(eval export CF_HOME)
 
-CF_MANIFEST_FILE ?= manifest-${CF_SPACE}.yml
 NOTIFY_CREDENTIALS ?= ~/.notify-credentials
 
 .PHONY: help
@@ -195,12 +195,16 @@ cf-login: ## Log in to Cloud Foundry
 
 .PHONY: generate-manifest
 generate-manifest:
+	$(if ${CF_APP},,$(error Must specify CF_APP))
 	$(if ${CF_SPACE},,$(error Must specify CF_SPACE))
 	$(if $(shell which gpg2), $(eval export GPG=gpg2), $(eval export GPG=gpg))
 	$(if ${GPG_PASSPHRASE_TXT}, $(eval export DECRYPT_CMD=echo -n $$$${GPG_PASSPHRASE_TXT} | ${GPG} --quiet --batch --passphrase-fd 0 --pinentry-mode loopback -d), $(eval export DECRYPT_CMD=${GPG} --quiet --batch -d))
 
-	@./scripts/generate_manifest.py ${CF_MANIFEST_FILE} \
-	    <(${DECRYPT_CMD} ${NOTIFY_CREDENTIALS}/credentials/${CF_SPACE}/paas/environment-variables.gpg)
+	@jinja2 --strict manifest.yml.j2 \
+	    -D environment=${CF_SPACE} \
+	    -D CF_APP=${CF_APP} \
+	    --format=yaml \
+	    <(${DECRYPT_CMD} ${NOTIFY_CREDENTIALS}/credentials/${CF_SPACE}/paas/environment-variables.gpg) 2>&1
 
 .PHONY: cf-deploy
 cf-deploy: ## Deploys the app to Cloud Foundry
@@ -213,18 +217,12 @@ cf-deploy: ## Deploys the app to Cloud Foundry
 	cf delete -f notify-admin-rollback
 
 .PHONY: cf-deploy-prototype
-cf-deploy-prototype: cf-target ## Deploys the app to Cloud Foundry
-	$(if ${CF_SPACE},,$(error Must specify CF_SPACE))
-	(make -s CF_MANIFEST_FILE=manifest-prototype-${CF_SPACE}.yml generate-manifest) > /tmp/admin_manifest.yml
-	cf push -f /tmp/admin_manifest.yml
-	rm /tmp/admin_manifest.yml
+cf-deploy-prototype: cf-target ## Deploys the first prototype to Cloud Foundry
+	cf push -f <(CF_APP=notify-admin-prototype make -s generate-manifest)
 
 .PHONY: cf-deploy-prototype-2
-cf-deploy-prototype-2: cf-target ## Deploys the app to Cloud Foundry
-	$(if ${CF_SPACE},,$(error Must specify CF_SPACE))
-	(make -s CF_MANIFEST_FILE=manifest-prototype-2-${CF_SPACE}.yml generate-manifest) > /tmp/admin_manifest.yml
-	cf push -f /tmp/admin_manifest.yml
-	rm /tmp/admin_manifest.yml
+cf-deploy-prototype-2: cf-target ## Deploys the second prototype to Cloud Foundry
+	cf push -f <(CF_APP=notify-admin-prototype-2 make -s generate-manifest)
 
 .PHONY: cf-rollback
 cf-rollback: ## Rollbacks the app to the previous release

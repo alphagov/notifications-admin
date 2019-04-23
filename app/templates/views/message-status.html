@@ -1,0 +1,106 @@
+{% extends "withoutnav_template.html" %}
+{% from "components/sub-navigation.html" import sub_navigation %}
+{% from "components/table.html" import mapping_table, row, text_field %}
+
+{% block per_page_title %}
+  Message status
+{% endblock %}
+
+{% block maincolumn_content %}
+
+<div class="grid-row">
+  <div class="column-one-third">
+    {{ sub_navigation(navigation_links) }}
+  </div>
+  <div class="column-two-thirds">
+
+    <h1 class="heading-large">Message status</h1>
+
+    <p>When you send a message using GOV.UK Notify, it moves through different states.</p>
+    <p>Notify’s real-time dashboard lets you check the status of any message, to see when it was delivered. You can also use our API to check the status of your messages.</p>
+    <p>For <a href="{{ url_for("main.security") }}">security</a>, this information is only available for 7 days after a message has been sent. You can download a report, including a list of sent messages, for your own records.</p>
+
+    <img
+        src="{{ asset_url('images/message-sending-flow.svg') }}"
+        alt="A picture of the sending flow of messages in Notify, showing the three states of Sending, Delivered and Failed. Also shows the next
+             steps when messages fail, deleting data and trying a new channel for permanent failures, and trying again or trying a new channel for
+             temporary failures"
+        style="width: 100%;"
+    >
+    <h2 id="messagestatus" class="heading-medium">Types of message status</h2>
+    <p>These are the types of message status you’ll see when you’re signed in to Notify.</p>
+    <p>If you’re using our API, some of the statuses you’ll see will be different. Read our <a href="{{ url_for('.documentation') }}">documentation</a> for a detailed list of API message statuses.</p>
+
+    <h3 class="heading-small">Emails</h3>
+    <div class="bottom-gutter-3-2">
+      {% call mapping_table(
+        caption='Message statuses – emails',
+        field_headings=['Status', 'Description'],
+        field_headings_visible=True,
+        caption_visible=False
+      ) %}
+        {% for message_length, charge in [
+          ('Sending', 'Notify has sent the message to the provider. The provider will try to deliver the message to the recipient. Notify is waiting for delivery information.'),
+          ('Delivered', 'The message was successfully delivered. Notify will not tell you if a user has opened or read a message.'),
+          ('Email address does not exist', 'The provider could not deliver the message because the email address was wrong. You should remove these email addresses from your database.'),
+          ('Inbox not accepting messages right now', 'The provider could not deliver the message after trying for 72 hours. This can happen when the recipient’s inbox is full. You can try to send the message again.'),
+          ('Technical failure', 'Your message was not sent because there was a problem between Notify and the provider. You’ll have to try sending your messages again.'),
+        ] %}
+          {% call row() %}
+            {{ text_field(message_length) }}
+            {{ text_field(charge) }}
+          {% endcall %}
+        {% endfor %}
+      {% endcall %}
+    </div>
+
+    <h3 class="heading-small">Text messages</h3>
+    <div class="bottom-gutter-3-2">
+      {% call mapping_table(
+        caption='Message statuses – text messages',
+        field_headings=['Status', 'Description'],
+        field_headings_visible=True,
+        caption_visible=False
+      ) %}
+        {% for message_length, charge in [
+          ('Sending', 'Notify has sent the message to the provider. The provider will try to deliver the message to the recipient. Notify is waiting for delivery information.'),
+          ('Sent internationally', 'The message was sent to an international number. The mobile networks in some countries do not provide any more delivery information.'),
+          ('Delivered', 'The message was successfully delivered. Notify will not tell you if a user has opened or read a message.'),
+          ('Phone number does not exist', 'The provider could not deliver the message because the phone number was wrong. You should remove these phone numbers from your database. You’ll still be charged for text messages to numbers that do not exist.'),
+          ('Phone not accepting messages right now', 'The provider could not deliver the message after trying for 72 hours. This can happen when the recipient’s phone is off. You can try to send the message again. You’ll still be charged for text messages to phones that are not accepting messages.'),
+          ('Technical failure', 'Your message was not sent because there was a problem between Notify and the provider. You’ll have to try sending your messages again. You will not be charged for text messages that are affected by a technical failure.'),
+        ] %}
+          {% call row() %}
+            {{ text_field(message_length) }}
+            {{ text_field(charge) }}
+          {% endcall %}
+        {% endfor %}
+      {% endcall %}
+    </div>
+    
+    <h3 class="heading-small">Letters</h3>
+    <div class="bottom-gutter-3-2">
+      {% call mapping_table(
+        caption='Message statuses – letters',
+        field_headings=['Status', 'Description'],
+        field_headings_visible=True,
+        caption_visible=False
+      ) %}
+        {% for message_length, charge in [
+          ('Sent', 'Notify has sent the letter to the provider to be printed.'),
+          ('Cancelled', 'Sending cancelled. Your letter will not be printed or dispatched.'),
+          ('Technical failure', 'Notify had an unexpected error while sending the letter to our printing provider.'),
+        ] %}
+          {% call row() %}
+            {{ text_field(message_length) }}
+            {{ text_field(charge) }}
+          {% endcall %}
+        {% endfor %}
+      {% endcall %}
+    </div>
+
+
+  </div>
+</div>
+
+{% endblock %}

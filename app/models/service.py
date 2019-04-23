@@ -114,8 +114,12 @@ class Service(JSONModel):
 
     @cached_property
     def has_team_members(self):
-        return user_api_client.get_count_of_users_with_permission(
-            self.id, 'manage_service'
+        return (
+            user_api_client.get_count_of_users_with_permission(
+                self.id, 'manage_service'
+            ) + invite_api_client.get_count_of_invites_with_permission(
+                self.id, 'manage_service'
+            )
         ) > 1
 
     def cancel_invite(self, invited_user_id):

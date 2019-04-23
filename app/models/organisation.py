@@ -88,36 +88,6 @@ class Organisation(JSONModel):
             'agreement.'.format(self.name)
         )
 
-    def as_pricing_paragraph(self, **kwargs):
-        return Markup(self._as_pricing_paragraph(**kwargs))
-
-    def _as_pricing_paragraph(self, pricing_link, download_link, support_link, signed_in):
-
-        if not signed_in:
-            return ((
-                '<a href="{}">Sign in</a> to download a copy or find '
-                'out if one is already in place with your organisation.'
-            ).format(pricing_link))
-
-        if self.agreement_signed is None:
-            return ((
-                '<a href="{}">Download the agreement</a> or '
-                '<a href="{}">contact us</a> to find out if we already '
-                'have one in place with your organisation.'
-            ).format(download_link, support_link))
-
-        return (
-            '<a href="{}">Download the agreement</a> '
-            '({} {}).'.format(
-                download_link,
-                self.name,
-                {
-                    True: 'has already accepted it',
-                    False: 'hasn’t accepted it yet'
-                }.get(self.agreement_signed)
-            )
-        )
-
     @property
     def _acceptance_required(self):
         return (

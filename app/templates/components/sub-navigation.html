@@ -1,18 +1,29 @@
+{% macro sub_navigation_item(item) %}
+  <li class="sub-navigation__item {% if item['link'] == request.endpoint %} sub-navigation__item--active {% endif %}"
+      itemprop="itemListElement"
+      itemscope
+      itemtype="http://schema.org/ListItem"
+  >
+    <a href="{{ url_for(item['link']) }}" itemprop="item">
+      <span itemprop="name">{{item['name']}}</span>
+    </a>
+  </li>
+{% endmacro %}
+
 {% macro sub_navigation(
   item_set
 ) %}
   <nav class="sub-navigation">
     <ol itemscope itemtype="http://schema.org/ItemList">
       {% for item in item_set %}
-        <li class="sub-navigation__item {% if item['link'] == request.endpoint %} sub-navigation__item--active {% endif %}"
-            itemprop="itemListElement"
-            itemscope
-            itemtype="http://schema.org/ListItem"
-        >
-          <a href="{{ url_for(item['link']) }}" itemprop="item">
-            <span itemprop="name">{{item['name']}}</span>
-          </a>
-        </li>
+        {{ sub_navigation_item(item) }}
+        {% if item.sub_navigation_items %}
+          <ol itemscope itemtype="http://schema.org/ItemList">
+            {% for sub_item in item.sub_navigation_items %}
+              {{ sub_navigation_item(sub_item) }}
+            {% endfor %}
+          </ol>
+        {% endif %}
       {% endfor %}
     </ol>
   </nav>
