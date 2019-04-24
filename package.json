@@ -46,8 +46,5 @@
     "jest": "24.7.1",
     "jshint": "2.10.2",
     "jshint-stylish": "2.2.1"
-  },
-  "peerDependencies": {
-    "request": "2.88.0"
   }
 }
