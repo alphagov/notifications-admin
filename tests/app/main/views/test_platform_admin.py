@@ -932,11 +932,42 @@ def test_clear_cache_requires_option(client_request, platform_admin_user, mocker
 def test_reports_page(
     client,
     platform_admin_user,
-    mocker,
+    mocker
 ):
     mock_get_user(mocker, user=platform_admin_user)
     client.login(platform_admin_user)
+
     response = client.get(url_for('main.platform_admin_reports'))
 
     assert response.status_code == 200
-    response.get_data(as_text=True)
+    page = response.get_data(as_text=True)
+    assert "Download live services information sheet" in page
+
+
+def test_get_live_services_report(client, platform_admin_user, mocker):
+    mock_get_user(mocker, user=platform_admin_user)
+    client.login(platform_admin_user)
+
+    mocker.patch(
+        'app.service_api_client.get_services',
+        return_value={'data': [
+            {'id': '1', 'organisation': 'Forest', 'name': 'jessie the oak tree', 'consent_to_research': True,
+                'go_live_at': '2014-03-29', 'volume_sms': 100, 'volume_email': 50, 'volume_letter': 20,
+                'count_as_live': True, 'go_live_user': '123'},
+            {'id': '2', 'organisation': 'Forest', 'name': 'james the pine tree', 'consent_to_research': None,
+                'go_live_at': '2015-03-26', 'volume_sms': None, 'volume_email': 60, 'volume_letter': 0,
+                'count_as_live': True, 'go_live_user': None},
+            {'id': '3', 'organisation': 'Forest', 'name': 'gary the rock', 'consent_to_research': None,
+                'go_live_at': None, 'volume_sms': None, 'volume_email': 0, 'volume_letter': 0,
+                'count_as_live': False, 'go_live_user': None},
+        ]}
+    )
+    response = client.get(url_for('main.live_services_csv'))
+    assert response.status_code == 200
+    report = response.get_data(as_text=True)
+    assert report.strip() == (
+        'Service ID,Organisation,Service name,Consent to research,'
+        + 'Main contact,Contact email,Contact mobile,Live date,SMS volume,Email volume,Letter volume\r\n1,Forest'
+        + ',jessie the oak tree,True,Platform admin user,platform@admin.gov.uk,07700 900762,2014-03-29,100,50,20\r\n2,'
+        + 'Forest,james the pine tree,,,,,2015-03-26,,60,0'
+    )

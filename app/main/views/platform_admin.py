@@ -3,16 +3,26 @@ import re
 from collections import OrderedDict
 from datetime import datetime
 
-from flask import abort, flash, redirect, render_template, request, url_for
+from flask import (
+    Response,
+    abort,
+    flash,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
 from flask_login import login_required
 from notifications_python_client.errors import HTTPError
 from requests import RequestException
 
 from app import (
     complaint_api_client,
+    format_date_numeric,
     letter_jobs_client,
     platform_stats_api_client,
     service_api_client,
+    user_api_client,
 )
 from app.extensions import antivirus_client, redis_client
 from app.main import main
@@ -28,6 +38,7 @@ from app.statistics_utils import (
 )
 from app.template_previews import validate_letter
 from app.utils import (
+    Spreadsheet,
     generate_next_dict,
     generate_previous_dict,
     get_page_from_request,
@@ -193,6 +204,46 @@ def platform_admin_services():
 def platform_admin_reports():
     return render_template(
         'views/platform-admin/reports.html'
+    )
+
+
+@main.route("/platform-admin/reports/live-services.csv")
+@login_required
+@user_is_platform_admin
+def live_services_csv():
+    services = service_api_client.get_services()["data"]
+    live_services_columns = [
+        "Service ID", "Organisation", "Service name", "Consent to research", "Main contact",
+        "Contact email", "Contact mobile", "Live date", "SMS volume", "Email volume", "Letter volume"
+    ]
+    live_services_data = []
+    live_services_data.append(live_services_columns)
+    for service in services:
+        if service["count_as_live"]:
+            main_contact = None
+            if service["go_live_user"]:
+                main_contact = user_api_client.get_user(service["go_live_user"])
+            live_services_data.append([
+                service["id"],
+                service["organisation"],
+                service["name"],
+                service["consent_to_research"],
+                main_contact.name if main_contact else None,
+                main_contact.email_address if main_contact else None,
+                main_contact.mobile_number if main_contact else None,
+                service["go_live_at"],
+                service["volume_sms"],
+                service["volume_email"],
+                service["volume_letter"],
+            ])
+    return Response(
+        Spreadsheet.from_rows(live_services_data).as_csv_data,
+        mimetype='text/csv',
+        headers={
+            'Content-Disposition': 'inline; filename="{} live services report.csv"'.format(
+                format_date_numeric(datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")),
+            )
+        }
     )
 
 
