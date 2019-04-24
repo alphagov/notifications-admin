@@ -6,7 +6,7 @@
     "node": "10.15.3"
   },
   "scripts": {
-    "test": "gulp lint",
+    "test": "gulp lint && jest tests/javascripts",
     "build": "gulp",
     "watch": "gulp watch"
   },
@@ -43,6 +43,7 @@
     "gulp-jshint": "2.1.0",
     "gulp-prettyerror": "1.2.1",
     "gulp-sass-lint": "1.4.0",
+    "jest": "24.7.1",
     "jshint": "2.10.2",
     "jshint-stylish": "2.2.1"
   }
