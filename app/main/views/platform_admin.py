@@ -187,6 +187,15 @@ def platform_admin_services():
     )
 
 
+@main.route("/platform-admin/reports")
+@login_required
+@user_is_platform_admin
+def platform_admin_reports():
+    return render_template(
+        'views/platform-admin/reports.html'
+    )
+
+
 @main.route("/platform-admin/complaints")
 @login_required
 @user_is_platform_admin

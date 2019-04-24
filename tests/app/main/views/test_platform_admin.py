@@ -927,3 +927,16 @@ def test_clear_cache_requires_option(client_request, platform_admin_user, mocker
 
     assert normalize_spaces(page.find('span', class_='error-message').text) == 'Not a valid choice'
     assert not redis.delete_cache_keys_by_pattern.called
+
+
+def test_reports_page(
+    client,
+    platform_admin_user,
+    mocker,
+):
+    mock_get_user(mocker, user=platform_admin_user)
+    client.login(platform_admin_user)
+    response = client.get(url_for('main.platform_admin_reports'))
+
+    assert response.status_code == 200
+    response.get_data(as_text=True)
