@@ -5,7 +5,7 @@
 
 // 1. LIBRARIES
 // - - - - - - - - - - - - - - -
-const { src, pipe, dest, series, parallel } = require('gulp');
+const { src, pipe, dest, series, parallel, watch } = require('gulp');
 const stylish = require('jshint-stylish');
 
 const plugins = {};
@@ -142,13 +142,25 @@ const images = () => {
 };
 
 
-// Watch for changes and re-run tasks
-const watchForChanges = () => {
-  return watch(paths.src + 'javascripts/**/*', ['javascripts'])
-    .watch(paths.src + 'stylesheets/**/*', ['sass'])
-    .watch(paths.src + 'images/**/*', ['images'])
-    .watch('gulpfile.js', ['default']);
+const watchFiles = {
+  javascripts: (cb) => {
+    watch([paths.src + 'javascripts/**/*'], javascripts);
+    cb();
+  },
+  sass: (cb) => {
+    watch([paths.src + 'stylesheets/**/*'], sass);
+    cb();
+  },
+  images: (cb) => {
+    watch([paths.src + 'images/**/*'], images);
+    cb();
+  },
+  self: (cb) => {
+    watch(['gulpfile.js'], defaultTask);
+    cb();
+  }
 };
+
 
 const lint = {
   'sass': () => {
@@ -171,6 +183,7 @@ const lint = {
   }
 };
 
+
 // Default: compile everything
 const defaultTask = parallel(
   series(
@@ -187,6 +200,16 @@ const defaultTask = parallel(
     sass
   )
 );
+
+
+// Watch for changes and re-run tasks
+const watchForChanges = parallel(
+  watchFiles.javascripts,
+  watchFiles.sass,
+  watchFiles.images,
+  watchFiles.self
+);
+
 
 exports.default = defaultTask;
 
