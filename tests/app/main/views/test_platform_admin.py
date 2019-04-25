@@ -949,25 +949,27 @@ def test_get_live_services_report(client, platform_admin_user, mocker):
     client.login(platform_admin_user)
 
     mocker.patch(
-        'app.service_api_client.get_services',
+        'app.service_api_client.get_live_services_data',
         return_value={'data': [
-            {'id': '1', 'organisation': 'Forest', 'name': 'jessie the oak tree', 'consent_to_research': True,
-                'go_live_at': '2014-03-29', 'volume_sms': 100, 'volume_email': 50, 'volume_letter': 20,
-                'count_as_live': True, 'go_live_user': '123'},
-            {'id': '2', 'organisation': 'Forest', 'name': 'james the pine tree', 'consent_to_research': None,
-                'go_live_at': '2015-03-26', 'volume_sms': None, 'volume_email': 60, 'volume_letter': 0,
-                'count_as_live': True, 'go_live_user': None},
-            {'id': '3', 'organisation': 'Forest', 'name': 'gary the rock', 'consent_to_research': None,
-                'go_live_at': None, 'volume_sms': None, 'volume_email': 0, 'volume_letter': 0,
-                'count_as_live': False, 'go_live_user': None},
+            {'service_id': 1, 'service_name': 'jessie the oak tree', 'organisation_name': 'Forest',
+                'consent_to_research': True, 'contact_name': 'Forest fairy',
+                'contact_email': 'forest.fairy@digital.cabinet-office.gov.uk', 'contact_mobile': '+447700900986',
+                'live_date': '2014-03-29', 'sms_volume_intent': 100, 'email_volume_intent': 50,
+                'letter_volume_intent': 20, 'sms_totals': 300, 'email_totals': 1200, 'letter_totals': 0},
+            {'service_id': 2, 'service_name': 'james the pine tree', 'organisation_name': 'Forest',
+                'consent_to_research': None, 'contact_name': None,
+                'contact_email': None, 'contact_mobile': None,
+                'live_date': '2015-03-26', 'sms_volume_intent': None, 'email_volume_intent': 60,
+                'letter_volume_intent': 0, 'sms_totals': 0, 'email_totals': 0, 'letter_totals': 0},
         ]}
     )
     response = client.get(url_for('main.live_services_csv'))
     assert response.status_code == 200
     report = response.get_data(as_text=True)
     assert report.strip() == (
-        'Service ID,Organisation,Service name,Consent to research,'
-        + 'Main contact,Contact email,Contact mobile,Live date,SMS volume,Email volume,Letter volume\r\n1,Forest'
-        + ',jessie the oak tree,True,Platform admin user,platform@admin.gov.uk,07700 900762,2014-03-29,100,50,20\r\n2,'
-        + 'Forest,james the pine tree,,,,,2015-03-26,,60,0'
+        'Service ID,Organisation,Service name,Consent to research,Main contact,Contact email,Contact mobile,'
+        + 'Live date,SMS volume intent,Email volume intent,Letter volume intent,SMS sent this year,'
+        + 'Emails sent this year,Letters sent this year\r\n1,Forest,jessie the oak tree,True,Forest fairy,'
+        + 'forest.fairy@digital.cabinet-office.gov.uk,+447700900986,2014-03-29,100,50,20,300,1200,0\r\n2,Forest,'
+        + 'james the pine tree,,,,,2015-03-26,,60,0,0,0,0'
     )

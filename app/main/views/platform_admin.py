@@ -22,7 +22,6 @@ from app import (
     letter_jobs_client,
     platform_stats_api_client,
     service_api_client,
-    user_api_client,
 )
 from app.extensions import antivirus_client, redis_client
 from app.main import main
@@ -211,31 +210,31 @@ def platform_admin_reports():
 @login_required
 @user_is_platform_admin
 def live_services_csv():
-    services = service_api_client.get_services()["data"]
+    results = service_api_client.get_live_services_data()["data"]
     live_services_columns = [
         "Service ID", "Organisation", "Service name", "Consent to research", "Main contact",
-        "Contact email", "Contact mobile", "Live date", "SMS volume", "Email volume", "Letter volume"
+        "Contact email", "Contact mobile", "Live date", "SMS volume intent", "Email volume intent",
+        "Letter volume intent", "SMS sent this year", "Emails sent this year", "Letters sent this year"
     ]
     live_services_data = []
     live_services_data.append(live_services_columns)
-    for service in services:
-        if service["count_as_live"]:
-            main_contact = None
-            if service["go_live_user"]:
-                main_contact = user_api_client.get_user(service["go_live_user"])
-            live_services_data.append([
-                service["id"],
-                service["organisation"],
-                service["name"],
-                service["consent_to_research"],
-                main_contact.name if main_contact else None,
-                main_contact.email_address if main_contact else None,
-                main_contact.mobile_number if main_contact else None,
-                service["go_live_at"],
-                service["volume_sms"],
-                service["volume_email"],
-                service["volume_letter"],
-            ])
+    for row in results:
+        live_services_data.append([
+            row["service_id"],
+            row["organisation_name"],
+            row["service_name"],
+            row["consent_to_research"],
+            row["contact_name"],
+            row["contact_email"],
+            row["contact_mobile"],
+            row["live_date"],
+            row["sms_volume_intent"],
+            row["email_volume_intent"],
+            row["letter_volume_intent"],
+            row["sms_totals"],
+            row["email_totals"],
+            row["letter_totals"],
+        ])
     return Response(
         Spreadsheet.from_rows(live_services_data).as_csv_data,
         mimetype='text/csv',
