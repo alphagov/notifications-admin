@@ -58,6 +58,7 @@
     getAttributesHTML = function (attrsByElm) {
       var attrStr = '',
           elmIdx = attrsByElm.length,
+          existingAttributes = [],
           elmAttrs,
           attrIdx;
 
@@ -65,7 +66,11 @@
         elmAttrs = attrsByElm[elmIdx];
         attrIdx = elmAttrs.length;
         while (attrIdx--) {
-          attrStr += attributeTemplate.render({ 'name': elmAttrs[attrIdx].name, 'value': elmAttrs[attrIdx].value });
+          // prevent duplicates
+          if ($.inArray(elmAttrs[attrIdx].name, existingAttributes) === -1) {
+            attrStr += attributeTemplate.render({ 'name': elmAttrs[attrIdx].name, 'value': elmAttrs[attrIdx].value });
+            existingAttributes.push(elmAttrs[attrIdx].name);
+          }
         }
       }
       return attrStr;
