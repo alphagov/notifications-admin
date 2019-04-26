@@ -1,9 +1,5 @@
 (function (Modules) {
-
   'use strict';
-
-  var root = this,
-      $ = this.jQuery;
 
   var lists = [],
       listEntry,
