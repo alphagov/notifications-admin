@@ -14,7 +14,7 @@
   <div class="grid-row">
     <div class="column-three-quarters">
       {% call form_wrapper() %}
-        {{ textbox(form.email_address) }}
+        {{ textbox(form.email_address, safe_error_message=True) }}
         {{ page_footer(
           'Save',
           back_link=url_for('.edit_user_permissions', service_id=service_id, user_id=user.id),

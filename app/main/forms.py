@@ -504,10 +504,6 @@ class TwoFactorForm(StripWhitespaceForm):
         return True
 
 
-class EmailNotReceivedForm(StripWhitespaceForm):
-    email_address = email_address()
-
-
 class TextNotReceivedForm(StripWhitespaceForm):
     mobile_number = international_phone_number()
 
@@ -718,6 +714,10 @@ class ChangeEmailForm(StripWhitespaceForm):
         is_valid = self.validate_email_func(field.data)
         if is_valid:
             raise ValidationError("The email address is already in use")
+
+
+class ChangeNonGovEmailForm(ChangeEmailForm):
+    email_address = email_address(gov_user=False)
 
 
 class ChangeMobileNumberForm(StripWhitespaceForm):
