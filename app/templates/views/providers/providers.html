@@ -17,13 +17,15 @@ Providers
       caption="Domestic SMS providers",
       caption_visible=False,
       empty_message='No domestic sms providers',
-      field_headings=['Provider', 'Priority', 'Active', 'Last Updated', 'Updated By'],
+      field_headings=['Provider', 'Priority', '% monthly traffic', 'Active', 'Last Updated', 'Updated By'],
       field_headings_visible=True
   ) %}
 
       {{ link_field(item.display_name, url_for('main.view_provider', provider_id=item.id)) }}
 
       {{ text_field(item.priority) }}
+
+      {{ text_field(item.monthly_traffic) }}
 
       {{ text_field(item.active) }}
 

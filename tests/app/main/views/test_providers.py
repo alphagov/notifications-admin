@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup
 from flask import url_for
 
 import app
+from app.main.views.providers import add_monthly_traffic
 
 stub_providers = {
     'provider_details': [
@@ -23,7 +24,8 @@ stub_providers = {
                 'name': 'Test User',
                 'id': '7cc1dddb-bcbc-4739-8fc1-61bedde3332a'
             },
-            'supports_international': False
+            'supports_international': False,
+            'current_month_billable_sms': 5020,
         },
         {
             'id': '0bd529cd-a0fd-43e5-80ee-b95ef6b0d51f',
@@ -35,7 +37,8 @@ stub_providers = {
             'updated_at': None,
             'version': 1,
             'created_by': None,
-            'supports_international': False
+            'supports_international': False,
+            'current_month_billable_sms': 6891,
         },
         {
             'id': '6005e192-4738-4962-beec-ebd982d0b03a',
@@ -170,10 +173,11 @@ def test_should_show_all_providers(
     assert table_data[0].find_all("a")[0]['href'] == '/provider/6005e192-4738-4962-beec-ebd982d0b03f'
     assert table_data[0].text.strip() == "Domestic SMS Provider"
     assert table_data[1].text.strip() == "1"
-    assert table_data[2].text.strip() == "True"
-    assert table_data[3].text.strip() == "16 January at 3:20pm"
-    assert table_data[4].text.strip() == "Test User"
-    assert table_data[5].find_all("a")[0]['href'] == '/provider/6005e192-4738-4962-beec-ebd982d0b03f/edit'
+    assert table_data[2].text.strip() == "42"
+    assert table_data[3].text.strip() == "True"
+    assert table_data[4].text.strip() == "16 January at 3:20pm"
+    assert table_data[5].text.strip() == "Test User"
+    assert table_data[6].find_all("a")[0]['href'] == '/provider/6005e192-4738-4962-beec-ebd982d0b03f/edit'
 
     domestic_sms_second_row = domestic_sms_table.tbody.find_all('tr')[1]
     table_data = domestic_sms_second_row.find_all('td')
@@ -181,10 +185,11 @@ def test_should_show_all_providers(
     assert table_data[0].find_all("a")[0]['href'] == '/provider/0bd529cd-a0fd-43e5-80ee-b95ef6b0d51f'
     assert table_data[0].text.strip() == "Second Domestic SMS Provider"
     assert table_data[1].text.strip() == "2"
-    assert table_data[2].text.strip() == "True"
-    assert table_data[3].text.strip() == "None"
+    assert table_data[2].text.strip() == "58"
+    assert table_data[3].text.strip() == "True"
     assert table_data[4].text.strip() == "None"
-    assert table_data[5].find_all("a")[0]['href'] == '/provider/0bd529cd-a0fd-43e5-80ee-b95ef6b0d51f/edit'
+    assert table_data[5].text.strip() == "None"
+    assert table_data[6].find_all("a")[0]['href'] == '/provider/0bd529cd-a0fd-43e5-80ee-b95ef6b0d51f/edit'
 
     domestic_email_first_row = domestic_email_table.tbody.find_all('tr')[0]
     domestic_email_table_data = domestic_email_first_row.find_all('td')
@@ -220,6 +225,33 @@ def test_should_show_all_providers(
     assert table_data[3].text.strip() == "None"
     assert table_data[4].text.strip() == "None"
     assert table_data[5].find_all("a")[0]['href'] == '/provider/67c770f5-918e-4afa-a5ff-880b9beb161d/edit'
+
+
+def test_add_monthly_traffic():
+    domestic_sms_providers = [{
+        'identifier': 'mmg',
+        'current_month_billable_sms': 27,
+    }, {
+        'identifier': 'firetext',
+        'current_month_billable_sms': 5,
+    }, {
+        'identifier': 'loadtesting',
+    }]
+
+    add_monthly_traffic(domestic_sms_providers)
+
+    assert domestic_sms_providers == [{
+        'identifier': 'mmg',
+        'current_month_billable_sms': 27,
+        'monthly_traffic': 84
+    }, {
+        'identifier': 'firetext',
+        'current_month_billable_sms': 5,
+        'monthly_traffic': 16
+    }, {
+        'identifier': 'loadtesting',
+        'monthly_traffic': 0
+    }]
 
 
 def test_should_show_edit_provider_form(
