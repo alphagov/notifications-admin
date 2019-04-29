@@ -3,20 +3,6 @@
   position: relative;
   margin-bottom: 30px;
 
-  &-back-link {
-
-    @include button($grey-1);
-    display: inline-block;
-
-    @include media('mobile') {
-      box-sizing: border-box;
-      width: 100%;
-      margin-top: $gutter-half;
-      text-align: center;
-    }
-
-  }
-
   &-delete-link {
 
     line-height: 40px;

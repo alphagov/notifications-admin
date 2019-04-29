@@ -3,8 +3,6 @@
   button_name=None,
   button_value=None,
   destructive=False,
-  back_link=False,
-  back_link_text="Back",
   secondary_link=False,
   secondary_link_text=None,
   delete_link=False,
@@ -21,9 +19,6 @@
       >
         {{- button_text -}}
       </button>
-    {% endif %}
-    {% if back_link %}
-      <a class="page-footer-back-link" href="{{ back_link }}">{{ back_link_text }}</a>
     {% endif %}
     {% if delete_link %}
       <span class="page-footer-delete-link {% if not button_text %}page-footer-delete-link-without-button{% endif %}">
