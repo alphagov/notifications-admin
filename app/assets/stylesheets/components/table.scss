@@ -59,7 +59,7 @@
 
   th {
 
-    &.table-field-heading-first {
+    &:first-child {
       width: 35%;  // 33.33% + fudge
     }
 
