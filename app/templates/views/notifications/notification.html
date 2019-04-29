@@ -2,6 +2,7 @@
 {% from "components/banner.html" import banner %}
 {% from "components/ajax-block.html" import ajax_block %}
 {% from "components/message-count-label.html" import message_count_label %}
+{% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 
 {% block service_page_title %}
@@ -10,9 +11,10 @@
 
 {% block maincolumn_content %}
 
-    <h1 class="heading-large">
-      {{ message_count_label(1, template.template_type, suffix='') | capitalize }}
-    </h1>
+    {{ page_header(
+      message_count_label(1, template.template_type, suffix='') | capitalize,
+      back_link=None if request.args.get('help') == '0' else url_for('main.view_notifications', service_id=current_service.id, message_type=template.template_type)
+    ) }}
 
     <p>
       {% if is_precompiled_letter %}

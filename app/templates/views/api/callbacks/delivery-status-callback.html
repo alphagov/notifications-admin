@@ -1,5 +1,6 @@
 {% extends "withnav_template.html" %}
 {% from "components/textbox.html" import textbox %}
+{% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 
@@ -10,7 +11,12 @@
 {% block maincolumn_content %}
   <div class="grid-row">
     <div class="column-five-sixths">
-      <h1 class="heading-large">Callbacks for delivery receipts</h1>
+
+      {{ page_header(
+        'Callbacks for delivery receipts',
+        back_link=url_for(back_link, service_id=current_service.id)
+      ) }}
+
       <p>
         When you send an email or text message, we can tell you if Notify was able to deliver it.
         Check the <a href="{{ url_for('.callbacks') }}"> callback documentation </a> for more information.
@@ -27,11 +33,6 @@
           width='1-1',
           hint='At least 10 characters',
           autocomplete='new-password'
-        ) }}
-        {{ page_footer(
-          'Save',
-          back_link=url_for(back_link, service_id=current_service.id),
-          back_link_text='Back to settings'
         ) }}
       {% endcall %}
     </div>

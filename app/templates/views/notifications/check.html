@@ -1,6 +1,7 @@
 {% extends "withnav_template.html" %}
 {% from "components/banner.html" import banner_wrapper %}
 {% from "components/message-count-label.html" import message_count_label %}
+{% from "components/page-header.html" import govuk_back_link, page_header %}
 
 {% block service_page_title %}
   {{ "Error" if error else "Preview of ‘{}’".format(template.name) }}
@@ -8,6 +9,7 @@
 
 {% block maincolumn_content %}
   {% if template.template_type == 'letter' and current_service.trial_mode %}
+    {{ govuk_back_link(back_link) }}
     {% set error = 'trial-mode-letters' %}
     <div class="bottom-gutter">
       {% call banner_wrapper(type='dangerous') %}
@@ -19,6 +21,7 @@
       {% endcall %}
     </div>
   {% elif error == 'not-allowed-to-send-to' %}
+    {{ govuk_back_link(back_link) }}
     <div class="bottom-gutter">
       {% call banner_wrapper(type='dangerous') %}
         {% with
@@ -32,6 +35,7 @@
       {% endcall %}
     </div>
   {% elif error == 'too-many-messages' %}
+    {{ govuk_back_link(back_link) }}
     <div class="bottom-gutter">
       {% call banner_wrapper(type='dangerous') %}
         {% include "partials/check/too-many-messages.html" %}
@@ -39,15 +43,17 @@
     </div>
   {% elif error == 'message-too-long' %}
     {# the only row_errors we can get when sending one off messages is that the message is too long #}
+    {{ govuk_back_link(back_link) }}
     <div class="bottom-gutter">
       {% call banner_wrapper(type='dangerous') %}
         {% include "partials/check/message-too-long.html" %}
       {% endcall %}
     </div>
   {% else %}
-    <h1 class="heading-large">
-      Preview of ‘{{ template.name }}’
-    </h1>
+    {{ page_header(
+      'Preview of ‘{}’'.format(template.name),
+      back_link=back_link
+    ) }}
   {% endif %}
 
   {{ template|string }}
@@ -63,7 +69,6 @@
       {% if not error %}
         <button type="submit" class="button">Send 1 {{ message_count_label(1, template.template_type, suffix='') }}</button>
       {% endif %}
-      <a href="{{ back_link }}" class="page-footer-back-link">Back</a>
       {% if template.template_type == 'letter' %}
         <a href="{{ url_for('main.check_notification_preview', service_id=current_service.id, template_id=template.id, filetype='pdf') }}" download class="page-footer-right-aligned-link">Download as a PDF</a>
       {% endif %}

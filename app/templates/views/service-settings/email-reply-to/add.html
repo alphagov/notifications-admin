@@ -1,6 +1,7 @@
 {% extends "withnav_template.html" %}
 {% from "components/textbox.html" import textbox %}
 {% from "components/checkbox.html" import checkbox %}
+{% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 
@@ -10,9 +11,10 @@
 
 {% block maincolumn_content %}
 
-  <h1 class="heading-large">
-    Add email reply-to address
-  </h1>
+  {{ page_header(
+    'Add email reply-to address',
+    back_link=url_for('main.service_email_reply_to', service_id=current_service.id)
+  ) }}
   <p>
     Let recipients send replies to a shared inbox that’s managed by your team.
   </p>
@@ -30,11 +32,7 @@
         {{ checkbox(form.is_default) }}
       </div>
     {% endif %}
-    {{ page_footer(
-      'Add',
-      back_link=url_for('.service_email_reply_to', service_id=current_service.id),
-      back_link_text='Back'
-    ) }}
+    {{ page_footer('Add') }}
   {% endcall %}
 
 {% endblock %}

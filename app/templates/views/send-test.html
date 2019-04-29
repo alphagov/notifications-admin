@@ -1,4 +1,5 @@
 {% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/message-count-label.html" import recipient_count_label %}
 {% from "components/textbox.html" import textbox %}
@@ -10,9 +11,10 @@
 
 {% block maincolumn_content %}
 
-  <h1 class="heading-large">
-    {{ page_title }}
-  </h1>
+  {{ page_header(
+    page_title,
+    back_link=back_link
+  ) }}
 
   {% call form_wrapper(
     class='js-stick-at-top-when-scrolling send-one-off-form' if template.template_type != 'sms' else 'send-one-off-form',
@@ -40,7 +42,7 @@
         </a>
       </p>
     {% endif %}
-    {{ page_footer('Continue', back_link=back_link) }}
+    {{ page_footer('Continue') }}
   {% endcall %}
 
   {{ template|string }}

@@ -1,5 +1,6 @@
 {% extends "withnav_template.html" %}
 {% from "components/radios.html" import radios %}
+{% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 
@@ -11,20 +12,17 @@
 
   <div class="grid-row bottom-gutter">
     <div class="column-two-thirds">
-      <h1 class="heading-large">
-        Link service to organisation
-      </h1>
+      {{ page_header(
+        'Link service to organisation',
+        back_link=url_for('.service_settings', service_id=current_service.id)
+      ) }}
       {% call form_wrapper() %}
         {% if has_organisations %}
           {{ radios(form.organisations) }}
+          {{ page_footer('Save') }}
         {% else %}
         <p> No organisations </p>
         {% endif %}
-        {{ page_footer(
-          'Save' if has_organisations,
-          back_link=url_for('.service_settings', service_id=current_service.id),
-          back_link_text='Back to settings'
-        ) }}
       {% endcall %}
     </div>
   </div>

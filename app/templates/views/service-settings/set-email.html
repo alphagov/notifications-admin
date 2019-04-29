@@ -1,5 +1,6 @@
 {% extends "withnav_template.html" %}
 {% from "components/form.html" import form_wrapper %}
+{% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/radios.html" import radios %}
 
@@ -11,17 +12,16 @@
 
   <div class="grid-row">
     <div class="column-five-sixths">
-      <h1 class="heading-large">Send emails</h1>
+      {{ page_header(
+        'Send emails',
+        back_link=url_for('main.service_settings', service_id=current_service.id)
+      ) }}
       <p>
         It’s free to send emails through GOV.UK Notify.
       </p>
       {% call form_wrapper() %}
         {{ radios(form.enabled) }}
-        {{ page_footer(
-          'Save',
-          back_link=url_for('.service_settings', service_id=current_service.id),
-          back_link_text='Back to settings'
-        ) }}
+        {{ page_footer('Save') }}
       {% endcall %}
     </div>
   </div>

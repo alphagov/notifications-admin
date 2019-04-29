@@ -409,7 +409,7 @@ def copy_template(service_id, template_id):
     return render_template(
         'views/edit-{}-template.html'.format(template['template_type']),
         form=form,
-        template_type=template['template_type'],
+        template=template,
         heading_action='Add',
         services=user_api_client.get_service_ids_for_user(current_user),
     )
@@ -570,6 +570,7 @@ def add_service_template(service_id, template_type, template_folder_id=None):
             '.action_blocked',
             service_id=service_id,
             notification_type=template_type,
+            template_folder_id=template_folder_id,
             return_to='templates',
             template_id='0'
         ))
@@ -578,6 +579,7 @@ def add_service_template(service_id, template_type, template_folder_id=None):
             'views/edit-{}-template.html'.format(template_type),
             form=form,
             template_type=template_type,
+            template_folder_id=template_folder_id,
             heading_action='New',
         )
 
@@ -665,8 +667,7 @@ def edit_service_template(service_id, template_id):
         return render_template(
             'views/edit-{}-template.html'.format(template['template_type']),
             form=form,
-            template_id=template_id,
-            template_type=template['template_type'],
+            template=template,
             heading_action='Edit',
         )
 

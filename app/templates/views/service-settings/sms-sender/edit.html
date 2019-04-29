@@ -2,6 +2,7 @@
 {% from "components/banner.html" import banner_wrapper %}
 {% from "components/textbox.html" import textbox %}
 {% from "components/checkbox.html" import checkbox %}
+{% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 
@@ -11,9 +12,10 @@
 
 {% block maincolumn_content %}
 
-  <h1 class="heading-large">
-    Edit text message sender
-  </h1>
+  {{ page_header(
+    'Edit text message sender',
+    back_link=None if request.args.get('from_template') else url_for('.service_sms_senders', service_id=current_service.id)
+  ) }}
   {% call form_wrapper() %}
     {% if inbound_number %}
       <p>
@@ -31,26 +33,16 @@
       <p class="form-group">
         This is the default text message sender
       </p>
-      {{ page_footer(
-        'Save',
-        back_link=None if request.args.get('from_template') else url_for('.service_sms_senders', service_id=current_service.id),
-        back_link_text='Back'
-      ) }}
+      {{ page_footer('Save') }}
     {% else %}
       <div class="form-group">
         {{ checkbox(form.is_default) }}
       </div>
       {% if inbound_number %}
-        {{ page_footer(
-          'Save',
-          back_link=None if request.args.get('from_template') else url_for('.service_sms_senders', service_id=current_service.id),
-          back_link_text='Back'
-        ) }}
+        {{ page_footer('Save') }}
       {% else %}
         {{ page_footer(
           'Save',
-          back_link=None if request.args.get('from_template') else url_for('.service_sms_senders', service_id=current_service.id),
-          back_link_text='Back',
           delete_link=url_for('.service_confirm_delete_sms_sender', service_id=current_service.id, sms_sender_id=sms_sender_id),
           delete_link_text='Delete'
         ) }}

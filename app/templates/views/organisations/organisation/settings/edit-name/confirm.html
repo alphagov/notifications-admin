@@ -1,5 +1,6 @@
 {% extends "org_template.html" %}
 {% from "components/textbox.html" import textbox %}
+{% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 
@@ -9,7 +10,10 @@
 
 {% block maincolumn_content %}
 
-  <h1 class="heading-large">Confirm organisation name change</h1>
+  {{ page_header(
+    'Confirm organisation name change',
+    back_link=url_for('.organisation_settings', org_id=current_org.id)
+  ) }}
 
   <div class="grid-row">
     <div class="column-three-quarters">
@@ -17,11 +21,7 @@
     {% call form_wrapper() %}
       {{ textbox(form.password) }}
       <p> Your organisation name will be changed from {{ current_org.name }} to {{ new_name }} </p>
-      {{ page_footer(
-        'Confirm',
-        destructive=destructive,
-        back_link=url_for('.organisation_settings', org_id=current_org.id)
-      ) }}
+      {{ page_footer('Confirm') }}
     {% endcall %}
     </div>
   </div>

@@ -1,5 +1,6 @@
 {% extends "withnav_template.html" %}
 {% from "components/textbox.html" import textbox %}
+{% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 {% from "components/banner.html" import banner %}
@@ -18,9 +19,10 @@
     ) }}
   {% endif %}
 
-  <h1 class="heading-large">
-    {{ user.name or user.email_localpart }}
-  </h1>
+  {{ page_header(
+    user.name or user.email_localpart,
+    back_link=url_for('main.manage_users', service_id=current_service.id)
+  ) }}
 
   <p>
     {{ user.email_address }}&emsp;<a href="{{ url_for('.edit_user_email', service_id=current_service.id, user_id=user.id)}}">Change</a>

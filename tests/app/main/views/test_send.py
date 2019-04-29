@@ -261,8 +261,8 @@ def test_should_not_allow_files_to_be_uploaded_without_the_correct_permission(
     )
 
     assert page.select('main p')[0].text.strip() == "Sending text messages has been disabled for your service."
-    assert page.select(".page-footer-back-link")[0].text == "Back to the template"
-    assert page.select(".page-footer-back-link")[0]['href'] == url_for(
+    assert page.select(".govuk-back-link")[0].text == "Back"
+    assert page.select(".govuk-back-link")[0]['href'] == url_for(
         '.view_template',
         service_id=service_one['id'],
         template_id=template_id,
@@ -1033,8 +1033,8 @@ def test_send_one_off_does_not_send_without_the_correct_permissions(
     )
 
     assert page.select('main p')[0].text.strip() == "Sending text messages has been disabled for your service."
-    assert page.select(".page-footer-back-link")[0].text == "Back to the template"
-    assert page.select(".page-footer-back-link")[0]['href'] == url_for(
+    assert page.select(".govuk-back-link")[0].text == "Back"
+    assert page.select(".govuk-back-link")[0]['href'] == url_for(
         '.view_template',
         service_id=service_one['id'],
         template_id=template_id,
@@ -1239,8 +1239,8 @@ def test_skip_link_will_not_show_on_sms_one_off_if_service_has_no_mobile_number(
 
 
 @pytest.mark.parametrize('user, link_index', (
-    (active_user_with_permissions, 1),
-    (active_caseworking_user, 0),
+    (active_user_with_permissions, 2),
+    (active_caseworking_user, 1),
 ))
 def test_send_one_off_offers_link_to_upload(
     client_request,
@@ -1259,7 +1259,10 @@ def test_send_one_off_offers_link_to_upload(
         _follow_redirects=True,
     )
 
+    back_link = page.select('main a')[0]
     link = page.select('main a')[link_index]
+
+    assert back_link.text.strip() == 'Back'
 
     assert link.text.strip() == 'Upload a list of phone numbers'
     assert link['href'] == url_for(
@@ -1576,7 +1579,7 @@ def test_send_test_sms_message_with_placeholders_shows_first_field(
 
     assert page.select('label')[0].text.strip() == 'name'
     assert page.select('input')[0]['name'] == 'placeholder_value'
-    assert page.select('.page-footer-back-link')[0]['href'] == url_for(
+    assert page.select('.govuk-back-link')[0]['href'] == url_for(
         expected_back_link_endpoint,
         service_id=SERVICE_ONE_ID,
         **extra_args
@@ -1721,7 +1724,7 @@ def test_send_test_indicates_optional_address_columns(
         'address line 3 '
         'Optional'
     )
-    assert page.select('.page-footer-back-link')[0]['href'] == url_for(
+    assert page.select('.govuk-back-link')[0]['href'] == url_for(
         'main.send_one_off_step',
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
@@ -2393,7 +2396,7 @@ def test_check_messages_back_link(
     )
 
     assert (
-        page.findAll('a', {'class': 'page-footer-back-link'})[0]['href']
+        page.findAll('a', {'class': 'govuk-back-link'})[0]['href']
     ) == expected_url(service_id=SERVICE_ONE_ID, template_id=fake_uuid)
 
 
@@ -2923,7 +2926,7 @@ def test_send_one_off_letter_errors_in_trial_mode(
     assert len(page.select('.letter img')) == 5
 
     assert not page.select('[type=submit]')
-    assert page.select_one('.page-footer-back-link').text == 'Back'
+    assert page.select_one('.govuk-back-link').text == 'Back'
     assert page.select_one('a[download]').text == 'Download as a PDF'
 
 
@@ -3048,7 +3051,7 @@ def test_check_notification_shows_preview(
 
     assert page.h1.text.strip() == 'Preview of ‘Two week reminder’'
     assert (
-        page.findAll('a', {'class': 'page-footer-back-link'})[0]['href']
+        page.findAll('a', {'class': 'govuk-back-link'})[0]['href']
     ) == url_for(
         'main.send_one_off_step',
         service_id=service_one['id'],
@@ -3089,7 +3092,7 @@ def test_check_notification_shows_help(
         template_id=fake_uuid,
         help='3'
     )
-    assert page.select_one('.page-footer-back-link')['href'] == url_for(
+    assert page.select_one('.govuk-back-link')['href'] == url_for(
         'main.send_test',
         service_id=service_one['id'],
         template_id=fake_uuid,

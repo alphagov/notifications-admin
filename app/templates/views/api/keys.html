@@ -2,6 +2,7 @@
 {% from "components/banner.html" import banner_wrapper %}
 {% from "components/table.html" import list_table, field, hidden_field_heading %}
 {% from "components/api-key.html" import api_key %}
+{% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 
 {% block service_page_title %}
@@ -10,9 +11,10 @@
 
 {% block maincolumn_content %}
 
-  <h1 class="heading-large">
-    API keys
-  </h1>
+  {{ page_header(
+    'API keys',
+    back_link=url_for('main.api_integration', service_id=current_service.id)
+  ) }}
 
   <div class="body-copy-table">
     {% call(item, row_number) list_table(

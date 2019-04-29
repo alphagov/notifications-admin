@@ -1,5 +1,6 @@
 {% extends "withnav_template.html" %}
 {% from "components/textbox.html" import textbox %}
+{% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 
 {% block service_page_title %}
@@ -10,7 +11,10 @@
 
   <div class="grid-row">
     <div class="column-five-sixths">
-      <h1 class="heading-large">Sign-in method</h1>
+      {{ page_header(
+        'Sign-in method',
+        back_link=url_for('main.service_settings', service_id=current_service.id)
+      ) }}
       {% if 'email_auth' in current_service.permissions %}
         <p class="heading-small bottom-gutter-2-3">
           Email link or text message code
@@ -34,10 +38,6 @@
           please <a href="{{ url_for('.support') }}">contact us</a>.
         </p>
       {% endif %}
-      {{ page_footer(
-        back_link=url_for('.service_settings', service_id=current_service.id),
-        back_link_text='Back to settings'
-      ) }}
     </div>
   </div>
 

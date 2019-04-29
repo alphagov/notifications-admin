@@ -1,5 +1,6 @@
 {% extends "withnav_template.html" %}
 {% from "components/textbox.html" import textbox %}
+{% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 
 {% block service_page_title %}
@@ -10,14 +11,17 @@
 
   <div class="grid-row">
     <div class="column-five-sixths">
-      <h1 class="heading-large">Receive text messages</h1>
+      {{ page_header(
+        'Receive text messages',
+        back_link=url_for('main.service_settings', service_id=current_service.id)
+      ) }}
       {% if 'inbound_sms' in current_service.permissions %}
         <p>
           Your service can receive text messages sent to {{ current_service.inbound_number }}.
         </p>
         <p>
-          If you want to turn this feature off,
-          <a href="{{ url_for('.support') }}">get in touch with the GOV.UK Notify team</a>.
+          If you want to switch this feature off,
+          <a href="{{ url_for('.support') }}">get in touch with the GOV.UK&nbsp;Notify team</a>.
         </p>
         {% if current_user.has_permissions('manage_api_keys') %}
           <p>
@@ -38,10 +42,6 @@
           messaging a mobile number.
         </p>
       {% endif %}
-      {{ page_footer(
-        back_link=url_for('.service_settings', service_id=current_service.id),
-        back_link_text='Back to settings'
-      ) }}
     </div>
   </div>
 

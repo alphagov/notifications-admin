@@ -1,6 +1,7 @@
 {% extends "withnav_template.html" %}
 {% from "components/banner.html" import banner_wrapper %}
 {% from "components/form.html" import form_wrapper %}
+{% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/radios.html" import radios %}
 {% from "components/textbox.html" import textbox %}
@@ -19,7 +20,10 @@
           </h1>
         {% endcall %}
       {% else %}
-        <h1 class="heading-large">Tell us how many messages you expect to send</h1>
+        {{ page_header(
+          'Tell us how many messages you expect to send',
+          back_link=url_for('main.request_to_go_live', service_id=current_service.id)
+        ) }}
       {% endif %}
       {% call form_wrapper() %}
         <div class="form-group">

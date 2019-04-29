@@ -1,5 +1,6 @@
 {% extends "withoutnav_template.html" %}
 {% from "components/textbox.html" import textbox %}
+{% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 
@@ -12,7 +13,10 @@ Provider - {{provider.display_name}}
 <div class="grid-row">
     <div class="column-three-quarters">
 
-        <h1 class="heading-large">{{provider.display_name}}</h1>
+        {{ page_header(
+          provider.display_name,
+          back_link=url_for('.view_providers')
+        ) }}
 
         <p>Update provider:</p>
 
@@ -22,7 +26,7 @@ Provider - {{provider.display_name}}
 
         {% call form_wrapper() %}
             {{ textbox(form.priority) }}
-            {{ page_footer('Save', back_link=url_for('.view_providers'), back_link_text="Back to providers") }}
+            {{ page_footer('Save') }}
         {% endcall %}
 
     </div>

@@ -1,6 +1,7 @@
 {% extends "withnav_template.html" %}
 {% from "components/radios.html" import radio %}
 {% from "components/textbox.html" import textbox %}
+{% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 
@@ -10,7 +11,10 @@
 
 {% block maincolumn_content %}
 
-  <h1 class="heading-large">Email branding</h1>
+  {{ page_header(
+    'Email branding',
+    back_link=url_for('main.service_settings', service_id=current_service.id)
+  ) }}
 
   {% call form_wrapper() %}
     <fieldset class="form-group {% if form.options.errors %}form-group-error{% endif %} top-gutter">
@@ -37,11 +41,7 @@
       We’ll email you once your branding’s ready to use, or if we need any
       more info.
     </p>
-    {{ page_footer(
-      'Request new branding',
-      destructive=destructive,
-      back_link=url_for('.service_settings', service_id=current_service.id)
-    ) }}
+    {{ page_footer('Request new branding') }}
   {% endcall %}
 
 {% endblock %}
