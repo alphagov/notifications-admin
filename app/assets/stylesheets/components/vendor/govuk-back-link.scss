@@ -32,4 +32,22 @@
     left: 0;
     margin: auto;
   }
+
+  &:after {
+    content: "";
+    position: absolute;
+    top: -$gutter-half;
+    left: -3px;
+    width: 100%;
+    height: 100%;
+    border-style: solid;
+    border-width: $gutter-half $gutter $gutter-half 3px;
+    border-color: transparent;
+  }
+
+  &:focus {
+    &:after {
+      border-color: $yellow
+    }
+  }
 }
