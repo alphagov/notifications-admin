@@ -92,16 +92,29 @@ def test_service_setting_toggles_show(get_service_settings_page, service_one, se
     assert normalize_spaces(page.find('a', {'href': button_url}).find_parent('tr').text.strip()) == text
 
 
-@pytest.mark.parametrize('service_fields, endpoint, kwargs, text', [
-    ({'active': True}, '.archive_service', {}, 'Archive service'),
-    ({'active': True}, '.suspend_service', {}, 'Suspend service'),
-    ({'active': False}, '.resume_service', {}, 'Resume service'),
+@pytest.mark.parametrize('service_fields, endpoint, index, text', [
+    ({'active': True}, '.archive_service', 0, 'Archive service'),
+    ({'active': True}, '.suspend_service', 1, 'Suspend service'),
+    ({'active': False}, '.resume_service', 0, 'Resume service'),
+    pytest.param(
+        {'active': False}, '.archive_service', 1, 'Resume service',
+        marks=pytest.mark.xfail(raises=IndexError)
+    )
 ])
-def test_service_setting_button_toggles(get_service_settings_page, service_one, service_fields, endpoint, kwargs, text):
-    button_url = url_for(endpoint, **kwargs, service_id=service_one['id'])
+def test_service_setting_button_toggles(
+    get_service_settings_page,
+    service_one,
+    service_fields,
+    endpoint,
+    index,
+    text,
+):
+    button_url = url_for(endpoint, service_id=service_one['id'])
     service_one.update(service_fields)
     page = get_service_settings_page()
-    assert normalize_spaces(page.find('a', {'class': 'button', 'href': button_url}).text.strip()) == text
+    link = page.select('.page-footer-delete-link a')[index]
+    assert normalize_spaces(link.text) == text
+    assert link['href'] == button_url
 
 
 @pytest.mark.parametrize('permissions,permissions_text,visible', [

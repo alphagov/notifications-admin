@@ -67,7 +67,7 @@
 
 {% macro field(align='left', status='', border=True) -%}
 
-    {% set field_alignment = 'table-field-right-aligned' if align == 'right' else 'table-field-center-aligned' %}
+    {% set field_alignment = 'table-field-right-aligned' if align == 'right' else 'table-field-left-aligned' %}
     {% set border = '' if border else 'table-field-noborder' %}
 
     <td class="{{ [field_alignment, border]|join(' ') }}">
@@ -90,7 +90,7 @@
 {% macro text_field(text, status='', truncate=false) -%}
   {% call field(status=status) %}
     {% if text is iterable and text is not string %}
-      <ul class="list list-bullet">
+      <ul>
         {% for item in text %}
           {% if item %}
             <li>{{ item }}</li>

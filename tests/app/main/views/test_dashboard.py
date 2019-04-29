@@ -569,7 +569,7 @@ def test_monthly_shows_letters_in_breakdown(
         service_id=service_one['id']
     )
 
-    columns = page.select('.table-field-center-aligned .big-number-label')
+    columns = page.select('.table-field-left-aligned .big-number-label')
 
     assert normalize_spaces(columns[0].text) == 'emails'
     assert normalize_spaces(columns[1].text) == 'text messages'

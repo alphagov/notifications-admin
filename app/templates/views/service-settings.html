@@ -10,7 +10,7 @@
 
     <h1 class="heading-large">Settings</h1>
 
-    <div class="bottom-gutter-3-2 dashboard-table body-copy-table">
+    <div class="bottom-gutter-3-2 settings-table body-copy-table">
 
       {% call mapping_table(
         caption='General',
@@ -278,98 +278,105 @@
 
     {% if current_user.platform_admin %}
 
-      <h2 class="heading-medium">Platform admin settings</h2>
-      {% call mapping_table(
-        caption='Settings',
-        field_headings=['Label', 'Value', 'Action'],
-        field_headings_visible=False,
-        caption_visible=False
-      ) %}
+      <div class="settings-table body-copy-table top-gutter-4-3">
 
-        {% call row() %}
-          {{ text_field('Live')}}
-          {% if current_service.trial_mode and not current_service.organisation %}
-            {{ text_field('No (you need to assign this service to an organisation before you can make it live)') }}
-            {{ text_field('') }}
-          {% else %}
-            {{ boolean_field(not current_service.trial_mode) }}
-            {{ edit_field('Change', url_for('.service_switch_live', service_id=current_service.id)) }}
-          {% endif %}
-        {% endcall %}
+        <h2 class="heading-medium">Platform admin settings</h2>
 
-        {% call row() %}
-          {{ text_field('Count in list of live services')}}
-          {{ text_field('Yes' if current_service.count_as_live else 'No') }}
-          {{ edit_field('Change', url_for('.service_switch_count_as_live', service_id=current_service.id)) }}
-        {% endcall %}
+        {% call mapping_table(
+          caption='Settings',
+          field_headings=['Label', 'Value', 'Action'],
+          field_headings_visible=False,
+          caption_visible=False
+        ) %}
 
-        {% call row() %}
-          {{ text_field('Organisation')}}
-          {{ optional_text_field(current_service.organisation.name) }}
-          {{ edit_field('Change', url_for('.link_service_to_organisation', service_id=current_service.id)) }}
-        {% endcall %}
-        {% call row() %}
-          {{ text_field('Organisation type')}}
-          {{ optional_text_field(
-            (current_service.organisation_type or '')|title
-          ) }}
-          {{ edit_field('Change', url_for('.set_organisation_type', service_id=current_service.id)) }}
-        {% endcall %}
-        {% call row() %}
-          {{ text_field('Free text message allowance')}}
-          {{ text_field('{:,}'.format(current_service.free_sms_fragment_limit)) }}
-          {{ edit_field('Change', url_for('.set_free_sms_allowance', service_id=current_service.id)) }}
-        {% endcall %}
-        {% call row() %}
-          {{ text_field('Email branding' )}}
-          {{ text_field(current_service.email_branding_name) }}
-          {{ edit_field('Change', url_for('.service_set_email_branding', service_id=current_service.id)) }}
-        {% endcall %}
-        {% call row() %}
-          {{ text_field('Letter branding')}}
-          {{ optional_text_field(current_service.letter_branding.name) }}
-          {{ edit_field('Change', url_for('.service_set_letter_branding', service_id=current_service.id)) }}
-        {% endcall %}
-        {% call row() %}
-          {{ text_field('Data retention')}}
-          {% call field() %}
-              {{ current_service.data_retention | join(', ', attribute='notification_type') }}
+          {% call row() %}
+            {{ text_field('Live')}}
+            {% if current_service.trial_mode and not current_service.organisation %}
+              {{ text_field('No (you need to assign this service to an organisation before you can make it live)') }}
+              {{ text_field('') }}
+            {% else %}
+              {{ boolean_field(not current_service.trial_mode) }}
+              {{ edit_field('Change', url_for('.service_switch_live', service_id=current_service.id)) }}
+            {% endif %}
           {% endcall %}
-          {{ edit_field('Change', url_for('.data_retention', service_id=current_service.id)) }}
+
+          {% call row() %}
+            {{ text_field('Count in list of live services')}}
+            {{ text_field('Yes' if current_service.count_as_live else 'No') }}
+            {{ edit_field('Change', url_for('.service_switch_count_as_live', service_id=current_service.id)) }}
+          {% endcall %}
+
+          {% call row() %}
+            {{ text_field('Organisation')}}
+            {{ optional_text_field(current_service.organisation.name) }}
+            {{ edit_field('Change', url_for('.link_service_to_organisation', service_id=current_service.id)) }}
+          {% endcall %}
+          {% call row() %}
+            {{ text_field('Organisation type')}}
+            {{ optional_text_field(
+              (current_service.organisation_type or '')|title
+            ) }}
+            {{ edit_field('Change', url_for('.set_organisation_type', service_id=current_service.id)) }}
+          {% endcall %}
+          {% call row() %}
+            {{ text_field('Free text message allowance')}}
+            {{ text_field('{:,}'.format(current_service.free_sms_fragment_limit)) }}
+            {{ edit_field('Change', url_for('.set_free_sms_allowance', service_id=current_service.id)) }}
+          {% endcall %}
+          {% call row() %}
+            {{ text_field('Email branding' )}}
+            {{ text_field(current_service.email_branding_name) }}
+            {{ edit_field('Change', url_for('.service_set_email_branding', service_id=current_service.id)) }}
+          {% endcall %}
+          {% call row() %}
+            {{ text_field('Letter branding')}}
+            {{ optional_text_field(current_service.letter_branding.name) }}
+            {{ edit_field('Change', url_for('.service_set_letter_branding', service_id=current_service.id)) }}
+          {% endcall %}
+          {% call row() %}
+            {{ text_field('Data retention')}}
+            {% call field() %}
+                {{ current_service.data_retention | join(', ', attribute='notification_type') }}
+            {% endcall %}
+            {{ edit_field('Change', url_for('.data_retention', service_id=current_service.id)) }}
+          {% endcall %}
+
+          {% for permission in service_permissions %}
+            {% if not service_permissions[permission].requires or current_service.has_permission(service_permissions[permission].requires) %}
+              {% call row() %}
+                {{ text_field(service_permissions[permission].title)}}
+                {{ boolean_field(current_service.has_permission(permission)) }}
+                {{ edit_field('Change', url_for(service_permissions[permission].endpoint or '.service_set_permission', service_id=current_service.id, permission=permission if not service_permissions[permission].endpoint else None)) }}
+              {% endcall %}
+            {% endif %}
+          {% endfor %}
+
         {% endcall %}
 
-        {% for permission in service_permissions %}
-          {% if not service_permissions[permission].requires or current_service.has_permission(service_permissions[permission].requires) %}
-            {% call row() %}
-              {{ text_field(service_permissions[permission].title)}}
-              {{ boolean_field(current_service.has_permission(permission)) }}
-              {{ edit_field('Change', url_for(service_permissions[permission].endpoint or '.service_set_permission', service_id=current_service.id, permission=permission if not service_permissions[permission].endpoint else None)) }}
-            {% endcall %}
+        <p>
+          {% if current_service.active %}
+            <span class="page-footer-delete-link page-footer-delete-link-without-button">
+              <a href="{{ url_for('.archive_service', service_id=current_service.id) }}">
+                Archive service
+              </a>
+            </span>
+            <span class="page-footer-delete-link">
+              <a href="{{ url_for('.suspend_service', service_id=current_service.id) }}" class="page-footer-delete-link">
+                  Suspend service
+                </a>
+            </span>
+          {% else %}
+            <div class="hint bottom-gutter-1-2">
+              Service suspended
+            </div>
+            <span class="page-footer-delete-link page-footer-delete-link-without-button">
+              <a href="{{ url_for('.resume_service', service_id=current_service.id) }}">
+                Resume service
+              </a>
+            </span>
           {% endif %}
-        {% endfor %}
-
-      {% endcall %}
-
-      <ul>
-        {% if current_service.active %}
-          <li class="bottom-gutter">
-            <a href="{{ url_for('.archive_service', service_id=current_service.id) }}" class="button">
-              Archive service
-            </a>
-          </li>
-          <li class="bottom-gutter">
-            <a href="{{ url_for('.suspend_service', service_id=current_service.id) }}" class="button">
-              Suspend service
-            </a>
-          </li>
-        {% else %}
-          <li class="bottom-gutter">
-            <a href="{{ url_for('.resume_service', service_id=current_service.id) }}" class="button">
-              Resume service
-            </a>
-          </li>
-        {% endif %}
-      </ul>
+        </p>
+      </div>
 
     {% endif %}
 
