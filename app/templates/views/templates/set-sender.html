@@ -1,5 +1,6 @@
 {% extends "withnav_template.html" %}
 {% from "components/radios.html" import radios %}
+{% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 
@@ -9,7 +10,11 @@
 
 {% block maincolumn_content %}
 
-  <h1 class="heading-large">{{sender_context['title']}}</h1>
+  {{ page_header(
+    sender_context.title,
+    back_link=url_for('.view_template', service_id=current_service.id, template_id=template_id)
+  ) }}
+
   <div class="grid-row">
     <div class="column-three-quarters">
       {% call form_wrapper() %}
@@ -18,11 +23,7 @@
           option_hints=option_hints,
           hide_legend=True
         ) }}
-        {{ page_footer(
-          'Continue',
-          back_link=url_for('.view_template', service_id=current_service.id, template_id=template_id),
-          back_link_text='Back to template'
-        ) }}
+        {{ page_footer('Continue') }}
       {% endcall %}
     </div>
   </div>

@@ -1,35 +1,27 @@
 {% extends "withnav_template.html" %}
 {% from "components/textbox.html" import textbox %}
+{% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/radios.html" import radios%}
 {% from "components/form.html" import form_wrapper %}
 
 {% block service_page_title %}
-  Set Inbound Number
+  Set inbound number
 {% endblock %}
 
 {% block maincolumn_content %}
-    <h1 class="heading-large">Set Inbound Number</h1>
+    {{ page_header(
+      'Set inbound number',
+      back_link=url_for('.service_settings', service_id=current_service.id)
+    ) }}
     {% if current_service.has_inbound_number %}
     <p> This service already has an inbound number </p>
-    {{ page_footer(
-	    back_link=url_for('.service_settings', service_id=current_service.id),
-	    back_link_text='Back to settings'
-	  ) }}
     {% elif no_available_numbers %}
     <p> No available inbound numbers </p>
-    {{ page_footer(
-	    back_link=url_for('.service_settings', service_id=current_service.id),
-	    back_link_text='Back to settings'
-	  ) }}
     {% else %}
     {% call form_wrapper() %}
 	    {{ radios(form.inbound_number) }}
-	    {{ page_footer(
-		    'Save',
-		    back_link=url_for('.service_settings', service_id=current_service.id),
-		    back_link_text='Back'
-  	 	) }}
+	    {{ page_footer('Save') }}
   	{% endcall %}
 	{% endif %}
 

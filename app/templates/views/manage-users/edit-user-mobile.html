@@ -1,5 +1,6 @@
 {% extends "withnav_template.html" %}
 {% from "components/textbox.html" import textbox %}
+{% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 
@@ -9,17 +10,17 @@
 
 {% block maincolumn_content %}
 
-  <h1 class="heading-large">Change team member’s mobile number</h1>
+  {{ page_header(
+    'Change team member’s mobile number',
+    back_link=url_for('main.edit_user_permissions', service_id=current_service.id, user_id=user.id)
+  ) }}
+
   <p id="user_name">This will change the mobile number for {{ user.name }}.</p>
   <div class="grid-row">
     <div class="column-three-quarters">
       {% call form_wrapper(class="extra-tracking") %}
         {{ textbox(form.mobile_number) }}
-        {{ page_footer(
-          'Save',
-          back_link=url_for('.edit_user_permissions', service_id=service_id, user_id=user.id),
-          back_link_text="Back"
-        ) }}
+        {{ page_footer('Save') }}
       {% endcall %}
     </div>
   </div>

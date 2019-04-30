@@ -1,6 +1,7 @@
 {% extends "withnav_template.html" %}
 {% from "components/radios.html" import radios %}
-{% from "components/page-footer.html" import page_footer %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer, sticky_page_footer %}
 {% from "components/live-search.html" import live_search %}
 {% from "components/form.html" import form_wrapper %}
 
@@ -10,7 +11,10 @@
 
 {% block maincolumn_content %}
 
-  <h1 class="heading-large">Set email branding</h1>
+  {{ page_header(
+    'Set email branding',
+    back_link=url_for('.service_settings', service_id=current_service.id)
+  ) }}
   {% call form_wrapper(data_kwargs={'preview-type': 'email'}) %}
     <div class="grid-row">
       <div class="column-full preview-pane">
@@ -22,13 +26,7 @@
         {{ radios(form.branding_style) }}
       </div>
     </div>
-    <div class="js-stick-at-bottom-when-scrolling">
-      {{ page_footer(
-        'Preview',
-        back_link=url_for('.service_settings', service_id=current_service.id),
-        back_link_text='Back to settings'
-      ) }}
-    </div>
+    {{ sticky_page_footer('Preview') }}
   {% endcall %}
 
 {% endblock %}

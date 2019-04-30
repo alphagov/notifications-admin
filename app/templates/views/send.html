@@ -1,4 +1,5 @@
 {% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/file-upload.html" import file_upload %}
 {% from "components/message-count-label.html" import recipient_count_label %}
@@ -10,9 +11,10 @@
 
 {% block maincolumn_content %}
 
-  <h1 class="heading-large">
-    Upload a list of {{ recipient_count_label(999, template.template_type) }}
-  </h1>
+  {{ page_header(
+    'Upload a list of {}'.format(recipient_count_label(999, template.template_type)),
+    back_link=url_for('main.send_one_off', service_id=current_service.id, template_id=template.id)
+  ) }}
 
   <div class="page-footer bottom-gutter">
     {{file_upload(

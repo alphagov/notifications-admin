@@ -1,5 +1,6 @@
 {% extends "withnav_template.html" %}
 {% from "components/form.html" import form_wrapper %}
+{% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/task-list.html" import task_list_wrapper, task_list_item %}
 
@@ -10,7 +11,10 @@
 {% block maincolumn_content %}
   <div class="grid-row">
     <div class="column-whole">
-      <h1 class="heading-large">Before you request to go live</h1>
+      {{ page_header(
+        'Before you request to go live',
+        back_link=url_for('main.service_settings', service_id=current_service.id)
+      ) }}
       {% call task_list_wrapper() %}
         {{ task_list_item(
           current_service.has_estimated_usage,

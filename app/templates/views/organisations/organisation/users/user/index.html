@@ -1,5 +1,6 @@
 {% extends "withnav_template.html" %}
 {% from "components/textbox.html" import textbox %}
+{% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 
@@ -9,9 +10,10 @@
 
 {% block maincolumn_content %}
 
-  <h1 class="heading-large">
-    {{ user.name or user.email_localpart }}
-  </h1>
+  {{ page_header(
+    user.name or user.email_localpart,
+    back_link=url_for('.manage_org_users', org_id=current_org.id)
+  ) }}
 
   <p>
     {{ user.email_address }}
@@ -20,8 +22,6 @@
   {% call form_wrapper(class="column-three-quarters") %}
       {{ page_footer(
         'Save',
-        back_link=url_for('.manage_org_users', org_id=current_org.id),
-        back_link_text="Back",
         delete_link=url_for('.remove_user_from_organisation', org_id=current_org.id, user_id=user.id) if user or None,
         delete_link_text='Remove user from organisation'
       ) }}

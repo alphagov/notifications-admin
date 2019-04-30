@@ -1275,8 +1275,8 @@ def test_should_not_allow_creation_of_template_through_form_without_correct_perm
         _follow_redirects=True,
     )
     assert normalize_spaces(page.select('main p')[0].text) == expected_error
-    assert page.select(".page-footer-back-link")[0].text == "Back to templates"
-    assert page.select(".page-footer-back-link")[0]['href'] == url_for(
+    assert page.select(".govuk-back-link")[0].text == "Back"
+    assert page.select(".govuk-back-link")[0]['href'] == url_for(
         '.choose_template',
         service_id=SERVICE_ONE_ID,
         template_id='0',
@@ -1301,8 +1301,8 @@ def test_should_not_allow_creation_of_a_template_without_correct_permission(
     )
     assert page.select('main p')[0].text.strip() == \
         "Sending {} has been disabled for your service.".format(template_description[type_of_template])
-    assert page.select(".page-footer-back-link")[0].text == "Back to templates"
-    assert page.select(".page-footer-back-link")[0]['href'] == url_for(
+    assert page.select(".govuk-back-link")[0].text == "Back"
+    assert page.select(".govuk-back-link")[0]['href'] == url_for(
         '.choose_template',
         service_id=service_one['id'],
         template_id='0',
@@ -1418,8 +1418,8 @@ def test_should_not_allow_template_edits_without_correct_permission(
     )
 
     assert page.select('main p')[0].text.strip() == "Sending text messages has been disabled for your service."
-    assert page.select(".page-footer-back-link")[0].text == "Back to the template"
-    assert page.select(".page-footer-back-link")[0]['href'] == url_for(
+    assert page.select(".govuk-back-link")[0].text == "Back"
+    assert page.select(".govuk-back-link")[0]['href'] == url_for(
         '.view_template',
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
@@ -1539,7 +1539,7 @@ def test_should_show_interstitial_when_making_breaking_change(
     )
 
     assert page.h1.string.strip() == "Confirm changes"
-    assert page.find('a', {'class': 'page-footer-back-link'})['href'] == url_for(
+    assert page.find('a', {'class': 'govuk-back-link'})['href'] == url_for(
         ".edit_service_template",
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,

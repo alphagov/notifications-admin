@@ -1,6 +1,7 @@
 {% extends "withnav_template.html" %}
 {% from "components/checkbox.html" import checkbox %}
 {% from "components/textbox.html" import textbox %}
+{% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 
@@ -10,9 +11,10 @@
 
 {% block maincolumn_content %}
 
-  <h1 class="heading-large">
-    Invite a team member
-  </h1>
+  {{ page_header(
+    'Invite a team member',
+    back_link=url_for('main.manage_users', service_id=current_service.id)
+  ) }}
 
   {% call form_wrapper() %}
 

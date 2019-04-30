@@ -47,7 +47,7 @@
 
   {% else %}
 
-    <div class="grid-row {% if current_service.all_template_folders %}bottom-gutter-1-2{% else %}bottom-gutter-2-3{% endif %}">
+    <div class="grid-row">
       <div class="{% if current_user.has_permissions('manage_templates') %} column-five-sixths {% else %} column-two-thirds {% endif %}">
         {{ folder_path(
           folders=template_folder_path,
@@ -66,7 +66,7 @@
     </div>
   {% endif %}
     {% if show_template_nav %}
-      <div class="bottom-gutter">
+      <div class="bottom-gutter-2-3">
         {{ pill(template_nav_items, current_value=template_type, show_count=False) }}
       </div>
     {% endif %}

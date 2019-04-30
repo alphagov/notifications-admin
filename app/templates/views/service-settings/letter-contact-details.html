@@ -1,5 +1,6 @@
 {% extends "withnav_template.html" %}
 {% from "components/api-key.html" import api_key %}
+{% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/table.html" import row_group, row, text_field, edit_field, field, boolean_field, list_table with context %}
 
@@ -9,12 +10,11 @@
 
 {% block maincolumn_content %}
 
-  <div class="grid-row bottom-gutter">
-    <div class="column-two-thirds">
-      <h1 class="heading-large">
-        Sender addresses
-      </h1>
-    </div>
+  <div class="bottom-gutter">
+    {{ page_header(
+      'Sender addresses',
+      back_link=url_for('main.service_settings', service_id=current_service.id)
+    ) }}
   </div>
   <div class="user-list">
     {% if not letter_contact_details %}

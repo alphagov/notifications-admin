@@ -1,5 +1,6 @@
 {% extends "withnav_template.html" %}
 {% from "components/banner.html" import banner_wrapper %}
+{% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/table.html" import list_table, text_field, index_field, index_field_heading %}
 {% from "components/list.html" import list_of_placeholders %}
@@ -11,7 +12,10 @@
 
 {% block maincolumn_content %}
 
-  <h1 class="heading-large">Confirm changes</h1>
+  {{ page_header(
+    'Confirm changes',
+    back_link=url_for(".edit_service_template", service_id=current_service.id, template_id=new_template.id)
+  ) }}
 
   <div class="bottom-gutter">
     {% if template_change.placeholders_removed %}
@@ -33,11 +37,7 @@
     <input type="hidden" name="template_id" value="{{ new_template.id }}" />
 
     <input type="hidden" name="confirm" value="true" />
-    {{ page_footer(
-      'Save changes to template',
-      back_link=url_for(".edit_service_template", service_id=current_service.id, template_id=new_template.id),
-      back_link_text="Back"
-    ) }}
+    {{ page_footer('Save changes to template') }}
   {% endcall %}
 
   <p>

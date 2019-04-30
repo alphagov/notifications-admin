@@ -1,5 +1,6 @@
 {% extends "withnav_template.html" %}
 {% from "components/radios.html" import radios %}
+{% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 
 {% block service_page_title %}
@@ -8,7 +9,11 @@
 
 {% block maincolumn_content %}
 
-  <h1 class="heading-large">Letter branding</h1>
+  {{ page_header(
+    'Letter branding',
+    back_link=url_for('.view_template', service_id=current_service.id, template_id=from_template) if from_template else url_for('.service_settings', service_id=current_service.id)
+  ) }}
+
   <div class="grid-row">
     <div class="column-three-quarters">
       {% if current_service.letter_branding_id %}
@@ -27,17 +32,6 @@
           <a href="{{ url_for('main.feedback', ticket_type='ask-question-give-feedback', body='letter-branding') }}">Contact support</a>
           if you want to add your organisation’s logo.
         </p>
-      {% endif %}
-      {% if from_template %}
-        {{ page_footer(
-          back_link=url_for('.view_template', service_id=current_service.id, template_id=from_template),
-          back_link_text='Back to template'
-        ) }}
-      {% else %}
-        {{ page_footer(
-          back_link=url_for('.service_settings', service_id=current_service.id),
-          back_link_text='Back to settings'
-        ) }}
       {% endif %}
     </div>
   </div>

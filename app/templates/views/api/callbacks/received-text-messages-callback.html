@@ -1,5 +1,6 @@
 {% extends "withnav_template.html" %}
 {% from "components/textbox.html" import textbox %}
+{% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 
@@ -8,7 +9,10 @@
 {% endblock %}
 
 {% block maincolumn_content %}
-  <h1 class="heading-large">Callbacks for received text messages</h1>
+  {{ page_header(
+    'Callbacks for received text messages',
+    back_link=url_for('.api_callbacks', service_id=current_service.id)
+  ) }}
   <div class="grid-row">
     <div class="column-five-sixths">
       <p>
@@ -28,11 +32,7 @@
           hint='At least 10 characters',
           autocomplete='new-password'
         ) }}
-        {{ page_footer(
-          'Save',
-          back_link=url_for('.api_callbacks', service_id=current_service.id),
-          back_link_text='Back to settings'
-        ) }}
+        {{ page_footer('Save') }}
       {% endcall %}
     </div>
   </div>

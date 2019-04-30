@@ -1,5 +1,6 @@
 {% extends "withnav_template.html" %}
 {% from "components/radios.html" import radios %}
+{% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 
@@ -9,14 +10,14 @@
 
 {% block maincolumn_content %}
 
-  <h1 class="heading-large">Text messages start with service name</h1>
+  {{ page_header(
+    'Text messages start with service name',
+    back_link=url_for('main.service_settings', service_id=current_service.id)
+  ) }}
+
   {% call form_wrapper() %}
     {{ radios(form.enabled) }}
-    {{ page_footer(
-      button_text="Save",
-      back_link=url_for('.service_settings', service_id=current_service.id),
-      back_link_text='Back to settings'
-    ) }}
+    {{ page_footer('Save') }}
   {% endcall %}
 
 {% endblock %}

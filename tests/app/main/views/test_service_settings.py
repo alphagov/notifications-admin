@@ -2127,8 +2127,8 @@ def test_edit_reply_to_email_address(
     ),
     (
         get_default_reply_to_email_address,
-        'Back',
-        partial(url_for, '.service_email_reply_to'),
+        None,
+        None,
     ),
 ])
 def test_shows_delete_link_for_email_reply_to_address(
@@ -2148,10 +2148,18 @@ def test_shows_delete_link_for_email_reply_to_address(
         reply_to_email_id=sample_uuid(),
     )
 
-    last_link = page.select('.page-footer a')[-1]
+    assert page.select_one('.govuk-back-link').text.strip() == 'Back'
+    assert page.select_one('.govuk-back-link')['href'] == url_for(
+        '.service_email_reply_to',
+        service_id=SERVICE_ONE_ID,
+    )
 
-    assert normalize_spaces(last_link.text) == expected_link_text
-    assert last_link['href'] == partial_href(service_id=SERVICE_ONE_ID)
+    if expected_link_text:
+        link = page.select_one('.page-footer a')
+        assert normalize_spaces(link.text) == expected_link_text
+        assert link['href'] == partial_href(service_id=SERVICE_ONE_ID)
+    else:
+        assert not page.select('.page-footer a')
 
 
 def test_confirm_delete_reply_to_email_address(
@@ -2340,8 +2348,8 @@ def test_default_box_shows_on_non_default_sender_details_while_editing(
     ),
     (
         get_default_sms_sender,
-        'Back',
-        partial(url_for, '.service_sms_senders'),
+        None,
+        None,
     ),
 ])
 def test_shows_delete_link_for_sms_sender(
@@ -2361,10 +2369,20 @@ def test_shows_delete_link_for_sms_sender(
         sms_sender_id=sample_uuid(),
     )
 
-    last_link = page.select('.page-footer a')[-1]
+    link = page.select_one('.page-footer a')
+    back_link = page.select_one('.govuk-back-link')
 
-    assert normalize_spaces(last_link.text) == expected_link_text
-    assert last_link['href'] == partial_href(service_id=SERVICE_ONE_ID)
+    assert back_link.text.strip() == 'Back'
+    assert back_link['href'] == url_for(
+        '.service_sms_senders',
+        service_id=SERVICE_ONE_ID,
+    )
+
+    if expected_link_text:
+        assert normalize_spaces(link.text) == expected_link_text
+        assert link['href'] == partial_href(service_id=SERVICE_ONE_ID)
+    else:
+        assert not link
 
 
 def test_confirm_delete_sms_sender(
@@ -2389,8 +2407,8 @@ def test_confirm_delete_sms_sender(
 
 
 @pytest.mark.parametrize('fixture, expected_link_text', [
-    (get_inbound_number_sms_sender, 'Back'),
-    (get_default_sms_sender, 'Back'),
+    (get_inbound_number_sms_sender, None),
+    (get_default_sms_sender, None),
     (get_non_default_sms_sender, 'Delete'),
 ])
 def test_inbound_sms_sender_is_not_deleteable(
@@ -2409,8 +2427,14 @@ def test_inbound_sms_sender_is_not_deleteable(
         sms_sender_id='1234',
     )
 
-    last_link = page.select('.page-footer a')[-1]
-    assert normalize_spaces(last_link.text) == expected_link_text
+    back_link = page.select_one('.govuk-back-link')
+    footer_link = page.select_one('.page-footer a')
+    assert normalize_spaces(back_link.text) == 'Back'
+
+    if expected_link_text:
+        assert normalize_spaces(footer_link.text) == expected_link_text
+    else:
+        assert not footer_link
 
 
 def test_delete_sms_sender(
@@ -2607,12 +2631,17 @@ def test_request_letter_branding(
         **extra_args
     )
     assert request_page.select_one('main p').text.strip() == 'Your letters do not have a logo.'
-    link_href = request_page.select_one('main a')['href']
+    back_link_href = request_page.select('main a')[0]['href']
+    link_href = request_page.select('main a')[1]['href']
+    assert link_href == url_for(
+        'main.feedback',
+        ticket_type='ask-question-give-feedback',
+        body='letter-branding',
+    )
     feedback_page = client_request.get_url(link_href)
     assert feedback_page.select_one('textarea').text.strip() == (
         'I would like my own logo on my letter templates.'
     )
-    back_link_href = request_page.select('main a')[1]['href']
     assert back_link_href == expected_partial_url(service_id=SERVICE_ONE_ID)
 
 
@@ -3837,12 +3866,12 @@ def test_set_inbound_sms_when_inbound_number_is_not_set(
 @pytest.mark.parametrize('user, expected_paragraphs', [
     (active_user_with_permissions, [
         'Your service can receive text messages sent to 07700900123.',
-        'If you want to turn this feature off, get in touch with the GOV.UK Notify team.',
+        'If you want to switch this feature off, get in touch with the GOV.UK Notify team.',
         'You can set up callbacks for received text messages on the API integration page.',
     ]),
     (active_user_no_api_key_permission, [
         'Your service can receive text messages sent to 07700900123.',
-        'If you want to turn this feature off, get in touch with the GOV.UK Notify team.',
+        'If you want to switch this feature off, get in touch with the GOV.UK Notify team.',
     ]),
 ])
 def test_set_inbound_sms_when_inbound_number_is_set(

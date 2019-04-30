@@ -1,5 +1,6 @@
 {% extends "withnav_template.html" %}
 {% from "components/textbox.html" import textbox %}
+{% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 
@@ -10,13 +11,12 @@
 {% block maincolumn_content %}
 
   {% call form_wrapper() %}
-    <h1 class="heading-large">Free text message allowance</h1>
-    {{ textbox(form.free_sms_allowance) }}
-    {{ page_footer(
-      'Save',
-      back_link=url_for('.service_settings', service_id=current_service.id),
-      back_link_text='Back to settings'
+    {{ page_header(
+      'Free text message allowance',
+      back_link=url_for('.service_settings', service_id=current_service.id)
     ) }}
+    {{ textbox(form.free_sms_allowance) }}
+    {{ page_footer('Save') }}
   {% endcall %}
 
 {% endblock %}

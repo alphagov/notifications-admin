@@ -1,5 +1,6 @@
 {% extends "withnav_template.html" %}
 {% from "components/radios.html" import radios %}
+{% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 
@@ -9,15 +10,14 @@
 
 {% block maincolumn_content %}
 
-  <h1 class="heading-large">Set organisation type</h1>
+    {{ page_header(
+      'Set organisation type',
+      back_link=url_for('.service_settings', service_id=current_service.id)
+    ) }}
+
     {% call form_wrapper() %}
       {{ radios(form.organisation_type) }}
-      {{ page_footer(
-        'Save',
-        back_link=url_for('.service_settings', service_id=current_service.id),
-        back_link_text='Back to settings'
-      ) }}
+      {{ page_footer('Save') }}
     {% endcall %}
-  </div>
 
 {% endblock %}

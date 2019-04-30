@@ -1,5 +1,6 @@
 {% extends "withnav_template.html" %}
 {% from "components/textbox.html" import textbox %}
+{% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 
@@ -9,7 +10,10 @@
 
 {% block maincolumn_content %}
 
-  <h1 class="heading-large">{{ heading }}</h1>
+  {{ page_header(
+    heading,
+    back_link=url_for('main.service_settings', service_id=current_service.id)
+  ) }}
 
   <div class="grid-row">
     <div class="column-three-quarters">
@@ -18,8 +22,7 @@
       {{ textbox(form.password) }}
       {{ page_footer(
         'Confirm',
-        destructive=destructive,
-        back_link=url_for('.service_settings', service_id=current_service.id)
+        destructive=destructive
       ) }}
     {% endcall %}
     </div>

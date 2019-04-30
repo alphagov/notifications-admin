@@ -1,5 +1,6 @@
 {% extends "withnav_template.html" %}
 {% from "components/textbox.html" import textbox %}
+{% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 
 {% block service_page_title %}
@@ -10,7 +11,21 @@
 
   <div class="grid-row">
     <div class="column-five-sixths">
-      <h1 class="heading-large">{{ notification_type.capitalize() }} are disabled</h1>
+      {% set
+        back_link_dict = {
+          'add_new_template': '.choose_template',
+          'templates': '.choose_template',
+          'view_template': '.view_template'
+        }
+      %}
+      {{ page_header(
+        '{} are disabled'.format(notification_type.capitalize()),
+        back_link=url_for(
+          back_link_dict[return_to],
+          service_id=current_service.id,
+          template_id=template_id
+        )
+      ) }}
       <p>
         Sending {{ notification_type }} has been disabled for your service.
       </p>
@@ -18,28 +33,6 @@
         If you need to send {{ notification_type }}
         <a href="{{ url_for('.support') }}">get in touch with the GOV.UK Notify team</a>.
       </p>
-
-      {% set
-        back_link_dict = {
-          'add_new_template': {
-            'url' : '.choose_template', 'text': 'Back to templates'
-          },
-          'templates': {
-            'url' : '.choose_template', 'text' : 'Back to templates'
-          },
-          'view_template': {
-            'url' :'.view_template', 'text' : 'Back to the template'
-          }
-        }
-      %}
-
-      {{ page_footer(
-        back_link=url_for(
-          back_link_dict[return_to]['url'],
-          service_id=current_service.id,
-          template_id=template_id),
-        back_link_text=back_link_dict[return_to]['text']
-        ) }}
 
     </div>
   </div>

@@ -1,5 +1,6 @@
 {% extends "withnav_template.html" %}
 {% from "components/textbox.html" import textbox %}
+{% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 
@@ -9,9 +10,10 @@
 
 {% block maincolumn_content %}
 
-  <h1 class="heading-large">
-    Letter contact details
-  </h1>
+  {{ page_header(
+    'Letter contact details',
+    back_link=None if request.args.get('from_template') else url_for('.service_settings', service_id=current_service.id)
+  ) }}
   <div class="grid-row">
     {% call form_wrapper(class="column-half") %}
       {{ textbox(
@@ -22,11 +24,7 @@
         rows=10,
         highlight_tags=True
       ) }}
-      {{ page_footer(
-        'Save',
-        back_link=None if request.args.get('from_template') else url_for('.service_settings', service_id=current_service.id),
-        back_link_text='Back to settings'
-      ) }}
+      {{ page_footer('Save') }}
     {% endcall %}
   </div>
 

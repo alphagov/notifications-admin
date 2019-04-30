@@ -1,5 +1,6 @@
 {% extends "withoutnav_template.html" %}
 {% from "components/table.html" import list_table, field, text_field, link_field, right_aligned_field_heading, hidden_field_heading %}
+{% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 
 {% block per_page_title %}
@@ -9,8 +10,12 @@ Provider versions
 {% block maincolumn_content %}
 
 <div class="grid-row">
-    <div class="column-two-thirds">
-        <h1 class="heading-large">{{ provider_versions[0].display_name }}</h1>
+  <div class="column-two-thirds">
+
+    {{ page_header(
+      provider_versions[0].display_name,
+      back_link=url_for('main.view_providers')
+    ) }}
 
     {% call(item, row_number) list_table(
         provider_versions,
@@ -40,11 +45,6 @@ Provider versions
         {{ text_field(item.active) }}
 
       {% endcall %}
-
-    {{ page_footer(
-      back_link=url_for('main.view_providers'),
-      back_link_text="Back to providers"
-    ) }}
 
     </div>
 </div>

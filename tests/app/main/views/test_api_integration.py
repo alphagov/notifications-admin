@@ -646,7 +646,7 @@ def test_back_link_directs_to_api_integration_from_delivery_callback_if_no_inbou
         _follow_redirects=True,
     )
 
-    assert page.select_one('.page-footer-back-link')['href'] == url_for(
+    assert page.select_one('.govuk-back-link')['href'] == url_for(
         expected_link, service_id=service_one['id']
     )
 
@@ -798,21 +798,21 @@ def test_update_delivery_status_and_receive_text_message_callbacks_without_chang
 @pytest.mark.parametrize('service_callback_api, delivery_url, expected_1st_table_row', [
     (
         None, {},
-        'Callbacks for delivery receipts Not set Change'
+        'Delivery receipts Not set Change'
     ),
     (
         sample_uuid(), {'url': 'https://delivery.receipts'},
-        'Callbacks for delivery receipts https://delivery.receipts Change'
+        'Delivery receipts https://delivery.receipts Change'
     ),
 ])
 @pytest.mark.parametrize('inbound_api, inbound_url, expected_2nd_table_row', [
     (
         None, {},
-        'Callbacks for received text messages Not set Change'
+        'Received text messages Not set Change'
     ),
     (
         sample_uuid(), {'url': 'https://inbound.sms'},
-        'Callbacks for received text messages https://inbound.sms Change'
+        'Received text messages https://inbound.sms Change'
     ),
 ])
 def test_callbacks_page_works_when_no_apis_set(

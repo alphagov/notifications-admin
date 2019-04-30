@@ -1,5 +1,6 @@
 {% extends "withnav_template.html" %}
 {% from "components/textbox.html" import textbox %}
+{% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/radios.html" import radio %}
 {% from "components/select-input.html" import select_wrapper %}
@@ -12,9 +13,10 @@
 {% block maincolumn_content %}
   <div class="grid-row">
     <div class="column-five-sixths">
-      <h1 class="heading-large">
-        {{ 'Change' if 'upload_document' in current_service.permissions else 'Add' }} contact details for ‘Download your document’ page
-      </h1>
+      {{ page_header(
+        '{} contact details for ‘Download your document’ page'.format('Change' if 'upload_document' in current_service.permissions else 'Add'),
+        back_link=url_for('main.service_settings', service_id=current_service.id)
+      ) }}
       <p>
         When you send users a document to download, you need to include the contact details for your service
         on the download page. This is so users can contact you if there’s a problem (for example,
@@ -33,11 +35,7 @@
           {% endfor %}
         {% endcall %}
 
-        {{ page_footer(
-          'Save',
-          back_link=url_for('.service_settings', service_id=current_service.id),
-          back_link_text='Back to settings'
-        ) }}
+        {{ page_footer('Save') }}
       {% endcall %}
     </div>
   </div>

@@ -3,7 +3,7 @@
 {% from "components/radios.html" import radio_select %}
 {% from "components/table.html" import list_table, field, text_field, index_field, hidden_field_heading %}
 {% from "components/file-upload.html" import file_upload %}
-{% from "components/page-footer.html" import page_footer %}
+{% from "components/page-header.html" import govuk_back_link %}
 {% from "components/message-count-label.html" import message_count_label %}
 
 {% set file_contents_header_id = 'file-preview' %}
@@ -18,6 +18,8 @@
 {% endblock %}
 
 {% block maincolumn_content %}
+
+  {{ govuk_back_link(back_link) }}
 
   <div class="bottom-gutter-1-2">
     {% call banner_wrapper(type='dangerous') %}

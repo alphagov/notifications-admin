@@ -2,6 +2,7 @@
 {% from "components/banner.html" import banner_wrapper %}
 {% from "components/table.html" import list_table, field, hidden_field_heading %}
 {% from "components/api-key.html" import api_key %}
+{% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/list-entry.html" import list_entry %}
 {% from "components/form.html" import form_wrapper %}
@@ -32,9 +33,10 @@
       </ul>
     {% endcall %}
   {% else %}
-    <h1 class="heading-large">
-      Whitelist
-    </h1>
+    {{ page_header(
+      'Whitelist',
+      back_link=url_for('main.api_integration', service_id=current_service.id)
+    ) }}
   {% endif %}
 
   <p>
@@ -63,11 +65,7 @@
       </div>
     </div>
 
-    {{ page_footer(
-      'Save',
-      secondary_link=url_for('.api_integration', service_id=current_service.id),
-      secondary_link_text='Back to API integration'
-    ) }}
+    {{ page_footer('Save') }}
 
   {% endcall %}
 

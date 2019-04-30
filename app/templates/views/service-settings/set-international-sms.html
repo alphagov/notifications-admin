@@ -1,5 +1,6 @@
 {% extends "withnav_template.html" %}
 {% from "components/radios.html" import radios %}
+{% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 
@@ -11,7 +12,10 @@
 
   <div class="grid-row">
     <div class="column-five-sixths">
-      <h1 class="heading-large">International text messages</h1>
+      {{ page_header(
+        'International text messages',
+        back_link=url_for('main.service_settings', service_id=current_service.id)
+      ) }}
       <p>
         Messages to international mobile numbers are charged at 1, 2, or
         3 times the cost of messages to UK mobile numbers.</p>
@@ -21,11 +25,7 @@
       </p>
       {% call form_wrapper() %}
         {{ radios(form.enabled) }}
-        {{ page_footer(
-          button_text="Save",
-          back_link=url_for('.service_settings', service_id=current_service.id),
-          back_link_text='Back to settings'
-        ) }}
+        {{ page_footer('Save') }}
       {% endcall %}
     </div>
   </div>

@@ -66,7 +66,7 @@ def test_view_organisation_shows_the_correct_organisation(
         org_id=ORGANISATION_ID,
     )
 
-    assert normalize_spaces(page.select_one('.heading-large').text) == 'Services'
+    assert normalize_spaces(page.select_one('h1').text) == 'Services'
 
 
 def test_create_new_organisation(

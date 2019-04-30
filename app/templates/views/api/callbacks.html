@@ -1,5 +1,6 @@
 {% extends "withnav_template.html" %}
 {% from "components/textbox.html" import textbox %}
+{% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/table.html" import mapping_table, row, text_field, edit_field, optional_text_field with context %}
 
@@ -9,7 +10,10 @@
 {% endblock %}
 
 {% block maincolumn_content %}
-  <h1 class="heading-large">Callbacks</h1>
+  {{ page_header(
+    'Callbacks',
+    back_link=url_for('main.api_integration', service_id=current_service.id)
+  ) }}
   <div class="bottom-gutter-3-2 dashboard-table body-copy-table">
 		{% call mapping_table(
 	    caption='General',
@@ -18,20 +22,16 @@
 	    caption_visible=False
 	  ) %}
 	    {% call row() %}
-	      {{ text_field('Callbacks for delivery receipts') }}
+	      {{ text_field('Delivery receipts') }}
 	      {{ optional_text_field(delivery_status_callback, truncate=true) }}
 	      {{ edit_field('Change', url_for('.delivery_status_callback', service_id=current_service.id)) }}
 	    {% endcall %}
 
 	    {% call row() %}
-	      {{ text_field('Callbacks for received text messages') }}
+	      {{ text_field('Received text messages') }}
           {{ optional_text_field(received_text_messages_callback, truncate=true) }}
 	   	  {{ edit_field('Change', url_for('.received_text_messages_callback', service_id=current_service.id)) }}
 	    {% endcall %}
 	  {% endcall %}
 	</div>
-  {{ page_footer(
-    secondary_link=url_for('.api_integration', service_id=current_service.id),
-    secondary_link_text='Back to API integration'
-  ) }}
 {% endblock %}
