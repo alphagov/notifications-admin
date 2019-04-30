@@ -10,6 +10,11 @@
     Reports
   </h1>
 
-<a target="_blank" href="{{ url_for('main.live_services_csv') }}">Download live services information sheet</a>
+<p>
+  <a target="_blank" href="{{ url_for('main.live_services_csv') }}">Download live services csv report</a>
+</p>
 
+<p>
+  <a target="_blank" href="{{ url_for('main.performance_platform_csv') }}">Download performance platform csv report</a>
+<p>
 {% endblock %}

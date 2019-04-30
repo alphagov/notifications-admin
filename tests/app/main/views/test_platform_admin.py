@@ -940,8 +940,14 @@ def test_reports_page(
     response = client.get(url_for('main.platform_admin_reports'))
 
     assert response.status_code == 200
-    page = response.get_data(as_text=True)
-    assert "Download live services information sheet" in page
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert page.find(
+        'a', text="Download live services csv report"
+    ).attrs['href'] == '/platform-admin/reports/live-services.csv'
+
+    assert page.find(
+        'a', text="Download performance platform csv report"
+    ).attrs['href'] == '/platform-admin/reports/performance-platform.csv'
 
 
 def test_get_live_services_report(client, platform_admin_user, mocker):
@@ -954,12 +960,12 @@ def test_get_live_services_report(client, platform_admin_user, mocker):
             {'service_id': 1, 'service_name': 'jessie the oak tree', 'organisation_name': 'Forest',
                 'consent_to_research': True, 'contact_name': 'Forest fairy',
                 'contact_email': 'forest.fairy@digital.cabinet-office.gov.uk', 'contact_mobile': '+447700900986',
-                'live_date': '2014-03-29', 'sms_volume_intent': 100, 'email_volume_intent': 50,
+                'live_date': 'Sat, 29 Mar 2014 00:00:00 GMT', 'sms_volume_intent': 100, 'email_volume_intent': 50,
                 'letter_volume_intent': 20, 'sms_totals': 300, 'email_totals': 1200, 'letter_totals': 0},
             {'service_id': 2, 'service_name': 'james the pine tree', 'organisation_name': 'Forest',
                 'consent_to_research': None, 'contact_name': None,
                 'contact_email': None, 'contact_mobile': None,
-                'live_date': '2015-03-26', 'sms_volume_intent': None, 'email_volume_intent': 60,
+                'live_date': 'Tue, 15 Mar 2016 00:00:00 GMT', 'sms_volume_intent': None, 'email_volume_intent': 60,
                 'letter_volume_intent': 0, 'sms_totals': 0, 'email_totals': 0, 'letter_totals': 0},
         ]}
     )
@@ -970,6 +976,35 @@ def test_get_live_services_report(client, platform_admin_user, mocker):
         'Service ID,Organisation,Service name,Consent to research,Main contact,Contact email,Contact mobile,'
         + 'Live date,SMS volume intent,Email volume intent,Letter volume intent,SMS sent this year,'
         + 'Emails sent this year,Letters sent this year\r\n1,Forest,jessie the oak tree,True,Forest fairy,'
-        + 'forest.fairy@digital.cabinet-office.gov.uk,+447700900986,2014-03-29,100,50,20,300,1200,0\r\n2,Forest,'
-        + 'james the pine tree,,,,,2015-03-26,,60,0,0,0,0'
+        + 'forest.fairy@digital.cabinet-office.gov.uk,+447700900986,29-03-2014,100,50,20,300,1200,0\r\n2,Forest,'
+        + 'james the pine tree,,,,,15-03-2016,,60,0,0,0,0'
+    )
+
+
+def test_get_performance_platform_report(client, platform_admin_user, mocker):
+    mock_get_user(mocker, user=platform_admin_user)
+    client.login(platform_admin_user)
+
+    mocker.patch(
+        'app.service_api_client.get_live_services_data',
+        return_value={'data': [
+            {'service_id': 1, 'service_name': 'jessie the oak tree', 'organisation_name': 'Forest',
+                'consent_to_research': True, 'contact_name': 'Forest fairy',
+                'contact_email': 'forest.fairy@digital.cabinet-office.gov.uk', 'contact_mobile': '+447700900986',
+                'live_date': 'Sat, 29 Mar 2014 00:00:00 GMT', 'sms_volume_intent': 100, 'email_volume_intent': 50,
+                'letter_volume_intent': 20, 'sms_totals': 300, 'email_totals': 1200, 'letter_totals': 0},
+            {'service_id': 2, 'service_name': 'james the pine tree', 'organisation_name': 'Forest',
+                'consent_to_research': None, 'contact_name': None,
+                'contact_email': None, 'contact_mobile': None,
+                'live_date': 'Tue, 15 Mar 2016 00:00:00 GMT', 'sms_volume_intent': None, 'email_volume_intent': 60,
+                'letter_volume_intent': 0, 'sms_totals': 0, 'email_totals': 0, 'letter_totals': 0},
+        ]}
+    )
+    response = client.get(url_for('main.performance_platform_csv'))
+    assert response.status_code == 200
+    report = response.get_data(as_text=True)
+    assert report.strip() == (
+        'service_id,agency,service_name,_timestamp,service,count'
+        + '\r\n1,Forest,jessie the oak tree,2014-03-29T00:00:00Z,govuk-notify,1'
+        + '\r\n2,Forest,james the pine tree,2016-03-15T00:00:00Z,govuk-notify,1'
     )

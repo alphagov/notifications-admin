@@ -3,15 +3,7 @@ import re
 from collections import OrderedDict
 from datetime import datetime
 
-from flask import (
-    Response,
-    abort,
-    flash,
-    redirect,
-    render_template,
-    request,
-    url_for,
-)
+from flask import abort, flash, redirect, render_template, request, url_for
 from flask_login import login_required
 from notifications_python_client.errors import HTTPError
 from requests import RequestException
@@ -227,7 +219,7 @@ def live_services_csv():
             row["contact_name"],
             row["contact_email"],
             row["contact_mobile"],
-            row["live_date"],
+            datetime.strptime(row["live_date"], '%a, %d %b %Y %X %Z').strftime("%d-%m-%Y"),
             row["sms_volume_intent"],
             row["email_volume_intent"],
             row["letter_volume_intent"],
@@ -235,15 +227,39 @@ def live_services_csv():
             row["email_totals"],
             row["letter_totals"],
         ])
-    return Response(
-        Spreadsheet.from_rows(live_services_data).as_csv_data,
-        mimetype='text/csv',
-        headers={
-            'Content-Disposition': 'inline; filename="{} live services report.csv"'.format(
-                format_date_numeric(datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")),
-            )
-        }
-    )
+
+    return Spreadsheet.from_rows(live_services_data).as_csv_data, 200, {
+        'Content-Type': 'text/csv; charset=utf-8',
+        'Content-Disposition': 'inline; filename="{} live services report.csv"'.format(
+            format_date_numeric(datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")),
+        )
+    }
+
+
+@main.route("/platform-admin/reports/performance-platform.csv")
+@login_required
+@user_is_platform_admin
+def performance_platform_csv():
+    results = service_api_client.get_live_services_data()["data"]
+    live_services_columns = ["service_id", "agency", "service_name", "_timestamp", "service", "count"]
+    live_services_data = []
+    live_services_data.append(live_services_columns)
+    for row in results:
+        live_services_data.append([
+            row["service_id"],
+            row["organisation_name"],
+            row["service_name"],
+            datetime.strptime(row["live_date"], '%a, %d %b %Y %X %Z').strftime("%Y-%m-%dT%H:%M:%S") + "Z",
+            "govuk-notify",
+            1
+        ])
+
+    return Spreadsheet.from_rows(live_services_data).as_csv_data, 200, {
+        'Content-Type': 'text/csv; charset=utf-8',
+        'Content-Disposition': 'inline; filename="{} performance platform report.csv"'.format(
+            format_date_numeric(datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")),
+        )
+    }
 
 
 @main.route("/platform-admin/complaints")
