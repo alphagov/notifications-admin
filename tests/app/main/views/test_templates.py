@@ -3,7 +3,6 @@ from functools import partial
 from unittest.mock import ANY, Mock
 
 import pytest
-from bs4 import BeautifulSoup
 from flask import url_for
 from freezegun import freeze_time
 from notifications_python_client.errors import HTTPError
@@ -426,8 +425,14 @@ def test_user_with_only_send_and_view_sees_letter_page(
         'main.view_template',
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
+        _test_page_title=False,
     )
-    assert page.select_one('h1').text.strip() == 'Two week reminder'
+    assert normalize_spaces(page.select_one('h1').text) == (
+        'Templates / Two week reminder'
+    )
+    assert normalize_spaces(page.select_one('title').text) == (
+        'Two week reminder – Templates – service one – GOV.UK Notify'
+    )
 
 
 @pytest.mark.parametrize('letter_branding, expected_link, expected_link_text', (
@@ -462,6 +467,7 @@ def test_letter_with_default_branding_has_add_logo_button(
         'main.view_template',
         service_id=SERVICE_ONE_ID,
         template_id=TEMPLATE_ONE_ID,
+        _test_page_title=False,
     )
 
     first_edit_link = page.select_one('.template-container a')
@@ -493,6 +499,7 @@ def test_view_letter_template_displays_postage(
         'main.view_template',
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
+        _test_page_title=False,
     )
 
     assert normalize_spaces(page.select_one('.letter-postage').text) == expected_result
@@ -508,6 +515,7 @@ def test_view_non_letter_template_does_not_display_postage(
         '.view_template',
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
+        _test_page_title=False,
     )
     assert "Postage" not in page.text
 
@@ -595,29 +603,33 @@ def test_edit_letter_templates_postage_updates_postage(
     ),
 ])
 def test_should_be_able_to_view_a_template_with_links(
-    client,
+    client_request,
     mock_get_service_template,
     mock_get_template_folders,
     active_user_with_permissions,
     single_letter_contact_block,
-    mocker,
-    service_one,
     fake_uuid,
     permissions,
     links_to_be_shown,
     permissions_warning_to_be_shown,
 ):
-    active_user_with_permissions._permissions[service_one['id']] = permissions + ['view_activity']
-    client.login(active_user_with_permissions, mocker, service_one)
+    active_user_with_permissions._permissions[SERVICE_ONE_ID] = permissions + ['view_activity']
+    client_request.login(active_user_with_permissions)
 
-    response = client.get(url_for(
+    page = client_request.get(
         '.view_template',
-        service_id=service_one['id'],
-        template_id=fake_uuid
-    ))
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _test_page_title=False,
+    )
 
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert normalize_spaces(page.select_one('h1').text) == (
+        'Templates / Two week reminder'
+    )
+    assert normalize_spaces(page.select_one('title').text) == (
+        'Two week reminder – Templates – service one – GOV.UK Notify'
+    )
+
     links_in_page = page.select('.pill-separate-item')
 
     assert len(links_in_page) == len(links_to_be_shown)
@@ -625,7 +637,7 @@ def test_should_be_able_to_view_a_template_with_links(
     for index, link_to_be_shown in enumerate(links_to_be_shown):
         assert links_in_page[index]['href'] == url_for(
             link_to_be_shown,
-            service_id=service_one['id'],
+            service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
         )
 
@@ -644,6 +656,7 @@ def test_should_show_template_id_on_template_page(
         '.view_template',
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
+        _test_page_title=False,
     )
     assert page.select('.api-key-key')[0].text == fake_uuid
 
@@ -668,6 +681,7 @@ def test_should_show_sms_template_with_downgraded_unicode_characters(
         '.view_template',
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
+        _test_page_title=False,
     )
 
     assert rendered_msg in page.text
@@ -688,7 +702,8 @@ def test_should_let_letter_contact_block_be_changed_for_the_template(
     page = client_request.get(
         'main.view_template',
         service_id=SERVICE_ONE_ID,
-        template_id=fake_uuid
+        template_id=fake_uuid,
+        _test_page_title=False,
     )
 
     assert page.find('a', {'class': 'edit-template-link-letter-contact'})['href'] == url_for(
@@ -1814,6 +1829,7 @@ def test_should_show_page_for_a_deleted_template(
         '.view_template',
         service_id=SERVICE_ONE_ID,
         template_id=template_id,
+        _test_page_title=False,
     )
 
     content = str(page)
@@ -2138,6 +2154,7 @@ def test_should_show_hint_once_template_redacted(
         'main.view_template',
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
+        _test_page_title=False,
     )
 
     assert page.select('.hint')[0].text == 'Personalisation is hidden after sending'
@@ -2158,6 +2175,7 @@ def test_should_not_show_redaction_stuff_for_letters(
         'main.view_template',
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
+        _test_page_title=False,
     )
 
     assert page.select('.hint') == []

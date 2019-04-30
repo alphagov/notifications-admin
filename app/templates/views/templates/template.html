@@ -1,12 +1,12 @@
 {% extends "withnav_template.html" %}
 {% from "components/banner.html" import banner_wrapper %}
-{% from "components/folder-path.html" import folder_path %}
+{% from "components/folder-path.html" import folder_path, page_title_folder_path %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/textbox.html" import textbox %}
 {% from "components/api-key.html" import api_key %}
 
 {% block service_page_title %}
-  {{ template.name }}
+  {{ page_title_folder_path(current_service.get_template_path(template._template)) }}
 {% endblock %}
 
 {% block maincolumn_content %}
@@ -35,9 +35,7 @@
           folders=current_service.get_template_path(template._template),
           service_id=current_service.id,
           template_type='all',
-          current_user=current_user,
-          fallback_page_title=template.name,
-          show_fallback_page_title=not current_service.all_template_folders
+          current_user=current_user
         ) }}
       </div>
     </div>
