@@ -21,7 +21,9 @@
 
       {{ textbox(form.name, hint="You can change this later") }}
 
-      {{ radios(form.organisation_type) }}
+      {% if not current_user.default_organisation.organisation_type %}
+        {{ radios(form.organisation_type) }}
+      {% endif %}
 
       {{ page_footer('Add service') }}
 

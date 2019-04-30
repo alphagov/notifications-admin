@@ -1,5 +1,5 @@
 from flask import current_app, redirect, render_template, session, url_for
-from flask_login import login_required
+from flask_login import current_user, login_required
 from notifications_python_client.errors import HTTPError
 
 from app import billing_api_client, service_api_client
@@ -47,14 +47,21 @@ def _create_example_template(service_id):
 @login_required
 @user_is_gov_user
 def add_service():
-    form = CreateServiceForm()
+    form = CreateServiceForm(
+        organisation_type=current_user.default_organisation.organisation_type
+    )
     heading = 'About your service'
 
     if form.validate_on_submit():
         email_from = email_safe(form.name.data)
         service_name = form.name.data
 
-        service_id, error = _create_service(service_name, form.organisation_type.data, email_from, form)
+        service_id, error = _create_service(
+            service_name,
+            current_user.default_organisation.organisation_type or form.organisation_type.data,
+            email_from,
+            form,
+        )
         if error:
             return render_template('views/add-service.html', form=form, heading=heading)
         if len(service_api_client.get_active_services({'user_id': session['user_id']}).get('data', [])) > 1:

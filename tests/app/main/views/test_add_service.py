@@ -2,6 +2,7 @@ import pytest
 from flask import session, url_for
 
 from app.utils import is_gov_user
+from tests.conftest import mock_get_organisation_by_domain
 
 
 def test_non_gov_user_cannot_see_add_service_button(
@@ -18,14 +19,48 @@ def test_non_gov_user_cannot_see_add_service_button(
 
 
 def test_get_should_render_add_service_template(
-    client_request
+    client_request,
+    mock_get_organisation_by_domain,
 ):
     page = client_request.get('main.add_service')
-    assert 'About your service' in page.text
+    assert page.select_one('h1').text.strip() == 'About your service'
+    assert page.select_one('input[name=name]')['value'] == ''
+    assert [
+        label.text.strip() for label in page.select('.multiple-choice label')
+    ] == [
+        'Central government',
+        'Local government',
+        'NHS',
+    ]
+    assert [
+        radio['value'] for radio in page.select('.multiple-choice input')
+    ] == [
+        'central',
+        'local',
+        'nhs',
+    ]
 
 
+def test_get_should_not_render_radios_if_org_type_known(
+    client_request,
+    mocker,
+):
+    mock_get_organisation_by_domain(mocker, organisation_type='central')
+    page = client_request.get('main.add_service')
+    assert page.select_one('h1').text.strip() == 'About your service'
+    assert page.select_one('input[name=name]')['value'] == ''
+    assert not page.select('.multiple-choice')
+
+
+@pytest.mark.parametrize('inherited, posted, persisted, sms_limit', (
+    (None, 'central', 'central', 250000),
+    ('central', None, 'central', 250000),
+    ('nhs', None, 'nhs', 25000),
+    ('local', None, 'local', 25000),
+    ('central', 'local', 'central', 250000),
+))
 def test_should_add_service_and_redirect_to_tour_when_no_services(
-    app_,
+    mocker,
     client_request,
     mock_create_service,
     mock_create_service_template,
@@ -33,12 +68,17 @@ def test_should_add_service_and_redirect_to_tour_when_no_services(
     api_user_active,
     mock_create_or_update_free_sms_fragment_limit,
     mock_get_all_email_branding,
+    inherited,
+    posted,
+    persisted,
+    sms_limit,
 ):
+    mock_get_organisation_by_domain(mocker, organisation_type=inherited)
     client_request.post(
         'main.add_service',
         _data={
             'name': 'testing the post',
-            'organisation_type': 'local',
+            'organisation_type': posted,
         },
         _expected_status=302,
         _expected_redirect=url_for(
@@ -51,8 +91,8 @@ def test_should_add_service_and_redirect_to_tour_when_no_services(
     assert mock_get_services_with_no_services.called
     mock_create_service.assert_called_once_with(
         service_name='testing the post',
-        organisation_type='local',
-        message_limit=app_.config['DEFAULT_SERVICE_LIMIT'],
+        organisation_type=persisted,
+        message_limit=50,
         restricted=True,
         user_id=api_user_active.id,
         email_from='testing.the.post',
@@ -67,7 +107,7 @@ def test_should_add_service_and_redirect_to_tour_when_no_services(
         101,
     )
     assert session['service_id'] == 101
-    mock_create_or_update_free_sms_fragment_limit.assert_called_once_with(101, 25000)
+    mock_create_or_update_free_sms_fragment_limit.assert_called_once_with(101, sms_limit)
 
 
 @pytest.mark.parametrize('organisation_type, free_allowance', [
@@ -81,6 +121,7 @@ def test_should_add_service_and_redirect_to_dashboard_when_existing_service(
     mock_create_service,
     mock_create_service_template,
     mock_get_services,
+    mock_get_organisation_by_domain,
     api_user_active,
     organisation_type,
     free_allowance,
@@ -115,7 +156,8 @@ def test_should_add_service_and_redirect_to_dashboard_when_existing_service(
 
 
 def test_should_return_form_errors_when_service_name_is_empty(
-    client_request
+    client_request,
+    mock_get_organisation_by_domain,
 ):
     page = client_request.post(
         'main.add_service',
@@ -128,7 +170,7 @@ def test_should_return_form_errors_when_service_name_is_empty(
 def test_should_return_form_errors_with_duplicate_service_name_regardless_of_case(
     client_request,
     mock_create_duplicate_service,
-    mock_get_all_email_branding,
+    mock_get_organisation_by_domain,
 ):
     page = client_request.post(
         'main.add_service',
