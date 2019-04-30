@@ -30,7 +30,7 @@
             <label for="{{id}}">{{label}}</label>
           </div>
         {{/choices}}
-        <input type='button' class='js-reset-button js-reset-button-block' value='Back' />
+        <input type='button' class='js-reset-button js-reset-button-block' value='Done' />
       </div>
     `),
     'chosen': Hogan.compile(`
