@@ -36,7 +36,9 @@
       {% endif %}
     </ul>
   {% if can_add_service %}
-    <a href="{{ url_for('.add_service') }}" class="browse-list-link">Add a new service…</a>
+    <div class="js-stick-at-bottom-when-scrolling">
+      <a href="{{ url_for('.add_service') }}" class="button-secondary">Add a new service</a>
+    </div>
   {% endif %}
 
 {% endblock %}

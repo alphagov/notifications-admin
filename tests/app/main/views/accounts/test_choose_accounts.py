@@ -102,7 +102,7 @@ def test_choose_account_should_show_choose_accounts_page_if_no_services(
     assert len(links) == 1
     add_service_link = links[0]
     assert normalize_spaces(page.h1.text) == 'Choose service'
-    assert normalize_spaces(add_service_link.text) == 'Add a new service…'
+    assert normalize_spaces(add_service_link.text) == 'Add a new service'
     assert add_service_link['href'] == url_for('main.add_service')
 
 
