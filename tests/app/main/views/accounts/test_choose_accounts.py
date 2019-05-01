@@ -176,6 +176,7 @@ def test_should_not_show_back_to_service_if_user_doesnt_belong_to_service(
         service_id=mock_get_service.return_value['id'],
         template_id=fake_uuid,
         _expected_status=expected_status,
+        _test_page_title=False,
     )
 
     assert normalize_spaces(
