@@ -16,7 +16,7 @@ def agreement():
     )
 
 
-@main.route('/service/<uuid:service_id>/agreement')
+@main.route('/services/<uuid:service_id>/agreement')
 @login_required
 def service_agreement(service_id):
     return render_template(
