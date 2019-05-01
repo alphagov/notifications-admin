@@ -17,23 +17,7 @@
       GOV.UK Notify data sharing and financial agreement
     </h1>
 
-    <p>
-      Before you can go live on GOV.UK Notify, your organisation needs to agree to our data sharing and financial agreement.
-    </p>
-    <ol class="list list-number">
-      <li>
-        <a href="{{ url_for('main.download_agreement') }}">Download the agreement</a>.
-      </li>
-      <li>
-        Get it signed by someone who has the authority to do so on behalf of {{ owner }}.
-      </li>
-      <li>
-        Return the signed copy to <a href="mailto:notify-support@digital.cabinet-office.gov.uk">notify-support@digital.cabinet-office.gov.uk</a>.
-      </li>
-    </ol>
-    <p>
-      The agreement contains commercially sensitive information, so don’t share it more widely than you need to.
-    </p>
+    {% include 'views/agreement/_agreement.html'%}
 
   </div>
 </div>
