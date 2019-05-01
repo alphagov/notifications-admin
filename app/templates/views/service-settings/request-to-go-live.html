@@ -52,7 +52,7 @@
           {{ task_list_item(
             agreement_signed,
             'Sign our data sharing and financial agreement',
-            url_for('main.agreement'),
+            url_for('main.service_agreement', service_id=current_service.id),
           ) }}
         {% endif %}
       {% endcall %}
