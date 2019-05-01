@@ -10,7 +10,7 @@
       <div class="navigation-service-name">
         {% if current_user.platform_admin %}
           <a href="{{ url_for('.organisations') }}">Organisations</a>
-          &gt;
+          <span class="navigation-breadcrumb"></span>
         {% endif %}
         {{ current_org.name }}
       </div>

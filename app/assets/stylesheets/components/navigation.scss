@@ -40,6 +40,16 @@
 
   }
 
+  &-breadcrumb {
+    display: inline-block;
+    width: 6px;
+    height: 11px;
+    margin: 0 5px;
+    background-image: file-url("separator-2x.png");
+    background-size: 6px 11px;
+    background-repeat: no-repeat;
+  }
+
   li {
     @include core-19;
     margin: 0;
