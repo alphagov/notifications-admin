@@ -4,7 +4,7 @@ from io import BytesIO
 import pytest
 from flask import url_for
 
-from tests.conftest import mock_get_organisation_by_domain
+from tests.conftest import SERVICE_ONE_ID, mock_get_organisation_by_domain
 
 
 class _MockS3Object():
@@ -16,6 +16,22 @@ class _MockS3Object():
         return {'Body': BytesIO(self.data)}
 
 
+@pytest.mark.parametrize('endpoint, extra_args, link_selector, expected_back_links', [
+    (
+        'main.agreement',
+        {},
+        'main .column-two-thirds a',
+        []
+    ),
+    (
+        'main.service_agreement',
+        {'service_id': SERVICE_ONE_ID},
+        'main .column-five-sixths a',
+        [
+            partial(url_for, 'main.request_to_go_live', service_id=SERVICE_ONE_ID)
+        ]
+    ),
+])
 @pytest.mark.parametrize('agreement_signed, crown, expected_links', [
     (
         True, True,
@@ -44,17 +60,23 @@ def test_show_agreement_page(
     client_request,
     mocker,
     fake_uuid,
+    mock_has_jobs,
     agreement_signed,
     crown,
     expected_links,
+    endpoint,
+    extra_args,
+    link_selector,
+    expected_back_links,
 ):
     mock_get_organisation_by_domain(
         mocker,
         crown=crown,
         agreement_signed=agreement_signed,
     )
-    page = client_request.get('main.agreement')
-    links = page.select('main .column-two-thirds a')
+    expected_links = expected_back_links + expected_links
+    page = client_request.get(endpoint, **extra_args)
+    links = page.select(link_selector)
     assert len(links) == len(expected_links)
     for index, link in enumerate(links):
         assert link['href'] == expected_links[index]()

@@ -10,9 +10,18 @@ from app.s3_client.s3_mou_client import get_mou
 @login_required
 def agreement():
     return render_template(
-        'views/{}.html'.format(current_user.default_organisation.as_jinja_template),
+        'views/agreement/{}.html'.format(current_user.default_organisation.as_jinja_template),
         owner=current_user.default_organisation.name,
         navigation_links=features_nav(),
+    )
+
+
+@main.route('/services/<uuid:service_id>/agreement')
+@login_required
+def service_agreement(service_id):
+    return render_template(
+        'views/agreement/service-{}.html'.format(current_user.default_organisation.as_jinja_template),
+        owner=current_user.default_organisation.name,
     )
 
 
@@ -37,7 +46,7 @@ def public_agreement(variant):
         ))
 
     return render_template(
-        'views/agreement-public.html',
+        'views/agreement/agreement-public.html',
         owner=current_user.default_organisation.name,
         download_link=url_for('.public_download_agreement', variant=variant),
     )

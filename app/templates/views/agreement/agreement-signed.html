@@ -17,14 +17,8 @@
       GOV.UK Notify data sharing and financial agreement
     </h1>
 
-    <p>
-      Your organisation ({{ owner }}) has already accepted the GOV.UK
-      Notify data sharing and financial agreement. You can
-      <a href="{{ url_for('main.download_agreement') }}">download a copy</a>.
-    </p>
-    <p>
-      The agreement contains commercially sensitive information, so don’t share it more widely than you need to.
-    </p>
+    {% include 'views/agreement/_agreement-signed.html' %}
+
   </div>
 </div>
 
