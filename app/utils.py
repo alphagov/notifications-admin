@@ -246,7 +246,6 @@ class Spreadsheet():
     def from_rows(cls, rows, filename=''):
         with StringIO() as converted:
             output = csv.writer(converted)
-
             for row in rows:
                 output.writerow(row)
             return cls(converted.getvalue(), filename)

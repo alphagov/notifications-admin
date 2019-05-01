@@ -1,0 +1,20 @@
+{% extends "views/platform-admin/_base_template.html" %}
+
+{% block per_page_title %}
+  Platform admin
+{% endblock %}
+
+{% block platform_admin_content %}
+
+  <h1 class="heading-large">
+    Reports
+  </h1>
+
+<p>
+  <a target="_blank" href="{{ url_for('main.live_services_csv') }}">Download live services csv report</a>
+</p>
+
+<p>
+  <a target="_blank" href="{{ url_for('main.performance_platform_csv') }}">Download performance platform csv report</a>
+<p>
+{% endblock %}

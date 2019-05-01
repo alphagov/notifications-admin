@@ -10,6 +10,7 @@ from requests import RequestException
 
 from app import (
     complaint_api_client,
+    format_date_numeric,
     letter_jobs_client,
     platform_stats_api_client,
     service_api_client,
@@ -28,6 +29,7 @@ from app.statistics_utils import (
 )
 from app.template_previews import validate_letter
 from app.utils import (
+    Spreadsheet,
     generate_next_dict,
     generate_previous_dict,
     get_page_from_request,
@@ -185,6 +187,79 @@ def platform_admin_services():
         ),
         global_stats=create_global_stats(services),
     )
+
+
+@main.route("/platform-admin/reports")
+@login_required
+@user_is_platform_admin
+def platform_admin_reports():
+    return render_template(
+        'views/platform-admin/reports.html'
+    )
+
+
+@main.route("/platform-admin/reports/live-services.csv")
+@login_required
+@user_is_platform_admin
+def live_services_csv():
+    results = service_api_client.get_live_services_data()["data"]
+    live_services_columns = [
+        "Service ID", "Organisation", "Service name", "Consent to research", "Main contact",
+        "Contact email", "Contact mobile", "Live date", "SMS volume intent", "Email volume intent",
+        "Letter volume intent", "SMS sent this year", "Emails sent this year", "Letters sent this year"
+    ]
+    live_services_data = []
+    live_services_data.append(live_services_columns)
+    for row in results:
+        live_services_data.append([
+            row["service_id"],
+            row["organisation_name"],
+            row["service_name"],
+            row["consent_to_research"],
+            row["contact_name"],
+            row["contact_email"],
+            row["contact_mobile"],
+            datetime.strptime(row["live_date"], '%a, %d %b %Y %X %Z').strftime("%d-%m-%Y"),
+            row["sms_volume_intent"],
+            row["email_volume_intent"],
+            row["letter_volume_intent"],
+            row["sms_totals"],
+            row["email_totals"],
+            row["letter_totals"],
+        ])
+
+    return Spreadsheet.from_rows(live_services_data).as_csv_data, 200, {
+        'Content-Type': 'text/csv; charset=utf-8',
+        'Content-Disposition': 'inline; filename="{} live services report.csv"'.format(
+            format_date_numeric(datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")),
+        )
+    }
+
+
+@main.route("/platform-admin/reports/performance-platform.csv")
+@login_required
+@user_is_platform_admin
+def performance_platform_csv():
+    results = service_api_client.get_live_services_data()["data"]
+    live_services_columns = ["service_id", "agency", "service_name", "_timestamp", "service", "count"]
+    live_services_data = []
+    live_services_data.append(live_services_columns)
+    for row in results:
+        live_services_data.append([
+            row["service_id"],
+            row["organisation_name"],
+            row["service_name"],
+            datetime.strptime(row["live_date"], '%a, %d %b %Y %X %Z').strftime("%Y-%m-%dT%H:%M:%S") + "Z",
+            "govuk-notify",
+            1
+        ])
+
+    return Spreadsheet.from_rows(live_services_data).as_csv_data, 200, {
+        'Content-Type': 'text/csv; charset=utf-8',
+        'Content-Disposition': 'inline; filename="{} performance platform report.csv"'.format(
+            format_date_numeric(datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")),
+        )
+    }
 
 
 @main.route("/platform-admin/complaints")
