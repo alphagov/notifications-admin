@@ -16,6 +16,15 @@ def agreement():
     )
 
 
+@main.route('/service/<uuid:service_id>/agreement')
+@login_required
+def service_agreement(service_id):
+    return render_template(
+        'views/agreement/service-{}.html'.format(current_user.default_organisation.as_jinja_template),
+        owner=current_user.default_organisation.name,
+    )
+
+
 @main.route('/agreement.pdf')
 @login_required
 def download_agreement():
