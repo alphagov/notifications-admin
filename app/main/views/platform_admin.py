@@ -219,7 +219,9 @@ def live_services_csv():
             row["contact_name"],
             row["contact_email"],
             row["contact_mobile"],
-            datetime.strptime(row["live_date"], '%a, %d %b %Y %X %Z').strftime("%d-%m-%Y"),
+            datetime.strptime(
+                row["live_date"], '%a, %d %b %Y %X %Z'
+            ).strftime("%d-%m-%Y") if row["live_date"] else None,
             row["sms_volume_intent"],
             row["email_volume_intent"],
             row["letter_volume_intent"],
@@ -249,7 +251,9 @@ def performance_platform_csv():
             row["service_id"],
             row["organisation_name"],
             row["service_name"],
-            datetime.strptime(row["live_date"], '%a, %d %b %Y %X %Z').strftime("%Y-%m-%dT%H:%M:%S") + "Z",
+            datetime.strptime(
+                row["live_date"], '%a, %d %b %Y %X %Z'
+            ).strftime("%Y-%m-%dT%H:%M:%S") + "Z" if row["live_date"] else None,
             "govuk-notify",
             1
         ])

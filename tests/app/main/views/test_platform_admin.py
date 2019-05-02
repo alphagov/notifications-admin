@@ -965,7 +965,7 @@ def test_get_live_services_report(client, platform_admin_user, mocker):
             {'service_id': 2, 'service_name': 'james the pine tree', 'organisation_name': 'Forest',
                 'consent_to_research': None, 'contact_name': None,
                 'contact_email': None, 'contact_mobile': None,
-                'live_date': 'Tue, 15 Mar 2016 00:00:00 GMT', 'sms_volume_intent': None, 'email_volume_intent': 60,
+                'live_date': None, 'sms_volume_intent': None, 'email_volume_intent': 60,
                 'letter_volume_intent': 0, 'sms_totals': 0, 'email_totals': 0, 'letter_totals': 0},
         ]}
     )
@@ -977,7 +977,7 @@ def test_get_live_services_report(client, platform_admin_user, mocker):
         + 'Live date,SMS volume intent,Email volume intent,Letter volume intent,SMS sent this year,'
         + 'Emails sent this year,Letters sent this year\r\n1,Forest,jessie the oak tree,True,Forest fairy,'
         + 'forest.fairy@digital.cabinet-office.gov.uk,+447700900986,29-03-2014,100,50,20,300,1200,0\r\n2,Forest,'
-        + 'james the pine tree,,,,,15-03-2016,,60,0,0,0,0'
+        + 'james the pine tree,,,,,,,60,0,0,0,0'
     )
 
 
@@ -996,7 +996,7 @@ def test_get_performance_platform_report(client, platform_admin_user, mocker):
             {'service_id': 2, 'service_name': 'james the pine tree', 'organisation_name': 'Forest',
                 'consent_to_research': None, 'contact_name': None,
                 'contact_email': None, 'contact_mobile': None,
-                'live_date': 'Tue, 15 Mar 2016 00:00:00 GMT', 'sms_volume_intent': None, 'email_volume_intent': 60,
+                'live_date': None, 'sms_volume_intent': None, 'email_volume_intent': 60,
                 'letter_volume_intent': 0, 'sms_totals': 0, 'email_totals': 0, 'letter_totals': 0},
         ]}
     )
@@ -1006,5 +1006,5 @@ def test_get_performance_platform_report(client, platform_admin_user, mocker):
     assert report.strip() == (
         'service_id,agency,service_name,_timestamp,service,count'
         + '\r\n1,Forest,jessie the oak tree,2014-03-29T00:00:00Z,govuk-notify,1'
-        + '\r\n2,Forest,james the pine tree,2016-03-15T00:00:00Z,govuk-notify,1'
+        + '\r\n2,Forest,james the pine tree,,govuk-notify,1'
     )
