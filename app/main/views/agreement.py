@@ -1,6 +1,7 @@
 from flask import abort, render_template, request, send_file, url_for
 from flask_login import current_user, login_required
 
+from app import current_service
 from app.main import main
 from app.main.views.sub_navigation_dictionaries import features_nav
 from app.s3_client.s3_mou_client import get_mou
@@ -20,8 +21,8 @@ def agreement():
 @login_required
 def service_agreement(service_id):
     return render_template(
-        'views/agreement/service-{}.html'.format(current_user.default_organisation.as_jinja_template),
-        owner=current_user.default_organisation.name,
+        'views/agreement/service-{}.html'.format(current_service.organisation.as_jinja_template),
+        owner=current_service.organisation.name,
     )
 
 

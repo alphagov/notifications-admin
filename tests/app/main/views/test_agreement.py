@@ -4,7 +4,11 @@ from io import BytesIO
 import pytest
 from flask import url_for
 
-from tests.conftest import SERVICE_ONE_ID, mock_get_organisation_by_domain
+from tests.conftest import (
+    SERVICE_ONE_ID,
+    mock_get_organisation_by_domain,
+    mock_get_service_organisation,
+)
 
 
 class _MockS3Object():
@@ -16,16 +20,18 @@ class _MockS3Object():
         return {'Body': BytesIO(self.data)}
 
 
-@pytest.mark.parametrize('endpoint, extra_args, link_selector, expected_back_links', [
+@pytest.mark.parametrize('endpoint, extra_args, organisation_mock, link_selector, expected_back_links', [
     (
         'main.agreement',
         {},
+        mock_get_organisation_by_domain,
         'main .column-two-thirds a',
         []
     ),
     (
         'main.service_agreement',
         {'service_id': SERVICE_ONE_ID},
+        mock_get_service_organisation,
         'main .column-five-sixths a',
         [
             partial(url_for, 'main.request_to_go_live', service_id=SERVICE_ONE_ID)
@@ -66,10 +72,11 @@ def test_show_agreement_page(
     expected_links,
     endpoint,
     extra_args,
+    organisation_mock,
     link_selector,
     expected_back_links,
 ):
-    mock_get_organisation_by_domain(
+    organisation_mock(
         mocker,
         crown=crown,
         agreement_signed=agreement_signed,
