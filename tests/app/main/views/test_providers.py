@@ -19,11 +19,7 @@ stub_providers = {
             'notification_type': 'sms',
             'updated_at': datetime(2017, 1, 16, 15, 20, 40).isoformat(),
             'version': 1,
-            'created_by': {
-                'email_address': 'test@foo.bar',
-                'name': 'Test User',
-                'id': '7cc1dddb-bcbc-4739-8fc1-61bedde3332a'
-            },
+            'created_by_name': 'Test User',
             'supports_international': False,
             'current_month_billable_sms': 5020,
         },
@@ -50,7 +46,8 @@ stub_providers = {
             'updated_at': None,
             'version': 1,
             'created_by': None,
-            'supports_international': False
+            'supports_international': False,
+            'current_month_billable_sms': 0,
         },
         {
             'active': True,
@@ -62,7 +59,8 @@ stub_providers = {
             'updated_at': None,
             'version': 1,
             'created_by': None,
-            'supports_international': False
+            'supports_international': False,
+            'current_month_billable_sms': 0,
         },
         {
             'id': '67c770f5-918e-4afa-a5ff-880b9beb161d',
@@ -74,7 +72,8 @@ stub_providers = {
             'updated_at': None,
             'version': 1,
             'created_by': None,
-            'supports_international': True
+            'supports_international': True,
+            'current_month_billable_sms': 0,
         },
         {
             'id': '67c770f5-918e-4afa-a5ff-880b9beb161d',
@@ -86,6 +85,7 @@ stub_providers = {
             'updated_at': None,
             'version': 1,
             'created_by': None,
+            'current_month_billable_sms': 0,
         }
     ]
 }
@@ -236,6 +236,7 @@ def test_add_monthly_traffic():
         'current_month_billable_sms': 5,
     }, {
         'identifier': 'loadtesting',
+        'current_month_billable_sms': 0,
     }]
 
     add_monthly_traffic(domestic_sms_providers)
@@ -250,6 +251,7 @@ def test_add_monthly_traffic():
         'monthly_traffic': 16
     }, {
         'identifier': 'loadtesting',
+        'current_month_billable_sms': 0,
         'monthly_traffic': 0
     }]
 

@@ -33,14 +33,11 @@ def view_providers():
 
 
 def add_monthly_traffic(domestic_sms_providers):
-    total_sms_sent = sum(provider.get('current_month_billable_sms', 0) for provider in domestic_sms_providers)
+    total_sms_sent = sum(provider['current_month_billable_sms'] for provider in domestic_sms_providers)
 
     for provider in domestic_sms_providers:
-        if provider.get('current_month_billable_sms'):
-            percentage = (provider['current_month_billable_sms'] / total_sms_sent * 100) if total_sms_sent else 0
-            provider['monthly_traffic'] = round(percentage)
-        else:
-            provider['monthly_traffic'] = 0
+        percentage = (provider['current_month_billable_sms'] / total_sms_sent * 100) if total_sms_sent else 0
+        provider['monthly_traffic'] = round(percentage)
 
 
 @main.route("/provider/<provider_id>/edit", methods=['GET', 'POST'])
