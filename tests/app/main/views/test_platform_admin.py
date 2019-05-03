@@ -4,6 +4,7 @@ import uuid
 from functools import partial
 from unittest.mock import ANY, call
 
+import pyexcel
 import pytest
 import requests_mock
 from bs4 import BeautifulSoup
@@ -946,8 +947,8 @@ def test_reports_page(
     ).attrs['href'] == '/platform-admin/reports/live-services.csv'
 
     assert page.find(
-        'a', text="Download performance platform csv report"
-    ).attrs['href'] == '/platform-admin/reports/performance-platform.csv'
+        'a', text="Download performance platform report (.xlsx)"
+    ).attrs['href'] == '/platform-admin/reports/performance-platform.xlsx'
 
 
 def test_get_live_services_report(client, platform_admin_user, mocker):
@@ -1000,11 +1001,13 @@ def test_get_performance_platform_report(client, platform_admin_user, mocker):
                 'letter_volume_intent': 0, 'sms_totals': 0, 'email_totals': 0, 'letter_totals': 0},
         ]}
     )
-    response = client.get(url_for('main.performance_platform_csv'))
+    response = client.get(url_for('main.performance_platform_xlsx'))
     assert response.status_code == 200
-    report = response.get_data(as_text=True)
-    assert report.strip() == (
-        'service_id,agency,service_name,_timestamp,service,count'
-        + '\r\n1,Forest,jessie the oak tree,2014-03-29T00:00:00Z,govuk-notify,1'
-        + '\r\n2,Forest,james the pine tree,,govuk-notify,1'
-    )
+    assert pyexcel.get_array(
+        file_type='xlsx',
+        file_stream=response.get_data(),
+    ) == [
+        ['service_id', 'agency', 'service_name', '_timestamp', 'service', 'count'],
+        ['1', 'Forest', 'jessie the oak tree', '2014-03-29T00:00:00Z', 'govuk-notify', '1'],
+        ['2', 'Forest', 'james the pine tree', '', 'govuk-notify', '1'],
+    ]

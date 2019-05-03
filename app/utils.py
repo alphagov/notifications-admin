@@ -4,7 +4,7 @@ import re
 import unicodedata
 from datetime import datetime, time, timedelta, timezone
 from functools import wraps
-from io import StringIO
+from io import BytesIO, StringIO
 from itertools import chain
 from os import path
 from urllib.parse import urlparse
@@ -12,6 +12,7 @@ from urllib.parse import urlparse
 import ago
 import dateutil
 import pyexcel
+import pyexcel_xlsx
 import yaml
 from flask import abort, current_app, redirect, request, session, url_for
 from flask_login import current_user
@@ -277,6 +278,20 @@ class Spreadsheet():
             filename)
         pyexcel.free_resources()
         return instance
+
+    @property
+    def as_rows(self):
+        return list(csv.reader(
+            self.as_csv_data.strip().splitlines(),
+            quoting=csv.QUOTE_MINIMAL,
+            skipinitialspace=True,
+        ))
+
+    @property
+    def as_excel_file(self):
+        io = BytesIO()
+        pyexcel_xlsx.save_data(io, {'Sheet 1': self.as_rows})
+        return io.getvalue()
 
 
 def get_help_argument():

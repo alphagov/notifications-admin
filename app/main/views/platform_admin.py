@@ -238,10 +238,10 @@ def live_services_csv():
     }
 
 
-@main.route("/platform-admin/reports/performance-platform.csv")
+@main.route("/platform-admin/reports/performance-platform.xlsx")
 @login_required
 @user_is_platform_admin
-def performance_platform_csv():
+def performance_platform_xlsx():
     results = service_api_client.get_live_services_data()["data"]
     live_services_columns = ["service_id", "agency", "service_name", "_timestamp", "service", "count"]
     live_services_data = []
@@ -258,9 +258,9 @@ def performance_platform_csv():
             1
         ])
 
-    return Spreadsheet.from_rows(live_services_data).as_csv_data, 200, {
-        'Content-Type': 'text/csv; charset=utf-8',
-        'Content-Disposition': 'inline; filename="{} performance platform report.csv"'.format(
+    return Spreadsheet.from_rows(live_services_data).as_excel_file, 200, {
+        'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'Content-Disposition': 'attachment; filename="{} performance platform report.xlsx"'.format(
             format_date_numeric(datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")),
         )
     }
