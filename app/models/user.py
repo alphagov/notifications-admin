@@ -35,11 +35,11 @@ permissions = (
 
 
 def _get_service_id_from_view_args():
-    return request.view_args.get('service_id', None)
+    return str(request.view_args.get('service_id', '')) or None
 
 
 def _get_org_id_from_view_args():
-    return request.view_args.get('org_id', None)
+    return str(request.view_args.get('org_id', '')) or None
 
 
 def translate_permissions_from_db_to_admin_roles(permissions):
