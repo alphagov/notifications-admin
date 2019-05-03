@@ -386,11 +386,7 @@ def send_test_step(service_id, template_id, step_index):
     )
 
     try:
-        if request.endpoint == 'main.send_test_step':
-            current_placeholder = placeholders[step_index - 1]
-        else:
-            current_placeholder = placeholders[step_index]
-
+        current_placeholder = placeholders[step_index]
     except IndexError:
         if all_placeholders_in_session(placeholders):
             return get_notification_check_endpoint(service_id, template)
@@ -812,7 +808,7 @@ def get_back_link(service_id, template, step_index):
                 service_id=service_id,
                 template_id=template.id,
             )
-    elif is_current_user_the_recipient() and step_index > 1:
+    elif is_current_user_the_recipient() and step_index >= 1:
         return url_for(
             'main.send_test_step',
             service_id=service_id,

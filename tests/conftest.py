@@ -846,6 +846,20 @@ def mock_get_service_template_with_placeholders(mocker):
 
 
 @pytest.fixture(scope='function')
+def mock_get_service_template_with_multiple_placeholders(mocker):
+    def _get(service_id, template_id, version=None):
+        template = template_json(
+            service_id, template_id, "Two week reminder", "sms", "((one)) ((two)) ((three))"
+        )
+        return {'data': template}
+
+    return mocker.patch(
+        'app.service_api_client.get_service_template',
+        side_effect=_get
+    )
+
+
+@pytest.fixture(scope='function')
 def mock_get_service_template_with_placeholders_same_as_recipient(mocker):
     def _get(service_id, template_id, version=None):
         template = template_json(
