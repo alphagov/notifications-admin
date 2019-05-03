@@ -2,6 +2,7 @@ import pytest
 from flask import session, url_for
 
 from app.utils import is_gov_user
+from tests import organisation_json
 from tests.conftest import mock_get_organisation_by_domain
 
 
@@ -18,10 +19,19 @@ def test_non_gov_user_cannot_see_add_service_button(
     assert response.status_code == 200
 
 
+@pytest.mark.parametrize('org_json', (
+    None,
+    organisation_json(organisation_type=None),
+))
 def test_get_should_render_add_service_template(
     client_request,
-    mock_get_organisation_by_domain,
+    mocker,
+    org_json,
 ):
+    mocker.patch(
+        'app.organisations_client.get_organisation_by_domain',
+        return_value=org_json,
+    )
     page = client_request.get('main.add_service')
     assert page.select_one('h1').text.strip() == 'About your service'
     assert page.select_one('input[name=name]')['value'] == ''

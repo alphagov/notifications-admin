@@ -25,7 +25,11 @@ class Organisation(JSONModel):
         super().__init__(_dict)
 
         if self._dict == {}:
-            self.name, self.crown, self.agreement_signed, self.domains = None, None, None, []
+            self.name = None
+            self.crown = None
+            self.agreement_signed = None
+            self.domains = []
+            self.organisation_type = None
 
     def as_human_readable(self, fallback_domain):
         if 'dwp.' in ''.join(self.domains):
