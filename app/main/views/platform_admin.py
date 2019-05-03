@@ -204,7 +204,7 @@ def platform_admin_reports():
 def live_services_csv():
     results = service_api_client.get_live_services_data()["data"]
     live_services_columns = [
-        "Service ID", "Organisation", "Service name", "Consent to research", "Main contact",
+        "Service ID", "Organisation", "Organisation type", "Service name", "Consent to research", "Main contact",
         "Contact email", "Contact mobile", "Live date", "SMS volume intent", "Email volume intent",
         "Letter volume intent", "SMS sent this year", "Emails sent this year", "Letters sent this year"
     ]
@@ -214,6 +214,7 @@ def live_services_csv():
         live_services_data.append([
             row["service_id"],
             row["organisation_name"],
+            row["organisation_type"],
             row["service_name"],
             row["consent_to_research"],
             row["contact_name"],
