@@ -127,7 +127,7 @@ def get_sms_thread(service_id, user_number):
                     )
                 },
                 notification.get('personalisation'),
-                downgrade_non_gsm_characters=(not is_inbound),
+                downgrade_non_sms_characters=(not is_inbound),
                 redact_missing_personalisation=redact_personalisation,
             ),
             'created_at': notification['created_at'],

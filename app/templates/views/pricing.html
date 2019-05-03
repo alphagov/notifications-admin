@@ -40,10 +40,10 @@
     <p>See <a href="#paying">how to pay</a>.
 
     <h3 class="heading-small">Long text messages</h3>
-    <p>If a text message is beyond a certain length, it’ll be charged as more than one message:</p>
+    <p>If a text message is longer than 160 characters (including spaces), it’ll be charged as more than one message:</p>
     <div class="bottom-gutter-3-2">
       {% call mapping_table(
-        caption='Letter pricing',
+        caption='Text message pricing',
         field_headings=['Message length', 'Charge'],
         field_headings_visible=True,
         caption_visible=False
@@ -53,6 +53,29 @@
           ('Up to 306 characters', '2 text messages'),
           ('Up to 459 characters', '3 text messages'),
           ('Up to 612 characters', '4 text messages'),
+        ] %}
+          {% call row() %}
+            {{ text_field(message_length) }}
+            {{ text_field(charge) }}
+          {% endcall %}
+        {% endfor %}
+      {% endcall %}
+    </div>
+    <h3 class="heading-small">Text messages containing Welsh characters</h3>
+    <p>Long text messages containing Welsh characters (Â, â, Ê, ê, Î, î, Ô, ô, Û, û, Ŵ, ŵ, Ŷ, and ŷ) are charged differently:</p>
+    <div class="bottom-gutter-3-2">
+      {% call mapping_table(
+        caption='Text message pricing',
+        field_headings=['Message length', 'Charge'],
+        field_headings_visible=True,
+        caption_visible=False
+      ) %}
+        {% for message_length, charge in [
+          ('Up to 70 characters', '1 text message'),
+          ('Up to 134 characters', '2 text messages'),
+          ('Up to 201 characters', '3 text messages'),
+          ('Up to 268 characters', '4 text messages'),
+          ('Each additional 67 characters', '1 additional text message'),
         ] %}
           {% call row() %}
             {{ text_field(message_length) }}

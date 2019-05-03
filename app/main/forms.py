@@ -40,7 +40,7 @@ from app.main.validators import (
     DoesNotStartWithDoubleZero,
     LettersNumbersAndFullStopsOnly,
     NoCommasInPlaceHolders,
-    OnlyGSMCharacters,
+    OnlySMSCharacters,
     ValidEmail,
     ValidGovEmail,
 )
@@ -639,7 +639,7 @@ class BaseTemplateForm(StripWhitespaceForm):
 
 class SMSTemplateForm(BaseTemplateForm):
     def validate_template_content(self, field):
-        OnlyGSMCharacters()(None, field)
+        OnlySMSCharacters()(None, field)
 
 
 class EmailTemplateForm(BaseTemplateForm):
