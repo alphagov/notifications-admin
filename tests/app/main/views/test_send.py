@@ -1123,6 +1123,69 @@ def test_send_one_off_or_test_has_correct_page_titles(
     assert (len(page.select('.banner-tour')) == 1) == tour_shown
 
 
+@pytest.mark.parametrize('endpoint, step_index, prefilled, expected_field_label', [
+    (
+        'main.send_test_step',
+        0,
+        {'phone number': '07900900123'},
+        'one',
+    ),
+    (
+        'main.send_one_off_step',
+        0,
+        {},
+        'phone number',
+    ),
+    (
+        'main.send_test_step',
+        1,
+        {'phone number': '07900900123', 'one': 'foo'},
+        'two',
+    ),
+    (
+        'main.send_one_off_step',
+        1,
+        {'phone number': '07900900123'},
+        'one',
+    ),
+    (
+        'main.send_test_step',
+        2,
+        {'phone number': '07900900123', 'one': 'foo', 'two': 'foo'},
+        'three',
+    ),
+    (
+        'main.send_one_off_step',
+        2,
+        {'phone number': '07900900123', 'one': 'one'},
+        'two',
+    ),
+])
+def test_send_one_off_or_test_shows_placeholders_in_correct_order(
+    client_request,
+    fake_uuid,
+    mock_has_no_jobs,
+    mock_get_service_template_with_multiple_placeholders,
+    endpoint,
+    step_index,
+    prefilled,
+    expected_field_label,
+):
+    with client_request.session_transaction() as session:
+        session['recipient'] = None
+        session['placeholders'] = prefilled
+        session['send_test_letter_page_count'] = None
+
+    page = client_request.get(
+        endpoint,
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        step_index=step_index,
+    )
+
+    assert normalize_spaces(page.select_one('label').text) == expected_field_label
+
+
 @pytest.mark.parametrize('user, template_mock, expected_link_text, expected_link_url', [
     (
         active_user_with_permissions,
@@ -1588,6 +1651,31 @@ def test_send_test_sms_message_with_placeholders_shows_first_field(
         assert session['recipient'] == '07700 900762'
 
 
+def test_send_test_sms_message_back_link_with_multiple_placeholders(
+    client_request,
+    mock_get_service_template_with_multiple_placeholders,
+    mock_has_no_jobs,
+):
+    with client_request.session_transaction() as session:
+        session['recipient'] = '07900900123'
+        session['placeholders'] = {'phone number': '07900900123', 'one': 'bar'}
+        session['send_test_letter_page_count'] = None
+
+    page = client_request.get(
+        'main.send_test_step',
+        service_id=SERVICE_ONE_ID,
+        template_id=unchanging_fake_uuid,
+        step_index=2,
+    )
+
+    assert page.select_one('.govuk-back-link')['href'] == url_for(
+        'main.send_test_step',
+        service_id=SERVICE_ONE_ID,
+        template_id=unchanging_fake_uuid,
+        step_index=1,
+    )
+
+
 def test_send_test_letter_clears_previous_page_cache(
     logged_in_platform_admin_client,
     mocker,
@@ -1721,7 +1809,7 @@ def test_send_test_indicates_optional_address_columns(
     )
 
     assert normalize_spaces(page.select('label')[0].text) == (
-        'address line 3 '
+        'address line 4 '  # step_index is 0-indexed so step 3 is address line 4
         'Optional'
     )
     assert page.select('.govuk-back-link')[0]['href'] == url_for(
