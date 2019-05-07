@@ -25,6 +25,9 @@
   </div>
 
   {% if done %}
+
+    {{ banner("Your letters have been sent. Printing starts today at 5:30pm.", type='default', with_tick=True) }}
+
     <p>
       Sent by {{ current_user.name }} today at {{ time_now }}
     </p>
