@@ -226,7 +226,10 @@ class Spreadsheet():
     def __init__(self, csv_data, filename=''):
         self.filename = filename
         self.as_csv_data = csv_data
-        self.as_dict = {
+
+    @property
+    def as_dict(self):
+        return {
             'file_name': self.filename,
             'data': self.as_csv_data
         }
