@@ -16,11 +16,13 @@
       this.fieldLabel = this.$formGroup.data('fieldLabel');
       this.total = this.$checkboxes.length;
 
-      this.addHeadingHideLegend();
-      this.addFooterAndDoneButton();
+      const legendText = this.$fieldset.find('legend').text().trim();
+
+      this.addHeadingHideLegend(legendText);
+      this.addFooterAndDoneButton(legendText);
 
       // create summary from component pieces and match text to current selection
-      this.summary.addContent();
+      this.summary.addContent(legendText);
       this.summary.update(this.getSelection(), this.total, this.fieldLabel);
       this.$fieldset.before(this.summary.$el);
 
@@ -34,14 +36,13 @@
       this.bindEvents();
     };
     this.getSelection = function() { return this.$checkboxes.filter(':checked').length; };
-    this.addHeadingHideLegend = function() {
+    this.addHeadingHideLegend = function(legendText) {
       const headingLevel = this.$formGroup.data('heading-level') || '2';
-      const $legend = this.$fieldset.find('legend');
 
-      this.$heading = $(`<h${headingLevel} class="heading-small">${$legend.text().trim()}</h${headingLevel}>`);
+      this.$heading = $(`<h${headingLevel} class="heading-small">${legendText}</h${headingLevel}>`);
       this.$fieldset.before(this.$heading);
 
-      $legend.addClass('visuallyhidden');
+      this.$fieldset.find('legend').addClass('visuallyhidden');
     };
     this.summary = {
       templates: {
@@ -55,12 +56,13 @@
           }
         }
       },
-      addContent: function() {
+      addContent: function(legendText) {
         const $content = $(`<p>
-                             <span class="selection-summary__text"></span> <button class="button button-secondary">Change</button>
+                               <span class="selection-summary__text"></span>
+                               <button class="button button-secondary">Change<span class="visuallyhidden"> ${legendText}</span></button>
                             </p>`);
 
-        this.$text = $content.find('span');
+        this.$text = $content.find('.selection-summary__text');
         this.$changeButton = $content.find('button');
 
         this.$el.append($content);
@@ -79,9 +81,10 @@
         this.$text.html(this.templates[template](selection, total, field));
       }
     };
-    this.addFooterAndDoneButton = function () {
+    this.addFooterAndDoneButton = function (legendText) {
       this.$footer = $(`<div class="selection-footer">
                           <button class="button button-secondary">
+                            <span class="visuallyhidden">${legendText} are </span>
                             Done
                           </button>
                         </div>`);
