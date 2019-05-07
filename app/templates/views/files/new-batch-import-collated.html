@@ -1,6 +1,7 @@
 {% extends "withnav_template.html" %}
 {% from "components/radios.html" import radios %}
 {% from "components/form.html" import form_wrapper %}
+{% from "components/page-header.html" import page_header %}
 {% from "components/file-upload.html" import file_upload %}
 
 {% block service_page_title %}
@@ -9,9 +10,7 @@
 
 {% block maincolumn_content %}
 
-  <h1 class="heading-large">
-    Upload all your letters in one file
-  </h1>
+  {{ page_header("Upload all your letters in one file", back_link=url_for('main.import_letters_collated_chunk', service_id=current_service.id)) }}
 
   <p>
     Each letter should be {{ page_count }} pages long.

@@ -1,8 +1,8 @@
 {% extends "withnav_template.html" %}
 {% from "components/radios.html" import radios %}
-{% from "components/form.html" import form_wrapper %}
 {% from "components/radios.html" import radios %}
 {% from "components/textbox.html" import textbox %}
+{% from "components/page-header.html" import page_header %}
 
 {% block service_page_title %}
   {{ heading }}
@@ -10,10 +10,7 @@
 
 {% block maincolumn_content %}
 
-  <h1 class="heading-large">
-    {{ heading }}
-  </h1>
-
+  {{ page_header(heading, back_link=back_link) }}
   {{ textbox(form.name) }}
   {{ radios(form.postage) }}
   <a class="button" href="{{ back_link }}">Save</a>

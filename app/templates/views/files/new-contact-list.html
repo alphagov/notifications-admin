@@ -1,6 +1,7 @@
 {% extends "withnav_template.html" %}
 {% from "components/checkbox.html" import checkbox %}
 {% from "components/textbox.html" import textbox %}
+{% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 
@@ -11,7 +12,7 @@
 {% block maincolumn_content %}
 
   <h1 class="heading-large">
-    Upload contact list
+    {{ page_header("Upload contact list", back_link=url_for('main.files', service_id=current_service.id)) }}
   </h1>
 
   <p>

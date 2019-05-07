@@ -2,6 +2,7 @@
 {% from "components/radios.html" import radios %}
 {% from "components/form.html" import form_wrapper %}
 {% from "components/page-footer.html" import page_footer %}
+{% from "components/page-header.html" import page_header %}
 {% from "components/table.html" import list_table, row_heading, field %}
 {% from 'components/big-number.html' import big_number %}
 {% from 'components/message-count-label.html' import message_count_label %}
@@ -14,8 +15,8 @@
 
   <div class="grid-row">
     <div class="column-five-sixths">
-      <h1 class="heading-large">
-        {{ heading }}
+      <h1 class="heading-medium">
+        {{ page_header(heading) }}
       </h1>
     </div>
     <div class="column-one-sixth">
