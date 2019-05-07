@@ -20,7 +20,7 @@
 
       {{ textbox(form.name, hint="You can change this later") }}
 
-      {% if not current_user.default_organisation.organisation_type %}
+      {% if not current_user.default_organisation_type %}
         {{ radios(form.organisation_type) }}
       {% endif %}
 

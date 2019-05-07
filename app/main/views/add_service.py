@@ -48,7 +48,7 @@ def _create_example_template(service_id):
 @user_is_gov_user
 def add_service():
     form = CreateServiceForm(
-        organisation_type=current_user.default_organisation.organisation_type
+        organisation_type=current_user.default_organisation_type
     )
     heading = 'About your service'
 
@@ -58,7 +58,7 @@ def add_service():
 
         service_id, error = _create_service(
             service_name,
-            current_user.default_organisation.organisation_type or form.organisation_type.data,
+            current_user.default_organisation_type or form.organisation_type.data,
             email_from,
             form,
         )
