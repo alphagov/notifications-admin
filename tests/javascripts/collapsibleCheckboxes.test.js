@@ -47,6 +47,7 @@ describe('Collapsible fieldset', () => {
     // set up DOM
     document.body.innerHTML =
       `<div class="form-group" data-module="collapsible-checkboxes" data-field-label="folder">
+        <div class="selection-summary"></div>
         <fieldset id="folder_permissions">
           <legend class="form-label heading-small">
             Folders this team member can see
@@ -98,13 +99,12 @@ describe('Collapsible fieldset', () => {
 
     });
 
-    test("has a summary added before the selected fieldset", () => {
+    test("adds the right content to the summary", () => {
 
-      const summary = helpers.element(fieldset).getPreviousSibling(
-        el => (el.nodeName === 'p') && (el.hasClass('selection-summary'))
-      );
+      const summary = formGroup.querySelector('.selection-summary');
 
-      expect(summary).not.toBeNull();
+      expect(summary.querySelector('p')).not.toBeNull();
+      expect(summary.querySelector('p .selection-summary__text')).not.toBeNull();
 
     });
 

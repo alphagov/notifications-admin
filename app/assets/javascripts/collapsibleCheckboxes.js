@@ -20,7 +20,7 @@
       this.addFooterAndDoneButton();
 
       // create summary from component pieces and match text to current selection
-      this.summary.$el = this.summary.create(this.getSelection(), this.total);
+      this.summary.addContent();
       this.summary.update(this.getSelection(), this.total, this.fieldLabel);
       this.$fieldset.before(this.summary.$el);
 
@@ -55,15 +55,15 @@
           }
         }
       },
-      create: function() {
-        const $el = $(`<p class="selection-summary folder-selection">
-                        <span class="selection-summary__text"></span> <button class="button button-secondary">Change</button>
-                      </p>`);
+      addContent: function() {
+        const $content = $(`<p>
+                             <span class="selection-summary__text"></span> <button class="button button-secondary">Change</button>
+                            </p>`);
 
-        this.$text = $el.find('span');
-        this.$changeButton = $el.find('button');
+        this.$text = $content.find('span');
+        this.$changeButton = $content.find('button');
 
-        return $el;
+        this.$el.append($content);
       },
       update: function(selection, total, field) {
         let template;
