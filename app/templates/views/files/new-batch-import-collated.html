@@ -12,26 +12,19 @@
 
   {{ page_header("Upload all your letters in one file", back_link=url_for('main.import_letters_collated_chunk', service_id=current_service.id)) }}
 
-  <p>
+  <p class="bottom-gutter-1-3">
     Each letter should be {{ page_count }} pages long.
   </p>
 
-  <div class="bottom-gutter">
+  <div class="bottom-gutter-3-2">
     {{ file_upload(form.file, button_text='Choose a file') }}
   </div>
-
-  <h2 class="heading-medium">
-    Check your file meets the letter specification
-  </h2>
 
   <p>
     Your file must be a PDF.
   </p>
   <p>
-    The content of your letter must appear inside the printable area.
-  </p>
-  <p>
-    <a href="https://docs.notifications.service.gov.uk/documentation/images/notify-pdf-letter-spec-v2.3.pdf">Download the letter specification for more information</a>.
+    Each letter must meet <a href="https://docs.notifications.service.gov.uk/documentation/images/notify-pdf-letter-spec-v2.3.pdf">the letter specifciation</a>.
   </p>
 
 {% endblock %}

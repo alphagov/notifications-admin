@@ -2,6 +2,8 @@
 
   .file-upload {
 
+    display: inline-block;
+
     &-label {
 
       @include bold-19;
@@ -58,6 +60,12 @@
         @include bold-19;
       }
 
+    }
+
+    &-secondary {
+      display: inline-block;
+      position: relative;
+      left: -10px;
     }
 
   }

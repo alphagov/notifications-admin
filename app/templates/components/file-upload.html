@@ -7,7 +7,7 @@
   hint=None,
   multiple=False
 ) %}
-  <form method="post" enctype="multipart/form-data" {% if action %}action="{{ action }}"{% endif %} class="{% if field.errors %}form-group-error{% endif %}" data-module="file-upload">
+  <form method="post" enctype="multipart/form-data" {% if action %}action="{{ action }}"{% endif %} class="file-upload {% if field.errors %}form-group-error{% endif %}" data-module="file-upload">
     <label class="file-upload-label" for="{{ field.name }}">
       <span class="visually-hidden">{{ field.label.text }}</span>
       {% if hint %}
