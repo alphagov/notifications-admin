@@ -22,12 +22,22 @@ def view_providers():
         elif provider['notification_type'] == 'email':
             domestic_email_providers.append(provider)
 
+    add_monthly_traffic(domestic_sms_providers)
+
     return render_template(
         'views/providers/providers.html',
         email_providers=domestic_email_providers,
         domestic_sms_providers=domestic_sms_providers,
         intl_sms_providers=intl_sms_providers
     )
+
+
+def add_monthly_traffic(domestic_sms_providers):
+    total_sms_sent = sum(provider['current_month_billable_sms'] for provider in domestic_sms_providers)
+
+    for provider in domestic_sms_providers:
+        percentage = (provider['current_month_billable_sms'] / total_sms_sent * 100) if total_sms_sent else 0
+        provider['monthly_traffic'] = round(percentage)
 
 
 @main.route("/provider/<provider_id>/edit", methods=['GET', 'POST'])
