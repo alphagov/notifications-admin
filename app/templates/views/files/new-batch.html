@@ -85,6 +85,14 @@
     </p>
 
   {% else %}
+
+    {% set addresses = [
+      'Megan Priest',
+      'Olivia Stetler',
+      'Gabriel Suber',
+      'Allan Hugo',
+      'Amala Yousef',
+    ] %}
     {% call(item, row_number) list_table(
       files,
       caption=uploaded_file_name,
@@ -97,21 +105,30 @@
       field_headings_visible=False
     ) %}
       {% call row_heading() %}
-        <a class="file-list-filename" href="{{ url_for('.batch_one_file', service_id=current_service.id, filename=item) }}">{{ item }}</a>
+        <a class="file-list-filename" href="{{ url_for('.batch_one_file', service_id=current_service.id, filename=item) }}">
+          {% if files|length == 1 %}
+            Government Digital Service
+          {% endif %}
+          {% if files|length > 1 %}
+            {{ addresses[row_number - 2] }}
+          {% endif %}
+        </a>
         <p class="file-list-hint">
-          {% if done %}Uploaded today at {{ time_now }}{% else %}Uploaded just now{% endif %}
+          {{ item }}
         </p>
       {% endcall %}
       {% call field(
         status='',
         align='right'
       ) %}
-        {% if done %}
-        {% else %}
-          <span data-module='fake-delay' data-timeout='{{ range(800, files|length * 1000) | random }}' data-message='Checking'>
-            Ready to send
-          </span>
-        {% endif %}
+        <span class="align-with-message-body">
+          {% if done %}
+          {% else %}
+            <span data-module='fake-delay' data-timeout='{{ range(800, files|length * 1000) | random }}' data-message='Checking'>
+              Ready to send
+            </span>
+          {% endif %}
+        </span>
       {% endcall %}
     {% endcall %}
   {% endif %}
