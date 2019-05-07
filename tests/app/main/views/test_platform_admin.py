@@ -989,12 +989,12 @@ def test_get_performance_platform_report(client, platform_admin_user, mocker):
     mocker.patch(
         'app.service_api_client.get_live_services_data',
         return_value={'data': [
-            {'service_id': 1, 'service_name': 'jessie the oak tree', 'organisation_name': 'Forest',
+            {'service_id': 'abc123', 'service_name': 'jessie the oak tree', 'organisation_name': 'Forest',
                 'consent_to_research': True, 'contact_name': 'Forest fairy', 'organisation_type': 'Ecosystem',
                 'contact_email': 'forest.fairy@digital.cabinet-office.gov.uk', 'contact_mobile': '+447700900986',
                 'live_date': 'Sat, 29 Mar 2014 00:00:00 GMT', 'sms_volume_intent': 100, 'email_volume_intent': 50,
                 'letter_volume_intent': 20, 'sms_totals': 300, 'email_totals': 1200, 'letter_totals': 0},
-            {'service_id': 2, 'service_name': 'james the pine tree', 'organisation_name': 'Forest',
+            {'service_id': 'def456', 'service_name': 'james the pine tree', 'organisation_name': 'Forest',
                 'consent_to_research': None, 'contact_name': None, 'organisation_type': 'Ecosystem',
                 'contact_email': None, 'contact_mobile': None,
                 'live_date': None, 'sms_volume_intent': None, 'email_volume_intent': 60,
@@ -1008,6 +1008,6 @@ def test_get_performance_platform_report(client, platform_admin_user, mocker):
         file_stream=response.get_data(),
     ) == [
         ['service_id', 'agency', 'service_name', '_timestamp', 'service', 'count'],
-        ['1', 'Forest', 'jessie the oak tree', '2014-03-29T00:00:00Z', 'govuk-notify', '1'],
-        ['2', 'Forest', 'james the pine tree', '', 'govuk-notify', '1'],
+        ['abc123', 'Forest', 'jessie the oak tree', '2014-03-29T00:00:00Z', 'govuk-notify', 1],
+        ['def456', 'Forest', 'james the pine tree', '', 'govuk-notify', 1],
     ]
