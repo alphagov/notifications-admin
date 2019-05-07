@@ -1,3 +1,31 @@
+.selection-summary {
+
+  .selection-summary__text {
+    display: inline-block;
+    padding: .526315em .789473em .263157em 40px;
+    padding-left: 40px;
+    background-image: file-url('folder-black-bold.svg');
+    background-repeat: no-repeat;
+    background-size: auto 20px;
+    background-position: 0px 8px;
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+  @include ie-lte(8) {
+    background-image: file-url('folder-blue-bold.png');
+  }
+
+  // revert full-width button for smaller screens
+  .button {
+    display: inline-block;
+    width: auto;
+  }
+
+}
+
 .checkboxes-nested {
 
   margin-bottom: 10px;
@@ -39,6 +67,30 @@
       padding-left: 12px;
     }
 
+  }
+
+}
+
+.selection-footer {
+  clear: both;
+  padding-top: $gutter / 6;
+
+  @include media(tablet) {
+    padding-top: $gutter / 3;
+  }
+
+  .button-secondary {
+    // revert full-width button for smaller screens
+    display: inline-block;
+    width: auto;
+  }
+}
+
+// styles specific to the collapsible checkboxes module
+[data-module=collapsible-checkboxes] {
+
+  fieldset:focus {
+    outline: none;
   }
 
 }

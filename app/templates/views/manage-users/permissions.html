@@ -14,7 +14,7 @@
 </fieldset>
 
 {% if current_service.has_permission("edit_folder_permissions") and form.folder_permissions.all_template_folders %}
-  {{ checkboxes_nested(form.folder_permissions, form.folder_permissions.children()) }}
+  {{ checkboxes_nested(form.folder_permissions, form.folder_permissions.children(), hide_legend=True, collapsible_opts={ 'field': 'folder' }) }}
 {% endif %}
 
 {% if service_has_email_auth %}
