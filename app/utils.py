@@ -280,7 +280,7 @@ class Spreadsheet():
         extension = cls.get_extension(filename)
 
         if extension == 'csv':
-            return cls(Spreadsheet.normalise_newlines(file_content), filename=filename)
+            return cls(csv_data=Spreadsheet.normalise_newlines(file_content), filename=filename)
 
         if extension == 'tsv':
             file_content = StringIO(
