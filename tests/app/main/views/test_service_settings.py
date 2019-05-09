@@ -2030,6 +2030,44 @@ def test_add_reply_to_email_address(
 
 
 @pytest.mark.parametrize('fixture, data, api_default_args', [
+    (no_reply_to_email_addresses, {}, True),
+    (multiple_reply_to_email_addresses, {}, False),
+    (multiple_reply_to_email_addresses, {"is_default": "y"}, True)
+])
+def test_add_reply_to_email_address_sends_test_notification(
+    mocker, client_request, fixture, data, api_default_args
+):
+    fixture(mocker)
+    data['email_address'] = "test@example.com"
+    mock_verify = mocker.patch('app.service_api_client.verify_reply_to_email_address', return_value={"id": "123"})
+    client_request.post(
+        'main.service_add_email_reply_to',
+        service_id=SERVICE_ONE_ID,
+        _data=data,
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.verify_reply_to_address',
+            service_id=SERVICE_ONE_ID,
+            notification_id="123",
+            _external=True,
+        )
+    )
+    mock_verify.assert_called_once_with("test@example.com")
+
+
+def test_add_reply_to_email_address_waiting_page():
+    pass
+
+
+def test_add_reply_to_email_address_success():
+    pass
+
+
+def test_add_reply_to_email_address_failure():
+    pass
+
+
+@pytest.mark.parametrize('fixture, data, api_default_args', [
     (no_letter_contact_blocks, {}, True),
     (multiple_letter_contact_blocks, {}, False),
     (multiple_letter_contact_blocks, {"is_default": "y"}, True)

@@ -19,6 +19,7 @@ from app import (
     email_branding_client,
     inbound_number_client,
     letter_branding_client,
+    notification_api_client,
     organisations_client,
     service_api_client,
     user_api_client,
@@ -403,16 +404,27 @@ def service_add_email_reply_to(service_id):
     form = ServiceReplyToEmailForm()
     first_email_address = current_service.count_email_reply_to_addresses == 0
     if form.validate_on_submit():
-        service_api_client.add_reply_to_email_address(
-            current_service.id,
-            email_address=form.email_address.data,
-            is_default=first_email_address if first_email_address else form.is_default.data
-        )
-        return redirect(url_for('.service_email_reply_to', service_id=service_id))
+        notification_id = service_api_client.verify_reply_to_email_address(form.email_address.data)["data"]["id"]
+        return redirect(url_for('.verify_reply_to_address', service_id=service_id, notification_id=notification_id))
+        # service_api_client.add_reply_to_email_address(
+        #     current_service.id,
+        #     email_address=form.email_address.data,
+        #     is_default=first_email_address if first_email_address else form.is_default.data
+        # )
+        # return redirect(url_for('.service_email_reply_to', service_id=service_id))
     return render_template(
         'views/service-settings/email-reply-to/add.html',
         form=form,
         first_email_address=first_email_address)
+
+
+@main.route("/services/<service_id>/service-settings/email-reply-to/<notification_id>/verify", methods=['GET', 'POST'])
+@login_required
+@user_has_permissions('manage_service')
+def verify_reply_to_address(service_id, notification_id):
+    return render_template(
+        'views/service-settings/email-reply-to/verify.html'
+    )
 
 
 @main.route(
