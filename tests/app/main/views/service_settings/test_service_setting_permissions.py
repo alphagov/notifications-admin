@@ -40,8 +40,6 @@ def test_service_set_permission_requires_platform_admin(
 @pytest.mark.parametrize('permission, form_data, on', [
     ('upload_document', 'True', True),
     ('upload_document', 'False', False),
-    ('precompiled_letter', 'True', True),
-    ('precompiled_letter', 'False', False),
     ('inbound_sms', 'True', True),
     ('inbound_sms', 'False', False),
     ('email_auth', 'True', True),
@@ -73,12 +71,6 @@ def test_service_set_permission(
 @pytest.mark.parametrize('service_fields, endpoint, kwargs, text', [
     ({'restricted': True}, '.service_switch_live', {}, 'Live Off Change'),
     ({'restricted': False}, '.service_switch_live', {}, 'Live On Change'),
-
-    ({'permissions': ['letter', 'precompiled_letter']},
-     '.service_set_permission', {'permission': 'precompiled_letter'}, 'Send precompiled letters On Change'),
-    ({'permissions': ['letter']},
-     '.service_set_permission', {'permission': 'precompiled_letter'}, 'Send precompiled letters Off Change'),
-
     ({'permissions': ['upload_document']},
      '.service_switch_can_upload_document', {}, 'Uploading documents On Change'),
     ({'permissions': []},
@@ -120,11 +112,8 @@ def test_service_setting_button_toggles(
 @pytest.mark.parametrize('permissions,permissions_text,visible', [
     ('sms', 'inbound SMS', True),
     ('inbound_sms', 'inbound SMS', False),                 # no sms parent permission
-    ('letter', 'precompiled letters', True),
-    ('precompiled_letter', 'precompiled letters', False),  # no letter parent permission
     # also test no permissions set
     ('', 'inbound SMS', False),
-    ('', 'precompiled letters', False)
 ])
 def test_service_settings_doesnt_show_option_if_parent_permission_disabled(
     get_service_settings_page,
