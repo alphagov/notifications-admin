@@ -210,11 +210,11 @@ generate-manifest:
 cf-deploy: ## Deploys the app to Cloud Foundry
 	$(if ${CF_SPACE},,$(error Must specify CF_SPACE))
 	@cf app --guid notify-admin || exit 1
-	cf rename notify-admin notify-admin-rollback
-	cf push -f <(make -s generate-manifest)
-	cf scale -i $$(cf curl /v2/apps/$$(cf app --guid notify-admin-rollback) | jq -r ".entity.instances" 2>/dev/null || echo "1") notify-admin
-	cf stop notify-admin-rollback
-	cf delete -f notify-admin-rollback
+	# cancel any existing deploys to ensure we can apply manifest (if a deploy is in progress you'll see ScaleDisabledDuringDeployment)
+	cf v3-cancel-zdt-push ${CF_APP} || true
+
+	cf v3-apply-manifest ${CF_APP} -f <(make -s generate-manifest)
+	cf v3-zdt-push ${CF_APP} --wait-for-deploy-complete  # fails after 5 mins if deploy doesn't work
 
 .PHONY: cf-deploy-prototype
 cf-deploy-prototype: cf-target ## Deploys the first prototype to Cloud Foundry
@@ -225,11 +225,8 @@ cf-deploy-prototype-2: cf-target ## Deploys the second prototype to Cloud Foundr
 	cf push -f <(CF_APP=notify-admin-prototype-2 make -s generate-manifest)
 
 .PHONY: cf-rollback
-cf-rollback: ## Rollbacks the app to the previous release
-	@cf app --guid notify-admin-rollback || exit 1
-	@[ $$(cf curl /v2/apps/`cf app --guid notify-admin-rollback` | jq -r ".entity.state") = "STARTED" ] || (echo "Error: rollback is not possible because notify-admin-rollback is not in a started state" && exit 1)
-	cf delete -f notify-admin || true
-	cf rename notify-admin-rollback notify-admin
+cf-rollback: cf-target ## Rollbacks the app to the previous release
+	cf v3-cancel-zdt-push ${CF_APP}
 
 .PHONY: cf-push
 cf-push:
