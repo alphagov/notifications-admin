@@ -1,8 +1,8 @@
 .selection-summary {
 
   .selection-summary__text {
-    display: inline-block;
     padding: .526315em .789473em .263157em 0px;
+    margin-bottom: $gutter / 2;
 
     &:focus {
       outline: none;
@@ -76,13 +76,16 @@
 
 }
 
+.selection-content {
+  margin-bottom: ($gutter / 3) * 2;
+
+  .checkboxes-nested {
+    margin-bottom: 0;
+  }
+}
+
 .selection-footer {
   clear: both;
-  padding-top: $gutter / 6;
-
-  @include media(tablet) {
-    padding-top: $gutter / 3;
-  }
 
   .button-secondary {
     // revert full-width button for smaller screens
@@ -92,8 +95,7 @@
 }
 
 // styles specific to the collapsible checkboxes module
-[data-module=collapsible-checkboxes] {
-
+.selection-wrapper {
   fieldset:focus {
     outline: none;
   }

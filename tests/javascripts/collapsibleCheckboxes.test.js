@@ -89,6 +89,13 @@ describe('Collapsible fieldset', () => {
 
     });
 
+    test("adds the right classes to the group and fieldset", () => {
+
+      expect(formGroup.classList.contains('selection-wrapper')).toBe(true);
+      expect(fieldset.classList.contains('selection-content')).toBe(true);
+
+    });
+
     test("adds a heading before the selected fieldset", () => {
 
       const heading = helpers.element(fieldset).getPreviousSibling(
@@ -101,12 +108,10 @@ describe('Collapsible fieldset', () => {
 
     test("adds the right content and classes to the summary", () => {
 
-      const summary = formGroup.querySelector('.selection-summary');
+      const summary = formGroup.querySelector('.selection-summary__text');
 
-      expect(summary.querySelector('p')).not.toBeNull();
-      expect(summary.querySelector('p .selection-summary__text')).not.toBeNull();
-      debugger;
-      expect(summary.querySelector('p .selection-summary__text').classList.contains('selection-summary__text--folders')).toBe(true);
+      expect(summary).not.toBeNull();
+      expect(summary.classList.contains('selection-summary__text--folders')).toBe(true);
 
     });
 
@@ -118,36 +123,18 @@ describe('Collapsible fieldset', () => {
 
     });
 
-    test("has a change button", () => {
+    test("has a button to expand the fieldset", () => {
 
-      const changeButton = document.querySelector('.selection-summary .button');
+      const button = formGroup.querySelector('.button');
 
-      expect(changeButton).not.toBeNull();
-      expect(changeButton.textContent).toEqual('Change Folders this team member can see');
-
-    });
-
-    test("has a 'Done' button", () => {
-
-      const nextEl = fieldset.querySelector('.button');
-
-      expect(helpers.element(nextEl).nodeName).toEqual('button');
+      expect(button).not.toBeNull();
+      expect(button.textContent.trim()).toEqual('Choose folders');
 
     });
 
-    test("has the correct aria attributes on both buttons", () => {
+    test("has the correct aria attributes on the button", () => {
 
-      const changeButton = document.querySelector('.selection-summary .button');
-      const doneButton = fieldset.querySelector('.button');
-
-      // check change button
-      expect(helpers.element(changeButton).hasAttributesSetTo({
-        'aria-controls': fieldset.getAttribute('id'),
-        'aria-expanded': 'false'
-      })).toBe(true);
-
-      // check done button
-      expect(helpers.element(doneButton).hasAttributesSetTo({
+      expect(helpers.element(formGroup.querySelector('.button')).hasAttributesSetTo({
         'aria-controls': fieldset.getAttribute('id'),
         'aria-expanded': 'false'
       })).toBe(true);
@@ -170,7 +157,7 @@ describe('Collapsible fieldset', () => {
     const summaryText = document.querySelector('.selection-summary__text');
 
     // default state is for none to be selected
-    expect(summaryText.textContent).toEqual("No folders (only templates outside a folder)");
+    expect(summaryText.textContent.trim()).toEqual("No folders (only templates outside a folder)");
 
   });
 
@@ -186,7 +173,7 @@ describe('Collapsible fieldset', () => {
 
     const summaryText = document.querySelector('.selection-summary__text');
 
-    expect(summaryText.textContent).toEqual("3 of 10 folders");
+    expect(summaryText.textContent.trim()).toEqual("3 of 10 folders");
 
   });
 
@@ -200,7 +187,7 @@ describe('Collapsible fieldset', () => {
 
     const summaryText = document.querySelector('.selection-summary__text');
 
-    expect(summaryText.textContent).toEqual("All folders");
+    expect(summaryText.textContent.trim()).toEqual("All folders");
 
   });
 
@@ -217,20 +204,14 @@ describe('Collapsible fieldset', () => {
 
   });
 
-  describe("when 'change' is clicked", () => {
-
-    let changeButton;
-    let doneButton;
+  describe("when button is clicked while the fieldset is collapsed", () => {
 
     beforeEach(() => {
 
       // start module
       window.GOVUK.modules.start();
 
-      doneButton = fieldset.querySelector('.button');
-      changeButton = document.querySelector('.selection-summary .button');
-
-      helpers.triggerEvent(changeButton, 'click');
+      helpers.triggerEvent(formGroup.querySelector('.button'), 'click');
 
     });
 
@@ -239,37 +220,39 @@ describe('Collapsible fieldset', () => {
       expect(helpers.element(fieldset).is('hidden')).toBe(false);
 
     });
+
     test("it focuses the fieldset", () => {
 
       expect(document.activeElement).toBe(fieldset);
 
     });
+
     test("it uses ARIA to mark the checkboxes as expanded", () => {
 
-      expect(changeButton.getAttribute('aria-expanded')).toEqual('true');
-      expect(doneButton.getAttribute('aria-expanded')).toEqual('true');
+      expect(formGroup.querySelector('.button').getAttribute('aria-expanded')).toEqual('true');
 
     });
+
+    test("it changes it's text to indicate it's new action", () => {
+
+      expect(formGroup.querySelector('.button').textContent.trim()).toEqual("Done choosing folders");
+
+    });
+
   });
 
-  describe("when 'done' is clicked", () => {
-
-    let changeButton;
-    let doneButton;
+  describe("when button is clicked when the fieldset is expanded", () => {
 
     beforeEach(() => {
 
       // start module
       window.GOVUK.modules.start();
 
-      doneButton = fieldset.querySelector('.button');
-      changeButton = document.querySelector('.selection-summary .button');
-
       // show the checkboxes
-      helpers.triggerEvent(changeButton, 'click');
+      helpers.triggerEvent(formGroup.querySelector('.button'), 'click');
 
-      // click the done button
-      helpers.triggerEvent(doneButton, 'click');
+      // click the button
+      helpers.triggerEvent(formGroup.querySelector('.button'), 'click');
 
     });
 
@@ -287,8 +270,13 @@ describe('Collapsible fieldset', () => {
 
     test("it uses ARIA to mark the checkboxes as collapsed", () => {
 
-      expect(changeButton.getAttribute('aria-expanded')).toEqual('false');
-      expect(doneButton.getAttribute('aria-expanded')).toEqual('false');
+      expect(formGroup.querySelector('.button').getAttribute('aria-expanded')).toEqual('false');
+
+    });
+
+    test("it changes it's text to indicate it's new action", () => {
+
+      expect(formGroup.querySelector('.button').textContent.trim()).toEqual("Choose folders");
 
     });
   });
@@ -296,8 +284,7 @@ describe('Collapsible fieldset', () => {
   describe("when the selection changes", () => {
 
     const showCheckboxes = () => {
-      changeButton = document.querySelector('.selection-summary .button');
-      helpers.triggerEvent(changeButton, 'click');
+      helpers.triggerEvent(formGroup.querySelector('.button'), 'click');
     };
 
     const checkFirstCheckbox = () => {
@@ -321,8 +308,6 @@ describe('Collapsible fieldset', () => {
       });
     };
 
-    let changeButton;
-
     describe("from some to none the summary updates to reflect that", () => {
 
       test("if fields are called 'folders'", () => {
@@ -341,7 +326,7 @@ describe('Collapsible fieldset', () => {
         // click the first checkbox
         helpers.triggerEvent(checkboxes[0], 'click');
 
-        expect(summaryText.textContent).toEqual("No folders (only templates outside a folder)");
+        expect(summaryText.textContent.trim()).toEqual("No folders (only templates outside a folder)");
 
       });
 
@@ -361,7 +346,7 @@ describe('Collapsible fieldset', () => {
         // click the first checkbox
         helpers.triggerEvent(checkboxes[0], 'click');
 
-        expect(summaryText.textContent).toEqual("No team members (only you)");
+        expect(summaryText.textContent.trim()).toEqual("No team members (only you)");
 
       });
 
@@ -381,7 +366,7 @@ describe('Collapsible fieldset', () => {
         // click the first checkbox
         helpers.triggerEvent(checkboxes[0], 'click');
 
-        expect(summaryText.textContent).toEqual("No arbitrary things");
+        expect(summaryText.textContent.trim()).toEqual("No arbitrary things");
 
       });
 
@@ -405,7 +390,7 @@ describe('Collapsible fieldset', () => {
         // click the first checkbox
         helpers.triggerEvent(checkboxes[1], 'click');
 
-        expect(summaryText.textContent).toEqual("9 of 10 folders");
+        expect(summaryText.textContent.trim()).toEqual("9 of 10 folders");
 
       });
 
@@ -425,7 +410,7 @@ describe('Collapsible fieldset', () => {
         // click the first checkbox
         helpers.triggerEvent(checkboxes[1], 'click');
 
-        expect(summaryText.textContent).toEqual("9 of 10 team members");
+        expect(summaryText.textContent.trim()).toEqual("9 of 10 team members");
 
       });
 
@@ -448,7 +433,7 @@ describe('Collapsible fieldset', () => {
 
         helpers.triggerEvent(checkboxes[0], 'click');
 
-        expect(summaryText.textContent).toEqual("All folders");
+        expect(summaryText.textContent.trim()).toEqual("All folders");
 
       });
 
@@ -467,7 +452,7 @@ describe('Collapsible fieldset', () => {
 
         helpers.triggerEvent(checkboxes[0], 'click');
 
-        expect(summaryText.textContent).toEqual("All team members");
+        expect(summaryText.textContent.trim()).toEqual("All team members");
 
       });
 

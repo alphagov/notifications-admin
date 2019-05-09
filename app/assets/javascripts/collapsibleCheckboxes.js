@@ -12,34 +12,37 @@
       this.$formGroup = $(component);
       this.$fieldset = this.$formGroup.find('fieldset');
       this.$checkboxes = this.$fieldset.find('input[type=checkbox]');
-      this.summary.$el = this.$formGroup.find('.selection-summary');
       this.fieldLabel = this.$formGroup.data('fieldLabel');
       this.total = this.$checkboxes.length;
+      this.legendText = this.$fieldset.find('legend').text().trim();
+      this.expanded = false;
 
-      const legendText = this.$fieldset.find('legend').text().trim();
+      this.addHeadingHideLegend();
 
-      this.addHeadingHideLegend(legendText);
-      this.addFooterAndDoneButton(legendText);
+      // generate summary and footer
+      this.summary.$el = this.$formGroup.find('.selection-summary');
+      this.footer.$el = this.footer.getEl(this);
+      this.footer.update(this);
 
       // create summary from component pieces and match text to current selection
-      this.summary.addContent(legendText, this.fieldLabel);
+      this.summary.addContent(this.legendText, this.fieldLabel);
       this.summary.update(this.getSelection(), this.total, this.fieldLabel);
       this.$fieldset.before(this.summary.$el);
 
+      // add custom classes
+      this.$formGroup.addClass('selection-wrapper');
+      this.$fieldset.addClass('selection-content');
+
       // hide checkboxes
       this.$fieldset.hide();
-      this.expanded = false;
-
-      // set semantic relationships with aria attributes
-      this.addARIAToButtons();
 
       this.bindEvents();
     };
     this.getSelection = function() { return this.$checkboxes.filter(':checked').length; };
-    this.addHeadingHideLegend = function(legendText) {
+    this.addHeadingHideLegend = function() {
       const headingLevel = this.$formGroup.data('heading-level') || '2';
 
-      this.$heading = $(`<h${headingLevel} class="heading-small">${legendText}</h${headingLevel}>`);
+      this.$heading = $(`<h${headingLevel} class="heading-small">${this.legendText}</h${headingLevel}>`);
       this.$fieldset.before(this.$heading);
 
       this.$fieldset.find('legend').addClass('visuallyhidden');
@@ -54,17 +57,11 @@
         }[field] || `No ${field}s`)
       },
       addContent: function(legendText, fieldLabel) {
-        const $content = $(`<p>
-                               <span class="selection-summary__text"></span>
-                               <button class="button button-secondary">Change<span class="visuallyhidden"> ${legendText}</span></button>
-                            </p>`);
-
-        this.$text = $content.find('.selection-summary__text');
-        this.$changeButton = $content.find('button');
+        this.$text = $(`<p class="selection-summary__text" />`);
 
         if (fieldLabel === 'folder') { this.$text.addClass('selection-summary__text--folders'); }
 
-        this.$el.append($content);
+        this.$el.append(this.$text);
       },
       update: function(selection, total, field) {
         let template;
@@ -80,34 +77,38 @@
         this.$text.html(this.templates[template](selection, total, field));
       }
     };
-    this.addFooterAndDoneButton = function (legendText) {
-      this.$footer = $(`<div class="selection-footer">
-                          <button class="button button-secondary">
-                            <span class="visuallyhidden">${legendText} are </span>
-                            Done
-                          </button>
-                        </div>`);
+    this.footer = {
+      buttonContent: {
+        change: (fieldLabel) => `Choose ${fieldLabel}s`,
+        done: (fieldLabel) => `Done<span class="visuallyhidden"> choosing ${fieldLabel}s</span>`
+      },
+      getEl: function (module) {
+        const buttonState = module.expanded ? 'done' : 'change';
+        const buttonContent = this.buttonContent[buttonState](module.fieldLabel);
 
-      this.$doneButton = this.$footer.find('.button');
-      this.$fieldset.append(this.$footer);
-    };
-    this.addARIAToButtons = function () {
-      const aria = {
-        'aria-expanded': this.expanded,
-        'aria-controls': this.$fieldset.attr('id')
-      };
+        return $(`<div class="selection-footer">
+                  <button
+                    class="button button-secondary"
+                    aria-expanded="${module.expanded ? 'true' : 'false'}"
+                    aria-controls="${module.$fieldset.attr('id')}">
+                  ${buttonContent}
+                  </button>
+                </div>`);
+      },
+      update: function (module) {
+        this.$el.remove();
+        this.$el = this.getEl(module);
 
-      this.summary.$changeButton.attr(aria);
-      this.$doneButton.attr(aria);
+        module.$formGroup.append(this.$el);
+      }
     };
     this.expand = function(e) {
       if (e !== undefined) { e.preventDefault(); }
 
       if (!this.expanded) {
         this.$fieldset.show();
-        this.summary.$changeButton.attr('aria-expanded', true);
-        this.$doneButton.attr('aria-expanded', true);
         this.expanded = true;
+        this.footer.update(this);
       }
 
       // shift focus whether expanded or not
@@ -118,13 +119,19 @@
 
       if (this.expanded) {
         this.$fieldset.hide();
-        this.summary.$changeButton.attr('aria-expanded', false);
-        this.$doneButton.attr('aria-expanded', false);
         this.expanded = false;
+        this.footer.update(this);
       }
 
       // shift focus whether expanded or not
       _focusTextElement(this.summary.$text);
+    };
+    this.handleClick = function(e) {
+      if (this.expanded) {
+        this.collapse(e);
+      } else {
+        this.expand(e);
+      }
     };
     this.handleSelection = function(e) {
       this.summary.update(this.getSelection(), this.total, this.fieldLabel);
@@ -132,8 +139,7 @@
     this.bindEvents = function() {
       const self = this;
 
-      this.summary.$changeButton.on('click', this.expand.bind(this));
-      this.$doneButton.on('click', this.collapse.bind(this));
+      this.$formGroup.on('click', '.button', this.handleClick.bind(this));
       this.$checkboxes.on('click', this.handleSelection.bind(this));
 
       // take summary out of tab order when focus moves
