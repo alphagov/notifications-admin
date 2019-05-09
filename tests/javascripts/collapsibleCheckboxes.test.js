@@ -99,12 +99,14 @@ describe('Collapsible fieldset', () => {
 
     });
 
-    test("adds the right content to the summary", () => {
+    test("adds the right content and classes to the summary", () => {
 
       const summary = formGroup.querySelector('.selection-summary');
 
       expect(summary.querySelector('p')).not.toBeNull();
       expect(summary.querySelector('p .selection-summary__text')).not.toBeNull();
+      debugger;
+      expect(summary.querySelector('p .selection-summary__text').classList.contains('selection-summary__text--folders')).toBe(true);
 
     });
 
@@ -199,6 +201,19 @@ describe('Collapsible fieldset', () => {
     const summaryText = document.querySelector('.selection-summary__text');
 
     expect(summaryText.textContent).toEqual("All folders");
+
+  });
+
+  test("the summary doesn't have a folder icon if fields aren't called 'folder'", () => {
+    
+    formGroup.dataset.fieldLabel = 'team member';
+
+    // start module
+    window.GOVUK.modules.start();
+
+    const summaryText = document.querySelector('.selection-summary__text');
+
+    expect(summaryText.classList.contains('.selection-summary__text-label')).toBe(false);
 
   });
 

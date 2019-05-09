@@ -2,20 +2,23 @@
 
   .selection-summary__text {
     display: inline-block;
-    padding: .526315em .789473em .263157em 40px;
-    padding-left: 51px;
-    background-image: file-url('folder-black.svg');
-    background-repeat: no-repeat;
-    background-size: 39px auto;
-    background-position: 0px 4px;
+    padding: .526315em .789473em .263157em 0px;
 
     &:focus {
       outline: none;
     }
   }
 
-  @include ie-lte(8) {
-    background-image: file-url('folder-blue-bold.png');
+  .selection-summary__text--folders {
+    padding-left: 51px;
+    background-image: file-url('folder-black.svg');
+    background-repeat: no-repeat;
+    background-size: 39px auto;
+    background-position: 0px 4px;
+
+    @include ie-lte(8) {
+      background-image: file-url('folder-blue-bold.png');
+    }
   }
 
   // revert full-width button for smaller screens

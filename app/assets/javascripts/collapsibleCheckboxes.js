@@ -22,7 +22,7 @@
       this.addFooterAndDoneButton(legendText);
 
       // create summary from component pieces and match text to current selection
-      this.summary.addContent(legendText);
+      this.summary.addContent(legendText, this.fieldLabel);
       this.summary.update(this.getSelection(), this.total, this.fieldLabel);
       this.$fieldset.before(this.summary.$el);
 
@@ -56,7 +56,7 @@
           }
         }
       },
-      addContent: function(legendText) {
+      addContent: function(legendText, fieldLabel) {
         const $content = $(`<p>
                                <span class="selection-summary__text"></span>
                                <button class="button button-secondary">Change<span class="visuallyhidden"> ${legendText}</span></button>
@@ -64,6 +64,8 @@
 
         this.$text = $content.find('.selection-summary__text');
         this.$changeButton = $content.find('button');
+
+        if (fieldLabel === 'folder') { this.$text.addClass('selection-summary__text--folders'); }
 
         this.$el.append($content);
       },
