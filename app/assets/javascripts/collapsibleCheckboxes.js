@@ -48,13 +48,10 @@
       templates: {
         all: (selection, total, field) => `All ${field}s`,
         some: (selection, total, field) => `${selection} of ${total} ${field}s`,
-        none: (selection, total, field) => {
-          if (field === 'folder') {
-            return "No folders (only templates outside a folder)";
-          } else {
-            return `No ${field}s`;
-          }
-        }
+        none: (selection, total, field) => ({
+            "folder": "No folders (only templates outside a folder)",
+            "team member": "No team members (only you)"
+        }[field] || `No ${field}s`)
       },
       addContent: function(legendText, fieldLabel) {
         const $content = $(`<p>

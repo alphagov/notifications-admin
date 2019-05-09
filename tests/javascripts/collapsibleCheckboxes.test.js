@@ -205,7 +205,7 @@ describe('Collapsible fieldset', () => {
   });
 
   test("the summary doesn't have a folder icon if fields aren't called 'folder'", () => {
-    
+
     formGroup.dataset.fieldLabel = 'team member';
 
     // start module
@@ -361,7 +361,27 @@ describe('Collapsible fieldset', () => {
         // click the first checkbox
         helpers.triggerEvent(checkboxes[0], 'click');
 
-        expect(summaryText.textContent).toEqual("No team members");
+        expect(summaryText.textContent).toEqual("No team members (only you)");
+
+      });
+
+      test("if fields are called 'arbitrary thing'", () => {
+
+        formGroup.dataset.fieldLabel = 'arbitrary thing';
+
+        checkFirstCheckbox();
+
+        // start module
+        window.GOVUK.modules.start();
+
+        showCheckboxes();
+
+        const summaryText = document.querySelector('.selection-summary__text');
+
+        // click the first checkbox
+        helpers.triggerEvent(checkboxes[0], 'click');
+
+        expect(summaryText.textContent).toEqual("No arbitrary things");
 
       });
 
