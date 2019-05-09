@@ -114,6 +114,15 @@ def test_old_static_pages_redirect(
     )
 
 
+def test_message_status_page_contains_message_status_ids(client_request):
+    # The 'email-statuses' and 'sms-statuses' id are linked to when we display a message status,
+    # so this test ensures we don't accidentally remove them
+    page = client_request.get('main.message_status')
+
+    assert page.find(id='email-statuses')
+    assert page.find(id='sms-statuses')
+
+
 def test_old_using_notify_page(client_request):
     client_request.get('main.using_notify', _expected_status=410)
 

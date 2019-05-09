@@ -442,15 +442,13 @@ def format_notification_status_as_field_status(status, notification_type):
     ).get(status, 'error')
 
 
-def format_notification_status_as_url(status, notification_type):
-    if notification_type == 'letter':
-        return None
-    url = partial(url_for, "main.using_notify")
+def format_notification_status_as_url(notification_type):
+    url = partial(url_for, "main.message_status")
+
     return {
-        'technical-failure': url(_anchor='technical-failure'),
-        'temporary-failure': url(_anchor='not-accepting-messages'),
-        'permanent-failure': url(_anchor='does-not-exist')
-    }.get(status)
+        'email': url(_anchor='email-statuses'),
+        'sms': url(_anchor='sms-statuses')
+    }.get(notification_type)
 
 
 def nl2br(value):

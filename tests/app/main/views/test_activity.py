@@ -521,7 +521,10 @@ def test_html_contains_links_for_failed_notifications(
     mock_get_service_data_retention,
     mocker,
 ):
-    mock_get_notifications(mocker, active_user_with_permissions, noti_status='technical-failure')
+    mock_get_notifications(mocker,
+                           active_user_with_permissions,
+                           diff_template_type="sms",
+                           noti_status='technical-failure')
     response = client_request.get(
         'main.view_notifications',
         service_id=SERVICE_ONE_ID,
