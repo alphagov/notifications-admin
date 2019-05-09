@@ -5,6 +5,7 @@ from flask import url_for
 from freezegun import freeze_time
 
 from app.main.views.jobs import get_time_left
+from tests import sample_uuid
 from tests.conftest import (
     SERVICE_ONE_ID,
     active_caseworking_user,
@@ -218,6 +219,19 @@ def test_should_show_page_for_one_job(
     )
     assert csv_link.text == 'Download this report'
     assert page.find('span', {'id': 'time-left'}).text == 'Data available for 7 days'
+
+    assert normalize_spaces(page.select_one('tbody tr').text) == normalize_spaces(
+        '07123456789 '
+        'template content '
+        'Delivered 1 January at 11:10am'
+    )
+    assert page.select_one('tbody tr a')['href'] == url_for(
+        'main.view_notification',
+        service_id=SERVICE_ONE_ID,
+        notification_id=sample_uuid(),
+        from_job=fake_uuid,
+    )
+
     mock_get_notifications.assert_called_with(
         SERVICE_ONE_ID,
         fake_uuid,

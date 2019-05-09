@@ -55,7 +55,7 @@
         field_headings_visible=False
       ) %}
         {% call row_heading() %}
-          <a class="file-list-filename" href="{{ url_for('.view_notification', service_id=current_service.id, notification_id=item.id) }}">{{ item.to }}</a>
+          <a class="file-list-filename" href="{{ url_for('.view_notification', service_id=current_service.id, notification_id=item.id, from_job=job.id) }}">{{ item.to }}</a>
           <p class="file-list-hint">
             {{ item.preview_of_content }}
           </p>
