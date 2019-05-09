@@ -223,13 +223,32 @@ class Spreadsheet():
 
     allowed_file_extensions = ['csv', 'xlsx', 'xls', 'ods', 'xlsm', 'tsv']
 
-    def __init__(self, csv_data, filename=''):
+    def __init__(self, csv_data=None, rows=None, filename=''):
+
         self.filename = filename
-        self.as_csv_data = csv_data
-        self.as_dict = {
+
+        if csv_data and rows:
+            raise TypeError('Spreadsheet must be created from either rows or CSV data')
+
+        self._csv_data = csv_data or ''
+        self._rows = rows or []
+
+    @property
+    def as_dict(self):
+        return {
             'file_name': self.filename,
             'data': self.as_csv_data
         }
+
+    @property
+    def as_csv_data(self):
+        if not self._csv_data:
+            with StringIO() as converted:
+                output = csv.writer(converted)
+                for row in self._rows:
+                    output.writerow(row)
+                self._csv_data = converted.getvalue()
+        return self._csv_data
 
     @classmethod
     def can_handle(cls, filename):
@@ -245,11 +264,7 @@ class Spreadsheet():
 
     @classmethod
     def from_rows(cls, rows, filename=''):
-        with StringIO() as converted:
-            output = csv.writer(converted)
-            for row in rows:
-                output.writerow(row)
-            return cls(converted.getvalue(), filename)
+        return cls(rows=rows, filename=filename)
 
     @classmethod
     def from_dict(cls, dictionary, filename=''):
@@ -257,7 +272,7 @@ class Spreadsheet():
             zip(
                 *sorted(dictionary.items(), key=lambda pair: pair[0])
             ),
-            filename
+            filename=filename,
         )
 
     @classmethod
@@ -265,7 +280,7 @@ class Spreadsheet():
         extension = cls.get_extension(filename)
 
         if extension == 'csv':
-            return cls(Spreadsheet.normalise_newlines(file_content), filename)
+            return cls(csv_data=Spreadsheet.normalise_newlines(file_content), filename=filename)
 
         if extension == 'tsv':
             file_content = StringIO(
@@ -281,11 +296,13 @@ class Spreadsheet():
 
     @property
     def as_rows(self):
-        return list(csv.reader(
-            self.as_csv_data.strip().splitlines(),
-            quoting=csv.QUOTE_MINIMAL,
-            skipinitialspace=True,
-        ))
+        if not self._rows:
+            self._rows = list(csv.reader(
+                self._csv_data.strip().splitlines(),
+                quoting=csv.QUOTE_MINIMAL,
+                skipinitialspace=True,
+            ))
+        return self._rows
 
     @property
     def as_excel_file(self):
