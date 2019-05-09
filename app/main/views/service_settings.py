@@ -1,7 +1,5 @@
 from collections import OrderedDict
-from datetime import datetime
 
-import pytz
 from flask import (
     abort,
     current_app,
@@ -202,7 +200,6 @@ def submit_request_to_go_live(service_id):
             '\n---'
             '\nOrganisation type: {organisation_type}'
             '\nAgreement signed: {agreement}'
-            '\nChecklist completed: {checklist}'
             '\nEmails in next year: {volume_email_formatted}'
             '\nText messages in next year: {volume_sms_formatted}'
             '\nLetters in next year: {volume_letter_formatted}'
@@ -214,7 +211,6 @@ def submit_request_to_go_live(service_id):
             service_dashboard=url_for('main.service_dashboard', service_id=current_service.id, _external=True),
             organisation_type=str(current_service.organisation_type).title(),
             agreement=current_service.organisation.as_human_readable(current_user.email_domain),
-            checklist=current_service.go_live_checklist_completed_as_yes_no,
             volume_email_formatted=format_if_number(current_service.volume_email),
             volume_sms_formatted=format_if_number(current_service.volume_sms),
             volume_letter_formatted=format_if_number(current_service.volume_letter),

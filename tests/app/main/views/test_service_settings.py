@@ -1381,7 +1381,6 @@ def test_should_redirect_after_request_to_go_live(
         '---\n'
         'Organisation type: Central\n'
         'Agreement signed: Can’t tell (domain is user.gov.uk)\n'
-        'Checklist completed: No\n'
         '{formatted_displayed_volumes}'
         'Consent to research: Yes\n'
         'Other live services: No\n'
