@@ -3,11 +3,11 @@
   .selection-summary__text {
     display: inline-block;
     padding: .526315em .789473em .263157em 40px;
-    padding-left: 40px;
-    background-image: file-url('folder-black-bold.svg');
+    padding-left: 51px;
+    background-image: file-url('folder-black.svg');
     background-repeat: no-repeat;
-    background-size: auto 20px;
-    background-position: 0px 8px;
+    background-size: 39px auto;
+    background-position: 0px 4px;
 
     &:focus {
       outline: none;
