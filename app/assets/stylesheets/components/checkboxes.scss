@@ -17,7 +17,7 @@
     background-position: 0px 4px;
 
     @include ie-lte(8) {
-      background-image: file-url('folder-blue-bold.png');
+      background-image: file-url('folder-black.png');
     }
   }
 
