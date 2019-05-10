@@ -11,12 +11,11 @@
     var $scrollArea = $el.closest('.sticky-scroll-area');
 
     $scrollArea = $scrollArea.length ? $scrollArea : $el.parent();
-    scrollArea = $scrollArea.get(0);
 
     this._els = [el];
     this.edge = edge;
     this.selector = selector;
-    this.node = scrollArea;
+    this.node = $scrollArea.get(0);
     this.setEvents();
   };
   ScrollArea.prototype.addEl = function (el) {
@@ -38,7 +37,7 @@
   };
   ScrollArea.prototype.getFocusedDetails = {
     forElement: function ($focusedElement) {
-      focused = {
+      var focused = {
         'top': $focusedElement.offset().top,
         'height': $focusedElement.outerHeight(),
         'type': 'element'
