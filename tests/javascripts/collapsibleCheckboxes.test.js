@@ -7,6 +7,10 @@ beforeAll(() => {
 
   // load module code
   require('govuk_frontend_toolkit/javascripts/govuk/modules.js');
+
+  // TODO: remove this when tests for sticky JS are written
+  require('../../app/assets/javascripts/stick-to-window-when-scrolling.js');
+
   require('../../app/assets/javascripts/collapsibleCheckboxes.js');
 });
 
@@ -277,6 +281,39 @@ describe('Collapsible fieldset', () => {
     test("it changes it's text to indicate it's new action", () => {
 
       expect(formGroup.querySelector('.button').textContent.trim()).toEqual("Choose folders");
+
+    });
+  });
+
+  describe("the footer (that wraps the button)", () => {
+
+    beforeEach(() => {
+
+      // track calls to sticky JS
+      window.GOVUK.stickAtBottomWhenScrolling.recalculate = jest.fn(() => {});
+
+      // start module
+      window.GOVUK.modules.start();
+
+      // show the checkboxes
+      helpers.triggerEvent(formGroup.querySelector('.button'), 'click');
+
+    });
+
+    test("is made sticky when the fieldset is expanded", () => {
+
+      expect(formGroup.querySelector('.selection-footer').classList.contains('js-stick-at-bottom-when-scrolling')).toBe(true);
+      expect(window.GOVUK.stickAtBottomWhenScrolling.recalculate.mock.calls.length).toBe(1);
+
+    });
+
+    test("has its stickiness removed when the fieldset is collapsed", () => {
+
+      // click the button to collapse the fieldset
+      helpers.triggerEvent(formGroup.querySelector('.button'), 'click');
+
+      expect(formGroup.querySelector('.selection-footer').classList.contains('js-stick-at-bottom-when-scrolling')).toBe(false);
+      expect(window.GOVUK.stickAtBottomWhenScrolling.recalculate.mock.calls.length).toBe(2);
 
     });
   });

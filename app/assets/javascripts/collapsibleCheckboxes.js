@@ -1,5 +1,7 @@
-(function (Modules) {
+(function (global) {
   "use strict";
+
+  const GOVUK = global.GOVUK;
 
   function Summary (module) {
     this.module = module;
@@ -56,8 +58,9 @@
   Footer.prototype.getEl = function (expanded) {
     const buttonState = expanded ? 'done' : 'change';
     const buttonContent = this.buttonContent[buttonState](this.fieldLabel);
+    const stickyClass = expanded ? ' js-stick-at-bottom-when-scrolling' : '';
 
-    return $(`<div class="selection-footer">
+    return $(`<div class="selection-footer${stickyClass}">
               <button
                 class="button button-secondary"
                 aria-expanded="${expanded ? 'true' : 'false'}"
@@ -71,6 +74,9 @@
     this.$el = this.getEl(expanded);
 
     this.module.$formGroup.append(this.$el);
+
+    // make footer sticky if expanded, clear up from it being sticky if not
+    GOVUK.stickAtBottomWhenScrolling.recalculate();
   };
 
   function CollapsibleCheckboxes () {}
@@ -159,6 +165,6 @@
     this.summary.bindEvents(this);
   };
 
-  Modules.CollapsibleCheckboxes = CollapsibleCheckboxes;
+  GOVUK.Modules.CollapsibleCheckboxes = CollapsibleCheckboxes;
 
-}(window.GOVUK.Modules));
+}(window));
