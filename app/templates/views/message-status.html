@@ -31,7 +31,7 @@
     <p>These are the types of message status you’ll see when you’re signed in to Notify.</p>
     <p>If you’re using our API, some of the statuses you’ll see will be different. Read our <a href="{{ url_for('.documentation') }}">documentation</a> for a detailed list of API message statuses.</p>
 
-    <h3 class="heading-small">Emails</h3>
+    <h3 id="email-statuses" class="heading-small">Emails</h3>
     <div class="bottom-gutter-3-2">
       {% call mapping_table(
         caption='Message statuses – emails',
@@ -54,7 +54,7 @@
       {% endcall %}
     </div>
 
-    <h3 class="heading-small">Text messages</h3>
+    <h3 id="sms-statuses" class="heading-small">Text messages</h3>
     <div class="bottom-gutter-3-2">
       {% call mapping_table(
         caption='Message statuses – text messages',
@@ -77,7 +77,7 @@
         {% endfor %}
       {% endcall %}
     </div>
-    
+
     <h3 class="heading-small">Letters</h3>
     <div class="bottom-gutter-3-2">
       {% call mapping_table(
