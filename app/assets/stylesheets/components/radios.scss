@@ -8,7 +8,6 @@
     vertical-align: top;
 
     .multiple-choice {
-      margin-right: 5px;
       padding-right: 10px;
       padding-left: 54px - 10px;
     }
@@ -18,28 +17,23 @@
   .js-reset-button,
   .js-category-button {
 
-    background: none;
-    text-decoration: underline;
-    color: $link-colour;
-    border: none;
-    display: inline-block;
-    vertical-align: top;
-    width: auto;
-    padding: 7px 20px 7px 10px;
-    margin-right: 5px;
-    cursor: pointer;
-
-    &:hover {
-      color: $link-hover-colour;
-    }
+    @include button($grey-3);
+    margin-right: $gutter-half;
 
   }
 
   .js-reset-button-block {
+
     display: block;
-    width: 100%;
-    text-align: left;
-    padding: 20px 20px $gutter 57px;
+    clear: both;
+    margin: 0 0 $gutter 0;
+    position: relative;
+    top: $gutter-half;
+
+    &:active {
+      top: $gutter-half + 2px;
+    }
+
   }
 
   .js-enabled & {
