@@ -1,6 +1,6 @@
-{% macro select(field, hint=None, disable=[], option_hints={}, hide_legend=False, collapsible_opts={}, legend_style="text", input="radio") %}
+{% macro select(field, hint=None, disable=[], option_hints={}, hide_legend=False, input="radio") %}
   {% call select_wrapper(
-    field, hint, disable, option_hints, hide_legend, collapsible_opts, legend_style
+    field, hint, disable, option_hints, hide_legend
   ) %}
     {% for option in field %}
       {{ select_input(option, disable, option_hints, input=input) }}
@@ -24,9 +24,9 @@
 {% endmacro %}
 
 
-{% macro select_nested(field, child_map, hint=None, disable=[], option_hints={}, hide_legend=False, collapsible_opts={}, legend_style="text", input="radio") %}
+{% macro select_nested(field, child_map, hint=None, disable=[], option_hints={}, hide_legend=False, input="radio") %}
   {% call select_wrapper(
-    field, hint, disable, option_hints, hide_legend, collapsible_opts, legend_style
+    field, hint, disable, option_hints, hide_legend
   ) %}
   <div class="{{ "radios" if input == "radio" else "checkboxes" }}-nested">
       {{ select_list(child_map[None], child_map, disable, option_hints, input=input) }}
@@ -35,14 +35,10 @@
 {% endmacro %}
 
 
-{% macro select_wrapper(field, hint=None, disable=[], option_hints={}, hide_legend=False, collapsible_opts={}, legend_style="text") %}
-  {% set is_collapsible = collapsible_opts|length %}
-  <div class="form-group {% if field.errors %} form-group-error{% endif %}"{% if is_collapsible %} data-module="collapsible-checkboxes"{% if collapsible_opts.field %} data-field-label="{{ collapsible_opts.field }}"{% endif %}{% endif %}>
-    {% if is_collapsible %}
-    <div class="selection-summary" role="region" aria-live="polite"></div>
-    {% endif %}
-    <fieldset id="{{ field.id }}">
-      <legend class="{{ 'form-label' if not hide_legend else '' }}{% if legend_style != 'text' %} {{ legend_style }}{% endif %}">
+{% macro select_wrapper(field, hint=None, disable=[], option_hints={}, hide_legend=False) %}
+  <div class="form-group {% if field.errors %} form-group-error{% endif %}">
+    <fieldset>
+      <legend class="{{ 'form-label' if not hide_legend else '' }}">
         {% if hide_legend %}<span class="visually-hidden">{% endif %}
           {{ field.label.text|safe }}
         {% if hide_legend %}</span>{% endif %}

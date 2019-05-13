@@ -95,7 +95,6 @@ const javascripts = () => {
       paths.src + 'javascripts/previewPane.js',
       paths.src + 'javascripts/colourPreview.js',
       paths.src + 'javascripts/templateFolderForm.js',
-      paths.src + 'javascripts/collapsibleCheckboxes.js',
       paths.src + 'javascripts/main.js'
     ])
     .pipe(plugins.prettyerror())

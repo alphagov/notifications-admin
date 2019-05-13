@@ -27,7 +27,7 @@
     {{ textbox(form.name, width='1-1') }}
     {% if current_service.has_permission("edit_folder_permissions") %}
       {% if current_user.has_permissions("manage_service") and form.users_with_permission.all_service_users %}
-        {{ checkboxes(form.users_with_permission, collapsible_opts={ 'field': 'team member' }) }}
+        {{ checkboxes(form.users_with_permission) }}
       {% endif %}
     {% endif %}
 
