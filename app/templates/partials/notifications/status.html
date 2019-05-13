@@ -1,12 +1,12 @@
 <div class="ajax-block-container">
   <p class="notification-status {{ notification.status|format_notification_status_as_field_status(notification.notification_type) }}">
-    {% if notification.notification_type|format_notification_status_as_url %}
-      <a href="{{ notification.notification_type|format_notification_status_as_url }}">
+    {% if notification.status|format_notification_status_as_url(notification.notification_type) %}
+      <a href="{{ notification.status|format_notification_status_as_url(notification.notification_type) }}">
     {% endif %}
     {{ notification.status|format_notification_status(
       notification.template.template_type
     ) }}
-    {% if notification.notification_type|format_notification_status_as_url %}
+    {% if notification.status|format_notification_status_as_url(notification.notification_type) %}
       </a>
     {% endif %}
     {% if sent_with_test_key %}
