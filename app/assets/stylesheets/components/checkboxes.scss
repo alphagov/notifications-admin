@@ -1,6 +1,7 @@
 .selection-summary {
 
   .selection-summary__text {
+      @include core-19($tabular-numbers: true);
     padding: .526315em .789473em .263157em 0px;
     margin-bottom: $gutter / 2;
 
