@@ -154,11 +154,11 @@
       align='right'
     ) %}
       {% if displayed_on_single_line %}<span class="align-with-message-body">{% endif %}
-      {% if notification.notification_type|format_notification_status_as_url %}
-        <a href="{{ notification.notification_type|format_notification_status_as_url }}">
+      {% if notification.status|format_notification_status_as_url(notification.notification_type) %}
+        <a href="{{ notification.status|format_notification_status_as_url(notification.notification_type) }}">
       {% endif %}
       {{ notification.status|format_notification_status(notification.template.template_type) }}
-      {% if notification.notification_type|format_notification_status_as_url %}
+      {% if notification.status|format_notification_status_as_url(notification.notification_type) %}
         </a>
       {% endif %}
       <span class="status-hint">

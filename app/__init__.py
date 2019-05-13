@@ -442,8 +442,13 @@ def format_notification_status_as_field_status(status, notification_type):
     ).get(status, 'error')
 
 
-def format_notification_status_as_url(notification_type):
+def format_notification_status_as_url(status, notification_type):
     url = partial(url_for, "main.message_status")
+
+    if status not in {
+        'technical-failure', 'temporary-failure', 'permanent-failure',
+    }:
+        return None
 
     return {
         'email': url(_anchor='email-statuses'),
