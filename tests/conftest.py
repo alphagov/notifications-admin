@@ -2748,7 +2748,7 @@ def mock_reset_failed_login_count(mocker):
 @pytest.fixture
 def mock_get_notification(
     mocker,
-    fake_uuid,
+    notification_id=fake_uuid,
     notification_status='delivered',
     redact_personalisation=False,
     template_type=None,

@@ -30,6 +30,7 @@ from tests.conftest import (
     get_non_default_letter_contact_block,
     get_non_default_reply_to_email_address,
     get_non_default_sms_sender,
+    mock_get_notification,
     mock_get_service_organisation,
     multiple_letter_contact_blocks,
     multiple_reply_to_email_addresses,
@@ -2055,8 +2056,27 @@ def test_add_reply_to_email_address_sends_test_notification(
     mock_verify.assert_called_once_with("test@example.com")
 
 
-def test_add_reply_to_email_address_waiting_page():
-    pass
+@pytest.mark.parametrize("status,expected_failure,expected_success", [
+    ("delivered", 0, 1),
+    ("pending", 0, 0),
+    ("permanent-failure", 1, 0),
+])
+def test_add_reply_to_email_address_waiting_page(
+    mocker, client_request, fake_uuid, status, expected_failure, expected_success
+):
+    notification_id = fake_uuid
+    mock_get_notification(
+        mocker, notification_id=notification_id, notification_status=status
+    )
+
+    page = client_request.get(
+        'main.verify_reply_to_address',
+        service_id=SERVICE_ONE_ID,
+        notification_id=notification_id
+    )
+    assert page.find('h1').text == 'Verifying your reply-to email address'
+    assert len(page.find_all('div', class_='banner-dangerous')) == expected_failure
+    assert len(page.find_all('div', class_='banner-message-with-tick')) == expected_success
 
 
 def test_add_reply_to_email_address_success():

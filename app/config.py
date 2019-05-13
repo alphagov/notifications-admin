@@ -77,6 +77,8 @@ class Config(object):
     ASSET_DOMAIN = ''
     ASSET_PATH = '/static/'
 
+    NOTIFY_SERVICE_ID = 'd6aa2c68-a2d9-4437-ab19-3ae8eb202553'
+
 
 class Development(Config):
     NOTIFY_LOG_PATH = 'application.log'
