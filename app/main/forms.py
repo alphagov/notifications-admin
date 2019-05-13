@@ -1453,3 +1453,10 @@ class ClearCacheForm(StripWhitespaceForm):
         'What do you want to clear today',
         validators=[DataRequired()]
     )
+
+
+class GoLiveNotesForm(StripWhitespaceForm):
+    request_to_go_live_notes = TextAreaField(
+        'Go live notes',
+        filters=[lambda x: x or None],
+    )

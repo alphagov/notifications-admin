@@ -18,6 +18,7 @@ class Organisation(JSONModel):
         'agreement_signed_by_id',
         'agreement_signed_version',
         'domains',
+        'request_to_go_live_notes',
     }
 
     def __init__(self, _dict):
@@ -30,14 +31,13 @@ class Organisation(JSONModel):
             self.agreement_signed = None
             self.domains = []
             self.organisation_type = None
+            self.request_to_go_live_notes = None
 
     def as_human_readable(self, fallback_domain):
-        if 'dwp.' in ''.join(self.domains):
-            return 'DWP - Requires OED approval'
         if self.agreement_signed:
-            return 'Yes, on behalf of {}'.format(self.name)
+            agreement_statement = 'Yes, on behalf of {}.'.format(self.name)
         elif self.name:
-            return '{} (organisation is {}, {})'.format(
+            agreement_statement = '{} (organisation is {}, {}).'.format(
                 {
                     False: 'No',
                     None: 'Can’t tell',
@@ -50,7 +50,12 @@ class Organisation(JSONModel):
                 }.get(self.crown),
             )
         else:
-            return 'Can’t tell (domain is {})'.format(fallback_domain)
+            agreement_statement = 'Can’t tell (domain is {}).'.format(fallback_domain)
+
+        if self.request_to_go_live_notes:
+            agreement_statement = agreement_statement + ' ' + self.request_to_go_live_notes
+
+        return agreement_statement
 
     def as_info_for_branding_request(self, fallback_domain):
         return self.name or 'Can’t tell (domain is {})'.format(fallback_domain)

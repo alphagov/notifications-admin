@@ -80,6 +80,15 @@
           }}
         {% endcall %}
         {% call row() %}
+          {{ text_field('Request to go live notes') }}
+          {{ optional_text_field(current_org.request_to_go_live_notes, default='None') }}
+          {{ edit_field(
+              'Change',
+              url_for('.edit_organisation_go_live_notes', org_id=current_org.id)
+            )
+          }}
+        {% endcall %}
+        {% call row() %}
           {{ text_field('Default email branding') }}
           {{ text_field(email_branding) }}
           {{ edit_field(

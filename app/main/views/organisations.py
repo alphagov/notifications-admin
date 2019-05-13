@@ -17,6 +17,7 @@ from app.main import main
 from app.main.forms import (
     ConfirmPasswordForm,
     CreateOrUpdateOrganisation,
+    GoLiveNotesForm,
     InviteOrgUserForm,
     OrganisationAgreementSignedForm,
     OrganisationCrownStatusForm,
@@ -464,3 +465,27 @@ def confirm_edit_organisation_name(org_id):
         'views/organisations/organisation/settings/edit-name/confirm.html',
         new_name=session['organisation_name_change'],
         form=form)
+
+
+@main.route("/organisations/<org_id>/settings/edit-go-live-notes", methods=['GET', 'POST'])
+@login_required
+@user_has_permissions()
+@user_is_platform_admin
+def edit_organisation_go_live_notes(org_id):
+
+    form = GoLiveNotesForm()
+
+    if form.validate_on_submit():
+        organisations_client.update_organisation(
+            org_id,
+            request_to_go_live_notes=form.request_to_go_live_notes.data
+        )
+        return redirect(url_for('.organisation_settings', org_id=org_id))
+
+    org = organisations_client.get_organisation(org_id)
+    form.request_to_go_live_notes.data = org['request_to_go_live_notes']
+
+    return render_template(
+        'views/organisations/organisation/settings/edit-go-live-notes.html',
+        form=form,
+    )
