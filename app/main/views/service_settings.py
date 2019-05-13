@@ -62,7 +62,6 @@ from app.utils import (
 
 PLATFORM_ADMIN_SERVICE_PERMISSIONS = OrderedDict([
     ('inbound_sms', {'title': 'Receive inbound SMS', 'requires': 'sms', 'endpoint': '.service_set_inbound_number'}),
-    ('precompiled_letter', {'title': 'Send precompiled letters', 'requires': 'letter'}),
     ('email_auth', {'title': 'User auth type editing'}),
     ('upload_document', {'title': 'Uploading documents', 'endpoint': '.service_switch_can_upload_document'}),
     ('edit_folder_permissions', {'title': 'Folder permissions'}),
