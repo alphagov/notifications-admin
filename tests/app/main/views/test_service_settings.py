@@ -20,6 +20,7 @@ from tests import (
 from tests.conftest import (
     ORGANISATION_ID,
     SERVICE_ONE_ID,
+    TEMPLATE_ONE_ID,
     active_user_no_api_key_permission,
     active_user_no_settings_permission,
     active_user_with_permissions,
@@ -2056,27 +2057,41 @@ def test_add_reply_to_email_address_sends_test_notification(
     mock_verify.assert_called_once_with("test@example.com")
 
 
+@pytest.mark.parametrize("is_default", ["True", "False"])
 @pytest.mark.parametrize("status,expected_failure,expected_success", [
     ("delivered", 0, 1),
     ("pending", 0, 0),
     ("permanent-failure", 1, 0),
 ])
 def test_add_reply_to_email_address_waiting_page(
-    mocker, client_request, fake_uuid, status, expected_failure, expected_success
+    mocker, client_request, fake_uuid, status, expected_failure, expected_success, is_default
 ):
-    notification_id = fake_uuid
-    mock_get_notification(
-        mocker, notification_id=notification_id, notification_status=status
-    )
-
+    notification = {
+        "id": fake_uuid,
+        "status": status,
+        "to": "email@example.gov.uk",
+        "service_id": SERVICE_ONE_ID,
+        "template_id": TEMPLATE_ONE_ID,
+        "notification_type": "email"
+    }
+    mocker.patch('app.notification_api_client.get_notification', return_value=notification)
+    mock_add_reply_to_email_address = mocker.patch('app.service_api_client.add_reply_to_email_address')
     page = client_request.get(
         'main.verify_reply_to_address',
         service_id=SERVICE_ONE_ID,
-        notification_id=notification_id
+        notification_id=notification["id"],
+        _optional_args="?is_default={}".format(is_default)
     )
     assert page.find('h1').text == 'Verifying your reply-to email address'
     assert len(page.find_all('div', class_='banner-dangerous')) == expected_failure
     assert len(page.find_all('div', class_='banner-message-with-tick')) == expected_success
+
+    if status == "delivered":
+        mock_add_reply_to_email_address.assert_called_once_with(
+            SERVICE_ONE_ID, email_address=notification["to"], is_default=is_default
+        )
+    else:
+        mock_add_reply_to_email_address.assert_not_called()
 
 
 def test_add_reply_to_email_address_success():

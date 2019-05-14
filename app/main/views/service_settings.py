@@ -403,15 +403,15 @@ def service_email_reply_to(service_id):
 def service_add_email_reply_to(service_id):
     form = ServiceReplyToEmailForm()
     first_email_address = current_service.count_email_reply_to_addresses == 0
+    is_default = first_email_address if first_email_address else form.is_default.data
     if form.validate_on_submit():
         notification_id = service_api_client.verify_reply_to_email_address(form.email_address.data)["data"]["id"]
-        return redirect(url_for('.verify_reply_to_address', service_id=service_id, notification_id=notification_id))
-        # service_api_client.add_reply_to_email_address(
-        #     current_service.id,
-        #     email_address=form.email_address.data,
-        #     is_default=first_email_address if first_email_address else form.is_default.data
-        # )
-        # return redirect(url_for('.service_email_reply_to', service_id=service_id))
+        return redirect(url_for(
+            '.verify_reply_to_address',
+            service_id=service_id,
+            notification_id=notification_id
+        ) + "?is_default={}".format(is_default))
+
     return render_template(
         'views/service-settings/email-reply-to/add.html',
         form=form,
@@ -424,8 +424,14 @@ def service_add_email_reply_to(service_id):
 def verify_reply_to_address(service_id, notification_id):
     notification = notification_api_client.get_notification(current_app.config["NOTIFY_SERVICE_ID"], notification_id)
     verification_status = "pending"
+    is_default = request.args.get('is_default', False)
     if notification["status"] == "delivered":
         verification_status = "success"
+        service_api_client.add_reply_to_email_address(
+            current_service.id,
+            email_address=notification["to"],
+            is_default=True if is_default == "True" else False
+        )
     if notification["status"] in ["failed", "permanent-failure", "technical-failure", "temporary-failure"]:
         verification_status = "failure"
     # also include condition for when lots of time passes
@@ -434,7 +440,8 @@ def verify_reply_to_address(service_id, notification_id):
         reply_to_email_address=notification["to"],
         service_id=service_id,
         notification_id=notification_id,
-        verification_status=verification_status
+        verification_status=verification_status,
+        is_default=is_default
     )
 
 
