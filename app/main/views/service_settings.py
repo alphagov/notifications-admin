@@ -4,6 +4,7 @@ from flask import (
     abort,
     current_app,
     flash,
+    jsonify,
     redirect,
     render_template,
     request,
@@ -422,6 +423,22 @@ def service_add_email_reply_to(service_id):
 @login_required
 @user_has_permissions('manage_service')
 def verify_reply_to_address(service_id, notification_id):
+    return render_template(
+        'views/service-settings/email-reply-to/verify.html',
+        service_id=service_id,
+        notification_id=notification_id,
+        partials=get_verify_reply_to_address_partials(service_id, notification_id)
+    )
+
+
+@main.route("/services/<service_id>/service-settings/email-reply-to/<notification_id>/verify.json")
+@login_required
+@user_has_permissions('manage_service')
+def verify_reply_to_address_updates(service_id, notification_id):
+    return jsonify(**get_verify_reply_to_address_partials(service_id, notification_id))
+
+
+def get_verify_reply_to_address_partials(service_id, notification_id):
     notification = notification_api_client.get_notification(current_app.config["NOTIFY_SERVICE_ID"], notification_id)
     verification_status = "pending"
     is_default = request.args.get('is_default', False)
@@ -435,14 +452,16 @@ def verify_reply_to_address(service_id, notification_id):
     if notification["status"] in ["failed", "permanent-failure", "technical-failure", "temporary-failure"]:
         verification_status = "failure"
     # also include condition for when lots of time passes
-    return render_template(
-        'views/service-settings/email-reply-to/verify.html',
-        reply_to_email_address=notification["to"],
-        service_id=service_id,
-        notification_id=notification_id,
-        verification_status=verification_status,
-        is_default=is_default
-    )
+    return {
+        'status': render_template(
+            'views/service-settings/email-reply-to/_verify-updates.html',
+            reply_to_email_address=notification["to"],
+            service_id=current_service.id,
+            notification_id=notification_id,
+            verification_status=verification_status,
+            is_default=is_default,
+        ),
+    }
 
 
 @main.route(

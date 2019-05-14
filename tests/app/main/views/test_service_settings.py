@@ -2056,7 +2056,7 @@ def test_verify_reply_to_address(
     )
     assert page.find('h1').text == 'Verifying your reply-to email address'
     assert len(page.find_all('div', class_='banner-dangerous')) == expected_failure
-    assert len(page.find_all('div', class_='banner-message-with-tick')) == expected_success
+    assert len(page.find_all('div', class_='banner-default-with-tick')) == expected_success
 
     if status == "delivered":
         mock_add_reply_to_email_address.assert_called_once_with(

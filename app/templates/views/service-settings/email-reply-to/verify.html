@@ -4,6 +4,7 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
+{% from "components/ajax-block.html" import ajax_block %}
 
 {% block service_page_title %}
   Verifying your reply-to email address
@@ -15,22 +16,10 @@
     'Verifying your reply-to email address',
     back_link=url_for('main.service_email_reply_to', service_id=current_service.id)
   ) }}
-  {% if verification_status == "pending" %}
-    <p>
-      We have sent a notification to {{ reply_to_email_address }} to check if it's a working email address.
-
-    </p>
-    <p>
-      Once we receive a delivery confirmation, we will update your list of reply-to email addresses.
-    </p>
-
-    <p>
-      <a href="{{ url_for('main.verify_reply_to_address', service_id=service_id, notification_id=notification_id) + "?is_default={}".format(is_default) }}"">Refresh</a>
-    </p>
-  {% elif verification_status == "success" %}
-    {{ banner("Yay success! Your new reply-to email has been added ^__^", type='message', with_tick=True) }}
-  {% elif verification_status == "failure" %}
-    {{ banner("Sorry dawg, this email address doesn't seem to be working :d", type='dangerous') }}
-    <a href={{ url_for('main.service_add_email_reply_to', service_id=service_id) }}>Try again</a>
-  {% endif %}
+  {{ ajax_block(
+      partials,
+      url_for('main.verify_reply_to_address_updates', service_id=service_id, notification_id=notification_id),
+      'status',
+      finished=finished
+    ) }}
 {% endblock %}

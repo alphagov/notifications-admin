@@ -1,0 +1,22 @@
+{% from "components/banner.html" import banner %}
+
+<div class="ajax-block-container">
+  {% if verification_status == "pending" %}
+    <p>
+      We have sent a notification to {{ reply_to_email_address }} to check if it's a working email address.
+
+    </p>
+    <p>
+      Once we receive a delivery confirmation, we will update your list of reply-to email addresses.
+    </p>
+
+    <p>
+      <a href="{{ url_for('main.verify_reply_to_address', service_id=service_id, notification_id=notification_id) + "?is_default={}".format(is_default) }}"">Refresh</a>
+    </p>
+  {% elif verification_status == "success" %}
+    {{ banner("Yay success! Your new reply-to email has been added ^__^", type='default', with_tick=True) }}
+  {% elif verification_status == "failure" %}
+    {{ banner("Sorry dawg, this email address doesn't seem to be working :d", type='dangerous') }}
+    <a href={{ url_for('main.service_add_email_reply_to', service_id=service_id) }}>Try again</a>
+  {% endif %}
+</div>
