@@ -2008,34 +2008,6 @@ def test_incorrect_sms_sender_input(
     (multiple_reply_to_email_addresses, {}, False),
     (multiple_reply_to_email_addresses, {"is_default": "y"}, True)
 ])
-def test_add_reply_to_email_address(
-    fixture,
-    data,
-    api_default_args,
-    mocker,
-    client_request,
-    mock_add_reply_to_email_address
-):
-    fixture(mocker)
-    data['email_address'] = "test@example.com"
-    client_request.post(
-        'main.service_add_email_reply_to',
-        service_id=SERVICE_ONE_ID,
-        _data=data
-    )
-
-    mock_add_reply_to_email_address.assert_called_once_with(
-        SERVICE_ONE_ID,
-        email_address="test@example.com",
-        is_default=api_default_args
-    )
-
-
-@pytest.mark.parametrize('fixture, data, api_default_args', [
-    (no_reply_to_email_addresses, {}, True),
-    (multiple_reply_to_email_addresses, {}, False),
-    (multiple_reply_to_email_addresses, {"is_default": "y"}, True)
-])
 def test_add_reply_to_email_address_sends_test_notification(
     mocker, client_request, fixture, data, api_default_args
 ):
@@ -2052,18 +2024,18 @@ def test_add_reply_to_email_address_sends_test_notification(
             service_id=SERVICE_ONE_ID,
             notification_id="123",
             _external=True,
-        )
+        ) + "?is_default={}".format(api_default_args)
     )
     mock_verify.assert_called_once_with("test@example.com")
 
 
-@pytest.mark.parametrize("is_default", ["True", "False"])
+@pytest.mark.parametrize("is_default", [True, False])
 @pytest.mark.parametrize("status,expected_failure,expected_success", [
     ("delivered", 0, 1),
     ("pending", 0, 0),
     ("permanent-failure", 1, 0),
 ])
-def test_add_reply_to_email_address_waiting_page(
+def test_verify_reply_to_address(
     mocker, client_request, fake_uuid, status, expected_failure, expected_success, is_default
 ):
     notification = {
@@ -2092,6 +2064,10 @@ def test_add_reply_to_email_address_waiting_page(
         )
     else:
         mock_add_reply_to_email_address.assert_not_called()
+    if status == "permanent-failure":
+        assert page.find('a', text='Try again').attrs["href"] == url_for(
+            'main.service_add_email_reply_to', service_id=SERVICE_ONE_ID
+        )
 
 
 def test_add_reply_to_email_address_success():

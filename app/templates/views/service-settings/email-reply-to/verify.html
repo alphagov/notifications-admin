@@ -31,5 +31,6 @@
     {{ banner("Yay success! Your new reply-to email has been added ^__^", type='message', with_tick=True) }}
   {% elif verification_status == "failure" %}
     {{ banner("Sorry dawg, this email address doesn't seem to be working :d", type='dangerous') }}
+    <a href={{ url_for('main.service_add_email_reply_to', service_id=service_id) }}>Try again</a>
   {% endif %}
 {% endblock %}
