@@ -1,7 +1,5 @@
 from collections import OrderedDict
-from datetime import datetime
 
-import pytz
 from flask import (
     abort,
     current_app,
@@ -201,7 +199,6 @@ def submit_request_to_go_live(service_id):
             '\n---'
             '\nOrganisation type: {organisation_type}'
             '\nAgreement signed: {agreement}'
-            '\nChecklist completed: {checklist}'
             '\nEmails in next year: {volume_email_formatted}'
             '\nText messages in next year: {volume_sms_formatted}'
             '\nLetters in next year: {volume_letter_formatted}'
@@ -209,36 +206,19 @@ def submit_request_to_go_live(service_id):
             '\nOther live services: {existing_live}'
             '\n'
             '\n---'
+            '\nRequest sent by {email_address}'
             '\n'
-            '{service_id}, '
-            '{organisation}, '
-            '{service_name}, '
-            '{user_name}, '
-            '{user_email}, '
-            '-, '
-            '{date}, '
-            '{volume_sms}, '
-            '{volume_email}, '
-            '{volume_letter}'
         ).format(
             service_name=current_service.name,
             service_dashboard=url_for('main.service_dashboard', service_id=current_service.id, _external=True),
             organisation_type=str(current_service.organisation_type).title(),
             agreement=current_service.organisation.as_human_readable(current_user.email_domain),
-            checklist=current_service.go_live_checklist_completed_as_yes_no,
-            volume_email=print_if_number(current_service.volume_email),
             volume_email_formatted=format_if_number(current_service.volume_email),
-            volume_sms=print_if_number(current_service.volume_sms),
             volume_sms_formatted=format_if_number(current_service.volume_sms),
-            volume_letter=print_if_number(current_service.volume_letter),
             volume_letter_formatted=format_if_number(current_service.volume_letter),
             research_consent='Yes' if current_service.consent_to_research else 'No',
             existing_live='Yes' if user_api_client.user_has_live_services(current_user) else 'No',
-            service_id=current_service.id,
-            organisation=current_service.organisation.name,
-            user_name=current_user.name,
-            user_email=current_user.email_address,
-            date=datetime.now(tz=pytz.timezone('Europe/London')).strftime('%d/%m/%Y'),
+            email_address=current_user.email_address,
         ),
         ticket_type=zendesk_client.TYPE_QUESTION,
         user_email=current_user.email_address,
@@ -1066,10 +1046,6 @@ def check_contact_details_type(contact_details):
         return 'email_address'
     else:
         return 'phone_number'
-
-
-def print_if_number(value):
-    return value if isinstance(value, int) else ''
 
 
 def format_if_number(value):
