@@ -206,6 +206,9 @@ def submit_request_to_go_live(service_id):
             '\nConsent to research: {research_consent}'
             '\nOther live services: {existing_live}'
             '\n'
+            '\n---'
+            '\nRequest sent by {email_address}'
+            '\n'
         ).format(
             service_name=current_service.name,
             service_dashboard=url_for('main.service_dashboard', service_id=current_service.id, _external=True),
@@ -216,6 +219,7 @@ def submit_request_to_go_live(service_id):
             volume_letter_formatted=format_if_number(current_service.volume_letter),
             research_consent='Yes' if current_service.consent_to_research else 'No',
             existing_live='Yes' if user_api_client.user_has_live_services(current_user) else 'No',
+            email_address=current_user.email_address,
         ),
         ticket_type=zendesk_client.TYPE_QUESTION,
         user_email=current_user.email_address,

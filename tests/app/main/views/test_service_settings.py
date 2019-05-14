@@ -1384,6 +1384,9 @@ def test_should_redirect_after_request_to_go_live(
         '{formatted_displayed_volumes}'
         'Consent to research: Yes\n'
         'Other live services: No\n'
+        '\n'
+        '---\n'
+        'Request sent by test@user.gov.uk\n'
     ).format(
         service_id=SERVICE_ONE_ID,
         displayed_volumes=displayed_volumes,
