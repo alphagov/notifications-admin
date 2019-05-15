@@ -118,7 +118,7 @@ def test_notification_status_page_respects_redaction(
 @pytest.mark.parametrize('extra_args, expected_back_link', [
     (
         {},
-        partial(url_for, 'main.view_notifications', message_type='sms'),
+        partial(url_for, 'main.view_notifications', message_type='sms', status='sending,delivered,failed'),
     ),
     (
         {'from_job': 'job_id'},

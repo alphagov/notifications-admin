@@ -114,6 +114,7 @@ def view_notification(service_id, notification_id):
             'main.view_notifications',
             service_id=current_service.id,
             message_type=template.template_type,
+            status='sending,delivered,failed',
         )
 
     return render_template(
