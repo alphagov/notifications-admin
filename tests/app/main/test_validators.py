@@ -6,7 +6,7 @@ from wtforms import ValidationError
 from app.main.forms import RegisterUserForm, ServiceSmsSenderForm
 from app.main.validators import (
     NoCommasInPlaceHolders,
-    OnlyGSMCharacters,
+    OnlySMSCharacters,
     ValidGovEmail,
 )
 
@@ -165,8 +165,8 @@ def test_for_commas_in_placeholders(
 
 
 @pytest.mark.parametrize('msg', ['The quick brown fox', 'Thé “quick” bröwn fox\u200B'])
-def test_gsm_character_validation(client, msg):
-    OnlyGSMCharacters()(None, _gen_mock_field(msg))
+def test_sms_character_validation(client, msg):
+    OnlySMSCharacters()(None, _gen_mock_field(msg))
 
 
 @pytest.mark.parametrize('data, err_msg', [
@@ -185,9 +185,9 @@ def test_gsm_character_validation(client, msg):
         )
     ),
 ])
-def test_non_gsm_character_validation(data, err_msg, client):
+def test_non_sms_character_validation(data, err_msg, client):
     with pytest.raises(ValidationError) as error:
-        OnlyGSMCharacters()(None, _gen_mock_field(data))
+        OnlySMSCharacters()(None, _gen_mock_field(data))
 
     assert str(error.value) == err_msg
 
