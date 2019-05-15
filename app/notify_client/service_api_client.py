@@ -386,9 +386,9 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             )
         )
 
-    def verify_reply_to_email_address(self, email_address):
+    def verify_reply_to_email_address(self, service_id, email_address):
         return self.post(
-            "/service/email-reply-to/verify",
+            "/service/{}/email-reply-to/verify".format(service_id),
             data={"email": email_address}
         )
 

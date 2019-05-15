@@ -2024,7 +2024,7 @@ def test_add_reply_to_email_address_sends_test_notification(
             service_id=SERVICE_ONE_ID,
             notification_id="123",
             _external=True,
-        ) + "?is_default={}".format(api_default_args)
+        ) + "?is_default={}".format(SERVICE_ONE_ID, api_default_args)
     )
     mock_verify.assert_called_once_with("test@example.com")
 

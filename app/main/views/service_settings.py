@@ -406,7 +406,17 @@ def service_add_email_reply_to(service_id):
     first_email_address = current_service.count_email_reply_to_addresses == 0
     is_default = first_email_address if first_email_address else form.is_default.data
     if form.validate_on_submit():
-        notification_id = service_api_client.verify_reply_to_email_address(form.email_address.data)["data"]["id"]
+        try:
+            notification_id = service_api_client.verify_reply_to_email_address(
+                service_id, form.email_address.data
+            )["data"]["id"]
+        except HTTPError as e:
+            error_msg = "Your service already uses '{}' as an email reply-to address.".format(form.email_address.data)
+            if e.status_code == 400 and error_msg == e.message:
+                flash(error_msg, 'error')
+                return redirect(url_for('.service_email_reply_to', service_id=service_id))
+            else:
+                raise e
         return redirect(url_for(
             '.verify_reply_to_address',
             service_id=service_id,
@@ -444,11 +454,12 @@ def get_verify_reply_to_address_partials(service_id, notification_id):
     is_default = request.args.get('is_default', False)
     if notification["status"] == "delivered":
         verification_status = "success"
-        service_api_client.add_reply_to_email_address(
-            current_service.id,
-            email_address=notification["to"],
-            is_default=True if is_default == "True" else False
-        )
+        if notification["to"] not in [i["email_address"] for i in current_service.email_reply_to_addresses]:
+            service_api_client.add_reply_to_email_address(
+                current_service.id,
+                email_address=notification["to"],
+                is_default=True if is_default == "True" else False
+            )
     if notification["status"] in ["failed", "permanent-failure", "technical-failure", "temporary-failure"]:
         verification_status = "failure"
     # also include condition for when lots of time passes
