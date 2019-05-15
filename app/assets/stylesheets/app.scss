@@ -124,10 +124,20 @@ td {
 
 .form-label {
   margin-bottom: 5px;
+
+  &.heading-small {
+    @include bold-19();
+  }
 }
 
 .hint {
   color: $secondary-text-colour;
+
+  .form-label + & {
+    display: block;
+    margin-top: -5px;
+    margin-bottom: 5px;
+  }
 }
 
 .list-bullet {
