@@ -115,6 +115,46 @@ def test_notification_status_page_respects_redaction(
     )
 
 
+@pytest.mark.parametrize('extra_args, expected_back_link', [
+    (
+        {},
+        partial(url_for, 'main.view_notifications', message_type='sms', status='sending,delivered,failed'),
+    ),
+    (
+        {'from_job': 'job_id'},
+        partial(url_for, 'main.view_job', job_id='job_id'),
+    ),
+    (
+        {'help': '0'},
+        None,
+    ),
+    (
+        {'help': '0', 'from_job': 'job_id'},
+        None,
+    ),
+])
+def test_notification_status_shows_expected_back_link(
+    client_request,
+    mocker,
+    mock_get_notification,
+    fake_uuid,
+    extra_args,
+    expected_back_link,
+):
+    page = client_request.get(
+        'main.view_notification',
+        service_id=SERVICE_ONE_ID,
+        notification_id=fake_uuid,
+        **extra_args
+    )
+    back_link = page.select_one('.govuk-back-link')
+
+    if expected_back_link:
+        assert back_link['href'] == expected_back_link(service_id=SERVICE_ONE_ID)
+    else:
+        assert back_link is None
+
+
 @freeze_time("2012-01-01 01:01")
 def test_notification_page_doesnt_link_to_template_in_tour(
     client_request,

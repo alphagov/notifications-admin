@@ -101,6 +101,22 @@ def view_notification(service_id, notification_id):
     show_cancel_button = notification['notification_type'] == 'letter' and \
         letter_can_be_cancelled(notification['status'], notification_created)
 
+    if request.args.get('help') == '0':
+        back_link = None
+    elif request.args.get('from_job'):
+        back_link = url_for(
+            'main.view_job',
+            service_id=current_service.id,
+            job_id=request.args.get('from_job'),
+        )
+    else:
+        back_link = url_for(
+            'main.view_notifications',
+            service_id=current_service.id,
+            message_type=template.template_type,
+            status='sending,delivered,failed',
+        )
+
     return render_template(
         'views/notifications/notification.html',
         finished=(notification['status'] in (DELIVERED_STATUSES + FAILURE_STATUSES)),
@@ -133,6 +149,7 @@ def view_notification(service_id, notification_id):
         sent_with_test_key=(
             notification.get('key_type') == KEY_TYPE_TEST
         ),
+        back_link=back_link,
     )
 
 
