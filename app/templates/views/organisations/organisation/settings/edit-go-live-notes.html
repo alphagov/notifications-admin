@@ -1,0 +1,25 @@
+{% from "components/form.html" import form_wrapper %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/textbox.html" import textbox %}
+
+{% extends "org_template.html" %}
+
+{% block org_page_title %}
+  Edit request to go live notes
+{% endblock %}
+
+{% block maincolumn_content %}
+  <h1 class="heading-large">Edit request to go live notes</h1>
+  <div class="grid-row">
+    <div class="column-five-sixths">
+      <p>
+        Text entered here will be displayed in the Zendesk ticket when a service
+        belonging to this organisation requests to go live.
+      </p>
+      {% call form_wrapper() %}
+        {{ textbox(form.request_to_go_live_notes, width='1-1', rows=3) }}
+        {{ page_footer('Save') }}
+      {% endcall %}
+    </div>
+  </div>
+{% endblock %}

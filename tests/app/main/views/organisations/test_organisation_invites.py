@@ -503,6 +503,7 @@ def test_organisation_settings_for_platform_admin(
         'Organisation type Not set Change',
         'Crown organisation Yes Change',
         'Data sharing and financial agreement Not signed Change',
+        'Request to go live notes None Change',
         'Default email branding GOV.UK Change',
         'Default letter branding No branding Change',
         'Known email domains None Change',
@@ -945,3 +946,53 @@ def test_confirm_update_organisation_with_name_already_in_use(
 
     assert response.status_code == 302
     assert response.location == url_for('main.edit_organisation_name', org_id=organisation_one['id'], _external=True)
+
+
+def test_get_edit_organisation_go_live_notes_page(
+    logged_in_platform_admin_client,
+    mock_get_organisation,
+    organisation_one,
+):
+    response = logged_in_platform_admin_client.get(
+        url_for(
+            '.edit_organisation_go_live_notes',
+            org_id=organisation_one['id']
+        )
+    )
+
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    assert page.find('textarea', id='request_to_go_live_notes')
+
+
+@pytest.mark.parametrize('input_note,saved_note', [
+    ('Needs permission', 'Needs permission'),
+    ('  ', None)
+])
+def test_post_edit_organisation_go_live_notes_updates_go_live_notes(
+    logged_in_platform_admin_client,
+    mock_get_organisation,
+    mock_update_organisation,
+    organisation_one,
+    input_note,
+    saved_note,
+):
+    response = logged_in_platform_admin_client.post(
+        url_for(
+            '.edit_organisation_go_live_notes',
+            org_id=organisation_one['id'],
+        ),
+        data={'request_to_go_live_notes': input_note}
+    )
+
+    mock_update_organisation.assert_called_once_with(
+        organisation_one['id'],
+        request_to_go_live_notes=saved_note
+    )
+    assert response.status_code == 302
+    assert response.location == url_for(
+        '.organisation_settings',
+        org_id=organisation_one['id'],
+        _external=True
+    )

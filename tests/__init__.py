@@ -195,6 +195,7 @@ def organisation_json(
     crown=True,
     agreement_signed=False,
     organisation_type='',
+    request_to_go_live_notes=None,
 ):
     if users is None:
         users = []
@@ -215,6 +216,7 @@ def organisation_json(
         'agreement_signed_at': None,
         'agreement_signed_by': None,
         'domains': domains or [],
+        'request_to_go_live_notes': request_to_go_live_notes,
     }
 
 
