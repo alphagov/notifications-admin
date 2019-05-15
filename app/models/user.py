@@ -205,6 +205,20 @@ class User(UserMixin):
             organisations_client.get_organisation_by_domain(self.email_domain)
         )
 
+    @property
+    def default_organisation_type(self):
+        if self.default_organisation:
+            return self.default_organisation.organisation_type
+        if self.has_nhs_email_address:
+            return 'nhs'
+        return None
+
+    @property
+    def has_nhs_email_address(self):
+        return self.email_address.lower().endswith((
+            '@nhs.uk', '.nhs.uk', '@nhs.net', '.nhs.net',
+        ))
+
     def serialize(self):
         dct = {
             "id": self.id,
