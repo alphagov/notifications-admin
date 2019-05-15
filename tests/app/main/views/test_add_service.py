@@ -3,7 +3,7 @@ from flask import session, url_for
 
 from app.utils import is_gov_user
 from tests import organisation_json
-from tests.conftest import mock_get_organisation_by_domain
+from tests.conftest import mock_get_organisation_by_domain, normalize_spaces
 
 
 def test_non_gov_user_cannot_see_add_service_button(
@@ -126,6 +126,35 @@ def test_should_add_service_and_redirect_to_tour_when_no_services(
     )
     assert session['service_id'] == 101
     mock_create_or_update_free_sms_fragment_limit.assert_called_once_with(101, sms_limit)
+
+
+def test_add_service_has_to_choose_org_type(
+    mocker,
+    client_request,
+    mock_create_service,
+    mock_create_service_template,
+    mock_get_services_with_no_services,
+    api_user_active,
+    mock_create_or_update_free_sms_fragment_limit,
+    mock_get_all_email_branding,
+):
+    mocker.patch(
+        'app.organisations_client.get_organisation_by_domain',
+        return_value=None,
+    )
+    page = client_request.post(
+        'main.add_service',
+        _data={
+            'name': 'testing the post',
+        },
+        _expected_status=200,
+    )
+    assert normalize_spaces(page.select_one('.error-message').text) == (
+        'Not a valid choice'
+    )
+    assert mock_create_service.called is False
+    assert mock_create_service_template.called is False
+    assert mock_create_or_update_free_sms_fragment_limit.called is False
 
 
 @pytest.mark.parametrize('email_address', (
