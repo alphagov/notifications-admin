@@ -460,9 +460,12 @@ def get_verify_reply_to_address_partials(service_id, notification_id):
                 email_address=notification["to"],
                 is_default=True if is_default == "True" else False
             )
-    if notification["status"] in ["failed", "permanent-failure", "technical-failure", "temporary-failure"]:
+    created_at_no_tz = notification["created_at"][:-6]
+    seconds_since_sending = (datetime.utcnow() - datetime.strptime(created_at_no_tz, '%Y-%m-%dT%H:%M:%S.%f')).seconds
+    if notification["status"] in [
+        "failed", "permanent-failure", "technical-failure", "temporary-failure"
+    ] or (notification["status"] == "sending" and seconds_since_sending > 300):
         verification_status = "failure"
-    # also include condition for when lots of time passes
     return {
         'status': render_template(
             'views/service-settings/email-reply-to/_verify-updates.html',

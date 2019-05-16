@@ -2032,7 +2032,7 @@ def test_add_reply_to_email_address_sends_test_notification(
 @pytest.mark.parametrize("is_default", [True, False])
 @pytest.mark.parametrize("status,expected_failure,expected_success", [
     ("delivered", 0, 1),
-    ("pending", 0, 0),
+    ("sending", 0, 0),
     ("permanent-failure", 1, 0),
 ])
 def test_verify_reply_to_address(
@@ -2070,12 +2070,28 @@ def test_verify_reply_to_address(
         )
 
 
-def test_add_reply_to_email_address_success():
-    pass
-
-
-def test_add_reply_to_email_address_failure():
-    pass
+@freeze_time("2018-06-01 11:11:00.061258")
+def test_add_reply_to_email_address_fails_if_notification_not_received(mocker, client_request, fake_uuid):
+    notification = {
+        "id": fake_uuid,
+        "status": "sending",
+        "to": "email@example.gov.uk",
+        "service_id": SERVICE_ONE_ID,
+        "template_id": TEMPLATE_ONE_ID,
+        "notification_type": "email",
+        "created_at": '2018-06-01T11:05:52.499230+00:00'
+    }
+    mocker.patch('app.notification_api_client.get_notification', return_value=notification)
+    mock_add_reply_to_email_address = mocker.patch('app.service_api_client.add_reply_to_email_address')
+    page = client_request.get(
+        'main.verify_reply_to_address',
+        service_id=SERVICE_ONE_ID,
+        notification_id=notification["id"],
+        _optional_args="?is_default={}".format(False)
+    )
+    expected_banner = page.find_all('div', class_='banner-dangerous')[0]
+    assert expected_banner.text.strip() == "Sorry dawg, this email address doesn't seem to be working :d"
+    mock_add_reply_to_email_address.assert_not_called()
 
 
 @pytest.mark.parametrize('fixture, data, api_default_args', [
