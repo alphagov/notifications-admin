@@ -31,7 +31,6 @@ from tests.conftest import (
     get_non_default_letter_contact_block,
     get_non_default_reply_to_email_address,
     get_non_default_sms_sender,
-    mock_get_notification,
     mock_get_service_organisation,
     multiple_letter_contact_blocks,
     multiple_reply_to_email_addresses,
@@ -2013,20 +2012,22 @@ def test_add_reply_to_email_address_sends_test_notification(
 ):
     fixture(mocker)
     data['email_address'] = "test@example.com"
-    mock_verify = mocker.patch('app.service_api_client.verify_reply_to_email_address', return_value={"id": "123"})
+    mock_verify = mocker.patch(
+        'app.service_api_client.verify_reply_to_email_address', return_value={"data": {"id": "123"}}
+    )
     client_request.post(
         'main.service_add_email_reply_to',
         service_id=SERVICE_ONE_ID,
         _data=data,
         _expected_status=302,
         _expected_redirect=url_for(
-            'main.verify_reply_to_address',
+            'main.service_verify_reply_to_address',
             service_id=SERVICE_ONE_ID,
             notification_id="123",
             _external=True,
-        ) + "?is_default={}".format(SERVICE_ONE_ID, api_default_args)
+        ) + "?is_default={}".format(api_default_args)
     )
-    mock_verify.assert_called_once_with("test@example.com")
+    mock_verify.assert_called_once_with(SERVICE_ONE_ID, "test@example.com")
 
 
 @pytest.mark.parametrize("is_default", [True, False])
@@ -2035,7 +2036,8 @@ def test_add_reply_to_email_address_sends_test_notification(
     ("sending", 0, 0),
     ("permanent-failure", 1, 0),
 ])
-def test_verify_reply_to_address(
+@freeze_time("2018-06-01 11:11:00.061258")
+def test_service_verify_reply_to_address(
     mocker, client_request, fake_uuid, status, expected_failure, expected_success, is_default
 ):
     notification = {
@@ -2044,12 +2046,16 @@ def test_verify_reply_to_address(
         "to": "email@example.gov.uk",
         "service_id": SERVICE_ONE_ID,
         "template_id": TEMPLATE_ONE_ID,
-        "notification_type": "email"
+        "notification_type": "email",
+        "created_at": '2018-06-01T11:10:52.499230+00:00'
     }
     mocker.patch('app.notification_api_client.get_notification', return_value=notification)
     mock_add_reply_to_email_address = mocker.patch('app.service_api_client.add_reply_to_email_address')
+    mocker.patch(
+        'app.service_api_client.get_reply_to_email_addresses', return_value=[]
+    )
     page = client_request.get(
-        'main.verify_reply_to_address',
+        'main.service_verify_reply_to_address',
         service_id=SERVICE_ONE_ID,
         notification_id=notification["id"],
         _optional_args="?is_default={}".format(is_default)
@@ -2071,7 +2077,7 @@ def test_verify_reply_to_address(
 
 
 @freeze_time("2018-06-01 11:11:00.061258")
-def test_add_reply_to_email_address_fails_if_notification_not_received(mocker, client_request, fake_uuid):
+def test_add_reply_to_email_address_fails_if_notification_not_delivered_in_5_mins(mocker, client_request, fake_uuid):
     notification = {
         "id": fake_uuid,
         "status": "sending",
@@ -2084,7 +2090,7 @@ def test_add_reply_to_email_address_fails_if_notification_not_received(mocker, c
     mocker.patch('app.notification_api_client.get_notification', return_value=notification)
     mock_add_reply_to_email_address = mocker.patch('app.service_api_client.add_reply_to_email_address')
     page = client_request.get(
-        'main.verify_reply_to_address',
+        'main.service_verify_reply_to_address',
         service_id=SERVICE_ONE_ID,
         notification_id=notification["id"],
         _optional_args="?is_default={}".format(False)
@@ -2213,8 +2219,10 @@ def test_edit_reply_to_email_address(
     mocker,
     fake_uuid,
     client_request,
-    mock_update_reply_to_email_address
 ):
+    mock_verify = mocker.patch(
+        'app.service_api_client.verify_reply_to_email_address', return_value={"data": {"id": "123"}}
+    )
     fixture(mocker)
     data['email_address'] = "test@example.gov.uk"
     client_request.post(
@@ -2223,13 +2231,7 @@ def test_edit_reply_to_email_address(
         reply_to_email_id=fake_uuid,
         _data=data
     )
-
-    mock_update_reply_to_email_address.assert_called_once_with(
-        SERVICE_ONE_ID,
-        reply_to_email_id=fake_uuid,
-        email_address="test@example.gov.uk",
-        is_default=api_default_args
-    )
+    mock_verify.assert_called_once_with(SERVICE_ONE_ID, "test@example.gov.uk")
 
 
 @pytest.mark.parametrize('fixture, expected_link_text, partial_href', [

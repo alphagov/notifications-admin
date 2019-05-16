@@ -1,4 +1,5 @@
 from collections import OrderedDict
+from datetime import datetime
 
 from flask import (
     abort,
@@ -418,7 +419,7 @@ def service_add_email_reply_to(service_id):
             else:
                 raise e
         return redirect(url_for(
-            '.verify_reply_to_address',
+            '.service_verify_reply_to_address',
             service_id=service_id,
             notification_id=notification_id
         ) + "?is_default={}".format(is_default))
@@ -432,23 +433,23 @@ def service_add_email_reply_to(service_id):
 @main.route("/services/<service_id>/service-settings/email-reply-to/<notification_id>/verify", methods=['GET', 'POST'])
 @login_required
 @user_has_permissions('manage_service')
-def verify_reply_to_address(service_id, notification_id):
+def service_verify_reply_to_address(service_id, notification_id):
     return render_template(
         'views/service-settings/email-reply-to/verify.html',
         service_id=service_id,
         notification_id=notification_id,
-        partials=get_verify_reply_to_address_partials(service_id, notification_id)
+        partials=get_service_verify_reply_to_address_partials(service_id, notification_id)
     )
 
 
 @main.route("/services/<service_id>/service-settings/email-reply-to/<notification_id>/verify.json")
 @login_required
 @user_has_permissions('manage_service')
-def verify_reply_to_address_updates(service_id, notification_id):
-    return jsonify(**get_verify_reply_to_address_partials(service_id, notification_id))
+def service_verify_reply_to_address_updates(service_id, notification_id):
+    return jsonify(**get_service_verify_reply_to_address_partials(service_id, notification_id))
 
 
-def get_verify_reply_to_address_partials(service_id, notification_id):
+def get_service_verify_reply_to_address_partials(service_id, notification_id):
     notification = notification_api_client.get_notification(current_app.config["NOTIFY_SERVICE_ID"], notification_id)
     verification_status = "pending"
     is_default = request.args.get('is_default', False)
@@ -497,13 +498,23 @@ def service_edit_email_reply_to(service_id, reply_to_email_id):
         form.email_address.data = reply_to_email_address['email_address']
         form.is_default.data = reply_to_email_address['is_default']
     if form.validate_on_submit():
-        service_api_client.update_reply_to_email_address(
-            current_service.id,
-            reply_to_email_id=reply_to_email_id,
-            email_address=form.email_address.data,
-            is_default=True if reply_to_email_address['is_default'] else form.is_default.data
-        )
-        return redirect(url_for('.service_email_reply_to', service_id=service_id))
+        try:
+            notification_id = service_api_client.verify_reply_to_email_address(
+                service_id, form.email_address.data
+            )["data"]["id"]
+        except HTTPError as e:
+            error_msg = "Your service already uses '{}' as an email reply-to address.".format(form.email_address.data)
+            if e.status_code == 400 and error_msg == e.message:
+                flash(error_msg, 'error')
+                return redirect(url_for('.service_email_reply_to', service_id=service_id))
+            else:
+                raise e
+        return redirect(url_for(
+            '.service_verify_reply_to_address',
+            service_id=service_id,
+            notification_id=notification_id
+        ) + "?is_default={}".format(True if reply_to_email_address['is_default'] else form.is_default.data))
+
     if (request.endpoint == "main.service_confirm_delete_email_reply_to"):
         flash("Are you sure you want to delete this email reply-to address?", 'delete')
     return render_template(

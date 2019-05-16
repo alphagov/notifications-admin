@@ -11,7 +11,7 @@
     </p>
 
     <p>
-      <a href="{{ url_for('main.verify_reply_to_address', service_id=service_id, notification_id=notification_id) + "?is_default={}".format(is_default) }}"">Refresh</a>
+      <a href="{{ url_for('main.service_verify_reply_to_address', service_id=service_id, notification_id=notification_id) + "?is_default={}".format(is_default) }}"">Refresh</a>
     </p>
   {% elif verification_status == "success" %}
     {{ banner("Yay success! Your new reply-to email has been added ^__^", type='default', with_tick=True) }}
