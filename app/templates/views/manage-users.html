@@ -48,15 +48,6 @@
                 label
               ) }}
             {% endfor %}
-            {% if current_service.has_permission('email_auth') %}
-              <div class="tick-cross-list-hint">
-                {% if user.auth_type == 'sms_auth' %}
-                  Signs in with a text message code
-                {% else %}
-                  Signs in with an email link
-                {% endif %}
-              </div>
-            {% endif %}
             {# only show if the service has folders #}
             {% if current_service.all_template_folders %}
               <div class="tick-cross-list-hint">
@@ -69,6 +60,15 @@
                 {% else %}
                   Can see all folders
                 {% endif%}
+              </div>
+            {% endif %}
+            {% if current_service.has_permission('email_auth') %}
+              <div class="tick-cross-list-hint">
+                {% if user.auth_type == 'sms_auth' %}
+                  Signs in with a text message code
+                {% else %}
+                  Signs in with an email link
+                {% endif %}
               </div>
             {% endif %}
           </div>
