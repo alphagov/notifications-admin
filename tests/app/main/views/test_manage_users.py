@@ -124,6 +124,7 @@ def test_should_show_overview_page(
     client_request,
     mocker,
     mock_get_invites_for_service,
+    mock_get_template_folders,
     mock_has_no_jobs,
     fake_uuid,
     service_one,
@@ -157,6 +158,7 @@ def test_should_show_caseworker_on_overview_page(
     client_request,
     mocker,
     mock_get_invites_for_service,
+    mock_get_template_folders,
     fake_uuid,
     service_one,
 ):
@@ -276,6 +278,7 @@ def test_manage_users_page_shows_member_auth_type_if_service_has_email_auth_acti
     service_one,
     mock_get_users_by_service,
     mock_get_invites_for_service,
+    mock_get_template_folders,
     displays_auth_type
 ):
     if service_has_email_auth:
@@ -833,6 +836,7 @@ def test_manage_users_shows_invited_user(
     client_request,
     mocker,
     active_user_with_permissions,
+    mock_get_template_folders,
     sample_invite,
     invite_status,
     expected_text,
@@ -852,6 +856,7 @@ def test_manage_users_does_not_show_accepted_invite(
     mocker,
     active_user_with_permissions,
     sample_invite,
+    mock_get_template_folders,
 ):
     invited_user_id = uuid.uuid4()
     sample_invite['id'] = invited_user_id
@@ -897,6 +902,7 @@ def test_no_permission_manage_users_page(
     service_one,
     mock_get_users_by_service,
     mock_get_invites_for_service,
+    mock_get_template_folders,
     api_user_active,
     mocker,
 ):
@@ -997,6 +1003,7 @@ def test_can_invite_user_as_platform_admin(
     platform_admin_user,
     active_user_with_permissions,
     mock_get_invites_for_service,
+    mock_get_template_folders,
     mocker,
 ):
     mocker.patch('app.user_api_client.get_users_for_service', return_value=[active_user_with_permissions])

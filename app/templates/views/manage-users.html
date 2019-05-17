@@ -58,7 +58,7 @@
               </div>
             {% endif %}
             {# only show if the service has folders #}
-            {% if current_service.has_permission('edit_folder_permissions')  and current_service.all_template_folders %}
+            {% if current_service.all_template_folders %}
               <div class="tick-cross-list-hint">
                 {% set folder_count = user.template_folders_for_service(current_service) | length %}
 
