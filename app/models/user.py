@@ -168,9 +168,6 @@ class User(UserMixin):
         """
         Returns list of template folders that a user can view for a given service
         """
-        if not service.has_permission('edit_folder_permissions'):
-            return service.all_template_folders
-
         return [
             template_folder
             for template_folder in service.all_template_folders
