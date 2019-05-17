@@ -25,6 +25,9 @@ applications:
       - route: {{ route }}
       {%- endfor %}
 
+    health-check-type: http
+    health-check-http-endpoint: '/_status?simple=true'
+
     services:
       - logit-ssl-syslog-drain
 
