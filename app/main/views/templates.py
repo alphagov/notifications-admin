@@ -53,10 +53,7 @@ def view_template(service_id, template_id):
     template = current_service.get_template(template_id)
     template_folder = current_service.get_template_folder(template['folder'])
 
-    if not current_service.has_permission("edit_folder_permissions"):
-        user_has_template_permission = True
-    else:
-        user_has_template_permission = current_user.has_template_folder_permission(template_folder)
+    user_has_template_permission = current_user.has_template_folder_permission(template_folder)
 
     if should_skip_template_page(template['template_type']):
         return redirect(url_for(
@@ -120,10 +117,7 @@ def start_tour(service_id, template_id):
 def choose_template(service_id, template_type='all', template_folder_id=None):
     template_folder = current_service.get_template_folder(template_folder_id)
 
-    if not current_service.has_permission("edit_folder_permissions"):
-        user_has_template_folder_permission = True
-    else:
-        user_has_template_folder_permission = current_user.has_template_folder_permission(template_folder)
+    user_has_template_folder_permission = current_user.has_template_folder_permission(template_folder)
 
     template_list = TemplateList(current_service, template_type, template_folder_id, current_user)
 
@@ -393,10 +387,7 @@ def copy_template(service_id, template_id):
     template = service_api_client.get_service_template(from_service, str(template_id))['data']
 
     template_folder = template_folder_api_client.get_template_folder(from_service, template['folder'])
-    if (
-        current_service.has_permission('edit_folder_permissions') and
-        not current_user.has_template_folder_permission(template_folder)
-    ):
+    if not current_user.has_template_folder_permission(template_folder):
         abort(403)
 
     if request.method == 'POST':

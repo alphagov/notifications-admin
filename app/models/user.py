@@ -155,14 +155,6 @@ class User(UserMixin):
         return permission in self._permissions.get(service_id, [])
 
     def has_template_folder_permission(self, template_folder, service=None):
-        from app import current_service
-
-        if service is None:
-            service = current_service
-
-        if not service.has_permission('edit_folder_permissions'):
-            return True
-
         if self.platform_admin:
             return True
 

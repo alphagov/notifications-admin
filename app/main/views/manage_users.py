@@ -63,11 +63,6 @@ def invite_user(service_id):
         form.login_authentication.data = 'sms_auth'
 
     if form.validate_on_submit():
-        if current_service.has_permission('edit_folder_permissions'):
-            folder_permissions = form.folder_permissions.data
-        else:
-            folder_permissions = list(current_service.all_template_folder_ids)
-
         email_address = form.email_address.data
         invited_user = invite_api_client.create_invite(
             current_user.id,
@@ -75,7 +70,7 @@ def invite_user(service_id):
             email_address,
             form.permissions,
             form.login_authentication.data,
-            folder_permissions,
+            form.folder_permissions.data,
         )
 
         flash('Invite sent to {}'.format(invited_user.email_address), 'default_with_tick')
@@ -114,10 +109,7 @@ def edit_user_permissions(service_id, user_id):
         user_api_client.set_user_permissions(
             user_id, service_id,
             permissions=form.permissions,
-            folder_permissions=(
-                form.folder_permissions.data
-                if current_service.has_permission('edit_folder_permissions') else None
-            ),
+            folder_permissions=form.folder_permissions.data,
         )
         if service_has_email_auth:
             user_api_client.update_user_attribute(user_id, auth_type=form.login_authentication.data)

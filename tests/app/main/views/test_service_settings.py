@@ -110,8 +110,6 @@ def mock_get_service_settings_page_common(
         'Receive inbound SMS Off Change',
         'User auth type editing Off Change',
         'Uploading documents Off Change',
-        'Folder permissions Off Change',
-
     ]),
 ])
 def test_should_show_overview(

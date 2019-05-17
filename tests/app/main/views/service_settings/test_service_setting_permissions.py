@@ -44,8 +44,6 @@ def test_service_set_permission_requires_platform_admin(
     ('inbound_sms', 'False', False),
     ('email_auth', 'True', True),
     ('email_auth', 'False', False),
-    ('edit_folder_permissions', 'True', True),
-    ('edit_folder_permissions', 'False', False),
 ])
 def test_service_set_permission(
     mocker,
