@@ -15,6 +15,10 @@
 
 {% if current_service.has_permission("edit_folder_permissions") and form.folder_permissions.all_template_folders %}
   {{ checkboxes_nested(form.folder_permissions, form.folder_permissions.children(), hide_legend=True, collapsible_opts={ 'field': 'folder' }) }}
+{% elif user and user.platform_admin %}
+  <p class="bottom-gutter">
+    Platform admin users can access all template folders.
+  </p>
 {% endif %}
 
 {% if service_has_email_auth %}

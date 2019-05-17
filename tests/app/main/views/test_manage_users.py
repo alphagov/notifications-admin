@@ -17,6 +17,7 @@ from tests.conftest import (
     active_user_view_permissions,
     active_user_with_permissions,
     normalize_spaces,
+    platform_admin_user,
     sample_uuid,
 )
 
@@ -478,6 +479,18 @@ def test_edit_user_folder_permissions(
         {'id': 'folder-id-2', 'name': 'folder_one', 'parent_id': None, 'users_with_permission': []},
         {'id': 'folder-id-3', 'name': 'folder_one', 'parent_id': 'folder-id-1', 'users_with_permission': []},
     ]
+
+    page = client_request.get(
+        'main.edit_user_permissions',
+        service_id=SERVICE_ONE_ID,
+        user_id=fake_uuid,
+    )
+    assert [
+        item['value'] for item in page.select('input[name=folder_permissions]')
+    ] == [
+        'folder-id-1', 'folder-id-3', 'folder-id-2'
+    ]
+
     client_request.post(
         'main.edit_user_permissions',
         service_id=SERVICE_ONE_ID,
@@ -497,6 +510,57 @@ def test_edit_user_folder_permissions(
         SERVICE_ONE_ID,
         permissions=set(),
         folder_permissions=['folder-id-1', 'folder-id-3']
+    )
+
+
+def test_cant_edit_user_folder_permissions_for_platform_admin_users(
+    client_request,
+    mocker,
+    service_one,
+    mock_get_users_by_service,
+    mock_get_invites_for_service,
+    mock_set_user_permissions,
+    mock_get_template_folders,
+    fake_uuid,
+):
+    service_one['permissions'] = ['edit_folder_permissions']
+    mocker.patch(
+        'app.user_api_client.get_user', return_value=platform_admin_user(fake_uuid)
+    )
+    mock_get_template_folders.return_value = [
+        {'id': 'folder-id-1', 'name': 'folder_one', 'parent_id': None, 'users_with_permission': []},
+        {'id': 'folder-id-2', 'name': 'folder_one', 'parent_id': None, 'users_with_permission': []},
+        {'id': 'folder-id-3', 'name': 'folder_one', 'parent_id': 'folder-id-1', 'users_with_permission': []},
+    ]
+    page = client_request.get(
+        'main.edit_user_permissions',
+        service_id=SERVICE_ONE_ID,
+        user_id=fake_uuid,
+    )
+    assert normalize_spaces(page.select('main p')[0].text) == 'platform@admin.gov.uk Change'
+    assert normalize_spaces(page.select('main p')[2].text) == (
+        'Platform admin users can access all template folders.'
+    )
+    assert page.select('input[name=folder_permissions]') == []
+    client_request.post(
+        'main.edit_user_permissions',
+        service_id=SERVICE_ONE_ID,
+        user_id=fake_uuid,
+        _data={},
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.manage_users',
+            service_id=SERVICE_ONE_ID,
+            _external=True,
+        ),
+    )
+    mock_set_user_permissions.assert_called_with(
+        fake_uuid,
+        SERVICE_ONE_ID,
+        permissions={
+            'manage_api_keys', 'manage_service', 'manage_templates', 'send_messages', 'view_activity',
+        },
+        folder_permissions=None,
     )
 
 

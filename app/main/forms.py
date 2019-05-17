@@ -418,6 +418,7 @@ PermissionsAbstract = type("PermissionsAbstract", (StripWhitespaceForm,), {
 class PermissionsForm(PermissionsAbstract):
     def __init__(self, all_template_folders=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.folder_permissions.choices = []
         if all_template_folders is not None:
             self.folder_permissions.all_template_folders = all_template_folders
             self.folder_permissions.choices = [
