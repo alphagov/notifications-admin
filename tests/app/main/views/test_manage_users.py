@@ -479,6 +479,18 @@ def test_edit_user_folder_permissions(
         {'id': 'folder-id-2', 'name': 'folder_one', 'parent_id': None, 'users_with_permission': []},
         {'id': 'folder-id-3', 'name': 'folder_one', 'parent_id': 'folder-id-1', 'users_with_permission': []},
     ]
+
+    page = client_request.get(
+        'main.edit_user_permissions',
+        service_id=SERVICE_ONE_ID,
+        user_id=fake_uuid,
+    )
+    assert [
+        item['value'] for item in page.select('input[name=folder_permissions]')
+    ] == [
+        'folder-id-1', 'folder-id-3', 'folder-id-2'
+    ]
+
     client_request.post(
         'main.edit_user_permissions',
         service_id=SERVICE_ONE_ID,
@@ -525,15 +537,16 @@ def test_cant_edit_user_folder_permissions_for_platform_admin_users(
         service_id=SERVICE_ONE_ID,
         user_id=fake_uuid,
     )
-    assert page.select_one('main p').text == 'foo'
-    assert page.select('') is False
+    assert normalize_spaces(page.select('main p')[0].text) == 'platform@admin.gov.uk Change'
+    assert normalize_spaces(page.select('main p')[2].text) == (
+        'Platform admin users can access all template folders.'
+    )
+    assert page.select('input[name=folder_permissions]') == []
     client_request.post(
         'main.edit_user_permissions',
         service_id=SERVICE_ONE_ID,
         user_id=fake_uuid,
-        _data=dict(
-            folder_permissions=['folder-id-1', 'folder-id-3']
-        ),
+        _data={},
         _expected_status=302,
         _expected_redirect=url_for(
             'main.manage_users',
@@ -544,8 +557,10 @@ def test_cant_edit_user_folder_permissions_for_platform_admin_users(
     mock_set_user_permissions.assert_called_with(
         fake_uuid,
         SERVICE_ONE_ID,
-        permissions=set(),
-        folder_permissions=['folder-id-1', 'folder-id-3']
+        permissions={
+            'manage_api_keys', 'manage_service', 'manage_templates', 'send_messages', 'view_activity',
+        },
+        folder_permissions=None,
     )
 
 
