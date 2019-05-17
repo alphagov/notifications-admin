@@ -7,7 +7,7 @@ from app.status import status
 
 @status.route('/_status', methods=['GET'])
 def show_status():
-    if request.args.get('elb', None):
+    if request.args.get('elb', None) or request.args.get('simple', None):
         return jsonify(status="ok"), 200
     else:
         try:
