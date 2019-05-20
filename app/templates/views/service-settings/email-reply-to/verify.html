@@ -14,7 +14,7 @@
 
   {{ page_header(
     '{} email reply-to address'.format(verb),
-    back_link=url_for('main.service_email_reply_to', service_id=current_service.id)
+    back_link=url_for('main.service_add_email_reply_to', service_id=current_service.id)
   ) }}
   {{ ajax_block(
       partials,

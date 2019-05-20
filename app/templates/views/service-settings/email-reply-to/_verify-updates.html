@@ -14,6 +14,9 @@
     </p>
   {% elif verification_status == "success" %}
     {{ banner("‘{}’ is ready to use".format(reply_to_email_address), type='default', with_tick=True) }}
+    <div class="js-stick-at-bottom-when-scrolling">
+      <a href="{{ url_for('.service_email_reply_to', service_id=service_id) }}" class="button">Continue</a>
+    </div>
   {% elif verification_status == "failure" %}
     {% call banner_wrapper(type='dangerous') %}
       <h2 class='banner-title' data-module="track-error" data-error-type="reply-to-email-not-working" data-error-label="{{ upload_id }}">
