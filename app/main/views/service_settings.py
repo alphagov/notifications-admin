@@ -437,12 +437,14 @@ def service_add_email_reply_to(service_id):
 @user_has_permissions('manage_service')
 def service_verify_reply_to_address(service_id, notification_id):
     is_new = request.args.get('is_new', False)
+    request_args = "?is_default={}&is_new={}".format(request.args.get('is_default', False), is_new)
     return render_template(
         'views/service-settings/email-reply-to/verify.html',
         service_id=service_id,
         notification_id=notification_id,
         partials=get_service_verify_reply_to_address_partials(service_id, notification_id),
-        verb=("Add" if is_new else "Change")
+        verb=("Add" if is_new else "Change"),
+        request_args=request_args
     )
 
 
@@ -454,16 +456,18 @@ def service_verify_reply_to_address_updates(service_id, notification_id):
 
 
 def get_service_verify_reply_to_address_partials(service_id, notification_id):
+    form = ServiceReplyToEmailForm()
+    first_email_address = current_service.count_email_reply_to_addresses == 0
     notification = notification_api_client.get_notification(current_app.config["NOTIFY_SERVICE_ID"], notification_id)
     verification_status = "pending"
-    is_default = request.args.get('is_default', False)
+    is_default = True if (request.args.get('is_default', False) == "True") else False
     if notification["status"] == "delivered":
         verification_status = "success"
         if notification["to"] not in [i["email_address"] for i in current_service.email_reply_to_addresses]:
             service_api_client.add_reply_to_email_address(
                 current_service.id,
                 email_address=notification["to"],
-                is_default=True if is_default == "True" else False
+                is_default=is_default
             )
     created_at_no_tz = notification["created_at"][:-6]
     seconds_since_sending = (datetime.utcnow() - datetime.strptime(created_at_no_tz, '%Y-%m-%dT%H:%M:%S.%f')).seconds
@@ -471,6 +475,8 @@ def get_service_verify_reply_to_address_partials(service_id, notification_id):
         "failed", "permanent-failure", "technical-failure", "temporary-failure"
     ] or (notification["status"] == "sending" and seconds_since_sending > 300):
         verification_status = "failure"
+        form.email_address.data = notification['to']
+        form.is_default.data = is_default
     return {
         'status': render_template(
             'views/service-settings/email-reply-to/_verify-updates.html',
@@ -479,7 +485,10 @@ def get_service_verify_reply_to_address_partials(service_id, notification_id):
             notification_id=notification_id,
             verification_status=verification_status,
             is_default=is_default,
+            form=form,
+            first_email_address=first_email_address
         ),
+        'stop': 0 if verification_status == "pending" else 1
     }
 
 
