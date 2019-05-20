@@ -423,7 +423,6 @@ def service_add_email_reply_to(service_id):
             service_id=service_id,
             notification_id=notification_id
         ) + "?is_default={}".format(is_default)
-            + "&is_new=True"
         )
 
     return render_template(
@@ -436,14 +435,14 @@ def service_add_email_reply_to(service_id):
 @login_required
 @user_has_permissions('manage_service')
 def service_verify_reply_to_address(service_id, notification_id):
-    is_new = request.args.get('is_new', False)
-    request_args = "?is_default={}&is_new={}".format(request.args.get('is_default', False), is_new)
+    replace = request.args.get('replace', False)
+    request_args = "?is_default={}&replace={}".format(request.args.get('is_default', False), replace)
     return render_template(
         'views/service-settings/email-reply-to/verify.html',
         service_id=service_id,
         notification_id=notification_id,
         partials=get_service_verify_reply_to_address_partials(service_id, notification_id),
-        verb=("Add" if is_new else "Change"),
+        verb=("Change" if replace else "Add"),
         request_args=request_args
     )
 
@@ -464,11 +463,17 @@ def get_service_verify_reply_to_address_partials(service_id, notification_id):
     if notification["status"] == "delivered":
         verification_status = "success"
         if notification["to"] not in [i["email_address"] for i in current_service.email_reply_to_addresses]:
-            service_api_client.add_reply_to_email_address(
-                current_service.id,
-                email_address=notification["to"],
-                is_default=is_default
-            )
+            replace = request.args.get('replace', False)
+            if replace and replace != "False":
+                service_api_client.update_reply_to_email_address(
+                    current_service.id, replace, email_address=notification["to"], is_default=is_default
+                )
+            else:
+                service_api_client.add_reply_to_email_address(
+                    current_service.id,
+                    email_address=notification["to"],
+                    is_default=is_default
+                )
     created_at_no_tz = notification["created_at"][:-6]
     seconds_since_sending = (datetime.utcnow() - datetime.strptime(created_at_no_tz, '%Y-%m-%dT%H:%M:%S.%f')).seconds
     if notification["status"] in [
@@ -526,7 +531,10 @@ def service_edit_email_reply_to(service_id, reply_to_email_id):
             '.service_verify_reply_to_address',
             service_id=service_id,
             notification_id=notification_id
-        ) + "?is_default={}".format(True if reply_to_email_address['is_default'] else form.is_default.data))
+        ) + "?is_default={}&replace={}".format(
+            True if reply_to_email_address['is_default'] else form.is_default.data,
+            reply_to_email_id
+        ))
 
     if (request.endpoint == "main.service_confirm_delete_email_reply_to"):
         flash("Are you sure you want to delete this email reply-to address?", 'delete')
