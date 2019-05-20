@@ -422,7 +422,9 @@ def service_add_email_reply_to(service_id):
             '.service_verify_reply_to_address',
             service_id=service_id,
             notification_id=notification_id
-        ) + "?is_default={}".format(is_default))
+        ) + "?is_default={}".format(is_default)
+            + "&is_new=True"
+        )
 
     return render_template(
         'views/service-settings/email-reply-to/add.html',
@@ -434,11 +436,13 @@ def service_add_email_reply_to(service_id):
 @login_required
 @user_has_permissions('manage_service')
 def service_verify_reply_to_address(service_id, notification_id):
+    is_new = request.args.get('is_new', False)
     return render_template(
         'views/service-settings/email-reply-to/verify.html',
         service_id=service_id,
         notification_id=notification_id,
-        partials=get_service_verify_reply_to_address_partials(service_id, notification_id)
+        partials=get_service_verify_reply_to_address_partials(service_id, notification_id),
+        verb=("Add" if is_new else "Change")
     )
 
 

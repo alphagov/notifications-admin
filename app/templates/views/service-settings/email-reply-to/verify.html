@@ -7,13 +7,13 @@
 {% from "components/ajax-block.html" import ajax_block %}
 
 {% block service_page_title %}
-  Verifying your reply-to email address
+  {{ verb }} email reply-to address
 {% endblock %}
 
 {% block maincolumn_content %}
 
   {{ page_header(
-    'Verifying your reply-to email address',
+    '{} email reply-to address'.format(verb),
     back_link=url_for('main.service_email_reply_to', service_id=current_service.id)
   ) }}
   {{ ajax_block(

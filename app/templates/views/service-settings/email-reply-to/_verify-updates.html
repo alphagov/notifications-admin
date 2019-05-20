@@ -1,22 +1,31 @@
-{% from "components/banner.html" import banner %}
+{% from "components/banner.html" import banner, banner_wrapper %}
 
 <div class="ajax-block-container">
   {% if verification_status == "pending" %}
     <p>
-      We have sent a notification to {{ reply_to_email_address }} to check if it's a working email address.
-
+      We’re checking that ‘{{ reply_to_email_address }}’ is a real email address.
     </p>
     <p>
-      Once we receive a delivery confirmation, we will update your list of reply-to email addresses.
+  <span class='loading-indicator'>This can take a minute </span>
     </p>
 
     <p>
       <a href="{{ url_for('main.service_verify_reply_to_address', service_id=service_id, notification_id=notification_id) + "?is_default={}".format(is_default) }}"">Refresh</a>
     </p>
   {% elif verification_status == "success" %}
-    {{ banner("Yay success! Your new reply-to email has been added ^__^", type='default', with_tick=True) }}
+    {{ banner("‘{}’ is ready to use".format(reply_to_email_address), type='default', with_tick=True) }}
   {% elif verification_status == "failure" %}
-    {{ banner("Sorry dawg, this email address doesn't seem to be working :d", type='dangerous') }}
+    {% call banner_wrapper(type='dangerous') %}
+      <h2 class='banner-title' data-module="track-error" data-error-type="reply-to-email-not-working" data-error-label="{{ upload_id }}">
+        There’s a problem with your reply-to address
+      </h2>
+      <p>
+        We sent an email to ‘{{ reply_to_email_address }}’ but it wasn’t delivered.
+      </p>
+      <p>
+        You can try again, or use a different address.
+      </p>
+    {% endcall %}
     <a href={{ url_for('main.service_add_email_reply_to', service_id=service_id) }}>Try again</a>
   {% endif %}
 </div>
