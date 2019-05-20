@@ -30,7 +30,12 @@
     ).done(
       response => flushQueue(queue, response)
     ).fail(
-      () => poll = function(){}
+      response => {
+        if (response.responseJSON) {
+          flushQueue(queue, response.responseJSON);
+        }
+        poll = function(){};
+      }
     );
 
     setTimeout(
