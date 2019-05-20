@@ -158,7 +158,7 @@ def test_no_go_live_link_for_service_without_organisation(
 
     assert page.find('h1').text == 'Settings'
     assert normalize_spaces(page.select('tr')[16].text) == (
-        'Live No (you need to assign this service to an organisation before you can make it live)'
+        'Live No (organisation must be set first)'
     )
     assert normalize_spaces(page.select('tr')[18].text) == (
         'Organisation Not set Change'

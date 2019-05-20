@@ -292,7 +292,7 @@
           {% call row() %}
             {{ text_field('Live')}}
             {% if current_service.trial_mode and not current_service.organisation %}
-              {{ text_field('No (you need to assign this service to an organisation before you can make it live)') }}
+              {{ text_field('No (organisation must be set first)') }}
               {{ text_field('') }}
             {% else %}
               {{ boolean_field(not current_service.trial_mode) }}
