@@ -33,7 +33,7 @@ def test_letter_branding_page_shows_full_branding_list(
         page.select_one('h1').text
     ) == "Letter branding"
 
-    assert page.select_one('.column-three-quarters a')['href'] == url_for('main.create_letter_branding')
+    assert page.select('.column-three-quarters a')[-1]['href'] == url_for('main.create_letter_branding')
 
     assert brand_names == [
         'HM Government',

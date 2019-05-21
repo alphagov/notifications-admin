@@ -1,4 +1,5 @@
 {% extends "views/platform-admin/_base_template.html" %}
+{% from "components/page-header.html" import page_header %}
 {% from "components/live-search.html" import live_search %}
 
 {% block per_page_title %}
@@ -7,14 +8,7 @@
 
 {% block platform_admin_content %}
 
-  <div class="grid-row bottom-gutter-2-3">
-    <div class="column-two-thirds">
-      <h1 class="heading-large">Letter branding</h1>
-    </div>
-    <div class="column-one-third">
-      <a href="{{ url_for('.create_letter_branding') }}" class="button align-with-heading">Add new brand</a>
-    </div>
-  </div>
+  {{ page_header('Letter branding') }}
   {{ live_search(target_selector='.letter-brand', show=True, form=search_form) }}
   <nav>
     {% for brand in letter_brandings %}
@@ -27,5 +21,8 @@
       </div>
     {% endfor %}
   </nav>
+  <div class="js-stick-at-bottom-when-scrolling">
+    <a href="{{ url_for('.create_letter_branding') }}" class="button-secondary">New brand</a>
+  </div>
 
 {% endblock %}
