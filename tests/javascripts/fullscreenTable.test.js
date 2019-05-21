@@ -1,6 +1,9 @@
 const helpers = require('./support/helpers');
 
 beforeAll(() => {
+  // TODO: remove this when tests for sticky JS are written
+  require('../../app/assets/javascripts/stick-to-window-when-scrolling.js');
+
   require('../../app/assets/javascripts/fullscreenTable.js');
 });
 
@@ -171,14 +174,10 @@ describe('FullscreenTable', () => {
 
   describe("when it loads", () => {
 
-    beforeEach(() => {
+    test("it fixes the number column for each row without changing the semantics", () => {
 
       // start module
       window.GOVUK.modules.start();
-
-    });
-
-    test("it fixes the number column for each row without changing the semantics", () => {
 
       tableFrame = document.querySelector('.fullscreen-scrollable-table');
       numberColumnFrame = document.querySelector('.fullscreen-fixed-table');
@@ -186,6 +185,19 @@ describe('FullscreenTable', () => {
       expect(tableFrame).not.toBeNull();
       expect(numberColumnFrame).not.toBeNull();
       expect(numberColumnFrame.getAttribute('role')).toEqual('presentation');
+
+    });
+
+    test("it calls the sticky JS to update any cached dimensions", () => {
+
+      const stickyJSSpy = jest.spyOn(window.GOVUK.stickAtBottomWhenScrolling, 'recalculate');
+
+      // start module
+      window.GOVUK.modules.start();
+
+      expect(stickyJSSpy.mock.calls.length).toBe(1);
+
+      stickyJSSpy.mockClear();
 
     });
 
