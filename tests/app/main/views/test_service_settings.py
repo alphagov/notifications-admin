@@ -2088,7 +2088,7 @@ def test_service_verify_reply_to_address(
 
 
 @freeze_time("2018-06-01 11:11:00.061258")
-def test_add_reply_to_email_address_fails_if_notification_not_delivered_in_5_mins(mocker, client_request, fake_uuid):
+def test_add_reply_to_email_address_fails_if_notification_not_delivered_in_45_sec(mocker, client_request, fake_uuid):
     notification = {
         "id": fake_uuid,
         "status": "sending",
@@ -2096,7 +2096,7 @@ def test_add_reply_to_email_address_fails_if_notification_not_delivered_in_5_min
         "service_id": SERVICE_ONE_ID,
         "template_id": TEMPLATE_ONE_ID,
         "notification_type": "email",
-        "created_at": '2018-06-01T11:05:52.499230+00:00'
+        "created_at": '2018-06-01T11:10:12.499230+00:00'
     }
     mocker.patch(
         'app.service_api_client.get_reply_to_email_addresses', return_value=[]
@@ -2112,7 +2112,6 @@ def test_add_reply_to_email_address_fails_if_notification_not_delivered_in_5_min
     expected_banner = page.find_all('div', class_='banner-dangerous')[0]
     assert 'There’s a problem with your reply-to address' in expected_banner.text.strip()
     mock_add_reply_to_email_address.assert_not_called()
-    # add check that form is visible
 
 
 @pytest.mark.parametrize('fixture, data, api_default_args', [
