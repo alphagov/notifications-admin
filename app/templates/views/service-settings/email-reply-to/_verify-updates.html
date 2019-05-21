@@ -11,11 +11,11 @@
       We’re checking that ‘{{ reply_to_email_address }}’ is a real email address.
     </p>
     <p>
-  <span class='loading-indicator'>This can take a minute </span>
+  <span class='loading-indicator'>This can take a minute</span>
     </p>
 
     <p>
-      <a href="{{ url_for('main.service_verify_reply_to_address', service_id=service_id, notification_id=notification_id) + "?is_default={}".format(is_default) }}"">Refresh</a>
+      <a href="{{ url_for('main.service_verify_reply_to_address', service_id=service_id, notification_id=notification_id, is_default=is_default, replace=replace) }}"">Refresh</a>
     </p>
   {% elif verification_status == "success" %}
     {{ banner("‘{}’ is ready to use".format(reply_to_email_address), type='default', with_tick=True) }}

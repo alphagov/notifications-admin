@@ -22,7 +22,7 @@
   ) }}
   {{ ajax_block(
       partials,
-      url_for('main.service_verify_reply_to_address_updates', service_id=service_id, notification_id=notification_id) + request_args,
+      url_for('main.service_verify_reply_to_address_updates', service_id=service_id, notification_id=notification_id, is_default=is_default, replace=replace),
       'status',
       finished=finished
     ) }}

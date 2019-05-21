@@ -55,6 +55,9 @@ from app.main.forms import (
     branding_options_dict,
 )
 from app.utils import (
+    DELIVERED_STATUSES,
+    FAILURE_STATUSES,
+    SENDING_STATUSES,
     email_safe,
     user_has_permissions,
     user_is_gov_user,
@@ -421,9 +424,9 @@ def service_add_email_reply_to(service_id):
         return redirect(url_for(
             '.service_verify_reply_to_address',
             service_id=service_id,
-            notification_id=notification_id
-        ) + "?is_default={}".format(is_default)
-        )
+            notification_id=notification_id,
+            is_default=is_default
+        ))
 
     return render_template(
         'views/service-settings/email-reply-to/add.html',
@@ -436,7 +439,7 @@ def service_add_email_reply_to(service_id):
 @user_has_permissions('manage_service')
 def service_verify_reply_to_address(service_id, notification_id):
     replace = request.args.get('replace', False)
-    request_args = "?is_default={}&replace={}".format(request.args.get('is_default', False), replace)
+    is_default = request.args.get('is_default', False)
     return render_template(
         'views/service-settings/email-reply-to/verify.html',
         service_id=service_id,
@@ -444,7 +447,7 @@ def service_verify_reply_to_address(service_id, notification_id):
         partials=get_service_verify_reply_to_address_partials(service_id, notification_id),
         verb=("Change" if replace else "Add"),
         replace=replace,
-        request_args=request_args
+        is_default=is_default
     )
 
 
@@ -462,7 +465,7 @@ def get_service_verify_reply_to_address_partials(service_id, notification_id):
     replace = request.args.get('replace', False)
     verification_status = "pending"
     is_default = True if (request.args.get('is_default', False) == "True") else False
-    if notification["status"] == "delivered":
+    if notification["status"] in DELIVERED_STATUSES:
         verification_status = "success"
         if notification["to"] not in [i["email_address"] for i in current_service.email_reply_to_addresses]:
             if replace and replace != "False":
@@ -477,9 +480,9 @@ def get_service_verify_reply_to_address_partials(service_id, notification_id):
                 )
     created_at_no_tz = notification["created_at"][:-6]
     seconds_since_sending = (datetime.utcnow() - datetime.strptime(created_at_no_tz, '%Y-%m-%dT%H:%M:%S.%f')).seconds
-    if notification["status"] in [
-        "failed", "permanent-failure", "technical-failure", "temporary-failure"
-    ] or (notification["status"] == "sending" and seconds_since_sending > 300):
+    if notification["status"] in FAILURE_STATUSES or (
+        notification["status"] in SENDING_STATUSES and seconds_since_sending > 90
+    ):
         verification_status = "failure"
         form.email_address.data = notification['to']
         form.is_default.data = is_default
@@ -523,7 +526,7 @@ def service_edit_email_reply_to(service_id, reply_to_email_id):
                 service_id, form.email_address.data
             )["data"]["id"]
         except HTTPError as e:
-            error_msg = "Your service already uses '{}' as an email reply-to address.".format(form.email_address.data)
+            error_msg = "Your service already uses ‘{}’ as an email reply-to address.".format(form.email_address.data)
             if e.status_code == 400 and error_msg == e.message:
                 flash(error_msg, 'error')
                 return redirect(url_for('.service_email_reply_to', service_id=service_id))
@@ -532,10 +535,9 @@ def service_edit_email_reply_to(service_id, reply_to_email_id):
         return redirect(url_for(
             '.service_verify_reply_to_address',
             service_id=service_id,
-            notification_id=notification_id
-        ) + "?is_default={}&replace={}".format(
-            True if reply_to_email_address['is_default'] else form.is_default.data,
-            reply_to_email_id
+            notification_id=notification_id,
+            is_default=True if reply_to_email_address['is_default'] else form.is_default.data,
+            replace=reply_to_email_id
         ))
 
     if (request.endpoint == "main.service_confirm_delete_email_reply_to"):
