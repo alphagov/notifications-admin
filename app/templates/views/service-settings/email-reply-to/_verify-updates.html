@@ -40,8 +40,13 @@
     <p>
       Do not use your own email address for replies.
     </p>
+    {% if replace %}
+      {% set form_url = url_for('.service_edit_email_reply_to', service_id=service_id, reply_to_email_id=replace) %}
+    {% else %}
+      {% set form_url = url_for('.service_add_email_reply_to', service_id=service_id) %}
+    {% endif %}
     {% call form_wrapper(
-      action = url_for('.service_add_email_reply_to', service_id=service_id)
+      action = form_url
     ) %}
       {{ textbox(
         form.email_address,

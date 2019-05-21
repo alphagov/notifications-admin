@@ -2062,6 +2062,11 @@ def test_service_verify_reply_to_address(
         _optional_args="?is_default={}{}".format(is_default, replace)
     )
     assert page.find('h1').text == '{} email reply-to address'.format(expected_header)
+    if replace:
+        assert "/email-reply-to/123/edit" in page.find('a', text="Back").attrs["href"]
+    else:
+        assert "/email-reply-to/add" in page.find('a', text="Back").attrs["href"]
+
     assert len(page.find_all('div', class_='banner-dangerous')) == expected_failure
     assert len(page.find_all('div', class_='banner-default-with-tick')) == expected_success
 

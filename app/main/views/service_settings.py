@@ -443,6 +443,7 @@ def service_verify_reply_to_address(service_id, notification_id):
         notification_id=notification_id,
         partials=get_service_verify_reply_to_address_partials(service_id, notification_id),
         verb=("Change" if replace else "Add"),
+        replace=replace,
         request_args=request_args
     )
 
@@ -458,12 +459,12 @@ def get_service_verify_reply_to_address_partials(service_id, notification_id):
     form = ServiceReplyToEmailForm()
     first_email_address = current_service.count_email_reply_to_addresses == 0
     notification = notification_api_client.get_notification(current_app.config["NOTIFY_SERVICE_ID"], notification_id)
+    replace = request.args.get('replace', False)
     verification_status = "pending"
     is_default = True if (request.args.get('is_default', False) == "True") else False
     if notification["status"] == "delivered":
         verification_status = "success"
         if notification["to"] not in [i["email_address"] for i in current_service.email_reply_to_addresses]:
-            replace = request.args.get('replace', False)
             if replace and replace != "False":
                 service_api_client.update_reply_to_email_address(
                     current_service.id, replace, email_address=notification["to"], is_default=is_default
@@ -491,7 +492,8 @@ def get_service_verify_reply_to_address_partials(service_id, notification_id):
             verification_status=verification_status,
             is_default=is_default,
             form=form,
-            first_email_address=first_email_address
+            first_email_address=first_email_address,
+            replace=replace
         ),
         'stop': 0 if verification_status == "pending" else 1
     }

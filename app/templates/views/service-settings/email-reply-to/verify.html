@@ -11,10 +11,14 @@
 {% endblock %}
 
 {% block maincolumn_content %}
-
+  {% if replace %}
+    {% set back_link_href = url_for('.service_edit_email_reply_to', service_id=service_id, reply_to_email_id=replace) %}
+  {% else %}
+    {% set back_link_href = url_for('.service_add_email_reply_to', service_id=service_id) %}
+  {% endif %}
   {{ page_header(
     '{} email reply-to address'.format(verb),
-    back_link=url_for('main.service_add_email_reply_to', service_id=current_service.id)
+    back_link=back_link_href
   ) }}
   {{ ajax_block(
       partials,
