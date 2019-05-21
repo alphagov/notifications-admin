@@ -1,0 +1,22 @@
+{% extends "org_template.html" %}
+{% from "components/live-search.html" import live_search %}
+
+{% block org_page_title %}
+  Services
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <h1 class="heading-medium">
+    Trial mode services
+  </h1>
+  {{ live_search(target_selector='.browse-list-item', show=True, form=search_form, label='Search by name') }}
+  <ul>
+  {% for service in services %}
+    <li class="browse-list-item">
+      <a href="{{ url_for('main.service_dashboard', service_id=service.id) }}" class="browse-list-link">{{ service['name'] }}</a>
+    </li>
+  {% endfor %}
+  </ul>
+
+{% endblock %}

@@ -70,7 +70,10 @@ def add_organisation():
 @login_required
 @user_has_permissions()
 def organisation_dashboard(org_id):
-    organisation_services = organisations_client.get_organisation_services(org_id)
+    organisation_services = [
+        service for service in organisations_client.get_organisation_services(org_id)
+        if service['active'] and not service['restricted']
+    ]
     for service in organisation_services:
         has_permission = current_user.has_permission_for_service(service['id'], 'view_activity')
         service.update({'has_permission_to_view': has_permission})
@@ -78,6 +81,19 @@ def organisation_dashboard(org_id):
     return render_template(
         'views/organisations/organisation/index.html',
         organisation_services=organisation_services
+    )
+
+
+@main.route("/organisations/<org_id>/trial-services", methods=['GET'])
+@login_required
+@user_is_platform_admin
+def organisation_trial_mode_services(org_id):
+    organisation_services = organisations_client.get_organisation_services(org_id)
+
+    return render_template(
+        'views/organisations/organisation/trial-mode-services.html',
+        search_form=SearchByNameForm(),
+        services=[service for service in organisation_services if not service['active'] or service['restricted']]
     )
 
 

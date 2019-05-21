@@ -207,6 +207,7 @@ class HeaderNavigation(Navigation):
         'old_terms',
         'old_using_notify',
         'organisation_dashboard',
+        'organisation_trial_mode_services',
         'organisation_settings',
         'organisation_preview_email_branding',
         'organisation_preview_letter_branding',
@@ -494,6 +495,7 @@ class MainNavigation(Navigation):
         'old_terms',
         'old_using_notify',
         'organisation_dashboard',
+        'organisation_trial_mode_services',
         'organisation_preview_email_branding',
         'organisation_preview_letter_branding',
         'organisation_settings',
@@ -712,6 +714,7 @@ class CaseworkNavigation(Navigation):
         'old_terms',
         'old_using_notify',
         'organisation_dashboard',
+        'organisation_trial_mode_services',
         'organisation_preview_email_branding',
         'organisation_preview_letter_branding',
         'organisation_settings',
@@ -870,6 +873,9 @@ class OrgNavigation(Navigation):
             'invite_org_user',
             'manage_org_users',
             'remove_user_from_organisation',
+        },
+        'trial-services': {
+            'organisation_trial_mode_services',
         }
     }
 

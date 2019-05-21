@@ -3,5 +3,8 @@
   	<li><a href="{{ url_for('.organisation_dashboard', org_id=current_org.id) }}" {{ org_navigation.is_selected('dashboard') }}>Services</a></li>
     <li><a href="{{ url_for('.manage_org_users', org_id=current_org.id) }}" {{ org_navigation.is_selected('team-members') }}>Team members</a></li>
     <li><a href="{{ url_for('.organisation_settings', org_id=current_org.id) }}" {{ org_navigation.is_selected('settings') }}>Settings</a></li>
+    {% if current_user.platform_admin %}
+    <li><a href="{{ url_for('.organisation_trial_mode_services', org_id=current_org.id) }}" {{ org_navigation.is_selected('trial-services') }}>Trial services</a></li>
+    {% endif %}
   </ul>
 </nav>
