@@ -1,20 +1,11 @@
 const helpers = require('./support/helpers');
 
 beforeAll(() => {
-  // set up jQuery
-  window.jQuery = require('jquery');
-  $ = window.jQuery;
-
-  // load module code
-  require('govuk_frontend_toolkit/javascripts/govuk/modules.js');
   require('../../app/assets/javascripts/fullscreenTable.js');
 });
 
 afterAll(() => {
-  window.jQuery = null;
-  $ = null;
-
-  delete window.GOVUK;
+  require('./support/teardown.js');
 });
 
 describe('FullscreenTable', () => {

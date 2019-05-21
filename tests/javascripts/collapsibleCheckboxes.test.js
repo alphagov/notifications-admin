@@ -1,13 +1,6 @@
 const helpers = require('./support/helpers');
 
 beforeAll(() => {
-  // set up jQuery
-  window.jQuery = require('jquery');
-  $ = window.jQuery;
-
-  // load module code
-  require('govuk_frontend_toolkit/javascripts/govuk/modules.js');
-
   // TODO: remove this when tests for sticky JS are written
   require('../../app/assets/javascripts/stick-to-window-when-scrolling.js');
 
@@ -15,10 +8,7 @@ beforeAll(() => {
 });
 
 afterAll(() => {
-  window.jQuery = null;
-  $ = null;
-
-  delete window.GOVUK;
+  require('./support/teardown.js');
 });
 
 
