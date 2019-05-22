@@ -66,6 +66,10 @@ class UserApiClient(NotifyAdminAPIClient):
         return user_data['data']
 
     @cache.delete('user-{user_id}')
+    def archive_user(self, user_id):
+        return self.post('/user/{}/archive'.format(user_id), data=None)
+
+    @cache.delete('user-{user_id}')
     def reset_failed_login_count(self, user_id):
         url = "/user/{}/reset-failed-login-count".format(user_id)
         user_data = self.post(url, data={})

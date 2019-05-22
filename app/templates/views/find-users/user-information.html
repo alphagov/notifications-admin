@@ -38,6 +38,11 @@
         {{ user.failed_login_count }} failed login attempts
       </p>
       {% endif %}
+      <span class="page-footer-delete-link page-footer-delete-link-without-button">
+        <a href="{{ url_for('main.archive_user', user_id=user.id) }}">
+          Archive user
+        </a>
+      </span>
     </div>
   </div>
 {% endblock %}
