@@ -4,12 +4,12 @@ from app import events_api_client
 
 
 def on_user_logged_in(_sender, user):
-    _send_event(event_type='sucessful_login', user_id=user.id)
+    _send_event('sucessful_login', user_id=user.id)
 
 
 def create_email_change_event(user_id, updated_by_id, original_email_address, new_email_address):
     _send_event(
-        event_type='update_user_email',
+        'update_user_email',
         user_id=user_id,
         updated_by_id=updated_by_id,
         original_email_address=original_email_address,
@@ -18,30 +18,18 @@ def create_email_change_event(user_id, updated_by_id, original_email_address, ne
 
 def create_mobile_number_change_event(user_id, updated_by_id, original_mobile_number, new_mobile_number):
     _send_event(
-        event_type='update_user_mobile_number',
+        'update_user_mobile_number',
         user_id=user_id,
         updated_by_id=updated_by_id,
         original_mobile_number=original_mobile_number,
         new_mobile_number=new_mobile_number)
 
 
-def _send_event(**kwargs):
-    if not kwargs.get('event_type'):
-        return
-
+def _send_event(event_type, **kwargs):
     event_data = _construct_event_data(request)
-    event_fields = ('user_id',
-                    'updated_by_id',
-                    'original_email_address',
-                    'new_email_address',
-                    'original_mobile_number',
-                    'new_mobile_number')
+    event_data.update(kwargs)
 
-    for field in event_fields:
-        if kwargs.get(field):
-            event_data[field] = kwargs[field]
-
-    events_api_client.create_event(kwargs['event_type'], event_data)
+    events_api_client.create_event(event_type, event_data)
 
 
 def _construct_event_data(request):
