@@ -1,6 +1,9 @@
-(function(Modules) {
+(function(global) {
 
   "use strict";
+
+  var Modules = global.GOVUK.Modules;
+  var Hogan = global.Hogan;
 
   let states = {
     'initial': Hogan.compile(`
@@ -151,4 +154,4 @@
 
   };
 
-})(window.GOVUK.Modules);
+})(window);
