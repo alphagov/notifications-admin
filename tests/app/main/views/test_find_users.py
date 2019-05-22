@@ -1,3 +1,4 @@
+import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
 from lxml import html
@@ -166,6 +167,7 @@ def test_archive_user_posts_to_user_client(
     logged_in_platform_admin_client,
     api_user_active,
     mocker,
+    mock_events,
 ):
     mock_user_client = mocker.patch('app.user_api_client.post')
 
@@ -176,3 +178,24 @@ def test_archive_user_posts_to_user_client(
     assert response.status_code == 302
     assert response.location == url_for('main.user_information', user_id=api_user_active.id, _external=True)
     mock_user_client.assert_called_once_with('/user/{}/archive'.format(api_user_active.id), data=None)
+
+    assert mock_events.called
+
+
+def test_archive_user_does_not_create_event_if_user_client_raises_exception(
+    logged_in_platform_admin_client,
+    api_user_active,
+    mocker,
+    mock_events,
+):
+    mock_user_client = mocker.patch('app.user_api_client.post', side_effect=Exception())
+
+    with pytest.raises(Exception):
+        response = logged_in_platform_admin_client.post(
+            url_for('main.archive_user', user_id=api_user_active.id)
+        )
+
+        assert response.status_code == 500
+        assert response.location == url_for('main.user_information', user_id=api_user_active.id, _external=True)
+        mock_user_client.assert_called_once_with('/user/{}/archive'.format(api_user_active.id), data=None)
+        assert not mock_events.called

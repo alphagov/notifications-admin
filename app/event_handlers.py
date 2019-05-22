@@ -25,6 +25,13 @@ def create_mobile_number_change_event(user_id, updated_by_id, original_mobile_nu
         new_mobile_number=new_mobile_number)
 
 
+def create_archive_user_event(user_id, archived_by_id):
+    _send_event(
+        'archive_user',
+        user_id=user_id,
+        archived_by_id=archived_by_id)
+
+
 def _send_event(event_type, **kwargs):
     event_data = _construct_event_data(request)
     event_data.update(kwargs)
