@@ -12,7 +12,5 @@
     animation: ellipsis steps(4,end) 1.5s infinite;
     content: "\2026"; // ellipsis
     width: 0;
-    position: relative;
-    left: -0.15em;
   }
 }
