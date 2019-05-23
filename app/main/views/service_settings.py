@@ -521,6 +521,14 @@ def service_edit_email_reply_to(service_id, reply_to_email_id):
         form.email_address.data = reply_to_email_address['email_address']
         form.is_default.data = reply_to_email_address['is_default']
     if form.validate_on_submit():
+        if form.email_address.data == reply_to_email_address["email_address"]:
+            service_api_client.update_reply_to_email_address(
+                current_service.id,
+                reply_to_email_id=reply_to_email_id,
+                email_address=form.email_address.data,
+                is_default=True if reply_to_email_address['is_default'] else form.is_default.data
+            )
+            return redirect(url_for('.service_email_reply_to', service_id=service_id))
         try:
             notification_id = service_api_client.verify_reply_to_email_address(
                 service_id, form.email_address.data

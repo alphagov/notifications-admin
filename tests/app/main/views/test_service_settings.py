@@ -2226,7 +2226,7 @@ def test_default_box_doesnt_show_on_first_sender(
     (get_non_default_reply_to_email_address, {}, False),
     (get_non_default_reply_to_email_address, {"is_default": "y"}, True)
 ])
-def test_edit_reply_to_email_address(
+def test_edit_reply_to_email_address_sends_verification_notification_if_address_is_changed(
     fixture,
     data,
     api_default_args,
@@ -2246,6 +2246,40 @@ def test_edit_reply_to_email_address(
         _data=data
     )
     mock_verify.assert_called_once_with(SERVICE_ONE_ID, "test@example.gov.uk")
+
+
+@pytest.mark.parametrize('fixture, data, api_default_args', [
+    (get_default_reply_to_email_address, {"is_default": "y"}, True),
+    (get_default_reply_to_email_address, {}, True),
+    (get_non_default_reply_to_email_address, {}, False),
+    (get_non_default_reply_to_email_address, {"is_default": "y"}, True)
+])
+def test_edit_reply_to_email_address_goes_straight_to_update_if_address_not_changed(
+    fixture,
+    data,
+    api_default_args,
+    mocker,
+    fake_uuid,
+    client_request,
+    mock_update_reply_to_email_address
+):
+    fixture(mocker)
+    mock_verify = mocker.patch('app.service_api_client.verify_reply_to_email_address')
+    data['email_address'] = "test@example.com"
+    client_request.post(
+        'main.service_edit_email_reply_to',
+        service_id=SERVICE_ONE_ID,
+        reply_to_email_id=fake_uuid,
+        _data=data
+    )
+
+    mock_update_reply_to_email_address.assert_called_once_with(
+        SERVICE_ONE_ID,
+        reply_to_email_id=fake_uuid,
+        email_address="test@example.com",
+        is_default=api_default_args
+    )
+    mock_verify.assert_not_called()
 
 
 @pytest.mark.parametrize('fixture, expected_link_text, partial_href', [
