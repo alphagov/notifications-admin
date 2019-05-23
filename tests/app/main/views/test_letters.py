@@ -48,7 +48,7 @@ def test_letters_lets_in_without_permission(
     client.login(api_user_active)
     response = client.get(url(service_id=service_one['id']))
 
-    assert api_user_active.permissions == {}
+    assert api_user_active['permissions'] == {}
     assert response.status_code == 200
 
 

@@ -48,7 +48,7 @@ from app.extensions import (
 )
 from app.models.organisation import Organisation
 from app.models.service import Service
-from app.models.user import AnonymousUser
+from app.models.user import AnonymousUser, User
 from app.navigation import (
     CaseworkNavigation,
     HeaderNavigation,
@@ -463,7 +463,7 @@ def nl2br(value):
 
 @login_manager.user_loader
 def load_user(user_id):
-    return user_api_client.get_user(user_id)
+    return User.from_id(user_id)
 
 
 def load_service_before_request():

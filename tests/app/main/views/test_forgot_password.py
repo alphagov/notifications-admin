@@ -27,11 +27,11 @@ def test_should_redirect_to_password_reset_sent_for_valid_email(
     mocker.patch('app.user_api_client.send_reset_password_url', return_value=None)
     response = client.post(
         url_for('.forgot_password'),
-        data={'email_address': sample_user.email_address})
+        data={'email_address': sample_user['email_address']})
     assert response.status_code == 200
     assert 'Click the link in the email to reset your password.' \
            in response.get_data(as_text=True)
-    app.user_api_client.send_reset_password_url.assert_called_once_with(sample_user.email_address)
+    app.user_api_client.send_reset_password_url.assert_called_once_with(sample_user['email_address'])
 
 
 def test_should_redirect_to_password_reset_sent_for_missing_email(
@@ -44,8 +44,8 @@ def test_should_redirect_to_password_reset_sent_for_missing_email(
                                                                                       'Not found'))
     response = client.post(
         url_for('.forgot_password'),
-        data={'email_address': api_user_active.email_address})
+        data={'email_address': api_user_active['email_address']})
     assert response.status_code == 200
     assert 'Click the link in the email to reset your password.' \
            in response.get_data(as_text=True)
-    app.user_api_client.send_reset_password_url.assert_called_once_with(api_user_active.email_address)
+    app.user_api_client.send_reset_password_url.assert_called_once_with(api_user_active['email_address'])

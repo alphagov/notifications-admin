@@ -162,7 +162,7 @@ def test_register_with_existing_email_sends_emails(
 ):
     user_data = {
         'name': 'Already Hasaccount',
-        'email_address': api_user_active.email_address,
+        'email_address': api_user_active['email_address'],
         'mobile_number': '+4407700900460',
         'password': 'validPassword!'
     }
@@ -256,8 +256,8 @@ def test_register_from_invite_when_user_registers_in_another_browser(
     mock_get_user_by_email,
     mock_accept_invite,
 ):
-    invited_user = InvitedUser(api_user_active.id, api_user_active.id, "",
-                               api_user_active.email_address,
+    invited_user = InvitedUser(api_user_active['id'], api_user_active['id'], "",
+                               api_user_active['email_address'],
                                ["manage_users"],
                                "pending",
                                datetime.utcnow(),
@@ -269,9 +269,9 @@ def test_register_from_invite_when_user_registers_in_another_browser(
         url_for('main.register_from_invite'),
         data={
             'name': 'Registered in another Browser',
-            'email_address': api_user_active.email_address,
-            'mobile_number': api_user_active.mobile_number,
-            'service': str(api_user_active.id),
+            'email_address': api_user_active['email_address'],
+            'mobile_number': api_user_active['mobile_number'],
+            'service': str(api_user_active['id']),
             'password': 'somreallyhardthingtoguess',
             'auth_type': 'sms_auth'
         }

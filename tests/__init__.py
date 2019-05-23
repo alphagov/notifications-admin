@@ -7,15 +7,16 @@ from flask import url_for
 from flask.testing import FlaskClient
 from flask_login import login_user
 
-from app.models.user import InvitedOrgUser
+from app.models.user import User
 
 
 class TestClient(FlaskClient):
     def login(self, user, mocker=None, service=None):
         # Skipping authentication here and just log them in
+        model_user = User(user)
         with self.session_transaction() as session:
-            session['current_session_id'] = user.current_session_id
-            session['user_id'] = user.id
+            session['current_session_id'] = model_user.current_session_id
+            session['user_id'] = model_user.id
         if mocker:
             mocker.patch('app.user_api_client.get_user', return_value=user)
         if mocker and service:
@@ -24,7 +25,7 @@ class TestClient(FlaskClient):
             mocker.patch('app.service_api_client.get_service', return_value={'data': service})
 
         with patch('app.events_api_client.create_event'):
-            login_user(user)
+            login_user(model_user)
 
     def logout(self, user):
         self.get(url_for("main.logout"))
@@ -97,7 +98,6 @@ def invited_user(
     auth_type='sms_auth',
     organisation=None
 ):
-    org_user = organisation is not None
     data = {
         'id': _id,
         'from_user': from_user,
@@ -113,15 +113,7 @@ def invited_user(
     if organisation:
         data['organisation'] = organisation
 
-    if org_user:
-        return InvitedOrgUser(
-            data['id'],
-            data['organisation'],
-            data['from_user'],
-            data['email_address'],
-            data['status'],
-            data['created_at']
-        )
+    return data
 
 
 def service_json(
@@ -273,9 +265,9 @@ def template_version_json(service_id,
                           **kwargs):
     template = template_json(service_id, id_, **kwargs)
     template['created_by'] = created_by_json(
-        created_by.id,
-        created_by.name,
-        created_by.email_address
+        created_by['id'],
+        created_by['name'],
+        created_by['email_address'],
     )
     if created_at is None:
         created_at = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f')
@@ -328,7 +320,6 @@ TEST_USER_EMAIL = 'test@user.gov.uk'
 
 
 def create_test_api_user(state, permissions={}):
-    from app.notify_client.user_api_client import User
     user_data = {'id': 1,
                  'name': 'Test User',
                  'password': 'somepassword',
@@ -337,8 +328,7 @@ def create_test_api_user(state, permissions={}):
                  'state': state,
                  'permissions': permissions
                  }
-    user = User(user_data)
-    return user
+    return user_data
 
 
 def job_json(
@@ -375,9 +365,9 @@ def job_json(
         'job_status': job_status,
         'statistics': [],
         'created_by': created_by_json(
-            created_by.id,
-            created_by.name,
-            created_by.email_address
+            created_by['id'],
+            created_by['name'],
+            created_by['email_address'],
         ),
         'scheduled_for': scheduled_for
     }
@@ -516,8 +506,8 @@ def validate_route_permission(mocker,
                               permissions,
                               usr,
                               service):
-    usr._permissions[str(service['id'])] = permissions
-    usr.services = [service['id']]
+    usr['permissions'][str(service['id'])] = permissions
+    usr['services'] = [service['id']]
     mocker.patch(
         'app.user_api_client.check_verify_code',
         return_value=(True, ''))
@@ -529,7 +519,7 @@ def validate_route_permission(mocker,
     mocker.patch('app.user_api_client.get_user', return_value=usr)
     mocker.patch('app.user_api_client.get_user_by_email', return_value=usr)
     mocker.patch('app.service_api_client.get_service', return_value={'data': service})
-    mocker.patch('app.user_api_client.get_users_for_service', return_value=[usr])
+    mocker.patch('app.models.user.Users.client', return_value=[usr])
     mocker.patch('app.job_api_client.has_jobs', return_value=False)
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -554,7 +544,7 @@ def validate_route_permission_with_client(mocker,
                                           permissions,
                                           usr,
                                           service):
-    usr._permissions[str(service['id'])] = permissions
+    usr['permissions'][str(service['id'])] = permissions
     mocker.patch(
         'app.user_api_client.check_verify_code',
         return_value=(True, ''))

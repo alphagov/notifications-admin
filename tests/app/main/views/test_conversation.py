@@ -305,7 +305,7 @@ def test_conversation_reply_shows_templates(
             'name': "Parent 2 - visible",
             'id': VIS_PARENT_FOLDER_ID,
             'parent_id': None,
-            'users_with_permission': [active_user_with_permissions.id]
+            'users_with_permission': [active_user_with_permissions['id']]
         },
     ]
     page = client_request.get(

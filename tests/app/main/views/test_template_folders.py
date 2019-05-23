@@ -4,6 +4,7 @@ import pytest
 from flask import abort, url_for
 from notifications_python_client.errors import HTTPError
 
+from app.models.user import User
 from tests import sample_uuid
 from tests.conftest import (
     SERVICE_ONE_ID,
@@ -417,9 +418,12 @@ def test_get_manage_folder_page(
 ):
     folder_id = str(uuid.uuid4())
     mock_get_template_folders.return_value = [
-        _folder('folder_two', folder_id, None, [active_user_with_permissions.id]),
+        _folder('folder_two', folder_id, None, [active_user_with_permissions['id']]),
     ]
-    mocker.patch('app.models.service.Service.active_users', [active_user_with_permissions])
+    mocker.patch(
+        'app.models.user.Users.client',
+        return_value=[active_user_with_permissions],
+    )
     page = client_request.get(
         'main.manage_template_folder',
         service_id=service_one['id'],
@@ -440,15 +444,19 @@ def test_get_manage_folder_viewing_permissions_for_users(
     active_user_with_permissions,
     service_one,
     mock_get_template_folders,
+    mock_get_users_by_service,
     mocker
 ):
     folder_id = str(uuid.uuid4())
     team_member = active_user_view_permissions(str(uuid.uuid4()))
     team_member_2 = active_user_view_permissions(str(uuid.uuid4()))
     mock_get_template_folders.return_value = [
-        _folder('folder_two', folder_id, None, [active_user_with_permissions.id, team_member_2.id]),
+        _folder('folder_two', folder_id, None, [active_user_with_permissions['id'], team_member_2['id']]),
     ]
-    mocker.patch('app.models.service.Service.active_users', [active_user_with_permissions, team_member, team_member_2])
+    mocker.patch(
+        'app.models.user.Users.client',
+        return_value=[active_user_with_permissions, team_member, team_member_2],
+    )
 
     page = client_request.get(
         'main.manage_template_folder',
@@ -464,28 +472,27 @@ def test_get_manage_folder_viewing_permissions_for_users(
     checkboxes = page.select('input[name=users_with_permission]')
 
     assert len(checkboxes) == 2
-    assert checkboxes[0]['value'] == team_member.id
+    assert checkboxes[0]['value'] == team_member['id']
     assert "checked" not in checkboxes[0].attrs
 
-    assert checkboxes[1]['value'] == team_member_2.id
+    assert checkboxes[1]['value'] == team_member_2['id']
     assert "checked" in checkboxes[1].attrs
 
     assert "Test User" in page.findAll('label', {'for': 'users_with_permission-0'})[0].text
 
 
-def test_get_manage_folder_viewing_permissions_for_users_not_visible_when_no_manage_users_permission(
+def test_get_manage_folder_viewing_permissions_for_users_not_visible_when_no_manage_settings_permission(
     client_request,
     active_user_with_permissions,
     service_one,
     mock_get_template_folders,
     mocker
 ):
-    active_user_with_permissions.permissions[SERVICE_ONE_ID] = [
+    active_user_with_permissions['permissions'][SERVICE_ONE_ID] = [
         'send_texts',
         'send_emails',
         'send_letters',
         'manage_templates',
-        'manage_settings',
         'manage_api_keys',
         'view_activity',
     ]
@@ -495,10 +502,13 @@ def test_get_manage_folder_viewing_permissions_for_users_not_visible_when_no_man
     service_one["permissions"] += ["edit_folder_permissions"]
     mock_get_template_folders.return_value = [
         {'id': folder_id, 'name': 'folder_two', 'parent_id': None, 'users_with_permission': [
-            active_user_with_permissions.id, team_member_2.id
+            active_user_with_permissions['id'], team_member_2['id']
         ]},
     ]
-    mocker.patch('app.models.service.Service.active_users', [active_user_with_permissions, team_member, team_member_2])
+    mocker.patch(
+        'app.models.user.Users.client',
+        return_value=[active_user_with_permissions, team_member, team_member_2],
+    )
 
     page = client_request.get(
         'main.manage_template_folder',
@@ -526,10 +536,13 @@ def test_get_manage_folder_viewing_permissions_for_users_not_visible_for_service
     service_one["permissions"] += ["edit_folder_permissions"]
     mock_get_template_folders.return_value = [
         {'id': folder_id, 'name': 'folder_two', 'parent_id': None, 'users_with_permission': [
-            active_user_with_permissions.id
+            active_user_with_permissions['id']
         ]},
     ]
-    mocker.patch('app.models.service.Service.active_users', [active_user_with_permissions])
+    mocker.patch(
+        'app.models.user.Users.client',
+        return_value=[active_user_with_permissions],
+    )
 
     page = client_request.get(
         'main.manage_template_folder',
@@ -593,7 +606,7 @@ def test_user_access_denied_to_template_folder_actions_without_folder_permission
         _test_page_title=False,
     )
 
-    mock.assert_called_once_with(folder_id, active_user_with_permissions)
+    mock.assert_called_once_with(folder_id, User(active_user_with_permissions))
 
 
 @pytest.mark.parametrize('endpoint', [
@@ -629,16 +642,19 @@ def test_user_access_denied_to_template_actions_without_folder_permission(
         _test_page_title=False,
     )
 
-    mock.assert_called_once_with(template_id, active_user_with_permissions)
+    mock.assert_called_once_with(template_id, User(active_user_with_permissions))
 
 
 def test_rename_folder(client_request, active_user_with_permissions, service_one, mock_get_template_folders, mocker):
     mock_update = mocker.patch('app.template_folder_api_client.update_template_folder')
     folder_id = str(uuid.uuid4())
     mock_get_template_folders.return_value = [
-        _folder('folder_two', folder_id, None, [active_user_with_permissions.id])
+        _folder('folder_two', folder_id, None, [active_user_with_permissions['id']])
     ]
-    mocker.patch('app.models.service.Service.active_users', [active_user_with_permissions])
+    mocker.patch(
+        'app.models.user.Users.client',
+        return_value=[active_user_with_permissions],
+    )
 
     client_request.post(
         'main.manage_template_folder',
@@ -666,9 +682,12 @@ def test_manage_folder_users(
     mock_update = mocker.patch('app.template_folder_api_client.update_template_folder')
     folder_id = str(uuid.uuid4())
     mock_get_template_folders.return_value = [
-        _folder('folder_two', folder_id, None, [active_user_with_permissions.id, team_member.id])
+        _folder('folder_two', folder_id, None, [active_user_with_permissions['id'], team_member['id']])
     ]
-    mocker.patch('app.models.service.Service.active_users', [active_user_with_permissions, team_member])
+    mocker.patch(
+        'app.models.user.Users.client',
+        return_value=[active_user_with_permissions, team_member],
+    )
 
     client_request.post(
         'main.manage_template_folder',
@@ -685,19 +704,18 @@ def test_manage_folder_users(
         service_one['id'],
         folder_id,
         name="new beautiful name",
-        users_with_permission=[active_user_with_permissions.id]
+        users_with_permission=[active_user_with_permissions['id']]
     )
 
 
 def test_manage_folder_users_doesnt_change_permissions_current_user_cannot_manage_users(
     client_request, active_user_with_permissions, service_one, mock_get_template_folders, mocker
 ):
-    active_user_with_permissions.permissions[SERVICE_ONE_ID] = [
+    active_user_with_permissions['permissions'][SERVICE_ONE_ID] = [
         'send_texts',
         'send_emails',
         'send_letters',
         'manage_templates',
-        'manage_settings',
         'manage_api_keys',
         'view_activity',
     ]
@@ -706,10 +724,13 @@ def test_manage_folder_users_doesnt_change_permissions_current_user_cannot_manag
     folder_id = str(uuid.uuid4())
     mock_get_template_folders.return_value = [
         {'id': folder_id, 'name': 'folder_two', 'parent_id': None, 'users_with_permission': [
-            active_user_with_permissions.id, team_member.id
+            active_user_with_permissions['id'], team_member['id']
         ]}
     ]
-    mocker.patch('app.models.service.Service.active_users', [active_user_with_permissions, team_member])
+    mocker.patch(
+        'app.models.user.Users.client',
+        return_value=[active_user_with_permissions, team_member],
+    )
 
     client_request.post(
         'main.manage_template_folder',
@@ -1468,13 +1489,13 @@ def test_should_filter_templates_folder_page_based_on_user_permissions(
 ):
     service_one['permissions'] += ['letter']
     mock_get_template_folders.return_value = [
-        _folder('folder_A', FOLDER_TWO_ID, None, [active_user_with_permissions.id]),
+        _folder('folder_A', FOLDER_TWO_ID, None, [active_user_with_permissions['id']]),
         _folder('folder_B', FOLDER_B_ID, FOLDER_TWO_ID, []),
-        _folder('folder_C', FOLDER_C_ID, FOLDER_TWO_ID, [active_user_with_permissions.id]),
-        _folder('folder_D', None, FOLDER_TWO_ID, [active_user_with_permissions.id]),
+        _folder('folder_C', FOLDER_C_ID, FOLDER_TWO_ID, [active_user_with_permissions['id']]),
+        _folder('folder_D', None, FOLDER_TWO_ID, [active_user_with_permissions['id']]),
         _folder('folder_E', PARENT_FOLDER_ID, users_with_permission=[]),
         _folder('folder_F', CHILD_FOLDER_ID, PARENT_FOLDER_ID, []),
-        _folder('folder_G', GRANDCHILD_FOLDER_ID, CHILD_FOLDER_ID, [active_user_with_permissions.id]),
+        _folder('folder_G', GRANDCHILD_FOLDER_ID, CHILD_FOLDER_ID, [active_user_with_permissions['id']]),
     ]
     mocker.patch(
         'app.service_api_client.get_service_templates',

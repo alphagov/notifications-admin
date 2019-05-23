@@ -32,7 +32,6 @@ from app import (
     job_api_client,
     notification_api_client,
     service_api_client,
-    user_api_client,
 )
 from app.main import main
 from app.main.forms import (
@@ -41,6 +40,7 @@ from app.main.forms import (
     SetSenderForm,
     get_placeholder_form_instance,
 )
+from app.models.user import Users
 from app.s3_client.s3_csv_client import (
     s3download,
     s3upload,
@@ -520,8 +520,6 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
         if e.status_code != 404:
             raise
 
-    users = user_api_client.get_users_for_service(service_id=service_id)
-
     statistics = service_api_client.get_service_statistics(service_id, today_only=True)
     remaining_messages = (current_service.message_limit - sum(stat['requested'] for stat in statistics.values()))
 
@@ -559,7 +557,7 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
         max_initial_rows_shown=50,
         max_errors_shown=50,
         whitelist=itertools.chain.from_iterable(
-            [user.name, user.mobile_number, user.email_address] for user in users
+            [user.name, user.mobile_number, user.email_address] for user in Users(service_id)
         ) if current_service.trial_mode else None,
         remaining_messages=remaining_messages,
         international_sms=current_service.has_permission('international_sms'),

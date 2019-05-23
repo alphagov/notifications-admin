@@ -12,10 +12,10 @@ from flask import (
 from itsdangerous import SignatureExpired
 from notifications_utils.url_safe_token import check_token
 
-from app import user_api_client
 from app.main import main
 from app.main.forms import NewPasswordForm
 from app.main.views.two_factor import log_in_user
+from app.models.user import User
 
 
 @main.route('/new-password/<path:token>', methods=['GET', 'POST'])
@@ -28,7 +28,7 @@ def new_password(token):
         return redirect(url_for('.forgot_password'))
 
     email_address = json.loads(token_data)['email']
-    user = user_api_client.get_user_by_email(email_address)
+    user = User.from_email_address(email_address)
     if user.password_changed_at and datetime.strptime(user.password_changed_at, '%Y-%m-%d %H:%M:%S.%f') > \
             datetime.strptime(json.loads(token_data)['created_at'], '%Y-%m-%d %H:%M:%S.%f'):
         flash('The link in the email has already been used')
@@ -37,7 +37,7 @@ def new_password(token):
     form = NewPasswordForm()
 
     if form.validate_on_submit():
-        user_api_client.reset_failed_login_count(user.id)
+        user.reset_failed_login_count()
         session['user_details'] = {
             'id': user.id,
             'email': user.email_address,
@@ -47,7 +47,7 @@ def new_password(token):
             return log_in_user(user.id)
         else:
             # send user a 2fa sms code
-            user_api_client.send_verify_code(user.id, 'sms', user.mobile_number)
+            user.send_verify_code()
             return redirect(url_for('main.two_factor'))
     else:
         return render_template('views/new-password.html', token=token, form=form, user=user)

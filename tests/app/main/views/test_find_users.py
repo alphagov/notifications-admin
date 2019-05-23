@@ -1,7 +1,6 @@
 from flask import url_for
 from lxml import html
 
-from app.notify_client.user_api_client import User
 from tests import user_json
 
 
@@ -93,7 +92,7 @@ def test_user_information_page_shows_information_about_user(
 ):
     mocker.patch('app.user_api_client.get_user', side_effect=[
         platform_admin_user,
-        User(user_json(name="Apple Bloom", services=[1, 2]))
+        user_json(name="Apple Bloom", services=[1, 2])
     ], autospec=True)
 
     mocker.patch(
@@ -129,7 +128,7 @@ def test_user_information_page_displays_if_there_are_failed_login_attempts(
 ):
     mocker.patch('app.user_api_client.get_user', side_effect=[
         platform_admin_user,
-        User(user_json(name="Apple Bloom", failed_login_count=2))
+        user_json(name="Apple Bloom", failed_login_count=2)
     ], autospec=True)
 
     mocker.patch(

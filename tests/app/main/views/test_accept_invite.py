@@ -6,7 +6,6 @@ from flask import url_for
 from notifications_python_client.errors import HTTPError
 
 import app
-from app.models.user import InvitedUser
 from tests.conftest import (
     SERVICE_ONE_ID,
     USER_ONE_ID,
@@ -38,7 +37,12 @@ def test_existing_user_accept_invite_calls_api_and_redirects_to_dashboard(
     mock_check_invite_token.assert_called_with('thisisnotarealtoken')
     mock_get_unknown_user_by_email.assert_called_with('invited_user@test.gov.uk')
     assert mock_accept_invite.call_count == 1
-    mock_add_user_to_service.assert_called_with(expected_service, USER_ONE_ID, expected_permissions, [])
+    mock_add_user_to_service.assert_called_with(
+        expected_service,
+        USER_ONE_ID,
+        expected_permissions,
+        [],
+    )
 
     assert response.status_code == 302
     assert response.location == url_for('main.service_dashboard', service_id=expected_service, _external=True)
@@ -78,8 +82,7 @@ def test_if_existing_user_accepts_twice_they_redirect_to_sign_in(
     mock_get_service,
 ):
     sample_invite['status'] = 'accepted'
-    invite = InvitedUser(**sample_invite)
-    mocker.patch('app.invite_api_client.check_token', return_value=invite)
+    mocker.patch('app.invite_api_client.check_token', return_value=sample_invite)
 
     response = client.get(url_for('main.accept_invite', token='thisisnotarealtoken'), follow_redirects=True)
     assert response.status_code == 200
@@ -105,9 +108,8 @@ def test_invite_goes_in_session(
     mock_add_user_to_service,
     mock_accept_invite,
 ):
-    invite = InvitedUser(**sample_invite)
-    invite.email_address = 'test@user.gov.uk'
-    mocker.patch('app.invite_api_client.check_token', return_value=invite)
+    sample_invite['email_address'] = 'test@user.gov.uk'
+    mocker.patch('app.invite_api_client.check_token', return_value=sample_invite)
 
     client_request.get(
         'main.accept_invite',
@@ -122,7 +124,7 @@ def test_invite_goes_in_session(
     )
 
     with client_request.session_transaction() as session:
-        assert session['invited_user']['email_address'] == invite.email_address
+        assert session['invited_user']['email_address'] == 'test@user.gov.uk'
 
 
 @pytest.mark.parametrize('user, landing_page_title', [
@@ -151,11 +153,10 @@ def test_accepting_invite_removes_invite_from_session(
     user,
     landing_page_title,
 ):
-    invite = InvitedUser(**sample_invite)
     user = user(fake_uuid)
-    invite.email_address = user.email_address
+    sample_invite['email_address'] = user['email_address']
 
-    mocker.patch('app.invite_api_client.check_token', return_value=invite)
+    mocker.patch('app.invite_api_client.check_token', return_value=sample_invite)
     client_request.login(user)
 
     page = client_request.get(
@@ -178,10 +179,9 @@ def test_existing_user_of_service_get_redirected_to_signin(
     mock_get_user_by_email,
     mock_accept_invite,
 ):
-    sample_invite['email_address'] = api_user_active.email_address
-    invite = InvitedUser(**sample_invite)
-    mocker.patch('app.invite_api_client.check_token', return_value=invite)
-    mocker.patch('app.user_api_client.get_users_for_service', return_value=[api_user_active])
+    sample_invite['email_address'] = api_user_active['email_address']
+    mocker.patch('app.invite_api_client.check_token', return_value=sample_invite)
+    mocker.patch('app.models.user.Users.client', return_value=[api_user_active])
 
     response = client.get(url_for('main.accept_invite', token='thisisnotarealtoken'), follow_redirects=True)
     assert response.status_code == 200
@@ -404,8 +404,7 @@ def test_signed_in_existing_user_cannot_use_anothers_invite(
     mock_accept_invite,
     mock_get_service,
 ):
-    invite = InvitedUser(**sample_invite)
-    mocker.patch('app.invite_api_client.check_token', return_value=invite)
+    mocker.patch('app.invite_api_client.check_token', return_value=sample_invite)
     mocker.patch('app.user_api_client.get_users_for_service', return_value=[api_user_active])
 
     page = client_request.get(
@@ -434,9 +433,8 @@ def test_accept_invite_does_not_treat_email_addresses_as_case_sensitive(
 ):
     # the email address of api_user_active is 'test@user.gov.uk'
     sample_invite['email_address'] = 'TEST@user.gov.uk'
-    invite = InvitedUser(**sample_invite)
-    mocker.patch('app.invite_api_client.check_token', return_value=invite)
-    mocker.patch('app.user_api_client.get_users_for_service', return_value=[api_user_active])
+    mocker.patch('app.invite_api_client.check_token', return_value=sample_invite)
+    mocker.patch('app.models.user.Users.client', return_value=[api_user_active])
 
     client_request.get(
         'main.accept_invite',
@@ -527,12 +525,11 @@ def test_existing_user_accepts_and_sets_email_auth(
     mock_add_user_to_service,
     mocker
 ):
-    sample_invite['email_address'] = api_user_active.email_address
+    sample_invite['email_address'] = api_user_active['email_address']
 
     service_one['permissions'].append('email_auth')
     sample_invite['auth_type'] = 'email_auth'
-    mocker.patch('app.main.views.invites.service_api_client.get_service', return_value={'data': service_one})
-    mocker.patch('app.invite_api_client.check_token', return_value=InvitedUser(**sample_invite))
+    mocker.patch('app.invite_api_client.check_token', return_value=sample_invite)
 
     client_request.get(
         'main.accept_invite',
@@ -558,13 +555,12 @@ def test_existing_user_doesnt_get_auth_changed_by_service_without_permission(
     mock_add_user_to_service,
     mocker
 ):
-    sample_invite['email_address'] = api_user_active.email_address
+    sample_invite['email_address'] = api_user_active['email_address']
 
     assert 'email_auth' not in service_one['permissions']
 
     sample_invite['auth_type'] = 'email_auth'
-    mocker.patch('app.main.views.invites.service_api_client.get_service', return_value={'data': service_one})
-    mocker.patch('app.invite_api_client.check_token', return_value=InvitedUser(**sample_invite))
+    mocker.patch('app.invite_api_client.check_token', return_value=sample_invite)
 
     client_request.get(
         'main.accept_invite',
@@ -587,17 +583,16 @@ def test_existing_email_auth_user_without_phone_cannot_set_sms_auth(
     mock_add_user_to_service,
     mocker
 ):
-    sample_invite['email_address'] = api_user_active.email_address
+    sample_invite['email_address'] = api_user_active['email_address']
 
     service_one['permissions'].append('email_auth')
 
-    api_user_active.auth_type = 'email_auth'
-    api_user_active.mobile_number = None
+    api_user_active['auth_type'] = 'email_auth'
+    api_user_active['mobile_number'] = None
     sample_invite['auth_type'] = 'sms_auth'
 
-    mocker.patch('app.main.views.invites.user_api_client.get_user_by_email', return_value=api_user_active)
-    mocker.patch('app.main.views.invites.service_api_client.get_service', return_value={'data': service_one})
-    mocker.patch('app.invite_api_client.check_token', return_value=InvitedUser(**sample_invite))
+    mocker.patch('app.user_api_client.get_user_by_email', return_value=api_user_active)
+    mocker.patch('app.invite_api_client.check_token', return_value=sample_invite)
 
     client_request.get(
         'main.accept_invite',
@@ -621,11 +616,11 @@ def test_existing_email_auth_user_with_phone_can_set_sms_auth(
     mock_add_user_to_service,
     mocker
 ):
-    sample_invite['email_address'] = api_user_active.email_address
+    sample_invite['email_address'] = api_user_active['email_address']
     service_one['permissions'].append('email_auth')
     sample_invite['auth_type'] = 'sms_auth'
 
-    mocker.patch('app.invite_api_client.check_token', return_value=InvitedUser(**sample_invite))
+    mocker.patch('app.invite_api_client.check_token', return_value=sample_invite)
 
     client_request.get(
         'main.accept_invite',

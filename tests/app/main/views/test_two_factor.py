@@ -18,8 +18,8 @@ def test_should_render_two_factor_page(
     # reassign the session after it is lost mid register process
     with client.session_transaction() as session:
         session['user_details'] = {
-            'id': api_user_active.id,
-            'email': api_user_active.email_address}
+            'id': api_user_active['id'],
+            'email': api_user_active['email_address']}
     response = client.get(url_for('main.two_factor'))
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
@@ -43,8 +43,8 @@ def test_should_login_user_and_should_redirect_to_next_url(
 ):
     with client.session_transaction() as session:
         session['user_details'] = {
-            'id': api_user_active.id,
-            'email': api_user_active.email_address}
+            'id': api_user_active['id'],
+            'email': api_user_active['email_address']}
     response = client.post(url_for('main.two_factor', next='/services/{}'.format(SERVICE_ONE_ID)),
                            data={'sms_code': '12345'})
     assert response.status_code == 302
@@ -66,8 +66,8 @@ def test_should_login_user_and_not_redirect_to_external_url(
 ):
     with client.session_transaction() as session:
         session['user_details'] = {
-            'id': api_user_active.id,
-            'email': api_user_active.email_address}
+            'id': api_user_active['id'],
+            'email': api_user_active['email_address']}
     response = client.post(url_for('main.two_factor', next='http://www.google.com'),
                            data={'sms_code': '12345'})
     assert response.status_code == 302
@@ -84,8 +84,8 @@ def test_should_login_user_and_redirect_to_show_accounts(
 ):
     with client.session_transaction() as session:
         session['user_details'] = {
-            'id': api_user_active.id,
-            'email': api_user_active.email_address}
+            'id': api_user_active['id'],
+            'email': api_user_active['email_address']}
     response = client.post(url_for('main.two_factor'),
                            data={'sms_code': '12345'})
 
@@ -101,8 +101,8 @@ def test_should_return_200_with_sms_code_error_when_sms_code_is_wrong(
 ):
     with client.session_transaction() as session:
         session['user_details'] = {
-            'id': api_user_active.id,
-            'email': api_user_active.email_address}
+            'id': api_user_active['id'],
+            'email': api_user_active['email_address']}
     response = client.post(url_for('main.two_factor'),
                            data={'sms_code': '23456'})
     assert response.status_code == 200
@@ -120,8 +120,8 @@ def test_should_login_user_when_multiple_valid_codes_exist(
 ):
     with client.session_transaction() as session:
         session['user_details'] = {
-            'id': api_user_active.id,
-            'email': api_user_active.email_address}
+            'id': api_user_active['id'],
+            'email': api_user_active['email_address']}
     response = client.post(url_for('main.two_factor'),
                            data={'sms_code': '23456'})
     assert response.status_code == 302
@@ -138,8 +138,8 @@ def test_two_factor_should_set_password_when_new_password_exists_in_session(
 ):
     with client.session_transaction() as session:
         session['user_details'] = {
-            'id': api_user_active.id,
-            'email': api_user_active.email_address,
+            'id': api_user_active['id'],
+            'email': api_user_active['email_address'],
             'password': 'changedpassword'}
 
     response = client.post(url_for('main.two_factor'),
@@ -147,7 +147,7 @@ def test_two_factor_should_set_password_when_new_password_exists_in_session(
     assert response.status_code == 302
     assert response.location == url_for('main.show_accounts_or_dashboard', _external=True)
 
-    mock_update_user_password.assert_called_once_with(api_user_active.id, password='changedpassword')
+    mock_update_user_password.assert_called_once_with(api_user_active['id'], 'changedpassword')
 
 
 def test_two_factor_returns_error_when_user_is_locked(
@@ -159,8 +159,8 @@ def test_two_factor_returns_error_when_user_is_locked(
 ):
     with client.session_transaction() as session:
         session['user_details'] = {
-            'id': api_user_locked.id,
-            'email': api_user_locked.email_address,
+            'id': api_user_locked['id'],
+            'email': api_user_locked['email_address'],
         }
     response = client.post(url_for('main.two_factor'),
                            data={'sms_code': '12345'})
@@ -191,13 +191,12 @@ def test_two_factor_should_activate_pending_user(
     mocker.patch('app.service_api_client.get_services', return_value={'data': []})
     with client.session_transaction() as session:
         session['user_details'] = {
-            'id': api_user_pending.id,
-            'email_address': api_user_pending.email_address
+            'id': api_user_pending['id'],
+            'email_address': api_user_pending['email_address']
         }
     client.post(url_for('main.two_factor'), data={'sms_code': '12345'})
 
     assert mock_activate_user.called
-    assert api_user_pending.is_active
 
 
 def test_valid_two_factor_email_link_logs_in_user(

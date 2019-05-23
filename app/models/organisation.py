@@ -131,20 +131,18 @@ class Organisation(JSONModel):
         return [s for s in self.services if not s['active'] or s['restricted']]
 
     @cached_property
-    def active_users(self):
-        # need to put this here to prevent cyclical import
-        from app.notify_client.user_api_client import user_api_client
-        return user_api_client.get_users_for_organisation(org_id=self.id)
+    def invited_users(self):
+        from app.models.user import OrganisationInvitedUsers
+        return OrganisationInvitedUsers(self.id)
 
     @cached_property
-    def invited_users(self):
-        # need to put this here to prevent cyclical import
-        from app.notify_client.org_invite_api_client import org_invite_api_client
-        return org_invite_api_client.get_invites_for_organisation(org_id=self.id)
+    def active_users(self):
+        from app.models.user import OrganisationUsers
+        return OrganisationUsers(self.id)
 
     @cached_property
     def team_members(self):
         return sorted(
-            self.active_users + [i for i in self.invited_users if i.status != 'accepted'],
-            key=lambda user: user.email_address,
+            self.invited_users + self.active_users,
+            key=lambda user: user.email_address.lower(),
         )

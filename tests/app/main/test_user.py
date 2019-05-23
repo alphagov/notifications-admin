@@ -1,9 +1,9 @@
 import pytest
 
-from app.notify_client.user_api_client import User
+from app.models.user import User
 
 
-def test_user():
+def test_user(app_):
     user_data = {'id': 1,
                  'name': 'Test User',
                  'email_address': 'test@user.gov.uk',
@@ -19,14 +19,24 @@ def test_user():
     assert user.mobile_number == '+4412341234'
     assert user.state == 'pending'
 
-    # user has three failed logins before being locked
-    assert user.max_failed_login_count == 3
+    # user has ten failed logins before being locked
+    assert user.max_failed_login_count == app_.config['MAX_FAILED_LOGIN_COUNT'] == 10
     assert user.failed_login_count == 0
-    assert not user.is_locked()
+    assert user.locked is False
 
     # set failed logins to threshold
-    user.failed_login_count = 3
-    assert user.is_locked()
+    user.failed_login_count = app_.config['MAX_FAILED_LOGIN_COUNT']
+    assert user.locked is True
 
     with pytest.raises(TypeError):
         user.has_permissions('to_do_bad_things')
+
+
+def test_activate_user(app_, api_user_pending, mock_activate_user):
+    assert User(api_user_pending).activate() == User(api_user_pending)
+    mock_activate_user.assert_called_once_with(api_user_pending['id'])
+
+
+def test_activate_user_already_active(app_, api_user_active, mock_activate_user):
+    assert User(api_user_active).activate() == User(api_user_active)
+    assert mock_activate_user.called is False

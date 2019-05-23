@@ -3,7 +3,6 @@ from datetime import datetime, timedelta
 from flask import abort, redirect, render_template, session, url_for
 from flask_login import current_user
 
-from app import invite_api_client, org_invite_api_client, user_api_client
 from app.main import main
 from app.main.forms import (
     RegisterUserForm,
@@ -11,6 +10,7 @@ from app.main.forms import (
     RegisterUserFromOrgInviteForm,
 )
 from app.main.views.verify import activate_user
+from app.models.user import InvitedOrgUser, InvitedUser, User
 
 
 @main.route('/register', methods=['GET', 'POST'])
@@ -28,20 +28,18 @@ def register():
 
 @main.route('/register-from-invite', methods=['GET', 'POST'])
 def register_from_invite():
-    invited_user = session.get('invited_user')
+    invited_user = InvitedUser.from_session()
     if not invited_user:
         abort(404)
-
-    is_sms_auth = invited_user['auth_type'] == 'sms_auth'
 
     form = RegisterUserFromInviteForm(invited_user)
 
     if form.validate_on_submit():
-        if form.service.data != invited_user['service'] or form.email_address.data != invited_user['email_address']:
+        if form.service.data != invited_user.service or form.email_address.data != invited_user.email_address:
             abort(400)
-        _do_registration(form, send_email=False, send_sms=is_sms_auth)
-        invite_api_client.accept_invite(invited_user['service'], invited_user['id'])
-        if is_sms_auth:
+        _do_registration(form, send_email=False, send_sms=invited_user.sms_auth)
+        invited_user.accept_invite()
+        if invited_user.sms_auth:
             return redirect(url_for('main.verify'))
         else:
             # we've already proven this user has email because they clicked the invite link,
@@ -53,7 +51,7 @@ def register_from_invite():
 
 @main.route('/register-from-org-invite', methods=['GET', 'POST'])
 def register_from_org_invite():
-    invited_org_user = session.get('invited_org_user')
+    invited_org_user = InvitedOrgUser.from_session()
     if not invited_org_user:
         abort(404)
 
@@ -63,34 +61,37 @@ def register_from_org_invite():
     form.auth_type.data = 'sms_auth'
 
     if form.validate_on_submit():
-        if (form.organisation.data != invited_org_user['organisation'] or
-                form.email_address.data != invited_org_user['email_address']):
+        if (form.organisation.data != invited_org_user.organisation or
+                form.email_address.data != invited_org_user.email_address):
             abort(400)
-        _do_registration(form, send_email=False, send_sms=True, organisation_id=invited_org_user['organisation'])
-        org_invite_api_client.accept_invite(invited_org_user['organisation'], invited_org_user['id'])
+        _do_registration(form, send_email=False, send_sms=True, organisation_id=invited_org_user.organisation)
+        invited_org_user.accept_invite()
 
         return redirect(url_for('main.verify'))
     return render_template('views/register-from-org-invite.html', invited_org_user=invited_org_user, form=form)
 
 
 def _do_registration(form, send_sms=True, send_email=True, organisation_id=None):
-    if user_api_client.is_email_already_in_use(form.email_address.data):
-        user = user_api_client.get_user_by_email(form.email_address.data)
+    user = User.from_email_address_or_none(form.email_address.data)
+    if user:
         if send_email:
-            user_api_client.send_already_registered_email(user.id, user.email_address)
+            user.send_already_registered_email()
         session['expiry_date'] = str(datetime.utcnow() + timedelta(hours=1))
         session['user_details'] = {"email": user.email_address, "id": user.id}
     else:
-        user = user_api_client.register_user(form.name.data,
-                                             form.email_address.data,
-                                             form.mobile_number.data or None,
-                                             form.password.data,
-                                             form.auth_type.data)
+        user = User.register(
+            name=form.name.data,
+            email_address=form.email_address.data,
+            mobile_number=form.mobile_number.data,
+            password=form.password.data,
+            auth_type=form.auth_type.data,
+        )
+
         if send_email:
-            user_api_client.send_verify_email(user.id, user.email_address)
+            user.send_verify_email()
 
         if send_sms:
-            user_api_client.send_verify_code(user.id, 'sms', user.mobile_number)
+            user.send_verify_code()
         session['expiry_date'] = str(datetime.utcnow() + timedelta(hours=1))
         session['user_details'] = {"email": user.email_address, "id": user.id}
     if organisation_id:

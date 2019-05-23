@@ -16,7 +16,7 @@ def test_should_return_verify_template(
     # TODO this lives here until we work out how to
     # reassign the session after it is lost mid register process
     with client.session_transaction() as session:
-        session['user_details'] = {'email_address': api_user_active.email_address, 'id': api_user_active.id}
+        session['user_details'] = {'email_address': api_user_active['email_address'], 'id': api_user_active['id']}
     response = client.get(url_for('main.verify'))
     assert response.status_code == 200
 
@@ -35,11 +35,11 @@ def test_should_redirect_to_add_service_when_sms_code_is_correct(
     mock_create_event,
     fake_uuid,
 ):
-    api_user_active.current_session_id = str(uuid.UUID(int=1))
+    api_user_active['current_session_id'] = str(uuid.UUID(int=1))
     mocker.patch('app.user_api_client.get_user', return_value=api_user_active)
 
     with client.session_transaction() as session:
-        session['user_details'] = {'email_address': api_user_active.email_address, 'id': api_user_active.id}
+        session['user_details'] = {'email_address': api_user_active['email_address'], 'id': api_user_active['id']}
         # user's only just created their account so no session in the cookie
         session.pop('current_session_id', None)
 
@@ -52,7 +52,7 @@ def test_should_redirect_to_add_service_when_sms_code_is_correct(
     with client.session_transaction() as session:
         assert session['current_session_id'] == str(uuid.UUID(int=1))
 
-    mock_check_verify_code.assert_called_once_with(api_user_active.id, '12345', 'sms')
+    mock_check_verify_code.assert_called_once_with(api_user_active['id'], '12345', 'sms')
 
 
 def test_should_activate_user_after_verify(
@@ -66,7 +66,10 @@ def test_should_activate_user_after_verify(
 ):
     mocker.patch('app.user_api_client.get_user', return_value=api_user_pending)
     with client.session_transaction() as session:
-        session['user_details'] = {'email_address': api_user_pending.email_address, 'id': api_user_pending.id}
+        session['user_details'] = {
+            'email_address': api_user_pending['email_address'],
+            'id': api_user_pending['id']
+        }
     client.post(url_for('main.verify'),
                 data={'sms_code': '12345'})
     assert mock_activate_user.called
@@ -78,7 +81,10 @@ def test_should_return_200_when_sms_code_is_wrong(
     mock_check_verify_code_code_not_found,
 ):
     with client_request.session_transaction() as session:
-        session['user_details'] = {'email_address': api_user_active.email_address, 'id': api_user_active.id}
+        session['user_details'] = {
+            'email_address': api_user_active['email_address'],
+            'id': api_user_active['id'],
+        }
 
     page = client_request.post(
         'main.verify',
@@ -100,11 +106,14 @@ def test_verify_email_redirects_to_verify_if_token_valid(
     mock_send_verify_code,
     mock_check_verify_code,
 ):
-    token_data = {"user_id": api_user_pending.id, "secret_code": 'UNUSED'}
+    token_data = {"user_id": api_user_pending['id'], "secret_code": 'UNUSED'}
     mocker.patch('app.main.views.verify.check_token', return_value=json.dumps(token_data))
 
     with client.session_transaction() as session:
-        session['user_details'] = {'email_address': api_user_pending.email_address, 'id': api_user_pending.id}
+        session['user_details'] = {
+            'email_address': api_user_pending['email_address'],
+            'id': api_user_pending['id'],
+        }
 
     response = client.get(url_for('main.verify_email', token='notreal'))
 
@@ -112,10 +121,10 @@ def test_verify_email_redirects_to_verify_if_token_valid(
     assert response.location == url_for('main.verify', _external=True)
 
     assert not mock_check_verify_code.called
-    mock_send_verify_code.assert_called_once_with(api_user_pending.id, 'sms', api_user_pending.mobile_number)
+    mock_send_verify_code.assert_called_once_with(api_user_pending['id'], 'sms', api_user_pending['mobile_number'])
 
     with client.session_transaction() as session:
-        assert session['user_details'] == {'email': api_user_pending.email_address, 'id': api_user_pending.id}
+        assert session['user_details'] == {'email': api_user_pending['email_address'], 'id': api_user_pending['id']}
 
 
 def test_verify_email_redirects_to_email_sent_if_token_expired(
@@ -139,7 +148,7 @@ def test_verify_email_redirects_to_sign_in_if_user_active(
     mock_send_verify_code,
     mock_check_verify_code,
 ):
-    token_data = {"user_id": api_user_active.id, "secret_code": 12345}
+    token_data = {"user_id": api_user_active['id'], "secret_code": 12345}
     mocker.patch('app.main.views.verify.check_token', return_value=json.dumps(token_data))
 
     response = client.get(url_for('main.verify_email', token='notreal'), follow_redirects=True)

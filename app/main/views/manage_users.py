@@ -10,12 +10,7 @@ from flask import (
 from flask_login import current_user, login_required
 from notifications_python_client.errors import HTTPError
 
-from app import (
-    current_service,
-    invite_api_client,
-    service_api_client,
-    user_api_client,
-)
+from app import current_service, service_api_client
 from app.event_handlers import (
     create_email_change_event,
     create_mobile_number_change_event,
@@ -29,7 +24,8 @@ from app.main.forms import (
     PermissionsForm,
     SearchUsersForm,
 )
-from app.models.user import permissions
+from app.models.roles_and_permissions import permissions
+from app.models.user import InvitedUser, User
 from app.utils import is_gov_user, redact_mobile_number, user_has_permissions
 
 
@@ -64,7 +60,7 @@ def invite_user(service_id):
 
     if form.validate_on_submit():
         email_address = form.email_address.data
-        invited_user = invite_api_client.create_invite(
+        invited_user = InvitedUser.create(
             current_user.id,
             service_id,
             email_address,
@@ -106,13 +102,13 @@ def edit_user_permissions(service_id, user_id):
     )
 
     if form.validate_on_submit():
-        user_api_client.set_user_permissions(
-            user_id, service_id,
+        user.set_permissions(
+            service_id,
             permissions=form.permissions,
             folder_permissions=form.folder_permissions.data,
         )
         if service_has_email_auth:
-            user_api_client.update_user_attribute(user_id, auth_type=form.login_authentication.data)
+            user.update(auth_type=form.login_authentication.data)
         return redirect(url_for('.manage_users', service_id=service_id))
 
     return render_template(
@@ -154,13 +150,10 @@ def edit_user_email(service_id, user_id):
     user = current_service.get_team_member(user_id)
     user_email = user.email_address
 
-    def _is_email_already_in_use(email):
-        return user_api_client.is_email_already_in_use(email)
-
     if is_gov_user(user_email):
-        form = ChangeEmailForm(_is_email_already_in_use, email_address=user_email)
+        form = ChangeEmailForm(User.already_registered, email_address=user_email)
     else:
-        form = ChangeNonGovEmailForm(_is_email_already_in_use, email_address=user_email)
+        form = ChangeNonGovEmailForm(User.already_registered, email_address=user_email)
 
     if request.form.get('email_address', '').strip() == user_email:
         return redirect(url_for('.manage_users', service_id=current_service.id))
@@ -193,7 +186,7 @@ def confirm_edit_user_email(service_id, user_id):
         ))
     if request.method == 'POST':
         try:
-            user_api_client.update_user_attribute(str(user_id), email_address=new_email, updated_by=current_user.id)
+            user.update(email_address=new_email, updated_by=current_user.id)
         except HTTPError as e:
             abort(500, e)
         else:
@@ -253,7 +246,7 @@ def confirm_edit_user_mobile_number(service_id, user_id):
         ))
     if request.method == 'POST':
         try:
-            user_api_client.update_user_attribute(str(user_id), mobile_number=new_number, updated_by=current_user.id)
+            user.update(mobile_number=new_number, updated_by=current_user.id)
         except HTTPError as e:
             abort(500, e)
         else:

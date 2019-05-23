@@ -381,7 +381,7 @@ def test_user_with_only_send_and_view_redirected_to_one_off(
     mocker,
     fake_uuid,
 ):
-    active_user_with_permissions._permissions[SERVICE_ONE_ID] = [
+    active_user_with_permissions['permissions'][SERVICE_ONE_ID] = [
         'send_messages',
         'view_activity',
     ]
@@ -419,7 +419,7 @@ def test_user_with_only_send_and_view_sees_letter_page(
     permissions,
 ):
     mocker.patch('app.main.views.templates.get_page_count_for_letter', return_value=1)
-    active_user_with_permissions._permissions[SERVICE_ONE_ID] = permissions
+    active_user_with_permissions['permissions'][SERVICE_ONE_ID] = permissions
     client_request.login(active_user_with_permissions)
     page = client_request.get(
         'main.view_template',
@@ -613,7 +613,7 @@ def test_should_be_able_to_view_a_template_with_links(
     links_to_be_shown,
     permissions_warning_to_be_shown,
 ):
-    active_user_with_permissions._permissions[SERVICE_ONE_ID] = permissions + ['view_activity']
+    active_user_with_permissions['permissions'][SERVICE_ONE_ID] = permissions + ['view_activity']
     client_request.login(active_user_with_permissions)
 
     page = client_request.get(

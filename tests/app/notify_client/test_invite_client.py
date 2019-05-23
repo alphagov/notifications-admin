@@ -54,4 +54,4 @@ def test_client_returns_invite(mocker, sample_invite):
 
     mock_get.assert_called_once_with(expected_url)
     assert len(invites) == 1
-    assert invites[0].status == 'pending'
+    assert invites[0]['status'] == 'pending'

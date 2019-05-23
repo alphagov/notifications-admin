@@ -25,3 +25,7 @@ class JSONModel():
             return next(thing for thing in things if thing['id'] == str(id))
         except StopIteration:
             abort(404)
+
+
+class InviteTokenError(Exception):
+    pass

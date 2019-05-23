@@ -1288,8 +1288,8 @@ def test_skip_link_will_not_show_on_sms_one_off_if_service_has_no_mobile_number(
     user,
 ):
     user = user(fake_uuid)
-    user.mobile_number = None
-    mocker.patch('app.user_api_client.get_user', return_value=user)
+    user['mobile_number'] = None
+    client_request.login(user)
     page = client_request.get(
         'main.send_one_off_step',
         service_id=SERVICE_ONE_ID,
@@ -1627,7 +1627,7 @@ def test_send_test_sms_message_with_placeholders_shows_first_field(
     expected_back_link_endpoint,
     extra_args,
 ):
-    active_user_with_permissions._permissions[SERVICE_ONE_ID] = permissions
+    active_user_with_permissions['permissions'][SERVICE_ONE_ID] = permissions
     client_request.login(active_user_with_permissions)
 
     with client_request.session_transaction() as session:
@@ -2546,7 +2546,7 @@ def test_check_messages_shows_too_many_messages_errors(
 ):
     # csv with 100 phone numbers
     mocker.patch('app.main.views.send.s3download', return_value=',\n'.join(
-        ['phone number'] + ([mock_get_users_by_service(None)[0].mobile_number] * 100)
+        ['phone number'] + ([mock_get_users_by_service(None)[0]['mobile_number']] * 100)
     ))
     mocker.patch('app.service_api_client.get_service_statistics', return_value={
         'sms': {'requested': num_requested, 'delivered': 0, 'failed': 0},

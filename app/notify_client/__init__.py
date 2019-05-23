@@ -60,3 +60,7 @@ class NotifyAdminAPIClient(BaseAPIClient):
     def delete(self, *args, **kwargs):
         self.check_inactive_service()
         return super().delete(*args, **kwargs)
+
+
+class InviteTokenError(Exception):
+    pass

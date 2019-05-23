@@ -54,7 +54,7 @@ def test_send_notification(mocker, logged_in_client, active_user_with_permission
             'template_id': 'bar',
             'to': '07700900001',
             'personalisation': None,
-            'created_by': active_user_with_permissions.id
+            'created_by': active_user_with_permissions['id']
         }
     )
 
