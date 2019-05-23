@@ -998,7 +998,7 @@ def test_send_test_step_redirects_if_session_not_setup(
 ):
     mocker.patch('app.user_api_client.get_user', return_value=user(fake_uuid))
     template_mock(mocker)
-    mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=99)
+    mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=9)
 
     with client_request.session_transaction() as session:
         assert 'recipient' not in session
@@ -1109,7 +1109,7 @@ def test_send_one_off_or_test_has_correct_page_titles(
 ):
     mocker.patch('app.user_api_client.get_user', return_value=user(fake_uuid))
     template_mock(mocker)
-    mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=99)
+    mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=9)
 
     response = logged_in_client.get(
         partial_url(service_id=service_one['id'], template_id=fake_uuid, step_index=0),
@@ -1224,7 +1224,7 @@ def test_send_one_off_has_skip_link(
 ):
     mocker.patch('app.user_api_client.get_user', return_value=user(fake_uuid))
     template_mock(mocker)
-    mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=99)
+    mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=9)
 
     page = client_request.get(
         'main.send_one_off_step',
@@ -1261,7 +1261,7 @@ def test_send_one_off_has_sticky_header_for_email_and_letter(
     expected_sticky,
 ):
     template_mock(mocker)
-    mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=99)
+    mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=9)
 
     page = client_request.get(
         'main.send_one_off_step',
@@ -1774,7 +1774,7 @@ def test_send_test_caches_page_count(
     fake_uuid,
 ):
 
-    mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=99)
+    mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=9)
 
     logged_in_client.get(
         url_for(
@@ -1785,7 +1785,7 @@ def test_send_test_caches_page_count(
         follow_redirects=True,
     )
     with logged_in_client.session_transaction() as session:
-        assert session['send_test_letter_page_count'] == 99
+        assert session['send_test_letter_page_count'] == 9
 
 
 def test_send_test_indicates_optional_address_columns(

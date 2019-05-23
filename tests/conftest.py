@@ -2908,6 +2908,9 @@ def client_request(
                 assert resp.location == _expected_redirect
             page = BeautifulSoup(resp.data.decode('utf-8'), 'html.parser')
             if _test_page_title:
+                count_of_h1s = len(page.select('h1'))
+                if count_of_h1s != 1:
+                    raise AssertionError('Page should have one H1 ({} found)'.format(count_of_h1s))
                 page_title, h1 = (
                     normalize_spaces(page.find(selector).text) for selector in ('title', 'h1')
                 )

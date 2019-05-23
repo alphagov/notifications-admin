@@ -11,7 +11,6 @@
 
 {% block platform_admin_content %}
 
-  <h1 class="heading-large">{{ '{} letter branding'.format('Update' if is_update else 'Add')}}</h1>
   {{ page_header(
     '{} letter branding'.format('Update' if is_update else 'Add'),
     back_link=url_for('main.letter_branding')

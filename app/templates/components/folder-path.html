@@ -3,9 +3,10 @@
   service_id,
   template_type,
   current_user,
-  link_current_item=False
+  link_current_item=False,
+  root_element='h1'
 ) %}
-  <h1 class="heading-medium folder-heading">
+  <{{ root_element }} class="heading-medium folder-heading">
     {% for folder in folders %}
       {% if loop.last and not link_current_item %}
         {% if folder.template_type or not folder.id %}
@@ -26,7 +27,7 @@
         {% if not loop.last %}{{ folder_path_separator() }}{% endif %}
       {% endif %}
     {% endfor %}
-  </h1>
+  </{{ root_element }}>
 {% endmacro %}
 
 
