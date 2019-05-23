@@ -46,6 +46,7 @@ from app.extensions import (
     statsd_client,
     zendesk_client,
 )
+from app.models.organisation import Organisation
 from app.models.service import Service
 from app.models.user import AnonymousUser
 from app.navigation import (
@@ -502,7 +503,7 @@ def load_organisation_before_request():
 
             if org_id:
                 try:
-                    _request_ctx_stack.top.organisation = organisations_client.get_organisation(org_id)
+                    _request_ctx_stack.top.organisation = Organisation.from_id(org_id)
                 except HTTPError as exc:
                     # if org id isn't real, then 404 rather than 500ing later because we expect org to be set
                     if exc.status_code == 404:

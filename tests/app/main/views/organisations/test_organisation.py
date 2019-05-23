@@ -118,7 +118,7 @@ def test_organisation_services_shows_live_services_only(
     assert services[1].find('a')['href'] == url_for('main.service_dashboard', service_id=SERVICE_ONE_ID)
 
 
-def test_organisation_trial_mode_services_shows_all_services(
+def test_organisation_trial_mode_services_shows_all_non_live_services(
     client_request,
     platform_admin_user,
     mock_get_organisation,
@@ -130,7 +130,7 @@ def test_organisation_trial_mode_services_shows_all_services(
         return_value=[
             service_json(id_='1', name='1', restricted=False, active=True),  # live
             service_json(id_='2', name='2', restricted=True, active=True),  # trial
-            service_json(id_='3', name='3', restricted=True, active=False),  # archived
+            service_json(id_='3', name='3', restricted=False, active=False),  # archived
         ]
     )
 

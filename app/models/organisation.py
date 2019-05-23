@@ -1,6 +1,8 @@
 from flask import Markup, abort
+from werkzeug.utils import cached_property
 
 from app.models import JSONModel
+from app.notify_client.organisations_api_client import organisations_client
 
 
 class Organisation(JSONModel):
@@ -20,6 +22,10 @@ class Organisation(JSONModel):
         'domains',
         'request_to_go_live_notes',
     }
+
+    @classmethod
+    def from_id(cls, org_id):
+        return cls(organisations_client.get_organisation(org_id))
 
     def __init__(self, _dict):
 
@@ -111,3 +117,34 @@ class Organisation(JSONModel):
         if self.crown is None:
             abort(404)
         return self.crown
+
+    @cached_property
+    def services(self):
+        return organisations_client.get_organisation_services(self.id)
+
+    @property
+    def live_services(self):
+        return [s for s in self.services if s['active'] and not s['restricted']]
+
+    @property
+    def trial_services(self):
+        return [s for s in self.services if not s['active'] or s['restricted']]
+
+    @cached_property
+    def active_users(self):
+        # need to put this here to prevent cyclical import
+        from app.notify_client.user_api_client import user_api_client
+        return user_api_client.get_users_for_organisation(org_id=self.id)
+
+    @cached_property
+    def invited_users(self):
+        # need to put this here to prevent cyclical import
+        from app.notify_client.org_invite_api_client import org_invite_api_client
+        return org_invite_api_client.get_invites_for_organisation(org_id=self.id)
+
+    @cached_property
+    def team_members(self):
+        return sorted(
+            self.active_users + [i for i in self.invited_users if i.status != 'accepted'],
+            key=lambda user: user.email_address,
+        )
