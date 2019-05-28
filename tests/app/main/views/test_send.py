@@ -380,7 +380,7 @@ def test_shows_error_if_parsing_exception(
     )
 
 
-def test_upload_csvfile_with_errors_shows_check_page_with_errors(
+def test_upload_csv_file_with_errors_shows_check_page_with_errors(
     logged_in_client,
     service_one,
     mocker,
@@ -507,7 +507,7 @@ def test_upload_csvfile_with_errors_shows_check_page_with_errors(
         )
     ),
 ])
-def test_upload_csvfile_with_missing_columns_shows_error(
+def test_upload_csv_file_with_missing_columns_shows_error(
     client_request,
     mocker,
     mock_get_service_template_with_placeholders,
