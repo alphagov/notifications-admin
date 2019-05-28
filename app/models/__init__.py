@@ -4,10 +4,13 @@ from flask import abort
 class JSONModel():
 
     ALLOWED_PROPERTIES = set()
+    DEFAULTS = dict()
 
     def __init__(self, _dict):
         # in the case of a bad request _dict may be `None`
         self._dict = _dict or {}
+        for attribute, default_value in self.DEFAULTS.items():
+            self._dict[attribute] = self._dict.get(attribute, default_value)
 
     def __bool__(self):
         return self._dict != {}

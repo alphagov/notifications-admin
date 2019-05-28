@@ -3,6 +3,7 @@ from flask_login import AnonymousUserMixin, UserMixin, login_user
 from notifications_python_client.errors import HTTPError
 from werkzeug.utils import cached_property
 
+from app.models import JSONModel
 from app.models.organisation import Organisation
 from app.models.roles_and_permissions import (
     all_permissions,
@@ -24,23 +25,36 @@ def _get_org_id_from_view_args():
     return str(request.view_args.get('org_id', '')) or None
 
 
-class User(UserMixin):
-    def __init__(self, fields):
-        self.id = fields.get('id')
-        self.name = fields.get('name')
-        self.email_address = fields.get('email_address')
-        self.mobile_number = fields.get('mobile_number')
-        self.password_changed_at = fields.get('password_changed_at')
-        self._set_permissions(fields.get('permissions', {}))
-        self.auth_type = fields.get('auth_type')
-        self.failed_login_count = fields.get('failed_login_count')
-        self.state = fields.get('state')
-        self.max_failed_login_count = current_app.config["MAX_FAILED_LOGIN_COUNT"]
-        self.logged_in_at = fields.get('logged_in_at')
-        self.platform_admin = fields.get('platform_admin')
-        self.current_session_id = fields.get('current_session_id')
-        self.services = fields.get('services', [])
-        self.organisations = fields.get('organisations', [])
+class User(JSONModel, UserMixin):
+
+    ALLOWED_PROPERTIES = {
+        'id',
+        'name',
+        'email_address',
+        'mobile_number',
+        'password_changed_at',
+        'auth_type',
+        'failed_login_count',
+        'state',
+        'logged_in_at',
+        'platform_admin',
+        'current_session_id',
+        'services',
+        'organisations',
+    }
+
+    DEFAULTS = {
+        'current_session_id': None,
+        'services': [],
+        'organisations': [],
+        'logged_in_at': None,
+        'platform_admin': False,
+    }
+
+    def __init__(self, _dict):
+        super().__init__(_dict)
+        self._set_permissions(_dict.get('permissions', {}))
+        self.max_failed_login_count = current_app.config['MAX_FAILED_LOGIN_COUNT']
 
     @classmethod
     def from_id(cls, user_id):
