@@ -11,7 +11,8 @@ def test_non_gov_user_cannot_see_add_service_button(
     mock_login,
     mock_get_non_govuser,
     api_nongov_user_active,
-    mock_get_organisations_and_services_for_user
+    mock_get_organisations,
+    mock_get_organisations_and_services_for_user,
 ):
     client.login(api_nongov_user_active)
     response = client.get(url_for('main.choose_account'))
@@ -270,8 +271,9 @@ def test_non_whitelist_user_cannot_access_create_service_page(
     client_request,
     mock_get_non_govuser,
     api_nongov_user_active,
+    mock_get_organisations,
 ):
-    assert not is_gov_user(api_nongov_user_active.email_address)
+    assert is_gov_user(api_nongov_user_active.email_address) is False
     client_request.get(
         'main.add_service',
         _expected_status=403,
@@ -282,8 +284,9 @@ def test_non_whitelist_user_cannot_create_service(
     client_request,
     mock_get_non_govuser,
     api_nongov_user_active,
+    mock_get_organisations,
 ):
-    assert not is_gov_user(api_nongov_user_active.email_address)
+    assert is_gov_user(api_nongov_user_active.email_address) is False
     client_request.post(
         'main.add_service',
         _data={'name': 'SERVICE TWO'},

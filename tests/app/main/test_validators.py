@@ -30,7 +30,8 @@ def test_should_raise_validation_error_for_password(
 
 
 def test_valid_email_not_in_valid_domains(
-    client
+    client,
+    mock_get_organisations,
 ):
     form = RegisterUserForm(email_address="test@test.com", mobile_number='441231231231')
     assert not form.validate()
@@ -50,7 +51,8 @@ def test_valid_email_in_valid_domains(
 
 
 def test_invalid_email_address_error_message(
-    client
+    client,
+    mock_get_organisations,
 ):
     form = RegisterUserForm(
         name="test",
@@ -149,6 +151,7 @@ def test_valid_list_of_white_list_email_domains(
 def test_invalid_list_of_white_list_email_domains(
     client,
     email,
+    mock_get_organisations,
 ):
     email_domain_validators = ValidGovEmail()
     with pytest.raises(ValidationError):

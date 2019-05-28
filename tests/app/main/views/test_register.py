@@ -97,6 +97,7 @@ def test_should_return_200_when_email_is_not_gov_uk(
     client,
     mock_send_verify_code,
     mock_get_user_by_email,
+    mock_get_organisations,
     mock_login,
 ):
     response = client.post(url_for('main.register'),
@@ -109,27 +110,33 @@ def test_should_return_200_when_email_is_not_gov_uk(
     assert 'Enter a government email address' in response.get_data(as_text=True)
 
 
+@pytest.mark.parametrize('email_address', (
+    'notfound@example.gov.uk',
+    'example@lsquo.net',
+    pytest.param('example@ellipsis.com', marks=pytest.mark.xfail(raises=AssertionError)),
+))
 def test_should_add_user_details_to_session(
     client,
     mock_send_verify_code,
     mock_register_user,
-    mock_get_user,
     mock_get_user_by_email_not_found,
+    mock_get_organisations_with_unusual_domains,
     mock_email_is_not_already_in_use,
     mock_send_verify_email,
     mock_login,
+    email_address,
 ):
-    user_data = {
-        'name': 'Test Codes',
-        'email_address': 'notfound@example.gov.uk',
-        'mobile_number': '+4407700900460',
-        'password': 'validPassword!'
-    }
-
-    response = client.post(url_for('main.register'), data=user_data)
-
+    response = client.post(
+        url_for('main.register'),
+        data={
+            'name': 'Test Codes',
+            'email_address': email_address,
+            'mobile_number': '+4407700900460',
+            'password': 'validPassword!'
+        },
+    )
     assert response.status_code == 302
-    assert session['user_details']['email'] == user_data['email_address']
+    assert session['user_details']['email'] == email_address
 
 
 def test_should_return_200_if_password_is_blacklisted(
@@ -139,7 +146,7 @@ def test_should_return_200_if_password_is_blacklisted(
 ):
     response = client.post(url_for('main.register'),
                            data={'name': 'Bad Mobile',
-                                 'email_address': 'bad_mobile@example.not.right',
+                                 'email_address': 'bad_mobile@example.gov.uk',
                                  'mobile_number': '+44123412345',
                                  'password': 'password'})
 

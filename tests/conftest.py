@@ -3130,6 +3130,21 @@ def mock_get_organisations(mocker):
 
 
 @pytest.fixture(scope='function')
+def mock_get_organisations_with_unusual_domains(mocker):
+    def _get_organisations():
+        return [
+            organisation_json('7aa5d4e9-4385-4488-a489-07812ba13383', 'Org 1', domains=[
+                'ldquo.net',
+                'rdquo.net',
+                'lsquo.net',
+                'rsquo.net',
+            ]),
+        ]
+
+    return mocker.patch('app.organisations_client.get_organisations', side_effect=_get_organisations)
+
+
+@pytest.fixture(scope='function')
 def mock_get_organisation(
     mocker,
     email_branding_id=None,

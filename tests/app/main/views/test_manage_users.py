@@ -683,6 +683,7 @@ def test_invite_user(
     email_address,
     gov_user,
     mock_get_template_folders,
+    mock_get_organisations,
 ):
     sample_invite['email_address'] = 'test@example.gov.uk'
 
@@ -735,13 +736,14 @@ def test_invite_user_with_email_auth_service(
     gov_user,
     mocker,
     auth_type,
+    mock_get_organisations,
     mock_get_template_folders,
 ):
     service_one['permissions'].append('email_auth')
     sample_invite['email_address'] = 'test@example.gov.uk'
 
     data = [InvitedUser(**sample_invite)]
-    assert is_gov_user(email_address) == gov_user
+    assert is_gov_user(email_address) is gov_user
     mocker.patch('app.invite_api_client.get_invites_for_service', return_value=data)
     mocker.patch('app.user_api_client.get_users_for_service', return_value=[active_user_with_permissions])
     mocker.patch('app.invite_api_client.create_invite', return_value=InvitedUser(**sample_invite))
@@ -1099,7 +1101,8 @@ def test_edit_user_email_can_change_any_email_address_to_a_gov_email_address(
     mock_get_user,
     mock_get_users_by_service,
     mock_update_user_attribute,
-    original_email_address
+    mock_get_organisations,
+    original_email_address,
 ):
     active_user_with_permissions.email_address = original_email_address
 
@@ -1126,6 +1129,7 @@ def test_edit_user_email_can_change_a_non_gov_email_address_to_another_non_gov_e
     mock_get_user,
     mock_get_users_by_service,
     mock_update_user_attribute,
+    mock_get_organisations,
 ):
     active_user_with_permissions.email_address = 'old@example.com'
 
@@ -1152,6 +1156,7 @@ def test_edit_user_email_cannot_change_a_gov_email_address_to_a_non_gov_email_ad
     mock_get_user,
     mock_get_users_by_service,
     mock_update_user_attribute,
+    mock_get_organisations,
 ):
     page = client_request.post(
         'main.edit_user_email',
