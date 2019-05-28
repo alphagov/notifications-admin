@@ -53,7 +53,7 @@ class User(JSONModel, UserMixin):
 
     def __init__(self, _dict):
         super().__init__(_dict)
-        self._set_permissions(_dict.get('permissions', {}))
+        self.permissions = _dict.get('permissions', {})
         self.max_failed_login_count = current_app.config['MAX_FAILED_LOGIN_COUNT']
 
     @classmethod
@@ -86,7 +86,12 @@ class User(JSONModel, UserMixin):
             return None
         return user
 
-    def _set_permissions(self, permissions_by_service):
+    @property
+    def permissions(self):
+        return self._permissions
+
+    @permissions.setter
+    def permissions(self, permissions_by_service):
         """
         Permissions is a dict {'service_id': ['permission a', 'permission b', 'permission c']}
 
@@ -173,14 +178,6 @@ class User(JSONModel, UserMixin):
             not self.logged_in_elsewhere() and
             super(User, self).is_authenticated
         )
-
-    @property
-    def permissions(self):
-        return self._permissions
-
-    @permissions.setter
-    def permissions(self, permissions):
-        raise AttributeError("Read only property")
 
     def has_permissions(self, *permissions, restrict_admin_usage=False):
         unknown_permissions = set(permissions) - all_permissions
