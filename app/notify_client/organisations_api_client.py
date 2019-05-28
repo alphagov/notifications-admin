@@ -10,8 +10,9 @@ class OrganisationsClient(NotifyAdminAPIClient):
     def get_organisations(self):
         return self.get(url='/organisations')
 
+    @cache.set('domains')
     def get_domains(self):
-        return set(chain.from_iterable(
+        return list(chain.from_iterable(
             organisation['domains']
             for organisation in self.get_organisations()
         ))
@@ -35,6 +36,7 @@ class OrganisationsClient(NotifyAdminAPIClient):
         }
         return self.post(url="/organisations", data=data)
 
+    @cache.delete('domains')
     def update_organisation(self, org_id, **kwargs):
         return self.post(url="/organisations/{}".format(org_id), data=kwargs)
 
