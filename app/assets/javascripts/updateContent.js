@@ -28,7 +28,12 @@
         'data': form ? $('#' + form).serialize() : {}
       }
     ).done(
-      response => flushQueue(queue, response)
+      response => {
+        flushQueue(queue, response);
+        if (response.stop === 1) {
+          poll = function(){};
+        }
+      }
     ).fail(
       () => poll = function(){}
     );

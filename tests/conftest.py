@@ -2748,7 +2748,7 @@ def mock_reset_failed_login_count(mocker):
 @pytest.fixture
 def mock_get_notification(
     mocker,
-    fake_uuid,
+    notification_id=fake_uuid,
     notification_status='delivered',
     redact_personalisation=False,
     template_type=None,
@@ -2880,10 +2880,11 @@ def client_request(
             _follow_redirects=False,
             _expected_redirect=None,
             _test_page_title=True,
+            _optional_args="",
             **endpoint_kwargs
         ):
             return ClientRequest.get_url(
-                url_for(endpoint, **(endpoint_kwargs or {})),
+                url_for(endpoint, **(endpoint_kwargs or {})) + _optional_args,
                 _expected_status=_expected_status,
                 _follow_redirects=_follow_redirects,
                 _expected_redirect=_expected_redirect,

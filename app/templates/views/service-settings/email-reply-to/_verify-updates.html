@@ -1,0 +1,64 @@
+{% from "components/banner.html" import banner, banner_wrapper %}
+{% from "components/textbox.html" import textbox %}
+{% from "components/checkbox.html" import checkbox %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+
+<div class="ajax-block-container">
+  {% if verification_status == "pending" %}
+    <p>
+      We’re checking that ‘{{ reply_to_email_address }}’ is a real email address.
+    </p>
+    <p>
+  <span class='loading-indicator'>This can take a minute</span>
+    </p>
+
+    <p class="js-hidden">
+      <a href="{{ url_for('main.service_verify_reply_to_address', service_id=service_id, notification_id=notification_id, is_default=is_default, replace=replace) }}">Refresh</a>
+    </p>
+  {% elif verification_status == "success" %}
+    {{ banner("‘{}’ is ready to use".format(reply_to_email_address), type='default', with_tick=True) }}
+    <div class="js-stick-at-bottom-when-scrolling">
+      <a href="{{ url_for('.service_email_reply_to', service_id=service_id) }}" class="button">Continue</a>
+    </div>
+  {% elif verification_status == "failure" %}
+    {% call banner_wrapper(type='dangerous') %}
+      <h2 class='banner-title' data-module="track-error" data-error-type="reply-to-email-not-working" data-error-label="{{ upload_id }}">
+        There’s a problem with your reply-to address
+      </h2>
+      <p>
+        We sent an email to ‘{{ reply_to_email_address }}’ but it wasn’t delivered.
+      </p>
+      <p>
+        You can try again, or use a different address.
+      </p>
+    {% endcall %}
+    <p>
+      Let recipients send replies to a shared inbox that’s managed by your team.
+    </p>
+    <p>
+      Do not use your own email address for replies.
+    </p>
+    {% if replace and replace != "False" %}
+      {% set form_url = url_for('.service_edit_email_reply_to', service_id=service_id, reply_to_email_id=replace) %}
+    {% else %}
+      {% set form_url = url_for('.service_add_email_reply_to', service_id=service_id) %}
+    {% endif %}
+    {% call form_wrapper(
+      action = form_url
+    ) %}
+      {{ textbox(
+        form.email_address,
+        width='2-3',
+        safe_error_message=True
+      ) }}
+      {% if not first_email_address %}
+        <div class="form-group">
+          {{ checkbox(form.is_default) }}
+        </div>
+      {% endif %}
+      {{ page_footer('Try again') }}
+    {% endcall %}
+  {% endif %}
+</div>

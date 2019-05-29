@@ -1,0 +1,29 @@
+{% extends "withnav_template.html" %}
+{% from "components/textbox.html" import textbox %}
+{% from "components/checkbox.html" import checkbox %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/ajax-block.html" import ajax_block %}
+
+{% block service_page_title %}
+  {{ verb }} email reply-to address
+{% endblock %}
+
+{% block maincolumn_content %}
+  {% if replace %}
+    {% set back_link_href = url_for('.service_edit_email_reply_to', service_id=service_id, reply_to_email_id=replace) %}
+  {% else %}
+    {% set back_link_href = url_for('.service_add_email_reply_to', service_id=service_id) %}
+  {% endif %}
+  {{ page_header(
+    '{} email reply-to address'.format(verb),
+    back_link=back_link_href
+  ) }}
+  {{ ajax_block(
+      partials,
+      url_for('main.service_verify_reply_to_address_updates', service_id=service_id, notification_id=notification_id, is_default=is_default, replace=replace),
+      'status',
+      finished=finished
+    ) }}
+{% endblock %}

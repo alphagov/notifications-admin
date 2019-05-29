@@ -20,6 +20,7 @@ from tests import (
 from tests.conftest import (
     ORGANISATION_ID,
     SERVICE_ONE_ID,
+    TEMPLATE_ONE_ID,
     active_user_no_api_key_permission,
     active_user_no_settings_permission,
     active_user_with_permissions,
@@ -2006,27 +2007,111 @@ def test_incorrect_sms_sender_input(
     (multiple_reply_to_email_addresses, {}, False),
     (multiple_reply_to_email_addresses, {"is_default": "y"}, True)
 ])
-def test_add_reply_to_email_address(
-    fixture,
-    data,
-    api_default_args,
-    mocker,
-    client_request,
-    mock_add_reply_to_email_address
+def test_add_reply_to_email_address_sends_test_notification(
+    mocker, client_request, fixture, data, api_default_args
 ):
     fixture(mocker)
     data['email_address'] = "test@example.com"
+    mock_verify = mocker.patch(
+        'app.service_api_client.verify_reply_to_email_address', return_value={"data": {"id": "123"}}
+    )
     client_request.post(
         'main.service_add_email_reply_to',
         service_id=SERVICE_ONE_ID,
-        _data=data
+        _data=data,
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.service_verify_reply_to_address',
+            service_id=SERVICE_ONE_ID,
+            notification_id="123",
+            _external=True,
+        ) + "?is_default={}".format(api_default_args)
     )
+    mock_verify.assert_called_once_with(SERVICE_ONE_ID, "test@example.com")
 
-    mock_add_reply_to_email_address.assert_called_once_with(
-        SERVICE_ONE_ID,
-        email_address="test@example.com",
-        is_default=api_default_args
+
+@pytest.mark.parametrize("is_default,replace,expected_header", [(True, "&replace=123", "Change"), (False, "", "Add")])
+@pytest.mark.parametrize("status,expected_failure,expected_success", [
+    ("delivered", 0, 1),
+    ("sending", 0, 0),
+    ("permanent-failure", 1, 0),
+])
+@freeze_time("2018-06-01 11:11:00.061258")
+def test_service_verify_reply_to_address(
+    mocker, client_request, fake_uuid, status, expected_failure, expected_success, is_default, replace, expected_header
+):
+    notification = {
+        "id": fake_uuid,
+        "status": status,
+        "to": "email@example.gov.uk",
+        "service_id": SERVICE_ONE_ID,
+        "template_id": TEMPLATE_ONE_ID,
+        "notification_type": "email",
+        "created_at": '2018-06-01T11:10:52.499230+00:00'
+    }
+    mocker.patch('app.notification_api_client.get_notification', return_value=notification)
+    mock_add_reply_to_email_address = mocker.patch('app.service_api_client.add_reply_to_email_address')
+    mock_update_reply_to_email_address = mocker.patch('app.service_api_client.update_reply_to_email_address')
+    mocker.patch(
+        'app.service_api_client.get_reply_to_email_addresses', return_value=[]
     )
+    page = client_request.get(
+        'main.service_verify_reply_to_address',
+        service_id=SERVICE_ONE_ID,
+        notification_id=notification["id"],
+        _optional_args="?is_default={}{}".format(is_default, replace)
+    )
+    assert page.find('h1').text == '{} email reply-to address'.format(expected_header)
+    if replace:
+        assert "/email-reply-to/123/edit" in page.find('a', text="Back").attrs["href"]
+    else:
+        assert "/email-reply-to/add" in page.find('a', text="Back").attrs["href"]
+
+    assert len(page.find_all('div', class_='banner-dangerous')) == expected_failure
+    assert len(page.find_all('div', class_='banner-default-with-tick')) == expected_success
+
+    if status == "delivered":
+        if replace:
+            mock_update_reply_to_email_address.assert_called_once_with(
+                SERVICE_ONE_ID, "123", email_address=notification["to"], is_default=is_default
+            )
+            mock_add_reply_to_email_address.assert_not_called()
+        else:
+            mock_add_reply_to_email_address.assert_called_once_with(
+                SERVICE_ONE_ID, email_address=notification["to"], is_default=is_default
+            )
+            mock_update_reply_to_email_address.assert_not_called()
+    else:
+        mock_add_reply_to_email_address.assert_not_called()
+    if status == "permanent-failure":
+        assert page.find('input', type='email').attrs["value"] == notification["to"]
+
+
+@freeze_time("2018-06-01 11:11:00.061258")
+def test_add_reply_to_email_address_fails_if_notification_not_delivered_in_45_sec(mocker, client_request, fake_uuid):
+    notification = {
+        "id": fake_uuid,
+        "status": "sending",
+        "to": "email@example.gov.uk",
+        "service_id": SERVICE_ONE_ID,
+        "template_id": TEMPLATE_ONE_ID,
+        "notification_type": "email",
+        "created_at": '2018-06-01T11:10:12.499230+00:00'
+    }
+    mocker.patch(
+        'app.service_api_client.get_reply_to_email_addresses', return_value=[]
+    )
+    mocker.patch('app.notification_api_client.get_notification', return_value=notification)
+    mock_add_reply_to_email_address = mocker.patch('app.service_api_client.add_reply_to_email_address')
+    page = client_request.get(
+        'main.service_verify_reply_to_address',
+        service_id=SERVICE_ONE_ID,
+        notification_id=notification["id"],
+        _optional_args="?is_default={}".format(False)
+    )
+    expected_banner = page.find_all('div', class_='banner-dangerous')[0]
+    assert 'There’s a problem with your reply-to address' in expected_banner.text.strip()
+    mock_add_reply_to_email_address.assert_not_called()
 
 
 @pytest.mark.parametrize('fixture, data, api_default_args', [
@@ -2141,7 +2226,35 @@ def test_default_box_doesnt_show_on_first_sender(
     (get_non_default_reply_to_email_address, {}, False),
     (get_non_default_reply_to_email_address, {"is_default": "y"}, True)
 ])
-def test_edit_reply_to_email_address(
+def test_edit_reply_to_email_address_sends_verification_notification_if_address_is_changed(
+    fixture,
+    data,
+    api_default_args,
+    mocker,
+    fake_uuid,
+    client_request,
+):
+    mock_verify = mocker.patch(
+        'app.service_api_client.verify_reply_to_email_address', return_value={"data": {"id": "123"}}
+    )
+    fixture(mocker)
+    data['email_address'] = "test@example.gov.uk"
+    client_request.post(
+        'main.service_edit_email_reply_to',
+        service_id=SERVICE_ONE_ID,
+        reply_to_email_id=fake_uuid,
+        _data=data
+    )
+    mock_verify.assert_called_once_with(SERVICE_ONE_ID, "test@example.gov.uk")
+
+
+@pytest.mark.parametrize('fixture, data, api_default_args', [
+    (get_default_reply_to_email_address, {"is_default": "y"}, True),
+    (get_default_reply_to_email_address, {}, True),
+    (get_non_default_reply_to_email_address, {}, False),
+    (get_non_default_reply_to_email_address, {"is_default": "y"}, True)
+])
+def test_edit_reply_to_email_address_goes_straight_to_update_if_address_not_changed(
     fixture,
     data,
     api_default_args,
@@ -2151,7 +2264,8 @@ def test_edit_reply_to_email_address(
     mock_update_reply_to_email_address
 ):
     fixture(mocker)
-    data['email_address'] = "test@example.gov.uk"
+    mock_verify = mocker.patch('app.service_api_client.verify_reply_to_email_address')
+    data['email_address'] = "test@example.com"
     client_request.post(
         'main.service_edit_email_reply_to',
         service_id=SERVICE_ONE_ID,
@@ -2162,9 +2276,10 @@ def test_edit_reply_to_email_address(
     mock_update_reply_to_email_address.assert_called_once_with(
         SERVICE_ONE_ID,
         reply_to_email_id=fake_uuid,
-        email_address="test@example.gov.uk",
+        email_address="test@example.com",
         is_default=api_default_args
     )
+    mock_verify.assert_not_called()
 
 
 @pytest.mark.parametrize('fixture, expected_link_text, partial_href', [

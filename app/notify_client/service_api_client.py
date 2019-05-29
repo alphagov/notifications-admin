@@ -386,6 +386,12 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             )
         )
 
+    def verify_reply_to_email_address(self, service_id, email_address):
+        return self.post(
+            "/service/{}/email-reply-to/verify".format(service_id),
+            data={"email": email_address}
+        )
+
     @cache.delete('service-{service_id}')
     def add_reply_to_email_address(self, service_id, email_address, is_default=False):
         return self.post(
