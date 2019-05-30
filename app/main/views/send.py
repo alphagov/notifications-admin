@@ -386,7 +386,7 @@ def send_test_step(service_id, template_id, step_index):
     )
 
     try:
-        if "test" in request.endpoint:
+        if request.endpoint == 'main.send_test_step':
             current_placeholder = placeholders[step_index - 1]
         else:
             current_placeholder = placeholders[step_index]
