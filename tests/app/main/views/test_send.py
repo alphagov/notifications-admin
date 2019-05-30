@@ -380,7 +380,7 @@ def test_shows_error_if_parsing_exception(
     )
 
 
-def test_upload_csvfile_with_errors_shows_check_page_with_errors(
+def test_upload_csv_file_with_errors_shows_check_page_with_errors(
     logged_in_client,
     service_one,
     mocker,
@@ -507,7 +507,7 @@ def test_upload_csvfile_with_errors_shows_check_page_with_errors(
         )
     ),
 ])
-def test_upload_csvfile_with_missing_columns_shows_error(
+def test_upload_csv_file_with_missing_columns_shows_error(
     client_request,
     mocker,
     mock_get_service_template_with_placeholders,
@@ -1126,7 +1126,7 @@ def test_send_one_off_or_test_has_correct_page_titles(
 @pytest.mark.parametrize('endpoint, step_index, prefilled, expected_field_label', [
     (
         'main.send_test_step',
-        0,
+        1,
         {'phone number': '07900900123'},
         'one',
     ),
@@ -1138,7 +1138,7 @@ def test_send_one_off_or_test_has_correct_page_titles(
     ),
     (
         'main.send_test_step',
-        1,
+        2,
         {'phone number': '07900900123', 'one': 'foo'},
         'two',
     ),
@@ -1150,7 +1150,7 @@ def test_send_one_off_or_test_has_correct_page_titles(
     ),
     (
         'main.send_test_step',
-        2,
+        3,
         {'phone number': '07900900123', 'one': 'foo', 'two': 'foo'},
         'three',
     ),
@@ -1809,7 +1809,7 @@ def test_send_test_indicates_optional_address_columns(
     )
 
     assert normalize_spaces(page.select('label')[0].text) == (
-        'address line 4 '  # step_index is 0-indexed so step 3 is address line 4
+        'address line 3 '
         'Optional'
     )
     assert page.select('.govuk-back-link')[0]['href'] == url_for(

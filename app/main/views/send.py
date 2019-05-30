@@ -386,7 +386,10 @@ def send_test_step(service_id, template_id, step_index):
     )
 
     try:
-        current_placeholder = placeholders[step_index]
+        if request.endpoint == 'main.send_test_step':
+            current_placeholder = placeholders[step_index - 1]
+        else:
+            current_placeholder = placeholders[step_index]
     except IndexError:
         if all_placeholders_in_session(placeholders):
             return get_notification_check_endpoint(service_id, template)
@@ -413,9 +416,9 @@ def send_test_step(service_id, template_id, step_index):
         # Only if it's not a letter.
         # And only if we're not on the test route, since that will already have the user's own number set
         if (
-            step_index == 0 and
-            template.template_type != 'letter' and
-            request.endpoint != 'main.send_test_step'
+            step_index == 0
+            and template.template_type != 'letter'
+            and request.endpoint != 'main.send_test_step'
         ):
             session['recipient'] = form.placeholder_value.data
 
@@ -438,11 +441,11 @@ def send_test_step(service_id, template_id, step_index):
     template.values[current_placeholder] = None
 
     if (
-        request.endpoint == 'main.send_one_off_step' and
-        step_index == 0 and
-        template.template_type != 'letter' and
-        not (template.template_type == 'sms' and current_user.mobile_number is None) and
-        current_user.has_permissions('manage_templates', 'manage_service')
+        request.endpoint == 'main.send_one_off_step'
+        and step_index == 0
+        and template.template_type != 'letter'
+        and not (template.template_type == 'sms' and current_user.mobile_number is None)
+        and current_user.has_permissions('manage_templates', 'manage_service')
     ):
         skip_link = (
             'Use my {}'.format(first_column_headings[template.template_type][0]),
@@ -465,8 +468,8 @@ def send_test_step(service_id, template_id, step_index):
         back_link=back_link,
         help=get_help_argument(),
         link_to_upload=(
-            request.endpoint == 'main.send_one_off_step' and
-            step_index == 0
+            request.endpoint == 'main.send_one_off_step'
+            and step_index == 0
         ),
     )
 
@@ -808,12 +811,19 @@ def get_back_link(service_id, template, step_index):
                 service_id=service_id,
                 template_id=template.id,
             )
-    elif is_current_user_the_recipient() and step_index >= 1:
+    elif is_current_user_the_recipient() and step_index > 1:
         return url_for(
             'main.send_test_step',
             service_id=service_id,
             template_id=template.id,
             step_index=step_index - 1,
+        )
+    elif is_current_user_the_recipient() and step_index == 1:
+        return url_for(
+            'main.send_one_off_step',
+            service_id=service_id,
+            template_id=template.id,
+            step_index=0,
         )
 
     else:
