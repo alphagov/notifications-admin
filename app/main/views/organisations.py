@@ -70,14 +70,24 @@ def add_organisation():
 @login_required
 @user_has_permissions()
 def organisation_dashboard(org_id):
-    organisation_services = organisations_client.get_organisation_services(org_id)
-    for service in organisation_services:
+    for service in current_organisation.live_services:
         has_permission = current_user.has_permission_for_service(service['id'], 'view_activity')
         service.update({'has_permission_to_view': has_permission})
 
     return render_template(
         'views/organisations/organisation/index.html',
-        organisation_services=organisation_services
+        organisation_services=current_organisation.live_services
+    )
+
+
+@main.route("/organisations/<org_id>/trial-services", methods=['GET'])
+@login_required
+@user_is_platform_admin
+def organisation_trial_mode_services(org_id):
+    return render_template(
+        'views/organisations/organisation/trial-mode-services.html',
+        search_form=SearchByNameForm(),
+        services=current_organisation.trial_services
     )
 
 
@@ -85,18 +95,10 @@ def organisation_dashboard(org_id):
 @login_required
 @user_has_permissions()
 def manage_org_users(org_id):
-    users = sorted(
-        user_api_client.get_users_for_organisation(org_id=org_id) + [
-            invite for invite in org_invite_api_client.get_invites_for_organisation(org_id=org_id)
-            if invite.status != 'accepted'
-        ],
-        key=lambda user: user.email_address,
-    )
-
     return render_template(
         'views/organisations/organisation/users/index.html',
-        users=users,
-        show_search_box=(len(users) > 7),
+        users=current_organisation.team_members,
+        show_search_box=(len(current_organisation.team_members) > 7),
         form=SearchUsersForm(),
     )
 
@@ -183,16 +185,16 @@ def organisation_settings(org_id):
 
     email_branding = 'GOV.UK'
 
-    if current_organisation['email_branding_id']:
+    if current_organisation.email_branding_id:
         email_branding = email_branding_client.get_email_branding(
-            current_organisation['email_branding_id']
+            current_organisation.email_branding_id
         )['email_branding']['name']
 
     letter_branding = None
 
-    if current_organisation['letter_branding_id']:
+    if current_organisation.letter_branding_id:
         letter_branding = letter_branding_client.get_letter_branding(
-            current_organisation['letter_branding_id']
+            current_organisation.letter_branding_id
         )['name']
 
     return render_template(
@@ -209,7 +211,7 @@ def edit_organisation_name(org_id):
     form = RenameOrganisationForm()
 
     if request.method == 'GET':
-        form.name.data = current_organisation.get('name')
+        form.name.data = current_organisation.name
 
     if form.validate_on_submit():
         unique_name = organisations_client.is_organisation_name_unique(org_id, form.name.data)
@@ -232,12 +234,12 @@ def edit_organisation_name(org_id):
 def edit_organisation_type(org_id):
 
     form = OrganisationOrganisationTypeForm(
-        organisation_type=current_organisation['organisation_type']
+        organisation_type=current_organisation.organisation_type
     )
 
     if form.validate_on_submit():
         organisations_client.update_organisation(
-            current_organisation['id'],
+            current_organisation.id,
             organisation_type=form.organisation_type.data,
         )
         return redirect(url_for('.organisation_settings', org_id=org_id))
@@ -259,12 +261,12 @@ def edit_organisation_crown_status(org_id):
             True: 'crown',
             False: 'non-crown',
             None: 'unknown',
-        }.get(current_organisation['crown'])
+        }.get(current_organisation.crown)
     )
 
     if form.validate_on_submit():
         organisations_client.update_organisation(
-            current_organisation['id'],
+            current_organisation.id,
             crown={
                 'crown': True,
                 'non-crown': False,
@@ -290,12 +292,12 @@ def edit_organisation_agreement(org_id):
             True: 'yes',
             False: 'no',
             None: 'unknown',
-        }.get(current_organisation['agreement_signed'])
+        }.get(current_organisation.agreement_signed)
     )
 
     if form.validate_on_submit():
         organisations_client.update_organisation(
-            current_organisation['id'],
+            current_organisation.id,
             agreement_signed={
                 'yes': True,
                 'no': False,
@@ -320,7 +322,7 @@ def edit_organisation_email_branding(org_id):
 
     form = SetEmailBranding(
         all_branding_options=get_branding_as_value_and_label(email_branding),
-        current_branding=current_organisation['email_branding_id'],
+        current_branding=current_organisation.email_branding_id,
     )
 
     if form.validate_on_submit():
@@ -369,7 +371,7 @@ def edit_organisation_letter_branding(org_id):
 
     form = SetLetterBranding(
         all_branding_options=get_branding_as_value_and_label(letter_branding),
-        current_branding=current_organisation['letter_branding_id'],
+        current_branding=current_organisation.letter_branding_id,
     )
 
     if form.validate_on_submit():
@@ -426,7 +428,7 @@ def edit_organisation_domains(org_id):
         )
         return redirect(url_for('.organisation_settings', org_id=org_id))
 
-    form.populate(current_organisation.get('domains', []))
+    form.populate(current_organisation.domains)
 
     return render_template(
         'views/organisations/organisation/settings/edit-domains.html',
@@ -447,7 +449,7 @@ def confirm_edit_organisation_name(org_id):
     if form.validate_on_submit():
         try:
             organisations_client.update_organisation_name(
-                current_organisation['id'],
+                current_organisation.id,
                 name=session['organisation_name_change'],
             )
         except HTTPError as e:

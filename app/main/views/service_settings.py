@@ -1018,16 +1018,16 @@ def request_letter_branding(service_id):
 @user_is_platform_admin
 def link_service_to_organisation(service_id):
 
-    organisations = organisations_client.get_organisations()
-    current_organisation = organisations_client.get_service_organisation(service_id).get('id', None)
+    all_organisations = organisations_client.get_organisations()
+    current_linked_organisation = organisations_client.get_service_organisation(service_id).get('id', None)
 
     form = LinkOrganisationsForm(
-        choices=convert_dictionary_to_wtforms_choices_format(organisations, 'id', 'name'),
-        organisations=current_organisation
+        choices=convert_dictionary_to_wtforms_choices_format(all_organisations, 'id', 'name'),
+        organisations=current_linked_organisation
     )
 
     if form.validate_on_submit():
-        if form.organisations.data != current_organisation:
+        if form.organisations.data != current_linked_organisation:
             organisations_client.update_service_organisation(
                 service_id,
                 form.organisations.data
@@ -1036,7 +1036,7 @@ def link_service_to_organisation(service_id):
 
     return render_template(
         'views/service-settings/link-service-to-organisation.html',
-        has_organisations=organisations,
+        has_organisations=all_organisations,
         form=form,
     )
 
