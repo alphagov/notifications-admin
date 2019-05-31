@@ -220,6 +220,7 @@ def live_services_csv():
         ('sms_totals', 'SMS sent this year'),
         ('email_totals', 'Emails sent this year'),
         ('letter_totals', 'Letters sent this year'),
+        ('free_sms_fragment_limit', 'Free sms allowance'),
     ])
 
     # initialise with header row
