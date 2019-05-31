@@ -976,9 +976,12 @@ def test_get_live_services_report(client, platform_admin_user, mocker):
     assert report.strip() == (
         'Service ID,Organisation,Organisation type,Service name,Consent to research,Main contact,Contact email,'
         + 'Contact mobile,Live date,SMS volume intent,Email volume intent,Letter volume intent,SMS sent this year,'
-        + 'Emails sent this year,Letters sent this year\r\n1,Forest,Ecosystem,jessie the oak tree,True,Forest fairy,'
-        + 'forest.fairy@digital.cabinet-office.gov.uk,+447700900986,29-03-2014,100,50,20,300,1200,0\r\n2,Forest,'
-        + 'Ecosystem,james the pine tree,,,,,,,60,0,0,0,0'
+        + 'Emails sent this year,Letters sent this year\r\n'
+
+        + '1,Forest,Ecosystem,jessie the oak tree,True,Forest fairy,forest.fairy@digital.cabinet-office.gov.uk,'
+        + '+447700900986,29-03-2014,100,50,20,300,1200,0\r\n'
+
+        + '2,Forest,Ecosystem,james the pine tree,,,,,,,60,0,0,0,0'
     )
 
 
