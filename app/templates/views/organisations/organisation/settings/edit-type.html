@@ -10,7 +10,10 @@
 {% endblock %}
 
 {% block maincolumn_content %}
-  {{ page_header("Organisation sector") }}
+  {{ page_header(
+    "Organisation sector",
+    back_link=url_for('.organisation_settings', org_id=current_org.id)
+  ) }}
   {% call form_wrapper() %}
     {{ radios(form.organisation_type) }}
     {{ page_footer('Save') }}
