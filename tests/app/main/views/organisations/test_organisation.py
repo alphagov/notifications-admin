@@ -181,8 +181,8 @@ def test_organisation_settings_for_platform_admin(
 ):
     expected_rows = [
         'Label Value Action',
-        'Organisation name Org 1 Change',
-        'Organisation type Not set Change',
+        'Name Org 1 Change',
+        'Sector Not set Change',
         'Crown organisation Yes Change',
         'Data sharing and financial agreement Not signed Change',
         'Request to go live notes None Change',

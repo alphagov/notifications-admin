@@ -15,7 +15,7 @@
       caption_visible=False
     ) %}
       {% call row() %}
-        {{ text_field('Organisation name') }}
+        {{ text_field('Name') }}
         {{ text_field(current_org.name) }}
         {{ edit_field(
             'Change',
@@ -24,7 +24,7 @@
         }}
       {% endcall %}
       {% call row() %}
-        {{ text_field('Organisation type') }}
+        {{ text_field('Sector') }}
         {{ optional_text_field({
           'central': 'Central government',
           'local': 'Local government',
