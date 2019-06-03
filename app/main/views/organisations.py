@@ -229,7 +229,6 @@ def edit_organisation_name(org_id):
 
 @main.route("/organisations/<org_id>/settings/edit-type", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions()
 @user_is_platform_admin
 def edit_organisation_type(org_id):
 
@@ -252,7 +251,6 @@ def edit_organisation_type(org_id):
 
 @main.route("/organisations/<org_id>/settings/edit-crown-status", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions()
 @user_is_platform_admin
 def edit_organisation_crown_status(org_id):
 
@@ -283,7 +281,6 @@ def edit_organisation_crown_status(org_id):
 
 @main.route("/organisations/<org_id>/settings/edit-agreement", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions()
 @user_is_platform_admin
 def edit_organisation_agreement(org_id):
 
@@ -314,7 +311,6 @@ def edit_organisation_agreement(org_id):
 
 @main.route("/organisations/<org_id>/settings/set-email-branding", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions()
 @user_is_platform_admin
 def edit_organisation_email_branding(org_id):
 
@@ -341,7 +337,6 @@ def edit_organisation_email_branding(org_id):
 
 @main.route("/organisations/<org_id>/settings/preview-email-branding", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions()
 @user_is_platform_admin
 def organisation_preview_email_branding(org_id):
 
@@ -412,7 +407,6 @@ def organisation_preview_letter_branding(org_id):
 
 @main.route("/organisations/<org_id>/settings/edit-organisation-domains", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions()
 @user_is_platform_admin
 def edit_organisation_domains(org_id):
 
@@ -471,7 +465,6 @@ def confirm_edit_organisation_name(org_id):
 
 @main.route("/organisations/<org_id>/settings/edit-go-live-notes", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions()
 @user_is_platform_admin
 def edit_organisation_go_live_notes(org_id):
 
