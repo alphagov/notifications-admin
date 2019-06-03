@@ -1057,6 +1057,7 @@ def test_non_gov_user_is_told_they_cant_go_live(
     api_nongov_user_active,
     mock_get_invites_for_service,
     mocker,
+    mock_get_organisations,
     mock_get_service_organisation,
 ):
     mocker.patch(
@@ -1290,6 +1291,7 @@ def test_should_not_default_to_zero_if_some_fields_dont_validate(
 def test_non_gov_users_cant_request_to_go_live(
     client_request,
     api_nongov_user_active,
+    mock_get_organisations,
 ):
     client_request.login(api_nongov_user_active)
     client_request.post(

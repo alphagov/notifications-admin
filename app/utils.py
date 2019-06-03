@@ -13,7 +13,6 @@ import ago
 import dateutil
 import pyexcel
 import pyexcel_xlsx
-import yaml
 from flask import abort, current_app, redirect, request, session, url_for
 from flask_login import current_user
 from notifications_utils.field import Field
@@ -31,16 +30,18 @@ from orderedset._orderedset import OrderedSet
 from werkzeug.datastructures import MultiDict
 from werkzeug.routing import RequestRedirect
 
+from app.notify_client.organisations_api_client import organisations_client
+
 SENDING_STATUSES = ['created', 'pending', 'sending', 'pending-virus-check']
 DELIVERED_STATUSES = ['delivered', 'sent', 'returned-letter']
 FAILURE_STATUSES = ['failed', 'temporary-failure', 'permanent-failure',
                     'technical-failure', 'virus-scan-failed', 'validation-failed']
 REQUESTED_STATUSES = SENDING_STATUSES + DELIVERED_STATUSES + FAILURE_STATUSES
 
-with open('{}/email_domains.yml'.format(
+with open('{}/email_domains.txt'.format(
     os.path.dirname(os.path.realpath(__file__))
 )) as email_domains:
-    GOVERNMENT_EMAIL_DOMAIN_NAMES = yaml.safe_load(email_domains)
+    GOVERNMENT_EMAIL_DOMAIN_NAMES = [line.strip() for line in email_domains]
 
 
 def user_has_permissions(*permissions, **permission_kwargs):
@@ -315,13 +316,21 @@ def get_help_argument():
     return request.args.get('help') if request.args.get('help') in ('1', '2', '3') else None
 
 
-def is_gov_user(email_address):
+def email_address_ends_with(email_address, known_domains):
     return any(
         email_address.lower().endswith((
             "@{}".format(known),
             ".{}".format(known),
         ))
-        for known in GOVERNMENT_EMAIL_DOMAIN_NAMES
+        for known in known_domains
+    )
+
+
+def is_gov_user(email_address):
+    return email_address_ends_with(
+        email_address, GOVERNMENT_EMAIL_DOMAIN_NAMES
+    ) or email_address_ends_with(
+        email_address, organisations_client.get_domains()
     )
 
 

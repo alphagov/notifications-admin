@@ -30,7 +30,8 @@ def test_should_raise_validation_error_for_password(
 
 
 def test_valid_email_not_in_valid_domains(
-    client
+    client,
+    mock_get_organisations,
 ):
     form = RegisterUserForm(email_address="test@test.com", mobile_number='441231231231')
     assert not form.validate()
@@ -50,7 +51,8 @@ def test_valid_email_in_valid_domains(
 
 
 def test_invalid_email_address_error_message(
-    client
+    client,
+    mock_get_organisations,
 ):
     form = RegisterUserForm(
         name="test",
@@ -91,25 +93,9 @@ def _gen_mock_field(x):
     'test@police.uk',
     'test@gov.police.uk',
     'test@GOV.PoliCe.uk',
-    'test@ucds.email',
-    'test@naturalengland.org.uk',
-    'test@hmcts.net',
     'test@scotent.co.uk',
     'test@assembly.wales',
     'test@cjsm.net',
-    'test@cqc.org.uk',
-    'test@digital.cqc.org.uk',
-    'test@bl.uk',
-    'test@stfc.ac.uk',
-    'test@wmfs.net',
-    'test@bbsrc.ac.uk',
-    'test@acas.org.uk',
-    'test@biglotteryfund.org.uk',
-    'test@marinemanagement.org.uk',
-    'test@britishmuseum.org',
-    'test@derrystrabane.com',
-    'test@highwaysengland.co.uk',
-    'test@mansheadschool.co.uk',
 ])
 def test_valid_list_of_white_list_email_domains(
     client,
@@ -149,6 +135,7 @@ def test_valid_list_of_white_list_email_domains(
 def test_invalid_list_of_white_list_email_domains(
     client,
     email,
+    mock_get_organisations,
 ):
     email_domain_validators = ValidGovEmail()
     with pytest.raises(ValidationError):

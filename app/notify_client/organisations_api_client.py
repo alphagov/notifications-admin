@@ -1,3 +1,5 @@
+from itertools import chain
+
 from notifications_python_client.errors import HTTPError
 
 from app.notify_client import NotifyAdminAPIClient, _attach_current_user, cache
@@ -7,6 +9,13 @@ class OrganisationsClient(NotifyAdminAPIClient):
 
     def get_organisations(self):
         return self.get(url='/organisations')
+
+    @cache.set('domains')
+    def get_domains(self):
+        return list(chain.from_iterable(
+            organisation['domains']
+            for organisation in self.get_organisations()
+        ))
 
     def get_organisation(self, org_id):
         return self.get(url='/organisations/{}'.format(org_id))
@@ -27,6 +36,7 @@ class OrganisationsClient(NotifyAdminAPIClient):
         }
         return self.post(url="/organisations", data=data)
 
+    @cache.delete('domains')
     def update_organisation(self, org_id, **kwargs):
         return self.post(url="/organisations/{}".format(org_id), data=kwargs)
 
