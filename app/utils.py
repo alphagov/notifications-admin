@@ -13,7 +13,6 @@ import ago
 import dateutil
 import pyexcel
 import pyexcel_xlsx
-import yaml
 from flask import abort, current_app, redirect, request, session, url_for
 from flask_login import current_user
 from notifications_utils.field import Field
@@ -39,10 +38,10 @@ FAILURE_STATUSES = ['failed', 'temporary-failure', 'permanent-failure',
                     'technical-failure', 'virus-scan-failed', 'validation-failed']
 REQUESTED_STATUSES = SENDING_STATUSES + DELIVERED_STATUSES + FAILURE_STATUSES
 
-with open('{}/email_domains.yml'.format(
+with open('{}/email_domains.txt'.format(
     os.path.dirname(os.path.realpath(__file__))
 )) as email_domains:
-    GOVERNMENT_EMAIL_DOMAIN_NAMES = yaml.safe_load(email_domains)
+    GOVERNMENT_EMAIL_DOMAIN_NAMES = [line.strip() for line in email_domains]
 
 
 def user_has_permissions(*permissions, **permission_kwargs):
