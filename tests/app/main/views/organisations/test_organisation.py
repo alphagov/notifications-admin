@@ -161,24 +161,16 @@ def test_organisation_trial_mode_services_doesnt_work_if_not_platform_admin(
     )
 
 
-def test_organisation_settings(
+def test_organisation_settings_platform_admin_only(
     client_request,
     mock_get_organisation,
     organisation_one
 ):
-    expected_rows = [
-        'Label Value Action',
-        'Organisation name Org 1 Change',
-    ]
-
-    page = client_request.get('.organisation_settings', org_id=organisation_one['id'])
-
-    assert page.find('h1').text == 'Settings'
-    rows = page.select('tr')
-    assert len(rows) == len(expected_rows)
-    for index, row in enumerate(expected_rows):
-        assert row == " ".join(rows[index].text.split())
-    mock_get_organisation.assert_called_with(organisation_one['id'])
+    client_request.get(
+        '.organisation_settings',
+        org_id=organisation_one['id'],
+        _expected_status=403,
+    )
 
 
 def test_organisation_settings_for_platform_admin(

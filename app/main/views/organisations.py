@@ -180,7 +180,7 @@ def cancel_invited_org_user(org_id, invited_user_id):
 
 @main.route("/organisations/<org_id>/settings/", methods=['GET'])
 @login_required
-@user_has_permissions()
+@user_is_platform_admin
 def organisation_settings(org_id):
 
     email_branding = 'GOV.UK'
@@ -206,7 +206,7 @@ def organisation_settings(org_id):
 
 @main.route("/organisations/<org_id>/settings/edit-name", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions()
+@user_is_platform_admin
 def edit_organisation_name(org_id):
     form = RenameOrganisationForm()
 
