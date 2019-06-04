@@ -7,15 +7,22 @@
 {% endblock %}
 
 {% block maincolumn_content %}
+
   <div class="grid-row">
+
     {% if navigation_links %}
-      <div class="column-one-third">
+      <div class="column-one-quarter">
         {{ sub_navigation(navigation_links) }}
       </div>
+      <div class="column-five-eighths">
+    {% else %}
+      <div class="column-two-thirds">
     {% endif %}
-    <div class="column-two-thirds">
-      {% block content_column_content %}
-      {% endblock %}
+
+    {% block content_column_content %}
+    {% endblock %}
+
     </div>
   </div>
+
 {% endblock %}
