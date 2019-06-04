@@ -2,7 +2,7 @@
 
 {% block fullwidth_content %}
   <div id="content">
-    {% if current_service and current_user.is_authenticated and current_user.belongs_to_service(current_service.id) %}
+    {% if current_service and current_service.active and current_user.is_authenticated and current_user.belongs_to_service(current_service.id) %}
     <div class="navigation-service">
       <a href="{{ url_for('main.show_accounts_or_dashboard') }}">Back to {{ current_service.name }}</a>
     </div>

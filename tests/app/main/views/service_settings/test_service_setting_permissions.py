@@ -83,7 +83,7 @@ def test_service_setting_toggles_show(get_service_settings_page, service_one, se
 
 
 @pytest.mark.parametrize('service_fields, endpoint, index, text', [
-    ({'active': True}, '.archive_service', 0, 'Archive service'),
+    ({'active': True}, '.archive_service', 0, 'Delete this service'),
     ({'active': True}, '.suspend_service', 1, 'Suspend service'),
     ({'active': False}, '.resume_service', 0, 'Resume service'),
     pytest.param(

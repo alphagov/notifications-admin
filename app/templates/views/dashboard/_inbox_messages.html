@@ -4,7 +4,7 @@
 
 <div class="ajax-block-container">
   {% if messages %}
-    <p class="bottom-gutter-2-3 top-gutter-2-3">
+    <p class="bottom-gutter-2-3 top-gutter-1-2">
       <a href="{{ url_for('.inbox_download', service_id=current_service.id) }}" download class="heading-small">Download these messages</a>
     </p>
   {% endif %}
@@ -37,4 +37,3 @@
 
   {{ previous_next_navigation(prev_page, next_page) }}
 </div>
-

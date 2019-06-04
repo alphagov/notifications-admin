@@ -330,11 +330,22 @@ def service_switch_can_upload_document(service_id):
 @login_required
 @user_has_permissions('manage_service')
 def archive_service(service_id):
+    if not current_service.active and (
+        current_service.trial_mode or current_user.platform_admin
+    ):
+        abort(403)
     if request.method == 'POST':
         service_api_client.archive_service(service_id)
-        return redirect(url_for('.service_settings', service_id=service_id))
+        flash(
+            '‘{}’ was deleted'.format(current_service.name),
+            'default_with_tick',
+        )
+        return redirect(url_for('.choose_account'))
     else:
-        flash('There\'s no way to reverse this! Are you sure you want to archive this service?', 'delete')
+        flash(
+            'Are you sure you want to delete ‘{}’? There’s no way to undo this.'.format(current_service.name),
+            'delete',
+        )
         return service_settings(service_id)
 
 

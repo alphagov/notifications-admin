@@ -144,6 +144,25 @@ def test_choose_account_should_not_show_back_to_service_link_if_not_signed_in(
     assert page.select_one('.navigation-service a') is None
 
 
+@pytest.mark.parametrize('active', (
+    False,
+    pytest.param(True, marks=pytest.mark.xfail(raises=AssertionError)),
+))
+def test_choose_account_should_not_show_back_to_service_link_if_service_archived(
+    client_request,
+    service_one,
+    mock_get_orgs_and_services,
+    active,
+):
+    service_one['active'] = active
+    with client_request.session_transaction() as session:
+        session['service_id'] = service_one['id']
+    page = client_request.get('main.choose_account')
+
+    assert normalize_spaces(page.select_one('h1').text) == 'Choose service'
+    assert page.select_one('.navigation-service a') is None
+
+
 @pytest.mark.parametrize('service, expected_status, page_text', (
     (service_one, 200, (
         'Test Service   Switch service '
