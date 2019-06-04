@@ -1,6 +1,7 @@
 {% from "components/table.html" import mapping_table, row, text_field, field, row_heading %}
 {% from "components/textbox.html" import textbox %}
 {% from "components/live-search.html" import live_search %}
+{% from "components/sub-navigation.html" import sub_navigation %}
 
 {% extends "withoutnav_template.html" %}
 
@@ -11,6 +12,9 @@
 {% block maincolumn_content %}
 
 <div class="grid-row">
+  <div class="column-one-third">
+    {{ sub_navigation(navigation_links) }}
+  </div>
   <div class="column-two-thirds">
 
     <h1 class="heading-large">Pricing</h1>

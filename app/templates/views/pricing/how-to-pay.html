@@ -1,4 +1,5 @@
 {% from "components/page-header.html" import page_header %}
+{% from "components/sub-navigation.html" import sub_navigation %}
 
 {% extends "withoutnav_template.html" %}
 
@@ -9,6 +10,9 @@
 {% block maincolumn_content %}
 
   <div class="grid-row">
+    <div class="column-one-third">
+      {{ sub_navigation(navigation_links) }}
+    </div>
     <div class="column-two-thirds">
 
       {{ page_header('How to pay') }}
