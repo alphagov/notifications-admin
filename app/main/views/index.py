@@ -68,7 +68,7 @@ def privacy():
 @main.route('/pricing')
 def pricing():
     return render_template(
-        'views/pricing.html',
+        'views/pricing/index.html',
         sms_rate=0.0158,
         international_sms_rates=sorted([
             (cc, country['names'], country['billable_units'])
