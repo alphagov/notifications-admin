@@ -1,5 +1,6 @@
 {% from "components/form.html" import form_wrapper %}
 {% from "components/page-footer.html" import page_footer %}
+{% from "components/page-header.html" import page_header %}
 {% from "components/textbox.html" import textbox %}
 
 {% extends "org_template.html" %}
@@ -9,7 +10,10 @@
 {% endblock %}
 
 {% block maincolumn_content %}
-  <h1 class="heading-large">Edit request to go live notes</h1>
+  {{ page_header(
+    "Edit request to go live notes",
+    back_link=url_for('.organisation_settings', org_id=current_org.id)
+  ) }}
   <div class="grid-row">
     <div class="column-five-sixths">
       <p>

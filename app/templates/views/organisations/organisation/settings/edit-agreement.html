@@ -1,5 +1,6 @@
 {% from "components/radios.html" import radios %}
 {% from "components/page-footer.html" import page_footer %}
+{% from "components/page-header.html" import page_header %}
 {% from "components/form.html" import form_wrapper %}
 
 {% extends "org_template.html" %}
@@ -9,7 +10,10 @@
 {% endblock %}
 
 {% block maincolumn_content %}
-  <h1 class="heading-large">Data sharing and financial agreement</h1>
+  {{ page_header(
+    "Data sharing and financial agreement",
+    back_link=url_for('.organisation_settings', org_id=current_org.id)
+  ) }}
   <div class="grid-row">
     <div class="column-five-sixths">
       {% call form_wrapper() %}

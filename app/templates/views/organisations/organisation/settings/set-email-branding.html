@@ -1,6 +1,7 @@
 {% extends "org_template.html" %}
 {% from "components/radios.html" import radios %}
 {% from "components/page-footer.html" import page_footer %}
+{% from "components/page-header.html" import page_header %}
 {% from "components/live-search.html" import live_search %}
 {% from "components/form.html" import form_wrapper %}
 
@@ -10,7 +11,10 @@
 
 {% block maincolumn_content %}
 
-  <h1 class="heading-large">Default email branding</h1>
+  {{ page_header(
+    "Default email branding",
+    back_link=url_for('.organisation_settings', org_id=current_org.id)
+  ) }}
   {% call form_wrapper(data_kwargs={'preview-type': 'email'}) %}
     <div class="grid-row">
       <div class="column-full preview-pane">

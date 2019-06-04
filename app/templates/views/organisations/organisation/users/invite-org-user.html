@@ -2,6 +2,7 @@
 
 {% from "components/textbox.html" import textbox %}
 {% from "components/page-footer.html" import page_footer %}
+{% from "components/page-header.html" import page_header %}
 {% from "components/form.html" import form_wrapper %}
 
 {% block service_page_title %}
@@ -10,9 +11,10 @@
 
 {% block maincolumn_content %}
 
-  <h1 class="heading-large">
-    Invite a team member
-  </h1>
+  {{ page_header(
+    "Invite a team member",
+    back_link=url_for('.manage_org_users', org_id=current_org.id)
+  ) }}
   <div class="grid-row">
     {% call form_wrapper(class="column-three-quarters") %}
 	    {{ textbox(form.email_address, width='1-1', safe_error_message=True) }}

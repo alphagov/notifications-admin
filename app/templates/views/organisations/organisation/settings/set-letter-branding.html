@@ -2,6 +2,7 @@
 {% from "components/radios.html" import radios %}
 {% from "components/live-search.html" import live_search %}
 {% from "components/page-footer.html" import page_footer %}
+{% from "components/page-header.html" import page_header %}
 {% from "components/form.html" import form_wrapper %}
 
 {% block org_page_title %}
@@ -10,7 +11,10 @@
 
 {% block maincolumn_content %}
 
-  <h1 class="heading-large">Default letter branding</h1>
+  {{ page_header(
+    "Default letter branding",
+    back_link=url_for('.organisation_settings', org_id=current_org.id)
+  ) }}
   {% call form_wrapper(data_kwargs={'preview-type': 'letter'}) %}
     <div class="grid-row">
       <div class="column-full preview-pane">
