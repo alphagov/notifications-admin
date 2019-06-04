@@ -740,8 +740,12 @@ def fields_to_fill_in(template, prefill_current_user=False):
 
     if 'letter' == template.template_type or not prefill_current_user:
         return recipient_columns + list(template.placeholders)
-
-    session['recipient'] = current_user.mobile_number if template.template_type == 'sms' else current_user.email_address
+    if template.template_type == 'sms':
+        session['recipient'] = current_user.mobile_number
+        session['placeholders']['phone number'] = current_user.mobile_number
+    else:
+        session['recipient'] = current_user.email_address
+        session['placeholders']['email address'] = current_user.email_address
 
     return list(template.placeholders)
 
