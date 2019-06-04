@@ -106,6 +106,22 @@ def test_choose_account_should_show_choose_accounts_page_if_no_services(
     assert add_service_link['href'] == url_for('main.add_service')
 
 
+def test_choose_account_should_should_organisations_link_for_platform_admin(
+    client_request,
+    platform_admin_user,
+    mock_get_orgs_and_services,
+    mock_get_organisation,
+    mock_get_organisation_services,
+):
+    client_request.login(platform_admin_user)
+
+    page = client_request.get('main.choose_account')
+
+    first_link = page.select_one('.browse-list-item a')
+    assert first_link.text == 'All organisations'
+    assert first_link['href'] == url_for('main.organisations')
+
+
 def test_choose_account_should_show_back_to_service_link(
     client_request,
     mock_get_orgs_and_services

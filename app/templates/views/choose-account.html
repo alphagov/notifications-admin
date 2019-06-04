@@ -11,6 +11,12 @@
   </h1>
   <nav class="browse-list">
     <ul>
+      {% if current_user.platform_admin %}
+        <li class="browse-list-item">
+          <a href="{{ url_for('.organisations') }}" class="browse-list-link">All organisations</a>
+        </li>
+        <div class ="keyline-block"></div>
+      {% endif %}
       {% for org in organisations %}
         <li class="browse-list-item">
           <a href="{{ url_for('.organisation_dashboard', org_id=org.id) }}" class="browse-list-link">{{ org.name }}</a>
