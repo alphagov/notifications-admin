@@ -1,56 +1,46 @@
-{% extends "withoutnav_template.html" %}
+{% extends "content_template.html" %}
 {% from "components/table.html" import mapping_table, row, text_field, edit_field, field with context %}
-{% from "components/sub-navigation.html" import sub_navigation %}
 
 {% block per_page_title %}
   Letters
 {% endblock %}
 
-{% block maincolumn_content %}
+{% block content_column_content %}
 
-<div class="grid-row">
-  <div class="column-one-third">
-    {{ sub_navigation(navigation_links) }}
-  </div>
-  <div class="column-two-thirds">
+  <h1 class="heading heading-large">Letters</h1>
+  <p>GOV.UK Notify will print, pack and post your letters for you.</p>
+  {% if not current_user.is_authenticated %}
+    <p><a href="{{ url_for('main.register') }}">Create an account</a> and try Notify for yourself.</p>
+  {% endif %}
 
-    <h1 class="heading heading-large">Letters</h1>
-    <p>GOV.UK Notify will print, pack and post your letters for you.</p>
-    {% if not current_user.is_authenticated %}
-      <p><a href="{{ url_for('main.register') }}">Create an account</a> and try Notify for yourself.</p>
-    {% endif %}
+  <h2 class="heading heading-medium">Features</h2>
+  <p>Notify makes it easy to:</p>
+  <ul class="list list-bullet">
+    <li>create reusable letter templates</li>
+    <li>personalise the content of your letter</li>
+    <li>send bulk mail</li>
+  </ul>
+  <p>You can also <a href="{{ url_for('.documentation') }}">integrate with our API</a> to send letters automatically.</p>
 
-    <h2 class="heading heading-medium">Features</h2>
-    <p>Notify makes it easy to:</p>
-    <ul class="list list-bullet">
-      <li>create reusable letter templates</li>
-      <li>personalise the content of your letter</li>
-      <li>send bulk mail</li>
-    </ul>
-    <p>You can also <a href="{{ url_for('.documentation') }}">integrate with our API</a> to send letters automatically.</p>
+  <h3 class="heading-small">Choose your postage</h3>
+  <p>Notify can send letters by first or second class post.</p>
+  <p>First class letters are delivered one day after they’re dispatched. Second class letters are delivered 2 days after they’re dispatched.</p>
+  <p>Letters sent before 5:30pm are dispatched the next working day (Monday to Friday). Royal Mail delivers from Monday to Saturday, excluding bank holidays.</p>
 
-    <h3 class="heading-small">Choose your postage</h3>
-    <p>Notify can send letters by first or second class post.</p>
-    <p>First class letters are delivered one day after they’re dispatched. Second class letters are delivered 2 days after they’re dispatched.</p>
-    <p>Letters sent before 5:30pm are dispatched the next working day (Monday to Friday). Royal Mail delivers from Monday to Saturday, excluding bank holidays.</p>
+  <h3 class="heading heading-small">Upload your own letters</h3>
+  <p>You can create reusable letter templates in Notify, or upload and send your own letters with the Notify API.</p>
+  <p>Use the <a href="https://docs.notifications.service.gov.uk/documentation/images/notify-pdf-letter-spec-v2.3.pdf">letter specification document</a> to help you set up your letter, save it as a PDF, then upload it to Notify.<p>
+  <p>Read our <a href="{{ url_for('.documentation') }}">API documentation</a> for more information.</p>
 
-    <h3 class="heading heading-small">Upload your own letters</h3>
-    <p>You can create reusable letter templates in Notify, or upload and send your own letters with the Notify API.</p>
-    <p>Use the <a href="https://docs.notifications.service.gov.uk/documentation/images/notify-pdf-letter-spec-v2.3.pdf">letter specification document</a> to help you set up your letter, save it as a PDF, then upload it to Notify.<p>
-    <p>Read our <a href="{{ url_for('.documentation') }}">API documentation</a> for more information.</p>
-
-    <h2 class="heading heading-medium">Pricing</h2>
-    <p>It costs between 30p and 76p (plus VAT) to send a letter. Prices include:</p>
-    <ul class="list list-bullet">
-       <li>paper</li>
-       <li>double-sided colour printing</li>
-       <li>C5 size envelopes with an address window</li>
-       <li>first or second class postage</li>
-    </ul>
-    <p>Letters can be up to 10 pages long (5 double-sided sheets of paper).</p>
-    <p><a href="{{ url_for('.pricing') }}">See pricing</a> for more details.</p>
-
-  </div>
-</div>
+  <h2 class="heading heading-medium">Pricing</h2>
+  <p>It costs between 30p and 76p (plus VAT) to send a letter. Prices include:</p>
+  <ul class="list list-bullet">
+     <li>paper</li>
+     <li>double-sided colour printing</li>
+     <li>C5 size envelopes with an address window</li>
+     <li>first or second class postage</li>
+  </ul>
+  <p>Letters can be up to 10 pages long (5 double-sided sheets of paper).</p>
+  <p><a href="{{ url_for('.pricing') }}">See pricing</a> for more details.</p>
 
 {% endblock %}

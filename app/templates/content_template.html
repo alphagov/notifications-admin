@@ -1,0 +1,21 @@
+{% extends "withoutnav_template.html" %}
+{% from "components/sub-navigation.html" import sub_navigation %}
+{% from "components/page-header.html" import page_header %}
+
+{% block per_page_title %}
+  {{ content_page_title }}
+{% endblock %}
+
+{% block maincolumn_content %}
+  <div class="grid-row">
+    {% if navigation_links %}
+      <div class="column-one-third">
+        {{ sub_navigation(navigation_links) }}
+      </div>
+    {% endif %}
+    <div class="column-two-thirds">
+      {% block content_column_content %}
+      {% endblock %}
+    </div>
+  </div>
+{% endblock %}
