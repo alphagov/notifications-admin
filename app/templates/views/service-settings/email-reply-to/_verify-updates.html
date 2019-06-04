@@ -23,23 +23,19 @@
       <a href="{{ url_for('.service_email_reply_to', service_id=service_id) }}" class="button">Continue</a>
     </div>
   {% elif verification_status == "failure" %}
-    {% call banner_wrapper(type='dangerous') %}
-      <h2 class='banner-title' data-module="track-error" data-error-type="reply-to-email-not-working" data-error-label="{{ upload_id }}">
-        There’s a problem with your reply-to address
-      </h2>
-      <p>
-        We sent an email to ‘{{ reply_to_email_address }}’ but it wasn’t delivered.
-      </p>
-      <p>
-        You can try again, or use a different address.
-      </p>
-    {% endcall %}
-    <p>
-      Let recipients send replies to a shared inbox that’s managed by your team.
-    </p>
-    <p>
-      Do not use your own email address for replies.
-    </p>
+    <div class="bottom-gutter">
+      {% call banner_wrapper(type='dangerous') %}
+        <h2 class='banner-title' data-module="track-error" data-error-type="reply-to-email-not-working" data-error-label="{{ upload_id }}">
+          There’s a problem with your reply-to address
+        </h2>
+        <p>
+          We sent an email to ‘{{ reply_to_email_address }}’ but it wasn’t delivered.
+        </p>
+        <p>
+          You can try again, or use a different address.
+        </p>
+      {% endcall %}
+    </div>
     {% if replace and replace != "False" %}
       {% set form_url = url_for('.service_edit_email_reply_to', service_id=service_id, reply_to_email_id=replace) %}
     {% else %}
@@ -50,14 +46,11 @@
     ) %}
       {{ textbox(
         form.email_address,
-        width='2-3',
-        safe_error_message=True
+        width='1-1',
+        safe_error_message=True,
+        hint='This should be a shared inbox managed by your team, not your own email address'
       ) }}
-      {% if form.is_default.data %}
-        <p class="form-group">
-          This is the default reply-to address for {{ current_service.name }} emails
-        </p>
-      {% else %}
+      {% if not first_email_address and not replace %}
         <div class="form-group">
           {{ checkbox(form.is_default) }}
         </div>
