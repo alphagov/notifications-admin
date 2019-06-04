@@ -1,0 +1,53 @@
+{% extends "content_template.html" %}
+{% from "components/page-header.html" import page_header %}
+
+{% block per_page_title %}
+  How to pay
+{% endblock %}
+
+{% block content_column_content %}
+
+    {{ page_header('How to pay') }}
+
+    <h2 class="heading-medium" id="invoices">
+      Invoices
+    </h2>
+
+    <p>
+      We’ll send your organisation an invoice each quarter if:
+    </p>
+
+    <ul class="list list-bullet">
+      <li>you exceed the free text message allowance</li>
+      <li>you send letters</li>
+    </ul>
+
+    <p>
+      If your organisation has more than one service that owes money the invoice will be broken down by service.
+    </p>
+
+    <p>
+      If the invoice is less than £250 (before <abbr title="Value Added Tax">VAT</abbr>) we’ll roll it into the next quarter’s invoice to save time and effort.
+    </p>
+
+    <p>
+      You can pay by BACS, debit card, or credit card.
+    </p>
+
+    <h2 class="heading-medium" id="purchase-orders">
+      Purchase orders
+    </h2>
+
+    <p>
+      If your organisation’s annual usage will cost over £500 (before <abbr title="Value Added Tax">VAT</abbr>) you need to provide us with a purchase order so we can invoice you.
+    </p>
+
+    <p>
+      Your organisation should raise a single purchase order to cover the estimated annual usage costs for all your Notify services. This purchase order should be updated if the estimated annual usage costs increase.
+    </p>
+
+    <p>
+      You may need to set up Cabinet Office as a supplier before you can raise a purchase order. If you need any details to do that, please <a href="{{ support_link }}">get in touch with us</a>.
+    </p>
+
+{% endblock %}

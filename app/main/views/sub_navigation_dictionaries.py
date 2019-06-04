@@ -39,3 +39,16 @@ def features_nav():
             "link": "main.terms",
         },
     ]
+
+
+def pricing_nav():
+    return [
+        {
+            "name": "Pricing",
+            "link": "main.pricing",
+        },
+        {
+            "name": "How to pay",
+            "link": "main.how_to_pay",
+        },
+    ]

@@ -1,64 +1,54 @@
-{% extends "withoutnav_template.html" %}
+{% extends "content_template.html" %}
 {% from "components/banner.html" import banner_wrapper %}
-{% from "components/sub-navigation.html" import sub_navigation %}
 
 {% block per_page_title %}
-Terms of use
+  Terms of use
 {% endblock %}
 
-{% block maincolumn_content %}
+{% block content_column_content %}
 
-<div class="grid-row">
-  <div class="column-one-third">
-    {{ sub_navigation(navigation_links) }}
-  </div>
-  <div class="column-two-thirds">
+  <h1 class="heading-large">Terms of use</h1>
 
-    <h1 class="heading-large">Terms of use</h1>
+  <p>
+    These terms apply to your service’s use of GOV.UK&nbsp;Notify. You must be the service manager to accept them.
+  </p>
 
-    <p>
-      These terms apply to your service’s use of GOV.UK&nbsp;Notify. You must be the service manager to accept them.
-    </p>
+  <p>
+    {{ current_user.default_organisation.as_terms_of_use_paragraph(
+      terms_link=url_for('main.sign_in', next=url_for('main.terms')),
+      download_link=url_for('.agreement'),
+      support_link=url_for('.feedback', ticket_type='ask-question-give-feedback', body='agreement'),
+      signed_in=current_user.is_authenticated
+    )}}
+  </p>
 
-    <p>
-      {{ current_user.default_organisation.as_terms_of_use_paragraph(
-        terms_link=url_for('main.sign_in', next=url_for('main.terms')),
-        download_link=url_for('.agreement'),
-        support_link=url_for('.feedback', ticket_type='ask-question-give-feedback', body='agreement'),
-        signed_in=current_user.is_authenticated
-      )}}
-    </p>
+  <h2 class="heading-medium">When using Notify</h2>
+  <p>You must:</p>
+  <ul class="list list-bullet">
+    <li>complete your organisation’s information assurance process (you don’t need to include Notify or our delivery partners, we’ve already done that)</li>
+    <li>tell us immediately if you have any security breaches</li>
+    <li>keep your API keys secure</li>
+    <li>get the right levels of consent (to send messages and to use data)</li>
+    <li>not send unsolicited messages, only ones related to a transaction or something the user has subscribed to be updated about (<a href="https://www.gov.uk/service-manual/design/sending-emails-and-text-messages">check the Service Manual</a> if you’re not sure)</li>
+    <li>
+      send messages that meet the GOV.UK Service Manual standards for <a href="https://www.gov.uk/service-manual/design/sending-emails-and-text-messages">writing text messages and emails</a></li>
+    <li>not send messages containing any personally or commercially sensitive information</li>
+    <li>check that the data you add to Notify is accurate and complies with data protection legislation</li>
+  </ul>
+  <p>If you don’t keep to these terms, we might have to stop sending your messages.</p>
 
-    <h2 class="heading-medium">When using Notify</h2>
-    <p>You must:</p>
-    <ul class="list list-bullet">
-      <li>complete your organisation’s information assurance process (you don’t need to include Notify or our delivery partners, we’ve already done that)</li>
-      <li>tell us immediately if you have any security breaches</li>
-      <li>keep your API keys secure</li>
-      <li>get the right levels of consent (to send messages and to use data)</li>
-      <li>not send unsolicited messages, only ones related to a transaction or something the user has subscribed to be updated about (<a href="https://www.gov.uk/service-manual/design/sending-emails-and-text-messages">check the Service Manual</a> if you’re not sure)</li>
-      <li>
-        send messages that meet the GOV.UK Service Manual standards for <a href="https://www.gov.uk/service-manual/design/sending-emails-and-text-messages">writing text messages and emails</a></li>
-      <li>not send messages containing any personally or commercially sensitive information</li>
-      <li>check that the data you add to Notify is accurate and complies with data protection legislation</li>
-    </ul>
-    <p>If you don’t keep to these terms, we might have to stop sending your messages.</p>
+  <p>Notify will:</p>
+  <ul class="list list-bullet">
+    <li>send all the messages you pass to us, as long as they meet our guidelines</li>
+    <li>
+      show how Notify is performing (through our <a href="https://www.gov.uk/performance/govuk-notify">performance</a> and <a href="https://status.notifications.service.gov.uk/">status</a> pages)
+    </li>
+    <li>keep your data <a href="{{ url_for('.security') }}">secure</a></li>
+    <li>give you one month’s notice by email if we change our terms of use or delivery providers</li>
+  </ul>
 
-    <p>Notify will:</p>
-    <ul class="list list-bullet">
-      <li>send all the messages you pass to us, as long as they meet our guidelines</li>
-      <li>
-        show how Notify is performing (through our <a href="https://www.gov.uk/performance/govuk-notify">performance</a> and <a href="https://status.notifications.service.gov.uk/">status</a> pages)
-      </li>
-      <li>keep your data <a href="{{ url_for('.security') }}">secure</a></li>
-      <li>give you one month’s notice by email if we change our terms of use or delivery providers</li>
-    </ul>
-
-    <h2 class="heading-medium">Leaving Notify</h2>
-    <p>You can leave Notify at any time. Just <a href="{{url_for('.feedback', ticket_type='ask-question-give-feedback')}}">contact us</a> and we’ll close your account.</p>
-    <p>When you leave Notify, all your data will be deleted.</p>
-
-  </div>
-</div>
+  <h2 class="heading-medium">Leaving Notify</h2>
+  <p>You can leave Notify at any time. Just <a href="{{url_for('.feedback', ticket_type='ask-question-give-feedback')}}">contact us</a> and we’ll close your account.</p>
+  <p>When you leave Notify, all your data will be deleted.</p>
 
 {% endblock %}

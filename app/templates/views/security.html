@@ -1,89 +1,82 @@
-{% extends "withoutnav_template.html" %}
+{% extends "content_template.html" %}
 {% from "components/table.html" import mapping_table, row, text_field, edit_field, field with context %}
-{% from "components/sub-navigation.html" import sub_navigation %}
 
 {% block per_page_title %}
   Security
 {% endblock %}
 
-{% block maincolumn_content %}
+{% block content_column_content %}
 
-<div class="grid-row">
-  <div class="column-one-third">
-    {{ sub_navigation(navigation_links) }}
-  </div>
-  <div class="column-two-thirds">
+  <h1 class="heading-large">Security</h1>
+  <p>GOV.UK Notify is built for the needs of government services. It has processes in place to:</p>
+  <ul class="list list-bullet">
+    <li>protect user data</li>
+    <li>keep systems secure</li>
+    <li>manage risks around information</li>
+  </ul>
 
-    <h1 class="heading-large">Security</h1>
-    <p>GOV.UK Notify is built for the needs of government services. It has processes in place to:</p>
-    <ul class="list list-bullet">
-      <li>protect user data</li>
-      <li>keep systems secure</li>
-      <li>manage risks around information</li>
-    </ul>
+  <h2 class="heading-medium">Data</h2>
+  <p>On Notify, data is encrypted:</p>
+  <ul class="list list-bullet">
+    <li>when it passes through the service</li>
+    <li>when it’s stored on the service</li>
+  </ul>
+  <p>Any user data you upload is only held for 7 days.</p>
+  <p>The Cabinet Office acts as data processor for Notify. Your organisation is the data controller.</p>
+  <h3 class="heading-small">Data Protection Act</h3>
+  <p>Notify complies with data protection law. To make sure it stays compliant, there are regular legal reviews of the service’s:</p>
+  <ul class="list list-bullet">
+    <li>privacy policy</li>
+    <li>terms of use</li>
+    <li>approach to data sharing</li>
+  </ul>
 
-    <h2 class="heading-medium">Data</h2>
-    <p>On Notify, data is encrypted:</p>
-    <ul class="list list-bullet">
-      <li>when it passes through the service</li>
-      <li>when it’s stored on the service</li>
-    </ul>
-    <p>Any user data you upload is only held for 7 days.</p>
-    <p>The Cabinet Office acts as data processor for Notify. Your organisation is the data controller.</p>
-    <h3 class="heading-small">Data Protection Act</h3>
-    <p>Notify complies with data protection law. To make sure it stays compliant, there are regular legal reviews of the service’s:</p>
-    <ul class="list list-bullet">
-      <li>privacy policy</li>
-      <li>terms of use</li>
-      <li>approach to data sharing</li>
-    </ul>
+  <h2 class="heading-medium">Technical security</h2>
+  <p>Other technical security controls on Notify include:</p>
+  <ul class="list list-bullet">
+    <li>protective monitoring to record activity, and raise alerts about any suspicious activity</li>
+    <li>using JSON Web Tokens, to avoid sending API keys when your service talks to Notify</li>
+  </ul>
 
-    <h2 class="heading-medium">Technical security</h2>
-    <p>Other technical security controls on Notify include:</p>
-    <ul class="list list-bullet">
-      <li>protective monitoring to record activity, and raise alerts about any suspicious activity</li>
-      <li>using JSON Web Tokens, to avoid sending API keys when your service talks to Notify</li>
-    </ul>
-    
-    <h3 class="heading-small">Protect sensitive information</h3>
-    <p>Some messages include sensitive information like security codes or password reset links.</p>
-    <p>If you’re sending a message with sensitive information, you can choose to hide those details on the Notify dashboard once the message has been sent. This means that only the message recipient will be able to see that information.</p>
-    
-    <h2 class="heading-medium">User permissions and signing in</h2>
-    <p>You can set different user permissions in Notify. This lets you control who in your team has access to certain parts of the service.</p>
-    <h3 class="heading-small">Two-factor authentication</h3>
-    <p>To sign in to Notify, you’ll need to enter:</p>
-    <ul class="list list-bullet">
-      <li>your email address and password</li>
-      <li>a text message code that Notify sends to your phone</li>
-    </ul>
-    <p>If receiving text messages at work is a problem for your team, <a href="https://www.notifications.service.gov.uk/">contact us</a> about using an email link instead.</p>
+  <h3 class="heading-small">Protect sensitive information</h3>
+  <p>Some messages include sensitive information like security codes or password reset links.</p>
+  <p>If you’re sending a message with sensitive information, you can choose to hide those details on the Notify dashboard once the message has been sent. This means that only the message recipient will be able to see that information.</p>
 
-    <h2 class="heading-medium">Information risk management</h2>
-    <p>Our approach to information risk management follows National Cyber Security Centre (NCSC) guidance. It assesses:</p>
-    <ul class="list list-bullet">
-      <li>how Notify is built</li>
-      <li>the infrastructure Notify is built upon</li>
-      <li>support for the Notify service</li>
-    </ul>
-    <p>This approach also applies to the service providers Notify uses to send messages.</p>
+  <h2 class="heading-medium">User permissions and signing in</h2>
+  <p>You can set different user permissions in Notify. This lets you control who in your team has access to certain parts of the service.</p>
+  <h3 class="heading-small">Two-factor authentication</h3>
+  <p>To sign in to Notify, you’ll need to enter:</p>
+  <ul class="list list-bullet">
+    <li>your email address and password</li>
+    <li>a text message code that Notify sends to your phone</li>
+  </ul>
+  <p>If receiving text messages at work is a problem for your team, <a href="https://www.notifications.service.gov.uk/">contact us</a> about using an email link instead.</p>
 
-    <h2 class="heading-medium">How we manage risks on Notify</h2>
-    <p>Things we do to manage risks on Notify include:</p>
-    <ul class="list list-bullet">
-      <li>formal risk assessments based on <a href="http://www.iso.org/iso/catalogue_detail?csnumber=56742">ISO 2700:2011</a> and National Cyber Security Centre guidance</li>
-      <li><a href="https://www.cesg.gov.uk/articles/check-fundamental-principles">CHECK</a>-based testing, both annually and when any major changes are made to Notify</li>
-      <li>residual risk statement preparation and active management of the risk treatment plan</li>
-      <li>regular updates to the Privacy Impact Assessment</li>
-      <li>security impact assessments</li>
-    </ul>
+  <h2 class="heading-medium">Information risk management</h2>
+  <p>Our approach to information risk management follows National Cyber Security Centre (NCSC) guidance. It assesses:</p>
+  <ul class="list list-bullet">
+    <li>how Notify is built</li>
+    <li>the infrastructure Notify is built upon</li>
+    <li>support for the Notify service</li>
+  </ul>
+  <p>This approach also applies to the service providers Notify uses to send messages.</p>
 
-    <h2 class="heading-medium">Cabinet Office approval</h2>
-    <p>Notify has been assessed and approved by the Cabinet Office Senior Information Risk Officer (SIRO). The SIRO checks this approval once a year.</p>
-    <p>Notify also has approval from the Office of the Government’s SIRO to host data within the EEA.</p>
+  <h2 class="heading-medium">How we manage risks on Notify</h2>
+  <p>Things we do to manage risks on Notify include:</p>
+  <ul class="list list-bullet">
+    <li>formal risk assessments based on <a href="http://www.iso.org/iso/catalogue_detail?csnumber=56742">ISO 2700:2011</a> and National Cyber Security Centre guidance</li>
+    <li><a href="https://www.cesg.gov.uk/articles/check-fundamental-principles">CHECK</a>-based testing, both annually and when any major changes are made to Notify</li>
+    <li>residual risk statement preparation and active management of the risk treatment plan</li>
+    <li>regular updates to the Privacy Impact Assessment</li>
+    <li>security impact assessments</li>
+  </ul>
 
-    <h2 class="heading-medium">Classifications and security vetting</h2>
-    <p>Any information in Notify is classified as ‘OFFICIAL’ under the Government Security Classifications Policy.</p>
-    <p>All system administration staff working on Notify are cleared to Security Check (SC) level by United Kingdom Security Vetting.</p>
+  <h2 class="heading-medium">Cabinet Office approval</h2>
+  <p>Notify has been assessed and approved by the Cabinet Office Senior Information Risk Officer (SIRO). The SIRO checks this approval once a year.</p>
+  <p>Notify also has approval from the Office of the Government’s SIRO to host data within the EEA.</p>
+
+  <h2 class="heading-medium">Classifications and security vetting</h2>
+  <p>Any information in Notify is classified as ‘OFFICIAL’ under the Government Security Classifications Policy.</p>
+  <p>All system administration staff working on Notify are cleared to Security Check (SC) level by United Kingdom Security Vetting.</p>
 
 {% endblock %}

@@ -1,0 +1,145 @@
+{% from "components/table.html" import mapping_table, row, text_field, field, row_heading %}
+{% from "components/textbox.html" import textbox %}
+{% from "components/live-search.html" import live_search %}
+
+{% extends "content_template.html" %}
+
+{% block per_page_title %}
+  Pricing
+{% endblock %}
+
+{% block content_column_content %}
+
+  <h1 class="heading-large">Pricing</h1>
+  <p>To use GOV.UK Notify, there’s:</p>
+  <ul class="list list-bullet">
+    <li>no monthly charge</li>
+    <li>no setup fee</li>
+    <li>no procurement cost</li>
+  </ul>
+
+  {% if not current_user.is_authenticated %}
+    <p><a href="{{ url_for('main.register') }}">Create an account</a> then set up as many different services as you need to. Each service has its own free text message allowance.</p>
+  {% endif %}
+
+  <p>When you set up a new service it will start in <a href="{{ url_for('main.trial_mode_new') }}">trial mode</a>.</p>
+
+  <h2 class="heading-medium">Emails</h2>
+  <p>It’s free to send emails through Notify.</p>
+
+  <h2 class="heading-medium">Text messages</h2>
+  <p>Each service you set up in Notify has a free annual allowance. The allowance is:</p>
+  <ul class="list list-bullet">
+    <li>250,000 free text messages for central government services</li>
+    <li>25,000 free text messages for other public sector services</li>
+  </ul>
+  <p>It costs 1.58 pence (plus VAT) for each text message you send after your free allowance.</p>
+  <p>See <a href="{{ url_for('main.how_to_pay') }}">how to pay</a>.
+
+  <h3 class="heading-small">Long text messages</h3>
+  <p>If a text message is longer than 160 characters (including spaces), it’ll be charged as more than one message:</p>
+  <div class="bottom-gutter-3-2">
+    {% call mapping_table(
+      caption='Text message pricing',
+      field_headings=['Message length', 'Charge'],
+      field_headings_visible=True,
+      caption_visible=False
+    ) %}
+      {% for message_length, charge in [
+        ('Up to 160 characters', '1 text message'),
+        ('Up to 306 characters', '2 text messages'),
+        ('Up to 459 characters', '3 text messages'),
+        ('Up to 612 characters', '4 text messages'),
+      ] %}
+        {% call row() %}
+          {{ text_field(message_length) }}
+          {{ text_field(charge) }}
+        {% endcall %}
+      {% endfor %}
+    {% endcall %}
+  </div>
+  <p>Long text messages containing Welsh characters (Â, â, Ê, ê, Î, î, Ô, ô, Û, û, Ŵ, ŵ, Ŷ, and ŷ) are charged differently:</p>
+  <div class="bottom-gutter-3-2">
+    {% call mapping_table(
+      caption='Text message pricing',
+      field_headings=['Message length', 'Charge'],
+      field_headings_visible=True,
+      caption_visible=False
+    ) %}
+      {% for message_length, charge in [
+        ('Up to 70 characters', '1 text message'),
+        ('Up to 134 characters', '2 text messages'),
+        ('Up to 201 characters', '3 text messages'),
+        ('Up to 268 characters', '4 text messages'),
+        ('Each additional 67 characters', '1 additional text message'),
+      ] %}
+        {% call row() %}
+          {{ text_field(message_length) }}
+          {{ text_field(charge) }}
+        {% endcall %}
+      {% endfor %}
+    {% endcall %}
+  </div>
+  <h3 class="heading-small">Sending text messages to international numbers</h3>
+  <p>It might cost more to send text messages to international numbers than UK ones, depending on the country.</p>
+  <details>
+    <summary>International text message rates</summary>
+
+    {{ live_search(target_selector='#international-pricing .table-row', show=True, form=search_form, label='Search by country name or code') }}
+
+    <div id="international-pricing" class="bottom-gutter-3-2">
+      {% call mapping_table(
+        caption='Letter pricing',
+        field_headings=['Country code', 'Country', 'Cost multiplier'],
+        field_headings_visible=True,
+        caption_visible=False
+      ) %}
+        {% for cc, names, billable_units in international_sms_rates %}
+          {% call row() %}
+            {{ text_field('+' + cc) }}
+            {% call field() %}
+              {% for name in names %}
+                {{ name }}<br>
+              {% endfor %}
+            {% endcall %}
+            {{ text_field('{}&hairsp;&times;'.format(billable_units)|safe) }}
+          {% endcall %}
+        {% endfor %}
+      {% endcall %}
+    </div>
+
+  </details>
+
+  <h2 class="heading-medium" id="letters">Letters</h2>
+  <p>The cost of sending a letter depends on the postage you choose and how many sheets of paper you need.</p>
+  <div class="bottom-gutter-3-2">
+    {% call mapping_table(
+      caption='Letter pricing',
+      field_headings=['Paper', 'Second class', 'First class'],
+      field_headings_visible=True,
+      caption_visible=False
+    ) %}
+      {% for sheets, second, first in [
+        ('1 sheet', '30', '56'),
+        ('2 sheets', '35', '61'),
+        ('3 sheets', '40', '66'),
+        ('4 sheets', '45', '71'),
+        ('5 sheets', '50', '76'),
+      ] %}
+        {% call row() %}
+          {% call row_heading() %} {{ sheets }} (double-sided) {% endcall %}
+          {{ text_field(second + 'p + VAT') }}
+          {{ text_field(first + 'p + VAT') }}
+        {% endcall %}
+      {% endfor %}
+    {% endcall %}
+  </div>
+  <p>Prices include:</p>
+  <ul class="list list-bullet">
+     <li>paper</li>
+     <li>double-sided colour printing</li>
+     <li>C5 size envelopes with an address window</li>
+     <li>first or second class postage</li>
+  </ul>
+
+{% endblock %}

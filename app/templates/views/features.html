@@ -1,4 +1,4 @@
-{% extends "withoutnav_template.html" %}
+{% extends "content_template.html" %}
 {% from "components/table.html" import mapping_table, row, text_field, edit_field, field with context %}
 {% from "components/sub-navigation.html" import sub_navigation %}
 
@@ -6,81 +6,72 @@
   Features
 {% endblock %}
 
-{% block maincolumn_content %}
+{% block content_column_content %}
 
-<div class="grid-row">
-  <div class="column-one-third">
-    {{ sub_navigation(navigation_links) }}
-  </div>
-  <div class="column-two-thirds">
+<h1 class="heading-large">Features</h1>
+<p>If you work for central government, a local authority or the NHS, you can use GOV.UK Notify to keep your users updated.</p>
+<p>Notify makes it easy to create, customise and send:</p>
+<ul class="list list-bullet">
+  <li><a href="{{ url_for('main.features_email') }}">emails</a></li>
+  <li><a href="{{ url_for('main.features_sms') }}">text messages</a></li>
+  <li><a href="{{ url_for('main.features_letters') }}">letters</a></li>
+</ul>
+<p>You do not need any technical knowledge to use Notify.</p>
+{% if not current_user.is_authenticated %}
+  <p><a href="{{ url_for('main.register') }}">Create an account</a> for free and try it yourself.</p>
+{% endif %}
 
-    <h1 class="heading-large">Features</h1>
-    <p>If you work for central government, a local authority or the NHS, you can use GOV.UK Notify to keep your users updated.</p>
-    <p>Notify makes it easy to create, customise and send:</p>
-    <ul class="list list-bullet">
-      <li><a href="{{ url_for('main.features_email') }}">emails</a></li>
-      <li><a href="{{ url_for('main.features_sms') }}">text messages</a></li>
-      <li><a href="{{ url_for('main.features_letters') }}">letters</a></li>
-    </ul>
-    <p>You do not need any technical knowledge to use Notify.</p>
-    {% if not current_user.is_authenticated %}
-      <p><a href="{{ url_for('main.register') }}">Create an account</a> for free and try it yourself.</p>
-    {% endif %}
+<h2 class="heading-medium">Reusable message templates</h2>
+<p>To send an email, text or letter with Notify, you need to create a reusable message template first.</p>
+<p>Templates let you send the same thing to lots of people, as often as you need to, without writing a new message each time.</p>
 
-    <h2 class="heading-medium">Reusable message templates</h2>
-    <p>To send an email, text or letter with Notify, you need to create a reusable message template first.</p>
-    <p>Templates let you send the same thing to lots of people, as often as you need to, without writing a new message each time.</p>
+<h2 class="heading-medium">Personalised content</h2>
+<p>Notify makes it easy to send personalised messages from a single template.</p>
+<p>If you want to include personalised content in your message, you can add a placeholder. Placeholders are filled in with details, like a name or reference number, each time you send a message. You can do this manually or upload a list of personal details and let Notify do it for you.</p>
 
-    <h2 class="heading-medium">Personalised content</h2>
-    <p>Notify makes it easy to send personalised messages from a single template.</p>
-    <p>If you want to include personalised content in your message, you can add a placeholder. Placeholders are filled in with details, like a name or reference number, each time you send a message. You can do this manually or upload a list of personal details and let Notify do it for you.</p>
+<h2 class="heading-medium">Bulk sending</h2>
+<p>To send a batch of messages at once, upload a list of contact details to Notify. If you're sending emails and text messages, you can also schedule the date and time you want them to be sent.</p>
 
-    <h2 class="heading-medium">Bulk sending</h2>
-    <p>To send a batch of messages at once, upload a list of contact details to Notify. If you're sending emails and text messages, you can also schedule the date and time you want them to be sent.</p>
+<h2 class="heading-medium">API integration</h2>
+<p>You can integrate the Notify API with your web application or back-office system to send messages automatically.</p>
+<p>Read our <a href="{{ url_for('.documentation') }}">API documentation</a> for more information.</p>
 
-    <h2 class="heading-medium">API integration</h2>
-    <p>You can integrate the Notify API with your web application or back-office system to send messages automatically.</p>
-    <p>Read our <a href="{{ url_for('.documentation') }}">API documentation</a> for more information.</p>
+<h2 class="heading-medium">Reporting</h2>
+<p>Notify’s real-time dashboard lets you see the number of messages sent. You can also check the current status of any message to see when it was delivered.</p>
+<p>Read more about how <a href="{{ url_for('main.message_status') }}">message status</a> works.</p>
 
-    <h2 class="heading-medium">Reporting</h2>
-    <p>Notify’s real-time dashboard lets you see the number of messages sent. You can also check the current status of any message to see when it was delivered.</p>
-    <p>Read more about how <a href="{{ url_for('main.message_status') }}">message status</a> works.</p>
+<h2 class="heading-medium">Permissions</h2>
+<p>Control which members of your team can see, create, edit and send messages.</p>
+<p>Notify lets you:</p>
+<ul class="list list-bullet">
+  <li>set different permission levels for each team member</li>
+  <li>invite team members who don’t have a government email address</li>
+  <li>choose who else can manage team members</li>
+</ul>
 
-    <h2 class="heading-medium">Permissions</h2>
-    <p>Control which members of your team can see, create, edit and send messages.</p>
-    <p>Notify lets you:</p>
-    <ul class="list list-bullet">
-      <li>set different permission levels for each team member</li>
-      <li>invite team members who don’t have a government email address</li>
-      <li>choose who else can manage team members</li>
-    </ul>
+<h2 class="heading-medium">Performance</h2>
+<p>Notify commits to:</p>
+<ul class="list list-bullet">
+  <li>sending 95% of emails and text messages within 10 seconds</li>
+  <li>printing and posting letters by 3pm the next working day (if you send them to us before 5:30pm)</li>
+</ul>
 
-    <h2 class="heading-medium">Performance</h2>
-    <p>Notify commits to:</p>
-    <ul class="list list-bullet">
-      <li>sending 95% of emails and text messages within 10 seconds</li>
-      <li>printing and posting letters by 3pm the next working day (if you send them to us before 5:30pm)</li>
-    </ul>
+<p>We send messages through several different providers. If one provider fails, Notify switches to another so that your messages are not affected.</p>
 
-    <p>We send messages through several different providers. If one provider fails, Notify switches to another so that your messages are not affected.</p>
+<p>Visit GOV.UK Performance to <a href="https://www.gov.uk/performance/govuk-notify">see how Notify is performing</a>.</p>
 
-    <p>Visit GOV.UK Performance to <a href="https://www.gov.uk/performance/govuk-notify">see how Notify is performing</a>.</p>
+<h2 class="heading-medium">Security</h2>
+<p>Notify protects and manages data to meet the needs of government services.</p>
 
-    <h2 class="heading-medium">Security</h2>
-    <p>Notify protects and manages data to meet the needs of government services.</p>
+<h3 class="heading-small">Hide sensitive information</h3>
+<p>Notify lets you redact personal information from your messages after they’ve been sent. This means that only the recipient can see that information.</p>
 
-    <h3 class="heading-small">Hide sensitive information</h3>
-    <p>Notify lets you redact personal information from your messages after they’ve been sent. This means that only the recipient can see that information.</p>
+<h3 class="heading-small">Two-factor authentication</h3>
+<p>Notify uses two-factor authentication (2FA) to keep your account secure. When you sign in, we'll send a unique one-time code to your phone and ask you to enter it before we let you use your account.</p>
+<p>Read more about <a href="{{ url_for('main.security') }}">security</a>.
 
-    <h3 class="heading-small">Two-factor authentication</h3>
-    <p>Notify uses two-factor authentication (2FA) to keep your account secure. When you sign in, we'll send a unique one-time code to your phone and ask you to enter it before we let you use your account.</p>
-    <p>Read more about <a href="{{ url_for('main.security') }}">security</a>.
-
-    <h2 class="heading-medium">Support</h2>
-    <p>Notify provides 24-hour online support. If you have an emergency outside office hours, we’ll reply within 30 minutes.</p>
-    <p>Find out more about <a href="{{ url_for('.support') }}">support</a>.</p>
-
-  </div>
-</div>
+<h2 class="heading-medium">Support</h2>
+<p>Notify provides 24-hour online support. If you have an emergency outside office hours, we’ll reply within 30 minutes.</p>
+<p>Find out more about <a href="{{ url_for('.support') }}">support</a>.</p>
 
 {% endblock %}

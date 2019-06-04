@@ -80,7 +80,7 @@ def test_robots(client):
     'cookies', 'privacy', 'pricing', 'terms', 'roadmap',
     'features', 'callbacks', 'documentation', 'security',
     'message_status', 'features_email', 'features_sms',
-    'features_letters',
+    'features_letters', 'how_to_pay',
 ])
 def test_static_pages(
     client_request,
