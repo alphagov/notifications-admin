@@ -56,6 +56,7 @@ class HeaderNavigation(Navigation):
             'roadmap',
             'security',
             'terms',
+            'trial_mode_new',
             'using_notify',
         },
         'pricing': {
@@ -292,7 +293,6 @@ class HeaderNavigation(Navigation):
         'template_history',
         'template_usage',
         'trial_mode',
-        'trial_mode_new',
         'usage',
         'view_job',
         'view_job_csv',
