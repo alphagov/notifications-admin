@@ -7,20 +7,21 @@
 {% from "components/form.html" import form_wrapper %}
 
 {% block service_page_title %}
- Edit email reply to address
+ Change email reply to address
 {% endblock %}
 
 {% block maincolumn_content %}
 
   {{ page_header(
-    'Edit email reply to address',
+    'Change email reply to address',
     back_link=url_for('main.service_email_reply_to', service_id=current_service.id)
   ) }}
   {% call form_wrapper() %}
     {{ textbox(
       form.email_address,
-      width='2-3',
-      safe_error_message=True
+      width='1-1',
+      safe_error_message=True,
+      hint='This should be a shared inbox managed by your team, not your own email address.'
     ) }}
     {% if form.is_default.data %}
       <p class="form-group">

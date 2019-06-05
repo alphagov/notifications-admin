@@ -15,16 +15,12 @@
     'Add email reply-to address',
     back_link=url_for('main.service_email_reply_to', service_id=current_service.id)
   ) }}
-  <p>
-    Let recipients send replies to a shared inbox that’s managed by your team.
-  </p>
-  <p>
-    Do not use your own email address for replies.
-  </p>
+
   {% call form_wrapper() %}
     {{ textbox(
       form.email_address,
-      width='2-3',
+      width='1-1',
+      hint='This should be a shared inbox managed by your team, not your own email address',
       safe_error_message=True
     ) }}
     {% if not first_email_address %}
