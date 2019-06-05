@@ -1,3 +1,5 @@
+from collections.abc import Sequence
+
 from flask import abort, current_app, request, session
 from flask_login import AnonymousUserMixin, UserMixin, login_user
 from notifications_python_client.errors import HTTPError
@@ -517,15 +519,18 @@ class AnonymousUser(AnonymousUserMixin):
         return Organisation(None)
 
 
-class Users():
+class Users(Sequence):
 
     client = user_api_client.get_users_for_service
 
     def __init__(self, service_id):
         self.users = self.client(service_id)
 
-    def __iter__(self):
-        return (User(user) for user in self.users)
+    def __getitem__(self, index):
+        return User(self.users[index])
+
+    def __len__(self):
+        return len(self.users)
 
     def __add__(self, other):
         return list(self) + list(other)
@@ -540,11 +545,14 @@ class InvitedUsers(Users):
     client = invite_api_client.get_invites_for_service
     model = InvitedUser
 
-    def __iter__(self):
-        return (
-            self.model(**invite) for invite in self.users
-            if invite['status'] != 'accepted'
-        )
+    def __init__(self, service_id):
+        self.users = [
+            user for user in self.client(service_id)
+            if user['status'] != 'accepted'
+        ]
+
+    def __getitem__(self, index):
+        return self.model(**self.users[index])
 
 
 class OrganisationInvitedUsers(InvitedUsers):
