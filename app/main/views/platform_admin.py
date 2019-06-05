@@ -203,33 +203,34 @@ def platform_admin_reports():
 @user_is_platform_admin
 def live_services_csv():
     results = service_api_client.get_live_services_data()["data"]
-    live_services_columns = [
-        "Service ID", "Organisation", "Organisation type", "Service name", "Consent to research", "Main contact",
-        "Contact email", "Contact mobile", "Live date", "SMS volume intent", "Email volume intent",
-        "Letter volume intent", "SMS sent this year", "Emails sent this year", "Letters sent this year"
-    ]
-    live_services_data = []
-    live_services_data.append(live_services_columns)
+
+    column_names = OrderedDict([
+        ('service_id', 'Service ID'),
+        ('organisation_name', 'Organisation'),
+        ('organisation_type', 'Organisation type'),
+        ('service_name', 'Service name'),
+        ('consent_to_research', 'Consent to research'),
+        ('contact_name', 'Main contact'),
+        ('contact_email', 'Contact email'),
+        ('contact_mobile', 'Contact mobile'),
+        ('live_date', 'Live date'),
+        ('sms_volume_intent', 'SMS volume intent'),
+        ('email_volume_intent', 'Email volume intent'),
+        ('letter_volume_intent', 'Letter volume intent'),
+        ('sms_totals', 'SMS sent this year'),
+        ('email_totals', 'Emails sent this year'),
+        ('letter_totals', 'Letters sent this year'),
+        ('free_sms_fragment_limit', 'Free sms allowance'),
+    ])
+
+    # initialise with header row
+    live_services_data = [[x for x in column_names.values()]]
+
     for row in results:
-        live_services_data.append([
-            row["service_id"],
-            row["organisation_name"],
-            row["organisation_type"],
-            row["service_name"],
-            row["consent_to_research"],
-            row["contact_name"],
-            row["contact_email"],
-            row["contact_mobile"],
-            datetime.strptime(
-                row["live_date"], '%a, %d %b %Y %X %Z'
-            ).strftime("%d-%m-%Y") if row["live_date"] else None,
-            row["sms_volume_intent"],
-            row["email_volume_intent"],
-            row["letter_volume_intent"],
-            row["sms_totals"],
-            row["email_totals"],
-            row["letter_totals"],
-        ])
+        if row['live_date']:
+            row['live_date'] = datetime.strptime(row["live_date"], '%a, %d %b %Y %X %Z').strftime("%d-%m-%Y")
+
+        live_services_data.append([row[api_key] for api_key in column_names.keys()])
 
     return Spreadsheet.from_rows(live_services_data).as_csv_data, 200, {
         'Content-Type': 'text/csv; charset=utf-8',
