@@ -36,7 +36,7 @@
         </p>
       {% endcall %}
     </div>
-    {% if replace and replace != "False" %}
+    {% if replace %}
       {% set form_url = url_for('.service_edit_email_reply_to', service_id=service_id, reply_to_email_id=replace) %}
     {% else %}
       {% set form_url = url_for('.service_add_email_reply_to', service_id=service_id) %}
@@ -50,7 +50,7 @@
         safe_error_message=True,
         hint='This should be a shared inbox managed by your team, not your own email address'
       ) }}
-      {% if not first_email_address and not replace %}
+      {% if not first_email_address and not existing_is_default %}
         <div class="form-group">
           {{ checkbox(form.is_default) }}
         </div>

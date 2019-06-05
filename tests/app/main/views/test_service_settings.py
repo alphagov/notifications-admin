@@ -2040,7 +2040,16 @@ def test_add_reply_to_email_address_sends_test_notification(
 ])
 @freeze_time("2018-06-01 11:11:00.061258")
 def test_service_verify_reply_to_address(
-    mocker, client_request, fake_uuid, status, expected_failure, expected_success, is_default, replace, expected_header
+    mocker,
+    client_request,
+    fake_uuid,
+    get_non_default_reply_to_email_address,
+    status,
+    expected_failure,
+    expected_success,
+    is_default,
+    replace,
+    expected_header
 ):
     notification = {
         "id": fake_uuid,
