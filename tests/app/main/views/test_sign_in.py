@@ -45,7 +45,7 @@ def test_doesnt_redirect_to_sign_in_if_no_session_info(
     api_user_active,
     mock_get_organisation_by_domain,
 ):
-    assert 'current_session_id' not in api_user_active
+    api_user_active['current_session_id'] = str(uuid.UUID(int=1))
 
     with client_request.session_transaction() as session:
         session['current_session_id'] = None

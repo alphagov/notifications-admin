@@ -18,6 +18,7 @@ class JSONModel():
     def __getattr__(self, attr):
         if attr in self.ALLOWED_PROPERTIES:
             return self._dict[attr]
+        return
         raise AttributeError('`{}` is not a {} attribute'.format(
             attr,
             self.__class__.__name__.lower(),

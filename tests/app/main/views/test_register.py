@@ -199,14 +199,18 @@ def test_shows_registration_page_from_invite(
     expected_value,
 ):
     with client_request.session_transaction() as session:
-        session['invited_user'] = InvitedUser(
-            fake_uuid, fake_uuid, "",
-            email_address,
-            ["manage_users"],
-            "pending",
-            datetime.utcnow(),
-            'sms_auth', []
-        ).serialize()
+        session['invited_user'] = {
+            'id': fake_uuid,
+            'service': fake_uuid,
+            'from_user': "",
+            'email_address': email_address,
+            'permissions': ["manage_users"],
+            'status': "pending",
+            'created_at': datetime.utcnow(),
+            'auth_type': 'sms_auth',
+            'folder_permissions': [],
+        }
+
     page = client_request.get('main.register_from_invite')
     assert page.select_one('input[name=name]')['value'] == expected_value
 
@@ -219,13 +223,19 @@ def test_register_from_invite(
     mock_send_verify_code,
     mock_accept_invite,
 ):
-    invited_user = InvitedUser(fake_uuid, fake_uuid, "",
-                               "invited@user.com",
-                               ["manage_users"],
-                               "pending",
-                               datetime.utcnow(),
-                               'sms_auth',
-                               [])
+    invited_user = InvitedUser(
+        {
+            'id': fake_uuid,
+            'service': fake_uuid,
+            'from_user': "",
+            'email_address': "invited@user.com",
+            'permissions': ["manage_users"],
+            'status': "pending",
+            'created_at': datetime.utcnow(),
+            'auth_type': 'sms_auth',
+            'folder_permissions': [],
+        }
+    )
     with client.session_transaction() as session:
         session['invited_user'] = invited_user.serialize()
     response = client.post(
@@ -256,13 +266,19 @@ def test_register_from_invite_when_user_registers_in_another_browser(
     mock_get_user_by_email,
     mock_accept_invite,
 ):
-    invited_user = InvitedUser(api_user_active['id'], api_user_active['id'], "",
-                               api_user_active['email_address'],
-                               ["manage_users"],
-                               "pending",
-                               datetime.utcnow(),
-                               'sms_auth',
-                               [])
+    invited_user = InvitedUser(
+        {
+            'id': api_user_active['id'],
+            'service': api_user_active['id'],
+            'from_user': "",
+            'email_address': api_user_active['email_address'],
+            'permissions': ["manage_users"],
+            'status': "pending",
+            'created_at': datetime.utcnow(),
+            'auth_type': 'sms_auth',
+            'folder_permissions': [],
+        }
+    )
     with client.session_transaction() as session:
         session['invited_user'] = invited_user.serialize()
     response = client.post(

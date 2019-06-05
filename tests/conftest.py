@@ -1088,7 +1088,8 @@ def api_user_pending(fake_uuid):
                  'state': 'pending',
                  'failed_login_count': 0,
                  'permissions': {},
-                 'organisations': []
+                 'organisations': [],
+                 'current_session_id': None,
                  }
     return user_data
 
@@ -1112,7 +1113,8 @@ def platform_admin_user(fake_uuid):
                                                   'view_activity']},
                  'platform_admin': True,
                  'auth_type': 'sms_auth',
-                 'organisations': []
+                 'organisations': [],
+                 'current_session_id': None,
                  }
     return user_data
 
@@ -1130,7 +1132,8 @@ def api_user_active(fake_uuid, email_address='test@user.gov.uk'):
                  'platform_admin': False,
                  'auth_type': 'sms_auth',
                  'password_changed_at': str(datetime.utcnow()),
-                 'organisations': []
+                 'organisations': [],
+                 'current_session_id': None,
                  }
     return user_data
 
@@ -1148,7 +1151,8 @@ def api_user_active_email_auth(fake_uuid, email_address='test@user.gov.uk'):
                  'platform_admin': False,
                  'auth_type': 'email_auth',
                  'password_changed_at': str(datetime.utcnow()),
-                 'organisations': []
+                 'organisations': [],
+                 'current_session_id': None,
                  }
     return user_data
 
@@ -1176,7 +1180,8 @@ def api_nongov_user_active(fake_uuid):
         'platform_admin': False,
         'auth_type': 'sms_auth',
         'password_changed_at': str(datetime.utcnow()),
-        'organisations': []
+        'organisations': [],
+        'current_session_id': None,
     }
     return user_data
 
@@ -1202,7 +1207,8 @@ def active_user_with_permissions(fake_uuid):
                  'platform_admin': False,
                  'auth_type': 'sms_auth',
                  'organisations': [ORGANISATION_ID],
-                 'services': [SERVICE_ONE_ID]
+                 'services': [SERVICE_ONE_ID],
+                 'current_session_id': None,
                  }
     return user_data
 
@@ -1238,6 +1244,7 @@ def active_user_with_permission_to_two_services(fake_uuid):
         'auth_type': 'sms_auth',
         'organisations': [ORGANISATION_ID],
         'services': [SERVICE_ONE_ID, SERVICE_TWO_ID],
+        'current_session_id': None,
     }
 
 
@@ -1261,7 +1268,8 @@ def active_caseworking_user(fake_uuid):
         'platform_admin': False,
         'auth_type': 'sms_auth',
         'organisations': [],
-        'services': [SERVICE_ONE_ID]
+        'services': [SERVICE_ONE_ID],
+        'current_session_id': None,
     }
     return user_data
 
@@ -1287,7 +1295,8 @@ def active_user_no_mobile(fake_uuid):
                  'platform_admin': False,
                  'auth_type': 'email_auth',
                  'organisations': [],
-                 'services': [SERVICE_ONE_ID]
+                 'services': [SERVICE_ONE_ID],
+                 'current_session_id': None,
                  }
     return user_data
 
@@ -1306,7 +1315,8 @@ def active_user_view_permissions(fake_uuid):
                  'platform_admin': False,
                  'auth_type': 'sms_auth',
                  'organisations': [],
-                 'services': [SERVICE_ONE_ID]
+                 'services': [SERVICE_ONE_ID],
+                 'current_session_id': None,
                  }
     return user_data
 
@@ -1325,7 +1335,8 @@ def active_user_empty_permissions(fake_uuid):
                  'platform_admin': False,
                  'auth_type': 'sms_auth',
                  'organisations': [],
-                 'services': [SERVICE_ONE_ID]
+                 'services': [SERVICE_ONE_ID],
+                 'current_session_id': None,
                  }
     return user_data
 
@@ -1348,7 +1359,8 @@ def active_user_manage_template_permission(fake_uuid):
         'platform_admin': False,
         'auth_type': 'sms_auth',
         'organisations': [],
-        'services': [SERVICE_ONE_ID]
+        'services': [SERVICE_ONE_ID],
+        'current_session_id': None,
     }
 
 
@@ -1370,7 +1382,8 @@ def active_user_no_api_key_permission(fake_uuid):
         ]},
         'platform_admin': False,
         'auth_type': 'sms_auth',
-        'organisations': []
+        'organisations': [],
+        'current_session_id': None,
     }
 
 
@@ -1391,7 +1404,8 @@ def active_user_no_settings_permission(fake_uuid):
             'view_activity',
         ]},
         'platform_admin': False,
-        'auth_type': 'sms_auth'
+        'auth_type': 'sms_auth',
+        'current_session_id': None,
     }
 
 
@@ -1406,7 +1420,8 @@ def api_user_locked(fake_uuid):
                  'failed_login_count': 5,
                  'permissions': {},
                  'auth_type': 'sms_auth',
-                 'organisations': []
+                 'organisations': [],
+                 'current_session_id': None,
                  }
     return user_data
 
@@ -1423,7 +1438,8 @@ def api_user_request_password_reset(fake_uuid):
                  'permissions': {},
                  'password_changed_at': None,
                  'auth_type': 'sms_auth',
-                 'organisations': []
+                 'organisations': [],
+                 'current_session_id': None,
                  }
     return user_data
 
@@ -1440,7 +1456,8 @@ def api_user_changed_password(fake_uuid):
                  'permissions': {},
                  'auth_type': 'sms_auth',
                  'password_changed_at': str(datetime.utcnow() + timedelta(minutes=1)),
-                 'organisations': []
+                 'organisations': [],
+                 'current_session_id': None,
                  }
     return user_data
 

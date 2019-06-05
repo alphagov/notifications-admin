@@ -231,7 +231,7 @@ def test_registration_from_org_invite_has_bad_data(
     data,
     error
 ):
-    invited_org_user = InvitedOrgUser(**sample_org_invite)
+    invited_org_user = InvitedOrgUser(sample_org_invite)
     with client.session_transaction() as session:
         session['invited_org_user'] = invited_org_user.serialize()
 
@@ -251,7 +251,7 @@ def test_registration_from_org_invite_has_different_email_or_organisation(
     sample_org_invite,
     diff_data
 ):
-    invited_org_user = InvitedOrgUser(**sample_org_invite)
+    invited_org_user = InvitedOrgUser(sample_org_invite)
     with client.session_transaction() as session:
         session['invited_org_user'] = invited_org_user.serialize()
 
@@ -278,7 +278,7 @@ def test_org_user_registers_with_email_already_in_use(
     mock_send_already_registered_email,
     mock_register_user
 ):
-    invited_org_user = InvitedOrgUser(**sample_org_invite)
+    invited_org_user = InvitedOrgUser(sample_org_invite)
     with client.session_transaction() as session:
         session['invited_org_user'] = invited_org_user.serialize()
 
@@ -311,7 +311,7 @@ def test_org_user_registration(
     mock_accept_org_invite,
     mock_add_user_to_organisation,
 ):
-    invited_org_user = InvitedOrgUser(**sample_org_invite)
+    invited_org_user = InvitedOrgUser(sample_org_invite)
     with client.session_transaction() as session:
         session['invited_org_user'] = invited_org_user.serialize()
 
@@ -349,7 +349,7 @@ def test_verified_org_user_redirects_to_dashboard(
     mock_activate_user,
     mock_login,
 ):
-    invited_org_user = InvitedOrgUser(**sample_org_invite).serialize()
+    invited_org_user = InvitedOrgUser(sample_org_invite).serialize()
     with client.session_transaction() as session:
         session['expiry_date'] = str(datetime.utcnow() + timedelta(hours=1))
         session['user_details'] = {"email": invited_org_user['email_address'], "id": invited_org_user['id']}

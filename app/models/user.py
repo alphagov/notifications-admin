@@ -315,34 +315,24 @@ class User(JSONModel, UserMixin):
         session['current_session_id'] = self.current_session_id
 
 
-class InvitedUser(object):
+class InvitedUser(JSONModel):
 
-    def __init__(self,
-                 id,
-                 service,
-                 from_user,
-                 email_address,
-                 permissions,
-                 status,
-                 created_at,
-                 auth_type,
-                 folder_permissions):
-        self.id = id
-        self.service = str(service)
-        self._from_user = from_user
-        self.email_address = email_address
-        if isinstance(permissions, list):
-            self.permissions = permissions
-        else:
-            if permissions:
-                self.permissions = permissions.split(',')
-            else:
-                self.permissions = []
-        self.status = status
-        self.created_at = created_at
-        self.auth_type = auth_type
-        self.permissions = translate_permissions_from_db_to_admin_roles(self.permissions)
-        self.folder_permissions = folder_permissions
+    ALLOWED_PROPERTIES = {
+        'id',
+        'service',
+        'from_user',
+        'email_address',
+        'permissions',
+        'status',
+        'created_at',
+        'auth_type',
+        'folder_permissions',
+    }
+
+    def __init__(self, _dict):
+        super().__init__(_dict)
+        self.permissions = _dict.get('permissions') or []
+        self._from_user = _dict['from_user']
 
     @classmethod
     def create(
@@ -354,7 +344,7 @@ class InvitedUser(object):
         auth_type,
         folder_permissions,
     ):
-        return cls(**invite_api_client.create_invite(
+        return cls(invite_api_client.create_invite(
             invite_from_id,
             service_id,
             email_address,
@@ -375,6 +365,18 @@ class InvitedUser(object):
         )
 
     @property
+    def permissions(self):
+        return self._permissions
+
+    @permissions.setter
+    def permissions(self, permissions):
+        if isinstance(permissions, list):
+            self._permissions = permissions
+        else:
+            self._permissions = permissions.split(',')
+        self._permissions = translate_permissions_from_db_to_admin_roles(self.permissions)
+
+    @property
     def from_user(self):
         return User.from_id(self._from_user)
 
@@ -389,7 +391,7 @@ class InvitedUser(object):
     @classmethod
     def from_token(cls, token):
         try:
-            return cls(**invite_api_client.check_token(token))
+            return cls(invite_api_client.check_token(token))
         except HTTPError as exception:
             if exception.status_code == 400 and 'invitation' in exception.message:
                 raise InviteTokenError(exception.message['invitation'])
@@ -399,7 +401,7 @@ class InvitedUser(object):
     @classmethod
     def from_session(cls):
         invited_user = session.get('invited_user')
-        return cls(**invited_user) if invited_user else None
+        return cls(invited_user) if invited_user else None
 
     def has_permissions(self, *permissions):
         if self.status == 'cancelled':
@@ -445,15 +447,19 @@ class InvitedUser(object):
         return [{'id': x} for x in self.folder_permissions]
 
 
-class InvitedOrgUser(object):
+class InvitedOrgUser(JSONModel):
 
-    def __init__(self, id, organisation, invited_by, email_address, status, created_at):
-        self.id = id
-        self.organisation = str(organisation)
-        self._invited_by = invited_by
-        self.email_address = email_address
-        self.status = status
-        self.created_at = created_at
+    ALLOWED_PROPERTIES = {
+        'id',
+        'organisation',
+        'email_address',
+        'status',
+        'created_at',
+    }
+
+    def __init__(self, _dict):
+        super().__init__(_dict)
+        self._invited_by = _dict['invited_by']
 
     def __eq__(self, other):
         return ((self.id,
@@ -468,14 +474,14 @@ class InvitedOrgUser(object):
 
     @classmethod
     def create(cls, invite_from_id, org_id, email_address):
-        return cls(**org_invite_api_client.create_invite(
+        return cls(org_invite_api_client.create_invite(
             invite_from_id, org_id, email_address
         ))
 
     @classmethod
     def from_session(cls):
         invited_org_user = session.get('invited_org_user')
-        return cls(**invited_org_user) if invited_org_user else None
+        return cls(invited_org_user) if invited_org_user else None
 
     def serialize(self, permissions_as_string=False):
         data = {'id': self.id,
@@ -494,7 +500,7 @@ class InvitedOrgUser(object):
     @classmethod
     def from_token(cls, token):
         try:
-            return cls(**org_invite_api_client.check_token(token))
+            return cls(org_invite_api_client.check_token(token))
         except HTTPError as exception:
             if exception.status_code == 400 and 'invitation' in exception.message:
                 raise InviteTokenError(exception.message['invitation'])
@@ -552,7 +558,7 @@ class InvitedUsers(Users):
         ]
 
     def __getitem__(self, index):
-        return self.model(**self.users[index])
+        return self.model(self.users[index])
 
 
 class OrganisationInvitedUsers(InvitedUsers):
