@@ -528,12 +528,13 @@ class AnonymousUser(AnonymousUserMixin):
 class Users(Sequence):
 
     client = user_api_client.get_users_for_service
+    model = User
 
     def __init__(self, service_id):
         self.users = self.client(service_id)
 
     def __getitem__(self, index):
-        return User(self.users[index])
+        return self.model(self.users[index])
 
     def __len__(self):
         return len(self.users)
@@ -556,9 +557,6 @@ class InvitedUsers(Users):
             user for user in self.client(service_id)
             if user['status'] != 'accepted'
         ]
-
-    def __getitem__(self, index):
-        return self.model(self.users[index])
 
 
 class OrganisationInvitedUsers(InvitedUsers):
