@@ -4,6 +4,7 @@ from flask import url_for
 from lxml import html
 
 from tests import user_json
+from tests.conftest import normalize_spaces
 
 
 def test_find_users_by_email_page_loads_correctly(client_request, platform_admin_user):
@@ -149,13 +150,46 @@ def test_user_information_page_displays_if_there_are_failed_login_attempts(
     assert document.xpath("//p/text()[normalize-space()='2 failed login attempts']")
 
 
+def test_user_information_page_shows_archive_link_for_active_users(
+    logged_in_platform_admin_client,
+    api_user_active,
+    mock_get_organisations_and_services_for_user,
+):
+    response = logged_in_platform_admin_client.get(
+        url_for('main.user_information', user_id=api_user_active['id'])
+    )
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    archive_url = url_for('main.archive_user', user_id=api_user_active['id'])
+
+    link = page.find('a', {'href': archive_url})
+    assert normalize_spaces(link.text) == 'Archive user'
+
+
+def test_user_information_page_does_not_show_archive_link_for_inactive_users(
+    mocker,
+    client,
+    platform_admin_user,
+    mock_get_organisations_and_services_for_user,
+):
+    inactive_user = user_json(state='inactive')
+    mocker.patch('app.user_api_client.get_user', side_effect=[platform_admin_user, inactive_user], autospec=True)
+    client.login(platform_admin_user)
+    response = client.get(
+        url_for('main.user_information', user_id=inactive_user['id'])
+    )
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    archive_url = url_for('main.archive_user', user_id=inactive_user['id'])
+    assert not page.find('a', {'href': archive_url})
+
+
 def test_archive_user_prompts_for_confirmation(
     logged_in_platform_admin_client,
     api_user_active,
     mock_get_organisations_and_services_for_user,
 ):
     response = logged_in_platform_admin_client.get(
-        url_for('main.archive_user', user_id=api_user_active.id)
+        url_for('main.archive_user', user_id=api_user_active['id'])
     )
 
     assert response.status_code == 200
@@ -172,12 +206,12 @@ def test_archive_user_posts_to_user_client(
     mock_user_client = mocker.patch('app.user_api_client.post')
 
     response = logged_in_platform_admin_client.post(
-        url_for('main.archive_user', user_id=api_user_active.id)
+        url_for('main.archive_user', user_id=api_user_active['id'])
     )
 
     assert response.status_code == 302
-    assert response.location == url_for('main.user_information', user_id=api_user_active.id, _external=True)
-    mock_user_client.assert_called_once_with('/user/{}/archive'.format(api_user_active.id), data=None)
+    assert response.location == url_for('main.user_information', user_id=api_user_active['id'], _external=True)
+    mock_user_client.assert_called_once_with('/user/{}/archive'.format(api_user_active['id']), data=None)
 
     assert mock_events.called
 
@@ -196,6 +230,6 @@ def test_archive_user_does_not_create_event_if_user_client_raises_exception(
         )
 
         assert response.status_code == 500
-        assert response.location == url_for('main.user_information', user_id=api_user_active.id, _external=True)
-        mock_user_client.assert_called_once_with('/user/{}/archive'.format(api_user_active.id), data=None)
+        assert response.location == url_for('main.user_information', user_id=api_user_active['id'], _external=True)
+        mock_user_client.assert_called_once_with('/user/{}/archive'.format(api_user_active['id']), data=None)
         assert not mock_events.called
