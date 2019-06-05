@@ -1087,6 +1087,7 @@ def api_user_pending(fake_uuid):
                  'mobile_number': '07700 900762',
                  'state': 'pending',
                  'failed_login_count': 0,
+                 'platform_admin': False,
                  'permissions': {},
                  'organisations': [],
                  'current_session_id': None,
@@ -1113,6 +1114,7 @@ def platform_admin_user(fake_uuid):
                                                   'view_activity']},
                  'platform_admin': True,
                  'auth_type': 'sms_auth',
+                 'services': [],
                  'organisations': [],
                  'current_session_id': None,
                  }
@@ -1132,6 +1134,7 @@ def api_user_active(fake_uuid, email_address='test@user.gov.uk'):
                  'platform_admin': False,
                  'auth_type': 'sms_auth',
                  'password_changed_at': str(datetime.utcnow()),
+                 'services': [],
                  'organisations': [],
                  'current_session_id': None,
                  }
@@ -1151,6 +1154,7 @@ def api_user_active_email_auth(fake_uuid, email_address='test@user.gov.uk'):
                  'platform_admin': False,
                  'auth_type': 'email_auth',
                  'password_changed_at': str(datetime.utcnow()),
+                 'services': [],
                  'organisations': [],
                  'current_session_id': None,
                  }
@@ -1180,6 +1184,7 @@ def api_nongov_user_active(fake_uuid):
         'platform_admin': False,
         'auth_type': 'sms_auth',
         'password_changed_at': str(datetime.utcnow()),
+        'services': [],
         'organisations': [],
         'current_session_id': None,
     }

@@ -33,24 +33,17 @@ class User(JSONModel, UserMixin):
         'id',
         'name',
         'email_address',
-        'mobile_number',
-        'password_changed_at',
         'auth_type',
-        'failed_login_count',
-        'state',
-        'logged_in_at',
-        'platform_admin',
         'current_session_id',
-        'services',
+        'failed_login_count',
+        'logged_in_at',
+        'mobile_number',
         'organisations',
-    }
-
-    DEFAULTS = {
-        'current_session_id': None,
-        'services': [],
-        'organisations': [],
-        'logged_in_at': None,
-        'platform_admin': False,
+        'password_changed_at',
+        'permissions',
+        'platform_admin',
+        'services',
+        'state',
     }
 
     def __init__(self, _dict):
@@ -320,7 +313,6 @@ class InvitedUser(JSONModel):
     ALLOWED_PROPERTIES = {
         'id',
         'service',
-        'from_user',
         'email_address',
         'permissions',
         'status',

@@ -238,7 +238,8 @@ def _user_with_permissions():
                  'permissions': {'foo': ['manage_users', 'manage_templates', 'manage_settings']},
                  'platform_admin': False,
                  'organisations': ['org_1', 'org_2'],
-                 'services': ['foo', 'bar']
+                 'services': ['foo', 'bar'],
+                 'current_session_id': None,
                  }
     return user_data
 

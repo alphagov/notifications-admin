@@ -162,8 +162,8 @@ def test_should_show_caseworker_on_overview_page(
     service_one,
 ):
     service_one['permissions'].append('caseworking')
-    current_user = active_user_view_permissions(active_user_view_permissions)
-    other_user = active_caseworking_user(fake_uuid)
+    current_user = active_user_view_permissions(fake_uuid)
+    other_user = active_caseworking_user(uuid.uuid4())
     other_user['email_address'] = 'zzzzzzz@example.gov.uk'
 
     mocker.patch('app.user_api_client.get_user', return_value=current_user)
@@ -312,10 +312,11 @@ def test_user_with_no_mobile_number_cant_be_set_to_sms_auth(
     sms_option_disabled,
     expected_label,
     service_one,
-    mocker
+    mocker,
+    fake_uuid,
 ):
     service_one['permissions'].append('email_auth')
-    mocker.patch('app.user_api_client.get_user', return_value=user(mocker))
+    mocker.patch('app.user_api_client.get_user', return_value=user(fake_uuid))
 
     page = client_request.get(
         'main.edit_user_permissions',
