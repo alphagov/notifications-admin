@@ -99,7 +99,7 @@
                 currency="£",
                 smallest=True
               ) }}
-          <ul>
+              <ul>
               {% if month.free %}
                 <li class="tabular-numbers">{{ "{:,}".format(month.free) }} free {{ message_count_label(month.free, 'sms', '') }}</li>
               {% endif %}
@@ -107,18 +107,16 @@
                 <li class="tabular-numbers">{{ "{:,}".format(month.paid) }} {{ message_count_label(month.paid, 'sms', '') }}at
                 {{- ' {:.2f}p'.format(sms_rate * 100) }}</li>
               {% endif %}
-              {% if not (month.free or month.paid) %}
-                <li aria-hidden="true">–</li>
-              {% endif %}
-              </ul>
-             <ul>
               {% for letter in month.letters%}
                 {% if letter[0] %}
                   <li class="tabular-numbers">{{ "{:,} {}".format(letter[0], letter[3])}} class {{ message_count_label(letter[0], 'letter', '') }}at
                   {{ '{:.0f}p'.format(letter[1] * 100) }}</li>
                 {% endif %}
               {% endfor %}
-            </ul>
+              {% if not (month.free or month.paid or month.letters) %}
+                <li aria-hidden="true">–</li>
+              {% endif %}
+              </ul>
             {% endcall %}
           {% endcall %}
         </div>
