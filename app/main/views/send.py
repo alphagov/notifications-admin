@@ -800,7 +800,20 @@ def get_back_link(service_id, template, step_index):
                 help=get_help_argument()
             )
         else:
-            return None
+            if step_index == 0:
+                return url_for(
+                    'main.start_tour',
+                    service_id=service_id,
+                    template_id=template.id,
+                )
+            elif step_index > 0:
+                return url_for(
+                    'main.send_test_step',
+                    service_id=service_id,
+                    template_id=template.id,
+                    step_index=step_index - 1,
+                    help=2,
+                )
     elif step_index == 0:
         if should_skip_template_page(template.template_type):
             return url_for(
