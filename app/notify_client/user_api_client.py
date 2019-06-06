@@ -2,9 +2,7 @@ from itertools import chain
 
 from notifications_python_client.errors import HTTPError
 
-from app.models.user import (
-    User,
-    roles,
+from app.models.roles_and_permissions import (
     translate_permissions_from_admin_roles_to_db,
 )
 from app.notify_client import NotifyAdminAPIClient, cache
@@ -22,8 +20,6 @@ class UserApiClient(NotifyAdminAPIClient):
 
     def init_app(self, app):
         super().init_app(app)
-
-        self.max_failed_login_count = app.config["MAX_FAILED_LOGIN_COUNT"]
         self.admin_url = app.config['ADMIN_BASE_URL']
 
     def register_user(self, name, email_address, mobile_number, password, auth_type):
@@ -35,10 +31,10 @@ class UserApiClient(NotifyAdminAPIClient):
             "auth_type": auth_type
         }
         user_data = self.post("/user", data)
-        return User(user_data['data'], max_failed_login_count=self.max_failed_login_count)
+        return user_data['data']
 
     def get_user(self, user_id):
-        return User(self._get_user(user_id)['data'], max_failed_login_count=self.max_failed_login_count)
+        return self._get_user(user_id)['data']
 
     @cache.set('user-{user_id}')
     def _get_user(self, user_id):
@@ -46,7 +42,7 @@ class UserApiClient(NotifyAdminAPIClient):
 
     def get_user_by_email(self, email_address):
         user_data = self.get('/user/email', params={'email': email_address})
-        return User(user_data['data'], max_failed_login_count=self.max_failed_login_count)
+        return user_data['data']
 
     def get_user_by_email_or_none(self, email_address):
         try:
@@ -54,13 +50,7 @@ class UserApiClient(NotifyAdminAPIClient):
         except HTTPError as e:
             if e.status_code == 404:
                 return None
-
-    def get_users(self):
-        users_data = self.get("/user")['data']
-        users = []
-        for user in users_data:
-            users.append(User(user, max_failed_login_count=self.max_failed_login_count))
-        return users
+            raise e
 
     @cache.delete('user-{user_id}')
     def update_user_attribute(self, user_id, **kwargs):
@@ -73,20 +63,20 @@ class UserApiClient(NotifyAdminAPIClient):
 
         url = "/user/{}".format(user_id)
         user_data = self.post(url, data=data)
-        return User(user_data['data'], max_failed_login_count=self.max_failed_login_count)
+        return user_data['data']
 
     @cache.delete('user-{user_id}')
     def reset_failed_login_count(self, user_id):
         url = "/user/{}/reset-failed-login-count".format(user_id)
         user_data = self.post(url, data={})
-        return User(user_data['data'], max_failed_login_count=self.max_failed_login_count)
+        return user_data['data']
 
     @cache.delete('user-{user_id}')
     def update_password(self, user_id, password):
         data = {"_password": password}
         url = "/user/{}/update-password".format(user_id)
         user_data = self.post(url, data=data)
-        return User(user_data['data'], max_failed_login_count=self.max_failed_login_count)
+        return user_data['data']
 
     @cache.delete('user-{user_id}')
     def verify_password(self, user_id, password):
@@ -132,21 +122,11 @@ class UserApiClient(NotifyAdminAPIClient):
 
     def get_users_for_service(self, service_id):
         endpoint = '/service/{}/users'.format(service_id)
-        resp = self.get(endpoint)
-        return [User(data) for data in resp['data']]
-
-    def get_count_of_users_with_permission(self, service_id, permission):
-        if permission not in roles.keys():
-            raise TypeError('{} is not a valid permission'.format(permission))
-        return len([
-            user for user in self.get_users_for_service(service_id)
-            if user.has_permission_for_service(service_id, permission)
-        ])
+        return self.get(endpoint)['data']
 
     def get_users_for_organisation(self, org_id):
         endpoint = '/organisations/{}/users'.format(org_id)
-        resp = self.get(endpoint)
-        return [User(data) for data in resp['data']]
+        return self.get(endpoint)['data']
 
     @cache.delete('service-{service_id}')
     @cache.delete('service-{service_id}-template-folders')
@@ -164,7 +144,7 @@ class UserApiClient(NotifyAdminAPIClient):
     @cache.delete('user-{user_id}')
     def add_user_to_organisation(self, org_id, user_id):
         resp = self.post('/organisations/{}/users/{}'.format(org_id, user_id), data={})
-        return User(resp['data'], max_failed_login_count=self.max_failed_login_count)
+        return resp['data']
 
     @cache.delete('service-{service_id}-template-folders')
     @cache.delete('user-{user_id}')
@@ -191,20 +171,8 @@ class UserApiClient(NotifyAdminAPIClient):
         users = self.post(endpoint, data=data)
         return users
 
-    def is_email_already_in_use(self, email_address):
-        if self.get_user_by_email_or_none(email_address):
-            return True
-        return False
-
-    def activate_user(self, user):
-        if user.state == 'pending':
-            user_data = self._activate_user(user.id)
-            return User(user_data['data'], max_failed_login_count=self.max_failed_login_count)
-        else:
-            return user
-
     @cache.delete('user-{user_id}')
-    def _activate_user(self, user_id):
+    def activate_user(self, user_id):
         return self.post("/user/{}/activate".format(user_id), data=None)
 
     def send_change_email_verification(self, user_id, new_email):

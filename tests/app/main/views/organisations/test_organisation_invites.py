@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from unittest.mock import ANY
+from uuid import UUID
 
 import pytest
 from bs4 import BeautifulSoup
@@ -28,7 +29,7 @@ def test_view_team_members(
         ) == 'Test User {}'.format(i + 1)
 
     assert normalize_spaces(
-        page.select('.tick-cross-list-edit-link')[1].text
+        page.select('.tick-cross-list-edit-link')[0].text
     ) == 'Cancel invitation'
 
 
@@ -41,7 +42,7 @@ def test_invite_org_user(
 
     mock_invite_org_user = mocker.patch(
         'app.org_invite_api_client.create_invite',
-        return_value=InvitedOrgUser(**sample_org_invite)
+        return_value=sample_org_invite,
     )
 
     client_request.post(
@@ -69,7 +70,7 @@ def test_invite_org_user_errors_when_same_email_as_inviter(
 
     mock_invite_org_user = mocker.patch(
         'app.org_invite_api_client.create_invite',
-        return_value=InvitedOrgUser(**sample_org_invite)
+        return_value=sample_org_invite,
     )
 
     page = client_request.post(
@@ -141,6 +142,7 @@ def test_user_invite_already_accepted(
 def test_existing_user_invite_already_is_member_of_organisation(
     client,
     mock_check_org_invite_token,
+    mock_get_user,
     mock_get_user_by_email,
     mock_get_users_for_organisation,
     mock_accept_org_invite,
@@ -155,6 +157,7 @@ def test_existing_user_invite_already_is_member_of_organisation(
         _external=True
     )
 
+    mock_check_org_invite_token.assert_called_once_with('thisisnotarealtoken')
     mock_accept_org_invite.assert_called_once_with(ORGANISATION_ID, ANY)
     mock_get_user_by_email.assert_called_once_with('invited_user@test.gov.uk')
     mock_get_users_for_organisation.assert_called_once_with(ORGANISATION_ID)
@@ -177,12 +180,13 @@ def test_existing_user_invite_not_a_member_of_organisation(
         _external=True
     )
 
+    mock_check_org_invite_token.assert_called_once_with('thisisnotarealtoken')
     mock_accept_org_invite.assert_called_once_with(ORGANISATION_ID, ANY)
     mock_get_user_by_email.assert_called_once_with('invited_user@test.gov.uk')
     mock_get_users_for_organisation.assert_called_once_with(ORGANISATION_ID)
     mock_add_user_to_organisation.assert_called_once_with(
         ORGANISATION_ID,
-        '6ce466d0-fd6a-11e5-82f5-e0accb9d11a6'
+        str(UUID(bytes=b'sample_org_invit', version=4))
     )
 
 
@@ -227,7 +231,7 @@ def test_registration_from_org_invite_has_bad_data(
     data,
     error
 ):
-    invited_org_user = InvitedOrgUser(**sample_org_invite)
+    invited_org_user = InvitedOrgUser(sample_org_invite)
     with client.session_transaction() as session:
         session['invited_org_user'] = invited_org_user.serialize()
 
@@ -247,7 +251,7 @@ def test_registration_from_org_invite_has_different_email_or_organisation(
     sample_org_invite,
     diff_data
 ):
-    invited_org_user = InvitedOrgUser(**sample_org_invite)
+    invited_org_user = InvitedOrgUser(sample_org_invite)
     with client.session_transaction() as session:
         session['invited_org_user'] = invited_org_user.serialize()
 
@@ -268,14 +272,13 @@ def test_registration_from_org_invite_has_different_email_or_organisation(
 def test_org_user_registers_with_email_already_in_use(
     client,
     sample_org_invite,
-    mock_email_is_already_in_use,
     mock_get_user_by_email,
     mock_accept_org_invite,
     mock_add_user_to_organisation,
     mock_send_already_registered_email,
     mock_register_user
 ):
-    invited_org_user = InvitedOrgUser(**sample_org_invite)
+    invited_org_user = InvitedOrgUser(sample_org_invite)
     with client.session_transaction() as session:
         session['invited_org_user'] = invited_org_user.serialize()
 
@@ -308,7 +311,7 @@ def test_org_user_registration(
     mock_accept_org_invite,
     mock_add_user_to_organisation,
 ):
-    invited_org_user = InvitedOrgUser(**sample_org_invite)
+    invited_org_user = InvitedOrgUser(sample_org_invite)
     with client.session_transaction() as session:
         session['invited_org_user'] = invited_org_user.serialize()
 
@@ -346,7 +349,7 @@ def test_verified_org_user_redirects_to_dashboard(
     mock_activate_user,
     mock_login,
 ):
-    invited_org_user = InvitedOrgUser(**sample_org_invite).serialize()
+    invited_org_user = InvitedOrgUser(sample_org_invite).serialize()
     with client.session_transaction() as session:
         session['expiry_date'] = str(datetime.utcnow() + timedelta(hours=1))
         session['user_details'] = {"email": invited_org_user['email_address'], "id": invited_org_user['id']}

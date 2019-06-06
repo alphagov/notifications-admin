@@ -1,37 +1,22 @@
-from itertools import chain
+from collections.abc import Sequence
 
-from flask import abort, request, session
-from flask_login import AnonymousUserMixin, UserMixin
+from flask import abort, current_app, request, session
+from flask_login import AnonymousUserMixin, UserMixin, login_user
+from notifications_python_client.errors import HTTPError
 from werkzeug.utils import cached_property
 
+from app.models import JSONModel
 from app.models.organisation import Organisation
-from app.notify_client.organisations_api_client import organisations_client
-from app.utils import is_gov_user
-
-roles = {
-    'send_messages': ['send_texts', 'send_emails', 'send_letters'],
-    'manage_templates': ['manage_templates'],
-    'manage_service': ['manage_users', 'manage_settings'],
-    'manage_api_keys': ['manage_api_keys'],
-    'view_activity': ['view_activity'],
-}
-
-# same dict as above, but flipped round
-roles_by_permission = {
-    permission: next(
-        role for role, permissions in roles.items() if permission in permissions
-    ) for permission in chain(*list(roles.values()))
-}
-
-all_permissions = set(roles_by_permission.values())
-
-permissions = (
-    ('view_activity', 'See dashboard'),
-    ('send_messages', 'Send messages'),
-    ('manage_templates', 'Add and edit templates'),
-    ('manage_service', 'Manage settings, team and usage'),
-    ('manage_api_keys', 'Manage API integration'),
+from app.models.roles_and_permissions import (
+    all_permissions,
+    translate_permissions_from_db_to_admin_roles,
 )
+from app.notify_client import InviteTokenError
+from app.notify_client.invite_api_client import invite_api_client
+from app.notify_client.org_invite_api_client import org_invite_api_client
+from app.notify_client.organisations_api_client import organisations_client
+from app.notify_client.user_api_client import user_api_client
+from app.utils import is_gov_user
 
 
 def _get_service_id_from_view_args():
@@ -42,43 +27,66 @@ def _get_org_id_from_view_args():
     return str(request.view_args.get('org_id', '')) or None
 
 
-def translate_permissions_from_db_to_admin_roles(permissions):
-    """
-    Given a list of database permissions, return a set of roles
+class User(JSONModel, UserMixin):
 
-    look them up in roles_by_permission, falling back to just passing through from the api if they aren't in the dict
-    """
-    return {roles_by_permission.get(permission, permission) for permission in permissions}
+    ALLOWED_PROPERTIES = {
+        'id',
+        'name',
+        'email_address',
+        'auth_type',
+        'current_session_id',
+        'failed_login_count',
+        'logged_in_at',
+        'mobile_number',
+        'organisations',
+        'password_changed_at',
+        'permissions',
+        'platform_admin',
+        'services',
+        'state',
+    }
 
+    def __init__(self, _dict):
+        super().__init__(_dict)
+        self.permissions = _dict.get('permissions', {})
+        self.max_failed_login_count = current_app.config['MAX_FAILED_LOGIN_COUNT']
 
-def translate_permissions_from_admin_roles_to_db(permissions):
-    """
-    Given a list of admin roles (ie: checkboxes on a permissions edit page for example), return a set of db permissions
+    @classmethod
+    def from_id(cls, user_id):
+        return cls(user_api_client.get_user(user_id))
 
-    Looks them up in the roles dict, falling back to just passing through if they're not recognised.
-    """
-    return set(chain.from_iterable(roles.get(permission, [permission]) for permission in permissions))
+    @classmethod
+    def from_email_address(cls, email_address):
+        return cls(user_api_client.get_user_by_email(email_address))
 
+    @classmethod
+    def from_email_address_or_none(cls, email_address):
+        response = user_api_client.get_user_by_email_or_none(email_address)
+        if response:
+            return cls(response)
+        return None
 
-class User(UserMixin):
-    def __init__(self, fields, max_failed_login_count=3):
-        self.id = fields.get('id')
-        self.name = fields.get('name')
-        self.email_address = fields.get('email_address')
-        self.mobile_number = fields.get('mobile_number')
-        self.password_changed_at = fields.get('password_changed_at')
-        self._set_permissions(fields.get('permissions', {}))
-        self.auth_type = fields.get('auth_type')
-        self.failed_login_count = fields.get('failed_login_count')
-        self.state = fields.get('state')
-        self.max_failed_login_count = max_failed_login_count
-        self.logged_in_at = fields.get('logged_in_at')
-        self.platform_admin = fields.get('platform_admin')
-        self.current_session_id = fields.get('current_session_id')
-        self.services = fields.get('services', [])
-        self.organisations = fields.get('organisations', [])
+    @staticmethod
+    def already_registered(email_address):
+        return bool(User.from_email_address_or_none(email_address))
 
-    def _set_permissions(self, permissions_by_service):
+    @classmethod
+    def from_email_address_and_password_or_none(cls, email_address, password):
+        user = cls.from_email_address_or_none(email_address)
+        if not user:
+            return None
+        if user.locked:
+            return None
+        if not user_api_client.verify_password(user.id, password):
+            return None
+        return user
+
+    @property
+    def permissions(self):
+        return self._permissions
+
+    @permissions.setter
+    def permissions(self, permissions_by_service):
         """
         Permissions is a dict {'service_id': ['permission a', 'permission b', 'permission c']}
 
@@ -96,12 +104,60 @@ class User(UserMixin):
             in permissions_by_service.items()
         }
 
-    def get_id(self):
-        return self.id
+    def update(self, **kwargs):
+        response = user_api_client.update_user_attribute(self.id, **kwargs)
+        self.__init__(response)
+
+    def update_password(self, password):
+        response = user_api_client.update_password(self.id, password)
+        self.__init__(response)
+
+    def set_permissions(self, service_id, permissions, folder_permissions):
+        user_api_client.set_user_permissions(
+            self.id,
+            service_id,
+            permissions=permissions,
+            folder_permissions=folder_permissions,
+        )
 
     def logged_in_elsewhere(self):
         # if the current user (ie: db object) has no session, they've never logged in before
         return self.current_session_id is not None and session.get('current_session_id') != self.current_session_id
+
+    def activate(self):
+        if self.state == 'pending':
+            user_data = user_api_client.activate_user(self.id)
+            return self.__class__(user_data['data'])
+        else:
+            return self
+
+    def login(self):
+        login_user(self)
+
+    def sign_in(self):
+
+        session['user_details'] = {"email": self.email_address, "id": self.id}
+
+        if not self.is_active:
+            return False
+
+        if self.email_auth:
+            user_api_client.send_verify_code(self.id, 'email', None, request.args.get('next'))
+        if self.sms_auth:
+            user_api_client.send_verify_code(self.id, 'sms', self.mobile_number)
+
+        return True
+
+    @property
+    def sms_auth(self):
+        return self.auth_type == 'sms_auth'
+
+    @property
+    def email_auth(self):
+        return self.auth_type == 'email_auth'
+
+    def reset_failed_login_count(self):
+        user_api_client.reset_failed_login_count(self.id)
 
     @property
     def is_active(self):
@@ -117,14 +173,6 @@ class User(UserMixin):
             not self.logged_in_elsewhere() and
             super(User, self).is_authenticated
         )
-
-    @property
-    def permissions(self):
-        return self._permissions
-
-    @permissions.setter
-    def permissions(self, permissions):
-        raise AttributeError("Read only property")
 
     def has_permissions(self, *permissions, restrict_admin_usage=False):
         unknown_permissions = set(permissions) - all_permissions
@@ -181,7 +229,8 @@ class User(UserMixin):
         if not self.belongs_to_service(service_id):
             abort(403)
 
-    def is_locked(self):
+    @property
+    def locked(self):
         return self.failed_login_count >= self.max_failed_login_count
 
     @property
@@ -225,38 +274,126 @@ class User(UserMixin):
             dct['password'] = self._password
         return dct
 
+    @classmethod
+    def register(
+        cls,
+        name,
+        email_address,
+        mobile_number,
+        password,
+        auth_type,
+    ):
+        return cls(user_api_client.register_user(
+            name,
+            email_address,
+            mobile_number or None,
+            password,
+            auth_type,
+        ))
+
     def set_password(self, pwd):
         self._password = pwd
 
+    def send_verify_email(self):
+        user_api_client.send_verify_email(self.id, self.email_address)
 
-class InvitedUser(object):
+    def send_verify_code(self, to=None):
+        user_api_client.send_verify_code(self.id, 'sms', to or self.mobile_number)
 
-    def __init__(self,
-                 id,
-                 service,
-                 from_user,
-                 email_address,
-                 permissions,
-                 status,
-                 created_at,
-                 auth_type,
-                 folder_permissions):
-        self.id = id
-        self.service = str(service)
-        self.from_user = from_user
-        self.email_address = email_address
+    def send_already_registered_email(self):
+        user_api_client.send_already_registered_email(self.id, self.email_address)
+
+    def refresh_session_id(self):
+        self.current_session_id = user_api_client.get_user(self.id).get('current_session_id')
+        session['current_session_id'] = self.current_session_id
+
+
+class InvitedUser(JSONModel):
+
+    ALLOWED_PROPERTIES = {
+        'id',
+        'service',
+        'email_address',
+        'permissions',
+        'status',
+        'created_at',
+        'auth_type',
+        'folder_permissions',
+    }
+
+    def __init__(self, _dict):
+        super().__init__(_dict)
+        self.permissions = _dict.get('permissions') or []
+        self._from_user = _dict['from_user']
+
+    @classmethod
+    def create(
+        cls,
+        invite_from_id,
+        service_id,
+        email_address,
+        permissions,
+        auth_type,
+        folder_permissions,
+    ):
+        return cls(invite_api_client.create_invite(
+            invite_from_id,
+            service_id,
+            email_address,
+            permissions,
+            auth_type,
+            folder_permissions,
+        ))
+
+    def accept_invite(self):
+        invite_api_client.accept_invite(self.service, self.id)
+
+    def add_to_service(self):
+        user_api_client.add_user_to_service(
+            self.service,
+            self.id,
+            self.permissions,
+            self.folder_permissions,
+        )
+
+    @property
+    def permissions(self):
+        return self._permissions
+
+    @permissions.setter
+    def permissions(self, permissions):
         if isinstance(permissions, list):
-            self.permissions = permissions
+            self._permissions = permissions
         else:
-            if permissions:
-                self.permissions = permissions.split(',')
+            self._permissions = permissions.split(',')
+        self._permissions = translate_permissions_from_db_to_admin_roles(self.permissions)
+
+    @property
+    def from_user(self):
+        return User.from_id(self._from_user)
+
+    @property
+    def sms_auth(self):
+        return self.auth_type == 'sms_auth'
+
+    @property
+    def email_auth(self):
+        return self.auth_type == 'email_auth'
+
+    @classmethod
+    def from_token(cls, token):
+        try:
+            return cls(invite_api_client.check_token(token))
+        except HTTPError as exception:
+            if exception.status_code == 400 and 'invitation' in exception.message:
+                raise InviteTokenError(exception.message['invitation'])
             else:
-                self.permissions = []
-        self.status = status
-        self.created_at = created_at
-        self.auth_type = auth_type
-        self.permissions = translate_permissions_from_db_to_admin_roles(self.permissions)
-        self.folder_permissions = folder_permissions
+                raise exception
+
+    @classmethod
+    def from_session(cls):
+        invited_user = session.get('invited_user')
+        return cls(invited_user) if invited_user else None
 
     def has_permissions(self, *permissions):
         if self.status == 'cancelled':
@@ -271,12 +408,12 @@ class InvitedUser(object):
     def __eq__(self, other):
         return ((self.id,
                 self.service,
-                self.from_user,
+                self._from_user,
                 self.email_address,
                 self.auth_type,
                 self.status) == (other.id,
                 other.service,
-                other.from_user,
+                other._from_user,
                 other.email_address,
                 other.auth_type,
                 other.status))
@@ -284,7 +421,7 @@ class InvitedUser(object):
     def serialize(self, permissions_as_string=False):
         data = {'id': self.id,
                 'service': self.service,
-                'from_user': self.from_user,
+                'from_user': self._from_user,
                 'email_address': self.email_address,
                 'status': self.status,
                 'created_at': str(self.created_at),
@@ -302,43 +439,118 @@ class InvitedUser(object):
         return [{'id': x} for x in self.folder_permissions]
 
 
-class InvitedOrgUser(object):
+class InvitedOrgUser(JSONModel):
 
-    def __init__(self, id, organisation, invited_by, email_address, status, created_at):
-        self.id = id
-        self.organisation = str(organisation)
-        self.invited_by = invited_by
-        self.email_address = email_address
-        self.status = status
-        self.created_at = created_at
+    ALLOWED_PROPERTIES = {
+        'id',
+        'organisation',
+        'email_address',
+        'status',
+        'created_at',
+    }
+
+    def __init__(self, _dict):
+        super().__init__(_dict)
+        self._invited_by = _dict['invited_by']
 
     def __eq__(self, other):
         return ((self.id,
                 self.organisation,
-                self.invited_by,
+                self._invited_by,
                 self.email_address,
                 self.status) == (other.id,
                 other.organisation,
-                other.invited_by,
+                other._invited_by,
                 other.email_address,
                 other.status))
+
+    @classmethod
+    def create(cls, invite_from_id, org_id, email_address):
+        return cls(org_invite_api_client.create_invite(
+            invite_from_id, org_id, email_address
+        ))
+
+    @classmethod
+    def from_session(cls):
+        invited_org_user = session.get('invited_org_user')
+        return cls(invited_org_user) if invited_org_user else None
 
     def serialize(self, permissions_as_string=False):
         data = {'id': self.id,
                 'organisation': self.organisation,
-                'invited_by': self.invited_by,
+                'invited_by': self._invited_by,
                 'email_address': self.email_address,
                 'status': self.status,
                 'created_at': str(self.created_at)
                 }
         return data
 
+    @property
+    def invited_by(self):
+        return User.from_id(self._invited_by)
+
+    @classmethod
+    def from_token(cls, token):
+        try:
+            return cls(org_invite_api_client.check_token(token))
+        except HTTPError as exception:
+            if exception.status_code == 400 and 'invitation' in exception.message:
+                raise InviteTokenError(exception.message['invitation'])
+            else:
+                raise exception
+
+    def accept_invite(self):
+        org_invite_api_client.accept_invite(self.organisation, self.id)
+
+    def add_to_organisation(self):
+        user_api_client.add_user_to_organisation(self.organisation, self.id)
+
 
 class AnonymousUser(AnonymousUserMixin):
     # set the anonymous user so that if a new browser hits us we don't error http://stackoverflow.com/a/19275188
+
     def logged_in_elsewhere(self):
         return False
 
     @property
     def default_organisation(self):
         return Organisation(None)
+
+
+class Users(Sequence):
+
+    client = user_api_client.get_users_for_service
+    model = User
+
+    def __init__(self, service_id):
+        self.users = self.client(service_id)
+
+    def __getitem__(self, index):
+        return self.model(self.users[index])
+
+    def __len__(self):
+        return len(self.users)
+
+    def __add__(self, other):
+        return list(self) + list(other)
+
+
+class OrganisationUsers(Users):
+    client = user_api_client.get_users_for_organisation
+
+
+class InvitedUsers(Users):
+
+    client = invite_api_client.get_invites_for_service
+    model = InvitedUser
+
+    def __init__(self, service_id):
+        self.users = [
+            user for user in self.client(service_id)
+            if user['status'] != 'accepted'
+        ]
+
+
+class OrganisationInvitedUsers(InvitedUsers):
+    client = org_invite_api_client.get_invites_for_organisation
+    model = InvitedOrgUser

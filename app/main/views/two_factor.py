@@ -8,13 +8,14 @@ from flask import (
     session,
     url_for,
 )
-from flask_login import current_user, login_user
+from flask_login import current_user
 from itsdangerous import SignatureExpired
 from notifications_utils.url_safe_token import check_token
 
 from app import user_api_client
 from app.main import main
 from app.main.forms import TwoFactorForm
+from app.models.user import User
 from app.utils import redirect_to_sign_in
 
 
@@ -30,7 +31,7 @@ def two_factor_email_sent():
 @main.route('/email-auth/<token>', methods=['GET'])
 def two_factor_email(token):
     if current_user.is_authenticated:
-        return redirect_when_logged_in(current_user.id)
+        return redirect_when_logged_in(platform_admin=current_user.platform_admin)
 
     # checks url is valid, and hasn't timed out
     try:
@@ -79,27 +80,27 @@ def _is_safe_redirect_url(target):
 
 def log_in_user(user_id):
     try:
-        user = user_api_client.get_user(user_id)
+        user = User.from_id(user_id)
         # the user will have a new current_session_id set by the API - store it in the cookie for future requests
         session['current_session_id'] = user.current_session_id
         # Check if coming from new password page
         if 'password' in session.get('user_details', {}):
-            user = user_api_client.update_password(user.id, password=session['user_details']['password'])
-        activated_user = user_api_client.activate_user(user)
-        login_user(activated_user)
+            user.update_password(session['user_details']['password'])
+        user.activate()
+        user.login()
     finally:
         # get rid of anything in the session that we don't expect to have been set during register/sign in flow
         session.pop("user_details", None)
         session.pop("file_uploads", None)
 
-    return redirect_when_logged_in(user_id)
+    return redirect_when_logged_in(platform_admin=user.platform_admin)
 
 
-def redirect_when_logged_in(user_id):
+def redirect_when_logged_in(platform_admin):
     next_url = request.args.get('next')
     if next_url and _is_safe_redirect_url(next_url):
         return redirect(next_url)
-    if current_user.platform_admin:
+    if platform_admin:
         return redirect(url_for('main.platform_admin'))
 
     return redirect(url_for('main.show_accounts_or_dashboard'))

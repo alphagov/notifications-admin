@@ -44,7 +44,7 @@ from app.main.validators import (
     ValidEmail,
     ValidGovEmail,
 )
-from app.models.user import permissions, roles
+from app.models.roles_and_permissions import permissions, roles
 from app.utils import guess_name_from_email_address
 
 
@@ -373,11 +373,11 @@ class RegisterUserForm(StripWhitespaceForm):
 class RegisterUserFromInviteForm(RegisterUserForm):
     def __init__(self, invited_user):
         super().__init__(
-            service=invited_user['service'],
-            email_address=invited_user['email_address'],
-            auth_type=invited_user['auth_type'],
+            service=invited_user.service,
+            email_address=invited_user.email_address,
+            auth_type=invited_user.auth_type,
             name=guess_name_from_email_address(
-                invited_user['email_address']
+                invited_user.email_address
             ),
         )
 
@@ -394,8 +394,8 @@ class RegisterUserFromInviteForm(RegisterUserForm):
 class RegisterUserFromOrgInviteForm(StripWhitespaceForm):
     def __init__(self, invited_org_user):
         super().__init__(
-            organisation=invited_org_user['organisation'],
-            email_address=invited_org_user['email_address'],
+            organisation=invited_org_user.organisation,
+            email_address=invited_org_user.email_address,
         )
 
     name = StringField(

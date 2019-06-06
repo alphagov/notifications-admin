@@ -3,7 +3,7 @@ from flask import request
 from werkzeug.exceptions import Forbidden, Unauthorized
 
 from app.main.views.index import index
-from app.models.user import (
+from app.models.roles_and_permissions import (
     translate_permissions_from_admin_roles_to_db,
     translate_permissions_from_db_to_admin_roles,
 )
@@ -143,7 +143,7 @@ def test_user_has_permissions_for_organisation(
     mocker,
 ):
     user = _user_with_permissions()
-    user.organisations = ['org_1', 'org_2']
+    user['organisations'] = ['org_1', 'org_2']
     mocker.patch('app.user_api_client.get_user', return_value=user)
     client.login(user)
 
@@ -161,7 +161,7 @@ def test_platform_admin_can_see_orgs_they_dont_have(
     platform_admin_user,
     mocker,
 ):
-    platform_admin_user.organisations = []
+    platform_admin_user['organisations'] = []
     mocker.patch('app.user_api_client.get_user', return_value=platform_admin_user)
     client.login(platform_admin_user)
 
@@ -197,7 +197,7 @@ def test_user_doesnt_have_permissions_for_organisation(
     mocker,
 ):
     user = _user_with_permissions()
-    user.organisations = ['org_1', 'org_2']
+    user['organisations'] = ['org_1', 'org_2']
     mocker.patch('app.user_api_client.get_user', return_value=user)
     client.login(user)
 
@@ -228,8 +228,6 @@ def test_user_with_no_permissions_to_service_goes_to_templates(
 
 
 def _user_with_permissions():
-    from app.notify_client.user_api_client import User
-
     user_data = {'id': 999,
                  'name': 'Test User',
                  'password': 'somepassword',
@@ -240,10 +238,10 @@ def _user_with_permissions():
                  'permissions': {'foo': ['manage_users', 'manage_templates', 'manage_settings']},
                  'platform_admin': False,
                  'organisations': ['org_1', 'org_2'],
-                 'services': ['foo', 'bar']
+                 'services': ['foo', 'bar'],
+                 'current_session_id': None,
                  }
-    user = User(user_data)
-    return user
+    return user_data
 
 
 def test_translate_permissions_from_db_to_admin_roles():

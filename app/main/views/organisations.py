@@ -31,6 +31,7 @@ from app.main.forms import (
     SetLetterBranding,
 )
 from app.main.views.service_settings import get_branding_as_value_and_label
+from app.models.user import InvitedOrgUser, User
 from app.utils import user_has_permissions, user_is_platform_admin
 
 
@@ -112,7 +113,7 @@ def invite_org_user(org_id):
     )
     if form.validate_on_submit():
         email_address = form.email_address.data
-        invited_org_user = org_invite_api_client.create_invite(
+        invited_org_user = InvitedOrgUser.create(
             current_user.id,
             org_id,
             email_address
@@ -131,11 +132,9 @@ def invite_org_user(org_id):
 @login_required
 @user_has_permissions()
 def edit_user_org_permissions(org_id, user_id):
-    user = user_api_client.get_user(user_id)
-
     return render_template(
         'views/organisations/organisation/users/user/index.html',
-        user=user
+        user=User.from_id(user_id)
     )
 
 
@@ -143,7 +142,7 @@ def edit_user_org_permissions(org_id, user_id):
 @login_required
 @user_has_permissions()
 def remove_user_from_organisation(org_id, user_id):
-    user = user_api_client.get_user(user_id)
+    user = User.from_id(user_id)
     if request.method == 'POST':
         try:
             organisations_client.remove_user_from_organisation(org_id, user_id)

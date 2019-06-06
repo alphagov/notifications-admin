@@ -16,7 +16,7 @@ def test_should_render_new_password_template(
     mock_send_verify_code,
     mock_get_user_by_email_request_password_reset,
 ):
-    data = json.dumps({'email': api_user_active.email_address, 'created_at': str(datetime.utcnow())})
+    data = json.dumps({'email': api_user_active['email_address'], 'created_at': str(datetime.utcnow())})
     token = generate_token(data, app_.config['SECRET_KEY'],
                            app_.config['DANGEROUS_SALT'])
 
@@ -45,13 +45,13 @@ def test_should_redirect_to_two_factor_when_password_reset_is_successful(
     mock_reset_failed_login_count
 ):
     user = mock_get_user_by_email_request_password_reset.return_value
-    data = json.dumps({'email': user.email_address, 'created_at': str(datetime.utcnow())})
+    data = json.dumps({'email': user['email_address'], 'created_at': str(datetime.utcnow())})
     token = generate_token(data, app_.config['SECRET_KEY'], app_.config['DANGEROUS_SALT'])
     response = client.post(url_for_endpoint_with_token('.new_password', token=token),
                            data={'new_password': 'a-new_password'})
     assert response.status_code == 302
     assert response.location == url_for('.two_factor', _external=True)
-    mock_get_user_by_email_request_password_reset.assert_called_once_with(user.email_address)
+    mock_get_user_by_email_request_password_reset.assert_called_once_with(user['email_address'])
 
 
 def test_should_redirect_index_if_user_has_already_changed_password(
@@ -63,13 +63,13 @@ def test_should_redirect_index_if_user_has_already_changed_password(
     mock_reset_failed_login_count
 ):
     user = mock_get_user_by_email_user_changed_password.return_value
-    data = json.dumps({'email': user.email_address, 'created_at': str(datetime.utcnow())})
+    data = json.dumps({'email': user['email_address'], 'created_at': str(datetime.utcnow())})
     token = generate_token(data, app_.config['SECRET_KEY'], app_.config['DANGEROUS_SALT'])
     response = client.post(url_for_endpoint_with_token('.new_password', token=token),
                            data={'new_password': 'a-new_password'})
     assert response.status_code == 302
     assert response.location == url_for('.index', _external=True)
-    mock_get_user_by_email_user_changed_password.assert_called_once_with(user.email_address)
+    mock_get_user_by_email_user_changed_password.assert_called_once_with(user['email_address'])
 
 
 def test_should_redirect_to_forgot_password_with_flash_message_when_token_is_expired(
@@ -98,8 +98,8 @@ def test_should_sign_in_when_password_reset_is_successful_for_email_auth(
     mock_update_user_password
 ):
     user = mock_get_user_by_email_request_password_reset.return_value
-    user.auth_type = 'email_auth'
-    data = json.dumps({'email': user.email_address, 'created_at': str(datetime.utcnow())})
+    user['auth_type'] = 'email_auth'
+    data = json.dumps({'email': user['email_address'], 'created_at': str(datetime.utcnow())})
     token = generate_token(data, app_.config['SECRET_KEY'], app_.config['DANGEROUS_SALT'])
 
     response = client.post(url_for_endpoint_with_token('.new_password', token=token),
@@ -111,7 +111,7 @@ def test_should_sign_in_when_password_reset_is_successful_for_email_auth(
     assert mock_reset_failed_login_count.called
 
     # the log-in flow makes a couple of calls
-    mock_get_user.assert_called_once_with(user.id)
-    mock_update_user_password.assert_called_once_with(user.id, password='a-new_password')
+    mock_get_user.assert_called_once_with(user['id'])
+    mock_update_user_password.assert_called_once_with(user['id'], 'a-new_password')
 
     assert not mock_send_verify_code.called

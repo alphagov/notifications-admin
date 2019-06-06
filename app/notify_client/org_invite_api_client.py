@@ -1,4 +1,3 @@
-from app.models.user import InvitedOrgUser
 from app.notify_client import NotifyAdminAPIClient, _attach_current_user
 
 
@@ -17,18 +16,16 @@ class OrgInviteApiClient(NotifyAdminAPIClient):
         }
         data = _attach_current_user(data)
         resp = self.post(url='/organisation/{}/invite'.format(org_id), data=data)
-        return InvitedOrgUser(**resp['data'])
+        return resp['data']
 
     def get_invites_for_organisation(self, org_id):
         endpoint = '/organisation/{}/invite'.format(org_id)
         resp = self.get(endpoint)
-        invites = resp['data']
-        invited_users = self._get_invited_org_users(invites)
-        return invited_users
+        return resp['data']
 
     def check_token(self, token):
         resp = self.get(url='/invite/organisation/{}'.format(token))
-        return InvitedOrgUser(**resp['data'])
+        return resp['data']
 
     def cancel_invited_user(self, org_id, invited_user_id):
         data = {'status': 'cancelled'}
@@ -40,13 +37,6 @@ class OrgInviteApiClient(NotifyAdminAPIClient):
         data = {'status': 'accepted'}
         self.post(url='/organisation/{0}/invite/{1}'.format(org_id, invited_user_id),
                   data=data)
-
-    def _get_invited_org_users(self, invites):
-        invited_users = []
-        for invite in invites:
-            invited_user = InvitedOrgUser(**invite)
-            invited_users.append(invited_user)
-        return invited_users
 
 
 org_invite_api_client = OrgInviteApiClient()

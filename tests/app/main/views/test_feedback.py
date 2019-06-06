@@ -107,7 +107,7 @@ def test_get_feedback_page_with_prefilled_body(
     expected_textarea,
 ):
     user = active_user_with_permissions(fake_uuid)
-    user.email_address = 'test@marinemanagement.org.uk'
+    user['email_address'] = 'test@marinemanagement.org.uk'
     mocker.patch('app.user_api_client.get_user', return_value=user)
     mock_post = mocker.patch('app.main.views.feedback.zendesk_client.create_ticket')
     page = client_request.get(

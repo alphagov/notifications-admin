@@ -1,5 +1,4 @@
-from app.models.user import (
-    InvitedUser,
+from app.models.roles_and_permissions import (
     roles,
     translate_permissions_from_admin_roles_to_db,
 )
@@ -31,16 +30,9 @@ class InviteApiClient(NotifyAdminAPIClient):
         }
         data = _attach_current_user(data)
         resp = self.post(url='/service/{}/invite'.format(service_id), data=data)
-        return InvitedUser(**resp['data'])
+        return resp['data']
 
     def get_invites_for_service(self, service_id):
-        return [
-            InvitedUser(**invite)
-            for invite in self._get_invites_for_service(service_id)
-            if invite['status'] != 'accepted'
-        ]
-
-    def _get_invites_for_service(self, service_id):
         return self.get(
             '/service/{}/invite'.format(service_id)
         )['data']
@@ -54,8 +46,7 @@ class InviteApiClient(NotifyAdminAPIClient):
         ])
 
     def check_token(self, token):
-        resp = self.get(url='/invite/service/{}'.format(token))
-        return InvitedUser(**resp['data'])
+        return self.get(url='/invite/service/{}'.format(token))['data']
 
     def cancel_invited_user(self, service_id, invited_user_id):
         data = {'status': 'cancelled'}

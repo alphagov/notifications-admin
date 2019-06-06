@@ -4,6 +4,7 @@ from werkzeug.utils import cached_property
 
 from app.models import JSONModel
 from app.models.organisation import Organisation
+from app.models.user import InvitedUsers, User, Users
 from app.notify_client.api_key_api_client import api_key_api_client
 from app.notify_client.billing_api_client import billing_api_client
 from app.notify_client.email_branding_client import email_branding_client
@@ -16,7 +17,6 @@ from app.notify_client.service_api_client import service_api_client
 from app.notify_client.template_folder_api_client import (
     template_folder_api_client,
 )
-from app.notify_client.user_api_client import user_api_client
 from app.utils import get_default_sms_sender
 
 
@@ -60,6 +60,10 @@ class Service(JSONModel):
         if 'permissions' not in self._dict:
             self.permissions = {'email', 'sms', 'letter'}
 
+    @classmethod
+    def from_id(cls, service_id):
+        return cls(service_api_client.get_service(service_id)['data'])
+
     def update(self, **kwargs):
         return service_api_client.update_service(self.id, **kwargs)
 
@@ -99,11 +103,11 @@ class Service(JSONModel):
 
     @cached_property
     def invited_users(self):
-        return invite_api_client.get_invites_for_service(service_id=self.id)
+        return InvitedUsers(self.id)
 
     @cached_property
     def active_users(self):
-        return user_api_client.get_users_for_service(service_id=self.id)
+        return Users(self.id)
 
     @cached_property
     def team_members(self):
@@ -114,16 +118,12 @@ class Service(JSONModel):
 
     @cached_property
     def has_team_members(self):
-        return (
-            user_api_client.get_count_of_users_with_permission(
-                self.id, 'manage_service'
-            ) + invite_api_client.get_count_of_invites_with_permission(
-                self.id, 'manage_service'
-            )
-        ) > 1
+        return len([
+            user for user in self.team_members
+            if user.has_permission_for_service(self.id, 'manage_service')
+        ]) > 1
 
     def cancel_invite(self, invited_user_id):
-
         if str(invited_user_id) not in {user.id for user in self.invited_users}:
             abort(404)
 
@@ -137,7 +137,7 @@ class Service(JSONModel):
         if str(user_id) not in {user.id for user in self.active_users}:
             abort(404)
 
-        return user_api_client.get_user(user_id)
+        return User.from_id(user_id)
 
     @cached_property
     def all_templates(self):

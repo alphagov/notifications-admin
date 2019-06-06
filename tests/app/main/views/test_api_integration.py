@@ -278,7 +278,7 @@ def test_should_create_api_key_with_type_normal(
     post.assert_called_once_with(url='/service/{}/api-key'.format(SERVICE_ONE_ID), data={
         'name': 'Some default key name 1/2',
         'key_type': 'normal',
-        'created_by': api_user_active.id
+        'created_by': api_user_active['id']
     })
 
 

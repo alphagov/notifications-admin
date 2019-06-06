@@ -4,6 +4,7 @@ from flask_login import login_required
 from app import user_api_client
 from app.main import main
 from app.main.forms import SearchUsersByEmailForm
+from app.models.user import User
 from app.utils import user_is_platform_admin
 
 
@@ -29,7 +30,7 @@ def find_users_by_email():
 @login_required
 @user_is_platform_admin
 def user_information(user_id):
-    user = user_api_client.get_user(user_id)
+    user = User.from_id(user_id)
     services = user_api_client.get_services_for_user(user)
     return render_template(
         'views/find-users/user-information.html',

@@ -40,6 +40,7 @@ from tests.conftest import (
     no_sms_senders,
     normalize_spaces,
     platform_admin_user,
+    sample_invite,
 )
 
 FAKE_TEMPLATE_ID = uuid4()
@@ -707,6 +708,8 @@ def test_should_check_if_estimated_volumes_provided(
 def test_should_check_for_sending_things_right(
     client_request,
     mocker,
+    service_one,
+    fake_uuid,
     mock_get_service_organisation,
     single_sms_sender,
     count_of_users_with_manage_service,
@@ -724,14 +727,20 @@ def test_should_check_for_sending_things_right(
             'email': list(range(0, count_of_email_templates)),
             'sms': [],
         }.get(template_type)
-
-    mock_count_users = mocker.patch(
-        'app.models.service.user_api_client.get_count_of_users_with_permission',
-        return_value=count_of_users_with_manage_service
+    active_user_with_permissions,
+    mock_get_users = mocker.patch(
+        'app.models.user.Users.client',
+        return_value=(
+            [active_user_with_permissions(fake_uuid)] * count_of_users_with_manage_service +
+            [active_user_no_settings_permission(fake_uuid)]
+        )
     )
-    mock_count_invites = mocker.patch(
-        'app.models.service.invite_api_client.get_count_of_invites_with_permission',
-        return_value=count_of_invites_with_manage_service
+    mock_get_invites = mocker.patch(
+        'app.models.user.InvitedUsers.client',
+        return_value=(
+            ([sample_invite(mocker, service_one)] * count_of_invites_with_manage_service) +
+            [sample_invite(mocker, service_one, permissions='view_activity')]
+        )
     )
 
     mock_templates = mocker.patch(
@@ -769,8 +778,8 @@ def test_should_check_for_sending_things_right(
     assert normalize_spaces(checklist_items[2].text) == expected_templates_checklist_item
     assert normalize_spaces(checklist_items[3].text) == expected_reply_to_checklist_item
 
-    mock_count_users.assert_called_once_with(SERVICE_ONE_ID, 'manage_service')
-    mock_count_invites.assert_called_once_with(SERVICE_ONE_ID, 'manage_service')
+    mock_get_users.assert_called_once_with(SERVICE_ONE_ID)
+    mock_get_invites.assert_called_once_with(SERVICE_ONE_ID)
     assert mock_templates.called is True
 
     if count_of_email_templates:
@@ -947,8 +956,8 @@ def test_should_check_for_sms_sender_on_go_live(
         }.get(template_type, count_of_sms_templates)))
 
     mocker.patch(
-        'app.main.views.service_settings.user_api_client.get_count_of_users_with_permission',
-        return_value=99,
+        'app.models.service.Service.has_team_members',
+        return_value=True,
     )
     mock_templates = mocker.patch(
         'app.models.service.Service.all_templates',
@@ -1014,8 +1023,8 @@ def test_should_check_for_mou_on_request_to_go_live(
     expected_item,
 ):
     mocker.patch(
-        'app.main.views.service_settings.user_api_client.get_count_of_users_with_permission',
-        return_value=0,
+        'app.models.service.Service.has_team_members',
+        return_value=False,
     )
     mocker.patch(
         'app.models.service.Service.all_templates',
@@ -1061,8 +1070,8 @@ def test_non_gov_user_is_told_they_cant_go_live(
     mock_get_service_organisation,
 ):
     mocker.patch(
-        'app.main.views.service_settings.user_api_client.get_count_of_users_with_permission',
-        return_value=0,
+        'app.models.service.Service.has_team_members',
+        return_value=False,
     )
     mocker.patch(
         'app.models.service.Service.all_templates',
@@ -1364,8 +1373,8 @@ def test_should_redirect_after_request_to_go_live(
         subject='Request to go live - service one',
         message=ANY,
         ticket_type=ZendeskClient.TYPE_QUESTION,
-        user_name=active_user_with_permissions.name,
-        user_email=active_user_with_permissions.email_address,
+        user_name=active_user_with_permissions['name'],
+        user_email=active_user_with_permissions['email_address'],
         tags=[
             'notify_request_to_go_live',
             'notify_request_to_go_live_incomplete',
@@ -1402,7 +1411,7 @@ def test_should_redirect_after_request_to_go_live(
     )
     mock_update_service.assert_called_once_with(
         SERVICE_ONE_ID,
-        go_live_user=active_user_with_permissions.id
+        go_live_user=active_user_with_permissions['id']
     )
 
 

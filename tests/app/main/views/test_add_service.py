@@ -90,7 +90,7 @@ def test_should_add_service_and_redirect_to_tour_when_no_services(
     persisted,
     sms_limit,
 ):
-    api_user_active.email_address = email_address
+    api_user_active['email_address'] = email_address
     client_request.login(api_user_active)
     mock_get_organisation_by_domain(mocker, organisation_type=inherited)
     client_request.post(
@@ -113,7 +113,7 @@ def test_should_add_service_and_redirect_to_tour_when_no_services(
         organisation_type=persisted,
         message_limit=50,
         restricted=True,
-        user_id=api_user_active.id,
+        user_id=api_user_active['id'],
         email_from='testing.the.post',
     )
     mock_create_service_template.assert_called_once_with(
@@ -179,7 +179,7 @@ def test_add_service_guesses_org_type_for_unknown_nhs_orgs(
     mock_get_all_email_branding,
     email_address,
 ):
-    api_user_active.email_address = email_address
+    api_user_active['email_address'] = email_address
     client_request.login(api_user_active)
     mocker.patch(
         'app.organisations_client.get_organisation_by_domain',
@@ -229,7 +229,7 @@ def test_should_add_service_and_redirect_to_dashboard_when_existing_service(
         organisation_type=organisation_type,
         message_limit=app_.config['DEFAULT_SERVICE_LIMIT'],
         restricted=True,
-        user_id=api_user_active.id,
+        user_id=api_user_active['id'],
         email_from='testing.the.post',
     )
     mock_create_or_update_free_sms_fragment_limit.assert_called_once_with(101, free_allowance)
@@ -273,7 +273,7 @@ def test_non_whitelist_user_cannot_access_create_service_page(
     api_nongov_user_active,
     mock_get_organisations,
 ):
-    assert is_gov_user(api_nongov_user_active.email_address) is False
+    assert is_gov_user(api_nongov_user_active['email_address']) is False
     client_request.get(
         'main.add_service',
         _expected_status=403,
@@ -286,7 +286,7 @@ def test_non_whitelist_user_cannot_create_service(
     api_nongov_user_active,
     mock_get_organisations,
 ):
-    assert is_gov_user(api_nongov_user_active.email_address) is False
+    assert is_gov_user(api_nongov_user_active['email_address']) is False
     client_request.post(
         'main.add_service',
         _data={'name': 'SERVICE TWO'},

@@ -4,7 +4,6 @@ from unittest.mock import call
 import pytest
 
 from app import invite_api_client, service_api_client, user_api_client
-from app.models.user import User
 from tests import sample_uuid
 from tests.conftest import SERVICE_ONE_ID, api_user_pending
 
@@ -28,59 +27,18 @@ def test_client_gets_all_users_for_service(
 
     mock_get.assert_called_once_with('/service/{}/users'.format(SERVICE_ONE_ID))
     assert len(users) == 1
-    assert users[0].id == fake_uuid
-
-
-def test_client_returns_count_of_users_with_manage_service(
-    app_,
-    client,
-    mocker,
-    fake_uuid,
-):
-
-    def _service_one_user_with_permissions(*permissions):
-        return User({'permissions': {SERVICE_ONE_ID: list(permissions)}})
-
-    mock_get_users = mocker.patch(
-        'app.notify_client.user_api_client.UserApiClient.get_users_for_service',
-        return_value=[
-            _service_one_user_with_permissions('manage_service', 'view_activity'),
-            _service_one_user_with_permissions('manage_service'),
-            _service_one_user_with_permissions('view_activity'),
-            _service_one_user_with_permissions('manage_templates'),
-        ]
-    )
-
-    mocker.patch(
-        'app.models.user._get_service_id_from_view_args',
-        return_value=SERVICE_ONE_ID,
-    )
-
-    assert user_api_client.get_count_of_users_with_permission(
-        SERVICE_ONE_ID,
-        'manage_service'
-    ) == 2
-
-    assert user_api_client.get_count_of_users_with_permission(
-        SERVICE_ONE_ID,
-        'manage_templates'
-    ) == 1
-
-    assert mock_get_users.call_args_list == [
-        call(SERVICE_ONE_ID),
-        call(SERVICE_ONE_ID)
-    ]
+    assert users[0]['id'] == fake_uuid
 
 
 def test_client_uses_correct_find_by_email(mocker, api_user_active):
 
     expected_url = '/user/email'
-    expected_params = {'email': api_user_active.email_address}
+    expected_params = {'email': api_user_active['email_address']}
 
     user_api_client.max_failed_login_count = 1  # doesn't matter for this test
     mock_get = mocker.patch('app.notify_client.user_api_client.UserApiClient.get')
 
-    user_api_client.get_user_by_email(api_user_active.email_address)
+    user_api_client.get_user_by_email(api_user_active['email_address'])
 
     mock_get.assert_called_once_with(expected_url, params=expected_params)
 
@@ -93,12 +51,12 @@ def test_client_only_updates_allowed_attributes(mocker):
 
 
 def test_client_updates_password_separately(mocker, api_user_active):
-    expected_url = '/user/{}/update-password'.format(api_user_active.id)
+    expected_url = '/user/{}/update-password'.format(api_user_active['id'])
     expected_params = {'_password': 'newpassword'}
     user_api_client.max_failed_login_count = 1  # doesn't matter for this test
     mock_update_password = mocker.patch('app.notify_client.user_api_client.UserApiClient.post')
 
-    user_api_client.update_password(api_user_active.id, expected_params['_password'])
+    user_api_client.update_password(api_user_active['id'], expected_params['_password'])
     mock_update_password.assert_called_once_with(expected_url, data=expected_params)
 
 
@@ -106,17 +64,9 @@ def test_client_activates_if_pending(mocker, api_user_pending):
     mock_post = mocker.patch('app.notify_client.user_api_client.UserApiClient.post')
     user_api_client.max_failed_login_count = 1  # doesn't matter for this test
 
-    user_api_client.activate_user(api_user_pending)
+    user_api_client.activate_user(api_user_pending['id'])
 
-    mock_post.assert_called_once_with('/user/{}/activate'.format(api_user_pending.id), data=None)
-
-
-def test_client_doesnt_activate_if_already_active(mocker, api_user_active):
-    mock_post = mocker.patch('app.notify_client.user_api_client.UserApiClient.post')
-
-    user_api_client.activate_user(api_user_active)
-
-    assert not mock_post.called
+    mock_post.assert_called_once_with('/user/{}/activate'.format(api_user_pending['id']), data=None)
 
 
 def test_client_passes_admin_url_when_sending_email_auth(
@@ -224,17 +174,9 @@ def test_returns_value_from_cache(
     mock_redis_set = mocker.patch(
         'app.extensions.RedisClient.set',
     )
-    mock_model = mocker.patch(
-        'app.models.user.User.__init__',
-        return_value=None,
-    )
 
     user_api_client.get_user(user_id)
 
-    mock_model.assert_called_once_with(
-        expected_return_value,
-        max_failed_login_count=10,
-    )
     assert mock_redis_get.call_args_list == expected_cache_get_calls
     assert mock_api_get.call_args_list == expected_api_calls
     assert mock_redis_set.call_args_list == expected_cache_set_calls
@@ -251,7 +193,7 @@ def test_returns_value_from_cache(
     (user_api_client, 'add_user_to_service', [SERVICE_ONE_ID, user_id, [], []], {}),
     (user_api_client, 'add_user_to_organisation', [sample_uuid(), user_id], {}),
     (user_api_client, 'set_user_permissions', [user_id, SERVICE_ONE_ID, []], {}),
-    (user_api_client, 'activate_user', [api_user_pending(sample_uuid())], {}),
+    (user_api_client, 'activate_user', [api_user_pending(sample_uuid())['id']], {}),
     (service_api_client, 'remove_user_from_service', [SERVICE_ONE_ID, user_id], {}),
     (service_api_client, 'create_service', ['', '', 0, False, user_id, sample_uuid()], {}),
     (invite_api_client, 'accept_invite', [SERVICE_ONE_ID, user_id], {}),
