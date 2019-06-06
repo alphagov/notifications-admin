@@ -386,10 +386,7 @@ def send_test_step(service_id, template_id, step_index):
     )
 
     try:
-        if request.endpoint == 'main.send_test_step':
-            current_placeholder = placeholders[step_index - 1]
-        else:
-            current_placeholder = placeholders[step_index]
+        current_placeholder = placeholders[step_index]
     except IndexError:
         if all_placeholders_in_session(placeholders):
             return get_notification_check_endpoint(service_id, template)
@@ -449,7 +446,7 @@ def send_test_step(service_id, template_id, step_index):
     ):
         skip_link = (
             'Use my {}'.format(first_column_headings[template.template_type][0]),
-            url_for('.send_test_step', service_id=service_id, template_id=template.id, step_index=1),
+            url_for('.send_test', service_id=service_id, template_id=template.id),
         )
     else:
         skip_link = None
