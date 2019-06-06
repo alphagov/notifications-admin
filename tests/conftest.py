@@ -1652,6 +1652,7 @@ def mock_verify_password(mocker):
 @pytest.fixture(scope='function')
 def mock_update_user_password(mocker, api_user_active):
     def _update(user_id, password):
+        api_user_active['id'] = user_id
         return api_user_active
 
     return mocker.patch('app.user_api_client.update_password', side_effect=_update)
@@ -1660,6 +1661,7 @@ def mock_update_user_password(mocker, api_user_active):
 @pytest.fixture(scope='function')
 def mock_update_user_attribute(mocker, api_user_active):
     def _update(user_id, **kwargs):
+        api_user_active['id'] = user_id
         return api_user_active
 
     return mocker.patch('app.user_api_client.update_user_attribute', side_effect=_update)
@@ -1668,6 +1670,7 @@ def mock_update_user_attribute(mocker, api_user_active):
 @pytest.fixture
 def mock_activate_user(mocker, api_user_active):
     def _activate(user_id):
+        api_user_active['id'] = user_id
         return {'data': api_user_active}
 
     return mocker.patch('app.user_api_client.activate_user', side_effect=_activate)
