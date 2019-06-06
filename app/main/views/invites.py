@@ -65,7 +65,7 @@ def accept_invite(token):
                 invited_user.auth_type == 'email_auth'
             ):
                 existing_user.update(auth_type=invited_user.auth_type)
-            invited_user.add_to_service()
+            invited_user.add_to_service(existing_user_id=existing_user.id)
             return redirect(url_for('main.service_dashboard', service_id=service.id))
     else:
         return redirect(url_for('main.register_from_invite'))

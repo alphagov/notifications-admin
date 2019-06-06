@@ -348,10 +348,10 @@ class InvitedUser(JSONModel):
     def accept_invite(self):
         invite_api_client.accept_invite(self.service, self.id)
 
-    def add_to_service(self):
+    def add_to_service(self, existing_user_id):
         user_api_client.add_user_to_service(
             self.service,
-            self.id,
+            existing_user_id,
             self.permissions,
             self.folder_permissions,
         )
