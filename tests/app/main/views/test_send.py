@@ -1669,6 +1669,50 @@ def test_send_test_sms_message_back_link_with_multiple_placeholders(
     )
 
 
+@pytest.mark.parametrize('step_index, expected_back_link', (
+    (0, partial(
+        url_for,
+        'main.start_tour',
+    )),
+    (1, partial(
+        url_for,
+        'main.send_test_step',
+        step_index=0,
+        help=2,
+    )),
+    (2, partial(
+        url_for,
+        'main.send_test_step',
+        step_index=1,
+        help=2,
+    ))
+))
+def test_send_test_sms_message_back_link_in_tour(
+    client_request,
+    mock_get_service_template_with_multiple_placeholders,
+    mock_has_no_jobs,
+    step_index,
+    expected_back_link,
+):
+    with client_request.session_transaction() as session:
+        session['recipient'] = '07900900123'
+        session['placeholders'] = {'phone number': '07900900123', 'one': 'bar'}
+        session['send_test_letter_page_count'] = None
+
+    page = client_request.get(
+        'main.send_test_step',
+        service_id=SERVICE_ONE_ID,
+        template_id=unchanging_fake_uuid,
+        step_index=step_index,
+        help=2,
+    )
+
+    assert page.select_one('.govuk-back-link')['href'] == expected_back_link(
+        service_id=SERVICE_ONE_ID,
+        template_id=unchanging_fake_uuid,
+    )
+
+
 def test_send_test_letter_clears_previous_page_cache(
     logged_in_platform_admin_client,
     mocker,
