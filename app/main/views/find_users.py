@@ -1,7 +1,8 @@
-from flask import render_template, request
-from flask_login import login_required
+from flask import flash, redirect, render_template, request, url_for
+from flask_login import current_user, login_required
 
 from app import user_api_client
+from app.event_handlers import create_archive_user_event
 from app.main import main
 from app.main.forms import SearchUsersByEmailForm
 from app.models.user import User
@@ -37,3 +38,17 @@ def user_information(user_id):
         user=user,
         services=services,
     )
+
+
+@main.route("/users/<uuid:user_id>/archive", methods=['GET', 'POST'])
+@login_required
+@user_is_platform_admin
+def archive_user(user_id):
+    if request.method == 'POST':
+        user_api_client.archive_user(user_id)
+        create_archive_user_event(str(user_id), current_user.id)
+
+        return redirect(url_for('.user_information', user_id=user_id))
+    else:
+        flash('There\'s no way to reverse this! Are you sure you want to archive this user?', 'delete')
+        return user_information(user_id)

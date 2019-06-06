@@ -1117,6 +1117,7 @@ def platform_admin_user(fake_uuid):
                  'services': [],
                  'organisations': [],
                  'current_session_id': None,
+                 'logged_in_at': None,
                  }
     return user_data
 
@@ -1137,6 +1138,7 @@ def api_user_active(fake_uuid, email_address='test@user.gov.uk'):
                  'services': [],
                  'organisations': [],
                  'current_session_id': None,
+                 'logged_in_at': None,
                  }
     return user_data
 
