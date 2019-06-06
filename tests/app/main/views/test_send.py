@@ -1126,9 +1126,15 @@ def test_send_one_off_or_test_has_correct_page_titles(
 @pytest.mark.parametrize('endpoint, step_index, prefilled, expected_field_label', [
     (
         'main.send_test_step',
-        1,
+        0,
         {'phone number': '07900900123'},
         'one',
+    ),
+    (
+        'main.send_test_step',
+        1,
+        {'phone number': '07900900123', 'one': 'one'},
+        'two',
     ),
     (
         'main.send_one_off_step',
@@ -1137,22 +1143,10 @@ def test_send_one_off_or_test_has_correct_page_titles(
         'phone number',
     ),
     (
-        'main.send_test_step',
-        2,
-        {'phone number': '07900900123', 'one': 'foo'},
-        'two',
-    ),
-    (
         'main.send_one_off_step',
         1,
         {'phone number': '07900900123'},
         'one',
-    ),
-    (
-        'main.send_test_step',
-        3,
-        {'phone number': '07900900123', 'one': 'foo', 'two': 'foo'},
-        'three',
     ),
     (
         'main.send_one_off_step',
@@ -1191,13 +1185,13 @@ def test_send_one_off_or_test_shows_placeholders_in_correct_order(
         active_user_with_permissions,
         mock_get_service_template,
         'Use my phone number',
-        partial(url_for, 'main.send_test_step')
+        partial(url_for, 'main.send_test')
     ),
     (
         active_user_with_permissions,
         mock_get_service_email_template,
         'Use my email address',
-        partial(url_for, 'main.send_test_step')
+        partial(url_for, 'main.send_test')
     ),
     (
         active_user_with_permissions,
@@ -1241,7 +1235,6 @@ def test_send_one_off_has_skip_link(
         assert skip_links[0]['href'] == expected_link_url(
             service_id=service_one['id'],
             template_id=fake_uuid,
-            step_index=1
         )
     else:
         assert not skip_links
@@ -1809,7 +1802,7 @@ def test_send_test_indicates_optional_address_columns(
     )
 
     assert normalize_spaces(page.select('label')[0].text) == (
-        'address line 3 '
+        'address line 4 '
         'Optional'
     )
     assert page.select('.govuk-back-link')[0]['href'] == url_for(
