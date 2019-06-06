@@ -101,8 +101,13 @@ def view_notification(service_id, notification_id):
     show_cancel_button = notification['notification_type'] == 'letter' and \
         letter_can_be_cancelled(notification['status'], notification_created)
 
-    if request.args.get('help') == '0':
-        back_link = None
+    if get_help_argument():
+        back_link = url_for(
+            'main.send_test',
+            service_id=current_service.id,
+            template_id=template.id,
+            help='2',
+        )
     elif request.args.get('from_job'):
         back_link = url_for(
             'main.view_job',
