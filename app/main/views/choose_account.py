@@ -41,7 +41,7 @@ def show_accounts_or_dashboard():
     if len(current_user.service_ids) == 1 and not current_user.organisation_ids:
         return redirect(url_for('.service_dashboard', service_id=current_user.service_ids[0]))
 
-    if len(current_user.organisation_ids) == 1 and not current_user.service_ids:
+    if len(current_user.organisation_ids) == 1 and not current_user.trial_mode_services:
         return redirect(url_for('.organisation_dashboard', org_id=current_user.organisation_ids[0]))
 
     return redirect(url_for('.choose_account'))

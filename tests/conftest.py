@@ -3355,6 +3355,7 @@ def mock_get_non_empty_organisations_and_services_for_user(mocker, organisation_
         return [{
             'name': '{} {}'.format(name, i),
             'id': SERVICE_TWO_ID,
+            'restricted': False,
         } for i in range(1, 3)]
 
     def _get_orgs_and_services(user_id):
