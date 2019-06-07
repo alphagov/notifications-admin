@@ -269,6 +269,13 @@ class User(JSONModel, UserMixin):
         ]
 
     @property
+    def live_services_not_belonging_to_users_organisations(self):
+        return [
+            service for service in self.orgs_and_services['services_without_organisations']
+            if not service['restricted']
+        ]
+
+    @property
     def organisations(self):
         return [
             Organisation.from_id(organisation['id'])

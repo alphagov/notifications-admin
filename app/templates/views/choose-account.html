@@ -15,28 +15,26 @@
         <li class="browse-list-item">
           <a href="{{ url_for('.organisations') }}" class="browse-list-link">All organisations</a>
         </li>
-        <div class="keyline-block"></div>
+        <div class ="keyline-block"></div>
       {% endif %}
-      {% for org in current_user.organisations %}
-        <li class="browse-list-item">
-          <a href="{{ url_for('.organisation_dashboard', org_id=org.id) }}" class="browse-list-link">{{ org.name }}</a>
-          <p class="browse-list-hint">
-            {{ org.live_services|length }}
-            live service{% if org.live_services|length != 1 %}s{% endif %}
-          </p>
-        </li>
-        <div class="keyline-block"></div>
-      {% endfor %}
-      {% if services_without_organisations %}
-        {% for item in services_without_organisations %}
+      {% if current_user.organisations %}
+        {% for org in current_user.organisations %}
+          <li class="browse-list-item">
+            <a href="{{ url_for('.organisation_dashboard', org_id=org.id) }}" class="browse-list-link">{{ org.name }}</a>
+            <p class="browse-list-hint">
+              {{ org.live_services|length }}
+              live service{% if org.live_services|length != 1 %}s{% endif %}
+            </p>
+          </li>
+          <div class ="keyline-block"></div>
+        {% endfor %}
+        {% for item in current_user.live_services_not_belonging_to_users_organisations %}
           <li class="browse-list-item">
             <a href="{{ url_for('.service_dashboard', service_id=item.id) }}" class="browse-list-link">{{ item.name }}</a>
           </li>
         {% endfor %}
-        <div class="keyline-block"></div>
-      {% endif %}
-      {% if not current_user.organisations %}
-        {% if current_user.trial_mode_services %}
+      {% else %}
+        {% if current_user.trial_mode_services and current_user.live_services %}
           </ul>
           <h2 class="heading-small">
             Live services

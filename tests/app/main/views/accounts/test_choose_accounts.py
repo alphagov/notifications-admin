@@ -59,9 +59,8 @@ def test_choose_account_should_show_choose_accounts_page(
     page = resp.find('div', {'id': 'content'}).main
 
     assert normalize_spaces(page.h1.text) == 'Choose service'
-    outer_list_items = page.nav.ul.find_all('li', recursive=False)
-
-    assert len(outer_list_items) == 6
+    outer_list_items = page.select('nav ul')[0].select('li')
+    assert len(outer_list_items) == 5
 
     # first org
     assert outer_list_items[0].a.text == 'Org 1'
@@ -84,13 +83,19 @@ def test_choose_account_should_show_choose_accounts_page(
         '0 live services'
     )
 
-    # orphaned services
+    # orphaned live services
     assert outer_list_items[3].a.text == 'service_1'
     assert outer_list_items[3].a['href'] == url_for('.service_dashboard', service_id='s1')
     assert outer_list_items[4].a.text == 'service_2'
     assert outer_list_items[4].a['href'] == url_for('.service_dashboard', service_id='s2')
-    assert outer_list_items[5].a.text == 'service_3'
-    assert outer_list_items[5].a['href'] == url_for('.service_dashboard', service_id='s3')
+
+    # orphaned live services
+    trial_services_list_items = page.select('nav ul')[1].select('li')
+    assert len(trial_services_list_items) == 2
+    assert trial_services_list_items[0].a.text == 'org_service_3'
+    assert trial_services_list_items[0].a['href'] == url_for('.service_dashboard', service_id='os3')
+    assert trial_services_list_items[1].a.text == 'service_3'
+    assert trial_services_list_items[1].a['href'] == url_for('.service_dashboard', service_id='s3')
 
 
 def test_choose_account_should_show_choose_accounts_page_if_no_services(

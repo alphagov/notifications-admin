@@ -18,11 +18,8 @@ def services_or_dashboard():
 @main.route("/accounts")
 @login_required
 def choose_account():
-    orgs_and_services = current_user.orgs_and_services
-
     return render_template(
         'views/choose-account.html',
-        services_without_organisations=orgs_and_services['services_without_organisations'],
         can_add_service=current_user.is_gov_user,
     )
 
