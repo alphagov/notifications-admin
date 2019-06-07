@@ -242,10 +242,28 @@ class User(JSONModel, UserMixin):
 
     @property
     def services(self):
-        all_services = self.orgs_and_services['services_without_organisations'] + next(chain(
-            org['services'] for org in self.orgs_and_services['organisations']
-        ), [])
-        return sorted(all_services, key=lambda service: service['name'].lower())
+        return sorted(
+            self.services_with_organisation + self.services_without_organisations,
+            key=lambda service: service.name.lower(),
+        )
+
+    @property
+    def services_with_organisation(self):
+        from app.models.service import Service
+        return [
+            Service(service) for service in
+            next(chain(
+                org['services'] for org in self.orgs_and_services['organisations']
+            ), [])
+        ]
+
+    @property
+    def services_without_organisations(self):
+        from app.models.service import Service
+        return [
+            Service(service) for service in
+            self.orgs_and_services['services_without_organisations']
+        ]
 
     @property
     def service_ids(self):
@@ -254,21 +272,21 @@ class User(JSONModel, UserMixin):
     @property
     def trial_mode_services(self):
         return [
-            service for service in self.services
-            if service['restricted']
+            service for service in self.services if service.trial_mode
         ]
 
     @property
     def live_services(self):
         return [
-            service for service in self.services
-            if not service['restricted']
+            service for service in self.services if service.live
         ]
 
     @property
     def live_services_not_belonging_to_users_organisations(self):
+        from app.models.service import Service
         return [
-            service for service in self.orgs_and_services['services_without_organisations']
+            Service(service)
+            for service in self.orgs_and_services['services_without_organisations']
             if not service['restricted']
         ]
 

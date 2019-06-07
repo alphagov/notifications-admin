@@ -367,10 +367,7 @@ def choose_template_to_copy(
     else:
         return render_template(
             'views/templates/copy.html',
-            services_templates_and_folders=TemplateLists([
-                Service(service) for service in
-                current_user.services
-            ], user=current_user),
+            services_templates_and_folders=TemplateLists(current_user),
             search_form=SearchByNameForm(),
         )
 
