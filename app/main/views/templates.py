@@ -126,7 +126,7 @@ def choose_template(service_id, template_type='all', template_folder_id=None):
         template_type=template_type,
         allow_adding_letter_template=current_service.has_permission('letter'),
         allow_adding_copy_of_template=(
-            current_service.all_templates or len(current_user.services) > 1
+            current_service.all_templates or len(current_user.service_ids) > 1
         ),
     )
     option_hints = {template_folder_id: 'current folder'}
@@ -369,7 +369,7 @@ def choose_template_to_copy(
             'views/templates/copy.html',
             services_templates_and_folders=TemplateLists([
                 Service(service) for service in
-                current_user.all_services
+                current_user.services
             ], user=current_user),
             search_form=SearchByNameForm(),
         )
@@ -401,7 +401,7 @@ def copy_template(service_id, template_id):
         form=form,
         template=template,
         heading_action='Add',
-        services=current_user.all_service_ids,
+        services=current_user.service_ids,
     )
 
 

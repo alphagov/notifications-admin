@@ -42,7 +42,6 @@ class User(JSONModel, UserMixin):
         'password_changed_at',
         'permissions',
         'platform_admin',
-        'services',
         'state',
     }
 
@@ -195,7 +194,7 @@ class User(JSONModel, UserMixin):
         if org_id:
             return org_id in self.organisation_ids
         if not permissions:
-            return service_id in self.services
+            return service_id in self.service_ids
         if service_id:
             return any(x in self._permissions.get(service_id, []) for x in permissions)
 
@@ -223,7 +222,7 @@ class User(JSONModel, UserMixin):
         ]
 
     def belongs_to_service(self, service_id):
-        return str(service_id) in self.services
+        return str(service_id) in self.service_ids
 
     def belongs_to_service_or_403(self, service_id):
         if not self.belongs_to_service(service_id):
@@ -242,29 +241,27 @@ class User(JSONModel, UserMixin):
         return user_api_client.get_organisations_and_services_for_user(self.id)
 
     @property
-    def all_services(self):
+    def services(self):
         all_services = self.orgs_and_services['services_without_organisations'] + next(chain(
             org['services'] for org in self.orgs_and_services['organisations']
         ), [])
         return sorted(all_services, key=lambda service: service['name'].lower())
 
     @property
-    def all_service_ids(self):
-        return {
-            service['id'] for service in self.all_services
-        }
+    def service_ids(self):
+        return self._dict['services']
 
     @property
     def trial_mode_services(self):
         return [
-            service for service in self.all_services
+            service for service in self.services
             if service['restricted']
         ]
 
     @property
     def live_services(self):
         return [
-            service for service in self.all_services
+            service for service in self.services
             if not service['restricted']
         ]
 

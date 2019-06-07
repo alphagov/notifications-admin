@@ -31,17 +31,17 @@ def show_accounts_or_dashboard():
         return redirect(url_for('.index'))
 
     service_id = session.get('service_id')
-    if service_id and (service_id in current_user.services or current_user.platform_admin):
+    if service_id and (service_id in current_user.service_ids or current_user.platform_admin):
         return redirect(url_for('.service_dashboard', service_id=service_id))
 
     organisation_id = session.get('organisation_id')
     if organisation_id and (organisation_id in current_user.organisation_ids or current_user.platform_admin):
         return redirect(url_for('.organisation_dashboard', org_id=organisation_id))
 
-    if len(current_user.services) == 1 and not current_user.organisation_ids:
-        return redirect(url_for('.service_dashboard', service_id=current_user.services[0]))
+    if len(current_user.service_ids) == 1 and not current_user.organisation_ids:
+        return redirect(url_for('.service_dashboard', service_id=current_user.service_ids[0]))
 
-    if len(current_user.organisation_ids) == 1 and not current_user.services:
+    if len(current_user.organisation_ids) == 1 and not current_user.service_ids:
         return redirect(url_for('.organisation_dashboard', org_id=current_user.organisation_ids[0]))
 
     return redirect(url_for('.choose_account'))

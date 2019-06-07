@@ -16,7 +16,7 @@
       <h2 class="heading-medium">Services</h2>
       <nav class="browse-list">
         <ul>
-        {% for service in user.all_services %}
+        {% for service in user.services %}
           <li class="browse-list-item">
             <a class="browse-list-hint" href={{url_for('.service_dashboard', service_id=service.id)}}>{{ service.name }}</a>
           </li>
