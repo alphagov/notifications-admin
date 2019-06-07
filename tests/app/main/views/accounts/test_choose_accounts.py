@@ -64,14 +64,12 @@ def test_choose_account_should_show_choose_accounts_page(
     # first org
     assert outer_list_items[0].a.text == 'org_1'
     assert outer_list_items[0].a['href'] == url_for('.organisation_dashboard', org_id='o1')
-    outer_list_orgs = outer_list_items[0].ul
-    assert ' '.join(outer_list_orgs.stripped_strings) == 'org_service_1 org_service_2 org_service_3'
+    assert not outer_list_items[0].ul
 
     # second org
     assert outer_list_items[1].a.text == 'org_2'
     assert outer_list_items[1].a['href'] == url_for('.organisation_dashboard', org_id='o2')
-    outer_list_orgs = outer_list_items[1].ul
-    assert ' '.join(outer_list_orgs.stripped_strings) == 'org_service_4'
+    assert not outer_list_items[2].ul
 
     # third org
     assert outer_list_items[2].a.text == 'org_3'

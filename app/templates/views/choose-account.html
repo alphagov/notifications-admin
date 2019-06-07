@@ -20,15 +20,6 @@
       {% for org in current_user.organisations %}
         <li class="browse-list-item">
           <a href="{{ url_for('.organisation_dashboard', org_id=org.id) }}" class="browse-list-link">{{ org.name }}</a>
-          {% if org.services %}
-            <ul class="browse-sub-list">
-              {% for item in org.services %}
-                <li class="browse-list-sub-item">
-                  <a href="{{ url_for('.service_dashboard', service_id=item.id) }}" class="browse-list-link">{{ item.name }}</a>
-                </li>
-              {% endfor %}
-            </ul>
-          {% endif %}
         </li>
         <div class="keyline-block"></div>
       {% endfor %}
