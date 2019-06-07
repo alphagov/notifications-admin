@@ -14,7 +14,6 @@ from app import (
     service_api_client,
     template_folder_api_client,
     template_statistics_client,
-    user_api_client,
 )
 from app.main import main
 from app.main.forms import (
@@ -370,7 +369,7 @@ def choose_template_to_copy(
             'views/templates/copy.html',
             services_templates_and_folders=TemplateLists([
                 Service(service) for service in
-                user_api_client.get_services_for_user(current_user)
+                current_user.all_services
             ], user=current_user),
             search_form=SearchByNameForm(),
         )

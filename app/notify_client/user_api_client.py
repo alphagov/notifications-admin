@@ -1,5 +1,3 @@
-from itertools import chain
-
 from notifications_python_client.errors import HTTPError
 
 from app.models.roles_and_permissions import (
@@ -184,16 +182,9 @@ class UserApiClient(NotifyAdminAPIClient):
         data = {'email': new_email}
         self.post(endpoint, data)
 
-    def get_organisations_and_services_for_user(self, user):
-        endpoint = '/user/{}/organisations-and-services'.format(user.id)
+    def get_organisations_and_services_for_user(self, user_id):
+        endpoint = '/user/{}/organisations-and-services'.format(user_id)
         return self.get(endpoint)
-
-    def get_services_for_user(self, user):
-        orgs_and_services_for_user = self.get_organisations_and_services_for_user(user)
-        all_services = orgs_and_services_for_user['services_without_organisations'] + next(chain(
-            org['services'] for org in orgs_and_services_for_user['organisations']
-        ), [])
-        return sorted(all_services, key=lambda service: service['name'])
 
 
 user_api_client = UserApiClient()

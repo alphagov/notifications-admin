@@ -17,7 +17,7 @@
         </li>
         <div class="keyline-block"></div>
       {% endif %}
-      {% for org in organisations %}
+      {% for org in current_user.organisations %}
         <li class="browse-list-item">
           <a href="{{ url_for('.organisation_dashboard', org_id=org.id) }}" class="browse-list-link">{{ org.name }}</a>
           {% if org.services %}
@@ -40,7 +40,7 @@
         {% endfor %}
         <div class="keyline-block"></div>
       {% endif %}
-      {% if not organisations %}
+      {% if not current_user.organisations %}
         {% if current_user.trial_mode_services %}
           </ul>
           <h2 class="heading-small">

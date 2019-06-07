@@ -1,4 +1,5 @@
 from collections.abc import Sequence
+from itertools import chain
 
 from flask import abort, current_app, request, session
 from flask_login import AnonymousUserMixin, UserMixin, login_user
@@ -38,7 +39,6 @@ class User(JSONModel, UserMixin):
         'failed_login_count',
         'logged_in_at',
         'mobile_number',
-        'organisations',
         'password_changed_at',
         'permissions',
         'platform_admin',
@@ -193,7 +193,7 @@ class User(JSONModel, UserMixin):
             return True
 
         if org_id:
-            return org_id in self.organisations
+            return org_id in self.organisation_ids
         if not permissions:
             return service_id in self.services
         if service_id:
@@ -238,8 +238,15 @@ class User(JSONModel, UserMixin):
         return self.email_address.split('@')[-1]
 
     @cached_property
+    def orgs_and_services(self):
+        return user_api_client.get_organisations_and_services_for_user(self.id)
+
+    @property
     def all_services(self):
-        return user_api_client.get_services_for_user(self.id)
+        all_services = self.orgs_and_services['services_without_organisations'] + next(chain(
+            org['services'] for org in self.orgs_and_services['organisations']
+        ), [])
+        return sorted(all_services, key=lambda service: service['name'].lower())
 
     @property
     def all_service_ids(self):
@@ -260,6 +267,14 @@ class User(JSONModel, UserMixin):
             service for service in self.all_services
             if not service['restricted']
         ]
+
+    @property
+    def organisations(self):
+        return self.orgs_and_services['organisations']
+
+    @property
+    def organisation_ids(self):
+        return self._dict['organisations']
 
     @cached_property
     def default_organisation(self):
@@ -291,7 +306,7 @@ class User(JSONModel, UserMixin):
             "state": self.state,
             "failed_login_count": self.failed_login_count,
             "permissions": [x for x in self._permissions],
-            "organisations": self.organisations,
+            "organisations": self.organisation_ids,
             "current_session_id": self.current_session_id
         }
         if hasattr(self, '_password'):
