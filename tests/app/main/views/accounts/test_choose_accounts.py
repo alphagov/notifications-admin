@@ -15,16 +15,16 @@ SAMPLE_DATA = {
             'name': 'org_1',
             'id': 'o1',
             'services': [
-                {'name': 'org_service_1', 'id': 'os1'},
-                {'name': 'org_service_2', 'id': 'os2'},
-                {'name': 'org_service_3', 'id': 'os3'},
+                {'name': 'org_service_1', 'id': 'os1', 'restricted': False},
+                {'name': 'org_service_2', 'id': 'os2', 'restricted': False},
+                {'name': 'org_service_3', 'id': 'os3', 'restricted': True},
             ]
         },
         {
             'name': 'org_2',
             'id': 'o2',
             'services': [
-                {'name': 'org_service_4', 'id': 'os4'},
+                {'name': 'org_service_4', 'id': 'os4', 'restricted': False},
             ]
         },
         {
@@ -34,9 +34,9 @@ SAMPLE_DATA = {
         }
     ],
     'services_without_organisations': [
-        {'name': 'service_1', 'id': 's1'},
-        {'name': 'service_2', 'id': 's2'},
-        {'name': 'service_3', 'id': 's3'},
+        {'name': 'service_1', 'id': 's1', 'restricted': False},
+        {'name': 'service_2', 'id': 's2', 'restricted': False},
+        {'name': 'service_3', 'id': 's3', 'restricted': True},
     ]
 }
 

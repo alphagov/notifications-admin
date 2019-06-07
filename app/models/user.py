@@ -238,6 +238,24 @@ class User(JSONModel, UserMixin):
         return self.email_address.split('@')[-1]
 
     @cached_property
+    def all_services(self):
+        return user_api_client.get_services_for_user(self.id)
+
+    @property
+    def trial_mode_services(self):
+        return [
+            service for service in self.all_services
+            if service['restricted']
+        ]
+
+    @property
+    def live_services(self):
+        return [
+            service for service in self.all_services
+            if not service['restricted']
+        ]
+
+    @cached_property
     def default_organisation(self):
         return Organisation(
             organisations_client.get_organisation_by_domain(self.email_domain)
