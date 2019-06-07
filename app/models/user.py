@@ -228,6 +228,9 @@ class User(JSONModel, UserMixin):
         if not self.belongs_to_service(service_id):
             abort(403)
 
+    def belongs_to_organisation(self, organisation_id):
+        return str(organisation_id) in self.organisation_ids
+
     @property
     def locked(self):
         return self.failed_login_count >= self.max_failed_login_count
