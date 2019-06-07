@@ -20,6 +20,10 @@
       {% for org in current_user.organisations %}
         <li class="browse-list-item">
           <a href="{{ url_for('.organisation_dashboard', org_id=org.id) }}" class="browse-list-link">{{ org.name }}</a>
+          <p class="browse-list-hint">
+            {{ org.live_services|length }}
+            live service{% if org.live_services|length != 1 %}s{% endif %}
+          </p>
         </li>
         <div class="keyline-block"></div>
       {% endfor %}

@@ -3136,7 +3136,11 @@ def mock_get_organisation(
     def _get_organisation(org_id):
         return organisation_json(
             org_id,
-            'Org 1',
+            {
+                'o1': 'Org 1',
+                'o2': 'Org 2',
+                'o3': 'Org 3',
+            }.get(org_id, 'Org 1'),
             email_branding_id=email_branding_id,
             letter_branding_id=letter_branding_id,
         )
@@ -3199,6 +3203,18 @@ def mock_update_service_organisation(mocker):
 @pytest.fixture(scope='function')
 def mock_get_organisation_services(mocker, api_user_active):
     def _get_organisation_services(organisation_id):
+        if organisation_id == 'o1':
+            return [
+                service_json('12345', 'service one', restricted=False),
+                service_json('67890', 'service two'),
+                service_json('abcde', 'service three'),
+            ]
+        if organisation_id == 'o2':
+            return [
+                service_json('12345', 'service one', restricted=False),
+                service_json('67890', 'service two', restricted=False),
+                service_json('abcde', 'service three'),
+            ]
         return [
             service_json('12345', 'service one'),
             service_json('67890', 'service two'),

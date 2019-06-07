@@ -270,7 +270,10 @@ class User(JSONModel, UserMixin):
 
     @property
     def organisations(self):
-        return self.orgs_and_services['organisations']
+        return [
+            Organisation.from_id(organisation['id'])
+            for organisation in self.orgs_and_services['organisations']
+        ]
 
     @property
     def organisation_ids(self):
