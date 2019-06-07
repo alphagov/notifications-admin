@@ -1,5 +1,29 @@
 {% extends "withoutnav_template.html" %}
 
+{% macro service_list(heading, show_heading, organisations=[], services=[]) %}
+  {% if show_heading %}
+    <h2 class="heading-small">
+      {{ heading }}
+    </h2>
+  {% endif %}
+  <ul>
+  {% for org in organisations %}
+    <li class="browse-list-item">
+      <a href="{{ url_for('.organisation_dashboard', org_id=org.id) }}" class="browse-list-link">{{ org.name }}</a>
+      <p class="browse-list-hint">
+        {{ org.live_services|length }}
+        live service{% if org.live_services|length != 1 %}s{% endif %}
+      </p>
+    </li>
+  {% endfor %}
+  {% for service in services %}
+    <li class="browse-list-item">
+      <a href="{{ url_for('.service_dashboard', service_id=service.id) }}" class="browse-list-link">{{ service.name }}</a>
+    </li>
+  {% endfor %}
+  </ul>
+{% endmacro %}
+
 {% block per_page_title %}
   Choose service
 {% endblock %}
@@ -10,58 +34,40 @@
     Choose service
   </h1>
   <nav class="browse-list">
-    <ul>
-      {% if current_user.platform_admin %}
+
+    {% if current_user.platform_admin %}
+      <h2>Platform admin</h2>
+      <ul>
         <li class="browse-list-item">
           <a href="{{ url_for('.organisations') }}" class="browse-list-link">All organisations</a>
         </li>
-        <div class ="keyline-block"></div>
-      {% endif %}
-      {% if current_user.organisations %}
-        {% for org in current_user.organisations %}
-          <li class="browse-list-item">
-            <a href="{{ url_for('.organisation_dashboard', org_id=org.id) }}" class="browse-list-link">{{ org.name }}</a>
-            <p class="browse-list-hint">
-              {{ org.live_services|length }}
-              live service{% if org.live_services|length != 1 %}s{% endif %}
-            </p>
-          </li>
-          <div class ="keyline-block"></div>
-        {% endfor %}
-        {% for item in current_user.live_services_not_belonging_to_users_organisations %}
-          <li class="browse-list-item">
-            <a href="{{ url_for('.service_dashboard', service_id=item.id) }}" class="browse-list-link">{{ item.name }}</a>
-          </li>
-        {% endfor %}
-      {% else %}
-        {% if current_user.trial_mode_services and current_user.live_services %}
-          </ul>
-          <h2 class="heading-small">
-            Live services
-          </h2>
-          <ul>
-        {% endif %}
-        {% for service in current_user.live_services %}
-          <li class="browse-list-item">
-            <a href="{{ url_for('.service_dashboard', service_id=service.id) }}" class="browse-list-link">{{ service.name }}</a>
-          </li>
-        {% endfor %}
-      {% endif %}
-      {% if current_user.trial_mode_services %}
-        {% if organisations or current_user.live_services %}
-          </ul>
-          <h2 class="heading-small">
-            Trial mode services
-          </h2>
-          <ul>
-        {% endif %}
-        {% for service in current_user.trial_mode_services %}
-          <li class="browse-list-item">
-            <a href="{{ url_for('.service_dashboard', service_id=service.id) }}" class="browse-list-link">{{ service.name }}</a>
-          </li>
-        {% endfor %}
-      {% endif %}
-    </ul>
+      <ul>
+      <div class ="keyline-block"></div>
+    {% endif %}
+
+    {% if current_user.organisations %}
+      {{ service_list(
+        heading='Live services',
+        show_heading=current_user.trial_mode_services,
+        organisations=current_user.organisations,
+        services=current_user.live_services_not_belonging_to_users_organisations
+      ) }}
+    {% else %}
+      {{ service_list(
+        heading='Live services',
+        show_heading=(current_user.trial_mode_services and current_user.live_services),
+        services=current_user.live_services
+      ) }}
+    {% endif %}
+
+    {% if current_user.trial_mode_services %}
+      {{ service_list(
+        heading='Trial mode services',
+        show_heading=(current_user.organisations or current_user.live_services),
+        services=current_user.trial_mode_services
+      ) }}
+    {% endif %}
+
   </nav>
   {% if can_add_service %}
     <div class="js-stick-at-bottom-when-scrolling">
