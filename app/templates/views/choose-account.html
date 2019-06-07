@@ -40,6 +40,20 @@
         {% endfor %}
         <div class="keyline-block"></div>
       {% endif %}
+      {% if not organisations %}
+        {% if current_user.trial_mode_services %}
+          </ul>
+          <h2 class="heading-small">
+            Live services
+          </h2>
+          <ul>
+        {% endif %}
+        {% for service in current_user.live_services %}
+          <li class="browse-list-item">
+            <a href="{{ url_for('.service_dashboard', service_id=service.id) }}" class="browse-list-link">{{ service.name }}</a>
+          </li>
+        {% endfor %}
+      {% endif %}
       {% if current_user.trial_mode_services %}
         {% if organisations or current_user.live_services %}
           </ul>
