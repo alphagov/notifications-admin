@@ -242,6 +242,12 @@ class User(JSONModel, UserMixin):
         return user_api_client.get_services_for_user(self.id)
 
     @property
+    def all_service_ids(self):
+        return {
+            service['id'] for service in self.all_services
+        }
+
+    @property
     def trial_mode_services(self):
         return [
             service for service in self.all_services

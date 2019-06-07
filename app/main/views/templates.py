@@ -402,7 +402,7 @@ def copy_template(service_id, template_id):
         form=form,
         template=template,
         heading_action='Add',
-        services=user_api_client.get_service_ids_for_user(current_user),
+        services=current_user.all_service_ids,
     )
 
 
