@@ -319,6 +319,14 @@ class User(JSONModel, UserMixin):
         return None
 
     @property
+    def has_multiple_services_or_organisations(self):
+        return (
+            self.organisations or self.live_services
+        ) and (
+            self.trial_mode_services
+        )
+
+    @property
     def has_nhs_email_address(self):
         return self.email_address.lower().endswith((
             '@nhs.uk', '.nhs.uk', '@nhs.net', '.nhs.net',

@@ -37,6 +37,7 @@
 
   &-hint {
     @include core-19;
-    margin-top: 5px;
+    margin: 5px 0 10px 0;
+    color: $secondary-text-colour;
   }
 }
