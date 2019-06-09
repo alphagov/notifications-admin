@@ -37,7 +37,7 @@ def test_organisation_page_shows_all_organisations(
 
     assert normalize_spaces(
         page.select_one('h1').text
-    ) == "Organisations"
+    ) == "All organisations"
 
     for index, org in enumerate(orgs):
         assert page.select('a.browse-list-link')[index].text == org['name']

@@ -4,32 +4,56 @@
 {% from "components/page-header.html" import page_header %}
 
 {% block per_page_title %}
-  Organisations
+  All organisations
 {% endblock %}
 
-{% block maincolumn_content %}
+{% block fullwidth_content %}
 
-  {{ page_header(
-    'Organisations',
-    back_link=url_for('main.choose_account'),
-  ) }}
+  <div id="content">
+    <div class="navigation-service">
+      <div class="navigation-service-name">
+        &nbsp;
+      </div>
+      <a href="{{ url_for('main.choose_account') }}" class="navigation-service-switch">Switch service</a>
+    </div>
 
-  {{ live_search(target_selector='.browse-list-item', show=True, form=search_form, label='Search by name') }}
+    <main role="main">
+      <div class="grid-row top-gutter-2-3">
+        <div class="column-one-quarter">
+          <h1>
+            All organisations
+          </h1>
+        </div>
+        <div class="column-three-quarters">
 
-  <nav class="browse-list">
-    <ul>
-      {% for org in organisations %}
-        <li class="browse-list-item">
-          <a href="{{ url_for('main.organisation_dashboard', org_id=org['id']) }}" class="browse-list-link">{{ org['name'] }}</a>
-          {% if not org['active'] %}
-            <span class="table-field-status-default heading-medium">- archived</span>
-          {% endif %}
-        </li>
-      {% endfor %}
-    </ul>
-  </nav>
-  <div class="js-stick-at-bottom-when-scrolling">
-    <a href="{{ url_for('main.add_organisation') }}" class="button-secondary">New organisation</a>
+          {{ live_search(target_selector='.browse-list-item', show=True, form=search_form, label='Search by name') }}
+
+          <nav class="browse-list">
+            <ul>
+              {% for org in organisations %}
+                <li class="browse-list-item">
+                  <a href="{{ url_for('main.organisation_dashboard', org_id=org['id']) }}" class="browse-list-link">{{ org['name'] }}</a>
+                  {% if not org['active'] %}
+                    <span class="table-field-status-default heading-medium">- archived</span>
+                  {% endif %}
+                </li>
+              {% endfor %}
+            </ul>
+          </nav>
+
+        </div>
+      </div>
+      <div class="js-stick-at-bottom-when-scrolling">
+        <div class="grid-row">
+          <div class="column-one-quarter">
+            &nbsp;
+          </div>
+          <div class="column-three-quarters">
+            <a href="{{ url_for('main.add_organisation') }}" class="button-secondary">New organisation</a>
+          </div>
+        </div>
+      </div>
+    </main>
   </div>
 
 {% endblock %}

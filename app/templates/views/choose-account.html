@@ -2,11 +2,17 @@
 
 {% macro service_list(heading, show_heading, organisations=[], services=[]) %}
   {% if show_heading %}
-    <h2 class="heading-small">
-      {{ heading }}
-    </h2>
+    <div class="grid-row">
+      <div class="column-one-quarter">
+        <h2>
+          {{ heading }}
+        </h2>
+      </div>
+      <div class="column-three-quarters">
+        <ul>
+  {% else %}
+    <ul>
   {% endif %}
-  <ul>
   {% for org in organisations %}
     <li class="browse-list-item">
       <a href="{{ url_for('.organisation_dashboard', org_id=org.id) }}" class="browse-list-link">{{ org.name }}</a>
@@ -21,7 +27,14 @@
       <a href="{{ url_for('.service_dashboard', service_id=service.id) }}" class="browse-list-link">{{ service.name }}</a>
     </li>
   {% endfor %}
-  </ul>
+  {% if show_heading %}
+        </ul>
+      </div>
+    </div>
+  {% else %}
+    </ul>
+  {% endif %}
+  <div class="keyline-block"></div>
 {% endmacro %}
 
 {% block per_page_title %}
@@ -36,13 +49,19 @@
   <nav class="browse-list">
 
     {% if current_user.platform_admin %}
-      <h2>Platform admin</h2>
-      <ul>
-        <li class="browse-list-item">
-          <a href="{{ url_for('.organisations') }}" class="browse-list-link">All organisations</a>
-        </li>
-      <ul>
-      <div class ="keyline-block"></div>
+      <div class="grid-row">
+        <div class="column-one-quarter">
+          <h2>
+            Platform admin
+          </h2>
+        </div>
+        <div class="column-three-quarters">
+          <li class="browse-list-item">
+            <a href="{{ url_for('.organisations') }}" class="browse-list-link">All organisations</a>
+          </li>
+        </div>
+      </div>
+      <div class="keyline-block"></div>
     {% endif %}
 
     {% if current_user.organisations %}
