@@ -125,22 +125,16 @@ def test_notification_status_page_respects_redaction(
         partial(url_for, 'main.view_job', job_id='job_id'),
     ),
     (
-        {'help': '0'},  # not a valid help step
-        partial(url_for, 'main.view_notifications', message_type='sms', status='sending,delivered,failed'),
-    ),
-    (
-        {'help': '0', 'from_job': 'job_id'},
-        partial(url_for, 'main.view_job', job_id='job_id'),
+        {'help': '0'},
+        None,
     ),
     (
         {'help': '1'},
-        partial(
-            url_for,
-            'main.send_test',
-            service_id=SERVICE_ONE_ID,
-            template_id='5407f4db-51c7-4150-8758-35412d42186a',
-            help='2'
-        ),
+        None,
+    ),
+    (
+        {'help': '2'},
+        None,
     ),
 ])
 def test_notification_status_shows_expected_back_link(

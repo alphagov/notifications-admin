@@ -101,13 +101,11 @@ def view_notification(service_id, notification_id):
     show_cancel_button = notification['notification_type'] == 'letter' and \
         letter_can_be_cancelled(notification['status'], notification_created)
 
-    if get_help_argument():
-        back_link = url_for(
-            'main.send_test',
-            service_id=current_service.id,
-            template_id=template.id,
-            help='2',
-        )
+    if get_help_argument() or request.args.get('help') == '0':
+        # help=0 is set when you’ve just sent a notification. We
+        # only want to show the back link when you’ve navigated to a
+        # notification, not when you’ve just sent it.
+        back_link = None
     elif request.args.get('from_job'):
         back_link = url_for(
             'main.view_job',
