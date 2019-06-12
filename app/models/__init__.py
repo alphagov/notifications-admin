@@ -1,3 +1,6 @@
+from abc import ABC, abstractmethod
+from collections.abc import Sequence
+
 from flask import abort
 
 
@@ -31,6 +34,31 @@ class JSONModel():
             return next(thing for thing in things if thing['id'] == str(id))
         except StopIteration:
             abort(404)
+
+
+class ModelList(ABC, Sequence):
+
+    @property
+    @abstractmethod
+    def client():
+        pass
+
+    @property
+    @abstractmethod
+    def model():
+        pass
+
+    def __init__(self):
+        self.items = self.client()
+
+    def __getitem__(self, index):
+        return self.model(self.items[index])
+
+    def __len__(self):
+        return len(self.items)
+
+    def __add__(self, other):
+        return list(self) + list(other)
 
 
 class InviteTokenError(Exception):

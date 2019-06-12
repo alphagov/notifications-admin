@@ -1,11 +1,9 @@
-from collections.abc import Sequence
-
 from flask import abort, current_app, request, session
 from flask_login import AnonymousUserMixin, UserMixin, login_user
 from notifications_python_client.errors import HTTPError
 from werkzeug.utils import cached_property
 
-from app.models import JSONModel
+from app.models import JSONModel, ModelList
 from app.models.organisation import Organisation
 from app.models.roles_and_permissions import (
     all_permissions,
@@ -590,22 +588,13 @@ class AnonymousUser(AnonymousUserMixin):
         return Organisation(None)
 
 
-class Users(Sequence):
+class Users(ModelList):
 
     client = user_api_client.get_users_for_service
     model = User
 
     def __init__(self, service_id):
-        self.users = self.client(service_id)
-
-    def __getitem__(self, index):
-        return self.model(self.users[index])
-
-    def __len__(self):
-        return len(self.users)
-
-    def __add__(self, other):
-        return list(self) + list(other)
+        self.items = self.client(service_id)
 
 
 class OrganisationUsers(Users):
@@ -618,7 +607,7 @@ class InvitedUsers(Users):
     model = InvitedUser
 
     def __init__(self, service_id):
-        self.users = [
+        self.items = [
             user for user in self.client(service_id)
             if user['status'] != 'accepted'
         ]

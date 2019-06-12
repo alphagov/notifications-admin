@@ -26,7 +26,7 @@ def test_organisation_page_shows_all_organisations(
     ]
 
     mocker.patch(
-        'app.organisations_client.get_organisations', return_value=orgs
+        'app.models.organisation.Organisations.client', return_value=orgs
     )
     response = logged_in_platform_admin_client.get(
         url_for('.organisations')
