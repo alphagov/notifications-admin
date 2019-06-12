@@ -101,8 +101,8 @@ def test_user_information_page_shows_information_about_user(
     mocker.patch(
         'app.user_api_client.get_organisations_and_services_for_user',
         return_value={'organisations': [], 'services_without_organisations': [
-            {"id": 1, "name": "Fresh Orchard Juice"},
-            {"id": 2, "name": "Nature Therapy"},
+            {"id": 1, "name": "Fresh Orchard Juice", "restricted": True},
+            {"id": 2, "name": "Nature Therapy", "restricted": False},
         ]},
         autospec=True
     )
@@ -116,9 +116,11 @@ def test_user_information_page_shows_information_about_user(
     assert document.xpath("//p/text()[normalize-space()='test@gov.uk']")
     assert document.xpath("//p/text()[normalize-space()='+447700900986']")
 
-    assert document.xpath("//h2/text()[normalize-space()='Services']")
-    assert document.xpath("//a/text()[normalize-space()='Fresh Orchard Juice']")
+    assert document.xpath("//h2/text()[normalize-space()='Live services']")
     assert document.xpath("//a/text()[normalize-space()='Nature Therapy']")
+
+    assert document.xpath("//h2/text()[normalize-space()='Trial mode services']")
+    assert document.xpath("//a/text()[normalize-space()='Fresh Orchard Juice']")
 
     assert document.xpath("//h2/text()[normalize-space()='Last login']")
     assert not document.xpath("//p/text()[normalize-space()='0 failed login attempts']")
@@ -137,8 +139,8 @@ def test_user_information_page_displays_if_there_are_failed_login_attempts(
     mocker.patch(
         'app.user_api_client.get_organisations_and_services_for_user',
         return_value={'organisations': [], 'services_without_organisations': [
-            {"id": 1, "name": "Fresh Orchard Juice"},
-            {"id": 2, "name": "Nature Therapy"},
+            {"id": 1, "name": "Fresh Orchard Juice", "restricted": True},
+            {"id": 2, "name": "Nature Therapy", "restricted": True},
         ]},
         autospec=True
     )
