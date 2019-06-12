@@ -1,5 +1,4 @@
 from collections.abc import Sequence
-from itertools import chain
 
 from flask import abort, current_app, request, session
 from flask_login import AnonymousUserMixin, UserMixin, login_user
@@ -247,29 +246,29 @@ class User(JSONModel, UserMixin):
     def orgs_and_services(self):
         return user_api_client.get_organisations_and_services_for_user(self.id)
 
+    @staticmethod
+    def sort_services(services):
+        return sorted(services, key=lambda service: service.name.lower())
+
     @property
     def services(self):
-        return sorted(
-            self.services_with_organisation + self.services_without_organisations,
-            key=lambda service: service.name.lower(),
-        )
+        from app.models.service import Service
+        return self.sort_services([
+            Service(service) for service in self.orgs_and_services['services']
+        ])
 
     @property
     def services_with_organisation(self):
-        from app.models.service import Service
         return [
-            Service(service) for service in
-            next(chain(
-                org['services'] for org in self.orgs_and_services['organisations']
-            ), [])
+            service for service in self.services
+            if self.belongs_to_organisation(service.organisation_id)
         ]
 
     @property
     def services_without_organisations(self):
-        from app.models.service import Service
         return [
-            Service(service) for service in
-            self.orgs_and_services['services_without_organisations']
+            service for service in self.services
+            if not self.belongs_to_organisation(service.organisation_id)
         ]
 
     @property
@@ -290,12 +289,9 @@ class User(JSONModel, UserMixin):
 
     @property
     def live_services_not_belonging_to_users_organisations(self):
-        from app.models.service import Service
-        return [
-            Service(service)
-            for service in self.orgs_and_services['services_without_organisations']
-            if not service['restricted']
-        ]
+        return self.sort_services(
+            set(self.live_services).union(self.services_without_organisations)
+        )
 
     @property
     def organisations(self):

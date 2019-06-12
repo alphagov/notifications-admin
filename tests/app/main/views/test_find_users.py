@@ -100,7 +100,7 @@ def test_user_information_page_shows_information_about_user(
 
     mocker.patch(
         'app.user_api_client.get_organisations_and_services_for_user',
-        return_value={'organisations': [], 'services_without_organisations': [
+        return_value={'organisations': [], 'services': [
             {"id": 1, "name": "Fresh Orchard Juice", "restricted": True},
             {"id": 2, "name": "Nature Therapy", "restricted": False},
         ]},
@@ -138,7 +138,7 @@ def test_user_information_page_displays_if_there_are_failed_login_attempts(
 
     mocker.patch(
         'app.user_api_client.get_organisations_and_services_for_user',
-        return_value={'organisations': [], 'services_without_organisations': [
+        return_value={'organisations': [], 'services': [
             {"id": 1, "name": "Fresh Orchard Juice", "restricted": True},
             {"id": 2, "name": "Nature Therapy", "restricted": True},
         ]},

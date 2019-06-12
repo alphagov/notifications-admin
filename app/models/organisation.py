@@ -21,6 +21,7 @@ class Organisation(JSONModel):
         'agreement_signed_version',
         'domains',
         'request_to_go_live_notes',
+        'count_of_live_services',
     }
 
     @classmethod

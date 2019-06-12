@@ -1,42 +1,72 @@
+import uuid
+from itertools import repeat
+
 import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
 
 from tests.conftest import (
     SERVICE_ONE_ID,
+    SERVICE_TWO_ID,
     normalize_spaces,
     service_one,
     service_two,
 )
+
+OS1, OS2, OS3, S1, S2, S3 = repeat(uuid.uuid4(), 6)
 
 SAMPLE_DATA = {
     'organisations': [
         {
             'name': 'org_1',
             'id': 'o1',
-            'services': [
-                {'name': 'org_service_1', 'id': 'os1', 'restricted': False},
-                {'name': 'org_service_2', 'id': 'os2', 'restricted': False},
-                {'name': 'org_service_3', 'id': 'os3', 'restricted': True},
-            ]
         },
         {
             'name': 'org_2',
             'id': 'o2',
-            'services': [
-                {'name': 'org_service_4', 'id': 'os4', 'restricted': False},
-            ]
         },
         {
             'name': 'org_3',
             'id': 'o3',
-            'services': []
         }
     ],
-    'services_without_organisations': [
-        {'name': 'service_1', 'id': 's1', 'restricted': False},
-        {'name': 'service_2', 'id': 's2', 'restricted': False},
-        {'name': 'service_3', 'id': 's3', 'restricted': True},
+    'services': [
+        {
+            'name': 'org_service_1',
+            'id': OS1,
+            'restricted': False,
+            'organisation': 'o1',
+        },
+        {
+            'name': 'org_service_2',
+            'id': OS2,
+            'restricted': False,
+            'organisation': 'o1',
+        },
+        {
+            'name': 'org_service_3',
+            'id': OS3,
+            'restricted': True,
+            'organisation': 'o1',
+        },
+        {
+            'name': 'service_1',
+            'id': S1,
+            'restricted': False,
+            'organisation': None,
+        },
+        {
+            'name': 'service_2',
+            'id': S2,
+            'restricted': False,
+            'organisation': None,
+        },
+        {
+            'name': 'service_3',
+            'id': S3,
+            'restricted': True,
+            'organisation': None,
+        },
     ]
 }
 
@@ -51,29 +81,29 @@ def mock_get_orgs_and_services(mocker):
 
 def test_choose_account_should_show_choose_accounts_page(
     client_request,
-    mock_get_orgs_and_services,
+    mock_get_non_empty_organisations_and_services_for_user,
     mock_get_organisation,
-    mock_get_organisation_services,
 ):
     resp = client_request.get('main.choose_account')
     page = resp.find('div', {'id': 'content'}).main
 
     assert normalize_spaces(page.h1.text) == 'Choose service'
     outer_list_items = page.select('nav ul')[0].select('li')
-    assert len(outer_list_items) == 5
+
+    assert len(outer_list_items) == 7
 
     # first org
     assert outer_list_items[0].a.text == 'Org 1'
     assert outer_list_items[0].a['href'] == url_for('.organisation_dashboard', org_id='o1')
     assert normalize_spaces(outer_list_items[0].select_one('.browse-list-hint').text) == (
-        '1 live service'
+        '0 live services'
     )
 
     # second org
     assert outer_list_items[1].a.text == 'Org 2'
     assert outer_list_items[1].a['href'] == url_for('.organisation_dashboard', org_id='o2')
     assert normalize_spaces(outer_list_items[1].select_one('.browse-list-hint').text) == (
-        '2 live services'
+        '0 live services'
     )
 
     # third org
@@ -84,18 +114,20 @@ def test_choose_account_should_show_choose_accounts_page(
     )
 
     # orphaned live services
-    assert outer_list_items[3].a.text == 'service_1'
-    assert outer_list_items[3].a['href'] == url_for('.service_dashboard', service_id='s1')
-    assert outer_list_items[4].a.text == 'service_2'
-    assert outer_list_items[4].a['href'] == url_for('.service_dashboard', service_id='s2')
+    assert outer_list_items[3].a.text == 'Service 1'
+    assert outer_list_items[3].a['href'] == url_for('.service_dashboard', service_id=SERVICE_TWO_ID)
+    assert outer_list_items[4].a.text == 'service one'
+    assert outer_list_items[4].a['href'] == url_for('.service_dashboard', service_id='12345')
 
     # orphaned trial services
     trial_services_list_items = page.select('nav ul')[1].select('li')
-    assert len(trial_services_list_items) == 2
-    assert trial_services_list_items[0].a.text == 'org_service_3'
-    assert trial_services_list_items[0].a['href'] == url_for('.service_dashboard', service_id='os3')
-    assert trial_services_list_items[1].a.text == 'service_3'
-    assert trial_services_list_items[1].a['href'] == url_for('.service_dashboard', service_id='s3')
+    assert len(trial_services_list_items) == 3
+    assert trial_services_list_items[0].a.text == 'service three'
+    assert trial_services_list_items[0].a['href'] == url_for('.service_dashboard', service_id='abcde')
+    assert trial_services_list_items[1].a.text == 'service three'
+    assert trial_services_list_items[1].a['href'] == url_for('.service_dashboard', service_id='abcde')
+
+    assert len(mock_get_organisation.call_args_list) == 21
 
 
 def test_choose_account_should_show_choose_accounts_page_if_no_services(
@@ -106,7 +138,7 @@ def test_choose_account_should_show_choose_accounts_page_if_no_services(
 ):
     mock_get_orgs_and_services.return_value = {
         'organisations': [],
-        'services_without_organisations': []
+        'services': []
     }
     resp = client_request.get('main.choose_account')
     page = resp.find('div', {'id': 'content'}).main
