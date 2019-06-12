@@ -20,12 +20,12 @@ def test_organisation_page_shows_all_organisations(
     mocker
 ):
     orgs = [
-        {'id': '1', 'name': 'Test 1', 'active': True},
-        {'id': '2', 'name': 'Test 2', 'active': True},
-        {'id': '3', 'name': 'Test 3', 'active': False},
+        {'id': '1', 'name': 'Test 1', 'active': True, 'count_of_live_services': 0},
+        {'id': '2', 'name': 'Test 2', 'active': True, 'count_of_live_services': 1},
+        {'id': '3', 'name': 'Test 3', 'active': False, 'count_of_live_services': 2},
     ]
 
-    mocker.patch(
+    get_organisations = mocker.patch(
         'app.models.organisation.Organisations.client', return_value=orgs
     )
     response = logged_in_platform_admin_client.get(
@@ -39,13 +39,19 @@ def test_organisation_page_shows_all_organisations(
         page.select_one('h1').text
     ) == "All organisations"
 
+    expected_hints = ('0 live services', '1 live service', '2 live services')
+
     for index, org in enumerate(orgs):
         assert page.select('a.browse-list-link')[index].text == org['name']
         if not org['active']:
             assert page.select_one('.table-field-status-default,heading-medium').text == '- archived'
+        assert normalize_spaces(page.select('.browse-list-hint')[index].text) == (
+            expected_hints[index]
+        )
     assert normalize_spaces(
         page.select_one('a.button-secondary').text
     ) == 'New organisation'
+    get_organisations.assert_called_once_with()
 
 
 def test_view_organisation_shows_the_correct_organisation(
