@@ -12,20 +12,42 @@
         {{ user.name }}
       </h1>
       <p>{{ user.email_address }}</p>
-      <p>{{ user.mobile_number }}</p>
-      <h2 class="heading-medium">Services</h2>
+      <p class="{{ '' if user.mobile_number else 'hint' }}">{{ user.mobile_number or 'No mobile number'}}</p>
+      <h2 class="heading-medium">Live services</h2>
       <nav class="browse-list">
-        <ul>
-        {% for service in services %}
-          <li class="browse-list-item">
-            <a class="browse-list-hint" href={{url_for('.service_dashboard', service_id=service.id)}}>{{ service.name }}</a>
-          </li>
-        {% endfor %}
-        </ul>
+        {% if user.live_services %}
+          <ul>
+          {% for service in user.live_services %}
+            <li class="browse-list-item">
+              <a class="browse-list-hint" href={{url_for('.service_dashboard', service_id=service.id)}}>{{ service.name }}</a>
+            </li>
+          {% endfor %}
+          </ul>
+        {% else %}
+          <p class="hint">
+            No live services
+          </p>
+        {% endif %}
+      </nav>
+      <h2 class="heading-medium">Trial mode services</h2>
+      <nav class="browse-list">
+        {% if user.trial_mode_services %}
+          <ul>
+          {% for service in user.trial_mode_services %}
+            <li class="browse-list-item">
+              <a class="browse-list-hint" href={{url_for('.service_dashboard', service_id=service.id)}}>{{ service.name }}</a>
+            </li>
+          {% endfor %}
+          </ul>
+        {% else %}
+          <p class="hint">
+            No services in trial mode
+          </p>
+        {% endif %}
       </nav>
       <h2 class="heading-medium">Last login</h2>
       {% if not user.logged_in_at %}
-      <p>This person has never logged in</p>
+      <p class="hint">This person has never logged in</p>
       {% else %}
       <p>Last logged in
         <time class="timeago" datetime="{{ user.logged_in_at }}">

@@ -1,4 +1,5 @@
 from collections.abc import Sequence
+from itertools import chain
 
 from flask import abort, current_app, request, session
 from flask_login import AnonymousUserMixin, UserMixin, login_user
@@ -38,11 +39,9 @@ class User(JSONModel, UserMixin):
         'failed_login_count',
         'logged_in_at',
         'mobile_number',
-        'organisations',
         'password_changed_at',
         'permissions',
         'platform_admin',
-        'services',
         'state',
     }
 
@@ -193,9 +192,9 @@ class User(JSONModel, UserMixin):
             return True
 
         if org_id:
-            return org_id in self.organisations
+            return org_id in self.organisation_ids
         if not permissions:
-            return service_id in self.services
+            return service_id in self.service_ids
         if service_id:
             return any(x in self._permissions.get(service_id, []) for x in permissions)
 
@@ -223,11 +222,14 @@ class User(JSONModel, UserMixin):
         ]
 
     def belongs_to_service(self, service_id):
-        return str(service_id) in self.services
+        return str(service_id) in self.service_ids
 
     def belongs_to_service_or_403(self, service_id):
         if not self.belongs_to_service(service_id):
             abort(403)
+
+    def belongs_to_organisation(self, organisation_id):
+        return str(organisation_id) in self.organisation_ids
 
     @property
     def locked(self):
@@ -236,6 +238,71 @@ class User(JSONModel, UserMixin):
     @property
     def email_domain(self):
         return self.email_address.split('@')[-1]
+
+    @cached_property
+    def orgs_and_services(self):
+        return user_api_client.get_organisations_and_services_for_user(self.id)
+
+    @property
+    def services(self):
+        return sorted(
+            self.services_with_organisation + self.services_without_organisations,
+            key=lambda service: service.name.lower(),
+        )
+
+    @property
+    def services_with_organisation(self):
+        from app.models.service import Service
+        return [
+            Service(service) for service in
+            next(chain(
+                org['services'] for org in self.orgs_and_services['organisations']
+            ), [])
+        ]
+
+    @property
+    def services_without_organisations(self):
+        from app.models.service import Service
+        return [
+            Service(service) for service in
+            self.orgs_and_services['services_without_organisations']
+        ]
+
+    @property
+    def service_ids(self):
+        return self._dict['services']
+
+    @property
+    def trial_mode_services(self):
+        return [
+            service for service in self.services if service.trial_mode
+        ]
+
+    @property
+    def live_services(self):
+        return [
+            service for service in self.services if service.live
+        ]
+
+    @property
+    def live_services_not_belonging_to_users_organisations(self):
+        from app.models.service import Service
+        return [
+            Service(service)
+            for service in self.orgs_and_services['services_without_organisations']
+            if not service['restricted']
+        ]
+
+    @property
+    def organisations(self):
+        return [
+            Organisation.from_id(organisation['id'])
+            for organisation in self.orgs_and_services['organisations']
+        ]
+
+    @property
+    def organisation_ids(self):
+        return self._dict['organisations']
 
     @cached_property
     def default_organisation(self):
@@ -250,6 +317,14 @@ class User(JSONModel, UserMixin):
         if self.has_nhs_email_address:
             return 'nhs'
         return None
+
+    @property
+    def has_access_to_live_and_trial_mode_services(self):
+        return (
+            self.organisations or self.live_services
+        ) and (
+            self.trial_mode_services
+        )
 
     @property
     def has_nhs_email_address(self):
@@ -267,7 +342,7 @@ class User(JSONModel, UserMixin):
             "state": self.state,
             "failed_login_count": self.failed_login_count,
             "permissions": [x for x in self._permissions],
-            "organisations": self.organisations,
+            "organisations": self.organisation_ids,
             "current_session_id": self.current_session_id
         }
         if hasattr(self, '_password'):

@@ -56,7 +56,6 @@ class Service(JSONModel):
     def __init__(self, _dict):
 
         super().__init__(_dict)
-
         if 'permissions' not in self._dict:
             self.permissions = {'email', 'sms', 'letter'}
 
@@ -93,6 +92,10 @@ class Service(JSONModel):
     @property
     def trial_mode(self):
         return self._dict['restricted']
+
+    @property
+    def live(self):
+        return not self.trial_mode
 
     def has_permission(self, permission):
         return permission in self.permissions

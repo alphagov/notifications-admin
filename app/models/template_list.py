@@ -65,9 +65,9 @@ class TemplateList():
 
 class TemplateLists():
 
-    def __init__(self, services, user=None):
+    def __init__(self, user):
         self.services = sorted(
-            services,
+            user.services,
             key=lambda service: service.name.lower(),
         )
         self.user = user

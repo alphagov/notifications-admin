@@ -222,7 +222,7 @@ def submit_request_to_go_live(service_id):
             volume_sms_formatted=format_if_number(current_service.volume_sms),
             volume_letter_formatted=format_if_number(current_service.volume_letter),
             research_consent='Yes' if current_service.consent_to_research else 'No',
-            existing_live='Yes' if user_api_client.user_has_live_services(current_user) else 'No',
+            existing_live='Yes' if current_user.live_services else 'No',
             email_address=current_user.email_address,
         ),
         ticket_type=zendesk_client.TYPE_QUESTION,

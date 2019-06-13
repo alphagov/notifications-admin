@@ -15,16 +15,16 @@ SAMPLE_DATA = {
             'name': 'org_1',
             'id': 'o1',
             'services': [
-                {'name': 'org_service_1', 'id': 'os1'},
-                {'name': 'org_service_2', 'id': 'os2'},
-                {'name': 'org_service_3', 'id': 'os3'},
+                {'name': 'org_service_1', 'id': 'os1', 'restricted': False},
+                {'name': 'org_service_2', 'id': 'os2', 'restricted': False},
+                {'name': 'org_service_3', 'id': 'os3', 'restricted': True},
             ]
         },
         {
             'name': 'org_2',
             'id': 'o2',
             'services': [
-                {'name': 'org_service_4', 'id': 'os4'},
+                {'name': 'org_service_4', 'id': 'os4', 'restricted': False},
             ]
         },
         {
@@ -34,9 +34,9 @@ SAMPLE_DATA = {
         }
     ],
     'services_without_organisations': [
-        {'name': 'service_1', 'id': 's1'},
-        {'name': 'service_2', 'id': 's2'},
-        {'name': 'service_3', 'id': 's3'},
+        {'name': 'service_1', 'id': 's1', 'restricted': False},
+        {'name': 'service_2', 'id': 's2', 'restricted': False},
+        {'name': 'service_3', 'id': 's3', 'restricted': True},
     ]
 }
 
@@ -51,45 +51,58 @@ def mock_get_orgs_and_services(mocker):
 
 def test_choose_account_should_show_choose_accounts_page(
     client_request,
-    mock_get_orgs_and_services
+    mock_get_orgs_and_services,
+    mock_get_organisation,
+    mock_get_organisation_services,
 ):
     resp = client_request.get('main.choose_account')
     page = resp.find('div', {'id': 'content'}).main
 
     assert normalize_spaces(page.h1.text) == 'Choose service'
-    outer_list_items = page.nav.ul.find_all('li', recursive=False)
-
-    assert len(outer_list_items) == 6
+    outer_list_items = page.select('nav ul')[0].select('li')
+    assert len(outer_list_items) == 5
 
     # first org
-    assert outer_list_items[0].a.text == 'org_1'
+    assert outer_list_items[0].a.text == 'Org 1'
     assert outer_list_items[0].a['href'] == url_for('.organisation_dashboard', org_id='o1')
-    outer_list_orgs = outer_list_items[0].ul
-    assert ' '.join(outer_list_orgs.stripped_strings) == 'org_service_1 org_service_2 org_service_3'
+    assert normalize_spaces(outer_list_items[0].select_one('.browse-list-hint').text) == (
+        '1 live service'
+    )
 
     # second org
-    assert outer_list_items[1].a.text == 'org_2'
+    assert outer_list_items[1].a.text == 'Org 2'
     assert outer_list_items[1].a['href'] == url_for('.organisation_dashboard', org_id='o2')
-    outer_list_orgs = outer_list_items[1].ul
-    assert ' '.join(outer_list_orgs.stripped_strings) == 'org_service_4'
+    assert normalize_spaces(outer_list_items[1].select_one('.browse-list-hint').text) == (
+        '2 live services'
+    )
 
     # third org
-    assert outer_list_items[2].a.text == 'org_3'
+    assert outer_list_items[2].a.text == 'Org 3'
     assert outer_list_items[2].a['href'] == url_for('.organisation_dashboard', org_id='o3')
-    assert not outer_list_items[2].ul  # org 3 has no services
+    assert normalize_spaces(outer_list_items[2].select_one('.browse-list-hint').text) == (
+        '0 live services'
+    )
 
-    # orphaned services
+    # orphaned live services
     assert outer_list_items[3].a.text == 'service_1'
     assert outer_list_items[3].a['href'] == url_for('.service_dashboard', service_id='s1')
     assert outer_list_items[4].a.text == 'service_2'
     assert outer_list_items[4].a['href'] == url_for('.service_dashboard', service_id='s2')
-    assert outer_list_items[5].a.text == 'service_3'
-    assert outer_list_items[5].a['href'] == url_for('.service_dashboard', service_id='s3')
+
+    # orphaned trial services
+    trial_services_list_items = page.select('nav ul')[1].select('li')
+    assert len(trial_services_list_items) == 2
+    assert trial_services_list_items[0].a.text == 'org_service_3'
+    assert trial_services_list_items[0].a['href'] == url_for('.service_dashboard', service_id='os3')
+    assert trial_services_list_items[1].a.text == 'service_3'
+    assert trial_services_list_items[1].a['href'] == url_for('.service_dashboard', service_id='s3')
 
 
 def test_choose_account_should_show_choose_accounts_page_if_no_services(
     client_request,
-    mock_get_orgs_and_services
+    mock_get_orgs_and_services,
+    mock_get_organisation,
+    mock_get_organisation_services,
 ):
     mock_get_orgs_and_services.return_value = {
         'organisations': [],
@@ -106,9 +119,27 @@ def test_choose_account_should_show_choose_accounts_page_if_no_services(
     assert add_service_link['href'] == url_for('main.add_service')
 
 
+def test_choose_account_should_should_organisations_link_for_platform_admin(
+    client_request,
+    platform_admin_user,
+    mock_get_orgs_and_services,
+    mock_get_organisation,
+    mock_get_organisation_services,
+):
+    client_request.login(platform_admin_user)
+
+    page = client_request.get('main.choose_account')
+
+    first_link = page.select_one('.browse-list-item a')
+    assert first_link.text == 'All organisations'
+    assert first_link['href'] == url_for('main.organisations')
+
+
 def test_choose_account_should_show_back_to_service_link(
     client_request,
-    mock_get_orgs_and_services
+    mock_get_orgs_and_services,
+    mock_get_organisation,
+    mock_get_organisation_services,
 ):
     resp = client_request.get('main.choose_account')
 
@@ -122,7 +153,9 @@ def test_choose_account_should_show_back_to_service_link(
 def test_choose_account_should_not_show_back_to_service_link_if_no_service_in_session(
     client,
     client_request,
-    mock_get_orgs_and_services
+    mock_get_orgs_and_services,
+    mock_get_organisation,
+    mock_get_organisation_services,
 ):
     with client.session_transaction() as session:
         session['service_id'] = None
@@ -152,6 +185,8 @@ def test_choose_account_should_not_show_back_to_service_link_if_service_archived
     client_request,
     service_one,
     mock_get_orgs_and_services,
+    mock_get_organisation,
+    mock_get_organisation_services,
     active,
 ):
     service_one['active'] = active
