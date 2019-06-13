@@ -319,7 +319,7 @@ class User(JSONModel, UserMixin):
         return None
 
     @property
-    def has_multiple_services_or_organisations(self):
+    def has_access_to_live_and_trial_mode_services(self):
         return (
             self.organisations or self.live_services
         ) and (

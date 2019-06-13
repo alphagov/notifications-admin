@@ -53,11 +53,11 @@
 
 {% block maincolumn_content %}
 
-  <h1 class="heading-large {% if current_user.has_multiple_services_or_organisations %}visually-hidden{% endif %}">
+  <h1 class="heading-large {% if current_user.has_access_to_live_and_trial_mode_services %}visually-hidden{% endif %}">
     Choose service
   </h1>
 
-  <nav class="browse-list {% if current_user.has_multiple_services_or_organisations %}top-gutter-2-3{% endif %}">
+  <nav class="browse-list {% if current_user.has_access_to_live_and_trial_mode_services %}top-gutter-2-3{% endif %}">
 
     {% if current_user.platform_admin %}
       <div class="grid-row">
@@ -102,7 +102,7 @@
 
   {% if can_add_service %}
     <div class="js-stick-at-bottom-when-scrolling">
-      {% if current_user.has_multiple_services_or_organisations %}
+      {% if current_user.has_access_to_live_and_trial_mode_services %}
         <div class="grid-row">
           <div class="column-one-quarter">
             &nbsp;
@@ -110,7 +110,7 @@
           <div class="column-three-quarters">
       {% endif %}
       <a href="{{ url_for('.add_service') }}" class="button-secondary">Add a new service</a>
-      {% if current_user.has_multiple_services_or_organisations %}
+      {% if current_user.has_access_to_live_and_trial_mode_services %}
           </div>
         </div>
       {% endif %}
