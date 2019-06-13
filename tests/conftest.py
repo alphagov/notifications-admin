@@ -1091,6 +1091,7 @@ def api_user_pending(fake_uuid):
                  'permissions': {},
                  'organisations': [],
                  'current_session_id': None,
+                 'password_changed_at': str(datetime.utcnow()),
                  }
     return user_data
 
@@ -1114,6 +1115,7 @@ def platform_admin_user(fake_uuid):
                                                   'view_activity']},
                  'platform_admin': True,
                  'auth_type': 'sms_auth',
+                 'password_changed_at': str(datetime.utcnow()),
                  'services': [],
                  'organisations': [],
                  'current_session_id': None,
@@ -1443,7 +1445,7 @@ def api_user_request_password_reset(fake_uuid):
                  'state': 'active',
                  'failed_login_count': 5,
                  'permissions': {},
-                 'password_changed_at': None,
+                 'password_changed_at': str(datetime.utcnow()),
                  'auth_type': 'sms_auth',
                  'organisations': [],
                  'current_session_id': None,
@@ -2165,7 +2167,7 @@ def mock_get_users_by_service(mocker):
                                                   'manage_settings',
                                                   'manage_api_keys']},
                  'state': 'active',
-                 'password_changed_at': None,
+                 'password_changed_at': str(datetime.utcnow()),
                  'name': 'Test User',
                  'email_address': 'notify@digital.cabinet-office.gov.uk',
                  'auth_type': 'sms_auth',

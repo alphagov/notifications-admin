@@ -1,6 +1,6 @@
 import json
 
-from flask import current_app, redirect, render_template, session, url_for
+from flask import current_app, redirect, render_template, session, url_for, abort
 from flask_login import current_user, login_required
 from notifications_utils.url_safe_token import check_token
 
@@ -12,6 +12,7 @@ from app.main.forms import (
     ChangeNameForm,
     ChangePasswordForm,
     ConfirmPasswordForm,
+    ServiceOnOffSettingForm,
     TwoFactorForm,
 )
 from app.models.user import User
@@ -190,5 +191,28 @@ def user_profile_password():
 
     return render_template(
         'views/user-profile/change-password.html',
+        form=form
+    )
+
+
+@main.route("/user-profile/suppress-platform-admin", methods=['GET', 'POST'])
+@login_required
+def user_profile_suppress_platform_admin():
+    if not current_user.platform_admin and not session.get('suppress_platform_admin'):
+        abort(403)
+
+    form = ServiceOnOffSettingForm(
+        name="This setting will be cleared if you sign out and sign in again",
+        enabled=session.get('suppress_platform_admin', False),
+        truthy='Yes (view as regular user)',
+        falsey='No (view as platform admin)',
+    )
+
+    if form.validate_on_submit():
+        session['suppress_platform_admin'] = form.enabled.data
+        return redirect(url_for('.user_profile'))
+
+    return render_template(
+        'views/user-profile/suppress-platform-admin.html',
         form=form
     )

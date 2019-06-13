@@ -14,6 +14,18 @@ def test_should_show_overview_page(
 ):
     page = client_request.get(('main.user_profile'))
     assert page.select_one('h1').text.strip() == 'Your profile'
+    assert 'Suppress Platform Admin' not in page
+
+
+def test_overview_page_shows_suppress_for_platform_admin(
+    client_request,
+    platform_admin_user
+):
+    client_request.login(platform_admin_user)
+    page = client_request.get(('main.user_profile'))
+    assert page.select_one('h1').text.strip() == 'Your profile'
+    suppress_platform_admin_row = page.select('tr')[-1]
+    assert ' '.join(suppress_platform_admin_row.text.split()) == 'Suppress Platform Admin Off Change'
 
 
 def test_should_show_name_page(
@@ -264,3 +276,49 @@ def test_non_gov_user_cannot_access_change_email_page(
 ):
     client_request.login(api_nongov_user_active)
     client_request.get('main.user_profile_email', _expected_status=403)
+
+
+def test_normal_user_doesnt_see_suppress_platform_admin(client_request):
+    client_request.get('main.user_profile_suppress_platform_admin', _expected_status=403)
+
+
+def test_platform_admin_can_see_suppress_platform_admin_page(client_request, platform_admin_user):
+    client_request.login(platform_admin_user)
+    page = client_request.get('main.user_profile_suppress_platform_admin')
+
+    assert page.select_one('h1').text.strip() == 'Suppress platform admin'
+    assert page.select_one('input[checked]')['value'] == 'False'
+
+
+def test_can_suppress_platform_admin(client_request, platform_admin_user):
+    client_request.login(platform_admin_user)
+
+    with client_request.session_transaction() as session:
+        assert 'suppress_platform_admin' not in session
+
+    client_request.post(
+        'main.user_profile_suppress_platform_admin',
+        _data={'enabled': True},
+        _expected_status=302,
+        _expected_redirect=url_for('main.user_profile', _external=True),
+    )
+
+    with client_request.session_transaction() as session:
+        assert session['suppress_platform_admin'] is True
+
+
+def test_can_turn_off_suppress_platform_admin(client_request, platform_admin_user):
+    client_request.login(platform_admin_user)
+
+    with client_request.session_transaction() as session:
+        session['suppress_platform_admin'] = True
+
+    client_request.post(
+        'main.user_profile_suppress_platform_admin',
+        _data={'enabled': False},
+        _expected_status=302,
+        _expected_redirect=url_for('main.user_profile', _external=True),
+    )
+
+    with client_request.session_transaction() as session:
+        assert session['suppress_platform_admin'] is False

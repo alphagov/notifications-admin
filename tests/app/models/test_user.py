@@ -9,7 +9,8 @@ def test_user(app_):
                  'email_address': 'test@user.gov.uk',
                  'mobile_number': '+4412341234',
                  'state': 'pending',
-                 'failed_login_count': 0
+                 'failed_login_count': 0,
+                 'platform_admin': False,
                  }
     user = User(user_data)
 
@@ -40,3 +41,21 @@ def test_activate_user(app_, api_user_pending, mock_activate_user):
 def test_activate_user_already_active(app_, api_user_active, mock_activate_user):
     assert User(api_user_active).activate() == User(api_user_active)
     assert mock_activate_user.called is False
+
+
+@pytest.mark.parametrize('is_platform_admin, value_in_session, expected_result', [
+    (True, True, False),
+    (True, False, True),
+    (True, None, True),
+    (False, True, False),
+    (False, False, False),
+    (False, None, False),
+])
+def test_platform_admin_checks_flag_set_in_session(client, mocker, is_platform_admin, value_in_session, expected_result):
+    session_dict = {}
+    if value_in_session is not None:
+        session_dict['suppress_platform_admin'] = value_in_session
+
+    mocker.patch.dict('app.models.user.session', values=session_dict, clear=True)
+
+    assert User({'platform_admin': is_platform_admin}).platform_admin == expected_result
