@@ -14,7 +14,6 @@ from app.models.roles_and_permissions import (
 from app.notify_client import InviteTokenError
 from app.notify_client.invite_api_client import invite_api_client
 from app.notify_client.org_invite_api_client import org_invite_api_client
-from app.notify_client.organisations_api_client import organisations_client
 from app.notify_client.user_api_client import user_api_client
 from app.utils import is_gov_user
 
@@ -239,9 +238,7 @@ class User(JSONModel, UserMixin):
 
     @cached_property
     def default_organisation(self):
-        return Organisation(
-            organisations_client.get_organisation_by_domain(self.email_domain)
-        )
+        return Organisation.from_domain(self.email_domain)
 
     @property
     def default_organisation_type(self):
