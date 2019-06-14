@@ -7,6 +7,7 @@ from app import organisations_client
 
 @pytest.mark.parametrize(
     (
+        'client_method,'
         'expected_cache_get_calls,'
         'cache_value,'
         'expected_api_calls,'
@@ -15,13 +16,14 @@ from app import organisations_client
     ),
     [
         (
+            'get_domains',
             [
-                call('domains')
+                call('domains'),
             ],
             b"""
                 [
-                    {"domains": ["a", "b", "c"]},
-                    {"domains": ["c", "d", "e"]}
+                    {"name": "org 1", "domains": ["a", "b", "c"]},
+                    {"name": "org 2", "domains": ["c", "d", "e"]}
                 ]
             """,
             [],
@@ -29,8 +31,10 @@ from app import organisations_client
             ['a', 'b', 'c', 'd', 'e'],
         ),
         (
+            'get_domains',
             [
-                call('domains')
+                call('domains'),
+                call('organisations'),
             ],
             None,
             [
@@ -38,10 +42,51 @@ from app import organisations_client
             ],
             [
                 call(
+                    'organisations',
+                    '[{"domains": ["x", "y", "z"]}]',
+                    ex=604800,
+                ),
+                call(
                     'domains',
                     '["x", "y", "z"]',
                     ex=604800
-                )
+                ),
+            ],
+            'from api',
+        ),
+        (
+            'get_organisations',
+            [
+                call('organisations'),
+            ],
+            b"""
+                [
+                    {"name": "org 1", "domains": ["a", "b", "c"]},
+                    {"name": "org 2", "domains": ["c", "d", "e"]}
+                ]
+            """,
+            [],
+            [],
+            [
+                {"name": "org 1", "domains": ["a", "b", "c"]},
+                {"name": "org 2", "domains": ["c", "d", "e"]}
+            ],
+        ),
+        (
+            'get_organisations',
+            [
+                call('organisations'),
+            ],
+            None,
+            [
+                call(url='/organisations')
+            ],
+            [
+                call(
+                    'organisations',
+                    '[{"domains": ["x", "y", "z"]}]',
+                    ex=604800,
+                ),
             ],
             'from api',
         ),
@@ -50,6 +95,7 @@ from app import organisations_client
 def test_returns_value_from_cache(
     app_,
     mocker,
+    client_method,
     expected_cache_get_calls,
     cache_value,
     expected_return_value,
@@ -71,7 +117,7 @@ def test_returns_value_from_cache(
         'app.extensions.RedisClient.set',
     )
 
-    organisations_client.get_domains()
+    getattr(organisations_client, client_method)()
 
     assert mock_redis_get.call_args_list == expected_cache_get_calls
     assert mock_api_get.call_args_list == expected_api_calls

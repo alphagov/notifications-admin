@@ -7,6 +7,7 @@ from app.notify_client import NotifyAdminAPIClient, _attach_current_user, cache
 
 class OrganisationsClient(NotifyAdminAPIClient):
 
+    @cache.set('organisations')
     def get_organisations(self):
         return self.get(url='/organisations')
 
@@ -30,6 +31,7 @@ class OrganisationsClient(NotifyAdminAPIClient):
                 return None
             raise error
 
+    @cache.delete('organisations')
     def create_organisation(self, name):
         data = {
             "name": name
@@ -37,6 +39,7 @@ class OrganisationsClient(NotifyAdminAPIClient):
         return self.post(url="/organisations", data=data)
 
     @cache.delete('domains')
+    @cache.delete('organisations')
     def update_organisation(self, org_id, **kwargs):
         return self.post(url="/organisations/{}".format(org_id), data=kwargs)
 
