@@ -176,7 +176,7 @@ class User(JSONModel, UserMixin):
 
     @property
     def platform_admin(self):
-        return self._platform_admin and not session.get('suppress_platform_admin', False)
+        return self._platform_admin and not session.get('disable_platform_admin_view', False)
 
     def has_permissions(self, *permissions, restrict_admin_usage=False):
         unknown_permissions = set(permissions) - all_permissions
