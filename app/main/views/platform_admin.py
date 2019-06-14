@@ -417,7 +417,12 @@ def clear_cache():
         ('letter_branding', [
             'letter_branding',
             'letter_branding-????????-????-????-????-????????????',
-        ])
+        ]),
+        ('organisation', [
+            'organisations',
+            'domains',
+            'live-service-and-organisation-counts',
+        ]),
     ])
 
     form = ClearCacheForm()
