@@ -27,6 +27,14 @@ class Organisation(JSONModel):
     def from_id(cls, org_id):
         return cls(organisations_client.get_organisation(org_id))
 
+    @classmethod
+    def from_domain(cls, domain):
+        return cls(organisations_client.get_organisation_by_domain(domain))
+
+    @classmethod
+    def from_service(cls, service_id):
+        return cls(organisations_client.get_service_organisation(service_id))
+
     def __init__(self, _dict):
 
         super().__init__(_dict)

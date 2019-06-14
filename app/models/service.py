@@ -12,7 +12,6 @@ from app.notify_client.inbound_number_client import inbound_number_client
 from app.notify_client.invite_api_client import invite_api_client
 from app.notify_client.job_api_client import job_api_client
 from app.notify_client.letter_branding_client import letter_branding_client
-from app.notify_client.organisations_api_client import organisations_client
 from app.notify_client.service_api_client import service_api_client
 from app.notify_client.template_folder_api_client import (
     template_folder_api_client,
@@ -401,9 +400,7 @@ class Service(JSONModel):
 
     @cached_property
     def organisation(self):
-        return Organisation(
-            organisations_client.get_service_organisation(self.id)
-        )
+        return Organisation.from_service(self.id)
 
     @cached_property
     def inbound_number(self):
