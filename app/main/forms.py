@@ -749,6 +749,7 @@ class CreateKeyForm(StripWhitespaceForm):
     def __init__(self, existing_keys, *args, **kwargs):
         self.existing_key_names = [
             key['name'].lower() for key in existing_keys
+            if not key['expiry_date']
         ]
         super().__init__(*args, **kwargs)
 
