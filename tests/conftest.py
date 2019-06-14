@@ -1431,6 +1431,7 @@ def api_user_locked(fake_uuid):
                  'auth_type': 'sms_auth',
                  'organisations': [],
                  'current_session_id': None,
+                 'platform_admin': False,
                  }
     return user_data
 
@@ -1449,6 +1450,7 @@ def api_user_request_password_reset(fake_uuid):
                  'auth_type': 'sms_auth',
                  'organisations': [],
                  'current_session_id': None,
+                 'platform_admin': False,
                  }
     return user_data
 
@@ -1467,6 +1469,7 @@ def api_user_changed_password(fake_uuid):
                  'password_changed_at': str(datetime.utcnow() + timedelta(minutes=1)),
                  'organisations': [],
                  'current_session_id': None,
+                 'platform_admin': False,
                  }
     return user_data
 
@@ -2172,7 +2175,9 @@ def mock_get_users_by_service(mocker):
                  'email_address': 'notify@digital.cabinet-office.gov.uk',
                  'auth_type': 'sms_auth',
                  'failed_login_count': 0,
-                 'organisations': []}]
+                 'organisations': [],
+                 'platform_admin': False,
+                 }]
         return [data[0]]
 
     # You shouldn’t be calling the user API client directly, so it’s the
