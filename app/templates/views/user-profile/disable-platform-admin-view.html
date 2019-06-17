@@ -1,0 +1,27 @@
+{% extends "withoutnav_template.html" %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/radios.html" import radios %}
+
+{% block per_page_title %}
+  Use platform admin view
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <div class="grid-row">
+    <div class="column-five-sixths">
+      {{ page_header(
+        'Use platform admin view',
+        back_link=url_for('.user_profile')
+      ) }}
+
+      {% call form_wrapper() %}
+        {{ radios(form.enabled) }}
+        {{ page_footer('Save') }}
+      {% endcall %}
+    </div>
+  </div>
+
+{% endblock %}

@@ -1,6 +1,13 @@
 import json
 
-from flask import current_app, redirect, render_template, session, url_for
+from flask import (
+    abort,
+    current_app,
+    redirect,
+    render_template,
+    session,
+    url_for,
+)
 from flask_login import current_user, login_required
 from notifications_utils.url_safe_token import check_token
 
@@ -12,6 +19,7 @@ from app.main.forms import (
     ChangeNameForm,
     ChangePasswordForm,
     ConfirmPasswordForm,
+    ServiceOnOffSettingForm,
     TwoFactorForm,
 )
 from app.models.user import User
@@ -190,5 +198,28 @@ def user_profile_password():
 
     return render_template(
         'views/user-profile/change-password.html',
+        form=form
+    )
+
+
+@main.route("/user-profile/disable-platform-admin-view", methods=['GET', 'POST'])
+@login_required
+def user_profile_disable_platform_admin_view():
+    if not current_user.platform_admin and not session.get('disable_platform_admin_view'):
+        abort(403)
+
+    form = ServiceOnOffSettingForm(
+        name="Signing in again clears this setting",
+        enabled=not session.get('disable_platform_admin_view'),
+        truthy='Yes',
+        falsey='No',
+    )
+
+    if form.validate_on_submit():
+        session['disable_platform_admin_view'] = not form.enabled.data
+        return redirect(url_for('.user_profile'))
+
+    return render_template(
+        'views/user-profile/disable-platform-admin-view.html',
         form=form
     )

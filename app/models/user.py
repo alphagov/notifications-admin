@@ -48,6 +48,7 @@ class User(JSONModel, UserMixin):
         super().__init__(_dict)
         self.permissions = _dict.get('permissions', {})
         self.max_failed_login_count = current_app.config['MAX_FAILED_LOGIN_COUNT']
+        self._platform_admin = _dict['platform_admin']
 
     @classmethod
     def from_id(cls, user_id):
@@ -171,6 +172,10 @@ class User(JSONModel, UserMixin):
             not self.logged_in_elsewhere() and
             super(User, self).is_authenticated
         )
+
+    @property
+    def platform_admin(self):
+        return self._platform_admin and not session.get('disable_platform_admin_view', False)
 
     def has_permissions(self, *permissions, restrict_admin_usage=False):
         unknown_permissions = set(permissions) - all_permissions
