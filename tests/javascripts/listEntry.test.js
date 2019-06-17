@@ -1,19 +1,11 @@
 beforeAll(() => {
-  // set up jQuery & HoganJS
-  window.jQuery = require('jquery');
-  $ = window.jQuery;
   Hogan = require('hogan.js');
 
-  // load module code
-  require('govuk_frontend_toolkit/javascripts/govuk/modules.js');
   require('../../app/assets/javascripts/listEntry.js');
 });
 
 afterAll(() => {
-  window.jQuery = null;
-  $ = null;
-
-  delete window.GOVUK;
+  require('./support/teardown.js');
 });
 
 describe("List entry", () => {
