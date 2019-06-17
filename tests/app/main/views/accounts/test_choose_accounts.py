@@ -20,14 +20,17 @@ SAMPLE_DATA = {
         {
             'name': 'org_1',
             'id': 'o1',
+            'count_of_live_services': 1,
         },
         {
             'name': 'org_2',
             'id': 'o2',
+            'count_of_live_services': 2,
         },
         {
             'name': 'org_3',
             'id': 'o3',
+            'count_of_live_services': 0,
         }
     ],
     'services': [
@@ -96,14 +99,14 @@ def test_choose_account_should_show_choose_accounts_page(
     assert outer_list_items[0].a.text == 'Org 1'
     assert outer_list_items[0].a['href'] == url_for('.organisation_dashboard', org_id='o1')
     assert normalize_spaces(outer_list_items[0].select_one('.browse-list-hint').text) == (
-        '0 live services'
+        '1 live service'
     )
 
     # second org
     assert outer_list_items[1].a.text == 'Org 2'
     assert outer_list_items[1].a['href'] == url_for('.organisation_dashboard', org_id='o2')
     assert normalize_spaces(outer_list_items[1].select_one('.browse-list-hint').text) == (
-        '0 live services'
+        '2 live services'
     )
 
     # third org
@@ -127,7 +130,7 @@ def test_choose_account_should_show_choose_accounts_page(
     assert trial_services_list_items[1].a.text == 'service three'
     assert trial_services_list_items[1].a['href'] == url_for('.service_dashboard', service_id='abcde')
 
-    assert len(mock_get_organisation.call_args_list) == 21
+    assert mock_get_organisation.call_args_list == []
 
 
 def test_choose_account_should_show_choose_accounts_page_if_no_services(
@@ -155,7 +158,6 @@ def test_choose_account_should_should_organisations_link_for_platform_admin(
     client_request,
     platform_admin_user,
     mock_get_orgs_and_services,
-    mock_get_organisation,
     mock_get_organisation_services,
 ):
     client_request.login(platform_admin_user)

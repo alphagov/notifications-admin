@@ -294,7 +294,7 @@ class User(JSONModel, UserMixin):
     @property
     def organisations(self):
         return [
-            Organisation.from_id(organisation['id'])
+            Organisation(organisation)
             for organisation in self.orgs_and_services['organisations']
         ]
 
