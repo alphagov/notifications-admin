@@ -25,7 +25,7 @@
 
     th,
     .table-field-error-label,
-    .table-field-center-aligned {
+    .table-field-left-aligned {
       white-space: nowrap;
     }
 
@@ -62,7 +62,7 @@
       display: none;
     }
 
-    .table-field-center-aligned {
+    .table-field-left-aligned {
       position: relative;
       z-index: 150;
       background: $white;
@@ -100,7 +100,7 @@
       visibility: hidden;
     }
 
-    .table-field-center-aligned {
+    .table-field-left-aligned {
       width: 0;
       position: relative;
       z-index: 100;
