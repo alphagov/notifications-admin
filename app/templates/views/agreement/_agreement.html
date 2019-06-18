@@ -1,17 +1,17 @@
 <p>
-  Before you can go live on GOV.UK Notify, your organisation needs to agree to our data sharing and financial agreement.
+  To use GOV.UK Notify your organisation (Cabinet Office) must accept the GOV.UK Notify data sharing and financial agreement.
 </p>
-<ol class="list list-number">
-  <li>
-    <a href="{{ url_for('main.download_agreement') }}">Download the agreement</a>.
-  </li>
-  <li>
-    Get it signed by someone who has the authority to do so on behalf of {{ owner }}.
-  </li>
-  <li>
-    Return the signed copy to <a href="mailto:notify-support@digital.cabinet-office.gov.uk">notify-support@digital.cabinet-office.gov.uk</a>.
-  </li>
-</ol>
+<p>
+  This agreement only needs to be accepted once and will then cover all Notify services from
+  {{ current_service.organisation.name }}.
+</p>
+<p>
+  It needs to be accepted by, or on behalf of someone who can sign contracts for your organisation.
+</p>
+<p>
+  <a href="{{ url_for('main.download_agreement') }}">Download a copy of the agreement</a>.
+</p>
 <p>
   The agreement contains commercially sensitive information, so don’t share it more widely than you need to.
 </p>
+<a href="{{ url_for('main.service_accept_agreement', service_id=current_service.id) }}" class="button">Continue</a>

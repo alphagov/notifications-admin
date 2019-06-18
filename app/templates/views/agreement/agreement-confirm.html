@@ -1,0 +1,39 @@
+{% extends "withnav_template.html" %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/page-header.html" import page_header %}
+
+{% block per_page_title %}
+  GOV.UK Notify data sharing and financial agreement
+{% endblock %}
+
+{% block maincolumn_content %}
+
+<div class="grid-row">
+  <div class="column-five-sixths">
+
+    {{ page_header(
+      'GOV.UK Notify data sharing and financial agreement',
+      back_link=url_for('main.service_accept_agreement', service_id=current_service.id)
+    ) }}
+
+    {% call form_wrapper(class='top-gutter') %}
+
+      {% if current_service.organisation.agreement_signed_on_behalf_of_name and current_service.organisation.agreement_signed_on_behalf_of_email_address %}
+        <p>
+          I confirm that I have the legal authority to accept the GOV.UK Notify data sharing and financial agreement (version {{ current_service.organisation.agreement_signed_version }}) on behalf of {{ current_service.organisation.agreement_signed_on_behalf_of_name }} ({{ current_service.organisation.agreement_signed_on_behalf_of_email_address }}) and that {{ current_service.organisation.name }} will be bound by it.
+        </p>
+      {% else %}
+        <p>
+          I confirm that I have the legal authority to accept the GOV.UK Notify data sharing and financial agreement (version {{ current_service.organisation.agreement_signed_version }}) and that {{ current_service.organisation.name }} will be bound by it.
+        </p>
+      {% endif %}
+
+      {{ page_footer('Accept this agreement') }}
+
+    {% endcall %}
+
+  </div>
+</div>
+
+{% endblock %}
