@@ -32,8 +32,12 @@
             <ul>
               {% for org in organisations %}
                 <li class="browse-list-item">
-                  <a href="{{ url_for('main.organisation_dashboard', org_id=org['id']) }}" class="browse-list-link">{{ org['name'] }}</a>
-                  {% if not org['active'] %}
+                  <a href="{{ url_for('main.organisation_dashboard', org_id=org.id) }}" class="browse-list-link">{{ org.name }}</a>
+                  <p class="browse-list-hint">
+                    {{ org.count_of_live_services }}
+                    live service{% if org.count_of_live_services != 1 %}s{% endif %}
+                  </p>
+                  {% if not org.active %}
                     <span class="table-field-status-default heading-medium">- archived</span>
                   {% endif %}
                 </li>

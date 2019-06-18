@@ -31,6 +31,7 @@ from app.main.forms import (
     SetLetterBranding,
 )
 from app.main.views.service_settings import get_branding_as_value_and_label
+from app.models.organisation import Organisations
 from app.models.user import InvitedOrgUser, User
 from app.utils import user_has_permissions, user_is_platform_admin
 
@@ -39,11 +40,9 @@ from app.utils import user_has_permissions, user_is_platform_admin
 @login_required
 @user_is_platform_admin
 def organisations():
-    orgs = organisations_client.get_organisations()
-
     return render_template(
         'views/organisations/index.html',
-        organisations=orgs,
+        organisations=Organisations(),
         search_form=SearchByNameForm(),
     )
 

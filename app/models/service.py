@@ -402,6 +402,10 @@ class Service(JSONModel):
     def organisation(self):
         return Organisation.from_service(self.id)
 
+    @property
+    def organisation_id(self):
+        return self._dict['organisation']
+
     @cached_property
     def inbound_number(self):
         return inbound_number_client.get_inbound_sms_number_for_service(self.id)['data'].get('number', '')

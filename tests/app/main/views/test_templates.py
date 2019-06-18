@@ -840,7 +840,7 @@ def test_choose_a_template_to_copy(
     client_request,
     mock_get_service_templates,
     mock_get_template_folders,
-    mock_get_non_empty_organisations_and_services_for_user,
+    mock_get_just_services_for_user,
 ):
     page = client_request.get(
         'main.choose_template_to_copy',
@@ -850,62 +850,6 @@ def test_choose_a_template_to_copy(
     assert page.select('.folder-heading') == []
 
     expected = [
-        (
-            'Org 1 service 1 '
-            '6 templates'
-        ),
-        (
-            'Org 1 service 1 / sms_template_one '
-            'Text message template'
-        ),
-        (
-            'Org 1 service 1 / sms_template_two '
-            'Text message template'
-        ),
-        (
-            'Org 1 service 1 / email_template_one '
-            'Email template'
-        ),
-        (
-            'Org 1 service 1 / email_template_two '
-            'Email template'
-        ),
-        (
-            'Org 1 service 1 / letter_template_one '
-            'Letter template'
-        ),
-        (
-            'Org 1 service 1 / letter_template_two '
-            'Letter template'
-        ),
-        (
-            'Org 1 service 2 '
-            '6 templates'
-        ),
-        (
-            'Org 1 service 2 / sms_template_one '
-            'Text message template'
-        ),
-        (
-            'Org 1 service 2 / sms_template_two '
-            'Text message template'
-        ),
-        (
-            'Org 1 service 2 / email_template_one '
-            'Email template'
-        ),
-        (
-            'Org 1 service 2 / email_template_two '
-            'Email template'
-        ),
-        (
-            'Org 1 service 2 / letter_template_one '
-            'Letter template'
-        ),
-        (
-            'Org 1 service 2 / letter_template_two '
-            'Letter template'
-        ),
         (
             'Service 1 '
             '6 templates'

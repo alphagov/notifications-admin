@@ -3207,27 +3207,28 @@ def mock_update_service_organisation(mocker):
     )
 
 
+def _get_organisation_services(organisation_id):
+    if organisation_id == 'o1':
+        return [
+            service_json('12345', 'service one', restricted=False),
+            service_json('67890', 'service two'),
+            service_json('abcde', 'service three'),
+        ]
+    if organisation_id == 'o2':
+        return [
+            service_json('12345', 'service one', restricted=False),
+            service_json('67890', 'service two', restricted=False),
+            service_json('abcde', 'service three'),
+        ]
+    return [
+        service_json('12345', 'service one'),
+        service_json('67890', 'service two'),
+        service_json(SERVICE_ONE_ID, 'service one', [api_user_active(fake_uuid())['id']])
+    ]
+
+
 @pytest.fixture(scope='function')
 def mock_get_organisation_services(mocker, api_user_active):
-    def _get_organisation_services(organisation_id):
-        if organisation_id == 'o1':
-            return [
-                service_json('12345', 'service one', restricted=False),
-                service_json('67890', 'service two'),
-                service_json('abcde', 'service three'),
-            ]
-        if organisation_id == 'o2':
-            return [
-                service_json('12345', 'service one', restricted=False),
-                service_json('67890', 'service two', restricted=False),
-                service_json('abcde', 'service three'),
-            ]
-        return [
-            service_json('12345', 'service one'),
-            service_json('67890', 'service two'),
-            service_json(SERVICE_ONE_ID, 'service one', [api_user_active['id']])
-        ]
-
     return mocker.patch(
         'app.organisations_client.get_organisation_services',
         side_effect=_get_organisation_services
@@ -3346,7 +3347,7 @@ def mock_get_organisations_and_services_for_user(mocker, organisation_one, api_u
     def _get_orgs_and_services(user_id):
         return {
             'organisations': [],
-            'services_without_organisations': []
+            'services': []
         }
 
     return mocker.patch(
@@ -3358,20 +3359,61 @@ def mock_get_organisations_and_services_for_user(mocker, organisation_one, api_u
 @pytest.fixture
 def mock_get_non_empty_organisations_and_services_for_user(mocker, organisation_one, api_user_active):
 
-    def _make_services(name):
+    def _make_services(name, trial_mode=False):
         return [{
             'name': '{} {}'.format(name, i),
             'id': SERVICE_TWO_ID,
-            'restricted': False,
+            'restricted': trial_mode,
+            'organisation': None,
         } for i in range(1, 3)]
 
     def _get_orgs_and_services(user_id):
         return {
             'organisations': [
-                {'name': 'Org 1', 'services': _make_services('Org 1 service')},
-                {'name': 'Org 2', 'services': _make_services('Org 2 service')},
+                {
+                    'name': 'Org 1',
+                    'id': 'o1',
+                    'count_of_live_services': 1,
+                },
+                {
+                    'name': 'Org 2',
+                    'id': 'o2',
+                    'count_of_live_services': 2,
+                },
+                {
+                    'name': 'Org 3',
+                    'id': 'o3',
+                    'count_of_live_services': 0,
+                },
             ],
-            'services_without_organisations': _make_services('Service')
+            'services': (
+                _get_organisation_services('o1')
+                + _get_organisation_services('o2')
+                + _make_services('Service')
+            )
+        }
+
+    return mocker.patch(
+        'app.user_api_client.get_organisations_and_services_for_user',
+        side_effect=_get_orgs_and_services
+    )
+
+
+@pytest.fixture
+def mock_get_just_services_for_user(mocker, organisation_one, api_user_active):
+
+    def _make_services(name, trial_mode=False):
+        return [{
+            'name': '{} {}'.format(name, i + 1),
+            'id': id,
+            'restricted': trial_mode,
+            'organisation': None,
+        } for i, id in enumerate([SERVICE_TWO_ID, SERVICE_ONE_ID])]
+
+    def _get_orgs_and_services(user_id):
+        return {
+            'organisations': [],
+            'services': _make_services('Service'),
         }
 
     return mocker.patch(
@@ -3386,7 +3428,7 @@ def mock_get_empty_organisations_and_one_service_for_user(mocker, organisation_o
     def _get_orgs_and_services(user_id):
         return {
             'organisations': [],
-            'services_without_organisations': [{
+            'services': [{
                 'name': 'Only service',
                 'id': SERVICE_TWO_ID,
             }]

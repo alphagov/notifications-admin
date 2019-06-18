@@ -139,6 +139,7 @@ def service_json(
     organisation_type='central',
     prefix_sms=True,
     contact_link=None,
+    organisation_id=None,
 ):
     if users is None:
         users = []
@@ -173,6 +174,7 @@ def service_json(
         'volume_letter': 333333,
         'consent_to_research': True,
         'count_as_live': True,
+        'organisation': organisation_id,
     }
 
 
@@ -200,7 +202,6 @@ def organisation_json(
         'name': 'Test Organisation' if name is False else name,
         'active': active,
         'users': users,
-        'services': services,
         'created_at': created_at or str(datetime.utcnow()),
         'email_branding_id': email_branding_id,
         'letter_branding_id': letter_branding_id,
@@ -211,6 +212,7 @@ def organisation_json(
         'agreement_signed_by': None,
         'domains': domains or [],
         'request_to_go_live_notes': request_to_go_live_notes,
+        'count_of_live_services': len(services),
     }
 
 

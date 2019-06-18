@@ -1,12 +1,9 @@
-from collections.abc import Sequence
-from itertools import chain
-
 from flask import abort, current_app, request, session
 from flask_login import AnonymousUserMixin, UserMixin, login_user
 from notifications_python_client.errors import HTTPError
 from werkzeug.utils import cached_property
 
-from app.models import JSONModel
+from app.models import JSONModel, ModelList
 from app.models.organisation import Organisation
 from app.models.roles_and_permissions import (
     all_permissions,
@@ -247,29 +244,29 @@ class User(JSONModel, UserMixin):
     def orgs_and_services(self):
         return user_api_client.get_organisations_and_services_for_user(self.id)
 
+    @staticmethod
+    def sort_services(services):
+        return sorted(services, key=lambda service: service.name.lower())
+
     @property
     def services(self):
-        return sorted(
-            self.services_with_organisation + self.services_without_organisations,
-            key=lambda service: service.name.lower(),
-        )
+        from app.models.service import Service
+        return self.sort_services([
+            Service(service) for service in self.orgs_and_services['services']
+        ])
 
     @property
     def services_with_organisation(self):
-        from app.models.service import Service
         return [
-            Service(service) for service in
-            next(chain(
-                org['services'] for org in self.orgs_and_services['organisations']
-            ), [])
+            service for service in self.services
+            if self.belongs_to_organisation(service.organisation_id)
         ]
 
     @property
     def services_without_organisations(self):
-        from app.models.service import Service
         return [
-            Service(service) for service in
-            self.orgs_and_services['services_without_organisations']
+            service for service in self.services
+            if not self.belongs_to_organisation(service.organisation_id)
         ]
 
     @property
@@ -290,17 +287,14 @@ class User(JSONModel, UserMixin):
 
     @property
     def live_services_not_belonging_to_users_organisations(self):
-        from app.models.service import Service
-        return [
-            Service(service)
-            for service in self.orgs_and_services['services_without_organisations']
-            if not service['restricted']
-        ]
+        return self.sort_services(
+            set(self.live_services).union(self.services_without_organisations)
+        )
 
     @property
     def organisations(self):
         return [
-            Organisation.from_id(organisation['id'])
+            Organisation(organisation)
             for organisation in self.orgs_and_services['organisations']
         ]
 
@@ -594,22 +588,13 @@ class AnonymousUser(AnonymousUserMixin):
         return Organisation(None)
 
 
-class Users(Sequence):
+class Users(ModelList):
 
     client = user_api_client.get_users_for_service
     model = User
 
     def __init__(self, service_id):
-        self.users = self.client(service_id)
-
-    def __getitem__(self, index):
-        return self.model(self.users[index])
-
-    def __len__(self):
-        return len(self.users)
-
-    def __add__(self, other):
-        return list(self) + list(other)
+        self.items = self.client(service_id)
 
 
 class OrganisationUsers(Users):
@@ -622,7 +607,7 @@ class InvitedUsers(Users):
     model = InvitedUser
 
     def __init__(self, service_id):
-        self.users = [
+        self.items = [
             user for user in self.client(service_id)
             if user['status'] != 'accepted'
         ]

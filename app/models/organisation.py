@@ -1,7 +1,7 @@
 from flask import Markup, abort
 from werkzeug.utils import cached_property
 
-from app.models import JSONModel
+from app.models import JSONModel, ModelList
 from app.notify_client.organisations_api_client import organisations_client
 
 
@@ -21,6 +21,7 @@ class Organisation(JSONModel):
         'agreement_signed_version',
         'domains',
         'request_to_go_live_notes',
+        'count_of_live_services',
     }
 
     @classmethod
@@ -154,3 +155,8 @@ class Organisation(JSONModel):
             self.invited_users + self.active_users,
             key=lambda user: user.email_address.lower(),
         )
+
+
+class Organisations(ModelList):
+    client = organisations_client.get_organisations
+    model = Organisation

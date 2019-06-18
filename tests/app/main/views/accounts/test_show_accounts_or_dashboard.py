@@ -29,7 +29,7 @@ def user_with_orgs_and_services(num_orgs, num_services, platform_admin=False):
 def test_show_accounts_or_dashboard_redirects_to_choose_account_or_service_dashboard(
     client,
     mocker,
-    mock_get_non_empty_organisations_and_services_for_user,
+    mock_get_organisations_and_services_for_user,
     num_orgs,
     num_services,
     endpoint,
@@ -78,7 +78,7 @@ def test_show_accounts_or_dashboard_redirects_if_org_in_session(client, mocker):
 def test_show_accounts_or_dashboard_doesnt_redirect_to_service_dashboard_if_user_not_part_of_service_in_session(
     client,
     mocker,
-    mock_get_non_empty_organisations_and_services_for_user,
+    mock_get_organisations_and_services_for_user,
     mock_get_service
 ):
     client.login(user_with_orgs_and_services(num_orgs=1, num_services=1), mocker=mocker)
@@ -95,7 +95,7 @@ def test_show_accounts_or_dashboard_doesnt_redirect_to_service_dashboard_if_user
 def test_show_accounts_or_dashboard_doesnt_redirect_to_org_dashboard_if_user_not_part_of_org_in_session(
     client,
     mocker,
-    mock_get_non_empty_organisations_and_services_for_user,
+    mock_get_organisations_and_services_for_user,
 ):
     client.login(user_with_orgs_and_services(num_orgs=1, num_services=1), mocker=mocker)
     with client.session_transaction() as session:
