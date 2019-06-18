@@ -1,5 +1,6 @@
 from functools import partial
 from io import BytesIO
+from unittest.mock import call
 
 import pytest
 from flask import url_for
@@ -131,10 +132,12 @@ def test_show_accept_agreement_page(
         'I’m accepting the agreement'
     )
     assert page.select('input[name=who]')[0]['value'] == 'me'
+    assert 'checked' not in page.select('input[name=who]')[0]
     assert normalize_spaces(page.select_one('label[for=who-1]').text) == (
         'I’m accepting the agreement on behalf of someone else'
     )
     assert page.select('input[name=who]')[1]['value'] == 'someone-else'
+    assert 'checked' not in page.select('input[name=who]')[1]
 
     assert normalize_spaces(page.select_one('label[for=on_behalf_of_name]').text) == (
         'Who are you accepting the agreement on behalf of?'
@@ -170,45 +173,142 @@ def test_accept_agreement_page_populates(
         ('on_behalf_of_name', 'Firstname Lastname'),
         ('on_behalf_of_email', 'test@example.com'),
     ]
+    assert 'checked' not in page.select('input[name=who]')[0]
+    assert page.select('input[name=who]')[1]['checked'] == ''
 
 
-def test_accept_agreement_page_validates(
-    client_request,
-    mock_get_service_organisation,
-):
-    page = client_request.post(
-        'main.service_accept_agreement',
-        service_id=SERVICE_ONE_ID,
-        _data={
+@pytest.mark.parametrize('data, expected_errors', (
+    (
+        {
             'version': '',
             'who': '',
             'on_behalf_of_name': '',
             'on_behalf_of_email': '',
         },
+        [
+            'Must be a number',
+            'This field is required.',
+        ],
+    ),
+    (
+        {
+            'version': 'one point two',
+            'who': 'me',
+            'on_behalf_of_name': '',
+            'on_behalf_of_email': '',
+        },
+        [
+            'Must be a number',
+        ],
+    ),
+    (
+        {
+            'version': '1.2',
+            'who': 'someone-else',
+            'on_behalf_of_name': '',
+            'on_behalf_of_email': '',
+        },
+        [
+            'Can’t be empty',
+            'Can’t be empty',
+        ],
+    ),
+    (
+        {
+            'version': '1.2',
+            'who': 'someone-else',
+            'on_behalf_of_name': 'Firstname Lastname',
+            'on_behalf_of_email': '',
+        },
+        [
+            'Can’t be empty',
+        ],
+    ),
+    (
+        {
+            'version': '1.2',
+            'who': 'someone-else',
+            'on_behalf_of_name': '',
+            'on_behalf_of_email': 'test@example.com',
+        },
+        [
+            'Can’t be empty',
+        ],
+    ),
+
+))
+def test_accept_agreement_page_validates(
+    client_request,
+    mock_get_service_organisation,
+    data,
+    expected_errors,
+):
+    page = client_request.post(
+        'main.service_accept_agreement',
+        service_id=SERVICE_ONE_ID,
+        _data=data,
         _expected_status=200,
     )
     assert [
         error.text.strip() for error in page.select('.error-message')
-    ] == [
-        'Must be a number',
-        'This field is required.',
-    ]
+    ] == expected_errors
 
 
-def test_accept_agreement_page_persists(
-    client_request,
-    mock_get_service_organisation,
-    mock_update_organisation,
-):
-    client_request.post(
-        'main.service_accept_agreement',
-        service_id=SERVICE_ONE_ID,
-        _data={
+@pytest.mark.parametrize('data, expected_persisted', (
+    (
+        {
             'version': '1.2',
             'who': 'someone-else',
             'on_behalf_of_name': 'Firstname Lastname',
             'on_behalf_of_email': 'test@example.com',
         },
+        call(
+            '7aa5d4e9-4385-4488-a489-07812ba13383',
+            agreement_signed_version=1.2,
+            agreement_signed_on_behalf_of_name='Firstname Lastname',
+            agreement_signed_on_behalf_of_email_address='test@example.com',
+        )
+    ),
+    (
+        {
+            'version': '1.2',
+            'who': 'me',
+            'on_behalf_of_name': 'Firstname Lastname',
+            'on_behalf_of_email': 'test@example.com',
+        },
+        call(
+            '7aa5d4e9-4385-4488-a489-07812ba13383',
+            agreement_signed_version=1.2,
+            agreement_signed_on_behalf_of_name='',
+            agreement_signed_on_behalf_of_email_address='',
+        )
+    ),
+    (
+        {
+            'version': '1.2',
+            'who': 'me',
+            'on_behalf_of_name': '',
+            'on_behalf_of_email': '',
+        },
+        call(
+            '7aa5d4e9-4385-4488-a489-07812ba13383',
+            agreement_signed_version=1.2,
+            agreement_signed_on_behalf_of_name='',
+            agreement_signed_on_behalf_of_email_address='',
+        )
+    ),
+))
+def test_accept_agreement_page_persists(
+    client_request,
+    mock_get_service_organisation,
+    mock_update_organisation,
+    data,
+    expected_persisted,
+):
+    client_request.post(
+        'main.service_accept_agreement',
+        service_id=SERVICE_ONE_ID,
+        _data=data,
         _expected_status=302,
         _expected_redirect=url_for(
             'main.service_confirm_agreement',
@@ -216,12 +316,7 @@ def test_accept_agreement_page_persists(
             _external=True,
         ),
     )
-    mock_update_organisation.assert_called_once_with(
-        '7aa5d4e9-4385-4488-a489-07812ba13383',
-        agreement_signed_version=1.2,
-        agreement_signed_on_behalf_of_name='Firstname Lastname',
-        agreement_signed_on_behalf_of_email_address='test@example.com',
-    )
+    assert mock_update_organisation.call_args_list == [expected_persisted]
 
 
 @pytest.mark.parametrize('name, email, expected_paragraph', (

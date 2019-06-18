@@ -1466,6 +1466,23 @@ class GoLiveNotesForm(StripWhitespaceForm):
 
 class AcceptAgreementForm(StripWhitespaceForm):
 
+    @classmethod
+    def from_organisation(cls, org):
+
+        if org.agreement_signed_on_behalf_of_name and org.agreement_signed_on_behalf_of_email_address:
+            who = 'someone-else'
+        elif org.agreement_signed_version:  # only set if user has submitted form previously
+            who = 'me'
+        else:
+            who = None
+
+        return cls(
+            version=org.agreement_signed_version,
+            who=who,
+            on_behalf_of_name=org.agreement_signed_on_behalf_of_name,
+            on_behalf_of_email=org.agreement_signed_on_behalf_of_email_address,
+        )
+
     version = StringField(
         'Which version of the agreement are you accepting?'
     )
@@ -1494,6 +1511,16 @@ class AcceptAgreementForm(StripWhitespaceForm):
         required=False,
         gov_user=False,
     )
+
+    def __validate_if_nominating(self, field):
+        if self.who.data == 'someone-else':
+            if not field.data:
+                raise ValidationError('Can’t be empty')
+        else:
+            field.data = ''
+
+    validate_on_behalf_of_name = __validate_if_nominating
+    validate_on_behalf_of_email = __validate_if_nominating
 
     def validate_version(self, field):
         try:

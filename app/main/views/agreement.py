@@ -33,20 +33,10 @@ def service_agreement(service_id):
 @login_required
 def service_accept_agreement(service_id):
 
-    org = current_service.organisation
-
-    if not org:
+    if not current_service.organisation:
         abort(404)
 
-    form = AcceptAgreementForm(
-        version=org.agreement_signed_version,
-        who='someone-else' if (
-            org.agreement_signed_on_behalf_of_name
-            and org.agreement_signed_on_behalf_of_email_address
-        ) else 'me',
-        on_behalf_of_name=org.agreement_signed_on_behalf_of_name,
-        on_behalf_of_email=org.agreement_signed_on_behalf_of_email_address,
-    )
+    form = AcceptAgreementForm.from_organisation(current_service.organisation)
 
     if form.validate_on_submit():
         current_service.organisation.update(
