@@ -133,11 +133,19 @@ def test_show_accept_agreement_page(
     )
     assert page.select('input[name=who]')[0]['value'] == 'me'
     assert 'checked' not in page.select('input[name=who]')[0]
+    assert 'data-target' not in page.select('.multiple-choice')[0]
     assert normalize_spaces(page.select_one('label[for=who-1]').text) == (
         'I’m accepting the agreement on behalf of someone else'
     )
     assert page.select('input[name=who]')[1]['value'] == 'someone-else'
     assert 'checked' not in page.select('input[name=who]')[1]
+    assert page.select('.multiple-choice')[1]['data-target'] == 'on-behalf-of'
+    assert [
+        field['name']
+        for field in page.select('#on-behalf-of.conditional-radio-panel input')
+    ] == [
+        'on_behalf_of_name', 'on_behalf_of_email'
+    ]
 
     assert normalize_spaces(page.select_one('label[for=on_behalf_of_name]').text) == (
         'Who are you accepting the agreement on behalf of?'
