@@ -3,11 +3,21 @@
     {% if job.scheduled_for %}
       {% if job.processing_started %}
         Sent by {{ job.created_by.name }} on {{ job.processing_started|format_datetime_short }}
+        {% if template_type == "letter" %}
+          <p id="printing-info">
+            {{ letter_print_day }}
+          </p>
+        {% endif %}
       {% else %}
         Uploaded by {{ job.created_by.name }} on {{ job.created_at|format_datetime_short }}
       {% endif %}
     {% else %}
       Sent by {{ job.created_by.name }} on {{ job.created_at|format_datetime_short }}
+      {% if template_type == "letter" %}
+        <p id="printing-info">
+          {{ letter_print_day }}
+        </p>
+      {% endif %}
     {% endif %}
   </p>
 </div>

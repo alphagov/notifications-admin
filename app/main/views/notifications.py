@@ -2,7 +2,7 @@
 import base64
 import io
 import os
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from dateutil import parser
 from flask import (
@@ -22,11 +22,9 @@ from notifications_utils.letter_timings import (
     letter_can_be_cancelled,
 )
 from notifications_utils.pdf import pdf_page_count
-from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
 from PyPDF2.utils import PdfReadError
 
 from app import (
-    _format_datetime_short,
     current_service,
     format_date_numeric,
     job_api_client,
@@ -40,9 +38,9 @@ from app.utils import (
     FAILURE_STATUSES,
     generate_notifications_csv,
     get_help_argument,
+    get_letter_printing_statement,
     get_template,
     parse_filter_args,
-    printing_today_or_tomorrow,
     set_status_filters,
     user_has_permissions,
 )
@@ -164,18 +162,6 @@ def cancel_letter(service_id, notification_id):
 
     flash("Are you sure you want to cancel sending this letter?", 'cancel')
     return view_notification(service_id, notification_id)
-
-
-def get_letter_printing_statement(status, created_at):
-    created_at_dt = parser.parse(created_at).replace(tzinfo=None)
-
-    if letter_can_be_cancelled(status, created_at_dt):
-        return 'Printing starts {} at 5:30pm'.format(printing_today_or_tomorrow())
-    else:
-        printed_datetime = utc_string_to_aware_gmt_datetime(created_at) + timedelta(hours=6, minutes=30)
-        printed_date = _format_datetime_short(printed_datetime)
-
-        return 'Printed on {}'.format(printed_date)
 
 
 def get_preview_error_image():

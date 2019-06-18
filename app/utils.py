@@ -13,10 +13,12 @@ import ago
 import dateutil
 import pyexcel
 import pyexcel_xlsx
+from dateutil import parser
 from flask import abort, current_app, redirect, request, session, url_for
 from flask_login import current_user, login_required
 from notifications_utils.field import Field
 from notifications_utils.formatters import make_quotes_smart
+from notifications_utils.letter_timings import letter_can_be_cancelled
 from notifications_utils.recipients import RecipientCSV
 from notifications_utils.take import Take
 from notifications_utils.template import (
@@ -25,7 +27,10 @@ from notifications_utils.template import (
     LetterPreviewTemplate,
     SMSPreviewTemplate,
 )
-from notifications_utils.timezones import convert_utc_to_bst
+from notifications_utils.timezones import (
+    convert_utc_to_bst,
+    utc_string_to_aware_gmt_datetime,
+)
 from orderedset._orderedset import OrderedSet
 from werkzeug.datastructures import MultiDict
 from werkzeug.routing import RequestRedirect
@@ -522,6 +527,22 @@ def redact_mobile_number(mobile_number, spacing=""):
     for i in indices:
         mobile_number_list[i] = redact_character
     return "".join(mobile_number_list)
+
+
+def get_letter_printing_statement(status, created_at):
+    created_at_dt = parser.parse(created_at).replace(tzinfo=None)
+    if letter_can_be_cancelled(status, created_at_dt):
+        return 'Printing starts {} at 5:30pm'.format(printing_today_or_tomorrow())
+    else:
+        printed_datetime = utc_string_to_aware_gmt_datetime(created_at) + timedelta(hours=6, minutes=30)
+        if printed_datetime.date() == datetime.now().date():
+            return 'Printed today at 5:30pm'
+        elif printed_datetime.date() == datetime.now().date() - timedelta(days=1):
+            return 'Printed yesterday at 5:30pm'
+
+        printed_date = printed_datetime.strftime('%d %B').lstrip('0')
+
+        return 'Printed on {} at 5:30pm'.format(printed_date)
 
 
 class PermanentRedirect(RequestRedirect):

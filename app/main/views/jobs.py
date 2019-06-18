@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from datetime import datetime
+
 from flask import (
     Response,
     abort,
@@ -13,7 +15,11 @@ from flask import (
 )
 from flask_login import current_user
 from notifications_python_client.errors import HTTPError
-from notifications_utils.letter_timings import get_letter_timings
+from notifications_utils.letter_timings import (
+    CANCELLABLE_JOB_LETTER_STATUSES,
+    get_letter_timings,
+    letter_can_be_cancelled,
+)
 from notifications_utils.template import Template, WithSubjectTemplate
 
 from app import (
@@ -30,6 +36,7 @@ from app.utils import (
     generate_next_dict,
     generate_notifications_csv,
     generate_previous_dict,
+    get_letter_printing_statement,
     get_page_from_request,
     get_time_left,
     parse_filter_args,
@@ -96,6 +103,8 @@ def view_job(service_id, job_id):
         'letter has' if job['notification_count'] == 1 else 'letters have',
         printing_today_or_tomorrow()
     )
+    partials = get_job_partials(job, template)
+    can_cancel_letter_job = partials["can_letter_job_be_cancelled"]
 
     return render_template(
         'views/jobs/job.html',
@@ -103,7 +112,6 @@ def view_job(service_id, job_id):
         uploaded_file_name=job['original_file_name'],
         template_id=job['template'],
         job_id=job_id,
-        template_type=template["template_type"],
         status=request.args.get('status', ''),
         updates_url=url_for(
             ".view_job_updates",
@@ -111,12 +119,13 @@ def view_job(service_id, job_id):
             job_id=job['id'],
             status=request.args.get('status', ''),
         ),
-        partials=get_job_partials(job, template),
+        partials=partials,
         just_sent=bool(
             request.args.get('just_sent') == 'yes'
             and template['template_type'] == 'letter'
         ),
         just_sent_message=just_sent_message,
+        can_cancel_letter_job=can_cancel_letter_job,
     )
 
 
@@ -420,7 +429,20 @@ def get_job_partials(job, template):
             status=filter_args['status']
         )
     service_data_retention_days = current_service.get_days_of_retention(template['template_type'])
-
+    can_letter_job_be_cancelled = False
+    if template["template_type"] == "letter":
+        not_cancellable = [
+            n for n in notifications["notifications"] if n["status"] not in CANCELLABLE_JOB_LETTER_STATUSES
+        ]
+        job_created = job["created_at"][:-6]
+        if job["job_status"] != "finished":
+            can_letter_job_be_cancelled = "This job is still being processed. Wait a couple of minutes and try again."
+        elif not letter_can_be_cancelled(
+            "created", datetime.strptime(job_created, '%Y-%m-%dT%H:%M:%S.%f')
+        ) or len(not_cancellable) != 0:
+            can_letter_job_be_cancelled = "Cancel sending those letters"
+        else:
+            can_letter_job_be_cancelled = True
     return {
         'counts': counts,
         'notifications': render_template(
@@ -443,8 +465,11 @@ def get_job_partials(job, template):
         ),
         'status': render_template(
             'partials/jobs/status.html',
-            job=job
+            job=job,
+            template_type=template["template_type"],
+            letter_print_day=get_letter_printing_statement("created", job["created_at"])
         ),
+        'can_letter_job_be_cancelled': can_letter_job_be_cancelled,
     }
 
 

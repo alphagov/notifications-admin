@@ -9,7 +9,6 @@ from freezegun import freeze_time
 from notifications_python_client.errors import APIError
 from PyPDF2.utils import PdfReadError
 
-from app.main.views.notifications import get_letter_printing_statement
 from tests.conftest import (
     SERVICE_ONE_ID,
     active_caseworking_user,
@@ -755,42 +754,6 @@ def test_should_show_image_of_precompiled_letter_notification(
     assert response.status_code == 200
     assert response.get_data(as_text=True) == 'foo'
     assert mock_pdf_page_count.called_once()
-
-
-@pytest.mark.parametrize('created_at, current_datetime', [
-    ('2017-07-07T12:00:00+00:00', '2017-07-07 16:29:00'),  # created today, summer
-    ('2017-12-12T12:00:00+00:00', '2017-12-12 17:29:00'),  # created today, winter
-    ('2017-12-12T21:30:00+00:00', '2017-12-13 17:29:00'),  # created after 5:30 yesterday
-    ('2017-03-25T17:30:00+00:00', '2017-03-26 16:29:00'),  # over clock change period on 2017-03-26
-])
-def test_get_letter_printing_statement_when_letter_prints_today(created_at, current_datetime):
-    with freeze_time(current_datetime):
-        statement = get_letter_printing_statement('created', created_at)
-
-    assert statement == 'Printing starts today at 5:30pm'
-
-
-@pytest.mark.parametrize('created_at, current_datetime', [
-    ('2017-07-07T16:31:00+00:00', '2017-07-07 22:59:00'),  # created today, summer
-    ('2017-12-12T17:31:00+00:00', '2017-12-12 23:59:00'),  # created today, winter
-])
-def test_get_letter_printing_statement_when_letter_prints_tomorrow(created_at, current_datetime):
-    with freeze_time(current_datetime):
-        statement = get_letter_printing_statement('created', created_at)
-
-    assert statement == 'Printing starts tomorrow at 5:30pm'
-
-
-@pytest.mark.parametrize('created_at, print_day', [
-    ('2017-07-06T16:30:00+00:00', '7 July'),
-    ('2017-12-01T00:00:00+00:00', '1 December'),
-    ('2017-03-26T12:00:00+00:00', '26 March'),
-])
-@freeze_time('2017-07-07 12:00:00')
-def test_get_letter_printing_statement_for_letter_that_has_been_sent(created_at, print_day):
-    statement = get_letter_printing_statement('delivered', created_at)
-
-    assert statement == 'Printed on {}'.format(print_day)
 
 
 @freeze_time('2016-01-01 15:00')

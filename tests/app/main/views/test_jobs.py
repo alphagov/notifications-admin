@@ -1,13 +1,12 @@
 import json
-
-import pytest
 import uuid
 
+import pytest
 from flask import url_for
 from freezegun import freeze_time
 
 from app.main.views.jobs import get_time_left
-from tests import sample_uuid
+from tests import job_json, notification_json, sample_uuid
 from tests.conftest import (
     SERVICE_ONE_ID,
     active_caseworking_user,
@@ -321,7 +320,7 @@ def test_should_show_letter_job(
     )
     assert normalize_spaces(page.h1.text) == 'thisisatest.csv'
     assert normalize_spaces(page.select('p.bottom-gutter')[0].text) == (
-        'Sent by Test User on 1 January at 11:09am'
+        'Sent by Test User on 1 January at 11:09am Printing starts today at 5:30pm'
     )
     assert page.select('.banner-default-with-tick') == []
     assert normalize_spaces(page.select('tbody tr')[0].text) == (
@@ -506,6 +505,50 @@ def test_should_cancel_letter_job(
         )
     )
     mock_cancel.assert_called_once_with(SERVICE_ONE_ID, job_id)
+
+
+@freeze_time("2019-06-20 17:30:00.000001")
+@pytest.mark.parametrize("job_created_at, expected_fragment", [
+    ("2019-06-20T15:30:00.000001+00:00", "today"),
+    ("2019-06-19T15:30:00.000001+00:00", "yesterday"),
+    ("2019-06-18T15:30:00.000001+00:00", "on 18 June"),
+])
+def test_should_not_show_cancel_link_for_letter_job_if_too_late(
+    client_request,
+    mocker,
+    mock_get_service_letter_template,
+    mock_get_service_data_retention,
+    active_user_with_permissions,
+    job_created_at,
+    expected_fragment,
+):
+    job_id = uuid.uuid4()
+    job = job_json(
+        SERVICE_ONE_ID, active_user_with_permissions, job_id=job_id, created_at=job_created_at
+    )
+    notifications_json = notification_json(SERVICE_ONE_ID, job=job, status="created", template_type="letter")
+    mocker.patch('app.job_api_client.get_job', side_effect=[{"data": job}])
+    mocker.patch(
+        'app.notification_api_client.get_notifications_for_service',
+        side_effect=[notifications_json]
+    )
+
+    page = client_request.get(
+        'main.view_job',
+        service_id=SERVICE_ONE_ID,
+        job_id=str(job_id)
+    )
+
+    assert "Cancel sending those letters" not in page
+    assert page.find('p', {'id': 'printing-info'}).text.strip() == "Printed {} at 5:30pm".format(expected_fragment)
+
+
+def test_dont_cancel_letter_job_when_to_early_to_cancel():
+    pass
+
+
+def test_page_when_user_clicks_cancel_link_letter_job_and_to_early_to_cancel():
+    pass
 
 
 @freeze_time("2016-01-01 00:00:00.000001")
