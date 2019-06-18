@@ -21,4 +21,14 @@
     {{ ajax_block(partials, updates_url, 'counts', finished=finished) }}
     {{ ajax_block(partials, updates_url, 'notifications', finished=finished) }}
 
+    {% if template_type == "letter" %}
+      <div class="js-stick-at-bottom-when-scrolling">
+        <div class="page-footer">
+          <span class="page-footer-delete-link page-footer-delete-link-without-button">
+            <a href="{{ url_for('main.cancel_letter_job', service_id=current_service.id, job_id=job_id) }}">Cancel sending those letters</a>
+          </span>
+    {% else %}
+      <div>&nbsp;</div>
+    {% endif %}
+
 {% endblock %}

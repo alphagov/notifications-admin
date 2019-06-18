@@ -1,6 +1,8 @@
 import json
 
 import pytest
+import uuid
+
 from flask import url_for
 from freezegun import freeze_time
 
@@ -484,6 +486,26 @@ def test_should_not_show_cancelled_job(
         job_id=fake_uuid,
         _expected_status=404,
     )
+
+
+def test_should_cancel_letter_job(
+    client_request,
+    mocker,
+):
+    job_id = uuid.uuid4()
+    mock_cancel = mocker.patch('app.main.jobs.job_api_client.cancel_letter_job')
+    client_request.post(
+        'main.cancel_letter_job',
+        service_id=SERVICE_ONE_ID,
+        job_id=job_id,
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.service_dashboard',
+            service_id=SERVICE_ONE_ID,
+            _external=True,
+        )
+    )
+    mock_cancel.assert_called_once_with(SERVICE_ONE_ID, job_id)
 
 
 @freeze_time("2016-01-01 00:00:00.000001")

@@ -3,6 +3,7 @@
 from flask import (
     Response,
     abort,
+    flash,
     jsonify,
     redirect,
     render_template,
@@ -11,6 +12,7 @@ from flask import (
     url_for,
 )
 from flask_login import current_user
+from notifications_python_client.errors import HTTPError
 from notifications_utils.letter_timings import get_letter_timings
 from notifications_utils.template import Template, WithSubjectTemplate
 
@@ -100,6 +102,8 @@ def view_job(service_id, job_id):
         finished=(total_notifications == processed_notifications),
         uploaded_file_name=job['original_file_name'],
         template_id=job['template'],
+        job_id=job_id,
+        template_type=template["template_type"],
         status=request.args.get('status', ''),
         updates_url=url_for(
             ".view_job_updates",
@@ -109,8 +113,8 @@ def view_job(service_id, job_id):
         ),
         partials=get_job_partials(job, template),
         just_sent=bool(
-            request.args.get('just_sent') == 'yes' and
-            template['template_type'] == 'letter'
+            request.args.get('just_sent') == 'yes'
+            and template['template_type'] == 'letter'
         ),
         just_sent_message=just_sent_message,
     )
@@ -155,6 +159,23 @@ def view_job_csv(service_id, job_id):
 def cancel_job(service_id, job_id):
     job_api_client.cancel_job(service_id, job_id)
     return redirect(url_for('main.service_dashboard', service_id=service_id))
+
+
+@main.route("/services/<service_id>/jobs/<uuid:job_id>/cancel", methods=['GET', 'POST'])
+@user_has_permissions()
+def cancel_letter_job(service_id, job_id):
+
+    if request.method == 'POST':
+        try:
+            number_of_letters = job_api_client.cancel_letter_job(current_service.id, job_id)
+        except HTTPError as e:
+            flash(e.message, 'dangerous')
+            return redirect(url_for('main.view_job', service_id=service_id, job_id=job_id))
+        flash(" {} letters have been cancelled succesfully".format(number_of_letters), 'default_with_tick')
+        return redirect(url_for('main.service_dashboard', service_id=service_id))
+
+    flash("Are you sure you want to cancel sending those letters?", 'cancel')
+    return view_job(service_id, job_id)
 
 
 @main.route("/services/<service_id>/jobs/<job_id>.json")
