@@ -691,6 +691,7 @@ def mock_update_service_raise_httperror_duplicate_name(mocker):
 SERVICE_ONE_ID = "596364a0-858e-42c8-9062-a8fe822260eb"
 SERVICE_TWO_ID = "147ad62a-2951-4fa1-9ca0-093cd1a52c52"
 ORGANISATION_ID = "c011fa40-4cbe-4524-b415-dde2f421bd9c"
+ORGANISATION_TWO_ID = "d9b5be73-0b36-4210-9d89-8f1a5c2fef26"
 TEMPLATE_ONE_ID = "b22d7d94-2197-4a7d-a8e7-fd5f9770bf48"
 USER_ONE_ID = "7b395b52-c6c1-469c-9d61-54166461c1ab"
 
@@ -1393,6 +1394,7 @@ def active_user_no_api_key_permission(fake_uuid):
         'auth_type': 'sms_auth',
         'organisations': [],
         'current_session_id': None,
+        'services': [SERVICE_ONE_ID],
     }
 
 
@@ -1415,6 +1417,8 @@ def active_user_no_settings_permission(fake_uuid):
         'platform_admin': False,
         'auth_type': 'sms_auth',
         'current_session_id': None,
+        'services': [SERVICE_ONE_ID],
+        'organisations': [],
     }
 
 
@@ -1432,6 +1436,7 @@ def api_user_locked(fake_uuid):
                  'organisations': [],
                  'current_session_id': None,
                  'platform_admin': False,
+                 'services': [],
                  }
     return user_data
 
@@ -1451,6 +1456,7 @@ def api_user_request_password_reset(fake_uuid):
                  'organisations': [],
                  'current_session_id': None,
                  'platform_admin': False,
+                 'services': [],
                  }
     return user_data
 
@@ -1470,6 +1476,7 @@ def api_user_changed_password(fake_uuid):
                  'organisations': [],
                  'current_session_id': None,
                  'platform_admin': False,
+                 'services': [],
                  }
     return user_data
 
@@ -2148,7 +2155,7 @@ def mock_no_inbound_number_for_service(mocker):
 
 @pytest.fixture(scope='function')
 def mock_has_permissions(mocker):
-    def _has_permission(*permissions, restrict_admin_usage=False):
+    def _has_permission(*permissions, restrict_admin_usage=False, allow_org_user=False):
         return True
 
     return mocker.patch(
