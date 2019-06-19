@@ -1007,11 +1007,11 @@ def test_should_check_for_sms_sender_on_go_live(
     ),
     (
         True,
-        'Sign our data sharing and financial agreement Completed',
+        'Accept our data sharing and financial agreement Completed',
     ),
     (
         False,
-        'Sign our data sharing and financial agreement Not completed',
+        'Accept our data sharing and financial agreement Not completed',
     ),
 ))
 def test_should_check_for_mou_on_request_to_go_live(
