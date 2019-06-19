@@ -45,7 +45,7 @@
 {%- endmacro %}
 
 {% macro row(id=None) -%}
-  <tr class="table-row" {% if id %}id="{{id}}"{% endif %}>
+  <tr class="table-row" {% if id and id is string %}id="{{id}}"{% endif %}>
     {{ caller() }}
   </tr>
 {%- endmacro %}

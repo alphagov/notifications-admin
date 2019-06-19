@@ -565,7 +565,14 @@ def test_upload_valid_csv_redirects_to_check_page(
         'main.send_messages', service_id=SERVICE_ONE_ID, template_id=fake_uuid,
         _data={'file': (BytesIO(''.encode('utf-8')), 'valid.csv')},
         _expected_status=302,
-        expected_redirect='foo'
+        _expected_redirect=url_for(
+            'main.check_messages',
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            upload_id=fake_uuid,
+            original_file_name='valid.csv',
+            _external=True,
+        ),
     )
 
 
@@ -697,6 +704,7 @@ def test_upload_valid_csv_shows_preview_and_table(
     ]):
         for index, cell in enumerate(row):
             row = page.select('table tbody tr')[row_index]
+            assert 'id' not in row
             assert normalize_spaces(str(row.select('td')[index + 1])) == cell
 
 
