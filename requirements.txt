@@ -9,8 +9,8 @@ Flask-WTF==0.14.2
 Flask-Login==0.4.1
 
 blinker==1.4
-pyexcel==0.5.13
-pyexcel-io==0.5.17
+pyexcel==0.5.14
+pyexcel-io==0.5.18
 pyexcel-xls==0.5.8
 pyexcel-xlsx==0.5.7
 pyexcel-ods3==0.5.3
@@ -28,11 +28,11 @@ itsdangerous==0.24  # pyup: <1.0.0
 git+https://github.com/alphagov/notifications-utils.git@32.0.1#egg=notifications-utils==32.0.1
 
 ## The following requirements were added by pip freeze:
-awscli==1.16.170
+awscli==1.16.181
 bleach==3.1.0
 boto3==1.6.16
-botocore==1.12.160
-certifi==2019.3.9
+botocore==1.12.171
+certifi==2019.6.16
 chardet==3.0.4
 Click==7.0
 colorama==0.3.9
@@ -48,7 +48,7 @@ jdcal==1.4.1
 Jinja2==2.10.1
 jmespath==0.9.4
 lml==0.0.9
-lxml==4.3.3
+lxml==4.3.4
 MarkupSafe==1.1.1
 mistune==0.8.4
 monotonic==1.5
@@ -65,7 +65,7 @@ PyYAML==3.13
 redis==3.2.1
 requests==2.22.0
 rsa==3.4.2
-s3transfer==0.2.0
+s3transfer==0.2.1
 six==1.12.0
 smartypants==2.0.1
 statsd==3.3.0
