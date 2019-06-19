@@ -193,11 +193,15 @@ class User(JSONModel, UserMixin):
             return True
 
         if org_id:
-            return org_id in self.organisation_ids
+            return self.belongs_to_organisation(org_id)
+
         if not permissions:
-            return service_id in self.service_ids
-        if service_id:
-            return any(x in self._permissions.get(service_id, []) for x in permissions)
+            return self.belongs_to_service(service_id)
+
+        return any(
+            self.has_permission_for_service(service_id, permission)
+            for permission in permissions
+        )
 
     def has_permission_for_service(self, service_id, permission):
         return permission in self._permissions.get(service_id, [])
