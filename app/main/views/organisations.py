@@ -70,13 +70,8 @@ def add_organisation():
 @login_required
 @user_has_permissions()
 def organisation_dashboard(org_id):
-    for service in current_organisation.live_services:
-        has_permission = current_user.has_permission_for_service(service['id'], 'view_activity')
-        service.update({'has_permission_to_view': has_permission})
-
     return render_template(
         'views/organisations/organisation/index.html',
-        organisation_services=current_organisation.live_services
     )
 
 
@@ -87,7 +82,6 @@ def organisation_trial_mode_services(org_id):
     return render_template(
         'views/organisations/organisation/trial-mode-services.html',
         search_form=SearchByNameForm(),
-        services=current_organisation.trial_services
     )
 
 

@@ -174,7 +174,7 @@ class User(JSONModel, UserMixin):
     def platform_admin(self):
         return self._platform_admin and not session.get('disable_platform_admin_view', False)
 
-    def has_permissions(self, *permissions, restrict_admin_usage=False):
+    def has_permissions(self, *permissions, restrict_admin_usage=False, allow_org_user=False):
         unknown_permissions = set(permissions) - all_permissions
         if unknown_permissions:
             raise TypeError('{} are not valid permissions'.format(list(unknown_permissions)))
@@ -193,11 +193,22 @@ class User(JSONModel, UserMixin):
             return True
 
         if org_id:
-            return org_id in self.organisation_ids
-        if not permissions:
-            return service_id in self.service_ids
-        if service_id:
-            return any(x in self._permissions.get(service_id, []) for x in permissions)
+            return self.belongs_to_organisation(org_id)
+
+        if not permissions and self.belongs_to_service(service_id):
+            return True
+
+        if any(
+            self.has_permission_for_service(service_id, permission)
+            for permission in permissions
+        ):
+            return True
+
+        from app.models.service import Service
+
+        return allow_org_user and self.belongs_to_organisation(
+            Service.from_id(service_id).organisation_id
+        )
 
     def has_permission_for_service(self, service_id, permission):
         return permission in self._permissions.get(service_id, [])

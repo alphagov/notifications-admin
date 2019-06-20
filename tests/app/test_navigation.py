@@ -130,7 +130,7 @@ def test_a_page_should_nave_selected_header_navigation_item(
 
 
 @pytest.mark.parametrize('endpoint, selected_nav_item', [
-    ('main.organisation_dashboard', 'Services'),
+    ('main.organisation_dashboard', 'Usage'),
     ('main.manage_org_users', 'Team members'),
 ])
 def test_a_page_should_nave_selected_org_navigation_item(

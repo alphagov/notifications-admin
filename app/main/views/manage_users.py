@@ -31,7 +31,7 @@ from app.utils import is_gov_user, redact_mobile_number, user_has_permissions
 
 @main.route("/services/<service_id>/users")
 @login_required
-@user_has_permissions()
+@user_has_permissions(allow_org_user=True)
 def manage_users(service_id):
     return render_template(
         'views/manage-users.html',

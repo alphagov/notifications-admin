@@ -8,6 +8,13 @@ from app.models.roles_and_permissions import (
     translate_permissions_from_db_to_admin_roles,
 )
 from app.utils import user_has_permissions
+from tests import service_json
+from tests.conftest import (
+    ORGANISATION_ID,
+    ORGANISATION_TWO_ID,
+    SERVICE_ONE_ID,
+    SERVICE_TWO_ID,
+)
 
 
 def _test_permissions(
@@ -37,6 +44,7 @@ def _test_permissions(
 def test_user_has_permissions_on_endpoint_fail(
     client,
     mocker,
+    mock_get_service,
 ):
     user = _user_with_permissions()
     mocker.patch('app.user_api_client.get_user', return_value=user)
@@ -116,6 +124,7 @@ def test_platform_admin_user_can_not_access_page(
     client,
     platform_admin_user,
     mocker,
+    mock_get_service,
 ):
     mocker.patch('app.user_api_client.get_user', return_value=platform_admin_user)
     _test_permissions(
@@ -254,3 +263,109 @@ def test_translate_permissions_from_admin_roles_to_db():
     roles = ['send_messages', 'manage_templates', 'some_unknown_permission']
     db_perms = translate_permissions_from_admin_roles_to_db(roles)
     assert db_perms == {'send_texts', 'send_emails', 'send_letters', 'manage_templates', 'some_unknown_permission'}
+
+
+@pytest.mark.parametrize(
+    'user_services, user_organisations, expected_status, organisation_checked',
+    (
+        ([SERVICE_ONE_ID], [], 200, False),
+        ([SERVICE_ONE_ID, SERVICE_TWO_ID], [], 200, False),
+        ([], [ORGANISATION_ID], 200, True),
+        ([SERVICE_ONE_ID], [ORGANISATION_ID], 200, False),
+        ([], [], 403, True),
+        ([SERVICE_TWO_ID], [], 403, True),
+        ([SERVICE_TWO_ID], [ORGANISATION_ID], 200, True),
+        ([SERVICE_ONE_ID, SERVICE_TWO_ID], [ORGANISATION_ID], 200, False),
+        ([], [ORGANISATION_TWO_ID], 403, True),
+        ([], [ORGANISATION_ID, ORGANISATION_TWO_ID], 200, True),
+    )
+)
+def test_services_pages_that_org_users_are_allowed_to_see(
+    client_request,
+    mocker,
+    api_user_active,
+    mock_get_usage,
+    mock_get_billable_units,
+    mock_get_free_sms_fragment_limit,
+    mock_get_service,
+    mock_get_invites_for_service,
+    mock_get_users_by_service,
+    mock_get_template_folders,
+    mock_get_service_organisation,
+    mock_has_jobs,
+    user_services,
+    user_organisations,
+    expected_status,
+    organisation_checked,
+):
+    api_user_active['services'] = user_services
+    api_user_active['organisations'] = user_organisations
+    api_user_active['permissions'] = {
+        service_id: ['manage_service']
+        for service_id in user_services
+    }
+    service = service_json(
+        name='SERVICE WITH ORG',
+        id_=SERVICE_ONE_ID,
+        users=[api_user_active['id']],
+        organisation_id=ORGANISATION_ID,
+    )
+
+    mock_get_service = mocker.patch(
+        'app.notify_client.service_api_client.service_api_client.get_service',
+        return_value={'data': service}
+    )
+    client_request.login(
+        api_user_active,
+        service=service if SERVICE_ONE_ID in user_services else None,
+    )
+
+    endpoints = (
+        'main.usage',
+        'main.manage_users',
+    )
+
+    for endpoint in endpoints:
+        client_request.get(
+            endpoint,
+            service_id=SERVICE_ONE_ID,
+            _expected_status=expected_status,
+        )
+
+    assert mock_get_service.called is organisation_checked
+
+
+def test_service_navigation_for_org_user(
+    client_request,
+    mocker,
+    api_user_active,
+    mock_get_usage,
+    mock_get_billable_units,
+    mock_get_free_sms_fragment_limit,
+    mock_get_service,
+    mock_get_invites_for_service,
+    mock_get_users_by_service,
+    mock_get_service_organisation,
+):
+    api_user_active['services'] = []
+    api_user_active['organisations'] = [ORGANISATION_ID]
+    service = service_json(
+        id_=SERVICE_ONE_ID,
+        organisation_id=ORGANISATION_ID,
+    )
+    mocker.patch(
+        'app.service_api_client.get_service',
+        return_value={'data': service}
+    )
+    client_request.login(api_user_active, service=service)
+
+    page = client_request.get(
+        'main.usage',
+        service_id=SERVICE_ONE_ID,
+    )
+    assert [
+        item.text.strip() for item in page.select('nav.navigation a')
+    ] == [
+        'Team members',
+        'Usage',
+    ]

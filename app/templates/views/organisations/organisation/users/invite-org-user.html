@@ -15,22 +15,20 @@
     "Invite a team member",
     back_link=url_for('.manage_org_users', org_id=current_org.id)
   ) }}
-  <div class="grid-row">
-    {% call form_wrapper(class="column-three-quarters") %}
-	    {{ textbox(form.email_address, width='1-1', safe_error_message=True) }}
+  {% call form_wrapper() %}
+    {{ textbox(form.email_address, width='1-1', safe_error_message=True) }}
 
-	    <div class="bottom-gutter">
-			  <p class="form-label">
-			    All team members can see:
-			  </p>
-			  <ul class="list list-bullet">
-			    <li>dashboard</li>
-			    <li>who the other team members are</li>
-			  </ul>
-			</div>
+    <div class="bottom-gutter">
+		  <p class="form-label">
+		    {{ current_org.name }} team members can:
+		  </p>
+		  <ul class="list list-bullet">
+		    <li>see usage for and team members for each service</li>
+        <li>invite other team members</li>
+		  </ul>
+		</div>
 
-	    {{ page_footer('Send invitation email') }}
-	  {% endcall %}
-  </div>
+    {{ page_footer('Send invitation email') }}
+  {% endcall %}
 
 {% endblock %}
