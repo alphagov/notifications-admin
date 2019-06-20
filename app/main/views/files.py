@@ -86,6 +86,22 @@ def batch_one_file(service_id):
     return render_template(
         'views/files/batch-one-file.html',
         filename=request.args.get('filename'),
+        time_now=datetime.utcnow().strftime('%-I:%M%p').lower(),
+        edd=(datetime.utcnow() + timedelta(days=3)).strftime('%-d %B'),
+    )
+
+
+@main.route("/services/<service_id>/files/send-one")
+@login_required
+@user_has_permissions()
+def batch_send_one_file(service_id):
+
+    return render_template(
+        'views/files/send-one-file.html',
+        filename=request.args.get('filename'),
+        done=bool(request.args.get('done')),
+        time_now=datetime.utcnow().strftime('%-I:%M%p').lower(),
+        edd=(datetime.utcnow() + timedelta(days=3)).strftime('%-d %B'),
     )
 
 
@@ -97,14 +113,20 @@ def import_letters(service_id):
     form = PDFUploadForm()
 
     if form.validate_on_submit():
-        files = {
-            'file{}'.format(index): filename
-            for index, filename in enumerate(form.file.data.filename.split(', '))
-        }
+        filenames = form.file.data.filename.split(', ')
+        if len(filenames) == 1:
+            return redirect(url_for(
+                'main.batch_send_one_file',
+                service_id=current_service.id,
+                filename=filenames[0],
+            ))
         return redirect(url_for(
             'main.new_batch',
             service_id=current_service.id,
-            **files
+            **{
+                'file{}'.format(index): filename
+                for index, filename in enumerate(filenames)
+            }
         ))
 
     return render_template(

@@ -26,10 +26,13 @@
 
   {% if done %}
 
-    {{ banner("Your letters have been sent. Printing starts today at 5:30pm.", type='default', with_tick=True) }}
+    {{ banner("Your letters are being sent", type='default', with_tick=True) }}
 
     <p>
       Sent by {{ current_user.name }} today at {{ time_now }}
+    </p>
+    <p>
+      Printing starts today at 5:30pm
     </p>
 
     <div class="grid-row bottom-gutter-2-3">
@@ -55,7 +58,7 @@
 
   {% else %}
 
-    <div data-module='fake-delay' data-timeout='{{ files|length * 1000 }}' data-message='Checking your files' class="bottom-gutter top-gutter-1-3">
+    <div data-module='fake-delay' data-timeout='{{ files|length * 2000 }}' data-message='Checking your files' data-progress='true' class="bottom-gutter top-gutter-1-3">
 
       <p>
         Postage: second class
@@ -87,11 +90,11 @@
   {% else %}
 
     {% set addresses = [
-      'Megan Priest',
-      'Olivia Stetler',
-      'Gabriel Suber',
-      'Allan Hugo',
-      'Amala Yousef',
+      'Megan Priest, Government Digital Service, The White Chapel Building, 10 Whitechapel High Street, London E1 8QS',
+      'Olivia Stetler, Ministry of Justice, 102 Petty France, London, SW1H 9AJ',
+      'Gabriel Suber, Environment Agency, 2 Marsham Street, London, SW1P 4DF',
+      'Allan Hugo, Department of Education, Santuary Buildings, London, SW2B 1FE',
+      'Amala Yousef, Department of Work and Pensions, Caxton House, London, SW1A 1WP',
     ] %}
     {% call(item, row_number) list_table(
       files,
@@ -106,15 +109,10 @@
     ) %}
       {% call row_heading() %}
         <a class="file-list-filename" href="{{ url_for('.batch_one_file', service_id=current_service.id, filename=item) }}">
-          {% if files|length == 1 %}
-            Government Digital Service
-          {% endif %}
-          {% if files|length > 1 %}
-            {{ addresses[row_number - 2] }}
-          {% endif %}
+          {{ item }}
         </a>
         <p class="file-list-hint">
-          {{ item }}
+          {{ addresses[row_number - 2] }}
         </p>
       {% endcall %}
       {% call field(
@@ -124,7 +122,7 @@
         <span class="align-with-message-body">
           {% if done %}
           {% else %}
-            <span data-module='fake-delay' data-timeout='{{ range(800, files|length * 1000) | random }}' data-message='Checking'>
+            <span data-module='fake-delay' data-timeout='{{ range(800, files|length * 2000) | random }}' data-message='Checking'>
               Ready to send
             </span>
           {% endif %}
@@ -138,8 +136,6 @@
       <span class="page-footer-delete-link page-footer-delete-link-without-button">
         <a href="{{ url_for('main.cancel_letter', service_id=current_service.id, notification_id=notification_id) }}">Cancel sending these letters</a>
       </span>
-    {% else %}
-      <a href="{{ url_for('main.import_letters', service_id=current_service.id) }}" class="button-secondary">Upload more letters</a>
     {% endif %}
   </div>
 

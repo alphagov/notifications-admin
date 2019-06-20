@@ -13,8 +13,27 @@
 
   {{ page_header(filename, back_link='javascript:history.go(-1)') }}
 
+  <p>
+    Sent by {{ current_user.name }} today at {{ time_now }}
+  </p>
+  <p>
+    Printing starts today at 5:30pm
+  </p>
+  <p>
+    Estimated delivery date: {{ edd }}
+  </p>
+
   <div class="letter">
 
+  </div>
+
+  <div class="js-stick-at-bottom-when-scrolling">
+    <div class="page-footer">
+      <span class="page-footer-delete-link page-footer-delete-link-without-button">
+        <a href="#">Cancel sending this letter</a>
+      </span>
+      <a class="page-footer-right-aligned-link" href="#">Download as a PDF</a>
+    </div>
   </div>
 
 {% endblock %}

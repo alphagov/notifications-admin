@@ -5,13 +5,10 @@
     this.start = function(component) {
 
       let $component = $(component),
-          cache = $(component).html();
+          cache = $(component).html(),
+          cssClass = $component.data('progress') ? 'loading-indicator' : 'hint';
 
-      $component.html('<span class="hint">' + $component.data('message') + '</span>');
-
-      console.log($component);
-      console.log($component.data('timeout'));
-      console.log($component.data('message'));
+      $component.html('<span class="' + cssClass + '">' + $component.data('message') + '</span>');
 
       setTimeout(function(){
         console.log('timeout')
