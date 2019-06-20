@@ -4,6 +4,7 @@ from datetime import datetime
 from unittest.mock import call
 
 import pytest
+from bs4 import BeautifulSoup
 from flask import url_for
 from freezegun import freeze_time
 
@@ -17,10 +18,12 @@ from app.main.views.dashboard import (
     get_tuples_of_financial_years,
 )
 from tests import (
+    service_json,
     validate_route_permission,
     validate_route_permission_with_client,
 )
 from tests.conftest import (
+    ORGANISATION_ID,
     SERVICE_ONE_ID,
     active_caseworking_user,
     active_user_view_permissions,
@@ -1333,3 +1336,79 @@ def test_should_show_all_jobs_with_valid_statuses(
         'ready to send',
         'sent to dvla'
     })
+
+
+def test_org_breadcrumbs_do_not_show_if_service_has_no_org(
+    client_request,
+    mock_get_template_statistics,
+    mock_get_service_templates_when_no_templates_exist,
+    mock_get_jobs,
+):
+    page = client_request.get('main.service_dashboard', service_id=SERVICE_ONE_ID)
+
+    assert not page.select('.navigation-breadcrumb')
+
+
+def test_org_breadcrumbs_do_not_show_if_user_is_not_an_org_member(
+    mocker,
+    client,
+    mock_get_service_templates_when_no_templates_exist,
+    mock_get_jobs,
+    active_caseworking_user,
+    client_request,
+    mock_get_template_folders,
+):
+    # active_caseworking_user is not an org member
+
+    service_one_json = service_json(SERVICE_ONE_ID,
+                                    users=[active_caseworking_user['id']],
+                                    organisation_id=ORGANISATION_ID)
+    mocker.patch('app.service_api_client.get_service', return_value={'data': service_one_json})
+
+    client_request.login(active_caseworking_user, service=service_one_json)
+    page = client_request.get('main.service_dashboard', service_id=SERVICE_ONE_ID, _follow_redirects=True)
+
+    assert not page.select('.navigation-breadcrumb')
+
+
+def test_org_breadcrumbs_show_if_user_is_a_member_of_the_services_org(
+    mocker,
+    mock_get_template_statistics,
+    mock_get_service_templates_when_no_templates_exist,
+    mock_get_jobs,
+    active_user_with_permissions,
+    client_request,
+):
+    # active_user_with_permissions (used by the client_request) is an org member
+
+    service_one_json = service_json(SERVICE_ONE_ID,
+                                    users=[active_user_with_permissions['id']],
+                                    organisation_id=ORGANISATION_ID)
+
+    mocker.patch('app.service_api_client.get_service', return_value={'data': service_one_json})
+    mocker.patch('app.models.service.Organisation')
+
+    page = client_request.get('main.service_dashboard', service_id=SERVICE_ONE_ID)
+
+    assert page.select('.navigation-breadcrumb')
+
+
+def test_org_breadcrumbs_show_if_user_is_platform_admin(
+    mocker,
+    mock_get_template_statistics,
+    mock_get_service_templates_when_no_templates_exist,
+    mock_get_jobs,
+    platform_admin_user,
+    logged_in_platform_admin_client,
+):
+    service_one_json = service_json(SERVICE_ONE_ID,
+                                    users=[platform_admin_user['id']],
+                                    organisation_id=ORGANISATION_ID)
+
+    mocker.patch('app.service_api_client.get_service', return_value={'data': service_one_json})
+    mocker.patch('app.models.service.Organisation')
+
+    response = logged_in_platform_admin_client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    assert page.select('.navigation-breadcrumb')
