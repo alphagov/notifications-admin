@@ -1362,6 +1362,7 @@ def test_org_breadcrumbs_do_not_show_if_user_is_not_an_org_member(
 
     service_one_json = service_json(SERVICE_ONE_ID,
                                     users=[active_caseworking_user['id']],
+                                    restricted=False,
                                     organisation_id=ORGANISATION_ID)
     mocker.patch('app.service_api_client.get_service', return_value={'data': service_one_json})
 
@@ -1383,6 +1384,7 @@ def test_org_breadcrumbs_show_if_user_is_a_member_of_the_services_org(
 
     service_one_json = service_json(SERVICE_ONE_ID,
                                     users=[active_user_with_permissions['id']],
+                                    restricted=False,
                                     organisation_id=ORGANISATION_ID)
 
     mocker.patch('app.service_api_client.get_service', return_value={'data': service_one_json})
@@ -1391,6 +1393,28 @@ def test_org_breadcrumbs_show_if_user_is_a_member_of_the_services_org(
     page = client_request.get('main.service_dashboard', service_id=SERVICE_ONE_ID)
 
     assert page.select('.navigation-breadcrumb')
+
+
+def test_org_breadcrumbs_do_not_show_if_user_is_a_member_of_the_services_org_but_service_is_in_trial_mode(
+    mocker,
+    mock_get_template_statistics,
+    mock_get_service_templates_when_no_templates_exist,
+    mock_get_jobs,
+    active_user_with_permissions,
+    client_request,
+):
+    # active_user_with_permissions (used by the client_request) is an org member
+
+    service_one_json = service_json(SERVICE_ONE_ID,
+                                    users=[active_user_with_permissions['id']],
+                                    organisation_id=ORGANISATION_ID)
+
+    mocker.patch('app.service_api_client.get_service', return_value={'data': service_one_json})
+    mocker.patch('app.models.service.Organisation')
+
+    page = client_request.get('main.service_dashboard', service_id=SERVICE_ONE_ID)
+
+    assert not page.select('.navigation-breadcrumb')
 
 
 def test_org_breadcrumbs_show_if_user_is_platform_admin(
