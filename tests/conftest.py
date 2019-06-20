@@ -2847,10 +2847,8 @@ def os_environ():
 @pytest.fixture
 def client_request(
     logged_in_client,
-    active_user_with_permissions,
     mocker,
     service_one,
-    fake_uuid,
 ):
     class ClientRequest:
 
