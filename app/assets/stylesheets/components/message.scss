@@ -46,7 +46,13 @@
 }
 
 #template-list {
+
   margin-top: $gutter;
+
+  &.top-gutter-0 {
+    margin-top: 0;
+  }
+
 }
 
 .template-list {
@@ -150,6 +156,11 @@
 }
 
 .folder-heading {
+
+  .grid-row & {
+    margin: $gutter-half 0 20px 0;
+    word-wrap: break-word;
+  }
 
   a,
   &-folder,

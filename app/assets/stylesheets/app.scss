@@ -79,16 +79,6 @@ a {
     word-wrap: break-word;
   }
 
-  > .grid-row:first-child  {
-
-    .heading-large,
-    .heading-medium {
-      margin: $gutter-half 0 $gutter-half 0;
-      word-wrap: break-word;
-    }
-
-  }
-
 }
 
 .highlight {
