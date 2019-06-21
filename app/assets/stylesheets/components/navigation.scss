@@ -4,7 +4,6 @@
 
   &-service {
 
-    padding: 11px 0 9px 0;
     border-bottom: 1px solid $border-colour;
     margin: 0 0 10px;
     position: relative;
@@ -41,16 +40,6 @@
 
   }
 
-  &-breadcrumb {
-    display: inline-block;
-    width: 6px;
-    height: 11px;
-    margin: 0 5px;
-    background-image: file-url("separator-2x.png");
-    background-size: 6px 11px;
-    background-repeat: no-repeat;
-  }
-
   &-organisation-link {
     @include core-19;
     display: inline-block;
@@ -60,6 +49,12 @@
     text-overflow: ellipsis;
     font-weight: normal;
     text-decoration: none;
+    background-image: file-url("separator-2x.png");
+    background-size: 6px 11px;
+    background-repeat: no-repeat;
+    background-position: right 10px top 5px;
+    padding-right: 25px;
+    box-sizing: border-box;
   }
 
   li {

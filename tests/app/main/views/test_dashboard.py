@@ -1346,7 +1346,7 @@ def test_org_breadcrumbs_do_not_show_if_service_has_no_org(
 ):
     page = client_request.get('main.service_dashboard', service_id=SERVICE_ONE_ID)
 
-    assert not page.select('.navigation-breadcrumb')
+    assert not page.select('.navigation-organisation-link')
 
 
 def test_org_breadcrumbs_do_not_show_if_user_is_not_an_org_member(
@@ -1369,7 +1369,7 @@ def test_org_breadcrumbs_do_not_show_if_user_is_not_an_org_member(
     client_request.login(active_caseworking_user, service=service_one_json)
     page = client_request.get('main.service_dashboard', service_id=SERVICE_ONE_ID, _follow_redirects=True)
 
-    assert not page.select('.navigation-breadcrumb')
+    assert not page.select('.navigation-organisation-link')
 
 
 def test_org_breadcrumbs_show_if_user_is_a_member_of_the_services_org(
@@ -1391,8 +1391,10 @@ def test_org_breadcrumbs_show_if_user_is_a_member_of_the_services_org(
     mocker.patch('app.models.service.Organisation')
 
     page = client_request.get('main.service_dashboard', service_id=SERVICE_ONE_ID)
-
-    assert page.select('.navigation-breadcrumb')
+    assert page.select_one('.navigation-organisation-link')['href'] == url_for(
+        'main.organisation_dashboard',
+        org_id=ORGANISATION_ID,
+    )
 
 
 def test_org_breadcrumbs_do_not_show_if_user_is_a_member_of_the_services_org_but_service_is_in_trial_mode(
@@ -1435,4 +1437,7 @@ def test_org_breadcrumbs_show_if_user_is_platform_admin(
     response = logged_in_platform_admin_client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
-    assert page.select('.navigation-breadcrumb')
+    assert page.select_one('.navigation-organisation-link')['href'] == url_for(
+        'main.organisation_dashboard',
+        org_id=ORGANISATION_ID,
+    )

@@ -10,8 +10,7 @@
       {% if current_service.organisation_id %}
         {% if current_user.platform_admin or
           (current_user.belongs_to_organisation(current_service.organisation_id) and current_service.live) %}
-          <a href="{{ url_for('.organisation_dashboard', org_id=current_service.organisation.id) }}" class="navigation-organisation-link">{{ current_service.organisation.name }}</a>
-          <span class="navigation-breadcrumb"></span>
+          <a href="{{ url_for('.organisation_dashboard', org_id=current_service.organisation_id) }}" class="navigation-organisation-link">{{ current_service.organisation.name }}</a>
         {% endif %}
       {% endif %}
       <div class="navigation-service-name">
