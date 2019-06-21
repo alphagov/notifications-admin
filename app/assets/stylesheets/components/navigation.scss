@@ -21,7 +21,8 @@
 
     &-switch {
 
-      @include core-16;
+      @include core-19;
+      text-decoration: none;
       text-align: right;
       position: absolute;
       top: 0;
@@ -30,11 +31,12 @@
 
       &:hover {
         color: $link-hover-colour;
+        text-decoration: underline;
       }
 
       &:focus {
         outline: none;
-        border-bottom: 4px solid $yellow;
+        border-bottom: 1px solid $yellow;
         border-left: 10px solid $yellow;
         border-right: 3px solid $yellow;
         right: -3px;
