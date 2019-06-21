@@ -12,6 +12,7 @@
     &-name {
       @include bold-19;
       margin: 0 0 0 0;
+      display: inline-block;
     }
 
     &-switch {
@@ -48,6 +49,17 @@
     background-image: file-url("separator-2x.png");
     background-size: 6px 11px;
     background-repeat: no-repeat;
+  }
+
+  &-organisation-link {
+    @include core-19;
+    display: inline-block;
+    max-width: 25%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: normal;
+    text-decoration: none;
   }
 
   li {
