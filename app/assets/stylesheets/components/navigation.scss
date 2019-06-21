@@ -16,7 +16,10 @@
       @include bold-19;
       padding: $padding-top 0 $padding-bottom 0;
       display: inline-block;
-      vertical-align: top;
+      max-width: 50%;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
     }
 
     &-switch {
