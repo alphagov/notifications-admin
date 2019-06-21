@@ -1,3 +1,4 @@
+from functools import partial
 from unittest.mock import Mock
 
 import pytest
@@ -95,12 +96,23 @@ def test_create_new_organisation(
     mock_create_organisation.assert_called_once_with(name=org['name'])
 
 
+@pytest.mark.parametrize('user, expected_links', (
+    (active_user_with_permissions, (
+        partial(url_for, 'main.service_dashboard', service_id=SERVICE_ONE_ID),
+        partial(url_for, 'main.usage', service_id=SERVICE_TWO_ID),
+    )),
+    (platform_admin_user, (
+        partial(url_for, 'main.service_dashboard', service_id=SERVICE_ONE_ID),
+        partial(url_for, 'main.service_dashboard', service_id=SERVICE_TWO_ID),
+    )),
+))
 def test_organisation_services_shows_live_services_only(
     client_request,
     mock_get_organisation,
     mocker,
-    active_user_with_permissions,
     fake_uuid,
+    user,
+    expected_links,
 ):
     mocker.patch(
         'app.organisations_client.get_organisation_services',
@@ -113,7 +125,7 @@ def test_organisation_services_shows_live_services_only(
         ]
     )
 
-    client_request.login(active_user_with_permissions)
+    client_request.login(user(fake_uuid))
     page = client_request.get('.organisation_dashboard', org_id=ORGANISATION_ID)
 
     services = page.select('.browse-list-item')
@@ -121,8 +133,8 @@ def test_organisation_services_shows_live_services_only(
 
     assert normalize_spaces(services[0].text) == '1'
     assert normalize_spaces(services[1].text) == '5'
-    assert services[0].find('a')['href'] == url_for('main.usage', service_id=SERVICE_ONE_ID)
-    assert services[1].find('a')['href'] == url_for('main.usage', service_id=SERVICE_TWO_ID)
+    assert services[0].find('a')['href'] == expected_links[0]()
+    assert services[1].find('a')['href'] == expected_links[1]()
 
 
 def test_organisation_trial_mode_services_shows_all_non_live_services(
