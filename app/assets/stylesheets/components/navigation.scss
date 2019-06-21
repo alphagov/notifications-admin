@@ -2,16 +2,21 @@
 
   padding: 0 $gutter 0 0;
 
+  $padding-top: 14px;
+  $padding-bottom: 11px;
+
   &-service {
 
     border-bottom: 1px solid $border-colour;
     margin: 0 0 10px;
     position: relative;
+    font-size: 0;
 
     &-name {
       @include bold-19;
-      margin: 0 0 0 0;
+      padding: $padding-top 0 $padding-bottom 0;
       display: inline-block;
+      vertical-align: top;
     }
 
     &-switch {
@@ -21,7 +26,7 @@
       position: absolute;
       top: 0;
       right: 0;
-      padding: 13px 0 9px 15px;
+      padding: $padding-top 0 $padding-bottom $gutter-half;
 
       &:hover {
         color: $link-hover-colour;
@@ -38,9 +43,24 @@
 
     }
 
+    &-back-to {
+
+      @include core-19;
+      padding: $padding-top $gutter-half $padding-bottom 0;
+      display: inline-block;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+        color: $link-hover-colour;
+      }
+
+    }
+
   }
 
   &-organisation-link {
+
     @include core-19;
     display: inline-block;
     max-width: 25%;
@@ -52,9 +72,22 @@
     background-image: file-url("separator-2x.png");
     background-size: 6px 11px;
     background-repeat: no-repeat;
-    background-position: right 10px top 5px;
-    padding-right: 25px;
+    background-position: right 5px top ($padding-top + 5px);
+    padding: $padding-top 20px $padding-bottom 0;
+    margin-right: 7px;
     box-sizing: border-box;
+
+    &:hover {
+      color: $link-hover-colour;
+      text-decoration: underline;
+    }
+
+    &:focus {
+      color: $text-colour;
+      outline: none;
+      box-shadow: 0 1px 0 0 $focus-colour, -3px 0 0 0 $focus-colour, -3px 1px 0 0 $focus-colour;
+    }
+
   }
 
   li {
