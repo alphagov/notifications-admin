@@ -75,7 +75,7 @@ a {
 
   .heading-large,
   > .heading-medium {
-    margin: ($gutter / 3) 0 ($gutter / 3 * 2) 0;
+    margin: $gutter-half 0 ($gutter / 3 * 2) 0;
     word-wrap: break-word;
   }
 
@@ -83,7 +83,7 @@ a {
 
     .heading-large,
     .heading-medium {
-      margin: 10px 0 15px 0;
+      margin: $gutter-half 0 $gutter-half 0;
       word-wrap: break-word;
     }
 
@@ -286,5 +286,5 @@ details .arrow {
 }
 
 .heading-upcoming-jobs {
-  margin-top: $gutter / 3;
+  margin-top: $gutter-half;
 }
