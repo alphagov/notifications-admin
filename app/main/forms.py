@@ -1068,6 +1068,21 @@ class PDFUploadForm(StripWhitespaceForm):
     )
 
 
+class PDFAndWordUploadForm(StripWhitespaceForm):
+    file = FileField_wtf(
+        'Upload a letter in PDF format to check if it fits in the printable area',
+        validators=[
+            FileAllowed(['pdf', 'docx'], 'Your file must be a PDF or Microsoft Word document'),
+            DataRequired(message="You need to upload a file to submit")
+        ]
+    )
+
+
+class CreateOrUpdateOrganisation(StripWhitespaceForm):
+
+    name = StringField('Name', validators=[DataRequired()])
+
+
 class EmailFieldInWhitelist(EmailField, StripWhitespaceStringField):
     pass
 

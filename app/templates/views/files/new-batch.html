@@ -89,13 +89,6 @@
 
   {% else %}
 
-    {% set addresses = [
-      'Megan Priest, Government Digital Service, The White Chapel Building, 10 Whitechapel High Street, London E1 8QS',
-      'Olivia Stetler, Ministry of Justice, 102 Petty France, London, SW1H 9AJ',
-      'Gabriel Suber, Environment Agency, 2 Marsham Street, London, SW1P 4DF',
-      'Allan Hugo, Department of Education, Santuary Buildings, London, SW2B 1FE',
-      'Amala Yousef, Department of Work and Pensions, Caxton House, London, SW1A 1WP',
-    ] %}
     {% call(item, row_number) list_table(
       files,
       caption=uploaded_file_name,
@@ -131,13 +124,13 @@
     {% endcall %}
   {% endif %}
 
+  {% if done %}
   <div class="js-stick-at-bottom-when-scrolling">
-    {% if done %}
-      <span class="page-footer-delete-link page-footer-delete-link-without-button">
-        <a href="{{ url_for('main.cancel_letter', service_id=current_service.id, notification_id=notification_id) }}">Cancel sending these letters</a>
-      </span>
-    {% endif %}
+    <span class="page-footer-delete-link page-footer-delete-link-without-button">
+      <a href="{{ url_for('main.cancel_letter', service_id=current_service.id, notification_id=notification_id) }}">Cancel sending these letters</a>
+    </span>
   </div>
+  {% endif %}
 
 
 {% endblock %}

@@ -1,11 +1,26 @@
+import random
 from flask import redirect, request, render_template, url_for
-from flask_login import current_user, login_required
+from flask_login import login_required
 from datetime import datetime, timedelta
 
 from app import current_service
 from app.main import main
-from app.main.forms import BatchOptionsForm, NewBatchForm, PageCountForm, PDFUploadForm
+from app.main.forms import BatchOptionsForm, PageCountForm, PDFUploadForm, PDFAndWordUploadForm
 from app.utils import user_has_permissions
+
+
+ADDRESSES = [
+    'Megan Priest, Studio 11, Hall Manors, Burton-on-Trent, BT51 3NQS',
+    'Olivia Stetler, 1 Green Terrace, Westmoreland, CT14 7EW',
+    'Allan Hugo, 12a Russell Lock, Lewiston, WF1 5HR',
+    'Valeria Fernández, 3rd floor, Caxton House, Tothill Street, London, SW1A 1WP',
+    'Hank Scorpio, Managing Director, Globex, 2 Longacre, London, WC2A 4DF',
+    'Jakayla Fitzpatrick, 51 Prospect Road, Portstewart, Coleraine, Northern Ireland, United Kingdom, BT557NG',
+    'Madeleine Yang, 4 Johnson Orchard, North Aarlburgh, SP6 1NH',
+    'Patrick Lance Sloan, 38, Rapide Way, Weston-super-Mare, North Somerset, BS24 8ER',
+    'Joe Parry, 73 Netherpark Cres., Steel Cross, TN6 4WT',
+    'Chloë Turner, Flat 2, 18 Admiral Drive, Stevenage, Hertfordshire, SG1 4QA',
+]
 
 
 def _get_batch_heading():
@@ -55,6 +70,7 @@ def new_batch(service_id):
         time_now=datetime.utcnow().strftime('%-I:%M%p').lower(),
         edd=(datetime.utcnow() + timedelta(days=3)).strftime('%-d %B'),
         done=bool(request.args.get('done')),
+        addresses=ADDRESSES,
     )
 
 
@@ -102,6 +118,7 @@ def batch_send_one_file(service_id):
         done=bool(request.args.get('done')),
         time_now=datetime.utcnow().strftime('%-I:%M%p').lower(),
         edd=(datetime.utcnow() + timedelta(days=3)).strftime('%-d %B'),
+        recipient=random.choice(ADDRESSES),
     )
 
 
@@ -110,11 +127,21 @@ def batch_send_one_file(service_id):
 @user_has_permissions()
 def import_letters(service_id):
 
-    form = PDFUploadForm()
+    form = PDFAndWordUploadForm()
 
     if form.validate_on_submit():
         filenames = form.file.data.filename.split(', ')
         if len(filenames) == 1:
+            file = filenames[0]
+            if file.lower().endswith('mrg.docx'):
+                return redirect(url_for(
+                    'main.new_batch',
+                    service_id=current_service.id,
+                    **{
+                        'file{}'.format(index): '{} ({} of 10)'.format(file, index)
+                        for index in range(1, 11)
+                    }
+                ))
             return redirect(url_for(
                 'main.batch_send_one_file',
                 service_id=current_service.id,

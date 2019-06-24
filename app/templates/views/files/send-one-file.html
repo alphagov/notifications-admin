@@ -44,8 +44,8 @@
 
 
       <div class="js-stick-at-bottom-when-scrolling">
-        <p>
-          Recipient: Kai Reeves, 12a Childers Close, Greenwich, London SE5 1AZ
+        <p style="overflow:hidden; text-overflow: ellipsis; white-space: nowrap;">
+          Recipient: {{ recipient }}
         </p>
         <a href="{{ request.url }}&done=true" class="button">
           Send 1 letter
