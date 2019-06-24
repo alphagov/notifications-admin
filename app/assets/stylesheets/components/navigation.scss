@@ -74,13 +74,28 @@
     text-overflow: ellipsis;
     font-weight: normal;
     text-decoration: none;
-    background-image: file-url("separator-2x.png");
-    background-size: 6px 11px;
-    background-repeat: no-repeat;
-    background-position: right 5px top ($padding-top + 5px);
     padding: $padding-top 20px $padding-bottom 0;
     margin-right: 7px;
     box-sizing: border-box;
+    position: relative;
+
+    &:before {
+      content: "";
+      display: block;
+      position: absolute;
+      top: -1px;
+      bottom: 1px;
+      right: 6px;
+      width: 7px;
+      height: 7px;
+      margin: auto 0;
+      -webkit-transform: rotate(45deg);
+      -ms-transform: rotate(45deg);
+      transform: rotate(45deg);
+      border: solid;
+      border-width: 1px 1px 0 0;
+      border-color: $secondary-text-colour;
+    }
 
     &:hover {
       color: $link-hover-colour;
