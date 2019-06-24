@@ -261,6 +261,7 @@ def test_should_show_page_for_one_job_with_flexible_data_retention(
     )
 
     assert page.find('span', {'id': 'time-left'}).text == 'Data available for 10 days'
+    assert "Cancel sending these letters" not in page
 
 
 def test_get_jobs_should_tell_user_if_more_than_one_page(
@@ -490,9 +491,24 @@ def test_should_not_show_cancelled_job(
 def test_should_cancel_letter_job(
     client_request,
     mocker,
+    active_user_with_permissions
 ):
     job_id = uuid.uuid4()
-    mock_cancel = mocker.patch('app.main.jobs.job_api_client.cancel_letter_job')
+    job = job_json(
+        SERVICE_ONE_ID,
+        active_user_with_permissions,
+        job_id=job_id,
+        created_at="2019-06-20T15:30:00.000001+00:00",
+        job_status="finished"
+    )
+    mocker.patch('app.job_api_client.get_job', side_effect=[{"data": job}])
+    notifications_json = notification_json(SERVICE_ONE_ID, job=job, status="created", template_type="letter")
+    mocker.patch('app.job_api_client.get_job', side_effect=[{"data": job}])
+    mocker.patch(
+        'app.notification_api_client.get_notifications_for_service',
+        side_effect=[notifications_json]
+    )
+    mock_cancel = mocker.patch('app.main.jobs.job_api_client.cancel_letter_job', return_value=5)
     client_request.post(
         'main.cancel_letter_job',
         service_id=SERVICE_ONE_ID,
@@ -539,16 +555,90 @@ def test_should_not_show_cancel_link_for_letter_job_if_too_late(
         job_id=str(job_id)
     )
 
-    assert "Cancel sending those letters" not in page
+    assert "Cancel sending these letters" not in page
     assert page.find('p', {'id': 'printing-info'}).text.strip() == "Printed {} at 5:30pm".format(expected_fragment)
 
 
-def test_dont_cancel_letter_job_when_to_early_to_cancel():
-    pass
+@freeze_time("2019-06-20 15:32:00.000001")
+@pytest.mark.parametrize(" job_status", [
+    "finished", "in progress"
+])
+def test_should_show_cancel_link_for_letter_job(
+    client_request,
+    mocker,
+    mock_get_service_letter_template,
+    mock_get_service_data_retention,
+    active_user_with_permissions,
+    job_status,
+):
+    job_id = uuid.uuid4()
+    job = job_json(
+        SERVICE_ONE_ID,
+        active_user_with_permissions,
+        job_id=job_id,
+        created_at="2019-06-20T15:30:00.000001+00:00",
+        job_status=job_status
+    )
+    notifications_json = notification_json(SERVICE_ONE_ID, job=job, status="created", template_type="letter")
+    mocker.patch('app.job_api_client.get_job', side_effect=[{"data": job}])
+    mocker.patch(
+        'app.notification_api_client.get_notifications_for_service',
+        side_effect=[notifications_json]
+    )
+
+    page = client_request.get(
+        'main.view_job',
+        service_id=SERVICE_ONE_ID,
+        job_id=str(job_id)
+    )
+
+    assert page.find('a', text='Cancel sending these letters').attrs["href"] == url_for(
+        "main.cancel_letter_job", service_id=SERVICE_ONE_ID, job_id=job_id
+    )
+    assert page.find('p', {'id': 'printing-info'}).text.strip() == "Printing starts today at 5:30pm"
 
 
-def test_page_when_user_clicks_cancel_link_letter_job_and_to_early_to_cancel():
-    pass
+@freeze_time("2019-06-20 15:31:00.000001")
+@pytest.mark.parametrize('job_status,number_of_processed_notifications', [['in progress', 2], ['finished', 1]])
+def test_dont_cancel_letter_job_when_to_early_to_cancel(
+    client_request,
+    mocker,
+    mock_get_service_letter_template,
+    mock_get_service_data_retention,
+    active_user_with_permissions,
+    job_status,
+    number_of_processed_notifications,
+):
+    job_id = uuid.uuid4()
+    job = job_json(
+        SERVICE_ONE_ID,
+        active_user_with_permissions,
+        job_id=job_id,
+        created_at="2019-06-20T15:30:00.000001+00:00",
+        job_status=job_status,
+        notification_count=2
+    )
+    mocker.patch('app.job_api_client.get_job', side_effect=[{"data": job}, {"data": job}])
+
+    notifications_json = notification_json(
+        SERVICE_ONE_ID, job=job, status="created", template_type="letter", rows=number_of_processed_notifications
+    )
+    mocker.patch(
+        'app.notification_api_client.get_notifications_for_service',
+        side_effect=[notifications_json, notifications_json]
+    )
+
+    mock_cancel = mocker.patch('app.main.jobs.job_api_client.cancel_letter_job')
+    page = client_request.post(
+        'main.cancel_letter_job',
+        service_id=SERVICE_ONE_ID,
+        job_id=str(job_id),
+        _expected_status=200,
+    )
+    mock_cancel.assert_not_called()
+    flash_message = normalize_spaces(page.find('div', class_='banner-dangerous').text)
+
+    assert 'We are still processing these letters, please try again in a minute.' in flash_message
 
 
 @freeze_time("2016-01-01 00:00:00.000001")

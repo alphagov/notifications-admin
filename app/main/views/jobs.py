@@ -173,17 +173,25 @@ def cancel_job(service_id, job_id):
 @main.route("/services/<service_id>/jobs/<uuid:job_id>/cancel", methods=['GET', 'POST'])
 @user_has_permissions()
 def cancel_letter_job(service_id, job_id):
-
     if request.method == 'POST':
+        job = job_api_client.get_job(service_id, job_id)['data']
+        notifications = notification_api_client.get_notifications_for_service(
+            job['service'], job['id']
+        )['notifications']
+        if job['job_status'] != 'finished' or len(notifications) < job['notification_count']:
+            flash("We are still processing these letters, please try again in a minute.", 'try again')
+            return view_job(service_id, job_id)
         try:
             number_of_letters = job_api_client.cancel_letter_job(current_service.id, job_id)
         except HTTPError as e:
             flash(e.message, 'dangerous')
             return redirect(url_for('main.view_job', service_id=service_id, job_id=job_id))
-        flash(" {} letters have been cancelled succesfully".format(number_of_letters), 'default_with_tick')
+        flash("Cancelled {:,.0f} letters from {}".format(
+            number_of_letters, job['original_file_name']
+        ), 'default_with_tick')
         return redirect(url_for('main.service_dashboard', service_id=service_id))
 
-    flash("Are you sure you want to cancel sending those letters?", 'cancel')
+    flash("Are you sure you want to cancel sending these letters?", 'cancel')
     return view_job(service_id, job_id)
 
 
@@ -435,12 +443,10 @@ def get_job_partials(job, template):
             n for n in notifications["notifications"] if n["status"] not in CANCELLABLE_JOB_LETTER_STATUSES
         ]
         job_created = job["created_at"][:-6]
-        if job["job_status"] != "finished":
-            can_letter_job_be_cancelled = "This job is still being processed. Wait a couple of minutes and try again."
-        elif not letter_can_be_cancelled(
+        if not letter_can_be_cancelled(
             "created", datetime.strptime(job_created, '%Y-%m-%dT%H:%M:%S.%f')
         ) or len(not_cancellable) != 0:
-            can_letter_job_be_cancelled = "Cancel sending those letters"
+            can_letter_job_be_cancelled = False
         else:
             can_letter_job_be_cancelled = True
     return {
