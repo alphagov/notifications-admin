@@ -452,7 +452,10 @@ class Service(JSONModel):
                     "users_with_permission": folder["users_with_permission"]
                 }
                 while folder_attrs["parent_id"] is not None:
-                    folder_attrs["name"] = parent["name"] + " / " + folder_attrs["name"]
+                    folder_attrs["name"] = [
+                        parent["name"],
+                        folder_attrs["name"],
+                    ]
                     if parent["parent_id"] is None:
                         folder_attrs["parent_id"] = None
                     else:

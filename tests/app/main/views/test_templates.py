@@ -428,7 +428,7 @@ def test_user_with_only_send_and_view_sees_letter_page(
         _test_page_title=False,
     )
     assert normalize_spaces(page.select_one('h1').text) == (
-        'Templates / Two week reminder'
+        'Templates Two week reminder'
     )
     assert normalize_spaces(page.select_one('title').text) == (
         'Two week reminder – Templates – service one – GOV.UK Notify'
@@ -624,7 +624,7 @@ def test_should_be_able_to_view_a_template_with_links(
     )
 
     assert normalize_spaces(page.select_one('h1').text) == (
-        'Templates / Two week reminder'
+        'Templates Two week reminder'
     )
     assert normalize_spaces(page.select_one('title').text) == (
         'Two week reminder – Templates – service one – GOV.UK Notify'
@@ -855,27 +855,27 @@ def test_choose_a_template_to_copy(
             '6 templates'
         ),
         (
-            'Service 1 / sms_template_one '
+            'Service 1 sms_template_one '
             'Text message template'
         ),
         (
-            'Service 1 / sms_template_two '
+            'Service 1 sms_template_two '
             'Text message template'
         ),
         (
-            'Service 1 / email_template_one '
+            'Service 1 email_template_one '
             'Email template'
         ),
         (
-            'Service 1 / email_template_two '
+            'Service 1 email_template_two '
             'Email template'
         ),
         (
-            'Service 1 / letter_template_one '
+            'Service 1 letter_template_one '
             'Letter template'
         ),
         (
-            'Service 1 / letter_template_two '
+            'Service 1 letter_template_two '
             'Letter template'
         ),
         (
@@ -883,27 +883,27 @@ def test_choose_a_template_to_copy(
             '6 templates'
         ),
         (
-            'Service 2 / sms_template_one '
+            'Service 2 sms_template_one '
             'Text message template'
         ),
         (
-            'Service 2 / sms_template_two '
+            'Service 2 sms_template_two '
             'Text message template'
         ),
         (
-            'Service 2 / email_template_one '
+            'Service 2 email_template_one '
             'Email template'
         ),
         (
-            'Service 2 / email_template_two '
+            'Service 2 email_template_two '
             'Email template'
         ),
         (
-            'Service 2 / letter_template_one '
+            'Service 2 letter_template_one '
             'Letter template'
         ),
         (
-            'Service 2 / letter_template_two '
+            'Service 2 letter_template_two '
             'Letter template'
         ),
     ]
@@ -1026,7 +1026,7 @@ def test_choose_a_template_to_copy_from_folder_within_service(
     )
 
     assert normalize_spaces(page.select_one('.folder-heading').text) == (
-        'service one / Parent folder'
+        'service one Parent folder'
     )
     breadcrumb_links = page.select('.folder-heading a')
     assert len(breadcrumb_links) == 1
@@ -1046,7 +1046,7 @@ def test_choose_a_template_to_copy_from_folder_within_service(
             '1 template'
         ),
         (
-            'Child folder non-empty / Should appear in list (nested) '
+            'Child folder non-empty Should appear in list (nested) '
             'Text message template'
         ),
         (

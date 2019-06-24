@@ -1,3 +1,29 @@
+@mixin separator {
+  display: inline-block;
+  vertical-align: top;
+  width: 20px;
+  height: $gutter;
+  position: relative;
+
+  &:before {
+    content: "";
+    display: block;
+    position: absolute;
+    top: -5px;
+    bottom: 1px;
+    right: 7px;
+    width: 9px;
+    height: 9px;
+    margin: auto 0;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+    border: solid;
+    border-width: 2px 2px 0 0;
+    border-color: $secondary-text-colour;
+  }
+}
+
 .message {
 
   &-name {
@@ -28,11 +54,7 @@
     }
 
     &-separator {
-      display: inline-block;
-      vertical-align: top;
-      color: $secondary-text-colour;
-      padding: 0 4px 0 5px;
-      font-weight: normal;
+      @include separator;
     }
 
   }
@@ -235,13 +257,7 @@
   }
 
   &-separator {
-
-    display: inline-block;
-    vertical-align: top;
-    color: $secondary-text-colour;
-    padding: 0 4px 0 5px;
-    font-weight: normal;
-
+    @include separator;
   }
 
   &-manage-link {

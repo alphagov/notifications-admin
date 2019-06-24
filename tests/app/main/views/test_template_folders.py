@@ -55,11 +55,11 @@ def _folder(name, folder_id=None, parent=None, users_with_permission=None):
             ['Email', 'Text message', 'Letter'],
             [
                 'folder_one 2 folders',
-                'folder_one / folder_one_one 1 template, 1 folder',
-                'folder_one / folder_one_one / folder_one_one_one 1 template',
-                'folder_one / folder_one_one / folder_one_one_one / sms_template_nested Text message template',
-                'folder_one / folder_one_one / letter_template_nested Letter template',
-                'folder_one / folder_one_two Empty',
+                'folder_one folder_one_one 1 template, 1 folder',
+                'folder_one folder_one_one folder_one_one_one 1 template',
+                'folder_one folder_one_one folder_one_one_one sms_template_nested Text message template',
+                'folder_one folder_one_one letter_template_nested Letter template',
+                'folder_one folder_one_two Empty',
                 'folder_two Empty',
                 'sms_template_one Text message template',
                 'sms_template_two Text message template',
@@ -103,9 +103,9 @@ def _folder(name, folder_id=None, parent=None, users_with_permission=None):
             ['All', 'Email', 'Letter'],
             [
                 'folder_one 1 folder',
-                'folder_one / folder_one_one 1 folder',
-                'folder_one / folder_one_one / folder_one_one_one 1 template',
-                'folder_one / folder_one_one / folder_one_one_one / sms_template_nested Text message template',
+                'folder_one folder_one_one 1 folder',
+                'folder_one folder_one_one folder_one_one_one 1 template',
+                'folder_one folder_one_one folder_one_one_one sms_template_nested Text message template',
                 'sms_template_one Text message template',
                 'sms_template_two Text message template',
             ],
@@ -126,15 +126,15 @@ def _folder(name, folder_id=None, parent=None, users_with_permission=None):
         ),
         (
             'folder_one – Templates – service one – GOV.UK Notify',
-            'Templates / folder_one',
+            'Templates folder_one',
             [{'template_type': 'all'}],
             {'template_folder_id': PARENT_FOLDER_ID},
             ['Email', 'Text message', 'Letter'],
             [
                 'folder_one_one 1 template, 1 folder',
-                'folder_one_one / folder_one_one_one 1 template',
-                'folder_one_one / folder_one_one_one / sms_template_nested Text message template',
-                'folder_one_one / letter_template_nested Letter template',
+                'folder_one_one folder_one_one_one 1 template',
+                'folder_one_one folder_one_one_one sms_template_nested Text message template',
+                'folder_one_one letter_template_nested Letter template',
                 'folder_one_two Empty',
             ],
             [
@@ -152,14 +152,14 @@ def _folder(name, folder_id=None, parent=None, users_with_permission=None):
         ),
         (
             'folder_one – Templates – service one – GOV.UK Notify',
-            'Templates / folder_one',
+            'Templates folder_one',
             [{'template_type': 'sms'}],
             {'template_type': 'sms', 'template_folder_id': PARENT_FOLDER_ID},
             ['All', 'Email', 'Letter'],
             [
                 'folder_one_one 1 folder',
-                'folder_one_one / folder_one_one_one 1 template',
-                'folder_one_one / folder_one_one_one / sms_template_nested Text message template',
+                'folder_one_one folder_one_one_one 1 template',
+                'folder_one_one folder_one_one_one sms_template_nested Text message template',
             ],
             [
                 'folder_one_one 1 folder',
@@ -173,7 +173,7 @@ def _folder(name, folder_id=None, parent=None, users_with_permission=None):
         ),
         (
             'folder_one – Templates – service one – GOV.UK Notify',
-            'Templates / folder_one',
+            'Templates folder_one',
             [{'template_type': 'email'}],
             {'template_type': 'email', 'template_folder_id': PARENT_FOLDER_ID},
             ['All', 'Text message', 'Letter'],
@@ -184,7 +184,7 @@ def _folder(name, folder_id=None, parent=None, users_with_permission=None):
         ),
         (
             'folder_one_one – folder_one – Templates – service one – GOV.UK Notify',
-            'Templates / folder_one / folder_one_one',
+            'Templates folder_one folder_one_one',
             [
                 {'template_type': 'all'},
                 {'template_type': 'all', 'template_folder_id': PARENT_FOLDER_ID},
@@ -193,7 +193,7 @@ def _folder(name, folder_id=None, parent=None, users_with_permission=None):
             ['Email', 'Text message', 'Letter'],
             [
                 'folder_one_one_one 1 template',
-                'folder_one_one_one / sms_template_nested Text message template',
+                'folder_one_one_one sms_template_nested Text message template',
                 'letter_template_nested Letter template',
             ],
             [
@@ -209,7 +209,7 @@ def _folder(name, folder_id=None, parent=None, users_with_permission=None):
         ),
         (
             'folder_one_one_one – folder_one_one – folder_one – Templates – service one – GOV.UK Notify',
-            'Templates / folder_one / folder_one_one / folder_one_one_one',
+            'Templates folder_one folder_one_one folder_one_one_one',
             [
                 {'template_type': 'all'},
                 {'template_type': 'all', 'template_folder_id': PARENT_FOLDER_ID},
@@ -230,7 +230,7 @@ def _folder(name, folder_id=None, parent=None, users_with_permission=None):
         ),
         (
             'folder_one_one_one – folder_one_one – folder_one – Templates – service one – GOV.UK Notify',
-            'Templates / folder_one / folder_one_one / folder_one_one_one',
+            'Templates folder_one folder_one_one folder_one_one_one',
             [
                 {'template_type': 'email'},
                 {'template_type': 'email', 'template_folder_id': PARENT_FOLDER_ID},
@@ -248,7 +248,7 @@ def _folder(name, folder_id=None, parent=None, users_with_permission=None):
         ),
         (
             'folder_two – Templates – service one – GOV.UK Notify',
-            'Templates / folder_two',
+            'Templates folder_two',
             [{'template_type': 'all'}],
             {'template_folder_id': FOLDER_TWO_ID},
             ['Email', 'Text message', 'Letter'],
@@ -259,7 +259,7 @@ def _folder(name, folder_id=None, parent=None, users_with_permission=None):
         ),
         (
             'folder_two – Templates – service one – GOV.UK Notify',
-            'Templates / folder_two',
+            'Templates folder_two',
             [{'template_type': 'sms'}],
             {'template_folder_id': FOLDER_TWO_ID, 'template_type': 'sms'},
             ['All', 'Email', 'Letter'],
@@ -1405,17 +1405,17 @@ def test_show_custom_error_message(
             {},
             [
                 ['folder_A', '1 template, 2 folders'],
-                ['folder_E / folder_F / folder_G', '1 template'],
+                ['folder_E  folder_F  folder_G', '1 template'],
                 ['email_template_root', 'Email template'],
             ],
             [
                 ['folder_A', '1 template, 2 folders'],
-                ['folder_A', '/', 'folder_C', '1 template'],
-                ['folder_A', '/', 'folder_C', '/', 'sms_template_C', 'Text message template'],
-                ['folder_A', '/', 'folder_D', 'Empty'],
-                ['folder_A', '/', 'sms_template_A', 'Text message template'],
-                ['folder_E / folder_F / folder_G', '1 template'],
-                ['folder_E / folder_F / folder_G', '/', 'email_template_G', 'Email template'],
+                ['folder_A', 'folder_C', '1 template'],
+                ['folder_A', 'folder_C', 'sms_template_C', 'Text message template'],
+                ['folder_A', 'folder_D', 'Empty'],
+                ['folder_A', 'sms_template_A', 'Text message template'],
+                ['folder_E  folder_F  folder_G', '1 template'],
+                ['folder_E  folder_F  folder_G', 'email_template_G', 'Email template'],
                 ['email_template_root', 'Email template'],
             ],
             None,
@@ -1423,12 +1423,12 @@ def test_show_custom_error_message(
         (
             {'template_type': 'email'},
             [
-                ['folder_E / folder_F / folder_G', '1 template'],
+                ['folder_E  folder_F  folder_G', '1 template'],
                 ['email_template_root', 'Email template'],
             ],
             [
-                ['folder_E / folder_F / folder_G', '1 template'],
-                ['folder_E / folder_F / folder_G', '/', 'email_template_G', 'Email template'],
+                ['folder_E  folder_F  folder_G', '1 template'],
+                ['folder_E  folder_F  folder_G', 'email_template_G', 'Email template'],
                 ['email_template_root', 'Email template'],
             ],
             None,
@@ -1440,9 +1440,9 @@ def test_show_custom_error_message(
             ],
             [
                 ['folder_A', '1 template, 1 folder'],
-                ['folder_A', '/', 'folder_C', '1 template'],
-                ['folder_A', '/', 'folder_C', '/', 'sms_template_C', 'Text message template'],
-                ['folder_A', '/', 'sms_template_A', 'Text message template'],
+                ['folder_A', 'folder_C', '1 template'],
+                ['folder_A', 'folder_C', 'sms_template_C', 'Text message template'],
+                ['folder_A', 'sms_template_A', 'Text message template'],
             ],
             None,
         ),
@@ -1521,7 +1521,6 @@ def test_should_filter_templates_folder_page_based_on_user_permissions(
         and 'template-list-item' in tag['class']
         and 'template-list-item-hidden-by-default' not in tag['class']
     ))
-
     assert [
         [i.strip() for i in e.text.split("\n") if i.strip()]
         for e in displayed_page_items
