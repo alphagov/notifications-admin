@@ -66,10 +66,7 @@ class _MockS3Object():
     (
         None, None,
         [
-            partial(url_for, 'main.public_download_agreement', variant='crown'),
-            partial(url_for, 'main.public_download_agreement', variant='non-crown'),
             partial(url_for, 'main.support'),
-            lambda: 'mailto:notify-support@digital.cabinet-office.gov.uk',
         ]
     ),
 ])
