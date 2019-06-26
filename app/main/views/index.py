@@ -112,19 +112,21 @@ def email_template():
         branding_type = email_branding['brand_type']
 
     if branding_type == 'govuk':
-        brand_name = None
+        brand_text = None
         brand_colour = None
         brand_logo = None
         govuk_banner = True
         brand_banner = False
+        brand_name = None
     else:
         colour = email_branding['colour']
-        brand_name = email_branding['text']
+        brand_text = email_branding['text']
         brand_colour = colour
         brand_logo = ('https://{}/{}'.format(get_logo_cdn_domain(), email_branding['logo'])
                       if email_branding['logo'] else None)
         govuk_banner = branding_type in ['govuk', 'both']
         brand_banner = branding_type == 'org_banner'
+        brand_name = email_branding['name']
 
     template = {
         'subject': 'foo',
@@ -174,10 +176,11 @@ def email_template():
         resp = make_response(str(HTMLEmailTemplate(
             template,
             govuk_banner=govuk_banner,
-            brand_name=brand_name,
+            brand_text=brand_text,
             brand_colour=brand_colour,
             brand_logo=brand_logo,
             brand_banner=brand_banner,
+            brand_name=brand_name,
         )))
 
     resp.headers['X-Frame-Options'] = 'SAMEORIGIN'
