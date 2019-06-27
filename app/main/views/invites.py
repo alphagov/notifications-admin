@@ -105,7 +105,7 @@ def accept_org_invite(token):
     if existing_user:
         invited_org_user.accept_invite()
         if existing_user not in organisation_users:
-            invited_org_user.add_to_organisation()
+            invited_org_user.add_to_organisation(existing_user.id)
         return redirect(url_for('main.organisation_dashboard', org_id=invited_org_user.organisation))
     else:
         return redirect(url_for('main.register_from_org_invite'))

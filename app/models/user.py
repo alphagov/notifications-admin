@@ -584,8 +584,8 @@ class InvitedOrgUser(JSONModel):
     def accept_invite(self):
         org_invite_api_client.accept_invite(self.organisation, self.id)
 
-    def add_to_organisation(self):
-        user_api_client.add_user_to_organisation(self.organisation, self.id)
+    def add_to_organisation(self, user_id):
+        user_api_client.add_user_to_organisation(self.organisation, user_id)
 
 
 class AnonymousUser(AnonymousUserMixin):

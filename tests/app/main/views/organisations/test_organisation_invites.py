@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta
 from unittest.mock import ANY
-from uuid import UUID
 
 import pytest
 from bs4 import BeautifulSoup
@@ -84,7 +83,7 @@ def test_invite_org_user_errors_when_same_email_as_inviter(
     assert normalize_spaces(page.select_one('.error-message').text) == 'You can’t send an invitation to yourself'
 
 
-def test_accepted_invite_when_user_already_logged_in(
+def test_accepted_invite_when_other_user_already_logged_in(
     client_request,
     mock_check_org_invite_token
 ):
@@ -165,6 +164,7 @@ def test_existing_user_invite_already_is_member_of_organisation(
 
 def test_existing_user_invite_not_a_member_of_organisation(
     client,
+    api_user_active,
     mock_check_org_invite_token,
     mock_get_user_by_email,
     mock_get_users_for_organisation,
@@ -186,7 +186,7 @@ def test_existing_user_invite_not_a_member_of_organisation(
     mock_get_users_for_organisation.assert_called_once_with(ORGANISATION_ID)
     mock_add_user_to_organisation.assert_called_once_with(
         ORGANISATION_ID,
-        str(UUID(bytes=b'sample_org_invit', version=4))
+        api_user_active['id'],
     )
 
 
