@@ -1462,3 +1462,68 @@ class GoLiveNotesForm(StripWhitespaceForm):
         'Go live notes',
         filters=[lambda x: x or None],
     )
+
+
+class AcceptAgreementForm(StripWhitespaceForm):
+
+    @classmethod
+    def from_organisation(cls, org):
+
+        if org.agreement_signed_on_behalf_of_name and org.agreement_signed_on_behalf_of_email_address:
+            who = 'someone-else'
+        elif org.agreement_signed_version:  # only set if user has submitted form previously
+            who = 'me'
+        else:
+            who = None
+
+        return cls(
+            version=org.agreement_signed_version,
+            who=who,
+            on_behalf_of_name=org.agreement_signed_on_behalf_of_name,
+            on_behalf_of_email=org.agreement_signed_on_behalf_of_email_address,
+        )
+
+    version = StringField(
+        'Which version of the agreement are you accepting?'
+    )
+
+    who = RadioField(
+        'Who is accepting the agreement?',
+        choices=(
+            (
+                'me',
+                'I’m accepting the agreement',
+            ),
+            (
+                'someone-else',
+                'I’m accepting the agreement on behalf of someone else',
+            ),
+        ),
+        validators=[DataRequired()],
+    )
+
+    on_behalf_of_name = StringField(
+        'Who are you accepting the agreement on behalf of?'
+    )
+
+    on_behalf_of_email = email_address(
+        'What’s their email address?',
+        required=False,
+        gov_user=False,
+    )
+
+    def __validate_if_nominating(self, field):
+        if self.who.data == 'someone-else':
+            if not field.data:
+                raise ValidationError('Can’t be empty')
+        else:
+            field.data = ''
+
+    validate_on_behalf_of_name = __validate_if_nominating
+    validate_on_behalf_of_email = __validate_if_nominating
+
+    def validate_version(self, field):
+        try:
+            float(field.data)
+        except (TypeError, ValueError):
+            raise ValidationError("Must be a number")

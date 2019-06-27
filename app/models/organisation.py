@@ -19,6 +19,8 @@ class Organisation(JSONModel):
         'agreement_signed_at',
         'agreement_signed_by_id',
         'agreement_signed_version',
+        'agreement_signed_on_behalf_of_name',
+        'agreement_signed_on_behalf_of_email_address',
         'domains',
         'request_to_go_live_notes',
         'count_of_live_services',
@@ -155,6 +157,10 @@ class Organisation(JSONModel):
             self.invited_users + self.active_users,
             key=lambda user: user.email_address.lower(),
         )
+
+    def update(self, **kwargs):
+        response = organisations_client.update_organisation(self.id, **kwargs)
+        self.__init__(response)
 
 
 class Organisations(ModelList):
