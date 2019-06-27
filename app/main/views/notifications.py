@@ -220,6 +220,7 @@ def view_letter_notification_as_preview(service_id, notification_id, filetype):
 
 @main.route("/services/<service_id>/notification/<notification_id>.json")
 @user_has_permissions('view_activity', 'send_messages')
+@login_required
 def view_notification_updates(service_id, notification_id):
     return jsonify(**get_single_notification_partials(
         notification_api_client.get_notification(service_id, notification_id)

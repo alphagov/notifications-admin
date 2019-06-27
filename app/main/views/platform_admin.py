@@ -33,6 +33,7 @@ from app.utils import (
     generate_next_dict,
     generate_previous_dict,
     get_page_from_request,
+    user_has_permissions,
     user_is_platform_admin,
 )
 
@@ -339,6 +340,7 @@ def platform_admin_letter_validation_preview():
 
 @main.route("/services/<service_id>/letter-validation-preview", methods=["GET", "POST"])
 @login_required
+@user_has_permissions()
 def service_letter_validation_preview(service_id):
     return letter_validation_preview(from_platform_admin=False)
 

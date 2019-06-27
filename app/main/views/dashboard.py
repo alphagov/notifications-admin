@@ -43,6 +43,7 @@ from app.utils import (
 # to view history
 @main.route("/services/<service_id>/history")
 @login_required
+@user_has_permissions()
 def temp_service_history(service_id):
     data = service_api_client.get_service_history(service_id)['data']
     return render_template('views/temp-history.html',
@@ -78,6 +79,7 @@ def service_dashboard(service_id):
 
 
 @main.route("/services/<service_id>/dashboard.json")
+@login_required
 @user_has_permissions('view_activity')
 def service_dashboard_updates(service_id):
     return jsonify(**get_dashboard_partials(service_id))

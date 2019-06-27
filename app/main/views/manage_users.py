@@ -269,6 +269,7 @@ def confirm_edit_user_mobile_number(service_id, user_id):
 
 @main.route("/services/<service_id>/cancel-invited-user/<uuid:invited_user_id>", methods=['GET'])
 @user_has_permissions('manage_service')
+@login_required
 def cancel_invited_user(service_id, invited_user_id):
     current_service.cancel_invite(invited_user_id)
 

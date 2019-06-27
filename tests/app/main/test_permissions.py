@@ -1,3 +1,6 @@
+import ast
+import inspect
+
 import pytest
 from flask import request
 from werkzeug.exceptions import Forbidden, Unauthorized
@@ -369,3 +372,72 @@ def test_service_navigation_for_org_user(
         'Team members',
         'Usage',
     ]
+
+
+def get_name_of_decorator_from_ast_node(node):
+    if isinstance(node, ast.Attribute):
+        return '{}.{}'.format(
+            get_name_of_decorator_from_ast_node(node.value),
+            node.attr,
+        )
+    if isinstance(node, ast.Name):
+        return str(node.id)
+    if isinstance(node, ast.Call) and isinstance(node.func, ast.Name):
+        return get_name_of_decorator_from_ast_node(node.func)
+    return node.func.attr
+
+
+def get_decorators_for_function(function):
+    for node in ast.walk(ast.parse(inspect.getsource(function))):
+        if isinstance(node, ast.FunctionDef):
+            for decorator in node.decorator_list:
+                yield get_name_of_decorator_from_ast_node(decorator)
+
+
+SERVICE_ID_ARGUMENT = 'service_id'
+ORGANISATION_ID_ARGUMENT = 'org_id'
+
+
+def get_routes_and_decorators_with_argument(argument_name):
+    import app.main.views as views
+    for module_name, module in inspect.getmembers(views):
+        for function_name, function in inspect.getmembers(module):
+            if (
+                inspect.isfunction(function) and
+                argument_name in inspect.signature(function).parameters.keys()
+            ):
+                decorators = list(get_decorators_for_function(function))
+                if 'route' in decorators:
+                    yield '{}.{}'.format(module_name, function_name), decorators
+
+
+def test_code_to_extract_decorators_works_with_known_examples():
+    assert (
+        'templates.choose_template',
+        ['route', 'route', 'route', 'route', 'login_required', 'user_has_permissions'],
+    ) in list(
+        get_routes_and_decorators_with_argument(SERVICE_ID_ARGUMENT)
+    )
+    assert (
+        'organisations.organisation_dashboard',
+        ['route', 'login_required', 'user_has_permissions'],
+    ) in list(
+        get_routes_and_decorators_with_argument(ORGANISATION_ID_ARGUMENT)
+    )
+
+
+def test_service_routes_have_decorator():
+
+    for endpoint, decorators in (
+        list(get_routes_and_decorators_with_argument(SERVICE_ID_ARGUMENT)) +
+        list(get_routes_and_decorators_with_argument(ORGANISATION_ID_ARGUMENT))
+    ):
+        if 'user_is_platform_admin' in decorators:
+            required_decorators = {'login_required'}
+        else:
+            required_decorators = {'login_required', 'user_has_permissions'}
+
+        for required_decorator in required_decorators:
+            assert required_decorator in decorators, (
+                'Missing {} decorator on app/main/views/{}.py::{}'
+            ).format(required_decorator, *endpoint.split('.'))

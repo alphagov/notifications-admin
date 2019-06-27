@@ -163,6 +163,7 @@ def cancel_job(service_id, job_id):
 
 @main.route("/services/<service_id>/jobs/<job_id>.json")
 @user_has_permissions()
+@login_required
 def view_job_updates(service_id, job_id):
 
     job = job_api_client.get_job(service_id, job_id)['data']
@@ -205,6 +206,7 @@ def view_notifications(service_id, message_type=None):
 @main.route('/services/<service_id>/notifications.json', methods=['GET', 'POST'])
 @main.route('/services/<service_id>/notifications/<message_type>.json', methods=['GET', 'POST'])
 @user_has_permissions()
+@login_required
 def get_notifications_as_json(service_id, message_type=None):
     return jsonify(get_notifications(
         service_id, message_type, status_override=request.args.get('status')
@@ -213,6 +215,7 @@ def get_notifications_as_json(service_id, message_type=None):
 
 @main.route('/services/<service_id>/notifications/<message_type>.csv', endpoint="view_notifications_csv")
 @user_has_permissions()
+@login_required
 def get_notifications(service_id, message_type, status_override=None):
     # TODO get the api to return count of pages as well.
     page = get_page_from_request()
