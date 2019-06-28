@@ -65,7 +65,11 @@ def accept_invite(token):
                 invited_user.auth_type == 'email_auth'
             ):
                 existing_user.update(auth_type=invited_user.auth_type)
-            invited_user.add_to_service(existing_user_id=existing_user.id)
+            existing_user.add_to_service(
+                service_id=invited_user.service,
+                permissions=invited_user.permissions,
+                folder_permissions=invited_user.folder_permissions,
+            )
             return redirect(url_for('main.service_dashboard', service_id=service.id))
     else:
         return redirect(url_for('main.register_from_invite'))
@@ -105,7 +109,7 @@ def accept_org_invite(token):
     if existing_user:
         invited_org_user.accept_invite()
         if existing_user not in organisation_users:
-            invited_org_user.add_to_organisation()
+            existing_user.add_to_organisation(organisation_id=invited_org_user.organisation)
         return redirect(url_for('main.organisation_dashboard', org_id=invited_org_user.organisation))
     else:
         return redirect(url_for('main.register_from_org_invite'))

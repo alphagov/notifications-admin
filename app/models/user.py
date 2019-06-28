@@ -389,6 +389,20 @@ class User(JSONModel, UserMixin):
         self.current_session_id = user_api_client.get_user(self.id).get('current_session_id')
         session['current_session_id'] = self.current_session_id
 
+    def add_to_service(self, service_id, permissions, folder_permissions):
+        user_api_client.add_user_to_service(
+            service_id,
+            self.id,
+            permissions,
+            folder_permissions,
+        )
+
+    def add_to_organisation(self, organisation_id):
+        user_api_client.add_user_to_organisation(
+            organisation_id,
+            self.id,
+        )
+
 
 class InvitedUser(JSONModel):
 
@@ -429,14 +443,6 @@ class InvitedUser(JSONModel):
 
     def accept_invite(self):
         invite_api_client.accept_invite(self.service, self.id)
-
-    def add_to_service(self, existing_user_id):
-        user_api_client.add_user_to_service(
-            self.service,
-            existing_user_id,
-            self.permissions,
-            self.folder_permissions,
-        )
 
     @property
     def permissions(self):
@@ -583,9 +589,6 @@ class InvitedOrgUser(JSONModel):
 
     def accept_invite(self):
         org_invite_api_client.accept_invite(self.organisation, self.id)
-
-    def add_to_organisation(self):
-        user_api_client.add_user_to_organisation(self.organisation, self.id)
 
 
 class AnonymousUser(AnonymousUserMixin):
