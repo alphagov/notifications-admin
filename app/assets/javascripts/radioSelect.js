@@ -82,11 +82,34 @@
       });
       let categories = $component.data('categories').split(',');
       let name = $component.find('input').eq(0).attr('name');
-      let reset = () => {
+      let mousedownOption = null;
+      const reset = () => {
         render('initial', {
           'categories': categories,
           'name': name
         });
+      };
+      const selectOption = (value) => {
+        render('chosen', {
+          'choices': choices.filter(
+            element => element.value == value
+          ),
+          'name': name
+        });
+        focusSelected();
+      };
+      const trackMouseup = (event) => {
+        const parentNode = event.target.parentNode;
+
+        if (parentNode === mousedownOption) {
+          const value = $('input', parentNode).attr('value');
+
+          selectOption(value);
+
+          // clear tracking
+          mousedownOption = null;
+          $(document).off('mouseup', trackMouseup);
+        }
       };
 
       $component
@@ -104,38 +127,23 @@
           focusSelected();
 
         })
-        .on('click', '.js-option', function(event) {
+        .on('mousedown', '.js-option', function(event) {
+          mousedownOption = this;
 
-          // stop click being triggered by keyboard events
-          if (!event.pageX) return true;
-
-          event.preventDefault();
-          let value = $('input', this).attr('value');
-          render('chosen', {
-            'choices': choices.filter(
-              element => element.value == value
-            ),
-            'name': name
-          });
-          focusSelected();
-
+          // mouseup on the same option completes the click action
+          $(document).on('mouseup', trackMouseup);
         })
+        // space and enter, clicked on a radio confirm that option was selected
         .on('keydown', 'input[type=radio]', function(event) {
 
-          // intercept keypresses which aren’t enter or space
+          // allow keypresses which aren’t enter or space through
           if (event.which !== 13 && event.which !== 32) {
             return true;
           }
 
           event.preventDefault();
           let value = $(this).attr('value');
-          render('chosen', {
-            'choices': choices.filter(
-              element => element.value == value
-            ),
-            'name': name
-          });
-          focusSelected();
+          selectOption(value);
 
         })
         .on('click', '.js-done-button', function(event) {

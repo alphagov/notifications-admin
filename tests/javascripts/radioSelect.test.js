@@ -212,6 +212,7 @@ describe('RadioSelect', () => {
     describe("clicking on an option with the mouse/trackpad should", () => {
 
       let optionsColumn;
+      let firstOptionPositionSpy;
       let firstOptionLabel;
 
       beforeEach(() => {
@@ -360,6 +361,7 @@ describe('RadioSelect', () => {
 
         // select the first option
         const firstOption = document.querySelector('.radio-select-column:nth-child(2) input[type=radio]');
+
         helpers.triggerEvent(firstOption, 'click');
 
         // click the 'Choose a different time' button
@@ -371,6 +373,7 @@ describe('RadioSelect', () => {
         expect(categoryButtons.length).toEqual(CATEGORIES.length);
 
       });
+
     });
 
   });
