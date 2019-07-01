@@ -38,8 +38,8 @@ from app.utils import (
 
 
 @main.route("/services/<service_id>/jobs")
-@login_required
 @user_has_permissions()
+@login_required
 def view_jobs(service_id):
     page = int(request.args.get('page', 1))
     jobs_response = job_api_client.get_page_of_jobs(service_id, page=page)
@@ -73,8 +73,8 @@ def view_jobs(service_id):
 
 
 @main.route("/services/<service_id>/jobs/<job_id>")
-@login_required
 @user_has_permissions()
+@login_required
 def view_job(service_id, job_id):
     job = job_api_client.get_job(service_id, job_id)['data']
     if job['job_status'] == 'cancelled':
@@ -119,8 +119,8 @@ def view_job(service_id, job_id):
 
 
 @main.route("/services/<service_id>/jobs/<job_id>.csv")
-@login_required
 @user_has_permissions('view_activity')
+@login_required
 def view_job_csv(service_id, job_id):
     job = job_api_client.get_job(service_id, job_id)['data']
     template = service_api_client.get_service_template(
@@ -154,8 +154,8 @@ def view_job_csv(service_id, job_id):
 
 
 @main.route("/services/<service_id>/jobs/<job_id>", methods=['POST'])
-@login_required
 @user_has_permissions('send_messages')
+@login_required
 def cancel_job(service_id, job_id):
     job_api_client.cancel_job(service_id, job_id)
     return redirect(url_for('main.service_dashboard', service_id=service_id))
@@ -180,8 +180,8 @@ def view_job_updates(service_id, job_id):
 
 @main.route('/services/<service_id>/notifications', methods=['GET', 'POST'])
 @main.route('/services/<service_id>/notifications/<message_type>', methods=['GET', 'POST'])
-@login_required
 @user_has_permissions()
+@login_required
 def view_notifications(service_id, message_type=None):
     return render_template(
         'views/notifications.html',

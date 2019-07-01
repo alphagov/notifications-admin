@@ -37,8 +37,8 @@ from app.utils import user_has_permissions, user_is_platform_admin
 
 
 @main.route("/organisations", methods=['GET'])
-@login_required
 @user_is_platform_admin
+@login_required
 def organisations():
     return render_template(
         'views/organisations/index.html',
@@ -48,8 +48,8 @@ def organisations():
 
 
 @main.route("/organisations/add", methods=['GET', 'POST'])
-@login_required
 @user_is_platform_admin
+@login_required
 def add_organisation():
     form = CreateOrUpdateOrganisation()
 
@@ -67,8 +67,8 @@ def add_organisation():
 
 
 @main.route("/organisations/<org_id>", methods=['GET'])
-@login_required
 @user_has_permissions()
+@login_required
 def organisation_dashboard(org_id):
     return render_template(
         'views/organisations/organisation/index.html',
@@ -76,8 +76,8 @@ def organisation_dashboard(org_id):
 
 
 @main.route("/organisations/<org_id>/trial-services", methods=['GET'])
-@login_required
 @user_is_platform_admin
+@login_required
 def organisation_trial_mode_services(org_id):
     return render_template(
         'views/organisations/organisation/trial-mode-services.html',
@@ -86,8 +86,8 @@ def organisation_trial_mode_services(org_id):
 
 
 @main.route("/organisations/<org_id>/users", methods=['GET'])
-@login_required
 @user_has_permissions()
+@login_required
 def manage_org_users(org_id):
     return render_template(
         'views/organisations/organisation/users/index.html',
@@ -98,8 +98,8 @@ def manage_org_users(org_id):
 
 
 @main.route("/organisations/<org_id>/users/invite", methods=['GET', 'POST'])
-@login_required
 @user_has_permissions()
+@login_required
 def invite_org_user(org_id):
     form = InviteOrgUserForm(
         invalid_email_address=current_user.email_address
@@ -122,8 +122,8 @@ def invite_org_user(org_id):
 
 
 @main.route("/organisations/<org_id>/users/<user_id>", methods=['GET', 'POST'])
-@login_required
 @user_has_permissions()
+@login_required
 def edit_user_org_permissions(org_id, user_id):
     return render_template(
         'views/organisations/organisation/users/user/index.html',
@@ -132,8 +132,8 @@ def edit_user_org_permissions(org_id, user_id):
 
 
 @main.route("/organisations/<org_id>/users/<user_id>/delete", methods=['GET', 'POST'])
-@login_required
 @user_has_permissions()
+@login_required
 def remove_user_from_organisation(org_id, user_id):
     user = User.from_id(user_id)
     if request.method == 'POST':
@@ -162,8 +162,8 @@ def remove_user_from_organisation(org_id, user_id):
 
 
 @main.route("/organisations/<org_id>/cancel-invited-user/<invited_user_id>", methods=['GET'])
-@login_required
 @user_has_permissions()
+@login_required
 def cancel_invited_org_user(org_id, invited_user_id):
     org_invite_api_client.cancel_invited_user(org_id=org_id, invited_user_id=invited_user_id)
 
@@ -171,8 +171,8 @@ def cancel_invited_org_user(org_id, invited_user_id):
 
 
 @main.route("/organisations/<org_id>/settings/", methods=['GET'])
-@login_required
 @user_is_platform_admin
+@login_required
 def organisation_settings(org_id):
 
     email_branding = 'GOV.UK'
@@ -197,8 +197,8 @@ def organisation_settings(org_id):
 
 
 @main.route("/organisations/<org_id>/settings/edit-name", methods=['GET', 'POST'])
-@login_required
 @user_is_platform_admin
+@login_required
 def edit_organisation_name(org_id):
     form = RenameOrganisationForm()
 
@@ -220,8 +220,8 @@ def edit_organisation_name(org_id):
 
 
 @main.route("/organisations/<org_id>/settings/edit-type", methods=['GET', 'POST'])
-@login_required
 @user_is_platform_admin
+@login_required
 def edit_organisation_type(org_id):
 
     form = OrganisationOrganisationTypeForm(
@@ -242,8 +242,8 @@ def edit_organisation_type(org_id):
 
 
 @main.route("/organisations/<org_id>/settings/edit-crown-status", methods=['GET', 'POST'])
-@login_required
 @user_is_platform_admin
+@login_required
 def edit_organisation_crown_status(org_id):
 
     form = OrganisationCrownStatusForm(
@@ -272,8 +272,8 @@ def edit_organisation_crown_status(org_id):
 
 
 @main.route("/organisations/<org_id>/settings/edit-agreement", methods=['GET', 'POST'])
-@login_required
 @user_is_platform_admin
+@login_required
 def edit_organisation_agreement(org_id):
 
     form = OrganisationAgreementSignedForm(
@@ -302,8 +302,8 @@ def edit_organisation_agreement(org_id):
 
 
 @main.route("/organisations/<org_id>/settings/set-email-branding", methods=['GET', 'POST'])
-@login_required
 @user_is_platform_admin
+@login_required
 def edit_organisation_email_branding(org_id):
 
     email_branding = email_branding_client.get_all_email_branding()
@@ -328,8 +328,8 @@ def edit_organisation_email_branding(org_id):
 
 
 @main.route("/organisations/<org_id>/settings/preview-email-branding", methods=['GET', 'POST'])
-@login_required
 @user_is_platform_admin
+@login_required
 def organisation_preview_email_branding(org_id):
 
     branding_style = request.args.get('branding_style', None)
@@ -351,8 +351,8 @@ def organisation_preview_email_branding(org_id):
 
 
 @main.route("/organisations/<org_id>/settings/set-letter-branding", methods=['GET', 'POST'])
-@login_required
 @user_is_platform_admin
+@login_required
 def edit_organisation_letter_branding(org_id):
     letter_branding = letter_branding_client.get_all_letter_branding()
 
@@ -376,8 +376,8 @@ def edit_organisation_letter_branding(org_id):
 
 
 @main.route("/organisations/<org_id>/settings/preview-letter-branding", methods=['GET', 'POST'])
-@login_required
 @user_is_platform_admin
+@login_required
 def organisation_preview_letter_branding(org_id):
     branding_style = request.args.get('branding_style')
 
@@ -398,8 +398,8 @@ def organisation_preview_letter_branding(org_id):
 
 
 @main.route("/organisations/<org_id>/settings/edit-organisation-domains", methods=['GET', 'POST'])
-@login_required
 @user_is_platform_admin
+@login_required
 def edit_organisation_domains(org_id):
 
     form = OrganisationDomainsForm()
@@ -423,8 +423,8 @@ def edit_organisation_domains(org_id):
 
 
 @main.route("/organisations/<org_id>/settings/edit-name/confirm", methods=['GET', 'POST'])
-@login_required
 @user_has_permissions()
+@login_required
 def confirm_edit_organisation_name(org_id):
     # Validate password for form
     def _check_password(pwd):
@@ -456,8 +456,8 @@ def confirm_edit_organisation_name(org_id):
 
 
 @main.route("/organisations/<org_id>/settings/edit-go-live-notes", methods=['GET', 'POST'])
-@login_required
 @user_is_platform_admin
+@login_required
 def edit_organisation_go_live_notes(org_id):
 
     form = GoLiveNotesForm()

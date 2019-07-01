@@ -3,6 +3,7 @@ import inspect
 
 import pytest
 from flask import request
+from orderedset import OrderedSet
 from werkzeug.exceptions import Forbidden, Unauthorized
 
 from app.main.views.index import index
@@ -375,16 +376,11 @@ def test_service_navigation_for_org_user(
 
 
 def get_name_of_decorator_from_ast_node(node):
-    if isinstance(node, ast.Attribute):
-        return '{}.{}'.format(
-            get_name_of_decorator_from_ast_node(node.value),
-            node.attr,
-        )
     if isinstance(node, ast.Name):
         return str(node.id)
     if isinstance(node, ast.Call) and isinstance(node.func, ast.Name):
         return get_name_of_decorator_from_ast_node(node.func)
-    return node.func.attr
+    return '{}.{}'.format(node.func.value.id, node.func.attr)
 
 
 def get_decorators_for_function(function):
@@ -407,20 +403,27 @@ def get_routes_and_decorators_with_argument(argument_name):
                 argument_name in inspect.signature(function).parameters.keys()
             ):
                 decorators = list(get_decorators_for_function(function))
-                if 'route' in decorators:
+                if 'main.route' in decorators:
                     yield '{}.{}'.format(module_name, function_name), decorators
+
+
+def format_decorators(decorators, indent=8):
+    return '\n'.join(
+        '{}@{}'.format(' ' * indent, decorator)
+        for decorator in decorators
+    )
 
 
 def test_code_to_extract_decorators_works_with_known_examples():
     assert (
         'templates.choose_template',
-        ['route', 'route', 'route', 'route', 'login_required', 'user_has_permissions'],
+        ['main.route', 'main.route', 'main.route', 'main.route', 'user_has_permissions', 'login_required'],
     ) in list(
         get_routes_and_decorators_with_argument(SERVICE_ID_ARGUMENT)
     )
     assert (
         'organisations.organisation_dashboard',
-        ['route', 'login_required', 'user_has_permissions'],
+        ['main.route', 'user_has_permissions', 'login_required'],
     ) in list(
         get_routes_and_decorators_with_argument(ORGANISATION_ID_ARGUMENT)
     )
@@ -432,12 +435,29 @@ def test_service_routes_have_decorator():
         list(get_routes_and_decorators_with_argument(SERVICE_ID_ARGUMENT)) +
         list(get_routes_and_decorators_with_argument(ORGANISATION_ID_ARGUMENT))
     ):
+        file, function = endpoint.split('.')
         if 'user_is_platform_admin' in decorators:
-            required_decorators = {'login_required'}
+            required_decorators = ('main.route', 'user_is_platform_admin', 'login_required')
         else:
-            required_decorators = {'login_required', 'user_has_permissions'}
+            required_decorators = ('main.route', 'user_has_permissions', 'login_required')
 
         for required_decorator in required_decorators:
             assert required_decorator in decorators, (
                 'Missing {} decorator on app/main/views/{}.py::{}'
-            ).format(required_decorator, *endpoint.split('.'))
+            ).format(required_decorator, file, function)
+
+        present_required_decorators = tuple(OrderedSet(
+            decorator for decorator in decorators
+            if decorator in required_decorators
+        ))
+        assert present_required_decorators == required_decorators, (
+            'Wrong order of permissions decorators on app/main/views/{}.py::{}\n'
+            '   Expected:\n'
+            '{}\n'
+            '   Actual:\n'
+            '{}\n'
+        ).format(
+            file, function,
+            format_decorators(required_decorators),
+            format_decorators(present_required_decorators),
+        )

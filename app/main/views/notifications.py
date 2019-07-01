@@ -50,8 +50,8 @@ from app.utils import (
 
 
 @main.route("/services/<service_id>/notification/<uuid:notification_id>")
-@login_required
 @user_has_permissions('view_activity', 'send_messages')
+@login_required
 def view_notification(service_id, notification_id):
     notification = notification_api_client.get_notification(service_id, str(notification_id))
     notification['template'].update({'reply_to_text': notification['reply_to_text']})
@@ -157,8 +157,8 @@ def view_notification(service_id, notification_id):
 
 
 @main.route("/services/<service_id>/notification/<uuid:notification_id>/cancel", methods=['GET', 'POST'])
-@login_required
 @user_has_permissions('view_activity', 'send_messages')
+@login_required
 def cancel_letter(service_id, notification_id):
 
     if request.method == 'POST':
@@ -188,8 +188,8 @@ def get_preview_error_image():
 
 
 @main.route("/services/<service_id>/notification/<uuid:notification_id>.<filetype>")
-@login_required
 @user_has_permissions('view_activity')
+@login_required
 def view_letter_notification_as_preview(service_id, notification_id, filetype):
 
     if filetype not in ('pdf', 'png'):
@@ -254,8 +254,8 @@ def get_all_personalisation_from_notification(notification):
 
 
 @main.route("/services/<service_id>/download-notifications.csv")
-@login_required
 @user_has_permissions('view_activity')
+@login_required
 def download_notifications_csv(service_id):
     filter_args = parse_filter_args(request.args)
     filter_args['status'] = set_status_filters(filter_args)

@@ -22,8 +22,8 @@ def agreement():
 
 
 @main.route('/services/<uuid:service_id>/agreement')
-@login_required
 @user_has_permissions('manage_service')
+@login_required
 def service_agreement(service_id):
     return render_template(
         'views/agreement/service-{}.html'.format(current_service.organisation.as_jinja_template),
@@ -32,8 +32,8 @@ def service_agreement(service_id):
 
 
 @main.route('/services/<uuid:service_id>/agreement.pdf')
-@login_required
 @user_has_permissions('manage_service')
+@login_required
 def service_download_agreement(service_id):
     return send_file(**get_mou(
         current_service.organisation.crown_status_or_404
@@ -41,8 +41,8 @@ def service_download_agreement(service_id):
 
 
 @main.route('/services/<uuid:service_id>/agreement/accept', methods=['GET', 'POST'])
-@login_required
 @user_has_permissions('manage_service')
+@login_required
 def service_accept_agreement(service_id):
 
     if not current_service.organisation:
@@ -65,8 +65,8 @@ def service_accept_agreement(service_id):
 
 
 @main.route('/services/<uuid:service_id>/agreement/confirm', methods=['GET', 'POST'])
-@login_required
 @user_has_permissions('manage_service')
+@login_required
 def service_confirm_agreement(service_id):
 
     if (

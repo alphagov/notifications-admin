@@ -339,8 +339,8 @@ def platform_admin_letter_validation_preview():
 
 
 @main.route("/services/<service_id>/letter-validation-preview", methods=["GET", "POST"])
-@login_required
 @user_has_permissions()
+@login_required
 def service_letter_validation_preview(service_id):
     return letter_validation_preview(from_platform_admin=False)
 

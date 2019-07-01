@@ -100,8 +100,8 @@ def get_example_letter_address(key):
 
 
 @main.route("/services/<service_id>/send/<template_id>/csv", methods=['GET', 'POST'])
-@login_required
 @user_has_permissions('send_messages', restrict_admin_usage=True)
+@login_required
 def send_messages(service_id, template_id):
     # if there's lots of data in the session, lets log it for debugging purposes
     # TODO: Remove this once we're confident we have session size under control
@@ -185,8 +185,8 @@ def send_messages(service_id, template_id):
 
 
 @main.route("/services/<service_id>/send/<template_id>.csv", methods=['GET'])
-@login_required
 @user_has_permissions('send_messages', 'manage_templates')
+@login_required
 def get_example_csv(service_id, template_id):
     template = get_template(
         service_api_client.get_service_template(service_id, template_id)['data'], current_service
@@ -201,8 +201,8 @@ def get_example_csv(service_id, template_id):
 
 
 @main.route("/services/<service_id>/send/<template_id>/set-sender", methods=['GET', 'POST'])
-@login_required
 @user_has_permissions('send_messages', restrict_admin_usage=True)
+@login_required
 def set_sender(service_id, template_id):
     session['sender_id'] = None
     redirect_to_one_off = redirect(
@@ -290,8 +290,8 @@ def get_sender_details(service_id, template_type):
 
 @main.route("/services/<service_id>/send/<template_id>/test", endpoint='send_test')
 @main.route("/services/<service_id>/send/<template_id>/one-off", endpoint='send_one_off')
-@login_required
 @user_has_permissions('send_messages', restrict_admin_usage=True)
+@login_required
 def send_test(service_id, template_id):
     session['recipient'] = None
     session['placeholders'] = {}
@@ -341,8 +341,8 @@ def get_notification_check_endpoint(service_id, template):
     methods=['GET', 'POST'],
     endpoint='send_one_off_step',
 )
-@login_required
 @user_has_permissions('send_messages', restrict_admin_usage=True)
+@login_required
 def send_test_step(service_id, template_id, step_index):
     if {'recipient', 'placeholders'} - set(session.keys()):
         return redirect(url_for(
@@ -472,8 +472,8 @@ def send_test_step(service_id, template_id, step_index):
 
 
 @main.route("/services/<service_id>/send/<template_id>/test.<filetype>", methods=['GET'])
-@login_required
 @user_has_permissions('send_messages')
+@login_required
 def send_test_preview(service_id, template_id, filetype):
 
     if filetype not in ('pdf', 'png'):
@@ -604,8 +604,8 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
 
 @main.route("/services/<service_id>/<uuid:template_id>/check/<upload_id>", methods=['GET'])
 @main.route("/services/<service_id>/<uuid:template_id>/check/<upload_id>/row-<int:row_index>", methods=['GET'])
-@login_required
 @user_has_permissions('send_messages', restrict_admin_usage=True)
+@login_required
 def check_messages(service_id, template_id, upload_id, row_index=2):
 
     data = _check_messages(service_id, template_id, upload_id, row_index)
@@ -657,8 +657,8 @@ def check_messages(service_id, template_id, upload_id, row_index=2):
     "/services/<service_id>/<uuid:template_id>/check/<upload_id>/row-<int:row_index>.<filetype>",
     methods=['GET'],
 )
-@login_required
 @user_has_permissions('send_messages')
+@login_required
 def check_messages_preview(service_id, template_id, upload_id, filetype, row_index=2):
     if filetype == 'pdf':
         page = None
@@ -677,8 +677,8 @@ def check_messages_preview(service_id, template_id, upload_id, filetype, row_ind
     "/services/<service_id>/<uuid:template_id>/check.<filetype>",
     methods=['GET'],
 )
-@login_required
 @user_has_permissions('send_messages')
+@login_required
 def check_notification_preview(service_id, template_id, filetype):
     if filetype == 'pdf':
         page = None
@@ -694,8 +694,8 @@ def check_notification_preview(service_id, template_id, filetype):
 
 
 @main.route("/services/<service_id>/start-job/<upload_id>", methods=['POST'])
-@login_required
 @user_has_permissions('send_messages', restrict_admin_usage=True)
+@login_required
 def start_job(service_id, upload_id):
 
     job_api_client.create_job(
@@ -718,8 +718,8 @@ def start_job(service_id, upload_id):
 
 
 @main.route("/services/<service_id>/end-tour/<example_template_id>")
-@login_required
 @user_has_permissions('manage_templates')
+@login_required
 def go_to_dashboard_after_tour(service_id, example_template_id):
 
     service_api_client.delete_service_template(service_id, example_template_id)
@@ -848,8 +848,8 @@ def get_back_link(service_id, template, step_index):
 
 
 @main.route("/services/<service_id>/template/<template_id>/notification/check", methods=['GET'])
-@login_required
 @user_has_permissions('send_messages', restrict_admin_usage=True)
+@login_required
 def check_notification(service_id, template_id):
     return render_template(
         'views/notifications/check.html',
@@ -923,8 +923,8 @@ def get_template_error_dict(exception):
 
 
 @main.route("/services/<service_id>/template/<template_id>/notification/check", methods=['POST'])
-@login_required
 @user_has_permissions('send_messages', restrict_admin_usage=True)
+@login_required
 def send_notification(service_id, template_id):
     if {'recipient', 'placeholders'} - set(session.keys()):
         return redirect(url_for(

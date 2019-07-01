@@ -46,8 +46,8 @@ form_objects = {
 
 
 @main.route("/services/<service_id>/templates/<uuid:template_id>")
-@login_required
 @user_has_permissions()
+@login_required
 def view_template(service_id, template_id):
     template = current_service.get_template(template_id)
     template_folder = current_service.get_template_folder(template['folder'])
@@ -87,8 +87,8 @@ def view_template(service_id, template_id):
 
 
 @main.route("/services/<service_id>/start-tour/<uuid:template_id>")
-@login_required
 @user_has_permissions('view_activity')
+@login_required
 def start_tour(service_id, template_id):
 
     template = current_service.get_template(template_id)
@@ -111,8 +111,8 @@ def start_tour(service_id, template_id):
 @main.route("/services/<service_id>/templates/folders/<template_folder_id>", methods=['GET', 'POST'])
 @main.route("/services/<service_id>/templates/<template_type>", methods=['GET', 'POST'])
 @main.route("/services/<service_id>/templates/<template_type>/folders/<template_folder_id>", methods=['GET', 'POST'])
-@login_required
 @user_has_permissions()
+@login_required
 def choose_template(service_id, template_type='all', template_folder_id=None):
     template_folder = current_service.get_template_folder(template_folder_id)
 
@@ -220,8 +220,8 @@ def get_template_nav_items(template_folder_id):
 
 
 @main.route("/services/<service_id>/templates/<template_id>.<filetype>")
-@login_required
 @user_has_permissions()
+@login_required
 def view_letter_template_preview(service_id, template_id, filetype):
     if filetype not in ('pdf', 'png'):
         abort(404)
@@ -275,8 +275,8 @@ def _view_template_version(service_id, template_id, version, letters_as_pdf=Fals
 
 
 @main.route("/services/<service_id>/templates/<template_id>/version/<int:version>")
-@login_required
 @user_has_permissions()
+@login_required
 def view_template_version(service_id, template_id, version):
     return render_template(
         'views/templates/template_history.html',
@@ -285,8 +285,8 @@ def view_template_version(service_id, template_id, version):
 
 
 @main.route("/services/<service_id>/templates/<template_id>/version/<int:version>.<filetype>")
-@login_required
 @user_has_permissions()
+@login_required
 def view_template_version_preview(service_id, template_id, version, filetype):
     db_template = current_service.get_template(template_id, version=version)
     return TemplatePreview.from_database_object(db_template, filetype)
@@ -337,8 +337,8 @@ def _add_template_by_type(template_type, template_folder_id):
 @main.route("/services/<service_id>/templates/copy/from-folder/<uuid:from_folder>")
 @main.route("/services/<service_id>/templates/copy/from-service/<uuid:from_service>")
 @main.route("/services/<service_id>/templates/copy/from-service/<uuid:from_service>/from-folder/<uuid:from_folder>")
-@login_required
 @user_has_permissions('manage_templates')
+@login_required
 def choose_template_to_copy(
     service_id,
     from_service=None,
@@ -373,8 +373,8 @@ def choose_template_to_copy(
 
 
 @main.route("/services/<service_id>/templates/copy/<uuid:template_id>", methods=['GET', 'POST'])
-@login_required
 @user_has_permissions('manage_templates')
+@login_required
 def copy_template(service_id, template_id):
     from_service = request.args.get('from_service')
 
@@ -417,8 +417,8 @@ def _get_template_copy_name(template, existing_templates):
 
 
 @main.route("/services/<service_id>/templates/action-blocked/<notification_type>/<return_to>/<template_id>")
-@login_required
 @user_has_permissions('manage_templates')
+@login_required
 def action_blocked(service_id, notification_type, return_to, template_id):
     if notification_type == 'sms':
         notification_type = 'text messages'
@@ -435,8 +435,8 @@ def action_blocked(service_id, notification_type, return_to, template_id):
 
 
 @main.route("/services/<service_id>/templates/folders/<template_folder_id>/manage", methods=['GET', 'POST'])
-@login_required
 @user_has_permissions('manage_templates')
+@login_required
 def manage_template_folder(service_id, template_folder_id):
     template_folder = current_service.get_template_folder_with_user_permission_or_403(template_folder_id, current_user)
     form = TemplateFolderForm(
@@ -470,8 +470,8 @@ def manage_template_folder(service_id, template_folder_id):
 
 
 @main.route("/services/<service_id>/templates/folders/<template_folder_id>/delete", methods=['GET', 'POST'])
-@login_required
 @user_has_permissions('manage_templates')
+@login_required
 def delete_template_folder(service_id, template_folder_id):
     template_folder = current_service.get_template_folder_with_user_permission_or_403(template_folder_id, current_user)
 
@@ -515,8 +515,8 @@ def delete_template_folder(service_id, template_folder_id):
 @main.route("/services/<service_id>/templates/add-<template_type>", methods=['GET', 'POST'])
 @main.route("/services/<service_id>/templates/folders/<template_folder_id>/add-<template_type>",
             methods=['GET', 'POST'])
-@login_required
 @user_has_permissions('manage_templates')
+@login_required
 def add_service_template(service_id, template_type, template_folder_id=None):
 
     if template_type not in ['sms', 'email', 'letter']:
@@ -577,8 +577,8 @@ def abort_403_if_not_admin_user():
 
 
 @main.route("/services/<service_id>/templates/<template_id>/edit", methods=['GET', 'POST'])
-@login_required
 @user_has_permissions('manage_templates')
+@login_required
 def edit_service_template(service_id, template_id):
     template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
     template['template_content'] = template['content']
@@ -660,8 +660,8 @@ def edit_service_template(service_id, template_id):
 
 
 @main.route("/services/<service_id>/templates/<template_id>/delete", methods=['GET', 'POST'])
-@login_required
 @user_has_permissions('manage_templates')
+@login_required
 def delete_service_template(service_id, template_id):
     template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
 
@@ -710,8 +710,8 @@ def delete_service_template(service_id, template_id):
 
 
 @main.route("/services/<service_id>/templates/<template_id>/redact", methods=['GET'])
-@login_required
 @user_has_permissions('manage_templates')
+@login_required
 def confirm_redact_template(service_id, template_id):
     template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
 
@@ -735,8 +735,8 @@ def confirm_redact_template(service_id, template_id):
 
 
 @main.route("/services/<service_id>/templates/<template_id>/redact", methods=['POST'])
-@login_required
 @user_has_permissions('manage_templates')
+@login_required
 def redact_template(service_id, template_id):
 
     service_api_client.redact_service_template(service_id, template_id)
@@ -754,8 +754,8 @@ def redact_template(service_id, template_id):
 
 
 @main.route('/services/<service_id>/templates/<template_id>/versions')
-@login_required
 @user_has_permissions('view_activity')
+@login_required
 def view_template_versions(service_id, template_id):
     return render_template(
         'views/templates/choose_history.html',
@@ -778,8 +778,8 @@ def view_template_versions(service_id, template_id):
 
 
 @main.route('/services/<service_id>/templates/<template_id>/set-template-sender', methods=['GET', 'POST'])
-@login_required
 @user_has_permissions('manage_templates')
+@login_required
 def set_template_sender(service_id, template_id):
     template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
     sender_details = get_template_sender_form_dict(service_id, template)
@@ -809,8 +809,8 @@ def set_template_sender(service_id, template_id):
 
 
 @main.route('/services/<service_id>/templates/<template_id>/edit-postage', methods=['GET', 'POST'])
-@login_required
 @user_has_permissions('manage_templates')
+@login_required
 def edit_template_postage(service_id, template_id):
     template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
     if template["template_type"] != "letter":
