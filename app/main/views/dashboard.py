@@ -12,7 +12,7 @@ from flask import (
     session,
     url_for,
 )
-from flask_login import current_user, login_required
+from flask_login import current_user
 from werkzeug.utils import redirect
 
 from app import (
@@ -43,7 +43,6 @@ from app.utils import (
 # to view history
 @main.route("/services/<service_id>/history")
 @user_has_permissions()
-@login_required
 def temp_service_history(service_id):
     data = service_api_client.get_service_history(service_id)['data']
     return render_template('views/temp-history.html',
@@ -54,14 +53,12 @@ def temp_service_history(service_id):
 
 @main.route("/services/<service_id>/dashboard")
 @user_has_permissions('view_activity', 'send_messages')
-@login_required
 def old_service_dashboard(service_id):
     return redirect(url_for('.service_dashboard', service_id=service_id))
 
 
 @main.route("/services/<service_id>")
 @user_has_permissions()
-@login_required
 def service_dashboard(service_id):
 
     if session.get('invited_user'):
@@ -80,14 +77,12 @@ def service_dashboard(service_id):
 
 @main.route("/services/<service_id>/dashboard.json")
 @user_has_permissions('view_activity')
-@login_required
 def service_dashboard_updates(service_id):
     return jsonify(**get_dashboard_partials(service_id))
 
 
 @main.route("/services/<service_id>/template-activity")
 @user_has_permissions('view_activity')
-@login_required
 def template_history(service_id):
 
     return redirect(url_for('main.template_usage', service_id=service_id), code=301)
@@ -95,7 +90,6 @@ def template_history(service_id):
 
 @main.route("/services/<service_id>/template-usage")
 @user_has_permissions('view_activity')
-@login_required
 def template_usage(service_id):
 
     year, current_financial_year = requested_and_current_financial_year(request)
@@ -145,7 +139,6 @@ def template_usage(service_id):
 
 @main.route("/services/<service_id>/usage")
 @user_has_permissions('manage_service', allow_org_user=True)
-@login_required
 def usage(service_id):
     year, current_financial_year = requested_and_current_financial_year(request)
 
@@ -176,7 +169,6 @@ def usage(service_id):
 
 @main.route("/services/<service_id>/monthly")
 @user_has_permissions('view_activity')
-@login_required
 def monthly(service_id):
     year, current_financial_year = requested_and_current_financial_year(request)
     return render_template(
@@ -195,7 +187,6 @@ def monthly(service_id):
 
 @main.route("/services/<service_id>/inbox")
 @user_has_permissions('view_activity')
-@login_required
 def inbox(service_id):
 
     return render_template(
@@ -207,7 +198,6 @@ def inbox(service_id):
 
 @main.route("/services/<service_id>/inbox.json")
 @user_has_permissions('view_activity')
-@login_required
 def inbox_updates(service_id):
 
     return jsonify(get_inbox_partials(service_id))
@@ -215,7 +205,6 @@ def inbox_updates(service_id):
 
 @main.route("/services/<service_id>/inbox.csv")
 @user_has_permissions('view_activity')
-@login_required
 def inbox_download(service_id):
     return Response(
         Spreadsheet.from_rows(

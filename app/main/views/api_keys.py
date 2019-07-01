@@ -7,7 +7,7 @@ from flask import (
     request,
     url_for,
 )
-from flask_login import current_user, login_required
+from flask_login import current_user
 
 from app import (
     api_key_api_client,
@@ -34,7 +34,6 @@ dummy_bearer_token = 'bearer_token_set'
 
 @main.route("/services/<service_id>/api")
 @user_has_permissions('manage_api_keys')
-@login_required
 def api_integration(service_id):
     callbacks_link = (
         '.api_callbacks' if current_service.has_permission('inbound_sms')
@@ -49,14 +48,12 @@ def api_integration(service_id):
 
 @main.route("/services/<service_id>/api/documentation")
 @user_has_permissions('manage_api_keys')
-@login_required
 def api_documentation(service_id):
     return redirect(url_for('.documentation'), code=301)
 
 
 @main.route("/services/<service_id>/api/whitelist", methods=['GET', 'POST'])
 @user_has_permissions('manage_api_keys')
-@login_required
 def whitelist(service_id):
     form = Whitelist()
     if form.validate_on_submit():
@@ -76,7 +73,6 @@ def whitelist(service_id):
 
 @main.route("/services/<service_id>/api/keys")
 @user_has_permissions('manage_api_keys')
-@login_required
 def api_keys(service_id):
     return render_template(
         'views/api/keys.html',
@@ -85,7 +81,6 @@ def api_keys(service_id):
 
 @main.route("/services/<service_id>/api/keys/create", methods=['GET', 'POST'])
 @user_has_permissions('manage_api_keys', restrict_admin_usage=True)
-@login_required
 def create_api_key(service_id):
     form = CreateKeyForm(current_service.api_keys)
     form.key_type.choices = [
@@ -126,7 +121,6 @@ def create_api_key(service_id):
 
 @main.route("/services/<service_id>/api/keys/revoke/<key_id>", methods=['GET', 'POST'])
 @user_has_permissions('manage_api_keys')
-@login_required
 def revoke_api_key(service_id, key_id):
     key_name = current_service.get_api_key(key_id)['name']
     if request.method == 'GET':
@@ -169,7 +163,6 @@ def check_token_against_dummy_bearer(token):
 
 @main.route("/services/<service_id>/api/callbacks", methods=['GET'])
 @user_has_permissions('manage_api_keys')
-@login_required
 def api_callbacks(service_id):
     if not current_service.has_permission('inbound_sms'):
         return redirect(url_for('.delivery_status_callback', service_id=service_id))
@@ -194,7 +187,6 @@ def get_delivery_status_callback_details():
 
 @main.route("/services/<service_id>/api/callbacks/delivery-status-callback", methods=['GET', 'POST'])
 @user_has_permissions('manage_api_keys')
-@login_required
 def delivery_status_callback(service_id):
     delivery_status_callback = get_delivery_status_callback_details()
     back_link = (
@@ -257,7 +249,6 @@ def get_received_text_messages_callback():
 
 @main.route("/services/<service_id>/api/callbacks/received-text-messages-callback", methods=['GET', 'POST'])
 @user_has_permissions('manage_api_keys')
-@login_required
 def received_text_messages_callback(service_id):
     if not current_service.has_permission('inbound_sms'):
         return redirect(url_for('.api_integration', service_id=service_id))

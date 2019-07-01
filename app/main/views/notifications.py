@@ -16,7 +16,6 @@ from flask import (
     stream_with_context,
     url_for,
 )
-from flask_login import login_required
 from notifications_python_client.errors import APIError
 from notifications_utils.letter_timings import (
     get_letter_timings,
@@ -51,7 +50,6 @@ from app.utils import (
 
 @main.route("/services/<service_id>/notification/<uuid:notification_id>")
 @user_has_permissions('view_activity', 'send_messages')
-@login_required
 def view_notification(service_id, notification_id):
     notification = notification_api_client.get_notification(service_id, str(notification_id))
     notification['template'].update({'reply_to_text': notification['reply_to_text']})
@@ -158,7 +156,6 @@ def view_notification(service_id, notification_id):
 
 @main.route("/services/<service_id>/notification/<uuid:notification_id>/cancel", methods=['GET', 'POST'])
 @user_has_permissions('view_activity', 'send_messages')
-@login_required
 def cancel_letter(service_id, notification_id):
 
     if request.method == 'POST':
@@ -189,7 +186,6 @@ def get_preview_error_image():
 
 @main.route("/services/<service_id>/notification/<uuid:notification_id>.<filetype>")
 @user_has_permissions('view_activity')
-@login_required
 def view_letter_notification_as_preview(service_id, notification_id, filetype):
 
     if filetype not in ('pdf', 'png'):
@@ -220,7 +216,6 @@ def view_letter_notification_as_preview(service_id, notification_id, filetype):
 
 @main.route("/services/<service_id>/notification/<notification_id>.json")
 @user_has_permissions('view_activity', 'send_messages')
-@login_required
 def view_notification_updates(service_id, notification_id):
     return jsonify(**get_single_notification_partials(
         notification_api_client.get_notification(service_id, notification_id)
@@ -255,7 +250,6 @@ def get_all_personalisation_from_notification(notification):
 
 @main.route("/services/<service_id>/download-notifications.csv")
 @user_has_permissions('view_activity')
-@login_required
 def download_notifications_csv(service_id):
     filter_args = parse_filter_args(request.args)
     filter_args['status'] = set_status_filters(filter_args)

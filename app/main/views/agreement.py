@@ -1,18 +1,18 @@
 from datetime import datetime
 
 from flask import abort, redirect, render_template, request, send_file, url_for
-from flask_login import current_user, login_required
+from flask_login import current_user
 
 from app import current_service
 from app.main import main
 from app.main.forms import AcceptAgreementForm
 from app.main.views.sub_navigation_dictionaries import features_nav
 from app.s3_client.s3_mou_client import get_mou
-from app.utils import user_has_permissions
+from app.utils import user_has_permissions, user_is_logged_in
 
 
 @main.route('/agreement')
-@login_required
+@user_is_logged_in
 def agreement():
     return render_template(
         'views/agreement/{}.html'.format(current_user.default_organisation.as_jinja_template),
@@ -23,7 +23,6 @@ def agreement():
 
 @main.route('/services/<uuid:service_id>/agreement')
 @user_has_permissions('manage_service')
-@login_required
 def service_agreement(service_id):
     return render_template(
         'views/agreement/service-{}.html'.format(current_service.organisation.as_jinja_template),
@@ -33,7 +32,6 @@ def service_agreement(service_id):
 
 @main.route('/services/<uuid:service_id>/agreement.pdf')
 @user_has_permissions('manage_service')
-@login_required
 def service_download_agreement(service_id):
     return send_file(**get_mou(
         current_service.organisation.crown_status_or_404
@@ -42,7 +40,6 @@ def service_download_agreement(service_id):
 
 @main.route('/services/<uuid:service_id>/agreement/accept', methods=['GET', 'POST'])
 @user_has_permissions('manage_service')
-@login_required
 def service_accept_agreement(service_id):
 
     if not current_service.organisation:
@@ -66,7 +63,6 @@ def service_accept_agreement(service_id):
 
 @main.route('/services/<uuid:service_id>/agreement/confirm', methods=['GET', 'POST'])
 @user_has_permissions('manage_service')
-@login_required
 def service_confirm_agreement(service_id):
 
     if (
@@ -87,7 +83,7 @@ def service_confirm_agreement(service_id):
 
 
 @main.route('/agreement.pdf')
-@login_required
+@user_is_logged_in
 def download_agreement():
     return send_file(**get_mou(
         current_user.default_organisation.crown_status_or_404

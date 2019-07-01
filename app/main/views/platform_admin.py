@@ -4,7 +4,6 @@ from collections import OrderedDict
 from datetime import datetime
 
 from flask import abort, flash, redirect, render_template, request, url_for
-from flask_login import login_required
 from notifications_python_client.errors import HTTPError
 from requests import RequestException
 
@@ -43,7 +42,6 @@ ZERO_FAILURE_THRESHOLD = 0
 
 
 @main.route("/platform-admin")
-@login_required
 @user_is_platform_admin
 def platform_admin():
     form = DateFilterForm(request.args, meta={'csrf': False})
@@ -152,7 +150,6 @@ def make_columns(global_stats, complaints_number):
 
 @main.route("/platform-admin/live-services", endpoint='live_services')
 @main.route("/platform-admin/trial-services", endpoint='trial_services')
-@login_required
 @user_is_platform_admin
 def platform_admin_services():
     form = DateFilterForm(request.args)
@@ -191,7 +188,6 @@ def platform_admin_services():
 
 
 @main.route("/platform-admin/reports")
-@login_required
 @user_is_platform_admin
 def platform_admin_reports():
     return render_template(
@@ -200,7 +196,6 @@ def platform_admin_reports():
 
 
 @main.route("/platform-admin/reports/live-services.csv")
-@login_required
 @user_is_platform_admin
 def live_services_csv():
     results = service_api_client.get_live_services_data()["data"]
@@ -242,7 +237,6 @@ def live_services_csv():
 
 
 @main.route("/platform-admin/reports/performance-platform.xlsx")
-@login_required
 @user_is_platform_admin
 def performance_platform_xlsx():
     results = service_api_client.get_live_services_data()["data"]
@@ -270,7 +264,6 @@ def performance_platform_xlsx():
 
 
 @main.route("/platform-admin/complaints")
-@login_required
 @user_is_platform_admin
 def platform_admin_list_complaints():
     page = get_page_from_request()
@@ -297,7 +290,6 @@ def platform_admin_list_complaints():
 
 
 @main.route("/platform-admin/returned-letters", methods=["GET", "POST"])
-@login_required
 @user_is_platform_admin
 def platform_admin_returned_letters():
     form = ReturnedLettersForm()
@@ -332,7 +324,6 @@ def platform_admin_returned_letters():
 
 
 @main.route("/platform-admin/letter-validation-preview", methods=["GET", "POST"])
-@login_required
 @user_is_platform_admin
 def platform_admin_letter_validation_preview():
     return letter_validation_preview(from_platform_admin=True)
@@ -340,7 +331,6 @@ def platform_admin_letter_validation_preview():
 
 @main.route("/services/<service_id>/letter-validation-preview", methods=["GET", "POST"])
 @user_has_permissions()
-@login_required
 def service_letter_validation_preview(service_id):
     return letter_validation_preview(from_platform_admin=False)
 
@@ -392,7 +382,6 @@ def letter_validation_preview(from_platform_admin):
 
 
 @main.route("/platform-admin/clear-cache", methods=['GET', 'POST'])
-@login_required
 @user_is_platform_admin
 def clear_cache():
     # note: `service-{uuid}-templates` cache is cleared for both services and templates.

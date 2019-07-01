@@ -14,7 +14,7 @@ import dateutil
 import pyexcel
 import pyexcel_xlsx
 from flask import abort, current_app, redirect, request, session, url_for
-from flask_login import current_user
+from flask_login import current_user, login_required
 from notifications_utils.field import Field
 from notifications_utils.formatters import make_quotes_smart
 from notifications_utils.recipients import RecipientCSV
@@ -44,20 +44,18 @@ with open('{}/email_domains.txt'.format(
     GOVERNMENT_EMAIL_DOMAIN_NAMES = [line.strip() for line in email_domains]
 
 
+user_is_logged_in = login_required
+
+
 def user_has_permissions(*permissions, **permission_kwargs):
     def wrap(func):
         @wraps(func)
         def wrap_func(*args, **kwargs):
-            if current_user and current_user.is_authenticated:
-                if current_user.has_permissions(
-                    *permissions,
-                    **permission_kwargs
-                ):
-                    return func(*args, **kwargs)
-                else:
-                    abort(403)
-            else:
-                abort(401)
+            if not current_user.is_authenticated:
+                return current_app.login_manager.unauthorized()
+            if not current_user.has_permissions(*permissions, **permission_kwargs):
+                abort(403)
+            return func(*args, **kwargs)
         return wrap_func
     return wrap
 
@@ -65,6 +63,8 @@ def user_has_permissions(*permissions, **permission_kwargs):
 def user_is_gov_user(f):
     @wraps(f)
     def wrapped(*args, **kwargs):
+        if not current_user.is_authenticated:
+            return current_app.login_manager.unauthorized()
         if not current_user.is_gov_user:
             abort(403)
         return f(*args, **kwargs)
@@ -75,7 +75,7 @@ def user_is_platform_admin(f):
     @wraps(f)
     def wrapped(*args, **kwargs):
         if not current_user.is_authenticated:
-            abort(401)
+            return current_app.login_manager.unauthorized()
         if not current_user.platform_admin:
             abort(403)
         return f(*args, **kwargs)

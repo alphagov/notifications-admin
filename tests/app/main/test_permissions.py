@@ -3,7 +3,6 @@ import inspect
 
 import pytest
 from flask import request
-from orderedset import OrderedSet
 from werkzeug.exceptions import Forbidden, Unauthorized
 
 from app.main.views.index import index
@@ -39,8 +38,11 @@ def _test_permissions(
         decorated_index()
     else:
         try:
-            decorated_index()
-            pytest.fail("Failed to throw a forbidden or unauthorised exception")
+            if (
+                decorated_index().location != '/sign-in?next=%2F' or
+                decorated_index().status_code != 302
+            ):
+                pytest.fail("Failed to throw a forbidden or unauthorised exception")
         except (Forbidden, Unauthorized):
             pass
 
@@ -380,6 +382,8 @@ def get_name_of_decorator_from_ast_node(node):
         return str(node.id)
     if isinstance(node, ast.Call) and isinstance(node.func, ast.Name):
         return get_name_of_decorator_from_ast_node(node.func)
+    if isinstance(node, ast.Attribute):
+        return node.value.id
     return '{}.{}'.format(node.func.value.id, node.func.attr)
 
 
@@ -394,16 +398,16 @@ SERVICE_ID_ARGUMENT = 'service_id'
 ORGANISATION_ID_ARGUMENT = 'org_id'
 
 
-def get_routes_and_decorators_with_argument(argument_name):
+def get_routes_and_decorators(argument_name=None):
     import app.main.views as views
     for module_name, module in inspect.getmembers(views):
         for function_name, function in inspect.getmembers(module):
-            if (
-                inspect.isfunction(function) and
-                argument_name in inspect.signature(function).parameters.keys()
-            ):
+            if inspect.isfunction(function):
                 decorators = list(get_decorators_for_function(function))
-                if 'main.route' in decorators:
+                if 'main.route' in decorators and (
+                    not argument_name or
+                    argument_name in inspect.signature(function).parameters.keys()
+                ):
                     yield '{}.{}'.format(module_name, function_name), decorators
 
 
@@ -417,47 +421,63 @@ def format_decorators(decorators, indent=8):
 def test_code_to_extract_decorators_works_with_known_examples():
     assert (
         'templates.choose_template',
-        ['main.route', 'main.route', 'main.route', 'main.route', 'user_has_permissions', 'login_required'],
+        ['main.route', 'main.route', 'main.route', 'main.route', 'user_has_permissions'],
     ) in list(
-        get_routes_and_decorators_with_argument(SERVICE_ID_ARGUMENT)
+        get_routes_and_decorators(SERVICE_ID_ARGUMENT)
     )
     assert (
         'organisations.organisation_dashboard',
-        ['main.route', 'user_has_permissions', 'login_required'],
+        ['main.route', 'user_has_permissions'],
     ) in list(
-        get_routes_and_decorators_with_argument(ORGANISATION_ID_ARGUMENT)
+        get_routes_and_decorators(ORGANISATION_ID_ARGUMENT)
+    )
+    assert (
+        'platform_admin.platform_admin',
+        ['main.route', 'user_is_platform_admin'],
+    ) in list(
+        get_routes_and_decorators()
     )
 
 
-def test_service_routes_have_decorator():
+def test_routes_have_permissions_decorators():
 
     for endpoint, decorators in (
-        list(get_routes_and_decorators_with_argument(SERVICE_ID_ARGUMENT)) +
-        list(get_routes_and_decorators_with_argument(ORGANISATION_ID_ARGUMENT))
+        list(get_routes_and_decorators(SERVICE_ID_ARGUMENT)) +
+        list(get_routes_and_decorators(ORGANISATION_ID_ARGUMENT))
     ):
         file, function = endpoint.split('.')
+
+        assert 'user_is_logged_in' not in decorators, (
+            '@user_is_logged_in used on service or organisation specific endpoint\n'
+            'Use @user_has_permissions() or @user_is_platform_admin only\n'
+            'app/main/views/{}.py::{}\n'
+        ).format(file, function)
+
         if 'user_is_platform_admin' in decorators:
-            required_decorators = ('main.route', 'user_is_platform_admin', 'login_required')
-        else:
-            required_decorators = ('main.route', 'user_has_permissions', 'login_required')
+            continue
 
-        for required_decorator in required_decorators:
-            assert required_decorator in decorators, (
-                'Missing {} decorator on app/main/views/{}.py::{}'
-            ).format(required_decorator, file, function)
+        assert 'user_has_permissions' in decorators, (
+            'Missing @user_has_permissions decorator\n'
+            'Use @user_has_permissions() or @user_is_platform_admin instead\n'
+            'app/main/views/{}.py::{}\n'
+        ).format(file, function)
 
-        present_required_decorators = tuple(OrderedSet(
-            decorator for decorator in decorators
-            if decorator in required_decorators
-        ))
-        assert present_required_decorators == required_decorators, (
-            'Wrong order of permissions decorators on app/main/views/{}.py::{}\n'
-            '   Expected:\n'
-            '{}\n'
-            '   Actual:\n'
-            '{}\n'
-        ).format(
-            file, function,
-            format_decorators(required_decorators),
-            format_decorators(present_required_decorators),
-        )
+    for endpoint, decorators in get_routes_and_decorators():
+
+        assert 'login_required' not in decorators, (
+            '@login_required found\n'
+            'For consistency, use @user_is_logged_in() instead (from app.utils)\n'
+            'app/main/views/{}.py::{}\n'
+        ).format(file, function)
+
+        if 'user_is_platform_admin' in decorators:
+            assert 'user_has_permissions' not in decorators, (
+                '@user_has_permissions and @user_is_platform_admin decorating same function\n'
+                'You can only use one of these at a time\n'
+                'app/main/views/{}.py::{}\n'
+            ).format(file, function)
+            assert 'user_is_logged_in' not in decorators, (
+                '@user_is_logged_in used with @user_is_platform_admin\n'
+                'Use @user_is_platform_admin only\n'
+                'app/main/views/{}.py::{}\n'
+            ).format(file, function)
