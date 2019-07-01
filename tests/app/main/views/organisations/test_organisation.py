@@ -93,7 +93,6 @@ def test_page_to_create_new_organisation(
         ('radio', 'organisation_type', 'nhs'),
         ('radio', 'crown_status', 'crown'),
         ('radio', 'crown_status', 'non-crown'),
-        ('radio', 'crown_status', 'unknown'),
         ('hidden', 'csrf_token', ANY),
     ]
 
