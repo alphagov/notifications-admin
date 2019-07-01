@@ -594,6 +594,14 @@ class OrganisationTypeForm(StripWhitespaceForm):
     organisation_type = organisation_type()
 
 
+class NewOrganisationForm(
+    RenameOrganisationForm,
+    OrganisationTypeForm,
+    OrganisationCrownStatusForm,
+):
+    pass
+
+
 class FreeSMSAllowance(StripWhitespaceForm):
     free_sms_allowance = IntegerField(
         'Numbers of text message fragments per year',
@@ -1037,11 +1045,6 @@ class PDFUploadForm(StripWhitespaceForm):
             DataRequired(message="You need to upload a file to submit")
         ]
     )
-
-
-class CreateOrUpdateOrganisation(StripWhitespaceForm):
-
-    name = StringField('Name', validators=[DataRequired()])
 
 
 class EmailFieldInWhitelist(EmailField, StripWhitespaceStringField):

@@ -1,4 +1,4 @@
-from unittest.mock import Mock
+from unittest.mock import ANY, Mock
 
 import pytest
 from bs4 import BeautifulSoup
@@ -75,24 +75,79 @@ def test_view_organisation_shows_the_correct_organisation(
     assert normalize_spaces(page.select_one('h1').text) == 'Usage'
 
 
-def test_create_new_organisation(
-    logged_in_platform_admin_client,
+def test_page_to_create_new_organisation(
+    client_request,
+    platform_admin_user,
     mocker,
-    fake_uuid
+):
+    client_request.login(platform_admin_user)
+    page = client_request.get('.add_organisation')
+
+    assert [
+        (input['type'], input['name'], input['value'])
+        for input in page.select('input')
+    ] == [
+        ('text', 'name', ''),
+        ('radio', 'organisation_type', 'central'),
+        ('radio', 'organisation_type', 'local'),
+        ('radio', 'organisation_type', 'nhs'),
+        ('radio', 'crown_status', 'crown'),
+        ('radio', 'crown_status', 'non-crown'),
+        ('radio', 'crown_status', 'unknown'),
+        ('hidden', 'csrf_token', ANY),
+    ]
+
+
+def test_create_new_organisation(
+    client_request,
+    platform_admin_user,
+    mocker,
 ):
     mock_create_organisation = mocker.patch(
         'app.organisations_client.create_organisation'
     )
 
-    org = {'name': 'new name'}
-
-    logged_in_platform_admin_client.post(
-        url_for('.add_organisation'),
-        content_type='multipart/form-data',
-        data=org
+    client_request.login(platform_admin_user)
+    client_request.post(
+        '.add_organisation',
+        _data={
+            'name': 'new name',
+            'organisation_type': 'local',
+            'crown_status': 'non-crown',
+        }
     )
 
-    mock_create_organisation.assert_called_once_with(name=org['name'])
+    mock_create_organisation.assert_called_once_with(
+        name='new name',
+        organisation_type='local',
+        crown=False,
+        agreement_signed=False,
+    )
+
+
+def test_create_new_organisation_validates(
+    client_request,
+    platform_admin_user,
+    mocker,
+):
+    mock_create_organisation = mocker.patch(
+        'app.organisations_client.create_organisation'
+    )
+
+    client_request.login(platform_admin_user)
+    page = client_request.post(
+        '.add_organisation',
+        _expected_status=200,
+    )
+    assert [
+        (error['data-error-label'], normalize_spaces(error.text))
+        for error in page.select('.error-message')
+    ] == [
+        ('name', 'Can’t be empty'),
+        ('organisation_type', 'Not a valid choice'),
+        ('crown_status', 'Not a valid choice'),
+    ]
+    assert mock_create_organisation.called is False
 
 
 def test_organisation_services_shows_live_services_only(

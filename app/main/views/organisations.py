@@ -16,9 +16,9 @@ from app import (
 from app.main import main
 from app.main.forms import (
     ConfirmPasswordForm,
-    CreateOrUpdateOrganisation,
     GoLiveNotesForm,
     InviteOrgUserForm,
+    NewOrganisationForm,
     OrganisationAgreementSignedForm,
     OrganisationCrownStatusForm,
     OrganisationDomainsForm,
@@ -51,11 +51,18 @@ def organisations():
 @login_required
 @user_is_platform_admin
 def add_organisation():
-    form = CreateOrUpdateOrganisation()
+    form = NewOrganisationForm()
 
     if form.validate_on_submit():
         organisations_client.create_organisation(
             name=form.name.data,
+            crown={
+                'crown': True,
+                'non-crown': False,
+                'unknown': None,
+            }.get(form.crown_status.data),
+            organisation_type=form.organisation_type.data,
+            agreement_signed=False,
         )
 
         return redirect(url_for('.organisations'))

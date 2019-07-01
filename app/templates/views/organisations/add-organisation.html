@@ -2,14 +2,11 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/textbox.html" import textbox %}
+{% from "components/radios.html" import radios %}
 {% from "components/form.html" import form_wrapper %}
 
 {% block per_page_title %}
-  Create an organisation
-{% endblock %}
-
-{% block org_page_title %}
-  Create an organisation
+  New organisation
 {% endblock %}
 
 {% block platform_admin_content %}
@@ -21,6 +18,8 @@
 
   {% call form_wrapper() %}
     {{textbox(form.name)}}
+    {{radios(form.organisation_type)}}
+    {{radios(form.crown_status)}}
     {{ page_footer('Save') }}
   {% endcall %}
 
