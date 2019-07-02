@@ -80,7 +80,6 @@ class HeaderNavigation(Navigation):
             'user_profile_disable_platform_admin_view',
         },
         'platform-admin': {
-            'add_organisation',
             'archive_user',
             'clear_cache',
             'create_email_branding',
@@ -120,6 +119,7 @@ class HeaderNavigation(Navigation):
         'accept_org_invite',
         'action_blocked',
         'add_data_retention',
+        'add_organisation',
         'add_service',
         'add_service_template',
         'agreement',
