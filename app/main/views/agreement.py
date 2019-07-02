@@ -8,6 +8,7 @@ from app.main import main
 from app.main.forms import AcceptAgreementForm
 from app.main.views.sub_navigation_dictionaries import features_nav
 from app.s3_client.s3_mou_client import get_mou
+from app.utils import user_has_permissions
 
 
 @main.route('/agreement')
@@ -27,6 +28,15 @@ def service_agreement(service_id):
         'views/agreement/service-{}.html'.format(current_service.organisation.as_jinja_template),
         owner=current_service.organisation.name,
     )
+
+
+@main.route('/services/<uuid:service_id>/agreement.pdf')
+@login_required
+@user_has_permissions('manage_service')
+def service_download_agreement(service_id):
+    return send_file(**get_mou(
+        current_service.organisation.crown_status_or_404
+    ))
 
 
 @main.route('/services/<uuid:service_id>/agreement/accept', methods=['GET', 'POST'])
