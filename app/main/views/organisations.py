@@ -31,7 +31,7 @@ from app.main.forms import (
     SetLetterBranding,
 )
 from app.main.views.service_settings import get_branding_as_value_and_label
-from app.models.organisation import Organisations
+from app.models.organisation import Organisation, Organisations
 from app.models.user import InvitedOrgUser, User
 from app.utils import user_has_permissions, user_is_platform_admin
 
@@ -54,17 +54,7 @@ def add_organisation():
     form = NewOrganisationForm()
 
     if form.validate_on_submit():
-        organisations_client.create_organisation(
-            name=form.name.data,
-            crown={
-                'crown': True,
-                'non-crown': False,
-                'unknown': None,
-            }.get(form.crown_status.data),
-            organisation_type=form.organisation_type.data,
-            agreement_signed=False,
-        )
-
+        Organisation.create_from_form(form)
         return redirect(url_for('.organisations'))
 
     return render_template(
