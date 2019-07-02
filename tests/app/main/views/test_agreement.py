@@ -46,20 +46,20 @@ class _MockS3Object():
     (
         True, True,
         [
-            partial(url_for, 'main.download_agreement'),
+            partial(url_for, 'main.service_download_agreement', service_id=SERVICE_ONE_ID),
         ]
     ),
     (
         False, False,
         [
-            partial(url_for, 'main.download_agreement'),
+            partial(url_for, 'main.service_download_agreement', service_id=SERVICE_ONE_ID),
             partial(url_for, 'main.service_accept_agreement', service_id=SERVICE_ONE_ID),
         ]
     ),
     (
         False, True,
         [
-            partial(url_for, 'main.download_agreement'),
+            partial(url_for, 'main.service_download_agreement', service_id=SERVICE_ONE_ID),
             partial(url_for, 'main.service_accept_agreement', service_id=SERVICE_ONE_ID),
         ]
     ),
@@ -96,6 +96,57 @@ def test_show_agreement_page(
     assert len(links) == len(expected_links)
     for index, link in enumerate(links):
         assert link['href'] == expected_links[index]()
+
+
+@pytest.mark.parametrize('crown, expected_status, expected_file_fetched, expected_file_served', (
+    (
+        True, 200, 'crown.pdf',
+        'GOV.UK Notify data sharing and financial agreement.pdf',
+    ),
+    (
+        False, 200, 'non-crown.pdf',
+        'GOV.UK Notify data sharing and financial agreement (non-crown).pdf',
+    ),
+    (
+        None, 404, None,
+        None,
+    ),
+))
+def test_download_service_agreement(
+    logged_in_client,
+    mocker,
+    crown,
+    expected_status,
+    expected_file_fetched,
+    expected_file_served,
+):
+    mocker.patch(
+        'app.models.organisation.organisations_client.get_service_organisation',
+        return_value=organisation_json(
+            crown=crown
+        )
+    )
+    mock_get_s3_object = mocker.patch(
+        'app.s3_client.s3_mou_client.get_s3_object',
+        return_value=_MockS3Object(b'foo')
+    )
+
+    response = logged_in_client.get(url_for(
+        'main.service_download_agreement',
+        service_id=SERVICE_ONE_ID,
+    ))
+    assert response.status_code == expected_status
+
+    if expected_file_served:
+        assert response.get_data() == b'foo'
+        assert response.headers['Content-Type'] == 'application/pdf'
+        assert response.headers['Content-Disposition'] == (
+            'attachment; filename="{}"'.format(expected_file_served)
+        )
+        mock_get_s3_object.assert_called_once_with('test-mou', expected_file_fetched)
+    else:
+        assert not expected_file_fetched
+        assert mock_get_s3_object.called is False
 
 
 def test_show_accept_agreement_page(
