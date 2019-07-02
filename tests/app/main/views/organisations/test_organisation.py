@@ -103,7 +103,8 @@ def test_create_new_organisation(
     mocker,
 ):
     mock_create_organisation = mocker.patch(
-        'app.organisations_client.create_organisation'
+        'app.organisations_client.create_organisation',
+        return_value=organisation_json(ORGANISATION_ID),
     )
 
     client_request.login(platform_admin_user)
@@ -113,7 +114,12 @@ def test_create_new_organisation(
             'name': 'new name',
             'organisation_type': 'local',
             'crown_status': 'non-crown',
-        }
+        },
+        _expected_redirect=url_for(
+            'main.organisation_settings',
+            org_id=ORGANISATION_ID,
+            _external=True,
+        ),
     )
 
     mock_create_organisation.assert_called_once_with(

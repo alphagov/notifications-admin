@@ -54,8 +54,10 @@ def add_organisation():
     form = NewOrganisationForm()
 
     if form.validate_on_submit():
-        Organisation.create_from_form(form)
-        return redirect(url_for('.organisations'))
+        return redirect(url_for(
+            '.organisation_settings',
+            org_id=Organisation.create_from_form(form).id,
+        ))
 
     return render_template(
         'views/organisations/add-organisation.html',
