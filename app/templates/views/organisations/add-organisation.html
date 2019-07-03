@@ -1,27 +1,39 @@
-{% extends "views/platform-admin/_base_template.html" %}
+{% extends "withoutnav_template.html" %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/textbox.html" import textbox %}
+{% from "components/radios.html" import radios %}
 {% from "components/form.html" import form_wrapper %}
 
 {% block per_page_title %}
-  Create an organisation
+  New organisation
 {% endblock %}
 
-{% block org_page_title %}
-  Create an organisation
-{% endblock %}
+{% block fullwidth_content %}
+  <div id="content">
+    <div class="navigation-service">
+      <div class="navigation-service-name">
+        <a href="{{ url_for('.organisations') }}">All organisations</a>
+      </div>
+      <a href="{{ url_for('main.choose_account') }}" class="navigation-service-switch">Switch service</a>
+    </div>
 
-{% block platform_admin_content %}
-
-  {{ page_header(
-    'New organisation',
-    back_link=url_for('.organisations')
-  ) }}
-
-  {% call form_wrapper() %}
-    {{textbox(form.name)}}
-    {{ page_footer('Save') }}
-  {% endcall %}
+    <main role="main">
+      <div class="grid-row">
+        <div class="column-one-quarter">
+          &nbsp;
+        </div>
+        <div class="column-three-quarters">
+          {{ page_header('New organisation') }}
+          {% call form_wrapper() %}
+            {{textbox(form.name)}}
+            {{radios(form.organisation_type)}}
+            {{radios(form.crown_status)}}
+            {{ page_footer('Save') }}
+          {% endcall %}
+        </div>
+      </div>
+    </main>
+  </div>
 
 {% endblock %}

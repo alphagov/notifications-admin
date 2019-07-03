@@ -38,6 +38,27 @@ class Organisation(JSONModel):
     def from_service(cls, service_id):
         return cls(organisations_client.get_service_organisation(service_id))
 
+    @classmethod
+    def create_from_form(cls, form):
+        return cls.create(
+            name=form.name.data,
+            crown={
+                'crown': True,
+                'non-crown': False,
+                'unknown': None,
+            }.get(form.crown_status.data),
+            organisation_type=form.organisation_type.data,
+        )
+
+    @classmethod
+    def create(cls, name, crown, organisation_type, agreement_signed=False):
+        return cls(organisations_client.create_organisation(
+            name=name,
+            crown=crown,
+            organisation_type=organisation_type,
+            agreement_signed=agreement_signed,
+        ))
+
     def __init__(self, _dict):
 
         super().__init__(_dict)

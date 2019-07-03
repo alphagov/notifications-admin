@@ -16,9 +16,9 @@ from app import (
 from app.main import main
 from app.main.forms import (
     ConfirmPasswordForm,
-    CreateOrUpdateOrganisation,
     GoLiveNotesForm,
     InviteOrgUserForm,
+    NewOrganisationForm,
     OrganisationAgreementSignedForm,
     OrganisationCrownStatusForm,
     OrganisationDomainsForm,
@@ -31,7 +31,7 @@ from app.main.forms import (
     SetLetterBranding,
 )
 from app.main.views.service_settings import get_branding_as_value_and_label
-from app.models.organisation import Organisations
+from app.models.organisation import Organisation, Organisations
 from app.models.user import InvitedOrgUser, User
 from app.utils import user_has_permissions, user_is_platform_admin
 
@@ -49,14 +49,13 @@ def organisations():
 @main.route("/organisations/add", methods=['GET', 'POST'])
 @user_is_platform_admin
 def add_organisation():
-    form = CreateOrUpdateOrganisation()
+    form = NewOrganisationForm()
 
     if form.validate_on_submit():
-        organisations_client.create_organisation(
-            name=form.name.data,
-        )
-
-        return redirect(url_for('.organisations'))
+        return redirect(url_for(
+            '.organisation_settings',
+            org_id=Organisation.create_from_form(form).id,
+        ))
 
     return render_template(
         'views/organisations/add-organisation.html',
