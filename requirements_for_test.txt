@@ -1,15 +1,15 @@
 -r requirements.txt
-isort==4.3.16
+isort==4.3.21
 pytest==3.10.1  # pyup: <4.0.0
 pytest-env==0.6.2
-pytest-mock==1.10.1
-pytest-cov==2.6.1
+pytest-cov==2.7.1
+pytest-mock==1.10.4
 pytest-xdist==1.27.0
-coveralls==1.7.0
+coveralls==1.8.1
 beautifulsoup4==4.7.1
-freezegun==0.3.11
+freezegun==0.3.12
 flake8==3.7.7
 flake8-print==3.1.0
-requests-mock==1.5.2
+requests-mock==1.6.0
 # used for creating manifest file locally
 jinja2-cli[yaml]==0.6.0
