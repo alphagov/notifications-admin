@@ -1,5 +1,5 @@
 from flask import jsonify, redirect, render_template, session, url_for
-from flask_login import current_user, login_required
+from flask_login import current_user
 from notifications_python_client.errors import HTTPError
 from notifications_utils.recipients import format_phone_number_human_readable
 from notifications_utils.template import SMSPreviewTemplate
@@ -12,7 +12,6 @@ from app.utils import user_has_permissions
 
 
 @main.route("/services/<service_id>/conversation/<notification_id>")
-@login_required
 @user_has_permissions('view_activity')
 def conversation(service_id, notification_id):
 
@@ -28,7 +27,6 @@ def conversation(service_id, notification_id):
 
 
 @main.route("/services/<service_id>/conversation/<notification_id>.json")
-@login_required
 @user_has_permissions('view_activity')
 def conversation_updates(service_id, notification_id):
 
@@ -40,7 +38,6 @@ def conversation_updates(service_id, notification_id):
 
 @main.route("/services/<service_id>/conversation/<notification_id>/reply-with")
 @main.route("/services/<service_id>/conversation/<notification_id>/reply-with/from-folder/<uuid:from_folder>")
-@login_required
 @user_has_permissions('send_messages')
 def conversation_reply(
     service_id,
@@ -63,7 +60,6 @@ def conversation_reply(
 
 
 @main.route("/services/<service_id>/conversation/<notification_id>/reply-with/<template_id>")
-@login_required
 @user_has_permissions('send_messages')
 def conversation_reply_with_template(
     service_id,

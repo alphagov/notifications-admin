@@ -1,5 +1,5 @@
 from flask import flash, redirect, render_template, request, url_for
-from flask_login import current_user, login_required
+from flask_login import current_user
 
 from app import user_api_client
 from app.event_handlers import create_archive_user_event
@@ -10,7 +10,6 @@ from app.utils import user_is_platform_admin
 
 
 @main.route("/find-users-by-email", methods=['GET', 'POST'])
-@login_required
 @user_is_platform_admin
 def find_users_by_email():
     form = SearchUsersByEmailForm()
@@ -28,7 +27,6 @@ def find_users_by_email():
 
 
 @main.route("/users/<user_id>", methods=['GET'])
-@login_required
 @user_is_platform_admin
 def user_information(user_id):
     return render_template(
@@ -38,7 +36,6 @@ def user_information(user_id):
 
 
 @main.route("/users/<uuid:user_id>/archive", methods=['GET', 'POST'])
-@login_required
 @user_is_platform_admin
 def archive_user(user_id):
     if request.method == 'POST':

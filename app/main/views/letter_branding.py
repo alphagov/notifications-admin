@@ -7,7 +7,6 @@ from flask import (
     session,
     url_for,
 )
-from flask_login import login_required
 from notifications_python_client.errors import HTTPError
 from requests import get as requests_get
 
@@ -33,7 +32,6 @@ from app.utils import get_logo_cdn_domain, user_is_platform_admin
 
 
 @main.route("/letter-branding", methods=['GET'])
-@login_required
 @user_is_platform_admin
 def letter_branding():
 
@@ -48,7 +46,6 @@ def letter_branding():
 
 @main.route("/letter-branding/<branding_id>/edit", methods=['GET', 'POST'])
 @main.route("/letter-branding/<branding_id>/edit/<path:logo>", methods=['GET', 'POST'])
-@login_required
 @user_is_platform_admin
 def update_letter_branding(branding_id, logo=None):
     letter_branding = letter_branding_client.get_letter_branding(branding_id)
@@ -128,7 +125,6 @@ def update_letter_branding(branding_id, logo=None):
 
 @main.route("/letter-branding/create", methods=['GET', 'POST'])
 @main.route("/letter-branding/create/<path:logo>", methods=['GET', 'POST'])
-@login_required
 @user_is_platform_admin
 def create_letter_branding(logo=None):
     file_upload_form = SVGFileUpload()

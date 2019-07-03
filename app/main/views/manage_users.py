@@ -7,7 +7,7 @@ from flask import (
     session,
     url_for,
 )
-from flask_login import current_user, login_required
+from flask_login import current_user
 from notifications_python_client.errors import HTTPError
 
 from app import current_service, service_api_client
@@ -30,7 +30,6 @@ from app.utils import is_gov_user, redact_mobile_number, user_has_permissions
 
 
 @main.route("/services/<service_id>/users")
-@login_required
 @user_has_permissions(allow_org_user=True)
 def manage_users(service_id):
     return render_template(
@@ -44,7 +43,6 @@ def manage_users(service_id):
 
 
 @main.route("/services/<service_id>/users/invite", methods=['GET', 'POST'])
-@login_required
 @user_has_permissions('manage_service')
 def invite_user(service_id):
 
@@ -81,7 +79,6 @@ def invite_user(service_id):
 
 
 @main.route("/services/<service_id>/users/<user_id>", methods=['GET', 'POST'])
-@login_required
 @user_has_permissions('manage_service')
 def edit_user_permissions(service_id, user_id):
     service_has_email_auth = current_service.has_permission('email_auth')
@@ -122,7 +119,6 @@ def edit_user_permissions(service_id, user_id):
 
 
 @main.route("/services/<service_id>/users/<user_id>/delete", methods=['POST'])
-@login_required
 @user_has_permissions('manage_service')
 def remove_user_from_service(service_id, user_id):
     try:
@@ -144,7 +140,6 @@ def remove_user_from_service(service_id, user_id):
 
 
 @main.route("/services/<service_id>/users/<uuid:user_id>/edit-email", methods=['GET', 'POST'])
-@login_required
 @user_has_permissions('manage_service')
 def edit_user_email(service_id, user_id):
     user = current_service.get_team_member(user_id)
@@ -172,7 +167,6 @@ def edit_user_email(service_id, user_id):
 
 
 @main.route("/services/<service_id>/users/<uuid:user_id>/edit-email/confirm", methods=['GET', 'POST'])
-@login_required
 @user_has_permissions('manage_service')
 def confirm_edit_user_email(service_id, user_id):
     user = current_service.get_team_member(user_id)
@@ -207,7 +201,6 @@ def confirm_edit_user_email(service_id, user_id):
 
 
 @main.route("/services/<service_id>/users/<uuid:user_id>/edit-mobile-number", methods=['GET', 'POST'])
-@login_required
 @user_has_permissions('manage_service')
 def edit_user_mobile_number(service_id, user_id):
     user = current_service.get_team_member(user_id)
@@ -232,7 +225,6 @@ def edit_user_mobile_number(service_id, user_id):
 
 
 @main.route("/services/<service_id>/users/<uuid:user_id>/edit-mobile-number/confirm", methods=['GET', 'POST'])
-@login_required
 @user_has_permissions('manage_service')
 def confirm_edit_user_mobile_number(service_id, user_id):
     user = current_service.get_team_member(user_id)

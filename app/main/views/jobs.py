@@ -10,7 +10,7 @@ from flask import (
     stream_with_context,
     url_for,
 )
-from flask_login import current_user, login_required
+from flask_login import current_user
 from notifications_utils.letter_timings import get_letter_timings
 from notifications_utils.template import Template, WithSubjectTemplate
 
@@ -38,7 +38,6 @@ from app.utils import (
 
 
 @main.route("/services/<service_id>/jobs")
-@login_required
 @user_has_permissions()
 def view_jobs(service_id):
     page = int(request.args.get('page', 1))
@@ -73,7 +72,6 @@ def view_jobs(service_id):
 
 
 @main.route("/services/<service_id>/jobs/<job_id>")
-@login_required
 @user_has_permissions()
 def view_job(service_id, job_id):
     job = job_api_client.get_job(service_id, job_id)['data']
@@ -119,7 +117,6 @@ def view_job(service_id, job_id):
 
 
 @main.route("/services/<service_id>/jobs/<job_id>.csv")
-@login_required
 @user_has_permissions('view_activity')
 def view_job_csv(service_id, job_id):
     job = job_api_client.get_job(service_id, job_id)['data']
@@ -154,7 +151,6 @@ def view_job_csv(service_id, job_id):
 
 
 @main.route("/services/<service_id>/jobs/<job_id>", methods=['POST'])
-@login_required
 @user_has_permissions('send_messages')
 def cancel_job(service_id, job_id):
     job_api_client.cancel_job(service_id, job_id)
@@ -179,7 +175,6 @@ def view_job_updates(service_id, job_id):
 
 @main.route('/services/<service_id>/notifications', methods=['GET', 'POST'])
 @main.route('/services/<service_id>/notifications/<message_type>', methods=['GET', 'POST'])
-@login_required
 @user_has_permissions()
 def view_notifications(service_id, message_type=None):
     return render_template(

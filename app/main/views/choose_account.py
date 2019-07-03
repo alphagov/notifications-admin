@@ -1,8 +1,8 @@
 from flask import redirect, render_template, session, url_for
-from flask_login import current_user, login_required
+from flask_login import current_user
 
 from app.main import main
-from app.utils import PermanentRedirect
+from app.utils import PermanentRedirect, user_is_logged_in
 
 
 @main.route("/services")
@@ -16,7 +16,7 @@ def services_or_dashboard():
 
 
 @main.route("/accounts")
-@login_required
+@user_is_logged_in
 def choose_account():
     return render_template(
         'views/choose-account.html',

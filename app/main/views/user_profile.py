@@ -8,7 +8,7 @@ from flask import (
     session,
     url_for,
 )
-from flask_login import current_user, login_required
+from flask_login import current_user
 from notifications_utils.url_safe_token import check_token
 
 from app import user_api_client
@@ -23,7 +23,7 @@ from app.main.forms import (
     TwoFactorForm,
 )
 from app.models.user import User
-from app.utils import user_is_gov_user
+from app.utils import user_is_gov_user, user_is_logged_in
 
 NEW_EMAIL = 'new-email'
 NEW_MOBILE = 'new-mob'
@@ -31,7 +31,7 @@ NEW_MOBILE_PASSWORD_CONFIRMED = 'new-mob-password-confirmed'
 
 
 @main.route("/user-profile")
-@login_required
+@user_is_logged_in
 def user_profile():
     return render_template(
         'views/user-profile.html',
@@ -40,7 +40,7 @@ def user_profile():
 
 
 @main.route("/user-profile/name", methods=['GET', 'POST'])
-@login_required
+@user_is_logged_in
 def user_profile_name():
 
     form = ChangeNameForm(new_name=current_user.name)
@@ -57,7 +57,7 @@ def user_profile_name():
 
 
 @main.route("/user-profile/email", methods=['GET', 'POST'])
-@login_required
+@user_is_logged_in
 @user_is_gov_user
 def user_profile_email():
 
@@ -75,7 +75,7 @@ def user_profile_email():
 
 
 @main.route("/user-profile/email/authenticate", methods=['GET', 'POST'])
-@login_required
+@user_is_logged_in
 def user_profile_email_authenticate():
     # Validate password for form
     def _check_password(pwd):
@@ -99,7 +99,7 @@ def user_profile_email_authenticate():
 
 
 @main.route("/user-profile/email/confirm/<token>", methods=['GET'])
-@login_required
+@user_is_logged_in
 def user_profile_email_confirm(token):
     token_data = check_token(token,
                              current_app.config['SECRET_KEY'],
@@ -114,7 +114,7 @@ def user_profile_email_confirm(token):
 
 
 @main.route("/user-profile/mobile-number", methods=['GET', 'POST'])
-@login_required
+@user_is_logged_in
 def user_profile_mobile_number():
 
     form = ChangeMobileNumberForm(mobile_number=current_user.mobile_number)
@@ -131,7 +131,7 @@ def user_profile_mobile_number():
 
 
 @main.route("/user-profile/mobile-number/authenticate", methods=['GET', 'POST'])
-@login_required
+@user_is_logged_in
 def user_profile_mobile_number_authenticate():
 
     # Validate password for form
@@ -156,7 +156,7 @@ def user_profile_mobile_number_authenticate():
 
 
 @main.route("/user-profile/mobile-number/confirm", methods=['GET', 'POST'])
-@login_required
+@user_is_logged_in
 def user_profile_mobile_number_confirm():
 
     # Validate verify code for form
@@ -184,7 +184,7 @@ def user_profile_mobile_number_confirm():
 
 
 @main.route("/user-profile/password", methods=['GET', 'POST'])
-@login_required
+@user_is_logged_in
 def user_profile_password():
 
     # Validate password for form
@@ -203,7 +203,7 @@ def user_profile_password():
 
 
 @main.route("/user-profile/disable-platform-admin-view", methods=['GET', 'POST'])
-@login_required
+@user_is_logged_in
 def user_profile_disable_platform_admin_view():
     if not current_user.platform_admin and not session.get('disable_platform_admin_view'):
         abort(403)

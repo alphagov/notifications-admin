@@ -1,5 +1,4 @@
 from flask import current_app, redirect, render_template, session, url_for
-from flask_login import login_required
 
 from app import email_branding_client
 from app.main import main
@@ -16,7 +15,6 @@ from app.utils import get_logo_cdn_domain, user_is_platform_admin
 
 
 @main.route("/email-branding", methods=['GET', 'POST'])
-@login_required
 @user_is_platform_admin
 def email_branding():
     brandings = email_branding_client.get_all_email_branding(sort_key='name')
@@ -30,7 +28,6 @@ def email_branding():
 
 @main.route("/email-branding/<branding_id>/edit", methods=['GET', 'POST'])
 @main.route("/email-branding/<branding_id>/edit/<logo>", methods=['GET', 'POST'])
-@login_required
 @user_is_platform_admin
 def update_email_branding(branding_id, logo=None):
     email_branding = email_branding_client.get_email_branding(branding_id)['email_branding']
@@ -87,7 +84,6 @@ def update_email_branding(branding_id, logo=None):
 
 @main.route("/email-branding/create", methods=['GET', 'POST'])
 @main.route("/email-branding/create/<logo>", methods=['GET', 'POST'])
-@login_required
 @user_is_platform_admin
 def create_email_branding(logo=None):
     form = ServiceUpdateEmailBranding(brand_type='org')

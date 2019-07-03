@@ -19,7 +19,7 @@ from app.main.views.platform_admin import (
     sum_service_usage,
 )
 from tests import service_json
-from tests.conftest import mock_get_user, normalize_spaces
+from tests.conftest import SERVICE_ONE_ID, mock_get_user, normalize_spaces
 
 
 @pytest.mark.parametrize('endpoint', [
@@ -767,7 +767,7 @@ def test_service_letter_validation_preview_renders_correctly(
         mock_has_no_jobs
 
 ):
-    page = client_request.get('main.service_letter_validation_preview', service_id="service_1")
+    page = client_request.get('main.service_letter_validation_preview', service_id=SERVICE_ONE_ID)
 
     assert page.find('h1').text.strip() == "Letter validation preview"
     assert page.find_all('input', class_='file-upload-field')
@@ -780,7 +780,7 @@ def test_service_letter_validation_preview_returns_400_if_file_is_too_big(
 
 ):
     with open('tests/test_pdf_files/big.pdf', 'rb') as file:
-        page = client_request.post('main.service_letter_validation_preview', service_id="service_1",
+        page = client_request.post('main.service_letter_validation_preview', service_id=SERVICE_ONE_ID,
                                    _data=dict(
                                        pdf_file=file,
                                    ),

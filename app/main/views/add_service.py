@@ -1,11 +1,11 @@
 from flask import current_app, redirect, render_template, session, url_for
-from flask_login import current_user, login_required
+from flask_login import current_user
 from notifications_python_client.errors import HTTPError
 
 from app import billing_api_client, service_api_client
 from app.main import main
 from app.main.forms import CreateServiceForm
-from app.utils import email_safe, user_is_gov_user
+from app.utils import email_safe, user_is_gov_user, user_is_logged_in
 
 
 def _create_service(service_name, organisation_type, email_from, form):
@@ -44,7 +44,7 @@ def _create_example_template(service_id):
 
 
 @main.route("/add-service", methods=['GET', 'POST'])
-@login_required
+@user_is_logged_in
 @user_is_gov_user
 def add_service():
     form = CreateServiceForm(

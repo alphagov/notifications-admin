@@ -13,7 +13,7 @@ from flask import (
     session,
     url_for,
 )
-from flask_login import current_user, login_required
+from flask_login import current_user
 from notifications_python_client.errors import HTTPError
 from notifications_utils import SMS_CHAR_COUNT_LIMIT
 from notifications_utils.columns import Columns
@@ -100,7 +100,6 @@ def get_example_letter_address(key):
 
 
 @main.route("/services/<service_id>/send/<template_id>/csv", methods=['GET', 'POST'])
-@login_required
 @user_has_permissions('send_messages', restrict_admin_usage=True)
 def send_messages(service_id, template_id):
     # if there's lots of data in the session, lets log it for debugging purposes
@@ -185,7 +184,6 @@ def send_messages(service_id, template_id):
 
 
 @main.route("/services/<service_id>/send/<template_id>.csv", methods=['GET'])
-@login_required
 @user_has_permissions('send_messages', 'manage_templates')
 def get_example_csv(service_id, template_id):
     template = get_template(
@@ -201,7 +199,6 @@ def get_example_csv(service_id, template_id):
 
 
 @main.route("/services/<service_id>/send/<template_id>/set-sender", methods=['GET', 'POST'])
-@login_required
 @user_has_permissions('send_messages', restrict_admin_usage=True)
 def set_sender(service_id, template_id):
     session['sender_id'] = None
@@ -290,7 +287,6 @@ def get_sender_details(service_id, template_type):
 
 @main.route("/services/<service_id>/send/<template_id>/test", endpoint='send_test')
 @main.route("/services/<service_id>/send/<template_id>/one-off", endpoint='send_one_off')
-@login_required
 @user_has_permissions('send_messages', restrict_admin_usage=True)
 def send_test(service_id, template_id):
     session['recipient'] = None
@@ -341,7 +337,6 @@ def get_notification_check_endpoint(service_id, template):
     methods=['GET', 'POST'],
     endpoint='send_one_off_step',
 )
-@login_required
 @user_has_permissions('send_messages', restrict_admin_usage=True)
 def send_test_step(service_id, template_id, step_index):
     if {'recipient', 'placeholders'} - set(session.keys()):
@@ -472,7 +467,6 @@ def send_test_step(service_id, template_id, step_index):
 
 
 @main.route("/services/<service_id>/send/<template_id>/test.<filetype>", methods=['GET'])
-@login_required
 @user_has_permissions('send_messages')
 def send_test_preview(service_id, template_id, filetype):
 
@@ -604,7 +598,6 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
 
 @main.route("/services/<service_id>/<uuid:template_id>/check/<upload_id>", methods=['GET'])
 @main.route("/services/<service_id>/<uuid:template_id>/check/<upload_id>/row-<int:row_index>", methods=['GET'])
-@login_required
 @user_has_permissions('send_messages', restrict_admin_usage=True)
 def check_messages(service_id, template_id, upload_id, row_index=2):
 
@@ -657,7 +650,6 @@ def check_messages(service_id, template_id, upload_id, row_index=2):
     "/services/<service_id>/<uuid:template_id>/check/<upload_id>/row-<int:row_index>.<filetype>",
     methods=['GET'],
 )
-@login_required
 @user_has_permissions('send_messages')
 def check_messages_preview(service_id, template_id, upload_id, filetype, row_index=2):
     if filetype == 'pdf':
@@ -677,7 +669,6 @@ def check_messages_preview(service_id, template_id, upload_id, filetype, row_ind
     "/services/<service_id>/<uuid:template_id>/check.<filetype>",
     methods=['GET'],
 )
-@login_required
 @user_has_permissions('send_messages')
 def check_notification_preview(service_id, template_id, filetype):
     if filetype == 'pdf':
@@ -694,7 +685,6 @@ def check_notification_preview(service_id, template_id, filetype):
 
 
 @main.route("/services/<service_id>/start-job/<upload_id>", methods=['POST'])
-@login_required
 @user_has_permissions('send_messages', restrict_admin_usage=True)
 def start_job(service_id, upload_id):
 
@@ -718,7 +708,6 @@ def start_job(service_id, upload_id):
 
 
 @main.route("/services/<service_id>/end-tour/<example_template_id>")
-@login_required
 @user_has_permissions('manage_templates')
 def go_to_dashboard_after_tour(service_id, example_template_id):
 
@@ -848,7 +837,6 @@ def get_back_link(service_id, template, step_index):
 
 
 @main.route("/services/<service_id>/template/<template_id>/notification/check", methods=['GET'])
-@login_required
 @user_has_permissions('send_messages', restrict_admin_usage=True)
 def check_notification(service_id, template_id):
     return render_template(
@@ -923,7 +911,6 @@ def get_template_error_dict(exception):
 
 
 @main.route("/services/<service_id>/template/<template_id>/notification/check", methods=['POST'])
-@login_required
 @user_has_permissions('send_messages', restrict_admin_usage=True)
 def send_notification(service_id, template_id):
     if {'recipient', 'placeholders'} - set(session.keys()):

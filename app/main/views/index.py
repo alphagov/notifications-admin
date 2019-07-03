@@ -6,7 +6,7 @@ from flask import (
     request,
     url_for,
 )
-from flask_login import current_user, login_required
+from flask_login import current_user
 from notifications_utils.international_billing_rates import (
     INTERNATIONAL_BILLING_RATES,
 )
@@ -17,7 +17,7 @@ from app.main import main
 from app.main.forms import FieldWithNoneOption, SearchByNameForm
 from app.main.views.feedback import QUESTION_TICKET_TYPE
 from app.main.views.sub_navigation_dictionaries import features_nav, pricing_nav
-from app.utils import get_logo_cdn_domain
+from app.utils import get_logo_cdn_domain, user_is_logged_in
 
 
 @main.route('/')
@@ -51,7 +51,7 @@ def error(status_code):
 
 
 @main.route("/verify-mobile")
-@login_required
+@user_is_logged_in
 def verify_mobile():
     return render_template('views/verify-mobile.html')
 
