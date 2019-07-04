@@ -209,15 +209,7 @@ describe('RadioSelect', () => {
 
     });
 
-    test("clicking the 'Done' button should reset the module to its initial state, showing the category buttons again", () => {
-
-      const doneButton = document.querySelector('.radio-select-column:nth-child(2) input[type=button]');
-
-      helpers.triggerEvent(doneButton, 'click');
-
-    });
-
-    describe("clicking on an option should", () => {
+    describe("clicking on an option with the mouse/trackpad should", () => {
 
       let optionsColumn;
       let firstOptionLabel;
@@ -229,7 +221,7 @@ describe('RadioSelect', () => {
         const firstOption = optionsColumn.querySelector('input[type=radio]');
         firstOptionLabel = firstOption.parentNode.querySelector('label').textContent.trim();
 
-        helpers.triggerEvent(firstOption, 'click');
+        helpers.clickElementWithMouse(firstOption);
 
       });
 
@@ -251,6 +243,114 @@ describe('RadioSelect', () => {
         expect(button.getAttribute('value')).toEqual('Choose a different time');
 
       })
+
+    });
+
+    describe("selecting an option with the space key should", () => {
+
+      let optionsColumn;
+      let secondOptionLabel;
+
+      beforeEach(() => {
+
+        optionsColumn = document.querySelector('.radio-select-column:nth-child(2)');
+
+        const options = optionsColumn.querySelectorAll('input[type=radio]');
+        secondOptionLabel = options[1].parentNode.querySelector('label').textContent.trim();
+
+        helpers.moveSelectionToRadio(options[1], { 'direction': 'down' });
+        helpers.activateRadioWithSpace(options[1]);
+      });
+
+      test("remove all the other options", () => {
+
+        // module replaces the column node so this needs querying again
+        optionsColumn = document.querySelector('.radio-select-column:nth-child(2)');
+
+        expect(optionsColumn.querySelectorAll('input[type=radio]').length).toEqual(1);
+        expect(optionsColumn.querySelector('label').textContent.trim()).toEqual(secondOptionLabel);
+
+      });
+
+      test("add a button for choosing a different time", () => {
+
+        const button = document.querySelector('.radio-select-column:nth-child(3) input[type=button]');
+
+        expect(button).not.toBeNull();
+        expect(button.getAttribute('value')).toEqual('Choose a different time');
+
+      })
+
+    });
+
+    describe("selecting an option with the enter key should", () => {
+
+      let optionsColumn;
+      let secondOptionLabel;
+
+      beforeEach(() => {
+
+        optionsColumn = document.querySelector('.radio-select-column:nth-child(2)');
+
+        const options = optionsColumn.querySelectorAll('input[type=radio]');
+        secondOptionLabel = options[1].parentNode.querySelector('label').textContent.trim();
+
+        // simulate events for arrow key press moving selection to 2nd option
+        // event for down arrow key press
+        helpers.triggerEvent(options[1], 'keydown', {
+          eventInit: { which: 40 }
+        });
+        // click event fired from option radio being activated
+        helpers.triggerEvent(options[1], 'click', {
+          eventInit: { pageX: 0 }
+        });
+
+        // simulate events for enter key press to confirm selection
+        // event for enter key press
+        helpers.triggerEvent(options[1], 'keydown', {
+          eventInit: { which: 13 }
+        });
+
+      });
+
+      test("remove all the other options", () => {
+
+        // module replaces the column node so this needs querying again
+        optionsColumn = document.querySelector('.radio-select-column:nth-child(2)');
+
+        expect(optionsColumn.querySelectorAll('input[type=radio]').length).toEqual(1);
+        expect(optionsColumn.querySelector('label').textContent.trim()).toEqual(secondOptionLabel);
+
+      });
+
+      test("add a button for choosing a different time", () => {
+
+        const button = document.querySelector('.radio-select-column:nth-child(3) input[type=button]');
+
+        expect(button).not.toBeNull();
+        expect(button.getAttribute('value')).toEqual('Choose a different time');
+
+      })
+
+    });
+
+    test("clicking the 'Done' button should choose whatever time is selected", () => {
+
+      let optionsColumn = document.querySelector('.radio-select-column:nth-child(2)');
+      const secondOption = optionsColumn.querySelectorAll('input[type=radio]')[1];
+      const secondOptionLabel = document.querySelector('label[for=' + secondOption.getAttribute('id')).textContent.trim();
+      const doneButton = document.querySelector('.radio-select-column:nth-child(2) input[type=button]');
+
+      // select second option
+      secondOption.checked = true;
+      secondOption.setAttribute('checked', '');
+
+      helpers.triggerEvent(doneButton, 'click');
+
+      optionsColumn = document.querySelector('.radio-select-column:nth-child(2)');
+
+      expect(optionsColumn.querySelectorAll('input[type=radio]').length).toEqual(1);
+      expect(optionsColumn.querySelector('label').textContent.trim()).toEqual(secondOptionLabel);
 
     });
 
