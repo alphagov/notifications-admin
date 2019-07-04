@@ -44,7 +44,7 @@
   {% else %}
 
     <div class="grid-row">
-      <div class="{% if current_user.has_permissions('manage_templates') %} column-five-sixths {% else %} column-two-thirds {% endif %}">
+      <div class="{% if current_user.has_permissions('manage_templates') %} column-five-sixths {% else %} column-whole {% endif %}">
         {{ folder_path(
           folders=template_folder_path,
           service_id=current_service.id,

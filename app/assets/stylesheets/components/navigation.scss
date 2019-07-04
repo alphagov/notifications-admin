@@ -2,34 +2,44 @@
 
   padding: 0 $gutter 0 0;
 
+  $padding-top: 14px;
+  $padding-bottom: 11px;
+
   &-service {
 
-    padding: 11px 0 9px 0;
     border-bottom: 1px solid $border-colour;
     margin: 0 0 10px;
     position: relative;
+    font-size: 0;
 
     &-name {
       @include bold-19;
-      margin: 0 0 0 0;
+      padding: $padding-top 0 $padding-bottom 0;
+      display: inline-block;
+      max-width: 50%;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
     }
 
     &-switch {
 
-      @include core-16;
+      @include core-19;
+      text-decoration: none;
       text-align: right;
       position: absolute;
       top: 0;
       right: 0;
-      padding: 13px 0 9px 15px;
+      padding: $padding-top 0 $padding-bottom $gutter-half;
 
       &:hover {
         color: $link-hover-colour;
+        text-decoration: underline;
       }
 
       &:focus {
         outline: none;
-        border-bottom: 4px solid $yellow;
+        border-bottom: 1px solid $yellow;
         border-left: 10px solid $yellow;
         border-right: 3px solid $yellow;
         right: -3px;
@@ -38,16 +48,66 @@
 
     }
 
+    &-back-to {
+
+      @include core-19;
+      padding: $padding-top $gutter-half $padding-bottom 0;
+      display: inline-block;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+        color: $link-hover-colour;
+      }
+
+    }
+
   }
 
-  &-breadcrumb {
+  &-organisation-link {
+
+    @include core-19;
     display: inline-block;
-    width: 6px;
-    height: 11px;
-    margin: 0 5px;
-    background-image: file-url("separator-2x.png");
-    background-size: 6px 11px;
-    background-repeat: no-repeat;
+    max-width: 25%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: normal;
+    text-decoration: none;
+    padding: $padding-top 20px $padding-bottom 0;
+    margin-right: 7px;
+    box-sizing: border-box;
+    position: relative;
+
+    &:before {
+      content: "";
+      display: block;
+      position: absolute;
+      top: -1px;
+      bottom: 1px;
+      right: 6px;
+      width: 7px;
+      height: 7px;
+      margin: auto 0;
+      -webkit-transform: rotate(45deg);
+      -ms-transform: rotate(45deg);
+      transform: rotate(45deg);
+      border: solid;
+      border-width: 1px 1px 0 0;
+      border-color: $secondary-text-colour;
+    }
+
+    &:hover {
+      color: $link-hover-colour;
+      text-decoration: underline;
+    }
+
+    &:focus {
+      color: $text-colour;
+      outline: none;
+      box-shadow: 0 1px 0 0 $focus-colour, -3px 0 0 0 $focus-colour, -3px 1px 0 0 $focus-colour;
+    }
+
   }
 
   li {
