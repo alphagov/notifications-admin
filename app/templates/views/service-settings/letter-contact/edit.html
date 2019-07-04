@@ -33,7 +33,11 @@
         {{ checkbox(form.is_default) }}
       </div>
     {% endif %}
-    {{ page_footer('Save') }}
+    {{ page_footer(
+      'Save',
+      delete_link=url_for('.service_confirm_delete_letter_contact', service_id=current_service.id, letter_contact_id=letter_contact_id),
+      delete_link_text='Delete'
+    ) }}
   {% endcall %}
 
 {% endblock %}

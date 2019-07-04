@@ -2464,6 +2464,51 @@ def test_edit_letter_contact_block(
     )
 
 
+def test_confirm_delete_letter_contact_block(
+    fake_uuid,
+    client_request,
+    get_default_letter_contact_block,
+):
+
+    page = client_request.get(
+        'main.service_confirm_delete_letter_contact',
+        service_id=SERVICE_ONE_ID,
+        letter_contact_id=fake_uuid,
+        _test_page_title=False,
+    )
+
+    assert normalize_spaces(page.select_one('.banner-dangerous').text) == (
+        'Are you sure you want to delete this contact block? '
+        'Yes, delete'
+    )
+    assert 'action' not in page.select_one('.banner-dangerous form')
+    assert page.select_one('.banner-dangerous form')['method'] == 'post'
+
+
+def test_delete_letter_contact_block(
+    client_request,
+    service_one,
+    fake_uuid,
+    get_default_letter_contact_block,
+    mocker,
+):
+    mock_delete = mocker.patch('app.service_api_client.delete_letter_contact')
+    client_request.post(
+        '.service_delete_letter_contact',
+        service_id=SERVICE_ONE_ID,
+        letter_contact_id=fake_uuid,
+        _expected_redirect=url_for(
+            'main.service_letter_contact_details',
+            service_id=SERVICE_ONE_ID,
+            _external=True,
+        )
+    )
+    mock_delete.assert_called_once_with(
+        service_id=SERVICE_ONE_ID,
+        letter_contact_id=fake_uuid,
+    )
+
+
 @pytest.mark.parametrize('fixture, data, api_default_args', [
     (get_default_sms_sender, {"is_default": "y", "sms_sender": "test"}, True),
     (get_default_sms_sender, {"sms_sender": "test"}, True),

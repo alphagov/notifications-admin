@@ -355,6 +355,7 @@ def test_returns_value_from_cache(
     (service_api_client, 'delete_reply_to_email_address', [SERVICE_ONE_ID, ''], {}),
     (service_api_client, 'add_letter_contact', [SERVICE_ONE_ID, ''], {}),
     (service_api_client, 'update_letter_contact', [SERVICE_ONE_ID] + [''] * 2, {}),
+    (service_api_client, 'delete_letter_contact', [SERVICE_ONE_ID, ''], {}),
     (service_api_client, 'add_sms_sender', [SERVICE_ONE_ID, ''], {}),
     (service_api_client, 'update_sms_sender', [SERVICE_ONE_ID] + [''] * 2, {}),
     (service_api_client, 'delete_sms_sender', [SERVICE_ONE_ID, ''], {}),

@@ -736,7 +736,16 @@ def service_add_letter_contact(service_id):
     )
 
 
-@main.route("/services/<service_id>/service-settings/letter-contact/<letter_contact_id>/edit", methods=['GET', 'POST'])
+@main.route(
+    "/services/<service_id>/service-settings/letter-contact/<letter_contact_id>/edit",
+    methods=['GET', 'POST'],
+    endpoint="service_edit_letter_contact",
+)
+@main.route(
+    "/services/<service_id>/service-settings/letter-contact/<letter_contact_id>/delete",
+    methods=['GET'],
+    endpoint="service_confirm_delete_letter_contact",
+)
 @user_has_permissions('manage_service')
 def service_edit_letter_contact(service_id, letter_contact_id):
     letter_contact_block = current_service.get_letter_contact_block(letter_contact_id)
@@ -753,10 +762,26 @@ def service_edit_letter_contact(service_id, letter_contact_id):
             is_default=True if letter_contact_block['is_default'] else form.is_default.data
         )
         return redirect(url_for('.service_letter_contact_details', service_id=service_id))
+
+    if (request.endpoint == "main.service_confirm_delete_letter_contact"):
+        flash("Are you sure you want to delete this contact block?", 'delete')
     return render_template(
         'views/service-settings/letter-contact/edit.html',
         form=form,
         letter_contact_id=letter_contact_block['id'])
+
+
+@main.route(
+    "/services/<service_id>/service-settings/letter-contact/<letter_contact_id>/delete",
+    methods=['POST'],
+)
+@user_has_permissions('manage_service')
+def service_delete_letter_contact(service_id, letter_contact_id):
+    service_api_client.delete_letter_contact(
+        service_id=current_service.id,
+        letter_contact_id=letter_contact_id,
+    )
+    return redirect(url_for('.service_letter_contact_details', service_id=current_service.id))
 
 
 @main.route("/services/<service_id>/service-settings/sms-sender", methods=['GET'])
