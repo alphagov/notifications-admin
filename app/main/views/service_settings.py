@@ -755,11 +755,10 @@ def service_edit_letter_contact(service_id, letter_contact_id):
     if request.method == 'GET':
         form.is_default.data = letter_contact_block['is_default']
     if form.validate_on_submit():
-        service_api_client.update_letter_contact(
-            current_service.id,
-            letter_contact_id=letter_contact_id,
+        current_service.edit_letter_contact_block(
+            id=letter_contact_id,
             contact_block=form.letter_contact_block.data.replace('\r', '') or None,
-            is_default=True if letter_contact_block['is_default'] else form.is_default.data
+            is_default=letter_contact_block['is_default'] or form.is_default.data
         )
         return redirect(url_for('.service_letter_contact_details', service_id=service_id))
 
@@ -769,6 +768,13 @@ def service_edit_letter_contact(service_id, letter_contact_id):
         'views/service-settings/letter-contact/edit.html',
         form=form,
         letter_contact_id=letter_contact_block['id'])
+
+
+@main.route("/services/<service_id>/service-settings/letter-contact/make-blank-default")
+@user_has_permissions('manage_service')
+def service_make_blank_default_letter_contact(service_id):
+    current_service.remove_default_letter_contact_block()
+    return redirect(url_for('.service_letter_contact_details', service_id=service_id))
 
 
 @main.route(

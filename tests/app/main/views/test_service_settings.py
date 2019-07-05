@@ -1852,10 +1852,10 @@ def test_and_more_hint_appears_on_settings_with_more_than_just_a_single_sender(
     assert get_row(page, 11) == "Sender addresses 1 Example Street …and 2 more Manage"
 
 
-@pytest.mark.parametrize('sender_list_page, expected_output', [
-    ('main.service_email_reply_to', 'test@example.com (default) Change'),
-    ('main.service_letter_contact_details', '1 Example Street (default) Change'),
-    ('main.service_sms_senders', 'GOVUK (default) Change')
+@pytest.mark.parametrize('sender_list_page, index, expected_output', [
+    ('main.service_email_reply_to', 0, 'test@example.com (default) Change'),
+    ('main.service_letter_contact_details', 1, '1 Example Street (default) Change'),
+    ('main.service_sms_senders', 0, 'GOVUK (default) Change')
 ])
 def test_api_ids_dont_show_on_option_pages_with_a_single_sender(
     client_request,
@@ -1864,7 +1864,8 @@ def test_api_ids_dont_show_on_option_pages_with_a_single_sender(
     mock_get_service_organisation,
     single_sms_sender,
     sender_list_page,
-    expected_output
+    index,
+    expected_output,
 ):
     rows = client_request.get(
         sender_list_page,
@@ -1873,34 +1874,41 @@ def test_api_ids_dont_show_on_option_pages_with_a_single_sender(
         '.user-list-item'
     )
 
-    assert normalize_spaces(rows[0].text) == expected_output
-    assert len(rows) == 1
+    assert normalize_spaces(rows[index].text) == expected_output
+    assert len(rows) == index + 1
 
 
 @pytest.mark.parametrize(
-    'sender_list_page, \
-    sample_data, \
-    expected_default_sender_output, \
-    expected_second_sender_output, \
-    expected_third_sender_output',
+    (
+        'sender_list_page,'
+        'sample_data,'
+        'expected_items,'
+    ),
     [(
         'main.service_email_reply_to',
         multiple_reply_to_email_addresses,
-        'test@example.com (default) Change 1234',
-        'test2@example.com Change 5678',
-        'test3@example.com Change 9457'
+        [
+            'test@example.com (default) Change 1234',
+            'test2@example.com Change 5678',
+            'test3@example.com Change 9457',
+        ],
     ), (
         'main.service_letter_contact_details',
         multiple_letter_contact_blocks,
-        '1 Example Street (default) Change 1234',
-        '2 Example Street Change 5678',
-        '3 Example Street Change 9457'
+        [
+            'Blank Make default',
+            '1 Example Street (default) Change 1234',
+            '2 Example Street Change 5678',
+            '3 Example Street Change 9457',
+        ],
     ), (
         'main.service_sms_senders',
         multiple_sms_senders,
-        'Example (default and receives replies) Change 1234',
-        'Example 2 Change 5678',
-        'Example 3 Change 9457'
+        [
+            'Example (default and receives replies) Change 1234',
+            'Example 2 Change 5678',
+            'Example 3 Change 9457',
+        ],
     ),
     ]
 )
@@ -1909,9 +1917,7 @@ def test_default_option_shows_for_default_sender(
     mocker,
     sender_list_page,
     sample_data,
-    expected_default_sender_output,
-    expected_second_sender_output,
-    expected_third_sender_output
+    expected_items,
 ):
     sample_data(mocker)
 
@@ -1922,10 +1928,40 @@ def test_default_option_shows_for_default_sender(
         '.user-list-item'
     )
 
-    assert normalize_spaces(rows[0].text) == expected_default_sender_output
-    assert normalize_spaces(rows[1].text) == expected_second_sender_output
-    assert normalize_spaces(rows[2].text) == expected_third_sender_output
-    assert len(rows) == 3
+    assert [normalize_spaces(row.text) for row in rows] == expected_items
+
+
+def test_remove_default_from_default_letter_contact_block(
+    client_request,
+    mocker,
+    multiple_letter_contact_blocks,
+    mock_update_letter_contact,
+):
+    letter_contact_details_page = url_for(
+        'main.service_letter_contact_details',
+        service_id=SERVICE_ONE_ID,
+        _external=True,
+    )
+
+    link = client_request.get_url(letter_contact_details_page).select_one('.user-list-item a')
+    assert link.text == 'Make default'
+    assert link['href'] == url_for(
+        '.service_make_blank_default_letter_contact',
+        service_id=SERVICE_ONE_ID,
+    )
+
+    client_request.get_url(
+        link['href'],
+        _expected_status=302,
+        _expected_redirect=letter_contact_details_page,
+    )
+
+    mock_update_letter_contact.assert_called_once_with(
+        SERVICE_ONE_ID,
+        letter_contact_id='1234',
+        contact_block='1 Example Street',
+        is_default=False,
+    )
 
 
 @pytest.mark.parametrize('sender_list_page, sample_data, expected_output', [
@@ -1937,7 +1973,7 @@ def test_default_option_shows_for_default_sender(
     (
         'main.service_letter_contact_details',
         no_letter_contact_blocks,
-        'You haven’t added any letter contact details yet'
+        'Blank (default)'
     ),
     (
         'main.service_sms_senders',
@@ -2558,14 +2594,14 @@ def test_edit_sms_sender(
     (
         'main.service_edit_letter_contact',
         get_default_letter_contact_block,
-        'This is currently your default address for service one',
+        'This is the default address for service one',
         'letter_contact_id',
         False
     ),
     (
         'main.service_edit_letter_contact',
         get_non_default_letter_contact_block,
-        'This is the default contact details for service one letters',
+        'THIS TEXT WONT BE TESTED',
         'letter_contact_id',
         True
     ),

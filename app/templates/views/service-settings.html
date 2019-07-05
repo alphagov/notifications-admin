@@ -213,8 +213,14 @@
 
         {% call settings_row(if_has_permission='letter') %}
           {{ text_field('Sender addresses') }}
-          {% call field(status='default' if current_service.default_letter_contact_block == None else '') %}
-            {{ current_service.default_letter_contact_block | string | nl2br | safe if current_service.default_letter_contact_block else 'Not set'}}
+          {% call field(status='' if current_service.count_letter_contact_details else 'default') %}
+            {% if current_service.default_letter_contact_block %}
+              {{ current_service.default_letter_contact_block_html }}
+            {% elif current_service.count_letter_contact_details %}
+              Blank
+            {% else %}
+              Not set
+            {% endif %}
             {% if current_service.count_letter_contact_details > 1 %}
               <div class="hint">
                 {{ '…and %d more' | format(current_service.count_letter_contact_details - 1) }}
