@@ -49,7 +49,11 @@
     {% endif %}
     <a href="{{ url_for(".edit_template_postage", service_id=current_service.id, template_id=template.id) }}" class="edit-template-link-letter-postage">Change</a>
     <a href="{{ url_for(".edit_service_template", service_id=current_service.id, template_id=template.id) }}" class="edit-template-link-letter-body">Edit</a>
-    <a href="{{ url_for(".set_template_sender", service_id=current_service.id, template_id=template.id) }}" class="edit-template-link-letter-contact">Edit</a>
+    {% if current_service.count_letter_contact_details %}
+      <a href="{{ url_for(".set_template_sender", service_id=current_service.id, template_id=template.id) }}" class="edit-template-link-letter-contact">Edit</a>
+    {% else %}
+      <a href="{{ url_for(".service_add_letter_contact", service_id=current_service.id, from_template=template.id) }}" class="edit-template-link-letter-contact">Edit</a>
+    {% endif %}
   {% endif %}
   {{ template|string }}
 </div>
