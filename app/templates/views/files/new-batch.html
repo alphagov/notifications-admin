@@ -15,9 +15,7 @@
 
   <div class="grid-row">
     <div class="column-five-sixths">
-      <h1 class="heading-medium">
-        {{ page_header(heading) }}
-      </h1>
+      {{ page_header(heading) }}
     </div>
     <div class="column-one-sixth">
       {% if not done %}<a href="{{ manage_link }}" class="folder-heading-manage-link">Manage</a>{% endif %}
@@ -89,39 +87,42 @@
 
   {% else %}
 
-    {% call(item, row_number) list_table(
-      files,
-      caption=uploaded_file_name,
-      caption_visible=False,
-      empty_message="No messages to show",
-      field_headings=[
-        'Recipient',
-        'Status'
-      ],
-      field_headings_visible=False
-    ) %}
-      {% call row_heading() %}
-        <a class="file-list-filename" href="{{ url_for('.batch_one_file', service_id=current_service.id, filename=item) }}">
-          {{ item }}
-        </a>
-        <p class="file-list-hint">
-          {{ addresses[row_number - 2] }}
-        </p>
-      {% endcall %}
-      {% call field(
-        status='',
-        align='right'
+    <div class="dashboard-table">
+      {% call(item, row_number) list_table(
+        files,
+        caption=uploaded_file_name,
+        caption_visible=False,
+        empty_message="No messages to show",
+        field_headings=[
+          'Recipient',
+          'Status'
+        ],
+        field_headings_visible=False
       ) %}
-        <span class="align-with-message-body">
-          {% if done %}
-          {% else %}
-            <span data-module='fake-delay' data-timeout='{{ range(800, files|length * 2000) | random }}' data-message='Checking'>
-              Ready to send
-            </span>
-          {% endif %}
-        </span>
+        {% call row_heading() %}
+          <a class="file-list-filename" href="{{ url_for('.batch_one_file', service_id=current_service.id, filename=item) }}">
+            {{ addresses[row_number - 2] }}
+          </a>
+          <p class="file-list-hint">
+            {{ item }}
+          </p>
+        {% endcall %}
+        {% call field(
+          status='',
+          align='right'
+        ) %}
+          <span class="align-with-message-body">
+            {% if done %}
+            {% else %}
+              <span data-module='fake-delay' data-timeout='{{ range(800, files|length * 2000) | random }}' data-message='Checking'>
+                Ready to send
+              </span>
+            {% endif %}
+          </span>
+        {% endcall %}
       {% endcall %}
-    {% endcall %}
+    </div>
+
   {% endif %}
 
   {% if done %}
