@@ -69,6 +69,9 @@
         <ul class="column-three-quarters">
           <li class="browse-list-item">
             <a href="{{ url_for('.organisations') }}" class="browse-list-link">All organisations</a>
+            <p class="browse-list-hint">
+              {{ org_count|format_thousands }} organisations, {{ live_service_count|format_thousands }} live services
+            </p>
           </li>
         </ul>
       </div>

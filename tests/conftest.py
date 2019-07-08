@@ -3121,7 +3121,15 @@ def mock_get_organisations(mocker):
             organisation_json('7aa5d4e9-4385-4488-a489-07812ba13385', 'Org 3'),
         ]
 
-    return mocker.patch('app.organisations_client.get_organisations', side_effect=_get_organisations)
+    mocker.patch(
+        'app.models.organisation.Organisations.client',
+        side_effect=_get_organisations,
+    )
+
+    return mocker.patch(
+        'app.notify_client.organisations_api_client.organisations_client.get_organisations',
+        side_effect=_get_organisations,
+    )
 
 
 @pytest.fixture(scope='function')

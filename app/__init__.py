@@ -345,6 +345,10 @@ def format_delta(date):
     )
 
 
+def format_thousands(number):
+    return "{:,.0f}".format(number)
+
+
 def valid_phone_number(phone_number):
     try:
         validate_phone_number(phone_number)
@@ -688,6 +692,7 @@ def add_template_filters(application):
         formatted_list,
         nl2br,
         format_phone_number_human_readable,
+        format_thousands,
         id_safe,
     ]:
         application.add_template_filter(fn)
