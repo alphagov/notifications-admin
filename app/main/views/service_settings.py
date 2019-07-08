@@ -19,6 +19,7 @@ from app import (
     billing_api_client,
     current_service,
     email_branding_client,
+    format_thousands,
     inbound_number_client,
     letter_branding_client,
     notification_api_client,
@@ -212,9 +213,9 @@ def submit_request_to_go_live(service_id):
             service_dashboard=url_for('main.service_dashboard', service_id=current_service.id, _external=True),
             organisation_type=str(current_service.organisation_type).title(),
             agreement=current_service.organisation.as_human_readable(current_user.email_domain),
-            volume_email_formatted=format_if_number(current_service.volume_email),
-            volume_sms_formatted=format_if_number(current_service.volume_sms),
-            volume_letter_formatted=format_if_number(current_service.volume_letter),
+            volume_email_formatted=format_thousands(current_service.volume_email),
+            volume_sms_formatted=format_thousands(current_service.volume_sms),
+            volume_letter_formatted=format_thousands(current_service.volume_letter),
             research_consent='Yes' if current_service.consent_to_research else 'No',
             existing_live='Yes' if current_user.live_services else 'No',
             email_address=current_user.email_address,
@@ -1121,7 +1122,3 @@ def check_contact_details_type(contact_details):
         return 'email_address'
     else:
         return 'phone_number'
-
-
-def format_if_number(value):
-    return '{:,.0f}'.format(value) if isinstance(value, int) else ''

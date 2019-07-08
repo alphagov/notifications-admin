@@ -25,6 +25,7 @@ from notifications_utils.template import Template, WithSubjectTemplate
 from app import (
     current_service,
     format_datetime_short,
+    format_thousands,
     job_api_client,
     notification_api_client,
     service_api_client,
@@ -186,8 +187,8 @@ def cancel_letter_job(service_id, job_id):
         except HTTPError as e:
             flash(e.message, 'dangerous')
             return redirect(url_for('main.view_job', service_id=service_id, job_id=job_id))
-        flash("Cancelled {:,.0f} letters from {}".format(
-            number_of_letters, job['original_file_name']
+        flash("Cancelled {} letters from {}".format(
+            format_thousands(number_of_letters), job['original_file_name']
         ), 'default_with_tick')
         return redirect(url_for('main.service_dashboard', service_id=service_id))
 
