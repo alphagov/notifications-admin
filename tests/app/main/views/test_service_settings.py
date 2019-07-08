@@ -60,7 +60,7 @@ def mock_get_service_settings_page_common(
     (active_user_with_permissions, [
 
         'Label Value Action',
-        'Service name service one Change',
+        'Service name Test Service Change',
         'Sign-in method Text message code Change',
 
         'Label Value Action',
@@ -82,7 +82,7 @@ def mock_get_service_settings_page_common(
     (platform_admin_user, [
 
         'Label Value Action',
-        'Service name service one Change',
+        'Service name Test Service Change',
         'Sign-in method Text message code Change',
 
         'Label Value Action',
@@ -103,8 +103,7 @@ def mock_get_service_settings_page_common(
         'Label Value Action',
         'Live Off Change',
         'Count in list of live services Yes Change',
-        'Organisation Test Organisation Change',
-        'Organisation type Central Change',
+        'Organisation Test Organisation Central government Change',
         'Free text message allowance 250,000 Change',
         'Email branding GOV.UK Change',
         'Letter branding Not set Change',
@@ -117,7 +116,7 @@ def mock_get_service_settings_page_common(
 def test_should_show_overview(
         client,
         mocker,
-        service_one,
+        api_user_active,
         fake_uuid,
         no_reply_to_email_addresses,
         no_letter_contact_blocks,
@@ -127,12 +126,15 @@ def test_should_show_overview(
         expected_rows,
         mock_get_service_settings_page_common,
 ):
-
-    service_one['permissions'] = ['sms', 'email']
+    service_one = service_json(SERVICE_ONE_ID,
+                               users=[api_user_active['id']],
+                               permissions=['sms', 'email'],
+                               organisation_id=ORGANISATION_ID)
+    mocker.patch('app.service_api_client.get_service', return_value={'data': service_one})
 
     client.login(user(fake_uuid), mocker, service_one)
     response = client.get(url_for(
-        'main.service_settings', service_id=service_one['id']
+        'main.service_settings', service_id=SERVICE_ONE_ID
     ))
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
@@ -141,7 +143,7 @@ def test_should_show_overview(
     assert len(rows) == len(expected_rows)
     for index, row in enumerate(expected_rows):
         assert row == " ".join(rows[index].text.split())
-    app.service_api_client.get_service.assert_called_with(service_one['id'])
+    app.service_api_client.get_service.assert_called_with(SERVICE_ONE_ID)
 
 
 def test_no_go_live_link_for_service_without_organisation(
@@ -149,7 +151,6 @@ def test_no_go_live_link_for_service_without_organisation(
     mocker,
     no_reply_to_email_addresses,
     no_letter_contact_blocks,
-    mock_get_service_organisation,
     single_sms_sender,
     platform_admin_user,
     mock_get_service_settings_page_common,
@@ -163,8 +164,33 @@ def test_no_go_live_link_for_service_without_organisation(
         'Live No (organisation must be set first)'
     )
     assert normalize_spaces(page.select('tr')[18].text) == (
-        'Organisation Not set Change'
+        'Organisation Not set Central government Change'
     )
+
+
+def test_organisation_name_links_to_org_dashboard(
+    client_request,
+    platform_admin_user,
+    no_reply_to_email_addresses,
+    no_letter_contact_blocks,
+    single_sms_sender,
+    mock_get_service_settings_page_common,
+    mocker,
+    mock_get_service_organisation,
+):
+    service_one = service_json(SERVICE_ONE_ID,
+                               permissions=['sms', 'email'],
+                               organisation_id=ORGANISATION_ID)
+    mocker.patch('app.service_api_client.get_service', return_value={'data': service_one})
+
+    client_request.login(platform_admin_user, service_one)
+    response = client_request.get(
+        'main.service_settings', service_id=SERVICE_ONE_ID
+    )
+
+    org_row = response.select('tr')[18]
+    assert org_row.find('a')['href'] == url_for('main.organisation_dashboard', org_id=ORGANISATION_ID)
+    assert normalize_spaces(org_row.find('a').text) == 'Test Organisation'
 
 
 @pytest.mark.parametrize('permissions, expected_rows', [
@@ -3288,7 +3314,6 @@ def test_should_set_branding_and_organisations(
 
 @pytest.mark.parametrize('method', ['get', 'post'])
 @pytest.mark.parametrize('endpoint', [
-    'main.set_organisation_type',
     'main.set_free_sms_allowance',
 ])
 def test_organisation_type_pages_are_platform_admin_only(
@@ -3302,64 +3327,6 @@ def test_organisation_type_pages_are_platform_admin_only(
         _expected_status=403,
         _test_page_title=False,
     )
-
-
-def test_should_show_page_to_set_organisation_type(
-    logged_in_platform_admin_client,
-):
-    response = logged_in_platform_admin_client.get(url_for(
-        'main.set_organisation_type',
-        service_id=SERVICE_ONE_ID
-    ))
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-
-    labels = page.select('label')
-    checked_radio_buttons = page.select('input[checked]')
-
-    assert len(checked_radio_buttons) == 1
-    assert checked_radio_buttons[0]['value'] == 'central'
-
-    assert len(labels) == 3
-    for index, expected in enumerate((
-        'Central government',
-        'Local government',
-        'NHS',
-    )):
-        assert normalize_spaces(labels[index].text) == expected
-
-
-@pytest.mark.parametrize('organisation_type, free_allowance', [
-    ('central', 250000),
-    ('local', 25000),
-    ('nhs', 25000),
-    pytest.param('private sector', 1000, marks=pytest.mark.xfail)
-])
-def test_should_set_organisation_type(
-    logged_in_platform_admin_client,
-    mock_update_service,
-    organisation_type,
-    free_allowance,
-    mock_create_or_update_free_sms_fragment_limit
-):
-    response = logged_in_platform_admin_client.post(
-        url_for(
-            'main.set_organisation_type',
-            service_id=SERVICE_ONE_ID,
-        ),
-        data={
-            'organisation_type': organisation_type,
-            'organisation': 'organisation-id'
-        },
-    )
-    assert response.status_code == 302
-    assert response.location == url_for('main.service_settings', service_id=SERVICE_ONE_ID, _external=True)
-
-    mock_update_service.assert_called_once_with(
-        SERVICE_ONE_ID,
-        organisation_type=organisation_type,
-    )
-    mock_create_or_update_free_sms_fragment_limit.assert_called_once_with(SERVICE_ONE_ID, free_allowance)
 
 
 def test_should_show_page_to_set_sms_allowance(

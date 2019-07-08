@@ -308,16 +308,27 @@
 
           {% call row() %}
             {{ text_field('Organisation')}}
-            {{ optional_text_field(current_service.organisation.name) }}
+            {% call field() %}
+              {% if current_service.organisation_id %}
+                <a href="{{ url_for('main.organisation_dashboard', org_id=current_service.organisation_id) }}">
+                  {{ current_service.organisation.name }}
+                </a>
+              {% else %}
+                <span class="table-field-status-default">Not set</span>
+              {% endif %}
+              {% if current_service.organisation_type %}
+                <div class="hint">
+                  {{ {
+                    'central': 'Central government',
+                    'local': 'Local government',
+                    'nhs': 'NHS',
+                  }.get(current_service.organisation_type) }}
+                </div>
+              {% endif %}
+            {% endcall %}
             {{ edit_field('Change', url_for('.link_service_to_organisation', service_id=current_service.id)) }}
           {% endcall %}
-          {% call row() %}
-            {{ text_field('Organisation type')}}
-            {{ optional_text_field(
-              (current_service.organisation_type or '')|title
-            ) }}
-            {{ edit_field('Change', url_for('.set_organisation_type', service_id=current_service.id)) }}
-          {% endcall %}
+
           {% call row() %}
             {{ text_field('Free text message allowance')}}
             {{ text_field('{:,}'.format(current_service.free_sms_fragment_limit)) }}

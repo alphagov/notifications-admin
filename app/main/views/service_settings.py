@@ -36,7 +36,6 @@ from app.main.forms import (
     FreeSMSAllowance,
     InternationalSMSForm,
     LinkOrganisationsForm,
-    OrganisationTypeForm,
     PreviewBranding,
     RenameServiceForm,
     SearchByNameForm,
@@ -857,29 +856,6 @@ def service_set_letter_contact_block(service_id):
     return render_template(
         'views/service-settings/set-letter-contact-block.html',
         form=form
-    )
-
-
-@main.route("/services/<service_id>/service-settings/set-organisation-type", methods=['GET', 'POST'])
-@user_is_platform_admin
-def set_organisation_type(service_id):
-
-    form = OrganisationTypeForm(organisation_type=current_service.organisation_type)
-
-    if form.validate_on_submit():
-        free_sms_fragment_limit = current_app.config['DEFAULT_FREE_SMS_FRAGMENT_LIMITS'].get(
-            form.organisation_type.data)
-
-        current_service.update(
-            organisation_type=form.organisation_type.data,
-        )
-        billing_api_client.create_or_update_free_sms_fragment_limit(service_id, free_sms_fragment_limit)
-
-        return redirect(url_for('.service_settings', service_id=service_id))
-
-    return render_template(
-        'views/service-settings/set-organisation-type.html',
-        form=form,
     )
 
 
