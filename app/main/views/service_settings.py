@@ -713,7 +713,7 @@ def service_add_letter_contact(service_id):
         )
         if request.args.get('from_template'):
             return redirect(
-                url_for('.set_template_sender', service_id=service_id, template_id=request.args.get('from_template'))
+                url_for('.view_template', service_id=service_id, template_id=request.args.get('from_template'))
             )
         return redirect(url_for('.service_letter_contact_details', service_id=service_id))
     return render_template(
