@@ -23,9 +23,7 @@
           hide_legend=True
         ) }}
         {{ page_footer('Continue') }}
-        {% if no_senders %}
-          <a href="{{ url_for('.service_add_letter_contact', service_id=current_service.id, from_template=template_id) }}">Add new sender</a>
-        {% endif %}
+        <a href="{{ url_for('.service_add_letter_contact', service_id=current_service.id, from_template=template_id) }}">Add new sender</a>
       {% endcall %}
     </div>
   </div>

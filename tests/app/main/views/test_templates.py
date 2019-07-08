@@ -2161,16 +2161,15 @@ def test_set_template_sender(
     )
 
 
-@pytest.mark.parametrize('fixture, add_button_is_on_page', [
-    (no_letter_contact_blocks, True),
-    (single_letter_contact_block, False),
+@pytest.mark.parametrize('fixture', [
+    no_letter_contact_blocks,
+    single_letter_contact_block,
 ])
 def test_add_sender_link_only_appears_on_services_with_no_senders(
     client_request,
     fake_uuid,
     mocker,
     fixture,
-    add_button_is_on_page,
     mock_get_service_letter_template,
     no_letter_contact_blocks
 ):
@@ -2181,4 +2180,8 @@ def test_add_sender_link_only_appears_on_services_with_no_senders(
         template_id=fake_uuid,
     )
 
-    assert (page.select_one('.column-three-quarters form > a') is not None) == add_button_is_on_page
+    assert page.select_one('.column-three-quarters form > a')['href'] == url_for(
+        'main.service_add_letter_contact',
+        service_id=SERVICE_ONE_ID,
+        from_template=fake_uuid,
+    )
