@@ -6,7 +6,6 @@
   {% if current_user.has_permissions('view_activity') %}
     <li><a href="{{ url_for('.service_dashboard', service_id=current_service.id) }}" {{ main_navigation.is_selected('dashboard') }}>Dashboard</a></li>
   {% endif %}
-  {% if current_user.has_permissions() %}
     <li><a href="{{ url_for('.choose_template', service_id=current_service.id) }}" {{ main_navigation.is_selected('templates') }}>Templates</a></li>
     <li><a href="{{ url_for('.files', service_id=current_service.id) }}" {{ main_navigation.is_selected('uploads') }}>Uploads</a></li>
   {% if not current_user.has_permissions('view_activity') %}
