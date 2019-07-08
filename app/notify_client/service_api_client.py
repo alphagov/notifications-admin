@@ -114,6 +114,13 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             go_live_at=str(datetime.utcnow()) if live else None
         )
 
+    @cache.delete('live-service-and-organisation-counts')
+    def update_count_as_live(self, service_id, count_as_live):
+        return self.update_service(
+            service_id,
+            count_as_live=count_as_live,
+        )
+
     # This method is not cached because it calls through to one which is
     def update_service_with_properties(self, service_id, properties):
         return self.update_service(service_id, **properties)

@@ -263,7 +263,7 @@ def service_switch_count_as_live(service_id):
     )
 
     if form.validate_on_submit():
-        current_service.update(count_as_live=form.enabled.data)
+        current_service.update_count_as_live(form.enabled.data)
         return redirect(url_for('.service_settings', service_id=service_id))
 
     return render_template(
