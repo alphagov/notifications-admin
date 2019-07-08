@@ -2168,6 +2168,7 @@ def test_add_letter_contact_when_coming_from_template(
     mock_add_letter_contact,
     fake_uuid,
     mock_get_service_letter_template,
+    mock_update_service_template_sender,
 ):
     page = client_request.get(
         'main.service_add_letter_contact',
@@ -2200,6 +2201,11 @@ def test_add_letter_contact_when_coming_from_template(
         SERVICE_ONE_ID,
         contact_block="1 Example Street",
         is_default=True,
+    )
+    mock_update_service_template_sender.assert_called_once_with(
+        SERVICE_ONE_ID,
+        fake_uuid,
+        '1234',
     )
 
 

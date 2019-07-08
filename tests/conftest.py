@@ -270,7 +270,14 @@ def get_non_default_letter_contact_block(mocker):
 @pytest.fixture(scope='function')
 def mock_add_letter_contact(mocker):
     def _add_letter_contact(service_id, contact_block, is_default=False):
-        return
+        return {'data': {
+            'id': '1234',
+            'service_id': service_id,
+            'contact_block': '1 Example Street',
+            'is_default': True,
+            'created_at': str(datetime.utcnow()),
+            'updated_at': None
+        }}
 
     return mocker.patch('app.service_api_client.add_letter_contact', side_effect=_add_letter_contact)
 
