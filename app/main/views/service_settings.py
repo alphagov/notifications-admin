@@ -705,13 +705,13 @@ def service_letter_contact_details(service_id):
 def service_add_letter_contact(service_id):
     form = ServiceLetterContactBlockForm()
     first_contact_block = current_service.count_letter_contact_details == 0
+    from_template = request.args.get('from_template')
     if form.validate_on_submit():
         new_letter_contact = service_api_client.add_letter_contact(
             current_service.id,
             contact_block=form.letter_contact_block.data.replace('\r', '') or None,
             is_default=first_contact_block if first_contact_block else form.is_default.data
         )
-        from_template = request.args.get('from_template')
         if from_template:
             service_api_client.update_service_template_sender(
                 service_id,
@@ -726,6 +726,11 @@ def service_add_letter_contact(service_id):
         'views/service-settings/letter-contact/add.html',
         form=form,
         first_contact_block=first_contact_block,
+        back_link=(
+            url_for('main.view_template', template_id=from_template, service_id=current_service.id)
+            if from_template
+            else url_for('.service_letter_contact_details', service_id=current_service.id)
+        ),
     )
 
 
