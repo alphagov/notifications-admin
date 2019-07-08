@@ -33,7 +33,7 @@
             <label for="{{id}}">{{label}}</label>
           </div>
         {{/choices}}
-        <input type='button' class='js-reset-button js-reset-button-block' value='Done' />
+        <input type='button' class='js-done-button js-done-button-block' value='Done' />
       </div>
     `),
     'chosen': Hogan.compile(`
@@ -82,6 +82,12 @@
       });
       let categories = $component.data('categories').split(',');
       let name = $component.find('input').eq(0).attr('name');
+      let reset = () => {
+        render('initial', {
+          'categories': categories,
+          'name': name
+        });
+      };
 
       $component
         .on('click', '.js-category-button', function(event) {
@@ -132,14 +138,31 @@
           focusSelected();
 
         })
+        .on('click', '.js-done-button', function(event) {
+
+          event.preventDefault();
+          let $selection = $('input[type=radio]:checked', this.parentNode);
+          if ($selection.length) {
+
+            render('chosen', {
+              'choices': choices.filter(
+                element => element.value == $selection.eq(0).attr('value')
+              ),
+              'name': name
+            });
+
+          } else {
+
+            reset();
+
+          }
+          focusSelected();
+
+        })
         .on('click', '.js-reset-button', function(event) {
 
           event.preventDefault();
-          render('initial', {
-            'categories': categories,
-            'name': name
-          });
-          focusSelected();
+          reset();
 
         });
 
