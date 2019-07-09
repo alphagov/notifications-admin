@@ -65,6 +65,9 @@ class Service(JSONModel):
     def update(self, **kwargs):
         return service_api_client.update_service(self.id, **kwargs)
 
+    def update_count_as_live(self, count_as_live):
+        return service_api_client.update_count_as_live(self.id, count_as_live=count_as_live)
+
     def update_status(self, live):
         return service_api_client.update_status(self.id, live=live)
 

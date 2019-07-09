@@ -157,16 +157,21 @@ def test_choose_account_should_show_choose_accounts_page_if_no_services(
 def test_choose_account_should_should_organisations_link_for_platform_admin(
     client_request,
     platform_admin_user,
+    mock_get_organisations,
     mock_get_orgs_and_services,
     mock_get_organisation_services,
+    mock_get_service_and_organisation_counts,
 ):
     client_request.login(platform_admin_user)
 
     page = client_request.get('main.choose_account')
 
-    first_link = page.select_one('.browse-list-item a')
+    first_item = page.select_one('.browse-list-item')
+    first_link = first_item.select_one('a')
+    first_hint = first_item.select_one('.browse-list-hint')
     assert first_link.text == 'All organisations'
     assert first_link['href'] == url_for('main.organisations')
+    assert normalize_spaces(first_hint.text) == '3 organisations, 9,999 live services'
 
 
 def test_choose_account_should_show_back_to_service_link(

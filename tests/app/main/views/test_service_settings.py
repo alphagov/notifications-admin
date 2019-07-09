@@ -3647,6 +3647,8 @@ def test_service_switch_can_upload_document_lets_contact_details_be_added_and_sh
 def test_archive_service_after_confirm(
     client_request,
     mocker,
+    mock_get_organisations,
+    mock_get_service_and_organisation_counts,
     mock_get_organisations_and_services_for_user,
     user,
     fake_uuid,

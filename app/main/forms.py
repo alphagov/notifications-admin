@@ -34,6 +34,7 @@ from wtforms.fields.html5 import EmailField, SearchField, TelField
 from wtforms.validators import URL, DataRequired, Length, Optional, Regexp
 from wtforms.widgets import CheckboxInput, ListWidget
 
+from app import format_thousands
 from app.main.validators import (
     Blacklist,
     CsvFileValidator,
@@ -209,9 +210,9 @@ class ForgivingIntegerField(StringField):
             error = None
             try:
                 if int(self.data) > self.POSTGRES_MAX_INT:
-                    error = 'Number of {} must be {:,.0f} or less'.format(
+                    error = 'Number of {} must be {} or less'.format(
                         self.things,
-                        self.POSTGRES_MAX_INT,
+                        format_thousands(self.POSTGRES_MAX_INT),
                     )
             except ValueError:
                 error = 'Enter the number of {} {}'.format(
@@ -234,7 +235,7 @@ class ForgivingIntegerField(StringField):
 
         try:
             value = int(self.data)
-            value = '{:,.0f}'.format(value)
+            value = format_thousands(value)
         except (ValueError, TypeError):
             value = self.data if self.data is not None else ''
 

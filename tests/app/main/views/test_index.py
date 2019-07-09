@@ -34,7 +34,7 @@ def test_non_logged_in_user_can_see_homepage(
     assert normalize_spaces(page.select_one('#whos-using-notify').text) == (
         'Who’s using GOV.UK Notify '
         'Services '
-        '9999 services '
+        '9,999 services '
         'Organisations '
         '111 organisations '
         'See the list of services and organisations.'

@@ -3,6 +3,7 @@ import os
 import urllib
 from datetime import datetime, timedelta, timezone
 from functools import partial
+from numbers import Number
 from time import monotonic
 
 import ago
@@ -343,6 +344,14 @@ def format_delta(date):
         past_tense='{} ago',
         precision=1
     )
+
+
+def format_thousands(value):
+    if isinstance(value, Number):
+        return '{:,.0f}'.format(value)
+    if value is None:
+        return ''
+    return value
 
 
 def valid_phone_number(phone_number):
@@ -688,6 +697,7 @@ def add_template_filters(application):
         formatted_list,
         nl2br,
         format_phone_number_human_readable,
+        format_thousands,
         id_safe,
     ]:
         application.add_template_filter(fn)
