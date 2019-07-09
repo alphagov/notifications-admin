@@ -57,11 +57,8 @@
     `)
   };
 
-  let focusSelected = function() {
-    setTimeout(
-      () => $('[type=radio]:checked').next('label').blur().trigger('focus').addClass('selected'),
-      50
-    );
+  let focusSelected = function(component) {
+    $('[type=radio]:checked', component).focus();
   };
 
   Modules.RadioSelect = function() {
@@ -96,7 +93,7 @@
           ),
           'name': name
         });
-        focusSelected();
+        focusSelected(component);
       };
       const trackMouseup = (event) => {
         const parentNode = event.target.parentNode;
@@ -124,7 +121,7 @@
             ),
             'name': name
           });
-          focusSelected();
+          focusSelected(component);
 
         })
         .on('mousedown', '.js-option', function(event) {
@@ -164,13 +161,14 @@
             reset();
 
           }
-          focusSelected();
+          focusSelected(component);
 
         })
         .on('click', '.js-reset-button', function(event) {
 
           event.preventDefault();
           reset();
+          focusSelected(component);
 
         });
 

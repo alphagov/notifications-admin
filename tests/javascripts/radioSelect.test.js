@@ -156,27 +156,41 @@ describe('RadioSelect', () => {
 
     CATEGORIES.forEach((category, idx) => {
 
-      test(`clicking the button for ${category} should show the options for it, with the right label and value`, () => {
+      describe(`clicking the button for ${category} should`, () => {
 
-        // get all the options in the original page for this category
-        originalOptionsForCategory = originalOptionsForAllCategories.filter(option => option.label === category);
+        beforeEach(() => {
 
-        // start module
-        window.GOVUK.modules.start();
+          // get all the options in the original page for this category
+          originalOptionsForCategory = originalOptionsForAllCategories.filter(option => option.label === category);
 
-        clickButtonForCategory(category);
+          // start module
+          window.GOVUK.modules.start();
 
-        // check options this reveals against those originally in the page for this category
-        const options = document.querySelector('.radio-select-column:nth-child(2) .multiple-choice');
+          clickButtonForCategory(category);
+        
+        });
+        
+        test("show the options for it, with the right label and value", () => {
 
-        const optionsThatMatchOriginals = Array.from(options).filter((option, idx) => {
-          const optionData = getDataFromOption(option);
-          const originalOption = originalOptionsForCategory[idx];
-          
-          return optionData.value === originalOption.value && optionData.label === originalOption.label;
+          // check options this reveals against those originally in the page for this category
+          const options = document.querySelector('.radio-select-column:nth-child(2) .multiple-choice');
+
+          const optionsThatMatchOriginals = Array.from(options).filter((option, idx) => {
+            const optionData = getDataFromOption(option);
+            const originalOption = originalOptionsForCategory[idx];
+            
+            return optionData.value === originalOption.value && optionData.label === originalOption.label;
+          });
+
+          expect(optionsThatMatchOriginals.length).toEqual(originalOptionsForCategory.length);
+
         });
 
-        expect(optionsThatMatchOriginals.length).toEqual(originalOptionsForCategory.length);
+        test("keep focus on the default time slot", () => {
+
+          expect(document.activeElement).toBe(document.getElementById('scheduled_for-0'));
+
+        });
 
       });
 
@@ -244,6 +258,14 @@ describe('RadioSelect', () => {
         expect(button.getAttribute('value')).toEqual('Choose a different time');
 
       })
+
+      test("focus the selected option", () => {
+
+        selectedOption = document.querySelector('.radio-select-column:nth-child(2) input[checked=checked]');
+
+        expect(document.activeElement).toBe(selectedOption);
+
+      });
 
     });
 
@@ -355,22 +377,32 @@ describe('RadioSelect', () => {
 
     });
 
-    describe("after selecting an option", () => {
+    describe("after selecting an option clicking the 'Choose a different time' button should", () => {
 
-      test("clicking the 'Choose a different time' button should reset the module", () => {
+      beforeEach(() => {
 
         // select the first option
         const firstOption = document.querySelector('.radio-select-column:nth-child(2) input[type=radio]');
 
-        helpers.triggerEvent(firstOption, 'click');
+        helpers.clickElementWithMouse(firstOption);
 
         // click the 'Choose a different time' button
         const resetButton = document.querySelector('.radio-select-column:nth-child(3) input[type=button]');
         helpers.triggerEvent(resetButton, 'click');
 
+      });
+
+      test("reset the module", () => {
+
         categoryButtons = document.querySelectorAll('.radio-select-column:nth-child(2) .js-category-button');
 
         expect(categoryButtons.length).toEqual(CATEGORIES.length);
+
+      });
+
+      test("focus the default option", () => {
+
+        expect(document.activeElement).toBe(document.getElementById('scheduled_for-0'));
 
       });
 
