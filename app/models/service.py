@@ -32,7 +32,6 @@ class Service(JSONModel):
         'letter_contact_block',
         'message_limit',
         'name',
-        'organisation_type',
         'permissions',
         'prefix_sms',
         'research_mode',
@@ -408,6 +407,10 @@ class Service(JSONModel):
     @property
     def organisation_id(self):
         return self._dict['organisation']
+
+    @property
+    def organisation_type(self):
+        return self.organisation.organisation_type or self._dict['organisation_type']
 
     @cached_property
     def inbound_number(self):

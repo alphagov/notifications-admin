@@ -2,6 +2,7 @@ import uuid
 
 from app.models.service import Service
 from app.models.user import User
+from tests import organisation_json
 
 INV_PARENT_FOLDER_ID = '7e979e79-d970-43a5-ac69-b625a8d147b0'
 INV_CHILD_1_FOLDER_ID = '92ee1ee0-e4ee-4dcc-b1a7-a5da9ebcfa2b'
@@ -173,3 +174,20 @@ def test_get_template_folders_shows_all_folders_when_user_id_not_passed_in(
             'users_with_permission': [active_user_with_permissions['id']],
         }
     ]
+
+
+def test_organisation_type_when_services_organisation_has_no_org_type(mocker, service_one, organisation_one):
+    service = Service(service_one)
+    mocker.patch('app.organisations_client.get_service_organisation', return_value=organisation_one)
+
+    assert not organisation_one['organisation_type']
+    assert service.organisation_type == 'central'
+
+
+def test_organisation_type_when_service_and_its_org_both_have_an_org_type(mocker, service_one):
+    # service_one has an organisation_type of 'central'
+    service = Service(service_one)
+    org = organisation_json(organisation_type='local')
+    mocker.patch('app.organisations_client.get_service_organisation', return_value=org)
+
+    assert service.organisation_type == 'local'
