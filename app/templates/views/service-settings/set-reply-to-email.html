@@ -5,13 +5,13 @@
 {% from "components/form.html" import form_wrapper %}
 
 {% block service_page_title %}
-  Email reply-to address
+  Reply-to email address
 {% endblock %}
 
 {% block maincolumn_content %}
 
   {{ page_header(
-    'Email reply-to address',
+    'Reply-to email address',
     back_link=url_for('.service_settings', service_id=current_service.id)
   ) }}
 
@@ -19,7 +19,7 @@
     Your emails will be sent from
     {{ current_service.email_from }}@notifications.service.gov.uk.
     This is so they have the best chance of being delivered.
-    This email address can’t receive replies.
+    This email address cannot receive replies.
   </p>
   <p>
     Set up a separate email address to receive replies from
@@ -27,7 +27,7 @@
   </p>
   {% if current_service.trial_mode %}
     <p>
-      Your service can’t go live until you’ve done this.
+      Your service cannot go live until you’ve done this.
     </p>
   {% endif %}
   {% call form () %}
