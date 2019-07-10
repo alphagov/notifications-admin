@@ -65,7 +65,7 @@ def mock_get_service_settings_page_common(
 
         'Label Value Action',
         'Send emails On Change',
-        'Email reply-to addresses Not set Change',
+        'Reply-to email addresses Not set Change',
         'Email branding GOV.UK Change',
 
         'Label Value Action',
@@ -87,7 +87,7 @@ def mock_get_service_settings_page_common(
 
         'Label Value Action',
         'Send emails On Change',
-        'Email reply-to addresses Not set Change',
+        'Reply-to email addresses Not set Change',
         'Email branding GOV.UK Change',
 
         'Label Value Action',
@@ -175,7 +175,7 @@ def test_no_go_live_link_for_service_without_organisation(
 
         'Label Value Action',
         'Send emails On Change',
-        'Email reply-to addresses test@example.com Manage',
+        'Reply-to email addresses test@example.com Manage',
         'Email branding Your branding (Organisation name) Change',
 
         'Label Value Action',
@@ -196,7 +196,7 @@ def test_no_go_live_link_for_service_without_organisation(
 
         'Label Value Action',
         'Send emails On Change',
-        'Email reply-to addresses test@example.com Manage',
+        'Reply-to email addresses test@example.com Manage',
         'Email branding Your branding (Organisation name) Change',
 
         'Label Value Action',
@@ -698,12 +698,12 @@ def test_should_check_if_estimated_volumes_provided(
 ), [
     pytest.param(None, 0, [], '', marks=pytest.mark.xfail(raises=IndexError)),
     pytest.param(0, 0, [], '', marks=pytest.mark.xfail(raises=IndexError)),
-    (None, 1, [], 'Add an email reply-to address Not completed'),
-    (None, 1, [{}], 'Add an email reply-to address Completed'),
-    (1, 1, [], 'Add an email reply-to address Not completed'),
-    (1, 1, [{}], 'Add an email reply-to address Completed'),
-    (1, 0, [], 'Add an email reply-to address Not completed'),
-    (1, 0, [{}], 'Add an email reply-to address Completed'),
+    (None, 1, [], 'Add a reply-to email address Not completed'),
+    (None, 1, [{}], 'Add a reply-to email address Completed'),
+    (1, 1, [], 'Add a reply-to email address Not completed'),
+    (1, 1, [{}], 'Add a reply-to email address Completed'),
+    (1, 0, [], 'Add a reply-to email address Not completed'),
+    (1, 0, [{}], 'Add a reply-to email address Completed'),
 ])
 def test_should_check_for_sending_things_right(
     client_request,
@@ -1821,7 +1821,7 @@ def test_and_more_hint_appears_on_settings_with_more_than_just_a_single_sender(
             page.select('tbody tr')[index].text
         )
 
-    assert get_row(page, 3) == "Email reply-to addresses test@example.com …and 2 more Manage"
+    assert get_row(page, 3) == "Reply-to email addresses test@example.com …and 2 more Manage"
     assert get_row(page, 6) == "Text message sender Example …and 2 more Manage"
     assert get_row(page, 11) == "Sender addresses 1 Example Street …and 2 more Manage"
 
@@ -1906,7 +1906,7 @@ def test_default_option_shows_for_default_sender(
     (
         'main.service_email_reply_to',
         no_reply_to_email_addresses,
-        'You haven’t added any email reply-to addresses yet'
+        'You haven’t added any reply-to email addresses yet'
     ),
     (
         'main.service_letter_contact_details',
@@ -2359,7 +2359,7 @@ def test_confirm_delete_reply_to_email_address(
     )
 
     assert normalize_spaces(page.select_one('.banner-dangerous').text) == (
-        'Are you sure you want to delete this email reply-to address? '
+        'Are you sure you want to delete this reply-to email address? '
         'Yes, delete'
     )
     assert 'action' not in page.select_one('.banner-dangerous form')
