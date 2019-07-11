@@ -20,8 +20,7 @@
           Your service can receive text messages sent to {{ current_service.inbound_number }}.
         </p>
         <p>
-          If you want to switch this feature off,
-          <a href="{{ url_for('.support') }}">get in touch with the GOV.UK&nbsp;Notify team</a>.
+          <a href="{{ url_for('.support') }}">Contact us</a> if you want to switch this feature off.
         </p>
         {% if current_user.has_permissions('manage_api_keys') %}
           <p>
@@ -31,8 +30,7 @@
         {% endif %}
       {% else %}
         <p>
-          If you want to be able to receive text messages from your users, please
-          <a href="{{ url_for('.support') }}">get in touch</a>.
+          <a href="{{ url_for('.support') }}">Contact us</a> if you want to be able to receive text messages from your users.
         </p>
         <p>
           We’ll create a special phone number for your users to contact. You'll be able to see
