@@ -9,19 +9,26 @@
 {% block maincolumn_content %}
 
     <h1 class="heading-large">
-      Thanks for contacting GOV.UK Notify
+      Thanks for contacting us
     </h1>
     <p>
-      {% if anonymous %}
-        We’ll look into it
+      {% if out_of_hours_emergency %}
+        We’ll reply in the next 30 minutes.
       {% else %}
-        We’ll get back to you
-      {% endif %}
-
-      {% if urgent %}
-        within 30 minutes.
-      {% else %}
-        by the next working day.
+        {% if email_address_provided %}
+          {% if out_of_hours %}
+            We’ll reply within one working day.
+          {% else %}
+            We’ll read it in the next 30 minutes and reply within one
+            working day.
+          {% endif %}
+        {% else %}
+          {% if out_of_hours %}
+            We’ll read it when we’re back in the office.
+          {% else %}
+            We’ll read it in the next 30 minutes.
+          {% endif %}
+        {% endif %}
       {% endif %}
     </p>
     <p>
