@@ -551,18 +551,18 @@ def test_bat_email_page(
     # Anonymous tickets don’t promise a reply
     (
         False, False, False,
-        'We’ll read it in the next 30 minutes.',
+        'We’ll read your message in the next 30 minutes.',
     ),
     (
         False, False, True,
-        'We’ll read it when we’re back in the office.',
+        'We’ll read your message when we’re back in the office.',
     ),
 
     # When we look at your ticket depends on whether we’re in normal
     # business hours
     (
         False, True, False,
-        'We’ll read it in the next 30 minutes and reply within one working day.',
+        'We’ll read your message in the next 30 minutes and reply within one working day.',
     ),
     (
         False, True, True,
