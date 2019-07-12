@@ -532,7 +532,7 @@ def service_edit_email_reply_to(service_id, reply_to_email_id):
                 service_id, form.email_address.data
             )["data"]["id"]
         except HTTPError as e:
-            error_msg = "Your service already uses ‘{}’ as an email reply-to address.".format(form.email_address.data)
+            error_msg = "Your service already uses ‘{}’ as a reply-to email address.".format(form.email_address.data)
             if e.status_code == 400 and error_msg == e.message:
                 flash(error_msg, 'error')
                 return redirect(url_for('.service_email_reply_to', service_id=service_id))
@@ -547,7 +547,7 @@ def service_edit_email_reply_to(service_id, reply_to_email_id):
         ))
 
     if (request.endpoint == "main.service_confirm_delete_email_reply_to"):
-        flash("Are you sure you want to delete this email reply-to address?", 'delete')
+        flash("Are you sure you want to delete this reply-to email address?", 'delete')
     return render_template(
         'views/service-settings/email-reply-to/edit.html',
         form=form,

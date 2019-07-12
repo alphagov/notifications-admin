@@ -891,7 +891,7 @@ class ServiceContactDetailsForm(StripWhitespaceForm):
 
 
 class ServiceReplyToEmailForm(StripWhitespaceForm):
-    email_address = email_address(label='Email reply-to address', gov_user=False)
+    email_address = email_address(label='Reply-to email address', gov_user=False)
     is_default = BooleanField("Make this email address the default")
 
 

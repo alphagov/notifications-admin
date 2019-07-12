@@ -34,7 +34,7 @@
         {% if current_service.intending_to_send_email %}
           {{ task_list_item(
             current_service.has_email_reply_to_address,
-            'Add an email reply-to address',
+            'Add a reply-to email address',
             url_for('main.service_email_reply_to', service_id=current_service.id),
           ) }}
         {% endif %}

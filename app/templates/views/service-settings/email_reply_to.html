@@ -5,20 +5,20 @@
 {% from "components/table.html" import row_group, row, text_field, edit_field, field, boolean_field, list_table with context %}
 
 {% block service_page_title %}
-  Email reply-to addresses
+  Reply-to email addresses
 {% endblock %}
 
 {% block maincolumn_content %}
 
   {{ page_header(
-    'Email reply-to addresses',
+    'Reply-to email addresses',
     back_link=url_for('main.service_settings', service_id=current_service.id)
   ) }}
 
   <div class="user-list">
     {% if not current_service.email_reply_to_addresses %}
       <div class="user-list-item">
-        <span class="hint">You haven’t added any email reply-to addresses yet</span>
+        <span class="hint">You haven’t added any reply-to email addresses yet</span>
       </div>
     {% endif %}
     {% for item in current_service.email_reply_to_addresses %}
@@ -43,7 +43,7 @@
     <div class="column-whole">
       {% if current_user.has_permissions('manage_service') %}
         <div class="js-stick-at-bottom-when-scrolling">
-          <a href="{{ url_for('.service_add_email_reply_to', service_id=current_service.id) }}" class="button">Add email reply-to address</a>
+          <a href="{{ url_for('.service_add_email_reply_to', service_id=current_service.id) }}" class="button">Add reply-to email address</a>
         </div>
       {% endif %}
     </div>
