@@ -4004,7 +4004,7 @@ def test_contact_link_is_not_displayed_without_the_upload_document_permission(
         'main.service_set_inbound_sms',
         ['sms'],
         (
-            'If you want to be able to receive text messages from your users, please get in touch.'
+            'Contact us if you want to be able to receive text messages from your users.'
         )
     ),
     (
@@ -4085,12 +4085,12 @@ def test_set_inbound_sms_when_inbound_number_is_not_set(
 @pytest.mark.parametrize('user, expected_paragraphs', [
     (active_user_with_permissions, [
         'Your service can receive text messages sent to 07700900123.',
-        'If you want to switch this feature off, get in touch with the GOV.UK Notify team.',
+        'Contact us if you want to switch this feature off.',
         'You can set up callbacks for received text messages on the API integration page.',
     ]),
     (active_user_no_api_key_permission, [
         'Your service can receive text messages sent to 07700900123.',
-        'If you want to switch this feature off, get in touch with the GOV.UK Notify team.',
+        'Contact us if you want to switch this feature off.',
     ]),
 ])
 def test_set_inbound_sms_when_inbound_number_is_set(
