@@ -1,15 +1,9 @@
-from functools import partial
-
 import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
 
 from app.main.forms import FieldWithNoneOption
-from tests.conftest import (
-    mock_get_organisation_by_domain,
-    normalize_spaces,
-    sample_uuid,
-)
+from tests.conftest import normalize_spaces, sample_uuid
 
 
 def test_non_logged_in_user_can_see_homepage(
@@ -144,96 +138,12 @@ def test_old_integration_testing_page(
     )
 
 
-def test_terms_is_generic_if_user_is_not_logged_in(
-    client
-):
-    response = client.get(url_for('main.terms'))
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-
-    assert normalize_spaces(page.select('main p')[1].text) == (
-        'Your organisation must also accept our data sharing and '
-        'financial agreement. Sign in to download a copy or find out '
-        'if one is already in place.'
-    )
-
-
-@pytest.mark.parametrize((
-    'name,'
-    'agreement_signed,'
-    'expected_terms_paragraph,'
-    'expected_terms_link,'
-), [
-    (
-        'Cabinet Office',
-        True,
-        (
-            'Your organisation (Cabinet Office) has already accepted '
-            'the GOV.UK Notify data sharing and financial agreement.'
-        ),
-        None,
-    ),
-    (
-        'Aylesbury Town Council',
-        False,
-        (
-            'Your organisation (Aylesbury Town Council) must also '
-            'accept our data sharing and financial agreement. Download '
-            'a copy.'
-        ),
-        partial(
-            url_for,
-            'main.agreement',
-        ),
-    ),
-    (
-        None,
-        None,
-        (
-            'Your organisation must also accept our data sharing and '
-            'financial agreement. Download the agreement or contact us '
-            'to find out if we already have one in place with your '
-            'organisation.'
-        ),
-        partial(
-            url_for,
-            'main.agreement',
-        ),
-    ),
-    (
-        'Met Office',
-        False,
-        (
-            'Your organisation (Met Office) must also accept our data '
-            'sharing and financial agreement. Download a copy.'
-        ),
-        partial(
-            url_for,
-            'main.agreement',
-        ),
-    ),
-])
-def test_terms_tells_logged_in_users_what_we_know_about_their_agreement(
-    mocker,
-    fake_uuid,
-    client_request,
-    name,
-    agreement_signed,
-    expected_terms_paragraph,
-    expected_terms_link,
-):
-    mock_get_organisation_by_domain(
-        mocker,
-        name=name,
-        agreement_signed=agreement_signed,
-    )
+def test_terms_page_has_correct_content(client_request):
     terms_page = client_request.get('main.terms')
-
-    assert normalize_spaces(terms_page.select('main p')[1].text) == expected_terms_paragraph
-    if expected_terms_link:
-        assert terms_page.select_one('main p a')['href'] == expected_terms_link()
-    else:
-        assert not terms_page.select_one('main p').select('a')
+    assert normalize_spaces(terms_page.select('main p')[0].text) == (
+        'These terms apply to your service’s use of GOV.UK Notify. '
+        'You must be the service manager to accept them.'
+    )
 
 
 def test_css_is_served_from_correct_path(client_request):

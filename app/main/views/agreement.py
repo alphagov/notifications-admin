@@ -6,28 +6,18 @@ from flask_login import current_user
 from app import current_service
 from app.main import main
 from app.main.forms import AcceptAgreementForm
-from app.main.views.sub_navigation_dictionaries import features_nav
 from app.s3_client.s3_mou_client import get_mou
-from app.utils import user_has_permissions, user_is_logged_in
-
-
-@main.route('/agreement')
-@user_is_logged_in
-def agreement():
-    return render_template(
-        'views/agreement/{}.html'.format(current_user.default_organisation.as_jinja_template),
-        owner=current_user.default_organisation.name,
-        navigation_links=features_nav(),
-    )
+from app.utils import user_has_permissions
 
 
 @main.route('/services/<uuid:service_id>/agreement')
 @user_has_permissions('manage_service')
 def service_agreement(service_id):
-    return render_template(
-        'views/agreement/service-{}.html'.format(current_service.organisation.as_jinja_template),
-        owner=current_service.organisation.name,
-    )
+    if current_service.organisation.crown is None:
+        return render_template('views/agreement/service-agreement-choose.html')
+    if current_service.organisation.agreement_signed:
+        return render_template('views/agreement/service-agreement-signed.html')
+    return render_template('views/agreement/service-agreement.html')
 
 
 @main.route('/services/<uuid:service_id>/agreement.pdf')
@@ -80,14 +70,6 @@ def service_confirm_agreement(service_id):
         return redirect(url_for('main.request_to_go_live', service_id=current_service.id))
 
     return render_template('views/agreement/agreement-confirm.html')
-
-
-@main.route('/agreement.pdf')
-@user_is_logged_in
-def download_agreement():
-    return send_file(**get_mou(
-        current_user.default_organisation.crown_status_or_404
-    ))
 
 
 @main.route('/agreement/<variant>', endpoint='public_agreement')
