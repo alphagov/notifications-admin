@@ -142,7 +142,12 @@ def test_passed_non_logged_in_user_details_through_flow(client, mocker, ticket_t
     )
 
     assert resp.status_code == 302
-    assert resp.location == url_for('main.thanks', urgent=True, anonymous=False, _external=True)
+    assert resp.location == url_for(
+        'main.thanks',
+        out_of_hours_emergency=False,
+        email_address_provided=True,
+        _external=True,
+    )
     mock_post.assert_called_with(
         subject='Notify feedback',
         message='blah\n',
@@ -174,8 +179,8 @@ def test_passes_user_details_through_flow(
         _expected_status=302,
         _expected_redirect=url_for(
             'main.thanks',
-            urgent=True,
-            anonymous=False,
+            email_address_provided=True,
+            out_of_hours_emergency=False,
             _external=True,
         ),
     )
@@ -207,7 +212,7 @@ def test_passes_user_details_through_flow(
 ])
 @pytest.mark.parametrize('ticket_type, expected_response, things_expected_in_url, expected_error', [
     (PROBLEM_TICKET_TYPE, 200, [], element.Tag),
-    (QUESTION_TICKET_TYPE, 302, ['thanks', 'anonymous=True', 'urgent=True'], type(None)),
+    (QUESTION_TICKET_TYPE, 302, ['thanks', 'email_address_provided=False', 'out_of_hours_emergency=False'], type(None)),
 ])
 def test_email_address_required_for_problems(
     client,
@@ -255,21 +260,21 @@ def test_email_address_must_be_valid_if_provided_to_support_form(
     )
 
 
-@pytest.mark.parametrize('ticket_type, severe, is_in_business_hours, is_urgent, is_p1', [
+@pytest.mark.parametrize('ticket_type, severe, is_in_business_hours, is_out_of_hours_emergency', [
 
-    # business hours, always urgent, never p1
-    (PROBLEM_TICKET_TYPE, 'yes', True, True, False),
-    (QUESTION_TICKET_TYPE, 'yes', True, True, False),
-    (PROBLEM_TICKET_TYPE, 'no', True, True, False),
-    (QUESTION_TICKET_TYPE, 'no', True, True, False),
+    # business hours, never an emergency
+    (PROBLEM_TICKET_TYPE, 'yes', True, False),
+    (QUESTION_TICKET_TYPE, 'yes', True, False),
+    (PROBLEM_TICKET_TYPE, 'no', True, False),
+    (QUESTION_TICKET_TYPE, 'no', True, False),
 
-    # out of hours, non emergency, never urgent, not p1
-    (PROBLEM_TICKET_TYPE, 'no', False, False, False),
-    (QUESTION_TICKET_TYPE, 'no', False, False, False),
+    # out of hours, if the user says it’s not an emergency
+    (PROBLEM_TICKET_TYPE, 'no', False, False),
+    (QUESTION_TICKET_TYPE, 'no', False, False),
 
-    # out of hours, emergency problems are urgent and p1
-    (PROBLEM_TICKET_TYPE, 'yes', False, True, True),
-    (QUESTION_TICKET_TYPE, 'yes', False, False, False),
+    # out of hours, only problems can be emergencies
+    (PROBLEM_TICKET_TYPE, 'yes', False, True),
+    (QUESTION_TICKET_TYPE, 'yes', False, False),
 
 ])
 def test_urgency(
@@ -278,8 +283,7 @@ def test_urgency(
     ticket_type,
     severe,
     is_in_business_hours,
-    is_urgent,
-    is_p1,
+    is_out_of_hours_emergency,
 ):
     mocker.patch('app.main.views.feedback.in_business_hours', return_value=is_in_business_hours)
     mock_post = mocker.patch('app.main.views.feedback.zendesk_client.create_ticket')
@@ -291,12 +295,12 @@ def test_urgency(
         _expected_status=302,
         _expected_redirect=url_for(
             'main.thanks',
-            urgent=is_urgent,
-            anonymous=False,
+            out_of_hours_emergency=is_out_of_hours_emergency,
+            email_address_provided=True,
             _external=True,
         ),
     )
-    assert mock_post.call_args[1]['p1'] == is_p1
+    assert mock_post.call_args[1]['p1'] == is_out_of_hours_emergency
 
 
 ids, params = zip(*[
@@ -532,29 +536,54 @@ def test_bat_email_page(
     assert logged_in_response.location == url_for('main.feedback', ticket_type=PROBLEM_TICKET_TYPE, _external=True)
 
 
-@pytest.mark.parametrize('logged_in', [True, False])
-@pytest.mark.parametrize('urgent, anonymous, message', [
+@pytest.mark.parametrize('out_of_hours_emergency, email_address_provided, out_of_hours, message', (
 
-    (True, False, 'We’ll get back to you within 30 minutes.'),
-    (False, False, 'We’ll get back to you by the next working day.'),
+    # Out of hours emergencies trump everything else
+    (
+        True, True, True,
+        'We’ll reply in the next 30 minutes.',
+    ),
+    (
+        True, False, False,  # Not a real scenario
+        'We’ll reply in the next 30 minutes.',
+    ),
 
-    (True, True, 'We’ll look into it within 30 minutes.'),
-    (False, True, 'We’ll look into it by the next working day.'),
+    # Anonymous tickets don’t promise a reply
+    (
+        False, False, False,
+        'We’ll read your message in the next 30 minutes.',
+    ),
+    (
+        False, False, True,
+        'We’ll read your message when we’re back in the office.',
+    ),
 
-])
+    # When we look at your ticket depends on whether we’re in normal
+    # business hours
+    (
+        False, True, False,
+        'We’ll read your message in the next 30 minutes and reply within one working day.',
+    ),
+    (
+        False, True, True,
+        'We’ll reply within one working day.'
+    ),
+
+))
 def test_thanks(
-    client,
+    client_request,
     mocker,
     api_user_active,
     mock_get_user,
-    urgent,
-    anonymous,
+    out_of_hours_emergency,
+    email_address_provided,
+    out_of_hours,
     message,
-    logged_in,
 ):
-    if logged_in:
-        client.login(api_user_active)
-    response = client.get(url_for('main.thanks', urgent=urgent, anonymous=anonymous))
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    assert ' '.join(page.find('main').find('p').text.split()) == message
+    mocker.patch('app.main.views.feedback.in_business_hours', return_value=(not out_of_hours))
+    page = client_request.get(
+        'main.thanks',
+        out_of_hours_emergency=out_of_hours_emergency,
+        email_address_provided=email_address_provided,
+    )
+    assert normalize_spaces(page.find('main').find('p').text) == message

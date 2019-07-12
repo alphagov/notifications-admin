@@ -71,21 +71,11 @@ def feedback(ticket_type):
     else:
         severe = None
 
-    p1 = False
-    urgent = False
-
-    if in_business_hours():
-        # if we're in the office, it's urgent (aka we'll get back in 30 mins)
-        urgent = True
-    elif ticket_type == PROBLEM_TICKET_TYPE and severe:
-        # out of hours, it's only a p1 and it's only urgent if it's a p1
-        urgent = True
-        p1 = True
-
-    anonymous = (
-        (not form.email_address.data) and
-        (not current_user.is_authenticated)
-    )
+    out_of_hours_emergency = all((
+        ticket_type == PROBLEM_TICKET_TYPE,
+        not in_business_hours(),
+        severe,
+    ))
 
     if needs_triage(ticket_type, severe):
         session['feedback_message'] = form.feedback.data
@@ -119,11 +109,17 @@ def feedback(ticket_type):
             subject='Notify feedback',
             message=feedback_msg,
             ticket_type=ticket_type,
-            p1=p1,
+            p1=out_of_hours_emergency,
             user_email=user_email,
             user_name=user_name
         )
-        return redirect(url_for('.thanks', urgent=urgent, anonymous=anonymous))
+        return redirect(url_for(
+            '.thanks',
+            out_of_hours_emergency=out_of_hours_emergency,
+            email_address_provided=(
+                current_user.is_authenticated or bool(form.email_address.data)
+            ),
+        ))
 
     if not form.feedback.data:
         form.feedback.data = get_prefilled_message()
@@ -148,9 +144,9 @@ def bat_phone():
 def thanks():
     return render_template(
         'views/support/thanks.html',
-        urgent=convert_to_boolean(request.args.get('urgent')),
-        anonymous=convert_to_boolean(request.args.get('anonymous')),
-        logged_in=current_user.is_authenticated,
+        out_of_hours_emergency=convert_to_boolean(request.args.get('out_of_hours_emergency')),
+        email_address_provided=convert_to_boolean(request.args.get('email_address_provided')),
+        out_of_hours=not in_business_hours(),
     )
 
 
