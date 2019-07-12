@@ -2168,26 +2168,45 @@ def test_add_letter_contact_when_coming_from_template(
     mock_add_letter_contact,
     fake_uuid,
     mock_get_service_letter_template,
+    mock_update_service_template_sender,
 ):
-    data = {
-        'letter_contact_block': "1 Example Street"
-    }
-
-    page = client_request.post(
+    page = client_request.get(
         'main.service_add_letter_contact',
         service_id=SERVICE_ONE_ID,
-        _data=data,
         from_template=fake_uuid,
-        _follow_redirects=True
+    )
+
+    assert page.select_one('.govuk-back-link')['href'] == url_for(
+        'main.view_template',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+    )
+
+    client_request.post(
+        'main.service_add_letter_contact',
+        service_id=SERVICE_ONE_ID,
+        _data={
+            'letter_contact_block': '1 Example Street',
+        },
+        from_template=fake_uuid,
+        _expected_redirect=url_for(
+            'main.view_template',
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            _external=True,
+        ),
     )
 
     mock_add_letter_contact.assert_called_once_with(
         SERVICE_ONE_ID,
         contact_block="1 Example Street",
-        is_default=True
+        is_default=True,
     )
-
-    assert page.find('h1').text == 'Set letter contact block'
+    mock_update_service_template_sender.assert_called_once_with(
+        SERVICE_ONE_ID,
+        fake_uuid,
+        '1234',
+    )
 
 
 @pytest.mark.parametrize('fixture, data, api_default_args', [

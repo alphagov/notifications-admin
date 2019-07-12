@@ -13,7 +13,7 @@
 
   {{ page_header(
     'Add a new address',
-    back_link=None if request.args.get('from_template') else url_for('.service_letter_contact_details', service_id=current_service.id)
+    back_link=back_link
   ) }}
   <div class="grid-row">
     <div class="column-whole">
