@@ -157,6 +157,13 @@ function setFixtures (hierarchy) {
 
 };
 
+function resetStickyMocks () {
+
+  GOVUK.stickAtBottomWhenScrolling.recalculate.mockClear();
+  GOVUK.stickAtBottomWhenScrolling.setMode.mockClear();
+
+};
+
 beforeAll(() => {
   require('../../app/assets/javascripts/templateFolderForm.js');
 });
@@ -245,6 +252,22 @@ describe('TemplateFolderForm', () => {
     return formControls.querySelector('[role=status]');
   };
 
+  describe("Before the page loads", () => {
+  
+    // We need parts of the module to be made sticky, but by the module code,
+    // not the sticky JS code that operates on the HTML at page load.
+    // Because of this, they wll need to be marked with classes
+    test("the HTML for the module should contain placeholder classes on each part that needs to be sticky", () => {
+
+      expect(templateFolderForm.querySelectorAll('#move_to_folder_radios > .js-will-stick-at-bottom-when-scrolling').length).toEqual(2);
+      expect(templateFolderForm.querySelector('#move_to_new_folder_form > .js-will-stick-at-bottom-when-scrolling')).not.toBeNull();
+      expect(templateFolderForm.querySelector('#add_new_folder_form > .js-will-stick-at-bottom-when-scrolling')).not.toBeNull();
+      expect(templateFolderForm.querySelectorAll('#add_new_template_form > .js-will-stick-at-bottom-when-scrolling').length).toEqual(2);
+
+    });
+  
+  });
+
   describe("When the page loads", () => {
 
     beforeEach(() => {
@@ -256,6 +279,8 @@ describe('TemplateFolderForm', () => {
       visibleCounter = getVisibleCounter();
 
     });
+
+    afterEach(() => resetStickyMocks());
 
     test("the default controls and the counter should be showing", () => {
 
@@ -293,6 +318,20 @@ describe('TemplateFolderForm', () => {
 
     });
 
+    test("should make the current controls sticky", () => {
+
+      // the class the sticky JS hooks into should be present
+      expect(formControls.querySelector('#nothing_selected .js-stick-at-bottom-when-scrolling')).not.toBeNull();
+
+      // .recalculate should have been called so the sticky JS picks up the controls
+      expect(GOVUK.stickAtBottomWhenScrolling.recalculate.mock.calls.length).toEqual(1);
+
+      // mode should have been set to 'default' as the controls only have one part
+      expect(GOVUK.stickAtBottomWhenScrolling.setMode.mock.calls.length).toEqual(1);
+      expect(GOVUK.stickAtBottomWhenScrolling.setMode.mock.calls[0][0]).toEqual('default');
+
+    });
+
   });
 
   describe("Clicking 'New template'", () => {
@@ -304,9 +343,14 @@ describe('TemplateFolderForm', () => {
 
       formControls = templateFolderForm.querySelector('#sticky_template_forms');
 
+      // reset sticky JS mocks called when the module starts
+      resetStickyMocks();
+
       helpers.triggerEvent(formControls.querySelector('[value=add-new-template]'), 'click');
 
     });
+
+    afterEach(() => resetStickyMocks());
 
     test("should show options for all the types of template", () => {
 
@@ -325,7 +369,7 @@ describe('TemplateFolderForm', () => {
         let matchingRadio = formControls.querySelector(`#${matchingLabels[0].getAttribute('for')}`)
 
         expect(matchingRadio).not.toBeNull();
-      });;
+      });
 
     });
 
@@ -343,11 +387,28 @@ describe('TemplateFolderForm', () => {
 
     });
 
+    test("should make the current controls sticky", () => {
+
+      // the classes the sticky JS hooks into should be present for both parts
+      expect(formControls.querySelectorAll('#add_new_template_form .js-stick-at-bottom-when-scrolling').length).toEqual(2);
+
+      // .recalculate should have been called so the sticky JS picks up the controls
+      expect(GOVUK.stickAtBottomWhenScrolling.recalculate.mock.calls.length).toEqual(1);
+
+      // the mode should be set to 'dialog' so both parts can be sticky
+      expect(GOVUK.stickAtBottomWhenScrolling.setMode.mock.calls.length).toEqual(1);
+      expect(GOVUK.stickAtBottomWhenScrolling.setMode.mock.calls[0][0]).toEqual('dialog');
+
+    });
+
     describe("When the 'Cancel' link is clicked", () => {
 
       let addNewTemplateButton;
 
       beforeEach(() => {
+
+        // reset sticky JS mocks called when the new template state loaded
+        resetStickyMocks();
 
         helpers.triggerEvent(formControls.querySelector('.js-cancel'), 'click');
 
@@ -375,12 +436,17 @@ describe('TemplateFolderForm', () => {
 
     let textbox;
 
+    afterEach(() => resetStickyMocks());
+
     beforeEach(() => {
 
       // start module
       window.GOVUK.modules.start();
 
       formControls = templateFolderForm.querySelector('#sticky_template_forms');
+
+      // reset sticky JS mocks called when the module starts
+      resetStickyMocks();
 
       helpers.triggerEvent(formControls.querySelector('[value=add-new-folder]'), 'click');
 
@@ -400,6 +466,20 @@ describe('TemplateFolderForm', () => {
     test("should focus the textbox", () => {
 
       expect(document.activeElement).toBe(textbox);
+
+    });
+
+    test("should make the current controls sticky", () => {
+
+      // the class the sticky JS hooks into should be present
+      expect(formControls.querySelector('#add_new_folder_form .js-stick-at-bottom-when-scrolling')).not.toBeNull();
+
+      // .recalculate should have been called so the sticky JS picks up the controls
+      expect(GOVUK.stickAtBottomWhenScrolling.recalculate.mock.calls.length).toEqual(1);
+
+      // mode should have been set to 'default' as the controls only have one part
+      expect(GOVUK.stickAtBottomWhenScrolling.setMode.mock.calls.length).toEqual(1);
+      expect(GOVUK.stickAtBottomWhenScrolling.setMode.mock.calls[0][0]).toEqual('default');
 
     });
 
@@ -444,15 +524,34 @@ describe('TemplateFolderForm', () => {
 
       formControls = templateFolderForm.querySelector('#sticky_template_forms');
 
+      // reset sticky JS mocks called when the module starts
+      resetStickyMocks();
+
       helpers.triggerEvent(templateFolderCheckboxes[0], 'click');
       helpers.triggerEvent(templateFolderCheckboxes[2], 'click');
 
     });
 
+    afterEach(() => resetStickyMocks());
+
     test("the buttons for moving to a new or existing folder are showing", () => {
 
       expect(formControls.querySelector('button[value=move-to-new-folder]')).not.toBeNull();
       expect(formControls.querySelector('button[value=move-to-existing-folder]')).not.toBeNull();
+
+    });
+
+    test("should make the current controls sticky", () => {
+
+      // the class the sticky JS hooks into should be present
+      expect(formControls.querySelector('#items_selected .js-stick-at-bottom-when-scrolling')).not.toBeNull();
+
+      // .recalculate should have been called so the sticky JS picks up the controls
+      expect(GOVUK.stickAtBottomWhenScrolling.recalculate.mock.calls.length).toEqual(1);
+
+      // mode should have been set to 'default' as the controls only have one part
+      expect(GOVUK.stickAtBottomWhenScrolling.setMode.mock.calls.length).toEqual(1);
+      expect(GOVUK.stickAtBottomWhenScrolling.setMode.mock.calls[0][0]).toEqual('default');
 
     });
 
@@ -515,6 +614,9 @@ describe('TemplateFolderForm', () => {
 
       beforeEach(() => {
 
+      // reset sticky JS mocks called when a selection was made
+      resetStickyMocks();
+
         helpers.triggerEvent(formControls.querySelector('[value=move-to-existing-folder]'), 'click');
 
       });
@@ -557,6 +659,20 @@ describe('TemplateFolderForm', () => {
 
       });
 
+      test("should make the current controls sticky", () => {
+
+        // the classes the sticky JS hooks into should be present for both parts
+        expect(formControls.querySelectorAll('#move_to_folder_radios .js-stick-at-bottom-when-scrolling').length).toEqual(2);
+
+        // .recalculate should have been called so the sticky JS picks up the controls
+        expect(GOVUK.stickAtBottomWhenScrolling.recalculate.mock.calls.length).toEqual(1);
+
+        // the mode should be set to 'dialog' so both parts can be sticky
+        expect(GOVUK.stickAtBottomWhenScrolling.setMode.mock.calls.length).toEqual(1);
+        expect(GOVUK.stickAtBottomWhenScrolling.setMode.mock.calls[0][0]).toEqual('dialog');
+
+      });
+
       describe("When the 'Cancel' link is clicked", () => {
 
         let moveToFolderButton;
@@ -591,6 +707,9 @@ describe('TemplateFolderForm', () => {
 
       beforeEach(() => {
 
+        // reset sticky JS mocks called when a selection was made
+        resetStickyMocks();
+
         helpers.triggerEvent(formControls.querySelector('[value=move-to-new-folder]'), 'click');
 
         textbox = formControls.querySelector('input[type=text]');
@@ -609,6 +728,20 @@ describe('TemplateFolderForm', () => {
       test("should focus the textbox", () => {
 
         expect(document.activeElement).toBe(textbox);
+
+      });
+
+      test("should make the current controls sticky", () => {
+
+        // the class the sticky JS hooks into should be present
+        expect(formControls.querySelector('#move_to_new_folder_form .js-stick-at-bottom-when-scrolling')).not.toBeNull();
+
+        // .recalculate should have been called so the sticky JS picks up the controls
+        expect(GOVUK.stickAtBottomWhenScrolling.recalculate.mock.calls.length).toEqual(1);
+
+        // mode should have been set to 'default' as the controls only have one part
+        expect(GOVUK.stickAtBottomWhenScrolling.setMode.mock.calls.length).toEqual(1);
+        expect(GOVUK.stickAtBottomWhenScrolling.setMode.mock.calls[0][0]).toEqual('default');
 
       });
 
