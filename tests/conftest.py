@@ -16,6 +16,7 @@ from app import create_app
 from . import (
     TestClient,
     api_key_json,
+    assert_url_expected,
     generate_uuid,
     invite_json,
     job_json,
@@ -2875,6 +2876,9 @@ def client_request(
         def login(user, service=service_one):
             logged_in_client.login(user, mocker, service)
 
+        def logout():
+            logged_in_client.logout(None)
+
         @staticmethod
         def get(
             endpoint,
@@ -2939,7 +2943,7 @@ def client_request(
             )
             assert resp.status_code == _expected_status
             if _expected_redirect:
-                assert resp.location == _expected_redirect
+                assert_url_expected(resp.location, _expected_redirect)
             return BeautifulSoup(resp.data.decode('utf-8'), 'html.parser')
 
     return ClientRequest
