@@ -1,6 +1,7 @@
 import uuid
 from datetime import datetime, timedelta, timezone
 from unittest.mock import patch
+from urllib.parse import parse_qs, urlparse
 
 import pytest
 from flask import url_for
@@ -28,7 +29,7 @@ class TestClient(FlaskClient):
             login_user(model_user)
 
     def logout(self, user):
-        self.get(url_for("main.logout"))
+        self.get(url_for("main.sign_out"))
 
 
 def sample_uuid():
@@ -579,3 +580,28 @@ def validate_route_permission_with_client(mocker,
     if resp.status_code != response_code:
         pytest.fail("Invalid permissions set for endpoint {}".format(route))
     return resp
+
+
+def assert_url_expected(actual, expected):
+    actual_parts = urlparse(actual)
+    expected_parts = urlparse(expected)
+    for attribute in actual_parts._fields:
+        if attribute == 'query':
+            # query string ordering can be non-deterministic
+            # so we need to parse it first, which gives us a
+            # dictionary of keys and values, not a
+            # serialized string
+            assert parse_qs(
+                expected_parts.query
+            ) == parse_qs(
+                actual_parts.query
+            )
+        else:
+            assert getattr(
+                actual_parts, attribute
+            ) == getattr(
+                expected_parts, attribute
+            ), (
+                'Expected redirect: {}\n'
+                'Actual redirect: {}'
+            ).format(expected, actual)

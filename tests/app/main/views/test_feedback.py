@@ -210,29 +210,44 @@ def test_passes_user_details_through_flow(
     {'feedback': 'blah', 'name': 'Fred'},
     {'feedback': 'blah'},
 ])
-@pytest.mark.parametrize('ticket_type, expected_response, things_expected_in_url, expected_error', [
-    (PROBLEM_TICKET_TYPE, 200, [], element.Tag),
-    (QUESTION_TICKET_TYPE, 302, ['thanks', 'email_address_provided=False', 'out_of_hours_emergency=False'], type(None)),
+@pytest.mark.parametrize('ticket_type, expected_response, expected_redirect, expected_error', [
+    (
+        PROBLEM_TICKET_TYPE,
+        200,
+        lambda: None,
+        element.Tag,
+    ),
+    (
+        QUESTION_TICKET_TYPE,
+        302,
+        partial(
+            url_for,
+            '.thanks',
+            email_address_provided=False,
+            out_of_hours_emergency=False,
+            _external=True,
+        ),
+        type(None),
+    ),
 ])
 def test_email_address_required_for_problems(
-    client,
+    client_request,
     mocker,
     data,
     ticket_type,
     expected_response,
-    things_expected_in_url,
+    expected_redirect,
     expected_error
 ):
     mocker.patch('app.main.views.feedback.zendesk_client')
-    response = client.post(
-        url_for('main.feedback', ticket_type=ticket_type),
-        data=data,
+    client_request.logout()
+    page = client_request.post(
+        'main.feedback',
+        ticket_type=ticket_type,
+        _data=data,
+        _expected_status=expected_response,
+        _expected_redirect=expected_redirect(),
     )
-    assert response.status_code == expected_response
-    # This is to work around non-deterministic query ordering in Flask url_for
-    for thing in things_expected_in_url:
-        assert thing in response.location
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert isinstance(page.find('span', {'class': 'error-message'}), expected_error)
 
 
