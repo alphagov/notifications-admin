@@ -248,7 +248,11 @@ def organisation_type(label='Who runs this service?'):
         choices=[
             ('central', 'Central government'),
             ('local', 'Local government'),
-            ('nhs', 'NHS'),
+            ('nhs_central', 'NHS – central government agency or public body'),
+            ('nhs_local', 'NHS Trust, GP surgery or Clinical Commissioning Group'),
+            ('emergency_service', 'Emergency service'),
+            ('school_or_college', 'School or college'),
+            ('other', 'Other'),
         ],
         validators=[DataRequired()],
     )

@@ -41,14 +41,22 @@ def test_get_should_render_add_service_template(
     ] == [
         'Central government',
         'Local government',
-        'NHS',
+        'NHS – central government agency or public body',
+        'NHS Trust, GP surgery or Clinical Commissioning Group',
+        'Emergency service',
+        'School or college',
+        'Other',
     ]
     assert [
         radio['value'] for radio in page.select('.multiple-choice input')
     ] == [
         'central',
         'local',
-        'nhs',
+        'nhs_central',
+        'nhs_local',
+        'emergency_service',
+        'school_or_college',
+        'other',
     ]
 
 
@@ -71,8 +79,12 @@ def test_get_should_not_render_radios_if_org_type_known(
 @pytest.mark.parametrize('inherited, posted, persisted, sms_limit', (
     (None, 'central', 'central', 250000),
     ('central', None, 'central', 250000),
-    ('nhs', None, 'nhs', 25000),
+    ('nhs_central', None, 'nhs_central', 250000),
+    ('nhs_local', None, 'nhs_local', 25000),
     ('local', None, 'local', 25000),
+    ('emergency_service', None, 'emergency_service', 25000),
+    ('school_or_college', None, 'school_or_college', 25000),
+    ('other', None, 'other', 25000),
     ('central', 'local', 'central', 250000),
 ))
 def test_should_add_service_and_redirect_to_tour_when_no_services(
@@ -189,13 +201,17 @@ def test_add_service_guesses_org_type_for_unknown_nhs_orgs(
         'main.add_service',
         _data={'name': 'example'},
     )
-    assert mock_create_service.call_args[1]['organisation_type'] == 'nhs'
+    assert mock_create_service.call_args[1]['organisation_type'] == 'nhs_local'
 
 
 @pytest.mark.parametrize('organisation_type, free_allowance', [
     ('central', 250 * 1000),
     ('local', 25 * 1000),
-    ('nhs', 25 * 1000),
+    ('nhs_central', 250 * 1000),
+    ('nhs_local', 25 * 1000),
+    ('school_or_college', 25 * 1000),
+    ('emergency_service', 25 * 1000),
+    ('other', 25 * 1000),
 ])
 def test_should_add_service_and_redirect_to_dashboard_when_existing_service(
     app_,
