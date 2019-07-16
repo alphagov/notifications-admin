@@ -322,7 +322,7 @@ class User(JSONModel, UserMixin):
         if self.default_organisation:
             return self.default_organisation.organisation_type
         if self.has_nhs_email_address:
-            return 'nhs_local'
+            return 'nhs'
         return None
 
     @property

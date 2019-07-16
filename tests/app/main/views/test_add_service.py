@@ -42,7 +42,8 @@ def test_get_should_render_add_service_template(
         'Central government',
         'Local government',
         'NHS – central government agency or public body',
-        'NHS Trust, GP surgery or Clinical Commissioning Group',
+        'NHS Trust or Clinical Commissioning Group',
+        'GP practice',
         'Emergency service',
         'School or college',
         'Other',
@@ -53,6 +54,7 @@ def test_get_should_render_add_service_template(
         'central',
         'local',
         'nhs_central',
+        'nhs_local',
         'nhs_local',
         'emergency_service',
         'school_or_college',
@@ -175,20 +177,11 @@ def test_add_service_has_to_choose_org_type(
     'test@nhs.uk',
     'test@example.NhS.uK',
     'test@EXAMPLE.NHS.NET',
-    pytest.param(
-        'test@not-nhs.uk',
-        marks=pytest.mark.xfail(raises=AssertionError)
-    )
 ))
-def test_add_service_guesses_org_type_for_unknown_nhs_orgs(
-    mocker,
+def test_get_should_only_show_nhs_org_types_radios_if_user_has_nhs_email(
     client_request,
-    mock_create_service,
-    mock_create_service_template,
-    mock_get_services_with_no_services,
+    mocker,
     api_user_active,
-    mock_create_or_update_free_sms_fragment_limit,
-    mock_get_all_email_branding,
     email_address,
 ):
     api_user_active['email_address'] = email_address
@@ -197,11 +190,23 @@ def test_add_service_guesses_org_type_for_unknown_nhs_orgs(
         'app.organisations_client.get_organisation_by_domain',
         return_value=None,
     )
-    client_request.post(
-        'main.add_service',
-        _data={'name': 'example'},
-    )
-    assert mock_create_service.call_args[1]['organisation_type'] == 'nhs_local'
+    page = client_request.get('main.add_service')
+    assert page.select_one('h1').text.strip() == 'About your service'
+    assert page.select_one('input[name=name]')['value'] == ''
+    assert [
+        label.text.strip() for label in page.select('.multiple-choice label')
+    ] == [
+        'NHS – central government agency or public body',
+        'NHS Trust or Clinical Commissioning Group',
+        'GP practice',
+    ]
+    assert [
+        radio['value'] for radio in page.select('.multiple-choice input')
+    ] == [
+        'nhs_central',
+        'nhs_local',
+        'nhs_local',
+    ]
 
 
 @pytest.mark.parametrize('organisation_type, free_allowance', [

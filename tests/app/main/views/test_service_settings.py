@@ -955,7 +955,7 @@ def test_should_not_show_go_live_button_if_checklist_not_complete(
     ),
     (
         None,
-        'nhs',
+        'nhs_local',
         1,
         [{'is_default': True, 'sms_sender': 'KUVOG'}],
         'Change your text message sender name Completed',
