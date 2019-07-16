@@ -387,6 +387,16 @@ def test_invite_user_allows_to_choose_auth(
     assert sms_auth_radio_button.has_attr("disabled") is False
 
 
+def test_invite_user_has_correct_email_field(
+    client_request,
+    mock_get_users_by_service,
+    mock_get_template_folders,
+):
+    email_field = client_request.get('main.invite_user', service_id=SERVICE_ONE_ID).select_one('#email_address')
+    assert email_field['spellcheck'] == 'false'
+    assert 'autocomplete' not in email_field
+
+
 def test_should_not_show_page_for_non_team_member(
     client_request,
     mock_get_users_by_service,

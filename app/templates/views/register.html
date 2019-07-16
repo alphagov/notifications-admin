@@ -14,7 +14,7 @@ Create an account
     <h1 class="heading-large">Create an account</h1>
     {% call form_wrapper(autocomplete=True) %}
       {{ textbox(form.name, width='3-4') }}
-      {{ textbox(form.email_address, hint="Must be from a government organisation", width='3-4', safe_error_message=True) }}
+      {{ textbox(form.email_address, hint="Must be from a government organisation", width='3-4', safe_error_message=True, autocomplete='email') }}
       <div class="extra-tracking">
         {{ textbox(form.mobile_number, width='3-4', hint='We’ll send you a security code by text message') }}
       </div>
