@@ -121,7 +121,7 @@ def email_address(label='Email address', gov_user=True, required=True):
     if required:
         validators.append(DataRequired(message='Can’t be empty'))
 
-    return EmailField(label, validators)
+    return EmailField(label, validators, render_kw={'spellcheck': 'false'})
 
 
 class UKMobileNumber(TelField):
