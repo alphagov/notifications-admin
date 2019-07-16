@@ -1,7 +1,8 @@
 {% extends "withnav_template.html" %}
 {% from "components/radios.html" import radios %}
 {% from "components/page-header.html" import page_header %}
-{% from "components/page-footer.html" import page_footer %}
+{% from "components/page-footer.html" import sticky_page_footer %}
+{% from "components/live-search.html" import live_search %}
 {% from "components/form.html" import form_wrapper %}
 
 {% block service_page_title %}
@@ -10,20 +11,17 @@
 
 {% block maincolumn_content %}
 
-  <div class="grid-row bottom-gutter">
-    <div class="column-two-thirds">
-      {{ page_header(
-        'Link service to organisation',
-        back_link=url_for('.service_settings', service_id=current_service.id)
-      ) }}
-      {% call form_wrapper() %}
-        {% if has_organisations %}
-          {{ radios(form.organisations) }}
-          {{ page_footer('Save') }}
-        {% else %}
-        <p> No organisations </p>
-        {% endif %}
-      {% endcall %}
-    </div>
-  </div>
+  {{ page_header(
+    'Link service to organisation',
+    back_link=url_for('.service_settings', service_id=current_service.id)
+  ) }}
+  {{ live_search(target_selector='.multiple-choice', show=True, form=search_form, label='Search by name') }}
+  {% call form_wrapper() %}
+    {% if has_organisations %}
+      {{ radios(form.organisations) }}
+      {{ sticky_page_footer('Save') }}
+    {% else %}
+      <p class="hint"> No organisations </p>
+    {% endif %}
+  {% endcall %}
 {% endblock %}

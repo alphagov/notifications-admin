@@ -999,6 +999,7 @@ def link_service_to_organisation(service_id):
         'views/service-settings/link-service-to-organisation.html',
         has_organisations=all_organisations,
         form=form,
+        search_form=SearchByNameForm(),
     )
 
 
