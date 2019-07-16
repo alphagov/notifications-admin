@@ -260,7 +260,7 @@
 
       <p>
         {% if current_user.has_permissions('manage_service') %}
-          To remove these restrictions
+          To remove these restrictions, you can send us a 
           <a href="{{ url_for('.request_to_go_live', service_id=current_service.id) }}">request to go live</a>.
         {% else %}
           Your service manager can ask to have these restrictions removed.
