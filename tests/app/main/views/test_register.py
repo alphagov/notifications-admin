@@ -17,6 +17,7 @@ def test_render_register_returns_template_with_form(client):
     assert page.find('input', attrs={'name': 'auth_type'}).attrs['value'] == 'sms_auth'
     assert page.select_one('#email_address')['spellcheck'] == 'false'
     assert page.select_one('#email_address')['autocomplete'] == 'email'
+    assert page.select_one('#password')['autocomplete'] == 'new-password'
     assert 'Create an account' in response.get_data(as_text=True)
 
 

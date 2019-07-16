@@ -5,20 +5,26 @@ from bs4 import BeautifulSoup
 from flask import url_for
 
 from app.models.user import User
+from tests.conftest import normalize_spaces
 
 
 def test_render_sign_in_template_for_new_user(
-    client
+    client_request
 ):
-    response = client.get(url_for('main.sign_in', next=None))
-    assert response.status_code == 200
-    resp = response.get_data(as_text=True)
-    assert 'Sign in' in resp
-    assert 'Email address' in resp
-    assert 'Password' in resp
-    assert 'Forgot your password?' in resp
-    assert 'If you do not have an account, you can' in resp
-    assert 'Sign in again' not in resp
+    client_request.logout()
+    page = client_request.get('main.sign_in')
+    assert normalize_spaces(page.select_one('h1').text) == 'Sign in'
+    assert normalize_spaces(page.select('label')[0].text) == 'Email address'
+    assert page.select_one('#email_address')['value'] == ''
+    assert page.select_one('#email_address')['autocomplete'] == 'email'
+    assert normalize_spaces(page.select('label')[1].text) == 'Password'
+    assert page.select_one('#password')['value'] == ''
+    assert page.select_one('#password')['autocomplete'] == 'current-password'
+    assert page.select('main a')[0].text == 'create one now'
+    assert page.select('main a')[0]['href'] == url_for('main.register')
+    assert page.select('main a')[1].text == 'Forgot your password?'
+    assert page.select('main a')[1]['href'] == url_for('main.forgot_password')
+    assert 'Sign in again' not in normalize_spaces(page.text)
 
 
 def test_sign_in_explains_session_timeout(client):

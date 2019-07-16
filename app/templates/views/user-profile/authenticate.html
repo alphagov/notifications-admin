@@ -19,7 +19,7 @@
     <div class="column-three-quarters">
 
     {% call form_wrapper(autocomplete=True) %}
-      {{ textbox(form.password) }}
+      {{ textbox(form.password, autocomplete='current-password') }}
       {{ page_footer('Confirm') }}
     {% endcall %}
     </div>
