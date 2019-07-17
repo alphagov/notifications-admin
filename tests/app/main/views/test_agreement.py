@@ -9,7 +9,6 @@ from freezegun import freeze_time
 from tests import organisation_json
 from tests.conftest import (
     SERVICE_ONE_ID,
-    mock_get_organisation_by_domain,
     mock_get_service_organisation,
     normalize_spaces,
 )
@@ -24,49 +23,65 @@ class _MockS3Object():
         return {'Body': BytesIO(self.data)}
 
 
-@pytest.mark.parametrize('endpoint, extra_args, organisation_mock, link_selector, expected_back_links', [
-    (
-        'main.agreement',
-        {},
-        mock_get_organisation_by_domain,
-        'main .column-two-thirds a',
-        []
-    ),
-    (
-        'main.service_agreement',
-        {'service_id': SERVICE_ONE_ID},
-        mock_get_service_organisation,
-        'main .column-five-sixths a',
-        [
-            partial(url_for, 'main.request_to_go_live', service_id=SERVICE_ONE_ID)
-        ]
-    ),
-])
 @pytest.mark.parametrize('agreement_signed, crown, expected_links', [
     (
         True, True,
         [
-            partial(url_for, 'main.service_download_agreement', service_id=SERVICE_ONE_ID),
+            (
+                ['govuk-back-link'],
+                partial(url_for, 'main.request_to_go_live', service_id=SERVICE_ONE_ID),
+            ),
+            (
+                [],
+                partial(url_for, 'main.service_download_agreement', service_id=SERVICE_ONE_ID),
+            ),
         ]
     ),
     (
         False, False,
         [
-            partial(url_for, 'main.service_download_agreement', service_id=SERVICE_ONE_ID),
-            partial(url_for, 'main.service_accept_agreement', service_id=SERVICE_ONE_ID),
+            (
+                ['govuk-back-link'],
+                partial(url_for, 'main.request_to_go_live', service_id=SERVICE_ONE_ID),
+            ),
+            (
+                [],
+                partial(url_for, 'main.service_download_agreement', service_id=SERVICE_ONE_ID),
+            ),
+            (
+                ['button'],
+                partial(url_for, 'main.service_accept_agreement', service_id=SERVICE_ONE_ID),
+            ),
         ]
     ),
     (
         False, True,
         [
-            partial(url_for, 'main.service_download_agreement', service_id=SERVICE_ONE_ID),
-            partial(url_for, 'main.service_accept_agreement', service_id=SERVICE_ONE_ID),
+            (
+                ['govuk-back-link'],
+                partial(url_for, 'main.request_to_go_live', service_id=SERVICE_ONE_ID),
+            ),
+            (
+                [],
+                partial(url_for, 'main.service_download_agreement', service_id=SERVICE_ONE_ID),
+            ),
+            (
+                ['button'],
+                partial(url_for, 'main.service_accept_agreement', service_id=SERVICE_ONE_ID),
+            ),
         ]
     ),
     (
         None, None,
         [
-            partial(url_for, 'main.support'),
+            (
+                ['govuk-back-link'],
+                partial(url_for, 'main.request_to_go_live', service_id=SERVICE_ONE_ID),
+            ),
+            (
+                [],
+                partial(url_for, 'main.support'),
+            ),
         ]
     ),
 ])
@@ -75,27 +90,22 @@ def test_show_agreement_page(
     mocker,
     fake_uuid,
     mock_has_jobs,
-    mock_get_service_organisation,
     agreement_signed,
     crown,
     expected_links,
-    endpoint,
-    extra_args,
-    organisation_mock,
-    link_selector,
-    expected_back_links,
 ):
-    organisation_mock(
+    mock_get_service_organisation(
         mocker,
         crown=crown,
         agreement_signed=agreement_signed,
     )
-    expected_links = expected_back_links + expected_links
-    page = client_request.get(endpoint, **extra_args)
-    links = page.select(link_selector)
+    page = client_request.get('main.service_agreement', service_id=SERVICE_ONE_ID)
+    links = page.select('main .column-five-sixths a')
     assert len(links) == len(expected_links)
     for index, link in enumerate(links):
-        assert link['href'] == expected_links[index]()
+        classes, url = expected_links[index]
+        assert link.get('class', []) == classes
+        assert link['href'] == url()
 
 
 @pytest.mark.parametrize('crown, expected_status, expected_file_fetched, expected_file_served', (
@@ -446,76 +456,6 @@ def test_confirm_agreement_page_persists(
         agreement_signed_at='2012-01-01 01:01:00',
         agreement_signed_by_id=fake_uuid,
     )
-
-
-@pytest.mark.parametrize('crown, expected_file_fetched, expected_file_served', [
-    (
-        True,
-        'crown.pdf',
-        'GOV.UK Notify data sharing and financial agreement.pdf',
-    ),
-    (
-        False,
-        'non-crown.pdf',
-        'GOV.UK Notify data sharing and financial agreement (non-crown).pdf',
-    ),
-])
-def test_downloading_agreement(
-    logged_in_client,
-    mocker,
-    fake_uuid,
-    crown,
-    expected_file_fetched,
-    expected_file_served,
-):
-    mock_get_s3_object = mocker.patch(
-        'app.s3_client.s3_mou_client.get_s3_object',
-        return_value=_MockS3Object(b'foo')
-    )
-    mock_get_organisation_by_domain(
-        mocker,
-        crown=crown,
-    )
-    response = logged_in_client.get(url_for('main.download_agreement'))
-    assert response.status_code == 200
-    assert response.get_data() == b'foo'
-    assert response.headers['Content-Type'] == 'application/pdf'
-    assert response.headers['Content-Disposition'] == (
-        'attachment; filename="{}"'.format(expected_file_served)
-    )
-    mock_get_s3_object.assert_called_once_with('test-mou', expected_file_fetched)
-
-
-def test_agreement_cant_be_downloaded_unknown_crown_status(
-    logged_in_client,
-    mocker,
-    fake_uuid,
-):
-    mock_get_s3_object = mocker.patch(
-        'app.s3_client.s3_mou_client.get_s3_object',
-        return_value=_MockS3Object()
-    )
-    mock_get_organisation_by_domain(
-        mocker,
-        crown=None,
-    )
-    response = logged_in_client.get(url_for('main.download_agreement'))
-    assert response.status_code == 404
-    assert mock_get_s3_object.call_args_list == []
-
-
-def test_agreement_requires_login(
-    client,
-    mocker,
-):
-    mock_get_s3_object = mocker.patch(
-        'app.s3_client.s3_mou_client.get_s3_object',
-        return_value=_MockS3Object()
-    )
-    response = client.get(url_for('main.download_agreement'))
-    assert response.status_code == 302
-    assert response.location == 'http://localhost/sign-in?next=%2Fagreement.pdf'
-    assert mock_get_s3_object.call_args_list == []
 
 
 @pytest.mark.parametrize('endpoint', (

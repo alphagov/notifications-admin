@@ -211,7 +211,9 @@ def submit_request_to_go_live(service_id):
             service_name=current_service.name,
             service_dashboard=url_for('main.service_dashboard', service_id=current_service.id, _external=True),
             organisation_type=str(current_service.organisation_type).title(),
-            agreement=current_service.organisation.as_human_readable(current_user.email_domain),
+            agreement=current_service.organisation.as_agreement_statement_for_go_live_request(
+                current_user.email_domain
+            ),
             volume_email_formatted=format_thousands(current_service.volume_email),
             volume_sms_formatted=format_thousands(current_service.volume_sms),
             volume_letter_formatted=format_thousands(current_service.volume_letter),

@@ -1,4 +1,4 @@
-from flask import Markup, abort
+from flask import abort
 from werkzeug.utils import cached_property
 
 from app.models import JSONModel, ModelList
@@ -71,7 +71,7 @@ class Organisation(JSONModel):
             self.organisation_type = None
             self.request_to_go_live_notes = None
 
-    def as_human_readable(self, fallback_domain):
+    def as_agreement_statement_for_go_live_request(self, fallback_domain):
         if self.agreement_signed:
             agreement_statement = 'Yes, on behalf of {}.'.format(self.name)
         elif self.name:
@@ -97,52 +97,6 @@ class Organisation(JSONModel):
 
     def as_info_for_branding_request(self, fallback_domain):
         return self.name or 'Can’t tell (domain is {})'.format(fallback_domain)
-
-    @property
-    def as_jinja_template(self):
-        if self.crown is None:
-            return 'agreement-choose'
-        if self.agreement_signed:
-            return 'agreement-signed'
-        return 'agreement'
-
-    def as_terms_of_use_paragraph(self, **kwargs):
-        return Markup(self._as_terms_of_use_paragraph(**kwargs))
-
-    def _as_terms_of_use_paragraph(self, terms_link, download_link, support_link, signed_in):
-
-        if not signed_in:
-            return ((
-                '{} <a href="{}">Sign in</a> to download a copy '
-                'or find out if one is already in place.'
-            ).format(self._acceptance_required, terms_link))
-
-        if self.agreement_signed is None:
-            return ((
-                '{} <a href="{}">Download the agreement</a> or '
-                '<a href="{}">contact us</a> to find out if we already '
-                'have one in place with your organisation.'
-            ).format(self._acceptance_required, download_link, support_link))
-
-        if self.agreement_signed is False:
-            return ((
-                '{} <a href="{}">Download a copy</a>.'
-            ).format(self._acceptance_required, download_link))
-
-        return (
-            'Your organisation ({}) has already accepted the '
-            'GOV.UK&nbsp;Notify data sharing and financial '
-            'agreement.'.format(self.name)
-        )
-
-    @property
-    def _acceptance_required(self):
-        return (
-            'Your organisation {} must also accept our data sharing '
-            'and financial agreement.'.format(
-                '({})'.format(self.name) if self.name else '',
-            )
-        )
 
     @property
     def crown_status_or_404(self):
