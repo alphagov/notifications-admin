@@ -17,11 +17,12 @@
 
     <p>
       Your organisation ({{ current_service.organisation.name }}) has already accepted the GOV.UK
-      Notify data sharing and financial agreement. You can
-      <a href="{{ url_for('main.service_download_agreement', service_id=current_service.id) }}">download a copy</a>.
+      Notify data sharing and financial agreement.
+    </p>
+    <p><a href="{{ url_for('main.service_download_agreement', service_id=current_service.id) }}">Download a copy of the agreement</a>.
     </p>
     <p>
-      The agreement contains commercially sensitive information, so don’t share it more widely than you need to.
+      The agreement is confidential and should not be shared outside your organisation.
     </p>
 
   </div>
