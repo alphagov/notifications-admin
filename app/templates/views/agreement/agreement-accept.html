@@ -7,7 +7,7 @@
 {% from "components/page-header.html" import page_header %}
 
 {% block per_page_title %}
-  Accept data sharing and financial agreement
+  Accept the data sharing and financial agreement
 {% endblock %}
 
 {% block maincolumn_content %}
@@ -16,13 +16,12 @@
   <div class="column-five-sixths">
 
     {{ page_header(
-      'Accept data sharing and financial agreement',
+      'How do you want to accept the agreement?',
       back_link=url_for('main.service_agreement', service_id=current_service.id)
     ) }}
 
     {% call form_wrapper(class='top-gutter') %}
 
-      {{ textbox(form.version, width='1-3', hint='The version number is on the front page, for example ‘3.6’') }}
       {% call select_wrapper(form.who) %}
         {% for option in form.who %}
           {{ radio(option, data_target='on-behalf-of' if option.data == 'someone-else' else None) }}
@@ -32,6 +31,8 @@
         {{ textbox(form.on_behalf_of_name, width='1-1') }}
         {{ textbox(form.on_behalf_of_email, width='1-1') }}
       </div>
+      {{ textbox(form.version, width='1-3', hint='The version number is on the front page, for example ‘3.6’') }}
+
       {{ page_footer('Continue') }}
 
     {% endcall %}
