@@ -1487,26 +1487,26 @@ class AcceptAgreementForm(StripWhitespaceForm):
         )
 
     version = StringField(
-        'Which version of the agreement are you accepting?'
+        'Which version of the agreement do you want to accept?'
     )
 
     who = RadioField(
-        'Who is accepting the agreement?',
+        'How do you want to accept the agreement?',
         choices=(
             (
                 'me',
-                'I’m accepting the agreement',
+                'In your own name',
             ),
             (
                 'someone-else',
-                'I’m accepting the agreement on behalf of someone else',
+                'On behalf of someone else',
             ),
         ),
         validators=[DataRequired()],
     )
 
     on_behalf_of_name = StringField(
-        'Who are you accepting the agreement on behalf of?'
+        'What’s their name?'
     )
 
     on_behalf_of_email = email_address(
