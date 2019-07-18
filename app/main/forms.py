@@ -1491,15 +1491,15 @@ class AcceptAgreementForm(StripWhitespaceForm):
     )
 
     who = RadioField(
-        'How do you want to accept the agreement?',
+        'Who are you accepting the agreement for?',
         choices=(
             (
                 'me',
-                'In your own name',
+                'Yourself',
             ),
             (
                 'someone-else',
-                'On behalf of someone else',
+                'Someone else',
             ),
         ),
         validators=[DataRequired()],
