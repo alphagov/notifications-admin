@@ -4,7 +4,7 @@
 {% from "components/page-header.html" import page_header %}
 
 {% block per_page_title %}
-  GOV.UK Notify data sharing and financial agreement
+  Confirm that you accept the agreement
 {% endblock %}
 
 {% block maincolumn_content %}
@@ -13,7 +13,7 @@
   <div class="column-five-sixths">
 
     {{ page_header(
-      'GOV.UK Notify data sharing and financial agreement',
+      'Confirm that you accept the agreement',
       back_link=url_for('main.service_accept_agreement', service_id=current_service.id)
     ) }}
 
