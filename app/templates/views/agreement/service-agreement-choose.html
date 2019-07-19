@@ -2,7 +2,7 @@
 {% from "components/page-header.html" import page_header %}
 
 {% block service_page_title %}
-  GOV.UK Notify data sharing and financial agreement
+  Accept the data sharing and financial agreement
 {% endblock %}
 
 {% block maincolumn_content %}
@@ -11,19 +11,24 @@
   <div class="column-five-sixths">
 
     {{ page_header(
-      'GOV.UK Notify data sharing and financial agreement',
+      'Accept the data sharing and financial agreement',
       back_link=url_for('main.request_to_go_live', service_id=current_service.id)
     )}}
 
     <p>
-      Before you can go live on GOV.UK Notify, your organisation needs to
-      accept to our data sharing and financial agreement.
+      Before you can use GOV.UK Notify, you need to accept our data sharing and financial agreement.
+    </p>
+    <p>
+      This must be done by, or on behalf of, someone with the authority to sign contracts for your organisation.
+    </p>
+    <p>
+      Once accepted, the agreement covers all Notify services from your organisation.
     </p>
     <p>
       There are different agreements for crown and non-crown organisations.
     </p>
     <p>
-      <a href="{{ url_for('main.support') }}">Get in touch</a> to tell us
+      <a href="{{ url_for('main.support') }}">Contact us</a> to tell us
       whether or not you work for a crown organisation. If you’re not sure
       we’ll help you work it out.
     </p>

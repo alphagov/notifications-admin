@@ -2,7 +2,7 @@
 {% from "components/page-header.html" import page_header %}
 
 {% block service_page_title %}
-  GOV.UK Notify data sharing and financial agreement
+  Your organisation has already accepted the agreement
 {% endblock %}
 
 {% block maincolumn_content %}
@@ -11,17 +11,18 @@
   <div class="column-five-sixths">
 
     {{ page_header(
-      'GOV.UK Notify data sharing and financial agreement',
+      'Your organisation has already accepted the agreement',
       back_link=url_for('main.request_to_go_live', service_id=current_service.id)
     )}}
 
     <p>
-      Your organisation ({{ current_service.organisation.name }}) has already accepted the GOV.UK
-      Notify data sharing and financial agreement. You can
-      <a href="{{ url_for('main.service_download_agreement', service_id=current_service.id) }}">download a copy</a>.
+      {{ current_service.organisation.name }} has already accepted the GOV.UK
+      Notify data sharing and financial agreement.
+    </p>
+    <p>For more information, you can <a href="{{ url_for('main.service_download_agreement', service_id=current_service.id) }}">download a copy of the agreement</a>.
     </p>
     <p>
-      The agreement contains commercially sensitive information, so don’t share it more widely than you need to.
+      The agreement is confidential and should not be shared outside your organisation.
     </p>
 
   </div>

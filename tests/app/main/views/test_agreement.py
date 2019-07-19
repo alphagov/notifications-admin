@@ -169,31 +169,31 @@ def test_show_accept_agreement_page(
     assert [
         (input['type'], input['name'], input.get('id')) for input in page.select('input')
     ] == [
-        ('text', 'version', 'version'),
         ('radio', 'who', 'who-0'),
         ('radio', 'who', 'who-1'),
         ('text', 'on_behalf_of_name', 'on_behalf_of_name'),
         ('email', 'on_behalf_of_email', 'on_behalf_of_email'),
+        ('text', 'version', 'version'),
         ('hidden', 'csrf_token', None),
     ]
 
     assert normalize_spaces(page.select_one('label[for=version]').text) == (
-        'Which version of the agreement are you accepting? '
+        'Which version of the agreement do you want to accept? '
         'The version number is on the front page, for example ‘3.6’'
     )
     assert page.select_one('input[name=version]')['value'] == ''
 
     assert normalize_spaces(page.select_one('#who legend').text) == (
-        'Who is accepting the agreement?'
+        'Who are you accepting the agreement for?'
     )
     assert normalize_spaces(page.select_one('label[for=who-0]').text) == (
-        'I’m accepting the agreement'
+        'Yourself'
     )
     assert page.select('input[name=who]')[0]['value'] == 'me'
     assert 'checked' not in page.select('input[name=who]')[0]
     assert 'data-target' not in page.select('.multiple-choice')[0]
     assert normalize_spaces(page.select_one('label[for=who-1]').text) == (
-        'I’m accepting the agreement on behalf of someone else'
+        'Someone else'
     )
     assert page.select('input[name=who]')[1]['value'] == 'someone-else'
     assert 'checked' not in page.select('input[name=who]')[1]
@@ -206,7 +206,7 @@ def test_show_accept_agreement_page(
     ]
 
     assert normalize_spaces(page.select_one('label[for=on_behalf_of_name]').text) == (
-        'Who are you accepting the agreement on behalf of?'
+        'What’s their name?'
     )
     assert page.select_one('input[name=on_behalf_of_name]')['value'] == ''
 
@@ -235,9 +235,9 @@ def test_accept_agreement_page_populates(
     assert [
         (field['name'], field['value']) for field in page.select('input[type=text], input[type=email]')
     ] == [
-        ('version', '1.2'),
         ('on_behalf_of_name', 'Firstname Lastname'),
         ('on_behalf_of_email', 'test@example.com'),
+        ('version', '1.2'),
     ]
     assert 'checked' not in page.select('input[name=who]')[0]
     assert page.select('input[name=who]')[1]['checked'] == ''
@@ -252,8 +252,8 @@ def test_accept_agreement_page_populates(
             'on_behalf_of_email': '',
         },
         [
-            'Must be a number',
             'This field is required.',
+            'Must be a number',
         ],
     ),
     (
