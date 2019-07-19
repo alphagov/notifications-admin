@@ -135,7 +135,7 @@ def batch_send_one_file(service_id):
         done=bool(request.args.get('done')),
         time_now=datetime.utcnow().strftime('%-I:%M%p').lower(),
         edd=(datetime.utcnow() + timedelta(days=3)).strftime('%-d %B'),
-        recipient=random.choice(ADDRESSES),
+        recipient=ADDRESSES[0],
     )
 
 
