@@ -54,12 +54,12 @@ def new_batch(service_id):
 
     files = list(filter(None, (
         request.args.get('file{}'.format(i))
-        for i in range(10)
+        for i in range(11)
     )))
 
     files_dict = {
         'file{}'.format(i): request.args.get('file{}'.format(i))
-        for i in range(10)
+        for i in range(11)
     }
 
     return render_template(
