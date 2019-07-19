@@ -268,9 +268,7 @@ class Service(JSONModel):
 
     @property
     def shouldnt_use_govuk_as_sms_sender(self):
-        return self.organisation_type in {
-            'local', 'nhs', 'nhs_local', 'nhs_central', 'emergency_service', 'school_or_college', 'other'
-        }
+        return self.organisation_type != 'central'
 
     @cached_property
     def sms_senders(self):

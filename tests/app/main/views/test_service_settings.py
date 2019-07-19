@@ -900,7 +900,7 @@ def test_should_not_show_go_live_button_if_checklist_not_complete(
     ),
     pytest.param(
         1,
-        None,
+        'central',
         99,
         [{'is_default': True, 'sms_sender': 'GOVUK'}],
         '',
@@ -931,14 +931,14 @@ def test_should_not_show_go_live_button_if_checklist_not_complete(
     ),
     (
         1,
-        'local',
+        'nhs_local',
         0,
         [],
         'Change your text message sender name Not completed',
     ),
     (
         None,
-        'local',
+        'school_or_college',
         1,
         [{'is_default': True, 'sms_sender': 'GOVUK'}],
         'Change your text message sender name Not completed',
