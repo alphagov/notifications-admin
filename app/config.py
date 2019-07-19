@@ -38,7 +38,6 @@ class Config(object):
     DEFAULT_FREE_SMS_FRAGMENT_LIMITS = {
         'central': 250000,
         'local': 25000,
-        'nhs': 25000,
         'nhs_central': 250000,
         'nhs_local': 25000,
         'emergency_service': 25000,
