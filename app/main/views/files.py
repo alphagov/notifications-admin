@@ -107,6 +107,23 @@ def batch_one_file(service_id):
     )
 
 
+@main.route("/services/<service_id>/files/preview-one")
+@login_required
+@user_has_permissions()
+def batch_one_file_preview(service_id):
+
+    try:
+        recipient = ADDRESSES[int(request.args.get('index')) - 2]
+    except Exception:
+        recipient = None
+
+    return render_template(
+        'views/files/batch-one-file-preview.html',
+        filename=request.args.get('filename'),
+        recipient=recipient,
+    )
+
+
 @main.route("/services/<service_id>/files/send-one")
 @login_required
 @user_has_permissions()

@@ -56,7 +56,7 @@
 
   {% else %}
 
-    <div data-module='fake-delay' data-timeout='{{ files|length * 2000 }}' data-message='Checking your files' data-progress='true' class="bottom-gutter top-gutter-1-3">
+    <div data-module='fake-delay' data-timeout='{{ files|length * 2000 }}' data-message='Checking your letters' data-progress='true' class="bottom-gutter top-gutter-1-3">
 
       <p>
         Postage: second class
@@ -69,10 +69,10 @@
       {% if files|length == 1 %}
         Send 1 letter
       {% else %}
-        Send these {{ files|length }} letters
+        Send {{ files|length }} letters
       {% endif %}
 
-      </a><!--&emsp;<span style="display: inline-block;padding-top: 10px;">If you send now, printing will start today at 5.30pm</span>-->
+      </a>
     </div>
 
   {% endif %}
@@ -100,9 +100,15 @@
         field_headings_visible=False
       ) %}
         {% call row_heading() %}
-          <a class="file-list-filename" href="{{ url_for('.batch_one_file', service_id=current_service.id, filename=item) }}">
-            {{ addresses[row_number - 2] }}
-          </a>
+          {% if done %}
+            <a class="file-list-filename" href="{{ url_for('.batch_one_file', service_id=current_service.id, filename=item) }}">
+              {{ addresses[row_number - 2] }}
+            </a>
+          {% else %}
+            <a class="file-list-filename" href="{{ url_for('.batch_one_file_preview', service_id=current_service.id, filename=item, index=row_number) }}">
+              {{ addresses[row_number - 2] }}
+            </a>
+          {% endif %}
           <p class="file-list-hint">
             {{ item }}
           </p>
