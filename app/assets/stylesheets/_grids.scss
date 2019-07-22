@@ -54,6 +54,10 @@
   margin-top: $gutter * 2 / 3;
 }
 
+.top-gutter-0 {
+  margin-top: 0;
+}
+
 %bottom-gutter,
 .bottom-gutter {
   @extend %contain-floats;

@@ -55,6 +55,7 @@
 
   table {
     table-layout: fixed;
+    margin-bottom: $gutter / 6;
   }
 
   th {
@@ -89,6 +90,10 @@
       margin-bottom: 5px;
     }
 
+  }
+
+  .table-heading {
+    margin-bottom: 20px;
   }
 
 }
