@@ -710,20 +710,35 @@
     this.recalculate();
   };
   Sticky.prototype.setEvents = function () {
-    var self = this;
+    this._scrollEvent = this.onScroll.bind(this);
+    this._resizeEvent = this.onResize.bind(this);
 
     // flag when scrolling takes place and check (and re-position) sticky elements relative to
     // window position
-    if (self._scrollTimeout === false) {
-      $(global).scroll(function (e) { self.onScroll(); });
-      self._scrollTimeout = global.setInterval(function (e) { self.checkScroll(); }, 50);
+    if (this._scrollTimeout === false) {
+      $(global).scroll(this._scrollEvent);
+      this._scrollTimeout = global.setInterval(this.checkScroll.bind(this), 50);
     }
 
     // Recalculate all dimensions when the window resizes
-    if (self._resizeTimeout === false) {
-      $(global).resize(function (e) { self.onResize(); });
-      self._resizeTimeout = global.setInterval(function (e) { self.checkResize(); }, 50);
+    if (this._resizeTimeout === false) {
+      $(global).resize(this._resizeEvent);
+      this._resizeTimeout = global.setInterval(this.checkResize.bind(this), 50);
     }
+  };
+  Sticky.prototype.clearEvents = function () {
+    if (this._scrollTimeout !== false) {
+      $(global).off('scroll', this._scrollEvent);
+      global.clearInterval(this._scrollTimeout);
+      this._scrollTimeout = false;
+    }
+
+    if (this._resizeTimeout !== false) {
+      $(global).off('resize', this._resizeEvent);
+      global.clearInterval(this._resizeTimeout);
+      this._resizeTimeout = false;
+    }
+
   };
   Sticky.prototype.viewportIsWideEnough = function (windowWidth) {
     return windowWidth > 768;
