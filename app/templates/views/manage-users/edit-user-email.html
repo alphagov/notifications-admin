@@ -5,13 +5,13 @@
 {% from "components/form.html" import form_wrapper %}
 
 {% block per_page_title %}
-  Change team member’s email address
+  Edit team member’s email address
 {% endblock %}
 
 {% block maincolumn_content %}
 
   {{ page_header(
-    'Change team member’s email address',
+    'Edit team member’s email address',
     back_link=url_for('main.edit_user_permissions', service_id=current_service.id, user_id=user.id)
   ) }}
 
