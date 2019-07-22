@@ -41,14 +41,24 @@ def test_get_should_render_add_service_template(
     ] == [
         'Central government',
         'Local government',
-        'NHS',
+        'NHS – central government agency or public body',
+        'NHS Trust or Clinical Commissioning Group',
+        'GP practice',
+        'Emergency service',
+        'School or college',
+        'Other',
     ]
     assert [
         radio['value'] for radio in page.select('.multiple-choice input')
     ] == [
         'central',
         'local',
-        'nhs',
+        'nhs_central',
+        'nhs_local',
+        'nhs_local',
+        'emergency_service',
+        'school_or_college',
+        'other',
     ]
 
 
@@ -71,8 +81,12 @@ def test_get_should_not_render_radios_if_org_type_known(
 @pytest.mark.parametrize('inherited, posted, persisted, sms_limit', (
     (None, 'central', 'central', 250000),
     ('central', None, 'central', 250000),
-    ('nhs', None, 'nhs', 25000),
+    ('nhs_central', None, 'nhs_central', 250000),
+    ('nhs_local', None, 'nhs_local', 25000),
     ('local', None, 'local', 25000),
+    ('emergency_service', None, 'emergency_service', 25000),
+    ('school_or_college', None, 'school_or_college', 25000),
+    ('other', None, 'other', 25000),
     ('central', 'local', 'central', 250000),
 ))
 def test_should_add_service_and_redirect_to_tour_when_no_services(
@@ -163,20 +177,11 @@ def test_add_service_has_to_choose_org_type(
     'test@nhs.uk',
     'test@example.NhS.uK',
     'test@EXAMPLE.NHS.NET',
-    pytest.param(
-        'test@not-nhs.uk',
-        marks=pytest.mark.xfail(raises=AssertionError)
-    )
 ))
-def test_add_service_guesses_org_type_for_unknown_nhs_orgs(
-    mocker,
+def test_get_should_only_show_nhs_org_types_radios_if_user_has_nhs_email(
     client_request,
-    mock_create_service,
-    mock_create_service_template,
-    mock_get_services_with_no_services,
+    mocker,
     api_user_active,
-    mock_create_or_update_free_sms_fragment_limit,
-    mock_get_all_email_branding,
     email_address,
 ):
     api_user_active['email_address'] = email_address
@@ -185,17 +190,33 @@ def test_add_service_guesses_org_type_for_unknown_nhs_orgs(
         'app.organisations_client.get_organisation_by_domain',
         return_value=None,
     )
-    client_request.post(
-        'main.add_service',
-        _data={'name': 'example'},
-    )
-    assert mock_create_service.call_args[1]['organisation_type'] == 'nhs'
+    page = client_request.get('main.add_service')
+    assert page.select_one('h1').text.strip() == 'About your service'
+    assert page.select_one('input[name=name]')['value'] == ''
+    assert [
+        label.text.strip() for label in page.select('.multiple-choice label')
+    ] == [
+        'NHS – central government agency or public body',
+        'NHS Trust or Clinical Commissioning Group',
+        'GP practice',
+    ]
+    assert [
+        radio['value'] for radio in page.select('.multiple-choice input')
+    ] == [
+        'nhs_central',
+        'nhs_local',
+        'nhs_local',
+    ]
 
 
 @pytest.mark.parametrize('organisation_type, free_allowance', [
     ('central', 250 * 1000),
     ('local', 25 * 1000),
-    ('nhs', 25 * 1000),
+    ('nhs_central', 250 * 1000),
+    ('nhs_local', 25 * 1000),
+    ('school_or_college', 25 * 1000),
+    ('emergency_service', 25 * 1000),
+    ('other', 25 * 1000),
 ])
 def test_should_add_service_and_redirect_to_dashboard_when_existing_service(
     app_,

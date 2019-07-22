@@ -248,7 +248,24 @@ def organisation_type(label='Who runs this service?'):
         choices=[
             ('central', 'Central government'),
             ('local', 'Local government'),
-            ('nhs', 'NHS'),
+            ('nhs_central', 'NHS – central government agency or public body'),
+            ('nhs_local', 'NHS Trust or Clinical Commissioning Group'),
+            ('nhs_local', 'GP practice'),
+            ('emergency_service', 'Emergency service'),
+            ('school_or_college', 'School or college'),
+            ('other', 'Other'),
+        ],
+        validators=[DataRequired()],
+    )
+
+
+def nhs_organisation_type(label='Who runs this service?'):
+    return RadioField(
+        label,
+        choices=[
+            ('nhs_central', 'NHS – central government agency or public body'),
+            ('nhs_local', 'NHS Trust or Clinical Commissioning Group'),
+            ('nhs_local', 'GP practice'),
         ],
         validators=[DataRequired()],
     )
@@ -584,11 +601,15 @@ class OrganisationDomainsForm(StripWhitespaceForm):
 
 class CreateServiceForm(StripWhitespaceForm):
     name = StringField(
-        u'What’s your service called?',
+        "What’s your service called?",
         validators=[
             DataRequired(message='Can’t be empty')
         ])
     organisation_type = organisation_type()
+
+
+class CreateNhsServiceForm(CreateServiceForm):
+    organisation_type = nhs_organisation_type()
 
 
 class NewOrganisationForm(
