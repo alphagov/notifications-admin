@@ -2414,7 +2414,7 @@ def mock_get_usage(mocker, service_one, fake_uuid):
         ]
 
     return mocker.patch(
-        'app.billing_api_client.get_service_usage_ft', side_effect=_get_usage)
+        'app.billing_api_client.get_service_usage', side_effect=_get_usage)
 
 
 @pytest.fixture(scope='function')
@@ -2508,7 +2508,7 @@ def mock_get_billable_units(mocker):
         ]
 
     return mocker.patch(
-        'app.billing_api_client.get_billable_units_ft', side_effect=_get_usage)
+        'app.billing_api_client.get_billable_units', side_effect=_get_usage)
 
 
 @pytest.fixture(scope='function')
@@ -2526,7 +2526,7 @@ def mock_get_future_usage(mocker, service_one, fake_uuid):
         ]
 
     return mocker.patch(
-        'app.billing_api_client.get_service_usage_ft', side_effect=_get_usage)
+        'app.billing_api_client.get_service_usage', side_effect=_get_usage)
 
 
 @pytest.fixture(scope='function')
@@ -2535,7 +2535,7 @@ def mock_get_future_billable_units(mocker):
         return []
 
     return mocker.patch(
-        'app.billing_api_client.get_billable_units_ft', side_effect=_get_usage)
+        'app.billing_api_client.get_billable_units', side_effect=_get_usage)
 
 
 @pytest.fixture(scope='function')
