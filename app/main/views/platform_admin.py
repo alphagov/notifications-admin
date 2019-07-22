@@ -11,6 +11,7 @@ from app import (
     complaint_api_client,
     format_date_numeric,
     letter_jobs_client,
+    notification_api_client,
     platform_stats_api_client,
     service_api_client,
 )
@@ -20,6 +21,7 @@ from app.main.forms import (
     ClearCacheForm,
     DateFilterForm,
     PDFUploadForm,
+    RequiredDateFilterForm,
     ReturnedLettersForm,
 )
 from app.statistics_utils import (
@@ -261,6 +263,33 @@ def performance_platform_xlsx():
             format_date_numeric(datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")),
         )
     }
+
+
+@main.route("/platform-admin/reports/notifications-sent-by-service", methods=['GET', 'POST'])
+@user_is_platform_admin
+def notifications_sent_by_service():
+    form = RequiredDateFilterForm()
+
+    if form.validate_on_submit():
+        start_date = form.start_date.data
+        end_date = form.end_date.data
+
+        headers = [
+            'date_created', 'service_id', 'service_name', 'notification_type', 'count_sending', 'count_delivered',
+            'count_technical_failure', 'count_temporary_failure', 'count_permanent_failure', 'count_sent'
+        ]
+        result = notification_api_client.get_notification_status_by_service(start_date, end_date)
+
+        for row in result:
+            row[0] = datetime.strptime(row[0], '%a, %d %b %Y %X %Z').strftime('%Y-%m-%d')
+
+        return Spreadsheet.from_rows([headers] + result).as_csv_data, 200, {
+            'Content-Type': 'text/csv; charset=utf-8',
+            'Content-Disposition': 'attachment; filename="{} to {} notification status per service report.csv"'.format(
+                start_date, end_date)
+        }
+
+    return render_template('views/platform-admin/notifications_by_service.html', form=form)
 
 
 @main.route("/platform-admin/complaints")
