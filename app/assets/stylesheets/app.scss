@@ -77,6 +77,10 @@ a {
   > .heading-medium {
     margin: $gutter-half 0 ($gutter / 3 * 2) 0;
     word-wrap: break-word;
+
+    &.top-gutter-0 {
+      margin-top: 0;
+    }
   }
 
 }
