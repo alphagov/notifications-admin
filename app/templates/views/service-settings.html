@@ -153,7 +153,7 @@
         {% endcall %}
 
         {% call settings_row(if_has_permission='sms') %}
-          {{ text_field('Text messages start with service name') }}
+          {{ text_field('Start text messages with service name') }}
           {{ boolean_field(current_service.prefix_sms) }}
           {{ edit_field(
               'Change',
