@@ -5,13 +5,13 @@
 {% from "components/form.html" import form_wrapper %}
 
 {% block per_page_title %}
-  Edit team member’s mobile number
+  Change team member’s mobile number
 {% endblock %}
 
 {% block maincolumn_content %}
 
   {{ page_header(
-    'Edit team member’s mobile number',
+    'Change team member’s mobile number',
     back_link=url_for('main.edit_user_permissions', service_id=current_service.id, user_id=user.id)
   ) }}
 
