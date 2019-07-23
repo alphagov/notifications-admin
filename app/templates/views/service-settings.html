@@ -134,7 +134,7 @@
         {% endcall %}
 
         {% call settings_row(if_has_permission='sms') %}
-          {{ text_field('Text message sender') }}
+          {{ text_field('Text message senders') }}
           {% call field(status='default' if current_service.default_sms_sender == "None" else '') %}
             {{ current_service.default_sms_sender | string | nl2br | safe if current_service.default_sms_sender else 'None'}}
             {% if current_service.count_sms_senders > 1 %}
