@@ -20,14 +20,14 @@
       {% call row() %}
         {{ text_field('Name') }}
         {{ text_field(current_user.name) }}
-        {{ edit_field('Edit', url_for('.user_profile_name')) }}
+        {{ edit_field('Change', url_for('.user_profile_name')) }}
       {% endcall %}
 
       {% call row() %}
         {{ text_field('Email address') }}
         {{ text_field(current_user.email_address) }}
         {% if can_see_edit %}
-          {{ edit_field('Edit', url_for('.user_profile_email')) }}
+          {{ edit_field('Change', url_for('.user_profile_email')) }}
         {% else %}
           {{ text_field('') }}
         {% endif %}
@@ -36,7 +36,7 @@
       {% call row() %}
         {{ text_field('Mobile number') }}
         {{ optional_text_field(current_user.mobile_number) }}
-        {{ edit_field('Edit', url_for('.user_profile_mobile_number')) }}
+        {{ edit_field('Change', url_for('.user_profile_mobile_number')) }}
       {% endcall %}
 
       {% call row() %}
