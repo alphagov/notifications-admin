@@ -110,5 +110,14 @@ class NotificationApiClient(NotifyAdminAPIClient):
             url='/service/{}/notifications/{}/cancel'.format(service_id, notification_id),
             data={})
 
+    def get_notification_status_by_service(self, start_date, end_date):
+        return self.get(
+            url='service/monthly-data-by-service',
+            params={
+                'start_date': str(start_date),
+                'end_date': str(end_date),
+            }
+        )
+
 
 notification_api_client = NotificationApiClient()

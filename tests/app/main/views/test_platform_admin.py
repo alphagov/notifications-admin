@@ -19,7 +19,12 @@ from app.main.views.platform_admin import (
     sum_service_usage,
 )
 from tests import service_json
-from tests.conftest import SERVICE_ONE_ID, mock_get_user, normalize_spaces
+from tests.conftest import (
+    SERVICE_ONE_ID,
+    SERVICE_TWO_ID,
+    mock_get_user,
+    normalize_spaces,
+)
 
 
 @pytest.mark.parametrize('endpoint', [
@@ -968,6 +973,10 @@ def test_reports_page(
         'a', text="Download performance platform report (.xlsx)"
     ).attrs['href'] == '/platform-admin/reports/performance-platform.xlsx'
 
+    assert page.find(
+        'a', text="Monthly notification statuses for live services"
+    ).attrs['href'] == url_for('main.notifications_sent_by_service')
+
 
 def test_get_live_services_report(client, platform_admin_user, mocker):
     mock_get_user(mocker, user=platform_admin_user)
@@ -1034,3 +1043,76 @@ def test_get_performance_platform_report(client, platform_admin_user, mocker):
         ['abc123', 'Forest', 'jessie the oak tree', '2014-03-29T00:00:00Z', 'govuk-notify', 1],
         ['def456', 'Forest', 'james the pine tree', '', 'govuk-notify', 1],
     ]
+
+
+def test_get_notifications_sent_by_service_shows_date_form(client_request, platform_admin_user):
+    client_request.login(platform_admin_user)
+    page = client_request.get('main.notifications_sent_by_service')
+
+    assert [
+        (input['type'], input['name'], input['value'])
+        for input in page.select('input')
+    ] == [
+        ('text', 'start_date', ''),
+        ('text', 'end_date', ''),
+        ('hidden', 'csrf_token', ANY)
+    ]
+
+
+def test_get_notifications_sent_by_service_validates_form(mocker, client_request, platform_admin_user):
+    mock_get_stats_from_api = mocker.patch('app.main.views.platform_admin.notification_api_client')
+
+    client_request.login(platform_admin_user)
+
+    page = client_request.post(
+        'main.notifications_sent_by_service',
+        _expected_status=200,
+        _data={'start_date': '', 'end_date': '20190101'}
+    )
+
+    errors = page.select('.error-message')
+    assert len(errors) == 2
+
+    for error in errors:
+        assert normalize_spaces(error.text) == 'Not a valid date value'
+
+    mock_get_stats_from_api.assert_not_called()
+
+
+def test_get_notifications_sent_by_service_calls_api_and_downloads_data(
+    mocker,
+    client,
+    platform_admin_user,
+    service_one,
+    service_two,
+):
+    mock_get_user(mocker, user=platform_admin_user)
+    api_data = [
+        ['Tue, 01 Jan 2019 00:00:00 GMT', SERVICE_ONE_ID, service_one['name'], 'email', 191, 0, 0, 14, 0, 0],
+        ['Tue, 01 Jan 2019 00:00:00 GMT', SERVICE_ONE_ID, service_one['name'], 'sms', 42, 0, 0, 8, 0, 0],
+        ['Tue, 01 Jan 2019 00:00:00 GMT', SERVICE_TWO_ID, service_two['name'], 'email', 3, 1, 0, 2, 0, 0],
+    ]
+    mocker.patch('app.main.views.platform_admin.notification_api_client.get_notification_status_by_service',
+                 return_value=api_data)
+    start_date = datetime.date(2019, 1, 1)
+    end_date = datetime.date(2019, 1, 31)
+
+    client.login(platform_admin_user)
+
+    response = client.post(
+        url_for('main.notifications_sent_by_service'),
+        data={'start_date': start_date, 'end_date': end_date}
+    )
+
+    assert response.status_code == 200
+    assert response.content_type == 'text/csv; charset=utf-8'
+    assert response.headers['Content-Disposition'] == (
+        'attachment; filename="{} to {} notification status per service report.csv"'.format(start_date, end_date)
+    )
+    assert response.get_data(as_text=True) == (
+        'date_created,service_id,service_name,notification_type,count_sending,count_delivered,count_technical_failure,'
+        'count_temporary_failure,count_permanent_failure,count_sent\r\n'
+        '2019-01-01,596364a0-858e-42c8-9062-a8fe822260eb,service one,email,191,0,0,14,0,0\r\n'
+        '2019-01-01,596364a0-858e-42c8-9062-a8fe822260eb,service one,sms,42,0,0,8,0,0\r\n'
+        '2019-01-01,147ad62a-2951-4fa1-9ca0-093cd1a52c52,service two,email,3,1,0,2,0,0\r\n'
+    )

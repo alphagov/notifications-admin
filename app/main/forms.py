@@ -1120,6 +1120,11 @@ class DateFilterForm(StripWhitespaceForm):
     include_from_test_key = BooleanField("Include test keys", default="checked", false_values={"N"})
 
 
+class RequiredDateFilterForm(StripWhitespaceForm):
+    start_date = DateField("Start Date")
+    end_date = DateField("End Date")
+
+
 class SearchByNameForm(StripWhitespaceForm):
 
     search = SearchField('Search by name')
