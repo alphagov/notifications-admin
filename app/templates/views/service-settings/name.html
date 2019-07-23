@@ -6,13 +6,13 @@
 {% from "components/form.html" import form_wrapper %}
 
 {% block service_page_title %}
-  Edit your service name
+  Change your service name
 {% endblock %}
 
 {% block maincolumn_content %}
 
   {{ page_header(
-    'Edit your service name',
+    'Change your service name',
     back_link=url_for('main.service_settings', service_id=current_service.id)
   ) }}
 
