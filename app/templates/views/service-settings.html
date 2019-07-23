@@ -23,7 +23,7 @@
           {{ text_field('Service name') }}
           {{ text_field(current_service.name) }}
           {{ edit_field(
-              'Edit',
+              'Change',
               url_for('.service_name_change', service_id=current_service.id),
               permissions=['manage_service']
             )
@@ -165,7 +165,7 @@
         {% endcall %}
 
         {% call settings_row(if_has_permission='sms') %}
-          {{ text_field('International text messages') }}
+          {{ text_field('Send international text messages') }}
           {{ boolean_field('international_sms' in current_service.permissions) }}
           {{ edit_field(
               'Change',
