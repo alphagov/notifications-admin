@@ -65,14 +65,14 @@ def mock_get_service_settings_page_common(
 
         'Label Value Action',
         'Send emails On Change',
-        'Reply-to email addresses Not set Change',
+        'Reply-to email addresses Not set Manage',
         'Email branding GOV.UK Change',
 
         'Label Value Action',
         'Send text messages On Change',
-        'Text message sender GOVUK Change',
+        'Text message senders GOVUK Manage',
         'Start text messages with service name On Change',
-        'International text messages Off Change',
+        'Send international text messages Off Change',
         'Receive text messages Off Change',
 
         'Label Value Action',
@@ -87,14 +87,14 @@ def mock_get_service_settings_page_common(
 
         'Label Value Action',
         'Send emails On Change',
-        'Reply-to email addresses Not set Change',
+        'Reply-to email addresses Not set Manage',
         'Email branding GOV.UK Change',
 
         'Label Value Action',
         'Send text messages On Change',
-        'Text message sender GOVUK Change',
+        'Text message senders GOVUK Manage',
         'Start text messages with service name On Change',
-        'International text messages Off Change',
+        'Send international text messages Off Change',
         'Receive text messages Off Change',
 
         'Label Value Action',
@@ -206,9 +206,9 @@ def test_organisation_name_links_to_org_dashboard(
 
         'Label Value Action',
         'Send text messages On Change',
-        'Text message sender GOVUK Change',
+        'Text message senders GOVUK Manage',
         'Start text messages with service name On Change',
-        'International text messages On Change',
+        'Send international text messages On Change',
         'Receive text messages On Change',
 
         'Label Value Action',
@@ -227,9 +227,9 @@ def test_organisation_name_links_to_org_dashboard(
 
         'Label Value Action',
         'Send text messages On Change',
-        'Text message sender GOVUK Change',
+        'Text message senders GOVUK Manage',
         'Start text messages with service name On Change',
-        'International text messages Off Change',
+        'Send international text messages Off Change',
         'Receive text messages Off Change',
 
         'Label Value Action',
@@ -1848,7 +1848,7 @@ def test_and_more_hint_appears_on_settings_with_more_than_just_a_single_sender(
         )
 
     assert get_row(page, 3) == "Reply-to email addresses test@example.com …and 2 more Manage"
-    assert get_row(page, 6) == "Text message sender Example …and 2 more Manage"
+    assert get_row(page, 6) == "Text message senders Example …and 2 more Manage"
     assert get_row(page, 11) == "Sender addresses 1 Example Street …and 2 more Manage"
 
 
