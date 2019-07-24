@@ -1,5 +1,7 @@
 const helpers = require('./support/helpers');
-const STOP_PADDING = 10;
+const PADDING_BETWEEN_STICKYS = 40;
+const PADDING_BEFORE_STOPPING_POINT = 10;
+
 function getScreenItemBottomPosition (screenItem) {
   return screenItem.offsetTop + screenItem.offsetHeight;
 };
@@ -22,6 +24,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
     let formFooter;
     let footer;
     let windowHeight;
+    let getFurthestTopPoint;
 
     beforeEach(() => {
 
@@ -122,10 +125,10 @@ describe("Stick to top/bottom of window when scrolling", () => {
     test("if top of viewport is below the furthest point the top of the element can go in the scroll area on load, the element should be marked as stopped", () => {
 
       // the element should stop a set distance from the stopping point
-      const furthestPoint = (footer.offsetTop - inputForm.offsetHeight) - STOP_PADDING;
+      const furthestTopPoint = getFurthestTopPoint(inputForm.offsetHeight);
 
       // scroll past the furthest point
-      screenMock.scrollTo(furthestPoint + 10);
+      screenMock.scrollTo(furthestTopPoint + 10);
 
       window.GOVUK.stickAtTopWhenScrolling.init();
 
@@ -135,7 +138,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
 
       // elements are stopped by adding inline styles
       expect(inputForm.style.position).toEqual('absolute');
-      expect(inputForm.style.top).toEqual(`${furthestPoint}px`);
+      expect(inputForm.style.top).toEqual(`${furthestTopPoint}px`);
 
     });
 
@@ -162,10 +165,10 @@ describe("Stick to top/bottom of window when scrolling", () => {
 
       test("if window is scrolled so top of it is below the furthest point the top of the element can go in the scroll area, the element should be stopped", () => {
 
-        const furthestPoint = (footer.offsetTop - inputForm.offsetHeight) - STOP_PADDING;
+        const furthestTopPoint = getFurthestTopPoint(inputForm.offsetHeight);
 
         // scroll past top of form
-        screenMock.scrollTo(furthestPoint + 10);
+        screenMock.scrollTo(furthestTopPoint + 10);
         jest.advanceTimersByTime(60); // fake advance of time to something similar to that for a scroll
 
         // `content-fixed` fades the drop-shadow in to show it became sticky from user interaction
@@ -174,7 +177,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
 
         // elements are stopped by adding inline styles
         expect(inputForm.style.position).toEqual('absolute');
-        expect(inputForm.style.top).toEqual(`${furthestPoint}px`);
+        expect(inputForm.style.top).toEqual(`${furthestTopPoint}px`);
 
       });
 
@@ -204,6 +207,198 @@ describe("Stick to top/bottom of window when scrolling", () => {
 
     });
 
+    describe("if mode is set to 'dialog' and multiple sticky elements share the same scroll area", () => {
+
+      let radios;
+
+      beforeEach(() => {
+
+        const inputFormBottom = getScreenItemBottomPosition(inputForm);
+
+        // set mode to 'dialog' so sticky elements are treated as one item
+        window.GOVUK.stickAtTopWhenScrolling.setMode('dialog')
+
+        // add another sticky element before the form footer
+        radios = helpers.getRadioGroup({
+          cssClasses: ['js-stick-at-top-when-scrolling'],
+          name: 'send-time',
+          label: 'send time',
+          fields: [
+            {
+              label: 'Now',
+              value: 'now',
+              checked: true
+            },
+            {
+              label: 'Tomorrow',
+              value: 'tomorrow',
+              checked: false
+            },
+            {
+              label: 'Friday',
+              value: 'friday',
+              checked: false
+            }
+          ]
+        });
+        formFooter.parentNode.insertBefore(radios, formFooter);
+        screenMock.mockPositionAndDimension('radios', radios, {
+          offsetHeight: 175,
+          offsetWidth: 727,
+          offsetTop: inputFormBottom
+        });
+        const radiosBottom = getScreenItemBottomPosition(radios);
+
+        // adjust other screen items
+
+        // formFooter top should be at the radios bottom
+        formFooter.offsetTop = radiosBottom;
+
+        // footer top should be at formFooter's bottom
+        footer.offsetTop = getScreenItemBottomPosition(formFooter);
+
+      });
+
+      describe("if window top is below the top of the highest element on load", () => {
+
+        beforeEach(() => {
+
+          // scroll past top of first sticky element
+          screenMock.scrollTo(inputForm.offsetTop + 10);
+
+          window.GOVUK.stickAtTopWhenScrolling.init();
+
+        });
+
+        test("both should be marked as already sticky", () => {
+
+          // `.content-fixed-onload` adds the drop-shadow without fading in to show it did not become sticky from user interaction
+          expect(radios.classList.contains('content-fixed-onload')).toBe(true);
+          expect(radios.classList.contains('content-fixed')).toBe(false);
+          expect(inputForm.classList.contains('content-fixed-onload')).toBe(true);
+          expect(inputForm.classList.contains('content-fixed')).toBe(false);
+
+        });
+
+        test("the lowest element should have the drop-shadow", () => {
+
+          expect(radios.classList.contains('content-fixed__top')).toBe(true);
+
+        });
+
+        test("they should be stacked from the top edge of the viewport in the order they appear in the document", () => {
+
+          expect(inputForm.style.top).toEqual('0px');
+
+          // dialog mode removes enough padding to deal with that each sticky element is given to give its content enough space from the surrounding page
+          expect(radios.style.top).toEqual(`${inputForm.offsetHeight - PADDING_BETWEEN_STICKYS}px`);
+
+        });
+
+      });
+
+      describe("if window top is below the furthest point the highest element can go on load", () => {
+
+        let furthestTopPoint;
+
+        beforeEach(() => {
+
+          // ensure each sticky element is positioned correctly relative to the furthest point
+          const dialogHeight = (inputForm.offsetHeight + radios.offsetHeight) - PADDING_BETWEEN_STICKYS;
+
+          furthestTopPoint = getFurthestTopPoint(dialogHeight);
+
+          // scroll past top of first sticky element
+          screenMock.scrollTo(furthestTopPoint + 10);
+
+          window.GOVUK.stickAtTopWhenScrolling.init();
+
+        });
+
+        test("both should be stopped so the bottom of their stack is at the furthest point", () => {
+
+          expect(inputForm.style.position).toEqual('absolute');
+          expect(radios.style.position).toEqual('absolute');
+
+          expect(inputForm.style.top).toEqual(`${furthestTopPoint}px`);
+          expect(radios.style.top).toEqual(`${footer.offsetTop - PADDING_BEFORE_STOPPING_POINT - radios.offsetHeight}px`);
+
+        });
+
+      });
+
+      describe("if the group of sticky elements is taller than the window when stuck together", () => {
+
+        // the sticky behaviour should stick as many elements as possible to the top of the viewport
+        // the rest should be put back into their place in the document
+        beforeEach(() => {
+
+          const windowHeight = 460;
+
+          function makeStickysBiggerThanWindow () {
+
+            // make the radios too big to fit in the viewport
+            const fields = ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
+              .map(field => {
+                return {
+                  label: field,
+                  value: field.toLowerCase(),
+                  checked: false
+                }
+              });
+
+            radios.querySelector('fieldset').insertAdjacentHTML('beforeend', helpers.getRadios(fields));
+
+            radios.offsetHeight = 475;
+
+          };
+
+          function adjustScreenPositions () {
+
+            const radiosBottom = getScreenItemBottomPosition(radios);
+
+            screenMock.window.setHeightTo(windowHeight);
+
+            // formFooter top should be at the radios bottom
+            formFooter.offsetTop = radiosBottom;
+
+            // footer top should be at formFooter's bottom
+            footer.offsetTop = getScreenItemBottomPosition(formFooter);
+
+          };
+
+          makeStickysBiggerThanWindow();
+          adjustScreenPositions();
+
+          screenMock.scrollTo(inputForm.offsetTop + 10);
+
+          window.GOVUK.stickAtTopWhenScrolling.init()
+
+        });
+
+        test("the number of elements in the group that are stuck should be reduced until it fits into the viewport", () => {
+
+          // when the group is stuck, pageFooter is closest to the viewport edge so should stay sticky
+          expect(inputForm.classList.contains('content-fixed-onload')).toBe(true);
+          expect(inputForm.classList.contains('content-fixed')).toBe(false);
+
+          // radios are made not sticky
+          expect(radios.classList.contains('content-fixed-onload')).toBe(false);
+          expect(radios.classList.contains('content-fixed')).toBe(false);
+
+        });
+
+        test("window is scrolled so the sticky elements (stuck and not stuck) appear in sequence", () => {
+
+          // we assume it's useful to start by seeing all the elements in the position they normally sit in the page
+          expect(screenMock.window.top).toEqual(inputForm.offsetTop);
+
+        });
+
+      });
+
+    });
+
   });
 
   describe("If intending to stick to the bottom", () => {
@@ -212,7 +407,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
     let content;
     let pageFooter;
     let windowHeight;
-    let furthestBottomPoint;
+    let getFurthestBottomPoint;
 
     beforeEach(() => {
 
@@ -284,11 +479,10 @@ describe("Stick to top/bottom of window when scrolling", () => {
         offsetTop: content.offsetTop + content.offsetHeight
       });
 
-      furthestBottomPoint = () => {
-        const headingBottom = getScreenItemBottomPosition(headingItem);
+      getFurthestBottomPoint = (stickysTotalHeight) => {
+        const headingBottom = getScreenItemBottomPosition(heading);
 
-        // the element should stop so its top at the bottom of the heading, with a set amount of padding to separate them
-        return (headingBottom + pageFooterItem.height) + STOP_PADDING;
+        return headingBottom + PADDING_BEFORE_STOPPING_POINT + stickysTotalHeight;
       };
 
       // the sticky JS polls for changes to position/dimension so we need to fake setTimeout and setInterval
@@ -332,11 +526,12 @@ describe("Stick to top/bottom of window when scrolling", () => {
 
       // change window size so its bottom can go past stopping position
       const windowHeight = 200;
+      const furthestBottomPoint = getFurthestBottomPoint(pageFooter.offsetHeight);
 
       screenMock.window.setHeightTo(windowHeight);
 
       // scroll the window bottom past the furthest point
-      screenMock.scrollTo((furthestBottomPoint() - windowHeight) - 10);
+      screenMock.scrollTo((furthestBottomPoint - windowHeight) - 10);
 
       window.GOVUK.stickAtBottomWhenScrolling.init();
 
@@ -346,7 +541,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
 
       // elements are stopped by adding inline styles
       expect(pageFooter.style.position).toEqual('absolute');
-      expect(pageFooter.style.top).toEqual(`${furthestBottomPoint() - pageFooter.offsetHeight}px`);
+      expect(pageFooter.style.top).toEqual(`${furthestBottomPoint - pageFooter.offsetHeight}px`);
 
     });
 
@@ -385,8 +580,10 @@ describe("Stick to top/bottom of window when scrolling", () => {
 
       test("if window is scrolled so bottom of it is above the furthest point the bottom of the element can go in the scroll area, the element should be stopped", () => {
 
+        const furthestBottomPoint = getFurthestBottomPoint(pageFooter.offsetHeight);
+
         // scroll past top of content
-        screenMock.scrollTo((furthestBottomPoint() - windowHeight) - 10);
+        screenMock.scrollTo((furthestBottomPoint - windowHeight) - 10);
         jest.advanceTimersByTime(60); // fake advance of time to something similar to that for a scroll
 
         // `content-fixed` fades the drop-shadow in to show it became sticky from user interaction
@@ -395,7 +592,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
 
         // elements are stopped by adding inline styles
         expect(pageFooter.style.position).toEqual('absolute');
-        expect(pageFooter.style.top).toEqual(`${furthestBottomPoint() pageFooter.offsetHeight}px`);
+        expect(pageFooter.style.top).toEqual(`${furthestBottomPoint - pageFooter.offsetHeight}px`);
 
       });
 
@@ -423,6 +620,199 @@ describe("Stick to top/bottom of window when scrolling", () => {
 
         expect(pageFooter.classList.contains('content-fixed')).toBe(false);
         expect(pageFooter.classList.contains('content-fixed-onload')).toBe(false); // check the class for onload isn't applied
+
+      });
+
+    });
+
+    describe("if mode is set to 'dialog' and multiple sticky elements have the same scroll area", () => {
+
+      let radios;
+
+      beforeEach(() => {
+
+        const contentBottom = getScreenItemBottomPosition(content);
+
+        // set mode to 'dialog' so sticky elements are treated as one item
+        window.GOVUK.stickAtBottomWhenScrolling.setMode('dialog')
+
+        // add another sticky element before the form footer
+        radios = helpers.getRadioGroup({
+          cssClasses: ['js-stick-at-bottom-when-scrolling'],
+          name: 'send-time',
+          label: 'Send time',
+          fields: [
+            {
+              label: 'Now',
+              value: 'now',
+              checked: true
+            },
+            {
+              label: 'Tomorrow',
+              value: 'tomorrow',
+              checked: false
+            },
+            {
+              label: 'Friday',
+              value: 'friday',
+              checked: false
+            }
+          ]
+        });
+
+        pageFooter.parentNode.insertBefore(radios, pageFooter);
+        screenMock.mockPositionAndDimension('radios', radios, {
+          offsetHeight: 175,
+          offsetWidth: 727,
+          offsetTop: contentBottom
+        });
+        const radiosBottom = getScreenItemBottomPosition(radios);
+
+        // adjust other screen items
+
+        // pageFooter top should be at the radios bottom
+        pageFooter.offsetTop = radiosBottom;
+
+      });
+
+      describe("if window bottom is above the bottom of the lowest element on load", () => {
+
+        let pageFooterBottom;
+
+        beforeEach(() => {
+
+          pageFooterBottom = getScreenItemBottomPosition(pageFooter);
+
+          // scroll to just above the element
+          screenMock.scrollTo((pageFooterBottom - windowHeight) - 10);
+
+          window.GOVUK.stickAtBottomWhenScrolling.init();
+
+        });
+
+        test("both should be marked as already sticky", () => {
+
+          expect(pageFooter.classList.contains('content-fixed-onload')).toBe(true);
+          expect(pageFooter.classList.contains('content-fixed')).toBe(false);
+
+        });
+
+        test("the highest element should have the drop-shadow", () => {
+
+          expect(radios.classList.contains('content-fixed__bottom')).toBe(true);
+
+        });
+
+        test("they should be stacked from the bottom edge of the viewport in the order they appear in the document", () => {
+
+          expect(radios.style.bottom).toEqual(`${pageFooter.offsetHeight - PADDING_BETWEEN_STICKYS}px`);
+
+        });
+
+      });
+
+      describe("if window bottom is above the furthest point the lowest element can go on load", () => {
+
+        let headingBottom;
+
+        beforeEach(() => {
+
+          const dialogHeight = (pageFooter.offsetHeight + radios.offsetHeight) - PADDING_BETWEEN_STICKYS;
+          const furthestBottomPoint = getFurthestBottomPoint(dialogHeight);
+
+          // change window size so its bottom can go past stopping position
+          const windowHeight = 200;
+
+          headingBottom = getScreenItemBottomPosition(heading);
+
+          screenMock.window.setHeightTo(windowHeight);
+
+          screenMock.scrollTo((furthestBottomPoint - windowHeight) - 10)
+
+          window.GOVUK.stickAtBottomWhenScrolling.init();
+
+        });
+
+        test("both should be stopped so the top of their stack is at the furthest point", () => {
+
+          expect(radios.style.position).toEqual('absolute');
+          expect(pageFooter.style.position).toEqual('absolute');
+          expect(radios.style.top).toEqual(`${headingBottom + PADDING_BEFORE_STOPPING_POINT}px`);
+          expect(pageFooter.style.top).toEqual(`${headingBottom + PADDING_BEFORE_STOPPING_POINT + (radios.offsetHeight - PADDING_BETWEEN_STICKYS)}px`);
+
+        });
+
+      });
+
+      describe("if the group of sticky elements is taller than the window when stuck together", () => {
+
+        let windowHeight;
+        let pageFooterBottom;
+
+        // the sticky behaviour should stick as many elements as possible to the bottom of the viewport
+        // the rest should be put back into their place in the document
+        beforeEach(() => {
+
+          windowHeight = 460;
+
+          function makeStickysBiggerThanWindow () {
+
+            // make the radios too big to fit in the viewport
+            const fields = ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
+              .map(field => {
+                return {
+                  label: field,
+                  value: field.toLowerCase(),
+                  checked: false
+                }
+              });
+
+            radios.querySelector('fieldset').insertAdjacentHTML('beforeend', helpers.getRadios(fields));
+
+            radios.offsetHeight = 475;
+
+          };
+
+          function adjustScreenPositions () {
+
+            const radiosBottom = getScreenItemBottomPosition(radios);
+
+            screenMock.window.setHeightTo(windowHeight);
+
+            // formFooter top should be at the radios bottom
+            pageFooter.offsetTop = radiosBottom;
+
+          };
+
+          makeStickysBiggerThanWindow();
+          adjustScreenPositions();
+
+          pageFooterBottom = getScreenItemBottomPosition(pageFooter);
+
+          screenMock.scrollTo((pageFooterBottom - windowHeight) - 10);
+
+          window.GOVUK.stickAtBottomWhenScrolling.init()
+
+        });
+
+        test("the number of elements in the group that are stuck should be reduced until it fits into the viewport", () => {
+
+          // when the group is stuck, pageFooter is closest to the viewport edge so should stay sticky
+          expect(pageFooter.classList.contains('content-fixed-onload')).toBe(true);
+          expect(pageFooter.classList.contains('content-fixed')).toBe(false);
+
+          // radios are made not sticky
+          expect(radios.classList.contains('content-fixed-onload')).toBe(false);
+          expect(radios.classList.contains('content-fixed')).toBe(false);
+
+        });
+
+        test("window is scrolled so the sticky elements (stuck and not stuck) appear in sequence", () => {
+
+          // we assume it's useful to start by seeing all the elements in the position they normally sit in the page
+          expect(screenMock.window.top).toEqual(pageFooterBottom - windowHeight);
+
+        });
 
       });
 
