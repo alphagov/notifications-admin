@@ -216,8 +216,11 @@ def edit_organisation_type(org_id):
     )
 
     if form.validate_on_submit():
+        org_service_ids = [service['id'] for service in current_organisation.services]
+
         organisations_client.update_organisation(
             current_organisation.id,
+            cached_service_ids=org_service_ids,
             organisation_type=form.organisation_type.data,
         )
         return redirect(url_for('.organisation_settings', org_id=org_id))

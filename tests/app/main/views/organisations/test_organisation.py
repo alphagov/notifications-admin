@@ -359,17 +359,17 @@ def test_view_organisation_settings(
     (
         '.edit_organisation_type',
         {'organisation_type': 'central'},
-        {'organisation_type': 'central'},
+        {'cached_service_ids': [], 'organisation_type': 'central'},
     ),
     (
         '.edit_organisation_type',
         {'organisation_type': 'local'},
-        {'organisation_type': 'local'},
+        {'cached_service_ids': [], 'organisation_type': 'local'},
     ),
     (
         '.edit_organisation_type',
         {'organisation_type': 'nhs_local'},
-        {'organisation_type': 'nhs_local'},
+        {'cached_service_ids': [], 'organisation_type': 'nhs_local'},
     ),
     (
         '.edit_organisation_crown_status',
@@ -412,6 +412,7 @@ def test_view_organisation_settings(
     ),
 ))
 def test_update_organisation_settings(
+    mocker,
     client_request,
     fake_uuid,
     organisation_one,
@@ -422,6 +423,7 @@ def test_update_organisation_settings(
     expected_persisted,
     user,
 ):
+    mocker.patch('app.organisations_client.get_organisation_services', return_value=[])
     client_request.login(user(fake_uuid))
 
     client_request.post(
@@ -439,6 +441,35 @@ def test_update_organisation_settings(
     mock_update_organisation.assert_called_once_with(
         organisation_one['id'],
         **expected_persisted,
+    )
+
+
+def test_update_organisation_sector_sends_service_id_data_to_api_client(
+    client_request,
+    mock_get_organisation,
+    organisation_one,
+    mock_get_organisation_services,
+    mock_update_organisation,
+    platform_admin_user,
+):
+    client_request.login(platform_admin_user)
+
+    client_request.post(
+        'main.edit_organisation_type',
+        org_id=organisation_one['id'],
+        _data={'organisation_type': 'central'},
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.organisation_settings',
+            org_id=organisation_one['id'],
+            _external=True,
+        ),
+    )
+
+    mock_update_organisation.assert_called_once_with(
+        organisation_one['id'],
+        cached_service_ids=['12345', '67890', SERVICE_ONE_ID],
+        organisation_type='central'
     )
 
 
