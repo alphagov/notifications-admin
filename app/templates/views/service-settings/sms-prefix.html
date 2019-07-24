@@ -5,13 +5,13 @@
 {% from "components/form.html" import form_wrapper %}
 
 {% block service_page_title %}
-  Text messages start with service name
+  Start text messages with service name
 {% endblock %}
 
 {% block maincolumn_content %}
 
   {{ page_header(
-    'Text messages start with service name',
+    'Start text messages with service name',
     back_link=url_for('main.service_settings', service_id=current_service.id)
   ) }}
 
