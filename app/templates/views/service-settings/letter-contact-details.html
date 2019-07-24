@@ -17,11 +17,18 @@
     ) }}
   </div>
   <div class="user-list">
-    {% if not letter_contact_details %}
-      <div class="user-list-item">
-        <span class="hint">You haven’t added any letter contact details yet</span>
-      </div>
-    {% endif %}
+    <div class="user-list-item">
+      <span class="hint">
+        Blank
+        {% if current_service.default_letter_contact_block %}
+          {% if current_user.has_permissions('manage_service') %}
+            <a class="user-list-edit-link" href="{{ url_for('.service_make_blank_default_letter_contact', service_id =current_service.id) }}">Make default</a>
+          {% endif %}
+        {% else %}
+          (default)
+        {% endif %}
+      </span>
+    </div>
     {% for item in letter_contact_details %}
       <div class="user-list-item">
         <p>

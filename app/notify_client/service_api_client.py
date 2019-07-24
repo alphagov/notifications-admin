@@ -458,6 +458,13 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             }
         )
 
+    @cache.delete('service-{service_id}')
+    def delete_letter_contact(self, service_id, letter_contact_id):
+        return self.post(
+            "/service/{}/letter-contact/{}/archive".format(service_id, letter_contact_id),
+            data=None
+        )
+
     def get_sms_senders(self, service_id):
         return self.get(
             "/service/{}/sms-sender".format(service_id)

@@ -24,16 +24,24 @@
       rows=10,
       highlight_tags=True
     ) }}
+
+
     {% if form.is_default.data %}
       <p class="form-group">
-        This is currently your default address for {{ current_service.name }}
+        This is the default address for {{ current_service.name }}
       </p>
     {% else %}
       <div class="form-group">
         {{ checkbox(form.is_default) }}
       </div>
     {% endif %}
-    {{ page_footer('Save') }}
+
+    {{ page_footer(
+      'Save',
+      delete_link=url_for('.service_confirm_delete_letter_contact', service_id=current_service.id, letter_contact_id=letter_contact_id),
+      delete_link_text='Delete'
+    ) }}
+
   {% endcall %}
 
 {% endblock %}

@@ -1,5 +1,7 @@
-from flask import abort, current_app
+from flask import Markup, abort, current_app
 from notifications_utils.field import Field
+from notifications_utils.formatters import nl2br
+from notifications_utils.take import Take
 from werkzeug.utils import cached_property
 
 from app.models import JSONModel
@@ -324,10 +326,35 @@ class Service(JSONModel):
     def default_letter_contact_block(self):
         return next(
             (
-                Field(x['contact_block'], html='escape')
-                for x in self.letter_contact_details if x['is_default']
+                letter_contact_block
+                for letter_contact_block in self.letter_contact_details
+                if letter_contact_block['is_default']
             ), None
         )
+
+    @property
+    def default_letter_contact_block_html(self):
+        if self.default_letter_contact_block:
+            return Markup(Take(Field(
+                self.default_letter_contact_block['contact_block'],
+                html='escape',
+            )).then(
+                nl2br
+            ))
+        return ''
+
+    def edit_letter_contact_block(self, id, contact_block, is_default):
+        service_api_client.update_letter_contact(
+            self.id, letter_contact_id=id, contact_block=contact_block, is_default=is_default,
+        )
+
+    def remove_default_letter_contact_block(self):
+        if self.default_letter_contact_block:
+            self.edit_letter_contact_block(
+                self.default_letter_contact_block['id'],
+                self.default_letter_contact_block['contact_block'],
+                is_default=False,
+            )
 
     def get_letter_contact_block(self, id):
         return service_api_client.get_letter_contact(self.id, id)
