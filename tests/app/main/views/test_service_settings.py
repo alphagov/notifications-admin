@@ -71,7 +71,7 @@ def mock_get_service_settings_page_common(
         'Label Value Action',
         'Send text messages On Change',
         'Text message sender GOVUK Change',
-        'Text messages start with service name On Change',
+        'Start text messages with service name On Change',
         'International text messages Off Change',
         'Receive text messages Off Change',
 
@@ -93,7 +93,7 @@ def mock_get_service_settings_page_common(
         'Label Value Action',
         'Send text messages On Change',
         'Text message sender GOVUK Change',
-        'Text messages start with service name On Change',
+        'Start text messages with service name On Change',
         'International text messages Off Change',
         'Receive text messages Off Change',
 
@@ -207,7 +207,7 @@ def test_organisation_name_links_to_org_dashboard(
         'Label Value Action',
         'Send text messages On Change',
         'Text message sender GOVUK Change',
-        'Text messages start with service name On Change',
+        'Start text messages with service name On Change',
         'International text messages On Change',
         'Receive text messages On Change',
 
@@ -228,7 +228,7 @@ def test_organisation_name_links_to_org_dashboard(
         'Label Value Action',
         'Send text messages On Change',
         'Text message sender GOVUK Change',
-        'Text messages start with service name On Change',
+        'Start text messages with service name On Change',
         'International text messages Off Change',
         'Receive text messages Off Change',
 
@@ -341,7 +341,7 @@ def test_should_show_service_name(
     assert page.find('input', attrs={"type": "text"})['value'] == 'service one'
     assert page.select_one('main p').text == 'Users will see your service name:'
     assert normalize_spaces(page.select_one('main ul').text) == (
-        'at the start of every text message, eg ‘service one: This is an example message’ '
+        'at the start of every text message '
         'as your email sender name'
     )
     app.service_api_client.get_service.assert_called_with(SERVICE_ONE_ID)
@@ -400,7 +400,7 @@ def test_should_not_hit_api_if_service_name_hasnt_changed(
 @pytest.mark.parametrize('user, expected_text, expected_link', [
     (
         active_user_with_permissions,
-        'To remove these restrictions request to go live.',
+        'To remove these restrictions, you can send us a request to go live.',
         True,
     ),
     (
@@ -2594,7 +2594,7 @@ def test_edit_sms_sender(
     (
         'main.service_edit_letter_contact',
         get_default_letter_contact_block,
-        'This is the default address for service one',
+        'This is currently your default address for service one.',
         'letter_contact_id',
         False
     ),
@@ -2608,14 +2608,14 @@ def test_edit_sms_sender(
     (
         'main.service_edit_sms_sender',
         get_default_sms_sender,
-        'This is the default text message sender',
+        'This is the default text message sender.',
         'sms_sender_id',
         False
     ),
     (
         'main.service_edit_sms_sender',
         get_non_default_sms_sender,
-        'This is the default text message sender',
+        'This is the default text message sender.',
         'sms_sender_id',
         True
     )
