@@ -228,6 +228,7 @@ class WindowMock {
     };
     this._jest = jest;
     this._setSpies();
+    this._plugJSDOM();
   }
 
   get top () {
@@ -257,6 +258,27 @@ class WindowMock {
 
     // remove calls to document.documentElement.clientWidth when jQuery is gone. It's called to support older browsers like IE8
     this.spies.document.clientWidth = this._jest.spyOn(document.documentElement, 'clientWidth', 'get').mockImplementation(() => window.innerWidth);
+
+  }
+
+  _plugJSDOM () {
+
+    const self = this;
+
+    // JSDOM doesn't support .scrollTo
+    window.scrollTo = function () {
+      let y;
+
+      // data sent as props in an object
+      if (arguments.length === 1) {
+        y = arguments[0].y;
+      } else {
+        y = arguments[1];
+      }
+
+      self.scrollTo(y);
+
+    };
 
   }
 
