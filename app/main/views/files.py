@@ -29,15 +29,6 @@ def _get_batch_heading():
     )
 
 
-@main.route("/services/<service_id>/files")
-@login_required
-@user_has_permissions()
-def files(service_id):
-    return render_template(
-        'views/files/index.html',
-    )
-
-
 @main.route("/services/<service_id>/files/new-contact-list")
 @login_required
 @user_has_permissions()

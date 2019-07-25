@@ -329,7 +329,6 @@ class MainNavigation(Navigation):
             'service_dashboard',
             'template_usage',
             'view_job',
-            'view_jobs',
             'view_notification',
             'view_notifications',
         },
@@ -367,6 +366,7 @@ class MainNavigation(Navigation):
             'import_letters_collated_chunk',
             'import_letters_collated',
             'batch_one_file',
+            'view_jobs',
         },
         'team-members': {
             'confirm_edit_user_email',

@@ -11,7 +11,7 @@
 
 {% block maincolumn_content %}
 
-  {{ page_header("Upload letters", back_link=url_for('main.files', service_id=current_service.id)) }}
+  {{ page_header("Upload letters", back_link=url_for('main.view_jobs', service_id=current_service.id)) }}
 
   <div class="bottom-gutter-3-2">
     {{ file_upload(form.file, button_text='Choose files', multiple=True) }}
