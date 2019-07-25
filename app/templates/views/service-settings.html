@@ -92,7 +92,7 @@
             {% endif %}
           {% endcall %}
           {{ edit_field(
-              'Manage' if current_service.count_email_reply_to_addresses else 'Change',
+              'Manage',
               url_for('.service_email_reply_to',
               service_id=current_service.id),
               permissions=['manage_service','manage_api_keys']
@@ -134,7 +134,7 @@
         {% endcall %}
 
         {% call settings_row(if_has_permission='sms') %}
-          {{ text_field('Text message sender') }}
+          {{ text_field('Text message senders') }}
           {% call field(status='default' if current_service.default_sms_sender == "None" else '') %}
             {{ current_service.default_sms_sender | string | nl2br | safe if current_service.default_sms_sender else 'None'}}
             {% if current_service.count_sms_senders > 1 %}
@@ -144,7 +144,7 @@
             {% endif %}
           {% endcall %}
           {{ edit_field(
-              'Manage' if current_service.count_sms_senders > 1 else 'Change',
+              'Manage',
               url_for('.service_sms_senders',
               service_id=current_service.id),
               permissions=['manage_service','manage_api_keys']
@@ -165,7 +165,7 @@
         {% endcall %}
 
         {% call settings_row(if_has_permission='sms') %}
-          {{ text_field('International text messages') }}
+          {{ text_field('Send international text messages') }}
           {{ boolean_field('international_sms' in current_service.permissions) }}
           {{ edit_field(
               'Change',
@@ -228,7 +228,7 @@
             {% endif %}
           {% endcall %}
           {{ edit_field(
-              'Manage' if current_service.count_letter_contact_details else 'Change',
+              'Manage',
               url_for('.service_letter_contact_details',
               service_id=current_service.id),
               permissions=['manage_service','manage_api_keys']

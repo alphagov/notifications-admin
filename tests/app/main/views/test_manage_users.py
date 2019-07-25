@@ -39,7 +39,7 @@ from tests.conftest import (
             'Can’t Add and edit templates '
             'Can’t Manage settings, team and usage '
             'Can’t Manage API integration '
-            'Edit team member'
+            'Change details'
         )
     ),
     (

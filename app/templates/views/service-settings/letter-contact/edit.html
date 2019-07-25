@@ -6,13 +6,13 @@
 {% from "components/form.html" import form_wrapper %}
 
 {% block service_page_title %}
-  Edit an address
+  Change sender address
 {% endblock %}
 
 {% block maincolumn_content %}
 
   {{ page_header(
-    'Edit an address',
+    'Change sender address',
     back_link=None if request.args.get('from_template') else url_for('.service_letter_contact_details', service_id=current_service.id)
   ) }}
   {% call form_wrapper() %}
