@@ -19,8 +19,6 @@
       {% include 'views/dashboard/write-first-messages.html' %}
     {% endif %}
 
-    {{ ajax_block(partials, updates_url, 'upcoming', interval=5) }}
-
     <h2 class="heading-medium">
       In the last 7 days
     </h2>
@@ -38,14 +36,6 @@
       {{ show_more(
         url_for('.template_usage', service_id=current_service.id),
         'See templates used by month'
-      ) }}
-    {% endif %}
-
-    {% if partials['has_jobs'] %}
-      {{ ajax_block(partials, updates_url, 'jobs', interval=5) }}
-      {{ show_more(
-        url_for('.view_jobs', service_id=current_service.id),
-        'See all uploaded files'
       ) }}
     {% endif %}
 
