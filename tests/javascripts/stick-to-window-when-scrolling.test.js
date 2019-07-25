@@ -109,16 +109,36 @@ describe("Stick to top/bottom of window when scrolling", () => {
 
     });
 
-    test("if top of viewport is below top of element but still in the scroll area on load, the element should be marked as already sticky", () => {
+    describe("if top of viewport is below top of element but still in the scroll area on load", () => {
 
-      // scroll past the top of the form
-      screenMock.scrollTo(inputForm.offsetTop + 10);
+      beforeEach(() => {
 
-      window.GOVUK.stickAtTopWhenScrolling.init();
+        // scroll past the top of the form
+        screenMock.scrollTo(inputForm.offsetTop + 10);
 
-      // `.content-fixed-onload` adds the drop-shadow without fading in to show it did not become sticky from user interaction
-      expect(inputForm.classList.contains('content-fixed-onload')).toBe(true);
-      expect(inputForm.classList.contains('content-fixed')).toBe(false);
+        window.GOVUK.stickAtTopWhenScrolling.init();
+
+      });
+
+      test("the element should be marked as already sticky", () => {
+
+        // `.content-fixed-onload` adds the drop-shadow without fading in to show it did not become sticky from user interaction
+        expect(inputForm.classList.contains('content-fixed-onload')).toBe(true);
+        expect(inputForm.classList.contains('content-fixed')).toBe(false);
+
+      });
+
+      test("a 'shim' element with dimensions matching the sticky element should be added to the document to take up the space it no longer occupies", () => {
+
+        const shim = inputForm.previousElementSibling;
+
+        expect(shim).not.toBeNull();
+        expect(shim.classList.contains('shim')).toBe(true);
+        expect(shim.style.height).toEqual(`${inputForm.offsetHeight}px`);
+        expect(shim.style.marginTop).toEqual(''); // 0px would return an empty string
+        expect(shim.style.marginBottom).toEqual(''); // 0px would return an empty string
+
+      });
 
     });
 
@@ -511,14 +531,33 @@ describe("Stick to top/bottom of window when scrolling", () => {
 
     });
 
-    test("if bottom of viewport is above bottom of element on load, the element should be marked as already sticky", () => {
+    describe("if bottom of viewport is above bottom of element on load", () => {
 
-      // scroll position defaults to 0 so bottom of window starts at 940px. Element bottom defaults to 1160px.
+      beforeEach(() => {
 
-      window.GOVUK.stickAtBottomWhenScrolling.init();
+        // scroll position defaults to 0 so bottom of window starts at 940px. Element bottom defaults to 1160px.
+        window.GOVUK.stickAtBottomWhenScrolling.init();
 
-      expect(pageFooter.classList.contains('content-fixed-onload')).toBe(true);
-      expect(pageFooter.classList.contains('content-fixed')).toBe(false);
+      });
+
+      test("the element should be marked as already sticky", () => {
+
+        expect(pageFooter.classList.contains('content-fixed-onload')).toBe(true);
+        expect(pageFooter.classList.contains('content-fixed')).toBe(false);
+
+      });
+
+      test("a 'shim' element with dimensions matching the sticky element should be added to the document to take up the space it no longer occupies", () => {
+
+        const shim = pageFooter.nextElementSibling;
+
+        expect(shim).not.toBeNull();
+        expect(shim.classList.contains('shim')).toBe(true);
+        expect(shim.style.height).toEqual(`${pageFooter.offsetHeight}px`);
+        expect(shim.style.marginTop).toEqual(''); // 0px would return an empty string
+        expect(shim.style.marginBottom).toEqual(''); // 0px would return an empty string
+
+      });
 
     });
 
