@@ -150,7 +150,7 @@ def test_update_organisation_when_not_updating_org_type(mocker, fake_uuid):
         url='/organisations/{}'.format(fake_uuid),
         data={'foo': 'bar'}
     )
-    assert mock_redis_delete.call_args_list == [call('domains'), call('organisations')]
+    assert mock_redis_delete.call_args_list == [call('organisations'), call('domains')]
 
 
 def test_update_organisation_when_updating_org_type_and_org_has_services(mocker, fake_uuid):
@@ -168,9 +168,9 @@ def test_update_organisation_when_updating_org_type_and_org_has_services(mocker,
         data={'organisation_type': 'central'}
     )
     assert mock_redis_delete.call_args_list == [
-        call('domains'),
-        call('organisations'),
         call('service-a', 'service-b', 'service-c'),
+        call('organisations'),
+        call('domains'),
     ]
 
 
@@ -189,6 +189,6 @@ def test_update_organisation_when_updating_org_type_but_org_has_no_services(mock
         data={'organisation_type': 'central'}
     )
     assert mock_redis_delete.call_args_list == [
-        call('domains'),
         call('organisations'),
+        call('domains'),
     ]

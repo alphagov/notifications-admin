@@ -85,6 +85,6 @@ def test_update_email_branding(mocker, fake_uuid):
         data=org_data
     )
     assert mock_redis_delete.call_args_list == [
-        call('email_branding'),
         call('email_branding-{}'.format(fake_uuid)),
+        call('email_branding'),
     ]
