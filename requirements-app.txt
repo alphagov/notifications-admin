@@ -2,7 +2,7 @@
 # with package version changes made in requirements-app.txt
 
 ago==0.0.93
-Flask==1.0.3
+Flask==1.1.1
 Flask-WTF==0.14.2
 Flask-Login==0.4.1
 
