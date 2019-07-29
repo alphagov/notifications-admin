@@ -6,6 +6,16 @@ function getScreenItemBottomPosition (screenItem) {
   return screenItem.offsetTop + screenItem.offsetHeight;
 };
 
+function getCaretPosition (caretPosition, textarea) {
+
+  return {
+    top: textarea.offsetTop + caretPosition.top,
+    bottom: textarea.offsetTop + caretPosition.top + caretPosition.height,
+    height: caretPosition.height
+  };
+
+};
+
 function getStickyGroupPosition (screenMock, opts) {
 
   const edgePosition = screenMock.window[opts.edge];
@@ -28,6 +38,21 @@ function getStickyGroupPosition (screenMock, opts) {
   }
 
 };
+
+class CaretCoordinates {
+  constructor (data) {
+    this.top = 5.5;
+    this.left = 2;
+    this.height = 19;
+  }
+
+  moveToLine (lineNumber) {
+    const lineHeight = 30;
+    const verticalPadding = 5.5;
+
+    this.top = ((lineNumber - 1) * lineHeight) + verticalPadding;
+  }
+}
 
 beforeAll(() => {
   require('../../app/assets/javascripts/stick-to-window-when-scrolling.js');
@@ -301,6 +326,116 @@ describe("Stick to top/bottom of window when scrolling", () => {
 
         // the bottom of the sticky element should be at the top of the checkbox
         expect(screenMock.window.spies.window.scrollTo.mock.calls[0]).toEqual([0, checkbox.offsetTop - stickyPosition.height]);
+
+      });
+
+    });
+
+    describe("if element is made sticky and overlaps a textarea", () => {
+
+      let textarea;
+      let textareaBottom;
+      let caretCoordinates;
+      let caretCoordinatesMock;
+
+      beforeEach(() => {
+
+        const inputFormBottom = getScreenItemBottomPosition(inputForm);
+
+        inputForm.insertAdjacentHTML('afterEnd', '<textarea name="notes"></textarea>');
+        textarea = document.querySelector('textarea');
+
+        // line height: 30px, text height: 19px, lines: 10
+        screenMock.mockPositionAndDimension('textarea', textarea, {
+          offsetHeight: 300,
+          offsetWidth: 727,
+          offsetTop: inputFormBottom
+        });
+
+        textareaBottom = getScreenItemBottomPosition(textarea);
+
+        // mock calls for caret position, relative to textarea
+        caretCoordinatesMock = jest.fn(() => caretCoordinates);
+        window.getCaretCoordinates = caretCoordinatesMock;
+
+        // start caret on first line
+        caretCoordinates = new CaretCoordinates();
+
+        // move the sticky so it overlaps the top 168px of the textarea.
+        screenMock.scrollTo(textarea.offsetTop);
+
+        // update inputForm position as DOM normally would
+        inputForm.offsetTop = screenMock.window.top;
+
+        window.GOVUK.stickAtTopWhenScrolling.init();
+
+      });
+
+      afterEach(() => {
+
+        screenMock.window.spies.window.scrollTo.mockClear();
+        caretCoordinatesMock.mockClear();
+
+      });
+
+      test("if the textarea receives focus while its caret is underneath, the window should scroll to reveal the caret", () => {
+
+        // caret is on first line
+        const stickyPosition = getStickyGroupPosition(screenMock, { stickyEls: [inputForm], edge: 'top' });
+        const caretPosition = getCaretPosition(caretCoordinates, textarea);
+
+        // sticky position should overlap caret position
+        expect(stickyPosition.top).toBeLessThanOrEqual(caretPosition.top);
+        expect(stickyPosition.bottom).toBeGreaterThanOrEqual(caretPosition.bottom);
+
+        // the sticky element (page footer) is 50 high so should cover the last of the radios if the bottom edge of the viewport is at its bottom
+        textarea.focus();
+
+        // the bottom of the sticky element should be at the top of the checkbox
+        expect(screenMock.window.spies.window.scrollTo.mock.calls[0]).toEqual([0, caretPosition.top - stickyPosition.height]);
+
+      });
+
+      test("if the caret is moved so it isn't underneath the sticky element, the window shouldn't scroll", () => {
+
+        // start caret on 7th line which isn't under the sticky element.
+        caretCoordinates.moveToLine(7);
+
+        const stickyPosition = getStickyGroupPosition(screenMock, { stickyEls: [inputForm], edge: 'top' });
+        const caretPosition = getCaretPosition(caretCoordinates, textarea);
+
+        // the sticky element should be above the caret
+        expect(stickyPosition.bottom).toBeLessThan(caretPosition.top);
+
+        textarea.focus();
+
+        // no scrolling should have happened
+        expect(screenMock.window.spies.window.scrollTo.mock.calls.length).toEqual(0);
+
+      });
+
+      test("if the caret is moved to be underneath the sticky element, the window should scroll to reveal the caret", () => {
+
+        // start caret on 7th line which isn't under the sticky element.
+        caretCoordinates.moveToLine(7);
+
+        // make sure the textarea has focus
+        textarea.focus();
+
+        // line 6 is under the sticky element
+        caretCoordinates.moveToLine(6);
+
+        const stickyPosition = getStickyGroupPosition(screenMock, { stickyEls: [inputForm], edge: 'top' });
+        const caretPosition = getCaretPosition(caretCoordinates, textarea);
+
+        // sticky should now overlap the caret
+        expect(stickyPosition.bottom).toBeGreaterThanOrEqual(caretPosition.top);
+
+        // the sticky element (page footer) is 50 high so should cover the last of the radios if the bottom edge of the viewport is at its bottom
+        helpers.triggerEvent(textarea, 'keyup', { interface: window.KeyboardEvent });
+
+        // the bottom of the sticky element should be at the top of the checkbox
+        expect(screenMock.window.spies.window.scrollTo.mock.calls[0]).toEqual([0, caretPosition.top - stickyPosition.height]);
 
       });
 
@@ -794,6 +929,112 @@ describe("Stick to top/bottom of window when scrolling", () => {
 
         // the top of the sticky element should be at the bottom of the checkbox
         expect(screenMock.window.spies.window.scrollTo.mock.calls[0]).toEqual([0, (checkboxBottom + pageFooter.offsetHeight) - windowHeight]);
+
+      });
+
+    });
+
+    describe("if element is made sticky and overlaps a textarea", () => {
+
+      let textarea;
+      let textareaBottom;
+      let caretCoordinates;
+      let caretCoordinatesMock;
+
+      beforeEach(() => {
+
+        const contentBottom = getScreenItemBottomPosition(content);
+
+        content.insertAdjacentHTML('afterEnd', '<textarea name="notes"></textarea>');
+        textarea = document.querySelector('textarea');
+
+        // line height: 30px, text height: 19px, 10 lines.
+        screenMock.mockPositionAndDimension('textarea', textarea, {
+          offsetHeight: 300,
+          offsetWidth: 727,
+          offsetTop: contentBottom
+        });
+
+        textareaBottom = getScreenItemBottomPosition(textarea);
+
+        // start caret on the last line
+        caretCoordinates = new CaretCoordinates();
+        caretCoordinates.moveToLine(10);
+        caretCoordinatesMock = jest.fn(() => caretCoordinates);
+        window.getCaretCoordinates = caretCoordinatesMock;
+
+        // move the sticky so it overlaps the bottom 50px of the textarea.
+        screenMock.scrollTo(textareaBottom - windowHeight);
+
+        // update content position as DOM normally would
+        pageFooter.offsetTop = screenMock.window.bottom - pageFooter.offsetHeight;
+
+        window.GOVUK.stickAtBottomWhenScrolling.init();
+
+      });
+
+      afterEach(() => {
+
+        screenMock.window.spies.window.scrollTo.mockClear();
+        caretCoordinatesMock.mockClear();
+
+      });
+
+      test("if the textarea receives focus while its caret is underneath, the window should scroll to reveal the caret", () => {
+
+        const stickyPosition = getStickyGroupPosition(screenMock, { stickyEls: [pageFooter], edge: 'bottom' });
+        const caretPosition = getCaretPosition(caretCoordinates, textarea);
+
+        // sticky position should overlap caret position
+        expect(stickyPosition.top).toBeLessThan(caretPosition.bottom);
+
+        textarea.focus();
+
+        // the top of the sticky element should be at the bottom of the caret
+        expect(screenMock.window.spies.window.scrollTo.mock.calls[0]).toEqual([0, caretPosition.bottom - (windowHeight - stickyPosition.height)]);
+
+      });
+
+      test("if the caret is moved so it isn't underneath the sticky element, the window shouldn't scroll", () => {
+
+        // start caret on 8th line which isn't under the sticky element.
+        caretCoordinates.moveToLine(8);
+
+        const stickyPosition = getStickyGroupPosition(screenMock, { stickyEls: [pageFooter], edge: 'bottom' });
+        const caretPosition = getCaretPosition(caretCoordinates, textarea);
+
+        // the sticky element should be below the caret
+        expect(stickyPosition.top).toBeGreaterThan(caretPosition.bottom);
+
+        textarea.focus();
+
+        // no scrolling should have happened
+        expect(screenMock.window.spies.window.scrollTo.mock.calls.length).toEqual(0);
+
+      });
+
+      test("if the caret is moved to be underneath the sticky element, the window should scroll to reveal the caret", () => {
+
+        // start caret on 8th line which isn't under the sticky element.
+        caretCoordinates.moveToLine(8);
+
+        // make sure the textarea has focus
+        textarea.focus();
+
+        // move the caret underneath the sticky element
+        caretCoordinates.moveToLine(9);
+
+        const stickyPosition = getStickyGroupPosition(screenMock, { stickyEls: [pageFooter], edge: 'bottom' });
+        const caretPosition = getCaretPosition(caretCoordinates, textarea);
+
+        // sticky position should overlap caret position
+        expect(stickyPosition.top).toBeLessThan(caretPosition.bottom);
+
+        // simulate a press of the down arrow
+        helpers.triggerEvent(textarea, 'keyup', { interface: window.KeyboardEvent });
+
+        // the top of the sticky element should be at the bottom of the caret
+        expect(screenMock.window.spies.window.scrollTo.mock.calls[0]).toEqual([0, caretPosition.bottom - (windowHeight - stickyPosition.height)]);
 
       });
 
