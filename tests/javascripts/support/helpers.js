@@ -224,7 +224,8 @@ class WindowMock {
       width: window.innerWidth
     };
     this.spies = {
-      document: {}
+      document: {},
+      window: {}
     };
     this._jest = jest;
     this._setSpies();
@@ -266,7 +267,7 @@ class WindowMock {
     const self = this;
 
     // JSDOM doesn't support .scrollTo
-    window.scrollTo = function () {
+    this.spies.window.scrollTo = this._jest.fn(function () {
       let y;
 
       // data sent as props in an object
@@ -278,7 +279,9 @@ class WindowMock {
 
       self.scrollTo(y);
 
-    };
+    });
+
+     window.scrollTo = this.spies.window.scrollTo;
 
   }
 

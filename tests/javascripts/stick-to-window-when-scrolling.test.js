@@ -6,6 +6,29 @@ function getScreenItemBottomPosition (screenItem) {
   return screenItem.offsetTop + screenItem.offsetHeight;
 };
 
+function getStickyGroupPosition (screenMock, opts) {
+
+  const edgePosition = screenMock.window[opts.edge];
+  const height = opts.stickyEls
+                  .map(el => el.offsetHeight)
+                  .reduce((accumulator, height) => accumulator + height);
+
+  if (opts.edge === 'top') {
+    return {
+      top: screenMock.window.top,
+      bottom: edgePosition + height,
+      height: height
+    };
+  } else {
+    return {
+      top: edgePosition - height,
+      bottom: screenMock.window.bottom,
+      height: height
+    }
+  }
+
+};
+
 beforeAll(() => {
   require('../../app/assets/javascripts/stick-to-window-when-scrolling.js');
 });
@@ -222,6 +245,62 @@ describe("Stick to top/bottom of window when scrolling", () => {
 
         expect(inputForm.classList.contains('content-fixed')).toBe(false);
         expect(inputForm.classList.contains('content-fixed-onload')).toBe(false); // check the class for onload isn't applied
+
+      });
+
+    });
+
+    describe("if element is made sticky and another element underneath it is focused", () => {
+
+      let checkbox;
+      let checkboxBottom;
+
+      beforeEach(() => {
+
+        const inputFormBottom = getScreenItemBottomPosition(inputForm);
+
+        inputForm.insertAdjacentHTML('afterEnd', '<input type="checkbox" name="confirm" value="yes" />');
+        checkbox = document.querySelector('input[type=checkbox]');
+
+        screenMock.mockPositionAndDimension('checkbox', checkbox, {
+          offsetHeight: 50, // 118px smaller than the sticky
+          offsetWidth: 727,
+          offsetTop: inputFormBottom
+        });
+
+        checkboxBottom = getScreenItemBottomPosition(checkbox);
+
+        // move the sticky over the checkbox. It's 168px high so this position will cause it to overlap.
+        screenMock.scrollTo(checkbox.offsetTop - 10);
+
+        window.GOVUK.stickAtTopWhenScrolling.init();
+
+      });
+
+      afterEach(() => {
+
+        screenMock.window.spies.window.scrollTo.mockClear();
+
+      });
+
+      test("the window should scroll so the focused element is revealed", () => {
+
+        // update inputForm position as DOM normally would
+        inputForm.offsetTop = screenMock.window.top;
+
+        let stickyPosition = getStickyGroupPosition(screenMock, { stickyEls: [inputForm], edge: 'top' });
+
+        // sticky position should overlap checkbox position
+        expect(stickyPosition.top).toBeLessThanOrEqual(checkbox.offsetTop);
+        expect(stickyPosition.bottom).toBeGreaterThanOrEqual(checkboxBottom);
+
+        // the sticky element (page footer) is 50 high so should cover the last of the radios if the bottom edge of the viewport is at its bottom
+        checkbox.focus();
+
+        stickyPosition = getStickyGroupPosition(screenMock, { stickyEls: [inputForm], edge: 'top' });
+
+        // the bottom of the sticky element should be at the top of the checkbox
+        expect(screenMock.window.spies.window.scrollTo.mock.calls[0]).toEqual([0, checkbox.offsetTop - stickyPosition.height]);
 
       });
 
@@ -659,6 +738,62 @@ describe("Stick to top/bottom of window when scrolling", () => {
 
         expect(pageFooter.classList.contains('content-fixed')).toBe(false);
         expect(pageFooter.classList.contains('content-fixed-onload')).toBe(false); // check the class for onload isn't applied
+
+      });
+
+    });
+
+    describe("if element is made sticky and another element underneath it is focused", () => {
+
+      let checkbox;
+      let checkboxBottom;
+
+      beforeEach(() => {
+
+        const contentBottom = getScreenItemBottomPosition(content);
+
+        content.insertAdjacentHTML('afterEnd', '<input type="checkbox" name="confirm" value="yes" />');
+        checkbox = document.querySelector('input[type=checkbox]');
+
+        screenMock.mockPositionAndDimension('checkbox', checkbox, {
+          offsetHeight: 40, // 10px smaller than the sticky
+          offsetWidth: 727,
+          offsetTop: contentBottom
+        });
+
+        checkboxBottom = getScreenItemBottomPosition(checkbox);
+
+        // move the sticky over the checkbox. It's 50px high so this position will cause it to overlap.
+        screenMock.scrollTo((checkboxBottom - windowHeight) + 5);
+
+        window.GOVUK.stickAtBottomWhenScrolling.init();
+
+      });
+
+      afterEach(() => {
+
+        screenMock.window.spies.window.scrollTo.mockClear();
+
+      });
+
+      test("the window should scroll so the focused element is revealed", () => {
+
+        // update inputForm position as DOM normally would
+        pageFooter.offsetTop = screenMock.window.bottom - pageFooter.offsetHeight;
+
+        let stickyPosition = getStickyGroupPosition(screenMock, { stickyEls: [pageFooter], edge: 'bottom' });
+
+        // sticky position should overlap checkbox position
+        expect(stickyPosition.top).toBeLessThanOrEqual(checkbox.offsetTop);
+        expect(stickyPosition.bottom).toBeGreaterThanOrEqual(checkboxBottom);
+
+        // the sticky element (page footer) is 50 high so should cover the last of the radios if the bottom edge of the viewport is at its bottom
+        checkbox.focus();
+
+        stickyPosition = getStickyGroupPosition(screenMock, { stickyEls: [pageFooter], edge: 'bottom' });
+
+        // the top of the sticky element should be at the bottom of the checkbox
+        expect(screenMock.window.spies.window.scrollTo.mock.calls[0]).toEqual([0, (checkboxBottom + pageFooter.offsetHeight) - windowHeight]);
 
       });
 
