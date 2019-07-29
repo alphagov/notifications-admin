@@ -2,6 +2,7 @@ from itertools import chain
 
 from notifications_python_client.errors import HTTPError
 
+from app.extensions import redis_client
 from app.notify_client import NotifyAdminAPIClient, _attach_current_user, cache
 
 
@@ -45,8 +46,13 @@ class OrganisationsClient(NotifyAdminAPIClient):
 
     @cache.delete('domains')
     @cache.delete('organisations')
-    def update_organisation(self, org_id, **kwargs):
-        return self.post(url="/organisations/{}".format(org_id), data=kwargs)
+    def update_organisation(self, org_id, cached_service_ids=None, **kwargs):
+        api_response = self.post(url="/organisations/{}".format(org_id), data=kwargs)
+
+        if kwargs.get('organisation_type') and cached_service_ids:
+            redis_client.delete(*map('service-{}'.format, cached_service_ids))
+
+        return api_response
 
     def update_organisation_name(self, org_id, name):
         return self.update_organisation(org_id, name=name)

@@ -68,6 +68,6 @@ def test_update_letter_branding(mocker, fake_uuid):
         data=branding
     )
     assert mock_redis_delete.call_args_list == [
-        call('letter_branding'),
         call('letter_branding-{}'.format(fake_uuid)),
+        call('letter_branding'),
     ]

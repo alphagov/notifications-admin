@@ -61,9 +61,12 @@ def delete(key_format):
 
         @wraps(client_method)
         def new_client_method(client_instance, *args, **kwargs):
-            redis_key = _make_key(key_format, client_method, args, kwargs)
-            redis_client.delete(redis_key)
-            return client_method(client_instance, *args, **kwargs)
+            try:
+                api_response = client_method(client_instance, *args, **kwargs)
+            finally:
+                redis_key = _make_key(key_format, client_method, args, kwargs)
+                redis_client.delete(redis_key)
+            return api_response
 
         return new_client_method
 

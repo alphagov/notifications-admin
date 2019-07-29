@@ -138,3 +138,57 @@ def test_deletes_domain_cache(
 
     assert call('domains') in mock_redis_delete.call_args_list
     assert len(mock_request.call_args_list) == 1
+
+
+def test_update_organisation_when_not_updating_org_type(mocker, fake_uuid):
+    mock_redis_delete = mocker.patch('app.extensions.RedisClient.delete')
+    mock_post = mocker.patch('app.notify_client.organisations_api_client.OrganisationsClient.post')
+
+    organisations_client.update_organisation(fake_uuid, foo='bar')
+
+    mock_post.assert_called_with(
+        url='/organisations/{}'.format(fake_uuid),
+        data={'foo': 'bar'}
+    )
+    assert mock_redis_delete.call_args_list == [call('organisations'), call('domains')]
+
+
+def test_update_organisation_when_updating_org_type_and_org_has_services(mocker, fake_uuid):
+    mock_redis_delete = mocker.patch('app.extensions.RedisClient.delete')
+    mock_post = mocker.patch('app.notify_client.organisations_api_client.OrganisationsClient.post')
+
+    organisations_client.update_organisation(
+        fake_uuid,
+        cached_service_ids=['a', 'b', 'c'],
+        organisation_type='central',
+    )
+
+    mock_post.assert_called_with(
+        url='/organisations/{}'.format(fake_uuid),
+        data={'organisation_type': 'central'}
+    )
+    assert mock_redis_delete.call_args_list == [
+        call('service-a', 'service-b', 'service-c'),
+        call('organisations'),
+        call('domains'),
+    ]
+
+
+def test_update_organisation_when_updating_org_type_but_org_has_no_services(mocker, fake_uuid):
+    mock_redis_delete = mocker.patch('app.extensions.RedisClient.delete')
+    mock_post = mocker.patch('app.notify_client.organisations_api_client.OrganisationsClient.post')
+
+    organisations_client.update_organisation(
+        fake_uuid,
+        cached_service_ids=[],
+        organisation_type='central',
+    )
+
+    mock_post.assert_called_with(
+        url='/organisations/{}'.format(fake_uuid),
+        data={'organisation_type': 'central'}
+    )
+    assert mock_redis_delete.call_args_list == [
+        call('organisations'),
+        call('domains'),
+    ]

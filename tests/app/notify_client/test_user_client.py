@@ -234,7 +234,7 @@ def test_add_user_to_service_calls_correct_endpoint_and_deletes_keys_from_cache(
 
     mock_post.assert_called_once_with(expected_url, data=data)
     assert mock_redis_delete.call_args_list == [
-        call('service-{service_id}'.format(service_id=service_id)),
-        call('service-{service_id}-template-folders'.format(service_id=service_id)),
         call('user-{user_id}'.format(user_id=user_id)),
+        call('service-{service_id}-template-folders'.format(service_id=service_id)),
+        call('service-{service_id}'.format(service_id=service_id)),
     ]

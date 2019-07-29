@@ -97,12 +97,6 @@ class JobApiClient(NotifyAdminAPIClient):
         return bool(self.get_jobs(service_id)['data'])
 
     def create_job(self, job_id, service_id, scheduled_for=None):
-        redis_client.set(
-            'has_jobs-{}'.format(service_id),
-            b'true',
-            ex=cache.TTL,
-        )
-
         data = {"id": job_id}
 
         if scheduled_for:
@@ -110,6 +104,12 @@ class JobApiClient(NotifyAdminAPIClient):
 
         data = _attach_current_user(data)
         job = self.post(url='/service/{}/job'.format(service_id), data=data)
+
+        redis_client.set(
+            'has_jobs-{}'.format(service_id),
+            b'true',
+            ex=cache.TTL,
+        )
 
         stats = self.__convert_statistics(job['data'])
         job['data']['notifications_sent'] = stats['delivered'] + stats['failed']
