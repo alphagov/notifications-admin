@@ -876,7 +876,7 @@ def test_usage_page_displays_letters_ordered_by_postage(
         {'month': 'April', 'notification_type': 'letter', 'rate': 0.3, 'billing_units': 3, 'postage': 'second'},
         {'month': 'April', 'notification_type': 'letter', 'rate': 0.5, 'billing_units': 1, 'postage': 'first'},
     ]
-    mocker.patch('app.billing_api_client.get_billable_units_ft', return_value=billable_units_resp)
+    mocker.patch('app.billing_api_client.get_billable_units', return_value=billable_units_resp)
     service_one['permissions'].append('letter')
     page = client_request.get(
         'main.usage',
