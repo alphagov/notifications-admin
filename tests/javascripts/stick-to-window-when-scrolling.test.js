@@ -157,6 +157,23 @@ describe("Stick to top/bottom of window when scrolling", () => {
 
     });
 
+    test("if the window is 768px or less wide and the top of the viewport is below top of element on load, the element should not be marked as sticky", () => {
+
+      screenMock.window.resizeTo({
+        height: windowHeight,
+        width: 768
+      });
+
+      // scroll past top of form
+      screenMock.scrollTo(inputForm.offsetTop + 10);
+
+      window.GOVUK.stickAtTopWhenScrolling.init();
+
+      expect(inputForm.classList.contains('content-fixed')).toBe(false);
+      expect(inputForm.classList.contains('content-fixed-onload')).toBe(false); // check the class for onload isn't applied
+
+    });
+
     describe("if top of viewport is below top of element but still in the scroll area on load", () => {
 
       beforeEach(() => {
@@ -742,6 +759,25 @@ describe("Stick to top/bottom of window when scrolling", () => {
       // `.content-fixed-onload` adds the drop-shadow without fading in to show it did not become sticky from user interaction
       expect(pageFooter.classList.contains('content-fixed-onload')).toBe(false);
       expect(pageFooter.classList.contains('content-fixed')).toBe(false);
+
+    });
+
+    test("if the window is 768px or less wide and the bottom of the viewport is above bottom of element on load, the element should not be marked as sticky", () => {
+
+      const pageFooterBottom = getScreenItemBottomPosition(pageFooter);
+
+      screenMock.window.resizeTo({
+        height: windowHeight,
+        width: 768
+      });
+
+      // scroll past top of form
+      screenMock.scrollTo(pageFooterBottom - 10);
+
+      window.GOVUK.stickAtTopWhenScrolling.init();
+
+      expect(pageFooter.classList.contains('content-fixed')).toBe(false);
+      expect(pageFooter.classList.contains('content-fixed-onload')).toBe(false); // check the class for onload isn't applied
 
     });
 
