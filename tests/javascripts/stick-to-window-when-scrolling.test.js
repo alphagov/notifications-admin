@@ -510,6 +510,12 @@ describe("Stick to top/bottom of window when scrolling", () => {
 
       });
 
+      afterEach(() => {
+
+        window.GOVUK.stickAtTopWhenScrolling.setMode('default');
+
+      });
+
       describe("if window top is below the top of the highest element on load", () => {
 
         beforeEach(() => {
@@ -850,7 +856,6 @@ describe("Stick to top/bottom of window when scrolling", () => {
         // scroll to just below the element
         screenMock.scrollTo((pageFooterBottom - windowHeight) + 10);
 
-        // default scroll position is above top of form
         window.GOVUK.stickAtBottomWhenScrolling.init();
 
       });
@@ -871,7 +876,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
 
         const furthestBottomPoint = getFurthestBottomPoint(pageFooter.offsetHeight);
 
-        // scroll past top of content
+        // scroll past furthest point
         screenMock.scrollTo((furthestBottomPoint - windowHeight) - 10);
         jest.advanceTimersByTime(60); // fake advance of time to something similar to that for a scroll
 
@@ -885,19 +890,42 @@ describe("Stick to top/bottom of window when scrolling", () => {
 
       });
 
+      test("if window resizes so bottom is above the bottom of the element, the element should be marked so it becomes sticky to the user", () => {
+
+        // resize window so the bottom is 30px above the bottom of the element
+        screenMock.window.resizeTo({ height: 560, width: screenMock.window.width });
+        jest.advanceTimersByTime(60); // fake advance of time to something similar to that for a resize
+
+        // `content-fixed` fades the drop-shadow in to show it became sticky from user interaction
+        expect(pageFooter.classList.contains('content-fixed')).toBe(true);
+        expect(pageFooter.classList.contains('content-fixed-onload')).toBe(false); // check the class for onload isn't applied
+
+      });
+
     });
 
     describe("if viewport bottom starts above element bottom", () => {
 
       let pageFooterBottom;
+      let pageFooterShim;
 
       beforeEach(() => {
 
         // scroll position defaults to 0 so bottom of window starts at 940px. Element bottom defaults to 1160px so will be sticky on load.
-
         pageFooterBottom = getScreenItemBottomPosition(pageFooter);
 
+        // shim will be inserted, inheriting space in the page from pageFooter so store this data
+        const pageFooterData = {
+          offsetHeight: pageFooter.offsetHeight,
+          offsetWidth: pageFooter.offsetWidth,
+          offsetTop: pageFooter.offsetTop
+        };
+
         window.GOVUK.stickAtBottomWhenScrolling.init();
+
+        // add mock for shim
+        pageFooterShim = document.querySelector('.shim');
+        screenMock.mockPositionAndDimension('pageFooterShim', pageFooterShim, pageFooterData);
 
       });
 
@@ -909,6 +937,34 @@ describe("Stick to top/bottom of window when scrolling", () => {
 
         expect(pageFooter.classList.contains('content-fixed')).toBe(false);
         expect(pageFooter.classList.contains('content-fixed-onload')).toBe(false); // check the class for onload isn't applied
+
+      });
+
+      test("if window resizes so bottom is below the bottom of the element, the element should be made not sticky", () => {
+
+        // resize window so the bottom is 30px above the bottom of the element
+        screenMock.window.resizeTo({ height: pageFooterBottom + 10, width: screenMock.window.width });
+        jest.advanceTimersByTime(60); // fake advance of time to something similar to that for a resize
+
+        expect(pageFooter.classList.contains('content-fixed')).toBe(false);
+        expect(pageFooter.classList.contains('content-fixed-onload')).toBe(false);
+
+      });
+
+      test("if window resizes so bottom is above the furthest point the bottom of the element can go in the scroll area, the element should be stopped", () => {
+
+        const furthestBottomPoint = getFurthestBottomPoint(pageFooter.offsetHeight);
+
+        // resize window so the bottom is above the furthest point
+        screenMock.window.resizeTo({ height: furthestBottomPoint - 10, width: screenMock.window.width });
+        jest.advanceTimersByTime(60); // fake advance of time to something similar to that for a resize
+
+        expect(pageFooter.classList.contains('content-fixed')).toBe(false); // applied if made sticky after page load
+        expect(pageFooter.classList.contains('content-fixed-onload')).toBe(true); // check the class for onload isn't applied
+
+        // elements are stopped by adding inline styles
+        expect(pageFooter.style.position).toEqual('absolute');
+        expect(pageFooter.style.top).toEqual(`${furthestBottomPoint - pageFooter.offsetHeight}px`);
 
       });
 
@@ -1123,6 +1179,12 @@ describe("Stick to top/bottom of window when scrolling", () => {
 
         // pageFooter top should be at the radios bottom
         pageFooter.offsetTop = radiosBottom;
+
+      });
+
+      afterEach(() => {
+
+        window.GOVUK.stickAtBottomWhenScrolling.setMode('default');
 
       });
 
