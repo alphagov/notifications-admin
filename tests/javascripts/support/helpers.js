@@ -173,27 +173,52 @@ class WindowMock {
       height: window.innerHeight,
       width: window.innerWidth
     };
-    this._spies = {
+    this.spies = {
       document: {}
     };
     this._jest = jest;
+    this._setSpies();
+  }
+
+  get top () {
+    return window.scrollY;
+  }
+
+  get bottom () {
+    return window.scrollY + window.innerHeight;
+  }
+
+  get height () {
+    return window.innerHeight;
+  }
+
+  get width () {
+    return window.innerWidth
+  }
+
+  get scrollPosition () {
+    return window.scrollY;
+  }
+
+  _setSpies () {
+
+    // remove calls to document.documentElement.clientHeight when jQuery is gone. It's called to support older browsers like IE8
+    this.spies.document.clientHeight = this._jest.spyOn(document.documentElement, 'clientHeight', 'get').mockImplementation(() => window.innerHeight);
+
+    // remove calls to document.documentElement.clientWidth when jQuery is gone. It's called to support older browsers like IE8
+    this.spies.document.clientWidth = this._jest.spyOn(document.documentElement, 'clientWidth', 'get').mockImplementation(() => window.innerWidth);
+
   }
 
   setHeightTo (height) {
 
-    // mock DOM calls for window height
     window.innerHeight = height;
-    // remove calls to document.documentElement.clientHeight  when jQuery is gone. It's called to support older browsers like IE8
-    this._spies.document.clientHeight = this._jest.spyOn(document.documentElement, 'clientHeight', 'get').mockImplementation(() => height);
 
   }
 
   setWidthTo (width) {
 
-    // mock DOM calls for window width
     window.innerWidth = width;
-    // remove calls to document.documentElement.clientWidth  when jQuery is gone. It's called to support older browsers like IE8
-    this._spies.document.clientWidth = this._jest.spyOn(document.documentElement, 'clientWidth', 'get').mockImplementation(() => height);
 
   }
 
@@ -205,9 +230,11 @@ class WindowMock {
 
   }
 
-  scrollBy (scrollPosition) {
+  scrollTo (scrollPosition) {
 
     document.documentElement.scrollTop = scrollPosition;
+    window.scrollY = scrollPosition;
+    window.pageYOffset = scrollPosition;
     triggerEvent(window, 'scroll');
 
   }
@@ -216,11 +243,11 @@ class WindowMock {
 
     window.innerHeight = this._defaults.height;
     window.innerWidth = this._defaults.width;
-    document.documentElement.scrollTop = 0;
+    this.scrollTo(0);
 
     // reset all spies
-    Object.keys(this._spies).forEach(key => {
-      const objectSpies = this._spies[key];
+    Object.keys(this.spies).forEach(key => {
+      const objectSpies = this.spies[key];
       Object.keys(objectSpies).forEach(key => objectSpies[key].mockClear());
     });
 
