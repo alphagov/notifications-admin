@@ -304,7 +304,7 @@ class Spreadsheet():
     def as_rows(self):
         if not self._rows:
             self._rows = list(csv.reader(
-                self._csv_data.strip().splitlines(),
+                StringIO(self._csv_data),
                 quoting=csv.QUOTE_MINIMAL,
                 skipinitialspace=True,
             ))

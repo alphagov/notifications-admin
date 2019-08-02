@@ -59,6 +59,7 @@ docs/_build/
 target/
 .idea/
 .DS_Store
+.vscode
 
 # Frontend dependencies and compiled assets
 app/assets/stylesheets/govuk_template/.sass-cache/
