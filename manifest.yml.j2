@@ -49,6 +49,7 @@ applications:
       ANTIVIRUS_API_HOST: '{{ ANTIVIRUS_API_HOST }}'
       ANTIVIRUS_API_KEY: '{{ ANTIVIRUS_API_KEY }}'
 
+      STATSD_HOST: 'notify-statsd-exporter-{{ environment }}.apps.internal'
       STATSD_PREFIX: '{{ STATSD_PREFIX }}'
 
       ZENDESK_API_KEY: '{{ ZENDESK_API_KEY }}'
