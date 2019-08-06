@@ -68,6 +68,7 @@ PLATFORM_ADMIN_SERVICE_PERMISSIONS = OrderedDict([
     ('inbound_sms', {'title': 'Receive inbound SMS', 'requires': 'sms', 'endpoint': '.service_set_inbound_number'}),
     ('email_auth', {'title': 'User auth type editing'}),
     ('upload_document', {'title': 'Uploading documents', 'endpoint': '.service_switch_can_upload_document'}),
+    ('upload_letters', {'title': 'Uploading letters', 'requires': 'letter'}),
 ])
 
 
