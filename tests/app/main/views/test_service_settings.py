@@ -109,8 +109,8 @@ def mock_get_service_settings_page_common(
         'Letter branding Not set Change',
         'Data retention email Change',
         'Receive inbound SMS Off Change',
-        'User auth type editing Off Change',
-        'Uploading documents Off Change',
+        'Email authentication Off Change',
+        'Send files by email Off Change',
     ]),
 ])
 def test_should_show_overview(
@@ -3655,7 +3655,7 @@ def test_service_switch_can_upload_document_shows_permission_page_if_service_con
         follow_redirects=True
     )
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    assert normalize_spaces(page.h1.text) == 'Uploading documents'
+    assert normalize_spaces(page.h1.text) == 'Send files by email'
 
 
 def test_service_switch_can_upload_document_turning_permission_on_with_no_contact_details_shows_form(
@@ -3703,7 +3703,7 @@ def test_service_switch_can_upload_document_lets_contact_details_be_added_and_sh
     )
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
-    assert normalize_spaces(page.h1.text) == 'Uploading documents'
+    assert normalize_spaces(page.h1.text) == 'Send files by email'
 
 
 @pytest.mark.parametrize('user', (
