@@ -1,6 +1,9 @@
-(function(Modules) {
+(function(global) {
 
   "use strict";
+
+  var Modules = global.GOVUK.Modules;
+  var Hogan = global.Hogan;
 
   let states = {
     'initial': Hogan.compile(`
@@ -30,7 +33,7 @@
             <label for="{{id}}">{{label}}</label>
           </div>
         {{/choices}}
-        <input type='button' class='js-reset-button js-reset-button-block' value='Done' />
+        <input type='button' class='js-done-button js-done-button-block' value='Done' />
       </div>
     `),
     'chosen': Hogan.compile(`
@@ -54,11 +57,8 @@
     `)
   };
 
-  let focusSelected = function() {
-    setTimeout(
-      () => $('[type=radio]:checked').next('label').blur().trigger('focus').addClass('selected'),
-      50
-    );
+  let focusSelected = function(component) {
+    $('[type=radio]:checked', component).focus();
   };
 
   Modules.RadioSelect = function() {
@@ -79,6 +79,35 @@
       });
       let categories = $component.data('categories').split(',');
       let name = $component.find('input').eq(0).attr('name');
+      let mousedownOption = null;
+      const reset = () => {
+        render('initial', {
+          'categories': categories,
+          'name': name
+        });
+      };
+      const selectOption = (value) => {
+        render('chosen', {
+          'choices': choices.filter(
+            element => element.value == value
+          ),
+          'name': name
+        });
+        focusSelected(component);
+      };
+      const trackMouseup = (event) => {
+        const parentNode = event.target.parentNode;
+
+        if (parentNode === mousedownOption) {
+          const value = $('input', parentNode).attr('value');
+
+          selectOption(value);
+
+          // clear tracking
+          mousedownOption = null;
+          $(document).off('mouseup', trackMouseup);
+        }
+      };
 
       $component
         .on('click', '.js-category-button', function(event) {
@@ -92,51 +121,54 @@
             ),
             'name': name
           });
-          focusSelected();
+          focusSelected(component);
 
         })
-        .on('click', '.js-option', function(event) {
+        .on('mousedown', '.js-option', function(event) {
+          mousedownOption = this;
 
-          // stop click being triggered by keyboard events
-          if (!event.pageX) return true;
-
-          event.preventDefault();
-          let value = $('input', this).attr('value');
-          render('chosen', {
-            'choices': choices.filter(
-              element => element.value == value
-            ),
-            'name': name
-          });
-          focusSelected();
-
+          // mouseup on the same option completes the click action
+          $(document).on('mouseup', trackMouseup);
         })
+        // space and enter, clicked on a radio confirm that option was selected
         .on('keydown', 'input[type=radio]', function(event) {
 
-          // intercept keypresses which aren’t enter or space
+          // allow keypresses which aren’t enter or space through
           if (event.which !== 13 && event.which !== 32) {
             return true;
           }
 
           event.preventDefault();
           let value = $(this).attr('value');
-          render('chosen', {
-            'choices': choices.filter(
-              element => element.value == value
-            ),
-            'name': name
-          });
-          focusSelected();
+          selectOption(value);
+
+        })
+        .on('click', '.js-done-button', function(event) {
+
+          event.preventDefault();
+          let $selection = $('input[type=radio]:checked', this.parentNode);
+          if ($selection.length) {
+
+            render('chosen', {
+              'choices': choices.filter(
+                element => element.value == $selection.eq(0).attr('value')
+              ),
+              'name': name
+            });
+
+          } else {
+
+            reset();
+
+          }
+          focusSelected(component);
 
         })
         .on('click', '.js-reset-button', function(event) {
 
           event.preventDefault();
-          render('initial', {
-            'categories': categories,
-            'name': name
-          });
-          focusSelected();
+          reset();
+          focusSelected(component);
 
         });
 
@@ -151,4 +183,4 @@
 
   };
 
-})(window.GOVUK.Modules);
+})(window);

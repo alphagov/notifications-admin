@@ -14,15 +14,16 @@
 
   }
 
-  .js-reset-button,
-  .js-category-button {
+  .js-done-button,
+  .js-category-button,
+  .js-reset-button {
 
     @include button($grey-3);
     margin-right: $gutter-half;
 
   }
 
-  .js-reset-button-block {
+  .js-done-button-block {
 
     display: block;
     clear: both;
