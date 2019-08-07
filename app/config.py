@@ -21,6 +21,9 @@ class Config(object):
     TEMPLATE_PREVIEW_API_KEY = os.environ.get('TEMPLATE_PREVIEW_API_KEY', 'my-secret-key')
 
     # Hosted graphite statsd prefix
+    STATSD_ENABLED = False
+    STATSD_HOST = os.getenv('STATSD_HOST')
+    STATSD_PORT = 8125
     STATSD_PREFIX = os.getenv('STATSD_PREFIX')
 
     # Logging
@@ -65,9 +68,6 @@ class Config(object):
     ACTIVITY_STATS_LIMIT_DAYS = 7
     TEST_MESSAGE_FILENAME = 'Report'
 
-    STATSD_ENABLED = False
-    STATSD_HOST = "statsd.hostedgraphite.com"
-    STATSD_PORT = 8125
     NOTIFY_ENVIRONMENT = 'development'
     LOGO_UPLOAD_BUCKET_NAME = 'public-logos-local'
     MOU_BUCKET_NAME = 'local-mou'
