@@ -6,6 +6,13 @@
     this.start = function(component) {
 
       this.$component = $(component);
+
+      let $parent = this.$component.parent();
+      let wrappedInClosedDetails = $parent.is('details') && !$parent.attr('open');
+
+      // if wrapped in closed <details> element, open it while initialising the module
+      if (wrappedInClosedDetails) { $parent.attr('open', true); }
+
       this.$table = this.$component.find('table');
       this.nativeHeight = this.$component.innerHeight() + 20; // 20px to allow room for scrollbar
       this.topOffset = this.$component.offset().top;
@@ -31,6 +38,8 @@
       }
 
       this.maintainWidth();
+
+      if (wrappedInClosedDetails) { $parent.attr('open', false); }
 
     };
 
@@ -80,7 +89,7 @@
 
       this.$scrollableTable
         .css({
-            'width': this.$component.parent('main').width() - indexColumnWidth,
+            'width': this.$component.parent().width() - indexColumnWidth,
             'margin-left': indexColumnWidth
         });
 
