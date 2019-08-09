@@ -118,10 +118,8 @@
 
   <h2 class="heading-medium" id="letters">Letters</h2>
   <p>The cost of sending a letter depends on the postage you choose and how many sheets of paper you need.</p>
-  <div class="panel panel-border-wide">
-    <p>Current prices will increase by 5 pence on Tuesday 1 October.</p>
-  </div>
-  <div class="bottom-gutter-3-2">
+  
+  <div>
     {% call mapping_table(
       caption='Letter pricing',
       field_headings=['Paper', 'Second class', 'First class'],
@@ -143,12 +141,15 @@
       {% endfor %}
     {% endcall %}
   </div>
+  <div class="panel panel-border-wide">
+    <p>These prices will increase by 5 pence plus VAT on 1 October 2019.</p>
+  </div>
   <p>Prices include:</p>
-  <ul class="list list-bullet">
-     <li>paper</li>
+   <ul class="list list-bullet">
+      <li>paper</li>
      <li>double-sided colour printing</li>
      <li>C5 size envelopes with an address window</li>
      <li>first or second class postage</li>
-  </ul>
+   </ul>
 
 {% endblock %}
