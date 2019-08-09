@@ -33,6 +33,7 @@ from app.main.views import (  # noqa isort:skip
     styleguide,
     templates,
     two_factor,
+    uploads,
     user_profile,
     verify,
 )

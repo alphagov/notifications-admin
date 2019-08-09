@@ -300,6 +300,7 @@ class HeaderNavigation(Navigation):
         'template_history',
         'template_usage',
         'trial_mode',
+        'uploads',
         'usage',
         'view_job',
         'view_job_csv',
@@ -358,6 +359,9 @@ class MainNavigation(Navigation):
             'view_template',
             'view_template_version',
             'view_template_versions',
+        },
+        'uploads': {
+            'uploads',
         },
         'team-members': {
             'confirm_edit_user_email',
@@ -844,6 +848,7 @@ class CaseworkNavigation(Navigation):
         'two_factor_email_sent',
         'update_email_branding',
         'update_letter_branding',
+        'uploads',
         'usage',
         'user_information',
         'user_profile',
@@ -1118,6 +1123,7 @@ class OrgNavigation(Navigation):
         'two_factor_email_sent',
         'update_email_branding',
         'update_letter_branding',
+        'uploads',
         'usage',
         'user_information',
         'user_profile',
