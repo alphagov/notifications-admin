@@ -113,6 +113,14 @@ describe('FullscreenTable', () => {
 
   describe("when it loads", () => {
 
+    let attributeMock;
+
+    afterEach(() => {
+
+      if (attributeMock !== undefined) { attributeMock.reset(); }
+
+    });
+
     test("it fixes the number column for each row without changing the semantics", () => {
 
       // start module
@@ -137,6 +145,28 @@ describe('FullscreenTable', () => {
       expect(stickyJSSpy.mock.calls.length).toBe(1);
 
       stickyJSSpy.mockClear();
+
+    });
+
+    test("if the table is wrapped in a closed <details> tag, it should be opened during initialisation to ensure the positions/dimensions queried are correct", () => {
+
+      // wrap the module in a <details> tag
+      // note: <details> tags are closed by default
+      const detailsEl = document.createElement('details');
+
+      detailsEl.appendChild(container);
+      document.querySelector('main').appendChild(detailsEl);
+
+      // set up a check for changes to the <details> open attribute
+      attributeMock = new helpers.MockAttribute(jest, detailsEl, 'open');;
+
+      // start module
+      window.GOVUK.modules.start();
+
+      // check open was set and unset
+      expect(attributeMock.spies.setAttribute.mock.calls.length).toEqual(2);
+      expect(attributeMock.spies.setAttribute.mock.calls[0][0]).toEqual('open');
+      expect(attributeMock.spies.setAttribute.mock.calls[1][0]).toEqual('open');
 
     });
 
