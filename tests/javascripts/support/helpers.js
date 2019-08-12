@@ -227,6 +227,50 @@ class WindowMock {
   }
 }
 
+// Base class for mocking an DOM APi interfaces not in JSDOM
+class DOMInterfaceMock {
+
+  constructor (jest, spec) {
+
+    // set up methods so their calls can be tracked
+    // leave implementation/return values to the test
+    spec.methods.forEach(method => this[method] = jest.fn(() => {}));
+
+    // set up props
+    // any spies should be relative to the test so not set here
+    spec.props.forEach(prop => {
+
+      Object.defineProperty(this, prop, {
+        get: () => this[prop],
+        set: value => this[prop] = value
+      });
+
+    });
+
+  }
+
+}
+
+// Very basic class for stubbing the Range interface
+// Only contains methods required for current tests
+class RangeMock extends DOMInterfaceMock {
+
+  constructor (jest) {
+    super(jest, { props: [], methods: ['selectNodeContents'] });
+  }
+
+}
+
+// Very basic class for stubbing the Selection interface
+// Only contains methods required for current tests
+class SelectionMock extends DOMInterfaceMock {
+
+  constructor (jest) {
+    super(jest, { props: [], methods: ['removeAllRanges', 'addRange'] });
+  }
+
+}
+
 // function to ask certain questions of a DOM Element
 const element = function (el) {
   return new ElementQuery(el);
@@ -236,5 +280,7 @@ exports.triggerEvent = triggerEvent;
 exports.clickElementWithMouse = clickElementWithMouse;
 exports.moveSelectionToRadio = moveSelectionToRadio;
 exports.activateRadioWithSpace = activateRadioWithSpace;
+exports.RangeMock = RangeMock;
+exports.SelectionMock = SelectionMock;
 exports.element = element;
 exports.WindowMock = WindowMock;
