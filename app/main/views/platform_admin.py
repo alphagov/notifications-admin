@@ -23,7 +23,6 @@ from app.main.forms import (
     PDFUploadForm,
     RequiredDateFilterForm,
     ReturnedLettersForm,
-    SearchByNameForm,
 )
 from app.statistics_utils import (
     get_formatted_percentage,
@@ -188,23 +187,6 @@ def platform_admin_services():
         ),
         global_stats=create_global_stats(services),
     )
-
-
-@main.route("/find-services-by-name", methods=['GET', 'POST'])
-@user_is_platform_admin
-def find_services_by_name():
-    form = SearchByNameForm()
-    services_found = None
-    status = 200
-    if form.validate_on_submit():
-        services_found = service_api_client.get_service({"name": form.search.data})['data']
-    elif request.method == 'POST':
-        status = 400
-    return render_template(
-        'views/find-services/find-services-by-name.html',
-        form=form,
-        services_found=services_found
-    ), status
 
 
 @main.route("/platform-admin/reports")

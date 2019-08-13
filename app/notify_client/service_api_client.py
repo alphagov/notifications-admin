@@ -48,6 +48,9 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         """
         return self.get('/service', params=params_dict)
 
+    def find_services_by_name(self, service_name):
+        return self.get('/service/find-services-by-name', params={"service_name": service_name})
+
     def get_live_services_data(self, params_dict=None):
         """
         Retrieve a list of live services data with contact names and notification counts.
