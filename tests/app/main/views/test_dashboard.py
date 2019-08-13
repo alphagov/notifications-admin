@@ -960,6 +960,8 @@ def test_menu_send_messages(
     mock_get_inbound_sms_summary,
     mock_get_free_sms_fragment_limit,
 ):
+    service_one['permissions'] = ['email', 'sms', 'letter', 'upload_letters']
+
     with app_.test_request_context():
         resp = _test_dashboard_menu(
             mocker,
@@ -972,11 +974,36 @@ def test_menu_send_messages(
             'main.choose_template',
             service_id=service_one['id'],
         ) in page
+        assert url_for('main.uploads', service_id=service_one['id']) in page
         assert url_for('main.manage_users', service_id=service_one['id']) in page
 
         assert url_for('main.service_settings', service_id=service_one['id']) not in page
         assert url_for('main.api_keys', service_id=service_one['id']) not in page
         assert url_for('main.view_providers') not in page
+
+
+def test_menu_send_messages_when_service_does_not_have_upload_letters_permission(
+    mocker,
+    app_,
+    api_user_active,
+    service_one,
+    mock_get_service_templates,
+    mock_get_jobs,
+    mock_get_template_statistics,
+    mock_get_service_statistics,
+    mock_get_usage,
+    mock_get_inbound_sms_summary,
+    mock_get_free_sms_fragment_limit,
+):
+    with app_.test_request_context():
+        resp = _test_dashboard_menu(
+            mocker,
+            app_,
+            api_user_active,
+            service_one,
+            ['view_activity', 'send_messages'])
+        page = resp.get_data(as_text=True)
+        assert url_for('main.uploads', service_id=service_one['id']) not in page
 
 
 def test_menu_manage_service(
