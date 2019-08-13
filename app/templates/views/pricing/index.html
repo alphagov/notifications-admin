@@ -78,7 +78,7 @@
           ('Dieresis', '', '', 'Ë', 'ë', 'Ï', 'ï', '', '', '', '', 'Ẅ', 'ẅ', 'Ÿ', 'ÿ'),
           ] %}
           {% call row() %}
-            {{ index_field(accent) }}
+            {{ index_field(accent, table_header=True) }}
             {{ text_field(A) }}
             {{ text_field(a) }}
             {{ text_field(E) }}
