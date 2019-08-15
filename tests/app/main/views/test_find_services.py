@@ -61,13 +61,13 @@ def test_find_services_by_name_displays_message_if_no_services_found(
     assert document.find('p', {'class': 'browse-list-hint'}).text.strip() == 'No services found.'
 
 
-# def test_find_users_by_email_validates_against_empty_search_submission(
-#     client_request,
-#     platform_admin_user,
-#     mocker
-# ):
-#     client_request.login(platform_admin_user)
-#     document = client_request.post('main.find_users_by_email', _data={"search": ""}, _expected_status=400)
-#
-#     expected_message = "You need to enter full or partial email address to search by."
-#     assert document.find('span', {'class': 'error-message'}).text.strip() == expected_message
+def test_find_services_by_name_validates_against_empty_search_submission(
+    client_request,
+    platform_admin_user,
+    mocker
+):
+    client_request.login(platform_admin_user)
+    document = client_request.post('main.find_services_by_name', _data={"search": ""}, _expected_status=200)
+
+    expected_message = "You need to enter full or partial name to search by."
+    assert document.find('span', {'class': 'error-message'}).text.strip() == expected_message
