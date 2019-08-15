@@ -1127,7 +1127,10 @@ class RequiredDateFilterForm(StripWhitespaceForm):
 
 class SearchByNameForm(StripWhitespaceForm):
 
-    search = SearchField('Search by name')
+    search = SearchField(
+        'Search by name',
+        validators=[DataRequired("You need to enter full or partial name to search by.")],
+    )
 
 
 class SearchUsersByEmailForm(StripWhitespaceForm):
