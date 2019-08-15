@@ -81,7 +81,7 @@
     this.maintainHeight = () => {
 
       let height = Math.min(
-        $(window).height() - this.topOffset + $('html, body').scrollTop(),
+        $(window).height() - this.topOffset + $(window).scrollTop(),
         this.nativeHeight
       );
 
