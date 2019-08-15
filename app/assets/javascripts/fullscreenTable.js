@@ -30,6 +30,13 @@
         .on('scroll', this.toggleShadows)
         .on('scroll', this.maintainHeight);
 
+      // recalculate height when <details> opens
+      if (wrappedInClosedDetails) {
+        $parent.find('summary').on('click', (e) => {
+          if (!$parent[0].open) { this.maintainHeight(); }
+        });
+      }
+
       if (
         window.GOVUK.stickAtBottomWhenScrolling &&
         window.GOVUK.stickAtBottomWhenScrolling.recalculate
