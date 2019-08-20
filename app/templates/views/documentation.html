@@ -7,9 +7,9 @@
 {% block content_column_content %}
 
   <h1 class="heading-large">Documentation</h1>
-    <p>Use the GOV.UK Notify API to send messages automatically.</p>
+    <p>This documentation is for developers who want to integrate the GOV.UK Notify API with a web application or back office system.</p>
   <h2 class="heading-medium">Clients</h2>
-    <p>Choose a client to integrate our API with your web application or back-office system. Links to documentation open in a new tab.</p>
+    <p>Links to documentation open in a new tab.</p>
   <ul class="list list-bullet">
     {% for key, label in [
       ('java', 'Java'),
@@ -22,5 +22,5 @@
       <li><a href="https://docs.notifications.service.gov.uk/{{ key }}.html" target="_blank" rel="noopener">{{ label }}</a></li>
     {% endfor %}
   </ul>
-
+    <p>You can work directly with the API, but this may be complicated to set up. <a href="{{ url_for('.feedback', ticket_type='ask-question-give-feedback') }}">Contact us</a> for more information.</p>
 {% endblock %}
