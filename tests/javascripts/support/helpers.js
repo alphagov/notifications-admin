@@ -13,6 +13,7 @@ exports.RangeMock = domInterfaces.RangeMock;
 exports.SelectionMock = domInterfaces.SelectionMock;
 exports.getRadioGroup = html.getRadioGroup;
 exports.getRadios = html.getRadios;
+exports.templatesAndFoldersCheckboxes = html.templatesAndFoldersCheckboxes;
 exports.element = elements.element;
 exports.WindowMock = rendering.WindowMock;
 exports.ScreenMock = rendering.ScreenMock;

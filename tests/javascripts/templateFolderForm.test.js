@@ -2,31 +2,6 @@ const helpers = require('./support/helpers');
 
 function setFixtures (hierarchy) {
 
-  function templatesAndFoldersCheckboxesHTML () {
-    let result = '';
-
-    hierarchy.forEach((node, idx) => {
-
-      result += `
-        <div class="template-list-item template-list-item-with-checkbox  template-list-item-without-ancestors">
-          <div class="multiple-choice">
-            <input id="templates-or-folder-${idx}" name="templates_and_folders" type="checkbox" value="templates-or-folder-${idx}">
-            <label></label>
-          </div>
-          <h2 class="message-name">
-            <a href="/services/6658542f-0cad-491f-bec8-ab8457700ead/templates/all/folders/3d057d9a-51fc-45ea-8b63-0003206350a6" class="template-list-${node.type === 'folder' ? 'folder' : 'template'}">
-              <span class="live-search-relevant">${node.label}</span>
-            </a>
-          </h2>
-          ${node.meta}
-        </div>`;
-
-    });
-
-    return result;
-
-  };
-
   const foldersCheckboxesHTML = function (filter) {
     let count = 0;
 
@@ -151,7 +126,7 @@ function setFixtures (hierarchy) {
 
   document.body.innerHTML = `
     <form method="post" data-module="template-folder-form">
-      ${templatesAndFoldersCheckboxesHTML()}
+      ${helpers.templatesAndFoldersCheckboxes(hierarchy)}
       ${controlsHTML()}
     </form>`;
 
