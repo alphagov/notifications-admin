@@ -54,6 +54,8 @@ describe('API key', () => {
 
   describe("If copy command is available", () => {
 
+    let componentHeightOnLoad;
+
     beforeAll(() => {
 
       // assume copy command is available
@@ -78,6 +80,10 @@ describe('API key', () => {
         </div>`;
 
       component = document.querySelector('[data-module=api-key]');
+
+      // mock DOM API called for element height
+      componentHeightOnLoad = 50;
+      jest.spyOn(component, 'offsetHeight', 'get').mockImplementation(() => componentHeightOnLoad);
 
       // start the module
       window.GOVUK.modules.start();
@@ -108,6 +114,13 @@ describe('API key', () => {
 
         // recalculate forces the sticky JS to recalculate any stored DOM position/dimensions
         expect(window.GOVUK.stickAtBottomWhenScrolling.recalculate).toHaveBeenCalled();
+
+      });
+
+      test("It should set the component's minimum height based on its height when the page loads", () => {
+
+        // to prevent the position of the button moving when the state changes
+        expect(window.getComputedStyle(component)['min-height']).toEqual(`${componentHeightOnLoad}px`);
 
       });
 
