@@ -20,6 +20,9 @@
           Your service can receive text messages sent to {{ current_service.inbound_number }}.
         </p>
         <p>
+          You can still send text messages from a sender name if you need to, but users will not be able to reply to those messages.
+        </p>
+        <p>
           <a href="{{ url_for('.support') }}">Contact us</a> if you want to switch this feature off.
         </p>
         {% if current_user.has_permissions('manage_api_keys') %}
