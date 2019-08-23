@@ -1127,7 +1127,6 @@ def test_usage_for_all_services_when_calls_api_and_download_data(client, platfor
 #     )
 
 
-
 def test_get_notifications_sent_by_service_calls_api_and_downloads_data(
     mocker,
     client,
