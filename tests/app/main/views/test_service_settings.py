@@ -4100,6 +4100,7 @@ def test_invitation_pages(
     client_request,
     service_one,
     mock_get_inbound_number_for_service,
+    single_sms_sender,
     endpoint,
     permissions,
     expected_p,
@@ -4138,6 +4139,7 @@ def test_set_inbound_sms_when_inbound_number_is_not_set(
     service_one,
     single_reply_to_email_address,
     single_letter_contact_block,
+    single_sms_sender,
     mocker,
     mock_get_all_letter_branding,
 ):
@@ -4152,11 +4154,15 @@ def test_set_inbound_sms_when_inbound_number_is_not_set(
 @pytest.mark.parametrize('user, expected_paragraphs', [
     (active_user_with_permissions, [
         'Your service can receive text messages sent to 07700900123.',
+        'You can still send text messages from a sender name if you '
+        'need to, but users will not be able to reply to those messages.',
         'Contact us if you want to switch this feature off.',
         'You can set up callbacks for received text messages on the API integration page.',
     ]),
     (active_user_no_api_key_permission, [
         'Your service can receive text messages sent to 07700900123.',
+        'You can still send text messages from a sender name if you '
+        'need to, but users will not be able to reply to those messages.',
         'Contact us if you want to switch this feature off.',
     ]),
 ])
