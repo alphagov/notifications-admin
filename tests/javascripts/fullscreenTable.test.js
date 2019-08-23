@@ -181,7 +181,7 @@ describe('FullscreenTable', () => {
     test("when the page has scrolled", () => {
 
       // scroll the window so the table fills the height of the window (768px)
-      windowMock.scrollBy(500);
+      windowMock.scrollTo(500);
 
       // the frames should crop to the window height
       expect(window.getComputedStyle(tableFrame)['height']).toEqual('768px');
