@@ -1079,6 +1079,55 @@ def test_get_notifications_sent_by_service_validates_form(mocker, client_request
     mock_get_stats_from_api.assert_not_called()
 
 
+def test_usage_for_all_services_when_no_results_for_date(client_request, platform_admin_user, mocker):
+    client_request.login(platform_admin_user)
+
+    mocker.patch("app.main.views.platform_admin.billing_api_client.get_usage_for_all_services",
+                 return_value=[])
+
+    page = client_request.post('main.usage_for_all_services',
+                               _expected_status=200,
+                               _data={'start_date': '2019-01-01', 'end_date': '2019-03-31'})
+
+    errors = page.select('.error-message')
+    for error in errors:
+        assert normalize_spaces(error.text) == 'No results for date'
+
+
+def test_usage_for_all_services_when_calls_api_and_download_data(client, platform_admin_user, mocker):
+    mock_get_user(mocker, user=platform_admin_user)
+    client.login(platform_admin_user)
+
+    mocker.patch("app.main.views.platform_admin.billing_api_client.get_usage_for_all_services",
+                 return_value=[{'letter_breakdown': '6 second class letters at 45p\n2 first class letters at 35p\n',
+                                'letter_cost': 3.4,
+                                'organisation_id': '7832a1be-a1f0-4f2a-982f-05adfd3d6354',
+                                'organisation_name': 'Org for a - with sms and letter',
+                                'service_id': '48e82ac0-c8c4-4e46-8712-c83c35a94006',
+                                'service_name': 'a - with sms and letter',
+                                'sms_cost': 0, 'sms_fragments': 0
+                                }])
+
+    response = client.post(url_for('main.usage_for_all_services'),
+                           data={'start_date': '2019-01-01', 'end_date': '2019-03-31'})
+
+    assert response.status_code == 200
+    assert response.content_type == 'text/csv; charset=utf-8'
+    assert response.headers['Content-Disposition'] == (
+        'attachment; filename="Usage for all services from {} to {}.csv"'.format('2019-01-01', '2019-03-31')
+    )
+    # I don't know how to get this assert to work
+#     assert response.get_data(as_text=True) == (
+#         """organisation_id,organisation_name,service_id,service_name,sms_cost,sms_fragments,
+# letter_cost,letter_breakdown
+# 7832a1be-a1f0-4f2a-982f-05adfd3d6354,Org for a - with sms and letter,48e82ac0-c8c4-4e46-8712-c83c35a94006,
+# a - with sms and letter,0,0,3.4,"6 second class letters at 45p\n
+# 2 first class letters at 35p"
+# """
+#     )
+
+
+
 def test_get_notifications_sent_by_service_calls_api_and_downloads_data(
     mocker,
     client,
