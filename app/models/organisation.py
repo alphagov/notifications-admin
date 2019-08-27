@@ -110,6 +110,10 @@ class Organisation(JSONModel):
         return self.name or 'Can’t tell (domain is {})'.format(fallback_domain)
 
     @property
+    def organisation_type_label(self):
+        return dict(self.TYPES).get(self.organisation_type)
+
+    @property
     def crown_status_or_404(self):
         if self.crown is None:
             abort(404)

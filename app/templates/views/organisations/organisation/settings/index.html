@@ -25,15 +25,7 @@
       {% endcall %}
       {% call row() %}
         {{ text_field('Sector') }}
-        {{ optional_text_field({
-          'central': 'Central government',
-          'local': 'Local government',
-          'nhs_central': 'NHS – central government agency or public body',
-          'nhs_local': 'NHS Trust, GP practice or Clinical Commissioning Group',
-          'emergency_service': 'Emergency service',
-          'school_or_college': 'School or college',
-          'other': 'Other',
-        }.get(current_org.organisation_type)) }}
+        {{ optional_text_field(current_org.organisation_type_label) }}
         {{ edit_field(
             'Change',
             url_for('.edit_organisation_type', org_id=current_org.id)

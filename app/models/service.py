@@ -439,6 +439,10 @@ class Service(JSONModel):
     def organisation_type(self):
         return self.organisation.organisation_type or self._dict['organisation_type']
 
+    @property
+    def organisation_type_label(self):
+        return dict(Organisation.TYPES).get(self.organisation_type)
+
     @cached_property
     def inbound_number(self):
         return inbound_number_client.get_inbound_sms_number_for_service(self.id)['data'].get('number', '')
