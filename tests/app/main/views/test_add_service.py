@@ -55,7 +55,7 @@ def test_get_should_render_add_service_template(
         'local',
         'nhs_central',
         'nhs_local',
-        'nhs_local',
+        'nhs_gp',
         'emergency_service',
         'school_or_college',
         'other',
@@ -205,7 +205,7 @@ def test_get_should_only_show_nhs_org_types_radios_if_user_has_nhs_email(
     ] == [
         'nhs_central',
         'nhs_local',
-        'nhs_local',
+        'nhs_gp',
     ]
 
 

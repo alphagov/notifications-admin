@@ -12,7 +12,7 @@ class Organisation(JSONModel):
         ('local', 'Local government'),
         ('nhs_central', 'NHS – central government agency or public body'),
         ('nhs_local', 'NHS Trust or Clinical Commissioning Group'),
-        ('nhs_local', 'GP practice'),
+        ('nhs_gp', 'GP practice'),
         ('emergency_service', 'Emergency service'),
         ('school_or_college', 'School or college'),
         ('other', 'Other'),
