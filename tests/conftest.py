@@ -2835,7 +2835,7 @@ def logged_in_client(
 
 
 @pytest.fixture(scope='function')
-def logged_in_platform_admin_client(
+def platform_admin_client(
     client,
     platform_admin_user,
     mocker,

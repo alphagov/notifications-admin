@@ -17,7 +17,7 @@ from tests.conftest import (
 
 
 def test_organisation_page_shows_all_organisations(
-    logged_in_platform_admin_client,
+    platform_admin_client,
     mocker
 ):
     orgs = [
@@ -29,7 +29,7 @@ def test_organisation_page_shows_all_organisations(
     get_organisations = mocker.patch(
         'app.models.organisation.Organisations.client', return_value=orgs
     )
-    response = logged_in_platform_admin_client.get(
+    response = platform_admin_client.get(
         url_for('.organisations')
     )
 
@@ -594,12 +594,12 @@ def test_update_organisation_domains(
 
 
 def test_update_organisation_name(
-    logged_in_platform_admin_client,
+    platform_admin_client,
     organisation_one,
     mock_get_organisation,
     mock_organisation_name_is_unique
 ):
-    response = logged_in_platform_admin_client.post(
+    response = platform_admin_client.post(
         url_for('.edit_organisation_name', org_id=organisation_one['id']),
         data={'name': 'TestNewOrgName'}
     )
@@ -614,11 +614,11 @@ def test_update_organisation_name(
 
 
 def test_update_organisation_with_incorrect_input(
-    logged_in_platform_admin_client,
+    platform_admin_client,
     organisation_one,
     mock_get_organisation,
 ):
-    response = logged_in_platform_admin_client.post(
+    response = platform_admin_client.post(
         url_for('.edit_organisation_name', org_id=organisation_one['id']),
         data={'name': ''}
     )
@@ -632,12 +632,12 @@ def test_update_organisation_with_incorrect_input(
 
 
 def test_update_organisation_with_non_unique_name(
-    logged_in_platform_admin_client,
+    platform_admin_client,
     organisation_one,
     mock_get_organisation,
     mock_organisation_name_is_not_unique
 ):
-    response = logged_in_platform_admin_client.post(
+    response = platform_admin_client.post(
         url_for('.edit_organisation_name', org_id=organisation_one['id']),
         data={'name': 'TestNewOrgName'}
     )
@@ -653,17 +653,17 @@ def test_update_organisation_with_non_unique_name(
 
 
 def test_confirm_update_organisation(
-    logged_in_platform_admin_client,
+    platform_admin_client,
     organisation_one,
     mock_get_organisation,
     mock_verify_password,
     mock_update_organisation,
     mocker
 ):
-    with logged_in_platform_admin_client.session_transaction() as session:
+    with platform_admin_client.session_transaction() as session:
         session['organisation_name_change'] = 'newName'
 
-    response = logged_in_platform_admin_client.post(
+    response = platform_admin_client.post(
         url_for(
             '.confirm_edit_organisation_name',
             org_id=organisation_one['id'],
@@ -681,17 +681,17 @@ def test_confirm_update_organisation(
 
 
 def test_confirm_update_organisation_with_incorrect_password(
-    logged_in_platform_admin_client,
+    platform_admin_client,
     organisation_one,
     mock_get_organisation,
     mocker
 ):
-    with logged_in_platform_admin_client.session_transaction() as session:
+    with platform_admin_client.session_transaction() as session:
         session['organisation_name_change'] = 'newName'
 
     mocker.patch('app.user_api_client.verify_password', return_value=False)
 
-    response = logged_in_platform_admin_client.post(
+    response = platform_admin_client.post(
         url_for(
             '.confirm_edit_organisation_name',
             org_id=organisation_one['id']
@@ -707,13 +707,13 @@ def test_confirm_update_organisation_with_incorrect_password(
 
 
 def test_confirm_update_organisation_with_name_already_in_use(
-    logged_in_platform_admin_client,
+    platform_admin_client,
     organisation_one,
     mock_get_organisation,
     mock_verify_password,
     mocker
 ):
-    with logged_in_platform_admin_client.session_transaction() as session:
+    with platform_admin_client.session_transaction() as session:
         session['organisation_name_change'] = 'newName'
 
     mocker.patch(
@@ -727,7 +727,7 @@ def test_confirm_update_organisation_with_name_already_in_use(
         )
     )
 
-    response = logged_in_platform_admin_client.post(
+    response = platform_admin_client.post(
         url_for(
             '.confirm_edit_organisation_name',
             org_id=organisation_one['id']
@@ -739,11 +739,11 @@ def test_confirm_update_organisation_with_name_already_in_use(
 
 
 def test_get_edit_organisation_go_live_notes_page(
-    logged_in_platform_admin_client,
+    platform_admin_client,
     mock_get_organisation,
     organisation_one,
 ):
-    response = logged_in_platform_admin_client.get(
+    response = platform_admin_client.get(
         url_for(
             '.edit_organisation_go_live_notes',
             org_id=organisation_one['id']
@@ -761,14 +761,14 @@ def test_get_edit_organisation_go_live_notes_page(
     ('  ', None)
 ])
 def test_post_edit_organisation_go_live_notes_updates_go_live_notes(
-    logged_in_platform_admin_client,
+    platform_admin_client,
     mock_get_organisation,
     mock_update_organisation,
     organisation_one,
     input_note,
     saved_note,
 ):
-    response = logged_in_platform_admin_client.post(
+    response = platform_admin_client.post(
         url_for(
             '.edit_organisation_go_live_notes',
             org_id=organisation_one['id'],

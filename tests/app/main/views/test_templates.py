@@ -722,7 +722,7 @@ def test_should_let_letter_contact_block_be_changed_for_the_template(
 
 
 def test_should_show_page_template_with_priority_select_if_platform_admin(
-    logged_in_platform_admin_client,
+    platform_admin_client,
     platform_admin_user,
     mocker,
     mock_get_service_template,
@@ -731,7 +731,7 @@ def test_should_show_page_template_with_priority_select_if_platform_admin(
 ):
     mocker.patch('app.user_api_client.get_users_for_service', return_value=[platform_admin_user])
     template_id = fake_uuid
-    response = logged_in_platform_admin_client.get(url_for(
+    response = platform_admin_client.get(url_for(
         '.edit_service_template',
         service_id=service_one['id'],
         template_id=template_id,
@@ -806,7 +806,7 @@ def test_dont_show_preview_letter_templates_for_bad_filetype(
 ])
 def test_letter_branding_preview_image(
     mocker,
-    logged_in_platform_admin_client,
+    platform_admin_client,
     original_filename,
     new_filename,
 ):
@@ -814,7 +814,7 @@ def test_letter_branding_preview_image(
         'app.main.views.templates.TemplatePreview.from_example_template',
         return_value='foo'
     )
-    resp = logged_in_platform_admin_client.get(
+    resp = platform_admin_client.get(
         url_for('.letter_branding_preview_image', filename=original_filename)
     )
 

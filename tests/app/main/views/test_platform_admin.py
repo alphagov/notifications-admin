@@ -22,7 +22,6 @@ from tests import service_json
 from tests.conftest import (
     SERVICE_ONE_ID,
     SERVICE_TWO_ID,
-    mock_get_user,
     normalize_spaces,
 )
 
@@ -47,16 +46,10 @@ def test_should_redirect_if_not_logged_in(
     'main.trial_services',
 ])
 def test_should_403_if_not_platform_admin(
-    client,
-    active_user_with_permissions,
-    mocker,
+    client_request,
     endpoint,
 ):
-    mock_get_user(mocker, user=active_user_with_permissions)
-    client.login(active_user_with_permissions)
-    response = client.get(url_for(endpoint))
-
-    assert response.status_code == 403
+    client_request.get(endpoint, _expected_status=403)
 
 
 @pytest.mark.parametrize('endpoint, restricted, research_mode, displayed', [
@@ -70,9 +63,7 @@ def test_should_show_research_and_restricted_mode(
     restricted,
     research_mode,
     displayed,
-    client,
-    platform_admin_user,
-    mocker,
+    platform_admin_client,
     mock_get_detailed_services,
     fake_uuid,
 ):
@@ -80,9 +71,8 @@ def test_should_show_research_and_restricted_mode(
     services[0]['statistics'] = create_stats()
 
     mock_get_detailed_services.return_value = {'data': services}
-    mock_get_user(mocker, user=platform_admin_user)
-    client.login(platform_admin_user)
-    response = client.get(url_for(endpoint))
+
+    response = platform_admin_client.get(url_for(endpoint))
 
     assert response.status_code == 200
     mock_get_detailed_services.assert_called_once_with({'detailed': True,
@@ -100,16 +90,12 @@ def test_should_show_research_and_restricted_mode(
     ('main.trial_services', 1),
 ])
 def test_should_render_platform_admin_page(
-    client,
-    platform_admin_user,
-    mocker,
+    platform_admin_client,
     mock_get_detailed_services,
     endpoint,
     expected_services_shown
 ):
-    mock_get_user(mocker, user=platform_admin_user)
-    client.login(platform_admin_user)
-    response = client.get(url_for(endpoint))
+    response = platform_admin_client.get(url_for(endpoint))
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert len(page.select('tbody tr')) == expected_services_shown * 3  # one row for SMS, one for email, one for letter
@@ -129,16 +115,12 @@ def test_should_render_platform_admin_page(
 ])
 def test_live_trial_services_toggle_including_from_test_key(
     partial_url_for,
-    client,
-    platform_admin_user,
-    mocker,
+    platform_admin_client,
     mock_get_detailed_services,
     endpoint,
     inc
 ):
-    mock_get_user(mocker, user=platform_admin_user)
-    client.login(platform_admin_user)
-    response = client.get(partial_url_for(endpoint))
+    response = platform_admin_client.get(partial_url_for(endpoint))
 
     assert response.status_code == 200
     mock_get_detailed_services.assert_called_once_with({
@@ -153,15 +135,11 @@ def test_live_trial_services_toggle_including_from_test_key(
     'main.trial_services'
 ])
 def test_live_trial_services_with_date_filter(
-    client,
-    platform_admin_user,
-    mocker,
+    platform_admin_client,
     mock_get_detailed_services,
     endpoint
 ):
-    mock_get_user(mocker, user=platform_admin_user)
-    client.login(platform_admin_user)
-    response = client.get(url_for(endpoint, start_date='2016-12-20', end_date='2016-12-28'))
+    response = platform_admin_client.get(url_for(endpoint, start_date='2016-12-20', end_date='2016-12-28'))
 
     assert response.status_code == 200
     resp_data = response.get_data(as_text=True)
@@ -192,9 +170,7 @@ def test_live_trial_services_with_date_filter(
     ),
 ])
 def test_should_show_total_on_live_trial_services_pages(
-    client,
-    platform_admin_user,
-    mocker,
+    platform_admin_client,
     mock_get_detailed_services,
     endpoint,
     fake_uuid,
@@ -230,9 +206,7 @@ def test_should_show_total_on_live_trial_services_pages(
 
     mock_get_detailed_services.return_value = {'data': services}
 
-    mock_get_user(mocker, user=platform_admin_user)
-    client.login(platform_admin_user)
-    response = client.get(url_for(endpoint))
+    response = platform_admin_client.get(url_for(endpoint))
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert (
@@ -349,9 +323,7 @@ def test_should_show_email_and_sms_stats_for_all_service_types(
     endpoint,
     restricted,
     research_mode,
-    client,
-    platform_admin_user,
-    mocker,
+    platform_admin_client,
     mock_get_detailed_services,
     fake_uuid,
 ):
@@ -366,9 +338,7 @@ def test_should_show_email_and_sms_stats_for_all_service_types(
     )
 
     mock_get_detailed_services.return_value = {'data': services}
-    mock_get_user(mocker, user=platform_admin_user)
-    client.login(platform_admin_user)
-    response = client.get(url_for(endpoint))
+    response = platform_admin_client.get(url_for(endpoint))
 
     assert response.status_code == 200
     mock_get_detailed_services.assert_called_once_with({'detailed': True,
@@ -397,9 +367,7 @@ def test_should_show_email_and_sms_stats_for_all_service_types(
 ], ids=['live', 'trial'])
 def test_should_show_archived_services_last(
     endpoint,
-    client,
-    platform_admin_user,
-    mocker,
+    platform_admin_client,
     mock_get_detailed_services,
     restricted,
 ):
@@ -413,9 +381,7 @@ def test_should_show_archived_services_last(
     services[2]['statistics'] = create_stats()
 
     mock_get_detailed_services.return_value = {'data': services}
-    mock_get_user(mocker, user=platform_admin_user)
-    client.login(platform_admin_user)
-    response = client.get(url_for(endpoint))
+    response = platform_admin_client.get(url_for(endpoint))
 
     assert response.status_code == 200
     mock_get_detailed_services.assert_called_once_with({'detailed': True,
@@ -433,9 +399,7 @@ def test_should_show_archived_services_last(
 
 @pytest.mark.parametrize('research_mode', (True, False))
 def test_shows_archived_label_instead_of_live_or_research_mode_label(
-    client,
-    platform_admin_user,
-    mocker,
+    platform_admin_client,
     mock_get_detailed_services,
     research_mode,
 ):
@@ -445,9 +409,7 @@ def test_shows_archived_label_instead_of_live_or_research_mode_label(
     services[0]['statistics'] = create_stats()
 
     mock_get_detailed_services.return_value = {'data': services}
-    mock_get_user(mocker, user=platform_admin_user)
-    client.login(platform_admin_user)
-    response = client.get(url_for('main.live_services'))
+    response = platform_admin_client.get(url_for('main.live_services'))
 
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
@@ -466,9 +428,7 @@ def test_should_order_services_by_usage_with_inactive_last(
     endpoint,
     restricted,
     research_mode,
-    client,
-    platform_admin_user,
-    mocker,
+    platform_admin_client,
     mock_get_detailed_services,
     fake_uuid,
 ):
@@ -505,9 +465,7 @@ def test_should_order_services_by_usage_with_inactive_last(
     )
 
     mock_get_detailed_services.return_value = {'data': services}
-    mock_get_user(mocker, user=platform_admin_user)
-    client.login(platform_admin_user)
-    response = client.get(url_for(endpoint))
+    response = platform_admin_client.get(url_for(endpoint))
 
     assert response.status_code == 200
     mock_get_detailed_services.assert_called_once_with({'detailed': True,
@@ -550,12 +508,9 @@ def test_sum_service_usage_with_zeros(fake_uuid):
 
 
 def test_platform_admin_list_complaints(
-        client,
-        platform_admin_user,
-        mocker
+    platform_admin_client,
+    mocker
 ):
-    mock_get_user(mocker, user=platform_admin_user)
-    client.login(platform_admin_user)
     complaint = {
         'id': str(uuid.uuid4()),
         'notification_id': str(uuid.uuid4()),
@@ -569,8 +524,7 @@ def test_platform_admin_list_complaints(
     mock = mocker.patch('app.complaint_api_client.get_all_complaints',
                         return_value={'complaints': [complaint], 'links': {}})
 
-    client.login(platform_admin_user)
-    response = client.get(url_for('main.platform_admin_list_complaints'))
+    response = platform_admin_client.get(url_for('main.platform_admin_list_complaints'))
 
     assert response.status_code == 200
     resp_data = response.get_data(as_text=True)
@@ -578,9 +532,7 @@ def test_platform_admin_list_complaints(
     assert mock.called
 
 
-def test_should_show_complaints_with_next_previous(mocker, client, platform_admin_user, service_one, fake_uuid):
-    mock_get_user(mocker, user=platform_admin_user)
-    client.login(platform_admin_user)
+def test_should_show_complaints_with_next_previous(platform_admin_client, mocker, service_one, fake_uuid):
 
     api_response = {
         'complaints': [{'complaint_date': None,
@@ -596,7 +548,7 @@ def test_should_show_complaints_with_next_previous(mocker, client, platform_admi
 
     mocker.patch('app.complaint_api_client.get_all_complaints', return_value=api_response)
 
-    response = client.get(url_for('main.platform_admin_list_complaints', page=2))
+    response = platform_admin_client.get(url_for('main.platform_admin_list_complaints', page=2))
 
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
@@ -611,13 +563,11 @@ def test_should_show_complaints_with_next_previous(mocker, client, platform_admi
     assert 'page 1' in prev_page_link.text.strip()
 
 
-def test_platform_admin_list_complaints_returns_404_with_invalid_page(mocker, client, platform_admin_user):
-    mock_get_user(mocker, user=platform_admin_user)
-    client.login(platform_admin_user)
+def test_platform_admin_list_complaints_returns_404_with_invalid_page(platform_admin_client, mocker):
 
     mocker.patch('app.complaint_api_client.get_all_complaints', return_value={'complaints': [], 'links': {}})
 
-    response = client.get(url_for('main.platform_admin_list_complaints', page='invalid'))
+    response = platform_admin_client.get(url_for('main.platform_admin_list_complaints', page='invalid'))
 
     assert response.status_code == 404
 
@@ -644,7 +594,7 @@ def test_get_tech_failure_status_box_data_removes_percentage_data():
     assert 'percentage' not in tech_failure_data
 
 
-def test_platform_admin_with_start_and_end_dates_provided(mocker, logged_in_platform_admin_client):
+def test_platform_admin_with_start_and_end_dates_provided(mocker, platform_admin_client):
     start_date = '2018-01-01'
     end_date = '2018-06-01'
     api_args = {'start_date': datetime.date(2018, 1, 1), 'end_date': datetime.date(2018, 6, 1)}
@@ -654,7 +604,7 @@ def test_platform_admin_with_start_and_end_dates_provided(mocker, logged_in_plat
         'app.main.views.platform_admin.platform_stats_api_client.get_aggregate_platform_stats')
     complaint_count_mock = mocker.patch('app.main.views.platform_admin.complaint_api_client.get_complaint_count')
 
-    logged_in_platform_admin_client.get(
+    platform_admin_client.get(
         url_for('main.platform_admin', start_date=start_date, end_date=end_date)
     )
 
@@ -663,7 +613,7 @@ def test_platform_admin_with_start_and_end_dates_provided(mocker, logged_in_plat
 
 
 @freeze_time('2018-6-11')
-def test_platform_admin_with_only_a_start_date_provided(mocker, logged_in_platform_admin_client):
+def test_platform_admin_with_only_a_start_date_provided(mocker, platform_admin_client):
     start_date = '2018-01-01'
     api_args = {'start_date': datetime.date(2018, 1, 1), 'end_date': datetime.datetime.utcnow().date()}
 
@@ -672,13 +622,13 @@ def test_platform_admin_with_only_a_start_date_provided(mocker, logged_in_platfo
         'app.main.views.platform_admin.platform_stats_api_client.get_aggregate_platform_stats')
     complaint_count_mock = mocker.patch('app.main.views.platform_admin.complaint_api_client.get_complaint_count')
 
-    logged_in_platform_admin_client.get(url_for('main.platform_admin', start_date=start_date))
+    platform_admin_client.get(url_for('main.platform_admin', start_date=start_date))
 
     aggregate_stats_mock.assert_called_with(api_args)
     complaint_count_mock.assert_called_with(api_args)
 
 
-def test_platform_admin_without_dates_provided(mocker, logged_in_platform_admin_client):
+def test_platform_admin_without_dates_provided(mocker, platform_admin_client):
     api_args = {}
 
     mocker.patch('app.main.views.platform_admin.make_columns')
@@ -686,7 +636,7 @@ def test_platform_admin_without_dates_provided(mocker, logged_in_platform_admin_
         'app.main.views.platform_admin.platform_stats_api_client.get_aggregate_platform_stats')
     complaint_count_mock = mocker.patch('app.main.views.platform_admin.complaint_api_client.get_complaint_count')
 
-    logged_in_platform_admin_client.get(url_for('main.platform_admin'))
+    platform_admin_client.get(url_for('main.platform_admin'))
 
     aggregate_stats_mock.assert_called_with(api_args)
     complaint_count_mock.assert_called_with(api_args)
@@ -694,7 +644,7 @@ def test_platform_admin_without_dates_provided(mocker, logged_in_platform_admin_
 
 def test_platform_admin_displays_stats_in_right_boxes_and_with_correct_styling(
     mocker,
-    logged_in_platform_admin_client,
+    platform_admin_client,
 ):
     platform_stats = {
         'email': {'failures':
@@ -714,7 +664,7 @@ def test_platform_admin_displays_stats_in_right_boxes_and_with_correct_styling(
                  return_value=platform_stats)
     mocker.patch('app.main.views.platform_admin.complaint_api_client.get_complaint_count', return_value=15)
 
-    response = logged_in_platform_admin_client.get(url_for('main.platform_admin'))
+    response = platform_admin_client.get(url_for('main.platform_admin'))
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
     # Email permanent failure status box - number is correct
@@ -733,13 +683,11 @@ def test_platform_admin_displays_stats_in_right_boxes_and_with_correct_styling(
         'div', class_='big-number-status-failing').text
 
 
-def test_platform_admin_submit_returned_letters(mocker, client, platform_admin_user):
-    mock_get_user(mocker, user=platform_admin_user)
-    client.login(platform_admin_user)
+def test_platform_admin_submit_returned_letters(mocker, platform_admin_client):
 
     mock_client = mocker.patch('app.letter_jobs_client.submit_returned_letters')
 
-    response = client.post(
+    response = platform_admin_client.post(
         url_for('main.platform_admin_returned_letters'),
         data={'references': ' NOTIFY000REF1 \n NOTIFY002REF2 '}
     )
@@ -750,13 +698,11 @@ def test_platform_admin_submit_returned_letters(mocker, client, platform_admin_u
     assert response.location == url_for('main.platform_admin_returned_letters', _external=True)
 
 
-def test_platform_admin_submit_empty_returned_letters(mocker, client, platform_admin_user):
-    mock_get_user(mocker, user=platform_admin_user)
-    client.login(platform_admin_user)
+def test_platform_admin_submit_empty_returned_letters(mocker, platform_admin_client):
 
     mock_client = mocker.patch('app.letter_jobs_client.submit_returned_letters')
 
-    response = client.post(
+    response = platform_admin_client.post(
         url_for('main.platform_admin_returned_letters'),
         data={'references': '  \n  '}
     )
@@ -797,10 +743,8 @@ def test_service_letter_validation_preview_returns_400_if_file_is_too_big(
     page.find('span', class_='error-message').text.strip() == "File must be less than 2MB"
 
 
-def test_letter_validation_preview_renders_correctly(mocker, client, platform_admin_user):
-    mock_get_user(mocker, user=platform_admin_user)
-    client.login(platform_admin_user)
-    response = client.get(url_for('main.platform_admin_letter_validation_preview'))
+def test_letter_validation_preview_renders_correctly(mocker, platform_admin_client):
+    response = platform_admin_client.get(url_for('main.platform_admin_letter_validation_preview'))
     assert response.status_code == 200
 
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
@@ -810,10 +754,8 @@ def test_letter_validation_preview_renders_correctly(mocker, client, platform_ad
 
 @pytest.mark.parametrize("result,expected_class", [(True, 'banner-with-tick'), (False, "banner-dangerous")])
 def test_letter_validation_preview_calls_template_preview_when_data_correct_and_displays_correct_message(
-    mocker, client, platform_admin_user, result, expected_class
+    mocker, platform_admin_client, result, expected_class
 ):
-    mock_get_user(mocker, user=platform_admin_user)
-    client.login(platform_admin_user)
     endpoint = '{}/precompiled/validate?include_preview=true'.format(current_app.config['TEMPLATE_PREVIEW_API_HOST'])
     mocker.patch('app.main.views.platform_admin.antivirus_client.scan', return_value=True)
 
@@ -825,7 +767,7 @@ def test_letter_validation_preview_calls_template_preview_when_data_correct_and_
             status_code=200
         )
         with open('tests/test_pdf_files/multi_page_pdf.pdf', 'rb') as file:
-            response = client.post(
+            response = platform_admin_client.post(
                 url_for('main.platform_admin_letter_validation_preview'),
                 data={"file": file},
                 content_type='multipart/form-data'
@@ -838,12 +780,10 @@ def test_letter_validation_preview_calls_template_preview_when_data_correct_and_
     assert page.find('div', class_=expected_class).text.strip() == "bazinga!"
 
 
-def test_letter_validation_preview_doesnt_call_template_preview_when_no_file(mocker, client, platform_admin_user):
-    mock_get_user(mocker, user=platform_admin_user)
-    client.login(platform_admin_user)
+def test_letter_validation_preview_doesnt_call_template_preview_when_no_file(mocker, platform_admin_client):
     antivirus_scan = mocker.patch('app.main.views.platform_admin.antivirus_client.scan')
     validate_letter = mocker.patch('app.main.views.platform_admin.validate_letter')
-    response = client.post(
+    response = platform_admin_client.post(
         url_for('main.platform_admin_letter_validation_preview'),
         data={"file": ""},
         content_type='multipart/form-data'
@@ -856,13 +796,11 @@ def test_letter_validation_preview_doesnt_call_template_preview_when_no_file(moc
     assert page.find('span', class_='error-message').text.strip() == "You need to upload a file to submit"
 
 
-def test_letter_validation_preview_doesnt_call_template_preview_when_file_not_pdf(mocker, client, platform_admin_user):
-    mock_get_user(mocker, user=platform_admin_user)
-    client.login(platform_admin_user)
+def test_letter_validation_preview_doesnt_call_template_preview_when_file_not_pdf(mocker, platform_admin_client):
     antivirus_scan = mocker.patch('app.main.views.platform_admin.antivirus_client.scan')
     validate_letter = mocker.patch('app.main.views.platform_admin.validate_letter')
     with open('tests/non_spreadsheet_files/actually_a_png.csv', 'rb') as file:
-        response = client.post(
+        response = platform_admin_client.post(
             url_for('main.platform_admin_letter_validation_preview'),
             data={"file": file},
             content_type='multipart/form-data'
@@ -875,15 +813,14 @@ def test_letter_validation_preview_doesnt_call_template_preview_when_file_not_pd
 
 
 def test_letter_validation_preview_doesnt_call_template_preview_when_file_doesnt_pass_virus_scan(
-    mocker, client, platform_admin_user
+    mocker,
+    platform_admin_client
 ):
-    mock_get_user(mocker, user=platform_admin_user)
-    client.login(platform_admin_user)
     antivirus_scan = mocker.patch('app.main.views.platform_admin.antivirus_client.scan', return_value=False)
     validate_letter = mocker.patch('app.main.views.platform_admin.validate_letter')
 
     with open('tests/test_pdf_files/multi_page_pdf.pdf', 'rb') as file:
-        response = client.post(
+        response = platform_admin_client.post(
             url_for('main.platform_admin_letter_validation_preview'),
             data={"file": file},
             content_type='multipart/form-data'
@@ -954,14 +891,10 @@ def test_clear_cache_requires_option(client_request, platform_admin_user, mocker
 
 
 def test_reports_page(
-    client,
-    platform_admin_user,
-    mocker
+    platform_admin_client
 ):
-    mock_get_user(mocker, user=platform_admin_user)
-    client.login(platform_admin_user)
 
-    response = client.get(url_for('main.platform_admin_reports'))
+    response = platform_admin_client.get(url_for('main.platform_admin_reports'))
 
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
@@ -978,9 +911,7 @@ def test_reports_page(
     ).attrs['href'] == url_for('main.notifications_sent_by_service')
 
 
-def test_get_live_services_report(client, platform_admin_user, mocker):
-    mock_get_user(mocker, user=platform_admin_user)
-    client.login(platform_admin_user)
+def test_get_live_services_report(platform_admin_client, mocker):
 
     mocker.patch(
         'app.service_api_client.get_live_services_data',
@@ -999,7 +930,7 @@ def test_get_live_services_report(client, platform_admin_user, mocker):
                 'free_sms_fragment_limit': 200},
         ]}
     )
-    response = client.get(url_for('main.live_services_csv'))
+    response = platform_admin_client.get(url_for('main.live_services_csv'))
     assert response.status_code == 200
     report = response.get_data(as_text=True)
     assert report.strip() == (
@@ -1014,9 +945,7 @@ def test_get_live_services_report(client, platform_admin_user, mocker):
     )
 
 
-def test_get_performance_platform_report(client, platform_admin_user, mocker):
-    mock_get_user(mocker, user=platform_admin_user)
-    client.login(platform_admin_user)
+def test_get_performance_platform_report(platform_admin_client, mocker):
 
     mocker.patch(
         'app.service_api_client.get_live_services_data',
@@ -1033,7 +962,7 @@ def test_get_performance_platform_report(client, platform_admin_user, mocker):
                 'letter_volume_intent': 0, 'sms_totals': 0, 'email_totals': 0, 'letter_totals': 0},
         ]}
     )
-    response = client.get(url_for('main.performance_platform_xlsx'))
+    response = platform_admin_client.get(url_for('main.performance_platform_xlsx'))
     assert response.status_code == 200
     assert pyexcel.get_array(
         file_type='xlsx',
@@ -1094,10 +1023,7 @@ def test_usage_for_all_services_when_no_results_for_date(client_request, platfor
         assert normalize_spaces(error.text) == 'No results for date'
 
 
-def test_usage_for_all_services_when_calls_api_and_download_data(client, platform_admin_user, mocker):
-    mock_get_user(mocker, user=platform_admin_user)
-    client.login(platform_admin_user)
-
+def test_usage_for_all_services_when_calls_api_and_download_data(platform_admin_client, mocker):
     mocker.patch("app.main.views.platform_admin.billing_api_client.get_usage_for_all_services",
                  return_value=[{'letter_breakdown': '6 second class letters at 45p\n2 first class letters at 35p\n',
                                 'letter_cost': 3.4,
@@ -1108,8 +1034,8 @@ def test_usage_for_all_services_when_calls_api_and_download_data(client, platfor
                                 'sms_cost': 0, 'sms_fragments': 0
                                 }])
 
-    response = client.post(url_for('main.usage_for_all_services'),
-                           data={'start_date': '2019-01-01', 'end_date': '2019-03-31'})
+    response = platform_admin_client.post(url_for('main.usage_for_all_services'),
+                                          data={'start_date': '2019-01-01', 'end_date': '2019-03-31'})
 
     assert response.status_code == 200
     assert response.content_type == 'text/csv; charset=utf-8'
@@ -1129,12 +1055,10 @@ def test_usage_for_all_services_when_calls_api_and_download_data(client, platfor
 
 def test_get_notifications_sent_by_service_calls_api_and_downloads_data(
     mocker,
-    client,
-    platform_admin_user,
+    platform_admin_client,
     service_one,
     service_two,
 ):
-    mock_get_user(mocker, user=platform_admin_user)
     api_data = [
         ['Tue, 01 Jan 2019 00:00:00 GMT', SERVICE_ONE_ID, service_one['name'], 'email', 191, 0, 0, 14, 0, 0],
         ['Tue, 01 Jan 2019 00:00:00 GMT', SERVICE_ONE_ID, service_one['name'], 'sms', 42, 0, 0, 8, 0, 0],
@@ -1145,9 +1069,7 @@ def test_get_notifications_sent_by_service_calls_api_and_downloads_data(
     start_date = datetime.date(2019, 1, 1)
     end_date = datetime.date(2019, 1, 31)
 
-    client.login(platform_admin_user)
-
-    response = client.post(
+    response = platform_admin_client.post(
         url_for('main.notifications_sent_by_service'),
         data={'start_date': start_date, 'end_date': end_date}
     )
