@@ -45,6 +45,7 @@ from app.main.validators import (
     ValidEmail,
     ValidGovEmail,
 )
+from app.models.organisation import Organisation
 from app.models.roles_and_permissions import permissions, roles
 from app.utils import guess_name_from_email_address
 
@@ -242,33 +243,23 @@ class ForgivingIntegerField(StringField):
         return super().__call__(value=value, **kwargs)
 
 
-def organisation_type(label='Who runs this service?'):
-    return RadioField(
-        label,
-        choices=[
-            ('central', 'Central government'),
-            ('local', 'Local government'),
-            ('nhs_central', 'NHS – central government agency or public body'),
-            ('nhs_local', 'NHS Trust or Clinical Commissioning Group'),
-            ('nhs_local', 'GP practice'),
-            ('emergency_service', 'Emergency service'),
-            ('school_or_college', 'School or college'),
-            ('other', 'Other'),
-        ],
-        validators=[DataRequired()],
-    )
-
-
-def nhs_organisation_type(label='Who runs this service?'):
-    return RadioField(
-        label,
-        choices=[
-            ('nhs_central', 'NHS – central government agency or public body'),
-            ('nhs_local', 'NHS Trust or Clinical Commissioning Group'),
-            ('nhs_local', 'GP practice'),
-        ],
-        validators=[DataRequired()],
-    )
+class OrganisationTypeField(RadioField):
+    def __init__(
+        self,
+        *args,
+        include_only=None,
+        validators=None,
+        **kwargs
+    ):
+        super().__init__(
+            *args,
+            choices=[
+                (value, label) for value, label in Organisation.TYPES
+                if not include_only or value in include_only
+            ],
+            validators=[DataRequired()] + (validators or []),
+            **kwargs
+        )
 
 
 class FieldWithNoneOption():
@@ -544,7 +535,7 @@ class RenameOrganisationForm(StripWhitespaceForm):
 
 
 class OrganisationOrganisationTypeForm(StripWhitespaceForm):
-    organisation_type = organisation_type(label='What type of organisation is this?')
+    organisation_type = OrganisationTypeField('What type of organisation is this?')
 
 
 class OrganisationCrownStatusForm(StripWhitespaceForm):
@@ -605,11 +596,14 @@ class CreateServiceForm(StripWhitespaceForm):
         validators=[
             DataRequired(message='Can’t be empty')
         ])
-    organisation_type = organisation_type()
+    organisation_type = OrganisationTypeField('Who runs this service?')
 
 
 class CreateNhsServiceForm(CreateServiceForm):
-    organisation_type = nhs_organisation_type()
+    organisation_type = OrganisationTypeField(
+        'Who runs this service?',
+        include_only={'nhs_central', 'nhs_local'}
+    )
 
 
 class NewOrganisationForm(
