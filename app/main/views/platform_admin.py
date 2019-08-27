@@ -305,10 +305,13 @@ def usage_for_all_services():
                    "sms_cost", "sms_fragments", "letter_cost", "letter_breakdown"]
 
         result = billing_api_client.get_usage_for_all_services(start_date, end_date)
-        rows = []
-        for r in result:
-            rows.append([r['organisation_id'], r["organisation_name"], r["service_id"], r["service_name"],
-                         r["sms_cost"], r['sms_fragments'], r["letter_cost"], r["letter_breakdown"].strip()])
+        rows = [
+            [
+                r['organisation_id'], r["organisation_name"], r["service_id"], r["service_name"],
+                r["sms_cost"], r['sms_fragments'], r["letter_cost"], r["letter_breakdown"].strip()
+            ]
+            for r in result
+        ]
         if rows:
             return Spreadsheet.from_rows([headers] + rows).as_csv_data, 200, {
                 'Content-Type': 'text/csv; charset=utf-8',
@@ -317,7 +320,7 @@ def usage_for_all_services():
                 )
             }
         else:
-            form.errors['start_date'] = 'no results for date'
+            flash('No results for dates')
     return render_template('views/platform-admin/usage_for_all_services.html', form=form)
 
 

@@ -19,11 +19,7 @@ from app.main.views.platform_admin import (
     sum_service_usage,
 )
 from tests import service_json
-from tests.conftest import (
-    SERVICE_ONE_ID,
-    SERVICE_TWO_ID,
-    normalize_spaces,
-)
+from tests.conftest import SERVICE_ONE_ID, SERVICE_TWO_ID, normalize_spaces
 
 
 @pytest.mark.parametrize('endpoint', [
@@ -1018,9 +1014,8 @@ def test_usage_for_all_services_when_no_results_for_date(client_request, platfor
                                _expected_status=200,
                                _data={'start_date': '2019-01-01', 'end_date': '2019-03-31'})
 
-    errors = page.select('.error-message')
-    for error in errors:
-        assert normalize_spaces(error.text) == 'No results for date'
+    error = page.select_one('.banner-dangerous')
+    assert normalize_spaces(error.text) == 'No results for dates'
 
 
 def test_usage_for_all_services_when_calls_api_and_download_data(platform_admin_client, mocker):
@@ -1042,15 +1037,26 @@ def test_usage_for_all_services_when_calls_api_and_download_data(platform_admin_
     assert response.headers['Content-Disposition'] == (
         'attachment; filename="Usage for all services from {} to {}.csv"'.format('2019-01-01', '2019-03-31')
     )
-    # I don't know how to get this assert to work
-#     assert response.get_data(as_text=True) == (
-#         """organisation_id,organisation_name,service_id,service_name,sms_cost,sms_fragments,
-# letter_cost,letter_breakdown
-# 7832a1be-a1f0-4f2a-982f-05adfd3d6354,Org for a - with sms and letter,48e82ac0-c8c4-4e46-8712-c83c35a94006,
-# a - with sms and letter,0,0,3.4,"6 second class letters at 45p\n
-# 2 first class letters at 35p"
-# """
-#     )
+
+    assert response.get_data(as_text=True) == (
+        'organisation_id,organisation_name,service_id,service_name,' +
+        'sms_cost,sms_fragments,letter_cost,letter_breakdown' +
+
+        '\r\n' +
+
+        '7832a1be-a1f0-4f2a-982f-05adfd3d6354,' +
+        'Org for a - with sms and letter,' +
+        '48e82ac0-c8c4-4e46-8712-c83c35a94006,' +
+        'a - with sms and letter,' +
+        '0,' +
+        '0,' +
+        '3.4,' +
+        '"6 second class letters at 45p' +
+        '\n' +
+        '2 first class letters at 35p"' +
+
+        '\r\n'
+    )
 
 
 def test_get_notifications_sent_by_service_calls_api_and_downloads_data(
