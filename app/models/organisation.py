@@ -7,6 +7,17 @@ from app.notify_client.organisations_api_client import organisations_client
 
 class Organisation(JSONModel):
 
+    TYPES = (
+        ('central', 'Central government'),
+        ('local', 'Local government'),
+        ('nhs_central', 'NHS – central government agency or public body'),
+        ('nhs_local', 'NHS Trust or Clinical Commissioning Group'),
+        ('nhs_gp', 'GP practice'),
+        ('emergency_service', 'Emergency service'),
+        ('school_or_college', 'School or college'),
+        ('other', 'Other'),
+    )
+
     ALLOWED_PROPERTIES = {
         'id',
         'name',
@@ -97,6 +108,10 @@ class Organisation(JSONModel):
 
     def as_info_for_branding_request(self, fallback_domain):
         return self.name or 'Can’t tell (domain is {})'.format(fallback_domain)
+
+    @property
+    def organisation_type_label(self):
+        return dict(self.TYPES).get(self.organisation_type)
 
     @property
     def crown_status_or_404(self):
