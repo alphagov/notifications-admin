@@ -123,7 +123,7 @@ describe('FullscreenTable', () => {
 
       expect(tableFrame).not.toBeNull();
       expect(numberColumnFrame).not.toBeNull();
-      expect(numberColumnFrame.getAttribute('role')).toEqual('presentation');
+      expect(numberColumnFrame.getAttribute('aria-hidden')).toEqual('true');
 
     });
 
