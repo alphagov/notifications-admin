@@ -70,16 +70,6 @@ $email-message-gutter: $gutter * 2;
 
     }
 
-    &-wrapper {
-
-      .js-enabled & {
-        max-height: 92px;
-        padding: 0;
-        overflow: hidden;
-      }
-
-    }
-
   }
 
 }
