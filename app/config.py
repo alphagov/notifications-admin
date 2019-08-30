@@ -43,6 +43,7 @@ class Config(object):
         'local': 25000,
         'nhs_central': 250000,
         'nhs_local': 25000,
+        'nhs_gp': 25000,
         'emergency_service': 25000,
         'school_or_college': 25000,
         'other': 25000,
