@@ -1452,7 +1452,7 @@ def test_org_breadcrumbs_show_if_user_is_platform_admin(
     mock_get_service_templates_when_no_templates_exist,
     mock_get_jobs,
     platform_admin_user,
-    logged_in_platform_admin_client,
+    platform_admin_client,
 ):
     service_one_json = service_json(SERVICE_ONE_ID,
                                     users=[platform_admin_user['id']],
@@ -1461,7 +1461,7 @@ def test_org_breadcrumbs_show_if_user_is_platform_admin(
     mocker.patch('app.service_api_client.get_service', return_value={'data': service_one_json})
     mocker.patch('app.models.service.Organisation')
 
-    response = logged_in_platform_admin_client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
+    response = platform_admin_client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
     assert page.select_one('.navigation-organisation-link')['href'] == url_for(

@@ -16,10 +16,10 @@ from tests.conftest import normalize_spaces
 
 
 def test_letter_branding_page_shows_full_branding_list(
-    logged_in_platform_admin_client,
+    platform_admin_client,
     mock_get_all_letter_branding
 ):
-    response = logged_in_platform_admin_client.get(
+    response = platform_admin_client.get(
         url_for('.letter_branding')
     )
 
@@ -49,10 +49,10 @@ def test_letter_branding_page_shows_full_branding_list(
 
 
 def test_update_letter_branding_shows_the_current_letter_brand(
-    logged_in_platform_admin_client,
+    platform_admin_client,
     mock_get_letter_branding_by_id,
 ):
-    response = logged_in_platform_admin_client.get(
+    response = platform_admin_client.get(
         url_for('.update_letter_branding', branding_id='abc')
     )
 
@@ -66,11 +66,11 @@ def test_update_letter_branding_shows_the_current_letter_brand(
 
 def test_update_letter_branding_with_new_valid_file(
     mocker,
-    logged_in_platform_admin_client,
+    platform_admin_client,
     mock_get_letter_branding_by_id,
     fake_uuid
 ):
-    with logged_in_platform_admin_client.session_transaction() as session:
+    with platform_admin_client.session_transaction() as session:
         user_id = session["user_id"]
 
     filename = 'new_file.svg'
@@ -80,7 +80,7 @@ def test_update_letter_branding_with_new_valid_file(
     mocker.patch('app.s3_client.s3_logo_client.uuid.uuid4', return_value=fake_uuid)
     mock_delete_temp_files = mocker.patch('app.main.views.letter_branding.delete_letter_temp_file')
 
-    response = logged_in_platform_admin_client.post(
+    response = platform_admin_client.post(
         url_for('.update_letter_branding', branding_id='abc'),
         data={'file': (BytesIO(''.encode('utf-8')), filename)},
         follow_redirects=True
@@ -96,10 +96,10 @@ def test_update_letter_branding_with_new_valid_file(
 
 
 def test_update_letter_branding_when_uploading_invalid_file(
-    logged_in_platform_admin_client,
+    platform_admin_client,
     mock_get_letter_branding_by_id
 ):
-    response = logged_in_platform_admin_client.post(
+    response = platform_admin_client.post(
         url_for('.update_letter_branding', branding_id='abc'),
         data={'file': (BytesIO(''.encode('utf-8')), 'test.png')},
         follow_redirects=True
@@ -114,11 +114,11 @@ def test_update_letter_branding_when_uploading_invalid_file(
 
 def test_update_letter_branding_deletes_any_temp_files_when_uploading_a_file(
     mocker,
-    logged_in_platform_admin_client,
+    platform_admin_client,
     mock_get_letter_branding_by_id,
     fake_uuid,
 ):
-    with logged_in_platform_admin_client.session_transaction() as session:
+    with platform_admin_client.session_transaction() as session:
         user_id = session["user_id"]
 
     temp_logo = LETTER_TEMP_LOGO_LOCATION.format(user_id=user_id, unique_id=fake_uuid, filename='temp.svg')
@@ -126,7 +126,7 @@ def test_update_letter_branding_deletes_any_temp_files_when_uploading_a_file(
     mock_s3_upload = mocker.patch('app.s3_client.s3_logo_client.utils_s3upload')
     mock_delete_temp_files = mocker.patch('app.main.views.letter_branding.delete_letter_temp_file')
 
-    response = logged_in_platform_admin_client.post(
+    response = platform_admin_client.post(
         url_for('.update_letter_branding', branding_id='abc', logo=temp_logo),
         data={'file': (BytesIO(''.encode('utf-8')), 'new_uploaded_file.svg')},
         follow_redirects=True
@@ -142,7 +142,7 @@ def test_update_letter_branding_deletes_any_temp_files_when_uploading_a_file(
 
 def test_update_letter_branding_with_original_file_and_new_details(
     mocker,
-    logged_in_platform_admin_client,
+    platform_admin_client,
     mock_get_all_letter_branding,
     mock_get_letter_branding_by_id,
     fake_uuid
@@ -151,7 +151,7 @@ def test_update_letter_branding_with_original_file_and_new_details(
     mock_template_preview = mocker.patch('app.main.views.letter_branding.get_png_file_from_svg')
     mock_upload_logos = mocker.patch('app.main.views.letter_branding.upload_letter_logos')
 
-    response = logged_in_platform_admin_client.post(
+    response = platform_admin_client.post(
         url_for('.update_letter_branding', branding_id=fake_uuid),
         data={
             'name': 'Updated name',
@@ -175,7 +175,7 @@ def test_update_letter_branding_with_original_file_and_new_details(
 
 def test_update_letter_branding_shows_form_errors_on_name_fields(
     mocker,
-    logged_in_platform_admin_client,
+    platform_admin_client,
     mock_get_letter_branding_by_id,
     fake_uuid
 ):
@@ -183,7 +183,7 @@ def test_update_letter_branding_shows_form_errors_on_name_fields(
 
     logo = permanent_letter_logo_name('hm-government', 'svg')
 
-    response = logged_in_platform_admin_client.post(
+    response = platform_admin_client.post(
         url_for('.update_letter_branding', branding_id=fake_uuid, logo=logo),
         data={
             'name': '',
@@ -202,7 +202,7 @@ def test_update_letter_branding_shows_form_errors_on_name_fields(
 
 def test_update_letter_branding_shows_database_errors_on_name_field(
     mocker,
-    logged_in_platform_admin_client,
+    platform_admin_client,
     mock_get_letter_branding_by_id,
     fake_uuid,
 ):
@@ -222,7 +222,7 @@ def test_update_letter_branding_shows_database_errors_on_name_field(
         message={'name': ['name already in use']}
     ))
 
-    response = logged_in_platform_admin_client.post(
+    response = platform_admin_client.post(
         url_for('.update_letter_branding', branding_id='abc'),
         data={
             'name': 'my brand',
@@ -239,7 +239,7 @@ def test_update_letter_branding_shows_database_errors_on_name_field(
 
 def test_update_letter_branding_with_new_file_and_new_details(
     mocker,
-    logged_in_platform_admin_client,
+    platform_admin_client,
     mock_get_all_letter_branding,
     mock_get_letter_branding_by_id,
     fake_uuid
@@ -254,7 +254,7 @@ def test_update_letter_branding_with_new_file_and_new_details(
     mock_upload_png = mocker.patch('app.main.views.letter_branding.upload_letter_png_logo')
     mock_delete_temp_files = mocker.patch('app.main.views.letter_branding.delete_letter_temp_files_created_by')
 
-    response = logged_in_platform_admin_client.post(
+    response = platform_admin_client.post(
         url_for('.update_letter_branding', branding_id=fake_uuid, logo=temp_logo),
         data={
             'name': 'Updated name',
@@ -286,7 +286,7 @@ def test_update_letter_branding_with_new_file_and_new_details(
 
 def test_update_letter_branding_rolls_back_db_changes_and_shows_error_if_saving_to_s3_fails(
     mocker,
-    logged_in_platform_admin_client,
+    platform_admin_client,
     mock_get_letter_branding_by_id,
     fake_uuid
 ):
@@ -295,7 +295,7 @@ def test_update_letter_branding_rolls_back_db_changes_and_shows_error_if_saving_
     mocker.patch('app.main.views.letter_branding.upload_letter_logos', side_effect=BotoClientError({}, 'error'))
 
     temp_logo = LETTER_TEMP_LOGO_LOCATION.format(user_id=fake_uuid, unique_id=fake_uuid, filename='new_file.svg')
-    response = logged_in_platform_admin_client.post(
+    response = platform_admin_client.post(
         url_for('.update_letter_branding', branding_id=fake_uuid, logo=temp_logo),
         data={
             'name': 'Updated name',
@@ -315,8 +315,8 @@ def test_update_letter_branding_rolls_back_db_changes_and_shows_error_if_saving_
     ]
 
 
-def test_create_letter_branding_does_not_show_branding_info(logged_in_platform_admin_client):
-    response = logged_in_platform_admin_client.get(
+def test_create_letter_branding_does_not_show_branding_info(platform_admin_client):
+    response = platform_admin_client.get(
         url_for('.create_letter_branding')
     )
 
@@ -329,10 +329,10 @@ def test_create_letter_branding_does_not_show_branding_info(logged_in_platform_a
 
 def test_create_letter_branding_when_uploading_valid_file(
     mocker,
-    logged_in_platform_admin_client,
+    platform_admin_client,
     fake_uuid
 ):
-    with logged_in_platform_admin_client.session_transaction() as session:
+    with platform_admin_client.session_transaction() as session:
         user_id = session["user_id"]
 
     filename = 'test.svg'
@@ -342,7 +342,7 @@ def test_create_letter_branding_when_uploading_valid_file(
     mocker.patch('app.s3_client.s3_logo_client.uuid.uuid4', return_value=fake_uuid)
     mock_delete_temp_files = mocker.patch('app.main.views.letter_branding.delete_letter_temp_file')
 
-    response = logged_in_platform_admin_client.post(
+    response = platform_admin_client.post(
         url_for('.create_letter_branding'),
         data={'file': (BytesIO(''.encode('utf-8')), filename)},
         follow_redirects=True
@@ -356,8 +356,8 @@ def test_create_letter_branding_when_uploading_valid_file(
     mock_delete_temp_files.assert_not_called()
 
 
-def test_create_letter_branding_when_uploading_invalid_file(logged_in_platform_admin_client):
-    response = logged_in_platform_admin_client.post(
+def test_create_letter_branding_when_uploading_invalid_file(platform_admin_client):
+    response = platform_admin_client.post(
         url_for('.create_letter_branding'),
         data={'file': (BytesIO(''.encode('utf-8')), 'test.png')},
         follow_redirects=True
@@ -372,10 +372,10 @@ def test_create_letter_branding_when_uploading_invalid_file(logged_in_platform_a
 
 def test_create_letter_branding_deletes_temp_files_when_uploading_a_new_file(
     mocker,
-    logged_in_platform_admin_client,
+    platform_admin_client,
     fake_uuid,
 ):
-    with logged_in_platform_admin_client.session_transaction() as session:
+    with platform_admin_client.session_transaction() as session:
         user_id = session["user_id"]
 
     temp_logo = LETTER_TEMP_LOGO_LOCATION.format(user_id=user_id, unique_id=fake_uuid, filename='temp.svg')
@@ -383,7 +383,7 @@ def test_create_letter_branding_deletes_temp_files_when_uploading_a_new_file(
     mock_s3_upload = mocker.patch('app.s3_client.s3_logo_client.utils_s3upload')
     mock_delete_temp_files = mocker.patch('app.main.views.letter_branding.delete_letter_temp_file')
 
-    response = logged_in_platform_admin_client.post(
+    response = platform_admin_client.post(
         url_for('.create_letter_branding', logo=temp_logo),
         data={'file': (BytesIO(''.encode('utf-8')), 'new.svg')},
         follow_redirects=True
@@ -399,15 +399,15 @@ def test_create_letter_branding_deletes_temp_files_when_uploading_a_new_file(
 
 def test_create_new_letter_branding_shows_preview_of_logo(
     mocker,
-    logged_in_platform_admin_client,
+    platform_admin_client,
     fake_uuid
 ):
-    with logged_in_platform_admin_client.session_transaction() as session:
+    with platform_admin_client.session_transaction() as session:
         user_id = session["user_id"]
 
     temp_logo = LETTER_TEMP_LOGO_LOCATION.format(user_id=user_id, unique_id=fake_uuid, filename='temp.svg')
 
-    response = logged_in_platform_admin_client.get(
+    response = platform_admin_client.get(
         url_for('.create_letter_branding', logo=temp_logo)
     )
 
@@ -419,10 +419,10 @@ def test_create_new_letter_branding_shows_preview_of_logo(
 
 
 def test_create_letter_branding_shows_an_error_when_submitting_details_with_no_logo(
-    logged_in_platform_admin_client,
+    platform_admin_client,
     fake_uuid
 ):
-    response = logged_in_platform_admin_client.post(
+    response = platform_admin_client.post(
         url_for('.create_letter_branding'),
         data={
             'name': 'Test brand',
@@ -439,10 +439,10 @@ def test_create_letter_branding_shows_an_error_when_submitting_details_with_no_l
 
 def test_create_letter_branding_persists_logo_when_all_data_is_valid(
     mocker,
-    logged_in_platform_admin_client,
+    platform_admin_client,
     fake_uuid,
 ):
-    with logged_in_platform_admin_client.session_transaction() as session:
+    with platform_admin_client.session_transaction() as session:
         user_id = session["user_id"]
 
     temp_logo = LETTER_TEMP_LOGO_LOCATION.format(user_id=user_id, unique_id=fake_uuid, filename='test.svg')
@@ -455,7 +455,7 @@ def test_create_letter_branding_persists_logo_when_all_data_is_valid(
     mock_upload_png = mocker.patch('app.main.views.letter_branding.upload_letter_png_logo')
     mock_delete_temp_files = mocker.patch('app.main.views.letter_branding.delete_letter_temp_files_created_by')
 
-    response = logged_in_platform_admin_client.post(
+    response = platform_admin_client.post(
         url_for('.create_letter_branding', logo=temp_logo),
         data={
             'name': 'Test brand',
@@ -485,15 +485,15 @@ def test_create_letter_branding_persists_logo_when_all_data_is_valid(
 
 
 def test_create_letter_branding_shows_form_errors_on_name_field(
-    logged_in_platform_admin_client,
+    platform_admin_client,
     fake_uuid
 ):
-    with logged_in_platform_admin_client.session_transaction() as session:
+    with platform_admin_client.session_transaction() as session:
         user_id = session["user_id"]
 
     temp_logo = LETTER_TEMP_LOGO_LOCATION.format(user_id=user_id, unique_id=fake_uuid, filename='test.svg')
 
-    response = logged_in_platform_admin_client.post(
+    response = platform_admin_client.post(
         url_for('.create_letter_branding', logo=temp_logo),
         data={
             'name': '',
@@ -511,10 +511,10 @@ def test_create_letter_branding_shows_form_errors_on_name_field(
 
 def test_create_letter_branding_shows_database_errors_on_name_fields(
     mocker,
-    logged_in_platform_admin_client,
+    platform_admin_client,
     fake_uuid,
 ):
-    with logged_in_platform_admin_client.session_transaction() as session:
+    with platform_admin_client.session_transaction() as session:
         user_id = session["user_id"]
 
     mocker.patch('app.main.views.letter_branding.get_png_file_from_svg')
@@ -535,7 +535,7 @@ def test_create_letter_branding_shows_database_errors_on_name_fields(
 
     temp_logo = LETTER_TEMP_LOGO_LOCATION.format(user_id=user_id, unique_id=fake_uuid, filename='test.svg')
 
-    response = logged_in_platform_admin_client.post(
+    response = platform_admin_client.post(
         url_for('.create_letter_branding', logo=temp_logo),
         data={
             'name': 'my brand',

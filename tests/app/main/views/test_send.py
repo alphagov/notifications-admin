@@ -1455,7 +1455,7 @@ def test_send_test_redirects_to_end_if_step_out_of_bounds(
     ('main.send_one_off_step', 'main.send_one_off'),
 ])
 def test_send_test_redirects_to_start_if_you_skip_steps(
-    logged_in_platform_admin_client,
+    platform_admin_client,
     service_one,
     fake_uuid,
     mock_get_service_letter_template,
@@ -1470,11 +1470,11 @@ def test_send_test_redirects_to_start_if_you_skip_steps(
 ):
     mocker.patch('app.user_api_client.get_user', return_value=user(fake_uuid))
 
-    with logged_in_platform_admin_client.session_transaction() as session:
+    with platform_admin_client.session_transaction() as session:
         session['send_test_letter_page_count'] = 1
         session['placeholders'] = {'address_line_1': 'foo'}
 
-    response = logged_in_platform_admin_client.get(url_for(
+    response = platform_admin_client.get(url_for(
         endpoint,
         service_id=service_one['id'],
         template_id=fake_uuid,
@@ -1722,7 +1722,7 @@ def test_send_test_sms_message_back_link_in_tour(
 
 
 def test_send_test_letter_clears_previous_page_cache(
-    logged_in_platform_admin_client,
+    platform_admin_client,
     mocker,
     service_one,
     mock_login,
@@ -1731,22 +1731,22 @@ def test_send_test_letter_clears_previous_page_cache(
     fake_uuid,
 ):
 
-    with logged_in_platform_admin_client.session_transaction() as session:
+    with platform_admin_client.session_transaction() as session:
         session['send_test_letter_page_count'] = 'WRONG'
 
-    response = logged_in_platform_admin_client.get(url_for(
+    response = platform_admin_client.get(url_for(
         'main.send_test',
         service_id=service_one['id'],
         template_id=fake_uuid,
     ))
     assert response.status_code == 302
 
-    with logged_in_platform_admin_client.session_transaction() as session:
+    with platform_admin_client.session_transaction() as session:
         assert session['send_test_letter_page_count'] is None
 
 
 def test_send_test_letter_redirects_to_right_url(
-    logged_in_platform_admin_client,
+    platform_admin_client,
     fake_uuid,
     mock_get_service_letter_template,
     mock_s3_upload,
@@ -1755,7 +1755,7 @@ def test_send_test_letter_redirects_to_right_url(
     mocker,
 ):
 
-    with logged_in_platform_admin_client.session_transaction() as session:
+    with platform_admin_client.session_transaction() as session:
         session['send_test_letter_page_count'] = 1
         session['recipient'] = ''
         session['placeholders'] = {
@@ -1768,7 +1768,7 @@ def test_send_test_letter_redirects_to_right_url(
             'postcode': 'SW1 1AA',
         }
 
-    response = logged_in_platform_admin_client.get(url_for(
+    response = platform_admin_client.get(url_for(
         'main.send_one_off_step',
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
@@ -1930,7 +1930,7 @@ def test_send_test_sms_message_puts_submitted_data_in_session(
 @pytest.mark.parametrize('filetype', ['pdf', 'png'])
 def test_send_test_works_as_letter_preview(
     filetype,
-    logged_in_platform_admin_client,
+    platform_admin_client,
     mock_get_service_letter_template,
     mock_get_users_by_service,
     mock_get_service_statistics,
@@ -1948,9 +1948,9 @@ def test_send_test_works_as_letter_preview(
 
     service_id = service_one['id']
     template_id = fake_uuid
-    with logged_in_platform_admin_client.session_transaction() as session:
+    with platform_admin_client.session_transaction() as session:
         session['placeholders'] = {'address_line_1': 'Jo Lastname'}
-    response = logged_in_platform_admin_client.get(
+    response = platform_admin_client.get(
         url_for(
             'main.send_test_preview',
             service_id=service_id,
@@ -2208,12 +2208,12 @@ def test_create_job_should_call_api(
 
 
 def test_can_start_letters_job(
-    logged_in_platform_admin_client,
+    platform_admin_client,
     mock_create_job,
     service_one,
     fake_uuid
 ):
-    with logged_in_platform_admin_client.session_transaction() as session:
+    with platform_admin_client.session_transaction() as session:
         session['file_uploads'] = {
             fake_uuid: {
                 'template_id': fake_uuid,
@@ -2222,7 +2222,7 @@ def test_can_start_letters_job(
             }
         }
 
-    response = logged_in_platform_admin_client.post(
+    response = platform_admin_client.post(
         url_for('main.start_job', service_id=service_one['id'], upload_id=fake_uuid),
         data={}
     )
@@ -2271,7 +2271,7 @@ def test_can_start_letters_job(
 ])
 def test_should_show_preview_letter_message(
     filetype,
-    logged_in_platform_admin_client,
+    platform_admin_client,
     mock_get_service_letter_template,
     mock_get_users_by_service,
     mock_get_service_statistics,
@@ -2303,7 +2303,7 @@ def test_should_show_preview_letter_message(
 
     service_id = service_one['id']
     template_id = fake_uuid
-    with logged_in_platform_admin_client.session_transaction() as session:
+    with platform_admin_client.session_transaction() as session:
         session['file_uploads'] = {
             fake_uuid: {
                 'template_id': fake_uuid,
@@ -2312,7 +2312,7 @@ def test_should_show_preview_letter_message(
             }
         }
 
-    response = logged_in_platform_admin_client.get(
+    response = platform_admin_client.get(
         url_for(
             'main.check_messages_preview',
             service_id=service_id,

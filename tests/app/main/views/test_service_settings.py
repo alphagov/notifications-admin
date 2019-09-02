@@ -3411,10 +3411,10 @@ def test_organisation_type_pages_are_platform_admin_only(
 
 
 def test_should_show_page_to_set_sms_allowance(
-    logged_in_platform_admin_client,
+    platform_admin_client,
     mock_get_free_sms_fragment_limit
 ):
-    response = logged_in_platform_admin_client.get(url_for(
+    response = platform_admin_client.get(url_for(
         'main.set_free_sms_allowance',
         service_id=SERVICE_ONE_ID
     ))
@@ -3432,14 +3432,14 @@ def test_should_show_page_to_set_sms_allowance(
     pytest.param('foo', 'foo', marks=pytest.mark.xfail),
 ])
 def test_should_set_sms_allowance(
-    logged_in_platform_admin_client,
+    platform_admin_client,
     given_allowance,
     expected_api_argument,
     mock_get_free_sms_fragment_limit,
     mock_create_or_update_free_sms_fragment_limit,
 ):
 
-    response = logged_in_platform_admin_client.post(
+    response = platform_admin_client.post(
         url_for(
             'main.set_free_sms_allowance',
             service_id=SERVICE_ONE_ID,
@@ -3635,7 +3635,7 @@ def test_switch_service_enable_international_sms(
     ([], '0207 123 4567', ['upload_document']),
 ])
 def test_service_switch_can_upload_document_shows_permission_page_if_service_contact_details_exist(
-    logged_in_platform_admin_client,
+    platform_admin_client,
     service_one,
     mock_update_service,
     mock_get_service_settings_page_common,
@@ -3650,7 +3650,7 @@ def test_service_switch_can_upload_document_shows_permission_page_if_service_con
     service_one['permissions'] = start_permissions
     service_one['contact_link'] = contact_details
 
-    response = logged_in_platform_admin_client.get(
+    response = platform_admin_client.get(
         url_for('main.service_switch_can_upload_document', service_id=SERVICE_ONE_ID),
         follow_redirects=True
     )
@@ -3659,7 +3659,7 @@ def test_service_switch_can_upload_document_shows_permission_page_if_service_con
 
 
 def test_service_switch_can_upload_document_turning_permission_on_with_no_contact_details_shows_form(
-    logged_in_platform_admin_client,
+    platform_admin_client,
     service_one,
     mock_get_service_settings_page_common,
     mock_get_service_organisation,
@@ -3667,7 +3667,7 @@ def test_service_switch_can_upload_document_turning_permission_on_with_no_contac
     no_letter_contact_blocks,
     single_sms_sender,
 ):
-    response = logged_in_platform_admin_client.get(
+    response = platform_admin_client.get(
         url_for('main.service_switch_can_upload_document', service_id=SERVICE_ONE_ID),
         follow_redirects=True
     )
@@ -3683,7 +3683,7 @@ def test_service_switch_can_upload_document_turning_permission_on_with_no_contac
     ('phone_number', '0207 12345'),
 ])
 def test_service_switch_can_upload_document_lets_contact_details_be_added_and_shows_permission_page(
-    logged_in_platform_admin_client,
+    platform_admin_client,
     service_one,
     mock_update_service,
     mock_get_service_settings_page_common,
@@ -3696,7 +3696,7 @@ def test_service_switch_can_upload_document_lets_contact_details_be_added_and_sh
 ):
     data = {'contact_details_type': contact_details_type, contact_details_type: contact_details_value}
 
-    response = logged_in_platform_admin_client.post(
+    response = platform_admin_client.post(
         url_for('main.service_switch_can_upload_document', service_id=SERVICE_ONE_ID),
         data=data,
         follow_redirects=True
@@ -3778,7 +3778,7 @@ def test_archive_service_prompts_user(
 
 
 def test_cant_archive_inactive_service(
-    logged_in_platform_admin_client,
+    platform_admin_client,
     service_one,
     single_reply_to_email_address,
     single_letter_contact_block,
@@ -3788,7 +3788,7 @@ def test_cant_archive_inactive_service(
 ):
     service_one['active'] = False
 
-    response = logged_in_platform_admin_client.get(url_for('main.service_settings', service_id=service_one['id']))
+    response = platform_admin_client.get(url_for('main.service_settings', service_id=service_one['id']))
 
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
@@ -3796,14 +3796,14 @@ def test_cant_archive_inactive_service(
 
 
 def test_suspend_service_after_confirm(
-    logged_in_platform_admin_client,
+    platform_admin_client,
     service_one,
     mocker,
     mock_get_inbound_number_for_service,
 ):
     mocked_fn = mocker.patch('app.service_api_client.post', return_value=service_one)
 
-    response = logged_in_platform_admin_client.post(url_for('main.suspend_service', service_id=service_one['id']))
+    response = platform_admin_client.post(url_for('main.suspend_service', service_id=service_one['id']))
 
     assert response.status_code == 302
     assert response.location == url_for('main.service_settings', service_id=service_one['id'], _external=True)
@@ -3811,7 +3811,7 @@ def test_suspend_service_after_confirm(
 
 
 def test_suspend_service_prompts_user(
-    logged_in_platform_admin_client,
+    platform_admin_client,
     service_one,
     mocker,
     single_reply_to_email_address,
@@ -3822,7 +3822,7 @@ def test_suspend_service_prompts_user(
 ):
     mocked_fn = mocker.patch('app.service_api_client.post')
 
-    response = logged_in_platform_admin_client.get(url_for('main.suspend_service', service_id=service_one['id']))
+    response = platform_admin_client.get(url_for('main.suspend_service', service_id=service_one['id']))
 
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
@@ -3832,7 +3832,7 @@ def test_suspend_service_prompts_user(
 
 
 def test_cant_suspend_inactive_service(
-    logged_in_platform_admin_client,
+    platform_admin_client,
     service_one,
     single_reply_to_email_address,
     single_letter_contact_block,
@@ -3842,7 +3842,7 @@ def test_cant_suspend_inactive_service(
 ):
     service_one['active'] = False
 
-    response = logged_in_platform_admin_client.get(url_for('main.service_settings', service_id=service_one['id']))
+    response = platform_admin_client.get(url_for('main.service_settings', service_id=service_one['id']))
 
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
@@ -3850,7 +3850,7 @@ def test_cant_suspend_inactive_service(
 
 
 def test_resume_service_after_confirm(
-    logged_in_platform_admin_client,
+    platform_admin_client,
     service_one,
     single_reply_to_email_address,
     single_letter_contact_block,
@@ -3861,7 +3861,7 @@ def test_resume_service_after_confirm(
     service_one['active'] = False
     mocked_fn = mocker.patch('app.service_api_client.post', return_value=service_one)
 
-    response = logged_in_platform_admin_client.post(url_for('main.resume_service', service_id=service_one['id']))
+    response = platform_admin_client.post(url_for('main.resume_service', service_id=service_one['id']))
 
     assert response.status_code == 302
     assert response.location == url_for('main.service_settings', service_id=service_one['id'], _external=True)
@@ -3869,7 +3869,7 @@ def test_resume_service_after_confirm(
 
 
 def test_resume_service_prompts_user(
-    logged_in_platform_admin_client,
+    platform_admin_client,
     service_one,
     single_reply_to_email_address,
     single_letter_contact_block,
@@ -3881,7 +3881,7 @@ def test_resume_service_prompts_user(
     service_one['active'] = False
     mocked_fn = mocker.patch('app.service_api_client.post')
 
-    response = logged_in_platform_admin_client.get(url_for('main.resume_service', service_id=service_one['id']))
+    response = platform_admin_client.get(url_for('main.resume_service', service_id=service_one['id']))
 
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
@@ -3891,7 +3891,7 @@ def test_resume_service_prompts_user(
 
 
 def test_cant_resume_active_service(
-    logged_in_platform_admin_client,
+    platform_admin_client,
     service_one,
     single_reply_to_email_address,
     single_letter_contact_block,
@@ -3899,7 +3899,7 @@ def test_cant_resume_active_service(
     single_sms_sender,
     mock_get_service_settings_page_common
 ):
-    response = logged_in_platform_admin_client.get(url_for('main.service_settings', service_id=service_one['id']))
+    response = platform_admin_client.get(url_for('main.service_settings', service_id=service_one['id']))
 
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
@@ -4251,12 +4251,12 @@ def test_updates_sms_prefixing(
 
 
 def test_select_organisation(
-    logged_in_platform_admin_client,
+    platform_admin_client,
     service_one,
     mock_get_service_organisation,
     mock_get_organisations
 ):
-    response = logged_in_platform_admin_client.get(
+    response = platform_admin_client.get(
         url_for('.link_service_to_organisation', service_id=service_one['id']),
     )
 
@@ -4271,14 +4271,14 @@ def test_select_organisation(
 
 
 def test_select_organisation_shows_message_if_no_orgs(
-    logged_in_platform_admin_client,
+    platform_admin_client,
     service_one,
     mock_get_service_organisation,
     mocker
 ):
     mocker.patch('app.organisations_client.get_organisations', return_value=[])
 
-    response = logged_in_platform_admin_client.get(
+    response = platform_admin_client.get(
         url_for('.link_service_to_organisation', service_id=service_one['id']),
     )
 
@@ -4290,13 +4290,13 @@ def test_select_organisation_shows_message_if_no_orgs(
 
 
 def test_update_service_organisation(
-    logged_in_platform_admin_client,
+    platform_admin_client,
     service_one,
     mock_get_service_organisation,
     mock_get_organisations,
     mock_update_service_organisation,
 ):
-    response = logged_in_platform_admin_client.post(
+    response = platform_admin_client.post(
         url_for('.link_service_to_organisation', service_id=service_one['id']),
         data={'organisations': '7aa5d4e9-4385-4488-a489-07812ba13384'},
     )
@@ -4309,13 +4309,13 @@ def test_update_service_organisation(
 
 
 def test_update_service_organisation_does_not_update_if_same_value(
-    logged_in_platform_admin_client,
+    platform_admin_client,
     service_one,
     mock_get_service_organisation,
     mock_get_organisations,
     mock_update_service_organisation,
 ):
-    response = logged_in_platform_admin_client.post(
+    response = platform_admin_client.post(
         url_for('.link_service_to_organisation', service_id=service_one['id']),
         data={'organisations': '7aa5d4e9-4385-4488-a489-07812ba13383'},
     )
@@ -4440,7 +4440,7 @@ def test_submit_email_branding_request(
 
 
 def test_show_service_data_retention(
-        logged_in_platform_admin_client,
+        platform_admin_client,
         service_one,
         mock_get_service_data_retention,
 
@@ -4448,7 +4448,7 @@ def test_show_service_data_retention(
 
     mock_get_service_data_retention.return_value[0]['days_of_retention'] = 5
 
-    response = logged_in_platform_admin_client.get(url_for('main.data_retention', service_id=service_one['id']))
+    response = platform_admin_client.get(url_for('main.data_retention', service_id=service_one['id']))
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     rows = page.select('tbody tr')
     assert len(rows) == 1
@@ -4456,26 +4456,26 @@ def test_show_service_data_retention(
 
 
 def test_view_add_service_data_retention(
-        logged_in_platform_admin_client,
+        platform_admin_client,
         service_one,
 
 ):
-    response = logged_in_platform_admin_client.get(url_for('main.add_data_retention', service_id=service_one['id']))
+    response = platform_admin_client.get(url_for('main.add_data_retention', service_id=service_one['id']))
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert normalize_spaces(page.select_one('input')['value']) == "email"
     assert page.find('input', attrs={'name': 'days_of_retention'})
 
 
 def test_add_service_data_retention(
-        logged_in_platform_admin_client,
+        platform_admin_client,
         service_one,
         mock_create_service_data_retention
 ):
-    response = logged_in_platform_admin_client.post(url_for('main.add_data_retention', service_id=service_one['id']),
-                                                    data={'notification_type': "email",
-                                                          'days_of_retention': 5
-                                                          }
-                                                    )
+    response = platform_admin_client.post(url_for(
+        'main.add_data_retention',
+        service_id=service_one['id']),
+        data={'notification_type': "email", 'days_of_retention': 5}
+    )
     assert response.status_code == 302
     settings_url = url_for(
         'main.data_retention', service_id=service_one['id'], _external=True)
@@ -4484,17 +4484,19 @@ def test_add_service_data_retention(
 
 
 def test_update_service_data_retention(
-        logged_in_platform_admin_client,
+        platform_admin_client,
         service_one,
         fake_uuid,
         mock_get_service_data_retention,
         mock_update_service_data_retention,
 ):
-    response = logged_in_platform_admin_client.post(url_for('main.edit_data_retention',
-                                                            service_id=service_one['id'],
-                                                            data_retention_id=str(fake_uuid)),
-                                                    data={'days_of_retention': 5}
-                                                    )
+    response = platform_admin_client.post(
+        url_for(
+            'main.edit_data_retention',
+            service_id=service_one['id'],
+            data_retention_id=str(fake_uuid)),
+        data={'days_of_retention': 5}
+    )
     assert response.status_code == 302
     settings_url = url_for(
         'main.data_retention', service_id=service_one['id'], _external=True)
@@ -4503,17 +4505,20 @@ def test_update_service_data_retention(
 
 
 def test_update_service_data_retention_return_validation_error_for_negative_days_of_retention(
-        logged_in_platform_admin_client,
+        platform_admin_client,
         service_one,
         fake_uuid,
         mock_get_service_data_retention,
         mock_update_service_data_retention,
 ):
-    response = logged_in_platform_admin_client.post(url_for('main.edit_data_retention',
-                                                            service_id=service_one['id'],
-                                                            data_retention_id=fake_uuid),
-                                                    data={'days_of_retention': -5}
-                                                    )
+    response = platform_admin_client.post(
+        url_for(
+            'main.edit_data_retention',
+            service_id=service_one['id'],
+            data_retention_id=fake_uuid
+        ),
+        data={'days_of_retention': -5}
+    )
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     error_message = page.find('span', class_='error-message').text.strip()
@@ -4523,17 +4528,18 @@ def test_update_service_data_retention_return_validation_error_for_negative_days
 
 
 def test_update_service_data_retention_populates_form(
-        logged_in_platform_admin_client,
+        platform_admin_client,
         service_one,
         fake_uuid,
         mock_get_service_data_retention,
 ):
 
     mock_get_service_data_retention.return_value[0]['days_of_retention'] = 5
-    response = logged_in_platform_admin_client.get(url_for('main.edit_data_retention',
-                                                           service_id=service_one['id'],
-                                                           data_retention_id=fake_uuid)
-                                                   )
+    response = platform_admin_client.get(url_for(
+        'main.edit_data_retention',
+        service_id=service_one['id'],
+        data_retention_id=fake_uuid
+    ))
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert page.find('input', attrs={'name': 'days_of_retention'})['value'] == '5'
