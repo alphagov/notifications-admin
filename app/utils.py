@@ -355,7 +355,6 @@ def get_template(
             template,
             from_name=service.name,
             from_address='{}@notifications.service.gov.uk'.format(service.email_from),
-            expanded=expand_emails,
             show_recipient=show_recipient,
             redact_missing_personalisation=redact_missing_personalisation,
             reply_to=email_reply_to,
