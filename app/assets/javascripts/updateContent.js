@@ -1,8 +1,8 @@
-(function(Modules) {
+(function(global) {
   "use strict";
 
   var queues = {};
-  var dd = new diffDOM();
+  var dd = new global.diffDOM();
 
   var getRenderer = $component => response => dd.apply(
     $component.get(0),
@@ -43,7 +43,7 @@
     );
   };
 
-  Modules.UpdateContent = function() {
+  global.GOVUK.Modules.UpdateContent = function() {
 
     this.start = component => poll(
       getRenderer($(component)),
@@ -55,4 +55,4 @@
 
   };
 
-})(window.GOVUK.Modules);
+})(window);
