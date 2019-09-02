@@ -14,7 +14,7 @@ pyexcel-xlsx==0.5.7
 pyexcel-ods3==0.5.3
 pytz==2019.2
 gunicorn==19.7.1  # pyup: ignore, >19.8 breaks eventlet patching
-eventlet==0.25.0
+eventlet==0.25.1
 notifications-python-client==5.3.0
 
 # PaaS
