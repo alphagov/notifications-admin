@@ -63,7 +63,6 @@ def view_template(service_id, template_id):
         template=get_template(
             template,
             current_service,
-            expand_emails=True,
             letter_preview_url=url_for(
                 '.view_letter_template_preview',
                 service_id=service_id,
@@ -251,7 +250,6 @@ def _view_template_version(service_id, template_id, version, letters_as_pdf=Fals
     return dict(template=get_template(
         current_service.get_template(template_id, version=version),
         current_service,
-        expand_emails=True,
         letter_preview_url=url_for(
             '.view_template_version_preview',
             service_id=service_id,
@@ -674,7 +672,6 @@ def delete_service_template(service_id, template_id):
         template=get_template(
             template,
             current_service,
-            expand_emails=True,
             letter_preview_url=url_for(
                 '.view_letter_template_preview',
                 service_id=service_id,
@@ -697,7 +694,6 @@ def confirm_redact_template(service_id, template_id):
         template=get_template(
             template,
             current_service,
-            expand_emails=True,
             letter_preview_url=url_for(
                 '.view_letter_template_preview',
                 service_id=service_id,
@@ -738,7 +734,6 @@ def view_template_versions(service_id, template_id):
             get_template(
                 template,
                 current_service,
-                expand_emails=True,
                 letter_preview_url=url_for(
                     '.view_template_version_preview',
                     service_id=service_id,

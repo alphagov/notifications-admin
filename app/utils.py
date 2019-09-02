@@ -343,7 +343,6 @@ def get_template(
     template,
     service,
     show_recipient=False,
-    expand_emails=False,
     letter_preview_url=None,
     page_count=1,
     redact_missing_personalisation=False,
