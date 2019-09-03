@@ -63,36 +63,18 @@ $iso-paper-ratio: 141.42135624%;
     box-shadow: 0 2px 0 0 rgba($border-colour, 0.2);
 
     &-first {
-
       background-image: file-url('envelope-1st-class.svg');
-
-      @include ie-lte(8) {
-        background-image: file-url('envelope-1st-class.png');
-      }
-
     }
 
     &-second {
-
       background-image: file-url('envelope-2nd-class.svg');
-
-      @include ie-lte(8) {
-        background-image: file-url('envelope-2nd-class.png');
-      }
-
     }
 
     .letter-sent &:hover {
-
       background-color: transparent;
       border-color: transparent;
       box-shadow: none;
       background-image: file-url('envelope-fold.svg');
-
-      @include ie-lte(8) {
-        background-image: file-url('envelope-fold.png');
-      }
-
     }
 
   }

@@ -30,9 +30,6 @@
 .banner-with-tick {
   padding: $gutter-half ($gutter + $gutter-half);
   background-image: file-url('tick.png');
-  @include ie-lte(8) {
-    background-image: file-url('tick-16px.png');
-  }
   background-size: 19px;
   background-repeat: no-repeat;
   background-position: $gutter-half $gutter-half;
@@ -141,15 +138,7 @@
   }
 
   .greyed-out-step {
-
-    $opacity: 0.6;
-
-    opacity: $opacity;
-
-    @include ie-lte(8) {
-      -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=" + ($opacity * 100) + ")";
-    }
-
+    opacity: 0.6;
   }
 
 }

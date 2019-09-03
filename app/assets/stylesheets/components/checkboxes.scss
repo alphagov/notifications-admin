@@ -16,10 +16,6 @@
     background-repeat: no-repeat;
     background-size: 39px auto;
     background-position: 0px 4px;
-
-    @include ie-lte(8) {
-      background-image: file-url('folder-black.png');
-    }
   }
 
   // revert full-width button for smaller screens

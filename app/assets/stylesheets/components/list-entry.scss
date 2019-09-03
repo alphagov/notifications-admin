@@ -4,10 +4,6 @@
     vertical-align: middle;
     margin-bottom: 15px;
     position: relative;
-
-    @include ie-lte(7) {
-      zoom: 1;
-    }
   }
 
   .list-entry-remove {
@@ -25,21 +21,12 @@
       top: 0;
       left: 100%;
     }
-
-    @include ie-lte(7) {
-      top: auto;
-      left: 110%;
-    }
   }
 
   .form-control {
     padding-left: 1.84em;
     width: 100%;
     margin-bottom: 0;
-
-    @include ie-lte(8) {
-      width: 95%;
-    }
 
     @include media(desktop) {
       @include inline-block;

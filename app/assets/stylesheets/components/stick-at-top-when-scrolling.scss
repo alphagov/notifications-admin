@@ -20,17 +20,11 @@ $sticky-padding: $gutter * 2 / 3;
   }
 
   .back-to-top-link {
-
     position: absolute;
     top: $gutter;
     right: $gutter-half;
     opacity: 0;
     transition: opacity 0.1s ease-in-out;
-
-    @include ie-lte(8) {
-      display: none;
-    }
-
   }
 
 }
