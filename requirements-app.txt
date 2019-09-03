@@ -2,19 +2,19 @@
 # with package version changes made in requirements-app.txt
 
 ago==0.0.93
-Flask==1.0.3
+Flask==1.1.1
 Flask-WTF==0.14.2
 Flask-Login==0.4.1
 
 blinker==1.4
-pyexcel==0.5.14
-pyexcel-io==0.5.18
+pyexcel==0.5.15
+pyexcel-io==0.5.20
 pyexcel-xls==0.5.8
 pyexcel-xlsx==0.5.7
 pyexcel-ods3==0.5.3
-pytz==2019.1
+pytz==2019.2
 gunicorn==19.7.1  # pyup: ignore, >19.8 breaks eventlet patching
-eventlet==0.25.0
+eventlet==0.25.1
 notifications-python-client==5.3.0
 
 # PaaS
