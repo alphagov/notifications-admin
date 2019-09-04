@@ -7,6 +7,7 @@ from werkzeug.exceptions import abort
 
 from app import (
     current_organisation,
+    current_service,
     email_branding_client,
     letter_branding_client,
     org_invite_api_client,
@@ -59,6 +60,36 @@ def add_organisation():
 
     return render_template(
         'views/organisations/add-organisation.html',
+        form=form
+    )
+
+
+@main.route('/services/<uuid:service_id>/add-gp-organisation', methods=['GET', 'POST'])
+@user_has_permissions('manage_service')
+def add_organisation_from_gp_service(service_id):
+    print(current_service.organisation_type)
+    print(current_service.organisation)
+    if (not current_service.organisation_type == 'nhs_gp') or current_service.organisation:
+        abort(403)
+
+    form = RenameOrganisationForm()
+
+    if form.validate_on_submit():
+        Organisation.create(
+            form.name.data,
+            crown=False,
+            organisation_type='nhs_gp',
+            agreement_signed=False,
+        ).associate_service(
+            service_id
+        )
+        return redirect(url_for(
+            '.service_agreement',
+            service_id=service_id,
+        ))
+
+    return render_template(
+        'views/organisations/add-gp-organisation.html',
         form=form
     )
 

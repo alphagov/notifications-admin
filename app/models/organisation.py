@@ -152,6 +152,12 @@ class Organisation(JSONModel):
         response = organisations_client.update_organisation(self.id, **kwargs)
         self.__init__(response)
 
+    def associate_service(self, service_id):
+        organisations_client.update_service_organisation(
+            str(service_id),
+            self.id
+        )
+
 
 class Organisations(ModelList):
     client = organisations_client.get_organisations

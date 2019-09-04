@@ -1,0 +1,18 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/textbox.html" import textbox %}
+{% from "components/radios.html" import radios %}
+{% from "components/form.html" import form_wrapper %}
+
+{% block per_page_title %}
+  What is the name of your organisation?
+{% endblock %}
+
+{% block maincolumn_content %}
+  {{ page_header('What is the name of your organisation?') }}
+  {% call form_wrapper() %}
+    {{textbox(form.name)}}
+    {{ page_footer('Continue') }}
+  {% endcall %}
+{% endblock %}
