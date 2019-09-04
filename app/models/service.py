@@ -592,6 +592,13 @@ class Service(JSONModel):
         return self._get_by_id(self.api_keys, id)
 
     @property
+    def able_to_accept_agreement(self):
+        return (
+            self.organisation.agreement_signed is not None
+            or self.organisation_type == 'nhs_gp'
+        )
+
+    @property
     def request_to_go_live_tags(self):
         return list(self._get_request_to_go_live_tags())
 
