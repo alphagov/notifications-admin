@@ -776,6 +776,33 @@ def test_letter_validation_preview_calls_template_preview_when_data_correct_and_
     assert page.find('div', class_=expected_class).text.strip() == "bazinga!"
 
 
+def test_letter_validation_preview_calls_template_preview_when_data_correct_and_displays_correct_errors(
+    mocker, platform_admin_client,
+):
+    endpoint = '{}/precompiled/validate?include_preview=true'.format(current_app.config['TEMPLATE_PREVIEW_API_HOST'])
+    mocker.patch('app.main.views.platform_admin.antivirus_client.scan', return_value=True)
+
+    with requests_mock.mock() as rmock:
+        rmock.request(
+            "POST",
+            endpoint,
+            json={"pages": [], "errors": {"foo_bar": [1]}, "result": False},
+            status_code=200
+        )
+        with open('tests/test_pdf_files/multi_page_pdf.pdf', 'rb') as file:
+            response = platform_admin_client.post(
+                url_for('main.platform_admin_letter_validation_preview'),
+                data={"file": file},
+                content_type='multipart/form-data'
+            )
+        assert response.status_code == 200
+        assert rmock.called
+        assert rmock.request_history[0].url == endpoint
+
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert page.find('div', class_="banner-dangerous").text.strip() == "Validation failed, foo bar on pages: [1]"
+
+
 def test_letter_validation_preview_doesnt_call_template_preview_when_no_file(mocker, platform_admin_client):
     antivirus_scan = mocker.patch('app.main.views.platform_admin.antivirus_client.scan')
     validate_letter = mocker.patch('app.main.views.platform_admin.validate_letter')
