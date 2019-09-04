@@ -425,7 +425,14 @@ def letter_validation_preview(from_platform_admin):
             response = validate_letter(pdf_file)
             response.raise_for_status()
             if response.status_code == 200:
-                pages, message, result = response.json()["pages"], response.json()["message"], response.json()["result"]
+                pages, result = response.json()["pages"], response.json()["result"]
+                if "message" in response.json():
+                    message = response.json()["message"]
+                else:
+                    message = "Validation failed, "
+                    for k, v in response.json()["errors"].items():
+                        if v:
+                            message += k.replace("_", " ") + " on pages: {}".format(v)
         except RequestException as error:
             if error.response and error.response.status_code == 400:
                 message = "Something was wrong with the file you tried to upload. Please upload a valid PDF file."
