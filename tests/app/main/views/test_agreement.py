@@ -108,22 +108,28 @@ def test_show_agreement_page(
         assert link['href'] == url()
 
 
-def test_unknown_gps_are_redirected(
+@pytest.mark.parametrize('org_type, expected_endpoint', (
+    ('nhs_gp', 'main.add_organisation_from_gp_service'),
+    ('nhs_local', 'main.add_organisation_from_nhs_local_service'),
+))
+def test_unknown_gps_and_trusts_are_redirected(
     client_request,
     mocker,
     fake_uuid,
     mock_has_jobs,
     service_one,
+    org_type,
+    expected_endpoint,
 ):
     mocker.patch('app.organisations_client.get_service_organisation', return_value=None)
     service_one['organisation_id'] = None
-    service_one['organisation_type'] = 'nhs_gp'
+    service_one['organisation_type'] = org_type
     client_request.get(
         'main.service_agreement',
         service_id=SERVICE_ONE_ID,
         _expected_status=302,
         _expected_redirect=url_for(
-            'main.add_organisation_from_gp_service',
+            expected_endpoint,
             service_id=SERVICE_ONE_ID,
             _external=True,
         ),

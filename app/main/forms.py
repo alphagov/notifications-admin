@@ -591,6 +591,17 @@ class AddGPOrganisationForm(StripWhitespaceForm):
             field.data = ''
 
 
+class AddNHSLocalOrganisationForm(StripWhitespaceForm):
+
+    def __init__(self, *args, organisation_choices=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.organisations.choices = organisation_choices
+
+    organisations = RadioField(
+        'Which NHS Trust or Clinical Commissioning Group do you work for?',
+    )
+
+
 class OrganisationOrganisationTypeForm(StripWhitespaceForm):
     organisation_type = OrganisationTypeField('What type of organisation is this?')
 

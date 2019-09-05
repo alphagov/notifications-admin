@@ -1,0 +1,26 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import sticky_page_footer %}
+{% from "components/textbox.html" import textbox %}
+{% from "components/radios.html" import radios %}
+{% from "components/live-search.html" import live_search %}
+{% from "components/form.html" import form_wrapper %}
+
+{% block per_page_title %}
+  Accept our data sharing and financial agreement
+{% endblock %}
+
+{% block maincolumn_content %}
+  {{ page_header(
+    'Accept our data sharing and financial agreement',
+    back_link=url_for('main.request_to_go_live', service_id=current_service.id)
+  ) }}
+  {% call form_wrapper() %}
+    <p>
+      {{ form.organisations.label.text }}
+    </p>
+    {{ live_search(target_selector='.multiple-choice', show=True, form=search_form, label='Search by name') }}
+    {{ radios(form.organisations, hide_legend=True) }}
+    {{ sticky_page_footer('Continue') }}
+  {% endcall %}
+{% endblock %}

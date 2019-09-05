@@ -595,7 +595,7 @@ class Service(JSONModel):
     def able_to_accept_agreement(self):
         return (
             self.organisation.agreement_signed is not None
-            or self.organisation_type == 'nhs_gp'
+            or self.organisation_type in {'nhs_gp', 'nhs_local'}
         )
 
     @property
