@@ -96,7 +96,7 @@ def delivery_and_failure():
 
 @main.route('/design-patterns-content-guidance')
 def design_content():
-    return render_template('views/design-patterns-content-guidance.html')
+    return redirect('https://www.gov.uk/service-manual/design/sending-emails-and-text-messages', 301)
 
 
 @main.route('/_email')
@@ -228,7 +228,7 @@ def integration_testing():
 
 @main.route('/callbacks')
 def callbacks():
-    return render_template('views/callbacks.html')
+    return redirect(url_for('main.documentation'), 301)
 
 
 # --- Features page set --- #
