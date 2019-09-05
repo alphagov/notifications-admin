@@ -53,7 +53,7 @@ describe('Prevent duplicate form submissions', () => {
 
   });
 
-  test("It should allow clicks again after 1.5 minutes", () => {
+  test("It should allow clicks again after 1.5 seconds", () => {
 
     helpers.triggerEvent(button, 'click');
 
