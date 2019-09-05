@@ -222,7 +222,7 @@ def test_show_accept_agreement_page(
     assert page.select('.multiple-choice')[1]['data-target'] == 'on-behalf-of'
     assert [
         field['name']
-        for field in page.select('#on-behalf-of.conditional-radio-panel input')
+        for field in page.select('#on-behalf-of.conditional-radios-panel input')
     ] == [
         'on_behalf_of_name', 'on_behalf_of_email'
     ]

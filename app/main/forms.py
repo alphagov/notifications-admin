@@ -358,6 +358,31 @@ class StripWhitespaceStringField(StringField):
         super(StringField, self).__init__(label, **kwargs)
 
 
+class OnOffField(RadioField):
+
+    def __init__(self, label, choices=None, *args, **kwargs):
+        super().__init__(label, choices=choices or [
+            (True, 'On'),
+            (False, 'Off'),
+        ], *args, **kwargs)
+
+    def process_formdata(self, valuelist):
+        if valuelist:
+            value = valuelist[0]
+            self.data = (value == 'True') if value in ['True', 'False'] else value
+
+    def iter_choices(self):
+        for value, label in self.choices:
+            # This overrides WTForms default behaviour which is to check
+            # self.coerce(value) == self.data
+            # where self.coerce returns a string for a boolean input
+            yield (
+                value,
+                label,
+                (self.data in {value, self.coerce(value)})
+            )
+
+
 class LoginForm(StripWhitespaceForm):
     email_address = EmailField('Email address', validators=[
         Length(min=5, max=255),
@@ -532,6 +557,38 @@ class RenameOrganisationForm(StripWhitespaceForm):
         validators=[
             DataRequired(message='Can’t be empty')
         ])
+
+
+class AddGPOrganisationForm(StripWhitespaceForm):
+
+    def __init__(self, *args, service_name='unknown', **kwargs):
+        super().__init__(*args, **kwargs)
+        self.same_as_service_name.label.text = 'Is your GP practice called ‘{}’?'.format(service_name)
+        self.service_name = service_name
+
+    def get_organisation_name(self):
+        if self.same_as_service_name.data:
+            return self.service_name
+        return self.name.data
+
+    same_as_service_name = OnOffField(
+        'Is your GP practice called the same name as your service?',
+        choices=(
+            (True, 'Yes'),
+            (False, 'No'),
+        ),
+    )
+
+    name = StringField(
+        'What’s your practice called?',
+    )
+
+    def validate_name(self, field):
+        if self.same_as_service_name.data is False:
+            if not field.data:
+                raise ValidationError('Can’t be empty')
+        else:
+            field.data = ''
 
 
 class OrganisationOrganisationTypeForm(StripWhitespaceForm):
@@ -939,19 +996,6 @@ class ServiceLetterContactBlockForm(StripWhitespaceForm):
             raise ValidationError(
                 'Contains {} lines, maximum is 10'.format(line_count + 1)
             )
-
-
-class OnOffField(RadioField):
-    def __init__(self, label, *args, **kwargs):
-        super().__init__(label, choices=[
-            (True, 'On'),
-            (False, 'Off'),
-        ], *args, **kwargs)
-
-    def process_formdata(self, valuelist):
-        if valuelist:
-            value = valuelist[0]
-            self.data = (value == 'True') if value in ['True', 'False'] else value
 
 
 class ServiceOnOffSettingForm(StripWhitespaceForm):

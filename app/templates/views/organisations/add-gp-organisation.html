@@ -2,17 +2,28 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/textbox.html" import textbox %}
-{% from "components/radios.html" import radios %}
+{% from "components/radios.html" import radio, conditional_radio_panel %}
+{% from "components/select-input.html" import select_wrapper %}
 {% from "components/form.html" import form_wrapper %}
 
 {% block per_page_title %}
-  What is the name of your organisation?
+  Accept our data sharing and financial agreement
 {% endblock %}
 
 {% block maincolumn_content %}
-  {{ page_header('What is the name of your organisation?') }}
+  {{ page_header(
+    'Accept our data sharing and financial agreement',
+    back_link=url_for('main.request_to_go_live', service_id=current_service.id)
+  ) }}
   {% call form_wrapper() %}
-    {{textbox(form.name)}}
+    {% call select_wrapper(form.same_as_service_name) %}
+      {% for option in form.same_as_service_name %}
+        {{ radio(option, data_target='custom-organisation-name' if option.data == False else '') }}
+      {% endfor %}
+    {% endcall %}
+    {% call conditional_radio_panel('custom-organisation-name') %}
+      {{ textbox(form.name) }}
+    {% endcall %}
     {{ page_footer('Continue') }}
   {% endcall %}
 {% endblock %}

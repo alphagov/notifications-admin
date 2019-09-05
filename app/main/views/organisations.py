@@ -16,6 +16,7 @@ from app import (
 )
 from app.main import main
 from app.main.forms import (
+    AddGPOrganisationForm,
     ConfirmPasswordForm,
     GoLiveNotesForm,
     InviteOrgUserForm,
@@ -67,16 +68,14 @@ def add_organisation():
 @main.route('/services/<uuid:service_id>/add-gp-organisation', methods=['GET', 'POST'])
 @user_has_permissions('manage_service')
 def add_organisation_from_gp_service(service_id):
-    print(current_service.organisation_type)
-    print(current_service.organisation)
     if (not current_service.organisation_type == 'nhs_gp') or current_service.organisation:
         abort(403)
 
-    form = RenameOrganisationForm()
+    form = AddGPOrganisationForm(service_name=current_service.name)
 
     if form.validate_on_submit():
         Organisation.create(
-            form.name.data,
+            form.get_organisation_name(),
             crown=False,
             organisation_type='nhs_gp',
             agreement_signed=False,

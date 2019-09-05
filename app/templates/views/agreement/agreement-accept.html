@@ -1,6 +1,6 @@
 {% extends "withnav_template.html" %}
 {% from "components/textbox.html" import textbox %}
-{% from "components/radios.html" import radio %}
+{% from "components/radios.html" import radio, conditional_radio_panel %}
 {% from "components/select-input.html" import select_wrapper %}
 {% from "components/form.html" import form_wrapper %}
 {% from "components/page-footer.html" import page_footer %}
@@ -27,10 +27,10 @@
           {{ radio(option, data_target='on-behalf-of' if option.data == 'someone-else' else None) }}
         {% endfor %}
       {% endcall %}
-      <div class="conditional-radio-panel js-hidden" id="on-behalf-of">
+      {% call conditional_radio_panel('on-behalf-of') %}
         {{ textbox(form.on_behalf_of_name, width='1-1') }}
         {{ textbox(form.on_behalf_of_email, width='1-1') }}
-      </div>
+      {% endcall %}
       {{ textbox(form.version, width='1-3', hint='The version number is on the front page, for example ‘3.6’') }}
 
       {{ page_footer('Continue') }}

@@ -57,7 +57,7 @@
 
 
 {% macro conditional_radio_panel(id) %}
-  <div class="conditional-radios-panel" id="panel-{{ id }}">
+  <div class="conditional-radios-panel js-hidden" id="{{ id }}">
     {{ caller() }}
   </div>
 {% endmacro %}

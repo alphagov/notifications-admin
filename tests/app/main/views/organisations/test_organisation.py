@@ -193,11 +193,29 @@ def test_only_gps_can_create_own_organisations(
     )
 
 
+@pytest.mark.parametrize('data, expected_service_name', (
+    (
+        {
+            'same_as_service_name': False,
+            'name': 'Dr. Example',
+        },
+        'Dr. Example',
+    ),
+    (
+        {
+            'same_as_service_name': True,
+            'name': 'This is ignored',
+        },
+        'service one',
+    ),
+))
 def test_gps_can_name_their_organisation(
     client_request,
     mocker,
     service_one,
     mock_update_service_organisation,
+    data,
+    expected_service_name,
 ):
     mocker.patch('app.organisations_client.get_service_organisation', return_value=None)
     service_one['organisation_type'] = 'nhs_gp'
@@ -209,9 +227,7 @@ def test_gps_can_name_their_organisation(
     client_request.post(
         '.add_organisation_from_gp_service',
         service_id=SERVICE_ONE_ID,
-        _data={
-            'name': 'Dr. Example',
-        },
+        _data=data,
         _expected_status=302,
         _expected_redirect=url_for(
             'main.service_agreement',
@@ -221,12 +237,45 @@ def test_gps_can_name_their_organisation(
     )
 
     mock_create_organisation.assert_called_once_with(
-        name='Dr. Example',
+        name=expected_service_name,
         organisation_type='nhs_gp',
         agreement_signed=False,
         crown=False,
     )
     mock_update_service_organisation.assert_called_once_with(SERVICE_ONE_ID, ORGANISATION_ID)
+
+
+@pytest.mark.parametrize('data, expected_error', (
+    (
+        {
+            'name': 'Dr. Example',
+        },
+        'Not a valid choice',
+    ),
+    (
+        {
+            'same_as_service_name': False,
+            'name': '',
+        },
+        'Can’t be empty',
+    ),
+))
+def test_validation_of_gps_creating_organisations(
+    client_request,
+    mocker,
+    service_one,
+    data,
+    expected_error,
+):
+    mocker.patch('app.organisations_client.get_service_organisation', return_value=None)
+    service_one['organisation_type'] = 'nhs_gp'
+    page = client_request.post(
+        '.add_organisation_from_gp_service',
+        service_id=SERVICE_ONE_ID,
+        _data=data,
+        _expected_status=200,
+    )
+    assert normalize_spaces(page.select_one('.error-message').text) == expected_error
 
 
 def test_organisation_services_shows_live_services_only(
