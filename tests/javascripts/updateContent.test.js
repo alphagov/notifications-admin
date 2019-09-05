@@ -145,6 +145,7 @@ describe('Update content', () => {
 
     expect($.ajax).toHaveBeenCalledTimes(1);
 
+    // units are milliseconds
     jest.advanceTimersByTime(500);
     jest.advanceTimersByTime(500);
     jest.advanceTimersByTime(500);
@@ -178,6 +179,7 @@ describe('Update content', () => {
 
       expect($.ajax).toHaveBeenCalledTimes(1);
 
+      // units are milliseconds
       jest.advanceTimersByTime(1500);
 
       expect($.ajax).toHaveBeenCalledTimes(2);
