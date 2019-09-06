@@ -7,10 +7,12 @@
 
 {% block maincolumn_content %}
 <div class="grid-row">
-  <div class="column-two-thirds">
+  <div class="column-five-sixths">
     {{ page_header('Uploads') }}
 
     <p>Upload a letter and Notify will print, pack and post it for you.</p>
+
+    <a href="{{ url_for('.upload_letter', service_id=current_service.id) }}" class="button-secondary">Upload a letter</a>
   </div>
 </div>
 {% endblock %}
