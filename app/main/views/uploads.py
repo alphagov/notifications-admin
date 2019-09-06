@@ -9,6 +9,8 @@ from app.main import main
 from app.main.forms import PDFUploadForm
 from app.utils import user_has_permissions
 
+MAX_FILE_UPLOAD_SIZE = 2 * 1024 * 1024  # 2MB
+
 
 @main.route("/services/<service_id>/uploads")
 @user_has_permissions('send_messages')
@@ -27,6 +29,10 @@ def upload_letter(service_id):
         virus_free = antivirus_client.scan(BytesIO(pdf_file_bytes))
         if not virus_free:
             flash('Your file has failed the virus check', 'dangerous')
+            return render_template('views/uploads/choose-file.html', form=form), 400
+
+        if len(pdf_file_bytes) > MAX_FILE_UPLOAD_SIZE:
+            flash('Your file must be smaller than 2MB', 'dangerous')
             return render_template('views/uploads/choose-file.html', form=form), 400
 
         upload_id = uuid.uuid4()

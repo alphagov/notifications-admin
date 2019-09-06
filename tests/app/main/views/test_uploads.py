@@ -76,6 +76,20 @@ def test_post_upload_letter_shows_error_when_file_contains_virus(mocker, client_
     assert normalize_spaces(page.select('.banner-dangerous')[0].text) == 'Your file has failed the virus check'
 
 
+def test_post_choose_upload_file_when_file_is_too_big(mocker, client_request):
+    mocker.patch('app.main.views.uploads.antivirus_client.scan', return_value=True)
+
+    with open('tests/test_pdf_files/big.pdf', 'rb') as file:
+        page = client_request.post(
+            'main.upload_letter',
+            service_id=SERVICE_ONE_ID,
+            _data={'file': file},
+            _expected_status=400
+        )
+    assert page.find('h1').text == 'Upload a letter'
+    assert normalize_spaces(page.select('.banner-dangerous')[0].text) == 'Your file must be smaller than 2MB'
+
+
 def test_uploaded_letter_preview(client_request):
     page = client_request.get(
         'main.uploaded_letter_preview',
