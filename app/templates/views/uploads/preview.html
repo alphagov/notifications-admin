@@ -11,4 +11,9 @@
         back_link=url_for('main.upload_letter', service_id=current_service.id)
     ) }}
 
+    {% if status == 'invalid' %}
+    <p class="notification-status-cancelled" id="validation-error-message">
+      Validation failed
+    </p>
+    {% endif %}
 {% endblock %}

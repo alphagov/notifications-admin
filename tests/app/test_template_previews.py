@@ -4,7 +4,11 @@ from unittest.mock import Mock
 import pytest
 from notifications_utils.template import LetterPreviewTemplate
 
-from app.template_previews import TemplatePreview, get_page_count_for_letter
+from app.template_previews import (
+    TemplatePreview,
+    get_page_count_for_letter,
+    sanitise_letter,
+)
 
 
 @pytest.mark.parametrize('partial_call, expected_page_argument', [
@@ -118,4 +122,16 @@ def test_from_example_template_makes_request(mocker):
               'template': template,
               'filename': filename,
               'letter_contact_block': None}
+    )
+
+
+def test_sanitise_letter_calls_template_preview_sanitise_endoint_with_file(mocker):
+    request_mock = mocker.patch('app.template_previews.requests.post')
+
+    sanitise_letter('pdf_data')
+
+    request_mock.assert_called_once_with(
+        'http://localhost:9999/precompiled/sanitise',
+        headers={'Authorization': 'Token my-secret-key'},
+        data='pdf_data'
     )

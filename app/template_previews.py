@@ -66,3 +66,11 @@ def validate_letter(pdf_file):
         data=pdf_file,
         headers={'Authorization': 'Token {}'.format(current_app.config['TEMPLATE_PREVIEW_API_KEY'])}
     )
+
+
+def sanitise_letter(pdf_file):
+    return requests.post(
+        '{}/precompiled/sanitise'.format(current_app.config['TEMPLATE_PREVIEW_API_HOST']),
+        data=pdf_file,
+        headers={'Authorization': 'Token {}'.format(current_app.config['TEMPLATE_PREVIEW_API_KEY'])}
+    )
