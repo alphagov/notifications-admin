@@ -48,9 +48,9 @@
             url_for('main.service_sms_senders', service_id=current_service.id),
           ) }}
         {% endif %}
-        {% if show_agreement %}
+        {% if current_service.able_to_accept_agreement %}
           {{ task_list_item(
-            agreement_signed,
+            current_service.organisation.agreement_signed,
             'Accept our data sharing and financial agreement',
             url_for('main.service_agreement', service_id=current_service.id),
           ) }}
@@ -60,7 +60,7 @@
         <p>
           Only team members with a government email address can request to go live.
         </p>
-      {% elif (not current_service.go_live_checklist_completed) or (show_agreement and not agreement_signed) %}
+      {% elif (not current_service.go_live_checklist_completed) or (current_service.able_to_accept_agreement and not current_service.organisation.agreement_signed) %}
         <p>
           You must complete these steps before you can request to go live.
         </p>

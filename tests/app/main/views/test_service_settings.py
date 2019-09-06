@@ -1087,6 +1087,59 @@ def test_should_check_for_mou_on_request_to_go_live(
     assert normalize_spaces(checklist_items[3].text) == expected_item
 
 
+@pytest.mark.parametrize('organisation_type', (
+    'nhs_gp',
+    pytest.param(
+        'central',
+        marks=pytest.mark.xfail(raises=IndexError)
+    ),
+))
+def test_gp_without_organisation_is_shown_agreement_step(
+    client_request,
+    service_one,
+    mocker,
+    organisation_type,
+):
+    mocker.patch(
+        'app.models.service.Service.has_team_members',
+        return_value=False,
+    )
+    mocker.patch(
+        'app.models.service.Service.all_templates',
+        new_callable=PropertyMock,
+        return_value=[],
+    )
+    mocker.patch(
+        'app.main.views.service_settings.service_api_client.get_sms_senders',
+        return_value=[],
+    )
+    mocker.patch(
+        'app.main.views.service_settings.service_api_client.get_reply_to_email_addresses',
+        return_value=[],
+    )
+    for channel in {'email', 'sms', 'letter'}:
+        mocker.patch(
+            'app.models.service.Service.volume_{}'.format(channel),
+            create=True,
+            new_callable=PropertyMock,
+            return_value=None,
+        )
+
+    mocker.patch('app.organisations_client.get_service_organisation', return_value=None)
+    service_one['organisation_id'] = None
+    service_one['organisation_type'] = organisation_type
+
+    page = client_request.get(
+        'main.request_to_go_live', service_id=SERVICE_ONE_ID
+    )
+    assert page.h1.text == 'Before you request to go live'
+    assert normalize_spaces(
+        page.select('.task-list .task-list-item')[3].text
+    ) == (
+        'Accept our data sharing and financial agreement Not completed'
+    )
+
+
 def test_non_gov_user_is_told_they_cant_go_live(
     client_request,
     api_nongov_user_active,

@@ -13,6 +13,12 @@ from app.utils import user_has_permissions
 @main.route('/services/<uuid:service_id>/agreement')
 @user_has_permissions('manage_service')
 def service_agreement(service_id):
+    if (
+        current_service.organisation_type == 'nhs_gp' and not current_service.organisation
+    ):
+        return redirect(
+            url_for('main.add_organisation_from_gp_service', service_id=current_service.id)
+        )
     if current_service.organisation.crown is None:
         return render_template('views/agreement/service-agreement-choose.html')
     if current_service.organisation.agreement_signed:

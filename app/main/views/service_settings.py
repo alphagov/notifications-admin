@@ -176,13 +176,8 @@ def estimate_usage(service_id):
 @main.route("/services/<service_id>/service-settings/request-to-go-live", methods=['GET'])
 @user_has_permissions('manage_service')
 def request_to_go_live(service_id):
-
-    agreement_signed = current_service.organisation.agreement_signed
-
     return render_template(
-        'views/service-settings/request-to-go-live.html',
-        show_agreement=agreement_signed is not None,
-        agreement_signed=agreement_signed,
+        'views/service-settings/request-to-go-live.html'
     )
 
 
