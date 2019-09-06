@@ -1,5 +1,6 @@
 from flask import url_for
 
+from app.utils import normalize_spaces
 from tests.conftest import SERVICE_ONE_ID
 
 
@@ -22,6 +23,7 @@ def test_get_upload_letter(client_request):
 
 def test_post_upload_letter_redirects_for_valid_file(mocker, client_request):
     mocker.patch('uuid.uuid4', return_value='fake-uuid')
+    antivirus_mock = mocker.patch('app.main.views.uploads.antivirus_client.scan', return_value=True)
 
     with open('tests/test_pdf_files/one_page_pdf.pdf', 'rb') as file:
         client_request.post(
@@ -36,6 +38,7 @@ def test_post_upload_letter_redirects_for_valid_file(mocker, client_request):
                 _external=True
             )
         )
+        assert antivirus_mock.called
 
 
 def test_post_upload_letter_shows_error_when_file_is_not_a_pdf(client_request):
@@ -57,6 +60,20 @@ def test_post_upload_letter_shows_error_when_no_file_uploaded(client_request):
         _expected_status=200
     )
     assert page.find('span', class_='error-message').text.strip() == "You need to upload a file to submit"
+
+
+def test_post_upload_letter_shows_error_when_file_contains_virus(mocker, client_request):
+    mocker.patch('app.main.views.uploads.antivirus_client.scan', return_value=False)
+
+    with open('tests/test_pdf_files/one_page_pdf.pdf', 'rb') as file:
+        page = client_request.post(
+            'main.upload_letter',
+            service_id=SERVICE_ONE_ID,
+            _data={'file': file},
+            _expected_status=400
+        )
+    assert page.find('h1').text == 'Upload a letter'
+    assert normalize_spaces(page.select('.banner-dangerous')[0].text) == 'Your file has failed the virus check'
 
 
 def test_uploaded_letter_preview(client_request):
