@@ -1,7 +1,16 @@
 import uuid
 from io import BytesIO
 
-from flask import flash, redirect, render_template, request, url_for
+from flask import (
+    current_app,
+    flash,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
+from notifications_utils.pdf import pdf_page_count
+from PyPDF2.utils import PdfReadError
 
 from app import current_service
 from app.extensions import antivirus_client
@@ -28,12 +37,16 @@ def upload_letter(service_id):
 
         virus_free = antivirus_client.scan(BytesIO(pdf_file_bytes))
         if not virus_free:
-            flash('Your file has failed the virus check', 'dangerous')
-            return render_template('views/uploads/choose-file.html', form=form), 400
+            return invalid_upload_error('Your file has failed the virus check')
 
         if len(pdf_file_bytes) > MAX_FILE_UPLOAD_SIZE:
-            flash('Your file must be smaller than 2MB', 'dangerous')
-            return render_template('views/uploads/choose-file.html', form=form), 400
+            return invalid_upload_error('Your file must be smaller than 2MB')
+
+        try:
+            pdf_page_count(BytesIO(pdf_file_bytes))
+        except PdfReadError:
+            current_app.logger.info('Invalid PDF uploaded for service_id: {}'.format(service_id))
+            return invalid_upload_error('Your file must be a valid PDF')
 
         upload_id = uuid.uuid4()
 
@@ -47,6 +60,11 @@ def upload_letter(service_id):
         )
 
     return render_template('views/uploads/choose-file.html', form=form)
+
+
+def invalid_upload_error(message):
+    flash(message, 'dangerous')
+    return render_template('views/uploads/choose-file.html', form=PDFUploadForm()), 400
 
 
 @main.route("/services/<service_id>/preview-letter/<file_id>")
