@@ -1,3 +1,4 @@
+import base64
 import uuid
 from io import BytesIO
 
@@ -51,6 +52,7 @@ def upload_letter(service_id):
             return invalid_upload_error('Your file must be smaller than 2MB')
 
         try:
+            # TODO: get page count from the sanitise response once template preview handles malformed files nicely
             page_count = pdf_page_count(BytesIO(pdf_file_bytes))
         except PdfReadError:
             current_app.logger.info('Invalid PDF uploaded for service_id: {}'.format(service_id))
@@ -70,7 +72,8 @@ def upload_letter(service_id):
                 raise ex
         else:
             status = 'valid'
-            upload_letter_to_s3(response.content, file_location, status)
+            file_contents = base64.b64decode(response.json()['file'].encode())
+            upload_letter_to_s3(file_contents, file_location, status)
 
         return redirect(
             url_for(

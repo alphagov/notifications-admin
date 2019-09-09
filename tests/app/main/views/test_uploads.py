@@ -28,7 +28,10 @@ def test_get_upload_letter(client_request):
 def test_post_upload_letter_redirects_for_valid_file(mocker, client_request):
     mocker.patch('uuid.uuid4', return_value='fake-uuid')
     antivirus_mock = mocker.patch('app.main.views.uploads.antivirus_client.scan', return_value=True)
-    mocker.patch('app.main.views.uploads.sanitise_letter', return_value=Mock(content='The sanitised content'))
+    mocker.patch(
+        'app.main.views.uploads.sanitise_letter',
+        return_value=Mock(content='The sanitised content', json=lambda: {'file': 'VGhlIHNhbml0aXNlZCBjb250ZW50'})
+    )
     mock_s3 = mocker.patch('app.main.views.uploads.upload_letter_to_s3')
     mocker.patch('app.main.views.uploads.service_api_client.get_precompiled_template')
 
@@ -42,7 +45,7 @@ def test_post_upload_letter_redirects_for_valid_file(mocker, client_request):
     assert antivirus_mock.called
 
     mock_s3.assert_called_once_with(
-        'The sanitised content',
+        b'The sanitised content',
         'service-{}/fake-uuid.pdf'.format(SERVICE_ONE_ID),
         'valid',
     )
@@ -64,7 +67,10 @@ def test_post_upload_letter_shows_letter_preview_for_valid_file(mocker, client_r
 
     mocker.patch('uuid.uuid4', return_value='fake-uuid')
     mocker.patch('app.main.views.uploads.antivirus_client.scan', return_value=True)
-    mocker.patch('app.main.views.uploads.sanitise_letter', return_value=Mock(content='The sanitised content'))
+    mocker.patch(
+        'app.main.views.uploads.sanitise_letter',
+        return_value=Mock(content='The sanitised content', json=lambda: {'file': 'VGhlIHNhbml0aXNlZCBjb250ZW50'})
+    )
     mocker.patch('app.main.views.uploads.upload_letter_to_s3')
     mocker.patch('app.main.views.uploads.pdf_page_count', return_value=3)
     mocker.patch('app.main.views.uploads.service_api_client.get_precompiled_template', return_value=letter_template)
