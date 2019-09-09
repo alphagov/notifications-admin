@@ -7,6 +7,8 @@
 {% from "components/table.html" import list_table, row_heading, field %}
 {% from 'components/big-number.html' import big_number %}
 {% from 'components/message-count-label.html' import message_count_label %}
+{% from "components/file-upload.html" import file_upload %}
+{% from "components/banner.html" import banner_wrapper %}
 
 {% block service_page_title %}
   {{ heading }}
@@ -45,26 +47,40 @@
 
     <div data-module='fake-delay' data-timeout='{{ files|length * 2000 }}' data-message='Checking your letters' data-progress='true' class="bottom-gutter top-gutter-1-3">
 
-      <p>
-        If you send now, printing will start today at 5.30pm
-      </p>
-
-      <div style="margin-bottom: -15px;">
-      {% call select_wrapper(form.postage, hide_legend=True, inline=True) %}
-        {% for option in form.postage %}
-          {{ radio(option) }}
-        {% endfor %}
-      {% endcall %}
-      </div>
-
-      <a href="{{ request.url }}&done=true" class="button">
-      {% if files|length == 1 %}
-        Send 1 letter
+      {% if pages_with_errors %}
+        {% call banner_wrapper(type='dangerous') %}
+          <h1 class='banner-title'>
+            We cannot print your letters
+          </h1>
+          <p>
+            There is a problem letter 2 of 10 letters
+          </p>
+        {% endcall %}
+        <div class="bottom-gutter-3-2">
+          {{ file_upload(reupload_form.file, button_text='Re-upload your file', multiple=True) }}
+        </div>
       {% else %}
-        Send {{ files|length }} letters
+        <p>
+          If you send now, printing will start today at 5.30pm
+        </p>
+
+        <div style="margin-bottom: -15px;">
+        {% call select_wrapper(form.postage, hide_legend=True, inline=True) %}
+          {% for option in form.postage %}
+            {{ radio(option) }}
+          {% endfor %}
+        {% endcall %}
+        </div>
+
+        <a href="{{ request.url }}&done=true" class="button">
+        {% if files|length == 1 %}
+          Send 1 letter
+        {% else %}
+          Send {{ files|length }} letters
+        {% endif %}
+        </a>
       {% endif %}
 
-      </a>
     </div>
 
   {% endif %}
@@ -106,11 +122,13 @@
           </p>
         {% endcall %}
         {% call field(
-          status='',
+          status='error' if row_number in pages_with_errors else '',
           align='right'
         ) %}
           <span class="align-with-message-body">
             {% if done %}
+            {% elif row_number in pages_with_errors %}
+              Cannot print
             {% else %}
               <span data-module='fake-delay' data-timeout='{{ range(800, files|length * 2000) | random }}' data-message='Checking'>
                 Ready to send

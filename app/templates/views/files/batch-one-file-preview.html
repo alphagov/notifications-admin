@@ -4,6 +4,7 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/file-upload.html" import file_upload %}
+{% from "components/banner.html" import banner_wrapper %}
 
 {% block service_page_title %}
   {{ filename }}
@@ -13,9 +14,24 @@
 
   {{ page_header(filename, back_link='javascript:history.go(-1)') }}
 
-  <p>
-    Ready to send
-  </p>
+  {% if error %}
+    {% call banner_wrapper(type='dangerous') %}
+      <h1 class='banner-title'>
+        We cannot print your letter
+      </h1>
+      <p>
+        The content appears outside the printable area on page 1
+      </p>
+      <p>
+        Files must meet our <a href="https://docs.notifications.service.gov.uk/documentation/images/notify-pdf-letter-spec-v2.3.pdf">letter specification</a>
+      </p>
+    {% endcall %}
+  {% else %}
+    <p>
+      Ready to send
+    </p>
+  {% endif %}
+
 
   <div class="letter">
 

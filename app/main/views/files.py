@@ -58,16 +58,20 @@ def new_batch(service_id):
         for i in range(11)
     }
 
+    original_file_name = request.args.get('file1')[:-9]
+
     return render_template(
         'views/files/new-batch.html',
         files=files,
         manage_link=url_for('.new_batch_manage', service_id=current_service.id, **files_dict),
-        heading=request.args.get('file1')[:-9],
+        heading=original_file_name,
         time_now=datetime.utcnow().strftime('%-I:%M%p').lower(),
         edd=(datetime.utcnow() + timedelta(days=3)).strftime('%-d %B'),
         done=bool(request.args.get('done')),
         addresses=ADDRESSES,
         form=UploadOptionsForm(),
+        pages_with_errors=[3] if 'err' in original_file_name else [],
+        reupload_form=PDFAndWordUploadForm(),
     )
 
 
@@ -110,14 +114,17 @@ def batch_one_file(service_id):
 def batch_one_file_preview(service_id):
 
     try:
-        recipient = ADDRESSES[int(request.args.get('index')) - 2]
+        index = int(request.args.get('index')) - 2
+        recipient = ADDRESSES[index]
     except Exception:
+        index = 0
         recipient = None
 
     return render_template(
         'views/files/batch-one-file-preview.html',
         filename=request.args.get('filename'),
         recipient=recipient,
+        error=(index + 1 == 2)
     )
 
 
