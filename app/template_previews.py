@@ -1,5 +1,9 @@
+import base64
+from io import BytesIO
+
 import requests
 from flask import current_app, json
+from notifications_utils.pdf import extract_page_from_pdf
 
 from app import current_service
 
@@ -23,6 +27,36 @@ class TemplatePreview:
             headers={'Authorization': 'Token {}'.format(current_app.config['TEMPLATE_PREVIEW_API_KEY'])}
         )
         return (resp.content, resp.status_code, resp.headers.items())
+
+    @classmethod
+    def from_valid_pdf_file(cls, pdf_file, page):
+        pdf_page = extract_page_from_pdf(BytesIO(pdf_file), int(page) - 1)
+
+        response = requests.post(
+            '{}/precompiled-preview.png{}'.format(
+                current_app.config['TEMPLATE_PREVIEW_API_HOST'],
+                '?hide_notify=true' if page == '1' else ''
+            ),
+            data=base64.b64encode(pdf_page).decode('utf-8'),
+            headers={'Authorization': 'Token {}'.format(current_app.config['TEMPLATE_PREVIEW_API_KEY'])}
+        )
+
+        return (response.content, response.status_code, response.headers.items())
+
+    @classmethod
+    def from_invalid_pdf_file(cls, pdf_file, page):
+        pdf_page = extract_page_from_pdf(BytesIO(pdf_file), int(page) - 1)
+
+        response = requests.post(
+            '{}/precompiled/overlay.png{}'.format(
+                current_app.config['TEMPLATE_PREVIEW_API_HOST'],
+                '?page_number={}'.format(page)
+            ),
+            data=pdf_page,
+            headers={'Authorization': 'Token {}'.format(current_app.config['TEMPLATE_PREVIEW_API_KEY'])}
+        )
+
+        return (response.content, response.status_code, response.headers.items())
 
     @classmethod
     def from_example_template(cls, template, filename):

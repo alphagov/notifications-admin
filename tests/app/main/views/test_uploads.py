@@ -30,6 +30,7 @@ def test_post_upload_letter_redirects_for_valid_file(mocker, client_request):
     antivirus_mock = mocker.patch('app.main.views.uploads.antivirus_client.scan', return_value=True)
     mocker.patch('app.main.views.uploads.sanitise_letter', return_value=Mock(content='The sanitised content'))
     mock_s3 = mocker.patch('app.main.views.uploads.upload_letter_to_s3')
+    mocker.patch('app.main.views.uploads.service_api_client.get_precompiled_template')
 
     with open('tests/test_pdf_files/one_page_pdf.pdf', 'rb') as file:
         page = client_request.post(
@@ -48,6 +49,43 @@ def test_post_upload_letter_redirects_for_valid_file(mocker, client_request):
 
     assert page.find('h1').text == 'tests/test_pdf_files/one_page_pdf.pdf'
     assert not page.find(id='validation-error-message')
+
+
+def test_post_upload_letter_shows_letter_preview_for_valid_file(mocker, client_request):
+    letter_template = {'template_type': 'letter',
+                       'reply_to_text': '',
+                       'postage': 'second',
+                       'subject': 'hi',
+                       'content': 'my letter'}
+
+    mocker.patch('uuid.uuid4', return_value='fake-uuid')
+    mocker.patch('app.main.views.uploads.antivirus_client.scan', return_value=True)
+    mocker.patch('app.main.views.uploads.sanitise_letter', return_value=Mock(content='The sanitised content'))
+    mocker.patch('app.main.views.uploads.upload_letter_to_s3')
+    mocker.patch('app.main.views.uploads.pdf_page_count', return_value=3)
+    mocker.patch('app.main.views.uploads.service_api_client.get_precompiled_template', return_value=letter_template)
+
+    with open('tests/test_pdf_files/one_page_pdf.pdf', 'rb') as file:
+        page = client_request.post(
+            'main.upload_letter',
+            service_id=SERVICE_ONE_ID,
+            _data={'file': file},
+            _follow_redirects=True,
+        )
+
+    assert len(page.select('.letter-postage')) == 1
+    assert normalize_spaces(page.select_one('.letter-postage').text) == ('Postage: second class')
+    assert page.select_one('.letter-postage')['class'] == ['letter-postage', 'letter-postage-second']
+
+    letter_images = page.select('main img')
+    assert len(letter_images) == 3
+
+    for page_no, img in enumerate(letter_images, start=1):
+        assert img['src'] == url_for(
+            '.view_letter_upload_as_preview',
+            service_id=SERVICE_ONE_ID,
+            file_id='fake-uuid',
+            page=page_no)
 
 
 def test_post_upload_letter_shows_error_when_file_is_not_a_pdf(client_request):
@@ -121,6 +159,7 @@ def test_post_upload_letter_with_invalid_file(mocker, client_request):
     mock_sanitise_response = Mock()
     mock_sanitise_response.raise_for_status.side_effect = RequestException(response=Mock(status_code=400))
     mocker.patch('app.main.views.uploads.sanitise_letter', return_value=mock_sanitise_response)
+    mocker.patch('app.main.views.uploads.service_api_client.get_precompiled_template')
 
     with open('tests/test_pdf_files/one_page_pdf.pdf', 'rb') as file:
         file_contents = file.read()
@@ -145,6 +184,43 @@ def test_post_upload_letter_with_invalid_file(mocker, client_request):
     ) == 'Validation failed'
 
 
+def test_post_upload_letter_shows_letter_preview_for_invalid_file(mocker, client_request):
+    letter_template = {'template_type': 'letter',
+                       'reply_to_text': '',
+                       'postage': 'first',
+                       'subject': 'hi',
+                       'content': 'my letter'}
+
+    mocker.patch('uuid.uuid4', return_value='fake-uuid')
+    mocker.patch('app.main.views.uploads.antivirus_client.scan', return_value=True)
+    mocker.patch('app.main.views.uploads.upload_letter_to_s3')
+    mock_sanitise_response = Mock()
+    mock_sanitise_response.raise_for_status.side_effect = RequestException(response=Mock(status_code=400))
+    mocker.patch('app.main.views.uploads.sanitise_letter', return_value=mock_sanitise_response)
+    mocker.patch('app.main.views.uploads.service_api_client.get_precompiled_template', return_value=letter_template)
+
+    with open('tests/test_pdf_files/one_page_pdf.pdf', 'rb') as file:
+        page = client_request.post(
+            'main.upload_letter',
+            service_id=SERVICE_ONE_ID,
+            _data={'file': file},
+            _follow_redirects=True,
+        )
+
+    assert len(page.select('.letter-postage')) == 1
+    assert normalize_spaces(page.select_one('.letter-postage').text) == ('Postage: first class')
+    assert page.select_one('.letter-postage')['class'] == ['letter-postage', 'letter-postage-first']
+
+    letter_images = page.select('main img')
+    assert len(letter_images) == 1
+    assert letter_images[0]['src'] == url_for(
+        '.view_letter_upload_as_preview',
+        service_id=SERVICE_ONE_ID,
+        file_id='fake-uuid',
+        page=1
+    )
+
+
 def test_post_upload_letter_does_not_upload_to_s3_if_template_preview_raises_unknown_error(mocker, client_request):
     mocker.patch('uuid.uuid4', return_value='fake-uuid')
     mocker.patch('app.main.views.uploads.antivirus_client.scan', return_value=True)
@@ -164,12 +240,17 @@ def test_post_upload_letter_does_not_upload_to_s3_if_template_preview_raises_unk
     assert not mock_s3.called
 
 
-def test_uploaded_letter_preview(client_request):
+def test_uploaded_letter_preview(mocker, client_request):
+    mocker.patch('app.main.views.uploads.service_api_client')
+
     page = client_request.get(
         'main.uploaded_letter_preview',
         service_id=SERVICE_ONE_ID,
         file_id='fake-uuid',
         original_filename='my_letter.pdf',
+        page_count=1,
+        status='valid',
     )
 
     assert page.find('h1').text == 'my_letter.pdf'
+    assert page.find('div', class_='letter-sent')
