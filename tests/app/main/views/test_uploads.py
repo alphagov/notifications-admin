@@ -50,6 +50,10 @@ def test_post_upload_letter_redirects_for_valid_file(mocker, client_request):
     assert page.find('h1').text == 'tests/test_pdf_files/one_page_pdf.pdf'
     assert not page.find(id='validation-error-message')
 
+    assert page.find('input', {'type': 'hidden', 'name': 'filename', 'value': 'tests/test_pdf_files/one_page_pdf.pdf'})
+    assert page.find('input', {'type': 'hidden', 'name': 'file_id', 'value': 'fake-uuid'})
+    assert page.find('button', {'type': 'submit'}).text == 'Send 1 letter'
+
 
 def test_post_upload_letter_shows_letter_preview_for_valid_file(mocker, client_request):
     letter_template = {'template_type': 'letter',
@@ -182,6 +186,7 @@ def test_post_upload_letter_with_invalid_file(mocker, client_request):
     assert normalize_spaces(
         page.find(id='validation-error-message').text
     ) == 'Validation failed'
+    assert not page.find('button', {'type': 'submit'})
 
 
 def test_post_upload_letter_shows_letter_preview_for_invalid_file(mocker, client_request):
@@ -254,3 +259,66 @@ def test_uploaded_letter_preview(mocker, client_request):
 
     assert page.find('h1').text == 'my_letter.pdf'
     assert page.find('div', class_='letter-sent')
+
+
+def test_send_uploaded_letter_sends_letter_and_redirects_to_notification_page(mocker, service_one, client_request):
+    mocker.patch('app.main.views.uploads.get_letter_pdf_and_metadata', return_value=('file', {'status': 'valid'}))
+    mock_send = mocker.patch('app.main.views.uploads.notification_api_client.send_precompiled_letter')
+
+    service_one['permissions'] = ['letter', 'upload_letters']
+    file_id = 'abcd-1234'
+
+    client_request.post(
+        'main.send_uploaded_letter',
+        service_id=SERVICE_ONE_ID,
+        _data={'filename': 'my_file.pdf', 'file_id': file_id},
+        _expected_redirect=url_for(
+            'main.view_notification',
+            service_id=SERVICE_ONE_ID,
+            notification_id=file_id,
+            _external=True
+        )
+    )
+    mock_send.assert_called_once_with(SERVICE_ONE_ID, 'my_file.pdf', file_id)
+
+
+@pytest.mark.parametrize('permissions', [
+    ['email'],
+    ['letter'],
+    ['upload_letters'],
+])
+def test_send_uploaded_letter_when_service_does_not_have_correct_permissions(
+    mocker,
+    service_one,
+    client_request,
+    permissions,
+):
+    mocker.patch('app.main.views.uploads.get_letter_pdf_and_metadata', return_value=('file', {'status': 'valid'}))
+    mock_send = mocker.patch('app.main.views.uploads.notification_api_client.send_precompiled_letter')
+
+    service_one['permissions'] = permissions
+    file_id = 'abcd-1234'
+
+    client_request.post(
+        'main.send_uploaded_letter',
+        service_id=SERVICE_ONE_ID,
+        _data={'filename': 'my_file.pdf', 'file_id': file_id},
+        _expected_status=403
+    )
+    assert not mock_send.called
+
+
+def test_send_uploaded_letter_when_metadata_states_pdf_is_invalid(mocker, service_one, client_request):
+    mocker.patch('app.main.views.uploads.get_letter_pdf_and_metadata', return_value=('file', {'status': 'invalid'}))
+    mock_send = mocker.patch('app.main.views.uploads.notification_api_client.send_precompiled_letter')
+
+    service_one['permissions'] = ['letter', 'upload_letters']
+    file_id = 'abcd-1234'
+
+    client_request.post(
+        'main.send_uploaded_letter',
+        service_id=SERVICE_ONE_ID,
+        _data={'filename': 'my_file.pdf', 'file_id': file_id},
+        _expected_status=403
+    )
+    assert not mock_send.called

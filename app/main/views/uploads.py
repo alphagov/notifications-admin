@@ -2,6 +2,7 @@ import uuid
 from io import BytesIO
 
 from flask import (
+    abort,
     current_app,
     flash,
     redirect,
@@ -13,7 +14,7 @@ from notifications_utils.pdf import pdf_page_count
 from PyPDF2.utils import PdfReadError
 from requests import RequestException
 
-from app import current_service, service_api_client
+from app import current_service, notification_api_client, service_api_client
 from app.extensions import antivirus_client
 from app.main import main
 from app.main.forms import PDFUploadForm
@@ -115,6 +116,7 @@ def uploaded_letter_preview(service_id, file_id):
         original_filename=original_filename,
         template=template,
         status=status,
+        file_id=file_id,
     )
 
 
@@ -130,3 +132,27 @@ def view_letter_upload_as_preview(service_id, file_id):
         return TemplatePreview.from_invalid_pdf_file(pdf_file, page)
     else:
         return TemplatePreview.from_valid_pdf_file(pdf_file, page)
+
+
+@main.route("/services/<service_id>/upload-letter/send", methods=['POST'])
+@user_has_permissions('send_messages', restrict_admin_usage=True)
+def send_uploaded_letter(service_id):
+    filename = request.form['filename']
+    file_id = request.form['file_id']
+
+    if not (current_service.has_permission('letter') and current_service.has_permission('upload_letters')):
+        abort(403)
+
+    file_location = get_transient_letter_file_location(service_id, file_id)
+    _, metadata = get_letter_pdf_and_metadata(file_location)
+
+    if metadata.get('status') != 'valid':
+        abort(403)
+
+    notification_api_client.send_precompiled_letter(service_id, filename, file_id)
+
+    return redirect(url_for(
+        '.view_notification',
+        service_id=service_id,
+        notification_id=file_id,
+    ))
