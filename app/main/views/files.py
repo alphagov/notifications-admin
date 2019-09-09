@@ -62,11 +62,12 @@ def new_batch(service_id):
         'views/files/new-batch.html',
         files=files,
         manage_link=url_for('.new_batch_manage', service_id=current_service.id, **files_dict),
-        heading=_get_batch_heading(),
+        heading=request.args.get('file1')[:-9],
         time_now=datetime.utcnow().strftime('%-I:%M%p').lower(),
         edd=(datetime.utcnow() + timedelta(days=3)).strftime('%-d %B'),
         done=bool(request.args.get('done')),
         addresses=ADDRESSES,
+        form=UploadOptionsForm(),
     )
 
 

@@ -1,5 +1,6 @@
 {% extends "withnav_template.html" %}
-{% from "components/radios.html" import radios %}
+{% from "components/radios.html" import radio %}
+{% from "components/select-input.html" import select_wrapper %}
 {% from "components/form.html" import form_wrapper %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/page-header.html" import page_header %}
@@ -13,25 +14,11 @@
 
 {% block maincolumn_content %}
 
-  <div class="grid-row">
-    <div class="column-five-sixths">
-      {{ page_header(heading) }}
-    </div>
-    <div class="column-one-sixth">
-      {% if not done %}<a href="{{ manage_link }}" class="folder-heading-manage-link">Manage</a>{% endif %}
-    </div>
-  </div>
+  {{ page_header(heading) }}
 
   {% if done %}
 
-    {{ banner("Your letters are being sent", type='default', with_tick=True) }}
-
-    <p>
-      Sent by {{ current_user.name }} today at {{ time_now }}
-    </p>
-    <p>
-      Printing starts today at 5:30pm
-    </p>
+    {{ banner("Your letters have been sent. Printing starts today at 5:30pm.", type='default', with_tick=True) }}
 
     <div class="grid-row bottom-gutter-2-3">
       <div class="column-half">
@@ -59,12 +46,17 @@
     <div data-module='fake-delay' data-timeout='{{ files|length * 2000 }}' data-message='Checking your letters' data-progress='true' class="bottom-gutter top-gutter-1-3">
 
       <p>
-        Postage: second class
-      </p>
-
-      <p>
         If you send now, printing will start today at 5.30pm
       </p>
+
+      <div style="margin-bottom: -15px;">
+      {% call select_wrapper(form.postage, hide_legend=True, inline=True) %}
+        {% for option in form.postage %}
+          {{ radio(option) }}
+        {% endfor %}
+      {% endcall %}
+      </div>
+
       <a href="{{ request.url }}&done=true" class="button">
       {% if files|length == 1 %}
         Send 1 letter
@@ -110,7 +102,7 @@
             </a>
           {% endif %}
           <p class="file-list-hint">
-            {{ item }}
+            1 page
           </p>
         {% endcall %}
         {% call field(

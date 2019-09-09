@@ -367,6 +367,7 @@ class MainNavigation(Navigation):
             'import_letters_collated',
             'batch_one_file',
             'view_jobs',
+            'batch_send_one_file',
         },
         'team-members': {
             'confirm_edit_user_email',
