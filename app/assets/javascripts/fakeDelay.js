@@ -11,8 +11,8 @@
       $component.html('<span class="' + cssClass + '">' + $component.data('message') + '</span>');
 
       setTimeout(function(){
-        console.log('timeout')
         $component.html(cache);
+        GOVUK.modules.start();
       }, $component.data('timeout'))
 
     };

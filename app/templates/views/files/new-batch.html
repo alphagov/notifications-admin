@@ -50,14 +50,19 @@
       {% if pages_with_errors %}
         {% call banner_wrapper(type='dangerous') %}
           <h1 class='banner-title'>
-            We cannot print your letters
+            There is a problem with one of your letters
           </h1>
           <p>
-            There is a problem letter 2 of 10 letters
+            Make sure your file meets our <a href="https://docs.notifications.service.gov.uk/documentation/images/notify-pdf-letter-spec-v2.3.pdf">letter specification</a> and try again
           </p>
         {% endcall %}
         <div class="bottom-gutter-3-2">
-          {{ file_upload(reupload_form.file, button_text='Re-upload your file', multiple=True) }}
+          {{ file_upload(
+            reupload_form.file,
+            button_text='Re-upload your file',
+            multiple=False,
+            action=url_for('main.import_letters', service_id=current_service.id)
+          ) }}
         </div>
       {% else %}
         <p>

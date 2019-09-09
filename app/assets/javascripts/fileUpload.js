@@ -3,7 +3,9 @@
 
   Modules.FileUpload = function() {
 
-    this.submit = () => this.$form.trigger('submit');
+    this.submit = () => {
+      this.$form.trigger('submit');
+    }
 
     this.showCancelButton = () => $('.file-upload-button', this.$form).replaceWith(`
       <a href="" class='file-upload-button-cancel'>Cancel upload</a>
