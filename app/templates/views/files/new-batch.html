@@ -59,7 +59,7 @@
         <div class="bottom-gutter-3-2">
           {{ file_upload(
             reupload_form.file,
-            button_text='Re-upload your file',
+            button_text='Choose a file',
             multiple=False,
             action=url_for('main.import_letters', service_id=current_service.id)
           ) }}
