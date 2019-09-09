@@ -1,11 +1,16 @@
-import random
 from flask import redirect, request, render_template, url_for
 from flask_login import login_required
 from datetime import datetime, timedelta
 
 from app import current_service
 from app.main import main
-from app.main.forms import BatchOptionsForm, PageCountForm, PDFUploadForm, PDFAndWordUploadForm
+from app.main.forms import (
+    BatchOptionsForm,
+    PageCountForm,
+    PDFUploadForm,
+    PDFAndWordUploadForm,
+    UploadOptionsForm,
+)
 from app.utils import user_has_permissions
 
 
@@ -127,6 +132,7 @@ def batch_send_one_file(service_id):
         time_now=datetime.utcnow().strftime('%-I:%M%p').lower(),
         edd=(datetime.utcnow() + timedelta(days=3)).strftime('%-d %B'),
         recipient=ADDRESSES[0],
+        form=UploadOptionsForm(),
     )
 
 

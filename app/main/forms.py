@@ -1594,19 +1594,22 @@ class PageCountForm(StripWhitespaceForm):
     )
 
 
-class BatchOptionsForm(StripWhitespaceForm):
+class UploadOptionsForm(StripWhitespaceForm):
+    postage = RadioField(
+        'Postage for this upload',
+        choices=[
+            ('first', 'First class post'),
+            ('second', 'Second class post'),
+        ],
+        default='second',
+        validators=[DataRequired()]
+    )
+
+
+class BatchOptionsForm(UploadOptionsForm):
     name = StringField(
         u'Upload name',
         validators=[
             DataRequired(message='Can’t be empty')
         ]
-    )
-    postage = RadioField(
-        'Postage for this upload',
-        choices=[
-            ('first', 'First class'),
-            ('second', 'Second class'),
-        ],
-        default='second',
-        validators=[DataRequired()]
     )

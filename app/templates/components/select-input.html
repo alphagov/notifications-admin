@@ -35,9 +35,9 @@
 {% endmacro %}
 
 
-{% macro select_wrapper(field, hint=None, disable=[], option_hints={}, hide_legend=False, collapsible_opts={}, legend_style="text") %}
+{% macro select_wrapper(field, hint=None, disable=[], option_hints={}, hide_legend=False, collapsible_opts={}, legend_style="text", inline=False) %}
   {% set is_collapsible = collapsible_opts|length %}
-  <div class="form-group {% if field.errors %} form-group-error{% endif %}"{% if is_collapsible %} data-module="collapsible-checkboxes"{% if collapsible_opts.field %} data-field-label="{{ collapsible_opts.field }}"{% endif %}{% endif %}>
+  <div class="form-group {% if field.errors %} form-group-error{% endif %} {% if inline %}inline-multiple-choice{% endif %}"{% if is_collapsible %} data-module="collapsible-checkboxes"{% if collapsible_opts.field %} data-field-label="{{ collapsible_opts.field }}"{% endif %}{% endif %}>
     {% if is_collapsible %}
     <div class="selection-summary" role="region" aria-live="polite"></div>
     {% endif %}

@@ -116,3 +116,10 @@
   margin: -20px 0 0 17px;
   padding: 10px 0 0 28px;
 }
+
+.inline-multiple-choice {
+  .multiple-choice {
+    clear: none;
+    margin-right: $gutter-half;
+  }
+}

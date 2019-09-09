@@ -1,5 +1,6 @@
 {% extends "withnav_template.html" %}
-{% from "components/radios.html" import radios %}
+{% from "components/radios.html" import radio %}
+{% from "components/select-input.html" import select_wrapper %}
 {% from "components/form.html" import form_wrapper %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
@@ -47,7 +48,12 @@
         <p style="overflow:hidden; text-overflow: ellipsis; white-space: nowrap;">
           Recipient: {{ recipient }}
         </p>
-        <a href="{{ request.url }}&done=true" class="button">
+        {% call select_wrapper(form.postage, hide_legend=True, inline=True) %}
+          {% for option in form.postage %}
+            {{ radio(option) }}
+          {% endfor %}
+        {% endcall %}
+        <a href="{{ request.url }}&done=true" class="button bottom-gutter-1-2">
           Send 1 letter
         </a>
       </div>
