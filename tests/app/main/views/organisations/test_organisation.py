@@ -165,7 +165,7 @@ def test_create_new_organisation_validates(
     ('central', None, 403),
     ('nhs_gp', organisation_json(organisation_type='nhs_gp'), 403),
 ))
-def test_only_gps_can_create_own_organisations(
+def test_gps_can_create_own_organisations(
     client_request,
     mocker,
     service_one,
@@ -190,6 +190,62 @@ def test_only_gps_can_create_own_organisations(
         page.select_one('label[for=name]').text
     ) == (
         'What’s your practice called?'
+    )
+
+
+@pytest.mark.parametrize('organisation_type, organisation, expected_status', (
+    ('nhs_local', None, 200),
+    ('nhs_gp', None, 403),
+    ('central', None, 403),
+    ('nhs_local', organisation_json(organisation_type='nhs_local'), 403),
+))
+def test_nhs_local_can_create_own_organisations(
+    client_request,
+    mocker,
+    service_one,
+    organisation_type,
+    organisation,
+    expected_status,
+):
+    mocker.patch('app.organisations_client.get_service_organisation', return_value=organisation)
+    mocker.patch(
+        'app.models.organisation.Organisations.client',
+        return_value=[
+            organisation_json('t1', 'Trust 1', organisation_type='nhs_local'),
+            organisation_json('t2', 'Trust 2', organisation_type='nhs_local'),
+            organisation_json('gp1', 'GP 1', organisation_type='nhs_gp'),
+            organisation_json('c1', 'Central 1'),
+        ],
+    )
+    service_one['organisation_type'] = organisation_type
+
+    page = client_request.get(
+        '.add_organisation_from_nhs_local_service',
+        service_id=SERVICE_ONE_ID,
+        _expected_status=expected_status,
+    )
+
+    if expected_status == 403:
+        return
+
+    assert normalize_spaces(page.select_one('main p').text) == (
+        'Which NHS Trust or Clinical Commissioning Group do you work for?'
+    )
+    assert page.select_one('[data-module=live-search]')['data-targets'] == (
+        '.multiple-choice'
+    )
+    assert [
+        (
+            normalize_spaces(radio.select_one('label').text),
+            radio.select_one('input')['value']
+        )
+        for radio in page.select('.multiple-choice')
+    ] == [
+        ('Trust 1', 't1'),
+        ('Trust 2', 't2'),
+    ]
+    assert normalize_spaces(page.select_one('.js-stick-at-bottom-when-scrolling button').text) == (
+        'Continue'
     )
 
 
@@ -276,6 +332,38 @@ def test_validation_of_gps_creating_organisations(
         _expected_status=200,
     )
     assert normalize_spaces(page.select_one('.error-message').text) == expected_error
+
+
+def test_nhs_local_assigns_to_selected_organisation(
+    client_request,
+    mocker,
+    service_one,
+    mock_get_organisation,
+    mock_update_service_organisation,
+):
+    mocker.patch('app.organisations_client.get_service_organisation', return_value=None)
+    mocker.patch(
+        'app.models.organisation.Organisations.client',
+        return_value=[
+            organisation_json(ORGANISATION_ID, 'Trust 1', organisation_type='nhs_local'),
+        ],
+    )
+    service_one['organisation_type'] = 'nhs_local'
+
+    client_request.post(
+        '.add_organisation_from_nhs_local_service',
+        service_id=SERVICE_ONE_ID,
+        _data={
+            'organisations': ORGANISATION_ID,
+        },
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.service_agreement',
+            service_id=SERVICE_ONE_ID,
+            _external=True
+        )
+    )
+    mock_update_service_organisation.assert_called_once_with(SERVICE_ONE_ID, ORGANISATION_ID)
 
 
 def test_organisation_services_shows_live_services_only(
