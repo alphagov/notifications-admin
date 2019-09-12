@@ -418,6 +418,10 @@ class Service(JSONModel):
         return self.email_branding['name']
 
     @property
+    def needs_to_change_email_branding(self):
+        return self.email_branding_id is None and self.organisation_type != 'central'
+
+    @property
     def letter_branding_id(self):
         return self._dict['letter_branding']
 

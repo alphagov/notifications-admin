@@ -17,9 +17,15 @@
     back_link=url_for('main.service_settings', service_id=current_service.id)
   ) }}
 
-  <p class="form-group">
+  <p>
     Your emails currently have {{ current_service.email_branding_name }} branding.
   </p>
+
+  {% if current_service.needs_to_change_email_branding %}
+    <p>
+      You should be using your own branding instead. We can help you to set this up.
+    </p>
+  {% endif %}
 
   {% call form_wrapper() %}
     {% if form.something_else_is_only_option %}
