@@ -17,6 +17,10 @@
     back_link=url_for('main.service_settings', service_id=current_service.id)
   ) }}
 
+  <p class="form-group">
+    Your emails currently have {{ current_service.email_branding_name }} branding.
+  </p>
+
   {% call form_wrapper() %}
     {% if form.something_else_is_only_option %}
       {{ textbox(
