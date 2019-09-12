@@ -222,25 +222,8 @@ def cancel_invited_org_user(org_id, invited_user_id):
 @main.route("/organisations/<org_id>/settings/", methods=['GET'])
 @user_is_platform_admin
 def organisation_settings(org_id):
-
-    email_branding = 'GOV.UK'
-
-    if current_organisation.email_branding_id:
-        email_branding = email_branding_client.get_email_branding(
-            current_organisation.email_branding_id
-        )['email_branding']['name']
-
-    letter_branding = None
-
-    if current_organisation.letter_branding_id:
-        letter_branding = letter_branding_client.get_letter_branding(
-            current_organisation.letter_branding_id
-        )['name']
-
     return render_template(
         'views/organisations/organisation/settings/index.html',
-        email_branding=email_branding,
-        letter_branding=letter_branding,
     )
 
 

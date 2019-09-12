@@ -2,6 +2,8 @@ from flask import abort
 from werkzeug.utils import cached_property
 
 from app.models import JSONModel, ModelList
+from app.notify_client.email_branding_client import email_branding_client
+from app.notify_client.letter_branding_client import letter_branding_client
 from app.notify_client.organisations_api_client import organisations_client
 
 
@@ -147,6 +149,26 @@ class Organisation(JSONModel):
             self.invited_users + self.active_users,
             key=lambda user: user.email_address.lower(),
         )
+
+    @cached_property
+    def email_branding(self):
+        if self.email_branding_id:
+            return email_branding_client.get_email_branding(
+                self.email_branding_id
+            )['email_branding']
+
+    @property
+    def email_branding_name(self):
+        if self.email_branding_id:
+            return self.email_branding['name']
+        return 'GOV.UK'
+
+    @cached_property
+    def letter_branding(self):
+        if self.letter_branding_id:
+            return letter_branding_client.get_letter_branding(
+                self.letter_branding_id
+            )
 
     def update(self, **kwargs):
         response = organisations_client.update_organisation(self.id, **kwargs)

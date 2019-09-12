@@ -73,7 +73,7 @@
       {% endcall %}
       {% call row() %}
         {{ text_field('Default email branding') }}
-        {{ text_field(email_branding) }}
+        {{ text_field(current_org.email_branding_name) }}
         {{ edit_field(
             'Change',
             url_for('.edit_organisation_email_branding', org_id=current_org.id)
@@ -83,7 +83,7 @@
       {% call row() %}
         {{ text_field('Default letter branding') }}
         {{ optional_text_field(
-          letter_branding,
+          current_org.letter_branding.name,
           default='No branding'
         ) }}
         {{ edit_field(
