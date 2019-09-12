@@ -3208,6 +3208,7 @@ def mock_get_service_organisation(
     name=False,
     crown=True,
     agreement_signed=None,
+    organisation_type=None,
 ):
     def _get_service_organisation(service_id):
         return organisation_json(
@@ -3215,6 +3216,7 @@ def mock_get_service_organisation(
             name,
             crown=crown,
             agreement_signed=agreement_signed,
+            organisation_type=organisation_type,
         )
 
     return mocker.patch('app.organisations_client.get_service_organisation', side_effect=_get_service_organisation)

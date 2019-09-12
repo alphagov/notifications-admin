@@ -83,6 +83,7 @@ class Organisation(JSONModel):
             self.domains = []
             self.organisation_type = None
             self.request_to_go_live_notes = None
+            self.email_branding_id = None
 
     def as_agreement_statement_for_go_live_request(self, fallback_domain):
         if self.agreement_signed:

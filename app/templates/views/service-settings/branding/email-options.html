@@ -1,5 +1,5 @@
 {% extends "withnav_template.html" %}
-{% from "components/radios.html" import radio %}
+{% from "components/radios.html" import radios %}
 {% from "components/textbox.html" import textbox %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
@@ -17,26 +17,7 @@
   ) }}
 
   {% call form_wrapper() %}
-    <fieldset class="form-group {% if form.options.errors %}form-group-error{% endif %} top-gutter">
-      <legend class="bottom-gutter-2-3">
-        Choose the branding you’d like on your emails.
-      </legend>
-      {% if form.options.errors %}
-        <span class="error-message" data-module="track-error" data-error-type="Can’t be empty" data-error-label="{{ form.options.name }}">
-          You need to choose an option
-        </span>
-      {% endif %}
-      <div class="grid-row">
-        {% for option in form.options %}
-          <div class="column-one-quarter">
-            <label for="{{ option.id }}">
-              <img src="{{ asset_url('images/branding-options/{}.png'.format(option.data)) }}" alt="" class="bordered-image bottom-gutter-1-3">
-            </label>
-            {{ radio(option) }}
-          </div>
-        {% endfor %}
-      </div>
-    </fieldset>
+    {{ radios(form.options) }}
     <p class="form-group">
       We’ll email you once your branding’s ready to use, or if we need any
       more information.

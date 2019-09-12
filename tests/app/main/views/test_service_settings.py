@@ -202,7 +202,7 @@ def test_organisation_name_links_to_org_dashboard(
         'Label Value Action',
         'Send emails On Change',
         'Reply-to email addresses test@example.com Manage',
-        'Email branding Your branding (Organisation name) Change',
+        'Email branding Organisation name Change',
 
         'Label Value Action',
         'Send text messages On Change',
@@ -223,7 +223,7 @@ def test_organisation_name_links_to_org_dashboard(
         'Label Value Action',
         'Send emails On Change',
         'Reply-to email addresses test@example.com Manage',
-        'Email branding Your branding (Organisation name) Change',
+        'Email branding Organisation name Change',
 
         'Label Value Action',
         'Send text messages On Change',
@@ -4377,63 +4377,203 @@ def test_update_service_organisation_does_not_update_if_same_value(
     mock_update_service_organisation.called is False
 
 
+@pytest.mark.parametrize('organisation_type, expected_options', (
+    ('central', [
+        ('something_else', 'Something else'),
+    ]),
+    ('local', [
+        ('something_else', 'Something else'),
+    ]),
+    ('nhs_central', [
+        ('nhs', 'NHS'),
+        ('something_else', 'Something else'),
+    ]),
+    ('nhs_local', [
+        ('nhs', 'NHS'),
+        ('something_else', 'Something else'),
+    ]),
+    ('nhs_gp', [
+        ('nhs', 'NHS'),
+        ('something_else', 'Something else'),
+    ]),
+    ('emergency_service', [
+        ('something_else', 'Something else'),
+    ]),
+    ('other', [
+        ('something_else', 'Something else'),
+    ]),
+))
 def test_show_email_branding_request_page_when_no_email_branding_is_set(
+    mocker,
+    service_one,
     client_request,
-    mock_get_email_branding
+    mock_get_email_branding,
+    organisation_type,
+    expected_options,
 ):
+    service_one['email_branding'] = None
+    service_one['organisation_type'] = organisation_type
+    mocker.patch(
+        'app.organisations_client.get_service_organisation',
+        return_value=None,
+    )
+
     page = client_request.get(
         '.branding_request', service_id=SERVICE_ONE_ID
     )
 
     mock_get_email_branding.assert_not_called()
 
-    radios = page.select('input[type=radio]')
-
-    for index, option in enumerate((
-        'govuk',
-        'both',
-        'org',
-        'org_banner',
-    )):
-        assert radios[index]['name'] == 'options'
-        assert radios[index]['value'] == option
+    assert [
+        (
+            radio['value'],
+            page.select_one('label[for={}]'.format(radio['id'])).text.strip()
+        )
+        for radio in page.select('input[type=radio]')
+    ] == expected_options
 
 
-def test_show_email_branding_request_page_when_email_branding_is_set(
+@pytest.mark.parametrize('organisation_type, expected_options', (
+    ('central', [
+        ('govuk_and_org', 'GOV.UK and Test Organisation'),
+        ('organisation', 'Test Organisation'),
+        ('something_else', 'Something else'),
+    ]),
+    ('local', [
+        ('organisation', 'Test Organisation'),
+        ('something_else', 'Something else'),
+    ]),
+    ('nhs_central', [
+        ('nhs', 'NHS'),
+        ('something_else', 'Something else'),
+    ]),
+    ('nhs_local', [
+        ('nhs', 'NHS'),
+        ('something_else', 'Something else'),
+    ]),
+    ('nhs_gp', [
+        ('nhs', 'NHS'),
+        ('something_else', 'Something else'),
+    ]),
+    ('emergency_service', [
+        ('organisation', 'Test Organisation'),
+        ('something_else', 'Something else'),
+    ]),
+    ('other', [
+        ('organisation', 'Test Organisation'),
+        ('something_else', 'Something else'),
+    ]),
+))
+def test_show_email_branding_request_page_when_no_email_branding_is_set_but_organisation_exists(
+    mocker,
+    service_one,
     client_request,
     mock_get_email_branding,
-    active_user_with_permissions,
+    organisation_type,
+    expected_options,
 ):
-
-    service_one = service_json(email_branding='1234')
-    client_request.login(active_user_with_permissions, service=service_one)
+    service_one['email_branding'] = None
+    service_one['organisation_type'] = organisation_type
+    mocker.patch(
+        'app.organisations_client.get_service_organisation',
+        return_value=organisation_json(organisation_type=organisation_type),
+    )
 
     page = client_request.get(
         '.branding_request', service_id=SERVICE_ONE_ID
     )
 
-    mock_get_email_branding.called_once_with('1234')
+    mock_get_email_branding.assert_not_called()
 
-    radios = page.select('input[type=radio]')
-
-    for index, option in enumerate((
-        'govuk',
-        'both',
-        'org',
-        'org_banner',
-    )):
-        assert radios[index]['name'] == 'options'
-        assert radios[index]['value'] == option
-        if option == 'org':
-            assert 'checked' in radios[index].attrs
+    assert [
+        (
+            radio['value'],
+            page.select_one('label[for={}]'.format(radio['id'])).text.strip()
+        )
+        for radio in page.select('input[type=radio]')
+    ] == expected_options
 
 
-@pytest.mark.parametrize('choice, requested_branding', (
-    ('govuk', 'GOV.UK only'),
-    ('both', 'GOV.UK and logo'),
-    ('org', 'Your logo'),
-    ('org_banner', 'Your logo on a colour'),
-    pytest.param('foo', 'Nope', marks=pytest.mark.xfail(raises=AssertionError)),
+def test_show_email_branding_request_page_when_email_branding_is_set(
+    mocker,
+    service_one,
+    client_request,
+    mock_get_email_branding,
+    active_user_with_permissions,
+):
+    service_one['email_branding'] = sample_uuid()
+    mocker.patch(
+        'app.organisations_client.get_service_organisation',
+        return_value=organisation_json(),
+    )
+
+    page = client_request.get(
+        '.branding_request', service_id=SERVICE_ONE_ID
+    )
+    assert [
+        (
+            radio['value'],
+            page.select_one('label[for={}]'.format(radio['id'])).text.strip()
+        )
+        for radio in page.select('input[type=radio]')
+    ] == [
+        ('govuk', 'GOV.UK'),
+        ('govuk_and_org', 'GOV.UK and Test Organisation'),
+        ('organisation', 'Test Organisation'),
+        ('something_else', 'Something else'),
+    ]
+
+
+def test_show_email_branding_request_page_when_email_branding_is_same_as_org(
+    mocker,
+    service_one,
+    client_request,
+    mock_get_email_branding,
+    active_user_with_permissions,
+):
+    service_one['email_branding'] = sample_uuid()
+    mocker.patch(
+        'app.organisations_client.get_service_organisation',
+        return_value=organisation_json(email_branding_id=service_one['email_branding']),
+    )
+
+    page = client_request.get(
+        '.branding_request', service_id=SERVICE_ONE_ID
+    )
+
+    assert [
+        (
+            radio['value'],
+            page.select_one('label[for={}]'.format(radio['id'])).text.strip()
+        )
+        for radio in page.select('input[type=radio]')
+    ] == [
+        # Central government organisations who have their own default
+        # branding will do so because they’re exempt from GOV.UK.
+        # We also don’t show their organisation’s branding because they
+        # have it already.
+        ('something_else', 'Something else'),
+    ]
+
+
+@pytest.mark.parametrize('data, requested_branding', (
+    (
+        {
+            'options': 'govuk',
+        },
+        'GOV.UK',
+    ),
+    (
+        {
+            'options': 'something_else',
+        },
+        'Something else'
+    ),
+    pytest.param(
+        {'options': 'foo'},
+        'Nope',
+        marks=pytest.mark.xfail(raises=AssertionError),
+    ),
 ))
 @pytest.mark.parametrize('org_name, expected_organisation', (
     (None, 'Can’t tell (domain is user.gov.uk)'),
@@ -4441,20 +4581,22 @@ def test_show_email_branding_request_page_when_email_branding_is_set(
 ))
 def test_submit_email_branding_request(
     client_request,
+    service_one,
     mocker,
-    choice,
+    data,
     requested_branding,
     mock_get_service_settings_page_common,
+    mock_get_email_branding,
     no_reply_to_email_addresses,
     no_letter_contact_blocks,
     single_sms_sender,
     org_name,
     expected_organisation,
 ):
-
-    mock_get_service_organisation(
-        mocker,
-        name=org_name,
+    service_one['email_branding'] = sample_uuid()
+    mocker.patch(
+        'app.organisations_client.get_service_organisation',
+        return_value=organisation_json(name=org_name) if org_name else None,
     )
 
     zendesk = mocker.patch(
@@ -4464,9 +4606,7 @@ def test_submit_email_branding_request(
 
     page = client_request.post(
         '.branding_request', service_id=SERVICE_ONE_ID,
-        _data={
-            'options': choice,
-        },
+        _data=data,
         _follow_redirects=True,
     )
 
@@ -4477,7 +4617,7 @@ def test_submit_email_branding_request(
             'http://localhost/services/596364a0-858e-42c8-9062-a8fe822260eb',
             '',
             '---',
-            'Current branding: GOV.UK',
+            'Current branding: Organisation name',
             'Branding requested: {}',
         ]).format(expected_organisation, requested_branding),
         subject='Email branding request - service one',

@@ -1357,24 +1357,54 @@ class LinkOrganisationsForm(StripWhitespaceForm):
     )
 
 
-branding_options = (
-    ('govuk', 'GOV.UK only'),
-    ('both', 'GOV.UK and logo'),
-    ('org', 'Your logo'),
-    ('org_banner', 'Your logo on a colour'),
-)
-branding_options_dict = dict(branding_options)
-
-
 class BrandingOptionsEmail(StripWhitespaceForm):
 
     options = RadioField(
-        'Branding options',
-        choices=branding_options,
+        'Choose your new email branding',
         validators=[
             DataRequired()
         ],
     )
+
+    def __init__(self, service, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.options.choices = tuple(self.get_available_choices(service))
+
+    @staticmethod
+    def get_available_choices(service):
+
+        if (
+            service.organisation_type == 'central' and
+            service.organisation.email_branding_id is None and
+            service.email_branding_id is not None
+        ):
+            yield ('govuk', 'GOV.UK')
+
+        if (
+            service.organisation_type == 'central' and
+            service.organisation and
+            service.organisation.email_branding_id is None and
+            service.email_branding_name.lower() != 'GOV.UK and {}'.format(service.organisation.name).lower()
+        ):
+            yield ('govuk_and_org', 'GOV.UK and {}'.format(service.organisation.name))
+
+        if (
+            service.organisation_type in {'nhs_local', 'nhs_central', 'nhs_gp'} and
+            service.email_branding_name != 'NHS'
+        ):
+            yield ('nhs', 'NHS')
+
+        if (
+            service.organisation and
+            service.organisation_type not in {'nhs_local', 'nhs_central', 'nhs_gp'} and
+            (
+                service.email_branding_id is None or
+                service.email_branding_id != service.organisation.email_branding_id
+            )
+        ):
+            yield ('organisation', service.organisation.name)
+
+        yield ('something_else', 'Something else')
 
 
 class ServiceDataRetentionForm(StripWhitespaceForm):
