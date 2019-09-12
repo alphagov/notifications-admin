@@ -805,7 +805,7 @@ def test_letter_validation_preview_doesnt_call_template_preview_when_file_not_pd
     antivirus_scan.assert_not_called()
     validate_letter.assert_not_called()
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    assert page.find('span', class_='error-message').text.strip() == "PDF documents only!"
+    assert page.find('span', class_='error-message').text.strip() == "Letters must be saved as a PDF"
 
 
 def test_letter_validation_preview_doesnt_call_template_preview_when_file_doesnt_pass_virus_scan(

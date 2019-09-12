@@ -1,0 +1,28 @@
+{% extends "withnav_template.html" %}
+{% from "components/file-upload.html" import file_upload %}
+{% from "components/page-header.html" import page_header %}
+
+{% block service_page_title %}
+  Upload a letter
+{% endblock %}
+
+{% block maincolumn_content %}
+<div class="grid-row">
+  <div class="column-five-sixths">
+    {{ page_header(
+        'Upload a letter',
+        back_link=url_for('main.uploads', service_id=current_service.id)
+    ) }}
+
+  <p>
+    {{ file_upload(
+      form.file,
+      action = url_for('main.upload_letter', service_id=current_service.id),
+    )}}
+  </p>
+  <p>You can upload a single letter as a PDF.</p>
+  <p>Your file must meet our <a href="https://docs.notifications.service.gov.uk/documentation/images/notify-pdf-letter-spec-v2.3.pdf">letter specification</a>.</p>
+
+  </div>
+</div>
+{% endblock %}

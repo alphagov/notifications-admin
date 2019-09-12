@@ -261,6 +261,12 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         )
         return self.get(endpoint)
 
+    def get_precompiled_template(self, service_id):
+        """
+        Returns the precompiled template for a service, creating it if it doesn't already exist
+        """
+        return self.get('/service/{}/template/precompiled'.format(service_id))
+
     @cache.set('service-{service_id}-templates')
     def get_service_templates(self, service_id):
         """

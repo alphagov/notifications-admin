@@ -93,6 +93,14 @@ def test_client_creates_service_with_correct_data(
     )
 
 
+def test_get_precompiled_template(mocker):
+    client = ServiceAPIClient()
+    mock_get = mocker.patch.object(client, 'get')
+
+    client.get_precompiled_template(SERVICE_ONE_ID)
+    mock_get.assert_called_once_with('/service/{}/template/precompiled'.format(SERVICE_ONE_ID))
+
+
 @pytest.mark.parametrize('template_data, extra_args, expected_count', (
     (
         [],

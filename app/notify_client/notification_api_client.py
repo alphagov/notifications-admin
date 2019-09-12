@@ -59,6 +59,14 @@ class NotificationApiClient(NotifyAdminAPIClient):
         data = _attach_current_user(data)
         return self.post(url='/service/{}/send-notification'.format(service_id), data=data)
 
+    def send_precompiled_letter(self, service_id, filename, file_id):
+        data = {
+            'filename': filename,
+            'file_id': file_id,
+        }
+        data = _attach_current_user(data)
+        return self.post(url='/service/{}/send-pdf-letter'.format(service_id), data=data)
+
     def get_notification(self, service_id, notification_id):
         return self.get(url='/service/{}/notifications/{}'.format(service_id, notification_id))
 

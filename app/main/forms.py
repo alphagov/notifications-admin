@@ -1109,9 +1109,9 @@ class ServiceLetterBrandingDetails(StripWhitespaceForm):
 
 class PDFUploadForm(StripWhitespaceForm):
     file = FileField_wtf(
-        'Upload a letter in PDF format to check if it fits in the printable area',
+        'Upload a letter in PDF format',
         validators=[
-            FileAllowed(['pdf'], 'PDF documents only!'),
+            FileAllowed(['pdf'], 'Letters must be saved as a PDF'),
             DataRequired(message="You need to upload a file to submit")
         ]
     )

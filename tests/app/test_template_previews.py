@@ -1,10 +1,15 @@
+import base64
 from functools import partial
 from unittest.mock import Mock
 
 import pytest
 from notifications_utils.template import LetterPreviewTemplate
 
-from app.template_previews import TemplatePreview, get_page_count_for_letter
+from app.template_previews import (
+    TemplatePreview,
+    get_page_count_for_letter,
+    sanitise_letter,
+)
 
 
 @pytest.mark.parametrize('partial_call, expected_page_argument', [
@@ -75,6 +80,44 @@ def test_from_database_object_makes_request(
     request_mock.assert_called_once_with(expected_url, json=data, headers=headers)
 
 
+@pytest.mark.parametrize('page_number, expected_url', [
+    ('1', 'http://localhost:9999/precompiled-preview.png?hide_notify=true'),
+    ('2', 'http://localhost:9999/precompiled-preview.png'),
+])
+def test_from_valid_pdf_file_makes_request(mocker, page_number, expected_url):
+    mocker.patch('app.template_previews.extract_page_from_pdf', return_value=b'pdf page')
+    request_mock = mocker.patch(
+        'app.template_previews.requests.post',
+        return_value=Mock(content='a', status_code='b', headers={'c': 'd'})
+    )
+
+    response = TemplatePreview.from_valid_pdf_file(b'pdf file', page_number)
+
+    assert response == ('a', 'b', {'c': 'd'}.items())
+    request_mock.assert_called_once_with(
+        expected_url,
+        data=base64.b64encode(b'pdf page').decode('utf-8'),
+        headers={'Authorization': 'Token my-secret-key'},
+    )
+
+
+def test_from_invalid_pdf_file_makes_request(mocker):
+    mocker.patch('app.template_previews.extract_page_from_pdf', return_value=b'pdf page')
+    request_mock = mocker.patch(
+        'app.template_previews.requests.post',
+        return_value=Mock(content='a', status_code='b', headers={'c': 'd'})
+    )
+
+    response = TemplatePreview.from_invalid_pdf_file(b'pdf file', '1')
+
+    assert response == ('a', 'b', {'c': 'd'}.items())
+    request_mock.assert_called_once_with(
+        'http://localhost:9999/precompiled/overlay.png?page_number=1',
+        data=b'pdf page',
+        headers={'Authorization': 'Token my-secret-key'},
+    )
+
+
 @pytest.mark.parametrize('template_type', [
     'email', 'sms'
 ])
@@ -118,4 +161,16 @@ def test_from_example_template_makes_request(mocker):
               'template': template,
               'filename': filename,
               'letter_contact_block': None}
+    )
+
+
+def test_sanitise_letter_calls_template_preview_sanitise_endoint_with_file(mocker):
+    request_mock = mocker.patch('app.template_previews.requests.post')
+
+    sanitise_letter('pdf_data')
+
+    request_mock.assert_called_once_with(
+        'http://localhost:9999/precompiled/sanitise',
+        headers={'Authorization': 'Token my-secret-key'},
+        data='pdf_data'
     )

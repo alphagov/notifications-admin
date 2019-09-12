@@ -1,0 +1,37 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+
+{% block service_page_title %}
+  {{ original_filename }}
+{% endblock %}
+
+{% block maincolumn_content %}
+    {{ page_header(
+        original_filename,
+        back_link=url_for('main.upload_letter', service_id=current_service.id)
+    ) }}
+
+    {% if status == 'invalid' %}
+    <p class="notification-status-cancelled" id="validation-error-message">
+      Validation failed
+    </p>
+    {% endif %}
+
+    <div class="letter-sent">
+      {{ template|string }}
+    </div>
+
+    {% if status == 'valid' %}
+    <div class="js-stick-at-bottom-when-scrolling">
+      <form method="post" enctype="multipart/form-data" action="{{url_for(
+          'main.send_uploaded_letter',
+          service_id=current_service.id,
+        )}}" class='page-footer'>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+        <input type="hidden" name="filename" value="{{ original_filename }}" />
+        <input type="hidden" name="file_id" value="{{ file_id }}" />
+        <button type="submit" class="button">Send 1 letter</button>
+      </form>
+    </div>
+  {% endif %}
+{% endblock %}
