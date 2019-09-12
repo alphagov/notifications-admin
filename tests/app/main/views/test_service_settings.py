@@ -4378,12 +4378,8 @@ def test_update_service_organisation_does_not_update_if_same_value(
 
 
 @pytest.mark.parametrize('organisation_type, expected_options', (
-    ('central', [
-        ('something_else', 'Something else'),
-    ]),
-    ('local', [
-        ('something_else', 'Something else'),
-    ]),
+    ('central', None),
+    ('local', None),
     ('nhs_central', [
         ('nhs', 'NHS'),
         ('something_else', 'Something else'),
@@ -4396,12 +4392,8 @@ def test_update_service_organisation_does_not_update_if_same_value(
         ('nhs', 'NHS'),
         ('something_else', 'Something else'),
     ]),
-    ('emergency_service', [
-        ('something_else', 'Something else'),
-    ]),
-    ('other', [
-        ('something_else', 'Something else'),
-    ]),
+    ('emergency_service', None),
+    ('other', None),
 ))
 def test_show_email_branding_request_page_when_no_email_branding_is_set(
     mocker,
@@ -4424,13 +4416,26 @@ def test_show_email_branding_request_page_when_no_email_branding_is_set(
 
     mock_get_email_branding.assert_not_called()
 
-    assert [
-        (
-            radio['value'],
-            page.select_one('label[for={}]'.format(radio['id'])).text.strip()
+    if expected_options:
+        assert [
+            (
+                radio['value'],
+                page.select_one('label[for={}]'.format(radio['id'])).text.strip()
+            )
+            for radio in page.select('input[type=radio]')
+        ] == expected_options
+        assert page.select_one(
+            '.conditional-radios-panel#panel-something-else textarea'
+        )['name'] == (
+            'something_else'
         )
-        for radio in page.select('input[type=radio]')
-    ] == expected_options
+    else:
+        assert page.select_one(
+            'textarea'
+        )['name'] == (
+            'something_else'
+        )
+        assert not page.select('.conditional-radios-panel')
 
 
 @pytest.mark.parametrize('organisation_type, expected_options', (
@@ -4541,19 +4546,12 @@ def test_show_email_branding_request_page_when_email_branding_is_same_as_org(
         '.branding_request', service_id=SERVICE_ONE_ID
     )
 
-    assert [
-        (
-            radio['value'],
-            page.select_one('label[for={}]'.format(radio['id'])).text.strip()
-        )
-        for radio in page.select('input[type=radio]')
-    ] == [
-        # Central government organisations who have their own default
-        # branding will do so because they’re exempt from GOV.UK.
-        # We also don’t show their organisation’s branding because they
-        # have it already.
-        ('something_else', 'Something else'),
-    ]
+    # Central government organisations who have their own default
+    # branding will do so because they’re exempt from GOV.UK.
+    # We also don’t show their organisation’s branding because they
+    # have it already. So ‘Something else’ is the only option.
+    assert not page.select('input[type=radio]')
+    assert page.select_one('textarea')['name'] == 'something_else'
 
 
 @pytest.mark.parametrize('data, requested_branding', (
@@ -4565,9 +4563,24 @@ def test_show_email_branding_request_page_when_email_branding_is_same_as_org(
     ),
     (
         {
+            'options': 'govuk',
+            'something_else': 'ignored',
+        },
+        'GOV.UK',
+    ),
+    (
+        {
+            'options': 'something_else',
+            'something_else': 'Homer Simpson'
+        },
+        'Something else\n\nHomer Simpson'
+    ),
+    pytest.param(
+        {
             'options': 'something_else',
         },
-        'Something else'
+        '[Missing details]',
+        marks=pytest.mark.xfail(raises=AssertionError),
     ),
     pytest.param(
         {'options': 'foo'},
@@ -4618,7 +4631,7 @@ def test_submit_email_branding_request(
             '',
             '---',
             'Current branding: Organisation name',
-            'Branding requested: {}',
+            'Branding requested: {}\n',
         ]).format(expected_organisation, requested_branding),
         subject='Email branding request - service one',
         ticket_type='question',

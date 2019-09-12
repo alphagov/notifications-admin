@@ -1359,16 +1359,17 @@ class LinkOrganisationsForm(StripWhitespaceForm):
 
 class BrandingOptionsEmail(StripWhitespaceForm):
 
-    options = RadioField(
-        'Choose your new email branding',
-        validators=[
-            DataRequired()
-        ],
-    )
+    FALLBACK_OPTION_VALUE = 'something_else'
+    FALLBACK_OPTION = (FALLBACK_OPTION_VALUE, 'Something else')
+
+    options = RadioField('Choose your new email branding')
+    something_else = TextAreaField('Describe the branding you want')
 
     def __init__(self, service, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.options.choices = tuple(self.get_available_choices(service))
+        if not self.something_else_is_only_option:
+            self.options.validators.append(DataRequired())
 
     @staticmethod
     def get_available_choices(service):
@@ -1404,7 +1405,21 @@ class BrandingOptionsEmail(StripWhitespaceForm):
         ):
             yield ('organisation', service.organisation.name)
 
-        yield ('something_else', 'Something else')
+        yield BrandingOptionsEmail.FALLBACK_OPTION
+
+    @property
+    def something_else_is_only_option(self):
+        return self.options.choices == (self.FALLBACK_OPTION,)
+
+    def validate_something_else(self, field):
+        if (
+            self.something_else_is_only_option or
+            self.options.data == self.FALLBACK_OPTION_VALUE
+        ) and not field.data:
+            raise ValidationError('Can’t be empty')
+
+        if self.options.data != self.FALLBACK_OPTION_VALUE:
+            field.data = ''
 
 
 class ServiceDataRetentionForm(StripWhitespaceForm):
