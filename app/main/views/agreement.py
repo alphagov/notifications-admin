@@ -6,6 +6,7 @@ from flask_login import current_user
 from app import current_service
 from app.main import main
 from app.main.forms import AcceptAgreementForm
+from app.models.organisation import Organisation
 from app.s3_client.s3_mou_client import get_mou
 from app.utils import user_has_permissions
 
@@ -14,11 +15,11 @@ from app.utils import user_has_permissions
 @user_has_permissions('manage_service')
 def service_agreement(service_id):
     if not current_service.organisation:
-        if current_service.organisation_type == 'nhs_gp':
+        if current_service.organisation_type == Organisation.TYPE_NHS_GP:
             return redirect(
                 url_for('main.add_organisation_from_gp_service', service_id=current_service.id)
             )
-        if current_service.organisation_type == 'nhs_local':
+        if current_service.organisation_type == Organisation.TYPE_NHS_LOCAL:
             return redirect(
                 url_for('main.add_organisation_from_nhs_local_service', service_id=current_service.id)
             )

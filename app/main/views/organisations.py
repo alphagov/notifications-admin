@@ -69,7 +69,7 @@ def add_organisation():
 @main.route('/services/<uuid:service_id>/add-gp-organisation', methods=['GET', 'POST'])
 @user_has_permissions('manage_service')
 def add_organisation_from_gp_service(service_id):
-    if (not current_service.organisation_type == 'nhs_gp') or current_service.organisation:
+    if (not current_service.organisation_type == Organisation.TYPE_NHS_GP) or current_service.organisation:
         abort(403)
 
     form = AddGPOrganisationForm(service_name=current_service.name)
@@ -97,13 +97,13 @@ def add_organisation_from_gp_service(service_id):
 @main.route('/services/<uuid:service_id>/add-nhs-local-organisation', methods=['GET', 'POST'])
 @user_has_permissions('manage_service')
 def add_organisation_from_nhs_local_service(service_id):
-    if (not current_service.organisation_type == 'nhs_local') or current_service.organisation:
+    if (not current_service.organisation_type == Organisation.TYPE_NHS_LOCAL) or current_service.organisation:
         abort(403)
 
     form = AddNHSLocalOrganisationForm(organisation_choices=[
         (organisation.id, organisation.name)
         for organisation in Organisations()
-        if organisation.organisation_type == 'nhs_local'
+        if organisation.organisation_type == Organisation.TYPE_NHS_LOCAL
     ])
 
     search_form = SearchByNameForm()

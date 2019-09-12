@@ -1375,14 +1375,14 @@ class BrandingOptionsEmail(StripWhitespaceForm):
     def get_available_choices(service):
 
         if (
-            service.organisation_type == 'central' and
+            service.organisation_type == Organisation.TYPE_CENTRAL and
             service.organisation.email_branding_id is None and
             service.email_branding_id is not None
         ):
             yield ('govuk', 'GOV.UK')
 
         if (
-            service.organisation_type == 'central' and
+            service.organisation_type == Organisation.TYPE_CENTRAL and
             service.organisation and
             service.organisation.email_branding_id is None and
             service.email_branding_name.lower() != 'GOV.UK and {}'.format(service.organisation.name).lower()
@@ -1390,15 +1390,21 @@ class BrandingOptionsEmail(StripWhitespaceForm):
             yield ('govuk_and_org', 'GOV.UK and {}'.format(service.organisation.name))
 
         if (
-            service.organisation_type in {'nhs_local', 'nhs_central', 'nhs_gp'} and
-            service.email_branding_name != 'NHS'
+            service.organisation_type in {
+                Organisation.TYPE_NHS_CENTRAL,
+                Organisation.TYPE_NHS_LOCAL,
+                Organisation.TYPE_NHS_GP,
+            } and service.email_branding_name != 'NHS'
         ):
             yield ('nhs', 'NHS')
 
         if (
             service.organisation and
-            service.organisation_type not in {'nhs_local', 'nhs_central', 'nhs_gp'} and
-            (
+            service.organisation_type not in {
+                Organisation.TYPE_NHS_LOCAL,
+                Organisation.TYPE_NHS_CENTRAL,
+                Organisation.TYPE_NHS_GP,
+            } and (
                 service.email_branding_id is None or
                 service.email_branding_id != service.organisation.email_branding_id
             )

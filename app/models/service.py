@@ -270,7 +270,7 @@ class Service(JSONModel):
 
     @property
     def shouldnt_use_govuk_as_sms_sender(self):
-        return self.organisation_type != 'central'
+        return self.organisation_type != Organisation.TYPE_CENTRAL
 
     @cached_property
     def sms_senders(self):
@@ -419,7 +419,7 @@ class Service(JSONModel):
 
     @property
     def needs_to_change_email_branding(self):
-        return self.email_branding_id is None and self.organisation_type != 'central'
+        return self.email_branding_id is None and self.organisation_type != Organisation.TYPE_CENTRAL
 
     @property
     def letter_branding_id(self):
@@ -599,7 +599,10 @@ class Service(JSONModel):
     def able_to_accept_agreement(self):
         return (
             self.organisation.agreement_signed is not None
-            or self.organisation_type in {'nhs_gp', 'nhs_local'}
+            or self.organisation_type in {
+                Organisation.TYPE_NHS_GP,
+                Organisation.TYPE_NHS_LOCAL,
+            }
         )
 
     @property

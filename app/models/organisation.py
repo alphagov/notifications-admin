@@ -9,15 +9,24 @@ from app.notify_client.organisations_api_client import organisations_client
 
 class Organisation(JSONModel):
 
+    TYPE_CENTRAL = 'central'
+    TYPE_LOCAL = 'local'
+    TYPE_NHS_CENTRAL = 'nhs_central'
+    TYPE_NHS_LOCAL = 'nhs_local'
+    TYPE_NHS_GP = 'nhs_gp'
+    TYPE_EMERGENCY_SERVICE = 'emergency_service'
+    TYPE_SCHOOL_OR_COLLEGE = 'school_or_college'
+    TYPE_OTHER = 'other'
+
     TYPES = (
-        ('central', 'Central government'),
-        ('local', 'Local government'),
-        ('nhs_central', 'NHS – central government agency or public body'),
-        ('nhs_local', 'NHS Trust or Clinical Commissioning Group'),
-        ('nhs_gp', 'GP practice'),
-        ('emergency_service', 'Emergency service'),
-        ('school_or_college', 'School or college'),
-        ('other', 'Other'),
+        (TYPE_CENTRAL, 'Central government'),
+        (TYPE_LOCAL, 'Local government'),
+        (TYPE_NHS_CENTRAL, 'NHS – central government agency or public body'),
+        (TYPE_NHS_LOCAL, 'NHS Trust or Clinical Commissioning Group'),
+        (TYPE_NHS_GP, 'GP practice'),
+        (TYPE_EMERGENCY_SERVICE, 'Emergency service'),
+        (TYPE_SCHOOL_OR_COLLEGE, 'School or college'),
+        (TYPE_OTHER, 'Other'),
     )
 
     ALLOWED_PROPERTIES = {
