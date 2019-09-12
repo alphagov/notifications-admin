@@ -303,8 +303,8 @@ def test_accept_agreement_page_populates(
             'on_behalf_of_email': '',
         },
         [
-            'Can’t be empty',
-            'Can’t be empty',
+            'Cannot be empty',
+            'Cannot be empty',
         ],
     ),
     (
@@ -315,7 +315,7 @@ def test_accept_agreement_page_populates(
             'on_behalf_of_email': '',
         },
         [
-            'Can’t be empty',
+            'Cannot be empty',
         ],
     ),
     (
@@ -326,7 +326,7 @@ def test_accept_agreement_page_populates(
             'on_behalf_of_email': 'test@example.com',
         },
         [
-            'Can’t be empty',
+            'Cannot be empty',
         ],
     ),
 
