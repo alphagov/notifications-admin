@@ -552,7 +552,7 @@ def test_upload_csv_invalid_extension(
     )
 
     assert resp.status_code == 200
-    assert "invalid.txt isn’t a spreadsheet that Notify can read" in resp.get_data(as_text=True)
+    assert "invalid.txt is not a spreadsheet that Notify can read" in resp.get_data(as_text=True)
 
 
 def test_upload_valid_csv_redirects_to_check_page(
