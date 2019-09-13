@@ -292,7 +292,7 @@ def test_manage_users_page_shows_member_auth_type_if_service_has_email_auth_acti
         True,
         """
             Text message code
-            Not available because this team member hasn’t added a
+            Not available because this team member has not added a
             phone number to their profile
         """,
     ),
