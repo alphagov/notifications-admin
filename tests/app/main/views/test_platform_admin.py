@@ -706,7 +706,7 @@ def test_platform_admin_submit_empty_returned_letters(mocker, platform_admin_cli
     assert not mock_client.called
 
     assert response.status_code == 200
-    assert "Can’t be empty" in response.get_data(as_text=True)
+    assert "Cannot be empty" in response.get_data(as_text=True)
 
 
 def test_service_letter_validation_preview_renders_correctly(
