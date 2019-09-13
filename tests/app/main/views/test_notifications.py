@@ -24,13 +24,13 @@ from tests.conftest import (
     (None, 'delivered', 'Delivered'),
     (None, 'failed', 'Failed'),
     (None, 'temporary-failure', 'Phone not accepting messages right now'),
-    (None, 'permanent-failure', 'Phone number doesn’t exist'),
+    (None, 'permanent-failure', 'Phone number does not exist'),
     (None, 'technical-failure', 'Technical failure'),
     ('team', 'delivered', 'Delivered'),
     ('live', 'delivered', 'Delivered'),
     ('test', 'sending', 'Sending (test)'),
     ('test', 'delivered', 'Delivered (test)'),
-    ('test', 'permanent-failure', 'Phone number doesn’t exist (test)'),
+    ('test', 'permanent-failure', 'Phone number does not exist (test)'),
 ])
 @pytest.mark.parametrize('user', [
     active_user_with_permissions,
