@@ -153,7 +153,7 @@ def test_create_new_organisation_validates(
         (error['data-error-label'], normalize_spaces(error.text))
         for error in page.select('.error-message')
     ] == [
-        ('name', 'Can’t be empty'),
+        ('name', 'Cannot be empty'),
         ('organisation_type', 'Not a valid choice'),
         ('crown_status', 'Not a valid choice'),
     ]
@@ -313,7 +313,7 @@ def test_gps_can_name_their_organisation(
             'same_as_service_name': False,
             'name': '',
         },
-        'Can’t be empty',
+        'Cannot be empty',
     ),
 ))
 def test_validation_of_gps_creating_organisations(
@@ -834,7 +834,7 @@ def test_update_organisation_with_incorrect_input(
 
     assert normalize_spaces(
         page.select_one('.error-message').text
-    ) == "Can’t be empty"
+    ) == "Cannot be empty"
 
 
 def test_update_organisation_with_non_unique_name(
