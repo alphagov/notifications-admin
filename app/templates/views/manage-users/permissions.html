@@ -26,7 +26,7 @@
     {{ radios(
       form.login_authentication,
       disable=['sms_auth'],
-      option_hints={'sms_auth': 'Not available because this team member hasn’t added a phone&nbsp;number to their profile'|safe}
+      option_hints={'sms_auth': 'Not available because this team member has not added a phone&nbsp;number to their profile'|safe}
     ) }}
   {% else %}
     {{ radios(form.login_authentication) }}
