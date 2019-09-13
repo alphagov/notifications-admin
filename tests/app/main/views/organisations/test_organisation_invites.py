@@ -80,7 +80,7 @@ def test_invite_org_user_errors_when_same_email_as_inviter(
     )
 
     assert mock_invite_org_user.called is False
-    assert normalize_spaces(page.select_one('.error-message').text) == 'You can’t send an invitation to yourself'
+    assert normalize_spaces(page.select_one('.error-message').text) == 'You cannot send an invitation to yourself'
 
 
 def test_accepted_invite_when_other_user_already_logged_in(
