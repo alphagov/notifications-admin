@@ -336,19 +336,19 @@ def test_upload_files_in_different_formats(
         'Couldn’t read example.xlsx. Try using a different file format.'
     )),
     (XLDateError, (
-        'example.xlsx contains numbers or dates that Notify can’t understand. '
+        'example.xlsx contains numbers or dates that Notify cannot understand. '
         'Try formatting all columns as ‘text’ or export your file as CSV.'
     )),
     (XLDateNegative, (
-        'example.xlsx contains numbers or dates that Notify can’t understand. '
+        'example.xlsx contains numbers or dates that Notify cannot understand. '
         'Try formatting all columns as ‘text’ or export your file as CSV.'
     )),
     (XLDateAmbiguous, (
-        'example.xlsx contains numbers or dates that Notify can’t understand. '
+        'example.xlsx contains numbers or dates that Notify cannot understand. '
         'Try formatting all columns as ‘text’ or export your file as CSV.'
     )),
     (XLDateTooLarge, (
-        'example.xlsx contains numbers or dates that Notify can’t understand. '
+        'example.xlsx contains numbers or dates that Notify cannot understand. '
         'Try formatting all columns as ‘text’ or export your file as CSV.'
     )),
 ])
@@ -2658,7 +2658,7 @@ def test_check_messages_shows_trial_mode_error(
     assert ' '.join(
         page.find('div', class_='banner-dangerous').text.split()
     ) == (
-        'You can’t send to this phone number '
+        'You cannot send to this phone number '
         'In trial mode you can only send to yourself and members of your team '
         'Skip to file contents'
     )
@@ -2669,9 +2669,9 @@ def test_check_messages_shows_trial_mode_error(
     (mock_get_live_service, False),
 ])
 @pytest.mark.parametrize('number_of_rows, expected_error_message', [
-    (1, 'You can’t send this letter'),
-    (11, 'You can’t send these letters'),  # Less than trial mode limit
-    (111, 'You can’t send these letters'),  # More than trial mode limit
+    (1, 'You cannot send this letter'),
+    (11, 'You cannot send these letters'),  # Less than trial mode limit
+    (111, 'You cannot send these letters'),  # More than trial mode limit
 ])
 def test_check_messages_shows_trial_mode_error_for_letters(
     client_request,
@@ -2960,7 +2960,7 @@ def test_letters_from_csv_files_dont_have_download_link(
     assert normalize_spaces(
         page.select_one('.banner-dangerous').text
     ) == normalize_spaces(
-        'You can’t send this letter '
+        'You cannot send this letter '
         'In trial mode you can only preview how your letters will look '
         'Skip to file contents'
     )
@@ -3052,7 +3052,7 @@ def test_send_one_off_letter_errors_in_trial_mode(
     )
 
     assert normalize_spaces(page.select('.banner-dangerous')) == normalize_spaces(
-        'You can’t send this letter '
+        'You cannot send this letter '
         'In trial mode you can only preview how your letters will look'
     )
 
@@ -3358,7 +3358,7 @@ def test_send_notification_redirects_to_view_page(
 
 
 TRIAL_MODE_MSG = (
-    'Can’t send to this recipient when service is in trial mode – '
+    'Cannot send to this recipient when service is in trial mode – '
     'see https://www.notifications.service.gov.uk/trial-mode'
 )
 TOO_LONG_MSG = 'Content for template has a character count greater than the limit of 612'
@@ -3368,13 +3368,13 @@ SERVICE_DAILY_LIMIT_MSG = 'Exceeded send limits (1000) for today'
 @pytest.mark.parametrize('exception_msg, expected_h1, expected_err_details', [
     (
         TRIAL_MODE_MSG,
-        'You can’t send to this phone number',
+        'You cannot send to this phone number',
         'In trial mode you can only send to yourself and members of your team'
     ),
     (
         TOO_LONG_MSG,
         'Message too long',
-        'Text messages can’t be longer than 612 characters. Your message is 654 characters.'
+        'Text messages cannot be longer than 612 characters. Your message is 654 characters.'
     ),
     (
         SERVICE_DAILY_LIMIT_MSG,
@@ -3442,7 +3442,7 @@ def test_send_notification_shows_email_error_in_trial_mode(
     )
 
     assert normalize_spaces(page.select('.banner-dangerous h1')[0].text) == (
-        'You can’t send to this email address'
+        'You cannot send to this email address'
     )
     assert normalize_spaces(page.select('.banner-dangerous p')[0].text) == (
         'In trial mode you can only send to yourself and members of your team'
