@@ -517,7 +517,7 @@ def test_organisation_settings_for_platform_admin(
             )),
             ('unknown', (
                 'No (but we have some service-specific agreements in place) '
-                'Users won’t be prompted to sign the agreement'
+                'Users will not be prompted to sign the agreement'
             )),
         ),
         'no',
