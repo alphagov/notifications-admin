@@ -228,7 +228,7 @@ def test_should_show_api_keys_page(
         'Live – sends to anyone',
         (
             'Team and whitelist – limits who you can send to '
-            'Can’t be used to send letters'
+            'Cannot be used to send letters'
         ),
         'Test – pretends to send messages',
     ]),
@@ -487,7 +487,7 @@ def test_should_validate_whitelist_items(
     ('main.received_text_messages_callback'),
 ])
 @pytest.mark.parametrize('url, bearer_token, expected_errors', [
-    ("https://example.com", "", "Can’t be empty"),
+    ("https://example.com", "", "Cannot be empty"),
     ("http://not_https.com", "1234567890", "Must be a valid https URL"),
     ("https://test.com", "123456789", "Must be at least 10 characters"),
 ])

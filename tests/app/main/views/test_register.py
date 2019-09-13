@@ -405,7 +405,7 @@ def test_cannot_register_with_sms_auth_and_missing_mobile_number(
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     err = page.select_one('.error-message')
-    assert err.text.strip() == 'Can’t be empty'
+    assert err.text.strip() == 'Cannot be empty'
     assert err.attrs['data-error-label'] == 'mobile_number'
 
 

@@ -826,7 +826,7 @@ def test_letter_validation_preview_doesnt_call_template_preview_when_file_doesnt
     validate_letter.assert_not_called()
 
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    assert page.find('div', class_='banner-dangerous').text.strip() == "Document didn't pass the virus scan"
+    assert page.find('div', class_='banner-dangerous').text.strip() == "Document did not pass the virus scan"
 
 
 def test_clear_cache_shows_form(client_request, platform_admin_user, mocker):

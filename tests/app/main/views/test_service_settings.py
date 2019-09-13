@@ -2055,7 +2055,7 @@ def test_no_senders_message_shows(
 
 
 @pytest.mark.parametrize('reply_to_input, expected_error', [
-    ('', 'Can’t be empty'),
+    ('', 'Cannot be empty'),
     ('testtest', 'Enter a valid email address'),
 ])
 def test_incorrect_reply_to_email_address_input(
@@ -2075,7 +2075,7 @@ def test_incorrect_reply_to_email_address_input(
 
 
 @pytest.mark.parametrize('contact_block_input, expected_error', [
-    ('', 'Can’t be empty'),
+    ('', 'Cannot be empty'),
     ('1 \n 2 \n 3 \n 4 \n 5 \n 6 \n 7 \n 8 \n 9 \n 0 \n a', 'Contains 11 lines, maximum is 10')
 ])
 def test_incorrect_letter_contact_block_input(
@@ -2097,11 +2097,11 @@ def test_incorrect_letter_contact_block_input(
 @pytest.mark.parametrize('sms_sender_input, expected_error', [
     ('elevenchars', None),
     ('11 chars', None),
-    ('', 'Can’t be empty'),
+    ('', 'Cannot be empty'),
     ('abcdefghijkhgkg', 'Enter 11 characters or fewer'),
     (r' ¯\_(ツ)_/¯ ', 'Use letters and numbers only'),
     ('blood.co.uk', None),
-    ('00123', "Can't start with 00")
+    ('00123', "Cannot start with 00")
 ])
 def test_incorrect_sms_sender_input(
     sms_sender_input,
@@ -2845,7 +2845,7 @@ def test_inbound_sms_sender_is_not_editable(
     if hide_textbox:
         assert normalize_spaces(
             page.select_one('form[method="post"] p').text
-        ) == "GOVUK This phone number receives replies and can’t be changed"
+        ) == "GOVUK This phone number receives replies and cannot be changed"
 
 
 def test_shows_research_mode_indicator(
@@ -4257,7 +4257,7 @@ def test_empty_letter_contact_block_returns_error(
         _expected_status=200,
     )
     error_message = page.find('span', class_='error-message').text.strip()
-    assert error_message == 'Can’t be empty'
+    assert error_message == 'Cannot be empty'
 
 
 def test_show_sms_prefixing_setting_page(

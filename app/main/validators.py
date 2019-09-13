@@ -71,7 +71,7 @@ class ValidEmail(Email):
 
 class NoCommasInPlaceHolders:
 
-    def __init__(self, message='You can’t put commas between double brackets'):
+    def __init__(self, message='You cannot put commas between double brackets'):
         self.message = message
 
     def __call__(self, form, field):
@@ -84,7 +84,7 @@ class OnlySMSCharacters:
         non_sms_characters = sorted(list(SanitiseSMS.get_non_compatible_characters(field.data)))
         if non_sms_characters:
             raise ValidationError(
-                'You can’t use {} in text messages. {} will not show up properly on everyone’s phones.'.format(
+                'You cannot use {} in text messages. {} will not show up properly on everyone’s phones.'.format(
                     formatted_list(non_sms_characters, conjunction='or', before_each='', after_each=''),
                     ('It' if len(non_sms_characters) == 1 else 'They')
                 )
@@ -105,7 +105,7 @@ class LettersNumbersAndFullStopsOnly:
 
 class DoesNotStartWithDoubleZero:
 
-    def __init__(self, message="Can't start with 00"):
+    def __init__(self, message="Cannot start with 00"):
         self.message = message
 
     def __call__(self, form, field):
