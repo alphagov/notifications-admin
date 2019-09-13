@@ -578,7 +578,7 @@ def test_notifification_page_shows_error_message_if_precompiled_letter_cannot_be
     )
 
     error_message = page.find('p', class_='notification-status-cancelled').text
-    assert normalize_spaces(error_message) == "Validation failed – this isn’t a PDF file that Notify can read"
+    assert normalize_spaces(error_message) == "Validation failed – this is not a PDF file that Notify can read"
 
 
 def test_should_404_for_unknown_extension(
