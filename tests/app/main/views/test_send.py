@@ -321,19 +321,19 @@ def test_upload_files_in_different_formats(
     else:
         assert not mock_s3_upload.called
         assert normalize_spaces(page.select_one('.banner-dangerous').text) == (
-            'Couldn’t read {}. Try using a different file format.'.format(filename)
+            'Could not read {}. Try using a different file format.'.format(filename)
         )
 
 
 @pytest.mark.parametrize('exception, expected_error_message', [
     (partial(UnicodeDecodeError, 'codec', b'', 1, 2, 'reason'), (
-        'Couldn’t read example.xlsx. Try using a different file format.'
+        'Could not read example.xlsx. Try using a different file format.'
     )),
     (BadZipFile, (
-        'Couldn’t read example.xlsx. Try using a different file format.'
+        'Could not read example.xlsx. Try using a different file format.'
     )),
     (XLRDError, (
-        'Couldn’t read example.xlsx. Try using a different file format.'
+        'Could not read example.xlsx. Try using a different file format.'
     )),
     (XLDateError, (
         'example.xlsx contains numbers or dates that Notify cannot understand. '
