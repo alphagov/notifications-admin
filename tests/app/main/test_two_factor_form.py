@@ -42,7 +42,7 @@ def test_form_is_valid_returns_no_errors(
     (
         mock_check_verify_code,
         {},
-        'Can’t be empty',
+        'Cannot be empty',
     ),
     (
         mock_check_verify_code,
