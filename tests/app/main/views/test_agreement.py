@@ -108,6 +108,34 @@ def test_show_agreement_page(
         assert link['href'] == url()
 
 
+@pytest.mark.parametrize('org_type, expected_endpoint', (
+    ('nhs_gp', 'main.add_organisation_from_gp_service'),
+    ('nhs_local', 'main.add_organisation_from_nhs_local_service'),
+))
+def test_unknown_gps_and_trusts_are_redirected(
+    client_request,
+    mocker,
+    fake_uuid,
+    mock_has_jobs,
+    service_one,
+    org_type,
+    expected_endpoint,
+):
+    mocker.patch('app.organisations_client.get_service_organisation', return_value=None)
+    service_one['organisation_id'] = None
+    service_one['organisation_type'] = org_type
+    client_request.get(
+        'main.service_agreement',
+        service_id=SERVICE_ONE_ID,
+        _expected_status=302,
+        _expected_redirect=url_for(
+            expected_endpoint,
+            service_id=SERVICE_ONE_ID,
+            _external=True,
+        ),
+    )
+
+
 @pytest.mark.parametrize('crown, expected_status, expected_file_fetched, expected_file_served', (
     (
         True, 200, 'crown.pdf',
@@ -200,7 +228,7 @@ def test_show_accept_agreement_page(
     assert page.select('.multiple-choice')[1]['data-target'] == 'on-behalf-of'
     assert [
         field['name']
-        for field in page.select('#on-behalf-of.conditional-radio-panel input')
+        for field in page.select('#on-behalf-of.conditional-radios-panel input')
     ] == [
         'on_behalf_of_name', 'on_behalf_of_email'
     ]

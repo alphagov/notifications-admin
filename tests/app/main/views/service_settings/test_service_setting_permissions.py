@@ -47,7 +47,7 @@ def test_service_set_permission_requires_platform_admin(
 ])
 def test_service_set_permission(
     mocker,
-    logged_in_platform_admin_client,
+    platform_admin_client,
     service_one,
     mock_get_inbound_number_for_service,
     permission,
@@ -55,7 +55,7 @@ def test_service_set_permission(
     on
 ):
     force_permission = mocker.patch('app.models.service.Service.force_permission')
-    response = logged_in_platform_admin_client.post(
+    response = platform_admin_client.post(
         url_for('main.service_set_permission', service_id=service_one['id'], permission=permission),
         data={'enabled': form_data}
     )

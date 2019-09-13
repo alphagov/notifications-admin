@@ -82,7 +82,7 @@ def test_find_users_by_email_validates_against_empty_search_submission(
     mocker
 ):
     client_request.login(platform_admin_user)
-    document = client_request.post('main.find_users_by_email', _data={"search": ""}, _expected_status=400)
+    document = client_request.post('main.find_users_by_email', _data={"search": ""}, _expected_status=200)
 
     expected_message = "You need to enter full or partial email address to search by."
     assert document.find('span', {'class': 'error-message'}).text.strip() == expected_message
@@ -153,11 +153,11 @@ def test_user_information_page_displays_if_there_are_failed_login_attempts(
 
 
 def test_user_information_page_shows_archive_link_for_active_users(
-    logged_in_platform_admin_client,
+    platform_admin_client,
     api_user_active,
     mock_get_organisations_and_services_for_user,
 ):
-    response = logged_in_platform_admin_client.get(
+    response = platform_admin_client.get(
         url_for('main.user_information', user_id=api_user_active['id'])
     )
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
@@ -186,11 +186,11 @@ def test_user_information_page_does_not_show_archive_link_for_inactive_users(
 
 
 def test_archive_user_prompts_for_confirmation(
-    logged_in_platform_admin_client,
+    platform_admin_client,
     api_user_active,
     mock_get_organisations_and_services_for_user,
 ):
-    response = logged_in_platform_admin_client.get(
+    response = platform_admin_client.get(
         url_for('main.archive_user', user_id=api_user_active['id'])
     )
 
@@ -200,14 +200,14 @@ def test_archive_user_prompts_for_confirmation(
 
 
 def test_archive_user_posts_to_user_client(
-    logged_in_platform_admin_client,
+    platform_admin_client,
     api_user_active,
     mocker,
     mock_events,
 ):
     mock_user_client = mocker.patch('app.user_api_client.post')
 
-    response = logged_in_platform_admin_client.post(
+    response = platform_admin_client.post(
         url_for('main.archive_user', user_id=api_user_active['id'])
     )
 
@@ -219,7 +219,7 @@ def test_archive_user_posts_to_user_client(
 
 
 def test_archive_user_does_not_create_event_if_user_client_raises_exception(
-    logged_in_platform_admin_client,
+    platform_admin_client,
     api_user_active,
     mocker,
     mock_events,
@@ -227,7 +227,7 @@ def test_archive_user_does_not_create_event_if_user_client_raises_exception(
     mock_user_client = mocker.patch('app.user_api_client.post', side_effect=Exception())
 
     with pytest.raises(Exception):
-        response = logged_in_platform_admin_client.post(
+        response = platform_admin_client.post(
             url_for('main.archive_user', user_id=api_user_active.id)
         )
 

@@ -4,7 +4,7 @@
 
   let disableSubmitButtons = function(event) {
 
-    $submitButton = $(this).find(':submit');
+    var $submitButton = $(this).find(':submit');
 
     if ($submitButton.data('clicked') == 'true') {
 

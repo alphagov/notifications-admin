@@ -1,42 +1,24 @@
 %tick-cross {
-
   @include core-19;
   display: inline-block;
   background-size: 19px 19px;
   background-repeat: no-repeat;
   background-position: 0 6px;
   padding: 6px 0 5px 25px;
-
-  @include ie-lte(8) {
-    background-position: 0 3px;
-  }
-
 }
 
 .tick-cross {
 
   &-tick {
-
     @extend %tick-cross;
     background-image: file-url('tick.png');
-
-    @include ie-lte(8) {
-      background-image: file-url('tick-16px.png');
-    }
-
   }
 
   &-cross {
-
     @extend %tick-cross;
     color: $secondary-text-colour;
     background-image: file-url('cross-grey.png');
     box-shadow: inset 20px 0 0 0 rgba(255, 255, 255, 0.6);
-
-    @include ie-lte(8) {
-      background-image: file-url('cross-grey-16px.png');
-    }
-
   }
 
   &-list {

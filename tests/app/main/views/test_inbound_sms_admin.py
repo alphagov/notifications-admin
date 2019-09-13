@@ -25,9 +25,9 @@ sample_inbound_sms = {'data': [{"id": "activated",
                                ]}
 
 
-def test_inbound_sms_admin(logged_in_platform_admin_client, mocker):
+def test_inbound_sms_admin(platform_admin_client, mocker):
     mocker.patch("app.inbound_number_client.get_all_inbound_sms_number_service", return_value=sample_inbound_sms)
-    response = logged_in_platform_admin_client.get(url_for("main.inbound_sms_admin"))
+    response = platform_admin_client.get(url_for("main.inbound_sms_admin"))
     assert response.status_code == 200
 
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')

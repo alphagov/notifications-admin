@@ -260,7 +260,7 @@
 
       <p>
         {% if current_user.has_permissions('manage_service') %}
-          To remove these restrictions, you can send us a 
+          To remove these restrictions, you can send us a
           <a href="{{ url_for('.request_to_go_live', service_id=current_service.id) }}">request to go live</a>.
         {% else %}
           Your service manager can ask to have these restrictions removed.
@@ -324,15 +324,7 @@
               {% endif %}
               {% if current_service.organisation_type %}
                 <div class="hint">
-                  {{ {
-                    'central': 'Central government',
-                    'local': 'Local government',
-                    'nhs_central': 'NHS – central government agency or public body',
-                    'nhs_local': 'NHS Trust, GP practice or Clinical Commissioning Group',
-                    'emergency_service': 'Emergency service',
-                    'school_or_college': 'School or college',
-                    'other': 'Other'
-                  }.get(current_service.organisation_type) }}
+                  {{ current_service.organisation_type_label }}
                 </div>
               {% endif %}
             {% endcall %}

@@ -439,6 +439,10 @@ class Service(JSONModel):
     def organisation_type(self):
         return self.organisation.organisation_type or self._dict['organisation_type']
 
+    @property
+    def organisation_type_label(self):
+        return dict(Organisation.TYPES).get(self.organisation_type)
+
     @cached_property
     def inbound_number(self):
         return inbound_number_client.get_inbound_sms_number_for_service(self.id)['data'].get('number', '')
@@ -586,6 +590,13 @@ class Service(JSONModel):
 
     def get_api_key(self, id):
         return self._get_by_id(self.api_keys, id)
+
+    @property
+    def able_to_accept_agreement(self):
+        return (
+            self.organisation.agreement_signed is not None
+            or self.organisation_type in {'nhs_gp', 'nhs_local'}
+        )
 
     @property
     def request_to_go_live_tags(self):

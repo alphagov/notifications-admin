@@ -48,6 +48,9 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         """
         return self.get('/service', params=params_dict)
 
+    def find_services_by_name(self, service_name):
+        return self.get('/service/find-services-by-name', params={"service_name": service_name})
+
     def get_live_services_data(self, params_dict=None):
         """
         Retrieve a list of live services data with contact names and notification counts.
@@ -257,6 +260,12 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             template_id=template_id
         )
         return self.get(endpoint)
+
+    def get_precompiled_template(self, service_id):
+        """
+        Returns the precompiled template for a service, creating it if it doesn't already exist
+        """
+        return self.get('/service/{}/template/precompiled'.format(service_id))
 
     @cache.set('service-{service_id}-templates')
     def get_service_templates(self, service_id):

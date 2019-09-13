@@ -59,6 +59,23 @@ def test_send_notification(mocker, logged_in_client, active_user_with_permission
     )
 
 
+def test_send_precompiled_letter(mocker, logged_in_client, active_user_with_permissions):
+    mock_post = mocker.patch('app.notify_client.notification_api_client.NotificationApiClient.post')
+    NotificationApiClient().send_precompiled_letter(
+        'abcd-1234',
+        'my_file.pdf',
+        'file-ID'
+    )
+    mock_post.assert_called_once_with(
+        url='/service/abcd-1234/send-pdf-letter',
+        data={
+            'filename': 'my_file.pdf',
+            'file_id': 'file-ID',
+            'created_by': active_user_with_permissions['id']
+        }
+    )
+
+
 def test_get_notification(mocker):
     mock_get = mocker.patch('app.notify_client.notification_api_client.NotificationApiClient.get')
     NotificationApiClient().get_notification('foo', 'bar')

@@ -55,7 +55,7 @@ def test_get_should_render_add_service_template(
         'local',
         'nhs_central',
         'nhs_local',
-        'nhs_local',
+        'nhs_gp',
         'emergency_service',
         'school_or_college',
         'other',
@@ -80,6 +80,13 @@ def test_get_should_not_render_radios_if_org_type_known(
 ))
 @pytest.mark.parametrize('inherited, posted, persisted, sms_limit', (
     (None, 'central', 'central', 250000),
+    (None, 'nhs_central', 'nhs_central', 250000),
+    (None, 'nhs_gp', 'nhs_gp', 25000),
+    (None, 'nhs_local', 'nhs_local', 25000),
+    (None, 'local', 'local', 25000),
+    (None, 'emergency_service', 'emergency_service', 25000),
+    (None, 'school_or_college', 'school_or_college', 25000),
+    (None, 'other', 'other', 25000),
     ('central', None, 'central', 250000),
     ('nhs_central', None, 'nhs_central', 250000),
     ('nhs_local', None, 'nhs_local', 25000),
@@ -205,7 +212,7 @@ def test_get_should_only_show_nhs_org_types_radios_if_user_has_nhs_email(
     ] == [
         'nhs_central',
         'nhs_local',
-        'nhs_local',
+        'nhs_gp',
     ]
 
 

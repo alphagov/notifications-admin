@@ -17,7 +17,7 @@ from tests.conftest import (
 
 
 def test_organisation_page_shows_all_organisations(
-    logged_in_platform_admin_client,
+    platform_admin_client,
     mocker
 ):
     orgs = [
@@ -29,7 +29,7 @@ def test_organisation_page_shows_all_organisations(
     get_organisations = mocker.patch(
         'app.models.organisation.Organisations.client', return_value=orgs
     )
-    response = logged_in_platform_admin_client.get(
+    response = platform_admin_client.get(
         url_for('.organisations')
     )
 
@@ -92,7 +92,7 @@ def test_page_to_create_new_organisation(
         ('radio', 'organisation_type', 'local'),
         ('radio', 'organisation_type', 'nhs_central'),
         ('radio', 'organisation_type', 'nhs_local'),
-        ('radio', 'organisation_type', 'nhs_local'),
+        ('radio', 'organisation_type', 'nhs_gp'),
         ('radio', 'organisation_type', 'emergency_service'),
         ('radio', 'organisation_type', 'school_or_college'),
         ('radio', 'organisation_type', 'other'),
@@ -158,6 +158,212 @@ def test_create_new_organisation_validates(
         ('crown_status', 'Not a valid choice'),
     ]
     assert mock_create_organisation.called is False
+
+
+@pytest.mark.parametrize('organisation_type, organisation, expected_status', (
+    ('nhs_gp', None, 200),
+    ('central', None, 403),
+    ('nhs_gp', organisation_json(organisation_type='nhs_gp'), 403),
+))
+def test_gps_can_create_own_organisations(
+    client_request,
+    mocker,
+    service_one,
+    organisation_type,
+    organisation,
+    expected_status,
+):
+    mocker.patch('app.organisations_client.get_service_organisation', return_value=organisation)
+    service_one['organisation_type'] = organisation_type
+
+    page = client_request.get(
+        '.add_organisation_from_gp_service',
+        service_id=SERVICE_ONE_ID,
+        _expected_status=expected_status,
+    )
+
+    if expected_status == 403:
+        return
+
+    assert page.select_one('input[type=text]')['name'] == 'name'
+    assert normalize_spaces(
+        page.select_one('label[for=name]').text
+    ) == (
+        'What’s your practice called?'
+    )
+
+
+@pytest.mark.parametrize('organisation_type, organisation, expected_status', (
+    ('nhs_local', None, 200),
+    ('nhs_gp', None, 403),
+    ('central', None, 403),
+    ('nhs_local', organisation_json(organisation_type='nhs_local'), 403),
+))
+def test_nhs_local_can_create_own_organisations(
+    client_request,
+    mocker,
+    service_one,
+    organisation_type,
+    organisation,
+    expected_status,
+):
+    mocker.patch('app.organisations_client.get_service_organisation', return_value=organisation)
+    mocker.patch(
+        'app.models.organisation.Organisations.client',
+        return_value=[
+            organisation_json('t1', 'Trust 1', organisation_type='nhs_local'),
+            organisation_json('t2', 'Trust 2', organisation_type='nhs_local'),
+            organisation_json('gp1', 'GP 1', organisation_type='nhs_gp'),
+            organisation_json('c1', 'Central 1'),
+        ],
+    )
+    service_one['organisation_type'] = organisation_type
+
+    page = client_request.get(
+        '.add_organisation_from_nhs_local_service',
+        service_id=SERVICE_ONE_ID,
+        _expected_status=expected_status,
+    )
+
+    if expected_status == 403:
+        return
+
+    assert normalize_spaces(page.select_one('main p').text) == (
+        'Which NHS Trust or Clinical Commissioning Group do you work for?'
+    )
+    assert page.select_one('[data-module=live-search]')['data-targets'] == (
+        '.multiple-choice'
+    )
+    assert [
+        (
+            normalize_spaces(radio.select_one('label').text),
+            radio.select_one('input')['value']
+        )
+        for radio in page.select('.multiple-choice')
+    ] == [
+        ('Trust 1', 't1'),
+        ('Trust 2', 't2'),
+    ]
+    assert normalize_spaces(page.select_one('.js-stick-at-bottom-when-scrolling button').text) == (
+        'Continue'
+    )
+
+
+@pytest.mark.parametrize('data, expected_service_name', (
+    (
+        {
+            'same_as_service_name': False,
+            'name': 'Dr. Example',
+        },
+        'Dr. Example',
+    ),
+    (
+        {
+            'same_as_service_name': True,
+            'name': 'This is ignored',
+        },
+        'service one',
+    ),
+))
+def test_gps_can_name_their_organisation(
+    client_request,
+    mocker,
+    service_one,
+    mock_update_service_organisation,
+    data,
+    expected_service_name,
+):
+    mocker.patch('app.organisations_client.get_service_organisation', return_value=None)
+    service_one['organisation_type'] = 'nhs_gp'
+    mock_create_organisation = mocker.patch(
+        'app.organisations_client.create_organisation',
+        return_value=organisation_json(ORGANISATION_ID),
+    )
+
+    client_request.post(
+        '.add_organisation_from_gp_service',
+        service_id=SERVICE_ONE_ID,
+        _data=data,
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.service_agreement',
+            service_id=SERVICE_ONE_ID,
+            _external=True,
+        )
+    )
+
+    mock_create_organisation.assert_called_once_with(
+        name=expected_service_name,
+        organisation_type='nhs_gp',
+        agreement_signed=False,
+        crown=False,
+    )
+    mock_update_service_organisation.assert_called_once_with(SERVICE_ONE_ID, ORGANISATION_ID)
+
+
+@pytest.mark.parametrize('data, expected_error', (
+    (
+        {
+            'name': 'Dr. Example',
+        },
+        'Not a valid choice',
+    ),
+    (
+        {
+            'same_as_service_name': False,
+            'name': '',
+        },
+        'Can’t be empty',
+    ),
+))
+def test_validation_of_gps_creating_organisations(
+    client_request,
+    mocker,
+    service_one,
+    data,
+    expected_error,
+):
+    mocker.patch('app.organisations_client.get_service_organisation', return_value=None)
+    service_one['organisation_type'] = 'nhs_gp'
+    page = client_request.post(
+        '.add_organisation_from_gp_service',
+        service_id=SERVICE_ONE_ID,
+        _data=data,
+        _expected_status=200,
+    )
+    assert normalize_spaces(page.select_one('.error-message').text) == expected_error
+
+
+def test_nhs_local_assigns_to_selected_organisation(
+    client_request,
+    mocker,
+    service_one,
+    mock_get_organisation,
+    mock_update_service_organisation,
+):
+    mocker.patch('app.organisations_client.get_service_organisation', return_value=None)
+    mocker.patch(
+        'app.models.organisation.Organisations.client',
+        return_value=[
+            organisation_json(ORGANISATION_ID, 'Trust 1', organisation_type='nhs_local'),
+        ],
+    )
+    service_one['organisation_type'] = 'nhs_local'
+
+    client_request.post(
+        '.add_organisation_from_nhs_local_service',
+        service_id=SERVICE_ONE_ID,
+        _data={
+            'organisations': ORGANISATION_ID,
+        },
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.service_agreement',
+            service_id=SERVICE_ONE_ID,
+            _external=True
+        )
+    )
+    mock_update_service_organisation.assert_called_once_with(SERVICE_ONE_ID, ORGANISATION_ID)
 
 
 def test_organisation_services_shows_live_services_only(
@@ -282,7 +488,7 @@ def test_organisation_settings_for_platform_admin(
             ('local', 'Local government'),
             ('nhs_central', 'NHS – central government agency or public body'),
             ('nhs_local', 'NHS Trust or Clinical Commissioning Group'),
-            ('nhs_local', 'GP practice'),
+            ('nhs_gp', 'GP practice'),
             ('emergency_service', 'Emergency service'),
             ('school_or_college', 'School or college'),
             ('other', 'Other'),
@@ -594,12 +800,12 @@ def test_update_organisation_domains(
 
 
 def test_update_organisation_name(
-    logged_in_platform_admin_client,
+    platform_admin_client,
     organisation_one,
     mock_get_organisation,
     mock_organisation_name_is_unique
 ):
-    response = logged_in_platform_admin_client.post(
+    response = platform_admin_client.post(
         url_for('.edit_organisation_name', org_id=organisation_one['id']),
         data={'name': 'TestNewOrgName'}
     )
@@ -614,11 +820,11 @@ def test_update_organisation_name(
 
 
 def test_update_organisation_with_incorrect_input(
-    logged_in_platform_admin_client,
+    platform_admin_client,
     organisation_one,
     mock_get_organisation,
 ):
-    response = logged_in_platform_admin_client.post(
+    response = platform_admin_client.post(
         url_for('.edit_organisation_name', org_id=organisation_one['id']),
         data={'name': ''}
     )
@@ -632,12 +838,12 @@ def test_update_organisation_with_incorrect_input(
 
 
 def test_update_organisation_with_non_unique_name(
-    logged_in_platform_admin_client,
+    platform_admin_client,
     organisation_one,
     mock_get_organisation,
     mock_organisation_name_is_not_unique
 ):
-    response = logged_in_platform_admin_client.post(
+    response = platform_admin_client.post(
         url_for('.edit_organisation_name', org_id=organisation_one['id']),
         data={'name': 'TestNewOrgName'}
     )
@@ -653,17 +859,17 @@ def test_update_organisation_with_non_unique_name(
 
 
 def test_confirm_update_organisation(
-    logged_in_platform_admin_client,
+    platform_admin_client,
     organisation_one,
     mock_get_organisation,
     mock_verify_password,
     mock_update_organisation,
     mocker
 ):
-    with logged_in_platform_admin_client.session_transaction() as session:
+    with platform_admin_client.session_transaction() as session:
         session['organisation_name_change'] = 'newName'
 
-    response = logged_in_platform_admin_client.post(
+    response = platform_admin_client.post(
         url_for(
             '.confirm_edit_organisation_name',
             org_id=organisation_one['id'],
@@ -681,17 +887,17 @@ def test_confirm_update_organisation(
 
 
 def test_confirm_update_organisation_with_incorrect_password(
-    logged_in_platform_admin_client,
+    platform_admin_client,
     organisation_one,
     mock_get_organisation,
     mocker
 ):
-    with logged_in_platform_admin_client.session_transaction() as session:
+    with platform_admin_client.session_transaction() as session:
         session['organisation_name_change'] = 'newName'
 
     mocker.patch('app.user_api_client.verify_password', return_value=False)
 
-    response = logged_in_platform_admin_client.post(
+    response = platform_admin_client.post(
         url_for(
             '.confirm_edit_organisation_name',
             org_id=organisation_one['id']
@@ -707,13 +913,13 @@ def test_confirm_update_organisation_with_incorrect_password(
 
 
 def test_confirm_update_organisation_with_name_already_in_use(
-    logged_in_platform_admin_client,
+    platform_admin_client,
     organisation_one,
     mock_get_organisation,
     mock_verify_password,
     mocker
 ):
-    with logged_in_platform_admin_client.session_transaction() as session:
+    with platform_admin_client.session_transaction() as session:
         session['organisation_name_change'] = 'newName'
 
     mocker.patch(
@@ -727,7 +933,7 @@ def test_confirm_update_organisation_with_name_already_in_use(
         )
     )
 
-    response = logged_in_platform_admin_client.post(
+    response = platform_admin_client.post(
         url_for(
             '.confirm_edit_organisation_name',
             org_id=organisation_one['id']
@@ -739,11 +945,11 @@ def test_confirm_update_organisation_with_name_already_in_use(
 
 
 def test_get_edit_organisation_go_live_notes_page(
-    logged_in_platform_admin_client,
+    platform_admin_client,
     mock_get_organisation,
     organisation_one,
 ):
-    response = logged_in_platform_admin_client.get(
+    response = platform_admin_client.get(
         url_for(
             '.edit_organisation_go_live_notes',
             org_id=organisation_one['id']
@@ -761,14 +967,14 @@ def test_get_edit_organisation_go_live_notes_page(
     ('  ', None)
 ])
 def test_post_edit_organisation_go_live_notes_updates_go_live_notes(
-    logged_in_platform_admin_client,
+    platform_admin_client,
     mock_get_organisation,
     mock_update_organisation,
     organisation_one,
     input_note,
     saved_note,
 ):
-    response = logged_in_platform_admin_client.post(
+    response = platform_admin_client.post(
         url_for(
             '.edit_organisation_go_live_notes',
             org_id=organisation_one['id'],

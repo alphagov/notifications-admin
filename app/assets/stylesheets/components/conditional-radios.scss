@@ -17,8 +17,8 @@ $top-spacing: $gutter - 5px;
 
   &-panel {
     border-left: $border-thickness solid $border-colour;
-    margin: 0 0 (-$top-spacing - $gutter) ($gutter-half + ($border-thickness / 2));
-    padding: $top-spacing 0 0 ($gutter - ($border-thickness / 2));
+    margin: 0 0 (-$gutter-half) ($gutter-half + ($border-thickness / 2));
+    padding: $gutter-half 0 0 ($gutter - ($border-thickness / 2));
     position: relative;
     top: -$top-spacing;
     z-index: 1;

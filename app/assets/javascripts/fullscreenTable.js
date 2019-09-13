@@ -44,7 +44,7 @@
             .clone()
             .addClass('fullscreen-fixed-table')
             .removeClass('fullscreen-scrollable-table')
-            .attr('role', 'presentation')
+            .attr('aria-hidden', true)
         )
         .append(
           '<div class="fullscreen-right-shadow" />'

@@ -7,6 +7,7 @@ from werkzeug.exceptions import abort
 
 from app import (
     current_organisation,
+    current_service,
     email_branding_client,
     letter_branding_client,
     org_invite_api_client,
@@ -15,6 +16,8 @@ from app import (
 )
 from app.main import main
 from app.main.forms import (
+    AddGPOrganisationForm,
+    AddNHSLocalOrganisationForm,
     ConfirmPasswordForm,
     GoLiveNotesForm,
     InviteOrgUserForm,
@@ -60,6 +63,62 @@ def add_organisation():
     return render_template(
         'views/organisations/add-organisation.html',
         form=form
+    )
+
+
+@main.route('/services/<uuid:service_id>/add-gp-organisation', methods=['GET', 'POST'])
+@user_has_permissions('manage_service')
+def add_organisation_from_gp_service(service_id):
+    if (not current_service.organisation_type == 'nhs_gp') or current_service.organisation:
+        abort(403)
+
+    form = AddGPOrganisationForm(service_name=current_service.name)
+
+    if form.validate_on_submit():
+        Organisation.create(
+            form.get_organisation_name(),
+            crown=False,
+            organisation_type='nhs_gp',
+            agreement_signed=False,
+        ).associate_service(
+            service_id
+        )
+        return redirect(url_for(
+            '.service_agreement',
+            service_id=service_id,
+        ))
+
+    return render_template(
+        'views/organisations/add-gp-organisation.html',
+        form=form
+    )
+
+
+@main.route('/services/<uuid:service_id>/add-nhs-local-organisation', methods=['GET', 'POST'])
+@user_has_permissions('manage_service')
+def add_organisation_from_nhs_local_service(service_id):
+    if (not current_service.organisation_type == 'nhs_local') or current_service.organisation:
+        abort(403)
+
+    form = AddNHSLocalOrganisationForm(organisation_choices=[
+        (organisation.id, organisation.name)
+        for organisation in Organisations()
+        if organisation.organisation_type == 'nhs_local'
+    ])
+
+    search_form = SearchByNameForm()
+
+    if form.validate_on_submit():
+        Organisation.from_id(form.organisations.data).associate_service(service_id)
+        return redirect(url_for(
+            '.service_agreement',
+            service_id=service_id,
+        ))
+
+    return render_template(
+        'views/organisations/add-nhs-local-organisation.html',
+        form=form,
+        search_form=search_form,
     )
 
 

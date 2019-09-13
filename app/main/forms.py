@@ -45,6 +45,7 @@ from app.main.validators import (
     ValidEmail,
     ValidGovEmail,
 )
+from app.models.organisation import Organisation
 from app.models.roles_and_permissions import permissions, roles
 from app.utils import guess_name_from_email_address
 
@@ -242,33 +243,23 @@ class ForgivingIntegerField(StringField):
         return super().__call__(value=value, **kwargs)
 
 
-def organisation_type(label='Who runs this service?'):
-    return RadioField(
-        label,
-        choices=[
-            ('central', 'Central government'),
-            ('local', 'Local government'),
-            ('nhs_central', 'NHS – central government agency or public body'),
-            ('nhs_local', 'NHS Trust or Clinical Commissioning Group'),
-            ('nhs_local', 'GP practice'),
-            ('emergency_service', 'Emergency service'),
-            ('school_or_college', 'School or college'),
-            ('other', 'Other'),
-        ],
-        validators=[DataRequired()],
-    )
-
-
-def nhs_organisation_type(label='Who runs this service?'):
-    return RadioField(
-        label,
-        choices=[
-            ('nhs_central', 'NHS – central government agency or public body'),
-            ('nhs_local', 'NHS Trust or Clinical Commissioning Group'),
-            ('nhs_local', 'GP practice'),
-        ],
-        validators=[DataRequired()],
-    )
+class OrganisationTypeField(RadioField):
+    def __init__(
+        self,
+        *args,
+        include_only=None,
+        validators=None,
+        **kwargs
+    ):
+        super().__init__(
+            *args,
+            choices=[
+                (value, label) for value, label in Organisation.TYPES
+                if not include_only or value in include_only
+            ],
+            validators=[DataRequired()] + (validators or []),
+            **kwargs
+        )
 
 
 class FieldWithNoneOption():
@@ -365,6 +356,31 @@ class StripWhitespaceStringField(StringField):
             ),
         ))
         super(StringField, self).__init__(label, **kwargs)
+
+
+class OnOffField(RadioField):
+
+    def __init__(self, label, choices=None, *args, **kwargs):
+        super().__init__(label, choices=choices or [
+            (True, 'On'),
+            (False, 'Off'),
+        ], *args, **kwargs)
+
+    def process_formdata(self, valuelist):
+        if valuelist:
+            value = valuelist[0]
+            self.data = (value == 'True') if value in ['True', 'False'] else value
+
+    def iter_choices(self):
+        for value, label in self.choices:
+            # This overrides WTForms default behaviour which is to check
+            # self.coerce(value) == self.data
+            # where self.coerce returns a string for a boolean input
+            yield (
+                value,
+                label,
+                (self.data in {value, self.coerce(value)})
+            )
 
 
 class LoginForm(StripWhitespaceForm):
@@ -543,8 +559,51 @@ class RenameOrganisationForm(StripWhitespaceForm):
         ])
 
 
+class AddGPOrganisationForm(StripWhitespaceForm):
+
+    def __init__(self, *args, service_name='unknown', **kwargs):
+        super().__init__(*args, **kwargs)
+        self.same_as_service_name.label.text = 'Is your GP practice called ‘{}’?'.format(service_name)
+        self.service_name = service_name
+
+    def get_organisation_name(self):
+        if self.same_as_service_name.data:
+            return self.service_name
+        return self.name.data
+
+    same_as_service_name = OnOffField(
+        'Is your GP practice called the same name as your service?',
+        choices=(
+            (True, 'Yes'),
+            (False, 'No'),
+        ),
+    )
+
+    name = StringField(
+        'What’s your practice called?',
+    )
+
+    def validate_name(self, field):
+        if self.same_as_service_name.data is False:
+            if not field.data:
+                raise ValidationError('Can’t be empty')
+        else:
+            field.data = ''
+
+
+class AddNHSLocalOrganisationForm(StripWhitespaceForm):
+
+    def __init__(self, *args, organisation_choices=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.organisations.choices = organisation_choices
+
+    organisations = RadioField(
+        'Which NHS Trust or Clinical Commissioning Group do you work for?',
+    )
+
+
 class OrganisationOrganisationTypeForm(StripWhitespaceForm):
-    organisation_type = organisation_type(label='What type of organisation is this?')
+    organisation_type = OrganisationTypeField('What type of organisation is this?')
 
 
 class OrganisationCrownStatusForm(StripWhitespaceForm):
@@ -605,11 +664,14 @@ class CreateServiceForm(StripWhitespaceForm):
         validators=[
             DataRequired(message='Can’t be empty')
         ])
-    organisation_type = organisation_type()
+    organisation_type = OrganisationTypeField('Who runs this service?')
 
 
 class CreateNhsServiceForm(CreateServiceForm):
-    organisation_type = nhs_organisation_type()
+    organisation_type = OrganisationTypeField(
+        'Who runs this service?',
+        include_only={'nhs_central', 'nhs_local', 'nhs_gp'},
+    )
 
 
 class NewOrganisationForm(
@@ -947,19 +1009,6 @@ class ServiceLetterContactBlockForm(StripWhitespaceForm):
             )
 
 
-class OnOffField(RadioField):
-    def __init__(self, label, *args, **kwargs):
-        super().__init__(label, choices=[
-            (True, 'On'),
-            (False, 'Off'),
-        ], *args, **kwargs)
-
-    def process_formdata(self, valuelist):
-        if valuelist:
-            value = valuelist[0]
-            self.data = (value == 'True') if value in ['True', 'False'] else value
-
-
 class ServiceOnOffSettingForm(StripWhitespaceForm):
 
     def __init__(self, name, *args, truthy='On', falsey='Off', **kwargs):
@@ -1060,9 +1109,9 @@ class ServiceLetterBrandingDetails(StripWhitespaceForm):
 
 class PDFUploadForm(StripWhitespaceForm):
     file = FileField_wtf(
-        'Upload a letter in PDF format to check if it fits in the printable area',
+        'Upload a letter in PDF format',
         validators=[
-            FileAllowed(['pdf'], 'PDF documents only!'),
+            FileAllowed(['pdf'], 'Letters must be saved as a PDF'),
             DataRequired(message="You need to upload a file to submit")
         ]
     )
@@ -1127,7 +1176,10 @@ class RequiredDateFilterForm(StripWhitespaceForm):
 
 class SearchByNameForm(StripWhitespaceForm):
 
-    search = SearchField('Search by name')
+    search = SearchField(
+        'Search by name',
+        validators=[DataRequired("You need to enter full or partial name to search by.")],
+    )
 
 
 class SearchUsersByEmailForm(StripWhitespaceForm):
