@@ -2021,7 +2021,7 @@ def test_remove_default_from_default_letter_contact_block(
     (
         'main.service_email_reply_to',
         no_reply_to_email_addresses,
-        'You haven’t added any reply-to email addresses yet'
+        'You have not added any reply-to email addresses yet'
     ),
     (
         'main.service_letter_contact_details',
@@ -2031,7 +2031,7 @@ def test_remove_default_from_default_letter_contact_block(
     (
         'main.service_sms_senders',
         no_sms_senders,
-        'You haven’t added any text message senders yet'
+        'You have not added any text message senders yet'
     ),
 ])
 def test_no_senders_message_shows(
