@@ -32,7 +32,7 @@ class CsvFileValidator:
 
     def __call__(self, form, field):
         if not Spreadsheet.can_handle(field.data.filename):
-            raise ValidationError("{} isn’t a spreadsheet that Notify can read".format(field.data.filename))
+            raise ValidationError("{} is not a spreadsheet that Notify can read".format(field.data.filename))
 
 
 class ValidGovEmail:
