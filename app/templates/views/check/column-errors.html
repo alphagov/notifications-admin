@@ -38,7 +38,7 @@
       {% elif not count_of_recipients %}
 
         <h1 class='banner-title' data-module="track-error" data-error-type="No rows" data-error-label="{{ upload_id }}">
-          Your file is missing rows
+          Your file is missing some rows
         </h1>
         {% if recipients.missing_column_headers %}
           <p>
@@ -56,7 +56,7 @@
       {% elif not recipients.has_recipient_columns %}
 
         <h1 class='banner-title' data-module="track-error" data-error-type="Missing recipient columns" data-error-label="{{ upload_id }}">
-          Your file is missing columns
+          Your file is missing some columns
         </h1>
           <p>
             It needs {{ (
@@ -95,7 +95,7 @@
       {% elif recipients.missing_column_headers %}
 
         <h1 class='banner-title' data-module="track-error" data-error-type="Missing placeholder columns" data-error-label="{{ upload_id }}">
-          Your file is missing columns
+          Your file is missing some columns
         </h1>
           <p>
             The column names need to match the double brackets in your template.
