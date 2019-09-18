@@ -259,16 +259,6 @@ details .arrow {
   display: inline-block;
 }
 
-.bordered-image {
-  padding: 5px;
-  outline: 1px solid $border-colour;
-  max-width: 100%;
-
-  label & {
-    cursor: pointer;
-  }
-}
-
 .bordered-text-box {
   padding: 5px;
   outline: 2px solid $black;

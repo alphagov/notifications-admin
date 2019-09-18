@@ -1357,24 +1357,75 @@ class LinkOrganisationsForm(StripWhitespaceForm):
     )
 
 
-branding_options = (
-    ('govuk', 'GOV.UK only'),
-    ('both', 'GOV.UK and logo'),
-    ('org', 'Your logo'),
-    ('org_banner', 'Your logo on a colour'),
-)
-branding_options_dict = dict(branding_options)
-
-
 class BrandingOptionsEmail(StripWhitespaceForm):
 
-    options = RadioField(
-        'Branding options',
-        choices=branding_options,
-        validators=[
-            DataRequired()
-        ],
-    )
+    FALLBACK_OPTION_VALUE = 'something_else'
+    FALLBACK_OPTION = (FALLBACK_OPTION_VALUE, 'Something else')
+
+    options = RadioField('Choose your new email branding')
+    something_else = TextAreaField('Describe the branding you want')
+
+    def __init__(self, service, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.options.choices = tuple(self.get_available_choices(service))
+        if not self.something_else_is_only_option:
+            self.options.validators.append(DataRequired())
+
+    @staticmethod
+    def get_available_choices(service):
+
+        if (
+            service.organisation_type == Organisation.TYPE_CENTRAL and
+            service.organisation.email_branding_id is None and
+            service.email_branding_id is not None
+        ):
+            yield ('govuk', 'GOV.UK')
+
+        if (
+            service.organisation_type == Organisation.TYPE_CENTRAL and
+            service.organisation and
+            service.organisation.email_branding_id is None and
+            service.email_branding_name.lower() != 'GOV.UK and {}'.format(service.organisation.name).lower()
+        ):
+            yield ('govuk_and_org', 'GOV.UK and {}'.format(service.organisation.name))
+
+        if (
+            service.organisation_type in {
+                Organisation.TYPE_NHS_CENTRAL,
+                Organisation.TYPE_NHS_LOCAL,
+                Organisation.TYPE_NHS_GP,
+            } and service.email_branding_name != 'NHS'
+        ):
+            yield ('nhs', 'NHS')
+
+        if (
+            service.organisation and
+            service.organisation_type not in {
+                Organisation.TYPE_NHS_LOCAL,
+                Organisation.TYPE_NHS_CENTRAL,
+                Organisation.TYPE_NHS_GP,
+            } and (
+                service.email_branding_id is None or
+                service.email_branding_id != service.organisation.email_branding_id
+            )
+        ):
+            yield ('organisation', service.organisation.name)
+
+        yield BrandingOptionsEmail.FALLBACK_OPTION
+
+    @property
+    def something_else_is_only_option(self):
+        return self.options.choices == (self.FALLBACK_OPTION,)
+
+    def validate_something_else(self, field):
+        if (
+            self.something_else_is_only_option or
+            self.options.data == self.FALLBACK_OPTION_VALUE
+        ) and not field.data:
+            raise ValidationError('Cannot be empty')
+
+        if self.options.data != self.FALLBACK_OPTION_VALUE:
+            field.data = ''
 
 
 class ServiceDataRetentionForm(StripWhitespaceForm):

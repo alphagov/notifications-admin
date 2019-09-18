@@ -52,7 +52,6 @@ from app.main.forms import (
     SetEmailBranding,
     SetLetterBranding,
     SMSPrefixForm,
-    branding_options_dict,
 )
 from app.utils import (
     DELIVERED_STATUSES,
@@ -1036,14 +1035,7 @@ def link_service_to_organisation(service_id):
 @user_has_permissions('manage_service')
 def branding_request(service_id):
 
-    branding_type = 'govuk'
-
-    if current_service.email_branding:
-        branding_type = current_service.email_branding['brand_type']
-
-    form = BrandingOptionsEmail(
-        options=branding_type
-    )
+    form = BrandingOptionsEmail(current_service)
 
     if form.validate_on_submit():
         zendesk_client.create_ticket(
@@ -1055,12 +1047,17 @@ def branding_request(service_id):
                 '\n---'
                 '\nCurrent branding: {current_branding}'
                 '\nBranding requested: {branding_requested}'
+                '{new_paragraph}'
+                '{detail}'
+                '\n'
             ).format(
                 organisation=current_service.organisation.as_info_for_branding_request(current_user.email_domain),
                 service_name=current_service.name,
                 dashboard_url=url_for('main.service_dashboard', service_id=current_service.id, _external=True),
                 current_branding=current_service.email_branding_name,
-                branding_requested=branding_options_dict[form.options.data],
+                branding_requested=dict(form.options.choices)[form.options.data],
+                new_paragraph='\n\n' if form.something_else.data else '',
+                detail=form.something_else.data or ''
             ),
             ticket_type=zendesk_client.TYPE_QUESTION,
             user_email=current_user.email_address,
