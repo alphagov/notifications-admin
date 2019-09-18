@@ -1422,7 +1422,7 @@ class BrandingOptionsEmail(StripWhitespaceForm):
             self.something_else_is_only_option or
             self.options.data == self.FALLBACK_OPTION_VALUE
         ) and not field.data:
-            raise ValidationError('Can’t be empty')
+            raise ValidationError('Cannot be empty')
 
         if self.options.data != self.FALLBACK_OPTION_VALUE:
             field.data = ''
