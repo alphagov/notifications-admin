@@ -36,7 +36,7 @@ class ElementNotFound(Exception):
     pass
 
 
-@pytest.fixture
+@pytest.fixture(scope='session')
 def app_(request):
     app = Flask('app')
     create_app(app)
@@ -46,8 +46,6 @@ def app_(request):
 
     app.test_client_class = TestClient
     yield app
-
-    ctx.pop()
 
 
 @pytest.fixture(scope='function')
