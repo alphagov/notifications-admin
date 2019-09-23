@@ -160,12 +160,12 @@ def send_messages(service_id, template_id):
                 original_file_name=form.file.data.filename,
             ))
         except (UnicodeDecodeError, BadZipFile, XLRDError):
-            flash('Couldn’t read {}. Try using a different file format.'.format(
+            flash('Could not read {}. Try using a different file format.'.format(
                 form.file.data.filename
             ))
         except (XLDateError):
             flash((
-                '{} contains numbers or dates that Notify can’t understand. '
+                '{} contains numbers or dates that Notify cannot understand. '
                 'Try formatting all columns as ‘text’ or export your file as CSV.'
             ).format(
                 form.file.data.filename

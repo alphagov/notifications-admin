@@ -1934,7 +1934,7 @@ def test_should_not_create_sms_template_with_emoji(
         },
         _expected_status=200,
     )
-    assert "You can’t use 🍜 in text messages." in page.text
+    assert "You cannot use 🍜 in text messages." in page.text
     assert mock_create_service_template.called is False
 
 
@@ -1958,7 +1958,7 @@ def test_should_not_update_sms_template_with_emoji(
         },
         _expected_status=200,
     )
-    assert "You can’t use 🍔 in text messages." in page.text
+    assert "You cannot use 🍔 in text messages." in page.text
     assert mock_update_service_template.called is False
 
 

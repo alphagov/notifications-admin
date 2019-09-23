@@ -96,7 +96,7 @@ def create_api_key(service_id):
             '<a href="/features/trial-mode">trial mode</a>'
         )
     if current_service.has_permission('letter'):
-        option_hints[KEY_TYPE_TEAM] = 'Can’t be used to send letters'
+        option_hints[KEY_TYPE_TEAM] = 'Cannot be used to send letters'
     if form.validate_on_submit():
         if form.key_type.data in disabled_options:
             abort(400)

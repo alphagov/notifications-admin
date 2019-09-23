@@ -18,7 +18,7 @@
   <div class="user-list">
     {% if not current_service.email_reply_to_addresses %}
       <div class="user-list-item">
-        <span class="hint">You haven’t added any reply-to email addresses yet</span>
+        <span class="hint">You have not added any reply-to email addresses yet</span>
       </div>
     {% endif %}
     {% for item in current_service.email_reply_to_addresses %}

@@ -30,7 +30,7 @@ def test_render_sign_in_template_for_new_user(
 def test_sign_in_explains_session_timeout(client):
     response = client.get(url_for('main.sign_in', next='/foo'))
     assert response.status_code == 200
-    assert 'We signed you out because you haven’t used Notify for a while.' in response.get_data(as_text=True)
+    assert 'We signed you out because you have not used Notify for a while.' in response.get_data(as_text=True)
 
 
 def test_sign_in_explains_other_browser(logged_in_client, api_user_active, mocker):

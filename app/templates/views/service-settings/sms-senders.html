@@ -18,7 +18,7 @@
   <div class="user-list">
     {% if not current_service.sms_senders %}
       <div class="user-list-item">
-        <span class="hint">You haven’t added any text message senders yet</span>
+        <span class="hint">You have not added any text message senders yet</span>
       </div>
     {% endif %}
     {% for item in current_service.sms_senders_with_hints %}

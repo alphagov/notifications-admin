@@ -19,7 +19,7 @@
     {% call form_wrapper() %}
       <div class="grid-row">
         <div class="column-five-sixths">
-          {{ textbox(form.name, width='1-1', hint='Your recipients won’t see this', rows=10) }}
+          {{ textbox(form.name, width='1-1', hint='Your recipients will not see this', rows=10) }}
           {{ textbox(form.subject, width='1-1', highlight_tags=True, rows=2) }}
           {{ textbox(form.template_content, highlight_tags=True, width='1-1', rows=8) }}
           {% if current_user.platform_admin %}

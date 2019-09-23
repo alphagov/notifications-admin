@@ -21,13 +21,13 @@ def test_form_class_not_mutated(app_):
 
 @pytest.mark.parametrize('service_can_send_international_sms, placeholder_name, template_type, value, expected_error', [
 
-    (False, 'email address', 'email', '', 'Can’t be empty'),
+    (False, 'email address', 'email', '', 'Cannot be empty'),
     (False, 'email address', 'email', '12345', 'Enter a valid email address'),
     (False, 'email address', 'email', '“bad”@email-address.com', 'Enter a valid email address'),
     (False, 'email address', 'email', 'test@example.com', None),
     (False, 'email address', 'email', 'test@example.gov.uk', None),
 
-    (False, 'phone number', 'sms', '', 'Can’t be empty'),
+    (False, 'phone number', 'sms', '', 'Cannot be empty'),
     (False, 'phone number', 'sms', '+1-2345-678890', 'Not a UK mobile number'),
     (False, 'phone number', 'sms', '07900900123', None),
     (False, 'phone number', 'sms', '+44(0)7900 900-123', None),
@@ -36,8 +36,8 @@ def test_form_class_not_mutated(app_):
     (True, 'phone number', 'sms', '+44(0)7900 900-123', None),
     (True, 'phone number', 'sms', '+1-2345-678890', None),
 
-    (False, 'anything else', 'sms', '', 'Can’t be empty'),
-    (False, 'anything else', 'email', '', 'Can’t be empty'),
+    (False, 'anything else', 'sms', '', 'Cannot be empty'),
+    (False, 'anything else', 'email', '', 'Cannot be empty'),
 
     (True, 'phone number', 'sms', 'invalid', 'Must not contain letters or symbols'),
     (True, 'phone number', 'email', 'invalid', None),

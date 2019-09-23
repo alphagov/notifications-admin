@@ -410,7 +410,7 @@ def letter_validation_preview(from_platform_admin):
         if not virus_free:
             return render_template(
                 view_location,
-                form=form, message="Document didn't pass the virus scan", pages=pages, result=result
+                form=form, message="Document did not pass the virus scan", pages=pages, result=result
             ), 400
 
         try:

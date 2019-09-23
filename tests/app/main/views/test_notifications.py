@@ -24,13 +24,13 @@ from tests.conftest import (
     (None, 'delivered', 'Delivered'),
     (None, 'failed', 'Failed'),
     (None, 'temporary-failure', 'Phone not accepting messages right now'),
-    (None, 'permanent-failure', 'Phone number doesn’t exist'),
+    (None, 'permanent-failure', 'Phone number does not exist'),
     (None, 'technical-failure', 'Technical failure'),
     ('team', 'delivered', 'Delivered'),
     ('live', 'delivered', 'Delivered'),
     ('test', 'sending', 'Sending (test)'),
     ('test', 'delivered', 'Delivered (test)'),
-    ('test', 'permanent-failure', 'Phone number doesn’t exist (test)'),
+    ('test', 'permanent-failure', 'Phone number does not exist (test)'),
 ])
 @pytest.mark.parametrize('user', [
     active_user_with_permissions,
@@ -578,7 +578,7 @@ def test_notifification_page_shows_error_message_if_precompiled_letter_cannot_be
     )
 
     error_message = page.find('p', class_='notification-status-cancelled').text
-    assert normalize_spaces(error_message) == "Validation failed – this isn’t a PDF file that Notify can read"
+    assert normalize_spaces(error_message) == "Validation failed – Notify cannot read this PDF file"
 
 
 def test_should_404_for_unknown_extension(

@@ -191,7 +191,7 @@ def test_should_show_empty_api_keys_page(
     response = client.get(url_for('main.api_keys', service_id=service_id))
 
     assert response.status_code == 200
-    assert 'You haven’t created any API keys yet' in response.get_data(as_text=True)
+    assert 'You have not created any API keys yet' in response.get_data(as_text=True)
     assert 'Create an API key' in response.get_data(as_text=True)
     mock_get_no_api_keys.assert_called_once_with(service_id)
 
@@ -228,7 +228,7 @@ def test_should_show_api_keys_page(
         'Live – sends to anyone',
         (
             'Team and whitelist – limits who you can send to '
-            'Can’t be used to send letters'
+            'Cannot be used to send letters'
         ),
         'Test – pretends to send messages',
     ]),
@@ -487,7 +487,7 @@ def test_should_validate_whitelist_items(
     ('main.received_text_messages_callback'),
 ])
 @pytest.mark.parametrize('url, bearer_token, expected_errors', [
-    ("https://example.com", "", "Can’t be empty"),
+    ("https://example.com", "", "Cannot be empty"),
     ("http://not_https.com", "1234567890", "Must be a valid https URL"),
     ("https://test.com", "123456789", "Must be at least 10 characters"),
 ])
