@@ -127,11 +127,11 @@
       caption_visible=False
     ) %}
       {% for sheets, second, first in [
-        ('1 sheet', '30', '56'),
-        ('2 sheets', '35', '61'),
-        ('3 sheets', '40', '66'),
-        ('4 sheets', '45', '71'),
-        ('5 sheets', '50', '76'),
+        ('1 sheet', '35', '61'),
+        ('2 sheets', '40', '66'),
+        ('3 sheets', '45', '71'),
+        ('4 sheets', '50', '76'),
+        ('5 sheets', '55', '81'),
       ] %}
         {% call row() %}
           {% call row_heading() %} {{ sheets }} (double-sided) {% endcall %}
@@ -142,7 +142,7 @@
     {% endcall %}
   </div>
   <div class="panel panel-border-wide">
-    <p>These prices will increase by 5 pence (plus VAT) on 1 October 2019.</p>
+    <p>These prices were updated on 1 October 2019.</p>
   </div>
   <p>Prices include:</p>
   <ul class="list list-bullet">
