@@ -72,7 +72,7 @@ def test_robots(client):
 
 @pytest.mark.parametrize('view', [
     'cookies', 'privacy', 'pricing', 'terms', 'roadmap',
-    'features', 'callbacks', 'documentation', 'security',
+    'features', 'documentation', 'security',
     'message_status', 'features_email', 'features_sms',
     'features_letters', 'how_to_pay',
 ])
@@ -94,6 +94,7 @@ def test_static_pages(
     ('information_security', 'using_notify'),
     ('old_using_notify', 'using_notify'),
     ('delivery_and_failure', 'message_status'),
+    ('callbacks', 'documentation'),
 ])
 def test_old_static_pages_redirect(
     client,
