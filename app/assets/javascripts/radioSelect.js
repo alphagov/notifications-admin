@@ -59,6 +59,9 @@
 
   let focusSelected = function(component) {
     $('[type=radio]:checked', component).focus();
+    if ('stickAtBottomWhenScrolling' in GOVUK) {
+      GOVUK.stickAtBottomWhenScrolling.recalculate();
+    }
   };
 
   Modules.RadioSelect = function() {
@@ -122,6 +125,9 @@
             'name': name
           });
           focusSelected(component);
+          if ('stickAtBottomWhenScrolling' in GOVUK) {
+            GOVUK.stickAtBottomWhenScrolling.recalculate();
+          }
 
         })
         .on('mousedown', '.js-option', function(event) {
