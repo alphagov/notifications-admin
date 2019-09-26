@@ -34,7 +34,7 @@ isort --check-only -rc ./app ./tests
 display_result $? 2 "Import order check"
 
 npm test
-display_result $? 3 "Front end code style check"
+display_result $? 3 "Javascript tests have failed"
 
 ## Code coverage
 py.test -n auto --maxfail=10 --cov=app --cov-report=term-missing tests/ --junitxml=test_results.xml --strict -p no:warnings

@@ -23,12 +23,8 @@
     {% endfor %}
   </ul>
     <p>A developer should be able to set up the API client and start sending test messages in around 30 minutes. A full integration can take a few days, depending on the other systems you’re using.</p>
-  <h2 class="heading-medium">Integrating directly with the API</h2>
-    <p>We recommend using the client libraries rather than integrating directly with the API.</p>
-    <p>There’s no documentation for using the API in this way. You’ll still need to read the client documentation to understand:</p>
-  <ul class="list list-bullet">
-    <li>what the API client does</li>
-    <li>what development work you’ll need to do</li>
-  </ul>
-  <p>To send a message you’ll need to create an HTTPS request and add an authorisation header with your API key. The API key is encoded with JSON Web Tokens (JWT).</p>
+  <h2 class="heading-medium">Integrate directly with the API</h2>
+    <p>If you cannot use the client libraries, you can integrate directly with the API instead.</p>
+<p>Read the <a href="https://docs.notifications.service.gov.uk/api_doc_template.html" target="_blank" rel="noopener">REST API documentation</a> (this link opens in a new tab).</p>
+
 {% endblock %}
