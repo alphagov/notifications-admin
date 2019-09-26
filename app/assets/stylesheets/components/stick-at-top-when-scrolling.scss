@@ -65,6 +65,12 @@ $sticky-padding: $gutter * 2 / 3;
     margin-right: $gutter-half;
   }
 
+  .back-to-top-link {
+    top: auto;
+    bottom: 5px;
+    right: 0;
+  }
+
 }
 
 .content-fixed,
