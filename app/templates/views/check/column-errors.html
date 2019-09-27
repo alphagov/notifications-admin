@@ -56,10 +56,10 @@
       {% elif not recipients.has_recipient_columns %}
 
         <h1 class='banner-title' data-module="track-error" data-error-type="Missing recipient columns" data-error-label="{{ upload_id }}">
-          Your file is missing some columns
+          There’s a problem with your column names
         </h1>
           <p>
-            It needs {{ (
+            Your file needs {{ (
               recipients.missing_column_headers
               if template.template_type == 'letter' else required_recipient_columns
             ) | formatted_list(
@@ -95,11 +95,8 @@
       {% elif recipients.missing_column_headers %}
 
         <h1 class='banner-title' data-module="track-error" data-error-type="Missing placeholder columns" data-error-label="{{ upload_id }}">
-          Your file is missing some columns
+          Your column names do not match the double brackets in your template
         </h1>
-          <p>
-            The column names need to match the double brackets in your template.
-          </p>
           <p>
             Your file is missing {{ recipients.missing_column_headers | formatted_list(
               conjunction='and',
