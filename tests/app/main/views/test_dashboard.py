@@ -774,7 +774,7 @@ def test_should_show_recent_jobs_on_dashboard(
             "thisisatest.csv",
     )):
         assert filename in table_rows[index].find_all('th')[0].text
-        assert 'Sent 1 January at 11:09' in table_rows[index].find_all('th')[0].text
+        assert 'Sent today at 11:09' in table_rows[index].find_all('th')[0].text
         for column_index, count in enumerate((1, 0, 0)):
             assert table_rows[index].find_all('td')[column_index].text.strip() == str(count)
 
