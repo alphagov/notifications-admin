@@ -15,7 +15,7 @@
     <div class="bottom-gutter-2-3">
       <div class="grid-row">
         {% if template.template_type == 'letter' %}
-          {% if current_user.has_permissions('send_messages', restrict_admin_usage=True) %}
+          {% if current_user.has_permissions('send_messages', restrict_admin_usage=True) and page_count < 11 %}
             <div class="column-half">
               <a href="{{ url_for(".set_sender", service_id=current_service.id, template_id=template.id) }}" class="pill-separate-item">
                 Send

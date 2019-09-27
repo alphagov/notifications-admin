@@ -74,6 +74,7 @@ def view_template(service_id, template_id):
         ),
         template_postage=template["postage"],
         user_has_template_permission=user_has_template_permission,
+        page_count=get_page_count_for_letter(template),
     )
 
 
