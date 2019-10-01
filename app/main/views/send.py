@@ -850,6 +850,7 @@ def _check_notification(service_id, template_id, exception=None):
         email_reply_to = get_email_reply_to_address_from_session()
     elif db_template['template_type'] == 'sms':
         sms_sender = get_sms_sender_from_session()
+    page_count = get_page_count_for_letter(db_template)
     template = get_template(
         db_template,
         current_service,
@@ -862,7 +863,7 @@ def _check_notification(service_id, template_id, exception=None):
             template_id=template_id,
             filetype='png',
         ),
-        page_count=get_page_count_for_letter(db_template),
+        page_count=page_count,
     )
 
     back_link = get_back_link(service_id, template, len(fields_to_fill_in(template)))
@@ -881,6 +882,7 @@ def _check_notification(service_id, template_id, exception=None):
         template=template,
         back_link=back_link,
         help=get_help_argument(),
+        page_count=page_count,
         **(get_template_error_dict(exception) if exception else {}),
     )
 

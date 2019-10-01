@@ -3066,6 +3066,49 @@ def test_send_one_off_letter_errors_in_trial_mode(
     assert page.select_one('a[download]').text == 'Download as a PDF'
 
 
+def test_send_one_off_letter_errors_if_letter_longer_than_10_pages(
+    client_request,
+    mocker,
+    mock_get_live_service,
+    mock_get_service_letter_template,
+    mock_has_permissions,
+    fake_uuid,
+    mock_get_users_by_service,
+    mock_get_service_statistics,
+    mock_get_job_doesnt_exist,
+    mock_s3_set_metadata,
+):
+
+    mocker.patch(
+        'app.main.views.send.get_page_count_for_letter',
+        return_value=11,
+    )
+
+    with client_request.session_transaction() as session:
+        session['recipient'] = None
+        session['placeholders'] = {
+            'address_line_1': 'First Last',
+            'address_line_2': '123 Street',
+            'postcode': 'SW1 1AA',
+        }
+
+    page = client_request.get(
+        'main.check_notification',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _test_page_title=False,
+    )
+
+    assert normalize_spaces(page.select('.banner-dangerous')) == normalize_spaces(
+        'This letter is too long '
+        'Letters must be 10 pages or less'
+    )
+
+    assert len(page.select('.letter img')) == 10
+
+    assert not page.select('[type=submit]')
+
+
 def test_check_messages_shows_over_max_row_error(
     client_request,
     mock_get_users_by_service,
