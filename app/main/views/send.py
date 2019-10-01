@@ -522,6 +522,7 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
         email_reply_to = get_email_reply_to_address_from_session()
     elif db_template['template_type'] == 'sms':
         sms_sender = get_sms_sender_from_session()
+    page_count = get_page_count_for_letter(db_template)
     template = get_template(
         db_template,
         current_service,
@@ -536,7 +537,7 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
         ) if not letters_as_pdf else None,
         email_reply_to=email_reply_to,
         sms_sender=sms_sender,
-        page_count=get_page_count_for_letter(db_template),
+        page_count=page_count,
     )
     recipients = RecipientCSV(
         contents,
@@ -589,7 +590,8 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
         preview_row=preview_row,
         sent_previously=job_api_client.has_sent_previously(
             service_id, template.id, db_template['version'], request.args.get('original_file_name', '')
-        )
+        ),
+        page_count=page_count
     )
 
 
@@ -601,12 +603,12 @@ def check_messages(service_id, template_id, upload_id, row_index=2):
     data = _check_messages(service_id, template_id, upload_id, row_index)
 
     if (
-        data['recipients'].too_many_rows or
-        not data['count_of_recipients'] or
-        not data['recipients'].has_recipient_columns or
-        data['recipients'].duplicate_recipient_column_headers or
-        data['recipients'].missing_column_headers or
-        data['sent_previously']
+        data['recipients'].too_many_rows
+        or not data['count_of_recipients']
+        or not data['recipients'].has_recipient_columns
+        or data['recipients'].duplicate_recipient_column_headers
+        or data['recipients'].missing_column_headers
+        or data['sent_previously']
     ):
         return render_template('views/check/column-errors.html', **data)
 
@@ -614,8 +616,8 @@ def check_messages(service_id, template_id, upload_id, row_index=2):
         return render_template('views/check/row-errors.html', **data)
 
     if (
-        data['errors'] or
-        data['trying_to_send_letters_in_trial_mode']
+        data['errors']
+        or data['trying_to_send_letters_in_trial_mode']
     ):
         return render_template('views/check/column-errors.html', **data)
 
