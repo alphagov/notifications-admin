@@ -231,7 +231,7 @@ describe('TemplateFolderForm', () => {
   
     // We need parts of the module to be made sticky, but by the module code,
     // not the sticky JS code that operates on the HTML at page load.
-    // Because of this, they wll need to be marked with classes
+    // Because of this, they will need to be marked with classes
     test("the HTML for the module should contain placeholder classes on each part that needs to be sticky", () => {
 
       expect(templateFolderForm.querySelectorAll('#move_to_folder_radios > .js-will-stick-at-bottom-when-scrolling').length).toEqual(2);
