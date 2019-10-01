@@ -2779,9 +2779,7 @@ def test_check_messages_does_not_allow_to_send_letter_longer_than_10_pages(
         _test_page_title=False,
     )
 
-    error = page.select('.banner-dangerous')
-
-    assert normalize_spaces(error[0].text) == 'This letter is too long Letters must be 10 pages or less'
+    assert page.select('#letter-too-long')
 
     assert len(page.select('.letter img')) == 10  # if letter longer than 10 pages, only 10 first pages are displayed
     assert not page.select('[type=submit]')
@@ -3151,11 +3149,7 @@ def test_send_one_off_letter_errors_if_letter_longer_than_10_pages(
         _test_page_title=False,
     )
 
-    assert normalize_spaces(page.select('.banner-dangerous')) == normalize_spaces(
-        'This letter is too long '
-        'Letters must be 10 pages or less'
-    )
-
+    assert page.select('#letter-too-long')
     assert len(page.select('.letter img')) == 10
 
     assert not page.select('[type=submit]')

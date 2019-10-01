@@ -543,6 +543,7 @@ def test_view_letter_template_does_not_display_send_button_if_template_over_10_p
     )
 
     assert "Send" not in page.text
+    assert page.select('#letter-too-long')
 
 
 def test_edit_letter_template_postage_page_displays_correctly(

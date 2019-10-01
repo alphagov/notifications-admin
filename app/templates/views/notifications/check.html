@@ -49,6 +49,14 @@
         {% include "partials/check/message-too-long.html" %}
       {% endcall %}
     </div>
+  {% elif letter_too_long %}
+    {% set error = 'letter-too-long' %}
+    {{ govuk_back_link(back_link) }}
+    <div class="bottom-gutter">
+      {% call banner_wrapper(type='dangerous', id='letter-too-long') %}
+          {% include "partials/check/letter-too-long.html" %}
+      {% endcall %}
+    </div>
   {% else %}
     {{ page_header(
       'Preview of ‘{}’'.format(template.name),
@@ -66,7 +74,7 @@
         help='3' if help else 0
       )}}" class='page-footer'>
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-      {% if not error and (not page_count or page_count <= letter_max_pages) %}
+      {% if not error %}
         <button type="submit" class="button">Send 1 {{ message_count_label(1, template.template_type, suffix='') }}</button>
       {% endif %}
       {% if template.template_type == 'letter' %}

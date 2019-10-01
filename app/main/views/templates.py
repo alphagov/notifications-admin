@@ -2,15 +2,7 @@ from datetime import datetime, timedelta
 from string import ascii_uppercase
 
 from dateutil.parser import parse
-from flask import (
-    abort,
-    current_app,
-    flash,
-    redirect,
-    render_template,
-    request,
-    url_for,
-)
+from flask import abort, flash, redirect, render_template, request, url_for
 from flask_login import current_user
 from markupsafe import Markup
 from notifications_python_client.errors import HTTPError
@@ -41,6 +33,7 @@ from app.template_previews import TemplatePreview, get_page_count_for_letter
 from app.utils import (
     email_or_sms_not_enabled,
     get_template,
+    is_letter_too_long,
     should_skip_template_page,
     user_has_permissions,
     user_is_platform_admin,
@@ -82,8 +75,7 @@ def view_template(service_id, template_id):
         ),
         template_postage=template["postage"],
         user_has_template_permission=user_has_template_permission,
-        page_count=get_page_count_for_letter(template),
-        letter_max_pages=current_app.config['LETTER_MAX_PAGES'],
+        letter_too_long=is_letter_too_long(get_page_count_for_letter(template)),
     )
 
 

@@ -54,6 +54,7 @@ from app.utils import (
     get_errors_for_csv,
     get_help_argument,
     get_template,
+    is_letter_too_long,
     should_skip_template_page,
     unicode_truncate,
     user_has_permissions,
@@ -591,8 +592,7 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
         sent_previously=job_api_client.has_sent_previously(
             service_id, template.id, db_template['version'], request.args.get('original_file_name', '')
         ),
-        page_count=page_count,
-        letter_max_pages=current_app.config['LETTER_MAX_PAGES'],
+        letter_too_long=is_letter_too_long(page_count),
     )
 
 
@@ -885,8 +885,7 @@ def _check_notification(service_id, template_id, exception=None):
         template=template,
         back_link=back_link,
         help=get_help_argument(),
-        page_count=page_count,
-        letter_max_pages=current_app.config['LETTER_MAX_PAGES'],
+        letter_too_long=is_letter_too_long(page_count),
         **(get_template_error_dict(exception) if exception else {}),
     )
 

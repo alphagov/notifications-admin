@@ -232,8 +232,7 @@ def test_post_upload_letter_with_letter_that_is_too_long(mocker, client_request)
     assert mock_page_count.called
 
     assert page.find('h1').text == 'tests/test_pdf_files/one_page_pdf.pdf'
-    assert page.find("div", {"class": "banner-dangerous bottom-gutter"})
-    assert "This letter is too long" in page.text
+    assert page.select('#letter-too-long')
     assert not page.find('button', {'type': 'submit'})
 
 
