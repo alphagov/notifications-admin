@@ -376,7 +376,7 @@ describe('TemplateFolderForm', () => {
 
     });
 
-    describe("When the 'Cancel' link is clicked", () => {
+    describe("When the 'Cancel' link is clicked after choosing to add a new template", () => {
 
       let addNewTemplateButton;
 
@@ -458,7 +458,7 @@ describe('TemplateFolderForm', () => {
 
     });
 
-    describe("When the 'Cancel' link is clicked", () => {
+    describe("When the 'Cancel' link is clicked after choosing to add a new folder", () => {
 
       let addNewFolderButton;
 
@@ -648,7 +648,7 @@ describe('TemplateFolderForm', () => {
 
       });
 
-      describe("When the 'Cancel' link is clicked", () => {
+      describe("When the 'Cancel' link is clicked after choosing to move a template or folder", () => {
 
         let moveToFolderButton;
 
@@ -720,7 +720,7 @@ describe('TemplateFolderForm', () => {
 
       });
 
-      describe("When the 'Cancel' link is clicked", () => {
+      describe("When the 'Cancel' link is clicked after choosing to add a template or folder to a new folder", () => {
 
         let moveToNewFolderButton;
 
