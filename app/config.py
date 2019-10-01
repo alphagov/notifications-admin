@@ -53,6 +53,7 @@ class Config(object):
     EMAIL_2FA_EXPIRY_SECONDS = 1800  # 30 Minutes
     HEADER_COLOUR = '#FFBF47'  # $yellow
     HTTP_PROTOCOL = 'http'
+    LETTER_MAX_PAGES = 10
     MAX_FAILED_LOGIN_COUNT = 10
     NOTIFY_APP_NAME = 'admin'
     NOTIFY_LOG_LEVEL = 'DEBUG'

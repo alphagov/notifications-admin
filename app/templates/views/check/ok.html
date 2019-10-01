@@ -39,7 +39,7 @@
           wrapping_class='bottom-gutter-2-3'
         ) }}
       {% endif %}
-      {% if (template.template_type != 'letter' or not request.args.from_test) and page_count < 11 %}
+      {% if (template.template_type != 'letter' or not request.args.from_test) and (not page_count or page_count <= letter_max_pages) %}
       <button type="submit" class="button">Send {{ count_of_recipients }} {{ message_count_label(count_of_recipients, template.template_type, suffix='') }}</button>
       {% else %}
         <a href="{{ url_for('main.check_messages_preview', service_id=current_service.id, template_id=template.id, upload_id=upload_id, filetype='pdf') }}" download class="button">Download as a PDF</a>

@@ -2,7 +2,15 @@ from datetime import datetime, timedelta
 from string import ascii_uppercase
 
 from dateutil.parser import parse
-from flask import abort, flash, redirect, render_template, request, url_for
+from flask import (
+    abort,
+    current_app,
+    flash,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
 from flask_login import current_user
 from markupsafe import Markup
 from notifications_python_client.errors import HTTPError
@@ -75,6 +83,7 @@ def view_template(service_id, template_id):
         template_postage=template["postage"],
         user_has_template_permission=user_has_template_permission,
         page_count=get_page_count_for_letter(template),
+        letter_max_pages=current_app.config['LETTER_MAX_PAGES'],
     )
 
 
