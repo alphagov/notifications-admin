@@ -530,7 +530,7 @@ describe('TemplateFolderForm', () => {
 
     });
 
-    describe("Clear link", () => {
+    describe("'Clear selection' link", () => {
 
       let clearLink;
 
