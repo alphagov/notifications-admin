@@ -48,6 +48,10 @@ $sticky-padding: $gutter * 2 / 3;
     margin-top: ($sticky-padding * 2) * -1;
   }
 
+  fieldset:focus {
+    outline: none;
+  }
+
   .page-footer {
     margin-bottom: 0;
     min-height: 50px;
