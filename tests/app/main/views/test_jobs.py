@@ -24,19 +24,19 @@ from tests.conftest import (
         ),
         (
             'export 1/1/2016.xls '
-            'Sent 12 December at 12:12pm 1 0 0'
+            'Sent today at 12:12pm 1 0 0'
         ),
         (
             'all email addresses.xlsx '
-            'Sent 12 December at 12:12pm 1 0 0'
+            'Sent today at 12:12pm 1 0 0'
         ),
         (
             'applicants.ods '
-            'Sent 12 December at 12:12pm 1 0 0'
+            'Sent today at 12:12pm 1 0 0'
         ),
         (
             'thisisatest.csv '
-            'Sent 12 December at 12:12pm 1 0 0'
+            'Sent today at 12:12pm 1 0 0'
         ),
     )),
     (active_caseworking_user, (
@@ -56,19 +56,19 @@ from tests.conftest import (
         ),
         (
             'export 1/1/2016.xls '
-            'Sent 12 December at 12:12pm 1 0 0'
+            'Sent today at 12:12pm 1 0 0'
         ),
         (
             'all email addresses.xlsx '
-            'Sent 12 December at 12:12pm 1 0 0'
+            'Sent today at 12:12pm 1 0 0'
         ),
         (
             'applicants.ods '
-            'Sent 12 December at 12:12pm 1 0 0'
+            'Sent today at 12:12pm 1 0 0'
         ),
         (
             'thisisatest.csv '
-            'Sent 12 December at 12:12pm 1 0 0'
+            'Sent today at 12:12pm 1 0 0'
         ),
     )),
 ])
@@ -129,19 +129,19 @@ def test_jobs_page_doesnt_show_scheduled_on_page_2(
         ),
         (
             'export 1/1/2016.xls '
-            'Sent 12 December at 12:12pm 1 0 0'
+            'Sent today at 12:12pm 1 0 0'
         ),
         (
             'all email addresses.xlsx '
-            'Sent 12 December at 12:12pm 1 0 0'
+            'Sent today at 12:12pm 1 0 0'
         ),
         (
             'applicants.ods '
-            'Sent 12 December at 12:12pm 1 0 0'
+            'Sent today at 12:12pm 1 0 0'
         ),
         (
             'thisisatest.csv '
-            'Sent 12 December at 12:12pm 1 0 0'
+            'Sent today at 12:12pm 1 0 0'
         ),
     )):
         assert normalize_spaces(page.select('tr')[index].text) == row
