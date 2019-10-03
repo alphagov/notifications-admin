@@ -1,6 +1,7 @@
 import itertools
 import os
 import urllib
+import jinja2
 from datetime import datetime, timedelta, timezone
 from functools import partial
 from numbers import Number
@@ -85,6 +86,8 @@ from app.notify_client.template_statistics_api_client import (
 )
 from app.notify_client.user_api_client import user_api_client
 from app.utils import get_logo_cdn_domain, id_safe
+
+from govuk_frontend_jinja.flask_ext import init_govuk_frontend
 
 login_manager = LoginManager()
 csrf = CSRFProtect()
