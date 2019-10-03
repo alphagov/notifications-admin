@@ -56,32 +56,38 @@
       {% elif not recipients.has_recipient_columns %}
 
         <h1 class='banner-title' data-module="track-error" data-error-type="Missing recipient columns" data-error-label="{{ upload_id }}">
-          Your file needs {{ (
-            recipients.missing_column_headers
-            if template.template_type == 'letter' else required_recipient_columns
-          ) | formatted_list(
-            prefix='a column called',
-            prefix_plural='columns called'
-          ) }}
+          There’s a problem with your column names
         </h1>
-        <p>
-          Right now it has {{ recipients.column_headers | formatted_list(
-            prefix='one column, called ',
-            prefix_plural='columns called '
-          ) }}.
-        </p>
+          <p>
+            Your file needs {{ (
+              recipients.missing_column_headers
+              if template.template_type == 'letter' else required_recipient_columns
+            ) | formatted_list(
+              prefix='a column called',
+              prefix_plural='columns called'
+            ) }}.
+          </p>
+          <p>
+            Right now it has {{ recipients.column_headers | formatted_list(
+              prefix='one column, called ',
+              prefix_plural='columns called '
+            ) }}.
+          </p>
 
       {% elif recipients.duplicate_recipient_column_headers %}
 
         <h1 class='banner-title' data-module="track-error" data-error-type="Duplicate recipient columns" data-error-label="{{ upload_id }}">
-          Your file has more than one column called {{ (
-            recipients.duplicate_recipient_column_headers
-          ) | formatted_list(
-            conjunction='or',
-            prefix='',
-            prefix_plural=''
-          ) }}
+          There’s a problem with your column names
         </h1>
+           <p>
+            We found more than one column called {{ (
+            recipients.duplicate_recipient_column_headers
+            ) | formatted_list(
+              conjunction='or',
+              prefix='',
+              prefix_plural=''
+            ) }}.
+          </p>
         <p>
           Delete or rename one of these columns and try again.
         </p>
@@ -89,16 +95,15 @@
       {% elif recipients.missing_column_headers %}
 
         <h1 class='banner-title' data-module="track-error" data-error-type="Missing placeholder columns" data-error-label="{{ upload_id }}">
-          The columns in your file need to match the double brackets in
-          your template
+          Your column names need to match the double brackets in your template
         </h1>
-        <p>
-          Your file is missing {{ recipients.missing_column_headers | formatted_list(
-            conjunction='and',
-            prefix='a column called ',
-            prefix_plural='columns called '
-          ) }}.
-        </p>
+          <p>
+            Your file is missing {{ recipients.missing_column_headers | formatted_list(
+              conjunction='and',
+              prefix='a column called ',
+              prefix_plural='columns called '
+            ) }}.
+          </p>
 
       {% elif sent_previously %}
 
@@ -141,7 +146,7 @@
         {{ file_upload(
           form.file,
           action=url_for('.send_messages', service_id=current_service.id, template_id=template.id),
-          button_text='Re-upload your file'
+          button_text='Upload your file again'
         ) }}
       {% endif %}
     </div>
