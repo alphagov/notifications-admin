@@ -3196,6 +3196,7 @@ def test_service_preview_letter_branding_saves(
     client_request,
     platform_admin_user,
     mock_get_organisation,
+    mock_get_organisation_services,
     mock_update_service,
     mock_update_organisation,
     mock_get_all_letter_branding,
@@ -3229,6 +3230,11 @@ def test_service_preview_letter_branding_saves(
         mock_update_organisation.assert_called_once_with(
             ORGANISATION_ID,
             letter_branding_id=expected_post_data,
+            cached_service_ids=[
+                '12345',
+                '67890',
+                '596364a0-858e-42c8-9062-a8fe822260eb',
+            ],
         )
         assert mock_update_service.called is False
 
@@ -3407,6 +3413,7 @@ def test_should_set_branding_and_organisations(
     platform_admin_user,
     service_one,
     mock_get_organisation,
+    mock_get_organisation_services,
     mock_update_service,
     mock_update_organisation,
     posted_value,
@@ -3439,7 +3446,12 @@ def test_should_set_branding_and_organisations(
     elif endpoint == 'main.organisation_preview_email_branding':
         mock_update_organisation.assert_called_once_with(
             ORGANISATION_ID,
-            email_branding_id=submitted_value
+            email_branding_id=submitted_value,
+            cached_service_ids=[
+                '12345',
+                '67890',
+                '596364a0-858e-42c8-9062-a8fe822260eb',
+            ],
         )
         assert mock_update_service.called is False
     else:

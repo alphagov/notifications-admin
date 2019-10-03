@@ -49,7 +49,7 @@ class OrganisationsClient(NotifyAdminAPIClient):
     def update_organisation(self, org_id, cached_service_ids=None, **kwargs):
         api_response = self.post(url="/organisations/{}".format(org_id), data=kwargs)
 
-        if kwargs.get('organisation_type') and cached_service_ids:
+        if cached_service_ids:
             redis_client.delete(*map('service-{}'.format, cached_service_ids))
 
         return api_response

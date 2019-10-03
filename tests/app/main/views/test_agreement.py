@@ -361,6 +361,7 @@ def test_accept_agreement_page_validates(
             agreement_signed_version=1.2,
             agreement_signed_on_behalf_of_name='Firstname Lastname',
             agreement_signed_on_behalf_of_email_address='test@example.com',
+            cached_service_ids=None,
         )
     ),
     (
@@ -375,6 +376,7 @@ def test_accept_agreement_page_validates(
             agreement_signed_version=1.2,
             agreement_signed_on_behalf_of_name='',
             agreement_signed_on_behalf_of_email_address='',
+            cached_service_ids=None,
         )
     ),
     (
@@ -389,6 +391,7 @@ def test_accept_agreement_page_validates(
             agreement_signed_version=1.2,
             agreement_signed_on_behalf_of_name='',
             agreement_signed_on_behalf_of_email_address='',
+            cached_service_ids=None,
         )
     ),
 ))
@@ -483,6 +486,7 @@ def test_confirm_agreement_page_persists(
         agreement_signed=True,
         agreement_signed_at='2012-01-01 01:01:00',
         agreement_signed_by_id=fake_uuid,
+        cached_service_ids=None,
     )
 
 
