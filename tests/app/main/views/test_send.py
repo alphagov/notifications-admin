@@ -427,7 +427,8 @@ def test_upload_csv_file_with_errors_shows_check_page_with_errors(
             +447700900986
         """,
         (
-            'Your file needs a column called ‘phone number’ '
+            'There’s a problem with your column names '
+            'Your file needs a column called ‘phone number’. '
             'Right now it has columns called ‘telephone’ and ‘name’. '
             'Skip to file contents'
         )
@@ -438,7 +439,7 @@ def test_upload_csv_file_with_errors_shows_check_page_with_errors(
             +447700900986
         """,
         (
-            'The columns in your file need to match the double brackets in your template '
+            'Your column names need to match the double brackets in your template '
             'Your file is missing a column called ‘name’. '
             'Skip to file contents'
         )
@@ -449,7 +450,8 @@ def test_upload_csv_file_with_errors_shows_check_page_with_errors(
             +447700900111,+447700900222,+447700900333,
         """,
         (
-            'Your file has more than one column called ‘phone number’ or ‘PHONE_NUMBER’ '
+            'There’s a problem with your column names '
+            'We found more than one column called ‘phone number’ or ‘PHONE_NUMBER’. '
             'Delete or rename one of these columns and try again. '
             'Skip to file contents'
         )
@@ -2863,7 +2865,8 @@ def test_check_messages_column_error_doesnt_show_optional_columns(
     )
 
     assert normalize_spaces(page.select_one('.banner-dangerous').text) == (
-        'Your file needs a column called ‘postcode’ '
+        'There’s a problem with your column names '
+        'Your file needs a column called ‘postcode’. '
         'Right now it has columns called ‘address_line_1’, ‘address_line_2’ and ‘foo’. '
         'Skip to file contents'
     )

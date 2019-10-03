@@ -77,7 +77,7 @@
       {% elif recipients.duplicate_recipient_column_headers %}
 
         <h1 class='banner-title' data-module="track-error" data-error-type="Duplicate recipient columns" data-error-label="{{ upload_id }}">
-          Your file has duplicate columns
+          There’s a problem with your column names
         </h1>
            <p>
             We found more than one column called {{ (
@@ -95,7 +95,7 @@
       {% elif recipients.missing_column_headers %}
 
         <h1 class='banner-title' data-module="track-error" data-error-type="Missing placeholder columns" data-error-label="{{ upload_id }}">
-          Your column names do not match the double brackets in your template
+          Your column names need to match the double brackets in your template
         </h1>
           <p>
             Your file is missing {{ recipients.missing_column_headers | formatted_list(
