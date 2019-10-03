@@ -258,12 +258,9 @@ def edit_organisation_type(org_id):
     )
 
     if form.validate_on_submit():
-        org_service_ids = [service['id'] for service in current_organisation.services]
-
-        organisations_client.update_organisation(
-            current_organisation.id,
-            cached_service_ids=org_service_ids,
+        current_organisation.update(
             organisation_type=form.organisation_type.data,
+            delete_services_cache=True,
         )
         return redirect(url_for('.organisation_settings', org_id=org_id))
 
@@ -365,9 +362,9 @@ def organisation_preview_email_branding(org_id):
     form = PreviewBranding(branding_style=branding_style)
 
     if form.validate_on_submit():
-        organisations_client.update_organisation(
-            org_id,
-            email_branding_id=form.branding_style.data
+        current_organisation.update(
+            email_branding_id=form.branding_style.data,
+            delete_services_cache=True,
         )
         return redirect(url_for('.organisation_settings', org_id=org_id))
 
@@ -410,9 +407,9 @@ def organisation_preview_letter_branding(org_id):
     form = PreviewBranding(branding_style=branding_style)
 
     if form.validate_on_submit():
-        organisations_client.update_organisation(
-            org_id,
-            letter_branding_id=form.branding_style.data
+        current_organisation.update(
+            letter_branding_id=form.branding_style.data,
+            delete_services_cache=True,
         )
         return redirect(url_for('.organisation_settings', org_id=org_id))
 

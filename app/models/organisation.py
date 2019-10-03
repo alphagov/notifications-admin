@@ -135,6 +135,10 @@ class Organisation(JSONModel):
     def services(self):
         return organisations_client.get_organisation_services(self.id)
 
+    @cached_property
+    def service_ids(self):
+        return [s['id'] for s in self.services]
+
     @property
     def live_services(self):
         return [s for s in self.services if s['active'] and not s['restricted']]
@@ -180,8 +184,12 @@ class Organisation(JSONModel):
                 self.letter_branding_id
             )
 
-    def update(self, **kwargs):
-        response = organisations_client.update_organisation(self.id, **kwargs)
+    def update(self, delete_services_cache=False, **kwargs):
+        response = organisations_client.update_organisation(
+            self.id,
+            cached_service_ids=self.service_ids if delete_services_cache else None,
+            **kwargs
+        )
         self.__init__(response)
 
     def associate_service(self, service_id):
