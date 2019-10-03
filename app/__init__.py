@@ -7,6 +7,7 @@ from numbers import Number
 from time import monotonic
 
 import ago
+import jinja2
 from flask import (
     current_app,
     flash,
@@ -22,6 +23,7 @@ from flask.globals import _lookup_req_object, _request_ctx_stack
 from flask_login import LoginManager, current_user
 from flask_wtf import CSRFProtect
 from flask_wtf.csrf import CSRFError
+from govuk_frontend_jinja.flask_ext import init_govuk_frontend
 from itsdangerous import BadSignature
 from notifications_python_client.errors import HTTPError
 from notifications_utils import formatters, logging, request_helper
@@ -115,6 +117,9 @@ def create_app(application):
     asset_fingerprinter._asset_root = application.config['ASSET_PATH']
 
     init_app(application)
+
+    init_govuk_frontend(application)
+    init_jinja(application)
 
     for client in (
 
@@ -701,3 +706,13 @@ def add_template_filters(application):
         id_safe,
     ]:
         application.add_template_filter(fn)
+
+
+def init_jinja(application):
+    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+    template_folders = [
+        os.path.join(repo_root, 'app/templates'),
+        os.path.join(repo_root, 'node_modules/govuk-frontend'),
+    ]
+    jinja_loader = jinja2.FileSystemLoader(template_folders)
+    application.jinja_loader = jinja_loader
