@@ -33,6 +33,8 @@ def test_post_upload_letter_redirects_for_valid_file(mocker, client_request):
         return_value=Mock(content='The sanitised content', json=lambda: {'file': 'VGhlIHNhbml0aXNlZCBjb250ZW50'})
     )
     mock_s3 = mocker.patch('app.main.views.uploads.upload_letter_to_s3')
+    mocker.patch('app.main.views.uploads.get_letter_metadata', return_value={
+        'filename': 'tests/test_pdf_files/one_page_pdf.pdf', 'page_count': '1', 'status': 'valid'})
     mocker.patch('app.main.views.uploads.service_api_client.get_precompiled_template')
 
     with open('tests/test_pdf_files/one_page_pdf.pdf', 'rb') as file:
@@ -46,14 +48,15 @@ def test_post_upload_letter_redirects_for_valid_file(mocker, client_request):
 
     mock_s3.assert_called_once_with(
         b'The sanitised content',
-        'service-{}/fake-uuid.pdf'.format(SERVICE_ONE_ID),
-        'valid',
+        file_location='service-{}/fake-uuid.pdf'.format(SERVICE_ONE_ID),
+        status='valid',
+        page_count=1,
+        filename='tests/test_pdf_files/one_page_pdf.pdf'
     )
 
     assert page.find('h1').text == 'tests/test_pdf_files/one_page_pdf.pdf'
     assert not page.find(id='validation-error-message')
 
-    assert page.find('input', {'type': 'hidden', 'name': 'filename', 'value': 'tests/test_pdf_files/one_page_pdf.pdf'})
     assert page.find('input', {'type': 'hidden', 'name': 'file_id', 'value': 'fake-uuid'})
     assert page.find('button', {'type': 'submit'}).text == 'Send 1 letter'
 
@@ -73,6 +76,8 @@ def test_post_upload_letter_shows_letter_preview_for_valid_file(mocker, client_r
     )
     mocker.patch('app.main.views.uploads.upload_letter_to_s3')
     mocker.patch('app.main.views.uploads.pdf_page_count', return_value=3)
+    mocker.patch('app.main.views.uploads.get_letter_metadata', return_value={
+        'filename': 'tests/test_pdf_files/one_page_pdf.pdf', 'page_count': '3', 'status': 'valid'})
     mocker.patch('app.main.views.uploads.service_api_client.get_precompiled_template', return_value=letter_template)
 
     with open('tests/test_pdf_files/one_page_pdf.pdf', 'rb') as file:
@@ -170,6 +175,8 @@ def test_post_upload_letter_with_invalid_file(mocker, client_request):
     mock_sanitise_response.raise_for_status.side_effect = RequestException(response=Mock(status_code=400))
     mocker.patch('app.main.views.uploads.sanitise_letter', return_value=mock_sanitise_response)
     mocker.patch('app.main.views.uploads.service_api_client.get_precompiled_template')
+    mocker.patch('app.main.views.uploads.get_letter_metadata', return_value={
+        'filename': 'tests/test_pdf_files/one_page_pdf.pdf', 'page_count': '1', 'status': 'invalid'})
 
     with open('tests/test_pdf_files/one_page_pdf.pdf', 'rb') as file:
         file_contents = file.read()
@@ -184,8 +191,10 @@ def test_post_upload_letter_with_invalid_file(mocker, client_request):
 
         mock_s3.assert_called_once_with(
             file_contents,
-            'service-{}/fake-uuid.pdf'.format(SERVICE_ONE_ID),
-            'invalid',
+            file_location='service-{}/fake-uuid.pdf'.format(SERVICE_ONE_ID),
+            status='invalid',
+            page_count=1,
+            filename='tests/test_pdf_files/one_page_pdf.pdf'
         )
 
     assert page.find('h1').text == 'tests/test_pdf_files/one_page_pdf.pdf'
@@ -209,6 +218,8 @@ def test_post_upload_letter_shows_letter_preview_for_invalid_file(mocker, client
     mock_sanitise_response.raise_for_status.side_effect = RequestException(response=Mock(status_code=400))
     mocker.patch('app.main.views.uploads.sanitise_letter', return_value=mock_sanitise_response)
     mocker.patch('app.main.views.uploads.service_api_client.get_precompiled_template', return_value=letter_template)
+    mocker.patch('app.main.views.uploads.get_letter_metadata', return_value={
+        'filename': 'tests/test_pdf_files/one_page_pdf.pdf', 'page_count': '1', 'status': 'invalid'})
 
     with open('tests/test_pdf_files/one_page_pdf.pdf', 'rb') as file:
         page = client_request.post(
@@ -253,6 +264,8 @@ def test_post_upload_letter_does_not_upload_to_s3_if_template_preview_raises_unk
 
 def test_uploaded_letter_preview(mocker, client_request):
     mocker.patch('app.main.views.uploads.service_api_client')
+    mocker.patch('app.main.views.uploads.get_letter_metadata', return_value={
+        'filename': 'my_letter.pdf', 'page_count': '1', 'status': 'valid'})
 
     page = client_request.get(
         'main.uploaded_letter_preview',
@@ -268,8 +281,11 @@ def test_uploaded_letter_preview(mocker, client_request):
 
 
 def test_send_uploaded_letter_sends_letter_and_redirects_to_notification_page(mocker, service_one, client_request):
-    mocker.patch('app.main.views.uploads.get_letter_pdf_and_metadata', return_value=('file', {'status': 'valid'}))
+    metadata = {'filename': 'my_file.pdf', 'page_count': '1', 'status': 'valid'}
+
+    mocker.patch('app.main.views.uploads.get_letter_pdf_and_metadata', return_value=('file', metadata))
     mock_send = mocker.patch('app.main.views.uploads.notification_api_client.send_precompiled_letter')
+    mocker.patch('app.main.views.uploads.get_letter_metadata', return_value=metadata)
 
     service_one['permissions'] = ['letter', 'upload_letters']
     file_id = 'abcd-1234'
@@ -315,8 +331,11 @@ def test_send_uploaded_letter_when_service_does_not_have_correct_permissions(
 
 
 def test_send_uploaded_letter_when_metadata_states_pdf_is_invalid(mocker, service_one, client_request):
-    mocker.patch('app.main.views.uploads.get_letter_pdf_and_metadata', return_value=('file', {'status': 'invalid'}))
     mock_send = mocker.patch('app.main.views.uploads.notification_api_client.send_precompiled_letter')
+    mocker.patch(
+        'app.main.views.uploads.get_letter_metadata',
+        return_value={'filename': 'my_file.pdf', 'page_count': '3', 'status': 'invalid'}
+    )
 
     service_one['permissions'] = ['letter', 'upload_letters']
     file_id = 'abcd-1234'
