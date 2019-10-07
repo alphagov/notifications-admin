@@ -15,6 +15,12 @@
   <div class="dashboard">
 
     <h1 class="visuallyhidden">Dashboard</h1>
+    {% from "components/button/macro.njk" import govukButton %}
+
+    {{ govukButton({
+      "text": "Push me!!!"
+    }) }}
+
     {% if current_user.has_permissions('manage_templates') and not current_service.all_templates %}
       {% include 'views/dashboard/write-first-messages.html' %}
     {% endif %}
