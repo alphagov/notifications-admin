@@ -20,6 +20,7 @@ from app.extensions import antivirus_client
 from app.main import main
 from app.main.forms import PDFUploadForm
 from app.s3_client.s3_letter_upload_client import (
+    get_letter_metadata,
     get_letter_pdf_and_metadata,
     get_transient_letter_file_location,
     upload_letter_to_s3,
@@ -43,6 +44,7 @@ def upload_letter(service_id):
 
     if form.validate_on_submit():
         pdf_file_bytes = form.file.data.read()
+        original_filename = form.file.data.filename
 
         virus_free = antivirus_client.scan(BytesIO(pdf_file_bytes))
         if not virus_free:
@@ -67,22 +69,29 @@ def upload_letter(service_id):
         except RequestException as ex:
             if ex.response is not None and ex.response.status_code == 400:
                 status = 'invalid'
-                upload_letter_to_s3(pdf_file_bytes, file_location, status)
+                upload_letter_to_s3(
+                    pdf_file_bytes,
+                    file_location=file_location,
+                    status=status,
+                    page_count=page_count,
+                    filename=original_filename)
             else:
                 raise ex
         else:
             status = 'valid'
             file_contents = base64.b64decode(response.json()['file'].encode())
-            upload_letter_to_s3(file_contents, file_location, status)
+            upload_letter_to_s3(
+                file_contents,
+                file_location=file_location,
+                status=status,
+                page_count=page_count,
+                filename=original_filename)
 
         return redirect(
             url_for(
                 'main.uploaded_letter_preview',
                 service_id=current_service.id,
                 file_id=upload_id,
-                original_filename=form.file.data.filename,
-                page_count=page_count,
-                status=status,
             )
         )
 
@@ -97,9 +106,10 @@ def invalid_upload_error(message):
 @main.route("/services/<service_id>/preview-letter/<file_id>")
 @user_has_permissions('send_messages')
 def uploaded_letter_preview(service_id, file_id):
-    original_filename = request.args.get('original_filename')
-    page_count = request.args.get('page_count')
-    status = request.args.get('status')
+    metadata = get_letter_metadata(service_id, file_id)
+    original_filename = metadata.get('filename')
+    page_count = metadata.get('page_count')
+    status = metadata.get('status')
 
     template_dict = service_api_client.get_precompiled_template(service_id)
 
@@ -126,8 +136,7 @@ def uploaded_letter_preview(service_id, file_id):
 @main.route("/services/<service_id>/preview-letter-image/<file_id>")
 @user_has_permissions('send_messages')
 def view_letter_upload_as_preview(service_id, file_id):
-    file_location = get_transient_letter_file_location(service_id, file_id)
-    pdf_file, metadata = get_letter_pdf_and_metadata(file_location)
+    pdf_file, metadata = get_letter_pdf_and_metadata(service_id, file_id)
 
     page = request.args.get('page')
 
@@ -140,14 +149,12 @@ def view_letter_upload_as_preview(service_id, file_id):
 @main.route("/services/<service_id>/upload-letter/send", methods=['POST'])
 @user_has_permissions('send_messages', restrict_admin_usage=True)
 def send_uploaded_letter(service_id):
-    filename = request.form['filename']
-    file_id = request.form['file_id']
-
     if not (current_service.has_permission('letter') and current_service.has_permission('upload_letters')):
         abort(403)
 
-    file_location = get_transient_letter_file_location(service_id, file_id)
-    _, metadata = get_letter_pdf_and_metadata(file_location)
+    file_id = request.form['file_id']
+    metadata = get_letter_metadata(service_id, file_id)
+    filename = metadata.get('filename')
 
     if metadata.get('status') != 'valid':
         abort(403)

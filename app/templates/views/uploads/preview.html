@@ -28,7 +28,6 @@
           service_id=current_service.id,
         )}}" class='page-footer'>
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-        <input type="hidden" name="filename" value="{{ original_filename }}" />
         <input type="hidden" name="file_id" value="{{ file_id }}" />
         <button type="submit" class="button">Send 1 letter</button>
       </form>
