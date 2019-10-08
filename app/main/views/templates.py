@@ -31,6 +31,7 @@ from app.models.service import Service
 from app.models.template_list import TemplateList, TemplateLists
 from app.template_previews import TemplatePreview, get_page_count_for_letter
 from app.utils import (
+    LETTER_MAX_PAGES,
     email_or_sms_not_enabled,
     get_template,
     is_letter_too_long,
@@ -76,6 +77,7 @@ def view_template(service_id, template_id):
         template_postage=template["postage"],
         user_has_template_permission=user_has_template_permission,
         letter_too_long=is_letter_too_long(get_page_count_for_letter(template)),
+        letter_max_pages=LETTER_MAX_PAGES,
     )
 
 

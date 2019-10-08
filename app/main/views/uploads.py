@@ -26,7 +26,12 @@ from app.s3_client.s3_letter_upload_client import (
     upload_letter_to_s3,
 )
 from app.template_previews import TemplatePreview, sanitise_letter
-from app.utils import get_template, is_letter_too_long, user_has_permissions
+from app.utils import (
+    LETTER_MAX_PAGES,
+    get_template,
+    is_letter_too_long,
+    user_has_permissions,
+)
 
 MAX_FILE_UPLOAD_SIZE = 2 * 1024 * 1024  # 2MB
 
@@ -132,6 +137,7 @@ def uploaded_letter_preview(service_id, file_id):
         status=status,
         file_id=file_id,
         letter_too_long=letter_too_long,
+        letter_max_pages=LETTER_MAX_PAGES,
     )
 
 

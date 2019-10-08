@@ -48,6 +48,7 @@ from app.s3_client.s3_csv_client import (
 )
 from app.template_previews import TemplatePreview, get_page_count_for_letter
 from app.utils import (
+    LETTER_MAX_PAGES,
     PermanentRedirect,
     Spreadsheet,
     email_or_sms_not_enabled,
@@ -523,7 +524,7 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
         email_reply_to = get_email_reply_to_address_from_session()
     elif db_template['template_type'] == 'sms':
         sms_sender = get_sms_sender_from_session()
-    page_count = get_page_count_for_letter(db_template)
+
     template = get_template(
         db_template,
         current_service,
@@ -538,7 +539,7 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
         ) if not letters_as_pdf else None,
         email_reply_to=email_reply_to,
         sms_sender=sms_sender,
-        page_count=page_count,
+        page_count=get_page_count_for_letter(db_template),
     )
     recipients = RecipientCSV(
         contents,
@@ -569,6 +570,8 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
     elif preview_row > 2:
         abort(404)
 
+    page_count = get_page_count_for_letter(db_template, template.values)
+
     return dict(
         recipients=recipients,
         template=template,
@@ -593,6 +596,7 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
             service_id, template.id, db_template['version'], request.args.get('original_file_name', '')
         ),
         letter_too_long=is_letter_too_long(page_count),
+        letter_max_pages=LETTER_MAX_PAGES,
     )
 
 
@@ -853,7 +857,6 @@ def _check_notification(service_id, template_id, exception=None):
         email_reply_to = get_email_reply_to_address_from_session()
     elif db_template['template_type'] == 'sms':
         sms_sender = get_sms_sender_from_session()
-    page_count = get_page_count_for_letter(db_template)
     template = get_template(
         db_template,
         current_service,
@@ -866,7 +869,7 @@ def _check_notification(service_id, template_id, exception=None):
             template_id=template_id,
             filetype='png',
         ),
-        page_count=page_count,
+        page_count=get_page_count_for_letter(db_template),
     )
 
     back_link = get_back_link(service_id, template, len(fields_to_fill_in(template)))
@@ -881,11 +884,13 @@ def _check_notification(service_id, template_id, exception=None):
         raise PermanentRedirect(back_link)
 
     template.values = get_recipient_and_placeholders_from_session(template.template_type)
+    page_count = get_page_count_for_letter(db_template, template.values)
     return dict(
         template=template,
         back_link=back_link,
         help=get_help_argument(),
         letter_too_long=is_letter_too_long(page_count),
+        letter_max_pages=LETTER_MAX_PAGES,
         **(get_template_error_dict(exception) if exception else {}),
     )
 
