@@ -176,10 +176,10 @@ def cancel_job(service_id, job_id):
 def cancel_letter_job(service_id, job_id):
     if request.method == 'POST':
         job = job_api_client.get_job(service_id, job_id)['data']
-        notifications = notification_api_client.get_notifications_for_service(
-            job['service'], job['id']
-        )['notifications']
-        if job['job_status'] != 'finished' or len(notifications) < job['notification_count']:
+        notification_count = notification_api_client.get_notification_count_for_job_id(
+            service_id=service_id, job_id=job_id
+        )
+        if job['job_status'] != 'finished' or notification_count < job['notification_count']:
             flash("We are still processing these letters, please try again in a minute.", 'try again')
             return view_job(service_id, job_id)
         try:

@@ -118,3 +118,11 @@ def test_update_notification_to_cancelled(mocker):
         url='/service/foo/notifications/bar/cancel',
         data={},
     )
+
+
+def test_get_notification_count_for_job_id(mocker):
+    mock_get = mocker.patch('app.notify_client.notification_api_client.NotificationApiClient.get')
+    NotificationApiClient().get_notification_count_for_job_id(service_id='foo', job_id='bar')
+    mock_get.assert_called_once_with(
+        url='/service/foo/job/bar/notification_count',
+    )
