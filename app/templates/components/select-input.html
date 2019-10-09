@@ -1,6 +1,6 @@
-{% macro select(field, hint=None, disable=[], option_hints={}, hide_legend=False, collapsible_opts={}, legend_style="text", input="radio") %}
+{% macro select(field, hint=None, disable=[], option_hints={}, hide_legend=False, collapsible_opts={}, legend_style="text", input="radio", inline=False) %}
   {% call select_wrapper(
-    field, hint, disable, option_hints, hide_legend, collapsible_opts, legend_style
+    field, hint, disable, option_hints, hide_legend, collapsible_opts, legend_style, inline=inline
   ) %}
     {% for option in field %}
       {{ select_input(option, disable, option_hints, input=input) }}
@@ -35,13 +35,13 @@
 {% endmacro %}
 
 
-{% macro select_wrapper(field, hint=None, disable=[], option_hints={}, hide_legend=False, collapsible_opts={}, legend_style="text") %}
+{% macro select_wrapper(field, hint=None, disable=[], option_hints={}, hide_legend=False, collapsible_opts={}, legend_style="text", inline=False) %}
   {% set is_collapsible = collapsible_opts|length %}
   <div class="form-group {% if field.errors %} form-group-error{% endif %}"{% if is_collapsible %} data-module="collapsible-checkboxes"{% if collapsible_opts.field %} data-field-label="{{ collapsible_opts.field }}"{% endif %}{% endif %}>
     {% if is_collapsible %}
     <div class="selection-summary" role="region" aria-live="polite"></div>
     {% endif %}
-    <fieldset id="{{ field.id }}">
+    <fieldset id="{{ field.id }}" {% if inline %}class="inline"{% endif %}>
       <legend class="{{ 'form-label' if not hide_legend else '' }}{% if legend_style != 'text' %} {{ legend_style }}{% endif %}">
         {% if hide_legend %}<span class="visually-hidden">{% endif %}
           {{ field.label.text|safe }}

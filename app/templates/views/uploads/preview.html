@@ -41,7 +41,7 @@
           service_id=current_service.id,
         )}}" class='page-footer'>
           {{ form.csrf_token }}
-          {{ radios(form.postage, hide_legend=true) }}
+          {{ radios(form.postage, hide_legend=true, inline=True) }}
           {{ form.file_id(value=file_id) }}
         <button type="submit" class="button">Send 1 letter</button>
       </form>
