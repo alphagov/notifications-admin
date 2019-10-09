@@ -1,5 +1,6 @@
 {% extends "template.njk" %}
 {% from "components/banner.html" import banner %}
+{% from "components/notify-footer.html" import notify_footer %}
 
 {% block headIcons %}
   <link rel="shortcut icon" sizes="16x16 32x32 48x48" href="{{ asset_url('images/favicon.ico') }}" type="image/x-icon" />
@@ -124,54 +125,93 @@
   {% block fullwidth_content %}{% endblock %}
 {% endblock %}
 
-{% block footer_top %}
-  <div class="footer-categories">
-    <div class="footer-categories-wrapper">
-      <div class="grid-row">
-        <div class="column-one-quarter">
-          <ul>
-            <li><a href="{{ url_for('main.support') }}">Support</a></li>
-            <li><a href="https://status.notifications.service.gov.uk">System status</a></li>
-            <li><a href="https://www.gov.uk/performance/govuk-notify">Performance</a></li>
-            <li><a href="https://ukgovernmentdigital.slack.com/messages/C0E1ADVPC">Slack channel</a></li>
-            <li><a href="https://gds.blog.gov.uk/category/notify/">Blog</a></li>
-          </ul>
-        </div>
-        <div class="column-one-quarter">
-          <ul>
-            <li><a href="{{ url_for("main.features") }}">Features</a></li>
-            <li><a href="{{ url_for("main.roadmap") }}">Roadmap</a></li>
-            <li><a href="{{ url_for("main.trial_mode_new") }}">Trial mode</a></li>
-            <li><a href="{{ url_for("main.message_status") }}">Message status</a></li>
-            <li><a href="{{ url_for("main.security") }}">Security</a></li>
-            <li><a href="{{ url_for("main.terms") }}">Terms of use</a></li>
-          </ul>
-        </div>
-        <div class="column-one-quarter">
-          <ul>
-            <li><a href="{{ url_for("main.pricing") }}">Pricing</a></li>
-            <li><a href="{{ url_for("main.how_to_pay") }}">How to pay</a></li>
-          </ul>
-        </div>
-        <div class="column-one-quarter">
-          <ul>
-            <li><a href="{{ url_for("main.documentation") }}">Documentation</a></li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
-{% endblock %}
+{% block footer %}
+  {% set meta_items = [
+    {
+      "href": url_for("main.privacy"),
+      "text": "Privacy"
+    },
+    {
+      "href": url_for("main.cookies"),
+      "text": "Cookies"
+    }
+  ] %}
 
-{% block footer_support_links %}
-  <nav class="footer-nav">
-    Built by the <a href="https://www.gov.uk/government/organisations/government-digital-service">Government Digital Service</a>
-    <a href="{{ url_for("main.privacy") }}">Privacy</a>
-    <a href="{{ url_for("main.cookies") }}">Cookies</a>
-    {% if current_service and current_service.research_mode %}
-    <span id="research-mode" class="research-mode">research mode</span>
-    {% endif %}
-  </nav>
+  {% if current_service and current_service.research_mode %}
+    {% set meta_suffix = 'Built by the <a href="#" class="govuk-footer__link">Government Digital Service</a><span id="research-mode" class="research-mode">research mode</span>' %}
+  {% else %}
+    {% set meta_suffix = 'Built by the <a href="#" class="govuk-footer__link">Government Digital Service</a>' %}
+  {% endif %}
+
+  {{ notify_footer({
+    "navigation": [
+      {
+        "columns": 4,
+        "items": [
+          {
+            "href": url_for('main.support'),
+            "text": "Support"
+          },
+          {
+            "href": "https://status.notifications.service.gov.uk",
+            "text": "System status"
+          },
+          {
+            "href": "https://www.gov.uk/performance/govuk-notify",
+            "text": "Performance"
+          },
+          {
+            "href": "https://ukgovernmentdigital.slack.com/messages/C0E1ADVPC",
+            "text": "Slack channel"
+          },
+          {
+            "href": "https://gds.blog.gov.uk/category/notify/",
+            "text": "Blog"
+          },
+          {
+            "href": url_for("main.features"),
+            "text": "Features"
+          },
+          {
+            "href": url_for("main.roadmap"),
+            "text": "Roadmap"
+          },
+          {
+            "href": url_for("main.trial_mode_new"),
+            "text": "Trial mode"
+          },
+          {
+            "href": url_for("main.message_status"),
+            "text": "Message status"
+          },
+          {
+            "href": url_for("main.security"),
+            "text": "Security"
+          },
+          {
+            "href": url_for("main.terms"),
+            "text": "Terms of use"
+          },
+          {
+            "href": url_for("main.pricing"),
+            "text": "Pricing"
+          },
+          {
+            "href": url_for("main.how_to_pay"),
+            "text": "How to pay"
+          },
+          {
+            "href": url_for("main.documentation"),
+            "text": "Documentation"
+          }
+        ]
+      }
+    ],
+    "meta": {
+      "items": meta_items,
+      "html": meta_suffix
+    }
+  }) }}
 {% endblock %}
 
 {% block bodyEnd %}
