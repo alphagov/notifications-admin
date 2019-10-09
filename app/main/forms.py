@@ -1368,8 +1368,8 @@ class BrandingOptionsEmail(StripWhitespaceForm):
     def __init__(self, service, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.options.choices = tuple(self.get_available_choices(service))
-        if not self.something_else_is_only_option:
-            self.options.validators.append(DataRequired())
+        if self.something_else_is_only_option:
+            self.options.data = self.FALLBACK_OPTION_VALUE
 
     @staticmethod
     def get_available_choices(service):
