@@ -775,7 +775,9 @@ class LetterUploadPostageForm(StripWhitespaceForm):
         default='second',
         validators=[DataRequired()]
     )
-    file_id = HiddenField()
+    file_id = HiddenField(
+        validators=[DataRequired()]
+    )
 
 
 class ForgotPasswordForm(StripWhitespaceForm):

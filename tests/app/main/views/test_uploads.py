@@ -125,9 +125,7 @@ def test_post_upload_letter_shows_letter_preview_for_valid_file(
         )
 
     assert page.find('h1').text == 'tests/test_pdf_files/one_page_pdf.pdf'
-    assert len(page.select('.letter-postage')) == 1
-    assert normalize_spaces(page.select_one('.letter-postage').text) == ('Postage: second class')
-    assert page.select_one('.letter-postage')['class'] == ['letter-postage', 'letter-postage-second']
+    assert len(page.select('.letter-postage')) == 0
 
     letter_images = page.select('main img')
     assert len(letter_images) == 3
@@ -283,9 +281,7 @@ def test_post_upload_letter_shows_letter_preview_for_invalid_file(mocker, client
             _follow_redirects=True,
         )
 
-    assert len(page.select('.letter-postage')) == 1
-    assert normalize_spaces(page.select_one('.letter-postage').text) == ('Postage: first class')
-    assert page.select_one('.letter-postage')['class'] == ['letter-postage', 'letter-postage-first']
+    assert len(page.select('.letter-postage')) == 0
 
     letter_images = page.select('main img')
     assert len(letter_images) == 1
