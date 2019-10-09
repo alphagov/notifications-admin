@@ -8,15 +8,16 @@
   {% endif %}
   {% if current_user.has_permissions() %}
     <li><a href="{{ url_for('.choose_template', service_id=current_service.id) }}" {{ main_navigation.is_selected('templates') }}>Templates</a></li>
-    {% if not current_user.has_permissions('view_activity') %}
+    {% if current_user.has_permissions('view_activity') %}
+      {% if current_service.can_upload_letters %}
+        <li><a href="{{ url_for('main.uploads', service_id=current_service.id) }}" {{ main_navigation.is_selected('uploads') }}>Uploads</a></li>
+      {% endif %}
+    {% else %}
       <li><a href="{{ url_for('.view_notifications', service_id=current_service.id, status='sending,delivered,failed') }}" {{ casework_navigation.is_selected('sent-messages') }}>Sent messages</a></li>
-      {% if current_service.has_jobs %}
-        <li><a href="{{ url_for('.view_jobs', service_id=current_service.id) }}" {{ casework_navigation.is_selected('uploaded-files') }}>Uploads</a></li>
+      {% if current_service.has_jobs or current_service.can_upload_letters %}
+        <li><a href="{{ url_for('main.uploads', service_id=current_service.id) }}" {{ casework_navigation.is_selected('uploads') }}>Uploads</a></li>
       {% endif %}
     {% endif %}
-  {% endif %}
-  {% if current_service.can_upload_letters %}
-    <li><a href="{{ url_for('main.uploads', service_id=current_service.id) }}" {{ main_navigation.is_selected('uploads') }}>Uploads</a></li>
   {% endif %}
     <li><a href="{{ url_for('.manage_users', service_id=current_service.id) }}" {{ main_navigation.is_selected('team-members') }}>Team members</a></li>
   {% if current_user.has_permissions('manage_service', allow_org_user=True) %}
