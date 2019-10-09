@@ -43,7 +43,6 @@ FAILURE_STATUSES = ['failed', 'temporary-failure', 'permanent-failure',
                     'technical-failure', 'virus-scan-failed', 'validation-failed']
 REQUESTED_STATUSES = SENDING_STATUSES + DELIVERED_STATUSES + FAILURE_STATUSES
 
-LETTER_MAX_PAGES = 10
 
 with open('{}/email_domains.txt'.format(
     os.path.dirname(os.path.realpath(__file__))
@@ -543,12 +542,6 @@ def get_letter_printing_statement(status, created_at):
         printed_date = printed_datetime.strftime('%d %B').lstrip('0')
 
         return 'Printed on {} at 5:30pm'.format(printed_date)
-
-
-def is_letter_too_long(page_count):
-    if not page_count:
-        return False
-    return page_count > LETTER_MAX_PAGES
 
 
 class PermanentRedirect(RequestRedirect):

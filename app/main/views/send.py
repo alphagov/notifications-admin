@@ -15,8 +15,9 @@ from flask import (
 )
 from flask_login import current_user
 from notifications_python_client.errors import HTTPError
-from notifications_utils import SMS_CHAR_COUNT_LIMIT
+from notifications_utils import LETTER_MAX_PAGE_COUNT, SMS_CHAR_COUNT_LIMIT
 from notifications_utils.columns import Columns
+from notifications_utils.pdf import is_letter_too_long
 from notifications_utils.recipients import (
     RecipientCSV,
     first_column_headings,
@@ -48,14 +49,12 @@ from app.s3_client.s3_csv_client import (
 )
 from app.template_previews import TemplatePreview, get_page_count_for_letter
 from app.utils import (
-    LETTER_MAX_PAGES,
     PermanentRedirect,
     Spreadsheet,
     email_or_sms_not_enabled,
     get_errors_for_csv,
     get_help_argument,
     get_template,
-    is_letter_too_long,
     should_skip_template_page,
     unicode_truncate,
     user_has_permissions,
@@ -596,7 +595,7 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
             service_id, template.id, db_template['version'], request.args.get('original_file_name', '')
         ),
         letter_too_long=is_letter_too_long(page_count),
-        letter_max_pages=LETTER_MAX_PAGES,
+        letter_max_pages=LETTER_MAX_PAGE_COUNT,
     )
 
 
@@ -890,7 +889,7 @@ def _check_notification(service_id, template_id, exception=None):
         back_link=back_link,
         help=get_help_argument(),
         letter_too_long=is_letter_too_long(page_count),
-        letter_max_pages=LETTER_MAX_PAGES,
+        letter_max_pages=LETTER_MAX_PAGE_COUNT,
         **(get_template_error_dict(exception) if exception else {}),
     )
 

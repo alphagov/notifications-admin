@@ -1,6 +1,5 @@
 {% extends "withnav_template.html" %}
 {% from "components/page-header.html" import page_header %}
-{% from "components/banner.html" import banner_wrapper %}
 
 {% block service_page_title %}
   {{ original_filename }}
@@ -17,16 +16,12 @@
       Validation failed
     </p>
     {% endif %}
-    {% if letter_too_long %}
-      {% call banner_wrapper(type='dangerous', id='letter-too-long') %}
-          {% include "partials/check/letter-too-long.html" %}
-      {% endcall %}
-    {% endif %}
+
     <div class="letter-sent">
       {{ template|string }}
     </div>
 
-    {% if status == 'valid' and not letter_too_long %}
+    {% if status == 'valid' %}
     <div class="js-stick-at-bottom-when-scrolling">
       <form method="post" enctype="multipart/form-data" action="{{url_for(
           'main.send_uploaded_letter',

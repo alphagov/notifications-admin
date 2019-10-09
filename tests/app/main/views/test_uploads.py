@@ -204,47 +204,6 @@ def test_post_upload_letter_with_invalid_file(mocker, client_request):
     assert not page.find('button', {'type': 'submit'})
 
 
-def test_post_upload_letter_with_letter_that_is_too_long(mocker, client_request):
-    letter_template = {'template_type': 'letter',
-                       'reply_to_text': '',
-                       'postage': 'second',
-                       'subject': 'hi',
-                       'content': 'my letter'}
-
-    mocker.patch('uuid.uuid4', return_value='fake-uuid')
-    mocker.patch('app.main.views.uploads.antivirus_client.scan', return_value=True)
-    mocker.patch(
-        'app.main.views.uploads.sanitise_letter',
-        return_value=Mock(content='The sanitised content', json=lambda: {'file': 'VGhlIHNhbml0aXNlZCBjb250ZW50'})
-    )
-    mock_upload = mocker.patch('app.main.views.uploads.upload_letter_to_s3')
-    mock_page_count = mocker.patch('app.main.views.uploads.pdf_page_count', return_value=11)
-    mocker.patch('app.main.views.uploads.service_api_client.get_precompiled_template', return_value=letter_template)
-    mocker.patch('app.main.views.uploads.get_letter_metadata', return_value={
-        'filename': 'tests/test_pdf_files/one_page_pdf.pdf', 'page_count': '11', 'status': 'invalid'})
-
-    with open('tests/test_pdf_files/one_page_pdf.pdf', 'rb') as file:
-        page = client_request.post(
-            'main.upload_letter',
-            service_id=SERVICE_ONE_ID,
-            _data={'file': file},
-            _follow_redirects=True,
-        )
-
-    assert mock_page_count.called
-    mock_upload.assert_called_once_with(
-        b'The sanitised content',
-        file_location='service-596364a0-858e-42c8-9062-a8fe822260eb/fake-uuid.pdf',
-        filename='tests/test_pdf_files/one_page_pdf.pdf',
-        page_count=11,
-        status='invalid'
-    )
-
-    assert page.find('h1').text == 'tests/test_pdf_files/one_page_pdf.pdf'
-    assert page.select('#letter-too-long')
-    assert not page.find('button', {'type': 'submit'})
-
-
 def test_post_upload_letter_shows_letter_preview_for_invalid_file(mocker, client_request):
     letter_template = {'template_type': 'letter',
                        'reply_to_text': '',

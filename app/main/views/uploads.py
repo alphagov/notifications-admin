@@ -26,12 +26,7 @@ from app.s3_client.s3_letter_upload_client import (
     upload_letter_to_s3,
 )
 from app.template_previews import TemplatePreview, sanitise_letter
-from app.utils import (
-    LETTER_MAX_PAGES,
-    get_template,
-    is_letter_too_long,
-    user_has_permissions,
-)
+from app.utils import get_template, user_has_permissions
 
 MAX_FILE_UPLOAD_SIZE = 2 * 1024 * 1024  # 2MB
 
@@ -83,10 +78,7 @@ def upload_letter(service_id):
             else:
                 raise ex
         else:
-            if is_letter_too_long(page_count):
-                status = 'invalid'
-            else:
-                status = 'valid'
+            status = 'valid'
             file_contents = base64.b64decode(response.json()['file'].encode())
             upload_letter_to_s3(
                 file_contents,
@@ -117,7 +109,6 @@ def uploaded_letter_preview(service_id, file_id):
     metadata = get_letter_metadata(service_id, file_id)
     original_filename = metadata.get('filename')
     page_count = metadata.get('page_count')
-    letter_too_long = is_letter_too_long(int(page_count))
     status = metadata.get('status')
 
     template_dict = service_api_client.get_precompiled_template(service_id)
@@ -139,8 +130,6 @@ def uploaded_letter_preview(service_id, file_id):
         template=template,
         status=status,
         file_id=file_id,
-        letter_too_long=letter_too_long,
-        letter_max_pages=LETTER_MAX_PAGES,
     )
 
 
