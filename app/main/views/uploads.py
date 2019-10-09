@@ -18,7 +18,7 @@ from requests import RequestException
 from app import current_service, notification_api_client, service_api_client
 from app.extensions import antivirus_client
 from app.main import main
-from app.main.forms import PDFUploadForm
+from app.main.forms import LetterUploadPostageForm, PDFUploadForm
 from app.main.views.jobs import view_jobs
 from app.s3_client.s3_letter_upload_client import (
     get_letter_metadata,
@@ -154,6 +154,8 @@ def uploaded_letter_preview(service_id, file_id):
     error = get_letter_validation_error(error_message, invalid_pages, page_count)
     template_dict = service_api_client.get_precompiled_template(service_id)
 
+    form = LetterUploadPostageForm()
+
     template = get_template(
         template_dict,
         service_id,
@@ -172,6 +174,7 @@ def uploaded_letter_preview(service_id, file_id):
         status=status,
         file_id=file_id,
         error=error,
+        form=form,
     )
 
 

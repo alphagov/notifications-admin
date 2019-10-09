@@ -765,6 +765,19 @@ class LetterTemplatePostageForm(StripWhitespaceForm):
     )
 
 
+class LetterUploadPostageForm(StripWhitespaceForm):
+    postage = RadioField(
+        'Choose the postage for this letter',
+        choices=[
+            ('first', 'First class post'),
+            ('second', 'Second class post'),
+        ],
+        default='second',
+        validators=[DataRequired()]
+    )
+    file_id = HiddenField()
+
+
 class ForgotPasswordForm(StripWhitespaceForm):
     email_address = email_address(gov_user=False)
 
