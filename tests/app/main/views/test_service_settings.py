@@ -4657,6 +4657,39 @@ def test_submit_email_branding_request(
     )
 
 
+def test_submit_email_branding_when_something_else_is_only_option(
+    client_request,
+    service_one,
+    mocker,
+    mock_get_service_settings_page_common,
+    mock_get_email_branding,
+):
+    mocker.patch(
+        'app.organisations_client.get_service_organisation',
+        return_value=None,
+    )
+
+    zendesk = mocker.patch(
+        'app.main.views.service_settings.zendesk_client.create_ticket',
+        autospec=True,
+    )
+
+    client_request.post(
+        '.branding_request',
+        service_id=SERVICE_ONE_ID,
+        _data={
+            'something_else': 'Homer Simpson',
+        },
+    )
+
+    assert (
+        'Current branding: GOV.UK\n'
+        'Branding requested: Something else\n'
+        '\n'
+        'Homer Simpson'
+    ) in zendesk.call_args_list[0][1]['message']
+
+
 def test_show_service_data_retention(
         platform_admin_client,
         service_one,
