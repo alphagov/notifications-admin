@@ -31,37 +31,94 @@
   </p>
 {% endblock %}
 
-{% block header_class %}with-proposition{% endblock %}
-{% block proposition_header %}
-  <div class="header-proposition">
-    <div class="content">
-      <a href="#proposition-links" class="js-header-toggle menu">Menu</a>
-      <nav id="proposition-menu">
-        <ul id="proposition-links">
-          <li><a href="{{ url_for('main.support') }}" {{ header_navigation.is_selected('support') }}>Support</a></li>
-          {% if current_user.is_authenticated %}
-            <li><a href="{{ url_for('main.documentation') }}" {{ header_navigation.is_selected('documentation') }}>Documentation</a></li>
-            <li><a href="{{ url_for('main.user_profile') }}" {{ header_navigation.is_selected('user-profile') }}>{{ current_user.name }}</a></li>
-            {% if current_user.platform_admin %}
-              <li><a href="{{ url_for('main.platform_admin') }}" {{ header_navigation.is_selected('platform-admin') }}>Platform admin</a></li>
-            {% endif %}
-            <li><a href="{{ url_for('main.sign_out')}}">Sign out</a></li>
-          {% else %}
-            <li><a href="{{ url_for('main.features') }}" {{ header_navigation.is_selected('features') }}>Features</a></li>
-            <li><a href="{{ url_for('main.pricing' )}}" {{ header_navigation.is_selected('pricing') }}>Pricing</a></li>
-            <li><a href="{{ url_for('main.documentation') }}" {{ header_navigation.is_selected('documentation') }}>Documentation</a></li>
-            <li><a href="{{ url_for('main.sign_in' )}}" {{ header_navigation.is_selected('sign-in') }}>Sign in</a></li>
-          {% endif %}
-        </ul>
-      </nav>
-    </div>
-  </div>
+{% block header %}
+  {% if current_user.is_authenticated %}
+    {% if current_user.platform_admin %}
+      {% set navigation = [
+        {
+          "href": url_for('main.support'),
+          "text": "Support",
+          "active": header_navigation.is_selected('support')
+        },
+        {
+          "href": url_for('main.documentation'),
+          "text": "Documentation",
+          "active": header_navigation.is_selected('documentation')
+        },
+        {
+          "href": url_for('main.user_profile'),
+          "text": current_user.name,
+          "active": header_navigation.is_selected('user-profile')
+        },
+        {
+          "href": url_for('main.platform_admin'),
+          "text": "Platform admin",
+          "active": header_navigation.is_selected('platform-admin')
+        },
+        {
+          "href": url_for('main.sign_out'),
+          "text": "Sign out"
+        }
+      ] %}
+    {% else %}
+      {% set navigation = [
+        {
+          "href": url_for('main.support'),
+          "text": "Support",
+          "active": header_navigation.is_selected('support')
+        },
+        {
+          "href": url_for('main.documentation'),
+          "text": "Documentation",
+          "active": header_navigation.is_selected('documentation')
+        },
+        {
+          "href": url_for('main.user_profile'),
+          "text": current_user.name,
+          "active": header_navigation.is_selected('user-profile')
+        },
+        {
+          "href": url_for('main.sign_out'),
+          "text": "Sign out"
+        }
+      ] %}
+    {% endif %}
+  {% else %}
+    {% set navigation = [
+      {
+        "href": url_for('main.support'),
+        "text": "Support",
+        "active": header_navigation.is_selected('support')
+      },
+      {
+        "href": url_for('main.features'),
+        "text": "Features",
+        "active": header_navigation.is_selected('features')
+      },
+      {
+        "href": url_for('main.pricing'),
+        "text": "Pricing",
+        "active": header_navigation.is_selected('pricing')
+      },
+      {
+        "href": url_for('main.documentation'),
+        "text": "Documentation",
+        "active": header_navigation.is_selected('documentation')
+      },
+      {
+        "href": url_for('main.sign_in'),
+        "text": "Sign in",
+        "active": header_navigation.is_selected('sign-in')
+      }
+    ] %}
+  {% endif %}
+
+  {{ govukHeader({
+    "homepageUrl": url_for('main.show_accounts_or_dashboard'),
+    "productName": "Notify",
+    "navigation": navigation
+  }) }}
 {% endblock %}
-
-
-{% set global_header_text = "GOV.UK <span id='product-name'>Notify</span>"|safe %}
-
-{% set homepage_url = url_for('main.show_accounts_or_dashboard') %}
 
 {% block content %}
   {% block fullwidth_content %}{% endblock %}
