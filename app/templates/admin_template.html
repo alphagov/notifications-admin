@@ -1,5 +1,14 @@
-{% extends "govuk_template.html" %}
+{% extends "template.njk" %}
 {% from "components/banner.html" import banner %}
+
+{% block headIcons %}
+  <link rel="shortcut icon" sizes="16x16 32x32 48x48" href="{{ asset_url('images/favicon.ico') }}" type="image/x-icon" />
+  <link rel="mask-icon" href="{{ asset_url('images/govuk-mask-icon.svg') }}" color="{{ themeColor | default('#0b0c0c') }}"> {# Hardcoded value of $govuk-black #}
+  <link rel="apple-touch-icon" sizes="180x180" href="{{ asset_url('images/govuk-apple-touch-icon-180x180.png') }}">
+  <link rel="apple-touch-icon" sizes="167x167" href="{{ asset_url('images/govuk-apple-touch-icon-167x167.png') }}">
+  <link rel="apple-touch-icon" sizes="152x152" href="{{ asset_url('images/govuk-apple-touch-icon-152x152.png') }}">
+  <link rel="apple-touch-icon" href="{{ asset_url('images/govuk-apple-touch-icon.png') }}">
+{% endblock %}
 
 {% block head %}
   <link rel="stylesheet" media="screen" href="{{ asset_url('stylesheets/main.css') }}" />
@@ -11,7 +20,7 @@
   {% endblock %}
 {% endblock %}
 
-{% block page_title %}
+{% block pageTitle %}
    {% block per_page_title %}{% endblock %} – GOV.UK Notify
 {% endblock %}
 
@@ -108,7 +117,7 @@
   </nav>
 {% endblock %}
 
-{% block body_end %}
+{% block bodyEnd %}
   <!--[if gt IE 8]><!-->
   <script type="text/javascript" src="{{ asset_url('javascripts/all.js') }}"></script>
   <!--<![endif]-->
