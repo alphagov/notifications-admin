@@ -8,6 +8,26 @@ from app.utils import normalize_spaces
 from tests.conftest import SERVICE_ONE_ID
 
 
+@pytest.mark.parametrize('extra_permissions', (
+    [],
+    ['letter'],
+    ['upload_letters'],
+    pytest.param(
+        ['letter', 'upload_letters'],
+        marks=pytest.mark.xfail(raises=AssertionError),
+    ),
+))
+def test_no_upload_letters_button_without_permission(
+    client_request,
+    service_one,
+    mock_get_jobs,
+    extra_permissions,
+):
+    service_one['permissions'] += extra_permissions
+    page = client_request.get('main.uploads', service_id=SERVICE_ONE_ID)
+    assert not page.find('a', text='Upload a letter')
+
+
 def test_get_upload_hub_page(
     client_request,
     service_one,
