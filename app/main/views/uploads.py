@@ -202,13 +202,14 @@ def send_uploaded_letter(service_id):
         abort(403)
 
     file_id = request.form['file_id']
+    postage = request.form['postage']
     metadata = get_letter_metadata(service_id, file_id)
     filename = metadata.get('filename')
 
     if metadata.get('status') != 'valid':
         abort(403)
 
-    notification_api_client.send_precompiled_letter(service_id, filename, file_id)
+    notification_api_client.send_precompiled_letter(service_id, filename, file_id, postage)
 
     return redirect(url_for(
         '.view_notification',

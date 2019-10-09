@@ -417,7 +417,7 @@ def test_send_uploaded_letter_sends_letter_and_redirects_to_notification_page(mo
     client_request.post(
         'main.send_uploaded_letter',
         service_id=SERVICE_ONE_ID,
-        _data={'filename': 'my_file.pdf', 'file_id': file_id},
+        _data={'filename': 'my_file.pdf', 'file_id': file_id, 'postage': 'first'},
         _expected_redirect=url_for(
             'main.view_notification',
             service_id=SERVICE_ONE_ID,
@@ -425,7 +425,7 @@ def test_send_uploaded_letter_sends_letter_and_redirects_to_notification_page(mo
             _external=True
         )
     )
-    mock_send.assert_called_once_with(SERVICE_ONE_ID, 'my_file.pdf', file_id)
+    mock_send.assert_called_once_with(SERVICE_ONE_ID, 'my_file.pdf', file_id, 'first')
 
 
 @pytest.mark.parametrize('permissions', [
@@ -448,7 +448,7 @@ def test_send_uploaded_letter_when_service_does_not_have_correct_permissions(
     client_request.post(
         'main.send_uploaded_letter',
         service_id=SERVICE_ONE_ID,
-        _data={'filename': 'my_file.pdf', 'file_id': file_id},
+        _data={'filename': 'my_file.pdf', 'file_id': file_id, 'postage': 'first'},
         _expected_status=403
     )
     assert not mock_send.called
