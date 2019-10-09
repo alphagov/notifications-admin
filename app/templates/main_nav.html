@@ -15,7 +15,7 @@
       {% endif %}
     {% endif %}
   {% endif %}
-  {% if current_user.has_permissions('send_messages') and current_service.has_permission('letter') and current_service.has_permission('upload_letters') %}
+  {% if current_user.has_permissions('send_messages') and current_service.can_upload_letters %}
     <li><a href="{{ url_for('main.uploads', service_id=current_service.id) }}" {{ main_navigation.is_selected('uploads') }}>Uploads</a></li>
   {% endif %}
     <li><a href="{{ url_for('.manage_users', service_id=current_service.id) }}" {{ main_navigation.is_selected('team-members') }}>Team members</a></li>

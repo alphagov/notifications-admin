@@ -11,5 +11,10 @@
       {{ scheduled_jobs|safe }}
       {% include 'views/dashboard/_jobs.html' %}
       {{ previous_next_navigation(prev_page, next_page) }}
+      {% if current_service.can_upload_letters and current_user.has_permissions('send_messages') %}
+        <div class="js-stick-at-bottom-when-scrolling">
+          <a href="{{ url_for('.upload_letter', service_id=current_service.id) }}" class="button-secondary" role="button">Upload a letter</a>
+        </div>
+      {% endif %}
     </div>
 {% endblock %}

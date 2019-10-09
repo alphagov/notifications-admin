@@ -6,14 +6,16 @@
     jobs,
     caption="Recent files uploaded",
     caption_visible=False,
-    empty_message='You have not uploaded any files recently',
+    empty_message=(
+      'Upload a letter and Notify will print, pack and post it for you.' if current_service.can_upload_letters else 'You have not uploaded any files recently'
+    ),
     field_headings=[
       'File',
       'Sending',
       'Delivered',
       'Failed'
     ],
-    field_headings_visible=True
+    field_headings_visible=True if jobs else False
   ) %}
     {% call row_heading() %}
       <div class="file-list">

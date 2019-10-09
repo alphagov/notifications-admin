@@ -8,9 +8,13 @@ from app.utils import normalize_spaces
 from tests.conftest import SERVICE_ONE_ID
 
 
-def test_get_upload_hub_page(client_request):
+def test_get_upload_hub_page(
+    client_request,
+    service_one,
+    mock_get_jobs,
+):
+    service_one['permissions'] += ['letter', 'upload_letters']
     page = client_request.get('main.uploads', service_id=SERVICE_ONE_ID)
-
     assert page.find('h1').text == 'Uploads'
     assert page.find('a', text='Upload a letter').attrs['href'] == url_for(
         'main.upload_letter', service_id=SERVICE_ONE_ID

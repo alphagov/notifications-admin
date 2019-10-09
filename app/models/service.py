@@ -462,6 +462,10 @@ class Service(JSONModel):
             key=lambda folder: folder['name'].lower(),
         )
 
+    @property
+    def can_upload_letters(self):
+        return self.has_permission('letter') and self.has_permission('upload_letters')
+
     @cached_property
     def all_template_folder_ids(self):
         return {folder['id'] for folder in self.all_template_folders}
