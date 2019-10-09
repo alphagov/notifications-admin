@@ -1,0 +1,21 @@
+// Version of node_modules/govuk-frontend/components/all.scss specific to Notify
+// Included to allow us to only include the components we need
+// All imports come from node_modules/govuk-frontend
+
+// set asset URL root to match that of application
+$govuk-assets-path: "/static/";
+
+@import "settings/all";
+@import "tools/all";
+@import "helpers/all";
+
+@import "core/all";
+@import "objects/all";
+
+// section replacing @import 'components/all', specifying which components to include
+@import 'components/skip-link/_skip-link';
+@import 'components/header/_header';
+@import 'components/footer/_footer';
+
+@import "utilities/all";
+@import "overrides/all";
