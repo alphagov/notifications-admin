@@ -37,7 +37,7 @@ MAX_FILE_UPLOAD_SIZE = 2 * 1024 * 1024  # 2MB
 
 
 @main.route("/services/<service_id>/uploads")
-@user_has_permissions('send_messages')
+@user_has_permissions()
 def uploads(service_id):
     return view_jobs(service_id)
 
