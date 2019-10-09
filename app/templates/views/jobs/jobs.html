@@ -2,11 +2,11 @@
 {% extends "withnav_template.html" %}
 
 {% block service_page_title %}
-  Uploaded files
+  Uploads
 {% endblock %}
 
 {% block maincolumn_content %}
-    <h1 class="heading-large">Uploaded files</h1>
+    <h1 class="heading-large">Uploads</h1>
     <div class="dashboard">
       {{ scheduled_jobs|safe }}
       {% include 'views/dashboard/_jobs.html' %}

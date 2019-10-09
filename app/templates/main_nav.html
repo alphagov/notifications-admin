@@ -11,7 +11,7 @@
     {% if not current_user.has_permissions('view_activity') %}
       <li><a href="{{ url_for('.view_notifications', service_id=current_service.id, status='sending,delivered,failed') }}" {{ casework_navigation.is_selected('sent-messages') }}>Sent messages</a></li>
       {% if current_service.has_jobs %}
-        <li><a href="{{ url_for('.view_jobs', service_id=current_service.id) }}" {{ casework_navigation.is_selected('uploaded-files') }}>Uploaded files</a></li>
+        <li><a href="{{ url_for('.view_jobs', service_id=current_service.id) }}" {{ casework_navigation.is_selected('uploaded-files') }}>Uploads</a></li>
       {% endif %}
     {% endif %}
   {% endif %}
