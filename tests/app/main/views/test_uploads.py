@@ -217,9 +217,11 @@ def test_post_upload_letter_with_letter_that_is_too_long(mocker, client_request)
         'app.main.views.uploads.sanitise_letter',
         return_value=Mock(content='The sanitised content', json=lambda: {'file': 'VGhlIHNhbml0aXNlZCBjb250ZW50'})
     )
-    mocker.patch('app.main.views.uploads.upload_letter_to_s3')
+    mock_upload = mocker.patch('app.main.views.uploads.upload_letter_to_s3')
     mock_page_count = mocker.patch('app.main.views.uploads.pdf_page_count', return_value=11)
     mocker.patch('app.main.views.uploads.service_api_client.get_precompiled_template', return_value=letter_template)
+    mocker.patch('app.main.views.uploads.get_letter_metadata', return_value={
+        'filename': 'tests/test_pdf_files/one_page_pdf.pdf', 'page_count': '11', 'status': 'invalid'})
 
     with open('tests/test_pdf_files/one_page_pdf.pdf', 'rb') as file:
         page = client_request.post(
@@ -230,6 +232,13 @@ def test_post_upload_letter_with_letter_that_is_too_long(mocker, client_request)
         )
 
     assert mock_page_count.called
+    mock_upload.assert_called_once_with(
+        b'The sanitised content',
+        file_location='service-596364a0-858e-42c8-9062-a8fe822260eb/fake-uuid.pdf',
+        filename='tests/test_pdf_files/one_page_pdf.pdf',
+        page_count=11,
+        status='invalid'
+    )
 
     assert page.find('h1').text == 'tests/test_pdf_files/one_page_pdf.pdf'
     assert page.select('#letter-too-long')

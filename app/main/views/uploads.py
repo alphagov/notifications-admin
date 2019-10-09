@@ -83,7 +83,10 @@ def upload_letter(service_id):
             else:
                 raise ex
         else:
-            status = 'valid'
+            if is_letter_too_long(page_count):
+                status = 'invalid'
+            else:
+                status = 'valid'
             file_contents = base64.b64decode(response.json()['file'].encode())
             upload_letter_to_s3(
                 file_contents,
