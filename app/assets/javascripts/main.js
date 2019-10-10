@@ -1,3 +1,5 @@
+window.GOVUKFrontend.initAll();
+
 $(() => $("time.timeago").timeago());
 
 $(() => GOVUK.stickAtTopWhenScrolling.init());
