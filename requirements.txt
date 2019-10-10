@@ -25,14 +25,14 @@ awscli-cwlogs>=1.4,<1.5
 # Putting upgrade on hold due to v1.0.0 using sha512 instead of sha1 by default
 itsdangerous==0.24  # pyup: <1.0.0
 
-git+https://github.com/alphagov/notifications-utils.git@35.0.0#egg=notifications-utils==35.0.0
+git+https://github.com/alphagov/notifications-utils.git@36.0.0#egg=notifications-utils==36.0.0
 git+https://github.com/alphagov/govuk-frontend-jinja.git@v0.3.0-alpha#egg=govuk-frontend-jinja==0.3.0-alpha
 
 ## The following requirements were added by pip freeze:
-awscli==1.16.255
+awscli==1.16.266
 bleach==3.1.0
 boto3==1.9.221
-botocore==1.12.245
+botocore==1.13.2
 certifi==2019.9.11
 chardet==3.0.4
 Click==7.0
@@ -42,7 +42,7 @@ docopt==0.6.2
 docutils==0.15.2
 et-xmlfile==1.0.1
 flask-redis==0.4.0
-future==0.17.1
+future==0.18.1
 greenlet==0.4.15
 idna==2.8
 jdcal==1.4.1
@@ -63,7 +63,7 @@ PyPDF2==1.26.0
 python-dateutil==2.8.0
 python-json-logger==0.1.11
 PyYAML==5.1.2
-redis==3.3.8
+redis==3.3.11
 requests==2.22.0
 rsa==3.4.2
 s3transfer==0.2.1
