@@ -1,0 +1,12 @@
+// Overrides for certain GOV.UK Frontend styles to make its components match this application's design
+
+// Notify's header navigation aligns to the right
+.govuk-header__navigation {
+  text-align: right;
+
+  // reset the alignment of each item to left-to-right
+  .govuk-header__navigation-item {
+    text-align: left;
+  }
+
+}
