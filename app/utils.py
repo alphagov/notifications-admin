@@ -17,7 +17,7 @@ from dateutil import parser
 from flask import abort, current_app, redirect, request, session, url_for
 from flask_login import current_user, login_required
 from notifications_utils.field import Field
-from notifications_utils.formatters import make_quotes_smart
+from notifications_utils.formatters import make_quotes_smart, unescaped_formatted_list
 from notifications_utils.letter_timings import letter_can_be_cancelled
 from notifications_utils.recipients import RecipientCSV
 from notifications_utils.take import Take
@@ -42,6 +42,37 @@ DELIVERED_STATUSES = ['delivered', 'sent', 'returned-letter']
 FAILURE_STATUSES = ['failed', 'temporary-failure', 'permanent-failure',
                     'technical-failure', 'virus-scan-failed', 'validation-failed']
 REQUESTED_STATUSES = SENDING_STATUSES + DELIVERED_STATUSES + FAILURE_STATUSES
+
+
+LETTER_VALIDATION_MESSAGES = {
+    "letter-not-a4-portrait-oriented": {
+        "title": "We cannot print your letter",
+        "detail_line_1": "Your letter is not A4 portrait size on ",
+        "detail_line_2": 'Files must meet our '
+        '<a href="https://docs.notifications.service.gov.uk/documentation/images/'
+        'notify-pdf-letter-spec-v2.4.pdf" target="_blank">letter specification</a>.'
+    },
+    "content-outside-printable-area": {
+        "title": "We cannot print your letter",
+        "detail_line_1": "The content appears outside the printable area on ",
+        "detail_line_2": 'Files must meet our '
+        '<a href="https://docs.notifications.service.gov.uk/documentation/images/'
+        'notify-pdf-letter-spec-v2.4.pdf" target="_blank">letter specification</a>.'
+    },
+    "letter-too-long": {
+        "title": "Your letter is too long",
+        "detail_line_1": "Letters must be 10 pages or less.",
+        "detail_line_2": "Your letter is {} pages long."
+    },
+    "no-encoded-string": {
+        "title": "Sanitise failed - No encoded string"
+    },
+    "unable-to-read-the-file": {
+        "title": "Unable to read the PDF data",
+        "detail_line_1": "Could not read malformed PDF file"
+    }
+}
+
 
 with open('{}/email_domains.txt'.format(
     os.path.dirname(os.path.realpath(__file__))
@@ -541,6 +572,26 @@ def get_letter_printing_statement(status, created_at):
         printed_date = printed_datetime.strftime('%d %B').lstrip('0')
 
         return 'Printed on {} at 5:30pm'.format(printed_date)
+
+
+def get_letter_validation_message(validation_response, invalid_pages=None, page_count=None):
+    if validation_response["message"] in LETTER_VALIDATION_MESSAGES:
+        message = LETTER_VALIDATION_MESSAGES[validation_response["message"]]
+    else:
+        return {"title": "Validation failed"}
+
+    if invalid_pages:
+        message["detail_line_1"] += unescaped_formatted_list(
+            invalid_pages,
+            before_each='',
+            after_each='',
+            prefix='page',
+            prefix_plural='pages'
+        )
+    elif validation_response["message"] == "letter-too-long":
+        message["detail_line_2"] = message["detail_line_2"].format(page_count)
+
+    return message
 
 
 class PermanentRedirect(RequestRedirect):

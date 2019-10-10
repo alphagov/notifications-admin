@@ -1,0 +1,12 @@
+{% call banner_wrapper(type='dangerous') %}
+  <h1 class="banner-title">{{ message.title }}</h1>
+  {% if detail_line_1 in message %}
+    <p>
+      {{ message.detail_line_1 | safe }}
+    {% if detail_line_2 in message %}
+      <br>
+      {{ message.detail_line_2 | safe }}
+    {% endif %}
+    </p>
+  {% endif %}
+{% endcall %}
