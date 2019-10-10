@@ -19,3 +19,9 @@ $govuk-assets-path: "/static/";
 
 @import "utilities/all";
 @import "overrides/all";
+
+// Styles extending those from GOV.UK Frontend
+@import './extensions';
+
+// Styles for GOV.UK Frontend components specific to this application
+@import './overrides';
