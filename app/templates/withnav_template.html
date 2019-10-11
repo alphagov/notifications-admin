@@ -4,8 +4,8 @@
   {% block service_page_title %}{% endblock %} – {{ current_service.name }}
 {% endblock %}
 
-{% block fullwidth_content %}
-  <div id="content">
+{% block main %}
+  <div class="govuk-width-container">
     <div class="navigation-service">
       {% if current_service.organisation_id %}
         {% if current_user.platform_admin or
@@ -27,13 +27,18 @@
         {% include "main_nav.html" %}
       </div>
       {% if help %}
-        <main role="main" class="column-two-thirds column-main">
+        <div class="column-two-thirds column-main">
       {% else %}
-        <main role="main" class="column-three-quarters column-main">
+        <div class="column-three-quarters column-main">
       {% endif %}
-        {% include 'flash_messages.html' %}
-        {% block maincolumn_content %}{% endblock %}
-      </main>
+        {% block beforeContent %}{% endblock %}
+        <main class="govuk-main-wrapper column-main {{ mainClasses }}" id="main-content" role="main">
+        {% block content %}
+          {% include 'flash_messages.html' %}
+          {% block maincolumn_content %}{% endblock %}
+        {% endblock %}
+        </main>
+      </div>
     </div>
   </div>
 {% endblock %}
