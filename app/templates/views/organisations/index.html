@@ -7,9 +7,10 @@
   All organisations
 {% endblock %}
 
-{% block fullwidth_content %}
+{% block beforeContent %}{% endblock %}
 
-  <div id="content">
+{% block maincolumn_content %}
+
     <div class="navigation-service">
       <div class="navigation-service-name">
         &nbsp;
@@ -17,47 +18,45 @@
       <a href="{{ url_for('main.choose_account') }}" class="navigation-service-switch">Switch service</a>
     </div>
 
-    <main role="main">
-      <div class="grid-row top-gutter-2-3">
+    <div class="grid-row top-gutter-2-3">
+      <div class="column-one-quarter">
+        <h1>
+          All organisations
+        </h1>
+      </div>
+      <div class="column-three-quarters">
+
+        {{ live_search(target_selector='.browse-list-item', show=True, form=search_form, label='Search by name') }}
+
+        <nav class="browse-list">
+          <ul>
+            {% for org in organisations %}
+              <li class="browse-list-item">
+                <a href="{{ url_for('main.organisation_dashboard', org_id=org.id) }}" class="browse-list-link">{{ org.name }}</a>
+                <p class="browse-list-hint">
+                  {{ org.count_of_live_services }}
+                  live service{% if org.count_of_live_services != 1 %}s{% endif %}
+                </p>
+                {% if not org.active %}
+                  <span class="table-field-status-default heading-medium">- archived</span>
+                {% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+        </nav>
+
+      </div>
+    </div>
+    <div class="js-stick-at-bottom-when-scrolling">
+      <div class="grid-row">
         <div class="column-one-quarter">
-          <h1>
-            All organisations
-          </h1>
+          &nbsp;
         </div>
         <div class="column-three-quarters">
-
-          {{ live_search(target_selector='.browse-list-item', show=True, form=search_form, label='Search by name') }}
-
-          <nav class="browse-list">
-            <ul>
-              {% for org in organisations %}
-                <li class="browse-list-item">
-                  <a href="{{ url_for('main.organisation_dashboard', org_id=org.id) }}" class="browse-list-link">{{ org.name }}</a>
-                  <p class="browse-list-hint">
-                    {{ org.count_of_live_services }}
-                    live service{% if org.count_of_live_services != 1 %}s{% endif %}
-                  </p>
-                  {% if not org.active %}
-                    <span class="table-field-status-default heading-medium">- archived</span>
-                  {% endif %}
-                </li>
-              {% endfor %}
-            </ul>
-          </nav>
-
+          <a href="{{ url_for('main.add_organisation') }}" class="button-secondary">New organisation</a>
         </div>
       </div>
-      <div class="js-stick-at-bottom-when-scrolling">
-        <div class="grid-row">
-          <div class="column-one-quarter">
-            &nbsp;
-          </div>
-          <div class="column-three-quarters">
-            <a href="{{ url_for('main.add_organisation') }}" class="button-secondary">New organisation</a>
-          </div>
-        </div>
-      </div>
-    </main>
+    </div>
   </div>
 
 {% endblock %}
