@@ -6,6 +6,9 @@
 // 1. LIBRARIES
 // - - - - - - - - - - - - - - -
 const { src, pipe, dest, series, parallel, watch } = require('gulp');
+const rollup = require('rollup');
+const rollupPluginCommonjs = require('rollup-plugin-commonjs');
+const rollupPluginNodeResolve = require('rollup-plugin-node-resolve');
 const stylish = require('jshint-stylish');
 
 const plugins = {};
@@ -50,6 +53,27 @@ const copy = {
 };
 
 
+const bundleJavaScriptModules = async function () {
+  const bundle = await rollup.rollup({
+    input: paths.src + 'javascripts/modules/all.mjs',
+    plugins: [
+      rollupPluginNodeResolve({
+        mainFields: ['module', 'main']
+      }),
+      rollupPluginCommonjs({
+        include: 'node_modules/**'
+      })
+    ]
+  });
+
+  await bundle.write({
+    file: paths.src + 'javascripts/modules/all.js',
+    format: 'iife',
+    name: 'GOVUKFrontend'
+  });
+};
+
+
 const javascripts = () => {
   return src([
       paths.toolkit + 'javascripts/govuk/modules.js',
@@ -86,7 +110,7 @@ const javascripts = () => {
       paths.npm + 'diff-dom/diffDOM.js',
       paths.npm + 'timeago/jquery.timeago.js',
       paths.npm + 'textarea-caret/index.js',
-      paths.govuk_frontend + 'all.js'
+      paths.src + 'javascripts/modules/all.js'
     ]))
     .pipe(plugins.uglify())
     .pipe(plugins.concat('all.js'))
@@ -157,7 +181,10 @@ const lint = {
       .pipe(plugins.sassLint.failOnError());
   },
   'js': (cb) => {
-    return src(paths.src + 'javascripts/**/*.js')
+    return src(
+        paths.src + 'javascripts/**/*.js',
+        { ignore: paths.src + 'javascripts/modules/*.js' } // ignore bundler boilerplate JS
+      )
       .pipe(plugins.jshint())
       .pipe(plugins.jshint.reporter(stylish))
       .pipe(plugins.jshint.reporter('fail'))
@@ -173,7 +200,10 @@ const defaultTask = parallel(
   ),
   series(
     copy.error_pages,
-    javascripts,
+    series(
+      bundleJavaScriptModules,
+      javascripts
+    ),
     sass
   )
 );
