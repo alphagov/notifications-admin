@@ -4,8 +4,8 @@
   {% block org_page_title %}{% endblock %} – {{ current_org.name }}
 {% endblock %}
 
-{% block fullwidth_content %}
-  <div id="content">
+{% block main %}
+  <div class="govuk-width-container">
     <div class="navigation-service">
       {% if current_user.platform_admin %}
         <a href="{{ url_for('.organisations') }}" class="navigation-organisation-link">All organisations</a>
@@ -19,10 +19,15 @@
       <div class="column-one-quarter">
         {% include "org_nav.html" %}
       </div>
-      <main role="main" class="column-three-quarters column-main">
-        {% include 'flash_messages.html' %}
-        {% block maincolumn_content %}{% endblock %}
-      </main>
+      <div class="column-three-quarters">
+        {% block beforeContent %}{% endblock %}
+        <main class="govuk-main-wrapper column-main" id="main-content" role="main" >
+          {% block content %}
+            {% include 'flash_messages.html' %}
+            {% block maincolumn_content %}{% endblock %}
+          {% endblock %}
+        </main>
+      </div>
     </div>
   </div>
 {% endblock %}
