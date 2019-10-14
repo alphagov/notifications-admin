@@ -1,5 +1,7 @@
 {% extends "admin_template.html" %}
 
+{% set mainClasses = "govuk-!-padding-top-0 govuk-!-padding-bottom-12" %}
+
 {% block beforeContent %}
     {% if current_service and current_service.active and current_user.is_authenticated and current_user.belongs_to_service(current_service.id) %}
     <div class="navigation-service">
