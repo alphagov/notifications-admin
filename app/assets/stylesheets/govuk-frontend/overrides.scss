@@ -18,3 +18,13 @@
 .govuk-main-wrapper {
   position: relative;
 }
+
+// Additional padding-bottom override, following the GOV.UK Frontend spacing scale:
+// https://design-system.service.gov.uk/styles/spacing/#the-responsive-spacing-scale
+.govuk-\!-padding-bottom-12 {
+  padding-bottom: 70px;
+
+  @include govuk-media-query($from: tablet) {
+    padding-bottom: 90px;
+  }
+}
