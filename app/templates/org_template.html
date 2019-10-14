@@ -15,13 +15,13 @@
       </div>
       <a href="{{ url_for('main.choose_account') }}" class="navigation-service-switch">Switch service</a>
     </div>
-    <div class="grid-row">
+    <div class="grid-row govuk-!-padding-bottom-12">
       <div class="column-one-quarter">
         {% include "org_nav.html" %}
       </div>
       <div class="column-three-quarters">
         {% block beforeContent %}{% endblock %}
-        <main class="govuk-main-wrapper column-main" id="main-content" role="main" >
+        <main class="govuk-main-wrapper column-main govuk-!-padding-top-0 govuk-!-padding-bottom-0" id="main-content" role="main" >
           {% block content %}
             {% include 'flash_messages.html' %}
             {% block maincolumn_content %}{% endblock %}

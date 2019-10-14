@@ -1,5 +1,7 @@
 {% extends "admin_template.html" %}
 
+{% set mainClasses = "govuk-!-padding-top-0 govuk-!-padding-bottom-0" %}
+
 {% block per_page_title %}
   {% block service_page_title %}{% endblock %} – {{ current_service.name }}
 {% endblock %}
@@ -18,18 +20,18 @@
       </div>
       <a href="{{ url_for('main.choose_account') }}" class="navigation-service-switch">Switch service</a>
     </div>
-    <div class="grid-row">
+    <div class="grid-row govuk-!-padding-bottom-12">
       {% if help %}
         <div class="column-one-third">
       {% else %}
         <div class="column-one-quarter">
       {% endif %}
-        {% include "main_nav.html" %}
-      </div>
+          {% include "main_nav.html" %}
+        </div>
       {% if help %}
-        <div class="column-two-thirds column-main">
+        <div class="column-two-thirds">
       {% else %}
-        <div class="column-three-quarters column-main">
+        <div class="column-three-quarters">
       {% endif %}
         {% block beforeContent %}{% endblock %}
         <main class="govuk-main-wrapper column-main {{ mainClasses }}" id="main-content" role="main">
