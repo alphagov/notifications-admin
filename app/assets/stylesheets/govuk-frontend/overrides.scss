@@ -10,3 +10,11 @@
   }
 
 }
+
+// The GOV.UK Frontend header component wraps content that is `position: relative`
+// This changes its z-index position, putting it above the `<main>` section
+// We need the `<main>` section to be above it, like the default order, to hide the theme colour
+// bar on full-width pages
+.govuk-main-wrapper {
+  position: relative;
+}
