@@ -1,4 +1,5 @@
 {% extends "withnav_template.html" %}
+{% from "components/banner.html" import banner_wrapper %}
 {% from "components/file-upload.html" import file_upload %}
 {% from "components/page-header.html" import page_header %}
 
@@ -9,15 +10,26 @@
 {% block maincolumn_content %}
 <div class="grid-row">
   <div class="column-five-sixths">
-    {{ page_header(
+    {% if error %}
+      {% call banner_wrapper(type='dangerous') %}
+        <h1 class="banner-title">{{ error.title }}</h1>
+        {% if error.detail %}
+          <p>{{ error.detail | safe }}</p>
+        {% endif %}
+      {% endcall %}
+    {% else %}
+      {{ page_header(
         'Upload a letter',
         back_link=url_for('main.uploads', service_id=current_service.id)
     ) }}
+    {% endif %}
 
   <p>
     {{ file_upload(
       form.file,
-      action = url_for('main.upload_letter', service_id=current_service.id),
+      action=url_for('main.upload_letter', service_id=current_service.id),
+      button_text='Upload your file again' if error else 'Choose file',
+      show_errors=False
     )}}
   </p>
   <p>You can upload a single letter as a PDF.</p>

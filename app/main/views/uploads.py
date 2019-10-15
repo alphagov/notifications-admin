@@ -1,11 +1,11 @@
 import base64
+import json
 import uuid
 from io import BytesIO
 
 from flask import (
     abort,
     current_app,
-    flash,
     redirect,
     render_template,
     request,
@@ -26,7 +26,11 @@ from app.s3_client.s3_letter_upload_client import (
     upload_letter_to_s3,
 )
 from app.template_previews import TemplatePreview, sanitise_letter
-from app.utils import get_template, user_has_permissions
+from app.utils import (
+    get_letter_validation_error,
+    get_template,
+    user_has_permissions,
+)
 
 MAX_FILE_UPLOAD_SIZE = 2 * 1024 * 1024  # 2MB
 
@@ -41,6 +45,7 @@ def uploads(service_id):
 @user_has_permissions('send_messages')
 def upload_letter(service_id):
     form = PDFUploadForm()
+    error = {}
 
     if form.validate_on_submit():
         pdf_file_bytes = form.file.data.read()
@@ -48,17 +53,20 @@ def upload_letter(service_id):
 
         virus_free = antivirus_client.scan(BytesIO(pdf_file_bytes))
         if not virus_free:
-            return invalid_upload_error('Your file has failed the virus check')
+            return invalid_upload_error('Your file contains a virus')
 
         if len(pdf_file_bytes) > MAX_FILE_UPLOAD_SIZE:
-            return invalid_upload_error('Your file must be smaller than 2MB')
+            return invalid_upload_error('Your file is too big', 'Files must be smaller than 2MB.')
 
         try:
             # TODO: get page count from the sanitise response once template preview handles malformed files nicely
             page_count = pdf_page_count(BytesIO(pdf_file_bytes))
         except PdfReadError:
             current_app.logger.info('Invalid PDF uploaded for service_id: {}'.format(service_id))
-            return invalid_upload_error('Your file must be a valid PDF')
+            return invalid_upload_error(
+                "There’s a problem with your file",
+                'Notify cannot read this PDF.<br>Save a new copy of your file and try again.'
+            )
 
         upload_id = uuid.uuid4()
         file_location = get_transient_letter_file_location(service_id, upload_id)
@@ -68,13 +76,18 @@ def upload_letter(service_id):
             response.raise_for_status()
         except RequestException as ex:
             if ex.response is not None and ex.response.status_code == 400:
+                validation_failed_message = response.json().get('message')
+                invalid_pages = response.json().get('invalid_pages')
+
                 status = 'invalid'
                 upload_letter_to_s3(
                     pdf_file_bytes,
                     file_location=file_location,
                     status=status,
                     page_count=page_count,
-                    filename=original_filename)
+                    filename=original_filename,
+                    message=validation_failed_message,
+                    invalid_pages=invalid_pages)
             else:
                 raise ex
         else:
@@ -95,12 +108,33 @@ def upload_letter(service_id):
             )
         )
 
-    return render_template('views/uploads/choose-file.html', form=form)
+    if form.file.errors:
+        error = _get_error_from_upload_form(form.file.errors[0])
+
+    return render_template(
+        'views/uploads/choose-file.html',
+        error=error,
+        form=form
+    )
 
 
-def invalid_upload_error(message):
-    flash(message, 'dangerous')
-    return render_template('views/uploads/choose-file.html', form=PDFUploadForm()), 400
+def invalid_upload_error(error_title, error_detail=None):
+    return render_template(
+        'views/uploads/choose-file.html',
+        error={'title': error_title, 'detail': error_detail},
+        form=PDFUploadForm()
+    ), 400
+
+
+def _get_error_from_upload_form(form_errors):
+    error = {}
+    if 'PDF' in form_errors:
+        error['title'] = 'Wrong file type'
+        error['detail'] = form_errors
+    else:  # No file was uploaded error
+        error['title'] = form_errors
+
+    return error
 
 
 @main.route("/services/<service_id>/preview-letter/<file_id>")
@@ -110,7 +144,13 @@ def uploaded_letter_preview(service_id, file_id):
     original_filename = metadata.get('filename')
     page_count = metadata.get('page_count')
     status = metadata.get('status')
+    error_message = metadata.get('message')
+    invalid_pages = metadata.get('invalid_pages')
 
+    if invalid_pages:
+        invalid_pages = json.loads(invalid_pages)
+
+    error = get_letter_validation_error(error_message, invalid_pages, page_count)
     template_dict = service_api_client.get_precompiled_template(service_id)
 
     template = get_template(
@@ -130,6 +170,7 @@ def uploaded_letter_preview(service_id, file_id):
         template=template,
         status=status,
         file_id=file_id,
+        error=error,
     )
 
 
