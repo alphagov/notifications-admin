@@ -8,7 +8,7 @@
 
 {% block content_column_content %}
 
-<h1 class="heading-large">Get started with GOV.UK Notify</h1>
+<h1 class="heading-large">Get started</h1>
 
 <ol class="list list-number">
   <li>
