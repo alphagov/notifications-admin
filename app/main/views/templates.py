@@ -60,6 +60,8 @@ def view_template(service_id, template_id):
             '.send_one_off', service_id=service_id, template_id=template_id
         ))
 
+    page_count = get_page_count_for_letter(template)
+
     return render_template(
         'views/templates/template.html',
         template=get_template(
@@ -76,8 +78,9 @@ def view_template(service_id, template_id):
         ),
         template_postage=template["postage"],
         user_has_template_permission=user_has_template_permission,
-        letter_too_long=is_letter_too_long(get_page_count_for_letter(template)),
+        letter_too_long=is_letter_too_long(page_count),
         letter_max_pages=LETTER_MAX_PAGE_COUNT,
+        page_count=page_count
     )
 
 

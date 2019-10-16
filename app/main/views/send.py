@@ -596,6 +596,7 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
         ),
         letter_too_long=is_letter_too_long(page_count),
         letter_max_pages=LETTER_MAX_PAGE_COUNT,
+        page_count=page_count
     )
 
 
@@ -890,6 +891,7 @@ def _check_notification(service_id, template_id, exception=None):
         help=get_help_argument(),
         letter_too_long=is_letter_too_long(page_count),
         letter_max_pages=LETTER_MAX_PAGE_COUNT,
+        page_count=page_count,
         **(get_template_error_dict(exception) if exception else {}),
     )
 
