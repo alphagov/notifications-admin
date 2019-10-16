@@ -82,7 +82,7 @@ const javascripts = () => {
       paths.src + 'javascripts/detailsPolyfill.js',
       paths.src + 'javascripts/apiKey.js',
       paths.src + 'javascripts/autofocus.js',
-      paths.src + 'javascripts/highlightTags.js',
+      paths.src + 'javascripts/enhancedTextbox.js',
       paths.src + 'javascripts/fileUpload.js',
       paths.src + 'javascripts/radioSelect.js',
       paths.src + 'javascripts/updateContent.js',

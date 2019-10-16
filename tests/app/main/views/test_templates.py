@@ -346,6 +346,8 @@ def test_should_show_page_for_one_template(
     assert "Template &lt;em&gt;content&lt;/em&gt; with &amp; entity" in str(
         page.select_one('textarea')
     )
+    assert page.select_one('textarea')['data-module'] == 'enhanced-textbox'
+    assert page.select_one('textarea')['data-highlight-placeholders'] == 'true'
     assert "priority" not in str(page.select_one('main'))
     mock_get_service_template.assert_called_with(SERVICE_ONE_ID, template_id, None)
 

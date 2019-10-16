@@ -7,7 +7,7 @@
 
   const tagPattern = /\(\(([^\)\((\?)]+)(\?\?)?([^\)\(]*)\)\)/g;
 
-  Modules.HighlightTags = function() {
+  Modules.EnhancedTextbox = function() {
 
     this.start = function(textarea) {
 
