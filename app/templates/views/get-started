@@ -54,7 +54,7 @@
     <h2 class="heading-small">API integration (optional) </h2>
     <p>Share our <a href="{{ url_for('main.documentation') }}">documentation</a> with your developers to help them set up an API integration.</p>
 
-    <p>You only need to do this if you're using the API to send messages automatically, rather than signing in to Notify.</p>
+    <p>You only need to do this if you’re using the API to send messages automatically, rather than signing in to Notify.</p>
   </li>
     
   <li>
@@ -71,7 +71,7 @@
   <li>
     <h2 class="heading-small">Start sending messages</h2>
     {% if not current_user.is_authenticated %}
-    <p><a href="{{ url_for('') }}">Request to go live</a> when you're ready to start sending messages to people outside your team.</p>
+    <p><a href="{{ url_for('') }}">Request to go live</a> when you’re ready to start sending messages to people outside your team.</p>
     {% else %}
     <p>When you're ready to start sending messages to people outside your team, you can send us a request to go live.</p>
     {% endif %}
