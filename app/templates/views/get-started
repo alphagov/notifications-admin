@@ -33,21 +33,21 @@
   <li>
     <h2 class="heading-small">Create an account</h2>
     {% if not current_user.is_authenticated %}
-      <p><a href="{{ url_for('main.register') }}">Create an account</a> for free and set up your first Notify service. When you set up a new service, it will start in <a href="{{ url_for('main.trial-mode') }}">trial mode</a>.</p>
+      <p><a href="{{ url_for('.register') }}">Create an account</a> for free and set up your first Notify service. When you set up a new service, it will start in <a href="{{ url_for('main.trial-mode') }}">trial mode</a>.</p>
     {% else %}
-      <p>Create an account for free and set up your first Notify service. When you set up a new service, it will start in <a href="{{ url_for('main.trial-mode') }}">trial mode</a>.</p>
+      <p>Create an account for free and set up your first Notify service. When you set up a new service, it will start in <a href="{{ url_for('main.trial_mode_new') }}">trial mode</a>.</p>
     {% endif %}
   </li>
   
   <li>
     <h2 class="heading-small">Write some messages</h2>
-    <p>Add <a href="">reusable message templates</a> with examples of the content you plan to send.</p>
+    <p>Add <a href="{{ url_for('main.features', _anchor='templates') }}">reusable message templates</a> with examples of the content you plan to send.</p>
     <p>The GOV.UK Service Manual has advice on:</p>
     <ul class="list list-bullet">
       <li><a href="https://www.gov.uk/service-manual/design/sending-emails-and-text-messages#how-to-write-emails-and-text-messages">how to write emails and text messages</a></li>
       <li><a href="https://www.gov.uk/service-manual/design/writing-effective-letters">writing effective letters</a></li>
     </ul> 
-    <p>If you’re planning to <a href="">upload your own letters</a>, you do not need to add letter templates.</p>
+    <p>If you’re planning to <a href="{{ url_for('main.features_letters', _anchor='upload-letters') }}">upload your own letters</a>, you do not need to add letter templates.</p>
   </li>
   
   <li>
@@ -60,10 +60,10 @@
   <li>
     <h2 class="heading-small">Manage your team members and settings</h2>
     {% if not current_user.is_authenticated %}
-    <p>Check that each of your <a href="{{ url_for('') }}">team members</a> has the right <a href="">permissions</a>.</p>
+    <p>Check that each of your <a href="{{ url_for('') }}">team members</a> has the right <a href="{{ url_for('main.features', _anchor='permissions') }}">permissions</a>.</p>
     <p>Review your <a href="{{ url_for('') }}">settings</a> to make sure you have the right branding and sender information.</p>
     {% else %}
-    <p>Check that each of your team members has the right <a href="">permissions</a>.</p>
+    <p>Check that each of your team members has the right <a href="{{ url_for('main.features', _anchor='permissions') }}">permissions</a>.</p>
     <p>Review your settings to make sure you have the right branding and sender information.</p>
     {% endif %}
   </li>
@@ -71,9 +71,9 @@
   <li>
     <h2 class="heading-small">Start sending messages</h2>
     {% if not current_user.is_authenticated %}
-    <p><a href="{{ url_for('') }}">Request to go live</a> when you’re ready to start sending messages to people outside your team.</p>
+    <p>You should <a href="{{ url_for('') }}">request to go live</a> when you’re ready to start sending messages to people outside your team.</p>
     {% else %}
-    <p>When you're ready to start sending messages to people outside your team, you can send us a request to go live.</p>
+    <p>You should request to go live when you’re ready to start sending messages to people outside your team.</p>
     {% endif %}
     <p>When we receive your request we’ll get back to you within one working day.</p>
 
