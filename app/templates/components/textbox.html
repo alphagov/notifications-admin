@@ -4,6 +4,7 @@
   hint=False,
   highlight_tags=False,
   autofocus=False,
+  autosize=False,
   colour_preview=False,
   help_link=None,
   help_link_text=None,
@@ -47,7 +48,8 @@
     %}
     {{ field(
       class=field_class,
-      data_module='highlight-tags' if highlight_tags else '',
+      data_module='highlight-tags' if highlight_tags or autosize else '',
+      data_highlight_placeholders='true' if highlight_tags else 'false',
       rows=rows|string,
       **kwargs
     ) }}

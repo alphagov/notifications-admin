@@ -11,6 +11,13 @@
 
     this.start = function(textarea) {
 
+      let visibleTextbox;
+
+      this.highlightPlaceholders = (
+        typeof textarea.data('highlightPlaceholders') === 'undefined' ||
+        !!textarea.data('highlightPlaceholders')
+      );
+
       this.$textbox = $(textarea)
         .wrap(`
           <div class='textbox-highlight-wrapper' />
@@ -20,12 +27,18 @@
         `))
         .on("input", this.update);
 
-      this.initialHeight = this.$textbox.height();
+      visibleTextbox = this.$textbox.clone().appendTo("body").css({
+        position: 'absolute',
+        visibility: 'hidden',
+        display: 'block'
+      });
+      this.initialHeight = visibleTextbox.height();
 
       this.$background.css({
-        'width': this.$textbox.outerWidth(),
         'border-width': this.$textbox.css('border-width')
       });
+
+      visibleTextbox.remove();
 
       this.$textbox
         .trigger("input");
@@ -33,6 +46,8 @@
     };
 
     this.resize = () => {
+
+      this.$background.width(this.$textbox.outerWidth());
 
       this.$textbox.height(
         Math.max(
@@ -47,17 +62,23 @@
 
     };
 
-    this.escapedMessage = () => $('<div/>').text(this.$textbox.val()).html();
+    this.contentEscaped = () => $('<div/>').text(this.$textbox.val()).html();
 
-    this.replacePlaceholders = () => this.$background.html(
-      this.escapedMessage().replace(
-        tagPattern, (match, name, separator, value) => value && separator ?
-          `<span class='placeholder-conditional'>((${name}??</span>${value}))` :
-          `<span class='placeholder'>((${name}${value}))</span>`
-      )
+    this.contentReplaced = () => this.contentEscaped().replace(
+      tagPattern, (match, name, separator, value) => value && separator ?
+        `<span class='placeholder-conditional'>((${name}??</span>${value}))` :
+        `<span class='placeholder'>((${name}${value}))</span>`
     );
 
-    this.update = () => this.replacePlaceholders() && this.resize();
+    this.update = () => {
+
+      this.$background.html(
+        this.highlightPlaceholders ? this.contentReplaced() : this.contentEscaped()
+      );
+
+      this.resize();
+
+    };
 
   };
 

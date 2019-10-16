@@ -125,6 +125,34 @@ describe('Highlight tags', () => {
 
     });
 
+    describe("The element's width should match even when the textbox is initially hidden", () => {
+
+      beforeEach(() => {
+
+        let setDisplayPropertyOfFormGroups = function(property) {
+          Array.prototype.forEach.call(
+            document.getElementsByClassName('form-group'),
+            element => element.style.display = property
+          );
+        };
+
+        setDisplayPropertyOfFormGroups('none');
+
+        window.GOVUK.modules.start();
+
+        setDisplayPropertyOfFormGroups('block');
+
+      });
+
+      test("If the textbox is an <textarea>", () => {
+
+        backgroundEl = textarea.nextElementSibling;
+        expect(backgroundEl.style.width).toEqual('582px');
+
+      });
+
+    });
+
     test("The element should be hidden from assistive technologies", () => {
 
       expect(backgroundEl.getAttribute('aria-hidden')).toEqual('true');
@@ -164,6 +192,22 @@ describe('Highlight tags', () => {
         expect(highlightTags.length).toEqual(2);
         expect(highlightTags[0].textContent).toEqual('((title))');
         expect(highlightTags[1].textContent).toEqual('((name))');
+
+      });
+
+      test("Unless a data attribute is set to turn this feature off", () => {
+
+        textarea.textContent  = "Dear ((title)) ((name))";
+        textarea.setAttribute('data-highlight-placeholders', 'false')
+
+        // start module
+        window.GOVUK.modules.start();
+
+        backgroundEl = textarea.nextElementSibling;
+
+        const highlightTags = backgroundEl.querySelectorAll('.placeholder');
+
+        expect(highlightTags.length).toEqual(0);
 
       });
 
