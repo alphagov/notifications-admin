@@ -63,8 +63,8 @@
     <p>Check that each of your team members has the right <a href="{{ url_for('main.features', _anchor='permissions') }}">permissions</a>.</p>
     <p>Review your settings to make sure you have the right branding and sender information.</p>
     {% else %}
-    <p>Check that each of your <a href="{{ url_for('') }}">team members</a> has the right <a href="{{ url_for('main.features', _anchor='permissions') }}">permissions</a>.</p>
-    <p>Review your <a href="{{ url_for('') }}">settings</a> to make sure you have the right branding and sender information.</p>
+    <p>Check that each of your <a href="{{ url_for('.manage_users', service_id=current_service.id) }}">team members</a> has the right <a href="{{ url_for('main.features', _anchor='permissions') }}">permissions</a>.</p>
+    <p>Review your <a href="{{ url_for('.service_settings', service_id=current_service.id) }}">settings</a> to make sure you have the right branding and sender information.</p>
     {% endif %}
   </li>
   
@@ -73,7 +73,7 @@
     {% if not current_user.is_authenticated %}
     <p>You should request to go live when you’re ready to start sending messages to people outside your team.</p>
     {% else %}
-    <p>You should <a href="{{ url_for('') }}">request to go live</a> when you’re ready to start sending messages to people outside your team.</p>
+    <p>You should <a href="{{ url_for('.request_to_go_live', service_id=current_service.id) }}">request to go live</a> when you’re ready to start sending messages to people outside your team.</p>
     {% endif %}
     <p>When we receive your request we’ll get back to you within one working day.</p>
 
