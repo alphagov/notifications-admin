@@ -521,6 +521,31 @@ def test_view_non_letter_template_does_not_display_postage(
     assert "Postage" not in page.text
 
 
+def test_view_letter_template_does_not_display_send_button_if_template_over_10_pages_long(
+    client_request,
+    service_one,
+    mock_get_service_templates,
+    mock_get_template_folders,
+    single_letter_contact_block,
+    mock_has_jobs,
+    active_user_with_permissions,
+    mocker,
+    fake_uuid,
+):
+    mocker.patch('app.main.views.templates.get_page_count_for_letter', return_value=11)
+    client_request.login(active_user_with_permissions)
+    mock_get_service_letter_template(mocker, postage="second")
+    page = client_request.get(
+        'main.view_template',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _test_page_title=False,
+    )
+
+    assert "Send" not in page.text
+    assert page.select('#letter-too-long')
+
+
 def test_edit_letter_template_postage_page_displays_correctly(
     client_request,
     service_one,

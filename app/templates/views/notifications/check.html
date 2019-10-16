@@ -49,6 +49,14 @@
         {% include "partials/check/message-too-long.html" %}
       {% endcall %}
     </div>
+  {% elif letter_too_long %}
+    {% set error = 'letter-too-long' %}
+    {{ govuk_back_link(back_link) }}
+    <div class="bottom-gutter">
+      {% call banner_wrapper(type='dangerous', id='letter-too-long') %}
+          {% include "partials/check/letter-too-long.html" %}
+      {% endcall %}
+    </div>
   {% else %}
     {{ page_header(
       'Preview of ‘{}’'.format(template.name),

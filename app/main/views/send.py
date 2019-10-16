@@ -15,8 +15,9 @@ from flask import (
 )
 from flask_login import current_user
 from notifications_python_client.errors import HTTPError
-from notifications_utils import SMS_CHAR_COUNT_LIMIT
+from notifications_utils import LETTER_MAX_PAGE_COUNT, SMS_CHAR_COUNT_LIMIT
 from notifications_utils.columns import Columns
+from notifications_utils.pdf import is_letter_too_long
 from notifications_utils.recipients import (
     RecipientCSV,
     first_column_headings,
@@ -522,6 +523,7 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
         email_reply_to = get_email_reply_to_address_from_session()
     elif db_template['template_type'] == 'sms':
         sms_sender = get_sms_sender_from_session()
+
     template = get_template(
         db_template,
         current_service,
@@ -567,6 +569,8 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
     elif preview_row > 2:
         abort(404)
 
+    page_count = get_page_count_for_letter(db_template, template.values)
+
     return dict(
         recipients=recipients,
         template=template,
@@ -589,7 +593,10 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
         preview_row=preview_row,
         sent_previously=job_api_client.has_sent_previously(
             service_id, template.id, db_template['version'], request.args.get('original_file_name', '')
-        )
+        ),
+        letter_too_long=is_letter_too_long(page_count),
+        letter_max_pages=LETTER_MAX_PAGE_COUNT,
+        page_count=page_count
     )
 
 
@@ -601,12 +608,12 @@ def check_messages(service_id, template_id, upload_id, row_index=2):
     data = _check_messages(service_id, template_id, upload_id, row_index)
 
     if (
-        data['recipients'].too_many_rows or
-        not data['count_of_recipients'] or
-        not data['recipients'].has_recipient_columns or
-        data['recipients'].duplicate_recipient_column_headers or
-        data['recipients'].missing_column_headers or
-        data['sent_previously']
+        data['recipients'].too_many_rows
+        or not data['count_of_recipients']
+        or not data['recipients'].has_recipient_columns
+        or data['recipients'].duplicate_recipient_column_headers
+        or data['recipients'].missing_column_headers
+        or data['sent_previously']
     ):
         return render_template('views/check/column-errors.html', **data)
 
@@ -614,8 +621,8 @@ def check_messages(service_id, template_id, upload_id, row_index=2):
         return render_template('views/check/row-errors.html', **data)
 
     if (
-        data['errors'] or
-        data['trying_to_send_letters_in_trial_mode']
+        data['errors']
+        or data['trying_to_send_letters_in_trial_mode']
     ):
         return render_template('views/check/column-errors.html', **data)
 
@@ -877,10 +884,14 @@ def _check_notification(service_id, template_id, exception=None):
         raise PermanentRedirect(back_link)
 
     template.values = get_recipient_and_placeholders_from_session(template.template_type)
+    page_count = get_page_count_for_letter(db_template, template.values)
     return dict(
         template=template,
         back_link=back_link,
         help=get_help_argument(),
+        letter_too_long=is_letter_too_long(page_count),
+        letter_max_pages=LETTER_MAX_PAGE_COUNT,
+        page_count=page_count,
         **(get_template_error_dict(exception) if exception else {}),
     )
 

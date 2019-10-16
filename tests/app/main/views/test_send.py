@@ -2735,6 +2735,56 @@ def test_check_messages_shows_trial_mode_error_for_letters(
         assert page.select_one('.table-field-index a').text == '3'
 
 
+@pytest.mark.parametrize('number_of_rows, expected_error_message', [
+    (1, 'This letter is'),
+    (11, 'These letters are'),  # TODO: Pluralise too many pages error message for multiple letters
+])
+def test_check_messages_does_not_allow_to_send_letter_longer_than_10_pages(
+    client_request,
+    api_user_active,
+    mock_get_service_letter_template,
+    mock_has_permissions,
+    mock_get_users_by_service,
+    mock_get_service_statistics,
+    mock_get_job_doesnt_exist,
+    mock_get_jobs,
+    mock_s3_set_metadata,
+    fake_uuid,
+    mocker,
+    mock_get_live_service,
+    number_of_rows,
+    expected_error_message,
+):
+    mocker.patch('app.main.views.send.s3download', return_value='\n'.join(
+        ['address_line_1,address_line_2,postcode,'] +
+        ['First Last,    123 Street,    SW1 1AA'] * number_of_rows
+    ))
+    mocker.patch(
+        'app.main.views.send.get_page_count_for_letter',
+        return_value=11,
+    )
+
+    with client_request.session_transaction() as session:
+        session['file_uploads'] = {
+            fake_uuid: {
+                'template_id': '',
+            }
+        }
+
+    page = client_request.get(
+        'main.check_messages',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        upload_id=fake_uuid,
+        _test_page_title=False,
+    )
+
+    assert page.select('#letter-too-long')
+
+    assert len(page.select('.letter img')) == 10  # if letter longer than 10 pages, only 10 first pages are displayed
+    assert not page.select('[type=submit]')
+
+
 def test_check_messages_shows_data_errors_before_trial_mode_errors_for_letters(
     mocker,
     client_request,
@@ -3064,6 +3114,45 @@ def test_send_one_off_letter_errors_in_trial_mode(
     assert not page.select('[type=submit]')
     assert page.select_one('.govuk-back-link').text == 'Back'
     assert page.select_one('a[download]').text == 'Download as a PDF'
+
+
+def test_send_one_off_letter_errors_if_letter_longer_than_10_pages(
+    client_request,
+    mocker,
+    mock_get_live_service,
+    mock_get_service_letter_template,
+    mock_has_permissions,
+    fake_uuid,
+    mock_get_users_by_service,
+    mock_get_service_statistics,
+    mock_get_job_doesnt_exist,
+    mock_s3_set_metadata,
+):
+
+    mocker.patch(
+        'app.main.views.send.get_page_count_for_letter',
+        return_value=11,
+    )
+
+    with client_request.session_transaction() as session:
+        session['recipient'] = None
+        session['placeholders'] = {
+            'address_line_1': 'First Last',
+            'address_line_2': '123 Street',
+            'postcode': 'SW1 1AA',
+        }
+
+    page = client_request.get(
+        'main.check_notification',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _test_page_title=False,
+    )
+
+    assert page.select('#letter-too-long')
+    assert len(page.select('.letter img')) == 10
+
+    assert not page.select('[type=submit]')
 
 
 def test_check_messages_shows_over_max_row_error(
