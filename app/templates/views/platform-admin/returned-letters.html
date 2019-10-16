@@ -13,7 +13,7 @@
   <div class="column-two-thirds">
     <h1 class="heading-large">Submit returned letters</h1>
     {% call form_wrapper() %}
-      {{ textbox(form.references, width='1-1', rows=8) }}
+      {{ textbox(form.references, width='1-1', rows=8, autosize=True) }}
       {{ page_footer("Submit") }}
     {% endcall %}
   </div>

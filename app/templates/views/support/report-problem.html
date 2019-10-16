@@ -24,7 +24,7 @@
           </p>
         </div>
         {% call form_wrapper() %}
-            {{ textbox(form.feedback, width='1-1', hint='', rows=10) }}
+            {{ textbox(form.feedback, width='1-1', hint='', rows=10, autosize=True) }}
             {% if not current_user.is_authenticated %}
               {{ textbox(form.name, width='1-1') }}
               {{ textbox(form.email_address, width='1-1') }}

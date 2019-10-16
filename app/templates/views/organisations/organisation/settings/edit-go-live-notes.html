@@ -21,7 +21,7 @@
         belonging to this organisation requests to go live.
       </p>
       {% call form_wrapper() %}
-        {{ textbox(form.request_to_go_live_notes, width='1-1', rows=3) }}
+        {{ textbox(form.request_to_go_live_notes, width='1-1', rows=3, autosize=True) }}
         {{ page_footer('Save') }}
       {% endcall %}
     </div>
