@@ -126,7 +126,7 @@ const javascripts = () => {
 
 
 const sass = () => {
-  return src(paths.src + '/stylesheets/main*.scss')
+  return src([paths.src + '/stylesheets/main*.scss', paths.src + '/stylesheets/print.scss'])
     .pipe(plugins.prettyerror())
     .pipe(plugins.sass({
       outputStyle: 'compressed',
