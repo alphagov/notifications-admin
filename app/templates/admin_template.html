@@ -25,11 +25,15 @@
    {% block per_page_title %}{% endblock %} – GOV.UK Notify
 {% endblock %}
 
-{% block cookie_message %}
-  <p>
-    GOV.UK Notify uses cookies to make the site simpler.
-    <a href="{{ url_for("main.cookies") }}">Find out more about cookies</a>
-  </p>
+{% block bodyStart %}
+  {% block cookie_message %}
+    <div class="notify-cookie-message">
+      <p class="govuk-width-container">
+        GOV.UK Notify uses cookies to make the site simpler.
+        <a href="{{ url_for("main.cookies") }}">Find out more about cookies</a>
+      </p>
+    </div>
+  {% endblock %}
 {% endblock %}
 
 {% block header %}
