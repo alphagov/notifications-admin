@@ -34,7 +34,7 @@
     {% if not current_user.is_authenticated %}
       <p><a href="{{ url_for('.register') }}">Create an account</a> for free and add your first Notify service. When you set up a new service, it will start in <a href="{{ url_for('main.trial-mode') }}">trial mode</a>.</p>
     {% else %}
-      <p>Create an account for free and add your first Notify service. When you set up a new service, it will start in <a href="{{ url_for('main.trial_mode_new') }}">trial mode</a>.</p>
+      <p>Create an account for free and add your first Notify service. When you add a new service, it will start in <a href="{{ url_for('main.trial_mode_new') }}">trial mode</a>.</p>
     {% endif %}
   </li>
   
