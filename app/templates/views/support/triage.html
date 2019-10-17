@@ -1,6 +1,7 @@
 {% extends "withoutnav_template.html" %}
 {% from "components/radios.html" import radios %}
 {% from "components/page-footer.html" import page_footer %}
+{% from "components/page-header.html" import page_header %}
 {% from "components/form.html" import form_wrapper %}
 
 {% block per_page_title %}
@@ -11,9 +12,10 @@
 
   <div class="grid-row">
     <div class="column-two-thirds">
-      <h1 class="heading-large">
-        Report a problem
-      </h1>
+      {{ page_header(
+        'Report a problem',
+        back_link=url_for('.support')
+      ) }}
       {% call form_wrapper() %}
         {{ radios(form.severe) }}
         {{ page_footer('Continue') }}
@@ -53,9 +55,6 @@
           message
         </li>
       </ul>
-      <p>
-        <a href="{{ url_for('.support') }}">Back to support</a>
-      </p>
     </div>
   </div>
 
