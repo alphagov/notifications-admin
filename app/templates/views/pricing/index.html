@@ -20,19 +20,19 @@
 
   <p>
     {% if not current_user.is_authenticated %}
-      <a href="{{ url_for('main.register') }}">Create an account</a> then set up as many different services as you need to.</p>
+      <a href="{{ url_for('main.register') }}">Create an account</a> then add as many different services as you need to.</p>
     {% else %}
-      You can set up as many different services as you need to.
+      You can add as many different services as you need to.
     {% endif %}
   </p>
 
-  <p>When you set up a new service it will start in <a href="{{ url_for('main.trial_mode_new') }}">trial mode</a>.</p>
+  <p>When you add a new service it will start in <a href="{{ url_for('main.trial_mode_new') }}">trial mode</a>.</p>
 
   <h2 class="heading-medium">Emails</h2>
   <p>It’s free to send emails through Notify.</p>
 
   <h2 class="heading-medium">Text messages</h2>
-  <p>Every service you set up has an annual allowance of free text messages.</p>
+  <p>Every service you add has an annual allowance of free text messages.</p>
   <p>If your organisation has more than one service on Notify, they each have a separate allowance.</p>
   <p>The allowance is:</p>
   <ul class="list list-bullet">
