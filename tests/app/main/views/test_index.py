@@ -74,7 +74,7 @@ def test_robots(client):
     'cookies', 'privacy', 'pricing', 'terms', 'roadmap',
     'features', 'documentation', 'security',
     'message_status', 'features_email', 'features_sms',
-    'features_letters', 'how_to_pay',
+    'features_letters', 'how_to_pay', 'get_started'
 ])
 def test_static_pages(
     client_request,
@@ -83,6 +83,12 @@ def test_static_pages(
 ):
     page = client_request.get('main.{}'.format(view))
     assert not page.select_one('meta[name=description]')
+
+    client_request.logout()
+    with client_request.session_transaction() as session:
+        session['service_id'] = None
+        session['user_id'] = None
+    client_request.get('main.{}'.format(view))
 
 
 @pytest.mark.parametrize('view, expected_view', [
