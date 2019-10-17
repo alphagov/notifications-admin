@@ -85,6 +85,8 @@ const javascripts = () => {
   return src([
       paths.toolkit + 'javascripts/govuk/modules.js',
       paths.toolkit + 'javascripts/govuk/show-hide-content.js',
+      paths.src + 'javascripts/govuk/cookie-functions.js',
+      paths.src + 'javascripts/cookieMessage.js',
       paths.src + 'javascripts/stick-to-window-when-scrolling.js',
       paths.src + 'javascripts/detailsPolyfill.js',
       paths.src + 'javascripts/apiKey.js',
