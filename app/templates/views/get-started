@@ -32,7 +32,7 @@
   <li>
     <h2 class="heading-small">Create an account</h2>
     {% if not current_user.is_authenticated %}
-      <p><a href="{{ url_for('.register') }}">Create an account</a> for free and add your first Notify service. When you set up a new service, it will start in <a href="{{ url_for('main.trial-mode') }}">trial mode</a>.</p>
+      <p><a href="{{ url_for('.register') }}">Create an account</a> for free and add your first Notify service. When you add a new service, it will start in <a href="{{ url_for('main.trial-mode') }}">trial mode</a>.</p>
     {% else %}
       <p>Create an account for free and add your first Notify service. When you add a new service, it will start in <a href="{{ url_for('main.trial_mode_new') }}">trial mode</a>.</p>
     {% endif %}
@@ -51,10 +51,10 @@
   <li>
     <h2 class="heading-small">Set up your service</h2>
     {% if not current_user.is_authenticated %}
-    <p>Review your service settings to make sure your messages have the right branding.</p>
+    <p>Review your service settings to make sure you have the right branding and sender information.</p>
     <p>Add team members and check their <a href="{{ url_for('main.features', _anchor='permissions') }}">permissions</a>.</p>
     {% else %}
-    <p>Review your <a href="{{ url_for('.service_settings', service_id=current_service.id) }}">service settings</a> to make sure you have the right branding.</p>
+    <p>Review your <a href="{{ url_for('.service_settings', service_id=current_service.id) }}">service settings</a> to make sure you have the right branding and sender information.</p>
     <p>Add <a href="{{ url_for('.manage_users', service_id=current_service.id) }}">team members</a> and check their <a href="{{ url_for('main.features', _anchor='permissions') }}">permissions</a>.</p>
     {% endif %}
   </li>
@@ -69,9 +69,9 @@
   <li>
     <h2 class="heading-small">Start sending messages</h2>
     {% if not current_user.is_authenticated %}
-    <p>You should request to go live when you’re ready to send messages to people outside your team. We’ll get back to you within one working day.</p>
+    <p>You should request to go live when you’re ready to send messages to people outside your team. We’ll process your request within one working day.</p>
     {% else %}
-    <p>You should <a href="{{ url_for('.request_to_go_live', service_id=current_service.id) }}">request to go live</a> when you’re ready to send messages to people outside your team. We’ll get back to you within one working day.</p>
+    <p>You should <a href="{{ url_for('.request_to_go_live', service_id=current_service.id) }}">request to go live</a> when you’re ready to send messages to people outside your team. We’ll process your request within one working day.</p>
     {% endif %}
     <p>Once your service is live, we’ll send you an invoice if you:</p>
     <ul class="list list-bullet">
