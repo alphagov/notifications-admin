@@ -71,9 +71,9 @@
   <li>
     <h2 class="heading-small">Start sending messages</h2>
     {% if not current_user.is_authenticated %}
-    <p>You should request to go live when you’re ready to send messages to people outside your team. We’ll process your request within one working day.</p>
+    <p>You should request to go live when you’re ready to send messages to people outside your team. We’ll approve your request within one working day.</p>
     {% else %}
-    <p>You should <a href="{{ url_for('.request_to_go_live', service_id=current_service.id) }}">request to go live</a> when you’re ready to send messages to people outside your team. We’ll process your request within one working day.</p>
+    <p>You should <a href="{{ url_for('.request_to_go_live', service_id=current_service.id) }}">request to go live</a> when you’re ready to send messages to people outside your team. We’ll approve your request within one working day.</p>
     {% endif %}
     <p>Once your service is live, we’ll send you an invoice if you:</p>
     <ul class="list list-bullet">
