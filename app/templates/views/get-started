@@ -12,7 +12,8 @@
 
 <ol class="list list-number">
   <li>
-    <h2 class="heading-small">Check if you can use GOV.UK Notify</h2>
+    <h2 class="heading-small">Check if GOV.UK Notify is right for you</h2>
+    <p>Read about our <a href="{{ url_for('main.features') }}">features</a>, <a href="{{ url_for('.pricing') }}">pricing</a> and <a href="{{ url_for('main.roadmap') }}">roadmap</a>.</p>
     <details>
       <summary>Organisations that can use Notify</summary>
         <p>Notify is available to:</p>
@@ -26,55 +27,57 @@
         </ul>
         <p>Notify is not currently available to charities.</p>
     </details>
-    
-    <p>Read about our <a href="{{ url_for('main.features') }}">features</a> and <a href="{{ url_for('main.roadmap') }}">roadmap</a> to find out whether Notify meets your needs.</p>
   </li>
     
   <li>
     <h2 class="heading-small">Create an account</h2>
     {% if not current_user.is_authenticated %}
-      <p><a href="{{ url_for('.register') }}">Create an account</a> for free and set up your first Notify service. When you set up a new service, it will start in <a href="{{ url_for('main.trial-mode') }}">trial mode</a>.</p>
+      <p><a href="{{ url_for('.register') }}">Create an account</a> for free and add your first Notify service. When you set up a new service, it will start in <a href="{{ url_for('main.trial-mode') }}">trial mode</a>.</p>
     {% else %}
-      <p>Create an account for free and set up your first Notify service. When you set up a new service, it will start in <a href="{{ url_for('main.trial_mode_new') }}">trial mode</a>.</p>
+      <p>Create an account for free and add your first Notify service. When you set up a new service, it will start in <a href="{{ url_for('main.trial_mode_new') }}">trial mode</a>.</p>
     {% endif %}
   </li>
   
   <li>
     <h2 class="heading-small">Write some messages</h2>
-    <p>Add <a href="{{ url_for('main.features', _anchor='templates') }}">reusable message templates</a> with examples of the content you plan to send.</p>
+    <p>Add <a href="{{ url_for('main.features', _anchor='templates') }}">message templates</a> with examples of the content you plan to send. You do not need to add letter templates if you’re planning to <a href="{{ url_for('main.features_letters', _anchor='upload-letters') }}">upload your own letters</a>.</p>
     <p>The GOV.UK Service Manual has advice on:</p>
     <ul class="list list-bullet">
       <li><a href="https://www.gov.uk/service-manual/design/sending-emails-and-text-messages#how-to-write-emails-and-text-messages">how to write emails and text messages</a></li>
       <li><a href="https://www.gov.uk/service-manual/design/writing-effective-letters">writing effective letters</a></li>
     </ul> 
-    <p>If you’re planning to <a href="{{ url_for('main.features_letters', _anchor='upload-letters') }}">upload your own letters</a>, you do not need to add letter templates.</p>
   </li>
   
   <li>
-    <h2 class="heading-small">API integration (optional) </h2>
+    <h2 class="heading-small">Set up your service</h2>
+    {% if not current_user.is_authenticated %}
+    <p>Review your service settings to make sure your messages have the right branding.</p>
+    <p>Add team members and check their <a href="{{ url_for('main.features', _anchor='permissions') }}">permissions</a>.</p>
+    {% else %}
+    <p>Review your <a href="{{ url_for('.service_settings', service_id=current_service.id) }}">service settings</a> to make sure you have the right branding.</p>
+    <p>Add <a href="{{ url_for('.manage_users', service_id=current_service.id) }}">team members</a> and check their <a href="{{ url_for('main.features', _anchor='permissions') }}">permissions</a>.</p>
+    {% endif %}
+  </li>
+  
+  <li>
+    <h2 class="heading-small">API integration (optional)</h2>
     <p>Share our <a href="{{ url_for('main.documentation') }}">documentation</a> with your developers to help them set up an API integration.</p>
 
     <p>You only need to do this if you’re using the API to send messages automatically, rather than signing in to Notify.</p>
-  </li>
-    
-  <li>
-    <h2 class="heading-small">Manage your team members and settings</h2>
-    {% if not current_user.is_authenticated %}
-    <p>Check that each of your team members has the right <a href="{{ url_for('main.features', _anchor='permissions') }}">permissions</a>.</p>
-    <p>Review your settings to make sure you have the right branding and sender information.</p>
-    {% else %}
-    <p>Check that each of your <a href="{{ url_for('.manage_users', service_id=current_service.id) }}">team members</a> has the right <a href="{{ url_for('main.features', _anchor='permissions') }}">permissions</a>.</p>
-    <p>Review your <a href="{{ url_for('.service_settings', service_id=current_service.id) }}">settings</a> to make sure you have the right branding and sender information.</p>
-    {% endif %}
   </li>
   
   <li>
     <h2 class="heading-small">Start sending messages</h2>
     {% if not current_user.is_authenticated %}
-    <p>You should request to go live when you’re ready to start sending messages to people outside your team.</p>
+    <p>You should request to go live when you’re ready to send messages to people outside your team. We’ll get back to you within one working day.</p>
     {% else %}
-    <p>You should <a href="{{ url_for('.request_to_go_live', service_id=current_service.id) }}">request to go live</a> when you’re ready to start sending messages to people outside your team.</p>
+    <p>You should <a href="{{ url_for('.request_to_go_live', service_id=current_service.id) }}">request to go live</a> when you’re ready to send messages to people outside your team. We’ll get back to you within one working day.</p>
     {% endif %}
-    <p>When we receive your request we’ll get back to you within one working day.</p>
+    <p>Once your service is live, we’ll send you an invoice if you:</p>
+    <ul class="list list-bullet">
+      <li>exceed the <a href="{{ url_for('.pricing') }}">free text message allowance</a></li>
+      <li>send letters</li>
+    </ul>
+    <p>See <a href="{{ url_for('main.how_to_pay') }}">how to pay</a>.</p>
 
 {% endblock %}
