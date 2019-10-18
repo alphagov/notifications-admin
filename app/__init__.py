@@ -328,6 +328,10 @@ def format_date_short(date):
     return _format_datetime_short(utc_string_to_aware_gmt_datetime(date))
 
 
+def format_date_human(date):
+    return get_human_day(date)
+
+
 def _format_datetime_short(datetime):
     return datetime.strftime('%d %B').lstrip('0')
 
@@ -681,6 +685,7 @@ def add_template_filters(application):
         valid_phone_number,
         linkable_name,
         format_date,
+        format_date_human,
         format_date_normal,
         format_date_short,
         format_datetime_relative,

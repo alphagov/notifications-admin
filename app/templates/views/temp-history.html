@@ -10,12 +10,28 @@ Service and API key history
 
   {{ page_header("Service and API key history") }}
 
-  <ul>
-    {% for event in current_service.history|reverse %}
-      <li>
-        {{ event.time|format_datetime_relative }} {{ event.user_id }}<br />
-        {{ event|string }}
-      </li>
-    {% endfor %}
-  </ul>
+  {% for day, events in days %}
+    <h2 class="heading-small top-gutter">
+      {{ events[0].time|format_date_human|title }}
+    </h2>
+    <ul class="bottom-gutter">
+      {% for event in events %}
+        <li class="history-list-item">
+          <div class="grid-row">
+            <div class="column-one-third">
+              <div class="history-list-user">
+                {{ event.user_id }}
+              </div>
+              <div class="history-list-time">
+                {{ event.time|format_time }}
+              </div>
+            </div>
+            <div class="column-two-thirds">
+              {{ event }}
+            </div>
+        </li>
+      {% endfor%}
+    </ul>
+  {% endfor %}
+
 {% endblock %}
