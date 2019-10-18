@@ -63,6 +63,7 @@ class NotificationApiClient(NotifyAdminAPIClient):
         data = {
             'filename': filename,
             'file_id': file_id,
+            'postage': 'second',
         }
         data = _attach_current_user(data)
         return self.post(url='/service/{}/send-pdf-letter'.format(service_id), data=data)

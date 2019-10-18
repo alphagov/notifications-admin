@@ -71,7 +71,8 @@ def test_send_precompiled_letter(mocker, logged_in_client, active_user_with_perm
         data={
             'filename': 'my_file.pdf',
             'file_id': 'file-ID',
-            'created_by': active_user_with_permissions['id']
+            'created_by': active_user_with_permissions['id'],
+            'postage': 'second',
         }
     )
 
