@@ -3501,3 +3501,12 @@ def mock_get_service_and_organisation_counts(mocker):
         'organisations': 111,
         'services': 9999,
     })
+
+
+@pytest.fixture(scope='function')
+def mock_get_service_history(mocker):
+    return mocker.patch('app.service_api_client.get_service_history', return_value={'data': {
+        'service_history': [],
+        'api_key_history': [],
+        'events': [],
+    }})
