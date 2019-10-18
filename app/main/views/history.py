@@ -1,6 +1,6 @@
 from flask import render_template
 
-from app import service_api_client
+from app import current_service
 from app.main import main
 from app.utils import user_has_permissions
 
@@ -9,11 +9,9 @@ from app.utils import user_has_permissions
 @user_has_permissions('manage_service')
 def history(service_id):
 
-    data = service_api_client.get_service_history(service_id)['data']
-
     return render_template(
         'views/temp-history.html',
-        services=data['service_history'],
-        api_keys=data['api_key_history'],
-        events=data['events']
+        services=current_service.history['service_history'],
+        api_keys=current_service.history['api_key_history'],
+        events=current_service.history['events']
     )
