@@ -1,3 +1,5 @@
+from operator import attrgetter
+
 from flask import Markup, abort, current_app
 from notifications_utils.field import Field
 from notifications_utils.formatters import nl2br
@@ -5,6 +7,7 @@ from notifications_utils.take import Take
 from werkzeug.utils import cached_property
 
 from app.models import JSONModel
+from app.models.event import APIKeyEvents, ServiceEvents
 from app.models.organisation import Organisation
 from app.models.user import InvitedUsers, User, Users
 from app.notify_client.api_key_api_client import api_key_api_client
@@ -632,6 +635,9 @@ class Service(JSONModel):
             if test:
                 yield BASE + '_incomplete' + tag
 
-    @cached_property
+    @property
     def history(self):
-        return service_api_client.get_service_history(self.id)['data']
+        return sorted(
+            ServiceEvents(self.id) + APIKeyEvents(self.id),
+            key=attrgetter('time'),
+        )

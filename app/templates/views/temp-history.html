@@ -10,96 +10,12 @@ Service and API key history
 
   {{ page_header("Service and API key history") }}
 
-  <div class="grid-row">
-    {% call(item, row_number) list_table(
-        services,
-        caption="Service history",
-        field_headings=['ID','Name','Created at','Updated at','Active','Message limit','Restricted','Created by id']
-    )%}
-      {% call field() %}
-        {{item.id}}
-      {% endcall %}
-      {% call field() %}
-        {{item.name}}
-      {% endcall %}
-      {% call field() %}
-        {{item.created_at}}
-      {% endcall %}
-      {% call field() %}
-        {{item.updated_at}}
-      {% endcall %}
-      {% call field() %}
-        {{item.active}}
-      {% endcall %}
-      {% call field() %}
-        {{item.message_limit}}
-      {% endcall %}
-      {% call field() %}
-        {{item.restricted}}
-      {% endcall %}
-      {% call field() %}
-        {{item.created_by_id}}
-      {% endcall %}
-
-    {% endcall %}
-
-  </div>
-
-
-  <div class="grid-row">
-    {% call(item, row_number) list_table(
-        api_keys,
-        caption="API key history",
-        field_headings=['ID','Name','Service ID','Exiry date','Created at','Updated at','Created by id']
-    )%}
-      {% call field() %}
-        {{item.id}}
-      {% endcall %}
-      {% call field() %}
-        {{item.name}}
-      {% endcall %}
-      {% call field() %}
-        {{item.service_id}}
-      {% endcall %}
-      {% call field() %}
-        {{item.expiry_date}}
-      {% endcall %}
-      {% call field() %}
-        {{item.created_at}}
-      {% endcall %}
-      {% call field() %}
-        {{item.updated_at}}
-      {% endcall %}
-      {% call field() %}
-        {{item.created_by_id}}
-      {% endcall %}
-
-    {% endcall %}
-
-  </div
-
-  <div class="grid-row">
-
-     {% call(item, row_number) list_table(
-        events,
-        caption="Events",
-        field_headings=['ID','Event type','User ID','IP Address','Event data']
-    )%}
-      {% call field() %}
-        {{item.id}}
-      {% endcall %}
-      {% call field() %}
-        {{item.event_type}}
-      {% endcall %}
-      {% call field() %}
-        {{item.data.user_id}}
-      {% endcall %}
-      {% call field() %}
-        {{item.data.ip_address}}
-      {% endcall %}
-      {% call field() %}
-        {{item.data}}
-      {% endcall %}
-    {% endcall %}
-  </div>
+  <ul>
+    {% for event in current_service.history|reverse %}
+      <li>
+        {{ event.time|format_datetime_relative }} {{ event.user_id }}<br />
+        {{ event|string }}
+      </li>
+    {% endfor %}
+  </ul>
 {% endblock %}

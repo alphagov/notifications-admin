@@ -3,7 +3,6 @@ import os
 import urllib
 from datetime import datetime, timedelta, timezone
 from functools import partial
-from numbers import Number
 from time import monotonic
 
 import ago
@@ -84,7 +83,7 @@ from app.notify_client.template_statistics_api_client import (
     template_statistics_client,
 )
 from app.notify_client.user_api_client import user_api_client
-from app.utils import get_logo_cdn_domain, id_safe
+from app.utils import format_thousands, get_logo_cdn_domain, id_safe
 
 login_manager = LoginManager()
 csrf = CSRFProtect()
@@ -349,14 +348,6 @@ def format_delta(date):
         past_tense='{} ago',
         precision=1
     )
-
-
-def format_thousands(value):
-    if isinstance(value, Number):
-        return '{:,.0f}'.format(value)
-    if value is None:
-        return ''
-    return value
 
 
 def valid_phone_number(phone_number):

@@ -63,8 +63,8 @@ class ModelList(ABC, Sequence):
     def model():
         pass
 
-    def __init__(self):
-        self.items = self.client()
+    def __init__(self, *args):
+        self.items = self.client(*args)
 
     def __getitem__(self, index):
         return self.model(self.items[index])
