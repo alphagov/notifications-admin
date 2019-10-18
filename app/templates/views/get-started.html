@@ -42,7 +42,7 @@
 
   <li>
     <h2 class="heading-small">Write some messages</h2>
-    <p>Add <a href="{{ url_for('main.features', _anchor='templates') }}">message templates</a> with examples of the content you plan to send. You do not need to add letter templates if you’re planning to <a href="{{ url_for('main.features_letters', _anchor='upload-letters') }}">upload your own letters</a>.</p>
+    <p>Add <a href="{{ url_for('main.features', _anchor='templates') }}">message templates</a> with examples of the content you plan to send.<!-- You do not need to add letter templates if you’re planning to <a href="{{ url_for('main.features_letters', _anchor='upload-letters') }}">upload your own letters</a>.--></p>
     <p>The GOV.UK Service Manual has advice on:</p>
     <ul class="list list-bullet">
       <li><a href="https://www.gov.uk/service-manual/design/sending-emails-and-text-messages#how-to-write-emails-and-text-messages">how to write emails and text messages</a></li>
@@ -75,11 +75,6 @@
     {% else %}
     <p>You should <a href="{{ url_for('.request_to_go_live', service_id=current_service.id) }}">request to go live</a> when you’re ready to send messages to people outside your team. We’ll approve your request within one working day.</p>
     {% endif %}
-    <p>Once your service is live, we’ll send you an invoice if you:</p>
-    <ul class="list list-bullet">
-      <li>exceed the <a href="{{ url_for('.pricing') }}">free text message allowance</a></li>
-      <li>send letters</li>
-    </ul>
-    <p>See <a href="{{ url_for('main.how_to_pay') }}">how to pay</a>.</p>
+    <p>Check <a href="{{ url_for('main.how_to_pay') }}">how to pay</a> if you're planning to send letters or exceed the <a href="{{ url_for('.pricing') }}">free text message allowance</a>.</p>
 
 {% endblock %}
