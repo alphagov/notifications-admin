@@ -4,6 +4,7 @@ from flask import render_template
 
 from app import current_service, format_date_numeric
 from app.main import main
+from app.models.event import APIKeyEvents, ServiceEvents
 from app.utils import user_has_permissions
 
 
@@ -12,8 +13,14 @@ from app.utils import user_has_permissions
 def history(service_id):
     return render_template(
         'views/temp-history.html',
-        days=_chunk_events_by_day(current_service.history)
+        days=_chunk_events_by_day(
+            _get_events(current_service.id)
+        )
     )
+
+
+def _get_events(service_id):
+    return APIKeyEvents(service_id) + ServiceEvents(service_id)
 
 
 def _chunk_events_by_day(events):

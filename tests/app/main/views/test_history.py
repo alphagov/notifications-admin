@@ -44,9 +44,9 @@ def test_history(
             '10 October',
             (
                 '6ce466d0-fd6a-11e5-82f5-e0accb9d11a6 11:10am '
-                'Created an API key called ‘Good key’ '
+                'Created this service and called it ‘Example service’ '
                 '6ce466d0-fd6a-11e5-82f5-e0accb9d11a6 11:10am '
-                'Created this service and called it ‘Example service’'
+                'Created an API key called ‘Good key’'
             ),
         ),
     ]
