@@ -1,4 +1,5 @@
 import pytest
+from freezegun import freeze_time
 
 from tests.conftest import SERVICE_ONE_ID, normalize_spaces
 
@@ -20,14 +21,14 @@ from tests.conftest import SERVICE_ONE_ID, normalize_spaces
             ),
         ),
         (
-            '11 November',
+            '11 November 2011',
             (
                 'Test User 11:11am '
                 'Created an API key called ‘Bad key’'
             ),
         ),
         (
-            '10 October',
+            '10 October 2010',
             (
                 'Test User 11:10am '
                 'Created an API key called ‘Good key’ '
@@ -45,14 +46,14 @@ from tests.conftest import SERVICE_ONE_ID, normalize_spaces
             ),
         ),
         (
-            '11 November',
+            '11 November 2011',
             (
                 'Test User 11:11am '
                 'Created an API key called ‘Bad key’'
             ),
         ),
         (
-            '10 October',
+            '10 October 2010',
             (
                 'Test User 11:10am '
                 'Created an API key called ‘Good key’'
@@ -68,7 +69,7 @@ from tests.conftest import SERVICE_ONE_ID, normalize_spaces
             ),
         ),
         (
-            '10 October',
+            '10 October 2010',
             (
                 'Unknown 2:01am '
                 'Created this service and called it ‘Example service’'
@@ -76,6 +77,7 @@ from tests.conftest import SERVICE_ONE_ID, normalize_spaces
         ),
     ]),
 ))
+@freeze_time("2012-01-01 01:01:01")
 def test_history(
     client_request,
     mock_get_service_history,

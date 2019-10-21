@@ -297,12 +297,16 @@ def get_human_day(time):
 
     #  Add 1 minute to transform 00:00 into ‘midnight today’ instead of ‘midnight tomorrow’
     date = (utc_string_to_aware_gmt_datetime(time) - timedelta(minutes=1)).date()
-    if date == (datetime.utcnow() + timedelta(days=1)).date():
+    now = datetime.utcnow()
+
+    if date == (now + timedelta(days=1)).date():
         return 'tomorrow'
-    if date == datetime.utcnow().date():
+    if date == now.date():
         return 'today'
-    if date == (datetime.utcnow() - timedelta(days=1)).date():
+    if date == (now - timedelta(days=1)).date():
         return 'yesterday'
+    if date.strftime('%Y') != now.strftime('%Y'):
+        return '{} {}'.format(_format_datetime_short(date), date.strftime('%Y'))
     return _format_datetime_short(date)
 
 
