@@ -10,7 +10,7 @@
 ) %}
   <form method="post" enctype="multipart/form-data" {% if action %}action="{{ action }}"{% endif %} class="{% if field.errors and show_errors %}form-group-error{% endif %}" data-module="file-upload">
     <label class="file-upload-label" for="{{ field.name }}">
-      <span class="visually-hidden">{{ field.label.text }}</span>
+      <span class="govuk-visually-hidden">{{ field.label.text }}</span>
       {% if hint %}
         <span class="form-hint">
           {{ hint }}
