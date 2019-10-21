@@ -4,17 +4,21 @@ from flask import render_template, request
 
 from app import current_service, format_date_numeric
 from app.main import main
-from app.models.event import APIKeyEvents, ServiceEvents
+from app.models.event import APIKeyEvent, APIKeyEvents, ServiceEvents
 from app.utils import user_has_permissions
 
 
 @main.route("/services/<service_id>/history")
 @user_has_permissions('manage_service')
 def history(service_id):
+
+    events = _get_events(current_service.id, request.args.get('selected'))
+
     return render_template(
         'views/temp-history.html',
-        days=_chunk_events_by_day(
-            _get_events(current_service.id, request.args.get('selected'))
+        days=_chunk_events_by_day(events),
+        show_navigation=request.args.get('selected') or any(
+            isinstance(event, APIKeyEvent) for event in events
         )
     )
 

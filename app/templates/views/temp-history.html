@@ -11,15 +11,19 @@
 
   {{ page_header("Audit events") }}
 
-  {{ pill(
-    [
-      ('All', None, url_for('main.history', service_id=current_service.id), None),
-      ('Service', 'service', url_for('main.history', service_id=current_service.id, selected='service'), None),
-      ('API keys', 'api', url_for('main.history', service_id=current_service.id, selected='api'), None),
-    ],
-    request.args.get('selected'),
-    show_count=False
-  ) }}
+  {% if show_navigation %}
+    <div class="bottom-gutter">
+      {{ pill(
+        [
+          ('All', None, url_for('main.history', service_id=current_service.id), None),
+          ('Service settings', 'service', url_for('main.history', service_id=current_service.id, selected='service'), None),
+          ('API keys', 'api', url_for('main.history', service_id=current_service.id, selected='api'), None),
+        ],
+        request.args.get('selected'),
+        show_count=False
+      ) }}
+    </div>
+  {% endif %}
 
   {% for day, events in days %}
     <h2 class="heading-small top-gutter">
