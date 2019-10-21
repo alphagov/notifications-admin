@@ -1,7 +1,7 @@
 from unittest.mock import Mock
 
 import pytest
-from flask import url_for
+from flask import make_response, url_for
 from requests import RequestException
 
 from app.utils import normalize_spaces
@@ -298,6 +298,54 @@ def test_uploaded_letter_preview(mocker, client_request):
 
     assert page.find('h1').text == 'my_letter.pdf'
     assert page.find('div', class_='letter-sent')
+
+
+def test_uploaded_letter_preview_image_shows_overlay_when_content_outside_printable_area(
+    mocker,
+    logged_in_client,
+    mock_get_service,
+):
+    mocker.patch(
+        'app.main.views.uploads.get_letter_pdf_and_metadata',
+        return_value=('pdf_file', {'message': 'content-outside-printable-area'})
+    )
+    template_preview_mock = mocker.patch(
+        'app.main.views.uploads.TemplatePreview.from_invalid_pdf_file',
+        return_value=make_response('page.html', 200))
+
+    logged_in_client.get(
+        url_for('main.view_letter_upload_as_preview', file_id='fake-uuid', service_id=SERVICE_ONE_ID, page=1)
+    )
+
+    template_preview_mock.assert_called_once_with('pdf_file', '1')
+
+
+@pytest.mark.parametrize(
+    'metadata', [
+        {'message': 'letter-not-a4-portrait-oriented'},
+        {'message': 'letter-too-long'},
+        {},
+    ]
+)
+def test_uploaded_letter_preview_image_does_not_show_overlay_if_no_content_outside_printable_area(
+    mocker,
+    logged_in_client,
+    mock_get_service,
+    metadata,
+):
+    mocker.patch(
+        'app.main.views.uploads.get_letter_pdf_and_metadata',
+        return_value=('pdf_file', metadata)
+    )
+    template_preview_mock = mocker.patch(
+        'app.main.views.uploads.TemplatePreview.from_valid_pdf_file',
+        return_value=make_response('page.html', 200))
+
+    logged_in_client.get(
+        url_for('main.view_letter_upload_as_preview', file_id='fake-uuid', service_id=SERVICE_ONE_ID, page=1)
+    )
+
+    template_preview_mock.assert_called_once_with('pdf_file', '1')
 
 
 def test_send_uploaded_letter_sends_letter_and_redirects_to_notification_page(mocker, service_one, client_request):

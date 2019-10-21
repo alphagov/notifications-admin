@@ -181,7 +181,7 @@ def view_letter_upload_as_preview(service_id, file_id):
 
     page = request.args.get('page')
 
-    if metadata['status'] == 'invalid':
+    if metadata.get('message') == 'content-outside-printable-area':
         return TemplatePreview.from_invalid_pdf_file(pdf_file, page)
     else:
         return TemplatePreview.from_valid_pdf_file(pdf_file, page)
