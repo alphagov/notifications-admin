@@ -53,10 +53,10 @@
   <li>
     <h2 class="heading-small">Set up your service</h2>
     {% if not current_user.is_authenticated %}
-    <p>Review your service settings to make sure you have the right branding and sender information.</p>
+    <p>Review your settings to make sure your messages have the right branding.</p>
     <p>Add team members and check their <a href="{{ url_for('main.features', _anchor='permissions') }}">permissions</a>.</p>
     {% else %}
-    <p>Review your <a href="{{ url_for('.service_settings', service_id=current_service.id) }}">service settings</a> to make sure you have the right branding and sender information.</p>
+    <p>Review your <a href="{{ url_for('.service_settings', service_id=current_service.id) }}">settings</a> to make sure your messages have the right branding.</p>
     <p>Add <a href="{{ url_for('.manage_users', service_id=current_service.id) }}">team members</a> and check their <a href="{{ url_for('main.features', _anchor='permissions') }}">permissions</a>.</p>
     {% endif %}
   </li>
