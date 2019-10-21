@@ -1,14 +1,25 @@
 {% extends "withnav_template.html" %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/table.html" import list_table, field %}
+{% from "components/pill.html" import pill %}
 
 {% block service_page_title %}
-Service and API key history
+  Audit events
 {% endblock %}
 
 {% block maincolumn_content %}
 
-  {{ page_header("Service and API key history") }}
+  {{ page_header("Audit events") }}
+
+  {{ pill(
+    [
+      ('All', None, url_for('main.history', service_id=current_service.id), None),
+      ('Service', 'service', url_for('main.history', service_id=current_service.id, selected='service'), None),
+      ('API keys', 'api', url_for('main.history', service_id=current_service.id, selected='api'), None),
+    ],
+    request.args.get('selected'),
+    show_count=False
+  ) }}
 
   {% for day, events in days %}
     <h2 class="heading-small top-gutter">
