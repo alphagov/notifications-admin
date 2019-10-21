@@ -1,7 +1,7 @@
 from unittest.mock import Mock
 
 import pytest
-from flask import url_for
+from flask import make_response, url_for
 from requests import RequestException
 
 from app.utils import normalize_spaces
@@ -23,6 +23,7 @@ def test_get_upload_letter(client_request):
     assert page.find('h1').text == 'Upload a letter'
     assert page.find('input', class_='file-upload-field')
     assert page.select('button[type=submit]')
+    assert normalize_spaces(page.find('label', class_='file-upload-button').text) == 'Choose file'
 
 
 def test_post_upload_letter_redirects_for_valid_file(mocker, client_request):
@@ -88,6 +89,7 @@ def test_post_upload_letter_shows_letter_preview_for_valid_file(mocker, client_r
             _follow_redirects=True,
         )
 
+    assert page.find('h1').text == 'tests/test_pdf_files/one_page_pdf.pdf'
     assert len(page.select('.letter-postage')) == 1
     assert normalize_spaces(page.select_one('.letter-postage').text) == ('Postage: second class')
     assert page.select_one('.letter-postage')['class'] == ['letter-postage', 'letter-postage-second']
@@ -111,7 +113,9 @@ def test_post_upload_letter_shows_error_when_file_is_not_a_pdf(client_request):
             _data={'file': file},
             _expected_status=200
         )
-    assert page.find('span', class_='error-message').text.strip() == "Letters must be saved as a PDF"
+    assert page.find('h1').text == 'Wrong file type'
+    assert page.find('div', class_='banner-dangerous').find('p').text == 'Save your letter as a PDF and try again.'
+    assert normalize_spaces(page.find('label', class_='file-upload-button').text) == 'Upload your file again'
 
 
 def test_post_upload_letter_shows_error_when_no_file_uploaded(client_request):
@@ -121,7 +125,8 @@ def test_post_upload_letter_shows_error_when_no_file_uploaded(client_request):
         _data={'file': ''},
         _expected_status=200
     )
-    assert page.find('span', class_='error-message').text.strip() == "You need to upload a file to submit"
+    assert page.find('div', class_='banner-dangerous').find('h1').text == 'You need to choose a file to upload'
+    assert normalize_spaces(page.find('label', class_='file-upload-button').text) == 'Upload your file again'
 
 
 def test_post_upload_letter_shows_error_when_file_contains_virus(mocker, client_request):
@@ -134,8 +139,8 @@ def test_post_upload_letter_shows_error_when_file_contains_virus(mocker, client_
             _data={'file': file},
             _expected_status=400
         )
-    assert page.find('h1').text == 'Upload a letter'
-    assert normalize_spaces(page.select('.banner-dangerous')[0].text) == 'Your file has failed the virus check'
+    assert page.find('div', class_='banner-dangerous').find('h1').text == 'Your file contains a virus'
+    assert normalize_spaces(page.find('label', class_='file-upload-button').text) == 'Upload your file again'
 
 
 def test_post_choose_upload_file_when_file_is_too_big(mocker, client_request):
@@ -148,8 +153,9 @@ def test_post_choose_upload_file_when_file_is_too_big(mocker, client_request):
             _data={'file': file},
             _expected_status=400
         )
-    assert page.find('h1').text == 'Upload a letter'
-    assert normalize_spaces(page.select('.banner-dangerous')[0].text) == 'Your file must be smaller than 2MB'
+    assert page.find('div', class_='banner-dangerous').find('h1').text == 'Your file is too big'
+    assert page.find('div', class_='banner-dangerous').find('p').text == 'Files must be smaller than 2MB.'
+    assert normalize_spaces(page.find('label', class_='file-upload-button').text) == 'Upload your file again'
 
 
 def test_post_choose_upload_file_when_file_is_malformed(mocker, client_request):
@@ -162,8 +168,11 @@ def test_post_choose_upload_file_when_file_is_malformed(mocker, client_request):
             _data={'file': file},
             _expected_status=400
         )
-    assert page.find('h1').text == 'Upload a letter'
-    assert normalize_spaces(page.select('.banner-dangerous')[0].text) == 'Your file must be a valid PDF'
+    assert page.find('div', class_='banner-dangerous').find('h1').text == "There’s a problem with your file"
+    assert page.find(
+        'div', class_='banner-dangerous'
+    ).find('p').text == 'Notify cannot read this PDF.Save a new copy of your file and try again.'
+    assert normalize_spaces(page.find('label', class_='file-upload-button').text) == 'Upload your file again'
 
 
 def test_post_upload_letter_with_invalid_file(mocker, client_request):
@@ -173,10 +182,15 @@ def test_post_upload_letter_with_invalid_file(mocker, client_request):
 
     mock_sanitise_response = Mock()
     mock_sanitise_response.raise_for_status.side_effect = RequestException(response=Mock(status_code=400))
+    mock_sanitise_response.json = lambda: {
+        "message": "content-outside-printable-area",
+        "invalid_pages": [1]
+    }
     mocker.patch('app.main.views.uploads.sanitise_letter', return_value=mock_sanitise_response)
     mocker.patch('app.main.views.uploads.service_api_client.get_precompiled_template')
     mocker.patch('app.main.views.uploads.get_letter_metadata', return_value={
-        'filename': 'tests/test_pdf_files/one_page_pdf.pdf', 'page_count': '1', 'status': 'invalid'})
+        'filename': 'tests/test_pdf_files/one_page_pdf.pdf', 'page_count': '1', 'status': 'invalid',
+        'message': 'content-outside-printable-area', 'invalid_pages': '[1]'})
 
     with open('tests/test_pdf_files/one_page_pdf.pdf', 'rb') as file:
         file_contents = file.read()
@@ -194,13 +208,16 @@ def test_post_upload_letter_with_invalid_file(mocker, client_request):
             file_location='service-{}/fake-uuid.pdf'.format(SERVICE_ONE_ID),
             status='invalid',
             page_count=1,
-            filename='tests/test_pdf_files/one_page_pdf.pdf'
+            filename='tests/test_pdf_files/one_page_pdf.pdf',
+            invalid_pages=[1],
+            message='content-outside-printable-area'
         )
 
-    assert page.find('h1').text == 'tests/test_pdf_files/one_page_pdf.pdf'
-    assert normalize_spaces(
-        page.find(id='validation-error-message').text
-    ) == 'Validation failed'
+    assert page.find('div', class_='banner-dangerous').find('h1').text == 'We cannot print your letter'
+    assert page.find(
+        'div', class_='banner-dangerous').find('p').text == (
+        'The content appears outside the printable area on page 1 Files must meet our letter specification.'
+    )
     assert not page.find('button', {'type': 'submit'})
 
 
@@ -216,10 +233,12 @@ def test_post_upload_letter_shows_letter_preview_for_invalid_file(mocker, client
     mocker.patch('app.main.views.uploads.upload_letter_to_s3')
     mock_sanitise_response = Mock()
     mock_sanitise_response.raise_for_status.side_effect = RequestException(response=Mock(status_code=400))
+    mock_sanitise_response.json = lambda: {"message": "template preview error"}
     mocker.patch('app.main.views.uploads.sanitise_letter', return_value=mock_sanitise_response)
     mocker.patch('app.main.views.uploads.service_api_client.get_precompiled_template', return_value=letter_template)
     mocker.patch('app.main.views.uploads.get_letter_metadata', return_value={
-        'filename': 'tests/test_pdf_files/one_page_pdf.pdf', 'page_count': '1', 'status': 'invalid'})
+        'filename': 'tests/test_pdf_files/one_page_pdf.pdf', 'page_count': '1', 'status': 'invalid',
+        'message': 'template-preview-error'})
 
     with open('tests/test_pdf_files/one_page_pdf.pdf', 'rb') as file:
         page = client_request.post(
@@ -274,10 +293,59 @@ def test_uploaded_letter_preview(mocker, client_request):
         original_filename='my_letter.pdf',
         page_count=1,
         status='valid',
+        error={}
     )
 
     assert page.find('h1').text == 'my_letter.pdf'
     assert page.find('div', class_='letter-sent')
+
+
+def test_uploaded_letter_preview_image_shows_overlay_when_content_outside_printable_area(
+    mocker,
+    logged_in_client,
+    mock_get_service,
+):
+    mocker.patch(
+        'app.main.views.uploads.get_letter_pdf_and_metadata',
+        return_value=('pdf_file', {'message': 'content-outside-printable-area'})
+    )
+    template_preview_mock = mocker.patch(
+        'app.main.views.uploads.TemplatePreview.from_invalid_pdf_file',
+        return_value=make_response('page.html', 200))
+
+    logged_in_client.get(
+        url_for('main.view_letter_upload_as_preview', file_id='fake-uuid', service_id=SERVICE_ONE_ID, page=1)
+    )
+
+    template_preview_mock.assert_called_once_with('pdf_file', '1')
+
+
+@pytest.mark.parametrize(
+    'metadata', [
+        {'message': 'letter-not-a4-portrait-oriented'},
+        {'message': 'letter-too-long'},
+        {},
+    ]
+)
+def test_uploaded_letter_preview_image_does_not_show_overlay_if_no_content_outside_printable_area(
+    mocker,
+    logged_in_client,
+    mock_get_service,
+    metadata,
+):
+    mocker.patch(
+        'app.main.views.uploads.get_letter_pdf_and_metadata',
+        return_value=('pdf_file', metadata)
+    )
+    template_preview_mock = mocker.patch(
+        'app.main.views.uploads.TemplatePreview.from_valid_pdf_file',
+        return_value=make_response('page.html', 200))
+
+    logged_in_client.get(
+        url_for('main.view_letter_upload_as_preview', file_id='fake-uuid', service_id=SERVICE_ONE_ID, page=1)
+    )
+
+    template_preview_mock.assert_called_once_with('pdf_file', '1')
 
 
 def test_send_uploaded_letter_sends_letter_and_redirects_to_notification_page(mocker, service_one, client_request):
@@ -334,7 +402,8 @@ def test_send_uploaded_letter_when_metadata_states_pdf_is_invalid(mocker, servic
     mock_send = mocker.patch('app.main.views.uploads.notification_api_client.send_precompiled_letter')
     mocker.patch(
         'app.main.views.uploads.get_letter_metadata',
-        return_value={'filename': 'my_file.pdf', 'page_count': '3', 'status': 'invalid'}
+        return_value={'filename': 'my_file.pdf', 'page_count': '3', 'status': 'invalid',
+                      'message': 'error', 'invalid_pages': '[1]'}
     )
 
     service_one['permissions'] = ['letter', 'upload_letters']

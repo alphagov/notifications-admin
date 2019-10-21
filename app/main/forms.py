@@ -1111,8 +1111,8 @@ class PDFUploadForm(StripWhitespaceForm):
     file = FileField_wtf(
         'Upload a letter in PDF format',
         validators=[
-            FileAllowed(['pdf'], 'Letters must be saved as a PDF'),
-            DataRequired(message="You need to upload a file to submit")
+            FileAllowed(['pdf'], 'Save your letter as a PDF and try again.'),
+            DataRequired(message="You need to choose a file to upload")
         ]
     )
 

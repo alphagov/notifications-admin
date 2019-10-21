@@ -1,3 +1,5 @@
+import json
+
 from boto3 import resource
 from flask import current_app
 from notifications_utils.s3 import s3upload as utils_s3upload
@@ -7,17 +9,23 @@ def get_transient_letter_file_location(service_id, upload_id):
     return 'service-{}/{}.pdf'.format(service_id, upload_id)
 
 
-def upload_letter_to_s3(data, *, file_location, status, page_count, filename):
+def upload_letter_to_s3(data, *, file_location, status, page_count, filename, message=None, invalid_pages=None):
+    metadata = {
+        'status': status,
+        'page_count': str(page_count),
+        'filename': filename,
+    }
+    if message:
+        metadata['message'] = message
+    if invalid_pages:
+        metadata['invalid_pages'] = json.dumps(invalid_pages)
+
     utils_s3upload(
         filedata=data,
         region=current_app.config['AWS_REGION'],
         bucket_name=current_app.config['TRANSIENT_UPLOADED_LETTERS'],
         file_location=file_location,
-        metadata={
-            'status': status,
-            'page_count': str(page_count),
-            'filename': filename,
-        }
+        metadata=metadata,
     )
 
 

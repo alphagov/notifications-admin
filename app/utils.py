@@ -17,7 +17,10 @@ from dateutil import parser
 from flask import abort, current_app, redirect, request, session, url_for
 from flask_login import current_user, login_required
 from notifications_utils.field import Field
-from notifications_utils.formatters import make_quotes_smart
+from notifications_utils.formatters import (
+    make_quotes_smart,
+    unescaped_formatted_list,
+)
 from notifications_utils.letter_timings import letter_can_be_cancelled
 from notifications_utils.recipients import RecipientCSV
 from notifications_utils.take import Take
@@ -542,6 +545,54 @@ def get_letter_printing_statement(status, created_at):
         printed_date = printed_datetime.strftime('%d %B').lstrip('0')
 
         return 'Printed on {} at 5:30pm'.format(printed_date)
+
+
+LETTER_VALIDATION_MESSAGES = {
+    'letter-not-a4-portrait-oriented': {
+        'title': 'We cannot print your letter',
+        'detail': 'Your letter is not A4 portrait size on {invalid_pages} <br>'
+                  'Files must meet our <a href="https://docs.notifications.service.gov.uk/documentation/images/'
+                  'notify-pdf-letter-spec-v2.4.pdf" target="_blank">letter specification</a>.'
+    },
+    'content-outside-printable-area': {
+        'title': 'We cannot print your letter',
+        'detail': 'The content appears outside the printable area on {invalid_pages} <br>'
+                  'Files must meet our <a href="https://docs.notifications.service.gov.uk/documentation/images/'
+                  'notify-pdf-letter-spec-v2.4.pdf" target="_blank">letter specification</a>.'
+    },
+    'letter-too-long': {
+        'title': 'Your letter is too long',
+        'detail': 'Letters must be 10 pages or less. <br>Your letter is {page_count} pages long.'
+    },
+    'no-encoded-string': {
+        'title': 'Sanitise failed - No encoded string'
+    },
+    'unable-to-read-the-file': {
+        'title': 'There’s a problem with your file',
+        'detail': 'Notify cannot read this PDF.<br>Save a new copy of your file and try again.'
+    }
+}
+
+
+def get_letter_validation_error(validation_message, invalid_pages=None, page_count=None):
+    if validation_message not in LETTER_VALIDATION_MESSAGES:
+        return {'title': 'Validation failed'}
+
+    invalid_pages = unescaped_formatted_list(
+        invalid_pages or [],
+        before_each='',
+        after_each='',
+        prefix='page',
+        prefix_plural='pages'
+    )
+
+    return {
+        'title': LETTER_VALIDATION_MESSAGES[validation_message]['title'],
+        'detail': LETTER_VALIDATION_MESSAGES[validation_message]['detail'].format(
+            invalid_pages=invalid_pages,
+            page_count=page_count,
+        )
+    }
 
 
 class PermanentRedirect(RequestRedirect):
