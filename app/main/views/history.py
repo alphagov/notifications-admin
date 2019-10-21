@@ -19,7 +19,8 @@ def history(service_id):
         days=_chunk_events_by_day(events),
         show_navigation=request.args.get('selected') or any(
             isinstance(event, APIKeyEvent) for event in events
-        )
+        ),
+        user_getter=current_service.active_users.get_name_from_id,
     )
 
 

@@ -3511,7 +3511,7 @@ def mock_get_service_history(mocker):
                 'name': 'Example service',
                 'created_at': '2010-10-10T01:01:01.000000Z',
                 'updated_at': None,
-                'created_by_id': sample_uuid(),
+                'created_by_id': uuid4(),
             },
             {
                 'name': 'Real service',

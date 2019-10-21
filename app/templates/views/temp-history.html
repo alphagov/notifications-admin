@@ -35,7 +35,7 @@
           <div class="grid-row">
             <div class="column-one-third">
               <div class="history-list-user">
-                {{ event.user_id }}
+                {{ user_getter(event.user_id) }}
               </div>
               <div class="history-list-time">
                 {{ event.time|format_time }}

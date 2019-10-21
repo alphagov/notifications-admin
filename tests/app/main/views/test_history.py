@@ -8,30 +8,30 @@ from tests.conftest import SERVICE_ONE_ID, normalize_spaces
         (
             '12 December',
             (
-                '6ce466d0-fd6a-11e5-82f5-e0accb9d11a6 12:12pm '
+                'Test User 12:12pm '
                 'Renamed this service from ‘Example service’ to ‘Real service’'
             ),
         ),
         (
             '11 November',
             (
-                '6ce466d0-fd6a-11e5-82f5-e0accb9d11a6 12:12pm '
+                'Test User 12:12pm '
                 'Revoked the ‘Bad key’ API key'
             ),
         ),
         (
             '11 November',
             (
-                '6ce466d0-fd6a-11e5-82f5-e0accb9d11a6 11:11am '
+                'Test User 11:11am '
                 'Created an API key called ‘Bad key’'
             ),
         ),
         (
             '10 October',
             (
-                '6ce466d0-fd6a-11e5-82f5-e0accb9d11a6 11:10am '
+                'Test User 11:10am '
                 'Created an API key called ‘Good key’ '
-                '6ce466d0-fd6a-11e5-82f5-e0accb9d11a6 2:01am '
+                'Unknown 2:01am '
                 'Created this service and called it ‘Example service’'
             ),
         ),
@@ -40,21 +40,21 @@ from tests.conftest import SERVICE_ONE_ID, normalize_spaces
         (
             '11 November',
             (
-                '6ce466d0-fd6a-11e5-82f5-e0accb9d11a6 12:12pm '
+                'Test User 12:12pm '
                 'Revoked the ‘Bad key’ API key'
             ),
         ),
         (
             '11 November',
             (
-                '6ce466d0-fd6a-11e5-82f5-e0accb9d11a6 11:11am '
+                'Test User 11:11am '
                 'Created an API key called ‘Bad key’'
             ),
         ),
         (
             '10 October',
             (
-                '6ce466d0-fd6a-11e5-82f5-e0accb9d11a6 11:10am '
+                'Test User 11:10am '
                 'Created an API key called ‘Good key’'
             ),
         ),
@@ -63,14 +63,14 @@ from tests.conftest import SERVICE_ONE_ID, normalize_spaces
         (
             '12 December',
             (
-                '6ce466d0-fd6a-11e5-82f5-e0accb9d11a6 12:12pm '
+                'Test User 12:12pm '
                 'Renamed this service from ‘Example service’ to ‘Real service’'
             ),
         ),
         (
             '10 October',
             (
-                '6ce466d0-fd6a-11e5-82f5-e0accb9d11a6 2:01am '
+                'Unknown 2:01am '
                 'Created this service and called it ‘Example service’'
             ),
         ),
