@@ -94,7 +94,7 @@ def test_show_correct_title_and_description_for_sender_type(
 
     assert page.select_one('h1').text == expected_title
 
-    for element in ('legend', 'legend .visually-hidden'):
+    for element in ('legend', 'legend .govuk-visually-hidden'):
         assert normalize_spaces(page.select_one(element).text) == expected_description
 
 
