@@ -88,7 +88,7 @@ def test_choose_account_should_show_choose_accounts_page(
     mock_get_organisation,
 ):
     resp = client_request.get('main.choose_account')
-    page = resp.find('div', {'id': 'content'}).main
+    page = resp.find('main', {'id': 'main-content'})
 
     assert normalize_spaces(page.h1.text) == 'Choose service'
     outer_list_items = page.select('nav ul')[0].select('li')
@@ -144,7 +144,7 @@ def test_choose_account_should_show_choose_accounts_page_if_no_services(
         'services': []
     }
     resp = client_request.get('main.choose_account')
-    page = resp.find('div', {'id': 'content'}).main
+    page = resp.find('main', {'id': 'main-content'})
 
     links = page.findAll('a')
     assert len(links) == 1
@@ -182,8 +182,8 @@ def test_choose_account_should_show_back_to_service_link(
 ):
     resp = client_request.get('main.choose_account')
 
-    page = resp.find('div', {'id': 'content'})
-    back_to_service_link = page.find('div', {'class': 'navigation-service'}).a
+    service_navigation = resp.find('div', {'class': 'navigation-service'})
+    back_to_service_link = service_navigation.a
 
     assert back_to_service_link['href'] == url_for('main.show_accounts_or_dashboard')
     assert back_to_service_link.text == 'Back to service one'
@@ -273,7 +273,7 @@ def test_should_not_show_back_to_service_if_user_doesnt_belong_to_service(
     )
 
     assert normalize_spaces(
-        page.select_one('#content').text
+        page.select_one('header + .govuk-width-container').text
     ).startswith(
         normalize_spaces(page_text)
     )
