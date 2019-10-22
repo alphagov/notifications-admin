@@ -38,19 +38,6 @@ from app.utils import (
 )
 
 
-# This is a placeholder view method to be replaced
-# when product team makes decision about how/what/when
-# to view history
-@main.route("/services/<service_id>/history")
-@user_has_permissions()
-def temp_service_history(service_id):
-    data = service_api_client.get_service_history(service_id)['data']
-    return render_template('views/temp-history.html',
-                           services=data['service_history'],
-                           api_keys=data['api_key_history'],
-                           events=data['events'])
-
-
 @main.route("/services/<service_id>/dashboard")
 @user_has_permissions('view_activity', 'send_messages')
 def old_service_dashboard(service_id):
