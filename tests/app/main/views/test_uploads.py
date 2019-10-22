@@ -26,7 +26,7 @@ def test_get_upload_letter(client_request):
     assert normalize_spaces(page.find('label', class_='file-upload-button').text) == 'Choose file'
 
 
-def test_post_upload_letter_redirects_for_valid_file(mocker, client_request):
+def test_post_upload_letter_redirects_for_valid_file(mocker, active_user_with_permissions, service_one, client_request):
     mocker.patch('uuid.uuid4', return_value='fake-uuid')
     antivirus_mock = mocker.patch('app.main.views.uploads.antivirus_client.scan', return_value=True)
     mocker.patch(
@@ -37,6 +37,9 @@ def test_post_upload_letter_redirects_for_valid_file(mocker, client_request):
     mocker.patch('app.main.views.uploads.get_letter_metadata', return_value={
         'filename': 'tests/test_pdf_files/one_page_pdf.pdf', 'page_count': '1', 'status': 'valid'})
     mocker.patch('app.main.views.uploads.service_api_client.get_precompiled_template')
+
+    service_one['restricted'] = False
+    client_request.login(active_user_with_permissions, service=service_one)
 
     with open('tests/test_pdf_files/one_page_pdf.pdf', 'rb') as file:
         page = client_request.post(
@@ -62,7 +65,12 @@ def test_post_upload_letter_redirects_for_valid_file(mocker, client_request):
     assert page.find('button', {'type': 'submit'}).text == 'Send 1 letter'
 
 
-def test_post_upload_letter_shows_letter_preview_for_valid_file(mocker, client_request):
+def test_post_upload_letter_shows_letter_preview_for_valid_file(
+    mocker,
+    active_user_with_permissions,
+    service_one,
+    client_request,
+):
     letter_template = {'template_type': 'letter',
                        'reply_to_text': '',
                        'postage': 'second',
@@ -80,6 +88,9 @@ def test_post_upload_letter_shows_letter_preview_for_valid_file(mocker, client_r
     mocker.patch('app.main.views.uploads.get_letter_metadata', return_value={
         'filename': 'tests/test_pdf_files/one_page_pdf.pdf', 'page_count': '3', 'status': 'valid'})
     mocker.patch('app.main.views.uploads.service_api_client.get_precompiled_template', return_value=letter_template)
+
+    service_one['restricted'] = False
+    client_request.login(active_user_with_permissions, service=service_one)
 
     with open('tests/test_pdf_files/one_page_pdf.pdf', 'rb') as file:
         page = client_request.post(
@@ -281,10 +292,13 @@ def test_post_upload_letter_does_not_upload_to_s3_if_template_preview_raises_unk
     assert not mock_s3.called
 
 
-def test_uploaded_letter_preview(mocker, client_request):
+def test_uploaded_letter_preview(mocker, active_user_with_permissions, service_one, client_request):
     mocker.patch('app.main.views.uploads.service_api_client')
     mocker.patch('app.main.views.uploads.get_letter_metadata', return_value={
         'filename': 'my_letter.pdf', 'page_count': '1', 'status': 'valid'})
+
+    service_one['restricted'] = False
+    client_request.login(active_user_with_permissions, service=service_one)
 
     page = client_request.get(
         'main.uploaded_letter_preview',
@@ -298,6 +312,28 @@ def test_uploaded_letter_preview(mocker, client_request):
 
     assert page.find('h1').text == 'my_letter.pdf'
     assert page.find('div', class_='letter-sent')
+
+
+def test_uploaded_letter_preview_does_not_show_send_button_if_service_in_trial_mode(mocker, client_request):
+    mocker.patch('app.main.views.uploads.service_api_client')
+    mocker.patch('app.main.views.uploads.get_letter_metadata', return_value={
+        'filename': 'my_letter.pdf', 'page_count': '1', 'status': 'valid'})
+
+    # client_request uses service_one, which is in trial mode
+    page = client_request.get(
+        'main.uploaded_letter_preview',
+        service_id=SERVICE_ONE_ID,
+        file_id='fake-uuid',
+        original_filename='my_letter.pdf',
+        page_count=1,
+        status='valid',
+        error={},
+        _test_page_title=False,
+    )
+
+    assert normalize_spaces(page.find('h1').text) == 'You cannot send this letter'
+    assert page.find('div', class_='letter-sent')
+    assert not page.find('button', {'type': 'submit'})
 
 
 def test_uploaded_letter_preview_image_shows_overlay_when_content_outside_printable_area(

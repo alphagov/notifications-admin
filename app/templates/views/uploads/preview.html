@@ -14,6 +14,14 @@
         <p>{{ error.detail | safe }}</p>
       {% endif %}
     {% endcall %}
+  {% elif current_service.trial_mode %}
+    {% call banner_wrapper(type='dangerous') %}
+      {% with
+        count_of_recipients=1
+      %}
+        {% include "partials/check/trying-to-send-letters-in-trial-mode.html" %}
+      {% endwith %}
+    {% endcall %}
   {% else %}
       {{ page_header(
         original_filename,
@@ -25,7 +33,7 @@
       {{ template|string }}
     </div>
 
-    {% if status == 'valid' %}
+    {% if status == 'valid' and current_service.live %}
     <div class="js-stick-at-bottom-when-scrolling">
       <form method="post" enctype="multipart/form-data" action="{{url_for(
           'main.send_uploaded_letter',
