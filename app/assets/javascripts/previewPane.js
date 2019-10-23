@@ -1,9 +1,8 @@
-(function () {
+(function (global) {
 
   'use strict';
 
-  const root = this,
-      $ = this.jQuery;
+  $ = global.jQuery;
 
   let branding_style = $('.multiple-choice input[name="branding_style"]:checked');
 
@@ -34,4 +33,4 @@
   $form.find('button[type="submit"]').text('Save');
 
   $('fieldset').on('change', 'input[name="branding_style"]', setPreviewPane);
-})();
+})(window);

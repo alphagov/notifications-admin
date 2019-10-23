@@ -472,8 +472,8 @@ describe("Stick to top/bottom of window when scrolling", () => {
         // add another sticky element before the form footer
         radios = helpers.getRadioGroup({
           cssClasses: ['js-stick-at-top-when-scrolling'],
-          name: 'send-time',
-          label: 'send time',
+          name: 'choose-send-time',
+          label: 'Choose send time',
           fields: [
             {
               label: 'Now',
@@ -604,7 +604,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
                 }
               });
 
-            radios.querySelector('fieldset').insertAdjacentHTML('beforeend', helpers.getRadios(fields));
+            radios.querySelector('fieldset').insertAdjacentHTML('beforeend', helpers.getRadios(fields, 'days'));
 
             radios.offsetHeight = 475;
 
@@ -1146,8 +1146,8 @@ describe("Stick to top/bottom of window when scrolling", () => {
         // add another sticky element before the form footer
         radios = helpers.getRadioGroup({
           cssClasses: ['js-stick-at-bottom-when-scrolling'],
-          name: 'send-time',
-          label: 'Send time',
+          name: 'choose-send-time',
+          label: 'Choose send time',
           fields: [
             {
               label: 'Now',
@@ -1280,7 +1280,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
                 }
               });
 
-            radios.querySelector('fieldset').insertAdjacentHTML('beforeend', helpers.getRadios(fields));
+            radios.querySelector('fieldset').insertAdjacentHTML('beforeend', helpers.getRadios(fields, 'days'));
 
             radios.offsetHeight = 475;
 
