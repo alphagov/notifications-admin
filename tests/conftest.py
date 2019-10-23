@@ -3505,8 +3505,40 @@ def mock_get_service_and_organisation_counts(mocker):
 
 @pytest.fixture(scope='function')
 def mock_get_service_history(mocker):
-    return mocker.patch('app.service_api_client.get_service_history', return_value={'data': {
-        'service_history': [],
-        'api_key_history': [],
+    return mocker.patch('app.service_api_client.get_service_history', return_value={
+        'service_history': [
+            {
+                'name': 'Example service',
+                'created_at': '2010-10-10T01:01:01.000000Z',
+                'updated_at': None,
+                'created_by_id': uuid4(),
+            },
+            {
+                'name': 'Real service',
+                'created_at': '2010-10-10T01:01:01.000000Z',
+                'updated_at': '2012-12-12T12:12:12.000000Z',
+                'created_by_id': sample_uuid(),
+            },
+        ],
+        'api_key_history': [
+            {
+                'name': 'Good key',
+                'updated_at': None,
+                'created_at': '2010-10-10T10:10:10.000000Z',
+                'created_by_id': sample_uuid(),
+            },
+            {
+                'name': 'Bad key',
+                'updated_at': '2012-11-11T12:12:12.000000Z',
+                'created_at': '2011-11-11T11:11:11.000000Z',
+                'created_by_id': sample_uuid(),
+            },
+            {
+                'name': 'Bad key',
+                'updated_at': None,
+                'created_at': '2011-11-11T11:11:11.000000Z',
+                'created_by_id': sample_uuid(),
+            },
+        ],
         'events': [],
-    }})
+    })

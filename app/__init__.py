@@ -3,7 +3,6 @@ import os
 import urllib
 from datetime import datetime, timedelta, timezone
 from functools import partial
-from numbers import Number
 from time import monotonic
 
 import ago
@@ -84,7 +83,7 @@ from app.notify_client.template_statistics_api_client import (
     template_statistics_client,
 )
 from app.notify_client.user_api_client import user_api_client
-from app.utils import get_logo_cdn_domain, id_safe
+from app.utils import format_thousands, get_logo_cdn_domain, id_safe
 
 login_manager = LoginManager()
 csrf = CSRFProtect()
@@ -298,12 +297,16 @@ def get_human_day(time):
 
     #  Add 1 minute to transform 00:00 into ‘midnight today’ instead of ‘midnight tomorrow’
     date = (utc_string_to_aware_gmt_datetime(time) - timedelta(minutes=1)).date()
-    if date == (datetime.utcnow() + timedelta(days=1)).date():
+    now = datetime.utcnow()
+
+    if date == (now + timedelta(days=1)).date():
         return 'tomorrow'
-    if date == datetime.utcnow().date():
+    if date == now.date():
         return 'today'
-    if date == (datetime.utcnow() - timedelta(days=1)).date():
+    if date == (now - timedelta(days=1)).date():
         return 'yesterday'
+    if date.strftime('%Y') != now.strftime('%Y'):
+        return '{} {}'.format(_format_datetime_short(date), date.strftime('%Y'))
     return _format_datetime_short(date)
 
 
@@ -329,6 +332,10 @@ def format_date_short(date):
     return _format_datetime_short(utc_string_to_aware_gmt_datetime(date))
 
 
+def format_date_human(date):
+    return get_human_day(date)
+
+
 def _format_datetime_short(datetime):
     return datetime.strftime('%d %B').lstrip('0')
 
@@ -349,14 +356,6 @@ def format_delta(date):
         past_tense='{} ago',
         precision=1
     )
-
-
-def format_thousands(value):
-    if isinstance(value, Number):
-        return '{:,.0f}'.format(value)
-    if value is None:
-        return ''
-    return value
 
 
 def valid_phone_number(phone_number):
@@ -690,6 +689,7 @@ def add_template_filters(application):
         valid_phone_number,
         linkable_name,
         format_date,
+        format_date_human,
         format_date_normal,
         format_date_short,
         format_datetime_relative,

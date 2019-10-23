@@ -631,7 +631,3 @@ class Service(JSONModel):
         ):
             if test:
                 yield BASE + '_incomplete' + tag
-
-    @cached_property
-    def history(self):
-        return service_api_client.get_service_history(self.id)['data']

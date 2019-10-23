@@ -311,7 +311,13 @@ class ServiceAPIClient(NotifyAdminAPIClient):
 
     # Temp access of service history data. Includes service and api key history
     def get_service_history(self, service_id):
-        return self.get('/service/{0}/history'.format(service_id))
+        return self.get('/service/{0}/history'.format(service_id))['data']
+
+    def get_service_service_history(self, service_id):
+        return self.get_service_history(service_id)['service_history']
+
+    def get_service_api_key_history(self, service_id):
+        return self.get_service_history(service_id)['api_key_history']
 
     def get_monthly_notification_stats(self, service_id, year):
         return self.get(url='/service/{}/notifications/monthly?year={}'.format(service_id, year))

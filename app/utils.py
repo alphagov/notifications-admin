@@ -6,6 +6,7 @@ from datetime import datetime, time, timedelta, timezone
 from functools import wraps
 from io import BytesIO, StringIO
 from itertools import chain
+from numbers import Number
 from os import path
 from urllib.parse import urlparse
 
@@ -602,3 +603,11 @@ class PermanentRedirect(RequestRedirect):
     and Windows 8.1, so this class keeps the original status code of 301.
     """
     code = 301
+
+
+def format_thousands(value):
+    if isinstance(value, Number):
+        return '{:,.0f}'.format(value)
+    if value is None:
+        return ''
+    return value

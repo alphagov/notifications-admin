@@ -1,7 +1,10 @@
-from flask import render_template
+from collections import defaultdict
 
-from app import current_service
+from flask import render_template, request
+
+from app import current_service, format_date_numeric
 from app.main import main
+from app.models.event import APIKeyEvent, APIKeyEvents, ServiceEvents
 from app.utils import user_has_permissions
 
 
@@ -9,9 +12,31 @@ from app.utils import user_has_permissions
 @user_has_permissions('manage_service')
 def history(service_id):
 
+    events = _get_events(current_service.id, request.args.get('selected'))
+
     return render_template(
         'views/temp-history.html',
-        services=current_service.history['service_history'],
-        api_keys=current_service.history['api_key_history'],
-        events=current_service.history['events']
+        days=_chunk_events_by_day(events),
+        show_navigation=request.args.get('selected') or any(
+            isinstance(event, APIKeyEvent) for event in events
+        ),
+        user_getter=current_service.active_users.get_name_from_id,
     )
+
+
+def _get_events(service_id, selected):
+    if selected == 'api':
+        return APIKeyEvents(service_id)
+    if selected == 'service':
+        return ServiceEvents(service_id)
+    return APIKeyEvents(service_id) + ServiceEvents(service_id)
+
+
+def _chunk_events_by_day(events):
+
+    days = defaultdict(list)
+
+    for event in events:
+        days[format_date_numeric(event.time)].append(event)
+
+    return sorted(days.items(), reverse=True)
