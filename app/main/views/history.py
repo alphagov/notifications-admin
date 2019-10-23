@@ -1,4 +1,5 @@
 from collections import defaultdict
+from operator import attrgetter
 
 from flask import render_template, request
 
@@ -36,7 +37,7 @@ def _chunk_events_by_day(events):
 
     days = defaultdict(list)
 
-    for event in events:
+    for event in sorted(events, key=attrgetter('time'), reverse=True):
         days[format_date_numeric(event.time)].append(event)
 
     return sorted(days.items(), reverse=True)
