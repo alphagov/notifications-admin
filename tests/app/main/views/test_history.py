@@ -9,8 +9,10 @@ from tests.conftest import SERVICE_ONE_ID, normalize_spaces
         (
             '12 December',
             (
+                'Test User 1:13pm '
+                'Renamed this service from ‘Before lunch’ to ‘After lunch’ '
                 'Test User 12:12pm '
-                'Renamed this service from ‘Example service’ to ‘Real service’'
+                'Renamed this service from ‘Example service’ to ‘Before lunch’'
             ),
         ),
         (
@@ -32,6 +34,8 @@ from tests.conftest import SERVICE_ONE_ID, normalize_spaces
             (
                 'Test User 11:10am '
                 'Created an API key called ‘Good key’ '
+                'Test User 10:09am '
+                'Created an API key called ‘Key event returned in non-chronological order’ '
                 'Unknown 2:01am '
                 'Created this service and called it ‘Example service’'
             ),
@@ -56,7 +60,9 @@ from tests.conftest import SERVICE_ONE_ID, normalize_spaces
             '10 October 2010',
             (
                 'Test User 11:10am '
-                'Created an API key called ‘Good key’'
+                'Created an API key called ‘Good key’ '
+                'Test User 10:09am '
+                'Created an API key called ‘Key event returned in non-chronological order’'
             ),
         ),
     ]),
@@ -64,8 +70,10 @@ from tests.conftest import SERVICE_ONE_ID, normalize_spaces
         (
             '12 December',
             (
+                'Test User 1:13pm '
+                'Renamed this service from ‘Before lunch’ to ‘After lunch’ '
                 'Test User 12:12pm '
-                'Renamed this service from ‘Example service’ to ‘Real service’'
+                'Renamed this service from ‘Example service’ to ‘Before lunch’'
             ),
         ),
         (
