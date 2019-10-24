@@ -5,6 +5,7 @@ from datetime import datetime
 
 from flask import abort, flash, redirect, render_template, request, url_for
 from notifications_python_client.errors import HTTPError
+from notifications_utils import LETTER_MAX_PAGE_COUNT
 from requests import RequestException
 
 from app import (
@@ -34,6 +35,7 @@ from app.utils import (
     Spreadsheet,
     generate_next_dict,
     generate_previous_dict,
+    get_letter_validation_error,
     get_page_from_request,
     user_has_permissions,
     user_is_platform_admin,
@@ -425,7 +427,18 @@ def letter_validation_preview(from_platform_admin):
             response = validate_letter(pdf_file)
             response.raise_for_status()
             if response.status_code == 200:
-                pages, message, result = response.json()["pages"], response.json()["message"], response.json()["result"]
+                pages, message = response.json()["pages"], response.json()["message"],
+                passed_validation = response.json()["result"]
+                invalid_pages = response.json().get('invalid_pages')
+                page_count = len(pages)
+                if page_count > LETTER_MAX_PAGE_COUNT:
+                    message = "letter-too-long"
+                    passed_validation = False
+
+                if not passed_validation:
+                    message = get_letter_validation_error(
+                        message, invalid_pages=invalid_pages, page_count=page_count
+                    )
         except RequestException as error:
             if error.response and error.response.status_code == 400:
                 message = "Something was wrong with the file you tried to upload. Please upload a valid PDF file."

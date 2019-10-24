@@ -1,0 +1,14 @@
+{% from "components/banner.html" import banner_wrapper %}
+
+{% call banner_wrapper(type='dangerous') %}
+  {% if message is string %}
+    <h1 class="banner-title">{{ message }}</h1>
+  {% else %}
+    <h1 class="banner-title">{{ message.title }}</h1>
+    {% if message.detail %}
+      <p>
+        {{ message.detail | safe }}
+      </p>
+    {% endif %}
+  {% endif %}
+{% endcall %}
