@@ -12,6 +12,10 @@ abbr[title] {
   cursor: help;
 }
 
+.js-enabled .js-hidden {
+  display: none;
+}
+
 // To be removed when all search inputs use the GOV.UK Frontend text input component:
 // https://design-system.service.gov.uk/components/text-input/
 /*
