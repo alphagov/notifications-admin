@@ -9,13 +9,8 @@
 {% endblock %}
 
 {% block maincolumn_content %}
-  {% if status == 'invalid' and error %}
-    {% call banner_wrapper(type='dangerous') %}
-      <h1 class="banner-title">{{ error.title }}</h1>
-      {% if error.detail %}
-        <p>{{ error.detail | safe }}</p>
-      {% endif %}
-    {% endcall %}
+  {% if status == 'invalid' and message %}
+    {% include "partials/check/letter-validation-failed-banner.html" %}
   {% elif current_service.trial_mode %}
     {% call banner_wrapper(type='dangerous') %}
       {% with

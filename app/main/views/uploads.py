@@ -145,13 +145,13 @@ def uploaded_letter_preview(service_id, file_id):
     original_filename = metadata.get('filename')
     page_count = metadata.get('page_count')
     status = metadata.get('status')
-    error_message = metadata.get('message')
+    error_shortcode = metadata.get('message')
     invalid_pages = metadata.get('invalid_pages')
 
     if invalid_pages:
         invalid_pages = json.loads(invalid_pages)
 
-    error = get_letter_validation_error(error_message, invalid_pages, page_count)
+    error_message = get_letter_validation_error(error_shortcode, invalid_pages, page_count)
     template_dict = service_api_client.get_precompiled_template(service_id)
     # Override pre compiled letter template postage to none as it has not yet been picked even though
     # the pre compiled letter template has its postage set as second class as the DB currently requires
@@ -177,7 +177,8 @@ def uploaded_letter_preview(service_id, file_id):
         template=template,
         status=status,
         file_id=file_id,
-        error=error,
+        message=error_message,
+        error_code=error_shortcode,
         form=form,
     )
 
