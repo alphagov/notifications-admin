@@ -43,6 +43,12 @@ input[type="search"]::-webkit-search-decoration {
 // https://design-system.service.gov.uk/styles/typography/#links
 a {
   @extend %govuk-link;
+
+  // Stops visited links looking different, until we can add the `govuk-link--no-visited-state`
+  // class to all links we want stay the same colour after visiting
+  &:visited {
+    color: $govuk-link-colour;
+  }
 }
 
 // Each selector, and then the whole block when only one remains, to be removed when the

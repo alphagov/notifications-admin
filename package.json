@@ -25,7 +25,6 @@
     "govuk-elements-sass": "3.1.2",
     "govuk-frontend": "2.13.0",
     "govuk_frontend_toolkit": "8.1.0",
-    "govuk_template_jinja": "0.24.1",
     "gulp": "4.0.0",
     "gulp-add-src": "1.0.0",
     "gulp-babel": "8.0.0",
