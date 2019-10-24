@@ -53,7 +53,7 @@
     {% set error = 'letter-too-long' %}
     {{ govuk_back_link(back_link) }}
     <div class="bottom-gutter">
-      {% call banner_wrapper(type='dangerous', id='letter-too-long') %}
+      {% call banner_wrapper(type='dangerous') %}
           {% include "partials/check/letter-too-long.html" %}
       {% endcall %}
     </div>

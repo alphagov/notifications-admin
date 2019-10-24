@@ -2778,8 +2778,7 @@ def test_check_messages_does_not_allow_to_send_letter_longer_than_10_pages(
         upload_id=fake_uuid,
         _test_page_title=False,
     )
-
-    assert page.select('#letter-too-long')
+    assert page.find('h1', {"data-error-type": "Trying to send a letter that's too long"})
 
     assert len(page.select('.letter img')) == 10  # if letter longer than 10 pages, only 10 first pages are displayed
     assert not page.select('[type=submit]')
@@ -3149,7 +3148,7 @@ def test_send_one_off_letter_errors_if_letter_longer_than_10_pages(
         _test_page_title=False,
     )
 
-    assert page.select('#letter-too-long')
+    assert page.find('h1', {"data-error-type": "Trying to send a letter that's too long"})
     assert len(page.select('.letter img')) == 10
 
     assert not page.select('[type=submit]')
