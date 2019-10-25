@@ -1468,3 +1468,45 @@ def test_org_breadcrumbs_show_if_user_is_platform_admin(
         'main.organisation_dashboard',
         org_id=ORGANISATION_ID,
     )
+
+
+def test_should_show_remaining_free_tier_count(
+    logged_in_client,
+    mock_get_service_templates,
+    mock_get_template_statistics,
+    mock_get_detailed_service,
+    mock_get_jobs,
+    mock_get_usage,
+    mocker
+):
+    mocker.patch(
+        'app.service_api_client.get_yearly_sms_unit_count_and_cost',
+        return_value={"billable_sms_units": 100, "total_cost": 200.0}
+    )
+
+    response = logged_in_client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
+
+    assert response.status_code == 200
+    assert '249,900' in response.get_data(as_text=True)
+    assert 'free text messages left' in response.get_data(as_text=True)
+
+
+def test_should_show_cost_if_exceeded_free_tier_count(
+    logged_in_client,
+    mock_get_service_templates,
+    mock_get_template_statistics,
+    mock_get_detailed_service,
+    mock_get_jobs,
+    mock_get_usage,
+    mocker
+):
+    mocker.patch(
+        'app.service_api_client.get_yearly_sms_unit_count_and_cost',
+        return_value={"billable_sms_units": 300000, "total_cost": 1500.50}
+    )
+
+    response = logged_in_client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
+
+    assert response.status_code == 200
+    assert '£1,500.50' in response.get_data(as_text=True)
+    assert 'spent on text messages' in response.get_data(as_text=True)
