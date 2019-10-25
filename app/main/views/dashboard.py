@@ -133,11 +133,8 @@ def usage(service_id):
     units = billing_api_client.get_billable_units(service_id, year)
     yearly_usage = billing_api_client.get_service_usage(service_id, year)
 
-    usage_template = 'views/usage.html'
-    if current_service.has_permission('letter'):
-        usage_template = 'views/usage-with-letters.html'
     return render_template(
-        usage_template,
+        'views/usage-with-letters.html',
         months=list(get_free_paid_breakdown_for_billable_units(
             year,
             free_sms_allowance,

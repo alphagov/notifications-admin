@@ -795,7 +795,7 @@ def test_usage_page(
     mock_get_usage.assert_called_once_with(SERVICE_ONE_ID, 2011)
     mock_get_free_sms_fragment_limit.assert_called_with(SERVICE_ONE_ID, 2011)
 
-    cols = page.find_all('div', {'class': 'column-half'})
+    cols = page.find_all('div', {'class': 'column-one-third'})
     nav = page.find('ul', {'class': 'pill', 'role': 'tablist'})
     nav_links = nav.find_all('a')
 
@@ -813,7 +813,7 @@ def test_usage_page(
     assert 'April' in table
     assert 'February' in table
     assert 'March' in table
-    assert '£15.84' in table
+    assert '£20.59' in table
     assert '140 free text messages' in table
     assert '£20.30' in table
     assert '1,230 text messages at 1.65p' in table
