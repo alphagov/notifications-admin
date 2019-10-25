@@ -399,7 +399,7 @@ def service_letter_validation_preview(service_id):
 
 
 def letter_validation_preview(from_platform_admin):
-    message, pages, result = None, [], None
+    message, pages, passed_validation, error_code = None, [], None, None
     form = PDFUploadForm()
 
     view_location = 'views/platform-admin/letter-validation-preview.html' \
@@ -412,7 +412,8 @@ def letter_validation_preview(from_platform_admin):
         if not virus_free:
             return render_template(
                 view_location,
-                form=form, message="Document did not pass the virus scan", pages=pages, result=result
+                form=form, message="Document did not pass the virus scan",
+                pages=pages, passed_validation=passed_validation
             ), 400
 
         try:
@@ -421,7 +422,7 @@ def letter_validation_preview(from_platform_admin):
                     view_location,
                     form=form,
                     message="File must be less than 2MB",
-                    pages=pages, result=result
+                    pages=pages, passed_validation=passed_validation
                 ), 400
             pdf_file.seek(0)
             response = validate_letter(pdf_file)
@@ -436,6 +437,7 @@ def letter_validation_preview(from_platform_admin):
                     passed_validation = False
 
                 if not passed_validation:
+                    error_code = message
                     message = get_letter_validation_error(
                         message, invalid_pages=invalid_pages, page_count=page_count
                     )
@@ -444,14 +446,14 @@ def letter_validation_preview(from_platform_admin):
                 message = "Something was wrong with the file you tried to upload. Please upload a valid PDF file."
                 return render_template(
                     view_location,
-                    form=form, message=message, pages=pages, result=result
+                    form=form, message=message, pages=pages, passed_validation=passed_validation
                 ), 400
             else:
                 raise error
 
     return render_template(
         view_location,
-        form=form, message=message, pages=pages, result=result
+        form=form, message=message, pages=pages, passed_validation=passed_validation, error_code=error_code
     )
 
 
