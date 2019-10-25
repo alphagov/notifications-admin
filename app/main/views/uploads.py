@@ -201,8 +201,10 @@ def send_uploaded_letter(service_id):
     if not (current_service.has_permission('letter') and current_service.has_permission('upload_letters')):
         abort(403)
 
-    file_id = request.form['file_id']
-    postage = request.form['postage']
+    form = LetterUploadPostageForm()
+
+    file_id = form.file_id.data
+    postage = form.postage.data
     metadata = get_letter_metadata(service_id, file_id)
     filename = metadata.get('filename')
 
