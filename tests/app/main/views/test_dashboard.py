@@ -145,6 +145,7 @@ def test_get_started(
     mock_get_jobs,
     mock_get_service_statistics,
     mock_get_usage,
+    mock_get_free_sms_fragment_limit,
     mock_get_inbound_sms_summary
 ):
     mocker.patch(
@@ -168,6 +169,7 @@ def test_get_started_is_hidden_once_templates_exist(
     mock_get_jobs,
     mock_get_service_statistics,
     mock_get_usage,
+    mock_get_free_sms_fragment_limit,
     mock_get_inbound_sms_summary
 ):
     mocker.patch(
@@ -191,6 +193,7 @@ def test_inbound_messages_not_visible_to_service_without_permissions(
     mock_get_service_statistics,
     mock_get_template_statistics,
     mock_get_usage,
+    mock_get_free_sms_fragment_limit,
     mock_get_inbound_sms_summary
 ):
 
@@ -218,6 +221,7 @@ def test_inbound_messages_shows_count_of_messages(
     mock_get_service_statistics,
     mock_get_template_statistics,
     mock_get_usage,
+    mock_get_free_sms_fragment_limit,
     inbound_summary_mock,
     expected_text
 ):
@@ -460,6 +464,7 @@ def test_should_show_recent_templates_on_dashboard(
     mock_get_jobs,
     mock_get_service_statistics,
     mock_get_usage,
+    mock_get_free_sms_fragment_limit,
     mock_get_inbound_sms_summary
 ):
     mock_template_stats = mocker.patch('app.template_statistics_client.get_template_statistics_for_service',
@@ -512,6 +517,7 @@ def test_should_not_show_recent_templates_on_dashboard_if_only_one_template_used
     mock_get_jobs,
     mock_get_service_statistics,
     mock_get_usage,
+    mock_get_free_sms_fragment_limit,
     mock_get_inbound_sms_summary,
     stats,
 ):
@@ -662,6 +668,7 @@ def test_should_show_upcoming_jobs_on_dashboard(
     mock_get_service_statistics,
     mock_get_jobs,
     mock_get_usage,
+    mock_get_free_sms_fragment_limit,
     mock_get_inbound_sms_summary
 ):
     page = client_request.get(
@@ -713,6 +720,8 @@ def test_correct_font_size_for_big_numbers(
     mock_get_template_statistics,
     mock_get_service_statistics,
     mock_get_jobs,
+    mock_get_usage,
+    mock_get_free_sms_fragment_limit,
     service_one,
     permissions,
     totals,
@@ -731,7 +740,8 @@ def test_correct_font_size_for_big_numbers(
         service_id=service_one['id'],
     )
 
-    assert len(page.select('.column-third')) == 3
+    assert len(page.select_one('[data-key=totals]').select('.column-third')) == 3
+    assert len(page.select_one('[data-key=usage]').select('.column-third')) == 3
 
     assert len(
         page.select('.big-number-with-status {}'.format(big_number_class))
@@ -746,6 +756,7 @@ def test_should_show_recent_jobs_on_dashboard(
     mock_get_service_statistics,
     mock_get_jobs,
     mock_get_usage,
+    mock_get_free_sms_fragment_limit,
     mock_get_inbound_sms_summary
 ):
     page = client_request.get(
@@ -1102,6 +1113,7 @@ def test_route_for_service_permissions(
     mock_get_template_statistics,
     mock_get_service_statistics,
     mock_get_usage,
+    mock_get_free_sms_fragment_limit,
     mock_get_inbound_sms_summary
 ):
     with app_.test_request_context():
@@ -1154,6 +1166,7 @@ def test_service_dashboard_updates_gets_dashboard_totals(
     mock_get_service_statistics,
     mock_get_jobs,
     mock_get_usage,
+    mock_get_free_sms_fragment_limit,
     mock_get_inbound_sms_summary
 ):
     mocker.patch('app.main.views.dashboard.get_dashboard_totals', return_value={
@@ -1365,6 +1378,8 @@ def test_org_breadcrumbs_do_not_show_if_service_has_no_org(
     mock_get_template_statistics,
     mock_get_service_templates_when_no_templates_exist,
     mock_get_jobs,
+    mock_get_usage,
+    mock_get_free_sms_fragment_limit,
 ):
     page = client_request.get('main.service_dashboard', service_id=SERVICE_ONE_ID)
 
@@ -1399,6 +1414,8 @@ def test_org_breadcrumbs_show_if_user_is_a_member_of_the_services_org(
     mock_get_template_statistics,
     mock_get_service_templates_when_no_templates_exist,
     mock_get_jobs,
+    mock_get_usage,
+    mock_get_free_sms_fragment_limit,
     active_user_with_permissions,
     client_request,
 ):
@@ -1424,6 +1441,8 @@ def test_org_breadcrumbs_do_not_show_if_user_is_a_member_of_the_services_org_but
     mock_get_template_statistics,
     mock_get_service_templates_when_no_templates_exist,
     mock_get_jobs,
+    mock_get_usage,
+    mock_get_free_sms_fragment_limit,
     active_user_with_permissions,
     client_request,
 ):
@@ -1446,6 +1465,8 @@ def test_org_breadcrumbs_show_if_user_is_platform_admin(
     mock_get_template_statistics,
     mock_get_service_templates_when_no_templates_exist,
     mock_get_jobs,
+    mock_get_usage,
+    mock_get_free_sms_fragment_limit,
     platform_admin_user,
     platform_admin_client,
 ):
@@ -1462,4 +1483,33 @@ def test_org_breadcrumbs_show_if_user_is_platform_admin(
     assert page.select_one('.navigation-organisation-link')['href'] == url_for(
         'main.organisation_dashboard',
         org_id=ORGANISATION_ID,
+    )
+
+
+@pytest.mark.parametrize('permissions', (
+    ['email', 'sms'],
+    ['email', 'sms', 'letter'],
+))
+def test_should_show_usage_on_dashboard(
+    client_request,
+    service_one,
+    mock_get_service_templates,
+    mock_get_template_statistics,
+    mock_get_jobs,
+    mock_get_usage,
+    mock_get_free_sms_fragment_limit,
+    permissions,
+):
+    service_one['permissions'] = permissions
+    page = client_request.get('main.service_dashboard', service_id=SERVICE_ONE_ID)
+
+    assert normalize_spaces(
+        page.select_one('[data-key=usage]').text
+    ) == (
+        'Unlimited '
+        'free email allowance '
+        '£36.14 '
+        'spent on text messages '
+        '£0.00 '
+        'spent on letters'
     )

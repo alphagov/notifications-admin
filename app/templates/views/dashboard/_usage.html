@@ -1,16 +1,16 @@
 {% from "components/big-number.html" import big_number %}
 
 <div class='grid-row ajax-block-container'>
-  <div class='column-half'>
+  <div class='{{ column_width }}'>
     <div class="keyline-block">
       {{ big_number("Unlimited", 'free email allowance', smaller=True) }}
     </div>
   </div>
-  <div class='column-half'>
+  <div class='{{ column_width }}'>
     <div class="keyline-block">
       {% if sms_chargeable %}
         {{ big_number(
-          total_sms_cost,
+          sms_chargeable * sms_rate,
           'spent on text messages',
           currency="£",
           smaller=True
@@ -18,6 +18,16 @@
       {% else %}
         {{ big_number(sms_allowance_remaining, 'free text messages left', smaller=True) }}
       {% endif %}
+    </div>
+  </div>
+  <div class='{{ column_width }}'>
+    <div class="keyline-block">
+      {{ big_number(
+        letter_cost,
+        'spent on letters',
+        currency="£",
+        smaller=True
+      ) }}
     </div>
   </div>
 </div>

@@ -299,7 +299,14 @@ def get_dashboard_partials(service_id):
         )
         for key, value in dashboard_totals[0].items()
     )
-
+    free_sms_allowance = billing_api_client.get_free_sms_fragment_limit_for_year(
+        current_service.id,
+        get_current_financial_year(),
+    )
+    yearly_usage = billing_api_client.get_service_usage(
+        service_id,
+        get_current_financial_year(),
+    )
     return {
         'upcoming': render_template(
             'views/dashboard/_upcoming.html',
@@ -332,7 +339,12 @@ def get_dashboard_partials(service_id):
             'views/dashboard/_jobs.html',
             jobs=immediate_jobs
         ),
-        'has_jobs': bool(immediate_jobs)
+        'has_jobs': bool(immediate_jobs),
+        'usage': render_template(
+            'views/dashboard/_usage.html',
+            column_width=column_width,
+            **calculate_usage(yearly_usage, free_sms_allowance),
+        ),
     }
 
 
