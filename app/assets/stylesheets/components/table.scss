@@ -98,6 +98,22 @@
 
 }
 
+.usage-table {
+
+  @extend .dashboard-table;
+
+  .table-field-heading-first {
+    width: 35%;  // 33.33% + fudge
+  }
+
+  .table-row {
+    th {
+      width: 17.5%  // 16.67% + fudge
+    }
+  }
+
+}
+
 %table-field,
 .table-field {
 

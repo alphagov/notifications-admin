@@ -78,7 +78,7 @@
       </div>
 
       {% if months %}
-        <div class="dashboard-table body-copy-table">
+        <div class="dashboard-table usage-table body-copy-table">
           {% call(month, row_index) list_table(
             months,
             caption="Total spend",
@@ -124,12 +124,12 @@
     </div>
 
     <div class="grid-row">
-      <div class="column-half">
+      <div class="column-one-third">
         <p class="align-with-heading-copy">
-          Financial year ends 31 March.
+          Financial year ends 31&nbsp;March
         </p>
       </div>
-      <div class="column-half">
+      <div class="column-two-thirds">
         <p class="align-with-heading-copy">
           What counts as 1 text message?<br />
           See <a href="{{ url_for('.pricing') }}">pricing</a>.
