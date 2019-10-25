@@ -126,6 +126,9 @@ def test_post_upload_letter_shows_letter_preview_for_valid_file(
 
     assert page.find('h1').text == 'tests/test_pdf_files/one_page_pdf.pdf'
     assert len(page.select('.letter-postage')) == 0
+    # Check postage radios exists and second class is checked by default
+    assert page.find('input', id="postage-0", value="first")
+    assert page.find('input', id="postage-1", value="second").has_attr('checked')
 
     letter_images = page.select('main img')
     assert len(letter_images) == 3
