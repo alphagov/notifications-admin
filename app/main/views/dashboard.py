@@ -290,11 +290,8 @@ def get_dashboard_partials(service_id):
         ]
 
     stats = aggregate_notifications_stats(all_statistics)
-    column_width, max_notifiction_count = get_column_properties(
-        number_of_columns=(
-            3 if current_service.has_permission('letter') else 2
-        )
-    )
+    column_width, max_notifiction_count = get_column_properties(3)
+
     dashboard_totals = get_dashboard_totals(stats),
     highest_notification_count = max(
         sum(

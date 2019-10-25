@@ -27,19 +27,17 @@
         smaller=smaller_font_size
       ) }}
     </div>
-    {% if current_service.has_permission('letter') %}
-      <div id="total-letters" class="{{column_width}}">
-        {{ big_number_with_status(
-          statistics['letter']['requested'],
-          message_count_label(statistics['letter']['requested'], 'letter', suffix='sent'),
-          statistics['letter']['failed'],
-          statistics['letter']['failed_percentage'],
-          statistics['letter']['show_warning'],
-          failure_link=url_for(".view_notifications", service_id=service_id, message_type='letter', status='failed'),
-          link=url_for(".view_notifications", service_id=service_id, message_type='letter', status=''),
-          smaller=smaller_font_size
-        ) }}
-      </div>
-    {% endif %}
+    <div id="total-letters" class="{{column_width}}">
+      {{ big_number_with_status(
+        statistics['letter']['requested'],
+        message_count_label(statistics['letter']['requested'], 'letter', suffix='sent'),
+        statistics['letter']['failed'],
+        statistics['letter']['failed_percentage'],
+        statistics['letter']['show_warning'],
+        failure_link=url_for(".view_notifications", service_id=service_id, message_type='letter', status='failed'),
+        link=url_for(".view_notifications", service_id=service_id, message_type='letter', status=''),
+        smaller=smaller_font_size
+      ) }}
+    </div>
   </div>
 </div>

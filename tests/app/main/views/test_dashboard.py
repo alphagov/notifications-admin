@@ -645,71 +645,26 @@ def test_should_show_upcoming_jobs_on_dashboard(
     assert table_rows[1].find_all('td')[0].text.strip() == '1'
 
 
-@pytest.mark.parametrize('permissions, column_name, expected_column_count', [
-    (['email', 'sms'], '.column-half', 2),
-    (['email', 'letter'], '.column-third', 3),
-    (['email', 'sms', 'letter'], '.column-third', 3)
-])
-def test_correct_columns_display_on_dashboard(
-    client_request,
-    mock_get_service_templates,
-    mock_get_template_statistics,
-    mock_get_service_statistics,
-    mock_get_jobs,
-    service_one,
-    permissions,
-    expected_column_count,
-    column_name
-):
-
-    service_one['permissions'] = permissions
-
-    page = client_request.get(
-        'main.service_dashboard',
-        service_id=service_one['id']
-    )
-
-    assert len(page.select(column_name)) == expected_column_count
-
-
-@pytest.mark.parametrize('permissions, totals, big_number_class, expected_column_count', [
+@pytest.mark.parametrize('permissions', (
+    ['email', 'sms'],
+    ['email', 'sms', 'letter'],
+))
+@pytest.mark.parametrize('totals, big_number_class', [
     (
-        ['email', 'sms'],
-        {
-            'email': {'requested': 0, 'delivered': 0, 'failed': 0},
-            'sms': {'requested': 999999999, 'delivered': 0, 'failed': 0}
-        },
-        '.big-number',
-        2,
-    ),
-    (
-        ['email', 'sms'],
-        {
-            'email': {'requested': 1000000000, 'delivered': 0, 'failed': 0},
-            'sms': {'requested': 1000000, 'delivered': 0, 'failed': 0}
-        },
-        '.big-number-smaller',
-        2,
-    ),
-    (
-        ['email', 'sms', 'letter'],
         {
             'email': {'requested': 0, 'delivered': 0, 'failed': 0},
             'sms': {'requested': 99999, 'delivered': 0, 'failed': 0},
             'letter': {'requested': 99999, 'delivered': 0, 'failed': 0}
         },
         '.big-number',
-        3,
     ),
     (
-        ['email', 'sms', 'letter'],
         {
             'email': {'requested': 0, 'delivered': 0, 'failed': 0},
             'sms': {'requested': 0, 'delivered': 0, 'failed': 0},
             'letter': {'requested': 100000, 'delivered': 0, 'failed': 0},
         },
         '.big-number-smaller',
-        3,
     ),
 ])
 def test_correct_font_size_for_big_numbers(
@@ -723,7 +678,6 @@ def test_correct_font_size_for_big_numbers(
     permissions,
     totals,
     big_number_class,
-    expected_column_count,
 ):
 
     service_one['permissions'] = permissions
@@ -738,9 +692,11 @@ def test_correct_font_size_for_big_numbers(
         service_id=service_one['id'],
     )
 
-    assert expected_column_count == len(
+    assert len(page.select('.column-third')) == 3
+
+    assert len(
         page.select('.big-number-with-status {}'.format(big_number_class))
-    )
+    ) == 3
 
 
 @freeze_time("2016-01-01 11:09:00.061258")
