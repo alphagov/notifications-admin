@@ -3,12 +3,12 @@
 
 
 <div class='grid-row ajax-block-container'>
-  <div class='{{ column_width }}'>
+  <div class='column-one-third'>
     <div class="keyline-block">
       {{ big_number("Unlimited", 'free email allowance', smaller=True) }}
     </div>
   </div>
-  <div class='{{ column_width }}'>
+  <div class='column-one-third'>
     <div class="keyline-block">
       {% if sms_chargeable %}
         {{ big_number(
@@ -22,8 +22,7 @@
       {% endif %}
     </div>
   </div>
-  {% if current_service.has_permission('letter') %}
-  <div class='{{ column_width }}'>
+  <div class='column-one-third'>
     <div class="keyline-block">
       {{ big_number(
         letter_cost,
@@ -33,5 +32,4 @@
       ) }}
     </div>
   </div>
-  {% endif %}
 </div>
