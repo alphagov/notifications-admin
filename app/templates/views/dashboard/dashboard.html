@@ -33,13 +33,7 @@
       'See messages sent per month'
     ) }}
 
-    {% if partials['has_template_statistics'] %}
-      {{ ajax_block(partials, updates_url, 'template-statistics', interval=5) }}
-      {{ show_more(
-        url_for('.template_usage', service_id=current_service.id),
-        'See templates used by month'
-      ) }}
-    {% endif %}
+    {{ ajax_block(partials, updates_url, 'template-statistics', interval=5) }}
 
     {% if partials['has_jobs'] %}
       {{ ajax_block(partials, updates_url, 'jobs', interval=5) }}

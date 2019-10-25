@@ -496,6 +496,45 @@ def test_should_show_recent_templates_on_dashboard(
     assert '100' in table_rows[3].find_all('td')[0].text
 
 
+@pytest.mark.parametrize('stats', (
+    pytest.param(
+        [stub_template_stats[0]],
+    ),
+    pytest.param(
+        [stub_template_stats[0], stub_template_stats[1]],
+        marks=pytest.mark.xfail(raises=AssertionError),
+    )
+))
+def test_should_not_show_recent_templates_on_dashboard_if_only_one_template_used(
+    client_request,
+    mocker,
+    mock_get_service_templates,
+    mock_get_jobs,
+    mock_get_service_statistics,
+    mock_get_usage,
+    mock_get_inbound_sms_summary,
+    stats,
+):
+    mock_template_stats = mocker.patch(
+        'app.template_statistics_client.get_template_statistics_for_service',
+        return_value=stats,
+    )
+
+    page = client_request.get('main.service_dashboard', service_id=SERVICE_ONE_ID)
+    main = page.select_one('main').text
+
+    mock_template_stats.assert_called_once_with(SERVICE_ONE_ID, limit_days=7)
+
+    assert stats[0]['template_name'] == 'one'
+    assert stats[0]['template_name'] not in main
+
+    # count appears as total, but not per template
+    expected_count = stats[0]['count']
+    assert expected_count == 50
+    assert main.count(str(expected_count)) == 1
+    assert '50 text messages sent' in normalize_spaces(main)
+
+
 @freeze_time("2016-07-01 12:00")  # 4 months into 2016 financial year
 @pytest.mark.parametrize('extra_args', [
     {},
@@ -763,7 +802,7 @@ def test_should_show_recent_jobs_on_dashboard(
     assert third_call[1]['limit_days'] == 7
     assert 'scheduled' not in third_call[1]['statuses']
 
-    table_rows = page.find_all('tbody')[2].find_all('tr')
+    table_rows = page.find_all('tbody')[1].find_all('tr')
 
     assert len(table_rows) == 4
 
