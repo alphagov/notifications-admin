@@ -108,6 +108,12 @@ class Service(JSONModel):
         return job_api_client.has_jobs(self.id)
 
     @cached_property
+    def scheduled_jobs(self):
+        if not self.has_jobs:
+            return []
+        return job_api_client.get_scheduled_jobs(self.id)
+
+    @cached_property
     def invited_users(self):
         return InvitedUsers(self.id)
 

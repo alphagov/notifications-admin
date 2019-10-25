@@ -20,12 +20,11 @@ from app import (
     current_service,
     format_date_numeric,
     format_datetime_numeric,
-    job_api_client,
     service_api_client,
     template_statistics_client,
 )
 from app.main import main
-from app.statistics_utils import add_rate_to_job, get_formatted_percentage
+from app.statistics_utils import get_formatted_percentage
 from app.utils import (
     DELIVERED_STATUSES,
     FAILURE_STATUSES,
@@ -281,14 +280,6 @@ def get_dashboard_partials(service_id):
     all_statistics = template_statistics_client.get_template_statistics_for_service(service_id, limit_days=7)
     template_statistics = aggregate_template_usage(all_statistics)
 
-    scheduled_jobs, immediate_jobs = [], []
-    if job_api_client.has_jobs(service_id):
-        scheduled_jobs = job_api_client.get_scheduled_jobs(service_id)
-        immediate_jobs = [
-            add_rate_to_job(job)
-            for job in job_api_client.get_immediate_jobs(service_id)
-        ]
-
     stats = aggregate_notifications_stats(all_statistics)
     column_width, max_notifiction_count = get_column_properties(3)
 
@@ -310,7 +301,6 @@ def get_dashboard_partials(service_id):
     return {
         'upcoming': render_template(
             'views/dashboard/_upcoming.html',
-            scheduled_jobs=scheduled_jobs
         ),
         'inbox': render_template(
             'views/dashboard/_inbox.html',
@@ -335,11 +325,6 @@ def get_dashboard_partials(service_id):
                 [row['count'] for row in template_statistics] or [0]
             ),
         ),
-        'jobs': render_template(
-            'views/dashboard/_jobs.html',
-            jobs=immediate_jobs
-        ),
-        'has_jobs': bool(immediate_jobs),
         'usage': render_template(
             'views/dashboard/_usage.html',
             column_width=column_width,

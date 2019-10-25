@@ -3,7 +3,7 @@
 {% from "components/show-more.html" import show_more %}
 
 <div class="ajax-block-container">
-  {% if scheduled_jobs %}
+  {% if current_service.scheduled_jobs %}
     <div class='dashboard-table'>
       {% if not hide_heading %}
         <h2 class="heading-medium heading-upcoming-jobs">
@@ -11,7 +11,7 @@
         </h2>
       {% endif %}
       {% call(item, row_number) list_table(
-        scheduled_jobs,
+        current_service.scheduled_jobs,
         caption="In the next few days",
         caption_visible=False,
         empty_message='Nothing to see here',

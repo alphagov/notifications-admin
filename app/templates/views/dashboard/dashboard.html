@@ -35,14 +35,6 @@
 
     {{ ajax_block(partials, updates_url, 'template-statistics', interval=5) }}
 
-    {% if partials['has_jobs'] %}
-      {{ ajax_block(partials, updates_url, 'jobs', interval=5) }}
-      {{ show_more(
-        url_for('.view_jobs', service_id=current_service.id),
-        'See all uploaded files'
-      ) }}
-    {% endif %}
-
     {% if current_user.has_permissions('manage_service') %}
       <h2 class='heading-medium'>This year</h2>
       {{ ajax_block(partials, updates_url, 'usage') }}
