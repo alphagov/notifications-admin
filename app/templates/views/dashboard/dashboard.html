@@ -41,14 +41,6 @@
       ) }}
     {% endif %}
 
-    {% if partials['has_jobs'] %}
-      {{ ajax_block(partials, updates_url, 'jobs', interval=5) }}
-      {{ show_more(
-        url_for('.view_jobs', service_id=current_service.id),
-        'See all uploaded files'
-      ) }}
-    {% endif %}
-
   </div>
 
 {% endblock %}
