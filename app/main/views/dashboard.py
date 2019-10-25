@@ -326,7 +326,7 @@ def get_dashboard_partials(service_id):
             most_used_template_count=max(
                 [row['count'] for row in template_statistics] or [0]
             ),
-        ),
+        ) if len(template_statistics) > 1 else '',
         'has_template_statistics': bool(template_statistics),
         'usage': render_template(
             'views/dashboard/_usage.html',
