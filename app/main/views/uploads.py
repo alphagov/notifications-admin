@@ -19,6 +19,7 @@ from app import current_service, notification_api_client, service_api_client
 from app.extensions import antivirus_client
 from app.main import main
 from app.main.forms import PDFUploadForm
+from app.main.views.jobs import view_jobs
 from app.s3_client.s3_letter_upload_client import (
     get_letter_metadata,
     get_letter_pdf_and_metadata,
@@ -36,9 +37,9 @@ MAX_FILE_UPLOAD_SIZE = 2 * 1024 * 1024  # 2MB
 
 
 @main.route("/services/<service_id>/uploads")
-@user_has_permissions('send_messages')
+@user_has_permissions()
 def uploads(service_id):
-    return render_template('views/uploads/index.html')
+    return view_jobs(service_id)
 
 
 @main.route("/services/<service_id>/upload-letter", methods=['GET', 'POST'])

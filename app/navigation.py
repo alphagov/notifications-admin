@@ -633,9 +633,12 @@ class CaseworkNavigation(Navigation):
             'view_notifications',
             'view_notification',
         },
-        'uploaded-files': {
+        'uploads': {
             'view_jobs',
             'view_job',
+            'upload_letter',
+            'uploaded_letter_preview',
+            'uploads',
         },
     }
 
@@ -868,9 +871,6 @@ class CaseworkNavigation(Navigation):
         'two_factor_email_sent',
         'update_email_branding',
         'update_letter_branding',
-        'upload_letter',
-        'uploaded_letter_preview',
-        'uploads',
         'usage',
         'usage_for_all_services',
         'user_information',
