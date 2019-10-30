@@ -330,9 +330,7 @@ class HeaderNavigation(Navigation):
 
     # header HTML now comes from GOVUK Frontend so requires a boolean, not an attribute
     def is_selected(self, navigation_item):
-        if request.endpoint in self.mapping[navigation_item]:
-            return True
-        return False
+        return request.endpoint in self.mapping[navigation_item]
 
 
 class MainNavigation(Navigation):
