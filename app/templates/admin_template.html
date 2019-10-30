@@ -139,9 +139,9 @@
   ] %}
 
   {% if current_service and current_service.research_mode %}
-    {% set meta_suffix = 'Built by the <a href="#" class="govuk-footer__link">Government Digital Service</a><span id="research-mode" class="research-mode">research mode</span>' %}
+    {% set meta_suffix = 'Built by the <a href="https://www.gov.uk/government/organisations/government-digital-service" class="govuk-footer__link">Government Digital Service</a><span id="research-mode" class="research-mode">research mode</span>' %}
   {% else %}
-    {% set meta_suffix = 'Built by the <a href="#" class="govuk-footer__link">Government Digital Service</a>' %}
+    {% set meta_suffix = 'Built by the <a href="https://www.gov.uk/government/organisations/government-digital-service" class="govuk-footer__link">Government Digital Service</a>' %}
   {% endif %}
 
   {{ notify_footer({
