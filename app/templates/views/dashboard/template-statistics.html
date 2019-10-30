@@ -34,18 +34,7 @@
           </span>
           {% endif %}
         {% endcall %}
-        {% if template_statistics|length > 1 %}
-          {{ spark_bar_field(item.count, most_used_template_count, id=item.template_id) }}
-        {% else %}
-          {% call field() %}
-            <span id='{{item.template_id}}' class="heading-small">
-              {{ big_number(
-                item.count,
-                smallest=True
-              ) }}
-            </span>
-          {% endcall %}
-        {% endif %}
+        {{ spark_bar_field(item.count, most_used_template_count, id=item.template_id) }}
       {% endcall %}
       {{ show_more(
         url_for('.template_usage', service_id=current_service.id),
