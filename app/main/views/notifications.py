@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import base64
 import io
+import json
 import os
 from datetime import datetime
 
@@ -39,6 +40,7 @@ from app.utils import (
     generate_notifications_csv,
     get_help_argument,
     get_letter_printing_statement,
+    get_letter_validation_error,
     get_template,
     parse_filter_args,
     set_status_filters,
@@ -53,13 +55,21 @@ def view_notification(service_id, notification_id):
     notification['template'].update({'reply_to_text': notification['reply_to_text']})
 
     personalisation = get_all_personalisation_from_notification(notification)
-
+    error_message = None
     if notification['template']['is_precompiled_letter']:
         try:
-            file_contents = view_letter_notification_as_preview(
-                service_id, notification_id, "pdf"
+            file_contents, metadata = view_letter_notification_as_preview(
+                service_id, notification_id, "pdf", with_metadata=True
             )
-            page_count = pdf_page_count(io.BytesIO(file_contents))
+            page_count = int(
+                metadata["page_count"]
+            ) if metadata.get("page_count") else pdf_page_count(io.BytesIO(file_contents))
+            if notification["status"] == "validation-failed":
+                invalid_pages = metadata.get("invalid_pages")
+                invalid_pages = json.loads(invalid_pages) if invalid_pages else invalid_pages
+                error_message = get_letter_validation_error(
+                    metadata.get("message"), invalid_pages, page_count
+                )
         except PdfReadError:
             return render_template(
                 'views/notifications/invalid_precompiled_letter.html',
@@ -119,6 +129,7 @@ def view_notification(service_id, notification_id):
         'views/notifications/notification.html',
         finished=(notification['status'] in (DELIVERED_STATUSES + FAILURE_STATUSES)),
         notification_status=notification['status'],
+        message=error_message,
         uploaded_file_name='Report',
         template=template,
         job=job,
@@ -171,31 +182,28 @@ def get_preview_error_image():
 
 @main.route("/services/<service_id>/notification/<uuid:notification_id>.<filetype>")
 @user_has_permissions('view_activity')
-def view_letter_notification_as_preview(service_id, notification_id, filetype):
+def view_letter_notification_as_preview(
+    service_id, notification_id, filetype, with_metadata=False
+):
 
     if filetype not in ('pdf', 'png'):
         abort(404)
-    notification = notification_api_client.get_notification(service_id, str(notification_id))
+
     try:
-        if notification['status'] == "validation-failed":
-            preview = notification_api_client.get_notification_letter_preview_with_overlay(
-                service_id,
-                notification_id,
-                filetype,
-                page=request.args.get('page')
-            )
-        else:
-            preview = notification_api_client.get_notification_letter_preview(
-                service_id,
-                notification_id,
-                filetype,
-                page=request.args.get('page')
-            )
+        preview = notification_api_client.get_notification_letter_preview(
+            service_id,
+            notification_id,
+            filetype,
+            page=request.args.get('page')
+        )
 
         display_file = base64.b64decode(preview['content'])
     except APIError:
         display_file = get_preview_error_image()
+        preview = {"metadata": {}}
 
+    if with_metadata:
+        return display_file, preview['metadata']
     return display_file
 
 

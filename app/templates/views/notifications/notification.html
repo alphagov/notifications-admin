@@ -15,7 +15,6 @@
       message_count_label(1, template.template_type, suffix='') | capitalize,
       back_link=back_link
     ) }}
-
     <p>
       {% if is_precompiled_letter %}
         Provided as PDF
@@ -45,7 +44,7 @@
         </p>
       {% elif notification_status == 'validation-failed' %}
         <p class="notification-status-cancelled">
-          Validation failed – content is outside the printable area
+          Validation failed. {{ message.detail | safe }}
         </p>
       {% elif notification_status == 'technical-failure' %}
         <p class="notification-status-cancelled">

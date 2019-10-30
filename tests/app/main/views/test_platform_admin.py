@@ -750,7 +750,7 @@ def test_letter_validation_preview_renders_correctly(mocker, platform_admin_clie
 
 @pytest.mark.parametrize("passed_validation,message,expected_class", [
     (True, 'Your PDF passed the layout check', 'banner-with-tick'),
-    (False, 'content-otside-printable-area', "banner-dangerous")
+    (False, 'content-outside-printable-area', "banner-dangerous")
 ])
 def test_letter_validation_preview_calls_template_preview_when_data_correct_and_displays_correct_message(
     mocker, platform_admin_client, passed_validation, message, expected_class
