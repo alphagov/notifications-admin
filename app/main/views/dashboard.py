@@ -334,7 +334,6 @@ def get_dashboard_partials(service_id):
                 [row['count'] for row in template_statistics] or [0]
             ),
         ),
-        'has_template_statistics': bool(template_statistics),
         'jobs': render_template(
             'views/dashboard/_jobs.html',
             jobs=immediate_jobs
