@@ -43,7 +43,6 @@ $sticky-padding: $gutter * 2 / 3;
   transition: bottom 0.1s ease-out, box-shadow 1s ease-in-out;
   padding: $sticky-padding 0 $sticky-padding $gutter-half;
   margin-top: -$sticky-padding;
-  min-height: 40px;
 
   & + .js-stick-at-bottom-when-scrolling {
     margin-top: ($sticky-padding * 2) * -1;
@@ -54,11 +53,7 @@ $sticky-padding: $gutter * 2 / 3;
   }
 
   .page-footer {
-    margin-bottom: 0;
-  }
-
-  .page-footer-delete-link-without-button {
-    margin-top: 10px;
+    margin-bottom: 1px;
   }
 
   .notification-status {
@@ -66,7 +61,7 @@ $sticky-padding: $gutter * 2 / 3;
   }
 
   .button-secondary {
-    margin-right: $gutter-half;
+    margin: 0 $gutter-half 3px 0;
   }
 
 }

@@ -88,7 +88,7 @@
           {% else %}
             <div>&nbsp;</div>
           {% endif %}
-          <a class="page-footer-right-aligned-link" href="{{ url_for('main.view_letter_notification_as_preview', service_id=current_service.id, notification_id=notification_id, filetype='pdf') }}" download>Download as a PDF</a>
+          <a class="page-footer-right-aligned-link-without-button" href="{{ url_for('main.view_letter_notification_as_preview', service_id=current_service.id, notification_id=notification_id, filetype='pdf') }}" download>Download as a PDF</a>
         </div>
       </div>
     {% elif template.template_type == 'email' %}
