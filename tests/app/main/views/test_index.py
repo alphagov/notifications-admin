@@ -1,3 +1,4 @@
+from functools import partial
 import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
@@ -81,14 +82,23 @@ def test_static_pages(
     mock_get_organisation_by_domain,
     view,
 ):
-    page = client_request.get('main.{}'.format(view))
+    request = partial(client_request.get, 'main.{}'.format(view))
+
+    # Check the page loads when user is signed in
+    page = request()
     assert not page.select_one('meta[name=description]')
 
+    # Check it still works when they don’t have a recent service
+    with client_request.session_transaction() as session:
+        session['service_id'] = None
+    request()
+
+    # Check it still works when they sign out
     client_request.logout()
     with client_request.session_transaction() as session:
         session['service_id'] = None
         session['user_id'] = None
-    client_request.get('main.{}'.format(view))
+    request()
 
 
 @pytest.mark.parametrize('view, expected_view', [
