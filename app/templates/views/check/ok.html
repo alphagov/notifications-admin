@@ -25,10 +25,15 @@
     back_link=back_link
   ) }}
 
+  {% if letter_too_long %}
+    {% call banner_wrapper(type='dangerous', id='letter-too-long') %}
+        {% include "partials/check/letter-too-long.html" %}
+    {% endcall %}
+  {% endif %}
+
   {{ skip_to_file_contents() }}
 
   {{ template|string }}
-
   <div class="bottom-gutter-3-2">
     <form method="post" enctype="multipart/form-data" action="{{url_for('main.start_job', service_id=current_service.id, upload_id=upload_id, original_file_name=original_file_name)}}" class='page-footer'>
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
@@ -39,7 +44,7 @@
           wrapping_class='bottom-gutter-2-3'
         ) }}
       {% endif %}
-      {% if template.template_type != 'letter' or not request.args.from_test %}
+      {% if (template.template_type != 'letter' or not request.args.from_test) and not letter_too_long %}
       <button type="submit" class="button">Send {{ count_of_recipients }} {{ message_count_label(count_of_recipients, template.template_type, suffix='') }}</button>
       {% else %}
         <a href="{{ url_for('main.check_messages_preview', service_id=current_service.id, template_id=template.id, upload_id=upload_id, filetype='pdf') }}" download class="button">Download as a PDF</a>

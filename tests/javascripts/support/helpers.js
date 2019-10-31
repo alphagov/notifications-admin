@@ -1,10 +1,13 @@
+const globals = require('./helpers/globals.js');
 const events = require('./helpers/events.js');
 const domInterfaces = require('./helpers/dom_interfaces.js');
 const html = require('./helpers/html.js');
 const elements = require('./helpers/elements.js');
 const rendering = require('./helpers/rendering.js');
 const forms = require('./helpers/forms.js');
+const utilities = require('./helpers/utilities.js');
 
+exports.LocationMock = globals.LocationMock;
 exports.triggerEvent = events.triggerEvent;
 exports.clickElementWithMouse = events.clickElementWithMouse;
 exports.moveSelectionToRadio = events.moveSelectionToRadio;
@@ -18,3 +21,4 @@ exports.element = elements.element;
 exports.WindowMock = rendering.WindowMock;
 exports.ScreenMock = rendering.ScreenMock;
 exports.spyOnFormSubmit = forms.spyOnFormSubmit;
+exports.getFormDataFromPairs = utilities.getFormDataFromPairs;

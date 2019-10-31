@@ -1,0 +1,29 @@
+$item-top-padding: $gutter-half;
+
+.history-list {
+
+  @include core-19;
+  margin-bottom: $gutter;
+
+  &-item {
+
+    padding: $item-top-padding 0 $gutter-half 0;
+    border-top: 1px solid $border-colour;
+    position: relative;
+
+    &:last-child {
+      border-bottom: 1px solid $border-colour;
+    }
+
+  }
+
+  &-user {
+    display: block;
+  }
+
+  &-time {
+    display: block;
+    color: $secondary-text-colour;
+  }
+
+}

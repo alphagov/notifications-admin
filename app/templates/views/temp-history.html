@@ -1,107 +1,52 @@
-{% extends "withoutnav_template.html" %}
-{% from "components/page-footer.html" import page_footer %}
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
 {% from "components/table.html" import list_table, field %}
+{% from "components/pill.html" import pill %}
 
 {% block service_page_title %}
-Service and API key history
+  Audit events
 {% endblock %}
 
 {% block maincolumn_content %}
 
-  <h1 class="heading-large">
-    {{ "Service and API key history" }}
-  </h1>
+  {{ page_header("Audit events") }}
 
-  <div class="grid-row">
-    {% call(item, row_number) list_table(
-        services,
-        caption="Service history",
-        field_headings=['ID','Name','Created at','Updated at','Active','Message limit','Restricted','Created by id']
-    )%}
-      {% call field() %}
-        {{item.id}}
-      {% endcall %}
-      {% call field() %}
-        {{item.name}}
-      {% endcall %}
-      {% call field() %}
-        {{item.created_at}}
-      {% endcall %}
-      {% call field() %}
-        {{item.updated_at}}
-      {% endcall %}
-      {% call field() %}
-        {{item.active}}
-      {% endcall %}
-      {% call field() %}
-        {{item.message_limit}}
-      {% endcall %}
-      {% call field() %}
-        {{item.restricted}}
-      {% endcall %}
-      {% call field() %}
-        {{item.created_by_id}}
-      {% endcall %}
+  {% if show_navigation %}
+    <div class="bottom-gutter">
+      {{ pill(
+        [
+          ('All', None, url_for('main.history', service_id=current_service.id), None),
+          ('Service settings', 'service', url_for('main.history', service_id=current_service.id, selected='service'), None),
+          ('API keys', 'api', url_for('main.history', service_id=current_service.id, selected='api'), None),
+        ],
+        request.args.get('selected'),
+        show_count=False
+      ) }}
+    </div>
+  {% endif %}
 
-    {% endcall %}
+  {% for day, events in days %}
+    <h2 class="heading-small top-gutter">
+      {{ events[0].time|format_date_human|title }}
+    </h2>
+    <ul class="bottom-gutter">
+      {% for event in events %}
+        <li class="history-list-item">
+          <div class="grid-row">
+            <div class="column-one-third">
+              <div class="history-list-user">
+                {{ user_getter(event.user_id) }}
+              </div>
+              <div class="history-list-time">
+                {{ event.time|format_time }}
+              </div>
+            </div>
+            <div class="column-two-thirds">
+              {{ event }}
+            </div>
+        </li>
+      {% endfor%}
+    </ul>
+  {% endfor %}
 
-  </div>
-
-
-  <div class="grid-row">
-    {% call(item, row_number) list_table(
-        api_keys,
-        caption="API key history",
-        field_headings=['ID','Name','Service ID','Exiry date','Created at','Updated at','Created by id']
-    )%}
-      {% call field() %}
-        {{item.id}}
-      {% endcall %}
-      {% call field() %}
-        {{item.name}}
-      {% endcall %}
-      {% call field() %}
-        {{item.service_id}}
-      {% endcall %}
-      {% call field() %}
-        {{item.expiry_date}}
-      {% endcall %}
-      {% call field() %}
-        {{item.created_at}}
-      {% endcall %}
-      {% call field() %}
-        {{item.updated_at}}
-      {% endcall %}
-      {% call field() %}
-        {{item.created_by_id}}
-      {% endcall %}
-
-    {% endcall %}
-
-  </div
-
-  <div class="grid-row">
-
-     {% call(item, row_number) list_table(
-        events,
-        caption="Events",
-        field_headings=['ID','Event type','User ID','IP Address','Event data']
-    )%}
-      {% call field() %}
-        {{item.id}}
-      {% endcall %}
-      {% call field() %}
-        {{item.event_type}}
-      {% endcall %}
-      {% call field() %}
-        {{item.data.user_id}}
-      {% endcall %}
-      {% call field() %}
-        {{item.data.ip_address}}
-      {% endcall %}
-      {% call field() %}
-        {{item.data}}
-      {% endcall %}
-    {% endcall %}
-  </div>
 {% endblock %}

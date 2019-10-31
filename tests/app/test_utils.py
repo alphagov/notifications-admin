@@ -14,6 +14,7 @@ from app.utils import (
     generate_notifications_csv,
     generate_previous_dict,
     get_letter_printing_statement,
+    get_letter_validation_error,
     get_logo_cdn_domain,
     printing_today_or_tomorrow,
 )
@@ -404,3 +405,25 @@ def test_get_letter_printing_statement_for_letter_that_has_been_sent(created_at,
     statement = get_letter_printing_statement('delivered', created_at)
 
     assert statement == 'Printed {} at 5:30pm'.format(print_day)
+
+
+def test_get_letter_validation_error_for_unknown_error():
+    assert get_letter_validation_error('Unknown error') == {
+        'title': 'Validation failed'
+    }
+
+
+@pytest.mark.parametrize('error_message, expected_title, expected_content', [
+    ('letter-not-a4-portrait-oriented', 'We cannot print your letter', 'A4 portrait size on page 2'),
+    ('content-outside-printable-area', 'We cannot print your letter', 'outside the printable area on page 2'),
+    ('letter-too-long', 'Your letter is too long', 'letter is 13 pages long.')
+])
+def test_get_letter_validation_error_for_known_errors(
+    error_message,
+    expected_title,
+    expected_content,
+):
+    error = get_letter_validation_error(error_message, invalid_pages=[2], page_count=13)
+
+    assert error['title'] == expected_title
+    assert expected_content in error['detail']

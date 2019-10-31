@@ -6,7 +6,9 @@ from flask import abort, flash, redirect, render_template, request, url_for
 from flask_login import current_user
 from markupsafe import Markup
 from notifications_python_client.errors import HTTPError
+from notifications_utils import LETTER_MAX_PAGE_COUNT
 from notifications_utils.formatters import nl2br
+from notifications_utils.pdf import is_letter_too_long
 from notifications_utils.recipients import first_column_headings
 
 from app import (
@@ -58,6 +60,8 @@ def view_template(service_id, template_id):
             '.send_one_off', service_id=service_id, template_id=template_id
         ))
 
+    page_count = get_page_count_for_letter(template)
+
     return render_template(
         'views/templates/template.html',
         template=get_template(
@@ -74,6 +78,9 @@ def view_template(service_id, template_id):
         ),
         template_postage=template["postage"],
         user_has_template_permission=user_has_template_permission,
+        letter_too_long=is_letter_too_long(page_count),
+        letter_max_pages=LETTER_MAX_PAGE_COUNT,
+        page_count=page_count
     )
 
 

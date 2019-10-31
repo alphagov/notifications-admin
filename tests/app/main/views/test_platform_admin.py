@@ -789,7 +789,7 @@ def test_letter_validation_preview_doesnt_call_template_preview_when_no_file(moc
     validate_letter.assert_not_called()
 
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    assert page.find('span', class_='error-message').text.strip() == "You need to upload a file to submit"
+    assert page.find('span', class_='error-message').text.strip() == "You need to choose a file to upload"
 
 
 def test_letter_validation_preview_doesnt_call_template_preview_when_file_not_pdf(mocker, platform_admin_client):
@@ -805,7 +805,7 @@ def test_letter_validation_preview_doesnt_call_template_preview_when_file_not_pd
     antivirus_scan.assert_not_called()
     validate_letter.assert_not_called()
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    assert page.find('span', class_='error-message').text.strip() == "Letters must be saved as a PDF"
+    assert page.find('span', class_='error-message').text.strip() == "Save your letter as a PDF and try again."
 
 
 def test_letter_validation_preview_doesnt_call_template_preview_when_file_doesnt_pass_virus_scan(

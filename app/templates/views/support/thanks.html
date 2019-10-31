@@ -1,6 +1,7 @@
 {% extends "withoutnav_template.html" %}
 {% from "components/textbox.html" import textbox %}
 {% from "components/page-footer.html" import page_footer %}
+{% from "components/page-header.html" import page_header %}
 
 {% block per_page_title %}
   Thanks for contacting us
@@ -8,9 +9,10 @@
 
 {% block maincolumn_content %}
 
-    <h1 class="heading-large">
-      Thanks for contacting us
-    </h1>
+    {{ page_header(
+      'Thanks for contacting us',
+      back_link=url_for('.support')
+    ) }}
     <p>
       {% if out_of_hours_emergency %}
         We’ll reply in the next 30 minutes.
@@ -31,9 +33,5 @@
         {% endif %}
       {% endif %}
     </p>
-    <p>
-      <a href="{{ url_for('.support') }}">Back to support</a>
-    </p>
-
 
 {% endblock %}

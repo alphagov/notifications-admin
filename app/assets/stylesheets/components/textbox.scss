@@ -39,7 +39,8 @@
     padding-bottom: $gutter-half;
     z-index: 10;
 
-    .placeholder {
+    .placeholder,
+    .placeholder-conditional {
       color: transparent;
     }
 

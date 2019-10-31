@@ -1,4 +1,5 @@
 {% extends "withnav_template.html" %}
+{% from "components/banner.html" import banner_wrapper %}
 {% from "components/page-header.html" import page_header %}
 
 {% block service_page_title %}
@@ -6,22 +7,33 @@
 {% endblock %}
 
 {% block maincolumn_content %}
-    {{ page_header(
+  {% if status == 'invalid' and error %}
+    {% call banner_wrapper(type='dangerous') %}
+      <h1 class="banner-title">{{ error.title }}</h1>
+      {% if error.detail %}
+        <p>{{ error.detail | safe }}</p>
+      {% endif %}
+    {% endcall %}
+  {% elif current_service.trial_mode %}
+    {% call banner_wrapper(type='dangerous') %}
+      {% with
+        count_of_recipients=1
+      %}
+        {% include "partials/check/trying-to-send-letters-in-trial-mode.html" %}
+      {% endwith %}
+    {% endcall %}
+  {% else %}
+      {{ page_header(
         original_filename,
         back_link=url_for('main.upload_letter', service_id=current_service.id)
-    ) }}
-
-    {% if status == 'invalid' %}
-    <p class="notification-status-cancelled" id="validation-error-message">
-      Validation failed
-    </p>
-    {% endif %}
+      ) }}
+  {% endif %}
 
     <div class="letter-sent">
       {{ template|string }}
     </div>
 
-    {% if status == 'valid' %}
+    {% if status == 'valid' and current_service.live %}
     <div class="js-stick-at-bottom-when-scrolling">
       <form method="post" enctype="multipart/form-data" action="{{url_for(
           'main.send_uploaded_letter',
