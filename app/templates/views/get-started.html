@@ -10,9 +10,9 @@
 
 <h1 class="heading-large">Get started</h1>
 
-<ol class="list list-number">
-  <li>
-    <h2 class="heading-small">Check if GOV.UK Notify is right for you</h2>
+<ol class="get-started-list">
+  <li class="get-started-list__item">
+    <h2 class="get-started-list__heading">Check if GOV.UK Notify is right for you</h2>
     <p>Read about our <a href="{{ url_for('main.features') }}">features</a>, <a href="{{ url_for('.pricing') }}">pricing</a> and <a href="{{ url_for('main.roadmap') }}">roadmap</a>.</p>
     <details>
       <summary>Organisations that can use Notify</summary>
@@ -31,8 +31,8 @@
     </details>
   </li>
 
-  <li>
-    <h2 class="heading-small">Create an account</h2>
+  <li class="get-started-list__item">
+    <h2 class="get-started-list__heading">Create an account</h2>
     {% if not current_user.is_authenticated %}
       <p><a href="{{ url_for('.register') }}">Create an account</a> for free and add your first Notify service. When you add a new service, it will start in <a href="{{ url_for('main.trial_mode_new') }}">trial mode</a>.</p>
     {% else %}
@@ -40,8 +40,8 @@
     {% endif %}
   </li>
 
-  <li>
-    <h2 class="heading-small">Write some messages</h2>
+  <li class="get-started-list__item">
+    <h2 class="get-started-list__heading">Write some messages</h2>
     <p>Add <a href="{{ url_for('main.features', _anchor='templates') }}">message templates</a> with examples of the content you plan to send.<!-- You do not need to add letter templates if you’re planning to <a href="{{ url_for('main.features_letters', _anchor='upload-letters') }}">upload your own letters</a>.--></p>
     <p>The GOV.UK Service Manual has advice on:</p>
     <ul class="list list-bullet">
@@ -50,8 +50,8 @@
     </ul>
   </li>
 
-  <li>
-    <h2 class="heading-small">Set up your service</h2>
+  <li class="get-started-list__item">
+    <h2 class="get-started-list__heading">Set up your service</h2>
     {% if not current_user.is_authenticated or not current_service %}
     <p>Review your settings to add message branding, reply-to addresses and sender information.</p>
     <p>Add team members and check their <a href="{{ url_for('main.features', _anchor='permissions') }}">permissions</a>.</p>
@@ -61,20 +61,23 @@
     {% endif %}
   </li>
 
-  <li>
-    <h2 class="heading-small">API integration (optional)</h2>
+  <li class="get-started-list__item">
+    <h2 class="get-started-list__heading">API integration (optional)</h2>
     <p>Share our <a href="{{ url_for('main.documentation') }}">documentation</a> with your developers to help them set up an API integration.</p>
 
     <p>You only need to do this if you’re using the API to send messages automatically, rather than signing in to Notify.</p>
   </li>
 
-  <li>
-    <h2 class="heading-small">Start sending messages</h2>
+  <li class="get-started-list__item">
+    <h2 class="get-started-list__heading">Start sending messages</h2>
     {% if not current_user.is_authenticated %}
     <p>You should request to go live when you’re ready to send messages to people outside your team. We’ll approve your request within one working day.</p>
     {% else %}
     <p>You should <a href="{{ url_for('.request_to_go_live', service_id=current_service.id) }}">request to go live</a> when you’re ready to send messages to people outside your team. We’ll approve your request within one working day.</p>
     {% endif %}
     <p>Check <a href="{{ url_for('main.how_to_pay') }}">how to pay</a> if you're planning to send letters or exceed the <a href="{{ url_for('.pricing') }}">free text message allowance</a>.</p>
+  </li>
+
+</ol>
 
 {% endblock %}

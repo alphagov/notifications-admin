@@ -1,0 +1,32 @@
+.get-started-list {
+
+  counter-reset: get-started-counter;
+
+  &__item {
+
+    counter-increment: get-started-counter;
+    padding: 0 0 0 $gutter + 5px;
+    margin: ($gutter * 1.67) 0 0 0;
+    position: relative;
+
+    &:before {
+      @include bold-24;
+      content: counter(get-started-counter) ".";
+      position: absolute;
+      top: 5px;
+      left: 0;
+    }
+
+    summary[aria-expanded=false] {
+      margin-bottom: 0;
+    }
+
+  }
+
+  &__heading {
+    @include bold-24;
+    display: inline-block;
+    margin: 5px 0 $gutter-half 0;
+  }
+
+}
