@@ -52,7 +52,7 @@
 
   <li>
     <h2 class="heading-small">Set up your service</h2>
-    {% if not current_user.is_authenticated %}
+    {% if not current_user.is_authenticated or not current_service %}
     <p>Review your settings to add message branding, reply-to addresses and sender information.</p>
     <p>Add team members and check their <a href="{{ url_for('main.features', _anchor='permissions') }}">permissions</a>.</p>
     {% else %}
