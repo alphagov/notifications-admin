@@ -202,8 +202,11 @@ def send_uploaded_letter(service_id):
         abort(403)
 
     form = LetterUploadPostageForm()
-
     file_id = form.file_id.data
+
+    if not form.validate_on_submit():
+        return uploaded_letter_preview(service_id, file_id)
+
     postage = form.postage.data
     metadata = get_letter_metadata(service_id, file_id)
     filename = metadata.get('filename')
