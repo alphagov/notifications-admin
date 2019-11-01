@@ -305,6 +305,13 @@ def message_status():
     )
 
 
+@main.route('/features/get-started')
+def get_started():
+    return render_template(
+        'views/get-started.html'
+    )
+
+
 @main.route('/trial-mode')
 def trial_mode():
     return redirect(url_for('.trial_mode_new'), 301)
