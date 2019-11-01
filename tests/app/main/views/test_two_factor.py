@@ -26,7 +26,7 @@ def test_should_render_two_factor_page(
     assert page.select_one('main p').text.strip() == (
         'We’ve sent you a text message with a security code.'
     )
-    assert page.select_one('label').text.strip(
+    assert page.select_one('label').text.strip() == (
         'Text message code'
     )
     assert page.select_one('input')['type'] == 'tel'

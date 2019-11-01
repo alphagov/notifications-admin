@@ -50,16 +50,7 @@ def user_json(
     email_address='test@gov.uk',
     mobile_number='+447700900986',
     password_changed_at=None,
-    permissions={generate_uuid(): [
-        'view_activity',
-        'send_texts',
-        'send_emails',
-        'send_letters',
-        'manage_users',
-        'manage_templates',
-        'manage_settings',
-        'manage_api_keys']
-    },
+    permissions=None,
     auth_type='sms_auth',
     failed_login_count=0,
     logged_in_at=None,
@@ -67,10 +58,21 @@ def user_json(
     max_failed_login_count=3,
     platform_admin=False,
     current_session_id='1234',
-    organisations=[],
+    organisations=None,
     services=None
 
 ):
+    if not permissions:
+        permissions = {generate_uuid(): [
+            'view_activity',
+            'send_texts',
+            'send_emails',
+            'send_letters',
+            'manage_users',
+            'manage_templates',
+            'manage_settings',
+            'manage_api_keys',
+        ]}
     return {
         'id': id_,
         'name': name,
@@ -85,7 +87,7 @@ def user_json(
         'max_failed_login_count': max_failed_login_count,
         'platform_admin': platform_admin,
         'current_session_id': current_session_id,
-        'organisations': organisations,
+        'organisations': organisations or [],
         'services': list(permissions.keys()) if services is None else services
     }
 
@@ -97,7 +99,7 @@ def invited_user(
     email_address='testinviteduser@gov.uk',
     permissions=None,
     status='pending',
-    created_at=datetime.utcnow(),
+    created_at=None,
     auth_type='sms_auth',
     organisation=None
 ):
@@ -106,7 +108,7 @@ def invited_user(
         'from_user': from_user,
         'email_address': email_address,
         'status': status,
-        'created_at': created_at,
+        'created_at': created_at or datetime.utcnow(),
         'auth_type': auth_type,
     }
     if service:
@@ -330,14 +332,14 @@ def org_invite_json(id_, invited_by, org_id, email_address, created_at, status):
 TEST_USER_EMAIL = 'test@user.gov.uk'
 
 
-def create_test_api_user(state, permissions={}):
+def create_test_api_user(state, permissions=None):
     user_data = {'id': 1,
                  'name': 'Test User',
                  'password': 'somepassword',
                  'email_address': TEST_USER_EMAIL,
                  'mobile_number': '+441234123412',
                  'state': state,
-                 'permissions': permissions
+                 'permissions': permissions or {}
                  }
     return user_data
 

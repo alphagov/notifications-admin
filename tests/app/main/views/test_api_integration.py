@@ -36,7 +36,7 @@ def test_should_show_api_page(
     assert page.h1.string.strip() == 'API integration'
     rows = page.find_all('details')
     assert len(rows) == 5
-    for index, row in enumerate(rows):
+    for row in rows:
         assert row.find('h3').string.strip() == '07123456789'
 
 

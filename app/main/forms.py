@@ -1087,9 +1087,9 @@ class ServiceUpdateEmailBranding(StripWhitespaceForm):
         ]
     )
 
-    def validate_name(form, name):
+    def validate_name(self, name):
         op = request.form.get('operation')
-        if op == 'email-branding-details' and not form.name.data:
+        if op == 'email-branding-details' and not self.name.data:
             raise ValidationError('This field is required')
 
 

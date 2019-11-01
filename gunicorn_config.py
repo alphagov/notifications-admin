@@ -14,5 +14,5 @@ gunicorn.SERVER_SOFTWARE = 'None'
 
 def worker_abort(worker):
     worker.log.info("worker received ABORT")
-    for threadId, stack in sys._current_frames().items():
+    for stack in sys._current_frames().values():
         worker.log.error(''.join(traceback.format_stack(stack)))
