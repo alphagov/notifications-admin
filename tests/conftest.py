@@ -2549,7 +2549,7 @@ def mock_send_already_registered_email(mocker):
     return mocker.patch('app.user_api_client.send_already_registered_email')
 
 
-def create_email_brandings(number_of_brandings, non_standard_values={}, shuffle=False):
+def create_email_brandings(number_of_brandings, non_standard_values=None, shuffle=False):
     brandings = [
         {
             'id': str(idx),
@@ -2560,7 +2560,7 @@ def create_email_brandings(number_of_brandings, non_standard_values={}, shuffle=
             'brand_type': 'org',
         } for idx in range(1, number_of_brandings + 1)]
 
-    for idx, row in enumerate(non_standard_values):
+    for idx, row in enumerate(non_standard_values or {}):
         brandings[row['idx']].update(non_standard_values[idx])
 
     if shuffle:
@@ -2636,7 +2636,7 @@ def mock_no_email_branding(mocker):
     )
 
 
-def create_email_branding(id, non_standard_values={}):
+def create_email_branding(id, non_standard_values=None):
     branding = {
         'logo': 'example.png',
         'name': 'Organisation name',
@@ -2646,7 +2646,7 @@ def create_email_branding(id, non_standard_values={}):
         'brand_type': 'org',
     }
 
-    if bool(non_standard_values):
+    if non_standard_values:
         branding.update(non_standard_values)
 
     return {'email_branding': branding}
@@ -2871,9 +2871,11 @@ def client_request(
             with logged_in_client.session_transaction() as session:
                 yield session
 
+        @staticmethod
         def login(user, service=service_one):
             logged_in_client.login(user, mocker, service)
 
+        @staticmethod
         def logout():
             logged_in_client.logout(None)
 

@@ -25,13 +25,13 @@ def _test_permissions(
     usr,
     permissions,
     will_succeed,
-    kwargs={}
+    kwargs=None,
 ):
     request.view_args.update({'service_id': 'foo'})
     if usr:
         client.login(usr)
 
-    decorator = user_has_permissions(*permissions, **kwargs)
+    decorator = user_has_permissions(*permissions, **(kwargs or {}))
     decorated_index = decorator(index)
 
     if will_succeed:
@@ -462,7 +462,7 @@ def test_routes_have_permissions_decorators():
             'app/main/views/{}.py::{}\n'
         ).format(file, function)
 
-    for endpoint, decorators in get_routes_and_decorators():
+    for _endpoint, decorators in get_routes_and_decorators():
 
         assert 'login_required' not in decorators, (
             '@login_required found\n'
