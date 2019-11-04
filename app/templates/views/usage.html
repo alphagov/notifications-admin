@@ -18,14 +18,14 @@
     </div>
     <div id='pill-selected-item'>
       <div class='grid-row'>
-        <div class='column-half'>
+        <div class='column-one-third'>
           <h2 class='heading-small'>Emails</h2>
           <div class="keyline-block">
             {{ big_number(emails_sent, 'sent', smaller=True) }}
             {{ big_number("Unlimited", 'free allowance', smaller=True) }}
           </div>
         </div>
-        <div class='column-half'>
+        <div class='column-one-third'>
           <h2 class='heading-small'>Text messages</h2>
           <div class="keyline-block">
             {{ big_number(sms_sent, 'sent', smaller=True) }}
@@ -40,15 +40,21 @@
             {% endif %}
           </div>
         </div>
+        <div class='column-one-third'>
+          <h2 class='heading-small'>Letters</h2>
+          <div class="keyline-block">
+            {{ big_number(letter_sent, 'sent', smaller=True) }}
+          </div>
+        </div>
       </div>
 
       <div class='grid-row'>
-        <div class='column-half'>
+        <div class='column-one-third'>
           <div class="keyline-block">
             &nbsp;
           </div>
         </div>
-        <div class='column-half'>
+        <div class='column-one-third'>
           <div class="keyline-block">
             {{ big_number(
               (sms_chargeable * sms_rate),
@@ -58,10 +64,21 @@
             ) }}
           </div>
         </div>
+        <div class='column-one-third'>
+          <div class="keyline-block">
+            {{ big_number(
+                letter_cost,
+                'spent',
+                currency="£",
+                smaller=True
+              ) }}
+          </div>
+        </div>
+
       </div>
 
       {% if months %}
-        <div class="dashboard-table body-copy-table">
+        <div class="dashboard-table usage-table body-copy-table">
           {% call(month, row_index) list_table(
             months,
             caption="Total spend",
@@ -78,7 +95,7 @@
             {% endcall %}
             {% call field(align='left') %}
               {{ big_number(
-                sms_rate * month.paid,
+                (sms_rate * month.paid) + month.letter_total,
                 currency="£",
                 smallest=True
               ) }}
@@ -87,10 +104,16 @@
                 <li class="tabular-numbers">{{ "{:,}".format(month.free) }} free {{ message_count_label(month.free, 'sms', '') }}</li>
               {% endif %}
               {% if month.paid %}
-                <li class="tabular-numbers">{{ "{:,}".format(month.paid) }} {{ message_count_label(month.free, 'sms', '') }}at
+                <li class="tabular-numbers">{{ "{:,}".format(month.paid) }} {{ message_count_label(month.paid, 'sms', '') }}at
                 {{- ' {:.2f}p'.format(sms_rate * 100) }}</li>
               {% endif %}
-              {% if not (month.free or month.paid) %}
+              {% for letter in month.letters%}
+                {% if letter[0] %}
+                  <li class="tabular-numbers">{{ "{:,} {}".format(letter[0], letter[3])}} class {{ message_count_label(letter[0], 'letter', '') }}at
+                  {{ '{:.0f}p'.format(letter[1] * 100) }}</li>
+                {% endif %}
+              {% endfor %}
+              {% if not (month.free or month.paid or month.letters) %}
                 <li aria-hidden="true">–</li>
               {% endif %}
               </ul>
@@ -101,12 +124,12 @@
     </div>
 
     <div class="grid-row">
-      <div class="column-half">
+      <div class="column-one-third">
         <p class="align-with-heading-copy">
-          Financial year ends 31 March.
+          Financial year ends 31&nbsp;March
         </p>
       </div>
-      <div class="column-half">
+      <div class="column-two-thirds">
         <p class="align-with-heading-copy">
           What counts as 1 text message?<br />
           See <a href="{{ url_for('.pricing') }}">pricing</a>.
