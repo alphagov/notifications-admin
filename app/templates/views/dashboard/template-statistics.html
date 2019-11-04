@@ -2,46 +2,44 @@
 {% from "components/message-count-label.html" import message_count_label %}
 {% from "components/big-number.html" import big_number %}
 {% from "components/table.html" import list_table, field, right_aligned_field_heading, row_heading, spark_bar_field %}
+{% from "components/show-more.html" import show_more %}
 
-<div class='dashboard-table'>
-  {% call(item, row_number) list_table(
-    template_statistics,
-    caption="Templates used",
-    caption_visible=False,
-    empty_message='',
-    field_headings=[
-      'Template',
-      'Messages sent'
-    ],
-    field_headings_visible=True
-  ) %}
+<div class="ajax-block-container">
+  {% if template_statistics|length > 1 %}
+    <div class='dashboard-table'>
+      {% call(item, row_number) list_table(
+        template_statistics,
+        caption="Templates used",
+        caption_visible=False,
+        empty_message='',
+        field_headings=[
+          'Template',
+          'Messages sent'
+        ],
+        field_headings_visible=True
+      ) %}
 
-    {% call row_heading() %}
-      {% if item.is_precompiled_letter %}
-      <span class="file-list-filename">
-      Provided as PDF
-      </span>
-      <span class="file-list-hint">
-        Letter
-      </span>
-      {% else %}
-      <a class="file-list-filename" href="{{ url_for('.view_template', service_id=current_service.id, template_id=item.template_id) }}">{{ item.template_name }}</a>
-      <span class="file-list-hint">
-        {{ message_count_label(1, item.template_type, suffix='template')|capitalize }}
-      </span>
-      {% endif %}
-    {% endcall %}
-    {% if template_statistics|length > 1 %}
-      {{ spark_bar_field(item.count, most_used_template_count, id=item.template_id) }}
-    {% else %}
-      {% call field() %}
-        <span id='{{item.template_id}}' class="heading-small">
-          {{ big_number(
-            item.count,
-            smallest=True
-          ) }}
-        </span>
+        {% call row_heading() %}
+          {% if item.is_precompiled_letter %}
+          <span class="file-list-filename">
+          Provided as PDF
+          </span>
+          <span class="file-list-hint">
+            Letter
+          </span>
+          {% else %}
+          <a class="file-list-filename" href="{{ url_for('.view_template', service_id=current_service.id, template_id=item.template_id) }}">{{ item.template_name }}</a>
+          <span class="file-list-hint">
+            {{ message_count_label(1, item.template_type, suffix='template')|capitalize }}
+          </span>
+          {% endif %}
+        {% endcall %}
+        {{ spark_bar_field(item.count, most_used_template_count, id=item.template_id) }}
       {% endcall %}
-    {% endif %}
-  {% endcall %}
+      {{ show_more(
+        url_for('.template_usage', service_id=current_service.id),
+        'See templates used by month'
+      ) }}
+    </div>
+  {% endif %}
 </div>
