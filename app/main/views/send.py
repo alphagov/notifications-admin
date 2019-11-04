@@ -630,7 +630,7 @@ def check_messages(service_id, template_id, upload_id, row_index=2):
 
     metadata_kwargs = {
         'notification_count': data['count_of_recipients'],
-        'template_id': str(template_id),
+        'template_id': template_id,
         'valid': True,
         'original_file_name': unicode_truncate(
             data['original_file_name'],

@@ -369,7 +369,7 @@ def copy_template(service_id, template_id):
 
     current_user.belongs_to_service_or_403(from_service)
 
-    template = service_api_client.get_service_template(from_service, str(template_id))['data']
+    template = service_api_client.get_service_template(from_service, template_id)['data']
 
     template_folder = template_folder_api_client.get_template_folder(from_service, template['folder'])
     if not current_user.has_template_folder_permission(template_folder):

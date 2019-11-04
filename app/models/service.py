@@ -176,7 +176,7 @@ class Service(JSONModel):
         ]
 
     def get_template(self, template_id, version=None):
-        return service_api_client.get_service_template(self.id, str(template_id), version)['data']
+        return service_api_client.get_service_template(self.id, template_id, version)['data']
 
     def get_template_folder_with_user_permission_or_403(self, folder_id, user):
         template_folder = self.get_template_folder(folder_id)
