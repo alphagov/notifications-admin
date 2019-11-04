@@ -9,7 +9,7 @@ from app.models.event import APIKeyEvent, APIKeyEvents, ServiceEvents
 from app.utils import user_has_permissions
 
 
-@main.route("/services/<service_id>/history")
+@main.route("/services/<uuid:service_id>/history")
 @user_has_permissions('manage_service')
 def history(service_id):
 

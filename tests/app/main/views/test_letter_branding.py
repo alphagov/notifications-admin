@@ -51,9 +51,10 @@ def test_letter_branding_page_shows_full_branding_list(
 def test_update_letter_branding_shows_the_current_letter_brand(
     platform_admin_client,
     mock_get_letter_branding_by_id,
+    fake_uuid,
 ):
     response = platform_admin_client.get(
-        url_for('.update_letter_branding', branding_id='abc')
+        url_for('.update_letter_branding', branding_id=fake_uuid)
     )
 
     assert response.status_code == 200
@@ -81,7 +82,7 @@ def test_update_letter_branding_with_new_valid_file(
     mock_delete_temp_files = mocker.patch('app.main.views.letter_branding.delete_letter_temp_file')
 
     response = platform_admin_client.post(
-        url_for('.update_letter_branding', branding_id='abc'),
+        url_for('.update_letter_branding', branding_id=fake_uuid),
         data={'file': (BytesIO(''.encode('utf-8')), filename)},
         follow_redirects=True
     )
@@ -97,10 +98,11 @@ def test_update_letter_branding_with_new_valid_file(
 
 def test_update_letter_branding_when_uploading_invalid_file(
     platform_admin_client,
-    mock_get_letter_branding_by_id
+    mock_get_letter_branding_by_id,
+    fake_uuid,
 ):
     response = platform_admin_client.post(
-        url_for('.update_letter_branding', branding_id='abc'),
+        url_for('.update_letter_branding', branding_id=fake_uuid),
         data={'file': (BytesIO(''.encode('utf-8')), 'test.png')},
         follow_redirects=True
     )
@@ -127,7 +129,7 @@ def test_update_letter_branding_deletes_any_temp_files_when_uploading_a_file(
     mock_delete_temp_files = mocker.patch('app.main.views.letter_branding.delete_letter_temp_file')
 
     response = platform_admin_client.post(
-        url_for('.update_letter_branding', branding_id='abc', logo=temp_logo),
+        url_for('.update_letter_branding', branding_id=fake_uuid, logo=temp_logo),
         data={'file': (BytesIO(''.encode('utf-8')), 'new_uploaded_file.svg')},
         follow_redirects=True
     )
@@ -223,7 +225,7 @@ def test_update_letter_branding_shows_database_errors_on_name_field(
     ))
 
     response = platform_admin_client.post(
-        url_for('.update_letter_branding', branding_id='abc'),
+        url_for('.update_letter_branding', branding_id=fake_uuid),
         data={
             'name': 'my brand',
             'operation': 'branding-details'

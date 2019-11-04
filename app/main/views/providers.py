@@ -38,7 +38,7 @@ def add_monthly_traffic(domestic_sms_providers):
         provider['monthly_traffic'] = round(percentage)
 
 
-@main.route("/provider/<provider_id>/edit", methods=['GET', 'POST'])
+@main.route("/provider/<uuid:provider_id>/edit", methods=['GET', 'POST'])
 @user_is_platform_admin
 def edit_provider(provider_id):
     provider = provider_client.get_provider_by_id(provider_id)['provider_details']
@@ -51,7 +51,7 @@ def edit_provider(provider_id):
     return render_template('views/providers/edit-provider.html', form=form, provider=provider)
 
 
-@main.route("/provider/<provider_id>")
+@main.route("/provider/<uuid:provider_id>")
 @user_is_platform_admin
 def view_provider(provider_id):
     versions = provider_client.get_provider_versions(provider_id)

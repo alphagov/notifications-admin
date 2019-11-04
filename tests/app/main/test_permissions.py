@@ -1,8 +1,9 @@
 import ast
 import inspect
+import re
 
 import pytest
-from flask import request
+from flask import current_app, request
 from werkzeug.exceptions import Forbidden, Unauthorized
 
 from app.main.views.index import index
@@ -481,3 +482,12 @@ def test_routes_have_permissions_decorators():
                 'Use @user_is_platform_admin only\n'
                 'app/main/views/{}.py::{}\n'
             ).format(file, function)
+
+
+def test_routes_require_uuids(client_request):
+    for rule in current_app.url_map.iter_rules():
+        for param in re.findall('<([^>]*)>', rule.rule):
+            if '_id' in param and not param.startswith('uuid:'):
+                pytest.fail((
+                    'Should be <uuid:{}> in {}'
+                ).format(param, rule.rule))
