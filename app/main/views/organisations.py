@@ -122,7 +122,7 @@ def add_organisation_from_nhs_local_service(service_id):
     )
 
 
-@main.route("/organisations/<org_id>", methods=['GET'])
+@main.route("/organisations/<uuid:org_id>", methods=['GET'])
 @user_has_permissions()
 def organisation_dashboard(org_id):
     return render_template(
@@ -130,7 +130,7 @@ def organisation_dashboard(org_id):
     )
 
 
-@main.route("/organisations/<org_id>/trial-services", methods=['GET'])
+@main.route("/organisations/<uuid:org_id>/trial-services", methods=['GET'])
 @user_is_platform_admin
 def organisation_trial_mode_services(org_id):
     return render_template(
@@ -139,7 +139,7 @@ def organisation_trial_mode_services(org_id):
     )
 
 
-@main.route("/organisations/<org_id>/users", methods=['GET'])
+@main.route("/organisations/<uuid:org_id>/users", methods=['GET'])
 @user_has_permissions()
 def manage_org_users(org_id):
     return render_template(
@@ -150,7 +150,7 @@ def manage_org_users(org_id):
     )
 
 
-@main.route("/organisations/<org_id>/users/invite", methods=['GET', 'POST'])
+@main.route("/organisations/<uuid:org_id>/users/invite", methods=['GET', 'POST'])
 @user_has_permissions()
 def invite_org_user(org_id):
     form = InviteOrgUserForm(
@@ -173,7 +173,7 @@ def invite_org_user(org_id):
     )
 
 
-@main.route("/organisations/<org_id>/users/<user_id>", methods=['GET', 'POST'])
+@main.route("/organisations/<uuid:org_id>/users/<uuid:user_id>", methods=['GET', 'POST'])
 @user_has_permissions()
 def edit_user_org_permissions(org_id, user_id):
     return render_template(
@@ -182,7 +182,7 @@ def edit_user_org_permissions(org_id, user_id):
     )
 
 
-@main.route("/organisations/<org_id>/users/<user_id>/delete", methods=['GET', 'POST'])
+@main.route("/organisations/<uuid:org_id>/users/<uuid:user_id>/delete", methods=['GET', 'POST'])
 @user_has_permissions()
 def remove_user_from_organisation(org_id, user_id):
     user = User.from_id(user_id)
@@ -211,7 +211,7 @@ def remove_user_from_organisation(org_id, user_id):
     )
 
 
-@main.route("/organisations/<org_id>/cancel-invited-user/<invited_user_id>", methods=['GET'])
+@main.route("/organisations/<uuid:org_id>/cancel-invited-user/<uuid:invited_user_id>", methods=['GET'])
 @user_has_permissions()
 def cancel_invited_org_user(org_id, invited_user_id):
     org_invite_api_client.cancel_invited_user(org_id=org_id, invited_user_id=invited_user_id)
@@ -219,7 +219,7 @@ def cancel_invited_org_user(org_id, invited_user_id):
     return redirect(url_for('main.manage_org_users', org_id=org_id))
 
 
-@main.route("/organisations/<org_id>/settings/", methods=['GET'])
+@main.route("/organisations/<uuid:org_id>/settings/", methods=['GET'])
 @user_is_platform_admin
 def organisation_settings(org_id):
     return render_template(
@@ -227,7 +227,7 @@ def organisation_settings(org_id):
     )
 
 
-@main.route("/organisations/<org_id>/settings/edit-name", methods=['GET', 'POST'])
+@main.route("/organisations/<uuid:org_id>/settings/edit-name", methods=['GET', 'POST'])
 @user_is_platform_admin
 def edit_organisation_name(org_id):
     form = RenameOrganisationForm()
@@ -249,7 +249,7 @@ def edit_organisation_name(org_id):
     )
 
 
-@main.route("/organisations/<org_id>/settings/edit-type", methods=['GET', 'POST'])
+@main.route("/organisations/<uuid:org_id>/settings/edit-type", methods=['GET', 'POST'])
 @user_is_platform_admin
 def edit_organisation_type(org_id):
 
@@ -270,7 +270,7 @@ def edit_organisation_type(org_id):
     )
 
 
-@main.route("/organisations/<org_id>/settings/edit-crown-status", methods=['GET', 'POST'])
+@main.route("/organisations/<uuid:org_id>/settings/edit-crown-status", methods=['GET', 'POST'])
 @user_is_platform_admin
 def edit_organisation_crown_status(org_id):
 
@@ -299,7 +299,7 @@ def edit_organisation_crown_status(org_id):
     )
 
 
-@main.route("/organisations/<org_id>/settings/edit-agreement", methods=['GET', 'POST'])
+@main.route("/organisations/<uuid:org_id>/settings/edit-agreement", methods=['GET', 'POST'])
 @user_is_platform_admin
 def edit_organisation_agreement(org_id):
 
@@ -328,7 +328,7 @@ def edit_organisation_agreement(org_id):
     )
 
 
-@main.route("/organisations/<org_id>/settings/set-email-branding", methods=['GET', 'POST'])
+@main.route("/organisations/<uuid:org_id>/settings/set-email-branding", methods=['GET', 'POST'])
 @user_is_platform_admin
 def edit_organisation_email_branding(org_id):
 
@@ -353,7 +353,7 @@ def edit_organisation_email_branding(org_id):
     )
 
 
-@main.route("/organisations/<org_id>/settings/preview-email-branding", methods=['GET', 'POST'])
+@main.route("/organisations/<uuid:org_id>/settings/preview-email-branding", methods=['GET', 'POST'])
 @user_is_platform_admin
 def organisation_preview_email_branding(org_id):
 
@@ -375,7 +375,7 @@ def organisation_preview_email_branding(org_id):
     )
 
 
-@main.route("/organisations/<org_id>/settings/set-letter-branding", methods=['GET', 'POST'])
+@main.route("/organisations/<uuid:org_id>/settings/set-letter-branding", methods=['GET', 'POST'])
 @user_is_platform_admin
 def edit_organisation_letter_branding(org_id):
     letter_branding = letter_branding_client.get_all_letter_branding()
@@ -399,7 +399,7 @@ def edit_organisation_letter_branding(org_id):
     )
 
 
-@main.route("/organisations/<org_id>/settings/preview-letter-branding", methods=['GET', 'POST'])
+@main.route("/organisations/<uuid:org_id>/settings/preview-letter-branding", methods=['GET', 'POST'])
 @user_is_platform_admin
 def organisation_preview_letter_branding(org_id):
     branding_style = request.args.get('branding_style')
@@ -420,7 +420,7 @@ def organisation_preview_letter_branding(org_id):
     )
 
 
-@main.route("/organisations/<org_id>/settings/edit-organisation-domains", methods=['GET', 'POST'])
+@main.route("/organisations/<uuid:org_id>/settings/edit-organisation-domains", methods=['GET', 'POST'])
 @user_is_platform_admin
 def edit_organisation_domains(org_id):
 
@@ -444,7 +444,7 @@ def edit_organisation_domains(org_id):
     )
 
 
-@main.route("/organisations/<org_id>/settings/edit-name/confirm", methods=['GET', 'POST'])
+@main.route("/organisations/<uuid:org_id>/settings/edit-name/confirm", methods=['GET', 'POST'])
 @user_has_permissions()
 def confirm_edit_organisation_name(org_id):
     # Validate password for form
@@ -476,7 +476,7 @@ def confirm_edit_organisation_name(org_id):
         form=form)
 
 
-@main.route("/organisations/<org_id>/settings/edit-go-live-notes", methods=['GET', 'POST'])
+@main.route("/organisations/<uuid:org_id>/settings/edit-go-live-notes", methods=['GET', 'POST'])
 @user_is_platform_admin
 def edit_organisation_go_live_notes(org_id):
 

@@ -392,7 +392,7 @@ def platform_admin_letter_validation_preview():
     return letter_validation_preview(from_platform_admin=True)
 
 
-@main.route("/services/<service_id>/letter-validation-preview", methods=["GET", "POST"])
+@main.route("/services/<uuid:service_id>/letter-validation-preview", methods=["GET", "POST"])
 @user_has_permissions()
 def service_letter_validation_preview(service_id):
     return letter_validation_preview(from_platform_admin=False)

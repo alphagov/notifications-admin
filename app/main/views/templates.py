@@ -47,7 +47,7 @@ form_objects = {
 }
 
 
-@main.route("/services/<service_id>/templates/<uuid:template_id>")
+@main.route("/services/<uuid:service_id>/templates/<uuid:template_id>")
 @user_has_permissions()
 def view_template(service_id, template_id):
     template = current_service.get_template(template_id)
@@ -84,7 +84,7 @@ def view_template(service_id, template_id):
     )
 
 
-@main.route("/services/<service_id>/start-tour/<uuid:template_id>")
+@main.route("/services/<uuid:service_id>/start-tour/<uuid:template_id>")
 @user_has_permissions('view_activity')
 def start_tour(service_id, template_id):
 
@@ -104,10 +104,10 @@ def start_tour(service_id, template_id):
     )
 
 
-@main.route("/services/<service_id>/templates", methods=['GET', 'POST'])
-@main.route("/services/<service_id>/templates/folders/<template_folder_id>", methods=['GET', 'POST'])
-@main.route("/services/<service_id>/templates/<template_type>", methods=['GET', 'POST'])
-@main.route("/services/<service_id>/templates/<template_type>/folders/<template_folder_id>", methods=['GET', 'POST'])
+@main.route("/services/<uuid:service_id>/templates", methods=['GET', 'POST'])
+@main.route("/services/<uuid:service_id>/templates/folders/<uuid:template_folder_id>", methods=['GET', 'POST'])
+@main.route("/services/<uuid:service_id>/templates/<template_type>", methods=['GET', 'POST'])
+@main.route("/services/<uuid:service_id>/templates/<template_type>/folders/<uuid:template_folder_id>", methods=['GET', 'POST'])
 @user_has_permissions()
 def choose_template(service_id, template_type='all', template_folder_id=None):
     template_folder = current_service.get_template_folder(template_folder_id)
@@ -215,7 +215,7 @@ def get_template_nav_items(template_folder_id):
     ]
 
 
-@main.route("/services/<service_id>/templates/<template_id>.<filetype>")
+@main.route("/services/<uuid:service_id>/templates/<uuid:template_id>.<filetype>")
 @user_has_permissions()
 def view_letter_template_preview(service_id, template_id, filetype):
     if filetype not in ('pdf', 'png'):
@@ -267,7 +267,7 @@ def _view_template_version(service_id, template_id, version, letters_as_pdf=Fals
     ))
 
 
-@main.route("/services/<service_id>/templates/<template_id>/version/<int:version>")
+@main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/version/<int:version>")
 @user_has_permissions()
 def view_template_version(service_id, template_id, version):
     return render_template(
@@ -276,7 +276,7 @@ def view_template_version(service_id, template_id, version):
     )
 
 
-@main.route("/services/<service_id>/templates/<template_id>/version/<int:version>.<filetype>")
+@main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/version/<int:version>.<filetype>")
 @user_has_permissions()
 def view_template_version_preview(service_id, template_id, version, filetype):
     db_template = current_service.get_template(template_id, version=version)
@@ -313,7 +313,6 @@ def _add_template_by_type(template_type, template_folder_id):
             service_id=current_service.id,
             notification_type=template_type,
             return_to='add_new_template',
-            template_id='0'
         ))
     else:
         return redirect(url_for(
@@ -324,10 +323,10 @@ def _add_template_by_type(template_type, template_folder_id):
         ))
 
 
-@main.route("/services/<service_id>/templates/copy")
-@main.route("/services/<service_id>/templates/copy/from-folder/<uuid:from_folder>")
-@main.route("/services/<service_id>/templates/copy/from-service/<uuid:from_service>")
-@main.route("/services/<service_id>/templates/copy/from-service/<uuid:from_service>/from-folder/<uuid:from_folder>")
+@main.route("/services/<uuid:service_id>/templates/copy")
+@main.route("/services/<uuid:service_id>/templates/copy/from-folder/<uuid:from_folder>")
+@main.route("/services/<uuid:service_id>/templates/copy/from-service/<uuid:from_service>")
+@main.route("/services/<uuid:service_id>/templates/copy/from-service/<uuid:from_service>/from-folder/<uuid:from_folder>")
 @user_has_permissions('manage_templates')
 def choose_template_to_copy(
     service_id,
@@ -362,7 +361,7 @@ def choose_template_to_copy(
         )
 
 
-@main.route("/services/<service_id>/templates/copy/<uuid:template_id>", methods=['GET', 'POST'])
+@main.route("/services/<uuid:service_id>/templates/copy/<uuid:template_id>", methods=['GET', 'POST'])
 @user_has_permissions('manage_templates')
 def copy_template(service_id, template_id):
     from_service = request.args.get('from_service')
@@ -405,9 +404,16 @@ def _get_template_copy_name(template, existing_templates):
     return '{} (copy)'.format(template['name'])
 
 
-@main.route("/services/<service_id>/templates/action-blocked/<notification_type>/<return_to>/<template_id>")
+@main.route((
+    '/services/<uuid:service_id>/templates/action-blocked/'
+    '<notification_type>'
+))
+@main.route((
+    '/services/<uuid:service_id>/templates/action-blocked/'
+    '<notification_type>/<return_to>/<uuid:template_id>'
+))
 @user_has_permissions('manage_templates')
-def action_blocked(service_id, notification_type, return_to, template_id):
+def action_blocked(service_id, notification_type, return_to='add_new_template', template_id=None):
     if notification_type == 'sms':
         notification_type = 'text messages'
     elif notification_type == 'email':
@@ -418,11 +424,11 @@ def action_blocked(service_id, notification_type, return_to, template_id):
         service_id=service_id,
         notification_type=notification_type,
         return_to=return_to,
-        template_id=template_id
+        template_id=template_id,
     )
 
 
-@main.route("/services/<service_id>/templates/folders/<template_folder_id>/manage", methods=['GET', 'POST'])
+@main.route("/services/<uuid:service_id>/templates/folders/<uuid:template_folder_id>/manage", methods=['GET', 'POST'])
 @user_has_permissions('manage_templates')
 def manage_template_folder(service_id, template_folder_id):
     template_folder = current_service.get_template_folder_with_user_permission_or_403(template_folder_id, current_user)
@@ -456,7 +462,7 @@ def manage_template_folder(service_id, template_folder_id):
     )
 
 
-@main.route("/services/<service_id>/templates/folders/<template_folder_id>/delete", methods=['GET', 'POST'])
+@main.route("/services/<uuid:service_id>/templates/folders/<uuid:template_folder_id>/delete", methods=['GET', 'POST'])
 @user_has_permissions('manage_templates')
 def delete_template_folder(service_id, template_folder_id):
     template_folder = current_service.get_template_folder_with_user_permission_or_403(template_folder_id, current_user)
@@ -498,9 +504,14 @@ def delete_template_folder(service_id, template_folder_id):
         return manage_template_folder(service_id, template_folder_id)
 
 
-@main.route("/services/<service_id>/templates/add-<template_type>", methods=['GET', 'POST'])
-@main.route("/services/<service_id>/templates/folders/<template_folder_id>/add-<template_type>",
-            methods=['GET', 'POST'])
+@main.route(
+    "/services/<uuid:service_id>/templates/add-<template_type>",
+    methods=['GET', 'POST'],
+)
+@main.route(
+    "/services/<uuid:service_id>/templates/folders/<uuid:template_folder_id>/add-<template_type>",
+    methods=['GET', 'POST'],
+)
 @user_has_permissions('manage_templates')
 def add_service_template(service_id, template_type, template_folder_id=None):
 
@@ -544,7 +555,6 @@ def add_service_template(service_id, template_type, template_folder_id=None):
             notification_type=template_type,
             template_folder_id=template_folder_id,
             return_to='templates',
-            template_id='0'
         ))
     else:
         return render_template(
@@ -561,7 +571,7 @@ def abort_403_if_not_admin_user():
         abort(403)
 
 
-@main.route("/services/<service_id>/templates/<template_id>/edit", methods=['GET', 'POST'])
+@main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/edit", methods=['GET', 'POST'])
 @user_has_permissions('manage_templates')
 def edit_service_template(service_id, template_id):
     template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
@@ -643,7 +653,7 @@ def edit_service_template(service_id, template_id):
         )
 
 
-@main.route("/services/<service_id>/templates/<template_id>/delete", methods=['GET', 'POST'])
+@main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/delete", methods=['GET', 'POST'])
 @user_has_permissions('manage_templates')
 def delete_service_template(service_id, template_id):
     template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
@@ -691,7 +701,7 @@ def delete_service_template(service_id, template_id):
     )
 
 
-@main.route("/services/<service_id>/templates/<template_id>/redact", methods=['GET'])
+@main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/redact", methods=['GET'])
 @user_has_permissions('manage_templates')
 def confirm_redact_template(service_id, template_id):
     template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
@@ -714,7 +724,7 @@ def confirm_redact_template(service_id, template_id):
     )
 
 
-@main.route("/services/<service_id>/templates/<template_id>/redact", methods=['POST'])
+@main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/redact", methods=['POST'])
 @user_has_permissions('manage_templates')
 def redact_template(service_id, template_id):
 
@@ -732,7 +742,7 @@ def redact_template(service_id, template_id):
     ))
 
 
-@main.route('/services/<service_id>/templates/<template_id>/versions')
+@main.route('/services/<uuid:service_id>/templates/<uuid:template_id>/versions')
 @user_has_permissions('view_activity')
 def view_template_versions(service_id, template_id):
     return render_template(
@@ -754,7 +764,7 @@ def view_template_versions(service_id, template_id):
     )
 
 
-@main.route('/services/<service_id>/templates/<template_id>/set-template-sender', methods=['GET', 'POST'])
+@main.route('/services/<uuid:service_id>/templates/<uuid:template_id>/set-template-sender', methods=['GET', 'POST'])
 @user_has_permissions('manage_templates')
 def set_template_sender(service_id, template_id):
     template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
@@ -784,7 +794,7 @@ def set_template_sender(service_id, template_id):
     )
 
 
-@main.route('/services/<service_id>/templates/<template_id>/edit-postage', methods=['GET', 'POST'])
+@main.route('/services/<uuid:service_id>/templates/<uuid:template_id>/edit-postage', methods=['GET', 'POST'])
 @user_has_permissions('manage_templates')
 def edit_template_postage(service_id, template_id):
     template = current_service.get_template_with_user_permission_or_403(template_id, current_user)

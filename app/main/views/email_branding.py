@@ -26,8 +26,8 @@ def email_branding():
     )
 
 
-@main.route("/email-branding/<branding_id>/edit", methods=['GET', 'POST'])
-@main.route("/email-branding/<branding_id>/edit/<logo>", methods=['GET', 'POST'])
+@main.route("/email-branding/<uuid:branding_id>/edit", methods=['GET', 'POST'])
+@main.route("/email-branding/<uuid:branding_id>/edit/<logo>", methods=['GET', 'POST'])
 @user_is_platform_admin
 def update_email_branding(branding_id, logo=None):
     email_branding = email_branding_client.get_email_branding(branding_id)['email_branding']

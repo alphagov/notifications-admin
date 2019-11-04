@@ -493,7 +493,7 @@ def test_should_cancel_letter_job(
     mocker,
     active_user_with_permissions
 ):
-    job_id = uuid.uuid4()
+    job_id = str(uuid.uuid4())
     job = job_json(
         SERVICE_ONE_ID,
         active_user_with_permissions,

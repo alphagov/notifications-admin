@@ -34,7 +34,6 @@ from tests.conftest import (
     SERVICE_ONE_ID,
     active_caseworking_user,
     active_user_with_permissions,
-    fake_uuid,
     mock_get_international_service,
     mock_get_live_service,
     mock_get_service,
@@ -358,6 +357,7 @@ def test_shows_error_if_parsing_exception(
     mock_get_service_template,
     exception,
     expected_error_message,
+    fake_uuid,
 ):
 
     def _raise_exception_or_partial_exception(file_content, filename):

@@ -36,13 +36,13 @@ from app.utils import (
 MAX_FILE_UPLOAD_SIZE = 2 * 1024 * 1024  # 2MB
 
 
-@main.route("/services/<service_id>/uploads")
+@main.route("/services/<uuid:service_id>/uploads")
 @user_has_permissions()
 def uploads(service_id):
     return view_jobs(service_id)
 
 
-@main.route("/services/<service_id>/upload-letter", methods=['GET', 'POST'])
+@main.route("/services/<uuid:service_id>/upload-letter", methods=['GET', 'POST'])
 @user_has_permissions('send_messages')
 def upload_letter(service_id):
     form = PDFUploadForm()
@@ -142,7 +142,7 @@ def _get_error_from_upload_form(form_errors):
     return error
 
 
-@main.route("/services/<service_id>/preview-letter/<file_id>")
+@main.route("/services/<uuid:service_id>/preview-letter/<uuid:file_id>")
 @user_has_permissions('send_messages')
 def uploaded_letter_preview(service_id, file_id):
     metadata = get_letter_metadata(service_id, file_id)
@@ -189,7 +189,7 @@ def uploaded_letter_preview(service_id, file_id):
     )
 
 
-@main.route("/services/<service_id>/preview-letter-image/<file_id>")
+@main.route("/services/<uuid:service_id>/preview-letter-image/<uuid:file_id>")
 @user_has_permissions('send_messages')
 def view_letter_upload_as_preview(service_id, file_id):
     pdf_file, metadata = get_letter_pdf_and_metadata(service_id, file_id)
@@ -202,7 +202,7 @@ def view_letter_upload_as_preview(service_id, file_id):
         return TemplatePreview.from_valid_pdf_file(pdf_file, page)
 
 
-@main.route("/services/<service_id>/upload-letter/send", methods=['POST'])
+@main.route("/services/<uuid:service_id>/upload-letter/send", methods=['POST'])
 @user_has_permissions('send_messages', restrict_admin_usage=True)
 def send_uploaded_letter(service_id):
     if not (current_service.has_permission('letter') and current_service.has_permission('upload_letters')):

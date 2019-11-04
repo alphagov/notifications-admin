@@ -2786,7 +2786,7 @@ def test_inbound_sms_sender_is_not_deleteable(
     page = client_request.get(
         '.service_edit_sms_sender',
         service_id=SERVICE_ONE_ID,
-        sms_sender_id='1234',
+        sms_sender_id=fake_uuid,
     )
 
     back_link = page.select_one('.govuk-back-link')
@@ -2810,19 +2810,19 @@ def test_delete_sms_sender(
     client_request.post(
         '.service_delete_sms_sender',
         service_id=SERVICE_ONE_ID,
-        sms_sender_id='1234',
+        sms_sender_id=fake_uuid,
         _expected_redirect=url_for(
             'main.service_sms_senders',
             service_id=SERVICE_ONE_ID,
             _external=True,
         )
     )
-    mock_delete.assert_called_once_with(service_id=SERVICE_ONE_ID, sms_sender_id='1234')
+    mock_delete.assert_called_once_with(service_id=SERVICE_ONE_ID, sms_sender_id=fake_uuid)
 
 
-@pytest.mark.parametrize('fixture, hide_textbox, fixture_sender_id', [
-    (get_inbound_number_sms_sender, True, '1234'),
-    (get_default_sms_sender, False, '1234'),
+@pytest.mark.parametrize('fixture, hide_textbox', [
+    (get_inbound_number_sms_sender, True),
+    (get_default_sms_sender, False),
 ])
 def test_inbound_sms_sender_is_not_editable(
     client_request,
@@ -2830,7 +2830,6 @@ def test_inbound_sms_sender_is_not_editable(
     fake_uuid,
     fixture,
     hide_textbox,
-    fixture_sender_id,
     mocker
 ):
     fixture(mocker)
@@ -2838,7 +2837,7 @@ def test_inbound_sms_sender_is_not_editable(
     page = client_request.get(
         '.service_edit_sms_sender',
         service_id=SERVICE_ONE_ID,
-        sms_sender_id=fixture_sender_id,
+        sms_sender_id=fake_uuid,
     )
 
     assert bool(page.find('input', attrs={'name': "sms_sender"})) != hide_textbox

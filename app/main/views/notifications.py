@@ -48,7 +48,7 @@ from app.utils import (
 )
 
 
-@main.route("/services/<service_id>/notification/<uuid:notification_id>")
+@main.route("/services/<uuid:service_id>/notification/<uuid:notification_id>")
 @user_has_permissions('view_activity', 'send_messages')
 def view_notification(service_id, notification_id):
     notification = notification_api_client.get_notification(service_id, str(notification_id))
@@ -162,7 +162,7 @@ def view_notification(service_id, notification_id):
     )
 
 
-@main.route("/services/<service_id>/notification/<uuid:notification_id>/cancel", methods=['GET', 'POST'])
+@main.route("/services/<uuid:service_id>/notification/<uuid:notification_id>/cancel", methods=['GET', 'POST'])
 @user_has_permissions('view_activity', 'send_messages')
 def cancel_letter(service_id, notification_id):
 
@@ -180,7 +180,7 @@ def get_preview_error_image():
         return file.read()
 
 
-@main.route("/services/<service_id>/notification/<uuid:notification_id>.<filetype>")
+@main.route("/services/<uuid:service_id>/notification/<uuid:notification_id>.<filetype>")
 @user_has_permissions('view_activity')
 def view_letter_notification_as_preview(
     service_id, notification_id, filetype, with_metadata=False
@@ -207,7 +207,7 @@ def view_letter_notification_as_preview(
     return display_file
 
 
-@main.route("/services/<service_id>/notification/<notification_id>.json")
+@main.route("/services/<uuid:service_id>/notification/<uuid:notification_id>.json")
 @user_has_permissions('view_activity', 'send_messages')
 def view_notification_updates(service_id, notification_id):
     return jsonify(**get_single_notification_partials(
@@ -241,7 +241,7 @@ def get_all_personalisation_from_notification(notification):
     return notification['personalisation']
 
 
-@main.route("/services/<service_id>/download-notifications.csv")
+@main.route("/services/<uuid:service_id>/download-notifications.csv")
 @user_has_permissions('view_activity')
 def download_notifications_csv(service_id):
     filter_args = parse_filter_args(request.args)
