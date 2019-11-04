@@ -8,7 +8,6 @@ from datetime import datetime
 from dateutil import parser
 from flask import (
     Response,
-    abort,
     flash,
     jsonify,
     redirect,
@@ -180,15 +179,11 @@ def get_preview_error_image():
         return file.read()
 
 
-@main.route("/services/<uuid:service_id>/notification/<uuid:notification_id>.<filetype>")
+@main.route("/services/<uuid:service_id>/notification/<uuid:notification_id>.<letter_file_extension:filetype>")
 @user_has_permissions('view_activity')
 def view_letter_notification_as_preview(
     service_id, notification_id, filetype, with_metadata=False
 ):
-
-    if filetype not in ('pdf', 'png'):
-        abort(404)
-
     try:
         preview = notification_api_client.get_notification_letter_preview(
             service_id,
