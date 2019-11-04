@@ -228,6 +228,8 @@ def init_app(application):
             'asset_url': asset_fingerprinter.get_url
         }
 
+    application.url_map.converters['uuid'].to_python = lambda self, value: value
+
 
 def convert_to_boolean(value):
     if isinstance(value, string_types):

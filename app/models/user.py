@@ -234,7 +234,7 @@ class User(JSONModel, UserMixin):
         ]
 
     def belongs_to_service(self, service_id):
-        return str(service_id) in self.service_ids
+        return service_id in self.service_ids
 
     def belongs_to_service_or_403(self, service_id):
         if not self.belongs_to_service(service_id):
