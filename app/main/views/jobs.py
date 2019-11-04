@@ -213,7 +213,7 @@ def view_job_updates(service_id, job_id):
 
 
 @main.route('/services/<uuid:service_id>/notifications', methods=['GET', 'POST'])
-@main.route('/services/<uuid:service_id>/notifications/<message_type>', methods=['GET', 'POST'])
+@main.route('/services/<uuid:service_id>/notifications/<template_type:message_type>', methods=['GET', 'POST'])
 @user_has_permissions()
 def view_notifications(service_id, message_type=None):
     return render_template(
@@ -237,7 +237,7 @@ def view_notifications(service_id, message_type=None):
 
 
 @main.route('/services/<uuid:service_id>/notifications.json', methods=['GET', 'POST'])
-@main.route('/services/<uuid:service_id>/notifications/<message_type>.json', methods=['GET', 'POST'])
+@main.route('/services/<uuid:service_id>/notifications/<template_type:message_type>.json', methods=['GET', 'POST'])
 @user_has_permissions()
 def get_notifications_as_json(service_id, message_type=None):
     return jsonify(get_notifications(
@@ -245,15 +245,14 @@ def get_notifications_as_json(service_id, message_type=None):
     ))
 
 
-@main.route('/services/<uuid:service_id>/notifications/<message_type>.csv', endpoint="view_notifications_csv")
+@main.route('/services/<uuid:service_id>/notifications.csv', endpoint="view_notifications_csv")
+@main.route('/services/<uuid:service_id>/notifications/<template_type:message_type>.csv', endpoint="view_notifications_csv")
 @user_has_permissions()
 def get_notifications(service_id, message_type, status_override=None):
     # TODO get the api to return count of pages as well.
     page = get_page_from_request()
     if page is None:
         abort(404, "Invalid page argument ({}).".format(request.args.get('page')))
-    if message_type not in ['email', 'sms', 'letter', None]:
-        abort(404)
     filter_args = parse_filter_args(request.args)
     filter_args['status'] = set_status_filters(filter_args)
     service_data_retention_days = None

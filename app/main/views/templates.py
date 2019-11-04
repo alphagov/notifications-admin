@@ -106,8 +106,8 @@ def start_tour(service_id, template_id):
 
 @main.route("/services/<uuid:service_id>/templates", methods=['GET', 'POST'])
 @main.route("/services/<uuid:service_id>/templates/folders/<uuid:template_folder_id>", methods=['GET', 'POST'])
-@main.route("/services/<uuid:service_id>/templates/<template_type>", methods=['GET', 'POST'])
-@main.route("/services/<uuid:service_id>/templates/<template_type>/folders/<uuid:template_folder_id>", methods=['GET', 'POST'])
+@main.route("/services/<uuid:service_id>/templates/<template_type:template_type>", methods=['GET', 'POST'])
+@main.route("/services/<uuid:service_id>/templates/<template_type:template_type>/folders/<uuid:template_folder_id>", methods=['GET', 'POST'])
 @user_has_permissions()
 def choose_template(service_id, template_type='all', template_folder_id=None):
     template_folder = current_service.get_template_folder(template_folder_id)
@@ -406,11 +406,11 @@ def _get_template_copy_name(template, existing_templates):
 
 @main.route((
     '/services/<uuid:service_id>/templates/action-blocked/'
-    '<notification_type>'
+    '<template_type:notification_type>'
 ))
 @main.route((
     '/services/<uuid:service_id>/templates/action-blocked/'
-    '<notification_type>/<return_to>/<uuid:template_id>'
+    '<template_type:notification_type>/<return_to>/<uuid:template_id>'
 ))
 @user_has_permissions('manage_templates')
 def action_blocked(service_id, notification_type, return_to='add_new_template', template_id=None):
@@ -505,18 +505,16 @@ def delete_template_folder(service_id, template_folder_id):
 
 
 @main.route(
-    "/services/<uuid:service_id>/templates/add-<template_type>",
+    "/services/<uuid:service_id>/templates/add-<template_type:template_type>",
     methods=['GET', 'POST'],
 )
 @main.route(
-    "/services/<uuid:service_id>/templates/folders/<uuid:template_folder_id>/add-<template_type>",
+    "/services/<uuid:service_id>/templates/folders/<uuid:template_folder_id>/add-<template_type:template_type>",
     methods=['GET', 'POST'],
 )
 @user_has_permissions('manage_templates')
 def add_service_template(service_id, template_type, template_folder_id=None):
 
-    if template_type not in ['sms', 'email', 'letter']:
-        abort(404)
     if not current_service.has_permission('letter') and template_type == 'letter':
         abort(403)
 
