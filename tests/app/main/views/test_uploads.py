@@ -125,9 +125,10 @@ def test_post_upload_letter_shows_letter_preview_for_valid_file(
         )
 
     assert page.find('h1').text == 'tests/test_pdf_files/one_page_pdf.pdf'
-    assert len(page.select('.letter-postage')) == 1
-    assert normalize_spaces(page.select_one('.letter-postage').text) == ('Postage: second class')
-    assert page.select_one('.letter-postage')['class'] == ['letter-postage', 'letter-postage-second']
+    assert len(page.select('.letter-postage')) == 0
+    # Check postage radios exists and second class is checked by default
+    assert page.find('input', id="postage-0", value="first")
+    assert page.find('input', id="postage-1", value="second").has_attr('checked')
 
     letter_images = page.select('main img')
     assert len(letter_images) == 3
@@ -283,9 +284,7 @@ def test_post_upload_letter_shows_letter_preview_for_invalid_file(mocker, client
             _follow_redirects=True,
         )
 
-    assert len(page.select('.letter-postage')) == 1
-    assert normalize_spaces(page.select_one('.letter-postage').text) == ('Postage: first class')
-    assert page.select_one('.letter-postage')['class'] == ['letter-postage', 'letter-postage-first']
+    assert len(page.select('.letter-postage')) == 0
 
     letter_images = page.select('main img')
     assert len(letter_images) == 1
@@ -421,7 +420,7 @@ def test_send_uploaded_letter_sends_letter_and_redirects_to_notification_page(mo
     client_request.post(
         'main.send_uploaded_letter',
         service_id=SERVICE_ONE_ID,
-        _data={'filename': 'my_file.pdf', 'file_id': file_id},
+        _data={'filename': 'my_file.pdf', 'file_id': file_id, 'postage': 'first'},
         _expected_redirect=url_for(
             'main.view_notification',
             service_id=SERVICE_ONE_ID,
@@ -429,7 +428,7 @@ def test_send_uploaded_letter_sends_letter_and_redirects_to_notification_page(mo
             _external=True
         )
     )
-    mock_send.assert_called_once_with(SERVICE_ONE_ID, 'my_file.pdf', file_id)
+    mock_send.assert_called_once_with(SERVICE_ONE_ID, 'my_file.pdf', file_id, 'first')
 
 
 @pytest.mark.parametrize('permissions', [
@@ -452,7 +451,7 @@ def test_send_uploaded_letter_when_service_does_not_have_correct_permissions(
     client_request.post(
         'main.send_uploaded_letter',
         service_id=SERVICE_ONE_ID,
-        _data={'filename': 'my_file.pdf', 'file_id': file_id},
+        _data={'filename': 'my_file.pdf', 'file_id': file_id, 'postage': 'first'},
         _expected_status=403
     )
     assert not mock_send.called

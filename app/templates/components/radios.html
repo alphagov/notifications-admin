@@ -1,7 +1,7 @@
 {% from "components/select-input.html" import select, select_list, select_nested, select_wrapper, select_input %}
 
-{% macro radios(field, hint=None, disable=[], option_hints={}, hide_legend=False) %}
-  {{ select(field, hint, disable, option_hints, hide_legend, input="radio") }}
+{% macro radios(field, hint=None, disable=[], option_hints={}, hide_legend=False, inline=False) %}
+  {{ select(field, hint, disable, option_hints, hide_legend, input="radio", inline=inline) }}
 {% endmacro %}
 
 

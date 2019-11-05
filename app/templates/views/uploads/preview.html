@@ -1,6 +1,8 @@
 {% extends "withnav_template.html" %}
 {% from "components/banner.html" import banner_wrapper %}
 {% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/radios.html" import radios %}
 
 {% block service_page_title %}
   {{ original_filename }}
@@ -39,9 +41,9 @@
           'main.send_uploaded_letter',
           service_id=current_service.id,
         )}}" class='page-footer'>
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-        <input type="hidden" name="file_id" value="{{ file_id }}" />
-        <button type="submit" class="button">Send 1 letter</button>
+          {{ radios(form.postage, hide_legend=true, inline=True) }}
+          {{ form.file_id(value=file_id) }}
+          {{ page_footer("Send 1 letter") }}
       </form>
     </div>
   {% endif %}

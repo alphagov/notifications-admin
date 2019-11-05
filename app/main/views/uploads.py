@@ -18,7 +18,7 @@ from requests import RequestException
 from app import current_service, notification_api_client, service_api_client
 from app.extensions import antivirus_client
 from app.main import main
-from app.main.forms import PDFUploadForm
+from app.main.forms import LetterUploadPostageForm, PDFUploadForm
 from app.main.views.jobs import view_jobs
 from app.s3_client.s3_letter_upload_client import (
     get_letter_metadata,
@@ -153,6 +153,12 @@ def uploaded_letter_preview(service_id, file_id):
 
     error = get_letter_validation_error(error_message, invalid_pages, page_count)
     template_dict = service_api_client.get_precompiled_template(service_id)
+    # Override pre compiled letter template postage to none as it has not yet been picked even though
+    # the pre compiled letter template has its postage set as second class as the DB currently requires
+    # a non null value of postage for letter templates
+    template_dict['postage'] = None
+
+    form = LetterUploadPostageForm()
 
     template = get_template(
         template_dict,
@@ -172,6 +178,7 @@ def uploaded_letter_preview(service_id, file_id):
         status=status,
         file_id=file_id,
         error=error,
+        form=form,
     )
 
 
@@ -194,14 +201,20 @@ def send_uploaded_letter(service_id):
     if not (current_service.has_permission('letter') and current_service.has_permission('upload_letters')):
         abort(403)
 
-    file_id = request.form['file_id']
+    form = LetterUploadPostageForm()
+    file_id = form.file_id.data
+
+    if not form.validate_on_submit():
+        return uploaded_letter_preview(service_id, file_id)
+
+    postage = form.postage.data
     metadata = get_letter_metadata(service_id, file_id)
     filename = metadata.get('filename')
 
     if metadata.get('status') != 'valid':
         abort(403)
 
-    notification_api_client.send_precompiled_letter(service_id, filename, file_id)
+    notification_api_client.send_precompiled_letter(service_id, filename, file_id, postage)
 
     return redirect(url_for(
         '.view_notification',

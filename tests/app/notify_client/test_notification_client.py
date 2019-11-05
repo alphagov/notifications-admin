@@ -64,7 +64,8 @@ def test_send_precompiled_letter(mocker, logged_in_client, active_user_with_perm
     NotificationApiClient().send_precompiled_letter(
         'abcd-1234',
         'my_file.pdf',
-        'file-ID'
+        'file-ID',
+        'second'
     )
     mock_post.assert_called_once_with(
         url='/service/abcd-1234/send-pdf-letter',
