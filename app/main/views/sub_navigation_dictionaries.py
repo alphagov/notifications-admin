@@ -23,6 +23,10 @@ def features_nav():
             "link": "main.roadmap",
         },
         {
+            "name": "Get started",
+            "link": "main.get_started",
+        },
+        {
             "name": "Trial mode",
             "link": "main.trial_mode_new",
         },
