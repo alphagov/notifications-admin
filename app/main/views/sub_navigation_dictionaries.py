@@ -23,18 +23,6 @@ def features_nav():
             "link": "main.roadmap",
         },
         {
-            "name": "Get started",
-            "link": "main.get_started",
-        },
-        {
-            "name": "Trial mode",
-            "link": "main.trial_mode_new",
-        },
-        {
-            "name": "Message status",
-            "link": "main.message_status",
-        },
-        {
             "name": "Security",
             "link": "main.security",
         },
@@ -54,5 +42,25 @@ def pricing_nav():
         {
             "name": "How to pay",
             "link": "main.how_to_pay",
+        },
+    ]
+
+def using_notify_nav():
+    return [
+        {
+            "name": "Get started",
+            "link": "main.get_started",
+        },
+        {
+            "name": "Documentation",
+            "link": "main.documentation",
+        },
+        {
+            "name": "Trial mode",
+            "link": "main.trial_mode_new",
+        },
+        {
+            "name": "Message status",
+            "link": "main.message_status",
         },
     ]
