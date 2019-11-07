@@ -148,6 +148,8 @@ def test_accepting_invite_removes_invite_from_session(
     mock_get_service_statistics,
     mock_get_template_folders,
     mock_get_usage,
+    mock_get_billable_units,
+    mock_get_free_sms_fragment_limit,
     mock_get_inbound_sms_summary,
     fake_uuid,
     user,
@@ -471,6 +473,7 @@ def test_new_invited_user_verifies_and_added_to_service(
     mock_get_users_by_service,
     mock_get_service_statistics,
     mock_get_usage,
+    mock_get_free_sms_fragment_limit,
     mock_create_event,
     mocker,
 ):

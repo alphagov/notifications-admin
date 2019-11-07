@@ -43,6 +43,15 @@
       ) }}
     {% endif %}
 
+    {% if current_user.has_permissions('manage_service') %}
+      <h2 class='heading-medium'>This year</h2>
+      {{ ajax_block(partials, updates_url, 'usage') }}
+      {{ show_more(
+        url_for(".usage", service_id=current_service['id']),
+        'See usage'
+      ) }}
+    {% endif %}
+
   </div>
 
 {% endblock %}
