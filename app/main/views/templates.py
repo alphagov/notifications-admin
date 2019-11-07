@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from functools import partial
 from string import ascii_uppercase
 
 from dateutil.parser import parse
@@ -406,25 +407,32 @@ def _get_template_copy_name(template, existing_templates):
 
 @main.route((
     '/services/<uuid:service_id>/templates/action-blocked/'
-    '<template_type:notification_type>'
+    '<template_type:notification_type>/<return_to>'
 ))
 @main.route((
     '/services/<uuid:service_id>/templates/action-blocked/'
     '<template_type:notification_type>/<return_to>/<uuid:template_id>'
 ))
 @user_has_permissions('manage_templates')
-def action_blocked(service_id, notification_type, return_to='add_new_template', template_id=None):
-    if notification_type == 'sms':
-        notification_type = 'text messages'
-    elif notification_type == 'email':
-        notification_type = 'emails'
+def action_blocked(service_id, notification_type, return_to, template_id=None):
+
+    back_link = {
+        'add_new_template': partial(
+            url_for, '.choose_template', service_id=current_service.id
+        ),
+        'templates': partial(
+            url_for, '.choose_template', service_id=current_service.id
+        ),
+        'view_template': partial(
+            url_for, '.view_template', service_id=current_service.id, template_id=template_id
+        ),
+    }.get(return_to)
 
     return render_template(
         'views/templates/action_blocked.html',
         service_id=service_id,
         notification_type=notification_type,
-        return_to=return_to,
-        template_id=template_id,
+        back_link=back_link(),
     )
 
 
