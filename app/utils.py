@@ -557,7 +557,7 @@ LETTER_VALIDATION_MESSAGES = {
     },
     'content-outside-printable-area': {
         'title': 'We cannot print your letter',
-        'detail': 'The content appears outside the printable area on {invalid_pages} <br>'
+        'detail': 'The content appears outside the printable area on {invalid_pages}.<br>'
                   'Files must meet our <a href="https://docs.notifications.service.gov.uk/documentation/images/'
                   'notify-pdf-letter-spec-v2.4.pdf" target="_blank">letter specification</a>.'
     },

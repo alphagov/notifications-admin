@@ -21,10 +21,10 @@
     )}}
   </div>
   <div class="column-whole template-container">
-    {% if result %}
+    {% if passed_validation %}
       {{ banner(message, with_tick=True) }}
     {% elif message %}
-      {{ banner(message, 'dangerous')}}
+      {% include "partials/check/letter-validation-failed-banner.html" %}
     {% endif %}
 
     {% for page in pages %}

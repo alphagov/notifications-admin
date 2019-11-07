@@ -748,9 +748,12 @@ def test_letter_validation_preview_renders_correctly(mocker, platform_admin_clie
     assert page.find_all('input', class_='file-upload-field')
 
 
-@pytest.mark.parametrize("result,expected_class", [(True, 'banner-with-tick'), (False, "banner-dangerous")])
+@pytest.mark.parametrize("passed_validation,message,expected_class", [
+    (True, 'Your PDF passed the layout check', 'banner-with-tick'),
+    (False, 'content-outside-printable-area', "banner-dangerous")
+])
 def test_letter_validation_preview_calls_template_preview_when_data_correct_and_displays_correct_message(
-    mocker, platform_admin_client, result, expected_class
+    mocker, platform_admin_client, passed_validation, message, expected_class
 ):
     endpoint = '{}/precompiled/validate?include_preview=true'.format(current_app.config['TEMPLATE_PREVIEW_API_HOST'])
     mocker.patch('app.main.views.platform_admin.antivirus_client.scan', return_value=True)
@@ -759,7 +762,7 @@ def test_letter_validation_preview_calls_template_preview_when_data_correct_and_
         rmock.request(
             "POST",
             endpoint,
-            json={"pages": [], "message": "bazinga!", "result": result},
+            json={"pages": [], "message": message, "result": passed_validation},
             status_code=200
         )
         with open('tests/test_pdf_files/multi_page_pdf.pdf', 'rb') as file:
@@ -773,7 +776,10 @@ def test_letter_validation_preview_calls_template_preview_when_data_correct_and_
         assert rmock.request_history[0].url == endpoint
 
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    assert page.find('div', class_=expected_class).text.strip() == "bazinga!"
+    if passed_validation:
+        assert page.find('div', class_=expected_class).text.strip() == message
+    else:
+        assert page.find('div', class_=expected_class).find('h1', {"data-error-type": message})
 
 
 def test_letter_validation_preview_doesnt_call_template_preview_when_no_file(mocker, platform_admin_client):

@@ -17,7 +17,7 @@
       <div class="grid-row">
         {% if template.template_type == 'letter' %}
         {% if letter_too_long %}
-          {% call banner_wrapper(type='dangerous', id='letter-too-long') %}
+          {% call banner_wrapper(type='dangerous') %}
               {% include "partials/check/letter-too-long.html" %}
           {% endcall %}
         {% endif %}

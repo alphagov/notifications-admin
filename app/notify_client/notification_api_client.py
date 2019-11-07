@@ -103,17 +103,6 @@ class NotificationApiClient(NotifyAdminAPIClient):
 
         return self.get(url=get_url)
 
-    def get_notification_letter_preview_with_overlay(self, service_id, notification_id, file_type, page=None):
-        get_url = '/service/{}/template/preview/{}/{}{}{}'.format(
-            service_id,
-            notification_id,
-            file_type,
-            '?overlay=1',
-            '&page={}'.format(page) if page else '',
-        )
-
-        return self.get(url=get_url)
-
     def update_notification_to_cancelled(self, service_id, notification_id):
         return self.post(
             url='/service/{}/notifications/{}/cancel'.format(service_id, notification_id),

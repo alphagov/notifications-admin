@@ -1,0 +1,18 @@
+{% from "components/banner.html" import banner_wrapper %}
+
+{% call banner_wrapper(type='dangerous') %}
+  {% if message is string %}
+    <h1 class="banner-title">
+      {{ message }}
+    </h1>
+  {% else %}
+    <h1 class="banner-title" data-module="track-error" data-error-type="{{ error_code }}" data-error-label="precompiled letter validation failed for service_id: {{ current_service.id }}">
+      {{ message.title }}
+    </h1>
+    {% if message.detail %}
+      <p>
+        {{ message.detail | safe }}
+      </p>
+    {% endif %}
+  {% endif %}
+{% endcall %}

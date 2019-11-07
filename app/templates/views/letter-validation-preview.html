@@ -14,10 +14,10 @@
 
 <div class="grid-row">
   <div class="column-whole">
-    {% if result %}
+    {% if passed_validation %}
       {{ banner(message, with_tick=True) }}
     {% elif message %}
-      {{ banner(message, 'dangerous')}}
+      {% include "partials/check/letter-validation-failed-banner.html" %}
     {% endif %}
 
       <h1 class="heading-large">Letter validation preview</h1>

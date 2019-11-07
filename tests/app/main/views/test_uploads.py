@@ -249,11 +249,7 @@ def test_post_upload_letter_with_invalid_file(mocker, client_request):
             message='content-outside-printable-area'
         )
 
-    assert page.find('div', class_='banner-dangerous').find('h1').text == 'We cannot print your letter'
-    assert page.find(
-        'div', class_='banner-dangerous').find('p').text == (
-        'The content appears outside the printable area on page 1 Files must meet our letter specification.'
-    )
+    assert page.find('div', class_='banner-dangerous').find('h1', {"data-error-type": 'content-outside-printable-area'})
     assert not page.find('button', {'type': 'submit'})
 
 

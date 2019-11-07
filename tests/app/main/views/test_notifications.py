@@ -263,10 +263,20 @@ def test_notification_page_shows_page_for_letter_sent_with_test_key(
     expected_postage,
 ):
 
-    mocker.patch(
-        'app.main.views.notifications.view_letter_notification_as_preview',
-        return_value=b'foo'
-    )
+    if is_precompiled_letter:
+        mocker.patch(
+            'app.main.views.notifications.view_letter_notification_as_preview',
+            return_value=(b'foo', {
+                'message': '',
+                'invalid_pages': '[]',
+                'page_count': '1'
+            })
+        )
+    else:
+        mocker.patch(
+            'app.main.views.notifications.view_letter_notification_as_preview',
+            return_value=b'foo'
+        )
 
     mocker.patch(
         'app.main.views.notifications.pdf_page_count',
@@ -319,7 +329,7 @@ def test_notification_page_shows_page_for_letter_sent_with_test_key(
     ),
     (
         'validation-failed',
-        'Validation failed – content is outside the printable area',
+        'Validation failed.',
     ),
     (
         'technical-failure',
@@ -334,7 +344,6 @@ def test_notification_page_shows_cancelled_or_failed_letter(
     notification_status,
     expected_message,
 ):
-
     mock_get_notification(
         mocker,
         fake_uuid,
@@ -343,7 +352,7 @@ def test_notification_page_shows_cancelled_or_failed_letter(
     )
     mocker.patch(
         'app.main.views.notifications.get_page_count_for_letter',
-        return_value=1
+        return_value=1,
     )
 
     page = client_request.get(
@@ -507,10 +516,16 @@ def test_should_show_image_of_letter_notification_that_failed_validation(
 
     mock_get_notification(mocker, fake_uuid, template_type='letter', notification_status='validation-failed')
 
+    metadata = {
+        'message': 'content-outside-printable-area',
+        'invalid_pages': '[1]',
+        'page_count': '1'
+    }
     mocker.patch(
-        'app.main.views.notifications.notification_api_client.get_notification_letter_preview_with_overlay',
+        'app.main.views.notifications.notification_api_client.get_notification_letter_preview',
         return_value={
-            'content': base64.b64encode(b'foo').decode('utf-8')
+            'content': base64.b64encode(b'foo').decode('utf-8'),
+            'metadata': metadata
         }
     )
 
@@ -518,11 +533,12 @@ def test_should_show_image_of_letter_notification_that_failed_validation(
         'main.view_letter_notification_as_preview',
         service_id=SERVICE_ONE_ID,
         notification_id=fake_uuid,
-        filetype='png'
+        filetype='png',
+        with_metadata=True
     ))
 
     assert response.status_code == 200
-    assert response.get_data(as_text=True) == 'foo'
+    assert response.get_data(as_text=True) == 'foo', metadata
 
 
 def test_should_show_preview_error_image_letter_notification_on_preview_error(
@@ -692,10 +708,16 @@ def test_notification_page_has_expected_template_link_for_letter(
     has_template_link
 ):
 
-    mocker.patch(
-        'app.main.views.notifications.view_letter_notification_as_preview',
-        return_value=b'foo'
-    )
+    if is_precompiled_letter:
+        mocker.patch(
+            'app.main.views.notifications.view_letter_notification_as_preview',
+            side_effect=[(b'foo', {"message": "", "invalid_pages": "[]", "page_count": "1"}), b'foo']
+        )
+    else:
+        mocker.patch(
+            'app.main.views.notifications.view_letter_notification_as_preview',
+            return_value=b'foo'
+        )
 
     mocker.patch(
         'app.main.views.notifications.pdf_page_count',
