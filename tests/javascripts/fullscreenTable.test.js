@@ -145,15 +145,22 @@ describe('FullscreenTable', () => {
   describe("the height of the table should fit the vertical space available to it", () => {
 
     let containerBoundingClientRectSpy;
+    let containerClientRectsSpy;
 
     beforeEach(() => {
+
+      let clientRect = { top: 500 };
 
       // set the height and offset of the window and table container from the top of the document
       // so just the top 268px of it appears on-screen
       windowMock.setHeightTo(768);
       container.setAttribute('style', 'height: 1000px');
+
       containerBoundingClientRectSpy = jest.spyOn(container, 'getBoundingClientRect')
-      containerBoundingClientRectSpy.mockImplementation(() => { return { top: 500 } });
+      containerBoundingClientRectSpy.mockImplementation(() => clientRect);
+
+      containerClientRectsSpy = jest.spyOn(container, 'getClientRects')
+      containerClientRectsSpy.mockImplementation(() => { return [clientRect] });
 
       // start module
       window.GOVUK.modules.start();
@@ -167,6 +174,7 @@ describe('FullscreenTable', () => {
 
       windowMock.reset();
       containerBoundingClientRectSpy.mockClear();
+      containerClientRectsSpy.mockClear();
 
     });
 
