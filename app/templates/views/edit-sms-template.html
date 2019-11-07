@@ -22,7 +22,7 @@
           {{ textbox(form.name, width='1-1', hint='Your recipients will not see this') }}
         </div>
         <div class="column-two-thirds">
-          {{ textbox(form.template_content, highlight_tags=True, width='1-1', rows=5) }}
+          {{ textbox(form.template_content, highlight_placeholders=True, width='1-1', rows=5) }}
           {% if current_user.platform_admin %}
             {{ radios(form.process_type) }}
           {% endif %}

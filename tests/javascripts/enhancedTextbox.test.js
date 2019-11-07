@@ -1,14 +1,14 @@
 const helpers = require('./support/helpers.js');
 
 beforeAll(() => {
-  require('../../app/assets/javascripts/highlightTags.js');
+  require('../../app/assets/javascripts/enhancedTextbox.js');
 });
 
 afterAll(() => {
   require('./support/teardown.js');
 });
 
-describe('Highlight tags', () => {
+describe('Enhanced textbox', () => {
 
   let input;
   let textarea;
@@ -38,11 +38,11 @@ describe('Highlight tags', () => {
     document.body.innerHTML = `
       <div class="form-group">
         <label for="subject">Subject</label>
-        <input class="form-control textbox-highlight-textbox" data-module="highlight-tags" type="text" name="subject" id="subject" />
+        <input class="form-control textbox-highlight-textbox" data-module="enhanced-textbox" type="text" name="subject" id="subject" />
       </div>
       <div class="form-group">
         <label for="template_content">Message</label>
-        <textarea class="form-control form-control-1-1 textbox-highlight-textbox" data-module="highlight-tags" id="template_content" name="template_content" rows="8">
+        <textarea class="form-control form-control-1-1 textbox-highlight-textbox" data-module="enhanced-textbox" id="template_content" name="template_content" rows="8">
         </textarea>
       </div>`;
 
@@ -125,6 +125,34 @@ describe('Highlight tags', () => {
 
     });
 
+    describe("The element's width should match even when the textbox is initially hidden", () => {
+
+      beforeEach(() => {
+
+        let setDisplayPropertyOfFormGroups = function(property) {
+          Array.prototype.forEach.call(
+            document.getElementsByClassName('form-group'),
+            element => element.style.display = property
+          );
+        };
+
+        setDisplayPropertyOfFormGroups('none');
+
+        window.GOVUK.modules.start();
+
+        setDisplayPropertyOfFormGroups('block');
+
+      });
+
+      test("If the textbox is an <textarea>", () => {
+
+        backgroundEl = textarea.nextElementSibling;
+        expect(backgroundEl.style.width).toEqual('582px');
+
+      });
+
+    });
+
     test("The element should be hidden from assistive technologies", () => {
 
       expect(backgroundEl.getAttribute('aria-hidden')).toEqual('true');
@@ -164,6 +192,22 @@ describe('Highlight tags', () => {
         expect(highlightTags.length).toEqual(2);
         expect(highlightTags[0].textContent).toEqual('((title))');
         expect(highlightTags[1].textContent).toEqual('((name))');
+
+      });
+
+      test("Unless a data attribute is set to turn this feature off", () => {
+
+        textarea.textContent  = "Dear ((title)) ((name))";
+        textarea.setAttribute('data-highlight-placeholders', 'false')
+
+        // start module
+        window.GOVUK.modules.start();
+
+        backgroundEl = textarea.nextElementSibling;
+
+        const highlightTags = backgroundEl.querySelectorAll('.placeholder');
+
+        expect(highlightTags.length).toEqual(0);
 
       });
 

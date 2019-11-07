@@ -2,8 +2,9 @@
   field,
   label=None,
   hint=False,
-  highlight_tags=False,
+  highlight_placeholders=False,
   autofocus=False,
+  autosize=False,
   colour_preview=False,
   help_link=None,
   help_link_text=None,
@@ -34,7 +35,7 @@
       {% endif %}
     </label>
     {%
-      if highlight_tags
+      if highlight_placeholders or autosize
     %}
       {% set field_class = 'form-control-{} textbox-highlight-textbox'.format(width) %}
     {% else %}
@@ -47,7 +48,8 @@
     %}
     {{ field(
       class=field_class,
-      data_module='highlight-tags' if highlight_tags else '',
+      data_module='enhanced-textbox' if highlight_placeholders or autosize else '',
+      data_highlight_placeholders='true' if highlight_placeholders else 'false',
       rows=rows|string,
       **kwargs
     ) }}
