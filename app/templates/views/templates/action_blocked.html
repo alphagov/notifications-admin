@@ -2,6 +2,7 @@
 {% from "components/textbox.html" import textbox %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
+{% from "components/message-count-label.html" import message_count_label %}
 
 {% block service_page_title %}
   {{ notification_type.capitalize() }} are disabled
@@ -11,26 +12,15 @@
 
   <div class="grid-row">
     <div class="column-five-sixths">
-      {% set
-        back_link_dict = {
-          'add_new_template': '.choose_template',
-          'templates': '.choose_template',
-          'view_template': '.view_template'
-        }
-      %}
       {{ page_header(
         '{} are disabled'.format(notification_type.capitalize()),
-        back_link=url_for(
-          back_link_dict[return_to],
-          service_id=current_service.id,
-          template_id=template_id
-        )
+        back_link=back_link,
       ) }}
       <p>
-        Sending {{ notification_type }} has been disabled for your service.
+        Sending {{ message_count_label(999, notification_type, suffix='') -}} has been disabled for your service.
       </p>
       <p>
-        If you need to send {{ notification_type }}
+        If you need to send {{ message_count_label(999, notification_type, suffix='') }}
         <a href="{{ url_for('.support') }}">get in touch with the GOV.UK Notify team</a>.
       </p>
 
