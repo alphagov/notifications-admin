@@ -92,14 +92,18 @@ def upload_letter(service_id):
             else:
                 raise ex
         else:
+            response = response.json()
+            recipient = response['recipient_address']
             status = 'valid'
-            file_contents = base64.b64decode(response.json()['file'].encode())
+            file_contents = base64.b64decode(response['file'].encode())
+
             upload_letter_to_s3(
                 file_contents,
                 file_location=file_location,
                 status=status,
                 page_count=page_count,
-                filename=original_filename)
+                filename=original_filename,
+                recipient=recipient)
 
         return redirect(
             url_for(
@@ -147,6 +151,7 @@ def uploaded_letter_preview(service_id, file_id):
     status = metadata.get('status')
     error_shortcode = metadata.get('message')
     invalid_pages = metadata.get('invalid_pages')
+    recipient = metadata.get('recipient')
 
     if invalid_pages:
         invalid_pages = json.loads(invalid_pages)
@@ -180,6 +185,7 @@ def uploaded_letter_preview(service_id, file_id):
         message=error_message,
         error_code=error_shortcode,
         form=form,
+        recipient=recipient,
     )
 
 

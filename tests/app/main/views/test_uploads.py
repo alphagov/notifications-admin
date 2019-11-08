@@ -55,11 +55,14 @@ def test_post_upload_letter_redirects_for_valid_file(mocker, active_user_with_pe
     antivirus_mock = mocker.patch('app.main.views.uploads.antivirus_client.scan', return_value=True)
     mocker.patch(
         'app.main.views.uploads.sanitise_letter',
-        return_value=Mock(content='The sanitised content', json=lambda: {'file': 'VGhlIHNhbml0aXNlZCBjb250ZW50'})
+        return_value=Mock(
+            content='The sanitised content',
+            json=lambda: {'file': 'VGhlIHNhbml0aXNlZCBjb250ZW50', 'recipient_address': 'The Queen'}
+        )
     )
     mock_s3 = mocker.patch('app.main.views.uploads.upload_letter_to_s3')
     mocker.patch('app.main.views.uploads.get_letter_metadata', return_value={
-        'filename': 'tests/test_pdf_files/one_page_pdf.pdf', 'page_count': '1', 'status': 'valid'})
+        'filename': 'tests/test_pdf_files/one_page_pdf.pdf', 'page_count': '1', 'status': 'valid', 'recipient': 'The Queen'})
     mocker.patch('app.main.views.uploads.service_api_client.get_precompiled_template')
 
     service_one['restricted'] = False
@@ -79,9 +82,11 @@ def test_post_upload_letter_redirects_for_valid_file(mocker, active_user_with_pe
         file_location='service-{}/fake-uuid.pdf'.format(SERVICE_ONE_ID),
         status='valid',
         page_count=1,
-        filename='tests/test_pdf_files/one_page_pdf.pdf'
+        filename='tests/test_pdf_files/one_page_pdf.pdf',
+        recipient='The Queen',
     )
 
+    assert 'The Queen' in page.find('div', class_='js-stick-at-bottom-when-scrolling').text
     assert page.find('h1').text == 'tests/test_pdf_files/one_page_pdf.pdf'
     assert not page.find(id='validation-error-message')
 
@@ -105,12 +110,15 @@ def test_post_upload_letter_shows_letter_preview_for_valid_file(
     mocker.patch('app.main.views.uploads.antivirus_client.scan', return_value=True)
     mocker.patch(
         'app.main.views.uploads.sanitise_letter',
-        return_value=Mock(content='The sanitised content', json=lambda: {'file': 'VGhlIHNhbml0aXNlZCBjb250ZW50'})
+        return_value=Mock(
+            content='The sanitised content',
+            json=lambda: {'file': 'VGhlIHNhbml0aXNlZCBjb250ZW50', 'recipient_address': 'The Queen'}
+        )
     )
     mocker.patch('app.main.views.uploads.upload_letter_to_s3')
     mocker.patch('app.main.views.uploads.pdf_page_count', return_value=3)
     mocker.patch('app.main.views.uploads.get_letter_metadata', return_value={
-        'filename': 'tests/test_pdf_files/one_page_pdf.pdf', 'page_count': '3', 'status': 'valid'})
+        'filename': 'tests/test_pdf_files/one_page_pdf.pdf', 'page_count': '3', 'status': 'valid', 'recipient': 'The Queen'})
     mocker.patch('app.main.views.uploads.service_api_client.get_precompiled_template', return_value=letter_template)
 
     service_one['restricted'] = False
@@ -265,7 +273,7 @@ def test_post_upload_letter_shows_letter_preview_for_invalid_file(mocker, client
     mocker.patch('app.main.views.uploads.upload_letter_to_s3')
     mock_sanitise_response = Mock()
     mock_sanitise_response.raise_for_status.side_effect = RequestException(response=Mock(status_code=400))
-    mock_sanitise_response.json = lambda: {"message": "template preview error"}
+    mock_sanitise_response.json = lambda: {"message": "template preview error", "recipient_address": "The Queen"}
     mocker.patch('app.main.views.uploads.sanitise_letter', return_value=mock_sanitise_response)
     mocker.patch('app.main.views.uploads.service_api_client.get_precompiled_template', return_value=letter_template)
     mocker.patch('app.main.views.uploads.get_letter_metadata', return_value={
@@ -280,6 +288,7 @@ def test_post_upload_letter_shows_letter_preview_for_invalid_file(mocker, client
             _follow_redirects=True,
         )
 
+    assert 'The Queen' not in page.text
     assert len(page.select('.letter-postage')) == 0
 
     letter_images = page.select('main img')
