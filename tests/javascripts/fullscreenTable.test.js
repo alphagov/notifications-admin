@@ -12,7 +12,7 @@ afterAll(() => {
 });
 
 describe('FullscreenTable', () => {
-  let windowMock;
+  let screenMock;
   let container;
   let tableFrame;
   let table;
@@ -79,7 +79,12 @@ describe('FullscreenTable', () => {
 
     }
 
-    windowMock = new helpers.WindowMock(jest);
+    screenMock = new helpers.ScreenMock(jest);
+    screenMock.setWindow({
+      width: 1990,
+      height: 940,
+      scrollTop: 0
+    });
 
     // set up DOM
     document.body.innerHTML =
@@ -149,18 +154,14 @@ describe('FullscreenTable', () => {
 
     beforeEach(() => {
 
-      let clientRect = { top: 500 };
-
       // set the height and offset of the window and table container from the top of the document
       // so just the top 268px of it appears on-screen
-      windowMock.setHeightTo(768);
-      container.setAttribute('style', 'height: 1000px');
-
-      containerBoundingClientRectSpy = jest.spyOn(container, 'getBoundingClientRect')
-      containerBoundingClientRectSpy.mockImplementation(() => clientRect);
-
-      containerClientRectsSpy = jest.spyOn(container, 'getClientRects')
-      containerClientRectsSpy.mockImplementation(() => { return [clientRect] });
+      screenMock.window.setHeightTo(768);
+      screenMock.mockPositionAndDimension('container', container, {
+        'offsetHeight': 1000,
+        'offsetWidth': 641,
+        'offsetTop': 500
+      });
 
       // start module
       window.GOVUK.modules.start();
@@ -172,9 +173,7 @@ describe('FullscreenTable', () => {
 
     afterEach(() => {
 
-      windowMock.reset();
-      containerBoundingClientRectSpy.mockClear();
-      containerClientRectsSpy.mockClear();
+      screenMock.reset();
 
     });
 
@@ -189,7 +188,7 @@ describe('FullscreenTable', () => {
     test("when the page has scrolled", () => {
 
       // scroll the window so the table fills the height of the window (768px)
-      windowMock.scrollTo(500);
+      screenMock.window.scrollTo(500);
 
       // the frames should crop to the window height
       expect(window.getComputedStyle(tableFrame)['height']).toEqual('768px');
@@ -200,7 +199,7 @@ describe('FullscreenTable', () => {
     test("when the page has resized", () => {
 
       // resize the window by 232px (from 768px to 1000px)
-      windowMock.resizeTo({ height: 1000, width: 1024 });
+      screenMock.window.resizeTo({ height: 1000, width: 1024 });
 
       // the frames should crop to the top 500px of the table now visible
       expect(window.getComputedStyle(tableFrame)['height']).toEqual('500px');
@@ -218,7 +217,7 @@ describe('FullscreenTable', () => {
       rowNumberColumnCell = container.querySelector('.table-field-index');
 
       // set main content column width (used as module as gauge for table width)
-      windowMock.setWidthTo(1024);
+      screenMock.window.setWidthTo(1024);
       document.querySelector('main').setAttribute('style', 'width: 742px');
 
       // set total width of column for row numbers in table to 40px
@@ -234,7 +233,7 @@ describe('FullscreenTable', () => {
 
     afterEach(() => {
 
-      windowMock.reset();
+      screenMock.reset();
 
     });
 
@@ -253,7 +252,7 @@ describe('FullscreenTable', () => {
 
       // resize window and content column
       document.querySelector('main').setAttribute('style', 'width: 720px');
-      windowMock.resizeTo({ height: 768, width: 960 });
+      screenMock.window.resizeTo({ height: 768, width: 960 });
 
       // table should set its width to be that of `<main>`, minus margin-left for the row numbers column
       expect(window.getComputedStyle(tableFrame)['width']).toEqual('680px'); // width of content column - numbers column
