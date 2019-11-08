@@ -13,9 +13,7 @@ function getFormDataFromPairs (pairs) {
 
   });
 
-  // Combine the pairs into a single string and replace all %-encoded spaces to 
-  // the '+' character; matches the behaviour of browser form submissions.
-  return urlEncodedDataPairs.join('&').replace(/%20/g, '+');
+  return urlEncodedDataPairs.join('&');
 
 };
 
