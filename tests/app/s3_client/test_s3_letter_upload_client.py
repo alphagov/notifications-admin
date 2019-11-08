@@ -1,6 +1,10 @@
+import pytest
 from flask import current_app
 
-from app.s3_client.s3_letter_upload_client import upload_letter_to_s3
+from app.s3_client.s3_letter_upload_client import (
+    format_recipient,
+    upload_letter_to_s3,
+)
 
 
 def test_upload_letter_to_s3(mocker):
@@ -47,3 +51,15 @@ def test_upload_letter_to_s3_with_message_and_invalid_pages(mocker):
         },
         region=current_app.config['AWS_REGION']
     )
+
+
+@pytest.mark.parametrize('original_address,expected_address', [
+    ('The Queen, Buckingham Palace, SW1 1AA', 'The Queen, Buckingham Palace, SW1 1AA'),
+    ('The Queen Buckingham Palace SW1 1AA', 'The Queen Buckingham Palace SW1 1AA'),
+    ('The Queen,\nBuckingham Palace,\r\nSW1 1AA', 'The Queen, Buckingham Palace, SW1 1AA'),
+    ('The Queen   ,,\nBuckingham Palace,\rSW1 1AA,', 'The Queen, Buckingham Palace, SW1 1AA'),
+    ('  The Queen\n Buckingham Palace\n SW1 1AA', 'The Queen, Buckingham Palace, SW1 1AA'),
+    ("The ’Queen\n Buckingham Palace\n SW1 1AA", "The 'Queen, Buckingham Palace, SW1 1AA"),
+])
+def test_format_recipient(original_address, expected_address):
+    assert format_recipient(original_address) == expected_address

@@ -32,6 +32,10 @@
 
     {% if status == 'valid' and current_service.live %}
     <div class="js-stick-at-bottom-when-scrolling">
+      <p>
+        Recipient: {{ recipient }}
+      </p>
+
       <form method="post" enctype="multipart/form-data" action="{{url_for(
           'main.send_uploaded_letter',
           service_id=current_service.id,
