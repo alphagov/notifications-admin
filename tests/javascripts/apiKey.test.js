@@ -81,13 +81,33 @@ describe('API key', () => {
 
       component = document.querySelector('[data-module=api-key]');
 
-      // mock DOM API called for element height
+      // set default style for component height (queried by jQuery before checking DOM APIs)
+      const stylesheet = document.createElement('style');
+      stylesheet.innerHTML = '[data-module=api-key] { height: auto; }'; // set to browser default
+      document.getElementsByTagName('head')[0].appendChild(stylesheet);
+
       componentHeightOnLoad = 50;
-      jest.spyOn(component, 'offsetHeight', 'get').mockImplementation(() => componentHeightOnLoad);
+
+      // mock the DOM APIs called for the position & dimension of the component
+      screenMock = new helpers.ScreenMock(jest);
+      screenMock.setWindow({
+        width: 1990,
+        height: 940,
+        scrollTop: 0
+      });
+      screenMock.mockPositionAndDimension('component', component, {
+        offsetHeight: componentHeightOnLoad,
+        offsetWidth: 641,
+        offsetTop: 0
+      });
 
       // start the module
       window.GOVUK.modules.start();
 
+    });
+
+    afterEach(() => {
+      screenMock.reset();
     });
 
     describe("On page load", () => {
