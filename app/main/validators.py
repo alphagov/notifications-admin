@@ -111,3 +111,18 @@ class DoesNotStartWithDoubleZero:
     def __call__(self, form, field):
         if field.data and field.data.startswith("00"):
             raise ValidationError(self.message)
+
+
+class MustContainAlphanumericCharacters:
+
+    regex = re.compile(r".*[a-zA-Z0-9].*[a-zA-Z0-9].*")
+
+    def __init__(
+        self,
+        message="Must include at least two alphanumeric characters"
+    ):
+        self.message = message
+
+    def __call__(self, form, field):
+        if field.data and not re.match(self.regex, field.data):
+            raise ValidationError(self.message)
