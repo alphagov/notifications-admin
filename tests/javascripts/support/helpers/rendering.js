@@ -214,8 +214,10 @@ class ScreenRenderItem {
   // mock any calls to the node's DOM API for position/dimension
   _mockAPICalls () {
 
-    // proxy boundingClientRect property calls to item data
+    // proxy getBoundingClientRect and getClientRects calls to item data
+    // assumes getClientRects only returns one clientRect
     this._jest.spyOn(this._node, 'getBoundingClientRect').mockImplementation(() => this._getBoundingClientRect());
+    this._jest.spyOn(this._node, 'getClientRects').mockImplementation(() => [this._getBoundingClientRect()]);
 
     // handle calls to offset properties
     ScreenRenderItem.OFFSET_PROPS.forEach(prop => {
