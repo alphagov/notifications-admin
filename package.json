@@ -35,7 +35,7 @@
     "gulp-sass": "4.0.2",
     "gulp-uglify": "3.0.2",
     "hogan": "1.0.2",
-    "jquery": "1.12.4",
+    "jquery": "3.4.1",
     "query-command-supported": "1.0.0",
     "textarea-caret": "3.1.0",
     "timeago": "1.6.5"
