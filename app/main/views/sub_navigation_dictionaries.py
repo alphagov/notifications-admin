@@ -52,15 +52,15 @@ def using_notify_nav():
             "link": "main.get_started",
         },
         {
-            "name": "Documentation",
-            "link": "main.documentation",
-        },
-        {
             "name": "Trial mode",
             "link": "main.trial_mode_new",
         },
         {
             "name": "Message status",
             "link": "main.message_status",
+        },
+        {
+            "name": "Documentation",
+            "link": "main.documentation",
         },
     ]
