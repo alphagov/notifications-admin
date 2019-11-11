@@ -1,12 +1,20 @@
 {% extends "withoutnav_template.html" %}
-{% block per_page_title %}Server error{% endblock %}
+{% block per_page_title %}Sorry, there’s a problem with the service – GOV.UK Notify{% endblock %}
 {% block maincolumn_content %}
   <div class="grid-row">
     <div class="column-two-thirds">
       <h1 class="heading-large">
-        Sorry, we’re experiencing technical difficulties
+        Sorry, there’s a problem with GOV.UK Notify
       </h1>
-      <p>Try again later.</p>
+      <p>
+        Try again later.
+      </p>
+      <p>
+        You can check our <a href="https://status.notifications.service.gov.uk">system status</a> page to see if there are any known issues.
+      </p>
+      <p>
+        To report a problem, email <a href="mailto:notify-support@digital.cabinet-office.gov.uk">notify-support@digital.cabinet-office.gov.uk</a>
+      </p>
     </div>
   </div>
 {% endblock %}
