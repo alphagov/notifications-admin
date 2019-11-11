@@ -1,9 +1,9 @@
 {% extends "withoutnav_template.html" %}
-{% block per_page_title %}Unauthorized{% endblock %}
+{% block per_page_title %}You are not authorised to see this page – GOV.UK Notify{% endblock %}
 {% block maincolumn_content %}
   <div class="grid-row">
     <div class="column-two-thirds">
-    <h1>401</h1>
-    <p>You are not authorized to see this page.</p>
+    <h1>You are not authorised to see this page</h1>
+      <p><a href="{{ url_for('.sign_in' )}}">Sign in</a> to GOV.UK Notify and try again.</p>
   </div>
 {% endblock %}
