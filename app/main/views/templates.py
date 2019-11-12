@@ -603,7 +603,12 @@ def edit_service_template(service_id, template_id):
 
         new_template = get_template(new_template_data, current_service)
         template_change = get_template(template, current_service).compare_to(new_template)
-        if template_change.placeholders_added and not request.form.get('confirm'):
+
+        if (
+            template_change.placeholders_added and
+            not request.form.get('confirm') and
+            current_service.api_keys
+        ):
             example_column_headings = (
                 first_column_headings[new_template.template_type] + list(new_template.placeholders)
             )

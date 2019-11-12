@@ -1328,6 +1328,7 @@ def test_should_redirect_to_one_off_if_template_type_is_letter(
 def test_should_redirect_when_saving_a_template(
     client_request,
     mock_get_service_template,
+    mock_get_api_keys,
     mock_update_service_template,
     fake_uuid,
 ):
@@ -1499,6 +1500,7 @@ def test_should_show_interstitial_when_making_breaking_change(
     client_request,
     mock_update_service_template,
     mock_get_user_by_email,
+    mock_get_api_keys,
     fake_uuid,
     mocker,
     template_mock,
