@@ -1483,7 +1483,6 @@ def test_should_403_when_create_template_with_process_type_of_priority_for_non_p
         [
             'You removed ((date))',
             'You added ((name))',
-            'When you send messages using this template you’ll need 3 columns of data:',
         ]
     ),
     (
@@ -1492,7 +1491,6 @@ def test_should_403_when_create_template_with_process_type_of_priority_for_non_p
         [
             'You removed ((date))',
             'You added ((name))',
-            'When you send messages using this template you’ll need 9 columns of data:',
         ]
     ),
 ])

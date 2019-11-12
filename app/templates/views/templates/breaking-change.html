@@ -2,7 +2,6 @@
 {% from "components/banner.html" import banner_wrapper %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
-{% from "components/table.html" import list_table, text_field, index_field, index_field_heading %}
 {% from "components/list.html" import list_of_placeholders %}
 {% from "components/form.html" import form_wrapper %}
 
@@ -30,6 +29,8 @@
     {% endif %}
   </div>
 
+  <p class="top-gutter">Developers, you’ll need to update your API calls</p>
+
   {% call form_wrapper() %}
     <input type="hidden" name="name" value="{{ new_template.name }}" />
     <input type="hidden" name="subject" value="{{ new_template._subject or '' }}" />
@@ -39,31 +40,5 @@
     <input type="hidden" name="confirm" value="true" />
     {{ page_footer('Save changes to template') }}
   {% endcall %}
-
-  <p>
-    When you send messages using this template you’ll need
-    {{ column_headings|length }}
-    column{{ 's' if column_headings|length > 1 else '' }} of data:
-  </p>
-
-  <div class="spreadsheet fullscreen-content" data-module="fullscreen-table"">
-    {% call(item, row_number) list_table(
-      example_rows,
-      caption="Example",
-      caption_visible=False,
-      field_headings=[''] + column_headings
-    ) %}
-      {% if 1 == row_number %}
-        {{ index_field('') }}
-      {% else %}
-        {{ index_field(row_number - 1) }}
-      {% endif %}
-      {% for column in item %}
-        {{ text_field(column) }}
-      {% endfor %}
-    {% endcall %}
-  </div>
-
-  <p class="top-gutter">Developers, you’ll need to update your API calls</p>
 
 {% endblock %}
