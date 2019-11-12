@@ -9,7 +9,7 @@ def test_bad_url_returns_page_not_found(client):
     response = client.get('/bad_url')
     assert response.status_code == 404
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    assert page.h1.string.strip() == 'Page could not be found'
+    assert page.h1.string.strip() == 'Page not found'
 
 
 def test_load_service_before_request_handles_404(client_request, mocker):
@@ -35,7 +35,7 @@ def test_malformed_token_returns_page_not_found(logged_in_client, url):
 
     assert response.status_code == 404
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    assert page.h1.string.strip() == 'Page could not be found'
+    assert page.h1.string.strip() == 'Page not found'
     flash_banner = page.find('div', class_='banner-dangerous').string.strip()
     assert flash_banner == "There’s something wrong with the link you’ve used."
 

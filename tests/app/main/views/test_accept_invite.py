@@ -415,7 +415,7 @@ def test_signed_in_existing_user_cannot_use_anothers_invite(
         _follow_redirects=True,
         _expected_status=403,
     )
-    assert page.h1.string.strip() == '403'
+    assert page.h1.string.strip() == 'You are not allowed to see this page'
     flash_banners = page.find_all('div', class_='banner-dangerous')
     assert len(flash_banners) == 1
     banner_contents = flash_banners[0].text.strip()
