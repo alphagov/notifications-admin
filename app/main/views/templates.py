@@ -106,8 +106,10 @@ def start_tour(service_id, template_id):
 
 
 @main.route("/services/<uuid:service_id>/templates", methods=['GET', 'POST'])
+@main.route("/services/<uuid:service_id>/templates/all", methods=['GET', 'POST'])
 @main.route("/services/<uuid:service_id>/templates/folders/<uuid:template_folder_id>", methods=['GET', 'POST'])
 @main.route("/services/<uuid:service_id>/templates/<template_type:template_type>", methods=['GET', 'POST'])
+@main.route("/services/<uuid:service_id>/templates/all/folders/<uuid:template_folder_id>", methods=['GET', 'POST'])
 @main.route("/services/<uuid:service_id>/templates/<template_type:template_type>/folders/<uuid:template_folder_id>", methods=['GET', 'POST'])
 @user_has_permissions()
 def choose_template(service_id, template_type='all', template_folder_id=None):
