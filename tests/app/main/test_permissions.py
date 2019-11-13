@@ -422,7 +422,7 @@ def format_decorators(decorators, indent=8):
 def test_code_to_extract_decorators_works_with_known_examples():
     assert (
         'templates.choose_template',
-        ['main.route', 'main.route', 'main.route', 'main.route', 'user_has_permissions'],
+        ['main.route', 'main.route', 'main.route', 'main.route', 'main.route', 'user_has_permissions'],
     ) in list(
         get_routes_and_decorators(SERVICE_ID_ARGUMENT)
     )

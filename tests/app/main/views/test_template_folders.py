@@ -268,6 +268,17 @@ def _folder(name, folder_id=None, parent=None, users_with_permission=None):
             [],
             'This folder is empty',
         ),
+        (
+            'folder_two – Templates – service one – GOV.UK Notify',
+            'Templates folder_two',
+            [{'template_type': 'all'}],
+            {'template_folder_id': FOLDER_TWO_ID, 'template_type': 'all'},
+            ['Email', 'Text message', 'Letter'],
+            [],
+            [],
+            [],
+            'This folder is empty',
+        ),
     ]
 )
 def test_should_show_templates_folder_page(
