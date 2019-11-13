@@ -2162,6 +2162,36 @@ def test_letter_can_only_be_sent_now(
     )
 
 
+def test_send_button_is_correctly_labelled(
+    client_request,
+    mocker,
+    mock_get_live_service,
+    mock_get_service_template,
+    mock_get_users_by_service,
+    mock_get_service_statistics,
+    mock_get_job_doesnt_exist,
+    mock_get_jobs,
+    fake_uuid,
+):
+    mocker.patch('app.main.views.send.s3download', return_value='\n'.join(
+        ['phone_number'] + (['07900900123'] * 1000)
+    ))
+    mocker.patch('app.main.views.send.set_metadata_on_csv_upload')
+
+    page = client_request.get(
+        'main.check_messages',
+        service_id=SERVICE_ONE_ID,
+        upload_id=fake_uuid,
+        template_id=fake_uuid,
+    )
+
+    assert normalize_spaces(
+        page.select_one('[type=submit]').text
+    ) == (
+        'Send 1,000 text messages'
+    )
+
+
 @pytest.mark.parametrize('when', [
     '', '2016-08-25T13:04:21.767198'
 ])
