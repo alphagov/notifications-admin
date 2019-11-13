@@ -148,6 +148,24 @@ def test_a_page_should_nave_selected_org_navigation_item(
     assert selected_nav_items[0].text.strip() == selected_nav_item
 
 
+def test_navigation_urls(
+    client_request,
+    mock_get_service_templates,
+    mock_get_template_folders,
+):
+    page = client_request.get('main.choose_template', service_id=SERVICE_ONE_ID)
+    assert [
+        a['href'] for a in page.select('.navigation a')
+    ] == [
+        '/services/{}'.format(SERVICE_ONE_ID),
+        '/services/{}/templates'.format(SERVICE_ONE_ID),
+        '/services/{}/users'.format(SERVICE_ONE_ID),
+        '/services/{}/usage'.format(SERVICE_ONE_ID),
+        '/services/{}/service-settings'.format(SERVICE_ONE_ID),
+        '/services/{}/api'.format(SERVICE_ONE_ID),
+    ]
+
+
 def test_caseworkers_get_caseworking_navigation(
     client_request,
     mocker,
