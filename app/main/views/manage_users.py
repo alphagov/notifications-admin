@@ -29,7 +29,7 @@ from app.models.user import InvitedUser, User
 from app.utils import is_gov_user, redact_mobile_number, user_has_permissions
 
 
-@main.route("/services/<service_id>/users")
+@main.route("/services/<uuid:service_id>/users")
 @user_has_permissions(allow_org_user=True)
 def manage_users(service_id):
     return render_template(
@@ -42,7 +42,7 @@ def manage_users(service_id):
     )
 
 
-@main.route("/services/<service_id>/users/invite", methods=['GET', 'POST'])
+@main.route("/services/<uuid:service_id>/users/invite", methods=['GET', 'POST'])
 @user_has_permissions('manage_service')
 def invite_user(service_id):
 
@@ -78,7 +78,7 @@ def invite_user(service_id):
     )
 
 
-@main.route("/services/<service_id>/users/<user_id>", methods=['GET', 'POST'])
+@main.route("/services/<uuid:service_id>/users/<uuid:user_id>", methods=['GET', 'POST'])
 @user_has_permissions('manage_service')
 def edit_user_permissions(service_id, user_id):
     service_has_email_auth = current_service.has_permission('email_auth')
@@ -118,7 +118,7 @@ def edit_user_permissions(service_id, user_id):
     )
 
 
-@main.route("/services/<service_id>/users/<user_id>/delete", methods=['POST'])
+@main.route("/services/<uuid:service_id>/users/<uuid:user_id>/delete", methods=['POST'])
 @user_has_permissions('manage_service')
 def remove_user_from_service(service_id, user_id):
     try:
@@ -139,7 +139,7 @@ def remove_user_from_service(service_id, user_id):
     ))
 
 
-@main.route("/services/<service_id>/users/<uuid:user_id>/edit-email", methods=['GET', 'POST'])
+@main.route("/services/<uuid:service_id>/users/<uuid:user_id>/edit-email", methods=['GET', 'POST'])
 @user_has_permissions('manage_service')
 def edit_user_email(service_id, user_id):
     user = current_service.get_team_member(user_id)
@@ -166,7 +166,7 @@ def edit_user_email(service_id, user_id):
     )
 
 
-@main.route("/services/<service_id>/users/<uuid:user_id>/edit-email/confirm", methods=['GET', 'POST'])
+@main.route("/services/<uuid:service_id>/users/<uuid:user_id>/edit-email/confirm", methods=['GET', 'POST'])
 @user_has_permissions('manage_service')
 def confirm_edit_user_email(service_id, user_id):
     user = current_service.get_team_member(user_id)
@@ -200,7 +200,7 @@ def confirm_edit_user_email(service_id, user_id):
     )
 
 
-@main.route("/services/<service_id>/users/<uuid:user_id>/edit-mobile-number", methods=['GET', 'POST'])
+@main.route("/services/<uuid:service_id>/users/<uuid:user_id>/edit-mobile-number", methods=['GET', 'POST'])
 @user_has_permissions('manage_service')
 def edit_user_mobile_number(service_id, user_id):
     user = current_service.get_team_member(user_id)
@@ -224,7 +224,7 @@ def edit_user_mobile_number(service_id, user_id):
     )
 
 
-@main.route("/services/<service_id>/users/<uuid:user_id>/edit-mobile-number/confirm", methods=['GET', 'POST'])
+@main.route("/services/<uuid:service_id>/users/<uuid:user_id>/edit-mobile-number/confirm", methods=['GET', 'POST'])
 @user_has_permissions('manage_service')
 def confirm_edit_user_mobile_number(service_id, user_id):
     user = current_service.get_team_member(user_id)
@@ -259,7 +259,7 @@ def confirm_edit_user_mobile_number(service_id, user_id):
     )
 
 
-@main.route("/services/<service_id>/cancel-invited-user/<uuid:invited_user_id>", methods=['GET'])
+@main.route("/services/<uuid:service_id>/cancel-invited-user/<uuid:invited_user_id>", methods=['GET'])
 @user_has_permissions('manage_service')
 def cancel_invited_user(service_id, invited_user_id):
     current_service.cancel_invite(invited_user_id)

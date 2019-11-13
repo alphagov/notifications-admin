@@ -260,11 +260,12 @@ def test_should_show_edit_provider_form(
     client,
     platform_admin_user,
     mocker,
+    fake_uuid,
 ):
     mocker.patch('app.provider_client.get_provider_by_id', return_value=copy.deepcopy(stub_provider))
 
     client.login(platform_admin_user, mocker)
-    response = client.get(url_for('main.edit_provider', provider_id='12345'))
+    response = client.get(url_for('main.edit_provider', provider_id=fake_uuid))
 
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 

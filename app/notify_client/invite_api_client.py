@@ -20,7 +20,7 @@ class InviteApiClient(NotifyAdminAPIClient):
                       auth_type,
                       folder_permissions):
         data = {
-            'service': str(service_id),
+            'service': service_id,
             'email_address': email_address,
             'from_user': invite_from_id,
             'permissions': ','.join(sorted(translate_permissions_from_admin_roles_to_db(permissions))),

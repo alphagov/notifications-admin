@@ -11,7 +11,7 @@ from app.models.template_list import TemplateList
 from app.utils import user_has_permissions
 
 
-@main.route("/services/<service_id>/conversation/<notification_id>")
+@main.route("/services/<uuid:service_id>/conversation/<uuid:notification_id>")
 @user_has_permissions('view_activity')
 def conversation(service_id, notification_id):
 
@@ -26,7 +26,7 @@ def conversation(service_id, notification_id):
     )
 
 
-@main.route("/services/<service_id>/conversation/<notification_id>.json")
+@main.route("/services/<uuid:service_id>/conversation/<uuid:notification_id>.json")
 @user_has_permissions('view_activity')
 def conversation_updates(service_id, notification_id):
 
@@ -36,8 +36,8 @@ def conversation_updates(service_id, notification_id):
     ))
 
 
-@main.route("/services/<service_id>/conversation/<notification_id>/reply-with")
-@main.route("/services/<service_id>/conversation/<notification_id>/reply-with/from-folder/<uuid:from_folder>")
+@main.route("/services/<uuid:service_id>/conversation/<uuid:notification_id>/reply-with")
+@main.route("/services/<uuid:service_id>/conversation/<uuid:notification_id>/reply-with/from-folder/<uuid:from_folder>")
 @user_has_permissions('send_messages')
 def conversation_reply(
     service_id,
@@ -59,7 +59,7 @@ def conversation_reply(
     )
 
 
-@main.route("/services/<service_id>/conversation/<notification_id>/reply-with/<template_id>")
+@main.route("/services/<uuid:service_id>/conversation/<uuid:notification_id>/reply-with/<uuid:template_id>")
 @user_has_permissions('send_messages')
 def conversation_reply_with_template(
     service_id,

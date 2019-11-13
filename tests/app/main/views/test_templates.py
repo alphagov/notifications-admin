@@ -1260,6 +1260,7 @@ def test_should_not_allow_creation_of_template_through_form_without_correct_perm
     endpoint,
     data,
     expected_error,
+    fake_uuid,
 ):
     service_one['permissions'] = []
     page = client_request.post(
@@ -1273,7 +1274,6 @@ def test_should_not_allow_creation_of_template_through_form_without_correct_perm
     assert page.select(".govuk-back-link")[0]['href'] == url_for(
         '.choose_template',
         service_id=SERVICE_ONE_ID,
-        template_id='0',
     )
 
 
@@ -1299,7 +1299,6 @@ def test_should_not_allow_creation_of_a_template_without_correct_permission(
     assert page.select(".govuk-back-link")[0]['href'] == url_for(
         '.choose_template',
         service_id=service_one['id'],
-        template_id='0',
     )
 
 

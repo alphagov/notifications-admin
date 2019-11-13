@@ -1,3 +1,5 @@
+import uuid
+
 import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
@@ -91,23 +93,26 @@ def test_find_users_by_email_validates_against_empty_search_submission(
 def test_user_information_page_shows_information_about_user(
     client,
     platform_admin_user,
-    mocker
+    mocker,
+    fake_uuid,
 ):
+    user_service_one = uuid.uuid4()
+    user_service_two = uuid.uuid4()
     mocker.patch('app.user_api_client.get_user', side_effect=[
         platform_admin_user,
-        user_json(name="Apple Bloom", services=[1, 2])
+        user_json(name="Apple Bloom", services=[user_service_one, user_service_two])
     ], autospec=True)
 
     mocker.patch(
         'app.user_api_client.get_organisations_and_services_for_user',
         return_value={'organisations': [], 'services': [
-            {"id": 1, "name": "Fresh Orchard Juice", "restricted": True},
-            {"id": 2, "name": "Nature Therapy", "restricted": False},
+            {"id": user_service_one, "name": "Fresh Orchard Juice", "restricted": True},
+            {"id": user_service_two, "name": "Nature Therapy", "restricted": False},
         ]},
         autospec=True
     )
     client.login(platform_admin_user)
-    response = client.get(url_for('main.user_information', user_id=345))
+    response = client.get(url_for('main.user_information', user_id=fake_uuid))
     assert response.status_code == 200
 
     document = html.fromstring(response.get_data(as_text=True))
@@ -129,7 +134,8 @@ def test_user_information_page_shows_information_about_user(
 def test_user_information_page_displays_if_there_are_failed_login_attempts(
     client,
     platform_admin_user,
-    mocker
+    mocker,
+    fake_uuid,
 ):
     mocker.patch('app.user_api_client.get_user', side_effect=[
         platform_admin_user,
@@ -138,14 +144,11 @@ def test_user_information_page_displays_if_there_are_failed_login_attempts(
 
     mocker.patch(
         'app.user_api_client.get_organisations_and_services_for_user',
-        return_value={'organisations': [], 'services': [
-            {"id": 1, "name": "Fresh Orchard Juice", "restricted": True},
-            {"id": 2, "name": "Nature Therapy", "restricted": True},
-        ]},
+        return_value={'organisations': [], 'services': []},
         autospec=True
     )
     client.login(platform_admin_user)
-    response = client.get(url_for('main.user_information', user_id=345))
+    response = client.get(url_for('main.user_information', user_id=fake_uuid))
     assert response.status_code == 200
 
     document = html.fromstring(response.get_data(as_text=True))

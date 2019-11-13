@@ -194,7 +194,7 @@ class Organisation(JSONModel):
 
     def associate_service(self, service_id):
         organisations_client.update_service_organisation(
-            str(service_id),
+            service_id,
             self.id
         )
 

@@ -100,7 +100,7 @@ def get_example_letter_address(key):
     }.get(key, '')
 
 
-@main.route("/services/<service_id>/send/<template_id>/csv", methods=['GET', 'POST'])
+@main.route("/services/<uuid:service_id>/send/<uuid:template_id>/csv", methods=['GET', 'POST'])
 @user_has_permissions('send_messages', restrict_admin_usage=True)
 def send_messages(service_id, template_id):
     # if there's lots of data in the session, lets log it for debugging purposes
@@ -183,7 +183,7 @@ def send_messages(service_id, template_id):
     )
 
 
-@main.route("/services/<service_id>/send/<template_id>.csv", methods=['GET'])
+@main.route("/services/<uuid:service_id>/send/<uuid:template_id>.csv", methods=['GET'])
 @user_has_permissions('send_messages', 'manage_templates')
 def get_example_csv(service_id, template_id):
     template = get_template(
@@ -198,7 +198,7 @@ def get_example_csv(service_id, template_id):
     }
 
 
-@main.route("/services/<service_id>/send/<template_id>/set-sender", methods=['GET', 'POST'])
+@main.route("/services/<uuid:service_id>/send/<uuid:template_id>/set-sender", methods=['GET', 'POST'])
 @user_has_permissions('send_messages', restrict_admin_usage=True)
 def set_sender(service_id, template_id):
     session['sender_id'] = None
@@ -285,8 +285,8 @@ def get_sender_details(service_id, template_type):
     return api_call(service_id)
 
 
-@main.route("/services/<service_id>/send/<template_id>/test", endpoint='send_test')
-@main.route("/services/<service_id>/send/<template_id>/one-off", endpoint='send_one_off')
+@main.route("/services/<uuid:service_id>/send/<uuid:template_id>/test", endpoint='send_test')
+@main.route("/services/<uuid:service_id>/send/<uuid:template_id>/one-off", endpoint='send_one_off')
 @user_has_permissions('send_messages', restrict_admin_usage=True)
 def send_test(service_id, template_id):
     session['recipient'] = None
@@ -328,12 +328,12 @@ def get_notification_check_endpoint(service_id, template):
 
 
 @main.route(
-    "/services/<service_id>/send/<template_id>/test/step-<int:step_index>",
+    "/services/<uuid:service_id>/send/<uuid:template_id>/test/step-<int:step_index>",
     methods=['GET', 'POST'],
     endpoint='send_test_step',
 )
 @main.route(
-    "/services/<service_id>/send/<template_id>/one-off/step-<int:step_index>",
+    "/services/<uuid:service_id>/send/<uuid:template_id>/one-off/step-<int:step_index>",
     methods=['GET', 'POST'],
     endpoint='send_one_off_step',
 )
@@ -465,7 +465,7 @@ def send_test_step(service_id, template_id, step_index):
     )
 
 
-@main.route("/services/<service_id>/send/<template_id>/test.<filetype>", methods=['GET'])
+@main.route("/services/<uuid:service_id>/send/<uuid:template_id>/test.<filetype>", methods=['GET'])
 @user_has_permissions('send_messages')
 def send_test_preview(service_id, template_id, filetype):
 
@@ -600,8 +600,8 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
     )
 
 
-@main.route("/services/<service_id>/<uuid:template_id>/check/<upload_id>", methods=['GET'])
-@main.route("/services/<service_id>/<uuid:template_id>/check/<upload_id>/row-<int:row_index>", methods=['GET'])
+@main.route("/services/<uuid:service_id>/<uuid:template_id>/check/<uuid:upload_id>", methods=['GET'])
+@main.route("/services/<uuid:service_id>/<uuid:template_id>/check/<uuid:upload_id>/row-<int:row_index>", methods=['GET'])
 @user_has_permissions('send_messages', restrict_admin_usage=True)
 def check_messages(service_id, template_id, upload_id, row_index=2):
 
@@ -630,7 +630,7 @@ def check_messages(service_id, template_id, upload_id, row_index=2):
 
     metadata_kwargs = {
         'notification_count': data['count_of_recipients'],
-        'template_id': str(template_id),
+        'template_id': template_id,
         'valid': True,
         'original_file_name': unicode_truncate(
             data['original_file_name'],
@@ -647,11 +647,11 @@ def check_messages(service_id, template_id, upload_id, row_index=2):
 
 
 @main.route(
-    "/services/<service_id>/<uuid:template_id>/check/<upload_id>.<filetype>",
+    "/services/<uuid:service_id>/<uuid:template_id>/check/<uuid:upload_id>.<filetype>",
     methods=['GET'],
 )
 @main.route(
-    "/services/<service_id>/<uuid:template_id>/check/<upload_id>/row-<int:row_index>.<filetype>",
+    "/services/<uuid:service_id>/<uuid:template_id>/check/<uuid:upload_id>/row-<int:row_index>.<filetype>",
     methods=['GET'],
 )
 @user_has_permissions('send_messages')
@@ -670,7 +670,7 @@ def check_messages_preview(service_id, template_id, upload_id, filetype, row_ind
 
 
 @main.route(
-    "/services/<service_id>/<uuid:template_id>/check.<filetype>",
+    "/services/<uuid:service_id>/<uuid:template_id>/check.<filetype>",
     methods=['GET'],
 )
 @user_has_permissions('send_messages')
@@ -688,7 +688,7 @@ def check_notification_preview(service_id, template_id, filetype):
     return TemplatePreview.from_utils_template(template, filetype, page=page)
 
 
-@main.route("/services/<service_id>/start-job/<upload_id>", methods=['POST'])
+@main.route("/services/<uuid:service_id>/start-job/<uuid:upload_id>", methods=['POST'])
 @user_has_permissions('send_messages', restrict_admin_usage=True)
 def start_job(service_id, upload_id):
 
@@ -711,7 +711,7 @@ def start_job(service_id, upload_id):
     )
 
 
-@main.route("/services/<service_id>/end-tour/<example_template_id>")
+@main.route("/services/<uuid:service_id>/end-tour/<uuid:example_template_id>")
 @user_has_permissions('manage_templates')
 def go_to_dashboard_after_tour(service_id, example_template_id):
 
@@ -840,7 +840,7 @@ def get_back_link(service_id, template, step_index):
         )
 
 
-@main.route("/services/<service_id>/template/<template_id>/notification/check", methods=['GET'])
+@main.route("/services/<uuid:service_id>/template/<uuid:template_id>/notification/check", methods=['GET'])
 @user_has_permissions('send_messages', restrict_admin_usage=True)
 def check_notification(service_id, template_id):
     return render_template(
@@ -917,7 +917,7 @@ def get_template_error_dict(exception):
     }
 
 
-@main.route("/services/<service_id>/template/<template_id>/notification/check", methods=['POST'])
+@main.route("/services/<uuid:service_id>/template/<uuid:template_id>/notification/check", methods=['POST'])
 @user_has_permissions('send_messages', restrict_admin_usage=True)
 def send_notification(service_id, template_id):
     if {'recipient', 'placeholders'} - set(session.keys()):

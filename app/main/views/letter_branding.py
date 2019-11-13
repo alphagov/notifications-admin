@@ -44,8 +44,8 @@ def letter_branding():
     )
 
 
-@main.route("/letter-branding/<branding_id>/edit", methods=['GET', 'POST'])
-@main.route("/letter-branding/<branding_id>/edit/<path:logo>", methods=['GET', 'POST'])
+@main.route("/letter-branding/<uuid:branding_id>/edit", methods=['GET', 'POST'])
+@main.route("/letter-branding/<uuid:branding_id>/edit/<path:logo>", methods=['GET', 'POST'])
 @user_is_platform_admin
 def update_letter_branding(branding_id, logo=None):
     letter_branding = letter_branding_client.get_letter_branding(branding_id)

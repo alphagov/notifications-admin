@@ -23,7 +23,7 @@ def find_users_by_email():
     )
 
 
-@main.route("/users/<user_id>", methods=['GET'])
+@main.route("/users/<uuid:user_id>", methods=['GET'])
 @user_is_platform_admin
 def user_information(user_id):
     return render_template(

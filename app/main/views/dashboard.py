@@ -38,13 +38,13 @@ from app.utils import (
 )
 
 
-@main.route("/services/<service_id>/dashboard")
+@main.route("/services/<uuid:service_id>/dashboard")
 @user_has_permissions('view_activity', 'send_messages')
 def old_service_dashboard(service_id):
     return redirect(url_for('.service_dashboard', service_id=service_id))
 
 
-@main.route("/services/<service_id>")
+@main.route("/services/<uuid:service_id>")
 @user_has_permissions()
 def service_dashboard(service_id):
 
@@ -62,20 +62,20 @@ def service_dashboard(service_id):
     )
 
 
-@main.route("/services/<service_id>/dashboard.json")
+@main.route("/services/<uuid:service_id>/dashboard.json")
 @user_has_permissions('view_activity')
 def service_dashboard_updates(service_id):
     return jsonify(**get_dashboard_partials(service_id))
 
 
-@main.route("/services/<service_id>/template-activity")
+@main.route("/services/<uuid:service_id>/template-activity")
 @user_has_permissions('view_activity')
 def template_history(service_id):
 
     return redirect(url_for('main.template_usage', service_id=service_id), code=301)
 
 
-@main.route("/services/<service_id>/template-usage")
+@main.route("/services/<uuid:service_id>/template-usage")
 @user_has_permissions('view_activity')
 def template_usage(service_id):
 
@@ -124,7 +124,7 @@ def template_usage(service_id):
     )
 
 
-@main.route("/services/<service_id>/usage")
+@main.route("/services/<uuid:service_id>/usage")
 @user_has_permissions('manage_service', allow_org_user=True)
 def usage(service_id):
     year, current_financial_year = requested_and_current_financial_year(request)
@@ -151,7 +151,7 @@ def usage(service_id):
     )
 
 
-@main.route("/services/<service_id>/monthly")
+@main.route("/services/<uuid:service_id>/monthly")
 @user_has_permissions('view_activity')
 def monthly(service_id):
     year, current_financial_year = requested_and_current_financial_year(request)
@@ -169,7 +169,7 @@ def monthly(service_id):
     )
 
 
-@main.route("/services/<service_id>/inbox")
+@main.route("/services/<uuid:service_id>/inbox")
 @user_has_permissions('view_activity')
 def inbox(service_id):
 
@@ -180,14 +180,14 @@ def inbox(service_id):
     )
 
 
-@main.route("/services/<service_id>/inbox.json")
+@main.route("/services/<uuid:service_id>/inbox.json")
 @user_has_permissions('view_activity')
 def inbox_updates(service_id):
 
     return jsonify(get_inbox_partials(service_id))
 
 
-@main.route("/services/<service_id>/inbox.csv")
+@main.route("/services/<uuid:service_id>/inbox.csv")
 @user_has_permissions('view_activity')
 def inbox_download(service_id):
     return Response(

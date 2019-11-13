@@ -50,8 +50,14 @@ def test_get_upload_letter(client_request):
     assert normalize_spaces(page.find('label', class_='file-upload-button').text) == 'Choose file'
 
 
-def test_post_upload_letter_redirects_for_valid_file(mocker, active_user_with_permissions, service_one, client_request):
-    mocker.patch('uuid.uuid4', return_value='fake-uuid')
+def test_post_upload_letter_redirects_for_valid_file(
+    mocker,
+    active_user_with_permissions,
+    service_one,
+    client_request,
+    fake_uuid,
+):
+    mocker.patch('uuid.uuid4', return_value=fake_uuid)
     antivirus_mock = mocker.patch('app.main.views.uploads.antivirus_client.scan', return_value=True)
     mocker.patch(
         'app.main.views.uploads.sanitise_letter',
@@ -79,7 +85,7 @@ def test_post_upload_letter_redirects_for_valid_file(mocker, active_user_with_pe
 
     mock_s3.assert_called_once_with(
         b'The sanitised content',
-        file_location='service-{}/fake-uuid.pdf'.format(SERVICE_ONE_ID),
+        file_location='service-{}/{}.pdf'.format(SERVICE_ONE_ID, fake_uuid),
         status='valid',
         page_count=1,
         filename='tests/test_pdf_files/one_page_pdf.pdf',
@@ -90,7 +96,7 @@ def test_post_upload_letter_redirects_for_valid_file(mocker, active_user_with_pe
     assert page.find('h1').text == 'tests/test_pdf_files/one_page_pdf.pdf'
     assert not page.find(id='validation-error-message')
 
-    assert page.find('input', {'type': 'hidden', 'name': 'file_id', 'value': 'fake-uuid'})
+    assert page.find('input', {'type': 'hidden', 'name': 'file_id', 'value': fake_uuid})
     assert page.find('button', {'type': 'submit'}).text == 'Send 1 letter'
 
 
@@ -99,6 +105,7 @@ def test_post_upload_letter_shows_letter_preview_for_valid_file(
     active_user_with_permissions,
     service_one,
     client_request,
+    fake_uuid,
 ):
     letter_template = {'template_type': 'letter',
                        'reply_to_text': '',
@@ -106,7 +113,7 @@ def test_post_upload_letter_shows_letter_preview_for_valid_file(
                        'subject': 'hi',
                        'content': 'my letter'}
 
-    mocker.patch('uuid.uuid4', return_value='fake-uuid')
+    mocker.patch('uuid.uuid4', return_value=fake_uuid)
     mocker.patch('app.main.views.uploads.antivirus_client.scan', return_value=True)
     mocker.patch(
         'app.main.views.uploads.sanitise_letter',
@@ -145,7 +152,7 @@ def test_post_upload_letter_shows_letter_preview_for_valid_file(
         assert img['src'] == url_for(
             '.view_letter_upload_as_preview',
             service_id=SERVICE_ONE_ID,
-            file_id='fake-uuid',
+            file_id=fake_uuid,
             page=page_no)
 
 
@@ -219,8 +226,8 @@ def test_post_choose_upload_file_when_file_is_malformed(mocker, client_request):
     assert normalize_spaces(page.find('label', class_='file-upload-button').text) == 'Upload your file again'
 
 
-def test_post_upload_letter_with_invalid_file(mocker, client_request):
-    mocker.patch('uuid.uuid4', return_value='fake-uuid')
+def test_post_upload_letter_with_invalid_file(mocker, client_request, fake_uuid):
+    mocker.patch('uuid.uuid4', return_value=fake_uuid)
     mocker.patch('app.main.views.uploads.antivirus_client.scan', return_value=True)
     mock_s3 = mocker.patch('app.main.views.uploads.upload_letter_to_s3')
 
@@ -249,7 +256,7 @@ def test_post_upload_letter_with_invalid_file(mocker, client_request):
 
         mock_s3.assert_called_once_with(
             file_contents,
-            file_location='service-{}/fake-uuid.pdf'.format(SERVICE_ONE_ID),
+            file_location='service-{}/{}.pdf'.format(SERVICE_ONE_ID, fake_uuid),
             status='invalid',
             page_count=1,
             filename='tests/test_pdf_files/one_page_pdf.pdf',
@@ -261,14 +268,14 @@ def test_post_upload_letter_with_invalid_file(mocker, client_request):
     assert not page.find('button', {'type': 'submit'})
 
 
-def test_post_upload_letter_shows_letter_preview_for_invalid_file(mocker, client_request):
+def test_post_upload_letter_shows_letter_preview_for_invalid_file(mocker, client_request, fake_uuid):
     letter_template = {'template_type': 'letter',
                        'reply_to_text': '',
                        'postage': 'first',
                        'subject': 'hi',
                        'content': 'my letter'}
 
-    mocker.patch('uuid.uuid4', return_value='fake-uuid')
+    mocker.patch('uuid.uuid4', return_value=fake_uuid)
     mocker.patch('app.main.views.uploads.antivirus_client.scan', return_value=True)
     mocker.patch('app.main.views.uploads.upload_letter_to_s3')
     mock_sanitise_response = Mock()
@@ -296,13 +303,17 @@ def test_post_upload_letter_shows_letter_preview_for_invalid_file(mocker, client
     assert letter_images[0]['src'] == url_for(
         '.view_letter_upload_as_preview',
         service_id=SERVICE_ONE_ID,
-        file_id='fake-uuid',
+        file_id=fake_uuid,
         page=1
     )
 
 
-def test_post_upload_letter_does_not_upload_to_s3_if_template_preview_raises_unknown_error(mocker, client_request):
-    mocker.patch('uuid.uuid4', return_value='fake-uuid')
+def test_post_upload_letter_does_not_upload_to_s3_if_template_preview_raises_unknown_error(
+    mocker,
+    client_request,
+    fake_uuid,
+):
+    mocker.patch('uuid.uuid4', return_value=fake_uuid)
     mocker.patch('app.main.views.uploads.antivirus_client.scan', return_value=True)
     mock_s3 = mocker.patch('app.main.views.uploads.upload_letter_to_s3')
 
@@ -320,7 +331,13 @@ def test_post_upload_letter_does_not_upload_to_s3_if_template_preview_raises_unk
     assert not mock_s3.called
 
 
-def test_uploaded_letter_preview(mocker, active_user_with_permissions, service_one, client_request):
+def test_uploaded_letter_preview(
+    mocker,
+    active_user_with_permissions,
+    service_one,
+    client_request,
+    fake_uuid,
+):
     mocker.patch('app.main.views.uploads.service_api_client')
     mocker.patch('app.main.views.uploads.get_letter_metadata', return_value={
         'filename': 'my_letter.pdf', 'page_count': '1', 'status': 'valid'})
@@ -331,7 +348,7 @@ def test_uploaded_letter_preview(mocker, active_user_with_permissions, service_o
     page = client_request.get(
         'main.uploaded_letter_preview',
         service_id=SERVICE_ONE_ID,
-        file_id='fake-uuid',
+        file_id=fake_uuid,
         original_filename='my_letter.pdf',
         page_count=1,
         status='valid',
@@ -342,7 +359,11 @@ def test_uploaded_letter_preview(mocker, active_user_with_permissions, service_o
     assert page.find('div', class_='letter-sent')
 
 
-def test_uploaded_letter_preview_does_not_show_send_button_if_service_in_trial_mode(mocker, client_request):
+def test_uploaded_letter_preview_does_not_show_send_button_if_service_in_trial_mode(
+    mocker,
+    client_request,
+    fake_uuid,
+):
     mocker.patch('app.main.views.uploads.service_api_client')
     mocker.patch('app.main.views.uploads.get_letter_metadata', return_value={
         'filename': 'my_letter.pdf', 'page_count': '1', 'status': 'valid'})
@@ -351,7 +372,7 @@ def test_uploaded_letter_preview_does_not_show_send_button_if_service_in_trial_m
     page = client_request.get(
         'main.uploaded_letter_preview',
         service_id=SERVICE_ONE_ID,
-        file_id='fake-uuid',
+        file_id=fake_uuid,
         original_filename='my_letter.pdf',
         page_count=1,
         status='valid',
@@ -368,6 +389,7 @@ def test_uploaded_letter_preview_image_shows_overlay_when_content_outside_printa
     mocker,
     logged_in_client,
     mock_get_service,
+    fake_uuid,
 ):
     mocker.patch(
         'app.main.views.uploads.get_letter_pdf_and_metadata',
@@ -378,7 +400,7 @@ def test_uploaded_letter_preview_image_shows_overlay_when_content_outside_printa
         return_value=make_response('page.html', 200))
 
     logged_in_client.get(
-        url_for('main.view_letter_upload_as_preview', file_id='fake-uuid', service_id=SERVICE_ONE_ID, page=1)
+        url_for('main.view_letter_upload_as_preview', file_id=fake_uuid, service_id=SERVICE_ONE_ID, page=1)
     )
 
     template_preview_mock.assert_called_once_with('pdf_file', '1')
@@ -396,6 +418,7 @@ def test_uploaded_letter_preview_image_does_not_show_overlay_if_no_content_outsi
     logged_in_client,
     mock_get_service,
     metadata,
+    fake_uuid,
 ):
     mocker.patch(
         'app.main.views.uploads.get_letter_pdf_and_metadata',
@@ -406,7 +429,7 @@ def test_uploaded_letter_preview_image_does_not_show_overlay_if_no_content_outsi
         return_value=make_response('page.html', 200))
 
     logged_in_client.get(
-        url_for('main.view_letter_upload_as_preview', file_id='fake-uuid', service_id=SERVICE_ONE_ID, page=1)
+        url_for('main.view_letter_upload_as_preview', file_id=fake_uuid, service_id=SERVICE_ONE_ID, page=1)
     )
 
     template_preview_mock.assert_called_once_with('pdf_file', '1')
