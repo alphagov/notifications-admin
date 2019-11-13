@@ -16,20 +16,19 @@
     back_link=url_for(".edit_service_template", service_id=current_service.id, template_id=new_template.id)
   ) }}
 
-  <div class="bottom-gutter">
-    {% if template_change.placeholders_removed %}
-      <p>
-        You removed {{ list_of_placeholders(template_change.placeholders_removed) }}
-      </p>
-    {% endif %}
-    {% if template_change.placeholders_added %}
-      <p>
-        You added {{ list_of_placeholders(template_change.placeholders_added) }}
-      </p>
-    {% endif %}
-  </div>
-
-  <p class="top-gutter">Developers, you’ll need to update your API calls</p>
+  {% if template_change.placeholders_removed %}
+    <p>
+      You removed {{ list_of_placeholders(template_change.placeholders_removed) }}
+    </p>
+  {% endif %}
+  {% if template_change.placeholders_added %}
+    <p>
+      You added {{ list_of_placeholders(template_change.placeholders_added) }}
+    </p>
+  {% endif %}
+  <p>
+    Developers, you’ll need to update your API calls.
+  </p>
 
   {% call form_wrapper() %}
     <input type="hidden" name="name" value="{{ new_template.name }}" />
