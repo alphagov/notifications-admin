@@ -28,7 +28,7 @@
 
 {% block bodyStart %}
   {% block cookie_message %}
-    <div class="notify-cookie-message">
+    <div class="notify-cookie-message" id="global-cookie-message">
       <p class="govuk-width-container">
         GOV.UK Notify uses cookies to make the site simpler.
         <a href="{{ url_for("main.cookies") }}">Find out more about cookies</a>
