@@ -53,12 +53,7 @@ $sticky-padding: $gutter * 2 / 3;
   }
 
   .page-footer {
-    margin-bottom: 0;
-    min-height: 50px;
-  }
-
-  .page-footer-delete-link-without-button {
-    margin-top: 10px;
+    margin-bottom: 1px;
   }
 
   .notification-status {
@@ -66,7 +61,7 @@ $sticky-padding: $gutter * 2 / 3;
   }
 
   .button-secondary {
-    margin-right: $gutter-half;
+    margin: 0 $gutter-half 3px 0;
   }
 
 }

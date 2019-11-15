@@ -78,7 +78,7 @@
         <button type="submit" class="button">Send 1 {{ message_count_label(1, template.template_type, suffix='') }}</button>
       {% endif %}
       {% if template.template_type == 'letter' %}
-        <a href="{{ url_for('main.check_notification_preview', service_id=current_service.id, template_id=template.id, filetype='pdf') }}" download class="page-footer-right-aligned-link">Download as a PDF</a>
+        <a href="{{ url_for('main.check_notification_preview', service_id=current_service.id, template_id=template.id, filetype='pdf') }}" download class="page-footer-right-aligned-link{% if error %}-without-button{% endif %}">Download as a PDF</a>
       {% endif %}
     </form>
   </div>

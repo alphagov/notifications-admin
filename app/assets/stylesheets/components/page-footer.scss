@@ -38,9 +38,17 @@
   }
 
   &-right-aligned-link {
+
     position: absolute;
     right: 0;
-    top: 10px;  // align baseline with buttons
+    top: 9px;  // align baseline with buttons
+
+    &-without-button {
+      position: absolute;
+      right: 0;
+      top: 0;
+    }
+
   }
 
   .button,
