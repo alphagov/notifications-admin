@@ -100,3 +100,41 @@ def get_tickets_without_service_id():
                                      })
             next_page = data["next_page"]
 
+
+def get_tickets_with_description():
+    ZENDESK_TICKET_URL = 'https://govuk.zendesk.com/api/v2/search.json?query={}'
+    query_params = 'type:ticket group:{}, created>2019-07-01'.format(NOTIFY_GROUP_ID)
+    query_params = urllib.parse.quote(query_params)
+
+    next_page = ZENDESK_TICKET_URL.format(query_params)
+    with open("zendesk_ticket.csv", 'w') as csvfile:
+        fieldnames = [
+            'Ticket id',
+            'Subject line',
+            'Description',
+            'Date ticket created',
+            'Tags',
+        ]
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+        while next_page:
+            print(next_page)
+            response = requests.get(
+                next_page,
+                headers={'Content-type': 'application/json'},
+                auth=(
+                    '{}/token'.format(NOTIFY_ZENDESK_EMAIL),
+                    ZENDESK_API_KEY
+                )
+            )
+            data = response.json()
+            print(data)
+            for row in data["results"]:
+                writer.writerow({'Ticket id': row['id'],
+                                 'Subject line': row['subject'],
+                                 'Description': row['description'],
+                                 'Date ticket created': row["created_at"],
+                                 'Tags': row.get('tags', '')
+                                 })
+            next_page = data["next_page"]
+
