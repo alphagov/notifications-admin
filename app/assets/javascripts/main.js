@@ -1,4 +1,4 @@
-window.GOVUKFrontend.initAll();
+window.GOVUK.Frontend.initAll();
 
 $(() => GOVUK.addCookieMessage());
 
