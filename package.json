@@ -21,6 +21,7 @@
   "dependencies": {
     "@babel/core": "7.4.0",
     "@babel/preset-env": "7.4.2",
+    "del": "5.1.0",
     "diff-dom": "2.5.1",
     "govuk-elements-sass": "3.1.2",
     "govuk-frontend": "2.13.0",

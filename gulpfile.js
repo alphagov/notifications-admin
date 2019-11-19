@@ -10,6 +10,7 @@ const rollup = require('rollup');
 const rollupPluginCommonjs = require('rollup-plugin-commonjs');
 const rollupPluginNodeResolve = require('rollup-plugin-node-resolve');
 const stylish = require('jshint-stylish');
+const del = require('del');
 
 const plugins = {};
 plugins.addSrc = require('gulp-add-src');
@@ -197,6 +198,13 @@ const lint = {
 };
 
 
+const clean = {
+  javascripts: (cb) => {
+    return del([paths.src + 'javascripts/modules/all.js'])
+  }
+}
+
+
 // Default: compile everything
 const defaultTask = parallel(
   series(
@@ -207,7 +215,8 @@ const defaultTask = parallel(
     copy.error_pages,
     series(
       bundleJavaScriptModules,
-      javascripts
+      javascripts,
+      clean.javascripts
     ),
     sass
   )
