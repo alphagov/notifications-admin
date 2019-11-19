@@ -1457,7 +1457,6 @@ def test_should_redirect_after_request_to_go_live(
         tags=[
             'notify_action',
             'notify_go_live',
-            'notify_go_live_incomplete',
         ] + extra_tags + [
             'notify_go_live_incomplete_checklist',
             'notify_go_live_incomplete_mou',
@@ -1631,7 +1630,6 @@ def test_should_be_able_to_request_to_go_live_with_no_organisation(
             [
                 'notify_action',
                 'notify_go_live',
-                'notify_go_live_incomplete',
                 'notify_go_live_incomplete_checklist',
                 'notify_go_live_incomplete_email_reply_to',
             ],
@@ -1667,7 +1665,6 @@ def test_should_be_able_to_request_to_go_live_with_no_organisation(
             [
                 'notify_action',
                 'notify_go_live',
-                'notify_go_live_incomplete',
                 'notify_go_live_incomplete_checklist',
                 'notify_go_live_incomplete_sms_sender',
             ],
@@ -1686,7 +1683,6 @@ def test_should_be_able_to_request_to_go_live_with_no_organisation(
             [
                 'notify_action',
                 'notify_go_live',
-                'notify_go_live_incomplete',
                 'notify_go_live_incomplete_checklist',
                 'notify_go_live_incomplete_team_member',
             ],
@@ -1705,7 +1701,6 @@ def test_should_be_able_to_request_to_go_live_with_no_organisation(
             [
                 'notify_action',
                 'notify_go_live',
-                'notify_go_live_incomplete',
                 'notify_go_live_incomplete_checklist',
                 'notify_go_live_incomplete_template_content',
             ],
@@ -1724,7 +1719,6 @@ def test_should_be_able_to_request_to_go_live_with_no_organisation(
             [
                 'notify_action',
                 'notify_go_live',
-                'notify_go_live_incomplete',
                 'notify_go_live_incomplete_volumes',
                 'notify_go_live_incomplete_checklist',
                 'notify_go_live_incomplete_mou',

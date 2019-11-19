@@ -625,7 +625,6 @@ class Service(JSONModel):
             return
 
         for test, tag in (
-            (True, ''),
             (not self.volumes, '_volumes'),
             (not self.go_live_checklist_completed, '_checklist'),
             (not self.organisation.agreement_signed, '_mou'),
