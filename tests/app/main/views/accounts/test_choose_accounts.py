@@ -247,8 +247,8 @@ def test_choose_account_should_not_show_back_to_service_link_if_service_archived
     )),
     (service_two, 403, (
         # Page has no ‘back to’ link
-        '403 '
-        'You do not have permission to view this page.'
+        'You are not allowed to see this page '
+        'To check your permissions, speak to a member of your team who can manage settings, team and usage.'
     )),
 ))
 def test_should_not_show_back_to_service_if_user_doesnt_belong_to_service(
