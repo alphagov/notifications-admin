@@ -68,7 +68,6 @@ cache/
 node_modules
 bower_components
 npm-debug.log
-app/assets/javascripts/modules/all.js
 
 environment.sh
 .envrc
