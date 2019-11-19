@@ -57,19 +57,24 @@ const bundleJavaScriptModules = async function () {
   const bundle = await rollup.rollup({
     input: paths.src + 'javascripts/modules/all.mjs',
     plugins: [
+      // determine module entry points from either 'module' or 'main' fields in package.json
       rollupPluginNodeResolve({
         mainFields: ['module', 'main']
       }),
+      // gulp rollup runs on nodeJS so reads modules in commonJS format
+      // this adds node_modules to the require path so it can find the GOVUK Frontend modules
       rollupPluginCommonjs({
         include: 'node_modules/**'
       })
     ]
   });
 
+  // write resulting module to Immediately Invoked Function Expression (IIFE) format
+  // map the exported code to the window.GOVUK namespace
   await bundle.write({
     file: paths.src + 'javascripts/modules/all.js',
     format: 'iife',
-    name: 'GOVUKFrontend'
+    name: 'GOVUK'
   });
 };
 

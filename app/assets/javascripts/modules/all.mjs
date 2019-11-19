@@ -1,5 +1,15 @@
+// JS Module used to combine all the JS modules used in the application into a single entry point,
+// a bit like `app/__init__` in the Flask app.
+//
+// When processed by a bundler, this is turned into a Immediately Invoked Function Expression (IIFE)
+// and saved as `all.js` in the same folder as this file. The IIFE format allows it to run in
+// browsers that don't support JS Modules.
+//
+// Exported items will be added to the window.GOVUK namespace.
 import Header from 'govuk-frontend/components/header/header';
 
+// Copy of the initAll function from https://github.com/alphagov/govuk-frontend/blob/v2.13.0/src/all.js
+// except it only includes, and initialises, the components used by this application.
 function initAll (options) {
   // Set the options to an empty object by default if no options are passed.
   options = typeof options !== 'undefined' ? options : {}
@@ -13,7 +23,12 @@ function initAll (options) {
   new Header($toggleButton).init()
 }
 
+// Create separate namespace for GOVUK Frontend.
+var Frontend = {
+  "Header": Header,
+  "initAll": initAll
+}
+
 export {
-  Header,
-  initAll
+  Frontend
 }
