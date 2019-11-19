@@ -615,8 +615,9 @@ class Service(JSONModel):
 
     def _get_request_to_go_live_tags(self):
 
-        BASE = 'notify_request_to_go_live'
+        BASE = 'notify_go_live'
 
+        yield 'notify_action'
         yield BASE
 
         if self.go_live_checklist_completed and self.organisation.agreement_signed:
