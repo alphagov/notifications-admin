@@ -5,6 +5,7 @@ from wtforms import ValidationError
 
 from app.main.forms import RegisterUserForm, ServiceSmsSenderForm
 from app.main.validators import (
+    MustContainAlphanumericCharacters,
     NoCommasInPlaceHolders,
     OnlySMSCharacters,
     ValidGovEmail,
@@ -177,6 +178,19 @@ def test_non_sms_character_validation(data, err_msg, client):
         OnlySMSCharacters()(None, _gen_mock_field(data))
 
     assert str(error.value) == err_msg
+
+
+@pytest.mark.parametrize("string", [".", "A.", ".8...."])
+def test_if_string_does_not_contain_alphanumeric_characters_raises(string):
+    with pytest.raises(ValidationError) as error:
+        MustContainAlphanumericCharacters()(None, _gen_mock_field(string))
+
+    assert str(error.value) == "Must include at least two alphanumeric characters"
+
+
+@pytest.mark.parametrize("string", [".A8", "AB.", ".42...."])
+def test_if_string_contains_alphanumeric_characters_does_not_raise(string):
+    MustContainAlphanumericCharacters()(None, _gen_mock_field(string))
 
 
 def test_sms_sender_form_validation(

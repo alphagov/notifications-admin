@@ -397,6 +397,22 @@ def test_should_not_hit_api_if_service_name_hasnt_changed(
     assert not mock_update_service.called
 
 
+def test_service_name_change_fails_if_new_name_has_less_than_2_alphanumeric_characters(
+    client_request,
+    mock_update_service,
+    mock_service_name_is_unique,
+):
+    page = client_request.post(
+        'main.service_name_change',
+        service_id=SERVICE_ONE_ID,
+        _data={'name': "."},
+        _expected_status=200,
+    )
+    assert not mock_service_name_is_unique.called
+    assert not mock_update_service.called
+    assert page.find("span", {"class": "error-message"})
+
+
 @pytest.mark.parametrize('user, expected_text, expected_link', [
     (
         active_user_with_permissions,
