@@ -2,10 +2,10 @@
 // a bit like `app/__init__` in the Flask app.
 //
 // When processed by a bundler, this is turned into a Immediately Invoked Function Expression (IIFE)
-// and saved as `all.js` in the same folder as this file. The IIFE format allows it to run in
-// browsers that don't support JS Modules.
+// The IIFE format allows it to run in browsers that don't support JS Modules.
 //
 // Exported items will be added to the window.GOVUK namespace.
+// For example, `export { Frontend }` will assign `Frontend` to `window.Frontend`
 import Header from 'govuk-frontend/components/header/header';
 
 // Copy of the initAll function from https://github.com/alphagov/govuk-frontend/blob/v2.13.0/src/all.js
