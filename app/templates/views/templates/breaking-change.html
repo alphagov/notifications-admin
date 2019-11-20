@@ -2,7 +2,7 @@
 {% from "components/banner.html" import banner_wrapper %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
-{% from "components/list.html" import list_of_placeholders %}
+{% from "components/list.html" import list_of_placeholders, list_of_code_snippets %}
 {% from "components/form.html" import form_wrapper %}
 
 {% block service_page_title %}
@@ -15,20 +15,21 @@
     'Confirm changes',
     back_link=url_for(".edit_service_template", service_id=current_service.id, template_id=new_template.id)
   ) }}
-
-  {% if template_change.placeholders_removed %}
-    <p>
-      You removed {{ list_of_placeholders(template_change.placeholders_removed) }}
-    </p>
-  {% endif %}
-  {% if template_change.placeholders_added %}
-    <p>
-      You added {{ list_of_placeholders(template_change.placeholders_added) }}
-    </p>
-  {% endif %}
-  <p>
-    Developers, you’ll need to update your API calls.
-  </p>
+  <div class="grid-row">
+    <div class="column-five-sixths">
+      {% if template_change.placeholders_removed %}
+        <p>
+          You removed {{ list_of_placeholders(template_change.placeholders_removed) }}
+        </p>
+      {% endif %}
+      <p>
+        You added {{ list_of_placeholders(template_change.placeholders_added) }}
+      </p>
+      <p>
+        Before you send any messages, make sure your API calls include {{ list_of_code_snippets(template_change.placeholders_added) }}.
+      </p>
+    </div>
+  </div>
 
   {% call form_wrapper() %}
     <input type="hidden" name="name" value="{{ new_template.name }}" />
