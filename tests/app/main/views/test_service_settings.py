@@ -1398,7 +1398,7 @@ def test_non_gov_users_cant_request_to_go_live(
             'Text messages in next year: \n'
             'Letters in next year: \n'
         ),
-        ['notify_request_to_go_live_incomplete_volumes']
+        ['notify_go_live_incomplete_volumes']
     ),
     (
         (('email', 1234), ('sms', 0), ('letter', 999)),
@@ -1455,12 +1455,12 @@ def test_should_redirect_after_request_to_go_live(
         user_name=active_user_with_permissions['name'],
         user_email=active_user_with_permissions['email_address'],
         tags=[
-            'notify_request_to_go_live',
-            'notify_request_to_go_live_incomplete',
+            'notify_action',
+            'notify_go_live',
         ] + extra_tags + [
-            'notify_request_to_go_live_incomplete_checklist',
-            'notify_request_to_go_live_incomplete_mou',
-            'notify_request_to_go_live_incomplete_team_member',
+            'notify_go_live_incomplete_checklist',
+            'notify_go_live_incomplete_mou',
+            'notify_go_live_incomplete_team_member',
         ],
     )
     assert mock_post.call_args[1]['message'] == (
@@ -1611,8 +1611,9 @@ def test_should_be_able_to_request_to_go_live_with_no_organisation(
             'Yes',
             True,
             [
-                'notify_request_to_go_live',
-                'notify_request_to_go_live_complete',
+                'notify_action',
+                'notify_go_live',
+                'notify_go_live_complete',
             ],
         ),
         (  # Needs to set reply to address
@@ -1627,10 +1628,10 @@ def test_should_be_able_to_request_to_go_live_with_no_organisation(
             'No',
             True,
             [
-                'notify_request_to_go_live',
-                'notify_request_to_go_live_incomplete',
-                'notify_request_to_go_live_incomplete_checklist',
-                'notify_request_to_go_live_incomplete_email_reply_to',
+                'notify_action',
+                'notify_go_live',
+                'notify_go_live_incomplete_checklist',
+                'notify_go_live_incomplete_email_reply_to',
             ],
         ),
         (  # Just sending SMS
@@ -1645,8 +1646,9 @@ def test_should_be_able_to_request_to_go_live_with_no_organisation(
             'Yes',
             True,
             [
-                'notify_request_to_go_live',
-                'notify_request_to_go_live_complete',
+                'notify_action',
+                'notify_go_live',
+                'notify_go_live_complete',
             ],
         ),
         (  # Needs to change SMS sender
@@ -1661,10 +1663,10 @@ def test_should_be_able_to_request_to_go_live_with_no_organisation(
             'No',
             True,
             [
-                'notify_request_to_go_live',
-                'notify_request_to_go_live_incomplete',
-                'notify_request_to_go_live_incomplete_checklist',
-                'notify_request_to_go_live_incomplete_sms_sender',
+                'notify_action',
+                'notify_go_live',
+                'notify_go_live_incomplete_checklist',
+                'notify_go_live_incomplete_sms_sender',
             ],
         ),
         (  # Needs team members
@@ -1679,10 +1681,10 @@ def test_should_be_able_to_request_to_go_live_with_no_organisation(
             'No',
             True,
             [
-                'notify_request_to_go_live',
-                'notify_request_to_go_live_incomplete',
-                'notify_request_to_go_live_incomplete_checklist',
-                'notify_request_to_go_live_incomplete_team_member',
+                'notify_action',
+                'notify_go_live',
+                'notify_go_live_incomplete_checklist',
+                'notify_go_live_incomplete_team_member',
             ],
         ),
         (  # Needs templates
@@ -1697,10 +1699,10 @@ def test_should_be_able_to_request_to_go_live_with_no_organisation(
             'No',
             True,
             [
-                'notify_request_to_go_live',
-                'notify_request_to_go_live_incomplete',
-                'notify_request_to_go_live_incomplete_checklist',
-                'notify_request_to_go_live_incomplete_template_content',
+                'notify_action',
+                'notify_go_live',
+                'notify_go_live_incomplete_checklist',
+                'notify_go_live_incomplete_template_content',
             ],
         ),
         (  # Not done anything yet
@@ -1715,13 +1717,13 @@ def test_should_be_able_to_request_to_go_live_with_no_organisation(
             'No',
             False,
             [
-                'notify_request_to_go_live',
-                'notify_request_to_go_live_incomplete',
-                'notify_request_to_go_live_incomplete_volumes',
-                'notify_request_to_go_live_incomplete_checklist',
-                'notify_request_to_go_live_incomplete_mou',
-                'notify_request_to_go_live_incomplete_team_member',
-                'notify_request_to_go_live_incomplete_template_content',
+                'notify_action',
+                'notify_go_live',
+                'notify_go_live_incomplete_volumes',
+                'notify_go_live_incomplete_checklist',
+                'notify_go_live_incomplete_mou',
+                'notify_go_live_incomplete_team_member',
+                'notify_go_live_incomplete_template_content',
             ],
         ),
     ),
@@ -4648,7 +4650,7 @@ def test_submit_email_branding_request(
         ticket_type='question',
         user_email='test@user.gov.uk',
         user_name='Test User',
-        tags=['notify_action_add_branding'],
+        tags=['notify_action', 'notify_branding'],
     )
     assert normalize_spaces(page.select_one('.banner-default').text) == (
         'Thanks for your branding request. We’ll get back to you '
