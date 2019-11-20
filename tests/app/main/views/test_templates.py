@@ -1487,11 +1487,11 @@ def test_should_403_when_create_template_with_process_type_of_priority_for_non_p
     ),
     (
         "hello ((name))",
-        "hello ((full name))",
+        "hello ((first name)) ((middle name)) ((last name))",
         [
             'You removed ((name))',
-            'You added ((full name))',
-            'Before you send any messages, make sure your API calls include full name.',
+            'You added ((first name)) ((middle name)) and ((last name))',
+            'Before you send any messages, make sure your API calls include first name, middle name and last name.',
         ]
     ),
 ])
