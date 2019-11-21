@@ -16,14 +16,16 @@
      <li>create letter templates, but not send them</li>
    </ul>
 
-  <p>
-    To remove these restrictions, you can
     {% if current_service and current_service.trial_mode %}
-      <a href="{{ url_for('.request_to_go_live', service_id=current_service.id) }}">send us a request to go live</a>.
+     <p>To remove these restrictions, you can <a href="{{ url_for('.request_to_go_live', service_id=current_service.id) }}">request to go live</a>.</p>
     {% else %}
-      send us a request to go live.
+      <p>To remove these restrictions:</p>
+      <ol class="list list-number">
+        <li><a href="{{ url_for('main.sign_in') }}">Sign in</a>.</li>
+        <li>Go to the Settings page.</li>
+        <li>In the Your service is in trial mode section, select request to go live.</li>
+      </ol>
     {% endif %}
-  </p>
 
   <p>Before you can request to go live, you must:</p>
   <ul class="list list-bullet">
