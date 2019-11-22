@@ -435,7 +435,7 @@ def test_show_restricted_service(
     assert normalize_spaces(request_to_live.text) == expected_text
 
     if expected_link:
-        assert request_to_live_link.text.strip() == 'send us a request to go live'
+        assert request_to_live_link.text.strip() == 'request to go live'
         assert request_to_live_link['href'] == url_for('main.request_to_go_live', service_id=SERVICE_ONE_ID)
     else:
         assert not request_to_live_link
