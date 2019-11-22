@@ -42,12 +42,20 @@ input[type="search"]::-webkit-search-decoration {
 // To be removed when all links follow the GOV.UK Frontend conventions:
 // https://design-system.service.gov.uk/styles/typography/#links
 a {
-  @extend %govuk-link;
+  &:link {
+    color: $link-colour;
+  }
 
-  // Stops visited links looking different, until we can add the `govuk-link--no-visited-state`
-  // class to all links we want stay the same colour after visiting
   &:visited {
-    color: $govuk-link-colour;
+    color: $link-visited-colour;
+  }
+
+  &:hover {
+    color: $link-hover-colour;
+  }
+
+  &:active {
+    color: $link-active-colour;
   }
 }
 
