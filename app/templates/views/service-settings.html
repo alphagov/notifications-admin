@@ -252,10 +252,12 @@
     {% if current_service.trial_mode %}
       <h2 class="heading-medium top-gutter-0">Your service is in trial mode</h2>
 
+      <p>You can only:</p>
+
       <ul class='list list-bullet'>
-        <li>you can only send messages to yourself</li>
-        <li>you can add people to your team, then you can send messages to them too</li>
-        <li>you can only send {{ current_service.message_limit }} messages per day</li>
+        <li>send {{ current_service.message_limit }} text messages and emails per day</li>
+        <li>send messages to yourself and other people in your team</li>
+        <li>create letter templates, but not send them</li>
       </ul>
 
       <p>

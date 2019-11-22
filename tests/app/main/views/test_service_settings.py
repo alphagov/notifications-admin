@@ -446,9 +446,8 @@ def test_show_restricted_service(
     assert page.find('h1').text == 'Settings'
     assert page.find_all('h2')[0].text == 'Your service is in trial mode'
 
-    request_to_live = page.select_one('main p')
+    request_to_live = page.select('main p')[1]
     request_to_live_link = request_to_live.select_one('a')
-
     assert normalize_spaces(request_to_live.text) == expected_text
 
     if expected_link:
