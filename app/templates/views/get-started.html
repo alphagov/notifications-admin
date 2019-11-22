@@ -63,15 +63,14 @@
 
   <li class="get-started-list__item">
     <h2 class="get-started-list__heading">Set up an API integration (optional)</h2>
-    <p>Share our <a href="{{ url_for('main.documentation') }}">documentation</a> with your developers to help them set up an API integration.</p>
-
-    <p>You only need to do this if you’re using the API to send messages automatically, rather than signing in to Notify.</p>
+    <p>You can use the Notify API to send messages automatically.</p>
+    <p>Our <a href="{{ url_for('main.documentation') }}">documentation</a> explains how to integrate the API with a web application or back office system.</p>
   </li>
 
   <li class="get-started-list__item">
     <h2 class="get-started-list__heading">Start sending messages</h2>
     {% if not current_user.is_authenticated or not current_service %}
-    <p>You should request to go live when you’re ready to send messages to people outside your team. We’ll approve your request within one working day.</p>
+    <p>When you’re ready to send messages to people outside your team, go to the Settings page and request to go live. We’ll approve your request within one working day.</p>
     {% else %}
     <p>You should <a href="{{ url_for('.request_to_go_live', service_id=current_service.id) }}">request to go live</a> when you’re ready to send messages to people outside your team. We’ll approve your request within one working day.</p>
     {% endif %}
