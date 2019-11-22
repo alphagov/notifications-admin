@@ -17,14 +17,15 @@
    </ul>
 
   <p>
+    To remove these restrictions, you can 
     {% if current_service and current_service.trial_mode %}
-     To remove these restrictions, you can <a href="{{ url_for('.request_to_go_live', service_id=current_service.id) }}">request to go live</a>.
+     <a href="{{ url_for('.request_to_go_live', service_id=current_service.id) }}">request to go live</a>.
     {% else %}
-     To remove these restrictions, go to the Settings page and request to go live.
+     go to the Settings page and request to go live.
     {% endif %}
   </p>
 
-  <p>Before you can request to go live, you must:</p>
+  <p>Before you request to go live, you must:</p>
   <ul class="list list-bullet">
     <li>accept our data sharing and financial agreement</li>
     <li>accept our terms of use</li>
