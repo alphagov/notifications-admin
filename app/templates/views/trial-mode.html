@@ -17,9 +17,9 @@
    </ul>
 
   <p>
-    To remove these restrictions, you can 
+    To remove these restrictions, 
     {% if current_service and current_service.trial_mode %}
-     <a href="{{ url_for('.request_to_go_live', service_id=current_service.id) }}">request to go live</a>.
+     you can <a href="{{ url_for('.request_to_go_live', service_id=current_service.id) }}">request to go live</a>.
     {% else %}
      go to the Settings page and request to go live.
     {% endif %}
