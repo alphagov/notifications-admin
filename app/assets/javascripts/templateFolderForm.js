@@ -127,7 +127,7 @@
                     });
 
         if (opts.hasOwnProperty('nonvisualText')) {
-          $btn.append(`<span class="visuallyhidden"> ${opts.nonvisualText}</span>`);
+          $btn.append(`<span class="govuk-visually-hidden"> ${opts.nonvisualText}</span>`);
         }
 
         return $btn;

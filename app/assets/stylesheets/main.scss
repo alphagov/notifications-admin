@@ -16,6 +16,9 @@ $path: '/static/images/';
 // Dependencies from GOVU.UK Frontend Toolkit, rewritten for this application
 @import 'url-helpers';
 
+// Specific to this application, needs to go at the top of the cascade
+@import 'globals';
+
 // Dependencies from GOV.UK Elements
 // https://github.com/alphagov/govuk_elements
 @import 'elements/helpers';
@@ -31,9 +34,12 @@ $path: '/static/images/';
 @import 'elements/panels';
 @import 'elements/tables';
 
+// Dependencies from GOV.UK Frontend, packaged to be specific to this application
+@import './govuk-frontend/all';
 
 // Specific to this application
 @import 'grids';
+@import 'components/cookie-message';
 @import 'components/site-footer';
 @import 'components/placeholder';
 @import 'components/sms-message';

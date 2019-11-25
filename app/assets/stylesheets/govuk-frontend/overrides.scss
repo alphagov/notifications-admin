@@ -1,0 +1,58 @@
+// Overrides for certain GOV.UK Frontend styles to make its components match this application's design
+
+// Notify's header navigation aligns to the right
+.govuk-header__navigation {
+  text-align: right;
+
+  // reset the alignment of each item to left-to-right
+  .govuk-header__navigation-item {
+    text-align: left;
+  }
+
+}
+
+// The GOV.UK Frontend header component wraps content that is `position: relative`
+// This changes its z-index position, putting it above the `<main>` section
+// We need the `<main>` section to be above it, like the default order, to hide the theme colour
+// bar on full-width pages
+.govuk-main-wrapper {
+  position: relative;
+}
+
+// Additional padding-bottom override, following the GOV.UK Frontend spacing scale:
+// https://design-system.service.gov.uk/styles/spacing/#the-responsive-spacing-scale
+.govuk-\!-padding-bottom-12 {
+  padding-bottom: 70px;
+
+  @include govuk-media-query($from: tablet) {
+    padding-bottom: 90px;
+  }
+}
+
+.govuk-footer__navigation {
+  -webkit-flex-wrap: wrap;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap
+}
+
+.govuk-footer__section {
+  -webkit-flex-basis: 200px;
+  -ms-flex-preferred-size: 200px;
+  flex-basis: 100%;
+}
+
+@include govuk-media-query($from: tablet) {
+
+  .govuk-footer__navigation {
+    -webkit-flex-wrap: nowrap;
+    -ms-flex-wrap: nowrap;
+    flex-wrap: nowrap
+  }
+
+  .govuk-footer__section {
+    -webkit-flex-basis: 200px;
+    -ms-flex-preferred-size: 200px;
+    flex-basis: 200px;
+  }
+
+}
