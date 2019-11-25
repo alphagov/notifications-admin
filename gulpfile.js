@@ -49,6 +49,42 @@ const copy = {
     fonts: () => {
       return src(paths.govuk_frontend + 'assets/fonts/**/*')
         .pipe(dest(paths.dist + 'fonts/'));
+    },
+    templates: (cb) => {
+      // Put names of GOVUK Frontend templates here
+      const _templates = [
+        'template',
+        'skip-link',
+        'header',
+        'footer'
+      ];
+      let done = 0;
+
+      // Copy the templates for each component across, preserving their folder structure
+      _templates.forEach(name => {
+        let _src = [
+          paths.govuk_frontend + 'components/' + name + '/macro.njk',
+          paths.govuk_frontend + 'components/' + name + '/template.njk'
+        ];
+        let _dest = paths.templates + 'vendor/govuk-frontend/components/' + name;
+
+        // template.njk isn't a component
+        if (name === 'template') {
+          _src = paths.govuk_frontend + 'template.njk';
+          _dest = paths.templates + 'vendor/govuk-frontend';
+        }
+
+        src(_src)
+        .pipe(
+          dest(_dest)
+          .on('end', () => { // resolve promise if all copied
+            done = done + 1;
+            if (done === _templates.length) {
+              cb();
+            }
+          })
+        )
+      });
     }
   }
 };
@@ -207,8 +243,9 @@ const lint = {
 
 // Default: compile everything
 const defaultTask = parallel(
-  series(
+  parallel(
     copy.govuk_frontend.fonts,
+    copy.govuk_frontend.templates,
     images
   ),
   series(

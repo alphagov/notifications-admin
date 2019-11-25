@@ -720,7 +720,7 @@ def init_jinja(application):
     repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
     template_folders = [
         os.path.join(repo_root, 'app/templates'),
-        os.path.join(repo_root, 'node_modules/govuk-frontend'),
+        os.path.join(repo_root, 'app/templates/vendor/govuk-frontend'),
     ]
     jinja_loader = jinja2.FileSystemLoader(template_folders)
     application.jinja_loader = jinja_loader
