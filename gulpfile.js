@@ -15,11 +15,12 @@ const plugins = {};
 plugins.addSrc = require('gulp-add-src');
 plugins.babel = require('gulp-babel');
 plugins.base64 = require('gulp-base64-inline');
-plugins.rollup = require('gulp-better-rollup')
+plugins.cleanCSS = require('gulp-clean-css');
 plugins.concat = require('gulp-concat');
 plugins.cssUrlAdjuster = require('gulp-css-url-adjuster');
 plugins.jshint = require('gulp-jshint');
 plugins.prettyerror = require('gulp-prettyerror');
+plugins.rollup = require('gulp-better-rollup')
 plugins.sass = require('gulp-sass');
 plugins.sassLint = require('gulp-sass-lint');
 plugins.uglify = require('gulp-uglify');
@@ -34,6 +35,11 @@ const paths = {
   toolkit: 'node_modules/govuk_frontend_toolkit/',
   govuk_frontend: 'node_modules/govuk-frontend/'
 };
+// Rewrite /static prefix for URLs in CSS files
+let staticPathMatcher = new RegExp('^\/static\/');
+if (process.env.NOTIFY_ENVIRONMENT == 'development') { // pass through if on development
+  staticPathMatcher = url => url;
+}
 
 // 3. TASKS
 // - - - - - - - - - - - - - - -
@@ -172,7 +178,7 @@ const sass = () => {
   return src([paths.src + '/stylesheets/main*.scss', paths.src + '/stylesheets/print.scss'])
     .pipe(plugins.prettyerror())
     .pipe(plugins.sass({
-      outputStyle: 'compressed',
+      outputStyle: 'nested',
       includePaths: [
         paths.npm + 'govuk-elements-sass/public/sass/',
         paths.toolkit + 'stylesheets/',
@@ -180,6 +186,11 @@ const sass = () => {
       ]
     }))
     .pipe(plugins.base64('../..'))
+    .pipe(plugins.cssUrlAdjuster({
+      replace: [staticPathMatcher, '/']
+    }))
+    // cssUrlAdjuster outputs uncompressed CSS so we need to perform the compression here
+    .pipe(plugins.cleanCSS({ compatibility: '*' }))
     .pipe(dest(paths.dist + 'stylesheets/'))
 };
 
