@@ -68,10 +68,24 @@ MockRecipients = namedtuple(
             ]
         ),
         (
+            {}, {}, {3, 12}, [],
+            'sms',
+            [
+                'shorten your messages in 2 rows'
+            ]
+        ),
+        (
             {}, {}, {}, {2},
             'sms',
             [
                 'add content to empty message in 1 row'
+            ]
+        ),
+        (
+            {}, {}, {}, {2, 4, 8},
+            'sms',
+            [
+                'add content to empty messages in 3 rows'
             ]
         ),
     ]
@@ -82,6 +96,8 @@ def test_get_errors_for_csv(
     expected_errors
 ):
     assert get_errors_for_csv(
-        MockRecipients(rows_with_bad_recipients, rows_with_missing_data, rows_with_message_too_long, rows_with_empty_message),
+        MockRecipients(
+            rows_with_bad_recipients, rows_with_missing_data, rows_with_message_too_long, rows_with_empty_message
+        ),
         template_type
     ) == expected_errors
