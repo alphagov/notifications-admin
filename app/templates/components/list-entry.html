@@ -28,7 +28,7 @@
         {% for index in range(0, field.entries|length) %}
           <div class="list-entry">
             <label for="input-{{ field.name }}-{{ index }}" class="text-box-number-label">
-              <span class="visuallyhidden">{{ item_name }} number </span>{{ index + 1 }}.
+              <span class="govuk-visually-hidden">{{ item_name }} number </span>{{ index + 1 }}.
             </label>
             <input
               type="text"

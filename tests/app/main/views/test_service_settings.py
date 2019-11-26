@@ -1187,8 +1187,8 @@ def test_non_gov_user_is_told_they_cant_go_live(
     assert normalize_spaces(page.select_one('main p').text) == (
         'Only team members with a government email address can request to go live.'
     )
-    assert page.select('form') == []
-    assert page.select('button') == []
+    assert len(page.select('form')) == 0
+    assert len(page.select('button')) == 1
 
 
 @pytest.mark.parametrize('consent_to_research, displayed_consent', (

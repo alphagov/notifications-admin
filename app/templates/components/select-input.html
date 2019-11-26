@@ -43,7 +43,7 @@
     {% endif %}
     <fieldset id="{{ field.id }}" {% if inline %}class="inline"{% endif %}>
       <legend class="{{ 'form-label' if not hide_legend else '' }}{% if legend_style != 'text' %} {{ legend_style }}{% endif %}">
-        {% if hide_legend %}<span class="visually-hidden">{% endif %}
+        {% if hide_legend %}<span class="govuk-visually-hidden">{% endif %}
           {{ field.label.text|safe }}
         {% if hide_legend %}</span>{% endif %}
         {% if hint %}

@@ -227,10 +227,9 @@ def test_notification_page_shows_page_for_letter_notification(
     letter_images = page.select('main img')
 
     assert len(letter_images) == count_of_pages
-
-    for index in range(1, count_of_pages + 1):
+    for index in range(count_of_pages):
         assert page.select('img')[index]['src'].endswith(
-            '.png?page={}'.format(index)
+            '.png?page={}'.format(index + 1)
         )
 
     assert len(mock_page_count.call_args_list) == 1

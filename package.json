@@ -21,15 +21,16 @@
   "dependencies": {
     "@babel/core": "7.4.0",
     "@babel/preset-env": "7.4.2",
+    "del": "5.1.0",
     "diff-dom": "2.5.1",
     "govuk-elements-sass": "3.1.2",
     "govuk-frontend": "2.13.0",
     "govuk_frontend_toolkit": "8.1.0",
-    "govuk_template_jinja": "0.24.1",
     "gulp": "4.0.0",
     "gulp-add-src": "1.0.0",
     "gulp-babel": "8.0.0",
     "gulp-base64-inline": "1.0.4",
+    "gulp-better-rollup": "4.0.1",
     "gulp-concat": "2.6.1",
     "gulp-include": "2.3.1",
     "gulp-sass": "4.0.2",
@@ -37,6 +38,8 @@
     "hogan": "1.0.2",
     "jquery": "3.4.1",
     "query-command-supported": "1.0.0",
+    "rollup": "1.23.1",
+    "streamqueue": "1.1.2",
     "textarea-caret": "3.1.0",
     "timeago": "1.6.5"
   },
@@ -47,6 +50,8 @@
     "gulp-sass-lint": "1.4.0",
     "jest": "24.7.1",
     "jshint": "2.10.2",
-    "jshint-stylish": "2.2.1"
+    "jshint-stylish": "2.2.1",
+    "rollup-plugin-commonjs": "10.1.0",
+    "rollup-plugin-node-resolve": "5.2.0"
   }
 }

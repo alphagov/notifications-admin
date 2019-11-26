@@ -18,7 +18,7 @@ Create an account
       <div class="extra-tracking">
         {{ textbox(form.mobile_number, width='3-4', hint='We’ll send you a security code by text message') }}
       </div>
-      <input class="visually-hidden" aria-hidden="true" tabindex="-1" id="defeat-chrome-autocomplete">
+      <input class="govuk-visually-hidden" aria-hidden="true" tabindex="-1" id="defeat-chrome-autocomplete">
       {{ textbox(form.password, hint="At least 8 characters", width='3-4', autocomplete='new-password') }}
       {{form.auth_type}}
       {{ page_footer("Continue") }}

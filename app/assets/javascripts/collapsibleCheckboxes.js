@@ -53,7 +53,7 @@
   }
   Footer.prototype.buttonContent = {
     change: (fieldLabel) => `Choose ${fieldLabel}s`,
-    done: (fieldLabel) => `Done<span class="visuallyhidden"> choosing ${fieldLabel}s</span>`
+    done: (fieldLabel) => `Done<span class="govuk-visually-hidden"> choosing ${fieldLabel}s</span>`
   };
   Footer.prototype.getEl = function (expanded) {
     const buttonState = expanded ? 'done' : 'change';
@@ -118,7 +118,7 @@
     this.$heading = $(`<h${headingLevel} class="heading-small">${this.legendText}</h${headingLevel}>`);
     this.$fieldset.before(this.$heading);
 
-    this.$fieldset.find('legend').addClass('visuallyhidden');
+    this.$fieldset.find('legend').addClass('govuk-visually-hidden');
   };
   CollapsibleCheckboxes.prototype.expand = function(e) {
     if (e !== undefined) { e.preventDefault(); }

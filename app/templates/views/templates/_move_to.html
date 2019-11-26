@@ -15,7 +15,7 @@
     </div>
     <div id="move_to_new_folder_form">
       <fieldset class="js-will-stick-at-bottom-when-scrolling">
-        <legend class="visuallyhidden">Add to new folder</legend>
+        <legend class="govuk-visually-hidden">Add to new folder</legend>
         {{ textbox(templates_and_folders_form.move_to_new_folder_name, width='1-1') }}
         {{ page_footer('Add to new folder', button_name='operation', button_value='move-to-new-folder') }}
       </fieldset>
@@ -23,7 +23,7 @@
   {% endif %}
   <div id="add_new_folder_form">
     <fieldset class="js-will-stick-at-bottom-when-scrolling">
-      <legend class="visuallyhidden">Add new folder</legend>
+      <legend class="govuk-visually-hidden">Add new folder</legend>
       {{ textbox(templates_and_folders_form.add_new_folder_name, width='1-1') }}
       {{ page_footer('Add new folder', button_name='operation', button_value='add-new-folder') }}
     </fieldset>
@@ -36,7 +36,7 @@
     {{ page_footer('Continue', button_name='operation', button_value='add-new-template') }}
     </div>
   </div>
-  <div class="selection-counter visuallyhidden" role="status" aria-live="polite">
+  <div class="selection-counter govuk-visually-hidden" role="status" aria-live="polite">
     Nothing selected
   </div>
 </div>
