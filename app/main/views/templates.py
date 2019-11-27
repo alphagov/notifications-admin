@@ -603,21 +603,17 @@ def edit_service_template(service_id, template_id):
 
         new_template = get_template(new_template_data, current_service)
         template_change = get_template(template, current_service).compare_to(new_template)
-        if template_change.placeholders_added and not request.form.get('confirm'):
-            example_column_headings = (
-                first_column_headings[new_template.template_type] + list(new_template.placeholders)
-            )
+
+        if (
+            template_change.placeholders_added and
+            not request.form.get('confirm') and
+            current_service.api_keys
+        ):
             return render_template(
                 'views/templates/breaking-change.html',
                 template_change=template_change,
                 new_template=new_template,
-                column_headings=list(ascii_uppercase[:len(example_column_headings)]),
-                example_rows=[
-                    example_column_headings,
-                    get_example_csv_rows(new_template),
-                    get_example_csv_rows(new_template)
-                ],
-                form=form
+                form=form,
             )
         try:
             service_api_client.update_service_template(

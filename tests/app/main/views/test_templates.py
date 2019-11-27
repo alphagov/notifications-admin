@@ -1328,6 +1328,7 @@ def test_should_redirect_to_one_off_if_template_type_is_letter(
 def test_should_redirect_when_saving_a_template(
     client_request,
     mock_get_service_template,
+    mock_get_api_keys,
     mock_update_service_template,
     fake_uuid,
 ):
@@ -1475,23 +1476,22 @@ def test_should_403_when_create_template_with_process_type_of_priority_for_non_p
     mock_update_service_template.called == 0
 
 
-@pytest.mark.parametrize('template_mock, template_type, expected_paragraphs', [
+@pytest.mark.parametrize('old_content, new_content, expected_paragraphs', [
     (
-        mock_get_service_email_template,
-        "email",
+        "my favourite colour is blue",
+        "my favourite colour is ((colour))",
         [
-            'You removed ((date))',
-            'You added ((name))',
-            'When you send messages using this template you’ll need 3 columns of data:',
+            'You added ((colour))',
+            'Before you send any messages, make sure your API calls include colour.',
         ]
     ),
     (
-        mock_get_service_letter_template,
-        "letter",
+        "hello ((name))",
+        "hello ((first name)) ((middle name)) ((last name))",
         [
-            'You removed ((date))',
-            'You added ((name))',
-            'When you send messages using this template you’ll need 9 columns of data:',
+            'You removed ((name))',
+            'You added ((first name)) ((middle name)) and ((last name))',
+            'Before you send any messages, make sure your API calls include first name, middle name and last name.',
         ]
     ),
 ])
@@ -1499,29 +1499,27 @@ def test_should_show_interstitial_when_making_breaking_change(
     client_request,
     mock_update_service_template,
     mock_get_user_by_email,
+    mock_get_api_keys,
     fake_uuid,
     mocker,
-    template_mock,
-    template_type,
+    new_content,
+    old_content,
     expected_paragraphs,
 ):
-    template_mock(
+    mock_get_service_email_template(
         mocker,
         subject="Your ((thing)) is due soon",
-        content="Your vehicle tax expires on ((date))",
+        content=old_content,
     )
     data = {
         'id': fake_uuid,
         'name': "new name",
-        'template_content': "hello lets talk about ((thing))",
-        'template_type': template_type,
-        'subject': 'reminder \'" <span> & ((name))',
+        'template_content': new_content,
+        'template_type': 'email',
+        'subject': 'reminder \'" <span> & ((thing))',
         'service': SERVICE_ONE_ID,
         'process_type': 'normal'
     }
-
-    if template_type == "letter":
-        data["postage"] = 'None'
 
     page = client_request.post(
         '.edit_service_template',
@@ -1537,13 +1535,14 @@ def test_should_show_interstitial_when_making_breaking_change(
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
     )
-    for index, p in enumerate(expected_paragraphs):
-        assert normalize_spaces(page.select('main p')[index].text) == p
+    assert [
+        normalize_spaces(paragraph.text) for paragraph in page.select('main p')
+    ] == expected_paragraphs
 
     for key, value in {
         'name': 'new name',
-        'subject': 'reminder \'" <span> & ((name))',
-        'template_content': 'hello lets talk about ((thing))',
+        'subject': 'reminder \'" <span> & ((thing))',
+        'template_content': new_content,
         'confirm': 'true'
     }.items():
         assert page.find('input', {'name': key})['value'] == value
@@ -1551,7 +1550,7 @@ def test_should_show_interstitial_when_making_breaking_change(
     # BeautifulSoup returns the value attribute as unencoded, let’s make
     # sure that it is properly encoded in the HTML
     assert str(page.find('input', {'name': 'subject'})) == (
-        """<input name="subject" type="hidden" value="reminder '&quot; &lt;span&gt; &amp; ((name))"/>"""
+        """<input name="subject" type="hidden" value="reminder '&quot; &lt;span&gt; &amp; ((thing))"/>"""
     )
 
 
