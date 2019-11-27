@@ -414,7 +414,7 @@ def test_upload_csv_file_with_errors_shows_check_page_with_errors(
 
     assert response.status_code == 200
     content = response.get_data(as_text=True)
-    assert 'There is a problem with invalid.csv' in content
+    assert 'There’s a problem with invalid.csv' in content
     assert '+447700900986' in content
     assert 'Missing' in content
     assert 'Upload your file again' in content
@@ -454,8 +454,8 @@ def test_upload_csv_file_with_empty_message_shows_check_page_with_errors(
 
     assert response.status_code == 200
     content = response.get_data(as_text=True)
-    assert 'There is a problem with invalid.csv' in content
-    assert 'add content to empty message in 1 row' in content
+    assert 'There’s a problem with invalid.csv' in content
+    assert 'check you have content for the empty message in 1 row' in content
 
 
 @pytest.mark.parametrize('file_contents, expected_error,', [
@@ -528,8 +528,8 @@ def test_upload_csv_file_with_empty_message_shows_check_page_with_errors(
             +447700900986, example
         """,
         (
-            'There is a problem with invalid.csv '
-            'You need to enter missing data in 1 row '
+            'There’s a problem with invalid.csv '
+            'You need to enter missing data in 1 row. '
             'Skip to file contents'
         )
     ),
@@ -541,8 +541,8 @@ def test_upload_csv_file_with_empty_message_shows_check_page_with_errors(
             +447700900986, example
         """,
         (
-            'There is a problem with invalid.csv '
-            'You need to enter missing data in 1 row '
+            'There’s a problem with invalid.csv '
+            'You need to enter missing data in 1 row. '
             'Skip to file contents'
         )
     ),
@@ -2893,8 +2893,8 @@ def test_check_messages_shows_data_errors_before_trial_mode_errors_for_letters(
     )
 
     assert normalize_spaces(page.select_one('.banner-dangerous').text) == (
-        'There is a problem with example.xlsx '
-        'You need to enter missing data in 2 rows '
+        'There’s a problem with example.xlsx '
+        'You need to enter missing data in 2 rows. '
         'Skip to file contents'
     )
     assert not page.select('.table-field-index a')

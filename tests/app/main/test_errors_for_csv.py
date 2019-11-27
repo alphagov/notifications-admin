@@ -64,28 +64,28 @@ MockRecipients = namedtuple(
             {}, {}, {3}, [],
             'sms',
             [
-                'shorten your message in 1 row'
+                'shorten the message in 1 row'
             ]
         ),
         (
             {}, {}, {3, 12}, [],
             'sms',
             [
-                'shorten your messages in 2 rows'
+                'shorten the messages in 2 rows'
             ]
         ),
         (
             {}, {}, {}, {2},
             'sms',
             [
-                'add content to empty message in 1 row'
+                'check you have content for the empty message in 1 row'
             ]
         ),
         (
             {}, {}, {}, {2, 4, 8},
             'sms',
             [
-                'add content to empty messages in 3 rows'
+                'check you have content for the empty messages in 3 rows'
             ]
         ),
     ]

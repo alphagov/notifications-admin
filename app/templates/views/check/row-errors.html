@@ -25,10 +25,10 @@
     {% call banner_wrapper(type='dangerous') %}
       {% if row_errors|length == 1 %}
         <h1 class='banner-title' data-module="track-error" data-error-type="Bad rows" data-error-label="{{ upload_id }}">
-          There is a problem with {{ original_file_name }}
+          There’s a problem with {{ original_file_name }}
         </h1>
         <p>
-          You need to {{ row_errors[0] }}
+          You need to {{ row_errors[0] }}.
         </p>
       {% else %}
         <h1 class='banner-title' data-module="track-error" data-error-type="Bad rows" data-error-label="{{ upload_id }}">

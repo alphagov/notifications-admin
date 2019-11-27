@@ -134,16 +134,18 @@ def get_errors_for_csv(recipients, template_type):
     if any(recipients.rows_with_message_too_long):
         number_of_rows_with_message_too_long = len(list(recipients.rows_with_message_too_long))
         if 1 == number_of_rows_with_message_too_long:
-            errors.append("shorten your message in 1 row")
+            errors.append("shorten the message in 1 row")
         else:
-            errors.append("shorten your messages in {} rows".format(number_of_rows_with_message_too_long))
+            errors.append("shorten the messages in {} rows".format(number_of_rows_with_message_too_long))
 
     if any(recipients.rows_with_empty_message):
         number_of_rows_with_empty_message = len(list(recipients.rows_with_empty_message))
         if 1 == number_of_rows_with_empty_message:
-            errors.append("add content to empty message in 1 row")
+            errors.append("check you have content for the empty message in 1 row")
         else:
-            errors.append("add content to empty messages in {} rows".format(number_of_rows_with_empty_message))
+            errors.append("check you have content for the empty messages in {} rows".format(
+                number_of_rows_with_empty_message
+            ))
 
     return errors
 
