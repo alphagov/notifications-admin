@@ -42,6 +42,9 @@ input[type="search"]::-webkit-search-decoration {
 // To be removed when all links follow the GOV.UK Frontend conventions:
 // https://design-system.service.gov.uk/styles/typography/#links
 a {
+  /* Give a strong clear visual idea as to what is currently in focus */
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0.3);
+
   &:link {
     color: $link-colour;
   }
@@ -56,6 +59,16 @@ a {
 
   &:active {
     color: $link-active-colour;
+  }
+
+  &:focus {
+    background-color: $focus-colour;
+    outline: 3px solid $focus-colour;
+  }
+
+  /* Make links slightly darker when focused to improve contrast. */
+  &:link:focus {
+    color: darken( $link-colour, 2.5%)
   }
 }
 
