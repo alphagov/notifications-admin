@@ -1,0 +1,9 @@
+// Extends footer column styles to allow 4 columns
+@include mq ($from: desktop) {
+  .govuk-footer__list--columns-4 {
+    // TODO: Move support for legacy properties to something like Post-CSS's auto-prefixer
+    -webkit-column-count: 4;
+    -moz-column-count: 4;
+    column-count: 4;
+  }
+}

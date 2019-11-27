@@ -14,7 +14,7 @@
 
   <div class="dashboard">
 
-    <h1 class="visuallyhidden">Dashboard</h1>
+    <h1 class="govuk-visually-hidden">Dashboard</h1>
     {% if current_user.has_permissions('manage_templates') and not current_service.all_templates %}
       {% include 'views/dashboard/write-first-messages.html' %}
     {% endif %}

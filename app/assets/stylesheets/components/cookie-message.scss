@@ -1,0 +1,8 @@
+.notify-cookie-message {
+  @include govuk-font($size: 16);
+  padding: govuk-spacing(3) 0;
+
+  .js-enabled & {
+    display: none;
+  }
+}

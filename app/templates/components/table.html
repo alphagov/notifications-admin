@@ -2,7 +2,7 @@
 
 {% macro mapping_table(caption='', field_headings=[], field_headings_visible=True, caption_visible=True, equal_length=False) -%}
   <table class="table table-font-xsmall">
-    <caption class="heading-medium table-heading{{ ' visuallyhidden' if not caption_visible}}">
+    <caption class="heading-medium table-heading{{ ' govuk-visually-hidden' if not caption_visible}}">
       {{ caption }}
     </caption>
     <thead class="table-field-headings{% if field_headings_visible %}-visible{% endif %}">
@@ -12,7 +12,7 @@
             {% if field_headings_visible %}
               {{ field_heading }}
             {% else %}
-              <span class="visuallyhidden">{{ field_heading }}</span>
+              <span class="govuk-visually-hidden">{{ field_heading }}</span>
             {% endif %}
           </th>
         {% endfor %}
@@ -138,7 +138,7 @@
 {%- endmacro %}
 
 {% macro hidden_field_heading(text) %}
-  <span class="visuallyhidden">{{ text }}</span>
+  <span class="govuk-visually-hidden">{{ text }}</span>
 {%- endmacro %}
 
 

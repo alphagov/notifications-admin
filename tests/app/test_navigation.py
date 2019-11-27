@@ -124,7 +124,7 @@ def test_a_page_should_nave_selected_header_navigation_item(
     selected_nav_item,
 ):
     page = client_request.get(endpoint, service_id=SERVICE_ONE_ID)
-    selected_nav_items = page.select('#proposition-links a.active')
+    selected_nav_items = page.select('.govuk-header__navigation-item--active')
     assert len(selected_nav_items) == 1
     assert selected_nav_items[0].text.strip() == selected_nav_item
 
@@ -179,7 +179,7 @@ def test_caseworkers_get_caseworking_navigation(
         return_value=active_caseworking_user(fake_uuid)
     )
     page = client_request.get('main.choose_template', service_id=SERVICE_ONE_ID)
-    assert normalize_spaces(page.select_one('#content nav').text) == (
+    assert normalize_spaces(page.select_one('header + .govuk-width-container nav').text) == (
         'Templates Sent messages Team members'
     )
 
@@ -197,6 +197,6 @@ def test_caseworkers_see_jobs_nav_if_jobs_exist(
         return_value=active_caseworking_user(fake_uuid)
     )
     page = client_request.get('main.choose_template', service_id=SERVICE_ONE_ID)
-    assert normalize_spaces(page.select_one('#content nav').text) == (
+    assert normalize_spaces(page.select_one('header + .govuk-width-container nav').text) == (
         'Templates Sent messages Uploads Team members'
     )
