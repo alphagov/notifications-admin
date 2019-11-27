@@ -94,14 +94,6 @@ def get_page_count_for_letter(template, values=None):
     return page_count
 
 
-def validate_letter(pdf_file):
-    return requests.post(
-        '{}/precompiled/validate?include_preview=true'.format(current_app.config['TEMPLATE_PREVIEW_API_HOST']),
-        data=pdf_file,
-        headers={'Authorization': 'Token {}'.format(current_app.config['TEMPLATE_PREVIEW_API_KEY'])}
-    )
-
-
 def sanitise_letter(pdf_file):
     return requests.post(
         '{}/precompiled/sanitise'.format(current_app.config['TEMPLATE_PREVIEW_API_HOST']),
