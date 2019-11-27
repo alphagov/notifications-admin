@@ -366,7 +366,7 @@ def test_uploaded_letter_preview_does_not_show_send_button_if_service_in_trial_m
 ):
     mocker.patch('app.main.views.uploads.service_api_client')
     mocker.patch('app.main.views.uploads.get_letter_metadata', return_value={
-        'filename': 'my_letter.pdf', 'page_count': '1', 'status': 'valid'})
+        'filename': 'my_letter.pdf', 'page_count': '1', 'status': 'valid', 'recipient': 'The Queen'})
 
     # client_request uses service_one, which is in trial mode
     page = client_request.get(
@@ -382,6 +382,12 @@ def test_uploaded_letter_preview_does_not_show_send_button_if_service_in_trial_m
 
     assert normalize_spaces(page.find('h1').text) == 'You cannot send this letter'
     assert page.find('div', class_='letter-sent')
+    assert normalize_spaces(
+        page.select_one('.js-stick-at-bottom-when-scrolling p').text
+    ) == (
+        'Recipient: The Queen'
+    )
+    assert not page.find('form')
     assert not page.find('button', {'type': 'submit'})
 
 
