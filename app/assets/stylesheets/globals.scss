@@ -75,3 +75,10 @@ button:focus {
   outline: 3px solid $focus-colour;
   outline-offset: 0;
 }
+
+// To be removed when all buttons follow the GOV.UK Frontend conventions
+// - https://design-system.service.gov.uk/components/button/
+
+button {
+  font-family: $NTA-Light;
+}
