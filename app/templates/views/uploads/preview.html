@@ -15,15 +15,17 @@
 
   {% if status == 'invalid' and message %}
     {% include "partials/check/letter-validation-failed-banner.html" %}
-    <div class="js-stick-at-top-when-scrolling">
-      <div class="form-group">
-        {{ file_upload(
-          re_upload_form.file,
-          action=url_for('main.upload_letter', service_id=current_service.id),
-          button_text='Upload your file again'
-        ) }}
+    <div class="bottom-gutter-1-2">
+      <div class="js-stick-at-top-when-scrolling">
+        <div class="form-group">
+          {{ file_upload(
+            re_upload_form.file,
+            action=url_for('main.upload_letter', service_id=current_service.id),
+            button_text='Upload your file again'
+          ) }}
+        </div>
+        <a href="#content" class="back-to-top-link">Back to top</a>
       </div>
-      <a href="#content" class="back-to-top-link">Back to top</a>
     </div>
   {% elif current_service.trial_mode %}
     {% call banner_wrapper(type='dangerous') %}
