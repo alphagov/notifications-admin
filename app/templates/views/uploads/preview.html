@@ -3,14 +3,28 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/radios.html" import radios %}
+{% from "components/page-header.html" import govuk_back_link %}
+{% from "components/file-upload.html" import file_upload %}
 
 {% block service_page_title %}
   {{ original_filename }}
 {% endblock %}
 
 {% block maincolumn_content %}
+  {{ govuk_back_link(url_for('main.upload_letter', service_id=current_service.id)) }}
+
   {% if status == 'invalid' and message %}
     {% include "partials/check/letter-validation-failed-banner.html" %}
+    <div class="js-stick-at-top-when-scrolling">
+      <div class="form-group">
+        {{ file_upload(
+          re_upload_form.file,
+          action=url_for('main.upload_letter', service_id=current_service.id),
+          button_text='Upload your file again'
+        ) }}
+      </div>
+      <a href="#content" class="back-to-top-link">Back to top</a>
+    </div>
   {% elif current_service.trial_mode %}
     {% call banner_wrapper(type='dangerous') %}
       {% with
@@ -21,8 +35,7 @@
     {% endcall %}
   {% else %}
       {{ page_header(
-        original_filename,
-        back_link=url_for('main.upload_letter', service_id=current_service.id)
+        original_filename
       ) }}
   {% endif %}
 
