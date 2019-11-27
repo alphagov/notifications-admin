@@ -145,6 +145,8 @@ def _get_error_from_upload_form(form_errors):
 @main.route("/services/<uuid:service_id>/preview-letter/<uuid:file_id>")
 @user_has_permissions('send_messages')
 def uploaded_letter_preview(service_id, file_id):
+    re_upload_form = PDFUploadForm()
+
     metadata = get_letter_metadata(service_id, file_id)
     original_filename = metadata.get('filename')
     page_count = metadata.get('page_count')
@@ -186,6 +188,7 @@ def uploaded_letter_preview(service_id, file_id):
         error_code=error_shortcode,
         form=form,
         recipient=recipient,
+        re_upload_form=re_upload_form
     )
 
 
