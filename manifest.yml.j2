@@ -27,6 +27,7 @@ applications:
 
     health-check-type: http
     health-check-http-endpoint: '/_status?simple=true'
+    health-check-invocation-timeout: 10
 
     services:
       - logit-ssl-syslog-drain
