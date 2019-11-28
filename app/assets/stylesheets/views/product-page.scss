@@ -2,6 +2,11 @@
 
   &-intro {
 
+    // The GOV.UK Frontend header component wraps content that is `position: relative`
+    // This changes its z-index position, putting it above the `<main>` section in the stacking order
+    // We need the `<main>` section to be above it, like the default order, so when we apply the
+    // negative margin-top it overlaps the theme bar at the bottom of the header
+    position: relative;
     margin: -10px 0 $gutter * 1.5 0;
     padding: 0 0 $gutter * 2 0;
     background: $govuk-blue;
