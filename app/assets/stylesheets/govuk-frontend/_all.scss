@@ -16,6 +16,7 @@ $govuk-assets-path: "/static/";
 @import 'components/skip-link/_skip-link';
 @import 'components/header/_header';
 @import 'components/footer/_footer';
+@import 'components/back-link/_back-link';
 
 @import "utilities/all";
 @import "overrides/all";
