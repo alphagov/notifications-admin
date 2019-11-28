@@ -168,10 +168,11 @@ describe('FullscreenTable', () => {
       // start module
       window.GOVUK.modules.start();
 
-      // check open was set and unset
-      expect(attributeMock.spies.setAttribute.mock.calls.length).toEqual(2);
+      // check open was set and unset (using removeAttribute)
+      expect(attributeMock.spies.setAttribute.mock.calls.length).toEqual(1);
       expect(attributeMock.spies.setAttribute.mock.calls[0][0]).toEqual('open');
-      expect(attributeMock.spies.setAttribute.mock.calls[1][0]).toEqual('open');
+      expect(attributeMock.spies.removeAttribute.mock.calls.length).toEqual(1);
+      expect(attributeMock.spies.removeAttribute.mock.calls[0][0]).toEqual('open');
 
     });
 

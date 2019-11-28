@@ -10,13 +10,18 @@ class MockAttribute {
 
     _mockAPI() {
 
-        // track calls to get/setAttribute
+        // track calls to get/set/removeAttribute
         this.spies.getAttribute = this._jest.spyOn(this._el, 'getAttribute');
         this.spies.setAttribute = this._jest.spyOn(this._el, 'setAttribute');
+        this.spies.removeAttribute = this._jest.spyOn(this._el, 'removeAttribute');
 
         // proxy calls to legacy getters/setters
-        this.spies.get = this._jest.spyOn(this._el, this._attr, 'get').mockImplementation(() => this._el.getAttribute(this._attr));
-        this.spies.set = this._jest.spyOn(this._el, this._attr, 'set').mockImplementation(value => this._el.setAttribute(this._attr, value));
+        this.spies.get = this._jest.spyOn(this._el, this._attr, 'get').mockImplementation(
+            () => this._el.getAttribute(this._attr)
+        );
+        this.spies.set = this._jest.spyOn(this._el, this._attr, 'set').mockImplementation(
+            value => this._el.setAttribute(this._attr, value)
+        );
 
     }
 
