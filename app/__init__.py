@@ -173,11 +173,7 @@ def create_app(application):
     # make sure we handle unicode correctly
     redis_client.redis_store.decode_responses = True
 
-    from app.main import main as main_blueprint
-    application.register_blueprint(main_blueprint)
-
-    from .status import status as status_blueprint
-    application.register_blueprint(status_blueprint)
+    setup_blueprints(application)
 
     add_template_filters(application)
 
@@ -188,20 +184,10 @@ def create_app(application):
 
 def init_app(application):
     application.after_request(useful_headers_after_request)
-    application.after_request(save_service_or_org_after_request)
+
     application.before_request(load_service_before_request)
     application.before_request(load_organisation_before_request)
     application.before_request(request_helper.check_proxy_header_before_request)
-
-    @application.before_request
-    def make_session_permanent():
-        # this is dumb. You'd think, given that there's `config['PERMANENT_SESSION_LIFETIME']`, that you'd enable
-        # permanent sessions in the config too - but no, you have to declare it for each request.
-        # https://stackoverflow.com/questions/34118093/flask-permanent-session-where-to-define-them
-        # session.permanent is also, helpfully, a way of saying that the session isn't permanent - in that, it will
-        # expire on its own, as opposed to being controlled by the browser's session. Because session is a proxy, it's
-        # only accessible from within a request context, so we need to set this before every request :rolls_eyes:
-        session.permanent = True
 
     @application.context_processor
     def _attach_current_service():
@@ -487,6 +473,19 @@ def load_user(user_id):
     return User.from_id(user_id)
 
 
+def make_session_permanent():
+    """
+    Make sessions permanent. By permanent, we mean "admin app sets when it expires". Normally the cookie would expire
+    whenever you close the browser. With this, the session expiry is set in `config['PERMANENT_SESSION_LIFETIME']`
+    (20 hours) and is refreshed after every request. IE: you will be logged out after twenty hours of inactivity.
+
+    We don't _need_ to set this every request (it's saved within the cookie itself under the `_permanent` flag), only
+    when you first log in/sign up/get invited/etc, but we do it just to be safe. For more reading, check here:
+    https://stackoverflow.com/questions/34118093/flask-permanent-session-where-to-define-them
+    """
+    session.permanent = True
+
+
 def load_service_before_request():
     if '/static/' in request.url:
         _request_ctx_stack.top.service = None
@@ -678,6 +677,38 @@ def register_errorhandlers(application):  # noqa (C901 too complex)
         if current_app.config.get('DEBUG', None):
             raise error
         return _error_response(500)
+
+
+def setup_blueprints(application):
+    """
+    There are three blueprints: status_blueprint, no_cookie_blueprint, and main_blueprint.
+
+    main_blueprint is the default for everything.
+
+    status_blueprint is only for the status page - unauthenticated, unstyled, no cookies, etc.
+
+    no_cookie_blueprint is for subresources (things loaded asynchronously) that we might be concerned are setting
+    cookies unnecessarily and potentially getting in to strange race conditions and overwriting other cookies, as we've
+    seen in the send message flow. Currently, this includes letter template previews, and the iframe from the platform
+    admin email branding preview pages.
+
+    This notably doesn't include the *.json ajax endpoints. If we included them in this, the cookies wouldn't be
+    updated, including the expiration date. If you have a dashboard open and in focus it'll refresh the expiration timer
+    every two seconds, and you will never log out, which is behaviour we want to preserve.
+    """
+    from app.status import status as status_blueprint
+    from app.main import (
+        main as main_blueprint,
+        no_cookie as no_cookie_blueprint
+    )
+
+    main_blueprint.before_request(make_session_permanent)
+    main_blueprint.after_request(save_service_or_org_after_request)
+
+    application.register_blueprint(main_blueprint)
+    # no_cookie_blueprint specifically doesn't have `make_session_permanent` or `save_service_or_org_after_request`
+    application.register_blueprint(no_cookie_blueprint)
+    application.register_blueprint(status_blueprint)
 
 
 def setup_event_handlers():

@@ -61,7 +61,10 @@ class Config(object):
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_NAME = 'notify_admin_session'
     SESSION_COOKIE_SECURE = True
-    SESSION_REFRESH_EACH_REQUEST = True
+    # don't send back the cookie if it hasn't been modified by the request. this means that the expiry time won't be
+    # updated unless the session is changed - but it's generally refreshed by `save_service_or_org_after_request`
+    # every time anyway, except for specific endpoints (png/pdfs generally) where we've disabled that handler.
+    SESSION_REFRESH_EACH_REQUEST = False
     SHOW_STYLEGUIDE = True
     WTF_CSRF_ENABLED = True
     WTF_CSRF_TIME_LIMIT = None
