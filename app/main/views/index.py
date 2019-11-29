@@ -200,7 +200,7 @@ def letter_template():
         filename = 'no-branding'
 
     template = {'subject': '', 'content': ''}
-    image_url = url_for('main.letter_branding_preview_image', filename=filename)
+    image_url = url_for('no_cookie.letter_branding_preview_image', filename=filename)
 
     template_image = str(LetterImageTemplate(
         template,

@@ -773,8 +773,8 @@ def test_should_show_page_template_with_priority_select_if_platform_admin(
 
 @pytest.mark.parametrize('filetype', ['pdf', 'png'])
 @pytest.mark.parametrize('view, extra_view_args', [
-    ('.view_letter_template_preview', {}),
-    ('.view_template_version_preview', {'version': 1}),
+    ('no_cookie.view_letter_template_preview', {}),
+    ('no_cookie.view_template_version_preview', {'version': 1}),
 ])
 def test_should_show_preview_letter_templates(
     view,
@@ -817,7 +817,7 @@ def test_dont_show_preview_letter_templates_for_bad_filetype(
 ):
     resp = logged_in_client.get(
         url_for(
-            '.view_letter_template_preview',
+            'no_cookie.view_letter_template_preview',
             service_id=service_one['id'],
             template_id=fake_uuid,
             filetype='blah'
@@ -842,7 +842,7 @@ def test_letter_branding_preview_image(
         return_value='foo'
     )
     resp = platform_admin_client.get(
-        url_for('.letter_branding_preview_image', filename=original_filename)
+        url_for('no_cookie.letter_branding_preview_image', filename=original_filename)
     )
 
     mocked_preview.assert_called_with(ANY, new_filename)
