@@ -46,7 +46,7 @@
   <p>If a text message is longer than 160 characters (including spaces), it’ll be charged as more than one message:</p>
   <div class="bottom-gutter-3-2">
     {% call mapping_table(
-      caption='Text message pricing for messages containing special characters',
+      caption='Text message pricing',
       field_headings=['Message length', 'Charge'],
       field_headings_visible=True,
       caption_visible=False
@@ -66,14 +66,14 @@
   </div>
   <h3 class="heading-small">Accents and accented characters</h3>
   <p>Some languages, such as Welsh, use accented characters.</p>
-  <p>Text messages containing the following accented characters are charged at the normal rate: à, Ä, ä, É, é, è, ì, ò, Ö, ö, ù, Ü, ü.</p>
-  <p>Using other accents and accented characters can increase the cost of sending text messages.<p>
+  <p>Text messages containing the following accented characters are charged at the normal rate: Ä, É, Ö, Ü, à, ä, é, è, ì, ò, ö, ù, ü.</p>
+  <p>Using other accented characters can increase the cost of sending text messages.<p>
   <details>
     <summary>Accented characters that affect text message charges</summary>
     <div class="bottom-gutter-3-2">
       {% call mapping_table(
         caption='Accented characters that affect text message charges',
-        field_headings=['Letter', 'Description'],
+        field_headings=['Character', 'Description'],
         field_headings_visible=True,
         caption_visible=False
       ) %}
@@ -99,28 +99,28 @@
                 ('Ẁ', 'Capital letter W with grave'),
                 ('Ẅ', 'Capital letter W with dieresis'),
                 ('Ŷ', 'Capital letter Y with circumflex'),
-                ('Y', 'Capital letter Y with acute'),
+                ('Ý', 'Capital letter Y with acute'),
                 ('Ỳ', 'Capital letter Y with grave'),
                 ('Ÿ', 'Capital letter Y with dieresis'),
-                ('â', 'Small letter a with circumflex'),
-                ('á', 'Small letter a with acute'),
-                ('ê', 'Small letter e with circumflex'),
-                ('ë', 'Small letter e with dieresis'),
-                ('î', 'Small letter i with circumflex'),
-                ('í', 'Small letter i with acute'),
-                ('ï', 'Small letter i with dieresis'),
-                ('ô', 'Small letter o with circumflex'),
-                ('ó', 'Small letter o with acute'),
-                ('û', 'Small letter u with circumflex'),
-                ('ú', 'Small letter u with acute'),
-                ('ŵ', 'Small letter w with circumflex'),
-                ('ẃ', 'Small letter w with acute'),
-                ('ẁ', 'Small letter w with grave'),
-                ('ẅ', 'Small letter w with dieresis'),
-                ('ŷ', 'Small letter y with circumflex'),
-                ('ý', 'Small letter y with acute'),
-                ('ỳ', 'Small letter y with grave'),
-                ('ÿ', 'Small letter y with dieresis'),
+                ('â', 'Lower case letter a with circumflex'),
+                ('á', 'Lower case letter a with acute'),
+                ('ê', 'Lower case letter e with circumflex'),
+                ('ë', 'Lower case letter e with dieresis'),
+                ('î', 'Lower case letter i with circumflex'),
+                ('í', 'Lower case letter i with acute'),
+                ('ï', 'Lower case letter i with dieresis'),
+                ('ô', 'Lower case letter o with circumflex'),
+                ('ó', 'Lower case letter o with acute'),
+                ('û', 'Lower case letter u with circumflex'),
+                ('ú', 'Lower case letter u with acute'),
+                ('ŵ', 'Lower case letter w with circumflex'),
+                ('ẃ', 'Lower case letter w with acute'),
+                ('ẁ', 'Lower case letter w with grave'),
+                ('ẅ', 'Lower case letter w with dieresis'),
+                ('ŷ', 'Lower case letter y with circumflex'),
+                ('ý', 'Lower case letter y with acute'),
+                ('ỳ', 'Lower case letter y with grave'),
+                ('ÿ', 'Lower case letter y with dieresis'),
               ] %}
           {% call row() %}
             {{ text_field(letter) }}
@@ -133,7 +133,7 @@
 
   <div class="bottom-gutter-3-2">
     {% call mapping_table(
-      caption='Text message pricing',
+      caption='Pricing for text messages containing accented characters that affect the charges',
       field_headings=['Message length', 'Charge'],
       field_headings_visible=True,
       caption_visible=False
