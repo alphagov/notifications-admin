@@ -37,7 +37,7 @@ def test_should_show_api_page(
     rows = page.find_all('details')
     assert len(rows) == 5
     for row in rows:
-        assert row.find('h3').string.strip() == '07123456789'
+        assert row.select('h3 .govuk-details__summary-text')[0].string.strip() == '07123456789'
 
 
 def test_should_show_api_page_with_lots_of_notifications(
