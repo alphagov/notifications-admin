@@ -70,35 +70,61 @@
   <p>Using other accents and accented characters can increase the cost of sending text messages.<p>
   <details>
     <summary>Accented characters that affect text message charges</summary>
-    <div class="bottom-gutter-3-2" data-module="fullscreen-table">
+    <div class="bottom-gutter-3-2">
       {% call mapping_table(
         caption='Accented characters that affect text message charges',
-        field_headings=['Accent', 'A', 'a', 'E', 'e', 'I', 'i', 'O', 'o', 'U', 'u', 'W', 'w', 'Y', 'y'],
+        field_headings=['Letter', 'Description'],
         field_headings_visible=True,
         caption_visible=False
       ) %}
-        {% for accent, A, a, E, e, I, i, O, o, U, u, W, w, Y, y in [
-          ('Circumflex', 'Â', 'â', 'Ê', 'ê', 'Î', 'î', 'Ô', 'ô', 'Û', 'û', 'Ŵ', 'ŵ', 'Ŷ', 'ŷ'),
-          ('Acute', 'Á', 'á', '', '', 'Í', 'í', 'Ó', 'ó', 'Ú', 'ú', 'Ẃ', 'ẃ', 'Ý', 'ý'),
-          ('Grave', 'À', '', 'È', '', 'Ì', '', 'Ò', '', 'Ù', '', 'Ẁ', 'ẁ', 'Ỳ', 'ỳ'),
-          ('Dieresis', '', '', 'Ë', 'ë', 'Ï', 'ï', '', '', '', '', 'Ẅ', 'ẅ', 'Ÿ', 'ÿ'),
-          ] %}
+        {% for letter, description in [
+                ('Â', 'Capital letter A with circumflex'),
+                ('Á', 'Capital letter A with acute'),
+                ('À', 'Capital letter A with grave'),
+                ('Ê', 'Capital letter E with circumflex'),
+                ('È', 'Capital letter E with grave'),
+                ('Ë', 'Capital letter E with dieresis'),
+                ('Î', 'Capital letter I with circumflex'),
+                ('Í', 'Capital letter I with acute'),
+                ('Ì', 'Capital letter I with grave'),
+                ('Ï', 'Capital letter I with dieresis'),
+                ('Ô', 'Capital letter O with circumflex'),
+                ('Ó', 'Capital letter O with acute'),
+                ('Ò', 'Capital letter O with grave'),
+                ('Û', 'Capital letter U with circumflex'),
+                ('Ú', 'Capital letter U with acute'),
+                ('Ù', 'Capital letter U with grave'),
+                ('Ŵ', 'Capital letter W with circumflex'),
+                ('Ẃ', 'Capital letter W with acute'),
+                ('Ẁ', 'Capital letter W with grave'),
+                ('Ẅ', 'Capital letter W with dieresis'),
+                ('Ŷ', 'Capital letter Y with circumflex'),
+                ('Y', 'Capital letter Y with acute'),
+                ('Ỳ', 'Capital letter Y with grave'),
+                ('Ÿ', 'Capital letter Y with dieresis'),
+                ('â', 'Small letter a with circumflex'),
+                ('á', 'Small letter a with acute'),
+                ('ê', 'Small letter e with circumflex'),
+                ('ë', 'Small letter e with dieresis'),
+                ('î', 'Small letter i with circumflex'),
+                ('í', 'Small letter i with acute'),
+                ('ï', 'Small letter i with dieresis'),
+                ('ô', 'Small letter o with circumflex'),
+                ('ó', 'Small letter o with acute'),
+                ('û', 'Small letter u with circumflex'),
+                ('ú', 'Small letter u with acute'),
+                ('ŵ', 'Small letter w with circumflex'),
+                ('ẃ', 'Small letter w with acute'),
+                ('ẁ', 'Small letter w with grave'),
+                ('ẅ', 'Small letter w with dieresis'),
+                ('ŷ', 'Small letter y with circumflex'),
+                ('ý', 'Small letter y with acute'),
+                ('ỳ', 'Small letter y with grave'),
+                ('ÿ', 'Small letter y with dieresis'),
+              ] %}
           {% call row() %}
-            {{ index_field(accent, table_header=True) }}
-            {{ text_field(A) }}
-            {{ text_field(a) }}
-            {{ text_field(E) }}
-            {{ text_field(e) }}
-            {{ text_field(I) }}
-            {{ text_field(i) }}
-            {{ text_field(O) }}
-            {{ text_field(o) }}
-            {{ text_field(U) }}
-            {{ text_field(u) }}
-            {{ text_field(W) }}
-            {{ text_field(w) }}
-            {{ text_field(Y) }}
-            {{ text_field(y) }}
+            {{ text_field(letter) }}
+            {{ text_field(description) }}
           {% endcall %}
         {% endfor %}
       {% endcall %}
