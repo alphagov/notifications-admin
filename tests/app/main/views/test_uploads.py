@@ -68,7 +68,11 @@ def test_post_upload_letter_redirects_for_valid_file(
     )
     mock_s3 = mocker.patch('app.main.views.uploads.upload_letter_to_s3')
     mocker.patch('app.main.views.uploads.get_letter_metadata', return_value={
-        'filename': 'tests/test_pdf_files/one_page_pdf.pdf', 'page_count': '1', 'status': 'valid', 'recipient': 'The Queen'})
+        'filename': 'tests/test_pdf_files/one_page_pdf.pdf',
+        'page_count': '1',
+        'status': 'valid',
+        'recipient': 'The Queen'
+    })
     mocker.patch('app.main.views.uploads.service_api_client.get_precompiled_template')
 
     service_one['restricted'] = False
@@ -125,7 +129,11 @@ def test_post_upload_letter_shows_letter_preview_for_valid_file(
     mocker.patch('app.main.views.uploads.upload_letter_to_s3')
     mocker.patch('app.main.views.uploads.pdf_page_count', return_value=3)
     mocker.patch('app.main.views.uploads.get_letter_metadata', return_value={
-        'filename': 'tests/test_pdf_files/one_page_pdf.pdf', 'page_count': '3', 'status': 'valid', 'recipient': 'The Queen'})
+        'filename': 'tests/test_pdf_files/one_page_pdf.pdf',
+        'page_count': '3',
+        'status': 'valid',
+        'recipient': 'The Queen'
+    })
     mocker.patch('app.main.views.uploads.service_api_client.get_precompiled_template', return_value=letter_template)
 
     service_one['restricted'] = False

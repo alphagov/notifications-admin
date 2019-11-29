@@ -425,7 +425,10 @@ def service_add_email_reply_to(service_id):
         first_email_address=first_email_address)
 
 
-@main.route("/services/<uuid:service_id>/service-settings/email-reply-to/<uuid:notification_id>/verify", methods=['GET', 'POST'])
+@main.route(
+    "/services/<uuid:service_id>/service-settings/email-reply-to/<uuid:notification_id>/verify",
+    methods=['GET', 'POST']
+)
 @user_has_permissions('manage_service')
 def service_verify_reply_to_address(service_id, notification_id):
     replace = request.args.get('replace', False)

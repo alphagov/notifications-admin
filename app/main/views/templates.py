@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta
 from functools import partial
-from string import ascii_uppercase
 
 from dateutil.parser import parse
 from flask import abort, flash, redirect, render_template, request, url_for
@@ -10,7 +9,6 @@ from notifications_python_client.errors import HTTPError
 from notifications_utils import LETTER_MAX_PAGE_COUNT
 from notifications_utils.formatters import nl2br
 from notifications_utils.pdf import is_letter_too_long
-from notifications_utils.recipients import first_column_headings
 
 from app import (
     current_service,
@@ -29,7 +27,7 @@ from app.main.forms import (
     TemplateAndFoldersSelectionForm,
     TemplateFolderForm,
 )
-from app.main.views.send import get_example_csv_rows, get_sender_details
+from app.main.views.send import get_sender_details
 from app.models.service import Service
 from app.models.template_list import TemplateList, TemplateLists
 from app.template_previews import TemplatePreview, get_page_count_for_letter
@@ -110,7 +108,10 @@ def start_tour(service_id, template_id):
 @main.route("/services/<uuid:service_id>/templates/folders/<uuid:template_folder_id>", methods=['GET', 'POST'])
 @main.route("/services/<uuid:service_id>/templates/<template_type:template_type>", methods=['GET', 'POST'])
 @main.route("/services/<uuid:service_id>/templates/all/folders/<uuid:template_folder_id>", methods=['GET', 'POST'])
-@main.route("/services/<uuid:service_id>/templates/<template_type:template_type>/folders/<uuid:template_folder_id>", methods=['GET', 'POST'])
+@main.route(
+    "/services/<uuid:service_id>/templates/<template_type:template_type>/folders/<uuid:template_folder_id>",
+    methods=['GET', 'POST']
+)
 @user_has_permissions()
 def choose_template(service_id, template_type='all', template_folder_id=None):
     template_folder = current_service.get_template_folder(template_folder_id)
@@ -329,7 +330,9 @@ def _add_template_by_type(template_type, template_folder_id):
 @main.route("/services/<uuid:service_id>/templates/copy")
 @main.route("/services/<uuid:service_id>/templates/copy/from-folder/<uuid:from_folder>")
 @main.route("/services/<uuid:service_id>/templates/copy/from-service/<uuid:from_service>")
-@main.route("/services/<uuid:service_id>/templates/copy/from-service/<uuid:from_service>/from-folder/<uuid:from_folder>")
+@main.route(
+    "/services/<uuid:service_id>/templates/copy/from-service/<uuid:from_service>/from-folder/<uuid:from_folder>"
+)
 @user_has_permissions('manage_templates')
 def choose_template_to_copy(
     service_id,

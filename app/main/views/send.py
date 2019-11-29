@@ -601,7 +601,10 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
 
 
 @main.route("/services/<uuid:service_id>/<uuid:template_id>/check/<uuid:upload_id>", methods=['GET'])
-@main.route("/services/<uuid:service_id>/<uuid:template_id>/check/<uuid:upload_id>/row-<int:row_index>", methods=['GET'])
+@main.route(
+    "/services/<uuid:service_id>/<uuid:template_id>/check/<uuid:upload_id>/row-<int:row_index>",
+    methods=['GET']
+)
 @user_has_permissions('send_messages', restrict_admin_usage=True)
 def check_messages(service_id, template_id, upload_id, row_index=2):
 
