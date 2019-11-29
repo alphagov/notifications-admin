@@ -6,9 +6,8 @@ from unittest.mock import ANY, call
 
 import pyexcel
 import pytest
-import requests_mock
 from bs4 import BeautifulSoup
-from flask import current_app, url_for
+from flask import url_for
 from freezegun import freeze_time
 
 from app.main.views.platform_admin import (
