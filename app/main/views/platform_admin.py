@@ -5,8 +5,6 @@ from datetime import datetime
 
 from flask import abort, flash, redirect, render_template, request, url_for
 from notifications_python_client.errors import HTTPError
-from notifications_utils import LETTER_MAX_PAGE_COUNT
-from requests import RequestException
 
 from app import (
     billing_api_client,
@@ -17,12 +15,11 @@ from app import (
     platform_stats_api_client,
     service_api_client,
 )
-from app.extensions import antivirus_client, redis_client
+from app.extensions import redis_client
 from app.main import main
 from app.main.forms import (
     ClearCacheForm,
     DateFilterForm,
-    PDFUploadForm,
     RequiredDateFilterForm,
     ReturnedLettersForm,
 )
@@ -30,14 +27,11 @@ from app.statistics_utils import (
     get_formatted_percentage,
     get_formatted_percentage_two_dp,
 )
-from app.template_previews import validate_letter
 from app.utils import (
     Spreadsheet,
     generate_next_dict,
     generate_previous_dict,
-    get_letter_validation_error,
     get_page_from_request,
-    user_has_permissions,
     user_is_platform_admin,
 )
 
