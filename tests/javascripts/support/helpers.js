@@ -6,7 +6,6 @@ const elements = require('./helpers/elements.js');
 const rendering = require('./helpers/rendering.js');
 const forms = require('./helpers/forms.js');
 const utilities = require('./helpers/utilities.js');
-const mock_attribute = require('./helpers/mock_attribute.js');
 
 exports.LocationMock = globals.LocationMock;
 exports.triggerEvent = events.triggerEvent;
@@ -23,4 +22,3 @@ exports.WindowMock = rendering.WindowMock;
 exports.ScreenMock = rendering.ScreenMock;
 exports.spyOnFormSubmit = forms.spyOnFormSubmit;
 exports.getFormDataFromPairs = utilities.getFormDataFromPairs;
-exports.MockAttribute = mock_attribute.MockAttribute;

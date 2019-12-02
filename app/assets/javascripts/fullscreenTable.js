@@ -6,13 +6,6 @@
     this.start = function(component) {
 
       this.$component = $(component);
-
-      let $parent = this.$component.parent();
-      let wrappedInClosedDetails = $parent.is('details') && !$parent.attr('open');
-
-      // if wrapped in closed <details> element, open it while initialising the module
-      if (wrappedInClosedDetails) { $parent.attr('open', true); }
-
       this.$table = this.$component.find('table');
       this.nativeHeight = this.$component.innerHeight() + 20; // 20px to allow room for scrollbar
       this.topOffset = this.$component.offset().top;
@@ -30,13 +23,6 @@
         .on('scroll', this.toggleShadows)
         .on('scroll', this.maintainHeight);
 
-      // recalculate height when <details> opens
-      if (wrappedInClosedDetails) {
-        $parent.find('summary').on('click', (e) => {
-          if (!$parent[0].open) { this.maintainHeight(); }
-        });
-      }
-
       if (
         window.GOVUK.stickAtBottomWhenScrolling &&
         window.GOVUK.stickAtBottomWhenScrolling.recalculate
@@ -45,8 +31,6 @@
       }
 
       this.maintainWidth();
-
-      if (wrappedInClosedDetails) { $parent.attr('open', false); }
 
     };
 
@@ -96,7 +80,7 @@
 
       this.$scrollableTable
         .css({
-            'width': this.$component.parent().width() - indexColumnWidth,
+            'width': this.$component.parent('main').width() - indexColumnWidth,
             'margin-left': indexColumnWidth
         });
 

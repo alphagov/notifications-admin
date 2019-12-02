@@ -81,16 +81,10 @@
   </th>
 {%- endmacro %}
 
-{% macro index_field(text=None, table_header=False) -%}
-  {% if table_header %}
-    <th scope="row" class="table-field-index">
-      {{ text if text != None else caller()  }}
-    </th>
-  {% else %}
-    <td class="table-field-index">
-      {{ text if text != None else caller()  }}
-    </td>
-  {% endif %}
+{% macro index_field(text=None) -%}
+  <td class="table-field-index">
+    {{ text if text != None else caller()  }}
+  </td>
 {%- endmacro %}
 
 {% macro text_field(text, status='', truncate=false) -%}
