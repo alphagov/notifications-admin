@@ -23,6 +23,7 @@ var/
 .installed.cfg
 *.egg
 venv/
+app/version.py
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -62,6 +63,7 @@ target/
 .vscode
 
 # Frontend dependencies and compiled assets
+app/static
 app/assets/stylesheets/govuk_template/.sass-cache/
 .sass-cache/
 cache/
