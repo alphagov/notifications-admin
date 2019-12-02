@@ -3,12 +3,12 @@
 {% from "components/sub-navigation.html" import sub_navigation %}
 
 {% block per_page_title %}
-  Get started
+  Guidance
 {% endblock %}
 
 {% block content_column_content %}
 
-  <h1 class="heading-large">Get started</h1>
+  <h1 class="heading-large">Guidance</h1>
 
   <p>This guidance is for teams using GOV.UK Notify to send emails, text messages and letters.</p>
 
