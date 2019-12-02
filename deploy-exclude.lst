@@ -9,3 +9,4 @@ target/*
 venv/*
 .envrc
 .cf/*
+.pytest_cache/*
