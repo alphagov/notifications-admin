@@ -117,3 +117,60 @@
     margin-right: 15px;
   }
 }
+
+.inline-stacked-label {
+
+}
+
+.radio-slider {
+
+  border-bottom: 2px solid $black;
+  height: 18px;
+  margin-bottom: 18px + 30px;
+  margin-right: -18px;
+  margin-left: -18px;
+  white-space: nowrap;
+
+  legend {
+    display: none;
+  }
+
+  .multiple-choice {
+
+    display: inline-block;
+    margin-right: 0;
+    padding: 0;
+    width: 38px;
+    margin-right: calc((100% - (38px * 11)) / 10);
+
+    &:last-child {
+      margin-right: 0;
+    }
+
+    label {
+
+      font-size: 0;
+      padding: 0;
+
+      &:before {
+        background: $white;
+      }
+
+    }
+
+  }
+
+  &-left-value {
+    position: absolute;
+    bottom: 30px;
+    left: 0;
+  }
+
+  &-right-value {
+    position: absolute;
+    bottom: 30px;
+    right: 0;
+    text-align: right;
+  }
+
+}

@@ -3,6 +3,7 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
+{% from "components/radios.html" import radios %}
 
 {% block per_page_title %}
   Text message providers
@@ -12,8 +13,39 @@
 
   {{ page_header('Text message providers') }}
 
-  {% call form_wrapper() %}
-  {% endcall %}
+
+  <h2 class="heading-small top-gutter">
+    Now
+  </h2>
+  <div class="bottom-gutter">
+    <div class="history-list-item">
+      <div class="grid-row">
+        <div class="column-one-third">&nbsp;</div>
+        <div class="column-two-thirds">
+          <div class="history-list-percentage-without-border">
+            <div class="history-list-percentage-left-label">
+              MMG
+            </div>
+            <div class="history-list-percentage-right-label">
+              Firetext
+            </div>
+            {% call form_wrapper() %}
+              <div class="radio-slider" data-module="radio-slider">
+                {{ radios(form.ratio, inline=True, hide_legend=True) }}
+                <div class="radio-slider-left-value">
+                  —
+                </div>
+                <div class="radio-slider-right-value">
+                  —
+                </div>
+              </div>
+              {{ page_footer('Update', centered_button=True) }}
+            {% endcall %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
 
   {% for day, versions in versions %}

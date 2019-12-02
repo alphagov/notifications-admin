@@ -7,7 +7,7 @@ from werkzeug.utils import redirect
 
 from app import format_date_numeric, provider_client
 from app.main import main
-from app.main.forms import ProviderForm
+from app.main.forms import ProviderForm, ProviderRatioForm
 from app.utils import user_is_platform_admin
 
 PROVIDER_PRIORITY_MEANING_SWITCHOVER = datetime(2019, 11, 29, 11, 0)
@@ -67,12 +67,19 @@ def edit_sms_provider_ratio():
         if provider['notification_type'] == 'sms'
     ], key=itemgetter('identifier'), reverse=True)
 
+    form = ProviderRatioForm(ratio=providers[0]['priority'])
+
+    if form.validate_on_submit():
+        provider_client.update_provider(providers[0]['id'], form.percentage_left)
+        provider_client.update_provider(providers[1]['id'], form.percentage_right)
+
     if len(providers) < 2:
         abort(400)
 
     return render_template(
         'views/providers/edit-sms-provider-ratio.html',
         versions=_chunk_versions_by_day(_get_versions(providers[0], providers[1])),
+        form=form,
     )
 
 

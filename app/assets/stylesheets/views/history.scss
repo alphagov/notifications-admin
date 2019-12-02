@@ -15,6 +15,10 @@ $item-top-padding: $gutter-half;
       border-bottom: 1px solid $border-colour;
     }
 
+    .page-footer {
+      margin-bottom: 5px;
+    }
+
   }
 
   &-user {
@@ -31,7 +35,7 @@ $item-top-padding: $gutter-half;
     $axis-thickness: 2px;
     border-bottom: $axis-thickness solid $black;
     position: relative;
-    margin-bottom: 30px;
+    margin-bottom: 35px;
     height: 35px;
 
     &:before,
@@ -48,6 +52,11 @@ $item-top-padding: $gutter-half;
     &:after {
       left: auto;
       right: 0;
+    }
+
+    &-without-border {
+      position: relative;
+      padding-top: 35px;
     }
 
     &-marker {
