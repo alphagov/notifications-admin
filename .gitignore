@@ -23,7 +23,6 @@ var/
 .installed.cfg
 *.egg
 venv/
-app/version.py
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -63,14 +62,12 @@ target/
 .vscode
 
 # Frontend dependencies and compiled assets
-app/static
 app/assets/stylesheets/govuk_template/.sass-cache/
 .sass-cache/
 cache/
 node_modules
 bower_components
 npm-debug.log
-app/templates/vendor
 
 environment.sh
 .envrc
@@ -78,3 +75,8 @@ environment.sh
 # CloudFoundry
 .cf
 package-lock.json
+
+# Files/folders created by build so not present in .cfignore
+app/version.py
+app/static
+app/templates/vendor
