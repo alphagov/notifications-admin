@@ -22,13 +22,13 @@
     <li>add branding and customisation</li>
   </ul>
   
-  <h2 class="heading-medium">Create and send messages</h2>
+  <h2 class="heading-medium" id="create-and-send-messages">Create and send messages</h2>
   
   <p><a href="{{ url_for('main.register') }}">Create an account</a> to see a short tutorial explaining how to create and send messages.</p>
   
-  <h2 class="heading-medium">Edit and format messages</h2>
+  <h2 class="heading-medium id="edit-and-format-messages"">Edit and format messages</h2>
   
-  <h3 class="heading-small">Formatting</h3>
+  <h3 class="heading-small" id="formatting">Formatting</h3>
 
   <p>You can see a list of formatting instructions on the edit template page:</p>
 
@@ -50,7 +50,7 @@
 
   <p>Notify does not allow bold, italics, subheadings, underlined text, HTML formatting or different fonts. This is because they can make it harder for users to read what you've written.</p>
 
-  <h3 class="heading-small">Links</h3>
+  <h3 class="heading-small" id="links">Links</h3>
   
   <p>When composing an email or text message, write URLs in full and Notify will convert them into links for you.</p>
 
@@ -64,7 +64,7 @@
     <li>you can no longer control where the redirect goes</li>
   </ul>
 
-  <h3 class="heading-small">Personalised content</h3>
+  <h3 class="heading-small" id="personalised-content">Personalised content</h3>
 
   <p>To personalise the content of your messages, add a placeholder to the template.</p>
 
@@ -89,7 +89,7 @@
 
   <p>If you upload a list, the column names need to match the placeholders in your template.</p>
   
-  <h3 class="heading-small">Optional content</h3>
+  <h3 class="heading-small" id="optional-content">Optional content</h3>
   
   <p>To add optional content to your emails and text messages:</p>
   
@@ -112,13 +112,13 @@
 
   <p>You cannot add optional content to a letter.</p>
   
-  <h2 class="heading-medium">Send files by email</h2>
+  <h2 class="heading-medium" id="send-files-by-email">Send files by email</h2>
   
   <p><a href="{{ url_for('.support') }}">Contact us</a> if you want to send files by email.</p>
 
   <p>Follow the instructions to send a file by email in our <a href="{{ url_for('.documentation') }}">API documentation</a>.</p>
   
-  <h2 class="heading-small">Upload your own letters</h2>
+  <h2 class="heading-medium" id="upload-letters">Upload your own letters</h2>
 
   <p>You can upload and send your own letters instead of creating a reusable letter template.</p>
   
@@ -133,9 +133,9 @@
 
   <p>Your file must meet our letter specification.</p>
   
-  <h2 class="heading-medium">Branding and customisation</h2>
+  <h2 class="heading-medium" id="branding">Branding and customisation</h2>
   
-  <h3 class="heading-small">Change email branding</h3>
+  <h3 class="heading-small" id="email-branding">Change email branding</h3>
 
   <p>To change your email branding:</p>
 
@@ -145,7 +145,7 @@
     <li>In the Email settings section, select Change on the Email branding row.</li>
   </ol>
 
-  <h3 class="heading-small">Add a reply-to email address</h3>
+  <h3 class="heading-small" id="reply-to-address">Add a reply-to email address</h3>
   
   <p>Notify lets you choose the email address that users reply to. You must add at least one reply-to address before your service can go live.</p>
 
@@ -159,7 +159,7 @@
     <!--<li>Enter the email address you want to use, and select Add.</li>-->
   </ol>
   
-  <h3 class="heading-small">Change the text message sender</h3>
+  <h3 class="heading-small" id="test-message-sender">Change the text message sender</h3>
   
   <p>The text message sender name tells your users who the message is from.</p>
 
@@ -170,7 +170,7 @@
     <li>Go to the Settings page.</li>
     <li>In the Text message settings section, select Manage on the Text message senders row.</li>
   
-  <h3 class="heading-small">Change letter branding</h3>
+  <h3 class="heading-small" id="letter-branding">Change letter branding</h3>
   
   <p>To change your letter branding:</p>
   
