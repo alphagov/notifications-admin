@@ -68,7 +68,6 @@ cache/
 node_modules
 bower_components
 npm-debug.log
-app/templates/vendor
 
 environment.sh
 .envrc
@@ -76,3 +75,8 @@ environment.sh
 # CloudFoundry
 .cf
 package-lock.json
+
+# Files/folders created by build so not present in .cfignore
+app/version.py
+app/static
+app/templates/vendor
