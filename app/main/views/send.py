@@ -543,6 +543,7 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
     recipients = RecipientCSV(
         contents,
         template_type=template.template_type,
+        template=template,
         placeholders=template.placeholders,
         max_initial_rows_shown=50,
         max_errors_shown=50,
