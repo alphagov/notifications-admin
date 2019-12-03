@@ -10,7 +10,7 @@ from app.main import main
 from app.main.forms import ProviderForm, ProviderRatioForm
 from app.utils import user_is_platform_admin
 
-PROVIDER_PRIORITY_MEANING_SWITCHOVER = datetime(2019, 11, 29, 11, 0)
+PROVIDER_PRIORITY_MEANING_SWITCHOVER = datetime(2019, 11, 29, 11, 0).isoformat()
 
 
 @main.route("/providers")
@@ -69,65 +69,39 @@ def edit_sms_provider_ratio():
 
     form = ProviderRatioForm(ratio=providers[0]['priority'])
 
-    if form.validate_on_submit():
-        provider_client.update_provider(providers[0]['id'], form.percentage_left)
-        provider_client.update_provider(providers[1]['id'], form.percentage_right)
-
     if len(providers) < 2:
         abort(400)
 
+    primary_provider, secondary_provider = providers[0:2]
+
+    if form.validate_on_submit():
+        provider_client.update_provider(primary_provider['id'], form.percentage_left)
+        provider_client.update_provider(secondary_provider['id'], form.percentage_right)
+        return redirect(url_for('.edit_sms_provider_ratio'))
+
     return render_template(
         'views/providers/edit-sms-provider-ratio.html',
-        versions=_chunk_versions_by_day(_get_versions(providers[0], providers[1])),
+        versions=_chunk_versions_by_day(_get_versions_since_switchover(primary_provider['id'])),
         form=form,
+        primary_provider=providers[0]['display_name'],
+        secondary_provider=providers[1]['display_name'],
     )
 
 
-def _get_versions(provider0, provider1):
+def _get_versions_since_switchover(provider_id):
 
-    versions = sorted((
-        provider_client.get_provider_versions(provider0['id'])['data'] +
-        provider_client.get_provider_versions(provider1['id'])['data']
-    ), key=lambda version: version['updated_at'] or '', reverse=True)
+    for version in sorted(
+        provider_client.get_provider_versions(provider_id)['data'],
+        key=lambda version: version['updated_at'] or ''
+    ):
 
-    for index, version in enumerate(versions):
-
-        previous_version = get_previous_version(
-            versions,
-            index,
-            version['identifier'],
-        )
-
-        if (
-            (version['updated_at'] or '0') < str(PROVIDER_PRIORITY_MEANING_SWITCHOVER)
-        ):
-            version['priority'], previous_version['priority'] = (
-                int(version['priority'] > previous_version['priority']),
-                int(version['priority'] <= previous_version['priority'])
-            )
-
-        if version['identifier'] == provider0['identifier']:
-            fresh_version = version.copy()
-            fresh_version['other_provider'] = previous_version.copy()
-            yield fresh_version
-        elif previous_version['identifier'] in {provider0['identifier'], None}:
-            fresh_version = previous_version.copy()
-            fresh_version['other_provider'] = version.copy()
-            yield fresh_version
-
-
-def get_previous_version(versions, start_index, current_provider_identifier):
-    for index, version in enumerate(versions):
-        if index < start_index:
+        if not version['updated_at']:
             continue
-        if current_provider_identifier == version['identifier']:
+
+        if version['updated_at'] < PROVIDER_PRIORITY_MEANING_SWITCHOVER:
             continue
-        return version
-    return {
-        'identifier': None,
-        'priority': 999,
-        'updated_at': None,
-    }
+
+        yield version
 
 
 def _chunk_versions_by_day(versions):
@@ -136,7 +110,7 @@ def _chunk_versions_by_day(versions):
 
     for version in sorted(versions, key=lambda version: version['updated_at'] or '', reverse=True):
         days[
-            format_date_numeric(version['updated_at']) if version['updated_at'] else ''
+            format_date_numeric(version['updated_at'])
         ].append(version)
 
     return sorted(days.items(), reverse=True)
