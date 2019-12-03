@@ -1,5 +1,4 @@
 {% from "components/table.html" import mapping_table, row, text_field, field, row_heading %}
-{% from "components/textbox.html" import textbox %}
 {% from "components/live-search.html" import live_search %}
 
 {% extends "content_template.html" %}
@@ -64,10 +63,76 @@
       {% endfor %}
     {% endcall %}
   </div>
-  <p>Long text messages containing Welsh characters (Â, â, Ê, ê, Î, î, Ô, ô, Û, û, Ŵ, ŵ, Ŷ, and ŷ) are charged differently:</p>
+  <h3 class="heading-small">Accents and accented characters</h3>
+  <p>Some languages, such as Welsh, use accented characters.</p>
+  <p>Text messages containing the following accented characters are charged at the normal rate: Ä, É, Ö, Ü, à, ä, é, è, ì, ò, ö, ù, ü.</p>
+  <p>Using other accented characters can increase the cost of sending text messages.<p>
+  <details>
+    <summary>Accented characters that affect text message charges</summary>
+    <div class="bottom-gutter-3-2">
+      {% call mapping_table(
+        caption='Accented characters that affect text message charges',
+        field_headings=['Character', 'Description'],
+        field_headings_visible=True,
+        caption_visible=False
+      ) %}
+        {% for letter, description in [
+                ('Â', 'Capital letter A with circumflex'),
+                ('Á', 'Capital letter A with acute'),
+                ('À', 'Capital letter A with grave'),
+                ('Ê', 'Capital letter E with circumflex'),
+                ('È', 'Capital letter E with grave'),
+                ('Ë', 'Capital letter E with dieresis'),
+                ('Î', 'Capital letter I with circumflex'),
+                ('Í', 'Capital letter I with acute'),
+                ('Ì', 'Capital letter I with grave'),
+                ('Ï', 'Capital letter I with dieresis'),
+                ('Ô', 'Capital letter O with circumflex'),
+                ('Ó', 'Capital letter O with acute'),
+                ('Ò', 'Capital letter O with grave'),
+                ('Û', 'Capital letter U with circumflex'),
+                ('Ú', 'Capital letter U with acute'),
+                ('Ù', 'Capital letter U with grave'),
+                ('Ŵ', 'Capital letter W with circumflex'),
+                ('Ẃ', 'Capital letter W with acute'),
+                ('Ẁ', 'Capital letter W with grave'),
+                ('Ẅ', 'Capital letter W with dieresis'),
+                ('Ŷ', 'Capital letter Y with circumflex'),
+                ('Ý', 'Capital letter Y with acute'),
+                ('Ỳ', 'Capital letter Y with grave'),
+                ('Ÿ', 'Capital letter Y with dieresis'),
+                ('â', 'Lower case letter a with circumflex'),
+                ('á', 'Lower case letter a with acute'),
+                ('ê', 'Lower case letter e with circumflex'),
+                ('ë', 'Lower case letter e with dieresis'),
+                ('î', 'Lower case letter i with circumflex'),
+                ('í', 'Lower case letter i with acute'),
+                ('ï', 'Lower case letter i with dieresis'),
+                ('ô', 'Lower case letter o with circumflex'),
+                ('ó', 'Lower case letter o with acute'),
+                ('û', 'Lower case letter u with circumflex'),
+                ('ú', 'Lower case letter u with acute'),
+                ('ŵ', 'Lower case letter w with circumflex'),
+                ('ẃ', 'Lower case letter w with acute'),
+                ('ẁ', 'Lower case letter w with grave'),
+                ('ẅ', 'Lower case letter w with dieresis'),
+                ('ŷ', 'Lower case letter y with circumflex'),
+                ('ý', 'Lower case letter y with acute'),
+                ('ỳ', 'Lower case letter y with grave'),
+                ('ÿ', 'Lower case letter y with dieresis'),
+              ] %}
+          {% call row() %}
+            {{ text_field(letter) }}
+            {{ text_field(description) }}
+          {% endcall %}
+        {% endfor %}
+      {% endcall %}
+    </div>
+  </details>
+
   <div class="bottom-gutter-3-2">
     {% call mapping_table(
-      caption='Text message pricing',
+      caption='Pricing for text messages containing accented characters that affect the charges',
       field_headings=['Message length', 'Charge'],
       field_headings_visible=True,
       caption_visible=False
@@ -86,6 +151,7 @@
       {% endfor %}
     {% endcall %}
   </div>
+
   <h3 class="heading-small">Sending text messages to international numbers</h3>
   <p>It might cost more to send text messages to international numbers than UK ones, depending on the country.</p>
   <details>
