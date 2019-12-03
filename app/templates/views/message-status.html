@@ -2,29 +2,21 @@
 {% from "components/table.html" import mapping_table, row, text_field %}
 
 {% block per_page_title %}
-  Message status
+  Delivery status
 {% endblock %}
 
 {% block content_column_content %}
 
-  <h1 class="heading-large">Message status</h1>
+  <h1 class="heading-large">Delivery status</h1>
 
-  <p>When you send a message using GOV.UK Notify, it moves through different states.</p>
-  <p>Notify’s real-time dashboard lets you check the status of any message, to see when it was delivered. You can also use our API to check the status of your messages.</p>
+  <p>Notify’s real-time dashboard lets you check the status of any message, to see when it was delivered.</p>
   <p>For <a href="{{ url_for("main.security") }}">security</a>, this information is only available for 7 days after a message has been sent. You can download a report, including a list of sent messages, for your own records.</p>
+  
+  <p>This page describes the types of message status you’ll see when you’re signed in to Notify.<p>
+    
+  <p>If you’re using our API, some of the statuses you’ll see will be different. Read our <a href="{{ url_for('.documentation') }}">documentation</a> for a list of API message statuses.</p>
 
-  <img
-      src="{{ asset_url('images/message-sending-flow.svg') }}"
-      alt="A picture of the sending flow of messages in Notify, showing the three states of Sending, Delivered and Failed. Also shows the next
-           steps when messages fail, deleting data and trying a new channel for permanent failures, and trying again or trying a new channel for
-           temporary failures"
-      style="width: 100%;"
-  >
-  <h2 id="messagestatus" class="heading-medium">Types of message status</h2>
-  <p>These are the types of message status you’ll see when you’re signed in to Notify.</p>
-  <p>If you’re using our API, some of the statuses you’ll see will be different. Read our <a href="{{ url_for('.documentation') }}">documentation</a> for a detailed list of API message statuses.</p>
-
-  <h3 id="email-statuses" class="heading-small">Emails</h3>
+  <h2 id="email-statuses" class="heading-medium">Emails</h2>
   <div class="bottom-gutter-3-2">
     {% call mapping_table(
       caption='Message statuses – emails',
@@ -46,8 +38,14 @@
       {% endfor %}
     {% endcall %}
   </div>
+  
+  <h3 id="spam" class="heading-small">Spam</h3>
+  <p>If an email is marked as spam, Notify receives a ‘complaint’ from the email provider. We contact you if we receive a complaint about any of your emails. When this happens you should remove the recipient’s email address from your list.</p>
 
-  <h3 id="sms-statuses" class="heading-small">Text messages</h3>
+  <h3 id="open-rates" class="heading-small">Open rates and click-throughs</h3>
+  <p>Notify does not track open rates and click-throughs because there are privacy issues. Tracking emails without asking users for their consent risks breaching General Data Protection Regulations (GDPR).</p>
+
+  <h2 id="sms-statuses" class="heading-medium">Text messages</h3>
   <div class="bottom-gutter-3-2">
     {% call mapping_table(
       caption='Message statuses – text messages',
@@ -71,7 +69,7 @@
     {% endcall %}
   </div>
 
-  <h3 class="heading-small">Letters</h3>
+  <h2 id="letter-statuses" class="heading-medium">Letters</h2>
   <div class="bottom-gutter-3-2">
     {% call mapping_table(
       caption='Message statuses – letters',
@@ -92,5 +90,11 @@
       {% endfor %}
     {% endcall %}
   </div>
+
+  <h3 id="returned-mail" class="heading-small">Undelivered letters and returned mail</h3>
+
+  <p>Every letter we send includes our printer’s address on the back of the envelope. It’s not possible to customise the return address.</p>
+  <p>Returned mail is securely destroyed by our printer.</p>
+  <p>Each letter has a unique ID. Our printer sends us the ID of every letter they destroy. We contact you if the IDs match any of your letters. This is a partly manual process, so it can take a few weeks.</p>
 
 {% endblock %}
