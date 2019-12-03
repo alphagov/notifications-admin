@@ -62,7 +62,8 @@ const copy = {
         'template',
         'skip-link',
         'header',
-        'footer'
+        'footer',
+        'back-link'
       ];
       let done = 0;
 

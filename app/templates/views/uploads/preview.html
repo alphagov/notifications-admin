@@ -3,7 +3,7 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/radios.html" import radios %}
-{% from "components/page-header.html" import govuk_back_link %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
 {% from "components/file-upload.html" import file_upload %}
 
 {% block service_page_title %}
@@ -11,7 +11,7 @@
 {% endblock %}
 
 {% block maincolumn_content %}
-  {{ govuk_back_link(url_for('main.upload_letter', service_id=current_service.id)) }}
+  {{ govukBackLink({ "href": url_for('main.upload_letter', service_id=current_service.id) }) }}
 
   {% if status == 'invalid' and message %}
     {% include "partials/check/letter-validation-failed-banner.html" %}
