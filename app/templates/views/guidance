@@ -28,6 +28,13 @@
   
   <h2 class="heading-medium id="edit-and-format-messages"">Edit and format messages</h2>
   
+  <p>This section explains how to add:</p>
+  <ul class="list list-bullet">
+    <li><a href="#formatting">formatting</a></li>
+    <li><a href="#links">links</a></li>
+    <li><a href="#personalised-content">personalised content</a></li>
+    <li><a href="#optional-content">optional content</a></li>
+  
   <h3 class="heading-small" id="formatting">Formatting</h3>
 
   <p>You can see a list of formatting instructions on the edit template page:</p>
