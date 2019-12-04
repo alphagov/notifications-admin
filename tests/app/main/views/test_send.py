@@ -775,7 +775,7 @@ def test_upload_valid_csv_only_sets_meta_if_filename_known(
     )
 
     client_request.get(
-        'main.check_messages_preview',
+        'no_cookie.check_messages_preview',
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
         upload_id=fake_uuid,
@@ -1992,7 +1992,7 @@ def test_send_test_works_as_letter_preview(
         session['placeholders'] = {'address_line_1': 'Jo Lastname'}
     response = platform_admin_client.get(
         url_for(
-            'main.send_test_preview',
+            'no_cookie.send_test_preview',
             service_id=service_id,
             template_id=template_id,
             filetype=filetype
@@ -2384,7 +2384,7 @@ def test_should_show_preview_letter_message(
 
     response = platform_admin_client.get(
         url_for(
-            'main.check_messages_preview',
+            'no_cookie.check_messages_preview',
             service_id=service_id,
             template_id=fake_uuid,
             upload_id=fake_uuid,
@@ -2412,7 +2412,7 @@ def test_dont_show_preview_letter_templates_for_bad_filetype(
 ):
     resp = logged_in_client.get(
         url_for(
-            'main.check_messages_preview',
+            'no_cookie.check_messages_preview',
             service_id=service_one['id'],
             template_id=fake_uuid,
             upload_id=fake_uuid,
@@ -3130,7 +3130,7 @@ def test_one_off_letters_have_download_link(
     assert len(page.select('.letter img')) == 5
 
     assert page.select_one('a[download]')['href'] == url_for(
-        'main.check_notification_preview',
+        'no_cookie.check_notification_preview',
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
         filetype='pdf',

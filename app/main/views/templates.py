@@ -16,7 +16,7 @@ from app import (
     template_folder_api_client,
     template_statistics_client,
 )
-from app.main import main
+from app.main import main, no_cookie
 from app.main.forms import (
     EmailTemplateForm,
     LetterTemplateForm,
@@ -67,7 +67,7 @@ def view_template(service_id, template_id):
             template,
             current_service,
             letter_preview_url=url_for(
-                '.view_letter_template_preview',
+                'no_cookie.view_letter_template_preview',
                 service_id=service_id,
                 template_id=template_id,
                 filetype='png',
@@ -219,7 +219,7 @@ def get_template_nav_items(template_folder_id):
     ]
 
 
-@main.route("/services/<uuid:service_id>/templates/<uuid:template_id>.<filetype>")
+@no_cookie.route("/services/<uuid:service_id>/templates/<uuid:template_id>.<filetype>")
 @user_has_permissions()
 def view_letter_template_preview(service_id, template_id, filetype):
     if filetype not in ('pdf', 'png'):
@@ -230,7 +230,7 @@ def view_letter_template_preview(service_id, template_id, filetype):
     return TemplatePreview.from_database_object(db_template, filetype, page=request.args.get('page'))
 
 
-@main.route("/templates/letter-preview-image/<filename>")
+@no_cookie.route("/templates/letter-preview-image/<filename>")
 @user_is_platform_admin
 def letter_branding_preview_image(filename):
     template = {
@@ -262,7 +262,7 @@ def _view_template_version(service_id, template_id, version, letters_as_pdf=Fals
         current_service.get_template(template_id, version=version),
         current_service,
         letter_preview_url=url_for(
-            '.view_template_version_preview',
+            'no_cookie.view_template_version_preview',
             service_id=service_id,
             template_id=template_id,
             version=version,
@@ -280,7 +280,7 @@ def view_template_version(service_id, template_id, version):
     )
 
 
-@main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/version/<int:version>.<filetype>")
+@no_cookie.route("/services/<uuid:service_id>/templates/<uuid:template_id>/version/<int:version>.<filetype>")
 @user_has_permissions()
 def view_template_version_preview(service_id, template_id, version, filetype):
     db_template = current_service.get_template(template_id, version=version)
@@ -697,7 +697,7 @@ def delete_service_template(service_id, template_id):
             template,
             current_service,
             letter_preview_url=url_for(
-                '.view_letter_template_preview',
+                'no_cookie.view_letter_template_preview',
                 service_id=service_id,
                 template_id=template['id'],
                 filetype='png',
@@ -719,7 +719,7 @@ def confirm_redact_template(service_id, template_id):
             template,
             current_service,
             letter_preview_url=url_for(
-                '.view_letter_template_preview',
+                'no_cookie.view_letter_template_preview',
                 service_id=service_id,
                 template_id=template_id,
                 filetype='png',
@@ -759,7 +759,7 @@ def view_template_versions(service_id, template_id):
                 template,
                 current_service,
                 letter_preview_url=url_for(
-                    '.view_template_version_preview',
+                    'no_cookie.view_template_version_preview',
                     service_id=service_id,
                     template_id=template_id,
                     version=template['version'],

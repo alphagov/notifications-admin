@@ -12,7 +12,8 @@ class Navigation:
     def __init__(self):
         self.mapping = {
             navigation: {
-                'main.{}'.format(endpoint) for endpoint in endpoints
+                # if not specified, assume endpoints are all in the `main` blueprint.
+                self._get_endpoint_with_blueprint(endpoint) for endpoint in endpoints
             } for navigation, endpoints in self.mapping.items()
         }
 
@@ -26,13 +27,17 @@ class Navigation:
     @property
     def endpoints_without_navigation(self):
         return tuple(
-            'main.{}'.format(endpoint) for endpoint in self.exclude
+            self._get_endpoint_with_blueprint(endpoint) for endpoint in self.exclude
         ) + ('static', 'status.show_status')
 
     def is_selected(self, navigation_item):
         if request.endpoint in self.mapping[navigation_item]:
             return self.selected_attribute
         return ''
+
+    @staticmethod
+    def _get_endpoint_with_blueprint(endpoint):
+        return endpoint if '.' in endpoint else 'main.{}'.format(endpoint)
 
 
 class HeaderNavigation(Navigation):
@@ -141,9 +146,9 @@ class HeaderNavigation(Navigation):
         'check_and_resend_text_code',
         'check_and_resend_verification_code',
         'check_messages',
-        'check_messages_preview',
+        'no_cookie.check_messages_preview',
         'check_notification',
-        'check_notification_preview',
+        'no_cookie.check_notification_preview',
         'choose_account',
         'choose_service',
         'choose_template',
@@ -201,7 +206,7 @@ class HeaderNavigation(Navigation):
         'information_security',
         'invite_org_user',
         'invite_user',
-        'letter_branding_preview_image',
+        'no_cookie.letter_branding_preview_image',
         'letter_template',
         'link_service_to_organisation',
         'manage_org_users',
@@ -243,7 +248,7 @@ class HeaderNavigation(Navigation):
         'send_one_off',
         'send_one_off_step',
         'send_test',
-        'send_test_preview',
+        'no_cookie.send_test_preview',
         'send_test_step',
         'send_uploaded_letter',
         'service_add_email_reply_to',
@@ -313,7 +318,7 @@ class HeaderNavigation(Navigation):
         'view_job_updates',
         'view_jobs',
         'view_letter_notification_as_preview',
-        'view_letter_template_preview',
+        'no_cookie.view_letter_template_preview',
         'view_letter_upload_as_preview',
         'view_notification',
         'view_notification_updates',
@@ -321,7 +326,7 @@ class HeaderNavigation(Navigation):
         'view_notifications_csv',
         'view_template',
         'view_template_version',
-        'view_template_version_preview',
+        'no_cookie.view_template_version_preview',
         'view_template_versions',
         'whitelist',
     }
@@ -363,7 +368,7 @@ class MainNavigation(Navigation):
             'send_one_off',
             'send_one_off_step',
             'send_test',
-            'send_test_preview',
+            'no_cookie.send_test_preview',
             'send_test_step',
             'set_sender',
             'set_template_sender',
@@ -465,8 +470,8 @@ class MainNavigation(Navigation):
         'cancel_letter_job',
         'check_and_resend_text_code',
         'check_and_resend_verification_code',
-        'check_messages_preview',
-        'check_notification_preview',
+        'no_cookie.check_messages_preview',
+        'no_cookie.check_notification_preview',
         'choose_account',
         'choose_service',
         'clear_cache',
@@ -520,7 +525,7 @@ class MainNavigation(Navigation):
         'integration_testing',
         'invite_org_user',
         'letter_branding',
-        'letter_branding_preview_image',
+        'no_cookie.letter_branding_preview_image',
         'live_services',
         'live_services_csv',
         'letter_template',
@@ -611,13 +616,13 @@ class MainNavigation(Navigation):
         'view_job_csv',
         'view_job_updates',
         'view_letter_notification_as_preview',
-        'view_letter_template_preview',
+        'no_cookie.view_letter_template_preview',
         'view_letter_upload_as_preview',
         'view_notification_updates',
         'view_notifications_csv',
         'view_provider',
         'view_providers',
-        'view_template_version_preview',
+        'no_cookie.view_template_version_preview',
     }
 
 
@@ -671,9 +676,9 @@ class CaseworkNavigation(Navigation):
         'check_and_resend_text_code',
         'check_and_resend_verification_code',
         'check_messages',
-        'check_messages_preview',
+        'no_cookie.check_messages_preview',
         'check_notification',
-        'check_notification_preview',
+        'no_cookie.check_notification_preview',
         'choose_account',
         'choose_service',
         'choose_template_to_copy',
@@ -747,7 +752,7 @@ class CaseworkNavigation(Navigation):
         'integration_testing',
         'invite_org_user',
         'invite_user',
-        'letter_branding_preview_image',
+        'no_cookie.letter_branding_preview_image',
         'letter_branding',
         'letter_template',
         'link_service_to_organisation',
@@ -799,7 +804,7 @@ class CaseworkNavigation(Navigation):
         'security',
         'send_messages',
         'send_notification',
-        'send_test_preview',
+        'no_cookie.send_test_preview',
         'send_uploaded_letter',
         'service_add_email_reply_to',
         'service_add_letter_contact',
@@ -892,7 +897,7 @@ class CaseworkNavigation(Navigation):
         'view_job_csv',
         'view_job_updates',
         'view_letter_notification_as_preview',
-        'view_letter_template_preview',
+        'no_cookie.view_letter_template_preview',
         'view_letter_upload_as_preview',
         'view_notification_updates',
         'view_notifications_csv',
@@ -900,7 +905,7 @@ class CaseworkNavigation(Navigation):
         'view_providers',
         'view_template',
         'view_template_version',
-        'view_template_version_preview',
+        'no_cookie.view_template_version_preview',
         'view_template_versions',
         'whitelist',
     }
@@ -966,9 +971,9 @@ class OrgNavigation(Navigation):
         'check_and_resend_text_code',
         'check_and_resend_verification_code',
         'check_messages',
-        'check_messages_preview',
+        'no_cookie.check_messages_preview',
         'check_notification',
-        'check_notification_preview',
+        'no_cookie.check_notification_preview',
         'choose_account',
         'choose_service',
         'choose_template',
@@ -1030,7 +1035,7 @@ class OrgNavigation(Navigation):
         'integration_testing',
         'invite_user',
         'letter_branding',
-        'letter_branding_preview_image',
+        'no_cookie.letter_branding_preview_image',
         'letter_template',
         'link_service_to_organisation',
         'live_services',
@@ -1077,7 +1082,7 @@ class OrgNavigation(Navigation):
         'send_one_off',
         'send_one_off_step',
         'send_test',
-        'send_test_preview',
+        'no_cookie.send_test_preview',
         'send_test_step',
         'send_uploaded_letter',
         'service_add_email_reply_to',
@@ -1176,7 +1181,7 @@ class OrgNavigation(Navigation):
         'view_job_updates',
         'view_jobs',
         'view_letter_notification_as_preview',
-        'view_letter_template_preview',
+        'no_cookie.view_letter_template_preview',
         'view_letter_upload_as_preview',
         'view_notification',
         'view_notification_updates',
@@ -1186,7 +1191,7 @@ class OrgNavigation(Navigation):
         'view_providers',
         'view_template',
         'view_template_version',
-        'view_template_version_preview',
+        'no_cookie.view_template_version_preview',
         'view_template_versions',
         'whitelist',
     }

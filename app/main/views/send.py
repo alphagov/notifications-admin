@@ -34,7 +34,7 @@ from app import (
     notification_api_client,
     service_api_client,
 )
-from app.main import main
+from app.main import main, no_cookie
 from app.main.forms import (
     ChooseTimeForm,
     CsvUploadForm,
@@ -135,7 +135,7 @@ def send_messages(service_id, template_id):
         current_service,
         show_recipient=True,
         letter_preview_url=url_for(
-            '.view_letter_template_preview',
+            'no_cookie.view_letter_template_preview',
             service_id=service_id,
             template_id=template_id,
             filetype='png',
@@ -364,7 +364,7 @@ def send_test_step(service_id, template_id, step_index):
         current_service,
         show_recipient=True,
         letter_preview_url=url_for(
-            '.send_test_preview',
+            'no_cookie.send_test_preview',
             service_id=service_id,
             template_id=template_id,
             filetype='png',
@@ -465,7 +465,7 @@ def send_test_step(service_id, template_id, step_index):
     )
 
 
-@main.route("/services/<uuid:service_id>/send/<uuid:template_id>/test.<filetype>", methods=['GET'])
+@no_cookie.route("/services/<uuid:service_id>/send/<uuid:template_id>/test.<filetype>", methods=['GET'])
 @user_has_permissions('send_messages')
 def send_test_preview(service_id, template_id, filetype):
 
@@ -478,7 +478,7 @@ def send_test_preview(service_id, template_id, filetype):
         db_template,
         current_service,
         letter_preview_url=url_for(
-            '.send_test_preview',
+            'no_cookie.send_test_preview',
             service_id=service_id,
             template_id=template_id,
             filetype='png',
@@ -502,7 +502,7 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
         # errors when we try and unpack in the check_messages route.
         # Rasing a werkzeug.routing redirect means that doesn't happen.
         raise PermanentRedirect(url_for(
-            '.send_messages',
+            'main.send_messages',
             service_id=service_id,
             template_id=template_id
         ))
@@ -529,7 +529,7 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
         current_service,
         show_recipient=True,
         letter_preview_url=url_for(
-            '.check_messages_preview',
+            'no_cookie.check_messages_preview',
             service_id=service_id,
             template_id=template_id,
             upload_id=upload_id,
@@ -556,10 +556,10 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
 
     if request.args.get('from_test'):
         # only happens if generating a letter preview test
-        back_link = url_for('.send_test', service_id=service_id, template_id=template.id)
+        back_link = url_for('main.send_test', service_id=service_id, template_id=template.id)
         choose_time_form = None
     else:
-        back_link = url_for('.send_messages', service_id=service_id, template_id=template.id)
+        back_link = url_for('main.send_messages', service_id=service_id, template_id=template.id)
         choose_time_form = ChooseTimeForm()
 
     if preview_row < 2:
@@ -650,11 +650,11 @@ def check_messages(service_id, template_id, upload_id, row_index=2):
     return render_template('views/check/ok.html', **data)
 
 
-@main.route(
+@no_cookie.route(
     "/services/<uuid:service_id>/<uuid:template_id>/check/<uuid:upload_id>.<filetype>",
     methods=['GET'],
 )
-@main.route(
+@no_cookie.route(
     "/services/<uuid:service_id>/<uuid:template_id>/check/<uuid:upload_id>/row-<int:row_index>.<filetype>",
     methods=['GET'],
 )
@@ -673,7 +673,7 @@ def check_messages_preview(service_id, template_id, upload_id, filetype, row_ind
     return TemplatePreview.from_utils_template(template, filetype, page=page)
 
 
-@main.route(
+@no_cookie.route(
     "/services/<uuid:service_id>/<uuid:template_id>/check.<filetype>",
     methods=['GET'],
 )
@@ -868,7 +868,7 @@ def _check_notification(service_id, template_id, exception=None):
         email_reply_to=email_reply_to,
         sms_sender=sms_sender,
         letter_preview_url=url_for(
-            '.check_notification_preview',
+            'no_cookie.check_notification_preview',
             service_id=service_id,
             template_id=template_id,
             filetype='png',
