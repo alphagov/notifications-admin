@@ -166,7 +166,7 @@
     <!--<li>Enter the email address you want to use, and select Add.</li>-->
   </ol>
   
-  <h3 class="heading-small" id="test-message-sender">Change the text message sender</h3>
+  <h3 class="heading-small" id="text-message-sender">Change the text message sender</h3>
   
   <p>The text message sender name tells your users who the message is from.</p>
 
