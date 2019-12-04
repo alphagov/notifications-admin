@@ -12,6 +12,8 @@ Providers
 
   <h2 class="heading-medium">SMS</h2>
 
+  <a href="{{ url_for('main.edit_sms_provider_ratio') }}">Change priority</a>
+
   {% call(item, row_number) list_table(
       domestic_sms_providers,
       caption="Domestic SMS providers",
@@ -21,7 +23,7 @@ Providers
       field_headings_visible=True
   ) %}
 
-      {{ link_field(item.display_name, url_for('main.view_provider', provider_id=item.id)) }}
+      {{ text_field(item.display_name) }}
 
       {{ text_field(item.priority) }}
 
@@ -36,8 +38,6 @@ Providers
       {% endif %}
 
       {{ optional_text_field(item.created_by_name, default='None') }}
-
-      {{ link_field('change', url_for('main.edit_provider', provider_id=item.id)) }}
 
   {% endcall %}
 
