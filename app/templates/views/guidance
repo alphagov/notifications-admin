@@ -15,11 +15,11 @@
   <p>It includes information about how to:</p>
 
   <ul class="list list-bullet">
-    <li>create and send messages</li>
-    <li>edit and format messages</li>
-    <li>send files by email</li>
-    <li>upload your own letters</li>
-    <li>add branding and customisation</li>
+    <li><a href="#create-and-send-messages">create and send messages</a></li>
+    <li><a href="#edit-and-format-messages">edit and format messages</a></li>
+    <li><a href="#send-files-by-email">send files by email</a></li>
+    <li><a href="#upload-letters">upload your own letters</a></li>
+    <li>add <a href="#branding">branding and customisation</a></li>
   </ul>
   
   <h2 class="heading-medium" id="create-and-send-messages">Create and send messages</h2>
