@@ -26,6 +26,15 @@
   
   <p><a href="{{ url_for('main.register') }}">Create an account</a> to see a short tutorial explaining how to create and send messages.</p>
   
+  <h3 class="heading-small" id="bulk-sending">Bulk sending</h3>
+
+  <p>To send a batch of messages at once:</p>
+  <ol class="list list-number">
+    <li><a href="{{ url_for('.register') }}">Sign in to Notify</a>.</li>
+    <li>Go to the Templates page and choose an existing template.</li>
+    <li>Select Send.</li>
+    <li>If you’re sending emails, select Upload a list of email addresses. If you’re sending text messages, select Upload a list of phone numbers. If you’re sending letters, select Upload a list of addresses.</li>
+  
   <h2 class="heading-medium id="edit-and-format-messages"">Edit and format messages</h2>
   
   <p>This section explains how to add:</p>
