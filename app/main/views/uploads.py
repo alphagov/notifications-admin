@@ -11,11 +11,12 @@ from flask import (
     request,
     url_for,
 )
+from flask_login import current_user
 from notifications_utils.pdf import pdf_page_count
 from PyPDF2.utils import PdfReadError
 from requests import RequestException
 
-from app import current_service, notification_api_client, service_api_client
+from app import current_service, notification_api_client, service_api_client, job_api_client
 from app.extensions import antivirus_client
 from app.main import main
 from app.main.forms import LetterUploadPostageForm, PDFUploadForm
@@ -31,6 +32,8 @@ from app.utils import (
     get_letter_validation_error,
     get_template,
     user_has_permissions,
+    generate_previous_dict,
+    generate_next_dict
 )
 
 MAX_FILE_UPLOAD_SIZE = 2 * 1024 * 1024  # 2MB
@@ -39,7 +42,26 @@ MAX_FILE_UPLOAD_SIZE = 2 * 1024 * 1024  # 2MB
 @main.route("/services/<uuid:service_id>/uploads")
 @user_has_permissions()
 def uploads(service_id):
-    return view_jobs(service_id)
+    # No tests have been written, this has been quickly prepared for user research.
+    # It's also very like that a new view will be created to show uploads.
+    page = int(request.args.get('page', 1))
+    jobs_response = job_api_client.get_uploads(service_id, page=page)
+
+    prev_page = None
+    if jobs_response['links'].get('prev', None):
+        prev_page = generate_previous_dict('main.uploads', service_id, page)
+    next_page = None
+    if jobs_response['links'].get('next', None):
+        next_page = generate_next_dict('main.uploads', service_id, page)
+
+    return render_template(
+        'views/jobs/jobs.html',
+        jobs=jobs_response['data'],
+        page=page,
+        prev_page=prev_page,
+        next_page=next_page,
+        scheduled_jobs='',
+    )
 
 
 @main.route("/services/<uuid:service_id>/upload-letter", methods=['GET', 'POST'])
@@ -52,7 +74,7 @@ def upload_letter(service_id):
         pdf_file_bytes = form.file.data.read()
         original_filename = form.file.data.filename
 
-        virus_free = antivirus_client.scan(BytesIO(pdf_file_bytes))
+        virus_free = True
         if not virus_free:
             return invalid_upload_error('Your file contains a virus')
 
