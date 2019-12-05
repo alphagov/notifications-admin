@@ -76,6 +76,7 @@ class Config(object):
     ROUTE_SECRET_KEY_1 = os.environ.get('ROUTE_SECRET_KEY_1', '')
     ROUTE_SECRET_KEY_2 = os.environ.get('ROUTE_SECRET_KEY_2', '')
     CHECK_PROXY_HEADER = False
+    ANTIVIRUS_ENABLED = True
 
     REDIS_URL = os.environ.get('REDIS_URL')
     REDIS_ENABLED = os.environ.get('REDIS_ENABLED') == '1'
@@ -103,6 +104,7 @@ class Development(Config):
     SECRET_KEY = 'dev-notify-secret-key'
     ANTIVIRUS_API_HOST = 'http://localhost:6016'
     ANTIVIRUS_API_KEY = 'test-key'
+    ANTIVIRUS_ENABLED = os.getenv('ANTIVIRUS_ENABLED') == '1'
 
     ASSET_PATH = '/static/'
 
@@ -123,6 +125,7 @@ class Test(Development):
     TEMPLATE_PREVIEW_API_HOST = 'http://localhost:9999'
     ANTIVIRUS_API_HOST = 'https://test-antivirus'
     ANTIVIRUS_API_KEY = 'test-antivirus-secret'
+    ANTIVIRUS_ENABLED = True
 
     ASSET_DOMAIN = 'static.example.com'
     ASSET_PATH = 'https://static.example.com/'

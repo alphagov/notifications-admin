@@ -52,9 +52,10 @@ def upload_letter(service_id):
         pdf_file_bytes = form.file.data.read()
         original_filename = form.file.data.filename
 
-        virus_free = antivirus_client.scan(BytesIO(pdf_file_bytes))
-        if not virus_free:
-            return invalid_upload_error('Your file contains a virus')
+        if current_app.config['ANTIVIRUS_ENABLED']:
+            virus_free = antivirus_client.scan(BytesIO(pdf_file_bytes))
+            if not virus_free:
+                return invalid_upload_error('Your file contains a virus')
 
         if len(pdf_file_bytes) > MAX_FILE_UPLOAD_SIZE:
             return invalid_upload_error('Your file is too big', 'Files must be smaller than 2MB.')
