@@ -1937,6 +1937,42 @@ def mock_get_jobs(mocker, api_user_active):
 
 
 @pytest.fixture(scope='function')
+def mock_get_uploads(mocker, api_user_active):
+    def _get_jobs(service_id, limit_days=None, statuses=None, page=1):
+        if statuses is None:
+            statuses = ['', 'scheduled', 'pending', 'cancelled', 'finished']
+
+        jobs = [
+            job_json(
+                service_id,
+                api_user_active,
+                original_file_name=filename,
+                scheduled_for=scheduled_for,
+                job_status=job_status,
+                template_version=template_version,
+            )
+            for filename, scheduled_for, job_status, template_version in (
+                ('export 1/1/2016.xls', '', 'finished', 1),
+                ('all email addresses.xlsx', '', 'pending', 1),
+                ('applicants.ods', '', 'finished', 1),
+                ('thisisatest.csv', '', 'finished', 2),
+                ('send_me_later.csv', '2016-01-01 11:09:00.061258', 'scheduled', 1),
+                ('even_later.csv', '2016-01-01 23:09:00.061258', 'scheduled', 1),
+                ('full_of_regret.csv', '2016-01-01 23:09:00.061258', 'cancelled', 1)
+            )
+        ]
+        return {
+            'data': [job for job in jobs if job['job_status'] in statuses],
+            'links': {
+                'prev': 'services/{}/jobs?page={}'.format(service_id, page - 1),
+                'next': 'services/{}/jobs?page={}'.format(service_id, page + 1)
+            }
+        }
+
+    return mocker.patch('app.job_api_client.get_uploads', side_effect=_get_jobs)
+
+
+@pytest.fixture(scope='function')
 def mock_get_notifications(
     mocker,
     api_user_active,

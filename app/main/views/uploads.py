@@ -11,16 +11,19 @@ from flask import (
     request,
     url_for,
 )
-from flask_login import current_user
 from notifications_utils.pdf import pdf_page_count
 from PyPDF2.utils import PdfReadError
 from requests import RequestException
 
-from app import current_service, notification_api_client, service_api_client, job_api_client
+from app import (
+    current_service,
+    job_api_client,
+    notification_api_client,
+    service_api_client,
+)
 from app.extensions import antivirus_client
 from app.main import main
 from app.main.forms import LetterUploadPostageForm, PDFUploadForm
-from app.main.views.jobs import view_jobs
 from app.s3_client.s3_letter_upload_client import (
     get_letter_metadata,
     get_letter_pdf_and_metadata,
@@ -29,11 +32,11 @@ from app.s3_client.s3_letter_upload_client import (
 )
 from app.template_previews import TemplatePreview, sanitise_letter
 from app.utils import (
+    generate_next_dict,
+    generate_previous_dict,
     get_letter_validation_error,
     get_template,
     user_has_permissions,
-    generate_previous_dict,
-    generate_next_dict
 )
 
 MAX_FILE_UPLOAD_SIZE = 2 * 1024 * 1024  # 2MB
@@ -74,7 +77,7 @@ def upload_letter(service_id):
         pdf_file_bytes = form.file.data.read()
         original_filename = form.file.data.filename
 
-        virus_free = True
+        virus_free = antivirus_client.scan(BytesIO(pdf_file_bytes))
         if not virus_free:
             return invalid_upload_error('Your file contains a virus')
 
