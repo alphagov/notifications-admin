@@ -8,12 +8,12 @@
   <div class="govuk-width-container">
     <div class="navigation-service">
       {% if current_user.platform_admin %}
-        <a href="{{ url_for('.organisations') }}" class="navigation-organisation-link">All organisations</a>
+        <a href="{{ url_for('.organisations') }}" class="govuk-link govuk-link--no-visited-state navigation-organisation-link">All organisations</a>
       {% endif %}
       <div class="navigation-service-name">
         {{ current_org.name }}
       </div>
-      <a href="{{ url_for('main.choose_account') }}" class="navigation-service-switch">Switch service</a>
+      <a href="{{ url_for('main.choose_account') }}" class="govuk-link govuk-link--no-visited-state navigation-service-switch">Switch service</a>
     </div>
     <div class="grid-row govuk-!-padding-bottom-12">
       <div class="column-one-quarter">

@@ -22,12 +22,12 @@
       <ul>
         {% if form.email_addresses.errors %}
           <li>
-            <a href="#{{ form.email_addresses.name }}">Enter valid email addresses</a>
+            <a class="govuk-link govuk-link--no-visited-state" href="#{{ form.email_addresses.name }}">Enter valid email addresses</a>
           </li>
         {% endif %}
         {% if form.phone_numbers.errors %}
           <li>
-            <a href="#{{ form.phone_numbers.name }}">Enter valid phone numbers</a>
+            <a class="govuk-link govuk-link--no-visited-state" href="#{{ form.phone_numbers.name }}">Enter valid phone numbers</a>
           </li>
         {% endif %}
       </ul>
@@ -41,7 +41,7 @@
 
   <p>
     You and members of
-    <a href="{{ url_for('main.manage_users', service_id=current_service.id) }}">your team</a>
+    <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.manage_users', service_id=current_service.id) }}">your team</a>
     are included in the whitelist automatically.
   </p>
 

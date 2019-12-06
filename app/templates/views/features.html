@@ -12,13 +12,13 @@
 <p>If you work for central government, a local authority or the NHS, you can use GOV.UK Notify to keep your users updated.</p>
 <p>Notify makes it easy to create, customise and send:</p>
 <ul class="list list-bullet">
-  <li><a href="{{ url_for('main.features_email') }}">emails</a></li>
-  <li><a href="{{ url_for('main.features_sms') }}">text messages</a></li>
-  <li><a href="{{ url_for('main.features_letters') }}">letters</a></li>
+  <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.features_email') }}">emails</a></li>
+  <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.features_sms') }}">text messages</a></li>
+  <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.features_letters') }}">letters</a></li>
 </ul>
 <p>You do not need any technical knowledge to use Notify.</p>
 {% if not current_user.is_authenticated %}
-  <p><a href="{{ url_for('main.register') }}">Create an account</a> for free and try it yourself.</p>
+  <p><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.register') }}">Create an account</a> for free and try it yourself.</p>
 {% endif %}
 
 <h2 class="heading-medium" id="templates">Reusable message templates</h2>
@@ -34,11 +34,11 @@
 
 <h2 class="heading-medium" id="api">API integration</h2>
 <p>You can integrate the Notify API with your web application or back-office system to send messages automatically.</p>
-<p>Read our <a href="{{ url_for('.documentation') }}">API documentation</a> for more information.</p>
+<p>Read our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.documentation') }}">API documentation</a> for more information.</p>
 
 <h2 class="heading-medium" id="reporting">Reporting</h2>
 <p>Notify’s real-time dashboard lets you see the number of messages sent. You can also check the current status of any message to see when it was delivered.</p>
-<p>Read more about the <a href="{{ url_for('main.message_status') }}">delivery status</a> of your messages.</p>
+<p>Read more about the <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.message_status') }}">delivery status</a> of your messages.</p>
 
 <h2 class="heading-medium" id="permissions">Permissions</h2>
 <p>Control which members of your team can see, create, edit and send messages.</p>
@@ -58,7 +58,7 @@
 
 <p>We send messages through several different providers. If one provider fails, Notify switches to another so that your messages are not affected.</p>
 
-<p>Visit GOV.UK Performance to <a href="https://www.gov.uk/performance/govuk-notify">see how Notify is performing</a>.</p>
+<p>Visit GOV.UK Performance to <a class="govuk-link govuk-link--no-visited-state" href="https://www.gov.uk/performance/govuk-notify">see how Notify is performing</a>.</p>
 
 <h2 class="heading-medium" id="security">Security</h2>
 <p>Notify protects and manages data to meet the needs of government services.</p>
@@ -68,10 +68,10 @@
 
 <h3 class="heading-small">Two-factor authentication</h3>
 <p>Notify uses two-factor authentication (2FA) to keep your account secure. When you sign in, we’ll send a unique one-time code to your phone and ask you to enter it before we let you use your account.</p>
-<p>Read more about <a href="{{ url_for('main.security') }}">security</a>.
+<p>Read more about <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.security') }}">security</a>.
 
 <h2 class="heading-medium" id="support">Support</h2>
 <p>Notify provides 24-hour online support. If you have an emergency outside office hours, we’ll reply within 30 minutes.</p>
-<p>Find out more about <a href="{{ url_for('.support') }}">support</a>.</p>
+<p>Find out more about <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.support') }}">support</a>.</p>
 
 {% endblock %}

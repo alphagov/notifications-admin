@@ -22,7 +22,7 @@
         Blank
         {% if current_service.default_letter_contact_block %}
           {% if current_user.has_permissions('manage_service') %}
-            <a class="user-list-edit-link" href="{{ url_for('.service_make_blank_default_letter_contact', service_id =current_service.id) }}">Make default</a>
+            <a class="govuk-link govuk-link--no-visited-state user-list-edit-link" href="{{ url_for('.service_make_blank_default_letter_contact', service_id =current_service.id) }}">Make default</a>
           {% endif %}
         {% else %}
           (default)
@@ -40,7 +40,7 @@
           {% endif %}
         </p>
         {% if current_user.has_permissions('manage_service') %}
-        <a class="user-list-edit-link" href="{{ url_for('.service_edit_letter_contact', service_id =current_service.id, letter_contact_id = item.id) }}">Change</a>
+        <a class="govuk-link govuk-link--no-visited-state user-list-edit-link" href="{{ url_for('.service_edit_letter_contact', service_id =current_service.id, letter_contact_id = item.id) }}">Change</a>
         {% endif %}
         {% if letter_contact_details|length  > 1 %}
           {{ api_key(item.id, thing="ID") }}

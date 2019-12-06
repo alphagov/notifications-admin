@@ -24,7 +24,7 @@
 
     {% if current_user.has_permissions('send_messages') %}
       <p class="sms-message-reply-link">
-        <a href="{{ url_for('.conversation_reply', service_id=current_service.id, notification_id=notification_id) }}">Send a text message to this phone number</a>
+        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.conversation_reply', service_id=current_service.id, notification_id=notification_id) }}">Send a text message to this phone number</a>
       </p>
     {% endif %}
 

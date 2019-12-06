@@ -1,6 +1,6 @@
 {% macro task_list_item(completed, label, link) %}
   <li class="task-list-item">
-    <span aria-describedby="{{ label|id_safe }}"><a href="{{ link }}">{{ label }}</a></span>
+    <span aria-describedby="{{ label|id_safe }}"><a class="govuk-link govuk-link--no-visited-state" href="{{ link }}">{{ label }}</a></span>
     {% if completed %}
       <strong class="task-list-indicator-completed" id="{{ label|id_safe }}">Completed</strong>
     {% else %}

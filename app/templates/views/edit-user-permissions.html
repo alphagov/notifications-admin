@@ -25,11 +25,17 @@
   ) }}
 
   <p>
-    {{ user.email_address }}&emsp;<a href="{{ url_for('.edit_user_email', service_id=current_service.id, user_id=user.id)}}">Change</a>
+    {{ user.email_address }}&emsp;
+    <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.edit_user_email', service_id=current_service.id, user_id=user.id)}}">
+    Change<span class="govuk-visually-hidden"> email address</span>
+    </a>
   </p>
   {% if mobile_number %}
     <p id="user_mobile_number">
-      {{ mobile_number }}&emsp;<a href="{{ url_for('.edit_user_mobile_number', service_id=current_service.id, user_id=user.id)}}">Change</a>
+      {{ mobile_number }}&emsp;
+      <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.edit_user_mobile_number', service_id=current_service.id, user_id=user.id)}}">
+      Change<span class="govuk-visually-hidden"> mobile number</span>
+      </a>
     </p>
   {% endif %}
   <div class="grid-row">

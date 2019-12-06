@@ -10,7 +10,7 @@
   <h1 class="heading heading-large">Letters</h1>
   <p>GOV.UK Notify will print, pack and post your letters for you.</p>
   {% if not current_user.is_authenticated %}
-    <p><a href="{{ url_for('main.register') }}">Create an account</a> and try Notify for yourself.</p>
+    <p><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.register') }}">Create an account</a> and try Notify for yourself.</p>
   {% endif %}
 
   <h2 class="heading heading-medium">Features</h2>
@@ -20,7 +20,7 @@
     <li>personalise the content of your letter</li>
     <li>send bulk mail</li>
   </ul>
-  <p>You can also <a href="{{ url_for('.documentation') }}">integrate with our API</a> to send letters automatically.</p>
+  <p>You can also <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.documentation') }}">integrate with our API</a> to send letters automatically.</p>
 
   <h3 class="heading-small" id="postage">Choose your postage</h3>
   <p>Notify can send letters by first or second class post.</p>
@@ -33,7 +33,7 @@
 
   <h3 class="heading heading-small" id="upload-letters">Upload your own letters</h3>
   <p>You can create reusable letter templates in Notify, or upload and send your own letters with the Notify API.</p>
-  <p>Read our <a href="{{ url_for('.documentation') }}">documentation</a>.</p>
+  <p>Read our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.documentation') }}">documentation</a>.</p>
 
   <h2 class="heading heading-medium">Pricing</h2>
   <p>It costs between 30p and 76p (plus VAT) to send a letter. Prices include:</p>
@@ -44,6 +44,6 @@
      <li>first or second class postage</li>
   </ul>
   <p>Letters can be up to 10 pages long (5 double-sided sheets of paper).</p>
-  <p><a href="{{ url_for('.pricing') }}">See pricing</a> for more details.</p>
+  <p><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.pricing') }}">See pricing</a> for more details.</p>
 
 {% endblock %}

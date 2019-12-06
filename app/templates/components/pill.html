@@ -13,7 +13,7 @@
           <div class='pill-selected-item{% if not show_count %} pill-centered-item{% endif %}' tabindex='0'>
       {% else %}
         <li aria-selected='false' role='tab'>
-          <a href="{{ link }}">
+          <a class="govuk-link govuk-link--no-visited-state" href="{{ link }}">
       {% endif %}
         {% if show_count %}
             {{ big_number(count, **big_number_args) }}

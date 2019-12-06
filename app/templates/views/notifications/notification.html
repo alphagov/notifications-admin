@@ -22,7 +22,7 @@
         {% if help %}
           ‘{{ template.name }}’
         {% else %}
-          <a href="{{ url_for('.view_template', service_id=current_service.id, template_id=template.id) }}">‘{{ template.name }}’</a>
+          <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.view_template', service_id=current_service.id, template_id=template.id) }}">‘{{ template.name }}’</a>
         {% endif %}
         was sent
       {% endif %}
@@ -30,7 +30,7 @@
         {% set destination =
           {'letter': 'an address', 'email': 'an email address', 'sms': 'a phone number'} %}
         to {{ destination[template.template_type] }} from
-        <a href="{{ url_for('.view_job', service_id=current_service.id, job_id=job.id) }}">{{ job.original_file_name }}</a>
+        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.view_job', service_id=current_service.id, job_id=job.id) }}">{{ job.original_file_name }}</a>
       {% elif created_by %}
         by {{ created_by.name }}
       {% endif %}
@@ -82,12 +82,12 @@
         <div class="page-footer">
           {% if show_cancel_button %}
             <span class="page-footer-delete-link page-footer-delete-link-without-button">
-              <a href="{{ url_for('main.cancel_letter', service_id=current_service.id, notification_id=notification_id) }}">Cancel sending this letter</a>
+              <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.cancel_letter', service_id=current_service.id, notification_id=notification_id) }}">Cancel sending this letter</a>
             </span>
           {% else %}
             <div>&nbsp;</div>
           {% endif %}
-          <a class="page-footer-right-aligned-link-without-button" href="{{ url_for('main.view_letter_notification_as_preview', service_id=current_service.id, notification_id=notification_id, filetype='pdf') }}" download>Download as a PDF</a>
+          <a class="govuk-link govuk-link--no-visited-state page-footer-right-aligned-link-without-button" href="{{ url_for('main.view_letter_notification_as_preview', service_id=current_service.id, notification_id=notification_id, filetype='pdf') }}" download>Download as a PDF</a>
         </div>
       </div>
     {% elif template.template_type == 'email' %}
@@ -100,7 +100,7 @@
 
     {% if current_user.has_permissions('send_messages') and current_user.has_permissions('view_activity') and template.template_type == 'sms' and can_receive_inbound %}
       <p>
-        <a href="{{ url_for('.conversation', service_id=current_service.id, notification_id=notification_id, _anchor='n{}'.format(notification_id)) }}">See all text messages sent to this phone number</a>
+        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.conversation', service_id=current_service.id, notification_id=notification_id, _anchor='n{}'.format(notification_id)) }}">See all text messages sent to this phone number</a>
       </p>
     {% endif %}
 

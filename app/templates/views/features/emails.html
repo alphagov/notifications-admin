@@ -10,7 +10,7 @@
   <h1 class="heading heading-large">Emails</h1>
   <p>Send an unlimited number of emails for free with GOV.UK Notify.</p>
   {% if not current_user.is_authenticated %}
-    <p><a href="{{ url_for('main.register') }}">Create an account</a> and try Notify for yourself.</p>
+    <p><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.register') }}">Create an account</a> and try Notify for yourself.</p>
   {% endif %}
 
   <h2 class="heading heading-medium">Features</h2>
@@ -20,7 +20,7 @@
     <li>personalise the content of your emails</li>
     <li>send and schedule bulk messages</li>
   </ul>
-  <p>You can also <a href="{{ url_for('.documentation') }}">integrate with our API</a> to send emails automatically.</p>
+  <p>You can also <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.documentation') }}">integrate with our API</a> to send emails automatically.</p>
 
   <h3 class="heading heading-small" id="branding">Email branding</h3>
   <p>Add your organisation’s logo and brand colour to email templates.</p>
@@ -35,8 +35,8 @@
     <!--<li>you can track when the recipient downloads your document</li>-->
     <li>email attachments are often marked as spam</li>
   </ul>
-  <p><a href="{{ url_for('.feedback', ticket_type='ask-question-give-feedback') }}">Contact us</a> if you want to send files by email.</p>
-  <p>Read our <a href="{{ url_for('.documentation') }}">API documentation</a> for more information.</p>
+  <p><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.feedback', ticket_type='ask-question-give-feedback') }}">Contact us</a> if you want to send files by email.</p>
+  <p>Read our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.documentation') }}">API documentation</a> for more information.</p>
 
   <h3 class="heading heading-small" id="reply-to">Add a reply-to address</h3>
   <p>Notify lets you choose the email address that users reply to.</p>
@@ -45,6 +45,6 @@
 
   <h2 class="heading heading-medium">Pricing</h2>
   <p>It’s free to send emails through Notify.</p>
-  <p><a href="{{ url_for('.pricing') }}">See pricing</a> for more details.</p>
+  <p><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.pricing') }}">See pricing</a> for more details.</p>
 
 {% endblock %}

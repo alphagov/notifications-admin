@@ -23,17 +23,17 @@
           You can still send text messages from a sender name if you need to, but users will not be able to reply to those messages.
         </p>
         <p>
-          <a href="{{ url_for('.support') }}">Contact us</a> if you want to switch this feature off.
+          <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.support') }}">Contact us</a> if you want to switch this feature off.
         </p>
         {% if current_user.has_permissions('manage_api_keys') %}
           <p>
             You can set up callbacks for received text messages on the
-            <a href="{{ url_for('.api_callbacks', service_id=current_service.id) }}">API integration page</a>.
+            <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.api_callbacks', service_id=current_service.id) }}">API integration page</a>.
           </p>
         {% endif %}
       {% else %}
         <p>
-          <a href="{{ url_for('.support') }}">Contact us</a> if you want to be able to receive text messages from your users.
+          <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.support') }}">Contact us</a> if you want to be able to receive text messages from your users.
         </p>
         <p>
           We’ll create a unique phone number for your service that they can reply to.

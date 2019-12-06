@@ -18,7 +18,7 @@
 
     {% if current_service and current_service.trial_mode %}
   <p>
-    To remove these restrictions, you can <a href="{{ url_for('.request_to_go_live', service_id=current_service.id) }}">request to go live</a>.</p>
+    To remove these restrictions, you can <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.request_to_go_live', service_id=current_service.id) }}">request to go live</a>.</p>
     {% else %}
   <p>
     To remove these restrictions:

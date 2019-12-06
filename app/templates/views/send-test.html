@@ -31,13 +31,13 @@
       </div>
       {% if skip_link %}
         <div class="column-one-third">
-          <a href="{{ skip_link[1] }}" class="top-gutter-4-3">{{ skip_link[0] }}</a>
+          <a href="{{ skip_link[1] }}" class="govuk-link govuk-link--no-visited-state top-gutter-4-3">{{ skip_link[0] }}</a>
         </div>
       {% endif %}
     </div>
     {% if link_to_upload %}
       <p>
-        <a href="{{ url_for('.send_messages', service_id=current_service.id, template_id=template.id) }}">
+        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.send_messages', service_id=current_service.id, template_id=template.id) }}">
           Upload a list of {{ recipient_count_label(999, template.template_type) }}
         </a>
       </p>
