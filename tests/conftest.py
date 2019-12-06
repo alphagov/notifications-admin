@@ -1937,6 +1937,33 @@ def mock_get_jobs(mocker, api_user_active):
 
 
 @pytest.fixture(scope='function')
+def mock_get_uploads(mocker, api_user_active):
+    def _get_uploads(service_id, limit_days=None, statuses=None, page=1):
+        uploads = [{'id': 'job_id_1',
+                    'original_file_name': 'some.csv',
+                    'notification_count': 10,
+                    'created_at': '2016-01-01 11:09:00.061258',
+                    'statistics': [{'count': 8, 'status': 'delivered'}, {'count': 2, 'status': 'temporary-failure'}],
+                    'upload_type': 'job'},
+                   {'id': 'job_id_1',
+                    'original_file_name': 'some.csv',
+                    'notification_count': 1,
+                    'created_at': '2016-01-01 11:09:00.061258',
+                    'statistics': [{'count': 1, 'status': 'delivered'}],
+                    'upload_type': 'letter'}
+                   ]
+        return {
+            'data': uploads,
+            'links': {
+                'prev': 'services/{}/uploads?page={}'.format(service_id, page - 1),
+                'next': 'services/{}/uploads?page={}'.format(service_id, page + 1)
+            }
+        }
+
+    return mocker.patch('app.job_api_client.get_uploads', side_effect=_get_uploads)
+
+
+@pytest.fixture(scope='function')
 def mock_get_notifications(
     mocker,
     api_user_active,

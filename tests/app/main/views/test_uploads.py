@@ -20,7 +20,7 @@ from tests.conftest import SERVICE_ONE_ID
 def test_no_upload_letters_button_without_permission(
     client_request,
     service_one,
-    mock_get_jobs,
+    mock_get_uploads,
     extra_permissions,
 ):
     service_one['permissions'] += extra_permissions
@@ -31,7 +31,7 @@ def test_no_upload_letters_button_without_permission(
 def test_get_upload_hub_page(
     client_request,
     service_one,
-    mock_get_jobs,
+    mock_get_uploads,
 ):
     service_one['permissions'] += ['letter', 'upload_letters']
     page = client_request.get('main.uploads', service_id=SERVICE_ONE_ID)

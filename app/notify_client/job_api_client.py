@@ -61,6 +61,20 @@ class JobApiClient(NotifyAdminAPIClient):
 
         return jobs
 
+    def get_uploads(self, service_id, limit_days=None, page=1):
+        params = {'page': page}
+        if limit_days is not None:
+            params['limit_days'] = limit_days
+        uploads = self.get(url='/service/{}/upload'.format(service_id), params=params)
+        for upload in uploads['data']:
+            stats = self.__convert_statistics(upload)
+            upload['notifications_sent'] = stats['delivered'] + stats['failed']
+            upload['notifications_delivered'] = stats['delivered']
+            upload['notifications_failed'] = stats['failed']
+            upload['notifications_requested'] = stats['requested']
+
+        return uploads
+
     def has_sent_previously(self, service_id, template_id, template_version, original_file_name):
         return (
             template_id, template_version, original_file_name

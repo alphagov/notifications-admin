@@ -15,11 +15,15 @@ from notifications_utils.pdf import pdf_page_count
 from PyPDF2.utils import PdfReadError
 from requests import RequestException
 
-from app import current_service, notification_api_client, service_api_client
+from app import (
+    current_service,
+    job_api_client,
+    notification_api_client,
+    service_api_client,
+)
 from app.extensions import antivirus_client
 from app.main import main
 from app.main.forms import LetterUploadPostageForm, PDFUploadForm
-from app.main.views.jobs import view_jobs
 from app.s3_client.s3_letter_upload_client import (
     get_letter_metadata,
     get_letter_pdf_and_metadata,
@@ -28,6 +32,8 @@ from app.s3_client.s3_letter_upload_client import (
 )
 from app.template_previews import TemplatePreview, sanitise_letter
 from app.utils import (
+    generate_next_dict,
+    generate_previous_dict,
     get_letter_validation_error,
     get_template,
     user_has_permissions,
@@ -39,7 +45,26 @@ MAX_FILE_UPLOAD_SIZE = 2 * 1024 * 1024  # 2MB
 @main.route("/services/<uuid:service_id>/uploads")
 @user_has_permissions()
 def uploads(service_id):
-    return view_jobs(service_id)
+    # No tests have been written, this has been quickly prepared for user research.
+    # It's also very like that a new view will be created to show uploads.
+    page = int(request.args.get('page', 1))
+    uploads_response = job_api_client.get_uploads(service_id, page=page)
+
+    prev_page = None
+    if uploads_response['links'].get('prev', None):
+        prev_page = generate_previous_dict('main.uploads', service_id, page)
+    next_page = None
+    if uploads_response['links'].get('next', None):
+        next_page = generate_next_dict('main.uploads', service_id, page)
+
+    return render_template(
+        'views/jobs/jobs.html',
+        jobs=uploads_response['data'],
+        page=page,
+        prev_page=prev_page,
+        next_page=next_page,
+        scheduled_jobs='',
+    )
 
 
 @main.route("/services/<uuid:service_id>/upload-letter", methods=['GET', 'POST'])
