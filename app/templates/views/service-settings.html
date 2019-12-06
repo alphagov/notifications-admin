@@ -263,7 +263,7 @@
       <p>
         {% if current_user.has_permissions('manage_service') %}
           To remove these restrictions, you can send us a
-          <a href="{{ url_for('.request_to_go_live', service_id=current_service.id) }}">request to go live</a>.
+          <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.request_to_go_live', service_id=current_service.id) }}">request to go live</a>.
         {% else %}
           Your service manager can ask to have these restrictions removed.
         {% endif %}
@@ -279,7 +279,7 @@
       </p>
       <p>
         Problems or comments?
-        <a href="{{ url_for('main.support') }}">Give feedback</a>.
+        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">Give feedback</a>.
       </p>
 
     {% endif %}
@@ -318,7 +318,7 @@
             {{ text_field('Organisation')}}
             {% call field() %}
               {% if current_service.organisation_id %}
-                <a href="{{ url_for('main.organisation_dashboard', org_id=current_service.organisation_id) }}">
+                <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.organisation_dashboard', org_id=current_service.organisation_id) }}">
                   {{ current_service.organisation.name }}
                 </a>
               {% else %}
@@ -375,13 +375,13 @@
     {% if current_service.active and (current_service.trial_mode or current_user.platform_admin) %}
       <p class="top-gutter-1-2">
         <span class="page-footer-delete-link page-footer-delete-link-without-button">
-          <a href="{{ url_for('.archive_service', service_id=current_service.id) }}">
+          <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.archive_service', service_id=current_service.id) }}">
             Delete this service
           </a>
         </span>
         {% if current_user.platform_admin %}
           <span class="page-footer-delete-link">
-            <a href="{{ url_for('.suspend_service', service_id=current_service.id) }}" class="page-footer-delete-link">
+            <a href="{{ url_for('.suspend_service', service_id=current_service.id) }}" class="govuk-link govuk-link--no-visited-state page-footer-delete-link">
                 Suspend service
               </a>
           </span>
@@ -394,7 +394,7 @@
           Service suspended
         </div>
         <span class="page-footer-delete-link page-footer-delete-link-without-button">
-          <a href="{{ url_for('.resume_service', service_id=current_service.id) }}">
+          <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.resume_service', service_id=current_service.id) }}">
             Resume service
           </a>
         </span>

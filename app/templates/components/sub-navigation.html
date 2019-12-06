@@ -4,7 +4,7 @@
       itemscope
       itemtype="http://schema.org/ListItem"
   >
-    <a href="{{ url_for(item['link']) }}" itemprop="item">
+    <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for(item['link']) }}" itemprop="item">
       <span itemprop="name">{{item['name']}}</span>
     </a>
   </li>

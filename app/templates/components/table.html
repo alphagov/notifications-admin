@@ -117,14 +117,14 @@
 
 {% macro link_field(text, link) -%}
   {% call field() %}
-    <a href="{{ link }}">{{ text }}</a>
+    <a class="govuk-link govuk-link--no-visited-state" href="{{ link }}">{{ text }}</a>
   {% endcall %}
 {%- endmacro %}
 
 {% macro edit_field(text, link, permissions=[]) -%}
   {% call field(align='right') %}
     {% if not permissions or current_user.has_permissions(*permissions) %}
-      <a href="{{ link }}">{{ text }}</a>
+      <a class="govuk-link govuk-link--no-visited-state" href="{{ link }}">{{ text }}</a>
     {% endif %}
   {% endcall %}
 {%- endmacro %}
@@ -155,7 +155,7 @@
     ) %}
       {% if displayed_on_single_line %}<span class="align-with-message-body">{% endif %}
       {% if notification.status|format_notification_status_as_url(notification.notification_type) %}
-        <a href="{{ notification.status|format_notification_status_as_url(notification.notification_type) }}">
+        <a class="govuk-link govuk-link--no-visited-state" href="{{ notification.status|format_notification_status_as_url(notification.notification_type) }}">
       {% endif %}
       {{ notification.status|format_notification_status(notification.template.template_type) }}
       {% if notification.status|format_notification_status_as_url(notification.notification_type) %}

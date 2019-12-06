@@ -5,7 +5,7 @@
         {% for item in items %}
           {% if item.title and item.link %}
             <li class="browse-list-item">
-              <a href="{{ item.link }}" class="browse-list-link{% if item.destructive %}-destructive{% endif %}">{{ item.title }}</a>
+              <a href="{{ item.link }}" class="govuk-link govuk-link--no-visited-state browse-list-link{% if item.destructive %}-destructive{% endif %}">{{ item.title }}</a>
               {% if item.hint %}
                 <div class="browse-list-hint">
                   {{ item.hint }}

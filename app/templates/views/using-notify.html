@@ -19,11 +19,11 @@
 
     <p>Find out more about:</p>
     <ul class="list list-bullet">
-      <li><a href="{{ url_for('main.trial_mode_new') }}">trial mode</a></li>
-      <li><a href="{{ url_for('main.message_status') }}">message status types</a></li>
-      <li><a href="{{ url_for('main.features_email') }}">email replies</a></li>
-      <li><a href="{{ url_for('main.features_sms') }}">text message replies</a></li>
-      <li><a href="{{ url_for('main.features_letters') }}">letters</a></li>
+      <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.trial_mode_new') }}">trial mode</a></li>
+      <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.message_status') }}">message status types</a></li>
+      <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.features_email') }}">email replies</a></li>
+      <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.features_sms') }}">text message replies</a></li>
+      <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.features_letters') }}">letters</a></li>
     </ul>
 
     <!-- <h2 id="trial-mode" class="heading-medium">Trial mode</h2>
@@ -38,7 +38,7 @@
     <p>
       To remove these restrictions, you can
       {% if current_service and current_service.trial_mode %}
-        <a href="{{ url_for('.request_to_go_live', service_id=current_service.id) }}">send us a request to go live</a>.
+        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.request_to_go_live', service_id=current_service.id) }}">send us a request to go live</a>.
       {% else %}
         send us a request to go live.
       {% endif %}
@@ -56,7 +56,7 @@
 
     <p>Notify’s real-time dashboard lets you check the status of any message, to see when it was delivered. You can use our API to check the status of your messages too.</p>
 
-    <p><a href="https://www.notifications.service.gov.uk/documentation">Read our documentation</a> for a detailed list of API message statuses.</p>
+    <p><a class="govuk-link govuk-link--no-visited-state" href="https://www.notifications.service.gov.uk/documentation">Read our documentation</a> for a detailed list of API message statuses.</p>
     <img
         src="{{ asset_url('images/message-sending-flow.svg') }}"
         alt="A picture of the sending flow of messages in Notify, showing the three states of Sending, Delivered, And Failed. Also shows the next

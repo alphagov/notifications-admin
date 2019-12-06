@@ -19,7 +19,7 @@
           <ul>
           {% for service in user.live_services %}
             <li class="browse-list-item">
-              <a class="browse-list-hint" href={{url_for('.service_dashboard', service_id=service.id)}}>{{ service.name }}</a>
+              <a class="govuk-link govuk-link--no-visited-state browse-list-hint" href={{url_for('.service_dashboard', service_id=service.id)}}>{{ service.name }}</a>
             </li>
           {% endfor %}
           </ul>
@@ -35,7 +35,7 @@
           <ul>
           {% for service in user.trial_mode_services %}
             <li class="browse-list-item">
-              <a class="browse-list-hint" href={{url_for('.service_dashboard', service_id=service.id)}}>{{ service.name }}</a>
+              <a class="govuk-link govuk-link--no-visited-state browse-list-hint" href={{url_for('.service_dashboard', service_id=service.id)}}>{{ service.name }}</a>
             </li>
           {% endfor %}
           </ul>
@@ -62,7 +62,7 @@
       {% endif %}
       {% if user.state == 'active' %}
         <span class="page-footer-delete-link page-footer-delete-link-without-button">
-          <a href="{{ url_for('main.archive_user', user_id=user.id) }}">
+          <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.archive_user', user_id=user.id) }}">
             Archive user
           </a>
         </span>

@@ -24,7 +24,7 @@
           or an email link.
         </p>
         <p>
-          You can <a href="{{ url_for('.manage_users', service_id=current_service.id) }}">set the sign-in method for individual team members</a>.
+          You can <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.manage_users', service_id=current_service.id) }}">set the sign-in method for individual team members</a>.
         </p>
       {% else %}
         <p class="heading-small bottom-gutter-2-3">
@@ -34,7 +34,7 @@
           Your team members sign in with a text message code.
         </p>
         <p>
-          <a href="{{ url_for('.support') }}">Contact us</a> if signing in with a text message is a problem for your team.
+          <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.support') }}">Contact us</a> if signing in with a text message is a problem for your team.
         </p>
       {% endif %}
     </div>

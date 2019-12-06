@@ -7,7 +7,7 @@
 
     <p>
       Sending
-      <a href="{{ url_for('.view_template_version', service_id=current_service.id, template_id=job.template.id, version=job.template_version) }}">{{ job.template.name }}</a>
+      <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.view_template_version', service_id=current_service.id, template_id=job.template.id, version=job.template_version) }}">{{ job.template.name }}</a>
       {{ job.scheduled_for|format_datetime_relative }}
     </p>
     <div class="page-footer">
@@ -34,7 +34,7 @@
           </p>
         {% elif notifications %}
           <p class="{% if job.template.template_type != 'letter' %}bottom-gutter{% endif %}">
-            <a href="{{ download_link }}" download class="heading-small">Download this report</a>
+            <a href="{{ download_link }}" download class="govuk-link govuk-link--no-visited-state heading-small">Download this report</a>
             &emsp;
             <span id="time-left">{{ time_left }}</span>
           </p>
@@ -55,7 +55,7 @@
         field_headings_visible=False
       ) %}
         {% call row_heading() %}
-          <a class="file-list-filename" href="{{ url_for('.view_notification', service_id=current_service.id, notification_id=item.id, from_job=job.id) }}">{{ item.to }}</a>
+          <a class="govuk-link govuk-link--no-visited-state file-list-filename" href="{{ url_for('.view_notification', service_id=current_service.id, notification_id=item.id, from_job=job.id) }}">{{ item.to }}</a>
           <p class="file-list-hint">
             {{ item.preview_of_content }}
           </p>

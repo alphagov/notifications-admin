@@ -9,7 +9,7 @@
 {% set file_contents_header_id = 'file-preview' %}
 {% macro skip_to_file_contents() %}
   <p class="govuk-visually-hidden">
-    <a href="#{{ file_contents_header_id }}">Skip to file contents</a>
+    <a class="govuk-link govuk-link--no-visited-state" href="#{{ file_contents_header_id }}">Skip to file contents</a>
   </p>
 {% endmacro %}
 
@@ -55,7 +55,7 @@
         button_text='Upload your file again'
       ) }}
     </div>
-    <a href="#content" class="back-to-top-link">Back to top</a>
+    <a href="#content" class="govuk-link govuk-link--no-visited-state back-to-top-link">Back to top</a>
   </div>
 
   <div class="fullscreen-content" data-module="fullscreen-table">

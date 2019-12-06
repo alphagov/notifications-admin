@@ -8,7 +8,7 @@
 <p>
   You can only send {{ current_service.message_limit }} messages per day
   {%- if current_service.trial_mode %}
-    in <a href="{{ url_for('.trial_mode_new')}}">trial mode</a>
+    in <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.trial_mode_new')}}">trial mode</a>
   {%- endif -%}
   .
 </p>

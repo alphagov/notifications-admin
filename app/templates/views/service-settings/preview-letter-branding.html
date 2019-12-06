@@ -17,7 +17,7 @@
           {{ form.hidden_tag() }}
           <div class="page-footer">
             {{ govukButton({ "text": "Save", "classes": "govuk-!-margin-right-2" }) }}
-            <a class="page-footer-back-link" href="{{ url_for('main.service_settings', service_id=service_id) }}">Back to service settings</a>
+            <a class="govuk-link govuk-link--no-visited-state page-footer-back-link" href="{{ url_for('main.service_settings', service_id=service_id) }}">Back to service settings</a>
           </div>
         </div>
       {% endcall %}

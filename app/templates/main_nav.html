@@ -5,32 +5,32 @@
   <ul>
   {% if current_user.has_permissions() %}
     {% if current_user.has_permissions('view_activity') %}
-      <li><a href="{{ url_for('.service_dashboard', service_id=current_service.id) }}" {{ main_navigation.is_selected('dashboard') }}>Dashboard</a></li>
+      <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.service_dashboard', service_id=current_service.id) }}" {{ main_navigation.is_selected('dashboard') }}>Dashboard</a></li>
     {% endif %}
-    <li><a href="{{ url_for('.choose_template', service_id=current_service.id) }}" {{ main_navigation.is_selected('templates') }}>Templates</a></li>
+    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.choose_template', service_id=current_service.id) }}" {{ main_navigation.is_selected('templates') }}>Templates</a></li>
     {% if current_user.has_permissions('view_activity') %}
       {% if current_service.can_upload_letters %}
-        <li><a href="{{ url_for('main.uploads', service_id=current_service.id) }}" {{ main_navigation.is_selected('uploads') }}>Uploads</a></li>
+        <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.uploads', service_id=current_service.id) }}" {{ main_navigation.is_selected('uploads') }}>Uploads</a></li>
       {% endif %}
     {% else %}
-      <li><a href="{{ url_for('.view_notifications', service_id=current_service.id, status='sending,delivered,failed') }}" {{ casework_navigation.is_selected('sent-messages') }}>Sent messages</a></li>
+      <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.view_notifications', service_id=current_service.id, status='sending,delivered,failed') }}" {{ casework_navigation.is_selected('sent-messages') }}>Sent messages</a></li>
       {% if current_service.has_jobs or current_service.can_upload_letters %}
-        <li><a href="{{ url_for('main.uploads', service_id=current_service.id) }}" {{ casework_navigation.is_selected('uploads') }}>Uploads</a></li>
+        <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.uploads', service_id=current_service.id) }}" {{ casework_navigation.is_selected('uploads') }}>Uploads</a></li>
       {% endif %}
     {% endif %}
-    <li><a href="{{ url_for('.manage_users', service_id=current_service.id) }}" {{ main_navigation.is_selected('team-members') }}>Team members</a></li>
+    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.manage_users', service_id=current_service.id) }}" {{ main_navigation.is_selected('team-members') }}>Team members</a></li>
     {% if current_user.has_permissions('manage_service', allow_org_user=True) %}
-      <li><a href="{{ url_for('.usage', service_id=current_service.id) }}" {{ main_navigation.is_selected('usage') }}>Usage</a></li>
+      <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.usage', service_id=current_service.id) }}" {{ main_navigation.is_selected('usage') }}>Usage</a></li>
     {% endif %}
     {% if current_user.has_permissions('manage_api_keys', 'manage_service') %}
-      <li><a href="{{ url_for('.service_settings', service_id=current_service.id) }}" {{ main_navigation.is_selected('settings') }}>Settings</a></li>
+      <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.service_settings', service_id=current_service.id) }}" {{ main_navigation.is_selected('settings') }}>Settings</a></li>
     {% endif %}
     {% if current_user.has_permissions('manage_api_keys') %}
-      <li><a href="{{ url_for('.api_integration', service_id=current_service.id) }}" {{ main_navigation.is_selected('api-integration') }}>API integration</a></li>
+      <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.api_integration', service_id=current_service.id) }}" {{ main_navigation.is_selected('api-integration') }}>API integration</a></li>
     {% endif %}
   {% elif current_user.has_permissions(allow_org_user=True) %}
-    <li><a href="{{ url_for('.usage', service_id=current_service.id) }}" {{ main_navigation.is_selected('usage') }}>Usage</a></li>
-    <li><a href="{{ url_for('.manage_users', service_id=current_service.id) }}" {{ main_navigation.is_selected('team-members') }}>Team members</a></li>
+    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.usage', service_id=current_service.id) }}" {{ main_navigation.is_selected('usage') }}>Usage</a></li>
+    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.manage_users', service_id=current_service.id) }}" {{ main_navigation.is_selected('team-members') }}>Team members</a></li>
   {% endif %}
   </ul>
 </nav>

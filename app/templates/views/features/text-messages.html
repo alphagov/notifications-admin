@@ -10,7 +10,7 @@
   <h1 class="heading heading-large">Text messages</h1>
   <p>Send thousands of free text messages to UK and international numbers with GOV.UK Notify.</p>
   {% if not current_user.is_authenticated %}
-  <p><a href="{{ url_for('main.register') }}">Create an account</a> and try Notify for yourself.</p>
+  <p><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.register') }}">Create an account</a> and try Notify for yourself.</p>
   {% endif %}
 
   <h2 class="heading heading-medium">Features</h2>
@@ -19,12 +19,12 @@
     <li>create reusable text message templates</li>
     <li>personalise the content of your texts</li>
     <li>send and schedule bulk messages</li></ul>
-  <p>You can also <a href="{{ url_for('.documentation') }}">integrate with our API</a> to send text messages automatically.<p>
+  <p>You can also <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.documentation') }}">integrate with our API</a> to send text messages automatically.<p>
 
   <h3 class="heading heading-small" id="receive">Receive text messages</h3>
   <p>Let people send messages to your service or reply to your texts.</p>
   <p>You can see and reply to the messages you receive when you sign in to Notify. If you’re using our API, you can set up your own automated processes to manage replies.</p>
-  <p><a href="{{ url_for('.feedback', ticket_type='ask-question-give-feedback') }}">Contact us</a> to request a unique number for text message replies.</p>
+  <p><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.feedback', ticket_type='ask-question-give-feedback') }}">Contact us</a> to request a unique number for text message replies.</p>
 
   <h3 class="heading heading-small" id="sender">Show people who your texts are from</h3>
   <p>When you send a text message with Notify, the sender name tells people who it's from.</p>
@@ -36,6 +36,6 @@
     <ul class="list list-bullet">
       <li>250,000 free text messages for central government services</li>
       <li>25,000 free text messages for other public sector services</li></ul>
-    <p><a href="{{ url_for('.pricing') }}">See pricing</a> for more details.</p>
+    <p><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.pricing') }}">See pricing</a> for more details.</p>
 
 {% endblock %}

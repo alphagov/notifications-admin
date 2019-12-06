@@ -21,7 +21,7 @@
   {% endif %}
   {% for org in organisations %}
     <li class="browse-list-item">
-      <a href="{{ url_for('.organisation_dashboard', org_id=org.id) }}" class="browse-list-link">{{ org.name }}</a>
+      <a href="{{ url_for('.organisation_dashboard', org_id=org.id) }}" class="govuk-link govuk-link--no-visited-state browse-list-link">{{ org.name }}</a>
       <p class="browse-list-hint">
         {{ org.count_of_live_services }}
         live service{% if org.count_of_live_services != 1 %}s{% endif %}
@@ -30,7 +30,7 @@
   {% endfor %}
   {% for service in services %}
     <li class="browse-list-item">
-      <a href="{{ url_for('.service_dashboard', service_id=service.id) }}" class="browse-list-link">{{ service.name }}</a>
+      <a href="{{ url_for('.service_dashboard', service_id=service.id) }}" class="govuk-link govuk-link--no-visited-state browse-list-link">{{ service.name }}</a>
     </li>
   {% endfor %}
   {% if show_heading %}
@@ -64,7 +64,7 @@
         </div>
         <ul class="column-three-quarters">
           <li class="browse-list-item">
-            <a href="{{ url_for('.organisations') }}" class="browse-list-link">All organisations</a>
+            <a href="{{ url_for('.organisations') }}" class="govuk-link govuk-link--no-visited-state browse-list-link">All organisations</a>
             <p class="browse-list-hint">
               {{ org_count|format_thousands }} organisations, {{ live_service_count|format_thousands }} live services
             </p>

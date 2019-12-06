@@ -5,7 +5,7 @@
 <div class="ajax-block-container">
   {% if messages %}
     <p class="bottom-gutter-2-3 top-gutter-1-2">
-      <a href="{{ url_for('.inbox_download', service_id=current_service.id) }}" download class="heading-small">Download these messages</a>
+      <a href="{{ url_for('.inbox_download', service_id=current_service.id) }}" download class="govuk-link govuk-link--no-visited-state govuk-!-font-weight-bold">Download these messages</a>
     </p>
   {% endif %}
   {% call(item, row_number) list_table(
@@ -21,7 +21,7 @@
   ) %}
     {% call field() %}
       <a
-        class="file-list-filename"
+        class="govuk-link govuk-link--no-visited-state file-list-filename"
         href="{{ url_for('.conversation', service_id=current_service.id, notification_id=item.id) }}#n{{ item.id }}"
       >
         {{ item.user_number | format_phone_number_human_readable }}
