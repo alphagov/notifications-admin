@@ -48,18 +48,18 @@ def uploads(service_id):
     # No tests have been written, this has been quickly prepared for user research.
     # It's also very like that a new view will be created to show uploads.
     page = int(request.args.get('page', 1))
-    jobs_response = job_api_client.get_uploads(service_id, page=page)
+    uploads_response = job_api_client.get_uploads(service_id, page=page)
 
     prev_page = None
-    if jobs_response['links'].get('prev', None):
+    if uploads_response['links'].get('prev', None):
         prev_page = generate_previous_dict('main.uploads', service_id, page)
     next_page = None
-    if jobs_response['links'].get('next', None):
+    if uploads_response['links'].get('next', None):
         next_page = generate_next_dict('main.uploads', service_id, page)
 
     return render_template(
         'views/jobs/jobs.html',
-        jobs=jobs_response['data'],
+        jobs=uploads_response['data'],
         page=page,
         prev_page=prev_page,
         next_page=next_page,
