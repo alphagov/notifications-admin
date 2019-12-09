@@ -41,34 +41,6 @@ input[type="search"]::-webkit-search-decoration {
   -webkit-appearance: none;
 }
 
-// To be removed when all links follow the GOV.UK Frontend conventions:
-// https://design-system.service.gov.uk/styles/typography/#links
-a {
-  /* Give a strong clear visual idea as to what is currently in focus */
-  -webkit-tap-highlight-color: rgba(0, 0, 0, 0.3);
-
-  &:link {
-    color: $link-colour;
-  }
-
-  &:visited {
-    color: $link-visited-colour;
-  }
-
-  &:hover {
-    color: $link-hover-colour;
-  }
-
-  &:active {
-    color: $link-active-colour;
-  }
-
-  &:focus {
-    background-color: $focus-colour;
-    outline: 3px solid $focus-colour;
-  }
-}
-
 // Each selector, and then the whole block when only one remains, to be removed when the
 // element comes from the corresponding GOV.UK Frontend component:
 // - https://design-system.service.gov.uk/components/text-input/
