@@ -1,5 +1,7 @@
 import pytest
+from flask import Flask
 
+from app import create_app
 from app.navigation import (
     CaseworkNavigation,
     HeaderNavigation,
@@ -10,12 +12,22 @@ from tests.conftest import (
     ORGANISATION_ID,
     SERVICE_ONE_ID,
     active_caseworking_user,
-    app_,
     normalize_spaces,
 )
 
+
+def flask_app():
+    app = Flask('app')
+    create_app(app)
+
+    ctx = app.app_context()
+    ctx.push()
+
+    yield app
+
+
 all_endpoints = [
-    rule.endpoint for rule in next(app_(None)).url_map.iter_rules()
+    rule.endpoint for rule in next(flask_app()).url_map.iter_rules()
 ]
 
 navigation_instances = (

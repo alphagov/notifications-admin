@@ -37,7 +37,7 @@ class ElementNotFound(Exception):
 
 
 @pytest.fixture(scope='session')
-def app_(request):
+def app_():
     app = Flask('app')
     create_app(app)
 
