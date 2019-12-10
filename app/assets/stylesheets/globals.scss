@@ -5,6 +5,16 @@
   width: device-width;
 }
 
+// To be removed when all text uses the GOV.UK Frontend New Transport font styles.
+// At present, some text gets these styles due to being in a GOV.UK Frontend component
+// or a link.
+// This ensures all text will have these styles applied, until it can be moved to use
+// the GOV.UK Frontend font styles.
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 b,
 strong {
   font-weight: 600;
