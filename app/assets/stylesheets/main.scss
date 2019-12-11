@@ -36,6 +36,7 @@ $path: '/static/images/';
 @import './govuk-frontend/all';
 
 // Specific to this application
+@import 'local/typography';
 @import 'grids';
 @import 'components/cookie-message';
 @import 'components/site-footer';

@@ -1,0 +1,62 @@
+@import 'settings/all';
+@import 'helpers/all';
+
+@mixin destructive-link-style-default {
+  &:link {
+    color: $govuk-error-colour;
+  }
+
+  &:visited {
+    color: $govuk-link-visited-colour;
+  }
+
+  &:hover {
+    color: govuk-tint( $govuk-error-colour, 25% );
+  }
+
+  &:active {
+    color: $govuk-link-active-colour;
+  }
+
+  // When focussed, the text colour needs to be darker to ensure that colour
+  // contrast is still acceptable
+  &:focus {
+    color: $govuk-focus-text-colour;
+  }
+}
+
+@mixin destructive-link-style-no-visited-state {
+  &:link {
+    color: $govuk-error-colour;
+  }
+
+  &:visited {
+    color: $govuk-error-colour;
+  }
+
+  &:hover {
+    color: govuk-tint( $govuk-error-colour, 25% );
+  }
+
+  &:active {
+    color: $govuk-link-active-colour;
+  }
+
+  // When focussed, the text colour needs to be darker to ensure that colour
+  // contrast is still acceptable
+  &:focus {
+    color: $govuk-focus-text-colour;
+  }
+}
+
+// mimics styles for govuk-link:
+// https://github.com/alphagov/govuk-frontend/blob/063cd8e2470b62b824c6e50ca66342ac7a95d2d8/package/core/_links.scss#L7
+.destructive-link {
+  @include govuk-link-common;
+  @include destructive-link-style-default;
+  @include govuk-link-print-friendly;
+}
+
+.destructive-link--no-visited-state {
+  @include destructive-link-style-no-visited-state;
+}
