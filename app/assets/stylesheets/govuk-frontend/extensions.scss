@@ -8,3 +8,30 @@
   }
 }
 
+// Extends govuk-link to create a class of link that causes a destructive action
+// Based on styles of link in:
+// https://github.com/alphagov/govuk-frontend/blob/v2.13.0/src/helpers/_links.scss
+//
+// Note: all destructive actions must have a confirmation step these links navigate to
+@mixin govuk-link-style-destructive-no-visited-state {
+  &:link,
+  &:visited {
+    color: $govuk-error-colour;
+  }
+
+  &:hover {
+    color: govuk-tint($govuk-error-colour, 25%);
+  }
+
+  // When focussed, the text colour needs to be darker to ensure that colour
+  // contrast is still acceptable against the focus colour
+  // Activated links are usually focused so this applies to them as well
+  &:active,
+  &:focus {
+    color: $govuk-focus-text-colour;
+  }
+}
+
+.govuk-link--destructive {
+  @include govuk-link-style-destructive-no-visited-state;
+}
