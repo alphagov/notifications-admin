@@ -15,7 +15,7 @@
           <a href="{{ url_for('.organisation_dashboard', org_id=current_service.organisation_id) }}" class="govuk-link govuk-link--no-visited-state navigation-organisation-link">{{ current_service.organisation.name }}</a>
         {% endif %}
       {% endif %}
-      <div class="navigation-service-name">
+      <div class="navigation-service-name govuk-!-font-weight-bold">
         {{ current_service.name }}
       </div>
       <a href="{{ url_for('main.choose_account') }}" class="govuk-link govuk-link--no-visited-state navigation-service-switch">Switch service</a>
