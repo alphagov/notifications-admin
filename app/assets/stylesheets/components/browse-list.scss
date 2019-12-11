@@ -16,22 +16,16 @@
     margin-bottom: $gutter-half;
   }
 
-  &-link {
-    @include bold-24;
+  &-link-destructive {
+    color: $error-colour;
 
-    &-destructive {
-      @include bold-24;
+    &:visited,
+    &:link {
       color: $error-colour;
+    }
 
-      &:visited,
-      &:link {
-        @include bold-24;
-        color: $error-colour;
-      }
-
-      &:hover {
-        color: $mellow-red;
-      }
+    &:hover {
+      color: $mellow-red;
     }
   }
 
