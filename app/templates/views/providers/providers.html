@@ -95,8 +95,6 @@ Providers
 
       {{ optional_text_field(item.created_by_name, default='None') }}
 
-      {{ link_field('change', url_for('main.edit_provider', provider_id=item.id)) }}
-
   {% endcall %}
 
 {% endblock %}

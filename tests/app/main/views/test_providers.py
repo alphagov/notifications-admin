@@ -226,7 +226,6 @@ def test_should_show_all_providers(
     assert table_data[2].text.strip() == "False"
     assert table_data[3].text.strip() == "None"
     assert table_data[4].text.strip() == "None"
-    assert table_data[5].find_all("a")[0]['href'] == '/provider/67c770f5-918e-4afa-a5ff-880b9beb161d/edit'
 
 
 def test_add_monthly_traffic():
