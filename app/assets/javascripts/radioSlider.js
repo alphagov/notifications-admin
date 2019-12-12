@@ -9,11 +9,13 @@
       $(component)
         .on('click', function() {
 
-          leftRight = $(this).find(':checked').next('label').text().split('/');
+          valuesInLabel = $(this).find(':checked').next('label').text().split('/');
 
-          if (leftRight.length === 2) {
-            $(this).find('.radio-slider-left-value').html(leftRight[0]);
-            $(this).find('.radio-slider-right-value').html(leftRight[1]);
+          if (valuesInLabel.length === 2) {
+            leftValue = valuesInLabel[0];
+            rightValue = valuesInLabel[1];
+            $(this).find('.radio-slider-left-value').html(leftValue);
+            $(this).find('.radio-slider-right-value').html(rightValue);
           }
 
         })
