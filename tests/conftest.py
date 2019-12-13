@@ -1754,7 +1754,8 @@ def mock_get_api_keys(mocker, fake_uuid):
 
 
 @pytest.fixture(scope='function')
-def mock_get_no_api_keys(mocker):
+# Second argument added so can be used interchangeably with `mock_get_api_keys`
+def mock_get_no_api_keys(mocker, _=None):
     def _get_keys(service_id):
         keys = {'apiKeys': []}
         return keys

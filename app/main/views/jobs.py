@@ -227,6 +227,15 @@ def view_notifications(service_id, message_type=None):
             message_type=message_type,
             to=request.form.get('to', ''),
         ),
+        things_you_can_search_by={
+            'email': ['email address'],
+            'sms': ['phone number'],
+            'letter': [],
+            None: ['email address', 'phone number'],
+        }.get(message_type) + {
+            True: ['reference'],
+            False: [],
+        }.get(bool(current_service.api_keys)),
         download_link=url_for(
             '.download_notifications_csv',
             service_id=current_service.id,

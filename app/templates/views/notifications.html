@@ -41,6 +41,13 @@
         {{ textbox(
           search_form.to,
           width='1-1',
+          label=things_you_can_search_by|formatted_list(
+            conjunction='or',
+            before_each='',
+            after_each='',
+            prefix='Search by',
+            prefix_plural='Search by'
+          )
         ) }}
       </div>
       <div class="column-one-quarter align-button-with-textbox">
