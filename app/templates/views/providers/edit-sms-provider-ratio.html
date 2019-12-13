@@ -51,7 +51,7 @@
   {% for day, versions in versions %}
     <h2 class="heading-small top-gutter">
       {% if day %}
-        {{ day|format_date_human|title }}
+        {{ versions[0]['updated_at']|format_date_human|title }}
       {% else %}
         Start
       {% endif %}
