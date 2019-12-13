@@ -2,6 +2,8 @@ window.GOVUK.Frontend.initAll();
 
 $(() => GOVUK.addCookieMessage());
 
+window.GOVUK.initAnalytics();
+
 $(() => $("time.timeago").timeago());
 
 $(() => GOVUK.stickAtTopWhenScrolling.init());
