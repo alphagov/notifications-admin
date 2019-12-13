@@ -952,6 +952,22 @@ class ProviderForm(StripWhitespaceForm):
     priority = IntegerField('Priority', [validators.NumberRange(min=1, max=100, message="Must be between 1 and 100")])
 
 
+class ProviderRatioForm(StripWhitespaceForm):
+
+    ratio = RadioField(choices=[
+        (str(value), '{}% / {}%'.format(value, 100 - value))
+        for value in range(100, -10, -10)
+    ])
+
+    @property
+    def percentage_left(self):
+        return int(self.ratio.data)
+
+    @property
+    def percentage_right(self):
+        return 100 - self.percentage_left
+
+
 class ServiceContactDetailsForm(StripWhitespaceForm):
     contact_details_type = RadioField(
         'Type of contact details',

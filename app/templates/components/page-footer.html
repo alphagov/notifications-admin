@@ -6,9 +6,10 @@
   secondary_link=False,
   secondary_link_text=None,
   delete_link=False,
-  delete_link_text="delete"
+  delete_link_text="delete",
+  centered_button=False
 ) %}
-  <div class="page-footer">
+  <div class="page-footer {% if centered_button %}page-footer-centered-button{% endif %}">
     {% if button_text %}
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
       <button

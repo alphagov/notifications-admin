@@ -1,10 +1,16 @@
-from flask import render_template, url_for
+from collections import defaultdict
+from datetime import datetime
+from operator import itemgetter
+
+from flask import abort, render_template, url_for
 from werkzeug.utils import redirect
 
-from app import provider_client
+from app import format_date_numeric, provider_client
 from app.main import main
-from app.main.forms import ProviderForm
+from app.main.forms import ProviderForm, ProviderRatioForm
 from app.utils import user_is_platform_admin
+
+PROVIDER_PRIORITY_MEANING_SWITCHOVER = datetime(2019, 11, 29, 11, 0).isoformat()
 
 
 @main.route("/providers")
@@ -49,6 +55,65 @@ def edit_provider(provider_id):
         return redirect(url_for('.view_providers'))
 
     return render_template('views/providers/edit-provider.html', form=form, provider=provider)
+
+
+@main.route("/provider/edit-sms-provider-ratio", methods=['GET', 'POST'])
+@user_is_platform_admin
+def edit_sms_provider_ratio():
+
+    providers = sorted([
+        provider
+        for provider in provider_client.get_all_providers()['provider_details']
+        if provider['notification_type'] == 'sms'
+    ], key=itemgetter('identifier'), reverse=True)
+
+    form = ProviderRatioForm(ratio=providers[0]['priority'])
+
+    if len(providers) < 2:
+        abort(400)
+
+    primary_provider, secondary_provider = providers[0:2]
+
+    if form.validate_on_submit():
+        provider_client.update_provider(primary_provider['id'], form.percentage_left)
+        provider_client.update_provider(secondary_provider['id'], form.percentage_right)
+        return redirect(url_for('.edit_sms_provider_ratio'))
+
+    return render_template(
+        'views/providers/edit-sms-provider-ratio.html',
+        versions=_chunk_versions_by_day(_get_versions_since_switchover(primary_provider['id'])),
+        form=form,
+        primary_provider=providers[0]['display_name'],
+        secondary_provider=providers[1]['display_name'],
+    )
+
+
+def _get_versions_since_switchover(provider_id):
+
+    for version in sorted(
+        provider_client.get_provider_versions(provider_id)['data'],
+        key=lambda version: version['updated_at'] or ''
+    ):
+
+        if not version['updated_at']:
+            continue
+
+        if version['updated_at'] < PROVIDER_PRIORITY_MEANING_SWITCHOVER:
+            continue
+
+        yield version
+
+
+def _chunk_versions_by_day(versions):
+
+    days = defaultdict(list)
+
+    for version in sorted(versions, key=lambda version: version['updated_at'] or '', reverse=True):
+        days[
+            format_date_numeric(version['updated_at'])
+        ].append(version)
+
+    return sorted(days.items(), reverse=True)
 
 
 @main.route("/provider/<uuid:provider_id>")

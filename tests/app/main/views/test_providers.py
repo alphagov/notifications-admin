@@ -1,12 +1,15 @@
 import copy
 import re
 from datetime import datetime
+from unittest.mock import call
 
+import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
 
 import app
 from app.main.views.providers import add_monthly_traffic
+from tests.conftest import normalize_spaces
 
 stub_providers = {
     'provider_details': [
@@ -79,12 +82,13 @@ stub_providers = {
             'id': '67c770f5-918e-4afa-a5ff-880b9beb161d',
             'active': False,
             'priority': 10,
-            'display_name': 'International SMS Provider (no flag)',
+            'display_name': 'Second International SMS Provider',
             'identifier': 'second_sms_international',
             'notification_type': 'sms',
             'updated_at': None,
             'version': 1,
             'created_by': None,
+            'supports_international': True,
             'current_month_billable_sms': 0,
         }
     ]
@@ -170,26 +174,24 @@ def test_should_show_all_providers(
     domestic_sms_first_row = domestic_sms_table.tbody.find_all('tr')[0]
     table_data = domestic_sms_first_row.find_all('td')
 
-    assert table_data[0].find_all("a")[0]['href'] == '/provider/6005e192-4738-4962-beec-ebd982d0b03f'
+    assert not table_data[0].find_all("a")
     assert table_data[0].text.strip() == "Domestic SMS Provider"
     assert table_data[1].text.strip() == "1"
     assert table_data[2].text.strip() == "42"
     assert table_data[3].text.strip() == "True"
     assert table_data[4].text.strip() == "16 January at 3:20pm"
     assert table_data[5].text.strip() == "Test User"
-    assert table_data[6].find_all("a")[0]['href'] == '/provider/6005e192-4738-4962-beec-ebd982d0b03f/edit'
 
     domestic_sms_second_row = domestic_sms_table.tbody.find_all('tr')[1]
     table_data = domestic_sms_second_row.find_all('td')
 
-    assert table_data[0].find_all("a")[0]['href'] == '/provider/0bd529cd-a0fd-43e5-80ee-b95ef6b0d51f'
+    assert not table_data[0].find_all("a")
     assert table_data[0].text.strip() == "Second Domestic SMS Provider"
     assert table_data[1].text.strip() == "2"
     assert table_data[2].text.strip() == "58"
     assert table_data[3].text.strip() == "True"
     assert table_data[4].text.strip() == "None"
     assert table_data[5].text.strip() == "None"
-    assert table_data[6].find_all("a")[0]['href'] == '/provider/0bd529cd-a0fd-43e5-80ee-b95ef6b0d51f/edit'
 
     domestic_email_first_row = domestic_email_table.tbody.find_all('tr')[0]
     domestic_email_table_data = domestic_email_first_row.find_all('td')
@@ -224,7 +226,6 @@ def test_should_show_all_providers(
     assert table_data[2].text.strip() == "False"
     assert table_data[3].text.strip() == "None"
     assert table_data[4].text.strip() == "None"
-    assert table_data[5].find_all("a")[0]['href'] == '/provider/67c770f5-918e-4afa-a5ff-880b9beb161d/edit'
 
 
 def test_add_monthly_traffic():
@@ -406,3 +407,143 @@ def test_should_show_provider_version_history(
     assert second_row[2].text.strip() == "None"
     assert second_row[3].text.strip() == "10"
     assert second_row[4].text.strip() == "True"
+
+
+def test_should_show_version_history_for_first_two_sms_providers(
+    client_request,
+    platform_admin_user,
+    mocker
+):
+    mocker.patch(
+        'app.provider_client.get_all_providers',
+        return_value=copy.deepcopy(stub_providers)
+    )
+    # second_sms_international will be the primary provider because it’s
+    # the first in the list when reverse sorting the SMS providers
+    second_sms_international = stub_providers['provider_details'][5]
+    mocker.patch(
+        'app.provider_client.get_provider_versions',
+        return_value={'data': [
+            {
+                'id': id,
+                'priority': priority,
+                'display_name': second_sms_international['display_name'],
+                'identifier': second_sms_international['identifier'],
+                'updated_at': updated_at,
+                'created_by': {
+                    'email_address': 'test@foo.bar',
+                    'name': 'Test User',
+                    'id': '7cc1dddb-bcbc-4739-8fc1-61bedde3332a'
+                },
+                'supports_international': False,
+            }
+            for updated_at, priority in [
+                (datetime(2022, 2, 22, 14).isoformat(), 100),
+                (datetime(2020, 1, 1, 5).isoformat(), 80),
+                (datetime(2020, 1, 1, 3).isoformat(), 10),
+                # Anything older than 11am on 29 November 2019
+                # should be ignored because the priority numbers
+                # didn’t mean the same thing before then
+                (datetime(2019, 11, 29, 10, 59).isoformat(), 123),
+                (datetime(2000, 1, 1, 0).isoformat(), 1999),
+                (None, 30),
+            ]
+        ]}
+    )
+
+    client_request.login(platform_admin_user)
+    page = client_request.get('main.edit_sms_provider_ratio')
+
+    assert [
+        radio['value']
+        for radio in page.select('input[name=ratio]')
+    ] == [
+        '100', '90', '80', '70', '60', '50', '40', '30', '20', '10', '0',
+    ]
+
+    assert [
+        radio['value']
+        for radio in page.select('input[checked]')
+    ] == [
+        str(second_sms_international['priority'])
+    ]
+
+    assert [
+        normalize_spaces(heading.text)
+        for heading in page.select('main h2')
+    ] == [
+        'Now',
+        '21 February 2022',
+        '31 December',
+    ]
+
+    assert [
+        normalize_spaces(version.text)
+        for version in page.select('li.history-list-item')
+    ] == [
+        (
+            'Test User 2:00pm '
+            'Second International SMS Provider 100% '
+            'Second Domestic SMS Provider 0%'
+        ),
+        (
+            'Test User 5:00am '
+            'Second International SMS Provider 80% '
+            'Second Domestic SMS Provider 20%'
+        ),
+        (
+            'Test User 3:00am '
+            'Second International SMS Provider 10% '
+            'Second Domestic SMS Provider 90%'
+        ),
+    ]
+
+
+@pytest.mark.parametrize('posted_number, expected_calls', [
+    (
+        '10',
+        [
+            call(stub_providers['provider_details'][5]['id'], 10),
+            call(stub_providers['provider_details'][1]['id'], 90),
+        ],
+    ),
+    (
+        '80',
+        [
+            call(stub_providers['provider_details'][5]['id'], 80),
+            call(stub_providers['provider_details'][1]['id'], 20),
+        ],
+    ),
+])
+def test_should_update_priority_of_first_two_sms_providers(
+    client_request,
+    platform_admin_user,
+    mocker,
+    posted_number,
+    expected_calls,
+):
+    mocker.patch(
+        'app.provider_client.get_all_providers',
+        return_value=copy.deepcopy(stub_providers)
+    )
+    mocker.patch(
+        'app.provider_client.get_provider_versions',
+        return_value={'data': []}
+    )
+    mock_update_provider = mocker.patch(
+        'app.provider_client.update_provider'
+    )
+
+    client_request.login(platform_admin_user)
+    client_request.post(
+        '.edit_sms_provider_ratio',
+        _data={
+            'ratio': posted_number,
+        },
+        _expected_redirect=url_for(
+            '.edit_sms_provider_ratio',
+            _external=True,
+        ),
+    )
+
+    assert mock_update_provider.call_args_list == expected_calls
