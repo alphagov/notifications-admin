@@ -4,6 +4,18 @@ window.GOVUK.Modules = window.GOVUK.Modules || {};
 (function (Modules) {
   function CookieBanner () { }
 
+  CookieBanner.clearOldCookies = function () {
+    // clear any cookies set by the previous version
+    var oldCookies = ['seen_cookie_message', '_ga', '_gid'];
+
+    for (var i = 0; i < oldCookies.length; i++) {
+      if (window.GOVUK.cookie(oldCookies[i])) {
+        var cookieString = oldCookies[i] + '=;expires=' + new Date() + ';domain=' + window.location.hostname.replace(/^www\./, '.') + ';path=/';
+        document.cookie = cookieString;
+      }
+    }
+  };
+
   CookieBanner.prototype.start = function ($module) {
     this.$module = $module[0];
     this.$module.hideCookieMessage = this.hideCookieMessage.bind(this);

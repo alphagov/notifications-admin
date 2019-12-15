@@ -242,12 +242,4 @@
   <!--[if gt IE 8]><!-->
   <script type="text/javascript" src="{{ asset_url('javascripts/all.js') }}"></script>
   <!--<![endif]-->
-  <script>
-    if (window.GOVUK.cookie('_ga') !== null) {
-      document.cookie = '_ga' + '=;expires=' + new Date() + ';domain=' + window.location.hostname.replace(/^www\./, '.') + ';path=/';
-    }
-    if (window.GOVUK.cookie('_gid') !== null) {
-      document.cookie = '_gid' + '=;expires=' + new Date() + ';domain=' + window.location.hostname.replace(/^www\./, '.') + ';path=/';
-    }
-  </script>
 {% endblock %}
