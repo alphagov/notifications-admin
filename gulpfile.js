@@ -142,6 +142,9 @@ const javascripts = () => {
     paths.toolkit + 'javascripts/govuk/modules.js',
     paths.toolkit + 'javascripts/govuk/show-hide-content.js',
     paths.src + 'javascripts/govuk/cookie-functions.js',
+    paths.src + 'javascripts/consent.js',
+    paths.src + 'javascripts/analytics/analytics.js',
+    paths.src + 'javascripts/analytics/init.js',
     paths.src + 'javascripts/cookieMessage.js',
     paths.src + 'javascripts/stick-to-window-when-scrolling.js',
     paths.src + 'javascripts/apiKey.js',
@@ -160,7 +163,7 @@ const javascripts = () => {
     paths.src + 'javascripts/templateFolderForm.js',
     paths.src + 'javascripts/collapsibleCheckboxes.js',
     paths.src + 'javascripts/radioSlider.js',
-    paths.src + 'javascripts/main.js'
+    paths.src + 'javascripts/main.js',
   ])
   .pipe(plugins.prettyerror())
   .pipe(plugins.babel({
