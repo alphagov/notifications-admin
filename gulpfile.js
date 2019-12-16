@@ -63,7 +63,8 @@ const copy = {
         'skip-link',
         'header',
         'footer',
-        'back-link'
+        'back-link',
+        'details'
       ];
       let done = 0;
 
@@ -143,7 +144,6 @@ const javascripts = () => {
     paths.src + 'javascripts/govuk/cookie-functions.js',
     paths.src + 'javascripts/cookieMessage.js',
     paths.src + 'javascripts/stick-to-window-when-scrolling.js',
-    paths.src + 'javascripts/detailsPolyfill.js',
     paths.src + 'javascripts/apiKey.js',
     paths.src + 'javascripts/autofocus.js',
     paths.src + 'javascripts/enhancedTextbox.js',

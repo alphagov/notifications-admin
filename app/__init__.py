@@ -743,6 +743,7 @@ def add_template_filters(application):
         format_phone_number_human_readable,
         format_thousands,
         id_safe,
+        convert_to_boolean,
     ]:
         application.add_template_filter(fn)
 
