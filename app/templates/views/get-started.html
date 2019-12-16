@@ -1,7 +1,6 @@
 {% extends "content_template.html" %}
 {% from "components/table.html" import mapping_table, row, text_field, edit_field, field with context %}
 {% from "components/sub-navigation.html" import sub_navigation %}
-{% from "components/details/macro.njk" import govukDetails %}
 
 {% block per_page_title %}
   Get started
@@ -15,22 +14,21 @@
   <li class="get-started-list__item">
     <h2 class="get-started-list__heading">Check if GOV.UK Notify is right for you</h2>
     <p>Read about our <a href="{{ url_for('main.features') }}">features</a>, <a href="{{ url_for('.pricing') }}">pricing</a> and <a href="{{ url_for('main.roadmap') }}">roadmap</a>.</p>
-    {{ govukDetails({
-      "summaryText": "Organisations that can use Notify",
-      "html": '''
-        <div id="eligible-organisations">
-          <p>Notify is available to:</p>
-          <ul class="list list-bullet">
-            <li>central government departments</li>
-            <li>local authorities</li>
-            <li>state-funded schools</li>
-            <li>housing associations</li>
-            <li>the NHS</li>
-            <li>companies owned by local or central government that deliver services on their behalf</li>
-          </ul>
-          <p>Notify is not currently available to charities.</p>
-        </div>'''
-    }) }}
+    <details>
+      <summary>Organisations that can use Notify</summary>
+      <div id="eligible-organisations">
+        <p>Notify is available to:</p>
+        <ul class="list list-bullet">
+          <li>central government departments</li>
+          <li>local authorities</li>
+          <li>state-funded schools</li>
+          <li>housing associations</li>
+          <li>the NHS</li>
+          <li>companies owned by local or central government that deliver services on their behalf</li>
+        </ul>
+        <p>Notify is not currently available to charities.</p>
+      </div>
+    </details>
   </li>
 
   <li class="get-started-list__item">

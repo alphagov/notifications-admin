@@ -39,45 +39,43 @@
   <div class="api-notifications">
     {% if not api_notifications.notifications %}
       <div class="api-notifications-item">
-        <p class="api-notifications-item__meta">
+        <p class="api-notifications-item-meta">
           When you send messages via the API they’ll appear here.
         </p>
-        <p class="api-notifications-item__meta">
+        <p class="api-notifications-item-meta">
           Notify deletes messages after 7 days.
         </p>
       </div>
     {% endif %}
     {% for notification in api_notifications.notifications %}
-      <details class="api-notifications-item govuk-details govuk-!-margin-bottom-0" data-module="govuk-details">
-        <summary class="govuk-details__summary govuk-clearfix api-notifications-item__heading">
-          <h3>
-            <span class="govuk-details__summary-text">
+      <details class="api-notifications-item">
+        <summary class="api-notifications-item-title">
+          <h3 class="api-notifications-item-recipient">
             {{ notification.to }}
-            </span>
-            <span class="govuk-grid-row api-notifications-item__meta">
-              <span class="govuk-grid-column-one-half api-notifications-item__meta-key">
-                {{notification.key_name}}
-              </span>
-              <span class="govuk-grid-column-one-half api-notifications-item__meta-time">
-                <time class="timeago" datetime="{{ notification.created_at }}">
-                  {{ notification.created_at|format_delta }}
-                </time>
-              </span>
-            </span>
           </h3>
+          <span class="grid-row api-notifications-item-meta">
+            <span class="column-half api-notifications-item-key">
+              {{notification.key_name}}
+            </span>
+            <span class="column-half api-notifications-item-time">
+              <time class="timeago" datetime="{{ notification.created_at }}">
+                {{ notification.created_at|format_delta }}
+              </time>
+            </span>
+          </span>
         </summary>
-        <div class="govuk-details__text api-notifications-item__data govuk-!-padding-top-0">
-          <dl id="notification-{{ notification.id }}">
+        <div>
+          <dl id="notification-{{ notification.id }}" class="api-notifications-item-data bottom-gutter-1-2">
             {% for key in [
               'id', 'client_reference', 'notification_type', 'created_at', 'updated_at', 'sent_at', 'status'
             ] %}
               {% if notification[key] %}
-                <dt class="api-notifications-item__data-name">{{ key }}:</dt>
-                <dd class="api-notifications-item__data-value">{{ notification[key] }}</dd>
+                <dt>{{ key }}:</dt>
+                <dd class="api-notifications-item-data-item">{{ notification[key] }}</dd>
               {% endif %}
             {% endfor %}
             {% if notification.status not in ('pending-virus-check', 'virus-scan-failed') %}
-              <a class="api-notifications-item__view" href="{{ url_for('.view_notification', service_id=current_service.id, notification_id=notification.id) }}">View {{ message_count_label(1, notification.template.template_type, suffix='') }}</a>
+              <a href="{{ url_for('.view_notification', service_id=current_service.id, notification_id=notification.id) }}">View {{ message_count_label(1, notification.template.template_type, suffix='') }}</a>
             {% endif %}
           </dl>
         </div>
@@ -86,11 +84,11 @@
     {% if api_notifications.notifications %}
       <div class="api-notifications-item">
         {% if api_notifications.notifications|length == 50 %}
-          <p class="api-notifications-item__meta">
+          <p class="api-notifications-item-meta">
             Only showing the first 50 messages.
           </p>
         {% endif %}
-        <p class="api-notifications-item__meta">
+        <p class="api-notifications-item-meta">
           Notify deletes messages after 7 days.
         </p>
       </div>
