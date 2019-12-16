@@ -1,8 +1,6 @@
 .api-notifications {
 
   font-family: monospace;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
   border-bottom: 1px solid $border-colour;
 
   &-item {
@@ -10,59 +8,38 @@
     border-top: 1px solid $border-colour;
     padding: 10px 0 0 0;
 
-    &__heading,
-    &__data,
-    &__view {
-      font-family: monospace;
-    }
-
-    &__heading {
+    &-title {
+      color: $link-colour;
+      text-decoration: none;
       display: block;
-      margin-bottom: $gutter-half;
-
-      &::before {
-        top: -1.3em;
-      }
     }
 
-    &__meta {
+    &-recipient {
+      display: inline;
+    }
 
+    &-meta {
       display: block;
       color: $secondary-text-colour;
-      text-decoration: none;
-
-      &-key,
-      &-time {
-        color: $secondary-text-colour;
-        display: inline-block;
-        width: auto;
-      }
-
-      @include govuk-media-query($from: tablet) {
-        &-key,
-        &-time {
-          width: 50%;
-        }
-
-        &-time {
-          text-align: right;
-        }
-      }
-
     }
 
-    &__data {
+    &-time {
+      text-align: right;
+    }
 
-      border-left: none;
-      padding-left: 25px;
+    &-key {
+      display: inline-block;
+      padding-left: 46px;
+    }
 
-      &-name {
-        color: $secondary-text-colour;
-      }
+    &-data {
 
-      &-value {
-        color: $text-colour;
+      padding-left: 31px;
+      color: $secondary-text-colour;
+
+      &-item {
         padding-bottom: 15px;
+        color: $text-colour;
       }
 
     }
