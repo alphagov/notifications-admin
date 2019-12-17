@@ -55,15 +55,14 @@ def user_json(
     failed_login_count=0,
     logged_in_at=None,
     state='active',
-    max_failed_login_count=3,
     platform_admin=False,
     current_session_id='1234',
     organisations=None,
     services=None
 
 ):
-    if not permissions:
-        permissions = {generate_uuid(): [
+    if permissions is None:
+        permissions = {str(generate_uuid()): [
             'view_activity',
             'send_texts',
             'send_emails',
@@ -73,6 +72,10 @@ def user_json(
             'manage_settings',
             'manage_api_keys',
         ]}
+
+    if services is None:
+        services = [str(service_id) for service_id in permissions.keys()]
+
     return {
         'id': id_,
         'name': name,
@@ -84,11 +87,10 @@ def user_json(
         'failed_login_count': failed_login_count,
         'logged_in_at': logged_in_at or datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f'),
         'state': state,
-        'max_failed_login_count': max_failed_login_count,
         'platform_admin': platform_admin,
         'current_session_id': current_session_id,
         'organisations': organisations or [],
-        'services': list(permissions.keys()) if services is None else services
+        'services': services
     }
 
 
