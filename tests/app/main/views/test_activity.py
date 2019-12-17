@@ -14,6 +14,8 @@ from tests.conftest import (
     active_caseworking_user,
     active_user_view_permissions,
     active_user_with_permissions,
+    mock_get_api_keys,
+    mock_get_no_api_keys,
     mock_get_notifications,
     normalize_spaces,
 )
@@ -94,6 +96,7 @@ def test_can_show_notifications(
     mock_get_service_statistics,
     mock_get_service_data_retention,
     mock_has_no_jobs,
+    mock_get_no_api_keys,
     user,
     extra_args,
     expected_update_endpoint,
@@ -176,6 +179,7 @@ def test_can_show_notifications_if_data_retention_not_available(
     mock_get_notifications,
     mock_get_service_statistics,
     mock_has_no_jobs,
+    mock_get_no_api_keys,
 ):
     page = client_request.get(
         'main.view_notifications',
@@ -234,6 +238,7 @@ def test_link_to_download_notifications(
     mock_get_service_statistics,
     mock_get_service_data_retention,
     mock_has_no_jobs,
+    mock_get_no_api_keys,
     user,
     query_parameters,
     expected_download_link,
@@ -269,6 +274,7 @@ def test_letters_with_status_virus_scan_failed_shows_a_failure_description(
     service_one,
     mock_get_service_statistics,
     mock_get_service_data_retention,
+    mock_get_api_keys,
 ):
     mock_get_notifications(
         mocker,
@@ -297,6 +303,7 @@ def test_should_not_show_preview_link_for_precompiled_letters_in_virus_states(
     service_one,
     mock_get_service_statistics,
     mock_get_service_data_retention,
+    mock_get_no_api_keys,
     letter_status,
 ):
     mock_get_notifications(
@@ -320,6 +327,7 @@ def test_shows_message_when_no_notifications(
     mock_get_service_statistics,
     mock_get_service_data_retention,
     mock_get_notifications_with_no_notifications,
+    mock_get_no_api_keys,
 ):
 
     page = client_request.get(
@@ -342,7 +350,7 @@ def test_shows_message_when_no_notifications(
     (
         {},
         {},
-        'Search by phone number or email address',
+        'Search by email address or phone number',
         '',
     ),
     (
@@ -381,6 +389,7 @@ def test_search_recipient_form(
     mock_get_notifications,
     mock_get_service_statistics,
     mock_get_service_data_retention,
+    mock_get_no_api_keys,
     initial_query_arguments,
     form_post_data,
     expected_search_box_label,
@@ -413,6 +422,62 @@ def test_search_recipient_form(
         assert field['value'] == expected_search_box_contents
 
 
+@pytest.mark.parametrize((
+    'message_type,'
+    'api_keys_mock,'
+    'expected_search_box_label,'
+), [
+    (
+        None,
+        mock_get_no_api_keys,
+        'Search by email address or phone number',
+    ),
+    (
+        None,
+        mock_get_api_keys,
+        'Search by email address, phone number or reference',
+    ),
+    (
+        'sms',
+        mock_get_no_api_keys,
+        'Search by phone number',
+    ),
+    (
+        'sms',
+        mock_get_api_keys,
+        'Search by phone number or reference',
+    ),
+    (
+        'email',
+        mock_get_no_api_keys,
+        'Search by email address',
+    ),
+    (
+        'email',
+        mock_get_api_keys,
+        'Search by email address or reference',
+    ),
+])
+def test_api_users_are_told_they_can_search_by_reference(
+    client_request,
+    mocker,
+    fake_uuid,
+    mock_get_notifications,
+    mock_get_service_statistics,
+    mock_get_service_data_retention,
+    message_type,
+    expected_search_box_label,
+    api_keys_mock,
+):
+    api_keys_mock(mocker, fake_uuid)
+    page = client_request.get(
+        'main.view_notifications',
+        service_id=SERVICE_ONE_ID,
+        message_type=message_type,
+    )
+    assert page.select_one('label[for=to]').text.strip() == expected_search_box_label
+
+
 def test_should_show_notifications_for_a_service_with_next_previous(
     client_request,
     service_one,
@@ -420,6 +485,7 @@ def test_should_show_notifications_for_a_service_with_next_previous(
     mock_get_notifications_with_previous_next,
     mock_get_service_statistics,
     mock_get_service_data_retention,
+    mock_get_no_api_keys,
     mocker,
 ):
     page = client_request.get(
@@ -500,6 +566,7 @@ def test_html_contains_notification_id(
     mock_get_notifications,
     mock_get_service_statistics,
     mock_get_service_data_retention,
+    mock_get_no_api_keys,
     mocker,
 ):
     page = client_request.get(
@@ -519,6 +586,7 @@ def test_html_contains_links_for_failed_notifications(
     active_user_with_permissions,
     mock_get_service_statistics,
     mock_get_service_data_retention,
+    mock_get_no_api_keys,
     mocker,
 ):
     mock_get_notifications(mocker,
@@ -543,6 +611,7 @@ def test_redacts_templates_that_should_be_redacted(
     active_user_with_permissions,
     mock_get_service_statistics,
     mock_get_service_data_retention,
+    mock_get_no_api_keys,
 ):
     mock_get_notifications(
         mocker,
@@ -576,6 +645,7 @@ def test_big_numbers_and_search_dont_show_for_letters(
     active_user_with_permissions,
     mock_get_service_statistics,
     mock_get_service_data_retention,
+    mock_get_no_api_keys,
     message_type,
     tablist_visible,
     search_bar_visible
@@ -625,6 +695,7 @@ def test_sending_status_hint_displays_correctly_on_notifications_page(
     active_user_with_permissions,
     mock_get_service_statistics,
     mock_get_service_data_retention,
+    mock_get_no_api_keys,
     message_type,
     status,
     expected_hint_status,
@@ -653,6 +724,7 @@ def test_should_expected_hint_for_letters(
     active_user_with_permissions,
     mock_get_service_statistics,
     mock_get_service_data_retention,
+    mock_get_no_api_keys,
     mocker,
     fake_uuid,
     is_precompiled_letter,
