@@ -1,0 +1,32 @@
+{% from "components/table.html" import list_table, field %}
+{% extends "withnav_template.html" %}
+
+{% block service_page_title %}
+  Returned letters
+{% endblock %}
+
+{% block maincolumn_content %}
+<h1 class="heading-large">
+    Messages sent
+  </h1>
+<div class="body-copy-table" id='pill-selected-item'>
+    {% call(item, row_number) list_table(
+        data,
+        caption="Report",
+        caption_visible=False,
+        empty_message='If you have returned letter reports they will be listed here',
+        field_headings=[
+          'Report date',
+          'number of letters'
+        ],
+        field_headings_visible=False
+      ) %}
+    {% call field() %}
+        <a href="{{url_for('.returned_letters_report', service_id=current_service.id, reported_date=item.reported_at)}}">
+        Returned letters reported on {{ item.reported_at | format_datetime_short}}  ({{ item.returned_letter_count}} letters)
+        </a>
+    {% endcall %}
+  {% endcall %}
+</div>
+
+{% endblock %}
