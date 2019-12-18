@@ -575,4 +575,5 @@ class ServiceAPIClient(NotifyAdminAPIClient):
     def get_returned_letters(self, service_id, reported_at):
         return self.get("service/{}/returned-letters?reported_at={}".format(service_id, reported_at))
 
+
 service_api_client = ServiceAPIClient()

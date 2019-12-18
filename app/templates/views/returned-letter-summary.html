@@ -22,7 +22,7 @@
         field_headings_visible=False
       ) %}
     {% call field() %}
-        <a href="{{url_for('.returned_letters_report', service_id=current_service.id, reported_date=item.reported_at)}}">
+        <a href="{{url_for('.returned_letters_report', service_id=current_service.id, reported_at=item.reported_at)}}">
         Returned letters reported on {{ item.reported_at | format_datetime_short}}  ({{ item.returned_letter_count}} letters)
         </a>
     {% endcall %}
