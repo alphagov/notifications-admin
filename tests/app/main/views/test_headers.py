@@ -21,7 +21,7 @@ def test_owasp_useful_headers_set(
         "font-src 'self' static.example.com data:;"
         "img-src "
         "'self' static.example.com *.google-analytics.com *.notifications.service.gov.uk static-logos.test.com data:;"
-        "frame-src 'self' www.youtube.com;"
+        "frame-src 'self' www.youtube-nocookie.com;"
     )
 
 
@@ -43,5 +43,5 @@ def test_headers_non_ascii_characters_are_replaced(
         "font-src 'self' static.example.com data:;"
         "img-src "
         "'self' static.example.com *.google-analytics.com *.notifications.service.gov.uk static-logos??.test.com data:;"
-        "frame-src 'self' www.youtube.com;"
+        "frame-src 'self' www.youtube-nocookie.com;"
     )
