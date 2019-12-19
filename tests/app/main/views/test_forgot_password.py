@@ -3,7 +3,7 @@ from flask import Response, url_for
 from notifications_python_client.errors import HTTPError
 
 import app
-from tests.conftest import api_user_active as create_active_user
+from tests import user_json
 
 
 def test_should_render_forgot_password(client):
@@ -23,7 +23,7 @@ def test_should_redirect_to_password_reset_sent_for_valid_email(
     email_address,
     mocker,
 ):
-    sample_user = create_active_user(fake_uuid, email_address=email_address)
+    sample_user = user_json(email_address=email_address)
     mocker.patch('app.user_api_client.send_reset_password_url', return_value=None)
     response = client.post(
         url_for('.forgot_password'),

@@ -12,13 +12,7 @@ from app.main.views.feedback import (
     has_live_services,
     in_business_hours,
 )
-from tests.conftest import (
-    active_user_with_permissions,
-    mock_get_services,
-    mock_get_services_with_no_services,
-    mock_get_services_with_one_service,
-    normalize_spaces,
-)
+from tests.conftest import normalize_spaces
 
 
 def no_redirect():
@@ -105,10 +99,10 @@ def test_get_feedback_page_with_prefilled_body(
     fake_uuid,
     prefilled_body,
     expected_textarea,
+    active_user_with_permissions,
 ):
-    user = active_user_with_permissions(fake_uuid)
-    user['email_address'] = 'test@marinemanagement.org.uk'
-    mocker.patch('app.user_api_client.get_user', return_value=user)
+    active_user_with_permissions['email_address'] = 'test@marinemanagement.org.uk'
+    mocker.patch('app.user_api_client.get_user', return_value=active_user_with_permissions)
     mock_post = mocker.patch('app.main.views.feedback.zendesk_client.create_ticket')
     page = client_request.get(
         'main.feedback',
@@ -400,19 +394,16 @@ def test_doesnt_lose_message_if_post_across_closing(
         assert 'feedback_message' not in session
 
 
-@pytest.mark.parametrize('get_services_mock, expected_return_value', [
-    (mock_get_services, True),
-    (mock_get_services_with_no_services, False),
-    (mock_get_services_with_one_service, False),
-])
-def test_has_live_services(
-    mocker,
-    fake_uuid,
-    get_services_mock,
-    expected_return_value
-):
-    get_services_mock(mocker, fake_uuid)
-    assert has_live_services(12345) == expected_return_value
+def test_has_live_services(mock_get_services):
+    assert has_live_services(12345) is True
+
+
+def test_has_live_services_when_there_are_no_services(mock_get_services_with_no_services):
+    assert has_live_services(12345) is False
+
+
+def test_has_live_services_when_service_is_not_live(mock_get_services_with_one_service):
+    assert has_live_services(12345) is False
 
 
 @pytest.mark.parametrize('when, is_in_business_hours', [

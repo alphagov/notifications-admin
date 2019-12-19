@@ -762,6 +762,7 @@ def test_should_check_for_sending_things_right(
     count_of_email_templates,
     reply_to_email_addresses,
     expected_reply_to_checklist_item,
+    active_user_with_permissions,
 ):
     def _templates_by_type(template_type):
         return {
@@ -772,7 +773,7 @@ def test_should_check_for_sending_things_right(
     mock_get_users = mocker.patch(
         'app.models.user.Users.client',
         return_value=(
-            [active_user_with_permissions(fake_uuid)] * count_of_users_with_manage_service +
+            [active_user_with_permissions] * count_of_users_with_manage_service +
             [active_user_no_settings_permission(fake_uuid)]
         )
     )
