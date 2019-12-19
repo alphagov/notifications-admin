@@ -2,7 +2,6 @@
 SHELL := /bin/bash
 DATE = $(shell date +%Y-%m-%dT%H:%M:%S)
 
-PIP_ACCEL_CACHE ?= ${CURDIR}/cache/pip-accel
 APP_VERSION_FILE = app/version.py
 
 GIT_BRANCH ?= $(shell git symbolic-ref --short HEAD 2> /dev/null || echo "detached")
@@ -37,7 +36,7 @@ venv: venv/bin/activate ## Create virtualenv if it does not exist
 
 venv/bin/activate:
 	test -d venv || virtualenv venv -p python3
-	. venv/bin/activate && pip install pip-accel
+	. venv/bin/activate
 
 .PHONY: check-env-vars
 check-env-vars: ## Check mandatory environment variables
@@ -73,8 +72,7 @@ dependencies: venv ## Install build dependencies
 	npm set progress=false
 	npm install
 	npm rebuild node-sass
-	mkdir -p ${PIP_ACCEL_CACHE}
-	. venv/bin/activate && PIP_ACCEL_CACHE=${PIP_ACCEL_CACHE} pip-accel install -r requirements_for_test.txt
+	. venv/bin/activate && pip install -r requirements_for_test.txt
 
 .PHONY: generate-version-file
 generate-version-file: ## Generates the app version file
@@ -83,7 +81,7 @@ generate-version-file: ## Generates the app version file
 .PHONY: build
 build: dependencies generate-version-file ## Build project
 	npm run build
-	. venv/bin/activate && PIP_ACCEL_CACHE=${PIP_ACCEL_CACHE} pip-accel install -r requirements.txt
+	. venv/bin/activate && pip install -r requirements.txt
 
 .PHONY: build-paas-artifact
 build-paas-artifact: ## Build the deploy artifact for PaaS
@@ -130,14 +128,12 @@ coverage: venv ## Create coverage report
 
 .PHONY: prepare-docker-build-image
 prepare-docker-build-image: ## Prepare the Docker builder image
-	mkdir -p ${PIP_ACCEL_CACHE}
 	make -C docker build
 
 define run_docker_container
 	@docker run -i${DOCKER_TTY} --rm \
 		--name "${DOCKER_CONTAINER_PREFIX}-${1}" \
 		-v "`pwd`:/var/project" \
-		-v "${PIP_ACCEL_CACHE}:/var/project/cache/pip-accel" \
 		-e UID=$(shell id -u) \
 		-e GID=$(shell id -g) \
 		-e GIT_COMMIT=${GIT_COMMIT} \
