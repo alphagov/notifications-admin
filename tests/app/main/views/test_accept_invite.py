@@ -9,8 +9,8 @@ import app
 from tests.conftest import (
     SERVICE_ONE_ID,
     USER_ONE_ID,
-    active_caseworking_user,
-    active_user_with_permissions,
+    create_active_caseworking_user,
+    create_active_user_with_permissions,
     normalize_spaces,
 )
 
@@ -126,8 +126,8 @@ def test_invite_goes_in_session(
 
 
 @pytest.mark.parametrize('user, landing_page_title', [
-    (active_user_with_permissions, 'Dashboard'),
-    (active_caseworking_user, 'Templates'),
+    (create_active_user_with_permissions(), 'Dashboard'),
+    (create_active_caseworking_user(), 'Templates'),
 ])
 def test_accepting_invite_removes_invite_from_session(
     client_request,
@@ -153,7 +153,6 @@ def test_accepting_invite_removes_invite_from_session(
     user,
     landing_page_title,
 ):
-    user = user(fake_uuid)
     sample_invite['email_address'] = user['email_address']
 
     mocker.patch('app.invite_api_client.check_token', return_value=sample_invite)

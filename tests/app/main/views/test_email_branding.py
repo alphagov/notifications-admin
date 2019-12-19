@@ -7,11 +7,7 @@ from flask import url_for
 from notifications_python_client.errors import HTTPError
 
 from app.s3_client.s3_logo_client import EMAIL_LOGO_LOCATION_STRUCTURE, TEMP_TAG
-from tests.conftest import (
-    mock_get_email_branding,
-    normalize_spaces,
-    platform_admin_user,
-)
+from tests.conftest import mock_get_email_branding, normalize_spaces
 
 
 def test_email_branding_page_shows_full_branding_list(
@@ -124,8 +120,8 @@ def test_create_new_email_branding_without_logo(
 def test_create_email_branding_requires_a_name_when_submitting_logo_details(
     client_request,
     mocker,
-    fake_uuid,
     mock_create_email_branding,
+    platform_admin_user,
 ):
     mocker.patch('app.main.views.email_branding.persist_logo')
     mocker.patch('app.main.views.email_branding.delete_email_temp_files_created_by')
@@ -137,7 +133,7 @@ def test_create_email_branding_requires_a_name_when_submitting_logo_details(
         'name': '',
         'brand_type': 'org',
     }
-    client_request.login(platform_admin_user(fake_uuid))
+    client_request.login(platform_admin_user)
     page = client_request.post(
         '.create_email_branding',
         content_type='multipart/form-data',
@@ -152,7 +148,7 @@ def test_create_email_branding_requires_a_name_when_submitting_logo_details(
 def test_create_email_branding_does_not_require_a_name_when_uploading_a_file(
     client_request,
     mocker,
-    fake_uuid,
+    platform_admin_user,
 ):
     mocker.patch('app.main.views.email_branding.upload_email_logo', return_value='temp_filename')
     data = {
@@ -162,7 +158,7 @@ def test_create_email_branding_does_not_require_a_name_when_uploading_a_file(
         'name': '',
         'brand_type': 'org',
     }
-    client_request.login(platform_admin_user(fake_uuid))
+    client_request.login(platform_admin_user)
     page = client_request.post(
         '.create_email_branding',
         content_type='multipart/form-data',

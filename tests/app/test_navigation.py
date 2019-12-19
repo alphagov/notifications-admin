@@ -8,12 +8,7 @@ from app.navigation import (
     MainNavigation,
     OrgNavigation,
 )
-from tests.conftest import (
-    ORGANISATION_ID,
-    SERVICE_ONE_ID,
-    active_caseworking_user,
-    normalize_spaces,
-)
+from tests.conftest import ORGANISATION_ID, SERVICE_ONE_ID, normalize_spaces
 
 
 def flask_app():
@@ -181,14 +176,14 @@ def test_navigation_urls(
 def test_caseworkers_get_caseworking_navigation(
     client_request,
     mocker,
-    fake_uuid,
     mock_get_template_folders,
     mock_get_service_templates,
     mock_has_no_jobs,
+    active_caseworking_user,
 ):
     mocker.patch(
         'app.user_api_client.get_user',
-        return_value=active_caseworking_user(fake_uuid)
+        return_value=active_caseworking_user
     )
     page = client_request.get('main.choose_template', service_id=SERVICE_ONE_ID)
     assert normalize_spaces(page.select_one('header + .govuk-width-container nav').text) == (
@@ -199,14 +194,14 @@ def test_caseworkers_get_caseworking_navigation(
 def test_caseworkers_see_jobs_nav_if_jobs_exist(
     client_request,
     mocker,
-    fake_uuid,
     mock_get_service_templates,
     mock_get_template_folders,
     mock_has_jobs,
+    active_caseworking_user,
 ):
     mocker.patch(
         'app.user_api_client.get_user',
-        return_value=active_caseworking_user(fake_uuid)
+        return_value=active_caseworking_user
     )
     page = client_request.get('main.choose_template', service_id=SERVICE_ONE_ID)
     assert normalize_spaces(page.select_one('header + .govuk-width-container nav').text) == (

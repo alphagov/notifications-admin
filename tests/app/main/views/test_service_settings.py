@@ -21,9 +21,10 @@ from tests.conftest import (
     ORGANISATION_ID,
     SERVICE_ONE_ID,
     TEMPLATE_ONE_ID,
-    active_user_no_api_key_permission,
-    active_user_no_settings_permission,
-    active_user_with_permissions,
+    create_active_user_no_api_key_permission,
+    create_active_user_no_settings_permission,
+    create_active_user_with_permissions,
+    create_platform_admin_user,
     get_default_letter_contact_block,
     get_default_reply_to_email_address,
     get_default_sms_sender,
@@ -39,7 +40,6 @@ from tests.conftest import (
     no_reply_to_email_addresses,
     no_sms_senders,
     normalize_spaces,
-    platform_admin_user,
     sample_invite,
 )
 
@@ -57,7 +57,7 @@ def mock_get_service_settings_page_common(
 
 
 @pytest.mark.parametrize('user, expected_rows', [
-    (active_user_with_permissions, [
+    (create_active_user_with_permissions(), [
 
         'Label Value Action',
         'Service name Test Service Change',
@@ -79,7 +79,7 @@ def mock_get_service_settings_page_common(
         'Send letters Off Change',
 
     ]),
-    (platform_admin_user, [
+    (create_platform_admin_user(), [
 
         'Label Value Action',
         'Service name Test Service Change',
@@ -117,7 +117,6 @@ def test_should_show_overview(
         client,
         mocker,
         api_user_active,
-        fake_uuid,
         no_reply_to_email_addresses,
         no_letter_contact_blocks,
         mock_get_service_organisation,
@@ -132,7 +131,7 @@ def test_should_show_overview(
                                organisation_id=ORGANISATION_ID)
     mocker.patch('app.service_api_client.get_service', return_value={'data': service_one})
 
-    client.login(user(fake_uuid), mocker, service_one)
+    client.login(user, mocker, service_one)
     response = client.get(url_for(
         'main.service_settings', service_id=SERVICE_ONE_ID
     ))
@@ -415,19 +414,18 @@ def test_service_name_change_fails_if_new_name_has_less_than_2_alphanumeric_char
 
 @pytest.mark.parametrize('user, expected_text, expected_link', [
     (
-        active_user_with_permissions,
+        create_active_user_with_permissions(),
         'To remove these restrictions, you can send us a request to go live.',
         True,
     ),
     (
-        active_user_no_settings_permission,
+        create_active_user_no_settings_permission(),
         'Your service manager can ask to have these restrictions removed.',
         False,
     ),
 ])
 def test_show_restricted_service(
     client_request,
-    fake_uuid,
     single_reply_to_email_address,
     single_letter_contact_block,
     mock_get_service_organisation,
@@ -437,7 +435,7 @@ def test_show_restricted_service(
     expected_text,
     expected_link,
 ):
-    client_request.login(user(fake_uuid))
+    client_request.login(user)
     page = client_request.get(
         'main.service_settings',
         service_id=SERVICE_ONE_ID,
@@ -763,6 +761,7 @@ def test_should_check_for_sending_things_right(
     reply_to_email_addresses,
     expected_reply_to_checklist_item,
     active_user_with_permissions,
+    active_user_no_settings_permission
 ):
     def _templates_by_type(template_type):
         return {
@@ -774,7 +773,7 @@ def test_should_check_for_sending_things_right(
         'app.models.user.Users.client',
         return_value=(
             [active_user_with_permissions] * count_of_users_with_manage_service +
-            [active_user_no_settings_permission(fake_uuid)]
+            [active_user_no_settings_permission]
         )
     )
     mock_get_invites = mocker.patch(
@@ -3789,9 +3788,9 @@ def test_service_switch_can_upload_document_lets_contact_details_be_added_and_sh
 
 
 @pytest.mark.parametrize('user', (
-    platform_admin_user,
-    active_user_with_permissions,
-    pytest.param(active_user_no_settings_permission, marks=pytest.mark.xfail),
+    create_platform_admin_user(),
+    create_active_user_with_permissions(),
+    pytest.param(create_active_user_no_settings_permission(), marks=pytest.mark.xfail),
 ))
 def test_archive_service_after_confirm(
     client_request,
@@ -3800,10 +3799,9 @@ def test_archive_service_after_confirm(
     mock_get_service_and_organisation_counts,
     mock_get_organisations_and_services_for_user,
     user,
-    fake_uuid,
 ):
     mocked_fn = mocker.patch('app.service_api_client.post')
-    client_request.login(user(fake_uuid))
+    client_request.login(user)
     page = client_request.post(
         'main.archive_service',
         service_id=SERVICE_ONE_ID,
@@ -3818,9 +3816,9 @@ def test_archive_service_after_confirm(
 
 
 @pytest.mark.parametrize('user', (
-    platform_admin_user,
-    active_user_with_permissions,
-    pytest.param(active_user_no_settings_permission, marks=pytest.mark.xfail),
+    create_platform_admin_user(),
+    create_active_user_with_permissions(),
+    pytest.param(create_active_user_no_settings_permission(), marks=pytest.mark.xfail),
 ))
 def test_archive_service_prompts_user(
     client_request,
@@ -3830,11 +3828,10 @@ def test_archive_service_prompts_user(
     mock_get_service_organisation,
     single_sms_sender,
     mock_get_service_settings_page_common,
-    fake_uuid,
     user,
 ):
     mocked_fn = mocker.patch('app.service_api_client.post')
-    client_request.login(user(fake_uuid))
+    client_request.login(user)
 
     settings_page = client_request.get(
         'main.archive_service',
@@ -4234,14 +4231,14 @@ def test_set_inbound_sms_when_inbound_number_is_not_set(
 
 
 @pytest.mark.parametrize('user, expected_paragraphs', [
-    (active_user_with_permissions, [
+    (create_active_user_with_permissions(), [
         'Your service can receive text messages sent to 07700900123.',
         'You can still send text messages from a sender name if you '
         'need to, but users will not be able to reply to those messages.',
         'Contact us if you want to switch this feature off.',
         'You can set up callbacks for received text messages on the API integration page.',
     ]),
-    (active_user_no_api_key_permission, [
+    (create_active_user_no_api_key_permission(), [
         'Your service can receive text messages sent to 07700900123.',
         'You can still send text messages from a sender name if you '
         'need to, but users will not be able to reply to those messages.',
@@ -4252,7 +4249,6 @@ def test_set_inbound_sms_when_inbound_number_is_set(
     client_request,
     service_one,
     mocker,
-    fake_uuid,
     user,
     expected_paragraphs,
 ):
@@ -4260,7 +4256,7 @@ def test_set_inbound_sms_when_inbound_number_is_set(
     mocker.patch('app.inbound_number_client.get_inbound_sms_number_for_service', return_value={
         'data': {'number': '07700900123'}
     })
-    client_request.login(user(fake_uuid))
+    client_request.login(user)
     page = client_request.get(
         'main.service_set_inbound_sms',
         service_id=SERVICE_ONE_ID,

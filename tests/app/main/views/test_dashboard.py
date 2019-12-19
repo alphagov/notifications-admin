@@ -25,8 +25,8 @@ from tests import (
 from tests.conftest import (
     ORGANISATION_ID,
     SERVICE_ONE_ID,
-    active_caseworking_user,
-    active_user_view_permissions,
+    create_active_caseworking_user,
+    create_active_user_view_permissions,
     mock_get_inbound_sms_summary,
     mock_get_inbound_sms_summary_with_no_messages,
     normalize_spaces,
@@ -101,16 +101,15 @@ stub_template_stats = [
 
 
 @pytest.mark.parametrize('user', (
-    active_user_view_permissions,
-    active_caseworking_user,
+    create_active_user_view_permissions(),
+    create_active_caseworking_user(),
 ))
 def test_redirect_from_old_dashboard(
     logged_in_client,
     user,
     mocker,
-    fake_uuid,
 ):
-    mocker.patch('app.user_api_client.get_user', return_value=user(fake_uuid))
+    mocker.patch('app.user_api_client.get_user', return_value=user)
     expected_location = 'http://localhost/services/{}'.format(SERVICE_ONE_ID)
 
     response = logged_in_client.get('/services/{}/dashboard'.format(SERVICE_ONE_ID))

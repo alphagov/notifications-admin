@@ -10,9 +10,9 @@ from tests.conftest import (
     ORGANISATION_ID,
     SERVICE_ONE_ID,
     SERVICE_TWO_ID,
-    active_user_with_permissions,
+    create_active_user_with_permissions,
+    create_platform_admin_user,
     normalize_spaces,
-    platform_admin_user,
 )
 
 
@@ -548,10 +548,10 @@ def test_organisation_settings_for_platform_admin(
 ))
 @pytest.mark.parametrize('user', (
     pytest.param(
-        platform_admin_user,
+        create_platform_admin_user(),
     ),
     pytest.param(
-        active_user_with_permissions,
+        create_active_user_with_permissions(),
         marks=pytest.mark.xfail
     ),
 ))
@@ -565,7 +565,7 @@ def test_view_organisation_settings(
     expected_selected,
     user,
 ):
-    client_request.login(user(fake_uuid))
+    client_request.login(user)
 
     page = client_request.get(endpoint, org_id=organisation_one['id'])
 
@@ -633,10 +633,10 @@ def test_view_organisation_settings(
 ))
 @pytest.mark.parametrize('user', (
     pytest.param(
-        platform_admin_user,
+        create_platform_admin_user(),
     ),
     pytest.param(
-        active_user_with_permissions,
+        create_active_user_with_permissions(),
         marks=pytest.mark.xfail
     ),
 ))
@@ -653,7 +653,7 @@ def test_update_organisation_settings(
     user,
 ):
     mocker.patch('app.organisations_client.get_organisation_services', return_value=[])
-    client_request.login(user(fake_uuid))
+    client_request.login(user)
 
     client_request.post(
         endpoint,
@@ -704,10 +704,10 @@ def test_update_organisation_sector_sends_service_id_data_to_api_client(
 
 @pytest.mark.parametrize('user', (
     pytest.param(
-        platform_admin_user,
+        create_platform_admin_user(),
     ),
     pytest.param(
-        active_user_with_permissions,
+        create_active_user_with_permissions(),
         marks=pytest.mark.xfail
     ),
 ))
@@ -717,7 +717,7 @@ def test_view_organisation_domains(
     fake_uuid,
     user,
 ):
-    client_request.login(user(fake_uuid))
+    client_request.login(user)
 
     mocker.patch(
         'app.organisations_client.get_organisation',
@@ -785,10 +785,10 @@ def test_view_organisation_domains(
 ))
 @pytest.mark.parametrize('user', (
     pytest.param(
-        platform_admin_user,
+        create_platform_admin_user(),
     ),
     pytest.param(
-        active_user_with_permissions,
+        create_active_user_with_permissions(),
         marks=pytest.mark.xfail
     ),
 ))
@@ -802,7 +802,7 @@ def test_update_organisation_domains(
     expected_persisted,
     user,
 ):
-    client_request.login(user(fake_uuid))
+    client_request.login(user)
 
     client_request.post(
         'main.edit_organisation_domains',

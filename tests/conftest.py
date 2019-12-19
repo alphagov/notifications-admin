@@ -3562,3 +3562,205 @@ def mock_get_service_history(mocker):
         ],
         'events': [],
     })
+
+
+def create_api_user_active(with_unique_id=False):
+    return {
+        'id': str(uuid4()) if with_unique_id else sample_uuid(),
+        'name': 'Test User',
+        'password': 'somepassword',
+        'email_address': 'test@user.gov.uk',
+        'mobile_number': '07700 900762',
+        'state': 'active',
+        'failed_login_count': 0,
+        'permissions': {},
+        'platform_admin': False,
+        'auth_type': 'sms_auth',
+        'password_changed_at': str(datetime.utcnow()),
+        'services': [],
+        'organisations': [],
+        'current_session_id': None,
+        'logged_in_at': None,
+    }
+
+
+def create_active_user_empty_permissions(with_unique_id=False):
+    user_data = {'id': str(uuid4()) if with_unique_id else sample_uuid(),
+                 'name': 'Test User With Empty Permissions',
+                 'password': 'somepassword',
+                 'password_changed_at': str(datetime.utcnow()),
+                 'email_address': 'test@user.gov.uk',
+                 'mobile_number': '07700 900763',
+                 'state': 'active',
+                 'failed_login_count': 0,
+                 'permissions': {},
+                 'platform_admin': False,
+                 'auth_type': 'sms_auth',
+                 'organisations': [],
+                 'services': [SERVICE_ONE_ID],
+                 'current_session_id': None,
+                 }
+    return user_data
+
+
+def create_active_user_with_permissions(with_unique_id=False):
+    return {
+        'id': str(uuid4()) if with_unique_id else sample_uuid(),
+        'name': 'Test User',
+        'password': 'somepassword',
+        'password_changed_at': str(datetime.utcnow()),
+        'email_address': 'test@user.gov.uk',
+        'mobile_number': '07700 900762',
+        'state': 'active',
+        'failed_login_count': 0,
+        'permissions': {SERVICE_ONE_ID: ['send_texts',
+                                         'send_emails',
+                                         'send_letters',
+                                         'manage_users',
+                                         'manage_templates',
+                                         'manage_settings',
+                                         'manage_api_keys',
+                                         'view_activity']},
+        'platform_admin': False,
+        'auth_type': 'sms_auth',
+        'organisations': [ORGANISATION_ID],
+        'services': [SERVICE_ONE_ID],
+        'current_session_id': None,
+                 }
+
+
+def create_active_user_view_permissions(with_unique_id=False):
+    return {
+        'id': str(uuid4()) if with_unique_id else sample_uuid(),
+        'name': 'Test User With Permissions',
+        'password': 'somepassword',
+        'password_changed_at': str(datetime.utcnow()),
+        'email_address': 'test@user.gov.uk',
+        'mobile_number': '07700 900762',
+        'state': 'active',
+        'failed_login_count': 0,
+        'permissions': {SERVICE_ONE_ID: ['view_activity']},
+        'platform_admin': False,
+        'auth_type': 'sms_auth',
+        'organisations': [],
+        'services': [SERVICE_ONE_ID],
+        'current_session_id': None,
+    }
+
+
+def create_active_caseworking_user(with_unique_id=False):
+    return {
+        'id': str(uuid4()) if with_unique_id else sample_uuid(),
+        'name': 'Test User',
+        'password': 'somepassword',
+        'password_changed_at': str(datetime.utcnow()),
+        'email_address': 'caseworker@example.gov.uk',
+        'mobile_number': '07700 900762',
+        'state': 'active',
+        'failed_login_count': 0,
+        'permissions': {SERVICE_ONE_ID: [
+            'send_texts',
+            'send_emails',
+            'send_letters',
+        ]},
+        'platform_admin': False,
+        'auth_type': 'sms_auth',
+        'organisations': [],
+        'services': [SERVICE_ONE_ID],
+        'current_session_id': None,
+    }
+
+
+def create_active_user_no_api_key_permission(with_unique_id=False):
+    return {
+        'id': str(uuid4()) if with_unique_id else sample_uuid(),
+        'name': 'Test User With Permissions',
+        'password': 'somepassword',
+        'password_changed_at': str(datetime.utcnow()),
+        'email_address': 'test@user.gov.uk',
+        'mobile_number': '07700 900762',
+        'state': 'active',
+        'failed_login_count': 0,
+        'permissions': {SERVICE_ONE_ID: [
+            'manage_templates',
+            'manage_settings',
+            'view_activity',
+        ]},
+        'platform_admin': False,
+        'auth_type': 'sms_auth',
+        'organisations': [],
+        'current_session_id': None,
+        'services': [SERVICE_ONE_ID],
+    }
+
+
+def create_active_user_no_settings_permission(with_unique_id=False):
+    return {
+        'id': str(uuid4()) if with_unique_id else sample_uuid(),
+        'name': 'Test User With Permissions',
+        'password': 'somepassword',
+        'password_changed_at': str(datetime.utcnow()),
+        'email_address': 'test@user.gov.uk',
+        'mobile_number': '07700 900762',
+        'state': 'active',
+        'failed_login_count': 0,
+        'permissions': {SERVICE_ONE_ID: [
+            'manage_templates',
+            'manage_api_keys',
+            'view_activity',
+        ]},
+        'platform_admin': False,
+        'auth_type': 'sms_auth',
+        'current_session_id': None,
+        'services': [SERVICE_ONE_ID],
+        'organisations': [],
+    }
+
+
+def create_active_user_manage_template_permissions(with_unique_id=False):
+    return {
+        'id': str(uuid4()) if with_unique_id else sample_uuid(),
+        'name': 'Test User With Permissions',
+        'password': 'somepassword',
+        'password_changed_at': str(datetime.utcnow()),
+        'email_address': 'test@user.gov.uk',
+        'mobile_number': '07700 900762',
+        'state': 'active',
+        'failed_login_count': 0,
+        'permissions': {SERVICE_ONE_ID: [
+            'manage_templates',
+            'view_activity',
+        ]},
+        'platform_admin': False,
+        'auth_type': 'sms_auth',
+        'organisations': [],
+        'services': [SERVICE_ONE_ID],
+        'current_session_id': None,
+    }
+
+
+def create_platform_admin_user(with_unique_id=False):
+    return {
+        'id': str(uuid4()) if with_unique_id else sample_uuid(),
+        'name': 'Platform admin user',
+        'password': 'somepassword',
+        'email_address': 'platform@admin.gov.uk',
+        'mobile_number': '07700 900762',
+        'state': 'active',
+        'failed_login_count': 0,
+        'permissions': {SERVICE_ONE_ID: ['send_texts',
+                                         'send_emails',
+                                         'send_letters',
+                                         'manage_users',
+                                         'manage_templates',
+                                         'manage_settings',
+                                         'manage_api_keys',
+                                         'view_activity']},
+        'platform_admin': True,
+        'auth_type': 'sms_auth',
+        'password_changed_at': str(datetime.utcnow()),
+        'services': [],
+        'organisations': [],
+        'current_session_id': None,
+        'logged_in_at': None,
+    }

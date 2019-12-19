@@ -5,7 +5,7 @@ import pytest
 
 from app import invite_api_client, service_api_client, user_api_client
 from tests import sample_uuid
-from tests.conftest import SERVICE_ONE_ID, api_user_pending
+from tests.conftest import SERVICE_ONE_ID
 
 user_id = sample_uuid()
 
@@ -193,7 +193,7 @@ def test_returns_value_from_cache(
     (user_api_client, 'add_user_to_service', [SERVICE_ONE_ID, user_id, [], []], {}),
     (user_api_client, 'add_user_to_organisation', [sample_uuid(), user_id], {}),
     (user_api_client, 'set_user_permissions', [user_id, SERVICE_ONE_ID, []], {}),
-    (user_api_client, 'activate_user', [api_user_pending(sample_uuid())['id']], {}),
+    (user_api_client, 'activate_user', [user_id], {}),
     (user_api_client, 'archive_user', [user_id], {}),
     (service_api_client, 'remove_user_from_service', [SERVICE_ONE_ID, user_id], {}),
     (service_api_client, 'create_service', ['', '', 0, False, user_id, sample_uuid()], {}),
