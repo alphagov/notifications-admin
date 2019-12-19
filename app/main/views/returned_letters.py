@@ -22,14 +22,16 @@ def returned_letter_summary(service_id):
 def returned_letters_report(service_id, reported_at):
     returned_letters = service_api_client.get_returned_letters(service_id, reported_at)
     column_names = OrderedDict([
+        ('notification_id', 'Notification ID'),
         ('client_reference', 'Reference'),
         ('created_at', 'Date sent'),
-        ('notification_id', 'Notification ID'),
+        ('email_address', 'Sent by'),
         ('template_name', 'Template name'),
         ('template_id', 'Template ID'),
         ('template_version', 'Template version'),
-        ('original_file_name', 'Job file name'),
-        ('job_row_number', 'Job row number'),
+        ('original_file_name', 'Spreadsheet file name'),
+        ('job_row_number', 'Spreadsheet row number'),
+        ('uploaded_letter', 'Uploaded letter')
     ])
 
     # initialise with header row
