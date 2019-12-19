@@ -11,10 +11,8 @@ from tests.conftest import (
     USER_ONE_ID,
     active_caseworking_user,
     active_user_with_permissions,
+    normalize_spaces,
 )
-from tests.conftest import mock_check_invite_token as mock_check_token_invite
-from tests.conftest import normalize_spaces
-from tests.conftest import sample_invite as create_sample_invite
 
 
 def test_existing_user_accept_invite_calls_api_and_redirects_to_dashboard(
@@ -296,13 +294,12 @@ def test_new_user_accept_invite_calls_api_and_views_registration_page(
 
 def test_cancelled_invited_user_accepts_invited_redirect_to_cancelled_invitation(
     client,
-    service_one,
-    mocker,
     mock_get_user,
     mock_get_service,
+    sample_invite,
+    mock_check_invite_token,
 ):
-    cancelled_invitation = create_sample_invite(mocker, service_one, status='cancelled')
-    mock_check_token_invite(mocker, cancelled_invitation)
+    sample_invite['status'] = 'cancelled'
     response = client.get(url_for('main.accept_invite', token='thisisnotarealtoken'))
 
     app.invite_api_client.check_token.assert_called_with('thisisnotarealtoken')
