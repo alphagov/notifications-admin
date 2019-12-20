@@ -101,7 +101,7 @@ def test_post_upload_letter_redirects_for_valid_file(
     assert not page.find(id='validation-error-message')
 
     assert page.find('input', {'type': 'hidden', 'name': 'file_id', 'value': fake_uuid})
-    assert page.find('button', {'type': 'submit'}).text == 'Send 1 letter'
+    assert page.select('main button[type=submit]')[0].text == 'Send 1 letter'
 
 
 def test_post_upload_letter_shows_letter_preview_for_valid_file(
@@ -401,7 +401,7 @@ def test_uploaded_letter_preview_does_not_show_send_button_if_service_in_trial_m
         'Recipient: The Queen'
     )
     assert not page.find('form')
-    assert not page.find('button', {'type': 'submit'})
+    assert len(page.select('main button[type=submit]')) == 0
 
 
 def test_uploaded_letter_preview_image_shows_overlay_when_content_outside_printable_area(
