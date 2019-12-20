@@ -126,5 +126,14 @@
 
     <script src="/static_503/govuk-template.js"></script>
 
+    <script>
+      if (window.GOVUK.cookie('_ga') !== null) {
+        document.cookie = '_ga' + '=;expires=' + new Date() + ';domain=.' + window.location.hostname + ';path=/';
+      }
+      if (window.GOVUK.cookie('_gid') !== null) {
+        document.cookie = '_gid' + '=;expires=' + new Date() + ';domain=.' + window.location.hostname + ';path=/';
+      }
+    </script>
+
 
 </body></html>
