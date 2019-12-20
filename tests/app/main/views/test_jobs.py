@@ -9,8 +9,8 @@ from app.main.views.jobs import get_time_left
 from tests import job_json, notification_json, sample_uuid
 from tests.conftest import (
     SERVICE_ONE_ID,
-    active_caseworking_user,
-    active_user_with_permissions,
+    create_active_caseworking_user,
+    create_active_user_with_permissions,
     mock_get_notifications,
     mock_get_service_letter_template,
     normalize_spaces,
@@ -18,7 +18,7 @@ from tests.conftest import (
 
 
 @pytest.mark.parametrize('user, expected_rows', [
-    (active_user_with_permissions, (
+    (create_active_user_with_permissions(), (
         (
             'File Sending Delivered Failed'
         ),
@@ -39,7 +39,7 @@ from tests.conftest import (
             'Sent today at 12:12pm 1 0 0'
         ),
     )),
-    (active_caseworking_user, (
+    (create_active_caseworking_user(), (
         (
             'File Messages to be sent'
         ),
@@ -78,11 +78,10 @@ def test_jobs_page_shows_scheduled_jobs_if_user_doesnt_have_dashboard(
     service_one,
     active_user_with_permissions,
     mock_get_jobs,
-    fake_uuid,
     user,
     expected_rows,
 ):
-    client_request.login(user(fake_uuid))
+    client_request.login(user)
     page = client_request.get('main.view_jobs', service_id=service_one['id'])
 
     for index, row in enumerate(expected_rows):
@@ -90,17 +89,16 @@ def test_jobs_page_shows_scheduled_jobs_if_user_doesnt_have_dashboard(
 
 
 @pytest.mark.parametrize('user', [
-    active_user_with_permissions,
-    active_caseworking_user,
+    create_active_user_with_permissions(),
+    create_active_caseworking_user(),
 ])
 def test_get_jobs_shows_page_links(
     client_request,
     active_user_with_permissions,
     mock_get_jobs,
     user,
-    fake_uuid,
 ):
-    client_request.login(user(fake_uuid))
+    client_request.login(user)
     page = client_request.get('main.view_jobs', service_id=SERVICE_ONE_ID)
 
     assert 'Next page' in page.find('li', {'class': 'next-page'}).text
@@ -108,8 +106,8 @@ def test_get_jobs_shows_page_links(
 
 
 @pytest.mark.parametrize('user', [
-    active_user_with_permissions,
-    active_caseworking_user,
+    create_active_user_with_permissions(),
+    create_active_caseworking_user(),
 ])
 @freeze_time("2012-12-12 12:12")
 def test_jobs_page_doesnt_show_scheduled_on_page_2(
@@ -117,10 +115,9 @@ def test_jobs_page_doesnt_show_scheduled_on_page_2(
     service_one,
     active_user_with_permissions,
     mock_get_jobs,
-    fake_uuid,
     user,
 ):
-    client_request.login(user(fake_uuid))
+    client_request.login(user)
     page = client_request.get('main.view_jobs', service_id=service_one['id'], page=2)
 
     for index, row in enumerate((
@@ -148,8 +145,8 @@ def test_jobs_page_doesnt_show_scheduled_on_page_2(
 
 
 @pytest.mark.parametrize('user', [
-    active_user_with_permissions,
-    active_caseworking_user,
+    create_active_user_with_permissions(),
+    create_active_caseworking_user(),
 ])
 @pytest.mark.parametrize(
     "status_argument, expected_api_call", [
@@ -182,7 +179,6 @@ def test_jobs_page_doesnt_show_scheduled_on_page_2(
 @freeze_time("2016-01-01 11:09:00.061258")
 def test_should_show_page_for_one_job(
     client_request,
-    active_user_with_permissions,
     mock_get_service_template,
     mock_get_job,
     mocker,

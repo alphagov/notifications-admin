@@ -5,13 +5,7 @@ import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
 
-from tests.conftest import (
-    SERVICE_ONE_ID,
-    SERVICE_TWO_ID,
-    normalize_spaces,
-    service_one,
-    service_two,
-)
+from tests.conftest import SERVICE_ONE_ID, SERVICE_TWO_ID, normalize_spaces
 
 OS1, OS2, OS3, S1, S2, S3 = repeat(uuid.uuid4(), 6)
 
@@ -237,43 +231,58 @@ def test_choose_account_should_not_show_back_to_service_link_if_service_archived
     assert page.select_one('.navigation-service a') is None
 
 
-@pytest.mark.parametrize('service, expected_status, page_text', (
-    (service_one, 200, (
-        'Test Service   Switch service '
-        ''
-        'Dashboard '
-        'Templates '
-        'Team members'
-    )),
-    (service_two, 403, (
+def test_should_not_show_back_to_service_if_user_doesnt_belong_to_service(
+    client_request,
+    fake_uuid,
+    mock_get_service,
+    service_two,
+):
+    mock_get_service.return_value = service_two
+    expected_page_text = (
         # Page has no ‘back to’ link
         'You’re not allowed to see this page '
         'To check your permissions, speak to a member of your team who can manage settings, team and usage.'
-    )),
-))
-def test_should_not_show_back_to_service_if_user_doesnt_belong_to_service(
-    client_request,
-    api_user_active,
-    fake_uuid,
-    mock_get_service,
-    mock_get_service_template,
-    mock_get_template_folders,
-    service,
-    expected_status,
-    page_text,
-):
-    mock_get_service.return_value = service(api_user_active)
-
+    )
     page = client_request.get(
         'main.view_template',
         service_id=mock_get_service.return_value['id'],
         template_id=fake_uuid,
-        _expected_status=expected_status,
+        _expected_status=403,
         _test_page_title=False,
     )
 
     assert normalize_spaces(
         page.select_one('header + .govuk-width-container').text
     ).startswith(
-        normalize_spaces(page_text)
+        normalize_spaces(expected_page_text)
+    )
+
+
+def test_should_show_back_to_service_if_user_belongs_to_service(
+    client_request,
+    fake_uuid,
+    mock_get_service,
+    mock_get_service_template,
+    service_one,
+):
+    mock_get_service.return_value = service_one
+    expected_page_text = (
+        'Test Service   Switch service '
+        ''
+        'Dashboard '
+        'Templates '
+        'Team members'
+    )
+
+    page = client_request.get(
+        'main.view_template',
+        service_id=mock_get_service.return_value['id'],
+        template_id=fake_uuid,
+        _test_page_title=False,
+    )
+
+    assert normalize_spaces(
+        page.select_one('header + .govuk-width-container').text
+    ).startswith(
+        normalize_spaces(expected_page_text)
     )

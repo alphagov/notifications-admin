@@ -11,8 +11,8 @@ from PyPDF2.utils import PdfReadError
 
 from tests.conftest import (
     SERVICE_ONE_ID,
-    active_caseworking_user,
-    active_user_with_permissions,
+    create_active_caseworking_user,
+    create_active_user_with_permissions,
     mock_get_notification,
     normalize_spaces,
 )
@@ -33,8 +33,8 @@ from tests.conftest import (
     ('test', 'permanent-failure', 'Phone number does not exist (test)'),
 ])
 @pytest.mark.parametrize('user', [
-    active_user_with_permissions,
-    active_caseworking_user,
+    create_active_user_with_permissions(),
+    create_active_caseworking_user(),
 ])
 @freeze_time("2016-01-01 11:09:00.061258")
 def test_notification_status_page_shows_details(
@@ -49,7 +49,7 @@ def test_notification_status_page_shows_details(
     expected_status,
 ):
 
-    mocker.patch('app.user_api_client.get_user', return_value=user(fake_uuid))
+    mocker.patch('app.user_api_client.get_user', return_value=user)
 
     _mock_get_notification = mock_get_notification(
         mocker,

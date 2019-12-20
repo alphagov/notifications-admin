@@ -11,9 +11,9 @@ from app.main.views.jobs import get_status_filters, get_time_left
 from app.models.service import Service
 from tests.conftest import (
     SERVICE_ONE_ID,
-    active_caseworking_user,
-    active_user_view_permissions,
-    active_user_with_permissions,
+    create_active_caseworking_user,
+    create_active_user_view_permissions,
+    create_active_user_with_permissions,
     mock_get_api_keys,
     mock_get_no_api_keys,
     mock_get_notifications,
@@ -24,21 +24,21 @@ from tests.conftest import (
 @pytest.mark.parametrize(
     "user,extra_args,expected_update_endpoint,expected_limit_days,page_title", [
         (
-            active_user_view_permissions,
+            create_active_user_view_permissions(),
             {'message_type': 'email'},
             '/email.json',
             7,
             'Emails',
         ),
         (
-            active_user_view_permissions,
+            create_active_user_view_permissions(),
             {'message_type': 'sms'},
             '/sms.json',
             7,
             'Text messages',
         ),
         (
-            active_caseworking_user,
+            create_active_caseworking_user(),
             {},
             '.json',
             None,
@@ -109,9 +109,8 @@ def test_can_show_notifications(
     to_argument,
     expected_to_argument,
     mocker,
-    fake_uuid,
 ):
-    client_request.login(user(fake_uuid))
+    client_request.login(user)
     if expected_to_argument:
         page = client_request.post(
             'main.view_notifications',
@@ -191,7 +190,7 @@ def test_can_show_notifications_if_data_retention_not_available(
 
 @pytest.mark.parametrize('user, query_parameters, expected_download_link', [
     (
-        active_user_with_permissions,
+        create_active_user_with_permissions(),
         {},
         partial(
             url_for,
@@ -200,7 +199,7 @@ def test_can_show_notifications_if_data_retention_not_available(
         ),
     ),
     (
-        active_user_with_permissions,
+        create_active_user_with_permissions(),
         {'status': 'failed'},
         partial(
             url_for,
@@ -209,7 +208,7 @@ def test_can_show_notifications_if_data_retention_not_available(
         ),
     ),
     (
-        active_user_with_permissions,
+        create_active_user_with_permissions(),
         {'message_type': 'sms'},
         partial(
             url_for,
@@ -218,7 +217,7 @@ def test_can_show_notifications_if_data_retention_not_available(
         ),
     ),
     (
-        active_user_view_permissions,
+        create_active_user_view_permissions(),
         {},
         partial(
             url_for,
@@ -226,14 +225,13 @@ def test_can_show_notifications_if_data_retention_not_available(
         ),
     ),
     (
-        active_caseworking_user,
+        create_active_caseworking_user(),
         {},
         lambda service_id: None,
     ),
 ])
 def test_link_to_download_notifications(
     client_request,
-    fake_uuid,
     mock_get_notifications,
     mock_get_service_statistics,
     mock_get_service_data_retention,
@@ -243,7 +241,7 @@ def test_link_to_download_notifications(
     query_parameters,
     expected_download_link,
 ):
-    client_request.login(user(fake_uuid))
+    client_request.login(user)
     page = client_request.get(
         'main.view_notifications',
         service_id=SERVICE_ONE_ID,

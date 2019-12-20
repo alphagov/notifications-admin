@@ -32,8 +32,8 @@ from tests import (
 )
 from tests.conftest import (
     SERVICE_ONE_ID,
-    active_caseworking_user,
-    active_user_with_permissions,
+    create_active_caseworking_user,
+    create_active_user_with_permissions,
     mock_get_international_service,
     mock_get_live_service,
     mock_get_service,
@@ -954,8 +954,8 @@ def test_404_for_previewing_a_row_out_of_range(
 
 
 @pytest.mark.parametrize('user', (
-    active_user_with_permissions,
-    active_caseworking_user,
+    create_active_user_with_permissions(),
+    create_active_caseworking_user(),
 ))
 def test_send_test_doesnt_show_file_contents(
     client_request,
@@ -969,7 +969,7 @@ def test_send_test_doesnt_show_file_contents(
     fake_uuid,
     user,
 ):
-    mocker.patch('app.user_api_client.get_user', return_value=user(fake_uuid))
+    mocker.patch('app.user_api_client.get_user', return_value=user)
     mocker.patch('app.main.views.send.s3download', return_value="""
         phone number
         07700 900 986
@@ -990,43 +990,43 @@ def test_send_test_doesnt_show_file_contents(
 
 @pytest.mark.parametrize('user, endpoint, template_mock, expected_recipient', [
     (
-        active_user_with_permissions,
+        create_active_user_with_permissions(),
         'main.send_test_step',
         mock_get_service_template_with_placeholders,
         '07700 900762'
     ),
     (
-        active_user_with_permissions,
+        create_active_user_with_permissions(),
         'main.send_test_step',
         mock_get_service_email_template,
         'test@user.gov.uk'
     ),
     (
-        active_caseworking_user,
+        create_active_caseworking_user(),
         'main.send_test_step',
         mock_get_service_email_template,
         'caseworker@example.gov.uk'
     ),
     (
-        active_user_with_permissions,
+        create_active_user_with_permissions(),
         'main.send_test_step',
         mock_get_service_letter_template,
         None
     ),
     (
-        active_user_with_permissions,
+        create_active_user_with_permissions(),
         'main.send_one_off_step',
         mock_get_service_template,
         None
     ),
     (
-        active_user_with_permissions,
+        create_active_user_with_permissions(),
         'main.send_one_off_step',
         mock_get_service_email_template,
         None
     ),
     (
-        active_user_with_permissions,
+        create_active_user_with_permissions(),
         'main.send_one_off_step',
         mock_get_service_letter_template,
         None
@@ -1044,7 +1044,7 @@ def test_send_test_step_redirects_if_session_not_setup(
     expected_recipient,
     user,
 ):
-    mocker.patch('app.user_api_client.get_user', return_value=user(fake_uuid))
+    mocker.patch('app.user_api_client.get_user', return_value=user)
     template_mock(mocker)
     mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=9)
 
@@ -1090,8 +1090,8 @@ def test_send_one_off_does_not_send_without_the_correct_permissions(
 
 
 @pytest.mark.parametrize('user', (
-    active_user_with_permissions,
-    active_caseworking_user,
+    create_active_user_with_permissions(),
+    create_active_caseworking_user(),
 ))
 @pytest.mark.parametrize('template_mock, partial_url, expected_h1, tour_shown', [
     (
@@ -1155,7 +1155,7 @@ def test_send_one_off_or_test_has_correct_page_titles(
     tour_shown,
     user,
 ):
-    mocker.patch('app.user_api_client.get_user', return_value=user(fake_uuid))
+    mocker.patch('app.user_api_client.get_user', return_value=user)
     template_mock(mocker)
     mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=9)
 
@@ -1230,24 +1230,24 @@ def test_send_one_off_or_test_shows_placeholders_in_correct_order(
 
 @pytest.mark.parametrize('user, template_mock, expected_link_text, expected_link_url', [
     (
-        active_user_with_permissions,
+        create_active_user_with_permissions(),
         mock_get_service_template,
         'Use my phone number',
         partial(url_for, 'main.send_test')
     ),
     (
-        active_user_with_permissions,
+        create_active_user_with_permissions(),
         mock_get_service_email_template,
         'Use my email address',
         partial(url_for, 'main.send_test')
     ),
     (
-        active_user_with_permissions,
+        create_active_user_with_permissions(),
         mock_get_service_letter_template,
         None, None
     ),
     (
-        active_caseworking_user,
+        create_active_caseworking_user(),
         mock_get_service_template,
         None, None
     ),
@@ -1264,7 +1264,7 @@ def test_send_one_off_has_skip_link(
     expected_link_url,
     user,
 ):
-    mocker.patch('app.user_api_client.get_user', return_value=user(fake_uuid))
+    mocker.patch('app.user_api_client.get_user', return_value=user)
     template_mock(mocker)
     mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=9)
 
@@ -1316,8 +1316,8 @@ def test_send_one_off_has_sticky_header_for_email_and_letter(
 
 
 @pytest.mark.parametrize('user', (
-    active_user_with_permissions,
-    active_caseworking_user,
+    create_active_user_with_permissions(),
+    create_active_caseworking_user(),
 ))
 def test_skip_link_will_not_show_on_sms_one_off_if_service_has_no_mobile_number(
     client_request,
@@ -1328,7 +1328,6 @@ def test_skip_link_will_not_show_on_sms_one_off_if_service_has_no_mobile_number(
     mocker,
     user,
 ):
-    user = user(fake_uuid)
     user['mobile_number'] = None
     client_request.login(user)
     page = client_request.get(
@@ -1343,8 +1342,8 @@ def test_skip_link_will_not_show_on_sms_one_off_if_service_has_no_mobile_number(
 
 
 @pytest.mark.parametrize('user, link_index', (
-    (active_user_with_permissions, 2),
-    (active_caseworking_user, 1),
+    (create_active_user_with_permissions(), 2),
+    (create_active_caseworking_user(), 1),
 ))
 def test_send_one_off_offers_link_to_upload(
     client_request,
@@ -1354,7 +1353,7 @@ def test_send_one_off_offers_link_to_upload(
     user,
     link_index,
 ):
-    client_request.login(user(fake_uuid))
+    client_request.login(user)
 
     page = client_request.get(
         'main.send_one_off',
@@ -1377,8 +1376,8 @@ def test_send_one_off_offers_link_to_upload(
 
 
 @pytest.mark.parametrize('user', (
-    active_user_with_permissions,
-    active_caseworking_user,
+    create_active_user_with_permissions(),
+    create_active_caseworking_user(),
 ))
 def test_link_to_upload_not_offered_in_tour(
     client_request,
@@ -1386,7 +1385,7 @@ def test_link_to_upload_not_offered_in_tour(
     mock_get_service_template,
     user,
 ):
-    client_request.login(user(fake_uuid))
+    client_request.login(user)
 
     page = client_request.get(
         'main.send_test',
@@ -1403,8 +1402,8 @@ def test_link_to_upload_not_offered_in_tour(
 
 
 @pytest.mark.parametrize('user', (
-    active_user_with_permissions,
-    active_caseworking_user,
+    create_active_user_with_permissions(),
+    create_active_caseworking_user(),
 ))
 @pytest.mark.parametrize('endpoint, step_index', (
     ('main.send_one_off_step', 1),
@@ -1419,7 +1418,7 @@ def test_link_to_upload_not_offered_when_entering_personalisation(
     endpoint,
     step_index,
 ):
-    client_request.login(user(fake_uuid))
+    client_request.login(user)
 
     with client_request.session_transaction() as session:
         session['recipient'] = '07900900900'
@@ -1441,8 +1440,8 @@ def test_link_to_upload_not_offered_when_entering_personalisation(
 
 
 @pytest.mark.parametrize('user', (
-    active_user_with_permissions,
-    active_caseworking_user,
+    create_active_user_with_permissions(),
+    create_active_caseworking_user(),
 ))
 @pytest.mark.parametrize('endpoint, expected_redirect, placeholders', [
     (
@@ -1466,7 +1465,7 @@ def test_send_test_redirects_to_end_if_step_out_of_bounds(
     mocker,
     user,
 ):
-    client_request.login(user(fake_uuid))
+    client_request.login(user)
 
     with client_request.session_transaction() as session:
         session['placeholders'] = placeholders
@@ -1487,8 +1486,8 @@ def test_send_test_redirects_to_end_if_step_out_of_bounds(
 
 
 @pytest.mark.parametrize('user', (
-    active_user_with_permissions,
-    active_caseworking_user,
+    create_active_user_with_permissions(),
+    create_active_caseworking_user(),
 ))
 @pytest.mark.parametrize('endpoint, expected_redirect', [
     ('main.send_test_step', 'main.send_test'),
@@ -1508,7 +1507,7 @@ def test_send_test_redirects_to_start_if_you_skip_steps(
     expected_redirect,
     user,
 ):
-    mocker.patch('app.user_api_client.get_user', return_value=user(fake_uuid))
+    mocker.patch('app.user_api_client.get_user', return_value=user)
 
     with platform_admin_client.session_transaction() as session:
         session['send_test_letter_page_count'] = 1
@@ -1530,8 +1529,8 @@ def test_send_test_redirects_to_start_if_you_skip_steps(
 
 
 @pytest.mark.parametrize('user', (
-    active_user_with_permissions,
-    active_caseworking_user,
+    create_active_user_with_permissions(),
+    create_active_caseworking_user(),
 ))
 @pytest.mark.parametrize('endpoint, expected_redirect', [
     ('main.send_test_step', 'main.send_test'),
@@ -1551,7 +1550,7 @@ def test_send_test_redirects_to_start_if_index_out_of_bounds_and_some_placeholde
     mocker,
     user,
 ):
-    mocker.patch('app.user_api_client.get_user', return_value=user(fake_uuid))
+    mocker.patch('app.user_api_client.get_user', return_value=user)
     with client_request.session_transaction() as session:
         session['placeholders'] = {'name': 'foo'}
 
@@ -1571,8 +1570,8 @@ def test_send_test_redirects_to_start_if_index_out_of_bounds_and_some_placeholde
 
 
 @pytest.mark.parametrize('user', (
-    active_user_with_permissions,
-    active_caseworking_user,
+    create_active_user_with_permissions(),
+    create_active_caseworking_user(),
 ))
 @pytest.mark.parametrize('endpoint, expected_redirect', [
     ('main.send_test', 'main.send_test_step'),
@@ -1587,7 +1586,7 @@ def test_send_test_sms_message_redirects_with_help_argument(
     expected_redirect,
     user,
 ):
-    mocker.patch('app.user_api_client.get_user', return_value=user(fake_uuid))
+    mocker.patch('app.user_api_client.get_user', return_value=user)
     template = {'data': {'template_type': 'sms', 'folder': None}}
     mocker.patch('app.service_api_client.get_service_template', return_value=template)
 
@@ -1609,8 +1608,8 @@ def test_send_test_sms_message_redirects_with_help_argument(
 
 
 @pytest.mark.parametrize('user', (
-    active_user_with_permissions,
-    active_caseworking_user,
+    create_active_user_with_permissions(),
+    create_active_caseworking_user(),
 ))
 def test_send_test_email_message_without_placeholders_redirects_to_check_page(
     client_request,
@@ -1624,7 +1623,7 @@ def test_send_test_email_message_without_placeholders_redirects_to_check_page(
     fake_uuid,
     user,
 ):
-    mocker.patch('app.user_api_client.get_user', return_value=user(fake_uuid))
+    mocker.patch('app.user_api_client.get_user', return_value=user)
 
     with client_request.session_transaction() as session:
         session['recipient'] = 'foo@bar.com'

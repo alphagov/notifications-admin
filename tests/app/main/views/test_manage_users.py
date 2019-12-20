@@ -9,21 +9,18 @@ from app.utils import is_gov_user
 from tests.conftest import (
     SERVICE_ONE_ID,
     USER_ONE_ID,
-    active_caseworking_user,
-    active_user_empty_permissions,
-    active_user_manage_template_permission,
-    active_user_no_mobile,
-    active_user_view_permissions,
-    active_user_with_permissions,
+    create_active_user_empty_permissions,
+    create_active_user_manage_template_permissions,
+    create_active_user_view_permissions,
+    create_active_user_with_permissions,
     normalize_spaces,
-    platform_admin_user,
     sample_uuid,
 )
 
 
 @pytest.mark.parametrize('user, expected_self_text, expected_coworker_text', [
     (
-        active_user_with_permissions,
+        create_active_user_with_permissions(),
         (
             'Test User (you) '
             'Can See dashboard '
@@ -43,7 +40,7 @@ from tests.conftest import (
         )
     ),
     (
-        active_user_empty_permissions,
+        create_active_user_empty_permissions(),
         (
             'Test User With Empty Permissions (you) '
             'Cannot See dashboard '
@@ -62,7 +59,7 @@ from tests.conftest import (
         ),
     ),
     (
-        active_user_view_permissions,
+        create_active_user_view_permissions(),
         (
             'Test User With Permissions (you) '
             'Can See dashboard '
@@ -81,7 +78,7 @@ from tests.conftest import (
         )
     ),
     (
-        active_user_manage_template_permission,
+        create_active_user_manage_template_permissions(),
         (
             'Test User With Permissions (you) '
             'Can See dashboard '
@@ -100,7 +97,7 @@ from tests.conftest import (
         )
     ),
     (
-        active_user_manage_template_permission,
+        create_active_user_manage_template_permissions(),
         (
             'Test User With Permissions (you) '
             'Can See dashboard '
@@ -125,14 +122,13 @@ def test_should_show_overview_page(
     mock_get_invites_for_service,
     mock_get_template_folders,
     mock_has_no_jobs,
-    fake_uuid,
     service_one,
     user,
     expected_self_text,
     expected_coworker_text,
     active_user_view_permissions,
 ):
-    current_user = user(fake_uuid)
+    current_user = user
     other_user = copy.deepcopy(active_user_view_permissions)
     other_user['email_address'] = 'zzzzzzz@example.gov.uk'
     other_user['name'] = 'ZZZZZZZZ'
@@ -158,12 +154,15 @@ def test_should_show_caseworker_on_overview_page(
     mocker,
     mock_get_invites_for_service,
     mock_get_template_folders,
-    fake_uuid,
     service_one,
+    active_user_view_permissions,
+    active_caseworking_user,
 ):
     service_one['permissions'].append('caseworking')
-    current_user = active_user_view_permissions(fake_uuid)
-    other_user = active_caseworking_user(uuid.uuid4())
+    current_user = active_user_view_permissions
+
+    other_user = active_caseworking_user
+    other_user['id'] = uuid.uuid4()
     other_user['email_address'] = 'zzzzzzz@example.gov.uk'
 
     mocker.patch('app.user_api_client.get_user', return_value=current_user)
@@ -286,10 +285,10 @@ def test_manage_users_page_shows_member_auth_type_if_service_has_email_auth_acti
     assert bool(page.select_one('.tick-cross-list-hint')) == displays_auth_type
 
 
-@pytest.mark.parametrize('user, sms_option_disabled, expected_label', [
+@pytest.mark.parametrize('sms_option_disabled, mobile_number, expected_label', [
     (
-        active_user_no_mobile,
         True,
+        None,
         """
             Text message code
             Not available because this team member has not added a
@@ -297,8 +296,8 @@ def test_manage_users_page_shows_member_auth_type_if_service_has_email_auth_acti
         """,
     ),
     (
-        active_user_with_permissions,
         False,
+        '07700 900762',
         """
             Text message code
         """,
@@ -308,15 +307,17 @@ def test_user_with_no_mobile_number_cant_be_set_to_sms_auth(
     client_request,
     mock_get_users_by_service,
     mock_get_template_folders,
-    user,
     sms_option_disabled,
+    mobile_number,
     expected_label,
     service_one,
     mocker,
-    fake_uuid,
+    active_user_with_permissions,
 ):
+    active_user_with_permissions['mobile_number'] = mobile_number
+
     service_one['permissions'].append('email_auth')
-    mocker.patch('app.user_api_client.get_user', return_value=user(fake_uuid))
+    mocker.patch('app.user_api_client.get_user', return_value=active_user_with_permissions)
 
     page = client_request.get(
         'main.edit_user_permissions',
@@ -533,11 +534,11 @@ def test_cant_edit_user_folder_permissions_for_platform_admin_users(
     mock_get_invites_for_service,
     mock_set_user_permissions,
     mock_get_template_folders,
-    fake_uuid,
+    platform_admin_user,
 ):
     service_one['permissions'] = ['edit_folder_permissions']
     mocker.patch(
-        'app.user_api_client.get_user', return_value=platform_admin_user(fake_uuid)
+        'app.user_api_client.get_user', return_value=platform_admin_user
     )
     mock_get_template_folders.return_value = [
         {'id': 'folder-id-1', 'name': 'folder_one', 'parent_id': None, 'users_with_permission': []},
@@ -547,7 +548,7 @@ def test_cant_edit_user_folder_permissions_for_platform_admin_users(
     page = client_request.get(
         'main.edit_user_permissions',
         service_id=SERVICE_ONE_ID,
-        user_id=fake_uuid,
+        user_id=platform_admin_user['id'],
     )
     assert normalize_spaces(page.select('main p')[0].text) == 'platform@admin.gov.uk Change'
     assert normalize_spaces(page.select('main p')[2].text) == (
@@ -557,7 +558,7 @@ def test_cant_edit_user_folder_permissions_for_platform_admin_users(
     client_request.post(
         'main.edit_user_permissions',
         service_id=SERVICE_ONE_ID,
-        user_id=fake_uuid,
+        user_id=platform_admin_user['id'],
         _data={},
         _expected_status=302,
         _expected_redirect=url_for(
@@ -567,7 +568,7 @@ def test_cant_edit_user_folder_permissions_for_platform_admin_users(
         ),
     )
     mock_set_user_permissions.assert_called_with(
-        fake_uuid,
+        platform_admin_user['id'],
         SERVICE_ONE_ID,
         permissions={
             'manage_api_keys', 'manage_service', 'manage_templates', 'send_messages', 'view_activity',
