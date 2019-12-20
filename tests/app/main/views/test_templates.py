@@ -28,14 +28,12 @@ from tests.conftest import (
     ElementNotFound,
     create_active_caseworking_user,
     create_active_user_view_permissions,
+    create_letter_contact_block,
     mock_get_service_email_template,
     mock_get_service_letter_template,
     mock_get_service_template,
-    no_letter_contact_blocks,
     normalize_spaces,
 )
-from tests.conftest import service_one as create_sample_service
-from tests.conftest import single_letter_contact_block
 
 
 def test_should_show_empty_page_when_no_templates(
@@ -715,11 +713,11 @@ def test_should_show_sms_template_with_downgraded_unicode_characters(
     assert rendered_msg in page.text
 
 
-@pytest.mark.parametrize('mock_contact_block, expected_partial_url', (
-    (no_letter_contact_blocks, partial(
+@pytest.mark.parametrize('contact_block_data, expected_partial_url', (
+    ([], partial(
         url_for, 'main.service_add_letter_contact', from_template=sample_uuid(),
     )),
-    (single_letter_contact_block, partial(
+    ([create_letter_contact_block()], partial(
         url_for, 'main.set_template_sender', template_id=sample_uuid(),
     )),
 ))
@@ -730,11 +728,11 @@ def test_should_let_letter_contact_block_be_changed_for_the_template(
     client_request,
     service_one,
     fake_uuid,
-    mock_contact_block,
+    contact_block_data,
     expected_partial_url
 ):
     mocker.patch('app.main.views.templates.get_page_count_for_letter', return_value=1)
-    mock_contact_block(mocker)
+    mocker.patch('app.service_api_client.get_letter_contacts', return_value=contact_block_data)
 
     page = client_request.get(
         'main.view_template',
@@ -1427,9 +1425,10 @@ def test_should_403_when_edit_template_with_process_type_of_priority_for_non_pla
     mock_get_service_template,
     mock_update_service_template,
     fake_uuid,
+    service_one,
 ):
-    service = create_sample_service(active_user_with_permissions)
-    client.login(active_user_with_permissions, mocker, service)
+    service_one['users'] = [active_user_with_permissions]
+    client.login(active_user_with_permissions, mocker, service_one)
     mocker.patch('app.user_api_client.get_users_for_service', return_value=[active_user_with_permissions])
     template_id = fake_uuid
     data = {
@@ -1437,12 +1436,12 @@ def test_should_403_when_edit_template_with_process_type_of_priority_for_non_pla
         'name': "new name",
         'template_content': "template <em>content</em> with & entity",
         'template_type': 'sms',
-        'service': service['id'],
+        'service': service_one['id'],
         'process_type': 'priority'
     }
     response = client.post(url_for(
         '.edit_service_template',
-        service_id=service['id'],
+        service_id=service_one['id'],
         template_id=template_id), data=data)
     assert response.status_code == 403
     mock_update_service_template.called == 0
@@ -1455,9 +1454,10 @@ def test_should_403_when_create_template_with_process_type_of_priority_for_non_p
     mock_get_service_template,
     mock_update_service_template,
     fake_uuid,
+    service_one,
 ):
-    service = create_sample_service(active_user_with_permissions)
-    client.login(active_user_with_permissions, mocker, service)
+    service_one['users'] = [active_user_with_permissions]
+    client.login(active_user_with_permissions, mocker, service_one)
     mocker.patch('app.user_api_client.get_users_for_service', return_value=[active_user_with_permissions])
     template_id = fake_uuid
     data = {
@@ -1465,12 +1465,12 @@ def test_should_403_when_create_template_with_process_type_of_priority_for_non_p
         'name': "new name",
         'template_content': "template <em>content</em> with & entity",
         'template_type': 'sms',
-        'service': service['id'],
+        'service': service_one['id'],
         'process_type': 'priority'
     }
     response = client.post(url_for(
         '.add_service_template',
-        service_id=service['id'],
+        service_id=service_one['id'],
         template_type='sms'), data=data)
     assert response.status_code == 403
     mock_update_service_template.called == 0
@@ -2186,19 +2186,19 @@ def test_set_template_sender(
     )
 
 
-@pytest.mark.parametrize('fixture', [
-    no_letter_contact_blocks,
-    single_letter_contact_block,
+@pytest.mark.parametrize('contact_block_data', [
+    [],  # no letter contact blocks
+    [create_letter_contact_block()],
 ])
 def test_add_sender_link_only_appears_on_services_with_no_senders(
     client_request,
     fake_uuid,
     mocker,
-    fixture,
+    contact_block_data,
     mock_get_service_letter_template,
     no_letter_contact_blocks
 ):
-    fixture(mocker)
+    mocker.patch('app.service_api_client.get_letter_contacts', return_value=contact_block_data)
     page = client_request.get(
         'main.set_template_sender',
         service_id=SERVICE_ONE_ID,

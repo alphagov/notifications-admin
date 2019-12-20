@@ -1,3 +1,4 @@
+from datetime import datetime
 from functools import partial
 from unittest.mock import ANY, PropertyMock, call
 from urllib.parse import parse_qs, urlparse
@@ -12,6 +13,7 @@ from notifications_utils.clients.zendesk.zendesk_client import ZendeskClient
 import app
 from app.utils import email_safe
 from tests import (
+    invite_json,
     organisation_json,
     sample_uuid,
     service_json,
@@ -24,23 +26,15 @@ from tests.conftest import (
     create_active_user_no_api_key_permission,
     create_active_user_no_settings_permission,
     create_active_user_with_permissions,
+    create_letter_contact_block,
+    create_multiple_email_reply_to_addresses,
+    create_multiple_letter_contact_blocks,
+    create_multiple_sms_senders,
     create_platform_admin_user,
-    get_default_letter_contact_block,
-    get_default_reply_to_email_address,
-    get_default_sms_sender,
-    get_inbound_number_sms_sender,
-    get_non_default_letter_contact_block,
-    get_non_default_reply_to_email_address,
-    get_non_default_sms_sender,
+    create_reply_to_email_address,
+    create_sms_sender,
     mock_get_service_organisation,
-    multiple_letter_contact_blocks,
-    multiple_reply_to_email_addresses,
-    multiple_sms_senders,
-    no_letter_contact_blocks,
-    no_reply_to_email_addresses,
-    no_sms_senders,
     normalize_spaces,
-    sample_invite,
 )
 
 FAKE_TEMPLATE_ID = uuid4()
@@ -761,7 +755,7 @@ def test_should_check_for_sending_things_right(
     reply_to_email_addresses,
     expected_reply_to_checklist_item,
     active_user_with_permissions,
-    active_user_no_settings_permission
+    active_user_no_settings_permission,
 ):
     def _templates_by_type(template_type):
         return {
@@ -776,11 +770,24 @@ def test_should_check_for_sending_things_right(
             [active_user_no_settings_permission]
         )
     )
+    invite_one = invite_json(id_=uuid4(),
+                             from_user=service_one['users'][0],
+                             service_id=service_one['id'],
+                             email_address='invited_user@test.gov.uk',
+                             permissions='view_activity,send_messages,manage_service,manage_api_keys',
+                             created_at=datetime.utcnow(),
+                             status='pending',
+                             auth_type='sms_auth',
+                             folder_permissions=[])
+
+    invite_two = invite_one.copy()
+    invite_two['permissions'] = 'view_activity'
+
     mock_get_invites = mocker.patch(
         'app.models.user.InvitedUsers.client',
         return_value=(
-            ([sample_invite(mocker, service_one)] * count_of_invites_with_manage_service) +
-            [sample_invite(mocker, service_one, permissions='view_activity')]
+            ([invite_one] * count_of_invites_with_manage_service) +
+            [invite_two]
         )
     )
 
@@ -1951,12 +1958,14 @@ def test_api_ids_dont_show_on_option_pages_with_a_single_sender(
 @pytest.mark.parametrize(
     (
         'sender_list_page,'
+        'endpoint_to_mock,'
         'sample_data,'
         'expected_items,'
     ),
     [(
         'main.service_email_reply_to',
-        multiple_reply_to_email_addresses,
+        'app.service_api_client.get_reply_to_email_addresses',
+        create_multiple_email_reply_to_addresses(),
         [
             'test@example.com (default) Change 1234',
             'test2@example.com Change 5678',
@@ -1964,7 +1973,8 @@ def test_api_ids_dont_show_on_option_pages_with_a_single_sender(
         ],
     ), (
         'main.service_letter_contact_details',
-        multiple_letter_contact_blocks,
+        'app.service_api_client.get_letter_contacts',
+        create_multiple_letter_contact_blocks(),
         [
             'Blank Make default',
             '1 Example Street (default) Change 1234',
@@ -1973,7 +1983,8 @@ def test_api_ids_dont_show_on_option_pages_with_a_single_sender(
         ],
     ), (
         'main.service_sms_senders',
-        multiple_sms_senders,
+        'app.service_api_client.get_sms_senders',
+        create_multiple_sms_senders(),
         [
             'Example (default and receives replies) Change 1234',
             'Example 2 Change 5678',
@@ -1986,10 +1997,11 @@ def test_default_option_shows_for_default_sender(
     client_request,
     mocker,
     sender_list_page,
+    endpoint_to_mock,
     sample_data,
     expected_items,
 ):
-    sample_data(mocker)
+    mocker.patch(endpoint_to_mock, return_value=sample_data)
 
     rows = client_request.get(
         sender_list_page,
@@ -2034,31 +2046,31 @@ def test_remove_default_from_default_letter_contact_block(
     )
 
 
-@pytest.mark.parametrize('sender_list_page, sample_data, expected_output', [
+@pytest.mark.parametrize('sender_list_page, endpoint_to_mock, expected_output', [
     (
         'main.service_email_reply_to',
-        no_reply_to_email_addresses,
+        'app.service_api_client.get_reply_to_email_addresses',
         'You have not added any reply-to email addresses yet'
     ),
     (
         'main.service_letter_contact_details',
-        no_letter_contact_blocks,
+        'app.service_api_client.get_letter_contacts',
         'Blank (default)'
     ),
     (
         'main.service_sms_senders',
-        no_sms_senders,
+        'app.service_api_client.get_sms_senders',
         'You have not added any text message senders yet'
     ),
 ])
 def test_no_senders_message_shows(
     client_request,
     sender_list_page,
+    endpoint_to_mock,
     expected_output,
-    sample_data,
     mocker
 ):
-    sample_data(mocker)
+    mocker.patch(endpoint_to_mock, return_value=[])
 
     rows = client_request.get(
         sender_list_page,
@@ -2145,15 +2157,15 @@ def test_incorrect_sms_sender_input(
         assert count_of_api_calls == 0
 
 
-@pytest.mark.parametrize('fixture, data, api_default_args', [
-    (no_reply_to_email_addresses, {}, True),
-    (multiple_reply_to_email_addresses, {}, False),
-    (multiple_reply_to_email_addresses, {"is_default": "y"}, True)
+@pytest.mark.parametrize('reply_to_addresses, data, api_default_args', [
+    ([], {}, True),
+    (create_multiple_email_reply_to_addresses(), {}, False),
+    (create_multiple_email_reply_to_addresses(), {"is_default": "y"}, True)
 ])
 def test_add_reply_to_email_address_sends_test_notification(
-    mocker, client_request, fixture, data, api_default_args
+    mocker, client_request, reply_to_addresses, data, api_default_args
 ):
-    fixture(mocker)
+    mocker.patch('app.service_api_client.get_reply_to_email_addresses', return_value=reply_to_addresses)
     data['email_address'] = "test@example.com"
     mock_verify = mocker.patch(
         'app.service_api_client.verify_reply_to_email_address', return_value={"data": {"id": "123"}}
@@ -2266,20 +2278,21 @@ def test_add_reply_to_email_address_fails_if_notification_not_delivered_in_45_se
     mock_add_reply_to_email_address.assert_not_called()
 
 
-@pytest.mark.parametrize('fixture, data, api_default_args', [
-    (no_letter_contact_blocks, {}, True),
-    (multiple_letter_contact_blocks, {}, False),
-    (multiple_letter_contact_blocks, {"is_default": "y"}, True)
+@pytest.mark.parametrize('letter_contact_blocks, data, api_default_args', [
+    ([], {}, True),  # no existing letter contact blocks
+    (create_multiple_letter_contact_blocks(), {}, False),
+    (create_multiple_letter_contact_blocks(), {"is_default": "y"}, True)
 ])
 def test_add_letter_contact(
-    fixture,
+    letter_contact_blocks,
     data,
     api_default_args,
     mocker,
     client_request,
     mock_add_letter_contact
 ):
-    fixture(mocker)
+    mocker.patch('app.service_api_client.get_letter_contacts', return_value=letter_contact_blocks)
+
     data['letter_contact_block'] = "1 Example Street"
     client_request.post(
         'main.service_add_letter_contact',
@@ -2341,20 +2354,20 @@ def test_add_letter_contact_when_coming_from_template(
     )
 
 
-@pytest.mark.parametrize('fixture, data, api_default_args', [
-    (no_sms_senders, {}, True),
-    (multiple_sms_senders, {}, False),
-    (multiple_sms_senders, {"is_default": "y"}, True)
+@pytest.mark.parametrize('sms_senders, data, api_default_args', [
+    ([], {}, True),
+    (create_multiple_sms_senders(), {}, False),
+    (create_multiple_sms_senders(), {"is_default": "y"}, True)
 ])
 def test_add_sms_sender(
-    fixture,
+    sms_senders,
     data,
     api_default_args,
     mocker,
     client_request,
     mock_add_sms_sender
 ):
-    fixture(mocker)
+    mocker.patch('app.service_api_client.get_sms_senders', return_value=sms_senders)
     data['sms_sender'] = "Example"
     client_request.post(
         'main.service_add_sms_sender',
@@ -2369,36 +2382,54 @@ def test_add_sms_sender(
     )
 
 
-@pytest.mark.parametrize('sender_page, fixture, checkbox_present', [
-    ('main.service_add_email_reply_to', no_reply_to_email_addresses, False),
-    ('main.service_add_email_reply_to', multiple_reply_to_email_addresses, True),
-    ('main.service_add_letter_contact', no_letter_contact_blocks, False),
-    ('main.service_add_letter_contact', multiple_letter_contact_blocks, True)
+@pytest.mark.parametrize('reply_to_addresses, checkbox_present', [
+    ([], False),
+    (create_multiple_email_reply_to_addresses(), True),
 ])
-def test_default_box_doesnt_show_on_first_sender(
-    sender_page,
-    fixture,
+def test_default_box_doesnt_show_on_first_email_sender(
+    reply_to_addresses,
     mocker,
     checkbox_present,
     client_request
 ):
-    fixture(mocker)
+    mocker.patch('app.service_api_client.get_reply_to_email_addresses', return_value=reply_to_addresses)
+
     page = client_request.get(
-        sender_page,
+        'main.service_add_email_reply_to',
         service_id=SERVICE_ONE_ID
     )
 
     assert bool(page.select_one('[name=is_default]')) == checkbox_present
 
 
-@pytest.mark.parametrize('fixture, data, api_default_args', [
-    (get_default_reply_to_email_address, {"is_default": "y"}, True),
-    (get_default_reply_to_email_address, {}, True),
-    (get_non_default_reply_to_email_address, {}, False),
-    (get_non_default_reply_to_email_address, {"is_default": "y"}, True)
+@pytest.mark.parametrize('contact_blocks, checkbox_present', [
+    ([], False),
+    (create_multiple_letter_contact_blocks(), True)
+])
+def test_default_box_doesnt_show_on_first_letter_sender(
+    contact_blocks,
+    mocker,
+    checkbox_present,
+    client_request
+):
+    mocker.patch('app.service_api_client.get_letter_contacts', return_value=contact_blocks)
+
+    page = client_request.get(
+        'main.service_add_letter_contact',
+        service_id=SERVICE_ONE_ID
+    )
+
+    assert bool(page.select_one('[name=is_default]')) == checkbox_present
+
+
+@pytest.mark.parametrize('reply_to_address, data, api_default_args', [
+    (create_reply_to_email_address(is_default=True), {"is_default": "y"}, True),
+    (create_reply_to_email_address(is_default=True), {}, True),
+    (create_reply_to_email_address(is_default=False), {}, False),
+    (create_reply_to_email_address(is_default=False), {"is_default": "y"}, True)
 ])
 def test_edit_reply_to_email_address_sends_verification_notification_if_address_is_changed(
-    fixture,
+    reply_to_address,
     data,
     api_default_args,
     mocker,
@@ -2408,7 +2439,7 @@ def test_edit_reply_to_email_address_sends_verification_notification_if_address_
     mock_verify = mocker.patch(
         'app.service_api_client.verify_reply_to_email_address', return_value={"data": {"id": "123"}}
     )
-    fixture(mocker)
+    mocker.patch('app.service_api_client.get_reply_to_email_address', return_value=reply_to_address)
     data['email_address'] = "test@example.gov.uk"
     client_request.post(
         'main.service_edit_email_reply_to',
@@ -2419,14 +2450,14 @@ def test_edit_reply_to_email_address_sends_verification_notification_if_address_
     mock_verify.assert_called_once_with(SERVICE_ONE_ID, "test@example.gov.uk")
 
 
-@pytest.mark.parametrize('fixture, data, api_default_args', [
-    (get_default_reply_to_email_address, {"is_default": "y"}, True),
-    (get_default_reply_to_email_address, {}, True),
-    (get_non_default_reply_to_email_address, {}, False),
-    (get_non_default_reply_to_email_address, {"is_default": "y"}, True)
+@pytest.mark.parametrize('reply_to_address, data, api_default_args', [
+    (create_reply_to_email_address(), {"is_default": "y"}, True),
+    (create_reply_to_email_address(), {}, True),
+    (create_reply_to_email_address(is_default=False), {}, False),
+    (create_reply_to_email_address(is_default=False), {"is_default": "y"}, True)
 ])
 def test_edit_reply_to_email_address_goes_straight_to_update_if_address_not_changed(
-    fixture,
+    reply_to_address,
     data,
     api_default_args,
     mocker,
@@ -2434,7 +2465,7 @@ def test_edit_reply_to_email_address_goes_straight_to_update_if_address_not_chan
     client_request,
     mock_update_reply_to_email_address
 ):
-    fixture(mocker)
+    mocker.patch('app.service_api_client.get_reply_to_email_address', return_value=reply_to_address)
     mock_verify = mocker.patch('app.service_api_client.verify_reply_to_email_address')
     data['email_address'] = "test@example.com"
     client_request.post(
@@ -2453,28 +2484,27 @@ def test_edit_reply_to_email_address_goes_straight_to_update_if_address_not_chan
     mock_verify.assert_not_called()
 
 
-@pytest.mark.parametrize('fixture, expected_link_text, partial_href', [
+@pytest.mark.parametrize('reply_to_address, expected_link_text, partial_href', [
     (
-        get_non_default_reply_to_email_address,
+        create_reply_to_email_address(is_default=False),
         'Delete',
         partial(url_for, 'main.service_confirm_delete_email_reply_to', reply_to_email_id=sample_uuid()),
     ),
     (
-        get_default_reply_to_email_address,
+        create_reply_to_email_address(is_default=True),
         None,
         None,
     ),
 ])
 def test_shows_delete_link_for_email_reply_to_address(
     mocker,
-    fixture,
+    reply_to_address,
     expected_link_text,
     partial_href,
     fake_uuid,
     client_request,
 ):
-
-    fixture(mocker)
+    mocker.patch('app.service_api_client.get_reply_to_email_address', return_value=reply_to_address)
 
     page = client_request.get(
         'main.service_edit_email_reply_to',
@@ -2538,14 +2568,14 @@ def test_delete_reply_to_email_address(
     mock_delete.assert_called_once_with(service_id=SERVICE_ONE_ID, reply_to_email_id=fake_uuid)
 
 
-@pytest.mark.parametrize('fixture, data, api_default_args', [
-    (get_default_letter_contact_block, {"is_default": "y"}, True),
-    (get_default_letter_contact_block, {}, True),
-    (get_non_default_letter_contact_block, {}, False),
-    (get_non_default_letter_contact_block, {"is_default": "y"}, True)
+@pytest.mark.parametrize('letter_contact_block, data, api_default_args', [
+    (create_letter_contact_block(), {"is_default": "y"}, True),
+    (create_letter_contact_block(), {}, True),
+    (create_letter_contact_block(is_default=False), {}, False),
+    (create_letter_contact_block(is_default=False), {"is_default": "y"}, True)
 ])
 def test_edit_letter_contact_block(
-    fixture,
+    letter_contact_block,
     data,
     api_default_args,
     mocker,
@@ -2553,7 +2583,7 @@ def test_edit_letter_contact_block(
     client_request,
     mock_update_letter_contact
 ):
-    fixture(mocker)
+    mocker.patch('app.service_api_client.get_letter_contact', return_value=letter_contact_block)
     data['letter_contact_block'] = "1 Example Street"
     client_request.post(
         'main.service_edit_letter_contact',
@@ -2615,14 +2645,14 @@ def test_delete_letter_contact_block(
     )
 
 
-@pytest.mark.parametrize('fixture, data, api_default_args', [
-    (get_default_sms_sender, {"is_default": "y", "sms_sender": "test"}, True),
-    (get_default_sms_sender, {"sms_sender": "test"}, True),
-    (get_non_default_sms_sender, {"sms_sender": "test"}, False),
-    (get_non_default_sms_sender, {"is_default": "y", "sms_sender": "test"}, True)
+@pytest.mark.parametrize('sms_sender, data, api_default_args', [
+    (create_sms_sender(), {"is_default": "y", "sms_sender": "test"}, True),
+    (create_sms_sender(), {"sms_sender": "test"}, True),
+    (create_sms_sender(is_default=False), {"sms_sender": "test"}, False),
+    (create_sms_sender(is_default=False), {"is_default": "y", "sms_sender": "test"}, True)
 ])
 def test_edit_sms_sender(
-    fixture,
+    sms_sender,
     data,
     api_default_args,
     mocker,
@@ -2630,7 +2660,8 @@ def test_edit_sms_sender(
     client_request,
     mock_update_sms_sender
 ):
-    fixture(mocker)
+    mocker.patch('app.service_api_client.get_sms_sender', return_value=sms_sender)
+
     client_request.post(
         'main.service_edit_sms_sender',
         service_id=SERVICE_ONE_ID,
@@ -2646,55 +2677,62 @@ def test_edit_sms_sender(
     )
 
 
-@pytest.mark.parametrize('sender_page, fixture, default_message, params, checkbox_present', [
+@pytest.mark.parametrize('sender_page, endpoint_to_mock, sender_details, default_message, params, checkbox_present', [
     (
         'main.service_edit_email_reply_to',
-        get_default_reply_to_email_address,
+        'app.service_api_client.get_reply_to_email_address',
+        create_reply_to_email_address(is_default=True),
         'This is the default reply-to address for service one emails',
         'reply_to_email_id',
         False
     ),
     (
         'main.service_edit_email_reply_to',
-        get_non_default_reply_to_email_address,
+        'app.service_api_client.get_reply_to_email_address',
+        create_reply_to_email_address(is_default=False),
         'This is the default reply-to address for service one emails',
         'reply_to_email_id',
         True
     ),
     (
         'main.service_edit_letter_contact',
-        get_default_letter_contact_block,
+        'app.service_api_client.get_letter_contact',
+        create_letter_contact_block(is_default=True),
         'This is currently your default address for service one.',
         'letter_contact_id',
         False
     ),
     (
         'main.service_edit_letter_contact',
-        get_non_default_letter_contact_block,
+        'app.service_api_client.get_letter_contact',
+        create_letter_contact_block(is_default=False),
         'THIS TEXT WONT BE TESTED',
         'letter_contact_id',
         True
     ),
     (
         'main.service_edit_sms_sender',
-        get_default_sms_sender,
+        'app.service_api_client.get_sms_sender',
+        create_sms_sender(is_default=True),
         'This is the default text message sender.',
         'sms_sender_id',
         False
     ),
     (
         'main.service_edit_sms_sender',
-        get_non_default_sms_sender,
+        'app.service_api_client.get_sms_sender',
+        create_sms_sender(is_default=False),
         'This is the default text message sender.',
         'sms_sender_id',
         True
     )
 ])
 def test_default_box_shows_on_non_default_sender_details_while_editing(
-    fixture,
     fake_uuid,
     mocker,
     sender_page,
+    endpoint_to_mock,
+    sender_details,
     client_request,
     default_message,
     checkbox_present,
@@ -2705,7 +2743,8 @@ def test_default_box_shows_on_non_default_sender_details_while_editing(
     }
     page_arguments[params] = fake_uuid
 
-    fixture(mocker)
+    mocker.patch(endpoint_to_mock, return_value=sender_details)
+
     page = client_request.get(
         sender_page,
         **page_arguments
@@ -2719,28 +2758,28 @@ def test_default_box_shows_on_non_default_sender_details_while_editing(
         )
 
 
-@pytest.mark.parametrize('fixture, expected_link_text, partial_href', [
+@pytest.mark.parametrize('sms_sender, expected_link_text, partial_href', [
     (
-        get_non_default_sms_sender,
+        create_sms_sender(is_default=False),
         'Delete',
         partial(url_for, 'main.service_confirm_delete_sms_sender', sms_sender_id=sample_uuid()),
     ),
     (
-        get_default_sms_sender,
+        create_sms_sender(is_default=True),
         None,
         None,
     ),
 ])
 def test_shows_delete_link_for_sms_sender(
     mocker,
-    fixture,
+    sms_sender,
     expected_link_text,
     partial_href,
     fake_uuid,
     client_request,
 ):
 
-    fixture(mocker)
+    mocker.patch('app.service_api_client.get_sms_sender', return_value=sms_sender)
 
     page = client_request.get(
         'main.service_edit_sms_sender',
@@ -2785,20 +2824,20 @@ def test_confirm_delete_sms_sender(
     assert page.select_one('.banner-dangerous form')['method'] == 'post'
 
 
-@pytest.mark.parametrize('fixture, expected_link_text', [
-    (get_inbound_number_sms_sender, None),
-    (get_default_sms_sender, None),
-    (get_non_default_sms_sender, 'Delete'),
+@pytest.mark.parametrize('sms_sender, expected_link_text', [
+    (create_sms_sender(is_default=False, inbound_number_id='1234'), None),
+    (create_sms_sender(is_default=True), None),
+    (create_sms_sender(is_default=False), 'Delete'),
 ])
 def test_inbound_sms_sender_is_not_deleteable(
     client_request,
     service_one,
     fake_uuid,
-    fixture,
+    sms_sender,
     expected_link_text,
     mocker
 ):
-    fixture(mocker)
+    mocker.patch('app.service_api_client.get_sms_sender', return_value=sms_sender)
 
     page = client_request.get(
         '.service_edit_sms_sender',
@@ -2837,19 +2876,19 @@ def test_delete_sms_sender(
     mock_delete.assert_called_once_with(service_id=SERVICE_ONE_ID, sms_sender_id=fake_uuid)
 
 
-@pytest.mark.parametrize('fixture, hide_textbox', [
-    (get_inbound_number_sms_sender, True),
-    (get_default_sms_sender, False),
+@pytest.mark.parametrize('sms_sender, hide_textbox', [
+    (create_sms_sender(is_default=False, inbound_number_id='1234'), True),
+    (create_sms_sender(is_default=True), False),
 ])
 def test_inbound_sms_sender_is_not_editable(
     client_request,
     service_one,
     fake_uuid,
-    fixture,
+    sms_sender,
     hide_textbox,
     mocker
 ):
-    fixture(mocker)
+    mocker.patch('app.service_api_client.get_sms_sender', return_value=sms_sender)
 
     page = client_request.get(
         '.service_edit_sms_sender',

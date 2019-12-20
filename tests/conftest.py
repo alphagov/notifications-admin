@@ -252,21 +252,6 @@ def get_default_letter_contact_block(mocker):
 
 
 @pytest.fixture(scope='function')
-def get_non_default_letter_contact_block(mocker):
-    def _get(service_id, letter_contact_id):
-        return {
-            'id': '1234',
-            'service_id': service_id,
-            'contact_block': '1 Example Street',
-            'is_default': False,
-            'created_at': datetime.utcnow(),
-            'updated_at': None
-        }
-
-    return mocker.patch('app.service_api_client.get_letter_contact', side_effect=_get)
-
-
-@pytest.fixture(scope='function')
 def mock_add_letter_contact(mocker):
     def _add_letter_contact(service_id, contact_block, is_default=False):
         return {'data': {
@@ -435,22 +420,6 @@ def get_non_default_sms_sender(mocker):
             'is_default': False,
             'created_at': datetime.utcnow(),
             'inbound_number_id': None,
-            'updated_at': None
-        }
-
-    return mocker.patch('app.service_api_client.get_sms_sender', side_effect=_get)
-
-
-@pytest.fixture(scope='function')
-def get_inbound_number_sms_sender(mocker):
-    def _get(service_id, sms_sender_id):
-        return {
-            'id': '1234',
-            'service_id': service_id,
-            'sms_sender': 'GOVUK',
-            'is_default': False,
-            'created_at': datetime.utcnow(),
-            'inbound_number_id': '1234',
             'updated_at': None
         }
 
@@ -3585,22 +3554,22 @@ def create_api_user_active(with_unique_id=False):
 
 
 def create_active_user_empty_permissions(with_unique_id=False):
-    user_data = {'id': str(uuid4()) if with_unique_id else sample_uuid(),
-                 'name': 'Test User With Empty Permissions',
-                 'password': 'somepassword',
-                 'password_changed_at': str(datetime.utcnow()),
-                 'email_address': 'test@user.gov.uk',
-                 'mobile_number': '07700 900763',
-                 'state': 'active',
-                 'failed_login_count': 0,
-                 'permissions': {},
-                 'platform_admin': False,
-                 'auth_type': 'sms_auth',
-                 'organisations': [],
-                 'services': [SERVICE_ONE_ID],
-                 'current_session_id': None,
-                 }
-    return user_data
+    return {
+        'id': str(uuid4()) if with_unique_id else sample_uuid(),
+        'name': 'Test User With Empty Permissions',
+        'password': 'somepassword',
+        'password_changed_at': str(datetime.utcnow()),
+        'email_address': 'test@user.gov.uk',
+        'mobile_number': '07700 900763',
+        'state': 'active',
+        'failed_login_count': 0,
+        'permissions': {},
+        'platform_admin': False,
+        'auth_type': 'sms_auth',
+        'organisations': [],
+        'services': [SERVICE_ONE_ID],
+        'current_session_id': None,
+    }
 
 
 def create_active_user_with_permissions(with_unique_id=False):
@@ -3764,3 +3733,143 @@ def create_platform_admin_user(with_unique_id=False):
         'current_session_id': None,
         'logged_in_at': None,
     }
+
+
+def create_reply_to_email_address(
+    id_='1234',
+    service_id='abcd',
+    email_address='test@example.com',
+    is_default=True,
+    created_at=None,
+    updated_at=None
+):
+    return {
+        'id': id_,
+        'service_id': service_id,
+        'email_address': email_address,
+        'is_default': is_default,
+        'created_at': created_at,
+        'updated_at': updated_at
+    }
+
+
+def create_multiple_email_reply_to_addresses(service_id='abcd'):
+    return [
+        {
+            'id': '1234',
+            'service_id': service_id,
+            'email_address': 'test@example.com',
+            'is_default': True,
+            'created_at': datetime.utcnow(),
+            'updated_at': None
+        }, {
+            'id': '5678',
+            'service_id': service_id,
+            'email_address': 'test2@example.com',
+            'is_default': False,
+            'created_at': datetime.utcnow(),
+            'updated_at': None
+        }, {
+            'id': '9457',
+            'service_id': service_id,
+            'email_address': 'test3@example.com',
+            'is_default': False,
+            'created_at': datetime.utcnow(),
+            'updated_at': None
+        }
+    ]
+
+
+def create_sms_sender(
+    id_='1234',
+    service_id='abcd',
+    sms_sender='GOVUK',
+    is_default=True,
+    created_at=None,
+    inbound_number_id=None,
+    updated_at=None
+):
+    return {
+        'id': id_,
+        'service_id': service_id,
+        'sms_sender': sms_sender,
+        'is_default': is_default,
+        'created_at': created_at,
+        'inbound_number_id': inbound_number_id,
+        'updated_at': updated_at
+    }
+
+
+def create_multiple_sms_senders(service_id='abcd'):
+    return [
+        {
+            'id': '1234',
+            'service_id': service_id,
+            'sms_sender': 'Example',
+            'is_default': True,
+            'created_at': datetime.utcnow(),
+            'inbound_number_id': '1234',
+            'updated_at': None
+        }, {
+            'id': '5678',
+            'service_id': service_id,
+            'sms_sender': 'Example 2',
+            'is_default': False,
+            'created_at': datetime.utcnow(),
+            'inbound_number_id': None,
+            'updated_at': None
+        }, {
+            'id': '9457',
+            'service_id': service_id,
+            'sms_sender': 'Example 3',
+            'is_default': False,
+            'created_at': datetime.utcnow(),
+            'inbound_number_id': None,
+            'updated_at': None
+        }
+    ]
+
+
+def create_letter_contact_block(
+    id_='1234',
+    service_id='abcd',
+    contact_block='1 Example Street',
+    is_default=True,
+    created_at=None,
+    updated_at=None,
+):
+    return {
+        'id': id_,
+        'service_id': service_id,
+        'contact_block': contact_block,
+        'is_default': is_default,
+        'created_at': created_at,
+        'updated_at': updated_at
+    }
+
+
+def create_multiple_letter_contact_blocks(service_id='abcd'):
+    return [
+        {
+            'id': '1234',
+            'service_id': service_id,
+            'contact_block': '1 Example Street',
+            'is_default': True,
+            'created_at': datetime.utcnow(),
+            'updated_at': None
+        }, {
+            'id': '5678',
+            'service_id': service_id,
+            'contact_block': '2 Example Street',
+            'is_default': False,
+            'created_at': datetime.utcnow(),
+            'updated_at': None
+        }, {
+            'id': '9457',
+            'service_id': service_id,
+            'contact_block': '3 Example Street',
+            'is_default': False,
+            'created_at': datetime.utcnow(),
+            'updated_at': None
+        }
+    ]
