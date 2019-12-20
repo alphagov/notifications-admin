@@ -126,20 +126,14 @@
 
     <script src="/static_503/govuk-template.js"></script>
 
-  <script>
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-    ga('create', 'UA-75215134-1', 'auto');
-    ga('set', 'anonymizeIp', true);
-    ga('set', 'displayFeaturesTask', null);
-    ga('set', 'transport', 'beacon');    
-    page = (window.location.pathname + window.location.search).replace(
-      /[a-f0-9]{8}-?[a-f0-9]{4}-?4[a-f0-9]{3}-?[89ab][a-f0-9]{3}-?[a-f0-9]{12}/g, '…'
-    )      
-    ga('send', 'pageview', page);
-  </script>
+    <script>
+      if (window.GOVUK.cookie('_ga') !== null) {
+        document.cookie = '_ga' + '=;expires=' + new Date() + ';domain=' + window.location.hostname.replace(/^www\./, '.') + ';path=/';
+      }
+      if (window.GOVUK.cookie('_gid') !== null) {
+        document.cookie = '_gid' + '=;expires=' + new Date() + ';domain=' + window.location.hostname.replace(/^www\./, '.') + ';path=/';
+      }
+    </script>
 
 
 </body></html>
