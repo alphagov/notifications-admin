@@ -3873,3 +3873,46 @@ def create_multiple_letter_contact_blocks(service_id='abcd'):
             'updated_at': None
         }
     ]
+
+
+def create_notification(
+    notifification_id=None,
+    service_id='abcd',
+    notification_status='delivered',
+    redact_personalisation=False,
+    template_type=None,
+    template_name='sample template',
+    is_precompiled_letter=False,
+    key_type=None,
+    postage=None,
+    sent_one_off=True,
+):
+    noti = notification_json(
+        service_id,
+        rows=1,
+        status=notification_status,
+        template_type=template_type,
+        postage=postage
+    )['notifications'][0]
+
+    noti['id'] = notifification_id or sample_uuid()
+    if sent_one_off:
+        noti['created_by'] = {
+            'id': sample_uuid(),
+            'name': 'Test User',
+            'email_address': 'test@user.gov.uk'
+        }
+    noti['personalisation'] = {'name': 'Jo'}
+    noti['template'] = template_json(
+        service_id,
+        '5407f4db-51c7-4150-8758-35412d42186a',
+        content='hello ((name))',
+        subject='blah',
+        redact_personalisation=redact_personalisation,
+        type_=template_type,
+        is_precompiled_letter=is_precompiled_letter,
+        name=template_name
+    )
+    if key_type:
+        noti['key_type'] = key_type
+    return noti
