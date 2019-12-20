@@ -33,7 +33,6 @@ from tests.conftest import (
     create_platform_admin_user,
     create_reply_to_email_address,
     create_sms_sender,
-    mock_get_service_organisation,
     normalize_spaces,
 )
 
@@ -1095,11 +1094,10 @@ def test_should_check_for_mou_on_request_to_go_live(
             return_value=None,
         )
 
-    mock_get_service_organisation(
-        mocker,
-        agreement_signed=agreement_signed,
+    mocker.patch(
+        'app.organisations_client.get_service_organisation',
+        return_value=organisation_json(agreement_signed=agreement_signed)
     )
-
     page = client_request.get(
         'main.request_to_go_live', service_id=SERVICE_ONE_ID
     )
@@ -1452,11 +1450,11 @@ def test_should_redirect_after_request_to_go_live(
     formatted_displayed_volumes,
     extra_tags,
 ):
-    mock_get_service_organisation(
-        mocker,
-        name=None,
-        agreement_signed=None,
+    mocker.patch(
+        'app.organisations_client.get_service_organisation',
+        return_value=organisation_json(name=None, agreement_signed=None)
     )
+
     for channel, volume in volumes:
         mocker.patch(
             'app.models.service.Service.volume_{}'.format(channel),
@@ -1767,9 +1765,9 @@ def test_ready_to_go_live(
     agreement_signed,
     expected_tags,
 ):
-    mock_get_service_organisation(
-        mocker,
-        agreement_signed=agreement_signed,
+    mocker.patch(
+        'app.organisations_client.get_service_organisation',
+        return_value=organisation_json(agreement_signed=agreement_signed)
     )
 
     for prop in {

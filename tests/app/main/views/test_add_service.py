@@ -3,7 +3,7 @@ from flask import session, url_for
 
 from app.utils import is_gov_user
 from tests import organisation_json
-from tests.conftest import mock_get_organisation_by_domain, normalize_spaces
+from tests.conftest import normalize_spaces
 
 
 def test_non_gov_user_cannot_see_add_service_button(
@@ -66,7 +66,10 @@ def test_get_should_not_render_radios_if_org_type_known(
     client_request,
     mocker,
 ):
-    mock_get_organisation_by_domain(mocker, organisation_type='central')
+    mocker.patch(
+        'app.organisations_client.get_organisation_by_domain',
+        return_value=organisation_json(organisation_type='central'),
+    )
     page = client_request.get('main.add_service')
     assert page.select_one('h1').text.strip() == 'About your service'
     assert page.select_one('input[name=name]')['value'] == ''
@@ -113,7 +116,10 @@ def test_should_add_service_and_redirect_to_tour_when_no_services(
 ):
     api_user_active['email_address'] = email_address
     client_request.login(api_user_active)
-    mock_get_organisation_by_domain(mocker, organisation_type=inherited)
+    mocker.patch(
+        'app.organisations_client.get_organisation_by_domain',
+        return_value=organisation_json(organisation_type=inherited),
+    )
     client_request.post(
         'main.add_service',
         _data={
