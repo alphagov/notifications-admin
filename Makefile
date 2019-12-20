@@ -31,13 +31,6 @@ NOTIFY_CREDENTIALS ?= ~/.notify-credentials
 help:
 	@cat $(MAKEFILE_LIST) | grep -E '^[a-zA-Z_-]+:.*?## .*$$' | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
-.PHONY: venv
-venv: venv/bin/activate ## Create virtualenv if it does not exist
-
-venv/bin/activate:
-	test -d venv || virtualenv venv -p python3
-	. venv/bin/activate
-
 .PHONY: check-env-vars
 check-env-vars: ## Check mandatory environment variables
 	$(if ${DEPLOY_ENV},,$(error Must specify DEPLOY_ENV))
@@ -68,11 +61,11 @@ production: ## Set environment to production
 	@true
 
 .PHONY: dependencies
-dependencies: venv ## Install build dependencies
+dependencies: ## Install build dependencies
 	npm set progress=false
 	npm install
 	npm rebuild node-sass
-	. venv/bin/activate && pip install -r requirements_for_test.txt
+	pip install -r requirements_for_test.txt
 
 .PHONY: generate-version-file
 generate-version-file: ## Generates the app version file
@@ -81,7 +74,7 @@ generate-version-file: ## Generates the app version file
 .PHONY: build
 build: dependencies generate-version-file ## Build project
 	npm run build
-	. venv/bin/activate && pip install -r requirements.txt
+	pip install -r requirements.txt
 
 .PHONY: build-paas-artifact
 build-paas-artifact: ## Build the deploy artifact for PaaS
@@ -100,7 +93,7 @@ upload-static:
 	aws s3 cp --region eu-west-1 --recursive --cache-control max-age=315360000,immutable ./app/static s3://${DNS_NAME}-static
 
 .PHONY: test
-test: venv ## Run tests
+test: ## Run tests
 	./scripts/run_tests.sh
 
 .PHONY: freeze-requirements
@@ -123,8 +116,8 @@ test-requirements:
 || { echo "requirements.txt is up to date"; exit 0; }
 
 .PHONY: coverage
-coverage: venv ## Create coverage report
-	. venv/bin/activate && coveralls
+coverage: ## Create coverage report
+	coveralls
 
 .PHONY: prepare-docker-build-image
 prepare-docker-build-image: ## Prepare the Docker builder image
@@ -179,7 +172,7 @@ clean-docker-containers: ## Clean up any remaining docker containers
 
 .PHONY: clean
 clean:
-	rm -rf node_modules cache target venv .coverage
+	rm -rf node_modules cache target .coverage
 
 .PHONY: cf-login
 cf-login: ## Log in to Cloud Foundry
