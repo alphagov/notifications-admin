@@ -7,7 +7,7 @@
 
 {% block maincolumn_content %}
 <h1 class="heading-large">
-    Messages sent
+    Returned letters
   </h1>
 <div class="body-copy-table" id='pill-selected-item'>
     {% call(item, row_number) list_table(
@@ -23,7 +23,7 @@
       ) %}
     {% call field() %}
         <a href="{{url_for('.returned_letters_report', service_id=current_service.id, reported_at=item.reported_at)}}">
-        Returned letters reported on {{ item.reported_at | format_datetime_short}}  ({{ item.returned_letter_count}} letters)
+        Returned letters reported on {{ item.reported_at | format_date}}  ({{ item.returned_letter_count}} letters)
         </a>
     {% endcall %}
   {% endcall %}

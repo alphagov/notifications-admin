@@ -2921,6 +2921,19 @@ def client_request(
                 assert_url_expected(resp.location, _expected_redirect)
             return BeautifulSoup(resp.data.decode('utf-8'), 'html.parser')
 
+        @staticmethod
+        def get_response(
+            endpoint,
+            _expected_status=200,
+            _optional_args="",
+            **endpoint_kwargs
+        ):
+            resp = logged_in_client.get(
+                url_for(endpoint, **(endpoint_kwargs or {})) + _optional_args,
+            )
+            assert resp.status_code == _expected_status
+            return resp
+
     return ClientRequest
 
 
