@@ -115,10 +115,6 @@ test-requirements:
 	         echo "Run 'make freeze-requirements' to update."; exit 1; } \
 || { echo "requirements.txt is up to date"; exit 0; }
 
-.PHONY: coverage
-coverage:  ## Create coverage report
-	coveralls
-
 .PHONY: prepare-docker-build-image
 prepare-docker-build-image: ## Prepare the Docker builder image
 	make -C docker build
@@ -137,8 +133,6 @@ define run_docker_container
 		-e https_proxy="${HTTPS_PROXY}" \
 		-e HTTPS_PROXY="${HTTPS_PROXY}" \
 		-e NO_PROXY="${NO_PROXY}" \
-		-e COVERALLS_REPO_TOKEN=${COVERALLS_REPO_TOKEN} \
-		-e CIRCLECI=1 \
 		-e CI_NAME=${CI_NAME} \
 		-e CI_BUILD_NUMBER=${BUILD_NUMBER} \
 		-e CI_BUILD_URL=${BUILD_URL} \
@@ -161,18 +155,13 @@ build-with-docker: prepare-docker-build-image ## Build inside a Docker container
 test-with-docker: prepare-docker-build-image ## Run tests inside a Docker container
 	$(call run_docker_container,test,gosu hostuser make test)
 
-# FIXME: CIRCLECI=1 is an ugly hack because the coveralls-python library sends the PR link only this way
-.PHONY: coverage-with-docker
-coverage-with-docker: prepare-docker-build-image ## Generates coverage report inside a Docker container
-	$(call run_docker_container,coverage,gosu hostuser make coverage)
-
 .PHONY: clean-docker-containers
 clean-docker-containers: ## Clean up any remaining docker containers
 	docker rm -f $(shell docker ps -q -f "name=${DOCKER_CONTAINER_PREFIX}") 2> /dev/null || true
 
 .PHONY: clean
 clean:
-	rm -rf node_modules cache target .coverage
+	rm -rf node_modules cache target
 
 .PHONY: cf-login
 cf-login: ## Log in to Cloud Foundry
