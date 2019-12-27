@@ -32,7 +32,7 @@ def test_returned_letters_reports(
         'template_version': 2,
         'original_file_name': None,
         'job_row_number': None,
-        'uploaded_letter': 'test_letter.pdf',
+        'uploaded_letter_file_name': 'test_letter.pdf',
     }]
     mock = mocker.patch("app.service_api_client.get_returned_letters", return_value=data)
 

@@ -31,7 +31,7 @@ def returned_letters_report(service_id, reported_at):
         ('template_version', 'Template version'),
         ('original_file_name', 'Spreadsheet file name'),
         ('job_row_number', 'Spreadsheet row number'),
-        ('uploaded_letter', 'Uploaded letter')
+        ('uploaded_letter_file_name', 'Uploaded letter')
     ])
 
     # initialise with header row
