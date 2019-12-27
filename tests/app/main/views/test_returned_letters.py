@@ -13,7 +13,7 @@ def test_returned_letter_summary(
 
     mock.assert_called_once_with(SERVICE_ONE_ID)
 
-    expected_text = "Returned letters reported on Tuesday 24 December 2019 (30 letters)"
+    expected_text = "Returned letters reported on Tuesday 24 December 2019 - 30 letters"
     assert page.h1.string.strip() == 'Returned letters'
     assert normalize_spaces(page.select('.table-field-left-aligned')[0].text) == expected_text
 

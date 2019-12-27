@@ -7,7 +7,7 @@ from app.main import main
 from app.utils import Spreadsheet, user_has_permissions
 
 
-@main.route("/services/<uuid:service_id>/returned-letter-summary", methods=["GET", "POST"])
+@main.route("/services/<uuid:service_id>/returned-letter-summary", methods=["GET"])
 @user_has_permissions('view_activity')
 def returned_letter_summary(service_id):
     summary = service_api_client.get_returned_letter_summary(service_id)
@@ -17,7 +17,7 @@ def returned_letter_summary(service_id):
     )
 
 
-@main.route("/services/<uuid:service_id>/returned-letters-csv/<reported_at>", methods=["GET", "POST"])
+@main.route("/services/<uuid:service_id>/returned-letters-csv/<reported_at>", methods=["GET"])
 @user_has_permissions('view_activity')
 def returned_letters_report(service_id, reported_at):
     returned_letters = service_api_client.get_returned_letters(service_id, reported_at)
