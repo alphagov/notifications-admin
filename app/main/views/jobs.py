@@ -480,6 +480,7 @@ def get_job_partials(job, template):
             job=job,
             template=template,
             template_version=job['template_version'],
+            service_data_retention_days=service_data_retention_days,
         ),
         'status': render_template(
             'partials/jobs/status.html',

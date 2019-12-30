@@ -314,7 +314,7 @@ def test_should_show_job_without_notifications(
         job_id=fake_uuid,
     )
     assert page.select_one('p.hint').text.strip() == 'Report is 50% complete…'
-    assert page.select_one('tbody').text.strip() == 'No messages to show'
+    assert page.select_one('tbody').text.strip() == 'No messages to show yet…'
 
 
 def test_should_show_old_job(
@@ -335,7 +335,9 @@ def test_should_show_old_job(
     )
     assert not page.select('p.hint')
     assert not page.select('a[download]')
-    assert page.select_one('tbody').text.strip() == 'No messages to show'
+    assert page.select_one('tbody').text.strip() == (
+        'These messages have been deleted because they were sent more than 7 days ago'
+    )
 
 
 @freeze_time("2016-01-01 11:09:00.061258")
