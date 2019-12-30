@@ -37,3 +37,8 @@
   }
 
 }
+
+// Make column headings smaller to prevent wrapping
+.govuk-footer__heading {
+  @include govuk-font($size: 19, $weight: bold);
+}
