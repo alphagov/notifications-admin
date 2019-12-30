@@ -70,3 +70,15 @@ def test_returned_letters_reports(
         + '12345678,2344567,2019-12-24 13:30,test@gov.uk,'
         + 'First letter template,3445667,2,,,test_letter.pdf'
     )
+
+
+def test_returned_letters_reports_returns_404_for_bad_date(
+        client_request,
+        mocker
+):
+    mock = mocker.patch("app.service_api_client.get_returned_letters")
+    client_request.get_response("main.returned_letters_report",
+                                service_id=SERVICE_ONE_ID,
+                                reported_at='19-12-2019',
+                                _expected_status=404)
+    mock.assert_not_called()

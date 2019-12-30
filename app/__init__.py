@@ -85,6 +85,7 @@ from app.notify_client.template_statistics_api_client import (
 from app.notify_client.user_api_client import user_api_client
 from app.url_converters import (
     LetterFileExtensionConverter,
+    SimpleDateTypeConverter,
     TemplateTypeConverter,
 )
 from app.utils import format_thousands, get_logo_cdn_domain, id_safe
@@ -221,6 +222,7 @@ def init_app(application):
     application.url_map.converters['uuid'].to_python = lambda self, value: value
     application.url_map.converters['template_type'] = TemplateTypeConverter
     application.url_map.converters['letter_file_extension'] = LetterFileExtensionConverter
+    application.url_map.converters['simple_date'] = SimpleDateTypeConverter
 
 
 def convert_to_boolean(value):
