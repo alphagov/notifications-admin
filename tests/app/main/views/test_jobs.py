@@ -294,6 +294,12 @@ def test_should_show_job_in_progress(
         service_id=service_one['id'],
         job_id=fake_uuid,
     )
+    assert [
+        normalize_spaces(link.text)
+        for link in page.select('.pill a')
+    ] == [
+        '10 sending', '0 delivered', '0 failed'
+    ]
     assert page.select_one('p.hint').text.strip() == 'Report is 50% complete…'
 
 
@@ -313,6 +319,12 @@ def test_should_show_job_without_notifications(
         service_id=service_one['id'],
         job_id=fake_uuid,
     )
+    assert [
+        normalize_spaces(link.text)
+        for link in page.select('.pill a')
+    ] == [
+        '10 sending', '0 delivered', '0 failed'
+    ]
     assert page.select_one('p.hint').text.strip() == 'Report is 50% complete…'
     assert page.select_one('tbody').text.strip() == 'No messages to show yet…'
 
@@ -333,6 +345,7 @@ def test_should_show_old_job(
         service_id=service_one['id'],
         job_id=fake_uuid,
     )
+    assert not page.select('.pill a')
     assert not page.select('p.hint')
     assert not page.select('a[download]')
     assert page.select_one('tbody').text.strip() == (
