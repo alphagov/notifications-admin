@@ -147,11 +147,15 @@
     {% set meta_suffix = 'Built by the <a href="https://www.gov.uk/government/organisations/government-digital-service" class="govuk-footer__link">Government Digital Service</a>' %}
   {% endif %}
 
-  {% if current_user.is_authenticated %}
+  {% if signed_out %}
     {% set using_notify_links = {
       "title": "Using Notify",
       "columns": 1,
       "items": [
+        {
+          "href": url_for("main.get_started"),
+          "text": "Get started"
+        },
         {
           "href": url_for("main.trial_mode_new"),
           "text": "Trial mode"
@@ -171,10 +175,6 @@
       "title": "Using Notify",
       "columns": 1,
       "items": [
-        {
-          "href": url_for("main.get_started"),
-          "text": "Get started"
-        },
         {
           "href": url_for("main.trial_mode_new"),
           "text": "Trial mode"
