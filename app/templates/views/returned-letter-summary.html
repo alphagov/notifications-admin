@@ -15,7 +15,9 @@
         data,
         caption="Returned letters report",
         caption_visible=False,
-        empty_message='If you have returned letter reports they will be listed here'
+        empty_message='If you have returned letter reports they will be listed here',
+        field_headings=['Report'],
+        field_headings_visible=False
       ) %}
     {% call field() %}
       <a download class="govuk_link file-list-filename"
