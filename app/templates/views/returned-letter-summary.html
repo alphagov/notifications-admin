@@ -18,7 +18,7 @@
         empty_message='If you have returned letter reports they will be listed here'
       ) %}
     {% call field() %}
-      <a target="_blank"
+      <a target="_blank" class="govuk_link"
          href="{{url_for('.returned_letters_report', service_id=current_service.id, reported_at=item.reported_at)}}">Returned letters reported on {{ item.reported_at | format_date}} - {{ item.returned_letter_count}} {{ message_count_label(item.returned_letter_count, 'letter', suffix='')}}</a>
     {% endcall %}
   {% endcall %}
