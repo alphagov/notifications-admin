@@ -181,7 +181,7 @@ def test_get_started_is_hidden_once_templates_exist(
     )
 
     mock_get_service_templates.assert_called_once_with(SERVICE_ONE_ID)
-    assert 'Get started' not in page.text
+    assert not page.find('h2', string='Get started')
 
 
 def test_inbound_messages_not_visible_to_service_without_permissions(
