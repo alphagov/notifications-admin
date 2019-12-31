@@ -569,5 +569,11 @@ class ServiceAPIClient(NotifyAdminAPIClient):
     def get_service_data_retention(self, service_id):
         return self.get("/service/{}/data-retention".format(service_id))
 
+    def get_returned_letter_summary(self, service_id):
+        return self.get("service/{}/returned-letter-summary".format(service_id))
+
+    def get_returned_letters(self, service_id, reported_at):
+        return self.get("service/{}/returned-letters?reported_at={}".format(service_id, reported_at))
+
 
 service_api_client = ServiceAPIClient()

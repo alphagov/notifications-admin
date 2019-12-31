@@ -29,6 +29,7 @@ from app.main.views import (  # noqa isort:skip
     platform_admin,
     providers,
     register,
+    returned_letters,
     send,
     service_settings,
     sign_in,
