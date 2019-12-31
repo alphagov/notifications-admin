@@ -324,11 +324,12 @@
   border-bottom: 1px solid $border-colour;
 }
 
-.table-empty-message {
-  @include core-16;
+.table-empty-message,
+td.table-empty-message {
+  @include core-19;
   color: $secondary-text-colour;
   border-bottom: 1px solid $border-colour;
-  padding: 0.75em 0 0.5625em 0;
+  padding: 20px 0 20px 0;
 }
 
 .table-show-more-link {
@@ -337,7 +338,7 @@
   color: $secondary-text-colour;
   margin-bottom: $gutter * 1.3333;
   border-bottom: 1px solid $border-colour;
-  padding: 10px 0 10px 0;
+  padding: 35px 0 10px 0;
   text-align: center;
 
   .table + & {

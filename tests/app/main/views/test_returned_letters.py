@@ -19,12 +19,12 @@ def test_returned_letter_summary(
 
     assert page.h1.string.strip() == 'Returned letters'
     assert normalize_spaces(
-        page.select_one('.table-field-left-aligned').text
+        page.select_one('.table-field').text
     ) == (
         '24 December 2019 '
         '30 letters'
     )
-    assert page.select_one('.table-field-left-aligned a')['href'] == url_for(
+    assert page.select_one('.table-field a')['href'] == url_for(
         '.returned_letters',
         service_id=SERVICE_ONE_ID,
         reported_at='2019-12-24',
@@ -45,7 +45,7 @@ def test_returned_letter_summary_with_one_letter(
 
     assert page.h1.string.strip() == 'Returned letters'
     assert normalize_spaces(
-        page.select_one('.table-field-left-aligned').text
+        page.select_one('.table-field').text
     ) == (
         '24 December 2019 '
         '1 letter'

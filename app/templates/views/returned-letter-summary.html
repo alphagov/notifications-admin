@@ -1,4 +1,4 @@
-{% from "components/table.html" import list_table, field %}
+{% from "components/table.html" import list_table, row_heading %}
 {% from "components/message-count-label.html" import message_count_label %}
 {% extends "withnav_template.html" %}
 
@@ -10,7 +10,7 @@
 <h1 class="heading-large">
     Returned letters
   </h1>
-<div class="body-copy-table" id='pill-selected-item'>
+<div class="dashboard-table">
     {% call(item, row_number) list_table(
         data,
         caption="Returned letters report",
@@ -18,8 +18,8 @@
         empty_message='If you have returned letter reports they will be listed here',
         field_headings=['Report'],
         field_headings_visible=False
-      ) %}
-    {% call field() %}
+    ) %}
+    {% call row_heading() %}
       <a class="govuk_link file-list-filename"
          href="{{url_for('.returned_letters', service_id=current_service.id, reported_at=item.reported_at)}}">{{ item.reported_at | format_date_normal }}</a>
        <p class="file-list-hint">
