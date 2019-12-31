@@ -15,9 +15,13 @@ def test_returned_letter_summary(
 
     mock.assert_called_once_with(SERVICE_ONE_ID)
 
-    expected_text = "Returned letters reported on Tuesday 24 December 2019 - 30 letters"
     assert page.h1.string.strip() == 'Returned letters'
-    assert normalize_spaces(page.select('.table-field-left-aligned')[0].text) == expected_text
+    assert normalize_spaces(
+        page.select_one('.table-field-left-aligned').text
+    ) == (
+        '24 December 2019 '
+        '30 letters'
+    )
     assert page.select_one('.table-field-left-aligned a')['href'] == url_for('.returned_letters_report',
                                                                              service_id=SERVICE_ONE_ID,
                                                                              reported_at='2019-12-24')
@@ -35,9 +39,13 @@ def test_returned_letter_summary_with_one_letter(
 
     mock.assert_called_once_with(SERVICE_ONE_ID)
 
-    expected_text = "Returned letters reported on Tuesday 24 December 2019 - 1 letter"
     assert page.h1.string.strip() == 'Returned letters'
-    assert normalize_spaces(page.select('.table-field-left-aligned')[0].text) == expected_text
+    assert normalize_spaces(
+        page.select_one('.table-field-left-aligned').text
+    ) == (
+        '24 December 2019 '
+        '1 letter'
+    )
 
 
 def test_returned_letters_reports(
