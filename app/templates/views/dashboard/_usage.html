@@ -8,22 +8,19 @@
   </div>
   <div class='{{ column_width }}'>
     <div class="keyline-block">
-      {% if sms_chargeable %}
         {{ big_number(
-          sms_chargeable * sms_rate,
+          24365,
           'spent on text messages',
           currency="£",
           smaller=True
         ) }}
-      {% else %}
-        {{ big_number(sms_allowance_remaining, 'free text messages left', smaller=True) }}
-      {% endif %}
+
     </div>
   </div>
   <div class='{{ column_width }}'>
     <div class="keyline-block">
       {{ big_number(
-        letter_cost,
+        820.75,
         'spent on letters',
         currency="£",
         smaller=True

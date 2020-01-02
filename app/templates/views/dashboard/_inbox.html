@@ -14,7 +14,7 @@
       }}
       <div class="big-number-meta">
         {% if inbound_sms_summary.most_recent %}
-          latest message {{ inbound_sms_summary.most_recent | format_delta }}
+          latest message 1 hour ago
         {% endif %}
       </div>
     </div>
@@ -35,6 +35,25 @@
     <div class="big-number-meta">
       {% if inbound_sms_summary.most_recent %}
         latest report 25 December
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<div id="complaints">
+  <div id="total-received" class="big-number-meta-wrapper">
+    {{
+      big_number_with_status(
+        73,
+        'email complaints',
+        link=url_for('.inbox', service_id=current_service.id),
+        show_failures=False,
+        smaller=True
+      )
+    }}
+    <div class="big-number-meta">
+      {% if inbound_sms_summary.most_recent %}
+        latest complaint 2 days ago
       {% endif %}
     </div>
   </div>

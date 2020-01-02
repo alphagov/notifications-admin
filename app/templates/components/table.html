@@ -1,4 +1,5 @@
 {% from "components/big-number.html" import big_number %}
+{% from "components/message-count-label.html" import message_count_label %}
 
 {% macro mapping_table(caption='', field_headings=[], field_headings_visible=True, caption_visible=True, equal_length=False) -%}
   <table class="table table-font-xsmall">
@@ -184,14 +185,15 @@
 {% macro spark_bar_field(
   count,
   max_count,
-  id=None
+  id=None,
+  message_type=None
 ) %}
   {% call field(align='right') %}
     <span {% if id %}id="{{ id }}"{% endif %} class="spark-bar">
-      <span style="width: {{ count / max_count * 100 }}%">
+      <span class="spark-bar-bar" style="width: {{ count / max_count * 100 }}%">
         {{ big_number(
           count,
-          smallest=True
+          smallest=True, label=message_count_label(count, message_type)
         ) }}
       </span>
     </span>

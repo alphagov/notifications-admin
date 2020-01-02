@@ -8,7 +8,7 @@
   {% if template_statistics|length > 1 %}
     <div class='dashboard-table'>
       {% call(item, row_number) list_table(
-        template_statistics,
+        template_statistics * 4,
         caption="Templates used",
         caption_visible=False,
         empty_message='',
@@ -29,16 +29,17 @@
           </span>
           {% else %}
           <a class="file-list-filename" href="{{ url_for('.view_template', service_id=current_service.id, template_id=item.template_id) }}">{{ item.template_name }}</a>
-          <span class="file-list-hint">
-            {{ message_count_label(1, item.template_type, suffix='template')|capitalize }}
-          </span>
           {% endif %}
         {% endcall %}
-        {{ spark_bar_field(item.count, most_used_template_count, id=item.template_id) }}
+        {{ spark_bar_field((item.count + 12) * (
+          ((template_statistics|length) * 4 - row_number + 1) *
+          ((template_statistics|length) * 4 - row_number + 1)
+          ), 1815, message_type=item.template_type, id=item.template_id) }}
       {% endcall %}
       {{ show_more(
         url_for('.template_usage', service_id=current_service.id),
-        'See templates used by month'
+        'See templates used by month',
+        bordered=False
       ) }}
     </div>
   {% endif %}

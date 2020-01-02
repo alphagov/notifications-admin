@@ -221,7 +221,7 @@ details .arrow {
   margin-top: $gutter-half;
 }
 
-#inbox, #upcoming, #returned {
+#inbox, #upcoming, #returned, #complaints {
 
   .big-number-number {
     display: inline-block;
@@ -229,6 +229,8 @@ details .arrow {
   }
 
   .big-number-with-status .big-number-link {
+
+    $bg: $white;
     background: $grey-4;
     background: $white;
     background: $light-blue-25;
@@ -247,7 +249,7 @@ details .arrow {
     box-shadow: inset 3px 0 0 0 $link-colour;
     //box-shadow: inset 0 3px 0 0 $link-colour, inset 0 -1px 0 0 $border-colour;
 
-    background: $white;
+    background: $bg;
     box-shadow: inset 0 1px 0 0 $border-colour, inset 0 -1px 0 0 $border-colour;
 
     box-shadow:
@@ -260,8 +262,9 @@ details .arrow {
     box-shadow:
       inset 0 1px 0 0 $border-colour,
       inset 0 -1px 0 0 $border-colour,
-      inset 0 15px 0 0 $white,
-      inset 0 -20px 0 0 $white;
+      inset 0 15px 0 0 $bg,
+      inset 0 -20px 0 0 $bg;
+    //padding-left: 5px;
   }
 
   .big-number-with-status .big-number,
@@ -270,11 +273,13 @@ details .arrow {
     padding-left: 15px;
     padding-left: 0;
     padding-right: 0;
+    padding: 20px 0;
   }
 
   .big-number-meta-wrapper .big-number-meta {
-    color: $secondary-text-colour;
-    bottom: 9px;
+    color: $text-colour;
+    color: $link-colour;
+    bottom: 14px;
     right: -10px;
   }
 
@@ -297,4 +302,8 @@ details .arrow {
 
 #inbox + #returned {
 margin-top: -31px;
+}
+
+#returned + #complaints {
+  margin-top: -31px;
 }

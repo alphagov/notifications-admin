@@ -10,8 +10,8 @@
   <div id="total-received" class="big-number-meta-wrapper">
     {{
       big_number_with_status(
-        1,
-        'file waiting to send',
+        5,
+        'files waiting to send',
         link=url_for('.uploads', service_id=current_service.id),
         show_failures=False,
         smaller=True

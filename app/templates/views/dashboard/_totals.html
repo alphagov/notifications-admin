@@ -5,10 +5,10 @@
   <div class="grid-row">
     <div id="total-email" class="{{column_width}}">
       {{ big_number_with_status(
-        statistics['email']['requested'],
-        message_count_label(statistics['email']['requested'], 'email', suffix='sent'),
-        statistics['email']['failed'],
-        statistics['email']['failed_percentage'],
+        statistics['email']['requested'] * 1234,
+        message_count_label(99, 'email', suffix='sent'),
+        42,
+        1.1,
         statistics['email']['show_warning'],
         failure_link=url_for(".view_notifications", service_id=service_id, message_type='email', status='failed'),
         link=url_for(".view_notifications", service_id=service_id, message_type='email', status='sending,delivered,failed'),
@@ -17,11 +17,11 @@
     </div>
     <div id="total-sms" class="{{column_width}}">
       {{ big_number_with_status(
-        statistics['sms']['requested'],
-        message_count_label(statistics['sms']['requested'], 'sms', suffix='sent'),
-        statistics['sms']['failed'],
-        statistics['sms']['failed_percentage'],
-        statistics['sms']['show_warning'],
+        80918,
+        message_count_label(80918, 'sms', suffix='sent'),
+        4098,
+        5.0,
+        True,
         failure_link=url_for(".view_notifications", service_id=service_id, message_type='sms', status='failed'),
         link=url_for(".view_notifications", service_id=service_id, message_type='sms', status='sending,delivered,failed'),
         smaller=True
@@ -29,8 +29,8 @@
     </div>
     <div id="total-letters" class="{{column_width}}">
       {{ big_number_with_status(
-        statistics['letter']['requested'],
-        message_count_label(statistics['letter']['requested'], 'letter', suffix='sent'),
+        12,
+        message_count_label(12, 'letter', suffix='sent'),
         statistics['letter']['failed'],
         statistics['letter']['failed_percentage'],
         statistics['letter']['show_warning'],

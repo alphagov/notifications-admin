@@ -1,7 +1,7 @@
 %show-more,
 .show-more {
 
-  @include core-16;
+  @include core-19;
   display: block;
   padding: 0 0;
   margin: $gutter-half 0 $gutter 0;
@@ -29,7 +29,8 @@
     outline: 10px solid white;
     background: $white;
     display: inline-block;
-    border-bottom: 1px solid $light-blue;
+    //border-bottom: 1px solid $light-blue;
+    text-decoration: underline;
   }
 
 }

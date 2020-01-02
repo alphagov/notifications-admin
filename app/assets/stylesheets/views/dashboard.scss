@@ -3,13 +3,21 @@
   table {
     th {
       @include core-19;
-      border-bottom: 0;
+      //border-bottom: 0;
     }
 
     td {
       @include core-19;
       border: 0;
     }
+  }
+
+  .file-list-filename {
+    @include bold-24;
+  }
+
+  .file-list-hint {
+    @include core-19;
   }
 
   > .heading-medium:first-of-type {
@@ -25,7 +33,7 @@
 
 .spark-bar {
 
-  @include core-16;
+  // @include core-16;
   box-sizing: border-box;
   display: block;
   width: 100%;
@@ -34,17 +42,27 @@
   color: $text-colour;
   text-align: left;
 
-  span {
+  &-bar {
     box-sizing: border-box;
     display: inline-block;
     overflow: visible;
     background: $grey-3;
-    border-left: 4px solid $link-colour;
     color: $text-colour;
-    padding: 5px 0 2px 10px;
+    padding: 15px 0 0 15px;
     text-indent: -2px;
-    margin: 3px 0 5px 0;
+    position: relative;
+    top: -14px;
     transition: width 0.6s ease-in-out;
+    white-space: nowrap;
+    border-left: 1px solid $border-colour;
+    border-top: 1px solid $border-colour;
+    box-shadow: 0 1px 0 0 $border-colour, inset -1px 0 0 0 $border-colour;
+  }
+
+  .big-number-number {
+    display: inline-block;
+    margin-left: 2px;
+    margin-right: 2px;
   }
 
 }
