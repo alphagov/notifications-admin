@@ -1,7 +1,7 @@
 {% from "components/big-number.html" import big_number_with_status %}
 {% from "components/message-count-label.html" import message_count_label %}
 
-<div class="ajax-block-container">
+<div class="ajax-block-container total-wrapper">
   <div class="grid-row">
     <div id="total-email" class="{{column_width}}">
       {{ big_number_with_status(
@@ -12,7 +12,7 @@
         statistics['email']['show_warning'],
         failure_link=url_for(".view_notifications", service_id=service_id, message_type='email', status='failed'),
         link=url_for(".view_notifications", service_id=service_id, message_type='email', status='sending,delivered,failed'),
-        smaller=smaller_font_size
+        smaller=True
       ) }}
     </div>
     <div id="total-sms" class="{{column_width}}">
@@ -24,7 +24,7 @@
         statistics['sms']['show_warning'],
         failure_link=url_for(".view_notifications", service_id=service_id, message_type='sms', status='failed'),
         link=url_for(".view_notifications", service_id=service_id, message_type='sms', status='sending,delivered,failed'),
-        smaller=smaller_font_size
+        smaller=True
       ) }}
     </div>
     <div id="total-letters" class="{{column_width}}">
@@ -36,7 +36,7 @@
         statistics['letter']['show_warning'],
         failure_link=url_for(".view_notifications", service_id=service_id, message_type='letter', status='failed'),
         link=url_for(".view_notifications", service_id=service_id, message_type='letter', status=''),
-        smaller=smaller_font_size
+        smaller=True
       ) }}
     </div>
   </div>

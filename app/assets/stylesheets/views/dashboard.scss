@@ -38,9 +38,10 @@
     box-sizing: border-box;
     display: inline-block;
     overflow: visible;
-    background: $panel-colour;
-    color: $black;
-    padding: 5px 5px 2px 5px;
+    background: $grey-3;
+    border-left: 4px solid $link-colour;
+    color: $text-colour;
+    padding: 5px 0 2px 10px;
     text-indent: -2px;
     margin: 3px 0 5px 0;
     transition: width 0.6s ease-in-out;

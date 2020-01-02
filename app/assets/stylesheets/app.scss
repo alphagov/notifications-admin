@@ -220,3 +220,81 @@ details .arrow {
 .heading-upcoming-jobs {
   margin-top: $gutter-half;
 }
+
+#inbox, #upcoming, #returned {
+
+  .big-number-number {
+    display: inline-block;
+    margin-right: 3px;
+  }
+
+  .big-number-with-status .big-number-link {
+    background: $grey-4;
+    background: $white;
+    background: $light-blue-25;
+
+    border-width: 0;
+    box-shadow: inset 8px 0 0 0 $link-colour, inset 0 0 0 1px $link-colour;
+    //box-shadow: inset 0 0 0 3px $link-colour;
+
+
+    box-shadow: inset 0 0 0 3px $link-colour;
+
+    box-shadow: inset 6px 0 0 0 $link-colour;
+    box-shadow: inset 0 3px 0 0 $link-colour;
+    box-shadow: inset 0 0 0 2px $link-colour;
+    //box-shadow: inset 6px 0 0 0 $link-colour;
+    box-shadow: inset 3px 0 0 0 $link-colour;
+    //box-shadow: inset 0 3px 0 0 $link-colour, inset 0 -1px 0 0 $border-colour;
+
+    background: $white;
+    box-shadow: inset 0 1px 0 0 $border-colour, inset 0 -1px 0 0 $border-colour;
+
+    box-shadow:
+      inset 0 1px 0 0 $border-colour,
+      inset 0 -1px 0 0 $border-colour,
+      inset 0 15px 0 0 $white,
+      inset 0 -20px 0 0 $white,
+      inset 5px 0 0 0 $grey-3;
+
+    box-shadow:
+      inset 0 1px 0 0 $border-colour,
+      inset 0 -1px 0 0 $border-colour,
+      inset 0 15px 0 0 $white,
+      inset 0 -20px 0 0 $white;
+  }
+
+  .big-number-with-status .big-number,
+  .big-number-with-status .big-number-smaller {
+    color: $link-colour;
+    padding-left: 15px;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .big-number-meta-wrapper .big-number-meta {
+    color: $secondary-text-colour;
+    bottom: 9px;
+    right: -10px;
+  }
+
+  .big-number-with-status .big-number-status {
+    background: $grey-4;
+    color: $green;
+    margin-top: -5px;
+    border-color: $border-colour;
+    border-width: 2px;
+  }
+
+  .big-number-with-status .big-number-link .big-number-label {
+    position: relative;
+    top: -4px;
+    left: 2px;
+    @include bold-24;
+  }
+
+}
+
+#inbox + #returned {
+margin-top: -31px;
+}

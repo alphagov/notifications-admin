@@ -1,6 +1,6 @@
 {% from "components/big-number.html" import big_number, big_number_with_status %}
 
-<div class="ajax-block">
+<div class="ajax-block" id="inbox">
   {% if inbound_sms_summary != None %}
     <div id="total-received" class="big-number-meta-wrapper">
       {{
@@ -8,7 +8,8 @@
           inbound_sms_summary.count,
           'text messages received',
           link=url_for('.inbox', service_id=current_service.id),
-          show_failures=False
+          show_failures=False,
+          smaller=True
         )
       }}
       <div class="big-number-meta">
@@ -18,4 +19,23 @@
       </div>
     </div>
   {% endif %}
+</div>
+
+<div id="returned">
+  <div id="total-received" class="big-number-meta-wrapper">
+    {{
+      big_number_with_status(
+        1204,
+        'returned letters',
+        link=url_for('.inbox', service_id=current_service.id),
+        show_failures=False,
+        smaller=True
+      )
+    }}
+    <div class="big-number-meta">
+      {% if inbound_sms_summary.most_recent %}
+        latest report 25 December
+      {% endif %}
+    </div>
+  </div>
 </div>
