@@ -1,3 +1,5 @@
+import uuid
+
 from flask import url_for
 
 from tests.conftest import SERVICE_ONE_ID, normalize_spaces
@@ -15,12 +17,18 @@ def test_returned_letter_summary(
 
     mock.assert_called_once_with(SERVICE_ONE_ID)
 
-    expected_text = "Returned letters reported on Tuesday 24 December 2019 - 30 letters"
     assert page.h1.string.strip() == 'Returned letters'
-    assert normalize_spaces(page.select('.table-field-left-aligned')[0].text) == expected_text
-    assert page.select_one('.table-field-left-aligned a')['href'] == url_for('.returned_letters_report',
-                                                                             service_id=SERVICE_ONE_ID,
-                                                                             reported_at='2019-12-24')
+    assert normalize_spaces(
+        page.select_one('.table-field').text
+    ) == (
+        '24 December 2019 '
+        '30 letters'
+    )
+    assert page.select_one('.table-field a')['href'] == url_for(
+        '.returned_letters',
+        service_id=SERVICE_ONE_ID,
+        reported_at='2019-12-24',
+    )
 
 
 def test_returned_letter_summary_with_one_letter(
@@ -35,9 +43,101 @@ def test_returned_letter_summary_with_one_letter(
 
     mock.assert_called_once_with(SERVICE_ONE_ID)
 
-    expected_text = "Returned letters reported on Tuesday 24 December 2019 - 1 letter"
     assert page.h1.string.strip() == 'Returned letters'
-    assert normalize_spaces(page.select('.table-field-left-aligned')[0].text) == expected_text
+    assert normalize_spaces(
+        page.select_one('.table-field').text
+    ) == (
+        '24 December 2019 '
+        '1 letter'
+    )
+
+
+def test_returned_letters_page(
+    client_request,
+    mocker
+):
+    data = [
+        {
+            'notification_id': uuid.uuid4(),
+            'client_reference': client_reference,
+            'created_at': '2019-12-24 13:30',
+            'email_address': 'test@gov.uk',
+            'template_name': template_name,
+            'template_id': uuid.uuid4(),
+            'template_version': None,
+            'original_file_name': original_file_name,
+            'job_row_number': None,
+            'uploaded_letter_file_name': 'test_letter.pdf',
+        }
+        for client_reference, template_name, original_file_name, uploaded_letter_file_name in (
+            ('ABC123', 'Example template', None, None),
+            (None, 'Example template', 'Example spreadsheet.xlsx', None),
+            (None, 'Example template', None, None),
+            ('DEF456', None, None, 'Example precompiled.pdf'),
+            (None, None, None, 'Example one-off.pdf'),
+        )
+    ]
+    mocker.patch('app.service_api_client.get_returned_letters', return_value=data)
+
+    page = client_request.get(
+        'main.returned_letters',
+        service_id=SERVICE_ONE_ID,
+        reported_at='2019-12-24',
+    )
+
+    assert [
+        'Template name Originally sent',
+        'Example template Reference ABC123 Originally sent 24 December 2019',
+        'Example template Sent from Example spreadsheet.xlsx Originally sent 24 December 2019',
+        'Example template No reference provided Originally sent 24 December 2019',
+        'test_letter.pdf Reference DEF456 Originally sent 24 December 2019',
+        'test_letter.pdf No reference provided Originally sent 24 December 2019',
+    ] == [
+        normalize_spaces(row.text) for row in page.select('tr')
+    ]
+
+
+def test_returned_letters_page_with_many_letters(
+    client_request,
+    mocker
+):
+    data = [
+        {
+            'notification_id': uuid.uuid4(),
+            'client_reference': None,
+            'created_at': '2019-12-24 13:30',
+            'email_address': 'test@gov.uk',
+            'template_name': 'Example template',
+            'template_id': uuid.uuid4(),
+            'template_version': None,
+            'original_file_name': None,
+            'job_row_number': None,
+            'uploaded_letter_file_name': None,
+        }
+    ] * 51
+    mocker.patch('app.service_api_client.get_returned_letters', return_value=data)
+
+    page = client_request.get(
+        'main.returned_letters',
+        service_id=SERVICE_ONE_ID,
+        reported_at='2019-12-24',
+    )
+
+    assert len(data) == 51
+    assert len(page.select('tbody tr')) == 50
+    assert normalize_spaces(
+        page.select_one('.table-show-more-link').text
+    ) == (
+        'Only showing the first 50 of 51 rows'
+    )
+    assert page.select_one('a[download]').text == (
+        'Download this report'
+    )
+    assert page.select_one('a[download]')['href'] == url_for(
+        '.returned_letters_report',
+        service_id=SERVICE_ONE_ID,
+        reported_at='2019-12-24',
+    )
 
 
 def test_returned_letters_reports(

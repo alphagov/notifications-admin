@@ -7,7 +7,7 @@ from app.main import main
 from app.utils import Spreadsheet, user_has_permissions
 
 
-@main.route("/services/<uuid:service_id>/returned-letter-summary", methods=["GET"])
+@main.route("/services/<uuid:service_id>/returned-letters")
 @user_has_permissions('view_activity')
 def returned_letter_summary(service_id):
     summary = service_api_client.get_returned_letter_summary(service_id)
@@ -17,7 +17,25 @@ def returned_letter_summary(service_id):
     )
 
 
-@main.route("/services/<uuid:service_id>/returned-letters-csv/<simple_date:reported_at>", methods=["GET"])
+@main.route("/services/<uuid:service_id>/returned-letters/<simple_date:reported_at>")
+@user_has_permissions('view_activity')
+def returned_letters(service_id, reported_at):
+
+    page_size = 50
+    returned_letters = service_api_client.get_returned_letters(service_id, reported_at)
+    count_of_returned_letters = len(returned_letters)
+
+    return render_template(
+        'views/returned-letters.html',
+        returned_letters=returned_letters[:page_size],
+        reported_at=reported_at,
+        more_than_one_page=(count_of_returned_letters > page_size),
+        page_size=page_size,
+        count_of_returned_letters=count_of_returned_letters,
+    )
+
+
+@main.route("/services/<uuid:service_id>/returned-letters/<simple_date:reported_at>.csv")
 @user_has_permissions('view_activity')
 def returned_letters_report(service_id, reported_at):
     returned_letters = service_api_client.get_returned_letters(service_id, reported_at)
