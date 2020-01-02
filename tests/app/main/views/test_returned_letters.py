@@ -75,6 +75,7 @@ def test_returned_letters_page(
             (None, 'Example template', None, None),
             ('DEF456', None, None, 'Example precompiled.pdf'),
             (None, None, None, 'Example one-off.pdf'),
+            ('XYZ999', None, None, None),
         )
     ]
     mocker.patch('app.service_api_client.get_returned_letters', return_value=data)
@@ -92,6 +93,7 @@ def test_returned_letters_page(
         'Example template No reference provided Originally sent 24 December 2019',
         'Example precompiled.pdf Reference DEF456 Originally sent 24 December 2019',
         'Example one-off.pdf No reference provided Originally sent 24 December 2019',
+        'Provided as PDF Reference XYZ999 Originally sent 24 December 2019',
     ] == [
         normalize_spaces(row.text) for row in page.select('tr')
     ]
