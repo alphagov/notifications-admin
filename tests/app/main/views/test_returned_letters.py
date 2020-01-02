@@ -67,7 +67,7 @@ def test_returned_letters_page(
             'template_version': None,
             'original_file_name': original_file_name,
             'job_row_number': None,
-            'uploaded_letter_file_name': 'test_letter.pdf',
+            'uploaded_letter_file_name': uploaded_letter_file_name,
         }
         for client_reference, template_name, original_file_name, uploaded_letter_file_name in (
             ('ABC123', 'Example template', None, None),
@@ -90,8 +90,8 @@ def test_returned_letters_page(
         'Example template Reference ABC123 Originally sent 24 December 2019',
         'Example template Sent from Example spreadsheet.xlsx Originally sent 24 December 2019',
         'Example template No reference provided Originally sent 24 December 2019',
-        'test_letter.pdf Reference DEF456 Originally sent 24 December 2019',
-        'test_letter.pdf No reference provided Originally sent 24 December 2019',
+        'Example precompiled.pdf Reference DEF456 Originally sent 24 December 2019',
+        'Example one-off.pdf No reference provided Originally sent 24 December 2019',
     ] == [
         normalize_spaces(row.text) for row in page.select('tr')
     ]
