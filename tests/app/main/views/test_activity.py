@@ -265,15 +265,19 @@ def test_download_not_available_to_users_without_dashboard(
 
 def test_letters_with_status_virus_scan_failed_shows_a_failure_description(
     mocker,
+    active_user_with_permissions,
     client_request,
     service_one,
     mock_get_service_statistics,
     mock_get_service_data_retention,
     mock_get_api_keys,
 ):
-    notifications = create_notifications(template_type='letter', status='virus-scan-failed', is_precompiled_letter=True)
-    mocker.patch('app.notification_api_client.get_notifications_for_service', return_value=notifications)
-
+    mock_get_notifications(
+        mocker,
+        active_user_with_permissions,
+        is_precompiled_letter=True,
+        noti_status='virus-scan-failed'
+    )
     page = client_request.get(
         'main.view_notifications',
         service_id=service_one['id'],
@@ -563,6 +567,7 @@ def test_html_contains_notification_id(
 
 def test_html_contains_links_for_failed_notifications(
     client_request,
+    active_user_with_permissions,
     mock_get_service_statistics,
     mock_get_service_data_retention,
     mock_get_no_api_keys,
