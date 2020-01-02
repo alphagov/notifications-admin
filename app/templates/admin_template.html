@@ -1,6 +1,5 @@
 {% extends "template.njk" %}
 {% from "components/banner.html" import banner %}
-{% from "components/notify-footer.html" import notify_footer %}
 
 {% block headIcons %}
   <link rel="shortcut icon" sizes="16x16 32x32 48x48" href="{{ asset_url('images/favicon.ico') }}" type="image/x-icon" />
@@ -125,7 +124,8 @@
   {{ govukHeader({
     "homepageUrl": url_for('main.show_accounts_or_dashboard'),
     "productName": "Notify",
-    "navigation": navigation
+    "navigation": navigation,
+    "navigationClasses": "govuk-header__navigation--end"
   }) }}
 {% endblock %}
 
@@ -147,35 +147,29 @@
     {% set meta_suffix = 'Built by the <a href="https://www.gov.uk/government/organisations/government-digital-service" class="govuk-footer__link">Government Digital Service</a>' %}
   {% endif %}
 
-  {{ notify_footer({
+  {{ govukFooter({
     "classes": "js-footer",
     "navigation": [
       {
+        "title": "Support",
         "columns": 1,
         "items": [
           {
             "href": url_for('main.support'),
-            "text": "Support"
+            "text": "Contact support"
           },
           {
             "href": "https://status.notifications.service.gov.uk",
             "text": "System status"
           },
           {
-            "href": "https://www.gov.uk/performance/govuk-notify",
-            "text": "Performance"
-          },
-          {
             "href": "https://ukgovernmentdigital.slack.com/messages/C0E1ADVPC",
-            "text": "Slack channel"
-          },
-          {
-            "href": "https://gds.blog.gov.uk/category/notify/",
-            "text": "Blog"
+            "text": "Chat to us on Slack"
           }
         ]
       },
       {
+        "title": "About Notify",
         "columns": 1,
         "items": [
           {
@@ -187,24 +181,25 @@
             "text": "Roadmap"
           },
           {
-            "href": url_for("main.trial_mode_new"),
-            "text": "Trial mode"
-          },
-          {
-            "href": url_for("main.message_status"),
-            "text": "Message status"
-          },
-          {
             "href": url_for("main.security"),
             "text": "Security"
           },
           {
             "href": url_for("main.terms"),
             "text": "Terms of use"
+          },
+          {
+            "href": "https://www.gov.uk/performance/govuk-notify",
+            "text": "Performance"
+          },
+          {
+            "href": "https://gds.blog.gov.uk/category/notify/",
+            "text": "Blog"
           }
         ]
       },
       {
+        "title": "Pricing and payment",
         "columns": 1,
         "items": [
           {
@@ -218,11 +213,24 @@
         ]
       },
       {
+        "title": "Using Notify",
         "columns": 1,
         "items": [
           {
+            "href": url_for("main.get_started"),
+            "text": "Get started"
+          },
+          {
+            "href": url_for("main.trial_mode_new"),
+            "text": "Trial mode"
+          },
+          {
+            "href": url_for("main.message_status"),
+            "text": "Message status"
+          },
+          {
             "href": url_for("main.documentation"),
-            "text": "Documentation"
+            "text": "API documentation"
           }
         ]
       }
