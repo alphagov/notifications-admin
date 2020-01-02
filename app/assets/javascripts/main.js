@@ -2,7 +2,9 @@ window.GOVUK.Frontend.initAll();
 
 $(() => GOVUK.addCookieMessage());
 
-window.GOVUK.initAnalytics();
+if (window.GOVUK.hasConsentFor('analytics')) {
+  window.GOVUK.initAnalytics();
+}
 
 $(() => $("time.timeago").timeago());
 
