@@ -1,8 +1,156 @@
-.notify-cookie-message {
-  @include govuk-font($size: 16);
-  padding: govuk-spacing(3) 0;
+// GOV.UK Publishing components cookie banner styles
+// https://github.com/alphagov/govuk_publishing_components/blob/master/app/assets/stylesheets/govuk_publishing_components/components/_cookie-banner.scss
+// sass-lint:disable mixins-before-declarations
+
+.notify-cookie-banner__with-js {
+  display: none;
+}
+
+.notify-cookie-banner__no-js {
+  display: block;
+}
+
+.notify-cookie-banner__with-js {
+  display: none;
+}
+
+.notify-cookie-banner__no-js {
+  display: block;
+}
+
+.js-enabled {
+  .notify-cookie-banner__no-js,
+  .notify-cookie-banner {
+    display: none; // shown with JS, always on for non-JS
+  }
+
+  .notify-cookie-banner__with-js {
+    display: block;
+  }
+}
+
+.notify-cookie-banner__buttons {
+  @include govuk-clearfix;
+
+  @include govuk-media-query($from: desktop) {
+    display: inline-block;
+  }
+}
+
+.notify-cookie-banner__button {
+  display: inline-block;
+  width: 100%;
+
+  @include govuk-media-query($from: mobile, $until: desktop) {
+    &.notify-cookie-banner__button-accept {
+      float: left;
+      width: 49%;
+    }
+
+    &.notify-cookie-banner__button-reject {
+      .js-enabled & {
+        float: right;
+        width: 49%;
+      }
+    }
+  }
+
+  @include govuk-media-query($from: desktop) {
+    width: auto;
+  }
+
+  @include govuk-media-query($until: 455px) {
+    width: 100%;
+  }
+}
+
+.notify-cookie-banner__button-accept {
+  display: none;
 
   .js-enabled & {
-    display: none;
+    display: inline-block;
   }
+}
+
+.notify-cookie-banner__confirmation {
+  display: none;
+  position: relative;
+  padding: govuk-spacing(4) 0;
+
+  @include govuk-media-query($from: desktop) {
+    padding: govuk-spacing(4);
+  }
+
+  // This element is focused using JavaScript so that it's being read out by screen readers
+  // for this reason we don't want to show the default outline or emphasise it visually using `govuk-focused-text`
+  &:focus {
+    outline: none;
+  }
+}
+
+.notify-cookie-banner__confirmation-message,
+.notify-cookie-banner__hide-button {
+  display: block;
+
+  @include govuk-media-query($from: desktop) {
+    display: inline-block;
+  }
+}
+
+.notify-cookie-banner__confirmation-message {
+  margin-right: govuk-spacing(4);
+
+  @include govuk-media-query($from: desktop) {
+    max-width: 90%;
+  }
+}
+
+.notify-cookie-banner__hide-button {
+  @include govuk-font($size: 19);
+  outline: 0;
+  border: 0;
+  background: none;
+  text-decoration: underline;
+  padding: govuk-spacing(0);
+  margin-top: govuk-spacing(2);
+  right: govuk-spacing(3);
+
+  @include govuk-media-query($from: desktop) {
+    margin-top: govuk-spacing(0);
+    position: absolute;
+    right: govuk-spacing(4);
+  }
+}
+
+// GOV.UK Publishing components button styles (inherits from GOV.UK Frontend button)
+// https://github.com/alphagov/govuk_publishing_components/blob/master/app/assets/stylesheets/govuk_publishing_components/components/_button.scss
+
+.notify-cookie-banner-button--inline {
+  display: block;
+  width: 100%;
+  margin-bottom: govuk-spacing(1);
+  vertical-align: top;
+
+  @include govuk-media-query($from: desktop) {
+    display: inline-block;
+    width: auto;
+    vertical-align: baseline;
+    margin-right: govuk-spacing(2);
+  }
+}
+
+.notify-cookie-banner-button--secondary {
+  padding: (govuk-spacing(2) - $govuk-border-width-form-element) govuk-spacing(2); // s1
+  box-shadow: none;
+
+  &:before {
+    content: none;
+  }
+}
+
+// Additions
+
+// Override margin-bottom, inherited from using .govuk-body class
+.notify-cookie-banner__confirmation-message {
+  margin-bottom: 0;
 }
