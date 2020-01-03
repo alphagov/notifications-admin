@@ -28,7 +28,7 @@
       field_headings_visible=False
   ) %}
     {% call field() %}
-      <span class="file-list-filename file-list-filename-unlinked">{{ item.template_name or item.uploaded_letter_file_name }}</span>
+      <span class="file-list-filename file-list-filename-unlinked">{{ item.template_name or item.uploaded_letter_file_name or 'Provided as PDF' }}</span>
       <span class="file-list-hint">
         {% if item.client_reference %}
           Reference {{ item.client_reference }}
