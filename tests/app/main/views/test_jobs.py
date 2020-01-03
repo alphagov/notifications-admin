@@ -294,7 +294,27 @@ def test_should_show_job_in_progress(
         service_id=service_one['id'],
         job_id=fake_uuid,
     )
-    assert page.find('p', {'class': 'hint'}).text.strip() == 'Report is 50% complete…'
+    assert page.select_one('p.hint').text.strip() == 'Report is 50% complete…'
+
+
+def test_should_show_job_without_notifications(
+    client_request,
+    service_one,
+    active_user_with_permissions,
+    mock_get_service_template,
+    mock_get_job_in_progress,
+    mocker,
+    mock_get_notifications_with_no_notifications,
+    mock_get_service_data_retention,
+    fake_uuid,
+):
+    page = client_request.get(
+        'main.view_job',
+        service_id=service_one['id'],
+        job_id=fake_uuid,
+    )
+    assert page.select_one('p.hint').text.strip() == 'Report is 50% complete…'
+    assert page.select_one('tbody').text.strip() == 'No messages to show'
 
 
 @freeze_time("2016-01-01 11:09:00.061258")
