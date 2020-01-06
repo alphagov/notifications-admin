@@ -14,8 +14,6 @@ from tests.conftest import (
     create_active_caseworking_user,
     create_active_user_view_permissions,
     create_active_user_with_permissions,
-    mock_get_api_keys,
-    mock_get_no_api_keys,
     mock_get_notifications,
     normalize_spaces,
 )
@@ -420,43 +418,12 @@ def test_search_recipient_form(
         assert field['value'] == expected_search_box_contents
 
 
-@pytest.mark.parametrize((
-    'message_type,'
-    'api_keys_mock,'
-    'expected_search_box_label,'
-), [
-    (
-        None,
-        mock_get_no_api_keys,
-        'Search by email address or phone number',
-    ),
-    (
-        None,
-        mock_get_api_keys,
-        'Search by email address, phone number or reference',
-    ),
-    (
-        'sms',
-        mock_get_no_api_keys,
-        'Search by phone number',
-    ),
-    (
-        'sms',
-        mock_get_api_keys,
-        'Search by phone number or reference',
-    ),
-    (
-        'email',
-        mock_get_no_api_keys,
-        'Search by email address',
-    ),
-    (
-        'email',
-        mock_get_api_keys,
-        'Search by email address or reference',
-    ),
+@pytest.mark.parametrize('message_type, expected_search_box_label', [
+    (None, 'Search by email address, phone number or reference'),
+    ('sms', 'Search by phone number or reference'),
+    ('email', 'Search by email address or reference'),
 ])
-def test_api_users_are_told_they_can_search_by_reference(
+def test_api_users_are_told_they_can_search_by_reference_when_service_has_api_keys(
     client_request,
     mocker,
     fake_uuid,
@@ -465,9 +432,32 @@ def test_api_users_are_told_they_can_search_by_reference(
     mock_get_service_data_retention,
     message_type,
     expected_search_box_label,
-    api_keys_mock,
+    mock_get_api_keys,
 ):
-    api_keys_mock(mocker, fake_uuid)
+    page = client_request.get(
+        'main.view_notifications',
+        service_id=SERVICE_ONE_ID,
+        message_type=message_type,
+    )
+    assert page.select_one('label[for=to]').text.strip() == expected_search_box_label
+
+
+@pytest.mark.parametrize('message_type, expected_search_box_label', [
+    (None, 'Search by email address or phone number'),
+    ('sms', 'Search by phone number'),
+    ('email', 'Search by email address'),
+])
+def test_api_users_are_not_told_they_can_search_by_reference_when_service_has_no_api_keys(
+    client_request,
+    mocker,
+    fake_uuid,
+    mock_get_notifications,
+    mock_get_service_statistics,
+    mock_get_service_data_retention,
+    message_type,
+    expected_search_box_label,
+    mock_get_no_api_keys,
+):
     page = client_request.get(
         'main.view_notifications',
         service_id=SERVICE_ONE_ID,
