@@ -2,12 +2,13 @@
 // https://github.com/alphagov/govuk_publishing_components/blob/master/app/assets/stylesheets/govuk_publishing_components/components/_cookie-banner.scss
 // sass-lint:disable mixins-before-declarations
 
-.notify-cookie-banner__with-js {
-  display: none;
-}
+// component uses .govuk-body and .govuk-button classes from govuk-frontend
+@import 'core/typography';
+@import 'components/button/_button';
 
-.notify-cookie-banner__no-js {
-  display: block;
+.notify-cookie-banner__wrapper {
+  @include govuk-responsive-padding(4, "top");
+  @include govuk-responsive-padding(4, "bottom");
 }
 
 .notify-cookie-banner__with-js {
@@ -125,26 +126,13 @@
 // GOV.UK Publishing components button styles (inherits from GOV.UK Frontend button)
 // https://github.com/alphagov/govuk_publishing_components/blob/master/app/assets/stylesheets/govuk_publishing_components/components/_button.scss
 
-.notify-cookie-banner-button--inline {
-  display: block;
-  width: 100%;
+.notify-cookie-banner-button {
   margin-bottom: govuk-spacing(1);
   vertical-align: top;
 
   @include govuk-media-query($from: desktop) {
-    display: inline-block;
-    width: auto;
     vertical-align: baseline;
     margin-right: govuk-spacing(2);
-  }
-}
-
-.notify-cookie-banner-button--secondary {
-  padding: (govuk-spacing(2) - $govuk-border-width-form-element) govuk-spacing(2); // s1
-  box-shadow: none;
-
-  &:before {
-    content: none;
   }
 }
 
