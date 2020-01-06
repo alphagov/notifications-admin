@@ -45,8 +45,6 @@ from tests.conftest import (
     multiple_sms_senders,
     multiple_sms_senders_no_inbound,
     multiple_sms_senders_with_diff_default,
-    no_reply_to_email_addresses,
-    no_sms_senders,
     normalize_spaces,
 )
 
@@ -204,26 +202,12 @@ def test_sender_session_is_present_after_selected(
         assert session['sender_id'] == '1234'
 
 
-@pytest.mark.parametrize('template_mock, sender_data', [
-    (
-        mock_get_service_email_template,
-        no_reply_to_email_addresses,
-    ),
-    (
-        mock_get_service_template,
-        no_sms_senders
-    )
-])
-def test_set_sender_redirects_if_no_sender_data(
+def test_set_sender_redirects_if_no_reply_to_email_addresses(
     client_request,
-    service_one,
     fake_uuid,
-    template_mock,
-    sender_data,
-    mocker
+    mock_get_service_email_template,
+    no_reply_to_email_addresses,
 ):
-    template_mock(mocker)
-    sender_data(mocker)
     client_request.get(
         '.set_sender',
         service_id=SERVICE_ONE_ID,
@@ -231,7 +215,27 @@ def test_set_sender_redirects_if_no_sender_data(
         _expected_status=302,
         _expected_url=url_for(
             '.send_one_off',
-            service_id=service_one['id'],
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            _external=True,
+        )
+    )
+
+
+def test_set_sender_redirects_if_no_sms_senders(
+    client_request,
+    fake_uuid,
+    mock_get_service_template,
+    no_sms_senders,
+):
+    client_request.get(
+        '.set_sender',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _expected_status=302,
+        _expected_url=url_for(
+            '.send_one_off',
+            service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
             _external=True,
         )

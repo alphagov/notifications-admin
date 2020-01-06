@@ -551,8 +551,8 @@ def test_edit_letter_template_postage_page_displays_correctly(
     service_one,
     fake_uuid,
     mocker,
+    mock_get_service_letter_template,
 ):
-    mock_get_service_letter_template(mocker)
     page = client_request.get(
         'main.edit_template_postage',
         service_id=SERVICE_ONE_ID,
@@ -586,12 +586,12 @@ def test_edit_letter_templates_postage_updates_postage(
     client_request,
     service_one,
     mocker,
-    fake_uuid
+    fake_uuid,
+    mock_get_service_letter_template,
 ):
     mock_update_template_postage = mocker.patch(
         'app.main.views.templates.service_api_client.update_service_template_postage'
     )
-    mock_get_service_letter_template(mocker)
 
     client_request.post(
         'main.edit_template_postage',
