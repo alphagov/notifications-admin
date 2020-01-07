@@ -3930,3 +3930,39 @@ def create_notification(
     if key_type:
         noti['key_type'] = key_type
     return noti
+
+
+def create_notifications(
+    service_id=SERVICE_ONE_ID,
+    template_type='sms',
+    rows=5,
+    status=None,
+    subject='subject',
+    content='content',
+    client_reference=None,
+    personalisation=None,
+    redact_personalisation=False,
+    is_precompiled_letter=False,
+    postage=None,
+):
+    template = template_json(
+        service_id,
+        id_=str(generate_uuid()),
+        type_=template_type,
+        subject=subject,
+        content=content,
+        redact_personalisation=redact_personalisation,
+        is_precompiled_letter=is_precompiled_letter
+    )
+
+    return notification_json(
+        service_id,
+        template=template,
+        rows=rows,
+        personalisation=personalisation,
+        template_type=template_type,
+        client_reference=client_reference,
+        status=status,
+        created_by_name='Firstname Lastname',
+        postage=postage
+    )

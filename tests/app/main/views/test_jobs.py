@@ -11,7 +11,7 @@ from tests.conftest import (
     SERVICE_ONE_ID,
     create_active_caseworking_user,
     create_active_user_with_permissions,
-    mock_get_notifications,
+    create_notifications,
     mock_get_service_letter_template,
     normalize_spaces,
 )
@@ -360,11 +360,13 @@ def test_should_show_letter_job(
     mock_get_job,
     mock_get_service_data_retention,
     fake_uuid,
-    active_user_with_permissions,
     mocker,
 ):
-
-    get_notifications = mock_get_notifications(mocker, active_user_with_permissions, diff_template_type='letter')
+    notifications = create_notifications(template_type='letter', subject='template subject')
+    get_notifications = mocker.patch(
+        'app.notification_api_client.get_notifications_for_service',
+        return_value=notifications,
+    )
 
     page = client_request.get(
         'main.view_job',
@@ -742,15 +744,10 @@ def test_should_show_letter_job_with_first_class_if_notifications_are_first_clas
     mock_get_job,
     mock_get_service_data_retention,
     fake_uuid,
-    active_user_with_permissions,
     mocker,
 ):
-    mock_get_notifications(
-        mocker,
-        active_user_with_permissions,
-        diff_template_type='letter',
-        postage='first'
-    )
+    notifications = create_notifications(template_type='letter', postage='first')
+    mocker.patch('app.notification_api_client.get_notifications_for_service', return_value=notifications)
 
     page = client_request.get(
         'main.view_job',

@@ -8,7 +8,7 @@ from flask import url_for
 from tests import sample_uuid, validate_route_permission
 from tests.conftest import (
     SERVICE_ONE_ID,
-    mock_get_notifications,
+    create_notifications,
     normalize_spaces,
 )
 
@@ -73,13 +73,13 @@ def test_should_show_api_page_with_no_notifications(
 ])
 def test_letter_notifications_should_have_link_to_view_letter(
     client_request,
-    api_user_active,
     mock_has_permissions,
     mocker,
     template_type,
     link_text,
 ):
-    mock_get_notifications(mocker, api_user_active, diff_template_type=template_type)
+    notifications = create_notifications(template_type=template_type)
+    mocker.patch('app.notification_api_client.get_notifications_for_service', return_value=notifications)
     page = client_request.get(
         'main.api_integration',
         service_id=SERVICE_ONE_ID,
@@ -93,13 +93,13 @@ def test_letter_notifications_should_have_link_to_view_letter(
 ])
 def test_should_not_have_link_to_view_letter_for_precompiled_letters_in_virus_states(
     client_request,
-    api_user_active,
     fake_uuid,
     mock_has_permissions,
     mocker,
     status
 ):
-    mock_get_notifications(mocker, api_user_active, noti_status=status)
+    notifications = create_notifications(status=status)
+    mocker.patch('app.notification_api_client.get_notifications_for_service', return_value=notifications)
 
     page = client_request.get(
         'main.api_integration',
@@ -115,14 +115,14 @@ def test_should_not_have_link_to_view_letter_for_precompiled_letters_in_virus_st
 ])
 def test_letter_notifications_should_show_client_reference(
     client_request,
-    api_user_active,
     fake_uuid,
     mock_has_permissions,
     mocker,
     client_reference,
     shows_ref
 ):
-    mock_get_notifications(mocker, api_user_active, client_reference=client_reference)
+    notifications = create_notifications(client_reference=client_reference)
+    mocker.patch('app.notification_api_client.get_notifications_for_service', return_value=notifications)
 
     page = client_request.get(
         'main.api_integration',
