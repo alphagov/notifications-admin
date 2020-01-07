@@ -478,7 +478,8 @@ def get_service_verify_reply_to_address_partials(service_id, notification_id):
     created_at_no_tz = notification["created_at"][:-6]
     seconds_since_sending = (datetime.utcnow() - datetime.strptime(created_at_no_tz, '%Y-%m-%dT%H:%M:%S.%f')).seconds
     if notification["status"] in FAILURE_STATUSES or (
-        notification["status"] in SENDING_STATUSES and seconds_since_sending > 45
+        notification["status"] in SENDING_STATUSES and
+        seconds_since_sending > current_app.config['REPLY_TO_EMAIL_ADDRESS_VALIDATION_TIMEOUT']
     ):
         verification_status = "failure"
         form.email_address.data = notification['to']
