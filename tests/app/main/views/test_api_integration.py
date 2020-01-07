@@ -11,10 +11,7 @@ from tests.conftest import (
     SERVICE_ONE_ID,
     mock_get_empty_service_callback_api,
     mock_get_empty_service_inbound_api,
-    mock_get_live_service,
     mock_get_notifications,
-    mock_get_service,
-    mock_get_service_with_letters,
     mock_get_valid_service_callback_api,
     mock_get_valid_service_inbound_api,
     normalize_spaces,
@@ -210,8 +207,8 @@ def test_should_show_api_keys_page(
     mock_get_api_keys.assert_called_once_with(SERVICE_ONE_ID)
 
 
-@pytest.mark.parametrize('service_mock, expected_options', [
-    (mock_get_service, [
+@pytest.mark.parametrize('restricted, can_send_letters, expected_options', [
+    (True, False, [
         (
             'Live – sends to anyone '
             'Not available because your service is in trial mode'
@@ -219,12 +216,12 @@ def test_should_show_api_keys_page(
         'Team and whitelist – limits who you can send to',
         'Test – pretends to send messages',
     ]),
-    (mock_get_live_service, [
+    (False, False, [
         'Live – sends to anyone',
         'Team and whitelist – limits who you can send to',
         'Test – pretends to send messages',
     ]),
-    (mock_get_service_with_letters, [
+    (False, True, [
         'Live – sends to anyone',
         (
             'Team and whitelist – limits who you can send to '
@@ -238,10 +235,16 @@ def test_should_show_create_api_key_page(
     mocker,
     api_user_active,
     mock_get_api_keys,
-    service_mock,
+    restricted,
+    can_send_letters,
     expected_options,
+    service_one,
 ):
-    service_mock(mocker, api_user_active)
+    service_one['restricted'] = restricted
+    if can_send_letters:
+        service_one['permissions'].append('letter')
+
+    mocker.patch('app.service_api_client.get_service', return_value={'data': service_one})
 
     page = client_request.get('main.create_api_key', service_id=SERVICE_ONE_ID)
 

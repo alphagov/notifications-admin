@@ -34,9 +34,6 @@ from tests.conftest import (
     SERVICE_ONE_ID,
     create_active_caseworking_user,
     create_active_user_with_permissions,
-    mock_get_international_service,
-    mock_get_live_service,
-    mock_get_service,
     mock_get_service_email_template,
     mock_get_service_letter_template,
     mock_get_service_template,
@@ -2110,9 +2107,9 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(
     mock_get_service_statistics.assert_called_once_with(service_one['id'], today_only=True)
 
 
-@pytest.mark.parametrize('service_mock, should_allow_international', [
-    (mock_get_service, False),
-    (mock_get_international_service, True),
+@pytest.mark.parametrize('international_sms_permission, should_allow_international', [
+    (False, False),
+    (True, True),
 ])
 def test_upload_csvfile_with_international_validates(
     mocker,
@@ -2126,11 +2123,14 @@ def test_upload_csvfile_with_international_validates(
     mock_get_job_doesnt_exist,
     mock_get_jobs,
     fake_uuid,
-    service_mock,
+    international_sms_permission,
     should_allow_international,
+    service_one,
 ):
+    if international_sms_permission:
+        service_one['permissions'] += ('sms', 'international_sms')
+    mocker.patch('app.service_api_client.get_service', return_value={'data': service_one})
 
-    service_mock(mocker, api_user_active)
     mocker.patch('app.main.views.send.s3download', return_value='')
     mock_recipients = mocker.patch(
         'app.main.views.send.RecipientCSV',
@@ -2737,9 +2737,9 @@ def test_check_messages_shows_trial_mode_error(
     )
 
 
-@pytest.mark.parametrize('service_mock, error_should_be_shown', [
-    (mock_get_service, True),
-    (mock_get_live_service, False),
+@pytest.mark.parametrize('restricted, error_should_be_shown', [
+    (True, True),
+    (False, False),
 ])
 @pytest.mark.parametrize('number_of_rows, expected_error_message', [
     (1, 'You cannot send this letter'),
@@ -2748,7 +2748,7 @@ def test_check_messages_shows_trial_mode_error(
 ])
 def test_check_messages_shows_trial_mode_error_for_letters(
     client_request,
-    api_user_active,
+    service_one,
     mock_get_service_letter_template,
     mock_has_permissions,
     mock_get_users_by_service,
@@ -2758,12 +2758,13 @@ def test_check_messages_shows_trial_mode_error_for_letters(
     mock_s3_set_metadata,
     fake_uuid,
     mocker,
-    service_mock,
+    restricted,
     error_should_be_shown,
     number_of_rows,
     expected_error_message,
 ):
-    service_mock(mocker, api_user_active)
+    service_one['restricted'] = restricted
+    mocker.patch('app.service_api_client.get_service', return_value={'data': service_one})
 
     mocker.patch('app.main.views.send.s3download', return_value='\n'.join(
         ['address_line_1,address_line_2,postcode,'] +
@@ -3092,10 +3093,7 @@ def test_letters_from_csv_files_dont_have_download_link(
     assert not page.select('a[download]')
 
 
-@pytest.mark.parametrize('service_mock', (
-    mock_get_service,
-    mock_get_live_service,
-))
+@pytest.mark.parametrize('restricted', [True, False])
 def test_one_off_letters_have_download_link(
     client_request,
     mocker,
@@ -3105,10 +3103,11 @@ def test_one_off_letters_have_download_link(
     fake_uuid,
     mock_get_users_by_service,
     mock_get_service_statistics,
-    service_mock,
+    restricted,
+    service_one,
 ):
-
-    service_mock(mocker, api_user_active)
+    service_one['restricted'] = restricted
+    mocker.patch('app.service_api_client.get_service', return_value={'data': service_one})
 
     mocker.patch(
         'app.main.views.send.get_page_count_for_letter',
