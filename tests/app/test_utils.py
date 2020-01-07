@@ -55,6 +55,7 @@ def _get_notifications_csv(
                 "row_number": row_number + i,
                 "to": recipient,
                 "recipient": recipient,
+                "client_reference": 'ref 1234',
                 "template_name": template_name,
                 "template_type": template_type,
                 "template": {"name": template_name, "template_type": template_type},
@@ -160,14 +161,14 @@ def test_spreadsheet_checks_for_bad_arguments(args, kwargs):
 @pytest.mark.parametrize('created_by_name, expected_content', [
     (
         None, [
-            'Recipient,Template,Type,Sent by,Sent by email,Job,Status,Time\n',
-            'foo@bar.com,foo,sms,,sender@email.gov.uk,,Delivered,1943-04-19 12:00:00\r\n',
+            'Recipient,Reference,Template,Type,Sent by,Sent by email,Job,Status,Time\n',
+            'foo@bar.com,ref 1234,foo,sms,,sender@email.gov.uk,,Delivered,1943-04-19 12:00:00\r\n',
         ]
     ),
     (
         'Anne Example', [
-            'Recipient,Template,Type,Sent by,Sent by email,Job,Status,Time\n',
-            'foo@bar.com,foo,sms,Anne Example,sender@email.gov.uk,,Delivered,1943-04-19 12:00:00\r\n',
+            'Recipient,Reference,Template,Type,Sent by,Sent by email,Job,Status,Time\n',
+            'foo@bar.com,ref 1234,foo,sms,Anne Example,sender@email.gov.uk,,Delivered,1943-04-19 12:00:00\r\n',
         ]
     ),
 ])
@@ -183,7 +184,7 @@ def test_generate_notifications_csv_without_job(
             created_by_name=created_by_name,
             created_by_email_address="sender@email.gov.uk",
             job_id=None,
-            job_name=None,
+            job_name=None
         )
     )
     assert list(generate_notifications_csv(service_id=fake_uuid)) == expected_content

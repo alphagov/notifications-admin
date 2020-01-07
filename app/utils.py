@@ -165,7 +165,7 @@ def generate_notifications_csv(**kwargs):
         original_column_headers = original_upload.column_headers
         fieldnames = ['Row number'] + original_column_headers + ['Template', 'Type', 'Job', 'Status', 'Time']
     else:
-        fieldnames = ['Recipient', 'Template', 'Type', 'Sent by', 'Sent by email', 'Job', 'Status', 'Time']
+        fieldnames = ['Recipient', 'Reference', 'Template', 'Type', 'Sent by', 'Sent by email', 'Job', 'Status', 'Time']
 
     yield ','.join(fieldnames) + '\n'
 
@@ -187,7 +187,9 @@ def generate_notifications_csv(**kwargs):
                 ]
             else:
                 values = [
-                    notification['recipient'],
+                    # the recipient for precompiled letters is the full address block
+                    notification['recipient'].splitlines()[0].lstrip().rstrip(' ,'),
+                    notification['client_reference'],
                     notification['template_name'],
                     notification['template_type'],
                     notification['created_by_name'] or '',
