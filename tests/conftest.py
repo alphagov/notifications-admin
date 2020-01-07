@@ -2827,9 +2827,10 @@ def os_environ():
     """
     # for use whenever you expect code to edit environment variables
     old_env = os.environ.copy()
-    os.environ = {}
+    os.environ.clear()
     yield
-    os.environ = old_env
+    for k, v in old_env.items():
+        os.environ[k] = v
 
 
 @pytest.fixture
