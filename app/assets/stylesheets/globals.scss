@@ -67,11 +67,6 @@ a {
     background-color: $focus-colour;
     outline: 3px solid $focus-colour;
   }
-
-  /* Make links slightly darker when focused to improve contrast. */
-  &:link:focus {
-    color: darken( $link-colour, 2.5%)
-  }
 }
 
 // Each selector, and then the whole block when only one remains, to be removed when the
