@@ -518,7 +518,7 @@ def test_should_cancel_job(
     mock_get_service_template,
     mocker,
 ):
-    mock_cancel = mocker.patch('app.main.jobs.job_api_client.cancel_job')
+    mock_cancel = mocker.patch('app.job_api_client.cancel_job')
     client_request.post(
         'main.cancel_job',
         service_id=SERVICE_ONE_ID,
@@ -687,7 +687,7 @@ def test_dont_cancel_letter_job_when_to_early_to_cancel(
         'app.notification_api_client.get_notification_count_for_job_id', return_value=number_of_processed_notifications
     )
 
-    mock_cancel = mocker.patch('app.main.jobs.job_api_client.cancel_letter_job')
+    mock_cancel = mocker.patch('app.job_api_client.cancel_letter_job')
     page = client_request.post(
         'main.cancel_letter_job',
         service_id=SERVICE_ONE_ID,

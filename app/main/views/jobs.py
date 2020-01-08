@@ -19,14 +19,12 @@ from app import (
     current_service,
     format_datetime_short,
     format_thousands,
-    job_api_client,
     notification_api_client,
     service_api_client,
 )
 from app.main import main
 from app.main.forms import SearchNotificationsForm
 from app.models.job import Job
-from app.statistics_utils import add_rate_to_job
 from app.utils import (
     generate_next_dict,
     generate_notifications_csv,
@@ -44,31 +42,25 @@ from app.utils import (
 @main.route("/services/<uuid:service_id>/jobs")
 @user_has_permissions()
 def view_jobs(service_id):
-    page = int(request.args.get('page', 1))
-    jobs_response = job_api_client.get_page_of_jobs(service_id, page=page)
-    jobs = [
-        add_rate_to_job(job) for job in jobs_response['data']
-    ]
+    jobs = current_service.get_page_of_jobs(page=request.args.get('page'))
 
     prev_page = None
-    if jobs_response['links'].get('prev', None):
-        prev_page = generate_previous_dict('main.view_jobs', service_id, page)
+    if jobs.prev_page:
+        prev_page = generate_previous_dict('main.view_jobs', service_id, jobs.current_page)
     next_page = None
-    if jobs_response['links'].get('next', None):
-        next_page = generate_next_dict('main.view_jobs', service_id, page)
+    if jobs.next_page:
+        next_page = generate_next_dict('main.view_jobs', service_id, jobs.current_page)
 
     scheduled_jobs = ''
-    if not current_user.has_permissions('view_activity') and page == 1:
+    if not current_user.has_permissions('view_activity') and jobs.current_page == 1:
         scheduled_jobs = render_template(
             'views/dashboard/_upcoming.html',
-            scheduled_jobs=job_api_client.get_scheduled_jobs(service_id),
             hide_heading=True,
         )
 
     return render_template(
         'views/jobs/jobs.html',
         jobs=jobs,
-        page=page,
         prev_page=prev_page,
         next_page=next_page,
         scheduled_jobs=scheduled_jobs,

@@ -1,7 +1,7 @@
 import pytest
 
+from app.models.job import Job
 from app.statistics_utils import (
-    add_rate_to_job,
     add_rates_to,
     statistics_by_state,
     sum_of_statistics,
@@ -128,7 +128,7 @@ def test_service_statistics_by_state():
     (1, 4, 20)
 ])
 def test_add_rate_to_job_calculates_rate(failed, delivered, expected_failure_rate):
-    resp = add_rate_to_job(
+    resp = Job(
         {
             'notifications_failed': failed,
             'notifications_delivered': delivered,
@@ -136,11 +136,11 @@ def test_add_rate_to_job_calculates_rate(failed, delivered, expected_failure_rat
         }
     )
 
-    assert resp['failure_rate'] == expected_failure_rate
+    assert resp.failure_rate == expected_failure_rate
 
 
 def test_add_rate_to_job_preserves_initial_fields():
-    resp = add_rate_to_job(
+    resp = Job(
         {
             'notifications_failed': 0,
             'notifications_delivered': 0,
@@ -148,4 +148,5 @@ def test_add_rate_to_job_preserves_initial_fields():
         }
     )
 
-    assert set(resp.keys()) == {'notifications_failed', 'notifications_delivered', 'id', 'failure_rate'}
+    assert resp.notifications_failed == resp.notifications_delivered == resp.failure_rate == 0
+    assert resp.id == 'foo'

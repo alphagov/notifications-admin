@@ -7,7 +7,7 @@ from notifications_utils.letter_timings import (
 )
 from werkzeug.utils import cached_property
 
-from app.models import JSONModel
+from app.models import JSONModel, ModelList
 from app.notify_client.job_api_client import job_api_client
 from app.notify_client.notification_api_client import notification_api_client
 from app.notify_client.service_api_client import service_api_client
@@ -147,6 +147,20 @@ class Job(JSONModel):
     def letter_timings(self):
         return get_letter_timings(self.created_at, postage=self.postage)
 
+    @property
+    def failure_rate(self):
+        if not self.notifications_delivered:
+            return 100 if self.notifications_failed else 0
+        return (
+            self.notifications_failed / (
+                self.notifications_failed + self.notifications_delivered
+            ) * 100
+        )
+
+    @property
+    def high_failure_rate(self):
+        return self.failure_rate > 30
+
     def get_notifications(self, status):
         return notification_api_client.get_notifications_for_service(
             self.service, self.id, status=status,
@@ -157,3 +171,31 @@ class Job(JSONModel):
             return job_api_client.cancel_letter_job(self.service, self.id)
         else:
             return job_api_client.cancel_job(self.service, self.id)
+
+
+class ImmediateJobs(ModelList):
+    client = job_api_client.get_immediate_jobs
+    model = Job
+
+
+class ScheduledJobs(ImmediateJobs):
+    client = job_api_client.get_scheduled_jobs
+
+
+class PaginatedJobs(ImmediateJobs):
+
+    client = job_api_client.get_page_of_jobs
+
+    def __init__(self, service_id, page):
+        try:
+            self.current_page = int(page)
+        except TypeError:
+            self.current_page = 1
+        response = self.client(service_id, page=self.current_page)
+        self.items = response['data']
+        self.prev_page = response['links'].get('prev', None)
+        self.next_page = response['links'].get('next', None)
+
+
+class PaginatedUploads(PaginatedJobs):
+    client = job_api_client.get_uploads

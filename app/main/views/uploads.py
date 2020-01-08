@@ -15,12 +15,7 @@ from notifications_utils.pdf import pdf_page_count
 from PyPDF2.utils import PdfReadError
 from requests import RequestException
 
-from app import (
-    current_service,
-    job_api_client,
-    notification_api_client,
-    service_api_client,
-)
+from app import current_service, notification_api_client, service_api_client
 from app.extensions import antivirus_client
 from app.main import main
 from app.main.forms import LetterUploadPostageForm, PDFUploadForm
@@ -47,20 +42,18 @@ MAX_FILE_UPLOAD_SIZE = 2 * 1024 * 1024  # 2MB
 def uploads(service_id):
     # No tests have been written, this has been quickly prepared for user research.
     # It's also very like that a new view will be created to show uploads.
-    page = int(request.args.get('page', 1))
-    uploads_response = job_api_client.get_uploads(service_id, page=page)
+    uploads = current_service.get_page_of_uploads(page=request.args.get('page'))
 
     prev_page = None
-    if uploads_response['links'].get('prev', None):
-        prev_page = generate_previous_dict('main.uploads', service_id, page)
+    if uploads.next_page:
+        prev_page = generate_previous_dict('main.uploads', service_id, uploads.current_page)
     next_page = None
-    if uploads_response['links'].get('next', None):
-        next_page = generate_next_dict('main.uploads', service_id, page)
+    if uploads.prev_page:
+        next_page = generate_next_dict('main.uploads', service_id, uploads.current_page)
 
     return render_template(
         'views/jobs/jobs.html',
-        jobs=uploads_response['data'],
-        page=page,
+        jobs=uploads,
         prev_page=prev_page,
         next_page=next_page,
         scheduled_jobs='',

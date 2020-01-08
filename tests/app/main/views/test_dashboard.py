@@ -1366,7 +1366,8 @@ def test_should_show_all_jobs_with_valid_statuses(
     mock_get_service_templates_when_no_templates_exist,
     mock_get_jobs,
     mock_get_usage,
-    mock_get_inbound_sms_summary
+    mock_get_inbound_sms_summary,
+    mock_get_free_sms_fragment_limit,
 ):
     logged_in_client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
 
