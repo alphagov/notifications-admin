@@ -1,24 +1,17 @@
 {% macro cookie_banner(message, id='global-cookie-message') %}
 
-<div id="{{ id }}" class="notify-cookie-banner" data-module="cookie-banner" role="region" aria-describedby="notify-cookie-banner__heading">
+<div id="{{ id }}" class="notify-cookie-banner notify-cookie-banner__with-js" data-module="cookie-banner" role="region" aria-describedby="notify-cookie-banner__heading">
   <div class="notify-cookie-banner__wrapper govuk-width-container">
     <h2 class="notify-cookie-banner__heading govuk-heading-m" id="notify-cookie-banner__heading">Cookies on GOV.UK Notify</h2>
     <p class="govuk-body">We use <a class="govuk-link" href="/cookies">small files called cookies</a> to make GOV.UK Notify work.</p>
-    <div class="notify-cookie-banner__buttons notify-cookie-banner__no-js">
-      <div class="notify-cookie-banner__button">
-        <a href="/cookies" class="notify-cookie-banner-button" role="button">Set cookie preferences</a>
+    <p class="govuk-body">We'd also like to use analytics cookies to help us improve our service.</p>
+    <p class="govuk-body">Please let us know if this is OK.</p>
+    <div class="notify-cookie-banner__buttons">
+      <div class="notify-cookie-banner__button notify-cookie-banner__button-accept">
+        <button class="govuk-button notify-cookie-banner-button" type="submit" data-accept-cookies="true">Yes, I accept analytics cookies</button>
       </div>
-    </div>
-    <div class="notify-cookie-banner__with-js">
-      <p class="govuk-body">We'd also like to use analytics cookies to help us improve our service.</p>
-      <p class="govuk-body">Please let us know if this is OK.</p>
-      <div class="notify-cookie-banner__buttons">
-        <div class="notify-cookie-banner__button notify-cookie-banner__button-accept">
-          <button class="govuk-button notify-cookie-banner-button" type="submit" data-accept-cookies="true">Yes, I accept analytics cookies</button>
-        </div>
-        <div class="notify-cookie-banner__button notify-cookie-banner__button-reject">
-          <button class="govuk-button notify-cookie-banner-button" type="submit" data-accept-cookies="false">No, do not use analytics cookies</button>
-        </div>
+      <div class="notify-cookie-banner__button notify-cookie-banner__button-reject">
+        <button class="govuk-button notify-cookie-banner-button" type="submit" data-accept-cookies="false">No, do not use analytics cookies</button>
       </div>
     </div>
   </div>

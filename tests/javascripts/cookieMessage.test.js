@@ -86,7 +86,7 @@ describe("Cookie message", () => {
   });
 
   /* 
-    Note: If no JS, the cookie banner shows a button to take you to the cookies page for more information.
+    Note: If no JS, the cookie banner is hidden.
 
     This works through CSS, based on the presence of the `js-enabled` class on the <body> so is not tested here.
   */
