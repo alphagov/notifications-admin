@@ -77,9 +77,6 @@ def view_job(service_id, job_id):
     filter_args = parse_filter_args(request.args)
     filter_args['status'] = set_status_filters(filter_args)
 
-    total_notifications = job.notification_count
-    processed_notifications = job.notifications_processed
-
     just_sent_message = 'Your {} been sent. Printing starts {} at 5:30pm.'.format(
         'letter has' if job.notification_count == 1 else 'letters have',
         printing_today_or_tomorrow()
@@ -87,7 +84,6 @@ def view_job(service_id, job_id):
 
     return render_template(
         'views/jobs/job.html',
-        finished=(total_notifications == processed_notifications),
         job=job,
         status=request.args.get('status', ''),
         updates_url=url_for(

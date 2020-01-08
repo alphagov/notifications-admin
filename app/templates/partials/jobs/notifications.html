@@ -28,7 +28,7 @@
       {% if template.template_type == 'letter' %}
         <div class="keyline-block bottom-gutter-1-2">
       {% endif %}
-        {% if job.percentage_complete < 100 and job.job_status != 'finished' %}
+        {% if job.still_processing %}
           <p class="{% if job.template.template_type != 'letter' %}bottom-gutter{% endif %} hint">
             Report is {{ "{:.0f}%".format(job.percentage_complete * 0.99) }} complete…
           </p>

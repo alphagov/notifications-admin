@@ -83,9 +83,12 @@ class Job(JSONModel):
     @property
     def still_processing(self):
         return (
-            self.status != 'finished' or
-            self.notifications_created < self.notification_count
+            self.status != 'finished' or self.percentage_complete < 100
         )
+
+    @cached_property
+    def finished_processing(self):
+        return self.notification_count == self.notifications_processed
 
     @property
     def template_id(self):
