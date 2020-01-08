@@ -8,7 +8,7 @@
 
 .notify-cookie-banner__wrapper {
   @include govuk-responsive-padding(4, "top");
-  @include govuk-responsive-padding(4, "bottom");
+  @include govuk-responsive-padding(5, "bottom");
 }
 
 .notify-cookie-banner__with-js {
@@ -33,43 +33,35 @@
 .notify-cookie-banner__buttons {
   @include govuk-clearfix;
 
-  @include govuk-media-query($from: desktop) {
+  @include govuk-media-query($from: tablet) {
     display: inline-block;
   }
 }
 
 .notify-cookie-banner__button {
-  display: inline-block;
-  width: 100%;
+  float: left;
+  width: 50%;
+  box-sizing: border-box;
 
-  @include govuk-media-query($from: mobile, $until: desktop) {
-    &.notify-cookie-banner__button-accept {
-      float: left;
-      width: 49%;
-    }
-
-    &.notify-cookie-banner__button-reject {
-      .js-enabled & {
-        float: right;
-        width: 49%;
-      }
-    }
-  }
-
-  @include govuk-media-query($from: desktop) {
+  @include govuk-media-query($from: tablet) {
+    display: inline-block;
+    float: none;
     width: auto;
-  }
-
-  @include govuk-media-query($until: 455px) {
-    width: 100%;
   }
 }
 
 .notify-cookie-banner__button-accept {
-  display: none;
+  padding-right: govuk-spacing(4);
+}
 
-  .js-enabled & {
+.notify-cookie-banner__link {
+  @include govuk-font(19);
+  display: block;
+  clear: both;
+
+  @include govuk-media-query($from: tablet) {
     display: inline-block;
+    margin-left: govuk-spacing(6);
   }
 }
 
@@ -108,6 +100,7 @@
 
 .notify-cookie-banner__hide-button {
   @include govuk-font($size: 19);
+  color: $govuk-link-colour;
   outline: 0;
   border: 0;
   background: none;
@@ -115,24 +108,12 @@
   padding: govuk-spacing(0);
   margin-top: govuk-spacing(2);
   right: govuk-spacing(3);
+  cursor: pointer;
 
   @include govuk-media-query($from: desktop) {
     margin-top: govuk-spacing(0);
     position: absolute;
     right: govuk-spacing(4);
-  }
-}
-
-// GOV.UK Publishing components button styles (inherits from GOV.UK Frontend button)
-// https://github.com/alphagov/govuk_publishing_components/blob/master/app/assets/stylesheets/govuk_publishing_components/components/_button.scss
-
-.notify-cookie-banner-button {
-  margin-bottom: govuk-spacing(1);
-  vertical-align: top;
-
-  @include govuk-media-query($from: desktop) {
-    vertical-align: baseline;
-    margin-right: govuk-spacing(2);
   }
 }
 
