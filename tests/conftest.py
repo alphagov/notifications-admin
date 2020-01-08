@@ -866,11 +866,20 @@ def mock_get_service_email_template(mocker, content=None, subject=None, redact_p
 
 @pytest.fixture(scope='function')
 def mock_get_service_email_template_without_placeholders(mocker):
-    return mock_get_service_email_template(
-        mocker,
-        content="Your vehicle tax expires soon",
-        subject="Your thing is due soon",
-    )
+    def _get(service_id, template_id, version=None):
+        template = template_json(
+            service_id,
+            template_id,
+            "Two week reminder",
+            "email",
+            "Your vehicle tax expires soon",
+            "Your thing is due soon",
+            redact_personalisation=False,
+        )
+        return {'data': template}
+
+    return mocker.patch(
+        'app.service_api_client.get_service_template', side_effect=_get)
 
 
 @pytest.fixture(scope='function')
@@ -3965,4 +3974,26 @@ def create_notifications(
         status=status,
         created_by_name='Firstname Lastname',
         postage=postage
+    )
+
+
+def create_template(
+    service_id=SERVICE_ONE_ID,
+    template_id=None,
+    template_type='sms',
+    name='sample template',
+    content='Template content',
+    subject='Template subject',
+    redact_personalisation=False,
+    postage=None
+):
+    return template_json(
+        service_id=service_id,
+        id_=template_id or str(generate_uuid()),
+        name=name,
+        type_=template_type,
+        content=content,
+        subject=subject,
+        redact_personalisation=redact_personalisation,
+        postage=postage,
     )

@@ -12,7 +12,7 @@ from tests.conftest import (
     create_active_caseworking_user,
     create_active_user_with_permissions,
     create_notifications,
-    mock_get_service_letter_template,
+    create_template,
     normalize_spaces,
 )
 
@@ -768,8 +768,10 @@ def test_should_show_letter_job_with_first_class_if_no_notifications(
     mock_get_service_data_retention,
     mocker
 ):
-
-    mock_get_service_letter_template(mocker, postage="first")
+    mocker.patch(
+        'app.service_api_client.get_service_template',
+        return_value={'data': create_template(template_type='letter', postage='first')}
+    )
 
     page = client_request.get(
         'main.view_job',
