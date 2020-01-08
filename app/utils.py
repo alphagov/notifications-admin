@@ -566,14 +566,14 @@ def get_letter_printing_statement(status, created_at):
 
 LETTER_VALIDATION_MESSAGES = {
     'letter-not-a4-portrait-oriented': {
-        'title': 'We cannot print your letter',
-        'detail': 'Your letter is not A4 portrait size on {invalid_pages} <br>'
+        'title': 'Your letter is not A4 portrait size',
+        'detail': 'You need to change the size or orientation of {invalid_pages} <br>'
                   'Files must meet our <a href="https://docs.notifications.service.gov.uk/documentation/images/'
                   'notify-pdf-letter-spec-v2.4.pdf" target="_blank">letter specification</a>.'
     },
     'content-outside-printable-area': {
-        'title': 'We cannot print your letter',
-        'detail': 'The content appears outside the printable area on {invalid_pages}.<br>'
+        'title': 'Your content is outside the printable area',
+        'detail': 'You need to edit {invalid_pages}.<br>'
                   'Files must meet our <a href="https://docs.notifications.service.gov.uk/documentation/images/'
                   'notify-pdf-letter-spec-v2.4.pdf" target="_blank">letter specification</a>.'
     },
@@ -587,7 +587,14 @@ LETTER_VALIDATION_MESSAGES = {
     'unable-to-read-the-file': {
         'title': 'There’s a problem with your file',
         'detail': 'Notify cannot read this PDF.<br>Save a new copy of your file and try again.'
+    },
+    'address-is-empty': {
+        'title': 'The address block is empty',
+        'detail': 'You need to add a recipient address.<br>'
+                  'Files must meet our <a href="https://docs.notifications.service.gov.uk/documentation/images/'
+                  'notify-pdf-letter-spec-v2.4.pdf" target="_blank">letter specification</a>.'
     }
+
 }
 
 
