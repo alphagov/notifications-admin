@@ -37,5 +37,5 @@ npm test
 display_result $? 3 "Javascript tests have"
 
 ## Code coverage
-py.test -n auto --maxfail=10 --cov=app --cov-report=term-missing tests/ --junitxml=test_results.xml --strict -p no:warnings
+py.test -n auto --maxfail=10 --cov=app --cov-report=term-missing tests/ --strict -p no:warnings
 display_result $? 4 "Code coverage"
