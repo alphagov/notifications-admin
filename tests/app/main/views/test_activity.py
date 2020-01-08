@@ -276,7 +276,8 @@ def test_letters_with_status_virus_scan_failed_shows_a_failure_description(
         mocker,
         active_user_with_permissions,
         is_precompiled_letter=True,
-        noti_status='virus-scan-failed'
+        noti_status='virus-scan-failed',
+        client_reference='client reference'
     )
     page = client_request.get(
         'main.view_notifications',
@@ -294,6 +295,7 @@ def test_letters_with_status_virus_scan_failed_shows_a_failure_description(
 ])
 def test_should_not_show_preview_link_for_precompiled_letters_in_virus_states(
     mocker,
+    active_user_with_permissions,
     client_request,
     service_one,
     mock_get_service_statistics,
@@ -301,9 +303,13 @@ def test_should_not_show_preview_link_for_precompiled_letters_in_virus_states(
     mock_get_no_api_keys,
     letter_status,
 ):
-    notifications = create_notifications(template_type='letter', status=letter_status)
-    mocker.patch('app.notification_api_client.get_notifications_for_service', return_value=notifications)
-
+    mock_get_notifications(
+        mocker,
+        active_user_with_permissions,
+        is_precompiled_letter=True,
+        noti_status=letter_status,
+        client_reference='ref'
+    )
     page = client_request.get(
         'main.view_notifications',
         service_id=service_one['id'],
@@ -414,12 +420,43 @@ def test_search_recipient_form(
         assert field['value'] == expected_search_box_contents
 
 
-@pytest.mark.parametrize('message_type, expected_search_box_label', [
-    (None, 'Search by email address, phone number or reference'),
-    ('sms', 'Search by phone number or reference'),
-    ('email', 'Search by email address or reference'),
+@pytest.mark.parametrize((
+    'message_type,'
+    'api_keys_mock,'
+    'expected_search_box_label,'
+), [
+    (
+        None,
+        mock_get_no_api_keys,
+        'Search by email address or phone number',
+    ),
+    (
+        None,
+        mock_get_api_keys,
+        'Search by email address, phone number or reference',
+    ),
+    (
+        'sms',
+        mock_get_no_api_keys,
+        'Search by phone number',
+    ),
+    (
+        'sms',
+        mock_get_api_keys,
+        'Search by phone number or reference',
+    ),
+    (
+        'email',
+        mock_get_no_api_keys,
+        'Search by email address',
+    ),
+    (
+        'email',
+        mock_get_api_keys,
+        'Search by email address or reference',
+    ),
 ])
-def test_api_users_are_told_they_can_search_by_reference_when_service_has_api_keys(
+def test_api_users_are_told_they_can_search_by_reference(
     client_request,
     mocker,
     fake_uuid,
@@ -428,32 +465,9 @@ def test_api_users_are_told_they_can_search_by_reference_when_service_has_api_ke
     mock_get_service_data_retention,
     message_type,
     expected_search_box_label,
-    mock_get_api_keys,
+    api_keys_mock,
 ):
-    page = client_request.get(
-        'main.view_notifications',
-        service_id=SERVICE_ONE_ID,
-        message_type=message_type,
-    )
-    assert page.select_one('label[for=to]').text.strip() == expected_search_box_label
-
-
-@pytest.mark.parametrize('message_type, expected_search_box_label', [
-    (None, 'Search by email address or phone number'),
-    ('sms', 'Search by phone number'),
-    ('email', 'Search by email address'),
-])
-def test_api_users_are_not_told_they_can_search_by_reference_when_service_has_no_api_keys(
-    client_request,
-    mocker,
-    fake_uuid,
-    mock_get_notifications,
-    mock_get_service_statistics,
-    mock_get_service_data_retention,
-    message_type,
-    expected_search_box_label,
-    mock_get_no_api_keys,
-):
+    api_keys_mock(mocker, fake_uuid)
     page = client_request.get(
         'main.view_notifications',
         service_id=SERVICE_ONE_ID,
@@ -697,11 +711,11 @@ def test_sending_status_hint_displays_correctly_on_notifications_page(
     assert bool(page.select('.align-with-message-body')) is single_line
 
 
-@pytest.mark.parametrize("is_precompiled_letter,expected_hint", [
-    (True, "Provided as PDF"),
-    (False, "template subject")
+@pytest.mark.parametrize("is_precompiled_letter,expected_address,expected_hint", [
+    (True, "Full Name,\nFirst address line\npostcode", "ref"),
+    (False, "Full Name,\nFirst address line\npostcode", "template subject")
 ])
-def test_should_expected_hint_for_letters(
+def test_should_show_address_and_hint_for_letters(
     client_request,
     service_one,
     mock_get_service_statistics,
@@ -724,4 +738,5 @@ def test_should_expected_hint_for_letters(
         message_type='letter',
     )
 
+    assert page.select_one('a.file-list-filename').text == 'Full Name'
     assert page.find('p', {'class': 'file-list-hint'}).text.strip() == expected_hint

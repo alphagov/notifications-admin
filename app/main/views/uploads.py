@@ -199,7 +199,7 @@ def uploaded_letter_preview(service_id, file_id):
     status = metadata.get('status')
     error_shortcode = metadata.get('message')
     invalid_pages = metadata.get('invalid_pages')
-    recipient = format_recipient(metadata.get('recipient'))
+    recipient = format_recipient(metadata.get('recipient', ''))
 
     if invalid_pages:
         invalid_pages = json.loads(invalid_pages)

@@ -535,6 +535,7 @@ def test_send_uploaded_letter_when_metadata_states_pdf_is_invalid(mocker, servic
     ('The Queen,\nBuckingham Palace,\r\nSW1 1AA', 'The Queen, Buckingham Palace, SW1 1AA'),
     ('The Queen   ,,\nBuckingham Palace,\rSW1 1AA,', 'The Queen, Buckingham Palace, SW1 1AA'),
     ('  The Queen\n Buckingham Palace\n SW1 1AA', 'The Queen, Buckingham Palace, SW1 1AA'),
+    ('', ''),
 ])
 def test_format_recipient(original_address, expected_address):
     assert format_recipient(urllib.parse.quote(original_address)) == expected_address

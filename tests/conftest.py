@@ -1791,6 +1791,7 @@ def mock_get_notifications(
         return notification_json(
             service_id,
             template=template,
+            to=to,
             rows=rows,
             job=job,
             with_links=True if count_pages is None else count_pages,
@@ -2877,6 +2878,14 @@ def mock_create_service_inbound_api(mocker):
         return
 
     return mocker.patch('app.service_api_client.create_service_inbound_api', side_effect=_create_service_inbound_api)
+
+
+@pytest.fixture(scope='function')
+def mock_delete_service_inbound_api(mocker):
+    return mocker.patch(
+        'app.service_api_client.delete_service_callback_api',
+        side_effect=lambda service_id: None
+    )
 
 
 @pytest.fixture(scope='function')
