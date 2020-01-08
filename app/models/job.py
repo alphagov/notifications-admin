@@ -1,3 +1,4 @@
+from collections import defaultdict
 from datetime import datetime
 
 from notifications_utils.letter_timings import (
@@ -24,10 +25,7 @@ class Job(JSONModel):
         'original_file_name',
         'created_at',
         'notification_count',
-        'notifications_sent',
-        'notifications_requested',
         'job_status',
-        'statistics',
         'created_by',
         'scheduled_for',
     }
@@ -48,17 +46,37 @@ class Job(JSONModel):
     def scheduled(self):
         return self.status == 'scheduled'
 
-    @property
-    def notification_count(self):
-        return self._dict.get('notification_count', 0)
+    @cached_property
+    def statistics(self):
+        results = defaultdict(int)
+        for outcome in self._dict['statistics']:
+            if outcome['status'] in [
+                'failed', 'technical-failure', 'temporary-failure',
+                'permanent-failure', 'cancelled'
+            ]:
+                results['failed'] += outcome['count']
+            if outcome['status'] in ['sending', 'pending', 'created']:
+                results['sending'] += outcome['count']
+            if outcome['status'] in ['delivered', 'sent']:
+                results['delivered'] += outcome['count']
+            results['requested'] += outcome['count']
+        return results
 
     @property
     def notifications_delivered(self):
-        return self._dict.get('notifications_delivered', 0)
+        return self.statistics['delivered']
 
     @property
     def notifications_failed(self):
-        return self._dict.get('notifications_failed', 0)
+        return self.statistics['failed']
+
+    @property
+    def notifications_requested(self):
+        return self.statistics['requested']
+
+    @property
+    def notifications_sent(self):
+        return self.notifications_delivered + self.notifications_failed
 
     @property
     def notifications_processed(self):
@@ -68,11 +86,7 @@ class Job(JSONModel):
     def notifications_sending(self):
         if self.scheduled:
             return 0
-        return (
-            self.notification_count -
-            self.notifications_delivered -
-            self.notifications_failed
-        )
+        return self.notification_count - self.notifications_sent
 
     @property
     def notifications_created(self):
@@ -83,7 +97,7 @@ class Job(JSONModel):
     @property
     def still_processing(self):
         return (
-            self.status != 'finished' or self.percentage_complete < 100
+            self.percentage_complete < 100 and self.status != 'finished'
         )
 
     @cached_property
@@ -189,15 +203,15 @@ class PaginatedJobs(ImmediateJobs):
 
     client = job_api_client.get_page_of_jobs
 
-    def __init__(self, service_id, page):
+    def __init__(self, service_id, page=None):
         try:
             self.current_page = int(page)
         except TypeError:
             self.current_page = 1
         response = self.client(service_id, page=self.current_page)
         self.items = response['data']
-        self.prev_page = response['links'].get('prev', None)
-        self.next_page = response['links'].get('next', None)
+        self.prev_page = response.get('links', {}).get('prev', None)
+        self.next_page = response.get('links', {}).get('next', None)
 
 
 class PaginatedUploads(PaginatedJobs):

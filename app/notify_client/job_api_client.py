@@ -1,5 +1,3 @@
-from collections import defaultdict
-
 from app.extensions import redis_client
 from app.notify_client import NotifyAdminAPIClient, _attach_current_user, cache
 
@@ -19,28 +17,9 @@ class JobApiClient(NotifyAdminAPIClient):
 
     NON_SCHEDULED_JOB_STATUSES = JOB_STATUSES - {'scheduled', 'cancelled'}
 
-    @staticmethod
-    def __convert_statistics(job):
-        results = defaultdict(int)
-        for outcome in job['statistics']:
-            if outcome['status'] in ['failed', 'technical-failure', 'temporary-failure',
-                                     'permanent-failure', 'cancelled']:
-                results['failed'] += outcome['count']
-            if outcome['status'] in ['sending', 'pending', 'created']:
-                results['sending'] += outcome['count']
-            if outcome['status'] in ['delivered', 'sent']:
-                results['delivered'] += outcome['count']
-            results['requested'] += outcome['count']
-        return results
-
     def get_job(self, service_id, job_id):
         params = {}
         job = self.get(url='/service/{}/job/{}'.format(service_id, job_id), params=params)
-        stats = self.__convert_statistics(job['data'])
-        job['data']['notifications_sent'] = stats['delivered'] + stats['failed']
-        job['data']['notifications_delivered'] = stats['delivered']
-        job['data']['notifications_failed'] = stats['failed']
-        job['data']['notifications_requested'] = stats['requested']
 
         return job
 
@@ -51,29 +30,13 @@ class JobApiClient(NotifyAdminAPIClient):
         if statuses is not None:
             params['statuses'] = ','.join(statuses)
 
-        jobs = self.get(url='/service/{}/job'.format(service_id), params=params)
-        for job in jobs['data']:
-            stats = self.__convert_statistics(job)
-            job['notifications_sent'] = stats['delivered'] + stats['failed']
-            job['notifications_delivered'] = stats['delivered']
-            job['notifications_failed'] = stats['failed']
-            job['notifications_requested'] = stats['requested']
-
-        return jobs
+        return self.get(url='/service/{}/job'.format(service_id), params=params)
 
     def get_uploads(self, service_id, limit_days=None, page=1):
         params = {'page': page}
         if limit_days is not None:
             params['limit_days'] = limit_days
-        uploads = self.get(url='/service/{}/upload'.format(service_id), params=params)
-        for upload in uploads['data']:
-            stats = self.__convert_statistics(upload)
-            upload['notifications_sent'] = stats['delivered'] + stats['failed']
-            upload['notifications_delivered'] = stats['delivered']
-            upload['notifications_failed'] = stats['failed']
-            upload['notifications_requested'] = stats['requested']
-
-        return uploads
+        return self.get(url='/service/{}/upload'.format(service_id), params=params)
 
     def has_sent_previously(self, service_id, template_id, template_version, original_file_name):
         return (
@@ -125,29 +88,14 @@ class JobApiClient(NotifyAdminAPIClient):
             ex=cache.TTL,
         )
 
-        stats = self.__convert_statistics(job['data'])
-        job['data']['notifications_sent'] = stats['delivered'] + stats['failed']
-        job['data']['notifications_delivered'] = stats['delivered']
-        job['data']['notifications_failed'] = stats['failed']
-        job['data']['notifications_requested'] = stats['requested']
-
         return job
 
     @cache.delete('has_jobs-{service_id}')
     def cancel_job(self, service_id, job_id):
-
-        job = self.post(
+        return self.post(
             url='/service/{}/job/{}/cancel'.format(service_id, job_id),
             data={}
         )
-
-        stats = self.__convert_statistics(job['data'])
-        job['data']['notifications_sent'] = stats['delivered'] + stats['failed']
-        job['data']['notifications_delivered'] = stats['delivered']
-        job['data']['notifications_failed'] = stats['failed']
-        job['data']['notifications_requested'] = stats['requested']
-
-        return job
 
     @cache.delete('has_jobs-{service_id}')
     def cancel_letter_job(self, service_id, job_id):

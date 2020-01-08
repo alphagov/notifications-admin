@@ -3,6 +3,7 @@ from unittest.mock import ANY
 
 import pytest
 
+from app.models.job import Job, PaginatedJobs
 from app.notify_client.job_api_client import JobApiClient
 
 
@@ -113,16 +114,15 @@ def test_client_parses_job_stats(mocker):
 
     expected_url = '/service/{}/job/{}'.format(service_id, job_id)
 
-    client = JobApiClient()
     mock_get = mocker.patch('app.notify_client.job_api_client.JobApiClient.get', return_value=expected_data)
 
-    result = client.get_job(service_id, job_id)
+    result = Job.from_id(job_id, service_id=service_id)
 
     mock_get.assert_called_once_with(url=expected_url, params={})
-    assert result['data']['notifications_requested'] == 80
-    assert result['data']['notifications_sent'] == 50
-    assert result['data']['notification_count'] == 80
-    assert result['data']['notifications_failed'] == 40
+    assert result.notifications_requested == 80
+    assert result.notifications_sent == 50
+    assert result.notification_count == 80
+    assert result.notifications_failed == 40
 
 
 def test_client_parses_empty_job_stats(mocker):
@@ -149,16 +149,15 @@ def test_client_parses_empty_job_stats(mocker):
 
     expected_url = '/service/{}/job/{}'.format(service_id, job_id)
 
-    client = JobApiClient()
     mock_get = mocker.patch('app.notify_client.job_api_client.JobApiClient.get', return_value=expected_data)
 
-    result = client.get_job(service_id, job_id)
+    result = Job.from_id(job_id, service_id=service_id)
 
     mock_get.assert_called_once_with(url=expected_url, params={})
-    assert result['data']['notifications_requested'] == 0
-    assert result['data']['notifications_sent'] == 0
-    assert result['data']['notification_count'] == 80
-    assert result['data']['notifications_failed'] == 0
+    assert result.notifications_requested == 0
+    assert result.notifications_sent == 0
+    assert result.notification_count == 80
+    assert result.notifications_failed == 0
 
 
 def test_client_parses_job_stats_for_service(mocker):
@@ -221,22 +220,21 @@ def test_client_parses_job_stats_for_service(mocker):
 
     expected_url = '/service/{}/job'.format(service_id)
 
-    client = JobApiClient()
     mock_get = mocker.patch('app.notify_client.job_api_client.JobApiClient.get', return_value=expected_data)
 
-    result = client.get_jobs(service_id)
+    result = PaginatedJobs(service_id)
 
-    mock_get.assert_called_once_with(url=expected_url, params={'page': 1})
-    assert result['data'][0]['id'] == job_1_id
-    assert result['data'][0]['notifications_requested'] == 80
-    assert result['data'][0]['notifications_sent'] == 50
-    assert result['data'][0]['notification_count'] == 80
-    assert result['data'][0]['notifications_failed'] == 40
-    assert result['data'][1]['id'] == job_2_id
-    assert result['data'][1]['notifications_requested'] == 40
-    assert result['data'][1]['notifications_sent'] == 25
-    assert result['data'][1]['notification_count'] == 40
-    assert result['data'][1]['notifications_failed'] == 20
+    mock_get.assert_called_once_with(url=expected_url, params={'page': 1, 'statuses': ANY})
+    assert result[0].id == job_1_id
+    assert result[0].notifications_requested == 80
+    assert result[0].notifications_sent == 50
+    assert result[0].notification_count == 80
+    assert result[0].notifications_failed == 40
+    assert result[1].id == job_2_id
+    assert result[1].notifications_requested == 40
+    assert result[1].notifications_sent == 25
+    assert result[1].notification_count == 40
+    assert result[1].notifications_failed == 20
 
 
 def test_client_parses_empty_job_stats_for_service(mocker):
@@ -281,22 +279,21 @@ def test_client_parses_empty_job_stats_for_service(mocker):
 
     expected_url = '/service/{}/job'.format(service_id)
 
-    client = JobApiClient()
     mock_get = mocker.patch('app.notify_client.job_api_client.JobApiClient.get', return_value=expected_data)
 
-    result = client.get_jobs(service_id)
+    result = PaginatedJobs(service_id)
 
-    mock_get.assert_called_once_with(url=expected_url, params={'page': 1})
-    assert result['data'][0]['id'] == job_1_id
-    assert result['data'][0]['notifications_requested'] == 0
-    assert result['data'][0]['notifications_sent'] == 0
-    assert result['data'][0]['notification_count'] == 80
-    assert result['data'][0]['notifications_failed'] == 0
-    assert result['data'][1]['id'] == job_2_id
-    assert result['data'][1]['notifications_requested'] == 0
-    assert result['data'][1]['notifications_sent'] == 0
-    assert result['data'][1]['notification_count'] == 40
-    assert result['data'][1]['notifications_failed'] == 0
+    mock_get.assert_called_once_with(url=expected_url, params={'page': 1, 'statuses': ANY})
+    assert result[0].id == job_1_id
+    assert result[0].notifications_requested == 0
+    assert result[0].notifications_sent == 0
+    assert result[0].notification_count == 80
+    assert result[0].notifications_failed == 0
+    assert result[1].id == job_2_id
+    assert result[1].notifications_requested == 0
+    assert result[1].notifications_sent == 0
+    assert result[1].notification_count == 40
+    assert result[1].notifications_failed == 0
 
 
 def test_cancel_job(mocker):

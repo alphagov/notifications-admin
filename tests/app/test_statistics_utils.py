@@ -128,25 +128,25 @@ def test_service_statistics_by_state():
     (1, 4, 20)
 ])
 def test_add_rate_to_job_calculates_rate(failed, delivered, expected_failure_rate):
-    resp = Job(
-        {
-            'notifications_failed': failed,
-            'notifications_delivered': delivered,
-            'id': 'foo'
-        }
-    )
+    resp = Job({
+        'statistics': [
+            {'status': 'failed', 'count': failed},
+            {'status': 'delivered', 'count': delivered},
+        ],
+        'id': 'foo',
+    })
 
     assert resp.failure_rate == expected_failure_rate
 
 
 def test_add_rate_to_job_preserves_initial_fields():
-    resp = Job(
-        {
-            'notifications_failed': 0,
-            'notifications_delivered': 0,
-            'id': 'foo'
-        }
-    )
+    resp = Job({
+        'statistics': [
+            {'status': 'failed', 'count': 0},
+            {'status': 'delivered', 'count': 0},
+        ],
+        'id': 'foo',
+    })
 
     assert resp.notifications_failed == resp.notifications_delivered == resp.failure_rate == 0
     assert resp.id == 'foo'
