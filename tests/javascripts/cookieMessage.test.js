@@ -211,7 +211,7 @@ describe("Cookie message", () => {
 
       }); 
 
-      test("The consent cookie should be set, with analytics set to 'true'", () => {
+      test("The consent cookie should be set, with analytics set to 'false'", () => {
 
         expect(window.GOVUK.getConsentCookie()).toEqual({ 'analytics': false });
 
