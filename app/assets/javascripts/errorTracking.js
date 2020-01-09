@@ -5,7 +5,7 @@
 
     this.start = function(component) {
 
-      if (!ga) return;
+      if (!('ga' in window)) return;
 
       ga(
         'send',
