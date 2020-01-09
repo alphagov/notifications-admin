@@ -446,7 +446,10 @@ def get_job_partials(job, template):
         counts = render_template(
             'partials/count.html',
             counts=_get_job_counts(job),
-            status=filter_args['status']
+            status=filter_args['status'],
+            notifications_deleted=(
+                job['job_status'] == 'finished' and not notifications['notifications']
+            ),
         )
     service_data_retention_days = current_service.get_days_of_retention(template['template_type'])
     can_letter_job_be_cancelled = False
@@ -480,6 +483,7 @@ def get_job_partials(job, template):
             job=job,
             template=template,
             template_version=job['template_version'],
+            service_data_retention_days=service_data_retention_days,
         ),
         'status': render_template(
             'partials/jobs/status.html',

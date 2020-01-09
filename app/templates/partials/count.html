@@ -1,5 +1,18 @@
+{% from "components/big-number.html" import big_number %}
 {% from "components/pill.html" import pill %}
 
-<div class="bottom-gutter ajax-block-container">
-  {{ pill(counts, request.args.get('status', '')) }}
+<div class="ajax-block-container">
+  {% if notifications_deleted %}
+    <div class="grid-row bottom-gutter-1-2">
+      {% for label, query_param, url, count in counts %}
+        <div class="column-one-quarter">
+          {{ big_number(count, label, smaller=True) }}
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="bottom-gutter">
+      {{ pill(counts, request.args.get('status', '')) }}
+    </div>
+  {% endif %}
 </div>
