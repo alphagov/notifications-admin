@@ -1,17 +1,16 @@
 {% extends "withnav_template.html" %}
 
+{% from "components/back-link/macro.njk" import govukBackLink %}
+
 {% block service_page_title %}
-  Letter
+  Letter validation failed
 {% endblock %}
 
 {% block maincolumn_content %}
 
-    <h1 class="heading-large">Letter</h1>
-
-    <p>
+  {{ govukBackLink({ "href": back_link }) }}
+  {% include "partials/check/letter-validation-failed-banner.html" %}
+  <p>
       Provided as PDF on {{ created_at|format_datetime_short }}
-    </p>
-    <p class="notification-status-cancelled">
-      Validation failed – Notify cannot read this PDF file
-    </p>
+  </p>
 {% endblock %}

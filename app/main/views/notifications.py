@@ -72,6 +72,7 @@ def view_notification(service_id, notification_id):
         except PdfReadError:
             return render_template(
                 'views/notifications/invalid_precompiled_letter.html',
+                message={"title": "There’s a problem with your letter", "detail": "Notify cannot read this PDF."},
                 created_at=notification['created_at']
             )
     else:

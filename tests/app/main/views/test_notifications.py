@@ -304,34 +304,54 @@ def test_notification_page_shows_page_for_letter_sent_with_test_key(
     assert page.select('p.notification-status') == []
 
 
-@pytest.mark.parametrize('notification_status, expected_message', (
-    (
-        'permanent-failure',
-        'Cancelled 1 January at 1:02am',
-    ),
-    (
-        'cancelled',
-        'Cancelled 1 January at 1:02am',
-    ),
-    (
-        'validation-failed',
-        'Validation failed.',
-    ),
-    (
-        'technical-failure',
-        'Technical failure – Notify will resend once the team have fixed the problem',
-    ),
-))
-@freeze_time("2016-01-01 01:01")
-def test_notification_page_shows_cancelled_or_failed_letter(
+def test_notification_page_shows_validation_failed_letter(
     client_request,
     mocker,
     fake_uuid,
-    notification_status,
-    expected_message,
 ):
-    notification = create_notification(template_type='letter', notification_status=notification_status)
+    notification = create_notification(template_type='letter',
+                                       notification_status='validation-failed',
+                                       is_precompiled_letter=True
+                                       )
     mocker.patch('app.notification_api_client.get_notification', return_value=notification)
+    metadata = {"page_count": "1", "status": "validation-failed",
+                "invalid_pages": "[1]",
+                "message": "content-outside-printable-area"}
+    mocker.patch('app.main.views.notifications.view_letter_notification_as_preview',
+                 return_value=("some letter content", metadata))
+    mocker.patch(
+        'app.main.views.notifications.get_page_count_for_letter',
+        return_value=1,
+    )
+
+    page = client_request.get(
+        'main.view_notification',
+        service_id=SERVICE_ONE_ID,
+        notification_id=fake_uuid,
+        _test_page_title=False
+    )
+
+    assert normalize_spaces(page.select_one('h1').text) == (
+        "Your content is outside the printable area"
+    )
+    assert not page.select('p.notification-status')
+
+    assert page.select_one('main img')['src'].endswith('.png?page=1')
+
+
+@freeze_time("2016-01-01 01:01")
+def test_notification_page_shows_technical_failure_letter(
+    client_request,
+    mocker,
+    fake_uuid,
+):
+    notification = create_notification(template_type='letter', notification_status='technical-failure')
+    mocker.patch('app.notification_api_client.get_notification', return_value=notification)
+    metadata = {"page_count": "1", "status": "validation-passed",
+                "recipient_address": "Some address",
+                }
+    mocker.patch('app.main.views.notifications.view_letter_notification_as_preview',
+                 return_value=("some letter content", metadata))
     mocker.patch(
         'app.main.views.notifications.get_page_count_for_letter',
         return_value=1,
@@ -347,7 +367,44 @@ def test_notification_page_shows_cancelled_or_failed_letter(
         "‘sample template’ was sent by Test User on 1 January at 1:01am"
     )
     assert normalize_spaces(page.select('main p')[1].text) == (
-        expected_message
+        'Technical failure – Notify will resend once the team have fixed the problem'
+    )
+    assert not page.select('p.notification-status')
+
+    assert page.select_one('main img')['src'].endswith('.png?page=1')
+
+
+@freeze_time("2016-01-01 01:01")
+def test_notification_page_shows_cancelled_letter(
+    client_request,
+    mocker,
+    fake_uuid,
+):
+    notification = create_notification(template_type='letter', notification_status='cancelled',
+                                       is_precompiled_letter=True, sent_one_off=False
+                                       )
+    mocker.patch('app.notification_api_client.get_notification', return_value=notification)
+    metadata = {"page_count": "1", "status": "validation-passed",
+                "recipient_address": "Some address",
+                }
+    mocker.patch('app.main.views.notifications.view_letter_notification_as_preview',
+                 return_value=("some letter content", metadata))
+    mocker.patch(
+        'app.main.views.notifications.get_page_count_for_letter',
+        return_value=1,
+    )
+
+    page = client_request.get(
+        'main.view_notification',
+        service_id=SERVICE_ONE_ID,
+        notification_id=fake_uuid,
+    )
+
+    assert normalize_spaces(page.select('main p')[0].text) == (
+        "Provided as PDF on 1 January at 1:01am"
+    )
+    assert normalize_spaces(page.find('div', class_='govuk-warning-text').text) == (
+        '! Warning Cancelled 1 January at 1:02am'
     )
     assert not page.select('p.notification-status')
 
@@ -538,7 +595,7 @@ def test_should_show_preview_error_image_letter_notification_on_preview_error(
     assert response.get_data(as_text=True) == 'preview error image'
 
 
-def test_notifification_page_shows_error_message_if_precompiled_letter_cannot_be_opened(
+def test_notification_page_shows_error_message_if_precompiled_letter_cannot_be_opened(
     client_request,
     mocker,
     fake_uuid,
@@ -560,10 +617,11 @@ def test_notifification_page_shows_error_message_if_precompiled_letter_cannot_be
         'main.view_notification',
         service_id=SERVICE_ONE_ID,
         notification_id=fake_uuid,
+        _test_page_title=False
     )
 
-    error_message = page.find('p', class_='notification-status-cancelled').text
-    assert normalize_spaces(error_message) == "Validation failed – Notify cannot read this PDF file"
+    error_message = page.find('h1', class_='banner-title').text
+    assert normalize_spaces(error_message) == "There’s a problem with your letter"
 
 
 def test_should_404_for_unknown_extension(

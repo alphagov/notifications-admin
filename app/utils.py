@@ -567,7 +567,7 @@ def get_letter_printing_statement(status, created_at):
 LETTER_VALIDATION_MESSAGES = {
     'letter-not-a4-portrait-oriented': {
         'title': 'Your letter is not A4 portrait size',
-        'detail': 'You need to change the size or orientation of {invalid_pages} <br>'
+        'detail': 'You need to change the size or orientation of {invalid_pages}. <br>'
                   'Files must meet our <a href="https://docs.notifications.service.gov.uk/documentation/images/'
                   'notify-pdf-letter-spec-v2.4.pdf" target="_blank">letter specification</a>.'
     },

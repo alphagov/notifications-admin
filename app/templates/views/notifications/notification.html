@@ -4,17 +4,23 @@
 {% from "components/message-count-label.html" import message_count_label %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
-
+{% from "components/warning-text/macro.njk" import govukWarningText %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
 {% block service_page_title %}
   {{ message_count_label(1, template.template_type, suffix='') | capitalize }}
 {% endblock %}
 
 {% block maincolumn_content %}
 
-    {{ page_header(
-      message_count_label(1, template.template_type, suffix='') | capitalize,
-      back_link=back_link
-    ) }}
+    {% if notification_status == 'validation-failed' %}
+      {{ govukBackLink({ "href": back_link }) }}
+      {% include "partials/check/letter-validation-failed-banner.html" %}
+    {% else %}
+      {{ page_header(
+        message_count_label(1, template.template_type, suffix='') | capitalize,
+        back_link=back_link
+      ) }}
+    {% endif %}
     <p>
       {% if is_precompiled_letter %}
         Provided as PDF
@@ -38,14 +44,13 @@
     </p>
 
     {% if template.template_type == 'letter' %}
-      {% if notification_status in ('permanent-failure', 'cancelled') %}
-        <p class="notification-status-cancelled">
-          Cancelled {{ updated_at|format_datetime_short }}
-        </p>
+      {% if notification_status in ('cancelled') %}
+        {{ govukWarningText({
+          "text": "Cancelled " + updated_at|format_datetime_short,
+          "iconFallbackText": "Warning"
+        }) }}
       {% elif notification_status == 'validation-failed' %}
-        <p class="notification-status-cancelled">
-          Validation failed. {{ message.detail | safe }}
-        </p>
+
       {% elif notification_status == 'technical-failure' %}
         <p class="notification-status-cancelled">
           Technical failure – Notify will resend once the team have

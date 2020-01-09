@@ -64,7 +64,8 @@ const copy = {
         'header',
         'footer',
         'back-link',
-        'details'
+        'details',
+        'warning-text'
       ];
       let done = 0;
 
