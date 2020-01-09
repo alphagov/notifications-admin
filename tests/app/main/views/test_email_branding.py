@@ -7,7 +7,7 @@ from flask import url_for
 from notifications_python_client.errors import HTTPError
 
 from app.s3_client.s3_logo_client import EMAIL_LOGO_LOCATION_STRUCTURE, TEMP_TAG
-from tests.conftest import mock_get_email_branding, normalize_spaces
+from tests.conftest import create_email_branding, normalize_spaces
 
 
 def test_email_branding_page_shows_full_branding_list(
@@ -231,7 +231,7 @@ def test_deletes_previous_temp_logo_after_uploading_logo(
     fake_uuid
 ):
     if has_data:
-        mock_get_email_branding(mocker, fake_uuid)
+        mocker.patch('app.email_branding_client.get_email_branding', return_value=create_email_branding(fake_uuid))
 
     with platform_admin_client.session_transaction() as session:
         user_id = session["user_id"]

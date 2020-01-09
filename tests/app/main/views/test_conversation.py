@@ -11,7 +11,7 @@ from app.main.views.conversation import get_user_number
 from tests.conftest import (
     SERVICE_ONE_ID,
     _template,
-    mock_get_notifications,
+    create_notifications,
     normalize_spaces,
 )
 
@@ -76,7 +76,6 @@ def test_get_user_phone_number_raises_if_both_api_requests_fail(mocker):
 def test_view_conversation(
     client_request,
     mocker,
-    api_user_active,
     mock_get_inbound_sms_by_id_with_no_messages,
     mock_get_notification,
     fake_uuid,
@@ -84,14 +83,12 @@ def test_view_conversation(
     expected_outbound_content,
     mock_get_inbound_sms
 ):
-
-    mock = mock_get_notifications(
-        mocker,
-        api_user_active,
-        template_content='Hello ((name))',
+    notifications = create_notifications(
+        content='Hello ((name))',
         personalisation={'name': 'Jo'},
         redact_personalisation=outbound_redacted,
     )
+    mock = mocker.patch('app.notification_api_client.get_notifications_for_service', return_value=notifications)
 
     page = client_request.get(
         'main.conversation',

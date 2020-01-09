@@ -29,9 +29,7 @@ from tests.conftest import (
     create_active_caseworking_user,
     create_active_user_view_permissions,
     create_letter_contact_block,
-    mock_get_service_email_template,
-    mock_get_service_letter_template,
-    mock_get_service_template,
+    create_template,
     normalize_spaces,
 )
 
@@ -495,7 +493,11 @@ def test_view_letter_template_displays_postage(
 ):
     mocker.patch('app.main.views.templates.get_page_count_for_letter', return_value=1)
     client_request.login(active_user_with_permissions)
-    mock_get_service_letter_template(mocker, postage=template_postage)
+    mocker.patch(
+        'app.service_api_client.get_service_template',
+        return_value={'data': create_template(template_type='letter', postage=template_postage)}
+    )
+
     page = client_request.get(
         'main.view_template',
         service_id=SERVICE_ONE_ID,
@@ -534,7 +536,11 @@ def test_view_letter_template_does_not_display_send_button_if_template_over_10_p
 ):
     mocker.patch('app.main.views.templates.get_page_count_for_letter', return_value=11)
     client_request.login(active_user_with_permissions)
-    mock_get_service_letter_template(mocker, postage="second")
+    mocker.patch(
+        'app.service_api_client.get_service_template',
+        return_value={'data': create_template(template_type='letter', postage='second')}
+    )
+
     page = client_request.get(
         'main.view_template',
         service_id=SERVICE_ONE_ID,
@@ -551,8 +557,8 @@ def test_edit_letter_template_postage_page_displays_correctly(
     service_one,
     fake_uuid,
     mocker,
+    mock_get_service_letter_template,
 ):
-    mock_get_service_letter_template(mocker)
     page = client_request.get(
         'main.edit_template_postage',
         service_id=SERVICE_ONE_ID,
@@ -586,12 +592,12 @@ def test_edit_letter_templates_postage_updates_postage(
     client_request,
     service_one,
     mocker,
-    fake_uuid
+    fake_uuid,
+    mock_get_service_letter_template,
 ):
     mock_update_template_postage = mocker.patch(
         'app.main.views.templates.service_api_client.update_service_template_postage'
     )
-    mock_get_service_letter_template(mocker)
 
     client_request.post(
         'main.edit_template_postage',
@@ -1300,10 +1306,10 @@ def test_should_not_allow_creation_of_a_template_without_correct_permission(
     )
 
 
-@pytest.mark.parametrize('fixture,  expected_status_code', [
-    (mock_get_service_email_template, 200),
-    (mock_get_service_template, 200),
-    (mock_get_service_letter_template, 302),
+@pytest.mark.parametrize('template_type,  expected_status_code', [
+    ('email', 200),
+    ('sms', 200),
+    ('letter', 302),
 ])
 def test_should_redirect_to_one_off_if_template_type_is_letter(
     client_request,
@@ -1311,10 +1317,13 @@ def test_should_redirect_to_one_off_if_template_type_is_letter(
     multiple_sms_senders,
     fake_uuid,
     mocker,
-    fixture,
+    template_type,
     expected_status_code
 ):
-    fixture(mocker)
+    mocker.patch(
+        'app.service_api_client.get_service_template',
+        return_value={'data': create_template(template_type=template_type)}
+    )
     client_request.get(
         '.set_sender',
         service_id=SERVICE_ONE_ID,
@@ -1506,11 +1515,14 @@ def test_should_show_interstitial_when_making_breaking_change(
     old_content,
     expected_paragraphs,
 ):
-    mock_get_service_email_template(
-        mocker,
+    email_template = create_template(
+        template_id=fake_uuid,
+        template_type='email',
         subject="Your ((thing)) is due soon",
-        content=old_content,
+        content=old_content
     )
+    mocker.patch('app.service_api_client.get_service_template', return_value={'data': email_template})
+
     data = {
         'id': fake_uuid,
         'name': "new name",
@@ -2048,18 +2060,17 @@ def test_should_show_template_as_first_page_of_tour(
     )
 
 
-@pytest.mark.parametrize('template_mock', [
-    mock_get_service_email_template,
-    mock_get_service_letter_template,
-])
+@pytest.mark.parametrize('template_type', ['email', 'letter'])
 def test_cant_see_email_template_in_tour(
     client_request,
     fake_uuid,
     mocker,
-    template_mock,
+    template_type,
 ):
-
-    template_mock(mocker)
+    mocker.patch(
+        'app.service_api_client.get_service_template',
+        return_value={'data': create_template(template_type=template_type)}
+    )
 
     client_request.get(
         'main.start_tour',
@@ -2124,8 +2135,8 @@ def test_should_show_hint_once_template_redacted(
     mock_get_template_folders,
     fake_uuid,
 ):
-
-    mock_get_service_email_template(mocker, redact_personalisation=True)
+    template = create_template(template_type='email', content='hi ((name))', redact_personalisation=True)
+    mocker.patch('app.service_api_client.get_service_template', return_value={'data': template})
 
     page = client_request.get(
         'main.view_template',

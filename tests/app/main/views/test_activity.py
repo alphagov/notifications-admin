@@ -14,9 +14,7 @@ from tests.conftest import (
     create_active_caseworking_user,
     create_active_user_view_permissions,
     create_active_user_with_permissions,
-    mock_get_api_keys,
-    mock_get_no_api_keys,
-    mock_get_notifications,
+    create_notifications,
     normalize_spaces,
 )
 
@@ -267,19 +265,15 @@ def test_download_not_available_to_users_without_dashboard(
 
 def test_letters_with_status_virus_scan_failed_shows_a_failure_description(
     mocker,
-    active_user_with_permissions,
     client_request,
     service_one,
     mock_get_service_statistics,
     mock_get_service_data_retention,
     mock_get_api_keys,
 ):
-    mock_get_notifications(
-        mocker,
-        active_user_with_permissions,
-        is_precompiled_letter=True,
-        noti_status='virus-scan-failed'
-    )
+    notifications = create_notifications(template_type='letter', status='virus-scan-failed', is_precompiled_letter=True)
+    mocker.patch('app.notification_api_client.get_notifications_for_service', return_value=notifications)
+
     page = client_request.get(
         'main.view_notifications',
         service_id=service_one['id'],
@@ -296,7 +290,6 @@ def test_letters_with_status_virus_scan_failed_shows_a_failure_description(
 ])
 def test_should_not_show_preview_link_for_precompiled_letters_in_virus_states(
     mocker,
-    active_user_with_permissions,
     client_request,
     service_one,
     mock_get_service_statistics,
@@ -304,12 +297,9 @@ def test_should_not_show_preview_link_for_precompiled_letters_in_virus_states(
     mock_get_no_api_keys,
     letter_status,
 ):
-    mock_get_notifications(
-        mocker,
-        active_user_with_permissions,
-        is_precompiled_letter=True,
-        noti_status=letter_status
-    )
+    notifications = create_notifications(template_type='letter', status=letter_status)
+    mocker.patch('app.notification_api_client.get_notifications_for_service', return_value=notifications)
+
     page = client_request.get(
         'main.view_notifications',
         service_id=service_one['id'],
@@ -420,43 +410,12 @@ def test_search_recipient_form(
         assert field['value'] == expected_search_box_contents
 
 
-@pytest.mark.parametrize((
-    'message_type,'
-    'api_keys_mock,'
-    'expected_search_box_label,'
-), [
-    (
-        None,
-        mock_get_no_api_keys,
-        'Search by email address or phone number',
-    ),
-    (
-        None,
-        mock_get_api_keys,
-        'Search by email address, phone number or reference',
-    ),
-    (
-        'sms',
-        mock_get_no_api_keys,
-        'Search by phone number',
-    ),
-    (
-        'sms',
-        mock_get_api_keys,
-        'Search by phone number or reference',
-    ),
-    (
-        'email',
-        mock_get_no_api_keys,
-        'Search by email address',
-    ),
-    (
-        'email',
-        mock_get_api_keys,
-        'Search by email address or reference',
-    ),
+@pytest.mark.parametrize('message_type, expected_search_box_label', [
+    (None, 'Search by email address, phone number or reference'),
+    ('sms', 'Search by phone number or reference'),
+    ('email', 'Search by email address or reference'),
 ])
-def test_api_users_are_told_they_can_search_by_reference(
+def test_api_users_are_told_they_can_search_by_reference_when_service_has_api_keys(
     client_request,
     mocker,
     fake_uuid,
@@ -465,9 +424,32 @@ def test_api_users_are_told_they_can_search_by_reference(
     mock_get_service_data_retention,
     message_type,
     expected_search_box_label,
-    api_keys_mock,
+    mock_get_api_keys,
 ):
-    api_keys_mock(mocker, fake_uuid)
+    page = client_request.get(
+        'main.view_notifications',
+        service_id=SERVICE_ONE_ID,
+        message_type=message_type,
+    )
+    assert page.select_one('label[for=to]').text.strip() == expected_search_box_label
+
+
+@pytest.mark.parametrize('message_type, expected_search_box_label', [
+    (None, 'Search by email address or phone number'),
+    ('sms', 'Search by phone number'),
+    ('email', 'Search by email address'),
+])
+def test_api_users_are_not_told_they_can_search_by_reference_when_service_has_no_api_keys(
+    client_request,
+    mocker,
+    fake_uuid,
+    mock_get_notifications,
+    mock_get_service_statistics,
+    mock_get_service_data_retention,
+    message_type,
+    expected_search_box_label,
+    mock_get_no_api_keys,
+):
     page = client_request.get(
         'main.view_notifications',
         service_id=SERVICE_ONE_ID,
@@ -581,16 +563,14 @@ def test_html_contains_notification_id(
 
 def test_html_contains_links_for_failed_notifications(
     client_request,
-    active_user_with_permissions,
     mock_get_service_statistics,
     mock_get_service_data_retention,
     mock_get_no_api_keys,
     mocker,
 ):
-    mock_get_notifications(mocker,
-                           active_user_with_permissions,
-                           diff_template_type="sms",
-                           noti_status='technical-failure')
+    notifications = create_notifications(status='technical-failure')
+    mocker.patch('app.notification_api_client.get_notifications_for_service', return_value=notifications)
+
     response = client_request.get(
         'main.view_notifications',
         service_id=SERVICE_ONE_ID,
@@ -606,18 +586,18 @@ def test_html_contains_links_for_failed_notifications(
 def test_redacts_templates_that_should_be_redacted(
     client_request,
     mocker,
-    active_user_with_permissions,
     mock_get_service_statistics,
     mock_get_service_data_retention,
     mock_get_no_api_keys,
 ):
-    mock_get_notifications(
-        mocker,
-        active_user_with_permissions,
-        template_content="hello ((name))",
+    notifications = create_notifications(
+        status='technical-failure',
+        content='hello ((name))',
         personalisation={'name': 'Jo'},
         redact_personalisation=True,
     )
+    mocker.patch('app.notification_api_client.get_notifications_for_service', return_value=notifications)
+
     page = client_request.get(
         'main.view_notifications',
         service_id=SERVICE_ONE_ID,
@@ -690,7 +670,6 @@ def test_big_numbers_and_search_dont_show_for_letters(
 def test_sending_status_hint_displays_correctly_on_notifications_page(
     client_request,
     service_one,
-    active_user_with_permissions,
     mock_get_service_statistics,
     mock_get_service_data_retention,
     mock_get_no_api_keys,
@@ -700,7 +679,8 @@ def test_sending_status_hint_displays_correctly_on_notifications_page(
     single_line,
     mocker
 ):
-    mock_get_notifications(mocker, True, diff_template_type=message_type, noti_status=status)
+    notifications = create_notifications(template_type=message_type, status=status)
+    mocker.patch('app.notification_api_client.get_notifications_for_service', return_value=notifications)
 
     page = client_request.get(
         'main.view_notifications',
@@ -719,17 +699,19 @@ def test_sending_status_hint_displays_correctly_on_notifications_page(
 def test_should_expected_hint_for_letters(
     client_request,
     service_one,
-    active_user_with_permissions,
     mock_get_service_statistics,
     mock_get_service_data_retention,
     mock_get_no_api_keys,
     mocker,
-    fake_uuid,
     is_precompiled_letter,
     expected_hint
 ):
-    mock_get_notifications(
-        mocker, active_user_with_permissions, is_precompiled_letter=is_precompiled_letter)
+    notifications = create_notifications(
+        template_type='letter',
+        subject=expected_hint,
+        is_precompiled_letter=is_precompiled_letter,
+    )
+    mocker.patch('app.notification_api_client.get_notifications_for_service', return_value=notifications)
 
     page = client_request.get(
         'main.view_notifications',
