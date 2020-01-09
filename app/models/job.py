@@ -45,28 +45,26 @@ class Job(JSONModel):
     def scheduled(self):
         return self.status == 'scheduled'
 
-    @property
-    def notifications_delivered(self):
+    def _aggregate_statistics(self, *statuses):
         return sum(
             outcome['count'] for outcome in self._dict['statistics']
-            if outcome['status'] in {'delivered', 'sent'}
+            if not statuses or outcome['status'] in statuses
         )
 
     @property
+    def notifications_delivered(self):
+        return self._aggregate_statistics('delivered', 'sent')
+
+    @property
     def notifications_failed(self):
-        return sum(
-            outcome['count'] for outcome in self._dict['statistics']
-            if outcome['status'] in {
-                'failed', 'technical-failure', 'temporary-failure',
-                'permanent-failure', 'cancelled',
-            }
+        return self._aggregate_statistics(
+            'failed', 'technical-failure', 'temporary-failure',
+            'permanent-failure', 'cancelled',
         )
 
     @property
     def notifications_requested(self):
-        return sum(
-            outcome['count'] for outcome in self._dict['statistics']
-        )
+        return self._aggregate_statistics()
 
     @property
     def notifications_sent(self):
