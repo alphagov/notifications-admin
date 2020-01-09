@@ -1,4 +1,3 @@
-from collections import defaultdict
 from datetime import datetime
 
 from notifications_utils.letter_timings import (
@@ -46,33 +45,28 @@ class Job(JSONModel):
     def scheduled(self):
         return self.status == 'scheduled'
 
-    @cached_property
-    def statistics(self):
-        results = defaultdict(int)
-        for outcome in self._dict['statistics']:
-            if outcome['status'] in [
-                'failed', 'technical-failure', 'temporary-failure',
-                'permanent-failure', 'cancelled'
-            ]:
-                results['failed'] += outcome['count']
-            if outcome['status'] in ['sending', 'pending', 'created']:
-                results['sending'] += outcome['count']
-            if outcome['status'] in ['delivered', 'sent']:
-                results['delivered'] += outcome['count']
-            results['requested'] += outcome['count']
-        return results
-
     @property
     def notifications_delivered(self):
-        return self.statistics['delivered']
+        return sum(
+            outcome['count'] for outcome in self._dict['statistics']
+            if outcome['status'] in {'delivered', 'sent'}
+        )
 
     @property
     def notifications_failed(self):
-        return self.statistics['failed']
+        return sum(
+            outcome['count'] for outcome in self._dict['statistics']
+            if outcome['status'] in {
+                'failed', 'technical-failure', 'temporary-failure',
+                'permanent-failure', 'cancelled',
+            }
+        )
 
     @property
     def notifications_requested(self):
-        return self.statistics['requested']
+        return sum(
+            outcome['count'] for outcome in self._dict['statistics']
+        )
 
     @property
     def notifications_sent(self):
