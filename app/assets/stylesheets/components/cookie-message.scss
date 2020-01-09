@@ -31,36 +31,48 @@
 }
 
 .notify-cookie-banner__buttons {
-  @include govuk-clearfix;
+  display: flex;
+  flex-wrap: wrap;
 
   @include govuk-media-query($from: tablet) {
-    display: inline-block;
+    flex-wrap: nowrap;
   }
 }
 
+.notify-cookie-banner__button,
+.notify-cookie-banner__link {
+  vertical-align: baseline;
+}
+
 .notify-cookie-banner__button {
-  float: left;
-  width: 50%;
-  box-sizing: border-box;
+  display: inline-block;
+  flex: 1 0;
+  padding-left: govuk-spacing(9);
+  padding-right: govuk-spacing(9);
+  margin-bottom: govuk-spacing(2);
 
   @include govuk-media-query($from: tablet) {
-    display: inline-block;
-    float: none;
-    width: auto;
+    flex: 0 0 150px;
+    padding-left: govuk-spacing(2);
+    padding-right: govuk-spacing(2);
+    margin-bottom: govuk-spacing(1);
   }
 }
 
 .notify-cookie-banner__button-accept {
-  padding-right: govuk-spacing(4);
+  margin-right: govuk-spacing(4);
 }
 
 .notify-cookie-banner__link {
   @include govuk-font(19);
+  line-height: 1;
   display: block;
-  clear: both;
+  width: 100%;
+  padding: 9px 0px 6px;
 
   @include govuk-media-query($from: tablet) {
-    display: inline-block;
+    display: inline;
+    width: auto;
     margin-left: govuk-spacing(6);
   }
 }

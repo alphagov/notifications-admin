@@ -8,12 +8,3 @@
   }
 }
 
-// Class to extend govuk-button to allow it to sit alongside other inline content
-.govuk-button__inline {
-  vertical-align: top;
-  margin-bottom: 0;
-
-  @include govuk-media-query($from: tablet) {
-    vertical-align: baseline;
-  }
-}
