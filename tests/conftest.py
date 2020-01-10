@@ -1791,7 +1791,6 @@ def mock_get_notifications(
         return notification_json(
             service_id,
             template=template,
-            to=to,
             rows=rows,
             job=job,
             with_links=True if count_pages is None else count_pages,
