@@ -579,11 +579,19 @@ LETTER_VALIDATION_MESSAGES = {
             'You need to change the size or orientation of {invalid_pages}. <br>'
             f'Files must meet our <a href="{LETTER_SPECIFICATION_URL}" target="_blank">letter specification</a>.'
         ),
+        'summary': (
+            'Validation failed because {invalid_pages} {invalid_pages_are_or_is} not A4 portrait size.<br>'
+            f'Files must meet our <a href="{LETTER_SPECIFICATION_URL}" target="_blank">letter specification</a>.'
+        ),
     },
     'content-outside-printable-area': {
         'title': 'Your content is outside the printable area',
         'detail': (
             'You need to edit {invalid_pages}.<br>'
+            f'Files must meet our <a href="{LETTER_SPECIFICATION_URL}" target="_blank">letter specification</a>.'
+        ),
+        'summary': (
+            'Validation failed because content is outside the printable area on {invalid_pages}.<br>'
             f'Files must meet our <a href="{LETTER_SPECIFICATION_URL}" target="_blank">letter specification</a>.'
         ),
     },
@@ -592,6 +600,10 @@ LETTER_VALIDATION_MESSAGES = {
         'detail': (
             'Letters must be 10 pages or less. <br>'
             'Your letter is {page_count} pages long.'
+        ),
+        'summary': (
+            'Validation failed because this letter is {page_count} pages long.<br>'
+            'Letters must be 10 pages or less.'
         ),
     },
     'no-encoded-string': {
@@ -603,11 +615,19 @@ LETTER_VALIDATION_MESSAGES = {
             'Notify cannot read this PDF.'
             '<br>Save a new copy of your file and try again.'
         ),
+        'summary': (
+            'Letters must be 10 pages or less. <br>'
+            'This letter is {page_count} pages long.'
+        ),
     },
     'address-is-empty': {
         'title': 'The address block is empty',
         'detail': (
             'You need to add a recipient address.<br>'
+            f'Files must meet our <a href="{LETTER_SPECIFICATION_URL}" target="_blank">letter specification</a>.'
+        ),
+        'summary': (
+            'Validation failed because the address block is empty.<br>'
             f'Files must meet our <a href="{LETTER_SPECIFICATION_URL}" target="_blank">letter specification</a>.'
         ),
     }
@@ -617,6 +637,8 @@ LETTER_VALIDATION_MESSAGES = {
 def get_letter_validation_error(validation_message, invalid_pages=None, page_count=None):
     if validation_message not in LETTER_VALIDATION_MESSAGES:
         return {'title': 'Validation failed'}
+
+    invalid_pages_are_or_is = 'is' if len(invalid_pages) == 1 else 'are'
 
     invalid_pages = unescaped_formatted_list(
         invalid_pages or [],
@@ -630,8 +652,14 @@ def get_letter_validation_error(validation_message, invalid_pages=None, page_cou
         'title': LETTER_VALIDATION_MESSAGES[validation_message]['title'],
         'detail': LETTER_VALIDATION_MESSAGES[validation_message]['detail'].format(
             invalid_pages=invalid_pages,
+            invalid_pages_are_or_is=invalid_pages_are_or_is,
             page_count=page_count,
-        )
+        ),
+        'summary': LETTER_VALIDATION_MESSAGES[validation_message]['summary'].format(
+            invalid_pages=invalid_pages,
+            invalid_pages_are_or_is=invalid_pages_are_or_is,
+            page_count=page_count,
+        ),
     }
 
 

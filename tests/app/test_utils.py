@@ -413,24 +413,57 @@ def test_get_letter_validation_error_for_unknown_error():
     }
 
 
-@pytest.mark.parametrize('error_message, expected_title, expected_content', [
-    ('letter-not-a4-portrait-oriented', 'Your letter is not A4 portrait size',
-     'You need to change the size or orientation of page 2. <br>Files must meet our '
-     '<a href="https://docs.notifications.service.gov.uk/documentation/images/notify-pdf-letter-spec-v2.4.pdf" '
-     'target="_blank">letter specification</a>.'),
-    ('content-outside-printable-area', 'Your content is outside the printable area',
-     'You need to edit page 2.<br>Files must meet our '
-     '<a href="https://docs.notifications.service.gov.uk/documentation/images/notify-pdf-letter-spec-v2.4.pdf" '
-     'target="_blank">letter specification</a>.'),
-    ('letter-too-long', 'Your letter is too long',
-     'Letters must be 10 pages or less. <br>Your letter is 13 pages long.')
+@pytest.mark.parametrize('error_message, expected_title, expected_content, expected_summary', [
+    (
+        'letter-not-a4-portrait-oriented',
+        'Your letter is not A4 portrait size',
+        (
+            'You need to change the size or orientation of page 2. <br>Files must meet our '
+            '<a href="https://docs.notifications.service.gov.uk/documentation/images/notify-pdf-letter-spec-v2.4.pdf" '
+            'target="_blank">letter specification</a>.'
+        ),
+        (
+            'Validation failed because page 2 is not A4 portrait size.<br>'
+            'Files must meet our <a href="https://docs.notifications.service.gov.uk/'
+            'documentation/images/notify-pdf-letter-spec-v2.4.pdf" target="_blank">'
+            'letter specification</a>.'
+        ),
+    ),
+    (
+        'content-outside-printable-area',
+        'Your content is outside the printable area',
+        (
+            'You need to edit page 2.<br>Files must meet our '
+            '<a href="https://docs.notifications.service.gov.uk/documentation/images/notify-pdf-letter-spec-v2.4.pdf" '
+            'target="_blank">letter specification</a>.'
+        ),
+        (
+            'Validation failed because content is outside the printable area '
+            'on page 2.<br>Files must meet our <a href="https://docs.notifications.service.gov.uk/'
+            'documentation/images/notify-pdf-letter-spec-v2.4.pdf" target="_blank">'
+            'letter specification</a>.'
+        ),
+    ),
+    (
+        'letter-too-long',
+        'Your letter is too long',
+        (
+            'Letters must be 10 pages or less. <br>Your letter is 13 pages long.'
+        ),
+        (
+            'Validation failed because this letter is 13 pages long.<br>'
+            'Letters must be 10 pages or less.'
+        ),
+    ),
 ])
 def test_get_letter_validation_error_for_known_errors(
     error_message,
     expected_title,
     expected_content,
+    expected_summary,
 ):
     error = get_letter_validation_error(error_message, invalid_pages=[2], page_count=13)
 
     assert error['title'] == expected_title
     assert expected_content in error['detail']
+    assert error['summary'] == expected_summary
