@@ -37,7 +37,7 @@ describe("Analytics", () => {
 
   afterEach(() => {
 
-    window.ga.mockReset();
+    window.ga.mockClear();
 
   });
 
@@ -58,9 +58,14 @@ describe("Analytics", () => {
 
   describe("When tracking pageviews", () => {
 
-    test("It sends the right URL for the page if no arguments", () => {
+    beforeEach(() => {
 
+      // clear calls to window.ga from set up
       window.ga.mockClear();
+
+    });
+
+    test("It sends the right URL for the page if no arguments", () => {
 
       jest.spyOn(window, 'location', 'get').mockImplementation(() => {
         return {
@@ -77,8 +82,6 @@ describe("Analytics", () => {
 
     test("It strips the UUIDs from URLs", () => {
 
-      window.ga.mockClear();
-
       jest.spyOn(window, 'location', 'get').mockImplementation(() => {
         return {
           'pathname': '/services/6658542f-0cad-491f-bec8-ab8457700ead',
@@ -89,6 +92,31 @@ describe("Analytics", () => {
       analytics.trackPageview();
 
       expect(window.ga.mock.calls[0]).toEqual(['send', 'pageview', '/services/…']);
+
+    });
+
+  });
+
+  describe("When tracking events", () => {
+
+    beforeEach(() => {
+
+      // clear calls to window.ga from set up
+      window.ga.mockClear();
+
+    });
+
+    test("It sends the right arguments to `ga`", () => {
+
+      analytics.trackEvent('Error', 'Enter a valid email address', {
+        'label': 'email_address'
+      });
+
+      expect(window.ga.mock.calls[0]).toEqual(['send', 'event', {
+        'eventCategory': 'Error',
+        'eventAction': 'Enter a valid email address',
+        'eventLabel': 'email_address'
+      }]);
 
     });
 

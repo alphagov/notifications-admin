@@ -1,22 +1,22 @@
-(function(Modules) {
+(function(window) {
   "use strict";
 
-  Modules.TrackError = function() {
+  window.GOVUK.Modules.TrackError = function() {
 
     this.start = function(component) {
 
-      if (!ga) return;
+      if (!('analytics' in window.GOVUK)) return;
 
-      ga(
-        'send',
-        'event',
+      window.GOVUK.analytics.trackEvent(
         'Error',
         $(component).data('error-type'),
-        $(component).data('error-label')
+        {
+          'label': $(component).data('error-label')
+        }
       );
 
     };
 
   };
 
-})(window.GOVUK.Modules);
+})(window);
