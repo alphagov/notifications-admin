@@ -426,9 +426,9 @@ def test_get_letter_validation_error_for_unknown_error():
      'Letters must be 10 pages or less. <br>Your letter is 13 pages long.')
 ])
 def test_get_letter_validation_error_for_known_errors(
-        error_message,
-        expected_title,
-        expected_content,
+    error_message,
+    expected_title,
+    expected_content,
 ):
     error = get_letter_validation_error(error_message, invalid_pages=[2], page_count=13)
 
