@@ -79,7 +79,6 @@ def _get_notifications_csv(
 def _get_notifications_csv_mock(
     mocker,
     api_user_active,
-    job_id=fake_uuid
 ):
     return mocker.patch(
         'app.notification_api_client.get_notifications_for_service',
