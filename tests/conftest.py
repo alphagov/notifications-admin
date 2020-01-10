@@ -825,16 +825,16 @@ def mock_get_service_template_with_placeholders_same_as_recipient(mocker):
 
 
 @pytest.fixture(scope='function')
-def mock_get_service_email_template(mocker, content=None, subject=None, redact_personalisation=False):
+def mock_get_service_email_template(mocker):
     def _get(service_id, template_id, version=None):
         template = template_json(
             service_id,
             template_id,
             "Two week reminder",
             "email",
-            content or "Your vehicle tax expires on ((date))",
-            subject or "Your ((thing)) is due soon",
-            redact_personalisation=redact_personalisation,
+            "Your vehicle tax expires on ((date))",
+            "Your ((thing)) is due soon",
+            redact_personalisation=False,
         )
         return {'data': template}
 
@@ -861,15 +861,15 @@ def mock_get_service_email_template_without_placeholders(mocker):
 
 
 @pytest.fixture(scope='function')
-def mock_get_service_letter_template(mocker, content=None, subject=None, postage='second'):
-    def _get(service_id, template_id, version=None, postage=postage):
+def mock_get_service_letter_template(mocker):
+    def _get(service_id, template_id, version=None, postage='second'):
         template = template_json(
             service_id,
             template_id,
             "Two week reminder",
             "letter",
-            content or "Template <em>content</em> with & entity",
-            subject or "Subject",
+            "Template <em>content</em> with & entity",
+            "Subject",
             postage=postage,
         )
         return {'data': template}
@@ -1108,11 +1108,11 @@ def api_user_active(fake_uuid):
 
 
 @pytest.fixture(scope='function')
-def api_user_active_email_auth(fake_uuid, email_address='test@user.gov.uk'):
+def api_user_active_email_auth(fake_uuid):
     user_data = {'id': fake_uuid,
                  'name': 'Test User',
                  'password': 'somepassword',
-                 'email_address': email_address,
+                 'email_address': 'test@user.gov.uk',
                  'mobile_number': '07700 900762',
                  'state': 'active',
                  'failed_login_count': 0,
@@ -1755,14 +1755,6 @@ def mock_get_uploads(mocker, api_user_active):
 def mock_get_notifications(
     mocker,
     api_user_active,
-    template_content=None,
-    diff_template_type=None,
-    personalisation=None,
-    redact_personalisation=False,
-    is_precompiled_letter=False,
-    client_reference=None,
-    noti_status=None,
-    postage=None,
 ):
     def _get_notifications(
         service_id,
@@ -1782,21 +1774,19 @@ def mock_get_notifications(
         job = None
         if job_id is not None:
             job = job_json(service_id, api_user_active, job_id=job_id)
-        if diff_template_type or template_type:
+        if template_type:
             template = template_json(
                 service_id,
                 id_=str(generate_uuid()),
-                type_=diff_template_type or template_type[0],
-                content=template_content,
-                redact_personalisation=redact_personalisation,
-                is_precompiled_letter=is_precompiled_letter,
+                type_=template_type[0],
+                redact_personalisation=False,
+                is_precompiled_letter=False,
             )
         else:
             template = template_json(
                 service_id,
                 id_=str(generate_uuid()),
-                content=template_content,
-                redact_personalisation=redact_personalisation,
+                redact_personalisation=False,
             )
         return notification_json(
             service_id,
@@ -1804,12 +1794,7 @@ def mock_get_notifications(
             rows=rows,
             job=job,
             with_links=True if count_pages is None else count_pages,
-            personalisation=personalisation,
-            template_type=diff_template_type,
-            client_reference=client_reference,
-            status=noti_status,
             created_by_name='Firstname Lastname',
-            postage=postage
         )
 
     return mocker.patch(
@@ -2036,38 +2021,35 @@ def mock_s3_upload(mocker):
 
 
 @pytest.fixture(scope='function')
-def mock_s3_download(mocker, content=None):
-    if not content:
-        content = """
+def mock_s3_download(mocker):
+    def _download(service_id, upload_id):
+        return """
             phone number,name
             +447700900986,John
             +447700900986,Smith
         """
 
-    def _download(service_id, upload_id):
-        return content
-
     return mocker.patch('app.main.views.send.s3download', side_effect=_download)
 
 
 @pytest.fixture(scope='function')
-def mock_s3_set_metadata(mocker, content=None):
+def mock_s3_set_metadata(mocker):
     return mocker.patch('app.main.views.send.set_metadata_on_csv_upload')
 
 
 @pytest.fixture(scope='function')
-def sample_invite(mocker, service_one, status='pending', permissions=None):
+def sample_invite(mocker, service_one):
     id_ = USER_ONE_ID
     from_user = service_one['users'][0]
     email_address = 'invited_user@test.gov.uk'
     service_id = service_one['id']
-    permissions = permissions or 'view_activity,send_messages,manage_service,manage_api_keys'
+    permissions = 'view_activity,send_messages,manage_service,manage_api_keys'
     created_at = str(datetime.utcnow())
     auth_type = 'sms_auth'
     folder_permissions = []
 
     return invite_json(
-        id_, from_user, service_id, email_address, permissions, created_at, status, auth_type, folder_permissions)
+        id_, from_user, service_id, email_address, permissions, created_at, 'pending', auth_type, folder_permissions)
 
 
 @pytest.fixture(scope='function')
@@ -2573,18 +2555,7 @@ def mock_reset_failed_login_count(mocker):
 
 
 @pytest.fixture
-def mock_get_notification(
-    mocker,
-    notification_id=fake_uuid,
-    notification_status='delivered',
-    redact_personalisation=False,
-    template_type=None,
-    template_name='sample template',
-    is_precompiled_letter=False,
-    key_type=None,
-    postage=None,
-    sent_one_off=True,
-):
+def mock_get_notification(mocker):
     def _get_notification(
         service_id,
         notification_id,
@@ -2592,31 +2563,23 @@ def mock_get_notification(
         noti = notification_json(
             service_id,
             rows=1,
-            status=notification_status,
-            template_type=template_type,
-            postage=postage
+            personalisation={'name': 'Jo'}
         )['notifications'][0]
 
         noti['id'] = notification_id
-        if sent_one_off:
-            noti['created_by'] = {
-                'id': fake_uuid,
-                'name': 'Test User',
-                'email_address': 'test@user.gov.uk'
-            }
-        noti['personalisation'] = {'name': 'Jo'}
+        noti['created_by'] = {
+            'id': fake_uuid,
+            'name': 'Test User',
+            'email_address': 'test@user.gov.uk'
+        }
         noti['template'] = template_json(
             service_id,
             '5407f4db-51c7-4150-8758-35412d42186a',
             content='hello ((name))',
             subject='blah',
-            redact_personalisation=redact_personalisation,
-            type_=template_type,
-            is_precompiled_letter=is_precompiled_letter,
-            name=template_name
+            redact_personalisation=False,
+            name='sample template'
         )
-        if key_type:
-            noti['key_type'] = key_type
         return noti
 
     return mocker.patch(
@@ -2981,11 +2944,7 @@ def mock_get_organisations_with_unusual_domains(mocker):
 
 
 @pytest.fixture(scope='function')
-def mock_get_organisation(
-    mocker,
-    email_branding_id=None,
-    letter_branding_id=None,
-):
+def mock_get_organisation(mocker):
     def _get_organisation(org_id):
         return organisation_json(
             org_id,
@@ -2994,29 +2953,15 @@ def mock_get_organisation(
                 'o2': 'Org 2',
                 'o3': 'Org 3',
             }.get(org_id, 'Org 1'),
-            email_branding_id=email_branding_id,
-            letter_branding_id=letter_branding_id,
         )
 
     return mocker.patch('app.organisations_client.get_organisation', side_effect=_get_organisation)
 
 
 @pytest.fixture(scope='function')
-def mock_get_organisation_by_domain(
-    mocker,
-    name=False,
-    crown=True,
-    agreement_signed=False,
-    organisation_type='',
-):
+def mock_get_organisation_by_domain(mocker):
     def _get_organisation_by_domain(org_id):
-        return organisation_json(
-            org_id,
-            name,
-            crown=crown,
-            agreement_signed=agreement_signed,
-            organisation_type=organisation_type,
-        )
+        return organisation_json(org_id)
 
     return mocker.patch(
         'app.organisations_client.get_organisation_by_domain',
@@ -3027,18 +2972,14 @@ def mock_get_organisation_by_domain(
 @pytest.fixture(scope='function')
 def mock_get_service_organisation(
     mocker,
-    name=False,
-    crown=True,
     agreement_signed=None,
     organisation_type=None,
 ):
     def _get_service_organisation(service_id):
         return organisation_json(
             '7aa5d4e9-4385-4488-a489-07812ba13383',
-            name,
-            crown=crown,
-            agreement_signed=agreement_signed,
-            organisation_type=organisation_type,
+            agreement_signed=None,
+            organisation_type=None,
         )
 
     return mocker.patch('app.organisations_client.get_service_organisation', side_effect=_get_service_organisation)
@@ -3111,12 +3052,13 @@ def mock_get_invited_users_for_organisation(mocker, sample_org_invite):
 
 
 @pytest.fixture(scope='function')
-def sample_org_invite(mocker, organisation_one, status='pending'):
+def sample_org_invite(mocker, organisation_one):
     id_ = str(UUID(bytes=b'sample_org_invit', version=4))
     invited_by = organisation_one['users'][0]
     email_address = 'invited_user@test.gov.uk'
     organisation = organisation_one['id']
     created_at = str(datetime.utcnow())
+    status = 'pending'
 
     return org_invite_json(id_, invited_by, organisation, email_address, created_at, status)
 
