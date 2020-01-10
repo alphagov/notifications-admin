@@ -331,9 +331,10 @@ def test_notification_page_shows_validation_failed_precompiled_letter(
     )
 
     error_message = page.find('p', class_='notification-status-cancelled').text
-    assert normalize_spaces(error_message) == \
-        "Validation failed – Your content is outside the printable area. " \
-        "You need to edit page 1.Files must meet our letter specification."
+    assert normalize_spaces(error_message) == (
+        'Validation failed. You need to edit page 1.'
+        'Files must meet our letter specification.'
+    )
 
     assert not page.select('p.notification-status')
 
