@@ -44,7 +44,7 @@
         </p>
       {% elif notification_status == 'validation-failed' %}
         <p class="notification-status-cancelled">
-          Validation failed. {{ message.detail | safe }}
+          Validation failed – {{ message.title | safe }}. {{ message.detail | safe }}
         </p>
       {% elif notification_status == 'technical-failure' %}
         <p class="notification-status-cancelled">

@@ -414,14 +414,21 @@ def test_get_letter_validation_error_for_unknown_error():
 
 
 @pytest.mark.parametrize('error_message, expected_title, expected_content', [
-    ('letter-not-a4-portrait-oriented', 'We cannot print your letter', 'A4 portrait size on page 2'),
-    ('content-outside-printable-area', 'We cannot print your letter', 'outside the printable area on page 2'),
-    ('letter-too-long', 'Your letter is too long', 'letter is 13 pages long.')
+    ('letter-not-a4-portrait-oriented', 'Your letter is not A4 portrait size',
+     'You need to change the size or orientation of page 2. <br>Files must meet our '
+     '<a href="https://docs.notifications.service.gov.uk/documentation/images/notify-pdf-letter-spec-v2.4.pdf" '
+     'target="_blank">letter specification</a>.'),
+    ('content-outside-printable-area', 'Your content is outside the printable area',
+     'You need to edit page 2.<br>Files must meet our '
+     '<a href="https://docs.notifications.service.gov.uk/documentation/images/notify-pdf-letter-spec-v2.4.pdf" '
+     'target="_blank">letter specification</a>.'),
+    ('letter-too-long', 'Your letter is too long',
+     'Letters must be 10 pages or less. <br>Your letter is 13 pages long.')
 ])
 def test_get_letter_validation_error_for_known_errors(
-    error_message,
-    expected_title,
-    expected_content,
+        error_message,
+        expected_title,
+        expected_content,
 ):
     error = get_letter_validation_error(error_message, invalid_pages=[2], page_count=13)
 
