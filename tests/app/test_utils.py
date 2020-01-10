@@ -4,6 +4,7 @@ from io import StringIO
 from pathlib import Path
 
 import pytest
+from bs4 import BeautifulSoup
 from freezegun import freeze_time
 
 from app import format_datetime_relative
@@ -418,40 +419,36 @@ def test_get_letter_validation_error_for_unknown_error():
         'letter-not-a4-portrait-oriented',
         'Your letter is not A4 portrait size',
         (
-            'You need to change the size or orientation of page 2. <br>Files must meet our '
-            '<a href="https://docs.notifications.service.gov.uk/documentation/images/notify-pdf-letter-spec-v2.4.pdf" '
-            'target="_blank">letter specification</a>.'
+            'You need to change the size or orientation of page 2. '
+            'Files must meet our letter specification.'
         ),
         (
-            'Validation failed because page 2 is not A4 portrait size.<br>'
-            'Files must meet our <a href="https://docs.notifications.service.gov.uk/'
-            'documentation/images/notify-pdf-letter-spec-v2.4.pdf" target="_blank">'
-            'letter specification</a>.'
+            'Validation failed because page 2 is not A4 portrait size.'
+            'Files must meet our letter specification.'
         ),
     ),
     (
         'content-outside-printable-area',
         'Your content is outside the printable area',
         (
-            'You need to edit page 2.<br>Files must meet our '
-            '<a href="https://docs.notifications.service.gov.uk/documentation/images/notify-pdf-letter-spec-v2.4.pdf" '
-            'target="_blank">letter specification</a>.'
+            'You need to edit page 2.'
+            'Files must meet our letter specification.'
         ),
         (
             'Validation failed because content is outside the printable area '
-            'on page 2.<br>Files must meet our <a href="https://docs.notifications.service.gov.uk/'
-            'documentation/images/notify-pdf-letter-spec-v2.4.pdf" target="_blank">'
-            'letter specification</a>.'
+            'on page 2.'
+            'Files must meet our letter specification.'
         ),
     ),
     (
         'letter-too-long',
         'Your letter is too long',
         (
-            'Letters must be 10 pages or less. <br>Your letter is 13 pages long.'
+            'Letters must be 10 pages or less. '
+            'Your letter is 13 pages long.'
         ),
         (
-            'Validation failed because this letter is 13 pages long.<br>'
+            'Validation failed because this letter is 13 pages long.'
             'Letters must be 10 pages or less.'
         ),
     ),
@@ -462,8 +459,22 @@ def test_get_letter_validation_error_for_known_errors(
     expected_content,
     expected_summary,
 ):
+    expected_letter_spec_url = (
+        'https://docs.notifications.service.gov.uk/'
+        'documentation/images/notify-pdf-letter-spec-v2.4.pdf'
+    )
     error = get_letter_validation_error(error_message, invalid_pages=[2], page_count=13)
+    detail = BeautifulSoup(error['detail'], 'html.parser')
+    summary = BeautifulSoup(error['summary'], 'html.parser')
 
     assert error['title'] == expected_title
-    assert expected_content in error['detail']
-    assert error['summary'] == expected_summary
+
+    assert detail.text == expected_content
+    if detail.select_one('a'):
+        assert detail.select_one('a')['href'] == expected_letter_spec_url
+        assert detail.select_one('a')['target'] == '_blank'
+
+    assert summary.text == expected_summary
+    if summary.select_one('a'):
+        assert summary.select_one('a')['href'] == expected_letter_spec_url
+        assert summary.select_one('a')['target'] == '_blank'
