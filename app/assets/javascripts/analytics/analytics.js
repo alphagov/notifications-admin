@@ -4,7 +4,7 @@
   window.GOVUK = window.GOVUK || {};
 
   // Stripped-down wrapper for Google Analytics, based on:
-  // https://github.com/alphagov/static/blob/master/app/assets/javascripts/analytics_toolkit/analytics.js
+  // https://github.com/alphagov/static/blob/master/doc/analytics.md
   const Analytics = function (config) {
     window.ga('create', config.trackingId, config.cookieDomain);
 
@@ -31,6 +31,29 @@
       /[a-f0-9]{8}-?[a-f0-9]{4}-?4[a-f0-9]{3}-?[89ab][a-f0-9]{3}-?[a-f0-9]{12}/g, '…'
     );
     window.ga('send', 'pageview', page);
+
+  };
+
+  // https://developers.google.com/analytics/devguides/collection/analyticsjs/events
+  Analytics.prototype.trackEvent = function (category, action, options) {
+
+    options = options || {};
+
+    var evt = {
+      eventCategory: category,
+      eventAction: action
+    };
+
+    if (options.label) {
+      evt.eventLabel = options.label;
+      delete options.label;
+    }
+
+    if (typeof options === 'object') {
+      $.extend(evt, options);
+    }
+
+    window.ga('send', 'event', evt);
 
   };
 
