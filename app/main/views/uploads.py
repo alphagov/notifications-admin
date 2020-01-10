@@ -33,6 +33,7 @@ from app.s3_client.s3_letter_upload_client import (
 )
 from app.template_previews import TemplatePreview, sanitise_letter
 from app.utils import (
+    LETTER_SPECIFICATION_URL,
     generate_next_dict,
     generate_previous_dict,
     get_letter_validation_error,
@@ -65,6 +66,7 @@ def uploads(service_id):
         prev_page=prev_page,
         next_page=next_page,
         scheduled_jobs='',
+        letter_specification_url=LETTER_SPECIFICATION_URL,
     )
 
 

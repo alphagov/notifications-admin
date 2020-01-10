@@ -17,7 +17,11 @@ from app.main import main
 from app.main.forms import FieldWithNoneOption, SearchByNameForm
 from app.main.views.feedback import QUESTION_TICKET_TYPE
 from app.main.views.sub_navigation_dictionaries import features_nav, pricing_nav
-from app.utils import get_logo_cdn_domain, user_is_logged_in
+from app.utils import (
+    LETTER_SPECIFICATION_URL,
+    get_logo_cdn_domain,
+    user_is_logged_in,
+)
 
 
 @main.route('/')
@@ -269,6 +273,7 @@ def features_sms():
 def features_letters():
     return render_template(
         'views/features/letters.html',
+        letter_specification_url=LETTER_SPECIFICATION_URL,
         navigation_links=features_nav()
     )
 
