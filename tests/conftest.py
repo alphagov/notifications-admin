@@ -499,15 +499,6 @@ def mock_get_service(mocker, api_user_active):
 
 
 @pytest.fixture(scope='function')
-def mock_get_international_service(mocker, api_user_active):
-    def _get(service_id):
-        service = service_json(service_id, users=[api_user_active['id']], permissions=['sms', 'international_sms'])
-        return {'data': service}
-
-    return mocker.patch('app.service_api_client.get_service', side_effect=_get)
-
-
-@pytest.fixture(scope='function')
 def mock_get_service_statistics(mocker, api_user_active):
     def _get(service_id, today_only, limit_days=None):
         return {
@@ -572,19 +563,6 @@ def mock_get_live_service(mocker, api_user_active):
             users=[api_user_active['id']],
             restricted=False)
         return {'data': service}
-
-    return mocker.patch('app.service_api_client.get_service', side_effect=_get)
-
-
-@pytest.fixture(scope='function')
-def mock_get_service_with_letters(mocker, api_user_active):
-    def _get(service_id):
-        return {'data': service_json(
-            service_id,
-            users=[api_user_active['id']],
-            restricted=False,
-            permissions=['email', 'sms', 'letter']
-        )}
 
     return mocker.patch('app.service_api_client.get_service', side_effect=_get)
 
@@ -1267,33 +1245,6 @@ def active_caseworking_user(fake_uuid):
     return user_data
 
 
-@pytest.fixture(scope='function')
-def active_user_no_mobile(fake_uuid):
-    user_data = {'id': fake_uuid,
-                 'name': 'Test User',
-                 'password': 'somepassword',
-                 'password_changed_at': str(datetime.utcnow()),
-                 'email_address': 'test@user.gov.uk',
-                 'mobile_number': None,
-                 'state': 'active',
-                 'failed_login_count': 0,
-                 'permissions': {SERVICE_ONE_ID: ['send_texts',
-                                                  'send_emails',
-                                                  'send_letters',
-                                                  'manage_users',
-                                                  'manage_templates',
-                                                  'manage_settings',
-                                                  'manage_api_keys',
-                                                  'view_activity']},
-                 'platform_admin': False,
-                 'auth_type': 'email_auth',
-                 'organisations': [],
-                 'services': [SERVICE_ONE_ID],
-                 'current_session_id': None,
-                 }
-    return user_data
-
-
 @pytest.fixture
 def active_user_view_permissions(fake_uuid):
     user_data = {'id': fake_uuid,
@@ -1312,73 +1263,6 @@ def active_user_view_permissions(fake_uuid):
                  'current_session_id': None,
                  }
     return user_data
-
-
-@pytest.fixture
-def active_user_empty_permissions(fake_uuid):
-    user_data = {'id': fake_uuid,
-                 'name': 'Test User With Empty Permissions',
-                 'password': 'somepassword',
-                 'password_changed_at': str(datetime.utcnow()),
-                 'email_address': 'test@user.gov.uk',
-                 'mobile_number': '07700 900763',
-                 'state': 'active',
-                 'failed_login_count': 0,
-                 'permissions': {},
-                 'platform_admin': False,
-                 'auth_type': 'sms_auth',
-                 'organisations': [],
-                 'services': [SERVICE_ONE_ID],
-                 'current_session_id': None,
-                 }
-    return user_data
-
-
-@pytest.fixture
-def active_user_manage_template_permission(fake_uuid):
-    return {
-        'id': fake_uuid,
-        'name': 'Test User With Permissions',
-        'password': 'somepassword',
-        'password_changed_at': str(datetime.utcnow()),
-        'email_address': 'test@user.gov.uk',
-        'mobile_number': '07700 900762',
-        'state': 'active',
-        'failed_login_count': 0,
-        'permissions': {SERVICE_ONE_ID: [
-            'manage_templates',
-            'view_activity',
-        ]},
-        'platform_admin': False,
-        'auth_type': 'sms_auth',
-        'organisations': [],
-        'services': [SERVICE_ONE_ID],
-        'current_session_id': None,
-    }
-
-
-@pytest.fixture
-def active_user_no_api_key_permission(fake_uuid):
-    return {
-        'id': fake_uuid,
-        'name': 'Test User With Permissions',
-        'password': 'somepassword',
-        'password_changed_at': str(datetime.utcnow()),
-        'email_address': 'test@user.gov.uk',
-        'mobile_number': '07700 900762',
-        'state': 'active',
-        'failed_login_count': 0,
-        'permissions': {SERVICE_ONE_ID: [
-            'manage_templates',
-            'manage_settings',
-            'view_activity',
-        ]},
-        'platform_admin': False,
-        'auth_type': 'sms_auth',
-        'organisations': [],
-        'current_session_id': None,
-        'services': [SERVICE_ONE_ID],
-    }
 
 
 @pytest.fixture
@@ -1515,12 +1399,6 @@ def mock_get_locked_user(mocker, api_user_locked):
 
 
 @pytest.fixture(scope='function')
-def mock_get_user_locked(mocker, api_user_locked):
-    return mocker.patch(
-        'app.user_api_client.get_user', return_value=api_user_locked)
-
-
-@pytest.fixture(scope='function')
 def mock_get_user_pending(mocker, api_user_pending):
     return mocker.patch(
         'app.user_api_client.get_user', return_value=api_user_pending)
@@ -1544,16 +1422,6 @@ def mock_get_unknown_user_by_email(mocker, api_user_active):
         return api_user_active
 
     return mocker.patch('app.user_api_client.get_user_by_email', side_effect=_get_user)
-
-
-@pytest.fixture(scope='function')
-def mock_get_user_with_permissions(mocker, api_user_active):
-    def _get_user(id):
-        api_user_active._permissions[''] = ['manage_users', 'manage_templates', 'manage_settings']
-        return api_user_active
-
-    return mocker.patch(
-        'app.user_api_client.get_user', side_effect=_get_user)
 
 
 @pytest.fixture(scope='function')
@@ -1586,11 +1454,6 @@ def mock_get_user_by_email_user_changed_password(mocker, api_user_changed_passwo
 def mock_get_user_by_email_locked(mocker, api_user_locked):
     return mocker.patch(
         'app.user_api_client.get_user_by_email', return_value=api_user_locked)
-
-
-@pytest.fixture(scope='function')
-def mock_get_user_by_email_inactive(mocker, api_user_pending):
-    return mocker.patch('app.user_api_client.get_user_by_email', return_value=api_user_pending)
 
 
 @pytest.fixture(scope='function')
@@ -1651,26 +1514,8 @@ def mock_activate_user(mocker, api_user_active):
 
 
 @pytest.fixture(scope='function')
-def mock_email_is_already_in_use(mocker, api_user_active):
-    return mocker.patch('app.user_api_client.get_user_by_email_or_none', return_value=api_user_active)
-
-
-@pytest.fixture(scope='function')
 def mock_email_is_not_already_in_use(mocker):
     return mocker.patch('app.user_api_client.get_user_by_email_or_none', return_value=None)
-
-
-@pytest.fixture(scope='function')
-def mock_get_all_users_from_api(mocker):
-    return mocker.patch('app.user_api_client.get_users', return_value={'data': []})
-
-
-@pytest.fixture(scope='function')
-def mock_create_api_key(mocker):
-    def _create(service_id, key_name):
-        return str(generate_uuid())
-
-    return mocker.patch('app.api_key_api_client.create_api_key', side_effect=_create)
 
 
 @pytest.fixture(scope='function')
@@ -2223,11 +2068,6 @@ def sample_invite(mocker, service_one, status='pending', permissions=None):
 
     return invite_json(
         id_, from_user, service_id, email_address, permissions, created_at, status, auth_type, folder_permissions)
-
-
-@pytest.fixture(scope='function')
-def sample_invited_user(mocker, sample_invite):
-    return sample_invite
 
 
 @pytest.fixture(scope='function')
@@ -3077,14 +2917,6 @@ def mock_create_service_inbound_api(mocker):
 
 
 @pytest.fixture(scope='function')
-def mock_delete_service_inbound_api(mocker):
-    return mocker.patch(
-        'app.service_api_client.delete_service_callback_api',
-        side_effect=lambda service_id: None
-    )
-
-
-@pytest.fixture(scope='function')
 def mock_update_service_inbound_api(mocker):
     def _update_service_inbound_api(service_id, url, bearer_token, user_id, inbound_api_id):
         return
@@ -3098,14 +2930,6 @@ def mock_create_service_callback_api(mocker):
         return
 
     return mocker.patch('app.service_api_client.create_service_callback_api', side_effect=_create_service_callback_api)
-
-
-@pytest.fixture(scope='function')
-def mock_delete_service_callback_api(mocker):
-    return mocker.patch(
-        'app.service_api_client.delete_service_callback_api',
-        side_effect=lambda service_id: None
-    )
 
 
 @pytest.fixture(scope='function')
@@ -3348,14 +3172,6 @@ def mock_organisation_name_is_not_unique(mocker):
 @pytest.fixture(scope='function')
 def mock_organisation_name_is_unique(mocker):
     return mocker.patch('app.organisations_client.is_organisation_name_unique', return_value=True)
-
-
-@pytest.fixture(scope='function')
-def mock_update_organisation_name(mocker):
-    def _update_org_name(organisation_id, name):
-        return
-
-    return mocker.patch('app.organisations_client.update_organisation_name', side_effect=_update_org_name)
 
 
 @pytest.fixture(scope='function')
