@@ -96,6 +96,10 @@ upload-static:
 test: ## Run tests
 	./scripts/run_tests.sh
 
+.PHONY: fix-imports
+fix-imports:
+	isort -rc ./app ./tests
+
 .PHONY: freeze-requirements
 freeze-requirements:
 	rm -rf venv-freeze
