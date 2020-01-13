@@ -241,11 +241,19 @@ def uploaded_letter_preview(service_id, file_id):
 @main.route("/services/<uuid:service_id>/preview-letter-image/<uuid:file_id>")
 @user_has_permissions('send_messages')
 def view_letter_upload_as_preview(service_id, file_id):
+
+    try:
+        page = int(request.args.get('page'))
+    except ValueError:
+        abort(400)
+
     pdf_file, metadata = get_letter_pdf_and_metadata(service_id, file_id)
+    invalid_pages = json.loads(metadata.get('invalid_pages', '[]'))
 
-    page = request.args.get('page')
-
-    if metadata.get('message') == 'content-outside-printable-area':
+    if (
+        metadata.get('message') == 'content-outside-printable-area' and
+        page in invalid_pages
+    ):
         return TemplatePreview.from_invalid_pdf_file(pdf_file, page)
     else:
         return TemplatePreview.from_valid_pdf_file(pdf_file, page)
