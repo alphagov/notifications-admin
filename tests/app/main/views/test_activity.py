@@ -271,7 +271,8 @@ def test_letters_with_status_virus_scan_failed_shows_a_failure_description(
     mock_get_service_data_retention,
     mock_get_api_keys,
 ):
-    notifications = create_notifications(template_type='letter', status='virus-scan-failed', is_precompiled_letter=True)
+    notifications = create_notifications(template_type='letter', status='virus-scan-failed', is_precompiled_letter=True,
+                                         client_reference='client reference')
     mocker.patch('app.notification_api_client.get_notifications_for_service', return_value=notifications)
 
     page = client_request.get(
@@ -297,7 +298,8 @@ def test_should_not_show_preview_link_for_precompiled_letters_in_virus_states(
     mock_get_no_api_keys,
     letter_status,
 ):
-    notifications = create_notifications(template_type='letter', status=letter_status)
+    notifications = create_notifications(template_type='letter', status=letter_status,
+                                         is_precompiled_letter=True, client_reference='ref')
     mocker.patch('app.notification_api_client.get_notifications_for_service', return_value=notifications)
 
     page = client_request.get(
@@ -692,11 +694,11 @@ def test_sending_status_hint_displays_correctly_on_notifications_page(
     assert bool(page.select('.align-with-message-body')) is single_line
 
 
-@pytest.mark.parametrize("is_precompiled_letter,expected_hint", [
-    (True, "Provided as PDF"),
-    (False, "template subject")
+@pytest.mark.parametrize("is_precompiled_letter,expected_address,expected_hint", [
+    (True, "Full Name,\nFirst address line\npostcode", "ref"),
+    (False, "Full Name,\nFirst address line\npostcode", "template subject")
 ])
-def test_should_expected_hint_for_letters(
+def test_should_show_address_and_hint_for_letters(
     client_request,
     service_one,
     mock_get_service_statistics,
@@ -704,12 +706,15 @@ def test_should_expected_hint_for_letters(
     mock_get_no_api_keys,
     mocker,
     is_precompiled_letter,
+    expected_address,
     expected_hint
 ):
     notifications = create_notifications(
         template_type='letter',
         subject=expected_hint,
         is_precompiled_letter=is_precompiled_letter,
+        client_reference=expected_hint,
+        to=expected_address
     )
     mocker.patch('app.notification_api_client.get_notifications_for_service', return_value=notifications)
 
@@ -719,4 +724,5 @@ def test_should_expected_hint_for_letters(
         message_type='letter',
     )
 
+    assert page.select_one('a.file-list-filename').text == 'Full Name'
     assert page.find('p', {'class': 'file-list-hint'}).text.strip() == expected_hint

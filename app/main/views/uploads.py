@@ -1,5 +1,6 @@
 import base64
 import json
+import urllib
 import uuid
 from io import BytesIO
 
@@ -168,6 +169,25 @@ def _get_error_from_upload_form(form_errors):
     return error
 
 
+def format_recipient(address):
+    '''
+    To format the recipient we need to:
+        - decode, address is url encoded
+        - remove new line characters
+        - remove whitespace around the lines
+        - join the address lines, separated by a comma
+    '''
+    if not address:
+        return address
+    address = urllib.parse.unquote(address)
+    stripped_address_lines_no_trailing_commas = [
+        line.lstrip().rstrip(' ,')
+        for line in address.splitlines() if line
+    ]
+    one_line_address = ', '.join(stripped_address_lines_no_trailing_commas)
+    return one_line_address
+
+
 @main.route("/services/<uuid:service_id>/preview-letter/<uuid:file_id>")
 @user_has_permissions('send_messages')
 def uploaded_letter_preview(service_id, file_id):
@@ -179,7 +199,7 @@ def uploaded_letter_preview(service_id, file_id):
     status = metadata.get('status')
     error_shortcode = metadata.get('message')
     invalid_pages = metadata.get('invalid_pages')
-    recipient = metadata.get('recipient')
+    recipient = format_recipient(metadata.get('recipient', ''))
 
     if invalid_pages:
         invalid_pages = json.loads(invalid_pages)
@@ -246,11 +266,12 @@ def send_uploaded_letter(service_id):
     postage = form.postage.data
     metadata = get_letter_metadata(service_id, file_id)
     filename = metadata.get('filename')
+    recipient_address = metadata.get('recipient')
 
     if metadata.get('status') != 'valid':
         abort(403)
 
-    notification_api_client.send_precompiled_letter(service_id, filename, file_id, postage)
+    notification_api_client.send_precompiled_letter(service_id, filename, file_id, postage, recipient_address)
 
     return redirect(url_for(
         '.view_notification',

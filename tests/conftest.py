@@ -3711,6 +3711,7 @@ def create_notifications(
     redact_personalisation=False,
     is_precompiled_letter=False,
     postage=None,
+    to=None
 ):
     template = template_json(
         service_id,
@@ -3731,7 +3732,8 @@ def create_notifications(
         client_reference=client_reference,
         status=status,
         created_by_name='Firstname Lastname',
-        postage=postage
+        postage=postage,
+        to=to
     )
 
 
