@@ -2880,14 +2880,6 @@ def mock_create_service_inbound_api(mocker):
 
 
 @pytest.fixture(scope='function')
-def mock_delete_service_inbound_api(mocker):
-    return mocker.patch(
-        'app.service_api_client.delete_service_callback_api',
-        side_effect=lambda service_id: None
-    )
-
-
-@pytest.fixture(scope='function')
 def mock_update_service_inbound_api(mocker):
     def _update_service_inbound_api(service_id, url, bearer_token, user_id, inbound_api_id):
         return
