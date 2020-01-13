@@ -21,6 +21,10 @@ def test_non_logged_in_user_can_see_homepage(
         'Send emails, text messages and letters to your users'
     )
 
+    assert page.select_one('a[role=button][draggable=false]')['href'] == url_for(
+        'main.register'
+    )
+
     assert page.select_one('meta[name=description]')['content'].strip() == (
         'GOV.UK Notify lets you send emails, text messages and letters '
         'to your users. Try it now if you work in central government, a '
