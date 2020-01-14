@@ -21,6 +21,13 @@ describe("Cookie message", () => {
 
   beforeAll(() => {
 
+    const cookieMessageStyles = document.createElement('style');
+
+    // add the CSS that hides the cookie message by default
+    cookieMessageStyles.textContent = '.notify-cookie-banner { display: none; }';
+    document.getElementsByTagName('head')[0].appendChild(cookieMessageStyles);
+
+    // protect against any previous tests setting a cookies-policy cookie
     helpers.deleteCookie('cookies-policy');
 
   });
