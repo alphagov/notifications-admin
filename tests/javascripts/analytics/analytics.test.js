@@ -30,7 +30,9 @@ describe("Analytics", () => {
       cookieDomain: 'auto',
       anonymizeIp: true,
       displayFeaturesTask: null,
-      transport: 'beacon'
+      transport: 'beacon',
+      name: 'GOVUK.analytics',
+      expires: 365
     });
 
   });
@@ -47,7 +49,7 @@ describe("Analytics", () => {
 
       setUpArguments = window.ga.mock.calls;
 
-      expect(setUpArguments[0]).toEqual(['create', 'UA-75215134-1', 'auto']);
+      expect(setUpArguments[0]).toEqual(['create', 'UA-75215134-1', 'auto', 'GOVUK.analytics', { 'cookieExpires': 31536000 }]);
       expect(setUpArguments[1]).toEqual(['set', 'anonymizeIp', true]);
       expect(setUpArguments[2]).toEqual(['set', 'displayFeaturesTask', null]);
       expect(setUpArguments[3]).toEqual(['set', 'transport', 'beacon']);
