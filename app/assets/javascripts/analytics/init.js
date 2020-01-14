@@ -25,7 +25,9 @@
         cookieDomain: 'auto',
         anonymizeIp: true,
         displayFeaturesTask: null,
-        transport: 'beacon'
+        transport: 'beacon',
+        name: 'GOVUK.analytics',
+        expires: 365
       });
 
       // Track initial pageview
