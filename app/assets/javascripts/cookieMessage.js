@@ -51,15 +51,10 @@ window.GOVUK.Modules = window.GOVUK.Modules || {};
     // Show the cookie banner if not in the cookie settings page
     if (!this.isInCookiesPage()) {
       var hasCookiesPolicy = window.GOVUK.cookie('cookies_policy');
-      var shouldHaveCookieMessage = (this.$module && !hasCookiesPolicy);
 
-      if (shouldHaveCookieMessage) {
+      if (this.$module && !hasCookiesPolicy) {
         this.$module.style.display = 'block';
-      } else {
-        this.$module.style.display = 'none';
       }
-    } else {
-      this.$module.style.display = 'none';
     }
   };
 

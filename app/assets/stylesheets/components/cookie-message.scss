@@ -11,23 +11,9 @@
   @include govuk-responsive-padding(5, "bottom");
 }
 
-.notify-cookie-banner__with-js {
+// component should only be shown if JS is available, by the cookieMessage JS, so hide by default
+.notify-cookie-banner {
   display: none;
-}
-
-.notify-cookie-banner__no-js {
-  display: block;
-}
-
-.js-enabled {
-  .notify-cookie-banner__no-js,
-  .notify-cookie-banner {
-    display: none; // shown with JS, always on for non-JS
-  }
-
-  .notify-cookie-banner__with-js {
-    display: block;
-  }
 }
 
 .notify-cookie-banner__buttons {
