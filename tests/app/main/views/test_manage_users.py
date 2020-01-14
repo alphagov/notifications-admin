@@ -1079,6 +1079,10 @@ def test_edit_user_email_redirects_to_confirmation(
             _external=True,
         ),
     )
+    with client_request.session_transaction() as session:
+        assert session[
+            'team_member_email_change-{}'.format(active_user_with_permissions['id'])
+        ] == 'test@user.gov.uk'
 
 
 def test_edit_user_email_without_changing_goes_back_to_team_members(
@@ -1179,6 +1183,8 @@ def test_edit_user_email_cannot_change_a_gov_email_address_to_a_non_gov_email_ad
         _expected_status=200,
     )
     assert 'Enter a government email address.' in page.find('span', class_='error-message').text
+    with client_request.session_transaction() as session:
+        assert 'team_member_email_change-'.format(active_user_with_permissions['id']) not in session
 
 
 def test_confirm_edit_user_email_page(
@@ -1189,7 +1195,9 @@ def test_confirm_edit_user_email_page(
 ):
     new_email = 'new_email@gov.uk'
     with client_request.session_transaction() as session:
-        session['team_member_email_change'] = new_email
+        session[
+            'team_member_email_change-{}'.format(active_user_with_permissions['id'])
+        ] = new_email
 
     page = client_request.get(
         'main.confirm_edit_user_email',
@@ -1253,7 +1261,9 @@ def test_confirm_edit_user_email_changes_user_email(
 
     new_email = 'new_email@gov.uk'
     with client_request.session_transaction() as session:
-        session['team_member_email_change'] = new_email
+        session[
+            'team_member_email_change-{}'.format(api_user_active['id'])
+        ] = new_email
 
     client_request.post(
         'main.confirm_edit_user_email',

@@ -144,6 +144,7 @@ def remove_user_from_service(service_id, user_id):
 def edit_user_email(service_id, user_id):
     user = current_service.get_team_member(user_id)
     user_email = user.email_address
+    session_key = 'team_member_email_change-{}'.format(user_id)
 
     if is_gov_user(user_email):
         form = ChangeEmailForm(User.already_registered, email_address=user_email)
@@ -154,7 +155,7 @@ def edit_user_email(service_id, user_id):
         return redirect(url_for('.manage_users', service_id=current_service.id))
 
     if form.validate_on_submit():
-        session['team_member_email_change'] = form.email_address.data
+        session[session_key] = form.email_address.data
 
         return redirect(url_for('.confirm_edit_user_email', user_id=user.id, service_id=service_id))
 
@@ -170,8 +171,9 @@ def edit_user_email(service_id, user_id):
 @user_has_permissions('manage_service')
 def confirm_edit_user_email(service_id, user_id):
     user = current_service.get_team_member(user_id)
-    if 'team_member_email_change' in session:
-        new_email = session['team_member_email_change']
+    session_key = 'team_member_email_change-{}'.format(user_id)
+    if session_key in session:
+        new_email = session[session_key]
     else:
         return redirect(url_for(
             '.edit_user_email',
@@ -186,7 +188,7 @@ def confirm_edit_user_email(service_id, user_id):
         else:
             create_email_change_event(user.id, current_user.id, user.email_address, new_email)
         finally:
-            session.pop('team_member_email_change', None)
+            session.pop(session_key, None)
 
         return redirect(url_for(
             '.manage_users',
