@@ -552,8 +552,11 @@ def test_should_not_show_recent_templates_on_dashboard_if_only_one_template_used
     # count appears as total, but not per template
     expected_count = stats[0]['count']
     assert expected_count == 50
-    assert main.count(str(expected_count)) == 1
-    assert '50 text messages sent' in normalize_spaces(main)
+    assert normalize_spaces(
+        page.select_one('#total-sms .big-number').text
+    ) == (
+        '{} text messages sent'.format(expected_count)
+    )
 
 
 @freeze_time("2016-07-01 12:00")  # 4 months into 2016 financial year
