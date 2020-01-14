@@ -409,25 +409,52 @@ def test_uploaded_letter_preview_does_not_show_send_button_if_service_in_trial_m
     assert not page.find('button', {'type': 'submit'})
 
 
-def test_uploaded_letter_preview_image_shows_overlay_when_content_outside_printable_area(
+@pytest.mark.parametrize('invalid_pages, page_requested, overlay_expected', (
+    ('[1, 2]', 1, True),
+    ('[1, 2]', 2, True),
+    ('[1, 2]', 3, False),
+    ('[]', 1, False),
+))
+def test_uploaded_letter_preview_image_shows_overlay_when_content_outside_printable_area_on_a_page(
     mocker,
     logged_in_client,
     mock_get_service,
     fake_uuid,
+    invalid_pages,
+    page_requested,
+    overlay_expected,
 ):
     mocker.patch(
         'app.main.views.uploads.get_letter_pdf_and_metadata',
-        return_value=('pdf_file', {'message': 'content-outside-printable-area'})
+        return_value=('pdf_file', {
+            'message': 'content-outside-printable-area',
+            'invalid_pages': invalid_pages,
+        })
     )
-    template_preview_mock = mocker.patch(
+    template_preview_mock_valid = mocker.patch(
+        'app.main.views.uploads.TemplatePreview.from_valid_pdf_file',
+        return_value=make_response('page.html', 200)
+    )
+    template_preview_mock_invalid = mocker.patch(
         'app.main.views.uploads.TemplatePreview.from_invalid_pdf_file',
-        return_value=make_response('page.html', 200))
+        return_value=make_response('page.html', 200)
+    )
 
     logged_in_client.get(
-        url_for('main.view_letter_upload_as_preview', file_id=fake_uuid, service_id=SERVICE_ONE_ID, page=1)
+        url_for(
+            'main.view_letter_upload_as_preview',
+            file_id=fake_uuid,
+            service_id=SERVICE_ONE_ID,
+            page=page_requested,
+        )
     )
 
-    template_preview_mock.assert_called_once_with('pdf_file', '1')
+    if overlay_expected:
+        template_preview_mock_invalid.assert_called_once_with('pdf_file', page_requested)
+        assert template_preview_mock_valid.called is False
+    else:
+        template_preview_mock_valid.assert_called_once_with('pdf_file', page_requested)
+        assert template_preview_mock_invalid.called is False
 
 
 @pytest.mark.parametrize(
@@ -456,7 +483,20 @@ def test_uploaded_letter_preview_image_does_not_show_overlay_if_no_content_outsi
         url_for('main.view_letter_upload_as_preview', file_id=fake_uuid, service_id=SERVICE_ONE_ID, page=1)
     )
 
-    template_preview_mock.assert_called_once_with('pdf_file', '1')
+    template_preview_mock.assert_called_once_with('pdf_file', 1)
+
+
+def test_uploaded_letter_preview_image_400s_for_bad_page_type(
+    client_request,
+    fake_uuid,
+):
+    client_request.get(
+        'main.view_letter_upload_as_preview',
+        file_id=fake_uuid,
+        service_id=SERVICE_ONE_ID,
+        page='foo',
+        _expected_status=400,
+    )
 
 
 def test_send_uploaded_letter_sends_letter_and_redirects_to_notification_page(mocker, service_one, client_request):
