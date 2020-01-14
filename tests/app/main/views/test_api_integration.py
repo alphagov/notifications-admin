@@ -1,7 +1,6 @@
 import uuid
 from collections import OrderedDict
 from unittest.mock import call
-from uuid import uuid4
 
 import pytest
 from flask import url_for
@@ -9,14 +8,7 @@ from flask import url_for
 from tests import sample_uuid, validate_route_permission
 from tests.conftest import (
     SERVICE_ONE_ID,
-    mock_get_empty_service_callback_api,
-    mock_get_empty_service_inbound_api,
-    mock_get_live_service,
-    mock_get_notifications,
-    mock_get_service,
-    mock_get_service_with_letters,
-    mock_get_valid_service_callback_api,
-    mock_get_valid_service_inbound_api,
+    create_notifications,
     normalize_spaces,
 )
 
@@ -81,13 +73,13 @@ def test_should_show_api_page_with_no_notifications(
 ])
 def test_letter_notifications_should_have_link_to_view_letter(
     client_request,
-    api_user_active,
     mock_has_permissions,
     mocker,
     template_type,
     link_text,
 ):
-    mock_get_notifications(mocker, api_user_active, diff_template_type=template_type)
+    notifications = create_notifications(template_type=template_type)
+    mocker.patch('app.notification_api_client.get_notifications_for_service', return_value=notifications)
     page = client_request.get(
         'main.api_integration',
         service_id=SERVICE_ONE_ID,
@@ -101,13 +93,13 @@ def test_letter_notifications_should_have_link_to_view_letter(
 ])
 def test_should_not_have_link_to_view_letter_for_precompiled_letters_in_virus_states(
     client_request,
-    api_user_active,
     fake_uuid,
     mock_has_permissions,
     mocker,
     status
 ):
-    mock_get_notifications(mocker, api_user_active, noti_status=status)
+    notifications = create_notifications(status=status)
+    mocker.patch('app.notification_api_client.get_notifications_for_service', return_value=notifications)
 
     page = client_request.get(
         'main.api_integration',
@@ -123,14 +115,14 @@ def test_should_not_have_link_to_view_letter_for_precompiled_letters_in_virus_st
 ])
 def test_letter_notifications_should_show_client_reference(
     client_request,
-    api_user_active,
     fake_uuid,
     mock_has_permissions,
     mocker,
     client_reference,
     shows_ref
 ):
-    mock_get_notifications(mocker, api_user_active, client_reference=client_reference)
+    notifications = create_notifications(client_reference=client_reference)
+    mocker.patch('app.notification_api_client.get_notifications_for_service', return_value=notifications)
 
     page = client_request.get(
         'main.api_integration',
@@ -210,8 +202,8 @@ def test_should_show_api_keys_page(
     mock_get_api_keys.assert_called_once_with(SERVICE_ONE_ID)
 
 
-@pytest.mark.parametrize('service_mock, expected_options', [
-    (mock_get_service, [
+@pytest.mark.parametrize('restricted, can_send_letters, expected_options', [
+    (True, False, [
         (
             'Live – sends to anyone '
             'Not available because your service is in trial mode'
@@ -219,12 +211,12 @@ def test_should_show_api_keys_page(
         'Team and whitelist – limits who you can send to',
         'Test – pretends to send messages',
     ]),
-    (mock_get_live_service, [
+    (False, False, [
         'Live – sends to anyone',
         'Team and whitelist – limits who you can send to',
         'Test – pretends to send messages',
     ]),
-    (mock_get_service_with_letters, [
+    (False, True, [
         'Live – sends to anyone',
         (
             'Team and whitelist – limits who you can send to '
@@ -238,10 +230,16 @@ def test_should_show_create_api_key_page(
     mocker,
     api_user_active,
     mock_get_api_keys,
-    service_mock,
+    restricted,
+    can_send_letters,
     expected_options,
+    service_one,
 ):
-    service_mock(mocker, api_user_active)
+    service_one['restricted'] = restricted
+    if can_send_letters:
+        service_one['permissions'].append('letter')
+
+    mocker.patch('app.service_api_client.get_service', return_value={'data': service_one})
 
     page = client_request.get('main.create_api_key', service_id=SERVICE_ONE_ID)
 
@@ -519,16 +517,6 @@ def test_callback_forms_validation(
     assert error_msgs == expected_errors
 
 
-@pytest.mark.parametrize('existing_values, callback_ids, delete_should_be_called', [
-    ((
-        mock_get_valid_service_callback_api,
-        mock_get_valid_service_inbound_api,
-    ), [uuid4()], True),
-    ((
-        mock_get_empty_service_callback_api,
-        mock_get_empty_service_inbound_api,
-    ), [], False),
-])
 @pytest.mark.parametrize('bearer_token', ['', 'some-bearer-token'])
 @pytest.mark.parametrize('endpoint, expected_delete_url', [
     (
@@ -543,22 +531,18 @@ def test_callback_forms_validation(
 def test_callback_forms_can_be_cleared(
     client_request,
     service_one,
-    existing_values,
-    callback_ids,
-    delete_should_be_called,
     endpoint,
     expected_delete_url,
     bearer_token,
     mocker,
+    fake_uuid,
+    mock_get_valid_service_callback_api,
+    mock_get_valid_service_inbound_api,
 ):
-
-    service_one['service_callback_api'] = callback_ids
-    service_one['inbound_api'] = callback_ids
-    mocked_delete = mocker.patch('app.service_api_client.delete')
-    for mock_get_callback in existing_values:
-        mock_get_callback(mocker)
-
+    service_one['service_callback_api'] = [fake_uuid]
+    service_one['inbound_api'] = [fake_uuid]
     service_one['permissions'] = ['inbound_sms']
+    mocked_delete = mocker.patch('app.service_api_client.delete')
 
     page = client_request.post(
         endpoint,
@@ -576,14 +560,53 @@ def test_callback_forms_can_be_cleared(
 
     assert not page.select(".error-message")
 
-    if delete_should_be_called:
-        mocked_delete.assert_called_once_with(
-            expected_delete_url.format(
-                service_one['id'], callback_ids[0]
-            )
+    mocked_delete.assert_called_once_with(
+        expected_delete_url.format(
+            service_one['id'], fake_uuid
         )
-    else:
-        assert mocked_delete.call_args_list == []
+    )
+
+
+@pytest.mark.parametrize('bearer_token', ['', 'some-bearer-token'])
+@pytest.mark.parametrize('endpoint, expected_delete_url', [
+    (
+        'main.delivery_status_callback',
+        '/service/{}/delivery-receipt-api/{}',
+    ),
+    (
+        'main.received_text_messages_callback',
+        '/service/{}/inbound-api/{}',
+    ),
+])
+def test_callback_forms_can_be_cleared_when_callback_and_inbound_apis_are_empty(
+    client_request,
+    service_one,
+    endpoint,
+    expected_delete_url,
+    bearer_token,
+    mocker,
+    mock_get_empty_service_callback_api,
+    mock_get_empty_service_inbound_api,
+):
+    service_one['permissions'] = ['inbound_sms']
+    mocked_delete = mocker.patch('app.service_api_client.delete')
+
+    page = client_request.post(
+        endpoint,
+        service_id=service_one['id'],
+        _data={
+            'url': '',
+            'bearer_token': bearer_token,
+        },
+        _expected_redirect=url_for(
+            'main.api_callbacks',
+            service_id=service_one['id'],
+            _external=True,
+        )
+    )
+
+    assert not page.select(".error-message")
+    assert mocked_delete.call_args_list == []
 
 
 @pytest.mark.parametrize('has_inbound_sms, expected_link', [
@@ -696,28 +719,14 @@ def test_create_delivery_status_and_receive_text_message_callbacks(
         )
 
 
-@pytest.mark.parametrize('endpoint, fixture', [
-    ('main.delivery_status_callback', mock_get_valid_service_callback_api),
-    ('main.received_text_messages_callback', mock_get_valid_service_inbound_api),
-])
-def test_update_delivery_status_and_receive_text_message_callbacks(
+def test_update_delivery_status_callback_details(
     client_request,
     service_one,
-    mocker,
-    mock_get_notifications,
-    mock_update_service_inbound_api,
     mock_update_service_callback_api,
-    endpoint,
-    fixture,
+    mock_get_valid_service_callback_api,
     fake_uuid,
 ):
-    if endpoint == 'main.received_text_messages_callback':
-        service_one['inbound_api'] = [fake_uuid]
-        service_one['permissions'] = ['inbound_sms']
-    else:
-        service_one['service_callback_api'] = [fake_uuid]
-
-    fixture(mocker)
+    service_one['service_callback_api'] = [fake_uuid]
 
     data = {
         'url': "https://test.url.com/",
@@ -726,73 +735,88 @@ def test_update_delivery_status_and_receive_text_message_callbacks(
     }
 
     client_request.post(
-        endpoint,
+        'main.delivery_status_callback',
         service_id=service_one['id'],
         _data=data,
     )
 
-    if endpoint == 'main.received_text_messages_callback':
-        mock_update_service_inbound_api.assert_called_once_with(
-            service_one['id'],
-            url="https://test.url.com/",
-            bearer_token="1234567890",
-            user_id=fake_uuid,
-            inbound_api_id=fake_uuid,
-        )
-    else:
-        mock_update_service_callback_api.assert_called_once_with(
-            service_one['id'],
-            url="https://test.url.com/",
-            bearer_token="1234567890",
-            user_id=fake_uuid,
-            callback_api_id=fake_uuid
-        )
+    mock_update_service_callback_api.assert_called_once_with(
+        service_one['id'],
+        url="https://test.url.com/",
+        bearer_token="1234567890",
+        user_id=fake_uuid,
+        callback_api_id=fake_uuid
+    )
 
 
-@pytest.mark.parametrize('endpoint, data, fixture', [
-    (
-        'main.delivery_status_callback',
-        {"url": "https://hello2.gov.uk", "bearer_token": "bearer_token_set"},
-        mock_get_valid_service_callback_api
-    ),
-    (
-        'main.received_text_messages_callback',
-        {"url": "https://hello3.gov.uk", "bearer_token": "bearer_token_set"},
-        mock_get_valid_service_inbound_api
-    ),
-])
-def test_update_delivery_status_and_receive_text_message_callbacks_without_changes_do_not_update(
+def test_update_receive_text_message_callback_details(
     client_request,
     service_one,
-    mocker,
-    mock_get_notifications,
-    mock_update_service_callback_api,
     mock_update_service_inbound_api,
-    data,
-    fixture,
-    endpoint,
+    mock_get_valid_service_inbound_api,
     fake_uuid,
 ):
-    if endpoint == 'main.received_text_messages_callback':
-        service_one['inbound_api'] = [fake_uuid]
-        service_one['permissions'] = ['inbound_sms']
-    else:
-        service_one['service_callback_api'] = [fake_uuid]
+    service_one['inbound_api'] = [fake_uuid]
+    service_one['permissions'] = ['inbound_sms']
 
-    fixture(mocker)
-
-    data['user_id'] = fake_uuid
+    data = {
+        'url': "https://test.url.com/",
+        'bearer_token': '1234567890',
+        'user_id': fake_uuid
+    }
 
     client_request.post(
-        endpoint,
+        'main.received_text_messages_callback',
         service_id=service_one['id'],
         _data=data,
     )
 
-    if endpoint == 'main.received_text_messages_callback':
-        assert mock_update_service_inbound_api.called is False
-    else:
-        assert mock_update_service_callback_api.called is False
+    mock_update_service_inbound_api.assert_called_once_with(
+        service_one['id'],
+        url="https://test.url.com/",
+        bearer_token="1234567890",
+        user_id=fake_uuid,
+        inbound_api_id=fake_uuid,
+    )
+
+
+def test_update_delivery_status_callback_without_changes_does_not_update(
+    client_request,
+    service_one,
+    mock_update_service_callback_api,
+    fake_uuid,
+    mock_get_valid_service_callback_api,
+):
+    service_one['service_callback_api'] = [fake_uuid]
+    data = {"user_id": fake_uuid, "url": "https://hello2.gov.uk", "bearer_token": "bearer_token_set"}
+
+    client_request.post(
+        'main.delivery_status_callback',
+        service_id=service_one['id'],
+        _data=data,
+    )
+
+    assert mock_update_service_callback_api.called is False
+
+
+def test_update_receive_text_message_callback_without_changes_does_not_update(
+    client_request,
+    service_one,
+    mock_update_service_inbound_api,
+    fake_uuid,
+    mock_get_valid_service_inbound_api,
+):
+    service_one['inbound_api'] = [fake_uuid]
+    service_one['permissions'] = ['inbound_sms']
+    data = {"user_id": fake_uuid, "url": "https://hello3.gov.uk", "bearer_token": "bearer_token_set"}
+
+    client_request.post(
+        'main.received_text_messages_callback',
+        service_id=service_one['id'],
+        _data=data,
+    )
+
+    assert mock_update_service_inbound_api.called is False
 
 
 @pytest.mark.parametrize('service_callback_api, delivery_url, expected_1st_table_row', [

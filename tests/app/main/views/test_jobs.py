@@ -11,8 +11,8 @@ from tests.conftest import (
     SERVICE_ONE_ID,
     create_active_caseworking_user,
     create_active_user_with_permissions,
-    mock_get_notifications,
-    mock_get_service_letter_template,
+    create_notifications,
+    create_template,
     normalize_spaces,
 )
 
@@ -294,7 +294,63 @@ def test_should_show_job_in_progress(
         service_id=service_one['id'],
         job_id=fake_uuid,
     )
-    assert page.find('p', {'class': 'hint'}).text.strip() == 'Report is 50% complete…'
+    assert [
+        normalize_spaces(link.text)
+        for link in page.select('.pill a')
+    ] == [
+        '10 sending', '0 delivered', '0 failed'
+    ]
+    assert page.select_one('p.hint').text.strip() == 'Report is 50% complete…'
+
+
+def test_should_show_job_without_notifications(
+    client_request,
+    service_one,
+    active_user_with_permissions,
+    mock_get_service_template,
+    mock_get_job_in_progress,
+    mocker,
+    mock_get_notifications_with_no_notifications,
+    mock_get_service_data_retention,
+    fake_uuid,
+):
+    page = client_request.get(
+        'main.view_job',
+        service_id=service_one['id'],
+        job_id=fake_uuid,
+    )
+    assert [
+        normalize_spaces(link.text)
+        for link in page.select('.pill a')
+    ] == [
+        '10 sending', '0 delivered', '0 failed'
+    ]
+    assert page.select_one('p.hint').text.strip() == 'Report is 50% complete…'
+    assert page.select_one('tbody').text.strip() == 'No messages to show yet…'
+
+
+def test_should_show_old_job(
+    client_request,
+    service_one,
+    active_user_with_permissions,
+    mock_get_service_template,
+    mock_get_job,
+    mocker,
+    mock_get_notifications_with_no_notifications,
+    mock_get_service_data_retention,
+    fake_uuid,
+):
+    page = client_request.get(
+        'main.view_job',
+        service_id=service_one['id'],
+        job_id=fake_uuid,
+    )
+    assert not page.select('.pill a')
+    assert not page.select('p.hint')
+    assert not page.select('a[download]')
+    assert page.select_one('tbody').text.strip() == (
+        'These messages have been deleted because they were sent more than 7 days ago'
+    )
 
 
 @freeze_time("2016-01-01 11:09:00.061258")
@@ -304,11 +360,13 @@ def test_should_show_letter_job(
     mock_get_job,
     mock_get_service_data_retention,
     fake_uuid,
-    active_user_with_permissions,
     mocker,
 ):
-
-    get_notifications = mock_get_notifications(mocker, active_user_with_permissions, diff_template_type='letter')
+    notifications = create_notifications(template_type='letter', subject='template subject')
+    get_notifications = mocker.patch(
+        'app.notification_api_client.get_notifications_for_service',
+        return_value=notifications,
+    )
 
     page = client_request.get(
         'main.view_job',
@@ -329,7 +387,11 @@ def test_should_show_letter_job(
     assert normalize_spaces(page.select('.keyline-block')[1].text) == (
         '6 January Estimated delivery date'
     )
-    assert page.select('[download=download]') == []
+    assert page.select_one('a[download]')['href'] == url_for(
+        'main.view_job_csv',
+        service_id=SERVICE_ONE_ID,
+        job_id=fake_uuid,
+    )
     assert page.select('.hint') == []
 
     get_notifications.assert_called_with(
@@ -682,15 +744,10 @@ def test_should_show_letter_job_with_first_class_if_notifications_are_first_clas
     mock_get_job,
     mock_get_service_data_retention,
     fake_uuid,
-    active_user_with_permissions,
     mocker,
 ):
-    mock_get_notifications(
-        mocker,
-        active_user_with_permissions,
-        diff_template_type='letter',
-        postage='first'
-    )
+    notifications = create_notifications(template_type='letter', postage='first')
+    mocker.patch('app.notification_api_client.get_notifications_for_service', return_value=notifications)
 
     page = client_request.get(
         'main.view_job',
@@ -711,8 +768,10 @@ def test_should_show_letter_job_with_first_class_if_no_notifications(
     mock_get_service_data_retention,
     mocker
 ):
-
-    mock_get_service_letter_template(mocker, postage="first")
+    mocker.patch(
+        'app.service_api_client.get_service_template',
+        return_value={'data': create_template(template_type='letter', postage='first')}
+    )
 
     page = client_request.get(
         'main.view_job',

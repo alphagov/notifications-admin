@@ -27,8 +27,6 @@ from tests.conftest import (
     SERVICE_ONE_ID,
     create_active_caseworking_user,
     create_active_user_view_permissions,
-    mock_get_inbound_sms_summary,
-    mock_get_inbound_sms_summary_with_no_messages,
     normalize_spaces,
 )
 
@@ -207,11 +205,7 @@ def test_inbound_messages_not_visible_to_service_without_permissions(
     assert mock_get_inbound_sms_summary.called is False
 
 
-@pytest.mark.parametrize('inbound_summary_mock, expected_text', [
-    (mock_get_inbound_sms_summary_with_no_messages, '0 text messages received'),
-    (mock_get_inbound_sms_summary, '99 text messages received latest message just now'),
-])
-def test_inbound_messages_shows_count_of_messages(
+def test_inbound_messages_shows_count_of_messages_when_there_are_messages(
     client_request,
     mocker,
     service_one,
@@ -221,19 +215,41 @@ def test_inbound_messages_shows_count_of_messages(
     mock_get_template_statistics,
     mock_get_usage,
     mock_get_free_sms_fragment_limit,
-    inbound_summary_mock,
-    expected_text
+    mock_get_inbound_sms_summary,
 ):
-
     service_one['permissions'] = ['inbound_sms']
-    inbound_summary_mock(mocker)
-
     page = client_request.get(
         'main.service_dashboard',
         service_id=SERVICE_ONE_ID,
     )
 
-    assert normalize_spaces(page.select('.big-number-meta-wrapper')[0].text) == expected_text
+    assert normalize_spaces(
+        page.select('.big-number-meta-wrapper')[0].text
+    ) == '99 text messages received latest message just now'
+    assert page.select('.big-number-meta-wrapper a')[0]['href'] == url_for(
+        'main.inbox', service_id=SERVICE_ONE_ID
+    )
+
+
+def test_inbound_messages_shows_count_of_messages_when_there_are_no_messages(
+    client_request,
+    mocker,
+    service_one,
+    mock_get_service_templates_when_no_templates_exist,
+    mock_get_jobs,
+    mock_get_service_statistics,
+    mock_get_template_statistics,
+    mock_get_usage,
+    mock_get_free_sms_fragment_limit,
+    mock_get_inbound_sms_summary_with_no_messages,
+):
+    service_one['permissions'] = ['inbound_sms']
+    page = client_request.get(
+        'main.service_dashboard',
+        service_id=SERVICE_ONE_ID,
+    )
+
+    assert normalize_spaces(page.select('.big-number-meta-wrapper')[0].text) == '0 text messages received'
     assert page.select('.big-number-meta-wrapper a')[0]['href'] == url_for(
         'main.inbox', service_id=SERVICE_ONE_ID
     )

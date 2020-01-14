@@ -72,6 +72,8 @@ class Config(object):
     ACTIVITY_STATS_LIMIT_DAYS = 7
     TEST_MESSAGE_FILENAME = 'Report'
 
+    REPLY_TO_EMAIL_ADDRESS_VALIDATION_TIMEOUT = 45
+
     NOTIFY_ENVIRONMENT = 'development'
     LOGO_UPLOAD_BUCKET_NAME = 'public-logos-local'
     MOU_BUCKET_NAME = 'local-mou'
@@ -146,6 +148,9 @@ class Preview(Config):
     CHECK_PROXY_HEADER = False
     ASSET_DOMAIN = 'static.notify.works'
     ASSET_PATH = 'https://static.notify.works/'
+
+    # On preview, extend the validation timeout to allow more leniency when running functional tests
+    REPLY_TO_EMAIL_ADDRESS_VALIDATION_TIMEOUT = 120
 
 
 class Staging(Config):

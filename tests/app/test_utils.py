@@ -55,6 +55,7 @@ def _get_notifications_csv(
                 "row_number": row_number + i,
                 "to": recipient,
                 "recipient": recipient,
+                "client_reference": 'ref 1234',
                 "template_name": template_name,
                 "template_type": template_type,
                 "template": {"name": template_name, "template_type": template_type},
@@ -79,7 +80,6 @@ def _get_notifications_csv(
 def _get_notifications_csv_mock(
     mocker,
     api_user_active,
-    job_id=fake_uuid
 ):
     return mocker.patch(
         'app.notification_api_client.get_notifications_for_service',
@@ -161,14 +161,14 @@ def test_spreadsheet_checks_for_bad_arguments(args, kwargs):
 @pytest.mark.parametrize('created_by_name, expected_content', [
     (
         None, [
-            'Recipient,Template,Type,Sent by,Sent by email,Job,Status,Time\n',
-            'foo@bar.com,foo,sms,,sender@email.gov.uk,,Delivered,1943-04-19 12:00:00\r\n',
+            'Recipient,Reference,Template,Type,Sent by,Sent by email,Job,Status,Time\n',
+            'foo@bar.com,ref 1234,foo,sms,,sender@email.gov.uk,,Delivered,1943-04-19 12:00:00\r\n',
         ]
     ),
     (
         'Anne Example', [
-            'Recipient,Template,Type,Sent by,Sent by email,Job,Status,Time\n',
-            'foo@bar.com,foo,sms,Anne Example,sender@email.gov.uk,,Delivered,1943-04-19 12:00:00\r\n',
+            'Recipient,Reference,Template,Type,Sent by,Sent by email,Job,Status,Time\n',
+            'foo@bar.com,ref 1234,foo,sms,Anne Example,sender@email.gov.uk,,Delivered,1943-04-19 12:00:00\r\n',
         ]
     ),
 ])
@@ -184,7 +184,7 @@ def test_generate_notifications_csv_without_job(
             created_by_name=created_by_name,
             created_by_email_address="sender@email.gov.uk",
             job_id=None,
-            job_name=None,
+            job_name=None
         )
     )
     assert list(generate_notifications_csv(service_id=fake_uuid)) == expected_content
@@ -414,14 +414,21 @@ def test_get_letter_validation_error_for_unknown_error():
 
 
 @pytest.mark.parametrize('error_message, expected_title, expected_content', [
-    ('letter-not-a4-portrait-oriented', 'We cannot print your letter', 'A4 portrait size on page 2'),
-    ('content-outside-printable-area', 'We cannot print your letter', 'outside the printable area on page 2'),
-    ('letter-too-long', 'Your letter is too long', 'letter is 13 pages long.')
+    ('letter-not-a4-portrait-oriented', 'Your letter is not A4 portrait size',
+     'You need to change the size or orientation of page 2. <br>Files must meet our '
+     '<a href="https://docs.notifications.service.gov.uk/documentation/images/notify-pdf-letter-spec-v2.4.pdf" '
+     'target="_blank">letter specification</a>.'),
+    ('content-outside-printable-area', 'Your content is outside the printable area',
+     'You need to edit page 2.<br>Files must meet our '
+     '<a href="https://docs.notifications.service.gov.uk/documentation/images/notify-pdf-letter-spec-v2.4.pdf" '
+     'target="_blank">letter specification</a>.'),
+    ('letter-too-long', 'Your letter is too long',
+     'Letters must be 10 pages or less. <br>Your letter is 13 pages long.')
 ])
 def test_get_letter_validation_error_for_known_errors(
-    error_message,
-    expected_title,
-    expected_content,
+        error_message,
+        expected_title,
+        expected_content,
 ):
     error = get_letter_validation_error(error_message, invalid_pages=[2], page_count=13)
 

@@ -1,9 +1,11 @@
+import urllib
 from unittest.mock import Mock
 
 import pytest
 from flask import make_response, url_for
 from requests import RequestException
 
+from app.main.views.uploads import format_recipient
 from app.utils import normalize_spaces
 from tests.conftest import SERVICE_ONE_ID
 
@@ -350,8 +352,11 @@ def test_uploaded_letter_preview(
     fake_uuid,
 ):
     mocker.patch('app.main.views.uploads.service_api_client')
+    recipient = 'Bugs Bunny\n123 Big Hole\rLooney Town'
     mocker.patch('app.main.views.uploads.get_letter_metadata', return_value={
-        'filename': 'my_letter.pdf', 'page_count': '1', 'status': 'valid'})
+        'filename': 'my_letter.pdf', 'page_count': '1', 'status': 'valid',
+        'recipient': urllib.parse.quote(recipient)
+        })
 
     service_one['restricted'] = False
     client_request.login(active_user_with_permissions, service=service_one)
@@ -455,7 +460,7 @@ def test_uploaded_letter_preview_image_does_not_show_overlay_if_no_content_outsi
 
 
 def test_send_uploaded_letter_sends_letter_and_redirects_to_notification_page(mocker, service_one, client_request):
-    metadata = {'filename': 'my_file.pdf', 'page_count': '1', 'status': 'valid'}
+    metadata = {'filename': 'my_file.pdf', 'page_count': '1', 'status': 'valid', 'recipient': 'address'}
 
     mocker.patch('app.main.views.uploads.get_letter_pdf_and_metadata', return_value=('file', metadata))
     mock_send = mocker.patch('app.main.views.uploads.notification_api_client.send_precompiled_letter')
@@ -475,7 +480,7 @@ def test_send_uploaded_letter_sends_letter_and_redirects_to_notification_page(mo
             _external=True
         )
     )
-    mock_send.assert_called_once_with(SERVICE_ONE_ID, 'my_file.pdf', file_id, 'first')
+    mock_send.assert_called_once_with(SERVICE_ONE_ID, 'my_file.pdf', file_id, 'first', 'address')
 
 
 @pytest.mark.parametrize('permissions', [
@@ -522,3 +527,15 @@ def test_send_uploaded_letter_when_metadata_states_pdf_is_invalid(mocker, servic
         _expected_status=403
     )
     assert not mock_send.called
+
+
+@pytest.mark.parametrize('original_address,expected_address', [
+    ('The Queen, Buckingham Palace, SW1 1AA', 'The Queen, Buckingham Palace, SW1 1AA'),
+    ('The Queen Buckingham Palace SW1 1AA', 'The Queen Buckingham Palace SW1 1AA'),
+    ('The Queen,\nBuckingham Palace,\r\nSW1 1AA', 'The Queen, Buckingham Palace, SW1 1AA'),
+    ('The Queen   ,,\nBuckingham Palace,\rSW1 1AA,', 'The Queen, Buckingham Palace, SW1 1AA'),
+    ('  The Queen\n Buckingham Palace\n SW1 1AA', 'The Queen, Buckingham Palace, SW1 1AA'),
+    ('', ''),
+])
+def test_format_recipient(original_address, expected_address):
+    assert format_recipient(urllib.parse.quote(original_address)) == expected_address

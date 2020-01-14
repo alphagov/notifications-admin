@@ -121,7 +121,8 @@
     "homepageUrl": url_for('main.show_accounts_or_dashboard'),
     "productName": "Notify",
     "navigation": navigation,
-    "navigationClasses": "govuk-header__navigation--end"
+    "navigationClasses": "govuk-header__navigation--end",
+    "assetsPath": asset_path + "images"
   }) }}
 {% endblock %}
 
@@ -159,6 +160,10 @@
             "text": "System status"
           },
           {
+            "href": "https://www.gov.uk/performance/govuk-notify",
+            "text": "Performance data"
+          },
+          {
             "href": "https://ukgovernmentdigital.slack.com/messages/C0E1ADVPC",
             "text": "Chat to us on Slack"
           }
@@ -183,10 +188,6 @@
           {
             "href": url_for("main.terms"),
             "text": "Terms of use"
-          },
-          {
-            "href": "https://www.gov.uk/performance/govuk-notify",
-            "text": "Performance"
           },
           {
             "href": "https://gds.blog.gov.uk/category/notify/",

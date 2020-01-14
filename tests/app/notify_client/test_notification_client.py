@@ -65,7 +65,8 @@ def test_send_precompiled_letter(mocker, logged_in_client, active_user_with_perm
         'abcd-1234',
         'my_file.pdf',
         'file-ID',
-        'second'
+        'second',
+        'Bugs Bunny, 12 Hole Avenue, Looney Town'
     )
     mock_post.assert_called_once_with(
         url='/service/abcd-1234/send-pdf-letter',
@@ -74,6 +75,7 @@ def test_send_precompiled_letter(mocker, logged_in_client, active_user_with_perm
             'file_id': 'file-ID',
             'created_by': active_user_with_permissions['id'],
             'postage': 'second',
+            'recipient_address': 'Bugs Bunny, 12 Hole Avenue, Looney Town',
         }
     )
 

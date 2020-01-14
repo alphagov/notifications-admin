@@ -150,6 +150,8 @@ def service_json(
         users = []
     if permissions is None:
         permissions = ['email', 'sms']
+    if service_callback_api is None:
+        service_callback_api = []
     if inbound_api is None:
         inbound_api = []
     return {

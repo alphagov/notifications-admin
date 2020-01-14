@@ -304,6 +304,42 @@ def test_notification_page_shows_page_for_letter_sent_with_test_key(
     assert page.select('p.notification-status') == []
 
 
+def test_notification_page_shows_validation_failed_precompiled_letter(
+    client_request,
+    mocker,
+    fake_uuid,
+):
+    notification = create_notification(template_type='letter',
+                                       notification_status='validation-failed',
+                                       is_precompiled_letter=True
+                                       )
+    mocker.patch('app.notification_api_client.get_notification', return_value=notification)
+    metadata = {"page_count": "1", "status": "validation-failed",
+                "invalid_pages": "[1]",
+                "message": "content-outside-printable-area"}
+    mocker.patch('app.main.views.notifications.view_letter_notification_as_preview',
+                 return_value=("some letter content", metadata))
+    mocker.patch(
+        'app.main.views.notifications.get_page_count_for_letter',
+        return_value=1,
+    )
+
+    page = client_request.get(
+        'main.view_notification',
+        service_id=SERVICE_ONE_ID,
+        notification_id=fake_uuid,
+    )
+
+    error_message = page.find('p', class_='notification-status-cancelled').text
+    assert normalize_spaces(error_message) == \
+        "Validation failed – Your content is outside the printable area. " \
+        "You need to edit page 1.Files must meet our letter specification."
+
+    assert not page.select('p.notification-status')
+
+    assert page.select_one('main img')['src'].endswith('.png?page=1')
+
+
 @pytest.mark.parametrize('notification_status, expected_message', (
     (
         'permanent-failure',
@@ -312,10 +348,6 @@ def test_notification_page_shows_page_for_letter_sent_with_test_key(
     (
         'cancelled',
         'Cancelled 1 January at 1:02am',
-    ),
-    (
-        'validation-failed',
-        'Validation failed.',
     ),
     (
         'technical-failure',
@@ -538,7 +570,7 @@ def test_should_show_preview_error_image_letter_notification_on_preview_error(
     assert response.get_data(as_text=True) == 'preview error image'
 
 
-def test_notifification_page_shows_error_message_if_precompiled_letter_cannot_be_opened(
+def test_notification_page_shows_error_message_if_precompiled_letter_cannot_be_opened(
     client_request,
     mocker,
     fake_uuid,
@@ -563,7 +595,8 @@ def test_notifification_page_shows_error_message_if_precompiled_letter_cannot_be
     )
 
     error_message = page.find('p', class_='notification-status-cancelled').text
-    assert normalize_spaces(error_message) == "Validation failed – Notify cannot read this PDF file"
+    assert normalize_spaces(error_message) == \
+        "Validation failed – There’s a problem with your letter. Notify cannot read this PDF."
 
 
 def test_should_404_for_unknown_extension(
