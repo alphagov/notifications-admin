@@ -18,23 +18,18 @@ describe('Error tracking', () => {
   afterEach(() => {
 
     document.body.innerHTML = '';
-    delete window.GOVUK.analytics;
 
   });
 
-  test("If there is an analytics tracker set up, it should send details of the error to window.GOVUK.analytic", () => {
+  test("It should send the right data to Google Analytics", () => {
 
-    window.GOVUK.analytics = {
-      'trackEvent': jest.fn()
-    };
+    window.ga = jest.fn(() => {});
 
     // start the module
     window.GOVUK.modules.start();
 
-    expect(window.GOVUK.analytics.trackEvent).toHaveBeenCalled();
-    expect(window.GOVUK.analytics.trackEvent.mock.calls[0]).toEqual(['Error', 'validation', {
-      'label': 'missing field'
-    }]);
+    expect(window.ga).toHaveBeenCalled();
+    expect(window.ga.mock.calls[0]).toEqual(['send', 'event', 'Error', 'validation', 'missing field']);
 
   });
 

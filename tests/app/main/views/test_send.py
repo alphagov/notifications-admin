@@ -1003,7 +1003,7 @@ def test_send_test_doesnt_show_file_contents(
     assert page.select('h1')[0].text.strip() == 'Preview of ‘Two week reminder’'
     assert len(page.select('table')) == 0
     assert len(page.select('.banner-dangerous')) == 0
-    assert page.select_one('main button[type=submit]').text.strip() == 'Send 1 text message'
+    assert page.select_one('button[type=submit]').text.strip() == 'Send 1 text message'
 
 
 @pytest.mark.parametrize('user, endpoint, template_type, content_has_placeholders, expected_recipient', [
@@ -2229,7 +2229,7 @@ def test_letter_can_only_be_sent_now(
 
     assert 'name="scheduled_for"' not in page
     assert normalize_spaces(
-        page.select_one('main [type=submit]').text
+        page.select_one('[type=submit]').text
     ) == (
         'Send 1 letter'
     )
@@ -2259,7 +2259,7 @@ def test_send_button_is_correctly_labelled(
     )
 
     assert normalize_spaces(
-        page.select_one('main [type=submit]').text
+        page.select_one('[type=submit]').text
     ) == (
         'Send 1,000 text messages'
     )
@@ -2891,7 +2891,7 @@ def test_check_messages_does_not_allow_to_send_letter_longer_than_10_pages(
     assert page.find('h1', {"data-error-type": "letter-too-long"})
 
     assert len(page.select('.letter img')) == 10  # if letter longer than 10 pages, only 10 first pages are displayed
-    assert not page.select('main [type=submit]')
+    assert not page.select('[type=submit]')
 
 
 def test_check_messages_shows_data_errors_before_trial_mode_errors_for_letters(
@@ -3218,7 +3218,7 @@ def test_send_one_off_letter_errors_in_trial_mode(
 
     assert len(page.select('.letter img')) == 5
 
-    assert not page.select('main [type=submit]')
+    assert not page.select('[type=submit]')
     assert page.select_one('.govuk-back-link').text == 'Back'
     assert page.select_one('a[download]').text == 'Download as a PDF'
 
@@ -3259,7 +3259,7 @@ def test_send_one_off_letter_errors_if_letter_longer_than_10_pages(
     assert page.find('h1', {"data-error-type": "letter-too-long"})
     assert len(page.select('.letter img')) == 10
 
-    assert not page.select('main [type=submit]')
+    assert not page.select('[type=submit]')
 
 
 def test_check_messages_shows_over_max_row_error(
