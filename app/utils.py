@@ -566,33 +566,27 @@ def get_letter_printing_statement(status, created_at):
         return 'Printed on {} at 5:30pm'.format(printed_date)
 
 
-LETTER_SPECIFICATION_URL = (
-    'https://docs.notifications.service.gov.uk'
-    '/documentation/images/notify-pdf-letter-spec-v2.4.pdf'
-)
-
-
 LETTER_VALIDATION_MESSAGES = {
     'letter-not-a4-portrait-oriented': {
         'title': 'Your letter is not A4 portrait size',
         'detail': (
             'You need to change the size or orientation of {invalid_pages}. <br>'
-            f'Files must meet our <a href="{LETTER_SPECIFICATION_URL}" target="_blank">letter specification</a>.'
+            'Files must meet our <a href="{letter_spec}" target="_blank">letter specification</a>.'
         ),
         'summary': (
             'Validation failed because {invalid_pages} {invalid_pages_are_or_is} not A4 portrait size.<br>'
-            f'Files must meet our <a href="{LETTER_SPECIFICATION_URL}" target="_blank">letter specification</a>.'
+            'Files must meet our <a href="{letter_spec}" target="_blank">letter specification</a>.'
         ),
     },
     'content-outside-printable-area': {
         'title': 'Your content is outside the printable area',
         'detail': (
             'You need to edit {invalid_pages}.<br>'
-            f'Files must meet our <a href="{LETTER_SPECIFICATION_URL}" target="_blank">letter specification</a>.'
+            'Files must meet our <a href="{letter_spec}" target="_blank">letter specification</a>.'
         ),
         'summary': (
             'Validation failed because content is outside the printable area on {invalid_pages}.<br>'
-            f'Files must meet our <a href="{LETTER_SPECIFICATION_URL}" target="_blank">letter specification</a>.'
+            'Files must meet our <a href="{letter_spec}" target="_blank">letter specification</a>.'
         ),
     },
     'letter-too-long': {
@@ -624,11 +618,11 @@ LETTER_VALIDATION_MESSAGES = {
         'title': 'The address block is empty',
         'detail': (
             'You need to add a recipient address.<br>'
-            f'Files must meet our <a href="{LETTER_SPECIFICATION_URL}" target="_blank">letter specification</a>.'
+            'Files must meet our <a href="{letter_spec}" target="_blank">letter specification</a>.'
         ),
         'summary': (
             'Validation failed because the address block is empty.<br>'
-            f'Files must meet our <a href="{LETTER_SPECIFICATION_URL}" target="_blank">letter specification</a>.'
+            'Files must meet our <a href="{letter_spec}" target="_blank">letter specification</a>.'
         ),
     }
 }
@@ -654,11 +648,13 @@ def get_letter_validation_error(validation_message, invalid_pages=None, page_cou
             invalid_pages=invalid_pages,
             invalid_pages_are_or_is=invalid_pages_are_or_is,
             page_count=page_count,
+            letter_spec=url_for('.letter_spec'),
         ),
         'summary': LETTER_VALIDATION_MESSAGES[validation_message]['summary'].format(
             invalid_pages=invalid_pages,
             invalid_pages_are_or_is=invalid_pages_are_or_is,
             page_count=page_count,
+            letter_spec=url_for('.letter_spec'),
         ),
     }
 

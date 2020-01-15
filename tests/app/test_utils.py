@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pytest
 from bs4 import BeautifulSoup
+from flask import url_for
 from freezegun import freeze_time
 
 from app import format_datetime_relative
@@ -454,15 +455,12 @@ def test_get_letter_validation_error_for_unknown_error():
     ),
 ])
 def test_get_letter_validation_error_for_known_errors(
+    client_request,
     error_message,
     expected_title,
     expected_content,
     expected_summary,
 ):
-    expected_letter_spec_url = (
-        'https://docs.notifications.service.gov.uk/'
-        'documentation/images/notify-pdf-letter-spec-v2.4.pdf'
-    )
     error = get_letter_validation_error(error_message, invalid_pages=[2], page_count=13)
     detail = BeautifulSoup(error['detail'], 'html.parser')
     summary = BeautifulSoup(error['summary'], 'html.parser')
@@ -471,10 +469,10 @@ def test_get_letter_validation_error_for_known_errors(
 
     assert detail.text == expected_content
     if detail.select_one('a'):
-        assert detail.select_one('a')['href'] == expected_letter_spec_url
+        assert detail.select_one('a')['href'] == url_for('.letter_spec')
         assert detail.select_one('a')['target'] == '_blank'
 
     assert summary.text == expected_summary
     if summary.select_one('a'):
-        assert summary.select_one('a')['href'] == expected_letter_spec_url
+        assert summary.select_one('a')['href'] == url_for('.letter_spec')
         assert summary.select_one('a')['target'] == '_blank'
