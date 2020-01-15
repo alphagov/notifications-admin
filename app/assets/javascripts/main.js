@@ -1,10 +1,6 @@
 window.GOVUK.Frontend.initAll();
 
-window.GOVUK.Modules.CookieBanner.clearOldCookies();
-
-if (window.GOVUK.hasConsentFor('analytics')) {
-  window.GOVUK.initAnalytics();
-}
+$(() => GOVUK.addCookieMessage());
 
 $(() => $("time.timeago").timeago());
 

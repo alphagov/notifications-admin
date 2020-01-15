@@ -22,7 +22,7 @@ def test_should_return_verify_template(
 
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert page.h1.text == 'Check your phone'
-    message = page.select('main p')[0].text
+    message = page.find_all('p')[1].text
     assert message == "We’ve sent you a text message with a security code."
 
 
