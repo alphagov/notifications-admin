@@ -43,7 +43,7 @@ describe("Analytics init", () => {
 
   test("After the init.js script has been loaded, Google Analytics will be disabled", () => {
 
-    expect(window['ga-disable-UA-26179049-1']).toBe(true);
+    expect(window['ga-disable-UA-75215134-1']).toBe(true);
 
   });
 
@@ -93,7 +93,7 @@ describe("Analytics init", () => {
 
     test("Google Analytics will not be disabled", () => {
 
-      expect(window['ga-disable-UA-26179049-1']).toBe(false);
+      expect(window['ga-disable-UA-75215134-1']).toBe(false);
 
     });
 
