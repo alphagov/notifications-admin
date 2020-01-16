@@ -4,28 +4,28 @@
 {% from "components/page-footer.html" import page_footer %}
 
 {% block service_page_title %}
-  {{ uploaded_file_name }}
+  {{ job.original_file_name }}
 {% endblock %}
 
 {% block maincolumn_content %}
 
     <h1 class="heading-large">
-      {{ uploaded_file_name }}
+      {{ job.original_file_name }}
     </h1>
 
     {% if just_sent %}
       {{ banner(just_sent_message, type='default', with_tick=True) }}
     {% else %}
-      {{ ajax_block(partials, updates_url, 'status', finished=finished) }}
+      {{ ajax_block(partials, updates_url, 'status', finished=job.processing_finished) }}
     {% endif %}
-    {{ ajax_block(partials, updates_url, 'counts', finished=finished) }}
-    {{ ajax_block(partials, updates_url, 'notifications', finished=finished) }}
+    {{ ajax_block(partials, updates_url, 'counts', finished=job.processing_finished) }}
+    {{ ajax_block(partials, updates_url, 'notifications', finished=job.processing_finished) }}
 
-    {% if can_cancel_letter_job %}
+    {% if job.letter_job_can_be_cancelled %}
       <div class="js-stick-at-bottom-when-scrolling">
         <div class="page-footer">
           <span class="page-footer-delete-link page-footer-delete-link-without-button">
-              <a href="{{ url_for('main.cancel_letter_job', service_id=current_service.id, job_id=job_id) }}">Cancel sending these letters</a>
+              <a href="{{ url_for('main.cancel_letter_job', service_id=current_service.id, job_id=job.id) }}">Cancel sending these letters</a>
           </span>
     {% else %}
       <div>&nbsp;</div>

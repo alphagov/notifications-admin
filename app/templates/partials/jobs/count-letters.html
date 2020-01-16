@@ -5,8 +5,8 @@
   <div class="column-half">
     <div class="keyline-block">
       {{ big_number(
-        total,
-        message_count_label(total, 'letter', suffix='')|capitalize,
+        job.notification_count,
+        message_count_label(job.notification_count, 'letter', suffix='')|capitalize,
         smaller=True
       )}}
     </div>
@@ -14,7 +14,7 @@
   <div class="column-half">
     <div class="keyline-block">
       {{ big_number(
-        delivery_estimate|string|format_date_short,
+        job.letter_timings.earliest_delivery|string|format_date_short,
         'Estimated delivery date',
         smaller=True
       )}}

@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from datetime import datetime
-
 from flask import (
     Response,
     abort,
@@ -15,24 +13,18 @@ from flask import (
 )
 from flask_login import current_user
 from notifications_python_client.errors import HTTPError
-from notifications_utils.letter_timings import (
-    CANCELLABLE_JOB_LETTER_STATUSES,
-    get_letter_timings,
-    letter_can_be_cancelled,
-)
 from notifications_utils.template import Template, WithSubjectTemplate
 
 from app import (
     current_service,
     format_datetime_short,
     format_thousands,
-    job_api_client,
     notification_api_client,
     service_api_client,
 )
 from app.main import main
 from app.main.forms import SearchNotificationsForm
-from app.statistics_utils import add_rate_to_job
+from app.models.job import Job
 from app.utils import (
     generate_next_dict,
     generate_notifications_csv,
@@ -50,31 +42,25 @@ from app.utils import (
 @main.route("/services/<uuid:service_id>/jobs")
 @user_has_permissions()
 def view_jobs(service_id):
-    page = int(request.args.get('page', 1))
-    jobs_response = job_api_client.get_page_of_jobs(service_id, page=page)
-    jobs = [
-        add_rate_to_job(job) for job in jobs_response['data']
-    ]
+    jobs = current_service.get_page_of_jobs(page=request.args.get('page'))
 
     prev_page = None
-    if jobs_response['links'].get('prev', None):
-        prev_page = generate_previous_dict('main.view_jobs', service_id, page)
+    if jobs.prev_page:
+        prev_page = generate_previous_dict('main.view_jobs', service_id, jobs.current_page)
     next_page = None
-    if jobs_response['links'].get('next', None):
-        next_page = generate_next_dict('main.view_jobs', service_id, page)
+    if jobs.next_page:
+        next_page = generate_next_dict('main.view_jobs', service_id, jobs.current_page)
 
     scheduled_jobs = ''
-    if not current_user.has_permissions('view_activity') and page == 1:
+    if not current_user.has_permissions('view_activity') and jobs.current_page == 1:
         scheduled_jobs = render_template(
             'views/dashboard/_upcoming.html',
-            scheduled_jobs=job_api_client.get_scheduled_jobs(service_id),
             hide_heading=True,
         )
 
     return render_template(
         'views/jobs/jobs.html',
         jobs=jobs,
-        page=page,
         prev_page=prev_page,
         next_page=next_page,
         scheduled_jobs=scheduled_jobs,
@@ -84,61 +70,41 @@ def view_jobs(service_id):
 @main.route("/services/<uuid:service_id>/jobs/<uuid:job_id>")
 @user_has_permissions()
 def view_job(service_id, job_id):
-    job = job_api_client.get_job(service_id, job_id)['data']
-    if job['job_status'] == 'cancelled':
+    job = Job.from_id(job_id, service_id=current_service.id)
+    if job.cancelled:
         abort(404)
 
     filter_args = parse_filter_args(request.args)
     filter_args['status'] = set_status_filters(filter_args)
 
-    total_notifications = job.get('notification_count', 0)
-    processed_notifications = job.get('notifications_delivered', 0) + job.get('notifications_failed', 0)
-
-    template = service_api_client.get_service_template(
-        service_id=service_id,
-        template_id=job['template'],
-        version=job['template_version']
-    )['data']
-
     just_sent_message = 'Your {} been sent. Printing starts {} at 5:30pm.'.format(
-        'letter has' if job['notification_count'] == 1 else 'letters have',
+        'letter has' if job.notification_count == 1 else 'letters have',
         printing_today_or_tomorrow()
     )
-    partials = get_job_partials(job, template)
-    can_cancel_letter_job = partials["can_letter_job_be_cancelled"]
 
     return render_template(
         'views/jobs/job.html',
-        finished=(total_notifications == processed_notifications),
-        uploaded_file_name=job['original_file_name'],
-        template_id=job['template'],
-        job_id=job_id,
+        job=job,
         status=request.args.get('status', ''),
         updates_url=url_for(
             ".view_job_updates",
             service_id=service_id,
-            job_id=job['id'],
+            job_id=job.id,
             status=request.args.get('status', ''),
         ),
-        partials=partials,
+        partials=get_job_partials(job),
         just_sent=bool(
             request.args.get('just_sent') == 'yes'
-            and template['template_type'] == 'letter'
+            and job.template_type == 'letter'
         ),
         just_sent_message=just_sent_message,
-        can_cancel_letter_job=can_cancel_letter_job,
     )
 
 
 @main.route("/services/<uuid:service_id>/jobs/<uuid:job_id>.csv")
 @user_has_permissions('view_activity')
 def view_job_csv(service_id, job_id):
-    job = job_api_client.get_job(service_id, job_id)['data']
-    template = service_api_client.get_service_template(
-        service_id=service_id,
-        template_id=job['template'],
-        version=job['template_version']
-    )['data']
+    job = Job.from_id(job_id, service_id=service_id)
     filter_args = parse_filter_args(request.args)
     filter_args['status'] = set_status_filters(filter_args)
 
@@ -151,14 +117,14 @@ def view_job_csv(service_id, job_id):
                 page=request.args.get('page', 1),
                 page_size=5000,
                 format_for_csv=True,
-                template_type=template['template_type'],
+                template_type=job.template_type,
             )
         ),
         mimetype='text/csv',
         headers={
             'Content-Disposition': 'inline; filename="{} - {}.csv"'.format(
-                template['name'],
-                format_datetime_short(job['created_at'])
+                job.template['name'],
+                format_datetime_short(job.created_at)
             )
         }
     )
@@ -167,7 +133,7 @@ def view_job_csv(service_id, job_id):
 @main.route("/services/<uuid:service_id>/jobs/<uuid:job_id>", methods=['POST'])
 @user_has_permissions('send_messages')
 def cancel_job(service_id, job_id):
-    job_api_client.cancel_job(service_id, job_id)
+    Job.from_id(job_id, service_id=service_id).cancel()
     return redirect(url_for('main.service_dashboard', service_id=service_id))
 
 
@@ -175,20 +141,18 @@ def cancel_job(service_id, job_id):
 @user_has_permissions()
 def cancel_letter_job(service_id, job_id):
     if request.method == 'POST':
-        job = job_api_client.get_job(service_id, job_id)['data']
-        notification_count = notification_api_client.get_notification_count_for_job_id(
-            service_id=service_id, job_id=job_id
-        )
-        if job['job_status'] != 'finished' or notification_count < job['notification_count']:
+        job = Job.from_id(job_id, service_id=service_id)
+
+        if job.status != 'finished' or job.notifications_created < job.notification_count:
             flash("We are still processing these letters, please try again in a minute.", 'try again')
             return view_job(service_id, job_id)
         try:
-            number_of_letters = job_api_client.cancel_letter_job(current_service.id, job_id)
+            number_of_letters = job.cancel()
         except HTTPError as e:
             flash(e.message, 'dangerous')
             return redirect(url_for('main.view_job', service_id=service_id, job_id=job_id))
         flash("Cancelled {} letters from {}".format(
-            format_thousands(number_of_letters), job['original_file_name']
+            format_thousands(number_of_letters), job.original_file_name
         ), 'default_with_tick')
         return redirect(url_for('main.service_dashboard', service_id=service_id))
 
@@ -200,16 +164,9 @@ def cancel_letter_job(service_id, job_id):
 @user_has_permissions()
 def view_job_updates(service_id, job_id):
 
-    job = job_api_client.get_job(service_id, job_id)['data']
+    job = Job.from_id(job_id, service_id=service_id)
 
-    return jsonify(**get_job_partials(
-        job,
-        service_api_client.get_service_template(
-            service_id=current_service.id,
-            template_id=job['template'],
-            version=job['template_version']
-        )['data'],
-    ))
+    return jsonify(**get_job_partials(job))
 
 
 @main.route('/services/<uuid:service_id>/notifications', methods=['GET', 'POST'])
@@ -386,61 +343,46 @@ def get_status_filters(service, message_type, statistics):
 
 
 def _get_job_counts(job):
-    sending = 0 if job['job_status'] == 'scheduled' else (
-        job.get('notification_count', 0) -
-        job.get('notifications_delivered', 0) -
-        job.get('notifications_failed', 0)
-    )
     return [
         (
             label,
             query_param,
             url_for(
                 ".view_job",
-                service_id=job['service'],
-                job_id=job['id'],
+                service_id=job.service,
+                job_id=job.id,
                 status=query_param,
             ),
             count
         ) for label, query_param, count in [
             [
                 'total', '',
-                job.get('notification_count', 0)
+                job.notification_count
             ],
             [
                 'sending', 'sending',
-                sending
+                job.notifications_sending
             ],
             [
                 'delivered', 'delivered',
-                job.get('notifications_delivered', 0)
+                job.notifications_delivered
             ],
             [
                 'failed', 'failed',
-                job.get('notifications_failed', 0)
+                job.notifications_failed
             ]
         ]
     ]
 
 
-def get_job_partials(job, template):
+def get_job_partials(job):
     filter_args = parse_filter_args(request.args)
     filter_args['status'] = set_status_filters(filter_args)
-    notifications = notification_api_client.get_notifications_for_service(
-        job['service'], job['id'], status=filter_args['status']
-    )
-
-    if template['template_type'] == 'letter':
-        # there might be no notifications if the job has only just been created and the tasks haven't run yet
-        if notifications['notifications']:
-            postage = notifications['notifications'][0]['postage']
-        else:
-            postage = template['postage']
-
+    notifications = job.get_notifications(status=filter_args['status'])
+    if job.template_type == 'letter':
         counts = render_template(
             'partials/jobs/count-letters.html',
-            total=job.get('notification_count', 0),
-            delivery_estimate=get_letter_timings(job['created_at'], postage=postage).earliest_delivery,
+            job=job,
         )
     else:
         counts = render_template(
@@ -448,22 +390,11 @@ def get_job_partials(job, template):
             counts=_get_job_counts(job),
             status=filter_args['status'],
             notifications_deleted=(
-                job['job_status'] == 'finished' and not notifications['notifications']
+                job.status == 'finished' and not notifications['notifications']
             ),
         )
-    service_data_retention_days = current_service.get_days_of_retention(template['template_type'])
-    can_letter_job_be_cancelled = False
-    if template["template_type"] == "letter":
-        not_cancellable = [
-            n for n in notifications["notifications"] if n["status"] not in CANCELLABLE_JOB_LETTER_STATUSES
-        ]
-        job_created = job["created_at"][:-6]
-        if not letter_can_be_cancelled(
-            "created", datetime.strptime(job_created, '%Y-%m-%dT%H:%M:%S.%f')
-        ) or len(not_cancellable) != 0:
-            can_letter_job_be_cancelled = False
-        else:
-            can_letter_job_be_cancelled = True
+    service_data_retention_days = current_service.get_days_of_retention(job.template_type)
+
     return {
         'counts': counts,
         'notifications': render_template(
@@ -472,26 +403,21 @@ def get_job_partials(job, template):
                 add_preview_of_content_to_notifications(notifications['notifications'])
             ),
             more_than_one_page=bool(notifications.get('links', {}).get('next')),
-            percentage_complete=(job['notifications_requested'] / job['notification_count'] * 100),
             download_link=url_for(
                 '.view_job_csv',
                 service_id=current_service.id,
-                job_id=job['id'],
+                job_id=job.id,
                 status=request.args.get('status')
             ),
-            time_left=get_time_left(job['created_at'], service_data_retention_days=service_data_retention_days),
+            time_left=get_time_left(job.created_at, service_data_retention_days=service_data_retention_days),
             job=job,
-            template=template,
-            template_version=job['template_version'],
             service_data_retention_days=service_data_retention_days,
         ),
         'status': render_template(
             'partials/jobs/status.html',
             job=job,
-            template_type=template["template_type"],
-            letter_print_day=get_letter_printing_statement("created", job["created_at"])
+            letter_print_day=get_letter_printing_statement("created", job.created_at)
         ),
-        'can_letter_job_be_cancelled': can_letter_job_be_cancelled,
     }
 
 

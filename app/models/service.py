@@ -5,6 +5,12 @@ from notifications_utils.take import Take
 from werkzeug.utils import cached_property
 
 from app.models import JSONModel
+from app.models.job import (
+    ImmediateJobs,
+    PaginatedJobs,
+    PaginatedUploads,
+    ScheduledJobs,
+)
 from app.models.organisation import Organisation
 from app.models.user import InvitedUsers, User, Users
 from app.notify_client.api_key_api_client import api_key_api_client
@@ -103,9 +109,27 @@ class Service(JSONModel):
     def has_permission(self, permission):
         return permission in self.permissions
 
+    def get_page_of_jobs(self, page):
+        return PaginatedJobs(self.id, page=page)
+
+    def get_page_of_uploads(self, page):
+        return PaginatedUploads(self.id, page=page)
+
     @cached_property
     def has_jobs(self):
         return job_api_client.has_jobs(self.id)
+
+    @cached_property
+    def immediate_jobs(self):
+        if not self.has_jobs:
+            return []
+        return ImmediateJobs(self.id)
+
+    @cached_property
+    def scheduled_jobs(self):
+        if not self.has_jobs:
+            return []
+        return ScheduledJobs(self.id)
 
     @cached_property
     def invited_users(self):

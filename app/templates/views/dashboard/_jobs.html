@@ -26,22 +26,22 @@
         {% endif %}
         <span class="file-list-hint">
           Sent {{
-            (item.scheduled_for if item.scheduled_for else item.created_at)|format_datetime_relative
+            (item.scheduled_for or item.created_at)|format_datetime_relative
           }}
         </span>
       </div>
     {% endcall %}
     {% call field() %}
       {{ big_number(
-        item.get('notification_count', 0) - item.get('notifications_delivered', 0) - item.get('notifications_failed', 0),
+        item.notifications_sending,
         smallest=True
       ) }}
     {% endcall %}
     {% call field() %}
-      {{ big_number(item.get('notifications_delivered', 0), smallest=True) }}
+      {{ big_number(item.notifications_delivered, smallest=True) }}
     {% endcall %}
-    {% call field(status='error' if item.get('failure_rate', 0) > 3 else '') %}
-      {{ big_number(item.get('notifications_failed', 0), smallest=True) }}
+    {% call field(status='error' if item.high_failure_rate else '') %}
+      {{ big_number(item.notifications_failed, smallest=True) }}
     {% endcall %}
   {% endcall %}
 </div>

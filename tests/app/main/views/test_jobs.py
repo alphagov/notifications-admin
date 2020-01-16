@@ -514,9 +514,11 @@ def test_should_show_scheduled_job(
 def test_should_cancel_job(
     client_request,
     fake_uuid,
+    mock_get_job,
+    mock_get_service_template,
     mocker,
 ):
-    mock_cancel = mocker.patch('app.main.jobs.job_api_client.cancel_job')
+    mock_cancel = mocker.patch('app.job_api_client.cancel_job')
     client_request.post(
         'main.cancel_job',
         service_id=SERVICE_ONE_ID,
@@ -549,6 +551,7 @@ def test_should_not_show_cancelled_job(
 def test_should_cancel_letter_job(
     client_request,
     mocker,
+    mock_get_service_letter_template,
     active_user_with_permissions
 ):
     job_id = str(uuid.uuid4())
@@ -564,7 +567,7 @@ def test_should_cancel_letter_job(
     mocker.patch('app.job_api_client.get_job', side_effect=[{"data": job}])
     mocker.patch('app.notification_api_client.get_notifications_for_service', return_value=notifications_json)
     mocker.patch('app.notification_api_client.get_notification_count_for_job_id', return_value=5)
-    mock_cancel = mocker.patch('app.main.jobs.job_api_client.cancel_letter_job', return_value=5)
+    mock_cancel = mocker.patch('app.job_api_client.cancel_letter_job', return_value=5)
     client_request.post(
         'main.cancel_letter_job',
         service_id=SERVICE_ONE_ID,
@@ -602,7 +605,7 @@ def test_should_not_show_cancel_link_for_letter_job_if_too_late(
     mocker.patch('app.job_api_client.get_job', side_effect=[{"data": job}])
     mocker.patch(
         'app.notification_api_client.get_notifications_for_service',
-        side_effect=[notifications_json]
+        return_value=notifications_json
     )
 
     page = client_request.get(
@@ -639,7 +642,7 @@ def test_should_show_cancel_link_for_letter_job(
     mocker.patch('app.job_api_client.get_job', side_effect=[{"data": job}])
     mocker.patch(
         'app.notification_api_client.get_notifications_for_service',
-        side_effect=[notifications_json]
+        return_value=notifications_json,
     )
 
     page = client_request.get(
@@ -684,7 +687,7 @@ def test_dont_cancel_letter_job_when_to_early_to_cancel(
         'app.notification_api_client.get_notification_count_for_job_id', return_value=number_of_processed_notifications
     )
 
-    mock_cancel = mocker.patch('app.main.jobs.job_api_client.cancel_letter_job')
+    mock_cancel = mocker.patch('app.job_api_client.cancel_letter_job')
     page = client_request.post(
         'main.cancel_letter_job',
         service_id=SERVICE_ONE_ID,
