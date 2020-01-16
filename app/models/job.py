@@ -48,6 +48,12 @@ class Job(JSONModel):
     def scheduled_for(self):
         return self._dict.get('scheduled_for')
 
+    @property
+    def processing_started(self):
+        if not self._dict.get('processing_started'):
+            return None
+        return datetime.strptime(self._dict['processing_started'][:-6], '%Y-%m-%dT%H:%M:%S')
+
     def _aggregate_statistics(self, *statuses):
         return sum(
             outcome['count'] for outcome in self._dict['statistics']
@@ -94,6 +100,17 @@ class Job(JSONModel):
     @cached_property
     def finished_processing(self):
         return self.notification_count == self.notifications_sent
+
+    @property
+    def recently_created(self):
+        if not self.processing_started:
+            # Assume that if processing hasn’t started yet then the job
+            # must have been created recently enough to not have any
+            # notifications yet
+            return True
+        return (
+            datetime.utcnow() - self.processing_started
+        ).days < 1
 
     @property
     def template_id(self):
