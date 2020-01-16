@@ -763,7 +763,7 @@ def test_should_check_for_sending_things_right(
         }.get(template_type)
     active_user_with_permissions,
     mock_get_users = mocker.patch(
-        'app.models.user.Users.client',
+        'app.models.user.Users.client_method',
         return_value=(
             [active_user_with_permissions] * count_of_users_with_manage_service +
             [active_user_no_settings_permission]
@@ -783,7 +783,7 @@ def test_should_check_for_sending_things_right(
     invite_two['permissions'] = 'view_activity'
 
     mock_get_invites = mocker.patch(
-        'app.models.user.InvitedUsers.client',
+        'app.models.user.InvitedUsers.client_method',
         return_value=(
             ([invite_one] * count_of_invites_with_manage_service) +
             [invite_two]

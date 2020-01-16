@@ -55,7 +55,7 @@ class ModelList(ABC, Sequence):
 
     @property
     @abstractmethod
-    def client(self):
+    def client_method(self):
         pass
 
     @property
@@ -64,7 +64,7 @@ class ModelList(ABC, Sequence):
         pass
 
     def __init__(self, *args):
-        self.items = self.client(*args)
+        self.items = self.client_method(*args)
 
     def __getitem__(self, index):
         return self.model(self.items[index])
