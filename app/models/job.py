@@ -71,10 +71,6 @@ class Job(JSONModel):
         return self.notifications_delivered + self.notifications_failed
 
     @property
-    def notifications_processed(self):
-        return self.notifications_delivered + self.notifications_failed
-
-    @property
     def notifications_sending(self):
         if self.scheduled:
             return 0
@@ -94,7 +90,7 @@ class Job(JSONModel):
 
     @cached_property
     def finished_processing(self):
-        return self.notification_count == self.notifications_processed
+        return self.notification_count == self.notifications_sent
 
     @property
     def template_id(self):
