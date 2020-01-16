@@ -607,9 +607,6 @@ class Users(ModelList):
     client_method = user_api_client.get_users_for_service
     model = User
 
-    def __init__(self, service_id):
-        self.items = self.client(service_id)
-
     def get_name_from_id(self, id):
         for user in self:
             if user.id == id:
