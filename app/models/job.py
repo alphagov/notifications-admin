@@ -26,7 +26,6 @@ class Job(JSONModel):
         'notification_count',
         'job_status',
         'created_by',
-        'scheduled_for',
     }
 
     @classmethod
@@ -44,6 +43,10 @@ class Job(JSONModel):
     @property
     def scheduled(self):
         return self.status == 'scheduled'
+
+    @property
+    def scheduled_for(self):
+        return self._dict.get('scheduled_for')
 
     def _aggregate_statistics(self, *statuses):
         return sum(
