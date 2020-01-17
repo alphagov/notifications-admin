@@ -1392,35 +1392,43 @@ class LinkOrganisationsForm(StripWhitespaceForm):
     )
 
 
-class BrandingOptionsEmail(StripWhitespaceForm):
+class BrandingOptions(StripWhitespaceForm):
 
     FALLBACK_OPTION_VALUE = 'something_else'
     FALLBACK_OPTION = (FALLBACK_OPTION_VALUE, 'Something else')
 
-    options = RadioField('Choose your new email branding')
+    options = RadioField('Choose your new branding')
     something_else = TextAreaField('Describe the branding you want')
 
-    def __init__(self, service, *args, **kwargs):
+    def __init__(self, service, *args, branding_type="email", **kwargs):
         super().__init__(*args, **kwargs)
-        self.options.choices = tuple(self.get_available_choices(service))
+        self.options.choices = tuple(self.get_available_choices(service, branding_type))
         if self.something_else_is_only_option:
             self.options.data = self.FALLBACK_OPTION_VALUE
 
     @staticmethod
-    def get_available_choices(service):
+    def get_available_choices(service, branding_type):
+        if branding_type == "email":
+            organisation_branding_id = service.organisation.email_branding_id if service.organisation else None
+            service_branding_id = service.email_branding_id
+            service_branding_name = service.email_branding_name
+        elif branding_type == "letter":
+            organisation_branding_id = service.organisation.letter_branding_id if service.organisation else None
+            service_branding_id = service.letter_branding_id
+            service_branding_name = service.letter_branding_name
 
         if (
             service.organisation_type == Organisation.TYPE_CENTRAL and
-            service.organisation.email_branding_id is None and
-            service.email_branding_id is not None
+            organisation_branding_id is None and
+            service_branding_id is not None
         ):
             yield ('govuk', 'GOV.UK')
 
         if (
             service.organisation_type == Organisation.TYPE_CENTRAL and
             service.organisation and
-            service.organisation.email_branding_id is None and
-            service.email_branding_name.lower() != 'GOV.UK and {}'.format(service.organisation.name).lower()
+            organisation_branding_id is None and
+            service_branding_name.lower() != 'GOV.UK and {}'.format(service.organisation.name).lower()
         ):
             yield ('govuk_and_org', 'GOV.UK and {}'.format(service.organisation.name))
 
@@ -1429,7 +1437,7 @@ class BrandingOptionsEmail(StripWhitespaceForm):
                 Organisation.TYPE_NHS_CENTRAL,
                 Organisation.TYPE_NHS_LOCAL,
                 Organisation.TYPE_NHS_GP,
-            } and service.email_branding_name != 'NHS'
+            } and service_branding_name != 'NHS'
         ):
             yield ('nhs', 'NHS')
 
@@ -1440,13 +1448,13 @@ class BrandingOptionsEmail(StripWhitespaceForm):
                 Organisation.TYPE_NHS_CENTRAL,
                 Organisation.TYPE_NHS_GP,
             } and (
-                service.email_branding_id is None or
-                service.email_branding_id != service.organisation.email_branding_id
+                service_branding_id is None or
+                service_branding_id != organisation_branding_id
             )
         ):
             yield ('organisation', service.organisation.name)
 
-        yield BrandingOptionsEmail.FALLBACK_OPTION
+        yield BrandingOptions.FALLBACK_OPTION
 
     @property
     def something_else_is_only_option(self):

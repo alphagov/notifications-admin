@@ -417,6 +417,12 @@ class Service(JSONModel):
             return 'GOV.UK'
         return self.email_branding['name']
 
+    @cached_property
+    def letter_branding_name(self):
+        if self.letter_branding is None:
+            return 'no'
+        return self.letter_branding['name']
+
     @property
     def needs_to_change_email_branding(self):
         return self.email_branding_id is None and self.organisation_type != Organisation.TYPE_CENTRAL
