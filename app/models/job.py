@@ -182,28 +182,28 @@ class Job(JSONModel):
 
 
 class ImmediateJobs(ModelList):
-    client = job_api_client.get_immediate_jobs
+    client_method = job_api_client.get_immediate_jobs
     model = Job
 
 
 class ScheduledJobs(ImmediateJobs):
-    client = job_api_client.get_scheduled_jobs
+    client_method = job_api_client.get_scheduled_jobs
 
 
 class PaginatedJobs(ImmediateJobs):
 
-    client = job_api_client.get_page_of_jobs
+    client_method = job_api_client.get_page_of_jobs
 
     def __init__(self, service_id, page=None):
         try:
             self.current_page = int(page)
         except TypeError:
             self.current_page = 1
-        response = self.client(service_id, page=self.current_page)
+        response = self.client_method(service_id, page=self.current_page)
         self.items = response['data']
         self.prev_page = response.get('links', {}).get('prev', None)
         self.next_page = response.get('links', {}).get('next', None)
 
 
 class PaginatedUploads(PaginatedJobs):
-    client = job_api_client.get_uploads
+    client_method = job_api_client.get_uploads

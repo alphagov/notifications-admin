@@ -27,7 +27,7 @@ def test_organisation_page_shows_all_organisations(
     ]
 
     get_organisations = mocker.patch(
-        'app.models.organisation.Organisations.client', return_value=orgs
+        'app.models.organisation.Organisations.client_method', return_value=orgs
     )
     response = platform_admin_client.get(
         url_for('.organisations')
@@ -232,7 +232,7 @@ def test_nhs_local_can_create_own_organisations(
 ):
     mocker.patch('app.organisations_client.get_service_organisation', return_value=organisation)
     mocker.patch(
-        'app.models.organisation.Organisations.client',
+        'app.models.organisation.Organisations.client_method',
         return_value=[
             organisation_json('t1', 'Trust 1', organisation_type='nhs_local'),
             organisation_json('t2', 'Trust 2', organisation_type='nhs_local'),
@@ -366,7 +366,7 @@ def test_nhs_local_assigns_to_selected_organisation(
 ):
     mocker.patch('app.organisations_client.get_service_organisation', return_value=None)
     mocker.patch(
-        'app.models.organisation.Organisations.client',
+        'app.models.organisation.Organisations.client_method',
         return_value=[
             organisation_json(ORGANISATION_ID, 'Trust 1', organisation_type='nhs_local'),
         ],

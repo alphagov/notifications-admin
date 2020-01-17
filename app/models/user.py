@@ -604,11 +604,8 @@ class AnonymousUser(AnonymousUserMixin):
 
 class Users(ModelList):
 
-    client = user_api_client.get_users_for_service
+    client_method = user_api_client.get_users_for_service
     model = User
-
-    def __init__(self, service_id):
-        self.items = self.client(service_id)
 
     def get_name_from_id(self, id):
         for user in self:
@@ -618,21 +615,21 @@ class Users(ModelList):
 
 
 class OrganisationUsers(Users):
-    client = user_api_client.get_users_for_organisation
+    client_method = user_api_client.get_users_for_organisation
 
 
 class InvitedUsers(Users):
 
-    client = invite_api_client.get_invites_for_service
+    client_method = invite_api_client.get_invites_for_service
     model = InvitedUser
 
     def __init__(self, service_id):
         self.items = [
-            user for user in self.client(service_id)
+            user for user in self.client_method(service_id)
             if user['status'] != 'accepted'
         ]
 
 
 class OrganisationInvitedUsers(InvitedUsers):
-    client = org_invite_api_client.get_invites_for_organisation
+    client_method = org_invite_api_client.get_invites_for_organisation
     model = InvitedOrgUser
