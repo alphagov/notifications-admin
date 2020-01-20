@@ -24,7 +24,6 @@ class Job(JSONModel):
         'original_file_name',
         'created_at',
         'notification_count',
-        'job_status',
         'created_by',
     }
 
