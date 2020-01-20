@@ -1,5 +1,6 @@
 {% extends "template.njk" %}
 {% from "components/banner.html" import banner %}
+{% from "components/cookie-banner.html" import cookie_banner %}
 
 {% block headIcons %}
   <link rel="shortcut icon" sizes="16x16 32x32 48x48" href="{{ asset_url('images/favicon.ico') }}" type="image/x-icon" />
@@ -30,12 +31,7 @@
 
 {% block bodyStart %}
   {% block cookie_message %}
-    <div class="notify-cookie-message" id="global-cookie-message">
-      <p class="govuk-width-container">
-        GOV.UK Notify uses cookies to make the site simpler.
-        <a href="{{ url_for("main.cookies") }}">Find out more about cookies</a>
-      </p>
-    </div>
+    {{ cookie_banner() }}
   {% endblock %}
 {% endblock %}
 
@@ -247,12 +243,4 @@
   <!--[if gt IE 8]><!-->
   <script type="text/javascript" src="{{ asset_url('javascripts/all.js') }}"></script>
   <!--<![endif]-->
-  <script>
-    if (window.GOVUK.cookie('_ga') !== null) {
-      document.cookie = '_ga' + '=;expires=' + new Date() + ';domain=' + window.location.hostname.replace(/^www\./, '.') + ';path=/';
-    }
-    if (window.GOVUK.cookie('_gid') !== null) {
-      document.cookie = '_gid' + '=;expires=' + new Date() + ';domain=' + window.location.hostname.replace(/^www\./, '.') + ';path=/';
-    }
-  </script>
 {% endblock %}
