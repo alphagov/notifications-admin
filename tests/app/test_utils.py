@@ -469,6 +469,19 @@ def test_get_letter_validation_error_for_unknown_error():
             'Letters must be 10 pages or less.'
         ),
     ),
+    (
+        'unable-to-read-the-file',
+        [2],
+        'There’s a problem with your file',
+        (
+            'Notify cannot read this PDF.'
+            'Save a new copy of your file and try again.'
+        ),
+        (
+            'Validation failed because Notify cannot read this PDF.'
+            'Save a new copy of your file and try again.'
+        ),
+    ),
 ])
 def test_get_letter_validation_error_for_known_errors(
     client_request,

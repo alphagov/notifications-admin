@@ -610,8 +610,8 @@ LETTER_VALIDATION_MESSAGES = {
             '<br>Save a new copy of your file and try again.'
         ),
         'summary': (
-            'Letters must be 10 pages or less. <br>'
-            'This letter is {page_count} pages long.'
+            'Validation failed because Notify cannot read this PDF.<br>'
+            'Save a new copy of your file and try again.'
         ),
     },
     'address-is-empty': {
