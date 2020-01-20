@@ -415,9 +415,10 @@ def test_get_letter_validation_error_for_unknown_error():
     }
 
 
-@pytest.mark.parametrize('error_message, expected_title, expected_content, expected_summary', [
+@pytest.mark.parametrize('error_message, invalid_pages, expected_title, expected_content, expected_summary', [
     (
         'letter-not-a4-portrait-oriented',
+        [2],
         'Your letter is not A4 portrait size',
         (
             'You need to change the size or orientation of page 2. '
@@ -429,7 +430,21 @@ def test_get_letter_validation_error_for_unknown_error():
         ),
     ),
     (
+        'letter-not-a4-portrait-oriented',
+        [2, 3, 4],
+        'Your letter is not A4 portrait size',
+        (
+            'You need to change the size or orientation of pages 2, 3 and 4. '
+            'Files must meet our letter specification.'
+        ),
+        (
+            'Validation failed because pages 2, 3 and 4 are not A4 portrait size.'
+            'Files must meet our letter specification.'
+        ),
+    ),
+    (
         'content-outside-printable-area',
+        [2],
         'Your content is outside the printable area',
         (
             'You need to edit page 2.'
@@ -443,6 +458,7 @@ def test_get_letter_validation_error_for_unknown_error():
     ),
     (
         'letter-too-long',
+        [2],
         'Your letter is too long',
         (
             'Letters must be 10 pages or less. '
@@ -457,11 +473,12 @@ def test_get_letter_validation_error_for_unknown_error():
 def test_get_letter_validation_error_for_known_errors(
     client_request,
     error_message,
+    invalid_pages,
     expected_title,
     expected_content,
     expected_summary,
 ):
-    error = get_letter_validation_error(error_message, invalid_pages=[2], page_count=13)
+    error = get_letter_validation_error(error_message, invalid_pages=invalid_pages, page_count=13)
     detail = BeautifulSoup(error['detail'], 'html.parser')
     summary = BeautifulSoup(error['summary'], 'html.parser')
 
