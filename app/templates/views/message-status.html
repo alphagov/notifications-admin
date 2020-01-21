@@ -12,8 +12,8 @@
   <p>Notify’s real-time dashboard lets you check the status of any message, to see when it was delivered.</p>
   <p>For <a href="{{ url_for("main.security") }}">security</a>, this information is only available for 7 days after a message has been sent. You can download a report, including a list of sent messages, for your own records.</p>
   
-  <p>This page describes the types of message status you’ll see when you’re signed in to Notify.</p>
-  <p>If you're using the Notify API, read our <a href="{{ url_for('.documentation') }}">documentation</a> for a list of API message statuses.<p>
+  <p>This page describes the statuses you’ll see when you’re signed in to Notify.</p>
+  <p>If you're using the Notify API, read our <a href="{{ url_for('.documentation') }}">documentation</a> for a list of API statuses.<p>
 
   <h2 id="email-statuses" class="heading-medium">Emails</h2>
   <div class="bottom-gutter-3-2">
@@ -93,7 +93,7 @@
   <h3 id="returned-mail" class="heading-small">Undelivered letters and returned mail</h3>
 
   <p>Every letter we send includes our printer’s address on the back of the envelope. It’s not possible to customise the return address.</p>
-  <p>Returned mail is securely destroyed by our printer.</p>
+  <p>Returned mail is destroyed by our printer.</p>
   <p>Each letter has a unique ID. Our printer sends us the ID of every letter they destroy. We’ll contact you if the IDs match any of your letters. This is a partly manual process, so it can take a few weeks.</p>
 
 {% endblock %}
