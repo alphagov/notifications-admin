@@ -98,17 +98,43 @@ describe("Cookie message", () => {
     This works through CSS, based on the presence of the `js-enabled` class on the <body> so is not tested here.
   */
 
-  test("If the cookies set by the old banner still exist, they can be cleared with the `clearOldCookies` method", () => {
+  describe("The `clearOldCookies` method", () => {
 
-    helpers.setCookie('seen_cookie_message', 'true', { 'days': 365 });
-    helpers.setCookie('_ga', 'GA1.1.123.123', { 'days': 365 });
-    helpers.setCookie('_gid', 'GA1.1.456.456', { 'days': 1 });
+    test("Will clear the seen_cookie_message cookie if it still exists", () => {
 
-    window.GOVUK.Modules.CookieBanner.clearOldCookies();
+      // seen_cookie_message was set on the www domain, which setCookie defaults to
+      helpers.setCookie('seen_cookie_message', 'true', { 'days': 365 });
 
-    expect(window.GOVUK.cookie('seen_cookie_message')).toBeNull();
-    expect(window.GOVUK.cookie('_ga')).toBeNull();
-    expect(window.GOVUK.cookie('_gid')).toBeNull();
+      window.GOVUK.Modules.CookieBanner.clearOldCookies({ "analytics": false });
+
+      expect(window.GOVUK.cookie('seen_cookie_message')).toBeNull();
+
+    });
+
+    test("Will clear any existing Google Analytics cookies if consent is not set", () => {
+
+      // GA cookies are set on the root domain
+      helpers.setCookie('_ga', 'GA1.1.123.123', { 'days': 365, 'domain': '.notifications.service.gov.uk' });
+      helpers.setCookie('_gid', 'GA1.1.456.456', { 'days': 1, 'domain': '.notifications.service.gov.uk' });
+
+      window.GOVUK.Modules.CookieBanner.clearOldCookies(null);
+
+      expect(window.GOVUK.cookie('_ga')).toBeNull();
+      expect(window.GOVUK.cookie('_gid')).toBeNull();
+
+    });
+
+    test("Will leave any existing Google Analytics cookies if consent is set", () => {
+
+      helpers.setCookie('_ga', 'GA1.1.123.123', { 'days': 365 });
+      helpers.setCookie('_gid', 'GA1.1.456.456', { 'days': 1 });
+
+      window.GOVUK.Modules.CookieBanner.clearOldCookies({ "analytics": true });
+
+      expect(window.GOVUK.cookie('_ga')).not.toBeNull();
+      expect(window.GOVUK.cookie('_gid')).not.toBeNull();
+
+    });
 
   });
 
