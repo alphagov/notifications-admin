@@ -1419,17 +1419,19 @@ class BrandingOptions(StripWhitespaceForm):
             service_branding_name = service.letter_branding_name
 
         if (
-            service.organisation_type == Organisation.TYPE_CENTRAL and
-            organisation_branding_id is None and
-            service_branding_id is not None
+            service.organisation_type == Organisation.TYPE_CENTRAL
+            and organisation_branding_id is None
+            and service_branding_id is not None
+            and branding_type == "email"
         ):
             yield ('govuk', 'GOV.UK')
 
         if (
-            service.organisation_type == Organisation.TYPE_CENTRAL and
-            service.organisation and
-            organisation_branding_id is None and
-            service_branding_name.lower() != 'GOV.UK and {}'.format(service.organisation.name).lower()
+            service.organisation_type == Organisation.TYPE_CENTRAL
+            and service.organisation
+            and organisation_branding_id is None
+            and service_branding_name.lower() != 'GOV.UK and {}'.format(service.organisation.name).lower()
+            and branding_type == "email"
         ):
             yield ('govuk_and_org', 'GOV.UK and {}'.format(service.organisation.name))
 
@@ -1438,19 +1440,21 @@ class BrandingOptions(StripWhitespaceForm):
                 Organisation.TYPE_NHS_CENTRAL,
                 Organisation.TYPE_NHS_LOCAL,
                 Organisation.TYPE_NHS_GP,
-            } and service_branding_name != 'NHS'
+            }
+            and service_branding_name != 'NHS'
         ):
             yield ('nhs', 'NHS')
 
         if (
-            service.organisation and
-            service.organisation_type not in {
+            service.organisation
+            and service.organisation_type not in {
                 Organisation.TYPE_NHS_LOCAL,
                 Organisation.TYPE_NHS_CENTRAL,
                 Organisation.TYPE_NHS_GP,
-            } and (
-                service_branding_id is None or
-                service_branding_id != organisation_branding_id
+            }
+            and (
+                service_branding_id is None
+                or service_branding_id != organisation_branding_id
             )
         ):
             yield ('organisation', service.organisation.name)
@@ -1463,8 +1467,8 @@ class BrandingOptions(StripWhitespaceForm):
 
     def validate_something_else(self, field):
         if (
-            self.something_else_is_only_option or
-            self.options.data == self.FALLBACK_OPTION_VALUE
+            self.something_else_is_only_option
+            or self.options.data == self.FALLBACK_OPTION_VALUE
         ) and not field.data:
             raise ValidationError('Cannot be empty')
 
