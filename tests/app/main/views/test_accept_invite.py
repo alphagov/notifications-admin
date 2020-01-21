@@ -180,7 +180,7 @@ def test_existing_user_of_service_get_redirected_to_signin(
 ):
     sample_invite['email_address'] = api_user_active['email_address']
     mocker.patch('app.invite_api_client.check_token', return_value=sample_invite)
-    mocker.patch('app.models.user.Users.client', return_value=[api_user_active])
+    mocker.patch('app.models.user.Users.client_method', return_value=[api_user_active])
 
     response = client.get(url_for('main.accept_invite', token='thisisnotarealtoken'), follow_redirects=True)
     assert response.status_code == 200
@@ -432,7 +432,7 @@ def test_accept_invite_does_not_treat_email_addresses_as_case_sensitive(
     # the email address of api_user_active is 'test@user.gov.uk'
     sample_invite['email_address'] = 'TEST@user.gov.uk'
     mocker.patch('app.invite_api_client.check_token', return_value=sample_invite)
-    mocker.patch('app.models.user.Users.client', return_value=[api_user_active])
+    mocker.patch('app.models.user.Users.client_method', return_value=[api_user_active])
 
     client_request.get(
         'main.accept_invite',

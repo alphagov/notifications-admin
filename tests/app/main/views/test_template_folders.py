@@ -480,7 +480,7 @@ def test_get_manage_folder_page(
         _folder('folder_two', folder_id, None, [active_user_with_permissions['id']]),
     ]
     mocker.patch(
-        'app.models.user.Users.client',
+        'app.models.user.Users.client_method',
         return_value=[active_user_with_permissions],
     )
     page = client_request.get(
@@ -514,7 +514,7 @@ def test_get_manage_folder_viewing_permissions_for_users(
         _folder('folder_two', folder_id, None, [active_user_with_permissions['id'], team_member_2['id']]),
     ]
     mocker.patch(
-        'app.models.user.Users.client',
+        'app.models.user.Users.client_method',
         return_value=[active_user_with_permissions, team_member, team_member_2],
     )
 
@@ -566,7 +566,7 @@ def test_get_manage_folder_viewing_permissions_for_users_not_visible_when_no_man
         ]},
     ]
     mocker.patch(
-        'app.models.user.Users.client',
+        'app.models.user.Users.client_method',
         return_value=[active_user_with_permissions, team_member, team_member_2],
     )
 
@@ -600,7 +600,7 @@ def test_get_manage_folder_viewing_permissions_for_users_not_visible_for_service
         ]},
     ]
     mocker.patch(
-        'app.models.user.Users.client',
+        'app.models.user.Users.client_method',
         return_value=[active_user_with_permissions],
     )
 
@@ -712,7 +712,7 @@ def test_rename_folder(client_request, active_user_with_permissions, service_one
         _folder('folder_two', folder_id, None, [active_user_with_permissions['id']])
     ]
     mocker.patch(
-        'app.models.user.Users.client',
+        'app.models.user.Users.client_method',
         return_value=[active_user_with_permissions],
     )
 
@@ -745,7 +745,7 @@ def test_manage_folder_users(
         _folder('folder_two', folder_id, None, [active_user_with_permissions['id'], team_member['id']])
     ]
     mocker.patch(
-        'app.models.user.Users.client',
+        'app.models.user.Users.client_method',
         return_value=[active_user_with_permissions, team_member],
     )
 
@@ -788,7 +788,7 @@ def test_manage_folder_users_doesnt_change_permissions_current_user_cannot_manag
         ]}
     ]
     mocker.patch(
-        'app.models.user.Users.client',
+        'app.models.user.Users.client_method',
         return_value=[active_user_with_permissions, team_member],
     )
 
@@ -835,18 +835,18 @@ def test_delete_template_folder_should_request_confirmation(
 
     assert page.select_one('input[name=name]')['value'] == 'sacrifice'
 
-    assert len(page.select('form')) == 2
-    assert len(page.select('button')) == 3
+    assert len(page.select('main form')) == 2
+    assert len(page.select('main button')) == 2
 
-    assert 'action' not in page.select('form')[0]
-    assert page.select('form button')[0].text == 'Yes, delete'
+    assert 'action' not in page.select('main form')[0]
+    assert page.select('main form button')[0].text == 'Yes, delete'
 
-    assert page.select('form')[1]['action'] == url_for(
+    assert page.select('main form')[1]['action'] == url_for(
         'main.manage_template_folder',
         service_id=service_one['id'],
         template_folder_id=folder_id,
     )
-    assert page.select('form button')[1].text == 'Save'
+    assert page.select('main form button')[1].text == 'Save'
 
 
 def test_delete_template_folder_should_detect_non_empty_folder_on_get(

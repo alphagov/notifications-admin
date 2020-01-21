@@ -1732,14 +1732,12 @@ def mock_get_uploads(mocker, api_user_active):
                     'notification_count': 10,
                     'created_at': '2016-01-01 11:09:00.061258',
                     'statistics': [{'count': 8, 'status': 'delivered'}, {'count': 2, 'status': 'temporary-failure'}],
-                    'job_status': 'finished',
                     'upload_type': 'job'},
                    {'id': 'job_id_1',
                     'original_file_name': 'some.csv',
                     'notification_count': 1,
                     'created_at': '2016-01-01 11:09:00.061258',
                     'statistics': [{'count': 1, 'status': 'delivered'}],
-                    'job_status': 'finished',
                     'upload_type': 'letter'}
                    ]
         return {
@@ -1750,7 +1748,7 @@ def mock_get_uploads(mocker, api_user_active):
             }
         }
     # Why is mocking on the model needed?
-    return mocker.patch('app.models.job.PaginatedUploads.client', side_effect=_get_uploads)
+    return mocker.patch('app.models.job.PaginatedUploads.client_method', side_effect=_get_uploads)
 
 
 @pytest.fixture(scope='function')
@@ -2011,7 +2009,7 @@ def mock_get_users_by_service(mocker):
 
     # You shouldn’t be calling the user API client directly, so it’s the
     # instance on the model that’s mocked here
-    return mocker.patch('app.models.user.Users.client', side_effect=_get_users_for_service)
+    return mocker.patch('app.models.user.Users.client_method', side_effect=_get_users_for_service)
 
 
 @pytest.fixture(scope='function')
@@ -2080,7 +2078,7 @@ def mock_get_invites_for_service(mocker, service_one, sample_invite):
             data.append(invite)
         return data
 
-    return mocker.patch('app.models.user.InvitedUsers.client', side_effect=_get_invites)
+    return mocker.patch('app.models.user.InvitedUsers.client_method', side_effect=_get_invites)
 
 
 @pytest.fixture(scope='function')
@@ -2099,7 +2097,7 @@ def mock_get_invites_without_manage_permission(mocker, service_one, sample_invit
             status='pending',
         )]
 
-    return mocker.patch('app.models.user.InvitedUsers.client', side_effect=_get_invites)
+    return mocker.patch('app.models.user.InvitedUsers.client_method', side_effect=_get_invites)
 
 
 @pytest.fixture(scope='function')
@@ -2920,7 +2918,7 @@ def mock_get_organisations(mocker):
         ]
 
     mocker.patch(
-        'app.models.organisation.Organisations.client',
+        'app.models.organisation.Organisations.client_method',
         side_effect=_get_organisations,
     )
 
@@ -3035,7 +3033,7 @@ def mock_get_users_for_organisation(mocker):
         ]
 
     return mocker.patch(
-        'app.models.user.OrganisationUsers.client',
+        'app.models.user.OrganisationUsers.client_method',
         side_effect=_get_users_for_organisation
     )
 
@@ -3048,7 +3046,7 @@ def mock_get_invited_users_for_organisation(mocker, sample_org_invite):
         ]
 
     return mocker.patch(
-        'app.models.user.OrganisationInvitedUsers.client',
+        'app.models.user.OrganisationInvitedUsers.client_method',
         side_effect=_get_invited_invited_users_for_organisation
     )
 

@@ -176,6 +176,7 @@ def is_weekend(time):
 def is_bank_holiday(time):
     return time.strftime('%Y-%m-%d') in {
         # taken from https://www.gov.uk/bank-holidays.json
+        # curl https://www.gov.uk/bank-holidays.json | jq '."england-and-wales".events[].date'
         "2016-01-01",
         "2016-03-25",
         "2016-03-28",
@@ -208,6 +209,22 @@ def is_bank_holiday(time):
         "2019-08-26",
         "2019-12-25",
         "2019-12-26",
+        "2020-01-01",
+        "2020-04-10",
+        "2020-04-13",
+        "2020-05-08",
+        "2020-05-25",
+        "2020-08-31",
+        "2020-12-25",
+        "2020-12-28",
+        "2021-01-01",
+        "2021-04-02",
+        "2021-04-05",
+        "2021-05-03",
+        "2021-05-31",
+        "2021-08-30",
+        "2021-12-27",
+        "2021-12-28",
     }
 
 

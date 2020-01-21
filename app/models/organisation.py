@@ -200,5 +200,5 @@ class Organisation(JSONModel):
 
 
 class Organisations(ModelList):
-    client = organisations_client.get_organisations
+    client_method = organisations_client.get_organisations
     model = Organisation

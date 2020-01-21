@@ -157,12 +157,12 @@ class APIKeyEvent(Event):
 class APIKeyEvents(ModelList):
 
     model = APIKeyEvent
-    client = service_api_client.get_service_api_key_history
+    client_method = service_api_client.get_service_api_key_history
 
 
 class ServiceEvents(ModelList):
 
-    client = service_api_client.get_service_service_history
+    client_method = service_api_client.get_service_service_history
 
     @property
     def model(self):
@@ -187,5 +187,5 @@ class ServiceEvents(ModelList):
 
     def __init__(self, service_id):
         self.items = [
-            event for event in self.splat(self.client(service_id)) if event.relevant
+            event for event in self.splat(self.client_method(service_id)) if event.relevant
         ]

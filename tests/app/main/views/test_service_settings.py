@@ -435,7 +435,7 @@ def test_show_restricted_service(
     )
 
     assert page.find('h1').text == 'Settings'
-    assert page.find_all('h2')[0].text == 'Your service is in trial mode'
+    assert page.select('main h2')[0].text == 'Your service is in trial mode'
 
     request_to_live = page.select('main p')[1]
     request_to_live_link = request_to_live.select_one('a')
@@ -763,7 +763,7 @@ def test_should_check_for_sending_things_right(
         }.get(template_type)
     active_user_with_permissions,
     mock_get_users = mocker.patch(
-        'app.models.user.Users.client',
+        'app.models.user.Users.client_method',
         return_value=(
             [active_user_with_permissions] * count_of_users_with_manage_service +
             [active_user_no_settings_permission]
@@ -783,7 +783,7 @@ def test_should_check_for_sending_things_right(
     invite_two['permissions'] = 'view_activity'
 
     mock_get_invites = mocker.patch(
-        'app.models.user.InvitedUsers.client',
+        'app.models.user.InvitedUsers.client_method',
         return_value=(
             ([invite_one] * count_of_invites_with_manage_service) +
             [invite_two]
@@ -889,7 +889,7 @@ def test_should_not_show_go_live_button_if_checklist_not_complete(
         page.select_one('[type=submit]').text.strip() == ('Request to go live')
     else:
         assert not page.select('form')
-        assert not page.select('[type=submit]')
+        assert not page.select('main [type=submit]')
         assert len(page.select('main p')) == 1
         assert normalize_spaces(page.select_one('main p').text) == (
             'You must complete these steps before you can request to go live.'
@@ -1192,8 +1192,8 @@ def test_non_gov_user_is_told_they_cant_go_live(
     assert normalize_spaces(page.select_one('main p').text) == (
         'Only team members with a government email address can request to go live.'
     )
-    assert len(page.select('form')) == 0
-    assert len(page.select('button')) == 1
+    assert len(page.select('main form')) == 0
+    assert len(page.select('main button')) == 0
 
 
 @pytest.mark.parametrize('consent_to_research, displayed_consent', (

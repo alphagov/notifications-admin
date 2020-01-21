@@ -569,32 +569,61 @@ def get_letter_printing_statement(status, created_at):
 LETTER_VALIDATION_MESSAGES = {
     'letter-not-a4-portrait-oriented': {
         'title': 'Your letter is not A4 portrait size',
-        'detail': 'You need to change the size or orientation of {invalid_pages}. <br>'
-                  'Files must meet our <a href="https://docs.notifications.service.gov.uk/documentation/images/'
-                  'notify-pdf-letter-spec-v2.4.pdf" target="_blank">letter specification</a>.'
+        'detail': (
+            'You need to change the size or orientation of {invalid_pages}. <br>'
+            'Files must meet our <a href="{letter_spec}" target="_blank">letter specification</a>.'
+        ),
+        'summary': (
+            'Validation failed because {invalid_pages} {invalid_pages_are_or_is} not A4 portrait size.<br>'
+            'Files must meet our <a href="{letter_spec}" target="_blank">letter specification</a>.'
+        ),
     },
     'content-outside-printable-area': {
         'title': 'Your content is outside the printable area',
-        'detail': 'You need to edit {invalid_pages}.<br>'
-                  'Files must meet our <a href="https://docs.notifications.service.gov.uk/documentation/images/'
-                  'notify-pdf-letter-spec-v2.4.pdf" target="_blank">letter specification</a>.'
+        'detail': (
+            'You need to edit {invalid_pages}.<br>'
+            'Files must meet our <a href="{letter_spec}" target="_blank">letter specification</a>.'
+        ),
+        'summary': (
+            'Validation failed because content is outside the printable area on {invalid_pages}.<br>'
+            'Files must meet our <a href="{letter_spec}" target="_blank">letter specification</a>.'
+        ),
     },
     'letter-too-long': {
         'title': 'Your letter is too long',
-        'detail': 'Letters must be 10 pages or less. <br>Your letter is {page_count} pages long.'
+        'detail': (
+            'Letters must be 10 pages or less. <br>'
+            'Your letter is {page_count} pages long.'
+        ),
+        'summary': (
+            'Validation failed because this letter is {page_count} pages long.<br>'
+            'Letters must be 10 pages or less.'
+        ),
     },
     'no-encoded-string': {
         'title': 'Sanitise failed - No encoded string'
     },
     'unable-to-read-the-file': {
         'title': 'There’s a problem with your file',
-        'detail': 'Notify cannot read this PDF.<br>Save a new copy of your file and try again.'
+        'detail': (
+            'Notify cannot read this PDF.'
+            '<br>Save a new copy of your file and try again.'
+        ),
+        'summary': (
+            'Validation failed because Notify cannot read this PDF.<br>'
+            'Save a new copy of your file and try again.'
+        ),
     },
     'address-is-empty': {
         'title': 'The address block is empty',
-        'detail': 'You need to add a recipient address.<br>'
-                  'Files must meet our <a href="https://docs.notifications.service.gov.uk/documentation/images/'
-                  'notify-pdf-letter-spec-v2.4.pdf" target="_blank">letter specification</a>.'
+        'detail': (
+            'You need to add a recipient address.<br>'
+            'Files must meet our <a href="{letter_spec}" target="_blank">letter specification</a>.'
+        ),
+        'summary': (
+            'Validation failed because the address block is empty.<br>'
+            'Files must meet our <a href="{letter_spec}" target="_blank">letter specification</a>.'
+        ),
     }
 }
 
@@ -602,6 +631,8 @@ LETTER_VALIDATION_MESSAGES = {
 def get_letter_validation_error(validation_message, invalid_pages=None, page_count=None):
     if validation_message not in LETTER_VALIDATION_MESSAGES:
         return {'title': 'Validation failed'}
+
+    invalid_pages_are_or_is = 'is' if len(invalid_pages) == 1 else 'are'
 
     invalid_pages = unescaped_formatted_list(
         invalid_pages or [],
@@ -615,8 +646,16 @@ def get_letter_validation_error(validation_message, invalid_pages=None, page_cou
         'title': LETTER_VALIDATION_MESSAGES[validation_message]['title'],
         'detail': LETTER_VALIDATION_MESSAGES[validation_message]['detail'].format(
             invalid_pages=invalid_pages,
+            invalid_pages_are_or_is=invalid_pages_are_or_is,
             page_count=page_count,
-        )
+            letter_spec=url_for('.letter_spec'),
+        ),
+        'summary': LETTER_VALIDATION_MESSAGES[validation_message]['summary'].format(
+            invalid_pages=invalid_pages,
+            invalid_pages_are_or_is=invalid_pages_are_or_is,
+            page_count=page_count,
+            letter_spec=url_for('.letter_spec'),
+        ),
     }
 
 
