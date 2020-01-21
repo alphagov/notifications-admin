@@ -12,14 +12,14 @@
 
   <p>This guidance is for teams using GOV.UK Notify to send emails, text messages and letters.</p>
 
-  <p>It includes information about how to:</p>
+  <p>It explains how to:</p>
 
   <ul class="list list-bullet">
-    <li><a href="#create-and-send-messages">create and send messages</a></li>
-    <li><a href="#edit-and-format-messages">edit and format messages</a></li>
-    <li><a href="#send-files-by-email">send files by email</a></li>
-    <li><a href="#upload-letters">upload your own letters</a></li>
-    <li>add <a href="#branding">branding and customisation</a></li>
+    <li><a href="{{ url_for('.create-and-send-messages') }}">create and send messages</a></li>
+    <li><a href="{{ url_for('.edit-and-format-messages') }}">edit and format messages</a></li>
+    <li><a href="{{ url_for('.send-files-by-email') }}">send files by email</a></li>
+    <li><a href="{{ url_for('.upload-your-own-letters') }}">upload your own letters</a></li>
+    <li>add <a href="{{ url_for('.branding-and-customisation') }}">branding and customisation</a></li>
   </ul>
   
 {% endblock %}
