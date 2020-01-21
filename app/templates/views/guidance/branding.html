@@ -21,6 +21,8 @@
   
   <h2 class="heading-medium" id="email-branding">Change email branding</h2>
 
+  <p>The default branding for email templates is the GOV.UK logo.</p>
+  
   <p>To change your email branding:</p>
 
   <ol class="list list-number">
@@ -31,7 +33,7 @@
 
   <h2 class="heading-medium" id="reply-to-address">Add a reply-to email address</h2>
   
-  <p>Notify lets you choose the email address that users reply to. You must add at least one reply-to address before your service can go live.</p>
+  <p>You can choose the email address that your users reply to. You must add at least one reply-to address for your service before you can <a href="{{ url_for('main.trial_mode_new') }}">request to go live</a>.</p>
 
   <p>To add a reply-to email address:</p>
 
@@ -40,7 +42,6 @@
     <li>Go to the Settings page.</li>
     <li>In the Email settings section, select Manage on the Reply-to email addresses row.</li>
     <li>Select Add reply-to address.</li>
-    <!--<li>Enter the email address you want to use, and select Add.</li>-->
   </ol>
   
   <h2 class="heading-medium" id="text-message-sender">Change the text message sender</h2>
@@ -56,7 +57,9 @@
   
   <h2 class="heading-medium" id="letter-branding">Change letter branding</h2>
   
-  <p>To change your letter branding:</p>
+  <p>Letter templates do not have default branding.</p>
+    
+  <p>To add a logo to your letters:</p>
   
   <ol class="list list-number">
     <li><a href="{{ url_for('.register') }}">Sign in to Notify</a>.</li>
