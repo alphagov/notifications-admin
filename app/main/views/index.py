@@ -343,3 +343,11 @@ def old_page_redirects():
         'main.old_integration_testing': 'main.integration_testing',
     }
     return redirect(url_for(redirects[request.endpoint]), code=301)
+
+
+@main.route('/docs/notify-pdf-letter-spec-latest.pdf')
+def letter_spec():
+    return redirect(
+        'https://docs.notifications.service.gov.uk'
+        '/documentation/images/notify-pdf-letter-spec-v2.4.pdf'
+    )

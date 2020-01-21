@@ -254,3 +254,26 @@ def test_letter_template_preview_headers(
     )
 
     assert response.headers.get('X-Frame-Options') == 'SAMEORIGIN'
+
+
+def test_letter_spec_redirect(client_request):
+    client_request.get(
+        'main.letter_spec',
+        _expected_status=302,
+        _expected_redirect=(
+            'https://docs.notifications.service.gov.uk'
+            '/documentation/images/notify-pdf-letter-spec-v2.4.pdf'
+        ),
+    )
+
+
+def test_letter_spec_redirect_with_non_logged_in_user(client_request):
+    client_request.logout()
+    client_request.get(
+        'main.letter_spec',
+        _expected_status=302,
+        _expected_redirect=(
+            'https://docs.notifications.service.gov.uk'
+            '/documentation/images/notify-pdf-letter-spec-v2.4.pdf'
+        ),
+    )
