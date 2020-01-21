@@ -330,7 +330,7 @@ def test_should_show_job_without_notifications(
     assert page.select_one('tbody').text.strip() == 'No messages to show yet…'
 
 
-@freeze_time("2020-01-10 0:0:0")
+@freeze_time("2020-01-10 1:0:0")
 @pytest.mark.parametrize('created_at, processing_started, expected_message', (
     # Recently created, not yet started
     (datetime(2020, 1, 10, 0, 0, 0), None, (
