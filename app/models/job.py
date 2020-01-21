@@ -107,7 +107,7 @@ class Job(JSONModel):
         return self.notification_count == self.notifications_sent
 
     @property
-    def recently_created(self):
+    def awaiting_processing_or_recently_processed(self):
         if not self.processing_started:
             # Assume that if processing hasn’t started yet then the job
             # must have been created recently enough to not have any
