@@ -1,0 +1,103 @@
+{% extends "content_template.html" %}
+{% from "components/table.html" import mapping_table, row, text_field, edit_field, field with context %}
+{% from "components/sub-navigation.html" import sub_navigation %}
+
+{% block per_page_title %}
+  Guidance
+{% endblock %}
+
+{% block content_column_content %}
+
+  <h1 class="heading-large">Edit and format messages</h1>
+  
+  <p>This section explains how to add:</p>
+  <ul class="list list-bullet">
+    <li><a href="#formatting">formatting</a></li>
+    <li><a href="#links">links</a></li>
+    <li><a href="#personalised-content">personalised content</a></li>
+    <li><a href="#optional-content">optional content</a></li>
+  
+  <h3 class="heading-small" id="formatting">Formatting</h3>
+
+  <p>You can see a list of formatting instructions on the edit template page:</p>
+
+  <ol class="list list-number">
+    <li><a href="{{ url_for('.register') }}">Sign in to Notify</a>.</li>
+    <li>Go to the Templates page.</li>
+    <li>Add a new template or choose an existing template and select Edit.</li>
+  </ol>
+
+  <p>Email templates can include:</p>
+  <ul class="list list-bullet">
+    <li>headings</li>
+    <li>bullets</li>
+    <li>call-outs</li>
+    <li>horizontal rules</li>
+  </ul>
+
+  <p>Letter templates can include headings and bullets.</p>
+
+  <p>Notify does not allow bold, italics, subheadings, underlined text, HTML formatting or different fonts. This is because they can make it harder for users to read what you've written.</p>
+
+  <h3 class="heading-small" id="links">Links</h3>
+  
+  <p>When composing an email or text message, write URLs in full and Notify will convert them into links for you.</p>
+
+  <p>You cannot convert text into a link. Research shows that recipients like to read the URL to check a link looks genuine before they click it. This is hard to do if the URL is hidden behind clickable link text.</p>
+
+  <p>If your links are very long, we do not recommend using a third-party link shortening service because:</p>
+  
+  <ul class="list list-bullet">
+    <li>your users cannot see where the link will take them</li>
+    <li>your link might stop working if there's a service outage</li>
+    <li>you can no longer control where the redirect goes</li>
+  </ul>
+
+  <h3 class="heading-small" id="personalised-content">Personalised content</h3>
+
+  <p>To personalise the content of your messages, add a placeholder to the template.</p>
+
+  <p>Placeholders are filled in with details, like a name or reference number, each time you send a message.</p>
+
+  <p>To add a placeholder to the template:</p>
+
+  <ol class="list list-number">
+    <li><a href="{{ url_for('.register') }}">Sign in to Notify</a>.</li>
+    <li>Go to the Templates page.</li>
+    <li>Add a new template or choose an existing template and select Edit.</li>
+    <li>Add a placeholder using double brackets. For example: Hello ((first name)), your reference is ((ref number)).</li>
+    <li>Select Save.</li>
+  </ol>
+
+  <p>When you send a message you can either:</p>
+
+  <ul class="list list-bullet">
+    <li>manually fill in the placeholders yourself</li>
+    <li>upload a list of personal details and let Notify do it for you</li>
+  </ul>
+
+  <p>If you upload a list, the column names need to match the placeholders in your template.</p>
+  
+  <h3 class="heading-small" id="optional-content">Optional content</h3>
+  
+  <p>To add optional content to your emails and text messages:</p>
+  
+  <ol class="list list-number">
+    <li><a href="{{ url_for('.register') }}">Sign in to Notify</a>.</li>
+    <li>Go to the Templates page.</li>
+    <li>Add a new template or choose an existing template and select Edit.</li>
+    <li>Use double brackets and ?? to define optional content. For example, if you only want to show something to people who are under 18: ((under18??Please get your application signed by a parent or guardian.))</li>
+    <li>Select Save.</li>
+  </ol>
+
+  <p>For each person you send this message to, specify ‘yes’ or ‘no’ to show or hide this content. You can either:</p>
+
+  <ul class="list list-bullet">
+    <li>do this yourself</li>
+    <li>upload a list of personal details and let Notify do it for you</li>
+  </ul>
+
+  <p>If you upload a list, the column names need to match the optional content in your template.</p>
+
+  <p>You cannot add optional content to a letter.</p>
+  
