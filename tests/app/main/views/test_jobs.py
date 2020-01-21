@@ -344,8 +344,12 @@ def test_should_show_job_without_notifications(
     (datetime(2020, 1, 1, 0, 0, 0), datetime(2020, 1, 10, 0, 0, 1), (
         'No messages to show yet…'
     )),
-    # Created a while ago, started a couple of days ago
-    (datetime(2020, 1, 1, 0, 0, 0), datetime(2020, 1, 8, 0, 0, 1), (
+    # Created a while ago, started just within the last 24h
+    (datetime(2020, 1, 1, 0, 0, 0), datetime(2020, 1, 9, 1, 0, 1), (
+        'No messages to show yet…'
+    )),
+    # Created a while ago, started exactly 24h ago
+    (datetime(2020, 1, 1, 0, 0, 0), datetime(2020, 1, 9, 1, 0, 0), (
         'These messages have been deleted because they were sent more than 7 days ago'
     )),
 ))
