@@ -1,7 +1,4 @@
-from flask import Markup, abort, current_app
-from notifications_utils.field import Field
-from notifications_utils.formatters import nl2br
-from notifications_utils.take import Take
+from flask import abort, current_app
 from werkzeug.utils import cached_property
 
 from app.models import JSONModel
@@ -358,13 +355,11 @@ class Service(JSONModel):
 
     @property
     def default_letter_contact_block_html(self):
+        # import in the function to prevent cyclical imports
+        from app import nl2br
+
         if self.default_letter_contact_block:
-            return Markup(Take(Field(
-                self.default_letter_contact_block['contact_block'],
-                html='escape',
-            )).then(
-                nl2br
-            ))
+            return nl2br(self.default_letter_contact_block['contact_block'])
         return ''
 
     def edit_letter_contact_block(self, id, contact_block, is_default):

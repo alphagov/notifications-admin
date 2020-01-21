@@ -1,6 +1,7 @@
 import re
 
 from notifications_utils.field import Field
+from notifications_utils.formatters import formatted_list
 from notifications_utils.recipients import (
     InvalidEmailError,
     validate_email_address,
@@ -9,7 +10,6 @@ from notifications_utils.sanitise_text import SanitiseSMS
 from wtforms import ValidationError
 from wtforms.validators import Email
 
-from app import formatted_list
 from app.main._blacklisted_passwords import blacklisted_passwords
 from app.utils import Spreadsheet, is_gov_user
 
