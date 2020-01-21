@@ -8,6 +8,7 @@ from time import monotonic
 import ago
 import jinja2
 from flask import (
+    Markup,
     current_app,
     flash,
     g,
@@ -26,13 +27,14 @@ from govuk_frontend_jinja.flask_ext import init_govuk_frontend
 from itsdangerous import BadSignature
 from notifications_python_client.errors import HTTPError
 from notifications_utils import formatters, logging, request_helper
-from notifications_utils.formatters import formatted_list
+from notifications_utils.field import Field
 from notifications_utils.recipients import (
     InvalidPhoneError,
     format_phone_number_human_readable,
     validate_phone_number,
 )
 from notifications_utils.sanitise_text import SanitiseASCII
+from notifications_utils.take import Take
 from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
 from werkzeug.exceptions import HTTPException as WerkzeugHTTPException
 from werkzeug.exceptions import abort
@@ -467,7 +469,14 @@ def format_notification_status_as_url(status, notification_type):
 
 
 def nl2br(value):
-    return formatters.nl2br(value) if value else ''
+    if value:
+        return Markup(Take(Field(
+            value,
+            html='escape',
+        )).then(
+            formatters.nl2br
+        ))
+    return ''
 
 
 @login_manager.user_loader
@@ -740,7 +749,7 @@ def add_template_filters(application):
         format_notification_status_as_time,
         format_notification_status_as_field_status,
         format_notification_status_as_url,
-        formatted_list,
+        formatters.formatted_list,
         nl2br,
         format_phone_number_human_readable,
         format_thousands,

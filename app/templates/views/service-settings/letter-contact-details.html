@@ -32,7 +32,7 @@
     {% for item in letter_contact_details %}
       <div class="user-list-item">
         <p>
-          {{ item.contact_block | nl2br | safe }}
+          {{ item.contact_block | nl2br }}
         </p>
         <p class="hint">
           {%- if item.is_default -%}
