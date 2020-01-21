@@ -12,12 +12,12 @@ blinker==1.4
 pyexcel==0.5.15
 pyexcel-io==0.5.20
 pyexcel-xls==0.5.8
-pyexcel-xlsx==0.5.7
+pyexcel-xlsx==0.5.8
 pyexcel-ods3==0.5.3
 pytz==2019.3
 gunicorn==19.7.1  # pyup: ignore, >19.8 breaks eventlet patching
 eventlet==0.25.1
-notifications-python-client==5.4.0
+notifications-python-client==5.5.0
 
 # PaaS
 awscli-cwlogs>=1.4,<1.5
@@ -26,13 +26,13 @@ awscli-cwlogs>=1.4,<1.5
 itsdangerous==0.24  # pyup: <1.0.0
 
 git+https://github.com/alphagov/notifications-utils.git@36.4.0#egg=notifications-utils==36.4.0
-git+https://github.com/alphagov/govuk-frontend-jinja.git@v0.3.0-alpha#egg=govuk-frontend-jinja==0.3.0-alpha
+git+https://github.com/alphagov/govuk-frontend-jinja.git@v0.5.1-alpha#egg=govuk-frontend-jinja==0.5.1-alpha
 
 ## The following requirements were added by pip freeze:
-awscli==1.16.310
+awscli==1.17.6
 bleach==3.1.0
 boto3==1.10.38
-botocore==1.13.46
+botocore==1.14.6
 certifi==2019.11.28
 chardet==3.0.4
 Click==7.0
@@ -53,7 +53,7 @@ lxml==4.4.2
 MarkupSafe==1.1.1
 mistune==0.8.4
 monotonic==1.5
-openpyxl==2.5.14
+openpyxl==3.0.3
 orderedset==2.0.1
 phonenumbers==8.11.1
 pyasn1==0.4.8
@@ -66,8 +66,8 @@ PyYAML==5.2
 redis==3.3.11
 requests==2.22.0
 rsa==3.4.2
-s3transfer==0.2.1
-six==1.13.0
+s3transfer==0.3.1
+six==1.14.0
 smartypants==2.0.1
 statsd==3.3.0
 texttable==1.6.2
