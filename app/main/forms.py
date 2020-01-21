@@ -1403,6 +1403,7 @@ class BrandingOptions(StripWhitespaceForm):
     def __init__(self, service, *args, branding_type="email", **kwargs):
         super().__init__(*args, **kwargs)
         self.options.choices = tuple(self.get_available_choices(service, branding_type))
+        self.options.label.text = 'Choose your new {} branding'.format(branding_type)
         if self.something_else_is_only_option:
             self.options.data = self.FALLBACK_OPTION_VALUE
 
