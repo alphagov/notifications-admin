@@ -14,6 +14,7 @@ from flask import (
 )
 from flask_login import current_user
 from notifications_python_client.errors import HTTPError
+from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
 
 from app import (
     billing_api_client,
@@ -475,8 +476,10 @@ def get_service_verify_reply_to_address_partials(service_id, notification_id):
                     email_address=notification["to"],
                     is_default=is_default
                 )
-    created_at_no_tz = notification["created_at"][:-6]
-    seconds_since_sending = (datetime.utcnow() - datetime.strptime(created_at_no_tz, '%Y-%m-%dT%H:%M:%S.%f')).seconds
+    seconds_since_sending = (
+        utc_string_to_aware_gmt_datetime(datetime.utcnow().isoformat()) -
+        utc_string_to_aware_gmt_datetime(notification['created_at'])
+    ).seconds
     if notification["status"] in FAILURE_STATUSES or (
         notification["status"] in SENDING_STATUSES and
         seconds_since_sending > current_app.config['REPLY_TO_EMAIL_ADDRESS_VALIDATION_TIMEOUT']
