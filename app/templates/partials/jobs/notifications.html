@@ -47,7 +47,7 @@
         notifications,
         caption=uploaded_file_name,
         caption_visible=False,
-        empty_message='These messages have been deleted because they were sent more than {} days ago'.format(service_data_retention_days) if job.job_status == 'finished' else 'No messages to show yet…',
+        empty_message='These messages have been deleted because they were sent more than {} days ago'.format(service_data_retention_days) if job.status == 'finished' else 'No messages to show yet…',
         field_headings=[
           'Recipient',
           'Status'

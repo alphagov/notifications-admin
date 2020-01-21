@@ -24,7 +24,6 @@ class Job(JSONModel):
         'original_file_name',
         'created_at',
         'notification_count',
-        'job_status',
         'created_by',
     }
 
@@ -34,7 +33,7 @@ class Job(JSONModel):
 
     @property
     def status(self):
-        return self.job_status
+        return self._dict.get('job_status')
 
     @property
     def cancelled(self):

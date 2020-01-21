@@ -1732,14 +1732,12 @@ def mock_get_uploads(mocker, api_user_active):
                     'notification_count': 10,
                     'created_at': '2016-01-01 11:09:00.061258',
                     'statistics': [{'count': 8, 'status': 'delivered'}, {'count': 2, 'status': 'temporary-failure'}],
-                    'job_status': 'finished',
                     'upload_type': 'job'},
                    {'id': 'job_id_1',
                     'original_file_name': 'some.csv',
                     'notification_count': 1,
                     'created_at': '2016-01-01 11:09:00.061258',
                     'statistics': [{'count': 1, 'status': 'delivered'}],
-                    'job_status': 'finished',
                     'upload_type': 'letter'}
                    ]
         return {
