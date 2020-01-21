@@ -14,7 +14,7 @@
 
   {{ page_header(
     'Change {} branding'.format(branding_type),
-    back_link=url_for('main.service_settings', service_id=current_service.id)
+    back_link=url_for('.view_template', service_id=current_service.id, template_id=from_template) if from_template else url_for('.service_settings', service_id=current_service.id)
   ) }}
 
   <p>

@@ -1001,15 +1001,6 @@ def service_preview_letter_branding(service_id):
     )
 
 
-@main.route("/services/<uuid:service_id>/service-settings/request-letter-branding", methods=['GET', 'POST'])
-@user_has_permissions('manage_service', 'manage_templates')
-def request_letter_branding(service_id):
-    return render_template(
-        'views/service-settings/request-letter-branding.html',
-        from_template=request.args.get('from_template'),
-    )
-
-
 @main.route("/services/<uuid:service_id>/service-settings/link-service-to-organisation", methods=['GET', 'POST'])
 @user_is_platform_admin
 def link_service_to_organisation(service_id):
@@ -1085,7 +1076,8 @@ def branding_request(service_id, branding_type):
         'views/service-settings/branding/branding-options.html',
         form=form,
         branding_type=branding_type,
-        branding_name=branding_name
+        branding_name=branding_name,
+        from_template=request.args.get('from_template')
     )
 
 

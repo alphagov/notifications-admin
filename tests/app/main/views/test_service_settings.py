@@ -3024,58 +3024,6 @@ def test_set_letter_contact_block_has_max_10_lines(
     assert error_message == 'Contains 11 lines, maximum is 10'
 
 
-@pytest.mark.parametrize('extra_args, expected_partial_url', (
-    (
-        {},
-        partial(url_for, 'main.service_settings')
-    ),
-    (
-        {'from_template': FAKE_TEMPLATE_ID},
-        partial(url_for, 'main.view_template', template_id=FAKE_TEMPLATE_ID)
-    ),
-))
-def test_request_letter_branding(
-    client_request,
-    mock_get_letter_branding_by_id,
-    extra_args,
-    expected_partial_url,
-):
-    request_page = client_request.get(
-        'main.request_letter_branding',
-        service_id=SERVICE_ONE_ID,
-        **extra_args
-    )
-    assert request_page.select_one('main p').text.strip() == 'Your letters do not have a logo.'
-    back_link_href = request_page.select('main a')[0]['href']
-    link_href = request_page.select('main a')[1]['href']
-    assert link_href == url_for(
-        'main.feedback',
-        ticket_type='ask-question-give-feedback',
-        body='letter-branding',
-    )
-    feedback_page = client_request.get_url(link_href)
-    assert feedback_page.select_one('textarea').text.strip() == (
-        'I would like my own logo on my letter templates.'
-    )
-    assert back_link_href == expected_partial_url(service_id=SERVICE_ONE_ID)
-
-
-def test_request_letter_branding_if_already_have_branding(
-    client_request,
-    mock_get_letter_branding_by_id,
-    service_one,
-):
-    service_one['letter_branding'] = uuid4()
-
-    request_page = client_request.get(
-        'main.request_letter_branding',
-        service_id=SERVICE_ONE_ID,
-    )
-
-    mock_get_letter_branding_by_id.assert_called_once_with(service_one['letter_branding'])
-    assert request_page.select_one('main p').text.strip() == 'Your letters have the HM Government logo.'
-
-
 def test_service_set_letter_branding_platform_admin_only(
     client_request,
 ):

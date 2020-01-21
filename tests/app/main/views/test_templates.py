@@ -437,7 +437,10 @@ def test_user_with_only_send_and_view_sees_letter_page(
 @pytest.mark.parametrize('letter_branding, expected_link, expected_link_text', (
     (
         None,
-        partial(url_for, 'main.request_letter_branding', from_template=TEMPLATE_ONE_ID),
+        partial(
+            url_for, 'main.branding_request',
+            service_id=SERVICE_ONE_ID, branding_type="letter", from_template=TEMPLATE_ONE_ID
+        ),
         'Add logo',
     ),
     (
