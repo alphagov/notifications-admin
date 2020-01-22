@@ -3648,7 +3648,7 @@ def create_multiple_letter_contact_blocks(service_id='abcd'):
         }, {
             'id': '9457',
             'service_id': service_id,
-            'contact_block': '3 Example Street',
+            'contact_block': 'foo\n\n<bar>\n\nbaz',
             'is_default': False,
             'created_at': datetime.utcnow(),
             'updated_at': None
