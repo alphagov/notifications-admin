@@ -29,9 +29,8 @@ describe("Analytics", () => {
       trackingId: 'UA-75215134-1',
       cookieDomain: 'auto',
       anonymizeIp: true,
-      displayFeaturesTask: null,
+      allowAdFeatures: false,
       transport: 'beacon',
-      name: 'GOVUK.analytics',
       expires: 365
     });
 
@@ -49,9 +48,9 @@ describe("Analytics", () => {
 
       setUpArguments = window.ga.mock.calls;
 
-      expect(setUpArguments[0]).toEqual(['create', 'UA-75215134-1', 'auto', 'GOVUK.analytics', { 'cookieExpires': 31536000 }]);
+      expect(setUpArguments[0]).toEqual(['create', { 'trackingId': 'UA-75215134-1', 'cookieDomain': 'auto', 'cookieExpires': 31536000 }]);
       expect(setUpArguments[1]).toEqual(['set', 'anonymizeIp', true]);
-      expect(setUpArguments[2]).toEqual(['set', 'displayFeaturesTask', null]);
+      expect(setUpArguments[2]).toEqual(['set', 'allowAdFeatures', false]);
       expect(setUpArguments[3]).toEqual(['set', 'transport', 'beacon']);
 
     });

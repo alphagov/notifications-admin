@@ -24,9 +24,8 @@
         trackingId: trackingId,
         cookieDomain: 'auto',
         anonymizeIp: true,
-        displayFeaturesTask: null,
+        allowAdFeatures: false,
         transport: 'beacon',
-        name: 'GOVUK.analytics',
         expires: 365
       });
 
