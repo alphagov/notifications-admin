@@ -277,3 +277,23 @@ def test_letter_spec_redirect_with_non_logged_in_user(client_request):
             '/documentation/images/notify-pdf-letter-spec-v2.4.pdf'
         ),
     )
+
+
+def test_guidance_index(client_request):
+    client_request.get('main.guidance')
+
+
+@pytest.mark.parametrize('slug', (
+    'branding-and-customisation',
+    'create-and-send-messages',
+    'edit-and-format-messages',
+    'index',
+    'send-files-by-email',
+    'upload-a-letter',
+))
+def test_guidance_pages(client_request, slug):
+    client_request.get('main.guidance', slug=slug)
+
+
+def test_guidance_404s_for_page_that_doesnt_exist(client_request):
+    client_request.get('main.guidance', slug='foo', _expected_status=404)

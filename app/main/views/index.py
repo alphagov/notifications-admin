@@ -7,6 +7,7 @@ from flask import (
     url_for,
 )
 from flask_login import current_user
+from jinja2.exceptions import TemplateNotFound
 from notifications_utils.international_billing_rates import (
     INTERNATIONAL_BILLING_RATES,
 )
@@ -323,6 +324,17 @@ def trial_mode_new():
         'views/trial-mode.html',
         navigation_links=features_nav()
     )
+
+
+@main.route('/guidance')
+@main.route('/guidance/<slug>')
+def guidance(slug='index'):
+    try:
+        return render_template(
+            'views/guidance/{}.html'.format(slug)
+        )
+    except TemplateNotFound:
+        abort(404)
 
 
 # --- Redirects --- #
