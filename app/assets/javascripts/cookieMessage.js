@@ -9,7 +9,7 @@ window.GOVUK.Modules = window.GOVUK.Modules || {};
 
     // clear old cookie set by our previous JS, set on the www domain
     if (window.GOVUK.cookie('seen_cookie_message')) {
-      document.cookie = 'seen_cookie_message=;expires=' + new Date() + ';domain=' + window.location.hostname + ';path=/';
+      document.cookie = 'seen_cookie_message=;expires=' + new Date() + ';path=/';
     }
 
     if (consent === null) {
