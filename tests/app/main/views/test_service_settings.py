@@ -4615,6 +4615,39 @@ def test_show_letter_branding_request_page_when_letter_branding_is_set(
 
 
 @pytest.mark.parametrize('branding_type', ['email', 'letter'])
+@pytest.mark.parametrize('from_template,back_link_url', [
+    (None, '/services/{}/service-settings'.format(SERVICE_ONE_ID),),
+    (TEMPLATE_ONE_ID, '/services/{}/templates/{}'.format(SERVICE_ONE_ID, TEMPLATE_ONE_ID),)
+])
+def test_back_link_on_branding_request_page(
+    mocker,
+    service_one,
+    client_request,
+    mock_get_email_branding,
+    mock_get_letter_branding_by_id,
+    active_user_with_permissions,
+    from_template,
+    back_link_url,
+    branding_type,
+):
+    mocker.patch(
+        'app.organisations_client.get_service_organisation',
+        return_value=organisation_json(),
+    )
+    if from_template:
+        page = client_request.get(
+            '.branding_request', service_id=SERVICE_ONE_ID, branding_type=branding_type, from_template=from_template
+        )
+    else:
+        page = client_request.get(
+            '.branding_request', service_id=SERVICE_ONE_ID, branding_type=branding_type
+        )
+
+    back_link = page.select('a[class=govuk-back-link]')
+    assert back_link[0].attrs['href'] == back_link_url
+
+
+@pytest.mark.parametrize('branding_type', ['email', 'letter'])
 def test_show_branding_request_page_when_branding_is_same_as_org(
     mocker,
     service_one,
@@ -4817,6 +4850,44 @@ def test_submit_letter_branding_request(
         'Thanks for your branding request. We’ll get back to you '
         'within one working day.'
     )
+
+
+@pytest.mark.parametrize('branding_type', ['email', 'letter'])
+@pytest.mark.parametrize('from_template', [
+    None,
+    TEMPLATE_ONE_ID
+])
+def test_submit_letter_branding_request_redirects_if_from_template_is_set(
+    client_request,
+    service_one,
+    mocker,
+    mock_get_service_settings_page_common,
+    mock_get_letter_branding_by_id,
+    no_reply_to_email_addresses,
+    no_letter_contact_blocks,
+    single_sms_sender,
+    from_template,
+    branding_type,
+
+):
+    mocker.patch('app.organisations_client.get_service_organisation', return_value=None)
+    mocker.patch('app.main.views.service_settings.zendesk_client.create_ticket', autospec=True)
+    data = {'options': 'something_else', 'something_else': 'Homer Simpson'}
+
+    if from_template:
+        client_request.post(
+            '.branding_request', service_id=SERVICE_ONE_ID, branding_type="letter", from_template=from_template,
+            _data=data,
+            _expected_redirect=url_for(
+                'main.view_template', service_id=SERVICE_ONE_ID, template_id=from_template, _external=True
+            )
+        )
+    else:
+        client_request.post(
+            '.branding_request', service_id=SERVICE_ONE_ID, branding_type="letter",
+            _data=data,
+            _expected_redirect=url_for('main.service_settings', service_id=SERVICE_ONE_ID, _external=True)
+        )
 
 
 @pytest.mark.parametrize('branding_type,current_branding', [
