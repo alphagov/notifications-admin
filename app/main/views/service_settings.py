@@ -30,7 +30,7 @@ from app import (
 from app.extensions import zendesk_client
 from app.main import main
 from app.main.forms import (
-    BrandingOptionsEmail,
+    BrandingOptions,
     ConfirmPasswordForm,
     EstimateUsageForm,
     FreeSMSAllowance,
@@ -1001,15 +1001,6 @@ def service_preview_letter_branding(service_id):
     )
 
 
-@main.route("/services/<uuid:service_id>/service-settings/request-letter-branding", methods=['GET', 'POST'])
-@user_has_permissions('manage_service', 'manage_templates')
-def request_letter_branding(service_id):
-    return render_template(
-        'views/service-settings/request-letter-branding.html',
-        from_template=request.args.get('from_template'),
-    )
-
-
 @main.route("/services/<uuid:service_id>/service-settings/link-service-to-organisation", methods=['GET', 'POST'])
 @user_is_platform_admin
 def link_service_to_organisation(service_id):
@@ -1038,15 +1029,18 @@ def link_service_to_organisation(service_id):
     )
 
 
-@main.route("/services/<uuid:service_id>/branding-request/email", methods=['GET', 'POST'])
+@main.route("/services/<uuid:service_id>/branding-request/<branding_type>", methods=['GET', 'POST'])
 @user_has_permissions('manage_service')
-def branding_request(service_id):
-
-    form = BrandingOptionsEmail(current_service)
-
+def branding_request(service_id, branding_type):
+    form = BrandingOptions(current_service, branding_type=branding_type)
+    from_template = request.args.get('from_template')
+    if branding_type == "email":
+        branding_name = current_service.email_branding_name
+    elif branding_type == "letter":
+        branding_name = current_service.letter_branding_name
     if form.validate_on_submit():
         zendesk_client.create_ticket(
-            subject='Email branding request - {}'.format(current_service.name),
+            subject='{} branding request - {}'.format(branding_type.capitalize(), current_service.name),
             message=(
                 'Organisation: {organisation}\n'
                 'Service: {service_name}\n'
@@ -1061,7 +1055,7 @@ def branding_request(service_id):
                 organisation=current_service.organisation.as_info_for_branding_request(current_user.email_domain),
                 service_name=current_service.name,
                 dashboard_url=url_for('main.service_dashboard', service_id=current_service.id, _external=True),
-                current_branding=current_service.email_branding_name,
+                current_branding=branding_name,
                 branding_requested=dict(form.options.choices)[form.options.data],
                 new_paragraph='\n\n' if form.something_else.data else '',
                 detail=form.something_else.data or ''
@@ -1071,16 +1065,20 @@ def branding_request(service_id):
             user_name=current_user.name,
             tags=['notify_action', 'notify_branding'],
         )
-
         flash((
             'Thanks for your branding request. We’ll get back to you '
             'within one working day.'
         ), 'default')
-        return redirect(url_for('.service_settings', service_id=service_id))
+        return redirect(url_for(
+            '.view_template', service_id=current_service.id, template_id=from_template
+        ) if from_template else url_for('.service_settings', service_id=current_service.id))
 
     return render_template(
-        'views/service-settings/branding/email-options.html',
+        'views/service-settings/branding/branding-options.html',
         form=form,
+        branding_type=branding_type,
+        branding_name=branding_name,
+        from_template=from_template
     )
 
 

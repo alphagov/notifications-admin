@@ -3037,58 +3037,6 @@ def test_set_letter_contact_block_has_max_10_lines(
     assert error_message == 'Contains 11 lines, maximum is 10'
 
 
-@pytest.mark.parametrize('extra_args, expected_partial_url', (
-    (
-        {},
-        partial(url_for, 'main.service_settings')
-    ),
-    (
-        {'from_template': FAKE_TEMPLATE_ID},
-        partial(url_for, 'main.view_template', template_id=FAKE_TEMPLATE_ID)
-    ),
-))
-def test_request_letter_branding(
-    client_request,
-    mock_get_letter_branding_by_id,
-    extra_args,
-    expected_partial_url,
-):
-    request_page = client_request.get(
-        'main.request_letter_branding',
-        service_id=SERVICE_ONE_ID,
-        **extra_args
-    )
-    assert request_page.select_one('main p').text.strip() == 'Your letters do not have a logo.'
-    back_link_href = request_page.select('main a')[0]['href']
-    link_href = request_page.select('main a')[1]['href']
-    assert link_href == url_for(
-        'main.feedback',
-        ticket_type='ask-question-give-feedback',
-        body='letter-branding',
-    )
-    feedback_page = client_request.get_url(link_href)
-    assert feedback_page.select_one('textarea').text.strip() == (
-        'I would like my own logo on my letter templates.'
-    )
-    assert back_link_href == expected_partial_url(service_id=SERVICE_ONE_ID)
-
-
-def test_request_letter_branding_if_already_have_branding(
-    client_request,
-    mock_get_letter_branding_by_id,
-    service_one,
-):
-    service_one['letter_branding'] = uuid4()
-
-    request_page = client_request.get(
-        'main.request_letter_branding',
-        service_id=SERVICE_ONE_ID,
-    )
-
-    mock_get_letter_branding_by_id.assert_called_once_with(service_one['letter_branding'])
-    assert request_page.select_one('main p').text.strip() == 'Your letters have the HM Government logo.'
-
-
 def test_service_set_letter_branding_platform_admin_only(
     client_request,
 ):
@@ -4452,6 +4400,7 @@ def test_update_service_organisation_does_not_update_if_same_value(
     mock_update_service_organisation.called is False
 
 
+@pytest.mark.parametrize('branding_type', ['email', 'letter'])
 @pytest.mark.parametrize('organisation_type, expected_options', (
     ('central', None),
     ('local', None),
@@ -4470,15 +4419,17 @@ def test_update_service_organisation_does_not_update_if_same_value(
     ('emergency_service', None),
     ('other', None),
 ))
-def test_show_email_branding_request_page_when_no_email_branding_is_set(
+def test_show_branding_request_page_when_no_branding_is_set(
     mocker,
     service_one,
     client_request,
     mock_get_email_branding,
+    mock_get_letter_branding_by_id,
     organisation_type,
     expected_options,
+    branding_type
 ):
-    service_one['email_branding'] = None
+    service_one['{}_branding'.format(branding_type)] = None
     service_one['organisation_type'] = organisation_type
     mocker.patch(
         'app.organisations_client.get_service_organisation',
@@ -4486,10 +4437,11 @@ def test_show_email_branding_request_page_when_no_email_branding_is_set(
     )
 
     page = client_request.get(
-        '.branding_request', service_id=SERVICE_ONE_ID
+        '.branding_request', service_id=SERVICE_ONE_ID, branding_type=branding_type
     )
 
     mock_get_email_branding.assert_not_called()
+    mock_get_letter_branding_by_id.assert_not_called()
 
     if expected_options:
         assert [
@@ -4513,12 +4465,8 @@ def test_show_email_branding_request_page_when_no_email_branding_is_set(
         assert not page.select('.conditional-radios-panel')
 
 
+@pytest.mark.parametrize('branding_type', ['email', 'letter'])
 @pytest.mark.parametrize('organisation_type, expected_options', (
-    ('central', [
-        ('govuk_and_org', 'GOV.UK and Test Organisation'),
-        ('organisation', 'Test Organisation'),
-        ('something_else', 'Something else'),
-    ]),
     ('local', [
         ('organisation', 'Test Organisation'),
         ('something_else', 'Something else'),
@@ -4544,15 +4492,17 @@ def test_show_email_branding_request_page_when_no_email_branding_is_set(
         ('something_else', 'Something else'),
     ]),
 ))
-def test_show_email_branding_request_page_when_no_email_branding_is_set_but_organisation_exists(
+def test_show_branding_request_page_when_no_branding_is_set_but_organisation_exists(
     mocker,
     service_one,
     client_request,
     mock_get_email_branding,
+    mock_get_letter_branding_by_id,
     organisation_type,
     expected_options,
+    branding_type
 ):
-    service_one['email_branding'] = None
+    service_one['{}_branding'.format(branding_type)] = None
     service_one['organisation_type'] = organisation_type
     mocker.patch(
         'app.organisations_client.get_service_organisation',
@@ -4560,10 +4510,55 @@ def test_show_email_branding_request_page_when_no_email_branding_is_set_but_orga
     )
 
     page = client_request.get(
-        '.branding_request', service_id=SERVICE_ONE_ID
+        '.branding_request', service_id=SERVICE_ONE_ID, branding_type=branding_type
     )
 
     mock_get_email_branding.assert_not_called()
+    mock_get_letter_branding_by_id.assert_not_called()
+
+    assert [
+        (
+            radio['value'],
+            page.select_one('label[for={}]'.format(radio['id'])).text.strip()
+        )
+        for radio in page.select('input[type=radio]')
+    ] == expected_options
+
+
+@pytest.mark.parametrize('organisation_type, expected_options, branding_type', (
+    ('central', [
+        ('govuk_and_org', 'GOV.UK and Test Organisation'),
+        ('organisation', 'Test Organisation'),
+        ('something_else', 'Something else'),
+    ], 'email'),
+    ('central', [
+        ('organisation', 'Test Organisation'),
+        ('something_else', 'Something else'),
+    ], 'letter'),
+))
+def test_show_branding_request_page_when_no_branding_is_set_but_organisation_exists_central_org(
+    mocker,
+    service_one,
+    client_request,
+    mock_get_email_branding,
+    mock_get_letter_branding_by_id,
+    organisation_type,
+    expected_options,
+    branding_type
+):
+    service_one['{}_branding'.format(branding_type)] = None
+    service_one['organisation_type'] = organisation_type
+    mocker.patch(
+        'app.organisations_client.get_service_organisation',
+        return_value=organisation_json(organisation_type=organisation_type),
+    )
+
+    page = client_request.get(
+        '.branding_request', service_id=SERVICE_ONE_ID, branding_type=branding_type
+    )
+
+    mock_get_email_branding.assert_not_called()
+    mock_get_letter_branding_by_id.assert_not_called()
 
     assert [
         (
@@ -4588,7 +4583,7 @@ def test_show_email_branding_request_page_when_email_branding_is_set(
     )
 
     page = client_request.get(
-        '.branding_request', service_id=SERVICE_ONE_ID
+        '.branding_request', service_id=SERVICE_ONE_ID, branding_type="email"
     )
     assert [
         (
@@ -4604,21 +4599,91 @@ def test_show_email_branding_request_page_when_email_branding_is_set(
     ]
 
 
-def test_show_email_branding_request_page_when_email_branding_is_same_as_org(
+def test_show_letter_branding_request_page_when_letter_branding_is_set(
+    mocker,
+    service_one,
+    client_request,
+    mock_get_letter_branding_by_id,
+    active_user_with_permissions,
+):
+    service_one['letter_branding'] = sample_uuid()
+    mocker.patch(
+        'app.organisations_client.get_service_organisation',
+        return_value=organisation_json(),
+    )
+
+    page = client_request.get(
+        '.branding_request', service_id=SERVICE_ONE_ID, branding_type="letter"
+    )
+    assert [
+        (
+            radio['value'],
+            page.select_one('label[for={}]'.format(radio['id'])).text.strip()
+        )
+        for radio in page.select('input[type=radio]')
+    ] == [
+        ('organisation', 'Test Organisation'),
+        ('something_else', 'Something else'),
+    ]
+
+
+@pytest.mark.parametrize('branding_type', ['email', 'letter'])
+@pytest.mark.parametrize('from_template,back_link_url', [
+    (None, '/services/{}/service-settings'.format(SERVICE_ONE_ID),),
+    (TEMPLATE_ONE_ID, '/services/{}/templates/{}'.format(SERVICE_ONE_ID, TEMPLATE_ONE_ID),)
+])
+def test_back_link_on_branding_request_page(
     mocker,
     service_one,
     client_request,
     mock_get_email_branding,
+    mock_get_letter_branding_by_id,
     active_user_with_permissions,
+    from_template,
+    back_link_url,
+    branding_type,
 ):
-    service_one['email_branding'] = sample_uuid()
     mocker.patch(
         'app.organisations_client.get_service_organisation',
-        return_value=organisation_json(email_branding_id=service_one['email_branding']),
+        return_value=organisation_json(),
     )
+    if from_template:
+        page = client_request.get(
+            '.branding_request', service_id=SERVICE_ONE_ID, branding_type=branding_type, from_template=from_template
+        )
+    else:
+        page = client_request.get(
+            '.branding_request', service_id=SERVICE_ONE_ID, branding_type=branding_type
+        )
+
+    back_link = page.select('a[class=govuk-back-link]')
+    assert back_link[0].attrs['href'] == back_link_url
+
+
+@pytest.mark.parametrize('branding_type', ['email', 'letter'])
+def test_show_branding_request_page_when_branding_is_same_as_org(
+    mocker,
+    service_one,
+    client_request,
+    mock_get_email_branding,
+    mock_get_letter_branding_by_id,
+    active_user_with_permissions,
+    branding_type
+):
+    service_one['{}_branding'.format(branding_type)] = sample_uuid()
+    if branding_type == 'email':
+        mocker.patch(
+            'app.organisations_client.get_service_organisation',
+            return_value=organisation_json(email_branding_id=service_one['email_branding']),
+        )
+    else:
+        mocker.patch(
+            'app.organisations_client.get_service_organisation',
+            return_value=organisation_json(letter_branding_id=service_one['letter_branding']),
+        )
 
     page = client_request.get(
-        '.branding_request', service_id=SERVICE_ONE_ID
+        '.branding_request', service_id=SERVICE_ONE_ID, branding_type=branding_type
     )
 
     # Central government organisations who have their own default
@@ -4682,6 +4747,7 @@ def test_submit_email_branding_request(
     expected_organisation,
 ):
     service_one['email_branding'] = sample_uuid()
+
     mocker.patch(
         'app.organisations_client.get_service_organisation',
         return_value=organisation_json(name=org_name) if org_name else None,
@@ -4693,7 +4759,7 @@ def test_submit_email_branding_request(
     )
 
     page = client_request.post(
-        '.branding_request', service_id=SERVICE_ONE_ID,
+        '.branding_request', service_id=SERVICE_ONE_ID, branding_type="email",
         _data=data,
         _follow_redirects=True,
     )
@@ -4720,12 +4786,135 @@ def test_submit_email_branding_request(
     )
 
 
-def test_submit_email_branding_when_something_else_is_only_option(
+@pytest.mark.parametrize('data, requested_branding', (
+    (
+        {
+            'options': 'something_else',
+            'something_else': 'Homer Simpson'
+        },
+        'Something else\n\nHomer Simpson'
+    ),
+    pytest.param(
+        {
+            'options': 'something_else',
+        },
+        '[Missing details]',
+        marks=pytest.mark.xfail(raises=AssertionError),
+    ),
+    pytest.param(
+        {'options': 'foo'},
+        'Nope',
+        marks=pytest.mark.xfail(raises=AssertionError),
+    ),
+))
+@pytest.mark.parametrize('org_name, expected_organisation', (
+    (None, 'Can’t tell (domain is user.gov.uk)'),
+    ('Test Organisation', 'Test Organisation'),
+))
+def test_submit_letter_branding_request(
+    client_request,
+    service_one,
+    mocker,
+    data,
+    requested_branding,
+    mock_get_service_settings_page_common,
+    mock_get_letter_branding_by_id,
+    no_reply_to_email_addresses,
+    no_letter_contact_blocks,
+    single_sms_sender,
+    org_name,
+    expected_organisation,
+):
+    service_one['letter_branding'] = sample_uuid()
+
+    mocker.patch(
+        'app.organisations_client.get_service_organisation',
+        return_value=organisation_json(name=org_name) if org_name else None,
+    )
+
+    zendesk = mocker.patch(
+        'app.main.views.service_settings.zendesk_client.create_ticket',
+        autospec=True,
+    )
+
+    page = client_request.post(
+        '.branding_request', service_id=SERVICE_ONE_ID, branding_type="letter",
+        _data=data,
+        _follow_redirects=True,
+    )
+
+    zendesk.assert_called_once_with(
+        message='\n'.join([
+            'Organisation: {}',
+            'Service: service one',
+            'http://localhost/services/596364a0-858e-42c8-9062-a8fe822260eb',
+            '',
+            '---',
+            'Current branding: HM Government',
+            'Branding requested: {}\n',
+        ]).format(expected_organisation, requested_branding),
+        subject='Letter branding request - service one',
+        ticket_type='question',
+        user_email='test@user.gov.uk',
+        user_name='Test User',
+        tags=['notify_action', 'notify_branding'],
+    )
+    assert normalize_spaces(page.select_one('.banner-default').text) == (
+        'Thanks for your branding request. We’ll get back to you '
+        'within one working day.'
+    )
+
+
+@pytest.mark.parametrize('branding_type', ['email', 'letter'])
+@pytest.mark.parametrize('from_template', [
+    None,
+    TEMPLATE_ONE_ID
+])
+def test_submit_letter_branding_request_redirects_if_from_template_is_set(
+    client_request,
+    service_one,
+    mocker,
+    mock_get_service_settings_page_common,
+    mock_get_letter_branding_by_id,
+    no_reply_to_email_addresses,
+    no_letter_contact_blocks,
+    single_sms_sender,
+    from_template,
+    branding_type,
+
+):
+    mocker.patch('app.organisations_client.get_service_organisation', return_value=None)
+    mocker.patch('app.main.views.service_settings.zendesk_client.create_ticket', autospec=True)
+    data = {'options': 'something_else', 'something_else': 'Homer Simpson'}
+
+    if from_template:
+        client_request.post(
+            '.branding_request', service_id=SERVICE_ONE_ID, branding_type="letter", from_template=from_template,
+            _data=data,
+            _expected_redirect=url_for(
+                'main.view_template', service_id=SERVICE_ONE_ID, template_id=from_template, _external=True
+            )
+        )
+    else:
+        client_request.post(
+            '.branding_request', service_id=SERVICE_ONE_ID, branding_type="letter",
+            _data=data,
+            _expected_redirect=url_for('main.service_settings', service_id=SERVICE_ONE_ID, _external=True)
+        )
+
+
+@pytest.mark.parametrize('branding_type,current_branding', [
+    ('email', 'GOV.UK'), ('letter', 'no')
+])
+def test_submit_branding_when_something_else_is_only_option(
     client_request,
     service_one,
     mocker,
     mock_get_service_settings_page_common,
     mock_get_email_branding,
+    mock_get_letter_branding_by_id,
+    branding_type,
+    current_branding,
 ):
     mocker.patch(
         'app.organisations_client.get_service_organisation',
@@ -4739,18 +4928,37 @@ def test_submit_email_branding_when_something_else_is_only_option(
 
     client_request.post(
         '.branding_request',
-        service_id=SERVICE_ONE_ID,
+        service_id=SERVICE_ONE_ID, branding_type=branding_type,
         _data={
             'something_else': 'Homer Simpson',
         },
     )
 
     assert (
-        'Current branding: GOV.UK\n'
+        'Current branding: {}\n'
         'Branding requested: Something else\n'
         '\n'
-        'Homer Simpson'
+        'Homer Simpson'.format(current_branding)
     ) in zendesk.call_args_list[0][1]['message']
+
+
+def test_service_settings_links_to_branding_request_page_for_letters(
+    mocker,
+    service_one,
+    client_request,
+    active_user_with_permissions,
+    no_reply_to_email_addresses,
+    no_letter_contact_blocks,
+    single_sms_sender,
+    mock_get_service_settings_page_common,
+    mock_get_service_organisation,
+):
+    service_one["restricted"] is False
+    service_one['permissions'].append('letter')
+    page = client_request.get(
+        '.service_settings', service_id=SERVICE_ONE_ID
+    )
+    assert len(page.findAll('a', attrs={'href': '/services/{}/branding-request/letter'.format(SERVICE_ONE_ID)})) == 1
 
 
 def test_show_service_data_retention(

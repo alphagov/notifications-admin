@@ -7,21 +7,21 @@
 {% from "components/form.html" import form_wrapper %}
 
 {% block service_page_title %}
-  Change email branding
+  Change {{ branding_type }} branding
 {% endblock %}
 
 {% block maincolumn_content %}
 
   {{ page_header(
-    'Change email branding',
-    back_link=url_for('main.service_settings', service_id=current_service.id)
+    'Change {} branding'.format(branding_type),
+    back_link=url_for('.view_template', service_id=current_service.id, template_id=from_template) if from_template else url_for('.service_settings', service_id=current_service.id)
   ) }}
 
   <p>
-    Your emails currently have {{ current_service.email_branding_name }} branding.
+    Your {{ branding_type }}s currently have {{ branding_name }} branding.
   </p>
 
-  {% if current_service.needs_to_change_email_branding %}
+  {% if current_service.needs_to_change_email_branding and branding_type == "email" %}
     <p>
       You should be using your own branding instead. We can help you to set this up.
     </p>
