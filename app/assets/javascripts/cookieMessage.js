@@ -4,14 +4,21 @@ window.GOVUK.Modules = window.GOVUK.Modules || {};
 (function (Modules) {
   function CookieBanner () { }
 
-  CookieBanner.clearOldCookies = function () {
-    // clear any cookies set by the previous version
-    var oldCookies = ['seen_cookie_message', '_ga', '_gid'];
+  CookieBanner.clearOldCookies = function (consent) {
+    var gaCookies = ['_ga', '_gid'];
 
-    for (var i = 0; i < oldCookies.length; i++) {
-      if (window.GOVUK.cookie(oldCookies[i])) {
-        var cookieString = oldCookies[i] + '=;expires=' + new Date() + ';domain=' + window.location.hostname.replace(/^www\./, '.') + ';path=/';
-        document.cookie = cookieString;
+    // clear old cookie set by our previous JS, set on the www domain
+    if (window.GOVUK.cookie('seen_cookie_message')) {
+      document.cookie = 'seen_cookie_message=;expires=' + new Date() + ';domain=' + window.location.hostname + ';path=/';
+    }
+
+    if (consent === null) {
+      for (var i = 0; i < gaCookies.length; i++) {
+        if (window.GOVUK.cookie(gaCookies[i])) {
+          // GA cookies are set on the base domain so need the www stripping
+          var cookieString = gaCookies[i] + '=;expires=' + new Date() + ';domain=' + window.location.hostname.replace(/^www\./, '.') + ';path=/';
+          document.cookie = cookieString;
+        }
       }
     }
   };

@@ -1,8 +1,8 @@
 (function (window) {
   "use strict";
 
-  function hasConsentFor (cookieCategory) {
-    const consentCookie = window.GOVUK.getConsentCookie();
+  function hasConsentFor (cookieCategory, consentCookie) {
+    if (consentCookie === undefined) { consentCookie = window.GOVUK.getConsentCookie(); }
 
     if (consentCookie === null) { return false; }
 

@@ -1,8 +1,9 @@
 window.GOVUK.Frontend.initAll();
 
-window.GOVUK.Modules.CookieBanner.clearOldCookies();
+var consentData = window.GOVUK.getConsentCookie();
+window.GOVUK.Modules.CookieBanner.clearOldCookies(consentData);
 
-if (window.GOVUK.hasConsentFor('analytics')) {
+if (window.GOVUK.hasConsentFor('analytics', consentData)) {
   window.GOVUK.initAnalytics();
 }
 
