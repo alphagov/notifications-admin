@@ -1977,7 +1977,7 @@ def test_api_ids_dont_show_on_option_pages_with_a_single_sender(
             'Blank Make default',
             '1 Example Street (default) Change 1234',
             '2 Example Street Change 5678',
-            '3 Example Street Change 9457',
+            'foo<bar>baz Change 9457',
         ],
     ), (
         'main.service_sms_senders',
@@ -2754,6 +2754,19 @@ def test_default_box_shows_on_non_default_sender_details_while_editing(
         assert normalize_spaces(page.select_one('form p').text) == (
             default_message
         )
+
+
+def test_sender_details_are_escaped(client_request, mocker, fake_uuid):
+    letter_contact_block = create_letter_contact_block(contact_block='foo\n\n<br>\n\nbar')
+    mocker.patch('app.service_api_client.get_letter_contacts', return_value=[letter_contact_block])
+
+    page = client_request.get(
+        'main.service_letter_contact_details',
+        service_id=SERVICE_ONE_ID,
+    )
+
+    # get the second row (first is the default Blank sender)
+    assert 'foo<br>bar' in normalize_spaces(page.select('.user-list-item')[1].text)
 
 
 @pytest.mark.parametrize('sms_sender, expected_link_text, partial_href', [

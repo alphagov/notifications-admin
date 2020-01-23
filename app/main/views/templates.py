@@ -4,14 +4,13 @@ from functools import partial
 from dateutil.parser import parse
 from flask import abort, flash, redirect, render_template, request, url_for
 from flask_login import current_user
-from markupsafe import Markup
 from notifications_python_client.errors import HTTPError
 from notifications_utils import LETTER_MAX_PAGE_COUNT
-from notifications_utils.formatters import nl2br
 from notifications_utils.pdf import is_letter_too_long
 
 from app import (
     current_service,
+    nl2br,
     service_api_client,
     template_folder_api_client,
     template_statistics_client,
@@ -844,7 +843,7 @@ def get_template_sender_form_dict(service_id, template):
     if not service_senders:
         context['no_senders'] = True
 
-    context['value_and_label'] = [(sender['id'], Markup(nl2br(sender[sender_format]))) for sender in service_senders]
+    context['value_and_label'] = [(sender['id'], nl2br(sender[sender_format])) for sender in service_senders]
     context['value_and_label'].insert(0, ('', 'Blank'))  # Add blank option to start of list
 
     context['current_choice'] = template['service_letter_contact'] if template['service_letter_contact'] else ''

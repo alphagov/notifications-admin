@@ -136,7 +136,7 @@
         {% call settings_row(if_has_permission='sms') %}
           {{ text_field('Text message senders') }}
           {% call field(status='default' if current_service.default_sms_sender == "None" else '') %}
-            {{ current_service.default_sms_sender | string | nl2br if current_service.default_sms_sender else 'None'}}
+            {{ current_service.default_sms_sender | nl2br if current_service.default_sms_sender else 'None'}}
             {% if current_service.count_sms_senders > 1 %}
               <div class="hint">
                 {{ '…and %d more' | format(current_service.count_sms_senders - 1) }}

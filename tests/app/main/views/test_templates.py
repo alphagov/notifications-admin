@@ -2207,7 +2207,6 @@ def test_add_sender_link_only_appears_on_services_with_no_senders(
     mocker,
     contact_block_data,
     mock_get_service_letter_template,
-    no_letter_contact_blocks
 ):
     mocker.patch('app.service_api_client.get_letter_contacts', return_value=contact_block_data)
     page = client_request.get(
@@ -2221,3 +2220,24 @@ def test_add_sender_link_only_appears_on_services_with_no_senders(
         service_id=SERVICE_ONE_ID,
         from_template=fake_uuid,
     )
+
+
+def test_set_template_sender_escapes_letter_contact_block_names(
+    client_request,
+    fake_uuid,
+    mocker,
+    mock_get_service_letter_template,
+):
+    letter_contact_block = create_letter_contact_block(contact_block='foo\n\n<script>\n\nbar')
+    mocker.patch('app.service_api_client.get_letter_contacts', return_value=[letter_contact_block])
+    page = client_request.get(
+        'main.set_template_sender',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+    )
+
+    # use decode_contents, which returns the raw html, rather than text, which sanitises it and makes
+    # testing confusing
+    radio_text = page.select_one('.column-three-quarters label[for="sender-1"]').decode_contents()
+    assert "&lt;script&gt;" in radio_text
+    assert "<script>" not in radio_text
