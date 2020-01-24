@@ -80,7 +80,10 @@ def test_robots(client):
     'cookies', 'privacy', 'pricing', 'terms', 'roadmap',
     'features', 'documentation', 'security',
     'message_status', 'features_email', 'features_sms',
-    'features_letters', 'how_to_pay', 'get_started'
+    'features_letters', 'how_to_pay', 'get_started',
+    'guidance_index', 'branding_and_customisation',
+    'create_and_send_messages', 'edit_and_format_messages',
+    'send_files_by_email', 'upload_a_letter',
 ])
 def test_static_pages(
     client_request,
@@ -277,23 +280,3 @@ def test_letter_spec_redirect_with_non_logged_in_user(client_request):
             '/documentation/images/notify-pdf-letter-spec-v2.4.pdf'
         ),
     )
-
-
-def test_guidance_index(client_request):
-    client_request.get('main.guidance')
-
-
-@pytest.mark.parametrize('slug', (
-    'branding-and-customisation',
-    'create-and-send-messages',
-    'edit-and-format-messages',
-    'index',
-    'send-files-by-email',
-    'upload-a-letter',
-))
-def test_guidance_pages(client_request, slug):
-    client_request.get('main.guidance', slug=slug)
-
-
-def test_guidance_404s_for_page_that_doesnt_exist(client_request):
-    client_request.get('main.guidance', slug='foo', _expected_status=404)
