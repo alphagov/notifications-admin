@@ -5,6 +5,10 @@ from notifications_utils.letter_timings import (
     get_letter_timings,
     letter_can_be_cancelled,
 )
+from notifications_utils.timezones import (
+    local_timezone,
+    utc_string_to_aware_gmt_datetime,
+)
 from werkzeug.utils import cached_property
 
 from app.models import JSONModel, ModelList
@@ -23,6 +27,7 @@ class Job(JSONModel):
         'template_version',
         'original_file_name',
         'created_at',
+        'processing_started',
         'notification_count',
         'created_by',
     }
@@ -46,6 +51,12 @@ class Job(JSONModel):
     @property
     def scheduled_for(self):
         return self._dict.get('scheduled_for')
+
+    @property
+    def processing_started(self):
+        if not self._dict.get('processing_started'):
+            return None
+        return utc_string_to_aware_gmt_datetime(self._dict['processing_started'])
 
     def _aggregate_statistics(self, *statuses):
         return sum(
@@ -95,6 +106,17 @@ class Job(JSONModel):
         return self.notification_count == self.notifications_sent
 
     @property
+    def awaiting_processing_or_recently_processed(self):
+        if not self.processing_started:
+            # Assume that if processing hasn’t started yet then the job
+            # must have been created recently enough to not have any
+            # notifications yet
+            return True
+        return (
+            datetime.utcnow().astimezone(local_timezone) - self.processing_started
+        ).days < 1
+
+    @property
     def template_id(self):
         return self._dict['template']
 
@@ -124,7 +146,8 @@ class Job(JSONModel):
             return False
 
         if not letter_can_be_cancelled(
-            'created', datetime.strptime(self.created_at[:-6], '%Y-%m-%dT%H:%M:%S.%f')
+            'created',
+            utc_string_to_aware_gmt_datetime(self.created_at).replace(tzinfo=None)
         ):
             return False
 

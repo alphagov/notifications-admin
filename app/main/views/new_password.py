@@ -1,5 +1,4 @@
 import json
-from datetime import datetime
 
 from flask import (
     current_app,
@@ -29,8 +28,7 @@ def new_password(token):
 
     email_address = json.loads(token_data)['email']
     user = User.from_email_address(email_address)
-    if user.password_changed_at and datetime.strptime(user.password_changed_at, '%Y-%m-%d %H:%M:%S.%f') > \
-            datetime.strptime(json.loads(token_data)['created_at'], '%Y-%m-%d %H:%M:%S.%f'):
+    if user.password_changed_more_recently_than(json.loads(token_data)['created_at']):
         flash('The link in the email has already been used')
         return redirect(url_for('main.index'))
 

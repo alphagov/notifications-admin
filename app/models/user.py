@@ -1,6 +1,7 @@
 from flask import abort, current_app, request, session
 from flask_login import AnonymousUserMixin, UserMixin, login_user
 from notifications_python_client.errors import HTTPError
+from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
 from werkzeug.utils import cached_property
 
 from app.models import JSONModel, ModelList
@@ -107,6 +108,15 @@ class User(JSONModel, UserMixin):
     def update_password(self, password):
         response = user_api_client.update_password(self.id, password)
         self.__init__(response)
+
+    def password_changed_more_recently_than(self, datetime_string):
+        if not self.password_changed_at:
+            return False
+        return utc_string_to_aware_gmt_datetime(
+            self.password_changed_at
+        ) > utc_string_to_aware_gmt_datetime(
+            datetime_string
+        )
 
     def set_permissions(self, service_id, permissions, folder_permissions):
         user_api_client.set_user_permissions(

@@ -1,5 +1,6 @@
 import json
 import uuid
+from datetime import datetime, timezone
 
 import pytest
 from flask import url_for
@@ -329,28 +330,68 @@ def test_should_show_job_without_notifications(
     assert page.select_one('tbody').text.strip() == 'No messages to show yet…'
 
 
+@freeze_time("2020-01-10 1:0:0")
+@pytest.mark.parametrize('created_at, processing_started, expected_message', (
+    # Recently created, not yet started
+    (datetime(2020, 1, 10, 0, 0, 0), None, (
+        'No messages to show yet…'
+    )),
+    # Just started
+    (datetime(2020, 1, 10, 0, 0, 0), datetime(2020, 1, 10, 0, 0, 1), (
+        'No messages to show yet…'
+    )),
+    # Created a while ago, just started
+    (datetime(2020, 1, 1, 0, 0, 0), datetime(2020, 1, 10, 0, 0, 1), (
+        'No messages to show yet…'
+    )),
+    # Created a while ago, started just within the last 24h
+    (datetime(2020, 1, 1, 0, 0, 0), datetime(2020, 1, 9, 1, 0, 1), (
+        'No messages to show yet…'
+    )),
+    # Created a while ago, started exactly 24h ago
+    # ---
+    # It doesn’t matter that 24h (1 day) and 7 days (the service’s data
+    # retention) don’t match up. We’re testing the case of no
+    # notifications existing more than 1 day after the job started
+    # processing. In this case we assume it’s because the service’s
+    # data retention has kicked in.
+    (datetime(2020, 1, 1, 0, 0, 0), datetime(2020, 1, 9, 1, 0, 0), (
+        'These messages have been deleted because they were sent more than 7 days ago'
+    )),
+))
 def test_should_show_old_job(
     client_request,
     service_one,
     active_user_with_permissions,
     mock_get_service_template,
-    mock_get_job,
     mocker,
     mock_get_notifications_with_no_notifications,
     mock_get_service_data_retention,
     fake_uuid,
+    created_at,
+    processing_started,
+    expected_message,
 ):
+    mocker.patch('app.job_api_client.get_job', return_value={
+        "data": job_json(
+            SERVICE_ONE_ID,
+            active_user_with_permissions,
+            created_at=created_at.replace(tzinfo=timezone.utc).isoformat(),
+            processing_started=(
+                processing_started.replace(tzinfo=timezone.utc).isoformat()
+                if processing_started else None
+            ),
+        ),
+    })
     page = client_request.get(
         'main.view_job',
-        service_id=service_one['id'],
+        service_id=SERVICE_ONE_ID,
         job_id=fake_uuid,
     )
     assert not page.select('.pill a')
     assert not page.select('p.hint')
     assert not page.select('a[download]')
-    assert page.select_one('tbody').text.strip() == (
-        'These messages have been deleted because they were sent more than 7 days ago'
-    )
+    assert page.select_one('tbody').text.strip() == expected_message
 
 
 @freeze_time("2016-01-01 11:09:00.061258")
