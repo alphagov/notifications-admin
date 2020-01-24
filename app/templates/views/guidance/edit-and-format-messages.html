@@ -9,14 +9,15 @@
 {% block content_column_content %}
 
   <h1 class="heading-large">Edit and format messages</h1>
-  
+
   <p>This page explains how to:</p>
   <ul class="list list-bullet">
     <li><a href="#formatting">format your content</a></li>
     <li><a href="#links">add links</a></li>
     <li><a href="#personalised-content">personalise your content</a></li>
     <li><a href="#optional-content">add optional content</a></li>
-  
+  </ul>
+
   <h2 class="heading-medium" id="formatting">Format your content</h2>
 
   <p>You can see a list of formatting instructions on the edit template page:</p>
@@ -40,13 +41,13 @@
   <p>Notify does not allow bold, italics, subheadings, underlined text or different fonts. This is because they can make it harder for users to read what you’ve written.</p>
 
   <h2 class="heading-medium" id="links">Add links</h2>
-  
+
   <p>When composing an email or text message, write URLs in full and Notify will convert them into links for you.</p>
 
   <p>You cannot convert text into a link. Research shows that recipients like to read the URL to check a link looks genuine before they click it. This is hard to do if the URL is hidden behind clickable link text.</p>
 
   <p>We do not recommend using a third-party link shortening service because:</p>
-  
+
   <ul class="list list-bullet">
     <li>your users cannot see where the link will take them</li>
     <li>your link might stop working if there’s a service outage</li>
@@ -65,7 +66,7 @@
     <li><a href="{{ url_for('.register') }}">Sign in to Notify</a>.</li>
     <li>Go to the <b class="govuk-!-font-weight-bold">Templates</b> page.</li>
     <li>Add a new template or choose an existing template and select <b class="govuk-!-font-weight-bold">Edit</b>.</li>
-    <li>Add a placeholder using double brackets. For example: Hello ((first name)), your reference is ((ref number)).</li>
+    <li>Add a placeholder using double brackets. For example: Hello ((first&nbsp;name)), your reference is ((ref&nbsp;number)).</li>
     <li>Select <b class="govuk-!-font-weight-bold">Save</b>.</li>
   </ol>
 
@@ -77,11 +78,11 @@
   </ul>
 
   <p>If you upload a list, the column names need to match the placeholders in your template.</p>
-  
+
   <h2 class="heading-medium" id="optional-content">Add optional content</h2>
-  
+
   <p>To add optional content to your emails and text messages:</p>
-  
+
   <ol class="list list-number">
     <li><a href="{{ url_for('.register') }}">Sign in to Notify</a>.</li>
     <li>Go to the <b class="govuk-!-font-weight-bold">Templates</b> page.</li>
@@ -100,5 +101,5 @@
   <p>If you upload a list, the column names need to match the optional content in your template.</p>
 
   <p>You cannot add optional content to a letter.</p>
-  
+
 {% endblock %}
