@@ -629,13 +629,15 @@ LETTER_VALIDATION_MESSAGES = {
 
 
 def get_letter_validation_error(validation_message, invalid_pages=None, page_count=None):
+    if not invalid_pages:
+        invalid_pages = []
     if validation_message not in LETTER_VALIDATION_MESSAGES:
         return {'title': 'Validation failed'}
 
     invalid_pages_are_or_is = 'is' if len(invalid_pages) == 1 else 'are'
 
     invalid_pages = unescaped_formatted_list(
-        invalid_pages or [],
+        invalid_pages,
         before_each='',
         after_each='',
         prefix='page',
