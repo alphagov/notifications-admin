@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 
 from flask import (
     current_app,
@@ -57,6 +58,7 @@ def two_factor_email(token):
 @redirect_to_sign_in
 def two_factor():
     user_id = session['user_details']['id']
+    user = User.from_id(user_id)
 
     def _check_code(code):
         return user_api_client.check_verify_code(user_id, code, "sms")
@@ -64,9 +66,21 @@ def two_factor():
     form = TwoFactorForm(_check_code)
 
     if form.validate_on_submit():
-        return log_in_user(user_id)
+        if (datetime.utcnow() - datetime.strptime(
+            user.email_access_validated_at, '%a, %d %b %Y %X %Z'
+        )).days < 90:
+            return log_in_user(user_id)
+        else:
+            user_api_client.send_verify_code(user.id, 'email', None, request.args.get('next'))
+            return redirect(url_for('.revalidate_email_sent'))
 
     return render_template('views/two-factor.html', form=form)
+
+
+@main.route('/re-validate-email', methods=['GET'])
+def revalidate_email_sent():
+    title = 'Email resent' if request.args.get('email_resent') else 'Check your email'
+    return render_template('views/re-validate-email-sent.html', title=title)
 
 
 # see http://flask.pocoo.org/snippets/62/
@@ -85,7 +99,7 @@ def log_in_user(user_id):
         session['current_session_id'] = user.current_session_id
         # Check if coming from new password page
         if 'password' in session.get('user_details', {}):
-            user.update_password(session['user_details']['password'])
+            user.update_password(session['user_details']['password'], from_email=True)
         user.activate()
         user.login()
     finally:

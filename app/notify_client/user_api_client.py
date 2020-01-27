@@ -75,8 +75,10 @@ class UserApiClient(NotifyAdminAPIClient):
         return user_data['data']
 
     @cache.delete('user-{user_id}')
-    def update_password(self, user_id, password):
+    def update_password(self, user_id, password, from_email=False):
         data = {"_password": password}
+        if from_email:
+            data["from_email"] = from_email
         url = "/user/{}/update-password".format(user_id)
         user_data = self.post(url, data=data)
         return user_data['data']
