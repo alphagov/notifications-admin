@@ -66,7 +66,7 @@ def using_notify_nav():
             "sub_navigation_items": [
                 {
                     "name": "Send messages",
-                    "link": "main.create_and_send_messages",
+                    "link": "main.send_messages",
                 },
                 {
                     "name": "Formatting",
