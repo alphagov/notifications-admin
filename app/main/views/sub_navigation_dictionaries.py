@@ -65,15 +65,15 @@ def using_notify_nav():
             "link": "main.guidance_index",
             "sub_navigation_items": [
                 {
-                    "name": "Create and send messages",
+                    "name": "Send messages",
                     "link": "main.create_and_send_messages",
                 },
                 {
-                    "name": "Edit and format messages",
+                    "name": "Formatting",
                     "link": "main.edit_and_format_messages",
                 },
                 {
-                    "name": "Branding and customisation",
+                    "name": "Branding",
                     "link": "main.branding_and_customisation",
                 },
                 {
@@ -81,7 +81,7 @@ def using_notify_nav():
                     "link": "main.send_files_by_email",
                 },
                 {
-                    "name": "Upload your own letters",
+                    "name": "Upload a letter",
                     "link": "main.upload_a_letter",
                 },
             ]
