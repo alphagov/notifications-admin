@@ -16,15 +16,20 @@
      <li>create letter templates, but not send them</li>
    </ul>
 
-  <p>
-    To remove these restrictions, 
     {% if current_service and current_service.trial_mode %}
-     you can <a href="{{ url_for('.request_to_go_live', service_id=current_service.id) }}">request to go live</a>.
+  <p>
+    To remove these restrictions, you can <a href="{{ url_for('.request_to_go_live', service_id=current_service.id) }}">request to go live</a>.</p>
     {% else %}
-     go to the Settings page and request to go live.
-    {% endif %}
+  <p>
+    To remove these restrictions:
   </p>
-
+  <ol class="list list-number">
+    <li><a href="{{ url_for('.sign_in') }}">Sign in to Notify</a>.</li>
+    <li>Go to the <b class="govuk-!-font-weight-bold">Settings</b> page.</li>
+    <li>Select <b class="govuk-!-font-weight-bold">Request to go live</b>.</li>
+  </ol>
+    {% endif %}
+ 
   <p>Before you request to go live, you must:</p>
   <ul class="list list-bullet">
     <li>accept our data sharing and financial agreement</li>
