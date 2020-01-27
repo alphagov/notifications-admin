@@ -458,7 +458,7 @@ def test_get_letter_validation_error_for_unknown_error():
     ),
     (
         'letter-too-long',
-        [2],
+        None,
         'Your letter is too long',
         (
             'Letters must be 10 pages or less. '
@@ -471,7 +471,7 @@ def test_get_letter_validation_error_for_unknown_error():
     ),
     (
         'unable-to-read-the-file',
-        [2],
+        None,
         'There’s a problem with your file',
         (
             'Notify cannot read this PDF.'
