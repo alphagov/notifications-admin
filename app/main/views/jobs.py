@@ -19,12 +19,12 @@ from app import (
     current_service,
     format_datetime_short,
     format_thousands,
-    notification_api_client,
     service_api_client,
 )
 from app.main import main
 from app.main.forms import SearchNotificationsForm
 from app.models.job import Job
+from app.models.notification import Notifications
 from app.utils import (
     generate_next_dict,
     generate_notifications_csv,
@@ -243,7 +243,7 @@ def get_notifications(service_id, message_type, status_override=None):
             headers={
                 'Content-Disposition': 'inline; filename="notifications.csv"'}
         )
-    notifications = notification_api_client.get_notifications_for_service(
+    notifications = Notifications(
         service_id=service_id,
         page=page,
         template_type=[message_type] if message_type else [],
@@ -257,11 +257,11 @@ def get_notifications(service_id, message_type, status_override=None):
     }
     prev_page = None
 
-    if 'links' in notifications and notifications['links'].get('prev', None):
+    if notifications.prev_page:
         prev_page = generate_previous_dict('main.view_notifications', service_id, page, url_args=url_args)
     next_page = None
 
-    if 'links' in notifications and notifications['links'].get('next', None):
+    if notifications.next_page:
         next_page = generate_next_dict('main.view_notifications', service_id, page, url_args)
 
     if message_type:
@@ -291,9 +291,7 @@ def get_notifications(service_id, message_type, status_override=None):
         ),
         'notifications': render_template(
             'views/activity/notifications.html',
-            notifications=list(add_preview_of_content_to_notifications(
-                notifications['notifications']
-            )),
+            notifications=notifications,
             page=page,
             limit_days=service_data_retention_days,
             prev_page=prev_page,
@@ -390,7 +388,7 @@ def get_job_partials(job):
             counts=_get_job_counts(job),
             status=filter_args['status'],
             notifications_deleted=(
-                job.status == 'finished' and not notifications['notifications']
+                job.status == 'finished' and not any(notifications)
             ),
         )
     service_data_retention_days = current_service.get_days_of_retention(job.template_type)
@@ -399,10 +397,8 @@ def get_job_partials(job):
         'counts': counts,
         'notifications': render_template(
             'partials/jobs/notifications.html',
-            notifications=list(
-                add_preview_of_content_to_notifications(notifications['notifications'])
-            ),
-            more_than_one_page=bool(notifications.get('links', {}).get('next')),
+            notifications=notifications,
+            more_than_one_page=bool(notifications.next_page),
             download_link=url_for(
                 '.view_job_csv',
                 service_id=current_service.id,
@@ -419,34 +415,3 @@ def get_job_partials(job):
             letter_print_day=get_letter_printing_statement("created", job.created_at)
         ),
     }
-
-
-def add_preview_of_content_to_notifications(notifications):
-
-    for notification in notifications:
-
-        if notification['template'].get('redact_personalisation'):
-            notification['personalisation'] = {}
-
-        if notification['template']['template_type'] == 'sms':
-            yield dict(
-                preview_of_content=str(Template(
-                    notification['template'],
-                    notification['personalisation'],
-                    redact_missing_personalisation=True,
-                )),
-                **notification
-            )
-        else:
-            if notification['template']['is_precompiled_letter']:
-                notification['template']['subject'] = notification['client_reference']
-            yield dict(
-                preview_of_content=(
-                    WithSubjectTemplate(
-                        notification['template'],
-                        notification['personalisation'],
-                        redact_missing_personalisation=True,
-                    ).subject
-                ),
-                **notification
-            )

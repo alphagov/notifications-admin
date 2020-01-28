@@ -88,7 +88,7 @@ def test_view_conversation(
         personalisation={'name': 'Jo'},
         redact_personalisation=outbound_redacted,
     )
-    mock = mocker.patch('app.notification_api_client.get_notifications_for_service', return_value=notifications)
+    mock = mocker.patch('app.models.notification.Notifications.client_method', return_value=notifications)
 
     page = client_request.get(
         'main.conversation',
@@ -162,7 +162,7 @@ def test_view_conversation(
         ) == expected
 
     mock_get_inbound_sms.assert_called_once_with(SERVICE_ONE_ID, user_number='07123 456789')
-    mock.assert_called_once_with(SERVICE_ONE_ID, to='07123 456789', template_type='sms')
+    mock.assert_called_once_with(SERVICE_ONE_ID, page=1, to='07123 456789', template_type='sms')
 
 
 def test_view_conversation_updates(

@@ -1,5 +1,6 @@
 import csv
 import os
+import pytz
 import re
 import unicodedata
 from datetime import datetime, time, timedelta, timezone
@@ -146,7 +147,7 @@ def get_errors_for_csv(recipients, template_type):
 
 
 def generate_notifications_csv(**kwargs):
-    from app import notification_api_client
+    from app.models.notification import Notifications
     from app.s3_client.s3_csv_client import s3download
     if 'page' not in kwargs:
         kwargs['page'] = 1
@@ -165,37 +166,37 @@ def generate_notifications_csv(**kwargs):
     yield ','.join(fieldnames) + '\n'
 
     while kwargs['page']:
-        notifications_resp = notification_api_client.get_notifications_for_service(**kwargs)
-        for notification in notifications_resp['notifications']:
+        notifications = Notifications(**kwargs)
+        for notification in notifications:
             if kwargs.get('job_id'):
                 values = [
-                    notification['row_number'],
+                    notification.row_number,
                 ] + [
-                    original_upload[notification['row_number'] - 1].get(header).data
+                    original_upload[notification.row_number - 1].get(header).data
                     for header in original_column_headers
                 ] + [
-                    notification['template_name'],
-                    notification['template_type'],
-                    notification['job_name'],
-                    notification['status'],
-                    notification['created_at'],
+                    notification.template_name,
+                    notification.template_type,
+                    notification.job_name,
+                    notification.status,
+                    notification.created_at_utc_string,
                 ]
             else:
                 values = [
                     # the recipient for precompiled letters is the full address block
-                    notification['recipient'].splitlines()[0].lstrip().rstrip(' ,'),
-                    notification['client_reference'],
-                    notification['template_name'],
-                    notification['template_type'],
-                    notification['created_by_name'] or '',
-                    notification['created_by_email_address'] or '',
-                    notification['job_name'] or '',
-                    notification['status'],
-                    notification['created_at']
+                    notification.recipient.splitlines()[0].lstrip().rstrip(' ,'),
+                    notification.client_reference,
+                    notification.template_name,
+                    notification.template_type,
+                    notification.created_by_name or '',
+                    notification.created_by_email_address or '',
+                    notification.job_name or '',
+                    notification.status,
+                    notification.created_at_utc_string,
                 ]
             yield Spreadsheet.from_rows([map(str, values)]).as_csv_data
 
-        if notifications_resp['links'].get('next'):
+        if notifications.next_page:
             kwargs['page'] += 1
         else:
             return

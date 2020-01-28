@@ -143,13 +143,13 @@ class Job(JSONModel):
 
     @cached_property
     def all_notifications(self):
-        return self.get_notifications(set_status_filters({}))['notifications']
+        return self.get_notifications(set_status_filters({}))
 
     @property
     def uncancellable_notifications(self):
         return (
             n for n in self.all_notifications
-            if n['status'] not in CANCELLABLE_JOB_LETTER_STATUSES
+            if n.status not in CANCELLABLE_JOB_LETTER_STATUSES
         )
 
     @cached_property
@@ -157,7 +157,7 @@ class Job(JSONModel):
         # There might be no notifications if the job has only just been
         # created and the tasks haven't run yet
         try:
-            return self.all_notifications[0]['postage']
+            return self.all_notifications[0].postage
         except IndexError:
             return self.template['postage']
 
@@ -180,7 +180,8 @@ class Job(JSONModel):
         return self.failure_rate > 30
 
     def get_notifications(self, status):
-        return notification_api_client.get_notifications_for_service(
+        from app.models.notification import Notifications
+        return Notifications(
             self.service, self.id, status=status,
         )
 

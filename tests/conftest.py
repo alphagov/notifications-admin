@@ -1798,8 +1798,8 @@ def mock_get_notifications(
         )
 
     return mocker.patch(
-        'app.notification_api_client.get_notifications_for_service',
-        side_effect=_get_notifications
+        'app.models.notification.Notifications.client_method',
+        side_effect=_get_notifications,
     )
 
 
@@ -1820,8 +1820,8 @@ def mock_get_notifications_with_previous_next(mocker):
         return notification_json(service_id, rows=50, with_links=True if count_pages is None else count_pages)
 
     return mocker.patch(
-        'app.notification_api_client.get_notifications_for_service',
-        side_effect=_get_notifications
+        'app.models.notification.Notifications.client_method',
+        side_effect=_get_notifications,
     )
 
 
@@ -1842,8 +1842,8 @@ def mock_get_notifications_with_no_notifications(mocker):
         return notification_json(service_id, rows=0)
 
     return mocker.patch(
-        'app.notification_api_client.get_notifications_for_service',
-        side_effect=_get_notifications
+        'app.models.notification.Notifications.client_method',
+        side_effect=_get_notifications,
     )
 
 

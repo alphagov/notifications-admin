@@ -76,8 +76,8 @@ class ModelList(ABC, Sequence):
     def model(self):
         pass
 
-    def __init__(self, *args):
-        self.items = self.client_method(*args)
+    def __init__(self, *args, **kwargs):
+        self.items = self.client_method(*args, **kwargs)
 
     def __getitem__(self, index):
         return self.model(self.items[index])

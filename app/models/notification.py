@@ -1,8 +1,10 @@
+import pytz
 from datetime import datetime
 
 from app.models import JSONModel, ModelList
 from app.notify_client.api_key_api_client import KEY_TYPE_TEST
 from app.notify_client.notification_api_client import notification_api_client
+from notifications_utils.template import Template, WithSubjectTemplate
 from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
 from app.utils import DELIVERED_STATUSES, FAILURE_STATUSES, SENDING_STATUSES
 from werkzeug.utils import cached_property
@@ -30,6 +32,7 @@ class Notification(JSONModel):
         'template_type',
         'created_by_email_address',
         'job_name',
+        'row_number',
     }
 
     DATETIME_PROPERTIES = {
@@ -37,6 +40,13 @@ class Notification(JSONModel):
         'created_at',
         'updated_at',
     }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.is_precompiled_letter:
+            self.template['subject'] = self.client_reference
+        if self.postage:
+            self.template['postage'] = self.postage
 
     @classmethod
     def from_id(cls, notification_id, service_id):
@@ -55,20 +65,8 @@ class Notification(JSONModel):
         return self._dict.get('created_by')
 
     @property
-    def all_personalisation(self):
-
-        out = {}
-
-        if not self.template.get('redact_personalisation'):
-            out.update(self.personalisation)
-
-        if self.template['template_type'] == 'email':
-            out.update(email_address=self.to)
-
-        if self.template['template_type'] == 'sms':
-            out.update(phone_number=self.to)
-
-        return out
+    def created_at_utc_string(self):
+        return self.created_at.astimezone(pytz.utc).strftime("%Y-%m-%d %H:%M:%S")
 
     @property
     def sending(self):
@@ -92,7 +90,7 @@ class Notification(JSONModel):
 
     @property
     def is_precompiled_letter(self):
-        return self.template['is_precompiled_letter']
+        return 'template' in self._dict and self.template['is_precompiled_letter']
 
     @cached_property
     def job(self):
@@ -114,3 +112,53 @@ class Notification(JSONModel):
         if self.sending and self.seconds_since_sending > seconds:
             return False
         return True
+
+    @property
+    def redact_personalisation(self):
+        return self.template.get('redact_personalisation')
+
+    @property
+    def personalisation(self):
+        if self.redact_personalisation:
+            return {}
+        return self._dict.get('personalisation', {})
+
+    @property
+    def all_personalisation(self):
+
+        if self.template['template_type'] == 'email':
+            return dict(email_address=self.to, **self.personalisation)
+
+        if self.template['template_type'] == 'sms':
+            return dict(phone_number=self.to, **self.personalisation)
+
+        return self.personalisation
+
+    @property
+    def preview_of_content(self):
+        if self.template['template_type'] == 'sms':
+            return str(Template(
+                self.template,
+                self.personalisation,
+                redact_missing_personalisation=True,
+            ))
+        return str(WithSubjectTemplate(
+            self.template,
+            self.personalisation,
+            redact_missing_personalisation=True,
+        ).subject)
+
+
+class Notifications(ModelList):
+    client_method = notification_api_client.get_notifications_for_service
+    model = Notification
+
+    def __init__(self, *args, **kwargs):
+        try:
+            self.current_page = int(kwargs.pop('page'))
+        except (TypeError, KeyError):
+            self.current_page = 1
+        response = self.client_method(*args, **kwargs, page=self.current_page)
+        self.prev_page = response.get('links', {}).get('prev', None)
+        self.next_page = response.get('links', {}).get('next', None)
+        self.items = response['notifications']

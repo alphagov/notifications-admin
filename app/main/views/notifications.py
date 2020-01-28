@@ -72,8 +72,6 @@ def view_notification(service_id, notification_id):
     else:
         page_count = get_page_count_for_letter(notification.template, values=notification.all_personalisation)
 
-    if notification.postage:
-        notification.template['postage'] = notification.postage
     template = get_template(
         notification.template,
         current_service,

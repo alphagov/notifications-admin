@@ -4,10 +4,10 @@ from notifications_python_client.errors import HTTPError
 from notifications_utils.recipients import format_phone_number_human_readable
 from notifications_utils.template import SMSPreviewTemplate
 
-from app import current_service, notification_api_client, service_api_client
+from app import current_service, service_api_client
 from app.main import main
 from app.main.forms import SearchByNameForm
-from app.models.notification import Notification
+from app.models.notification import Notification, Notifications
 from app.models.template_list import TemplateList
 from app.utils import user_has_permissions
 
@@ -102,17 +102,23 @@ def get_user_number(service_id, notification_id):
 def get_sms_thread(service_id, user_number):
 
     for notification in sorted((
-        notification_api_client.get_notifications_for_service(service_id,
-                                                              to=user_number,
-                                                              template_type='sms')['notifications'] +
+        Notifications(
+            service_id,
+            to=user_number,
+            template_type='sms',
+        ) +
         service_api_client.get_inbound_sms(service_id, user_number=user_number)['data']
-    ), key=lambda notification: notification['created_at']):
+    ), key=lambda notification: (
+        notification.created_at.isoformat()
+        if isinstance(notification, Notification)
+        else notification['created_at']
+    )):
 
-        is_inbound = ('notify_number' in notification)
-        redact_personalisation = not is_inbound and notification['template']['redact_personalisation']
-
-        if redact_personalisation:
-            notification['personalisation'] = {}
+        is_inbound = not isinstance(notification, Notification)
+        created_at = notification['created_at'] if is_inbound else notification.created_at
+        status = None if is_inbound else notification.status
+        redact_personalisation = not is_inbound and notification.redact_personalisation
+        id = notification['id'] if is_inbound else notification.id
 
         yield {
             'inbound': is_inbound,
@@ -120,14 +126,14 @@ def get_sms_thread(service_id, user_number):
                 {
                     'content': (
                         notification['content'] if is_inbound else
-                        notification['template']['content']
+                        notification.template['content']
                     )
                 },
-                notification.get('personalisation'),
+                None if is_inbound else notification.personalisation,
                 downgrade_non_sms_characters=(not is_inbound),
                 redact_missing_personalisation=redact_personalisation,
             ),
-            'created_at': notification['created_at'],
-            'status': notification.get('status'),
-            'id': notification['id'],
+            'created_at': created_at,
+            'status': status,
+            'id': id,
         }
