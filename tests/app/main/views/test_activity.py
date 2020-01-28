@@ -1,5 +1,6 @@
 import json
 import uuid
+from dateutil.parser import parse
 from functools import partial
 from urllib.parse import parse_qs, quote, urlparse
 
@@ -503,7 +504,7 @@ def test_should_show_notifications_for_a_service_with_next_previous(
 )
 @freeze_time("2016-01-10 12:00:00.000000")
 def test_time_left(job_created_at, expected_message):
-    assert get_time_left(job_created_at) == expected_message
+    assert get_time_left(parse(job_created_at)) == expected_message
 
 
 STATISTICS = {

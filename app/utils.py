@@ -11,10 +11,8 @@ from os import path
 from urllib.parse import urlparse
 
 import ago
-import dateutil
 import pyexcel
 import pyexcel_xlsx
-from dateutil import parser
 from flask import abort, current_app, redirect, request, session, url_for
 from flask_login import current_user, login_required
 from notifications_utils.field import Field
@@ -31,10 +29,7 @@ from notifications_utils.template import (
     LetterPreviewTemplate,
     SMSPreviewTemplate,
 )
-from notifications_utils.timezones import (
-    convert_utc_to_bst,
-    utc_string_to_aware_gmt_datetime,
-)
+from notifications_utils.timezones import convert_utc_to_bst
 from orderedset._orderedset import OrderedSet
 from werkzeug.datastructures import MultiDict
 from werkzeug.routing import RequestRedirect
@@ -421,7 +416,7 @@ def get_time_left(created_at, service_data_retention_days=7):
         (
             datetime.now(timezone.utc)
         ) - (
-            dateutil.parser.parse(created_at).replace(hour=0, minute=0, second=0) + timedelta(
+            created_at.replace(hour=0, minute=0, second=0) + timedelta(
                 days=service_data_retention_days + 1
             )
         ),
@@ -551,11 +546,12 @@ def redact_mobile_number(mobile_number, spacing=""):
 
 
 def get_letter_printing_statement(status, created_at):
-    created_at_dt = parser.parse(created_at).replace(tzinfo=None)
-    if letter_can_be_cancelled(status, created_at_dt):
+    if not isinstance(created_at, datetime):
+        raise TypeError('created_at must be a datetime')
+    if letter_can_be_cancelled(status, created_at.replace(tzinfo=None)):
         return 'Printing starts {} at 5:30pm'.format(printing_today_or_tomorrow())
     else:
-        printed_datetime = utc_string_to_aware_gmt_datetime(created_at) + timedelta(hours=6, minutes=30)
+        printed_datetime = created_at + timedelta(hours=6, minutes=30)
         if printed_datetime.date() == datetime.now().date():
             return 'Printed today at 5:30pm'
         elif printed_datetime.date() == datetime.now().date() - timedelta(days=1):

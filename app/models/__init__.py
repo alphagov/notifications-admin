@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from collections.abc import Sequence
+from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
 
 from flask import abort
 
@@ -7,6 +8,7 @@ from flask import abort
 class JSONModel():
 
     ALLOWED_PROPERTIES = set()
+    DATETIME_PROPERTIES = set()
 
     def __init__(self, _dict):
         # in the case of a bad request _dict may be `None`
@@ -34,6 +36,11 @@ class JSONModel():
             ):
                 raise e
 
+        if attr in super().__getattribute__('DATETIME_PROPERTIES'):
+            return self._datetime_from_date_string(
+                super().__getattribute__('_dict').get(attr)
+            )
+
         if attr in super().__getattribute__('ALLOWED_PROPERTIES'):
             return super().__getattribute__('_dict')[attr]
 
@@ -49,6 +56,12 @@ class JSONModel():
             return next(thing for thing in things if thing['id'] == str(id))
         except StopIteration:
             abort(404)
+
+    @staticmethod
+    def _datetime_from_date_string(datetime_string):
+        if not datetime_string:
+            return None
+        return utc_string_to_aware_gmt_datetime(datetime_string)
 
 
 class ModelList(ABC, Sequence):

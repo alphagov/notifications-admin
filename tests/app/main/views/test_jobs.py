@@ -1,6 +1,7 @@
 import json
 import uuid
 from datetime import datetime, timezone
+from dateutil.parser import parse
 
 import pytest
 from flask import url_for
@@ -812,7 +813,7 @@ def test_should_show_updates_for_scheduled_job_as_json(
 )
 @freeze_time("2016-01-10 12:00:00.000000")
 def test_time_left(job_created_at, expected_message):
-    assert get_time_left(job_created_at) == expected_message
+    assert get_time_left(parse(job_created_at)) == expected_message
 
 
 @freeze_time("2016-01-01 11:09:00.061258")

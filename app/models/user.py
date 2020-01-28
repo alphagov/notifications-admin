@@ -34,12 +34,15 @@ class User(JSONModel, UserMixin):
         'auth_type',
         'current_session_id',
         'failed_login_count',
-        'logged_in_at',
         'mobile_number',
-        'password_changed_at',
         'permissions',
         'platform_admin',
         'state',
+    }
+
+    DATETIME_PROPERTIES = {
+        'logged_in_at',
+        'password_changed_at',
     }
 
     def __init__(self, _dict):
@@ -355,7 +358,7 @@ class User(JSONModel, UserMixin):
             "name": self.name,
             "email_address": self.email_address,
             "mobile_number": self.mobile_number,
-            "password_changed_at": self.password_changed_at,
+            "password_changed_at": self.password_changed_at.isoformat(),
             "state": self.state,
             "failed_login_count": self.failed_login_count,
             "permissions": [x for x in self._permissions],
@@ -422,9 +425,12 @@ class InvitedUser(JSONModel):
         'email_address',
         'permissions',
         'status',
-        'created_at',
         'auth_type',
         'folder_permissions',
+    }
+
+    DATETIME_PROPERTIES = {
+        'created_at',
     }
 
     def __init__(self, _dict):
@@ -544,6 +550,9 @@ class InvitedOrgUser(JSONModel):
         'organisation',
         'email_address',
         'status',
+    }
+
+    DATETIME_PROPERTIES = {
         'created_at',
     }
 

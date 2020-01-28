@@ -38,7 +38,6 @@ class Organisation(JSONModel):
         'letter_branding_id',
         'email_branding_id',
         'agreement_signed',
-        'agreement_signed_at',
         'agreement_signed_by_id',
         'agreement_signed_version',
         'agreement_signed_on_behalf_of_name',
@@ -46,6 +45,10 @@ class Organisation(JSONModel):
         'domains',
         'request_to_go_live_notes',
         'count_of_live_services',
+    }
+
+    DATETIME_PROPERTIES = {
+        'agreement_signed_at',
     }
 
     @classmethod

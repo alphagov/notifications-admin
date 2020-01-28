@@ -5,10 +5,7 @@ from notifications_utils.letter_timings import (
     get_letter_timings,
     letter_can_be_cancelled,
 )
-from notifications_utils.timezones import (
-    local_timezone,
-    utc_string_to_aware_gmt_datetime,
-)
+from notifications_utils.timezones import local_timezone
 from werkzeug.utils import cached_property
 
 from app.models import JSONModel, ModelList
@@ -26,10 +23,14 @@ class Job(JSONModel):
         'template',
         'template_version',
         'original_file_name',
-        'created_at',
-        'processing_started',
         'notification_count',
         'created_by',
+    }
+
+    DATETIME_PROPERTIES = {
+        'created_at',
+        'processing_started',
+        'scheduled_for',
     }
 
     @classmethod
@@ -47,16 +48,6 @@ class Job(JSONModel):
     @property
     def scheduled(self):
         return self.status == 'scheduled'
-
-    @property
-    def scheduled_for(self):
-        return self._dict.get('scheduled_for')
-
-    @property
-    def processing_started(self):
-        if not self._dict.get('processing_started'):
-            return None
-        return utc_string_to_aware_gmt_datetime(self._dict['processing_started'])
 
     def _aggregate_statistics(self, *statuses):
         return sum(
@@ -145,10 +136,7 @@ class Job(JSONModel):
         if any(self.uncancellable_notifications):
             return False
 
-        if not letter_can_be_cancelled(
-            'created',
-            utc_string_to_aware_gmt_datetime(self.created_at).replace(tzinfo=None)
-        ):
+        if not letter_can_be_cancelled('created', self.created_at.replace(tzinfo=None)):
             return False
 
         return True

@@ -1,5 +1,6 @@
 from collections import OrderedDict
 from csv import DictReader
+from dateutil.parser import parse
 from io import StringIO
 from pathlib import Path
 
@@ -381,7 +382,7 @@ def test_printing_today_or_tomorrow_returns_tomorrow(datetime):
 ])
 def test_get_letter_printing_statement_when_letter_prints_today(created_at, current_datetime):
     with freeze_time(current_datetime):
-        statement = get_letter_printing_statement('created', created_at)
+        statement = get_letter_printing_statement('created', parse(created_at))
 
     assert statement == 'Printing starts today at 5:30pm'
 
@@ -392,7 +393,7 @@ def test_get_letter_printing_statement_when_letter_prints_today(created_at, curr
 ])
 def test_get_letter_printing_statement_when_letter_prints_tomorrow(created_at, current_datetime):
     with freeze_time(current_datetime):
-        statement = get_letter_printing_statement('created', created_at)
+        statement = get_letter_printing_statement('created', parse(created_at))
 
     assert statement == 'Printing starts tomorrow at 5:30pm'
 
@@ -404,7 +405,7 @@ def test_get_letter_printing_statement_when_letter_prints_tomorrow(created_at, c
 ])
 @freeze_time('2017-07-07 12:00:00')
 def test_get_letter_printing_statement_for_letter_that_has_been_sent(created_at, print_day):
-    statement = get_letter_printing_statement('delivered', created_at)
+    statement = get_letter_printing_statement('delivered', parse(created_at))
 
     assert statement == 'Printed {} at 5:30pm'.format(print_day)
 

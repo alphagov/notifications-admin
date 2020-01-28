@@ -5,7 +5,6 @@ import json
 import os
 from datetime import datetime
 
-from dateutil import parser
 from flask import (
     Response,
     flash,
@@ -21,6 +20,7 @@ from notifications_utils.letter_timings import (
     get_letter_timings,
     letter_can_be_cancelled,
 )
+from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
 from notifications_utils.pdf import pdf_page_count
 from PyPDF2.utils import PdfReadError
 
@@ -98,12 +98,12 @@ def view_notification(service_id, notification_id):
     else:
         job = None
 
-    letter_print_day = get_letter_printing_statement(notification['status'], notification['created_at'])
+    notification_created_at = utc_string_to_aware_gmt_datetime(notification['created_at'])
 
-    notification_created = parser.parse(notification['created_at']).replace(tzinfo=None)
+    letter_print_day = get_letter_printing_statement(notification['status'], notification_created_at)
 
     show_cancel_button = notification['notification_type'] == 'letter' and \
-        letter_can_be_cancelled(notification['status'], notification_created)
+        letter_can_be_cancelled(notification['status'], notification_created_at.replace(tzinfo=None))
 
     if get_help_argument() or request.args.get('help') == '0':
         # help=0 is set when you’ve just sent a notification. We
