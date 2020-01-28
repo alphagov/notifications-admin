@@ -16,7 +16,7 @@
       back_link=back_link
     ) }}
     <p>
-      {% if is_precompiled_letter %}
+      {% if notification.is_precompiled_letter %}
         Provided as PDF
       {% else %}
         {% if help %}
@@ -26,34 +26,34 @@
         {% endif %}
         was sent
       {% endif %}
-      {% if job and job.original_file_name != 'Report' %}
+      {% if notificaton.job and notificaton.job.original_file_name != 'Report' %}
         {% set destination =
           {'letter': 'an address', 'email': 'an email address', 'sms': 'a phone number'} %}
         to {{ destination[template.template_type] }} from
-        <a href="{{ url_for('.view_job', service_id=current_service.id, job_id=job.id) }}">{{ job.original_file_name }}</a>
-      {% elif created_by %}
-        by {{ created_by.name }}
+        <a href="{{ url_for('.view_job', service_id=current_service.id, job_id=notificaton.job.id) }}">{{ notification.job.original_file_name }}</a>
+      {% elif notification.created_by %}
+        by {{ notification.created_by.name }}
       {% endif %}
-      on {{ created_at|format_datetime_short }}
+      on {{ notification.created_at|format_datetime_short }}
     </p>
 
     {% if template.template_type == 'letter' %}
-      {% if notification_status in ('permanent-failure', 'cancelled') %}
+      {% if notification.status in ('permanent-failure', 'cancelled') %}
         <p class="notification-status-cancelled">
-          Cancelled {{ updated_at|format_datetime_short }}
+          Cancelled {{ notification.updated_at|format_datetime_short }}
         </p>
-      {% elif notification_status == 'validation-failed' %}
+      {% elif notification.status == 'validation-failed' %}
         <p class="notification-status-cancelled">
           {{ message.summary | safe }}
         </p>
-      {% elif notification_status == 'technical-failure' %}
+      {% elif notification.status == 'technical-failure' %}
         <p class="notification-status-cancelled">
           Technical failure – Notify will resend once the team have
           fixed the problem
         </p>
       {% else %}
-        {% if sent_with_test_key %}
-          {% if is_precompiled_letter %}
+        {% if notification.sent_with_test_key %}
+          {% if notification.is_precompiled_letter %}
             <p>
               This letter passed our checks, but we will not print it because you used a test key.
             </p>
@@ -82,25 +82,25 @@
         <div class="page-footer">
           {% if show_cancel_button %}
             <span class="page-footer-delete-link page-footer-delete-link-without-button">
-              <a href="{{ url_for('main.cancel_letter', service_id=current_service.id, notification_id=notification_id) }}">Cancel sending this letter</a>
+              <a href="{{ url_for('main.cancel_letter', service_id=current_service.id, notification_id=notification.id) }}">Cancel sending this letter</a>
             </span>
           {% else %}
             <div>&nbsp;</div>
           {% endif %}
-          <a class="page-footer-right-aligned-link-without-button" href="{{ url_for('main.view_letter_notification_as_preview', service_id=current_service.id, notification_id=notification_id, filetype='pdf') }}" download>Download as a PDF</a>
+          <a class="page-footer-right-aligned-link-without-button" href="{{ url_for('main.view_letter_notification_as_preview', service_id=current_service.id, notification_id=notification.id, filetype='pdf') }}" download>Download as a PDF</a>
         </div>
       </div>
     {% elif template.template_type == 'email' %}
       <div class="js-stick-at-bottom-when-scrolling">
-        {{ ajax_block(partials, updates_url, 'status', finished=finished) }}
+        {{ ajax_block(partials, updates_url, 'status', finished=notification.finished) }}
       </div>
     {% elif template.template_type == 'sms' %}
-      {{ ajax_block(partials, updates_url, 'status', finished=finished) }}
+      {{ ajax_block(partials, updates_url, 'status', finished=notification.finished) }}
     {% endif %}
 
     {% if current_user.has_permissions('send_messages') and current_user.has_permissions('view_activity') and template.template_type == 'sms' and can_receive_inbound %}
       <p>
-        <a href="{{ url_for('.conversation', service_id=current_service.id, notification_id=notification_id, _anchor='n{}'.format(notification_id)) }}">See all text messages sent to this phone number</a>
+        <a href="{{ url_for('.conversation', service_id=current_service.id, notification_id=notification.id, _anchor='n{}'.format(notification.id)) }}">See all text messages sent to this phone number</a>
       </p>
     {% endif %}
 

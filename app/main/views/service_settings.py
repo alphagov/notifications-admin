@@ -1,5 +1,4 @@
 from collections import OrderedDict
-from datetime import datetime
 
 from flask import (
     abort,
@@ -14,7 +13,6 @@ from flask import (
 )
 from flask_login import current_user
 from notifications_python_client.errors import HTTPError
-from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
 
 from app import (
     billing_api_client,
@@ -23,7 +21,6 @@ from app import (
     format_thousands,
     inbound_number_client,
     letter_branding_client,
-    notification_api_client,
     organisations_client,
     service_api_client,
     user_api_client,
@@ -54,10 +51,8 @@ from app.main.forms import (
     SetLetterBranding,
     SMSPrefixForm,
 )
+from app.models.notification import Notification
 from app.utils import (
-    DELIVERED_STATUSES,
-    FAILURE_STATUSES,
-    SENDING_STATUSES,
     email_safe,
     user_has_permissions,
     user_is_gov_user,
@@ -454,7 +449,7 @@ def service_verify_reply_to_address_updates(service_id, notification_id):
 def get_service_verify_reply_to_address_partials(service_id, notification_id):
     form = ServiceReplyToEmailForm()
     first_email_address = current_service.count_email_reply_to_addresses == 0
-    notification = notification_api_client.get_notification(current_app.config["NOTIFY_SERVICE_ID"], notification_id)
+    notification = Notification.from_id(notification_id, current_app.config["NOTIFY_SERVICE_ID"])
     replace = request.args.get('replace', False)
     replace = False if replace == "False" else replace
     existing_is_default = False
@@ -463,34 +458,29 @@ def get_service_verify_reply_to_address_partials(service_id, notification_id):
         existing_is_default = existing['is_default']
     verification_status = "pending"
     is_default = True if (request.args.get('is_default', False) == "True") else False
-    if notification["status"] in DELIVERED_STATUSES:
+    if notification.delivered:
         verification_status = "success"
-        if notification["to"] not in [i["email_address"] for i in current_service.email_reply_to_addresses]:
+        if notification.to not in [i["email_address"] for i in current_service.email_reply_to_addresses]:
             if replace:
                 service_api_client.update_reply_to_email_address(
-                    current_service.id, replace, email_address=notification["to"], is_default=is_default
+                    current_service.id, replace, email_address=notification.to, is_default=is_default
                 )
             else:
                 service_api_client.add_reply_to_email_address(
                     current_service.id,
-                    email_address=notification["to"],
+                    email_address=notification.to,
                     is_default=is_default
                 )
-    seconds_since_sending = (
-        utc_string_to_aware_gmt_datetime(datetime.utcnow().isoformat()) -
-        utc_string_to_aware_gmt_datetime(notification['created_at'])
-    ).seconds
-    if notification["status"] in FAILURE_STATUSES or (
-        notification["status"] in SENDING_STATUSES and
-        seconds_since_sending > current_app.config['REPLY_TO_EMAIL_ADDRESS_VALIDATION_TIMEOUT']
+    if not notification.delivered_within(
+        seconds=current_app.config['REPLY_TO_EMAIL_ADDRESS_VALIDATION_TIMEOUT']
     ):
         verification_status = "failure"
-        form.email_address.data = notification['to']
+        form.email_address.data = notification.to
         form.is_default.data = is_default
     return {
         'status': render_template(
             'views/service-settings/email-reply-to/_verify-updates.html',
-            reply_to_email_address=notification["to"],
+            reply_to_email_address=notification.to,
             service_id=current_service.id,
             notification_id=notification_id,
             verification_status=verification_status,

@@ -9,7 +9,7 @@
     {% if notification.status|format_notification_status_as_url(notification.notification_type) %}
       </a>
     {% endif %}
-    {% if sent_with_test_key %}
+    {% if notification.sent_with_test_key %}
       (test)
     {% endif %}
   </p>

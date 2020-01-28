@@ -7,6 +7,7 @@ from notifications_utils.template import SMSPreviewTemplate
 from app import current_service, notification_api_client, service_api_client
 from app.main import main
 from app.main.forms import SearchByNameForm
+from app.models.notification import Notification
 from app.models.template_list import TemplateList
 from app.utils import user_has_permissions
 
@@ -94,7 +95,7 @@ def get_user_number(service_id, notification_id):
     except HTTPError as e:
         if e.status_code != 404:
             raise
-        user_number = notification_api_client.get_notification(service_id, notification_id)['to']
+        user_number = Notification.from_id(notification_id, service_id).to
     return format_phone_number_human_readable(user_number)
 
 

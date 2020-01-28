@@ -29,7 +29,7 @@ def test_get_user_phone_number_when_only_inbound_exists(mocker):
         }
     )
     mock_get_notification = mocker.patch(
-        'app.main.views.conversation.notification_api_client.get_notification',
+        'app.models.notification.notification_api_client.get_notification',
         side_effect=HTTPError(response=Mock(status_code=404)),
     )
     assert get_user_number('service', 'notification') == '07900 900123'
@@ -43,7 +43,7 @@ def test_get_user_phone_number_when_only_outbound_exists(mocker):
         side_effect=HTTPError(response=Mock(status_code=404)),
     )
     mock_get_notification = mocker.patch(
-        'app.main.views.conversation.notification_api_client.get_notification',
+        'app.models.notification.notification_api_client.get_notification',
         return_value={
             'to': '15550000000'
         }
@@ -59,7 +59,7 @@ def test_get_user_phone_number_raises_if_both_api_requests_fail(mocker):
         side_effect=HTTPError(response=Mock(status_code=404)),
     )
     mock_get_notification = mocker.patch(
-        'app.main.views.conversation.notification_api_client.get_notification',
+        'app.models.notification.notification_api_client.get_notification',
         side_effect=HTTPError(response=Mock(status_code=404)),
     )
     with pytest.raises(HTTPError):
@@ -382,7 +382,7 @@ def test_get_user_phone_number_when_not_a_standard_phone_number(mocker):
         }
     )
     mocker.patch(
-        'app.main.views.conversation.notification_api_client.get_notification',
+        'app.models.notification.notification_api_client.get_notification',
         side_effect=HTTPError,
     )
     assert get_user_number('service', 'notification') == 'ALPHANUM3R1C'
