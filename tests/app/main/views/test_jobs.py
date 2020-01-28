@@ -7,7 +7,7 @@ from flask import url_for
 from freezegun import freeze_time
 
 from app.main.views.jobs import get_time_left
-from tests import job_json, notification_json, sample_uuid
+from tests import job_json, notification_json, sample_uuid, user_json
 from tests.conftest import (
     SERVICE_ONE_ID,
     create_active_caseworking_user,
@@ -766,6 +766,40 @@ def test_should_show_updates_for_one_job_as_json(
     assert 'Delivered' in content['notifications']
     assert '12:01am' in content['notifications']
     assert 'Sent by Test User on 1 January at midnight' in content['status']
+
+
+@freeze_time("2016-01-01 00:00:00.000001")
+def test_should_show_updates_for_scheduled_job_as_json(
+    logged_in_client,
+    service_one,
+    active_user_with_permissions,
+    mock_get_notifications,
+    mock_get_service_template,
+    mock_get_service_data_retention,
+    mocker,
+    fake_uuid,
+):
+    mocker.patch('app.job_api_client.get_job', return_value={'data': job_json(
+        service_one['id'],
+        created_by=user_json(),
+        job_id=fake_uuid,
+        scheduled_for='2016-06-01T13:00:00',
+        processing_started='2016-06-01T15:00:00',
+    )})
+
+    response = logged_in_client.get(url_for('main.view_job_updates', service_id=service_one['id'], job_id=fake_uuid))
+
+    assert response.status_code == 200
+    content = response.json
+    assert 'sending' in content['counts']
+    assert 'delivered' in content['counts']
+    assert 'failed' in content['counts']
+    assert 'Recipient' in content['notifications']
+    assert '07123456789' in content['notifications']
+    assert 'Status' in content['notifications']
+    assert 'Delivered' in content['notifications']
+    assert '12:01am' in content['notifications']
+    assert 'Sent by Test User on 1 June at 5:00pm' in content['status']
 
 
 @pytest.mark.parametrize(
