@@ -1,7 +1,7 @@
 import pytz
 from datetime import datetime
 
-from app.models import JSONModel, ModelList
+from app.models import JSONModel, PaginatedModelList
 from app.notify_client.api_key_api_client import KEY_TYPE_TEST
 from app.notify_client.notification_api_client import notification_api_client
 from notifications_utils.template import Template, WithSubjectTemplate
@@ -149,16 +149,7 @@ class Notification(JSONModel):
         ).subject)
 
 
-class Notifications(ModelList):
+class Notifications(PaginatedModelList):
     client_method = notification_api_client.get_notifications_for_service
     model = Notification
-
-    def __init__(self, *args, **kwargs):
-        try:
-            self.current_page = int(kwargs.pop('page'))
-        except (TypeError, KeyError):
-            self.current_page = 1
-        response = self.client_method(*args, **kwargs, page=self.current_page)
-        self.prev_page = response.get('links', {}).get('prev', None)
-        self.next_page = response.get('links', {}).get('next', None)
-        self.items = response['notifications']
+    items_key = 'notifications'

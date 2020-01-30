@@ -49,7 +49,7 @@ class JobApiClient(NotifyAdminAPIClient):
             if job['job_status'] != 'cancelled'
         )
 
-    def get_page_of_jobs(self, service_id, page):
+    def get_page_of_jobs(self, service_id, *, page):
         return self.get_jobs(
             service_id,
             statuses=self.NON_SCHEDULED_JOB_STATUSES,

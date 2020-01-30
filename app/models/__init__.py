@@ -89,5 +89,24 @@ class ModelList(ABC, Sequence):
         return list(self) + list(other)
 
 
+class PaginatedModelList(ModelList):
+
+    @property
+    @abstractmethod
+    def items_key(self):
+        pass
+
+    def __init__(self, *args, **kwargs):
+        try:
+            self.current_page = int(kwargs.get('page'))
+        except TypeError:
+            self.current_page = 1
+        kwargs['page'] = self.current_page
+        response = self.client_method(*args, **kwargs)
+        self.prev_page = response.get('links', {}).get('prev', None)
+        self.next_page = response.get('links', {}).get('next', None)
+        self.items = response[self.items_key]
+
+
 class InviteTokenError(Exception):
     pass
