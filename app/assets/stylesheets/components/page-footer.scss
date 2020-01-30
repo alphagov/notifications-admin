@@ -76,20 +76,18 @@
 
 }
 
-.align-button-with-textbox {
+.search-form__button {
+  @include media(desktop) {
+    position: relative;
+    top: 32px;
+    left: -30px;
+    width: 100%;
+    margin-right: -30px;
+    padding-top: 7px;
+    box-sizing: content-box;
 
-  .button {
-
-    @include media(desktop) {
-      position: relative;
+    &:active {
       top: 32px;
-      left: -30px;
-      width: 100%;
-      margin-right: -30px;
-      padding-top: 8px;
-      box-sizing: content-box;
     }
-
   }
-
 }
