@@ -1,4 +1,5 @@
 {% from "components/form.html" import form_wrapper %}
+{% from "components/button/macro.njk" import govukButton %}
 
 {% macro banner(body, type=None, with_tick=False, delete_button=None, subhead=None, context=None, action=None, id=None) %}
   <div
@@ -23,7 +24,11 @@
     {% if delete_button %}
       {% call form_wrapper(action=action) %}
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-        <button type="submit" class="button" name="delete">{{ delete_button }}</button>
+        {{ govukButton({
+          "text": delete_button,
+          "name": "delete",
+          "classes": "govuk-button--warning govuk-!-margin-top-2",
+        }) }}
       {% endcall %}
     {% endif %}
   </div>

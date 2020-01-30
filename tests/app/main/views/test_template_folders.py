@@ -839,7 +839,7 @@ def test_delete_template_folder_should_request_confirmation(
     assert len(page.select('main button')) == 2
 
     assert 'action' not in page.select('main form')[0]
-    assert page.select('main form button')[0].text == 'Yes, delete'
+    assert normalize_spaces(page.select('main form button')[0].text) == 'Yes, delete'
 
     assert page.select('main form')[1]['action'] == url_for(
         'main.manage_template_folder',
