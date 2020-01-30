@@ -1,7 +1,6 @@
 {% extends "withoutnav_template.html" %}
 {% from "components/live-search.html" import live_search %}
-{% from "components/page-footer.html" import page_footer %}
-{% from "components/page-header.html" import page_header %}
+{% from "components/button/macro.njk" import govukButton %}
 
 {% block per_page_title %}
   All organisations
@@ -53,7 +52,12 @@
           &nbsp;
         </div>
         <div class="column-three-quarters">
-          <a href="{{ url_for('main.add_organisation') }}" class="button-secondary">New organisation</a>
+          {{ govukButton({
+            "element": "a",
+            "text": "New organisation",
+            "href": url_for('main.add_organisation'),
+            "classes": "govuk-button--secondary"
+          }) }}
         </div>
       </div>
     </div>

@@ -45,7 +45,7 @@ class _MockS3Object():
                 partial(url_for, 'main.service_download_agreement', service_id=SERVICE_ONE_ID),
             ),
             (
-                ['button'],
+                ['govuk-button'],
                 partial(url_for, 'main.service_accept_agreement', service_id=SERVICE_ONE_ID),
             ),
         ]
@@ -62,7 +62,7 @@ class _MockS3Object():
                 partial(url_for, 'main.service_download_agreement', service_id=SERVICE_ONE_ID),
             ),
             (
-                ['button'],
+                ['govuk-button'],
                 partial(url_for, 'main.service_accept_agreement', service_id=SERVICE_ONE_ID),
             ),
         ]

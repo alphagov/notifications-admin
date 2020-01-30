@@ -1,5 +1,5 @@
 {% extends "withoutnav_template.html" %}
-{% from "components/page-footer.html" import page_footer %}
+{% from "components/button/macro.njk" import govukButton %}
 
 {% block per_page_title %}
   Resend email link
@@ -15,8 +15,12 @@
     <p> If you no longer have access to the email address you registered for this service, speak to your service manager to reset the email.</p>
 
     <p>
-  		<a class="button" href="{{url_for('main.resend_email_link')}}" role="button">Resend email link</a>
-  	</p>
+      {{ govukButton({
+        "element": "a",
+        "text": "Resend email link",
+        "href": url_for('main.resend_email_link')
+      }) }}
+    </p>
 
   </div>
 </div>

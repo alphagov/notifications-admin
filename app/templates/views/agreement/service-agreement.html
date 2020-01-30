@@ -1,5 +1,6 @@
 {% extends "withnav_template.html" %}
 {% from "components/page-header.html" import page_header %}
+{% from "components/button/macro.njk" import govukButton %}
 
 {% block service_page_title %}
   Accept our data sharing and financial agreement
@@ -30,7 +31,11 @@
     <p>
       The agreement is confidential and should not be shared outside your organisation.
     </p>
-    <a href="{{ url_for('main.service_accept_agreement', service_id=current_service.id) }}" class="button">Continue</a>
+    {{ govukButton({
+      "element": "a",
+      "text": "Continue",
+      "href": url_for('main.service_accept_agreement', service_id=current_service.id),
+    }) }}
 
   </div>
 </div>

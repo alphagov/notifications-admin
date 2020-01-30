@@ -5,6 +5,7 @@
 {% from "components/status-box.html" import status_box %}
 {% from "components/form.html" import form_wrapper %}
 {% from "components/details/macro.njk" import govukDetails %}
+{% from "components/button/macro.njk" import govukButton %}
 
 {% block per_page_title %}
   Platform admin
@@ -21,7 +22,7 @@
       {{ textbox(form.start_date, hint="Enter start date in format YYYY-MM-DD") }}
       {{ textbox(form.end_date, hint="Enter end date in format YYYY-MM-DD") }}
       </br>
-      <button type="submit" class="button">Filter</button>
+      {{ govukButton({ "text": "Filter" }) }}
     {% endcall %}
   {% endset %}
 

@@ -1,3 +1,4 @@
+import re
 import urllib
 from unittest.mock import Mock
 
@@ -27,7 +28,7 @@ def test_no_upload_letters_button_without_permission(
 ):
     service_one['permissions'] += extra_permissions
     page = client_request.get('main.uploads', service_id=SERVICE_ONE_ID)
-    assert not page.find('a', text='Upload a letter')
+    assert not page.find('a', text=re.compile('Upload a letter'))
 
 
 def test_get_upload_hub_page(
@@ -38,7 +39,7 @@ def test_get_upload_hub_page(
     service_one['permissions'] += ['letter', 'upload_letters']
     page = client_request.get('main.uploads', service_id=SERVICE_ONE_ID)
     assert page.find('h1').text == 'Uploads'
-    assert page.find('a', text='Upload a letter').attrs['href'] == url_for(
+    assert page.find('a', text=re.compile('Upload a letter')).attrs['href'] == url_for(
         'main.upload_letter', service_id=SERVICE_ONE_ID
     )
 

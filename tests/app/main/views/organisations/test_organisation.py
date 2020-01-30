@@ -50,7 +50,7 @@ def test_organisation_page_shows_all_organisations(
             expected_hints[index]
         )
     assert normalize_spaces(
-        page.select_one('a.button-secondary').text
+        page.select_one('a.govuk-button--secondary').text
     ) == 'New organisation'
     get_organisations.assert_called_once_with()
 

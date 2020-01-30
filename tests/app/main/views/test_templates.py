@@ -2029,7 +2029,7 @@ def test_should_show_template_as_first_page_of_tour(
         'service one: Template <em>content</em> with & entity'
     )
 
-    assert page.select('a.button')[0]['href'] == url_for(
+    assert page.select('a.govuk-button')[0]['href'] == url_for(
         '.send_test', service_id=SERVICE_ONE_ID, template_id=fake_uuid, help=2
     )
 
