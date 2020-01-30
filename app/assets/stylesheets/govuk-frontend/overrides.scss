@@ -42,3 +42,7 @@
 .govuk-footer__heading {
   @include govuk-font($size: 19, $weight: bold);
 }
+
+.govuk-button {
+  margin-bottom: 0px;
+}
