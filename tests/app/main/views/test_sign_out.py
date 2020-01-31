@@ -4,9 +4,9 @@ from tests.conftest import SERVICE_ONE_ID
 
 
 def test_render_sign_out_redirects_to_sign_in(
-    client
+    logged_in_client
 ):
-    response = client.get(
+    response = logged_in_client.get(
         url_for('main.sign_out'))
     assert response.status_code == 302
     assert response.location == url_for(
