@@ -378,7 +378,7 @@ def test_service_navigation_for_org_user(
     ]
 
 
-def test_org_users_can_always_see_usage_page(
+def test_org_user_who_is_also_service_user_can_still_see_usage_page(
     client_request,
     mocker,
     active_caseworking_user,
