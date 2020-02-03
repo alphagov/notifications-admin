@@ -10,7 +10,8 @@ ALLOWED_ATTRIBUTES = {
     'email_address',
     'mobile_number',
     'auth_type',
-    'updated_by'
+    'updated_by',
+    'current_session_id'
 }
 
 

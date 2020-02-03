@@ -1,5 +1,5 @@
 from flask import abort, current_app, request, session
-from flask_login import AnonymousUserMixin, UserMixin, login_user
+from flask_login import AnonymousUserMixin, UserMixin, login_user, logout_user
 from notifications_python_client.errors import HTTPError
 from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
 from werkzeug.utils import cached_property
@@ -127,8 +127,7 @@ class User(JSONModel, UserMixin):
         )
 
     def logged_in_elsewhere(self):
-        # if the current user (ie: db object) has no session, they've never logged in before
-        return self.current_session_id is not None and session.get('current_session_id') != self.current_session_id
+        return session.get('current_session_id') != self.current_session_id
 
     def activate(self):
         if self.state == 'pending':
@@ -153,6 +152,12 @@ class User(JSONModel, UserMixin):
             user_api_client.send_verify_code(self.id, 'sms', self.mobile_number)
 
         return True
+
+    def sign_out(self):
+        # Update the db so the server also knows the user is logged out.
+        session.clear()
+        logout_user()
+        return self.update(current_session_id=None)
 
     @property
     def sms_auth(self):
