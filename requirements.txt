@@ -17,7 +17,7 @@ pyexcel-ods3==0.5.3
 pytz==2019.3
 gunicorn==19.7.1  # pyup: ignore, >19.8 breaks eventlet patching
 eventlet==0.25.1
-notifications-python-client==5.5.0
+notifications-python-client==5.5.1
 
 # PaaS
 awscli-cwlogs>=1.4,<1.5
@@ -46,10 +46,10 @@ future==0.18.2
 greenlet==0.4.15
 idna==2.8
 jdcal==1.4.1
-Jinja2==2.11.0
+Jinja2==2.11.1
 jmespath==0.9.4
 lml==0.0.9
-lxml==4.4.2
+lxml==4.5.0
 MarkupSafe==1.1.1
 mistune==0.8.4
 monotonic==1.5
@@ -63,7 +63,7 @@ PyPDF2==1.26.0
 python-dateutil==2.8.1
 python-json-logger==0.1.11
 PyYAML==5.2
-redis==3.3.11
+redis==3.4.1
 requests==2.22.0
 rsa==3.4.2
 s3transfer==0.3.2
