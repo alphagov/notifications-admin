@@ -18,6 +18,7 @@ from app.utils import (
     get_letter_printing_statement,
     get_letter_validation_error,
     get_logo_cdn_domain,
+    is_less_than_90_days_ago,
     printing_today_or_tomorrow,
 )
 from tests.conftest import fake_uuid
@@ -506,3 +507,12 @@ def test_get_letter_validation_error_for_known_errors(
     if summary.select_one('a'):
         assert summary.select_one('a')['href'] == url_for('.letter_spec')
         assert summary.select_one('a')['target'] == '_blank'
+
+
+@pytest.mark.parametrize("date_from_db, expected_result", [
+    ('Sun, 17 Nov 2019 11:28:25 GMT', True),
+    ('Sun, 16 Nov 2019 11:28:25 GMT', False),
+])
+@freeze_time('2020-02-14T12:00:00')
+def test_is_less_than_90_days_ago(date_from_db, expected_result):
+    assert is_less_than_90_days_ago(date_from_db) == expected_result

@@ -1,5 +1,4 @@
 import json
-from datetime import datetime
 
 from flask import (
     current_app,
@@ -17,7 +16,7 @@ from app import user_api_client
 from app.main import main
 from app.main.forms import TwoFactorForm
 from app.models.user import User
-from app.utils import redirect_to_sign_in
+from app.utils import is_less_than_90_days_ago, redirect_to_sign_in
 
 
 @main.route('/two-factor-email-sent', methods=['GET'])
@@ -66,9 +65,7 @@ def two_factor():
     form = TwoFactorForm(_check_code)
 
     if form.validate_on_submit():
-        if (datetime.utcnow() - datetime.strptime(
-            user.email_access_validated_at, '%a, %d %b %Y %X %Z'
-        )).days < 90:
+        if is_less_than_90_days_ago(user.email_access_validated_at):
             return log_in_user(user_id)
         else:
             user_api_client.send_verify_code(user.id, 'email', None, request.args.get('next'))
