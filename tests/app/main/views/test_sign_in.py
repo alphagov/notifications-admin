@@ -61,6 +61,7 @@ def test_doesnt_redirect_to_sign_in_if_no_session_info(
 
 @pytest.mark.parametrize('db_sess_id, cookie_sess_id', [
     (None, None),
+    (None, uuid.UUID(int=1)),  # BAD - cookie doesn't match db
     (uuid.UUID(int=1), None),  # BAD - has used other browsers before but this is a brand new browser with no cookie
     (uuid.UUID(int=1), uuid.UUID(int=2)),  # BAD - this person has just signed in on a different browser
 ])
