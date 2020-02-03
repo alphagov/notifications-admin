@@ -378,6 +378,45 @@ def test_service_navigation_for_org_user(
     ]
 
 
+def test_org_users_can_always_see_usage_page(
+    client_request,
+    mocker,
+    active_caseworking_user,
+    mock_has_no_jobs,
+    mock_get_usage,
+    mock_get_billable_units,
+    mock_get_free_sms_fragment_limit,
+    mock_get_service,
+    mock_get_invites_for_service,
+    mock_get_users_by_service,
+    mock_get_service_organisation,
+):
+    active_caseworking_user['services'] = [SERVICE_ONE_ID]
+    active_caseworking_user['organisations'] = [ORGANISATION_ID]
+    service = service_json(
+        id_=SERVICE_ONE_ID,
+        organisation_id=ORGANISATION_ID,
+    )
+    mocker.patch(
+        'app.service_api_client.get_service',
+        return_value={'data': service}
+    )
+    client_request.login(active_caseworking_user, service=service)
+
+    page = client_request.get(
+        'main.usage',
+        service_id=SERVICE_ONE_ID,
+    )
+    assert [
+        item.text.strip() for item in page.select('nav.navigation a')
+    ] == [
+        'Templates',
+        'Sent messages',
+        'Team members',
+        'Usage',
+    ]
+
+
 def get_name_of_decorator_from_ast_node(node):
     if isinstance(node, ast.Name):
         return str(node.id)
