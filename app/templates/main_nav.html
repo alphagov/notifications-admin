@@ -29,8 +29,8 @@
       <li><a href="{{ url_for('.api_integration', service_id=current_service.id) }}" {{ main_navigation.is_selected('api-integration') }}>API integration</a></li>
     {% endif %}
   {% elif current_user.has_permissions(allow_org_user=True) %}
-    <li><a href="{{ url_for('.manage_users', service_id=current_service.id) }}" {{ main_navigation.is_selected('team-members') }}>Team members</a></li>
     <li><a href="{{ url_for('.usage', service_id=current_service.id) }}" {{ main_navigation.is_selected('usage') }}>Usage</a></li>
+    <li><a href="{{ url_for('.manage_users', service_id=current_service.id) }}" {{ main_navigation.is_selected('team-members') }}>Team members</a></li>
   {% endif %}
   </ul>
 </nav>

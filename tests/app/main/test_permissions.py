@@ -373,8 +373,8 @@ def test_service_navigation_for_org_user(
     assert [
         item.text.strip() for item in page.select('nav.navigation a')
     ] == [
-        'Team members',
         'Usage',
+        'Team members',
     ]
 
 
