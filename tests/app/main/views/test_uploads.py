@@ -112,7 +112,7 @@ def test_post_upload_letter_redirects_for_valid_file(
     assert not page.find(id='validation-error-message')
 
     assert page.find('input', {'type': 'hidden', 'name': 'file_id', 'value': fake_uuid})
-    assert page.select('main button[type=submit]')[0].text == 'Send 1 letter'
+    assert normalize_spaces(page.select('main button[type=submit]')[0].text) == 'Send 1 letter'
 
 
 def test_post_upload_letter_shows_letter_preview_for_valid_file(
@@ -383,7 +383,7 @@ def test_uploaded_letter_preview(
     assert page.find('h1').text == 'my_letter.pdf'
     assert page.find('div', class_='letter-sent')
     assert not page.find("label", {"class": "file-upload-button"})
-    assert page.find('button', {'class': 'button', 'type': 'submit'})
+    assert page.find('button', {'class': 'govuk-button', 'type': 'submit'})
 
 
 def test_uploaded_letter_preview_does_not_show_send_button_if_service_in_trial_mode(

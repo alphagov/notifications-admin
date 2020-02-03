@@ -846,7 +846,7 @@ def test_delete_template_folder_should_request_confirmation(
         service_id=service_one['id'],
         template_folder_id=folder_id,
     )
-    assert page.select('main form button')[1].text == 'Save'
+    assert normalize_spaces(page.select('main form button')[1].text) == 'Save'
 
 
 def test_delete_template_folder_should_detect_non_empty_folder_on_get(
