@@ -1,16 +1,19 @@
+import flask
 from flask import url_for
 
 from tests.conftest import SERVICE_ONE_ID
 
 
 def test_render_sign_out_redirects_to_sign_in(
-    logged_in_client
+    logged_in_client_with_session
 ):
-    response = logged_in_client.get(
+    assert flask.session
+    response = logged_in_client_with_session.get(
         url_for('main.sign_out'))
     assert response.status_code == 302
     assert response.location == url_for(
         'main.index', _external=True)
+    assert not flask.session
 
 
 def test_sign_out_user(
@@ -46,3 +49,15 @@ def test_sign_out_user(
     )
     with client_request.session_transaction() as session:
         assert session.get('user_id') is None
+
+
+def test_sign_out_of_two_sessions(
+    logged_in_client_with_session
+):
+    logged_in_client_with_session.get(
+        url_for('main.sign_out'))
+    assert not flask.session
+    response = logged_in_client_with_session.get(
+        url_for('main.sign_out'))
+
+    assert response.status_code == 302
