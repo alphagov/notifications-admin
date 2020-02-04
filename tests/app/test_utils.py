@@ -510,8 +510,8 @@ def test_get_letter_validation_error_for_known_errors(
 
 
 @pytest.mark.parametrize("date_from_db, expected_result", [
-    ('Sun, 17 Nov 2019 11:28:25 GMT', True),
-    ('Sun, 16 Nov 2019 11:28:25 GMT', False),
+    ('2019-11-17T11:35:21.726132Z', True),
+    ('2019-11-16T11:35:21.726132Z', False),
 ])
 @freeze_time('2020-02-14T12:00:00')
 def test_is_less_than_90_days_ago(date_from_db, expected_result):

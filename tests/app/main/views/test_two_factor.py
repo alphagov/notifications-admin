@@ -49,7 +49,7 @@ def test_should_login_user_and_should_redirect_to_next_url(
         session['user_details'] = {
             'id': api_user_active['id'],
             'email': api_user_active['email_address']}
-    api_user_active['email_access_validated_at'] = 'Sun, 23 Jan 2020 11:28:25 GMT'
+    api_user_active['email_access_validated_at'] = '2020-01-23T11:35:21.726132Z'
 
     response = client.post(url_for('main.two_factor', next='/services/{}'.format(SERVICE_ONE_ID)),
                            data={'sms_code': '12345'})
@@ -72,7 +72,7 @@ def test_should_send_email_and_redirect_to_info_page_if_user_needs_to_revalidate
     mocker
 ):
     mocker.patch('app.user_api_client.get_user', return_value=api_user_active)
-    api_user_active['email_access_validated_at'] = 'Sun, 03 Mar 2019 11:28:25 GMT'
+    api_user_active['email_access_validated_at'] = '2019-03-23T11:35:21.726132Z'
     with client.session_transaction() as session:
         session['user_details'] = {
             'id': api_user_active['id'],
@@ -99,7 +99,7 @@ def test_should_login_user_and_not_redirect_to_external_url(
         session['user_details'] = {
             'id': api_user_active['id'],
             'email': api_user_active['email_address']}
-    api_user_active['email_access_validated_at'] = 'Sun, 23 Jan 2020 11:28:25 GMT'
+    api_user_active['email_access_validated_at'] = '2020-01-23T11:35:21.726132Z'
 
     response = client.post(url_for('main.two_factor', next='http://www.google.com'),
                            data={'sms_code': '12345'})
@@ -120,7 +120,7 @@ def test_should_login_user_and_redirect_to_show_accounts(
         session['user_details'] = {
             'id': api_user_active['id'],
             'email': api_user_active['email_address']}
-    api_user_active['email_access_validated_at'] = 'Sun, 23 Jan 2020 11:28:25 GMT'
+    api_user_active['email_access_validated_at'] = '2020-01-23T11:35:21.726132Z'
 
     response = client.post(url_for('main.two_factor'),
                            data={'sms_code': '12345'})
@@ -162,7 +162,7 @@ def test_should_login_user_when_multiple_valid_codes_exist(
         session['user_details'] = {
             'id': api_user_active['id'],
             'email': api_user_active['email_address']}
-    api_user_active['email_access_validated_at'] = 'Sun, 23 Jan 2020 11:28:25 GMT'
+    api_user_active['email_access_validated_at'] = '2020-01-23T11:35:21.726132Z'
 
     response = client.post(url_for('main.two_factor'),
                            data={'sms_code': '23456'})
@@ -184,7 +184,7 @@ def test_two_factor_should_set_password_when_new_password_exists_in_session(
             'id': api_user_active['id'],
             'email': api_user_active['email_address'],
             'password': 'changedpassword'}
-    api_user_active['email_access_validated_at'] = 'Sun, 23 Jan 2020 11:28:25 GMT'
+    api_user_active['email_access_validated_at'] = '2020-01-23T11:35:21.726132Z'
 
     response = client.post(url_for('main.two_factor'),
                            data={'sms_code': '12345'})
@@ -234,7 +234,7 @@ def test_two_factor_should_activate_pending_user(
 ):
     mocker.patch('app.user_api_client.get_user', return_value=api_user_pending)
     mocker.patch('app.service_api_client.get_services', return_value={'data': []})
-    api_user_pending['email_access_validated_at'] = 'Sun, 23 Jan 2020 11:28:25 GMT'
+    api_user_pending['email_access_validated_at'] = '2020-01-23T11:35:21.726132Z'
     with client.session_transaction() as session:
         session['user_details'] = {
             'id': api_user_pending['id'],
