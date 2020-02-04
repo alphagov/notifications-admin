@@ -42,6 +42,14 @@ def test_get_upload_hub_page(
         'main.upload_letter', service_id=SERVICE_ONE_ID
     )
 
+    assert page.findAll(
+        'a', {'class': 'file-list-filename'}
+    )[0].attrs['href'] == '/services/{}/jobs/job_id_1'.format(SERVICE_ONE_ID)
+
+    assert page.findAll(
+        'a', {'class': 'file-list-filename'}
+    )[1].attrs['href'] == '/services/{}/notification/letter_id_1'.format(SERVICE_ONE_ID)
+
 
 def test_get_upload_letter(client_request):
     page = client_request.get('main.upload_letter', service_id=SERVICE_ONE_ID)
