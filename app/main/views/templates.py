@@ -1,7 +1,5 @@
-from datetime import datetime, timedelta
 from functools import partial
 
-from dateutil.parser import parse
 from flask import abort, flash, redirect, render_template, request, url_for
 from flask_login import current_user
 from notifications_python_client.errors import HTTPError
@@ -10,6 +8,7 @@ from notifications_utils.pdf import is_letter_too_long
 
 from app import (
     current_service,
+    format_delta,
     nl2br,
     service_api_client,
     template_folder_api_client,
@@ -676,12 +675,8 @@ def delete_service_template(service_id, template_id):
         last_used_notification = template_statistics_client.get_template_statistics_for_template(
             service_id, template['id']
         )
-        message = 'This template was last used {} ago.'.format(
-            'more than seven days' if not last_used_notification else get_human_readable_delta(
-                parse(last_used_notification['created_at']).replace(tzinfo=None),
-                datetime.utcnow()
-            )
-        )
+        message = 'This template has never been used.' if not last_used_notification else \
+            'This template was last used {}.'.format(format_delta(last_used_notification['created_at']))
 
     except HTTPError as e:
         if e.status_code == 404:
@@ -848,18 +843,3 @@ def get_template_sender_form_dict(service_id, template):
 
     context['current_choice'] = template['service_letter_contact'] if template['service_letter_contact'] else ''
     return context
-
-
-def get_human_readable_delta(from_time, until_time):
-    delta = until_time - from_time
-    if delta < timedelta(seconds=60):
-        return 'under a minute'
-    elif delta < timedelta(hours=1):
-        minutes = int(delta.seconds / 60)
-        return '{} minute{}'.format(minutes, '' if minutes == 1 else 's')
-    elif delta < timedelta(days=1):
-        hours = int(delta.seconds / 3600)
-        return '{} hour{}'.format(hours, '' if hours == 1 else 's')
-    else:
-        days = delta.days
-        return '{} day{}'.format(days, '' if days == 1 else 's')

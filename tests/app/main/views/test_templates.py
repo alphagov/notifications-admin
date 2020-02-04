@@ -1,4 +1,3 @@
-from datetime import datetime
 from functools import partial
 from unittest.mock import ANY, Mock
 
@@ -7,7 +6,6 @@ from flask import url_for
 from freezegun import freeze_time
 from notifications_python_client.errors import HTTPError
 
-from app.main.views.templates import get_human_readable_delta
 from tests import (
     sample_uuid,
     single_notification_json,
@@ -1730,7 +1728,7 @@ def test_should_show_delete_template_page_with_time_block_for_empty_notification
         )
     assert "Are you sure you want to delete ‘Two week reminder’?" in page.select('.banner-dangerous')[0].text
     assert normalize_spaces(page.select('.banner-dangerous p')[0].text) == (
-        'This template was last used more than seven days ago.'
+        'This template has never been used.'
     )
     assert normalize_spaces(page.select('.sms-message-wrapper')[0].text) == (
         'service one: Template <em>content</em> with & entity'
@@ -1918,21 +1916,6 @@ def test_route_invalid_permissions(
         ['view_activity'],
         api_user_active,
         service_one)
-
-
-@pytest.mark.parametrize('from_time, until_time, message', [
-    (datetime(2000, 1, 1, 12, 0), datetime(2000, 1, 1, 12, 0, 59), 'under a minute'),
-    (datetime(2000, 1, 1, 12, 0), datetime(2000, 1, 1, 12, 1), '1 minute'),
-    (datetime(2000, 1, 1, 12, 0), datetime(2000, 1, 1, 12, 2, 35), '2 minutes'),
-    (datetime(2000, 1, 1, 12, 0), datetime(2000, 1, 1, 12, 59), '59 minutes'),
-    (datetime(2000, 1, 1, 12, 0), datetime(2000, 1, 1, 13, 0), '1 hour'),
-    (datetime(2000, 1, 1, 12, 0), datetime(2000, 1, 1, 14, 0), '2 hours'),
-    (datetime(2000, 1, 1, 12, 0), datetime(2000, 1, 2, 11, 59), '23 hours'),
-    (datetime(2000, 1, 1, 12, 0), datetime(2000, 1, 2, 12, 0), '1 day'),
-    (datetime(2000, 1, 1, 12, 0), datetime(2000, 1, 3, 14, 0), '2 days'),
-])
-def test_get_human_readable_delta(from_time, until_time, message):
-    assert get_human_readable_delta(from_time, until_time) == message
 
 
 def test_can_create_email_template_with_emoji(
