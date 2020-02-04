@@ -53,6 +53,10 @@ class Job(JSONModel):
         return self._dict.get('scheduled_for')
 
     @property
+    def upload_type(self):
+        return self._dict.get('upload_type')
+
+    @property
     def processing_started(self):
         if not self._dict.get('processing_started'):
             return None

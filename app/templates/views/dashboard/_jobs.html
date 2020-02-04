@@ -19,7 +19,7 @@
   ) %}
     {% call row_heading() %}
       <div class="file-list">
-        {% if item._dict.upload_type == 'letter' %}
+        {% if item.upload_type == 'letter' %}
           <a class="file-list-filename" href="{{ url_for('.view_notification', service_id=current_service.id, notification_id=item.id) }}">{{ item.original_file_name }}</a>
         {% else %}
           <a class="file-list-filename" href="{{ url_for('.view_job', service_id=current_service.id, job_id=item.id) }}">{{ item.original_file_name }}</a>
