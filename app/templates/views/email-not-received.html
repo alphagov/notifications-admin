@@ -11,9 +11,7 @@
   <div class="column-two-thirds">
     <h1 class="heading-large">Resend email link</h1>
 
-    <p> Email messages sometimes take a few minutes to arrive. If you do not recieve the email, you can resend it.</p>
-    <p> If you no longer have access to the email address you registered for this service, speak to your service manager to reset the email.</p>
-
+    <p>Emails sometimes take a few minutes to arrive. If you do not receive an email link, Notify can send you a new one.</p>
     <p>
       {{ govukButton({
         "element": "a",
@@ -21,6 +19,14 @@
         "href": url_for('main.resend_email_link')
       }) }}
     </p>
+
+    <h2 class="heading-medium">If your email address has changed</h2>
+    <p>You’ll need to:</p>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>find a member of your team who has permission to manage settings, team and usage</li>
+      <li>ask them to change the email address for your account</li>
+      <li>select <span class="govuk-body govuk-!-font-weight-bold">Resend email link</span></li>
+    </ul>
 
   </div>
 </div>
