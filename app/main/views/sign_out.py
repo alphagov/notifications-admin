@@ -6,5 +6,7 @@ from app.main import main
 
 @main.route('/sign-out', methods=(['GET']))
 def sign_out():
-    current_user.sign_out()
+    # An AnonymousUser does not have an id
+    if current_user.is_authenticated:
+        current_user.sign_out()
     return redirect(url_for('main.index'))
