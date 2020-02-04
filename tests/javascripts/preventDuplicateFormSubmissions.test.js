@@ -19,7 +19,7 @@ describe('Prevent duplicate form submissions', () => {
     // set up DOM
     document.body.innerHTML = `
       <form action="/" method="post">
-        <button class="button" type="submit">Continue</button>
+        <button class="govuk-button" type="submit">Continue</button>
       </form>`;
 
     form = document.querySelector('form');

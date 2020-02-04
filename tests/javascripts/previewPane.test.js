@@ -73,11 +73,11 @@ describe('Preview pane', () => {
                   <input autocomplete="off" class="form-control form-control-1-1 " id="search" name="search" required="" rows="8" type="search" value="">
                 </div>
               </div>
-            </div> 
+            </div>
           </div>
         </div>
         <div class="page-footer">
-          <button type="submit" class="button">Preview</button>
+          <button type="submit" class="govuk-button">Preview</button>
         </div>
       </form>`;
 
