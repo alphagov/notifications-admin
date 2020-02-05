@@ -104,7 +104,7 @@ describe("List entry", () => {
 
       // start module
       window.GOVUK.modules.start();
-      
+
       // re-select fields, based on updated DOM
       fields = inputList.querySelectorAll('.list-entry input[type=text]');
 
@@ -125,7 +125,7 @@ describe("List entry", () => {
 
       // re-select fields, based on updated DOM
       fields = inputList.querySelectorAll('.list-entry input[type=text]');
-      
+
       expect(fields.length).toEqual(2);
       expect(fields[1].getAttribute('value')).toEqual(domains[1]);
 
@@ -160,9 +160,9 @@ describe("List entry", () => {
       inputList.querySelectorAll('.list-entry').forEach((listEntry, idx) => {
 
         if (idx === 0) {
-          expect(listEntry.querySelector('.list-entry-remove')).toBeNull();
+          expect(listEntry.querySelector('.input-list__button--remove')).toBeNull();
         } else {
-          expect(listEntry.querySelector('.list-entry-remove')).not.toBeNull();
+          expect(listEntry.querySelector('.input-list__button--remove')).not.toBeNull();
         }
 
       });
@@ -211,7 +211,7 @@ describe("List entry", () => {
 
     test("Should remove the associated field", () => {
 
-      triggerEvent(inputList.querySelectorAll('.list-entry-remove')[0], 'click');
+      triggerEvent(inputList.querySelectorAll('.input-list__button--remove')[0], 'click');
 
       // list started with 10 fields
       expect(inputList.querySelectorAll('.list-entry').length).toEqual(9);
@@ -220,7 +220,7 @@ describe("List entry", () => {
 
     test("Should leave the list with the right numbers", () => {
 
-      triggerEvent(inputList.querySelectorAll('.list-entry-remove')[0], 'click');
+      triggerEvent(inputList.querySelectorAll('.input-list__button--remove')[0], 'click');
 
       const newNums = Array.from(
                         inputList.querySelectorAll('.text-box-number-label')
@@ -236,7 +236,7 @@ describe("List entry", () => {
     test("Should leave the list with the right values if you remove the last one", () => {
 
       // the first list item doesn't have a 'remove' button so there are only 9 for 10 items
-      triggerEvent(inputList.querySelectorAll('.list-entry-remove')[8], 'click');
+      triggerEvent(inputList.querySelectorAll('.input-list__button--remove')[8], 'click');
 
       // the items have their values set to the 10 domains
       const expectedValues = domains.slice(0, -1);
@@ -252,7 +252,7 @@ describe("List entry", () => {
     test("Should leave the list with the right values if you remove the second one", () => {
 
       // the first 'remove' button is attached to the second list item
-      triggerEvent(inputList.querySelectorAll('.list-entry-remove')[0], 'click');
+      triggerEvent(inputList.querySelectorAll('.input-list__button--remove')[0], 'click');
 
       // the items have their values set to the 10 domains
       const expectedValues = domains.slice();
@@ -270,10 +270,10 @@ describe("List entry", () => {
 
     test("Should add the 'add' button if the added question is the 10th field", () => {
 
-      triggerEvent(inputList.querySelectorAll('.list-entry-remove')[8], 'click');
-    
-      expect(inputList.querySelector('.list-entry-add')).not.toBeNull();
-    
+      triggerEvent(inputList.querySelectorAll('.input-list__button--remove')[8], 'click');
+
+      expect(inputList.querySelector('.input-list__button--add')).not.toBeNull();
+
     });
   });
 
@@ -285,7 +285,7 @@ describe("List entry", () => {
       // start module
       window.GOVUK.modules.start();
 
-      triggerEvent(inputList.querySelector('.list-entry-add'), 'click');
+      triggerEvent(inputList.querySelector('.input-list__button--add'), 'click');
 
       // inputList defaults to 2 items
       expect(inputList.querySelectorAll('.list-entry').length).toEqual(3);
@@ -296,9 +296,9 @@ describe("List entry", () => {
       // start module
       window.GOVUK.modules.start();
 
-      triggerEvent(inputList.querySelectorAll('.list-entry-remove')[0], 'click');
+      triggerEvent(inputList.querySelectorAll('.input-list__button--remove')[0], 'click');
 
-      expect(inputList.querySelector('.list-entry-add').textContent.trim())
+      expect(inputList.querySelector('.input-list__button--add').textContent.trim())
         .toEqual('Add another domain (9 remaining)');
 
     });
@@ -307,9 +307,9 @@ describe("List entry", () => {
       // start module
       window.GOVUK.modules.start();
 
-      triggerEvent(inputList.querySelector('.list-entry-add'), 'click');
+      triggerEvent(inputList.querySelector('.input-list__button--add'), 'click');
 
-      expect(inputList.querySelector('.list-entry-add').textContent.trim())
+      expect(inputList.querySelector('.input-list__button--add').textContent.trim())
         .toEqual('Add another domain (7 remaining)');
 
     });
@@ -320,9 +320,9 @@ describe("List entry", () => {
       // start module
       window.GOVUK.modules.start();
 
-      triggerEvent(inputList.querySelector('.list-entry-add'), 'click');
+      triggerEvent(inputList.querySelector('.input-list__button--add'), 'click');
 
-      expect(inputList.querySelector('.list-entry-add')).toBeNull();
+      expect(inputList.querySelector('.input-list__button--add')).toBeNull();
 
     });
   });

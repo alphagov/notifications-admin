@@ -220,3 +220,7 @@ details .arrow {
 .heading-upcoming-jobs {
   margin-top: $gutter-half;
 }
+
+.button-secondary {
+  @include button($grey-3);
+}
