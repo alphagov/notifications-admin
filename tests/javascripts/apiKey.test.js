@@ -17,7 +17,7 @@ describe('API key', () => {
 
   beforeEach(() => {
 
-    apiKey = 'admin-service-6658542f-0cad-491f-bec8-ab8457700ead-53c0c274-8e83-48f1-8448-598657bb39af';
+    apiKey = '00000000-0000-0000-0000-000000000000';
     thing = 'API key';
 
     // mock sticky JS
