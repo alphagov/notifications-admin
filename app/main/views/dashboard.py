@@ -279,7 +279,6 @@ def aggregate_notifications_stats(template_statistics):
 def get_dashboard_partials(service_id):
     all_statistics = template_statistics_client.get_template_statistics_for_service(service_id, limit_days=7)
     template_statistics = aggregate_template_usage(all_statistics)
-
     stats = aggregate_notifications_stats(all_statistics)
     column_width, max_notifiction_count = get_column_properties(3)
 

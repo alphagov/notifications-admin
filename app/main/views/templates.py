@@ -672,11 +672,11 @@ def delete_service_template(service_id, template_id):
         ))
 
     try:
-        last_used_notification = template_statistics_client.get_template_statistics_for_template(
+        last_used_notification = template_statistics_client.get_last_used_date_for_template(
             service_id, template['id']
         )
         message = 'This template has never been used.' if not last_used_notification else \
-            'This template was last used {}.'.format(format_delta(last_used_notification['created_at']))
+            'This template was last used {}.'.format(format_delta(last_used_notification))
 
     except HTTPError as e:
         if e.status_code == 404:

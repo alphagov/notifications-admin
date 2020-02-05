@@ -6,12 +6,7 @@ from flask import url_for
 from freezegun import freeze_time
 from notifications_python_client.errors import HTTPError
 
-from tests import (
-    sample_uuid,
-    single_notification_json,
-    template_json,
-    validate_route_permission,
-)
+from tests import sample_uuid, template_json, validate_route_permission
 from tests.app.main.views.test_template_folders import (
     CHILD_FOLDER_ID,
     FOLDER_TWO_ID,
@@ -1682,12 +1677,8 @@ def test_should_show_delete_template_page_with_time_block(
     mocker,
     fake_uuid
 ):
-    with freeze_time('2012-01-01 12:00:00'):
-        template = template_json('1234', '1234', "Test template", "sms", "Something very interesting")
-        notification = single_notification_json('1234', template=template)
-
-        mocker.patch('app.template_statistics_client.get_template_statistics_for_template',
-                     return_value=notification)
+    mocker.patch('app.template_statistics_client.get_last_used_date_for_template',
+                 return_value='2012-01-01 12:00:00')
 
     with freeze_time('2012-01-01 12:10:00'):
         page = client_request.get(
@@ -1713,11 +1704,8 @@ def test_should_show_delete_template_page_with_time_block_for_empty_notification
     mocker,
     fake_uuid
 ):
-    with freeze_time('2012-01-08 12:00:00'):
-        template = template_json('1234', '1234', "Test template", "sms", "Something very interesting")
-        single_notification_json('1234', template=template)
-        mocker.patch('app.template_statistics_client.get_template_statistics_for_template',
-                     return_value=None)
+    mocker.patch('app.template_statistics_client.get_last_used_date_for_template',
+                 return_value=None)
 
     with freeze_time('2012-01-01 11:00:00'):
         page = client_request.get(
@@ -1744,7 +1732,7 @@ def test_should_show_delete_template_page_with_never_used_block(
     mocker,
 ):
     mocker.patch(
-        'app.template_statistics_client.get_template_statistics_for_template',
+        'app.template_statistics_client.get_last_used_date_for_template',
         side_effect=HTTPError(response=Mock(status_code=404), message="Default message")
     )
     page = client_request.get(
@@ -1845,9 +1833,10 @@ def test_route_permissions(
     service_one,
     mock_get_service_template,
     mock_get_template_folders,
-    mock_get_template_statistics_for_template,
     fake_uuid,
 ):
+    mocker.patch('app.template_statistics_client.get_last_used_date_for_template',
+                 return_value='2012-01-01 12:00:00')
     validate_route_permission(
         mocker,
         app_,
@@ -1900,7 +1889,6 @@ def test_route_invalid_permissions(
     api_user_active,
     service_one,
     mock_get_service_template,
-    mock_get_template_statistics_for_template,
     fake_uuid,
 ):
     validate_route_permission(
