@@ -154,10 +154,10 @@ class User(JSONModel, UserMixin):
         return True
 
     def sign_out(self):
-        # Update the db so the server also knows the user is logged out.
         session.clear()
+        # Update the db so the server also knows the user is logged out.
+        self.update(current_session_id=None)
         logout_user()
-        return self.update(current_session_id=None)
 
     @property
     def sms_auth(self):
