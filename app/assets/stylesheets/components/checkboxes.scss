@@ -18,14 +18,6 @@
     background-position: 0px 4px;
   }
 
-  // revert full-width button for smaller screens
-  .button {
-    display: inline-block;
-    width: auto;
-    position: relative;
-    top: 1px;
-  }
-
 }
 
 .checkboxes-nested {
@@ -83,12 +75,12 @@
 
 .selection-footer {
   clear: both;
+}
 
-  .button-secondary {
-    // revert full-width button for smaller screens
-    display: inline-block;
-    width: auto;
-  }
+.selection-footer__button {
+  // revert full-width button for smaller screens
+  display: inline-block;
+  width: auto;
 }
 
 // styles specific to the collapsible checkboxes module

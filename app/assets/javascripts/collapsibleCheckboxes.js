@@ -62,7 +62,7 @@
 
     return $(`<div class="selection-footer${stickyClass}">
               <button
-                class="button button-secondary"
+                class="govuk-button govuk-button--secondary selection-footer__button"
                 aria-expanded="${expanded ? 'true' : 'false'}"
                 aria-controls="${this.fieldsetId}">
               ${buttonContent}
@@ -159,7 +159,7 @@
   CollapsibleCheckboxes.prototype.bindEvents = function() {
     const self = this;
 
-    this.$formGroup.on('click', '.button', this.handleClick.bind(this));
+    this.$formGroup.on('click', '.govuk-button', this.handleClick.bind(this));
     this.$checkboxes.on('click', this.handleSelection.bind(this));
 
     this.summary.bindEvents(this);
