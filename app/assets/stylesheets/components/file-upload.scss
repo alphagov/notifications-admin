@@ -28,18 +28,6 @@
 
     }
 
-    &-button {
-      @include button($button-colour);
-      display: inline-block;
-      margin-right: 5px;
-    }
-
-    &-button-cancel {
-      @include button($error-colour);
-      display: inline-block;
-      margin-right: 5px;
-    }
-
     &-filename {
       @include bold-19;
       display: inline-block;

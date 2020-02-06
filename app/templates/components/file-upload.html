@@ -1,3 +1,5 @@
+{% from "components/button/macro.njk" import govukButton %}
+
 {% macro file_upload(
   field,
   action=None,
@@ -35,6 +37,6 @@
     {% endif %}
     <label class="file-upload-filename" for="{{ field.name }}"></label>
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-    <button type="submit" class="file-upload-submit">Submit</button>
+    {{ govukButton({ "text": "Submit", "classes": "file-upload-submit" }) }}
   </form>
 {% endmacro %}
