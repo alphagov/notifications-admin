@@ -41,7 +41,7 @@
         this.render();
       }
 
-      this.$form.on('click', 'button.button-secondary', (event) => this.actionButtonClicked(event));
+      this.$form.on('click', 'button.govuk-button--secondary', (event) => this.actionButtonClicked(event));
       this.$form.on('change', 'input[type=checkbox]', () => this.templateFolderCheckboxChanged());
     };
 
@@ -225,8 +225,8 @@
     this.nothingSelectedButtons = $(`
       <div id="nothing_selected">
         <div class="js-stick-at-bottom-when-scrolling">
-          <button class="button-secondary" value="add-new-template">New template</button>
-          <button class="button-secondary" value="add-new-folder">New folder</button>
+          <button class="govuk-button govuk-button--secondary govuk-!-margin-right-3 govuk-!-margin-bottom-1" value="add-new-template">New template</button>
+          <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-1" value="add-new-folder">New folder</button>
           <div class="template-list-selected-counter">
             <span class="template-list-selected-counter__count" aria-hidden="true">
               ${this.selectionStatus.default}
@@ -239,8 +239,8 @@
     this.itemsSelectedButtons = $(`
       <div id="items_selected">
         <div class="js-stick-at-bottom-when-scrolling">
-          <button class="button-secondary" value="move-to-existing-folder">Move</button>
-          <button class="button-secondary" value="move-to-new-folder">Add to new folder</button>
+          <button class="govuk-button govuk-button--secondary govuk-!-margin-right-3 govuk-!-margin-bottom-1" value="move-to-existing-folder">Move</button>
+          <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-1" value="move-to-new-folder">Add to new folder</button>
           <div class="template-list-selected-counter" aria-hidden="true">
             <span class="template-list-selected-counter__count" aria-hidden="true">
               ${this.selectionStatus.selected(1)}
