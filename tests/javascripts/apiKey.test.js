@@ -36,11 +36,11 @@ describe('API key', () => {
 
     // set up DOM
     document.body.innerHTML =`
-      <h2 class="api-key-name">
+      <h2 class="api-key__name">
         ${thing}
       </h2>
       <div data-module="api-key" data-key="${apiKey}" data-thing="${thing}" aria-live="assertive">
-        <span class="api-key-key">${apiKey}</span>
+        <span class="api-key__key">${apiKey}</span>
       </div>`;
 
     component = document.querySelector('[data-module=api-key]');
@@ -72,11 +72,11 @@ describe('API key', () => {
 
       // set up DOM
       document.body.innerHTML =`
-        <h2 class="api-key-name">
+        <h2 class="api-key__name">
           ${thing}
         </h2>
         <div data-module="api-key" data-key="${apiKey}" data-thing="${thing}" aria-live="assertive">
-          <span class="api-key-key">${apiKey}</span>
+          <span class="api-key__key">${apiKey}</span>
         </div>`;
 
       component = document.querySelector('[data-module=api-key]');

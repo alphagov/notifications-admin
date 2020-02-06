@@ -686,7 +686,7 @@ def test_should_show_template_id_on_template_page(
         template_id=fake_uuid,
         _test_page_title=False,
     )
-    assert page.select('.api-key-key')[0].text == fake_uuid
+    assert page.select('.api-key__key')[0].text == fake_uuid
 
 
 def test_should_show_sms_template_with_downgraded_unicode_characters(
