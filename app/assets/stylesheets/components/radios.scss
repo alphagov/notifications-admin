@@ -2,7 +2,7 @@
 
   min-height: 39px;
 
-  &-column {
+  &__column {
 
     display: inline-block;
     vertical-align: top;
@@ -14,25 +14,23 @@
 
   }
 
-  .js-done-button,
-  .js-category-button,
-  .js-reset-button {
+  &__button--category {
 
-    @include button($grey-3);
-    margin-right: $gutter-half;
+    margin-right: govuk-spacing(3);
+    width: auto;
 
   }
 
-  .js-done-button-block {
+  &__button--done {
 
     display: block;
     clear: both;
-    margin: 0 0 $gutter 0;
+    margin: 0 0 govuk-spacing(6) 0;
     position: relative;
-    top: $gutter-half;
+    top: govuk-spacing(3);
 
     &:active {
-      top: $gutter-half + 2px;
+      top: govuk-spacing(3) + 2px;
     }
 
   }

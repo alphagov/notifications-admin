@@ -7,43 +7,43 @@
 
   let states = {
     'initial': Hogan.compile(`
-      <div class="radio-select-column">
+      <div class="radio-select__column">
         <div class="multiple-choice js-multiple-choice">
           <input checked="checked" id="{{name}}-0" name="{{name}}" type="radio" value="">
           <label class="block-label js-block-label" for="{{name}}-0">Now</label>
         </div>
       </div>
-      <div class="radio-select-column">
+      <div class="radio-select__column">
         {{#categories}}
-          <input type='button' class='js-category-button' value='{{.}}' />
+          <input type='button' class='govuk-button govuk-button--secondary radio-select__button--category' value='{{.}}' />
         {{/categories}}
       </div>
     `),
     'choose': Hogan.compile(`
-      <div class="radio-select-column">
+      <div class="radio-select__column">
         <div class="multiple-choice js-multiple-choice js-initial-option">
           <input checked="checked" id="{{name}}-0" name="{{name}}" type="radio" value="">
           <label for="{{name}}-0">Now</label>
         </div>
       </div>
-      <div class="radio-select-column">
+      <div class="radio-select__column">
         {{#choices}}
           <div class="multiple-choice js-multiple-choice js-option">
             <input type="radio" value="{{value}}" id="{{id}}" name="{{name}}" />
             <label for="{{id}}">{{label}}</label>
           </div>
         {{/choices}}
-        <input type='button' class='js-done-button js-done-button-block' value='Done' />
+        <input type='button' class='govuk-button govuk-button--secondary radio-select__button--done' value='Done' />
       </div>
     `),
     'chosen': Hogan.compile(`
-      <div class="radio-select-column">
+      <div class="radio-select__column">
         <div class="multiple-choice js-multiple-choice js-initial-option">
           <input id="{{name}}-0" name="{{name}}" type="radio" value="">
           <label for="{{name}}-0">Now</label>
         </div>
       </div>
-      <div class="radio-select-column">
+      <div class="radio-select__column">
         {{#choices}}
           <div class="multiple-choice js-multiple-choice">
             <input checked="checked" type="radio" value="{{value}}" id="{{id}}" name="{{name}}" />
@@ -51,8 +51,8 @@
           </div>
         {{/choices}}
       </div>
-      <div class="radio-select-column">
-        <input type='button' class='category-link js-reset-button' value='Choose a different time' />
+      <div class="radio-select__column">
+        <input type='button' class='govuk-button govuk-button--secondary radio-select__button--reset' value='Choose a different time' />
       </div>
     `)
   };
@@ -110,7 +110,7 @@
       };
 
       $component
-        .on('click', '.js-category-button', function(event) {
+        .on('click', '.radio-select__button--category', function(event) {
 
           event.preventDefault();
           let wordsInDay = $(this).attr('value').split(' ');
@@ -143,7 +143,7 @@
           selectOption(value);
 
         })
-        .on('click', '.js-done-button', function(event) {
+        .on('click', '.radio-select__button--done', function(event) {
 
           event.preventDefault();
           let $selection = $('input[type=radio]:checked', this.parentNode);
@@ -164,7 +164,7 @@
           focusSelected(component);
 
         })
-        .on('click', '.js-reset-button', function(event) {
+        .on('click', '.radio-select__button--reset', function(event) {
 
           event.preventDefault();
           reset();
