@@ -25,7 +25,9 @@
 
   a,
   &-selected-item {
-    display: block;
+    display: flex; // float causes display: block in browsers without flexbox
+    flex-direction: column;
+    justify-content: center;
     float: left;
     box-sizing: border-box;
     width: 100%;
