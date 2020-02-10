@@ -16,19 +16,6 @@
     margin-bottom: $gutter-half;
   }
 
-  &-link-destructive {
-    color: $error-colour;
-
-    &:visited,
-    &:link {
-      color: $error-colour;
-    }
-
-    &:hover {
-      color: $mellow-red;
-    }
-  }
-
   &-hint {
     @include core-19;
     margin: 5px 0 10px 0;

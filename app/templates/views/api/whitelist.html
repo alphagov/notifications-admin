@@ -22,12 +22,12 @@
       <ul>
         {% if form.email_addresses.errors %}
           <li>
-            <a class="govuk-link govuk-link--no-visited-state" href="#{{ form.email_addresses.name }}">Enter valid email addresses</a>
+            <a class="govuk-link govuk-link--destructive" href="#{{ form.email_addresses.name }}">Enter valid email addresses</a>
           </li>
         {% endif %}
         {% if form.phone_numbers.errors %}
           <li>
-            <a class="govuk-link govuk-link--no-visited-state" href="#{{ form.phone_numbers.name }}">Enter valid phone numbers</a>
+            <a class="govuk-link govuk-link--destructive" href="#{{ form.phone_numbers.name }}">Enter valid phone numbers</a>
           </li>
         {% endif %}
       </ul>

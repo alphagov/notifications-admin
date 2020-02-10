@@ -25,7 +25,7 @@
       <div class="js-stick-at-bottom-when-scrolling">
         <div class="page-footer">
           <span class="page-footer-delete-link page-footer-delete-link-without-button">
-            <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.cancel_letter_job', service_id=current_service.id, job_id=job.id) }}">Cancel sending these letters</a>
+            <a class="govuk-link govuk-link--destructive" href="{{ url_for('main.cancel_letter_job', service_id=current_service.id, job_id=job.id) }}">Cancel sending these letters</a>
           </span>
     {% else %}
       <div>&nbsp;</div>

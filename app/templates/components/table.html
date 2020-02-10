@@ -149,13 +149,14 @@
   {% if not notification %}
     {% call field(align='right') %}{% endcall %}
   {% else %}
+    {% set status = notification.status|format_notification_status_as_field_status(notification.notification_type) %}
     {% call field(
-      status=notification.status|format_notification_status_as_field_status(notification.notification_type),
+      status=status,
       align='right'
     ) %}
       {% if displayed_on_single_line %}<span class="align-with-message-body">{% endif %}
       {% if notification.status|format_notification_status_as_url(notification.notification_type) %}
-        <a class="govuk-link govuk-link--no-visited-state" href="{{ notification.status|format_notification_status_as_url(notification.notification_type) }}">
+        <a class="govuk-link govuk-link--{% if status == 'error' %}destructive{% else %}no-visited-state{% endif %}" href="{{ notification.status|format_notification_status_as_url(notification.notification_type) }}">
       {% endif %}
       {{ notification.status|format_notification_status(notification.template.template_type) }}
       {% if notification.status|format_notification_status_as_url(notification.notification_type) %}
