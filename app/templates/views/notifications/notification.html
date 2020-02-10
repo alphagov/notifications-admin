@@ -82,7 +82,7 @@
         <div class="page-footer">
           {% if show_cancel_button %}
             <span class="page-footer-delete-link page-footer-delete-link-without-button">
-              <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.cancel_letter', service_id=current_service.id, notification_id=notification_id) }}">Cancel sending this letter</a>
+              <a class="govuk-link govuk-link--destructive" href="{{ url_for('main.cancel_letter', service_id=current_service.id, notification_id=notification_id) }}">Cancel sending this letter</a>
             </span>
           {% else %}
             <div>&nbsp;</div>
