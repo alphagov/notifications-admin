@@ -3,7 +3,7 @@
 
 ago==0.0.93
 Flask==1.1.1
-Flask-WTF==0.14.2
+Flask-WTF==0.14.3
 Flask-Login==0.4.1
 
 blinker==1.4
