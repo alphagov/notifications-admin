@@ -373,9 +373,74 @@ def test_service_navigation_for_org_user(
     assert [
         item.text.strip() for item in page.select('nav.navigation a')
     ] == [
-        'Team members',
         'Usage',
+        'Team members',
     ]
+
+
+@pytest.mark.parametrize('user_organisations, expected_menu_items, expected_status', [
+    (
+        [],
+        (
+            'Templates',
+            'Sent messages',
+            'Team members',
+        ),
+        403,
+    ),
+    (
+        [ORGANISATION_ID],
+        (
+            'Templates',
+            'Sent messages',
+            'Team members',
+            'Usage',
+        ),
+        200,
+    ),
+])
+def test_service_user_without_manage_service_permission_can_see_usage_page_when_org_user(
+    client_request,
+    mocker,
+    active_caseworking_user,
+    mock_has_no_jobs,
+    mock_get_usage,
+    mock_get_billable_units,
+    mock_get_free_sms_fragment_limit,
+    mock_get_service,
+    mock_get_invites_for_service,
+    mock_get_users_by_service,
+    mock_get_service_organisation,
+    mock_get_service_templates,
+    mock_get_template_folders,
+    user_organisations,
+    expected_status,
+    expected_menu_items,
+):
+    active_caseworking_user['services'] = [SERVICE_ONE_ID]
+    active_caseworking_user['organisations'] = user_organisations
+    service = service_json(
+        id_=SERVICE_ONE_ID,
+        organisation_id=ORGANISATION_ID,
+    )
+    mocker.patch(
+        'app.service_api_client.get_service',
+        return_value={'data': service}
+    )
+    client_request.login(active_caseworking_user, service=service)
+    page = client_request.get(
+        'main.choose_template',
+        service_id=SERVICE_ONE_ID,
+    )
+    assert tuple(
+        item.text.strip() for item in page.select('nav.navigation a')
+    ) == expected_menu_items
+
+    client_request.get(
+        'main.usage',
+        service_id=SERVICE_ONE_ID,
+        _expected_status=expected_status,
+    )
 
 
 def get_name_of_decorator_from_ast_node(node):
