@@ -54,10 +54,6 @@ $is-ie: false !default;
       padding: $gutter-half;
       text-decoration: none;
 
-      &:visited {
-        color: $link-colour;
-      }
-
       &:hover,
       &:active {
         background-color: $canvas-colour;

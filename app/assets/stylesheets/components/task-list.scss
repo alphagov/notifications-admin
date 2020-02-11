@@ -31,13 +31,8 @@ $indicator-colour: $black;
       padding-right: 20%;
       position: relative;
 
-      &:hover {
-        color: $link-hover-colour;
-      }
-
       &:focus {
         outline: none;
-        color: $black;
         box-shadow: -3px 0 0 0 $focus-colour, 3px 0 0 0 $focus-colour;
         border-color: transparent;
         top: -1px;
