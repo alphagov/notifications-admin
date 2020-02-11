@@ -14,11 +14,20 @@
       See: https://www.w3.org/TR/css-flexbox-1/#flex-containers
     */
     float: left;
+    /*
+      Setting this as a flex container means the contents (1 item)
+      will fill the vertical space due to `align-items` defaulting
+      to `stretch`.
+      See: https://css-tricks.com/snippets/css/a-guide-to-flexbox/#prop-align-items
+    */
+    display: flex;
   }
 
   a,
   &-selected-item {
-    display: block;
+    display: flex; // float causes display: block in browsers without flexbox
+    flex-direction: column;
+    justify-content: center;
     float: left;
     box-sizing: border-box;
     width: 100%;
