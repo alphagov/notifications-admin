@@ -296,10 +296,6 @@ def get_dashboard_partials(service_id):
         ),
         'inbox': render_template(
             'views/dashboard/_inbox.html',
-            inbound_sms_summary=(
-                service_api_client.get_inbound_sms_summary(service_id)
-                if current_service.has_permission('inbound_sms') else None
-            ),
         ),
         'totals': render_template(
             'views/dashboard/_totals.html',
