@@ -3342,6 +3342,14 @@ def mock_get_service_history(mocker):
     })
 
 
+@pytest.fixture(scope='function')
+def mock_get_returned_letter_summary_with_no_returned_letters(mocker):
+    return mocker.patch(
+        'app.service_api_client.get_returned_letter_summary',
+        return_value=[],
+    )
+
+
 def create_api_user_active(with_unique_id=False):
     return {
         'id': str(uuid4()) if with_unique_id else sample_uuid(),

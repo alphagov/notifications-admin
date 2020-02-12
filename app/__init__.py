@@ -356,6 +356,22 @@ def format_delta(date):
     )
 
 
+def format_delta_days(date):
+    now = datetime.now(timezone.utc)
+    date = utc_string_to_aware_gmt_datetime(date)
+    delta = now - date
+    if date.strftime('%Y-%M-%D') == now.strftime('%Y-%M-%D'):
+        return "today"
+    if date.strftime('%Y-%M-%D') == (now - timedelta(days=1)).strftime('%Y-%M-%D'):
+        return "yesterday"
+    return ago.human(
+        delta,
+        precision=1,
+        future_tense='{} from now',
+        past_tense='{} ago',
+    )
+
+
 def valid_phone_number(phone_number):
     try:
         validate_phone_number(phone_number)
@@ -744,6 +760,7 @@ def add_template_filters(application):
         format_date_short,
         format_datetime_relative,
         format_delta,
+        format_delta_days,
         format_notification_status,
         format_notification_type,
         format_notification_status_as_time,

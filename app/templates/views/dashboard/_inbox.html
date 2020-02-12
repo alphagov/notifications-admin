@@ -17,4 +17,17 @@
       {% endif %}
     </a>
   {% endif %}
+  {% if current_service.returned_letter_summary %}
+    <a id="total-returned-letters" class="banner-dashboard" href="{{ url_for('main.returned_letter_summary', service_id=current_service.id) }}">
+      <span class="banner-dashboard-count">
+        {{ current_service.count_of_returned_letters_in_last_7_days|format_thousands }}
+      </span>
+      <span class="banner-dashboard-count-label">
+        returned {{ message_count_label(current_service.count_of_returned_letters_in_last_7_days, 'letter', suffix='') }}
+      </span>
+      <span class="banner-dashboard-meta">
+        latest report {{ current_service.most_recent_returned_letter_report|format_delta_days }}
+      </span>
+    </a>
+  {% endif %}
 </div>
