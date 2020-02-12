@@ -38,3 +38,9 @@
   @extend %show-more;
   margin-top: -10px;
 }
+
+.show-more-no-border {
+  @extend %show-more;
+  border-top: 1px solid transparent;
+  margin-top: -5px;
+}
