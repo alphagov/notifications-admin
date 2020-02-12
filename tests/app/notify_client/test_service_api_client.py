@@ -316,6 +316,25 @@ def test_client_returns_count_of_service_templates(
             ],
             {'data_from': 'api'},
         ),
+        (
+            service_api_client.get_returned_letter_summary,
+            [SERVICE_ONE_ID],
+            [
+                call('service-{}-returned-letters-summary'.format(SERVICE_ONE_ID))
+            ],
+            None,
+            [
+                call('service/{}/returned-letter-summary'.format(SERVICE_ONE_ID))
+            ],
+            [
+                call(
+                    'service-{}-returned-letters-summary'.format(SERVICE_ONE_ID),
+                    '{"data_from": "api"}',
+                    ex=604800,
+                )
+            ],
+            {'data_from': 'api'},
+        ),
     ]
 )
 def test_returns_value_from_cache(

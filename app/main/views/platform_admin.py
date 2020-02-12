@@ -360,6 +360,9 @@ def platform_admin_returned_letters():
 
         try:
             letter_jobs_client.submit_returned_letters(references)
+            redis_client.delete_cache_keys_by_pattern(
+                'service-????????-????-????-????-????????????-returned-letters-summary'
+            )
         except HTTPError as error:
             if error.status_code == 400:
                 error_references = [
