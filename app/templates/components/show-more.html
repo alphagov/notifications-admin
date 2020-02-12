@@ -1,10 +1,6 @@
-{% macro show_more(url=None, label=None, with_border=True) %}
-  {% if url and label %}
-    <a
-      href="{{ url }}"
-      class="show-more{% if not with_border %}-no-border{% endif %}"
-    ><span>{{ label }}</span></a>
-  {% else %}
-    <span class="show-more-empty"></span>
-  {% endif %}
+{% macro show_more(url, label, with_border=True) %}
+  <a
+    href="{{ url }}"
+    class="show-more{% if not with_border %}-no-border{% endif %}"
+  ><span>{{ label }}</span></a>
 {% endmacro %}
