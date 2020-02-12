@@ -680,6 +680,7 @@ def test_platform_admin_displays_stats_in_right_boxes_and_with_correct_styling(
 
 def test_platform_admin_submit_returned_letters(mocker, platform_admin_client):
 
+    redis = mocker.patch('app.main.views.platform_admin.redis_client')
     mock_client = mocker.patch('app.letter_jobs_client.submit_returned_letters')
 
     response = platform_admin_client.post(
@@ -688,7 +689,9 @@ def test_platform_admin_submit_returned_letters(mocker, platform_admin_client):
     )
 
     mock_client.assert_called_once_with(['REF1', 'REF2'])
-
+    redis.delete_cache_keys_by_pattern.assert_called_once_with(
+        'service-????????-????-????-????-????????????-returned-letters-summary'
+    )
     assert response.status_code == 302
     assert response.location == url_for('main.platform_admin_returned_letters', _external=True)
 
