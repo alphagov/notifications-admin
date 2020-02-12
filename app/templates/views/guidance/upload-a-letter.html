@@ -1,0 +1,28 @@
+{% extends "content_template.html" %}
+{% from "components/table.html" import mapping_table, row, text_field, edit_field, field with context %}
+{% from "components/sub-navigation.html" import sub_navigation %}
+
+{% block per_page_title %}
+  Upload a letter
+{% endblock %}
+
+{% block content_column_content %}
+
+  <h1 class="heading-large">Upload a letter</h1>
+  
+  <p>You can upload and send your own letters instead of creating a reusable letter template.</p>
+  
+  <p>To upload and send a letter from a PDF file:</p>
+  
+  <ol class="list list-number">
+    <li><a href="{{ url_for('.sign_in') }}">Sign in to Notify</a>.</li>
+    <li>Go to the <b class="govuk-!-font-weight-bold">Uploads</b> page.</li>
+    <li>Select <b class="govuk-!-font-weight-bold">Upload a letter</b>.</li>
+    <li>Select <b class="govuk-!-font-weight-bold">Choose file</b>.</li>
+  </ol>
+
+  <p>Use the <a href="{{ url_for('.letter_spec') }}">letter specification document</a> to help you set up your letter.<p>
+
+
+
+{% endblock %}

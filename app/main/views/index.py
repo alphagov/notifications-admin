@@ -16,7 +16,11 @@ from app import email_branding_client, letter_branding_client, status_api_client
 from app.main import main
 from app.main.forms import FieldWithNoneOption, SearchByNameForm
 from app.main.views.feedback import QUESTION_TICKET_TYPE
-from app.main.views.sub_navigation_dictionaries import features_nav, pricing_nav
+from app.main.views.sub_navigation_dictionaries import (
+    features_nav,
+    pricing_nav,
+    using_notify_nav,
+)
 from app.utils import get_logo_cdn_domain, user_is_logged_in
 
 
@@ -90,6 +94,7 @@ def how_to_pay():
 
 
 @main.route('/delivery-and-failure')
+@main.route('/features/messages-status')
 def delivery_and_failure():
     return redirect(url_for('.message_status'), 301)
 
@@ -218,7 +223,10 @@ def letter_template():
 
 @main.route('/documentation')
 def documentation():
-    return render_template('views/documentation.html')
+    return render_template(
+        'views/documentation.html',
+        navigation_links=using_notify_nav(),
+    )
 
 
 @main.route('/integration-testing')
@@ -297,31 +305,86 @@ def using_notify():
     ), 410
 
 
-@main.route('/features/messages-status')
+@main.route('/using-notify/delivery-status')
 def message_status():
     return render_template(
         'views/message-status.html',
-        navigation_links=features_nav()
+        navigation_links=using_notify_nav(),
     )
 
 
 @main.route('/features/get-started')
+def get_started_old():
+    return redirect(url_for('.get_started'), 301)
+
+
+@main.route('/using-notify/get-started')
 def get_started():
     return render_template(
-        'views/get-started.html'
+        'views/get-started.html',
+        navigation_links=using_notify_nav(),
     )
 
 
 @main.route('/trial-mode')
+@main.route('/features/trial-mode')
 def trial_mode():
     return redirect(url_for('.trial_mode_new'), 301)
 
 
-@main.route('/features/trial-mode')
+@main.route('/using-notify/trial-mode')
 def trial_mode_new():
     return render_template(
         'views/trial-mode.html',
-        navigation_links=features_nav()
+        navigation_links=using_notify_nav(),
+    )
+
+
+@main.route('/using-notify/guidance')
+def guidance_index():
+    return render_template(
+        'views/guidance/index.html',
+        navigation_links=using_notify_nav(),
+    )
+
+
+@main.route('/using-notify/guidance/branding-and-customisation')
+def branding_and_customisation():
+    return render_template(
+        'views/guidance/branding-and-customisation.html',
+        navigation_links=using_notify_nav(),
+    )
+
+
+@main.route('/using-notify/guidance/create-and-send-messages')
+def create_and_send_messages():
+    return render_template(
+        'views/guidance/create-and-send-messages.html',
+        navigation_links=using_notify_nav(),
+    )
+
+
+@main.route('/using-notify/guidance/edit-and-format-messages')
+def edit_and_format_messages():
+    return render_template(
+        'views/guidance/edit-and-format-messages.html',
+        navigation_links=using_notify_nav(),
+    )
+
+
+@main.route('/using-notify/guidance/send-files-by-email')
+def send_files_by_email():
+    return render_template(
+        'views/guidance/send-files-by-email.html',
+        navigation_links=using_notify_nav(),
+    )
+
+
+@main.route('/using-notify/guidance/upload-a-letter')
+def upload_a_letter():
+    return render_template(
+        'views/guidance/upload-a-letter.html',
+        navigation_links=using_notify_nav(),
     )
 
 

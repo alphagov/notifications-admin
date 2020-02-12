@@ -23,14 +23,6 @@ def features_nav():
             "link": "main.roadmap",
         },
         {
-            "name": "Trial mode",
-            "link": "main.trial_mode_new",
-        },
-        {
-            "name": "Message status",
-            "link": "main.message_status",
-        },
-        {
             "name": "Security",
             "link": "main.security",
         },
@@ -50,5 +42,44 @@ def pricing_nav():
         {
             "name": "How to pay",
             "link": "main.how_to_pay",
+        },
+    ]
+
+
+def using_notify_nav():
+    return [
+        {
+            "name": "Get started",
+            "link": "main.get_started",
+        },
+        {
+            "name": "Trial mode",
+            "link": "main.trial_mode_new",
+        },
+        {
+            "name": "Delivery status",
+            "link": "main.message_status",
+        },
+        {
+            "name": "Guidance",
+            "link": "main.guidance_index",
+            "sub_navigation_items": [
+                {
+                    "name": "Formatting",
+                    "link": "main.edit_and_format_messages",
+                },
+                {
+                    "name": "Branding",
+                    "link": "main.branding_and_customisation",
+                },
+                {
+                    "name": "Send files by email",
+                    "link": "main.send_files_by_email",
+                },
+            ]
+        },
+        {
+            "name": "API documentation",
+            "link": "main.documentation",
         },
     ]
