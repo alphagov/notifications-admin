@@ -222,11 +222,11 @@ def test_inbound_messages_shows_count_of_messages_when_there_are_messages(
         'main.service_dashboard',
         service_id=SERVICE_ONE_ID,
     )
-
+    banner = page.select_one('a.banner-dashboard')
     assert normalize_spaces(
-        page.select('.big-number-meta-wrapper')[0].text
-    ) == '99 text messages received latest message just now'
-    assert page.select('.big-number-meta-wrapper a')[0]['href'] == url_for(
+        banner.text
+    ) == '9,999 text messages received latest message just now'
+    assert banner['href'] == url_for(
         'main.inbox', service_id=SERVICE_ONE_ID
     )
 
@@ -248,9 +248,9 @@ def test_inbound_messages_shows_count_of_messages_when_there_are_no_messages(
         'main.service_dashboard',
         service_id=SERVICE_ONE_ID,
     )
-
-    assert normalize_spaces(page.select('.big-number-meta-wrapper')[0].text) == '0 text messages received'
-    assert page.select('.big-number-meta-wrapper a')[0]['href'] == url_for(
+    banner = page.select_one('a.banner-dashboard')
+    assert normalize_spaces(banner.text) == '0 text messages received'
+    assert banner['href'] == url_for(
         'main.inbox', service_id=SERVICE_ONE_ID
     )
 

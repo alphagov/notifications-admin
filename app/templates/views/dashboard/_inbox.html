@@ -2,20 +2,18 @@
 
 <div class="ajax-block">
   {% if inbound_sms_summary != None %}
-    <div id="total-received" class="big-number-meta-wrapper">
-      {{
-        big_number_with_status(
-          inbound_sms_summary.count,
-          'text messages received',
-          link=url_for('.inbox', service_id=current_service.id),
-          show_failures=False
-        )
-      }}
-      <div class="big-number-meta">
-        {% if inbound_sms_summary.most_recent %}
+    <a id="total-received" class="banner-dashboard" href="{{ url_for('.inbox', service_id=current_service.id) }}">
+      <span class="banner-dashboard-count">
+        {{ inbound_sms_summary.count|format_thousands }}
+      </span>
+      <span class="banner-dashboard-count-label">
+        text messages received
+      </span>
+      {% if inbound_sms_summary.most_recent %}
+        <span class="banner-dashboard-meta">
           latest message {{ inbound_sms_summary.most_recent | format_delta }}
-        {% endif %}
-      </div>
-    </div>
+        </span>
+      {% endif %}
+    </a>
   {% endif %}
 </div>

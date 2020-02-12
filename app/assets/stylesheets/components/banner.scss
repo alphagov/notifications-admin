@@ -142,3 +142,47 @@
   }
 
 }
+
+.banner-dashboard {
+
+  $baseline-shift: -5px;
+
+  display: block;
+  position: relative;
+  padding: $gutter-two-thirds 0;
+  border-top: 1px solid $border-colour;
+  border-bottom: 1px solid $border-colour;
+  margin-bottom: $gutter;
+  text-decoration: none;
+
+  &:focus {
+    border-color: $focus-colour;
+    box-shadow: 0 3px 0 0 $focus-colour, 0 -3px 0 0 $focus-colour;
+    color: $text-colour;
+  }
+
+  &-count {
+    @include bold-36;
+    padding-right: 5px;
+  }
+
+  &-count-label {
+    @include bold-24;
+    text-decoration: underline;
+    position: relative;
+    top: $baseline-shift;
+  }
+
+  &-meta {
+    @include core-19;
+    position: absolute;
+    right: 0;
+    bottom: $gutter-two-thirds - $baseline-shift;
+    text-align: right;
+  }
+
+  & + .banner-dashboard {
+    margin-top: -$gutter;
+    border-top: none;
+  }
+}
