@@ -25,7 +25,7 @@ def test_find_services_by_name_displays_services_found(
         _expected_status=200
     )
     get_services.assert_called_once_with(service_name="Test Service")
-    result = document.find('a', {'class': 'browse-list-link'})
+    result = document.select_one('.browse-list-item a')
     assert result.text.strip() == 'Test Service'
     assert result.attrs["href"] == "/services/1234"
 
@@ -42,7 +42,7 @@ def test_find_services_by_name_displays_multiple_services(
     )
     document = client_request.post('main.find_services_by_name', _data={"search": "Tadfield"}, _expected_status=200)
 
-    results = document.findAll('a', {'class': 'browse-list-link'})
+    results = document.select('.browse-list-item a')
     assert len(results) == 2
     assert sorted([result.text.strip() for result in results]) == ["Tadfield Air Base", "Tadfield Police"]
 

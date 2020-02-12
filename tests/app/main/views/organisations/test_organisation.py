@@ -43,7 +43,7 @@ def test_organisation_page_shows_all_organisations(
     expected_hints = ('0 live services', '1 live service', '2 live services')
 
     for index, org in enumerate(orgs):
-        assert page.select('a.browse-list-link')[index].text == org['name']
+        assert page.select('.browse-list-item a')[index].text == org['name']
         if not org['active']:
             assert page.select_one('.table-field-status-default,heading-medium').text == '- archived'
         assert normalize_spaces(page.select('.browse-list-hint')[index].text) == (

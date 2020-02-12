@@ -550,7 +550,7 @@ def test_cant_edit_user_folder_permissions_for_platform_admin_users(
         service_id=SERVICE_ONE_ID,
         user_id=platform_admin_user['id'],
     )
-    assert normalize_spaces(page.select('main p')[0].text) == 'platform@admin.gov.uk Change'
+    assert normalize_spaces(page.select('main p')[0].text) == 'platform@admin.gov.uk Change email address'
     assert normalize_spaces(page.select('main p')[2].text) == (
         'Platform admin users can access all template folders.'
     )
