@@ -575,7 +575,7 @@ LETTER_VALIDATION_MESSAGES = {
         ),
         'summary': (
             'Validation failed because {invalid_pages} {invalid_pages_are_or_is} not A4 portrait size.<br>'
-            'Files must meet our <a href="{{ url_for('.upload_a_letter', _anchor='letter-specification') }}" target="_blank">letter specification</a>.'
+            'Files must meet our <a href="{letter_spec}" target="_blank">letter specification</a>.'
         ),
     },
     'content-outside-printable-area': {
@@ -586,7 +586,7 @@ LETTER_VALIDATION_MESSAGES = {
         ),
         'summary': (
             'Validation failed because content is outside the printable area on {invalid_pages}.<br>'
-            'Files must meet our <a href="{{ url_for('.upload_a_letter', _anchor='letter-specification') }}" target="_blank">letter specification</a>.'
+            'Files must meet our <a href="{letter_spec}" target="_blank">letter specification</a>.'
         ),
     },
     'letter-too-long': {
@@ -622,7 +622,7 @@ LETTER_VALIDATION_MESSAGES = {
         ),
         'summary': (
             'Validation failed because the address block is empty.<br>'
-            'Files must meet our <a href="{{ url_for('.upload_a_letter', _anchor='letter-specification') }}" target="_blank">letter specification</a>.'
+            'Files must meet our <a href="{letter_spec}" target="_blank">letter specification</a>.'
         ),
     }
 }
