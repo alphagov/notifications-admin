@@ -27,10 +27,10 @@
 
   <p>When you add a new service it will start in <a href="{{ url_for('main.trial_mode_new') }}">trial mode</a>.</p>
 
-  <h2 class="heading-medium">Emails</h2>
+  <h2 class="heading-medium" id="emails">Emails</h2>
   <p>It’s free to send emails through Notify.</p>
 
-  <h2 class="heading-medium">Text messages</h2>
+  <h2 class="heading-medium" id="text-messages">Text messages</h2>
   <p>Every service you add has an annual allowance of free text messages.</p>
   <p>If your organisation has more than one service on Notify, they each have a separate allowance.</p>
   <p>The allowance is:</p>
@@ -41,7 +41,7 @@
   <p>It costs 1.58 pence (plus VAT) for each text message you send after you've used your free allowance.</p>
   <p>See <a href="{{ url_for('main.how_to_pay') }}">how to pay</a>.
 
-  <h3 class="heading-small">Long text messages</h3>
+  <h3 class="heading-small" id="long-text-messages">Long text messages</h3>
   <p>If a text message is longer than 160 characters (including spaces), it’ll be charged as more than one message:</p>
   <div class="bottom-gutter-3-2">
     {% call mapping_table(
@@ -63,7 +63,7 @@
       {% endfor %}
     {% endcall %}
   </div>
-  <h3 class="heading-small">Accents and accented characters</h3>
+  <h3 class="heading-small" id="accents">Accents and accented characters</h3>
   <p>Some languages, such as Welsh, use accented characters.</p>
   <p>Text messages containing the following accented characters are charged at the normal rate: Ä, É, Ö, Ü, à, ä, é, è, ì, ò, ö, ù, ü.</p>
   <p>Using other accented characters can increase the cost of sending text messages.<p>
@@ -152,7 +152,7 @@
     {% endcall %}
   </div>
 
-  <h3 class="heading-small">Sending text messages to international numbers</h3>
+  <h3 class="heading-small" id="international-numbers">Sending text messages to international numbers</h3>
   <p>It might cost more to send text messages to international numbers than UK ones, depending on the country.</p>
   <details>
     <summary>International text message rates</summary>
