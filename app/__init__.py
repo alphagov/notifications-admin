@@ -5,7 +5,7 @@ from datetime import datetime, timedelta, timezone
 from functools import partial
 from time import monotonic
 
-import ago
+import humanize
 import jinja2
 from flask import (
     Markup,
@@ -348,28 +348,17 @@ def format_delta(date):
         return "just now"
     if delta < timedelta(seconds=60):
         return "in the last minute"
-    return ago.human(
-        delta,
-        future_tense='{} from now',  # No-one should ever see this
-        past_tense='{} ago',
-        precision=1
-    )
+    return humanize.naturaltime(delta)
 
 
 def format_delta_days(date):
     now = datetime.now(timezone.utc)
     date = utc_string_to_aware_gmt_datetime(date)
-    delta = now - date
     if date.strftime('%Y-%M-%D') == now.strftime('%Y-%M-%D'):
         return "today"
     if date.strftime('%Y-%M-%D') == (now - timedelta(days=1)).strftime('%Y-%M-%D'):
         return "yesterday"
-    return ago.human(
-        delta,
-        precision=1,
-        future_tense='{} from now',
-        past_tense='{} ago',
-    )
+    return humanize.naturaltime(now - date)
 
 
 def valid_phone_number(phone_number):
