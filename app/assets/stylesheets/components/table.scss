@@ -57,8 +57,9 @@
     table-layout: fixed;
   }
 
-  .table-field-heading {
-    font-size: 0;
+  .table-heading {
+    @include core-19;
+    margin: 0 0 10px 0;
   }
 
   .table-field-heading-first {

@@ -9,14 +9,14 @@
     <div class='template-statistics-table'>
       {% call(item, row_number) list_table(
         template_statistics,
-        caption="Templates used",
-        caption_visible=False,
+        caption="By template",
+        caption_visible=True,
         empty_message='',
         field_headings=[
           'Template',
           'Messages sent'
         ],
-        field_headings_visible=True
+        field_headings_visible=False
       ) %}
 
         {% call row_heading() %}
