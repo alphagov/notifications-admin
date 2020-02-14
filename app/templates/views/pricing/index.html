@@ -1,5 +1,6 @@
 {% from "components/table.html" import mapping_table, row, text_field, field, row_heading %}
 {% from "components/live-search.html" import live_search %}
+{% from "components/details/macro.njk" import govukDetails %}
 
 {% extends "content_template.html" %}
 
@@ -67,8 +68,7 @@
   <p>Some languages, such as Welsh, use accented characters.</p>
   <p>Text messages containing the following accented characters are charged at the normal rate: Ä, É, Ö, Ü, à, ä, é, è, ì, ò, ö, ù, ü.</p>
   <p>Using other accented characters can increase the cost of sending text messages.<p>
-  <details>
-    <summary>Accented characters that affect text message charges</summary>
+  {% set accentedChars %}
     <div class="bottom-gutter-3-2">
       {% call mapping_table(
         caption='Accented characters that affect text message charges',
@@ -128,7 +128,11 @@
         {% endfor %}
       {% endcall %}
     </div>
-  </details>
+  {% endset %}
+  {{ govukDetails({
+    "summaryText": "Accented characters that affect text message charges",
+    "html": accentedChars
+  }) }}
 
   <div class="bottom-gutter-3-2">
     {% call mapping_table(
@@ -154,9 +158,7 @@
 
   <h3 class="heading-small" id="international-numbers">Sending text messages to international numbers</h3>
   <p>It might cost more to send text messages to international numbers than UK ones, depending on the country.</p>
-  <details>
-    <summary>International text message rates</summary>
-
+  {% set smsIntRates %}
     {{ live_search(target_selector='#international-pricing .table-row', show=True, form=search_form, label='Search by country name or code') }}
 
     <div id="international-pricing" class="bottom-gutter-3-2">
@@ -180,7 +182,11 @@
       {% endcall %}
     </div>
 
-  </details>
+  {% endset %}
+  {{ govukDetails({
+    "summaryText": "International text message rates",
+    "html": smsIntRates
+  }) }}
 
   <h2 class="heading-medium" id="letters">Letters</h2>
   <p>The cost of sending a letter depends on the postage you choose and how many sheets of paper you need.</p>
