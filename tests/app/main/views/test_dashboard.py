@@ -262,9 +262,9 @@ def test_inbound_messages_shows_count_of_messages_when_there_are_no_messages(
 
 
 @pytest.mark.parametrize('index, expected_row', enumerate([
-    '07900 900000 message-1 an hour ago',
-    '07900 900000 message-2 an hour ago',
-    '07900 900000 message-3 an hour ago',
+    '07900 900000 message-1 1 hour ago',
+    '07900 900000 message-2 1 hour ago',
+    '07900 900000 message-3 1 hour ago',
     '07900 900002 message-4 3 hours ago',
     '07900 900004 message-5 5 hours ago',
     '07900 900006 message-6 7 hours ago',
@@ -556,6 +556,9 @@ def test_returned_letters_shows_count_of_recently_returned_letters(
     )),
     ('2020-01-25', (
         '0 returned letters latest report 8 days ago'
+    )),
+    ('2020-01-01', (
+        '0 returned letters latest report 1 month ago'
     )),
     ('2019-09-09', (
         '0 returned letters latest report 4 months ago'
