@@ -145,10 +145,12 @@
 
 .banner-dashboard {
 
-  $baseline-shift: -5px;
+  $baseline-shift: 5px;
 
-  display: block;
-  position: relative;
+  display: block; // for browsers that don't support flexbox
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
   padding: $gutter-two-thirds 0;
   border-top: 1px solid $border-colour;
   border-bottom: 1px solid $border-colour;
@@ -156,29 +158,36 @@
   text-decoration: none;
 
   &:focus {
-    border-color: $focus-colour;
-    box-shadow: 0 3px 0 0 $focus-colour, 0 -3px 0 0 $focus-colour;
-    color: $text-colour;
+    border: none;
+  }
+
+  &-count,
+  &-meta {
+    float: left; // for browsers that don't support flexbox
   }
 
   &-count {
-    @include bold-36;
+    @include govuk-font(36, $weight: bold);
     padding-right: 5px;
+    position: relative;
+    // remove the top of the extra line-height this introduces
+    top: $baseline-shift;
+    margin-top: -$baseline-shift;
+    flex: 0 1 0.85ch;
   }
 
   &-count-label {
-    @include bold-24;
+    @include govuk-font(24, $weight: bold);
     text-decoration: underline;
-    position: relative;
-    top: $baseline-shift;
+    padding-right: govuk-spacing(6);
+    flex: 2 1 auto;
   }
 
   &-meta {
-    @include core-19;
-    position: absolute;
-    right: 0;
-    bottom: $gutter-two-thirds - $baseline-shift;
+    @include govuk-font(19);
+    float: right;
     text-align: right;
+    flex: initial;
   }
 
   & + .banner-dashboard {
