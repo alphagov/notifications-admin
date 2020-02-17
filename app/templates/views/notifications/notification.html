@@ -67,7 +67,7 @@
             {{ letter_print_day }}
           </p>
           <p>
-            Estimated delivery date: {{ estimated_letter_delivery_date|string|format_date_short }}
+            Estimated delivery date: {{ estimated_letter_delivery_date|format_day_of_week }} {{ estimated_letter_delivery_date|format_date_short }}
           </p>
         {% endif %}
       {% endif %}

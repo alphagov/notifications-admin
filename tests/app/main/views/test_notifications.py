@@ -202,7 +202,7 @@ def test_notification_page_shows_page_for_letter_notification(
         'Printing starts today at 5:30pm'
     )
     assert normalize_spaces(page.select('main p:nth-of-type(3)')[0].text) == (
-        'Estimated delivery date: 6 January'
+        'Estimated delivery date: Wednesday 6 January'
     )
     assert len(page.select('.letter-postage')) == 1
     assert normalize_spaces(page.select_one('.letter-postage').text) == (
@@ -473,7 +473,9 @@ def test_notification_page_shows_page_for_first_class_letter_notification(
     )
 
     assert normalize_spaces(page.select('main p:nth-of-type(2)')[0].text) == 'Printing starts tomorrow at 5:30pm'
-    assert normalize_spaces(page.select('main p:nth-of-type(3)')[0].text) == 'Estimated delivery date: 5 January'
+    assert normalize_spaces(page.select('main p:nth-of-type(3)')[0].text) == (
+        'Estimated delivery date: Tuesday 5 January'
+    )
     assert normalize_spaces(page.select_one('.letter-postage').text) == (
         'Postage: first class'
     )

@@ -334,6 +334,10 @@ def format_date_human(date):
     return get_human_day(date)
 
 
+def format_day_of_week(date):
+    return utc_string_to_aware_gmt_datetime(date).strftime('%A')
+
+
 def _format_datetime_short(datetime):
     return datetime.strftime('%d %B').lstrip('0')
 
@@ -743,6 +747,7 @@ def add_template_filters(application):
         format_date_normal,
         format_date_short,
         format_datetime_relative,
+        format_day_of_week,
         format_delta,
         format_notification_status,
         format_notification_type,
