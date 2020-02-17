@@ -10,7 +10,9 @@
     <h1 class="heading-large">Uploads</h1>
     <div class="dashboard">
       {{ scheduled_jobs|safe }}
-      {% include 'views/dashboard/_jobs.html' %}
+      {% if jobs or not current_service.scheduled_jobs %}
+        {% include 'views/dashboard/_jobs.html' %}
+      {% endif %}
       {{ previous_next_navigation(prev_page, next_page) }}
       {% if current_service.can_upload_letters and current_user.has_permissions('send_messages') %}
         <div class="js-stick-at-bottom-when-scrolling">

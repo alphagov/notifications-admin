@@ -1779,6 +1779,16 @@ def mock_get_uploads(mocker, api_user_active):
 
 
 @pytest.fixture(scope='function')
+def mock_get_no_uploads(mocker, api_user_active):
+    mocker.patch(
+        'app.models.job.PaginatedUploads.client_method',
+        return_value={
+            'data': [],
+        }
+    )
+
+
+@pytest.fixture(scope='function')
 def mock_get_notifications(
     mocker,
     api_user_active,
