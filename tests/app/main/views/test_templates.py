@@ -686,7 +686,7 @@ def test_should_show_template_id_on_template_page(
         template_id=fake_uuid,
         _test_page_title=False,
     )
-    assert page.select('.api-key-key')[0].text == fake_uuid
+    assert page.select('.api-key__key')[0].text == fake_uuid
 
 
 def test_should_show_sms_template_with_downgraded_unicode_characters(
@@ -2029,7 +2029,7 @@ def test_should_show_template_as_first_page_of_tour(
         'service one: Template <em>content</em> with & entity'
     )
 
-    assert page.select('a.button')[0]['href'] == url_for(
+    assert page.select('a.govuk-button')[0]['href'] == url_for(
         '.send_test', service_id=SERVICE_ONE_ID, template_id=fake_uuid, help=2
     )
 

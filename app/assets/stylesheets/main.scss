@@ -11,7 +11,6 @@ $path: '/static/images/';
 @import 'typography';
 @import 'grid_layout';
 @import 'helpers';
-@import 'design-patterns/buttons';
 
 // Dependencies from GOVU.UK Frontend Toolkit, rewritten for this application
 @import 'url-helpers';
@@ -23,7 +22,6 @@ $path: '/static/images/';
 // https://github.com/alphagov/govuk_elements
 @import 'elements/helpers';
 @import 'elements/reset';
-@import 'elements/buttons';
 @import 'elements/details';
 @import 'elements/elements-typography';
 @import 'elements/forms';

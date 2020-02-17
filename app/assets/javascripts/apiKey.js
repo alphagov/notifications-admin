@@ -7,12 +7,12 @@
 
     const states = {
       'keyVisible': (key, thing) => `
-        <span class="api-key-key">${key}</span>
-        <input type='button' class='api-key-button-copy' value='Copy ${thing} to clipboard' />
+        <span class="api-key__key">${key}</span>
+        <input type='button' class='govuk-button govuk-button--secondary api-key__button--copy' value='Copy ${thing} to clipboard' />
       `,
       'keyCopied': thing => `
-        <span class="api-key-key">Copied to clipboard</span>
-        <input type='button' class='api-key-button-show' value='Show ${thing}' />
+        <span class="api-key__key">Copied to clipboard</span>
+        <input type='button' class='govuk-button govuk-button--secondary api-key__button--show' value='Show ${thing}' />
       `
     };
 
@@ -39,14 +39,14 @@
         .html(states.keyVisible(key, thing))
         .attr('aria-live', 'polite')
         .on(
-          'click', '.api-key-button-copy', () =>
+          'click', '.api-key__button--copy', () =>
             this.copyKey(
-              $('.api-key-key', component)[0], () =>
+              $('.api-key__key', component)[0], () =>
                 $component.html(states.keyCopied(thing))
             )
         )
         .on(
-          'click', '.api-key-button-show', () =>
+          'click', '.api-key__button--show', () =>
             $component.html(states.keyVisible(key, thing))
         );
 

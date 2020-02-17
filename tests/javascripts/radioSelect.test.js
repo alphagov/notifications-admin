@@ -29,7 +29,7 @@ describe('RadioSelect', () => {
   const clickButtonForCategory = (category) => {
 
     // click the button for this category
-    const categoryButton = document.querySelector(`.radio-select-column:nth-child(2) input[value="${category}"]`);
+    const categoryButton = document.querySelector(`.radio-select__column:nth-child(2) input[value="${category}"]`);
     helpers.triggerEvent(categoryButton, 'click');
 
   };
@@ -100,7 +100,7 @@ describe('RadioSelect', () => {
           When should Notify send these messages?
         </legend>
         <div class="radio-select" data-module="radio-select" data-categories="${CATEGORIES.join(',')}">
-          <div class="radio-select-column">
+          <div class="radio-select__column">
             <div class="multiple-choice">
               <input checked="" id="scheduled_for-0" name="scheduled_for" type="radio" value="">
               <label for="scheduled_for-0">
@@ -108,13 +108,13 @@ describe('RadioSelect', () => {
               </label>
             </div>
           </div>
-          <div class="radio-select-column">
+          <div class="radio-select__column">
           ${options()}
           </div>
         </div>
       </fieldset>`;
 
-      originalOptionsForAllCategories = Array.from(document.querySelector('.radio-select-column:nth-child(2) .multiple-choice'))
+      originalOptionsForAllCategories = Array.from(document.querySelector('.radio-select__column:nth-child(2) .multiple-choice'))
                                           .map(option => getDataFromOption(option));
   });
 
@@ -131,7 +131,7 @@ describe('RadioSelect', () => {
       // start module
       window.GOVUK.modules.start();
 
-      categoryButtons = document.querySelectorAll('.radio-select-column:nth-child(2) .js-category-button');
+      categoryButtons = document.querySelectorAll('.radio-select__column:nth-child(2) .radio-select__button--category');
 
     });
 
@@ -147,7 +147,7 @@ describe('RadioSelect', () => {
       CATEGORIES.forEach((category, idx) => {
         expect(categoryButtons[idx].getAttribute('value')).toEqual(category);
       });
-      
+
     });
 
   });
@@ -167,18 +167,18 @@ describe('RadioSelect', () => {
           window.GOVUK.modules.start();
 
           clickButtonForCategory(category);
-        
+
         });
-        
+
         test("show the options for it, with the right label and value", () => {
 
           // check options this reveals against those originally in the page for this category
-          const options = document.querySelector('.radio-select-column:nth-child(2) .multiple-choice');
+          const options = document.querySelector('.radio-select__column:nth-child(2) .multiple-choice');
 
           const optionsThatMatchOriginals = Array.from(options).filter((option, idx) => {
             const optionData = getDataFromOption(option);
             const originalOption = originalOptionsForCategory[idx];
-            
+
             return optionData.value === originalOption.value && optionData.label === originalOption.label;
           });
 
@@ -203,7 +203,7 @@ describe('RadioSelect', () => {
 
       clickButtonForCategory(CATEGORIES[0]);
 
-      const button = document.querySelector('.radio-select-column:nth-child(2) input[type=button]');
+      const button = document.querySelector('.radio-select__column:nth-child(2) input[type=button]');
 
       expect(button).not.toBeNull();
       expect(button.getAttribute('value')).toEqual('Done');
@@ -231,7 +231,7 @@ describe('RadioSelect', () => {
 
       beforeEach(() => {
 
-        optionsColumn = document.querySelector('.radio-select-column:nth-child(2)');
+        optionsColumn = document.querySelector('.radio-select__column:nth-child(2)');
 
         const firstOption = optionsColumn.querySelector('input[type=radio]');
         firstOptionLabel = firstOption.parentNode.querySelector('label').textContent.trim();
@@ -243,7 +243,7 @@ describe('RadioSelect', () => {
       test("remove all the other options", () => {
 
         // module replaces the column node so this needs querying again
-        optionsColumn = document.querySelector('.radio-select-column:nth-child(2)');
+        optionsColumn = document.querySelector('.radio-select__column:nth-child(2)');
 
         expect(optionsColumn.querySelectorAll('input[type=radio]').length).toEqual(1);
         expect(optionsColumn.querySelector('label').textContent.trim()).toEqual(firstOptionLabel);
@@ -252,7 +252,7 @@ describe('RadioSelect', () => {
 
       test("add a button for choosing a different time", () => {
 
-        const button = document.querySelector('.radio-select-column:nth-child(3) input[type=button]');
+        const button = document.querySelector('.radio-select__column:nth-child(3) input[type=button]');
 
         expect(button).not.toBeNull();
         expect(button.getAttribute('value')).toEqual('Choose a different time');
@@ -261,7 +261,7 @@ describe('RadioSelect', () => {
 
       test("focus the selected option", () => {
 
-        selectedOption = document.querySelector('.radio-select-column:nth-child(2) input[checked=checked]');
+        selectedOption = document.querySelector('.radio-select__column:nth-child(2) input[checked=checked]');
 
         expect(document.activeElement).toBe(selectedOption);
 
@@ -276,7 +276,7 @@ describe('RadioSelect', () => {
 
       beforeEach(() => {
 
-        optionsColumn = document.querySelector('.radio-select-column:nth-child(2)');
+        optionsColumn = document.querySelector('.radio-select__column:nth-child(2)');
 
         const options = optionsColumn.querySelectorAll('input[type=radio]');
         secondOptionLabel = options[1].parentNode.querySelector('label').textContent.trim();
@@ -288,7 +288,7 @@ describe('RadioSelect', () => {
       test("remove all the other options", () => {
 
         // module replaces the column node so this needs querying again
-        optionsColumn = document.querySelector('.radio-select-column:nth-child(2)');
+        optionsColumn = document.querySelector('.radio-select__column:nth-child(2)');
 
         expect(optionsColumn.querySelectorAll('input[type=radio]').length).toEqual(1);
         expect(optionsColumn.querySelector('label').textContent.trim()).toEqual(secondOptionLabel);
@@ -297,7 +297,7 @@ describe('RadioSelect', () => {
 
       test("add a button for choosing a different time", () => {
 
-        const button = document.querySelector('.radio-select-column:nth-child(3) input[type=button]');
+        const button = document.querySelector('.radio-select__column:nth-child(3) input[type=button]');
 
         expect(button).not.toBeNull();
         expect(button.getAttribute('value')).toEqual('Choose a different time');
@@ -313,7 +313,7 @@ describe('RadioSelect', () => {
 
       beforeEach(() => {
 
-        optionsColumn = document.querySelector('.radio-select-column:nth-child(2)');
+        optionsColumn = document.querySelector('.radio-select__column:nth-child(2)');
 
         const options = optionsColumn.querySelectorAll('input[type=radio]');
         secondOptionLabel = options[1].parentNode.querySelector('label').textContent.trim();
@@ -339,7 +339,7 @@ describe('RadioSelect', () => {
       test("remove all the other options", () => {
 
         // module replaces the column node so this needs querying again
-        optionsColumn = document.querySelector('.radio-select-column:nth-child(2)');
+        optionsColumn = document.querySelector('.radio-select__column:nth-child(2)');
 
         expect(optionsColumn.querySelectorAll('input[type=radio]').length).toEqual(1);
         expect(optionsColumn.querySelector('label').textContent.trim()).toEqual(secondOptionLabel);
@@ -348,7 +348,7 @@ describe('RadioSelect', () => {
 
       test("add a button for choosing a different time", () => {
 
-        const button = document.querySelector('.radio-select-column:nth-child(3) input[type=button]');
+        const button = document.querySelector('.radio-select__column:nth-child(3) input[type=button]');
 
         expect(button).not.toBeNull();
         expect(button.getAttribute('value')).toEqual('Choose a different time');
@@ -359,10 +359,10 @@ describe('RadioSelect', () => {
 
     test("clicking the 'Done' button should choose whatever time is selected", () => {
 
-      let optionsColumn = document.querySelector('.radio-select-column:nth-child(2)');
+      let optionsColumn = document.querySelector('.radio-select__column:nth-child(2)');
       const secondOption = optionsColumn.querySelectorAll('input[type=radio]')[1];
       const secondOptionLabel = document.querySelector('label[for=' + secondOption.getAttribute('id')).textContent.trim();
-      const doneButton = document.querySelector('.radio-select-column:nth-child(2) input[type=button]');
+      const doneButton = document.querySelector('.radio-select__column:nth-child(2) input[type=button]');
 
       // select second option
       secondOption.checked = true;
@@ -370,7 +370,7 @@ describe('RadioSelect', () => {
 
       helpers.triggerEvent(doneButton, 'click');
 
-      optionsColumn = document.querySelector('.radio-select-column:nth-child(2)');
+      optionsColumn = document.querySelector('.radio-select__column:nth-child(2)');
 
       expect(optionsColumn.querySelectorAll('input[type=radio]').length).toEqual(1);
       expect(optionsColumn.querySelector('label').textContent.trim()).toEqual(secondOptionLabel);
@@ -382,19 +382,19 @@ describe('RadioSelect', () => {
       beforeEach(() => {
 
         // select the first option
-        const firstOption = document.querySelector('.radio-select-column:nth-child(2) input[type=radio]');
+        const firstOption = document.querySelector('.radio-select__column:nth-child(2) input[type=radio]');
 
         helpers.clickElementWithMouse(firstOption);
 
         // click the 'Choose a different time' button
-        const resetButton = document.querySelector('.radio-select-column:nth-child(3) input[type=button]');
+        const resetButton = document.querySelector('.radio-select__column:nth-child(3) input[type=button]');
         helpers.triggerEvent(resetButton, 'click');
 
       });
 
       test("reset the module", () => {
 
-        categoryButtons = document.querySelectorAll('.radio-select-column:nth-child(2) .js-category-button');
+        categoryButtons = document.querySelectorAll('.radio-select__column:nth-child(2) .radio-select__button--category');
 
         expect(categoryButtons.length).toEqual(CATEGORIES.length);
 

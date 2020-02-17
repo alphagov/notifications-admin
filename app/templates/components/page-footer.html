@@ -1,3 +1,5 @@
+{% from "components/button/macro.njk" import govukButton %}
+
 {% macro page_footer(
   button_text=None,
   button_name=None,
@@ -9,17 +11,18 @@
   delete_link_text="delete",
   centered_button=False
 ) %}
-  <div class="page-footer {% if centered_button %}page-footer-centered-button{% endif %}">
+  <div class="page-footer">
     {% if button_text %}
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-      <button
-        type="submit"
-        class="button{% if destructive %}-destructive{% endif %}"
-        {% if button_name %}name="{{ button_name }}"{% endif %}
-        {% if button_value %}value="{{ button_value }}"{% endif %}
-      >
-        {{- button_text -}}
-      </button>
+
+      {% set button_data = {"text": button_text, "classes": "page-footer__button"} %}
+      {% if destructive %}{% set _ = button_data.update({"classes": "govuk-button--warning page-footer__button"}) %}{% endif %}
+      {% if centered_button %}{% set _ = button_data.update({"classes": "page-footer__button--centred"}) %}{% endif %}
+      {% if button_name %}{% set _ = button_data.update({"name": button_name}) %}{% endif %}
+      {% if button_value %}{% set _ = button_data.update({"value": button_value}) %}{% endif %}
+
+      {{ govukButton(button_data) }}
+
     {% endif %}
     {% if delete_link %}
       <span class="page-footer-delete-link {% if not button_text %}page-footer-delete-link-without-button{% endif %}">

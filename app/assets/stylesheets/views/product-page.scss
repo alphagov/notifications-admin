@@ -1,3 +1,7 @@
+$product-page-blue: #005EA5;
+// See https://github.com/alphagov/govuk-frontend/blob/v2.13.0/src/components/button/_button.scss#L24
+$button-shadow-size: $govuk-border-width-form-element;
+
 .product-page {
 
   &-intro {
@@ -9,7 +13,7 @@
     position: relative;
     margin: -10px 0 $gutter * 1.5 0;
     padding: 0 0 $gutter * 2 0;
-    background: $govuk-blue;
+    background: $product-page-blue;
     color: $white;
 
     &-wrapper {
@@ -35,31 +39,7 @@
       margin: $gutter-half 0 $gutter;
     }
 
-    .button-container {
-      line-height: 45px;
-    }
-
-    .button {
-
-      @include box-shadow(0 2px 0 darken($govuk-blue, 15%));
-      background: $white;
-      margin-right: 15px;
-      padding-right: 1.25em;
-
-      &:link,
-      &:visited,
-      &:hover {
-        color: $govuk-blue;
-      }
-
-      &:hover {
-        background: $light-blue-25;
-        outline: none;
-      }
-
-    }
-
-    a {
+    .govuk-link {
 
       &:link,
       &:visited {
@@ -100,6 +80,40 @@
   &-big-number {
     @include bold-48($tabular-numbers: true);
     margin: 0 0 0 0;
+  }
+
+}
+
+.button-container {
+  line-height: 2.36;
+}
+
+.button-container__button {
+  vertical-align: baseline;
+}
+
+.product-page-button {
+
+  // based on the govuk-button styles:
+  // https://github.com/alphagov/govuk-frontend/blob/v2.13.0/src/components/button/_button.scss
+  @include govuk-font($size: 24, $weight: bold);
+  color: $product-page-blue;
+  box-shadow: 0 $button-shadow-size 0 govuk-shade($colour: $product-page-blue, $percentage: 15%);
+  background: $white;
+
+  &:link,
+  &:visited,
+  &:hover {
+    color: $product-page-blue;
+  }
+
+  &:focus {
+    background: $white;
+  }
+
+  &:hover {
+    background: $light-blue-25;
+    outline: none;
   }
 
 }

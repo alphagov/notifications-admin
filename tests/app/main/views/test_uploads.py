@@ -1,3 +1,4 @@
+import re
 import urllib
 from unittest.mock import Mock
 
@@ -27,7 +28,7 @@ def test_no_upload_letters_button_without_permission(
 ):
     service_one['permissions'] += extra_permissions
     page = client_request.get('main.uploads', service_id=SERVICE_ONE_ID)
-    assert not page.find('a', text='Upload a letter')
+    assert not page.find('a', text=re.compile('Upload a letter'))
 
 
 def test_get_upload_hub_page(
@@ -38,7 +39,7 @@ def test_get_upload_hub_page(
     service_one['permissions'] += ['letter', 'upload_letters']
     page = client_request.get('main.uploads', service_id=SERVICE_ONE_ID)
     assert page.find('h1').text == 'Uploads'
-    assert page.find('a', text='Upload a letter').attrs['href'] == url_for(
+    assert page.find('a', text=re.compile('Upload a letter')).attrs['href'] == url_for(
         'main.upload_letter', service_id=SERVICE_ONE_ID
     )
 
@@ -111,7 +112,7 @@ def test_post_upload_letter_redirects_for_valid_file(
     assert not page.find(id='validation-error-message')
 
     assert page.find('input', {'type': 'hidden', 'name': 'file_id', 'value': fake_uuid})
-    assert page.select('main button[type=submit]')[0].text == 'Send 1 letter'
+    assert normalize_spaces(page.select('main button[type=submit]')[0].text) == 'Send 1 letter'
 
 
 def test_post_upload_letter_shows_letter_preview_for_valid_file(
@@ -382,7 +383,7 @@ def test_uploaded_letter_preview(
     assert page.find('h1').text == 'my_letter.pdf'
     assert page.find('div', class_='letter-sent')
     assert not page.find("label", {"class": "file-upload-button"})
-    assert page.find('button', {'class': 'button', 'type': 'submit'})
+    assert page.find('button', {'class': 'govuk-button', 'type': 'submit'})
 
 
 def test_uploaded_letter_preview_does_not_show_send_button_if_service_in_trial_mode(

@@ -8,6 +8,7 @@
 // For example, `export { Frontend }` will assign `Frontend` to `window.Frontend`
 import Header from 'govuk-frontend/components/header/header';
 import Details from 'govuk-frontend/components/details/details';
+import Button from 'govuk-frontend/components/button/button';
 
 /**
  * TODO: Ideally this would be a NodeList.prototype.forEach polyfill
@@ -33,6 +34,9 @@ function initAll (options) {
   // Defaults to the entire document if nothing is set.
   var scope = typeof options.scope !== 'undefined' ? options.scope : document
 
+  // Find all buttons with [role=button] on the scope to enhance.
+  new Button(scope).init()
+
   // Find all global details elements to enhance.
   var $details = scope.querySelectorAll('details')
   nodeListForEach($details, function ($detail) {
@@ -48,6 +52,7 @@ function initAll (options) {
 var Frontend = {
   "Header": Header,
   "Details": Details,
+  "Button": Button,
   "initAll": initAll
 }
 

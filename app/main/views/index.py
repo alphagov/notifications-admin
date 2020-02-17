@@ -21,7 +21,7 @@ from app.main.views.sub_navigation_dictionaries import (
     pricing_nav,
     using_notify_nav,
 )
-from app.utils import get_logo_cdn_domain, user_is_logged_in
+from app.utils import get_logo_cdn_domain
 
 
 @main.route('/')
@@ -52,12 +52,6 @@ def error(status_code):
     if status_code >= 500:
         abort(404)
     abort(status_code)
-
-
-@main.route("/verify-mobile")
-@user_is_logged_in
-def verify_mobile():
-    return render_template('views/verify-mobile.html')
 
 
 @main.route('/cookies')

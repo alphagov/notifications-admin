@@ -51,45 +51,33 @@
 
   }
 
-  .button,
-  .button-destructive {
+  &__button {
     margin-right: 10px;
-  }
-
-  .button-destructive {
-    @include button($error-colour);
-    padding: 0.52632em 0.78947em 0.26316em 0.78947em;
   }
 
   .js-cancel {
     margin: 0;
   }
 
-  &-centered-button {
-
-    .button {
-      display: block;
-      margin: 0 auto;
-    }
-
+  &__button--centred {
+    display: block;
+    margin: 0 auto;
   }
 
 }
 
-.align-button-with-textbox {
+.search-form__button {
+  @include media(desktop) {
+    position: relative;
+    top: 32px;
+    left: -30px;
+    width: 100%;
+    margin-right: -30px;
+    padding-top: 7px;
+    box-sizing: content-box;
 
-  .button {
-
-    @include media(desktop) {
-      position: relative;
+    &:active {
       top: 32px;
-      left: -30px;
-      width: 100%;
-      margin-right: -30px;
-      padding-top: 8px;
-      box-sizing: content-box;
     }
-
   }
-
 }

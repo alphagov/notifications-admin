@@ -1,9 +1,9 @@
 {% from "components/banner.html" import banner, banner_wrapper %}
 {% from "components/textbox.html" import textbox %}
 {% from "components/checkbox.html" import checkbox %}
-{% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
+{% from "components/button/macro.njk" import govukButton %}
 
 <div class="ajax-block-container">
   {% if verification_status == "pending" %}
@@ -20,7 +20,11 @@
   {% elif verification_status == "success" %}
     {{ banner("‘{}’ is ready to use".format(reply_to_email_address), type='default', with_tick=True) }}
     <div class="js-stick-at-bottom-when-scrolling">
-      <a href="{{ url_for('.service_email_reply_to', service_id=service_id) }}" class="button">Continue</a>
+      {{ govukButton({
+        "element": "a",
+        "text": "Continue",
+        "href": url_for('.service_email_reply_to', service_id=service_id)
+      }) }}
     </div>
   {% elif verification_status == "failure" %}
     <div class="bottom-gutter">

@@ -839,14 +839,14 @@ def test_delete_template_folder_should_request_confirmation(
     assert len(page.select('main button')) == 2
 
     assert 'action' not in page.select('main form')[0]
-    assert page.select('main form button')[0].text == 'Yes, delete'
+    assert normalize_spaces(page.select('main form button')[0].text) == 'Yes, delete'
 
     assert page.select('main form')[1]['action'] == url_for(
         'main.manage_template_folder',
         service_id=service_one['id'],
         template_folder_id=folder_id,
     )
-    assert page.select('main form button')[1].text == 'Save'
+    assert normalize_spaces(page.select('main form button')[1].text) == 'Save'
 
 
 def test_delete_template_folder_should_detect_non_empty_folder_on_get(

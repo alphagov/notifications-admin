@@ -2,10 +2,9 @@
 {% from "components/banner.html" import banner_wrapper %}
 {% from "components/radios.html" import radio_select %}
 {% from "components/table.html" import list_table, field, text_field, index_field, hidden_field_heading %}
-{% from "components/file-upload.html" import file_upload %}
 {% from "components/page-header.html" import page_header %}
-{% from "components/page-footer.html" import page_footer %}
 {% from "components/message-count-label.html" import message_count_label %}
+{% from "components/button/macro.njk" import govukButton %}
 
 {% set file_contents_header_id = 'file-preview' %}
 {% macro skip_to_file_contents() %}
@@ -45,9 +44,16 @@
         ) }}
       {% endif %}
       {% if (template.template_type != 'letter' or not request.args.from_test) and not letter_too_long %}
-      <button type="submit" class="button">Send {{ count_of_recipients|format_thousands }} {{ message_count_label(count_of_recipients, template.template_type, suffix='') }}</button>
+        {% set button_text %}
+          Send {{ count_of_recipients|format_thousands }} {{ message_count_label(count_of_recipients, template.template_type, suffix='') }}
+        {% endset %}
+        {{ govukButton({ "text": button_text }) }}
       {% else %}
-        <a href="{{ url_for('no_cookie.check_messages_preview', service_id=current_service.id, template_id=template.id, upload_id=upload_id, filetype='pdf') }}" download class="button">Download as a PDF</a>
+        {{ govukButton({
+          "element": "a",
+          "text": "Download as a PDF",
+          "href": url_for('no_cookie.check_messages_preview', service_id=current_service.id, template_id=template.id, upload_id=upload_id, filetype='pdf'),
+        }) }}
       {% endif %}
     </form>
   </div>

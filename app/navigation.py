@@ -118,7 +118,6 @@ class HeaderNavigation(Navigation):
             'two_factor_email_sent',
             'verify',
             'verify_email',
-            'verify_mobile',
         },
     }
 
@@ -634,7 +633,6 @@ class MainNavigation(Navigation):
         'using_notify',
         'verify',
         'verify_email',
-        'verify_mobile',
         'view_job_csv',
         'view_job_updates',
         'view_letter_notification_as_preview',
@@ -926,7 +924,6 @@ class CaseworkNavigation(Navigation):
         'using_notify',
         'verify',
         'verify_email',
-        'verify_mobile',
         'view_job_csv',
         'view_job_updates',
         'view_letter_notification_as_preview',
@@ -1219,7 +1216,6 @@ class OrgNavigation(Navigation):
         'using_notify',
         'verify',
         'verify_email',
-        'verify_mobile',
         'view_job',
         'view_job_csv',
         'view_job_updates',

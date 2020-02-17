@@ -4,22 +4,21 @@
   padding-bottom: 38px;  // height of button
   display: flex;
 
-  &-name {
+  &__name {
     @include bold-19;
     margin-bottom: 5px;
   }
 
-  &-key {
+  &__key {
     font-family: monospace;
     display: block;
     padding: 0 0 10px 0;
     margin: auto 0;
   }
 
-  &-button-show,
-  &-button-copy {
+  &__button--show,
+  &__button--copy {
 
-    @include button($grey-3);
     position: absolute;
     bottom: 2px;
 

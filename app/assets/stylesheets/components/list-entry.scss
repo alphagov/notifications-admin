@@ -6,8 +6,12 @@
     position: relative;
   }
 
-  .list-entry-remove {
-    @include core-19;
+  &__button--remove,
+  &__button--add {
+    width: auto;
+  }
+
+  &__button--remove {
     display: block;
     margin-bottom: 15px;
     margin-top: 5px;
@@ -21,6 +25,10 @@
       top: 0;
       left: 100%;
     }
+  }
+
+  &__button--add {
+    margin: 0 0 20px 0;
   }
 
   .form-control {
@@ -45,12 +53,4 @@
     pointer-events: none;
   }
 
-  .list-entry-add {
-    @include core-19;
-    margin: 0 0 20px 0;
-  }
-}
-
-.button-secondary {
-  @include button($grey-3);
 }

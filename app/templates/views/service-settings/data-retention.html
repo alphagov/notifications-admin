@@ -1,7 +1,7 @@
 {% extends "withnav_template.html" %}
 {% from "components/api-key.html" import api_key %}
-{% from "components/page-footer.html" import page_footer %}
 {% from "components/table.html" import mapping_table, row_group, row, text_field, edit_field, field, boolean_field, list_table with context %}
+{% from "components/button/macro.njk" import govukButton %}
 
 {% block service_page_title %}
   Data retention
@@ -16,7 +16,12 @@
       </h1>
     </div>
    <div class="column-one-third">
-	    <a href="{{ url_for('.add_data_retention', service_id=current_service.id) }}" class="button align-with-heading">Add data retention</a>
+    {{ govukButton({
+      "element": "a",
+      "text": "Add data retention",
+      "href": url_for('.add_data_retention', service_id=current_service.id),
+      "classes": "align-with-heading"
+    }) }}
   </div>
   </div>
   <div class="grid-row bottom-gutter">

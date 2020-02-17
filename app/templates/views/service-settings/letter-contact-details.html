@@ -1,8 +1,8 @@
 {% extends "withnav_template.html" %}
 {% from "components/api-key.html" import api_key %}
 {% from "components/page-header.html" import page_header %}
-{% from "components/page-footer.html" import page_footer %}
 {% from "components/table.html" import row_group, row, text_field, edit_field, field, boolean_field, list_table with context %}
+{% from "components/button/macro.njk" import govukButton %}
 
 {% block service_page_title %}
   Sender addresses
@@ -52,7 +52,11 @@
     <div class="grid-row">
       <div class="column-whole">
         <div class="js-stick-at-bottom-when-scrolling">
-          <a href="{{ url_for('.service_add_letter_contact', service_id=current_service.id) }}" class="button">Add a new address</a>
+          {{ govukButton({
+            "element": "a",
+            "text": "Add a new address",
+            "href": url_for('.service_add_letter_contact', service_id=current_service.id)
+          }) }}
         </div>
       </div>
     </div>

@@ -1,8 +1,8 @@
 {% extends "withnav_template.html" %}
 {% from "components/api-key.html" import api_key %}
 {% from "components/page-header.html" import page_header %}
-{% from "components/page-footer.html" import page_footer %}
 {% from "components/table.html" import row_group, row, text_field, edit_field, field, boolean_field, list_table with context %}
+{% from "components/button/macro.njk" import govukButton %}
 
 {% block service_page_title %}
   Reply-to email addresses
@@ -43,7 +43,11 @@
     <div class="column-whole">
       {% if current_user.has_permissions('manage_service') %}
         <div class="js-stick-at-bottom-when-scrolling">
-          <a href="{{ url_for('.service_add_email_reply_to', service_id=current_service.id) }}" class="button">Add reply-to email address</a>
+          {{ govukButton({
+            "element": "a",
+            "text": "Add reply-to email address",
+            "href": url_for('.service_add_email_reply_to', service_id=current_service.id),
+          }) }}
         </div>
       {% endif %}
     </div>

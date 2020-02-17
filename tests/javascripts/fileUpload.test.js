@@ -26,7 +26,7 @@ describe('File upload', () => {
           Upload logo
         </label>
         <label class="file-upload-filename" for="file"></label>
-        <button type="submit" class="file-upload-submit">Submit</button>
+        <button type="submit" class="govuk-button file-upload-submit">Submit</button>
       </form>`;
 
     form = document.querySelector('form');

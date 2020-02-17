@@ -1,5 +1,6 @@
 {% from "components/previous-next-navigation.html" import previous_next_navigation %}
 {% extends "withnav_template.html" %}
+{% from "components/button/macro.njk" import govukButton %}
 
 {% block service_page_title %}
   Uploads
@@ -13,7 +14,12 @@
       {{ previous_next_navigation(prev_page, next_page) }}
       {% if current_service.can_upload_letters and current_user.has_permissions('send_messages') %}
         <div class="js-stick-at-bottom-when-scrolling">
-          <a href="{{ url_for('.upload_letter', service_id=current_service.id) }}" class="button-secondary" role="button">Upload a letter</a>
+          {{ govukButton({
+            "element": "a",
+            "text": "Upload a letter",
+            "href": url_for('.upload_letter', service_id=current_service.id),
+            "classes": "govuk-button--secondary"
+          }) }}
         </div>
       {% endif %}
     </div>

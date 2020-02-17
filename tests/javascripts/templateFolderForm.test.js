@@ -46,7 +46,7 @@ function setFixtures (hierarchy) {
                 </div>
                 <div class="js-will-stick-at-bottom-when-scrolling">
                   <div class="page-footer">
-                    <button type="submit" class="button" name="operation" value="move-to-existing-folder">Move</button>
+                    <button type="submit" class="govuk-button govuk-button--secondary govuk-!-margin-right-3 govuk-!-margin-bottom-1" name="operation" value="move-to-existing-folder">Move</button>
                   </div>
                 </div>
               </div>
@@ -60,7 +60,7 @@ function setFixtures (hierarchy) {
                     <input class="form-control form-control-1-1 " id="move_to_new_folder_name" name="move_to_new_folder_name" rows="8" type="text" value="">
                   </div>
                   <div class="page-footer">
-                    <button type="submit" class="button" name="operation" value="move-to-new-folder">Add to new folder</button>
+                    <button type="submit" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-1" name="operation" value="move-to-new-folder">Add to new folder</button>
                   </div>
                 </fieldset>
               </div>
@@ -74,7 +74,7 @@ function setFixtures (hierarchy) {
                     <input class="form-control form-control-1-1 " id="add_new_folder_name" name="add_new_folder_name" rows="8" type="text" value="">
                   </div>
                   <div class="page-footer">
-                    <button type="submit" class="button" name="operation" value="add-new-folder">Add new folder</button>
+                    <button type="submit" class="govuk-button page-footer__button" name="operation" value="add-new-folder">Add new folder</button>
                   </div>
                 </fieldset>
               </div>
@@ -114,7 +114,7 @@ function setFixtures (hierarchy) {
                 </div>
                 <div class="js-will-stick-at-bottom-when-scrolling">
                   <div class="page-footer">
-                    <button type="submit" class="button" name="operation" value="add-new-template">Continue</button>
+                    <button type="submit" class="govuk-button page-footer__button" name="operation" value="add-new-template">Continue</button>
                   </div>
                 </div>
               </div>
@@ -228,7 +228,7 @@ describe('TemplateFolderForm', () => {
   };
 
   describe("Before the page loads", () => {
-  
+
     // We need parts of the module to be made sticky, but by the module code,
     // not the sticky JS code that operates on the HTML at page load.
     // Because of this, they will need to be marked with classes
@@ -240,7 +240,7 @@ describe('TemplateFolderForm', () => {
       expect(templateFolderForm.querySelectorAll('#add_new_template_form > .js-will-stick-at-bottom-when-scrolling').length).toEqual(2);
 
     });
-  
+
   });
 
   describe("When the page loads", () => {
@@ -578,11 +578,11 @@ describe('TemplateFolderForm', () => {
       });
 
       test("the content of the counter should reflect the selection", () => {
-      
+
         expect(visibleCounterText).toEqual('2 selected');
-      
+
       });
-      
+
     });
 
     describe("Clicking the 'Move' button", () => {
