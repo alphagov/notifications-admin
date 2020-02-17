@@ -70,13 +70,6 @@ PLATFORM_ADMIN_SERVICE_PERMISSIONS = OrderedDict([
     ('upload_letters', {'title': 'Uploading letters', 'requires': 'letter'}),
 ])
 
-SERVICE_SETTINGS = OrderedDict([
-    (
-        'upload_document',
-        {'title': 'Send files by email', 'endpoint': '.service_switch_can_upload_document', 'type': 'email'}
-    ),
-])
-
 
 @main.route("/services/<uuid:service_id>/service-settings")
 @user_has_permissions('manage_service', 'manage_api_keys')
@@ -300,35 +293,12 @@ def service_set_permission(service_id, permission):
     )
 
 
-@main.route("/services/<uuid:service_id>/service-settings/<setting>", methods=["GET", "POST"])
-@user_has_permissions('manage_service')
-def service_set_setting(service_id, setting):
-    if setting not in SERVICE_SETTINGS:
-        abort(404)
-
-    title = SERVICE_SETTINGS[setting]['title']
-    form = ServiceOnOffSettingForm(
-        name=title,
-        enabled=current_service.has_permission(setting)
-    )
-
-    if form.validate_on_submit():
-        current_service.force_permission(setting, on=form.enabled.data)
-
-        return redirect(url_for(".service_settings", service_id=service_id))
-
-    return render_template(
-        'views/service-settings/set-service-setting.html',
-        title=title,
-        form=form,
-    )
-
-
 @main.route("/services/<uuid:service_id>/service-settings/can-upload-document", methods=['GET', 'POST'])
 @user_has_permissions('manage_service')
 def service_switch_can_upload_document(service_id):
     if current_service.contact_link:
-        return redirect(url_for('.service_set_setting', service_id=service_id, setting='upload_document'))
+        current_service.force_permission('upload_document', on=(not current_service.has_permission('upload_document')))
+        return redirect(url_for(".service_settings", service_id=service_id))
 
     form = ServiceContactDetailsForm()
 
@@ -339,7 +309,8 @@ def service_switch_can_upload_document(service_id):
             contact_link=form.data[contact_type]
         )
 
-        return redirect(url_for('.service_set_setting', service_id=service_id, setting='upload_document'))
+        current_service.force_permission('upload_document', on=(not current_service.has_permission('upload_document')))
+        return redirect(url_for(".service_settings", service_id=service_id))
 
     return render_template('views/service-settings/contact_link.html', form=form)
 

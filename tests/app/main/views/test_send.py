@@ -2640,7 +2640,7 @@ def test_check_messages_back_link(
     )
 
     assert (
-        page.findAll('a', {'class': 'govuk-back-link'})[0]['href']
+        page.find_all('a', {'class': 'govuk-back-link'})[0]['href']
     ) == expected_url(service_id=SERVICE_ONE_ID, template_id=fake_uuid)
 
 
@@ -2731,7 +2731,7 @@ def test_check_messages_shows_too_many_messages_errors(
     assert page.find('div', class_='banner-dangerous').find('a').text.strip() == 'trial mode'
 
     # remove excess whitespace from element
-    details = page.find('div', class_='banner-dangerous').findAll('p')[1]
+    details = page.find('div', class_='banner-dangerous').find_all('p')[1]
     details = ' '.join([line.strip() for line in details.text.split('\n') if line.strip() != ''])
     assert details == expected_msg
 
@@ -3383,7 +3383,7 @@ def test_check_notification_shows_preview(
 
     assert page.h1.text.strip() == 'Preview of ‘Two week reminder’'
     assert (
-        page.findAll('a', {'class': 'govuk-back-link'})[0]['href']
+        page.find_all('a', {'class': 'govuk-back-link'})[0]['href']
     ) == url_for(
         'main.send_one_off_step',
         service_id=service_one['id'],

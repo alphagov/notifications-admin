@@ -13,6 +13,7 @@ from notifications_utils.clients.zendesk.zendesk_client import ZendeskClient
 import app
 from app.utils import email_safe
 from tests import (
+    find_element_by_tag_and_partial_text,
     invite_json,
     organisation_json,
     sample_uuid,
@@ -60,6 +61,7 @@ def mock_get_service_settings_page_common(
         'Send emails On Change',
         'Reply-to email addresses Not set Manage',
         'Email branding GOV.UK Change',
+        'Send files by email Off Change',
 
         'Label Value Action',
         'Send text messages On Change',
@@ -82,6 +84,7 @@ def mock_get_service_settings_page_common(
         'Send emails On Change',
         'Reply-to email addresses Not set Manage',
         'Email branding GOV.UK Change',
+        'Send files by email Off Change',
 
         'Label Value Action',
         'Send text messages On Change',
@@ -103,7 +106,6 @@ def mock_get_service_settings_page_common(
         'Data retention email Change',
         'Receive inbound SMS Off Change',
         'Email authentication Off Change',
-        'Send files by email Off Change',
     ]),
 ])
 def test_should_show_overview(
@@ -152,12 +154,13 @@ def test_no_go_live_link_for_service_without_organisation(
     page = client_request.get('main.service_settings', service_id=SERVICE_ONE_ID)
 
     assert page.find('h1').text == 'Settings'
-    assert normalize_spaces(page.select('tr')[16].text) == (
-        'Live No (organisation must be set first)'
-    )
-    assert normalize_spaces(page.select('tr')[18].text) == (
-        'Organisation Not set Central government Change'
-    )
+
+    is_live = find_element_by_tag_and_partial_text(page, tag='td', string='Live')
+    assert normalize_spaces(is_live.find_next_sibling().text) == 'No (organisation must be set first)'
+
+    organisation = find_element_by_tag_and_partial_text(page, tag='td', string='Organisation')
+    assert normalize_spaces(organisation.find_next_siblings()[0].text) == 'Not set Central government'
+    assert normalize_spaces(organisation.find_next_siblings()[1].text) == 'Change'
 
 
 def test_organisation_name_links_to_org_dashboard(
@@ -180,7 +183,7 @@ def test_organisation_name_links_to_org_dashboard(
         'main.service_settings', service_id=SERVICE_ONE_ID
     )
 
-    org_row = response.select('tr')[18]
+    org_row = find_element_by_tag_and_partial_text(response, tag='tr', string='Organisation')
     assert org_row.find('a')['href'] == url_for('main.organisation_dashboard', org_id=ORGANISATION_ID)
     assert normalize_spaces(org_row.find('a').text) == 'Test Organisation'
 
@@ -195,6 +198,7 @@ def test_organisation_name_links_to_org_dashboard(
         'Send emails On Change',
         'Reply-to email addresses test@example.com Manage',
         'Email branding Organisation name Change',
+        'Send files by email Off Change',
 
         'Label Value Action',
         'Send text messages On Change',
@@ -216,6 +220,7 @@ def test_organisation_name_links_to_org_dashboard(
         'Send emails On Change',
         'Reply-to email addresses test@example.com Manage',
         'Email branding Organisation name Change',
+        'Send files by email Off Change',
 
         'Label Value Action',
         'Send text messages On Change',
@@ -1917,14 +1922,14 @@ def test_and_more_hint_appears_on_settings_with_more_than_just_a_single_sender(
         service_id=service_one['id']
     )
 
-    def get_row(page, index):
+    def get_row(page, label):
         return normalize_spaces(
-            page.select('tbody tr')[index].text
+            find_element_by_tag_and_partial_text(page, tag='tr', string=label).text
         )
 
-    assert get_row(page, 3) == "Reply-to email addresses test@example.com …and 2 more Manage"
-    assert get_row(page, 6) == "Text message senders Example …and 2 more Manage"
-    assert get_row(page, 11) == "Sender addresses 1 Example Street …and 2 more Manage"
+    assert get_row(page, 'Reply-to email addresses') == "Reply-to email addresses test@example.com …and 2 more Manage"
+    assert get_row(page, 'Text message senders') == "Text message senders Example …and 2 more Manage"
+    assert get_row(page, 'Sender addresses') == "Sender addresses 1 Example Street …and 2 more Manage"
 
 
 @pytest.mark.parametrize('sender_list_page, index, expected_output', [
@@ -3713,7 +3718,7 @@ def test_switch_service_enable_international_sms(
     (['upload_document'], 'http://example.com/', []),
     ([], '0207 123 4567', ['upload_document']),
 ])
-def test_service_switch_can_upload_document_shows_permission_page_if_service_contact_details_exist(
+def test_service_switch_can_upload_document_changes_permission_if_service_contact_details_exist(
     platform_admin_client,
     service_one,
     mock_update_service,
@@ -3734,7 +3739,8 @@ def test_service_switch_can_upload_document_shows_permission_page_if_service_con
         follow_redirects=True
     )
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    assert normalize_spaces(page.h1.text) == 'Send files by email'
+    assert normalize_spaces(page.h1.text) == 'Settings'
+    mock_update_service.assert_called_with(SERVICE_ONE_ID, permissions=end_permissions)
 
 
 def test_service_switch_can_upload_document_turning_permission_on_with_no_contact_details_shows_form(
@@ -3761,7 +3767,7 @@ def test_service_switch_can_upload_document_turning_permission_on_with_no_contac
     ('email_address', 'old@example.com'),
     ('phone_number', '0207 12345'),
 ])
-def test_service_switch_can_upload_document_lets_contact_details_be_added_and_shows_permission_page(
+def test_service_switch_can_upload_document_lets_contact_details_be_added_and_changes_setting(
     platform_admin_client,
     service_one,
     mock_update_service,
@@ -3773,6 +3779,7 @@ def test_service_switch_can_upload_document_lets_contact_details_be_added_and_sh
     contact_details_type,
     contact_details_value,
 ):
+    service_one['permissions'] = []
     data = {'contact_details_type': contact_details_type, contact_details_type: contact_details_value}
 
     response = platform_admin_client.post(
@@ -3782,7 +3789,8 @@ def test_service_switch_can_upload_document_lets_contact_details_be_added_and_sh
     )
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
-    assert normalize_spaces(page.h1.text) == 'Send files by email'
+    assert normalize_spaces(page.h1.text) == 'Settings'
+    mock_update_service.assert_called_with(SERVICE_ONE_ID, permissions=['upload_document'])
 
 
 @pytest.mark.parametrize('user', (
@@ -4958,7 +4966,7 @@ def test_service_settings_links_to_branding_request_page_for_letters(
     page = client_request.get(
         '.service_settings', service_id=SERVICE_ONE_ID
     )
-    assert len(page.findAll('a', attrs={'href': '/services/{}/branding-request/letter'.format(SERVICE_ONE_ID)})) == 1
+    assert len(page.find_all('a', attrs={'href': '/services/{}/branding-request/letter'.format(SERVICE_ONE_ID)})) == 1
 
 
 def test_show_service_data_retention(
