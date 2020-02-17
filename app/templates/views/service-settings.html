@@ -110,6 +110,16 @@
           )}}
         {% endcall %}
 
+        {% call settings_row(if_has_permission='email') %}
+          {{ text_field('Send files by email') }}
+          {{ boolean_field('upload_document' in current_service.permissions) }}
+          {{ edit_field(
+            'Change',
+            url_for('.service_switch_can_upload_document', service_id=current_service.id),
+            permissions=['manage_service'],
+          )}}
+        {% endcall %}
+
       {% endcall %}
 
       {% call mapping_table(
