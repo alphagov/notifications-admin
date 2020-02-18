@@ -151,7 +151,7 @@
   display: flex;
   align-items: baseline;
   flex-wrap: wrap;
-  padding: $gutter-two-thirds 0;
+  padding: ($gutter-two-thirds - 1px) 0 ($gutter-two-thirds + 1px) 0;
   border-top: 1px solid $border-colour;
   border-bottom: 1px solid $border-colour;
   margin-bottom: $gutter;
