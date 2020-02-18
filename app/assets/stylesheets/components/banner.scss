@@ -151,7 +151,7 @@
   display: flex;
   align-items: baseline;
   flex-wrap: wrap;
-  padding: ($gutter-two-thirds - 1px) 0 ($gutter-two-thirds + 1px) 0;
+  padding: ($gutter-half - 1px) 0 ($gutter-half + 1px) 0;
   border-top: 1px solid $border-colour;
   border-bottom: 1px solid $border-colour;
   margin-bottom: $gutter;
@@ -181,6 +181,7 @@
     @include govuk-font(24, $weight: bold);
     text-decoration: underline;
     padding-right: govuk-spacing(6);
+    margin: 10px 0px 5px; // 10px includes 5px extra to counter the -5px margin-top on the count item
     flex: 2 1 auto;
   }
 
