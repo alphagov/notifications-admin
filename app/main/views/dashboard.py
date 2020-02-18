@@ -280,15 +280,8 @@ def get_dashboard_partials(service_id):
     all_statistics = template_statistics_client.get_template_statistics_for_service(service_id, limit_days=7)
     template_statistics = aggregate_template_usage(all_statistics)
     stats = aggregate_notifications_stats(all_statistics)
-    column_width, max_notifiction_count = get_column_properties(3)
 
     dashboard_totals = get_dashboard_totals(stats),
-    highest_notification_count = max(
-        sum(
-            value[key] for key in {'requested', 'failed', 'delivered'}
-        )
-        for key, value in dashboard_totals[0].items()
-    )
     free_sms_allowance = billing_api_client.get_free_sms_fragment_limit_for_year(
         current_service.id,
         get_current_financial_year(),
@@ -312,10 +305,6 @@ def get_dashboard_partials(service_id):
             'views/dashboard/_totals.html',
             service_id=service_id,
             statistics=dashboard_totals[0],
-            column_width=column_width,
-            smaller_font_size=(
-                highest_notification_count > max_notifiction_count
-            ),
         ),
         'template-statistics': render_template(
             'views/dashboard/template-statistics.html',
@@ -330,7 +319,6 @@ def get_dashboard_partials(service_id):
         ),
         'usage': render_template(
             'views/dashboard/_usage.html',
-            column_width=column_width,
             **calculate_usage(yearly_usage, free_sms_allowance),
         ),
     }
@@ -505,10 +493,3 @@ def get_tuples_of_financial_years(
         )
         for year in range(start, end + 1)
     )
-
-
-def get_column_properties(number_of_columns):
-    return {
-        2: ('column-half', 999999999),
-        3: ('column-third', 99999),
-    }.get(number_of_columns)

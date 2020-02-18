@@ -1960,7 +1960,7 @@ def mock_get_inbound_sms_summary(mocker):
         service_id,
     ):
         return {
-            'count': 99,
+            'count': 9999,
             'most_recent': datetime.utcnow().isoformat()
         }
 
