@@ -222,11 +222,11 @@ def test_inbound_messages_shows_count_of_messages_when_there_are_messages(
         'main.service_dashboard',
         service_id=SERVICE_ONE_ID,
     )
-    banner = page.select_one('a.banner-dashboard')
+
     assert normalize_spaces(
-        banner.text
-    ) == '9,999 text messages received latest message just now'
-    assert banner['href'] == url_for(
+        page.select('.big-number-meta-wrapper')[0].text
+    ) == '99 text messages received latest message just now'
+    assert page.select('.big-number-meta-wrapper a')[0]['href'] == url_for(
         'main.inbox', service_id=SERVICE_ONE_ID
     )
 
@@ -248,9 +248,9 @@ def test_inbound_messages_shows_count_of_messages_when_there_are_no_messages(
         'main.service_dashboard',
         service_id=SERVICE_ONE_ID,
     )
-    banner = page.select_one('a.banner-dashboard')
-    assert normalize_spaces(banner.text) == '0 text messages received'
-    assert banner['href'] == url_for(
+
+    assert normalize_spaces(page.select('.big-number-meta-wrapper')[0].text) == '0 text messages received'
+    assert page.select('.big-number-meta-wrapper a')[0]['href'] == url_for(
         'main.inbox', service_id=SERVICE_ONE_ID
     )
 
@@ -553,7 +553,7 @@ def test_should_not_show_recent_templates_on_dashboard_if_only_one_template_used
     expected_count = stats[0]['count']
     assert expected_count == 50
     assert normalize_spaces(
-        page.select_one('#total-sms .big-number-smaller').text
+        page.select_one('#total-sms .big-number').text
     ) == (
         '{} text messages sent'.format(expected_count)
     )
@@ -713,13 +713,14 @@ def test_should_show_upcoming_jobs_on_dashboard(
     ['email', 'sms'],
     ['email', 'sms', 'letter'],
 ))
-@pytest.mark.parametrize('totals', [
+@pytest.mark.parametrize('totals, big_number_class', [
     (
         {
             'email': {'requested': 0, 'delivered': 0, 'failed': 0},
             'sms': {'requested': 99999, 'delivered': 0, 'failed': 0},
             'letter': {'requested': 99999, 'delivered': 0, 'failed': 0}
         },
+        '.big-number',
     ),
     (
         {
@@ -727,6 +728,7 @@ def test_should_show_upcoming_jobs_on_dashboard(
             'sms': {'requested': 0, 'delivered': 0, 'failed': 0},
             'letter': {'requested': 100000, 'delivered': 0, 'failed': 0},
         },
+        '.big-number-smaller',
     ),
 ])
 def test_correct_font_size_for_big_numbers(
@@ -741,6 +743,7 @@ def test_correct_font_size_for_big_numbers(
     service_one,
     permissions,
     totals,
+    big_number_class,
 ):
 
     service_one['permissions'] = permissions
@@ -755,12 +758,11 @@ def test_correct_font_size_for_big_numbers(
         service_id=service_one['id'],
     )
 
-    assert (
-        len(page.select_one('[data-key=totals]').select('.column-third'))
-    ) == (
-        len(page.select_one('[data-key=usage]').select('.column-third'))
-    ) == (
-        len(page.select('.big-number-with-status .big-number-smaller'))
+    assert len(page.select_one('[data-key=totals]').select('.column-third')) == 3
+    assert len(page.select_one('[data-key=usage]').select('.column-third')) == 3
+
+    assert len(
+        page.select('.big-number-with-status {}'.format(big_number_class))
     ) == 3
 
 
