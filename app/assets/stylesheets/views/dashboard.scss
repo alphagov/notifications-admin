@@ -1,15 +1,7 @@
 .dashboard {
 
-  table {
-    th {
-      @include core-19;
-      border-bottom: 0;
-    }
-
-    td {
-      @include core-19;
-      border: 0;
-    }
+  th {
+    font-weight: normal;
   }
 
   > .heading-medium:first-of-type {
@@ -34,15 +26,17 @@
   color: $text-colour;
   text-align: left;
 
-  span {
+  &-bar {
+    @include bold-27;
     box-sizing: border-box;
     display: inline-block;
     overflow: visible;
     background: $panel-colour;
     color: $black;
-    padding: 5px 5px 2px 5px;
-    text-indent: -2px;
-    margin: 3px 0 5px 0;
+    padding: 10px 6px 8px 0;
+    text-indent: 12px;
+    text-align: right;
+    margin: 2px 0 1px 0;
     transition: width 0.6s ease-in-out;
   }
 
@@ -82,19 +76,6 @@
 .failure-highlight {
   @include bold-19;
   color: $error-colour;
-}
-
-.template-usage-table {
-
-  border-top: 1px solid $border-colour;
-  border-bottom: 1px solid $border-colour;
-  margin-top: 10px;
-  margin-bottom: $gutter * 1.3333;
-
-  .table {
-    margin-bottom: 5px;
-  }
-
 }
 
 .align-with-message-body {
