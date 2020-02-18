@@ -34,6 +34,7 @@ class User(JSONModel, UserMixin):
         'auth_type',
         'current_session_id',
         'failed_login_count',
+        'email_access_validated_at',
         'logged_in_at',
         'mobile_number',
         'password_changed_at',
@@ -105,8 +106,8 @@ class User(JSONModel, UserMixin):
         response = user_api_client.update_user_attribute(self.id, **kwargs)
         self.__init__(response)
 
-    def update_password(self, password):
-        response = user_api_client.update_password(self.id, password)
+    def update_password(self, password, from_email=False):
+        response = user_api_client.update_password(self.id, password, from_email=from_email)
         self.__init__(response)
 
     def password_changed_more_recently_than(self, datetime_string):

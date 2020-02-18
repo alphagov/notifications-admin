@@ -676,3 +676,9 @@ def format_thousands(value):
     if value is None:
         return ''
     return value
+
+
+def is_less_than_90_days_ago(date_from_db):
+    return (datetime.utcnow() - datetime.strptime(
+        date_from_db, "%Y-%m-%dT%H:%M:%S.%fZ"
+    )).days < 90

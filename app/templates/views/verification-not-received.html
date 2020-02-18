@@ -11,18 +11,24 @@
   <div class="column-two-thirds">
     <h1 class="heading-large">Resend security code</h1>
 
-    <p>Text messages sometimes take a few minutes to arrive. If you do not receive the text message, you can resend it.</p>
+    <p>Text messages sometimes take a few minutes to arrive. If you do not receive a security code, Notify can send you a new one.</p>
+    <p>
+      {{ govukButton({
+        "element": "a",
+        "text": "Resend security code",
+        "href": url_for('main.check_and_resend_verification_code')
+      }) }}
+    </p>
 
-    <p>If you no longer have access to the phone with the number you registered for this service, speak to your service manager to reset the number.</p>
-
-
-      <p>
-        {{ govukButton({
-          "element": "a",
-          "text": "Resend security code",
-          "href": url_for('main.check_and_resend_verification_code')
-        }) }}
-      </p>
+    <h2 class="heading-medium">If your mobile number has changed</h2>
+    <p>You’ll need to:</p>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>find a member of your team who has permission to manage settings, team and usage</li>
+      <li>ask them to change the mobile number for your account</li>
+      <li>select <span class="govuk-body govuk-!-font-weight-bold">Resend security code</span></li>
+    </ul>
+  </div>
+</div>
   </div>
 </div>
 
