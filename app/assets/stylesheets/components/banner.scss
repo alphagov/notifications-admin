@@ -168,7 +168,7 @@
 
   &-count {
     @include govuk-font(36, $weight: bold);
-    padding-right: 5px;
+    padding-right: 8px;
     position: relative;
     // remove the top of the extra line-height this introduces
     top: $baseline-shift;
