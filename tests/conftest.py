@@ -2688,6 +2688,14 @@ def client_request(
                 yield session
 
         @staticmethod
+        def check_current_time():
+            if datetime.utcnow().strftime('%Y') < '2011':
+                raise ValueError(
+                    'You can’t freeze time to before 2011 because it '
+                    'breaks the session serializer'
+                )
+
+        @staticmethod
         def login(user, service=service_one):
             logged_in_client.login(user, mocker, service)
 
@@ -2722,6 +2730,7 @@ def client_request(
             _test_page_title=True,
             **endpoint_kwargs
         ):
+            ClientRequest.check_current_time()
             resp = logged_in_client.get(
                 url,
                 follow_redirects=_follow_redirects,
@@ -2750,6 +2759,7 @@ def client_request(
             _expected_redirect=None,
             **endpoint_kwargs
         ):
+            ClientRequest.check_current_time()
             if _expected_status is None:
                 _expected_status = 200 if _follow_redirects else 302
             resp = logged_in_client.post(

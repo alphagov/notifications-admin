@@ -516,3 +516,16 @@ def test_get_letter_validation_error_for_known_errors(
 @freeze_time('2020-02-14T12:00:00')
 def test_is_less_than_90_days_ago(date_from_db, expected_result):
     assert is_less_than_90_days_ago(date_from_db) == expected_result
+
+
+@pytest.mark.parametrize('method', ('get', 'post'))
+@freeze_time('2010-12-31 23:59:59')
+def test_freeze_time_before_2010_warning(client_request, method):
+    with pytest.raises(ValueError) as exception:
+        getattr(client_request, method)('main.index')
+    assert str(
+        exception.value
+    ) == (
+        'You can’t freeze time to before 2011 because it breaks the '
+        'session serializer'
+    )
