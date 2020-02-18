@@ -51,66 +51,6 @@
 
 }
 
-.template-statistics-table {
-
-  .table {
-    table-layout: fixed;
-  }
-
-  .table-heading {
-    @include core-19;
-    margin: 0 0 10px 0;
-  }
-
-  .table-field-heading-first {
-    width: 52.5%;
-  }
-
-  .table-row {
-    th {
-      display: table-cell;
-      width: 52.5%;
-      font-weight: normal;
-
-      .hint,
-      p {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-    }
-  }
-
-  &-template-name {
-
-    @include bold-24;
-    display: block;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    padding: 10px 0 32px 0;
-    margin: -10px 0 -32px 0;
-
-    &:focus {
-
-      color: $text-colour;
-
-      & + .template-statistics-table-hint {
-        color: $text-colour;
-      }
-
-    }
-
-  }
-
-  &-hint {
-    @include core-19;
-    color: $secondary-text-colour;
-    pointer-events: none;
-  }
-
-}
-
 .settings-table {
 
   table {
