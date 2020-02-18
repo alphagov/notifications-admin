@@ -26,7 +26,7 @@
   <p>To change your email branding:</p>
 
   <ol class="list list-number">
-    <li>Go to the <b class="govuk-!-font-weight-bold">Email settings</b> section of the <b class="govuk-!-font-weight-bold"><a href="{{ url_for('.settings', service_id=current_service.id) }}">Settings</a></b> page.</li>
+    <li>Go to the <b class="govuk-!-font-weight-bold">Email settings</b> section of the <b class="govuk-!-font-weight-bold"><a href="{{ url_for('main.service_settings', service_id=current_service.id) }}">Settings</a></b> page.</li>
     <li>Select <b class="govuk-!-font-weight-bold">Change</b> on the <b class="govuk-!-font-weight-bold">Email branding</b> row.</li>
   </ol>
 
@@ -37,7 +37,7 @@
   <p>To add a reply-to email address:</p>
 
   <ol class="list list-number">
-    <li>Go to the <b class="govuk-!-font-weight-bold">Email settings</b> section of the <b class="govuk-!-font-weight-bold"><a href="{{ url_for('.settings', service_id=current_service.id) }}">Settings</a></b> page.</li>
+    <li>Go to the <b class="govuk-!-font-weight-bold">Email settings</b> section of the <b class="govuk-!-font-weight-bold"><a href="{{ url_for('main.service_settings', service_id=current_service.id) }}">Settings</a></b> page.</li>
     <li>Select <b class="govuk-!-font-weight-bold">Manage</b> on the <b class="govuk-!-font-weight-bold">Reply-to email addresses</b> row.</li>
     <li>Select <b class="govuk-!-font-weight-bold">Add reply-to address</b>.</li>
   </ol>
@@ -49,7 +49,7 @@
   <p>To change the text message sender from the default of ‘GOVUK’:</p>
   
   <ol class="list list-number">
-    <li>Go to the <b class="govuk-!-font-weight-bold">Text message settings</b> section of the <b class="govuk-!-font-weight-bold"><a href="{{ url_for('.settings', service_id=current_service.id) }}">Settings</a></b> page.</li>
+    <li>Go to the <b class="govuk-!-font-weight-bold">Text message settings</b> section of the <b class="govuk-!-font-weight-bold"><a href="{{ url_for('main.service_settings', service_id=current_service.id) }}">Settings</a></b> page.</li>
     <li>Select <b class="govuk-!-font-weight-bold">Manage</b> on the <b class="govuk-!-font-weight-bold">Text message senders</b> row.</li>
     <li>Select <b class="govuk-!-font-weight-bold">Change</b> or <b class="govuk-!-font-weight-bold">Add text message sender</b>.</li>
 </ol>
@@ -61,7 +61,7 @@
   <p>To add a logo to your letters:</p>
   
   <ol class="list list-number">
-    <li>Go to the <b class="govuk-!-font-weight-bold">Letter settings</b> section of the <b class="govuk-!-font-weight-bold"><a href="{{ url_for('.settings', service_id=current_service.id) }}">Settings</a></b> page.</li>
+    <li>Go to the <b class="govuk-!-font-weight-bold">Letter settings</b> section of the <b class="govuk-!-font-weight-bold"><a href="{{ url_for('main.service_settings', service_id=current_service.id) }}">Settings</a></b> page.</li>
     <li>Select <b class="govuk-!-font-weight-bold">Change</b> on the <b class="govuk-!-font-weight-bold">Letter branding</b> row.</li>
   </ol>
 
