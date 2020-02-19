@@ -18,14 +18,14 @@
     </div>
     <div id='pill-selected-item'>
       <div class='govuk-grid-row'>
-        <div class='column-one-third'>
+        <div class='govuk-grid-column-one-third'>
           <h2 class='heading-small'>Emails</h2>
           <div class="keyline-block">
             {{ big_number(emails_sent, 'sent', smaller=True) }}
             {{ big_number("Unlimited", 'free allowance', smaller=True) }}
           </div>
         </div>
-        <div class='column-one-third'>
+        <div class='govuk-grid-column-one-third'>
           <h2 class='heading-small'>Text messages</h2>
           <div class="keyline-block">
             {{ big_number(sms_sent, 'sent', smaller=True) }}
@@ -40,7 +40,7 @@
             {% endif %}
           </div>
         </div>
-        <div class='column-one-third'>
+        <div class='govuk-grid-column-one-third'>
           <h2 class='heading-small'>Letters</h2>
           <div class="keyline-block">
             {{ big_number(letter_sent, 'sent', smaller=True) }}
@@ -49,12 +49,12 @@
       </div>
 
       <div class='govuk-grid-row'>
-        <div class='column-one-third'>
+        <div class='govuk-grid-column-one-third'>
           <div class="keyline-block">
             &nbsp;
           </div>
         </div>
-        <div class='column-one-third'>
+        <div class='govuk-grid-column-one-third'>
           <div class="keyline-block">
             {{ big_number(
               (sms_chargeable * sms_rate),
@@ -64,7 +64,7 @@
             ) }}
           </div>
         </div>
-        <div class='column-one-third'>
+        <div class='govuk-grid-column-one-third'>
           <div class="keyline-block">
             {{ big_number(
                 letter_cost,
@@ -124,7 +124,7 @@
     </div>
 
     <div class="govuk-grid-row">
-      <div class="column-one-third">
+      <div class="govuk-grid-column-one-third">
         <p class="align-with-heading-copy">
           Financial year ends 31&nbsp;March
         </p>

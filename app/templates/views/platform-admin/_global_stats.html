@@ -1,7 +1,7 @@
 {% from "components/big-number.html" import big_number_with_status %}
 {% from "components/message-count-label.html" import message_count_label %}
 <div class="govuk-grid-row bottom-gutter">
-  <div class="column-third">
+  <div class="govuk-grid-column-one-third">
     {{ big_number_with_status(
       global_stats.email.delivered + global_stats.email.failed,
       message_count_label(global_stats.email.delivered, 'email'),
@@ -11,7 +11,7 @@
       smaller=True
     ) }}
   </div>
-  <div class="column-third">
+  <div class="govuk-grid-column-one-third">
     {{ big_number_with_status(
       global_stats.sms.delivered + global_stats.sms.failed,
       message_count_label(global_stats.sms.delivered, 'sms'),
@@ -21,7 +21,7 @@
       smaller=True
     ) }}
   </div>
-  <div class="column-third">
+  <div class="govuk-grid-column-one-third">
     {{ big_number_with_status(
       global_stats.letter.requested,
       message_count_label(global_stats.letter.requested, 'letter'),

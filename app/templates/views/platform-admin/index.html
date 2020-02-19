@@ -34,7 +34,7 @@
 
   <div class="govuk-grid-row bottom-gutter">
     {% for noti_type in global_stats %}
-      <div class="column-third">
+      <div class="govuk-grid-column-one-third">
         {{ big_number_simple(
             noti_type.black_box.number,
             message_count_label(noti_type.black_box.number, noti_type.black_box.notification_type)
@@ -55,7 +55,7 @@
 
   <div class="govuk-grid-row bottom-gutter">
     {% for noti_type in global_stats %}
-      <div class="column-third">
+      <div class="govuk-grid-column-one-third">
         <div class="bordered-text-box">
           <span class="big-number-number">{{ "{:,}".format(noti_type.test_data.number) }}</span>
           {{ noti_type.test_data.label }}

@@ -20,7 +20,7 @@
   <div class="bottom-gutter">
     <div class="history-list-item">
       <div class="govuk-grid-row">
-        <div class="column-one-third">&nbsp;</div>
+        <div class="govuk-grid-column-one-third">&nbsp;</div>
         <div class="column-two-thirds">
           <div class="history-list-percentage-without-border">
             <div class="history-list-percentage-left-label">
@@ -60,7 +60,7 @@
       {% for version in versions %}
         <li class="history-list-item">
           <div class="govuk-grid-row">
-            <div class="column-one-third">
+            <div class="govuk-grid-column-one-third">
               <div class="history-list-user">
                 {{ version.created_by.name or ('&nbsp;'|safe) }}
               </div>

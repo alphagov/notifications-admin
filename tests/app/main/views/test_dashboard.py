@@ -895,9 +895,9 @@ def test_correct_font_size_for_big_numbers(
     )
 
     assert (
-        len(page.select_one('[data-key=totals]').select('.column-third'))
+        len(page.select_one('[data-key=totals]').select('.govuk-grid-column-one-third'))
     ) == (
-        len(page.select_one('[data-key=usage]').select('.column-third'))
+        len(page.select_one('[data-key=usage]').select('.govuk-grid-column-one-third'))
     ) == (
         len(page.select('.big-number-with-status .big-number-smaller'))
     ) == 3
@@ -996,7 +996,7 @@ def test_usage_page(
     mock_get_usage.assert_called_once_with(SERVICE_ONE_ID, 2011)
     mock_get_free_sms_fragment_limit.assert_called_with(SERVICE_ONE_ID, 2011)
 
-    cols = page.find_all('div', {'class': 'column-one-third'})
+    cols = page.find_all('div', {'class': 'govuk-grid-column-one-third'})
     nav = page.find('ul', {'class': 'pill', 'role': 'tablist'})
     nav_links = nav.find_all('a')
 
@@ -1038,7 +1038,7 @@ def test_usage_page_with_letters(
     mock_get_usage.assert_called_once_with(SERVICE_ONE_ID, 2011)
     mock_get_free_sms_fragment_limit.assert_called_with(SERVICE_ONE_ID, 2011)
 
-    cols = page.find_all('div', {'class': 'column-one-third'})
+    cols = page.find_all('div', {'class': 'govuk-grid-column-one-third'})
     nav = page.find('ul', {'class': 'pill', 'role': 'tablist'})
     nav_links = nav.find_all('a')
 
