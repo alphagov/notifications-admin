@@ -15,7 +15,7 @@
       back_link=url_for('.support')
     ) }}
     <div class="govuk-grid-row">
-      <div class="column-two-thirds">
+      <div class="govuk-grid-column-two-thirds">
         {% call form_wrapper() %}
             {{ textbox(form.feedback, width='1-1', hint='', rows=10, autosize=True) }}
             {% if not current_user.is_authenticated %}

@@ -2,7 +2,7 @@
   {% for message in conversation %}
     <div class="govuk-grid-row sms-message-row" id="n{{ message.id }}" tabindex="0">
       {% if message.inbound %}
-        <div class="column-two-thirds sms-message-inbound">
+        <div class="govuk-grid-column-two-thirds sms-message-inbound">
           {{ message.content | string }}
           <div class="sms-message-status">
             {{ message.created_at | format_datetime_relative }}
@@ -12,7 +12,7 @@
         <div class="govuk-grid-column-one-third">
           &nbsp;
         </div>
-        <div class="column-two-thirds">
+        <div class="govuk-grid-column-two-thirds">
           {{ message.content | string }}
           {% if message.status == 'delivered' %}
             <div class="sms-message-status sms-message-status-outbound">

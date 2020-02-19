@@ -81,7 +81,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
           <main class="column-three-quarters column-main">
             <form method="post" autocomplete="off">
               <div class="govuk-grid-row js-stick-at-top-when-scrolling">
-                <div class="column-two-thirds ">
+                <div class="govuk-grid-column-two-thirds ">
                   <div class="form-group" data-module="">
                     <label class="form-label" for="placeholder_value">
                       name
