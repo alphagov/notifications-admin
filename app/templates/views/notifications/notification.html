@@ -34,7 +34,7 @@
       {% elif created_by %}
         by {{ created_by.name }}
       {% endif %}
-      on {{ created_at|format_datetime_short }}
+      {{ created_at|format_datetime_human }}
     </p>
 
     {% if template.template_type == 'letter' %}

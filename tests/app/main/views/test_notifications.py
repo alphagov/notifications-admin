@@ -152,22 +152,43 @@ def test_notification_status_shows_expected_back_link(
         assert back_link is None
 
 
-@freeze_time("2012-01-01 01:01")
+@pytest.mark.parametrize('time_of_viewing_page, expected_message', (
+    ('2012-01-01 01:01', (
+        "‘sample template’ was sent by Test User today at 1:01am"
+    )),
+    ('2012-01-02 01:01', (
+        "‘sample template’ was sent by Test User yesterday at 1:01am"
+    )),
+    ('2012-01-03 01:01', (
+        "‘sample template’ was sent by Test User on 1 January at 1:01am"
+    )),
+    ('2013-01-03 01:01', (
+        "‘sample template’ was sent by Test User on 1 January 2012 at 1:01am"
+    )),
+))
 def test_notification_page_doesnt_link_to_template_in_tour(
+    mocker,
     client_request,
     fake_uuid,
     mock_get_notification,
+    time_of_viewing_page,
+    expected_message,
 ):
 
-    page = client_request.get(
-        'main.view_notification',
-        service_id=SERVICE_ONE_ID,
-        notification_id=fake_uuid,
-        help=3,
-    )
+    with freeze_time('2012-01-01 01:01'):
+        notification = create_notification()
+        mocker.patch('app.notification_api_client.get_notification', return_value=notification)
+
+    with freeze_time(time_of_viewing_page):
+        page = client_request.get(
+            'main.view_notification',
+            service_id=SERVICE_ONE_ID,
+            notification_id=fake_uuid,
+            help=3,
+        )
 
     assert normalize_spaces(page.select('main p:nth-of-type(1)')[0].text) == (
-        "‘sample template’ was sent by Test User on 1 January at 1:01am"
+        expected_message
     )
     assert len(page.select('main p:nth-of-type(1) a')) == 0
 
@@ -196,7 +217,7 @@ def test_notification_page_shows_page_for_letter_notification(
     )
 
     assert normalize_spaces(page.select('main p:nth-of-type(1)')[0].text) == (
-        "‘sample template’ was sent by Test User on 1 January at 1:01am"
+        "‘sample template’ was sent by Test User today at 1:01am"
     )
     assert normalize_spaces(page.select('main p:nth-of-type(2)')[0].text) == (
         'Printing starts today at 5:30pm'
@@ -230,13 +251,13 @@ def test_notification_page_shows_page_for_letter_notification(
 @pytest.mark.parametrize('is_precompiled_letter, expected_p1, expected_p2, expected_postage', (
     (
         True,
-        'Provided as PDF on 1 January at 1:01am',
+        'Provided as PDF today at 1:01am',
         'This letter passed our checks, but we will not print it because you used a test key.',
         'Postage: second class'
     ),
     (
         False,
-        '‘sample template’ was sent on 1 January at 1:01am',
+        '‘sample template’ was sent today at 1:01am',
         'We will not print this letter because you used a test key.',
         'Postage: second class',
     ),
@@ -377,7 +398,7 @@ def test_notification_page_shows_cancelled_or_failed_letter(
     )
 
     assert normalize_spaces(page.select('main p')[0].text) == (
-        "‘sample template’ was sent by Test User on 1 January at 1:01am"
+        "‘sample template’ was sent by Test User today at 1:01am"
     )
     assert normalize_spaces(page.select('main p')[1].text) == (
         expected_message
