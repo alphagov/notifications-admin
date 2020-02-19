@@ -1,6 +1,5 @@
 {% extends "content_template.html" %}
-{% from "components/table.html" import mapping_table, row, text_field, edit_field, field with context %}
-{% from "components/sub-navigation.html" import sub_navigation %}
+{% from "components/current-service-link.html" import current_service_link %}
 
 {% block per_page_title %}
   Branding and customisation
@@ -9,59 +8,59 @@
 {% block content_column_content %}
 
   <h1 class="heading-large">Branding and customisation</h1>
-  
+
   <p>This page explains how to:</p>
-  
+
   <ul class="list list-bullet">
     <li><a href="#email-branding">change your email branding</a></li>
     <li><a href="#reply-to-address">add a reply-to email address</a></li>
     <li><a href="#text-message-sender">change the text message sender</a></li>
     <li><a href="#letter-branding">change your letter branding</a></li>
   </ul>
-  
+
   <h2 class="heading-medium" id="email-branding">Change your email branding</h2>
 
   <p>The default branding for email templates is the GOV.UK logo.</p>
-  
+
   <p>To change your email branding:</p>
 
   <ol class="list list-number">
-    <li>Go to the <b class="govuk-!-font-weight-bold">Email settings</b> section of the <b class="govuk-!-font-weight-bold"><a href="{{ url_for('main.service_settings', service_id=current_service.id) }}">Settings</a></b> page.</li>
+    <li>Go to the <b class="govuk-!-font-weight-bold">Email settings</b> section of the {{ current_service_link('main.service_settings', 'settings') }} page.</li>
     <li>Select <b class="govuk-!-font-weight-bold">Change</b> on the <b class="govuk-!-font-weight-bold">Email branding</b> row.</li>
   </ol>
 
   <h2 class="heading-medium" id="reply-to-address">Add a reply-to email address</h2>
-  
+
   <p>You can choose the email address that your users reply to. You must add at least one reply-to address for your service before you can <a href="{{ url_for('main.trial_mode_new') }}">request to go live</a>.</p>
 
   <p>To add a reply-to email address:</p>
 
   <ol class="list list-number">
-    <li>Go to the <b class="govuk-!-font-weight-bold">Email settings</b> section of the <b class="govuk-!-font-weight-bold"><a href="{{ url_for('main.service_settings', service_id=current_service.id) }}">Settings</a></b> page.</li>
+    <li>Go to the <b class="govuk-!-font-weight-bold">Email settings</b> section of the {{ current_service_link('main.service_settings', 'settings') }} page.</li>
     <li>Select <b class="govuk-!-font-weight-bold">Manage</b> on the <b class="govuk-!-font-weight-bold">Reply-to email addresses</b> row.</li>
     <li>Select <b class="govuk-!-font-weight-bold">Add reply-to address</b>.</li>
   </ol>
-  
+
   <h2 class="heading-medium" id="text-message-sender">Change the text message sender</h2>
-  
+
   <p>The text message sender tells your users who the message is from.</p>
 
   <p>To change the text message sender from the default of ‘GOVUK’:</p>
-  
+
   <ol class="list list-number">
-    <li>Go to the <b class="govuk-!-font-weight-bold">Text message settings</b> section of the <b class="govuk-!-font-weight-bold"><a href="{{ url_for('main.service_settings', service_id=current_service.id) }}">Settings</a></b> page.</li>
+    <li>Go to the <b class="govuk-!-font-weight-bold">Text message settings</b> section of the {{ current_service_link('main.service_settings', 'settings') }} page.</li>
     <li>Select <b class="govuk-!-font-weight-bold">Manage</b> on the <b class="govuk-!-font-weight-bold">Text message senders</b> row.</li>
     <li>Select <b class="govuk-!-font-weight-bold">Change</b> or <b class="govuk-!-font-weight-bold">Add text message sender</b>.</li>
 </ol>
 
   <h2 class="heading-medium" id="letter-branding">Change your letter branding</h2>
-  
+
   <p>Letter templates do not have default branding.</p>
-    
+
   <p>To add a logo to your letters:</p>
-  
+
   <ol class="list list-number">
-    <li>Go to the <b class="govuk-!-font-weight-bold">Letter settings</b> section of the <b class="govuk-!-font-weight-bold"><a href="{{ url_for('main.service_settings', service_id=current_service.id) }}">Settings</a></b> page.</li>
+    <li>Go to the <b class="govuk-!-font-weight-bold">Letter settings</b> section of the {{ current_service_link('main.service_settings', 'settings') }} page.</li>
     <li>Select <b class="govuk-!-font-weight-bold">Change</b> on the <b class="govuk-!-font-weight-bold">Letter branding</b> row.</li>
   </ol>
 
