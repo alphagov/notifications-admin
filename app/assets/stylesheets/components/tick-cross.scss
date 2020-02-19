@@ -23,12 +23,10 @@
 
   &-list {
 
-    @extend %grid-row;
     position: relative;
 
     &-permissions {
 
-      @include grid-column(3/4);
       margin-top: 5px;
 
       li {

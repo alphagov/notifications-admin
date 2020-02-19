@@ -28,7 +28,7 @@
   }
 
   $paneWrapper.append($previewPane);
-  $form.find('.grid-row').eq(0).prepend($paneWrapper);
+  $form.find('.govuk-grid-row').eq(0).prepend($paneWrapper);
   $form.attr('action', location.pathname.replace(new RegExp(`set-${previewType}-branding$`), `preview-${previewType}-branding`));
   $form.find('button[type="submit"]').text('Save');
 

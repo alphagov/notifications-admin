@@ -1,6 +1,6 @@
 <div class="ajax-block-container">
   {% for message in conversation %}
-    <div class="grid-row sms-message-row" id="n{{ message.id }}" tabindex="0">
+    <div class="govuk-grid-row sms-message-row" id="n{{ message.id }}" tabindex="0">
       {% if message.inbound %}
         <div class="column-two-thirds sms-message-inbound">
           {{ message.content | string }}

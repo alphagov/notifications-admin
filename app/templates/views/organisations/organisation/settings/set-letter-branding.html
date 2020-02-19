@@ -16,11 +16,11 @@
     back_link=url_for('.organisation_settings', org_id=current_org.id)
   ) }}
   {% call form_wrapper(data_kwargs={'preview-type': 'letter'}) %}
-    <div class="grid-row">
+    <div class="govuk-grid-row">
       <div class="column-full preview-pane">
       </div>
     </div>
-    <div class="grid-row">
+    <div class="govuk-grid-row">
       <div class="column-full">
         {{ live_search(target_selector='.multiple-choice', show=True, form=search_form, label='Search by name') }}
         {{ radios(form.branding_style, hide_legend=True) }}

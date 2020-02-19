@@ -14,7 +14,7 @@
     'Letter contact details',
     back_link=None if request.args.get('from_template') else url_for('.service_settings', service_id=current_service.id)
   ) }}
-  <div class="grid-row">
+  <div class="govuk-grid-row">
     {% call form_wrapper(class="column-half") %}
       {{ textbox(
         form.letter_contact_block,

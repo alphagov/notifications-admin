@@ -14,7 +14,7 @@
     "Crown organisation",
     back_link=url_for('.organisation_settings', org_id=current_org.id)
   ) }}
-  <div class="grid-row">
+  <div class="govuk-grid-row">
     <div class="column-five-sixths">
       {% call form_wrapper() %}
         {{ radios(form.crown_status) }}

@@ -181,12 +181,12 @@ def test_old_integration_testing_page(
         'main.integration_testing',
         _expected_status=410,
     )
-    assert normalize_spaces(page.select_one('.grid-row').text) == (
+    assert normalize_spaces(page.select_one('.govuk-grid-row').text) == (
         'Integration testing '
         'This information has moved. '
         'Refer to the documentation for the client library you are using.'
     )
-    assert page.select_one('.grid-row a')['href'] == url_for(
+    assert page.select_one('.govuk-grid-row a')['href'] == url_for(
         'main.documentation'
     )
 

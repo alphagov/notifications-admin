@@ -61,8 +61,8 @@ describe('Preview pane', () => {
     // set up DOM
     document.body.innerHTML =
       `<form method="post" action="${emailPageURL}" autocomplete="off" data-preview-type="email" novalidate>
-        <div class="grid-row"></div>
-        <div class="grid-row">
+        <div class="govuk-grid-row"></div>
+        <div class="govuk-grid-row">
           <div class="column-full">
             <div data-module="autofocus">
               <div class="live-search js-header" data-module="live-search" data-targets=".multiple-choice">

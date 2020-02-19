@@ -38,8 +38,8 @@
             {% endif %}
           </span>
         </h3>
-        <ul class="tick-cross-list">
-          <div class="tick-cross-list-permissions">
+        <ul class="tick-cross-list govuk-grid-row">
+          <div class="tick-cross-list-permissions govuk-grid-column-three-quarters">
             {% for permission, label in permissions %}
               {{ tick_cross(
                 user.has_permission_for_service(current_service.id, permission),

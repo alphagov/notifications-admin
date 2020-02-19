@@ -77,10 +77,10 @@ describe("Stick to top/bottom of window when scrolling", () => {
     beforeEach(() => {
 
       document.body.innerHTML = `
-        <div class="grid-row">
+        <div class="govuk-grid-row">
           <main class="column-three-quarters column-main">
             <form method="post" autocomplete="off">
-              <div class="grid-row js-stick-at-top-when-scrolling">
+              <div class="govuk-grid-row js-stick-at-top-when-scrolling">
                 <div class="column-two-thirds ">
                   <div class="form-group" data-module="">
                     <label class="form-label" for="placeholder_value">
@@ -98,7 +98,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
         </div>
         <footer class="js-footer"></footer>`;
 
-      inputForm = document.querySelector('form > .grid-row');
+      inputForm = document.querySelector('form > .govuk-grid-row');
       formFooter = document.querySelector('.page-footer');
       footer = document.querySelector('.js-footer');
 
