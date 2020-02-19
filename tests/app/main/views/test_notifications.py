@@ -247,6 +247,51 @@ def test_notification_page_shows_page_for_letter_notification(
     assert mock_page_count.call_args_list[0][1]['values'] == {'name': 'Jo'}
 
 
+@freeze_time("2020-01-01 00:00")
+def test_notification_page_shows_uploaded_letter(
+    client_request,
+    mocker,
+    fake_uuid,
+):
+    mocker.patch(
+        'app.main.views.notifications.view_letter_notification_as_preview',
+        return_value=(b'foo', {
+            'message': '',
+            'invalid_pages': '[]',
+            'page_count': '1'
+        })
+    )
+    mocker.patch(
+        'app.main.views.notifications.pdf_page_count',
+        return_value=1
+    )
+    mocker.patch(
+        'app.main.views.notifications.get_page_count_for_letter',
+        return_value=1,
+    )
+
+    notification = create_notification(
+        notification_status='created',
+        template_type='letter',
+        is_precompiled_letter=True,
+        sent_one_off=True,
+    )
+    mocker.patch('app.notification_api_client.get_notification', return_value=notification)
+
+    page = client_request.get(
+        'main.view_notification',
+        service_id=SERVICE_ONE_ID,
+        notification_id=fake_uuid,
+    )
+
+    assert normalize_spaces(page.select('main p:nth-of-type(1)')[0].text) == (
+        'Uploaded by Test User yesterday at midnight'
+    )
+    assert normalize_spaces(page.select('main p:nth-of-type(2)')[0].text) == (
+        'Printing starts today at 5:30pm'
+    )
+
+
 @freeze_time("2016-01-01 01:01")
 @pytest.mark.parametrize('is_precompiled_letter, expected_p1, expected_p2, expected_postage', (
     (

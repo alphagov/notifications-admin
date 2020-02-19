@@ -17,7 +17,11 @@
     ) }}
     <p>
       {% if is_precompiled_letter %}
-        Provided as PDF
+        {% if created_by %}
+          Uploaded
+        {% else %}
+          Provided as PDF
+        {% endif %}
       {% else %}
         {% if help %}
           ‘{{ template.name }}’
