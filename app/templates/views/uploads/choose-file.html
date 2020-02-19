@@ -4,7 +4,7 @@
 {% from "components/page-header.html" import page_header %}
 
 {% block service_page_title %}
-  Upload a letter
+  Upload a one-off letter
 {% endblock %}
 
 {% block maincolumn_content %}
@@ -19,10 +19,10 @@
       {% endcall %}
     {% else %}
       {{ page_header(
-        'Upload a letter',
+        'Upload a one-off letter',
         back_link=url_for('main.uploads', service_id=current_service.id)
     ) }}
-    <p>Upload a single letter as a PDF and we'll print, pack and post it for you.</p>
+    <p>Upload a single letter as a PDF and we’ll print, pack and post it for you.</p>
     <p>You can use this feature if you send a lot of one-off letters or if our reusable letter templates do not meet your needs.</p>
     {% endif %}
 
