@@ -43,7 +43,7 @@ describe("Cookie message", () => {
       <div id="global-cookie-message" class="notify-cookie-banner" data-module="cookie-banner" role="region" aria-label="cookie banner" data-nosnippet="">
         <div class="notify-cookie-banner__wrapper govuk-width-container govuk-!-padding-4">
           <h2 class="notify-cookie-banner__heading govuk-heading-m">Cookies on GOV.UK Notify</h2>
-          <p class="notify-cookie-banner__message govuk-body">We use <a class="govuk-link" href="/cookies">small files called cookies</a> to make GOV.UK Notify work.</p>
+          <p class="notify-cookie-banner__message govuk-body">We use <a class="govuk-link govuk-link--no-visited-state" href="/cookies">small files called cookies</a> to make GOV.UK Notify work.</p>
           <div class="notify-cookie-banner__buttons notify-cookie-banner__no-js">
             <div class="notify-cookie-banner__button">
               <a href="/cookies" class="govuk-button notify-cookie-banner-button--inline" role="button" data-accept-cookies="true">Set cookie preferences</a>
@@ -64,7 +64,7 @@ describe("Cookie message", () => {
         </div>
         <div class="notify-cookie-banner__confirmation govuk-width-container" tabindex="-1">
           <p class="notify-cookie-banner__confirmation-message govuk-body">
-            You can <a class="govuk-link" href="/cookies">change your cookie settings</a> at any time.
+            You can <a class="govuk-link govuk-link--no-visited-state" href="/cookies">change your cookie settings</a> at any time.
           </p>
           <button class="notify-cookie-banner__hide-button" data-hide-cookie-banner="true">Hide</button>
         </div>
