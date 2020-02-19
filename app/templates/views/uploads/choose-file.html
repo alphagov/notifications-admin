@@ -22,6 +22,7 @@
         'Upload a letter',
         back_link=url_for('main.uploads', service_id=current_service.id)
     ) }}
+      <p>If a reusable letter template does not meet your needs, you can upload and send a one-off letter instead.</p>
     {% endif %}
 
   <p>
@@ -32,9 +33,10 @@
       show_errors=False
     )}}
   </p>
+
+  <h2 class="heading-medium">Your file must meet our letter specification TBC</h2>
   <p>You can upload a single letter as a PDF.</p>
   <p>Your file must meet our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.upload_a_letter', _anchor='letter-specification') }}">letter specification</a>.</p>
-
   </div>
 </div>
 {% endblock %}
