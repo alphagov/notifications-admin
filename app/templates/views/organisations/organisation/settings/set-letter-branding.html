@@ -17,11 +17,11 @@
   ) }}
   {% call form_wrapper(data_kwargs={'preview-type': 'letter'}) %}
     <div class="govuk-grid-row">
-      <div class="column-full preview-pane">
+      <div class="govuk-grid-column-full preview-pane">
       </div>
     </div>
     <div class="govuk-grid-row">
-      <div class="column-full">
+      <div class="govuk-grid-column-full">
         {{ live_search(target_selector='.multiple-choice', show=True, form=search_form, label='Search by name') }}
         {{ radios(form.branding_style, hide_legend=True) }}
       </div>

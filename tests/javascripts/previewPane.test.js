@@ -63,7 +63,7 @@ describe('Preview pane', () => {
       `<form method="post" action="${emailPageURL}" autocomplete="off" data-preview-type="email" novalidate>
         <div class="govuk-grid-row"></div>
         <div class="govuk-grid-row">
-          <div class="column-full">
+          <div class="govuk-grid-column-full">
             <div data-module="autofocus">
               <div class="live-search js-header" data-module="live-search" data-targets=".multiple-choice">
                 <div class="form-group">
@@ -81,7 +81,7 @@ describe('Preview pane', () => {
         </div>
       </form>`;
 
-    document.querySelector('.column-full').appendChild(helpers.getRadioGroup(brands));
+    document.querySelector('.govuk-grid-column-full').appendChild(helpers.getRadioGroup(brands));
     form = document.querySelector('form');
     radios = form.querySelector('fieldset');
 
