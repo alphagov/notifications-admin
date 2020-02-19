@@ -1,0 +1,7 @@
+{% macro current_service_link(endpoint, link_text) %}
+  {% if current_service %}
+    <a class="govuk-link" href="{{ url_for(endpoint, service_id=current_service.id) }}">{{ link_text }}</a>
+  {% else %}
+    <b class="govuk-!-font-weight-bold">{{ link_text|capitalize }}</b>
+  {% endif %}
+{% endmacro %}
