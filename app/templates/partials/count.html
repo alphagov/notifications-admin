@@ -5,7 +5,7 @@
   {% if notifications_deleted %}
     <div class="govuk-grid-row bottom-gutter-1-2">
       {% for label, query_param, url, count in counts %}
-        <div class="column-one-quarter">
+        <div class="govuk-grid-column-one-quarter">
           {{ big_number(count, label, smaller=True) }}
         </div>
       {% endfor %}

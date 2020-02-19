@@ -9,7 +9,7 @@
 ) %}
   {% if show_heading %}
     <div class="govuk-grid-row">
-      <div class="column-one-quarter">
+      <div class="govuk-grid-column-one-quarter">
         <h2>
           {{ heading }}
         </h2>
@@ -57,7 +57,7 @@
 
     {% if current_user.platform_admin %}
       <div class="govuk-grid-row">
-        <div class="column-one-quarter">
+        <div class="govuk-grid-column-one-quarter">
           <h2>
             Platform admin
           </h2>
@@ -103,7 +103,7 @@
     <div class="js-stick-at-bottom-when-scrolling">
       {% if current_user.has_access_to_live_and_trial_mode_services %}
         <div class="govuk-grid-row">
-          <div class="column-one-quarter">
+          <div class="govuk-grid-column-one-quarter">
             &nbsp;
           </div>
           <div class="column-three-quarters">
