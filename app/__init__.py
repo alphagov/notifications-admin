@@ -291,7 +291,7 @@ def format_time_24h(date):
     return utc_string_to_aware_gmt_datetime(date).strftime('%H:%M')
 
 
-def get_human_day(time):
+def get_human_day(time, date_prefix=''):
 
     #  Add 1 minute to transform 00:00 into ‘midnight today’ instead of ‘midnight tomorrow’
     date = (utc_string_to_aware_gmt_datetime(time) - timedelta(minutes=1)).date()
@@ -304,8 +304,15 @@ def get_human_day(time):
     if date == (now - timedelta(days=1)).date():
         return 'yesterday'
     if date.strftime('%Y') != now.strftime('%Y'):
-        return '{} {}'.format(_format_datetime_short(date), date.strftime('%Y'))
-    return _format_datetime_short(date)
+        return '{} {} {}'.format(
+            date_prefix,
+            _format_datetime_short(date),
+            date.strftime('%Y'),
+        ).strip()
+    return '{} {}'.format(
+        date_prefix,
+        _format_datetime_short(date),
+    ).strip()
 
 
 def format_time(date):
@@ -332,6 +339,17 @@ def format_date_short(date):
 
 def format_date_human(date):
     return get_human_day(date)
+
+
+def format_datetime_human(date, date_prefix=''):
+    return '{} at {}'.format(
+        get_human_day(date, date_prefix='on'),
+        format_time(date),
+    )
+
+
+def format_day_of_week(date):
+    return utc_string_to_aware_gmt_datetime(date).strftime('%A')
 
 
 def _format_datetime_short(datetime):
@@ -742,7 +760,9 @@ def add_template_filters(application):
         format_date_human,
         format_date_normal,
         format_date_short,
+        format_datetime_human,
         format_datetime_relative,
+        format_day_of_week,
         format_delta,
         format_notification_status,
         format_notification_type,

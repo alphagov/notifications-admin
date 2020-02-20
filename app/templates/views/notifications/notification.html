@@ -17,7 +17,11 @@
     ) }}
     <p>
       {% if is_precompiled_letter %}
-        Provided as PDF
+        {% if created_by %}
+          Uploaded
+        {% else %}
+          Provided as PDF
+        {% endif %}
       {% else %}
         {% if help %}
           ‘{{ template.name }}’
@@ -34,7 +38,7 @@
       {% elif created_by %}
         by {{ created_by.name }}
       {% endif %}
-      on {{ created_at|format_datetime_short }}
+      {{ created_at|format_datetime_human }}
     </p>
 
     {% if template.template_type == 'letter' %}
@@ -67,7 +71,7 @@
             {{ letter_print_day }}
           </p>
           <p>
-            Estimated delivery date: {{ estimated_letter_delivery_date|string|format_date_short }}
+            Estimated delivery date: {{ estimated_letter_delivery_date|format_day_of_week }} {{ estimated_letter_delivery_date|format_date_short }}
           </p>
         {% endif %}
       {% endif %}
