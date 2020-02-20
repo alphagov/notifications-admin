@@ -29,7 +29,7 @@
  */
 
 .breadcrumbs {
-  @extend %site-width-container;
+  @include govuk-width-container;
   @include core-16($line-height: (25 / 16), $line-height-640: 1.75);
 
   padding: $gutter-one-third 0;

@@ -18,7 +18,7 @@ $button-shadow-size: $govuk-border-width-form-element;
 
     &-wrapper {
 
-      @extend %site-width-container;
+      @include govuk-width-container;
 
       @include media(desktop) {
         background-image: file-url('product/proposition-illustration.png');
@@ -57,7 +57,7 @@ $button-shadow-size: $govuk-border-width-form-element;
 
   &-section {
 
-    @extend %site-width-container;
+    @include govuk-width-container;
     margin-bottom: $gutter-half;
 
     h2 {
