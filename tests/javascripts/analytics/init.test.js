@@ -111,10 +111,10 @@ describe("Analytics init", () => {
 
     test("A pageview will be registered", () => {
 
-      expect(window.ga.mock.calls.length).toEqual(5);
+      expect(window.ga.mock.calls.length).toEqual(6);
 
-      // The first 4 calls configure the analytics tracker. All subsequent calls send data
-      expect(window.ga.mock.calls[4]).toEqual(['send', 'pageview', '/privacy']);
+      // The first 5 calls configure the analytics tracker. All subsequent calls send data
+      expect(window.ga.mock.calls[5]).toEqual(['send', 'pageview', '/privacy']);
 
     });
 
