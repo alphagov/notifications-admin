@@ -1,5 +1,5 @@
 {% extends "content_template.html" %}
-{% from "components/current-service-link.html" import current_service_link %}
+{% from "components/service-link.html" import service_link %}
 
 {% block per_page_title %}
   Send messages
@@ -15,7 +15,7 @@
 
   <p>To send a batch of messages at once:</p>
   <ol class="list list-number">
-    <li>Go to the {{ current_service_link('main.choose_template', 'templates') }} page and choose an existing template.</li>
+    <li>Go to the {{ service_link(current_service, 'main.choose_template', 'templates') }} page and choose an existing template.</li>
     <li>Select <b class="govuk-!-font-weight-bold">Send</b>.</li>
     <li>If you’re sending emails, select <b class="govuk-!-font-weight-bold">Upload a list of email addresses</b>. If you’re sending text messages, select <b class="govuk-!-font-weight-bold">Upload a list of phone numbers</b>. If you’re sending letters, select <b class="govuk-!-font-weight-bold">Upload a list of addresses</b>.</li>
 
