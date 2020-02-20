@@ -1,4 +1,3 @@
-import itertools
 import os
 import urllib
 from datetime import datetime, timedelta, timezone
@@ -602,8 +601,10 @@ def useful_headers_after_request(response):
 
 
 def register_errorhandlers(application):  # noqa (C901 too complex)
-    def _error_response(error_code):
-        resp = make_response(render_template("error/{0}.html".format(error_code)), error_code)
+    def _error_response(error_code, error_page_template=None):
+        if error_page_template is None:
+            error_page_template = error_code
+        resp = make_response(render_template("error/{0}.html".format(error_page_template)), error_code)
         return useful_headers_after_request(resp)
 
     @application.errorhandler(HTTPError)
@@ -627,8 +628,10 @@ def register_errorhandlers(application):  # noqa (C901 too complex)
         return _error_response(error_code)
 
     @application.errorhandler(400)
-    def handle_400(error):
-        return _error_response(400)
+    def handle_client_error(error):
+        # This is tripped if we call `abort(400)`.
+        application.logger.exception('Unhandled 400 client error')
+        return _error_response(400, error_page_template=500)
 
     @application.errorhandler(410)
     def handle_gone(error):
@@ -671,19 +674,11 @@ def register_errorhandlers(application):  # noqa (C901 too complex)
             u'csrf.invalid_token: Aborting request, user_id: {user_id}',
             extra={'user_id': session['user_id']})
 
-        resp = make_response(render_template(
-            "error/400.html",
-            message=['Something went wrong, please go back and try again.']
-        ), 400)
-        return useful_headers_after_request(resp)
+        return _error_response(400, error_page_template=500)
 
     @application.errorhandler(405)
-    def handle_405(error):
-        resp = make_response(render_template(
-            "error/400.html",
-            message=['Something went wrong, please go back and try again.']
-        ), 405)
-        return useful_headers_after_request(resp)
+    def handle_method_not_allowed(error):
+        return _error_response(405, error_page_template=500)
 
     @application.errorhandler(WerkzeugHTTPException)
     def handle_http_error(error):
