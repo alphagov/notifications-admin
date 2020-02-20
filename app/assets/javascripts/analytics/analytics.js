@@ -15,6 +15,7 @@
     window.ga('set', 'anonymizeIp', config.anonymizeIp);
     window.ga('set', 'allowAdFeatures', config.allowAdFeatures);
     window.ga('set', 'transport', config.transport);
+    window.ga('set', 'title', 'GOV.UK Notify');
 
   };
 
