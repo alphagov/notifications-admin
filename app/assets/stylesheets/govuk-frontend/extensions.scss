@@ -35,3 +35,16 @@
 .govuk-link--destructive {
   @include govuk-link-style-destructive-no-visited-state;
 }
+$govuk-grid-widths: (
+  one-eighth: 12.5%,
+  one-sixth: 16.6666%,
+  one-quarter: 25%,
+  one-third: 33.3333%,
+  one-half: 50%,
+  five-eighths: 62.5%,
+  two-thirds: 66.6666%,
+  three-quarters: 75%,
+  five-sixths: 83.3333%,
+  seven-eighths: 87.5%,
+  full: 100%
+);

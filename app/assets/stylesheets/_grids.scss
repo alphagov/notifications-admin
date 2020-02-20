@@ -1,29 +1,22 @@
-.column-whole {
-  @include grid-column(1/1);
+
+.govuk-grid-column-one-sixth {
+  @include govuk-grid-column(one-sixth, $class: false);
 }
 
-.column-three-quarters {
-  @include grid-column(3/4);
+.govuk-grid-column-five-sixths {
+  @include govuk-grid-column(five-sixths, $class: false);
 }
 
-.column-one-sixth {
-  @include grid-column(1/6);
+.govuk-grid-column-one-eighth {
+  @include govuk-grid-column(one-eighth, $class: false);
 }
 
-.column-five-sixths {
-  @include grid-column(5/6);
+.govuk-grid-column-five-eighths {
+  @include govuk-grid-column(five-eighths, $class: false);
 }
 
-.column-one-eighth {
-  @include grid-column(1/8);
-}
-
-.column-five-eighths {
-  @include grid-column(5/8);
-}
-
-.column-seven-eighths {
-  @include grid-column(7/8);
+.govuk-grid-column-seven-eighths {
+  @include govuk-grid-column(seven-eighths, $class: false);
 }
 
 %top-gutter,

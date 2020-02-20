@@ -14,7 +14,7 @@
           {{ heading }}
         </h2>
       </div>
-      <div class="column-three-quarters">
+      <div class="govuk-grid-column-three-quarters">
         <ul>
   {% else %}
     <ul>
@@ -62,7 +62,7 @@
             Platform admin
           </h2>
         </div>
-        <ul class="column-three-quarters">
+        <ul class="govuk-grid-column-three-quarters">
           <li class="browse-list-item">
             <a href="{{ url_for('.organisations') }}" class="govuk-link govuk-link--no-visited-state">All organisations</a>
             <p class="browse-list-hint">
@@ -106,7 +106,7 @@
           <div class="govuk-grid-column-one-quarter">
             &nbsp;
           </div>
-          <div class="column-three-quarters">
+          <div class="govuk-grid-column-three-quarters">
       {% endif %}
       {{ govukButton({
         "element": "a",

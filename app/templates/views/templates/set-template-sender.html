@@ -15,7 +15,7 @@
     back_link=url_for('.view_template', service_id=current_service.id, template_id=template_id)
   ) }}
   <div class="govuk-grid-row">
-    <div class="column-three-quarters">
+    <div class="govuk-grid-column-three-quarters">
       {% call form_wrapper() %}
         {{ radios(
           form.sender,

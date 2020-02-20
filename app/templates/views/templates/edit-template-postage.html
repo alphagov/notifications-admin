@@ -16,11 +16,11 @@
     ) }}
     {% call form_wrapper() %}
       <div class="govuk-grid-row">
-        <div class="column-five-sixths">
+        <div class="govuk-grid-column-five-sixths">
           {{ radios(form.postage) }}
           {{ page_footer('Save') }}
         </div>
-        <aside class="column-three-quarters">
+        <aside class="govuk-grid-column-three-quarters">
           {% include "partials/templates/guidance-postage.html" %}
         </aside>
       </div>

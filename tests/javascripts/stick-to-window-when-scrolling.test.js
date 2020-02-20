@@ -78,7 +78,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
 
       document.body.innerHTML = `
         <div class="govuk-grid-row">
-          <main class="column-three-quarters column-main">
+          <main class="govuk-grid-column-three-quarters column-main">
             <form method="post" autocomplete="off">
               <div class="govuk-grid-row js-stick-at-top-when-scrolling">
                 <div class="govuk-grid-column-two-thirds ">
@@ -669,7 +669,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
     beforeEach(() => {
 
       document.body.innerHTML = `
-        <main role="main" class="column-three-quarters column-main">
+        <main role="main" class="govuk-grid-column-three-quarters column-main">
           <a class="govuk-back-link" href="">Back</a>
           <h1 class="heading-large js-header">
             Preview of ‘Content email’

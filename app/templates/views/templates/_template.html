@@ -1,7 +1,7 @@
 {% from 'components/message-count-label.html' import message_count_label %}
 {% from "components/banner.html" import banner_wrapper %}
 
-<div class="column-whole">
+<div class="govuk-grid-column-full">
   {% if template._template.archived %}
     <p class="hint">
       This template was deleted {{ template._template.updated_at|format_datetime_relative }}.
@@ -48,7 +48,7 @@
     </div>
   {% endif %}
 </div>
-<div class="column-whole template-container">
+<div class="govuk-grid-column-full template-container">
   {% if current_user.has_permissions('manage_templates') and template.template_type == 'letter' %}
     {% if not current_service.letter_branding_id %}
       <a href="{{ url_for(".branding_request", service_id=current_service.id, branding_type="letter", from_template=template.id) }}" class="govuk-link govuk-link--no-visited-state edit-template-link-letter-branding">Add logo</a>

@@ -44,7 +44,7 @@
   {% else %}
 
     <div class="govuk-grid-row">
-      <div class="{% if current_user.has_permissions('manage_templates') %} column-five-sixths {% else %} column-whole {% endif %}">
+      <div class="{% if current_user.has_permissions('manage_templates') %} govuk-grid-column-five-sixths {% else %} govuk-grid-column-full {% endif %}">
         {{ folder_path(
           folders=template_folder_path,
           service_id=current_service.id,
@@ -53,7 +53,7 @@
         ) }}
       </div>
       {% if current_user.has_permissions('manage_templates') and current_template_folder_id and user_has_template_folder_permission %}
-        <div class="column-one-sixth">
+        <div class="govuk-grid-column-one-sixth">
           <a href="{{ url_for('.manage_template_folder', service_id=current_service.id, template_folder_id=current_template_folder_id) }}" class="govuk-link govuk-link--no-visited-state folder-heading-manage-link">Manage<span class="govuk-visually-hidden"> this folder</span></a>
         </div>
       {% endif %}
