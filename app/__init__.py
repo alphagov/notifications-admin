@@ -614,15 +614,10 @@ def register_errorhandlers(application):  # noqa (C901 too complex)
             error.message
         ))
         error_code = error.status_code
-        if error_code == 400:
-            if isinstance(error.message, str):
-                msg = [error.message]
-            else:
-                msg = list(itertools.chain(*[error.message[x] for x in error.message.keys()]))
-            resp = make_response(render_template("error/400.html", message=msg))
-            return useful_headers_after_request(resp)
-        elif error_code not in [401, 404, 403, 410]:
-            # probably a 500 or 503
+        if error_code not in [401, 404, 403, 410]:
+            # probably a 500 or 503.
+            # it might be a 400, which we should handle as if it's an internal server error. If the API might
+            # legitimately return a 400, we should handle that within the view or the client that calls it.
             application.logger.exception("API {} failed with status {} message {}".format(
                 error.response.url if error.response else 'unknown',
                 error.status_code,
