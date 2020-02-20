@@ -227,7 +227,7 @@ def test_inbound_messages_shows_count_of_messages_when_there_are_messages(
         'main.service_dashboard',
         service_id=SERVICE_ONE_ID,
     )
-    banner = page.select_one('a.banner-dashboard')
+    banner = page.select('a.banner-dashboard')[1]
     assert normalize_spaces(
         banner.text
     ) == '9,999 text messages received latest message just now'
@@ -254,7 +254,7 @@ def test_inbound_messages_shows_count_of_messages_when_there_are_no_messages(
         'main.service_dashboard',
         service_id=SERVICE_ONE_ID,
     )
-    banner = page.select_one('a.banner-dashboard')
+    banner = page.select('a.banner-dashboard')[1]
     assert normalize_spaces(banner.text) == '0 text messages received'
     assert banner['href'] == url_for(
         'main.inbox', service_id=SERVICE_ONE_ID
@@ -625,7 +625,7 @@ def test_should_show_recent_templates_on_dashboard(
     headers = [header.text.strip() for header in page.find_all('h2') + page.find_all('h1')]
     assert 'In the last 7 days' in headers
 
-    table_rows = page.find_all('tbody')[1].find_all('tr')
+    table_rows = page.find_all('tbody')[0].find_all('tr')
 
     assert len(table_rows) == 4
 
@@ -825,20 +825,26 @@ def test_should_show_upcoming_jobs_on_dashboard(
         'main.service_dashboard',
         service_id=SERVICE_ONE_ID,
     )
-
     second_call = mock_get_jobs.call_args_list[1]
     assert second_call[0] == (SERVICE_ONE_ID,)
     assert second_call[1]['statuses'] == ['scheduled']
 
-    table_rows = page.find_all('tbody')[0].find_all('tr')
-    assert len(table_rows) == 2
+    assert normalize_spaces(
+        page.select_one('main h2').text
+    ) == (
+        'In the next few days'
+    )
 
-    assert 'send_me_later.csv' in table_rows[0].find_all('th')[0].text
-    assert 'Sending today at 11:09am' in table_rows[0].find_all('th')[0].text
-    assert table_rows[0].find_all('td')[0].text.strip() == '1'
-    assert 'even_later.csv' in table_rows[1].find_all('th')[0].text
-    assert 'Sending today at 11:09pm' in table_rows[1].find_all('th')[0].text
-    assert table_rows[1].find_all('td')[0].text.strip() == '1'
+    assert normalize_spaces(
+        page.select_one('a.banner-dashboard').text
+    ) == (
+        '2 files waiting to send '
+        'sending starts today at 11:09am'
+    )
+
+    assert page.select_one('a.banner-dashboard')['href'] == url_for(
+        'main.uploads', service_id=SERVICE_ONE_ID
+    )
 
 
 @pytest.mark.parametrize('permissions', (
@@ -919,7 +925,7 @@ def test_should_show_recent_jobs_on_dashboard(
     assert third_call[1]['limit_days'] == 7
     assert 'scheduled' not in third_call[1]['statuses']
 
-    table_rows = page.find_all('tbody')[1].find_all('tr')
+    table_rows = page.select_one('tbody').select('tr')
 
     assert len(table_rows) == 4
 
@@ -1151,6 +1157,7 @@ def test_menu_send_messages_when_service_does_not_have_upload_letters_permission
     mock_get_usage,
     mock_get_inbound_sms_summary,
     mock_get_free_sms_fragment_limit,
+    mock_get_returned_letter_summary_with_no_returned_letters,
 ):
     with app_.test_request_context():
         resp = _test_dashboard_menu(
@@ -1159,8 +1166,9 @@ def test_menu_send_messages_when_service_does_not_have_upload_letters_permission
             api_user_active,
             service_one,
             ['view_activity', 'send_messages'])
-        page = resp.get_data(as_text=True)
-        assert url_for('main.uploads', service_id=service_one['id']) not in page
+        page = BeautifulSoup(resp.data.decode('utf-8'), 'html.parser')
+        assert page.select_one('.navigation')
+        assert url_for('main.uploads', service_id=service_one['id']) not in page.select_one('.navigation')
 
 
 def test_menu_manage_service(

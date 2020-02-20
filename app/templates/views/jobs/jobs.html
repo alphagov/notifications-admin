@@ -11,7 +11,7 @@
     <div class="dashboard">
       {% if show_scheduled_jobs %}
         {% with hide_heading = True %}
-          {% include 'views/dashboard/_upcoming.html' %}
+          {% include 'views/jobs/_scheduled.html' %}
         {% endwith %}
       {% endif %}
       {% if jobs %}
