@@ -263,7 +263,7 @@ def test_non_gov_user_cannot_see_change_email_link(
 ):
     client_request.login(api_nongov_user_active)
     page = client_request.get('main.user_profile')
-    assert '<a href="/user-profile/email">' not in str(page)
+    assert '<a class="govuk-link govuk-link--no-visited-state" href="/user-profile/email">' not in str(page)
     assert page.select_one('h1').text.strip() == 'Your profile'
 
 

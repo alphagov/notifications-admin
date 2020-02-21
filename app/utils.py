@@ -571,22 +571,34 @@ LETTER_VALIDATION_MESSAGES = {
         'title': 'Your letter is not A4 portrait size',
         'detail': (
             'You need to change the size or orientation of {invalid_pages}. <br>'
-            'Files must meet our <a href="{letter_spec_guidance}" target="_blank">letter specification</a>.'
+            'Files must meet our '
+            '<a class="govuk-link govuk-link--no-visited-state" href="{letter_spec_guidance}" target="_blank">'
+            'letter specification'
+            '</a>.'
         ),
         'summary': (
             'Validation failed because {invalid_pages} {invalid_pages_are_or_is} not A4 portrait size.<br>'
-            'Files must meet our <a href="{letter_spec}" target="_blank">letter specification</a>.'
+            'Files must meet our '
+            '<a class="govuk-link govuk-link--no-visited-state" href="{letter_spec}" target="_blank">'
+            'letter specification'
+            '</a>.'
         ),
     },
     'content-outside-printable-area': {
         'title': 'Your content is outside the printable area',
         'detail': (
             'You need to edit {invalid_pages}.<br>'
-            'Files must meet our <a href="{letter_spec_guidance}" target="_blank">letter specification</a>.'
+            'Files must meet our '
+            '<a class="govuk-link govuk-link--no-visited-state" href="{letter_spec_guidance}" target="_blank">'
+            'letter specification'
+            '</a>.'
         ),
         'summary': (
             'Validation failed because content is outside the printable area on {invalid_pages}.<br>'
-            'Files must meet our <a href="{letter_spec}" target="_blank">letter specification</a>.'
+            'Files must meet our '
+            '<a class="govuk-link govuk-link--no-visited-state" href="{letter_spec}" target="_blank">'
+            'letter specification'
+            '</a>.'
         ),
     },
     'letter-too-long': {
@@ -618,11 +630,17 @@ LETTER_VALIDATION_MESSAGES = {
         'title': 'The address block is empty',
         'detail': (
             'You need to add a recipient address.<br>'
-            'Files must meet our <a href="{letter_spec_guidance}" target="_blank">letter specification</a>.'
+            'Files must meet our '
+            '<a class="govuk-link govuk-link--no-visited-state" href="{letter_spec_guidance}" target="_blank">'
+            'letter specification'
+            '</a>.'
         ),
         'summary': (
             'Validation failed because the address block is empty.<br>'
-            'Files must meet our <a href="{letter_spec}" target="_blank">letter specification</a>.'
+            'Files must meet our '
+            '<a class="govuk-link govuk-link--no-visited-state" href="{letter_spec}" target="_blank">'
+            'letter specification'
+            '</a>.'
         ),
     }
 }
