@@ -1,12 +1,12 @@
 $white-50-opaque: rgba($white, 0.5);
 $button-bottom-border-colour: rgba(0, 0, 0, 0.17);
-$email-message-gutter: $gutter * 2;
+$email-message-gutter: govuk-spacing(9);
 
 // sass-lint:disable no-important
 
 .email-message {
 
-  margin-bottom: $gutter;
+  margin-bottom: govuk-spacing(6);
   border: 1px solid $border-colour;
 
   &-meta {
@@ -49,7 +49,7 @@ $email-message-gutter: $gutter * 2;
 
     width: 100%;
     box-sizing: border-box;
-    padding: $gutter-half $email-message-gutter 0 $email-message-gutter;
+    padding: govuk-spacing(3) $email-message-gutter 0 $email-message-gutter;
     margin: 0 0 0 0;
     clear: both;
     position: relative;

@@ -18,7 +18,7 @@
 
 .big-number-dark {
   @extend %big-number;
-  padding: $gutter-half;
+  padding: govuk-spacing(3);
   position: relative;
   background: $black;
   color: $white;
@@ -52,11 +52,11 @@
 
   @extend %big-number;
   position: relative;
-  margin-bottom: $gutter-two-thirds;
+  margin-bottom: govuk-spacing(4);
 
   .big-number,
   .big-number-smaller {
-    padding: $gutter-half;
+    padding: govuk-spacing(3);
     position: relative;
     background: $black;
     color: $white;
@@ -146,12 +146,12 @@
 .big-number-meta-wrapper {
 
   position: relative;
-  margin: $gutter-half 0 $gutter 0;
+  margin: govuk-spacing(3) 0 govuk-spacing(6) 0;
   background: $govuk-blue;
 
   .big-number-meta {
 
-    padding: ($gutter / 3) $gutter-half;
+    padding: govuk-spacing(2) govuk-spacing(3);
     color: $white;
     pointer-events: none;
 

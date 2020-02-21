@@ -1,13 +1,13 @@
-$item-top-padding: $gutter-half;
+$item-top-padding: govuk-spacing(3);
 
 .history-list {
 
   @include core-19;
-  margin-bottom: $gutter;
+  margin-bottom: govuk-spacing(6);
 
   &-item {
 
-    padding: $item-top-padding 0 $gutter-half 0;
+    padding: $item-top-padding 0 govuk-spacing(3) 0;
     border-top: 1px solid $border-colour;
     position: relative;
 

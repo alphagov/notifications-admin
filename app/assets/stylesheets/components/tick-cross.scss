@@ -51,10 +51,10 @@
 
           position: absolute;
 
-          top: -$gutter-half - 1;
+          top: -govuk-spacing(3) - 1;
           right: 0;
-          bottom: -$gutter-half;
-          left: -$gutter-half;
+          bottom: -govuk-spacing(3);
+          left: -govuk-spacing(3);
 
           background: transparent;
         }

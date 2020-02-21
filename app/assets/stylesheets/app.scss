@@ -17,7 +17,7 @@
 
   .heading-large,
   > .heading-medium {
-    margin: $gutter-half 0 ($gutter / 3 * 2) 0;
+    margin: govuk-spacing(3) 0 govuk-spacing(4) 0;
     word-wrap: break-word;
 
     &.top-gutter-0 {
@@ -55,7 +55,7 @@ td {
 }
 
 .heading-medium {
-  margin-top: $gutter;
+  margin-top: govuk-spacing(6);
 }
 
 .form-label {
@@ -86,12 +86,12 @@ td {
 
 details summary {
   text-decoration: underline;
-  margin-bottom: $gutter-half;
+  margin-bottom: govuk-spacing(3);
 }
 
 .spreadsheet {
 
-  margin-bottom: -$gutter;
+  margin-bottom: -govuk-spacing(6);
 
   .table {
     margin-bottom: 0;
@@ -208,5 +208,5 @@ details .arrow {
 }
 
 .heading-upcoming-jobs {
-  margin-top: $gutter-half;
+  margin-top: govuk-spacing(3);
 }

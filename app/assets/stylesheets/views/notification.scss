@@ -2,7 +2,7 @@
 
   @include core-16;
   color: $secondary-text-colour;
-  margin-top: -$gutter-half;
+  margin-top: -govuk-spacing(3);
 
   &.error {
 
