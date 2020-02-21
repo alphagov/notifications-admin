@@ -1,11 +1,12 @@
 import itertools
 import os
+import re
 import urllib
 from datetime import datetime, timedelta, timezone
 from functools import partial
 from time import monotonic
 
-import ago
+import humanize
 import jinja2
 from flask import (
     Markup,
@@ -356,6 +357,14 @@ def _format_datetime_short(datetime):
     return datetime.strftime('%d %B').lstrip('0')
 
 
+def naturaltime_without_indefinite_article(date):
+    return re.sub(
+        'an? (.*) ago',
+        lambda match: '1 {} ago'.format(match.group(1)),
+        humanize.naturaltime(date),
+    )
+
+
 def format_delta(date):
     delta = (
         datetime.now(timezone.utc)
@@ -366,12 +375,17 @@ def format_delta(date):
         return "just now"
     if delta < timedelta(seconds=60):
         return "in the last minute"
-    return ago.human(
-        delta,
-        future_tense='{} from now',  # No-one should ever see this
-        past_tense='{} ago',
-        precision=1
-    )
+    return naturaltime_without_indefinite_article(delta)
+
+
+def format_delta_days(date):
+    now = datetime.now(timezone.utc)
+    date = utc_string_to_aware_gmt_datetime(date)
+    if date.strftime('%Y-%M-%D') == now.strftime('%Y-%M-%D'):
+        return "today"
+    if date.strftime('%Y-%M-%D') == (now - timedelta(days=1)).strftime('%Y-%M-%D'):
+        return "yesterday"
+    return naturaltime_without_indefinite_article(now - date)
 
 
 def valid_phone_number(phone_number):
@@ -764,6 +778,7 @@ def add_template_filters(application):
         format_datetime_relative,
         format_day_of_week,
         format_delta,
+        format_delta_days,
         format_notification_status,
         format_notification_type,
         format_notification_status_as_time,
