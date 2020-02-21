@@ -504,6 +504,7 @@ def test_uploaded_letter_preview_image_400s_for_bad_page_type(
         file_id=fake_uuid,
         service_id=SERVICE_ONE_ID,
         page='foo',
+        _test_page_title=False,
         _expected_status=400,
     )
 
