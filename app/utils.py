@@ -572,7 +572,7 @@ LETTER_VALIDATION_MESSAGES = {
         'detail': (
             'You need to change the size or orientation of {invalid_pages}. <br>'
             'Files must meet our '
-            '<a class="govuk-link govuk-link--no-visited-state" href="{letter_spec_guidance}" target="_blank">'
+            '<a class="govuk-link govuk-link--destructive" href="{letter_spec_guidance}" target="_blank">'
             'letter specification'
             '</a>.'
         ),
@@ -589,7 +589,7 @@ LETTER_VALIDATION_MESSAGES = {
         'detail': (
             'You need to edit {invalid_pages}.<br>'
             'Files must meet our '
-            '<a class="govuk-link govuk-link--no-visited-state" href="{letter_spec_guidance}" target="_blank">'
+            '<a class="govuk-link govuk-link--destructive" href="{letter_spec_guidance}" target="_blank">'
             'letter specification'
             '</a>.'
         ),
@@ -631,7 +631,7 @@ LETTER_VALIDATION_MESSAGES = {
         'detail': (
             'You need to add a recipient address.<br>'
             'Files must meet our '
-            '<a class="govuk-link govuk-link--no-visited-state" href="{letter_spec_guidance}" target="_blank">'
+            '<a class="govuk-link govuk-link--destructive" href="{letter_spec_guidance}" target="_blank">'
             'letter specification'
             '</a>.'
         ),
