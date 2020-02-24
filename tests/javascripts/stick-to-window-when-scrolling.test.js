@@ -697,7 +697,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
               <p>This is a paragraph with a horizontal line underneath.</p>
               <hr>
               <p>This is a paragraph with a horizontal line above.</p>
-              <p>This paragraph has a link in it: <a class="govuk-link govuk-link--no-visited-state" href="https://www.gov.uk">https://www.gov.uk</a>.</p>
+              <p>This paragraph has a link in it: <a href="https://www.gov.uk">https://www.gov.uk</a>.</p>
             </div>
             <div class="page-footer js-stick-at-bottom-when-scrolling">
               <form method="post" action="">

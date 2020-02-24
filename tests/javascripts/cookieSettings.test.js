@@ -34,7 +34,7 @@ describe("Cookie settings", () => {
     cookiesPageContent = `
       <div class="cookie-settings__confirmation banner banner-with-tick" data-cookie-confirmation="true" role="group" tabindex="-1">
         <h2 class="banner-title">Your cookie settings were saved</h2>
-        <a class="govuk_link govuk_link--no-visited-state cookie-settings__prev-page" href="#" data-module="track-click" data-track-category="cookieSettings" data-track-action="Back to previous page">
+        <a class="govuk_link cookie-settings__prev-page" href="#" data-module="track-click" data-track-category="cookieSettings" data-track-action="Back to previous page">
           Go back to the page you were looking at
         </a>
       </div>

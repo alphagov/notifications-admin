@@ -7,7 +7,7 @@ class Navigation:
 
     mapping = {}
     exclude = {}
-    selected_class = "selected"
+    selected_attribute = "class=selected"
 
     def __init__(self):
         self.mapping = {
@@ -32,7 +32,7 @@ class Navigation:
 
     def is_selected(self, navigation_item):
         if request.endpoint in self.mapping[navigation_item]:
-            return " " + self.selected_class
+            return self.selected_attribute
         return ''
 
     @staticmethod
@@ -41,6 +41,8 @@ class Navigation:
 
 
 class HeaderNavigation(Navigation):
+
+    selected_attribute = "class=active"
 
     mapping = {
         'support': {

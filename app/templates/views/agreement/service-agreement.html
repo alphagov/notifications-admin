@@ -26,7 +26,7 @@
       Once accepted, the agreement covers all Notify services from {{ current_service.organisation.name }}.
     </p>
     <p>
-      <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.service_download_agreement', service_id=current_service.id) }}">Download a copy of the data sharing and financial agreement</a>.
+      <a href="{{ url_for('main.service_download_agreement', service_id=current_service.id) }}">Download a copy of the data sharing and financial agreement</a>.
     </p>
     <p>
       The agreement is confidential and should not be shared outside your organisation.

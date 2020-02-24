@@ -114,7 +114,7 @@
     this.makeButton = (text, opts) => {
       let $btn = $('<a href=""></a>')
                     .html(text)
-                    .addClass('govuk-link govuk-link--no-visited-state js-cancel')
+                    .addClass('js-cancel')
                     // isn't set if cancelSelector is undefined
                     .data('target', opts.cancelSelector || undefined)
                     .attr('tabindex', '0')
