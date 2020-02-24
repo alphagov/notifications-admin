@@ -35,7 +35,7 @@
 
     {{ ajax_block(partials, updates_url, 'template-statistics', interval=5) }}
 
-    {% if current_service.immediate_jobs %}
+    {% if current_service.immediate_jobs and not current_service.has_permission('upload_letters') %}
       {{ ajax_block(partials, updates_url, 'jobs', interval=5) }}
       {{ show_more(
         url_for('.view_jobs', service_id=current_service.id),

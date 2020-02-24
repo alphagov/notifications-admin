@@ -935,6 +935,42 @@ def test_should_show_recent_jobs_on_dashboard(
             assert table_rows[index].find_all('td')[column_index].text.strip() == str(count)
 
 
+@pytest.mark.parametrize('extra_permissions', (
+    pytest.param(
+        [],
+        marks=pytest.mark.xfail(raises=AssertionError),
+    ),
+    pytest.param(
+        ['upload_letters']
+    ),
+))
+def test_should_not_show_jobs_on_dashboard_for_users_with_uploads_page(
+    client_request,
+    service_one,
+    mock_get_service_templates,
+    mock_get_template_statistics,
+    mock_get_service_statistics,
+    mock_get_jobs,
+    mock_get_usage,
+    mock_get_free_sms_fragment_limit,
+    mock_get_inbound_sms_summary,
+    mock_get_returned_letter_summary_with_no_returned_letters,
+    extra_permissions,
+):
+    service_one['permissions'] += extra_permissions
+    page = client_request.get(
+        'main.service_dashboard',
+        service_id=SERVICE_ONE_ID,
+    )
+    for filename in {
+        "export 1/1/2016.xls",
+        "all email addresses.xlsx",
+        "applicants.ods",
+        "thisisatest.csv",
+    }:
+        assert filename not in page.select_one('main').text
+
+
 @freeze_time("2012-03-31 12:12:12")
 def test_usage_page(
     client_request,
