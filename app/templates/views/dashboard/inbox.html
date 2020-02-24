@@ -1,4 +1,5 @@
 {% from "components/ajax-block.html" import ajax_block %}
+{% from "components/page-header.html" import page_header %}
 
 {% extends "withnav_template.html" %}
 
@@ -8,9 +9,10 @@
 
 {% block maincolumn_content %}
 
-  <h1 class="heading-large">
-    Received text messages
-  </h1>
+  {{ page_header(
+    'Received text messages',
+    back_link=url_for('main.service_dashboard', service_id=current_service.id)
+  ) }}
 
   {{ ajax_block(
     partials,

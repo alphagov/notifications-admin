@@ -2,7 +2,7 @@ from collections import OrderedDict
 
 from flask import render_template
 
-from app import service_api_client
+from app import current_service, service_api_client
 from app.main import main
 from app.utils import Spreadsheet, user_has_permissions
 
@@ -10,10 +10,9 @@ from app.utils import Spreadsheet, user_has_permissions
 @main.route("/services/<uuid:service_id>/returned-letters")
 @user_has_permissions('view_activity')
 def returned_letter_summary(service_id):
-    summary = service_api_client.get_returned_letter_summary(service_id)
     return render_template(
         'views/returned-letter-summary.html',
-        data=summary,
+        data=current_service.returned_letter_summary,
     )
 
 

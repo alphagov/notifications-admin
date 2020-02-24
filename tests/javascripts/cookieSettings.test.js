@@ -231,8 +231,8 @@ describe("Cookie settings", () => {
         expect(window.GOVUK.initAnalytics).toHaveBeenCalled();
 
         expect(window.ga).toHaveBeenCalled();
-        // the first 4 calls are configuration
-        expect(window.ga.mock.calls[4]).toEqual(['send', 'pageview', '/privacy']);
+        // the first 5 calls are configuration
+        expect(window.ga.mock.calls[5]).toEqual(['send', 'pageview', '/privacy']);
 
       });
 

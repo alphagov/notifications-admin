@@ -234,7 +234,6 @@ def uploaded_letter_preview(service_id, file_id):
 @main.route("/services/<uuid:service_id>/preview-letter-image/<uuid:file_id>")
 @user_has_permissions('send_messages')
 def view_letter_upload_as_preview(service_id, file_id):
-
     try:
         page = int(request.args.get('page'))
     except ValueError:
