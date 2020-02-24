@@ -18,13 +18,13 @@
 
     {% if current_service and current_service.trial_mode %}
   <p>
-    To remove these restrictions, you can <a href="{{ url_for('.request_to_go_live', service_id=current_service.id) }}">request to go live</a>.</p>
+    To remove these restrictions, you can <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.request_to_go_live', service_id=current_service.id) }}">request to go live</a>.</p>
     {% else %}
   <p>
     To remove these restrictions:
   </p>
   <ol class="list list-number">
-    <li><a href="{{ url_for('.sign_in') }}">Sign in to Notify</a>.</li>
+    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.sign_in') }}">Sign in to Notify</a>.</li>
     <li>Go to the <b class="govuk-!-font-weight-bold">Settings</b> page.</li>
     <li>Select <b class="govuk-!-font-weight-bold">Request to go live</b>.</li>
   </ol>

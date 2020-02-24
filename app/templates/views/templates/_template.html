@@ -23,7 +23,7 @@
         {% endif %}
           {% if current_user.has_permissions('send_messages', restrict_admin_usage=True) and not letter_too_long %}
             <div class="column-half">
-              <a href="{{ url_for(".set_sender", service_id=current_service.id, template_id=template.id) }}" class="pill-separate-item">
+              <a href="{{ url_for(".set_sender", service_id=current_service.id, template_id=template.id) }}" class="govuk-link govuk-link--no-visited-state pill-separate-item">
                 Send
               </a>
             </div>
@@ -31,14 +31,14 @@
         {% else %}
           {% if current_user.has_permissions('send_messages', restrict_admin_usage=True) %}
             <div class="column-half">
-              <a href="{{ url_for(".set_sender", service_id=current_service.id, template_id=template.id) }}" class="pill-separate-item">
+              <a href="{{ url_for(".set_sender", service_id=current_service.id, template_id=template.id) }}" class="govuk-link govuk-link--no-visited-state pill-separate-item">
                 Send
               </a>
             </div>
           {% endif %}
           {% if current_user.has_permissions('manage_templates') %}
             <div class="column-half">
-              <a href="{{ url_for(".edit_service_template", service_id=current_service.id, template_id=template.id) }}" class="pill-separate-item">
+              <a href="{{ url_for(".edit_service_template", service_id=current_service.id, template_id=template.id) }}" class="govuk-link govuk-link--no-visited-state pill-separate-item">
                 Edit
               </a>
             </div>
@@ -51,14 +51,14 @@
 <div class="column-whole template-container">
   {% if current_user.has_permissions('manage_templates') and template.template_type == 'letter' %}
     {% if not current_service.letter_branding_id %}
-      <a href="{{ url_for(".branding_request", service_id=current_service.id, branding_type="letter", from_template=template.id) }}" class="edit-template-link-letter-branding">Add logo</a>
+      <a href="{{ url_for(".branding_request", service_id=current_service.id, branding_type="letter", from_template=template.id) }}" class="govuk-link govuk-link--no-visited-state edit-template-link-letter-branding">Add logo</a>
     {% endif %}
-    <a href="{{ url_for(".edit_template_postage", service_id=current_service.id, template_id=template.id) }}" class="edit-template-link-letter-postage">Change</a>
-    <a href="{{ url_for(".edit_service_template", service_id=current_service.id, template_id=template.id) }}" class="edit-template-link-letter-body">Edit</a>
+    <a href="{{ url_for(".edit_template_postage", service_id=current_service.id, template_id=template.id) }}" class="govuk-link govuk-link--no-visited-state edit-template-link-letter-postage">Change</a>
+    <a href="{{ url_for(".edit_service_template", service_id=current_service.id, template_id=template.id) }}" class="govuk-link govuk-link--no-visited-state edit-template-link-letter-body">Edit</a>
     {% if current_service.count_letter_contact_details %}
-      <a href="{{ url_for(".set_template_sender", service_id=current_service.id, template_id=template.id) }}" class="edit-template-link-letter-contact">Edit</a>
+      <a href="{{ url_for(".set_template_sender", service_id=current_service.id, template_id=template.id) }}" class="govuk-link govuk-link--no-visited-state edit-template-link-letter-contact">Edit</a>
     {% else %}
-      <a href="{{ url_for(".service_add_letter_contact", service_id=current_service.id, from_template=template.id) }}" class="edit-template-link-letter-contact">Edit</a>
+      <a href="{{ url_for(".service_add_letter_contact", service_id=current_service.id, from_template=template.id) }}" class="govuk-link govuk-link--no-visited-state edit-template-link-letter-contact">Edit</a>
     {% endif %}
   {% endif %}
   {{ template|string }}

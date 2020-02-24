@@ -19,7 +19,7 @@
         {% if item.status in ('pending-virus-check', 'virus-scan-failed') %}
           <span class="file-list-filename loading-indicator">Checking</span>
         {% else %}
-          <a class="file-list-filename" href="{{ url_for('.view_notification', service_id=current_service.id, notification_id=item.id) }}">{{ item.to.splitlines()[0].lstrip().rstrip(' ,') if item.to else '' }}</a>
+          <a class="govuk-link govuk-link--no-visited-state file-list-filename" href="{{ url_for('.view_notification', service_id=current_service.id, notification_id=item.id) }}">{{ item.to.splitlines()[0].lstrip().rstrip(' ,') if item.to else '' }}</a>
         {% endif %}
         <p class="file-list-hint">
           {{ item.preview_of_content }}

@@ -61,22 +61,12 @@
           background: transparent;
         }
 
-        &:hover {
-          color: $link-hover-colour;
-        }
-
-        &:active,
-        &:focus {
-
-          color: $black;
-
-          &:before {
-            border-color: $yellow;
-            border-style: solid;
-            border-width: 15px 3px 15px 15px;
-            right: -3px;
-          }
-
+        &:active:before,
+        &:focus:before {
+          border-color: $yellow;
+          border-style: solid;
+          border-width: 15px 3px 15px 15px;
+          right: -3px;
         }
 
       }

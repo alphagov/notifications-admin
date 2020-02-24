@@ -16,13 +16,13 @@
 
   <nav class="grid-row bottom-gutter-1-2">
     <div class="column-one-third">
-      <a class="pill-separate-item" href="{{ url_for('.api_keys', service_id=current_service.id) }}">API keys</a>
+      <a class="govuk-link govuk-link--no-visited-state pill-separate-item" href="{{ url_for('.api_keys', service_id=current_service.id) }}">API keys</a>
     </div>
     <div class="column-one-third">
-      <a class="pill-separate-item" href="{{ url_for('.whitelist', service_id=current_service.id) }}">Whitelist</a>
+      <a class="govuk-link govuk-link--no-visited-state pill-separate-item" href="{{ url_for('.whitelist', service_id=current_service.id) }}">Whitelist</a>
     </div>
     <div class="column-one-third">
-      <a class="pill-separate-item" href="{{ url_for(callbacks_link, service_id=current_service.id) }}">Callbacks</a>
+      <a class="govuk-link govuk-link--no-visited-state pill-separate-item" href="{{ url_for(callbacks_link, service_id=current_service.id) }}">Callbacks</a>
     </div>
   </nav>
 
@@ -33,7 +33,7 @@
       </h2>
     </div>
     <div class="column-half align-with-heading-copy-right">
-      <a href="{{ url_for('.api_integration', service_id=current_service.id) }}">Refresh</a>
+      <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.api_integration', service_id=current_service.id) }}">Refresh</a>
     </div>
   </div>
   <div class="api-notifications">
@@ -77,7 +77,7 @@
               {% endif %}
             {% endfor %}
             {% if notification.status not in ('pending-virus-check', 'virus-scan-failed') %}
-              <a class="api-notifications-item__view" href="{{ url_for('.view_notification', service_id=current_service.id, notification_id=notification.id) }}">View {{ message_count_label(1, notification.template.template_type, suffix='') }}</a>
+              <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.view_notification', service_id=current_service.id, notification_id=notification.id) }}">View {{ message_count_label(1, notification.template.template_type, suffix='') }}</a>
             {% endif %}
           </dl>
         </div>

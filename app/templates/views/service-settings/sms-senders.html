@@ -33,7 +33,7 @@
           {% endif %}
         </h3>
         {% if current_user.has_permissions('manage_service') %}
-          <a class="user-list-edit-link" href="{{ url_for('.service_edit_sms_sender', service_id=current_service.id, sms_sender_id = item.id) }}">Change</a>
+          <a class="govuk-link govuk-link--no-visited-state user-list-edit-link" href="{{ url_for('.service_edit_sms_sender', service_id=current_service.id, sms_sender_id = item.id) }}">Change</a>
         {% endif %}
         {% if current_service.count_sms_senders > 1 %}
           {{ api_key(item.id, thing="ID") }}

@@ -8,26 +8,9 @@
     line-height: 40px;
     padding: 1px 0 0 15px;
 
-    a {
-
-      &:visited,
-      &:link {
-        color: $error-colour;
-        display: inline-block;
-        vertical-align: center;
-      }
-
-      &:hover,
-      &:active {
-        color: $mellow-red;
-      }
-
-    }
-
   }
 
   &-delete-link-without-button {
-    @include core-19;
     padding: 0;
     display: inline-block;
   }

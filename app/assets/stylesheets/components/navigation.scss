@@ -1,41 +1,59 @@
 .navigation {
 
+  @include govuk-font($size: 19);
   padding: 0 $gutter 0 0;
 
   $padding-top: 14px;
   $padding-bottom: 11px;
 
+  &-service-name,
+  &-organisation-link {
+    display: inline-block;
+    overflow: hidden;
+    // aligning to the baseline with overflow: hidden adds to the parent's height
+    // aligning to the top doesn't
+    // see: https://stackoverflow.com/questions/23529369/why-does-x-overflowhidden-cause-extra-space-below#answer-51088033
+    vertical-align: top;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  &-service-switch,
+  &-service-back-to,
+  &-organisation-link {
+
+    &:link,
+    &:visited {
+      text-decoration: none;
+    }
+
+    &:hover {
+      text-decoration: underline;
+    }
+
+  }
+
   &-service {
 
+    @include govuk-font($size: 19);
     border-bottom: 1px solid $border-colour;
     margin: 0 0 10px;
     position: relative;
-    font-size: 0;
 
     &-name {
-      @include bold-19;
+
       padding: $padding-top 0 $padding-bottom 0;
-      display: inline-block;
       max-width: 50%;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
+
     }
 
     &-switch {
 
-      @include core-19;
-      text-decoration: none;
       text-align: right;
       position: absolute;
       top: 0;
       right: 0;
       padding: $padding-top 0 $padding-bottom $gutter-half;
-
-      &:hover {
-        color: $link-hover-colour;
-        text-decoration: underline;
-      }
 
       &:focus {
         outline: none;
@@ -43,22 +61,14 @@
         border-left: 10px solid $yellow;
         border-right: 3px solid $yellow;
         right: -3px;
-        color: $text-colour;
       }
 
     }
 
     &-back-to {
 
-      @include core-19;
       padding: $padding-top $gutter-half $padding-bottom 0;
       display: inline-block;
-      text-decoration: none;
-
-      &:hover {
-        text-decoration: underline;
-        color: $link-hover-colour;
-      }
 
     }
 
@@ -66,14 +76,7 @@
 
   &-organisation-link {
 
-    @include core-19;
-    display: inline-block;
     max-width: 25%;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    font-weight: normal;
-    text-decoration: none;
     padding: $padding-top 20px $padding-bottom 0;
     margin-right: 7px;
     box-sizing: border-box;
@@ -97,13 +100,8 @@
       border-color: $secondary-text-colour;
     }
 
-    &:hover {
-      color: $link-hover-colour;
-      text-decoration: underline;
-    }
-
+    // hack to make the focus style fit in the navigation bar
     &:focus {
-      color: $text-colour;
       outline: none;
       box-shadow: 0 1px 0 0 $focus-colour, -3px 0 0 0 $focus-colour, -3px 1px 0 0 $focus-colour;
     }
@@ -111,7 +109,6 @@
   }
 
   li {
-    @include core-19;
     margin: 0;
     list-style-type: none;
   }
@@ -129,12 +126,7 @@
     }
 
     &:hover {
-      color: $link-hover-colour;
       text-decoration: underline;
-    }
-
-    &:focus {
-      color: $text-colour;
     }
 
     &.selected {

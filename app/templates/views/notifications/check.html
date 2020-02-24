@@ -81,7 +81,7 @@
         {{ govukButton({ "text": button_text }) }}
       {% endif %}
       {% if template.template_type == 'letter' %}
-        <a href="{{ url_for('no_cookie.check_notification_preview', service_id=current_service.id, template_id=template.id, filetype='pdf') }}" download class="page-footer-right-aligned-link{% if error %}-without-button{% endif %}">Download as a PDF</a>
+        <a href="{{ url_for('no_cookie.check_notification_preview', service_id=current_service.id, template_id=template.id, filetype='pdf') }}" download class="govuk-link govuk-link--no-visited-state page-footer-right-aligned-link{% if error %}-without-button{% endif %}">Download as a PDF</a>
       {% endif %}
     </form>
   </div>

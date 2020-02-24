@@ -1,6 +1,6 @@
 {% macro big_number(number, label, link=None, currency='', smaller=False, smallest=False) %}
   {% if link %}
-    <a class="big-number-link" href="{{ link }}">
+    <a class="govuk-link govuk-link--no-visited-state big-number-link" href="{{ link }}">
   {% endif %}
   <div class="big-number{% if smaller %}-smaller{% endif %}{% if smallest %}-smallest{% endif %}">
     <div class="big-number-number">
@@ -42,7 +42,7 @@
       <div class="big-number-status{% if danger_zone %}-failing{% endif %}">
         {% if failures %}
           {% if failure_link %}
-            <a href="{{ failure_link }}">
+            <a class="govuk-link govuk-link--no-visited-state" href="{{ failure_link }}">
               {{ "{:,}".format(failures) }}
               failed – {{ failure_percentage }}%
             </a>

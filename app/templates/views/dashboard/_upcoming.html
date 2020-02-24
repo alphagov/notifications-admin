@@ -23,7 +23,7 @@
       ) %}
         {% call row_heading() %}
           <div class="file-list">
-            <a class="file-list-filename" href="{{ url_for('.view_job', service_id=current_service.id, job_id=item.id) }}">{{ item.original_file_name }}</a>
+            <a class="govuk-link govuk-link--no-visited-state file-list-filename" href="{{ url_for('.view_job', service_id=current_service.id, job_id=item.id) }}">{{ item.original_file_name }}</a>
             <span class="file-list-hint">
               Sending {{ item.scheduled_for|format_datetime_relative }}
             </span>

@@ -120,19 +120,3 @@
 .align-with-big-number-hint {
   margin-top: $gutter / 0.6;
 }
-
-.global-cookie-message {
-  p {
-    @extend %site-width-container;
-  }
-}
-
-.footer-nav {
-  @include copy-16;
-  margin-bottom: $gutter-two-thirds;
-
-  a {
-    display: inline-block;
-    margin-right: $gutter-half;
-  }
-}
