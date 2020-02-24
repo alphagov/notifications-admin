@@ -9,8 +9,21 @@
 {% block maincolumn_content %}
     <h1 class="heading-large">Uploads</h1>
     <div class="dashboard">
-      {{ scheduled_jobs|safe }}
-      {% include 'views/dashboard/_jobs.html' %}
+      {% if show_scheduled_jobs %}
+        {% with hide_heading = True %}
+          {% include 'views/dashboard/_upcoming.html' %}
+        {% endwith %}
+      {% endif %}
+      {% if jobs %}
+        {% include 'views/dashboard/_jobs.html' %}
+      {% endif %}
+      {% if not jobs and not show_scheduled_jobs %}
+        {#
+          `_jobs.html` will show the ‘You have no jobs’ message when
+          passed an empty list of jobs
+        #}
+        {% include 'views/dashboard/_jobs.html' %}
+      {% endif %}
       {{ previous_next_navigation(prev_page, next_page) }}
       {% if current_service.can_upload_letters and current_user.has_permissions('send_messages') %}
         <div class="js-stick-at-bottom-when-scrolling">

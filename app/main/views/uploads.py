@@ -57,7 +57,9 @@ def uploads(service_id):
         jobs=uploads,
         prev_page=prev_page,
         next_page=next_page,
-        scheduled_jobs='',
+        show_scheduled_jobs=(
+            uploads.current_page == 1 and current_service.scheduled_jobs
+        ),
     )
 
 

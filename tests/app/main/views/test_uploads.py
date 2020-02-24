@@ -4,11 +4,16 @@ from unittest.mock import Mock
 
 import pytest
 from flask import make_response, url_for
+from freezegun import freeze_time
 from requests import RequestException
 
 from app.main.views.uploads import format_recipient
 from app.utils import normalize_spaces
-from tests.conftest import SERVICE_ONE_ID
+from tests.conftest import (
+    SERVICE_ONE_ID,
+    create_active_caseworking_user,
+    create_active_user_with_permissions,
+)
 
 
 @pytest.mark.parametrize('extra_permissions', (
@@ -24,6 +29,7 @@ def test_no_upload_letters_button_without_permission(
     client_request,
     service_one,
     mock_get_uploads,
+    mock_get_jobs,
     extra_permissions,
 ):
     service_one['permissions'] += extra_permissions
@@ -31,11 +37,38 @@ def test_no_upload_letters_button_without_permission(
     assert not page.find('a', text=re.compile('Upload a letter'))
 
 
+@pytest.mark.parametrize('extra_permissions, expected_empty_message', (
+    (['letter'], (
+        'You have not uploaded any files yet'
+    )),
+    (['letter', 'upload_letters'], (
+        'Upload a letter and Notify will print, pack and post it for you.'
+    )),
+))
+def test_get_upload_hub_with_no_uploads(
+    mocker,
+    client_request,
+    service_one,
+    mock_get_no_uploads,
+    extra_permissions,
+    expected_empty_message,
+):
+    mocker.patch('app.job_api_client.get_jobs', return_value={'data': []})
+    service_one['permissions'] += extra_permissions
+    page = client_request.get('main.uploads', service_id=SERVICE_ONE_ID)
+    assert normalize_spaces(
+        page.select_one('.table-empty-message').text
+    ) == expected_empty_message
+    assert not page.select('.file-list-filename')
+
+
 def test_get_upload_hub_page(
+    mocker,
     client_request,
     service_one,
     mock_get_uploads,
 ):
+    mocker.patch('app.job_api_client.get_jobs', return_value={'data': []})
     service_one['permissions'] += ['letter', 'upload_letters']
     page = client_request.get('main.uploads', service_id=SERVICE_ONE_ID)
     assert page.find('h1').text == 'Uploads'
@@ -589,3 +622,36 @@ def test_send_uploaded_letter_when_metadata_states_pdf_is_invalid(mocker, servic
 ])
 def test_format_recipient(original_address, expected_address):
     assert format_recipient(urllib.parse.quote(original_address)) == expected_address
+
+
+@pytest.mark.parametrize('user', (
+    create_active_caseworking_user(),
+    create_active_user_with_permissions(),
+))
+@freeze_time("2012-12-12 12:12")
+def test_uploads_page_shows_scheduled_jobs(
+    mocker,
+    client_request,
+    mock_get_no_uploads,
+    mock_get_jobs,
+    user,
+):
+    client_request.login(user)
+    page = client_request.get('main.uploads', service_id=SERVICE_ONE_ID)
+
+    assert [
+        normalize_spaces(row.text) for row in page.select('tr')
+    ] == [
+        (
+            'File Messages to be sent'
+        ),
+        (
+            'send_me_later.csv '
+            'Sending 1 January 2016 at 11:09am 1'
+        ),
+        (
+            'even_later.csv '
+            'Sending 1 January 2016 at 11:09pm 1'
+        ),
+    ]
+    assert not page.select('.table-empty-message')
