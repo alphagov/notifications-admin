@@ -50,7 +50,7 @@ def sign_in():
         flash(Markup(
             (
                 "The email address or password you entered is incorrect."
-                " <a href={password_reset}>Forgot your password</a>?"
+                " <a href={password_reset}>Forgotten your password?</a>"
             ).format(password_reset=url_for('.forgot_password'))
         ))
 
