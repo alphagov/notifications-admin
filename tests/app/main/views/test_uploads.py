@@ -632,11 +632,10 @@ def test_format_recipient(original_address, expected_address):
 def test_uploads_page_shows_scheduled_jobs(
     mocker,
     client_request,
-    mock_get_uploads,
+    mock_get_no_uploads,
     mock_get_jobs,
     user,
 ):
-    mocker.patch('app.models.job.PaginatedUploads.client_method', return_value={'data': []})
     client_request.login(user)
     page = client_request.get('main.uploads', service_id=SERVICE_ONE_ID)
 
