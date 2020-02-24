@@ -36,6 +36,5 @@ display_result $? 2 "Import order check"
 npm test
 display_result $? 3 "Javascript tests have"
 
-## Code coverage
-py.test -n auto --maxfail=10 --cov=app --cov-report=term-missing tests/ --strict -p no:warnings
-display_result $? 4 "Code coverage"
+py.test -n auto --maxfail=10 tests/ --strict
+display_result $? 4 "Unit tests have"
