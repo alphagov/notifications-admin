@@ -36,5 +36,5 @@ display_result $? 2 "Import order check"
 npm test
 display_result $? 3 "Javascript tests have"
 
-py.test -n auto --maxfail=10 tests/ --strict
+py.test -n auto --maxfail=10 tests/
 display_result $? 4 "Unit tests have"
