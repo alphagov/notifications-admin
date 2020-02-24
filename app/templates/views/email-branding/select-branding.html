@@ -15,7 +15,7 @@
     {% for brand in email_brandings %}
       <div class="email-brand">
         <div class="message-name">
-          <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.update_email_branding', branding_id=brand.id) }}">
+          <a href="{{ url_for('.update_email_branding', branding_id=brand.id) }}">
             {{ brand.name or 'Unnamed' }}
           </a>
         </div>

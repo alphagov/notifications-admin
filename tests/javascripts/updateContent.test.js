@@ -55,7 +55,7 @@ describe('Update content', () => {
               </div>
             </li>
             <li aria-selected="false" role="tab">
-              <a class="govuk-link govuk-link--no-visited-state" href="/services/6658542f-0cad-491f-bec8-ab8457700ead/notifications/email?status=sending">
+              <a href="/services/6658542f-0cad-491f-bec8-ab8457700ead/notifications/email?status=sending">
                 <div class="big-number-smaller">
                   <div class="big-number-number">0</div>
                 </div>
@@ -63,7 +63,7 @@ describe('Update content', () => {
               </a>
             </li>
             <li aria-selected="false" role="tab">
-              <a class="govuk-link govuk-link--no-visited-state" href="/services/6658542f-0cad-491f-bec8-ab8457700ead/notifications/email?status=delivered">
+              <a href="/services/6658542f-0cad-491f-bec8-ab8457700ead/notifications/email?status=delivered">
                 <div class="big-number-smaller">
                   <div class="big-number-number">0</div>
                 </div>
@@ -71,7 +71,7 @@ describe('Update content', () => {
               </a>
             </li>
             <li aria-selected="false" role="tab">
-              <a class="govuk-link govuk-link--no-visited-state" href="/services/6658542f-0cad-491f-bec8-ab8457700ead/notifications/email?status=failed">
+              <a href="/services/6658542f-0cad-491f-bec8-ab8457700ead/notifications/email?status=failed">
                 <div class="big-number-smaller">
                   <div class="big-number-number">0</div>
                 </div>

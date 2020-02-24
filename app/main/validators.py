@@ -46,8 +46,7 @@ class ValidGovEmail:
         message = (
             'Enter a government email address.'
             ' If you think you should have access'
-            ' <a class="govuk-link govuk-link--no-visited-state" href="{}">contact us</a>'
-        ).format(url_for('main.support'))
+            ' <a href="{}">contact us</a>').format(url_for('main.support'))
         if not is_gov_user(field.data.lower()):
             raise ValidationError(message)
 

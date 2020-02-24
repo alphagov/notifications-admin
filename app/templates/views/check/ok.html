@@ -9,7 +9,7 @@
 {% set file_contents_header_id = 'file-preview' %}
 {% macro skip_to_file_contents() %}
   <p class="govuk-visually-hidden">
-    <a class="govuk-link govuk-link--no-visited-state" href="#{{ file_contents_header_id }}">Skip to file contents</a>
+    <a href="#{{ file_contents_header_id }}">Skip to file contents</a>
   </p>
 {% endmacro %}
 
@@ -76,7 +76,7 @@
             {% if (item.index + 2) == preview_row %}
               {{ item.index + 2 }}
             {% else %}
-              <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.check_messages', service_id=current_service.id, template_id=template.id, upload_id=upload_id, row_index=(item.index + 2), original_file_name=original_file_name) }}">{{ item.index + 2 }}</a>
+              <a href="{{ url_for('.check_messages', service_id=current_service.id, template_id=template.id, upload_id=upload_id, row_index=(item.index + 2), original_file_name=original_file_name) }}">{{ item.index + 2 }}</a>
             {% endif %}
           </span>
         {% endcall %}

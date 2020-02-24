@@ -55,6 +55,19 @@
     outline: 3px solid $yellow;
   }
 
+  a {
+
+    &:link,
+    &:visited {
+      color: $error-colour;
+    }
+
+    &:hover {
+      color: $mellow-red;
+    }
+
+  }
+
   .list {
     margin-bottom: 0;
   }
@@ -95,7 +108,7 @@
 
   a {
 
-    font-weight: bold;
+    @include bold-19;
     display: block;
     padding: 0 ;
     margin: 0 0 $gutter 0;
@@ -105,16 +118,16 @@
       color: $white;
     }
 
-    &:focus,
+    &:hover,
     &:active {
-      color: $govuk-focus-text-colour;
-      outline: 10px solid $yellow;
-    }
-
-    &:hover {
-      color: $white;
       background-color: $link-hover-colour;
       outline: 10px solid $link-hover-colour;
+    }
+
+    &:active,
+    &:focus {
+      background-color: $yellow;
+      outline: 10px solid $yellow;
     }
 
   }

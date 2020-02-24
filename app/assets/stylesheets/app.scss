@@ -1,4 +1,10 @@
 // Extra CSS overlaying elements
+a {
+  &:visited {
+    color: $link-colour;
+  }
+}
+
 .form-control-1-1 {
   width: 100%;
 }

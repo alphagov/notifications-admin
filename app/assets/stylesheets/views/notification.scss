@@ -6,14 +6,18 @@
 
   &.error {
 
-    color: $govuk-error-colour;
+    color: $error-colour;
     font-weight: bold;
+
+    a {
+      color: $error-colour;
+    }
 
   }
 
   &-cancelled {
     @include bold-19;
-    color: $govuk-error-colour;
+    color: $error-colour;
   }
 
 }

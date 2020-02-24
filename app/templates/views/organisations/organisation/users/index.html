@@ -44,7 +44,7 @@
         <ul class="tick-cross-list">
           <li class="tick-cross-list-edit-link">
             {% if user.status == 'pending' %}
-              <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.cancel_invited_org_user', org_id=current_org.id, invited_user_id=user.id)}}">Cancel invitation</a>
+              <a href="{{ url_for('.cancel_invited_org_user', org_id=current_org.id, invited_user_id=user.id)}}">Cancel invitation</a>
             {% endif %}
           </li>
         </ul>
