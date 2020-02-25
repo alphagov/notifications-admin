@@ -28,7 +28,7 @@ class _MockS3Object():
                 partial(url_for, 'main.request_to_go_live', service_id=SERVICE_ONE_ID),
             ),
             (
-                [],
+                ['govuk-link', 'govuk-link--no-visited-state'],
                 partial(url_for, 'main.service_download_agreement', service_id=SERVICE_ONE_ID),
             ),
         ]
@@ -41,7 +41,7 @@ class _MockS3Object():
                 partial(url_for, 'main.request_to_go_live', service_id=SERVICE_ONE_ID),
             ),
             (
-                [],
+                ['govuk-link', 'govuk-link--no-visited-state'],
                 partial(url_for, 'main.service_download_agreement', service_id=SERVICE_ONE_ID),
             ),
             (
@@ -58,7 +58,7 @@ class _MockS3Object():
                 partial(url_for, 'main.request_to_go_live', service_id=SERVICE_ONE_ID),
             ),
             (
-                [],
+                ['govuk-link', 'govuk-link--no-visited-state'],
                 partial(url_for, 'main.service_download_agreement', service_id=SERVICE_ONE_ID),
             ),
             (
@@ -75,7 +75,7 @@ class _MockS3Object():
                 partial(url_for, 'main.request_to_go_live', service_id=SERVICE_ONE_ID),
             ),
             (
-                [],
+                ['govuk-link', 'govuk-link--no-visited-state'],
                 partial(url_for, 'main.support'),
             ),
         ]

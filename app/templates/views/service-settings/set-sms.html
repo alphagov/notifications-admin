@@ -26,7 +26,7 @@
         after your free allowance.
       </p>
       <p>
-        See <a href="{{ url_for(".pricing", _anchor="letters") }}">pricing</a> for more details.
+        See <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for(".pricing", _anchor="letters") }}">pricing</a> for more details.
       </p>
       {% call form_wrapper() %}
         {{ radios(form.enabled) }}

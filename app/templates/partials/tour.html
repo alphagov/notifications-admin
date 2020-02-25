@@ -31,7 +31,7 @@
           Notify delivers the message
         </p>
         {% if help == '3' %}
-          <a href='{{ url_for(".go_to_dashboard_after_tour", service_id=current_service.id, example_template_id=template.id) }}'>
+          <a class="govuk-link govuk-link--no-visited-state" href='{{ url_for(".go_to_dashboard_after_tour", service_id=current_service.id, example_template_id=template.id) }}'>
             Now go to your dashboard
           </a>
         {% endif %}

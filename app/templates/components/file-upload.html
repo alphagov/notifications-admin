@@ -32,7 +32,7 @@
     </label>
     {% if alternate_link and alternate_link_text %}
       <span class="file-upload-alternate-link">
-        or <a href="{{ alternate_link }}">{{ alternate_link_text }}</a>
+        or <a class="govuk-link govuk-link--no-visited-state" href="{{ alternate_link }}">{{ alternate_link_text }}</a>
       </span>
     {% endif %}
     <label class="file-upload-filename" for="{{ field.name }}"></label>

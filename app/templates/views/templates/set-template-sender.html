@@ -23,7 +23,7 @@
           hide_legend=True
         ) }}
         {{ page_footer('Continue') }}
-        <a href="{{ url_for('.service_add_letter_contact', service_id=current_service.id, from_template=template_id) }}">Add new sender</a>
+        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.service_add_letter_contact', service_id=current_service.id, from_template=template_id) }}">Add new sender</a>
       {% endcall %}
     </div>
   </div>

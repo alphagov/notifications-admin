@@ -20,13 +20,13 @@
 
   <p>
     {% if not current_user.is_authenticated %}
-      <a href="{{ url_for('main.register') }}">Create an account</a> then add as many different services as you need to.</p>
+      <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.register') }}">Create an account</a> then add as many different services as you need to.</p>
     {% else %}
       You can add as many different services as you need to.
     {% endif %}
   </p>
 
-  <p>When you add a new service it will start in <a href="{{ url_for('main.trial_mode_new') }}">trial mode</a>.</p>
+  <p>When you add a new service it will start in <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.trial_mode_new') }}">trial mode</a>.</p>
 
   <h2 class="heading-medium" id="emails">Emails</h2>
   <p>It’s free to send emails through Notify.</p>
@@ -40,7 +40,7 @@
     <li>25,000 free text messages for other public sector services</li>
   </ul>
   <p>It costs 1.58 pence (plus VAT) for each text message you send after you've used your free allowance.</p>
-  <p>See <a href="{{ url_for('main.how_to_pay') }}">how to pay</a>.
+  <p>See <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.how_to_pay') }}">how to pay</a>.
 
   <h3 class="heading-small" id="long-text-messages">Long text messages</h3>
   <p>If a text message is longer than 160 characters (including spaces), it’ll be charged as more than one message:</p>

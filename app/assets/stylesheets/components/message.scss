@@ -34,15 +34,8 @@
       margin-bottom: -$gutter;
       padding-bottom: $gutter;
 
-      &:hover {
-        color: $link-hover-colour;
-
-        .message-name-separator {
-          &:before {
-            border-color: $link-hover-colour;
-          }
-        }
-
+      &:hover .message-name-separator:before {
+        border-color: $link-hover-colour;
       }
 
       &:focus {

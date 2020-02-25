@@ -25,23 +25,23 @@
             <h2 class="message-name">
               {% for ancestor in item.ancestors %}
                 {% if ancestor.is_service %}
-                  <a href="{{ url_for('.choose_template_to_copy', service_id=current_service.id, from_service=ancestor.service_id) }}" class="template-list-folder">
+                  <a href="{{ url_for('.choose_template_to_copy', service_id=current_service.id, from_service=ancestor.service_id) }}" class="govuk-link govuk-link--no-visited-state template-list-folder">
                 {% else %}
-                  <a href="{{ url_for('.choose_template_to_copy', service_id=current_service.id, from_folder=ancestor.id) }}" class="template-list-folder">
+                  <a href="{{ url_for('.choose_template_to_copy', service_id=current_service.id, from_folder=ancestor.id) }}" class="govuk-link govuk-link--no-visited-state template-list-folder">
                 {% endif %}
                   {{ ancestor.name }}
                 </a> <span class="message-name-separator"></span>
               {% endfor %}
               {% if item.is_service %}
-                <a href="{{ url_for('.choose_template_to_copy', service_id=current_service.id, from_service=item.service_id) }}" class="template-list-folder">
+                <a href="{{ url_for('.choose_template_to_copy', service_id=current_service.id, from_service=item.service_id) }}" class="govuk-link govuk-link--no-visited-state template-list-folder">
                   <span class="live-search-relevant">{{ item.name }}</span>
                 </a>
               {% elif item.is_folder %}
-                <a href="{{ url_for('.choose_template_to_copy', service_id=current_service.id, from_service=item.service_id, from_folder=item.id) }}" class="template-list-folder">
+                <a href="{{ url_for('.choose_template_to_copy', service_id=current_service.id, from_service=item.service_id, from_folder=item.id) }}" class="govuk-link govuk-link--no-visited-state template-list-folder">
                   <span class="live-search-relevant">{{ item.name }}</span>
                 </a>
               {% else %}
-                <a href="{{ url_for('.copy_template', service_id=current_service.id, template_id=item.id, from_service=item.service_id) }}">
+                <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.copy_template', service_id=current_service.id, template_id=item.id, from_service=item.service_id) }}">
                   <span class="live-search-relevant">{{ item.name }}</span>
                 </a>
               {% endif %}

@@ -19,7 +19,7 @@
       {{ current_service.organisation.name }} has already accepted the GOV.UK
       Notify data sharing and financial agreement.
     </p>
-    <p>For more information, you can <a href="{{ url_for('main.service_download_agreement', service_id=current_service.id) }}">download a copy of the agreement</a>.
+    <p>For more information, you can <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.service_download_agreement', service_id=current_service.id) }}">download a copy of the agreement</a>.
     </p>
     <p>
       The agreement is confidential and should not be shared outside your organisation.

@@ -17,22 +17,7 @@
   }
 
   &-link {
-    @include bold-24;
-
-    &-destructive {
-      @include bold-24;
-      color: $error-colour;
-
-      &:visited,
-      &:link {
-        @include bold-24;
-        color: $error-colour;
-      }
-
-      &:hover {
-        color: $mellow-red;
-      }
-    }
+    @include govuk-font(24, $weight: bold);
   }
 
   &-hint {
