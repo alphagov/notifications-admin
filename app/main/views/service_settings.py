@@ -293,28 +293,6 @@ def service_set_permission(service_id, permission):
     )
 
 
-@main.route("/services/<uuid:service_id>/service-settings/can-upload-document", methods=['GET', 'POST'])
-@user_has_permissions('manage_service')
-def service_switch_can_upload_document(service_id):
-    if current_service.contact_link:
-        current_service.force_permission('upload_document', on=(not current_service.has_permission('upload_document')))
-        return redirect(url_for(".service_settings", service_id=service_id))
-
-    form = ServiceContactDetailsForm()
-
-    if form.validate_on_submit():
-        contact_type = form.contact_details_type.data
-
-        current_service.update(
-            contact_link=form.data[contact_type]
-        )
-
-        current_service.force_permission('upload_document', on=(not current_service.has_permission('upload_document')))
-        return redirect(url_for(".service_settings", service_id=service_id))
-
-    return render_template('views/service-settings/contact_link.html', form=form)
-
-
 @main.route("/services/<uuid:service_id>/service-settings/archive", methods=['GET', 'POST'])
 @user_has_permissions('manage_service')
 def archive_service(service_id):
@@ -360,18 +338,20 @@ def resume_service(service_id):
         return service_settings(service_id)
 
 
-@main.route("/services/<uuid:service_id>/service-settings/contact-link", methods=['GET', 'POST'])
+@main.route("/services/<uuid:service_id>/service-settings/send-files-by-email", methods=['GET', 'POST'])
 @user_has_permissions('manage_service')
-def service_set_contact_link(service_id):
+def send_files_by_email_contact_details(service_id):
     form = ServiceContactDetailsForm()
+    contact_details = None
 
     if request.method == 'GET':
         contact_details = current_service.contact_link
-        contact_type = check_contact_details_type(contact_details)
-        field_to_update = getattr(form, contact_type)
+        if contact_details:
+            contact_type = check_contact_details_type(contact_details)
+            field_to_update = getattr(form, contact_type)
 
-        form.contact_details_type.data = contact_type
-        field_to_update.data = contact_details
+            form.contact_details_type.data = contact_type
+            field_to_update.data = contact_details
 
     if form.validate_on_submit():
         contact_type = form.contact_details_type.data
@@ -381,7 +361,9 @@ def service_set_contact_link(service_id):
         )
         return redirect(url_for('.service_settings', service_id=current_service.id))
 
-    return render_template('views/service-settings/contact_link.html', form=form)
+    return render_template(
+        'views/service-settings/send-files-by-email.html', form=form, contact_details=contact_details
+    )
 
 
 @main.route("/services/<uuid:service_id>/service-settings/set-reply-to-email", methods=['GET'])

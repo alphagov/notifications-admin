@@ -175,7 +175,7 @@ def service_json(
         'inbound_api': inbound_api,
         'service_callback_api': service_callback_api,
         'prefix_sms': prefix_sms,
-        'contact_link': None,
+        'contact_link': contact_link,
         'volume_email': 111111,
         'volume_sms': 222222,
         'volume_letter': 333333,
