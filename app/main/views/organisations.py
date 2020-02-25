@@ -125,8 +125,10 @@ def add_organisation_from_nhs_local_service(service_id):
 @main.route("/organisations/<uuid:org_id>", methods=['GET'])
 @user_has_permissions()
 def organisation_dashboard(org_id):
+    services = current_organisation.services_and_usage()
     return render_template(
         'views/organisations/organisation/index.html',
+        services=services
     )
 
 

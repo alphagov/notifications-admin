@@ -9,11 +9,17 @@
   <h1 class="heading-medium">
     Usage
   </h1>
+
   <ul>
-  {% for service in current_org.live_services %}
+  {% for service in services['services'] %}
     <li class="browse-list-item">
-      <a href="{{ url_for('main.usage', service_id=service.id) }}" class="govuk-link govuk-link--no-visited-state browse-list-link">{{ service['name'] }}</a>
+      <a href="{{ url_for('main.usage', service_id=service.service_id) }}" class="govuk-link govuk-link--no-visited-state browse-list-link">{{ service.service_name  }}</a>
     </li>
+    <div class="grid-row">
+      <div class="column-one-third">{{ service.emails_sent|format_thousands }} emails sent</div>
+      <div class="column-one-third">{{ "£{:,.2f}".format(service.sms_cost) }} spent on text messages</div>
+      <div class="column-one-third">{{ "£{:,.2f}".format(service.letter_cost) }} spent on letters</div>
+    </div>
   {% endfor %}
   </ul>
 
