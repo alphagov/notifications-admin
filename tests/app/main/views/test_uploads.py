@@ -660,3 +660,21 @@ def test_uploads_page_shows_scheduled_jobs(
         ),
     ]
     assert not page.select('.table-empty-message')
+
+
+def test_get_uploads_shows_pagination(
+    client_request,
+    active_user_with_permissions,
+    mock_get_jobs,
+    mock_get_uploads,
+):
+    page = client_request.get('main.uploads', service_id=SERVICE_ONE_ID)
+
+    assert normalize_spaces(page.select_one('.next-page').text) == (
+        'Next page '
+        'page 2'
+    )
+    assert normalize_spaces(page.select_one('.previous-page').text) == (
+        'Previous page '
+        'page 0'
+    )

@@ -46,10 +46,10 @@ def uploads(service_id):
     uploads = current_service.get_page_of_uploads(page=request.args.get('page'))
 
     prev_page = None
-    if uploads.next_page:
+    if uploads.prev_page:
         prev_page = generate_previous_dict('main.uploads', service_id, uploads.current_page)
     next_page = None
-    if uploads.prev_page:
+    if uploads.next_page:
         next_page = generate_next_dict('main.uploads', service_id, uploads.current_page)
 
     if uploads.current_page == 1:
