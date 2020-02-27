@@ -11,8 +11,34 @@
     Usage
   </h1>
 
+  <div class="grid-row">
+    <div class="column-one-third">
+      {{ big_number(
+        total_emails_sent,
+        label='emails sent',
+        smaller=True
+      ) }}
+    </div>
+    <div class="column-one-third">
+      {{ big_number(
+        total_sms_cost,
+        'spent on text messages',
+        currency="£",
+        smaller=True
+      ) }}
+    </div>
+    <div class="column-one-third">
+      {{ big_number(
+        total_letter_cost,
+        'spent on letters',
+        currency="£",
+        smaller=True
+      ) }}
+    </div>
+  </div>
+
   <ul>
-  {% for service in services['services'] %}
+  {% for service in services %}
     <li class="browse-list-item">
       <a href="{{ url_for('main.usage', service_id=service.service_id) }}" class="govuk-link govuk-link--no-visited-state browse-list-link">{{ service.service_name  }}</a>
     </li>

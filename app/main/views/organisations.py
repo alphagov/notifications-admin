@@ -125,10 +125,14 @@ def add_organisation_from_nhs_local_service(service_id):
 @main.route("/organisations/<uuid:org_id>", methods=['GET'])
 @user_has_permissions()
 def organisation_dashboard(org_id):
-    services = current_organisation.services_and_usage()
+    services = current_organisation.services_and_usage()['services']
     return render_template(
         'views/organisations/organisation/index.html',
-        services=services
+        services=services,
+        **{
+            f'total_{key}': sum(service[key] for service in services)
+            for key in ('emails_sent', 'sms_cost', 'letter_cost')
+        }
     )
 
 

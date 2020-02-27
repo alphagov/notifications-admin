@@ -64,7 +64,7 @@ def test_view_organisation_shows_the_correct_organisation(
         'app.organisations_client.get_organisation', return_value=org
     )
     mocker.patch(
-        'app.organisations_client.get_services_and_usage', return_value=[]
+        'app.organisations_client.get_services_and_usage', return_value={'services': {}}
     )
 
     page = client_request.get(
@@ -413,19 +413,25 @@ def test_organisation_services_shows_live_services_and_usage(
     mock.assert_called_once_with(ORGANISATION_ID, 2019)
 
     services = page.select('.browse-list-item')
+    usage_rows = page.find_all("div", class_="column-one-third")
     assert len(services) == 2
+
+    # Totals
+    assert normalize_spaces(usage_rows[0].text) == "33,000 emails sent"
+    assert normalize_spaces(usage_rows[1].text) == "£43.93 spent on text messages"
+    assert normalize_spaces(usage_rows[2].text) == "£30.50 spent on letters"
 
     assert normalize_spaces(services[0].text) == '1'
     assert normalize_spaces(services[1].text) == '5'
     assert services[0].find('a')['href'] == url_for('main.usage', service_id=SERVICE_ONE_ID)
-    usage_rows = page.find_all("div", class_="column-one-third")
-    assert normalize_spaces(usage_rows[0].text) == "13,000 emails sent"
-    assert normalize_spaces(usage_rows[1].text) == "£1.93 spent on text messages"
-    assert normalize_spaces(usage_rows[2].text) == "£30.50 spent on letters"
+
+    assert normalize_spaces(usage_rows[3].text) == "13,000 emails sent"
+    assert normalize_spaces(usage_rows[4].text) == "£1.93 spent on text messages"
+    assert normalize_spaces(usage_rows[5].text) == "£30.50 spent on letters"
     assert services[1].find('a')['href'] == url_for('main.usage', service_id=SERVICE_TWO_ID)
-    assert normalize_spaces(usage_rows[3].text) == "20,000 emails sent"
-    assert normalize_spaces(usage_rows[4].text) == "£42.00 spent on text messages"
-    assert normalize_spaces(usage_rows[5].text) == "£0.00 spent on letters"
+    assert normalize_spaces(usage_rows[6].text) == "20,000 emails sent"
+    assert normalize_spaces(usage_rows[7].text) == "£42.00 spent on text messages"
+    assert normalize_spaces(usage_rows[8].text) == "£0.00 spent on letters"
 
 
 def test_organisation_trial_mode_services_shows_all_non_live_services(
