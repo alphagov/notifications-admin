@@ -30,6 +30,7 @@ class Job(JSONModel):
         'processing_started',
         'notification_count',
         'created_by',
+        'template_type',
     }
 
     @classmethod
@@ -131,10 +132,6 @@ class Job(JSONModel):
             template_id=self.template_id,
             version=self.template_version,
         )['data']
-
-    @property
-    def template_type(self):
-        return self.template['template_type']
 
     @property
     def percentage_complete(self):

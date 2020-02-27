@@ -398,7 +398,7 @@ def test_should_show_old_job(
 def test_should_show_letter_job(
     client_request,
     mock_get_service_letter_template,
-    mock_get_job,
+    mock_get_letter_job,
     mock_get_service_data_retention,
     fake_uuid,
     mocker,
@@ -460,7 +460,7 @@ def test_should_show_letter_job(
 def test_should_show_letter_job_with_banner_after_sending_before_1730(
     client_request,
     mock_get_service_letter_template,
-    mock_get_job,
+    mock_get_letter_job,
     mock_get_notifications,
     mock_get_service_data_retention,
     fake_uuid,
@@ -483,7 +483,7 @@ def test_should_show_letter_job_with_banner_after_sending_before_1730(
 def test_should_show_letter_job_with_banner_when_there_are_multiple_CSV_rows(
     client_request,
     mock_get_service_letter_template,
-    mock_get_job_in_progress,
+    mock_get_letter_job_in_progress,
     mock_get_notifications,
     mock_get_service_data_retention,
     fake_uuid,
@@ -506,7 +506,7 @@ def test_should_show_letter_job_with_banner_when_there_are_multiple_CSV_rows(
 def test_should_show_letter_job_with_banner_after_sending_after_1730(
     client_request,
     mock_get_service_letter_template,
-    mock_get_job,
+    mock_get_letter_job,
     mock_get_notifications,
     mock_get_service_data_retention,
     fake_uuid,
@@ -601,7 +601,8 @@ def test_should_cancel_letter_job(
         active_user_with_permissions,
         job_id=job_id,
         created_at="2019-06-20T15:30:00.000001+00:00",
-        job_status="finished"
+        job_status="finished",
+        template_type="letter",
     )
     mocker.patch('app.job_api_client.get_job', side_effect=[{"data": job}])
     notifications_json = notification_json(SERVICE_ONE_ID, job=job, status="created", template_type="letter")
@@ -819,7 +820,7 @@ def test_time_left(job_created_at, expected_message):
 def test_should_show_letter_job_with_first_class_if_notifications_are_first_class(
     client_request,
     mock_get_service_letter_template,
-    mock_get_job,
+    mock_get_letter_job,
     mock_get_service_data_retention,
     fake_uuid,
     mocker,
@@ -840,7 +841,7 @@ def test_should_show_letter_job_with_first_class_if_notifications_are_first_clas
 def test_should_show_letter_job_with_first_class_if_no_notifications(
     client_request,
     service_one,
-    mock_get_job,
+    mock_get_letter_job,
     fake_uuid,
     mock_get_notifications_with_no_notifications,
     mock_get_service_data_retention,
