@@ -13,6 +13,7 @@ from notifications_utils.clients.zendesk.zendesk_client import ZendeskClient
 import app
 from app.utils import email_safe
 from tests import (
+    find_element_by_tag_and_partial_text,
     invite_json,
     organisation_json,
     sample_uuid,
@@ -60,6 +61,7 @@ def mock_get_service_settings_page_common(
         'Send emails On Change',
         'Reply-to email addresses Not set Manage',
         'Email branding GOV.UK Change',
+        'Send files by email contact_us@gov.uk Manage',
 
         'Label Value Action',
         'Send text messages On Change',
@@ -82,6 +84,7 @@ def mock_get_service_settings_page_common(
         'Send emails On Change',
         'Reply-to email addresses Not set Manage',
         'Email branding GOV.UK Change',
+        'Send files by email contact_us@gov.uk Manage',
 
         'Label Value Action',
         'Send text messages On Change',
@@ -103,7 +106,6 @@ def mock_get_service_settings_page_common(
         'Data retention email Change',
         'Receive inbound SMS Off Change',
         'Email authentication Off Change',
-        'Send files by email Off Change',
     ]),
 ])
 def test_should_show_overview(
@@ -118,10 +120,13 @@ def test_should_show_overview(
         expected_rows,
         mock_get_service_settings_page_common,
 ):
-    service_one = service_json(SERVICE_ONE_ID,
-                               users=[api_user_active['id']],
-                               permissions=['sms', 'email'],
-                               organisation_id=ORGANISATION_ID)
+    service_one = service_json(
+        SERVICE_ONE_ID,
+        users=[api_user_active['id']],
+        permissions=['sms', 'email'],
+        organisation_id=ORGANISATION_ID,
+        contact_link='contact_us@gov.uk',
+    )
     mocker.patch('app.service_api_client.get_service', return_value={'data': service_one})
 
     client.login(user, mocker, service_one)
@@ -152,12 +157,13 @@ def test_no_go_live_link_for_service_without_organisation(
     page = client_request.get('main.service_settings', service_id=SERVICE_ONE_ID)
 
     assert page.find('h1').text == 'Settings'
-    assert normalize_spaces(page.select('tr')[16].text) == (
-        'Live No (organisation must be set first)'
-    )
-    assert normalize_spaces(page.select('tr')[18].text) == (
-        'Organisation Not set Central government Change'
-    )
+
+    is_live = find_element_by_tag_and_partial_text(page, tag='td', string='Live')
+    assert normalize_spaces(is_live.find_next_sibling().text) == 'No (organisation must be set first)'
+
+    organisation = find_element_by_tag_and_partial_text(page, tag='td', string='Organisation')
+    assert normalize_spaces(organisation.find_next_siblings()[0].text) == 'Not set Central government'
+    assert normalize_spaces(organisation.find_next_siblings()[1].text) == 'Change'
 
 
 def test_organisation_name_links_to_org_dashboard(
@@ -180,9 +186,43 @@ def test_organisation_name_links_to_org_dashboard(
         'main.service_settings', service_id=SERVICE_ONE_ID
     )
 
-    org_row = response.select('tr')[18]
+    org_row = find_element_by_tag_and_partial_text(response, tag='tr', string='Organisation')
     assert org_row.find('a')['href'] == url_for('main.organisation_dashboard', org_id=ORGANISATION_ID)
     assert normalize_spaces(org_row.find('a').text) == 'Test Organisation'
+
+
+@pytest.mark.parametrize('service_contact_link,expected_text', [
+    ('contact.me@gov.uk', 'Send files by email contact.me@gov.uk Manage'),
+    (None, 'Send files by email Not set up Manage'),
+])
+def test_send_files_by_email_row_on_settings_page(
+    client_request,
+    platform_admin_user,
+    no_reply_to_email_addresses,
+    no_letter_contact_blocks,
+    single_sms_sender,
+    mock_get_service_settings_page_common,
+    mocker,
+    mock_get_service_organisation,
+    service_contact_link,
+    expected_text
+):
+    service_one = service_json(
+        SERVICE_ONE_ID,
+        permissions=['sms', 'email'],
+        organisation_id=ORGANISATION_ID,
+        contact_link=service_contact_link
+    )
+
+    mocker.patch('app.service_api_client.get_service', return_value={'data': service_one})
+
+    client_request.login(platform_admin_user, service_one)
+    response = client_request.get(
+        'main.service_settings', service_id=SERVICE_ONE_ID
+    )
+
+    org_row = find_element_by_tag_and_partial_text(response, tag='tr', string='Send files by email')
+    assert normalize_spaces(org_row.get_text()) == expected_text
 
 
 @pytest.mark.parametrize('permissions, expected_rows', [
@@ -195,6 +235,7 @@ def test_organisation_name_links_to_org_dashboard(
         'Send emails On Change',
         'Reply-to email addresses test@example.com Manage',
         'Email branding Organisation name Change',
+        'Send files by email Not set up Manage',
 
         'Label Value Action',
         'Send text messages On Change',
@@ -216,6 +257,7 @@ def test_organisation_name_links_to_org_dashboard(
         'Send emails On Change',
         'Reply-to email addresses test@example.com Manage',
         'Email branding Organisation name Change',
+        'Send files by email Not set up Manage',
 
         'Label Value Action',
         'Send text messages On Change',
@@ -1917,14 +1959,14 @@ def test_and_more_hint_appears_on_settings_with_more_than_just_a_single_sender(
         service_id=service_one['id']
     )
 
-    def get_row(page, index):
+    def get_row(page, label):
         return normalize_spaces(
-            page.select('tbody tr')[index].text
+            find_element_by_tag_and_partial_text(page, tag='tr', string=label).text
         )
 
-    assert get_row(page, 3) == "Reply-to email addresses test@example.com …and 2 more Manage"
-    assert get_row(page, 6) == "Text message senders Example …and 2 more Manage"
-    assert get_row(page, 11) == "Sender addresses 1 Example Street …and 2 more Manage"
+    assert get_row(page, 'Reply-to email addresses') == "Reply-to email addresses test@example.com …and 2 more Manage"
+    assert get_row(page, 'Text message senders') == "Text message senders Example …and 2 more Manage"
+    assert get_row(page, 'Sender addresses') == "Sender addresses 1 Example Street …and 2 more Manage"
 
 
 @pytest.mark.parametrize('sender_list_page, index, expected_output', [
@@ -3709,82 +3751,6 @@ def test_switch_service_enable_international_sms(
     assert mocked_fn.call_args[0][0] == service_one['id']
 
 
-@pytest.mark.parametrize('start_permissions, contact_details, end_permissions', [
-    (['upload_document'], 'http://example.com/', []),
-    ([], '0207 123 4567', ['upload_document']),
-])
-def test_service_switch_can_upload_document_shows_permission_page_if_service_contact_details_exist(
-    platform_admin_client,
-    service_one,
-    mock_update_service,
-    mock_get_service_settings_page_common,
-    mock_get_service_organisation,
-    no_reply_to_email_addresses,
-    no_letter_contact_blocks,
-    single_sms_sender,
-    start_permissions,
-    contact_details,
-    end_permissions,
-):
-    service_one['permissions'] = start_permissions
-    service_one['contact_link'] = contact_details
-
-    response = platform_admin_client.get(
-        url_for('main.service_switch_can_upload_document', service_id=SERVICE_ONE_ID),
-        follow_redirects=True
-    )
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    assert normalize_spaces(page.h1.text) == 'Send files by email'
-
-
-def test_service_switch_can_upload_document_turning_permission_on_with_no_contact_details_shows_form(
-    platform_admin_client,
-    service_one,
-    mock_get_service_settings_page_common,
-    mock_get_service_organisation,
-    no_reply_to_email_addresses,
-    no_letter_contact_blocks,
-    single_sms_sender,
-):
-    response = platform_admin_client.get(
-        url_for('main.service_switch_can_upload_document', service_id=SERVICE_ONE_ID),
-        follow_redirects=True
-    )
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-
-    assert 'upload_document' not in service_one['permissions']
-    assert normalize_spaces(page.h1.text) == "Add contact details for ‘Download your document’ page"
-
-
-@pytest.mark.parametrize('contact_details_type, contact_details_value', [
-    ('url', 'http://example.com/'),
-    ('email_address', 'old@example.com'),
-    ('phone_number', '0207 12345'),
-])
-def test_service_switch_can_upload_document_lets_contact_details_be_added_and_shows_permission_page(
-    platform_admin_client,
-    service_one,
-    mock_update_service,
-    mock_get_service_settings_page_common,
-    mock_get_service_organisation,
-    no_reply_to_email_addresses,
-    no_letter_contact_blocks,
-    single_sms_sender,
-    contact_details_type,
-    contact_details_value,
-):
-    data = {'contact_details_type': contact_details_type, contact_details_type: contact_details_value}
-
-    response = platform_admin_client.post(
-        url_for('main.service_switch_can_upload_document', service_id=SERVICE_ONE_ID),
-        data=data,
-        follow_redirects=True
-    )
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-
-    assert normalize_spaces(page.h1.text) == 'Send files by email'
-
-
 @pytest.mark.parametrize('user', (
     create_platform_admin_user(),
     create_active_user_with_permissions(),
@@ -3988,7 +3954,7 @@ def test_cant_resume_active_service(
     ('email_address', 'me@example.com'),
     ('phone_number', '0207 123 4567'),
 ])
-def test_service_set_contact_link_prefills_the_form_with_the_existing_contact_details(
+def test_send_files_by_email_contact_details_prefills_the_form_with_the_existing_contact_details(
     client_request,
     service_one,
     contact_details_type,
@@ -3997,7 +3963,7 @@ def test_service_set_contact_link_prefills_the_form_with_the_existing_contact_de
     service_one['contact_link'] = contact_details_value
 
     page = client_request.get(
-        'main.service_set_contact_link', service_id=SERVICE_ONE_ID
+        'main.send_files_by_email_contact_details', service_id=SERVICE_ONE_ID
     )
     assert page.find('input', attrs={'name': 'contact_details_type', 'value': contact_details_type}).has_attr('checked')
     assert page.find('input', {'id': contact_details_type}).get('value') == contact_details_value
@@ -4008,7 +3974,7 @@ def test_service_set_contact_link_prefills_the_form_with_the_existing_contact_de
     ('email_address', 'old@example.com', 'new@example.com'),
     ('phone_number', '0207 12345', '0207 56789'),
 ])
-def test_service_set_contact_link_updates_contact_details_and_redirects_to_settings_page(
+def test_send_files_by_email_contact_details_updates_contact_details_and_redirects_to_settings_page(
     client_request,
     service_one,
     mock_update_service,
@@ -4024,7 +3990,7 @@ def test_service_set_contact_link_updates_contact_details_and_redirects_to_setti
     service_one['contact_link'] = old_value
 
     page = client_request.post(
-        'main.service_set_contact_link', service_id=SERVICE_ONE_ID,
+        'main.send_files_by_email_contact_details', service_id=SERVICE_ONE_ID,
         _data={
             'contact_details_type': contact_details_type,
             contact_details_type: new_value,
@@ -4036,7 +4002,7 @@ def test_service_set_contact_link_updates_contact_details_and_redirects_to_setti
     mock_update_service.assert_called_once_with(SERVICE_ONE_ID, contact_link=new_value)
 
 
-def test_service_set_contact_link_updates_contact_details_for_the_selected_field_when_multiple_textboxes_contain_data(
+def test_send_files_by_email_contact_details_uses_the_selected_field_when_multiple_textboxes_contain_data(
     client_request,
     service_one,
     mock_update_service,
@@ -4049,7 +4015,7 @@ def test_service_set_contact_link_updates_contact_details_for_the_selected_field
     service_one['contact_link'] = 'http://www.old-url.com'
 
     page = client_request.post(
-        'main.service_set_contact_link', service_id=SERVICE_ONE_ID,
+        'main.send_files_by_email_contact_details', service_id=SERVICE_ONE_ID,
         _data={
             'contact_details_type': 'url',
             'url': 'http://www.new-url.com',
@@ -4063,12 +4029,33 @@ def test_service_set_contact_link_updates_contact_details_for_the_selected_field
     mock_update_service.assert_called_once_with(SERVICE_ONE_ID, contact_link='http://www.new-url.com')
 
 
-def test_service_set_contact_link_displays_error_message_when_no_radio_button_selected(
+@pytest.mark.parametrize(
+    'contact_link, subheader, button_selected',
+    [
+        ('contact.me@gov.uk', 'Change contact details for the file download page', True),
+        (None, 'Add contact details to the file download page', False),
+    ]
+)
+def test_send_files_by_email_contact_details_page(
+    client_request, service_one, active_user_with_permissions, contact_link, subheader, button_selected
+):
+    service_one["contact_link"] = contact_link
+    page = client_request.get(
+        'main.send_files_by_email_contact_details', service_id=SERVICE_ONE_ID
+    )
+    assert normalize_spaces(page.find_all('h2')[1].text) == subheader
+    if button_selected:
+        assert 'checked' in page.find('input', {'name': 'contact_details_type', 'value': 'email_address'}).attrs
+    else:
+        assert 'checked' not in page.find('input', {'name': 'contact_details_type', 'value': 'email_address'}).attrs
+
+
+def test_send_files_by_email_contact_details_displays_error_message_when_no_radio_button_selected(
     client_request,
     service_one
 ):
     page = client_request.post(
-        'main.service_set_contact_link', service_id=SERVICE_ONE_ID,
+        'main.send_files_by_email_contact_details', service_id=SERVICE_ONE_ID,
         _data={
             'contact_details_type': None,
             'url': '',
@@ -4078,7 +4065,7 @@ def test_service_set_contact_link_displays_error_message_when_no_radio_button_se
         _follow_redirects=True
     )
     assert normalize_spaces(page.find('span', class_='error-message').text) == 'Not a valid choice'
-    assert normalize_spaces(page.h1.text) == "Add contact details for ‘Download your document’ page"
+    assert normalize_spaces(page.h1.text) == "Send files by email"
 
 
 @pytest.mark.parametrize('contact_details_type, invalid_value, error', [
@@ -4086,7 +4073,7 @@ def test_service_set_contact_link_displays_error_message_when_no_radio_button_se
     ('email_address', 'me@co', 'Enter a valid email address'),
     ('phone_number', 'abcde', 'Must be a valid phone number'),
 ])
-def test_service_set_contact_link_does_not_update_invalid_contact_details(
+def test_send_files_by_email_contact_details_does_not_update_invalid_contact_details(
     mocker,
     client_request,
     service_one,
@@ -4098,7 +4085,7 @@ def test_service_set_contact_link_does_not_update_invalid_contact_details(
     service_one['permissions'].append('upload_document')
 
     page = client_request.post(
-        'main.service_set_contact_link', service_id=SERVICE_ONE_ID,
+        'main.send_files_by_email_contact_details', service_id=SERVICE_ONE_ID,
         _data={
             'contact_details_type': contact_details_type,
             contact_details_type: invalid_value,
@@ -4107,24 +4094,7 @@ def test_service_set_contact_link_does_not_update_invalid_contact_details(
     )
 
     assert normalize_spaces(page.find('span', class_='error-message').text) == error
-    assert normalize_spaces(page.h1.text) == "Change contact details for ‘Download your document’ page"
-
-
-def test_contact_link_is_displayed_with_upload_document_permission(
-    client_request,
-    service_one,
-    mock_get_service_settings_page_common,
-    mock_get_service_organisation,
-    no_reply_to_email_addresses,
-    no_letter_contact_blocks,
-    single_sms_sender,
-):
-    service_one['permissions'] = ['upload_document']
-    page = client_request.get(
-        'main.service_settings',
-        service_id=SERVICE_ONE_ID,
-    )
-    assert 'Contact details' in page.text
+    assert normalize_spaces(page.h1.text) == "Send files by email"
 
 
 def test_contact_link_is_not_displayed_without_the_upload_document_permission(
@@ -4958,7 +4928,7 @@ def test_service_settings_links_to_branding_request_page_for_letters(
     page = client_request.get(
         '.service_settings', service_id=SERVICE_ONE_ID
     )
-    assert len(page.findAll('a', attrs={'href': '/services/{}/branding-request/letter'.format(SERVICE_ONE_ID)})) == 1
+    assert len(page.find_all('a', attrs={'href': '/services/{}/branding-request/letter'.format(SERVICE_ONE_ID)})) == 1
 
 
 def test_show_service_data_retention(

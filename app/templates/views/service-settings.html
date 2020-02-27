@@ -45,19 +45,6 @@
             )
           }}
         {% endcall %}
-
-        {% call settings_row(if_has_permission='upload_document') %}
-          {{ text_field('Contact details') }}
-          {{ text_field(current_service.contact_link, truncate=true) }}
-          {{ edit_field(
-              'Change',
-              url_for('.service_set_contact_link',
-              service_id=current_service.id),
-              permissions=['manage_service']
-            )
-          }}
-        {% endcall %}
-
       {% endcall %}
 
       {% call mapping_table(
@@ -106,6 +93,16 @@
           {{ edit_field(
             'Change',
             url_for('.branding_request', service_id=current_service.id, branding_type="email"),
+            permissions=['manage_service'],
+          )}}
+        {% endcall %}
+
+        {% call settings_row(if_has_permission='email') %}
+          {{ text_field('Send files by email') }}
+          {{ text_field(current_service.contact_link if current_service.contact_link else "Not set up", truncate=true) }}
+          {{ edit_field(
+            'Manage',
+            url_for('.send_files_by_email_contact_details', service_id=current_service.id),
             permissions=['manage_service'],
           )}}
         {% endcall %}

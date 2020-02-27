@@ -42,7 +42,7 @@ def test_find_services_by_name_displays_multiple_services(
     )
     document = client_request.post('main.find_services_by_name', _data={"search": "Tadfield"}, _expected_status=200)
 
-    results = document.select('.browse-list-item a')
+    results = document.find_all('li', {'class': 'browse-list-item'})
     assert len(results) == 2
     assert sorted([result.text.strip() for result in results]) == ["Tadfield Air Base", "Tadfield Police"]
 

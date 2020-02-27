@@ -31,15 +31,13 @@ def test_service_set_permission_requires_platform_admin(
     mock_get_inbound_number_for_service,
 ):
     client_request.post(
-        'main.service_set_permission', service_id=service_one['id'], permission='upload_document',
+        'main.service_set_permission', service_id=service_one['id'], permission='email_auth',
         _data={'enabled': 'True'},
         _expected_status=403
     )
 
 
 @pytest.mark.parametrize('permission, form_data, on', [
-    ('upload_document', 'True', True),
-    ('upload_document', 'False', False),
     ('inbound_sms', 'True', True),
     ('inbound_sms', 'False', False),
     ('email_auth', 'True', True),
@@ -69,10 +67,6 @@ def test_service_set_permission(
 @pytest.mark.parametrize('service_fields, endpoint, kwargs, text', [
     ({'restricted': True}, '.service_switch_live', {}, 'Live Off Change'),
     ({'restricted': False}, '.service_switch_live', {}, 'Live On Change'),
-    ({'permissions': ['upload_document']},
-     '.service_switch_can_upload_document', {}, 'Send files by email On Change'),
-    ({'permissions': []},
-     '.service_switch_can_upload_document', {}, 'Send files by email Off Change'),
     ({'permissions': ['sms']}, '.service_set_inbound_number', {}, 'Receive inbound SMS Off Change'),
     ({'permissions': ['letter']},
      '.service_set_permission', {'permission': 'upload_letters'}, 'Uploading letters Off Change'),
