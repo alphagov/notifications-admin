@@ -39,10 +39,13 @@ def test_no_upload_letters_button_without_permission(
 
 @pytest.mark.parametrize('extra_permissions, expected_empty_message', (
     (['letter'], (
-        'You have not uploaded any files yet'
+        'You have not uploaded any files yet. '
+        'To upload a list of contact details, first choose a template.'
     )),
     (['letter', 'upload_letters'], (
-        'Upload a letter and Notify will print, pack and post it for you.'
+        'You have not uploaded any files yet. '
+        'Upload a letter and Notify will print, pack and post it for you. '
+        'To upload a list of contact details, first choose a template.'
     )),
 ))
 def test_get_upload_hub_with_no_uploads(
@@ -56,9 +59,9 @@ def test_get_upload_hub_with_no_uploads(
     mocker.patch('app.job_api_client.get_jobs', return_value={'data': []})
     service_one['permissions'] += extra_permissions
     page = client_request.get('main.uploads', service_id=SERVICE_ONE_ID)
-    assert normalize_spaces(
-        page.select_one('.table-empty-message').text
-    ) == expected_empty_message
+    assert normalize_spaces(' '.join(
+        paragraph.text for paragraph in page.select('main p')
+    )) == expected_empty_message
     assert not page.select('.file-list-filename')
 
 
