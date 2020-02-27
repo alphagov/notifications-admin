@@ -9,7 +9,8 @@
 
   <h1 class="heading-large">Upload a letter</h1>
 
-  <p>You can upload and send your own letters instead of creating a reusable letter template.</p>
+  <p>Upload a one-off letter as a PDF and we’ll print, pack and post it for you.</p>
+  <p>You can use this feature if you send a lot of one-off letters or if our reusable letter templates do not meet your needs.</p>
 
   <p>To upload and send a letter from a PDF file:</p>
 
@@ -19,7 +20,9 @@
     <li>Select <b class="govuk-!-font-weight-bold">Choose file</b>.</li>
   </ol>
 
-  <h2 class="heading-medium" id="letter-specification">Letter specification</h2>
+  <h2 class="heading-medium" id="letter-specification">Your file must meet our letter specification</h2>
+
+  <p>The content of your letter must appear inside the printable area.</p>
 
   <p>Your file must be:</p>
 
@@ -30,14 +33,6 @@
     <li>smaller than 2MB</li>
   </ul>
 
-  <p>The content of your letter must appear inside the printable area.</p>
-
-  <p>To help you set up your letter, you can download our:</p>
-
-  <ul class="list list-bullet">
-    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.letter_spec') }}">letter specification document (PDF)</a></li>
-    <li><a class="govuk-link govuk-link--no-visited-state" href="https://docs.notifications.service.gov.uk/documentation/images/notify-pdf-letter-word-template-v1.0.docx">print margin checker for Microsoft Word (.docx)</a></li>
-  </ul>
-
+  <p>To help you set up your letter, you can download our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.letter_spec') }}">letter specification document (PDF)</a>.</p>
 
 {% endblock %}
