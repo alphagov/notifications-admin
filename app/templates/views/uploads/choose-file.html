@@ -4,7 +4,7 @@
 {% from "components/page-header.html" import page_header %}
 
 {% block service_page_title %}
-  Upload a one-off letter
+  Upload a letter
 {% endblock %}
 
 {% block maincolumn_content %}
@@ -19,7 +19,7 @@
       {% endcall %}
     {% else %}
       {{ page_header(
-        'Upload a one-off letter',
+        'Upload a letter',
         back_link=url_for('main.uploads', service_id=current_service.id)
     ) }}
     <p>Upload a single letter as a PDF and we’ll print, pack and post it for you.</p>
@@ -35,9 +35,20 @@
     )}}
   </p>
 
-  <h2 class="heading-medium">Your file must meet our letter specification TBC</h2>
-  <p>You can upload a single letter as a PDF.</p>
-  <p>Your file must meet our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.upload_a_letter', _anchor='letter-specification') }}">letter specification</a>.</p>
+  <h2 class="heading-medium">Your file must meet our letter specification</h2>
+
+  <p>The content of your letter must appear inside the printable area.</p>
+
+  <p>Your file must be:</p>
+
+    <ul class="list list-bullet">
+      <li>a PDF</li>
+      <li>A4 portrait size (210 × 297 mm)</li>
+      <li>10 pages or less</li>
+      <li>smaller than 2MB</li>
+    </ul>
+
+  <p>To help you set up your letter, you can download our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.upload_a_letter', _anchor='letter-specification') }}">letter specification document (PDF)</a>.</p>
   </div>
 </div>
 {% endblock %}
