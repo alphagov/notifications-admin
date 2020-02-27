@@ -87,5 +87,11 @@ class OrganisationsClient(NotifyAdminAPIClient):
             params={"org_id": org_id, "name": name}
         )["result"]
 
+    def get_services_and_usage(self, org_id, year):
+        return self.get(
+            url=f"/organisations/{org_id}/services-with-usage",
+            params={"year": str(year)}
+        )
+
 
 organisations_client = OrganisationsClient()
