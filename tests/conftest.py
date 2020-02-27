@@ -1781,13 +1781,22 @@ def mock_get_uploads(mocker, api_user_active):
                     'notification_count': 10,
                     'created_at': '2016-01-01 11:09:00.061258',
                     'statistics': [{'count': 8, 'status': 'delivered'}, {'count': 2, 'status': 'temporary-failure'}],
-                    'upload_type': 'job'},
+                    'upload_type': 'job',
+                    'template_type': 'sms',
+                    'recipient': None},
                    {'id': 'letter_id_1',
                     'original_file_name': 'some.pdf',
                     'notification_count': 1,
                     'created_at': '2016-01-01 11:09:00.061258',
                     'statistics': [{'count': 1, 'status': 'delivered'}],
-                    'upload_type': 'letter'}
+                    'upload_type': 'letter',
+                    'template_type': None,
+                    'recipient': (
+                        'Firstname Lastname\n'
+                        '123 Example Street\n'
+                        'City of Town\n'
+                        'XM4 5QQ'
+                    )}
                    ]
         return {
             'data': uploads,

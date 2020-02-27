@@ -31,6 +31,7 @@ class Job(JSONModel):
         'notification_count',
         'created_by',
         'template_type',
+        'recipient',
     }
 
     @classmethod
@@ -56,6 +57,10 @@ class Job(JSONModel):
     @property
     def upload_type(self):
         return self._dict.get('upload_type')
+
+    @property
+    def pdf_letter(self):
+        return self.upload_type == 'letter'
 
     @property
     def processing_started(self):

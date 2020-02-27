@@ -77,11 +77,11 @@ def test_get_upload_hub_page(
     )
 
     assert page.find_all(
-        'a', {'class': 'file-list-filename'}
+        'a', {'class': 'file-list-filename-large'}
     )[0].attrs['href'] == '/services/{}/jobs/job_id_1'.format(SERVICE_ONE_ID)
 
     assert page.find_all(
-        'a', {'class': 'file-list-filename'}
+        'a', {'class': 'file-list-filename-large'}
     )[1].attrs['href'] == '/services/{}/notification/letter_id_1'.format(SERVICE_ONE_ID)
 
 
@@ -643,15 +643,17 @@ def test_uploads_page_shows_scheduled_jobs(
         normalize_spaces(row.text) for row in page.select('tr')
     ] == [
         (
-            'File Sending Delivered Failed'
+            'File Status'
         ),
         (
             'send_me_later.csv '
-            'Sent 1 January 2016 at 11:09am 0 0 0'
+            'Sending 1 January 2016 at 11:09am '
+            '1 text message waiting to send'
         ),
         (
             'even_later.csv '
-            'Sent 1 January 2016 at 11:09pm 0 0 0'
+            'Sending 1 January 2016 at 11:09pm '
+            '1 text message waiting to send'
         ),
     ]
     assert not page.select('.table-empty-message')

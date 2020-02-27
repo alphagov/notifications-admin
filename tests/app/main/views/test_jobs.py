@@ -21,23 +21,23 @@ from tests.conftest import (
 @pytest.mark.parametrize('user, expected_rows', [
     (create_active_user_with_permissions(), (
         (
-            'File Sending Delivered Failed'
+            'File Status'
         ),
         (
             'export 1/1/2016.xls '
-            'Sent today at 12:12pm 1 0 0'
+            'Sent today at 12:12pm 1 sending 0 delivered 0 failed'
         ),
         (
             'all email addresses.xlsx '
-            'Sent today at 12:12pm 1 0 0'
+            'Sent today at 12:12pm 1 sending 0 delivered 0 failed'
         ),
         (
             'applicants.ods '
-            'Sent today at 12:12pm 1 0 0'
+            'Sent today at 12:12pm 1 sending 0 delivered 0 failed'
         ),
         (
             'thisisatest.csv '
-            'Sent today at 12:12pm 1 0 0'
+            'Sent today at 12:12pm 1 sending 0 delivered 0 failed'
         ),
     )),
     (create_active_caseworking_user(), (
@@ -53,23 +53,23 @@ from tests.conftest import (
             'Sending 1 January 2016 at 11:09pm 1'
         ),
         (
-            'File Sending Delivered Failed'
+            'File Status'
         ),
         (
             'export 1/1/2016.xls '
-            'Sent today at 12:12pm 1 0 0'
+            'Sent today at 12:12pm 1 sending 0 delivered 0 failed'
         ),
         (
             'all email addresses.xlsx '
-            'Sent today at 12:12pm 1 0 0'
+            'Sent today at 12:12pm 1 sending 0 delivered 0 failed'
         ),
         (
             'applicants.ods '
-            'Sent today at 12:12pm 1 0 0'
+            'Sent today at 12:12pm 1 sending 0 delivered 0 failed'
         ),
         (
             'thisisatest.csv '
-            'Sent today at 12:12pm 1 0 0'
+            'Sent today at 12:12pm 1 sending 0 delivered 0 failed'
         ),
     )),
 ])
@@ -123,23 +123,23 @@ def test_jobs_page_doesnt_show_scheduled_on_page_2(
 
     for index, row in enumerate((
         (
-            'File Sending Delivered Failed'
+            'File Status'
         ),
         (
             'export 1/1/2016.xls '
-            'Sent today at 12:12pm 1 0 0'
+            'Sent today at 12:12pm 1 sending 0 delivered 0 failed'
         ),
         (
             'all email addresses.xlsx '
-            'Sent today at 12:12pm 1 0 0'
+            'Sent today at 12:12pm 1 sending 0 delivered 0 failed'
         ),
         (
             'applicants.ods '
-            'Sent today at 12:12pm 1 0 0'
+            'Sent today at 12:12pm 1 sending 0 delivered 0 failed'
         ),
         (
             'thisisatest.csv '
-            'Sent today at 12:12pm 1 0 0'
+            'Sent today at 12:12pm 1 sending 0 delivered 0 failed'
         ),
     )):
         assert normalize_spaces(page.select('tr')[index].text) == row
