@@ -8,6 +8,7 @@
 {% from "components/form.html" import form_wrapper %}
 {% from "components/button/macro.njk" import govukButton %}
 {% from "components/details/macro.njk" import govukDetails %}
+{% from "components/checkboxes/macro.njk" import govukCheckboxes %}
 
 {% macro stats_fields(channel, data) -%}
 
@@ -108,8 +109,15 @@
     {% call form_wrapper(method="get") %}
       {{ textbox(form.start_date, hint="Enter start date in format YYYY-MM-DD") }}
       {{ textbox(form.end_date, hint="Enter end date in format YYYY-MM-DD") }}
-      {{ checkbox(form.include_from_test_key) }}
-      </br>
+      {{ govukCheckboxes({
+        "items": [{
+          "name": form.include_from_test_key.name,
+          "id": form.include_from_test_key.id,
+          "text": form.include_from_test_key.label.text,
+          "value": "y",
+          "checked": form.include_from_test_key.data
+        }]
+      }) }}
       {{ govukButton({ "text": "Filter" }) }}
     {% endcall %}
   {% endset %}

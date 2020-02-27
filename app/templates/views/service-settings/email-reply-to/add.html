@@ -4,6 +4,7 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
+{% from "components/checkboxes/macro.njk" import govukCheckboxes %}
 
 {% block service_page_title %}
   Add reply-to email address
@@ -24,9 +25,15 @@
       safe_error_message=True
     ) }}
     {% if not first_email_address %}
-      <div class="form-group">
-        {{ checkbox(form.is_default) }}
-      </div>
+      {{ govukCheckboxes({
+        "items": [{
+          "name": form.is_default.name,
+          "id": form.is_default.id,
+          "text": form.is_default.label.text,
+          "value": "y",
+          "checked": form.is_default.data
+        }]
+      }) }}
     {% endif %}
     {{ page_footer('Add') }}
   {% endcall %}

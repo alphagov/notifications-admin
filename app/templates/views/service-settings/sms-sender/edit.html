@@ -5,6 +5,7 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
+{% from "components/checkboxes/macro.njk" import govukCheckboxes %}
 
 {% block service_page_title %}
   Change text message sender
@@ -35,9 +36,15 @@
       </p>
       {{ page_footer('Save') }}
     {% else %}
-      <div class="form-group">
-        {{ checkbox(form.is_default) }}
-      </div>
+      {{ govukCheckboxes({
+        "items": [{
+          "name": form.is_default.name,
+          "id": form.is_default.id,
+          "text": form.is_default.label.text,
+          "value": "y",
+          "checked": form.is_default.data
+        }]
+      }) }}
       {% if inbound_number %}
         {{ page_footer('Save') }}
       {% else %}

@@ -4,6 +4,7 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
+{% from "components/checkboxes/macro.njk" import govukCheckboxes %}
 
 {% block service_page_title %}
   Add text message sender
@@ -23,9 +24,15 @@
       hint='Up to 11 characters, letters, numbers and spaces only'
     ) }}
     {% if not first_sms_sender %}
-      <div class="form-group">
-        {{ checkbox(form.is_default) }}
-      </div>
+      {{ govukCheckboxes({
+        "items": [{
+          "name": form.is_default.name,
+          "id": form.is_default.id,
+          "text": form.is_default.label.text,
+          "value": "y",
+          "checked": form.is_default.data
+        }]
+      }) }}
     {% endif %}
     {{ page_footer('Save') }}
   {% endcall %}

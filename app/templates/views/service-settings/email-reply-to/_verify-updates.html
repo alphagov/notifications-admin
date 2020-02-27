@@ -4,6 +4,7 @@
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 {% from "components/button/macro.njk" import govukButton %}
+{% from "components/checkboxes/macro.njk" import govukCheckboxes %}
 
 <div class="ajax-block-container">
   {% if verification_status == "pending" %}
@@ -55,9 +56,15 @@
         hint='This should be a shared inbox managed by your team, not your own email address'
       ) }}
       {% if not first_email_address and not existing_is_default %}
-        <div class="form-group">
-          {{ checkbox(form.is_default) }}
-        </div>
+        {{ govukCheckboxes({
+          "items": [{
+            "name": form.is_default.name,
+            "id": form.is_default.id,
+            "text": form.is_default.label.text,
+            "value": "y",
+            "checked": form.is_default.data
+          }]
+        }) }}
       {% endif %}
       {{ page_footer('Try again') }}
     {% endcall %}
