@@ -643,15 +643,15 @@ def test_uploads_page_shows_scheduled_jobs(
         normalize_spaces(row.text) for row in page.select('tr')
     ] == [
         (
-            'File Messages to be sent'
+            'File Sending Delivered Failed'
         ),
         (
             'send_me_later.csv '
-            'Sending 1 January 2016 at 11:09am 1'
+            'Sent 1 January 2016 at 11:09am 0 0 0'
         ),
         (
             'even_later.csv '
-            'Sending 1 January 2016 at 11:09pm 1'
+            'Sent 1 January 2016 at 11:09pm 0 0 0'
         ),
     ]
     assert not page.select('.table-empty-message')

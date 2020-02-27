@@ -52,14 +52,16 @@ def uploads(service_id):
     if uploads.prev_page:
         next_page = generate_next_dict('main.uploads', service_id, uploads.current_page)
 
+    if uploads.current_page == 1:
+        listed_uploads = current_service.scheduled_jobs + uploads
+    else:
+        listed_uploads = uploads
+
     return render_template(
         'views/jobs/jobs.html',
-        jobs=uploads,
+        jobs=listed_uploads,
         prev_page=prev_page,
         next_page=next_page,
-        show_scheduled_jobs=(
-            uploads.current_page == 1 and current_service.scheduled_jobs
-        ),
     )
 
 

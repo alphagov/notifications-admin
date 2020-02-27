@@ -76,5 +76,13 @@ class ModelList(ABC, Sequence):
         return list(self) + list(other)
 
 
+class EmptyModelList(ModelList):
+
+    client_method = model = None
+
+    def __init__(self, *args):
+        self.items = []
+
+
 class InviteTokenError(Exception):
     pass
