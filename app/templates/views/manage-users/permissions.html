@@ -1,21 +1,50 @@
-{% from "components/checkbox.html" import checkbox, checkboxes_nested %}
+{% from "components/checkbox.html" import notifyCollapsibleCheckboxes %}
 {% from "components/radios.html" import radio, radios, conditional_radio_panel %}
+{% from "components/checkboxes/macro.njk" import govukCheckboxes %}
 
-<fieldset class="form-group">
-  <legend class="form-label heading-small">
-    Permissions
-  </legend>
-  <span class="hint">
-    All team members can see sent messages.
-  </span>
-  {% for field in form.permissions_fields %}
-    {{ checkbox(field) }}
+{% set items = [] %}
+{% for option in form.permissions_fields %}
+  {% set _ = items.append({
+    "name": option.name,
+    "text": option.label.text,
+    "value": 'y',
+    "checked": option.data
+  }) %}
+{% endfor %}
+{{ govukCheckboxes({
+  "idPrefix": "permissions",
+  "fieldset": {
+    "legend": {
+      "text": "Permissions",
+      "classes": "govuk-fieldset__legend--s"
+    }
+  },
+  "hint": {
+    "text": "All team members can see sent messages."
+  },
+  "items": items
+}) }}
+
+{% macro build_tree_from_fields(_items, _fields) %}
+  {% for _field in _fields %}
+    {% set _item = {
+      "name": _field.name,
+      "text": _field.label.text,
+      "value": _field.data,
+      "checked": _field.checked
+    } %}
+    {% if _field.data in form.folder_permissions.children() %}
+      {% set _ = _item.update({"children": []}) %}
+      {{ build_tree_from_fields(_item["children"], form.folder_permissions.children()[_field.data]) }}
+    {% endif %}
+    {% set _ = _items.append(_item) %}
   {% endfor %}
-</fieldset>
+{% endmacro %}
+
 
 {% if form.folder_permissions.all_template_folders %}
-  {% set option_to_children_map = form.folder_permissions.children() %}
-  {% set folder_permissions = get_tree_of_govuk_items_from_wtforms_option_fields(option_to_children_map[None], option_to_children_map) %}
+  {% set folder_permissions = [] %}
+  {% set _ =  build_tree_from_fields(folder_permissions, form.folder_permissions.children()[None]) %}
   {{ notifyCollapsibleCheckboxes({
     "idPrefix": "folder_permissions",
     "fieldset": {
