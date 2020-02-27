@@ -1,3 +1,4 @@
+{% from "components/big-number.html" import big_number %}
 {% extends "org_template.html" %}
 
 {% block org_page_title %}
@@ -16,9 +17,37 @@
       <a href="{{ url_for('main.usage', service_id=service.service_id) }}" class="govuk-link govuk-link--no-visited-state browse-list-link">{{ service.service_name  }}</a>
     </li>
     <div class="grid-row">
-      <div class="column-one-third">{{ service.emails_sent|format_thousands }} emails sent</div>
-      <div class="column-one-third">{{ "£{:,.2f}".format(service.sms_cost) }} spent on text messages</div>
-      <div class="column-one-third">{{ "£{:,.2f}".format(service.letter_cost) }} spent on letters</div>
+      <div class="column-one-third">
+        {{ big_number(
+          service.emails_sent,
+          label='emails sent',
+          smallest=True
+        ) }}
+      </div>
+      <div class="column-one-third">
+        {% if service.sms_cost %}
+          {{ big_number(
+            service.sms_cost,
+            'spent on text messages',
+            currency="£",
+            smallest=True
+          ) }}
+        {% else %}
+          {{ big_number(
+            service.free_sms_limit - service.sms_remainder,
+            'free text messages sent',
+            smallest=True
+          ) }}
+        {% endif %}
+      </div>
+      <div class="column-one-third">
+        {{ big_number(
+          service.letter_cost,
+          'spent on letters',
+          currency="£",
+          smallest=True
+        ) }}
+      </div>
     </div>
   {% endfor %}
   </ul>
