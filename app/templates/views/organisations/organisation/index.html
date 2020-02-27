@@ -39,43 +39,46 @@
 
   <ul>
   {% for service in services %}
-    <li class="browse-list-item">
-      <a href="{{ url_for('main.usage', service_id=service.service_id) }}" class="govuk-link govuk-link--no-visited-state browse-list-link">{{ service.service_name  }}</a>
-    </li>
-    <div class="grid-row">
-      <div class="column-one-third">
-        {{ big_number(
-          service.emails_sent,
-          label='emails sent',
-          smallest=True
-        ) }}
-      </div>
-      <div class="column-one-third">
-        {% if service.sms_cost %}
+    <div class="keyline-block govuk-!-margin-top-2">
+      <li class="browse-list-item govuk-!-margin-bottom-1 govuk-!-margin-top-1">
+        <a href="{{ url_for('main.usage', service_id=service.service_id) }}" class="govuk-link govuk-link--no-visited-state browse-list-link">{{ service.service_name  }}</a>
+      </li>
+      <div class="grid-row">
+        <div class="column-one-third">
           {{ big_number(
-            service.sms_cost,
-            'spent on text messages',
+            service.emails_sent,
+            label='emails sent',
+            smallest=True
+          ) }}
+        </div>
+        <div class="column-one-third">
+          {% if service.sms_cost %}
+            {{ big_number(
+              service.sms_cost,
+              'spent on text messages',
+              currency="£",
+              smallest=True
+            ) }}
+          {% else %}
+            {{ big_number(
+              service.free_sms_limit - service.sms_remainder,
+              'free text messages sent',
+              smallest=True
+            ) }}
+          {% endif %}
+        </div>
+        <div class="column-one-third">
+          {{ big_number(
+            service.letter_cost,
+            'spent on letters',
             currency="£",
             smallest=True
           ) }}
-        {% else %}
-          {{ big_number(
-            service.free_sms_limit - service.sms_remainder,
-            'free text messages sent',
-            smallest=True
-          ) }}
-        {% endif %}
-      </div>
-      <div class="column-one-third">
-        {{ big_number(
-          service.letter_cost,
-          'spent on letters',
-          currency="£",
-          smallest=True
-        ) }}
+        </div>
       </div>
     </div>
-  {% endfor %}
+    {% endfor %}
+    <div class="keyline-block govuk-!-margin-top-2"></div>
   </ul>
 
 {% endblock %}
