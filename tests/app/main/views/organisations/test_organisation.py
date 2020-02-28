@@ -402,7 +402,7 @@ def test_organisation_services_shows_live_services_and_usage(
         'app.organisations_client.get_services_and_usage',
         return_value={"services": [
             {'service_id': SERVICE_ONE_ID, 'service_name': '1', 'chargeable_billable_sms': 250122, 'emails_sent': 13000,
-             'free_sms_limit': 250000, 'letter_cost': 30.50, 'sms_billable_units': 122, 'sms_cost': 1.93,
+             'free_sms_limit': 250000, 'letter_cost': 30.50, 'sms_billable_units': 122, 'sms_cost': 0,
              'sms_remainder': None},
             {'service_id': SERVICE_TWO_ID, 'service_name': '5', 'chargeable_billable_sms': 0, 'emails_sent': 20000,
              'free_sms_limit': 250000, 'letter_cost': 0, 'sms_billable_units': 2500, 'sms_cost': 42.0,
@@ -420,7 +420,7 @@ def test_organisation_services_shows_live_services_and_usage(
 
     # Totals
     assert normalize_spaces(usage_rows[0].text) == "Emails 33,000 sent"
-    assert normalize_spaces(usage_rows[1].text) == "Text messages £43.93 spent"
+    assert normalize_spaces(usage_rows[1].text) == "Text messages £42.00 spent"
     assert normalize_spaces(usage_rows[2].text) == "Letters £30.50 spent"
 
     assert normalize_spaces(services[0].text) == '1'
@@ -428,7 +428,7 @@ def test_organisation_services_shows_live_services_and_usage(
     assert services[0].find('a')['href'] == url_for('main.usage', service_id=SERVICE_ONE_ID)
 
     assert normalize_spaces(usage_rows[3].text) == "13,000 emails sent"
-    assert normalize_spaces(usage_rows[4].text) == "£1.93 spent on text messages"
+    assert normalize_spaces(usage_rows[4].text) == "122 free text messages sent"
     assert normalize_spaces(usage_rows[5].text) == "£30.50 spent on letters"
     assert services[1].find('a')['href'] == url_for('main.usage', service_id=SERVICE_TWO_ID)
     assert normalize_spaces(usage_rows[6].text) == "20,000 emails sent"

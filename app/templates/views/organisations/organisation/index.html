@@ -88,7 +88,7 @@
             ) }}
           {% else %}
             {{ big_number(
-              service.free_sms_limit - service.sms_remainder,
+              service.sms_billable_units,
               'free text messages sent',
               smallest=True
             ) }}
