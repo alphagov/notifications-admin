@@ -3,6 +3,7 @@ from unittest.mock import ANY, Mock
 import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
+from freezegun import freeze_time
 from notifications_python_client.errors import HTTPError
 
 from tests import organisation_json, service_json
@@ -64,7 +65,7 @@ def test_view_organisation_shows_the_correct_organisation(
         'app.organisations_client.get_organisation', return_value=org
     )
     mocker.patch(
-        'app.organisations_client.get_services_and_usage', return_value=[]
+        'app.organisations_client.get_services_and_usage', return_value={'services': {}}
     )
 
     page = client_request.get(
@@ -389,6 +390,7 @@ def test_nhs_local_assigns_to_selected_organisation(
     mock_update_service_organisation.assert_called_once_with(SERVICE_ONE_ID, ORGANISATION_ID)
 
 
+@freeze_time("2020-02-20 20:20")
 def test_organisation_services_shows_live_services_and_usage(
     client_request,
     mock_get_organisation,
@@ -403,7 +405,7 @@ def test_organisation_services_shows_live_services_and_usage(
              'free_sms_limit': 250000, 'letter_cost': 30.50, 'sms_billable_units': 122, 'sms_cost': 1.93,
              'sms_remainder': None},
             {'service_id': SERVICE_TWO_ID, 'service_name': '5', 'chargeable_billable_sms': 0, 'emails_sent': 20000,
-             'free_sms_limit': 250000, 'letter_cost': 0, 'sms_billable_units': 2500, 'sms_cost': 0.0,
+             'free_sms_limit': 250000, 'letter_cost': 0, 'sms_billable_units': 2500, 'sms_cost': 42.0,
              'sms_remainder': None}
         ]}
     )
@@ -412,20 +414,61 @@ def test_organisation_services_shows_live_services_and_usage(
     page = client_request.get('.organisation_dashboard', org_id=ORGANISATION_ID)
     mock.assert_called_once_with(ORGANISATION_ID, 2019)
 
-    services = page.select('.browse-list-item')
+    services = page.select('main h2')
+    usage_rows = page.select('main .govuk-grid-column-one-third')
     assert len(services) == 2
+
+    # Totals
+    assert normalize_spaces(usage_rows[0].text) == "33,000 emails sent"
+    assert normalize_spaces(usage_rows[1].text) == "£43.93 spent on text messages"
+    assert normalize_spaces(usage_rows[2].text) == "£30.50 spent on letters"
 
     assert normalize_spaces(services[0].text) == '1'
     assert normalize_spaces(services[1].text) == '5'
     assert services[0].find('a')['href'] == url_for('main.usage', service_id=SERVICE_ONE_ID)
-    usage_rows = page.find_all("div", class_="column-one-third")
-    assert normalize_spaces(usage_rows[0].text) == "13,000 emails sent"
-    assert normalize_spaces(usage_rows[1].text) == "£1.93 spent on text messages"
-    assert normalize_spaces(usage_rows[2].text) == "£30.50 spent on letters"
+
+    assert normalize_spaces(usage_rows[3].text) == "13,000 emails sent"
+    assert normalize_spaces(usage_rows[4].text) == "£1.93 spent on text messages"
+    assert normalize_spaces(usage_rows[5].text) == "£30.50 spent on letters"
     assert services[1].find('a')['href'] == url_for('main.usage', service_id=SERVICE_TWO_ID)
-    assert normalize_spaces(usage_rows[3].text) == "20,000 emails sent"
-    assert normalize_spaces(usage_rows[4].text) == "£0.00 spent on text messages"
-    assert normalize_spaces(usage_rows[5].text) == "£0.00 spent on letters"
+    assert normalize_spaces(usage_rows[6].text) == "20,000 emails sent"
+    assert normalize_spaces(usage_rows[7].text) == "£42.00 spent on text messages"
+    assert normalize_spaces(usage_rows[8].text) == "£0.00 spent on letters"
+
+
+@freeze_time("2020-02-20 20:20")
+@pytest.mark.parametrize('financial_year, expected_selected', (
+    (2018, '2018 to 2019 financial year'),
+    (2019, '2019 to 2020 financial year'),
+    (2020, '2020 to 2021 financial year'),
+))
+def test_organisation_services_filters_by_financial_year(
+    client_request,
+    mock_get_organisation,
+    mocker,
+    active_user_with_permissions,
+    fake_uuid,
+    financial_year,
+    expected_selected,
+):
+    mock = mocker.patch(
+        'app.organisations_client.get_services_and_usage',
+        return_value={"services": []}
+    )
+    page = client_request.get(
+        '.organisation_dashboard',
+        org_id=ORGANISATION_ID,
+        year=financial_year,
+    )
+    mock.assert_called_once_with(ORGANISATION_ID, financial_year)
+    assert normalize_spaces(page.select_one('.pill').text) == (
+        '2018 to 2019 financial year '
+        '2019 to 2020 financial year '
+        '2020 to 2021 financial year'
+    )
+    assert normalize_spaces(page.select_one('.pill-selected-item').text) == (
+        expected_selected
+    )
 
 
 def test_organisation_trial_mode_services_shows_all_non_live_services(

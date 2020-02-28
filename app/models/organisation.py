@@ -5,7 +5,6 @@ from app.models import JSONModel, ModelList
 from app.notify_client.email_branding_client import email_branding_client
 from app.notify_client.letter_branding_client import letter_branding_client
 from app.notify_client.organisations_api_client import organisations_client
-from app.utils import get_current_financial_year
 
 
 class Organisation(JSONModel):
@@ -199,8 +198,8 @@ class Organisation(JSONModel):
             self.id
         )
 
-    def services_and_usage(self):
-        return organisations_client.get_services_and_usage(self.id, get_current_financial_year())
+    def services_and_usage(self, financial_year):
+        return organisations_client.get_services_and_usage(self.id, financial_year)
 
 
 class Organisations(ModelList):
