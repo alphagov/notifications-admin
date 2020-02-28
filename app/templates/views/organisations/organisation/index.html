@@ -16,8 +16,8 @@
     {{ pill(years, selected_year, big_number_args={'smallest': True}) }}
   </div>
 
-  <div class="grid-row bottom-gutter">
-    <div class="column-one-third">
+  <div class="govuk-grid-row bottom-gutter">
+    <div class="govuk-grid-column-one-third">
       <div class="keyline-block">
         {{ big_number(
           total_emails_sent,
@@ -26,7 +26,7 @@
         ) }}
       </div>
     </div>
-    <div class="column-one-third">
+    <div class="govuk-grid-column-one-third">
       <div class="keyline-block">
         {{ big_number(
           total_sms_cost,
@@ -36,7 +36,7 @@
         ) }}
       </div>
     </div>
-    <div class="column-one-third">
+    <div class="govuk-grid-column-one-third">
       <div class="keyline-block">
         {{ big_number(
           total_letter_cost,
@@ -53,15 +53,15 @@
       <li class="browse-list-item govuk-!-margin-bottom-1 govuk-!-margin-top-1">
         <a href="{{ url_for('main.usage', service_id=service.service_id) }}" class="govuk-link govuk-link--no-visited-state browse-list-link">{{ service.service_name  }}</a>
       </li>
-      <div class="grid-row">
-        <div class="column-one-third">
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-one-third">
           {{ big_number(
             service.emails_sent,
             label='emails sent',
             smallest=True
           ) }}
         </div>
-        <div class="column-one-third">
+        <div class="govuk-grid-column-one-third">
           {% if service.sms_cost %}
             {{ big_number(
               service.sms_cost,
@@ -77,7 +77,7 @@
             ) }}
           {% endif %}
         </div>
-        <div class="column-one-third">
+        <div class="govuk-grid-column-one-third">
           {{ big_number(
             service.letter_cost,
             'spent on letters',
