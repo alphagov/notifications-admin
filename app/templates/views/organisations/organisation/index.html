@@ -12,46 +12,50 @@
     Usage
   </h1>
 
-  <div class="bottom-gutter-3-2">
+  <div class="bottom-gutter">
     {{ pill(years, selected_year, big_number_args={'smallest': True}) }}
   </div>
 
   <div class="govuk-grid-row bottom-gutter">
     <div class="govuk-grid-column-one-third">
+      <h2 class="heading-small">Emails</h2>
       <div class="keyline-block">
         {{ big_number(
           total_emails_sent,
-          label='emails sent',
+          label='sent',
           smaller=True
         ) }}
       </div>
     </div>
     <div class="govuk-grid-column-one-third">
+      <h2 class="heading-small">Text messages</h2>
       <div class="keyline-block">
         {{ big_number(
           total_sms_cost,
-          'spent on text messages',
+          'spent',
           currency="£",
           smaller=True
         ) }}
       </div>
     </div>
     <div class="govuk-grid-column-one-third">
+      <h2 class="heading-small">Letters</h2>
       <div class="keyline-block">
         {{ big_number(
           total_letter_cost,
-          'spent on letters',
+          'spent',
           currency="£",
           smaller=True
         ) }}
       </div>
     </div>
   </div>
+  <h2 class="heading-small">By service</h2>
   {% for service in services %}
     <div class="keyline-block govuk-!-margin-top-2">
-      <h2 class="govuk-!-font-weight-bold govuk-!-font-size-24 govuk-!-margin-bottom-1 govuk-!-margin-top-1">
+      <h3 class="govuk-!-font-weight-bold govuk-!-font-size-24 govuk-!-margin-bottom-1 govuk-!-margin-top-1">
         <a href="{{ url_for('main.usage', service_id=service.service_id) }}" class="govuk-link govuk-link--no-visited-state browse-list-link">{{ service.service_name  }}</a>
-      </h2>
+      </h3>
       <div class="govuk-grid-row">
         <div class="govuk-grid-column-one-third">
           {{ big_number(

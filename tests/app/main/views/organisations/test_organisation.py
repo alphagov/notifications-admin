@@ -414,14 +414,14 @@ def test_organisation_services_shows_live_services_and_usage(
     page = client_request.get('.organisation_dashboard', org_id=ORGANISATION_ID)
     mock.assert_called_once_with(ORGANISATION_ID, 2019)
 
-    services = page.select('main h2')
+    services = page.select('main h3')
     usage_rows = page.select('main .govuk-grid-column-one-third')
     assert len(services) == 2
 
     # Totals
-    assert normalize_spaces(usage_rows[0].text) == "33,000 emails sent"
-    assert normalize_spaces(usage_rows[1].text) == "£43.93 spent on text messages"
-    assert normalize_spaces(usage_rows[2].text) == "£30.50 spent on letters"
+    assert normalize_spaces(usage_rows[0].text) == "Emails 33,000 sent"
+    assert normalize_spaces(usage_rows[1].text) == "Text messages £43.93 spent"
+    assert normalize_spaces(usage_rows[2].text) == "Letters £30.50 spent"
 
     assert normalize_spaces(services[0].text) == '1'
     assert normalize_spaces(services[1].text) == '5'
