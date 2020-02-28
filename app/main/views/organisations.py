@@ -1,4 +1,5 @@
 from collections import OrderedDict
+from functools import partial
 
 from flask import flash, redirect, render_template, request, session, url_for
 from flask_login import current_user
@@ -32,6 +33,10 @@ from app.main.forms import (
     SearchUsersForm,
     SetEmailBranding,
     SetLetterBranding,
+)
+from app.main.views.dashboard import (
+    get_tuples_of_financial_years,
+    requested_and_current_financial_year,
 )
 from app.main.views.service_settings import get_branding_as_value_and_label
 from app.models.organisation import Organisation, Organisations
@@ -125,10 +130,19 @@ def add_organisation_from_nhs_local_service(service_id):
 @main.route("/organisations/<uuid:org_id>", methods=['GET'])
 @user_has_permissions()
 def organisation_dashboard(org_id):
-    services = current_organisation.services_and_usage()['services']
+    year, current_financial_year = requested_and_current_financial_year(request)
+    services = current_organisation.services_and_usage(
+        financial_year=year
+    )['services']
     return render_template(
         'views/organisations/organisation/index.html',
         services=services,
+        years=get_tuples_of_financial_years(
+            partial(url_for, '.organisation_dashboard', org_id=current_organisation.id),
+            start=current_financial_year - 1,
+            end=current_financial_year + 1,
+        ),
+        selected_year=year,
         **{
             f'total_{key}': sum(service[key] for service in services)
             for key in ('emails_sent', 'sms_cost', 'letter_cost')

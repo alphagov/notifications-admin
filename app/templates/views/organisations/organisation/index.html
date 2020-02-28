@@ -1,4 +1,5 @@
 {% from "components/big-number.html" import big_number %}
+{% from "components/pill.html" import pill %}
 {% extends "org_template.html" %}
 
 {% block org_page_title %}
@@ -11,32 +12,41 @@
     Usage
   </h1>
 
-  <div class="grid-row">
-    <div class="column-one-third">
-      {{ big_number(
-        total_emails_sent,
-        label='emails sent',
-        smaller=True
-      ) }}
-    </div>
-    <div class="column-one-third">
-      {{ big_number(
-        total_sms_cost,
-        'spent on text messages',
-        currency="£",
-        smaller=True
-      ) }}
-    </div>
-    <div class="column-one-third">
-      {{ big_number(
-        total_letter_cost,
-        'spent on letters',
-        currency="£",
-        smaller=True
-      ) }}
-    </div>
+  <div class="bottom-gutter-3-2">
+    {{ pill(years, selected_year, big_number_args={'smallest': True}) }}
   </div>
 
+  <div class="grid-row bottom-gutter">
+    <div class="column-one-third">
+      <div class="keyline-block">
+        {{ big_number(
+          total_emails_sent,
+          label='emails sent',
+          smaller=True
+        ) }}
+      </div>
+    </div>
+    <div class="column-one-third">
+      <div class="keyline-block">
+        {{ big_number(
+          total_sms_cost,
+          'spent on text messages',
+          currency="£",
+          smaller=True
+        ) }}
+      </div>
+    </div>
+    <div class="column-one-third">
+      <div class="keyline-block">
+        {{ big_number(
+          total_letter_cost,
+          'spent on letters',
+          currency="£",
+          smaller=True
+        ) }}
+      </div>
+    </div>
+  </div>
   <ul>
   {% for service in services %}
     <div class="keyline-block govuk-!-margin-top-2">

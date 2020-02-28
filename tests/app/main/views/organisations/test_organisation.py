@@ -3,6 +3,7 @@ from unittest.mock import ANY, Mock
 import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
+from freezegun import freeze_time
 from notifications_python_client.errors import HTTPError
 
 from tests import organisation_json, service_json
@@ -389,6 +390,7 @@ def test_nhs_local_assigns_to_selected_organisation(
     mock_update_service_organisation.assert_called_once_with(SERVICE_ONE_ID, ORGANISATION_ID)
 
 
+@freeze_time("2020-02-20 20:20")
 def test_organisation_services_shows_live_services_and_usage(
     client_request,
     mock_get_organisation,
@@ -432,6 +434,41 @@ def test_organisation_services_shows_live_services_and_usage(
     assert normalize_spaces(usage_rows[6].text) == "20,000 emails sent"
     assert normalize_spaces(usage_rows[7].text) == "£42.00 spent on text messages"
     assert normalize_spaces(usage_rows[8].text) == "£0.00 spent on letters"
+
+
+@freeze_time("2020-02-20 20:20")
+@pytest.mark.parametrize('financial_year, expected_selected', (
+    (2018, '2018 to 2019 financial year'),
+    (2019, '2019 to 2020 financial year'),
+    (2020, '2020 to 2021 financial year'),
+))
+def test_organisation_services_filters_by_financial_year(
+    client_request,
+    mock_get_organisation,
+    mocker,
+    active_user_with_permissions,
+    fake_uuid,
+    financial_year,
+    expected_selected,
+):
+    mock = mocker.patch(
+        'app.organisations_client.get_services_and_usage',
+        return_value={"services": []}
+    )
+    page = client_request.get(
+        '.organisation_dashboard',
+        org_id=ORGANISATION_ID,
+        year=financial_year,
+    )
+    mock.assert_called_once_with(ORGANISATION_ID, financial_year)
+    assert normalize_spaces(page.select_one('.pill').text) == (
+        '2018 to 2019 financial year '
+        '2019 to 2020 financial year '
+        '2020 to 2021 financial year'
+    )
+    assert normalize_spaces(page.select_one('.pill-selected-item').text) == (
+        expected_selected
+    )
 
 
 def test_organisation_trial_mode_services_shows_all_non_live_services(
