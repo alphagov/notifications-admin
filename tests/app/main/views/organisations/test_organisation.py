@@ -414,8 +414,8 @@ def test_organisation_services_shows_live_services_and_usage(
     page = client_request.get('.organisation_dashboard', org_id=ORGANISATION_ID)
     mock.assert_called_once_with(ORGANISATION_ID, 2019)
 
-    services = page.select('.browse-list-item')
-    usage_rows = page.select("main .govuk-grid-column-one-third")
+    services = page.select('main h2')
+    usage_rows = page.select('main .govuk-grid-column-one-third')
     assert len(services) == 2
 
     # Totals

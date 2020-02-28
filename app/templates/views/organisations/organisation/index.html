@@ -47,12 +47,11 @@
       </div>
     </div>
   </div>
-  <ul>
   {% for service in services %}
     <div class="keyline-block govuk-!-margin-top-2">
-      <li class="browse-list-item govuk-!-margin-bottom-1 govuk-!-margin-top-1">
+      <h2 class="govuk-!-font-weight-bold govuk-!-font-size-24 govuk-!-margin-bottom-1 govuk-!-margin-top-1">
         <a href="{{ url_for('main.usage', service_id=service.service_id) }}" class="govuk-link govuk-link--no-visited-state browse-list-link">{{ service.service_name  }}</a>
-      </li>
+      </h2>
       <div class="govuk-grid-row">
         <div class="govuk-grid-column-one-third">
           {{ big_number(
@@ -87,8 +86,7 @@
         </div>
       </div>
     </div>
-    {% endfor %}
-    <div class="keyline-block govuk-!-margin-top-2"></div>
-  </ul>
+  {% endfor %}
+  <div class="keyline-block govuk-!-margin-top-2"></div>
 
 {% endblock %}
