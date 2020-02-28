@@ -471,6 +471,86 @@ def test_organisation_services_filters_by_financial_year(
     )
 
 
+@freeze_time("2020-02-20 20:20")
+def test_organisation_services_shows_search_bar(
+    client_request,
+    mock_get_organisation,
+    mocker,
+    active_user_with_permissions,
+    fake_uuid,
+):
+    mocker.patch(
+        'app.organisations_client.get_services_and_usage',
+        return_value={"services": [
+            {
+                'service_id': SERVICE_ONE_ID,
+                'service_name': 'Service 1',
+                'chargeable_billable_sms': 250122,
+                'emails_sent': 13000,
+                'free_sms_limit': 250000,
+                'letter_cost': 30.50,
+                'sms_billable_units': 122,
+                'sms_cost': 1.93,
+                'sms_remainder': None
+            },
+        ] * 8}
+    )
+
+    client_request.login(active_user_with_permissions)
+    page = client_request.get('.organisation_dashboard', org_id=ORGANISATION_ID)
+
+    services = page.select('.organisation-service')
+    assert len(services) == 8
+
+    assert page.select_one('.live-search')['data-targets'] == '.organisation-service'
+    assert [
+        normalize_spaces(service_name.text)
+        for service_name in page.select('.live-search-relevant')
+    ] == [
+        'Service 1',
+        'Service 1',
+        'Service 1',
+        'Service 1',
+        'Service 1',
+        'Service 1',
+        'Service 1',
+        'Service 1',
+    ]
+
+
+@freeze_time("2020-02-20 20:20")
+def test_organisation_services_hides_search_bar_for_7_or_fewer_services(
+    client_request,
+    mock_get_organisation,
+    mocker,
+    active_user_with_permissions,
+    fake_uuid,
+):
+    mocker.patch(
+        'app.organisations_client.get_services_and_usage',
+        return_value={"services": [
+            {
+                'service_id': SERVICE_ONE_ID,
+                'service_name': 'Service 1',
+                'chargeable_billable_sms': 250122,
+                'emails_sent': 13000,
+                'free_sms_limit': 250000,
+                'letter_cost': 30.50,
+                'sms_billable_units': 122,
+                'sms_cost': 1.93,
+                'sms_remainder': None
+            },
+        ] * 7}
+    )
+
+    client_request.login(active_user_with_permissions)
+    page = client_request.get('.organisation_dashboard', org_id=ORGANISATION_ID)
+
+    services = page.select('.organisation-service')
+    assert len(services) == 7
+    assert not page.select_one('.live-search')
+
+
 def test_organisation_trial_mode_services_shows_all_non_live_services(
     client_request,
     platform_admin_user,

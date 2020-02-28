@@ -143,6 +143,7 @@ def organisation_dashboard(org_id):
             end=current_financial_year + 1,
         ),
         selected_year=year,
+        search_form=SearchByNameForm() if len(services) > 7 else None,
         **{
             f'total_{key}': sum(service[key] for service in services)
             for key in ('emails_sent', 'sms_cost', 'letter_cost')
