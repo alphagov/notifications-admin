@@ -16,7 +16,6 @@ from app.s3_client.s3_logo_client import (
     permanent_email_logo_name,
     persist_logo,
     upload_email_logo,
-    upload_letter_png_logo,
     upload_letter_temp_logo,
 )
 
@@ -74,21 +73,6 @@ def test_upload_letter_temp_logo_calls_correct_args(mocker, fake_uuid, letter_up
         content_type='image/svg+xml'
     )
     assert new_filename == 'letters/static/images/letter-template/temp-{}_test_uuid-test.svg'.format(fake_uuid)
-
-
-def test_upload_letter_png_logo_calls_correct_args(mocker):
-    mocked_s3_upload = mocker.patch('app.s3_client.s3_logo_client.utils_s3upload')
-    mocker.patch.dict('flask.current_app.config', {'LOGO_UPLOAD_BUCKET_NAME': bucket})
-
-    upload_letter_png_logo(filename, data, region)
-
-    mocked_s3_upload.assert_called_once_with(
-        filedata=data,
-        region=region,
-        bucket_name=bucket,
-        file_location=filename,
-        content_type='image/png'
-    )
 
 
 def test_persist_logo(client, mocker, fake_uuid, upload_filename):
