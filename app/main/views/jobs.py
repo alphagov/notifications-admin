@@ -42,26 +42,10 @@ from app.utils import (
 @main.route("/services/<uuid:service_id>/jobs")
 @user_has_permissions()
 def view_jobs(service_id):
-    jobs = current_service.get_page_of_jobs(page=request.args.get('page'))
-
-    prev_page = None
-    if jobs.prev_page:
-        prev_page = generate_previous_dict('main.view_jobs', service_id, jobs.current_page)
-    next_page = None
-    if jobs.next_page:
-        next_page = generate_next_dict('main.view_jobs', service_id, jobs.current_page)
-
-    return render_template(
-        'views/jobs/jobs.html',
-        jobs=jobs,
-        prev_page=prev_page,
-        next_page=next_page,
-        show_scheduled_jobs=(
-            jobs.current_page == 1
-            and not current_user.has_permissions('view_activity')
-            and current_service.scheduled_jobs
-        ),
-    )
+    return redirect(url_for(
+        'main.uploads',
+        service_id=current_service.id,
+    ))
 
 
 @main.route("/services/<uuid:service_id>/jobs/<uuid:job_id>")
