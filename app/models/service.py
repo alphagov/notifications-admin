@@ -5,7 +5,7 @@ from flask import abort, current_app
 from notifications_utils.timezones import local_timezone
 from werkzeug.utils import cached_property
 
-from app.models import EmptyModelList, JSONModel
+from app.models import JSONModel
 from app.models.job import (
     ImmediateJobs,
     PaginatedJobs,
@@ -123,13 +123,13 @@ class Service(JSONModel):
     @cached_property
     def immediate_jobs(self):
         if not self.has_jobs:
-            return EmptyModelList()
+            return []
         return ImmediateJobs(self.id)
 
     @cached_property
     def scheduled_jobs(self):
         if not self.has_jobs:
-            return EmptyModelList()
+            return []
         return ScheduledJobs(self.id)
 
     @cached_property
