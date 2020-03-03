@@ -32,7 +32,7 @@ from app import (
 )
 from app.main import main
 from app.notify_client.api_key_api_client import KEY_TYPE_TEST
-from app.template_previews import get_page_count_for_letter
+from app.template_previews import get_page_count_for_letter, TemplatePreview
 from app.utils import (
     DELIVERED_STATUSES,
     FAILURE_STATUSES,
@@ -44,6 +44,9 @@ from app.utils import (
     parse_filter_args,
     set_status_filters,
     user_has_permissions,
+)
+from app.s3_client.s3_letter_upload_client import (
+    get_letter_pdf_and_metadata,
 )
 
 
@@ -184,6 +187,27 @@ def get_preview_error_image():
 def view_letter_notification_as_preview(
     service_id, notification_id, filetype, with_metadata=False
 ):
+    notification = notification_api_client.get_notification(service_id, str(notification_id))
+
+    if notification['template']['is_precompiled_letter']:
+        try:
+            page = int(request.args.get('page', "1"))
+        except ValueError:
+            abort(400)
+
+        pdf_file, metadata = get_letter_pdf_and_metadata(notification)
+        invalid_pages = json.loads(metadata.get('invalid_pages', '[]'))
+
+        if (
+            metadata.get('message') == 'content-outside-printable-area' and
+            page in invalid_pages
+        ):
+            content, status_code, headers = TemplatePreview.from_invalid_pdf_file(pdf_file, page)
+            return content, metadata
+        else:
+            content, status_code, headers = TemplatePreview.from_valid_pdf_file(pdf_file, page)
+            return content, metadata
+
     try:
         preview = notification_api_client.get_notification_letter_preview(
             service_id,
