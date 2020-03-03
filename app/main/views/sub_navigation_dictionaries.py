@@ -76,6 +76,10 @@ def using_notify_nav():
                     "name": "Send files by email",
                     "link": "main.send_files_by_email",
                 },
+                {
+                    "name": "Upload a letter",
+                    "link": "main.upload_a_letter",
+                },
             ]
         },
         {
