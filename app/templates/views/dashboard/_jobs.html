@@ -62,7 +62,7 @@
         ) }}
       {% elif item.pdf_letter %}
         <p class="govuk-body govuk-!-margin-bottom-1">
-          {% for line in item.recipient.split(',') %}
+          {% for line in item.recipient.splitlines() %}
             {% if loop.index < 3 %}
               {{ line }}<br>
             {% endif %}

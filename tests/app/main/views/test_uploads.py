@@ -79,13 +79,32 @@ def test_get_upload_hub_page(
         'main.upload_letter', service_id=SERVICE_ONE_ID
     )
 
-    assert page.find_all(
-        'a', {'class': 'file-list-filename-large'}
-    )[0].attrs['href'] == '/services/{}/jobs/job_id_1'.format(SERVICE_ONE_ID)
+    uploads = page.select('tbody tr')
 
-    assert page.find_all(
-        'a', {'class': 'file-list-filename-large'}
-    )[1].attrs['href'] == '/services/{}/notification/letter_id_1'.format(SERVICE_ONE_ID)
+    assert normalize_spaces(uploads[0].text.strip()) == (
+        'some.csv '
+        'Sent 1 January 2016 at 11:09am '
+        '0 sending 8 delivered 2 failed'
+    )
+    assert uploads[0].select_one('a.file-list-filename-large')['href'] == (
+        '/services/{}/jobs/job_id_1'.format(SERVICE_ONE_ID)
+    )
+
+    assert normalize_spaces(uploads[1].text.strip()) == (
+        'some.pdf '
+        'Sent 1 January 2016 at 11:09am '
+        'Firstname Lastname '
+        '123 Example Street'
+    )
+    assert normalize_spaces(str(uploads[1].select_one('.govuk-body'))) == (
+        '<p class="govuk-body govuk-!-margin-bottom-1"> '
+        'Firstname Lastname<br/> '
+        '123 Example Street<br/> '
+        '</p>'
+    )
+    assert uploads[1].select_one('a.file-list-filename-large')['href'] == (
+        '/services/{}/notification/letter_id_1'.format(SERVICE_ONE_ID)
+    )
 
 
 def test_get_upload_letter(client_request):
