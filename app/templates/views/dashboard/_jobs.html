@@ -69,18 +69,18 @@
           {% endfor %}
         </p>
       {% else %}
-        <div class="grid-row">
-          <div class="column-one-third">
+        <div class="govuk-grid-row">
+          <div class="govuk-grid-column-one-third">
             {{ big_number(
               item.notifications_sending,
               smallest=True,
               label='sending',
             ) }}
           </div>
-          <div class="column-one-third">
+          <div class="govuk-grid-column-one-third">
         {{ big_number(item.notifications_delivered, smallest=True, label='delivered') }}
       </div>
-      <div class="column-one-third">
+      <div class="govuk-grid-column-one-third">
         {{ big_number(item.notifications_failed, smallest=True, label='failed') }}
       </div></div>
 
