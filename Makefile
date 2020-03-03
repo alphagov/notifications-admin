@@ -9,7 +9,6 @@ GIT_COMMIT ?= $(shell git rev-parse HEAD 2> /dev/null || echo "")
 
 DOCKER_IMAGE_TAG := $(shell cat docker/VERSION)
 DOCKER_BUILDER_IMAGE_NAME = govuk/notify-admin-builder:${DOCKER_IMAGE_TAG}
-DOCKER_TTY ?= $(if ${JENKINS_HOME},,t)
 
 BUILD_TAG ?= notifications-admin-manual
 BUILD_NUMBER ?= 0
@@ -124,7 +123,7 @@ prepare-docker-build-image: ## Prepare the Docker builder image
 	make -C docker build
 
 define run_docker_container
-	@docker run -i${DOCKER_TTY} --rm \
+	@docker run -it --rm \
 		--name "${DOCKER_CONTAINER_PREFIX}-${1}" \
 		-v "`pwd`:/var/project" \
 		-e UID=$(shell id -u) \
