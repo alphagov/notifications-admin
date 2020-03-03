@@ -3496,6 +3496,17 @@ def mock_template_preview(mocker):
     mocker.patch('app.template_previews.TemplatePreview.from_utils_template', return_value=example_response)
 
 
+@pytest.fixture(scope='function')
+def mock_get_returned_letter_statistics_with_no_returned_letters(mocker):
+    return mocker.patch(
+        'app.service_api_client.get_returned_letter_statistics',
+        return_value={
+            'returned_letter_count': 0,
+            'most_recent_report': None,
+        },
+    )
+
+
 def create_api_user_active(with_unique_id=False):
     return {
         'id': str(uuid4()) if with_unique_id else sample_uuid(),
