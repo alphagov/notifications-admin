@@ -106,5 +106,11 @@
     </div>
   {% endfor %}
   <div class="keyline-block govuk-!-margin-top-2"></div>
+  {% if not services %}
+    <p class="govuk-body govuk-hint">
+      {{ current_org.name }} has no live services on GOV.UK Notify
+    </p>
+    <div class="keyline-block govuk-!-margin-top-2"></div>
+  {% endif %}
 
 {% endblock %}

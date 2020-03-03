@@ -74,6 +74,9 @@ def test_view_organisation_shows_the_correct_organisation(
     )
 
     assert normalize_spaces(page.select_one('h1').text) == 'Usage'
+    assert normalize_spaces(page.select_one('.govuk-hint').text) == (
+        'Test 1 has no live services on GOV.UK Notify'
+    )
 
 
 def test_page_to_create_new_organisation(
@@ -434,6 +437,9 @@ def test_organisation_services_shows_live_services_and_usage(
     assert normalize_spaces(usage_rows[6].text) == "20,000 emails sent"
     assert normalize_spaces(usage_rows[7].text) == "£42.00 spent on text messages"
     assert normalize_spaces(usage_rows[8].text) == "£0.00 spent on letters"
+
+    # Ensure there’s no ‘this org has no services message’
+    assert not page.select('.govuk-hint')
 
 
 @freeze_time("2020-02-20 20:20")
