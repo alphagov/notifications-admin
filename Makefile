@@ -26,38 +26,12 @@ $(eval export CF_HOME)
 
 NOTIFY_CREDENTIALS ?= ~/.notify-credentials
 
+
+## DEVELOPMENT
+
 .PHONY: help
 help:
 	@cat $(MAKEFILE_LIST) | grep -E '^[a-zA-Z_-]+:.*?## .*$$' | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
-
-.PHONY: check-env-vars
-check-env-vars: ## Check mandatory environment variables
-	$(if ${DEPLOY_ENV},,$(error Must specify DEPLOY_ENV))
-	$(if ${DNS_NAME},,$(error Must specify DNS_NAME))
-
-.PHONY: sandbox
-sandbox: ## Set environment to sandbox
-	$(eval export DEPLOY_ENV=sandbox)
-	$(eval export DNS_NAME="cloudapps.digital")
-	@true
-
-.PHONY: preview
-preview: ## Set environment to preview
-	$(eval export DEPLOY_ENV=preview)
-	$(eval export DNS_NAME="notify.works")
-	@true
-
-.PHONY: staging
-staging: ## Set environment to staging
-	$(eval export DEPLOY_ENV=staging)
-	$(eval export DNS_NAME="staging-notify.works")
-	@true
-
-.PHONY: production
-production: ## Set environment to production
-	$(eval export DEPLOY_ENV=production)
-	$(eval export DNS_NAME="notifications.service.gov.uk")
-	@true
 
 .PHONY: dependencies
 dependencies: ## Install build dependencies
@@ -149,6 +123,32 @@ clean-docker-containers: ## Clean up any remaining docker containers
 .PHONY: clean
 clean:
 	rm -rf node_modules cache target
+
+
+## DEPLOYMENT
+
+.PHONY: check-env-vars
+check-env-vars: ## Check mandatory environment variables
+	$(if ${DEPLOY_ENV},,$(error Must specify DEPLOY_ENV))
+	$(if ${DNS_NAME},,$(error Must specify DNS_NAME))
+
+.PHONY: preview
+preview: ## Set environment to preview
+	$(eval export DEPLOY_ENV=preview)
+	$(eval export DNS_NAME="notify.works")
+	@true
+
+.PHONY: staging
+staging: ## Set environment to staging
+	$(eval export DEPLOY_ENV=staging)
+	$(eval export DNS_NAME="staging-notify.works")
+	@true
+
+.PHONY: production
+production: ## Set environment to production
+	$(eval export DEPLOY_ENV=production)
+	$(eval export DNS_NAME="notifications.service.gov.uk")
+	@true
 
 .PHONY: cf-login
 cf-login: ## Log in to Cloud Foundry
