@@ -34,6 +34,7 @@ $is-ie: false !default;
   margin-bottom: $gutter;
   margin-left: -$gutter-half;
   margin-right: -$gutter-half;
+  overflow: hidden;
 
   ul {
     margin: 0;

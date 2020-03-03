@@ -1,5 +1,6 @@
 {% from "components/table.html" import list_table, field, right_aligned_field_heading, row_heading %}
 {% from "components/big-number.html" import big_number -%}
+{% from "components/message-count-label.html" import message_count_label -%}
 
 <div class='dashboard-table ajax-block-container'>
   {% call(item, row_number) list_table(
@@ -11,37 +12,79 @@
     ),
     field_headings=[
       'File',
-      'Sending',
-      'Delivered',
-      'Failed'
+      'Status'
     ],
-    field_headings_visible=True if jobs else False
+    field_headings_visible=False
   ) %}
     {% call row_heading() %}
       <div class="file-list">
         {% if item.upload_type == 'letter' %}
-          <a class="file-list-filename govuk-link govuk-link--no-visited-state" href="{{ url_for('.view_notification', service_id=current_service.id, notification_id=item.id) }}">{{ item.original_file_name }}</a>
+          <a class="file-list-filename-large govuk-link govuk-link--no-visited-state" href="{{ url_for('.view_notification', service_id=current_service.id, notification_id=item.id) }}">{{ item.original_file_name }}</a>
         {% else %}
-          <a class="file-list-filename govuk-link govuk-link--no-visited-state" href="{{ url_for('.view_job', service_id=current_service.id, job_id=item.id) }}">{{ item.original_file_name }}</a>
+          <a class="file-list-filename-large govuk-link govuk-link--no-visited-state" href="{{ url_for('.view_job', service_id=current_service.id, job_id=item.id) }}">{{ item.original_file_name }}</a>
         {% endif %}
-        <span class="file-list-hint">
-          Sent {{
-            (item.scheduled_for or item.created_at)|format_datetime_relative
-          }}
-        </span>
+        {% if item.scheduled %}
+          <span class="file-list-hint">
+            Sending {{
+              item.scheduled_for|format_datetime_relative
+            }}
+          </span>
+        {% else %}
+          <span class="file-list-hint">
+            Sent {{
+              (item.scheduled_for or item.created_at)|format_datetime_relative
+            }}
+          </span>
+        {% endif %}
+
       </div>
     {% endcall %}
     {% call field() %}
-      {{ big_number(
-        item.notifications_sending,
-        smallest=True
-      ) }}
-    {% endcall %}
-    {% call field() %}
-      {{ big_number(item.notifications_delivered, smallest=True) }}
-    {% endcall %}
-    {% call field(status='error' if item.high_failure_rate else '') %}
-      {{ big_number(item.notifications_failed, smallest=True) }}
+      {% if item.scheduled %}
+        {{ big_number(
+          item.notification_count,
+          smallest=True,
+          label=message_count_label(
+            item.notification_count,
+            item.template_type,
+            suffix='waiting to send'
+          )
+        ) }}
+      {% elif item.template_type == 'letter' %}
+        {{ big_number(
+          item.notification_count,
+          smallest=True,
+          label=message_count_label(
+            item.notification_count,
+            item.template_type,
+            suffix=''
+          )
+        ) }}
+      {% elif item.pdf_letter %}
+        <p class="govuk-body govuk-!-margin-bottom-1">
+          {% for line in item.recipient.splitlines() %}
+            {% if loop.index < 3 %}
+              {{ line }}<br>
+            {% endif %}
+          {% endfor %}
+        </p>
+      {% else %}
+        <div class="grid-row">
+          <div class="column-one-third">
+            {{ big_number(
+              item.notifications_sending,
+              smallest=True,
+              label='sending',
+            ) }}
+          </div>
+          <div class="column-one-third">
+        {{ big_number(item.notifications_delivered, smallest=True, label='delivered') }}
+      </div>
+      <div class="column-one-third">
+        {{ big_number(item.notifications_failed, smallest=True, label='failed') }}
+      </div></div>
+
+      {% endif %}
     {% endcall %}
   {% endcall %}
 </div>

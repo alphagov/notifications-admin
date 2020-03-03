@@ -39,10 +39,13 @@ def test_no_upload_letters_button_without_permission(
 
 @pytest.mark.parametrize('extra_permissions, expected_empty_message', (
     (['letter'], (
-        'You have not uploaded any files yet'
+        'You have not uploaded any files yet. '
+        'To upload a list of contact details, first choose a template.'
     )),
     (['letter', 'upload_letters'], (
-        'Upload a letter and Notify will print, pack and post it for you.'
+        'You have not uploaded any files yet. '
+        'Upload a letter and Notify will print, pack and post it for you. '
+        'To upload a list of contact details, first choose a template.'
     )),
 ))
 def test_get_upload_hub_with_no_uploads(
@@ -56,9 +59,9 @@ def test_get_upload_hub_with_no_uploads(
     mocker.patch('app.job_api_client.get_jobs', return_value={'data': []})
     service_one['permissions'] += extra_permissions
     page = client_request.get('main.uploads', service_id=SERVICE_ONE_ID)
-    assert normalize_spaces(
-        page.select_one('.table-empty-message').text
-    ) == expected_empty_message
+    assert normalize_spaces(' '.join(
+        paragraph.text for paragraph in page.select('main p')
+    )) == expected_empty_message
     assert not page.select('.file-list-filename')
 
 
@@ -76,13 +79,32 @@ def test_get_upload_hub_page(
         'main.upload_letter', service_id=SERVICE_ONE_ID
     )
 
-    assert page.find_all(
-        'a', {'class': 'file-list-filename'}
-    )[0].attrs['href'] == '/services/{}/jobs/job_id_1'.format(SERVICE_ONE_ID)
+    uploads = page.select('tbody tr')
 
-    assert page.find_all(
-        'a', {'class': 'file-list-filename'}
-    )[1].attrs['href'] == '/services/{}/notification/letter_id_1'.format(SERVICE_ONE_ID)
+    assert normalize_spaces(uploads[0].text.strip()) == (
+        'some.csv '
+        'Sent 1 January 2016 at 11:09am '
+        '0 sending 8 delivered 2 failed'
+    )
+    assert uploads[0].select_one('a.file-list-filename-large')['href'] == (
+        '/services/{}/jobs/job_id_1'.format(SERVICE_ONE_ID)
+    )
+
+    assert normalize_spaces(uploads[1].text.strip()) == (
+        'some.pdf '
+        'Sent 1 January 2016 at 11:09am '
+        'Firstname Lastname '
+        '123 Example Street'
+    )
+    assert normalize_spaces(str(uploads[1].select_one('.govuk-body'))) == (
+        '<p class="govuk-body govuk-!-margin-bottom-1"> '
+        'Firstname Lastname<br/> '
+        '123 Example Street<br/> '
+        '</p>'
+    )
+    assert uploads[1].select_one('a.file-list-filename-large')['href'] == (
+        '/services/{}/notification/letter_id_1'.format(SERVICE_ONE_ID)
+    )
 
 
 def test_get_upload_letter(client_request):
@@ -643,15 +665,35 @@ def test_uploads_page_shows_scheduled_jobs(
         normalize_spaces(row.text) for row in page.select('tr')
     ] == [
         (
-            'File Messages to be sent'
+            'File Status'
         ),
         (
             'send_me_later.csv '
-            'Sending 1 January 2016 at 11:09am 1'
+            'Sending 1 January 2016 at 11:09am '
+            '1 text message waiting to send'
         ),
         (
             'even_later.csv '
-            'Sending 1 January 2016 at 11:09pm 1'
+            'Sending 1 January 2016 at 11:09pm '
+            '1 text message waiting to send'
         ),
     ]
     assert not page.select('.table-empty-message')
+
+
+def test_get_uploads_shows_pagination(
+    client_request,
+    active_user_with_permissions,
+    mock_get_jobs,
+    mock_get_uploads,
+):
+    page = client_request.get('main.uploads', service_id=SERVICE_ONE_ID)
+
+    assert normalize_spaces(page.select_one('.next-page').text) == (
+        'Next page '
+        'page 2'
+    )
+    assert normalize_spaces(page.select_one('.previous-page').text) == (
+        'Previous page '
+        'page 0'
+    )

@@ -937,8 +937,11 @@ def test_should_show_recent_jobs_on_dashboard(
     )):
         assert filename in table_rows[index].find_all('th')[0].text
         assert 'Sent today at 11:09' in table_rows[index].find_all('th')[0].text
-        for column_index, count in enumerate((1, 0, 0)):
-            assert table_rows[index].find_all('td')[column_index].text.strip() == str(count)
+        assert normalize_spaces(
+            table_rows[index].select_one('td').text
+        ) == (
+            '1 sending 0 delivered 0 failed'
+        )
 
 
 @pytest.mark.parametrize('extra_permissions', (

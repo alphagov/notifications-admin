@@ -1656,6 +1656,14 @@ def mock_get_job(mocker, api_user_active):
     return mocker.patch('app.job_api_client.get_job', side_effect=_get_job)
 
 
+@pytest.fixture(scope='function')
+def mock_get_letter_job(mocker, api_user_active):
+    def _get_job(service_id, job_id):
+        return {"data": job_json(service_id, api_user_active, job_id=job_id, template_type='letter')}
+
+    return mocker.patch('app.job_api_client.get_job', side_effect=_get_job)
+
+
 @pytest.fixture
 def mock_get_job_doesnt_exist(mocker):
     def _get_job(service_id, job_id):
@@ -1700,6 +1708,20 @@ def mock_get_job_in_progress(mocker, api_user_active):
             notification_count=10,
             notifications_requested=5,
             job_status='processing',
+        )}
+
+    return mocker.patch('app.job_api_client.get_job', side_effect=_get_job)
+
+
+@pytest.fixture(scope='function')
+def mock_get_letter_job_in_progress(mocker, api_user_active):
+    def _get_job(service_id, job_id):
+        return {"data": job_json(
+            service_id, api_user_active, job_id=job_id,
+            notification_count=10,
+            notifications_requested=5,
+            job_status='processing',
+            template_type='letter',
         )}
 
     return mocker.patch('app.job_api_client.get_job', side_effect=_get_job)
@@ -1759,13 +1781,22 @@ def mock_get_uploads(mocker, api_user_active):
                     'notification_count': 10,
                     'created_at': '2016-01-01 11:09:00.061258',
                     'statistics': [{'count': 8, 'status': 'delivered'}, {'count': 2, 'status': 'temporary-failure'}],
-                    'upload_type': 'job'},
+                    'upload_type': 'job',
+                    'template_type': 'sms',
+                    'recipient': None},
                    {'id': 'letter_id_1',
                     'original_file_name': 'some.pdf',
                     'notification_count': 1,
                     'created_at': '2016-01-01 11:09:00.061258',
                     'statistics': [{'count': 1, 'status': 'delivered'}],
-                    'upload_type': 'letter'}
+                    'upload_type': 'letter',
+                    'template_type': None,
+                    'recipient': (
+                        'Firstname Lastname\n'
+                        '123 Example Street\n'
+                        'City of Town\n'
+                        'XM4 5QQ'
+                    )}
                    ]
         return {
             'data': uploads,

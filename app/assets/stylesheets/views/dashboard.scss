@@ -56,6 +56,18 @@
     margin-top: -10px;
   }
 
+  &-filename-large {
+    @include bold-24;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-bottom: 30px;
+    padding-top: 10px;
+    margin-bottom: -30px;
+    margin-top: -10px;
+  }
+
   &-filename-unlinked {
     @include core-19;
   }

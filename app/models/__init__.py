@@ -75,6 +75,9 @@ class ModelList(ABC, Sequence):
     def __add__(self, other):
         return list(self) + list(other)
 
+    def __radd__(self, other):
+        return list(other) + list(self)
+
 
 class InviteTokenError(Exception):
     pass
