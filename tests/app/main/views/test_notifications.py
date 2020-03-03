@@ -405,6 +405,7 @@ def test_notification_page_shows_validation_failed_precompiled_letter(
     assert not page.select('p.notification-status')
 
     assert page.select_one('main img')['src'].endswith('.png?page=1')
+    assert not page.select('.letter-postage')
 
 
 @pytest.mark.parametrize('notification_status, expected_message', (
