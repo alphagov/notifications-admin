@@ -199,6 +199,9 @@ def test_should_show_page_for_one_job(
     )
 
     assert page.h1.text.strip() == 'thisisatest.csv'
+    assert page.select_one('.govuk-back-link')['href'] == url_for(
+        'main.uploads', service_id=SERVICE_ONE_ID,
+    )
     assert ' '.join(page.find('tbody').find('tr').text.split()) == (
         '07123456789 template content Delivered 1 January at 11:10am'
     )
@@ -477,6 +480,7 @@ def test_should_show_letter_job_with_banner_after_sending_before_1730(
     assert normalize_spaces(page.select('.banner-default-with-tick')[0].text) == (
         'Your letter has been sent. Printing starts today at 5:30pm.'
     )
+    assert not page.select_one('.govuk-back-link')
 
 
 @freeze_time("2016-01-01 11:09:00")
@@ -538,6 +542,7 @@ def test_should_show_scheduled_job(
         'main.view_job',
         service_id=SERVICE_ONE_ID,
         job_id=fake_uuid,
+        just_sent='yes',
     )
 
     assert normalize_spaces(page.select('main p')[1].text) == (
@@ -550,6 +555,7 @@ def test_should_show_scheduled_job(
         version=1,
     )
     assert page.select_one('main button[type=submit]').text.strip() == 'Cancel sending'
+    assert not page.select_one('.govuk-back-link')
 
 
 def test_should_cancel_job(

@@ -90,10 +90,7 @@ def view_job(service_id, job_id):
             status=request.args.get('status', ''),
         ),
         partials=get_job_partials(job),
-        just_sent=bool(
-            request.args.get('just_sent') == 'yes'
-            and job.template_type == 'letter'
-        ),
+        just_sent=request.args.get('just_sent') == 'yes',
         just_sent_message=just_sent_message,
     )
 
