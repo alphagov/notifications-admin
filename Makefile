@@ -75,22 +75,6 @@ build: dependencies generate-version-file ## Build project
 	npm run build
 	pip install -r requirements.txt
 
-.PHONY: build-paas-artifact
-build-paas-artifact: ## Build the deploy artifact for PaaS
-	rm -rf target
-	mkdir -p target
-	zip -y -q -r -x@deploy-exclude.lst target/notifications-admin.zip ./
-
-.PHONY: upload-paas-artifact ## Upload the deploy artifact for PaaS
-upload-paas-artifact:
-	$(if ${DEPLOY_BUILD_NUMBER},,$(error Must specify DEPLOY_BUILD_NUMBER))
-	$(if ${JENKINS_S3_BUCKET},,$(error Must specify JENKINS_S3_BUCKET))
-	aws s3 cp --region eu-west-1 --sse AES256 target/notifications-admin.zip s3://${JENKINS_S3_BUCKET}/build/notifications-admin/${DEPLOY_BUILD_NUMBER}.zip
-
-.PHONY: upload-static ## Upload the static files to be served from S3
-upload-static:
-	aws s3 cp --region eu-west-1 --recursive --cache-control max-age=315360000,immutable ./app/static s3://${DNS_NAME}-static
-
 .PHONY: test
 test: ## Run tests
 	./scripts/run_tests.sh
@@ -187,6 +171,10 @@ generate-manifest:
 	    --format=yaml \
 	    <(${DECRYPT_CMD} ${NOTIFY_CREDENTIALS}/credentials/${CF_SPACE}/paas/environment-variables.gpg) 2>&1
 
+.PHONY: upload-static ## Upload the static files to be served from S3
+upload-static:
+	aws s3 cp --region eu-west-1 --recursive --cache-control max-age=315360000,immutable ./app/static s3://${DNS_NAME}-static
+
 .PHONY: cf-deploy
 cf-deploy: ## Deploys the app to Cloud Foundry
 	$(if ${CF_SPACE},,$(error Must specify CF_SPACE))
@@ -208,10 +196,6 @@ cf-deploy-prototype-2: cf-target ## Deploys the second prototype to Cloud Foundr
 .PHONY: cf-rollback
 cf-rollback: cf-target ## Rollbacks the app to the previous release
 	cf v3-cancel-zdt-push ${CF_APP}
-
-.PHONY: cf-push
-cf-push:
-	cf push -f <(make -s generate-manifest)
 
 .PHONY: cf-target
 cf-target: check-env-vars
