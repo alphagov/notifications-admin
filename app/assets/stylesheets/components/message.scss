@@ -78,18 +78,6 @@ $message-type-bottom-spacing: govuk-spacing(4);
 
   &-item {
 
-    &-with-checkbox {
-
-      position: relative;
-      padding-left: govuk-spacing(9);
-
-      .multiple-choice {
-        position: absolute;
-        left: 0;
-      }
-
-    }
-
     &-hidden-by-default {
       display: none;
     }
