@@ -42,6 +42,7 @@ from app.main.validators import (
     LettersNumbersAndFullStopsOnly,
     MustContainAlphanumericCharacters,
     NoCommasInPlaceHolders,
+    NoEmbeddedImagesInSVG,
     OnlySMSCharacters,
     ValidEmail,
     ValidGovEmail,
@@ -1133,7 +1134,8 @@ class SVGFileUpload(StripWhitespaceForm):
         'Upload an SVG logo',
         validators=[
             FileAllowed(['svg'], 'SVG Images only!'),
-            DataRequired(message="You need to upload a file to submit")
+            DataRequired(message="You need to upload a file to submit"),
+            NoEmbeddedImagesInSVG()
         ]
     )
 
