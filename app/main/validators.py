@@ -86,7 +86,9 @@ class NoEmbeddedImagesInSVG:
         self.message = message
 
     def __call__(self, form, field):
-        if '<image' in field.data.stream.read().decode("utf-8"):
+        is_image_embedded = '<image' in field.data.stream.read().decode("utf-8")
+        field.data.stream.seek(0)
+        if is_image_embedded:
             raise ValidationError(self.message)
 
 
