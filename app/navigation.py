@@ -355,8 +355,6 @@ class MainNavigation(Navigation):
             'returned_letters',
             'service_dashboard',
             'template_usage',
-            'view_job',
-            'view_jobs',
             'view_notification',
             'view_notifications',
         },
@@ -390,6 +388,8 @@ class MainNavigation(Navigation):
             'upload_letter',
             'uploaded_letter_preview',
             'uploads',
+            'view_job',
+            'view_jobs',
         },
         'team-members': {
             'confirm_edit_user_email',
