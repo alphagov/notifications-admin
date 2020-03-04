@@ -30,13 +30,7 @@
       {{ page_footer('Save') }}
     {% else %}
       {{ govukCheckboxes({
-        "items": [{
-          "name": form.is_default.name,
-          "id": form.is_default.id,
-          "text": form.is_default.label.text,
-          "value": "y",
-          "checked": form.is_default.data
-        }]
+        "items": wtforms_boolean_fields_to_govuk_items([form.is_default])
       }) }}
       {{ page_footer(
         'Save',

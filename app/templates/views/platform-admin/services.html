@@ -109,13 +109,7 @@
       {{ textbox(form.start_date, hint="Enter start date in format YYYY-MM-DD") }}
       {{ textbox(form.end_date, hint="Enter end date in format YYYY-MM-DD") }}
       {{ govukCheckboxes({
-        "items": [{
-          "name": form.include_from_test_key.name,
-          "id": form.include_from_test_key.id,
-          "text": form.include_from_test_key.label.text,
-          "value": "y",
-          "checked": form.include_from_test_key.data
-        }]
+        "items": wtforms_boolean_fields_to_govuk_items([form.include_from_test_key])
       }) }}
       {{ govukButton({ "text": "Filter" }) }}
     {% endcall %}

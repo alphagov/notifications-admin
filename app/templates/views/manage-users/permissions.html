@@ -2,15 +2,6 @@
 {% from "components/radios.html" import radio, radios, conditional_radio_panel %}
 {% from "components/checkboxes/macro.njk" import govukCheckboxes %}
 
-{% set items = [] %}
-{% for option in form.permissions_fields %}
-  {% set _ = items.append({
-    "name": option.name,
-    "text": option.label.text,
-    "value": 'y',
-    "checked": option.data
-  }) %}
-{% endfor %}
 {{ govukCheckboxes({
   "idPrefix": "permissions",
   "fieldset": {
@@ -22,29 +13,13 @@
   "hint": {
     "text": "All team members can see sent messages."
   },
-  "items": items
+  "asList": True,
+  "items": wtforms_boolean_fields_to_govuk_items(form.permissions_fields)
 }) }}
 
-{% macro build_tree_from_fields(_items, _fields) %}
-  {% for _field in _fields %}
-    {% set _item = {
-      "name": _field.name,
-      "text": _field.label.text,
-      "value": _field.data,
-      "checked": _field.checked
-    } %}
-    {% if _field.data in form.folder_permissions.children() %}
-      {% set _ = _item.update({"children": []}) %}
-      {{ build_tree_from_fields(_item["children"], form.folder_permissions.children()[_field.data]) }}
-    {% endif %}
-    {% set _ = _items.append(_item) %}
-  {% endfor %}
-{% endmacro %}
-
-
 {% if form.folder_permissions.all_template_folders %}
-  {% set folder_permissions = [] %}
-  {% set _ =  build_tree_from_fields(folder_permissions, form.folder_permissions.children()[None]) %}
+  {% set option_to_children_map = form.folder_permissions.children() %}
+  {% set folder_permissions = get_tree_of_govuk_items_from_wtforms_option_fields(option_to_children_map[None], option_to_children_map) %}
   {{ notifyCollapsibleCheckboxes({
     "idPrefix": "folder_permissions",
     "fieldset": {

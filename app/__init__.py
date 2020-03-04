@@ -791,6 +791,53 @@ def add_template_filters(application):
         application.add_template_filter(fn)
 
 
+def wtforms_boolean_fields_to_govuk_items(boolean_fields):
+    return [{
+        "name": field.name,
+        "id": field.id,
+        "text": field.label.text,
+        "value": "y",
+        "checked": field.data
+    } for field in boolean_fields]
+
+
+def wtforms_option_field_to_govuk_item(option_field):
+    return {
+        "name": option_field.name,
+        "id": option_field.id,
+        "text": option_field.label.text,
+        "value": option_field.data,
+        "checked": option_field.checked
+    }
+
+
+def wtforms_option_fields_to_govuk_items(option_fields):
+    return [wtforms_option_field_to_govuk_item(field) for field in option_fields]
+
+
+def get_tree_of_govuk_items_from_wtforms_option_fields(option_fields, option_to_children_map):
+    items = []
+
+    for field in option_fields:
+        item = wtforms_option_field_to_govuk_item(field)
+        if field.data in option_to_children_map:
+            item['children'] = get_tree_of_govuk_items_from_wtforms_option_fields(
+                option_to_children_map[field.data], option_to_children_map)
+        items.append(item)
+
+    return items
+
+
+def add_global_functions(application):
+    for func in [
+        wtforms_boolean_fields_to_govuk_items,
+        wtforms_boolean_fields_to_govuk_items,
+        wtforms_option_fields_to_govuk_items,
+        get_tree_of_govuk_items_from_wtforms_option_fields
+    ]:
+        application.jinja_env.globals.update(**{func.__name__: func})
+
+
 def init_jinja(application):
     repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
     template_folders = [
@@ -799,3 +846,4 @@ def init_jinja(application):
     ]
     jinja_loader = jinja2.FileSystemLoader(template_folders)
     application.jinja_loader = jinja_loader
+    add_global_functions(application)
