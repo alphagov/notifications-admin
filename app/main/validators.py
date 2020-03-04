@@ -80,6 +80,16 @@ class NoCommasInPlaceHolders:
             raise ValidationError(self.message)
 
 
+class NoEmbeddedImagesInSVG:
+
+    def __init__(self, message='This SVG has an embedded raster image in it and will not render well'):
+        self.message = message
+
+    def __call__(self, form, field):
+        if '<image' in field.data.stream.read().decode("utf-8"):
+            raise ValidationError(self.message)
+
+
 class OnlySMSCharacters:
     def __call__(self, form, field):
         non_sms_characters = sorted(list(SanitiseSMS.get_non_compatible_characters(field.data)))

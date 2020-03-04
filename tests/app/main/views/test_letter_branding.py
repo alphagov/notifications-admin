@@ -331,7 +331,10 @@ def test_create_letter_branding_when_uploading_valid_file(
 
     response = platform_admin_client.post(
         url_for('.create_letter_branding'),
-        data={'file': (BytesIO(''.encode('utf-8')), filename)},
+        data={'file': (BytesIO("""
+            <svg height="100" width="100">
+            <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" /></svg>
+        """.encode('utf-8')), filename)},
         follow_redirects=True
     )
 
@@ -341,6 +344,35 @@ def test_create_letter_branding_when_uploading_valid_file(
     assert page.select_one('#logo-img > img').attrs['src'].endswith(expected_temp_filename)
     assert mock_s3_upload.called
     mock_delete_temp_files.assert_not_called()
+
+
+def test_create_letter_branding_fails_validation_when_uploading_SVG_with_embedded_image(
+    mocker,
+    platform_admin_client,
+    fake_uuid
+):
+    filename = 'test.svg'
+
+    mock_s3_upload = mocker.patch('app.s3_client.s3_logo_client.utils_s3upload')
+
+    response = platform_admin_client.post(
+        url_for('.create_letter_branding'),
+        data={'file': (BytesIO("""
+            <svg height="100" width="100">
+            <image href="someurlgoeshere" x="0" y="0" height="100" width="100"></image></svg>
+        """.encode('utf-8')), filename)},
+        follow_redirects=True,
+    )
+
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    assert normalize_spaces(page.find('h1').text) == "Add letter branding"
+    message = 'This SVG has an embedded raster image in it and will not render well'
+    assert normalize_spaces(page.find("span", {"class": "error-message"}).text) == message
+
+    assert page.findAll('div', {'id': 'logo-img'}) == []
+
+    mock_s3_upload.assert_not_called()
 
 
 def test_create_letter_branding_when_uploading_invalid_file(platform_admin_client):
