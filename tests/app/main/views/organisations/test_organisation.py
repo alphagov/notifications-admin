@@ -443,6 +443,38 @@ def test_organisation_services_shows_live_services_and_usage(
 
 
 @freeze_time("2020-02-20 20:20")
+def test_organisation_services_shows_live_services_and_usage_with_count_of_1(
+    client_request,
+    mock_get_organisation,
+    mocker,
+    active_user_with_permissions,
+    fake_uuid,
+):
+    mocker.patch(
+        'app.organisations_client.get_services_and_usage',
+        return_value={"services": [
+            {'service_id': SERVICE_ONE_ID, 'service_name': '1', 'chargeable_billable_sms': 1, 'emails_sent': 1,
+             'free_sms_limit': 250000, 'letter_cost': 0, 'sms_billable_units': 1, 'sms_cost': 0,
+             'sms_remainder': None},
+        ]}
+    )
+
+    client_request.login(active_user_with_permissions)
+    page = client_request.get('.organisation_dashboard', org_id=ORGANISATION_ID)
+
+    usage_rows = page.select('main .govuk-grid-column-one-third')
+
+    # Totals
+    assert normalize_spaces(usage_rows[0].text) == "Emails 1 sent"
+    assert normalize_spaces(usage_rows[1].text) == "Text messages £0.00 spent"
+    assert normalize_spaces(usage_rows[2].text) == "Letters £0.00 spent"
+
+    assert normalize_spaces(usage_rows[3].text) == "1 email sent"
+    assert normalize_spaces(usage_rows[4].text) == "1 free text message sent"
+    assert normalize_spaces(usage_rows[5].text) == "£0.00 spent on letters"
+
+
+@freeze_time("2020-02-20 20:20")
 @pytest.mark.parametrize('financial_year, expected_selected', (
     (2018, '2018 to 2019 financial year'),
     (2019, '2019 to 2020 financial year'),
