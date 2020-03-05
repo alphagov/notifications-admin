@@ -27,6 +27,8 @@
         `))
         .on("input", this.update);
 
+      $(window).on("resize", this.resize);
+
       visibleTextbox = this.$textbox.clone().appendTo("body").css({
         position: 'absolute',
         visibility: 'hidden',
@@ -47,7 +49,7 @@
 
     this.resize = () => {
 
-      this.$background.width(this.$textbox.outerWidth());
+      this.$background.width(this.$textbox.width());
 
       this.$textbox.height(
         Math.max(
