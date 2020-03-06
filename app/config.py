@@ -24,7 +24,6 @@ class Config(object):
     STATSD_ENABLED = False
     STATSD_HOST = os.getenv('STATSD_HOST')
     STATSD_PORT = 8125
-    STATSD_PREFIX = os.getenv('STATSD_PREFIX')
 
     # Logging
     DEBUG = False
