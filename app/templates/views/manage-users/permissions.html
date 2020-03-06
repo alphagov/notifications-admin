@@ -14,7 +14,20 @@
 </fieldset>
 
 {% if form.folder_permissions.all_template_folders %}
-  {{ checkboxes_nested(form.folder_permissions, form.folder_permissions.children(), hide_legend=True, collapsible_opts={ 'field': 'folder' }) }}
+  {% set option_to_children_map = form.folder_permissions.children() %}
+  {% set folder_permissions = get_tree_of_govuk_items_from_wtforms_option_fields(option_to_children_map[None], option_to_children_map) %}
+  {{ notifyCollapsibleCheckboxes({
+    "idPrefix": "folder_permissions",
+    "fieldset": {
+      "attributes": { "id": form.folder_permissions.id },
+      "legend": {
+        "text": "Folders this team member can see",
+        "classes": "govuk-fieldset__legend--s"
+      }
+    },
+    "asList": True,
+    "items": folder_permissions
+  }, 'folder') }}
 {% elif user and user.platform_admin %}
   <p class="bottom-gutter">
     Platform admin users can access all template folders.

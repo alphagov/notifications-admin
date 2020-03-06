@@ -192,3 +192,14 @@
   {% endif %}
   </div>
 {% endmacro %}
+
+
+{% macro notifyCollapsibleCheckboxes(params, field_label) %}
+  <div class="selection-wrapper" data-module="collapsible-checkboxes" data-field-label="{{ field_label }}">
+    {#- Add live region as hint by assigning results of dict update to unused variable -#}
+    {% set _ = params.update({
+      "hint": { "html": "<div class=\"selection-summary\" role=\"region\" aria-live=\"polite\"></div>" }
+    }) %}
+    {{ notifyCheckboxes(params) }}
+  </div>
+{% endmacro %}
