@@ -45,12 +45,12 @@ from tests.conftest import (
             'File Messages to be sent'
         ),
         (
-            'send_me_later.csv '
-            'Sending 1 January 2016 at 11:09am 1'
-        ),
-        (
             'even_later.csv '
             'Sending 1 January 2016 at 11:09pm 1'
+        ),
+        (
+            'send_me_later.csv '
+            'Sending 1 January 2016 at 11:09am 1'
         ),
         (
             'File Status'

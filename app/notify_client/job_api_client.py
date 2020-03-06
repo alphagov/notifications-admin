@@ -70,7 +70,8 @@ class JobApiClient(NotifyAdminAPIClient):
                 service_id,
                 statuses=[self.SCHEDULED_JOB_STATUS]
             )['data'],
-            key=lambda job: job['scheduled_for']
+            key=lambda job: job['scheduled_for'],
+            reverse=True,
         )
 
     @cache.set('has_jobs-{service_id}')
