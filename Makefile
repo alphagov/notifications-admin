@@ -9,7 +9,6 @@ GIT_COMMIT ?= $(shell git rev-parse HEAD 2> /dev/null || echo "")
 
 DOCKER_IMAGE_TAG := $(shell cat docker/VERSION)
 DOCKER_BUILDER_IMAGE_NAME = govuk/notify-admin-builder:${DOCKER_IMAGE_TAG}
-DOCKER_TTY ?= $(if ${JENKINS_HOME},,t)
 
 BUILD_TAG ?= notifications-admin-manual
 BUILD_NUMBER ?= 0
@@ -27,38 +26,12 @@ $(eval export CF_HOME)
 
 NOTIFY_CREDENTIALS ?= ~/.notify-credentials
 
+
+## DEVELOPMENT
+
 .PHONY: help
 help:
 	@cat $(MAKEFILE_LIST) | grep -E '^[a-zA-Z_-]+:.*?## .*$$' | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
-
-.PHONY: check-env-vars
-check-env-vars: ## Check mandatory environment variables
-	$(if ${DEPLOY_ENV},,$(error Must specify DEPLOY_ENV))
-	$(if ${DNS_NAME},,$(error Must specify DNS_NAME))
-
-.PHONY: sandbox
-sandbox: ## Set environment to sandbox
-	$(eval export DEPLOY_ENV=sandbox)
-	$(eval export DNS_NAME="cloudapps.digital")
-	@true
-
-.PHONY: preview
-preview: ## Set environment to preview
-	$(eval export DEPLOY_ENV=preview)
-	$(eval export DNS_NAME="notify.works")
-	@true
-
-.PHONY: staging
-staging: ## Set environment to staging
-	$(eval export DEPLOY_ENV=staging)
-	$(eval export DNS_NAME="staging-notify.works")
-	@true
-
-.PHONY: production
-production: ## Set environment to production
-	$(eval export DEPLOY_ENV=production)
-	$(eval export DNS_NAME="notifications.service.gov.uk")
-	@true
 
 .PHONY: dependencies
 dependencies: ## Install build dependencies
@@ -75,22 +48,6 @@ generate-version-file: ## Generates the app version file
 build: dependencies generate-version-file ## Build project
 	npm run build
 	pip install -r requirements.txt
-
-.PHONY: build-paas-artifact
-build-paas-artifact: ## Build the deploy artifact for PaaS
-	rm -rf target
-	mkdir -p target
-	zip -y -q -r -x@deploy-exclude.lst target/notifications-admin.zip ./
-
-.PHONY: upload-paas-artifact ## Upload the deploy artifact for PaaS
-upload-paas-artifact:
-	$(if ${DEPLOY_BUILD_NUMBER},,$(error Must specify DEPLOY_BUILD_NUMBER))
-	$(if ${JENKINS_S3_BUCKET},,$(error Must specify JENKINS_S3_BUCKET))
-	aws s3 cp --region eu-west-1 --sse AES256 target/notifications-admin.zip s3://${JENKINS_S3_BUCKET}/build/notifications-admin/${DEPLOY_BUILD_NUMBER}.zip
-
-.PHONY: upload-static ## Upload the static files to be served from S3
-upload-static:
-	aws s3 cp --region eu-west-1 --recursive --cache-control max-age=315360000,immutable ./app/static s3://${DNS_NAME}-static
 
 .PHONY: test
 test: ## Run tests
@@ -124,7 +81,7 @@ prepare-docker-build-image: ## Prepare the Docker builder image
 	make -C docker build
 
 define run_docker_container
-	@docker run -i${DOCKER_TTY} --rm \
+	@docker run -it --rm \
 		--name "${DOCKER_CONTAINER_PREFIX}-${1}" \
 		-v "`pwd`:/var/project" \
 		-e UID=$(shell id -u) \
@@ -167,6 +124,32 @@ clean-docker-containers: ## Clean up any remaining docker containers
 clean:
 	rm -rf node_modules cache target
 
+
+## DEPLOYMENT
+
+.PHONY: check-env-vars
+check-env-vars: ## Check mandatory environment variables
+	$(if ${DEPLOY_ENV},,$(error Must specify DEPLOY_ENV))
+	$(if ${DNS_NAME},,$(error Must specify DNS_NAME))
+
+.PHONY: preview
+preview: ## Set environment to preview
+	$(eval export DEPLOY_ENV=preview)
+	$(eval export DNS_NAME="notify.works")
+	@true
+
+.PHONY: staging
+staging: ## Set environment to staging
+	$(eval export DEPLOY_ENV=staging)
+	$(eval export DNS_NAME="staging-notify.works")
+	@true
+
+.PHONY: production
+production: ## Set environment to production
+	$(eval export DEPLOY_ENV=production)
+	$(eval export DNS_NAME="notifications.service.gov.uk")
+	@true
+
 .PHONY: cf-login
 cf-login: ## Log in to Cloud Foundry
 	$(if ${CF_USERNAME},,$(error Must specify CF_USERNAME))
@@ -187,6 +170,10 @@ generate-manifest:
 	    -D CF_APP=${CF_APP} \
 	    --format=yaml \
 	    <(${DECRYPT_CMD} ${NOTIFY_CREDENTIALS}/credentials/${CF_SPACE}/paas/environment-variables.gpg) 2>&1
+
+.PHONY: upload-static ## Upload the static files to be served from S3
+upload-static:
+	aws s3 cp --region eu-west-1 --recursive --cache-control max-age=315360000,immutable ./app/static s3://${DNS_NAME}-static
 
 .PHONY: cf-deploy
 cf-deploy: ## Deploys the app to Cloud Foundry
@@ -209,10 +196,6 @@ cf-deploy-prototype-2: cf-target ## Deploys the second prototype to Cloud Foundr
 .PHONY: cf-rollback
 cf-rollback: cf-target ## Rollbacks the app to the previous release
 	cf v3-cancel-zdt-push ${CF_APP}
-
-.PHONY: cf-push
-cf-push:
-	cf push -f <(make -s generate-manifest)
 
 .PHONY: cf-target
 cf-target: check-env-vars
