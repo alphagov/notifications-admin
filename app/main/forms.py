@@ -4,6 +4,7 @@ from itertools import chain
 
 import pytz
 from flask import request
+from flask_login import current_user
 from flask_wtf import FlaskForm as Form
 from flask_wtf.file import FileAllowed
 from flask_wtf.file import FileField as FileField_wtf
@@ -500,7 +501,7 @@ class InviteUserForm(PermissionsForm):
         self.invalid_email_address = invalid_email_address.lower()
 
     def validate_email_address(self, field):
-        if field.data.lower() == self.invalid_email_address:
+        if field.data.lower() == self.invalid_email_address and not current_user.platform_admin:
             raise ValidationError("You cannot send an invitation to yourself")
 
 
@@ -512,7 +513,7 @@ class InviteOrgUserForm(StripWhitespaceForm):
         self.invalid_email_address = invalid_email_address.lower()
 
     def validate_email_address(self, field):
-        if field.data.lower() == self.invalid_email_address:
+        if field.data.lower() == self.invalid_email_address and not current_user.platform_admin:
             raise ValidationError("You cannot send an invitation to yourself")
 
 

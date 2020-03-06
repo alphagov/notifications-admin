@@ -13,6 +13,7 @@ from flask import (
     flash,
     g,
     make_response,
+    redirect,
     render_template,
     request,
     session,
@@ -59,6 +60,7 @@ from app.navigation import (
     MainNavigation,
     OrgNavigation,
 )
+from app.notify_client import InviteTokenError
 from app.notify_client.api_key_api_client import api_key_api_client
 from app.notify_client.billing_api_client import billing_api_client
 from app.notify_client.complaint_api_client import complaint_api_client
@@ -701,6 +703,11 @@ def register_errorhandlers(application):  # noqa (C901 too complex)
             return error
 
         return _error_response(error.code)
+
+    @application.errorhandler(InviteTokenError)
+    def handle_bad_invite_token(error):
+        flash(str(error))
+        return redirect(url_for('main.sign_in'))
 
     @application.errorhandler(500)
     @application.errorhandler(Exception)
