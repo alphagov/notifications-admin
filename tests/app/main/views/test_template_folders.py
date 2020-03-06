@@ -395,7 +395,7 @@ def test_should_show_templates_folder_page(
         assert links_in_page[index].text.strip() == expected_link
 
     all_page_items = page.select('.template-list-item')
-    all_page_items_styled_with_checkboxes = page.select('.template-list-item-with-checkbox')
+    all_page_items_styled_with_checkboxes = page.select('.govuk-checkboxes__item')
 
     assert len(all_page_items) == len(all_page_items_styled_with_checkboxes)
 
@@ -527,8 +527,8 @@ def test_get_manage_folder_viewing_permissions_for_users(
     assert normalize_spaces(page.select_one('title').text) == (
         'folder_two – Templates – service one – GOV.UK Notify'
     )
-    form_labels = page.select('legend[class=form-label]')
-    assert normalize_spaces(form_labels[0].text) == "Team members who can see this folder"
+    form_legend = page.select_one('legend.govuk-fieldset__legend')
+    assert normalize_spaces(form_legend.text) == "Team members who can see this folder"
     checkboxes = page.select('input[name=users_with_permission]')
 
     assert len(checkboxes) == 2

@@ -678,7 +678,7 @@ def test_should_show_folder_permission_form_if_service_has_folder_permissions_en
 
     assert 'Invite a team member' in page.find('h1').text.strip()
 
-    folder_checkboxes = page.find('div', class_='checkboxes-nested').find_all('li')
+    folder_checkboxes = page.select('[data-module=collapsible-checkboxes] li')
     assert len(folder_checkboxes) == 3
 
 
