@@ -668,13 +668,13 @@ def test_uploads_page_shows_scheduled_jobs(
             'File Status'
         ),
         (
-            'send_me_later.csv '
-            'Sending 1 January 2016 at 11:09am '
+            'even_later.csv '
+            'Sending 1 January 2016 at 11:09pm '
             '1 text message waiting to send'
         ),
         (
-            'even_later.csv '
-            'Sending 1 January 2016 at 11:09pm '
+            'send_me_later.csv '
+            'Sending 1 January 2016 at 11:09am '
             '1 text message waiting to send'
         ),
     ]

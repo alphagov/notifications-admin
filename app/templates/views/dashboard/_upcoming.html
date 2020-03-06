@@ -20,7 +20,7 @@
       </span>
       <span class="banner-dashboard-meta">
         sending starts
-        {{ current_service.scheduled_jobs[0].scheduled_for|format_datetime_relative }}
+        {{ current_service.scheduled_jobs[-1].scheduled_for|format_datetime_relative }}
       </span>
     </a>
   {% endif %}
