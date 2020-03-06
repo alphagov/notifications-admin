@@ -7,7 +7,7 @@ $sticky-padding: govuk-spacing(4);
 .js-stick-at-bottom-when-scrolling {
 
   overflow: hidden;
-  margin-left: -govuk-spacing(3);
+  margin-left: -1 * govuk-spacing(3);
   padding: 10px 0 0 govuk-spacing(3);
   position: relative;
 

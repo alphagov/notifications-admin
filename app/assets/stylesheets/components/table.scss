@@ -343,10 +343,10 @@
 
       position: absolute;
 
-      top: -govuk-spacing(3);
+      top: -1 * govuk-spacing(3);
       right: 0;
-      bottom: -govuk-spacing(3) + 4px;
-      left: -govuk-spacing(3);
+      bottom: -1 * govuk-spacing(3) + 4px;
+      left: -1 * govuk-spacing(3);
 
       background: transparent;
     }
@@ -387,7 +387,7 @@ td.table-empty-message {
   text-align: center;
 
   .table + & {
-    margin-top: -govuk-spacing(6);
+    margin-top: -1 * govuk-spacing(6);
   }
 
 }

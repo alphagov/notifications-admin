@@ -31,7 +31,7 @@
     margin: 0;
 
     a {
-      margin-bottom: -govuk-spacing(6);
+      margin-bottom: -1 * govuk-spacing(6);
       padding-bottom: govuk-spacing(6);
 
       &:hover .message-name-separator:before {

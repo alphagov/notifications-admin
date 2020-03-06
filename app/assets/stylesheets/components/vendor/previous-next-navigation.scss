@@ -32,8 +32,8 @@ $is-ie: false !default;
   display: block;
   margin-top: govuk-spacing(6);
   margin-bottom: govuk-spacing(6);
-  margin-left: -govuk-spacing(3);
-  margin-right: -govuk-spacing(3);
+  margin-left: -1 * govuk-spacing(3);
+  margin-right: -1 * govuk-spacing(3);
   overflow: hidden;
 
   ul {

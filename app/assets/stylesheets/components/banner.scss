@@ -88,7 +88,7 @@
     }
 
     & + p {
-      margin-top: -govuk-spacing(3);
+      margin-top: -1 * govuk-spacing(3);
     }
 
   }
@@ -175,7 +175,7 @@
   }
 
   & + .banner-dashboard {
-    margin-top: -govuk-spacing(6);
+    margin-top: -1 * govuk-spacing(6);
     border-top: none;
   }
 }
