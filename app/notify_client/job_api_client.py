@@ -14,8 +14,9 @@ class JobApiClient(NotifyAdminAPIClient):
         'ready to send',
         'sent to dvla'
     }
-
-    NON_SCHEDULED_JOB_STATUSES = JOB_STATUSES - {'scheduled', 'cancelled'}
+    SCHEDULED_JOB_STATUS = 'scheduled'
+    CANCELLED_JOB_STATUS = 'cancelled'
+    NON_SCHEDULED_JOB_STATUSES = JOB_STATUSES - {SCHEDULED_JOB_STATUS, CANCELLED_JOB_STATUS}
 
     def get_job(self, service_id, job_id):
         params = {}
@@ -65,7 +66,10 @@ class JobApiClient(NotifyAdminAPIClient):
 
     def get_scheduled_jobs(self, service_id):
         return sorted(
-            self.get_jobs(service_id, statuses=['scheduled'])['data'],
+            self.get_jobs(
+                service_id,
+                statuses=[self.SCHEDULED_JOB_STATUS]
+            )['data'],
             key=lambda job: job['scheduled_for']
         )
 
