@@ -308,12 +308,18 @@ def test_cancelled_invited_user_accepts_invited_redirect_to_cancelled_invitation
     assert page.h1.string.strip() == 'The invitation you were sent has been cancelled'
 
 
+@pytest.mark.parametrize('admin_endpoint, api_endpoint', [
+    ('main.accept_invite', 'app.invite_api_client.check_token'),
+    ('main.accept_org_invite', 'app.org_invite_api_client.check_token'),
+])
 def test_new_user_accept_invite_with_malformed_token(
+    admin_endpoint,
+    api_endpoint,
     client,
     service_one,
     mocker,
 ):
-    mocker.patch('app.invite_api_client.check_token', side_effect=HTTPError(
+    mocker.patch(api_endpoint, side_effect=HTTPError(
         response=Mock(
             status_code=400,
             json={
@@ -328,7 +334,7 @@ def test_new_user_accept_invite_with_malformed_token(
         message={'invitation': 'Something’s wrong with this link. Make sure you’ve copied the whole thing.'}
     ))
 
-    response = client.get(url_for('main.accept_invite', token='thisisnotarealtoken'), follow_redirects=True)
+    response = client.get(url_for(admin_endpoint, token='thisisnotarealtoken'), follow_redirects=True)
 
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')

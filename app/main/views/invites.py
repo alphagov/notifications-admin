@@ -12,16 +12,11 @@ from app.models.user import (
     User,
     Users,
 )
-from app.notify_client import InviteTokenError
 
 
 @main.route("/invitation/<token>")
 def accept_invite(token):
-    try:
-        invited_user = InvitedUser.from_token(token)
-    except InviteTokenError as exception:
-        flash(str(exception))
-        return redirect(url_for('main.sign_in'))
+    invited_user = InvitedUser.from_token(token)
 
     if not current_user.is_anonymous and current_user.email_address.lower() != invited_user.email_address.lower():
         message = Markup("""
@@ -78,6 +73,7 @@ def accept_invite(token):
 @main.route("/organisation-invitation/<token>")
 def accept_org_invite(token):
     invited_org_user = InvitedOrgUser.from_token(token)
+
     if not current_user.is_anonymous and current_user.email_address.lower() != invited_org_user.email_address.lower():
         message = Markup("""
             You’re signed in as {}.
