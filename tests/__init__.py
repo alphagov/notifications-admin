@@ -4,6 +4,7 @@ from unittest.mock import patch
 from urllib.parse import parse_qs, urlparse
 
 import pytest
+from flask import session as flask_session
 from flask import url_for
 from flask.testing import FlaskClient
 from flask_login import login_user
@@ -27,6 +28,9 @@ class TestClient(FlaskClient):
 
         with patch('app.events_api_client.create_event'):
             login_user(model_user)
+        with self.session_transaction() as test_session:
+            for key, value in flask_session.items():
+                test_session[key] = value
 
     def logout(self, user):
         self.get(url_for("main.sign_out"))
