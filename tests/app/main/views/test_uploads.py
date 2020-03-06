@@ -39,11 +39,11 @@ def test_no_upload_letters_button_without_permission(
 
 @pytest.mark.parametrize('extra_permissions, expected_empty_message', (
     (['letter'], (
-        'You have not uploaded any files yet. '
+        'You have not uploaded any files recently. '
         'To upload a list of contact details, first choose a template.'
     )),
     (['letter', 'upload_letters'], (
-        'You have not uploaded any files yet. '
+        'You have not uploaded any files recently. '
         'Upload a letter and Notify will print, pack and post it for you. '
         'To upload a list of contact details, first choose a template.'
     )),
