@@ -39,8 +39,8 @@
       </div>
     {% endfor %}
   </div>
-  <div class="grid-row">
-    <div class="column-whole">
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
       {% if current_user.has_permissions('manage_service') %}
         <div class="js-stick-at-bottom-when-scrolling">
           {{ govukButton({
@@ -51,7 +51,7 @@
         </div>
       {% endif %}
     </div>
-    <div class="column-five-sixths">
+    <div class="govuk-grid-column-five-sixths">
       <p>
         You need to add at least one reply-to address so recipients can reply to your messages.
       </p>

@@ -15,8 +15,8 @@
     '{} letter branding'.format('Update' if is_update else 'Add'),
     back_link=url_for('main.letter_branding')
   ) }}
-  <div class="grid-row">
-    <div class="column-three-quarters">
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-three-quarters">
       {% if logo %}
         <div id="logo-img">
           <img src="https://{{ cdn_url }}/{{ logo }}"/>

@@ -23,12 +23,10 @@
 
   &-list {
 
-    @extend %grid-row;
     position: relative;
 
     &-permissions {
 
-      @include grid-column(3/4);
       margin-top: 5px;
 
       li {
@@ -53,10 +51,10 @@
 
           position: absolute;
 
-          top: -$gutter-half - 1;
+          top: -1 * govuk-spacing(3) - 1;
           right: 0;
-          bottom: -$gutter-half;
-          left: -$gutter-half;
+          bottom: -1 * govuk-spacing(3);
+          left: -1 * govuk-spacing(3);
 
           background: transparent;
         }

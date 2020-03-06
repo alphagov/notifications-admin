@@ -2189,7 +2189,7 @@ def test_add_sender_link_only_appears_on_services_with_no_senders(
         template_id=fake_uuid,
     )
 
-    assert page.select_one('.column-three-quarters form > a')['href'] == url_for(
+    assert page.select_one('.govuk-grid-column-three-quarters form > a')['href'] == url_for(
         'main.service_add_letter_contact',
         service_id=SERVICE_ONE_ID,
         from_template=fake_uuid,
@@ -2212,6 +2212,6 @@ def test_set_template_sender_escapes_letter_contact_block_names(
 
     # use decode_contents, which returns the raw html, rather than text, which sanitises it and makes
     # testing confusing
-    radio_text = page.select_one('.column-three-quarters label[for="sender-1"]').decode_contents()
+    radio_text = page.select_one('.govuk-grid-column-three-quarters label[for="sender-1"]').decode_contents()
     assert "&lt;script&gt;" in radio_text
     assert "<script>" not in radio_text

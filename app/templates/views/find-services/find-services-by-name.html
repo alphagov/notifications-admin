@@ -16,16 +16,16 @@
 
   {% call form_wrapper(
       action=url_for('.find_services_by_name'),
-      class='grid-row'
+      class='govuk-grid-row'
   ) %}
-    <div class="column-three-quarters">
+    <div class="govuk-grid-column-three-quarters">
       {{ textbox(
         form.search,
         width='1-1',
         label='Find services by name, or by partial name'
       ) }}
     </div>
-    <div class="column-one-quarter">
+    <div class="govuk-grid-column-one-quarter">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
       {{ govukButton({
         "text": "Search",

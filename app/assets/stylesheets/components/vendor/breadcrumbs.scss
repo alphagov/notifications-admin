@@ -29,14 +29,14 @@
  */
 
 .breadcrumbs {
-  @extend %site-width-container;
+  @include govuk-width-container;
   @include core-16($line-height: (25 / 16), $line-height-640: 1.75);
 
-  padding: $gutter-one-third 0;
+  padding: govuk-spacing(2) 0;
   list-style: none;
 
   @include media(tablet) {
-    margin-bottom: $gutter;
+    margin-bottom: govuk-spacing(6);
   }
 
   ol {
@@ -49,7 +49,7 @@
     display: inline-block;
 
     margin: 0;
-    padding: 0 $gutter-one-quarter 0 (11px + $gutter-one-quarter);
+    padding: 0 (govuk-spacing(6) / 4) 0 (11px + govuk-spacing(6) / 4);
 
     background-image: file-url('separator.png');
     background-repeat: no-repeat;

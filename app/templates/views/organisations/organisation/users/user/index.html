@@ -19,7 +19,7 @@
     {{ user.email_address }}
   </p>
 
-  {% call form_wrapper(class="column-three-quarters") %}
+  {% call form_wrapper(class="govuk-grid-column-three-quarters") %}
       {{ page_footer(
         'Save',
         delete_link=url_for('.remove_user_from_organisation', org_id=current_org.id, user_id=user.id) if user or None,

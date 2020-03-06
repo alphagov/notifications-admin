@@ -20,18 +20,18 @@
       </div>
       <a href="{{ url_for('main.choose_account') }}" class="govuk-link govuk-link--no-visited-state navigation-service-switch">Switch service</a>
     </div>
-    <div class="grid-row govuk-!-padding-bottom-12">
+    <div class="govuk-grid-row govuk-!-padding-bottom-12">
       {% if help %}
-        <div class="column-one-third">
+        <div class="govuk-grid-column-one-third">
       {% else %}
-        <div class="column-one-quarter">
+        <div class="govuk-grid-column-one-quarter">
       {% endif %}
           {% include "main_nav.html" %}
         </div>
       {% if help %}
-        <div class="column-two-thirds">
+        <div class="govuk-grid-column-two-thirds">
       {% else %}
-        <div class="column-three-quarters">
+        <div class="govuk-grid-column-three-quarters">
       {% endif %}
         {% block beforeContent %}{% endblock %}
         <main class="govuk-main-wrapper column-main {{ mainClasses }}" id="main-content" role="main">

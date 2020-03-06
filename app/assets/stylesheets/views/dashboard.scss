@@ -5,14 +5,14 @@
   }
 
   > .heading-medium:first-of-type {
-    margin-top: $gutter-half;
+    margin-top: govuk-spacing(3);
   }
 
 }
 
 .keyline-block {
   border-top: 1px solid $border-colour;
-  padding-top: $gutter-half;
+  padding-top: govuk-spacing(3);
 }
 
 .spark-bar {
@@ -21,8 +21,8 @@
   box-sizing: border-box;
   display: block;
   width: 100%;
-  margin-bottom: $gutter-half;
-  height: $gutter-half;
+  margin-bottom: govuk-spacing(3);
+  height: govuk-spacing(3);
   color: $text-colour;
   text-align: left;
 
@@ -92,5 +92,5 @@
 
 .align-with-message-body {
   display: block;
-  margin-top: $gutter * 5 / 6;
+  margin-top: govuk-spacing(5);
 }

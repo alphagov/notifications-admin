@@ -6,12 +6,12 @@ $tail-angle: 20deg;
   width: 100%;
   max-width: 464px;
   box-sizing: border-box;
-  padding: $gutter-half $gutter-half $gutter-half $gutter-half;
+  padding: govuk-spacing(3);
   background: $panel-colour;
   border: 1px solid $panel-colour;
   border-radius: 5px;
   white-space: normal;
-  margin: 0 0 $gutter 0;
+  margin: 0 0 govuk-spacing(6) 0;
   clear: both;
   word-wrap: break-word;
 
@@ -63,7 +63,7 @@ $tail-angle: 20deg;
 .sms-message-status {
   @include core-16;
   color: $secondary-text-colour;
-  margin: -20px $gutter-half 20px $gutter-half;
+  margin: -20px govuk-spacing(3) 20px govuk-spacing(3);
 }
 
 .sms-message-status-outbound {

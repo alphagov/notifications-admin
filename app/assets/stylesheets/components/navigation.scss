@@ -1,7 +1,7 @@
 .navigation {
 
   @include govuk-font($size: 19);
-  padding: 0 $gutter 0 0;
+  padding: 0 govuk-spacing(6) 0 0;
 
   $padding-top: 14px;
   $padding-bottom: 11px;
@@ -53,7 +53,7 @@
       position: absolute;
       top: 0;
       right: 0;
-      padding: $padding-top 0 $padding-bottom $gutter-half;
+      padding: $padding-top 0 $padding-bottom govuk-spacing(3);
 
       &:focus {
         outline: none;
@@ -67,7 +67,7 @@
 
     &-back-to {
 
-      padding: $padding-top $gutter-half $padding-bottom 0;
+      padding: $padding-top govuk-spacing(3) $padding-bottom 0;
       display: inline-block;
 
     }
@@ -145,7 +145,7 @@
 // https://github.com/alphagov/product-page-example/blob/master/source/stylesheets/modules/_sub-navigation.scss
 .sub-navigation {
   @include media(tablet) {
-    margin-top: $gutter * 1.5;
+    margin-top: govuk-spacing(6) * 1.5;
   }
 
   ol,
@@ -160,7 +160,7 @@
 
     border-bottom: 1px $grey-3 solid;
     display: block;
-    padding: $gutter-one-third 0;
+    padding: govuk-spacing(2) 0;
 
     a:link {
       text-decoration: none;
@@ -172,7 +172,7 @@
     }
 
     ol ol & {
-      padding-left: $gutter;
+      padding-left: govuk-spacing(6);
     }
   }
 

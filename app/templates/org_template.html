@@ -15,11 +15,11 @@
       </div>
       <a href="{{ url_for('main.choose_account') }}" class="govuk-link govuk-link--no-visited-state navigation-service-switch">Switch service</a>
     </div>
-    <div class="grid-row govuk-!-padding-bottom-12">
-      <div class="column-one-quarter">
+    <div class="govuk-grid-row govuk-!-padding-bottom-12">
+      <div class="govuk-grid-column-one-quarter">
         {% include "org_nav.html" %}
       </div>
-      <div class="column-three-quarters">
+      <div class="govuk-grid-column-three-quarters">
         {% block beforeContent %}{% endblock %}
         <main class="govuk-main-wrapper column-main govuk-!-padding-top-0 govuk-!-padding-bottom-0" id="main-content" role="main" >
           {% block content %}

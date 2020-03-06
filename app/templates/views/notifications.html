@@ -36,9 +36,9 @@
 
     {% call form_wrapper(
       action=url_for('.view_notifications', service_id=current_service.id, message_type=message_type),
-      class="grid-row"
+      class="govuk-grid-row"
     ) %}
-      <div class="column-three-quarters {% if message_type == 'sms' %}extra-tracking{% endif %}">
+      <div class="govuk-grid-column-three-quarters {% if message_type == 'sms' %}extra-tracking{% endif %}">
         {{ textbox(
           search_form.to,
           width='1-1',
@@ -51,7 +51,7 @@
           )
         ) }}
       </div>
-      <div class="column-one-quarter">
+      <div class="govuk-grid-column-one-quarter">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         {{ govukButton({
           "text": "Search",

@@ -12,7 +12,7 @@
 {% block content %}
 
   <div class="product-page-intro">
-    <div class="product-page-intro-wrapper override-elements-content" id="content">
+    <div class="product-page-intro-wrapper">
       <nav class="breadcrumbs breadcrumbs--inverse" aria-label="Breadcrumbs">
        <ol itemscope itemtype="http://schema.org/BreadcrumbList">
          <li class="breadcrumbs__item" itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
@@ -23,8 +23,8 @@
          </li>
        </ol>
       </nav>
-      <div class="grid-row">
-        <div class="column-two-thirds">
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
           <h1>
             Send emails, text messages and letters to your users
           </h1>
@@ -47,8 +47,8 @@
   </div>
 
   <div class="product-page-section">
-    <div class="grid-row">
-      <div class="column-half">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-one-half">
         <h2>
           Control your content
         </h2>
@@ -57,14 +57,14 @@
           text&nbsp;message or letter templates.
         </p>
       </div>
-      <div class="column-half">
+      <div class="govuk-grid-column-one-half">
         <img src="{{ asset_url('images/product/01-templates.svg') }}" alt="">
       </div>
     </div>
   </div>
   <div class="product-page-section">
-    <div class="grid-row">
-      <div class="column-half">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-one-half">
         <h2>
           See how your messages perform
         </h2>
@@ -73,7 +73,7 @@
           find out which ones are not being delivered.
         </p>
       </div>
-      <div class="column-half">
+      <div class="govuk-grid-column-one-half">
         <img
           src="{{ asset_url('images/product/02-reporting.svg') }}"
           alt="A screenshot of GOV.UK Notify showing counts of emails and text messages sent"
@@ -85,8 +85,8 @@
     <h2 class="with-keyline">
       Send messages manually or automatically
     </h2>
-    <div class="grid-row">
-      <div class="column-half">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-one-half">
         <p>
           Upload a spreadsheet of email&nbsp;addresses or
           phone&nbsp;numbers and Notify sends the messages.
@@ -96,7 +96,7 @@
           alt="A screenshot of a spreadsheet with columns for email address, name and colour"
         >
       </div>
-      <div class="column-half">
+      <div class="govuk-grid-column-one-half">
         <p>
           Integrate the GOV.UK Notify API with your web&nbsp;application or
           back office system.
@@ -121,13 +121,13 @@
   <div class="product-page-section">
     <div class="with-keyline bottom-gutter-2" id="whos-using-notify">
       <h2>Who’s using GOV.UK Notify</h2>
-      <div class="grid-row bottom-gutter">
-        <div class="column-half">
+      <div class="govuk-grid-row bottom-gutter">
+        <div class="govuk-grid-column-one-half">
           <h3 class="govuk-visually-hidden">Services</h3>
           <div class="product-page-big-number">{{ counts.services|format_thousands }}</div>
           services
         </div>
-        <div class="column-half">
+        <div class="govuk-grid-column-one-half">
           <h3 class="govuk-visually-hidden">Organisations</h3>
           <div class="product-page-big-number">{{ counts.organisations|format_thousands }}</div>
           organisations
@@ -142,24 +142,24 @@
   <div class="product-page-section">
     <div class="with-keyline bottom-gutter-2">
       <h2>Pricing</h2>
-      <div class="grid-row bottom-gutter">
-        <div class="column-half">
+      <div class="govuk-grid-row bottom-gutter">
+        <div class="govuk-grid-column-one-half">
           <h3 class="govuk-visually-hidden">Emails</h3>
           <div class="product-page-big-number">Unlimited</div>
           free emails
         </div>
-        <div class="column-half">
+        <div class="govuk-grid-column-one-half">
           <h3 class="govuk-visually-hidden">Text messages</h3>
           <div class="product-page-big-number">Up to 250,000</div>
           free text messages a year,<br>
           then 1.58 pence per message
         </div>
-        <div class="column-half">
+        <div class="govuk-grid-column-one-half">
           <h3 class="govuk-visually-hidden">Letters</h3>
           <div class="product-page-big-number">35 pence</div>
           to print and post a one page letter
         </div>
-        <div class="column-half">
+        <div class="govuk-grid-column-one-half">
           <p class="align-with-big-number-hint">
             There’s no monthly charge, no setup fee and no&nbsp;procurement process.
           </p>
@@ -170,8 +170,8 @@
     </div>
   </div>
   <div class="product-page-section">
-    <div class="grid-row">
-      <div class="column-half">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-one-half">
         <h2 class="with-keyline">
           The team
         </h2>
@@ -184,7 +184,7 @@
           to give feedback.
         </p>
       </div>
-      <div class="column-half">
+      <div class="govuk-grid-column-one-half">
         <img
           src="{{ asset_url('images/product/team.jpg') }}"
           alt="A photo of the GOV.UK Notify team gathered around a big screen. One team member is pointing at a graph on the screen."

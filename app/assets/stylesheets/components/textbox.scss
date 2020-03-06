@@ -36,7 +36,7 @@
     overflow-wrap: break-word;
     word-wrap: break-word;
     border: 2px solid transparent;
-    padding-bottom: $gutter-half;
+    padding-bottom: govuk-spacing(3);
     z-index: 10;
 
     .placeholder,

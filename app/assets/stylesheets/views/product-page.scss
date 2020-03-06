@@ -11,14 +11,14 @@ $button-shadow-size: $govuk-border-width-form-element;
     // We need the `<main>` section to be above it, like the default order, so when we apply the
     // negative margin-top it overlaps the theme bar at the bottom of the header
     position: relative;
-    margin: -10px 0 $gutter * 1.5 0;
-    padding: 0 0 $gutter * 2 0;
+    margin: -10px 0 govuk-spacing(6) * 1.5 0;
+    padding: 0 0 govuk-spacing(9) 0;
     background: $product-page-blue;
     color: $white;
 
     &-wrapper {
 
-      @extend %site-width-container;
+      @include govuk-width-container;
 
       @include media(desktop) {
         background-image: file-url('product/proposition-illustration.png');
@@ -31,12 +31,12 @@ $button-shadow-size: $govuk-border-width-form-element;
 
     h1 {
       @include bold-48;
-      margin: 20px 0 $gutter 0;
+      margin: 20px 0 govuk-spacing(6) 0;
     }
 
     p {
       @include core-24;
-      margin: $gutter-half 0 $gutter;
+      margin: govuk-spacing(3) 0 govuk-spacing(6);
     }
 
     .govuk-link {
@@ -57,22 +57,22 @@ $button-shadow-size: $govuk-border-width-form-element;
 
   &-section {
 
-    @extend %site-width-container;
-    margin-bottom: $gutter-half;
+    @include govuk-width-container;
+    margin-bottom: govuk-spacing(3);
 
     h2 {
       @include bold-27;
-      margin: 0 0 $gutter;
+      margin: 0 0 govuk-spacing(6);
     }
 
     .with-keyline {
       border-top: 1px solid $border-colour;
-      padding: $gutter * 1.5 0 0 0;
+      padding: govuk-spacing(6) * 1.5 0 0 0;
     }
 
     img {
       width: 100%;
-      margin: 0 0 $gutter * 1.5 0;
+      margin: 0 0 govuk-spacing(6) * 1.5 0;
     }
 
   }

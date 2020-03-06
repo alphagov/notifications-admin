@@ -9,7 +9,7 @@
   position: absolute;
   background: $link-colour;
   color: $white;
-  padding: 10px $gutter-half;
+  padding: 10px govuk-spacing(3);
   z-index: 10000;
 
   &:link, &:visited {

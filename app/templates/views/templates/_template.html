@@ -1,7 +1,7 @@
 {% from 'components/message-count-label.html' import message_count_label %}
 {% from "components/banner.html" import banner_wrapper %}
 
-<div class="column-whole">
+<div class="govuk-grid-column-full">
   {% if template._template.archived %}
     <p class="hint">
       This template was deleted {{ template._template.updated_at|format_datetime_relative }}.
@@ -14,7 +14,7 @@
     </p>
   {% else %}
     <div class="bottom-gutter-2-3">
-      <div class="grid-row">
+      <div class="govuk-grid-row">
         {% if template.template_type == 'letter' %}
         {% if letter_too_long %}
           {% call banner_wrapper(type='dangerous') %}
@@ -22,7 +22,7 @@
           {% endcall %}
         {% endif %}
           {% if current_user.has_permissions('send_messages', restrict_admin_usage=True) and not letter_too_long %}
-            <div class="column-half">
+            <div class="govuk-grid-column-one-half">
               <a href="{{ url_for(".set_sender", service_id=current_service.id, template_id=template.id) }}" class="govuk-link govuk-link--no-visited-state pill-separate-item">
                 Send
               </a>
@@ -30,14 +30,14 @@
           {% endif %}
         {% else %}
           {% if current_user.has_permissions('send_messages', restrict_admin_usage=True) %}
-            <div class="column-half">
+            <div class="govuk-grid-column-one-half">
               <a href="{{ url_for(".set_sender", service_id=current_service.id, template_id=template.id) }}" class="govuk-link govuk-link--no-visited-state pill-separate-item">
                 Send
               </a>
             </div>
           {% endif %}
           {% if current_user.has_permissions('manage_templates') %}
-            <div class="column-half">
+            <div class="govuk-grid-column-one-half">
               <a href="{{ url_for(".edit_service_template", service_id=current_service.id, template_id=template.id) }}" class="govuk-link govuk-link--no-visited-state pill-separate-item">
                 Edit
               </a>
@@ -48,7 +48,7 @@
     </div>
   {% endif %}
 </div>
-<div class="column-whole template-container">
+<div class="govuk-grid-column-full template-container">
   {% if current_user.has_permissions('manage_templates') and template.template_type == 'letter' %}
     {% if not current_service.letter_branding_id %}
       <a href="{{ url_for(".branding_request", service_id=current_service.id, branding_type="letter", from_template=template.id) }}" class="govuk-link govuk-link--no-visited-state edit-template-link-letter-branding">Add logo</a>

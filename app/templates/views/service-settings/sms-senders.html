@@ -43,8 +43,8 @@
   </div>
 
   {% if current_user.has_permissions('manage_service') %}
-    <div class="grid-row bottom-gutter">
-      <div class="column-whole">
+    <div class="govuk-grid-row bottom-gutter">
+      <div class="govuk-grid-column-full">
         {{ govukButton({
           "element": "a",
           "text": "Add text message sender",

@@ -1,14 +1,14 @@
 // CSS adapted from
 // https://github.com/alphagov/govuk_frontend_toolkit/blob/d9489a987086471fe30b4b925a81c12cd198c91d/docs/javascript.md#stick-at-top-when-scrolling
 
-$sticky-padding: $gutter * 2 / 3;
+$sticky-padding: govuk-spacing(4);
 
 .js-stick-at-top-when-scrolling,
 .js-stick-at-bottom-when-scrolling {
 
   overflow: hidden;
-  margin-left: -$gutter-half;
-  padding: 10px 0 0 $gutter-half;
+  margin-left: -1 * govuk-spacing(3);
+  padding: 10px 0 0 govuk-spacing(3);
   position: relative;
 
   .form-group {
@@ -21,8 +21,8 @@ $sticky-padding: $gutter * 2 / 3;
 
   .back-to-top-link {
     position: absolute;
-    top: $gutter;
-    right: $gutter-half;
+    top: govuk-spacing(6);
+    right: govuk-spacing(3);
     opacity: 0;
     transition: opacity 0.1s ease-in-out;
   }
@@ -41,7 +41,7 @@ $sticky-padding: $gutter * 2 / 3;
 .js-stick-at-bottom-when-scrolling {
 
   transition: bottom 0.1s ease-out, box-shadow 1s ease-in-out;
-  padding: $sticky-padding 0 $sticky-padding $gutter-half;
+  padding: $sticky-padding 0 $sticky-padding govuk-spacing(3);
   margin-top: -$sticky-padding;
 
   & + .js-stick-at-bottom-when-scrolling {
@@ -68,7 +68,7 @@ $sticky-padding: $gutter * 2 / 3;
   position: fixed;
   background: $white;
   z-index: 100;
-  padding-right: $gutter-half;
+  padding-right: govuk-spacing(3);
   margin-top: 0;
 
   .back-to-top-link {

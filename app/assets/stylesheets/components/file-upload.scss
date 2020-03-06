@@ -31,7 +31,7 @@
     &-filename {
       @include bold-19;
       display: inline-block;
-      padding-left: $gutter-half;
+      padding-left: govuk-spacing(3);
     }
 
     &-submit {

@@ -21,8 +21,8 @@
     module="autofocus",
     data_kwargs={'force-focus': True}
   ) %}
-    <div class="grid-row">
-      <div class="column-two-thirds {% if form.placeholder_value.label.text == 'phone number' %}extra-tracking{% endif %}">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds {% if form.placeholder_value.label.text == 'phone number' %}extra-tracking{% endif %}">
         {{ textbox(
           form.placeholder_value,
           hint='Optional' if optional_placeholder else None,
@@ -30,7 +30,7 @@
         ) }}
       </div>
       {% if skip_link %}
-        <div class="column-one-third">
+        <div class="govuk-grid-column-one-third">
           <a href="{{ skip_link[1] }}" class="govuk-link govuk-link--no-visited-state top-gutter-4-3">{{ skip_link[0] }}</a>
         </div>
       {% endif %}

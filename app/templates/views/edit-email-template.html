@@ -17,8 +17,8 @@
     ) }}
 
     {% call form_wrapper() %}
-      <div class="grid-row">
-        <div class="column-five-sixths">
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-five-sixths">
           {{ textbox(form.name, width='1-1', hint='Your recipients will not see this', rows=10) }}
           {{ textbox(form.subject, width='1-1', highlight_placeholders=True, rows=2) }}
           {{ textbox(form.template_content, highlight_placeholders=True, width='1-1', rows=8) }}
@@ -29,7 +29,7 @@
             'Save'
           ) }}
         </div>
-        <aside class="column-whole">
+        <aside class="govuk-grid-column-full">
           {% include "partials/templates/guidance-formatting.html" %}
           {% include "partials/templates/guidance-personalisation.html" %}
           {% include "partials/templates/guidance-optional-content.html" %}

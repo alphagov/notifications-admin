@@ -476,8 +476,8 @@ describe('Live search', () => {
               <span class="live-search-relevant">${user.label} (${user.email})</span> (invited)
             </span>
           </h3>
-          <ul class="tick-cross-list">
-            <div class="tick-cross-list-permissions">
+          <ul class="tick-cross-list govuk-grid-row">
+            <div class="tick-cross-list-permissions govuk-grid-column-three-quarters">
               ${getPermissionsHTML(user.permissions)}
               <div class="tick-cross-list-hint">
                   Can see 15 folders

@@ -97,7 +97,7 @@ def test_show_agreement_page(
     mocker.patch('app.organisations_client.get_service_organisation', return_value=org)
 
     page = client_request.get('main.service_agreement', service_id=SERVICE_ONE_ID)
-    links = page.select('main .column-five-sixths a')
+    links = page.select('main .govuk-grid-column-five-sixths a')
     assert len(links) == len(expected_links)
     for index, link in enumerate(links):
         classes, url = expected_links[index]
