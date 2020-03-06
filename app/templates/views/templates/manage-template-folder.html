@@ -4,6 +4,7 @@
 {% from "components/checkbox.html" import checkbox, checkboxes %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
+{% from "components/checkbox.html" import notifyCollapsibleCheckboxes %}
 
 {% block service_page_title %}
   {{ page_title_folder_path(template_folder_path) }}
@@ -26,7 +27,24 @@
   {% call form_wrapper(action=url_for('main.manage_template_folder', service_id=current_service.id, template_folder_id=template_folder_id)) %}
     {{ textbox(form.name, width='1-1') }}
     {% if current_user.has_permissions("manage_service") and form.users_with_permission.all_service_users %}
-      {{ checkboxes(form.users_with_permission, collapsible_opts={ 'field': 'team member' }) }}
+      {% set items = [] %}
+      {% for user in form.users_with_permission %}
+        {% set _ = items.append({
+          "name": user.name,
+          "text": user.label.text,
+          "value": user.data,
+          "checked": user.data in form.users_with_permission.data
+        }) %}
+      {% endfor %}
+      {{ notifyCollapsibleCheckboxes({
+        "fieldset": {
+          "legend": {
+            "text": "Team members who can see this folder",
+            "classes": "govuk-fieldset__legend--s"
+          }
+        },
+        "items": items
+      }, 'folder') }}
     {% endif %}
 
     {{ page_footer(
