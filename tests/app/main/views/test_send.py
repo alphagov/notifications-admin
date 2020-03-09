@@ -3560,7 +3560,7 @@ TRIAL_MODE_MSG = (
     'Cannot send to this recipient when service is in trial mode – '
     'see https://www.notifications.service.gov.uk/trial-mode'
 )
-TOO_LONG_MSG = 'Content for template has a character count greater than the limit of 612'
+TOO_LONG_MSG = 'Text messages cannot be longer than 612 characters. Your message is 654 characters.'
 SERVICE_DAILY_LIMIT_MSG = 'Exceeded send limits (1000) for today'
 
 

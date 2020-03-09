@@ -907,7 +907,10 @@ def get_template_error_dict(exception):
         error = 'not-allowed-to-send-to'
     elif 'Exceeded send limits' in exception.message:
         error = 'too-many-messages'
+    # the error from the api is changing for message-too-long, but we need both until the api is deployed.
     elif 'Content for template has a character count greater than the limit of' in exception.message:
+        error = 'message-too-long'
+    elif 'Text messages cannot be longer than' in exception.message:
         error = 'message-too-long'
     else:
         raise exception
