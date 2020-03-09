@@ -139,7 +139,6 @@ class User(JSONModel, UserMixin):
 
     def login(self):
         login_user(self)
-        session['user_id'] = self.id
 
     def sign_in(self):
 
