@@ -42,6 +42,8 @@ def test_service_set_permission_requires_platform_admin(
     ('inbound_sms', 'False', False),
     ('email_auth', 'True', True),
     ('email_auth', 'False', False),
+    ('international_letters', 'True', True),
+    ('international_letters', 'False', False),
 ])
 def test_service_set_permission(
     mocker,
@@ -70,6 +72,8 @@ def test_service_set_permission(
     ({'permissions': ['sms']}, '.service_set_inbound_number', {}, 'Receive inbound SMS Off Change'),
     ({'permissions': ['letter']},
      '.service_set_permission', {'permission': 'upload_letters'}, 'Uploading letters Off Change'),
+    ({'permissions': ['letter']},
+     '.service_set_permission', {'permission': 'international_letters'}, 'Send international letters Off Change'),
 ])
 def test_service_setting_toggles_show(get_service_settings_page, service_one, service_fields, endpoint, kwargs, text):
     link_url = url_for(endpoint, **kwargs, service_id=service_one['id'])
