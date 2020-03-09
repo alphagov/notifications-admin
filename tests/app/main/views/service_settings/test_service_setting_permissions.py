@@ -3,6 +3,7 @@ import functools
 import pytest
 from flask import url_for
 
+from app.main.views.service_settings import PLATFORM_ADMIN_SERVICE_PERMISSIONS
 from tests.conftest import normalize_spaces
 
 
@@ -91,7 +92,7 @@ def test_service_setting_toggles_show(get_service_settings_page, service_one, se
         marks=pytest.mark.xfail(raises=IndexError)
     )
 ])
-def test_service_setting_button_toggles(
+def test_service_setting_link_toggles(
     get_service_settings_page,
     service_one,
     service_fields,
@@ -99,12 +100,12 @@ def test_service_setting_button_toggles(
     index,
     text,
 ):
-    button_url = url_for(endpoint, service_id=service_one['id'])
+    link_url = url_for(endpoint, service_id=service_one['id'])
     service_one.update(service_fields)
     page = get_service_settings_page()
     link = page.select('.page-footer-delete-link a')[index]
     assert normalize_spaces(link.text) == text
-    assert link['href'] == button_url
+    assert link['href'] == link_url
 
 
 @pytest.mark.parametrize('permissions,permissions_text,visible', [
@@ -126,20 +127,20 @@ def test_service_settings_doesnt_show_option_if_parent_permission_disabled(
     assert any(cell for cell in cells if permissions_text in cell.text) is visible
 
 
-@pytest.mark.parametrize('service_fields, hidden_button_text', [
+@pytest.mark.parametrize('service_fields, link_text', [
     # can't archive or suspend inactive service. Can't resume active service.
     ({'active': False}, 'Archive service'),
     ({'active': False}, 'Suspend service'),
     ({'active': True}, 'Resume service'),
 ])
-def test_service_setting_toggles_dont_show(get_service_settings_page, service_one, service_fields, hidden_button_text):
+def test_service_setting_toggles_dont_show(get_service_settings_page, service_one, service_fields, link_text):
     service_one.update(service_fields)
     page = get_service_settings_page()
-    toggles = page.find_all('a', {'class': 'button'})
-    assert not any(button for button in toggles if hidden_button_text in button.text)
+    toggles = page.find_all('a', {'class': 'govuk-link'})
+    assert not any(link for link in toggles if link_text in link.text)
 
 
-def test_normal_user_doesnt_see_any_toggle_buttons(
+def test_normal_user_doesnt_see_any_platform_admin_settings(
     client_request,
     service_one,
     no_reply_to_email_addresses,
@@ -152,5 +153,7 @@ def test_normal_user_doesnt_see_any_toggle_buttons(
     mock_get_service_data_retention
 ):
     page = client_request.get('main.service_settings', service_id=service_one['id'])
-    toggles = page.find('a', {'class': 'button'})
-    assert toggles is None
+    platform_admin_settings = [permission['title'] for permission in PLATFORM_ADMIN_SERVICE_PERMISSIONS.values()]
+
+    for permission in platform_admin_settings:
+        assert permission not in page

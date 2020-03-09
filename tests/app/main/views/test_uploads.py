@@ -112,7 +112,7 @@ def test_get_upload_letter(client_request):
 
     assert page.find('h1').text == 'Upload a letter'
     assert page.find('input', class_='file-upload-field')
-    assert page.select('button[type=submit]')
+    assert page.select('main button[type=submit]')
     assert normalize_spaces(page.find('label', class_='file-upload-button').text) == 'Choose file'
 
 
@@ -339,7 +339,7 @@ def test_post_upload_letter_with_invalid_file(mocker, client_request, fake_uuid)
         )
 
     assert page.find('div', class_='banner-dangerous').find('h1', {"data-error-type": 'content-outside-printable-area'})
-    assert not page.find('button', {'class': 'button', 'type': 'submit'})
+    assert not page.find('button', {'class': 'page-footer__button', 'type': 'submit'})
 
 
 def test_post_upload_letter_shows_letter_preview_for_invalid_file(mocker, client_request, fake_uuid):
@@ -438,7 +438,7 @@ def test_uploaded_letter_preview(
     assert page.find('h1').text == 'my_letter.pdf'
     assert page.find('div', class_='letter-sent')
     assert not page.find("label", {"class": "file-upload-button"})
-    assert page.find('button', {'class': 'govuk-button', 'type': 'submit'})
+    assert page.find('button', {'class': 'page-footer__button', 'type': 'submit'})
 
 
 def test_uploaded_letter_preview_does_not_show_send_button_if_service_in_trial_mode(
