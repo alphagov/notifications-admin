@@ -16,11 +16,11 @@
     <div class="bottom-gutter-2-3">
       <div class="govuk-grid-row">
         {% if template.template_type == 'letter' %}
-        {% if letter_too_long %}
-          {% call banner_wrapper(type='dangerous') %}
-              {% include "partials/check/letter-too-long.html" %}
-          {% endcall %}
-        {% endif %}
+          {% if letter_too_long %}
+            {% call banner_wrapper(type='dangerous') %}
+                {% include "partials/check/letter-too-long.html" %}
+            {% endcall %}
+          {% endif %}
           {% if current_user.has_permissions('send_messages', restrict_admin_usage=True) and not letter_too_long %}
             <div class="govuk-grid-column-one-half">
               <a href="{{ url_for(".set_sender", service_id=current_service.id, template_id=template.id) }}" class="govuk-link govuk-link--no-visited-state pill-separate-item">
