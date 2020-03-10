@@ -994,9 +994,13 @@ def test_manage_user_page_doesnt_show_folder_hint_if_service_cant_edit_folder_pe
 def test_remove_user_from_service(
     client_request,
     active_user_with_permissions,
+    api_user_active,
     service_one,
     mock_remove_user_from_service,
+    mocker
 ):
+    mock_event_handler = mocker.patch('app.main.views.manage_users.create_remove_user_from_service_event')
+
     client_request.post(
         'main.remove_user_from_service',
         service_id=service_one['id'],
@@ -1006,6 +1010,12 @@ def test_remove_user_from_service(
     mock_remove_user_from_service.assert_called_once_with(
         service_one['id'],
         str(active_user_with_permissions['id'])
+    )
+
+    mock_event_handler.assert_called_once_with(
+        user_id=active_user_with_permissions['id'],
+        removed_by_id=api_user_active['id'],
+        service_id=service_one['id'],
     )
 
 

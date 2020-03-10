@@ -25,6 +25,15 @@ def create_mobile_number_change_event(user_id, updated_by_id, original_mobile_nu
         new_mobile_number=new_mobile_number)
 
 
+def create_remove_user_from_service_event(user_id, removed_by_id, service_id):
+    _send_event(
+        'remove_user_from_service',
+        user_id=user_id,
+        removed_by_id=removed_by_id,
+        service_id=service_id
+    )
+
+
 def create_archive_user_event(user_id, archived_by_id):
     _send_event(
         'archive_user',
