@@ -9,6 +9,7 @@
 import Header from 'govuk-frontend/components/header/header';
 import Details from 'govuk-frontend/components/details/details';
 import Button from 'govuk-frontend/components/button/button';
+import Radios from 'govuk-frontend/components/radios/radios';
 
 /**
  * TODO: Ideally this would be a NodeList.prototype.forEach polyfill
@@ -46,6 +47,11 @@ function initAll (options) {
   // Find first header module to enhance.
   var $toggleButton = scope.querySelector('[data-module="header"]')
   new Header($toggleButton).init()
+
+  var $radios = scope.querySelectorAll('[data-module="radios"]')
+  nodeListForEach($radios, function ($radio) {
+    new Radios($radio).init()
+  })
 }
 
 // Create separate namespace for GOVUK Frontend.
