@@ -169,6 +169,7 @@ def test_navigation_urls(
     ] == [
         '/services/{}'.format(SERVICE_ONE_ID),
         '/services/{}/templates'.format(SERVICE_ONE_ID),
+        '/services/{}/uploads'.format(SERVICE_ONE_ID),
         '/services/{}/users'.format(SERVICE_ONE_ID),
         '/services/{}/usage'.format(SERVICE_ONE_ID),
         '/services/{}/service-settings'.format(SERVICE_ONE_ID),

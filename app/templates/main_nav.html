@@ -9,9 +9,7 @@
     {% endif %}
     <li><a class="govuk-link govuk-link--no-visited-state{{ main_navigation.is_selected('templates') }}" href="{{ url_for('.choose_template', service_id=current_service.id) }}">Templates</a></li>
     {% if current_user.has_permissions('view_activity') %}
-      {% if current_service.can_upload_letters %}
-        <li><a class="govuk-link govuk-link--no-visited-state{{ main_navigation.is_selected('uploads') }}" href="{{ url_for('main.uploads', service_id=current_service.id) }}">Uploads</a></li>
-      {% endif %}
+      <li><a class="govuk-link govuk-link--no-visited-state{{ main_navigation.is_selected('uploads') }}" href="{{ url_for('main.uploads', service_id=current_service.id) }}">Uploads</a></li>
     {% else %}
       <li><a class="govuk-link govuk-link--no-visited-state{{ casework_navigation.is_selected('sent-messages') }}" href="{{ url_for('.view_notifications', service_id=current_service.id, status='sending,delivered,failed') }}">Sent messages</a></li>
       {% if current_service.has_jobs or current_service.can_upload_letters %}
