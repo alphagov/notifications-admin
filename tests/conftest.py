@@ -1820,6 +1820,29 @@ def mock_get_no_uploads(mocker, api_user_active):
 
 
 @pytest.fixture(scope='function')
+def mock_create_contact_list(mocker, api_user_active):
+    def _create(
+        service_id,
+        upload_id,
+        original_file_name,
+        row_count,
+        template_type,
+    ):
+        return {
+            'service_id': service_id,
+            'upload_id': upload_id,
+            'original_file_name': original_file_name,
+            'row_count': row_count,
+            'template_type': template_type,
+        }
+
+    return mocker.patch(
+        'app.contact_list_api_client.create_contact_list',
+        side_effect=_create,
+    )
+
+
+@pytest.fixture(scope='function')
 def mock_get_notifications(
     mocker,
     api_user_active,

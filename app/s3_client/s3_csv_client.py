@@ -55,3 +55,13 @@ def set_metadata_on_csv_upload(service_id, upload_id, **kwargs):
         },
         MetadataDirective='REPLACE',
     )
+
+
+def get_csv_metadata(service_id, upload_id):
+    try:
+        key = get_csv_upload(service_id, upload_id)
+        return key.get()['Metadata']
+    except botocore.exceptions.ClientError as e:
+        current_app.logger.error("Unable to download s3 file {}".format(
+            FILE_LOCATION_STRUCTURE.format(service_id, upload_id)))
+        raise e

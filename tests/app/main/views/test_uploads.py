@@ -1,6 +1,7 @@
 import re
 import urllib
-from unittest.mock import Mock
+from io import BytesIO
+from unittest.mock import ANY, Mock
 
 import pytest
 from flask import make_response, url_for
@@ -697,3 +698,402 @@ def test_get_uploads_shows_pagination(
         'Previous page '
         'page 0'
     )
+
+
+def test_upload_contact_list_page(client_request):
+    page = client_request.get(
+        'main.upload_contact_list',
+        service_id=SERVICE_ONE_ID,
+    )
+    assert 'action' not in page.select_one('form')
+    assert page.select_one('form input')['name'] == 'file'
+    assert page.select_one('form input')['type'] == 'file'
+
+    assert normalize_spaces(page.select('.spreadsheet')[0].text) == (
+        'Example A '
+        '1 email address '
+        '2 test@example.gov.uk'
+    )
+    assert normalize_spaces(page.select('.spreadsheet')[1].text) == (
+        'Example A '
+        '1 phone number '
+        '2 07700 900123'
+    )
+
+
+@pytest.mark.parametrize('file_contents, expected_error, expected_thead, expected_tbody,', [
+    (
+        """
+            telephone,name
+            +447700900986
+        """,
+        (
+            'Your file has too many columns '
+            'It needs to have 1 column, called ‘email address’ or ‘phone number’. '
+            'Right now it has 2 columns called ‘telephone’ and ‘name’. '
+            'Skip to file contents'
+        ),
+        'Row in file 1 telephone name',
+        '2 +447700900986',
+    ),
+    (
+        """
+            phone number, email address
+            +447700900986, test@example.com
+        """,
+        (
+            'Your file has too many columns '
+            'It needs to have 1 column, called ‘email address’ or ‘phone number’. '
+            'Right now it has 2 columns called ‘phone number’ and ‘email address’. '
+            'Skip to file contents'
+        ),
+        'Row in file 1 phone number email address',
+        '2 +447700900986 test@example.com',
+    ),
+    (
+        """
+            email address
+            +447700900986
+        """,
+        (
+            'There’s a problem with invalid.csv '
+            'You need to fix 1 email address. '
+            'Skip to file contents'
+        ),
+        'Row in file 1 email address',
+        '2 Not a valid email address +447700900986',
+    ),
+    (
+        """
+            phone number
+            test@example.com
+        """,
+        (
+            'There’s a problem with invalid.csv '
+            'You need to fix 1 phone number. '
+            'Skip to file contents'
+        ),
+        'Row in file 1 phone number',
+        '2 Must not contain letters or symbols test@example.com',
+    ),
+    (
+        """
+            phone number, phone number, PHONE_NUMBER
+            +447700900111,+447700900222,+447700900333,
+        """,
+        (
+            'Your file has too many columns '
+            'It needs to have 1 column, called ‘email address’ or ‘phone number’. '
+            'Right now it has 3 columns called ‘phone number’, ‘phone number’ and ‘PHONE_NUMBER’. '
+            'Skip to file contents'
+        ),
+        'Row in file 1 phone number phone number PHONE_NUMBER',
+        '2 +447700900333 +447700900333 +447700900333',
+    ),
+    (
+        """
+            phone number
+        """,
+        (
+            'Your file is missing some rows '
+            'It needs at least one row of data. '
+            'Skip to file contents'
+        ),
+        'Row in file 1 phone number',
+        '',
+    ),
+    (
+        "+447700900986",
+        (
+            'Your file is missing some rows '
+            'It needs at least one row of data, in a column called '
+            '‘email address’ or ‘phone number’. '
+            'Skip to file contents'
+        ),
+        'Row in file 1 +447700900986',
+        '',
+    ),
+    (
+        "",
+        (
+            'Your file is missing some rows '
+            'It needs at least one row of data, in a column called '
+            '‘email address’ or ‘phone number’. '
+            'Skip to file contents'
+        ),
+        'Row in file 1',
+        '',
+    ),
+    (
+        """
+            phone number
+            +447700900986
+
+            +447700900986
+        """,
+        (
+            'There’s a problem with invalid.csv '
+            'You need to enter missing data in 1 row. '
+            'Skip to file contents'
+        ),
+        'Row in file 1 phone number',
+        (
+            '3 Missing'
+        )
+    ),
+    (
+        """
+            phone number
+            +447700900
+        """,
+        (
+            'There’s a problem with invalid.csv '
+            'You need to fix 1 phone number. '
+            'Skip to file contents'
+        ),
+        'Row in file 1 phone number',
+        '2 Not enough digits +447700900',
+    ),
+    (
+        """
+            email address
+            ok@example.com
+            bad@example1
+            bad@example2
+        """,
+        (
+            'There’s a problem with invalid.csv '
+            'You need to fix 2 email addresses. '
+            'Skip to file contents'
+        ),
+        'Row in file 1 email address',
+        (
+            '3 Not a valid email address bad@example1 '
+            '4 Not a valid email address bad@example2'
+        ),
+    ),
+])
+def test_upload_csv_file_shows_error_banner(
+    client_request,
+    mocker,
+    mock_s3_upload,
+    mock_get_job_doesnt_exist,
+    mock_get_users_by_service,
+    fake_uuid,
+    file_contents,
+    expected_error,
+    expected_thead,
+    expected_tbody,
+):
+
+    mock_upload = mocker.patch('app.main.views.uploads.s3upload', return_value=fake_uuid)
+    mock_download = mocker.patch('app.main.views.uploads.s3download', return_value=file_contents)
+
+    page = client_request.post(
+        'main.upload_contact_list',
+        service_id=SERVICE_ONE_ID,
+        _data={'file': (BytesIO(''.encode('utf-8')), 'invalid.csv')},
+        _follow_redirects=True,
+    )
+    mock_upload.assert_called_once_with(
+        SERVICE_ONE_ID, {'data': '', 'file_name': 'invalid.csv'}, ANY,
+    )
+    mock_download.assert_called_once_with(SERVICE_ONE_ID, fake_uuid)
+
+    assert normalize_spaces(page.select_one('.banner-dangerous').text) == expected_error
+
+    assert page.select_one('form')['action'] == url_for(
+        'main.upload_contact_list',
+        service_id=SERVICE_ONE_ID,
+    )
+    assert page.select_one('form input')['type'] == 'file'
+
+    assert normalize_spaces(page.select_one('thead').text) == expected_thead
+    assert normalize_spaces(page.select_one('tbody').text) == expected_tbody
+
+
+def test_upload_csv_file_shows_error_banner_for_too_many_rows(
+    client_request,
+    mocker,
+    mock_s3_upload,
+    mock_get_job_doesnt_exist,
+    mock_get_users_by_service,
+    fake_uuid,
+):
+
+    mocker.patch('app.main.views.uploads.s3upload', return_value=fake_uuid)
+    mocker.patch('app.main.views.uploads.s3download', return_value='\n'.join(
+        ['phone number'] + (['07700900986'] * 50001)
+    ))
+
+    page = client_request.post(
+        'main.upload_contact_list',
+        service_id=SERVICE_ONE_ID,
+        _data={'file': (BytesIO(''.encode('utf-8')), 'invalid.csv')},
+        _follow_redirects=True,
+    )
+
+    assert normalize_spaces(page.select_one('.banner-dangerous').text) == (
+        'Your file has too many rows '
+        'Notify can store files up to 50,000 rows in size. '
+        'Your file has 50,001 rows. '
+        'Skip to file contents'
+    )
+    assert len(page.select('tbody tr')) == 50
+    assert normalize_spaces(page.select_one('.table-show-more-link').text) == (
+        'Only showing the first 50 rows'
+    )
+
+
+def test_upload_csv_shows_trial_mode_error(
+    client_request,
+    mock_get_users_by_service,
+    mock_get_job_doesnt_exist,
+    fake_uuid,
+    mocker
+):
+    mocker.patch('app.main.views.uploads.s3upload', return_value=fake_uuid)
+    mocker.patch('app.main.views.uploads.s3download', return_value=(
+        'phone number\n'
+        '07900900321'  # Not in team
+    ))
+
+    page = client_request.get(
+        'main.check_contact_list',
+        service_id=SERVICE_ONE_ID,
+        upload_id=fake_uuid,
+        _test_page_title=False,
+    )
+
+    assert normalize_spaces(page.select_one('.banner-dangerous').text) == (
+        'You cannot save this phone number '
+        'In trial mode you can only send to yourself and members of your team '
+        'Skip to file contents'
+    )
+    assert page.select_one('.banner-dangerous a')['href'] == url_for(
+        'main.trial_mode_new'
+    )
+
+
+def test_upload_csv_shows_ok_page(
+    client_request,
+    mock_get_live_service,
+    mock_get_users_by_service,
+    mock_get_job_doesnt_exist,
+    fake_uuid,
+    mocker
+):
+    mocker.patch('app.main.views.uploads.s3download', return_value='\n'.join(
+        ['email address'] + ['test@example.com'] * 51
+    ))
+    mock_metadata_set = mocker.patch('app.main.views.uploads.set_metadata_on_csv_upload')
+
+    page = client_request.get(
+        'main.check_contact_list',
+        service_id=SERVICE_ONE_ID,
+        upload_id=fake_uuid,
+        original_file_name='good times.xlsx',
+        _test_page_title=False,
+    )
+
+    mock_metadata_set.assert_called_once_with(
+        SERVICE_ONE_ID,
+        fake_uuid,
+        row_count=51,
+        original_file_name='good times.xlsx',
+        template_type='email',
+        valid=True,
+    )
+
+    assert normalize_spaces(page.select_one('h1').text) == (
+        'good times.xlsx'
+    )
+    assert normalize_spaces(page.select_one('main p').text) == (
+        '51 email addresses found'
+    )
+    assert page.select_one('form')['action'] == url_for(
+        'main.save_contact_list',
+        service_id=SERVICE_ONE_ID,
+        upload_id=fake_uuid,
+    )
+
+    assert normalize_spaces(page.select_one('form [type=submit]').text) == (
+        'Save contact list'
+    )
+    assert normalize_spaces(page.select_one('thead').text) == (
+        'Row in file 1 email address'
+    )
+    assert len(page.select('tbody tr')) == 50
+    assert normalize_spaces(page.select_one('tbody tr').text) == (
+        '2 test@example.com'
+    )
+    assert normalize_spaces(page.select_one('.table-show-more-link').text) == (
+        'Only showing the first 50 rows'
+    )
+
+
+def test_save_contact_list(
+    mocker,
+    client_request,
+    fake_uuid,
+    mock_create_contact_list,
+):
+    mocker.patch('app.models.contact_list.get_csv_metadata', return_value={
+        'row_count': 999,
+        'valid': True,
+        'original_file_name': 'example.csv',
+        'template_type': 'email'
+    })
+    client_request.post(
+        'main.save_contact_list',
+        service_id=SERVICE_ONE_ID,
+        upload_id=fake_uuid,
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.contact_list',
+            service_id=SERVICE_ONE_ID,
+            contact_list_id=fake_uuid,
+            _external=True,
+        )
+    )
+    mock_create_contact_list.assert_called_once_with(
+        service_id=SERVICE_ONE_ID,
+        upload_id=fake_uuid,
+        original_file_name='example.csv',
+        row_count=999,
+        template_type='email',
+    )
+
+
+def test_cant_save_bad_contact_list(
+    mocker,
+    client_request,
+    fake_uuid,
+    mock_create_contact_list,
+):
+    mocker.patch('app.models.contact_list.get_csv_metadata', return_value={
+        'row_count': 999,
+        'valid': False,
+        'original_file_name': 'example.csv',
+        'template_type': 'email'
+    })
+    client_request.post(
+        'main.save_contact_list',
+        service_id=SERVICE_ONE_ID,
+        upload_id=fake_uuid,
+        _expected_status=403,
+    )
+    assert mock_create_contact_list.called is False
+
+
+def test_view_contact_list(
+    client_request,
+    fake_uuid,
+):
+    page = client_request.get(
+        'main.contact_list',
+        service_id=SERVICE_ONE_ID,
+        contact_list_id=fake_uuid,
+        _test_page_title=False,
+    )
+    assert page.text == 'page for contact list 6ce466d0-fd6a-11e5-82f5-e0accb9d11a6'

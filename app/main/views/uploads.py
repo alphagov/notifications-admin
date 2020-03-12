@@ -1,25 +1,38 @@
 import base64
+import itertools
 import json
 import urllib
 import uuid
 from io import BytesIO
+from zipfile import BadZipFile
 
 from flask import (
     abort,
     current_app,
+    flash,
     redirect,
     render_template,
     request,
     url_for,
 )
+from notifications_utils.columns import Columns
 from notifications_utils.pdf import pdf_page_count
+from notifications_utils.recipients import RecipientCSV
+from notifications_utils.sanitise_text import SanitiseASCII
 from PyPDF2.utils import PdfReadError
 from requests import RequestException
+from xlrd.biffh import XLRDError
+from xlrd.xldate import XLDateError
 
 from app import current_service, notification_api_client, service_api_client
 from app.extensions import antivirus_client
 from app.main import main
-from app.main.forms import LetterUploadPostageForm, PDFUploadForm
+from app.main.forms import CsvUploadForm, LetterUploadPostageForm, PDFUploadForm
+from app.s3_client.s3_csv_client import (
+    s3download,
+    s3upload,
+    set_metadata_on_csv_upload,
+)
 from app.s3_client.s3_letter_upload_client import (
     get_letter_metadata,
     get_letter_pdf_and_metadata,
@@ -28,10 +41,13 @@ from app.s3_client.s3_letter_upload_client import (
 )
 from app.template_previews import TemplatePreview, sanitise_letter
 from app.utils import (
+    Spreadsheet,
     generate_next_dict,
     generate_previous_dict,
+    get_errors_for_csv,
     get_letter_validation_error,
     get_template,
+    unicode_truncate,
     user_has_permissions,
 )
 
@@ -282,3 +298,144 @@ def send_uploaded_letter(service_id):
         service_id=service_id,
         notification_id=file_id,
     ))
+
+
+@main.route("/services/<uuid:service_id>/upload-a-contact-list", methods=['GET', 'POST'])
+@user_has_permissions('send_messages')
+def upload_contact_list(service_id):
+    form = CsvUploadForm()
+
+    if form.validate_on_submit():
+        try:
+            upload_id = s3upload(
+                service_id,
+                Spreadsheet.from_file(form.file.data, filename=form.file.data.filename).as_dict,
+                current_app.config['AWS_REGION'],
+            )
+            return redirect(url_for(
+                '.check_contact_list',
+                service_id=service_id,
+                upload_id=upload_id,
+                original_file_name=form.file.data.filename,
+            ))
+        except (UnicodeDecodeError, BadZipFile, XLRDError):
+            flash('Could not read {}. Try using a different file format.'.format(
+                form.file.data.filename
+            ))
+        except (XLDateError):
+            flash((
+                '{} contains numbers or dates that Notify cannot understand. '
+                'Try formatting all columns as ‘text’ or export your file as CSV.'
+            ).format(
+                form.file.data.filename
+            ))
+
+    return render_template(
+        'views/uploads/contact-list/upload.html',
+        form=form,
+    )
+
+
+@main.route(
+    "/services/<uuid:service_id>/check-contact-list/<uuid:upload_id>",
+    methods=['GET', 'POST'],
+)
+@user_has_permissions('send_messages')
+def check_contact_list(service_id, upload_id):
+
+    form = CsvUploadForm()
+
+    contents = s3download(service_id, upload_id).strip()
+    first_row = contents.splitlines()[0].strip().rstrip(',') if contents else ''
+
+    template_type = {
+        'emailaddress': 'email',
+        'phonenumber': 'sms',
+    }.get(Columns.make_key(first_row))
+
+    original_file_name = SanitiseASCII.encode(request.args.get('original_file_name', ''))
+
+    recipients = RecipientCSV(
+        contents,
+        template_type=template_type or 'sms',
+        whitelist=itertools.chain.from_iterable(
+            [user.name, user.mobile_number, user.email_address]
+            for user in current_service.active_users
+        ) if current_service.trial_mode else None,
+        international_sms=current_service.has_permission('international_sms'),
+        max_initial_rows_shown=50,
+        max_errors_shown=50,
+    )
+
+    non_empty_column_headers = list(filter(None, recipients.column_headers))
+
+    if len(non_empty_column_headers) > 1 or not template_type or not recipients:
+        return render_template(
+            'views/uploads/contact-list/too-many-columns.html',
+            recipients=recipients,
+            original_file_name=original_file_name,
+            template_type=template_type,
+            form=form,
+        )
+
+    if recipients.too_many_rows or not len(recipients):
+        return render_template(
+            'views/uploads/contact-list/column-errors.html',
+            recipients=recipients,
+            original_file_name=original_file_name,
+            form=form,
+        )
+
+    row_errors = get_errors_for_csv(recipients, template_type)
+    if row_errors:
+        return render_template(
+            'views/uploads/contact-list/row-errors.html',
+            recipients=recipients,
+            original_file_name=original_file_name,
+            row_errors=row_errors,
+            form=form,
+        )
+
+    if recipients.has_errors:
+        return render_template(
+            'views/uploads/contact-list/column-errors.html',
+            recipients=recipients,
+            original_file_name=original_file_name,
+            form=form,
+        )
+
+    metadata_kwargs = {
+        'row_count': len(recipients),
+        'valid': True,
+        'original_file_name': unicode_truncate(
+            original_file_name,
+            1600,
+        ),
+        'template_type': template_type
+    }
+
+    set_metadata_on_csv_upload(service_id, upload_id, **metadata_kwargs)
+
+    return render_template(
+        'views/uploads/contact-list/ok.html',
+        recipients=recipients,
+        original_file_name=original_file_name,
+        upload_id=upload_id,
+    )
+
+
+@main.route("/services/<uuid:service_id>/save-contact-list/<uuid:upload_id>", methods=['POST'])
+@user_has_permissions('send_messages')
+def save_contact_list(service_id, upload_id):
+    current_service.save_contact_list(upload_id)
+    return redirect(url_for(
+        '.contact_list',
+        service_id=current_service.id,
+        contact_list_id=upload_id,
+    ))
+
+
+@main.route("/services/<uuid:service_id>/contact-list/<uuid:contact_list_id>", methods=['GET'])
+@user_has_permissions('send_messages')
+def contact_list(service_id, contact_list_id):
+    return 'page for contact list {}'.format(contact_list_id)
