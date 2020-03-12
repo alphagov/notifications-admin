@@ -271,6 +271,7 @@ def test_should_show_back_to_service_if_user_belongs_to_service(
         ''
         'Dashboard '
         'Templates '
+        'Uploads '
         'Team members'
     )
 
