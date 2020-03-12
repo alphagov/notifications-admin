@@ -2015,66 +2015,34 @@ def test_send_test_caches_page_count(
         assert session['send_test_letter_page_count'] == 9
 
 
-def test_send_test_indicates_optional_address_columns(
+def test_send_one_off_back_link_populates_address_textarea(
     client_request,
     mocker,
     mock_get_service_letter_template,
+    mock_template_preview,
     fake_uuid,
 ):
-
-    mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=1)
-
     with client_request.session_transaction() as session:
         session['recipient'] = None
-        session['placeholders'] = {}
+        session['placeholders'] = {'address line 1': 'foo', 'address line 2': 'bar', 'address line 3': ''}
 
+    # imagine someone hit the back button to go from line 3 page to line 2 page
     page = client_request.get(
         'main.send_test_step',
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
-        step_index=3,
-    )
-
-    assert normalize_spaces(page.select('label')[0].text) == (
-        'address line 4 '
-        'Optional'
-    )
-    assert page.select('.govuk-back-link')[0]['href'] == url_for(
-        'main.send_one_off_step',
-        service_id=SERVICE_ONE_ID,
-        template_id=fake_uuid,
         step_index=2,
+        _follow_redirects=True
     )
 
+    assert page.select_one('h1').text.strip() == 'Send ‘Two week reminder’'
 
-def test_send_test_allows_empty_optional_address_columns(
-    client_request,
-    mocker,
-    mock_get_service_letter_template,
-    fake_uuid,
-):
+    form = page.select_one('form')
+    assert form.select_one('label').text.strip() == 'Address'
 
-    mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=1)
-
-    with client_request.session_transaction() as session:
-        session['recipient'] = None
-        session['placeholders'] = {}
-
-    client_request.post(
-        'main.send_test_step',
-        service_id=SERVICE_ONE_ID,
-        template_id=fake_uuid,
-        step_index=3,
-        # no data here
-        _expected_status=302,
-        _expected_redirect=url_for(
-            'main.send_test_step',
-            service_id=SERVICE_ONE_ID,
-            template_id=fake_uuid,
-            step_index=4,
-            _external=True,
-        ),
-    )
+    textarea = form.select_one('textarea')
+    assert textarea.attrs['name'] == 'address'
+    assert textarea.text == 'foo\nbar'
 
 
 def test_send_test_sms_message_puts_submitted_data_in_session(
