@@ -2321,7 +2321,10 @@ def test_letter_can_only_be_sent_now(
     mock_get_jobs,
     fake_uuid,
 ):
-    mocker.patch('app.main.views.send.s3download', return_value="addressline1, addressline2, postcode\na,b,c")
+    mocker.patch(
+        'app.main.views.send.s3download',
+        return_value="addressline1, addressline2, postcode\na,b,sw1 1aa"
+    )
     mocker.patch('app.main.views.send.set_metadata_on_csv_upload')
     mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=1)
 
@@ -3021,8 +3024,8 @@ def test_check_messages_shows_data_errors_before_trial_mode_errors_for_letters(
 
     mocker.patch('app.main.views.send.s3download', return_value='\n'.join(
         ['address_line_1,address_line_2,postcode,'] +
-        ['              ,              ,11SW1 1AA'] +
-        ['              ,              ,11SW1 1AA']
+        ['              ,              ,SW1 1AA'] +
+        ['              ,              ,SW1 1AA']
     ))
 
     mocker.patch(
