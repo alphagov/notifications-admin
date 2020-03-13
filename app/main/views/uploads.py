@@ -433,4 +433,7 @@ def save_contact_list(service_id, upload_id):
 @main.route("/services/<uuid:service_id>/contact-list/<uuid:contact_list_id>", methods=['GET'])
 @user_has_permissions('send_messages')
 def contact_list(service_id, contact_list_id):
-    return 'page for contact list {}'.format(contact_list_id)
+    return render_template(
+        'views/uploads/contact-list/contact-list.html',
+        contact_list=ContactList.from_id(contact_list_id, service_id=service_id),
+    )

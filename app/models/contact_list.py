@@ -1,5 +1,7 @@
 from flask import abort, current_app
 from notifications_utils.formatters import strip_whitespace
+from notifications_utils.recipients import RecipientCSV
+from werkzeug.utils import cached_property
 
 from app.models import JSONModel
 from app.notify_client.contact_list_api_client import contact_list_api_client
@@ -12,6 +14,24 @@ from app.s3_client.s3_csv_client import (
 
 
 class ContactList(JSONModel):
+
+    ALLOWED_PROPERTIES = {
+        'id',
+        'created_at',
+        'created_by',
+        'service_id',
+        'original_file_name',
+        'row_count',
+        'template_type',
+    }
+
+    @classmethod
+    def from_id(cls, contact_list_id, *, service_id):
+        # This is temporary until we have a get single list endpoint
+        for contact_list in contact_list_api_client.get_contact_lists(service_id):
+            if contact_list['id'] == contact_list_id:
+                return cls(contact_list)
+        abort(404)
 
     @staticmethod
     def get_bucket_name():
@@ -82,3 +102,12 @@ class ContactList(JSONModel):
             row_count=int(metadata['row_count']),
             template_type=metadata['template_type'],
         ))
+
+    @cached_property
+    def recipients(self):
+        return RecipientCSV(
+            self.download(self.service_id, self.id),
+            template_type=self.template_type,
+            international_sms=True,
+            max_initial_rows_shown=50,
+        )

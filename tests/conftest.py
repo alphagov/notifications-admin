@@ -1843,6 +1843,33 @@ def mock_create_contact_list(mocker, api_user_active):
 
 
 @pytest.fixture(scope='function')
+def mock_get_contact_lists(mocker, api_user_active, fake_uuid):
+    def _get(service_id):
+        return [{
+            'created_at': '2020-03-13 10:59:56',
+            'created_by': 'Test User',
+            'id': fake_uuid,
+            'original_file_name': 'EmergencyContactList.xls',
+            'row_count': 100,
+            'service_id': service_id,
+            'template_type': 'email',
+        }, {
+            'created_at': '2020-03-13 13:00:00',
+            'created_by': 'Test User',
+            'id': uuid4(),
+            'original_file_name': 'another ist.csv',
+            'row_count': 123,
+            'service_id': service_id,
+            'template_type': 'sms',
+        }]
+
+    return mocker.patch(
+        'app.contact_list_api_client.get_contact_lists',
+        side_effect=_get,
+    )
+
+
+@pytest.fixture(scope='function')
 def mock_get_notifications(
     mocker,
     api_user_active,

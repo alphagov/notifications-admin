@@ -1,5 +1,6 @@
 import re
 import urllib
+import uuid
 from io import BytesIO
 from unittest.mock import ANY, Mock
 
@@ -1103,14 +1104,53 @@ def test_cant_save_bad_contact_list(
     assert mock_create_contact_list.called is False
 
 
+@freeze_time('2020-03-13 16:51:56')
 def test_view_contact_list(
+    mocker,
     client_request,
+    mock_get_contact_lists,
     fake_uuid,
 ):
+    mocker.patch('app.models.contact_list.s3download', return_value='\n'.join(
+        ['email address'] + ['test@example.com'] * 51
+    ))
     page = client_request.get(
         'main.contact_list',
         service_id=SERVICE_ONE_ID,
         contact_list_id=fake_uuid,
-        _test_page_title=False,
     )
-    assert page.text == 'page for contact list 6ce466d0-fd6a-11e5-82f5-e0accb9d11a6'
+    assert normalize_spaces(page.select_one('h1').text) == (
+        'EmergencyContactList.xls'
+    )
+    assert normalize_spaces(page.select('main p')[0].text) == (
+        'Uploaded by Test User today at 10:59am'
+    )
+    assert normalize_spaces(page.select('main p')[1].text) == (
+        '51 email addresses'
+    )
+    assert normalize_spaces(page.select_one('table').text).startswith(
+        'Email addresses '
+        '1 email address '
+        '2 test@example.com '
+        '3 test@example.com '
+    )
+    assert normalize_spaces(page.select_one('table').text).endswith(
+        '50 test@example.com '
+        '51 test@example.com'
+    )
+    assert normalize_spaces(page.select_one('.table-show-more-link').text) == (
+        'Only showing the first 50 rows'
+    )
+
+
+def test_view_contact_list_404s_for_non_existing_list(
+    client_request,
+    mock_get_contact_lists,
+    fake_uuid,
+):
+    client_request.get(
+        'main.contact_list',
+        service_id=SERVICE_ONE_ID,
+        contact_list_id=uuid.uuid4(),
+        _expected_status=404,
+    )
