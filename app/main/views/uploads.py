@@ -296,7 +296,7 @@ def send_uploaded_letter(service_id):
     ))
 
 
-@main.route("/services/<uuid:service_id>/upload-a-contact-list", methods=['GET', 'POST'])
+@main.route("/services/<uuid:service_id>/upload-contact-list", methods=['GET', 'POST'])
 @user_has_permissions('send_messages')
 def upload_contact_list(service_id):
     form = CsvUploadForm()
