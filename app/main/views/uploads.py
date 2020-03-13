@@ -28,11 +28,7 @@ from app import current_service, notification_api_client, service_api_client
 from app.extensions import antivirus_client
 from app.main import main
 from app.main.forms import CsvUploadForm, LetterUploadPostageForm, PDFUploadForm
-from app.s3_client.s3_csv_client import (
-    s3download,
-    s3upload,
-    set_metadata_on_csv_upload,
-)
+from app.models.contact_list import ContactList
 from app.s3_client.s3_letter_upload_client import (
     get_letter_metadata,
     get_letter_pdf_and_metadata,
@@ -307,10 +303,9 @@ def upload_contact_list(service_id):
 
     if form.validate_on_submit():
         try:
-            upload_id = s3upload(
-                service_id,
-                Spreadsheet.from_file(form.file.data, filename=form.file.data.filename).as_dict,
-                current_app.config['AWS_REGION'],
+            upload_id = ContactList.upload(
+                current_service.id,
+                Spreadsheet.from_file_form(form).as_dict,
             )
             return redirect(url_for(
                 '.check_contact_list',
@@ -345,7 +340,7 @@ def check_contact_list(service_id, upload_id):
 
     form = CsvUploadForm()
 
-    contents = s3download(service_id, upload_id).strip()
+    contents = ContactList.download(service_id, upload_id)
     first_row = contents.splitlines()[0].strip().rstrip(',') if contents else ''
 
     template_type = {
@@ -414,7 +409,7 @@ def check_contact_list(service_id, upload_id):
         'template_type': template_type
     }
 
-    set_metadata_on_csv_upload(service_id, upload_id, **metadata_kwargs)
+    ContactList.set_metadata(service_id, upload_id, **metadata_kwargs)
 
     return render_template(
         'views/uploads/contact-list/ok.html',
@@ -427,7 +422,7 @@ def check_contact_list(service_id, upload_id):
 @main.route("/services/<uuid:service_id>/save-contact-list/<uuid:upload_id>", methods=['POST'])
 @user_has_permissions('send_messages')
 def save_contact_list(service_id, upload_id):
-    current_service.save_contact_list(upload_id)
+    ContactList.create(current_service.id, upload_id)
     return redirect(url_for(
         '.contact_list',
         service_id=current_service.id,

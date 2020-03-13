@@ -6,7 +6,6 @@ from notifications_utils.timezones import local_timezone
 from werkzeug.utils import cached_property
 
 from app.models import JSONModel
-from app.models.contact_list import ContactList
 from app.models.job import (
     ImmediateJobs,
     PaginatedJobs,
@@ -132,9 +131,6 @@ class Service(JSONModel):
         if not self.has_jobs:
             return []
         return ScheduledJobs(self.id)
-
-    def save_contact_list(self, upload_id):
-        return ContactList.create(self.id, upload_id)
 
     @cached_property
     def invited_users(self):

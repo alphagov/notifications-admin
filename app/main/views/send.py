@@ -151,7 +151,7 @@ def send_messages(service_id, template_id):
         try:
             upload_id = s3upload(
                 service_id,
-                Spreadsheet.from_file(form.file.data, filename=form.file.data.filename).as_dict,
+                Spreadsheet.from_file_form(form).as_dict,
                 current_app.config['AWS_REGION']
             )
             return redirect(url_for(
