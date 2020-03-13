@@ -13,6 +13,7 @@ from zipfile import BadZipFile
 import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
+from freezegun import freeze_time
 from notifications_python_client.errors import HTTPError
 from notifications_utils.recipients import RecipientCSV
 from notifications_utils.template import (
@@ -3783,6 +3784,37 @@ def test_redirects_to_template_if_job_exists_already(
     )
 
 
+@freeze_time('2020-03-13 13:00')
+def test_choose_from_contact_list(
+    mocker,
+    client_request,
+    mock_get_service_template,
+    mock_get_contact_lists,
+    fake_uuid,
+):
+    page = client_request.get(
+        'main.choose_from_contact_list',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+    )
+    assert len(page.select('.file-list-filename-large')) == 2
+    assert normalize_spaces(page.select_one('.file-list-filename-large').text) == (
+        'EmergencyContactList.xls'
+    )
+    assert page.select_one('a.file-list-filename-large')['href'] == url_for(
+        'main.send_from_contact_list',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        contact_list_id=fake_uuid,
+    )
+    assert normalize_spaces(page.select_one('.file-list-hint').text) == (
+        'Uploaded today at 10:59am'
+    )
+    assert normalize_spaces(page.select_one('.big-number-smallest').text) == (
+        '100 email addresses'
+    )
+
+
 def test_send_from_contact_list(
     mocker,
     client_request,
@@ -3816,7 +3848,7 @@ def test_send_from_contact_list(
         SERVICE_ONE_ID, fake_uuid, bucket='test-contact-list'
     )
     mock_upload.assert_called_once_with(
-        SERVICE_ONE_ID, 'contents', ANY
+        SERVICE_ONE_ID, {'data': 'contents'}, ANY
     )
     mock_set_metadata.assert_called_once_with(
         SERVICE_ONE_ID, new_uuid, example_key='example value'

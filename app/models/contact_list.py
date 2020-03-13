@@ -3,7 +3,7 @@ from notifications_utils.formatters import strip_whitespace
 from notifications_utils.recipients import RecipientCSV
 from werkzeug.utils import cached_property
 
-from app.models import JSONModel
+from app.models import JSONModel, ModelList
 from app.notify_client.contact_list_api_client import contact_list_api_client
 from app.s3_client.s3_csv_client import (
     get_csv_metadata,
@@ -28,9 +28,9 @@ class ContactList(JSONModel):
     @classmethod
     def from_id(cls, contact_list_id, *, service_id):
         # This is temporary until we have a get single list endpoint
-        for contact_list in contact_list_api_client.get_contact_lists(service_id):
-            if contact_list['id'] == contact_list_id:
-                return cls(contact_list)
+        for contact_list in ContactLists(service_id):
+            if contact_list.id == contact_list_id:
+                return contact_list
         abort(404)
 
     @staticmethod
@@ -77,7 +77,7 @@ class ContactList(JSONModel):
         metadata = ContactList.get_metadata(service_id, upload_id)
         new_upload_id = s3upload(
             service_id,
-            contents,
+            {'data': contents},
             current_app.config['AWS_REGION'],
         )
         set_metadata_on_csv_upload(
@@ -111,3 +111,8 @@ class ContactList(JSONModel):
             international_sms=True,
             max_initial_rows_shown=50,
         )
+
+
+class ContactLists(ModelList):
+    client_method = contact_list_api_client.get_contact_lists
+    model = ContactList

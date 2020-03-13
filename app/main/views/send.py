@@ -42,7 +42,7 @@ from app.main.forms import (
     SetSenderForm,
     get_placeholder_form_instance,
 )
-from app.models.contact_list import ContactList
+from app.models.contact_list import ContactList, ContactLists
 from app.models.user import Users
 from app.s3_client.s3_csv_client import (
     s3download,
@@ -490,6 +490,19 @@ def send_test_preview(service_id, template_id, filetype):
     template.values = get_normalised_placeholders_from_session()
 
     return TemplatePreview.from_utils_template(template, filetype, page=request.args.get('page'))
+
+
+@main.route(
+    '/services/<uuid:service_id>/send/<uuid:template_id>'
+    '/from-contact-list'
+)
+@user_has_permissions('send_messages')
+def choose_from_contact_list(service_id, template_id):
+    return render_template(
+        'views/send-contact-list.html',
+        contact_lists=ContactLists(current_service.id),
+        template=current_service.get_template(template_id),
+    )
 
 
 @main.route(

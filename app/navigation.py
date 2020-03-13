@@ -149,6 +149,7 @@ class HeaderNavigation(Navigation):
         'check_notification',
         'no_cookie.check_notification_preview',
         'choose_account',
+        'choose_from_contact_list',
         'choose_service',
         'choose_template',
         'choose_template_to_copy',
@@ -368,6 +369,7 @@ class MainNavigation(Navigation):
             'add_service_template',
             'check_messages',
             'check_notification',
+            'choose_from_contact_list',
             'choose_template',
             'choose_template_to_copy',
             'confirm_redact_template',
@@ -658,6 +660,7 @@ class CaseworkNavigation(Navigation):
 
     mapping = {
         'send-one-off': {
+            'choose_from_contact_list',
             'choose_template',
             'send_one_off',
             'send_one_off_step',
@@ -1018,6 +1021,7 @@ class OrgNavigation(Navigation):
         'check_notification',
         'no_cookie.check_notification_preview',
         'choose_account',
+        'choose_from_contact_list',
         'choose_service',
         'choose_template',
         'choose_template_to_copy',

@@ -1864,7 +1864,7 @@ def mock_get_contact_lists(mocker, api_user_active, fake_uuid):
         }]
 
     return mocker.patch(
-        'app.contact_list_api_client.get_contact_lists',
+        'app.models.contact_list.ContactLists.client_method',
         side_effect=_get,
     )
 
