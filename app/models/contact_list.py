@@ -51,6 +51,22 @@ class ContactList(JSONModel):
             bucket=ContactList.get_bucket_name(),
         )
 
+    @staticmethod
+    def copy_to_uploads(service_id, upload_id):
+        contents = ContactList.download(service_id, upload_id)
+        metadata = ContactList.get_metadata(service_id, upload_id)
+        new_upload_id = s3upload(
+            service_id,
+            contents,
+            current_app.config['AWS_REGION'],
+        )
+        set_metadata_on_csv_upload(
+            service_id,
+            new_upload_id,
+            **metadata,
+        )
+        return new_upload_id
+
     @classmethod
     def create(cls, service_id, upload_id):
 

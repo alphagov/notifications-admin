@@ -6,6 +6,7 @@ from glob import glob
 from io import BytesIO
 from itertools import repeat
 from os import path
+from unittest.mock import ANY
 from uuid import uuid4
 from zipfile import BadZipFile
 
@@ -3779,4 +3780,44 @@ def test_redirects_to_template_if_job_exists_already(
             template_id=fake_uuid,
             _external=True,
         )
+    )
+
+
+def test_send_from_contact_list(
+    mocker,
+    client_request,
+    fake_uuid,
+):
+    new_uuid = uuid.uuid4()
+    mock_download = mocker.patch('app.models.contact_list.s3download', return_value='contents')
+    mock_get_metadata = mocker.patch('app.models.contact_list.get_csv_metadata', return_value={
+        'example_key': 'example value',
+    })
+    mock_upload = mocker.patch('app.models.contact_list.s3upload', return_value=new_uuid)
+    mock_set_metadata = mocker.patch('app.models.contact_list.set_metadata_on_csv_upload')
+    client_request.get(
+        'main.send_from_contact_list',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        contact_list_id=fake_uuid,
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.check_messages',
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            upload_id=new_uuid,
+            _external=True,
+        )
+    )
+    mock_download.assert_called_once_with(
+        SERVICE_ONE_ID, fake_uuid, bucket='test-contact-list'
+    )
+    mock_get_metadata.assert_called_once_with(
+        SERVICE_ONE_ID, fake_uuid, bucket='test-contact-list'
+    )
+    mock_upload.assert_called_once_with(
+        SERVICE_ONE_ID, 'contents', ANY
+    )
+    mock_set_metadata.assert_called_once_with(
+        SERVICE_ONE_ID, new_uuid, example_key='example value'
     )
