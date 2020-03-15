@@ -38,6 +38,7 @@ from tests.conftest import (
     create_active_user_with_permissions,
     create_multiple_email_reply_to_addresses,
     create_multiple_sms_senders,
+    create_platform_admin_user,
     create_template,
     mock_get_service_email_template,
     mock_get_service_letter_template,
@@ -1408,6 +1409,60 @@ def test_send_one_off_offers_link_to_upload(
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
     )
+
+
+@pytest.mark.parametrize('user', (
+    pytest.param(
+        create_platform_admin_user(),
+    ),
+    pytest.param(
+        create_active_user_with_permissions(),
+        marks=pytest.mark.xfail(raises=AssertionError),
+    ),
+))
+def test_platform_admin_has_link_to_use_existing_list(
+    client_request,
+    mock_get_service_template,
+    mock_has_jobs,
+    fake_uuid,
+    user,
+):
+    client_request.login(user)
+    page = client_request.get(
+        'main.send_one_off',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _follow_redirects=True,
+    )
+
+    assert [
+        (link.text, link['href']) for link in page.select('form a')
+    ] == [
+        (
+            'Upload a list of phone numbers',
+            url_for(
+                'main.send_messages',
+                service_id=SERVICE_ONE_ID,
+                template_id=fake_uuid,
+            ),
+        ),
+        (
+            'Use a saved list',
+            url_for(
+                'main.choose_from_contact_list',
+                service_id=SERVICE_ONE_ID,
+                template_id=fake_uuid,
+            ),
+        ),
+        (
+            'Use my phone number',
+            url_for(
+                'main.send_test',
+                service_id=SERVICE_ONE_ID,
+                template_id=fake_uuid,
+            ),
+        ),
+    ]
 
 
 @pytest.mark.parametrize('user', (
