@@ -15,6 +15,7 @@ from tests.conftest import (
     SERVICE_ONE_ID,
     create_active_caseworking_user,
     create_active_user_with_permissions,
+    create_platform_admin_user,
 )
 
 
@@ -37,6 +38,30 @@ def test_no_upload_letters_button_without_permission(
     service_one['permissions'] += extra_permissions
     page = client_request.get('main.uploads', service_id=SERVICE_ONE_ID)
     assert not page.find('a', text=re.compile('Upload a letter'))
+
+
+@pytest.mark.parametrize('user', (
+    pytest.param(
+        create_platform_admin_user(),
+    ),
+    pytest.param(
+        create_active_user_with_permissions(),
+        marks=pytest.mark.xfail(raises=AssertionError),
+    ),
+))
+def test_platform_admin_has_upload_contact_list(
+    client_request,
+    mock_get_uploads,
+    mock_get_jobs,
+    user,
+):
+    client_request.login(user)
+    page = client_request.get('main.uploads', service_id=SERVICE_ONE_ID)
+    button = page.find('a', text=re.compile('Upload a contact list'))
+    assert button
+    assert button['href'] == url_for(
+        'main.upload_contact_list', service_id=SERVICE_ONE_ID,
+    )
 
 
 @pytest.mark.parametrize('extra_permissions, expected_empty_message', (
