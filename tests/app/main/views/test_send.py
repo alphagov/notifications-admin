@@ -1310,16 +1310,17 @@ def test_send_one_off_has_skip_link(
         _follow_redirects=True,
     )
 
-    skip_links = page.select('a.top-gutter-4-3')
+    skip_links = page.select('form a')
 
     if expected_link_text and expected_link_url:
-        assert skip_links[0].text.strip() == expected_link_text
-        assert skip_links[0]['href'] == expected_link_url(
+        assert skip_links[1].text.strip() == expected_link_text
+        assert skip_links[1]['href'] == expected_link_url(
             service_id=service_one['id'],
             template_id=fake_uuid,
         )
     else:
-        assert not skip_links
+        with pytest.raises(IndexError):
+            skip_links[1]
 
 
 @pytest.mark.parametrize('template_type, expected_sticky', [
@@ -1376,9 +1377,9 @@ def test_skip_link_will_not_show_on_sms_one_off_if_service_has_no_mobile_number(
     assert not skip_links
 
 
-@pytest.mark.parametrize('user, link_index', (
-    (create_active_user_with_permissions(), 2),
-    (create_active_caseworking_user(), 1),
+@pytest.mark.parametrize('user', (
+    create_active_user_with_permissions(),
+    create_active_caseworking_user(),
 ))
 def test_send_one_off_offers_link_to_upload(
     client_request,
@@ -1386,7 +1387,6 @@ def test_send_one_off_offers_link_to_upload(
     mock_get_service_template,
     mock_has_jobs,
     user,
-    link_index,
 ):
     client_request.login(user)
 
@@ -1398,7 +1398,7 @@ def test_send_one_off_offers_link_to_upload(
     )
 
     back_link = page.select('main a')[0]
-    link = page.select('main a')[link_index]
+    link = page.select_one('form a')
 
     assert back_link.text.strip() == 'Back'
 
