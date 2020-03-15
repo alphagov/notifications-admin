@@ -22,6 +22,7 @@
   </p>
 
   <p class="govuk-body">
+    <a class="govuk-link govuk-link--no-visited-state heading-small" download href="{{ url_for('main.download_contact_list', service_id=current_service.id, contact_list_id=contact_list.id) }}">Download this list</a>&emsp;
     {{ contact_list.recipients|length|format_thousands }}
     {{ recipient_count_label(contact_list.recipients|length, contact_list.recipients.template_type) }}
   </p>

@@ -1,3 +1,5 @@
+from os import path
+
 from flask import abort, current_app
 from notifications_utils.formatters import strip_whitespace
 from notifications_utils.recipients import RecipientCSV
@@ -103,14 +105,23 @@ class ContactList(JSONModel):
             template_type=metadata['template_type'],
         ))
 
+    @property
+    def contents(self):
+        return self.download(self.service_id, self.id)
+
     @cached_property
     def recipients(self):
         return RecipientCSV(
-            self.download(self.service_id, self.id),
+            self.contents,
             template_type=self.template_type,
             international_sms=True,
             max_initial_rows_shown=50,
         )
+
+    @property
+    def saved_file_name(self):
+        file_name, extention = path.splitext(self.original_file_name)
+        return f'{file_name}.csv'
 
 
 class ContactLists(ModelList):

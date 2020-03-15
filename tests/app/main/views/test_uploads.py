@@ -1151,7 +1151,12 @@ def test_view_contact_list(
         'Uploaded by Test User today at 10:59am'
     )
     assert normalize_spaces(page.select('main p')[1].text) == (
-        '51 email addresses'
+        'Download this list 51 email addresses'
+    )
+    assert page.select_one('a[download]')['href'] == url_for(
+        'main.download_contact_list',
+        service_id=SERVICE_ONE_ID,
+        contact_list_id=fake_uuid,
     )
     assert normalize_spaces(page.select_one('table').text).startswith(
         'Email addresses '
@@ -1178,4 +1183,34 @@ def test_view_contact_list_404s_for_non_existing_list(
         service_id=SERVICE_ONE_ID,
         contact_list_id=uuid.uuid4(),
         _expected_status=404,
+    )
+
+
+def test_download_contact_list(
+    mocker,
+    logged_in_client,
+    fake_uuid,
+    mock_get_contact_lists,
+):
+    mocker.patch(
+        'app.models.contact_list.s3download',
+        return_value='phone number\n07900900321'
+    )
+    response = logged_in_client.get(url_for(
+        'main.download_contact_list',
+        service_id=SERVICE_ONE_ID,
+        contact_list_id=fake_uuid,
+    ))
+    assert response.status_code == 200
+    assert response.headers['Content-Type'] == (
+        'text/csv; '
+        'charset=utf-8'
+    )
+    assert response.headers['Content-Disposition'] == (
+        'attachment; '
+        'filename=EmergencyContactList.csv'
+    )
+    assert response.get_data(as_text=True) == (
+        'phone number\n'
+        '07900900321'
     )
