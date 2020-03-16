@@ -47,7 +47,7 @@
         {% call row_heading() %}
           <div class="file-list">
             <a class="file-list-filename-large govuk-link govuk-link--no-visited-state" href="{{ url_for('main.send_from_contact_list', service_id=current_service.id, template_id=template.id, contact_list_id=item.id) }}">{{ item.original_file_name }}</a>
-            <span class="file-list-hint">
+            <span class="file-list-hint-large">
               Uploaded {{ item.created_at|format_datetime_relative }}
             </span>
           </div>

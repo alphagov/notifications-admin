@@ -128,7 +128,7 @@ def test_get_upload_hub_page(
         '123 Example Street'
     )
     assert normalize_spaces(str(uploads[1].select_one('.govuk-body'))) == (
-        '<p class="govuk-body govuk-!-margin-bottom-1"> '
+        '<p class="govuk-body letter-recipient-summary"> '
         'Firstname Lastname<br/> '
         '123 Example Street<br/> '
         '</p>'

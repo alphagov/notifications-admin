@@ -26,19 +26,19 @@
           <a class="file-list-filename-large govuk-link govuk-link--no-visited-state" href="{{ url_for('.view_job', service_id=current_service.id, job_id=item.id) }}">{{ item.original_file_name }}</a>
         {% endif %}
         {% if item.scheduled %}
-          <span class="file-list-hint">
+          <span class="file-list-hint-large">
             Sending {{
               item.scheduled_for|format_datetime_relative
             }}
           </span>
         {% elif item.upload_type == 'contact_list' %}
-          <span class="file-list-hint">
+          <span class="file-list-hint-large">
             Uploaded {{
               item.created_at|format_datetime_relative
             }}
           </span>
         {% else %}
-          <span class="file-list-hint">
+          <span class="file-list-hint-large">
             Sent {{
               (item.scheduled_for or item.created_at)|format_datetime_relative
             }}
@@ -78,7 +78,7 @@
           ))
         ) }}
       {% elif item.pdf_letter %}
-        <p class="govuk-body govuk-!-margin-bottom-1">
+        <p class="govuk-body letter-recipient-summary">
           {% for line in item.recipient.splitlines() %}
             {% if loop.index < 3 %}
               {{ line }}<br>

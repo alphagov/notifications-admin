@@ -3920,7 +3920,7 @@ def test_choose_from_contact_list(
         template_id=template['id'],
         contact_list_id=expected_list_id,
     )
-    assert normalize_spaces(page.select_one('.file-list-hint').text) == (
+    assert normalize_spaces(page.select_one('.file-list-hint-large').text) == (
         expected_time
     )
     assert normalize_spaces(page.select_one('.big-number-smallest').text) == (
