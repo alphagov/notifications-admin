@@ -717,7 +717,6 @@ def test_uploads_page_shows_scheduled_jobs(
 def test_uploads_page_shows_contact_lists_first(
     mocker,
     client_request,
-    fake_uuid,
     mock_get_no_uploads,
     mock_get_jobs,
     mock_get_contact_lists,
@@ -731,14 +730,14 @@ def test_uploads_page_shows_contact_lists_first(
             'File Status'
         ),
         (
-            'EmergencyContactList.xls '
-            'Uploaded 13 March at 10:59am '
-            '100 saved email addresses'
-        ),
-        (
             'phone number list.csv '
             'Uploaded 13 March at 1:00pm '
             '123 saved phone numbers'
+        ),
+        (
+            'EmergencyContactList.xls '
+            'Uploaded 13 March at 10:59am '
+            '100 saved email addresses'
         ),
         (
             'even_later.csv '
@@ -754,7 +753,7 @@ def test_uploads_page_shows_contact_lists_first(
     assert page.select_one('.file-list-filename-large')['href'] == url_for(
         'main.contact_list',
         service_id=SERVICE_ONE_ID,
-        contact_list_id=fake_uuid,
+        contact_list_id='d7b0bd1a-d1c7-4621-be5c-3c1b4278a2ad',
     )
 
 

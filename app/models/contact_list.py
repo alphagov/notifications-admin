@@ -1,3 +1,4 @@
+from functools import partial
 from os import path
 
 from flask import abort, current_app
@@ -130,10 +131,23 @@ class ContactLists(ModelList):
 
     client_method = contact_list_api_client.get_contact_lists
     model = ContactList
+    sort_function = partial(
+        sorted,
+        key=lambda item: item['created_at'],
+        reverse=True,
+    )
 
     def __init__(self, service_id, template_type=None):
         super().__init__(service_id)
-        self.items = [
+        self.items = self.sort_function([
             item for item in self.items
             if template_type in {item['template_type'], None}
-        ]
+        ])
+
+
+class ContactListsAlphabetical(ContactLists):
+
+    sort_function = partial(
+        sorted,
+        key=lambda item: item['original_file_name'].lower(),
+    )
