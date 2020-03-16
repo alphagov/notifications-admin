@@ -1138,9 +1138,8 @@ def test_save_contact_list(
         upload_id=fake_uuid,
         _expected_status=302,
         _expected_redirect=url_for(
-            'main.contact_list',
+            'main.uploads',
             service_id=SERVICE_ONE_ID,
-            contact_list_id=fake_uuid,
             _external=True,
         )
     )

@@ -429,9 +429,8 @@ def check_contact_list(service_id, upload_id):
 def save_contact_list(service_id, upload_id):
     ContactList.create(current_service.id, upload_id)
     return redirect(url_for(
-        '.contact_list',
+        '.uploads',
         service_id=current_service.id,
-        contact_list_id=upload_id,
     ))
 
 
