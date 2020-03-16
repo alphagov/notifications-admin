@@ -309,10 +309,6 @@ def get_dashboard_partials(service_id):
                 [row['count'] for row in template_statistics] or [0]
             ),
         ),
-        'jobs': render_template(
-            'views/dashboard/_jobs.html',
-            jobs=current_service.immediate_jobs,
-        ),
         'usage': render_template(
             'views/dashboard/_usage.html',
             **calculate_usage(yearly_usage, free_sms_allowance),

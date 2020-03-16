@@ -191,7 +191,7 @@ def test_caseworkers_get_caseworking_navigation(
     )
     page = client_request.get('main.choose_template', service_id=SERVICE_ONE_ID)
     assert normalize_spaces(page.select_one('header + .govuk-width-container nav').text) == (
-        'Templates Sent messages Team members'
+        'Templates Sent messages Uploads Team members'
     )
 
 

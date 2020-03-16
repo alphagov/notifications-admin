@@ -1,7 +1,6 @@
 import copy
 import json
 from datetime import datetime
-from unittest.mock import call
 
 import pytest
 from bs4 import BeautifulSoup
@@ -903,56 +902,6 @@ def test_correct_font_size_for_big_numbers(
     ) == 3
 
 
-@freeze_time("2016-01-01 11:09:00.061258")
-def test_should_show_recent_jobs_on_dashboard(
-    client_request,
-    mock_get_service_templates,
-    mock_get_template_statistics,
-    mock_get_service_statistics,
-    mock_get_jobs,
-    mock_get_usage,
-    mock_get_free_sms_fragment_limit,
-    mock_get_inbound_sms_summary,
-    mock_get_returned_letter_summary_with_no_returned_letters,
-):
-    page = client_request.get(
-        'main.service_dashboard',
-        service_id=SERVICE_ONE_ID,
-    )
-
-    third_call = mock_get_jobs.call_args_list[2]
-    assert third_call[0] == (SERVICE_ONE_ID,)
-    assert third_call[1]['limit_days'] == 7
-    assert 'scheduled' not in third_call[1]['statuses']
-
-    table_rows = page.select_one('tbody').select('tr')
-
-    assert len(table_rows) == 4
-
-    for index, filename in enumerate((
-            "export 1/1/2016.xls",
-            "all email addresses.xlsx",
-            "applicants.ods",
-            "thisisatest.csv",
-    )):
-        assert filename in table_rows[index].find_all('th')[0].text
-        assert 'Sent today at 11:09' in table_rows[index].find_all('th')[0].text
-        assert normalize_spaces(
-            table_rows[index].select_one('td').text
-        ) == (
-            '1 sending 0 delivered 0 failed'
-        )
-
-
-@pytest.mark.parametrize('extra_permissions', (
-    pytest.param(
-        [],
-        marks=pytest.mark.xfail(raises=AssertionError),
-    ),
-    pytest.param(
-        ['upload_letters']
-    ),
-))
 def test_should_not_show_jobs_on_dashboard_for_users_with_uploads_page(
     client_request,
     service_one,
@@ -964,9 +913,7 @@ def test_should_not_show_jobs_on_dashboard_for_users_with_uploads_page(
     mock_get_free_sms_fragment_limit,
     mock_get_inbound_sms_summary,
     mock_get_returned_letter_summary_with_no_returned_letters,
-    extra_permissions,
 ):
-    service_one['permissions'] += extra_permissions
     page = client_request.get(
         'main.service_dashboard',
         service_id=SERVICE_ONE_ID,
@@ -1544,38 +1491,6 @@ def test_get_tuples_of_financial_years_defaults_to_2015():
         lambda year: 'http://example.com?year={}'.format(year),
         end=2040,
     ))[0]
-
-
-@freeze_time("2016-01-01 11:09:00.061258")
-def test_should_show_all_jobs_with_valid_statuses(
-    logged_in_client,
-    mock_get_template_statistics,
-    mock_get_service_statistics,
-    mock_get_service_templates_when_no_templates_exist,
-    mock_get_jobs,
-    mock_get_usage,
-    mock_get_inbound_sms_summary,
-    mock_get_returned_letter_summary_with_no_returned_letters,
-    mock_get_free_sms_fragment_limit,
-):
-    logged_in_client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
-
-    first_call = mock_get_jobs.call_args_list[0]
-    # first call - checking for any jobs
-    assert first_call == call(SERVICE_ONE_ID)
-    second_call = mock_get_jobs.call_args_list[1]
-    # second call - scheduled jobs only
-    assert second_call == call(SERVICE_ONE_ID, statuses=['scheduled'])
-    # third call - everything but scheduled and cancelled
-    third_call = mock_get_jobs.call_args_list[2]
-    assert third_call == call(SERVICE_ONE_ID, limit_days=7, statuses={
-        'pending',
-        'in progress',
-        'finished',
-        'sending limits exceeded',
-        'ready to send',
-        'sent to dvla'
-    })
 
 
 def test_org_breadcrumbs_do_not_show_if_service_has_no_org(
