@@ -1424,6 +1424,7 @@ def test_platform_admin_has_link_to_use_existing_list(
     client_request,
     mock_get_service_template,
     mock_has_jobs,
+    mock_get_contact_lists,
     fake_uuid,
     user,
 ):
@@ -1462,6 +1463,32 @@ def test_platform_admin_has_link_to_use_existing_list(
                 template_id=fake_uuid,
             ),
         ),
+    ]
+
+
+def test_no_link_to_use_existing_list_for_service_without_lists(
+    mocker,
+    client_request,
+    mock_get_service_template,
+    mock_has_jobs,
+    fake_uuid,
+):
+    mocker.patch(
+        'app.models.contact_list.ContactLists.client_method',
+        return_value=[],
+    )
+    client_request.login(create_platform_admin_user())
+    page = client_request.get(
+        'main.send_one_off',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _follow_redirects=True,
+    )
+    assert [
+        link.text for link in page.select('form a')
+    ] == [
+        'Upload a list of phone numbers',
+        'Use my phone number',
     ]
 
 
