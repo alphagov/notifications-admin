@@ -3988,6 +3988,7 @@ def test_send_from_contact_list(
     mocker,
     client_request,
     fake_uuid,
+    mock_get_contact_lists,
 ):
     new_uuid = uuid.uuid4()
     mock_download = mocker.patch('app.models.contact_list.s3download', return_value='contents')
@@ -4007,6 +4008,7 @@ def test_send_from_contact_list(
             service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
             upload_id=new_uuid,
+            original_file_name='EmergencyContactList.xls',
             _external=True,
         )
     )

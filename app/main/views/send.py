@@ -520,11 +520,16 @@ def choose_from_contact_list(service_id, template_id):
 )
 @user_has_permissions('send_messages')
 def send_from_contact_list(service_id, template_id, contact_list_id):
+    contact_list = ContactList.from_id(
+        contact_list_id,
+        service_id=current_service.id,
+    )
     return redirect(url_for(
         'main.check_messages',
         service_id=current_service.id,
         template_id=template_id,
-        upload_id=ContactList.copy_to_uploads(service_id, contact_list_id),
+        upload_id=contact_list.copy_to_uploads(),
+        original_file_name=contact_list.original_file_name,
     ))
 
 
