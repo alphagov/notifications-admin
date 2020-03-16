@@ -178,7 +178,7 @@ class Live(Config):
     HTTP_PROTOCOL = 'https'
     STATSD_ENABLED = True
     CSV_UPLOAD_BUCKET_NAME = 'live-notifications-csv-upload'
-    CONTACT_LIST_UPLOAD_BUCKET_NAME = 'live-contact-list'
+    CONTACT_LIST_UPLOAD_BUCKET_NAME = 'production-contact-list'
     LOGO_UPLOAD_BUCKET_NAME = 'public-logos-production'
     MOU_BUCKET_NAME = 'notifications.service.gov.uk-mou'
     TRANSIENT_UPLOADED_LETTERS = 'production-transient-uploaded-letters'
