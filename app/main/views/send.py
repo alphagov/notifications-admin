@@ -510,7 +510,7 @@ def choose_from_contact_list(service_id, template_id):
             current_service.id,
             template_type=template.template_type,
         ),
-        template=current_service.get_template(template_id),
+        template=template,
     )
 
 

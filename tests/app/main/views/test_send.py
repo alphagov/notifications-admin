@@ -3928,6 +3928,34 @@ def test_choose_from_contact_list(
     )
 
 
+def test_choose_from_contact_list_with_personalised_template(
+    mocker,
+    client_request,
+    mock_get_contact_lists,
+    fake_uuid,
+):
+    template = create_template(
+        content="Hey ((name)) ((thing)) is happening"
+    )
+    mocker.patch(
+        'app.service_api_client.get_service_template',
+        return_value={'data': template},
+    )
+    page = client_request.get(
+        'main.choose_from_contact_list',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+    )
+    assert [
+        normalize_spaces(p.text) for p in page.select('main p')
+    ] == [
+        'You cannot use a saved contact list with this template because '
+        'it is personalised with ((name)) and ((thing)).',
+        'Saved contact lists can only store email addresses or phone numbers.',
+    ]
+    assert not page.select('table')
+
+
 def test_choose_from_contact_list_with_no_lists(
     mocker,
     client_request,

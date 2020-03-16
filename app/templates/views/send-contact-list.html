@@ -1,5 +1,6 @@
 {% extends "withnav_template.html" %}
 {% from "components/big-number.html" import big_number -%}
+{% from "components/list.html" import list_of_placeholders %}
 {% from "components/message-count-label.html" import recipient_count_label %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/table.html" import list_table, field, right_aligned_field_heading, row_heading %}
@@ -15,7 +16,20 @@
     back_link=url_for('.send_one_off', service_id=current_service.id, template_id=template.id)
   ) }}
 
-  {% if contact_lists %}
+  {% if template.placeholders %}
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-five-sixths">
+        <p class="govuk-body">
+          You cannot use a saved contact list with this template because it
+          is personalised with {{ list_of_placeholders(template.placeholders) }}.
+        </p>
+        <p>
+          Saved contact lists can only store email addresses or phone
+          numbers.
+        </p>
+      </div>
+    </div>
+  {% elif contact_lists %}
     <div class='dashboard-table ajax-block-container'>
       {% call(item, row_number) list_table(
         contact_lists,
@@ -51,12 +65,16 @@
       {% endcall %}
     </div>
   {% else %}
-    <p class="govuk-body">
-      You have not saved any lists of {{ recipient_count_label(99, template.template_type) }} yet.
-    </p>
-    <p class="govuk-body">
-      To upload and save a new contact list, go to the <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.uploads', service_id=current_service.id) }}">uploads</a> page.
-    </p>
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-five-sixths">
+        <p class="govuk-body">
+          You have not saved any lists of {{ recipient_count_label(99, template.template_type) }} yet.
+        </p>
+        <p class="govuk-body">
+          To upload and save a new contact list, go to the <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.uploads', service_id=current_service.id) }}">uploads</a> page.
+        </p>
+      </div>
+    </div>
   {% endif %}
 
 {% endblock %}
