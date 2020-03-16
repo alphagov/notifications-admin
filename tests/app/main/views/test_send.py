@@ -6,12 +6,14 @@ from glob import glob
 from io import BytesIO
 from itertools import repeat
 from os import path
+from unittest.mock import ANY
 from uuid import uuid4
 from zipfile import BadZipFile
 
 import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
+from freezegun import freeze_time
 from notifications_python_client.errors import HTTPError
 from notifications_utils.recipients import RecipientCSV
 from notifications_utils.template import (
@@ -36,6 +38,7 @@ from tests.conftest import (
     create_active_user_with_permissions,
     create_multiple_email_reply_to_addresses,
     create_multiple_sms_senders,
+    create_platform_admin_user,
     create_template,
     mock_get_service_email_template,
     mock_get_service_letter_template,
@@ -1308,16 +1311,17 @@ def test_send_one_off_has_skip_link(
         _follow_redirects=True,
     )
 
-    skip_links = page.select('a.top-gutter-4-3')
+    skip_links = page.select('form a')
 
     if expected_link_text and expected_link_url:
-        assert skip_links[0].text.strip() == expected_link_text
-        assert skip_links[0]['href'] == expected_link_url(
+        assert skip_links[1].text.strip() == expected_link_text
+        assert skip_links[1]['href'] == expected_link_url(
             service_id=service_one['id'],
             template_id=fake_uuid,
         )
     else:
-        assert not skip_links
+        with pytest.raises(IndexError):
+            skip_links[1]
 
 
 @pytest.mark.parametrize('template_type, expected_sticky', [
@@ -1374,9 +1378,9 @@ def test_skip_link_will_not_show_on_sms_one_off_if_service_has_no_mobile_number(
     assert not skip_links
 
 
-@pytest.mark.parametrize('user, link_index', (
-    (create_active_user_with_permissions(), 2),
-    (create_active_caseworking_user(), 1),
+@pytest.mark.parametrize('user', (
+    create_active_user_with_permissions(),
+    create_active_caseworking_user(),
 ))
 def test_send_one_off_offers_link_to_upload(
     client_request,
@@ -1384,7 +1388,6 @@ def test_send_one_off_offers_link_to_upload(
     mock_get_service_template,
     mock_has_jobs,
     user,
-    link_index,
 ):
     client_request.login(user)
 
@@ -1396,7 +1399,7 @@ def test_send_one_off_offers_link_to_upload(
     )
 
     back_link = page.select('main a')[0]
-    link = page.select('main a')[link_index]
+    link = page.select_one('form a')
 
     assert back_link.text.strip() == 'Back'
 
@@ -1406,6 +1409,87 @@ def test_send_one_off_offers_link_to_upload(
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
     )
+
+
+@pytest.mark.parametrize('user', (
+    pytest.param(
+        create_platform_admin_user(),
+    ),
+    pytest.param(
+        create_active_user_with_permissions(),
+        marks=pytest.mark.xfail(raises=AssertionError),
+    ),
+))
+def test_platform_admin_has_link_to_use_existing_list(
+    client_request,
+    mock_get_service_template,
+    mock_has_jobs,
+    mock_get_contact_lists,
+    fake_uuid,
+    user,
+):
+    client_request.login(user)
+    page = client_request.get(
+        'main.send_one_off',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _follow_redirects=True,
+    )
+
+    assert [
+        (link.text, link['href']) for link in page.select('form a')
+    ] == [
+        (
+            'Upload a list of phone numbers',
+            url_for(
+                'main.send_messages',
+                service_id=SERVICE_ONE_ID,
+                template_id=fake_uuid,
+            ),
+        ),
+        (
+            'Use a saved list',
+            url_for(
+                'main.choose_from_contact_list',
+                service_id=SERVICE_ONE_ID,
+                template_id=fake_uuid,
+            ),
+        ),
+        (
+            'Use my phone number',
+            url_for(
+                'main.send_test',
+                service_id=SERVICE_ONE_ID,
+                template_id=fake_uuid,
+            ),
+        ),
+    ]
+
+
+def test_no_link_to_use_existing_list_for_service_without_lists(
+    mocker,
+    client_request,
+    mock_get_service_template,
+    mock_has_jobs,
+    fake_uuid,
+):
+    mocker.patch(
+        'app.models.contact_list.ContactLists.client_method',
+        return_value=[],
+    )
+    client_request.login(create_platform_admin_user())
+    page = client_request.get(
+        'main.send_one_off',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _follow_redirects=True,
+    )
+    assert [
+        link.text for link in page.select('form a')
+    ] == [
+        'Upload a list of phone numbers',
+        'Use my phone number',
+    ]
 
 
 @pytest.mark.parametrize('user', (
@@ -3779,4 +3863,164 @@ def test_redirects_to_template_if_job_exists_already(
             template_id=fake_uuid,
             _external=True,
         )
+    )
+
+
+@pytest.mark.parametrize((
+    'template_type, '
+    'expected_list_id, '
+    'expected_filename, '
+    'expected_time, '
+    'expected_count'
+), (
+    (
+        'email',
+        '6ce466d0-fd6a-11e5-82f5-e0accb9d11a6',
+        'EmergencyContactList.xls',
+        'Uploaded today at 10:59am',
+        '100 email addresses',
+    ),
+    (
+        'sms',
+        'd7b0bd1a-d1c7-4621-be5c-3c1b4278a2ad',
+        'phone number list.csv',
+        'Uploaded today at 1:00pm',
+        '123 phone numbers',
+    ),
+))
+@freeze_time('2020-03-13 13:00')
+def test_choose_from_contact_list(
+    mocker,
+    client_request,
+    mock_get_contact_lists,
+    fake_uuid,
+    template_type,
+    expected_list_id,
+    expected_filename,
+    expected_time,
+    expected_count,
+):
+    template = create_template(template_type=template_type)
+    mocker.patch(
+        'app.service_api_client.get_service_template',
+        return_value={'data': template},
+    )
+    page = client_request.get(
+        'main.choose_from_contact_list',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+    )
+    assert len(page.select('.file-list-filename-large')) == 1
+    assert normalize_spaces(page.select_one('.file-list-filename-large').text) == (
+        expected_filename
+    )
+    assert page.select_one('a.file-list-filename-large')['href'] == url_for(
+        'main.send_from_contact_list',
+        service_id=SERVICE_ONE_ID,
+        template_id=template['id'],
+        contact_list_id=expected_list_id,
+    )
+    assert normalize_spaces(page.select_one('.file-list-hint-large').text) == (
+        expected_time
+    )
+    assert normalize_spaces(page.select_one('.big-number-smallest').text) == (
+        expected_count
+    )
+
+
+def test_choose_from_contact_list_with_personalised_template(
+    mocker,
+    client_request,
+    mock_get_contact_lists,
+    fake_uuid,
+):
+    template = create_template(
+        content="Hey ((name)) ((thing)) is happening"
+    )
+    mocker.patch(
+        'app.service_api_client.get_service_template',
+        return_value={'data': template},
+    )
+    page = client_request.get(
+        'main.choose_from_contact_list',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+    )
+    assert [
+        normalize_spaces(p.text) for p in page.select('main p')
+    ] == [
+        'You cannot use a saved contact list with this template because '
+        'it is personalised with ((name)) and ((thing)).',
+        'Saved contact lists can only store email addresses or phone numbers.',
+    ]
+    assert not page.select('table')
+
+
+def test_choose_from_contact_list_with_no_lists(
+    mocker,
+    client_request,
+    mock_get_service_template,
+    fake_uuid,
+):
+    mocker.patch(
+        'app.models.contact_list.ContactLists.client_method',
+        return_value=[],
+    )
+    page = client_request.get(
+        'main.choose_from_contact_list',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+    )
+    assert [
+        normalize_spaces(p.text) for p in page.select('main p')
+    ] == [
+        'You have not saved any lists of phone numbers yet.',
+        'To upload and save a new contact list, go to the uploads page.',
+    ]
+    assert page.select_one('main p a')['href'] == url_for(
+        'main.uploads',
+        service_id=SERVICE_ONE_ID,
+    )
+    assert not page.select('table')
+
+
+def test_send_from_contact_list(
+    mocker,
+    client_request,
+    fake_uuid,
+    mock_get_contact_lists,
+):
+    new_uuid = uuid.uuid4()
+    mock_download = mocker.patch('app.models.contact_list.s3download', return_value='contents')
+    mock_get_metadata = mocker.patch('app.models.contact_list.get_csv_metadata', return_value={
+        'example_key': 'example value',
+    })
+    mock_upload = mocker.patch('app.models.contact_list.s3upload', return_value=new_uuid)
+    mock_set_metadata = mocker.patch('app.models.contact_list.set_metadata_on_csv_upload')
+    client_request.get(
+        'main.send_from_contact_list',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        contact_list_id=fake_uuid,
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.check_messages',
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            upload_id=new_uuid,
+            original_file_name='EmergencyContactList.xls',
+            _external=True,
+        )
+    )
+    mock_download.assert_called_once_with(
+        SERVICE_ONE_ID, fake_uuid, bucket='test-contact-list'
+    )
+    mock_get_metadata.assert_called_once_with(
+        SERVICE_ONE_ID, fake_uuid, bucket='test-contact-list'
+    )
+    mock_upload.assert_called_once_with(
+        SERVICE_ONE_ID, {'data': 'contents'}, ANY
+    )
+    mock_set_metadata.assert_called_once_with(
+        SERVICE_ONE_ID, new_uuid, example_key='example value'
     )

@@ -42,6 +42,7 @@ from app.main.forms import (
     SetSenderForm,
     get_placeholder_form_instance,
 )
+from app.models.contact_list import ContactList, ContactListsAlphabetical
 from app.models.user import Users
 from app.s3_client.s3_csv_client import (
     s3download,
@@ -151,7 +152,7 @@ def send_messages(service_id, template_id):
         try:
             upload_id = s3upload(
                 service_id,
-                Spreadsheet.from_file(form.file.data, filename=form.file.data.filename).as_dict,
+                Spreadsheet.from_file_form(form).as_dict,
                 current_app.config['AWS_REGION']
             )
             return redirect(url_for(
@@ -489,6 +490,47 @@ def send_test_preview(service_id, template_id, filetype):
     template.values = get_normalised_placeholders_from_session()
 
     return TemplatePreview.from_utils_template(template, filetype, page=request.args.get('page'))
+
+
+@main.route(
+    '/services/<uuid:service_id>/send/<uuid:template_id>'
+    '/from-contact-list'
+)
+@user_has_permissions('send_messages')
+def choose_from_contact_list(service_id, template_id):
+    db_template = current_service.get_template_with_user_permission_or_403(
+        template_id, current_user
+    )
+    template = get_template(
+        db_template, current_service,
+    )
+    return render_template(
+        'views/send-contact-list.html',
+        contact_lists=ContactListsAlphabetical(
+            current_service.id,
+            template_type=template.template_type,
+        ),
+        template=template,
+    )
+
+
+@main.route(
+    '/services/<uuid:service_id>/send/<uuid:template_id>'
+    '/from-contact-list/<uuid:contact_list_id>'
+)
+@user_has_permissions('send_messages')
+def send_from_contact_list(service_id, template_id, contact_list_id):
+    contact_list = ContactList.from_id(
+        contact_list_id,
+        service_id=current_service.id,
+    )
+    return redirect(url_for(
+        'main.check_messages',
+        service_id=current_service.id,
+        template_id=template_id,
+        upload_id=contact_list.copy_to_uploads(),
+        original_file_name=contact_list.original_file_name,
+    ))
 
 
 def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_pdf=False):

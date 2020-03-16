@@ -1,0 +1,91 @@
+{% extends "withnav_template.html" %}
+{% from "components/banner.html" import banner_wrapper %}
+{% from "components/file-upload.html" import file_upload %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/table.html" import list_table, text_field, index_field, index_field_heading %}
+
+{% block service_page_title %}
+  Upload an emergency contact list
+{% endblock %}
+
+{% block maincolumn_content %}
+  {% if error %}
+    {% call banner_wrapper(type='dangerous') %}
+      <h1 class="banner-title">{{ error.title }}</h1>
+      {% if error.detail %}
+        <p>{{ error.detail | safe }}</p>
+      {% endif %}
+    {% endcall %}
+  {% else %}
+    {{ page_header(
+      'Upload an emergency contact list',
+      back_link=url_for('main.uploads', service_id=current_service.id)
+    ) }}
+    <p class="govuk-body">
+      Save a list of staff email addresses or phone numbers in Notify.
+    </p>
+    <p class="govuk-body">
+      In an emergency, you can send a message to everyone on the list.
+    </p>
+    <p class="govuk-body">
+      Do not include contact details for members of the public.
+    </p>
+  {% endif %}
+
+<div class="bottom-gutter">
+  {{ file_upload(
+    form.file,
+    button_text='Upload your file again' if error else 'Choose file',
+    show_errors=False
+  )}}
+</div>
+
+<h2 class="heading-medium">Your file needs to look like one of these examples</h2>
+
+<p class="hint">
+  Save your file as a
+  <acronym title="Comma Separated Values">CSV</acronym>,
+  <acronym title="Tab Separated Values">TSV</acronym>,
+  <acronym title="Open Document Spreadsheet">ODS</acronym>,
+  or Microsoft Excel spreadsheet
+</p>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-one-half">
+    <div class="spreadsheet">
+      {% call(item, row_number) list_table(
+        [
+          ['email address'],
+          ['test@example.gov.uk'],
+        ],
+        caption="Example",
+        caption_visible=False,
+        field_headings=['', 'A']
+      ) %}
+        {{ index_field(row_number - 1) }}
+        {% for column in item %}
+          {{ text_field(column) }}
+        {% endfor %}
+      {% endcall %}
+    </div>
+  </div>
+  <div class="govuk-grid-column-one-half">
+    <div class="spreadsheet">
+      {% call(item, row_number) list_table(
+        [
+          ['phone number'],
+          ['07700 900123'],
+        ],
+        caption="Example",
+        caption_visible=False,
+        field_headings=['', 'A']
+      ) %}
+        {{ index_field(row_number - 1) }}
+        {% for column in item %}
+          {{ text_field(column) }}
+        {% endfor %}
+      {% endcall %}
+    </div>
+  </div>
+</div>
+{% endblock %}

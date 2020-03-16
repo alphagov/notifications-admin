@@ -1820,6 +1820,64 @@ def mock_get_no_uploads(mocker, api_user_active):
 
 
 @pytest.fixture(scope='function')
+def mock_create_contact_list(mocker, api_user_active):
+    def _create(
+        service_id,
+        upload_id,
+        original_file_name,
+        row_count,
+        template_type,
+    ):
+        return {
+            'service_id': service_id,
+            'upload_id': upload_id,
+            'original_file_name': original_file_name,
+            'row_count': row_count,
+            'template_type': template_type,
+        }
+
+    return mocker.patch(
+        'app.contact_list_api_client.create_contact_list',
+        side_effect=_create,
+    )
+
+
+@pytest.fixture(scope='function')
+def mock_get_contact_lists(mocker, api_user_active, fake_uuid):
+    def _get(service_id, template_type=None):
+        return [{
+            'created_at': '2020-03-13 10:59:56',
+            'created_by': 'Test User',
+            'id': fake_uuid,
+            'original_file_name': 'EmergencyContactList.xls',
+            'row_count': 100,
+            'service_id': service_id,
+            'template_type': 'email',
+        }, {
+            'created_at': '2020-03-13 13:00:00',
+            'created_by': 'Test User',
+            'id': 'd7b0bd1a-d1c7-4621-be5c-3c1b4278a2ad',
+            'original_file_name': 'phone number list.csv',
+            'row_count': 123,
+            'service_id': service_id,
+            'template_type': 'sms',
+        }]
+
+    return mocker.patch(
+        'app.models.contact_list.ContactLists.client_method',
+        side_effect=_get,
+    )
+
+
+@pytest.fixture(scope='function')
+def mock_get_no_contact_lists(mocker):
+    return mocker.patch(
+        'app.models.contact_list.ContactLists.client_method',
+        return_value=[],
+    )
+
+
+@pytest.fixture(scope='function')
 def mock_get_notifications(
     mocker,
     api_user_active,

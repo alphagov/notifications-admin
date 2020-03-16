@@ -1,0 +1,80 @@
+{% extends "withnav_template.html" %}
+{% from "components/big-number.html" import big_number -%}
+{% from "components/list.html" import list_of_placeholders %}
+{% from "components/message-count-label.html" import recipient_count_label %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/table.html" import list_table, field, right_aligned_field_heading, row_heading %}
+
+{% block service_page_title %}
+  Choose a saved contact list
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header(
+    'Choose a saved contact list',
+    back_link=url_for('.send_one_off', service_id=current_service.id, template_id=template.id)
+  ) }}
+
+  {% if template.placeholders %}
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-five-sixths">
+        <p class="govuk-body">
+          You cannot use a saved contact list with this template because it
+          is personalised with {{ list_of_placeholders(template.placeholders) }}.
+        </p>
+        <p>
+          Saved contact lists can only store email addresses or phone
+          numbers.
+        </p>
+      </div>
+    </div>
+  {% elif contact_lists %}
+    <div class='dashboard-table ajax-block-container'>
+      {% call(item, row_number) list_table(
+        contact_lists,
+        caption="Existing contact lists",
+        caption_visible=False,
+        empty_message=(
+          'You don’t have any contact lists yet'
+        ),
+        field_headings=[
+          'File',
+          'Status'
+        ],
+        field_headings_visible=False
+      ) %}
+        {% call row_heading() %}
+          <div class="file-list">
+            <a class="file-list-filename-large govuk-link govuk-link--no-visited-state" href="{{ url_for('main.send_from_contact_list', service_id=current_service.id, template_id=template.id, contact_list_id=item.id) }}">{{ item.original_file_name }}</a>
+            <span class="file-list-hint-large">
+              Uploaded {{ item.created_at|format_datetime_relative }}
+            </span>
+          </div>
+        {% endcall %}
+        {% call field() %}
+          {{ big_number(
+            item.row_count,
+            smallest=True,
+            label=recipient_count_label(
+              item.row_count,
+              item.template_type
+            )
+          ) }}
+        {% endcall %}
+      {% endcall %}
+    </div>
+  {% else %}
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-five-sixths">
+        <p class="govuk-body">
+          You have not saved any lists of {{ recipient_count_label(99, template.template_type) }} yet.
+        </p>
+        <p class="govuk-body">
+          To upload and save a new contact list, go to the <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.uploads', service_id=current_service.id) }}">uploads</a> page.
+        </p>
+      </div>
+    </div>
+  {% endif %}
+
+{% endblock %}

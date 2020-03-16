@@ -64,6 +64,7 @@ from app.notify_client import InviteTokenError
 from app.notify_client.api_key_api_client import api_key_api_client
 from app.notify_client.billing_api_client import billing_api_client
 from app.notify_client.complaint_api_client import complaint_api_client
+from app.notify_client.contact_list_api_client import contact_list_api_client
 from app.notify_client.email_branding_client import email_branding_client
 from app.notify_client.events_api_client import events_api_client
 from app.notify_client.inbound_number_client import inbound_number_client
@@ -140,6 +141,7 @@ def create_app(application):
         # API clients
         api_key_api_client,
         billing_api_client,
+        contact_list_api_client,
         complaint_api_client,
         email_branding_client,
         events_api_client,

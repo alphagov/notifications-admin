@@ -1,0 +1,91 @@
+{% extends "withnav_template.html" %}
+{% from "components/banner.html" import banner_wrapper %}
+{% from "components/radios.html" import radio_select %}
+{% from "components/table.html" import list_table, field, text_field, index_field, hidden_field_heading %}
+{% from "components/file-upload.html" import file_upload %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
+{% from "components/message-count-label.html" import message_count_label, recipient_count_label %}
+
+{% set file_contents_header_id = 'file-preview' %}
+{% macro skip_to_file_contents() %}
+  <p class="govuk-visually-hidden">
+    <a class="govuk-link govuk-link--no-visited-state" href="#{{ file_contents_header_id }}">Skip to file contents</a>
+  </p>
+{% endmacro %}
+
+{% block service_page_title %}
+  Error
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ govukBackLink({ "href": url_for('main.upload_contact_list', service_id=current_service.id) }) }}
+
+  <div class="bottom-gutter-1-2">
+    {% call banner_wrapper(type='dangerous') %}
+
+      {% if recipients.too_many_rows %}
+
+        <h1 class='banner-title' data-module="track-error" data-error-type="Too many rows" data-error-label="{{ upload_id }}">
+          Your file has too many rows
+        </h1>
+        <p>
+          Notify can store files up to
+          {{ "{:,}".format(recipients.max_rows) }} rows in size. Your
+          file has {{ "{:,}".format(recipients|length) }} rows.
+        </p>
+
+      {% elif not recipients.allowed_to_send_to %}
+
+        <h1 class='banner-title' data-module="track-error" data-error-type="Trial mode: bad recipients" data-error-label="{{ upload_id }}">
+          You cannot save
+          {{ 'this' if recipients|length == 1 else 'these' }}
+          {{ recipient_count_label(recipients|length, recipients.template_type) }}
+        </h1>
+        <p>
+          In <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.trial_mode_new') }}">trial mode</a> you can only
+          send to yourself and members of your team
+        </p>
+
+      {% endif %}
+
+      {{ skip_to_file_contents() }}
+
+    {% endcall %}
+  </div>
+
+
+  <div class="js-stick-at-top-when-scrolling">
+    <div class="form-group">
+      {{ file_upload(
+        form.file,
+        action=url_for('.upload_contact_list', service_id=current_service.id),
+        button_text='Upload your file again'
+      ) }}
+    </div>
+    <a href="#content" class="govuk-link govuk-link--no-visited-state back-to-top-link">Back to top</a>
+  </div>
+
+    <h2 class="heading-medium" id="{{ file_contents_header_id }}">{{ original_file_name }}</h2>
+
+    {% call(item, row_number) list_table(
+      recipients.displayed_rows,
+      caption=original_file_name,
+      caption_visible=False,
+      field_headings=[
+        '<span class="govuk-visually-hidden">Row in file</span> <span aria-hidden="true">1</span>'|safe
+      ] + recipients.column_headers
+    ) %}
+      {{ index_field(item.index + 2) }}
+      {% for column in recipients.column_headers %}
+        {{ text_field(item[column].data or '') }}
+      {% endfor %}
+    {% endcall %}
+
+  {% if recipients.displayed_rows|list|length < recipients|length %}
+    <p class="table-show-more-link">
+      Only showing the first {{ recipients.displayed_rows|list|length }} rows
+    </p>
+  {% endif %}
+
+{% endblock %}

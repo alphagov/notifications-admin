@@ -6,6 +6,7 @@ from notifications_utils.timezones import local_timezone
 from werkzeug.utils import cached_property
 
 from app.models import JSONModel
+from app.models.contact_list import ContactLists
 from app.models.job import (
     ImmediateJobs,
     PaginatedJobs,
@@ -695,3 +696,7 @@ class Service(JSONModel):
             for report in self.returned_letter_summary
             if parse(report['reported_at'] + " 00:00:00") >= seven_days_ago
         )
+
+    @property
+    def contact_lists(self):
+        return ContactLists(self.id)

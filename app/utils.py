@@ -323,6 +323,13 @@ class Spreadsheet():
         pyexcel.free_resources()
         return instance
 
+    @classmethod
+    def from_file_form(cls, form):
+        return cls.from_file(
+            form.file.data,
+            filename=form.file.data.filename,
+        )
+
     @property
     def as_rows(self):
         if not self._rows:

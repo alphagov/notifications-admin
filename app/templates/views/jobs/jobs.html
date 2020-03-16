@@ -31,7 +31,10 @@
         </p>
       {% endif %}
       {{ previous_next_navigation(prev_page, next_page) }}
-      {% if current_service.can_upload_letters and current_user.has_permissions('send_messages') %}
+      {% if (
+        current_service.can_upload_letters and
+        current_user.has_permissions('send_messages')
+      ) or current_user.platform_admin %}
         <div class="js-stick-at-bottom-when-scrolling">
           {{ govukButton({
             "element": "a",
@@ -39,6 +42,14 @@
             "href": url_for('.upload_letter', service_id=current_service.id),
             "classes": "govuk-button--secondary"
           }) }}
+          {% if current_user.platform_admin %}
+            {{ govukButton({
+              "element": "a",
+              "text": "Upload an emergency contact list",
+              "href": url_for('.upload_contact_list', service_id=current_service.id),
+              "classes": "govuk-button--secondary govuk-!-margin-left-3"
+            }) }}
+          {% endif %}
         </div>
       {% endif %}
     </div>

@@ -22,24 +22,30 @@
     data_kwargs={'force-focus': True}
   ) %}
     <div class="govuk-grid-row">
-      <div class="govuk-grid-column-two-thirds {% if form.placeholder_value.label.text == 'phone number' %}extra-tracking{% endif %}">
+      <div class="govuk-grid-column-full {% if form.placeholder_value.label.text == 'phone number' %}extra-tracking{% endif %}">
         {{ textbox(
           form.placeholder_value,
           hint='Optional' if optional_placeholder else None,
           width='1-1',
         ) }}
       </div>
-      {% if skip_link %}
-        <div class="govuk-grid-column-one-third">
-          <a href="{{ skip_link[1] }}" class="govuk-link govuk-link--no-visited-state top-gutter-4-3">{{ skip_link[0] }}</a>
+      {% if skip_link or link_to_upload %}
+        <div class="govuk-grid-column-full">
+          {% if link_to_upload %}
+            <a class="govuk-link govuk-link--no-visited-state govuk-!-margin-right-3" href="{{ url_for('.send_messages', service_id=current_service.id, template_id=template.id) }}">Upload a list of {{ recipient_count_label(999, template.template_type) }}</a>
+            {% if current_user.platform_admin and current_service.contact_lists %}
+              <a class="govuk-link govuk-link--no-visited-state govuk-!-margin-right-3" href="{{ url_for('.choose_from_contact_list', service_id=current_service.id, template_id=template.id) }}">Use a saved list</a>
+            {% endif %}
+          {% endif %}
+          {% if skip_link %}
+            <a href="{{ skip_link[1] }}" class="govuk-link govuk-link--no-visited-state govuk-!-margin-right-3">{{ skip_link[0] }}</a>
+          {% endif %}
         </div>
       {% endif %}
     </div>
     {% if link_to_upload %}
       <p>
-        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.send_messages', service_id=current_service.id, template_id=template.id) }}">
-          Upload a list of {{ recipient_count_label(999, template.template_type) }}
-        </a>
+
       </p>
     {% endif %}
     {{ page_footer('Continue') }}
