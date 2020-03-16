@@ -1066,6 +1066,7 @@ def test_send_test_step_redirects_if_session_not_setup(
     mock_get_service_statistics,
     mock_get_users_by_service,
     mock_has_no_jobs,
+    mock_get_no_contact_lists,
     fake_uuid,
     user,
     endpoint,
@@ -1180,6 +1181,7 @@ def test_send_one_off_or_test_has_correct_page_titles(
     logged_in_client,
     service_one,
     mock_has_no_jobs,
+    mock_get_no_contact_lists,
     fake_uuid,
     mocker,
     template_type,
@@ -1241,6 +1243,7 @@ def test_send_one_off_or_test_shows_placeholders_in_correct_order(
     client_request,
     fake_uuid,
     mock_has_no_jobs,
+    mock_get_no_contact_lists,
     mock_get_service_template_with_multiple_placeholders,
     endpoint,
     step_index,
@@ -1292,6 +1295,7 @@ def test_send_one_off_has_skip_link(
     fake_uuid,
     mock_get_service_email_template,
     mock_has_no_jobs,
+    mock_get_no_contact_lists,
     mocker,
     template_type,
     expected_link_text,
@@ -1334,6 +1338,7 @@ def test_send_one_off_has_sticky_header_for_email_and_letter(
     client_request,
     fake_uuid,
     mock_has_no_jobs,
+    mock_get_no_contact_lists,
     template_type,
     expected_sticky,
 ):
@@ -1362,6 +1367,7 @@ def test_skip_link_will_not_show_on_sms_one_off_if_service_has_no_mobile_number(
     fake_uuid,
     mock_get_service_template,
     mock_has_no_jobs,
+    mock_get_no_contact_lists,
     mocker,
     user,
 ):
@@ -1387,6 +1393,7 @@ def test_send_one_off_offers_link_to_upload(
     fake_uuid,
     mock_get_service_template,
     mock_has_jobs,
+    mock_get_no_contact_lists,
     user,
 ):
     client_request.login(user)
@@ -1411,24 +1418,13 @@ def test_send_one_off_offers_link_to_upload(
     )
 
 
-@pytest.mark.parametrize('user', (
-    pytest.param(
-        create_platform_admin_user(),
-    ),
-    pytest.param(
-        create_active_user_with_permissions(),
-        marks=pytest.mark.xfail(raises=AssertionError),
-    ),
-))
-def test_platform_admin_has_link_to_use_existing_list(
+def test_send_one_off_has_link_to_use_existing_list(
     client_request,
     mock_get_service_template,
     mock_has_jobs,
     mock_get_contact_lists,
     fake_uuid,
-    user,
 ):
-    client_request.login(user)
     page = client_request.get(
         'main.send_one_off',
         service_id=SERVICE_ONE_ID,
@@ -3787,6 +3783,7 @@ def test_reply_to_is_previewed_if_chosen(
     mock_get_service_statistics,
     mock_get_job_doesnt_exist,
     mock_get_jobs,
+    mock_get_no_contact_lists,
     get_default_reply_to_email_address,
     fake_uuid,
     endpoint,
@@ -3838,6 +3835,7 @@ def test_sms_sender_is_previewed(
     mock_get_service_statistics,
     mock_get_job_doesnt_exist,
     mock_get_jobs,
+    mock_get_no_contact_lists,
     get_default_sms_sender,
     fake_uuid,
     endpoint,

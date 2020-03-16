@@ -20,15 +20,18 @@ from tests.conftest import (
 
 
 @pytest.mark.parametrize('extra_permissions', (
-    [],
-    ['letter'],
-    ['upload_letters'],
     pytest.param(
-        ['letter', 'upload_letters'],
+        [],
         marks=pytest.mark.xfail(raises=AssertionError),
     ),
+    pytest.param(
+        ['upload_letters'],
+        marks=pytest.mark.xfail(raises=AssertionError),
+    ),
+    ['letter'],
+    ['letter', 'upload_letters'],
 ))
-def test_no_upload_letters_button_without_permission(
+def test_upload_letters_button_only_with_letters_permission(
     client_request,
     service_one,
     mock_get_uploads,
@@ -38,19 +41,14 @@ def test_no_upload_letters_button_without_permission(
 ):
     service_one['permissions'] += extra_permissions
     page = client_request.get('main.uploads', service_id=SERVICE_ONE_ID)
-    assert not page.find('a', text=re.compile('Upload a letter'))
+    assert page.find('a', text=re.compile('Upload a letter'))
 
 
 @pytest.mark.parametrize('user', (
-    pytest.param(
-        create_platform_admin_user(),
-    ),
-    pytest.param(
-        create_active_user_with_permissions(),
-        marks=pytest.mark.xfail(raises=AssertionError),
-    ),
+    create_platform_admin_user(),
+    create_active_user_with_permissions(),
 ))
-def test_platform_admin_has_upload_contact_list(
+def test_all_users_have_upload_contact_list(
     client_request,
     mock_get_uploads,
     mock_get_jobs,
