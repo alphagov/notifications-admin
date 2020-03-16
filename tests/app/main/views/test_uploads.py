@@ -59,7 +59,7 @@ def test_platform_admin_has_upload_contact_list(
 ):
     client_request.login(user)
     page = client_request.get('main.uploads', service_id=SERVICE_ONE_ID)
-    button = page.find('a', text=re.compile('Upload a contact list'))
+    button = page.find('a', text=re.compile('Upload an emergency contact list'))
     assert button
     assert button['href'] == url_for(
         'main.upload_contact_list', service_id=SERVICE_ONE_ID,

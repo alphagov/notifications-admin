@@ -45,7 +45,7 @@
           {% if current_user.platform_admin %}
             {{ govukButton({
               "element": "a",
-              "text": "Upload a contact list",
+              "text": "Upload an emergency contact list",
               "href": url_for('.upload_contact_list', service_id=current_service.id),
               "classes": "govuk-button--secondary govuk-!-margin-left-3"
             }) }}

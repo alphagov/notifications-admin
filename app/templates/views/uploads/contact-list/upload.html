@@ -20,9 +20,16 @@
     {{ page_header(
       'Upload an emergency contact list',
       back_link=url_for('main.uploads', service_id=current_service.id)
-  ) }}
-  <p>Upload a list of phone numbers or email addresses.</p>
-  <p>Don’t put members of the public in here.</p>
+    ) }}
+    <p class="govuk-body">
+      Save a list of staff email addresses or phone numbers in Notify.
+    </p>
+    <p class="govuk-body">
+      In an emergency, you can send a message to everyone on the list.
+    </p>
+    <p class="govuk-body">
+      Do not include contact details for members of the public.
+    </p>
   {% endif %}
 
 <div class="bottom-gutter">
