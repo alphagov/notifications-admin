@@ -2264,6 +2264,31 @@ def test_upload_csvfile_with_international_validates(
     assert mock_recipients.call_args[1]['international_sms'] == should_allow_international
 
 
+def test_job_from_contact_list_knows_where_its_come_from(
+    client_request,
+    mocker,
+    service_one,
+    mock_get_service_template,
+    mock_s3_download,
+    mock_get_users_by_service,
+    mock_get_service_statistics,
+    mock_get_job_doesnt_exist,
+    mock_get_jobs,
+    mock_s3_set_metadata,
+    fake_uuid
+):
+    page = client_request.get(
+        'main.check_messages',
+        service_id=service_one['id'],
+        upload_id=fake_uuid,
+        template_id=fake_uuid,
+        contact_list_id=unchanging_fake_uuid,
+    )
+    assert page.select_one(
+        'form input[type=hidden][name=contact_list_id]'
+    )['value'] == str(unchanging_fake_uuid)
+
+
 def test_test_message_can_only_be_sent_now(
     client_request,
     mocker,
@@ -2352,6 +2377,9 @@ def test_send_button_is_correctly_labelled(
 @pytest.mark.parametrize('when', [
     '', '2016-08-25T13:04:21.767198'
 ])
+@pytest.mark.parametrize('contact_list_id', [
+    '', unchanging_fake_uuid,
+])
 def test_create_job_should_call_api(
     client_request,
     mock_create_job,
@@ -2361,7 +2389,8 @@ def test_create_job_should_call_api(
     mock_get_service_data_retention,
     mocker,
     fake_uuid,
-    when
+    when,
+    contact_list_id,
 ):
     data = mock_get_job(SERVICE_ONE_ID, fake_uuid)['data']
     job_id = data['id']
@@ -2382,7 +2411,10 @@ def test_create_job_should_call_api(
         service_id=SERVICE_ONE_ID,
         upload_id=job_id,
         original_file_name=original_file_name,
-        _data={'scheduled_for': when},
+        _data={
+            'scheduled_for': when,
+            'contact_list_id': contact_list_id,
+        },
         _follow_redirects=True,
         _expected_status=200,
     )
@@ -2393,6 +2425,7 @@ def test_create_job_should_call_api(
         job_id,
         SERVICE_ONE_ID,
         scheduled_for=when,
+        contact_list_id=str(contact_list_id),
     )
 
 
@@ -4009,6 +4042,7 @@ def test_send_from_contact_list(
             template_id=fake_uuid,
             upload_id=new_uuid,
             original_file_name='EmergencyContactList.xls',
+            contact_list_id=fake_uuid,
             _external=True,
         )
     )
