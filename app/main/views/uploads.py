@@ -66,7 +66,11 @@ def uploads(service_id):
         next_page = generate_next_dict('main.uploads', service_id, uploads.current_page)
 
     if uploads.current_page == 1:
-        listed_uploads = current_service.scheduled_jobs + uploads
+        listed_uploads = (
+            current_service.contact_lists +
+            current_service.scheduled_jobs +
+            uploads
+        )
     else:
         listed_uploads = uploads
 

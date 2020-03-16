@@ -27,6 +27,8 @@ class ContactList(JSONModel):
         'template_type',
     }
 
+    upload_type = 'contact_list'
+
     @classmethod
     def from_id(cls, contact_list_id, *, service_id):
         # This is temporary until we have a get single list endpoint

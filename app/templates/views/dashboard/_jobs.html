@@ -1,6 +1,6 @@
 {% from "components/table.html" import list_table, field, right_aligned_field_heading, row_heading %}
 {% from "components/big-number.html" import big_number -%}
-{% from "components/message-count-label.html" import message_count_label -%}
+{% from "components/message-count-label.html" import message_count_label, recipient_count_label -%}
 
 <div class='dashboard-table ajax-block-container'>
   {% call(item, row_number) list_table(
@@ -20,6 +20,8 @@
       <div class="file-list">
         {% if item.upload_type == 'letter' %}
           <a class="file-list-filename-large govuk-link govuk-link--no-visited-state" href="{{ url_for('.view_notification', service_id=current_service.id, notification_id=item.id) }}">{{ item.original_file_name }}</a>
+        {% elif item.upload_type == 'contact_list' %}
+          <a class="file-list-filename-large govuk-link govuk-link--no-visited-state" href="{{ url_for('.contact_list', service_id=current_service.id, contact_list_id=item.id) }}">{{ item.original_file_name }}</a>
         {% else %}
           <a class="file-list-filename-large govuk-link govuk-link--no-visited-state" href="{{ url_for('.view_job', service_id=current_service.id, job_id=item.id) }}">{{ item.original_file_name }}</a>
         {% endif %}
@@ -27,6 +29,12 @@
           <span class="file-list-hint">
             Sending {{
               item.scheduled_for|format_datetime_relative
+            }}
+          </span>
+        {% elif item.upload_type == 'contact_list' %}
+          <span class="file-list-hint">
+            Uploaded {{
+              item.created_at|format_datetime_relative
             }}
           </span>
         {% else %}
@@ -59,6 +67,15 @@
             item.template_type,
             suffix=''
           )
+        ) }}
+      {% elif item.upload_type == 'contact_list' %}
+        {{ big_number(
+          item.row_count,
+          smallest=True,
+          label="saved {}".format(recipient_count_label(
+            item.row_count,
+            item.template_type
+          ))
         ) }}
       {% elif item.pdf_letter %}
         <p class="govuk-body govuk-!-margin-bottom-1">

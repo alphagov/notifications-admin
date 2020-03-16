@@ -1870,6 +1870,14 @@ def mock_get_contact_lists(mocker, api_user_active, fake_uuid):
 
 
 @pytest.fixture(scope='function')
+def mock_get_no_contact_lists(mocker):
+    return mocker.patch(
+        'app.models.contact_list.ContactLists.client_method',
+        return_value=[],
+    )
+
+
+@pytest.fixture(scope='function')
 def mock_get_notifications(
     mocker,
     api_user_active,

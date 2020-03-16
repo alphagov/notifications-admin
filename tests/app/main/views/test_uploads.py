@@ -33,6 +33,7 @@ def test_no_upload_letters_button_without_permission(
     service_one,
     mock_get_uploads,
     mock_get_jobs,
+    mock_get_no_contact_lists,
     extra_permissions,
 ):
     service_one['permissions'] += extra_permissions
@@ -53,6 +54,7 @@ def test_platform_admin_has_upload_contact_list(
     client_request,
     mock_get_uploads,
     mock_get_jobs,
+    mock_get_no_contact_lists,
     user,
 ):
     client_request.login(user)
@@ -80,6 +82,7 @@ def test_get_upload_hub_with_no_uploads(
     client_request,
     service_one,
     mock_get_no_uploads,
+    mock_get_no_contact_lists,
     extra_permissions,
     expected_empty_message,
 ):
@@ -97,6 +100,7 @@ def test_get_upload_hub_page(
     client_request,
     service_one,
     mock_get_uploads,
+    mock_get_no_contact_lists,
 ):
     mocker.patch('app.job_api_client.get_jobs', return_value={'data': []})
     service_one['permissions'] += ['letter', 'upload_letters']
@@ -683,6 +687,7 @@ def test_uploads_page_shows_scheduled_jobs(
     client_request,
     mock_get_no_uploads,
     mock_get_jobs,
+    mock_get_no_contact_lists,
     user,
 ):
     client_request.login(user)
@@ -708,11 +713,57 @@ def test_uploads_page_shows_scheduled_jobs(
     assert not page.select('.table-empty-message')
 
 
+@freeze_time('2020-03-15')
+def test_uploads_page_shows_contact_lists_first(
+    mocker,
+    client_request,
+    fake_uuid,
+    mock_get_no_uploads,
+    mock_get_jobs,
+    mock_get_contact_lists,
+):
+    page = client_request.get('main.uploads', service_id=SERVICE_ONE_ID)
+
+    assert [
+        normalize_spaces(row.text) for row in page.select('tr')
+    ] == [
+        (
+            'File Status'
+        ),
+        (
+            'EmergencyContactList.xls '
+            'Uploaded 13 March at 10:59am '
+            '100 saved email addresses'
+        ),
+        (
+            'phone number list.csv '
+            'Uploaded 13 March at 1:00pm '
+            '123 saved phone numbers'
+        ),
+        (
+            'even_later.csv '
+            'Sending 1 January 2016 at 11:09pm '
+            '1 text message waiting to send'
+        ),
+        (
+            'send_me_later.csv '
+            'Sending 1 January 2016 at 11:09am '
+            '1 text message waiting to send'
+        ),
+    ]
+    assert page.select_one('.file-list-filename-large')['href'] == url_for(
+        'main.contact_list',
+        service_id=SERVICE_ONE_ID,
+        contact_list_id=fake_uuid,
+    )
+
+
 def test_get_uploads_shows_pagination(
     client_request,
     active_user_with_permissions,
     mock_get_jobs,
     mock_get_uploads,
+    mock_get_no_contact_lists,
 ):
     page = client_request.get('main.uploads', service_id=SERVICE_ONE_ID)
 
