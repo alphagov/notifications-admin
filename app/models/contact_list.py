@@ -125,5 +125,13 @@ class ContactList(JSONModel):
 
 
 class ContactLists(ModelList):
+
     client_method = contact_list_api_client.get_contact_lists
     model = ContactList
+
+    def __init__(self, service_id, template_type=None):
+        super().__init__(service_id)
+        self.items = [
+            item for item in self.items
+            if template_type in {item['template_type'], None}
+        ]

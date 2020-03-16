@@ -3839,35 +3839,94 @@ def test_redirects_to_template_if_job_exists_already(
     )
 
 
+@pytest.mark.parametrize((
+    'template_type, '
+    'expected_list_id, '
+    'expected_filename, '
+    'expected_time, '
+    'expected_count'
+), (
+    (
+        'email',
+        '6ce466d0-fd6a-11e5-82f5-e0accb9d11a6',
+        'EmergencyContactList.xls',
+        'Uploaded today at 10:59am',
+        '100 email addresses',
+    ),
+    (
+        'sms',
+        'd7b0bd1a-d1c7-4621-be5c-3c1b4278a2ad',
+        'phone number list.csv',
+        'Uploaded today at 1:00pm',
+        '123 phone numbers',
+    ),
+))
 @freeze_time('2020-03-13 13:00')
 def test_choose_from_contact_list(
     mocker,
     client_request,
-    mock_get_service_template,
     mock_get_contact_lists,
     fake_uuid,
+    template_type,
+    expected_list_id,
+    expected_filename,
+    expected_time,
+    expected_count,
 ):
+    template = create_template(template_type=template_type)
+    mocker.patch(
+        'app.service_api_client.get_service_template',
+        return_value={'data': template},
+    )
     page = client_request.get(
         'main.choose_from_contact_list',
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
     )
-    assert len(page.select('.file-list-filename-large')) == 2
+    assert len(page.select('.file-list-filename-large')) == 1
     assert normalize_spaces(page.select_one('.file-list-filename-large').text) == (
-        'EmergencyContactList.xls'
+        expected_filename
     )
     assert page.select_one('a.file-list-filename-large')['href'] == url_for(
         'main.send_from_contact_list',
         service_id=SERVICE_ONE_ID,
-        template_id=fake_uuid,
-        contact_list_id=fake_uuid,
+        template_id=template['id'],
+        contact_list_id=expected_list_id,
     )
     assert normalize_spaces(page.select_one('.file-list-hint').text) == (
-        'Uploaded today at 10:59am'
+        expected_time
     )
     assert normalize_spaces(page.select_one('.big-number-smallest').text) == (
-        '100 email addresses'
+        expected_count
     )
+
+
+def test_choose_from_contact_list_with_no_lists(
+    mocker,
+    client_request,
+    mock_get_service_template,
+    fake_uuid,
+):
+    mocker.patch(
+        'app.models.contact_list.ContactLists.client_method',
+        return_value=[],
+    )
+    page = client_request.get(
+        'main.choose_from_contact_list',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+    )
+    assert [
+        normalize_spaces(p.text) for p in page.select('main p')
+    ] == [
+        'You have not saved any lists of phone numbers yet.',
+        'To upload and save a new contact list, go to the uploads page.',
+    ]
+    assert page.select_one('main p a')['href'] == url_for(
+        'main.uploads',
+        service_id=SERVICE_ONE_ID,
+    )
+    assert not page.select('table')
 
 
 def test_send_from_contact_list(

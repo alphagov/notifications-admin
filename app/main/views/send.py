@@ -498,9 +498,18 @@ def send_test_preview(service_id, template_id, filetype):
 )
 @user_has_permissions('send_messages')
 def choose_from_contact_list(service_id, template_id):
+    db_template = current_service.get_template_with_user_permission_or_403(
+        template_id, current_user
+    )
+    template = get_template(
+        db_template, current_service,
+    )
     return render_template(
         'views/send-contact-list.html',
-        contact_lists=ContactLists(current_service.id),
+        contact_lists=ContactLists(
+            current_service.id,
+            template_type=template.template_type,
+        ),
         template=current_service.get_template(template_id),
     )
 

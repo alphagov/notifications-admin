@@ -1844,7 +1844,7 @@ def mock_create_contact_list(mocker, api_user_active):
 
 @pytest.fixture(scope='function')
 def mock_get_contact_lists(mocker, api_user_active, fake_uuid):
-    def _get(service_id):
+    def _get(service_id, template_type=None):
         return [{
             'created_at': '2020-03-13 10:59:56',
             'created_by': 'Test User',
@@ -1856,8 +1856,8 @@ def mock_get_contact_lists(mocker, api_user_active, fake_uuid):
         }, {
             'created_at': '2020-03-13 13:00:00',
             'created_by': 'Test User',
-            'id': uuid4(),
-            'original_file_name': 'another ist.csv',
+            'id': 'd7b0bd1a-d1c7-4621-be5c-3c1b4278a2ad',
+            'original_file_name': 'phone number list.csv',
             'row_count': 123,
             'service_id': service_id,
             'template_type': 'sms',
