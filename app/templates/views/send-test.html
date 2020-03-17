@@ -33,7 +33,7 @@
         <div class="govuk-grid-column-full">
           {% if link_to_upload %}
             <a class="govuk-link govuk-link--no-visited-state govuk-!-margin-right-3" href="{{ url_for('.send_messages', service_id=current_service.id, template_id=template.id) }}">Upload a list of {{ recipient_count_label(999, template.template_type) }}</a>
-            {% if current_user.platform_admin and current_service.contact_lists %}
+            {% if current_service.contact_lists %}
               <a class="govuk-link govuk-link--no-visited-state govuk-!-margin-right-3" href="{{ url_for('.choose_from_contact_list', service_id=current_service.id, template_id=template.id) }}">Use a saved list</a>
             {% endif %}
           {% endif %}

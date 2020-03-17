@@ -1638,7 +1638,7 @@ def mock_check_verify_code_code_expired(mocker):
 
 @pytest.fixture(scope='function')
 def mock_create_job(mocker, api_user_active):
-    def _create(job_id, service_id, scheduled_for=None):
+    def _create(job_id, service_id, scheduled_for=None, contact_list_id=None):
         return job_json(
             service_id,
             api_user_active,

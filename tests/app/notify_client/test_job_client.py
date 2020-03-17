@@ -50,6 +50,21 @@ def test_client_schedules_job(mocker, fake_uuid):
     assert mock_post.call_args[1]['data']['scheduled_for'] == when
 
 
+def test_client_links_job_to_contact_list(mocker, fake_uuid):
+
+    mocker.patch('app.notify_client.current_user', id='1')
+
+    contact_list_id = uuid.uuid4()
+
+    mock_post = mocker.patch('app.notify_client.job_api_client.JobApiClient.post')
+
+    JobApiClient().create_job(
+        fake_uuid, 1, contact_list_id=contact_list_id
+    )
+
+    assert mock_post.call_args[1]['data']['contact_list_id'] == contact_list_id
+
+
 def test_client_gets_job_by_service_and_job(mocker):
     service_id = 'service_id'
     job_id = 'job_id'

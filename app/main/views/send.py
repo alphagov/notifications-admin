@@ -530,6 +530,7 @@ def send_from_contact_list(service_id, template_id, contact_list_id):
         template_id=template_id,
         upload_id=contact_list.copy_to_uploads(),
         original_file_name=contact_list.original_file_name,
+        contact_list_id=contact_list.id,
     ))
 
 
@@ -742,7 +743,8 @@ def start_job(service_id, upload_id):
     job_api_client.create_job(
         upload_id,
         service_id,
-        scheduled_for=request.form.get('scheduled_for', '')
+        scheduled_for=request.form.get('scheduled_for', ''),
+        contact_list_id=request.form.get('contact_list_id', ''),
     )
 
     session.pop('sender_id', None)
