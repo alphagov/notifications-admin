@@ -1870,6 +1870,36 @@ def mock_get_contact_lists(mocker, api_user_active, fake_uuid):
 
 
 @pytest.fixture(scope='function')
+def mock_get_contact_list(mocker, api_user_active, fake_uuid):
+    def _get(*, service_id, contact_list_id):
+        return {
+            'created_at': '2020-03-13 10:59:56',
+            'created_by': 'Test User',
+            'id': fake_uuid,
+            'original_file_name': 'EmergencyContactList.xls',
+            'row_count': 100,
+            'service_id': service_id,
+            'template_type': 'email',
+        }
+
+    return mocker.patch(
+        'app.models.contact_list.contact_list_api_client.get_contact_list',
+        side_effect=_get,
+    )
+
+
+@pytest.fixture(scope='function')
+def mock_get_no_contact_list(mocker, api_user_active, fake_uuid):
+    def _get(*, service_id, contact_list_id):
+        raise HTTPError(response=Mock(status_code=404))
+
+    return mocker.patch(
+        'app.models.contact_list.contact_list_api_client.get_contact_list',
+        side_effect=_get,
+    )
+
+
+@pytest.fixture(scope='function')
 def mock_get_no_contact_lists(mocker):
     return mocker.patch(
         'app.models.contact_list.ContactLists.client_method',

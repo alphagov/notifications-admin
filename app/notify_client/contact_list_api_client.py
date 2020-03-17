@@ -25,7 +25,10 @@ class ContactListApiClient(NotifyAdminAPIClient):
         return job
 
     def get_contact_lists(self, service_id):
-        return self.get('/service/{}/contact-list'.format(service_id))
+        return self.get(f'/service/{service_id}/contact-list')
+
+    def get_contact_list(self, *, service_id, contact_list_id):
+        return self.get(f'/service/{service_id}/contact-list/{contact_list_id}')
 
 
 contact_list_api_client = ContactListApiClient()

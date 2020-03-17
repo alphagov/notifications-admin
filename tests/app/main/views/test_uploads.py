@@ -1183,7 +1183,7 @@ def test_cant_save_bad_contact_list(
 def test_view_contact_list(
     mocker,
     client_request,
-    mock_get_contact_lists,
+    mock_get_contact_list,
     fake_uuid,
 ):
     mocker.patch('app.models.contact_list.s3download', return_value='\n'.join(
@@ -1225,7 +1225,7 @@ def test_view_contact_list(
 
 def test_view_contact_list_404s_for_non_existing_list(
     client_request,
-    mock_get_contact_lists,
+    mock_get_no_contact_list,
     fake_uuid,
 ):
     client_request.get(
@@ -1240,7 +1240,7 @@ def test_download_contact_list(
     mocker,
     logged_in_client,
     fake_uuid,
-    mock_get_contact_lists,
+    mock_get_contact_list,
 ):
     mocker.patch(
         'app.models.contact_list.s3download',
