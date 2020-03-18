@@ -34,14 +34,14 @@
               "element": "a",
               "text": "Upload a letter",
               "href": url_for('.upload_letter', service_id=current_service.id),
-              "classes": "govuk-button--secondary"
+              "classes": "govuk-button--secondary govuk-!-margin-right-3"
             }) }}
           {% endif %}
           {{ govukButton({
             "element": "a",
             "text": "Upload an emergency contact list",
             "href": url_for('.upload_contact_list', service_id=current_service.id),
-            "classes": "govuk-button--secondary govuk-!-margin-left-3"
+            "classes": "govuk-button--secondary"
           }) }}
         </div>
       {% endif %}
