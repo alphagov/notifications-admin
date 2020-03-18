@@ -1261,3 +1261,52 @@ def test_download_contact_list(
         'phone number\n'
         '07900900321'
     )
+
+
+def test_confirm_delete_contact_list(
+    mocker,
+    client_request,
+    fake_uuid,
+    mock_get_contact_list,
+):
+    mocker.patch(
+        'app.models.contact_list.s3download',
+        return_value='phone number\n07900900321'
+    )
+    page = client_request.get(
+        'main.delete_contact_list',
+        service_id=SERVICE_ONE_ID,
+        contact_list_id=fake_uuid,
+    )
+    assert normalize_spaces(page.select_one('.banner-dangerous').text) == (
+        'Are you sure you want to delete ‘EmergencyContactList.xls’? '
+        'Yes, delete'
+    )
+    assert 'action' not in page.select_one('form')
+    assert page.select_one('form')['method'] == 'post'
+    assert page.select_one('form button')['type'] == 'submit'
+
+
+def test_delete_contact_list(
+    mocker,
+    client_request,
+    fake_uuid,
+    mock_get_contact_list,
+):
+    mock_delete = mocker.patch(
+        'app.models.contact_list.contact_list_api_client.delete_contact_list'
+    )
+    client_request.post(
+        'main.delete_contact_list',
+        service_id=SERVICE_ONE_ID,
+        contact_list_id=fake_uuid,
+        _expected_redirect=url_for(
+            'main.uploads',
+            service_id=SERVICE_ONE_ID,
+            _external=True,
+        )
+    )
+    mock_delete.assert_called_once_with(
+        service_id=SERVICE_ONE_ID,
+        contact_list_id=fake_uuid,
+    )

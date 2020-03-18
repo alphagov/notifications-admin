@@ -443,6 +443,29 @@ def contact_list(service_id, contact_list_id):
     )
 
 
+@main.route("/services/<uuid:service_id>/contact-list/<uuid:contact_list_id>/delete", methods=['GET', 'POST'])
+@user_has_permissions('manage_templates')
+def delete_contact_list(service_id, contact_list_id):
+    contact_list = ContactList.from_id(contact_list_id, service_id=service_id)
+
+    if request.method == 'POST':
+        contact_list.delete()
+        return redirect(url_for(
+            '.uploads',
+            service_id=service_id,
+        ))
+
+    flash([
+        f"Are you sure you want to delete ‘{contact_list.original_file_name}’?",
+    ], 'delete')
+
+    return render_template(
+        'views/uploads/contact-list/contact-list.html',
+        contact_list=contact_list,
+        confirm_delete_banner=True,
+    )
+
+
 @main.route("/services/<uuid:service_id>/contact-list/<uuid:contact_list_id>.csv", methods=['GET'])
 @user_has_permissions('send_messages')
 def download_contact_list(service_id, contact_list_id):
