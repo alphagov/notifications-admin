@@ -96,10 +96,10 @@
       </div>
     {% elif template.template_type == 'email' %}
       <div class="js-stick-at-bottom-when-scrolling">
-        {{ ajax_block(partials, updates_url, 'status', finished=finished) }}
+        {{ ajax_block(partials, updates_url, 'status', interval=2, finished=finished) }}
       </div>
     {% elif template.template_type == 'sms' %}
-      {{ ajax_block(partials, updates_url, 'status', finished=finished) }}
+      {{ ajax_block(partials, updates_url, 'status', interval=2, finished=finished) }}
     {% endif %}
 
     {% if current_user.has_permissions('send_messages') and current_user.has_permissions('view_activity') and template.template_type == 'sms' and can_receive_inbound %}
