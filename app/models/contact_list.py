@@ -32,11 +32,10 @@ class ContactList(JSONModel):
 
     @classmethod
     def from_id(cls, contact_list_id, *, service_id):
-        # This is temporary until we have a get single list endpoint
-        for contact_list in ContactLists(service_id):
-            if contact_list.id == contact_list_id:
-                return contact_list
-        abort(404)
+        return cls(contact_list_api_client.get_contact_list(
+            service_id=service_id,
+            contact_list_id=contact_list_id,
+        ))
 
     @staticmethod
     def get_bucket_name():

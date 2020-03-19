@@ -4022,7 +4022,7 @@ def test_send_from_contact_list(
     mocker,
     client_request,
     fake_uuid,
-    mock_get_contact_lists,
+    mock_get_contact_list,
 ):
     new_uuid = uuid.uuid4()
     mock_download = mocker.patch('app.models.contact_list.s3download', return_value='contents')
