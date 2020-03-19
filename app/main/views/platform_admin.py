@@ -42,6 +42,14 @@ ZERO_FAILURE_THRESHOLD = 0
 
 @main.route("/platform-admin")
 @user_is_platform_admin
+def platform_admin_splash_page():
+    return render_template(
+        'views/platform-admin/splash-page.html',
+    )
+
+
+@main.route("/platform-admin/summary")
+@user_is_platform_admin
 def platform_admin():
     form = DateFilterForm(request.args, meta={'csrf': False})
     api_args = {}

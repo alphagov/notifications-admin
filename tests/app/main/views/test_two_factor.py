@@ -1,3 +1,4 @@
+import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
 from freezegun import freeze_time
@@ -107,6 +108,9 @@ def test_should_login_user_and_not_redirect_to_external_url(
     assert response.location == url_for('main.show_accounts_or_dashboard', _external=True)
 
 
+@pytest.mark.parametrize('platform_admin', (
+    True, False,
+))
 @freeze_time('2020-01-27T12:00:00')
 def test_should_login_user_and_redirect_to_show_accounts(
     client,
@@ -115,12 +119,14 @@ def test_should_login_user_and_redirect_to_show_accounts(
     mock_get_user_by_email,
     mock_check_verify_code,
     mock_create_event,
+    platform_admin,
 ):
     with client.session_transaction() as session:
         session['user_details'] = {
             'id': api_user_active['id'],
             'email': api_user_active['email_address']}
     api_user_active['email_access_validated_at'] = '2020-01-23T11:35:21.726132Z'
+    api_user_active['platform_admin'] = platform_admin
 
     response = client.post(url_for('main.two_factor'),
                            data={'sms_code': '12345'})
