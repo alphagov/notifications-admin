@@ -272,12 +272,11 @@ def test_accept_agreement_page_populates(
     (
         {
             'version': '',
-            'who': '',
             'on_behalf_of_name': '',
             'on_behalf_of_email': '',
         },
         [
-            'This field is required.',
+            'Not a valid choice',
             'Must be a number',
         ],
     ),
