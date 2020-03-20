@@ -50,6 +50,8 @@ class Organisation(JSONModel):
 
     @classmethod
     def from_id(cls, org_id):
+        if not org_id:
+            return cls({})
         return cls(organisations_client.get_organisation(org_id))
 
     @classmethod

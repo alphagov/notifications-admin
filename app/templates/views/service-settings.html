@@ -316,7 +316,7 @@
             {% call field() %}
               {% if current_service.organisation_id %}
                 <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.organisation_dashboard', org_id=current_service.organisation_id) }}">
-                  {{ current_service.organisation.name }}
+                  {{ current_service.organisation_name }}
                 </a>
               {% else %}
                 <span class="table-field-status-default">Not set</span>

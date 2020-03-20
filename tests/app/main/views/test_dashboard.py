@@ -17,6 +17,7 @@ from app.main.views.dashboard import (
     get_tuples_of_financial_years,
 )
 from tests import (
+    organisation_json,
     service_json,
     validate_route_permission,
     validate_route_permission_with_client,
@@ -1554,7 +1555,9 @@ def test_org_breadcrumbs_show_if_user_is_a_member_of_the_services_org(
                                     organisation_id=ORGANISATION_ID)
 
     mocker.patch('app.service_api_client.get_service', return_value={'data': service_one_json})
-    mocker.patch('app.models.service.Organisation')
+    mocker.patch('app.organisations_client.get_organisation', return_value=organisation_json(
+        id_=ORGANISATION_ID,
+    ))
 
     page = client_request.get('main.service_dashboard', service_id=SERVICE_ONE_ID)
     assert page.select_one('.navigation-organisation-link')['href'] == url_for(
@@ -1604,7 +1607,9 @@ def test_org_breadcrumbs_show_if_user_is_platform_admin(
                                     organisation_id=ORGANISATION_ID)
 
     mocker.patch('app.service_api_client.get_service', return_value={'data': service_one_json})
-    mocker.patch('app.models.service.Organisation')
+    mocker.patch('app.organisations_client.get_organisation', return_value=organisation_json(
+        id_=ORGANISATION_ID,
+    ))
 
     response = platform_admin_client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')

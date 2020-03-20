@@ -1,10 +1,11 @@
 import functools
+from unittest.mock import PropertyMock
 
 import pytest
 from flask import url_for
 
 from app.main.views.service_settings import PLATFORM_ADMIN_SERVICE_PERMISSIONS
-from tests.conftest import normalize_spaces
+from tests.conftest import ORGANISATION_ID, normalize_spaces
 
 
 @pytest.fixture
@@ -14,7 +15,7 @@ def get_service_settings_page(
     service_one,
     mock_get_inbound_number_for_service,
     mock_get_all_letter_branding,
-    mock_get_service_organisation,
+    mock_get_organisation,
     mock_get_free_sms_fragment_limit,
     no_reply_to_email_addresses,
     no_letter_contact_blocks,
@@ -76,9 +77,22 @@ def test_service_set_permission(
     ({'permissions': ['letter']},
      '.service_set_permission', {'permission': 'international_letters'}, 'Send international letters Off Change'),
 ])
-def test_service_setting_toggles_show(get_service_settings_page, service_one, service_fields, endpoint, kwargs, text):
+def test_service_setting_toggles_show(
+    mocker,
+    get_service_settings_page,
+    service_one,
+    service_fields,
+    endpoint,
+    kwargs,
+    text,
+):
     link_url = url_for(endpoint, **kwargs, service_id=service_one['id'])
     service_one.update(service_fields)
+    mocker.patch(
+        'app.models.service.Service.organisation_id',
+        new_callable=PropertyMock,
+        return_value=ORGANISATION_ID,
+    )
     page = get_service_settings_page()
     assert normalize_spaces(page.find('a', {'href': link_url}).find_parent('tr').text.strip()) == text
 
@@ -145,7 +159,7 @@ def test_normal_user_doesnt_see_any_platform_admin_settings(
     service_one,
     no_reply_to_email_addresses,
     no_letter_contact_blocks,
-    mock_get_service_organisation,
+    mock_get_organisation,
     single_sms_sender,
     mock_get_all_letter_branding,
     mock_get_inbound_number_for_service,

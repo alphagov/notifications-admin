@@ -991,15 +991,14 @@ def service_preview_letter_branding(service_id):
 def link_service_to_organisation(service_id):
 
     all_organisations = organisations_client.get_organisations()
-    current_linked_organisation = organisations_client.get_service_organisation(service_id).get('id', None)
 
     form = LinkOrganisationsForm(
         choices=convert_dictionary_to_wtforms_choices_format(all_organisations, 'id', 'name'),
-        organisations=current_linked_organisation
+        organisations=current_service.organisation_id
     )
 
     if form.validate_on_submit():
-        if form.organisations.data != current_linked_organisation:
+        if form.organisations.data != current_service.organisation_id:
             organisations_client.update_service_organisation(
                 service_id,
                 form.organisations.data

@@ -3113,7 +3113,7 @@ def mock_get_organisation(mocker):
                 'o1': 'Org 1',
                 'o2': 'Org 2',
                 'o3': 'Org 3',
-            }.get(org_id, 'Org 1'),
+            }.get(org_id, 'Test organisation'),
         )
 
     return mocker.patch('app.organisations_client.get_organisation', side_effect=_get_organisation)
@@ -3127,6 +3127,14 @@ def mock_get_organisation_by_domain(mocker):
     return mocker.patch(
         'app.organisations_client.get_organisation_by_domain',
         side_effect=_get_organisation_by_domain,
+    )
+
+
+@pytest.fixture(scope='function')
+def mock_get_no_organisation_by_domain(mocker):
+    return mocker.patch(
+        'app.organisations_client.get_organisation_by_domain',
+        return_value=None,
     )
 
 

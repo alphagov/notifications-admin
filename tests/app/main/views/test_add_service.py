@@ -233,11 +233,12 @@ def test_get_should_only_show_nhs_org_types_radios_if_user_has_nhs_email(
 ])
 def test_should_add_service_and_redirect_to_dashboard_when_existing_service(
     app_,
+    mocker,
     client_request,
     mock_create_service,
     mock_create_service_template,
     mock_get_services,
-    mock_get_organisation_by_domain,
+    mock_get_no_organisation_by_domain,
     api_user_active,
     organisation_type,
     free_allowance,

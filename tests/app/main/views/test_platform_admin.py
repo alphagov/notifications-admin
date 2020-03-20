@@ -763,6 +763,7 @@ def test_clear_cache_shows_form(client_request, platform_admin_user, mocker):
         call('organisations'),
         call('domains'),
         call('live-service-and-organisation-counts'),
+        call('organisation-????????-????-????-????-????????????-name'),
     ], 'Removed 3 organisation objects from redis'),
 ))
 def test_clear_cache_submits_and_tells_you_how_many_things_were_deleted(

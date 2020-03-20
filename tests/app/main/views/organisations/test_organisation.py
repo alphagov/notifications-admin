@@ -1,4 +1,4 @@
-from unittest.mock import ANY, Mock
+from unittest.mock import ANY, Mock, PropertyMock
 
 import pytest
 from bs4 import BeautifulSoup
@@ -200,7 +200,12 @@ def test_gps_can_create_own_organisations(
     organisation,
     expected_status,
 ):
-    mocker.patch('app.organisations_client.get_service_organisation', return_value=organisation)
+    mocker.patch(
+        'app.models.service.Service.organisation_id',
+        new_callable=PropertyMock,
+        return_value=ORGANISATION_ID,
+    )
+    mocker.patch('app.organisations_client.get_organisation', return_value=organisation)
     service_one['organisation_type'] = organisation_type
 
     page = client_request.get(
@@ -234,7 +239,12 @@ def test_nhs_local_can_create_own_organisations(
     organisation,
     expected_status,
 ):
-    mocker.patch('app.organisations_client.get_service_organisation', return_value=organisation)
+    mocker.patch(
+        'app.models.service.Service.organisation_id',
+        new_callable=PropertyMock,
+        return_value=ORGANISATION_ID,
+    )
+    mocker.patch('app.organisations_client.get_organisation', return_value=organisation)
     mocker.patch(
         'app.models.organisation.Organisations.client_method',
         return_value=[
@@ -300,7 +310,6 @@ def test_gps_can_name_their_organisation(
     data,
     expected_service_name,
 ):
-    mocker.patch('app.organisations_client.get_service_organisation', return_value=None)
     service_one['organisation_type'] = 'nhs_gp'
     mock_create_organisation = mocker.patch(
         'app.organisations_client.create_organisation',
@@ -350,7 +359,6 @@ def test_validation_of_gps_creating_organisations(
     data,
     expected_error,
 ):
-    mocker.patch('app.organisations_client.get_service_organisation', return_value=None)
     service_one['organisation_type'] = 'nhs_gp'
     page = client_request.post(
         '.add_organisation_from_gp_service',
@@ -368,7 +376,6 @@ def test_nhs_local_assigns_to_selected_organisation(
     mock_get_organisation,
     mock_update_service_organisation,
 ):
-    mocker.patch('app.organisations_client.get_service_organisation', return_value=None)
     mocker.patch(
         'app.models.organisation.Organisations.client_method',
         return_value=[
@@ -652,8 +659,8 @@ def test_organisation_settings_for_platform_admin(
 ):
     expected_rows = [
         'Label Value Action',
-        'Name Org 1 Change',
-        'Sector Not set Change',
+        'Name Test organisation Change',
+        'Sector Central government Change',
         'Crown organisation Yes Change',
         'Data sharing and financial agreement Not signed Change',
         'Request to go live notes None Change',
@@ -686,7 +693,7 @@ def test_organisation_settings_for_platform_admin(
             ('school_or_college', 'School or college'),
             ('other', 'Other'),
         ),
-        None,
+        'central',
     ),
     (
         '.edit_organisation_crown_status',

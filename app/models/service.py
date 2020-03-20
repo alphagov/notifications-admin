@@ -18,6 +18,7 @@ from app.notify_client.inbound_number_client import inbound_number_client
 from app.notify_client.invite_api_client import invite_api_client
 from app.notify_client.job_api_client import job_api_client
 from app.notify_client.letter_branding_client import letter_branding_client
+from app.notify_client.organisations_api_client import organisations_client
 from app.notify_client.service_api_client import service_api_client
 from app.notify_client.template_folder_api_client import (
     template_folder_api_client,
@@ -459,7 +460,7 @@ class Service(JSONModel):
 
     @cached_property
     def organisation(self):
-        return Organisation.from_service(self.id)
+        return Organisation.from_id(self.organisation_id)
 
     @property
     def organisation_id(self):
@@ -468,6 +469,12 @@ class Service(JSONModel):
     @property
     def organisation_type(self):
         return self.organisation.organisation_type or self._dict['organisation_type']
+
+    @property
+    def organisation_name(self):
+        if not self.organisation:
+            return None
+        return organisations_client.get_organisation_name(self.organisation_id)
 
     @property
     def organisation_type_label(self):
