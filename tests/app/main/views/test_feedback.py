@@ -204,34 +204,15 @@ def test_passes_user_details_through_flow(
     {'feedback': 'blah', 'name': 'Fred'},
     {'feedback': 'blah'},
 ])
-@pytest.mark.parametrize('ticket_type, expected_response, expected_redirect, expected_error', [
-    (
-        PROBLEM_TICKET_TYPE,
-        200,
-        lambda: None,
-        element.Tag,
-    ),
-    (
-        QUESTION_TICKET_TYPE,
-        302,
-        partial(
-            url_for,
-            '.thanks',
-            email_address_provided=False,
-            out_of_hours_emergency=False,
-            _external=True,
-        ),
-        type(None),
-    ),
+@pytest.mark.parametrize('ticket_type', [
+    PROBLEM_TICKET_TYPE,
+    QUESTION_TICKET_TYPE,
 ])
-def test_email_address_required_for_problems(
+def test_email_address_required_for_problems_and_questions(
     client_request,
     mocker,
     data,
     ticket_type,
-    expected_response,
-    expected_redirect,
-    expected_error
 ):
     mocker.patch('app.main.views.feedback.zendesk_client')
     client_request.logout()
@@ -239,10 +220,9 @@ def test_email_address_required_for_problems(
         'main.feedback',
         ticket_type=ticket_type,
         _data=data,
-        _expected_status=expected_response,
-        _expected_redirect=expected_redirect(),
+        _expected_status=200
     )
-    assert isinstance(page.find('span', {'class': 'error-message'}), expected_error)
+    assert isinstance(page.find('span', {'class': 'error-message'}), element.Tag)
 
 
 @freeze_time('2016-12-12 12:00:00.000000')
