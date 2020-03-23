@@ -183,7 +183,7 @@ cf-deploy: ## Deploys the app to Cloud Foundry
 	cf v3-cancel-zdt-push ${CF_APP} || true
 
 	cf v3-apply-manifest ${CF_APP} -f <(make -s generate-manifest)
-	cf v3-zdt-push ${CF_APP} --wait-for-deploy-complete  # fails after 5 mins if deploy doesn't work
+	CF_STARTUP_TIMEOUT=10 cf v3-zdt-push ${CF_APP} --wait-for-deploy-complete  # fails after 5 mins if deploy doesn't work
 
 .PHONY: cf-deploy-prototype
 cf-deploy-prototype: cf-target ## Deploys the first prototype to Cloud Foundry
