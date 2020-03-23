@@ -894,7 +894,7 @@ class SupportType(StripWhitespaceForm):
 
 class Feedback(StripWhitespaceForm):
     name = StringField('Name')
-    email_address = email_address(label='Email address', gov_user=False, required=False)
+    email_address = email_address(label='Email address', gov_user=False, required=True)
     feedback = TextAreaField('Your message', validators=[DataRequired(message="Cannot be empty")])
 
 
