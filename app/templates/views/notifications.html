@@ -31,7 +31,8 @@
     {{ ajax_block(
       partials,
       url_for('.get_notifications_as_json', service_id=current_service.id, message_type=message_type, status=status),
-      'counts'
+      'counts',
+      interval=20
     ) }}
 
     {% call form_wrapper(
@@ -82,7 +83,8 @@
     partials,
     url_for('.get_notifications_as_json', service_id=current_service.id, message_type=message_type, status=status, page=page),
     'notifications',
-    form='search-form'
+    form='search-form',
+    interval=20
   ) }}
 
 {% endblock %}
