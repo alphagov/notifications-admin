@@ -144,7 +144,7 @@ def feedback(ticket_type):
         form.feedback.data = get_prefilled_message()
 
     return render_template(
-        'views/support/{}.html'.format(PROBLEM_TICKET_TYPE),
+        'views/support/form.html',
         form=form,
         is_problem=(ticket_type == PROBLEM_TICKET_TYPE),
     )
