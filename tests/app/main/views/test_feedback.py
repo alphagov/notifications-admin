@@ -7,7 +7,11 @@ from flask import url_for
 from freezegun import freeze_time
 
 from app.main.views.feedback import has_live_services, in_business_hours
-from app.models.feedback import PROBLEM_TICKET_TYPE, QUESTION_TICKET_TYPE
+from app.models.feedback import (
+    GENERAL_TICKET_TYPE,
+    PROBLEM_TICKET_TYPE,
+    QUESTION_TICKET_TYPE,
+)
 from tests.conftest import normalize_spaces
 
 
@@ -82,6 +86,7 @@ def test_choose_support_type(
     )
 
 
+@freeze_time('2016-12-12 12:00:00.000000')
 def test_get_support_as_someone_in_the_public_sector(
     client_request,
 ):
@@ -92,7 +97,7 @@ def test_get_support_as_someone_in_the_public_sector(
         _follow_redirects=True,
     )
     assert normalize_spaces(page.select('h1')) == (
-        'Report a problem'
+        'Contact GOV.UK Notify support'
     )
     assert page.select_one('form textarea[name=feedback]')
     assert page.select_one('form input[name=name]')
@@ -344,8 +349,8 @@ def test_urgency(
 
 ids, params = zip(*[
     ('non-logged in users always have to triage', (
-        PROBLEM_TICKET_TYPE, False, False, True,
-        302, partial(url_for, 'main.triage')
+        GENERAL_TICKET_TYPE, False, False, True,
+        302, partial(url_for, 'main.triage', ticket_type=GENERAL_TICKET_TYPE)
     )),
     ('trial services are never high priority', (
         PROBLEM_TICKET_TYPE, False, True, False,
@@ -361,7 +366,7 @@ ids, params = zip(*[
     )),
     ('should triage out of hours', (
         PROBLEM_TICKET_TYPE, False, True, True,
-        302, partial(url_for, 'main.triage')
+        302, partial(url_for, 'main.triage', ticket_type=PROBLEM_TICKET_TYPE)
     ))
 ])
 
@@ -395,6 +400,21 @@ def test_redirects_to_triage(
     assert response.location == expected_redirect(_external=True)
 
 
+@pytest.mark.parametrize('ticket_type, expected_h1', (
+    (PROBLEM_TICKET_TYPE, 'Report a problem'),
+    (GENERAL_TICKET_TYPE, 'Contact GOV.UK Notify support'),
+))
+def test_options_on_triage_page(
+    client_request,
+    ticket_type,
+    expected_h1,
+):
+    page = client_request.get('main.triage', ticket_type=ticket_type)
+    assert normalize_spaces(page.select_one('h1').text) == expected_h1
+    assert page.select('form input[type=radio]')[0]['value'] == 'yes'
+    assert page.select('form input[type=radio]')[1]['value'] == 'no'
+
+
 def test_doesnt_lose_message_if_post_across_closing(
     client_request,
     mocker,
@@ -408,7 +428,7 @@ def test_doesnt_lose_message_if_post_across_closing(
         ticket_type=PROBLEM_TICKET_TYPE,
         _data={'feedback': 'foo'},
         _expected_status=302,
-        _expected_redirect=url_for('.triage', _external=True),
+        _expected_redirect=url_for('.triage', ticket_type=PROBLEM_TICKET_TYPE, _external=True),
     )
     with client_request.session_transaction() as session:
         assert session['feedback_message'] == 'foo'
@@ -458,18 +478,31 @@ def test_in_business_hours(when, is_in_business_hours):
         assert in_business_hours() == is_in_business_hours
 
 
+@pytest.mark.parametrize('ticket_type', (
+    GENERAL_TICKET_TYPE,
+    PROBLEM_TICKET_TYPE,
+))
 @pytest.mark.parametrize('choice, expected_redirect_param', [
     ('yes', 'yes'),
     ('no', 'no'),
 ])
-def test_triage_redirects_to_correct_url(client, choice, expected_redirect_param):
-    response = client.post(url_for('main.triage'), data={'severe': choice})
-    assert response.status_code == 302
-    assert response.location == url_for(
-        'main.feedback',
-        ticket_type=PROBLEM_TICKET_TYPE,
-        severe=expected_redirect_param,
-        _external=True,
+def test_triage_redirects_to_correct_url(
+    client_request,
+    ticket_type,
+    choice,
+    expected_redirect_param,
+):
+    client_request.post(
+        'main.triage',
+        ticket_type=ticket_type,
+        _data={'severe': choice},
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.feedback',
+            ticket_type=ticket_type,
+            severe=expected_redirect_param,
+            _external=True,
+        ),
     )
 
 
@@ -499,15 +532,15 @@ def test_triage_redirects_to_correct_url(client, choice, expected_redirect_param
         # Treat empty query param as mangled URL – ask question again
         (
             False, '',
-            302, partial(url_for, 'main.triage'),
-            302, partial(url_for, 'main.triage'),
+            302, partial(url_for, 'main.triage', ticket_type=PROBLEM_TICKET_TYPE),
+            302, partial(url_for, 'main.triage', ticket_type=PROBLEM_TICKET_TYPE),
         ),
 
         # User hasn’t answered the triage question
         (
             False, None,
-            302, partial(url_for, 'main.triage'),
-            302, partial(url_for, 'main.triage'),
+            302, partial(url_for, 'main.triage', ticket_type=PROBLEM_TICKET_TYPE),
+            302, partial(url_for, 'main.triage', ticket_type=PROBLEM_TICKET_TYPE),
         ),
 
         # Escalation is needed for non-logged-in users
@@ -535,6 +568,57 @@ def test_should_be_shown_the_bat_email(
     mocker.patch('app.main.views.feedback.in_business_hours', return_value=is_in_business_hours)
 
     feedback_page = url_for('main.feedback', ticket_type=PROBLEM_TICKET_TYPE, severe=severe)
+
+    response = client.get(feedback_page)
+
+    assert response.status_code == expected_status_code
+    assert response.location == expected_redirect(_external=True)
+
+    # logged in users should never be redirected to the bat email page
+    client.login(active_user_with_permissions, mocker, service_one)
+    logged_in_response = client.get(feedback_page)
+    assert logged_in_response.status_code == expected_status_code_when_logged_in
+    assert logged_in_response.location == expected_redirect_when_logged_in(_external=True)
+
+
+@pytest.mark.parametrize(
+    (
+        'severe,'
+        'expected_status_code, expected_redirect,'
+        'expected_status_code_when_logged_in, expected_redirect_when_logged_in'
+    ),
+    [
+        # User hasn’t answered the triage question
+        (
+            None,
+            302, partial(url_for, 'main.triage', ticket_type=GENERAL_TICKET_TYPE),
+            302, partial(url_for, 'main.triage', ticket_type=GENERAL_TICKET_TYPE),
+        ),
+
+        # Escalation is needed for non-logged-in users
+        (
+            'yes',
+            302, partial(url_for, 'main.bat_phone'),
+            200, no_redirect(),
+        ),
+    ]
+)
+def test_should_be_shown_the_bat_email_for_general_questions(
+    client,
+    active_user_with_permissions,
+    mocker,
+    service_one,
+    mock_get_services,
+    severe,
+    expected_status_code,
+    expected_redirect,
+    expected_status_code_when_logged_in,
+    expected_redirect_when_logged_in,
+):
+
+    mocker.patch('app.main.views.feedback.in_business_hours', return_value=False)
+
+    feedback_page = url_for('main.feedback', ticket_type=GENERAL_TICKET_TYPE, severe=severe)
 
     response = client.get(feedback_page)
 

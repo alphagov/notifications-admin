@@ -13,7 +13,11 @@ from app.main.forms import (
     SupportType,
     Triage,
 )
-from app.models.feedback import PROBLEM_TICKET_TYPE
+from app.models.feedback import (
+    GENERAL_TICKET_TYPE,
+    PROBLEM_TICKET_TYPE,
+    QUESTION_TICKET_TYPE,
+)
 
 
 def get_prefilled_message():
@@ -50,7 +54,7 @@ def support():
             else:
                 return redirect(url_for(
                     '.feedback',
-                    ticket_type=PROBLEM_TICKET_TYPE,
+                    ticket_type=GENERAL_TICKET_TYPE,
                 ))
 
     return render_template('views/support/index.html', form=form)
@@ -62,17 +66,22 @@ def support_public():
 
 
 @main.route('/support/triage', methods=['GET', 'POST'])
-def triage():
+@main.route('/support/triage/<ticket_type:ticket_type>', methods=['GET', 'POST'])
+def triage(ticket_type=PROBLEM_TICKET_TYPE):
     form = Triage()
     if form.validate_on_submit():
         return redirect(url_for(
             '.feedback',
-            ticket_type=PROBLEM_TICKET_TYPE,
+            ticket_type=ticket_type,
             severe=form.severe.data
         ))
     return render_template(
         'views/support/triage.html',
-        form=form
+        form=form,
+        page_title={
+            PROBLEM_TICKET_TYPE: 'Report a problem',
+            GENERAL_TICKET_TYPE: 'Contact GOV.UK Notify support',
+        }.get(ticket_type)
     )
 
 
@@ -89,14 +98,14 @@ def feedback(ticket_type):
         severe = None
 
     out_of_hours_emergency = all((
-        ticket_type == PROBLEM_TICKET_TYPE,
+        ticket_type != QUESTION_TICKET_TYPE,
         not in_business_hours(),
         severe,
     ))
 
     if needs_triage(ticket_type, severe):
         session['feedback_message'] = form.feedback.data
-        return redirect(url_for('.triage'))
+        return redirect(url_for('.triage', ticket_type=ticket_type))
 
     if needs_escalation(ticket_type, severe):
         return redirect(url_for('.bat_phone'))
@@ -144,7 +153,12 @@ def feedback(ticket_type):
     return render_template(
         'views/support/form.html',
         form=form,
-        is_problem=(ticket_type == PROBLEM_TICKET_TYPE),
+        show_status_page_banner=(ticket_type == PROBLEM_TICKET_TYPE),
+        page_title={
+            GENERAL_TICKET_TYPE: 'Contact GOV.UK Notify support',
+            PROBLEM_TICKET_TYPE: 'Report a problem',
+            QUESTION_TICKET_TYPE: 'Ask a question or give feedback',
+        }.get(ticket_type),
     )
 
 
@@ -254,7 +268,7 @@ def has_live_services(user_id):
 
 def needs_triage(ticket_type, severe):
     return all((
-        ticket_type == PROBLEM_TICKET_TYPE,
+        ticket_type != QUESTION_TICKET_TYPE,
         severe is None,
         (
             not current_user.is_authenticated or has_live_services(current_user.id)
@@ -265,7 +279,7 @@ def needs_triage(ticket_type, severe):
 
 def needs_escalation(ticket_type, severe):
     return all((
-        ticket_type == PROBLEM_TICKET_TYPE,
+        ticket_type != QUESTION_TICKET_TYPE,
         severe,
         not current_user.is_authenticated,
         not in_business_hours(),

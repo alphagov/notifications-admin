@@ -5,8 +5,6 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/form.html" import form_wrapper %}
 
-{% set page_title = 'Report a problem' if is_problem else 'Ask a question or give feedback' %}
-
 {% block per_page_title %}
   {{ page_title }}
 {% endblock %}
@@ -19,7 +17,7 @@
     ) }}
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-two-thirds">
-        {% if is_problem %}
+        {% if show_status_page_banner %}
           <div class="panel panel-border-wide">
             <p>
               Check our <a class="govuk-link govuk-link--no-visited-state" href="https://status.notifications.service.gov.uk">system status</a>
