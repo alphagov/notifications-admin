@@ -96,7 +96,7 @@ def test_get_support_as_someone_in_the_public_sector(
         _follow_redirects=True,
     )
     assert normalize_spaces(page.select('h1')) == (
-        'Ask a question or give feedback'
+        'Report a problem'
     )
     assert page.select_one('form textarea[name=feedback]')
     assert page.select_one('form input[name=name]')

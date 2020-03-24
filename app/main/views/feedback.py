@@ -52,7 +52,7 @@ def support():
             else:
                 return redirect(url_for(
                     '.feedback',
-                    ticket_type=QUESTION_TICKET_TYPE,
+                    ticket_type=PROBLEM_TICKET_TYPE,
                 ))
 
     return render_template('views/support/index.html', form=form)
@@ -144,9 +144,9 @@ def feedback(ticket_type):
         form.feedback.data = get_prefilled_message()
 
     return render_template(
-        'views/support/{}.html'.format(ticket_type),
+        'views/support/{}.html'.format(PROBLEM_TICKET_TYPE),
         form=form,
-        ticket_type=ticket_type,
+        is_problem=(ticket_type == PROBLEM_TICKET_TYPE),
     )
 
 
