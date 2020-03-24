@@ -892,6 +892,17 @@ class SupportType(StripWhitespaceForm):
     )
 
 
+class SupportRedirect(StripWhitespaceForm):
+    who = RadioField(
+        'What do you need help with?',
+        choices=[
+            ('public-sector', 'I work in the public sector and need to send emails, text messages or letters'),
+            ('public', 'I’m a member of the public with a question for the government'),
+        ],
+        validators=[DataRequired()]
+    )
+
+
 class Feedback(StripWhitespaceForm):
     name = StringField('Name (optional)')
     email_address = email_address(label='Email address', gov_user=False, required=True)

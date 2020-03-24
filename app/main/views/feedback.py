@@ -7,7 +7,13 @@ from flask_login import current_user
 from app import convert_to_boolean, current_service, service_api_client
 from app.extensions import zendesk_client
 from app.main import main
-from app.main.forms import Feedback, Problem, SupportType, Triage
+from app.main.forms import (
+    Feedback,
+    Problem,
+    SupportRedirect,
+    SupportType,
+    Triage,
+)
 
 QUESTION_TICKET_TYPE = 'ask-question-give-feedback'
 PROBLEM_TICKET_TYPE = "report-problem"
@@ -29,13 +35,33 @@ def get_prefilled_message():
 
 @main.route('/support', methods=['GET', 'POST'])
 def support():
-    form = SupportType()
-    if form.validate_on_submit():
-        return redirect(url_for(
-            '.feedback',
-            ticket_type=form.support_type.data,
-        ))
+
+    if current_user.is_authenticated:
+        form = SupportType()
+        if form.validate_on_submit():
+            return redirect(url_for(
+                '.feedback',
+                ticket_type=form.support_type.data,
+            ))
+    else:
+        form = SupportRedirect()
+        if form.validate_on_submit():
+            if form.who.data == 'public':
+                return redirect(url_for(
+                    '.support_public'
+                ))
+            else:
+                return redirect(url_for(
+                    '.feedback',
+                    ticket_type=QUESTION_TICKET_TYPE,
+                ))
+
     return render_template('views/support/index.html', form=form)
+
+
+@main.route('/support/public')
+def support_public():
+    return render_template('views/support/public.html')
 
 
 @main.route('/support/triage', methods=['GET', 'POST'])

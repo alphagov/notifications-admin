@@ -19,18 +19,48 @@ def no_redirect():
     return lambda _external=True: None
 
 
-@pytest.mark.parametrize('endpoint', [
-    'main.old_feedback',
-    'main.support',
-])
 def test_get_support_index_page(
-    client,
-    endpoint,
+    client_request,
 ):
-    response = client.get(url_for('main.support'), follow_redirects=True)
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    assert page.h1.string.strip() == 'Support'
+    page = client_request.get('.support')
+    assert page.select_one('form')['method'] == 'post'
+    assert 'action' not in page.select_one('form')
+    assert normalize_spaces(page.select_one('h1').text) == 'Support'
+    assert normalize_spaces(
+        page.select_one('form label[for=support_type-0]').text
+    ) == 'Report a problem'
+    assert page.select_one('form input#support_type-0')['value'] == 'report-problem'
+    assert normalize_spaces(
+        page.select_one('form label[for=support_type-1]').text
+    ) == 'Ask a question or give feedback'
+    assert page.select_one('form input#support_type-1')['value'] == 'ask-question-give-feedback'
+    assert normalize_spaces(
+        page.select_one('form button[type=submit]').text
+    ) == 'Continue'
+
+
+def test_get_support_index_page_when_signed_out(
+    client_request,
+):
+    client_request.logout()
+    page = client_request.get('.support')
+    assert page.select_one('form')['method'] == 'post'
+    assert 'action' not in page.select_one('form')
+    assert normalize_spaces(
+        page.select_one('form label[for=who-0]').text
+    ) == (
+        'I work in the public sector and need to send emails, text messages or letters'
+    )
+    assert page.select_one('form input#who-0')['value'] == 'public-sector'
+    assert normalize_spaces(
+        page.select_one('form label[for=who-1]').text
+    ) == (
+        'I’m a member of the public with a question for the government'
+    )
+    assert page.select_one('form input#who-1')['value'] == 'public'
+    assert normalize_spaces(
+        page.select_one('form button[type=submit]').text
+    ) == 'Continue'
 
 
 @freeze_time('2016-12-12 12:00:00.000000')
@@ -38,34 +68,58 @@ def test_get_support_index_page(
     (PROBLEM_TICKET_TYPE, 'Report a problem'),
     (QUESTION_TICKET_TYPE, 'Ask a question or give feedback'),
 ])
-@pytest.mark.parametrize('logged_in, expected_form_field, expected_contact_details', [
-    (True, type(None), 'We’ll reply to test@user.gov.uk'),
-    (False, element.Tag, None),
-])
 def test_choose_support_type(
-    client,
-    api_user_active,
-    mock_get_user,
-    mock_get_services,
-    logged_in,
-    expected_form_field,
-    expected_contact_details,
+    client_request,
     support_type,
     expected_h1
 ):
-    if logged_in:
-        client.login(api_user_active)
-    response = client.post(
-        url_for('main.support'),
-        data={'support_type': support_type}, follow_redirects=True
+    page = client_request.post(
+        'main.support',
+        _data={'support_type': support_type},
+        _follow_redirects=True,
     )
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert page.h1.string.strip() == expected_h1
-    assert isinstance(page.find('input', {'name': 'name'}), expected_form_field)
-    assert isinstance(page.find('input', {'name': 'email_address'}), expected_form_field)
-    if expected_contact_details:
-        assert page.find('form').find('p').text.strip() == expected_contact_details
+    assert not page.select_one('input[name=name]')
+    assert not page.select_one('input[name=email_address]')
+    assert page.find('form').find('p').text.strip() == (
+        'We’ll reply to test@user.gov.uk'
+    )
+
+
+def test_get_support_as_someone_in_the_public_sector(
+    client_request,
+):
+    client_request.logout()
+    page = client_request.post(
+        'main.support',
+        _data={'who': 'public-sector'},
+        _follow_redirects=True,
+    )
+    assert normalize_spaces(page.select('h1')) == (
+        'Ask a question or give feedback'
+    )
+    assert page.select_one('form textarea[name=feedback]')
+    assert page.select_one('form input[name=name]')
+    assert page.select_one('form input[name=email_address]')
+    assert page.select_one('form button[type=submit]')
+
+
+def test_get_support_as_member_of_public(
+    client_request,
+):
+    client_request.logout()
+    page = client_request.post(
+        'main.support',
+        _data={'who': 'public'},
+        _follow_redirects=True,
+    )
+    assert normalize_spaces(page.select('h1')) == (
+        'The GOV.UK Notify service is for people who work in the government'
+    )
+    assert len(page.select('h2 a')) == 3
+    assert not page.select('form')
+    assert not page.select('input')
+    assert not page.select('form [type=submit]')
 
 
 @freeze_time('2016-12-12 12:00:00.000000')
