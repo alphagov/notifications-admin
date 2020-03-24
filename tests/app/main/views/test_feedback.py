@@ -134,50 +134,6 @@ def test_get_feedback_page(client, ticket_type, expected_status_code):
     assert response.status_code == expected_status_code
 
 
-@pytest.mark.parametrize('prefilled_body, expected_textarea', [
-    (
-        'agreement',
-        (
-            'Please can you tell me if there’s an agreement in place '
-            'between GOV.UK Notify and my organisation?'
-        )
-    ),
-    (
-        'foo',
-        ''
-    ),
-])
-@freeze_time('2016-12-12 12:00:00.000000')
-def test_get_feedback_page_with_prefilled_body(
-    client_request,
-    mocker,
-    fake_uuid,
-    prefilled_body,
-    expected_textarea,
-    active_user_with_permissions,
-):
-    active_user_with_permissions['email_address'] = 'test@marinemanagement.org.uk'
-    mocker.patch('app.user_api_client.get_user', return_value=active_user_with_permissions)
-    mock_post = mocker.patch('app.main.views.feedback.zendesk_client.create_ticket')
-    page = client_request.get(
-        'main.feedback',
-        ticket_type=QUESTION_TICKET_TYPE,
-        body=prefilled_body,
-    )
-    assert page.select_one('textarea').text == (
-        expected_textarea
-    )
-    client_request.post(
-        'main.feedback',
-        ticket_type=QUESTION_TICKET_TYPE,
-        body='agreement',
-        _data={'feedback': 'blah', 'name': 'Example', 'email_address': 'test@example.com'}
-    )
-    message = mock_post.call_args[1]['message']
-    assert message.startswith('blah')
-    assert 'Please send' not in message
-
-
 @freeze_time('2016-12-12 12:00:00.000000')
 @pytest.mark.parametrize('ticket_type', [PROBLEM_TICKET_TYPE, QUESTION_TICKET_TYPE])
 def test_passed_non_logged_in_user_details_through_flow(client, mocker, ticket_type):

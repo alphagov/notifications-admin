@@ -20,20 +20,6 @@ from app.models.feedback import (
 )
 
 
-def get_prefilled_message():
-    return {
-        'agreement': (
-            'Please can you tell me if there’s an agreement in place '
-            'between GOV.UK Notify and my organisation?'
-        ),
-        'letter-branding': (
-            'I would like my own logo on my letter templates.'
-        ),
-    }.get(
-        request.args.get('body'), ''
-    )
-
-
 @main.route('/support', methods=['GET', 'POST'])
 def support():
 
@@ -146,9 +132,6 @@ def feedback(ticket_type):
                 current_user.is_authenticated or bool(form.email_address.data)
             ),
         ))
-
-    if not form.feedback.data:
-        form.feedback.data = get_prefilled_message()
 
     return render_template(
         'views/support/form.html',
