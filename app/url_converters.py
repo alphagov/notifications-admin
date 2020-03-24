@@ -1,5 +1,7 @@
 from werkzeug.routing import BaseConverter
 
+from app.models.feedback import PROBLEM_TICKET_TYPE, QUESTION_TICKET_TYPE
+
 
 class TemplateTypeConverter(BaseConverter):
 
@@ -8,7 +10,7 @@ class TemplateTypeConverter(BaseConverter):
 
 class TicketTypeConverter(BaseConverter):
 
-    regex = '(?:ask-question-give-feedback|report-problem)'
+    regex = f'(?:{PROBLEM_TICKET_TYPE}|{QUESTION_TICKET_TYPE})'
 
 
 class LetterFileExtensionConverter(BaseConverter):

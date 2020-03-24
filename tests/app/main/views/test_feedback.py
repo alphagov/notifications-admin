@@ -6,12 +6,8 @@ from bs4 import BeautifulSoup, element
 from flask import url_for
 from freezegun import freeze_time
 
-from app.main.views.feedback import (
-    PROBLEM_TICKET_TYPE,
-    QUESTION_TICKET_TYPE,
-    has_live_services,
-    in_business_hours,
-)
+from app.main.views.feedback import has_live_services, in_business_hours
+from app.models.feedback import PROBLEM_TICKET_TYPE, QUESTION_TICKET_TYPE
 from tests.conftest import normalize_spaces
 
 

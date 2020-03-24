@@ -13,9 +13,7 @@ from app.main.forms import (
     SupportType,
     Triage,
 )
-
-QUESTION_TICKET_TYPE = 'ask-question-give-feedback'
-PROBLEM_TICKET_TYPE = "report-problem"
+from app.models.feedback import PROBLEM_TICKET_TYPE
 
 
 def get_prefilled_message():

@@ -15,12 +15,12 @@ from notifications_utils.template import HTMLEmailTemplate, LetterImageTemplate
 from app import email_branding_client, letter_branding_client, status_api_client
 from app.main import main
 from app.main.forms import FieldWithNoneOption, SearchByNameForm
-from app.main.views.feedback import QUESTION_TICKET_TYPE
 from app.main.views.sub_navigation_dictionaries import (
     features_nav,
     pricing_nav,
     using_notify_nav,
 )
+from app.models.feedback import QUESTION_TICKET_TYPE
 from app.utils import get_logo_cdn_domain
 
 

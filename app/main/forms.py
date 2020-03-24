@@ -48,6 +48,7 @@ from app.main.validators import (
     ValidEmail,
     ValidGovEmail,
 )
+from app.models.feedback import PROBLEM_TICKET_TYPE, QUESTION_TICKET_TYPE
 from app.models.organisation import Organisation
 from app.models.roles_and_permissions import permissions, roles
 from app.utils import guess_name_from_email_address
@@ -885,8 +886,8 @@ class SupportType(StripWhitespaceForm):
     support_type = RadioField(
         'How can we help you?',
         choices=[
-            ('report-problem', 'Report a problem'),
-            ('ask-question-give-feedback', 'Ask a question or give feedback'),
+            (PROBLEM_TICKET_TYPE, 'Report a problem'),
+            (QUESTION_TICKET_TYPE, 'Ask a question or give feedback'),
         ],
         validators=[DataRequired()]
     )
