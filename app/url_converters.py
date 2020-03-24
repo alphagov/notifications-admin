@@ -6,6 +6,11 @@ class TemplateTypeConverter(BaseConverter):
     regex = '(?:email|sms|letter)'
 
 
+class TicketTypeConverter(BaseConverter):
+
+    regex = '(?:ask-question-give-feedback|report-problem)'
+
+
 class LetterFileExtensionConverter(BaseConverter):
 
     regex = '(?:pdf|png)'

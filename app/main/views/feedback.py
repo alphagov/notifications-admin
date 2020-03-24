@@ -1,15 +1,14 @@
 from datetime import datetime
 
 import pytz
-from flask import abort, redirect, render_template, request, session, url_for
+from flask import redirect, render_template, request, session, url_for
 from flask_login import current_user
 
 from app import convert_to_boolean, current_service, service_api_client
 from app.extensions import zendesk_client
 from app.main import main
 from app.main.forms import (
-    Feedback,
-    Problem,
+    FeedbackOrProblem,
     SupportRedirect,
     SupportType,
     Triage,
@@ -79,15 +78,9 @@ def triage():
     )
 
 
-@main.route('/support/<ticket_type>', methods=['GET', 'POST'])
+@main.route('/support/<ticket_type:ticket_type>', methods=['GET', 'POST'])
 def feedback(ticket_type):
-    try:
-        form = {
-            QUESTION_TICKET_TYPE: Feedback,
-            PROBLEM_TICKET_TYPE: Problem,
-        }[ticket_type]()
-    except KeyError:
-        abort(404)
+    form = FeedbackOrProblem()
 
     if not form.feedback.data:
         form.feedback.data = session.pop('feedback_message', '')

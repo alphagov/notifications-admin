@@ -903,14 +903,10 @@ class SupportRedirect(StripWhitespaceForm):
     )
 
 
-class Feedback(StripWhitespaceForm):
+class FeedbackOrProblem(StripWhitespaceForm):
     name = StringField('Name (optional)')
     email_address = email_address(label='Email address', gov_user=False, required=True)
     feedback = TextAreaField('Your message', validators=[DataRequired(message="Cannot be empty")])
-
-
-class Problem(Feedback):
-    email_address = email_address(label='Email address', gov_user=False)
 
 
 class Triage(StripWhitespaceForm):
