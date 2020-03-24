@@ -111,10 +111,9 @@ def feedback(ticket_type):
         else:
             service_string = ''
 
-        feedback_msg = '{}\n{}{}'.format(
+        feedback_msg = '{}\n{}'.format(
             form.feedback.data,
             service_string,
-            '' if user_email else '{} (no email address supplied)'.format(form.name.data)
         )
 
         zendesk_client.create_ticket(
