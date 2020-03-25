@@ -198,6 +198,9 @@ class Organisation(JSONModel):
             self.id
         )
 
+    def services_and_usage(self, financial_year):
+        return organisations_client.get_services_and_usage(self.id, financial_year)
+
 
 class Organisations(ModelList):
     client_method = organisations_client.get_organisations

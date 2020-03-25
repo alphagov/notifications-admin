@@ -111,7 +111,5 @@ def redirect_when_logged_in(platform_admin):
     next_url = request.args.get('next')
     if next_url and _is_safe_redirect_url(next_url):
         return redirect(next_url)
-    if platform_admin:
-        return redirect(url_for('main.platform_admin'))
 
     return redirect(url_for('main.show_accounts_or_dashboard'))

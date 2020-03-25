@@ -2,7 +2,7 @@
   display: inline-block;
   vertical-align: top;
   width: 20px;
-  height: $gutter;
+  height: govuk-spacing(6);
   position: relative;
 
   &:before {
@@ -31,18 +31,11 @@
     margin: 0;
 
     a {
-      margin-bottom: -$gutter;
-      padding-bottom: $gutter;
+      margin-bottom: -1 * govuk-spacing(6);
+      padding-bottom: govuk-spacing(6);
 
-      &:hover {
-        color: $link-hover-colour;
-
-        .message-name-separator {
-          &:before {
-            border-color: $link-hover-colour;
-          }
-        }
-
+      &:hover .message-name-separator:before {
+        border-color: $link-hover-colour;
       }
 
       &:focus {
@@ -71,7 +64,7 @@
 
   &-type {
     color: $secondary-text-colour;
-    margin: 0 0 $gutter-two-thirds 0;
+    margin: 0 0 govuk-spacing(4) 0;
     pointer-events: none;
   }
 
@@ -79,7 +72,7 @@
 
 #template-list {
 
-  margin-top: $gutter;
+  margin-top: govuk-spacing(6);
 
   &.top-gutter-5px {
     margin-top: 5px;
@@ -94,7 +87,7 @@
     &-with-checkbox {
 
       position: relative;
-      padding-left: $gutter * 2;
+      padding-left: govuk-spacing(9);
 
       .multiple-choice {
         position: absolute;
@@ -155,22 +148,22 @@
 
   &-empty {
     color: $secondary-text-colour;
-    padding: $gutter-half 0 $gutter-one-third 0;
+    padding: govuk-spacing(3) 0 govuk-spacing(2) 0;
   }
 
   &-selected-counter {
     color: $secondary-text-colour;
-    margin: $gutter-half 0;
+    margin: govuk-spacing(3) 0;
 
     @include media(tablet) {
       position: absolute;
       right: 0;
-      top: $gutter - 1px;
+      top: govuk-spacing(6) - 1px;
       margin: 0;
     }
 
     .content-fixed & {
-      right: $gutter-half;
+      right: govuk-spacing(3);
     }
 
   }
@@ -179,8 +172,8 @@
 
 .folder-heading {
 
-  .grid-row & {
-    margin: $gutter-half 0 20px 0;
+  .govuk-grid-row & {
+    margin: govuk-spacing(3) 0 20px 0;
     word-wrap: break-word;
   }
 
@@ -253,7 +246,7 @@
   &-manage-link {
     display: block;
     text-align: right;
-    padding: $gutter-two-thirds 0 0 0;
+    padding: govuk-spacing(4) 0 0 0;
     position: relative;
     top: -6px;
   }

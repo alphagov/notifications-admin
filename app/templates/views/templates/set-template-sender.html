@@ -14,8 +14,8 @@
     'Set letter contact block',
     back_link=url_for('.view_template', service_id=current_service.id, template_id=template_id)
   ) }}
-  <div class="grid-row">
-    <div class="column-three-quarters">
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-three-quarters">
       {% call form_wrapper() %}
         {{ radios(
           form.sender,
@@ -23,7 +23,7 @@
           hide_legend=True
         ) }}
         {{ page_footer('Continue') }}
-        <a href="{{ url_for('.service_add_letter_contact', service_id=current_service.id, from_template=template_id) }}">Add new sender</a>
+        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.service_add_letter_contact', service_id=current_service.id, from_template=template_id) }}">Add new sender</a>
       {% endcall %}
     </div>
   </div>

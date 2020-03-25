@@ -296,10 +296,6 @@ def get_dashboard_partials(service_id):
         ),
         'inbox': render_template(
             'views/dashboard/_inbox.html',
-            inbound_sms_summary=(
-                service_api_client.get_inbound_sms_summary(service_id)
-                if current_service.has_permission('inbound_sms') else None
-            ),
         ),
         'totals': render_template(
             'views/dashboard/_totals.html',
@@ -312,10 +308,6 @@ def get_dashboard_partials(service_id):
             most_used_template_count=max(
                 [row['count'] for row in template_statistics] or [0]
             ),
-        ),
-        'jobs': render_template(
-            'views/dashboard/_jobs.html',
-            jobs=current_service.immediate_jobs,
         ),
         'usage': render_template(
             'views/dashboard/_usage.html',

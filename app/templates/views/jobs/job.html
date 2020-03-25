@@ -2,6 +2,7 @@
 {% from "components/banner.html" import banner %}
 {% from "components/ajax-block.html" import ajax_block %}
 {% from "components/page-footer.html" import page_footer %}
+{% from "components/page-header.html" import page_header %}
 
 {% block service_page_title %}
   {{ job.original_file_name }}
@@ -9,11 +10,12 @@
 
 {% block maincolumn_content %}
 
-    <h1 class="heading-large">
-      {{ job.original_file_name }}
-    </h1>
+    {{ page_header(
+      job.original_file_name,
+      back_link=None if just_sent else url_for('main.uploads', service_id=current_service.id)
+    ) }}
 
-    {% if just_sent %}
+    {% if just_sent and job.template_type == 'letter' %}
       {{ banner(just_sent_message, type='default', with_tick=True) }}
     {% else %}
       {{ ajax_block(partials, updates_url, 'status', finished=job.processing_finished) }}
@@ -25,7 +27,7 @@
       <div class="js-stick-at-bottom-when-scrolling">
         <div class="page-footer">
           <span class="page-footer-delete-link page-footer-delete-link-without-button">
-              <a href="{{ url_for('main.cancel_letter_job', service_id=current_service.id, job_id=job.id) }}">Cancel sending these letters</a>
+            <a class="govuk-link govuk-link--destructive" href="{{ url_for('main.cancel_letter_job', service_id=current_service.id, job_id=job.id) }}">Cancel sending these letters</a>
           </span>
     {% else %}
       <div>&nbsp;</div>

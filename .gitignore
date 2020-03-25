@@ -62,7 +62,6 @@ target/
 .vscode
 
 # Frontend dependencies and compiled assets
-app/assets/stylesheets/govuk_template/.sass-cache/
 .sass-cache/
 cache/
 node_modules

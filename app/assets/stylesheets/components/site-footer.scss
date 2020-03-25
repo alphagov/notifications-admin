@@ -3,8 +3,8 @@
     margin: 0 auto;
 
     &-wrapper {
-      margin-bottom: $gutter;
-      padding-bottom: $gutter * 2;
+      margin-bottom: govuk-spacing(6);
+      padding-bottom: govuk-spacing(9);
       border-bottom: 1px solid $grey-2;
     }
 

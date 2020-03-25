@@ -6,23 +6,25 @@
 {% from "components/form.html" import form_wrapper %}
 
 {% block per_page_title %}
-  Report a problem
+  {{ page_title }}
 {% endblock %}
 
 {% block maincolumn_content %}
 
     {{ page_header(
-      'Report a problem',
-      back_link=url_for('.support')
+      page_title,
+      back_link=back_link
     ) }}
-    <div class="grid-row">
-      <div class="column-two-thirds">
-        <div class="panel panel-border-wide">
-          <p>
-            Check our <a href="https://status.notifications.service.gov.uk">system status</a>
-            page to see if there are any known issues with GOV.UK Notify.
-          </p>
-        </div>
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+        {% if show_status_page_banner %}
+          <div class="panel panel-border-wide">
+            <p>
+              Check our <a class="govuk-link govuk-link--no-visited-state" href="https://status.notifications.service.gov.uk">system status</a>
+              page to see if there are any known issues with GOV.UK Notify.
+            </p>
+          </div>
+        {% endif %}
         {% call form_wrapper() %}
             {{ textbox(form.feedback, width='1-1', hint='', rows=10, autosize=True) }}
             {% if not current_user.is_authenticated %}

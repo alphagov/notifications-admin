@@ -31,7 +31,7 @@
           </span>
         </h3>
         {% if current_user.has_permissions('manage_service') %}
-          <a class="user-list-edit-link" href="{{ url_for('.service_edit_email_reply_to', service_id =current_service.id, reply_to_email_id = item.id) }}">Change</a>
+          <a class="govuk-link govuk-link--no-visited-state user-list-edit-link" href="{{ url_for('.service_edit_email_reply_to', service_id =current_service.id, reply_to_email_id = item.id) }}">Change</a>
         {% endif %}
         {% if current_service.count_email_reply_to_addresses > 1 %}
           {{ api_key(item.id, thing="ID") }}
@@ -39,8 +39,8 @@
       </div>
     {% endfor %}
   </div>
-  <div class="grid-row">
-    <div class="column-whole">
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
       {% if current_user.has_permissions('manage_service') %}
         <div class="js-stick-at-bottom-when-scrolling">
           {{ govukButton({
@@ -51,7 +51,7 @@
         </div>
       {% endif %}
     </div>
-    <div class="column-five-sixths">
+    <div class="govuk-grid-column-five-sixths">
       <p>
         You need to add at least one reply-to address so recipients can reply to your messages.
       </p>

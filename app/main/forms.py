@@ -4,6 +4,7 @@ from itertools import chain
 
 import pytz
 from flask import request
+from flask_login import current_user
 from flask_wtf import FlaskForm as Form
 from flask_wtf.file import FileAllowed
 from flask_wtf.file import FileField as FileField_wtf
@@ -42,10 +43,12 @@ from app.main.validators import (
     LettersNumbersAndFullStopsOnly,
     MustContainAlphanumericCharacters,
     NoCommasInPlaceHolders,
+    NoEmbeddedImagesInSVG,
     OnlySMSCharacters,
     ValidEmail,
     ValidGovEmail,
 )
+from app.models.feedback import PROBLEM_TICKET_TYPE, QUESTION_TICKET_TYPE
 from app.models.organisation import Organisation
 from app.models.roles_and_permissions import permissions, roles
 from app.utils import guess_name_from_email_address
@@ -499,7 +502,7 @@ class InviteUserForm(PermissionsForm):
         self.invalid_email_address = invalid_email_address.lower()
 
     def validate_email_address(self, field):
-        if field.data.lower() == self.invalid_email_address:
+        if field.data.lower() == self.invalid_email_address and not current_user.platform_admin:
             raise ValidationError("You cannot send an invitation to yourself")
 
 
@@ -511,7 +514,7 @@ class InviteOrgUserForm(StripWhitespaceForm):
         self.invalid_email_address = invalid_email_address.lower()
 
     def validate_email_address(self, field):
-        if field.data.lower() == self.invalid_email_address:
+        if field.data.lower() == self.invalid_email_address and not current_user.platform_admin:
             raise ValidationError("You cannot send an invitation to yourself")
 
 
@@ -883,21 +886,28 @@ class SupportType(StripWhitespaceForm):
     support_type = RadioField(
         'How can we help you?',
         choices=[
-            ('report-problem', 'Report a problem'),
-            ('ask-question-give-feedback', 'Ask a question or give feedback'),
+            (PROBLEM_TICKET_TYPE, 'Report a problem'),
+            (QUESTION_TICKET_TYPE, 'Ask a question or give feedback'),
         ],
         validators=[DataRequired()]
     )
 
 
-class Feedback(StripWhitespaceForm):
-    name = StringField('Name')
-    email_address = email_address(label='Email address', gov_user=False, required=False)
+class SupportRedirect(StripWhitespaceForm):
+    who = RadioField(
+        'What do you need help with?',
+        choices=[
+            ('public-sector', 'I work in the public sector and need to send emails, text messages or letters'),
+            ('public', 'I’m a member of the public with a question for the government'),
+        ],
+        validators=[DataRequired()]
+    )
+
+
+class FeedbackOrProblem(StripWhitespaceForm):
+    name = StringField('Name (optional)')
+    email_address = email_address(label='Email address', gov_user=False, required=True)
     feedback = TextAreaField('Your message', validators=[DataRequired(message="Cannot be empty")])
-
-
-class Problem(Feedback):
-    email_address = email_address(label='Email address', gov_user=False)
 
 
 class Triage(StripWhitespaceForm):
@@ -1133,7 +1143,8 @@ class SVGFileUpload(StripWhitespaceForm):
         'Upload an SVG logo',
         validators=[
             FileAllowed(['svg'], 'SVG Images only!'),
-            DataRequired(message="You need to upload a file to submit")
+            DataRequired(message="You need to upload a file to submit"),
+            NoEmbeddedImagesInSVG()
         ]
     )
 

@@ -3,7 +3,7 @@
   box-sizing: border-box;
   border: solid 1px $border-colour;
   min-height: 200px;
-  margin-bottom: $gutter
+  margin-bottom: govuk-spacing(6)
 }
 
 #logo-img {

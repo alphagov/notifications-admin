@@ -1,8 +1,8 @@
 {% from 'components/big-number.html' import big_number %}
 {% from 'components/message-count-label.html' import message_count_label %}
 
-<div class="grid-row bottom-gutter-2-3">
-  <div class="column-half">
+<div class="govuk-grid-row bottom-gutter-2-3">
+  <div class="govuk-grid-column-one-half">
     <div class="keyline-block">
       {{ big_number(
         job.notification_count,
@@ -11,7 +11,7 @@
       )}}
     </div>
   </div>
-  <div class="column-half">
+  <div class="govuk-grid-column-one-half">
     <div class="keyline-block">
       {{ big_number(
         job.letter_timings.earliest_delivery|string|format_date_short,

@@ -1,6 +1,5 @@
 {% extends "content_template.html" %}
-{% from "components/table.html" import mapping_table, row, text_field, edit_field, field with context %}
-{% from "components/sub-navigation.html" import sub_navigation %}
+{% from "components/service-link.html" import service_link %}
 
 {% block per_page_title %}
   Upload a letter
@@ -9,19 +8,21 @@
 {% block content_column_content %}
 
   <h1 class="heading-large">Upload a letter</h1>
-  
-  <p>You can upload and send your own letters instead of creating a reusable letter template.</p>
-  
+
+  <p>Upload a one-off letter as a PDF and we’ll print, pack and post it for you.</p>
+  <p>You can use this feature if you send a lot of one-off letters or if our reusable letter templates do not meet your needs.</p>
+
   <p>To upload and send a letter from a PDF file:</p>
-  
+
   <ol class="list list-number">
-    <li><a href="{{ url_for('.sign_in') }}">Sign in to Notify</a>.</li>
-    <li>Go to the <b class="govuk-!-font-weight-bold">Uploads</b> page.</li>
+    <li>Go to the {{ service_link(current_service, 'main.uploads', 'uploads') }} page.</li>
     <li>Select <b class="govuk-!-font-weight-bold">Upload a letter</b>.</li>
     <li>Select <b class="govuk-!-font-weight-bold">Choose file</b>.</li>
   </ol>
 
-  <h2 class="heading-medium" id="letter-specification">Letter specification</h2>
+  <h2 class="heading-medium" id="letter-specification">Your file must meet our letter specification</h2>
+
+  <p>The content of your letter must appear inside the printable area.</p>
 
   <p>Your file must be:</p>
 
@@ -31,15 +32,7 @@
     <li>10 pages or less</li>
     <li>smaller than 2MB</li>
   </ul>
-  
-  <p>The content of your letter must appear inside the printable area.</p>
-  
-  <p>To help you set up your letter, you can download:</p>
 
-  <ul class="list list-bullet">
-    <li>our <a href="{{ url_for('.letter_spec') }}">letter specification document (PDF)</a></li>
-    <li>a <a href="https://docs.notifications.service.gov.uk/documentation/images/notify-pdf-letter-word-template-v1.0.docx">Microsoft Word document template (.docx)</a></li>
-  </ul>
-
+  <p>To help you set up your letter, you can download our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.letter_spec') }}">letter specification document (PDF)</a>.</p>
 
 {% endblock %}

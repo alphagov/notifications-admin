@@ -140,7 +140,7 @@ def test_choose_account_should_show_choose_accounts_page_if_no_services(
     resp = client_request.get('main.choose_account')
     page = resp.find('main', {'id': 'main-content'})
 
-    links = page.findAll('a')
+    links = page.find_all('a')
     assert len(links) == 1
     add_service_link = links[0]
     assert normalize_spaces(page.h1.text) == 'Choose service'
@@ -271,6 +271,7 @@ def test_should_show_back_to_service_if_user_belongs_to_service(
         ''
         'Dashboard '
         'Templates '
+        'Uploads '
         'Team members'
     )
 

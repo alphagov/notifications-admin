@@ -1,11 +1,11 @@
 .table {
-  margin-bottom: $gutter;
+  margin-bottom: govuk-spacing(6);
   width: 100%;
 }
 
 .table-heading {
   text-align: left;
-  margin: $gutter-half 0 $gutter-half 0;
+  margin: govuk-spacing(3) 0 govuk-spacing(3) 0;
 }
 
 .dashboard-table {
@@ -47,6 +47,10 @@
         text-overflow: ellipsis;
       }
     }
+  }
+
+  .big-number-label {
+    padding-bottom: 0;
   }
 
 }
@@ -115,7 +119,7 @@
 
   table {
     table-layout: fixed;
-    margin-bottom: $gutter / 6;
+    margin-bottom: govuk-spacing(1);
   }
 
   th {
@@ -211,15 +215,6 @@
 
       color: $error-colour;
       font-weight: bold;
-
-      a {
-
-        &:link,
-        &:visited {
-          color: $error-colour;
-        }
-
-      }
 
       .status-hint {
         display: block;
@@ -348,30 +343,20 @@
 
       position: absolute;
 
-      top: -$gutter-half;
+      top: -1 * govuk-spacing(3);
       right: 0;
-      bottom: -$gutter-half + 4px;
-      left: -$gutter-half;
+      bottom: -1 * govuk-spacing(3) + 4px;
+      left: -1 * govuk-spacing(3);
 
       background: transparent;
     }
 
-    &:hover {
-      color: $link-hover-colour;
-    }
-
-    &:active,
-    &:focus {
-
-      color: $black;
-
-      &:before {
-        border-color: $yellow;
-        border-style: solid;
-        border-width: 15px 3px 15px 15px;
-        right: -3px;
-      }
-
+    &:active:before,
+    &:focus:before {
+      border-color: $yellow;
+      border-style: solid;
+      border-width: 15px 3px 15px 15px;
+      right: -3px;
     }
 
   }
@@ -396,13 +381,13 @@ td.table-empty-message {
 
   @include core-16;
   color: $secondary-text-colour;
-  margin-bottom: $gutter * 1.3333;
+  margin-bottom: govuk-spacing(7);
   border-bottom: 1px solid $border-colour;
   padding: 35px 0 10px 0;
   text-align: center;
 
   .table + & {
-    margin-top: -$gutter;
+    margin-top: -1 * govuk-spacing(6);
   }
 
 }
@@ -415,7 +400,7 @@ a.table-show-more-link {
   @include core-16;
   color: $secondary-text-colour;
   margin-top: 10px;
-  margin-bottom: $gutter * 1.3333;
+  margin-bottom: govuk-spacing(7);
   border-top: 1px solid $border-colour;
   border-bottom: 1px solid $border-colour;
   padding: 0.75em 0 0.5625em 0;

@@ -14,6 +14,7 @@ from app import current_service, service_api_client
 from app.event_handlers import (
     create_email_change_event,
     create_mobile_number_change_event,
+    create_remove_user_from_service_event,
 )
 from app.main import main
 from app.main.forms import (
@@ -132,6 +133,8 @@ def remove_user_from_service(service_id, user_id):
                 service_id=service_id))
         else:
             abort(500, e)
+    else:
+        create_remove_user_from_service_event(user_id=user_id, removed_by_id=current_user.id, service_id=service_id)
 
     return redirect(url_for(
         '.manage_users',

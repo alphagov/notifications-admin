@@ -476,15 +476,15 @@ describe('Live search', () => {
               <span class="live-search-relevant">${user.label} (${user.email})</span> (invited)
             </span>
           </h3>
-          <ul class="tick-cross-list">
-            <div class="tick-cross-list-permissions">
+          <ul class="tick-cross-list govuk-grid-row">
+            <div class="tick-cross-list-permissions govuk-grid-column-three-quarters">
               ${getPermissionsHTML(user.permissions)}
               <div class="tick-cross-list-hint">
                   Can see 15 folders
               </div>
             </div>
             <li class="tick-cross-list-edit-link">
-              <a href="/services/6658542f-0cad-491f-bec8-ab8457700ead/cancel-invited-user/21d6d54f-51e2-44ba-b48f-545d678c4c64">Cancel invitation</a>
+              <a class="govuk-link govuk-link--no-visited-state" href="/services/6658542f-0cad-491f-bec8-ab8457700ead/cancel-invited-user/21d6d54f-51e2-44ba-b48f-545d678c4c64">Cancel invitation</a>
             </li>
           </ul>
         </div>`);

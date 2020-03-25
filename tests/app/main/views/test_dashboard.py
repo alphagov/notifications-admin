@@ -1,7 +1,6 @@
 import copy
 import json
 from datetime import datetime
-from unittest.mock import call
 
 import pytest
 from bs4 import BeautifulSoup
@@ -143,7 +142,8 @@ def test_get_started(
     mock_get_service_statistics,
     mock_get_usage,
     mock_get_free_sms_fragment_limit,
-    mock_get_inbound_sms_summary
+    mock_get_inbound_sms_summary,
+    mock_get_returned_letter_summary_with_no_returned_letters,
 ):
     mocker.patch(
         'app.template_statistics_client.get_template_statistics_for_service',
@@ -167,7 +167,8 @@ def test_get_started_is_hidden_once_templates_exist(
     mock_get_service_statistics,
     mock_get_usage,
     mock_get_free_sms_fragment_limit,
-    mock_get_inbound_sms_summary
+    mock_get_inbound_sms_summary,
+    mock_get_returned_letter_summary_with_no_returned_letters,
 ):
     mocker.patch(
         'app.template_statistics_client.get_template_statistics_for_service',
@@ -184,6 +185,7 @@ def test_get_started_is_hidden_once_templates_exist(
 
 def test_inbound_messages_not_visible_to_service_without_permissions(
     client_request,
+    mocker,
     service_one,
     mock_get_service_templates_when_no_templates_exist,
     mock_get_jobs,
@@ -191,7 +193,8 @@ def test_inbound_messages_not_visible_to_service_without_permissions(
     mock_get_template_statistics,
     mock_get_usage,
     mock_get_free_sms_fragment_limit,
-    mock_get_inbound_sms_summary
+    mock_get_inbound_sms_summary,
+    mock_get_returned_letter_summary_with_no_returned_letters,
 ):
 
     service_one['permissions'] = []
@@ -216,13 +219,14 @@ def test_inbound_messages_shows_count_of_messages_when_there_are_messages(
     mock_get_usage,
     mock_get_free_sms_fragment_limit,
     mock_get_inbound_sms_summary,
+    mock_get_returned_letter_summary_with_no_returned_letters,
 ):
     service_one['permissions'] = ['inbound_sms']
     page = client_request.get(
         'main.service_dashboard',
         service_id=SERVICE_ONE_ID,
     )
-    banner = page.select_one('a.banner-dashboard')
+    banner = page.select('a.banner-dashboard')[1]
     assert normalize_spaces(
         banner.text
     ) == '9,999 text messages received latest message just now'
@@ -242,13 +246,14 @@ def test_inbound_messages_shows_count_of_messages_when_there_are_no_messages(
     mock_get_usage,
     mock_get_free_sms_fragment_limit,
     mock_get_inbound_sms_summary_with_no_messages,
+    mock_get_returned_letter_summary_with_no_returned_letters,
 ):
     service_one['permissions'] = ['inbound_sms']
     page = client_request.get(
         'main.service_dashboard',
         service_id=SERVICE_ONE_ID,
     )
-    banner = page.select_one('a.banner-dashboard')
+    banner = page.select('a.banner-dashboard')[1]
     assert normalize_spaces(banner.text) == '0 text messages received'
     assert banner['href'] == url_for(
         'main.inbox', service_id=SERVICE_ONE_ID
@@ -472,6 +477,129 @@ def test_download_inbox_strips_formulae(
     assert expected_cell in response.get_data(as_text=True).split('\r\n')[1]
 
 
+def test_returned_letters_not_visible_if_service_has_no_returned_letters(
+    client_request,
+    mocker,
+    service_one,
+    mock_get_service_templates_when_no_templates_exist,
+    mock_get_jobs,
+    mock_get_service_statistics,
+    mock_get_template_statistics,
+    mock_get_usage,
+    mock_get_free_sms_fragment_limit,
+    mock_get_inbound_sms_summary,
+    mock_get_returned_letter_summary_with_no_returned_letters,
+):
+    page = client_request.get(
+        'main.service_dashboard',
+        service_id=SERVICE_ONE_ID,
+    )
+    assert not page.select('#total-returned-letters')
+
+
+@freeze_time('2020-01-10')
+def test_returned_letters_shows_count_of_recently_returned_letters(
+    client_request,
+    mocker,
+    service_one,
+    mock_get_service_templates_when_no_templates_exist,
+    mock_get_jobs,
+    mock_get_service_statistics,
+    mock_get_template_statistics,
+    mock_get_usage,
+    mock_get_free_sms_fragment_limit,
+    mock_get_inbound_sms_summary,
+):
+    mocker.patch(
+        'app.service_api_client.get_returned_letter_summary',
+        return_value=[
+            # Today (should be counted)
+            {
+                'returned_letter_count': 1000, 'reported_at': '2020-01-10'
+            },
+            # Just within the last 7 days (should be counted)
+            {
+                'returned_letter_count': 3000, 'reported_at': '2020-01-3'
+            },
+            # Just after the last 7 days (should not be counted)
+            {
+                'returned_letter_count': 2000, 'reported_at': '2020-01-2'
+            },
+        ],
+    )
+    page = client_request.get(
+        'main.service_dashboard',
+        service_id=SERVICE_ONE_ID,
+    )
+    banner = page.select_one('#total-returned-letters')
+    assert normalize_spaces(
+        banner.text
+    ) == '4,000 returned letters latest report today'
+    assert banner['href'] == url_for(
+        'main.returned_letter_summary', service_id=SERVICE_ONE_ID
+    )
+
+
+@pytest.mark.parametrize('reporting_date, expected_message', (
+    ('2020-02-02', (
+        '1 returned letter latest report today'
+    )),
+    ('2020-02-01', (
+        '1 returned letter latest report yesterday'
+    )),
+    ('2020-01-31', (
+        '1 returned letter latest report 2 days ago'
+    )),
+    ('2020-01-26', (
+        '1 returned letter latest report 7 days ago'
+    )),
+    ('2020-01-25', (
+        '0 returned letters latest report 8 days ago'
+    )),
+    ('2020-01-01', (
+        '0 returned letters latest report 1 month ago'
+    )),
+    ('2019-09-09', (
+        '0 returned letters latest report 4 months ago'
+    )),
+    ('2010-10-10', (
+        '0 returned letters latest report 9 years ago'
+    )),
+))
+@freeze_time('2020-02-02')
+def test_returned_letters_only_counts_recently_returned_letters(
+    client_request,
+    mocker,
+    service_one,
+    mock_get_service_templates_when_no_templates_exist,
+    mock_get_jobs,
+    mock_get_service_statistics,
+    mock_get_template_statistics,
+    mock_get_usage,
+    mock_get_free_sms_fragment_limit,
+    mock_get_inbound_sms_summary_with_no_messages,
+    reporting_date,
+    expected_message,
+):
+    mocker.patch(
+        'app.service_api_client.get_returned_letter_summary',
+        return_value=[
+            {
+                'returned_letter_count': 1, 'reported_at': reporting_date
+            },
+        ],
+    )
+    page = client_request.get(
+        'main.service_dashboard',
+        service_id=SERVICE_ONE_ID,
+    )
+    banner = page.select_one('#total-returned-letters')
+    assert normalize_spaces(banner.text) == expected_message
+    assert banner['href'] == url_for(
+        'main.returned_letter_summary', service_id=SERVICE_ONE_ID
+    )
+
+
 def test_should_show_recent_templates_on_dashboard(
     client_request,
     mocker,
@@ -480,7 +608,8 @@ def test_should_show_recent_templates_on_dashboard(
     mock_get_service_statistics,
     mock_get_usage,
     mock_get_free_sms_fragment_limit,
-    mock_get_inbound_sms_summary
+    mock_get_inbound_sms_summary,
+    mock_get_returned_letter_summary_with_no_returned_letters,
 ):
     mock_template_stats = mocker.patch('app.template_statistics_client.get_template_statistics_for_service',
                                        return_value=copy.deepcopy(stub_template_stats))
@@ -495,7 +624,7 @@ def test_should_show_recent_templates_on_dashboard(
     headers = [header.text.strip() for header in page.find_all('h2') + page.find_all('h1')]
     assert 'In the last 7 days' in headers
 
-    table_rows = page.find_all('tbody')[1].find_all('tr')
+    table_rows = page.find_all('tbody')[0].find_all('tr')
 
     assert len(table_rows) == 4
 
@@ -534,6 +663,7 @@ def test_should_not_show_recent_templates_on_dashboard_if_only_one_template_used
     mock_get_usage,
     mock_get_free_sms_fragment_limit,
     mock_get_inbound_sms_summary,
+    mock_get_returned_letter_summary_with_no_returned_letters,
     stats,
 ):
     mock_template_stats = mocker.patch(
@@ -687,26 +817,33 @@ def test_should_show_upcoming_jobs_on_dashboard(
     mock_get_jobs,
     mock_get_usage,
     mock_get_free_sms_fragment_limit,
-    mock_get_inbound_sms_summary
+    mock_get_inbound_sms_summary,
+    mock_get_returned_letter_summary_with_no_returned_letters,
 ):
     page = client_request.get(
         'main.service_dashboard',
         service_id=SERVICE_ONE_ID,
     )
-
     second_call = mock_get_jobs.call_args_list[1]
     assert second_call[0] == (SERVICE_ONE_ID,)
     assert second_call[1]['statuses'] == ['scheduled']
 
-    table_rows = page.find_all('tbody')[0].find_all('tr')
-    assert len(table_rows) == 2
+    assert normalize_spaces(
+        page.select_one('main h2').text
+    ) == (
+        'In the next few days'
+    )
 
-    assert 'send_me_later.csv' in table_rows[0].find_all('th')[0].text
-    assert 'Sending today at 11:09am' in table_rows[0].find_all('th')[0].text
-    assert table_rows[0].find_all('td')[0].text.strip() == '1'
-    assert 'even_later.csv' in table_rows[1].find_all('th')[0].text
-    assert 'Sending today at 11:09pm' in table_rows[1].find_all('th')[0].text
-    assert table_rows[1].find_all('td')[0].text.strip() == '1'
+    assert normalize_spaces(
+        page.select_one('a.banner-dashboard').text
+    ) == (
+        '2 files waiting to send '
+        'sending starts today at 11:09am'
+    )
+
+    assert page.select_one('a.banner-dashboard')['href'] == url_for(
+        'main.uploads', service_id=SERVICE_ONE_ID
+    )
 
 
 @pytest.mark.parametrize('permissions', (
@@ -738,6 +875,7 @@ def test_correct_font_size_for_big_numbers(
     mock_get_jobs,
     mock_get_usage,
     mock_get_free_sms_fragment_limit,
+    mock_get_returned_letter_summary_with_no_returned_letters,
     service_one,
     permissions,
     totals,
@@ -756,49 +894,37 @@ def test_correct_font_size_for_big_numbers(
     )
 
     assert (
-        len(page.select_one('[data-key=totals]').select('.column-third'))
+        len(page.select_one('[data-key=totals]').select('.govuk-grid-column-one-third'))
     ) == (
-        len(page.select_one('[data-key=usage]').select('.column-third'))
+        len(page.select_one('[data-key=usage]').select('.govuk-grid-column-one-third'))
     ) == (
         len(page.select('.big-number-with-status .big-number-smaller'))
     ) == 3
 
 
-@freeze_time("2016-01-01 11:09:00.061258")
-def test_should_show_recent_jobs_on_dashboard(
+def test_should_not_show_jobs_on_dashboard_for_users_with_uploads_page(
     client_request,
+    service_one,
     mock_get_service_templates,
     mock_get_template_statistics,
     mock_get_service_statistics,
     mock_get_jobs,
     mock_get_usage,
     mock_get_free_sms_fragment_limit,
-    mock_get_inbound_sms_summary
+    mock_get_inbound_sms_summary,
+    mock_get_returned_letter_summary_with_no_returned_letters,
 ):
     page = client_request.get(
         'main.service_dashboard',
         service_id=SERVICE_ONE_ID,
     )
-
-    third_call = mock_get_jobs.call_args_list[2]
-    assert third_call[0] == (SERVICE_ONE_ID,)
-    assert third_call[1]['limit_days'] == 7
-    assert 'scheduled' not in third_call[1]['statuses']
-
-    table_rows = page.find_all('tbody')[1].find_all('tr')
-
-    assert len(table_rows) == 4
-
-    for index, filename in enumerate((
-            "export 1/1/2016.xls",
-            "all email addresses.xlsx",
-            "applicants.ods",
-            "thisisatest.csv",
-    )):
-        assert filename in table_rows[index].find_all('th')[0].text
-        assert 'Sent today at 11:09' in table_rows[index].find_all('th')[0].text
-        for column_index, count in enumerate((1, 0, 0)):
-            assert table_rows[index].find_all('td')[column_index].text.strip() == str(count)
+    for filename in {
+        "export 1/1/2016.xls",
+        "all email addresses.xlsx",
+        "applicants.ods",
+        "thisisatest.csv",
+    }:
+        assert filename not in page.select_one('main').text
 
 
 @freeze_time("2012-03-31 12:12:12")
@@ -817,7 +943,7 @@ def test_usage_page(
     mock_get_usage.assert_called_once_with(SERVICE_ONE_ID, 2011)
     mock_get_free_sms_fragment_limit.assert_called_with(SERVICE_ONE_ID, 2011)
 
-    cols = page.find_all('div', {'class': 'column-one-third'})
+    cols = page.find_all('div', {'class': 'govuk-grid-column-one-third'})
     nav = page.find('ul', {'class': 'pill', 'role': 'tablist'})
     nav_links = nav.find_all('a')
 
@@ -859,7 +985,7 @@ def test_usage_page_with_letters(
     mock_get_usage.assert_called_once_with(SERVICE_ONE_ID, 2011)
     mock_get_free_sms_fragment_limit.assert_called_with(SERVICE_ONE_ID, 2011)
 
-    cols = page.find_all('div', {'class': 'column-one-third'})
+    cols = page.find_all('div', {'class': 'govuk-grid-column-one-third'})
     nav = page.find('ul', {'class': 'pill', 'role': 'tablist'})
     nav_links = nav.find_all('a')
 
@@ -981,6 +1107,7 @@ def test_menu_send_messages(
     mock_get_usage,
     mock_get_inbound_sms_summary,
     mock_get_free_sms_fragment_limit,
+    mock_get_returned_letter_summary_with_no_returned_letters,
 ):
     service_one['permissions'] = ['email', 'sms', 'letter', 'upload_letters']
 
@@ -1016,6 +1143,7 @@ def test_menu_send_messages_when_service_does_not_have_upload_letters_permission
     mock_get_usage,
     mock_get_inbound_sms_summary,
     mock_get_free_sms_fragment_limit,
+    mock_get_returned_letter_summary_with_no_returned_letters,
 ):
     with app_.test_request_context():
         resp = _test_dashboard_menu(
@@ -1024,8 +1152,9 @@ def test_menu_send_messages_when_service_does_not_have_upload_letters_permission
             api_user_active,
             service_one,
             ['view_activity', 'send_messages'])
-        page = resp.get_data(as_text=True)
-        assert url_for('main.uploads', service_id=service_one['id']) not in page
+        page = BeautifulSoup(resp.data.decode('utf-8'), 'html.parser')
+        assert page.select_one('.navigation')
+        assert url_for('main.uploads', service_id=service_one['id']) not in page.select_one('.navigation')
 
 
 def test_menu_manage_service(
@@ -1039,6 +1168,7 @@ def test_menu_manage_service(
     mock_get_service_statistics,
     mock_get_usage,
     mock_get_inbound_sms_summary,
+    mock_get_returned_letter_summary_with_no_returned_letters,
     mock_get_free_sms_fragment_limit,
 ):
     with app_.test_request_context():
@@ -1070,6 +1200,7 @@ def test_menu_manage_api_keys(
     mock_get_service_statistics,
     mock_get_usage,
     mock_get_inbound_sms_summary,
+    mock_get_returned_letter_summary_with_no_returned_letters,
     mock_get_free_sms_fragment_limit,
 ):
     with app_.test_request_context():
@@ -1099,6 +1230,7 @@ def test_menu_all_services_for_platform_admin_user(
     mock_get_service_statistics,
     mock_get_usage,
     mock_get_inbound_sms_summary,
+    mock_get_returned_letter_summary_with_no_returned_letters,
     mock_get_free_sms_fragment_limit,
 ):
     with app_.test_request_context():
@@ -1130,7 +1262,8 @@ def test_route_for_service_permissions(
     mock_get_service_statistics,
     mock_get_usage,
     mock_get_free_sms_fragment_limit,
-    mock_get_inbound_sms_summary
+    mock_get_inbound_sms_summary,
+    mock_get_returned_letter_summary_with_no_returned_letters,
 ):
     with app_.test_request_context():
         validate_route_permission(
@@ -1183,7 +1316,8 @@ def test_service_dashboard_updates_gets_dashboard_totals(
     mock_get_jobs,
     mock_get_usage,
     mock_get_free_sms_fragment_limit,
-    mock_get_inbound_sms_summary
+    mock_get_inbound_sms_summary,
+    mock_get_returned_letter_summary_with_no_returned_letters,
 ):
     mocker.patch('app.main.views.dashboard.get_dashboard_totals', return_value={
         'email': {'requested': 123, 'delivered': 0, 'failed': 0},
@@ -1359,37 +1493,6 @@ def test_get_tuples_of_financial_years_defaults_to_2015():
     ))[0]
 
 
-@freeze_time("2016-01-01 11:09:00.061258")
-def test_should_show_all_jobs_with_valid_statuses(
-    logged_in_client,
-    mock_get_template_statistics,
-    mock_get_service_statistics,
-    mock_get_service_templates_when_no_templates_exist,
-    mock_get_jobs,
-    mock_get_usage,
-    mock_get_inbound_sms_summary,
-    mock_get_free_sms_fragment_limit,
-):
-    logged_in_client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
-
-    first_call = mock_get_jobs.call_args_list[0]
-    # first call - checking for any jobs
-    assert first_call == call(SERVICE_ONE_ID)
-    second_call = mock_get_jobs.call_args_list[1]
-    # second call - scheduled jobs only
-    assert second_call == call(SERVICE_ONE_ID, statuses=['scheduled'])
-    # third call - everything but scheduled and cancelled
-    third_call = mock_get_jobs.call_args_list[2]
-    assert third_call == call(SERVICE_ONE_ID, limit_days=7, statuses={
-        'pending',
-        'in progress',
-        'finished',
-        'sending limits exceeded',
-        'ready to send',
-        'sent to dvla'
-    })
-
-
 def test_org_breadcrumbs_do_not_show_if_service_has_no_org(
     client_request,
     mock_get_template_statistics,
@@ -1397,6 +1500,7 @@ def test_org_breadcrumbs_do_not_show_if_service_has_no_org(
     mock_get_jobs,
     mock_get_usage,
     mock_get_free_sms_fragment_limit,
+    mock_get_returned_letter_summary_with_no_returned_letters,
 ):
     page = client_request.get('main.service_dashboard', service_id=SERVICE_ONE_ID)
 
@@ -1411,6 +1515,7 @@ def test_org_breadcrumbs_do_not_show_if_user_is_not_an_org_member(
     active_caseworking_user,
     client_request,
     mock_get_template_folders,
+    mock_get_returned_letter_summary_with_no_returned_letters,
 ):
     # active_caseworking_user is not an org member
 
@@ -1433,6 +1538,7 @@ def test_org_breadcrumbs_show_if_user_is_a_member_of_the_services_org(
     mock_get_jobs,
     mock_get_usage,
     mock_get_free_sms_fragment_limit,
+    mock_get_returned_letter_summary_with_no_returned_letters,
     active_user_with_permissions,
     client_request,
 ):
@@ -1460,6 +1566,7 @@ def test_org_breadcrumbs_do_not_show_if_user_is_a_member_of_the_services_org_but
     mock_get_jobs,
     mock_get_usage,
     mock_get_free_sms_fragment_limit,
+    mock_get_returned_letter_summary_with_no_returned_letters,
     active_user_with_permissions,
     client_request,
 ):
@@ -1484,6 +1591,7 @@ def test_org_breadcrumbs_show_if_user_is_platform_admin(
     mock_get_jobs,
     mock_get_usage,
     mock_get_free_sms_fragment_limit,
+    mock_get_returned_letter_summary_with_no_returned_letters,
     platform_admin_user,
     platform_admin_client,
 ):
@@ -1515,6 +1623,7 @@ def test_should_show_usage_on_dashboard(
     mock_get_jobs,
     mock_get_usage,
     mock_get_free_sms_fragment_limit,
+    mock_get_returned_letter_summary_with_no_returned_letters,
     permissions,
 ):
     service_one['permissions'] = permissions

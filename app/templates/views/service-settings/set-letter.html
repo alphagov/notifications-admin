@@ -10,17 +10,17 @@
 
 {% block maincolumn_content %}
 
-  <div class="grid-row">
-    <div class="column-five-sixths">
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-five-sixths">
       {{ page_header(
         'Send letters',
         back_link=url_for('main.service_settings', service_id=current_service.id)
       ) }}
       <p>
-        It costs between 30p and 76p to send a letter using Notify.
+        It costs between 35p and 81p to send a letter using Notify.
       </p>
       <p>
-        See <a href="{{ url_for(".pricing", _anchor="letters") }}">pricing</a> for the list
+        See <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for(".pricing", _anchor="letters") }}">pricing</a> for the list
         of rates.
       </p>
       {% call form_wrapper() %}

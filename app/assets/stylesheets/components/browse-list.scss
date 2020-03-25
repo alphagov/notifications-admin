@@ -1,11 +1,11 @@
 .browse-list {
-  margin-bottom: $gutter-half;
+  margin-bottom: govuk-spacing(3);
 
   .browse-sub-list {
-    margin-top: $gutter-half;
-    margin-left: $gutter;
+    margin-top: govuk-spacing(3);
+    margin-left: govuk-spacing(6);
     @include media('desktop') {
-      margin-left: $gutter * 2;
+      margin-left: govuk-spacing(9);
     }
   }
 
@@ -13,26 +13,11 @@
   &-sub-item {
     @include bold-24;
     list-style: none;
-    margin-bottom: $gutter-half;
+    margin-bottom: govuk-spacing(3);
   }
 
   &-link {
-    @include bold-24;
-
-    &-destructive {
-      @include bold-24;
-      color: $error-colour;
-
-      &:visited,
-      &:link {
-        @include bold-24;
-        color: $error-colour;
-      }
-
-      &:hover {
-        color: $mellow-red;
-      }
-    }
+    @include govuk-font(24, $weight: bold);
   }
 
   &-hint {

@@ -1638,7 +1638,7 @@ def mock_check_verify_code_code_expired(mocker):
 
 @pytest.fixture(scope='function')
 def mock_create_job(mocker, api_user_active):
-    def _create(job_id, service_id, scheduled_for=None):
+    def _create(job_id, service_id, scheduled_for=None, contact_list_id=None):
         return job_json(
             service_id,
             api_user_active,
@@ -1652,6 +1652,14 @@ def mock_create_job(mocker, api_user_active):
 def mock_get_job(mocker, api_user_active):
     def _get_job(service_id, job_id):
         return {"data": job_json(service_id, api_user_active, job_id=job_id)}
+
+    return mocker.patch('app.job_api_client.get_job', side_effect=_get_job)
+
+
+@pytest.fixture(scope='function')
+def mock_get_letter_job(mocker, api_user_active):
+    def _get_job(service_id, job_id):
+        return {"data": job_json(service_id, api_user_active, job_id=job_id, template_type='letter')}
 
     return mocker.patch('app.job_api_client.get_job', side_effect=_get_job)
 
@@ -1700,6 +1708,20 @@ def mock_get_job_in_progress(mocker, api_user_active):
             notification_count=10,
             notifications_requested=5,
             job_status='processing',
+        )}
+
+    return mocker.patch('app.job_api_client.get_job', side_effect=_get_job)
+
+
+@pytest.fixture(scope='function')
+def mock_get_letter_job_in_progress(mocker, api_user_active):
+    def _get_job(service_id, job_id):
+        return {"data": job_json(
+            service_id, api_user_active, job_id=job_id,
+            notification_count=10,
+            notifications_requested=5,
+            job_status='processing',
+            template_type='letter',
         )}
 
     return mocker.patch('app.job_api_client.get_job', side_effect=_get_job)
@@ -1759,13 +1781,22 @@ def mock_get_uploads(mocker, api_user_active):
                     'notification_count': 10,
                     'created_at': '2016-01-01 11:09:00.061258',
                     'statistics': [{'count': 8, 'status': 'delivered'}, {'count': 2, 'status': 'temporary-failure'}],
-                    'upload_type': 'job'},
+                    'upload_type': 'job',
+                    'template_type': 'sms',
+                    'recipient': None},
                    {'id': 'letter_id_1',
                     'original_file_name': 'some.pdf',
                     'notification_count': 1,
                     'created_at': '2016-01-01 11:09:00.061258',
                     'statistics': [{'count': 1, 'status': 'delivered'}],
-                    'upload_type': 'letter'}
+                    'upload_type': 'letter',
+                    'template_type': None,
+                    'recipient': (
+                        'Firstname Lastname\n'
+                        '123 Example Street\n'
+                        'City of Town\n'
+                        'XM4 5QQ'
+                    )}
                    ]
         return {
             'data': uploads,
@@ -1776,6 +1807,104 @@ def mock_get_uploads(mocker, api_user_active):
         }
     # Why is mocking on the model needed?
     return mocker.patch('app.models.job.PaginatedUploads.client_method', side_effect=_get_uploads)
+
+
+@pytest.fixture(scope='function')
+def mock_get_no_uploads(mocker, api_user_active):
+    mocker.patch(
+        'app.models.job.PaginatedUploads.client_method',
+        return_value={
+            'data': [],
+        }
+    )
+
+
+@pytest.fixture(scope='function')
+def mock_create_contact_list(mocker, api_user_active):
+    def _create(
+        service_id,
+        upload_id,
+        original_file_name,
+        row_count,
+        template_type,
+    ):
+        return {
+            'service_id': service_id,
+            'upload_id': upload_id,
+            'original_file_name': original_file_name,
+            'row_count': row_count,
+            'template_type': template_type,
+        }
+
+    return mocker.patch(
+        'app.contact_list_api_client.create_contact_list',
+        side_effect=_create,
+    )
+
+
+@pytest.fixture(scope='function')
+def mock_get_contact_lists(mocker, api_user_active, fake_uuid):
+    def _get(service_id, template_type=None):
+        return [{
+            'created_at': '2020-03-13 10:59:56',
+            'created_by': 'Test User',
+            'id': fake_uuid,
+            'original_file_name': 'EmergencyContactList.xls',
+            'row_count': 100,
+            'service_id': service_id,
+            'template_type': 'email',
+        }, {
+            'created_at': '2020-03-13 13:00:00',
+            'created_by': 'Test User',
+            'id': 'd7b0bd1a-d1c7-4621-be5c-3c1b4278a2ad',
+            'original_file_name': 'phone number list.csv',
+            'row_count': 123,
+            'service_id': service_id,
+            'template_type': 'sms',
+        }]
+
+    return mocker.patch(
+        'app.models.contact_list.ContactLists.client_method',
+        side_effect=_get,
+    )
+
+
+@pytest.fixture(scope='function')
+def mock_get_contact_list(mocker, api_user_active, fake_uuid):
+    def _get(*, service_id, contact_list_id):
+        return {
+            'created_at': '2020-03-13 10:59:56',
+            'created_by': 'Test User',
+            'id': fake_uuid,
+            'original_file_name': 'EmergencyContactList.xls',
+            'row_count': 100,
+            'service_id': service_id,
+            'template_type': 'email',
+        }
+
+    return mocker.patch(
+        'app.models.contact_list.contact_list_api_client.get_contact_list',
+        side_effect=_get,
+    )
+
+
+@pytest.fixture(scope='function')
+def mock_get_no_contact_list(mocker, api_user_active, fake_uuid):
+    def _get(*, service_id, contact_list_id):
+        raise HTTPError(response=Mock(status_code=404))
+
+    return mocker.patch(
+        'app.models.contact_list.contact_list_api_client.get_contact_list',
+        side_effect=_get,
+    )
+
+
+@pytest.fixture(scope='function')
+def mock_get_no_contact_lists(mocker):
+    return mocker.patch(
+        'app.models.contact_list.ContactLists.client_method',
+        return_value=[],
+    )
 
 
 @pytest.fixture(scope='function')
@@ -3340,6 +3469,14 @@ def mock_get_service_history(mocker):
         ],
         'events': [],
     })
+
+
+@pytest.fixture(scope='function')
+def mock_get_returned_letter_summary_with_no_returned_letters(mocker):
+    return mocker.patch(
+        'app.service_api_client.get_returned_letter_summary',
+        return_value=[],
+    )
 
 
 def create_api_user_active(with_unique_id=False):

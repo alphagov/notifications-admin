@@ -107,8 +107,7 @@ describe('Enhanced textbox', () => {
 
         backgroundEl = textarea.nextElementSibling;
 
-        // element has box-sizing: border-box so width includes padding and border
-        expect(backgroundEl.style.width).toEqual('582px');
+        expect(backgroundEl.style.width).toEqual('576px');
         expect(backgroundEl.style.borderWidth).toEqual('1px');
 
       });
@@ -117,8 +116,7 @@ describe('Enhanced textbox', () => {
 
         backgroundEl = input.nextElementSibling;
 
-        // element has box-sizing: border-box so width includes padding and border
-        expect(backgroundEl.style.width).toEqual('582px');
+        expect(backgroundEl.style.width).toEqual('576px');
         expect(backgroundEl.style.borderWidth).toEqual('1px');
 
       });
@@ -147,7 +145,7 @@ describe('Enhanced textbox', () => {
       test("If the textbox is an <textarea>", () => {
 
         backgroundEl = textarea.nextElementSibling;
-        expect(backgroundEl.style.width).toEqual('582px');
+        expect(backgroundEl.style.width).toEqual('576px');
 
       });
 
@@ -256,7 +254,7 @@ describe('Enhanced textbox', () => {
   describe("When the content of the textbox is updated", () => {
 
     // doesn't apply to inputs as they have a fixed height
-    test("If new input changes the textarea's dimensions, the size of the element below should still match", () => {
+    test("If new input changes the textarea's height, the height of the element below should still match", () => {
 
       // set 10 lines of content
       textarea.textContent = `
@@ -286,6 +284,23 @@ describe('Enhanced textbox', () => {
       helpers.triggerEvent(textarea, 'input');
 
       expect(window.getComputedStyle(textarea).height).toEqual("248px");
+
+    });
+
+    test("If a resize changes the textarea's width, the width of the element below should still match", () => {
+      // start module
+      window.GOVUK.modules.start();
+
+      backgroundEl = textarea.nextElementSibling;
+
+      expect(window.getComputedStyle(textarea).width).toEqual("576px");
+      expect(window.getComputedStyle(backgroundEl).width).toEqual("576px");
+
+      textarea.style.width = "500px"
+      helpers.triggerEvent(window, 'resize');
+
+      expect(window.getComputedStyle(textarea).width).toEqual("500px");
+      expect(window.getComputedStyle(backgroundEl).width).toEqual("500px");
 
     });
 

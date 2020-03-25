@@ -9,8 +9,8 @@
 {% endblock %}
 
 {% block maincolumn_content %}
-  <div class="grid-row">
-    <div class="column-five-sixths">
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-five-sixths">
 
       {{ page_header(
         'Callbacks for delivery receipts',
@@ -19,7 +19,7 @@
 
       <p>
         When you send an email or text message, we can tell you if Notify was able to deliver it.
-        Read the Callbacks section of our <a href="{{ url_for('main.documentation') }}">API documentation</a> for more information.
+        Read the Callbacks section of our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.documentation') }}">API documentation</a> for more information.
       </p>
 
       {% call form_wrapper() %}

@@ -9,7 +9,7 @@
 {% set file_contents_header_id = 'file-preview' %}
 {% macro skip_to_file_contents() %}
   <p class="govuk-visually-hidden">
-    <a href="#{{ file_contents_header_id }}">Skip to file contents</a>
+    <a class="govuk-link govuk-link--no-visited-state" href="#{{ file_contents_header_id }}">Skip to file contents</a>
   </p>
 {% endmacro %}
 
@@ -37,6 +37,7 @@
     <form method="post" enctype="multipart/form-data" action="{{url_for('main.start_job', service_id=current_service.id, upload_id=upload_id, original_file_name=original_file_name)}}" class='page-footer'>
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
       <input type="hidden" name="help" value="{{ '3' if help else 0 }}" />
+      <input type="hidden" name="contact_list_id" value="{{ request.args.get('contact_list_id', '') }}" />
       {% if choose_time_form and template.template_type != 'letter' %}
         {{ radio_select(
           choose_time_form.scheduled_for,
@@ -76,7 +77,7 @@
             {% if (item.index + 2) == preview_row %}
               {{ item.index + 2 }}
             {% else %}
-              <a href="{{ url_for('.check_messages', service_id=current_service.id, template_id=template.id, upload_id=upload_id, row_index=(item.index + 2), original_file_name=original_file_name) }}">{{ item.index + 2 }}</a>
+              <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.check_messages', service_id=current_service.id, template_id=template.id, upload_id=upload_id, row_index=(item.index + 2), original_file_name=original_file_name) }}">{{ item.index + 2 }}</a>
             {% endif %}
           </span>
         {% endcall %}

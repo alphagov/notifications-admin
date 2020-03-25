@@ -7,18 +7,45 @@
 {% endblock %}
 
 {% block maincolumn_content %}
-    <h1 class="heading-large">Uploads</h1>
+    <h1 class="heading-medium">Uploads</h1>
     <div class="dashboard">
-      {{ scheduled_jobs|safe }}
-      {% include 'views/dashboard/_jobs.html' %}
+      {% if show_scheduled_jobs %}
+        {% with hide_heading = True %}
+          {% include 'views/jobs/_scheduled.html' %}
+        {% endwith %}
+      {% endif %}
+      {% if jobs %}
+        {% include 'views/dashboard/_jobs.html' %}
+      {% endif %}
+      {% if not jobs and not show_scheduled_jobs %}
+        <p class="govuk-body">
+          You have not uploaded any files recently.
+        </p>
+        {% if current_service.has_permission('upload_letters') %}
+          <p class="govuk-body">
+            Upload a letter and Notify will print, pack and post it for you.
+          </p>
+        {% endif %}
+        <p class="govuk-body">
+          To upload a list of contact details, first <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.choose_template', service_id=current_service.id) }}">choose a template</a>.
+        </p>
+      {% endif %}
       {{ previous_next_navigation(prev_page, next_page) }}
-      {% if current_service.can_upload_letters and current_user.has_permissions('send_messages') %}
+      {% if current_user.has_permissions('send_messages') %}
         <div class="js-stick-at-bottom-when-scrolling">
+          {% if current_service.has_permission('letter') %}
+            {{ govukButton({
+              "element": "a",
+              "text": "Upload a letter",
+              "href": url_for('.upload_letter', service_id=current_service.id),
+              "classes": "govuk-button--secondary"
+            }) }}
+          {% endif %}
           {{ govukButton({
             "element": "a",
-            "text": "Upload a letter",
-            "href": url_for('.upload_letter', service_id=current_service.id),
-            "classes": "govuk-button--secondary"
+            "text": "Upload an emergency contact list",
+            "href": url_for('.upload_contact_list', service_id=current_service.id),
+            "classes": "govuk-button--secondary govuk-!-margin-left-3"
           }) }}
         </div>
       {% endif %}

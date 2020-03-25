@@ -22,7 +22,7 @@
       {{ page_title }}
     </h1>
     {% if current_user.has_permissions('manage_templates') %}
-       <p class="bottom-gutter top-gutter">
+       <p class="govuk-body">
          You need a template before you can send
          {% if 'letter' in current_service.permissions %}
            emails, text messages or letters
@@ -31,7 +31,7 @@
          {%- endif %}.
        </p>
     {% else %}
-      <p class="top-gutter">
+      <p class="govuk-body">
         You need to ask your service manager to add templates before you can send
         {% if 'letter' in current_service.permissions %}
           emails, text messages or letters
@@ -43,8 +43,8 @@
 
   {% else %}
 
-    <div class="grid-row">
-      <div class="{% if current_user.has_permissions('manage_templates') %} column-five-sixths {% else %} column-whole {% endif %}">
+    <div class="govuk-grid-row">
+      <div class="{% if current_user.has_permissions('manage_templates') %} govuk-grid-column-five-sixths {% else %} govuk-grid-column-full {% endif %}">
         {{ folder_path(
           folders=template_folder_path,
           service_id=current_service.id,
@@ -53,8 +53,8 @@
         ) }}
       </div>
       {% if current_user.has_permissions('manage_templates') and current_template_folder_id and user_has_template_folder_permission %}
-        <div class="column-one-sixth">
-          <a href="{{ url_for('.manage_template_folder', service_id=current_service.id, template_folder_id=current_template_folder_id) }}" class="folder-heading-manage-link">Manage</a>
+        <div class="govuk-grid-column-one-sixth">
+          <a href="{{ url_for('.manage_template_folder', service_id=current_service.id, template_folder_id=current_template_folder_id) }}" class="govuk-link govuk-link--no-visited-state folder-heading-manage-link">Manage<span class="govuk-visually-hidden"> this folder</span></a>
         </div>
       {% endif %}
     </div>

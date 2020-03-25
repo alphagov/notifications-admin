@@ -2,22 +2,18 @@
 
   @include core-16;
   color: $secondary-text-colour;
-  margin-top: -$gutter-half;
+  margin-top: -1 * govuk-spacing(3);
 
   &.error {
 
-    color: $error-colour;
+    color: $govuk-error-colour;
     font-weight: bold;
-
-    a {
-      color: $error-colour;
-    }
 
   }
 
   &-cancelled {
     @include bold-19;
-    color: $error-colour;
+    color: $govuk-error-colour;
   }
 
 }

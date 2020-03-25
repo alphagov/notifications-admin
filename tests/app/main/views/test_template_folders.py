@@ -538,7 +538,7 @@ def test_get_manage_folder_viewing_permissions_for_users(
     assert checkboxes[1]['value'] == team_member_2['id']
     assert "checked" in checkboxes[1].attrs
 
-    assert "Test User" in page.findAll('label', {'for': 'users_with_permission-0'})[0].text
+    assert "Test User" in page.find_all('label', {'for': 'users_with_permission-0'})[0].text
 
 
 def test_get_manage_folder_viewing_permissions_for_users_not_visible_when_no_manage_settings_permission(

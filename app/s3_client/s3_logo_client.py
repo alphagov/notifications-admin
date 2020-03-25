@@ -80,17 +80,6 @@ def upload_letter_temp_logo(filename, filedata, region, user_id):
     return upload_filename
 
 
-def upload_letter_png_logo(filename, filedata, region):
-    bucket_name = current_app.config['LOGO_UPLOAD_BUCKET_NAME']
-    utils_s3upload(
-        filedata=filedata,
-        region=region,
-        bucket_name=bucket_name,
-        file_location=filename,
-        content_type='image/png'
-    )
-
-
 def permanent_email_logo_name(filename, user_id):
     if filename.startswith(TEMP_TAG.format(user_id=user_id)):
         return get_temp_truncated_filename(filename=filename, user_id=user_id)

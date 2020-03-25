@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 from flask import url_for
 
 from app.main.forms import FieldWithNoneOption
-from tests.conftest import normalize_spaces, sample_uuid
+from tests.conftest import SERVICE_ONE_ID, normalize_spaces, sample_uuid
 
 
 def test_non_logged_in_user_can_see_homepage(
@@ -109,6 +109,34 @@ def test_static_pages(
     request()
 
 
+def test_guidance_pages_link_to_service_pages_when_signed_in(
+    client_request,
+):
+    request = partial(client_request.get, 'main.edit_and_format_messages')
+    selector = '.list-number li a'
+
+    # Check the page loads when user is signed in
+    page = request()
+    assert page.select_one(selector)['href'] == url_for(
+        'main.choose_template',
+        service_id=SERVICE_ONE_ID,
+    )
+
+    # Check it still works when they don’t have a recent service
+    with client_request.session_transaction() as session:
+        session['service_id'] = None
+    page = request()
+    assert not page.select_one(selector)
+
+    # Check it still works when they sign out
+    client_request.logout()
+    with client_request.session_transaction() as session:
+        session['service_id'] = None
+        session['user_id'] = None
+    page = request()
+    assert not page.select_one(selector)
+
+
 @pytest.mark.parametrize('view, expected_view', [
     ('information_risk_management', 'security'),
     ('old_integration_testing', 'integration_testing'),
@@ -153,12 +181,12 @@ def test_old_integration_testing_page(
         'main.integration_testing',
         _expected_status=410,
     )
-    assert normalize_spaces(page.select_one('.grid-row').text) == (
+    assert normalize_spaces(page.select_one('.govuk-grid-row').text) == (
         'Integration testing '
         'This information has moved. '
         'Refer to the documentation for the client library you are using.'
     )
-    assert page.select_one('.grid-row a')['href'] == url_for(
+    assert page.select_one('.govuk-grid-row a')['href'] == url_for(
         'main.documentation'
     )
 

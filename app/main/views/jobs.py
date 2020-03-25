@@ -51,19 +51,16 @@ def view_jobs(service_id):
     if jobs.next_page:
         next_page = generate_next_dict('main.view_jobs', service_id, jobs.current_page)
 
-    scheduled_jobs = ''
-    if not current_user.has_permissions('view_activity') and jobs.current_page == 1:
-        scheduled_jobs = render_template(
-            'views/dashboard/_upcoming.html',
-            hide_heading=True,
-        )
-
     return render_template(
         'views/jobs/jobs.html',
         jobs=jobs,
         prev_page=prev_page,
         next_page=next_page,
-        scheduled_jobs=scheduled_jobs,
+        show_scheduled_jobs=(
+            jobs.current_page == 1
+            and not current_user.has_permissions('view_activity')
+            and current_service.scheduled_jobs
+        ),
     )
 
 
@@ -93,10 +90,7 @@ def view_job(service_id, job_id):
             status=request.args.get('status', ''),
         ),
         partials=get_job_partials(job),
-        just_sent=bool(
-            request.args.get('just_sent') == 'yes'
-            and job.template_type == 'letter'
-        ),
+        just_sent=request.args.get('just_sent') == 'yes',
         just_sent_message=just_sent_message,
     )
 

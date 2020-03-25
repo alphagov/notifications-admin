@@ -14,7 +14,7 @@
   <ul>
   {% for service in current_org.trial_services %}
     <li class="browse-list-item">
-      <a href="{{ url_for('main.service_dashboard', service_id=service.id) }}" class="browse-list-link">{{ service['name'] }}</a>
+      <a href="{{ url_for('main.service_dashboard', service_id=service.id) }}" class="govuk-link govuk-link--no-visited-state browse-list-link">{{ service['name'] }}</a>
     </li>
   {% endfor %}
   </ul>

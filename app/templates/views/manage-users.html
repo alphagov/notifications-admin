@@ -38,8 +38,8 @@
             {% endif %}
           </span>
         </h3>
-        <ul class="tick-cross-list">
-          <div class="tick-cross-list-permissions">
+        <ul class="tick-cross-list govuk-grid-row">
+          <div class="tick-cross-list-permissions govuk-grid-column-three-quarters">
             {% for permission, label in permissions %}
               {{ tick_cross(
                 user.has_permission_for_service(current_service.id, permission),
@@ -73,9 +73,9 @@
           {% if current_user.has_permissions('manage_service') %}
             <li class="tick-cross-list-edit-link">
               {% if user.status == 'pending' %}
-                <a href="{{ url_for('.cancel_invited_user', service_id=current_service.id, invited_user_id=user.id)}}">Cancel invitation</a>
+                <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.cancel_invited_user', service_id=current_service.id, invited_user_id=user.id)}}">Cancel invitation</a>
               {% elif user.state == 'active' and current_user.id != user.id %}
-                <a href="{{ url_for('.edit_user_permissions', service_id=current_service.id, user_id=user.id)}}">Change details</a>
+                <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.edit_user_permissions', service_id=current_service.id, user_id=user.id)}}">Change details</a>
               {% endif %}
             </li>
           {% endif %}

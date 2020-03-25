@@ -16,16 +16,16 @@
 
   {% call form_wrapper(
       action=url_for('.find_services_by_name'),
-      class='grid-row'
+      class='govuk-grid-row'
   ) %}
-    <div class="column-three-quarters">
+    <div class="govuk-grid-column-three-quarters">
       {{ textbox(
         form.search,
         width='1-1',
         label='Find services by name, or by partial name'
       ) }}
     </div>
-    <div class="column-one-quarter">
+    <div class="govuk-grid-column-one-quarter">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
       {{ govukButton({
         "text": "Search",
@@ -43,7 +43,7 @@
     <ul>
     {% for service in services_found %}
       <li class="browse-list-item">
-        <a href="{{url_for('.service_dashboard', service_id=service.id)}}" class="browse-list-link">{{ service.name }}</a>
+        <a href="{{url_for('.service_dashboard', service_id=service.id)}}" class="govuk-link govuk-link--no-visited-state">{{ service.name }}</a>
       </li>
       <hr>
     {% endfor %}

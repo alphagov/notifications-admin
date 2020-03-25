@@ -1,7 +1,12 @@
+from datetime import datetime, timedelta
+
+from dateutil.parser import parse
 from flask import abort, current_app
+from notifications_utils.timezones import local_timezone
 from werkzeug.utils import cached_property
 
 from app.models import JSONModel
+from app.models.contact_list import ContactLists
 from app.models.job import (
     ImmediateJobs,
     PaginatedJobs,
@@ -481,6 +486,12 @@ class Service(JSONModel):
         return bool(self.inbound_number)
 
     @cached_property
+    def inbound_sms_summary(self):
+        if not self.has_permission('inbound_sms'):
+            return None
+        return service_api_client.get_inbound_sms_summary(self.id)
+
+    @cached_property
     def all_template_folders(self):
         return sorted(
             template_folder_api_client.get_template_folders(self.id),
@@ -660,3 +671,32 @@ class Service(JSONModel):
         ):
             if test:
                 yield BASE + '_incomplete' + tag
+
+    @cached_property
+    def returned_letter_summary(self):
+        return service_api_client.get_returned_letter_summary(self.id)
+
+    @property
+    def most_recent_returned_letter_report(self):
+        if not self.returned_letter_summary:
+            return None
+        return parse(
+            self.returned_letter_summary[0]['reported_at'] + " 00:00:00"
+        ).replace(tzinfo=local_timezone)
+
+    @property
+    def count_of_returned_letters_in_last_7_days(self):
+        seven_days_ago = (
+            datetime.now() - timedelta(days=7)
+        ).replace(
+            hour=0, minute=0, second=0
+        )
+        return sum(
+            report['returned_letter_count']
+            for report in self.returned_letter_summary
+            if parse(report['reported_at'] + " 00:00:00") >= seven_days_ago
+        )
+
+    @property
+    def contact_lists(self):
+        return ContactLists(self.id)

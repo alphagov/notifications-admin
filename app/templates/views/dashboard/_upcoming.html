@@ -4,38 +4,24 @@
 
 <div class="ajax-block-container">
   {% if current_service.scheduled_jobs %}
-    <div class='dashboard-table'>
-      {% if not hide_heading %}
-        <h2 class="heading-medium heading-upcoming-jobs">
-          In the next few days
-        </h2>
-      {% endif %}
-      {% call(item, row_number) list_table(
-        current_service.scheduled_jobs,
-        caption="In the next few days",
-        caption_visible=False,
-        empty_message='Nothing to see here',
-        field_headings=[
-          'File',
-          'Messages to be sent'
-        ],
-        field_headings_visible=True
-      ) %}
-        {% call row_heading() %}
-          <div class="file-list">
-            <a class="file-list-filename" href="{{ url_for('.view_job', service_id=current_service.id, job_id=item.id) }}">{{ item.original_file_name }}</a>
-            <span class="file-list-hint">
-              Sending {{ item.scheduled_for|format_datetime_relative }}
-            </span>
-          </div>
-        {% endcall %}
-        {% call field() %}
-          {{ big_number(
-            item.notification_count,
-            smallest=True
-          ) }}
-        {% endcall %}
-      {% endcall %}
-    </div>
+    <h2 class="heading-medium heading-upcoming-jobs">
+      In the next few days
+    </h2>
+    <a class="govuk-link govuk-link--no-visited-state banner-dashboard" href="{{ url_for('.uploads', service_id=current_service.id) }}">
+      <span class="banner-dashboard-count">
+        {{ current_service.scheduled_jobs|length }}
+      </span>
+      <span class="banner-dashboard-count-label">
+        {% if current_service.scheduled_jobs|length == 1 %}
+          file waiting to send
+        {% else %}
+          files waiting to send
+        {% endif %}
+      </span>
+      <span class="banner-dashboard-meta">
+        sending starts
+        {{ current_service.scheduled_jobs[-1].scheduled_for|format_datetime_relative }}
+      </span>
+    </a>
   {% endif %}
 </div>

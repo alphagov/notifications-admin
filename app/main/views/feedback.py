@@ -1,67 +1,79 @@
 from datetime import datetime
 
 import pytz
-from flask import abort, redirect, render_template, request, session, url_for
+from flask import redirect, render_template, request, session, url_for
 from flask_login import current_user
 
 from app import convert_to_boolean, current_service, service_api_client
 from app.extensions import zendesk_client
 from app.main import main
-from app.main.forms import Feedback, Problem, SupportType, Triage
-
-QUESTION_TICKET_TYPE = 'ask-question-give-feedback'
-PROBLEM_TICKET_TYPE = "report-problem"
-
-
-def get_prefilled_message():
-    return {
-        'agreement': (
-            'Please can you tell me if there’s an agreement in place '
-            'between GOV.UK Notify and my organisation?'
-        ),
-        'letter-branding': (
-            'I would like my own logo on my letter templates.'
-        ),
-    }.get(
-        request.args.get('body'), ''
-    )
+from app.main.forms import (
+    FeedbackOrProblem,
+    SupportRedirect,
+    SupportType,
+    Triage,
+)
+from app.models.feedback import (
+    GENERAL_TICKET_TYPE,
+    PROBLEM_TICKET_TYPE,
+    QUESTION_TICKET_TYPE,
+)
 
 
 @main.route('/support', methods=['GET', 'POST'])
 def support():
-    form = SupportType()
-    if form.validate_on_submit():
-        return redirect(url_for(
-            '.feedback',
-            ticket_type=form.support_type.data,
-        ))
+
+    if current_user.is_authenticated:
+        form = SupportType()
+        if form.validate_on_submit():
+            return redirect(url_for(
+                '.feedback',
+                ticket_type=form.support_type.data,
+            ))
+    else:
+        form = SupportRedirect()
+        if form.validate_on_submit():
+            if form.who.data == 'public':
+                return redirect(url_for(
+                    '.support_public'
+                ))
+            else:
+                return redirect(url_for(
+                    '.feedback',
+                    ticket_type=GENERAL_TICKET_TYPE,
+                ))
+
     return render_template('views/support/index.html', form=form)
 
 
+@main.route('/support/public')
+def support_public():
+    return render_template('views/support/public.html')
+
+
 @main.route('/support/triage', methods=['GET', 'POST'])
-def triage():
+@main.route('/support/triage/<ticket_type:ticket_type>', methods=['GET', 'POST'])
+def triage(ticket_type=PROBLEM_TICKET_TYPE):
     form = Triage()
     if form.validate_on_submit():
         return redirect(url_for(
             '.feedback',
-            ticket_type=PROBLEM_TICKET_TYPE,
+            ticket_type=ticket_type,
             severe=form.severe.data
         ))
     return render_template(
         'views/support/triage.html',
-        form=form
+        form=form,
+        page_title={
+            PROBLEM_TICKET_TYPE: 'Report a problem',
+            GENERAL_TICKET_TYPE: 'Contact GOV.UK Notify support',
+        }.get(ticket_type)
     )
 
 
-@main.route('/support/<ticket_type>', methods=['GET', 'POST'])
+@main.route('/support/<ticket_type:ticket_type>', methods=['GET', 'POST'])
 def feedback(ticket_type):
-    try:
-        form = {
-            QUESTION_TICKET_TYPE: Feedback,
-            PROBLEM_TICKET_TYPE: Problem,
-        }[ticket_type]()
-    except KeyError:
-        abort(404)
+    form = FeedbackOrProblem()
 
     if not form.feedback.data:
         form.feedback.data = session.pop('feedback_message', '')
@@ -72,14 +84,14 @@ def feedback(ticket_type):
         severe = None
 
     out_of_hours_emergency = all((
-        ticket_type == PROBLEM_TICKET_TYPE,
+        ticket_type != QUESTION_TICKET_TYPE,
         not in_business_hours(),
         severe,
     ))
 
     if needs_triage(ticket_type, severe):
         session['feedback_message'] = form.feedback.data
-        return redirect(url_for('.triage'))
+        return redirect(url_for('.triage', ticket_type=ticket_type))
 
     if needs_escalation(ticket_type, severe):
         return redirect(url_for('.bat_phone'))
@@ -99,10 +111,9 @@ def feedback(ticket_type):
         else:
             service_string = ''
 
-        feedback_msg = '{}\n{}{}'.format(
+        feedback_msg = '{}\n{}'.format(
             form.feedback.data,
             service_string,
-            '' if user_email else '{} (no email address supplied)'.format(form.name.data)
         )
 
         zendesk_client.create_ticket(
@@ -121,13 +132,20 @@ def feedback(ticket_type):
             ),
         ))
 
-    if not form.feedback.data:
-        form.feedback.data = get_prefilled_message()
-
     return render_template(
-        'views/support/{}.html'.format(ticket_type),
+        'views/support/form.html',
         form=form,
-        ticket_type=ticket_type,
+        back_link=(
+            url_for('.support')
+            if severe is None else
+            url_for('.triage', ticket_type=ticket_type)
+        ),
+        show_status_page_banner=(ticket_type == PROBLEM_TICKET_TYPE),
+        page_title={
+            GENERAL_TICKET_TYPE: 'Contact GOV.UK Notify support',
+            PROBLEM_TICKET_TYPE: 'Report a problem',
+            QUESTION_TICKET_TYPE: 'Ask a question or give feedback',
+        }.get(ticket_type),
     )
 
 
@@ -237,7 +255,7 @@ def has_live_services(user_id):
 
 def needs_triage(ticket_type, severe):
     return all((
-        ticket_type == PROBLEM_TICKET_TYPE,
+        ticket_type != QUESTION_TICKET_TYPE,
         severe is None,
         (
             not current_user.is_authenticated or has_live_services(current_user.id)
@@ -248,7 +266,7 @@ def needs_triage(ticket_type, severe):
 
 def needs_escalation(ticket_type, severe):
     return all((
-        ticket_type == PROBLEM_TICKET_TYPE,
+        ticket_type != QUESTION_TICKET_TYPE,
         severe,
         not current_user.is_authenticated,
         not in_business_hours(),

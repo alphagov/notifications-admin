@@ -7,15 +7,15 @@
 
 {% block maincolumn_content %}
 
-<div class="grid-row">
-  <div class="column-two-thirds">
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
 
     <h1 class="heading-large">
       Download the GOV.UK Notify data sharing and financial agreement
     </h1>
 
     <p>
-      <a href="{{ download_link }}">Download the agreement</a>{% if owner %} for {{ owner }}{% endif %}.
+      <a class="govuk-link govuk-link--no-visited-state" href="{{ download_link }}">Download the agreement</a>{% if owner %} for {{ owner }}{% endif %}.
     </p>
     <p>
       The agreement contains commercially sensitive information. Do not share it outside your organisation.

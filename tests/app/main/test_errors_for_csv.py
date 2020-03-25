@@ -45,6 +45,16 @@ MockRecipients = namedtuple(
             ['fix 3 email addresses']
         ),
         (
+            {2}, [], [], [],
+            'letter',
+            ['fix 1 address']
+        ),
+        (
+            {2, 4}, [], [], [],
+            'letter',
+            ['fix 2 addresses']
+        ),
+        (
             {2}, {3}, [], [],
             'sms',
             [

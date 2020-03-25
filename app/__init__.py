@@ -1,11 +1,11 @@
-import itertools
 import os
+import re
 import urllib
 from datetime import datetime, timedelta, timezone
 from functools import partial
 from time import monotonic
 
-import ago
+import humanize
 import jinja2
 from flask import (
     Markup,
@@ -13,6 +13,7 @@ from flask import (
     flash,
     g,
     make_response,
+    redirect,
     render_template,
     request,
     session,
@@ -59,9 +60,11 @@ from app.navigation import (
     MainNavigation,
     OrgNavigation,
 )
+from app.notify_client import InviteTokenError
 from app.notify_client.api_key_api_client import api_key_api_client
 from app.notify_client.billing_api_client import billing_api_client
 from app.notify_client.complaint_api_client import complaint_api_client
+from app.notify_client.contact_list_api_client import contact_list_api_client
 from app.notify_client.email_branding_client import email_branding_client
 from app.notify_client.events_api_client import events_api_client
 from app.notify_client.inbound_number_client import inbound_number_client
@@ -89,6 +92,7 @@ from app.url_converters import (
     LetterFileExtensionConverter,
     SimpleDateTypeConverter,
     TemplateTypeConverter,
+    TicketTypeConverter,
 )
 from app.utils import format_thousands, get_logo_cdn_domain, id_safe
 
@@ -138,6 +142,7 @@ def create_app(application):
         # API clients
         api_key_api_client,
         billing_api_client,
+        contact_list_api_client,
         complaint_api_client,
         email_branding_client,
         events_api_client,
@@ -223,6 +228,7 @@ def init_app(application):
 
     application.url_map.converters['uuid'].to_python = lambda self, value: value
     application.url_map.converters['template_type'] = TemplateTypeConverter
+    application.url_map.converters['ticket_type'] = TicketTypeConverter
     application.url_map.converters['letter_file_extension'] = LetterFileExtensionConverter
     application.url_map.converters['simple_date'] = SimpleDateTypeConverter
 
@@ -291,7 +297,7 @@ def format_time_24h(date):
     return utc_string_to_aware_gmt_datetime(date).strftime('%H:%M')
 
 
-def get_human_day(time):
+def get_human_day(time, date_prefix=''):
 
     #  Add 1 minute to transform 00:00 into ‘midnight today’ instead of ‘midnight tomorrow’
     date = (utc_string_to_aware_gmt_datetime(time) - timedelta(minutes=1)).date()
@@ -304,8 +310,15 @@ def get_human_day(time):
     if date == (now - timedelta(days=1)).date():
         return 'yesterday'
     if date.strftime('%Y') != now.strftime('%Y'):
-        return '{} {}'.format(_format_datetime_short(date), date.strftime('%Y'))
-    return _format_datetime_short(date)
+        return '{} {} {}'.format(
+            date_prefix,
+            _format_datetime_short(date),
+            date.strftime('%Y'),
+        ).strip()
+    return '{} {}'.format(
+        date_prefix,
+        _format_datetime_short(date),
+    ).strip()
 
 
 def format_time(date):
@@ -334,8 +347,27 @@ def format_date_human(date):
     return get_human_day(date)
 
 
+def format_datetime_human(date, date_prefix=''):
+    return '{} at {}'.format(
+        get_human_day(date, date_prefix='on'),
+        format_time(date),
+    )
+
+
+def format_day_of_week(date):
+    return utc_string_to_aware_gmt_datetime(date).strftime('%A')
+
+
 def _format_datetime_short(datetime):
     return datetime.strftime('%d %B').lstrip('0')
+
+
+def naturaltime_without_indefinite_article(date):
+    return re.sub(
+        'an? (.*) ago',
+        lambda match: '1 {} ago'.format(match.group(1)),
+        humanize.naturaltime(date),
+    )
 
 
 def format_delta(date):
@@ -348,12 +380,17 @@ def format_delta(date):
         return "just now"
     if delta < timedelta(seconds=60):
         return "in the last minute"
-    return ago.human(
-        delta,
-        future_tense='{} from now',  # No-one should ever see this
-        past_tense='{} ago',
-        precision=1
-    )
+    return naturaltime_without_indefinite_article(delta)
+
+
+def format_delta_days(date):
+    now = datetime.now(timezone.utc)
+    date = utc_string_to_aware_gmt_datetime(date)
+    if date.strftime('%Y-%M-%D') == now.strftime('%Y-%M-%D'):
+        return "today"
+    if date.strftime('%Y-%M-%D') == (now - timedelta(days=1)).strftime('%Y-%M-%D'):
+        return "yesterday"
+    return naturaltime_without_indefinite_article(now - date)
 
 
 def valid_phone_number(phone_number):
@@ -584,8 +621,10 @@ def useful_headers_after_request(response):
 
 
 def register_errorhandlers(application):  # noqa (C901 too complex)
-    def _error_response(error_code):
-        resp = make_response(render_template("error/{0}.html".format(error_code)), error_code)
+    def _error_response(error_code, error_page_template=None):
+        if error_page_template is None:
+            error_page_template = error_code
+        resp = make_response(render_template("error/{0}.html".format(error_page_template)), error_code)
         return useful_headers_after_request(resp)
 
     @application.errorhandler(HTTPError)
@@ -596,15 +635,10 @@ def register_errorhandlers(application):  # noqa (C901 too complex)
             error.message
         ))
         error_code = error.status_code
-        if error_code == 400:
-            if isinstance(error.message, str):
-                msg = [error.message]
-            else:
-                msg = list(itertools.chain(*[error.message[x] for x in error.message.keys()]))
-            resp = make_response(render_template("error/400.html", message=msg))
-            return useful_headers_after_request(resp)
-        elif error_code not in [401, 404, 403, 410]:
-            # probably a 500 or 503
+        if error_code not in [401, 404, 403, 410]:
+            # probably a 500 or 503.
+            # it might be a 400, which we should handle as if it's an internal server error. If the API might
+            # legitimately return a 400, we should handle that within the view or the client that calls it.
             application.logger.exception("API {} failed with status {} message {}".format(
                 error.response.url if error.response else 'unknown',
                 error.status_code,
@@ -614,8 +648,10 @@ def register_errorhandlers(application):  # noqa (C901 too complex)
         return _error_response(error_code)
 
     @application.errorhandler(400)
-    def handle_400(error):
-        return _error_response(400)
+    def handle_client_error(error):
+        # This is tripped if we call `abort(400)`.
+        application.logger.exception('Unhandled 400 client error')
+        return _error_response(400, error_page_template=500)
 
     @application.errorhandler(410)
     def handle_gone(error):
@@ -658,19 +694,11 @@ def register_errorhandlers(application):  # noqa (C901 too complex)
             u'csrf.invalid_token: Aborting request, user_id: {user_id}',
             extra={'user_id': session['user_id']})
 
-        resp = make_response(render_template(
-            "error/400.html",
-            message=['Something went wrong, please go back and try again.']
-        ), 400)
-        return useful_headers_after_request(resp)
+        return _error_response(400, error_page_template=500)
 
     @application.errorhandler(405)
-    def handle_405(error):
-        resp = make_response(render_template(
-            "error/400.html",
-            message=['Something went wrong, please go back and try again.']
-        ), 405)
-        return useful_headers_after_request(resp)
+    def handle_method_not_allowed(error):
+        return _error_response(405, error_page_template=500)
 
     @application.errorhandler(WerkzeugHTTPException)
     def handle_http_error(error):
@@ -679,6 +707,11 @@ def register_errorhandlers(application):  # noqa (C901 too complex)
             return error
 
         return _error_response(error.code)
+
+    @application.errorhandler(InviteTokenError)
+    def handle_bad_invite_token(error):
+        flash(str(error))
+        return redirect(url_for('main.sign_in'))
 
     @application.errorhandler(500)
     @application.errorhandler(Exception)
@@ -742,8 +775,11 @@ def add_template_filters(application):
         format_date_human,
         format_date_normal,
         format_date_short,
+        format_datetime_human,
         format_datetime_relative,
+        format_day_of_week,
         format_delta,
+        format_delta_days,
         format_notification_status,
         format_notification_type,
         format_notification_status_as_time,

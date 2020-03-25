@@ -5,8 +5,8 @@
   &__item {
 
     counter-increment: get-started-counter;
-    padding: 0 0 0 $gutter + 5px;
-    margin: ($gutter * 1.67) 0 0 0;
+    padding: 0 0 0 govuk-spacing(6) + 5px;
+    margin: govuk-spacing(8) 0 0 0;
     position: relative;
 
     &:before {
@@ -26,7 +26,7 @@
   &__heading {
     @include bold-24;
     display: inline-block;
-    margin: 5px 0 $gutter-half 0;
+    margin: 5px 0 govuk-spacing(3) 0;
   }
 
 }

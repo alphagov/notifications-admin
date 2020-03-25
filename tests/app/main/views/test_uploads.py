@@ -1,41 +1,106 @@
 import re
 import urllib
-from unittest.mock import Mock
+import uuid
+from io import BytesIO
+from unittest.mock import ANY, Mock
 
 import pytest
 from flask import make_response, url_for
+from freezegun import freeze_time
 from requests import RequestException
 
 from app.main.views.uploads import format_recipient
 from app.utils import normalize_spaces
-from tests.conftest import SERVICE_ONE_ID
+from tests.conftest import (
+    SERVICE_ONE_ID,
+    create_active_caseworking_user,
+    create_active_user_with_permissions,
+    create_platform_admin_user,
+)
 
 
 @pytest.mark.parametrize('extra_permissions', (
-    [],
-    ['letter'],
-    ['upload_letters'],
     pytest.param(
-        ['letter', 'upload_letters'],
+        [],
         marks=pytest.mark.xfail(raises=AssertionError),
     ),
+    pytest.param(
+        ['upload_letters'],
+        marks=pytest.mark.xfail(raises=AssertionError),
+    ),
+    ['letter'],
+    ['letter', 'upload_letters'],
 ))
-def test_no_upload_letters_button_without_permission(
+def test_upload_letters_button_only_with_letters_permission(
     client_request,
     service_one,
     mock_get_uploads,
+    mock_get_jobs,
+    mock_get_no_contact_lists,
     extra_permissions,
 ):
     service_one['permissions'] += extra_permissions
     page = client_request.get('main.uploads', service_id=SERVICE_ONE_ID)
-    assert not page.find('a', text=re.compile('Upload a letter'))
+    assert page.find('a', text=re.compile('Upload a letter'))
+
+
+@pytest.mark.parametrize('user', (
+    create_platform_admin_user(),
+    create_active_user_with_permissions(),
+))
+def test_all_users_have_upload_contact_list(
+    client_request,
+    mock_get_uploads,
+    mock_get_jobs,
+    mock_get_no_contact_lists,
+    user,
+):
+    client_request.login(user)
+    page = client_request.get('main.uploads', service_id=SERVICE_ONE_ID)
+    button = page.find('a', text=re.compile('Upload an emergency contact list'))
+    assert button
+    assert button['href'] == url_for(
+        'main.upload_contact_list', service_id=SERVICE_ONE_ID,
+    )
+
+
+@pytest.mark.parametrize('extra_permissions, expected_empty_message', (
+    (['letter'], (
+        'You have not uploaded any files recently. '
+        'To upload a list of contact details, first choose a template.'
+    )),
+    (['letter', 'upload_letters'], (
+        'You have not uploaded any files recently. '
+        'Upload a letter and Notify will print, pack and post it for you. '
+        'To upload a list of contact details, first choose a template.'
+    )),
+))
+def test_get_upload_hub_with_no_uploads(
+    mocker,
+    client_request,
+    service_one,
+    mock_get_no_uploads,
+    mock_get_no_contact_lists,
+    extra_permissions,
+    expected_empty_message,
+):
+    mocker.patch('app.job_api_client.get_jobs', return_value={'data': []})
+    service_one['permissions'] += extra_permissions
+    page = client_request.get('main.uploads', service_id=SERVICE_ONE_ID)
+    assert normalize_spaces(' '.join(
+        paragraph.text for paragraph in page.select('main p')
+    )) == expected_empty_message
+    assert not page.select('.file-list-filename')
 
 
 def test_get_upload_hub_page(
+    mocker,
     client_request,
     service_one,
     mock_get_uploads,
+    mock_get_no_contact_lists,
 ):
+    mocker.patch('app.job_api_client.get_jobs', return_value={'data': []})
     service_one['permissions'] += ['letter', 'upload_letters']
     page = client_request.get('main.uploads', service_id=SERVICE_ONE_ID)
     assert page.find('h1').text == 'Uploads'
@@ -43,13 +108,32 @@ def test_get_upload_hub_page(
         'main.upload_letter', service_id=SERVICE_ONE_ID
     )
 
-    assert page.findAll(
-        'a', {'class': 'file-list-filename'}
-    )[0].attrs['href'] == '/services/{}/jobs/job_id_1'.format(SERVICE_ONE_ID)
+    uploads = page.select('tbody tr')
 
-    assert page.findAll(
-        'a', {'class': 'file-list-filename'}
-    )[1].attrs['href'] == '/services/{}/notification/letter_id_1'.format(SERVICE_ONE_ID)
+    assert normalize_spaces(uploads[0].text.strip()) == (
+        'some.csv '
+        'Sent 1 January 2016 at 11:09am '
+        '0 sending 8 delivered 2 failed'
+    )
+    assert uploads[0].select_one('a.file-list-filename-large')['href'] == (
+        '/services/{}/jobs/job_id_1'.format(SERVICE_ONE_ID)
+    )
+
+    assert normalize_spaces(uploads[1].text.strip()) == (
+        'some.pdf '
+        'Sent 1 January 2016 at 11:09am '
+        'Firstname Lastname '
+        '123 Example Street'
+    )
+    assert normalize_spaces(str(uploads[1].select_one('.govuk-body'))) == (
+        '<p class="govuk-body letter-recipient-summary"> '
+        'Firstname Lastname<br/> '
+        '123 Example Street<br/> '
+        '</p>'
+    )
+    assert uploads[1].select_one('a.file-list-filename-large')['href'] == (
+        '/services/{}/notification/letter_id_1'.format(SERVICE_ONE_ID)
+    )
 
 
 def test_get_upload_letter(client_request):
@@ -57,7 +141,7 @@ def test_get_upload_letter(client_request):
 
     assert page.find('h1').text == 'Upload a letter'
     assert page.find('input', class_='file-upload-field')
-    assert page.select('button[type=submit]')
+    assert page.select('main button[type=submit]')
     assert normalize_spaces(page.find('label', class_='file-upload-button').text) == 'Choose file'
 
 
@@ -284,7 +368,7 @@ def test_post_upload_letter_with_invalid_file(mocker, client_request, fake_uuid)
         )
 
     assert page.find('div', class_='banner-dangerous').find('h1', {"data-error-type": 'content-outside-printable-area'})
-    assert not page.find('button', {'class': 'button', 'type': 'submit'})
+    assert not page.find('button', {'class': 'page-footer__button', 'type': 'submit'})
 
 
 def test_post_upload_letter_shows_letter_preview_for_invalid_file(mocker, client_request, fake_uuid):
@@ -383,7 +467,7 @@ def test_uploaded_letter_preview(
     assert page.find('h1').text == 'my_letter.pdf'
     assert page.find('div', class_='letter-sent')
     assert not page.find("label", {"class": "file-upload-button"})
-    assert page.find('button', {'class': 'govuk-button', 'type': 'submit'})
+    assert page.find('button', {'class': 'page-footer__button', 'type': 'submit'})
 
 
 def test_uploaded_letter_preview_does_not_show_send_button_if_service_in_trial_mode(
@@ -504,6 +588,7 @@ def test_uploaded_letter_preview_image_400s_for_bad_page_type(
         file_id=fake_uuid,
         service_id=SERVICE_ONE_ID,
         page='foo',
+        _test_page_title=False,
         _expected_status=400,
     )
 
@@ -588,3 +673,591 @@ def test_send_uploaded_letter_when_metadata_states_pdf_is_invalid(mocker, servic
 ])
 def test_format_recipient(original_address, expected_address):
     assert format_recipient(urllib.parse.quote(original_address)) == expected_address
+
+
+@pytest.mark.parametrize('user', (
+    create_active_caseworking_user(),
+    create_active_user_with_permissions(),
+))
+@freeze_time("2012-12-12 12:12")
+def test_uploads_page_shows_scheduled_jobs(
+    mocker,
+    client_request,
+    mock_get_no_uploads,
+    mock_get_jobs,
+    mock_get_no_contact_lists,
+    user,
+):
+    client_request.login(user)
+    page = client_request.get('main.uploads', service_id=SERVICE_ONE_ID)
+
+    assert [
+        normalize_spaces(row.text) for row in page.select('tr')
+    ] == [
+        (
+            'File Status'
+        ),
+        (
+            'even_later.csv '
+            'Sending 1 January 2016 at 11:09pm '
+            '1 text message waiting to send'
+        ),
+        (
+            'send_me_later.csv '
+            'Sending 1 January 2016 at 11:09am '
+            '1 text message waiting to send'
+        ),
+    ]
+    assert not page.select('.table-empty-message')
+
+
+@freeze_time('2020-03-15')
+def test_uploads_page_shows_contact_lists_first(
+    mocker,
+    client_request,
+    mock_get_no_uploads,
+    mock_get_jobs,
+    mock_get_contact_lists,
+):
+    page = client_request.get('main.uploads', service_id=SERVICE_ONE_ID)
+
+    assert [
+        normalize_spaces(row.text) for row in page.select('tr')
+    ] == [
+        (
+            'File Status'
+        ),
+        (
+            'phone number list.csv '
+            'Uploaded 13 March at 1:00pm '
+            '123 saved phone numbers'
+        ),
+        (
+            'EmergencyContactList.xls '
+            'Uploaded 13 March at 10:59am '
+            '100 saved email addresses'
+        ),
+        (
+            'even_later.csv '
+            'Sending 1 January 2016 at 11:09pm '
+            '1 text message waiting to send'
+        ),
+        (
+            'send_me_later.csv '
+            'Sending 1 January 2016 at 11:09am '
+            '1 text message waiting to send'
+        ),
+    ]
+    assert page.select_one('.file-list-filename-large')['href'] == url_for(
+        'main.contact_list',
+        service_id=SERVICE_ONE_ID,
+        contact_list_id='d7b0bd1a-d1c7-4621-be5c-3c1b4278a2ad',
+    )
+
+
+def test_get_uploads_shows_pagination(
+    client_request,
+    active_user_with_permissions,
+    mock_get_jobs,
+    mock_get_uploads,
+    mock_get_no_contact_lists,
+):
+    page = client_request.get('main.uploads', service_id=SERVICE_ONE_ID)
+
+    assert normalize_spaces(page.select_one('.next-page').text) == (
+        'Next page '
+        'page 2'
+    )
+    assert normalize_spaces(page.select_one('.previous-page').text) == (
+        'Previous page '
+        'page 0'
+    )
+
+
+def test_upload_contact_list_page(client_request):
+    page = client_request.get(
+        'main.upload_contact_list',
+        service_id=SERVICE_ONE_ID,
+    )
+    assert 'action' not in page.select_one('form')
+    assert page.select_one('form input')['name'] == 'file'
+    assert page.select_one('form input')['type'] == 'file'
+
+    assert normalize_spaces(page.select('.spreadsheet')[0].text) == (
+        'Example A '
+        '1 email address '
+        '2 test@example.gov.uk'
+    )
+    assert normalize_spaces(page.select('.spreadsheet')[1].text) == (
+        'Example A '
+        '1 phone number '
+        '2 07700 900123'
+    )
+
+
+@pytest.mark.parametrize('file_contents, expected_error, expected_thead, expected_tbody,', [
+    (
+        """
+            telephone,name
+            +447700900986
+        """,
+        (
+            'Your file has too many columns '
+            'It needs to have 1 column, called ‘email address’ or ‘phone number’. '
+            'Right now it has 2 columns called ‘telephone’ and ‘name’. '
+            'Skip to file contents'
+        ),
+        'Row in file 1 telephone name',
+        '2 +447700900986',
+    ),
+    (
+        """
+            phone number, email address
+            +447700900986, test@example.com
+        """,
+        (
+            'Your file has too many columns '
+            'It needs to have 1 column, called ‘email address’ or ‘phone number’. '
+            'Right now it has 2 columns called ‘phone number’ and ‘email address’. '
+            'Skip to file contents'
+        ),
+        'Row in file 1 phone number email address',
+        '2 +447700900986 test@example.com',
+    ),
+    (
+        """
+            email address
+            +447700900986
+        """,
+        (
+            'There’s a problem with invalid.csv '
+            'You need to fix 1 email address. '
+            'Skip to file contents'
+        ),
+        'Row in file 1 email address',
+        '2 Not a valid email address +447700900986',
+    ),
+    (
+        """
+            phone number
+            test@example.com
+        """,
+        (
+            'There’s a problem with invalid.csv '
+            'You need to fix 1 phone number. '
+            'Skip to file contents'
+        ),
+        'Row in file 1 phone number',
+        '2 Must not contain letters or symbols test@example.com',
+    ),
+    (
+        """
+            phone number, phone number, PHONE_NUMBER
+            +447700900111,+447700900222,+447700900333,
+        """,
+        (
+            'Your file has too many columns '
+            'It needs to have 1 column, called ‘email address’ or ‘phone number’. '
+            'Right now it has 3 columns called ‘phone number’, ‘phone number’ and ‘PHONE_NUMBER’. '
+            'Skip to file contents'
+        ),
+        'Row in file 1 phone number phone number PHONE_NUMBER',
+        '2 +447700900333 +447700900333 +447700900333',
+    ),
+    (
+        """
+            phone number
+        """,
+        (
+            'Your file is missing some rows '
+            'It needs at least one row of data. '
+            'Skip to file contents'
+        ),
+        'Row in file 1 phone number',
+        '',
+    ),
+    (
+        "+447700900986",
+        (
+            'Your file is missing some rows '
+            'It needs at least one row of data, in a column called '
+            '‘email address’ or ‘phone number’. '
+            'Skip to file contents'
+        ),
+        'Row in file 1 +447700900986',
+        '',
+    ),
+    (
+        "",
+        (
+            'Your file is missing some rows '
+            'It needs at least one row of data, in a column called '
+            '‘email address’ or ‘phone number’. '
+            'Skip to file contents'
+        ),
+        'Row in file 1',
+        '',
+    ),
+    (
+        """
+            phone number
+            +447700900986
+
+            +447700900986
+        """,
+        (
+            'There’s a problem with invalid.csv '
+            'You need to enter missing data in 1 row. '
+            'Skip to file contents'
+        ),
+        'Row in file 1 phone number',
+        (
+            '3 Missing'
+        )
+    ),
+    (
+        """
+            phone number
+            +447700900
+        """,
+        (
+            'There’s a problem with invalid.csv '
+            'You need to fix 1 phone number. '
+            'Skip to file contents'
+        ),
+        'Row in file 1 phone number',
+        '2 Not enough digits +447700900',
+    ),
+    (
+        """
+            email address
+            ok@example.com
+            bad@example1
+            bad@example2
+        """,
+        (
+            'There’s a problem with invalid.csv '
+            'You need to fix 2 email addresses. '
+            'Skip to file contents'
+        ),
+        'Row in file 1 email address',
+        (
+            '3 Not a valid email address bad@example1 '
+            '4 Not a valid email address bad@example2'
+        ),
+    ),
+])
+def test_upload_csv_file_shows_error_banner(
+    client_request,
+    mocker,
+    mock_s3_upload,
+    mock_get_job_doesnt_exist,
+    mock_get_users_by_service,
+    fake_uuid,
+    file_contents,
+    expected_error,
+    expected_thead,
+    expected_tbody,
+):
+    mock_upload = mocker.patch(
+        'app.models.contact_list.s3upload',
+        return_value=fake_uuid,
+    )
+    mock_download = mocker.patch(
+        'app.models.contact_list.s3download',
+        return_value=file_contents,
+    )
+
+    page = client_request.post(
+        'main.upload_contact_list',
+        service_id=SERVICE_ONE_ID,
+        _data={'file': (BytesIO(''.encode('utf-8')), 'invalid.csv')},
+        _follow_redirects=True,
+    )
+    mock_upload.assert_called_once_with(
+        SERVICE_ONE_ID,
+        {'data': '', 'file_name': 'invalid.csv'},
+        ANY,
+        bucket='test-contact-list',
+    )
+    mock_download.assert_called_once_with(
+        SERVICE_ONE_ID,
+        fake_uuid,
+        bucket='test-contact-list',
+    )
+
+    assert normalize_spaces(page.select_one('.banner-dangerous').text) == expected_error
+
+    assert page.select_one('form')['action'] == url_for(
+        'main.upload_contact_list',
+        service_id=SERVICE_ONE_ID,
+    )
+    assert page.select_one('form input')['type'] == 'file'
+
+    assert normalize_spaces(page.select_one('thead').text) == expected_thead
+    assert normalize_spaces(page.select_one('tbody').text) == expected_tbody
+
+
+def test_upload_csv_file_shows_error_banner_for_too_many_rows(
+    client_request,
+    mocker,
+    mock_s3_upload,
+    mock_get_job_doesnt_exist,
+    mock_get_users_by_service,
+    fake_uuid,
+):
+    mocker.patch('app.models.contact_list.s3upload', return_value=fake_uuid)
+    mocker.patch('app.models.contact_list.s3download', return_value='\n'.join(
+        ['phone number'] + (['07700900986'] * 50001)
+    ))
+
+    page = client_request.post(
+        'main.upload_contact_list',
+        service_id=SERVICE_ONE_ID,
+        _data={'file': (BytesIO(''.encode('utf-8')), 'invalid.csv')},
+        _follow_redirects=True,
+    )
+
+    assert normalize_spaces(page.select_one('.banner-dangerous').text) == (
+        'Your file has too many rows '
+        'Notify can store files up to 50,000 rows in size. '
+        'Your file has 50,001 rows. '
+        'Skip to file contents'
+    )
+    assert len(page.select('tbody tr')) == 50
+    assert normalize_spaces(page.select_one('.table-show-more-link').text) == (
+        'Only showing the first 50 rows'
+    )
+
+
+def test_upload_csv_shows_trial_mode_error(
+    client_request,
+    mock_get_users_by_service,
+    mock_get_job_doesnt_exist,
+    fake_uuid,
+    mocker
+):
+    mocker.patch('app.models.contact_list.s3upload', return_value=fake_uuid)
+    mocker.patch('app.models.contact_list.s3download', return_value=(
+        'phone number\n'
+        '07900900321'  # Not in team
+    ))
+
+    page = client_request.get(
+        'main.check_contact_list',
+        service_id=SERVICE_ONE_ID,
+        upload_id=fake_uuid,
+        _test_page_title=False,
+    )
+
+    assert normalize_spaces(page.select_one('.banner-dangerous').text) == (
+        'You cannot save this phone number '
+        'In trial mode you can only send to yourself and members of your team '
+        'Skip to file contents'
+    )
+    assert page.select_one('.banner-dangerous a')['href'] == url_for(
+        'main.trial_mode_new'
+    )
+
+
+def test_upload_csv_shows_ok_page(
+    client_request,
+    mock_get_live_service,
+    mock_get_users_by_service,
+    mock_get_job_doesnt_exist,
+    fake_uuid,
+    mocker
+):
+    mocker.patch('app.models.contact_list.s3download', return_value='\n'.join(
+        ['email address'] + ['test@example.com'] * 51
+    ))
+    mock_metadata_set = mocker.patch('app.models.contact_list.set_metadata_on_csv_upload')
+
+    page = client_request.get(
+        'main.check_contact_list',
+        service_id=SERVICE_ONE_ID,
+        upload_id=fake_uuid,
+        original_file_name='good times.xlsx',
+        _test_page_title=False,
+    )
+
+    mock_metadata_set.assert_called_once_with(
+        SERVICE_ONE_ID,
+        fake_uuid,
+        bucket='test-contact-list',
+        row_count=51,
+        original_file_name='good times.xlsx',
+        template_type='email',
+        valid=True,
+    )
+
+    assert normalize_spaces(page.select_one('h1').text) == (
+        'good times.xlsx'
+    )
+    assert normalize_spaces(page.select_one('main p').text) == (
+        '51 email addresses found'
+    )
+    assert page.select_one('form')['action'] == url_for(
+        'main.save_contact_list',
+        service_id=SERVICE_ONE_ID,
+        upload_id=fake_uuid,
+    )
+
+    assert normalize_spaces(page.select_one('form [type=submit]').text) == (
+        'Save contact list'
+    )
+    assert normalize_spaces(page.select_one('thead').text) == (
+        'Row in file 1 email address'
+    )
+    assert len(page.select('tbody tr')) == 50
+    assert normalize_spaces(page.select_one('tbody tr').text) == (
+        '2 test@example.com'
+    )
+    assert normalize_spaces(page.select_one('.table-show-more-link').text) == (
+        'Only showing the first 50 rows'
+    )
+
+
+def test_save_contact_list(
+    mocker,
+    client_request,
+    fake_uuid,
+    mock_create_contact_list,
+):
+    mock_get_metadata = mocker.patch('app.models.contact_list.get_csv_metadata', return_value={
+        'row_count': 999,
+        'valid': True,
+        'original_file_name': 'example.csv',
+        'template_type': 'email'
+    })
+    client_request.post(
+        'main.save_contact_list',
+        service_id=SERVICE_ONE_ID,
+        upload_id=fake_uuid,
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.uploads',
+            service_id=SERVICE_ONE_ID,
+            _external=True,
+        )
+    )
+    mock_get_metadata.assert_called_once_with(
+        SERVICE_ONE_ID,
+        fake_uuid,
+        bucket='test-contact-list',
+    )
+    mock_create_contact_list.assert_called_once_with(
+        service_id=SERVICE_ONE_ID,
+        upload_id=fake_uuid,
+        original_file_name='example.csv',
+        row_count=999,
+        template_type='email',
+    )
+
+
+def test_cant_save_bad_contact_list(
+    mocker,
+    client_request,
+    fake_uuid,
+    mock_create_contact_list,
+):
+    mocker.patch('app.models.contact_list.get_csv_metadata', return_value={
+        'row_count': 999,
+        'valid': False,
+        'original_file_name': 'example.csv',
+        'template_type': 'email'
+    })
+    client_request.post(
+        'main.save_contact_list',
+        service_id=SERVICE_ONE_ID,
+        upload_id=fake_uuid,
+        _expected_status=403,
+    )
+    assert mock_create_contact_list.called is False
+
+
+@freeze_time('2020-03-13 16:51:56')
+def test_view_contact_list(
+    mocker,
+    client_request,
+    mock_get_contact_list,
+    fake_uuid,
+):
+    mocker.patch('app.models.contact_list.s3download', return_value='\n'.join(
+        ['email address'] + ['test@example.com'] * 51
+    ))
+    page = client_request.get(
+        'main.contact_list',
+        service_id=SERVICE_ONE_ID,
+        contact_list_id=fake_uuid,
+    )
+    assert normalize_spaces(page.select_one('h1').text) == (
+        'EmergencyContactList.xls'
+    )
+    assert normalize_spaces(page.select('main p')[0].text) == (
+        'Uploaded by Test User today at 10:59am'
+    )
+    assert normalize_spaces(page.select('main p')[1].text) == (
+        'Download this list 51 email addresses'
+    )
+    assert page.select_one('a[download]')['href'] == url_for(
+        'main.download_contact_list',
+        service_id=SERVICE_ONE_ID,
+        contact_list_id=fake_uuid,
+    )
+    assert normalize_spaces(page.select_one('table').text).startswith(
+        'Email addresses '
+        '1 email address '
+        '2 test@example.com '
+        '3 test@example.com '
+    )
+    assert normalize_spaces(page.select_one('table').text).endswith(
+        '50 test@example.com '
+        '51 test@example.com'
+    )
+    assert normalize_spaces(page.select_one('.table-show-more-link').text) == (
+        'Only showing the first 50 rows'
+    )
+
+
+def test_view_contact_list_404s_for_non_existing_list(
+    client_request,
+    mock_get_no_contact_list,
+    fake_uuid,
+):
+    client_request.get(
+        'main.contact_list',
+        service_id=SERVICE_ONE_ID,
+        contact_list_id=uuid.uuid4(),
+        _expected_status=404,
+    )
+
+
+def test_download_contact_list(
+    mocker,
+    logged_in_client,
+    fake_uuid,
+    mock_get_contact_list,
+):
+    mocker.patch(
+        'app.models.contact_list.s3download',
+        return_value='phone number\n07900900321'
+    )
+    response = logged_in_client.get(url_for(
+        'main.download_contact_list',
+        service_id=SERVICE_ONE_ID,
+        contact_list_id=fake_uuid,
+    ))
+    assert response.status_code == 200
+    assert response.headers['Content-Type'] == (
+        'text/csv; '
+        'charset=utf-8'
+    )
+    assert response.headers['Content-Disposition'] == (
+        'attachment; '
+        'filename=EmergencyContactList.csv'
+    )
+    assert response.get_data(as_text=True) == (
+        'phone number\n'
+        '07900900321'
+    )

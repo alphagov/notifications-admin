@@ -8,8 +8,8 @@
 
 {% block maincolumn_content %}
 
-<div class="grid-row">
-  <div class="column-five-sixths">
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-five-sixths">
 
     {{ page_header(
       'Accept our data sharing and financial agreement',
@@ -26,7 +26,7 @@
       Once accepted, the agreement covers all Notify services from {{ current_service.organisation.name }}.
     </p>
     <p>
-      <a href="{{ url_for('main.service_download_agreement', service_id=current_service.id) }}">Download a copy of the data sharing and financial agreement</a>.
+      <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.service_download_agreement', service_id=current_service.id) }}">Download a copy of the data sharing and financial agreement</a>.
     </p>
     <p>
       The agreement is confidential and should not be shared outside your organisation.

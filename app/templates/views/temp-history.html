@@ -32,8 +32,8 @@
     <ul class="bottom-gutter">
       {% for event in events %}
         <li class="history-list-item">
-          <div class="grid-row">
-            <div class="column-one-third">
+          <div class="govuk-grid-row">
+            <div class="govuk-grid-column-one-third">
               <div class="history-list-user">
                 {{ user_getter(event.user_id) }}
               </div>
@@ -41,7 +41,7 @@
                 {{ event.time|format_time }}
               </div>
             </div>
-            <div class="column-two-thirds">
+            <div class="govuk-grid-column-two-thirds">
               {{ event }}
             </div>
         </li>

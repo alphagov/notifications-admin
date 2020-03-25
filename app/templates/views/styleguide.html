@@ -16,16 +16,16 @@
 {% block maincolumn_content %}
 
   <h1 class="heading-large">
-    <a href="http://www.notify.works/_styleguide" style="text-decoration: none;">www.notify.works/_styleguide</a>
+    <a class="govuk-link govuk-link--no-visited-state" href="http://www.notify.works/_styleguide" style="text-decoration: none;">www.notify.works/_styleguide</a>
   </h1>
 
   <p>
-    <a href="https://github.com/alphagov/notifications-admin/blob/master/app/templates/views/styleguide.html">View source</a>
+    <a class="govuk-link govuk-link--no-visited-state" href="https://github.com/alphagov/notifications-admin/blob/master/app/templates/views/styleguide.html">View source</a>
   </p>
 
   <h2 class="heading-large">Banner</h2>
-  <div class="grid-row">
-    <div class="column-three-quarters">
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-three-quarters">
       <p>Used to show the status of a thing or action.</p>
 
       {{ banner("You sent 1,234 text messages", with_tick=True) }}
@@ -42,11 +42,11 @@
 
   <p>Used to show some important statistics.</p>
 
-  <div class="grid-row">
-    <div class="column-one-third">
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-one-third">
       {{ big_number("567") }}
     </div>
-    <div class="column-one-third">
+    <div class="govuk-grid-column-one-third">
       {{ big_number("2", "Messages delivered") }}
     </div>
   </div>
@@ -109,8 +109,8 @@
   ) }}
 
   <h2 class="heading-large">Tables</h2>
-  <div class="grid-row">
-    <div class="column-three-quarters">
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-three-quarters">
       <p>
         Used for comparing rows of data.
       </p>
@@ -125,7 +125,7 @@
           {{ boolean_field(True) }}
           {{ boolean_field(False) }}
           {% call field(align='right') %}
-            <a href="#">Change</a>
+            <a class="govuk-link govuk-link--no-visited-state" href="#">Change</a>
           {% endcall %}
         {% endcall %}
       {% endcall %}
@@ -173,7 +173,7 @@
         {% endcall %}
       {% endcall %}
       <p class="table-show-more-link">
-        <a href="#">Add a job now</a>
+        <a class="govuk-link govuk-link--no-visited-state" href="#">Add a job now</a>
       </p>
     </div>
   </div>

@@ -9,23 +9,29 @@
 
 {% block maincolumn_content %}
 
-<div class="grid-row">
-  <div class="column-two-thirds">
+  <h1 class="heading-large">Support</h1>
+  <p>We provide 24-hour online support for teams with a live service on GOV.UK&nbsp;Notify.</p>
 
-    <h1 class="heading-large">Support</h1>
-    <p>We provide 24-hour online support for teams with a live service on GOV.UK Notify.</p>
-
-    {% call form_wrapper(class="bottom-gutter-2") %}
+  {% call form_wrapper() %}
+    {% if current_user.is_authenticated %}
       {{ radios(form.support_type) }}
-      {{ page_footer('Continue') }}
-    {% endcall %}
+    {% else %}
+      <p class="govuk-body">
+        What do you need help with?
+      </p>
+      {{ radios(form.who, hide_legend=True) }}
+    {% endif %}
+    {{ page_footer('Continue') }}
+  {% endcall %}
 
-    <p>You can also <a href="https://ukgovernmentdigital.slack.com/messages/C0E1ADVPC">contact us on Slack</a>.</p>
-    
+  <p>You can also <a class="govuk-link govuk-link--no-visited-state" href="https://ukgovernmentdigital.slack.com/messages/C0E1ADVPC">contact us on Slack</a>.</p>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
     <h2 class="heading-medium">Office hours</h2>
     <p>Our office hours are 9:30am to 5:30pm, Monday to Friday.</p>
     <p>When you report a problem in office hours, we’ll aim to read it within 30 minutes and reply within one working day.</p>
-    
+
     <h2 class="heading-medium">Out-of-hours</h2>
     <p>Outside office hours, response times depend on whether you’re reporting an emergency.</p>
     <p>If it’s an emergency, we’ll reply within 30 minutes and update you every hour until the problem’s fixed.</p>

@@ -10,8 +10,8 @@
 
 {% block maincolumn_content %}
 
-  <div class="grid-row">
-    <div class="column-five-sixths">
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-five-sixths">
       {{ page_header(
         'Send international text messages',
         back_link=url_for('main.service_settings', service_id=current_service.id)
@@ -20,7 +20,7 @@
         Messages to international mobile numbers are charged at 1, 2, or
         3 times the cost of messages to UK mobile numbers.</p>
       <p>
-        See <a href="{{ url_for(".pricing") }}">pricing</a> for the list
+        See <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for(".pricing") }}">pricing</a> for the list
         of rates.
       </p>
       {% call form_wrapper() %}

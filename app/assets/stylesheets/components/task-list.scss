@@ -6,7 +6,7 @@ $indicator-colour: $black;
   padding: 3px 8px 1px 8px;
   position: absolute;
   right: 0;
-  top: $gutter - 2px;
+  top: govuk-spacing(6) - 2px;
   margin-top: -15px;
   border: 2px solid $indicator-colour;
   pointer-events: none;
@@ -18,7 +18,7 @@ $indicator-colour: $black;
 .task-list {
 
   border-top: 1px solid $border-colour;
-  margin: $gutter 0;
+  margin: govuk-spacing(6) 0;
 
   &-item {
 
@@ -27,23 +27,18 @@ $indicator-colour: $black;
     a {
       border-bottom: 1px solid $border-colour;
       display: block;
-      padding: $gutter-half 0;
+      padding: govuk-spacing(3) 0;
       padding-right: 20%;
       position: relative;
 
-      &:hover {
-        color: $link-hover-colour;
-      }
-
       &:focus {
         outline: none;
-        color: $black;
         box-shadow: -3px 0 0 0 $focus-colour, 3px 0 0 0 $focus-colour;
         border-color: transparent;
         top: -1px;
         margin-bottom: -2px;
-        padding-top: $gutter-half + 1px;
-        padding-bottom: $gutter-half + 1px;
+        padding-top: govuk-spacing(3) + 1px;
+        padding-bottom: govuk-spacing(3) + 1px;
       }
 
     }

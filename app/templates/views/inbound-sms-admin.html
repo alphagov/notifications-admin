@@ -20,8 +20,8 @@ Inbound Numbers
 
 {% block platform_admin_content %}
 
-  <div class="grid-row bottom-gutter">
-    <div class="column-two-thirds">
+  <div class="govuk-grid-row bottom-gutter">
+    <div class="govuk-grid-column-two-thirds">
       <h1 class="heading-large">
         Inbound SMS
       </h1>
@@ -46,8 +46,8 @@ Inbound Numbers
 
           {% for value in inbound_num_list.data: %}
           <tr>
-              <th style="font-weight:normal;">{{value.number}}</th>
-              <th style="font-weight:normal;">
+              <td>{{value.number}}</td>
+              <td>
 
               {% if value.active %}
                 Active
@@ -56,10 +56,10 @@ Inbound Numbers
               {% else %}
                 Inactive
               {% endif %}
-              </th>
-              <th style="font-weight:normal;">
-                  <a href="{{ url_for('main.service_dashboard', service_id=value.service.id) }}" class="browse-list-link">{{ value.service.name }}</a>
-              </th>
+              </td>
+              <td>
+                  <a href="{{ url_for('main.service_dashboard', service_id=value.service.id) }}" class="govuk-link govuk-link--no-visited-state govuk-!-font-size-24 govuk-!-font-weight-bold">{{ value.service.name }}</a>
+              </td>
           </tr>
           {% endfor %}
           </tbody>

@@ -1,19 +1,19 @@
-$item-top-padding: $gutter-half;
+$item-top-padding: govuk-spacing(3);
 
 .user-list {
 
   @include core-19;
-  margin-bottom: $gutter;
+  margin-bottom: govuk-spacing(6);
 
   &-item {
 
-    padding: $item-top-padding 150px $gutter-half 0;
+    padding: $item-top-padding 150px govuk-spacing(3) 0;
     border-top: 1px solid $border-colour;
     position: relative;
 
     h3 {
 
-      padding-right: $gutter-half;
+      padding-right: govuk-spacing(3);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;

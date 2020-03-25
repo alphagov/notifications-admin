@@ -149,6 +149,7 @@ def test_accepting_invite_removes_invite_from_session(
     mock_get_billable_units,
     mock_get_free_sms_fragment_limit,
     mock_get_inbound_sms_summary,
+    mock_get_returned_letter_summary_with_no_returned_letters,
     fake_uuid,
     user,
     landing_page_title,
@@ -307,12 +308,18 @@ def test_cancelled_invited_user_accepts_invited_redirect_to_cancelled_invitation
     assert page.h1.string.strip() == 'The invitation you were sent has been cancelled'
 
 
+@pytest.mark.parametrize('admin_endpoint, api_endpoint', [
+    ('main.accept_invite', 'app.invite_api_client.check_token'),
+    ('main.accept_org_invite', 'app.org_invite_api_client.check_token'),
+])
 def test_new_user_accept_invite_with_malformed_token(
+    admin_endpoint,
+    api_endpoint,
     client,
     service_one,
     mocker,
 ):
-    mocker.patch('app.invite_api_client.check_token', side_effect=HTTPError(
+    mocker.patch(api_endpoint, side_effect=HTTPError(
         response=Mock(
             status_code=400,
             json={
@@ -327,7 +334,7 @@ def test_new_user_accept_invite_with_malformed_token(
         message={'invitation': 'Something’s wrong with this link. Make sure you’ve copied the whole thing.'}
     ))
 
-    response = client.get(url_for('main.accept_invite', token='thisisnotarealtoken'), follow_redirects=True)
+    response = client.get(url_for(admin_endpoint, token='thisisnotarealtoken'), follow_redirects=True)
 
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
@@ -470,6 +477,7 @@ def test_new_invited_user_verifies_and_added_to_service(
     mock_get_service_statistics,
     mock_get_usage,
     mock_get_free_sms_fragment_limit,
+    mock_get_returned_letter_summary_with_no_returned_letters,
     mock_create_event,
     mocker,
 ):

@@ -4,10 +4,9 @@ from uuid import UUID
 
 from botocore.exceptions import ClientError as BotoClientError
 from bs4 import BeautifulSoup
-from flask import current_app, url_for
+from flask import url_for
 from notifications_python_client.errors import HTTPError
 
-from app.main.views.letter_branding import get_png_file_from_svg
 from app.s3_client.s3_logo_client import (
     LETTER_TEMP_LOGO_LOCATION,
     permanent_letter_logo_name,
@@ -33,7 +32,7 @@ def test_letter_branding_page_shows_full_branding_list(
         page.select_one('h1').text
     ) == "Letter branding"
 
-    assert page.select('.column-three-quarters a')[-1]['href'] == url_for('main.create_letter_branding')
+    assert page.select('.govuk-grid-column-three-quarters a')[-1]['href'] == url_for('main.create_letter_branding')
 
     assert brand_names == [
         'HM Government',
@@ -150,8 +149,7 @@ def test_update_letter_branding_with_original_file_and_new_details(
     fake_uuid
 ):
     mock_client_update = mocker.patch('app.main.views.letter_branding.letter_branding_client.update_letter_branding')
-    mock_template_preview = mocker.patch('app.main.views.letter_branding.get_png_file_from_svg')
-    mock_upload_logos = mocker.patch('app.main.views.letter_branding.upload_letter_logos')
+    mock_upload_logos = mocker.patch('app.main.views.letter_branding.upload_letter_svg_logo')
 
     response = platform_admin_client.post(
         url_for('.update_letter_branding', branding_id=fake_uuid),
@@ -166,7 +164,6 @@ def test_update_letter_branding_with_original_file_and_new_details(
     assert page.find('h1').text == 'Letter branding'
 
     mock_upload_logos.assert_not_called()
-    mock_template_preview.assert_not_called()
 
     mock_client_update.assert_called_once_with(
         branding_id=fake_uuid,
@@ -208,7 +205,6 @@ def test_update_letter_branding_shows_database_errors_on_name_field(
     mock_get_letter_branding_by_id,
     fake_uuid,
 ):
-    mocker.patch('app.main.views.letter_branding.get_png_file_from_svg')
     mocker.patch('app.main.views.letter_branding.letter_branding_client.update_letter_branding', side_effect=HTTPError(
         response=Mock(
             status_code=400,
@@ -249,11 +245,7 @@ def test_update_letter_branding_with_new_file_and_new_details(
     temp_logo = LETTER_TEMP_LOGO_LOCATION.format(user_id=fake_uuid, unique_id=fake_uuid, filename='new_file.svg')
 
     mock_client_update = mocker.patch('app.main.views.letter_branding.letter_branding_client.update_letter_branding')
-    mock_template_preview = mocker.patch(
-        'app.main.views.letter_branding.get_png_file_from_svg',
-        return_value='fake_png')
     mock_persist_logo = mocker.patch('app.main.views.letter_branding.persist_logo')
-    mock_upload_png = mocker.patch('app.main.views.letter_branding.upload_letter_png_logo')
     mock_delete_temp_files = mocker.patch('app.main.views.letter_branding.delete_letter_temp_files_created_by')
 
     response = platform_admin_client.post(
@@ -268,7 +260,6 @@ def test_update_letter_branding_with_new_file_and_new_details(
     assert response.status_code == 200
     assert page.find('h1').text == 'Letter branding'
 
-    assert mock_template_preview.called
     mock_client_update.assert_called_once_with(
         branding_id=fake_uuid,
         filename='{}-new_file'.format(fake_uuid),
@@ -277,11 +268,6 @@ def test_update_letter_branding_with_new_file_and_new_details(
     mock_persist_logo.assert_called_once_with(
         temp_logo,
         'letters/static/images/letter-template/{}-new_file.svg'.format(fake_uuid)
-    )
-    mock_upload_png.assert_called_once_with(
-        'letters/static/images/letter-template/{}-new_file.png'.format(fake_uuid),
-        'fake_png',
-        current_app.config['AWS_REGION']
     )
     mock_delete_temp_files.assert_called_once_with(fake_uuid)
 
@@ -292,9 +278,8 @@ def test_update_letter_branding_rolls_back_db_changes_and_shows_error_if_saving_
     mock_get_letter_branding_by_id,
     fake_uuid
 ):
-    mocker.patch('app.main.views.letter_branding.get_png_file_from_svg',)
     mock_client_update = mocker.patch('app.main.views.letter_branding.letter_branding_client.update_letter_branding')
-    mocker.patch('app.main.views.letter_branding.upload_letter_logos', side_effect=BotoClientError({}, 'error'))
+    mocker.patch('app.main.views.letter_branding.upload_letter_svg_logo', side_effect=BotoClientError({}, 'error'))
 
     temp_logo = LETTER_TEMP_LOGO_LOCATION.format(user_id=fake_uuid, unique_id=fake_uuid, filename='new_file.svg')
     response = platform_admin_client.post(
@@ -346,7 +331,10 @@ def test_create_letter_branding_when_uploading_valid_file(
 
     response = platform_admin_client.post(
         url_for('.create_letter_branding'),
-        data={'file': (BytesIO(''.encode('utf-8')), filename)},
+        data={'file': (BytesIO("""
+            <svg height="100" width="100">
+            <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" /></svg>
+        """.encode('utf-8')), filename)},
         follow_redirects=True
     )
 
@@ -356,6 +344,35 @@ def test_create_letter_branding_when_uploading_valid_file(
     assert page.select_one('#logo-img > img').attrs['src'].endswith(expected_temp_filename)
     assert mock_s3_upload.called
     mock_delete_temp_files.assert_not_called()
+
+
+def test_create_letter_branding_fails_validation_when_uploading_SVG_with_embedded_image(
+    mocker,
+    platform_admin_client,
+    fake_uuid
+):
+    filename = 'test.svg'
+
+    mock_s3_upload = mocker.patch('app.s3_client.s3_logo_client.utils_s3upload')
+
+    response = platform_admin_client.post(
+        url_for('.create_letter_branding'),
+        data={'file': (BytesIO("""
+            <svg height="100" width="100">
+            <image href="someurlgoeshere" x="0" y="0" height="100" width="100"></image></svg>
+        """.encode('utf-8')), filename)},
+        follow_redirects=True,
+    )
+
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    assert normalize_spaces(page.find('h1').text) == "Add letter branding"
+    message = 'This SVG has an embedded raster image in it and will not render well'
+    assert normalize_spaces(page.find("span", {"class": "error-message"}).text) == message
+
+    assert page.findAll('div', {'id': 'logo-img'}) == []
+
+    mock_s3_upload.assert_not_called()
 
 
 def test_create_letter_branding_when_uploading_invalid_file(platform_admin_client):
@@ -450,11 +467,7 @@ def test_create_letter_branding_persists_logo_when_all_data_is_valid(
     temp_logo = LETTER_TEMP_LOGO_LOCATION.format(user_id=user_id, unique_id=fake_uuid, filename='test.svg')
 
     mock_letter_client = mocker.patch('app.main.views.letter_branding.letter_branding_client')
-    mock_template_preview = mocker.patch(
-        'app.main.views.letter_branding.get_png_file_from_svg',
-        return_value='fake_png')
     mock_persist_logo = mocker.patch('app.main.views.letter_branding.persist_logo')
-    mock_upload_png = mocker.patch('app.main.views.letter_branding.upload_letter_png_logo')
     mock_delete_temp_files = mocker.patch('app.main.views.letter_branding.delete_letter_temp_files_created_by')
 
     response = platform_admin_client.post(
@@ -473,15 +486,9 @@ def test_create_letter_branding_persists_logo_when_all_data_is_valid(
     mock_letter_client.create_letter_branding.assert_called_once_with(
         filename='{}-test'.format(fake_uuid), name='Test brand'
     )
-    assert mock_template_preview.called
     mock_persist_logo.assert_called_once_with(
         temp_logo,
         'letters/static/images/letter-template/{}-test.svg'.format(fake_uuid)
-    )
-    mock_upload_png.assert_called_once_with(
-        'letters/static/images/letter-template/{}-test.png'.format(fake_uuid),
-        'fake_png',
-        current_app.config['AWS_REGION']
     )
     mock_delete_temp_files.assert_called_once_with(user_id)
 
@@ -519,7 +526,6 @@ def test_create_letter_branding_shows_database_errors_on_name_fields(
     with platform_admin_client.session_transaction() as session:
         user_id = session["user_id"]
 
-    mocker.patch('app.main.views.letter_branding.get_png_file_from_svg')
     mocker.patch('app.main.views.letter_branding.letter_branding_client.create_letter_branding', side_effect=HTTPError(
         response=Mock(
             status_code=400,
@@ -550,19 +556,3 @@ def test_create_letter_branding_shows_database_errors_on_name_fields(
 
     assert page.find('h1').text == 'Add letter branding'
     assert error_message == 'name already in use'
-
-
-def test_get_png_file_from_svg(client, mocker, fake_uuid):
-    mocker.patch.dict(
-        'flask.current_app.config',
-        {'TEMPLATE_PREVIEW_API_HOST': 'localhost', 'TEMPLATE_PREVIEW_API_KEY': 'abc'}
-    )
-    tp_mock = mocker.patch('app.main.views.letter_branding.requests_get')
-    filename = LETTER_TEMP_LOGO_LOCATION.format(user_id=fake_uuid, unique_id=fake_uuid, filename='test.svg')
-
-    get_png_file_from_svg(filename)
-
-    tp_mock.assert_called_once_with(
-        'localhost/temp-{}_{}-test.svg.png'.format(fake_uuid, fake_uuid),
-        headers={'Authorization': 'Token abc'}
-    )

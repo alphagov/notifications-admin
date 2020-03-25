@@ -1,13 +1,7 @@
-{% from "components/banner.html" import banner_wrapper %}
-
-<div class="bottom-gutter">
-  {% call banner_wrapper(type='dangerous') %}
-    <h1 class='banner-title'>
-      Message too long
-    </h1>
-    <p>
-      Text messages cannot be longer than {{ SMS_CHAR_COUNT_LIMIT }} characters.
-      Your message is {{ template.content_count }} characters.
-    </p>
-  {% endcall %}
-</div>
+<h1 class='banner-title'>
+  Message too long
+</h1>
+<p>
+  Text messages cannot be longer than {{ SMS_CHAR_COUNT_LIMIT }} characters.
+  Your message is {{ template.content_count }} characters.
+</p>

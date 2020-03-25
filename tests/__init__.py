@@ -175,7 +175,7 @@ def service_json(
         'inbound_api': inbound_api,
         'service_callback_api': service_callback_api,
         'prefix_sms': prefix_sms,
-        'contact_link': None,
+        'contact_link': contact_link,
         'volume_email': 111111,
         'volume_sms': 222222,
         'volume_letter': 333333,
@@ -354,6 +354,7 @@ def job_json(
     job_id=None,
     template_id=None,
     template_version=1,
+    template_type='sms',
     created_at=None,
     bucket_name='',
     original_file_name="thisisatest.csv",
@@ -375,6 +376,7 @@ def job_json(
         'service': service_id,
         'template': template_id,
         'template_version': template_version,
+        'template_type': template_type,
         'original_file_name': original_file_name,
         'created_at': created_at,
         'notification_count': notification_count,
@@ -620,3 +622,7 @@ def assert_url_expected(actual, expected):
                 'Expected redirect: {}\n'
                 'Actual redirect: {}'
             ).format(expected, actual)
+
+
+def find_element_by_tag_and_partial_text(page, tag, string):
+    return [e for e in page.find_all(tag) if string in e.text][0]

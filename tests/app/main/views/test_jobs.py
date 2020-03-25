@@ -21,23 +21,23 @@ from tests.conftest import (
 @pytest.mark.parametrize('user, expected_rows', [
     (create_active_user_with_permissions(), (
         (
-            'File Sending Delivered Failed'
+            'File Status'
         ),
         (
             'export 1/1/2016.xls '
-            'Sent today at 12:12pm 1 0 0'
+            'Sent today at 12:12pm 1 sending 0 delivered 0 failed'
         ),
         (
             'all email addresses.xlsx '
-            'Sent today at 12:12pm 1 0 0'
+            'Sent today at 12:12pm 1 sending 0 delivered 0 failed'
         ),
         (
             'applicants.ods '
-            'Sent today at 12:12pm 1 0 0'
+            'Sent today at 12:12pm 1 sending 0 delivered 0 failed'
         ),
         (
             'thisisatest.csv '
-            'Sent today at 12:12pm 1 0 0'
+            'Sent today at 12:12pm 1 sending 0 delivered 0 failed'
         ),
     )),
     (create_active_caseworking_user(), (
@@ -45,31 +45,31 @@ from tests.conftest import (
             'File Messages to be sent'
         ),
         (
-            'send_me_later.csv '
-            'Sending 1 January 2016 at 11:09am 1'
-        ),
-        (
             'even_later.csv '
             'Sending 1 January 2016 at 11:09pm 1'
         ),
         (
-            'File Sending Delivered Failed'
+            'send_me_later.csv '
+            'Sending 1 January 2016 at 11:09am 1'
+        ),
+        (
+            'File Status'
         ),
         (
             'export 1/1/2016.xls '
-            'Sent today at 12:12pm 1 0 0'
+            'Sent today at 12:12pm 1 sending 0 delivered 0 failed'
         ),
         (
             'all email addresses.xlsx '
-            'Sent today at 12:12pm 1 0 0'
+            'Sent today at 12:12pm 1 sending 0 delivered 0 failed'
         ),
         (
             'applicants.ods '
-            'Sent today at 12:12pm 1 0 0'
+            'Sent today at 12:12pm 1 sending 0 delivered 0 failed'
         ),
         (
             'thisisatest.csv '
-            'Sent today at 12:12pm 1 0 0'
+            'Sent today at 12:12pm 1 sending 0 delivered 0 failed'
         ),
     )),
 ])
@@ -123,23 +123,23 @@ def test_jobs_page_doesnt_show_scheduled_on_page_2(
 
     for index, row in enumerate((
         (
-            'File Sending Delivered Failed'
+            'File Status'
         ),
         (
             'export 1/1/2016.xls '
-            'Sent today at 12:12pm 1 0 0'
+            'Sent today at 12:12pm 1 sending 0 delivered 0 failed'
         ),
         (
             'all email addresses.xlsx '
-            'Sent today at 12:12pm 1 0 0'
+            'Sent today at 12:12pm 1 sending 0 delivered 0 failed'
         ),
         (
             'applicants.ods '
-            'Sent today at 12:12pm 1 0 0'
+            'Sent today at 12:12pm 1 sending 0 delivered 0 failed'
         ),
         (
             'thisisatest.csv '
-            'Sent today at 12:12pm 1 0 0'
+            'Sent today at 12:12pm 1 sending 0 delivered 0 failed'
         ),
     )):
         assert normalize_spaces(page.select('tr')[index].text) == row
@@ -199,6 +199,9 @@ def test_should_show_page_for_one_job(
     )
 
     assert page.h1.text.strip() == 'thisisatest.csv'
+    assert page.select_one('.govuk-back-link')['href'] == url_for(
+        'main.uploads', service_id=SERVICE_ONE_ID,
+    )
     assert ' '.join(page.find('tbody').find('tr').text.split()) == (
         '07123456789 template content Delivered 1 January at 11:10am'
     )
@@ -398,7 +401,7 @@ def test_should_show_old_job(
 def test_should_show_letter_job(
     client_request,
     mock_get_service_letter_template,
-    mock_get_job,
+    mock_get_letter_job,
     mock_get_service_data_retention,
     fake_uuid,
     mocker,
@@ -460,7 +463,7 @@ def test_should_show_letter_job(
 def test_should_show_letter_job_with_banner_after_sending_before_1730(
     client_request,
     mock_get_service_letter_template,
-    mock_get_job,
+    mock_get_letter_job,
     mock_get_notifications,
     mock_get_service_data_retention,
     fake_uuid,
@@ -477,13 +480,14 @@ def test_should_show_letter_job_with_banner_after_sending_before_1730(
     assert normalize_spaces(page.select('.banner-default-with-tick')[0].text) == (
         'Your letter has been sent. Printing starts today at 5:30pm.'
     )
+    assert not page.select_one('.govuk-back-link')
 
 
 @freeze_time("2016-01-01 11:09:00")
 def test_should_show_letter_job_with_banner_when_there_are_multiple_CSV_rows(
     client_request,
     mock_get_service_letter_template,
-    mock_get_job_in_progress,
+    mock_get_letter_job_in_progress,
     mock_get_notifications,
     mock_get_service_data_retention,
     fake_uuid,
@@ -506,7 +510,7 @@ def test_should_show_letter_job_with_banner_when_there_are_multiple_CSV_rows(
 def test_should_show_letter_job_with_banner_after_sending_after_1730(
     client_request,
     mock_get_service_letter_template,
-    mock_get_job,
+    mock_get_letter_job,
     mock_get_notifications,
     mock_get_service_data_retention,
     fake_uuid,
@@ -538,6 +542,7 @@ def test_should_show_scheduled_job(
         'main.view_job',
         service_id=SERVICE_ONE_ID,
         job_id=fake_uuid,
+        just_sent='yes',
     )
 
     assert normalize_spaces(page.select('main p')[1].text) == (
@@ -550,6 +555,7 @@ def test_should_show_scheduled_job(
         version=1,
     )
     assert page.select_one('main button[type=submit]').text.strip() == 'Cancel sending'
+    assert not page.select_one('.govuk-back-link')
 
 
 def test_should_cancel_job(
@@ -601,7 +607,8 @@ def test_should_cancel_letter_job(
         active_user_with_permissions,
         job_id=job_id,
         created_at="2019-06-20T15:30:00.000001+00:00",
-        job_status="finished"
+        job_status="finished",
+        template_type="letter",
     )
     mocker.patch('app.job_api_client.get_job', side_effect=[{"data": job}])
     notifications_json = notification_json(SERVICE_ONE_ID, job=job, status="created", template_type="letter")
@@ -819,7 +826,7 @@ def test_time_left(job_created_at, expected_message):
 def test_should_show_letter_job_with_first_class_if_notifications_are_first_class(
     client_request,
     mock_get_service_letter_template,
-    mock_get_job,
+    mock_get_letter_job,
     mock_get_service_data_retention,
     fake_uuid,
     mocker,
@@ -840,7 +847,7 @@ def test_should_show_letter_job_with_first_class_if_notifications_are_first_clas
 def test_should_show_letter_job_with_first_class_if_no_notifications(
     client_request,
     service_one,
-    mock_get_job,
+    mock_get_letter_job,
     fake_uuid,
     mock_get_notifications_with_no_notifications,
     mock_get_service_data_retention,

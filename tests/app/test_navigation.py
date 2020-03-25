@@ -143,12 +143,15 @@ def test_a_page_should_nave_selected_header_navigation_item(
 def test_a_page_should_nave_selected_org_navigation_item(
     client_request,
     mock_get_organisation,
-    mock_get_organisation_services,
     mock_get_users_for_organisation,
     mock_get_invited_users_for_organisation,
     endpoint,
     selected_nav_item,
+    mocker
 ):
+    mocker.patch(
+        'app.organisations_client.get_services_and_usage', return_value={'services': {}}
+    )
     page = client_request.get(endpoint, org_id=ORGANISATION_ID)
     selected_nav_items = page.select('.navigation a.selected')
     assert len(selected_nav_items) == 1
@@ -166,6 +169,7 @@ def test_navigation_urls(
     ] == [
         '/services/{}'.format(SERVICE_ONE_ID),
         '/services/{}/templates'.format(SERVICE_ONE_ID),
+        '/services/{}/uploads'.format(SERVICE_ONE_ID),
         '/services/{}/users'.format(SERVICE_ONE_ID),
         '/services/{}/usage'.format(SERVICE_ONE_ID),
         '/services/{}/service-settings'.format(SERVICE_ONE_ID),
@@ -187,7 +191,7 @@ def test_caseworkers_get_caseworking_navigation(
     )
     page = client_request.get('main.choose_template', service_id=SERVICE_ONE_ID)
     assert normalize_spaces(page.select_one('header + .govuk-width-container nav').text) == (
-        'Templates Sent messages Team members'
+        'Templates Sent messages Uploads Team members'
     )
 
 

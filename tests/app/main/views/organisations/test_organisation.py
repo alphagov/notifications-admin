@@ -3,6 +3,7 @@ from unittest.mock import ANY, Mock
 import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
+from freezegun import freeze_time
 from notifications_python_client.errors import HTTPError
 
 from tests import organisation_json, service_json
@@ -43,7 +44,7 @@ def test_organisation_page_shows_all_organisations(
     expected_hints = ('0 live services', '1 live service', '2 live services')
 
     for index, org in enumerate(orgs):
-        assert page.select('a.browse-list-link')[index].text == org['name']
+        assert page.select('.browse-list-item a')[index].text == org['name']
         if not org['active']:
             assert page.select_one('.table-field-status-default,heading-medium').text == '- archived'
         assert normalize_spaces(page.select('.browse-list-hint')[index].text) == (
@@ -64,7 +65,7 @@ def test_view_organisation_shows_the_correct_organisation(
         'app.organisations_client.get_organisation', return_value=org
     )
     mocker.patch(
-        'app.organisations_client.get_organisation_services', return_value=[]
+        'app.organisations_client.get_services_and_usage', return_value={'services': {}}
     )
 
     page = client_request.get(
@@ -73,6 +74,9 @@ def test_view_organisation_shows_the_correct_organisation(
     )
 
     assert normalize_spaces(page.select_one('h1').text) == 'Usage'
+    assert normalize_spaces(page.select_one('.govuk-hint').text) == (
+        'Test 1 has no live services on GOV.UK Notify'
+    )
 
 
 def test_page_to_create_new_organisation(
@@ -389,7 +393,57 @@ def test_nhs_local_assigns_to_selected_organisation(
     mock_update_service_organisation.assert_called_once_with(SERVICE_ONE_ID, ORGANISATION_ID)
 
 
-def test_organisation_services_shows_live_services_only(
+@freeze_time("2020-02-20 20:20")
+def test_organisation_services_shows_live_services_and_usage(
+    client_request,
+    mock_get_organisation,
+    mocker,
+    active_user_with_permissions,
+    fake_uuid,
+):
+    mock = mocker.patch(
+        'app.organisations_client.get_services_and_usage',
+        return_value={"services": [
+            {'service_id': SERVICE_ONE_ID, 'service_name': '1', 'chargeable_billable_sms': 250122, 'emails_sent': 13000,
+             'free_sms_limit': 250000, 'letter_cost': 30.50, 'sms_billable_units': 122, 'sms_cost': 0,
+             'sms_remainder': None},
+            {'service_id': SERVICE_TWO_ID, 'service_name': '5', 'chargeable_billable_sms': 0, 'emails_sent': 20000,
+             'free_sms_limit': 250000, 'letter_cost': 0, 'sms_billable_units': 2500, 'sms_cost': 42.0,
+             'sms_remainder': None}
+        ]}
+    )
+
+    client_request.login(active_user_with_permissions)
+    page = client_request.get('.organisation_dashboard', org_id=ORGANISATION_ID)
+    mock.assert_called_once_with(ORGANISATION_ID, 2019)
+
+    services = page.select('main h3')
+    usage_rows = page.select('main .govuk-grid-column-one-third')
+    assert len(services) == 2
+
+    # Totals
+    assert normalize_spaces(usage_rows[0].text) == "Emails 33,000 sent"
+    assert normalize_spaces(usage_rows[1].text) == "Text messages £42.00 spent"
+    assert normalize_spaces(usage_rows[2].text) == "Letters £30.50 spent"
+
+    assert normalize_spaces(services[0].text) == '1'
+    assert normalize_spaces(services[1].text) == '5'
+    assert services[0].find('a')['href'] == url_for('main.usage', service_id=SERVICE_ONE_ID)
+
+    assert normalize_spaces(usage_rows[3].text) == "13,000 emails sent"
+    assert normalize_spaces(usage_rows[4].text) == "122 free text messages sent"
+    assert normalize_spaces(usage_rows[5].text) == "£30.50 spent on letters"
+    assert services[1].find('a')['href'] == url_for('main.usage', service_id=SERVICE_TWO_ID)
+    assert normalize_spaces(usage_rows[6].text) == "20,000 emails sent"
+    assert normalize_spaces(usage_rows[7].text) == "£42.00 spent on text messages"
+    assert normalize_spaces(usage_rows[8].text) == "£0.00 spent on letters"
+
+    # Ensure there’s no ‘this org has no services message’
+    assert not page.select('.govuk-hint')
+
+
+@freeze_time("2020-02-20 20:20")
+def test_organisation_services_shows_live_services_and_usage_with_count_of_1(
     client_request,
     mock_get_organisation,
     mocker,
@@ -397,26 +451,142 @@ def test_organisation_services_shows_live_services_only(
     fake_uuid,
 ):
     mocker.patch(
-        'app.organisations_client.get_organisation_services',
-        return_value=[
-            service_json(id_=SERVICE_ONE_ID, name='1', restricted=False, active=True),  # live
-            service_json(id_='2', name='2', restricted=True, active=True),  # trial
-            service_json(id_='3', name='3', restricted=True, active=False),  # trial, now archived
-            service_json(id_='4', name='4', restricted=False, active=False),  # was live, now archived
-            service_json(id_=SERVICE_TWO_ID, name='5', restricted=False, active=True),  # live, member of
-        ]
+        'app.organisations_client.get_services_and_usage',
+        return_value={"services": [
+            {'service_id': SERVICE_ONE_ID, 'service_name': '1', 'chargeable_billable_sms': 1, 'emails_sent': 1,
+             'free_sms_limit': 250000, 'letter_cost': 0, 'sms_billable_units': 1, 'sms_cost': 0,
+             'sms_remainder': None},
+        ]}
     )
 
     client_request.login(active_user_with_permissions)
     page = client_request.get('.organisation_dashboard', org_id=ORGANISATION_ID)
 
-    services = page.select('.browse-list-item')
-    assert len(services) == 2
+    usage_rows = page.select('main .govuk-grid-column-one-third')
 
-    assert normalize_spaces(services[0].text) == '1'
-    assert normalize_spaces(services[1].text) == '5'
-    assert services[0].find('a')['href'] == url_for('main.usage', service_id=SERVICE_ONE_ID)
-    assert services[1].find('a')['href'] == url_for('main.usage', service_id=SERVICE_TWO_ID)
+    # Totals
+    assert normalize_spaces(usage_rows[0].text) == "Emails 1 sent"
+    assert normalize_spaces(usage_rows[1].text) == "Text messages £0.00 spent"
+    assert normalize_spaces(usage_rows[2].text) == "Letters £0.00 spent"
+
+    assert normalize_spaces(usage_rows[3].text) == "1 email sent"
+    assert normalize_spaces(usage_rows[4].text) == "1 free text message sent"
+    assert normalize_spaces(usage_rows[5].text) == "£0.00 spent on letters"
+
+
+@freeze_time("2020-02-20 20:20")
+@pytest.mark.parametrize('financial_year, expected_selected', (
+    (2018, '2018 to 2019 financial year'),
+    (2019, '2019 to 2020 financial year'),
+    (2020, '2020 to 2021 financial year'),
+))
+def test_organisation_services_filters_by_financial_year(
+    client_request,
+    mock_get_organisation,
+    mocker,
+    active_user_with_permissions,
+    fake_uuid,
+    financial_year,
+    expected_selected,
+):
+    mock = mocker.patch(
+        'app.organisations_client.get_services_and_usage',
+        return_value={"services": []}
+    )
+    page = client_request.get(
+        '.organisation_dashboard',
+        org_id=ORGANISATION_ID,
+        year=financial_year,
+    )
+    mock.assert_called_once_with(ORGANISATION_ID, financial_year)
+    assert normalize_spaces(page.select_one('.pill').text) == (
+        '2018 to 2019 financial year '
+        '2019 to 2020 financial year '
+        '2020 to 2021 financial year'
+    )
+    assert normalize_spaces(page.select_one('.pill-selected-item').text) == (
+        expected_selected
+    )
+
+
+@freeze_time("2020-02-20 20:20")
+def test_organisation_services_shows_search_bar(
+    client_request,
+    mock_get_organisation,
+    mocker,
+    active_user_with_permissions,
+    fake_uuid,
+):
+    mocker.patch(
+        'app.organisations_client.get_services_and_usage',
+        return_value={"services": [
+            {
+                'service_id': SERVICE_ONE_ID,
+                'service_name': 'Service 1',
+                'chargeable_billable_sms': 250122,
+                'emails_sent': 13000,
+                'free_sms_limit': 250000,
+                'letter_cost': 30.50,
+                'sms_billable_units': 122,
+                'sms_cost': 1.93,
+                'sms_remainder': None
+            },
+        ] * 8}
+    )
+
+    client_request.login(active_user_with_permissions)
+    page = client_request.get('.organisation_dashboard', org_id=ORGANISATION_ID)
+
+    services = page.select('.organisation-service')
+    assert len(services) == 8
+
+    assert page.select_one('.live-search')['data-targets'] == '.organisation-service'
+    assert [
+        normalize_spaces(service_name.text)
+        for service_name in page.select('.live-search-relevant')
+    ] == [
+        'Service 1',
+        'Service 1',
+        'Service 1',
+        'Service 1',
+        'Service 1',
+        'Service 1',
+        'Service 1',
+        'Service 1',
+    ]
+
+
+@freeze_time("2020-02-20 20:20")
+def test_organisation_services_hides_search_bar_for_7_or_fewer_services(
+    client_request,
+    mock_get_organisation,
+    mocker,
+    active_user_with_permissions,
+    fake_uuid,
+):
+    mocker.patch(
+        'app.organisations_client.get_services_and_usage',
+        return_value={"services": [
+            {
+                'service_id': SERVICE_ONE_ID,
+                'service_name': 'Service 1',
+                'chargeable_billable_sms': 250122,
+                'emails_sent': 13000,
+                'free_sms_limit': 250000,
+                'letter_cost': 30.50,
+                'sms_billable_units': 122,
+                'sms_cost': 1.93,
+                'sms_remainder': None
+            },
+        ] * 7}
+    )
+
+    client_request.login(active_user_with_permissions)
+    page = client_request.get('.organisation_dashboard', org_id=ORGANISATION_ID)
+
+    services = page.select('.organisation-service')
+    assert len(services) == 7
+    assert not page.select_one('.live-search')
 
 
 def test_organisation_trial_mode_services_shows_all_non_live_services(

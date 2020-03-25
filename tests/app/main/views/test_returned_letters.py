@@ -88,12 +88,12 @@ def test_returned_letters_page(
 
     assert [
         'Template name Originally sent',
-        'Example template Reference ABC123 Originally sent 24 December 2019',
-        'Example template Sent from Example spreadsheet.xlsx Originally sent 24 December 2019',
-        'Example template No reference provided Originally sent 24 December 2019',
-        'Example precompiled.pdf Reference DEF456 Originally sent 24 December 2019',
-        'Example one-off.pdf No reference provided Originally sent 24 December 2019',
-        'Provided as PDF Reference XYZ999 Originally sent 24 December 2019',
+        'Example template Reference ABC123 Sent 24 December 2019',
+        'Example template Sent from Example spreadsheet.xlsx Sent 24 December 2019',
+        'Example template No reference provided Sent 24 December 2019',
+        'Example precompiled.pdf Reference DEF456 Sent 24 December 2019',
+        'Example one-off.pdf No reference provided Sent 24 December 2019',
+        'Provided as PDF Reference XYZ999 Sent 24 December 2019',
     ] == [
         normalize_spaces(row.text) for row in page.select('tr')
     ]

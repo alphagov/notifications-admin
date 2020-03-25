@@ -9,8 +9,8 @@
 
 {% block maincolumn_content %}
 
-<div class="grid-row">
-  <div class="column-two-thirds">
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
 
     {% if again %}
       <h1 class="heading-large">You need to sign in again</h1>
@@ -27,14 +27,14 @@
       <h1 class="heading-large">Sign in</h1>
       <p>
         If you do not have an account, you can
-        <a href="{{ url_for('.register') }}">create one now</a>.
+        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.register') }}">create one now</a>.
       </p>
     {% endif %}
 
     {% call form_wrapper(autocomplete=True) %}
       {{ textbox(form.email_address, autocomplete='email') }}
       {{ textbox(form.password, autocomplete='current-password') }}
-      {{ page_footer("Continue", secondary_link=url_for('.forgot_password'), secondary_link_text="Forgot your password?") }}
+      {{ page_footer("Continue", secondary_link=url_for('.forgot_password'), secondary_link_text="Forgotten your password?") }}
     {% endcall %}
   </div>
 </div>

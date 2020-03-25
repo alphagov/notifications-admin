@@ -1,3 +1,7 @@
+{% from "components/big-number.html" import big_number %}
+{% from "components/live-search.html" import live_search %}
+{% from "components/message-count-label.html" import message_count_label %}
+{% from "components/pill.html" import pill %}
 {% extends "org_template.html" %}
 
 {% block org_page_title %}
@@ -9,12 +13,105 @@
   <h1 class="heading-medium">
     Usage
   </h1>
-  <ul>
-  {% for service in current_org.live_services %}
-    <li class="browse-list-item">
-      <a href="{{ url_for('main.usage', service_id=service.id) }}" class="browse-list-link">{{ service['name'] }}</a>
-    </li>
+
+  <div class="bottom-gutter">
+    {{ pill(years, selected_year, big_number_args={'smallest': True}) }}
+  </div>
+
+  <div class="govuk-grid-row bottom-gutter">
+    <div class="govuk-grid-column-one-third">
+      <h2 class="heading-small">Emails</h2>
+      <div class="keyline-block">
+        {{ big_number(
+          total_emails_sent,
+          label='sent',
+          smaller=True
+        ) }}
+      </div>
+    </div>
+    <div class="govuk-grid-column-one-third">
+      <h2 class="heading-small">Text messages</h2>
+      <div class="keyline-block">
+        {{ big_number(
+          total_sms_cost,
+          'spent',
+          currency="£",
+          smaller=True
+        ) }}
+      </div>
+    </div>
+    <div class="govuk-grid-column-one-third">
+      <h2 class="heading-small">Letters</h2>
+      <div class="keyline-block">
+        {{ big_number(
+          total_letter_cost,
+          'spent',
+          currency="£",
+          smaller=True
+        ) }}
+      </div>
+    </div>
+  </div>
+
+  {% if search_form %}
+    <div class="govuk-!-margin-bottom-5">
+      {{ live_search(
+        target_selector='.organisation-service',
+        show=True,
+        form=search_form,
+        label='Search by service'
+      ) }}
+    </div>
+  {% endif %}
+
+  <h2 class="heading-small {% if search_form %}visually-hidden{% endif %}">By service</h2>
+
+  {% for service in services %}
+    <div class="keyline-block govuk-!-margin-top-2 organisation-service">
+      <h3 class="govuk-!-font-weight-bold govuk-!-font-size-24 govuk-!-margin-bottom-3 govuk-!-margin-top-1 live-search-relevant">
+        <a href="{{ url_for('main.usage', service_id=service.service_id) }}" class="govuk-link govuk-link--no-visited-state browse-list-link">{{ service.service_name  }}</a>
+      </h3>
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-one-third">
+          {{ big_number(
+            service.emails_sent,
+            label=message_count_label(service.emails_sent, 'email'),
+            smallest=True
+          ) }}
+        </div>
+        <div class="govuk-grid-column-one-third">
+          {% if service.sms_cost %}
+            {{ big_number(
+              service.sms_cost,
+              'spent on text messages',
+              currency="£",
+              smallest=True
+            ) }}
+          {% else %}
+            {{ big_number(
+              service.sms_billable_units,
+              'free {}'.format(message_count_label(service.sms_billable_units, 'sms')),
+              smallest=True
+            ) }}
+          {% endif %}
+        </div>
+        <div class="govuk-grid-column-one-third">
+          {{ big_number(
+            service.letter_cost,
+            'spent on letters',
+            currency="£",
+            smallest=True
+          ) }}
+        </div>
+      </div>
+    </div>
   {% endfor %}
-  </ul>
+  <div class="keyline-block govuk-!-margin-top-2"></div>
+  {% if not services %}
+    <p class="govuk-body govuk-hint">
+      {{ current_org.name }} has no live services on GOV.UK Notify
+    </p>
+    <div class="keyline-block govuk-!-margin-top-2"></div>
+  {% endif %}
 
 {% endblock %}
