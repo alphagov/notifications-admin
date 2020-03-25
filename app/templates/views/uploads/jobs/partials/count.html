@@ -1,0 +1,18 @@
+{% from "components/big-number.html" import big_number %}
+{% from "components/pill.html" import pill %}
+
+<div class="ajax-block-container">
+  {% if notifications_deleted %}
+    <div class="govuk-grid-row bottom-gutter-1-2">
+      {% for label, query_param, url, count in counts %}
+        <div class="govuk-grid-column-one-quarter">
+          {{ big_number(count, label, smaller=True) }}
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="bottom-gutter">
+      {{ pill(counts, request.args.get('status', '')) }}
+    </div>
+  {% endif %}
+</div>

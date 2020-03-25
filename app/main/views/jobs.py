@@ -64,7 +64,7 @@ def view_job(service_id, job_id):
     )
 
     return render_template(
-        'views/jobs/job.html',
+        'views/uploads/jobs/job.html',
         job=job,
         status=request.args.get('status', ''),
         updates_url=url_for(
@@ -359,12 +359,12 @@ def get_job_partials(job):
     notifications = job.get_notifications(status=filter_args['status'])
     if job.template_type == 'letter':
         counts = render_template(
-            'partials/jobs/count-letters.html',
+            'views/uploads/jobs/partials/count-letters.html',
             job=job,
         )
     else:
         counts = render_template(
-            'partials/count.html',
+            'views/uploads/jobs/partials/count.html',
             counts=_get_job_counts(job),
             status=filter_args['status'],
             notifications_deleted=(
@@ -376,7 +376,7 @@ def get_job_partials(job):
     return {
         'counts': counts,
         'notifications': render_template(
-            'partials/jobs/notifications.html',
+            'views/uploads/jobs/partials/notifications.html',
             notifications=list(
                 add_preview_of_content_to_notifications(notifications['notifications'])
             ),
@@ -392,7 +392,7 @@ def get_job_partials(job):
             service_data_retention_days=service_data_retention_days,
         ),
         'status': render_template(
-            'partials/jobs/status.html',
+            'views/uploads/jobs/partials/status.html',
             job=job,
             letter_print_day=get_letter_printing_statement("created", job.created_at)
         ),

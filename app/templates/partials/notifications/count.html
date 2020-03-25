@@ -1,0 +1,7 @@
+{% from "components/pill.html" import pill %}
+
+<div class="ajax-block-container">
+  <div class="bottom-gutter">
+    {{ pill(counts, request.args.get('status', '')) }}
+  </div>
+</div>

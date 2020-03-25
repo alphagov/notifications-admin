@@ -75,7 +75,7 @@ def uploads(service_id):
         listed_uploads = uploads
 
     return render_template(
-        'views/jobs/jobs.html',
+        'views/uploads/index.html',
         jobs=listed_uploads,
         prev_page=prev_page,
         next_page=next_page,
@@ -158,7 +158,7 @@ def upload_letter(service_id):
         error = _get_error_from_upload_form(form.file.errors[0])
 
     return render_template(
-        'views/uploads/choose-file.html',
+        'views/uploads/letter/choose-file.html',
         error=error,
         form=form
     )
@@ -166,7 +166,7 @@ def upload_letter(service_id):
 
 def invalid_upload_error(error_title, error_detail=None):
     return render_template(
-        'views/uploads/choose-file.html',
+        'views/uploads/letter/choose-file.html',
         error={'title': error_title, 'detail': error_detail},
         form=PDFUploadForm()
     ), 400
@@ -239,7 +239,7 @@ def uploaded_letter_preview(service_id, file_id):
     )
 
     return render_template(
-        'views/uploads/preview.html',
+        'views/uploads/letter/preview.html',
         original_filename=original_filename,
         template=template,
         status=status,
