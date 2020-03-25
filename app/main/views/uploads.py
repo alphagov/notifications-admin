@@ -39,7 +39,7 @@ from app import (
 from app.extensions import antivirus_client
 from app.main import main
 from app.main.forms import CsvUploadForm, LetterUploadPostageForm, PDFUploadForm
-from app.main.views.jobs import add_preview_of_content_to_notifications
+from app.main.views.notifications import add_preview_of_content_to_notifications
 from app.models.contact_list import ContactList
 from app.models.job import Job
 from app.s3_client.s3_letter_upload_client import (
