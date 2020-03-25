@@ -5,7 +5,7 @@
 {% from "components/form.html" import form_wrapper %}
 
 {% block per_page_title %}
-  Feedback
+  {{ page_title }}
 {% endblock %}
 
 {% block maincolumn_content %}
@@ -13,7 +13,7 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
       {{ page_header(
-        'Report a problem',
+        page_title,
         back_link=url_for('.support')
       ) }}
       {% call form_wrapper() %}

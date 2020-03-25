@@ -6,11 +6,11 @@ from bs4 import BeautifulSoup, element
 from flask import url_for
 from freezegun import freeze_time
 
-from app.main.views.feedback import (
+from app.main.views.feedback import has_live_services, in_business_hours
+from app.models.feedback import (
+    GENERAL_TICKET_TYPE,
     PROBLEM_TICKET_TYPE,
     QUESTION_TICKET_TYPE,
-    has_live_services,
-    in_business_hours,
 )
 from tests.conftest import normalize_spaces
 
@@ -19,18 +19,48 @@ def no_redirect():
     return lambda _external=True: None
 
 
-@pytest.mark.parametrize('endpoint', [
-    'main.old_feedback',
-    'main.support',
-])
 def test_get_support_index_page(
-    client,
-    endpoint,
+    client_request,
 ):
-    response = client.get(url_for('main.support'), follow_redirects=True)
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    assert page.h1.string.strip() == 'Support'
+    page = client_request.get('.support')
+    assert page.select_one('form')['method'] == 'post'
+    assert 'action' not in page.select_one('form')
+    assert normalize_spaces(page.select_one('h1').text) == 'Support'
+    assert normalize_spaces(
+        page.select_one('form label[for=support_type-0]').text
+    ) == 'Report a problem'
+    assert page.select_one('form input#support_type-0')['value'] == 'report-problem'
+    assert normalize_spaces(
+        page.select_one('form label[for=support_type-1]').text
+    ) == 'Ask a question or give feedback'
+    assert page.select_one('form input#support_type-1')['value'] == 'ask-question-give-feedback'
+    assert normalize_spaces(
+        page.select_one('form button[type=submit]').text
+    ) == 'Continue'
+
+
+def test_get_support_index_page_when_signed_out(
+    client_request,
+):
+    client_request.logout()
+    page = client_request.get('.support')
+    assert page.select_one('form')['method'] == 'post'
+    assert 'action' not in page.select_one('form')
+    assert normalize_spaces(
+        page.select_one('form label[for=who-0]').text
+    ) == (
+        'I work in the public sector and need to send emails, text messages or letters'
+    )
+    assert page.select_one('form input#who-0')['value'] == 'public-sector'
+    assert normalize_spaces(
+        page.select_one('form label[for=who-1]').text
+    ) == (
+        'I’m a member of the public with a question for the government'
+    )
+    assert page.select_one('form input#who-1')['value'] == 'public'
+    assert normalize_spaces(
+        page.select_one('form button[type=submit]').text
+    ) == 'Continue'
 
 
 @freeze_time('2016-12-12 12:00:00.000000')
@@ -38,34 +68,59 @@ def test_get_support_index_page(
     (PROBLEM_TICKET_TYPE, 'Report a problem'),
     (QUESTION_TICKET_TYPE, 'Ask a question or give feedback'),
 ])
-@pytest.mark.parametrize('logged_in, expected_form_field, expected_contact_details', [
-    (True, type(None), 'We’ll reply to test@user.gov.uk'),
-    (False, element.Tag, None),
-])
 def test_choose_support_type(
-    client,
-    api_user_active,
-    mock_get_user,
-    mock_get_services,
-    logged_in,
-    expected_form_field,
-    expected_contact_details,
+    client_request,
     support_type,
     expected_h1
 ):
-    if logged_in:
-        client.login(api_user_active)
-    response = client.post(
-        url_for('main.support'),
-        data={'support_type': support_type}, follow_redirects=True
+    page = client_request.post(
+        'main.support',
+        _data={'support_type': support_type},
+        _follow_redirects=True,
     )
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert page.h1.string.strip() == expected_h1
-    assert isinstance(page.find('input', {'name': 'name'}), expected_form_field)
-    assert isinstance(page.find('input', {'name': 'email_address'}), expected_form_field)
-    if expected_contact_details:
-        assert page.find('form').find('p').text.strip() == expected_contact_details
+    assert not page.select_one('input[name=name]')
+    assert not page.select_one('input[name=email_address]')
+    assert page.find('form').find('p').text.strip() == (
+        'We’ll reply to test@user.gov.uk'
+    )
+
+
+@freeze_time('2016-12-12 12:00:00.000000')
+def test_get_support_as_someone_in_the_public_sector(
+    client_request,
+):
+    client_request.logout()
+    page = client_request.post(
+        'main.support',
+        _data={'who': 'public-sector'},
+        _follow_redirects=True,
+    )
+    assert normalize_spaces(page.select('h1')) == (
+        'Contact GOV.UK Notify support'
+    )
+    assert page.select_one('form textarea[name=feedback]')
+    assert page.select_one('form input[name=name]')
+    assert page.select_one('form input[name=email_address]')
+    assert page.select_one('form button[type=submit]')
+
+
+def test_get_support_as_member_of_public(
+    client_request,
+):
+    client_request.logout()
+    page = client_request.post(
+        'main.support',
+        _data={'who': 'public'},
+        _follow_redirects=True,
+    )
+    assert normalize_spaces(page.select('h1')) == (
+        'The GOV.UK Notify service is for people who work in the government'
+    )
+    assert len(page.select('h2 a')) == 3
+    assert not page.select('form')
+    assert not page.select('input')
+    assert not page.select('form [type=submit]')
 
 
 @freeze_time('2016-12-12 12:00:00.000000')
@@ -77,50 +132,6 @@ def test_choose_support_type(
 def test_get_feedback_page(client, ticket_type, expected_status_code):
     response = client.get(url_for('main.feedback', ticket_type=ticket_type))
     assert response.status_code == expected_status_code
-
-
-@pytest.mark.parametrize('prefilled_body, expected_textarea', [
-    (
-        'agreement',
-        (
-            'Please can you tell me if there’s an agreement in place '
-            'between GOV.UK Notify and my organisation?'
-        )
-    ),
-    (
-        'foo',
-        ''
-    ),
-])
-@freeze_time('2016-12-12 12:00:00.000000')
-def test_get_feedback_page_with_prefilled_body(
-    client_request,
-    mocker,
-    fake_uuid,
-    prefilled_body,
-    expected_textarea,
-    active_user_with_permissions,
-):
-    active_user_with_permissions['email_address'] = 'test@marinemanagement.org.uk'
-    mocker.patch('app.user_api_client.get_user', return_value=active_user_with_permissions)
-    mock_post = mocker.patch('app.main.views.feedback.zendesk_client.create_ticket')
-    page = client_request.get(
-        'main.feedback',
-        ticket_type=QUESTION_TICKET_TYPE,
-        body=prefilled_body,
-    )
-    assert page.select_one('textarea').text == (
-        expected_textarea
-    )
-    client_request.post(
-        'main.feedback',
-        ticket_type=QUESTION_TICKET_TYPE,
-        body='agreement',
-        _data={'feedback': 'blah', 'name': 'Example', 'email_address': 'test@example.com'}
-    )
-    message = mock_post.call_args[1]['message']
-    assert message.startswith('blah')
-    assert 'Please send' not in message
 
 
 @freeze_time('2016-12-12 12:00:00.000000')
@@ -294,8 +305,8 @@ def test_urgency(
 
 ids, params = zip(*[
     ('non-logged in users always have to triage', (
-        PROBLEM_TICKET_TYPE, False, False, True,
-        302, partial(url_for, 'main.triage')
+        GENERAL_TICKET_TYPE, False, False, True,
+        302, partial(url_for, 'main.triage', ticket_type=GENERAL_TICKET_TYPE)
     )),
     ('trial services are never high priority', (
         PROBLEM_TICKET_TYPE, False, True, False,
@@ -311,7 +322,7 @@ ids, params = zip(*[
     )),
     ('should triage out of hours', (
         PROBLEM_TICKET_TYPE, False, True, True,
-        302, partial(url_for, 'main.triage')
+        302, partial(url_for, 'main.triage', ticket_type=PROBLEM_TICKET_TYPE)
     ))
 ])
 
@@ -345,6 +356,21 @@ def test_redirects_to_triage(
     assert response.location == expected_redirect(_external=True)
 
 
+@pytest.mark.parametrize('ticket_type, expected_h1', (
+    (PROBLEM_TICKET_TYPE, 'Report a problem'),
+    (GENERAL_TICKET_TYPE, 'Contact GOV.UK Notify support'),
+))
+def test_options_on_triage_page(
+    client_request,
+    ticket_type,
+    expected_h1,
+):
+    page = client_request.get('main.triage', ticket_type=ticket_type)
+    assert normalize_spaces(page.select_one('h1').text) == expected_h1
+    assert page.select('form input[type=radio]')[0]['value'] == 'yes'
+    assert page.select('form input[type=radio]')[1]['value'] == 'no'
+
+
 def test_doesnt_lose_message_if_post_across_closing(
     client_request,
     mocker,
@@ -358,7 +384,7 @@ def test_doesnt_lose_message_if_post_across_closing(
         ticket_type=PROBLEM_TICKET_TYPE,
         _data={'feedback': 'foo'},
         _expected_status=302,
-        _expected_redirect=url_for('.triage', _external=True),
+        _expected_redirect=url_for('.triage', ticket_type=PROBLEM_TICKET_TYPE, _external=True),
     )
     with client_request.session_transaction() as session:
         assert session['feedback_message'] == 'foo'
@@ -408,19 +434,64 @@ def test_in_business_hours(when, is_in_business_hours):
         assert in_business_hours() == is_in_business_hours
 
 
+@pytest.mark.parametrize('ticket_type', (
+    GENERAL_TICKET_TYPE,
+    PROBLEM_TICKET_TYPE,
+))
 @pytest.mark.parametrize('choice, expected_redirect_param', [
     ('yes', 'yes'),
     ('no', 'no'),
 ])
-def test_triage_redirects_to_correct_url(client, choice, expected_redirect_param):
-    response = client.post(url_for('main.triage'), data={'severe': choice})
-    assert response.status_code == 302
-    assert response.location == url_for(
+def test_triage_redirects_to_correct_url(
+    client_request,
+    ticket_type,
+    choice,
+    expected_redirect_param,
+):
+    client_request.post(
+        'main.triage',
+        ticket_type=ticket_type,
+        _data={'severe': choice},
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.feedback',
+            ticket_type=ticket_type,
+            severe=expected_redirect_param,
+            _external=True,
+        ),
+    )
+
+
+@pytest.mark.parametrize('extra_args, expected_back_link', [
+    (
+        {'severe': 'yes'},
+        partial(url_for, 'main.triage', ticket_type=PROBLEM_TICKET_TYPE)
+    ),
+    (
+        {'severe': 'no'},
+        partial(url_for, 'main.triage', ticket_type=PROBLEM_TICKET_TYPE)
+    ),
+    (
+        {'severe': 'foo'},  # hacking the URL
+        partial(url_for, 'main.support')
+    ),
+    (
+        {},
+        partial(url_for, 'main.support')
+    ),
+])
+def test_back_link_from_form(
+    client_request,
+    extra_args,
+    expected_back_link,
+):
+    page = client_request.get(
         'main.feedback',
         ticket_type=PROBLEM_TICKET_TYPE,
-        severe=expected_redirect_param,
-        _external=True,
+        **extra_args
     )
+    assert page.select_one('.govuk-back-link')['href'] == expected_back_link()
+    assert normalize_spaces(page.select_one('h1').text) == 'Report a problem'
 
 
 @pytest.mark.parametrize(
@@ -449,15 +520,15 @@ def test_triage_redirects_to_correct_url(client, choice, expected_redirect_param
         # Treat empty query param as mangled URL – ask question again
         (
             False, '',
-            302, partial(url_for, 'main.triage'),
-            302, partial(url_for, 'main.triage'),
+            302, partial(url_for, 'main.triage', ticket_type=PROBLEM_TICKET_TYPE),
+            302, partial(url_for, 'main.triage', ticket_type=PROBLEM_TICKET_TYPE),
         ),
 
         # User hasn’t answered the triage question
         (
             False, None,
-            302, partial(url_for, 'main.triage'),
-            302, partial(url_for, 'main.triage'),
+            302, partial(url_for, 'main.triage', ticket_type=PROBLEM_TICKET_TYPE),
+            302, partial(url_for, 'main.triage', ticket_type=PROBLEM_TICKET_TYPE),
         ),
 
         # Escalation is needed for non-logged-in users
@@ -498,6 +569,57 @@ def test_should_be_shown_the_bat_email(
     assert logged_in_response.location == expected_redirect_when_logged_in(_external=True)
 
 
+@pytest.mark.parametrize(
+    (
+        'severe,'
+        'expected_status_code, expected_redirect,'
+        'expected_status_code_when_logged_in, expected_redirect_when_logged_in'
+    ),
+    [
+        # User hasn’t answered the triage question
+        (
+            None,
+            302, partial(url_for, 'main.triage', ticket_type=GENERAL_TICKET_TYPE),
+            302, partial(url_for, 'main.triage', ticket_type=GENERAL_TICKET_TYPE),
+        ),
+
+        # Escalation is needed for non-logged-in users
+        (
+            'yes',
+            302, partial(url_for, 'main.bat_phone'),
+            200, no_redirect(),
+        ),
+    ]
+)
+def test_should_be_shown_the_bat_email_for_general_questions(
+    client,
+    active_user_with_permissions,
+    mocker,
+    service_one,
+    mock_get_services,
+    severe,
+    expected_status_code,
+    expected_redirect,
+    expected_status_code_when_logged_in,
+    expected_redirect_when_logged_in,
+):
+
+    mocker.patch('app.main.views.feedback.in_business_hours', return_value=False)
+
+    feedback_page = url_for('main.feedback', ticket_type=GENERAL_TICKET_TYPE, severe=severe)
+
+    response = client.get(feedback_page)
+
+    assert response.status_code == expected_status_code
+    assert response.location == expected_redirect(_external=True)
+
+    # logged in users should never be redirected to the bat email page
+    client.login(active_user_with_permissions, mocker, service_one)
+    logged_in_response = client.get(feedback_page)
+    assert logged_in_response.status_code == expected_status_code_when_logged_in
+    assert logged_in_response.location == expected_redirect_when_logged_in(_external=True)
+
+
 def test_bat_email_page(
     client,
     active_user_with_permissions,
@@ -510,9 +632,11 @@ def test_bat_email_page(
     assert response.status_code == 200
 
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    assert page.select('main a')[1].text == 'Fill in this form'
-    assert page.select('main a')[1]['href'] == url_for('main.feedback', ticket_type=PROBLEM_TICKET_TYPE, severe='no')
-    next_page_response = client.get(page.select('main a')[1]['href'])
+    assert page.select('main a')[0].text == 'Back'
+    assert page.select('main a')[0]['href'] == url_for('main.support')
+    assert page.select('main a')[2].text == 'Fill in this form'
+    assert page.select('main a')[2]['href'] == url_for('main.feedback', ticket_type=PROBLEM_TICKET_TYPE, severe='no')
+    next_page_response = client.get(page.select('main a')[2]['href'])
     next_page = BeautifulSoup(next_page_response.data.decode('utf-8'), 'html.parser')
     assert next_page.h1.text.strip() == 'Report a problem'
 

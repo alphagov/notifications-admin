@@ -48,6 +48,7 @@ from app.main.validators import (
     ValidEmail,
     ValidGovEmail,
 )
+from app.models.feedback import PROBLEM_TICKET_TYPE, QUESTION_TICKET_TYPE
 from app.models.organisation import Organisation
 from app.models.roles_and_permissions import permissions, roles
 from app.utils import guess_name_from_email_address
@@ -885,21 +886,28 @@ class SupportType(StripWhitespaceForm):
     support_type = RadioField(
         'How can we help you?',
         choices=[
-            ('report-problem', 'Report a problem'),
-            ('ask-question-give-feedback', 'Ask a question or give feedback'),
+            (PROBLEM_TICKET_TYPE, 'Report a problem'),
+            (QUESTION_TICKET_TYPE, 'Ask a question or give feedback'),
         ],
         validators=[DataRequired()]
     )
 
 
-class Feedback(StripWhitespaceForm):
+class SupportRedirect(StripWhitespaceForm):
+    who = RadioField(
+        'What do you need help with?',
+        choices=[
+            ('public-sector', 'I work in the public sector and need to send emails, text messages or letters'),
+            ('public', 'I’m a member of the public with a question for the government'),
+        ],
+        validators=[DataRequired()]
+    )
+
+
+class FeedbackOrProblem(StripWhitespaceForm):
     name = StringField('Name (optional)')
     email_address = email_address(label='Email address', gov_user=False, required=True)
     feedback = TextAreaField('Your message', validators=[DataRequired(message="Cannot be empty")])
-
-
-class Problem(Feedback):
-    email_address = email_address(label='Email address', gov_user=False)
 
 
 class Triage(StripWhitespaceForm):
