@@ -7,15 +7,19 @@ from io import BytesIO
 from zipfile import BadZipFile
 
 from flask import (
+    Response,
     abort,
     current_app,
     flash,
+    jsonify,
     redirect,
     render_template,
     request,
     send_file,
+    stream_with_context,
     url_for,
 )
+from notifications_python_client.errors import HTTPError
 from notifications_utils.columns import Columns
 from notifications_utils.pdf import pdf_page_count
 from notifications_utils.recipients import RecipientCSV
@@ -25,11 +29,19 @@ from requests import RequestException
 from xlrd.biffh import XLRDError
 from xlrd.xldate import XLDateError
 
-from app import current_service, notification_api_client, service_api_client
+from app import (
+    current_service,
+    format_datetime_short,
+    format_thousands,
+    notification_api_client,
+    service_api_client,
+)
 from app.extensions import antivirus_client
 from app.main import main
 from app.main.forms import CsvUploadForm, LetterUploadPostageForm, PDFUploadForm
+from app.main.views.jobs import add_preview_of_content_to_notifications
 from app.models.contact_list import ContactList
+from app.models.job import Job
 from app.s3_client.s3_letter_upload_client import (
     get_letter_metadata,
     get_letter_pdf_and_metadata,
@@ -40,10 +52,16 @@ from app.template_previews import TemplatePreview, sanitise_letter
 from app.utils import (
     Spreadsheet,
     generate_next_dict,
+    generate_notifications_csv,
     generate_previous_dict,
     get_errors_for_csv,
+    get_letter_printing_statement,
     get_letter_validation_error,
     get_template,
+    get_time_left,
+    parse_filter_args,
+    printing_today_or_tomorrow,
+    set_status_filters,
     unicode_truncate,
     user_has_permissions,
 )
@@ -452,3 +470,190 @@ def download_contact_list(service_id, contact_list_id):
         attachment_filename=contact_list.saved_file_name,
         as_attachment=True,
     )
+
+
+@main.route("/services/<uuid:service_id>/jobs")
+@user_has_permissions()
+def view_jobs(service_id):
+    return redirect(url_for(
+        'main.uploads',
+        service_id=current_service.id,
+    ))
+
+
+@main.route("/services/<uuid:service_id>/jobs/<uuid:job_id>")
+@user_has_permissions()
+def view_job(service_id, job_id):
+    job = Job.from_id(job_id, service_id=current_service.id)
+    if job.cancelled:
+        abort(404)
+
+    filter_args = parse_filter_args(request.args)
+    filter_args['status'] = set_status_filters(filter_args)
+
+    just_sent_message = 'Your {} been sent. Printing starts {} at 5:30pm.'.format(
+        'letter has' if job.notification_count == 1 else 'letters have',
+        printing_today_or_tomorrow()
+    )
+
+    return render_template(
+        'views/uploads/jobs/job.html',
+        job=job,
+        status=request.args.get('status', ''),
+        updates_url=url_for(
+            ".view_job_updates",
+            service_id=service_id,
+            job_id=job.id,
+            status=request.args.get('status', ''),
+        ),
+        partials=get_job_partials(job),
+        just_sent=request.args.get('just_sent') == 'yes',
+        just_sent_message=just_sent_message,
+    )
+
+
+@main.route("/services/<uuid:service_id>/jobs/<uuid:job_id>.csv")
+@user_has_permissions('view_activity')
+def view_job_csv(service_id, job_id):
+    job = Job.from_id(job_id, service_id=service_id)
+    filter_args = parse_filter_args(request.args)
+    filter_args['status'] = set_status_filters(filter_args)
+
+    return Response(
+        stream_with_context(
+            generate_notifications_csv(
+                service_id=service_id,
+                job_id=job_id,
+                status=filter_args.get('status'),
+                page=request.args.get('page', 1),
+                page_size=5000,
+                format_for_csv=True,
+                template_type=job.template_type,
+            )
+        ),
+        mimetype='text/csv',
+        headers={
+            'Content-Disposition': 'inline; filename="{} - {}.csv"'.format(
+                job.template['name'],
+                format_datetime_short(job.created_at)
+            )
+        }
+    )
+
+
+@main.route("/services/<uuid:service_id>/jobs/<uuid:job_id>", methods=['POST'])
+@user_has_permissions('send_messages')
+def cancel_job(service_id, job_id):
+    Job.from_id(job_id, service_id=service_id).cancel()
+    return redirect(url_for('main.service_dashboard', service_id=service_id))
+
+
+@main.route("/services/<uuid:service_id>/jobs/<uuid:job_id>/cancel", methods=['GET', 'POST'])
+@user_has_permissions()
+def cancel_letter_job(service_id, job_id):
+    if request.method == 'POST':
+        job = Job.from_id(job_id, service_id=service_id)
+
+        if job.status != 'finished' or job.notifications_created < job.notification_count:
+            flash("We are still processing these letters, please try again in a minute.", 'try again')
+            return view_job(service_id, job_id)
+        try:
+            number_of_letters = job.cancel()
+        except HTTPError as e:
+            flash(e.message, 'dangerous')
+            return redirect(url_for('main.view_job', service_id=service_id, job_id=job_id))
+        flash("Cancelled {} letters from {}".format(
+            format_thousands(number_of_letters), job.original_file_name
+        ), 'default_with_tick')
+        return redirect(url_for('main.service_dashboard', service_id=service_id))
+
+    flash("Are you sure you want to cancel sending these letters?", 'cancel')
+    return view_job(service_id, job_id)
+
+
+@main.route("/services/<uuid:service_id>/jobs/<uuid:job_id>.json")
+@user_has_permissions()
+def view_job_updates(service_id, job_id):
+
+    job = Job.from_id(job_id, service_id=service_id)
+
+    return jsonify(**get_job_partials(job))
+
+
+def _get_job_counts(job):
+    return [
+        (
+            label,
+            query_param,
+            url_for(
+                ".view_job",
+                service_id=job.service,
+                job_id=job.id,
+                status=query_param,
+            ),
+            count
+        ) for label, query_param, count in [
+            [
+                'total', '',
+                job.notification_count
+            ],
+            [
+                'sending', 'sending',
+                job.notifications_sending
+            ],
+            [
+                'delivered', 'delivered',
+                job.notifications_delivered
+            ],
+            [
+                'failed', 'failed',
+                job.notifications_failed
+            ]
+        ]
+    ]
+
+
+def get_job_partials(job):
+    filter_args = parse_filter_args(request.args)
+    filter_args['status'] = set_status_filters(filter_args)
+    notifications = job.get_notifications(status=filter_args['status'])
+    if job.template_type == 'letter':
+        counts = render_template(
+            'views/uploads/jobs/partials/count-letters.html',
+            job=job,
+        )
+    else:
+        counts = render_template(
+            'views/uploads/jobs/partials/count.html',
+            counts=_get_job_counts(job),
+            status=filter_args['status'],
+            notifications_deleted=(
+                job.status == 'finished' and not notifications['notifications']
+            ),
+        )
+    service_data_retention_days = current_service.get_days_of_retention(job.template_type)
+
+    return {
+        'counts': counts,
+        'notifications': render_template(
+            'views/uploads/jobs/partials/notifications.html',
+            notifications=list(
+                add_preview_of_content_to_notifications(notifications['notifications'])
+            ),
+            more_than_one_page=bool(notifications.get('links', {}).get('next')),
+            download_link=url_for(
+                '.view_job_csv',
+                service_id=current_service.id,
+                job_id=job.id,
+                status=request.args.get('status')
+            ),
+            time_left=get_time_left(job.created_at, service_data_retention_days=service_data_retention_days),
+            job=job,
+            service_data_retention_days=service_data_retention_days,
+        ),
+        'status': render_template(
+            'views/uploads/jobs/partials/status.html',
+            job=job,
+            letter_print_day=get_letter_printing_statement("created", job.created_at)
+        ),
+    }

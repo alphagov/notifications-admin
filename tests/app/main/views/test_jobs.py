@@ -6,7 +6,7 @@ import pytest
 from flask import url_for
 from freezegun import freeze_time
 
-from app.main.views.jobs import get_time_left
+from app.utils import get_time_left
 from tests import job_json, notification_json, sample_uuid, user_json
 from tests.conftest import (
     SERVICE_ONE_ID,

@@ -7,8 +7,9 @@ import pytest
 from flask import url_for
 from freezegun import freeze_time
 
-from app.main.views.jobs import get_status_filters, get_time_left
+from app.main.views.jobs import get_status_filters
 from app.models.service import Service
+from app.utils import get_time_left
 from tests.conftest import (
     SERVICE_ONE_ID,
     create_active_caseworking_user,
