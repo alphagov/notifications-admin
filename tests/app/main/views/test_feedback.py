@@ -462,6 +462,38 @@ def test_triage_redirects_to_correct_url(
     )
 
 
+@pytest.mark.parametrize('extra_args, expected_back_link', [
+    (
+        {'severe': 'yes'},
+        partial(url_for, 'main.triage', ticket_type=PROBLEM_TICKET_TYPE)
+    ),
+    (
+        {'severe': 'no'},
+        partial(url_for, 'main.triage', ticket_type=PROBLEM_TICKET_TYPE)
+    ),
+    (
+        {'severe': 'foo'},  # hacking the URL
+        partial(url_for, 'main.support')
+    ),
+    (
+        {},
+        partial(url_for, 'main.support')
+    ),
+])
+def test_back_link_from_form(
+    client_request,
+    extra_args,
+    expected_back_link,
+):
+    page = client_request.get(
+        'main.feedback',
+        ticket_type=PROBLEM_TICKET_TYPE,
+        **extra_args
+    )
+    assert page.select_one('.govuk-back-link')['href'] == expected_back_link()
+    assert normalize_spaces(page.select_one('h1').text) == 'Report a problem'
+
+
 @pytest.mark.parametrize(
     (
         'is_in_business_hours, severe,'
