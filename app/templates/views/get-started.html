@@ -15,21 +15,9 @@
   <li class="get-started-list__item">
     <h2 class="get-started-list__heading">Check if GOV.UK Notify is right for you</h2>
     <p>Read about our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.features') }}">features</a>, <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.pricing') }}">pricing</a> and <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.roadmap') }}">roadmap</a>.</p>
-    {{ govukDetails({
-      "summaryText": "Organisations that can use Notify",
-      "html": '''
-        <div id="eligible-organisations">
-          <p>Notify is available to:</p>
-          <ul class="list list-bullet">
-            <li>central government departments</li>
-            <li>local authorities</li>
-            <li>state-funded schools</li>
-            <li>the NHS</li>
-            <li>companies running a service on behalf of a public sector organisation</li>
-          </ul>
-          <p>Notify is not currently available to charities.</p>
-        </div>'''
-    }) }}
+    <p class="govuk-body">
+      Check <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.who_its_for') }}">whether your organisation can use Notify</a>.
+    </p>
   </li>
 
   <li class="get-started-list__item">

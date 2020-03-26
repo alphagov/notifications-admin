@@ -320,6 +320,14 @@ def get_started():
     )
 
 
+@main.route('/using-notify/who-its-for')
+def who_its_for():
+    return render_template(
+        'views/guidance/who-its-for.html',
+        navigation_links=using_notify_nav(),
+    )
+
+
 @main.route('/trial-mode')
 @main.route('/features/trial-mode')
 def trial_mode():

@@ -346,6 +346,7 @@ class HeaderNavigation(Navigation):
         'no_cookie.view_template_version_preview',
         'view_template_versions',
         'whitelist',
+        'who_its_for',
     }
 
     # header HTML now comes from GOVUK Frontend so requires a boolean, not an attribute
@@ -659,6 +660,7 @@ class MainNavigation(Navigation):
         'view_provider',
         'view_providers',
         'no_cookie.view_template_version_preview',
+        'who_its_for',
     }
 
 
@@ -963,6 +965,7 @@ class CaseworkNavigation(Navigation):
         'no_cookie.view_template_version_preview',
         'view_template_versions',
         'whitelist',
+        'who_its_for',
     }
 
 
@@ -1268,4 +1271,5 @@ class OrgNavigation(Navigation):
         'no_cookie.view_template_version_preview',
         'view_template_versions',
         'whitelist',
+        'who_its_for',
     }
