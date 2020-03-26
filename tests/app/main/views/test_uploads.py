@@ -66,13 +66,11 @@ def test_all_users_have_upload_contact_list(
 
 @pytest.mark.parametrize('extra_permissions, expected_empty_message', (
     ([], (
-        'You have not uploaded any files recently. '
-        'To upload a list of contact details, first choose a template.'
+        'You have not uploaded any files recently.'
     )),
     (['letter'], (
         'You have not uploaded any files recently. '
-        'Upload a letter and Notify will print, pack and post it for you. '
-        'To upload a list of contact details, first choose a template.'
+        'Upload a letter and Notify will print, pack and post it for you.'
     )),
 ))
 def test_get_upload_hub_with_no_uploads(

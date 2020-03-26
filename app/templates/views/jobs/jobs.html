@@ -15,14 +15,9 @@
         <p class="govuk-body">
           You have not uploaded any files recently.
         </p>
-        {% if current_user.has_permissions('send_messages') %}
-          {% if current_service.has_permission('letter') %}
-            <p class="govuk-body">
-              Upload a letter and Notify will print, pack and post it for you.
-            </p>
-          {% endif %}
+        {% if current_user.has_permissions('send_messages') and current_service.has_permission('letter')%}
           <p class="govuk-body">
-            To upload a list of contact details, first <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.choose_template', service_id=current_service.id) }}">choose a template</a>.
+            Upload a letter and Notify will print, pack and post it for you.
           </p>
         {% endif %}
       {% endif %}
