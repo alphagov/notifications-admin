@@ -62,9 +62,6 @@ class OrganisationsClient(NotifyAdminAPIClient):
     def update_organisation_name(self, org_id, name):
         return self.update_organisation(org_id, name=name)
 
-    def get_service_organisation(self, service_id):
-        return self.get(url="/service/{}/organisation".format(service_id))
-
     @cache.delete('service-{service_id}')
     @cache.delete('live-service-and-organisation-counts')
     def update_service_organisation(self, service_id, org_id):
