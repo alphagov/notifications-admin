@@ -105,6 +105,12 @@ class ContactList(JSONModel):
             template_type=metadata['template_type'],
         ))
 
+    def delete(self):
+        contact_list_api_client.delete_contact_list(
+            service_id=self.service_id,
+            contact_list_id=self.id,
+        )
+
     @property
     def contents(self):
         return self.download(self.service_id, self.id)
