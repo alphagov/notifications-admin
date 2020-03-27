@@ -27,7 +27,7 @@
   text-align: left;
 
   &-bar {
-    @include bold-27;
+    @include bold-27($tabular-numbers: true);
     box-sizing: border-box;
     display: inline-block;
     overflow: visible;
