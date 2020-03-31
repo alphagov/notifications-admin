@@ -847,10 +847,10 @@ def mock_get_service_email_template_without_placeholders(mocker):
         template = template_json(
             service_id,
             template_id,
-            "Two week reminder",
-            "email",
-            "Your vehicle tax expires soon",
-            "Your thing is due soon",
+            name="Two week reminder",
+            type_="email",
+            content="Your vehicle tax expires soon",
+            subject="Your thing is due soon",
             redact_personalisation=False,
         )
         return {'data': template}
@@ -865,10 +865,10 @@ def mock_get_service_letter_template(mocker):
         template = template_json(
             service_id,
             template_id,
-            "Two week reminder",
-            "letter",
-            "Template <em>content</em> with & entity",
-            "Subject",
+            name="Two week reminder",
+            type_="letter",
+            content="Template <em>content</em> with & entity",
+            subject="Subject",
             postage=postage,
         )
         return {'data': template}
@@ -2802,7 +2802,7 @@ def os_environ():
         os.environ[k] = v
 
 
-@pytest.fixture
+@pytest.fixture   # noqa (C901 too complex)
 def client_request(
     logged_in_client,
     mocker,
@@ -2855,6 +2855,10 @@ def client_request(
                 url,
                 follow_redirects=_follow_redirects,
             )
+
+            if _expected_redirect and _expected_status == 200:
+                _expected_status = 302
+
             assert resp.status_code == _expected_status, resp.location
             if _expected_redirect:
                 assert resp.location == _expected_redirect
@@ -3477,6 +3481,19 @@ def mock_get_returned_letter_summary_with_no_returned_letters(mocker):
         'app.service_api_client.get_returned_letter_summary',
         return_value=[],
     )
+
+
+@pytest.fixture
+def mock_template_preview(mocker):
+    content = b'{"count":1}'
+    status_code = 200
+    headers = {}
+    example_response = (content, status_code, headers)
+    mocker.patch('app.template_previews.TemplatePreview.from_database_object', return_value=example_response)
+    mocker.patch('app.template_previews.TemplatePreview.from_valid_pdf_file', return_value=example_response)
+    mocker.patch('app.template_previews.TemplatePreview.from_invalid_pdf_file', return_value=example_response)
+    mocker.patch('app.template_previews.TemplatePreview.from_example_template', return_value=example_response)
+    mocker.patch('app.template_previews.TemplatePreview.from_utils_template', return_value=example_response)
 
 
 def create_api_user_active(with_unique_id=False):

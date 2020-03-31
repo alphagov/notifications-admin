@@ -1,0 +1,45 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/message-count-label.html" import recipient_count_label %}
+{% from "components/textbox.html" import textbox %}
+{% from "components/form.html" import form_wrapper %}
+
+{% block service_page_title %}
+  {{ page_title }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header(
+    page_title,
+    back_link=back_link
+  ) }}
+
+  {% call form_wrapper(
+    class='send-one-off-form',
+    module="autofocus",
+    data_kwargs={'force-focus': True}
+  ) %}
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds {% if form.placeholder_value.label.text == 'phone number' %}extra-tracking{% endif %}">
+        {{ textbox(
+          form.address,
+          rows=4,
+          width='1-1',
+          autofocus=True,
+          autosize=True,
+        ) }}
+      </div>
+    </div>
+    <p>
+      <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.send_messages', service_id=current_service.id, template_id=template.id) }}">
+        Upload a list of {{ recipient_count_label(999, template.template_type) }}
+      </a>
+    </p>
+    {{ page_footer('Continue') }}
+  {% endcall %}
+
+  {{ template|string }}
+
+{% endblock %}
