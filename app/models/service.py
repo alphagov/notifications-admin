@@ -1,8 +1,4 @@
-from datetime import datetime, timedelta
-
-from dateutil.parser import parse
 from flask import abort, current_app
-from notifications_utils.timezones import local_timezone
 from werkzeug.utils import cached_property
 
 from app.models import JSONModel
@@ -669,29 +665,24 @@ class Service(JSONModel):
                 yield BASE + '_incomplete' + tag
 
     @cached_property
+    def returned_letter_statistics(self):
+        return service_api_client.get_returned_letter_statistics(self.id)
+
+    @cached_property
     def returned_letter_summary(self):
         return service_api_client.get_returned_letter_summary(self.id)
 
     @property
-    def most_recent_returned_letter_report(self):
-        if not self.returned_letter_summary:
-            return None
-        return parse(
-            self.returned_letter_summary[0]['reported_at'] + " 00:00:00"
-        ).replace(tzinfo=local_timezone)
+    def count_of_returned_letters_in_last_7_days(self):
+        return self.returned_letter_statistics['returned_letter_count']
 
     @property
-    def count_of_returned_letters_in_last_7_days(self):
-        seven_days_ago = (
-            datetime.now() - timedelta(days=7)
-        ).replace(
-            hour=0, minute=0, second=0
-        )
-        return sum(
-            report['returned_letter_count']
-            for report in self.returned_letter_summary
-            if parse(report['reported_at'] + " 00:00:00") >= seven_days_ago
-        )
+    def date_of_most_recent_returned_letter_report(self):
+        return self.returned_letter_statistics['most_recent_report']
+
+    @property
+    def has_returned_letters(self):
+        return bool(self.date_of_most_recent_returned_letter_report)
 
     @property
     def contact_lists(self):

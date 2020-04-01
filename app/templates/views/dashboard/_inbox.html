@@ -17,7 +17,7 @@
       {% endif %}
     </a>
   {% endif %}
-  {% if current_service.returned_letter_summary %}
+  {% if current_service.has_returned_letters %}
     <a id="total-returned-letters" class="govuk-link govuk-link--no-visited-state banner-dashboard" href="{{ url_for('main.returned_letter_summary', service_id=current_service.id) }}">
       <span class="banner-dashboard-count">
         {{ current_service.count_of_returned_letters_in_last_7_days|format_thousands }}
@@ -26,7 +26,7 @@
         returned {{ message_count_label(current_service.count_of_returned_letters_in_last_7_days, 'letter', suffix='') }}
       </span>
       <span class="banner-dashboard-meta">
-        latest report {{ current_service.most_recent_returned_letter_report|format_delta_days }}
+        latest report {{ current_service.date_of_most_recent_returned_letter_report|format_delta_days }}
       </span>
     </a>
   {% endif %}
