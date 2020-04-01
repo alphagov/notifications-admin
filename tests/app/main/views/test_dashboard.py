@@ -497,7 +497,21 @@ def test_returned_letters_not_visible_if_service_has_no_returned_letters(
     assert not page.select('#total-returned-letters')
 
 
-@freeze_time('2020-01-10')
+@pytest.mark.parametrize('reporting_date, expected_message', (
+    ('2020-01-10 00:00:00.000000', (
+        '4,000 returned letters latest report today'
+    )),
+    ('2020-01-09 23:59:59.000000', (
+        '4,000 returned letters latest report yesterday'
+    )),
+    ('2020-01-08 12:12:12.000000', (
+        '4,000 returned letters latest report 2 days ago'
+    )),
+    ('2019-12-10 00:00:00.000000', (
+        '4,000 returned letters latest report 1 month ago'
+    )),
+))
+@freeze_time('2020-01-10 12:34:00.000000')
 def test_returned_letters_shows_count_of_recently_returned_letters(
     client_request,
     mocker,
@@ -509,12 +523,14 @@ def test_returned_letters_shows_count_of_recently_returned_letters(
     mock_get_usage,
     mock_get_free_sms_fragment_limit,
     mock_get_inbound_sms_summary,
+    reporting_date,
+    expected_message,
 ):
     mocker.patch(
         'app.service_api_client.get_returned_letter_statistics',
         return_value={
             'returned_letter_count': 4000,
-            'most_recent_report': '2020-01-10',
+            'most_recent_report': reporting_date,
         },
     )
     page = client_request.get(
@@ -522,9 +538,7 @@ def test_returned_letters_shows_count_of_recently_returned_letters(
         service_id=SERVICE_ONE_ID,
     )
     banner = page.select_one('#total-returned-letters')
-    assert normalize_spaces(
-        banner.text
-    ) == '4,000 returned letters latest report today'
+    assert normalize_spaces(banner.text) == expected_message
     assert banner['href'] == url_for(
         'main.returned_letter_summary', service_id=SERVICE_ONE_ID
     )
