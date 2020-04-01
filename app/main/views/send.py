@@ -335,6 +335,18 @@ def get_notification_check_endpoint(service_id, template):
     ))
 
 
+def get_letter_address_from_session():
+    """
+    Takes non-blank-string address values out of the placeholders, and returns a multi line string
+    """
+    keys = [f'address line {i}' for i in range(1, 7)] + ['postcode']
+    return '\n'.join([
+        session['placeholders'][key]
+        for key in keys
+        if session['placeholders'].get(key)
+    ])
+
+
 @main.route(
     "/services/<uuid:service_id>/send/<uuid:template_id>/one-off/address",
     methods=['GET', 'POST']
@@ -364,7 +376,9 @@ def send_one_off_letter_address(service_id, template_id):
         sms_sender=None
     )
 
-    form = LetterAddressForm()
+    current_session_address = get_letter_address_from_session()
+
+    form = LetterAddressForm(address=current_session_address)
 
     if form.validate_on_submit():
         session['placeholders'].update(form.as_address_lines_1_to_7_with_postcode)
@@ -466,6 +480,10 @@ def send_test_step(service_id, template_id, step_index):
             service_id=service_id,
             template_id=template_id,
         ))
+
+    # if we're in a letter, we should show address block rather than "address line #" or "postcode"
+    if db_template['template_type'] == 'letter' and current_placeholder in first_column_headings['letter']:
+        return redirect(url_for('.send_one_off_letter_address', service_id=service_id, template_id=template_id))
 
     optional_placeholder = (current_placeholder in optional_address_columns)
     form = get_placeholder_form_instance(
