@@ -39,9 +39,11 @@ from app.main import main, no_cookie
 from app.main.forms import (
     ChooseTimeForm,
     CsvUploadForm,
+    LetterAddressForm,
     SetSenderForm,
     get_placeholder_form_instance,
 )
+from app.models.contact_list import ContactList, ContactListsAlphabetical
 from app.models.user import Users
 from app.s3_client.s3_csv_client import (
     s3download,
@@ -151,7 +153,7 @@ def send_messages(service_id, template_id):
         try:
             upload_id = s3upload(
                 service_id,
-                Spreadsheet.from_file(form.file.data, filename=form.file.data.filename).as_dict,
+                Spreadsheet.from_file_form(form).as_dict,
                 current_app.config['AWS_REGION']
             )
             return redirect(url_for(
@@ -306,6 +308,11 @@ def send_test(service_id, template_id):
             return_to='view_template',
             template_id=template_id))
 
+    if db_template['template_type'] == 'letter':
+        return redirect(
+            url_for('.send_one_off_letter_address', service_id=service_id, template_id=template_id)
+        )
+
     return redirect(url_for(
         {
             'main.send_test': '.send_test_step',
@@ -326,6 +333,72 @@ def get_notification_check_endpoint(service_id, template):
         # at check phase we should move to help stage 2 ("the template pulls in the data you provide")
         help='2' if 'help' in request.args else None
     ))
+
+
+@main.route(
+    "/services/<uuid:service_id>/send/<uuid:template_id>/one-off/address",
+    methods=['GET', 'POST']
+)
+@user_has_permissions('send_messages', restrict_admin_usage=True)
+def send_one_off_letter_address(service_id, template_id):
+    if {'recipient', 'placeholders'} - set(session.keys()):
+        # if someone has come here via a bookmark or back button they might have some stuff still in their session
+        return redirect(url_for('.send_one_off', service_id=service_id, template_id=template_id))
+
+    db_template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
+
+    session['send_test_letter_page_count'] = get_page_count_for_letter(db_template)
+
+    template = get_template(
+        db_template,
+        current_service,
+        show_recipient=True,
+        letter_preview_url=url_for(
+            'no_cookie.send_test_preview',
+            service_id=service_id,
+            template_id=template_id,
+            filetype='png',
+        ),
+        page_count=session['send_test_letter_page_count'],
+        email_reply_to=None,
+        sms_sender=None
+    )
+
+    form = LetterAddressForm()
+
+    if form.validate_on_submit():
+        session['placeholders'].update(form.as_address_lines_1_to_7_with_postcode)
+
+        placeholders = fields_to_fill_in(
+            template,
+            prefill_current_user=(request.endpoint == 'main.send_test_step'),
+        )
+        if all_placeholders_in_session(placeholders):
+            return get_notification_check_endpoint(service_id, template)
+
+        first_non_address_placeholder_index = len(first_column_headings['letter'])
+        return redirect(url_for(
+            'main.send_one_off_step',
+            service_id=service_id,
+            template_id=template_id,
+            step_index=first_non_address_placeholder_index,
+        ))
+
+    return render_template(
+        'views/send-one-off-letter-address.html',
+        page_title=get_send_test_page_title(
+            template_type='letter',
+            help_argument=None,
+            entering_recipient=True,
+            name=template.name,
+        ),
+        template=template,
+        form=form,
+        optional_placeholder=False,
+        back_link=get_back_link(service_id, template, 0),
+        help=False,
+        link_to_upload=True,
+    )
 
 
 @main.route(
@@ -489,6 +562,48 @@ def send_test_preview(service_id, template_id, filetype):
     template.values = get_normalised_placeholders_from_session()
 
     return TemplatePreview.from_utils_template(template, filetype, page=request.args.get('page'))
+
+
+@main.route(
+    '/services/<uuid:service_id>/send/<uuid:template_id>'
+    '/from-contact-list'
+)
+@user_has_permissions('send_messages')
+def choose_from_contact_list(service_id, template_id):
+    db_template = current_service.get_template_with_user_permission_or_403(
+        template_id, current_user
+    )
+    template = get_template(
+        db_template, current_service,
+    )
+    return render_template(
+        'views/send-contact-list.html',
+        contact_lists=ContactListsAlphabetical(
+            current_service.id,
+            template_type=template.template_type,
+        ),
+        template=template,
+    )
+
+
+@main.route(
+    '/services/<uuid:service_id>/send/<uuid:template_id>'
+    '/from-contact-list/<uuid:contact_list_id>'
+)
+@user_has_permissions('send_messages')
+def send_from_contact_list(service_id, template_id, contact_list_id):
+    contact_list = ContactList.from_id(
+        contact_list_id,
+        service_id=current_service.id,
+    )
+    return redirect(url_for(
+        'main.check_messages',
+        service_id=current_service.id,
+        template_id=template_id,
+        upload_id=contact_list.copy_to_uploads(),
+        original_file_name=contact_list.original_file_name,
+        contact_list_id=contact_list.id,
+    ))
 
 
 def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_pdf=False):
@@ -700,7 +815,8 @@ def start_job(service_id, upload_id):
     job_api_client.create_job(
         upload_id,
         service_id,
-        scheduled_for=request.form.get('scheduled_for', '')
+        scheduled_for=request.form.get('scheduled_for', ''),
+        contact_list_id=request.form.get('contact_list_id', ''),
     )
 
     session.pop('sender_id', None)

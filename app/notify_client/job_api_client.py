@@ -78,11 +78,14 @@ class JobApiClient(NotifyAdminAPIClient):
     def has_jobs(self, service_id):
         return bool(self.get_jobs(service_id)['data'])
 
-    def create_job(self, job_id, service_id, scheduled_for=None):
+    def create_job(self, job_id, service_id, scheduled_for=None, contact_list_id=None):
         data = {"id": job_id}
 
         if scheduled_for:
             data.update({'scheduled_for': scheduled_for})
+
+        if contact_list_id:
+            data.update({'contact_list_id': contact_list_id})
 
         data = _attach_current_user(data)
         job = self.post(url='/service/{}/job'.format(service_id), data=data)

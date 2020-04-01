@@ -27,7 +27,7 @@
   text-align: left;
 
   &-bar {
-    @include bold-27;
+    @include bold-27($tabular-numbers: true);
     box-sizing: border-box;
     display: inline-block;
     overflow: visible;
@@ -74,6 +74,17 @@
 
   &-hint {
     @include core-16;
+    display: block;
+    color: $secondary-text-colour;
+    pointer-events: none;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: 580px;
+  }
+
+  &-hint-large {
+    @include core-19;
     display: block;
     color: $secondary-text-colour;
     pointer-events: none;

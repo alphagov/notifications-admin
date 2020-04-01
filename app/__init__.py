@@ -64,6 +64,7 @@ from app.notify_client import InviteTokenError
 from app.notify_client.api_key_api_client import api_key_api_client
 from app.notify_client.billing_api_client import billing_api_client
 from app.notify_client.complaint_api_client import complaint_api_client
+from app.notify_client.contact_list_api_client import contact_list_api_client
 from app.notify_client.email_branding_client import email_branding_client
 from app.notify_client.events_api_client import events_api_client
 from app.notify_client.inbound_number_client import inbound_number_client
@@ -91,6 +92,7 @@ from app.url_converters import (
     LetterFileExtensionConverter,
     SimpleDateTypeConverter,
     TemplateTypeConverter,
+    TicketTypeConverter,
 )
 from app.utils import format_thousands, get_logo_cdn_domain, id_safe
 
@@ -140,6 +142,7 @@ def create_app(application):
         # API clients
         api_key_api_client,
         billing_api_client,
+        contact_list_api_client,
         complaint_api_client,
         email_branding_client,
         events_api_client,
@@ -225,6 +228,7 @@ def init_app(application):
 
     application.url_map.converters['uuid'].to_python = lambda self, value: value
     application.url_map.converters['template_type'] = TemplateTypeConverter
+    application.url_map.converters['ticket_type'] = TicketTypeConverter
     application.url_map.converters['letter_file_extension'] = LetterFileExtensionConverter
     application.url_map.converters['simple_date'] = SimpleDateTypeConverter
 

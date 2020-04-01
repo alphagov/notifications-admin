@@ -18,131 +18,19 @@ from tests.conftest import (
 )
 
 
-@pytest.mark.parametrize('user, expected_rows', [
-    (create_active_user_with_permissions(), (
-        (
-            'File Status'
-        ),
-        (
-            'export 1/1/2016.xls '
-            'Sent today at 12:12pm 1 sending 0 delivered 0 failed'
-        ),
-        (
-            'all email addresses.xlsx '
-            'Sent today at 12:12pm 1 sending 0 delivered 0 failed'
-        ),
-        (
-            'applicants.ods '
-            'Sent today at 12:12pm 1 sending 0 delivered 0 failed'
-        ),
-        (
-            'thisisatest.csv '
-            'Sent today at 12:12pm 1 sending 0 delivered 0 failed'
-        ),
-    )),
-    (create_active_caseworking_user(), (
-        (
-            'File Messages to be sent'
-        ),
-        (
-            'even_later.csv '
-            'Sending 1 January 2016 at 11:09pm 1'
-        ),
-        (
-            'send_me_later.csv '
-            'Sending 1 January 2016 at 11:09am 1'
-        ),
-        (
-            'File Status'
-        ),
-        (
-            'export 1/1/2016.xls '
-            'Sent today at 12:12pm 1 sending 0 delivered 0 failed'
-        ),
-        (
-            'all email addresses.xlsx '
-            'Sent today at 12:12pm 1 sending 0 delivered 0 failed'
-        ),
-        (
-            'applicants.ods '
-            'Sent today at 12:12pm 1 sending 0 delivered 0 failed'
-        ),
-        (
-            'thisisatest.csv '
-            'Sent today at 12:12pm 1 sending 0 delivered 0 failed'
-        ),
-    )),
-])
-@freeze_time("2012-12-12 12:12")
-def test_jobs_page_shows_scheduled_jobs_if_user_doesnt_have_dashboard(
+def test_old_jobs_hub_redirects(
     client_request,
-    service_one,
-    active_user_with_permissions,
-    mock_get_jobs,
-    user,
-    expected_rows,
 ):
-    client_request.login(user)
-    page = client_request.get('main.view_jobs', service_id=service_one['id'])
-
-    for index, row in enumerate(expected_rows):
-        assert normalize_spaces(page.select('tr')[index].text) == row
-
-
-@pytest.mark.parametrize('user', [
-    create_active_user_with_permissions(),
-    create_active_caseworking_user(),
-])
-def test_get_jobs_shows_page_links(
-    client_request,
-    active_user_with_permissions,
-    mock_get_jobs,
-    user,
-):
-    client_request.login(user)
-    page = client_request.get('main.view_jobs', service_id=SERVICE_ONE_ID)
-
-    assert 'Next page' in page.find('li', {'class': 'next-page'}).text
-    assert 'Previous page' in page.find('li', {'class': 'previous-page'}).text
-
-
-@pytest.mark.parametrize('user', [
-    create_active_user_with_permissions(),
-    create_active_caseworking_user(),
-])
-@freeze_time("2012-12-12 12:12")
-def test_jobs_page_doesnt_show_scheduled_on_page_2(
-    client_request,
-    service_one,
-    active_user_with_permissions,
-    mock_get_jobs,
-    user,
-):
-    client_request.login(user)
-    page = client_request.get('main.view_jobs', service_id=service_one['id'], page=2)
-
-    for index, row in enumerate((
-        (
-            'File Status'
-        ),
-        (
-            'export 1/1/2016.xls '
-            'Sent today at 12:12pm 1 sending 0 delivered 0 failed'
-        ),
-        (
-            'all email addresses.xlsx '
-            'Sent today at 12:12pm 1 sending 0 delivered 0 failed'
-        ),
-        (
-            'applicants.ods '
-            'Sent today at 12:12pm 1 sending 0 delivered 0 failed'
-        ),
-        (
-            'thisisatest.csv '
-            'Sent today at 12:12pm 1 sending 0 delivered 0 failed'
-        ),
-    )):
-        assert normalize_spaces(page.select('tr')[index].text) == row
+    client_request.get(
+        'main.view_jobs',
+        service_id=SERVICE_ONE_ID,
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.uploads',
+            service_id=SERVICE_ONE_ID,
+            _external=True,
+        )
+    )
 
 
 @pytest.mark.parametrize('user', [

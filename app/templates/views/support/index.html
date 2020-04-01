@@ -9,19 +9,25 @@
 
 {% block maincolumn_content %}
 
+  <h1 class="heading-large">Support</h1>
+  <p>We provide 24-hour online support for teams with a live service on GOV.UK&nbsp;Notify.</p>
+
+  {% call form_wrapper() %}
+    {% if current_user.is_authenticated %}
+      {{ radios(form.support_type) }}
+    {% else %}
+      <p class="govuk-body">
+        What do you need help with?
+      </p>
+      {{ radios(form.who, hide_legend=True) }}
+    {% endif %}
+    {{ page_footer('Continue') }}
+  {% endcall %}
+
+  <p>You can also <a class="govuk-link govuk-link--no-visited-state" href="https://ukgovernmentdigital.slack.com/messages/C0E1ADVPC">contact us on Slack</a>.</p>
+
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
-
-    <h1 class="heading-large">Support</h1>
-    <p>We provide 24-hour online support for teams with a live service on GOV.UK Notify.</p>
-
-    {% call form_wrapper(class="bottom-gutter-2") %}
-      {{ radios(form.support_type) }}
-      {{ page_footer('Continue') }}
-    {% endcall %}
-
-    <p>You can also <a class="govuk-link govuk-link--no-visited-state" href="https://ukgovernmentdigital.slack.com/messages/C0E1ADVPC">contact us on Slack</a>.</p>
-
     <h2 class="heading-medium">Office hours</h2>
     <p>Our office hours are 9:30am to 5:30pm, Monday to Friday.</p>
     <p>When you report a problem in office hours, we’ll aim to read it within 30 minutes and reply within one working day.</p>

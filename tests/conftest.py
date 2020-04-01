@@ -847,10 +847,10 @@ def mock_get_service_email_template_without_placeholders(mocker):
         template = template_json(
             service_id,
             template_id,
-            "Two week reminder",
-            "email",
-            "Your vehicle tax expires soon",
-            "Your thing is due soon",
+            name="Two week reminder",
+            type_="email",
+            content="Your vehicle tax expires soon",
+            subject="Your thing is due soon",
             redact_personalisation=False,
         )
         return {'data': template}
@@ -865,10 +865,10 @@ def mock_get_service_letter_template(mocker):
         template = template_json(
             service_id,
             template_id,
-            "Two week reminder",
-            "letter",
-            "Template <em>content</em> with & entity",
-            "Subject",
+            name="Two week reminder",
+            type_="letter",
+            content="Template <em>content</em> with & entity",
+            subject="Subject",
             postage=postage,
         )
         return {'data': template}
@@ -1638,7 +1638,7 @@ def mock_check_verify_code_code_expired(mocker):
 
 @pytest.fixture(scope='function')
 def mock_create_job(mocker, api_user_active):
-    def _create(job_id, service_id, scheduled_for=None):
+    def _create(job_id, service_id, scheduled_for=None, contact_list_id=None):
         return job_json(
             service_id,
             api_user_active,
@@ -1816,6 +1816,94 @@ def mock_get_no_uploads(mocker, api_user_active):
         return_value={
             'data': [],
         }
+    )
+
+
+@pytest.fixture(scope='function')
+def mock_create_contact_list(mocker, api_user_active):
+    def _create(
+        service_id,
+        upload_id,
+        original_file_name,
+        row_count,
+        template_type,
+    ):
+        return {
+            'service_id': service_id,
+            'upload_id': upload_id,
+            'original_file_name': original_file_name,
+            'row_count': row_count,
+            'template_type': template_type,
+        }
+
+    return mocker.patch(
+        'app.contact_list_api_client.create_contact_list',
+        side_effect=_create,
+    )
+
+
+@pytest.fixture(scope='function')
+def mock_get_contact_lists(mocker, api_user_active, fake_uuid):
+    def _get(service_id, template_type=None):
+        return [{
+            'created_at': '2020-03-13 10:59:56',
+            'created_by': 'Test User',
+            'id': fake_uuid,
+            'original_file_name': 'EmergencyContactList.xls',
+            'row_count': 100,
+            'service_id': service_id,
+            'template_type': 'email',
+        }, {
+            'created_at': '2020-03-13 13:00:00',
+            'created_by': 'Test User',
+            'id': 'd7b0bd1a-d1c7-4621-be5c-3c1b4278a2ad',
+            'original_file_name': 'phone number list.csv',
+            'row_count': 123,
+            'service_id': service_id,
+            'template_type': 'sms',
+        }]
+
+    return mocker.patch(
+        'app.models.contact_list.ContactLists.client_method',
+        side_effect=_get,
+    )
+
+
+@pytest.fixture(scope='function')
+def mock_get_contact_list(mocker, api_user_active, fake_uuid):
+    def _get(*, service_id, contact_list_id):
+        return {
+            'created_at': '2020-03-13 10:59:56',
+            'created_by': 'Test User',
+            'id': fake_uuid,
+            'original_file_name': 'EmergencyContactList.xls',
+            'row_count': 100,
+            'service_id': service_id,
+            'template_type': 'email',
+        }
+
+    return mocker.patch(
+        'app.models.contact_list.contact_list_api_client.get_contact_list',
+        side_effect=_get,
+    )
+
+
+@pytest.fixture(scope='function')
+def mock_get_no_contact_list(mocker, api_user_active, fake_uuid):
+    def _get(*, service_id, contact_list_id):
+        raise HTTPError(response=Mock(status_code=404))
+
+    return mocker.patch(
+        'app.models.contact_list.contact_list_api_client.get_contact_list',
+        side_effect=_get,
+    )
+
+
+@pytest.fixture(scope='function')
+def mock_get_no_contact_lists(mocker):
+    return mocker.patch(
+        'app.models.contact_list.ContactLists.client_method',
+        return_value=[],
     )
 
 
@@ -2714,7 +2802,7 @@ def os_environ():
         os.environ[k] = v
 
 
-@pytest.fixture
+@pytest.fixture   # noqa (C901 too complex)
 def client_request(
     logged_in_client,
     mocker,
@@ -2767,6 +2855,10 @@ def client_request(
                 url,
                 follow_redirects=_follow_redirects,
             )
+
+            if _expected_redirect and _expected_status == 200:
+                _expected_status = 302
+
             assert resp.status_code == _expected_status, resp.location
             if _expected_redirect:
                 assert resp.location == _expected_redirect
@@ -3388,6 +3480,30 @@ def mock_get_returned_letter_summary_with_no_returned_letters(mocker):
     return mocker.patch(
         'app.service_api_client.get_returned_letter_summary',
         return_value=[],
+    )
+
+
+@pytest.fixture
+def mock_template_preview(mocker):
+    content = b'{"count":1}'
+    status_code = 200
+    headers = {}
+    example_response = (content, status_code, headers)
+    mocker.patch('app.template_previews.TemplatePreview.from_database_object', return_value=example_response)
+    mocker.patch('app.template_previews.TemplatePreview.from_valid_pdf_file', return_value=example_response)
+    mocker.patch('app.template_previews.TemplatePreview.from_invalid_pdf_file', return_value=example_response)
+    mocker.patch('app.template_previews.TemplatePreview.from_example_template', return_value=example_response)
+    mocker.patch('app.template_previews.TemplatePreview.from_utils_template', return_value=example_response)
+
+
+@pytest.fixture(scope='function')
+def mock_get_returned_letter_statistics_with_no_returned_letters(mocker):
+    return mocker.patch(
+        'app.service_api_client.get_returned_letter_statistics',
+        return_value={
+            'returned_letter_count': 0,
+            'most_recent_report': None,
+        },
     )
 
 

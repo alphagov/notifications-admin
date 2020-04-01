@@ -53,6 +53,10 @@ def using_notify_nav():
             "link": "main.get_started",
         },
         {
+            "name": "Who it’s for",
+            "link": "main.who_its_for",
+        },
+        {
             "name": "Trial mode",
             "link": "main.trial_mode_new",
         },

@@ -19,33 +19,25 @@
       {% include 'views/dashboard/write-first-messages.html' %}
     {% endif %}
 
-    {{ ajax_block(partials, updates_url, 'upcoming', interval=5) }}
+    {{ ajax_block(partials, updates_url, 'upcoming', interval=20) }}
 
     <h2 class="heading-medium">
       In the last 7 days
     </h2>
 
-    {{ ajax_block(partials, updates_url, 'inbox', interval=5) }}
+    {{ ajax_block(partials, updates_url, 'inbox', interval=20) }}
 
-    {{ ajax_block(partials, updates_url, 'totals', interval=5) }}
+    {{ ajax_block(partials, updates_url, 'totals', interval=20) }}
     {{ show_more(
       url_for('.monthly', service_id=current_service.id),
       'See messages sent per month'
     ) }}
 
-    {{ ajax_block(partials, updates_url, 'template-statistics', interval=5) }}
-
-    {% if current_service.immediate_jobs and not current_service.has_permission('upload_letters') %}
-      {{ ajax_block(partials, updates_url, 'jobs', interval=5) }}
-      {{ show_more(
-        url_for('.view_jobs', service_id=current_service.id),
-        'See all uploaded files'
-      ) }}
-    {% endif %}
+    {{ ajax_block(partials, updates_url, 'template-statistics', interval=20) }}
 
     {% if current_user.has_permissions('manage_service') %}
       <h2 class='heading-medium'>This year</h2>
-      {{ ajax_block(partials, updates_url, 'usage') }}
+      {{ ajax_block(partials, updates_url, 'usage', interval=20) }}
       {{ show_more(
         url_for(".usage", service_id=current_service['id']),
         'See usage'

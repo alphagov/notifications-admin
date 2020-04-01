@@ -1,0 +1,58 @@
+{% extends "withnav_template.html" %}
+{% from "components/banner.html" import banner_wrapper %}
+{% from "components/radios.html" import radio_select %}
+{% from "components/table.html" import list_table, field, text_field, index_field, hidden_field_heading %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/message-count-label.html" import message_count_label, recipient_count_label %}
+{% from "components/button/macro.njk" import govukButton %}
+
+{% block service_page_title %}
+  {{ contact_list.original_file_name }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header(
+    contact_list.original_file_name,
+    back_link=url_for('main.uploads', service_id=current_service.id)
+  ) }}
+
+  <p class="govuk-body">
+    Uploaded by {{ contact_list.created_by }} {{ contact_list.created_at|format_datetime_human }}
+  </p>
+
+  <p class="govuk-body">
+    <a class="govuk-link govuk-link--no-visited-state heading-small" download href="{{ url_for('main.download_contact_list', service_id=current_service.id, contact_list_id=contact_list.id) }}">Download this list</a>&emsp;
+    {{ contact_list.recipients|length|format_thousands }}
+    {{ recipient_count_label(contact_list.recipients|length, contact_list.recipients.template_type) }}
+  </p>
+
+  {% set recipient_column = contact_list.recipients.column_headers[0] %}
+
+  {% call(item, row_number) list_table(
+    contact_list.recipients.displayed_rows,
+    caption=recipient_count_label(contact_list.recipients|length, contact_list.template_type)|capitalize,
+    caption_visible=False,
+    field_headings=['1', recipient_column],
+  ) %}
+    {{ index_field(row_number) }}
+    {{ text_field(item[recipient_column].data) }}
+  {% endcall %}
+
+  {% if contact_list.recipients.displayed_rows|list|length < contact_list.recipients|length %}
+    <p class="table-show-more-link">
+      Only showing the first {{ contact_list.recipients.displayed_rows|list|length }} rows
+    </p>
+  {% endif %}
+
+  {% if not confirm_delete_banner %}
+    <div class="js-stick-at-bottom-when-scrolling">
+      <div class="page-footer">
+        <span class="page-footer-delete-link page-footer-delete-link-without-button">
+          <a class="govuk-link govuk-link--destructive" href="{{ url_for('main.delete_contact_list', service_id=current_service.id, contact_list_id=contact_list.id) }}">Delete this contact list</a>
+        </span>
+      </div>
+    </div>
+  {% endif %}
+
+{% endblock %}

@@ -7,6 +7,7 @@ from flask import session, url_for
 from flask_login import current_user
 
 from app.models.user import InvitedUser
+from tests.conftest import normalize_spaces
 
 
 def test_render_register_returns_template_with_form(client):
@@ -97,20 +98,27 @@ def test_process_register_returns_200_when_mobile_number_is_invalid(
 
 
 def test_should_return_200_when_email_is_not_gov_uk(
-    client,
-    mock_send_verify_code,
-    mock_get_user_by_email,
+    client_request,
     mock_get_organisations,
-    mock_login,
 ):
-    response = client.post(url_for('main.register'),
-                           data={'name': 'Bad Mobile',
-                                 'email_address': 'bad_mobile@example.not.right',
-                                 'mobile_number': '+44123412345',
-                                 'password': 'validPassword!'})
+    client_request.logout()
+    page = client_request.post(
+        'main.register',
+        _data={
+            'name': 'Firstname Lastname',
+            'email_address': 'bad_mobile@example.not.right',
+            'mobile_number': '07900900123',
+            'password': 'validPassword!'
+        },
+        _expected_status=200,
+    )
 
-    assert response.status_code == 200
-    assert 'Enter a government email address' in response.get_data(as_text=True)
+    assert normalize_spaces(page.select_one('.error-message').text) == (
+        'Enter a public sector email address or find out who can use Notify'
+    )
+    assert page.select_one('.error-message a')['href'] == url_for(
+        'main.who_its_for'
+    )
 
 
 @pytest.mark.parametrize('email_address', (

@@ -83,7 +83,7 @@ def test_robots(client):
     'features_letters', 'how_to_pay', 'get_started',
     'guidance_index', 'branding_and_customisation',
     'create_and_send_messages', 'edit_and_format_messages',
-    'send_files_by_email', 'upload_a_letter',
+    'send_files_by_email', 'upload_a_letter', 'who_its_for',
 ])
 def test_static_pages(
     client_request,

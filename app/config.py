@@ -68,6 +68,7 @@ class Config(object):
     WTF_CSRF_ENABLED = True
     WTF_CSRF_TIME_LIMIT = None
     CSV_UPLOAD_BUCKET_NAME = 'local-notifications-csv-upload'
+    CONTACT_LIST_UPLOAD_BUCKET_NAME = 'local-contact-list'
     ACTIVITY_STATS_LIMIT_DAYS = 7
     TEST_MESSAGE_FILENAME = 'Report'
 
@@ -98,6 +99,7 @@ class Development(Config):
     SESSION_PROTECTION = None
     STATSD_ENABLED = False
     CSV_UPLOAD_BUCKET_NAME = 'development-notifications-csv-upload'
+    CONTACT_LIST_UPLOAD_BUCKET_NAME = 'development-contact-list'
     LOGO_UPLOAD_BUCKET_NAME = 'public-logos-tools'
     MOU_BUCKET_NAME = 'notify.tools-mou'
     TRANSIENT_UPLOADED_LETTERS = 'development-transient-uploaded-letters'
@@ -121,6 +123,7 @@ class Test(Development):
     STATSD_ENABLED = False
     WTF_CSRF_ENABLED = False
     CSV_UPLOAD_BUCKET_NAME = 'test-notifications-csv-upload'
+    CONTACT_LIST_UPLOAD_BUCKET_NAME = 'test-contact-list'
     LOGO_UPLOAD_BUCKET_NAME = 'public-logos-test'
     MOU_BUCKET_NAME = 'test-mou'
     TRANSIENT_UPLOADED_LETTERS = 'test-transient-uploaded-letters'
@@ -140,6 +143,7 @@ class Preview(Config):
     HEADER_COLOUR = '#F499BE'  # $baby-pink
     STATSD_ENABLED = True
     CSV_UPLOAD_BUCKET_NAME = 'preview-notifications-csv-upload'
+    CONTACT_LIST_UPLOAD_BUCKET_NAME = 'preview-contact-list'
     LOGO_UPLOAD_BUCKET_NAME = 'public-logos-preview'
     MOU_BUCKET_NAME = 'notify.works-mou'
     TRANSIENT_UPLOADED_LETTERS = 'preview-transient-uploaded-letters'
@@ -158,6 +162,7 @@ class Staging(Config):
     HEADER_COLOUR = '#6F72AF'  # $mauve
     STATSD_ENABLED = True
     CSV_UPLOAD_BUCKET_NAME = 'staging-notifications-csv-upload'
+    CONTACT_LIST_UPLOAD_BUCKET_NAME = 'staging-contact-list'
     LOGO_UPLOAD_BUCKET_NAME = 'public-logos-staging'
     MOU_BUCKET_NAME = 'staging-notify.works-mou'
     TRANSIENT_UPLOADED_LETTERS = 'staging-transient-uploaded-letters'
@@ -173,6 +178,7 @@ class Live(Config):
     HTTP_PROTOCOL = 'https'
     STATSD_ENABLED = True
     CSV_UPLOAD_BUCKET_NAME = 'live-notifications-csv-upload'
+    CONTACT_LIST_UPLOAD_BUCKET_NAME = 'production-contact-list'
     LOGO_UPLOAD_BUCKET_NAME = 'public-logos-production'
     MOU_BUCKET_NAME = 'notifications.service.gov.uk-mou'
     TRANSIENT_UPLOADED_LETTERS = 'production-transient-uploaded-letters'
