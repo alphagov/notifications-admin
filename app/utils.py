@@ -651,20 +651,12 @@ LETTER_VALIDATION_MESSAGES = {
         ),
     },
     'not-a-real-uk-postcode': {
-        'title': 'Postcode in the address block is not a real UK postcode',
+        'title': 'There’s a problem with the address on this letter',
         'detail': (
-            'You need to give us a real UK postcode.<br>'
-            'Files must meet our '
-            '<a class="govuk-link govuk-link--destructive" href="{letter_spec_guidance}" target="_blank">'
-            'letter specification'
-            '</a>.'
+            'The last line of the address must be a real UK postcode.'
         ),
         'summary': (
-            'Validation failed because the postcode is not a real UK postcode.<br>'
-            'Files must meet our '
-            '<a class="govuk-link govuk-link--no-visited-state" href="{letter_spec}" target="_blank">'
-            'letter specification'
-            '</a>.'
+            'Validation failed because the last line of the address is not a real UK postcode.'
         ),
     }
 }
