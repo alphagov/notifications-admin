@@ -651,7 +651,7 @@ LETTER_VALIDATION_MESSAGES = {
         ),
     },
     'not-a-real-uk-postcode': {
-        'title': 'There’s a problem with the address on this letter',
+        'title': 'There’s a problem with the address for this letter',
         'detail': (
             'The last line of the address must be a real UK postcode.'
         ),

@@ -483,6 +483,30 @@ def test_get_letter_validation_error_for_unknown_error():
             'Save a new copy of your file and try again.'
         ),
     ),
+    (
+        'address-is-empty',
+        None,
+        'The address block is empty',
+        (
+            'You need to add a recipient address.'
+            'Files must meet our letter specification.'
+        ),
+        (
+            'Validation failed because the address block is empty.'
+            'Files must meet our letter specification.'
+        ),
+    ),
+    (
+        'not-a-real-uk-postcode',
+        None,
+        'There’s a problem with the address for this letter',
+        (
+            'The last line of the address must be a real UK postcode.'
+        ),
+        (
+            'Validation failed because the last line of the address is not a real UK postcode.'
+        ),
+    ),
 ])
 def test_get_letter_validation_error_for_known_errors(
     client_request,
