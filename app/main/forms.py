@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from itertools import chain
 
 import pytz
-from flask import request
+from flask import Markup, render_template, request
 from flask_login import current_user
 from flask_wtf import FlaskForm as Form
 from flask_wtf.file import FileAllowed
@@ -487,12 +487,66 @@ class RegisterUserFromOrgInviteForm(StripWhitespaceForm):
     auth_type = HiddenField('auth_type', validators=[DataRequired()])
 
 
-PermissionsAbstract = type("PermissionsAbstract", (StripWhitespaceForm,), {
-    permission: BooleanField(label) for permission, label in permissions
-})
+# based on work done by @richardjpope: https://github.com/richardjpope/recourse/blob/master/recourse/forms.py#L6
+class govukCheckboxesField(SelectMultipleField):
+
+    def __init__(self, label='', validators=None, param_extensions=None, **kwargs):
+        super(govukCheckboxesField, self).__init__(label, validators, **kwargs)
+        # default choices to a single True Boolean
+        if 'choices' not in kwargs:
+            self.choices = [('y', label)]
+        self.param_extensions = param_extensions
+
+    # self.__call__ renders the HTML for the field by:
+    # 1. delegating to self.meta.render_field which
+    # 2. calls field.widget
+    # this bypasses that by making self.widget a method with the same interface as widget.__call__
+    def widget(self, field, **kwargs):
+        items = []
+
+        # error messages
+        error_message = None
+        if field.errors:
+            error_message = {"text": " ".join(field.errors).strip()}
+
+        # convert options to ones govuk understands
+        for option in field:
+            items.append({
+                "name": option.name,
+                "id": option.id,
+                "text": option.label.text,
+                "value": option.data,
+                "checked": option.checked
+            })
+
+        params = {
+            'idPrefix': field.id,
+            'name':  field.name,
+            'errorMessage': error_message,
+            'items': items
+        }
+
+        # add HTML to group items if more than one
+        if len(items) > 1:
+            params.update({
+                "fieldset": {
+                    "attributes": {"id": field.name},
+                    "legend": {
+                        "text": field.label.text,
+                        "classes": "govuk-fieldset__legend--s"
+                    }
+                }
+            })
+
+        # extend default params with any sent in
+        if self.param_extensions:
+            params.update(self.param_extensions)
+
+        return Markup(
+            render_template('vendor/govuk-frontend/components/checkboxes/template.njk', params=params))
 
 
-class PermissionsForm(PermissionsAbstract):
+class PermissionsForm(StripWhitespaceForm):
     def __init__(self, all_template_folders=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.folder_permissions.choices = []
