@@ -204,7 +204,7 @@ def organisation_json(
     agreement_signed_version=None,
     agreement_signed_on_behalf_of_name=None,
     agreement_signed_on_behalf_of_email_address=None,
-    organisation_type='',
+    organisation_type='central',
     request_to_go_live_notes=None,
 ):
     if users is None:

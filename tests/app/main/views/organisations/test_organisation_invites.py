@@ -118,7 +118,7 @@ def test_cancelled_invite_opened_by_user(
     ) == 'Test User decided to cancel this invitation.'
     assert normalize_spaces(
         page.select('main p')[1].text
-    ) == 'If you need access to Org 1, you’ll have to ask them to invite you again.'
+    ) == 'If you need access to Test organisation, you’ll have to ask them to invite you again.'
 
     mock_get_user.assert_called_once_with(fake_uuid)
     mock_get_organisation.assert_called_once_with(ORGANISATION_ID)

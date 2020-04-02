@@ -2,7 +2,7 @@ import json
 import os
 from contextlib import contextmanager
 from datetime import date, datetime, timedelta
-from unittest.mock import Mock
+from unittest.mock import Mock, PropertyMock
 from uuid import UUID, uuid4
 
 import pytest
@@ -3113,7 +3113,7 @@ def mock_get_organisation(mocker):
                 'o1': 'Org 1',
                 'o2': 'Org 2',
                 'o3': 'Org 3',
-            }.get(org_id, 'Org 1'),
+            }.get(org_id, 'Test organisation'),
         )
 
     return mocker.patch('app.organisations_client.get_organisation', side_effect=_get_organisation)
@@ -3131,19 +3131,23 @@ def mock_get_organisation_by_domain(mocker):
 
 
 @pytest.fixture(scope='function')
+def mock_get_no_organisation_by_domain(mocker):
+    return mocker.patch(
+        'app.organisations_client.get_organisation_by_domain',
+        return_value=None,
+    )
+
+
+@pytest.fixture(scope='function')
 def mock_get_service_organisation(
     mocker,
-    agreement_signed=None,
-    organisation_type=None,
+    mock_get_organisation,
 ):
-    def _get_service_organisation(service_id):
-        return organisation_json(
-            '7aa5d4e9-4385-4488-a489-07812ba13383',
-            agreement_signed=None,
-            organisation_type=None,
-        )
-
-    return mocker.patch('app.organisations_client.get_service_organisation', side_effect=_get_service_organisation)
+    return mocker.patch(
+        'app.models.service.Service.organisation_id',
+        new_callable=PropertyMock,
+        return_value=ORGANISATION_ID,
+    )
 
 
 @pytest.fixture(scope='function')

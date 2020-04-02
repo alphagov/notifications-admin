@@ -99,7 +99,7 @@ def mock_get_service_settings_page_common(
         'Label Value Action',
         'Live Off Change',
         'Count in list of live services Yes Change',
-        'Organisation Test Organisation Central government Change',
+        'Organisation Test organisation Central government Change',
         'Free text message allowance 250,000 Change',
         'Email branding GOV.UK Change',
         'Letter branding Not set Change',
@@ -114,7 +114,7 @@ def test_should_show_overview(
         api_user_active,
         no_reply_to_email_addresses,
         no_letter_contact_blocks,
-        mock_get_service_organisation,
+        mock_get_organisation,
         single_sms_sender,
         user,
         expected_rows,
@@ -152,7 +152,7 @@ def test_no_go_live_link_for_service_without_organisation(
     platform_admin_user,
     mock_get_service_settings_page_common,
 ):
-    mocker.patch('app.organisations_client.get_service_organisation', return_value=None)
+    mocker.patch('app.organisations_client.get_organisation', return_value=None)
     client_request.login(platform_admin_user)
     page = client_request.get('main.service_settings', service_id=SERVICE_ONE_ID)
 
@@ -174,7 +174,7 @@ def test_organisation_name_links_to_org_dashboard(
     single_sms_sender,
     mock_get_service_settings_page_common,
     mocker,
-    mock_get_service_organisation,
+    mock_get_organisation,
 ):
     service_one = service_json(SERVICE_ONE_ID,
                                permissions=['sms', 'email'],
@@ -188,7 +188,7 @@ def test_organisation_name_links_to_org_dashboard(
 
     org_row = find_element_by_tag_and_partial_text(response, tag='tr', string='Organisation')
     assert org_row.find('a')['href'] == url_for('main.organisation_dashboard', org_id=ORGANISATION_ID)
-    assert normalize_spaces(org_row.find('a').text) == 'Test Organisation'
+    assert normalize_spaces(org_row.find('a').text) == 'Test organisation'
 
 
 @pytest.mark.parametrize('service_contact_link,expected_text', [
@@ -203,7 +203,7 @@ def test_send_files_by_email_row_on_settings_page(
     single_sms_sender,
     mock_get_service_settings_page_common,
     mocker,
-    mock_get_service_organisation,
+    mock_get_organisation,
     service_contact_link,
     expected_text
 ):
@@ -296,7 +296,7 @@ def test_should_show_overview_for_service_with_more_things_set(
         single_reply_to_email_address,
         single_letter_contact_block,
         single_sms_sender,
-        mock_get_service_organisation,
+        mock_get_organisation,
         mock_get_email_branding,
         mock_get_service_settings_page_common,
         permissions,
@@ -318,7 +318,7 @@ def test_if_cant_send_letters_then_cant_see_letter_contact_block(
         service_one,
         single_reply_to_email_address,
         no_letter_contact_blocks,
-        mock_get_service_organisation,
+        mock_get_organisation,
         single_sms_sender,
         mock_get_service_settings_page_common,
 ):
@@ -331,7 +331,7 @@ def test_letter_contact_block_shows_none_if_not_set(
     service_one,
     single_reply_to_email_address,
     no_letter_contact_blocks,
-    mock_get_service_organisation,
+    mock_get_organisation,
     single_sms_sender,
     mock_get_service_settings_page_common,
 ):
@@ -352,7 +352,7 @@ def test_escapes_letter_contact_block(
     mocker,
     single_reply_to_email_address,
     single_sms_sender,
-    mock_get_service_organisation,
+    mock_get_organisation,
     injected_letter_contact_block,
     mock_get_service_settings_page_common,
 ):
@@ -463,7 +463,7 @@ def test_show_restricted_service(
     client_request,
     single_reply_to_email_address,
     single_letter_contact_block,
-    mock_get_service_organisation,
+    mock_get_organisation,
     single_sms_sender,
     mock_get_service_settings_page_common,
     user,
@@ -522,7 +522,7 @@ def test_show_live_service(
     mock_get_live_service,
     single_reply_to_email_address,
     single_letter_contact_block,
-    mock_get_service_organisation,
+    mock_get_organisation,
     single_sms_sender,
     mock_get_service_settings_page_common,
 ):
@@ -716,7 +716,7 @@ def test_should_check_if_estimated_volumes_provided(
     single_reply_to_email_address,
     mock_get_service_templates,
     mock_get_users_by_service,
-    mock_get_service_organisation,
+    mock_get_organisation,
     mock_get_invites_for_service,
     volumes,
     consent_to_research,
@@ -784,7 +784,6 @@ def test_should_check_for_sending_things_right(
     mocker,
     service_one,
     fake_uuid,
-    mock_get_service_organisation,
     single_sms_sender,
     count_of_users_with_manage_service,
     count_of_invites_with_manage_service,
@@ -842,6 +841,11 @@ def test_should_check_for_sending_things_right(
         'app.models.service.Service.get_templates',
         side_effect=_templates_by_type,
     )
+    mocker.patch(
+        'app.models.service.Service.organisation_id',
+        new_callable=PropertyMock,
+        return_value=None,
+    )
 
     mock_get_reply_to_email_addresses = mocker.patch(
         'app.main.views.service_settings.service_api_client.get_reply_to_email_addresses',
@@ -862,7 +866,6 @@ def test_should_check_for_sending_things_right(
     assert page.h1.text == 'Before you request to go live'
 
     checklist_items = page.select('.task-list .task-list-item')
-
     assert normalize_spaces(checklist_items[1].text) == expected_user_checklist_item
     assert normalize_spaces(checklist_items[2].text) == expected_templates_checklist_item
     assert normalize_spaces(checklist_items[3].text) == expected_reply_to_checklist_item
@@ -1028,7 +1031,7 @@ def test_should_check_for_sms_sender_on_go_live(
     client_request,
     service_one,
     mocker,
-    mock_get_service_organisation,
+    mock_get_organisation,
     mock_get_invites_for_service,
     organisation_type,
     count_of_sms_templates,
@@ -1109,6 +1112,7 @@ def test_should_check_for_mou_on_request_to_go_live(
     mocker,
     agreement_signed,
     mock_get_invites_for_service,
+    mock_get_service_organisation,
     expected_item,
 ):
     mocker.patch(
@@ -1137,7 +1141,7 @@ def test_should_check_for_mou_on_request_to_go_live(
         )
 
     mocker.patch(
-        'app.organisations_client.get_service_organisation',
+        'app.organisations_client.get_organisation',
         return_value=organisation_json(agreement_signed=agreement_signed)
     )
     page = client_request.get(
@@ -1186,10 +1190,16 @@ def test_gp_without_organisation_is_shown_agreement_step(
             new_callable=PropertyMock,
             return_value=None,
         )
-
-    mocker.patch('app.organisations_client.get_service_organisation', return_value=None)
-    service_one['organisation_id'] = None
-    service_one['organisation_type'] = organisation_type
+    mocker.patch(
+        'app.models.service.Service.organisation_id',
+        new_callable=PropertyMock,
+        return_value=None,
+    )
+    mocker.patch(
+        'app.models.service.Service.organisation_type',
+        new_callable=PropertyMock,
+        return_value=organisation_type,
+    )
 
     page = client_request.get(
         'main.request_to_go_live', service_id=SERVICE_ONE_ID
@@ -1208,7 +1218,7 @@ def test_non_gov_user_is_told_they_cant_go_live(
     mock_get_invites_for_service,
     mocker,
     mock_get_organisations,
-    mock_get_service_organisation,
+    mock_get_organisation,
 ):
     mocker.patch(
         'app.models.service.Service.has_team_members',
@@ -1492,11 +1502,6 @@ def test_should_redirect_after_request_to_go_live(
     formatted_displayed_volumes,
     extra_tags,
 ):
-    mocker.patch(
-        'app.organisations_client.get_service_organisation',
-        return_value=organisation_json(name=None, agreement_signed=None)
-    )
-
     for channel, volume in volumes:
         mocker.patch(
             'app.models.service.Service.volume_{}'.format(channel),
@@ -1564,6 +1569,7 @@ def test_request_to_go_live_displays_go_live_notes_in_zendesk_ticket(
     single_letter_contact_block,
     mock_get_organisations_and_services_for_user,
     single_sms_sender,
+    mock_get_service_organisation,
     mock_get_service_settings_page_common,
     mock_get_service_templates,
     mock_get_users_by_service,
@@ -1573,7 +1579,7 @@ def test_request_to_go_live_displays_go_live_notes_in_zendesk_ticket(
     go_live_note = 'This service is not allowed to go live'
 
     mocker.patch(
-        'app.organisations_client.get_service_organisation',
+        'app.organisations_client.get_organisation',
         side_effect=lambda org_id: organisation_json(
             ORGANISATION_ID,
             'Org 1',
@@ -1621,10 +1627,6 @@ def test_should_be_able_to_request_to_go_live_with_no_organisation(
     mock_update_service,
     mock_get_invites_without_manage_permission,
 ):
-    get_service_organisation = mocker.patch(
-        'app.organisations_client.get_service_organisation',
-        return_value=None,
-    )
     for channel in {'email', 'sms', 'letter'}:
         mocker.patch(
             'app.models.service.Service.volume_{}'.format(channel),
@@ -1641,7 +1643,6 @@ def test_should_be_able_to_request_to_go_live_with_no_organisation(
     )
 
     assert mock_post.called is True
-    get_service_organisation.assert_called_once_with(SERVICE_ONE_ID)
 
 
 @pytest.mark.parametrize(
@@ -1793,6 +1794,7 @@ def test_should_be_able_to_request_to_go_live_with_no_organisation(
 def test_ready_to_go_live(
     client_request,
     mocker,
+    mock_get_service_organisation,
     has_team_members,
     has_templates,
     has_email_templates,
@@ -1808,7 +1810,7 @@ def test_ready_to_go_live(
     expected_tags,
 ):
     mocker.patch(
-        'app.organisations_client.get_service_organisation',
+        'app.organisations_client.get_organisation',
         return_value=organisation_json(agreement_signed=agreement_signed)
     )
 
@@ -1863,7 +1865,7 @@ def test_route_permissions(
         service_one,
         single_reply_to_email_address,
         single_letter_contact_block,
-        mock_get_service_organisation,
+        mock_get_organisation,
         mock_get_invites_for_service,
         single_sms_sender,
         route,
@@ -1926,7 +1928,7 @@ def test_route_for_platform_admin(
         service_one,
         single_reply_to_email_address,
         single_letter_contact_block,
-        mock_get_service_organisation,
+        mock_get_organisation,
         single_sms_sender,
         route,
         mock_get_service_settings_page_common,
@@ -1948,7 +1950,7 @@ def test_and_more_hint_appears_on_settings_with_more_than_just_a_single_sender(
         service_one,
         multiple_reply_to_email_addresses,
         multiple_letter_contact_blocks,
-        mock_get_service_organisation,
+        mock_get_organisation,
         multiple_sms_senders,
         mock_get_service_settings_page_common,
 ):
@@ -1978,7 +1980,7 @@ def test_api_ids_dont_show_on_option_pages_with_a_single_sender(
     client_request,
     single_reply_to_email_address,
     single_letter_contact_block,
-    mock_get_service_organisation,
+    mock_get_organisation,
     single_sms_sender,
     sender_list_page,
     index,
@@ -2962,7 +2964,7 @@ def test_shows_research_mode_indicator(
     mocker,
     single_reply_to_email_address,
     single_letter_contact_block,
-    mock_get_service_organisation,
+    mock_get_organisation,
     single_sms_sender,
     mock_get_service_settings_page_common,
 ):
@@ -2982,7 +2984,7 @@ def test_does_not_show_research_mode_indicator(
     client_request,
     single_reply_to_email_address,
     single_letter_contact_block,
-    mock_get_service_organisation,
+    mock_get_organisation,
     single_sms_sender,
     mock_get_service_settings_page_common,
 ):
@@ -3789,7 +3791,7 @@ def test_archive_service_prompts_user(
     mocker,
     single_reply_to_email_address,
     single_letter_contact_block,
-    mock_get_service_organisation,
+    mock_get_organisation,
     single_sms_sender,
     mock_get_service_settings_page_common,
     user,
@@ -3825,7 +3827,7 @@ def test_cant_archive_inactive_service(
     service_one,
     single_reply_to_email_address,
     single_letter_contact_block,
-    mock_get_service_organisation,
+    mock_get_organisation,
     single_sms_sender,
     mock_get_service_settings_page_common
 ):
@@ -3859,7 +3861,7 @@ def test_suspend_service_prompts_user(
     mocker,
     single_reply_to_email_address,
     single_letter_contact_block,
-    mock_get_service_organisation,
+    mock_get_organisation,
     single_sms_sender,
     mock_get_service_settings_page_common,
 ):
@@ -3879,7 +3881,7 @@ def test_cant_suspend_inactive_service(
     service_one,
     single_reply_to_email_address,
     single_letter_contact_block,
-    mock_get_service_organisation,
+    mock_get_organisation,
     single_sms_sender,
     mock_get_service_settings_page_common,
 ):
@@ -3897,7 +3899,7 @@ def test_resume_service_after_confirm(
     service_one,
     single_reply_to_email_address,
     single_letter_contact_block,
-    mock_get_service_organisation,
+    mock_get_organisation,
     mocker,
     mock_get_inbound_number_for_service,
 ):
@@ -3916,7 +3918,7 @@ def test_resume_service_prompts_user(
     service_one,
     single_reply_to_email_address,
     single_letter_contact_block,
-    mock_get_service_organisation,
+    mock_get_organisation,
     single_sms_sender,
     mocker,
     mock_get_service_settings_page_common,
@@ -3938,7 +3940,7 @@ def test_cant_resume_active_service(
     service_one,
     single_reply_to_email_address,
     single_letter_contact_block,
-    mock_get_service_organisation,
+    mock_get_organisation,
     single_sms_sender,
     mock_get_service_settings_page_common
 ):
@@ -3979,7 +3981,7 @@ def test_send_files_by_email_contact_details_updates_contact_details_and_redirec
     service_one,
     mock_update_service,
     mock_get_service_settings_page_common,
-    mock_get_service_organisation,
+    mock_get_organisation,
     no_reply_to_email_addresses,
     no_letter_contact_blocks,
     single_sms_sender,
@@ -4007,7 +4009,7 @@ def test_send_files_by_email_contact_details_uses_the_selected_field_when_multip
     service_one,
     mock_update_service,
     mock_get_service_settings_page_common,
-    mock_get_service_organisation,
+    mock_get_organisation,
     no_reply_to_email_addresses,
     no_letter_contact_blocks,
     single_sms_sender,
@@ -4101,7 +4103,7 @@ def test_contact_link_is_not_displayed_without_the_upload_document_permission(
     client_request,
     service_one,
     mock_get_service_settings_page_common,
-    mock_get_service_organisation,
+    mock_get_organisation,
     no_reply_to_email_addresses,
     no_letter_contact_blocks,
     single_sms_sender,
@@ -4166,7 +4168,7 @@ def test_service_settings_when_inbound_number_is_not_set(
     service_one,
     single_reply_to_email_address,
     single_letter_contact_block,
-    mock_get_service_organisation,
+    mock_get_organisation,
     single_sms_sender,
     mocker,
     mock_get_all_letter_branding,
@@ -4299,7 +4301,7 @@ def test_updates_sms_prefixing(
 def test_select_organisation(
     platform_admin_client,
     service_one,
-    mock_get_service_organisation,
+    mock_get_organisation,
     mock_get_organisations
 ):
     response = platform_admin_client.get(
@@ -4319,7 +4321,7 @@ def test_select_organisation(
 def test_select_organisation_shows_message_if_no_orgs(
     platform_admin_client,
     service_one,
-    mock_get_service_organisation,
+    mock_get_organisation,
     mocker
 ):
     mocker.patch('app.organisations_client.get_organisations', return_value=[])
@@ -4338,7 +4340,7 @@ def test_select_organisation_shows_message_if_no_orgs(
 def test_update_service_organisation(
     platform_admin_client,
     service_one,
-    mock_get_service_organisation,
+    mock_get_organisation,
     mock_get_organisations,
     mock_update_service_organisation,
 ):
@@ -4357,7 +4359,7 @@ def test_update_service_organisation(
 def test_update_service_organisation_does_not_update_if_same_value(
     platform_admin_client,
     service_one,
-    mock_get_service_organisation,
+    mock_get_organisation,
     mock_get_organisations,
     mock_update_service_organisation,
 ):
@@ -4401,10 +4403,6 @@ def test_show_branding_request_page_when_no_branding_is_set(
 ):
     service_one['{}_branding'.format(branding_type)] = None
     service_one['organisation_type'] = organisation_type
-    mocker.patch(
-        'app.organisations_client.get_service_organisation',
-        return_value=None,
-    )
 
     page = client_request.get(
         '.branding_request', service_id=SERVICE_ONE_ID, branding_type=branding_type
@@ -4468,14 +4466,14 @@ def test_show_branding_request_page_when_no_branding_is_set_but_organisation_exi
     client_request,
     mock_get_email_branding,
     mock_get_letter_branding_by_id,
+    mock_get_service_organisation,
     organisation_type,
     expected_options,
     branding_type
 ):
     service_one['{}_branding'.format(branding_type)] = None
-    service_one['organisation_type'] = organisation_type
     mocker.patch(
-        'app.organisations_client.get_service_organisation',
+        'app.organisations_client.get_organisation',
         return_value=organisation_json(organisation_type=organisation_type),
     )
 
@@ -4512,14 +4510,14 @@ def test_show_branding_request_page_when_no_branding_is_set_but_organisation_exi
     client_request,
     mock_get_email_branding,
     mock_get_letter_branding_by_id,
+    mock_get_service_organisation,
     organisation_type,
     expected_options,
     branding_type
 ):
     service_one['{}_branding'.format(branding_type)] = None
-    service_one['organisation_type'] = organisation_type
     mocker.patch(
-        'app.organisations_client.get_service_organisation',
+        'app.organisations_client.get_organisation',
         return_value=organisation_json(organisation_type=organisation_type),
     )
 
@@ -4544,11 +4542,12 @@ def test_show_email_branding_request_page_when_email_branding_is_set(
     service_one,
     client_request,
     mock_get_email_branding,
+    mock_get_service_organisation,
     active_user_with_permissions,
 ):
     service_one['email_branding'] = sample_uuid()
     mocker.patch(
-        'app.organisations_client.get_service_organisation',
+        'app.organisations_client.get_organisation',
         return_value=organisation_json(),
     )
 
@@ -4574,11 +4573,12 @@ def test_show_letter_branding_request_page_when_letter_branding_is_set(
     service_one,
     client_request,
     mock_get_letter_branding_by_id,
+    mock_get_service_organisation,
     active_user_with_permissions,
 ):
     service_one['letter_branding'] = sample_uuid()
     mocker.patch(
-        'app.organisations_client.get_service_organisation',
+        'app.organisations_client.get_organisation',
         return_value=organisation_json(),
     )
 
@@ -4613,10 +4613,6 @@ def test_back_link_on_branding_request_page(
     back_link_url,
     branding_type,
 ):
-    mocker.patch(
-        'app.organisations_client.get_service_organisation',
-        return_value=organisation_json(),
-    )
     if from_template:
         page = client_request.get(
             '.branding_request', service_id=SERVICE_ONE_ID, branding_type=branding_type, from_template=from_template
@@ -4637,18 +4633,19 @@ def test_show_branding_request_page_when_branding_is_same_as_org(
     client_request,
     mock_get_email_branding,
     mock_get_letter_branding_by_id,
+    mock_get_service_organisation,
     active_user_with_permissions,
     branding_type
 ):
     service_one['{}_branding'.format(branding_type)] = sample_uuid()
     if branding_type == 'email':
         mocker.patch(
-            'app.organisations_client.get_service_organisation',
+            'app.organisations_client.get_organisation',
             return_value=organisation_json(email_branding_id=service_one['email_branding']),
         )
     else:
         mocker.patch(
-            'app.organisations_client.get_service_organisation',
+            'app.organisations_client.get_organisation',
             return_value=organisation_json(letter_branding_id=service_one['letter_branding']),
         )
 
@@ -4717,10 +4714,14 @@ def test_submit_email_branding_request(
     expected_organisation,
 ):
     service_one['email_branding'] = sample_uuid()
-
     mocker.patch(
-        'app.organisations_client.get_service_organisation',
-        return_value=organisation_json(name=org_name) if org_name else None,
+        'app.models.service.Service.organisation_id',
+        new_callable=PropertyMock,
+        return_value=ORGANISATION_ID if org_name else None,
+    )
+    mocker.patch(
+        'app.organisations_client.get_organisation',
+        return_value=organisation_json(name=org_name),
     )
 
     zendesk = mocker.patch(
@@ -4798,8 +4799,13 @@ def test_submit_letter_branding_request(
     service_one['letter_branding'] = sample_uuid()
 
     mocker.patch(
-        'app.organisations_client.get_service_organisation',
-        return_value=organisation_json(name=org_name) if org_name else None,
+        'app.models.service.Service.organisation_id',
+        new_callable=PropertyMock,
+        return_value=ORGANISATION_ID if org_name else None,
+    )
+    mocker.patch(
+        'app.organisations_client.get_organisation',
+        return_value=organisation_json(name=org_name),
     )
 
     zendesk = mocker.patch(
@@ -4853,7 +4859,6 @@ def test_submit_letter_branding_request_redirects_if_from_template_is_set(
     branding_type,
 
 ):
-    mocker.patch('app.organisations_client.get_service_organisation', return_value=None)
     mocker.patch('app.main.views.service_settings.zendesk_client.create_ticket', autospec=True)
     data = {'options': 'something_else', 'something_else': 'Homer Simpson'}
 
@@ -4886,11 +4891,6 @@ def test_submit_branding_when_something_else_is_only_option(
     branding_type,
     current_branding,
 ):
-    mocker.patch(
-        'app.organisations_client.get_service_organisation',
-        return_value=None,
-    )
-
     zendesk = mocker.patch(
         'app.main.views.service_settings.zendesk_client.create_ticket',
         autospec=True,
@@ -4921,7 +4921,7 @@ def test_service_settings_links_to_branding_request_page_for_letters(
     no_letter_contact_blocks,
     single_sms_sender,
     mock_get_service_settings_page_common,
-    mock_get_service_organisation,
+    mock_get_organisation,
 ):
     service_one["restricted"] is False
     service_one['permissions'].append('letter')

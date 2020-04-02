@@ -22,6 +22,10 @@ class OrganisationsClient(NotifyAdminAPIClient):
     def get_organisation(self, org_id):
         return self.get(url='/organisations/{}'.format(org_id))
 
+    @cache.set('organisation-{org_id}-name')
+    def get_organisation_name(self, org_id):
+        return self.get_organisation(org_id)['name']
+
     def get_organisation_by_domain(self, domain):
         try:
             return self.get(
@@ -54,11 +58,9 @@ class OrganisationsClient(NotifyAdminAPIClient):
 
         return api_response
 
+    @cache.delete('organisation-{org_id}-name')
     def update_organisation_name(self, org_id, name):
         return self.update_organisation(org_id, name=name)
-
-    def get_service_organisation(self, service_id):
-        return self.get(url="/service/{}/organisation".format(service_id))
 
     @cache.delete('service-{service_id}')
     @cache.delete('live-service-and-organisation-counts')

@@ -7,7 +7,7 @@ from flask import url_for
 from freezegun import freeze_time
 
 from tests import organisation_json
-from tests.conftest import SERVICE_ONE_ID, normalize_spaces
+from tests.conftest import ORGANISATION_ID, SERVICE_ONE_ID, normalize_spaces
 
 
 class _MockS3Object():
@@ -85,6 +85,7 @@ def test_show_agreement_page(
     client_request,
     mocker,
     fake_uuid,
+    mock_get_service_organisation,
     mock_has_jobs,
     agreement_signed,
     crown,
@@ -94,7 +95,7 @@ def test_show_agreement_page(
         crown=crown,
         agreement_signed=agreement_signed
     )
-    mocker.patch('app.organisations_client.get_service_organisation', return_value=org)
+    mocker.patch('app.organisations_client.get_organisation', return_value=org)
 
     page = client_request.get('main.service_agreement', service_id=SERVICE_ONE_ID)
     links = page.select('main .govuk-grid-column-five-sixths a')
@@ -118,7 +119,6 @@ def test_unknown_gps_and_trusts_are_redirected(
     org_type,
     expected_endpoint,
 ):
-    mocker.patch('app.organisations_client.get_service_organisation', return_value=None)
     service_one['organisation_id'] = None
     service_one['organisation_type'] = org_type
     client_request.get(
@@ -150,13 +150,14 @@ def test_unknown_gps_and_trusts_are_redirected(
 def test_download_service_agreement(
     logged_in_client,
     mocker,
+    mock_get_service_organisation,
     crown,
     expected_status,
     expected_file_fetched,
     expected_file_served,
 ):
     mocker.patch(
-        'app.models.organisation.organisations_client.get_service_organisation',
+        'app.models.organisation.organisations_client.get_organisation',
         return_value=organisation_json(
             crown=crown
         )
@@ -188,6 +189,7 @@ def test_show_accept_agreement_page(
     client_request,
     mocker,
     mock_get_service_organisation,
+    mock_get_organisation,
 ):
     page = client_request.get('main.service_accept_agreement', service_id=SERVICE_ONE_ID)
 
@@ -247,7 +249,7 @@ def test_accept_agreement_page_populates(
     mock_get_service_organisation,
 ):
     mocker.patch(
-        'app.models.organisation.organisations_client.get_service_organisation',
+        'app.models.organisation.organisations_client.get_organisation',
         return_value=organisation_json(
             agreement_signed_version='1.2',
             agreement_signed_on_behalf_of_name='Firstname Lastname',
@@ -328,6 +330,7 @@ def test_accept_agreement_page_populates(
 
 ))
 def test_accept_agreement_page_validates(
+    mocker,
     client_request,
     mock_get_service_organisation,
     data,
@@ -353,7 +356,7 @@ def test_accept_agreement_page_validates(
             'on_behalf_of_email': 'test@example.com',
         },
         call(
-            '7aa5d4e9-4385-4488-a489-07812ba13383',
+            ORGANISATION_ID,
             agreement_signed_version=1.2,
             agreement_signed_on_behalf_of_name='Firstname Lastname',
             agreement_signed_on_behalf_of_email_address='test@example.com',
@@ -368,7 +371,7 @@ def test_accept_agreement_page_validates(
             'on_behalf_of_email': 'test@example.com',
         },
         call(
-            '7aa5d4e9-4385-4488-a489-07812ba13383',
+            ORGANISATION_ID,
             agreement_signed_version=1.2,
             agreement_signed_on_behalf_of_name='',
             agreement_signed_on_behalf_of_email_address='',
@@ -383,7 +386,7 @@ def test_accept_agreement_page_validates(
             'on_behalf_of_email': '',
         },
         call(
-            '7aa5d4e9-4385-4488-a489-07812ba13383',
+            ORGANISATION_ID,
             agreement_signed_version=1.2,
             agreement_signed_on_behalf_of_name='',
             agreement_signed_on_behalf_of_email_address='',
@@ -392,6 +395,7 @@ def test_accept_agreement_page_validates(
     ),
 ))
 def test_accept_agreement_page_persists(
+    mocker,
     client_request,
     mock_get_service_organisation,
     mock_update_organisation,
@@ -428,12 +432,13 @@ def test_accept_agreement_page_persists(
 def test_show_confirm_agreement_page(
     client_request,
     mocker,
+    mock_get_service_organisation,
     name,
     email,
     expected_paragraph,
 ):
     mocker.patch(
-        'app.models.organisation.organisations_client.get_service_organisation',
+        'app.models.organisation.organisations_client.get_organisation',
         return_value=organisation_json(
             agreement_signed_version='1.2',
             agreement_signed_on_behalf_of_name=name,
@@ -447,7 +452,7 @@ def test_show_confirm_agreement_page(
 @pytest.mark.parametrize('http_method', ('get', 'post'))
 def test_confirm_agreement_page_403s_if_previous_step_not_taken(
     client_request,
-    mock_get_service_organisation,
+    mock_get_organisation,
     http_method,
 ):
     getattr(client_request, http_method)(
@@ -461,11 +466,12 @@ def test_confirm_agreement_page_403s_if_previous_step_not_taken(
 def test_confirm_agreement_page_persists(
     client_request,
     mocker,
+    mock_get_service_organisation,
     mock_update_organisation,
     fake_uuid,
 ):
     mocker.patch(
-        'app.models.organisation.organisations_client.get_service_organisation',
+        'app.models.organisation.organisations_client.get_organisation',
         return_value=organisation_json(agreement_signed_version='1.2')
     )
     client_request.post(

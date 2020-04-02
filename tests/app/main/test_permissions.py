@@ -298,7 +298,7 @@ def test_services_pages_that_org_users_are_allowed_to_see(
     mock_get_invites_for_service,
     mock_get_users_by_service,
     mock_get_template_folders,
-    mock_get_service_organisation,
+    mock_get_organisation,
     mock_has_jobs,
     user_services,
     user_organisations,
@@ -352,7 +352,7 @@ def test_service_navigation_for_org_user(
     mock_get_service,
     mock_get_invites_for_service,
     mock_get_users_by_service,
-    mock_get_service_organisation,
+    mock_get_organisation,
 ):
     api_user_active['services'] = []
     api_user_active['organisations'] = [ORGANISATION_ID]
@@ -412,7 +412,7 @@ def test_service_user_without_manage_service_permission_can_see_usage_page_when_
     mock_get_service,
     mock_get_invites_for_service,
     mock_get_users_by_service,
-    mock_get_service_organisation,
+    mock_get_organisation,
     mock_get_service_templates,
     mock_get_template_folders,
     user_organisations,
