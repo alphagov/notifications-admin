@@ -649,6 +649,23 @@ LETTER_VALIDATION_MESSAGES = {
             'letter specification'
             '</a>.'
         ),
+    },
+    'not-a-real-uk-postcode': {
+        'title': 'Postcode in the address block is not a real UK postcode',
+        'detail': (
+            'You need to give us a real UK postcode.<br>'
+            'Files must meet our '
+            '<a class="govuk-link govuk-link--destructive" href="{letter_spec_guidance}" target="_blank">'
+            'letter specification'
+            '</a>.'
+        ),
+        'summary': (
+            'Validation failed because the postcode is not a real UK postcode.<br>'
+            'Files must meet our '
+            '<a class="govuk-link govuk-link--no-visited-state" href="{letter_spec}" target="_blank">'
+            'letter specification'
+            '</a>.'
+        ),
     }
 }
 
