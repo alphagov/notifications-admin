@@ -2115,7 +2115,7 @@ def test_send_test_works_as_letter_preview(
     assert response.get_data(as_text=True) == 'foo'
     assert mocked_preview.call_args[0][0].id == template_id
     assert type(mocked_preview.call_args[0][0]) == LetterImageTemplate
-    assert mocked_preview.call_args[0][0].values == {'address_line_1': 'Jo Lastname'}
+    assert mocked_preview.call_args[0][0].values == {'addressline1': 'Jo Lastname'}
     assert mocked_preview.call_args[0][1] == filetype
 
 
@@ -2205,33 +2205,36 @@ def test_send_one_off_letter_address_shows_form(
 @pytest.mark.parametrize(['form_data', 'expected_placeholders'], [
     # minimal
     ('\n'.join(['a', 'b', 'c']), {
-        'address line 1': 'a',
-        'address line 2': 'b',
-        'address line 3': '',
-        'address line 4': '',
-        'address line 5': '',
-        'address line 6': '',
+        'address_line_1': 'a',
+        'address_line_2': 'b',
+        'address_line_3': '',
+        'address_line_4': '',
+        'address_line_5': '',
+        'address_line_6': '',
+        'address_line_7': 'c',
         'postcode': 'c',
     }),
     # maximal
     ('\n'.join(['a', 'b', 'c', 'd', 'e', 'f', 'g']), {
-        'address line 1': 'a',
-        'address line 2': 'b',
-        'address line 3': 'c',
-        'address line 4': 'd',
-        'address line 5': 'e',
-        'address line 6': 'f',
+        'address_line_1': 'a',
+        'address_line_2': 'b',
+        'address_line_3': 'c',
+        'address_line_4': 'd',
+        'address_line_5': 'e',
+        'address_line_6': 'f',
+        'address_line_7': 'g',
         'postcode': 'g',
     }),
     # it ignores empty lines and strips whitespace from each line.
     # It also strips extra whitespace from the middle of lines.
     ('\n  a\ta  \n\n\n      \n\n\n\nb  b   \r\nc', {
-        'address line 1': 'a\ta',
-        'address line 2': 'b b',
-        'address line 3': '',
-        'address line 4': '',
-        'address line 5': '',
-        'address line 6': '',
+        'address_line_1': 'a\ta',
+        'address_line_2': 'b b',
+        'address_line_3': '',
+        'address_line_4': '',
+        'address_line_5': '',
+        'address_line_6': '',
+        'address_line_7': 'c',
         'postcode': 'c',
     }),
 ])
