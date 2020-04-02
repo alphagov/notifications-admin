@@ -537,11 +537,6 @@ class RegisterUserFromOrgInviteForm(StripWhitespaceForm):
     auth_type = HiddenField('auth_type', validators=[DataRequired()])
 
 
-BroadcastPermissionsAbstract = type("BroadcastPermissionsAbstract", (StripWhitespaceForm,), {
-    permission: BooleanField(label) for permission, label in broadcast_permissions
-})
-
-
 class govukCheckboxesMixin:
 
     def extend_params(self, params, extensions):
@@ -713,7 +708,23 @@ class govukCollapsibleNestedCheckboxesField(govukCollapsibleCheckboxesMixin, Nes
     render_as_list = True
 
 
-class PermissionsForm(StripWhitespaceForm):
+# guard against data entries that aren't a role in permissions
+def filter_by_permissions(valuelist):
+    if valuelist is None:
+        return None
+    else:
+        return [entry for entry in valuelist if any(entry in role for role in permissions)]
+
+
+# guard against data entries that aren't a role in broadcast_permissions
+def filter_by_broadcast_permissions(valuelist):
+    if valuelist is None:
+        return None
+    else:
+        return [entry for entry in valuelist if any(entry in role for role in broadcast_permissions)]
+
+
+class BasePermissionsForm(StripWhitespaceForm):
     def __init__(self, all_template_folders=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.folder_permissions.choices = []
@@ -723,7 +734,9 @@ class PermissionsForm(StripWhitespaceForm):
                 (item['id'], item['name']) for item in ([{'name': 'Templates', 'id': None}] + all_template_folders)
             ]
 
-    folder_permissions = NestedCheckboxesField('Folders this team member can see')
+    folder_permissions = govukCollapsibleNestedCheckboxesField(
+        'Folders this team member can see',
+        field_label='folder')
 
     login_authentication = RadioField(
         'Sign in using',
@@ -735,34 +748,49 @@ class PermissionsForm(StripWhitespaceForm):
         validators=[DataRequired()]
     )
 
-    @property
-    def permissions(self):
-        return {field.id for field in self.permissions_fields if field.data is True}
+    permissions_field = govukCheckboxesField(
+        'Permssions',
+        filters=[filter_by_permissions],
+        choices=[
+            (value, label) for value, label in permissions
+        ],
+        param_extensions={
+            "hint": {"text": "All team members can see sent messages."}
+        }
+    )
 
     @property
-    def permissions_fields(self):
-        return (
-            getattr(self, permission) for permission, field in self.__dict__.items()
-            if isinstance(field, BooleanField)
-        )
+    def permissions(self):
+        return set(self.permissions_field.data)
 
     @classmethod
     def from_user(cls, user, service_id, **kwargs):
         return cls(
             **kwargs,
             **{
-                role: user.has_permission_for_service(service_id, role)
-                for role in roles.keys()
+                "permissions_field": [
+                    role for role in roles.keys() if user.has_permission_for_service(service_id, role)]
             },
             login_authentication=user.auth_type
         )
 
 
-class PermissionsForm(PermissionsAbstract, BasePermissionsForm):
+class PermissionsForm(BasePermissionsForm):
     pass
 
 
-class BroadcastPermissionsForm(BroadcastPermissionsAbstract, BasePermissionsForm):
+class BroadcastPermissionsForm(BasePermissionsForm):
+
+    permissions_field = govukCheckboxesField(
+        'Permssions',
+        choices=[
+            (value, label) for value, label in broadcast_permissions
+        ],
+        filters=[filter_by_broadcast_permissions],
+        param_extensions={
+            "hint": {"text": "All team members can see sent messages."}
+        }
+    )
 
     @property
     def permissions(self):
