@@ -472,7 +472,7 @@ class Service(JSONModel):
 
     @property
     def organisation_name(self):
-        if not self.organisation:
+        if not self.organisation_id:
             return None
         return organisations_client.get_organisation_name(self.organisation_id)
 
