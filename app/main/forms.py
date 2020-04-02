@@ -769,6 +769,11 @@ class LetterAddressForm(StripWhitespaceForm):
                 f'Address must be no more than {PostalAddress.MAX_LINES} lines long'
             )
 
+        if not address.postcode:
+            raise ValidationError(
+                f'Last line of the address must be a real UK postcode'
+            )
+
 
 class EmailTemplateForm(BaseTemplateForm):
     subject = TextAreaField(
