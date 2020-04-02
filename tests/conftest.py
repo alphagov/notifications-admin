@@ -2,7 +2,7 @@ import json
 import os
 from contextlib import contextmanager
 from datetime import date, datetime, timedelta
-from unittest.mock import Mock
+from unittest.mock import Mock, PropertyMock
 from uuid import UUID, uuid4
 
 import pytest
@@ -3135,6 +3135,18 @@ def mock_get_no_organisation_by_domain(mocker):
     return mocker.patch(
         'app.organisations_client.get_organisation_by_domain',
         return_value=None,
+    )
+
+
+@pytest.fixture(scope='function')
+def mock_get_service_organisation(
+    mocker,
+    mock_get_organisation,
+):
+    return mocker.patch(
+        'app.models.service.Service.organisation_id',
+        new_callable=PropertyMock,
+        return_value=ORGANISATION_ID,
     )
 
 

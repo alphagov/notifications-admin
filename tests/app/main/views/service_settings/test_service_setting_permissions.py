@@ -1,11 +1,10 @@
 import functools
-from unittest.mock import PropertyMock
 
 import pytest
 from flask import url_for
 
 from app.main.views.service_settings import PLATFORM_ADMIN_SERVICE_PERMISSIONS
-from tests.conftest import ORGANISATION_ID, normalize_spaces
+from tests.conftest import normalize_spaces
 
 
 @pytest.fixture
@@ -79,6 +78,7 @@ def test_service_set_permission(
 ])
 def test_service_setting_toggles_show(
     mocker,
+    mock_get_service_organisation,
     get_service_settings_page,
     service_one,
     service_fields,
@@ -88,11 +88,6 @@ def test_service_setting_toggles_show(
 ):
     link_url = url_for(endpoint, **kwargs, service_id=service_one['id'])
     service_one.update(service_fields)
-    mocker.patch(
-        'app.models.service.Service.organisation_id',
-        new_callable=PropertyMock,
-        return_value=ORGANISATION_ID,
-    )
     page = get_service_settings_page()
     assert normalize_spaces(page.find('a', {'href': link_url}).find_parent('tr').text.strip()) == text
 

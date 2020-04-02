@@ -1,6 +1,6 @@
 from functools import partial
 from io import BytesIO
-from unittest.mock import PropertyMock, call
+from unittest.mock import call
 
 import pytest
 from flask import url_for
@@ -85,16 +85,12 @@ def test_show_agreement_page(
     client_request,
     mocker,
     fake_uuid,
+    mock_get_service_organisation,
     mock_has_jobs,
     agreement_signed,
     crown,
     expected_links,
 ):
-    mocker.patch(
-        'app.models.service.Service.organisation_id',
-        new_callable=PropertyMock,
-        return_value=ORGANISATION_ID,
-    )
     org = organisation_json(
         crown=crown,
         agreement_signed=agreement_signed
@@ -154,16 +150,12 @@ def test_unknown_gps_and_trusts_are_redirected(
 def test_download_service_agreement(
     logged_in_client,
     mocker,
+    mock_get_service_organisation,
     crown,
     expected_status,
     expected_file_fetched,
     expected_file_served,
 ):
-    mocker.patch(
-        'app.models.service.Service.organisation_id',
-        new_callable=PropertyMock,
-        return_value=ORGANISATION_ID,
-    )
     mocker.patch(
         'app.models.organisation.organisations_client.get_organisation',
         return_value=organisation_json(
@@ -196,13 +188,9 @@ def test_download_service_agreement(
 def test_show_accept_agreement_page(
     client_request,
     mocker,
+    mock_get_service_organisation,
     mock_get_organisation,
 ):
-    mocker.patch(
-        'app.models.service.Service.organisation_id',
-        new_callable=PropertyMock,
-        return_value=ORGANISATION_ID,
-    )
     page = client_request.get('main.service_accept_agreement', service_id=SERVICE_ONE_ID)
 
     assert [
@@ -258,13 +246,8 @@ def test_show_accept_agreement_page(
 def test_accept_agreement_page_populates(
     client_request,
     mocker,
-    mock_get_organisation,
+    mock_get_service_organisation,
 ):
-    mocker.patch(
-        'app.models.service.Service.organisation_id',
-        new_callable=PropertyMock,
-        return_value=ORGANISATION_ID,
-    )
     mocker.patch(
         'app.models.organisation.organisations_client.get_organisation',
         return_value=organisation_json(
@@ -349,15 +332,10 @@ def test_accept_agreement_page_populates(
 def test_accept_agreement_page_validates(
     mocker,
     client_request,
-    mock_get_organisation,
+    mock_get_service_organisation,
     data,
     expected_errors,
 ):
-    mocker.patch(
-        'app.models.service.Service.organisation_id',
-        new_callable=PropertyMock,
-        return_value=ORGANISATION_ID,
-    )
     page = client_request.post(
         'main.service_accept_agreement',
         service_id=SERVICE_ONE_ID,
@@ -419,16 +397,11 @@ def test_accept_agreement_page_validates(
 def test_accept_agreement_page_persists(
     mocker,
     client_request,
-    mock_get_organisation,
+    mock_get_service_organisation,
     mock_update_organisation,
     data,
     expected_persisted,
 ):
-    mocker.patch(
-        'app.models.service.Service.organisation_id',
-        new_callable=PropertyMock,
-        return_value=ORGANISATION_ID,
-    )
     client_request.post(
         'main.service_accept_agreement',
         service_id=SERVICE_ONE_ID,
@@ -459,15 +432,11 @@ def test_accept_agreement_page_persists(
 def test_show_confirm_agreement_page(
     client_request,
     mocker,
+    mock_get_service_organisation,
     name,
     email,
     expected_paragraph,
 ):
-    mocker.patch(
-        'app.models.service.Service.organisation_id',
-        new_callable=PropertyMock,
-        return_value=ORGANISATION_ID,
-    )
     mocker.patch(
         'app.models.organisation.organisations_client.get_organisation',
         return_value=organisation_json(
@@ -497,14 +466,10 @@ def test_confirm_agreement_page_403s_if_previous_step_not_taken(
 def test_confirm_agreement_page_persists(
     client_request,
     mocker,
+    mock_get_service_organisation,
     mock_update_organisation,
     fake_uuid,
 ):
-    mocker.patch(
-        'app.models.service.Service.organisation_id',
-        new_callable=PropertyMock,
-        return_value=ORGANISATION_ID,
-    )
     mocker.patch(
         'app.models.organisation.organisations_client.get_organisation',
         return_value=organisation_json(agreement_signed_version='1.2')

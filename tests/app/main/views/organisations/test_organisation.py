@@ -1,4 +1,4 @@
-from unittest.mock import ANY, Mock, PropertyMock
+from unittest.mock import ANY, Mock
 
 import pytest
 from bs4 import BeautifulSoup
@@ -195,16 +195,12 @@ def test_create_new_organisation_fails_if_new_name_has_less_than_2_alphanumeric_
 def test_gps_can_create_own_organisations(
     client_request,
     mocker,
+    mock_get_service_organisation,
     service_one,
     organisation_type,
     organisation,
     expected_status,
 ):
-    mocker.patch(
-        'app.models.service.Service.organisation_id',
-        new_callable=PropertyMock,
-        return_value=ORGANISATION_ID,
-    )
     mocker.patch('app.organisations_client.get_organisation', return_value=organisation)
     service_one['organisation_type'] = organisation_type
 
@@ -234,16 +230,12 @@ def test_gps_can_create_own_organisations(
 def test_nhs_local_can_create_own_organisations(
     client_request,
     mocker,
+    mock_get_service_organisation,
     service_one,
     organisation_type,
     organisation,
     expected_status,
 ):
-    mocker.patch(
-        'app.models.service.Service.organisation_id',
-        new_callable=PropertyMock,
-        return_value=ORGANISATION_ID,
-    )
     mocker.patch('app.organisations_client.get_organisation', return_value=organisation)
     mocker.patch(
         'app.models.organisation.Organisations.client_method',

@@ -890,7 +890,7 @@ def test_should_not_show_go_live_button_if_checklist_not_complete(
     mocker,
     mock_get_service_templates,
     mock_get_users_by_service,
-    mock_get_organisation,
+    mock_get_service_organisation,
     mock_get_invites_for_service,
     single_sms_sender,
     checklist_completed,
@@ -901,11 +901,6 @@ def test_should_not_show_go_live_button_if_checklist_not_complete(
         'app.models.service.Service.go_live_checklist_completed',
         new_callable=PropertyMock,
         return_value=checklist_completed,
-    )
-    mocker.patch(
-        'app.models.service.Service.organisation_id',
-        new_callable=PropertyMock,
-        return_value=ORGANISATION_ID,
     )
     mocker.patch(
         'app.models.organisation.Organisation.agreement_signed',
@@ -1117,6 +1112,7 @@ def test_should_check_for_mou_on_request_to_go_live(
     mocker,
     agreement_signed,
     mock_get_invites_for_service,
+    mock_get_service_organisation,
     expected_item,
 ):
     mocker.patch(
@@ -1144,11 +1140,6 @@ def test_should_check_for_mou_on_request_to_go_live(
             return_value=None,
         )
 
-    mocker.patch(
-        'app.models.service.Service.organisation_id',
-        new_callable=PropertyMock,
-        return_value=ORGANISATION_ID,
-    )
     mocker.patch(
         'app.organisations_client.get_organisation',
         return_value=organisation_json(agreement_signed=agreement_signed)
@@ -1199,7 +1190,6 @@ def test_gp_without_organisation_is_shown_agreement_step(
             new_callable=PropertyMock,
             return_value=None,
         )
-
     mocker.patch(
         'app.models.service.Service.organisation_id',
         new_callable=PropertyMock,
@@ -1579,6 +1569,7 @@ def test_request_to_go_live_displays_go_live_notes_in_zendesk_ticket(
     single_letter_contact_block,
     mock_get_organisations_and_services_for_user,
     single_sms_sender,
+    mock_get_service_organisation,
     mock_get_service_settings_page_common,
     mock_get_service_templates,
     mock_get_users_by_service,
@@ -1587,11 +1578,6 @@ def test_request_to_go_live_displays_go_live_notes_in_zendesk_ticket(
 ):
     go_live_note = 'This service is not allowed to go live'
 
-    mocker.patch(
-        'app.models.service.Service.organisation_id',
-        new_callable=PropertyMock,
-        return_value=ORGANISATION_ID,
-    )
     mocker.patch(
         'app.organisations_client.get_organisation',
         side_effect=lambda org_id: organisation_json(
@@ -1808,6 +1794,7 @@ def test_should_be_able_to_request_to_go_live_with_no_organisation(
 def test_ready_to_go_live(
     client_request,
     mocker,
+    mock_get_service_organisation,
     has_team_members,
     has_templates,
     has_email_templates,
@@ -1822,11 +1809,6 @@ def test_ready_to_go_live(
     agreement_signed,
     expected_tags,
 ):
-    mocker.patch(
-        'app.models.service.Service.organisation_id',
-        new_callable=PropertyMock,
-        return_value=ORGANISATION_ID,
-    )
     mocker.patch(
         'app.organisations_client.get_organisation',
         return_value=organisation_json(agreement_signed=agreement_signed)
@@ -4484,16 +4466,12 @@ def test_show_branding_request_page_when_no_branding_is_set_but_organisation_exi
     client_request,
     mock_get_email_branding,
     mock_get_letter_branding_by_id,
+    mock_get_service_organisation,
     organisation_type,
     expected_options,
     branding_type
 ):
     service_one['{}_branding'.format(branding_type)] = None
-    mocker.patch(
-        'app.models.service.Service.organisation_id',
-        new_callable=PropertyMock,
-        return_value=ORGANISATION_ID,
-    )
     mocker.patch(
         'app.organisations_client.get_organisation',
         return_value=organisation_json(organisation_type=organisation_type),
@@ -4532,16 +4510,12 @@ def test_show_branding_request_page_when_no_branding_is_set_but_organisation_exi
     client_request,
     mock_get_email_branding,
     mock_get_letter_branding_by_id,
+    mock_get_service_organisation,
     organisation_type,
     expected_options,
     branding_type
 ):
     service_one['{}_branding'.format(branding_type)] = None
-    mocker.patch(
-        'app.models.service.Service.organisation_id',
-        new_callable=PropertyMock,
-        return_value=ORGANISATION_ID,
-    )
     mocker.patch(
         'app.organisations_client.get_organisation',
         return_value=organisation_json(organisation_type=organisation_type),
@@ -4568,14 +4542,10 @@ def test_show_email_branding_request_page_when_email_branding_is_set(
     service_one,
     client_request,
     mock_get_email_branding,
+    mock_get_service_organisation,
     active_user_with_permissions,
 ):
     service_one['email_branding'] = sample_uuid()
-    mocker.patch(
-        'app.models.service.Service.organisation_id',
-        new_callable=PropertyMock,
-        return_value=ORGANISATION_ID,
-    )
     mocker.patch(
         'app.organisations_client.get_organisation',
         return_value=organisation_json(),
@@ -4603,14 +4573,10 @@ def test_show_letter_branding_request_page_when_letter_branding_is_set(
     service_one,
     client_request,
     mock_get_letter_branding_by_id,
+    mock_get_service_organisation,
     active_user_with_permissions,
 ):
     service_one['letter_branding'] = sample_uuid()
-    mocker.patch(
-        'app.models.service.Service.organisation_id',
-        new_callable=PropertyMock,
-        return_value=ORGANISATION_ID,
-    )
     mocker.patch(
         'app.organisations_client.get_organisation',
         return_value=organisation_json(),
@@ -4667,15 +4633,11 @@ def test_show_branding_request_page_when_branding_is_same_as_org(
     client_request,
     mock_get_email_branding,
     mock_get_letter_branding_by_id,
+    mock_get_service_organisation,
     active_user_with_permissions,
     branding_type
 ):
     service_one['{}_branding'.format(branding_type)] = sample_uuid()
-    mocker.patch(
-        'app.models.service.Service.organisation_id',
-        new_callable=PropertyMock,
-        return_value=ORGANISATION_ID,
-    )
     if branding_type == 'email':
         mocker.patch(
             'app.organisations_client.get_organisation',
