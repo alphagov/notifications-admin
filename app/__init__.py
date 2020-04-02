@@ -386,9 +386,9 @@ def format_delta(date):
 def format_delta_days(date):
     now = datetime.now(timezone.utc)
     date = utc_string_to_aware_gmt_datetime(date)
-    if date.strftime('%Y-%M-%D') == now.strftime('%Y-%M-%D'):
+    if date.strftime('%Y-%m-%d') == now.strftime('%Y-%m-%d'):
         return "today"
-    if date.strftime('%Y-%M-%D') == (now - timedelta(days=1)).strftime('%Y-%M-%D'):
+    if date.strftime('%Y-%m-%d') == (now - timedelta(days=1)).strftime('%Y-%m-%d'):
         return "yesterday"
     return naturaltime_without_indefinite_article(now - date)
 
