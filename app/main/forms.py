@@ -714,7 +714,9 @@ class PermissionsForm(StripWhitespaceForm):
                 (item['id'], item['name']) for item in ([{'name': 'Templates', 'id': None}] + all_template_folders)
             ]
 
-    folder_permissions = NestedCheckboxesField('Folders this team member can see')
+    folder_permissions = govukCollapsibleNestedCheckboxesField(
+        'Folders this team member can see',
+        field_label='folder')
 
     login_authentication = RadioField(
         'Sign in using',
@@ -726,21 +728,23 @@ class PermissionsForm(StripWhitespaceForm):
         validators=[DataRequired()]
     )
 
-    @property
-    def permissions(self):
-        return {role for role in roles.keys() if self[role].data is True}
-
-    @property
-    def permissions_fields(self):
-        return (getattr(self, permission) for permission, _ in permissions)
+    permissions_field = govukCheckboxesField(
+        'Permssions',
+        choices=[
+            (value, label) for value, label in permissions
+        ],
+        param_extensions={
+            "hint": {"text": "All team members can see sent messages."}
+        }
+    )
 
     @classmethod
     def from_user(cls, user, service_id, **kwargs):
         return cls(
             **kwargs,
             **{
-                role: user.has_permission_for_service(service_id, role)
-                for role in roles.keys()
+                "permissions_field": [
+                    role for role in roles.keys() if user.has_permission_for_service(service_id, role)]
             },
             login_authentication=user.auth_type
         )
