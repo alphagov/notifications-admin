@@ -215,6 +215,16 @@ def test_sms_sender_form_validation(
     form.validate()
     assert 'Use letters and numbers only' == form.errors['sms_sender'][0]
 
+    # Underscores are allowed
+    form.sms_sender.data = 'UK_GOV'
+    form.validate()
+    assert not form.errors
+
+    # Full stops are allowed
+    form.sms_sender.data = 'UK.GOV'
+    form.validate()
+    assert not form.errors
+
     form.sms_sender.data = '333'
     form.validate()
     assert 'Enter 4 characters or more' == form.errors['sms_sender'][0]
