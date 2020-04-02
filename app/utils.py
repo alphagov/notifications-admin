@@ -649,6 +649,15 @@ LETTER_VALIDATION_MESSAGES = {
             'letter specification'
             '</a>.'
         ),
+    },
+    'not-a-real-uk-postcode': {
+        'title': 'There’s a problem with the address for this letter',
+        'detail': (
+            'The last line of the address must be a real UK postcode.'
+        ),
+        'summary': (
+            'Validation failed because the last line of the address is not a real UK postcode.'
+        ),
     }
 }
 
