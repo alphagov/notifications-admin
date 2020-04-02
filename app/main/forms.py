@@ -46,7 +46,7 @@ from app.main.validators import (
     Blacklist,
     CsvFileValidator,
     DoesNotStartWithDoubleZero,
-    LettersNumbersAndFullStopsOnly,
+    LettersNumbersFullStopsAndUnderscoresOnly,
     MustContainAlphanumericCharacters,
     NoCommasInPlaceHolders,
     NoEmbeddedImagesInSVG,
@@ -1086,7 +1086,7 @@ class ServiceSmsSenderForm(StripWhitespaceForm):
             DataRequired(message="Cannot be empty"),
             Length(max=11, message="Enter 11 characters or fewer"),
             Length(min=4, message="Enter 4 characters or more"),
-            LettersNumbersAndFullStopsOnly(),
+            LettersNumbersFullStopsAndUnderscoresOnly(),
             DoesNotStartWithDoubleZero(),
         ]
     )
