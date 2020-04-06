@@ -1,6 +1,6 @@
 from datetime import datetime
 from functools import partial
-from unittest.mock import ANY, PropertyMock, call
+from unittest.mock import ANY, Mock, PropertyMock, call
 from urllib.parse import parse_qs, urlparse
 from uuid import UUID, uuid4
 
@@ -8,6 +8,7 @@ import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
 from freezegun import freeze_time
+from notifications_python_client.errors import HTTPError
 from notifications_utils.clients.zendesk.zendesk_client import ZendeskClient
 
 import app
@@ -2524,6 +2525,48 @@ def test_edit_reply_to_email_address_goes_straight_to_update_if_address_not_chan
         is_default=api_default_args
     )
     mock_verify.assert_not_called()
+
+
+@pytest.mark.parametrize('url', [
+    'main.service_edit_email_reply_to',
+    'main.service_add_email_reply_to',
+])
+def test_add_edit_reply_to_email_address_goes_straight_to_update_if_address_not_changed(
+    mocker,
+    fake_uuid,
+    client_request,
+    mock_update_reply_to_email_address,
+    url
+):
+    reply_to_email_address = create_reply_to_email_address()
+    mocker.patch('app.service_api_client.get_reply_to_email_addresses', return_value=[reply_to_email_address])
+    mocker.patch('app.service_api_client.get_reply_to_email_address', return_value=reply_to_email_address)
+    error_message = 'Your service already uses ‘reply_to@example.com’ as an email reply-to address.'
+    mocker.patch(
+        'app.service_api_client.verify_reply_to_email_address', side_effect=[HTTPError(
+            response=Mock(
+                status_code=409,
+                json={
+                    'result': 'error',
+                    'message': error_message
+                }
+            ),
+            message=error_message
+        )]
+    )
+    data = {"is_default": "y", 'email_address': "reply_to@example.com"}
+    page = client_request.post(
+        url,
+        service_id=SERVICE_ONE_ID,
+        reply_to_email_id=fake_uuid,
+        _data=data,
+        _follow_redirects=True
+    )
+
+    assert page.find('h1').text == "Reply-to email addresses"
+    assert error_message in page.find('div', class_='banner-dangerous').text
+
+    mock_update_reply_to_email_address.assert_not_called()
 
 
 @pytest.mark.parametrize('reply_to_address, expected_link_text, partial_href', [

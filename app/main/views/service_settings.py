@@ -391,7 +391,7 @@ def service_add_email_reply_to(service_id):
                 service_id, form.email_address.data
             )["data"]["id"]
         except HTTPError as e:
-            if e.status_code == 409 or e.status_code == 400:
+            if e.status_code == 409:
                 flash(e.message, 'error')
                 return redirect(url_for('.service_email_reply_to', service_id=service_id))
             else:
@@ -518,7 +518,7 @@ def service_edit_email_reply_to(service_id, reply_to_email_id):
                 service_id, form.email_address.data
             )["data"]["id"]
         except HTTPError as e:
-            if e.status_code == 400 or e.status_code == 409:
+            if e.status_code == 409:
                 flash(e.message, 'error')
                 return redirect(url_for('.service_email_reply_to', service_id=service_id))
             else:
