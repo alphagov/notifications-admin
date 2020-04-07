@@ -3773,6 +3773,29 @@ def test_send_notification_submits_data(
     )
 
 
+@pytest.mark.parametrize('placeholders', (
+    {'address line 1': 'Foo'},
+    {'ADDRESSLINE_1': 'Foo'},
+))
+def test_send_notification_submits_data_for_letter(
+    client_request,
+    fake_uuid,
+    mock_send_notification,
+    mock_get_service_letter_template,
+    placeholders,
+):
+    with client_request.session_transaction() as session:
+        session['recipient'] = None
+        session['placeholders'] = placeholders
+
+    client_request.post(
+        'main.send_notification',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid
+    )
+    assert mock_send_notification.call_args[1]['recipient'] == 'Foo'
+
+
 def test_send_notification_clears_session(
     client_request,
     service_one,
