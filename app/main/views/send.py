@@ -1068,7 +1068,7 @@ def send_notification(service_id, template_id):
         noti = notification_api_client.send_notification(
             service_id,
             template_id=db_template['id'],
-            recipient=session['recipient'] or session['placeholders']['address line 1'],
+            recipient=session['recipient'] or Columns(session['placeholders'])['address line 1'],
             personalisation=session['placeholders'],
             sender_id=session['sender_id'] if 'sender_id' in session else None
         )
