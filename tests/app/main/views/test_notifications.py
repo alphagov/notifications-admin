@@ -254,7 +254,7 @@ def test_notification_page_shows_uploaded_letter(
     fake_uuid,
 ):
     mocker.patch(
-        'app.main.views.notifications.view_letter_notification_as_preview',
+        'app.main.views.notifications.get_letter_file_data',
         return_value=(b'foo', {
             'message': '',
             'invalid_pages': '[]',
@@ -319,17 +319,12 @@ def test_notification_page_shows_page_for_letter_sent_with_test_key(
 
     if is_precompiled_letter:
         mocker.patch(
-            'app.main.views.notifications.view_letter_notification_as_preview',
+            'app.main.views.notifications.get_letter_file_data',
             return_value=(b'foo', {
                 'message': '',
                 'invalid_pages': '[]',
                 'page_count': '1'
             })
-        )
-    else:
-        mocker.patch(
-            'app.main.views.notifications.view_letter_notification_as_preview',
-            return_value=b'foo'
         )
 
     mocker.patch(
@@ -383,7 +378,7 @@ def test_notification_page_shows_validation_failed_precompiled_letter(
     metadata = {"page_count": "1", "status": "validation-failed",
                 "invalid_pages": "[1]",
                 "message": "content-outside-printable-area"}
-    mocker.patch('app.main.views.notifications.view_letter_notification_as_preview',
+    mocker.patch('app.main.views.notifications.get_letter_file_data',
                  return_value=("some letter content", metadata))
     mocker.patch(
         'app.main.views.notifications.get_page_count_for_letter',
@@ -627,7 +622,7 @@ def test_should_show_preview_error_image_letter_notification_on_preview_error(
         side_effect=APIError
     )
 
-    mocker.patch("builtins.open", mock_open(read_data="preview error image"))
+    mocker.patch("builtins.open", mock_open(read_data=b"preview error image"))
 
     response = logged_in_client.get(url_for(
         'main.view_letter_notification_as_preview',
@@ -651,7 +646,7 @@ def test_notification_page_shows_error_message_if_precompiled_letter_cannot_be_o
         is_precompiled_letter=True)
     mocker.patch('app.notification_api_client.get_notification', return_value=notification)
     mocker.patch(
-        'app.main.views.notifications.view_letter_notification_as_preview',
+        'app.main.views.notifications.get_letter_file_data',
         side_effect=PdfReadError()
     )
     mocker.patch(
@@ -783,13 +778,8 @@ def test_notification_page_has_expected_template_link_for_letter(
 
     if is_precompiled_letter:
         mocker.patch(
-            'app.main.views.notifications.view_letter_notification_as_preview',
+            'app.main.views.notifications.get_letter_file_data',
             side_effect=[(b'foo', {"message": "", "invalid_pages": "[]", "page_count": "1"}), b'foo']
-        )
-    else:
-        mocker.patch(
-            'app.main.views.notifications.view_letter_notification_as_preview',
-            return_value=b'foo'
         )
 
     mocker.patch(
