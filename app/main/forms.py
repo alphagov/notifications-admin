@@ -1,4 +1,3 @@
-import re
 import weakref
 from datetime import datetime, timedelta
 from itertools import chain
@@ -10,17 +9,13 @@ from flask_wtf import FlaskForm as Form
 from flask_wtf.file import FileAllowed
 from flask_wtf.file import FileField as FileField_wtf
 from notifications_utils.columns import Columns
-from notifications_utils.formatters import (
-    normalise_whitespace_and_newlines,
-    remove_whitespace_before_punctuation,
-    strip_whitespace,
-)
+from notifications_utils.formatters import strip_whitespace
+from notifications_utils.postal_address import PostalAddress
 from notifications_utils.recipients import (
     InvalidPhoneError,
     normalise_phone_number,
     validate_phone_number,
 )
-from notifications_utils.take import Take
 from wtforms import (
     BooleanField,
     DateField,
@@ -368,21 +363,10 @@ class StripWhitespaceStringField(StringField):
         super(StringField, self).__init__(label, **kwargs)
 
 
-class StripWhitespaceTextAreaField(TextAreaField):
+class PostalAddressField(TextAreaField):
     def process_formdata(self, valuelist):
         if valuelist:
-            self.data = Take(
-                valuelist[0]
-            ).then(
-                remove_whitespace_before_punctuation
-            ).then(
-                normalise_whitespace_and_newlines
-            ).then(
-                # similar to normalise_multiple_newlines but taking everything down to one `\n` instead of two
-                lambda value: re.compile(r'\n{2,}').sub('\n', value)
-            ).then(
-                str.strip
-            )
+            self.data = PostalAddress(valuelist[0]).normalised
 
 
 class OnOffField(RadioField):
@@ -765,40 +749,30 @@ class SMSTemplateForm(BaseTemplateForm):
 
 
 class LetterAddressForm(StripWhitespaceForm):
-    MIN_ADDRESS_LINES = 3
-    MAX_ADDRESS_LINES = 7
 
-    address = StripWhitespaceTextAreaField(
+    address = PostalAddressField(
         'Address',
         validators=[DataRequired(message="Cannot be empty")]
     )
 
     def validate_address(self, field):
-        lines = field.data.splitlines()
-        if len(lines) < self.MIN_ADDRESS_LINES:
-            raise ValidationError('Address must be at least 3 lines long')
-        if len(lines) > self.MAX_ADDRESS_LINES:
-            raise ValidationError('Address must be no more than 7 lines long')
 
-    @property
-    def as_address_lines_1_to_7_with_postcode(self):
-        lines = self.address.data.splitlines()
-        placeholders = {}
+        address = PostalAddress(field.data)
 
-        # set all placeholders to empty strings, or all_placeholders_in_session will always return false.
-        # note that it must be `address line #` with spaces, not underscores or dashes
-        for i in range(1, 7):
-            placeholders[f'address line {i}'] = ''
+        if not address.has_enough_lines:
+            raise ValidationError(
+                f'Address must be at least {PostalAddress.MIN_LINES} lines long'
+            )
 
-        # unroll the address into lines, and place into the session in the underlying placeholder names
-        # postcode is required so make sure we put the last value in that
-        # TODO: When postcode is no longer a required field, remove this special case and just use `address line #`
-        address_lines, last_address_line = lines[:-1], lines[-1]
-        for i, line in enumerate(address_lines, start=1):
-            placeholders[f'address line {i}'] = line
-        placeholders['postcode'] = last_address_line
+        if address.has_too_many_lines:
+            raise ValidationError(
+                f'Address must be no more than {PostalAddress.MAX_LINES} lines long'
+            )
 
-        return placeholders
+        if not address.postcode:
+            raise ValidationError(
+                f'Last line of the address must be a real UK postcode'
+            )
 
 
 class EmailTemplateForm(BaseTemplateForm):

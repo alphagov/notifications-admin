@@ -18,6 +18,10 @@ from notifications_python_client.errors import HTTPError
 from notifications_utils import LETTER_MAX_PAGE_COUNT, SMS_CHAR_COUNT_LIMIT
 from notifications_utils.columns import Columns
 from notifications_utils.pdf import is_letter_too_long
+from notifications_utils.postal_address import (
+    PostalAddress,
+    address_lines_1_to_6_and_postcode_keys,
+)
 from notifications_utils.recipients import (
     RecipientCSV,
     first_column_headings,
@@ -335,18 +339,6 @@ def get_notification_check_endpoint(service_id, template):
     ))
 
 
-def get_letter_address_from_session():
-    """
-    Takes non-blank-string address values out of the placeholders, and returns a multi line string
-    """
-    keys = [f'address line {i}' for i in range(1, 7)] + ['postcode']
-    return '\n'.join([
-        session['placeholders'][key]
-        for key in keys
-        if session['placeholders'].get(key)
-    ])
-
-
 @main.route(
     "/services/<uuid:service_id>/send/<uuid:template_id>/one-off/address",
     methods=['GET', 'POST']
@@ -376,12 +368,14 @@ def send_one_off_letter_address(service_id, template_id):
         sms_sender=None
     )
 
-    current_session_address = get_letter_address_from_session()
+    current_session_address = PostalAddress.from_personalisation(
+        get_normalised_placeholders_from_session()
+    )
 
-    form = LetterAddressForm(address=current_session_address)
+    form = LetterAddressForm(address=current_session_address.normalised)
 
     if form.validate_on_submit():
-        session['placeholders'].update(form.as_address_lines_1_to_7_with_postcode)
+        session['placeholders'].update(PostalAddress(form.address.data).as_personalisation)
 
         placeholders = fields_to_fill_in(
             template,
@@ -482,7 +476,9 @@ def send_test_step(service_id, template_id, step_index):
         ))
 
     # if we're in a letter, we should show address block rather than "address line #" or "postcode"
-    if db_template['template_type'] == 'letter' and current_placeholder in first_column_headings['letter']:
+    if template.template_type == 'letter' and current_placeholder in (
+        Columns.from_keys(address_lines_1_to_6_and_postcode_keys)
+    ):
         return redirect(url_for('.send_one_off_letter_address', service_id=service_id, template_id=template_id))
 
     optional_placeholder = (current_placeholder in optional_address_columns)
@@ -878,10 +874,7 @@ def fields_to_fill_in(template, prefill_current_user=False):
 
 
 def get_normalised_placeholders_from_session():
-    return {
-        key: ''.join(value or [])
-        for key, value in session.get('placeholders', {}).items()
-    }
+    return Columns(session.get('placeholders', {}))
 
 
 def get_recipient_and_placeholders_from_session(template_type):

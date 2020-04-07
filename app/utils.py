@@ -23,6 +23,7 @@ from notifications_utils.formatters import (
     unescaped_formatted_list,
 )
 from notifications_utils.letter_timings import letter_can_be_cancelled
+from notifications_utils.postal_address import PostalAddress
 from notifications_utils.recipients import RecipientCSV
 from notifications_utils.take import Take
 from notifications_utils.template import (
@@ -657,6 +658,28 @@ LETTER_VALIDATION_MESSAGES = {
         ),
         'summary': (
             'Validation failed because the last line of the address is not a real UK postcode.'
+        ),
+    },
+    'not-enough-address-lines': {
+        'title': 'There’s a problem with the address for this letter',
+        'detail': (
+            f'The address must be at least {PostalAddress.MIN_LINES} '
+            f'lines long.'
+        ),
+        'summary': (
+            f'Validation failed because the address must be at least '
+            f'{PostalAddress.MIN_LINES} lines long.'
+        ),
+    },
+    'too-many-address-lines': {
+        'title': 'There’s a problem with the address for this letter',
+        'detail': (
+            f'The address must be no more than {PostalAddress.MAX_LINES} '
+            f'lines long.'
+        ),
+        'summary': (
+            f'Validation failed because the address must be no more '
+            f'than {PostalAddress.MAX_LINES} lines long.'
         ),
     }
 }

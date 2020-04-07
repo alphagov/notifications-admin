@@ -507,6 +507,28 @@ def test_get_letter_validation_error_for_unknown_error():
             'Validation failed because the last line of the address is not a real UK postcode.'
         ),
     ),
+    (
+        'not-enough-address-lines',
+        None,
+        'There’s a problem with the address for this letter',
+        (
+            'The address must be at least 3 lines long.'
+        ),
+        (
+            'Validation failed because the address must be at least 3 lines long.'
+        ),
+    ),
+    (
+        'too-many-address-lines',
+        None,
+        'There’s a problem with the address for this letter',
+        (
+            'The address must be no more than 7 lines long.'
+        ),
+        (
+            'Validation failed because the address must be no more than 7 lines long.'
+        ),
+    ),
 ])
 def test_get_letter_validation_error_for_known_errors(
     client_request,
