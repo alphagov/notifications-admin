@@ -50,6 +50,8 @@
     "gulp-prettyerror": "1.2.1",
     "gulp-sass-lint": "1.4.0",
     "jest": "24.7.1",
+    "jest-date-mock": "^1.0.8",
+    "jest-each": "^25.3.0",
     "jshint": "2.10.2",
     "jshint-stylish": "2.2.1",
     "rollup-plugin-commonjs": "10.1.0",

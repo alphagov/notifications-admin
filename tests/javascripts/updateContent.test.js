@@ -1,3 +1,6 @@
+const each = require('jest-each').default;
+const jestDateMock = require('jest-date-mock');
+
 const helpers = require('./support/helpers.js');
 
 const serviceNumber = '6658542f-0cad-491f-bec8-ab8457700ead';
@@ -18,6 +21,8 @@ beforeAll(() => {
   // set up the object returned from $.ajax so it responds with whatever responseObj is set to
   jqueryAJAXReturnObj = {
     done: callback => {
+      // The server takes 1 second to respond
+      jestDateMock.advanceBy(1000);
       callback(responseObj);
       return jqueryAJAXReturnObj;
     },
@@ -100,7 +105,7 @@ describe('Update content', () => {
     jest.clearAllTimers();
 
   });
-  
+
   test("It should make requests to the URL specified in the data-resource attribute", () => {
 
     // start the module
@@ -136,24 +141,6 @@ describe('Update content', () => {
 
   });
 
-  test("If an interval between requests is specified, using the data-interval-seconds attribute, requests should happen at that frequency", () => {
-
-    document.querySelector('[data-module=update-content]').setAttribute('data-interval-seconds', '0.5');
-
-    // start the module
-    window.GOVUK.modules.start();
-
-    expect($.ajax).toHaveBeenCalledTimes(1);
-
-    // units are milliseconds
-    jest.advanceTimersByTime(500);
-    jest.advanceTimersByTime(500);
-    jest.advanceTimersByTime(500);
-
-    expect($.ajax).toHaveBeenCalledTimes(4);
-
-  });
-
   describe("By default", () => {
 
     beforeEach(() => {
@@ -175,15 +162,34 @@ describe('Update content', () => {
 
     });
 
-    test("It should request updates every 1.5 seconds", () => {
+    test("It should request updates with a dynamic interval", () => {
 
+      // First call happens straight away
       expect($.ajax).toHaveBeenCalledTimes(1);
 
-      // units are milliseconds
-      jest.advanceTimersByTime(1500);
+      // It took the server 1000ms to respond to the first call so we
+      // will back off – the next call shouldn’t happen in the next 6904ms
+      jest.advanceTimersByTime(6904);
+      expect($.ajax).toHaveBeenCalledTimes(1);
 
+      // But it should happen after 6905ms
+      jest.advanceTimersByTime(1);
       expect($.ajax).toHaveBeenCalledTimes(2);
 
+    });
+
+    each([
+      [1000, 0],
+      [1500, 100],
+      [4590, 500],
+      [6905, 1000],
+      [24000, 10000],
+    ]).test('It calculates a delay of %dms if the API responds in %dms', (waitTime, responseTime) => {
+        expect(
+          window.GOVUK.Modules.UpdateContent.calculateBackoff(responseTime)
+        ).toBe(
+          waitTime
+        );
     });
 
   });

@@ -3,6 +3,12 @@
 
   var queues = {};
   var dd = new global.diffDOM();
+  var interval = 0;
+
+  var calculateBackoff = responseTime => parseInt(Math.max(
+      (250 * Math.sqrt(responseTime)) - 1000,
+      1000
+  ));
 
   var getRenderer = $component => response => dd.apply(
     $component.get(0),
@@ -19,7 +25,9 @@
 
   var clearQueue = queue => (queue.length = 0);
 
-  var poll = function(renderer, resource, queue, interval, form) {
+  var poll = function(renderer, resource, queue, form) {
+
+    let startTime = Date.now();
 
     if (document.visibilityState !== "hidden" && queue.push(renderer) === 1) $.ajax(
       resource,
@@ -33,6 +41,7 @@
         if (response.stop === 1) {
           poll = function(){};
         }
+        interval = calculateBackoff(Date.now() - startTime);
       }
     ).fail(
       () => poll = function(){}
@@ -49,10 +58,11 @@
       getRenderer($(component)),
       $(component).data('resource'),
       getQueue($(component).data('resource')),
-      ($(component).data('interval-seconds') || 1.5) * 1000,
       $(component).data('form')
     );
 
   };
+
+  global.GOVUK.Modules.UpdateContent.calculateBackoff = calculateBackoff;
 
 })(window);
