@@ -612,12 +612,12 @@ LETTER_VALIDATION_MESSAGES = {
     'letter-too-long': {
         'title': 'Your letter is too long',
         'detail': (
-            'Letters must be 10 pages or less. <br>'
+            'Letters must be 10 pages or less (5 double-sided sheets of paper). <br>'
             'Your letter is {page_count} pages long.'
         ),
         'summary': (
             'Validation failed because this letter is {page_count} pages long.<br>'
-            'Letters must be 10 pages or less.'
+            'Letters must be 10 pages or less (5 double-sided sheets of paper).'
         ),
     },
     'no-encoded-string': {
