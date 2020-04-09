@@ -21,37 +21,58 @@
     {% endif %}
   </p>
 {% else %}
-  <nav id="template-list" class="{{ 'top-gutter-5px' if (not show_template_nav and not show_search_box) else '' }}">
+  <nav id="template-list" class="{{ 'govuk-!-margin-top-1' if (not show_template_nav and not show_search_box) else 'govuk-!margin-top-6' }}">
+    {% set checkboxes_data = [] %}
+
     {% for item in template_list %}
-      <div class="template-list-item {% if current_user.has_permissions('manage_templates') %}template-list-item-with-checkbox{% endif %} {% if item.ancestors %}template-list-item-hidden-by-default{% endif %} {% if not item.ancestors %}template-list-item-without-ancestors{% endif %}">
-        {% if current_user.has_permissions('manage_templates') %}
-          {{ unlabelled_checkbox(
-            id='templates-or-folder-{}'.format(item.id),
-            name='templates_and_folders',
-            data=templates_and_folders_form.is_selected(item.id),
-            value=item.id,
-          ) }}
+
+      {% set item_label_content %}
+        {% for ancestor in item.ancestors %}
+          <a href="{{ url_for('.choose_template', service_id=current_service.id, template_type=template_type, template_folder_id=ancestor.id) }}" class="govuk-link govuk-link--no-visited-state template-list-folder">
+            {{- format_item_name(ancestor.name) -}}
+          </a> <span class="message-name-separator"></span>
+        {% endfor %}
+        {% if item.is_folder %}
+          <a href="{{ url_for('.choose_template', service_id=current_service.id, template_type=template_type, template_folder_id=item.id) }}" class="govuk-link govuk-link--no-visited-state template-list-folder">
+            <span class="live-search-relevant">{{ format_item_name(item.name) }}</span>
+          </a>
+        {% else %}
+          <a href="{{ url_for('.view_template', service_id=current_service.id, template_id=item.id) }}" class="govuk-link govuk-link--no-visited-state template-list-template">
+            <span class="live-search-relevant">{{ format_item_name(item.name) }}</span>
+          </a>
         {% endif %}
-        <h2 class="message-name">
-          {% for ancestor in item.ancestors %}
-            <a href="{{ url_for('.choose_template', service_id=current_service.id, template_type=template_type, template_folder_id=ancestor.id) }}" class="govuk-link govuk-link--no-visited-state template-list-folder">
-              {{- format_item_name(ancestor.name) -}}
-            </a> <span class="message-name-separator"></span>
-          {% endfor %}
-          {% if item.is_folder %}
-            <a href="{{ url_for('.choose_template', service_id=current_service.id, template_type=template_type, template_folder_id=item.id) }}" class="govuk-link govuk-link--no-visited-state template-list-folder">
-              <span class="live-search-relevant">{{ format_item_name(item.name) }}</span>
-            </a>
-          {% else %}
-            <a href="{{ url_for('.view_template', service_id=current_service.id, template_id=item.id) }}" class="govuk-link govuk-link--no-visited-state template-list-template">
-              <span class="live-search-relevant">{{ format_item_name(item.name) }}</span>
-            </a>
-          {% endif %}
-        </h2>
-        <p class="message-type">
-          {{ item.hint }}
-        </p>
-      </div>
+      {% endset %}
+
+      {# create the item config now to include the label content -#}
+      {% set checkbox_config = {
+        "html": item_label_content,
+        "label": {
+          "classes": "template-list-item-label govuk-!-font-size-24 govuk-!-font-weight-bold"
+        },
+        "id": "templates-or-folder-" ~ item.id,
+        "hint": {
+          "text": item.hint,
+         "classes": "template-list-item-hint"
+        },
+        "classes": "template-list-item {}".format(
+          "template-list-item-hidden-by-default" if item.ancestors else "template-list-item-without-ancestors")
+      } %}
+      {% set _ = checkboxes_data.append(checkbox_config) %}
+
+      {% if not current_user.has_permissions('manage_templates') %}
+        <div class="template-list-item {%- if item.ancestors %} template-list-item-hidden-by-default {%- else %} template-list-item-without-ancestors{%- endif %}">
+          <h2 class="message-name">
+            {{ item_label_content }}
+          </h2>
+          <p class="message-type govuk-!-margin-bottom-4">
+            {{ item.hint }}
+          </p>
+        </div>
+      {% endif %}
     {% endfor %}
+
+    {% if current_user.has_permissions('manage_templates') %}
+      {{ templates_and_folders_form.templates_and_folders(param_extensions={ "items": checkboxes_data }) }}
+    {% endif %}
   </nav>
 {% endif %}
