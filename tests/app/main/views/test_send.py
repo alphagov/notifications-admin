@@ -2091,11 +2091,11 @@ def test_send_one_off_letter_copes_with_placeholder_from_address_block(
         _follow_redirects=True,
     )
 
+    assert normalize_spaces(page.select_one('form label').text) == 'thing'
+    assert page.select_one('form input[type=text]')['name'] == 'placeholder_value'
+    assert page.select_one('form input[type=text]')['value'] == ''
+
     with client_request.session_transaction() as session:
-        assert normalize_spaces(page.select_one('form label').text) == placeholder
-        assert page.select_one('form input[type=text]')['value'] == (
-            session['placeholders'].get(placeholder, '')
-        )
         assert session['placeholders'] == {
             'address_line_1': 'foo',
             'address_line_2': 'bar',

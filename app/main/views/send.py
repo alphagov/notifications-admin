@@ -472,10 +472,21 @@ def send_test_step(service_id, template_id, step_index):
         ))
 
     # if we're in a letter, we should show address block rather than "address line #" or "postcode"
-    if template.template_type == 'letter' and (
-        step_index < len(first_column_headings['letter'])
-    ):
-        return redirect(url_for('.send_one_off_letter_address', service_id=service_id, template_id=template_id))
+    if template.template_type == 'letter':
+        if step_index < len(first_column_headings['letter']):
+            return redirect(url_for(
+                '.send_one_off_letter_address',
+                service_id=service_id,
+                template_id=template_id,
+            ))
+        if current_placeholder in Columns(PostalAddress('').as_personalisation):
+            return redirect(url_for(
+                request.endpoint,
+                service_id=service_id,
+                template_id=template_id,
+                step_index=step_index + 1,
+                help=get_help_argument(),
+            ))
 
     form = get_placeholder_form_instance(
         current_placeholder,
