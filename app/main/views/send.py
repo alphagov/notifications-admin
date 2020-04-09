@@ -519,7 +519,7 @@ def send_test_step(service_id, template_id, step_index):
             help=get_help_argument(),
         ))
 
-    back_link = get_back_link(service_id, template, step_index)
+    back_link = get_back_link(service_id, template, step_index, placeholders)
 
     template.values = get_recipient_and_placeholders_from_session(template.template_type)
     template.values[current_placeholder] = None
@@ -915,7 +915,7 @@ def is_current_user_the_recipient():
     return session['recipient'] == current_user.email_address
 
 
-def get_back_link(service_id, template, step_index):
+def get_back_link(service_id, template, step_index, placeholders=None):
     if get_help_argument():
         # if we're on the check page, redirect back to the beginning. anywhere else, don't return the back link
         if request.endpoint == 'main.check_notification':
@@ -967,13 +967,26 @@ def get_back_link(service_id, template, step_index):
             step_index=0,
         )
 
-    else:
-        return url_for(
-            'main.send_one_off_step',
-            service_id=service_id,
-            template_id=template.id,
-            step_index=step_index - 1,
-        )
+    if template.template_type == 'letter' and placeholders:
+        # Make sure we’re not redirecting users to a page which will
+        # just redirect them forwards again
+        back_link_destination_step_index = next((
+            index
+            for index, placeholder in reversed(
+                list(enumerate(placeholders[:step_index]))
+            )
+            if placeholder not in Columns(
+                PostalAddress('').as_personalisation
+            )
+        ), 1)
+        return get_back_link(service_id, template, back_link_destination_step_index + 1)
+
+    return url_for(
+        'main.send_one_off_step',
+        service_id=service_id,
+        template_id=template.id,
+        step_index=step_index - 1,
+    )
 
 
 @main.route("/services/<uuid:service_id>/template/<uuid:template_id>/notification/check", methods=['GET'])

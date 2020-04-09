@@ -2061,6 +2061,7 @@ def test_send_one_off_letter_copes_with_placeholder_from_address_block(
     mocker,
     fake_uuid,
     mock_template_preview,
+    no_letter_contact_blocks,
     placeholder,
 ):
     mocker.patch(
@@ -2106,6 +2107,19 @@ def test_send_one_off_letter_copes_with_placeholder_from_address_block(
             'address_line_7': 'SW1A 1AA',
             'postcode': 'SW1A 1AA',
         }
+
+    back_link = page.select_one('.govuk-back-link')['href']
+    assert back_link == url_for(
+        'main.send_one_off_step',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        step_index=1,
+    )
+    previous_page = client_request.get_url(back_link, _follow_redirects=True)
+
+    # We’ve skipped past the address placeholder and gone back to the
+    # address block
+    assert normalize_spaces(previous_page.select_one('form label').text) == 'Address'
 
 
 def test_send_test_sms_message_puts_submitted_data_in_session(
