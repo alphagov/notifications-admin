@@ -27,9 +27,7 @@
             highlight_placeholders=True
           ) }}
         {% if not first_contact_block %}
-          <div class="form-group">
-            {{ checkbox(form.is_default) }}
-          </div>
+          {{ form.is_default }}
         {% endif %}
         {{ page_footer('Add') }}
       {% endcall %}
