@@ -399,7 +399,6 @@ def send_one_off_letter_address(service_id, template_id):
         ),
         template=template,
         form=form,
-        optional_placeholder=False,
         back_link=get_back_link(service_id, template, 0),
         help=False,
         link_to_upload=True,
@@ -478,12 +477,10 @@ def send_test_step(service_id, template_id, step_index):
     ):
         return redirect(url_for('.send_one_off_letter_address', service_id=service_id, template_id=template_id))
 
-    optional_placeholder = (current_placeholder in optional_address_columns)
     form = get_placeholder_form_instance(
         current_placeholder,
         dict_to_populate_from=get_normalised_placeholders_from_session(),
         template_type=template.template_type,
-        optional_placeholder=optional_placeholder,
         allow_international_phone_numbers=current_service.has_permission('international_sms'),
     )
 
@@ -540,7 +537,6 @@ def send_test_step(service_id, template_id, step_index):
         template=template,
         form=form,
         skip_link=skip_link,
-        optional_placeholder=optional_placeholder,
         back_link=back_link,
         help=get_help_argument(),
         link_to_upload=(

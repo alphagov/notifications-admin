@@ -25,7 +25,6 @@
       <div class="govuk-grid-column-full {% if form.placeholder_value.label.text == 'phone number' %}extra-tracking{% endif %}">
         {{ textbox(
           form.placeholder_value,
-          hint='Optional' if optional_placeholder else None,
           width='1-1',
         ) }}
       </div>
