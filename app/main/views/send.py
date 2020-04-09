@@ -524,19 +524,6 @@ def send_test_step(service_id, template_id, step_index):
     template.values = get_recipient_and_placeholders_from_session(template.template_type)
     template.values[current_placeholder] = None
 
-    if (
-        request.endpoint == 'main.send_one_off_step'
-        and step_index == 0
-        and template.template_type != 'letter'
-        and not (template.template_type == 'sms' and current_user.mobile_number is None)
-        and current_user.has_permissions('manage_templates', 'manage_service')
-    ):
-        skip_link = (
-            'Use my {}'.format(first_column_headings[template.template_type][0]),
-            url_for('.send_test', service_id=service_id, template_id=template.id),
-        )
-    else:
-        skip_link = None
     return render_template(
         'views/send-test.html',
         page_title=get_send_test_page_title(
@@ -547,7 +534,7 @@ def send_test_step(service_id, template_id, step_index):
         ),
         template=template,
         form=form,
-        skip_link=skip_link,
+        skip_link=get_skip_link(step_index, template),
         back_link=back_link,
         help=get_help_argument(),
         link_to_upload=(
@@ -987,6 +974,20 @@ def get_back_link(service_id, template, step_index, placeholders=None):
         template_id=template.id,
         step_index=step_index - 1,
     )
+
+
+def get_skip_link(step_index, template):
+    if (
+        request.endpoint == 'main.send_one_off_step'
+        and step_index == 0
+        and template.template_type != 'letter'
+        and not (template.template_type == 'sms' and current_user.mobile_number is None)
+        and current_user.has_permissions('manage_templates', 'manage_service')
+    ):
+        return (
+            'Use my {}'.format(first_column_headings[template.template_type][0]),
+            url_for('.send_test', service_id=current_service.id, template_id=template.id),
+        )
 
 
 @main.route("/services/<uuid:service_id>/template/<uuid:template_id>/notification/check", methods=['GET'])
