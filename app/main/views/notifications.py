@@ -13,6 +13,7 @@ from flask import (
     redirect,
     render_template,
     request,
+    send_file,
     stream_with_context,
     url_for,
 )
@@ -57,7 +58,7 @@ def view_notification(service_id, notification_id):
     error_message = None
     if notification['template']['is_precompiled_letter']:
         try:
-            file_contents, metadata = view_letter_notification_as_preview(
+            file_contents, metadata = get_letter_file_data(
                 service_id, notification_id, "pdf", with_metadata=True
             )
             page_count = int(
@@ -187,6 +188,18 @@ def get_preview_error_image():
 def view_letter_notification_as_preview(
     service_id, notification_id, filetype, with_metadata=False
 ):
+    image_data = get_letter_file_data(service_id, notification_id, filetype, with_metadata)
+    file = io.BytesIO(image_data)
+
+    mimetype = 'image/png' if filetype == 'png' else 'application/pdf'
+
+    return send_file(
+        filename_or_fp=file,
+        mimetype=mimetype,
+    )
+
+
+def get_letter_file_data(service_id, notification_id, filetype, with_metadata=False):
     try:
         preview = notification_api_client.get_notification_letter_preview(
             service_id,
