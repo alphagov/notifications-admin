@@ -35,9 +35,7 @@
       </p>
       {{ page_footer('Save') }}
     {% else %}
-      <div class="form-group">
-        {{ checkbox(form.is_default) }}
-      </div>
+      {{ form.is_default }}
       {% if inbound_number %}
         {{ page_footer('Save') }}
       {% else %}

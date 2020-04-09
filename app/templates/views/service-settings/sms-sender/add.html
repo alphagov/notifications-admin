@@ -23,9 +23,7 @@
       hint='Up to 11 characters, letters, numbers and spaces only'
     ) }}
     {% if not first_sms_sender %}
-      <div class="form-group">
-        {{ checkbox(form.is_default) }}
-      </div>
+      {{ form.is_default }}
     {% endif %}
     {{ page_footer('Save') }}
   {% endcall %}

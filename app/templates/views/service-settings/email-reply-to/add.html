@@ -24,9 +24,7 @@
       safe_error_message=True
     ) }}
     {% if not first_email_address %}
-      <div class="form-group">
-        {{ checkbox(form.is_default) }}
-      </div>
+      {{ form.is_default }}
     {% endif %}
     {{ page_footer('Add') }}
   {% endcall %}

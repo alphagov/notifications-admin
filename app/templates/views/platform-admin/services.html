@@ -108,8 +108,7 @@
     {% call form_wrapper(method="get") %}
       {{ textbox(form.start_date, hint="Enter start date in format YYYY-MM-DD") }}
       {{ textbox(form.end_date, hint="Enter end date in format YYYY-MM-DD") }}
-      {{ checkbox(form.include_from_test_key) }}
-      </br>
+      {{ form.include_from_test_key }}
       {{ govukButton({ "text": "Filter" }) }}
     {% endcall %}
   {% endset %}
