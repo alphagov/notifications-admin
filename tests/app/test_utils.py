@@ -462,12 +462,12 @@ def test_get_letter_validation_error_for_unknown_error():
         None,
         'Your letter is too long',
         (
-            'Letters must be 10 pages or less. '
+            'Letters must be 10 pages or less (5 double-sided sheets of paper). '
             'Your letter is 13 pages long.'
         ),
         (
             'Validation failed because this letter is 13 pages long.'
-            'Letters must be 10 pages or less.'
+            'Letters must be 10 pages or less (5 double-sided sheets of paper).'
         ),
     ),
     (
