@@ -31,9 +31,7 @@
         This is currently your default address for {{ current_service.name }}.
       </p>
     {% else %}
-      <div class="form-group">
-        {{ checkbox(form.is_default) }}
-      </div>
+      {{ form.is_default }}
     {% endif %}
 
     {{ page_footer(

@@ -1412,7 +1412,7 @@ class ServiceContactDetailsForm(StripWhitespaceForm):
 
 class ServiceReplyToEmailForm(StripWhitespaceForm):
     email_address = email_address(label='Reply-to email address', gov_user=False)
-    is_default = BooleanField("Make this email address the default")
+    is_default = govukCheckboxField("Make this email address the default")
 
 
 class ServiceSmsSenderForm(StripWhitespaceForm):
@@ -1426,11 +1426,11 @@ class ServiceSmsSenderForm(StripWhitespaceForm):
             DoesNotStartWithDoubleZero(),
         ]
     )
-    is_default = BooleanField("Make this text message sender the default")
+    is_default = govukCheckboxField("Make this text message sender the default")
 
 
 class ServiceEditInboundNumberForm(StripWhitespaceForm):
-    is_default = BooleanField("Make this text message sender the default")
+    is_default = govukCheckboxField("Make this text message sender the default")
 
 
 class ServiceLetterContactBlockForm(StripWhitespaceForm):
@@ -1440,7 +1440,7 @@ class ServiceLetterContactBlockForm(StripWhitespaceForm):
             NoCommasInPlaceHolders()
         ]
     )
-    is_default = BooleanField("Set as your default address")
+    is_default = govukCheckboxField("Set as your default address")
 
     def validate_letter_contact_block(self, field):
         line_count = field.data.strip().count('\n')
@@ -1606,7 +1606,7 @@ class GuestList(StripWhitespaceForm):
 class DateFilterForm(StripWhitespaceForm):
     start_date = DateField("Start Date", [validators.optional()])
     end_date = DateField("End Date", [validators.optional()])
-    include_from_test_key = BooleanField("Include test keys", default="checked", false_values={"N"})
+    include_from_test_key = govukCheckboxField("Include test keys")
 
 
 class RequiredDateFilterForm(StripWhitespaceForm):
