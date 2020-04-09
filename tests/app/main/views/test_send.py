@@ -29,6 +29,7 @@ from xlrd.xldate import (
 )
 
 from tests import (
+    template_json,
     validate_route_permission,
     validate_route_permission_with_client,
 )
@@ -2043,6 +2044,68 @@ def test_send_one_off_back_link_populates_address_textarea(
     textarea = form.select_one('textarea')
     assert textarea.attrs['name'] == 'address'
     assert textarea.text == 'foo\nbar'
+
+
+@pytest.mark.parametrize('placeholder', (
+    'address_line_1',
+    'address_line_2',
+    'address_line_3',
+    'address_line_4',
+    'address_line_5',
+    'address_line_6',
+    'address_line_7',
+    'postcode',
+))
+def test_send_one_off_letter_copes_with_placeholder_from_address_block(
+    client_request,
+    mocker,
+    fake_uuid,
+    mock_template_preview,
+    placeholder,
+):
+    mocker.patch(
+        'app.service_api_client.get_service_template',
+        return_value={'data': template_json(
+            SERVICE_ONE_ID,
+            fake_uuid,
+            name="Awkward letter",
+            type_="letter",
+            subject=f"Hello (({placeholder}))",
+            content="We need to talk about ((thing))",
+        )},
+    )
+    with client_request.session_transaction() as session:
+        session['recipient'] = None
+        session['placeholders'] = {}
+        session['send_test_letter_page_count'] = None
+
+    page = client_request.post(
+        'main.send_one_off_letter_address',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _data={'address': '''
+            foo
+            bar
+            SW1A 1AA
+        '''},
+        _follow_redirects=True,
+    )
+
+    with client_request.session_transaction() as session:
+        assert normalize_spaces(page.select_one('form label').text) == placeholder
+        assert page.select_one('form input[type=text]')['value'] == (
+            session['placeholders'].get(placeholder, '')
+        )
+        assert session['placeholders'] == {
+            'address_line_1': 'foo',
+            'address_line_2': 'bar',
+            'address_line_3': '',
+            'address_line_4': '',
+            'address_line_5': '',
+            'address_line_6': '',
+            'address_line_7': 'SW1A 1AA',
+            'postcode': 'SW1A 1AA',
+        }
 
 
 def test_send_test_sms_message_puts_submitted_data_in_session(

@@ -18,10 +18,7 @@ from notifications_python_client.errors import HTTPError
 from notifications_utils import LETTER_MAX_PAGE_COUNT, SMS_CHAR_COUNT_LIMIT
 from notifications_utils.columns import Columns
 from notifications_utils.pdf import is_letter_too_long
-from notifications_utils.postal_address import (
-    PostalAddress,
-    address_lines_1_to_6_and_postcode_keys,
-)
+from notifications_utils.postal_address import PostalAddress
 from notifications_utils.recipients import (
     RecipientCSV,
     first_column_headings,
@@ -476,8 +473,8 @@ def send_test_step(service_id, template_id, step_index):
         ))
 
     # if we're in a letter, we should show address block rather than "address line #" or "postcode"
-    if template.template_type == 'letter' and current_placeholder in (
-        Columns.from_keys(address_lines_1_to_6_and_postcode_keys)
+    if template.template_type == 'letter' and (
+        step_index < len(first_column_headings['letter'])
     ):
         return redirect(url_for('.send_one_off_letter_address', service_id=service_id, template_id=template_id))
 
