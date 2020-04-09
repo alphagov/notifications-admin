@@ -623,11 +623,34 @@ class govukCheckboxesField(govukCheckboxesMixin, SelectMultipleField):
     def get_items_from_options(self, field):
         return [self.get_item_from_option(option) for option in field]
 
+    def extend_params(self, params, extensions):
+        items = None
+        param_items = len(params['items']) if 'items' in params else 0
+
+        # split items off from params to make it a pure dict
+        if 'items' in extensions:
+            items = extensions['items']
+            del extensions['items']
+
+        # merge dicts
+        params.update(extensions)
+
+        # merge items
+        if items:
+            if 'items' not in params:
+                params['items'] = items
+            else:
+                for idx, _item in enumerate(items):
+                    if idx >= param_items:
+                        params['items'].append(items[idx])
+                    else:
+                        params['items'][idx].update(items[idx])
+
     # self.__call__ renders the HTML for the field by:
     # 1. delegating to self.meta.render_field which
     # 2. calls field.widget
     # this bypasses that by making self.widget a method with the same interface as widget.__call__
-    def widget(self, field, **kwargs):
+    def widget(self, field, param_extensions=None, **kwargs):
 
         # error messages
         error_message = None
@@ -1898,9 +1921,18 @@ class TemplateAndFoldersSelectionForm(Form):
             return self.move_to_new_folder_name.data
         return None
 
-    templates_and_folders = MultiCheckboxField('Choose templates or folders', validators=[
-        required_for_ops('move-to-new-folder', 'move-to-existing-folder')
-    ])
+    templates_and_folders = govukCheckboxesField(
+        'Choose templates or folders',
+        validators=[required_for_ops('move-to-new-folder', 'move-to-existing-folder')],
+        choices=[],  # added to keep order of arguments, added properly in __init__
+        param_extensions={
+            "fieldset": {
+                "legend": {
+                    "classes": "govuk-visually-hidden"
+                }
+            }
+        }
+    )
     # if no default set, it is set to None, which process_data transforms to '__NONE__'
     # this means '__NONE__' (self.ALL_TEMPLATES option) is selected when no form data has been submitted
     # set default to empty string so process_data method doesn't perform any transformation
