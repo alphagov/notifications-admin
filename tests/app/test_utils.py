@@ -376,6 +376,7 @@ def test_printing_today_or_tomorrow_returns_tomorrow(datetime):
 
 @pytest.mark.parametrize('created_at, current_datetime', [
     ('2017-07-07T12:00:00+00:00', '2017-07-07 16:29:00'),  # created today, summer
+    ('2017-07-06T23:30:00+00:00', '2017-07-07 16:29:00'),  # created just after midnight, summer
     ('2017-12-12T12:00:00+00:00', '2017-12-12 17:29:00'),  # created today, winter
     ('2017-12-12T21:30:00+00:00', '2017-12-13 17:29:00'),  # created after 5:30 yesterday
     ('2017-03-25T17:31:00+00:00', '2017-03-26 16:29:00'),  # over clock change period on 2017-03-26
