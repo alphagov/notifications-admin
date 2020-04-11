@@ -486,8 +486,16 @@ def test_upload_csv_file_with_empty_message_shows_check_page_with_errors(
     assert [
         normalize_spaces(row.text) for row in page.select('tbody tr')
     ] == [
-        '3 +447700900986 no',
+        '3 No content for this message',
+        '+447700900986 no',
     ]
+    assert normalize_spaces(page.select_one('.table-field-index').text) == '3'
+    assert page.select_one('.table-field-index')['rowspan'] == '2'
+    assert normalize_spaces(page.select('tbody tr td')[0].text) == '3'
+    assert normalize_spaces(page.select('tbody tr td')[1].text) == (
+        'No content for this message'
+    )
+    assert page.select('tbody tr td')[1]['colspan'] == '2'
 
 
 @pytest.mark.parametrize('file_contents, expected_error,', [

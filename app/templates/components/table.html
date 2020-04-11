@@ -65,12 +65,12 @@
   {% endif %}
 {%- endmacro %}
 
-{% macro field(align='left', status='', border=True) -%}
+{% macro field(align='left', status='', border=True, colspan=None) -%}
 
     {% set field_alignment = 'table-field-right-aligned' if align == 'right' else 'table-field-left-aligned' %}
     {% set border = '' if border else 'table-field-noborder' %}
 
-    <td class="{{ [field_alignment, border]|join(' ') }}">
+    <td class="{{ [field_alignment, border]|join(' ') }}" {% if colspan %}colspan="{{ colspan }}"{% endif %}>
       <div class="{{ 'table-field-status-' + status if status }}">{{ caller() }}</div>
     </td>
 {%- endmacro %}
@@ -81,8 +81,8 @@
   </th>
 {%- endmacro %}
 
-{% macro index_field(text=None) -%}
-  <td class="table-field-index">
+{% macro index_field(text=None, rowspan=None) -%}
+  <td class="table-field-index" {% if rowspan %}rowspan="{{ rowspan }}"{% endif %}>
     {{ text if text != None else caller()  }}
   </td>
 {%- endmacro %}
