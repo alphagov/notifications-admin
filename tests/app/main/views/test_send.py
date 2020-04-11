@@ -475,9 +475,19 @@ def test_upload_csv_file_with_empty_message_shows_check_page_with_errors(
         assert 'file_uploads' not in session
 
     assert response.status_code == 200
-    content = response.get_data(as_text=True)
-    assert 'There’s a problem with invalid.csv' in content
-    assert 'check you have content for the empty message in 1 row' in content
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert normalize_spaces(
+        page.select_one('.banner-dangerous').text
+    ) == (
+        'There’s a problem with invalid.csv '
+        'You need to check you have content for the empty message in 1 row. '
+        'Skip to file contents'
+    )
+    assert [
+        normalize_spaces(row.text) for row in page.select('tbody tr')
+    ] == [
+        '3 +447700900986 no',
+    ]
 
 
 @pytest.mark.parametrize('file_contents, expected_error,', [
