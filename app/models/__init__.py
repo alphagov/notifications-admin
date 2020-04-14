@@ -18,6 +18,9 @@ class JSONModel():
     def __hash__(self):
         return hash(self.id)
 
+    def __dir__(self):
+        return super().__dir__() + list(sorted(self.ALLOWED_PROPERTIES))
+
     def __eq__(self, other):
         return self.id == other.id
 
