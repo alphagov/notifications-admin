@@ -68,3 +68,11 @@ def test_model_doesnt_swallow_attribute_errors(json_response):
         Custom(json_response).foo
 
     assert str(e.value) == 'Something has gone wrong'
+
+
+def test_dynamic_properties_are_introspectable():
+
+    class Custom(JSONModel):
+        ALLOWED_PROPERTIES = {'foo', 'bar', 'baz'}
+
+    assert dir(Custom({}))[-3:] == ['bar', 'baz', 'foo']
