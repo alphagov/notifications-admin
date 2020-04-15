@@ -13,7 +13,11 @@ from flask import (
 )
 from flask_login import current_user
 from notifications_python_client.errors import HTTPError
-from notifications_utils.template import Template, WithSubjectTemplate
+from notifications_utils.template import (
+    EmailPreviewTemplate,
+    LetterPreviewTemplate,
+    SMSPreviewTemplate,
+)
 
 from app import (
     current_service,
@@ -402,29 +406,37 @@ def get_job_partials(job):
 def add_preview_of_content_to_notifications(notifications):
 
     for notification in notifications:
+        yield(dict(
+            preview_of_content=get_preview_of_content(notification),
+            **notification
+        ))
 
-        if notification['template'].get('redact_personalisation'):
-            notification['personalisation'] = {}
 
-        if notification['template']['template_type'] == 'sms':
-            yield dict(
-                preview_of_content=str(Template(
-                    notification['template'],
-                    notification['personalisation'],
-                    redact_missing_personalisation=True,
-                )),
-                **notification
-            )
-        else:
-            if notification['template']['is_precompiled_letter']:
-                notification['template']['subject'] = notification['client_reference']
-            yield dict(
-                preview_of_content=(
-                    WithSubjectTemplate(
-                        notification['template'],
-                        notification['personalisation'],
-                        redact_missing_personalisation=True,
-                    ).subject
-                ),
-                **notification
-            )
+def get_preview_of_content(notification):
+
+    if notification['template'].get('redact_personalisation'):
+        notification['personalisation'] = {}
+
+    if notification['template']['is_precompiled_letter']:
+        return notification['client_reference']
+
+    if notification['template']['template_type'] == 'sms':
+        return str(SMSPreviewTemplate(
+            notification['template'],
+            notification['personalisation'],
+            redact_missing_personalisation=True,
+            show_prefix=False,
+        ))
+
+    if notification['template']['template_type'] == 'email':
+        return EmailPreviewTemplate(
+            notification['template'],
+            notification['personalisation'],
+            redact_missing_personalisation=True,
+        ).subject
+
+    if notification['template']['template_type'] == 'letter':
+        return LetterPreviewTemplate(
+            notification['template'],
+            notification['personalisation'],
+        ).subject

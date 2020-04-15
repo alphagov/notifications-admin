@@ -128,6 +128,7 @@ def email_template():
         brand_name = email_branding['name']
 
     template = {
+        'template_type': 'email',
         'subject': 'foo',
         'content': (
             'Lorem Ipsum is simply dummy text of the printing and typesetting '
@@ -198,7 +199,7 @@ def letter_template():
     else:
         filename = 'no-branding'
 
-    template = {'subject': '', 'content': ''}
+    template = {'subject': '', 'content': '', 'template_type': 'letter'}
     image_url = url_for('no_cookie.letter_branding_preview_image', filename=filename)
 
     template_image = str(LetterImageTemplate(
