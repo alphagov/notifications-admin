@@ -1372,7 +1372,6 @@ def get_placeholder_form_instance(
     placeholder_name,
     dict_to_populate_from,
     template_type,
-    optional_placeholder=False,
     allow_international_phone_numbers=False,
 ):
 
@@ -1389,8 +1388,6 @@ def get_placeholder_form_instance(
             field = international_phone_number(label=placeholder_name)
         else:
             field = uk_mobile_number(label=placeholder_name)
-    elif optional_placeholder:
-        field = StringField(placeholder_name)
     else:
         field = StringField(placeholder_name, validators=[
             DataRequired(message='Cannot be empty')

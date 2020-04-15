@@ -18,10 +18,7 @@ from notifications_python_client.errors import HTTPError
 from notifications_utils import LETTER_MAX_PAGE_COUNT, SMS_CHAR_COUNT_LIMIT
 from notifications_utils.columns import Columns
 from notifications_utils.pdf import is_letter_too_long
-from notifications_utils.postal_address import (
-    PostalAddress,
-    address_lines_1_to_6_and_postcode_keys,
-)
+from notifications_utils.postal_address import PostalAddress
 from notifications_utils.recipients import (
     RecipientCSV,
     first_column_headings,
@@ -402,7 +399,6 @@ def send_one_off_letter_address(service_id, template_id):
         ),
         template=template,
         form=form,
-        optional_placeholder=False,
         back_link=get_back_link(service_id, template, 0),
         help=False,
         link_to_upload=True,
@@ -476,17 +472,26 @@ def send_test_step(service_id, template_id, step_index):
         ))
 
     # if we're in a letter, we should show address block rather than "address line #" or "postcode"
-    if template.template_type == 'letter' and current_placeholder in (
-        Columns.from_keys(address_lines_1_to_6_and_postcode_keys)
-    ):
-        return redirect(url_for('.send_one_off_letter_address', service_id=service_id, template_id=template_id))
+    if template.template_type == 'letter':
+        if step_index < len(first_column_headings['letter']):
+            return redirect(url_for(
+                '.send_one_off_letter_address',
+                service_id=service_id,
+                template_id=template_id,
+            ))
+        if current_placeholder in Columns(PostalAddress('').as_personalisation):
+            return redirect(url_for(
+                request.endpoint,
+                service_id=service_id,
+                template_id=template_id,
+                step_index=step_index + 1,
+                help=get_help_argument(),
+            ))
 
-    optional_placeholder = (current_placeholder in optional_address_columns)
     form = get_placeholder_form_instance(
         current_placeholder,
         dict_to_populate_from=get_normalised_placeholders_from_session(),
         template_type=template.template_type,
-        optional_placeholder=optional_placeholder,
         allow_international_phone_numbers=current_service.has_permission('international_sms'),
     )
 
@@ -514,24 +519,11 @@ def send_test_step(service_id, template_id, step_index):
             help=get_help_argument(),
         ))
 
-    back_link = get_back_link(service_id, template, step_index)
+    back_link = get_back_link(service_id, template, step_index, placeholders)
 
     template.values = get_recipient_and_placeholders_from_session(template.template_type)
     template.values[current_placeholder] = None
 
-    if (
-        request.endpoint == 'main.send_one_off_step'
-        and step_index == 0
-        and template.template_type != 'letter'
-        and not (template.template_type == 'sms' and current_user.mobile_number is None)
-        and current_user.has_permissions('manage_templates', 'manage_service')
-    ):
-        skip_link = (
-            'Use my {}'.format(first_column_headings[template.template_type][0]),
-            url_for('.send_test', service_id=service_id, template_id=template.id),
-        )
-    else:
-        skip_link = None
     return render_template(
         'views/send-test.html',
         page_title=get_send_test_page_title(
@@ -542,8 +534,7 @@ def send_test_step(service_id, template_id, step_index):
         ),
         template=template,
         form=form,
-        skip_link=skip_link,
-        optional_placeholder=optional_placeholder,
+        skip_link=get_skip_link(step_index, template),
         back_link=back_link,
         help=get_help_argument(),
         link_to_upload=(
@@ -911,7 +902,7 @@ def is_current_user_the_recipient():
     return session['recipient'] == current_user.email_address
 
 
-def get_back_link(service_id, template, step_index):
+def get_back_link(service_id, template, step_index, placeholders=None):
     if get_help_argument():
         # if we're on the check page, redirect back to the beginning. anywhere else, don't return the back link
         if request.endpoint == 'main.check_notification':
@@ -963,12 +954,39 @@ def get_back_link(service_id, template, step_index):
             step_index=0,
         )
 
-    else:
-        return url_for(
-            'main.send_one_off_step',
-            service_id=service_id,
-            template_id=template.id,
-            step_index=step_index - 1,
+    if template.template_type == 'letter' and placeholders:
+        # Make sure we’re not redirecting users to a page which will
+        # just redirect them forwards again
+        back_link_destination_step_index = next((
+            index
+            for index, placeholder in reversed(
+                list(enumerate(placeholders[:step_index]))
+            )
+            if placeholder not in Columns(
+                PostalAddress('').as_personalisation
+            )
+        ), 1)
+        return get_back_link(service_id, template, back_link_destination_step_index + 1)
+
+    return url_for(
+        'main.send_one_off_step',
+        service_id=service_id,
+        template_id=template.id,
+        step_index=step_index - 1,
+    )
+
+
+def get_skip_link(step_index, template):
+    if (
+        request.endpoint == 'main.send_one_off_step'
+        and step_index == 0
+        and template.template_type != 'letter'
+        and not (template.template_type == 'sms' and current_user.mobile_number is None)
+        and current_user.has_permissions('manage_templates', 'manage_service')
+    ):
+        return (
+            'Use my {}'.format(first_column_headings[template.template_type][0]),
+            url_for('.send_test', service_id=current_service.id, template_id=template.id),
         )
 
 
@@ -1004,7 +1022,9 @@ def _check_notification(service_id, template_id, exception=None):
         page_count=get_page_count_for_letter(db_template),
     )
 
-    back_link = get_back_link(service_id, template, len(fields_to_fill_in(template)))
+    placeholders = fields_to_fill_in(template)
+
+    back_link = get_back_link(service_id, template, len(placeholders), placeholders)
 
     if (
         (

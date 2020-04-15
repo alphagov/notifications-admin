@@ -9,11 +9,11 @@ def test_form_class_not_mutated(app_):
         method='POST',
         data={'placeholder_value': ''}
     ):
-        form1 = get_placeholder_form_instance('name', {}, 'sms', optional_placeholder=False)
-        form2 = get_placeholder_form_instance('city', {}, 'sms', optional_placeholder=True)
+        form1 = get_placeholder_form_instance('name', {}, 'sms')
+        form2 = get_placeholder_form_instance('city', {}, 'sms')
 
         assert not form1.validate_on_submit()
-        assert form2.validate_on_submit()
+        assert not form2.validate_on_submit()
 
         assert str(form1.placeholder_value.label) == '<label for="placeholder_value">name</label>'
         assert str(form2.placeholder_value.label) == '<label for="placeholder_value">city</label>'
