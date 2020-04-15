@@ -711,6 +711,8 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
         ),
         letter_too_long=is_letter_too_long(page_count),
         letter_max_pages=LETTER_MAX_PAGE_COUNT,
+        letter_min_address_lines=PostalAddress.MIN_LINES,
+        letter_max_address_lines=PostalAddress.MAX_LINES,
         page_count=page_count
     )
 

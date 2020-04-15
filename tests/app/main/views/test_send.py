@@ -557,6 +557,60 @@ def test_upload_csv_file_with_very_long_placeholder_shows_check_page_with_errors
     assert page.select('tbody tr td')[1]['colspan'] == '2'
 
 
+def test_upload_csv_file_with_bad_postal_address_shows_check_page_with_errors(
+    logged_in_client,
+    service_one,
+    mocker,
+    mock_get_service_letter_template,
+    mock_s3_upload,
+    mock_get_users_by_service,
+    mock_get_service_statistics,
+    mock_get_job_doesnt_exist,
+    mock_get_jobs,
+    fake_uuid,
+):
+    mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=9)
+    mocker.patch(
+        'app.main.views.send.s3download',
+        return_value='''
+            address line 1,     address line 3,  address line 6,
+            Firstname Lastname, 123 Example St., SW1A 1AA
+            Firstname Lastname, 123 Example St., SW!A !AA
+                              , 123 Example St., SW!A !AA
+            "1\n2\n3\n4\n5\n6\n7\n8"
+        '''
+    )
+
+    response = logged_in_client.post(
+        url_for('main.send_messages', service_id=service_one['id'], template_id=fake_uuid),
+        data={'file': (BytesIO(''.encode('utf-8')), 'invalid.csv')},
+        content_type='multipart/form-data',
+        follow_redirects=True
+    )
+
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert normalize_spaces(
+        page.select_one('.banner-dangerous').text
+    ) == (
+        'There’s a problem with invalid.csv '
+        'You need to fix 3 addresses. '
+        'Skip to file contents'
+    )
+    assert [
+        normalize_spaces(row.text) for row in page.select('tbody tr')
+    ] == [
+        '3 Last line of the address must be a real UK postcode',
+        'Firstname Lastname 123 Example St. SW!A !AA',
+
+        '4 Address must be at least 3 lines long',
+        '123 Example St. SW!A !AA',
+
+        '5 Address must be no more than 7 lines long',
+        '1 2 3 4 5 6 7 8',
+    ]
+
+
 @pytest.mark.parametrize('file_contents, expected_error,', [
     (
         """
