@@ -1022,7 +1022,9 @@ def _check_notification(service_id, template_id, exception=None):
         page_count=get_page_count_for_letter(db_template),
     )
 
-    back_link = get_back_link(service_id, template, len(fields_to_fill_in(template)))
+    placeholders = fields_to_fill_in(template)
+
+    back_link = get_back_link(service_id, template, len(placeholders), placeholders)
 
     if (
         (

@@ -3801,6 +3801,58 @@ def test_check_notification_shows_help(
     )
 
 
+def test_check_notification_shows_back_link(
+    mocker,
+    client_request,
+    service_one,
+    fake_uuid,
+    mock_template_preview
+):
+    service_one['restricted'] = False
+    mocker.patch(
+        'app.service_api_client.get_service_template',
+        return_value={'data': template_json(
+            SERVICE_ONE_ID,
+            fake_uuid,
+            name="Awkward letter",
+            type_="letter",
+            subject="We need to talk about ((thing))",
+            content=f"Hello ((address line 3))",
+        )},
+    )
+    with client_request.session_transaction() as session:
+        session['recipient'] = 'foo'
+        session['placeholders'] = {
+            'address_line_1': 'foo',
+            'address_line_2': 'bar',
+            'address_line_3': '',
+            'address_line_4': '',
+            'address_line_5': '',
+            'address_line_6': '',
+            'address_line_7': 'SW1A 1AA',
+            'postcode': 'SW1A 1AA',
+            'thing': 'a thing',
+        }
+
+    page = client_request.get(
+        'main.check_notification',
+        service_id=service_one['id'],
+        template_id=fake_uuid,
+    )
+
+    assert page.h1.text.strip() == 'Preview of ‘Awkward letter’'
+    back_link = page.find_all('a', {'class': 'govuk-back-link'})[0]['href']
+    assert back_link == url_for(
+        'main.send_one_off_step',
+        service_id=service_one['id'],
+        template_id=fake_uuid,
+        step_index=7,
+    )
+
+    previous_page = client_request.get_url(back_link)
+    assert normalize_spaces(previous_page.select_one('label').text) == 'thing'
+
+
 @pytest.mark.parametrize('template, recipient, placeholders, expected_personalisation', (
     (
         mock_get_service_template,
