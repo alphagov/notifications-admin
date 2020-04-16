@@ -3,6 +3,7 @@
 
   var queues = {};
   var dd = new global.diffDOM();
+  var defaultInterval = 2000;
   var interval = 0;
 
   var calculateBackoff = responseTime => parseInt(Math.max(
@@ -54,11 +55,14 @@
 
   global.GOVUK.Modules.UpdateContent = function() {
 
-    this.start = component => poll(
-      getRenderer($(component)),
-      $(component).data('resource'),
-      getQueue($(component).data('resource')),
-      $(component).data('form')
+    this.start = component => setTimeout(
+      () => poll(
+        getRenderer($(component)),
+        $(component).data('resource'),
+        getQueue($(component).data('resource')),
+        $(component).data('form')
+      ),
+      defaultInterval
     );
 
   };
