@@ -177,6 +177,10 @@ class SMSCode(StringField):
     def __call__(self, **kwargs):
         return super().__call__(type='tel', pattern='[0-9]*', **kwargs)
 
+    def process_formdata(self, valuelist):
+        if valuelist:
+            self.data = Columns.make_key(valuelist[0])
+
 
 class ForgivingIntegerField(StringField):
 
