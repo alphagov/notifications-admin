@@ -117,6 +117,7 @@ def get_sms_thread(service_id, user_number):
             'inbound': is_inbound,
             'content': SMSPreviewTemplate(
                 {
+                    'template_type': 'sms',
                     'content': (
                         notification['content'] if is_inbound else
                         notification['template']['content']

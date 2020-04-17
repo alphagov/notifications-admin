@@ -1,6 +1,6 @@
 from flask import abort, current_app, render_template
 from flask_wtf import FlaskForm as Form
-from notifications_utils.template import Template
+from notifications_utils.template import SMSPreviewTemplate
 from wtforms import (
     FileField,
     PasswordField,
@@ -31,7 +31,7 @@ def styleguide():
     form.message.data = sms
     form.validate()
 
-    template = Template({'content': sms})
+    template = SMSPreviewTemplate({'content': sms, 'template_type': 'sms'})
 
     return render_template(
         'views/styleguide.html',
