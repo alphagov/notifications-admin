@@ -151,6 +151,15 @@ def get_errors_for_csv(recipients, template_type):
     return errors
 
 
+def get_sample_template(template_type):
+    if template_type == 'email':
+        return EmailPreviewTemplate({'content': 'any', 'subject': '', 'template_type': 'email'})
+    if template_type == 'sms':
+        return SMSPreviewTemplate({'content': 'any', 'template_type': 'sms'})
+    if template_type == 'letter':
+        return LetterImageTemplate({'content': 'any', 'subject': '', 'template_type': 'letter'})
+
+
 def generate_notifications_csv(**kwargs):
     from app import notification_api_client
     from app.s3_client.s3_csv_client import s3download
@@ -161,7 +170,7 @@ def generate_notifications_csv(**kwargs):
         original_file_contents = s3download(kwargs['service_id'], kwargs['job_id'])
         original_upload = RecipientCSV(
             original_file_contents,
-            template_type=kwargs['template_type'],
+            template=get_sample_template(kwargs['template_type']),
         )
         original_column_headers = original_upload.column_headers
         fieldnames = ['Row number'] + original_column_headers + ['Template', 'Type', 'Job', 'Status', 'Time']

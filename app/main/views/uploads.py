@@ -43,6 +43,7 @@ from app.utils import (
     generate_previous_dict,
     get_errors_for_csv,
     get_letter_validation_error,
+    get_sample_template,
     get_template,
     unicode_truncate,
     user_has_permissions,
@@ -357,7 +358,7 @@ def check_contact_list(service_id, upload_id):
 
     recipients = RecipientCSV(
         contents,
-        template_type=template_type or 'sms',
+        template=get_sample_template(template_type or 'sms'),
         whitelist=itertools.chain.from_iterable(
             [user.name, user.mobile_number, user.email_address]
             for user in current_service.active_users

@@ -19,6 +19,7 @@ from notifications_utils.recipients import RecipientCSV
 from notifications_utils.template import (
     LetterImageTemplate,
     LetterPreviewTemplate,
+    SMSPreviewTemplate,
 )
 from xlrd.biffh import XLRDError
 from xlrd.xldate import (
@@ -2575,7 +2576,9 @@ def test_upload_csvfile_with_international_validates(
     mocker.patch('app.main.views.send.s3download', return_value='')
     mock_recipients = mocker.patch(
         'app.main.views.send.RecipientCSV',
-        return_value=RecipientCSV("", template_type="sms"),
+        return_value=RecipientCSV("", template=SMSPreviewTemplate(
+            {'content': 'foo', 'template_type': 'sms'}
+        )),
     )
 
     response = logged_in_client.post(
@@ -3381,7 +3384,7 @@ def test_check_messages_shows_data_errors_before_trial_mode_errors_for_letters(
 
     assert normalize_spaces(page.select_one('.banner-dangerous').text) == (
         'There’s a problem with example.xlsx '
-        'You need to enter missing data in 2 rows. '
+        'You need to fix 2 addresses. '
         'Skip to file contents'
     )
     assert not page.select('.table-field-index a')
@@ -3470,7 +3473,8 @@ def test_check_messages_column_error_doesnt_show_optional_columns(
 
     assert normalize_spaces(page.select_one('.banner-dangerous').text) == (
         'There’s a problem with your column names '
-        'Your file needs a column called ‘postcode’. '
+        'Your file needs at least 3 address columns, for example ‘address line 1’, '
+        '‘address line 2’ and ‘address line 3’. '
         'Right now it has columns called ‘address_line_1’, ‘address_line_2’ and ‘foo’. '
         'Skip to file contents'
     )

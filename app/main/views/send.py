@@ -19,13 +19,8 @@ from notifications_utils import LETTER_MAX_PAGE_COUNT, SMS_CHAR_COUNT_LIMIT
 from notifications_utils.columns import Columns
 from notifications_utils.pdf import is_letter_too_long
 from notifications_utils.postal_address import PostalAddress
-from notifications_utils.recipients import (
-    RecipientCSV,
-    first_column_headings,
-    optional_address_columns,
-)
+from notifications_utils.recipients import RecipientCSV, first_column_headings
 from notifications_utils.sanitise_text import SanitiseASCII
-from orderedset import OrderedSet
 from xlrd.biffh import XLRDError
 from xlrd.xldate import XLDateError
 
@@ -663,9 +658,7 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
     )
     recipients = RecipientCSV(
         contents,
-        template_type=template.template_type,
         template=template,
-        placeholders=template.placeholders,
         max_initial_rows_shown=50,
         max_errors_shown=50,
         whitelist=itertools.chain.from_iterable(
@@ -711,7 +704,7 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
             current_service.trial_mode,
             template.template_type == 'letter',
         )),
-        required_recipient_columns=OrderedSet(recipients.recipient_column_headers) - optional_address_columns,
+        first_recipient_column=recipients.recipient_column_headers[0],
         preview_row=preview_row,
         sent_previously=job_api_client.has_sent_previously(
             service_id, template.id, db_template['version'], request.args.get('original_file_name', '')
