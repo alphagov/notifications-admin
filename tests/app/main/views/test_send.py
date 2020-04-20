@@ -475,9 +475,85 @@ def test_upload_csv_file_with_empty_message_shows_check_page_with_errors(
         assert 'file_uploads' not in session
 
     assert response.status_code == 200
-    content = response.get_data(as_text=True)
-    assert 'There’s a problem with invalid.csv' in content
-    assert 'check you have content for the empty message in 1 row' in content
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert normalize_spaces(
+        page.select_one('.banner-dangerous').text
+    ) == (
+        'There’s a problem with invalid.csv '
+        'You need to check you have content for the empty message in 1 row. '
+        'Skip to file contents'
+    )
+    assert [
+        normalize_spaces(row.text) for row in page.select('tbody tr')
+    ] == [
+        '3 No content for this message',
+        '+447700900986 no',
+    ]
+    assert normalize_spaces(page.select_one('.table-field-index').text) == '3'
+    assert page.select_one('.table-field-index')['rowspan'] == '2'
+    assert normalize_spaces(page.select('tbody tr td')[0].text) == '3'
+    assert normalize_spaces(page.select('tbody tr td')[1].text) == (
+        'No content for this message'
+    )
+    assert page.select('tbody tr td')[1]['colspan'] == '2'
+
+
+def test_upload_csv_file_with_very_long_placeholder_shows_check_page_with_errors(
+    logged_in_client,
+    service_one,
+    mocker,
+    mock_get_service_template_with_placeholders,
+    mock_s3_upload,
+    mock_get_users_by_service,
+    mock_get_service_statistics,
+    mock_get_job_doesnt_exist,
+    mock_get_jobs,
+    fake_uuid,
+):
+    big_placeholder = ' '.join(['not ok'] * 102)
+    mocker.patch(
+        'app.main.views.send.s3download',
+        return_value=f"""
+            phone number, name
+            +447700900986, {big_placeholder}
+            +447700900987, {big_placeholder}
+        """
+    )
+
+    response = logged_in_client.post(
+        url_for('main.send_messages', service_id=service_one['id'], template_id=fake_uuid),
+        data={'file': (BytesIO(''.encode('utf-8')), 'invalid.csv')},
+        content_type='multipart/form-data',
+        follow_redirects=True
+    )
+
+    with logged_in_client.session_transaction() as session:
+        assert 'file_uploads' not in session
+
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert normalize_spaces(
+        page.select_one('.banner-dangerous').text
+    ) == (
+        'There’s a problem with invalid.csv '
+        'You need to shorten the messages in 2 rows. '
+        'Skip to file contents'
+    )
+    assert [
+        normalize_spaces(row.text) for row in page.select('tbody tr')
+    ] == [
+        '2 Message is too long',
+        f'+447700900986 {big_placeholder}',
+        '3 Message is too long',
+        f'+447700900987 {big_placeholder}',
+    ]
+    assert normalize_spaces(page.select_one('.table-field-index').text) == '2'
+    assert page.select_one('.table-field-index')['rowspan'] == '2'
+    assert normalize_spaces(page.select('tbody tr td')[0].text) == '2'
+    assert normalize_spaces(page.select('tbody tr td')[1].text) == (
+        'Message is too long'
+    )
+    assert page.select('tbody tr td')[1]['colspan'] == '2'
 
 
 @pytest.mark.parametrize('file_contents, expected_error,', [
