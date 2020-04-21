@@ -340,7 +340,7 @@ def test_shows_message_when_no_notifications(
     (
         {},
         {},
-        'Search by email address or phone number',
+        'Search by recipient',
         '',
     ),
     (
@@ -372,6 +372,16 @@ def test_shows_message_when_no_notifications(
         },
         'Search by email address',
         'test@example.com',
+    ),
+    (
+        {
+            'message_type': 'letter',
+        },
+        {
+            'to': 'Firstname Lastname',
+        },
+        'Search by first line of address or file name',
+        'Firstname Lastname',
     ),
 ])
 def test_search_recipient_form(
@@ -413,9 +423,10 @@ def test_search_recipient_form(
 
 
 @pytest.mark.parametrize('message_type, expected_search_box_label', [
-    (None, 'Search by email address, phone number or reference'),
+    (None, 'Search by recipient or reference'),
     ('sms', 'Search by phone number or reference'),
     ('email', 'Search by email address or reference'),
+    ('letter', 'Search by first line of address, file name or reference'),
 ])
 def test_api_users_are_told_they_can_search_by_reference_when_service_has_api_keys(
     client_request,
@@ -437,7 +448,7 @@ def test_api_users_are_told_they_can_search_by_reference_when_service_has_api_ke
 
 
 @pytest.mark.parametrize('message_type, expected_search_box_label', [
-    (None, 'Search by email address or phone number'),
+    (None, 'Search by recipient'),
     ('sms', 'Search by phone number'),
     ('email', 'Search by email address'),
 ])
@@ -615,10 +626,10 @@ def test_redacts_templates_that_should_be_redacted(
     "message_type, tablist_visible, search_bar_visible", [
         ('email', True, True),
         ('sms', True, True),
-        ('letter', False, False)
+        ('letter', False, True)
     ]
 )
-def test_big_numbers_and_search_dont_show_for_letters(
+def test_big_numbers_dont_show_for_letters(
     client_request,
     service_one,
     mock_get_notifications,
