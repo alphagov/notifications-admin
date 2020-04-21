@@ -225,11 +225,11 @@ def test_sms_sender_form_validation(
     form.validate()
     assert not form.errors
 
-    form.sms_sender.data = '333'
+    form.sms_sender.data = '22'
     form.validate()
-    assert 'Enter 4 characters or more' == form.errors['sms_sender'][0]
+    assert 'Enter 3 characters or more' == form.errors['sms_sender'][0]
 
-    form.sms_sender.data = '4444'
+    form.sms_sender.data = '333'
     form.validate()
     assert not form.errors
 
