@@ -11,6 +11,8 @@ def _check_code(code):
 @pytest.mark.parametrize('post_data', [
     {'sms_code': '12345'},
     {'sms_code': ' 12345 '},
+    {'sms_code': '12 34 5'},
+    {'sms_code': '1-23-45'},
 ])
 def test_form_is_valid_returns_no_errors(
     app_,
@@ -21,6 +23,7 @@ def test_form_is_valid_returns_no_errors(
         form = TwoFactorForm(_check_code)
         assert form.validate() is True
         assert form.errors == {}
+    mock_check_verify_code.assert_called_once_with('1', '12345', 'sms')
 
 
 @pytest.mark.parametrize('post_data, expected_error', (
@@ -38,6 +41,10 @@ def test_form_is_valid_returns_no_errors(
     ),
     (
         {'sms_code': '12E45'},
+        'Numbers only',
+    ),
+    (
+        {'sms_code': ' ! 2 3 4 5'},
         'Numbers only',
     ),
 ))
