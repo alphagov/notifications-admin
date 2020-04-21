@@ -845,7 +845,14 @@ def test_letter_branding_preview_image(
         url_for('no_cookie.letter_branding_preview_image', filename=original_filename)
     )
 
-    mocked_preview.assert_called_with(ANY, new_filename)
+    mocked_preview.assert_called_with(
+        {
+            'subject': 'An example letter',
+            'content': ANY,
+            'template_type': 'letter',
+        },
+        new_filename,
+    )
     assert resp.get_data(as_text=True) == 'foo'
 
 
