@@ -1063,7 +1063,7 @@ class ServiceSmsSenderForm(StripWhitespaceForm):
         validators=[
             DataRequired(message="Cannot be empty"),
             Length(max=11, message="Enter 11 characters or fewer"),
-            Length(min=4, message="Enter 4 characters or more"),
+            Length(min=3, message="Enter 3 characters or more"),
             LettersNumbersFullStopsAndUnderscoresOnly(),
             DoesNotStartWithDoubleZero(),
         ]
