@@ -248,7 +248,8 @@ def letter_branding_preview_image(filename):
             'The point of using Lorem Ipsum is that it has a more-or-less '
             'normal distribution of letters, as opposed to using ‘Content '
             'here, content here’, making it look like readable English.'
-        )
+        ),
+        'template_type': 'letter',
     }
     filename = None if filename == 'no-branding' else filename
 
