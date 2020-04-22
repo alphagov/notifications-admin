@@ -16,7 +16,7 @@ from notifications_python_client.errors import HTTPError
 from notifications_utils.template import (
     EmailPreviewTemplate,
     LetterPreviewTemplate,
-    SMSPreviewTemplate,
+    SMSBodyPreviewTemplate,
 )
 
 from app import (
@@ -421,11 +421,9 @@ def get_preview_of_content(notification):
         return notification['client_reference']
 
     if notification['template']['template_type'] == 'sms':
-        return str(SMSPreviewTemplate(
+        return str(SMSBodyPreviewTemplate(
             notification['template'],
             notification['personalisation'],
-            redact_missing_personalisation=True,
-            show_prefix=False,
         ))
 
     if notification['template']['template_type'] == 'email':
