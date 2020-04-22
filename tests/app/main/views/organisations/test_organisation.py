@@ -158,8 +158,8 @@ def test_create_new_organisation_validates(
         for error in page.select('.error-message')
     ] == [
         ('name', 'Cannot be empty'),
-        ('organisation_type', 'Not a valid choice'),
-        ('crown_status', 'Not a valid choice'),
+        ('organisation_type', 'Select the type of organisation'),
+        ('crown_status', 'Select whether this organisation is a crown body'),
     ]
     assert mock_create_organisation.called is False
 
@@ -334,7 +334,7 @@ def test_gps_can_name_their_organisation(
         {
             'name': 'Dr. Example',
         },
-        'Not a valid choice',
+        'Select yes or no',
     ),
     (
         {

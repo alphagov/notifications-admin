@@ -1377,7 +1377,7 @@ def test_should_show_persist_estimated_volumes(
             'consent_to_research': '',
         },
         '[data-error-label="consent_to_research"]',
-        'This field is required.'
+        'Select yes or no'
     ),
 ))
 def test_should_error_if_bad_estimations_given(
@@ -4109,7 +4109,7 @@ def test_send_files_by_email_contact_details_displays_error_message_when_no_radi
         },
         _follow_redirects=True
     )
-    assert normalize_spaces(page.find('span', class_='error-message').text) == 'Not a valid choice'
+    assert normalize_spaces(page.find('span', class_='error-message').text) == 'Select an option'
     assert normalize_spaces(page.h1.text) == "Send files by email"
 
 

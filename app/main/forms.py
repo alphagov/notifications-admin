@@ -24,7 +24,9 @@ from wtforms import (
     HiddenField,
     IntegerField,
     PasswordField,
-    RadioField,
+)
+from wtforms import RadioField as WTFormsRadioField
+from wtforms import (
     SelectMultipleField,
     StringField,
     TextAreaField,
@@ -113,6 +115,24 @@ def get_next_days_until(until):
 class MultiCheckboxField(SelectMultipleField):
     widget = ListWidget(prefix_label=False)
     option_widget = CheckboxInput()
+
+
+class RadioField(WTFormsRadioField):
+
+    def __init__(
+        self,
+        *args,
+        thing='an option',
+        **kwargs
+    ):
+        super().__init__(*args, **kwargs)
+        self.thing = thing
+        self.validate_choice = False
+
+    def pre_validate(self, form):
+        super().pre_validate(form)
+        if self.data not in dict(self.choices).keys():
+            raise ValidationError(f'Select {self.thing}')
 
 
 def email_address(label='Email address', gov_user=True, required=True):
@@ -266,7 +286,8 @@ class OrganisationTypeField(RadioField):
                 (value, label) for value, label in Organisation.TYPES
                 if not include_only or value in include_only
             ],
-            validators=[DataRequired()] + (validators or []),
+            thing='the type of organisation',
+            validators=validators or [],
             **kwargs
         )
 
@@ -376,10 +397,17 @@ class PostalAddressField(TextAreaField):
 class OnOffField(RadioField):
 
     def __init__(self, label, choices=None, *args, **kwargs):
-        super().__init__(label, choices=choices or [
+        choices = choices or [
             (True, 'On'),
             (False, 'Off'),
-        ], *args, **kwargs)
+        ]
+        super().__init__(
+            label,
+            choices=choices,
+            thing=f'{choices[0][1].lower()} or {choices[1][1].lower()}',
+            *args,
+            **kwargs,
+        )
 
     def process_formdata(self, valuelist):
         if valuelist:
@@ -482,6 +510,7 @@ class PermissionsForm(PermissionsAbstract):
             ('sms_auth', 'Text message code'),
             ('email_auth', 'Email link'),
         ],
+        thing='how this team member should sign in',
         validators=[DataRequired()]
     )
 
@@ -616,6 +645,7 @@ class AddNHSLocalOrganisationForm(StripWhitespaceForm):
 
     organisations = RadioField(
         'Which NHS Trust or Clinical Commissioning Group do you work for?',
+        thing='an NHS Trust or Clinical Commissioning Group'
     )
 
 
@@ -633,9 +663,7 @@ class OrganisationCrownStatusForm(StripWhitespaceForm):
             ('non-crown', 'No'),
             ('unknown', 'Not sure'),
         ],
-        validators=[
-            DataRequired(message='Cannot be empty')
-        ],
+        thing='whether this organisation is a crown body',
     )
 
 
@@ -649,9 +677,7 @@ class OrganisationAgreementSignedForm(StripWhitespaceForm):
             ('no', 'No'),
             ('unknown', 'No (but we have some service-specific agreements in place)'),
         ],
-        validators=[
-            DataRequired(message='Cannot be empty')
-        ],
+        thing='whether this organisation has signed the agreement',
     )
 
 
@@ -742,6 +768,7 @@ class BaseTemplateForm(StripWhitespaceForm):
             ('priority', 'Yes'),
             ('normal', 'No'),
         ],
+        thing='yes or no',
         validators=[DataRequired()],
         default='normal'
     )
@@ -806,6 +833,7 @@ class LetterTemplatePostageForm(StripWhitespaceForm):
             ('first', 'First class'),
             ('second', 'Second class'),
         ],
+        thing='first class or second class',
         validators=[DataRequired()]
     )
 
@@ -890,9 +918,6 @@ class ChooseTimeForm(StripWhitespaceForm):
     scheduled_for = RadioField(
         'When should Notify send these messages?',
         default='',
-        validators=[
-            DataRequired()
-        ]
     )
 
 
@@ -906,9 +931,7 @@ class CreateKeyForm(StripWhitespaceForm):
 
     key_type = RadioField(
         'Type of key',
-        validators=[
-            DataRequired()
-        ]
+        thing='the type of key',
     )
 
     key_name = StringField(u'Description of key', validators=[
@@ -927,7 +950,6 @@ class SupportType(StripWhitespaceForm):
             (PROBLEM_TICKET_TYPE, 'Report a problem'),
             (QUESTION_TICKET_TYPE, 'Ask a question or give feedback'),
         ],
-        validators=[DataRequired()]
     )
 
 
@@ -938,7 +960,6 @@ class SupportRedirect(StripWhitespaceForm):
             ('public-sector', 'I work in the public sector and need to send emails, text messages or letters'),
             ('public', 'I’m a member of the public with a question for the government'),
         ],
-        validators=[DataRequired()]
     )
 
 
@@ -955,7 +976,7 @@ class Triage(StripWhitespaceForm):
             ('yes', 'Yes'),
             ('no', 'No'),
         ],
-        validators=[DataRequired()]
+        thing='yes or no',
     )
 
 
@@ -982,7 +1003,7 @@ class EstimateUsageForm(StripWhitespaceForm):
             ('yes', 'Yes'),
             ('no', 'No'),
         ],
-        validators=[DataRequired()]
+        thing='yes or no',
     )
 
     at_least_one_volume_filled = True
@@ -1024,7 +1045,6 @@ class ServiceContactDetailsForm(StripWhitespaceForm):
             ('email_address', 'Email address'),
             ('phone_number', 'Phone number'),
         ],
-        validators=[DataRequired()]
     )
 
     url = StringField("URL")
@@ -1120,9 +1140,7 @@ class SetEmailBranding(StripWhitespaceForm):
 
     branding_style = RadioFieldWithNoneOption(
         'Branding style',
-        validators=[
-            DataRequired()
-        ]
+        thing='a branding style',
     )
 
     DEFAULT = (FieldWithNoneOption.NONE_OPTION_VALUE, 'GOV.UK')
@@ -1314,9 +1332,7 @@ class ServiceInboundNumberForm(StripWhitespaceForm):
 
     inbound_number = RadioField(
         "Select your inbound number",
-        validators=[
-            DataRequired("Option must be selected")
-        ]
+        thing='an inbound number',
     )
 
 
@@ -1679,7 +1695,6 @@ class TemplateAndFoldersSelectionForm(Form):
 class ClearCacheForm(StripWhitespaceForm):
     model_type = RadioField(
         'What do you want to clear today',
-        validators=[DataRequired()]
     )
 
 
@@ -1725,7 +1740,6 @@ class AcceptAgreementForm(StripWhitespaceForm):
                 'Someone else',
             ),
         ),
-        validators=[DataRequired()],
     )
 
     on_behalf_of_name = StringField(

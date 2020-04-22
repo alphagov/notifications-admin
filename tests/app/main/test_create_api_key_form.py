@@ -36,8 +36,8 @@ def test_return_validation_error_when_key_name_exists(
 
 @pytest.mark.parametrize(
     'key_type, expected_error', [
-        ('', 'This field is required.'),
-        ('invalid', 'Not a valid choice')
+        ('', 'Select the type of key'),
+        ('invalid', 'Select the type of key')
     ]
 )
 def test_return_validation_error_when_key_type_not_chosen(client, key_type, expected_error):

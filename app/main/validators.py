@@ -8,7 +8,6 @@ from notifications_utils.recipients import (
 )
 from notifications_utils.sanitise_text import SanitiseSMS
 from wtforms import ValidationError
-from wtforms.validators import Email
 
 from app.main._blacklisted_passwords import blacklisted_passwords
 from app.utils import Spreadsheet, is_gov_user
@@ -51,10 +50,9 @@ class ValidGovEmail:
             raise ValidationError(message)
 
 
-class ValidEmail(Email):
+class ValidEmail:
 
-    def __init__(self):
-        super().__init__('Enter a valid email address')
+    message = 'Enter a valid email address'
 
     def __call__(self, form, field):
 
@@ -65,8 +63,6 @@ class ValidEmail(Email):
             validate_email_address(field.data)
         except InvalidEmailError:
             raise ValidationError(self.message)
-
-        return super().__call__(form, field)
 
 
 class NoCommasInPlaceHolders:

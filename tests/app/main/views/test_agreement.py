@@ -278,7 +278,7 @@ def test_accept_agreement_page_populates(
             'on_behalf_of_email': '',
         },
         [
-            'Not a valid choice',
+            'Select an option',
             'Must be a number',
         ],
     ),
