@@ -39,7 +39,7 @@ def test_organisation_page_shows_all_organisations(
 
     assert normalize_spaces(
         page.select_one('h1').text
-    ) == "All organisations"
+    ) == "Organisations"
 
     expected_hints = ('0 live services', '1 live service', '2 live services')
 

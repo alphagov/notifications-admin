@@ -3,18 +3,25 @@
 {% from "components/checkbox.html" import checkbox %}
 {% from "components/page-footer.html" import page_footer %}
 
-{% block maincolumn_content %}
 
+{% block beforeContent %}
+  <div class="navigation-service">
+    <div class="navigation-service-name govuk-!-font-weight-bold">
+      Platform admin
+    </div>
+    <a href="{{ url_for('main.choose_account') }}" class="govuk-link govuk-link--no-visited-state navigation-service-switch">Switch service</a>
+  </div>
+{% endblock %}
+
+{% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-one-quarter">
-      <p class="heading-medium">
-        Platform admin
-      </p>
       <nav class="navigation">
           {% for link_text, url in [
           ('Summary', url_for('main.platform_admin')),
           ('Live services', url_for('main.live_services')),
           ('Trial mode services', url_for('main.trial_services')),
+          ('Organisations', url_for('main.organisations')),
           ('Providers', url_for('main.view_providers')),
           ('Reports', url_for('main.platform_admin_reports')),
           ('Email branding', url_for('main.email_branding')),
@@ -22,7 +29,7 @@
           ('Inbound SMS numbers', url_for('main.inbound_sms_admin')),
           ('Find services by name', url_for('main.find_services_by_name')),
           ('Find users by email', url_for('main.find_users_by_email')),
-          ('Email Complaints', url_for('main.platform_admin_list_complaints')),
+          ('Email complaints', url_for('main.platform_admin_list_complaints')),
           ('Returned letters', url_for('main.platform_admin_returned_letters')),
           ('Clear cache', url_for('main.clear_cache')),
         ] %}
@@ -34,7 +41,8 @@
         {% endfor %}
       </nav>
     </div>
-    <div class="govuk-grid-column-three-quarters">
+    <div class="govuk-grid-column-three-quarters column-main">
+      {% include 'flash_messages.html' %}
       {% block platform_admin_content %}{% endblock %}
     </div>
   </div>
