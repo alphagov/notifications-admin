@@ -134,6 +134,8 @@ def test_can_show_notifications(
     assert normalize_spaces(
         first_row.select_one('a.file-list-filename.govuk-link').text
     ) == (
+        # Comes from
+        # https://github.com/alphagov/notifications-admin/blob/8faffad508f9a087b0006989c197741c693cc2e2/tests/__init__.py#L436
         '07123456789'
     )
     assert normalize_spaces(
@@ -141,8 +143,12 @@ def test_can_show_notifications(
         # HTML sneaking in
         str(first_row.select_one('.file-list-hint'))
     ) == (
+        # Comes from
+        # https://github.com/alphagov/notifications-admin/blob/8faffad508f9a087b0006989c197741c693cc2e2/tests/__init__.py#L271
         'template content'
     ) or (
+        # Comes from
+        # https://github.com/alphagov/notifications-admin/blob/8faffad508f9a087b0006989c197741c693cc2e2/tests/__init__.py#L273
         'template subject'
     )
 
