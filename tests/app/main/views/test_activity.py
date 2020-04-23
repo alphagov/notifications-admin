@@ -86,6 +86,7 @@ from tests.conftest import (
         ('test@example.com', 'test@example.com'),
     ]
 )
+@freeze_time('2020-01-01 01:00')
 def test_can_show_notifications(
     client_request,
     logged_in_client,
@@ -129,13 +130,34 @@ def test_can_show_notifications(
             page=page_argument,
             **extra_args
         )
-    text_of_first_row = page.select('tbody tr')[0].text
-    assert '07123456789' in text_of_first_row
-    assert (
-        'template content' in text_of_first_row or
-        'template subject' in text_of_first_row
+    first_row = page.select_one('tbody tr')
+    assert normalize_spaces(
+        first_row.select_one('a.file-list-filename.govuk-link').text
+    ) == (
+        # Comes from
+        # https://github.com/alphagov/notifications-admin/blob/8faffad508f9a087b0006989c197741c693cc2e2/tests/__init__.py#L436
+        '07123456789'
     )
-    assert 'Delivered' in text_of_first_row
+    assert normalize_spaces(
+        # We’re doing str() here not .text to make sure there’s no extra
+        # HTML sneaking in
+        str(first_row.select_one('.file-list-hint'))
+    ) == (
+        # Comes from
+        # https://github.com/alphagov/notifications-admin/blob/8faffad508f9a087b0006989c197741c693cc2e2/tests/__init__.py#L271
+        'template content'
+    ) or (
+        # Comes from
+        # https://github.com/alphagov/notifications-admin/blob/8faffad508f9a087b0006989c197741c693cc2e2/tests/__init__.py#L273
+        'template subject'
+    )
+
+    assert normalize_spaces(
+        first_row.select_one('.table-field-right-aligned .align-with-message-body').text
+    ) == (
+        'Delivered 1 January at 1:01am'
+    )
+
     assert page_title in page.h1.text.strip()
 
     path_to_json = page.find("div", {'data-key': 'notifications'})['data-resource']
