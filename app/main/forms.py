@@ -16,6 +16,7 @@ from notifications_utils.recipients import (
     normalise_phone_number,
     validate_phone_number,
 )
+from werkzeug.utils import cached_property
 from wtforms import (
     BooleanField,
     DateField,
@@ -317,13 +318,16 @@ class RadioFieldWithNoneOption(FieldWithNoneOption, RadioField):
 
 
 class NestedFieldMixin:
+
     def children(self):
+
         # start map with root option as a single child entry
         child_map = {None: [option for option in self
                             if option.data == self.NONE_OPTION_VALUE]}
 
         # add entries for all other children
         for option in self:
+            # assign all options with a NONE_OPTION_VALUE (not always None) to the None key
             if option.data == self.NONE_OPTION_VALUE:
                 child_ids = [
                     folder['id'] for folder in self.all_template_folders
@@ -338,6 +342,47 @@ class NestedFieldMixin:
             child_map[key] = [option for option in self if option.data in child_ids]
 
         return child_map
+
+    # to be used as the only version of .children once radios are converted
+    @cached_property
+    def _children(self):
+        return self.children()
+
+    def get_items_from_options(self, field):
+        items = []
+
+        for option in self._children[None]:
+            item = self.get_item_from_option(option)
+            if option.data in self._children:
+                item['children'] = self.render_children(field.name, option.label.text, self._children[option.data])
+            items.append(item)
+
+        return items
+
+    def render_children(self, name, label, options):
+        params = {
+            "name": name,
+            "fieldset": {
+                "legend": {
+                    "text": label,
+                    "classes": "govuk-visually-hidden"
+                }
+            },
+            "formGroup": {
+                "classes": "govuk-form-group--nested"
+            },
+            "asList": True,
+            "items": []
+        }
+        for option in options:
+            item = self.get_item_from_option(option)
+
+            if len(self._children[option.data]):
+                item['children'] = self.render_children(name, option.label.text, self._children[option.data])
+
+            params['items'].append(item)
+
+        return render_template('forms/fields/checkboxes/template.njk', params=params)
 
 
 class NestedRadioField(RadioFieldWithNoneOption, NestedFieldMixin):
@@ -490,6 +535,8 @@ class RegisterUserFromOrgInviteForm(StripWhitespaceForm):
 # based on work done by @richardjpope: https://github.com/richardjpope/recourse/blob/master/recourse/forms.py#L6
 class govukCheckboxesField(SelectMultipleField):
 
+    render_as_list = False
+
     def __init__(self, label='', validators=None, param_extensions=None, **kwargs):
         super(govukCheckboxesField, self).__init__(label, validators, **kwargs)
         # default choices to a single True Boolean
@@ -497,30 +544,34 @@ class govukCheckboxesField(SelectMultipleField):
             self.choices = [('y', label)]
         self.param_extensions = param_extensions
 
+    def get_item_from_option(self, option):
+        return {
+            "name": option.name,
+            "id": option.id,
+            "text": option.label.text,
+            "value": str(option.data),  # to protect against non-string types like uuids
+            "checked": option.checked
+        }
+
+    def get_items_from_options(self, field):
+        return [self.get_item_from_option(option) for option in field]
+
     # self.__call__ renders the HTML for the field by:
     # 1. delegating to self.meta.render_field which
     # 2. calls field.widget
     # this bypasses that by making self.widget a method with the same interface as widget.__call__
     def widget(self, field, **kwargs):
-        items = []
 
         # error messages
         error_message = None
         if field.errors:
             error_message = {"text": " ".join(field.errors).strip()}
 
-        # convert options to ones govuk understands
-        for option in field:
-            items.append({
-                "name": option.name,
-                "id": option.id,
-                "text": option.label.text,
-                "value": option.data,
-                "checked": option.checked
-            })
+        # returns either a list or a hierarchy of lists
+        # depending on how get_items_from_options is implemented
+        items = self.get_items_from_options(field)
 
         params = {
-            'idPrefix': field.id,
             'name':  field.name,
             'errorMessage': error_message,
             'items': items
@@ -535,21 +586,23 @@ class govukCheckboxesField(SelectMultipleField):
                         "text": field.label.text,
                         "classes": "govuk-fieldset__legend--s"
                     }
-                }
+                },
+                "asList": self.render_as_list
             })
 
         # extend default params with any sent in
-        if self.param_extensions:
+        if self.param_extensions.keys():
             params.update(self.param_extensions)
 
         return Markup(
-            render_template('vendor/govuk-frontend/components/checkboxes/template.njk', params=params))
+            render_template('forms/fields/checkboxes/macro.njk', params=params))
 
 
 # Extends fields using the govukCheckboxesField interface to wrap their render in HTML needed by the collapsible JS
 class govukCollapsibleCheckboxesMixin:
     def __init__(self, label='', validators=None, field_label='', param_extensions=None, **kwargs):
 
+        super(govukCollapsibleCheckboxesMixin, self).__init__(label, validators, param_extensions, **kwargs)
         self.field_label = field_label
 
     def widget(self, field, **kwargs):
@@ -574,6 +627,14 @@ class govukCollapsibleCheckboxesMixin:
 
 class govukCollapsibleCheckboxesField(govukCollapsibleCheckboxesMixin, govukCheckboxesField):
     pass
+
+
+# govukCollapsibleCheckboxesMixin adds an ARIA live-region to the hint and wraps the render in HTML needed by the
+# collapsible JS
+# NestedFieldMixin puts the items into a tree hierarchy, pre-rendering the sub-trees of the top-level items
+class govukCollapsibleNestedCheckboxesField(govukCollapsibleCheckboxesMixin, NestedFieldMixin, govukCheckboxesField):
+    NONE_OPTION_VALUE = None
+    render_as_list = True
 
 
 class PermissionsForm(StripWhitespaceForm):
