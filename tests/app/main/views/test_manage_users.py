@@ -288,11 +288,11 @@ def test_service_without_caseworking_doesnt_show_admin_vs_caseworker(
         service_id=SERVICE_ONE_ID,
         **extra_args
     )
-    assert page.select('input[type=checkbox]')[0]['name'] == 'view_activity'
-    assert page.select('input[type=checkbox]')[1]['name'] == 'send_messages'
-    assert page.select('input[type=checkbox]')[2]['name'] == 'manage_templates'
-    assert page.select('input[type=checkbox]')[3]['name'] == 'manage_service'
-    assert page.select('input[type=checkbox]')[4]['name'] == 'manage_api_keys'
+    assert page.select('input[type=checkbox]')[0]['value'] == 'view_activity'
+    assert page.select('input[type=checkbox]')[1]['value'] == 'send_messages'
+    assert page.select('input[type=checkbox]')[2]['value'] == 'manage_templates'
+    assert page.select('input[type=checkbox]')[3]['value'] == 'manage_service'
+    assert page.select('input[type=checkbox]')[4]['value'] == 'manage_api_keys'
 
 
 @pytest.mark.parametrize('endpoint, extra_args', [
@@ -320,7 +320,7 @@ def test_broadcast_service_only_shows_relevant_permissions(
         **extra_args
     )
     assert [
-        field['name'] for field in page.select('input[type=checkbox]')
+        field['value'] for field in page.select('input[type=checkbox]')
     ] == [
         'send_messages',
         'manage_templates',
@@ -432,8 +432,8 @@ def test_should_show_page_for_one_user(
     assert len(checkboxes) == 5
 
     for index, expected in enumerate(expected_checkboxes):
-        expected_input_name, expected_checked = expected
-        assert checkboxes[index]['name'] == expected_input_name
+        expected_input_value, expected_checked = expected
+        assert checkboxes[index]['value'] == expected_input_value
         assert checkboxes[index].has_attr('checked') == expected_checked
 
 
@@ -475,11 +475,13 @@ def test_should_not_show_page_for_non_team_member(
 @pytest.mark.parametrize('submitted_permissions, permissions_sent_to_api', [
     (
         {
-            'view_activity': 'y',
-            'send_messages': 'y',
-            'manage_templates': 'y',
-            'manage_service': 'y',
-            'manage_api_keys': 'y',
+            'permissions_field': [
+                'view_activity',
+                'send_messages',
+                'manage_templates',
+                'manage_service',
+                'manage_api_keys',
+            ]
         },
         {
             'view_activity',
@@ -491,13 +493,16 @@ def test_should_not_show_page_for_non_team_member(
     ),
     (
         {
-            'view_activity': 'y',
-            'send_messages': 'y',
-            'manage_templates': '',
+            'permissions_field': [
+                'view_activity',
+                'send_messages',
+                'manage_templates',
+            ]
         },
         {
             'view_activity',
             'send_messages',
+            'manage_templates',
         }
     ),
     (
@@ -542,11 +547,12 @@ def test_edit_user_permissions(
 @pytest.mark.parametrize('submitted_permissions, permissions_sent_to_api', [
     (
         {
-            'view_activity': 'y',
-            'send_messages': 'y',
-            'manage_templates': 'y',
-            'manage_service': 'y',
-            'manage_api_keys': 'y',
+            'permissions_field': [
+                'send_messages',
+                'manage_templates',
+                'manage_service',
+                'manage_api_keys',
+            ]
         },
         {
             'view_activity',
@@ -557,8 +563,9 @@ def test_edit_user_permissions(
     ),
     (
         {
-            'view_activity': 'y',
-            'send_messages': 'y',
+            'permissions_field': [
+                'send_messages',
+            ]
         },
         {
             'view_activity',
@@ -748,10 +755,12 @@ def test_edit_user_permissions_including_authentication_with_email_auth_service(
         user_id=active_user_with_permissions['id'],
         _data={
             'email_address': active_user_with_permissions['email_address'],
-            'send_messages': 'y',
-            'manage_templates': 'y',
-            'manage_service': 'y',
-            'manage_api_keys': 'y',
+            'permissions_field': [
+                'send_messages',
+                'manage_templates',
+                'manage_service',
+                'manage_api_keys',
+            ],
             'login_authentication': auth_type,
         },
         _expected_status=302,
@@ -810,7 +819,7 @@ def test_should_show_folder_permission_form_if_service_has_folder_permissions_en
 
     assert 'Invite a team member' in page.find('h1').text.strip()
 
-    folder_checkboxes = page.find('div', class_='checkboxes-nested').find_all('li')
+    folder_checkboxes = page.find('div', class_='selection-wrapper').find_all('li')
     assert len(folder_checkboxes) == 3
 
 
@@ -839,11 +848,13 @@ def test_invite_user(
         service_id=SERVICE_ONE_ID,
         _data={
             'email_address': email_address,
-            'view_activity': 'y',
-            'send_messages': 'y',
-            'manage_templates': 'y',
-            'manage_service': 'y',
-            'manage_api_keys': 'y',
+            'permissions_field': [
+                'view_activity',
+                'send_messages',
+                'manage_templates',
+                'manage_service',
+                'manage_api_keys',
+            ]
         },
         _follow_redirects=True,
     )
@@ -894,11 +905,13 @@ def test_invite_user_with_email_auth_service(
         service_id=SERVICE_ONE_ID,
         _data={
             'email_address': email_address,
-            'view_activity': 'y',
-            'send_messages': 'y',
-            'manage_templates': 'y',
-            'manage_service': 'y',
-            'manage_api_keys': 'y',
+            'permissions_field': [
+                'view_activity',
+                'send_messages',
+                'manage_templates',
+                'manage_service',
+                'manage_api_keys',
+            ],
             'login_authentication': auth_type,
         },
         _follow_redirects=True,
@@ -922,9 +935,11 @@ def test_invite_user_with_email_auth_service(
 @pytest.mark.parametrize('post_data, expected_permissions_to_api', (
     (
         {
-            'send_messages': 'y',
-            'manage_templates': 'y',
-            'manage_service': 'y',
+            'permissions_field': [
+                'send_messages',
+                'manage_templates',
+                'manage_service',
+            ]
         },
         {
             'view_activity',
@@ -935,9 +950,11 @@ def test_invite_user_with_email_auth_service(
     ),
     (
         {
-            'view_activity': 'y',
-            'manage_api_keys': 'y',
-            'foo': 'y',
+            'permissions_field': [
+                'view_activity',
+                'manage_api_keys',
+                'foo',
+            ]
         },
         {
             'view_activity',
