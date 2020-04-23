@@ -2202,8 +2202,8 @@ def test_incorrect_sms_sender_input(
 
 @pytest.mark.parametrize('reply_to_addresses, data, api_default_args', [
     ([], {}, True),
-    (create_multiple_email_reply_to_addresses(), {}, False),
-    (create_multiple_email_reply_to_addresses(), {"is_default": "y"}, True)
+    (create_multiple_email_reply_to_addresses(), {"is_default": []}, False),
+    (create_multiple_email_reply_to_addresses(), {"is_default": ["y"]}, True)
 ])
 def test_add_reply_to_email_address_sends_test_notification(
     mocker, client_request, reply_to_addresses, data, api_default_args
@@ -2323,8 +2323,8 @@ def test_add_reply_to_email_address_fails_if_notification_not_delivered_in_45_se
 
 @pytest.mark.parametrize('letter_contact_blocks, data, api_default_args', [
     ([], {}, True),  # no existing letter contact blocks
-    (create_multiple_letter_contact_blocks(), {}, False),
-    (create_multiple_letter_contact_blocks(), {"is_default": "y"}, True)
+    (create_multiple_letter_contact_blocks(), {"is_default": []}, False),
+    (create_multiple_letter_contact_blocks(), {"is_default": ["y"]}, True)
 ])
 def test_add_letter_contact(
     letter_contact_blocks,
@@ -2399,8 +2399,8 @@ def test_add_letter_contact_when_coming_from_template(
 
 @pytest.mark.parametrize('sms_senders, data, api_default_args', [
     ([], {}, True),
-    (create_multiple_sms_senders(), {}, False),
-    (create_multiple_sms_senders(), {"is_default": "y"}, True)
+    (create_multiple_sms_senders(), {"is_default": []}, False),
+    (create_multiple_sms_senders(), {"is_default": ["y"]}, True)
 ])
 def test_add_sms_sender(
     sms_senders,
@@ -2466,10 +2466,10 @@ def test_default_box_doesnt_show_on_first_letter_sender(
 
 
 @pytest.mark.parametrize('reply_to_address, data, api_default_args', [
-    (create_reply_to_email_address(is_default=True), {"is_default": "y"}, True),
-    (create_reply_to_email_address(is_default=True), {}, True),
-    (create_reply_to_email_address(is_default=False), {}, False),
-    (create_reply_to_email_address(is_default=False), {"is_default": "y"}, True)
+    (create_reply_to_email_address(is_default=True), {"is_default": ["y"]}, True),
+    (create_reply_to_email_address(is_default=True), {"is_default": []}, True),
+    (create_reply_to_email_address(is_default=False), {"is_default": []}, False),
+    (create_reply_to_email_address(is_default=False), {"is_default": ["y"]}, True)
 ])
 def test_edit_reply_to_email_address_sends_verification_notification_if_address_is_changed(
     reply_to_address,
@@ -2494,10 +2494,10 @@ def test_edit_reply_to_email_address_sends_verification_notification_if_address_
 
 
 @pytest.mark.parametrize('reply_to_address, data, api_default_args', [
-    (create_reply_to_email_address(), {"is_default": "y"}, True),
-    (create_reply_to_email_address(), {}, True),
-    (create_reply_to_email_address(is_default=False), {}, False),
-    (create_reply_to_email_address(is_default=False), {"is_default": "y"}, True)
+    (create_reply_to_email_address(), {"is_default": ["y"]}, True),
+    (create_reply_to_email_address(), {"is_default": []}, True),
+    (create_reply_to_email_address(is_default=False), {"is_default": []}, False),
+    (create_reply_to_email_address(is_default=False), {"is_default": ["y"]}, True)
 ])
 def test_edit_reply_to_email_address_goes_straight_to_update_if_address_not_changed(
     reply_to_address,
@@ -2554,7 +2554,7 @@ def test_add_edit_reply_to_email_address_goes_straight_to_update_if_address_not_
             message=error_message
         )]
     )
-    data = {"is_default": "y", 'email_address': "reply_to@example.com"}
+    data = {"is_default": ["y"], 'email_address': "reply_to@example.com"}
     page = client_request.post(
         url,
         service_id=SERVICE_ONE_ID,
@@ -2654,10 +2654,10 @@ def test_delete_reply_to_email_address(
 
 
 @pytest.mark.parametrize('letter_contact_block, data, api_default_args', [
-    (create_letter_contact_block(), {"is_default": "y"}, True),
-    (create_letter_contact_block(), {}, True),
-    (create_letter_contact_block(is_default=False), {}, False),
-    (create_letter_contact_block(is_default=False), {"is_default": "y"}, True)
+    (create_letter_contact_block(), {"is_default": ["y"]}, True),
+    (create_letter_contact_block(), {"is_default": []}, True),
+    (create_letter_contact_block(is_default=False), {"is_default": []}, False),
+    (create_letter_contact_block(is_default=False), {"is_default": ["y"]}, True)
 ])
 def test_edit_letter_contact_block(
     letter_contact_block,
@@ -2731,10 +2731,10 @@ def test_delete_letter_contact_block(
 
 
 @pytest.mark.parametrize('sms_sender, data, api_default_args', [
-    (create_sms_sender(), {"is_default": "y", "sms_sender": "test"}, True),
-    (create_sms_sender(), {"sms_sender": "test"}, True),
-    (create_sms_sender(is_default=False), {"sms_sender": "test"}, False),
-    (create_sms_sender(is_default=False), {"is_default": "y", "sms_sender": "test"}, True)
+    (create_sms_sender(), {"is_default": ["y"], "sms_sender": "test"}, True),
+    (create_sms_sender(), {"is_default": [], "sms_sender": "test"}, True),
+    (create_sms_sender(is_default=False), {"is_default": [], "sms_sender": "test"}, False),
+    (create_sms_sender(is_default=False), {"is_default": ["y"], "sms_sender": "test"}, True)
 ])
 def test_edit_sms_sender(
     sms_sender,
