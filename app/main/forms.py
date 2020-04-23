@@ -547,6 +547,36 @@ class govukCheckboxesField(SelectMultipleField):
             render_template('vendor/govuk-frontend/components/checkboxes/template.njk', params=params))
 
 
+# Extends fields using the govukCheckboxesField interface to wrap their render in HTML needed by the collapsible JS
+class govukCollapsibleCheckboxesMixin:
+    def __init__(self, label='', validators=None, field_label='', param_extensions=None, **kwargs):
+
+        self.field_label = field_label
+
+    def widget(self, field, **kwargs):
+
+        # add a blank hint to act as an ARIA live-region
+        if self.param_extensions is not None:
+            self.param_extensions.update(
+                {"hint": {"html": "<div class=\"selection-summary\" role=\"region\" aria-live=\"polite\"></div>"}})
+        else:
+            self.param_extensions = \
+                {"hint": {"html": "<div class=\"selection-summary\" role=\"region\" aria-live=\"polite\"></div>"}}
+
+        # wrap the checkboxes HTML in the HTML needed by the collapisble JS
+        return Markup(
+            f'<div class="selection-wrapper"'
+            f'     data-module="collapsible-checkboxes"'
+            f'     data-field-label="{self.field_label}">'
+            f'  {super(govukCollapsibleCheckboxesMixin, self).widget(field, **kwargs)}'
+            f'</div>'
+        )
+
+
+class govukCollapsibleCheckboxesField(govukCollapsibleCheckboxesMixin, govukCheckboxesField):
+    pass
+
+
 class PermissionsForm(StripWhitespaceForm):
     def __init__(self, all_template_folders=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
