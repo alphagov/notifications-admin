@@ -4,6 +4,7 @@ import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
 from lxml import html
+from notifications_python_client.errors import HTTPError
 
 from tests import user_json
 from tests.conftest import normalize_spaces
@@ -221,20 +222,48 @@ def test_archive_user_posts_to_user_client(
     assert mock_events.called
 
 
-def test_archive_user_does_not_create_event_if_user_client_raises_exception(
+def test_archive_user_shows_error_message_if_user_cannot_be_archived(
+    platform_admin_client,
+    api_user_active,
+    mocker,
+    mock_get_non_empty_organisations_and_services_for_user,
+):
+    mocker.patch(
+        'app.user_api_client.post',
+        side_effect=HTTPError(
+            response=mocker.Mock(
+                status_code=400,
+                json={'result': 'error',
+                      'message': 'User can’t be removed from a service - check all services have another '
+                      'team member with manage_settings'}
+            ),
+            message='User can’t be removed from a service - check all services have another team member '
+            'with manage_settings'
+        )
+    )
+
+    response = platform_admin_client.post(
+        url_for('main.archive_user', user_id=api_user_active['id']),
+        follow_redirects=True
+    )
+
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    assert normalize_spaces(page.find('h1').text) == 'Platform admin user'
+    assert normalize_spaces(
+        page.select_one('.banner-dangerous').text
+    ) == 'User can’t be removed from a service - check all services have another team member with manage_settings'
+
+
+def test_archive_user_does_not_create_event_if_user_client_raises_unexpected_exception(
     platform_admin_client,
     api_user_active,
     mocker,
     mock_events,
 ):
-    mock_user_client = mocker.patch('app.user_api_client.post', side_effect=Exception())
-
     with pytest.raises(Exception):
-        response = platform_admin_client.post(
+        platform_admin_client.post(
             url_for('main.archive_user', user_id=api_user_active.id)
         )
 
-        assert response.status_code == 500
-        assert response.location == url_for('main.user_information', user_id=api_user_active['id'], _external=True)
-        mock_user_client.assert_called_once_with('/user/{}/archive'.format(api_user_active['id']), data=None)
-        assert not mock_events.called
+    assert not mock_events.called

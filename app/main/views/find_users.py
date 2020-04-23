@@ -1,5 +1,6 @@
 from flask import flash, redirect, render_template, request, url_for
 from flask_login import current_user
+from notifications_python_client.errors import HTTPError
 
 from app import user_api_client
 from app.event_handlers import create_archive_user_event
@@ -36,7 +37,13 @@ def user_information(user_id):
 @user_is_platform_admin
 def archive_user(user_id):
     if request.method == 'POST':
-        user_api_client.archive_user(user_id)
+        try:
+            user_api_client.archive_user(user_id)
+        except HTTPError as e:
+            if e.status_code == 400 and 'manage_settings' in e.message:
+                flash('User can’t be removed from a service - '
+                      'check all services have another team member with manage_settings')
+                return redirect(url_for('main.user_information', user_id=user_id))
         create_archive_user_event(str(user_id), current_user.id)
 
         return redirect(url_for('.user_information', user_id=user_id))
