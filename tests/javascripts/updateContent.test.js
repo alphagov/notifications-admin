@@ -110,6 +110,7 @@ describe('Update content', () => {
 
     // start the module
     window.GOVUK.modules.start();
+    jest.advanceTimersByTime(2000);
 
     expect($.ajax.mock.calls[0][0]).toEqual(resourceURL);
 
@@ -122,6 +123,7 @@ describe('Update content', () => {
 
     // start the module
     window.GOVUK.modules.start();
+    jest.advanceTimersByTime(2000);
 
     // check the right DOM node is updated
     expect(document.querySelectorAll('.big-number-number')[0].textContent.trim()).toEqual("0");
@@ -135,6 +137,7 @@ describe('Update content', () => {
 
     // start the module
     window.GOVUK.modules.start();
+    jest.advanceTimersByTime(2000);
 
     // check the right DOM node is updated
     expect(document.querySelectorAll('.big-number-number')[0].textContent.trim()).toEqual("1");
@@ -152,19 +155,26 @@ describe('Update content', () => {
 
     test("It should use the GET HTTP method", () => {
 
+      jest.advanceTimersByTime(2000);
       expect($.ajax.mock.calls[0][1].method).toEqual('get');
 
     });
 
     test("It shouldn't send any data as part of the requests", () => {
 
+      jest.advanceTimersByTime(2000);
       expect($.ajax.mock.calls[0][1].data).toEqual({});
 
     });
 
     test("It should request updates with a dynamic interval", () => {
 
-      // First call happens straight away
+      // First call doesn’t happen in the first 2000ms
+      jest.advanceTimersByTime(1999);
+      expect($.ajax).toHaveBeenCalledTimes(0);
+
+      // But it happens after 2000ms by default
+      jest.advanceTimersByTime(1);
       expect($.ajax).toHaveBeenCalledTimes(1);
 
       // It took the server 1000ms to respond to the first call so we
@@ -213,12 +223,14 @@ describe('Update content', () => {
 
     test("requests should use the same HTTP method as the form", () => {
 
+      jest.advanceTimersByTime(2000);
       expect($.ajax.mock.calls[0][1].method).toEqual('post');
 
     })
 
     test("requests should use the data from the form", () => {
 
+      jest.advanceTimersByTime(2000);
       expect($.ajax.mock.calls[0][1].data).toEqual(helpers.getFormDataFromPairs([
         ['serviceName', 'Buckhurst surgery'],
         ['serviceNumber', serviceNumber]
