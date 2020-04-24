@@ -42,7 +42,7 @@ dependencies: ## Install build dependencies
 
 .PHONY: generate-version-file
 generate-version-file: ## Generates the app version file
-	@echo -e "__travis_commit__ = \"${GIT_COMMIT}\"\n__time__ = \"${DATE}\"\n__travis_job_number__ = \"${BUILD_NUMBER}\"\n__travis_job_url__ = \"${BUILD_URL}\"" > ${APP_VERSION_FILE}
+	@echo -e "__git_commit__ = \"${GIT_COMMIT}\"\n__time__ = \"${DATE}\"" > ${APP_VERSION_FILE}
 
 .PHONY: build
 build: dependencies generate-version-file ## Build project

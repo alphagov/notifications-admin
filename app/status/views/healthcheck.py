@@ -18,6 +18,5 @@ def show_status():
         return jsonify(
             status="ok",
             api=api_status,
-            travis_commit=version.__travis_commit__,
-            travis_build_number=version.__travis_job_number__,
+            git_commit=version.__git_commit__,
             build_time=version.__time__), 200
