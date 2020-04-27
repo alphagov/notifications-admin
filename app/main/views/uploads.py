@@ -363,7 +363,7 @@ def check_contact_list(service_id, upload_id):
             [user.name, user.mobile_number, user.email_address]
             for user in current_service.active_users
         ) if current_service.trial_mode else None,
-        international_sms=current_service.has_permission('international_sms'),
+        allow_international_sms=current_service.has_permission('international_sms'),
         max_initial_rows_shown=50,
         max_errors_shown=50,
     )

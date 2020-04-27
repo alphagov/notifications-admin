@@ -18,7 +18,10 @@ from notifications_python_client.errors import HTTPError
 from notifications_utils import LETTER_MAX_PAGE_COUNT, SMS_CHAR_COUNT_LIMIT
 from notifications_utils.columns import Columns
 from notifications_utils.pdf import is_letter_too_long
-from notifications_utils.postal_address import PostalAddress
+from notifications_utils.postal_address import (
+    PostalAddress,
+    address_lines_1_to_6_and_postcode_keys,
+)
 from notifications_utils.recipients import RecipientCSV, first_column_headings
 from notifications_utils.sanitise_text import SanitiseASCII
 from xlrd.biffh import XLRDError
@@ -59,6 +62,11 @@ from app.utils import (
     user_has_permissions,
 )
 
+letter_address_columns = [
+    column.replace('_', ' ')
+    for column in address_lines_1_to_6_and_postcode_keys
+]
+
 
 def get_example_csv_fields(column_headers, use_example_as_example, submitted_fields):
     if use_example_as_example:
@@ -77,7 +85,7 @@ def get_example_csv_rows(template, use_example_as_example=True, submitted_fields
             (submitted_fields or {}).get(
                 key, get_example_letter_address(key) if use_example_as_example else key
             )
-            for key in first_column_headings['letter']
+            for key in letter_address_columns
         ]
     }[template.template_type] + get_example_csv_fields(
         (
@@ -364,7 +372,10 @@ def send_one_off_letter_address(service_id, template_id):
         get_normalised_placeholders_from_session()
     )
 
-    form = LetterAddressForm(address=current_session_address.normalised)
+    form = LetterAddressForm(
+        address=current_session_address.normalised,
+        allow_international_letters=current_service.has_permission('international_letters'),
+    )
 
     if form.validate_on_submit():
         session['placeholders'].update(PostalAddress(form.address.data).as_personalisation)
@@ -376,7 +387,8 @@ def send_one_off_letter_address(service_id, template_id):
         if all_placeholders_in_session(placeholders):
             return get_notification_check_endpoint(service_id, template)
 
-        first_non_address_placeholder_index = len(first_column_headings['letter'])
+        first_non_address_placeholder_index = len(address_lines_1_to_6_and_postcode_keys)
+
         return redirect(url_for(
             'main.send_one_off_step',
             service_id=service_id,
@@ -468,7 +480,7 @@ def send_test_step(service_id, template_id, step_index):
 
     # if we're in a letter, we should show address block rather than "address line #" or "postcode"
     if template.template_type == 'letter':
-        if step_index < len(first_column_headings['letter']):
+        if step_index < len(address_lines_1_to_6_and_postcode_keys):
             return redirect(url_for(
                 '.send_one_off_letter_address',
                 service_id=service_id,
@@ -665,7 +677,8 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
             [user.name, user.mobile_number, user.email_address] for user in Users(service_id)
         ) if current_service.trial_mode else None,
         remaining_messages=remaining_messages,
-        international_sms=current_service.has_permission('international_sms'),
+        allow_international_sms=current_service.has_permission('international_sms'),
+        allow_international_letters=current_service.has_permission('international_letters'),
     )
 
     if request.args.get('from_test'):
@@ -845,10 +858,12 @@ def go_to_dashboard_after_tour(service_id, example_template_id):
 
 def fields_to_fill_in(template, prefill_current_user=False):
 
-    recipient_columns = first_column_headings[template.template_type]
+    if 'letter' == template.template_type:
+        return letter_address_columns + list(template.placeholders)
 
-    if 'letter' == template.template_type or not prefill_current_user:
-        return recipient_columns + list(template.placeholders)
+    if not prefill_current_user:
+        return first_column_headings[template.template_type] + list(template.placeholders)
+
     if template.template_type == 'sms':
         session['recipient'] = current_user.mobile_number
         session['placeholders']['phone number'] = current_user.mobile_number
@@ -1126,8 +1141,14 @@ def get_sms_sender_from_session():
 def get_spreadsheet_column_headings_from_template(template):
     column_headings = []
 
+    if template.template_type == 'letter':
+        # We want to avoid showing `address line 7` for now
+        recipient_columns = letter_address_columns
+    else:
+        recipient_columns = first_column_headings[template.template_type]
+
     for column_heading in (
-        first_column_headings[template.template_type] + list(template.placeholders)
+        recipient_columns + list(template.placeholders)
     ):
         if column_heading not in Columns.from_keys(column_headings):
             column_headings.append(column_heading)

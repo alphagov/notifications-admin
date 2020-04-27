@@ -121,7 +121,7 @@ class ContactList(JSONModel):
         return RecipientCSV(
             self.contents,
             template=get_sample_template(self.template_type),
-            international_sms=True,
+            allow_international_sms=True,
             max_initial_rows_shown=50,
         )
 
