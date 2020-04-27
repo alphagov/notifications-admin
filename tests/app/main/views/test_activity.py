@@ -451,6 +451,7 @@ def test_api_users_are_told_they_can_search_by_reference_when_service_has_api_ke
     (None, 'Search by recipient'),
     ('sms', 'Search by phone number'),
     ('email', 'Search by email address'),
+    ('letter', 'Search by first line of address or file name'),
 ])
 def test_api_users_are_not_told_they_can_search_by_reference_when_service_has_no_api_keys(
     client_request,
