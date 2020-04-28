@@ -588,7 +588,7 @@ class govukCheckboxesField(SelectMultipleField):
         }
 
         # add HTML to group items if more than one
-        if len(items) > 1:
+        if len(field.choices) > 1:
             params.update({
                 "fieldset": {
                     "attributes": {"id": field.name},
