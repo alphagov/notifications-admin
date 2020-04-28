@@ -169,8 +169,12 @@ def view_notifications(service_id, message_type=None):
         things_you_can_search_by={
             'email': ['email address'],
             'sms': ['phone number'],
-            'letter': [],
-            None: ['email address', 'phone number'],
+            # This should become ‘postal address’ not ‘first line…’ once
+            # we’ve finished populating normalised addresses
+            'letter': ['first line of address', 'file name'],
+            # We say recipient here because combining all 3 types, plus
+            # reference gets too long for the hint text
+            None: ['recipient'],
         }.get(message_type) + {
             True: ['reference'],
             False: [],

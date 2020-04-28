@@ -362,7 +362,7 @@ def test_shows_message_when_no_notifications(
     (
         {},
         {},
-        'Search by email address or phone number',
+        'Search by recipient',
         '',
     ),
     (
@@ -394,6 +394,16 @@ def test_shows_message_when_no_notifications(
         },
         'Search by email address',
         'test@example.com',
+    ),
+    (
+        {
+            'message_type': 'letter',
+        },
+        {
+            'to': 'Firstname Lastname',
+        },
+        'Search by first line of address or file name',
+        'Firstname Lastname',
     ),
 ])
 def test_search_recipient_form(
@@ -435,9 +445,10 @@ def test_search_recipient_form(
 
 
 @pytest.mark.parametrize('message_type, expected_search_box_label', [
-    (None, 'Search by email address, phone number or reference'),
+    (None, 'Search by recipient or reference'),
     ('sms', 'Search by phone number or reference'),
     ('email', 'Search by email address or reference'),
+    ('letter', 'Search by first line of address, file name or reference'),
 ])
 def test_api_users_are_told_they_can_search_by_reference_when_service_has_api_keys(
     client_request,
@@ -459,9 +470,10 @@ def test_api_users_are_told_they_can_search_by_reference_when_service_has_api_ke
 
 
 @pytest.mark.parametrize('message_type, expected_search_box_label', [
-    (None, 'Search by email address or phone number'),
+    (None, 'Search by recipient'),
     ('sms', 'Search by phone number'),
     ('email', 'Search by email address'),
+    ('letter', 'Search by first line of address or file name'),
 ])
 def test_api_users_are_not_told_they_can_search_by_reference_when_service_has_no_api_keys(
     client_request,
@@ -634,13 +646,13 @@ def test_redacts_templates_that_should_be_redacted(
 
 
 @pytest.mark.parametrize(
-    "message_type, tablist_visible, search_bar_visible", [
-        ('email', True, True),
-        ('sms', True, True),
-        ('letter', False, False)
+    "message_type, tablist_visible", [
+        ('email', True),
+        ('sms', True),
+        ('letter', False)
     ]
 )
-def test_big_numbers_and_search_dont_show_for_letters(
+def test_big_numbers_dont_show_for_letters(
     client_request,
     service_one,
     mock_get_notifications,
@@ -650,7 +662,6 @@ def test_big_numbers_and_search_dont_show_for_letters(
     mock_get_no_api_keys,
     message_type,
     tablist_visible,
-    search_bar_visible
 ):
     page = client_request.get(
         'main.view_notifications',
@@ -661,7 +672,7 @@ def test_big_numbers_and_search_dont_show_for_letters(
     )
 
     assert (len(page.select("[role=tablist]")) > 0) == tablist_visible
-    assert (len(page.select("[type=search]")) > 0) == search_bar_visible
+    assert (len(page.select("[type=search]")) > 0) is True
 
 
 @freeze_time("2017-09-27 16:30:00.000000")
