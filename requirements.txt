@@ -5,20 +5,20 @@
 
 ago==0.0.93
 govuk-bank-holidays==0.6
-humanize==2.2.0
-Flask==1.1.1
+humanize==2.4.0
+Flask==1.1.2
 Flask-WTF==0.14.3
 Flask-Login==0.5.0
 
 blinker==1.4
-pyexcel==0.5.15
+pyexcel==0.6.0
 pyexcel-io==0.5.20
 pyexcel-xls==0.5.8
 pyexcel-xlsx==0.5.8
 pyexcel-ods3==0.5.3
 pytz==2019.3
 gunicorn==20.0.4
-eventlet==0.25.1
+eventlet==0.25.2
 notifications-python-client==5.5.1
 
 # PaaS
@@ -29,13 +29,13 @@ git+https://github.com/alphagov/notifications-utils.git@37.3.0#egg=notifications
 git+https://github.com/alphagov/govuk-frontend-jinja.git@v0.5.1-alpha#egg=govuk-frontend-jinja==0.5.1-alpha
 
 ## The following requirements were added by pip freeze:
-awscli==1.18.44
+awscli==1.18.48
 bleach==3.1.4
 boto3==1.10.38
-botocore==1.15.44
+botocore==1.15.48
 certifi==2020.4.5.1
 chardet==3.0.4
-click==7.1.1
+click==7.1.2
 colorama==0.4.3
 dnspython==1.16.0
 docopt==0.6.2
@@ -70,7 +70,6 @@ s3transfer==0.3.3
 six==1.14.0
 smartypants==2.0.1
 statsd==3.3.0
-texttable==1.6.2
 urllib3==1.25.9
 webencodings==0.5.1
 Werkzeug==1.0.1
