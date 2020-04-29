@@ -1182,7 +1182,7 @@ def test_load_edit_template_with_copy_of_template(
         expected_name
     )
     assert page.select_one('textarea').text == (
-        'Your ((thing)) is due soon'
+        '\r\nYour ((thing)) is due soon'
     )
     mock_get_service_email_template.assert_called_once_with(
         SERVICE_TWO_ID,

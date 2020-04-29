@@ -9,7 +9,7 @@ def test_form_fails_validation_with_no_radio_buttons_selected(app_):
 
         assert not form.validate_on_submit()
         assert len(form.errors) == 1
-        assert form.errors['contact_details_type'] == ['Not a valid choice']
+        assert form.errors['contact_details_type'] == ['Select an option']
 
 
 @pytest.mark.parametrize('selected_radio_button, selected_text_box, text_box_data', [

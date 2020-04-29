@@ -2119,7 +2119,7 @@ def test_send_one_off_back_link_populates_address_textarea(
 
     textarea = form.select_one('textarea')
     assert textarea.attrs['name'] == 'address'
-    assert textarea.text == 'foo\nbar'
+    assert textarea.text == '\r\nfoo\nbar'
 
 
 @pytest.mark.parametrize('placeholder', (
