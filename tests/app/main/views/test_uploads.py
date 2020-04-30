@@ -143,16 +143,22 @@ def test_get_upload_letter(client_request):
     assert normalize_spaces(page.find('label', class_='file-upload-button').text) == 'Choose file'
 
 
+@pytest.mark.parametrize('extra_permissions, expected_allow_international', (
+    ([], False),
+    (['international_letters'], True),
+))
 def test_post_upload_letter_redirects_for_valid_file(
     mocker,
     active_user_with_permissions,
     service_one,
     client_request,
     fake_uuid,
+    extra_permissions,
+    expected_allow_international,
 ):
     mocker.patch('uuid.uuid4', return_value=fake_uuid)
     antivirus_mock = mocker.patch('app.main.views.uploads.antivirus_client.scan', return_value=True)
-    mocker.patch(
+    mock_sanitise = mocker.patch(
         'app.main.views.uploads.sanitise_letter',
         return_value=Mock(
             content='The sanitised content',
@@ -169,6 +175,7 @@ def test_post_upload_letter_redirects_for_valid_file(
     mocker.patch('app.main.views.uploads.service_api_client.get_precompiled_template')
 
     service_one['restricted'] = False
+    service_one['permissions'] += extra_permissions
     client_request.login(active_user_with_permissions, service=service_one)
 
     with open('tests/test_pdf_files/one_page_pdf.pdf', 'rb') as file:
@@ -187,6 +194,10 @@ def test_post_upload_letter_redirects_for_valid_file(
         page_count=1,
         filename='tests/test_pdf_files/one_page_pdf.pdf',
         recipient='The Queen',
+    )
+    mock_sanitise.assert_called_once_with(
+        ANY,
+        allow_international_letters=expected_allow_international,
     )
 
     assert 'The Queen' in page.find('div', class_='js-stick-at-bottom-when-scrolling').text
