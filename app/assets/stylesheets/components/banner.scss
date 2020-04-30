@@ -150,7 +150,7 @@
   }
 
   &-count {
-    @include govuk-font(36, $weight: bold);
+    @include govuk-font(36, $weight: bold, $tabular: true);
     padding-right: 8px;
     position: relative;
     // remove the top of the extra line-height this introduces
