@@ -19,6 +19,7 @@ from notifications_utils.recipients import RecipientCSV
 from notifications_utils.template import (
     LetterImageTemplate,
     LetterPreviewTemplate,
+    SMSPreviewTemplate,
 )
 from xlrd.biffh import XLRDError
 from xlrd.xldate import (
@@ -309,6 +310,37 @@ def test_example_spreadsheet(
     )
 
 
+def test_example_spreadsheet_for_letters(
+    client_request,
+    mocker,
+    mock_get_service_letter_template_with_placeholders,
+    fake_uuid,
+):
+    mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=1)
+
+    page = client_request.get(
+        '.send_messages',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid
+    )
+
+    assert list(zip(*[
+        [normalize_spaces(cell.text) for cell in page.select('tbody tr')[row].select('td')]
+        for row in (0, 1)
+    ])) == [
+        ('1', '2'),
+        ('address line 1', 'A. Name'),
+        ('address line 2', '123 Example Street'),
+        ('address line 3', ''),
+        ('address line 4', ''),
+        ('address line 5', ''),
+        ('address line 6', ''),
+        ('postcode', 'XM4 5HQ'),
+        ('name', 'example'),
+        ('date', 'example'),
+    ]
+
+
 @pytest.mark.parametrize(
     "filename, acceptable_file",
     list(zip(test_spreadsheet_files, repeat(True))) +
@@ -554,6 +586,116 @@ def test_upload_csv_file_with_very_long_placeholder_shows_check_page_with_errors
         'Message is too long'
     )
     assert page.select('tbody tr td')[1]['colspan'] == '2'
+
+
+def test_upload_csv_file_with_bad_postal_address_shows_check_page_with_errors(
+    logged_in_client,
+    service_one,
+    mocker,
+    mock_get_service_letter_template,
+    mock_s3_upload,
+    mock_get_users_by_service,
+    mock_get_service_statistics,
+    mock_get_job_doesnt_exist,
+    mock_get_jobs,
+    fake_uuid,
+):
+    mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=9)
+    mocker.patch(
+        'app.main.views.send.s3download',
+        return_value='''
+            address line 1,     address line 3,  address line 6,
+            Firstname Lastname, 123 Example St., SW1A 1AA
+            Firstname Lastname, 123 Example St., SW!A !AA
+            Firstname Lastname, 123 Example St., France
+                              , 123 Example St., SW!A !AA
+            "1\n2\n3\n4\n5\n6\n7\n8"
+        '''
+    )
+
+    response = logged_in_client.post(
+        url_for('main.send_messages', service_id=service_one['id'], template_id=fake_uuid),
+        data={'file': (BytesIO(''.encode('utf-8')), 'invalid.csv')},
+        content_type='multipart/form-data',
+        follow_redirects=True
+    )
+
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert normalize_spaces(
+        page.select_one('.banner-dangerous').text
+    ) == (
+        'There’s a problem with invalid.csv '
+        'You need to fix 4 addresses. '
+        'Skip to file contents'
+    )
+    assert [
+        normalize_spaces(row.text) for row in page.select('tbody tr')
+    ] == [
+        '3 Last line of the address must be a real UK postcode',
+        'Firstname Lastname 123 Example St. SW!A !AA',
+
+        '4 Last line of the address must be a real UK postcode',
+        'Firstname Lastname 123 Example St. France',
+
+        '5 Address must be at least 3 lines long',
+        '123 Example St. SW!A !AA',
+
+        '6 Address must be no more than 7 lines long',
+        '1 2 3 4 5 6 7 8',
+    ]
+
+
+def test_upload_csv_file_with_international_letters_permission_shows_appropriate_errors(
+    logged_in_client,
+    service_one,
+    mocker,
+    mock_get_service_letter_template,
+    mock_s3_upload,
+    mock_get_users_by_service,
+    mock_get_service_statistics,
+    mock_get_job_doesnt_exist,
+    mock_get_jobs,
+    fake_uuid,
+):
+    service_one['permissions'] += ['international_letters']
+    mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=9)
+    mocker.patch(
+        'app.main.views.send.s3download',
+        return_value='''
+            address line 1,     address line 3,  address line 6,
+            Firstname Lastname, 123 Example St., SW1A 1AA
+            Firstname Lastname, 123 Example St., France
+            Firstname Lastname, 123 Example St., SW!A !AA
+            Firstname Lastname, 123 Example St., Not France
+        '''
+    )
+
+    response = logged_in_client.post(
+        url_for('main.send_messages', service_id=service_one['id'], template_id=fake_uuid),
+        data={'file': (BytesIO(''.encode('utf-8')), 'invalid.csv')},
+        content_type='multipart/form-data',
+        follow_redirects=True
+    )
+
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert normalize_spaces(
+        page.select_one('.banner-dangerous').text
+    ) == (
+        'There’s a problem with invalid.csv '
+        'You need to fix 2 addresses. '
+        'Skip to file contents'
+    )
+    assert [
+        normalize_spaces(row.text) for row in page.select('tbody tr')
+    ] == [
+        '4 Last line of the address must be a UK postcode or another country',
+        'Firstname Lastname 123 Example St. SW!A !AA',
+
+        '5 Last line of the address must be a UK postcode or another country',
+        'Firstname Lastname 123 Example St. Not France',
+    ]
 
 
 @pytest.mark.parametrize('file_contents, expected_error,', [
@@ -2420,20 +2562,45 @@ def test_send_one_off_letter_address_populates_address_fields_in_session(
         assert session['placeholders'] == expected_placeholders
 
 
-@pytest.mark.parametrize(['form_data', 'expected_error_message'], [
-    ('', 'Cannot be empty'),
-    ('a\n\n\n\nb', 'Address must be at least 3 lines long'),
-    ('\n'.join(['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']), 'Address must be no more than 7 lines long'),
-    ('\n'.join(['a', 'b', 'c', 'd', 'e', 'f', 'g']), 'Last line of the address must be a real UK postcode'),
+@pytest.mark.parametrize('form_data, extra_permissions, expected_error_message', [
+    (
+        '',
+        [],
+        'Cannot be empty'
+    ),
+    (
+        'a\n\n\n\nb',
+        [],
+        'Address must be at least 3 lines long',
+    ),
+    (
+        '\n'.join(['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']),
+        [],
+        'Address must be no more than 7 lines long'
+    ),
+    (
+        '\n'.join(['a', 'b', 'c', 'd', 'e', 'f', 'g']),
+        [],
+        'Last line of the address must be a real UK postcode',
+    ),
+    (
+        '\n'.join(['a', 'b', 'c', 'd', 'e', 'f', 'g']),
+        ['international_letters'],
+        'Last line of the address must be a UK postcode or another country',
+    ),
 ])
 def test_send_one_off_letter_address_rejects_bad_addresses(
     client_request,
+    service_one,
     fake_uuid,
     mock_get_service_letter_template,
     mock_template_preview,
     form_data,
+    extra_permissions,
     expected_error_message
 ):
+    service_one['permissions'] += extra_permissions
+
     with client_request.session_transaction() as session:
         session['recipient'] = None
         session['placeholders'] = {}
@@ -2575,7 +2742,9 @@ def test_upload_csvfile_with_international_validates(
     mocker.patch('app.main.views.send.s3download', return_value='')
     mock_recipients = mocker.patch(
         'app.main.views.send.RecipientCSV',
-        return_value=RecipientCSV("", template_type="sms"),
+        return_value=RecipientCSV("", template=SMSPreviewTemplate(
+            {'content': 'foo', 'template_type': 'sms'}
+        )),
     )
 
     response = logged_in_client.post(
@@ -2586,7 +2755,7 @@ def test_upload_csvfile_with_international_validates(
     )
 
     assert response.status_code == 200
-    assert mock_recipients.call_args[1]['international_sms'] == should_allow_international
+    assert mock_recipients.call_args[1]['allow_international_sms'] == should_allow_international
 
 
 def test_job_from_contact_list_knows_where_its_come_from(
@@ -3381,7 +3550,7 @@ def test_check_messages_shows_data_errors_before_trial_mode_errors_for_letters(
 
     assert normalize_spaces(page.select_one('.banner-dangerous').text) == (
         'There’s a problem with example.xlsx '
-        'You need to enter missing data in 2 rows. '
+        'You need to fix 2 addresses. '
         'Skip to file contents'
     )
     assert not page.select('.table-field-index a')
@@ -3470,7 +3639,8 @@ def test_check_messages_column_error_doesnt_show_optional_columns(
 
     assert normalize_spaces(page.select_one('.banner-dangerous').text) == (
         'There’s a problem with your column names '
-        'Your file needs a column called ‘postcode’. '
+        'Your file needs at least 3 address columns, for example ‘address line 1’, '
+        '‘address line 2’ and ‘address line 3’. '
         'Right now it has columns called ‘address_line_1’, ‘address_line_2’ and ‘foo’. '
         'Skip to file contents'
     )

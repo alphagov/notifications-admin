@@ -14,6 +14,7 @@ from app.s3_client.s3_csv_client import (
     s3upload,
     set_metadata_on_csv_upload,
 )
+from app.utils import get_sample_template
 
 
 class ContactList(JSONModel):
@@ -119,8 +120,8 @@ class ContactList(JSONModel):
     def recipients(self):
         return RecipientCSV(
             self.contents,
-            template_type=self.template_type,
-            international_sms=True,
+            template=get_sample_template(self.template_type),
+            allow_international_sms=True,
             max_initial_rows_shown=50,
         )
 

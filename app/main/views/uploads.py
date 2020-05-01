@@ -43,6 +43,7 @@ from app.utils import (
     generate_previous_dict,
     get_errors_for_csv,
     get_letter_validation_error,
+    get_sample_template,
     get_template,
     unicode_truncate,
     user_has_permissions,
@@ -357,12 +358,12 @@ def check_contact_list(service_id, upload_id):
 
     recipients = RecipientCSV(
         contents,
-        template_type=template_type or 'sms',
+        template=get_sample_template(template_type or 'sms'),
         whitelist=itertools.chain.from_iterable(
             [user.name, user.mobile_number, user.email_address]
             for user in current_service.active_users
         ) if current_service.trial_mode else None,
-        international_sms=current_service.has_permission('international_sms'),
+        allow_international_sms=current_service.has_permission('international_sms'),
         max_initial_rows_shown=50,
         max_errors_shown=50,
     )

@@ -80,6 +80,16 @@
                   No content for this message
                 {% elif item.message_too_long %}
                   Message is too long
+                {% elif not item.as_postal_address.has_enough_lines %}
+                  Address must be at least {{ letter_min_address_lines }} lines long
+                {% elif item.as_postal_address.has_too_many_lines %}
+                  Address must be no more than {{ letter_max_address_lines }} lines long
+                {% elif not item.as_postal_address.has_valid_last_line %}
+                  {% if item.as_postal_address.allow_international_letters %}
+                    Last line of the address must be a UK postcode or another country
+                  {% else %}
+                    Last line of the address must be a real UK postcode
+                  {% endif %}
                 {% endif %}
               </span>
             {% endcall %}

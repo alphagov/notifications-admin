@@ -58,15 +58,16 @@
         <h1 class='banner-title' data-module="track-error" data-error-type="Missing recipient columns" data-error-label="{{ upload_id }}">
           There’s a problem with your column names
         </h1>
+        {% if template.template_type == 'letter' %}
           <p>
-            Your file needs {{ (
-              recipients.missing_column_headers
-              if template.template_type == 'letter' else required_recipient_columns
-            ) | formatted_list(
-              prefix='a column called',
-              prefix_plural='columns called'
-            ) }}.
+            Your file needs at least 3 address columns, for example ‘address line 1’,
+            ‘address line 2’ and ‘address line 3’.
           </p>
+        {% else %}
+          <p>
+            Your file needs a column called ‘{{ first_recipient_column }}’.
+          </p>
+        {% endif %}
           <p>
             Right now it has {{ recipients.column_headers | formatted_list(
               prefix='one column, called ',

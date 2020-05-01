@@ -781,6 +781,10 @@ class SMSTemplateForm(BaseTemplateForm):
 
 class LetterAddressForm(StripWhitespaceForm):
 
+    def __init__(self, *args, allow_international_letters=False, **kwargs):
+        self.allow_international_letters = allow_international_letters
+        super().__init__(*args, **kwargs)
+
     address = PostalAddressField(
         'Address',
         validators=[DataRequired(message="Cannot be empty")]
@@ -788,7 +792,10 @@ class LetterAddressForm(StripWhitespaceForm):
 
     def validate_address(self, field):
 
-        address = PostalAddress(field.data)
+        address = PostalAddress(
+            field.data,
+            allow_international_letters=self.allow_international_letters,
+        )
 
         if not address.has_enough_lines:
             raise ValidationError(
@@ -800,7 +807,11 @@ class LetterAddressForm(StripWhitespaceForm):
                 f'Address must be no more than {PostalAddress.MAX_LINES} lines long'
             )
 
-        if not address.postcode:
+        if not address.has_valid_last_line:
+            if self.allow_international_letters:
+                raise ValidationError(
+                    f'Last line of the address must be a UK postcode or another country'
+                )
             raise ValidationError(
                 f'Last line of the address must be a real UK postcode'
             )
