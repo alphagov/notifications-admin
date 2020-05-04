@@ -115,7 +115,12 @@ def upload_letter(service_id):
         file_location = get_transient_letter_file_location(service_id, upload_id)
 
         try:
-            response = sanitise_letter(BytesIO(pdf_file_bytes))
+            response = sanitise_letter(
+                BytesIO(pdf_file_bytes),
+                allow_international_letters=current_service.has_permission(
+                    'international_letters'
+                ),
+            )
             response.raise_for_status()
         except RequestException as ex:
             if ex.response is not None and ex.response.status_code == 400:

@@ -164,13 +164,21 @@ def test_from_example_template_makes_request(mocker):
     )
 
 
-def test_sanitise_letter_calls_template_preview_sanitise_endoint_with_file(mocker):
+@pytest.mark.parametrize('allow_international_letters, expected_url', (
+    (False, 'http://localhost:9999/precompiled/sanitise?allow_international_letters=false'),
+    (True, 'http://localhost:9999/precompiled/sanitise?allow_international_letters=true'),
+))
+def test_sanitise_letter_calls_template_preview_sanitise_endoint_with_file(
+    mocker,
+    allow_international_letters,
+    expected_url,
+):
     request_mock = mocker.patch('app.template_previews.requests.post')
 
-    sanitise_letter('pdf_data')
+    sanitise_letter('pdf_data', allow_international_letters=allow_international_letters)
 
     request_mock.assert_called_once_with(
-        'http://localhost:9999/precompiled/sanitise',
+        expected_url,
         headers={'Authorization': 'Token my-secret-key'},
         data='pdf_data'
     )
