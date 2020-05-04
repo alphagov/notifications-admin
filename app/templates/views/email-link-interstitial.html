@@ -1,0 +1,25 @@
+{% extends "withoutnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+
+{% block per_page_title %}
+  Sign in
+{% endblock %}
+
+{% block maincolumn_content %}
+
+<div class="js-hidden">
+
+  {{ page_header('Sign in') }}
+
+  <form method="post" id="use-email-auth">
+    {{ page_footer('Continue to dashboard') }}
+  </form>
+
+</div>
+
+<script type="text/javascript">
+  document.getElementById("use-email-auth").submit();
+</script>
+
+{% endblock %}
