@@ -509,6 +509,19 @@ def test_get_letter_validation_error_for_unknown_error():
         ),
     ),
     (
+        'not-a-real-uk-postcode-or-country',
+        None,
+        'There’s a problem with the address for this letter',
+        (
+            'The last line of the address must be a UK postcode or '
+            'another country.'
+        ),
+        (
+            'Validation failed because the last line of the address is '
+            'not a UK postcode or another country.'
+        ),
+    ),
+    (
         'not-enough-address-lines',
         None,
         'There’s a problem with the address for this letter',

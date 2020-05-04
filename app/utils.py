@@ -669,6 +669,17 @@ LETTER_VALIDATION_MESSAGES = {
             'Validation failed because the last line of the address is not a real UK postcode.'
         ),
     },
+    'not-a-real-uk-postcode-or-country': {
+        'title': 'There’s a problem with the address for this letter',
+        'detail': (
+            'The last line of the address must be a UK postcode or '
+            'another country.'
+        ),
+        'summary': (
+            'Validation failed because the last line of the address is '
+            'not a UK postcode or another country.'
+        ),
+    },
     'not-enough-address-lines': {
         'title': 'There’s a problem with the address for this letter',
         'detail': (
