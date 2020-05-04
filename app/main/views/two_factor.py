@@ -28,7 +28,7 @@ def two_factor_email_sent():
     )
 
 
-@main.route('/email-auth/<token>', methods=['GET'])
+@main.route('/email-auth/<token>', methods=['GET', 'POST'])
 def two_factor_email(token):
     if current_user.is_authenticated:
         return redirect_when_logged_in(platform_admin=current_user.platform_admin)
