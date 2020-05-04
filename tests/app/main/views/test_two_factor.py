@@ -253,6 +253,9 @@ def test_two_factor_should_activate_pending_user(
     assert mock_activate_user.called
 
 
+@pytest.mark.parametrize('http_method', (
+    'get', 'post',
+))
 def test_valid_two_factor_email_link_logs_in_user(
     client,
     valid_token,
@@ -260,10 +263,11 @@ def test_valid_two_factor_email_link_logs_in_user(
     mock_get_services_with_one_service,
     mocker,
     mock_create_event,
+    http_method,
 ):
     mocker.patch('app.user_api_client.check_verify_code', return_value=(True, ''))
 
-    response = client.get(
+    response = getattr(client, http_method)(
         url_for_endpoint_with_token('main.two_factor_email', token=valid_token),
     )
 
