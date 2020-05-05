@@ -253,9 +253,48 @@ def test_two_factor_should_activate_pending_user(
     assert mock_activate_user.called
 
 
-@pytest.mark.parametrize('http_method', (
-    'get', 'post',
+@pytest.mark.parametrize('extra_args, expected_encoded_next_arg', (
+    ({}, ''),
+    ({'next': 'https://example.com'}, '?next=https%3A%2F%2Fexample.com')
 ))
+def test_valid_two_factor_email_link_shows_interstitial(
+    client_request,
+    valid_token,
+    mocker,
+    extra_args,
+    expected_encoded_next_arg,
+):
+    mock_check_code = mocker.patch('app.user_api_client.check_verify_code')
+    encoded_token = valid_token.replace('%2E', '.')
+    token_url = url_for(
+        'main.two_factor_email_interstitial',
+        token=encoded_token,
+        **extra_args
+    )
+
+    # This must match the URL we put in the emails
+    assert token_url == f'/email-auth/{encoded_token}{expected_encoded_next_arg}'
+
+    client_request.logout()
+    page = client_request.get_url(token_url)
+
+    assert normalize_spaces(page.select_one('main .js-hidden').text) == (
+        'Sign in '
+        'Continue to dashboard'
+    )
+
+    form = page.select_one('form')
+    expected_form_id = 'use-email-auth'
+    assert 'action' not in form
+    assert form['method'] == 'post'
+    assert form['id'] == expected_form_id
+    assert page.select_one('main script').text.strip() == (
+        f'document.getElementById("{expected_form_id}").submit();'
+    )
+
+    assert mock_check_code.called is False
+
+
 def test_valid_two_factor_email_link_logs_in_user(
     client,
     valid_token,
@@ -263,11 +302,10 @@ def test_valid_two_factor_email_link_logs_in_user(
     mock_get_services_with_one_service,
     mocker,
     mock_create_event,
-    http_method,
 ):
     mocker.patch('app.user_api_client.check_verify_code', return_value=(True, ''))
 
-    response = getattr(client, http_method)(
+    response = client.post(
         url_for_endpoint_with_token('main.two_factor_email', token=valid_token),
     )
 
@@ -284,7 +322,7 @@ def test_two_factor_email_link_has_expired(
 ):
 
     with set_config(app_, 'EMAIL_2FA_EXPIRY_SECONDS', -1):
-        response = client.get(
+        response = client.post(
             url_for_endpoint_with_token('main.two_factor_email', token=valid_token),
             follow_redirects=True,
         )
@@ -300,7 +338,7 @@ def test_two_factor_email_link_is_invalid(
     client
 ):
     token = 12345
-    response = client.get(
+    response = client.post(
         url_for('main.two_factor_email', token=token),
         follow_redirects=True
     )
@@ -320,7 +358,7 @@ def test_two_factor_email_link_is_already_used(
 ):
     mocker.patch('app.user_api_client.check_verify_code', return_value=(False, 'Code has expired'))
 
-    response = client.get(
+    response = client.post(
         url_for_endpoint_with_token('main.two_factor_email', token=valid_token),
         follow_redirects=True
     )
@@ -340,7 +378,7 @@ def test_two_factor_email_link_when_user_is_locked_out(
 ):
     mocker.patch('app.user_api_client.check_verify_code', return_value=(False, 'Code not found'))
 
-    response = client.get(
+    response = client.post(
         url_for_endpoint_with_token('main.two_factor_email', token=valid_token),
         follow_redirects=True
     )
@@ -356,7 +394,7 @@ def test_two_factor_email_link_used_when_user_already_logged_in(
     logged_in_client,
     valid_token
 ):
-    response = logged_in_client.get(
+    response = logged_in_client.post(
         url_for_endpoint_with_token('main.two_factor_email', token=valid_token)
     )
     assert response.status_code == 302
