@@ -527,6 +527,35 @@ def test_should_show_notifications_for_a_service_with_next_previous(
     assert 'page 1' in prev_page_link.text.strip()
 
 
+def test_doesnt_show_pagination_with_search_term(
+    client_request,
+    service_one,
+    active_user_with_permissions,
+    mock_get_notifications_with_previous_next,
+    mock_get_service_statistics,
+    mock_get_service_data_retention,
+    mock_get_no_api_keys,
+    mocker,
+):
+    page = client_request.post(
+        'main.view_notifications',
+        service_id=service_one['id'],
+        message_type='sms',
+        _data={
+            'to': 'test@example.com',
+        },
+        _expected_status=200,
+    )
+    assert len(page.select('tbody tr')) == 50
+    assert not page.find('a', {'rel': 'next'})
+    assert not page.find('a', {'rel': 'previous'})
+    assert normalize_spaces(
+        page.select_one('.table-show-more-link').text
+    ) == (
+        'Only showing the first 50 messages'
+    )
+
+
 @pytest.mark.parametrize(
     "job_created_at, expected_message", [
         ("2016-01-10 11:09:00.000000+00:00", "Data available for 7 days"),

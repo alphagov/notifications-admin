@@ -33,6 +33,12 @@
     </div>
   {% endif %}
 
-  {{ previous_next_navigation(prev_page, next_page) }}
+  {% if more_than_can_be_shown %}
+    <p class="table-show-more-link">
+      Only showing the first 50 messages
+    </p>
+  {% else %}
+    {{ previous_next_navigation(prev_page, next_page) }}
+  {% endif %}
 
 </div>
