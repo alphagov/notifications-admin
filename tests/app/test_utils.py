@@ -7,6 +7,7 @@ import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
 from freezegun import freeze_time
+from notifications_utils.template import Template
 
 from app import format_datetime_relative
 from app.utils import (
@@ -18,6 +19,7 @@ from app.utils import (
     get_letter_printing_statement,
     get_letter_validation_error,
     get_logo_cdn_domain,
+    get_sample_template,
     is_less_than_90_days_ago,
     printing_today_or_tomorrow,
 )
@@ -576,3 +578,9 @@ def test_get_letter_validation_error_for_known_errors(
 @freeze_time('2020-02-14T12:00:00')
 def test_is_less_than_90_days_ago(date_from_db, expected_result):
     assert is_less_than_90_days_ago(date_from_db) == expected_result
+
+
+@pytest.mark.parametrize("template_type", ["sms", "letter", "email"])
+def test_get_sample_template_returns_template(template_type):
+    template = get_sample_template(template_type)
+    assert isinstance(template, Template)
