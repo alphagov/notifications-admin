@@ -157,7 +157,9 @@ def get_sample_template(template_type):
     if template_type == 'sms':
         return SMSPreviewTemplate({'content': 'any', 'template_type': 'sms'})
     if template_type == 'letter':
-        return LetterImageTemplate({'content': 'any', 'subject': '', 'template_type': 'letter'})
+        return LetterImageTemplate(
+            {'content': 'any', 'subject': '', 'template_type': 'letter'}, postage='second', image_url='x', page_count=1
+        )
 
 
 def generate_notifications_csv(**kwargs):
