@@ -532,11 +532,7 @@ class RegisterUserFromOrgInviteForm(StripWhitespaceForm):
     auth_type = HiddenField('auth_type', validators=[DataRequired()])
 
 
-class govukCheckboxField(BooleanField):
-
-    def __init__(self, label='', validators=None, param_extensions=None, **kwargs):
-        super(govukCheckboxField, self).__init__(label, validators, false_values=None, **kwargs)
-        self.param_extensions = param_extensions
+class govukCheckboxesMixin:
 
     def extend_params(self, params, extensions):
         items = None
@@ -560,6 +556,13 @@ class govukCheckboxField(BooleanField):
                         params['items'].append(items[idx])
                     else:
                         params['items'][idx].update(items[idx])
+
+
+class govukCheckboxField(govukCheckboxesMixin, BooleanField):
+
+    def __init__(self, label='', validators=None, param_extensions=None, **kwargs):
+        super(govukCheckboxField, self).__init__(label, validators, false_values=None, **kwargs)
+        self.param_extensions = param_extensions
 
     # self.__call__ renders the HTML for the field by:
     # 1. delegating to self.meta.render_field which
@@ -600,7 +603,7 @@ class govukCheckboxField(BooleanField):
 
 
 # based on work done by @richardjpope: https://github.com/richardjpope/recourse/blob/master/recourse/forms.py#L6
-class govukCheckboxesField(SelectMultipleField):
+class govukCheckboxesField(govukCheckboxesMixin, SelectMultipleField):
 
     render_as_list = False
 
