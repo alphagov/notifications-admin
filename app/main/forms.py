@@ -532,6 +532,73 @@ class RegisterUserFromOrgInviteForm(StripWhitespaceForm):
     auth_type = HiddenField('auth_type', validators=[DataRequired()])
 
 
+class govukCheckboxField(BooleanField):
+
+    def __init__(self, label='', validators=None, param_extensions=None, **kwargs):
+        super(govukCheckboxField, self).__init__(label, validators, false_values=None, **kwargs)
+        self.param_extensions = param_extensions
+
+    def extend_params(self, params, extensions):
+        items = None
+        param_items = len(params['items']) if 'items' in params else 0
+
+        # split items off from params to make it a pure dict
+        if 'items' in extensions:
+            items = extensions['items']
+            del extensions['items']
+
+        # merge dicts
+        params.update(extensions)
+
+        # merge items
+        if items:
+            if 'items' not in params:
+                params['items'] = items
+            else:
+                for idx, _item in enumerate(items):
+                    if idx >= param_items:
+                        params['items'].append(items[idx])
+                    else:
+                        params['items'][idx].update(items[idx])
+
+    # self.__call__ renders the HTML for the field by:
+    # 1. delegating to self.meta.render_field which
+    # 2. calls field.widget
+    # this bypasses that by making self.widget a method with the same interface as widget.__call__
+    def widget(self, field, param_extensions=None, **kwargs):
+
+        # error messages
+        error_message = None
+        if field.errors:
+            error_message = {"text": " ".join(field.errors).strip()}
+
+        params = {
+            'name':  field.name,
+            'errorMessage': error_message,
+            'items': [
+                {
+                    "name": field.name,
+                    "id": field.id,
+                    "text": field.label.text,
+                    "value": 'y',
+                    "checked": field.data
+                }
+            ]
+
+        }
+
+        # extend default params with any sent in during instantiation
+        if self.param_extensions:
+            self.extend_params(params, self.param_extensions)
+
+        # add any sent in though use in templates
+        if param_extensions:
+            self.extend_params(params, param_extensions)
+
+        return Markup(
+            render_template('forms/fields/checkboxes/macro.njk', params=params))
+
+
 # based on work done by @richardjpope: https://github.com/richardjpope/recourse/blob/master/recourse/forms.py#L6
 class govukCheckboxesField(SelectMultipleField):
 
@@ -539,9 +606,6 @@ class govukCheckboxesField(SelectMultipleField):
 
     def __init__(self, label='', validators=None, param_extensions=None, **kwargs):
         super(govukCheckboxesField, self).__init__(label, validators, **kwargs)
-        # default choices to a single True Boolean
-        if 'choices' not in kwargs:
-            self.choices = [('y', label)]
         self.param_extensions = param_extensions
 
     def get_item_from_option(self, option):
@@ -573,26 +637,25 @@ class govukCheckboxesField(SelectMultipleField):
 
         params = {
             'name':  field.name,
+            "fieldset": {
+                "attributes": {"id": field.name},
+                "legend": {
+                    "text": field.label.text,
+                    "classes": "govuk-fieldset__legend--s"
+                }
+            },
+            "asList": self.render_as_list,
             'errorMessage': error_message,
             'items': items
         }
 
-        # add HTML to group items if more than one
-        if len(field.choices) > 1:
-            params.update({
-                "fieldset": {
-                    "attributes": {"id": field.name},
-                    "legend": {
-                        "text": field.label.text,
-                        "classes": "govuk-fieldset__legend--s"
-                    }
-                },
-                "asList": self.render_as_list
-            })
+        # extend default params with any sent in during instantiation
+        if self.param_extensions:
+            self.extend_params(params, self.param_extensions)
 
-        # extend default params with any sent in
-        if self.param_extensions.keys():
-            params.update(self.param_extensions)
+        # add any sent in though use in templates
+        if param_extensions:
+            self.extend_params(params, param_extensions)
 
         return Markup(
             render_template('forms/fields/checkboxes/macro.njk', params=params))
