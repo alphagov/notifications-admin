@@ -794,9 +794,9 @@ def test_stats_pages_show_last_3_years(
     )
 
     assert normalize_spaces(page.select_one('.pill').text) == (
-        '2012 to 2013 financial year '
+        '2014 to 2015 financial year '
         '2013 to 2014 financial year '
-        '2014 to 2015 financial year'
+        '2012 to 2013 financial year'
     )
 
 
@@ -952,9 +952,9 @@ def test_usage_page(
     nav = page.find('ul', {'class': 'pill', 'role': 'tablist'})
     nav_links = nav.find_all('a')
 
-    assert normalize_spaces(nav_links[0].text) == '2010 to 2011 financial year'
     assert normalize_spaces(nav.find('li', {'aria-selected': 'true'}).text) == '2011 to 2012 financial year'
-    assert normalize_spaces(nav_links[1].text) == '2012 to 2013 financial year'
+    assert normalize_spaces(nav_links[0].text) == '2010 to 2011 financial year'
+    assert normalize_spaces(nav_links[1].text) == '2009 to 2010 financial year'
     assert '252,190' in cols[1].text
     assert 'Text messages' in cols[1].text
 
@@ -994,9 +994,9 @@ def test_usage_page_with_letters(
     nav = page.find('ul', {'class': 'pill', 'role': 'tablist'})
     nav_links = nav.find_all('a')
 
-    assert normalize_spaces(nav_links[0].text) == '2010 to 2011 financial year'
     assert normalize_spaces(nav.find('li', {'aria-selected': 'true'}).text) == '2011 to 2012 financial year'
-    assert normalize_spaces(nav_links[1].text) == '2012 to 2013 financial year'
+    assert normalize_spaces(nav_links[0].text) == '2010 to 2011 financial year'
+    assert normalize_spaces(nav_links[1].text) == '2009 to 2010 financial year'
     assert '252,190' in cols[1].text
     assert 'Text messages' in cols[1].text
 
@@ -1486,8 +1486,8 @@ def test_get_tuples_of_financial_years():
         start=2040,
         end=2041,
     )) == [
-        ('financial year', 2040, 'http://example.com?year=2040', '2040 to 2041'),
         ('financial year', 2041, 'http://example.com?year=2041', '2041 to 2042'),
+        ('financial year', 2040, 'http://example.com?year=2040', '2040 to 2041'),
     ]
 
 
@@ -1495,7 +1495,7 @@ def test_get_tuples_of_financial_years_defaults_to_2015():
     assert 2015 in list(get_tuples_of_financial_years(
         lambda year: 'http://example.com?year={}'.format(year),
         end=2040,
-    ))[0]
+    ))[-1]
 
 
 def test_org_breadcrumbs_do_not_show_if_service_has_no_org(
