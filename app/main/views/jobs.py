@@ -211,6 +211,7 @@ def get_notifications(service_id, message_type, status_override=None):
     filter_args = parse_filter_args(request.args)
     filter_args['status'] = set_status_filters(filter_args)
     service_data_retention_days = None
+    search_term = request.form.get('to', '')
 
     if message_type is not None:
         service_data_retention_days = current_service.get_days_of_retention(message_type)
@@ -235,7 +236,7 @@ def get_notifications(service_id, message_type, status_override=None):
         template_type=[message_type] if message_type else [],
         status=filter_args.get('status'),
         limit_days=service_data_retention_days,
-        to=request.form.get('to', ''),
+        to=search_term,
     )
     url_args = {
         'message_type': message_type,
@@ -284,6 +285,7 @@ def get_notifications(service_id, message_type, status_override=None):
             limit_days=service_data_retention_days,
             prev_page=prev_page,
             next_page=next_page,
+            show_pagination=(not search_term),
             status=request.args.get('status'),
             message_type=message_type,
             download_link=download_link,
