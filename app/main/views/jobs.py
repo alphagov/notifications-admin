@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from functools import partial
+
 from flask import (
     Response,
     abort,
@@ -289,6 +291,11 @@ def get_notifications(service_id, message_type, status_override=None):
             status=request.args.get('status'),
             message_type=message_type,
             download_link=download_link,
+            single_notification_url=partial(
+                url_for,
+                '.view_notification',
+                service_id=current_service.id,
+            )
         ),
     }
 

@@ -4,6 +4,7 @@ import json
 import urllib
 import uuid
 from datetime import datetime
+from functools import partial
 from io import BytesIO
 from zipfile import BadZipFile
 
@@ -126,6 +127,12 @@ def uploaded_letters(service_id, letter_print_day):
             letter_print_day,
         ),
         letter_print_day=letter_print_day,
+        single_notification_url=partial(
+            url_for,
+            '.view_notification',
+            service_id=current_service.id,
+            from_uploaded_letters=letter_print_day,
+        )
     )
 
 

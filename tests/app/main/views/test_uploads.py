@@ -160,6 +160,10 @@ def test_get_uploaded_letters(
         service_id=SERVICE_ONE_ID,
         letter_print_day='2020-02-02'
     )
+    assert page.select_one('.govuk-back-link')['href'] == url_for(
+        'main.uploads',
+        service_id=SERVICE_ONE_ID,
+    )
     assert normalize_spaces(
         page.select_one('h1').text
     ) == (
@@ -189,6 +193,23 @@ def test_get_uploaded_letters(
             'Kevin-McCallister.pdf '
             '671 Lincoln Avenue, Winnetka '
             '2 February at 12:59pm'
+        ),
+    ]
+
+    assert [
+        link['href'] for link in page.select('tbody tr a')
+    ] == [
+        url_for(
+            'main.view_notification',
+            service_id=SERVICE_ONE_ID,
+            notification_id='03e34025-be54-4d43-8e6a-fb1ea0fd1f29',
+            from_uploaded_letters='2020-02-02',
+        ),
+        url_for(
+            'main.view_notification',
+            service_id=SERVICE_ONE_ID,
+            notification_id='fc090d91-e761-4464-9041-9c4594c96a35',
+            from_uploaded_letters='2020-02-02',
         ),
     ]
 
