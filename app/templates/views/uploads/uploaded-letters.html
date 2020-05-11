@@ -1,0 +1,37 @@
+{% extends "withnav_template.html" %}
+{% from 'components/big-number.html' import big_number %}
+{% from 'components/message-count-label.html' import message_count_label %}
+{% from "components/page-header.html" import page_header %}
+
+{% block service_page_title %}
+  Uploaded letters
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header(
+    'Uploaded letters',
+    back_link=url_for('main.uploads', service_id=current_service.id)
+  ) }}
+
+  {% if notifications %}
+
+    <p class='govuk-body'>
+      {{ total|format_thousands}} {{ message_count_label(total, 'letter', suffix='') }}
+    </p>
+
+    <p class='govuk-body'>
+      {{ letter_printing_statement }}
+    </p>
+
+  {% else %}
+
+    <p class='table-empty-message'>
+      No letters printing {{ letter_print_day }}
+    </p>
+
+  {% endif %}
+
+  {% include 'views/activity/notifications.html' %}
+
+{% endblock %}

@@ -134,6 +134,138 @@ def test_get_upload_hub_page(
     )
 
 
+@freeze_time('2020-02-02 14:00')
+def test_get_uploaded_letters(
+    mocker,
+    client_request,
+    service_one,
+    mock_get_uploaded_letters,
+):
+    page = client_request.get(
+        'main.uploaded_letters',
+        service_id=SERVICE_ONE_ID,
+        letter_print_day='2020-02-02'
+    )
+    assert normalize_spaces(
+        page.select_one('h1').text
+    ) == (
+        'Uploaded letters'
+    )
+    assert normalize_spaces(
+        page.select('main p')[0].text
+    ) == (
+        '1,234 letters'
+    )
+    assert normalize_spaces(
+        page.select('main p')[1].text
+    ) == (
+        'Printing starts today at 5:30pm'
+    )
+
+    assert [
+        normalize_spaces(row.text)
+        for row in page.select('tbody tr')
+    ] == [
+        (
+            'Homer-Simpson.pdf '
+            '742 Evergreen Terrace '
+            '2 February at 1:59pm'
+        ),
+        (
+            'Kevin-McCallister.pdf '
+            '671 Lincoln Avenue, Winnetka '
+            '2 February at 12:59pm'
+        ),
+    ]
+
+    next_page_link = page.select_one('a[rel=next]')
+    prev_page_link = page.select_one('a[rel=previous]')
+    assert next_page_link['href'] == url_for(
+        'main.uploaded_letters', service_id=SERVICE_ONE_ID, letter_print_day='2020-02-02', page=2
+    )
+    assert normalize_spaces(next_page_link.text) == (
+        'Next page '
+        'page 2'
+    )
+    assert prev_page_link['href'] == url_for(
+        'main.uploaded_letters', service_id=SERVICE_ONE_ID, letter_print_day='2020-02-02', page=0
+    )
+    assert normalize_spaces(prev_page_link.text) == (
+        'Previous page '
+        'page 0'
+    )
+
+    mock_get_uploaded_letters.assert_called_once_with(
+        SERVICE_ONE_ID,
+        letter_print_day='2020-02-02',
+        page=1,
+    )
+
+
+@freeze_time('2020-02-02 14:00')
+def test_get_empty_uploaded_letters_page(
+    mocker,
+    client_request,
+    service_one,
+    mock_get_no_uploaded_letters,
+):
+    page = client_request.get(
+        'main.uploaded_letters',
+        service_id=SERVICE_ONE_ID,
+        letter_print_day='2020-02-02'
+    )
+    page.select_one('main table')
+
+    assert not page.select('tbody tr')
+    assert not page.select_one('a[rel=next]')
+    assert not page.select_one('a[rel=previous]')
+
+
+@freeze_time('2020-02-02')
+def test_get_uploaded_letters_passes_through_page_argument(
+    mocker,
+    client_request,
+    service_one,
+    mock_get_uploaded_letters,
+):
+    client_request.get(
+        'main.uploaded_letters',
+        service_id=SERVICE_ONE_ID,
+        letter_print_day='2020-02-02',
+        page=99,
+    )
+    mock_get_uploaded_letters.assert_called_once_with(
+        SERVICE_ONE_ID,
+        letter_print_day='2020-02-02',
+        page=99,
+    )
+
+
+def test_get_uploaded_letters_404s_for_bad_page_arguments(
+    mocker,
+    client_request,
+):
+    client_request.get(
+        'main.uploaded_letters',
+        service_id=SERVICE_ONE_ID,
+        letter_print_day='2020-02-02',
+        page='one',
+        _expected_status=404,
+    )
+
+
+def test_get_uploaded_letters_404s_for_invalid_date(
+    mocker,
+    client_request,
+):
+    client_request.get(
+        'main.uploaded_letters',
+        service_id=SERVICE_ONE_ID,
+        letter_print_day='1234-56-78',
+        _expected_status=404,
+    )
+
+
 def test_get_upload_letter(client_request):
     page = client_request.get('main.upload_letter', service_id=SERVICE_ONE_ID)
 

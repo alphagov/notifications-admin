@@ -87,6 +87,7 @@ from app.notify_client.template_folder_api_client import (
 from app.notify_client.template_statistics_api_client import (
     template_statistics_client,
 )
+from app.notify_client.upload_api_client import upload_api_client
 from app.notify_client.user_api_client import user_api_client
 from app.url_converters import (
     LetterFileExtensionConverter,
@@ -160,6 +161,7 @@ def create_app(application):
         status_api_client,
         template_folder_api_client,
         template_statistics_client,
+        upload_api_client,
         user_api_client,
 
         # External API clients
