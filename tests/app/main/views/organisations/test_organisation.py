@@ -499,9 +499,9 @@ def test_organisation_services_filters_by_financial_year(
     )
     mock.assert_called_once_with(ORGANISATION_ID, financial_year)
     assert normalize_spaces(page.select_one('.pill').text) == (
-        '2018 to 2019 financial year '
+        '2020 to 2021 financial year '
         '2019 to 2020 financial year '
-        '2020 to 2021 financial year'
+        '2018 to 2019 financial year'
     )
     assert normalize_spaces(page.select_one('.pill-selected-item').text) == (
         expected_selected
