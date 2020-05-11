@@ -353,27 +353,27 @@ def test_format_datetime_relative(time, human_readable_datetime):
 
 
 @pytest.mark.parametrize('utc_datetime', [
-    '2018-08-01 23:00',
-    '2018-08-01 16:29',
-    '2018-11-01 00:00',
-    '2018-11-01 10:00',
-    '2018-11-01 17:29',
+    '2018-08-01T23:00:00+00:00',
+    '2018-08-01T16:29:00+00:00',
+    '2018-11-01T00:00:00+00:00',
+    '2018-11-01T10:00:00+00:00',
+    '2018-11-01T17:29:00+00:00',
 ])
 def test_printing_today_or_tomorrow_returns_today(utc_datetime):
     with freeze_time(utc_datetime):
-        assert printing_today_or_tomorrow() == 'today'
+        assert printing_today_or_tomorrow(utc_datetime) == 'today'
 
 
-@pytest.mark.parametrize('datetime', [
-    '2018-08-01 22:59',
-    '2018-08-01 16:30',
-    '2018-11-01 17:30',
-    '2018-11-01 21:00',
-    '2018-11-01 23:59',
+@pytest.mark.parametrize('utc_datetime', [
+    '2018-08-01T22:59:00+00:00',
+    '2018-08-01T16:30:00+00:00',
+    '2018-11-01T17:30:00+00:00',
+    '2018-11-01T21:00:00+00:00',
+    '2018-11-01T23:59:00+00:00',
 ])
-def test_printing_today_or_tomorrow_returns_tomorrow(datetime):
-    with freeze_time(datetime):
-        assert printing_today_or_tomorrow() == 'tomorrow'
+def test_printing_today_or_tomorrow_returns_tomorrow(utc_datetime):
+    with freeze_time(utc_datetime):
+        assert printing_today_or_tomorrow(utc_datetime) == 'tomorrow'
 
 
 @pytest.mark.parametrize('created_at, current_datetime', [

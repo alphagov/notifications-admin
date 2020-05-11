@@ -782,6 +782,7 @@ def add_template_filters(application):
         format_date,
         format_date_human,
         format_date_normal,
+        format_date_numeric,
         format_date_short,
         format_datetime_human,
         format_datetime_relative,

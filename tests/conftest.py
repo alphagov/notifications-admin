@@ -1795,28 +1795,46 @@ def mock_get_jobs(mocker, api_user_active):
 @pytest.fixture(scope='function')
 def mock_get_uploads(mocker, api_user_active):
     def _get_uploads(service_id, limit_days=None, statuses=None, page=1):
-        uploads = [{'id': 'job_id_1',
-                    'original_file_name': 'some.csv',
-                    'notification_count': 10,
-                    'created_at': '2016-01-01 11:09:00.061258',
-                    'statistics': [{'count': 8, 'status': 'delivered'}, {'count': 2, 'status': 'temporary-failure'}],
-                    'upload_type': 'job',
-                    'template_type': 'sms',
-                    'recipient': None},
-                   {'id': 'letter_id_1',
-                    'original_file_name': 'some.pdf',
-                    'notification_count': 1,
-                    'created_at': '2016-01-01 11:09:00.061258',
-                    'statistics': [{'count': 1, 'status': 'delivered'}],
-                    'upload_type': 'letter',
-                    'template_type': None,
-                    'recipient': (
-                        'Firstname Lastname\n'
-                        '123 Example Street\n'
-                        'City of Town\n'
-                        'XM4 5QQ'
-                    )}
-                   ]
+        uploads = [
+            {
+                'id': None,
+                'original_file_name': 'Uploaded letters',
+                'recipient': None,
+                'notification_count': 33,
+                'template_type': 'letter',
+                'created_at': '2017-10-10 16:30:00',
+                'statistics': [],
+                'upload_type': 'letter_day',
+            },
+            {
+                'id': 'job_id_1',
+                'original_file_name': 'some.csv',
+                'notification_count': 10,
+                'created_at': '2016-01-01 11:09:00.061258',
+                'statistics': [
+                    {'count': 8, 'status': 'delivered'},
+                    {'count': 2, 'status': 'temporary-failure'}
+                ],
+                'upload_type': 'job',
+                'template_type': 'sms',
+                'recipient': None,
+            },
+            {
+                'id': 'letter_id_1',
+                'original_file_name': 'some.pdf',
+                'notification_count': 1,
+                'created_at': '2016-01-01 11:09:00.061258',
+                'statistics': [{'count': 1, 'status': 'delivered'}],
+                'upload_type': 'letter',
+                'template_type': None,
+                'recipient': (
+                    'Firstname Lastname\n'
+                    '123 Example Street\n'
+                    'City of Town\n'
+                    'XM4 5QQ'
+                ),
+            },
+        ]
         return {
             'data': uploads,
             'links': {

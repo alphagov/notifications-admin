@@ -1,5 +1,6 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
+import pytz
 from notifications_utils.letter_timings import (
     CANCELLABLE_JOB_LETTER_STATUSES,
     get_letter_timings,
@@ -15,7 +16,7 @@ from app.models import JSONModel, ModelList
 from app.notify_client.job_api_client import job_api_client
 from app.notify_client.notification_api_client import notification_api_client
 from app.notify_client.service_api_client import service_api_client
-from app.utils import set_status_filters
+from app.utils import get_letter_printing_statement, set_status_filters
 
 
 class Job(JSONModel):
@@ -158,6 +159,20 @@ class Job(JSONModel):
             return False
 
         return True
+
+    @property
+    def letter_printing_statement(self):
+        if self.upload_type != 'letter_day':
+            raise TypeError()
+        return get_letter_printing_statement(
+            'created',
+            # We have to make the time just before 5:30pm because a
+            # letter uploaded at 5:30pm will be printed the next day
+            (
+                utc_string_to_aware_gmt_datetime(self.created_at) - timedelta(minutes=1)
+            ).astimezone(pytz.utc).isoformat(),
+            long_form=False,
+        )
 
     @cached_property
     def all_notifications(self):

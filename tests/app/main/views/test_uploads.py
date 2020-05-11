@@ -91,6 +91,7 @@ def test_get_upload_hub_with_no_uploads(
     assert not page.select('.file-list-filename')
 
 
+@freeze_time('2017-10-10 10:10:10')
 def test_get_upload_hub_page(
     mocker,
     client_request,
@@ -108,28 +109,41 @@ def test_get_upload_hub_page(
 
     uploads = page.select('tbody tr')
 
+    assert len(uploads) == 3
+
     assert normalize_spaces(uploads[0].text.strip()) == (
+        'Uploaded letters '
+        'Printing today at 5:30pm '
+        '33 letters'
+    )
+    assert uploads[0].select_one('a.file-list-filename-large')['href'] == url_for(
+        'main.uploaded_letters',
+        service_id=SERVICE_ONE_ID,
+        letter_print_day='2017-10-10',
+    )
+
+    assert normalize_spaces(uploads[1].text.strip()) == (
         'some.csv '
         'Sent 1 January 2016 at 11:09am '
         '0 sending 8 delivered 2 failed'
     )
-    assert uploads[0].select_one('a.file-list-filename-large')['href'] == (
+    assert uploads[1].select_one('a.file-list-filename-large')['href'] == (
         '/services/{}/jobs/job_id_1'.format(SERVICE_ONE_ID)
     )
 
-    assert normalize_spaces(uploads[1].text.strip()) == (
+    assert normalize_spaces(uploads[2].text.strip()) == (
         'some.pdf '
         'Sent 1 January 2016 at 11:09am '
         'Firstname Lastname '
         '123 Example Street'
     )
-    assert normalize_spaces(str(uploads[1].select_one('.govuk-body'))) == (
+    assert normalize_spaces(str(uploads[2].select_one('.govuk-body'))) == (
         '<p class="govuk-body letter-recipient-summary"> '
         'Firstname Lastname<br/> '
         '123 Example Street<br/> '
         '</p>'
     )
-    assert uploads[1].select_one('a.file-list-filename-large')['href'] == (
+    assert uploads[2].select_one('a.file-list-filename-large')['href'] == (
         '/services/{}/notification/letter_id_1'.format(SERVICE_ONE_ID)
     )
 
