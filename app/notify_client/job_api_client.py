@@ -24,12 +24,14 @@ class JobApiClient(NotifyAdminAPIClient):
 
         return job
 
-    def get_jobs(self, service_id, limit_days=None, statuses=None, page=1):
+    def get_jobs(self, service_id, *, limit_days=None, contact_list_id=None, statuses=None, page=1):
         params = {'page': page}
         if limit_days is not None:
             params['limit_days'] = limit_days
         if statuses is not None:
             params['statuses'] = ','.join(statuses)
+        if contact_list_id is not None:
+            params['contact_list_id'] = contact_list_id
 
         return self.get(url='/service/{}/job'.format(service_id), params=params)
 
@@ -50,11 +52,12 @@ class JobApiClient(NotifyAdminAPIClient):
             if job['job_status'] != 'cancelled'
         )
 
-    def get_page_of_jobs(self, service_id, page):
+    def get_page_of_jobs(self, service_id, *, page, contact_list_id=None):
         return self.get_jobs(
             service_id,
             statuses=self.NON_SCHEDULED_JOB_STATUSES,
             page=page,
+            contact_list_id=contact_list_id,
         )
 
     def get_immediate_jobs(self, service_id):

@@ -8,6 +8,7 @@ from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
 from werkzeug.utils import cached_property
 
 from app.models import JSONModel, ModelList
+from app.models.job import PaginatedJobs
 from app.notify_client.contact_list_api_client import contact_list_api_client
 from app.s3_client.s3_csv_client import (
     get_csv_metadata,
@@ -133,6 +134,13 @@ class ContactList(JSONModel):
     def saved_file_name(self):
         file_name, extention = path.splitext(self.original_file_name)
         return f'{file_name}.csv'
+
+    def get_jobs(self, *, page):
+        return PaginatedJobs(
+            self.service_id,
+            contact_list_id=self.id,
+            page=page,
+        )
 
 
 class ContactLists(ModelList):
