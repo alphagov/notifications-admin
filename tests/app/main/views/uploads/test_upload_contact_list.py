@@ -478,7 +478,7 @@ def test_view_contact_list(
         'Uploaded by Test User today at 10:59am.'
     )
     assert normalize_spaces(page.select('main p')[1].text) == (
-        'Not used yet.'
+        'Not used in the last 7 days.'
     )
     assert normalize_spaces(page.select_one('main h2').text) == (
         '51 saved email addresses'

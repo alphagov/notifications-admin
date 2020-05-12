@@ -338,6 +338,7 @@ def test_uploads_page_shows_contact_lists_first(
     mock_get_no_uploads,
     mock_get_jobs,
     mock_get_contact_lists,
+    mock_get_service_data_retention,
 ):
     page = client_request.get('main.uploads', service_id=SERVICE_ONE_ID)
 
@@ -349,13 +350,18 @@ def test_uploads_page_shows_contact_lists_first(
         ),
         (
             'phone number list.csv '
-            'Uploaded 13 March at 1:00pm '
+            'Used twice in the last 7 days '
             '123 saved phone numbers'
         ),
         (
             'EmergencyContactList.xls '
-            'Uploaded 13 March at 10:59am '
+            'Not used in the last 7 days '
             '100 saved email addresses'
+        ),
+        (
+            'UnusedList.tsv '
+            'Not used yet '
+            '1 saved phone number'
         ),
         (
             'even_later.csv '

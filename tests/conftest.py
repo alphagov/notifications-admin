@@ -2075,6 +2075,8 @@ def mock_get_contact_lists(mocker, api_user_active, fake_uuid):
             'id': fake_uuid,
             'original_file_name': 'EmergencyContactList.xls',
             'row_count': 100,
+            'recent_job_count': 0,
+            'has_jobs': True,
             'service_id': service_id,
             'template_type': 'email',
         }, {
@@ -2083,6 +2085,18 @@ def mock_get_contact_lists(mocker, api_user_active, fake_uuid):
             'id': 'd7b0bd1a-d1c7-4621-be5c-3c1b4278a2ad',
             'original_file_name': 'phone number list.csv',
             'row_count': 123,
+            'recent_job_count': 2,
+            'has_jobs': True,
+            'service_id': service_id,
+            'template_type': 'sms',
+        }, {
+            'created_at': '2020-02-02 02:00:00',
+            'created_by': 'Test User',
+            'id': fake_uuid,
+            'original_file_name': 'UnusedList.tsv',
+            'row_count': 1,
+            'recent_job_count': 0,
+            'has_jobs': False,
             'service_id': service_id,
             'template_type': 'sms',
         }]
@@ -2102,6 +2116,8 @@ def mock_get_contact_list(mocker, api_user_active, fake_uuid):
             'id': fake_uuid,
             'original_file_name': 'EmergencyContactList.xls',
             'row_count': 100,
+            'recent_job_count': 0,
+            'has_jobs': True,
             'service_id': service_id,
             'template_type': 'email',
         }
