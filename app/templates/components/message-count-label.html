@@ -61,3 +61,19 @@
     {%- endif -%}
   {%- endif %}
 {%- endmacro %}
+
+
+{% macro recipient_count(count, template_type, prefix='') -%}
+  {{ count|format_thousands }} {{ prefix }} {{ recipient_count_label(count, template_type)}}
+{% endmacro %}
+
+
+{% macro iteration_count(count) -%}
+  {% if count == 1 %}
+    once
+  {% elif count == 2 %}
+    twice
+  {% else %}
+    {{ count }} times
+  {% endif %}
+{% endmacro %}
