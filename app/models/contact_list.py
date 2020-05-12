@@ -4,6 +4,7 @@ from os import path
 from flask import abort, current_app
 from notifications_utils.formatters import strip_whitespace
 from notifications_utils.recipients import RecipientCSV
+from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
 from werkzeug.utils import cached_property
 
 from app.models import JSONModel, ModelList
@@ -21,7 +22,6 @@ class ContactList(JSONModel):
 
     ALLOWED_PROPERTIES = {
         'id',
-        'created_at',
         'created_by',
         'service_id',
         'original_file_name',
@@ -111,6 +111,10 @@ class ContactList(JSONModel):
             service_id=self.service_id,
             contact_list_id=self.id,
         )
+
+    @property
+    def created_at(self):
+        return utc_string_to_aware_gmt_datetime(self._dict['created_at'])
 
     @property
     def contents(self):
