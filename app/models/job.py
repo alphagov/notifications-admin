@@ -233,9 +233,19 @@ class ScheduledJobs(ImmediateJobs):
 
 class PaginatedJobs(PaginatedModelList, ImmediateJobs):
     client_method = job_api_client.get_page_of_jobs
+    statuses = None
 
     def __init__(self, service_id, *, contact_list_id=None, page=None):
-        super().__init__(service_id, contact_list_id=contact_list_id, page=page)
+        super().__init__(
+            service_id,
+            contact_list_id=contact_list_id,
+            statuses=self.statuses,
+            page=page,
+        )
+
+
+class PaginatedJobsAndScheduledJobs(PaginatedJobs):
+    statuses = job_api_client.NON_CANCELLED_JOB_STATUSES
 
 
 class PaginatedUploads(PaginatedModelList, ImmediateJobs):

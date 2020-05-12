@@ -20,6 +20,7 @@ def test_get_jobs(mock_get_jobs):
             'finished',
             'sending limits exceeded',
             'ready to send',
+            'scheduled',
             'sent to dvla',
             'pending',
             'in progress',

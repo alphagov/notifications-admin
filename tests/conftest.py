@@ -1807,7 +1807,7 @@ def mock_has_no_jobs(mocker):
 
 
 @pytest.fixture(scope='function')
-def mock_get_jobs(mocker, api_user_active):
+def mock_get_jobs(mocker, api_user_active, fake_uuid):
     def _get_jobs(service_id, limit_days=None, statuses=None, contact_list_id=None, page=1):
         if statuses is None:
             statuses = ['', 'scheduled', 'pending', 'cancelled', 'finished']
@@ -1816,19 +1816,21 @@ def mock_get_jobs(mocker, api_user_active):
             job_json(
                 service_id,
                 api_user_active,
+                job_id=fake_uuid,
                 original_file_name=filename,
                 scheduled_for=scheduled_for,
                 job_status=job_status,
                 template_version=template_version,
+                template_name=template_name,
             )
-            for filename, scheduled_for, job_status, template_version in (
-                ('export 1/1/2016.xls', '', 'finished', 1),
-                ('all email addresses.xlsx', '', 'pending', 1),
-                ('applicants.ods', '', 'finished', 1),
-                ('thisisatest.csv', '', 'finished', 2),
-                ('send_me_later.csv', '2016-01-01 11:09:00.061258', 'scheduled', 1),
-                ('even_later.csv', '2016-01-01 23:09:00.061258', 'scheduled', 1),
-                ('full_of_regret.csv', '2016-01-01 23:09:00.061258', 'cancelled', 1)
+            for filename, scheduled_for, job_status, template_name, template_version in (
+                ('full_of_regret.csv', '2016-01-01 23:09:00.061258', 'cancelled', 'Template X', 1),
+                ('even_later.csv', '2016-01-01 23:09:00.061258', 'scheduled', 'Template Y', 1),
+                ('send_me_later.csv', '2016-01-01 11:09:00.061258', 'scheduled', 'Template Z', 1),
+                ('export 1/1/2016.xls', '', 'finished', 'Template A', 1),
+                ('all email addresses.xlsx', '', 'pending', 'Template B', 1),
+                ('applicants.ods', '', 'finished', 'Template C', 1),
+                ('thisisatest.csv', '', 'finished', 'Template D', 2),
             )
         ]
         return {
@@ -2026,6 +2028,17 @@ def mock_get_no_uploads(mocker, api_user_active):
         'app.models.job.PaginatedUploads.client_method',
         return_value={
             'data': [],
+        }
+    )
+
+
+@pytest.fixture(scope='function')
+def mock_get_no_jobs(mocker, api_user_active):
+    mocker.patch(
+        'app.models.job.PaginatedJobs.client_method',
+        return_value={
+            'data': [],
+            'links': {},
         }
     )
 

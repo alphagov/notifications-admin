@@ -16,6 +16,7 @@ class JobApiClient(NotifyAdminAPIClient):
     }
     SCHEDULED_JOB_STATUS = 'scheduled'
     CANCELLED_JOB_STATUS = 'cancelled'
+    NON_CANCELLED_JOB_STATUSES = JOB_STATUSES - {CANCELLED_JOB_STATUS}
     NON_SCHEDULED_JOB_STATUSES = JOB_STATUSES - {SCHEDULED_JOB_STATUS, CANCELLED_JOB_STATUS}
 
     def get_job(self, service_id, job_id):
@@ -52,10 +53,10 @@ class JobApiClient(NotifyAdminAPIClient):
             if job['job_status'] != 'cancelled'
         )
 
-    def get_page_of_jobs(self, service_id, *, page, contact_list_id=None):
+    def get_page_of_jobs(self, service_id, *, page, statuses=None, contact_list_id=None):
         return self.get_jobs(
             service_id,
-            statuses=self.NON_SCHEDULED_JOB_STATUSES,
+            statuses=statuses or self.NON_SCHEDULED_JOB_STATUSES,
             page=page,
             contact_list_id=contact_list_id,
         )
