@@ -24,9 +24,6 @@
   }
 }
 
-$message-text-left-spacing: 22px;
-$message-type-bottom-spacing: govuk-spacing(4);
-
 .message {
 
   &-name {
@@ -66,10 +63,19 @@ $message-type-bottom-spacing: govuk-spacing(4);
   }
 
   &-type {
-    color: $govuk-secondary-text-colour;
-    margin: 0 0 $message-type-bottom-spacing 0;
-    padding-left: 0;
+    color: $secondary-text-colour;
+    margin: 0 0 govuk-spacing(4) 0;
     pointer-events: none;
+  }
+
+}
+
+#template-list {
+
+  margin-top: govuk-spacing(6);
+
+  &.top-gutter-5px {
+    margin-top: 5px;
   }
 
 }
@@ -77,6 +83,18 @@ $message-type-bottom-spacing: govuk-spacing(4);
 .template-list {
 
   &-item {
+
+    &-with-checkbox {
+
+      position: relative;
+      padding-left: govuk-spacing(9);
+
+      .multiple-choice {
+        position: absolute;
+        left: 0;
+      }
+
+    }
 
     &-hidden-by-default {
       display: none;
@@ -103,22 +121,6 @@ $message-type-bottom-spacing: govuk-spacing(4);
 
       }
 
-    }
-
-    &-hint,
-    &-label {
-      padding-left: $message-text-left-spacing;
-    }
-
-    &-label {
-      padding-top: 0px;
-      padding-bottom: 0px;
-    }
-
-    // Fix for GOVUK Frontend selector with high precendence
-    // https://github.com/alphagov/govuk-frontend/blob/v2.13.0/src/components/hint/_hint.scss
-    &-label:not(.govuk-label--m):not(.govuk-label--l):not(.govuk-label--xl)+.template-list-item-hint {
-      margin-bottom: $message-type-bottom-spacing;
     }
 
   }

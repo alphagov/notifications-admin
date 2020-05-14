@@ -1,7 +1,3 @@
-// Taken from https://github.com/alphagov/govuk-frontend/blob/v2.13.0/src/components/checkboxes/_checkboxes.scss
-$govuk-touch-target-size: 44px;
-$govuk-checkboxes-size: 40px;
-
 .selection-summary {
 
   .selection-summary__text {
@@ -67,30 +63,6 @@ $govuk-checkboxes-size: 40px;
 
   }
 
-}
-
-.govuk-form-group--nested {
-
-  $border-thickness: $govuk-touch-target-size - $govuk-checkboxes-size;
-  $border-indent: $govuk-touch-target-size / 2;
-
-  position: relative;
-
-  // To equalise the spacing between the line and the top/bottom of
-  // the radio
-  margin-top: govuk-spacing(1) + ($border-thickness / 2);
-  margin-bottom: govuk-spacing(1) * -1;
-  padding-left: govuk-spacing(2) + 2;
-
-  &:before {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    left: $border-indent * -1;
-    width: $border-thickness;
-    height: 100%;
-    background: $govuk-border-colour;
-  }
 }
 
 .selection-content {

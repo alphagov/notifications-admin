@@ -65,12 +65,7 @@ const copy = {
         'footer',
         'back-link',
         'details',
-        'button',
-        'error-message',
-        'fieldset',
-        'hint',
-        'label',
-        'checkboxes'
+        'button'
       ];
       let done = 0;
 

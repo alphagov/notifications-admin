@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from itertools import chain
 
 import pytz
-from flask import Markup, render_template, request
+from flask import request
 from flask_login import current_user
 from flask_wtf import FlaskForm as Form
 from flask_wtf.file import FileAllowed
@@ -16,7 +16,6 @@ from notifications_utils.recipients import (
     normalise_phone_number,
     validate_phone_number,
 )
-from werkzeug.utils import cached_property
 from wtforms import (
     BooleanField,
     DateField,
@@ -318,16 +317,13 @@ class RadioFieldWithNoneOption(FieldWithNoneOption, RadioField):
 
 
 class NestedFieldMixin:
-
     def children(self):
-
         # start map with root option as a single child entry
         child_map = {None: [option for option in self
                             if option.data == self.NONE_OPTION_VALUE]}
 
         # add entries for all other children
         for option in self:
-            # assign all options with a NONE_OPTION_VALUE (not always None) to the None key
             if option.data == self.NONE_OPTION_VALUE:
                 child_ids = [
                     folder['id'] for folder in self.all_template_folders
@@ -342,47 +338,6 @@ class NestedFieldMixin:
             child_map[key] = [option for option in self if option.data in child_ids]
 
         return child_map
-
-    # to be used as the only version of .children once radios are converted
-    @cached_property
-    def _children(self):
-        return self.children()
-
-    def get_items_from_options(self, field):
-        items = []
-
-        for option in self._children[None]:
-            item = self.get_item_from_option(option)
-            if option.data in self._children:
-                item['children'] = self.render_children(field.name, option.label.text, self._children[option.data])
-            items.append(item)
-
-        return items
-
-    def render_children(self, name, label, options):
-        params = {
-            "name": name,
-            "fieldset": {
-                "legend": {
-                    "text": label,
-                    "classes": "govuk-visually-hidden"
-                }
-            },
-            "formGroup": {
-                "classes": "govuk-form-group--nested"
-            },
-            "asList": True,
-            "items": []
-        }
-        for option in options:
-            item = self.get_item_from_option(option)
-
-            if len(self._children[option.data]):
-                item['children'] = self.render_children(name, option.label.text, self._children[option.data])
-
-            params['items'].append(item)
-
-        return render_template('forms/fields/checkboxes/template.njk', params=params)
 
 
 class NestedRadioField(RadioFieldWithNoneOption, NestedFieldMixin):
@@ -532,201 +487,12 @@ class RegisterUserFromOrgInviteForm(StripWhitespaceForm):
     auth_type = HiddenField('auth_type', validators=[DataRequired()])
 
 
-class govukCheckboxesMixin:
-
-    def extend_params(self, params, extensions):
-        items = None
-        param_items = len(params['items']) if 'items' in params else 0
-
-        # split items off from params to make it a pure dict
-        if 'items' in extensions:
-            items = extensions['items']
-            del extensions['items']
-
-        # merge dicts
-        params.update(extensions)
-
-        # merge items
-        if items:
-            if 'items' not in params:
-                params['items'] = items
-            else:
-                for idx, _item in enumerate(items):
-                    if idx >= param_items:
-                        params['items'].append(items[idx])
-                    else:
-                        params['items'][idx].update(items[idx])
+PermissionsAbstract = type("PermissionsAbstract", (StripWhitespaceForm,), {
+    permission: BooleanField(label) for permission, label in permissions
+})
 
 
-class govukCheckboxField(govukCheckboxesMixin, BooleanField):
-
-    def __init__(self, label='', validators=None, param_extensions=None, **kwargs):
-        super(govukCheckboxField, self).__init__(label, validators, false_values=None, **kwargs)
-        self.param_extensions = param_extensions
-
-    # self.__call__ renders the HTML for the field by:
-    # 1. delegating to self.meta.render_field which
-    # 2. calls field.widget
-    # this bypasses that by making self.widget a method with the same interface as widget.__call__
-    def widget(self, field, param_extensions=None, **kwargs):
-
-        # error messages
-        error_message = None
-        if field.errors:
-            error_message = {"text": " ".join(field.errors).strip()}
-
-        params = {
-            'name':  field.name,
-            'errorMessage': error_message,
-            'items': [
-                {
-                    "name": field.name,
-                    "id": field.id,
-                    "text": field.label.text,
-                    "value": 'y',
-                    "checked": field.data
-                }
-            ]
-
-        }
-
-        # extend default params with any sent in during instantiation
-        if self.param_extensions:
-            self.extend_params(params, self.param_extensions)
-
-        # add any sent in though use in templates
-        if param_extensions:
-            self.extend_params(params, param_extensions)
-
-        return Markup(
-            render_template('forms/fields/checkboxes/macro.njk', params=params))
-
-
-# based on work done by @richardjpope: https://github.com/richardjpope/recourse/blob/master/recourse/forms.py#L6
-class govukCheckboxesField(govukCheckboxesMixin, SelectMultipleField):
-
-    render_as_list = False
-
-    def __init__(self, label='', validators=None, param_extensions=None, **kwargs):
-        super(govukCheckboxesField, self).__init__(label, validators, **kwargs)
-        self.param_extensions = param_extensions
-
-    def get_item_from_option(self, option):
-        return {
-            "name": option.name,
-            "id": option.id,
-            "text": option.label.text,
-            "value": str(option.data),  # to protect against non-string types like uuids
-            "checked": option.checked
-        }
-
-    def get_items_from_options(self, field):
-        return [self.get_item_from_option(option) for option in field]
-
-    def extend_params(self, params, extensions):
-        items = None
-        param_items = len(params['items']) if 'items' in params else 0
-
-        # split items off from params to make it a pure dict
-        if 'items' in extensions:
-            items = extensions['items']
-            del extensions['items']
-
-        # merge dicts
-        params.update(extensions)
-
-        # merge items
-        if items:
-            if 'items' not in params:
-                params['items'] = items
-            else:
-                for idx, _item in enumerate(items):
-                    if idx >= param_items:
-                        params['items'].append(items[idx])
-                    else:
-                        params['items'][idx].update(items[idx])
-
-    # self.__call__ renders the HTML for the field by:
-    # 1. delegating to self.meta.render_field which
-    # 2. calls field.widget
-    # this bypasses that by making self.widget a method with the same interface as widget.__call__
-    def widget(self, field, param_extensions=None, **kwargs):
-
-        # error messages
-        error_message = None
-        if field.errors:
-            error_message = {"text": " ".join(field.errors).strip()}
-
-        # returns either a list or a hierarchy of lists
-        # depending on how get_items_from_options is implemented
-        items = self.get_items_from_options(field)
-
-        params = {
-            'name':  field.name,
-            "fieldset": {
-                "attributes": {"id": field.name},
-                "legend": {
-                    "text": field.label.text,
-                    "classes": "govuk-fieldset__legend--s"
-                }
-            },
-            "asList": self.render_as_list,
-            'errorMessage': error_message,
-            'items': items
-        }
-
-        # extend default params with any sent in during instantiation
-        if self.param_extensions:
-            self.extend_params(params, self.param_extensions)
-
-        # add any sent in though use in templates
-        if param_extensions:
-            self.extend_params(params, param_extensions)
-
-        return Markup(
-            render_template('forms/fields/checkboxes/macro.njk', params=params))
-
-
-# Extends fields using the govukCheckboxesField interface to wrap their render in HTML needed by the collapsible JS
-class govukCollapsibleCheckboxesMixin:
-    def __init__(self, label='', validators=None, field_label='', param_extensions=None, **kwargs):
-
-        super(govukCollapsibleCheckboxesMixin, self).__init__(label, validators, param_extensions, **kwargs)
-        self.field_label = field_label
-
-    def widget(self, field, **kwargs):
-
-        # add a blank hint to act as an ARIA live-region
-        if self.param_extensions is not None:
-            self.param_extensions.update(
-                {"hint": {"html": "<div class=\"selection-summary\" role=\"region\" aria-live=\"polite\"></div>"}})
-        else:
-            self.param_extensions = \
-                {"hint": {"html": "<div class=\"selection-summary\" role=\"region\" aria-live=\"polite\"></div>"}}
-
-        # wrap the checkboxes HTML in the HTML needed by the collapisble JS
-        return Markup(
-            f'<div class="selection-wrapper"'
-            f'     data-module="collapsible-checkboxes"'
-            f'     data-field-label="{self.field_label}">'
-            f'  {super(govukCollapsibleCheckboxesMixin, self).widget(field, **kwargs)}'
-            f'</div>'
-        )
-
-
-class govukCollapsibleCheckboxesField(govukCollapsibleCheckboxesMixin, govukCheckboxesField):
-    pass
-
-
-# govukCollapsibleCheckboxesMixin adds an ARIA live-region to the hint and wraps the render in HTML needed by the
-# collapsible JS
-# NestedFieldMixin puts the items into a tree hierarchy, pre-rendering the sub-trees of the top-level items
-class govukCollapsibleNestedCheckboxesField(govukCollapsibleCheckboxesMixin, NestedFieldMixin, govukCheckboxesField):
-    NONE_OPTION_VALUE = None
-    render_as_list = True
-
-
-class PermissionsForm(StripWhitespaceForm):
+class PermissionsForm(PermissionsAbstract):
     def __init__(self, all_template_folders=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.folder_permissions.choices = []
@@ -736,9 +502,7 @@ class PermissionsForm(StripWhitespaceForm):
                 (item['id'], item['name']) for item in ([{'name': 'Templates', 'id': None}] + all_template_folders)
             ]
 
-    folder_permissions = govukCollapsibleNestedCheckboxesField(
-        'Folders this team member can see',
-        field_label='folder')
+    folder_permissions = NestedCheckboxesField('Folders this team member can see')
 
     login_authentication = RadioField(
         'Sign in using',
@@ -750,23 +514,21 @@ class PermissionsForm(StripWhitespaceForm):
         validators=[DataRequired()]
     )
 
-    permissions_field = govukCheckboxesField(
-        'Permssions',
-        choices=[
-            (value, label) for value, label in permissions
-        ],
-        param_extensions={
-            "hint": {"text": "All team members can see sent messages."}
-        }
-    )
+    @property
+    def permissions(self):
+        return {role for role in roles.keys() if self[role].data is True}
+
+    @property
+    def permissions_fields(self):
+        return (getattr(self, permission) for permission, _ in permissions)
 
     @classmethod
     def from_user(cls, user, service_id, **kwargs):
         return cls(
             **kwargs,
             **{
-                "permissions_field": [
-                    role for role in roles.keys() if user.has_permission_for_service(service_id, role)]
+                role: user.has_permission_for_service(service_id, role)
+                for role in roles.keys()
             },
             login_authentication=user.auth_type
         )
@@ -1323,7 +1085,7 @@ class ServiceContactDetailsForm(StripWhitespaceForm):
 
 class ServiceReplyToEmailForm(StripWhitespaceForm):
     email_address = email_address(label='Reply-to email address', gov_user=False)
-    is_default = govukCheckboxField("Make this email address the default")
+    is_default = BooleanField("Make this email address the default")
 
 
 class ServiceSmsSenderForm(StripWhitespaceForm):
@@ -1337,11 +1099,11 @@ class ServiceSmsSenderForm(StripWhitespaceForm):
             DoesNotStartWithDoubleZero(),
         ]
     )
-    is_default = govukCheckboxField("Make this text message sender the default")
+    is_default = BooleanField("Make this text message sender the default")
 
 
 class ServiceEditInboundNumberForm(StripWhitespaceForm):
-    is_default = govukCheckboxField("Make this text message sender the default")
+    is_default = BooleanField("Make this text message sender the default")
 
 
 class ServiceLetterContactBlockForm(StripWhitespaceForm):
@@ -1351,7 +1113,7 @@ class ServiceLetterContactBlockForm(StripWhitespaceForm):
             NoCommasInPlaceHolders()
         ]
     )
-    is_default = govukCheckboxField("Set as your default address")
+    is_default = BooleanField("Set as your default address")
 
     def validate_letter_contact_block(self, field):
         line_count = field.data.strip().count('\n')
@@ -1517,7 +1279,7 @@ class Whitelist(StripWhitespaceForm):
 class DateFilterForm(StripWhitespaceForm):
     start_date = DateField("Start Date", [validators.optional()])
     end_date = DateField("End Date", [validators.optional()])
-    include_from_test_key = govukCheckboxField("Include test keys")
+    include_from_test_key = BooleanField("Include test keys", default="checked", false_values={"N"})
 
 
 class RequiredDateFilterForm(StripWhitespaceForm):
@@ -1829,9 +1591,7 @@ class TemplateFolderForm(StripWhitespaceForm):
                 (item.id, item.name) for item in all_service_users
             ]
 
-    users_with_permission = govukCollapsibleCheckboxesField(
-        'Team members who can see this folder',
-        field_label='folder')
+    users_with_permission = MultiCheckboxField('Team members who can see this folder')
     name = StringField('Folder name', validators=[DataRequired(message='Cannot be empty')])
 
 
@@ -1921,18 +1681,9 @@ class TemplateAndFoldersSelectionForm(Form):
             return self.move_to_new_folder_name.data
         return None
 
-    templates_and_folders = govukCheckboxesField(
-        'Choose templates or folders',
-        validators=[required_for_ops('move-to-new-folder', 'move-to-existing-folder')],
-        choices=[],  # added to keep order of arguments, added properly in __init__
-        param_extensions={
-            "fieldset": {
-                "legend": {
-                    "classes": "govuk-visually-hidden"
-                }
-            }
-        }
-    )
+    templates_and_folders = MultiCheckboxField('Choose templates or folders', validators=[
+        required_for_ops('move-to-new-folder', 'move-to-existing-folder')
+    ])
     # if no default set, it is set to None, which process_data transforms to '__NONE__'
     # this means '__NONE__' (self.ALL_TEMPLATES option) is selected when no form data has been submitted
     # set default to empty string so process_data method doesn't perform any transformation

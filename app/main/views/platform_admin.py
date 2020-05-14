@@ -168,11 +168,9 @@ def platform_admin_services():
         # Default to True if the user hasn’t done any filtering,
         # otherwise respect their choice
         form.include_from_test_key.data = True
-
-    include_from_test_key = form.include_from_test_key.data
     api_args = {'detailed': True,
                 'only_active': False,    # specifically DO get inactive services
-                'include_from_test_key': include_from_test_key,
+                'include_from_test_key': form.include_from_test_key.data,
                 }
 
     if form.start_date.data:
@@ -186,7 +184,7 @@ def platform_admin_services():
 
     return render_template(
         'views/platform-admin/services.html',
-        include_from_test_key=include_from_test_key,
+        include_from_test_key=form.include_from_test_key.data,
         form=form,
         services=list(format_stats_by_service(services)),
         page_title='{} services'.format(
