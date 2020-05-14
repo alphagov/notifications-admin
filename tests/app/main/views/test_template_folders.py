@@ -395,7 +395,7 @@ def test_should_show_templates_folder_page(
         assert links_in_page[index].text.strip() == expected_link
 
     all_page_items = page.select('.template-list-item')
-    all_page_items_styled_with_checkboxes = page.select('.template-list-item.govuk-checkboxes__item')
+    all_page_items_styled_with_checkboxes = page.select('.template-list-item-with-checkbox')
 
     assert len(all_page_items) == len(all_page_items_styled_with_checkboxes)
 
@@ -527,7 +527,7 @@ def test_get_manage_folder_viewing_permissions_for_users(
     assert normalize_spaces(page.select_one('title').text) == (
         'folder_two – Templates – service one – GOV.UK Notify'
     )
-    form_labels = page.select('legend.govuk-fieldset__legend')
+    form_labels = page.select('legend[class=form-label]')
     assert normalize_spaces(form_labels[0].text) == "Team members who can see this folder"
     checkboxes = page.select('input[name=users_with_permission]')
 
@@ -538,7 +538,7 @@ def test_get_manage_folder_viewing_permissions_for_users(
     assert checkboxes[1]['value'] == team_member_2['id']
     assert "checked" in checkboxes[1].attrs
 
-    assert "Test User" in page.find_all('label', {'for': 'users_with_permission-1'})[0].text
+    assert "Test User" in page.find_all('label', {'for': 'users_with_permission-0'})[0].text
 
 
 def test_get_manage_folder_viewing_permissions_for_users_not_visible_when_no_manage_settings_permission(
