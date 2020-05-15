@@ -70,6 +70,10 @@ $iso-paper-ratio: 141.42135624%;
       background-image: file-url('envelope-2nd-class.svg');
     }
 
+    &-international {
+      background-image: file-url('envelope-international.svg');
+    }
+
     .letter-sent &:hover {
       background-color: transparent;
       border-color: transparent;
