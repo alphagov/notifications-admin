@@ -515,16 +515,41 @@ def test_notification_page_does_not_show_cancel_link_for_letter_which_cannot_be_
     assert 'Cancel sending this letter' not in normalize_spaces(page.text)
 
 
+@pytest.mark.parametrize('postage, expected_postage_text, expected_class_value, expected_delivery', (
+    (
+        'first',
+        'Postage: first class',
+        'letter-postage-first',
+        'Estimated delivery date: Tuesday 5 January',
+    ),
+    (
+        'europe',
+        'Postage: international',
+        'letter-postage-international',
+        'Estimated delivery date: Wednesday 6 January',
+    ),
+    (
+        'rest-of-world',
+        'Postage: international',
+        'letter-postage-international',
+        'Estimated delivery date: Wednesday 6 January',
+    ),
+))
 @freeze_time("2016-01-01 18:00")
-def test_notification_page_shows_page_for_first_class_letter_notification(
+def test_notification_page_shows_page_for_other_postage_classes(
     client_request,
     mocker,
     fake_uuid,
+    postage,
+    expected_postage_text,
+    expected_class_value,
+    expected_delivery,
 ):
     notification = create_notification(
         notification_status='pending-virus-check',
         template_type='letter',
-        postage='first')
+        postage=postage,
+    )
     mocker.patch('app.notification_api_client.get_notification', return_value=notification)
     mocker.patch('app.main.views.notifications.get_page_count_for_letter', return_value=3)
 
@@ -536,13 +561,13 @@ def test_notification_page_shows_page_for_first_class_letter_notification(
 
     assert normalize_spaces(page.select('main p:nth-of-type(2)')[0].text) == 'Printing starts tomorrow at 5:30pm'
     assert normalize_spaces(page.select('main p:nth-of-type(3)')[0].text) == (
-        'Estimated delivery date: Tuesday 5 January'
+        expected_delivery
     )
     assert normalize_spaces(page.select_one('.letter-postage').text) == (
-        'Postage: first class'
+        expected_postage_text
     )
     assert page.select_one('.letter-postage')['class'] == [
-        'letter-postage', 'letter-postage-first'
+        'letter-postage', expected_class_value
     ]
 
 
