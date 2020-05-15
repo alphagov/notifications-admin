@@ -1469,7 +1469,6 @@ def test_send_one_off_or_test_shows_placeholders_in_correct_order(
     with client_request.session_transaction() as session:
         session['recipient'] = None
         session['placeholders'] = prefilled
-        session['send_test_letter_page_count'] = None
 
     page = client_request.get(
         endpoint,
@@ -1584,7 +1583,6 @@ def test_send_one_off_has_sticky_header_for_letter_on_non_address_placeholders(
     mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=9)
 
     with client_request.session_transaction() as session:
-        session['send_test_letter_page_count'] = 1
         session['recipient'] = ''
         session['placeholders'] = {
             'address line 1': 'foo',
@@ -1872,7 +1870,6 @@ def test_send_test_redirects_to_start_if_you_skip_steps(
     mocker.patch('app.user_api_client.get_user', return_value=user)
 
     with platform_admin_client.session_transaction() as session:
-        session['send_test_letter_page_count'] = 1
         session['placeholders'] = {'address_line_1': 'foo'}
 
     response = platform_admin_client.get(url_for(
@@ -2061,7 +2058,6 @@ def test_send_test_sms_message_back_link_with_multiple_placeholders(
     with client_request.session_transaction() as session:
         session['recipient'] = '07900900123'
         session['placeholders'] = {'phone number': '07900900123', 'one': 'bar'}
-        session['send_test_letter_page_count'] = None
 
     page = client_request.get(
         'main.send_test_step',
@@ -2106,7 +2102,6 @@ def test_send_test_sms_message_back_link_in_tour(
     with client_request.session_transaction() as session:
         session['recipient'] = '07900900123'
         session['placeholders'] = {'phone number': '07900900123', 'one': 'bar'}
-        session['send_test_letter_page_count'] = None
 
     page = client_request.get(
         'main.send_test_step',
@@ -2122,30 +2117,6 @@ def test_send_test_sms_message_back_link_in_tour(
     )
 
 
-def test_send_test_letter_clears_previous_page_cache(
-    platform_admin_client,
-    mocker,
-    service_one,
-    mock_login,
-    mock_get_service,
-    mock_get_service_letter_template,
-    fake_uuid,
-):
-
-    with platform_admin_client.session_transaction() as session:
-        session['send_test_letter_page_count'] = 'WRONG'
-
-    response = platform_admin_client.get(url_for(
-        'main.send_test',
-        service_id=service_one['id'],
-        template_id=fake_uuid,
-    ))
-    assert response.status_code == 302
-
-    with platform_admin_client.session_transaction() as session:
-        assert session['send_test_letter_page_count'] is None
-
-
 def test_send_test_letter_redirects_to_right_url(
     platform_admin_client,
     fake_uuid,
@@ -2155,9 +2126,8 @@ def test_send_test_letter_redirects_to_right_url(
     mock_get_service_statistics,
     mocker,
 ):
-
+    mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=9)
     with platform_admin_client.session_transaction() as session:
-        session['send_test_letter_page_count'] = 1
         session['recipient'] = ''
         session['placeholders'] = {
             'address line 1': 'foo',
@@ -2208,30 +2178,6 @@ def test_send_test_populates_field_from_session(
     )
 
     assert page.select('input')[0]['value'] == 'Jo'
-
-
-def test_send_test_caches_page_count(
-    logged_in_client,
-    mocker,
-    service_one,
-    mock_login,
-    mock_get_service,
-    mock_get_service_letter_template,
-    fake_uuid,
-):
-
-    mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=9)
-
-    logged_in_client.get(
-        url_for(
-            'main.send_test',
-            service_id=service_one['id'],
-            template_id=fake_uuid,
-        ),
-        follow_redirects=True,
-    )
-    with logged_in_client.session_transaction() as session:
-        assert session['send_test_letter_page_count'] == 9
 
 
 def test_send_one_off_back_link_populates_address_textarea(
@@ -2296,7 +2242,6 @@ def test_send_one_off_letter_copes_with_placeholder_from_address_block(
     with client_request.session_transaction() as session:
         session['recipient'] = None
         session['placeholders'] = {}
-        session['send_test_letter_page_count'] = None
 
     page = client_request.post(
         'main.send_one_off_letter_address',

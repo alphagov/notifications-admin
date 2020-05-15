@@ -298,7 +298,6 @@ def get_sender_details(service_id, template_type):
 def send_test(service_id, template_id):
     session['recipient'] = None
     session['placeholders'] = {}
-    session['send_test_letter_page_count'] = None
 
     db_template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
     if db_template['template_type'] == 'letter':
@@ -351,8 +350,6 @@ def send_one_off_letter_address(service_id, template_id):
 
     db_template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
 
-    session['send_test_letter_page_count'] = get_page_count_for_letter(db_template)
-
     template = get_template(
         db_template,
         current_service,
@@ -363,7 +360,7 @@ def send_one_off_letter_address(service_id, template_id):
             template_id=template_id,
             filetype='png',
         ),
-        page_count=session['send_test_letter_page_count'],
+        page_count=get_page_count_for_letter(db_template),
         email_reply_to=None,
         sms_sender=None
     )
@@ -436,8 +433,6 @@ def send_test_step(service_id, template_id, step_index):
 
     db_template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
 
-    if not session.get('send_test_letter_page_count'):
-        session['send_test_letter_page_count'] = get_page_count_for_letter(db_template)
     email_reply_to = None
     sms_sender = None
     if db_template['template_type'] == 'email':
@@ -454,7 +449,7 @@ def send_test_step(service_id, template_id, step_index):
             template_id=template_id,
             filetype='png',
         ),
-        page_count=session['send_test_letter_page_count'],
+        page_count=get_page_count_for_letter(db_template),
         email_reply_to=email_reply_to,
         sms_sender=sms_sender
     )
