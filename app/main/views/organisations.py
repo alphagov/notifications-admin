@@ -448,13 +448,24 @@ def edit_organisation_domains(org_id):
     form = OrganisationDomainsForm()
 
     if form.validate_on_submit():
-        organisations_client.update_organisation(
-            org_id,
-            domains=list(OrderedDict.fromkeys(
-                domain.lower()
-                for domain in filter(None, form.domains.data)
-            )),
-        )
+        try:
+            organisations_client.update_organisation(
+                org_id,
+                domains=list(OrderedDict.fromkeys(
+                    domain.lower()
+                    for domain in filter(None, form.domains.data)
+                )),
+            )
+        except HTTPError as e:
+            error_message = "Domain already exists"
+            if e.status_code == 400 and error_message in e.message:
+                flash("This domain is already in use", "error")
+                return render_template(
+                    'views/organisations/organisation/settings/edit-domains.html',
+                    form=form,
+                )
+            else:
+                raise e
         return redirect(url_for('.organisation_settings', org_id=org_id))
 
     form.populate(current_organisation.domains)
@@ -483,7 +494,7 @@ def confirm_edit_organisation_name(org_id):
         except HTTPError as e:
             error_msg = "Organisation name already exists"
             if e.status_code == 400 and error_msg in e.message:
-                # Redirect the user back to the change service name screen
+                # Redirect the user back to the change organisation name screen
                 flash('This organisation name is already in use', 'error')
                 return redirect(url_for('main.edit_organisation_name', org_id=org_id))
             else:

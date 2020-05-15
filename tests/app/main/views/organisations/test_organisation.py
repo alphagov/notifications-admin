@@ -991,6 +991,38 @@ def test_update_organisation_domains(
     )
 
 
+def test_update_organisation_domains_when_domain_already_exists(
+    mocker,
+    client_request,
+    fake_uuid,
+    organisation_one,
+    mock_get_organisation,
+):
+    user = create_platform_admin_user()
+    client_request.login(user)
+
+    mocker.patch('app.organisations_client.update_organisation', side_effect=HTTPError(
+        response=Mock(
+            status_code=400,
+            json={'result': 'error', 'message': 'Domain already exists'}
+        ),
+        message="Domain already exists")
+    )
+
+    response = client_request.post(
+        'main.edit_organisation_domains',
+        org_id=ORGANISATION_ID,
+        _data={
+            'domains': [
+                'example.gov.uk',
+            ]
+        },
+        _expected_status=200,
+    )
+
+    assert response.find("div", class_="banner-dangerous").text.strip() == "This domain is already in use"
+
+
 def test_update_organisation_name(
     platform_admin_client,
     organisation_one,
