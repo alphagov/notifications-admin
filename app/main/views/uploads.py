@@ -1,7 +1,6 @@
 import base64
 import itertools
 import json
-import urllib
 import uuid
 from io import BytesIO
 from zipfile import BadZipFile
@@ -192,14 +191,12 @@ def _get_error_from_upload_form(form_errors):
 def format_recipient(address):
     '''
     To format the recipient we need to:
-        - decode, address is url encoded
         - remove new line characters
         - remove whitespace around the lines
         - join the address lines, separated by a comma
     '''
     if not address:
         return address
-    address = urllib.parse.unquote(address)
     stripped_address_lines_no_trailing_commas = [
         line.lstrip().rstrip(' ,')
         for line in address.splitlines() if line

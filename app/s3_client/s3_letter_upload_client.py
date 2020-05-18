@@ -45,15 +45,16 @@ def upload_letter_to_s3(
 
 
 class LetterMetadata:
-    KEYS_TO_DECODE = ["filename"]
+    KEYS_TO_DECODE = ["filename", "recipient"]
 
     def __init__(self, metadata):
         self._metadata = metadata
 
     def get(self, key, default=None):
-        if key in self.KEYS_TO_DECODE:
-            return urllib.parse.unquote(self._metadata.get(key, default))
-        return self._metadata.get(key, default)
+        value = self._metadata.get(key, default)
+        if value and key in self.KEYS_TO_DECODE:
+            value = urllib.parse.unquote(value)
+        return value
 
 
 def get_letter_pdf_and_metadata(service_id, file_id):

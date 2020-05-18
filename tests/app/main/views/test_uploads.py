@@ -1,5 +1,4 @@
 import re
-import urllib
 import uuid
 from io import BytesIO
 from unittest.mock import ANY, Mock
@@ -455,12 +454,11 @@ def test_uploaded_letter_preview(
     fake_uuid,
 ):
     mocker.patch('app.main.views.uploads.service_api_client')
-    recipient = 'Bugs Bunny\n123 Big Hole\rLooney Town'
     mocker.patch('app.main.views.uploads.get_letter_metadata', return_value=LetterMetadata({
         'filename': 'my_encoded_filename%C2%A3.pdf',
         'page_count': '1',
         'status': 'valid',
-        'recipient': urllib.parse.quote(recipient)
+        'recipient': 'Bugs Bunny%0A123 Big Hole%0DLooney Town'  # 'Bugs Bunny%0A123 Big Hole\rLooney Town' url encoded
     }))
 
     service_one['restricted'] = False
@@ -655,8 +653,12 @@ def test_send_uploaded_letter_when_metadata_states_pdf_is_invalid(mocker, servic
     mock_send = mocker.patch('app.main.views.uploads.notification_api_client.send_precompiled_letter')
     mocker.patch(
         'app.main.views.uploads.get_letter_metadata',
-        return_value=LetterMetadata({'filename': 'my_file.pdf', 'page_count': '3', 'status': 'invalid',
-                      'message': 'error', 'invalid_pages': '[1]'})
+        return_value=LetterMetadata(
+            {
+                'filename': 'my_file.pdf', 'page_count': '3', 'status': 'invalid',
+                'message': 'error', 'invalid_pages': '[1]'
+            }
+        )
     )
 
     service_one['permissions'] = ['letter', 'upload_letters']
@@ -680,7 +682,7 @@ def test_send_uploaded_letter_when_metadata_states_pdf_is_invalid(mocker, servic
     ('', ''),
 ])
 def test_format_recipient(original_address, expected_address):
-    assert format_recipient(urllib.parse.quote(original_address)) == expected_address
+    assert format_recipient(original_address) == expected_address
 
 
 @pytest.mark.parametrize('user', (
