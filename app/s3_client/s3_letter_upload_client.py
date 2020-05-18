@@ -48,9 +48,20 @@ def get_letter_pdf_and_metadata(service_id, file_id):
     s3_object = s3.Object(current_app.config['TRANSIENT_UPLOADED_LETTERS'], file_location).get()
 
     pdf = s3_object['Body'].read()
-    metadata = s3_object['Metadata']
 
-    return pdf, metadata
+    return pdf, LetterMetadata(s3_object['Metadata'])
+
+
+class LetterMetadata:
+    KEYS_TO_DECODE = []
+
+    def __init__(self, metadata):
+        self._metadata = metadata
+
+    def get(self, key, default=None):
+        if key in self.KEYS_TO_DECODE:
+            return urllib.parse.unquote(self._metadata.get(key, default))
+        return self._metadata.get(key, default)
 
 
 def get_letter_metadata(service_id, file_id):
@@ -58,4 +69,4 @@ def get_letter_metadata(service_id, file_id):
     s3 = resource('s3')
     s3_object = s3.Object(current_app.config['TRANSIENT_UPLOADED_LETTERS'], file_location).get()
 
-    return s3_object['Metadata']
+    return LetterMetadata(s3_object['Metadata'])
