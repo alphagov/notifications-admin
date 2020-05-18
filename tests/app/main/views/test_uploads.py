@@ -468,10 +468,6 @@ def test_uploaded_letter_preview(
         'main.uploaded_letter_preview',
         service_id=SERVICE_ONE_ID,
         file_id=fake_uuid,
-        original_filename='my_letter.pdf',
-        page_count=1,
-        status='valid',
-        error={}
     )
 
     assert page.find('h1').text == 'my_letter.pdf'
