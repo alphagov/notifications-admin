@@ -1,7 +1,7 @@
 from datetime import datetime
 
 import pytz
-from flask import redirect, render_template, request, session, url_for
+from flask import current_app, redirect, render_template, request, session, url_for
 from flask_login import current_user
 from govuk_bank_holidays.bank_holidays import BankHolidays
 
@@ -119,13 +119,16 @@ def feedback(ticket_type):
             service_string,
         )
 
-        zendesk_client.create_ticket(
+        ticket = zendesk_client.create_ticket(
             subject='Notify feedback',
             message=feedback_msg,
             ticket_type=ticket_type,
             p1=out_of_hours_emergency,
             user_email=user_email,
             user_name=user_name
+        )
+        current_app.logger.info(
+            f'Created Zendesk ticket {ticket["id"]}'
         )
         return redirect(url_for(
             '.thanks',

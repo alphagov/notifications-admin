@@ -137,7 +137,11 @@ def test_get_feedback_page(client, ticket_type, expected_status_code):
 @freeze_time('2016-12-12 12:00:00.000000')
 @pytest.mark.parametrize('ticket_type', [PROBLEM_TICKET_TYPE, QUESTION_TICKET_TYPE])
 def test_passed_non_logged_in_user_details_through_flow(client, mocker, ticket_type):
-    mock_post = mocker.patch('app.main.views.feedback.zendesk_client.create_ticket')
+    mock_post = mocker.patch(
+        'app.main.views.feedback.zendesk_client.create_ticket',
+        return_value={'id': 12345},
+    )
+    mock_logger = mocker.patch('app.current_app.logger.info')
 
     data = {'feedback': 'blah', 'name': 'Steve Irwin', 'email_address': 'rip@gmail.com'}
 
@@ -161,6 +165,7 @@ def test_passed_non_logged_in_user_details_through_flow(client, mocker, ticket_t
         ticket_type=ticket_type,
         p1=ANY
     )
+    mock_logger.assert_called_once_with('Created Zendesk ticket 12345')
 
 
 @freeze_time("2016-12-12 12:00:00.000000")
