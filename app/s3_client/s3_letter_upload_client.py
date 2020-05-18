@@ -21,10 +21,12 @@ def upload_letter_to_s3(
     invalid_pages=None,
     recipient=None
 ):
+    # Use of urllib.parse.quote encodes metadata into ascii, which is required by s3.
+    # Making sure data for displaying to users is decoded is taken care of by LetterMetadata
     metadata = {
         'status': status,
         'page_count': str(page_count),
-        'filename': filename,
+        'filename': urllib.parse.quote(filename),
     }
     if message:
         metadata['message'] = message
@@ -42,18 +44,8 @@ def upload_letter_to_s3(
     )
 
 
-def get_letter_pdf_and_metadata(service_id, file_id):
-    file_location = get_transient_letter_file_location(service_id, file_id)
-    s3 = resource('s3')
-    s3_object = s3.Object(current_app.config['TRANSIENT_UPLOADED_LETTERS'], file_location).get()
-
-    pdf = s3_object['Body'].read()
-
-    return pdf, LetterMetadata(s3_object['Metadata'])
-
-
 class LetterMetadata:
-    KEYS_TO_DECODE = []
+    KEYS_TO_DECODE = ["filename"]
 
     def __init__(self, metadata):
         self._metadata = metadata
@@ -62,6 +54,16 @@ class LetterMetadata:
         if key in self.KEYS_TO_DECODE:
             return urllib.parse.unquote(self._metadata.get(key, default))
         return self._metadata.get(key, default)
+
+
+def get_letter_pdf_and_metadata(service_id, file_id):
+    file_location = get_transient_letter_file_location(service_id, file_id)
+    s3 = resource('s3')
+    s3_object = s3.Object(current_app.config['TRANSIENT_UPLOADED_LETTERS'], file_location).get()
+
+    pdf = s3_object['Body'].read()
+
+    return pdf, LetterMetadata(s3_object['Metadata'])
 
 
 def get_letter_metadata(service_id, file_id):

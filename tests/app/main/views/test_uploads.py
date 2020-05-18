@@ -457,9 +457,11 @@ def test_uploaded_letter_preview(
     mocker.patch('app.main.views.uploads.service_api_client')
     recipient = 'Bugs Bunny\n123 Big Hole\rLooney Town'
     mocker.patch('app.main.views.uploads.get_letter_metadata', return_value=LetterMetadata({
-        'filename': 'my_letter.pdf', 'page_count': '1', 'status': 'valid',
+        'filename': 'my_encoded_filename%C2%A3.pdf',
+        'page_count': '1',
+        'status': 'valid',
         'recipient': urllib.parse.quote(recipient)
-        }))
+    }))
 
     service_one['restricted'] = False
     client_request.login(active_user_with_permissions, service=service_one)
@@ -470,7 +472,7 @@ def test_uploaded_letter_preview(
         file_id=fake_uuid,
     )
 
-    assert page.find('h1').text == 'my_letter.pdf'
+    assert page.find('h1').text == 'my_encoded_filename£.pdf'
     assert page.find('div', class_='letter-sent')
     assert not page.find("label", {"class": "file-upload-button"})
     assert page.find('button', {'class': 'page-footer__button', 'type': 'submit'})
