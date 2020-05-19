@@ -120,6 +120,12 @@ def view_notification(service_id, notification_id):
             service_id=current_service.id,
             job_id=request.args.get('from_job'),
         )
+    elif request.args.get('from_uploaded_letters'):
+        back_link = url_for(
+            'main.uploaded_letters',
+            service_id=current_service.id,
+            letter_print_day=request.args.get('from_uploaded_letters'),
+        )
     else:
         back_link = url_for(
             'main.view_notifications',

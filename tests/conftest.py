@@ -1795,28 +1795,46 @@ def mock_get_jobs(mocker, api_user_active):
 @pytest.fixture(scope='function')
 def mock_get_uploads(mocker, api_user_active):
     def _get_uploads(service_id, limit_days=None, statuses=None, page=1):
-        uploads = [{'id': 'job_id_1',
-                    'original_file_name': 'some.csv',
-                    'notification_count': 10,
-                    'created_at': '2016-01-01 11:09:00.061258',
-                    'statistics': [{'count': 8, 'status': 'delivered'}, {'count': 2, 'status': 'temporary-failure'}],
-                    'upload_type': 'job',
-                    'template_type': 'sms',
-                    'recipient': None},
-                   {'id': 'letter_id_1',
-                    'original_file_name': 'some.pdf',
-                    'notification_count': 1,
-                    'created_at': '2016-01-01 11:09:00.061258',
-                    'statistics': [{'count': 1, 'status': 'delivered'}],
-                    'upload_type': 'letter',
-                    'template_type': None,
-                    'recipient': (
-                        'Firstname Lastname\n'
-                        '123 Example Street\n'
-                        'City of Town\n'
-                        'XM4 5QQ'
-                    )}
-                   ]
+        uploads = [
+            {
+                'id': None,
+                'original_file_name': 'Uploaded letters',
+                'recipient': None,
+                'notification_count': 33,
+                'template_type': 'letter',
+                'created_at': '2017-10-10 16:30:00',
+                'statistics': [],
+                'upload_type': 'letter_day',
+            },
+            {
+                'id': 'job_id_1',
+                'original_file_name': 'some.csv',
+                'notification_count': 10,
+                'created_at': '2016-01-01 11:09:00.061258',
+                'statistics': [
+                    {'count': 8, 'status': 'delivered'},
+                    {'count': 2, 'status': 'temporary-failure'}
+                ],
+                'upload_type': 'job',
+                'template_type': 'sms',
+                'recipient': None,
+            },
+            {
+                'id': 'letter_id_1',
+                'original_file_name': 'some.pdf',
+                'notification_count': 1,
+                'created_at': '2016-01-01 11:09:00.061258',
+                'statistics': [{'count': 1, 'status': 'delivered'}],
+                'upload_type': 'letter',
+                'template_type': None,
+                'recipient': (
+                    'Firstname Lastname\n'
+                    '123 Example Street\n'
+                    'City of Town\n'
+                    'XM4 5QQ'
+                ),
+            },
+        ]
         return {
             'data': uploads,
             'links': {
@@ -1826,6 +1844,121 @@ def mock_get_uploads(mocker, api_user_active):
         }
     # Why is mocking on the model needed?
     return mocker.patch('app.models.job.PaginatedUploads.client_method', side_effect=_get_uploads)
+
+
+@pytest.fixture(scope='function')
+def mock_get_uploaded_letters(mocker):
+    def _get_uploaded_letters(service_id, *, letter_print_day, page=1):
+        uploads = [
+            {
+                "api_key": None,
+                "billable_units": 1,
+                "client_reference": "Homer-Simpson.pdf",
+                "created_at": "2020-02-02T13:59:00+00:00",
+                "created_by": {
+                    "email_address": "test@example.com",
+                    "id": "a1958d6b-955b-4f68-8847-cf43cd4b189a",
+                    "name": "Test User"
+                },
+                "document_download_count": None,
+                "id": "03e34025-be54-4d43-8e6a-fb1ea0fd1f29",
+                "international": False,
+                "job": None,
+                "job_row_number": None,
+                "key_name": None,
+                "key_type": "normal",
+                "normalised_to": None,
+                "notification_type": "letter",
+                "personalisation": {},
+                "phone_prefix": None,
+                "postage": "second",
+                "rate_multiplier": None,
+                "reference": "dvla-reference",
+                "reply_to_text": None,
+                "sent_at": "2020-02-02T14:00:00+00:00",
+                "sent_by": None,
+                "service": "f995d8a3-4ece-4961-bbbd-b657b192648c",
+                "status": "delivered",
+                "template": {
+                    "content": "",
+                    "id": "673e4f67-7d9a-42b8-8e56-f3444aa2fbef",
+                    "is_precompiled_letter": True,
+                    "name": "Pre-compiled PDF",
+                    "redact_personalisation": False,
+                    "subject": "Pre-compiled PDF",
+                    "template_type": "letter",
+                    "version": 1
+                },
+                "to": "742 Evergreen Terrace",
+                "updated_at": "2020-02-02T14:00:00+00:00"
+            },
+            {
+                "api_key": None,
+                "billable_units": 1,
+                "client_reference": "Kevin-McCallister.pdf",
+                "created_at": "2020-02-02T12:59:00+00:00",
+                "created_by": {
+                    "email_address": "test@example.com",
+                    "id": "a1958d6b-955b-4f68-8847-cf43cd4b189a",
+                    "name": "Test User"
+                },
+                "document_download_count": None,
+                "id": "fc090d91-e761-4464-9041-9c4594c96a35",
+                "international": False,
+                "job": None,
+                "job_row_number": None,
+                "key_name": None,
+                "key_type": "normal",
+                "normalised_to": None,
+                "notification_type": "letter",
+                "personalisation": {},
+                "phone_prefix": None,
+                "postage": "second",
+                "rate_multiplier": None,
+                "reference": "dvla-reference",
+                "reply_to_text": None,
+                "sent_at": "2020-02-02T14:00:00+00:00",
+                "sent_by": None,
+                "service": "f995d8a3-4ece-4961-bbbd-b657b192648c",
+                "status": "delivered",
+                "template": {
+                    "content": "",
+                    "id": "673e4f67-7d9a-42b8-8e56-f3444aa2fbef",
+                    "is_precompiled_letter": True,
+                    "name": "Pre-compiled PDF",
+                    "redact_personalisation": False,
+                    "subject": "Pre-compiled PDF",
+                    "template_type": "letter",
+                    "version": 1
+                },
+                "to": "671 Lincoln Avenue\nWinnetka",
+                "updated_at": "2020-02-02T14:00:00+00:00"
+            },
+        ]
+        return {
+            'notifications': uploads,
+            'total': 1234,
+            'links': {
+                'prev': 'services/{}/uploads?page={}'.format(service_id, page - 1),
+                'next': 'services/{}/uploads?page={}'.format(service_id, page + 1)
+            }
+        }
+    return mocker.patch(
+        'app.main.views.uploads.upload_api_client.get_letters_by_service_and_print_day',
+        side_effect=_get_uploaded_letters,
+    )
+
+
+@pytest.fixture(scope='function')
+def mock_get_no_uploaded_letters(mocker):
+    return mocker.patch(
+        'app.main.views.uploads.upload_api_client.get_letters_by_service_and_print_day',
+        return_value={
+            'notifications': [],
+            'total': 0,
+            'links': {}
+        },
+    )
 
 
 @pytest.fixture(scope='function')

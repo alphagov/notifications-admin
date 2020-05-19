@@ -118,6 +118,10 @@ def test_notification_status_page_respects_redaction(
         partial(url_for, 'main.view_job', job_id='job_id'),
     ),
     (
+        {'from_uploaded_letters': '2020-02-02'},
+        partial(url_for, 'main.uploaded_letters', letter_print_day='2020-02-02'),
+    ),
+    (
         {'help': '0'},
         None,
     ),

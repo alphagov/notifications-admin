@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from functools import partial
+
 from flask import (
     Response,
     abort,
@@ -64,7 +66,7 @@ def view_job(service_id, job_id):
 
     just_sent_message = 'Your {} been sent. Printing starts {} at 5:30pm.'.format(
         'letter has' if job.notification_count == 1 else 'letters have',
-        printing_today_or_tomorrow()
+        printing_today_or_tomorrow(job.created_at)
     )
 
     return render_template(
@@ -289,6 +291,11 @@ def get_notifications(service_id, message_type, status_override=None):
             status=request.args.get('status'),
             message_type=message_type,
             download_link=download_link,
+            single_notification_url=partial(
+                url_for,
+                '.view_notification',
+                service_id=current_service.id,
+            )
         ),
     }
 

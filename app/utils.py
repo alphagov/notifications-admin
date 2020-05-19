@@ -2,7 +2,7 @@ import csv
 import os
 import re
 import unicodedata
-from datetime import datetime, time, timedelta, timezone
+from datetime import datetime, timedelta, timezone
 from functools import wraps
 from io import BytesIO, StringIO
 from itertools import chain
@@ -14,6 +14,7 @@ import ago
 import dateutil
 import pyexcel
 import pyexcel_xlsx
+import pytz
 from dateutil import parser
 from flask import abort, current_app, redirect, request, session, url_for
 from flask_login import current_user, login_required
@@ -33,6 +34,7 @@ from notifications_utils.template import (
     SMSPreviewTemplate,
 )
 from notifications_utils.timezones import (
+    convert_bst_to_utc,
     convert_utc_to_bst,
     utc_string_to_aware_gmt_datetime,
 )
@@ -550,11 +552,13 @@ def get_default_sms_sender(sms_senders):
     ), "None"))
 
 
-def printing_today_or_tomorrow():
-    now_utc = datetime.utcnow()
-    now_bst = convert_utc_to_bst(now_utc)
+def printing_today_or_tomorrow(created_at):
+    print_cutoff = convert_bst_to_utc(
+        convert_utc_to_bst(datetime.utcnow()).replace(hour=17, minute=30)
+    ).replace(tzinfo=pytz.utc)
+    created_at = utc_string_to_aware_gmt_datetime(created_at)
 
-    if now_bst.time() < time(17, 30):
+    if created_at < print_cutoff:
         return 'today'
     else:
         return 'tomorrow'
@@ -569,10 +573,11 @@ def redact_mobile_number(mobile_number, spacing=""):
     return "".join(mobile_number_list)
 
 
-def get_letter_printing_statement(status, created_at):
+def get_letter_printing_statement(status, created_at, long_form=True):
     created_at_dt = parser.parse(created_at).replace(tzinfo=None)
     if letter_can_be_cancelled(status, created_at_dt):
-        return 'Printing starts {} at 5:30pm'.format(printing_today_or_tomorrow())
+        decription = 'Printing starts' if long_form else 'Printing'
+        return f'{decription} {printing_today_or_tomorrow(created_at)} at 5:30pm'
     else:
         printed_datetime = utc_string_to_aware_gmt_datetime(created_at) + timedelta(hours=6, minutes=30)
         if printed_datetime.date() == datetime.now().date():
@@ -581,8 +586,9 @@ def get_letter_printing_statement(status, created_at):
             return 'Printed yesterday at 5:30pm'
 
         printed_date = printed_datetime.strftime('%d %B').lstrip('0')
+        description = 'Printed on' if long_form else 'Printed'
 
-        return 'Printed on {} at 5:30pm'.format(printed_date)
+        return f'{description} {printed_date} at 5:30pm'
 
 
 LETTER_VALIDATION_MESSAGES = {

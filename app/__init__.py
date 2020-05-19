@@ -87,6 +87,7 @@ from app.notify_client.template_folder_api_client import (
 from app.notify_client.template_statistics_api_client import (
     template_statistics_client,
 )
+from app.notify_client.upload_api_client import upload_api_client
 from app.notify_client.user_api_client import user_api_client
 from app.url_converters import (
     LetterFileExtensionConverter,
@@ -160,6 +161,7 @@ def create_app(application):
         status_api_client,
         template_folder_api_client,
         template_statistics_client,
+        upload_api_client,
         user_api_client,
 
         # External API clients
@@ -780,6 +782,7 @@ def add_template_filters(application):
         format_date,
         format_date_human,
         format_date_normal,
+        format_date_numeric,
         format_date_short,
         format_datetime_human,
         format_datetime_relative,
