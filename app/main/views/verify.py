@@ -93,5 +93,5 @@ def _add_invited_user_to_service(invited_user):
     invitation = InvitedUser(invited_user)
     user = User.from_id(session['user_id'])
     service_id = invited_user['service']
-    user_api_client.add_user_to_service(service_id, user.id, invitation.permissions, invitation.folder_permissions)
+    user.add_to_service(service_id, invitation.permissions, invitation.folder_permissions)
     return service_id

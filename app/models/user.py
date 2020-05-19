@@ -407,12 +407,18 @@ class User(JSONModel, UserMixin):
         session['current_session_id'] = self.current_session_id
 
     def add_to_service(self, service_id, permissions, folder_permissions):
-        user_api_client.add_user_to_service(
-            service_id,
-            self.id,
-            permissions,
-            folder_permissions,
-        )
+        try:
+            user_api_client.add_user_to_service(
+                service_id,
+                self.id,
+                permissions,
+                folder_permissions,
+            )
+        except HTTPError as exception:
+            if exception.status_code == 400 and 'already part of service' in exception.message:
+                pass
+            else:
+                raise exception
 
     def add_to_organisation(self, organisation_id):
         user_api_client.add_user_to_organisation(
