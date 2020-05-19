@@ -2,7 +2,10 @@ import urllib
 
 from flask import current_app
 
-from app.s3_client.s3_letter_upload_client import upload_letter_to_s3
+from app.s3_client.s3_letter_upload_client import (
+    LetterMetadata,
+    upload_letter_to_s3,
+)
 
 
 def test_upload_letter_to_s3(mocker):
@@ -53,3 +56,17 @@ def test_upload_letter_to_s3_with_message_and_invalid_pages(mocker):
         },
         region=current_app.config['AWS_REGION']
     )
+
+
+def test_lettermetadata_gets_non_special_keys():
+    metadata = LetterMetadata({"key": "value", "not_key_to_decode": "%C2%A3"})
+    assert metadata.get("key") == "value"
+    assert metadata.get("other_key") is None
+    assert metadata.get("other_key", "default") == "default"
+    assert metadata.get("not_key_to_decode") == "%C2%A3"
+
+
+def test_lettermetadata_unquotes_special_keys():
+    metadata = LetterMetadata({"filename": "%C2%A3hello", "recipient": "%C2%A3hi"})
+    assert metadata.get("filename") == "£hello"
+    assert metadata.get("recipient") == "£hi"
