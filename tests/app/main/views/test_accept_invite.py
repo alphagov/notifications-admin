@@ -11,6 +11,7 @@ from tests.conftest import (
     USER_ONE_ID,
     create_active_caseworking_user,
     create_active_user_with_permissions,
+    create_api_user_active,
     normalize_spaces,
 )
 
@@ -194,6 +195,37 @@ def test_existing_user_of_service_get_redirected_to_signin(
         'We signed you out because you have not used Notify for a while.',
     )
     assert mock_accept_invite.call_count == 1
+
+
+def test_accept_invite_redirects_if_api_raises_an_error_that_they_are_already_part_of_the_service(
+    client,
+    mocker,
+    api_user_active,
+    sample_invite,
+    mock_accept_invite,
+    mock_get_service,
+    mock_get_users_by_service
+):
+    sample_invite['email_address'] = api_user_active['email_address']
+
+    # This mock needs to return a user with a different ID to the invited user so that
+    # `existing_user in Users(invited_user.service)` returns False and the right code path is tested
+    mocker.patch('app.user_api_client.get_user_by_email', return_value=create_api_user_active(with_unique_id=True))
+    mocker.patch('app.invite_api_client.check_token', return_value=sample_invite)
+
+    mocker.patch('app.user_api_client.add_user_to_service', side_effect=HTTPError(
+        response=Mock(
+            status_code=400,
+            json={
+                "result": "error",
+                "message": {f"User id: {api_user_active['id']} already part of service id: {SERVICE_ONE_ID}"}
+            },
+        ),
+        message=f"User id: {api_user_active['id']} already part of service id: {SERVICE_ONE_ID}"
+    ))
+
+    response = client.get(url_for('main.accept_invite', token='thisisnotarealtoken'), follow_redirects=False)
+    assert response.location == url_for('main.service_dashboard', service_id=SERVICE_ONE_ID, _external=True)
 
 
 def test_existing_signed_out_user_accept_invite_redirects_to_sign_in(

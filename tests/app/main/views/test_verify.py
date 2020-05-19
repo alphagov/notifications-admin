@@ -1,10 +1,14 @@
 import json
 import uuid
+from unittest.mock import Mock
 
 from bs4 import BeautifulSoup
+from flask import session as flask_session
 from flask import url_for
 from itsdangerous import SignatureExpired
+from notifications_python_client.errors import HTTPError
 
+from app.main.views.verify import activate_user
 from tests.conftest import normalize_spaces
 
 
@@ -165,3 +169,32 @@ def test_verify_redirects_to_sign_in_if_not_logged_in(
 
     assert response.location == url_for('main.sign_in', _external=True)
     assert response.status_code == 302
+
+
+def test_activate_user_redirects_to_service_dashboard_if_user_already_belongs_to_service(
+    mocker,
+    client,
+    service_one,
+    sample_invite,
+    api_user_active,
+    mock_login,
+):
+    mocker.patch('app.user_api_client.add_user_to_service', side_effect=HTTPError(
+        response=Mock(
+            status_code=400,
+            json={
+                "result": "error",
+                "message": {f"User id: {api_user_active['id']} already part of service id: {service_one['id']}"}
+            },
+        ),
+        message=f"User id: {api_user_active['id']} already part of service id: {service_one['id']}"
+    ))
+
+    # Can't use `with client.session_transaction()...` here since activate_session is not a view function
+    flask_session['invited_user'] = sample_invite
+
+    response = activate_user(api_user_active['id'])
+
+    assert response.location == url_for('main.service_dashboard', service_id=service_one['id'])
+
+    flask_session.pop('invited_user')
