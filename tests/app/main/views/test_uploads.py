@@ -1,5 +1,4 @@
 import re
-import urllib
 import uuid
 from io import BytesIO
 from unittest.mock import ANY, Mock
@@ -10,6 +9,7 @@ from freezegun import freeze_time
 from requests import RequestException
 
 from app.main.views.uploads import format_recipient
+from app.s3_client.s3_letter_upload_client import LetterMetadata
 from app.utils import normalize_spaces
 from tests.conftest import (
     SERVICE_ONE_ID,
@@ -333,12 +333,12 @@ def test_post_upload_letter_redirects_for_valid_file(
         )
     )
     mock_s3 = mocker.patch('app.main.views.uploads.upload_letter_to_s3')
-    mocker.patch('app.main.views.uploads.get_letter_metadata', return_value={
+    mocker.patch('app.main.views.uploads.get_letter_metadata', return_value=LetterMetadata({
         'filename': 'tests/test_pdf_files/one_page_pdf.pdf',
         'page_count': '1',
         'status': 'valid',
         'recipient': 'The Queen'
-    })
+    }))
     mocker.patch('app.main.views.uploads.service_api_client.get_precompiled_template')
 
     service_one['restricted'] = False
@@ -399,12 +399,12 @@ def test_post_upload_letter_shows_letter_preview_for_valid_file(
     )
     mocker.patch('app.main.views.uploads.upload_letter_to_s3')
     mocker.patch('app.main.views.uploads.pdf_page_count', return_value=3)
-    mocker.patch('app.main.views.uploads.get_letter_metadata', return_value={
+    mocker.patch('app.main.views.uploads.get_letter_metadata', return_value=LetterMetadata({
         'filename': 'tests/test_pdf_files/one_page_pdf.pdf',
         'page_count': '3',
         'status': 'valid',
         'recipient': 'The Queen'
-    })
+    }))
     mocker.patch('app.main.views.uploads.service_api_client.get_precompiled_template', return_value=letter_template)
 
     service_one['restricted'] = False
@@ -518,9 +518,9 @@ def test_post_upload_letter_with_invalid_file(mocker, client_request, fake_uuid)
     }
     mocker.patch('app.main.views.uploads.sanitise_letter', return_value=mock_sanitise_response)
     mocker.patch('app.main.views.uploads.service_api_client.get_precompiled_template')
-    mocker.patch('app.main.views.uploads.get_letter_metadata', return_value={
+    mocker.patch('app.main.views.uploads.get_letter_metadata', return_value=LetterMetadata({
         'filename': 'tests/test_pdf_files/one_page_pdf.pdf', 'page_count': '1', 'status': 'invalid',
-        'message': 'content-outside-printable-area', 'invalid_pages': '[1]'})
+        'message': 'content-outside-printable-area', 'invalid_pages': '[1]'}))
 
     with open('tests/test_pdf_files/one_page_pdf.pdf', 'rb') as file:
         file_contents = file.read()
@@ -562,9 +562,9 @@ def test_post_upload_letter_shows_letter_preview_for_invalid_file(mocker, client
     mock_sanitise_response.json = lambda: {"message": "template preview error", "recipient_address": "The Queen"}
     mocker.patch('app.main.views.uploads.sanitise_letter', return_value=mock_sanitise_response)
     mocker.patch('app.main.views.uploads.service_api_client.get_precompiled_template', return_value=letter_template)
-    mocker.patch('app.main.views.uploads.get_letter_metadata', return_value={
+    mocker.patch('app.main.views.uploads.get_letter_metadata', return_value=LetterMetadata({
         'filename': 'tests/test_pdf_files/one_page_pdf.pdf', 'page_count': '1', 'status': 'invalid',
-        'message': 'template-preview-error'})
+        'message': 'template-preview-error'}))
 
     with open('tests/test_pdf_files/one_page_pdf.pdf', 'rb') as file:
         page = client_request.post(
@@ -621,11 +621,12 @@ def test_uploaded_letter_preview(
     fake_uuid,
 ):
     mocker.patch('app.main.views.uploads.service_api_client')
-    recipient = 'Bugs Bunny\n123 Big Hole\rLooney Town'
-    mocker.patch('app.main.views.uploads.get_letter_metadata', return_value={
-        'filename': 'my_letter.pdf', 'page_count': '1', 'status': 'valid',
-        'recipient': urllib.parse.quote(recipient)
-        })
+    mocker.patch('app.main.views.uploads.get_letter_metadata', return_value=LetterMetadata({
+        'filename': 'my_encoded_filename%C2%A3.pdf',
+        'page_count': '1',
+        'status': 'valid',
+        'recipient': 'Bugs Bunny%0A123 Big Hole%0DLooney Town'  # 'Bugs Bunny%0A123 Big Hole\rLooney Town' url encoded
+    }))
 
     service_one['restricted'] = False
     client_request.login(active_user_with_permissions, service=service_one)
@@ -634,13 +635,9 @@ def test_uploaded_letter_preview(
         'main.uploaded_letter_preview',
         service_id=SERVICE_ONE_ID,
         file_id=fake_uuid,
-        original_filename='my_letter.pdf',
-        page_count=1,
-        status='valid',
-        error={}
     )
 
-    assert page.find('h1').text == 'my_letter.pdf'
+    assert page.find('h1').text == 'my_encoded_filename£.pdf'
     assert page.find('div', class_='letter-sent')
     assert not page.find("label", {"class": "file-upload-button"})
     assert page.find('button', {'class': 'page-footer__button', 'type': 'submit'})
@@ -652,8 +649,8 @@ def test_uploaded_letter_preview_does_not_show_send_button_if_service_in_trial_m
     fake_uuid,
 ):
     mocker.patch('app.main.views.uploads.service_api_client')
-    mocker.patch('app.main.views.uploads.get_letter_metadata', return_value={
-        'filename': 'my_letter.pdf', 'page_count': '1', 'status': 'valid', 'recipient': 'The Queen'})
+    mocker.patch('app.main.views.uploads.get_letter_metadata', return_value=LetterMetadata({
+        'filename': 'my_letter.pdf', 'page_count': '1', 'status': 'valid', 'recipient': 'The Queen'}))
 
     # client_request uses service_one, which is in trial mode
     page = client_request.get(
@@ -770,7 +767,7 @@ def test_uploaded_letter_preview_image_400s_for_bad_page_type(
 
 
 def test_send_uploaded_letter_sends_letter_and_redirects_to_notification_page(mocker, service_one, client_request):
-    metadata = {'filename': 'my_file.pdf', 'page_count': '1', 'status': 'valid', 'recipient': 'address'}
+    metadata = LetterMetadata({'filename': 'my_file.pdf', 'page_count': '1', 'status': 'valid', 'recipient': 'address'})
 
     mocker.patch('app.main.views.uploads.get_letter_pdf_and_metadata', return_value=('file', metadata))
     mock_send = mocker.patch('app.main.views.uploads.notification_api_client.send_precompiled_letter')
@@ -823,8 +820,12 @@ def test_send_uploaded_letter_when_metadata_states_pdf_is_invalid(mocker, servic
     mock_send = mocker.patch('app.main.views.uploads.notification_api_client.send_precompiled_letter')
     mocker.patch(
         'app.main.views.uploads.get_letter_metadata',
-        return_value={'filename': 'my_file.pdf', 'page_count': '3', 'status': 'invalid',
-                      'message': 'error', 'invalid_pages': '[1]'}
+        return_value=LetterMetadata(
+            {
+                'filename': 'my_file.pdf', 'page_count': '3', 'status': 'invalid',
+                'message': 'error', 'invalid_pages': '[1]'
+            }
+        )
     )
 
     service_one['permissions'] = ['letter', 'upload_letters']
@@ -848,7 +849,7 @@ def test_send_uploaded_letter_when_metadata_states_pdf_is_invalid(mocker, servic
     ('', ''),
 ])
 def test_format_recipient(original_address, expected_address):
-    assert format_recipient(urllib.parse.quote(original_address)) == expected_address
+    assert format_recipient(original_address) == expected_address
 
 
 @pytest.mark.parametrize('user', (
