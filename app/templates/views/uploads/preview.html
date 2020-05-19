@@ -55,9 +55,9 @@
         <form method="post" enctype="multipart/form-data" action="{{url_for(
             'main.send_uploaded_letter',
             service_id=current_service.id,
+            file_id=file_id,
           )}}" class='page-footer'>
             {{ radios(form.postage, hide_legend=true, inline=True) }}
-            {{ form.file_id(value=file_id) }}
             {{ page_footer("Send 1 letter") }}
         </form>
       {% endif %}
