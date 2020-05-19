@@ -339,13 +339,14 @@ def view_letter_upload_as_preview(service_id, file_id):
 
 
 @main.route("/services/<uuid:service_id>/upload-letter/send", methods=['POST'])
+@main.route("/services/<uuid:service_id>/upload-letter/send/<uuid:file_id>", methods=['POST'])
 @user_has_permissions('send_messages', restrict_admin_usage=True)
-def send_uploaded_letter(service_id):
+def send_uploaded_letter(service_id, file_id=None):
     if not (current_service.has_permission('letter') and current_service.has_permission('upload_letters')):
         abort(403)
 
-    form = LetterUploadPostageForm()
-    file_id = form.file_id.data
+    form = LetterUploadPostageForm(file_id=file_id)
+    file_id = file_id or form.file_id.data
 
     if not form.validate_on_submit():
         return uploaded_letter_preview(service_id, file_id)
