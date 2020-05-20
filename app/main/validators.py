@@ -45,7 +45,7 @@ class ValidGovEmail:
         message = '''
             Enter a public sector email address or
             <a class="govuk-link govuk-link--no-visited-state" href="{}">find out who can use Notify</a>
-        '''.format(url_for('main.who_its_for'))
+        '''.format(url_for('main.who_can_use_notify'))
         if not is_gov_user(field.data.lower()):
             raise ValidationError(message)
 
