@@ -344,20 +344,25 @@ def send_uploaded_letter(service_id, file_id=None):
     if not (current_service.has_permission('letter') and current_service.has_permission('upload_letters')):
         abort(403)
 
+    metadata = get_letter_metadata(service_id, file_id)
+
+    if metadata.get('status') != 'valid':
+        abort(403)
+
+    recipient_address = metadata.get('recipient')
+
     form = LetterUploadPostageForm()
 
     if not form.validate_on_submit():
         return uploaded_letter_preview(service_id, file_id)
 
-    postage = form.postage.data
-    metadata = get_letter_metadata(service_id, file_id)
-    filename = metadata.get('filename')
-    recipient_address = metadata.get('recipient')
-
-    if metadata.get('status') != 'valid':
-        abort(403)
-
-    notification_api_client.send_precompiled_letter(service_id, filename, file_id, postage, recipient_address)
+    notification_api_client.send_precompiled_letter(
+        service_id,
+        metadata.get('filename'),
+        file_id,
+        form.postage.data,
+        recipient_address,
+    )
 
     return redirect(url_for(
         '.view_notification',
