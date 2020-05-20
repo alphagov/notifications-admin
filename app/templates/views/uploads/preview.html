@@ -48,11 +48,11 @@
     {% if status == 'valid' %}
     <div class="js-stick-at-bottom-when-scrolling">
       <p class="top-gutter-0 bottom-gutter-1-2 send-recipient" title="{{ recipient }}">
-        Recipient: {{ recipient }}
+        Recipient: {{ postal_address.as_single_line }}
       </p>
 
       {% if current_service.live %}
-        {% if international %}
+        {% if postal_address.international %}
           <p class="govuk-body">
             Postage: international
           </p>

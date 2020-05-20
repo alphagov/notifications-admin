@@ -299,8 +299,7 @@ def uploaded_letter_preview(service_id, file_id):
         message=error_message,
         error_code=error_shortcode,
         form=form,
-        recipient=postal_address.as_single_line,
-        international=postal_address.international,
+        postal_address=postal_address,
         re_upload_form=re_upload_form
     )
 
