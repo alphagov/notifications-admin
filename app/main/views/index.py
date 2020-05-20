@@ -321,10 +321,10 @@ def get_started():
     )
 
 
-@main.route('/using-notify/who-can_use_notify')
+@main.route('/using-notify/who-can-use-notify')
 def who_can_use_notify():
     return render_template(
-        'views/guidance/who-can_use_notify.html',
+        'views/guidance/who-can-use-notify.html',
         navigation_links=using_notify_nav(),
     )
 
