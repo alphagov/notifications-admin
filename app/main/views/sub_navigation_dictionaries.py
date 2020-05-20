@@ -24,7 +24,7 @@ def features_nav():
         },
         {
             "name": "Who can use Notify",
-            "link": "main.who_its_for",
+            "link": "main.who_can_use_notify",
         },
         {
             "name": "Security",
