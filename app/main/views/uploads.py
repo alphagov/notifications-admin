@@ -252,23 +252,6 @@ def _get_error_from_upload_form(form_errors):
     return error
 
 
-def format_recipient(address):
-    '''
-    To format the recipient we need to:
-        - remove new line characters
-        - remove whitespace around the lines
-        - join the address lines, separated by a comma
-    '''
-    if not address:
-        return address
-    stripped_address_lines_no_trailing_commas = [
-        line.lstrip().rstrip(' ,')
-        for line in address.splitlines() if line
-    ]
-    one_line_address = ', '.join(stripped_address_lines_no_trailing_commas)
-    return one_line_address
-
-
 @main.route("/services/<uuid:service_id>/preview-letter/<uuid:file_id>")
 @user_has_permissions('send_messages')
 def uploaded_letter_preview(service_id, file_id):
@@ -316,7 +299,7 @@ def uploaded_letter_preview(service_id, file_id):
         message=error_message,
         error_code=error_shortcode,
         form=form,
-        recipient=format_recipient(postal_address.raw_address),
+        recipient=postal_address.as_single_line,
         international=postal_address.international,
         re_upload_form=re_upload_form
     )

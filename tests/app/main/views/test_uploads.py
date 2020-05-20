@@ -8,7 +8,6 @@ from flask import make_response, url_for
 from freezegun import freeze_time
 from requests import RequestException
 
-from app.main.views.uploads import format_recipient
 from app.s3_client.s3_letter_upload_client import LetterMetadata
 from app.utils import normalize_spaces
 from tests.conftest import (
@@ -945,18 +944,6 @@ def test_send_uploaded_letter_when_metadata_states_pdf_is_invalid(
         _expected_status=403
     )
     assert not mock_send.called
-
-
-@pytest.mark.parametrize('original_address,expected_address', [
-    ('The Queen, Buckingham Palace, SW1 1AA', 'The Queen, Buckingham Palace, SW1 1AA'),
-    ('The Queen Buckingham Palace SW1 1AA', 'The Queen Buckingham Palace SW1 1AA'),
-    ('The Queen,\nBuckingham Palace,\r\nSW1 1AA', 'The Queen, Buckingham Palace, SW1 1AA'),
-    ('The Queen   ,,\nBuckingham Palace,\rSW1 1AA,', 'The Queen, Buckingham Palace, SW1 1AA'),
-    ('  The Queen\n Buckingham Palace\n SW1 1AA', 'The Queen, Buckingham Palace, SW1 1AA'),
-    ('', ''),
-])
-def test_format_recipient(original_address, expected_address):
-    assert format_recipient(original_address) == expected_address
 
 
 @pytest.mark.parametrize('user', (
