@@ -117,7 +117,7 @@ def test_should_return_200_when_email_is_not_gov_uk(
         'Enter a public sector email address or find out who can use Notify'
     )
     assert page.select_one('.error-message a')['href'] == url_for(
-        'main.who_its_for'
+        'main.who_can_use_notify'
     )
 
 
