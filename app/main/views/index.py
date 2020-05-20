@@ -321,10 +321,10 @@ def get_started():
     )
 
 
-@main.route('/using-notify/who-its-for')
-def who_its_for():
+@main.route('/using-notify/who-can_use_notify')
+def who_can_use_notify():
     return render_template(
-        'views/guidance/who-its-for.html',
+        'views/guidance/who-can_use_notify.html',
         navigation_links=using_notify_nav(),
     )
 
