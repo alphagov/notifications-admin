@@ -52,12 +52,19 @@
       </p>
 
       {% if current_service.live %}
+        {% if international %}
+          <p class="govuk-body">
+            Postage: international
+          </p>
+        {% endif %}
         <form method="post" enctype="multipart/form-data" action="{{url_for(
             'main.send_uploaded_letter',
             service_id=current_service.id,
             file_id=file_id,
           )}}" class='page-footer'>
-            {{ radios(form.postage, hide_legend=true, inline=True) }}
+            {% if form.show_postage %}
+              {{ radios(form.postage, hide_legend=true, inline=True) }}
+            {% endif %}
             {{ page_footer("Send 1 letter") }}
         </form>
       {% endif %}

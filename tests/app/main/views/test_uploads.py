@@ -435,6 +435,64 @@ def test_post_upload_letter_shows_letter_preview_for_valid_file(
             page=page_no)
 
 
+def test_upload_international_letter_shows_preview_with_no_choice_of_postage(
+    mocker,
+    active_user_with_permissions,
+    service_one,
+    client_request,
+    fake_uuid,
+):
+    letter_template = {
+        'template_type': 'letter',
+        'reply_to_text': '',
+        'postage': 'second',
+        'subject': 'hi',
+        'content': 'my letter',
+    }
+
+    mocker.patch('uuid.uuid4', return_value=fake_uuid)
+    mocker.patch('app.main.views.uploads.antivirus_client.scan', return_value=True)
+    mocker.patch('app.main.views.uploads.sanitise_letter', return_value=Mock(
+        content='The sanitised content',
+        json=lambda: {'file': 'VGhlIHNhbml0aXNlZCBjb250ZW50', 'recipient_address': 'The Queen'}
+    ))
+    mocker.patch('app.main.views.uploads.upload_letter_to_s3')
+    mocker.patch('app.main.views.uploads.pdf_page_count', return_value=3)
+    mocker.patch('app.main.views.uploads.get_letter_metadata', return_value=LetterMetadata({
+        'filename': 'tests/test_pdf_files/one_page_pdf.pdf',
+        'page_count': '3',
+        'status': 'valid',
+        'recipient': (
+            '123 Example Street\n'
+            'Andorra la Vella\n'
+            'Andorra'
+        ),
+    }))
+    mocker.patch('app.main.views.uploads.service_api_client.get_precompiled_template', return_value=letter_template)
+
+    service_one['restricted'] = False
+    client_request.login(active_user_with_permissions, service=service_one)
+
+    with open('tests/test_pdf_files/one_page_pdf.pdf', 'rb') as file:
+        page = client_request.post(
+            'main.upload_letter',
+            service_id=SERVICE_ONE_ID,
+            _data={'file': file},
+            _follow_redirects=True,
+        )
+
+    assert page.find('h1').text == 'tests/test_pdf_files/one_page_pdf.pdf'
+    assert not page.select('.letter-postage')
+    assert not page.select('input[type=radio]')
+    assert normalize_spaces(
+        page.select_one('.js-stick-at-bottom-when-scrolling').text
+    ) == (
+        'Recipient: 123 Example Street, Andorra la Vella, Andorra '
+        'Postage: international '
+        'Send 1 letter'
+    )
+
+
 def test_post_upload_letter_shows_error_when_file_is_not_a_pdf(client_request):
     with open('tests/non_spreadsheet_files/actually_a_png.csv', 'rb') as file:
         page = client_request.post(
@@ -766,13 +824,48 @@ def test_uploaded_letter_preview_image_400s_for_bad_page_type(
     )
 
 
+@pytest.mark.parametrize('address, post_data, expected_postage', (
+    (
+        'address',
+        {'filename': 'my_file.pdf', 'postage': 'first'},
+        'first',
+    ),
+    (
+        'address',
+        {'filename': 'my_file.pdf'},
+        'second',
+    ),
+    (
+        '123 Example Street\nLiechtenstein',
+        {'filename': 'my_file.pdf', 'postage': 'first'},
+        'europe',
+    ),
+    (
+        '123 Example Street\nLiechtenstein',
+        {'filename': 'my_file.pdf'},
+        'europe',
+    ),
+    (
+        '123 Example Street\nLesotho',
+        {'filename': 'my_file.pdf'},
+        'rest-of-world',
+    ),
+))
 def test_send_uploaded_letter_sends_letter_and_redirects_to_notification_page(
     mocker,
     service_one,
     client_request,
     fake_uuid,
+    address,
+    post_data,
+    expected_postage,
 ):
-    metadata = LetterMetadata({'filename': 'my_file.pdf', 'page_count': '1', 'status': 'valid', 'recipient': 'address'})
+    metadata = LetterMetadata({
+        'filename': 'my_file.pdf',
+        'page_count': '1',
+        'status': 'valid',
+        'recipient': address,
+    })
 
     mocker.patch('app.main.views.uploads.get_letter_pdf_and_metadata', return_value=('file', metadata))
     mock_send = mocker.patch('app.main.views.uploads.notification_api_client.send_precompiled_letter')
@@ -784,7 +877,7 @@ def test_send_uploaded_letter_sends_letter_and_redirects_to_notification_page(
         'main.send_uploaded_letter',
         service_id=SERVICE_ONE_ID,
         file_id=fake_uuid,
-        _data={'filename': 'my_file.pdf', 'postage': 'first'},
+        _data=post_data,
         _expected_redirect=url_for(
             'main.view_notification',
             service_id=SERVICE_ONE_ID,
@@ -792,7 +885,13 @@ def test_send_uploaded_letter_sends_letter_and_redirects_to_notification_page(
             _external=True
         )
     )
-    mock_send.assert_called_once_with(SERVICE_ONE_ID, 'my_file.pdf', fake_uuid, 'first', 'address')
+    mock_send.assert_called_once_with(
+        SERVICE_ONE_ID,
+        'my_file.pdf',
+        fake_uuid,
+        expected_postage,
+        address,
+    )
 
 
 @pytest.mark.parametrize('permissions', [

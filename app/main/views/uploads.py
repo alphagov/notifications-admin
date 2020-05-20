@@ -19,6 +19,7 @@ from flask import (
 )
 from notifications_utils.columns import Columns
 from notifications_utils.pdf import pdf_page_count
+from notifications_utils.postal_address import PostalAddress
 from notifications_utils.recipients import RecipientCSV
 from notifications_utils.sanitise_text import SanitiseASCII
 from PyPDF2.utils import PdfReadError
@@ -279,7 +280,7 @@ def uploaded_letter_preview(service_id, file_id):
     status = metadata.get('status')
     error_shortcode = metadata.get('message')
     invalid_pages = metadata.get('invalid_pages')
-    recipient = format_recipient(metadata.get('recipient', ''))
+    postal_address = PostalAddress(metadata.get('recipient', ''))
 
     if invalid_pages:
         invalid_pages = json.loads(invalid_pages)
@@ -291,7 +292,9 @@ def uploaded_letter_preview(service_id, file_id):
     # a non null value of postage for letter templates
     template_dict['postage'] = None
 
-    form = LetterUploadPostageForm()
+    form = LetterUploadPostageForm(
+        postage_zone=postal_address.postage
+    )
 
     template = get_template(
         template_dict,
@@ -313,7 +316,8 @@ def uploaded_letter_preview(service_id, file_id):
         message=error_message,
         error_code=error_shortcode,
         form=form,
-        recipient=recipient,
+        recipient=format_recipient(postal_address.raw_address),
+        international=postal_address.international,
         re_upload_form=re_upload_form
     )
 
@@ -349,9 +353,11 @@ def send_uploaded_letter(service_id, file_id=None):
     if metadata.get('status') != 'valid':
         abort(403)
 
-    recipient_address = metadata.get('recipient')
+    postal_address = PostalAddress(metadata.get('recipient'))
 
-    form = LetterUploadPostageForm()
+    form = LetterUploadPostageForm(
+        postage_zone=postal_address.postage
+    )
 
     if not form.validate_on_submit():
         return uploaded_letter_preview(service_id, file_id)
@@ -361,7 +367,7 @@ def send_uploaded_letter(service_id, file_id=None):
         metadata.get('filename'),
         file_id,
         form.postage.data,
-        recipient_address,
+        postal_address.raw_address,
     )
 
     return redirect(url_for(
