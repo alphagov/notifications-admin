@@ -83,7 +83,7 @@ def test_robots(client):
     'features_letters', 'how_to_pay', 'get_started',
     'guidance_index', 'branding_and_customisation',
     'create_and_send_messages', 'edit_and_format_messages',
-    'send_files_by_email', 'upload_a_letter', 'who_its_for',
+    'send_files_by_email', 'upload_a_letter', 'who_can_use_notify',
 ])
 def test_static_pages(
     client_request,
@@ -147,6 +147,7 @@ def test_guidance_pages_link_to_service_pages_when_signed_in(
     ('old_using_notify', 'using_notify'),
     ('delivery_and_failure', 'message_status'),
     ('callbacks', 'documentation'),
+    ('who_its_for', 'who_can_use_notify'),
 ])
 def test_old_static_pages_redirect(
     client,

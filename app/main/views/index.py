@@ -323,9 +323,14 @@ def get_started():
 
 @main.route('/using-notify/who-its-for')
 def who_its_for():
+    return redirect(url_for('.who_can_use_notify'), 301)
+
+
+@main.route('/using-notify/who-can-use-notify')
+def who_can_use_notify():
     return render_template(
-        'views/guidance/who-its-for.html',
-        navigation_links=using_notify_nav(),
+        'views/guidance/who-can-use-notify.html',
+        navigation_links=features_nav(),
     )
 
 

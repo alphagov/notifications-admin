@@ -350,6 +350,7 @@ class HeaderNavigation(Navigation):
         'no_cookie.view_template_version_preview',
         'view_template_versions',
         'whitelist',
+        'who_can_use_notify',
         'who_its_for',
     }
 
@@ -668,6 +669,7 @@ class MainNavigation(Navigation):
         'view_provider',
         'view_providers',
         'no_cookie.view_template_version_preview',
+        'who_can_use_notify',
         'who_its_for',
     }
 
@@ -977,6 +979,7 @@ class CaseworkNavigation(Navigation):
         'no_cookie.view_template_version_preview',
         'view_template_versions',
         'whitelist',
+        'who_can_use_notify',
         'who_its_for',
     }
 
@@ -1287,5 +1290,6 @@ class OrgNavigation(Navigation):
         'no_cookie.view_template_version_preview',
         'view_template_versions',
         'whitelist',
+        'who_can_use_notify',
         'who_its_for',
     }

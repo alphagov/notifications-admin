@@ -23,6 +23,10 @@ def features_nav():
             "link": "main.roadmap",
         },
         {
+            "name": "Who can use Notify",
+            "link": "main.who_can_use_notify",
+        },
+        {
             "name": "Security",
             "link": "main.security",
         },
@@ -51,10 +55,6 @@ def using_notify_nav():
         {
             "name": "Get started",
             "link": "main.get_started",
-        },
-        {
-            "name": "Who it’s for",
-            "link": "main.who_its_for",
         },
         {
             "name": "Trial mode",

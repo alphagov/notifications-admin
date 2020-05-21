@@ -2,13 +2,13 @@
 {% from "components/page-header.html" import page_header %}
 
 {% block per_page_title %}
-  Who it’s for
+  Who can use Notify
 {% endblock %}
 
 {% block content_column_content %}
 
   {{ page_header(
-    'Who it’s for'
+    'Who can use Notify'
   ) }}
 
   <p class="govuk-body">
@@ -23,9 +23,6 @@
     <li>state-funded schools</li>
   </ul>
   <p class="govuk-body">
-    Notify is not currently available to charities.
-  </p>
-  <p class="govuk-body">
     If you work for one of these organisations but get an error when you try to create an account, <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">contact support</a>.
   </p>
 
@@ -35,6 +32,11 @@
   </p>
   <p class="govuk-body">
     Someone from the public sector organisation you’re working with needs to set up the account. Then they can invite you as a team member.
+  </p>
+
+  <h2 class="govuk-heading-m">Charities</h2>
+  <p class="govuk-body">
+    Notify is not currently available to charities.
   </p>
 
   <h2 class="govuk-heading-m">Members of the public</h2>
