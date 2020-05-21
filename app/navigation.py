@@ -351,6 +351,7 @@ class HeaderNavigation(Navigation):
         'view_template_versions',
         'whitelist',
         'who_can_use_notify',
+        'who_its_for',
     }
 
     # header HTML now comes from GOVUK Frontend so requires a boolean, not an attribute
@@ -669,6 +670,7 @@ class MainNavigation(Navigation):
         'view_providers',
         'no_cookie.view_template_version_preview',
         'who_can_use_notify',
+        'who_its_for',
     }
 
 
@@ -978,6 +980,7 @@ class CaseworkNavigation(Navigation):
         'view_template_versions',
         'whitelist',
         'who_can_use_notify',
+        'who_its_for',
     }
 
 
@@ -1288,4 +1291,5 @@ class OrgNavigation(Navigation):
         'view_template_versions',
         'whitelist',
         'who_can_use_notify',
+        'who_its_for',
     }

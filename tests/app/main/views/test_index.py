@@ -147,6 +147,7 @@ def test_guidance_pages_link_to_service_pages_when_signed_in(
     ('old_using_notify', 'using_notify'),
     ('delivery_and_failure', 'message_status'),
     ('callbacks', 'documentation'),
+    ('who_its_for', 'who_can_use_notify'),
 ])
 def test_old_static_pages_redirect(
     client,
