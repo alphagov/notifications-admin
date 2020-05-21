@@ -790,6 +790,65 @@ def test_send_uploaded_letter_sends_letter_and_redirects_to_notification_page(mo
     mock_send.assert_called_once_with(SERVICE_ONE_ID, 'my_file.pdf', file_id, 'first', 'address')
 
 
+@pytest.mark.parametrize('form_data', (
+    {'filename': 'my_file.pdf', 'postage': 'first'},
+    {'filename': 'my_file.pdf', 'postage': 'first', 'file_id': 'Ignored in favour of URL'},
+))
+def test_send_uploaded_letter_accepts_file_id_in_url(
+    mocker,
+    service_one,
+    client_request,
+    fake_uuid,
+    form_data,
+):
+    metadata = LetterMetadata({'filename': 'my_file.pdf', 'page_count': '1', 'status': 'valid', 'recipient': 'address'})
+
+    mocker.patch('app.main.views.uploads.get_letter_pdf_and_metadata', return_value=('file', metadata))
+    mock_send = mocker.patch('app.main.views.uploads.notification_api_client.send_precompiled_letter')
+    mocker.patch('app.main.views.uploads.get_letter_metadata', return_value=metadata)
+
+    service_one['permissions'] = ['letter', 'upload_letters']
+
+    client_request.post(
+        'main.send_uploaded_letter',
+        service_id=SERVICE_ONE_ID,
+        file_id=fake_uuid,
+        _data=form_data,
+        _expected_redirect=url_for(
+            'main.view_notification',
+            service_id=SERVICE_ONE_ID,
+            notification_id=fake_uuid,
+            _external=True
+        )
+    )
+    mock_send.assert_called_once_with(SERVICE_ONE_ID, 'my_file.pdf', fake_uuid, 'first', 'address')
+
+
+def test_send_uploaded_letter_needs_file_id_in_form_if_not_in_url(
+    mocker,
+    service_one,
+    client_request,
+    mock_template_preview,
+    fake_uuid,
+):
+    metadata = LetterMetadata({'filename': 'my_file.pdf', 'page_count': '1', 'status': 'valid', 'recipient': 'address'})
+
+    mock_send = mocker.patch('app.main.views.uploads.notification_api_client.send_precompiled_letter')
+    mocker.patch('app.main.views.uploads.get_letter_metadata', return_value=metadata)
+    mocker.patch('app.main.views.uploads.service_api_client.get_precompiled_template')
+
+    service_one['permissions'] = ['letter', 'upload_letters']
+
+    client_request.post(
+        'main.send_uploaded_letter',
+        service_id=SERVICE_ONE_ID,
+        _data={'filename': 'my_file.pdf', 'postage': 'first'},
+        _expected_status=200,
+        _expected_redirect=None,
+    )
+    assert mock_send.called is False
+
+
 @pytest.mark.parametrize('permissions', [
     ['email'],
     ['letter'],
