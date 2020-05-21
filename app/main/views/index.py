@@ -330,7 +330,7 @@ def who_its_for():
 def who_can_use_notify():
     return render_template(
         'views/guidance/who-can-use-notify.html',
-        navigation_links=using_notify_nav(),
+        navigation_links=features_nav(),
     )
 
 
