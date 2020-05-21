@@ -371,7 +371,7 @@ def test_post_upload_letter_redirects_for_valid_file(
     assert page.find('h1').text == 'tests/test_pdf_files/one_page_pdf.pdf'
     assert not page.find(id='validation-error-message')
 
-    assert page.find('input', {'type': 'hidden', 'name': 'file_id', 'value': fake_uuid})
+    assert not page.find('input', {'name': 'file_id'})
     assert normalize_spaces(page.select('main button[type=submit]')[0].text) == 'Send 1 letter'
 
 
