@@ -302,7 +302,11 @@ def archive_service(service_id):
     ):
         abort(403)
     if request.method == 'POST':
-        service_api_client.archive_service(service_id, current_service.active_users)
+        # We need to purge the cache for the services users as otherwise, although they will have had their permissions
+        # removed in the DB, they would still have permissions in the cache to view/edit/manage this service
+        cached_service_user_ids = [user.id for user in current_service.active_users]
+
+        service_api_client.archive_service(service_id, cached_service_user_ids)
         flash(
             '‘{}’ was deleted'.format(current_service.name),
             'default_with_tick',
