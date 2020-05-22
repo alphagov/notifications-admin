@@ -104,7 +104,9 @@ Install dependencies and build the frontend assets:
 pyenv global 3.6.3 2.7.15
 ```
 
-### 6. Create a local `environment.sh` file containing the following:
+### 6. Create a local `environment.sh` file
+
+In the root directory of the application, run:
 
 ```
 echo "
