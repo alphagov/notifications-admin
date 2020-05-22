@@ -9,6 +9,7 @@ from flask_wtf import FlaskForm as Form
 from flask_wtf.file import FileAllowed
 from flask_wtf.file import FileField as FileField_wtf
 from notifications_utils.columns import Columns
+from notifications_utils.countries.data import Postage
 from notifications_utils.formatters import strip_whitespace
 from notifications_utils.postal_address import PostalAddress
 from notifications_utils.recipients import (
@@ -850,6 +851,19 @@ class LetterTemplatePostageForm(StripWhitespaceForm):
 
 
 class LetterUploadPostageForm(StripWhitespaceForm):
+
+    def __init__(self, *args, postage_zone, **kwargs):
+
+        super().__init__(*args, **kwargs)
+
+        if postage_zone != Postage.UK:
+            self.postage.choices = [(postage_zone, '')]
+            self.postage.data = postage_zone
+
+    @property
+    def show_postage(self):
+        return len(self.postage.choices) > 1
+
     postage = RadioField(
         'Choose the postage for this letter',
         choices=[
@@ -857,9 +871,6 @@ class LetterUploadPostageForm(StripWhitespaceForm):
             ('second', 'Second class post'),
         ],
         default='second',
-        validators=[DataRequired()]
-    )
-    file_id = HiddenField(
         validators=[DataRequired()]
     )
 

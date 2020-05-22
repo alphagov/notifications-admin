@@ -19,6 +19,7 @@ from flask import (
 )
 from notifications_utils.columns import Columns
 from notifications_utils.pdf import pdf_page_count
+from notifications_utils.postal_address import PostalAddress
 from notifications_utils.recipients import RecipientCSV
 from notifications_utils.sanitise_text import SanitiseASCII
 from PyPDF2.utils import PdfReadError
@@ -251,23 +252,6 @@ def _get_error_from_upload_form(form_errors):
     return error
 
 
-def format_recipient(address):
-    '''
-    To format the recipient we need to:
-        - remove new line characters
-        - remove whitespace around the lines
-        - join the address lines, separated by a comma
-    '''
-    if not address:
-        return address
-    stripped_address_lines_no_trailing_commas = [
-        line.lstrip().rstrip(' ,')
-        for line in address.splitlines() if line
-    ]
-    one_line_address = ', '.join(stripped_address_lines_no_trailing_commas)
-    return one_line_address
-
-
 @main.route("/services/<uuid:service_id>/preview-letter/<uuid:file_id>")
 @user_has_permissions('send_messages')
 def uploaded_letter_preview(service_id, file_id):
@@ -279,7 +263,7 @@ def uploaded_letter_preview(service_id, file_id):
     status = metadata.get('status')
     error_shortcode = metadata.get('message')
     invalid_pages = metadata.get('invalid_pages')
-    recipient = format_recipient(metadata.get('recipient', ''))
+    postal_address = PostalAddress(metadata.get('recipient', ''))
 
     if invalid_pages:
         invalid_pages = json.loads(invalid_pages)
@@ -291,7 +275,9 @@ def uploaded_letter_preview(service_id, file_id):
     # a non null value of postage for letter templates
     template_dict['postage'] = None
 
-    form = LetterUploadPostageForm()
+    form = LetterUploadPostageForm(
+        postage_zone=postal_address.postage
+    )
 
     template = get_template(
         template_dict,
@@ -313,7 +299,7 @@ def uploaded_letter_preview(service_id, file_id):
         message=error_message,
         error_code=error_shortcode,
         form=form,
-        recipient=recipient,
+        postal_address=postal_address,
         re_upload_form=re_upload_form
     )
 
@@ -338,28 +324,33 @@ def view_letter_upload_as_preview(service_id, file_id):
         return TemplatePreview.from_valid_pdf_file(pdf_file, page)
 
 
-@main.route("/services/<uuid:service_id>/upload-letter/send", methods=['POST'])
 @main.route("/services/<uuid:service_id>/upload-letter/send/<uuid:file_id>", methods=['POST'])
 @user_has_permissions('send_messages', restrict_admin_usage=True)
-def send_uploaded_letter(service_id, file_id=None):
+def send_uploaded_letter(service_id, file_id):
     if not (current_service.has_permission('letter') and current_service.has_permission('upload_letters')):
         abort(403)
 
-    form = LetterUploadPostageForm(file_id=file_id)
-    file_id = file_id or form.file_id.data
-
-    if not form.validate_on_submit():
-        return uploaded_letter_preview(service_id, file_id)
-
-    postage = form.postage.data
     metadata = get_letter_metadata(service_id, file_id)
-    filename = metadata.get('filename')
-    recipient_address = metadata.get('recipient')
 
     if metadata.get('status') != 'valid':
         abort(403)
 
-    notification_api_client.send_precompiled_letter(service_id, filename, file_id, postage, recipient_address)
+    postal_address = PostalAddress(metadata.get('recipient'))
+
+    form = LetterUploadPostageForm(
+        postage_zone=postal_address.postage
+    )
+
+    if not form.validate_on_submit():
+        return uploaded_letter_preview(service_id, file_id)
+
+    notification_api_client.send_precompiled_letter(
+        service_id,
+        metadata.get('filename'),
+        file_id,
+        form.postage.data,
+        postal_address.raw_address,
+    )
 
     return redirect(url_for(
         '.view_notification',
