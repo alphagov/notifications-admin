@@ -644,6 +644,9 @@ def test_should_not_allow_duplicate_names(
 def test_should_show_service_name_confirmation(
     client_request,
 ):
+    service_new_name = 'New Name'
+    with client_request.session_transaction() as session:
+        session['service_name_change'] = service_new_name
     page = client_request.get(
         'main.service_name_change_confirm',
         service_id=SERVICE_ONE_ID,
@@ -701,6 +704,20 @@ def test_should_raise_duplicate_name_handled(
 
     assert mock_update_service_raise_httperror_duplicate_name.called
     assert mock_verify_password.called
+
+
+def test_service_name_change_confirm_handles_expired_session(
+    client_request, mock_verify_password, mock_update_service
+):
+    page = client_request.post(
+        'main.service_name_change_confirm',
+        service_id=SERVICE_ONE_ID,
+        _follow_redirects=True
+    )
+    mock_verify_password.assert_not_called()
+    mock_update_service.assert_not_called()
+
+    assert page.find('div', 'banner-dangerous').text.strip() == "Session expired. Try again"
 
 
 @pytest.mark.parametrize('volumes, consent_to_research, expected_estimated_volumes_item', [
@@ -1881,7 +1898,9 @@ def test_route_permissions(
         url_for(route, service_id=service_one['id']),
         ['manage_service'],
         api_user_active,
-        service_one)
+        service_one,
+        session={'service_name_change': "New Service Name"}
+    )
 
 
 @pytest.mark.parametrize('route', [
@@ -1936,14 +1955,17 @@ def test_route_for_platform_admin(
         mock_get_service_templates,
         mock_get_invites_for_service,
 ):
-    validate_route_permission(mocker,
-                              app_,
-                              "GET",
-                              200,
-                              url_for(route, service_id=service_one['id']),
-                              [],
-                              platform_admin_user,
-                              service_one)
+    validate_route_permission(
+        mocker,
+        app_,
+        "GET",
+        200,
+        url_for(route, service_id=service_one['id']),
+        [],
+        platform_admin_user,
+        service_one,
+        session={'service_name_change': "New Service Name"}
+    )
 
 
 def test_and_more_hint_appears_on_settings_with_more_than_just_a_single_sender(

@@ -112,6 +112,10 @@ def service_name_change(service_id):
 @main.route("/services/<uuid:service_id>/service-settings/name/confirm", methods=['GET', 'POST'])
 @user_has_permissions('manage_service')
 def service_name_change_confirm(service_id):
+    if 'service_name_change' not in session:
+        flash("Session expired. Try again", 'error')
+        return redirect(url_for('main.service_name_change', service_id=service_id))
+
     # Validate password for form
     def _check_password(pwd):
         return user_api_client.verify_password(current_user.id, pwd)
