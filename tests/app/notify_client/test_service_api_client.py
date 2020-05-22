@@ -389,7 +389,7 @@ def test_returns_value_from_cache(
 @pytest.mark.parametrize('client, method, extra_args, extra_kwargs', [
     (service_api_client, 'update_service', [SERVICE_ONE_ID], {'name': 'foo'}),
     (service_api_client, 'update_service_with_properties', [SERVICE_ONE_ID], {'properties': {}}),
-    (service_api_client, 'archive_service', [SERVICE_ONE_ID], {}),
+    (service_api_client, 'archive_service', [SERVICE_ONE_ID, []], {}),
     (service_api_client, 'suspend_service', [SERVICE_ONE_ID], {}),
     (service_api_client, 'resume_service', [SERVICE_ONE_ID], {}),
     (service_api_client, 'remove_user_from_service', [SERVICE_ONE_ID, ''], {}),
@@ -457,6 +457,10 @@ def test_deletes_service_cache(
         'template-{}-versions'.format(FAKE_TEMPLATE_ID),
         'template-{}-version-None'.format(FAKE_TEMPLATE_ID),
         'service-{}-templates'.format(SERVICE_ONE_ID),
+    ]),
+    ('archive_service', [SERVICE_ONE_ID, []], [
+        'service-{}-templates'.format(SERVICE_ONE_ID),
+        'service-{}'.format(SERVICE_ONE_ID),
     ]),
 ])
 def test_deletes_caches_when_modifying_templates(

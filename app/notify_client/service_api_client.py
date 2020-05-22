@@ -129,7 +129,12 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         return self.update_service(service_id, **properties)
 
     @cache.delete('service-{service_id}')
-    def archive_service(self, service_id):
+    @cache.delete('service-{service_id}-templates')
+    def archive_service(self, service_id, service_users):
+        # We need to purge the cache for the services users as otherwise, although they will have had their permissions
+        # removed in the DB, they would still have permissions in the cache to view/edit/manage this service
+        for user in service_users:
+            cache.delete(f'user-{user.id}')
         return self.post('/service/{}/archive'.format(service_id), data=None)
 
     @cache.delete('service-{service_id}')

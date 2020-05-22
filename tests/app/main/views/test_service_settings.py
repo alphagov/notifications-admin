@@ -3807,9 +3807,11 @@ def test_archive_service_after_confirm(
     mock_get_organisations,
     mock_get_service_and_organisation_counts,
     mock_get_organisations_and_services_for_user,
+    mock_get_users_by_service,
     user,
 ):
     mocked_fn = mocker.patch('app.service_api_client.post')
+    cache_delete_mock = mocker.patch('app.notify_client.service_api_client.cache.delete')
     client_request.login(user)
     page = client_request.post(
         'main.archive_service',
@@ -3822,6 +3824,8 @@ def test_archive_service_after_confirm(
     assert normalize_spaces(page.select_one('.banner-default-with-tick').text) == (
         '‘service one’ was deleted'
     )
+    # The one user which is part of this service has the sample_uuid as it's user ID
+    cache_delete_mock.assert_called_once_with(f"user-{sample_uuid()}")
 
 
 @pytest.mark.parametrize('user', (
