@@ -1,6 +1,6 @@
 # notifications-admin
 
-GOV.UK Notify admin application.
+GOV.UK Notify admin application - https://www.notifications.service.gov.uk/
 
 ## Features of this application
 
@@ -11,50 +11,102 @@ GOV.UK Notify admin application.
 
 ## First-time setup
 
-Brew is a package manager for OSX. The following command installs brew:
+### 1. Install Homebrew
+
+Install [Homebrew](https://brew.sh), a package manager for OSX:
+
 ```shell
-    /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
 ```
+
+### 2. Make sure you're using correct language versions
 
 Languages needed
-- Python 3.4
+- Python 3.6.x
 - [Node](https://nodejs.org/) 10.15.3 or greater
 - [npm](https://www.npmjs.com/) 6.4.1 or greater
+
+Need to install node? Run:
+
 ```shell
-    brew install node
+brew install node
 ```
 
+#### 2.1. `pyenv` For Python version management
+
+[pyenv](https://github.com/pyenv/pyenv) is a program to manage and swap between different versions of Python. To install:
+
+```shell
+brew install pyenv
+```
+
+And then follow the further installation instructions in https://github.com/pyenv/pyenv#installation to configure it.
+
+#### 2.2. `n` For Node version management
 
 [NPM](npmjs.org) is Node's package management tool. `n` is a tool for managing
 different versions of Node. The following installs `n` and uses the long term support (LTS)
 version of Node.
+
 ```shell
-    npm install -g n
-    n lts
-    npm rebuild node-sass
+npm install -g n
+n lts
 ```
 
-The app runs within a virtual environment. We use mkvirtualenv for easier working with venvs
+### 3. Install NPM dependencies
+
 ```shell
-    pip install virtualenvwrapper
-    mkvirtualenv -p /usr/local/bin/python3 notifications-admin
+npm install
+npm rebuild node-sass
 ```
+
+### 4. Install and use `virtualenvwrapper` (optional)
+
+We suggest using a virtualenv to separate the python dependencies for this project from python dependencies for other projects.
+
+Install [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/en/latest/install.html):
+
+```shell
+pip install virtualenvwrapper
+```
+
+Then follow the [virtualenvwrapper installation instructions](https://virtualenvwrapper.readthedocs.io/en/latest/install.html) docs to configure virtualenvwrapper for your terminal.
+
+Set up your virtualenv:
+
+```shell
+mkvirtualenv notifications-admin
+```
+
+If you need to specify a certain version of python you can do this using `-p`, for example:
+
+```shell
+mkvirtualenv -p ~/.pyenv/versions/3.6.3/bin/python notifications-admin
+```
+
+Activate your virtualenv:
+
+```shell
+workon notifications-admin
+```
+
+### 5. Install Python dependencies
 
 Install dependencies and build the frontend assets:
+
 ```shell
-    workon notifications-admin
-    ./scripts/bootstrap.sh
+./scripts/bootstrap.sh
 ```
 
-## Rebuilding the frontend assets
+**Note:** You may need versions of both Python 3 and Python 2 accessible to build the python dependencies. `pyenv` is great for that, and making both Python versions accessible can be done like so:
 
-If you want the front end assets to re-compile on changes, leave this running
-in a separate terminal from the app
 ```shell
-    npm run watch
+pyenv global 3.6.3 2.7.15
 ```
 
-## Create a local environment.sh file containing the following:
+### 6. Create a local `environment.sh` file
+
+In the root directory of the application, run:
 
 ```
 echo "
@@ -65,20 +117,20 @@ export WERKZEUG_DEBUG_PIN=off
 "> environment.sh
 ```
 
-## AWS credentials
+### 7. AWS credentials
 
 Your aws credentials should be stored in a folder located at `~/.aws`. Follow [Amazon's instructions](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html#cli-config-files) for storing them correctly
 
 
-## Running the application
+### 8. Running the application
+
+In the root directory of the application, run:
 
 ```shell
-    workon notifications-admin
-    ./scripts/run_app.sh
+./scripts/run_app.sh
 ```
 
 Then visit [localhost:6012](http://localhost:6012)
-
 
 ## Updating application dependencies
 
@@ -93,6 +145,15 @@ make freeze-requirements
 
 `requirements.txt` should be committed alongside `requirements-app.txt` changes.
 
+
+## Automatically rebuild the frontend assets
+
+If you want the front end assets to re-compile on changes, leave this running
+in a separate terminal from the app
+
+```shell
+    npm run watch
+```
 
 ## Working with static assets
 
