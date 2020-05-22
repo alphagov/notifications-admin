@@ -113,7 +113,7 @@ def service_name_change(service_id):
 @user_has_permissions('manage_service')
 def service_name_change_confirm(service_id):
     if 'service_name_change' not in session:
-        flash("Session expired. Try again", 'error')
+        flash("The change you made was not saved. Please try again.", 'error')
         return redirect(url_for('main.service_name_change', service_id=service_id))
 
     # Validate password for form

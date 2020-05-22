@@ -717,7 +717,7 @@ def test_service_name_change_confirm_handles_expired_session(
     mock_verify_password.assert_not_called()
     mock_update_service.assert_not_called()
 
-    assert page.find('div', 'banner-dangerous').text.strip() == "Session expired. Try again"
+    assert page.find('div', 'banner-dangerous').text.strip() == "The change you made was not saved. Please try again."
 
 
 @pytest.mark.parametrize('volumes, consent_to_research, expected_estimated_volumes_item', [
