@@ -7,6 +7,7 @@ from functools import partial
 from io import BytesIO
 from zipfile import BadZipFile
 
+from botocore.exceptions import ClientError
 from flask import (
     abort,
     current_app,
@@ -257,7 +258,20 @@ def _get_error_from_upload_form(form_errors):
 def uploaded_letter_preview(service_id, file_id):
     re_upload_form = PDFUploadForm()
 
-    metadata = get_letter_metadata(service_id, file_id)
+    try:
+        metadata = get_letter_metadata(service_id, file_id)
+    except ClientError as e:
+        # if the file's not there, it's probably because we've already created the notification and the letter has been
+        # moved to the normal letters-pdf bucket. So lets just bounce out to the notification page
+        if e.response['Error']['Code'] == 'NoSuchKey':
+            return redirect(url_for(
+                '.view_notification',
+                service_id=service_id,
+                notification_id=file_id,
+            ))
+        else:
+            raise
+
     original_filename = metadata.get('filename')
     page_count = metadata.get('page_count')
     status = metadata.get('status')

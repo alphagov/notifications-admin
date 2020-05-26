@@ -1,6 +1,7 @@
 from unittest.mock import ANY, Mock
 
 import pytest
+from botocore.exceptions import ClientError
 from flask import make_response, url_for
 from requests import RequestException
 
@@ -439,6 +440,30 @@ def test_uploaded_letter_preview_does_not_show_send_button_if_service_in_trial_m
     )
     assert not page.find('form')
     assert len(page.select('main button[type=submit]')) == 0
+
+
+def test_uploaded_letter_preview_redirects_if_file_not_in_s3(
+    mocker,
+    client_request,
+    fake_uuid
+):
+    boto_error_json = {'Error': {'Code': 'NoSuchKey', 'Message': 'The specified key does not exist.'}}
+    mocker.patch(
+        'app.main.views.uploads.get_letter_metadata',
+        side_effect=ClientError(boto_error_json, 'operation_name')
+    )
+    client_request.get(
+        'main.uploaded_letter_preview',
+        service_id=SERVICE_ONE_ID,
+        file_id=fake_uuid,
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.view_notification',
+            service_id=SERVICE_ONE_ID,
+            notification_id=fake_uuid,
+            _external=True
+        )
+    )
 
 
 @pytest.mark.parametrize('invalid_pages, page_requested, overlay_expected', (
