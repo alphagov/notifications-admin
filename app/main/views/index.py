@@ -36,17 +36,6 @@ def index():
     )
 
 
-@main.route('/robots.txt')
-def robots():
-    return (
-        'User-agent: *\n'
-        'Disallow: /sign-in\n'
-        'Disallow: /support\n'
-        'Disallow: /support/\n'
-        'Disallow: /register\n'
-    ), 200, {'Content-Type': 'text/plain'}
-
-
 @main.route('/error/<int:status_code>')
 def error(status_code):
     if status_code >= 500:
