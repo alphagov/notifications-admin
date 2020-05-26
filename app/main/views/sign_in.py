@@ -14,9 +14,11 @@ from app import login_manager
 from app.main import main
 from app.main.forms import LoginForm
 from app.models.user import InvitedUser, User
+from app.utils import hide_from_search_engines
 
 
 @main.route('/sign-in', methods=(['GET', 'POST']))
+@hide_from_search_engines
 def sign_in():
     if current_user and current_user.is_authenticated:
         return redirect(url_for('main.show_accounts_or_dashboard'))

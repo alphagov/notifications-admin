@@ -17,6 +17,9 @@
   <style>
       .govuk-header__container { border-color: {{header_colour}} }
   </style>
+  {% if g.hide_from_search_engines %}
+    <meta name="robots" content="noindex" />
+  {% endif %}
   <meta name="google-site-verification" content="niWnSqImOWz6mVQTYqNb5tFK8HaKSB4b3ED4Z9gtUQ0" />
   {% block meta_format_detection %}
     <meta name="format-detection" content="telephone=no">

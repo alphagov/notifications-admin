@@ -19,11 +19,13 @@ from app.models.feedback import (
     PROBLEM_TICKET_TYPE,
     QUESTION_TICKET_TYPE,
 )
+from app.utils import hide_from_search_engines
 
 bank_holidays = BankHolidays(use_cached_holidays=True)
 
 
 @main.route('/support', methods=['GET', 'POST'])
+@hide_from_search_engines
 def support():
 
     if current_user.is_authenticated:
@@ -50,12 +52,14 @@ def support():
 
 
 @main.route('/support/public')
+@hide_from_search_engines
 def support_public():
     return render_template('views/support/public.html')
 
 
 @main.route('/support/triage', methods=['GET', 'POST'])
 @main.route('/support/triage/<ticket_type:ticket_type>', methods=['GET', 'POST'])
+@hide_from_search_engines
 def triage(ticket_type=PROBLEM_TICKET_TYPE):
     form = Triage()
     if form.validate_on_submit():
@@ -75,6 +79,7 @@ def triage(ticket_type=PROBLEM_TICKET_TYPE):
 
 
 @main.route('/support/<ticket_type:ticket_type>', methods=['GET', 'POST'])
+@hide_from_search_engines
 def feedback(ticket_type):
     form = FeedbackOrProblem()
 
@@ -153,6 +158,7 @@ def feedback(ticket_type):
 
 
 @main.route('/support/escalate', methods=['GET', 'POST'])
+@hide_from_search_engines
 def bat_phone():
 
     if current_user.is_authenticated:
@@ -162,6 +168,7 @@ def bat_phone():
 
 
 @main.route('/support/thanks', methods=['GET', 'POST'])
+@hide_from_search_engines
 def thanks():
     return render_template(
         'views/support/thanks.html',

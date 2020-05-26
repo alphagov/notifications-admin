@@ -3,6 +3,7 @@ from functools import partial
 import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
+from freezegun import freeze_time
 
 from app.main.forms import FieldWithNoneOption
 from tests.conftest import SERVICE_ONE_ID, normalize_spaces, sample_uuid
@@ -74,6 +75,26 @@ def test_robots(client):
         'Disallow: /support/\n'
         'Disallow: /register\n'
     )
+
+
+@pytest.mark.parametrize('endpoint, kwargs', (
+    ('sign_in', {}),
+    ('support', {}),
+    ('support_public', {}),
+    ('triage', {}),
+    ('feedback', {'ticket_type': 'ask-question-give-feedback'}),
+    ('feedback', {'ticket_type': 'general'}),
+    ('feedback', {'ticket_type': 'report-problem'}),
+    ('bat_phone', {}),
+    ('thanks', {}),
+    ('register', {}),
+    pytest.param('index', {}, marks=pytest.mark.xfail(raises=AssertionError)),
+))
+@freeze_time('2012-12-12 12:12')  # So we don’t go out of business hours
+def test_hiding_pages_from_search_engines(client_request, endpoint, kwargs):
+    client_request.logout()
+    page = client_request.get(f'main.{endpoint}', **kwargs)
+    assert page.select_one('meta[name=robots]')['content'] == 'noindex'
 
 
 @pytest.mark.parametrize('view', [
