@@ -88,6 +88,7 @@ def test_robots(client):
     ('bat_phone', {}),
     ('thanks', {}),
     ('register', {}),
+    ('features_email', {}),
     pytest.param('index', {}, marks=pytest.mark.xfail(raises=AssertionError)),
 ))
 @freeze_time('2012-12-12 12:12')  # So we don’t go out of business hours

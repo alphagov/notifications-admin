@@ -21,7 +21,7 @@ from app.main.views.sub_navigation_dictionaries import (
     using_notify_nav,
 )
 from app.models.feedback import QUESTION_TICKET_TYPE
-from app.utils import get_logo_cdn_domain
+from app.utils import get_logo_cdn_domain, hide_from_search_engines
 
 
 @main.route('/')
@@ -253,6 +253,7 @@ def roadmap():
 
 
 @main.route('/features/email')
+@hide_from_search_engines
 def features_email():
     return render_template(
         'views/features/emails.html',
