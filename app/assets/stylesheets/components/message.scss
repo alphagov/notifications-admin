@@ -24,13 +24,13 @@
   }
 }
 
-$message-text-left-spacing: 22px;
+$govuk-checkboxes-size: 40px;
+$govuk-checkboxes-label-padding-left-right: govuk-spacing(3);
 $message-type-bottom-spacing: govuk-spacing(4);
 
 .message {
 
   &-name {
-    @include bold-24;
     margin: 0;
 
     a {
@@ -78,6 +78,10 @@ $message-type-bottom-spacing: govuk-spacing(4);
 
   &-item {
 
+    &-with-checkbox {
+      padding-left: $govuk-checkboxes-size + $govuk-checkboxes-label-padding-left-right;
+    }
+
     &-hidden-by-default {
       display: none;
     }
@@ -105,14 +109,12 @@ $message-type-bottom-spacing: govuk-spacing(4);
 
     }
 
-    &-hint,
     &-label {
-      padding-left: $message-text-left-spacing;
-    }
-
-    &-label {
-      padding-top: 0px;
-      padding-bottom: 0px;
+      position: absolute;
+      left: 0;
+      width: $govuk-checkboxes-size + $govuk-checkboxes-label-padding-left-right;
+      height: 100%;
+      padding: 0;
     }
 
     // Fix for GOVUK Frontend selector with high precendence
@@ -121,6 +123,15 @@ $message-type-bottom-spacing: govuk-spacing(4);
       margin-bottom: $message-type-bottom-spacing;
     }
 
+    &-hint {
+      padding-left: 0;
+    }
+
+  }
+
+  &-folder,
+  &-template {
+    @include govuk-font($size: 24, $weight: bold, $line-height: 1.25);
   }
 
   &-folder {
