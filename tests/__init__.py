@@ -443,7 +443,8 @@ def notification_json(
     if status is None:
         status = 'delivered'
     links = {}
-    postage = postage or 'second'
+    if template_type == 'letter':
+        postage = postage or 'second'
 
     if with_links:
         links = {
