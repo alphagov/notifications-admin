@@ -25,7 +25,7 @@
 
     {% for item in template_list %}
 
-      {% set item_label_content %}
+      {% set item_link_content %}
         {% for ancestor in item.ancestors %}
           <a href="{{ url_for('.choose_template', service_id=current_service.id, template_type=template_type, template_folder_id=ancestor.id) }}" class="govuk-link govuk-link--no-visited-state template-list-folder">
             {{- format_item_name(ancestor.name) -}}
@@ -42,26 +42,34 @@
         {% endif %}
       {% endset %}
 
+      {% set label_content %}
+        <span class="govuk-visually-hidden">{{ format_item_name(item.name) }}</span>
+      {% endset %}
+
+      {% set item_meta %}
+        <span id="{{ item.id }}-item-hint" class="govuk-hint govuk-checkboxes__hint template-list-item-hint">
+          {{ item.hint }}
+        </span>
+      {% endset %}
+
       {# create the item config now to include the label content -#}
+      {# TODO: "attributes": { "aria-describedby": item.id ~ "-hint" } needs to be added but govuk-frontend-jinja doesn't currently support this -#}
       {% set checkbox_config = {
-        "html": item_label_content,
+        "html": label_content,
         "label": {
-          "classes": "template-list-item-label govuk-!-font-size-24 govuk-!-font-weight-bold"
+          "classes": "template-list-item-label",
         },
         "id": "templates-or-folder-" ~ item.id,
-        "hint": {
-          "text": item.hint,
-         "classes": "template-list-item-hint"
-        },
-        "classes": "template-list-item {}".format(
-          "template-list-item-hidden-by-default" if item.ancestors else "template-list-item-without-ancestors")
+        "classes": "template-list-item template-list-item-with-checkbox {}".format(
+          "template-list-item-hidden-by-default" if item.ancestors else "template-list-item-without-ancestors"),
+        "after": item_link_content ~ item_meta
       } %}
       {% set _ = checkboxes_data.append(checkbox_config) %}
 
       {% if not current_user.has_permissions('manage_templates') %}
         <div class="template-list-item {%- if item.ancestors %} template-list-item-hidden-by-default {%- else %} template-list-item-without-ancestors{%- endif %}">
           <h2 class="message-name">
-            {{ item_label_content }}
+            {{ item_link_content }}
           </h2>
           <p class="message-type govuk-!-margin-bottom-4">
             {{ item.hint }}
