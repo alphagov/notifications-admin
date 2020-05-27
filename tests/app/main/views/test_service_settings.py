@@ -3811,7 +3811,7 @@ def test_archive_service_after_confirm(
     user,
 ):
     mocked_fn = mocker.patch('app.service_api_client.post')
-    cache_delete_mock = mocker.patch('app.notify_client.service_api_client.cache.delete')
+    redis_delete_mock = mocker.patch('app.notify_client.service_api_client.redis_client.delete')
     client_request.login(user)
     page = client_request.post(
         'main.archive_service',
@@ -3825,7 +3825,7 @@ def test_archive_service_after_confirm(
         '‘service one’ was deleted'
     )
     # The one user which is part of this service has the sample_uuid as it's user ID
-    cache_delete_mock.assert_called_once_with(f"user-{sample_uuid()}")
+    assert call(f"user-{sample_uuid()}") in redis_delete_mock.call_args_list
 
 
 @pytest.mark.parametrize('user', (
