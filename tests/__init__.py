@@ -537,7 +537,8 @@ def validate_route_permission(mocker,
                               route,
                               permissions,
                               usr,
-                              service):
+                              service,
+                              session=None):
     usr['permissions'][str(service['id'])] = permissions
     usr['services'] = [service['id']]
     mocker.patch(
@@ -556,6 +557,10 @@ def validate_route_permission(mocker,
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(usr)
+            if session:
+                with client.session_transaction() as session_:
+                    for k, v in session.items():
+                        session_[k] = v
             resp = None
             if method == 'GET':
                 resp = client.get(route)
