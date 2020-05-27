@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from app.extensions import redis_client
 from app.notify_client import NotifyAdminAPIClient, _attach_current_user, cache
 
 
@@ -132,7 +133,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
     @cache.delete('service-{service_id}-templates')
     def archive_service(self, service_id, cached_service_user_ids):
         if cached_service_user_ids:
-            cache.delete(*map('user-{}'.format, cached_service_user_ids))
+            redis_client.delete(*map('user-{}'.format, cached_service_user_ids))
         return self.post('/service/{}/archive'.format(service_id), data=None)
 
     @cache.delete('service-{service_id}')
