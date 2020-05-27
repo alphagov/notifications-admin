@@ -82,9 +82,16 @@ def test_robots(client_request):
     pytest.param('index', {}, marks=pytest.mark.xfail(raises=AssertionError)),
 ))
 @freeze_time('2012-12-12 12:12')  # So we don’t go out of business hours
-def test_hiding_pages_from_search_engines(client_request, endpoint, kwargs):
-    client_request.logout()
-    page = client_request.get(f'main.{endpoint}', **kwargs)
+def test_hiding_pages_from_search_engines(
+    client,
+    mock_get_service_and_organisation_counts,
+    endpoint,
+    kwargs,
+):
+    response = client.get(url_for(f'main.{endpoint}', **kwargs))
+    assert 'X-Robots-Tag' in response.headers
+    assert response.headers['X-Robots-Tag'] == 'noindex'
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert page.select_one('meta[name=robots]')['content'] == 'noindex'
 
 
