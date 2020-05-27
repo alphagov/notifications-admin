@@ -16,7 +16,16 @@ import pyexcel
 import pyexcel_xlsx
 import pytz
 from dateutil import parser
-from flask import abort, current_app, redirect, request, session, url_for
+from flask import (
+    abort,
+    current_app,
+    g,
+    make_response,
+    redirect,
+    request,
+    session,
+    url_for,
+)
 from flask_login import current_user, login_required
 from notifications_utils.field import Field
 from notifications_utils.formatters import (
@@ -767,3 +776,13 @@ def is_less_than_90_days_ago(date_from_db):
     return (datetime.utcnow() - datetime.strptime(
         date_from_db, "%Y-%m-%dT%H:%M:%S.%fZ"
     )).days < 90
+
+
+def hide_from_search_engines(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        g.hide_from_search_engines = True
+        response = make_response(f(*args, **kwargs))
+        response.headers['X-Robots-Tag'] = 'noindex'
+        return response
+    return decorated_function

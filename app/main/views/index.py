@@ -21,7 +21,7 @@ from app.main.views.sub_navigation_dictionaries import (
     using_notify_nav,
 )
 from app.models.feedback import QUESTION_TICKET_TYPE
-from app.utils import get_logo_cdn_domain
+from app.utils import get_logo_cdn_domain, hide_from_search_engines
 
 
 @main.route('/')
@@ -34,17 +34,6 @@ def index():
         'views/signedout.html',
         counts=status_api_client.get_count_of_live_services_and_organisations(),
     )
-
-
-@main.route('/robots.txt')
-def robots():
-    return (
-        'User-agent: *\n'
-        'Disallow: /sign-in\n'
-        'Disallow: /support\n'
-        'Disallow: /support/\n'
-        'Disallow: /register\n'
-    ), 200, {'Content-Type': 'text/plain'}
 
 
 @main.route('/error/<int:status_code>')
@@ -253,6 +242,7 @@ def roadmap():
 
 
 @main.route('/features/email')
+@hide_from_search_engines
 def features_email():
     return render_template(
         'views/features/emails.html',

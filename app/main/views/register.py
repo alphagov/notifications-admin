@@ -11,9 +11,11 @@ from app.main.forms import (
 )
 from app.main.views.verify import activate_user
 from app.models.user import InvitedOrgUser, InvitedUser, User
+from app.utils import hide_from_search_engines
 
 
 @main.route('/register', methods=['GET', 'POST'])
+@hide_from_search_engines
 def register():
     if current_user and current_user.is_authenticated:
         return redirect(url_for('main.show_accounts_or_dashboard'))

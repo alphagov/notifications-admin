@@ -3,6 +3,7 @@ from functools import partial
 import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
+from freezegun import freeze_time
 
 from app.main.forms import FieldWithNoneOption
 from tests.conftest import SERVICE_ONE_ID, normalize_spaces, sample_uuid
@@ -62,18 +63,36 @@ def test_logged_in_user_redirects_to_choose_account(
     )
 
 
-def test_robots(client):
-    assert url_for('main.robots') == '/robots.txt'
-    response = client.get(url_for('main.robots'))
-    assert response.headers['Content-Type'] == 'text/plain'
-    assert response.status_code == 200
-    assert response.get_data(as_text=True) == (
-        'User-agent: *\n'
-        'Disallow: /sign-in\n'
-        'Disallow: /support\n'
-        'Disallow: /support/\n'
-        'Disallow: /register\n'
-    )
+def test_robots(client_request):
+    client_request.get_url('/robots.txt', _expected_status=404)
+
+
+@pytest.mark.parametrize('endpoint, kwargs', (
+    ('sign_in', {}),
+    ('support', {}),
+    ('support_public', {}),
+    ('triage', {}),
+    ('feedback', {'ticket_type': 'ask-question-give-feedback'}),
+    ('feedback', {'ticket_type': 'general'}),
+    ('feedback', {'ticket_type': 'report-problem'}),
+    ('bat_phone', {}),
+    ('thanks', {}),
+    ('register', {}),
+    ('features_email', {}),
+    pytest.param('index', {}, marks=pytest.mark.xfail(raises=AssertionError)),
+))
+@freeze_time('2012-12-12 12:12')  # So we don’t go out of business hours
+def test_hiding_pages_from_search_engines(
+    client,
+    mock_get_service_and_organisation_counts,
+    endpoint,
+    kwargs,
+):
+    response = client.get(url_for(f'main.{endpoint}', **kwargs))
+    assert 'X-Robots-Tag' in response.headers
+    assert response.headers['X-Robots-Tag'] == 'noindex'
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert page.select_one('meta[name=robots]')['content'] == 'noindex'
 
 
 @pytest.mark.parametrize('view', [
