@@ -349,13 +349,17 @@ def test_should_show_letter_job(
 
 @freeze_time("2016-01-01 11:09:00")
 def test_should_show_letter_job_with_banner_after_sending_before_1730(
+    mocker,
     client_request,
     mock_get_service_letter_template,
     mock_get_letter_job,
-    mock_get_notifications,
     mock_get_service_data_retention,
     fake_uuid,
 ):
+    mocker.patch(
+        'app.notification_api_client.get_notifications_for_service',
+        return_value=create_notifications(template_type='letter', postage='second')
+    )
 
     page = client_request.get(
         'main.view_job',
@@ -373,13 +377,17 @@ def test_should_show_letter_job_with_banner_after_sending_before_1730(
 
 @freeze_time("2016-01-01 11:09:00")
 def test_should_show_letter_job_with_banner_when_there_are_multiple_CSV_rows(
+    mocker,
     client_request,
     mock_get_service_letter_template,
     mock_get_letter_job_in_progress,
-    mock_get_notifications,
     mock_get_service_data_retention,
     fake_uuid,
 ):
+    mocker.patch(
+        'app.notification_api_client.get_notifications_for_service',
+        return_value=create_notifications(template_type='letter', postage='second')
+    )
 
     page = client_request.get(
         'main.view_job',
@@ -396,13 +404,17 @@ def test_should_show_letter_job_with_banner_when_there_are_multiple_CSV_rows(
 
 @freeze_time("2016-01-01 18:09:00")
 def test_should_show_letter_job_with_banner_after_sending_after_1730(
+    mocker,
     client_request,
     mock_get_service_letter_template,
     mock_get_letter_job,
-    mock_get_notifications,
     mock_get_service_data_retention,
     fake_uuid,
 ):
+    mocker.patch(
+        'app.notification_api_client.get_notifications_for_service',
+        return_value=create_notifications(template_type='letter', postage='second')
+    )
 
     page = client_request.get(
         'main.view_job',

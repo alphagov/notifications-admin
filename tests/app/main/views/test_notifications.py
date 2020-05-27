@@ -530,13 +530,13 @@ def test_notification_page_does_not_show_cancel_link_for_letter_which_cannot_be_
         'europe',
         'Postage: international',
         'letter-postage-international',
-        'Estimated delivery date: Wednesday 6 January',
+        'Estimated delivery date: Friday 8 January',
     ),
     (
         'rest-of-world',
         'Postage: international',
         'letter-postage-international',
-        'Estimated delivery date: Wednesday 6 January',
+        'Estimated delivery date: Monday 11 January',
     ),
 ))
 @freeze_time("2016-01-01 18:00")

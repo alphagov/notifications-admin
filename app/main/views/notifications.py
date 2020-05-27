@@ -134,6 +134,14 @@ def view_notification(service_id, notification_id):
             status='sending,delivered,failed',
         )
 
+    if notification['notification_type'] == 'letter':
+        estimated_letter_delivery_date = get_letter_timings(
+            notification['created_at'],
+            postage=notification['postage']
+        ).earliest_delivery
+    else:
+        estimated_letter_delivery_date = None
+
     return render_template(
         'views/notifications/notification.html',
         finished=(notification['status'] in (DELIVERED_STATUSES + FAILURE_STATUSES)),
@@ -154,10 +162,7 @@ def view_notification(service_id, notification_id):
         created_at=notification['created_at'],
         updated_at=notification['updated_at'],
         help=get_help_argument(),
-        estimated_letter_delivery_date=get_letter_timings(
-            notification['created_at'],
-            postage=notification['postage']
-        ).earliest_delivery,
+        estimated_letter_delivery_date=estimated_letter_delivery_date,
         notification_id=notification['id'],
         postage=notification['postage'],
         can_receive_inbound=(current_service.has_permission('inbound_sms')),
