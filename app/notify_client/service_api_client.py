@@ -129,7 +129,10 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         return self.update_service(service_id, **properties)
 
     @cache.delete('service-{service_id}')
-    def archive_service(self, service_id):
+    @cache.delete('service-{service_id}-templates')
+    def archive_service(self, service_id, cached_service_user_ids):
+        if cached_service_user_ids:
+            cache.delete(*map('user-{}'.format, cached_service_user_ids))
         return self.post('/service/{}/archive'.format(service_id), data=None)
 
     @cache.delete('service-{service_id}')

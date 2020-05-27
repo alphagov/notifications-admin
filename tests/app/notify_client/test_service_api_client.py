@@ -389,7 +389,7 @@ def test_returns_value_from_cache(
 @pytest.mark.parametrize('client, method, extra_args, extra_kwargs', [
     (service_api_client, 'update_service', [SERVICE_ONE_ID], {'name': 'foo'}),
     (service_api_client, 'update_service_with_properties', [SERVICE_ONE_ID], {'properties': {}}),
-    (service_api_client, 'archive_service', [SERVICE_ONE_ID], {}),
+    (service_api_client, 'archive_service', [SERVICE_ONE_ID, []], {}),
     (service_api_client, 'suspend_service', [SERVICE_ONE_ID], {}),
     (service_api_client, 'resume_service', [SERVICE_ONE_ID], {}),
     (service_api_client, 'remove_user_from_service', [SERVICE_ONE_ID, ''], {}),
@@ -458,6 +458,10 @@ def test_deletes_service_cache(
         'template-{}-version-None'.format(FAKE_TEMPLATE_ID),
         'service-{}-templates'.format(SERVICE_ONE_ID),
     ]),
+    ('archive_service', [SERVICE_ONE_ID, []], [
+        'service-{}-templates'.format(SERVICE_ONE_ID),
+        'service-{}'.format(SERVICE_ONE_ID),
+    ]),
 ])
 def test_deletes_caches_when_modifying_templates(
     app_,
@@ -475,3 +479,12 @@ def test_deletes_caches_when_modifying_templates(
 
     assert mock_redis_delete.call_args_list == list(map(call, expected_cache_deletes))
     assert len(mock_request.call_args_list) == 1
+
+
+def test_deletes_cached_users_when_archiving_service(mocker):
+    mock_redis_delete = mocker.patch('app.notify_client.service_api_client.cache.delete')
+    mocker.patch('notifications_python_client.base.BaseAPIClient.request')
+
+    service_api_client.archive_service(SERVICE_ONE_ID, ["my-user-id1", "my-user-id2"])
+
+    assert mock_redis_delete.call_args_list == [call('user-my-user-id1', 'user-my-user-id2')]
