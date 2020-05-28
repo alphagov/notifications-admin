@@ -6,13 +6,13 @@
 {% from "components/table.html" import list_table, field, right_aligned_field_heading, row_heading %}
 
 {% block service_page_title %}
-  Choose a saved contact list
+  Choose an emergency contact list
 {% endblock %}
 
 {% block maincolumn_content %}
 
   {{ page_header(
-    'Choose a saved contact list',
+    'Choose an emergency contact list',
     back_link=url_for('.send_one_off', service_id=current_service.id, template_id=template.id)
   ) }}
 
@@ -20,11 +20,11 @@
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-five-sixths">
         <p class="govuk-body">
-          You cannot use a saved contact list with this template because it
+          You cannot use an emergency contact list with this template because it
           is personalised with {{ list_of_placeholders(template.placeholders) }}.
         </p>
         <p class="govuk-body">
-          Saved contact lists can only store email addresses or phone
+          Emergency contact lists can only include email addresses or phone
           numbers.
         </p>
       </div>
@@ -36,7 +36,7 @@
         caption="Existing contact lists",
         caption_visible=False,
         empty_message=(
-          'You don’t have any contact lists yet'
+          'You have not uploaded any emergency contact lists.'
         ),
         field_headings=[
           'File',
@@ -68,10 +68,10 @@
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-five-sixths">
         <p class="govuk-body">
-          You have not saved any lists of {{ recipient_count_label(99, template.template_type) }} yet.
+          You have not uploaded any lists of {{ recipient_count_label(99, template.template_type) }} yet.
         </p>
         <p class="govuk-body">
-          To upload and save a new contact list, go to the <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.uploads', service_id=current_service.id) }}">uploads</a> page.
+          To upload an emergency contact list, go to the <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.uploads', service_id=current_service.id) }}">uploads</a> page.
         </p>
       </div>
     </div>
