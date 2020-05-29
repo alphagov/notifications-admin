@@ -3030,6 +3030,7 @@ def client_request(
             if _test_for_elements_without_class and _expected_status not in (301, 302):
                 for tag, hint in (
                     ('p', 'govuk-body'),
+                    ('a', 'govuk-link govuk-link--no-visited-state'),
                 ):
                     element = page.select_one(f'{tag}:not([class])')
                     if (

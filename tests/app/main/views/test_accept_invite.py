@@ -453,7 +453,7 @@ def test_signed_in_existing_user_cannot_use_anothers_invite(
     assert page.h1.string.strip() == 'You’re not allowed to see this page'
     flash_banners = page.find_all('div', class_='banner-dangerous')
     assert len(flash_banners) == 1
-    banner_contents = flash_banners[0].text.strip()
+    banner_contents = normalize_spaces(flash_banners[0].text)
     assert "You’re signed in as test@user.gov.uk." in banner_contents
     assert "This invite is for another email address." in banner_contents
     assert "Sign out and click the link again to accept this invite." in banner_contents
