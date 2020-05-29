@@ -19,14 +19,14 @@
     <a class="govuk-link govuk-link--no-visited-state" href="http://www.notify.works/_styleguide" style="text-decoration: none;">www.notify.works/_styleguide</a>
   </h1>
 
-  <p>
+  <p class="govuk-body">
     <a class="govuk-link govuk-link--no-visited-state" href="https://github.com/alphagov/notifications-admin/blob/master/app/templates/views/styleguide.html">View source</a>
   </p>
 
   <h2 class="heading-large">Banner</h2>
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-three-quarters">
-      <p>Used to show the status of a thing or action.</p>
+      <p class="govuk-body">Used to show the status of a thing or action.</p>
 
       {{ banner("You sent 1,234 text messages", with_tick=True) }}
 
@@ -40,7 +40,7 @@
 
   <h2 class="heading-large">Big number</h2>
 
-  <p>Used to show some important statistics.</p>
+  <p class="govuk-body">Used to show some important statistics.</p>
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-one-third">
@@ -53,7 +53,7 @@
 
   <h2 class="heading-large">Browse list</h2>
 
-  <p>Used to navigate to child pages.</p>
+  <p class="govuk-body">Used to navigate to child pages.</p>
 
   {{ browse_list([
     {
@@ -75,14 +75,14 @@
 
   <h2 class="heading-large">Page footer</h2>
 
-  <p>
+  <p class="govuk-body">
     Used to submit forms and optionally provide a link to go back to the
     previous page.
   </p>
-  <p>
+  <p class="govuk-body">
     Must be used inside a form.
   </p>
-  <p>
+  <p class="govuk-body">
     Adds a hidden CSRF token to the page.
   </p>
 
@@ -111,7 +111,7 @@
   <h2 class="heading-large">Tables</h2>
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-three-quarters">
-      <p>
+      <p class="govuk-body">
         Used for comparing rows of data.
       </p>
       {% call mapping_table(
@@ -194,19 +194,19 @@
 
   <h2 class="heading-large">Formatted list</h2>
 
-  <p>
+  <p class="govuk-body">
     {{ 'A' | formatted_list(prefix="one item called") }}
   </p>
 
-  <p>
+  <p class="govuk-body">
     {{ 'AB' | formatted_list(prefix_plural="two items called") }}
   </p>
 
-  <p>
+  <p class="govuk-body">
     {{ 'ABC' | formatted_list }}
   </p>
 
-  <p>
+  <p class="govuk-body">
     {{ 'ABCD' | formatted_list(before_each='<strike>', after_each='</strike>', conjunction='or') }}
   </p>
 

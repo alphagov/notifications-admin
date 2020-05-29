@@ -15,7 +15,7 @@
     back_link=url_for('main.edit_user_permissions', service_id=current_service.id, user_id=user.id)
   ) }}
 
-  <p id="user_name">This will change the email address for {{ user.name }}.</p>
+  <p class="govuk-body" id="user_name">This will change the email address for {{ user.name }}.</p>
   {% call form_wrapper() %}
     {{ textbox(form.email_address, width='1-1', safe_error_message=True) }}
     {{ page_footer('Save') }}

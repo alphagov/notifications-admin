@@ -16,7 +16,7 @@
     field_headings_visible=False
   ) %}
     {% call row_heading() %}
-      <p>{{ item.to }}</p>
+      <p class="govuk-body">{{ item.to }}</p>
     {% endcall %}
     {{ notification_status_field(item) }}
   {% endcall %}

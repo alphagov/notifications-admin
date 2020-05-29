@@ -19,7 +19,7 @@
       <div class="govuk-grid-column-two-thirds">
         {% if show_status_page_banner %}
           <div class="panel panel-border-wide">
-            <p>
+            <p class="govuk-body">
               Check our <a class="govuk-link govuk-link--no-visited-state" href="https://status.notifications.service.gov.uk">system status</a>
               page to see if there are any known issues with GOV.UK Notify.
             </p>
@@ -31,7 +31,7 @@
               {{ textbox(form.name, width='1-1') }}
               {{ textbox(form.email_address, width='1-1') }}
             {% else %}
-              <p>We’ll reply to {{ current_user.email_address }}</p>
+              <p class="govuk-body">We’ll reply to {{ current_user.email_address }}</p>
             {% endif %}
             {{ sticky_page_footer('Send') }}
         {% endcall %}

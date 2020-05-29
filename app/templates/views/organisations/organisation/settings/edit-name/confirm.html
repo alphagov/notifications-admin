@@ -20,7 +20,7 @@
 
     {% call form_wrapper() %}
       {{ textbox(form.password, autocomplete='current-password') }}
-      <p> Your organisation name will be changed from {{ current_org.name }} to {{ new_name }} </p>
+      <p class="govuk-body"> Your organisation name will be changed from {{ current_org.name }} to {{ new_name }} </p>
       {{ page_footer('Confirm') }}
     {% endcall %}
     </div>

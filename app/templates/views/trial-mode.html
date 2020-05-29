@@ -8,8 +8,8 @@
 
   <h1 class="heading-large">Trial mode</h1>
 
-  <p>When you add a new service it will start in trial mode. This lets you try out GOV.UK Notify, with a few restrictions.</p>
-  <p>While your service is in trial mode you can only:</p>
+  <p class="govuk-body">When you add a new service it will start in trial mode. This lets you try out GOV.UK Notify, with a few restrictions.</p>
+  <p class="govuk-body">While your service is in trial mode you can only:</p>
     <ul class="list list-bullet">
      <li>send 50 text messages and emails per day</li>
       <li>send messages to yourself and other people in your team</li>
@@ -17,10 +17,10 @@
    </ul>
 
     {% if current_service and current_service.trial_mode %}
-  <p>
+  <p class="govuk-body">
     To remove these restrictions, you can <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.request_to_go_live', service_id=current_service.id) }}">request to go live</a>.</p>
     {% else %}
-  <p>
+  <p class="govuk-body">
     To remove these restrictions:
   </p>
   <ol class="list list-number">
@@ -29,11 +29,11 @@
     <li>Select <b class="govuk-!-font-weight-bold">Request to go live</b>.</li>
   </ol>
     {% endif %}
- <p>
+ <p class="govuk-body">
     When we receive your request we’ll get back to you within one working day.
   </p>
   <h2 class="heading-medium" id="before-you-request-to-go-live">Before you request to go live</h2>
-  <p>You must:</p>
+  <p class="govuk-body">You must:</p>
   <ul class="list list-bullet">
     <li>add examples of the messages you want to send</li>
     <li>update your settings so you’re ready to send and receive messages</li>

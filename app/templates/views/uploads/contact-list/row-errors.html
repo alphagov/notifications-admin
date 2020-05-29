@@ -27,14 +27,14 @@
         <h1 class='banner-title' data-module="track-error" data-error-type="Bad rows" data-error-label="{{ upload_id }}">
           There’s a problem with {{ original_file_name }}
         </h1>
-        <p>
+        <p class="govuk-body">
           You need to {{ row_errors[0] }}.
         </p>
       {% else %}
         <h1 class='banner-title' data-module="track-error" data-error-type="Bad rows" data-error-label="{{ upload_id }}">
           There are some problems with {{ original_file_name }}
         </h1>
-        <p>
+        <p class="govuk-body">
           You need to:
         </p>
         <ul class="list-bullet">

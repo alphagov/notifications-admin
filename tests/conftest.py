@@ -2983,6 +2983,7 @@ def client_request(
             _follow_redirects=False,
             _expected_redirect=None,
             _test_page_title=True,
+            _test_for_elements_without_class=True,
             _optional_args="",
             **endpoint_kwargs
         ):
@@ -2992,6 +2993,7 @@ def client_request(
                 _follow_redirects=_follow_redirects,
                 _expected_redirect=_expected_redirect,
                 _test_page_title=_test_page_title,
+                _test_for_elements_without_class=_test_for_elements_without_class,
             )
 
         @staticmethod
@@ -3001,6 +3003,7 @@ def client_request(
             _follow_redirects=False,
             _expected_redirect=None,
             _test_page_title=True,
+            _test_for_elements_without_class=True,
             **endpoint_kwargs
         ):
             resp = logged_in_client.get(
@@ -3024,6 +3027,22 @@ def client_request(
                 )
                 if not normalize_spaces(page_title).startswith(h1):
                     raise AssertionError('Page title ‘{}’ does not start with H1 ‘{}’'.format(page_title, h1))
+            if _test_for_elements_without_class and _expected_status not in (301, 302):
+                for tag, hint in (
+                    ('p', 'govuk-body'),
+                ):
+                    element = page.select_one(f'{tag}:not([class])')
+                    if (
+                        element
+                        and not element.has_attr('style')  # Elements with inline CSS are exempt
+                        and element.text.strip()  # Empty elements are exempt
+                    ):
+                        raise AssertionError(
+                            f'Found a <{tag}> without a class attribute:\n'
+                            f'    {element}\n'
+                            f'\n'
+                            f'(you probably want to add class="{hint}")'
+                        )
             return page
 
         @staticmethod

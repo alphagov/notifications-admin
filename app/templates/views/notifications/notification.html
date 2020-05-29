@@ -15,7 +15,7 @@
       message_count_label(1, template.template_type, suffix='') | capitalize,
       back_link=back_link
     ) }}
-    <p>
+    <p class="govuk-body">
       {% if is_precompiled_letter %}
         {% if created_by %}
           Uploaded
@@ -58,19 +58,19 @@
       {% else %}
         {% if sent_with_test_key %}
           {% if is_precompiled_letter %}
-            <p>
+            <p class="govuk-body">
               This letter passed our checks, but we will not print it because you used a test key.
             </p>
           {% else %}
-            <p>
+            <p class="govuk-body">
               We will not print this letter because you used a test key.
             </p>
           {% endif %}
         {% else %}
-          <p>
+          <p class="govuk-body">
             {{ letter_print_day }}
           </p>
-          <p>
+          <p class="govuk-body">
             Estimated delivery date: {{ estimated_letter_delivery_date|format_day_of_week }} {{ estimated_letter_delivery_date|format_date_short }}
           </p>
         {% endif %}
@@ -103,7 +103,7 @@
     {% endif %}
 
     {% if current_user.has_permissions('send_messages') and current_user.has_permissions('view_activity') and template.template_type == 'sms' and can_receive_inbound %}
-      <p>
+      <p class="govuk-body">
         <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.conversation', service_id=current_service.id, notification_id=notification_id, _anchor='n{}'.format(notification_id)) }}">See all text messages sent to this phone number</a>
       </p>
     {% endif %}
