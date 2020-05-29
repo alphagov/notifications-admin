@@ -285,6 +285,7 @@ def test_send_files_by_email_row_on_settings_page(
 
         'Label Value Action',
         'Send letters On Change',
+        'Send international letters Off Change',
         'Sender addresses 1 Example Street Manage',
         'Letter branding Not set Change',
 
@@ -349,7 +350,7 @@ def test_letter_contact_block_shows_none_if_not_set(
         service_id=SERVICE_ONE_ID,
     )
 
-    div = page.find_all('tr')[9].find_all('td')[1].div
+    div = page.find_all('tr')[10].find_all('td')[1].div
     assert div.text.strip() == 'Not set'
     assert 'default' in div.attrs['class'][0]
 
@@ -370,7 +371,7 @@ def test_escapes_letter_contact_block(
         service_id=SERVICE_ONE_ID,
     )
 
-    div = str(page.find_all('tr')[9].find_all('td')[1].div)
+    div = str(page.find_all('tr')[10].find_all('td')[1].div)
     assert 'foo<br/>bar' in div
     assert '<script>' not in div
 
@@ -3787,21 +3788,24 @@ def test_broadcast_service_cant_post_to_set_other_channels_endpoint(
     )
 
 
-@pytest.mark.parametrize('permissions, expected_checked', [
-    (['international_sms'], 'True'),
-    ([''], 'False'),
+@pytest.mark.parametrize('permission, permissions, expected_checked', [
+    ('international_sms', ['international_sms'], 'True'),
+    ('international_letters', ['international_letters'], 'True'),
+    ('international_sms', [''], 'False'),
+    ('international_letters', [''], 'False'),
 ])
-def test_show_international_sms_as_radio_button(
+def test_show_international_sms_and_letters_as_radio_button(
     client_request,
     service_one,
     mocker,
+    permission,
     permissions,
     expected_checked,
 ):
     service_one['permissions'] = permissions
 
     checked_radios = client_request.get(
-        'main.service_set_international_sms',
+        f'main.service_set_{permission}',
         service_id=service_one['id'],
     ).select(
         '.multiple-choice input[checked]'
@@ -3811,20 +3815,25 @@ def test_show_international_sms_as_radio_button(
     assert checked_radios[0]['value'] == expected_checked
 
 
-@pytest.mark.parametrize('post_value, international_sms_permission_expected_in_api_call', [
+@pytest.mark.parametrize('permission', (
+    'international_sms',
+    'international_letters',
+))
+@pytest.mark.parametrize('post_value, permission_expected_in_api_call', [
     ('True', True),
     ('False', False),
 ])
-def test_switch_service_enable_international_sms(
+def test_switch_service_enable_international_sms_and_letters(
     client_request,
     service_one,
     mocker,
+    permission,
     post_value,
-    international_sms_permission_expected_in_api_call,
+    permission_expected_in_api_call,
 ):
     mocked_fn = mocker.patch('app.service_api_client.update_service', return_value=service_one)
     client_request.post(
-        'main.service_set_international_sms',
+        f'main.service_set_{permission}',
         service_id=service_one['id'],
         _data={
             'enabled': post_value
@@ -3832,10 +3841,10 @@ def test_switch_service_enable_international_sms(
         _expected_redirect=url_for('main.service_settings', service_id=service_one['id'], _external=True)
     )
 
-    if international_sms_permission_expected_in_api_call:
-        assert 'international_sms' in mocked_fn.call_args[1]['permissions']
+    if permission_expected_in_api_call:
+        assert permission in mocked_fn.call_args[1]['permissions']
     else:
-        assert 'international_sms' not in mocked_fn.call_args[1]['permissions']
+        assert permission not in mocked_fn.call_args[1]['permissions']
 
     assert mocked_fn.call_args[0][0] == service_one['id']
 

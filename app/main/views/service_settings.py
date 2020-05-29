@@ -665,6 +665,27 @@ def service_set_international_sms(service_id):
     )
 
 
+@main.route("/services/<uuid:service_id>/service-settings/set-international-letters", methods=['GET', 'POST'])
+@user_has_permissions('manage_service')
+def service_set_international_letters(service_id):
+    form = ServiceOnOffSettingForm(
+        'Send letters to international addresses',
+        enabled=current_service.has_permission('international_letters'),
+    )
+    if form.validate_on_submit():
+        current_service.force_permission(
+            'international_letters',
+            on=form.enabled.data,
+        )
+        return redirect(
+            url_for(".service_settings", service_id=service_id)
+        )
+    return render_template(
+        'views/service-settings/set-international-letters.html',
+        form=form,
+    )
+
+
 @main.route("/services/<uuid:service_id>/service-settings/set-inbound-sms", methods=['GET'])
 @user_has_permissions('manage_service')
 def service_set_inbound_sms(service_id):
