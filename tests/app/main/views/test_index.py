@@ -284,6 +284,7 @@ def test_letter_template_preview_links_to_the_correct_image(
     page = client_request.get(
         'main.letter_template',
         _test_page_title=False,
+        # Letter HTML doesn’t use the Design System, so elements won’t have class attributes
         _test_for_elements_without_class=False,
         branding_style=branding_style
     )
