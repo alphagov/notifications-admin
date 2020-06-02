@@ -15,9 +15,9 @@
       back_link=url_for('.service_settings', service_id=current_service.id)
     ) }}
     {% if current_service.has_inbound_number %}
-    <p> This service already has an inbound number </p>
+    <p class="govuk-body"> This service already has an inbound number </p>
     {% elif no_available_numbers %}
-    <p> No available inbound numbers </p>
+    <p class="govuk-body"> No available inbound numbers </p>
     {% else %}
     {% call form_wrapper() %}
 	    {{ radios(form.inbound_number) }}

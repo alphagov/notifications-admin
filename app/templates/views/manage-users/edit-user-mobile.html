@@ -15,7 +15,7 @@
     back_link=url_for('main.edit_user_permissions', service_id=current_service.id, user_id=user.id)
   ) }}
 
-  <p id="user_name">This will change the mobile number for {{ user.name }}.</p>
+  <p class="govuk-body" id="user_name">This will change the mobile number for {{ user.name }}.</p>
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-three-quarters">
       {% call form_wrapper(class="extra-tracking") %}

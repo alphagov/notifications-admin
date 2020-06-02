@@ -14,7 +14,7 @@
       {% call banner_wrapper(type='dangerous') %}
         <h1 class="banner-title">{{ error.title }}</h1>
         {% if error.detail %}
-          <p>{{ error.detail | safe }}</p>
+          <p class="govuk-body">{{ error.detail | safe }}</p>
         {% endif %}
       {% endcall %}
     {% else %}
@@ -22,11 +22,11 @@
         'Upload a letter',
         back_link=url_for('main.uploads', service_id=current_service.id)
     ) }}
-    <p>Upload a single letter as a PDF and we’ll print, pack and post it for you.</p>
-    <p>You can use this feature if you send a lot of one-off letters or if our reusable letter templates do not meet your needs.</p>
+    <p class="govuk-body">Upload a single letter as a PDF and we’ll print, pack and post it for you.</p>
+    <p class="govuk-body">You can use this feature if you send a lot of one-off letters or if our reusable letter templates do not meet your needs.</p>
     {% endif %}
 
-  <p>
+  <p class="govuk-body">
     {{ file_upload(
       form.file,
       action=url_for('main.upload_letter', service_id=current_service.id),
@@ -37,9 +37,9 @@
 
   <h2 class="heading-medium">Your file must meet our letter specification</h2>
 
-  <p>The content of your letter must appear inside the printable area.</p>
+  <p class="govuk-body">The content of your letter must appear inside the printable area.</p>
 
-  <p>Your file must be:</p>
+  <p class="govuk-body">Your file must be:</p>
 
     <ul class="list list-bullet">
       <li>a PDF</li>
@@ -48,7 +48,7 @@
       <li>smaller than 2MB</li>
     </ul>
 
-  <p>To help you set up your letter, you can download our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.letter_spec') }}">letter specification document (PDF)</a>.</p>
+  <p class="govuk-body">To help you set up your letter, you can download our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.letter_spec') }}">letter specification document (PDF)</a>.</p>
   </div>
 </div>
 {% endblock %}

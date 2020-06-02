@@ -15,17 +15,17 @@
     {% if again %}
       <h1 class="heading-large">You need to sign in again</h1>
       {% if other_device %}
-        <p>
+        <p class="govuk-body">
           We signed you out because you logged in to Notify on another device.
         </p>
       {% else %}
-        <p>
+        <p class="govuk-body">
           We signed you out because you have not used Notify for a while.
         </p>
       {% endif %}
     {% else %}
       <h1 class="heading-large">Sign in</h1>
-      <p>
+      <p class="govuk-body">
         If you do not have an account, you can
         <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.register') }}">create one now</a>.
       </p>

@@ -29,7 +29,7 @@
         <h1 class='banner-title' data-module="track-error" data-error-type="No rows" data-error-label="{{ upload_id }}">
           Your file is missing some rows
         </h1>
-        <p>
+        <p class="govuk-body">
           It needs at least one row of data
           {%- if template_type %}.{% else %}, in a column called ‘email address’ or ‘phone number’.{% endif %}
         </p>
@@ -39,7 +39,7 @@
         <h1 class='banner-title' data-module="track-error" data-error-type="Too many rows" data-error-label="{{ upload_id }}">
           Your file needs a column called ‘email address’ or ‘phone number’.
         </h1>
-        <p>
+        <p class="govuk-body">
           Right now it has 1 column called ‘{{ recipients._raw_column_headers[0] }}’.
         </p>
 
@@ -48,10 +48,10 @@
         <h1 class='banner-title' data-module="track-error" data-error-type="Too many rows" data-error-label="{{ upload_id }}">
           Your file has too many columns
         </h1>
-        <p>
+        <p class="govuk-body">
           It needs to have 1 column, called ‘email address’ or ‘phone number’.
         </p>
-        <p>
+        <p class="govuk-body">
           Right now it has {{ recipients._raw_column_headers|length }} columns called {{ recipients._raw_column_headers | formatted_list }}.
         </p>
 

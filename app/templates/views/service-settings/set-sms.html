@@ -16,16 +16,16 @@
         'Send text messages',
         back_link=url_for('main.service_settings', service_id=current_service.id)
       ) }}
-      <p>
+      <p class="govuk-body">
         You have a free allowance of
         {{ '{:,}'.format(current_service.free_sms_fragment_limit) }} text messages each
         financial year.
       </p>
-      <p>
+      <p class="govuk-body">
         It costs 1.58 pence (plus VAT) for each text message you send
         after your free allowance.
       </p>
-      <p>
+      <p class="govuk-body">
         See <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for(".pricing", _anchor="letters") }}">pricing</a> for more details.
       </p>
       {% call form_wrapper() %}

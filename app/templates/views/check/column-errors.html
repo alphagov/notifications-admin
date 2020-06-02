@@ -29,7 +29,7 @@
         <h1 class='banner-title' data-module="track-error" data-error-type="Too many rows" data-error-label="{{ upload_id }}">
           Your file has too many rows
         </h1>
-        <p>
+        <p class="govuk-body">
           Notify can process up to
           {{ "{:,}".format(recipients.max_rows) }} rows at once. Your
           file has {{ "{:,}".format(recipients|length) }} rows.
@@ -41,14 +41,14 @@
           Your file is missing some rows
         </h1>
         {% if recipients.missing_column_headers %}
-          <p>
+          <p class="govuk-body">
             It needs at least one row of data, and {{ recipients.missing_column_headers | sort() | formatted_list(
               prefix='a column called',
               prefix_plural='columns called'
             ) }}.
           </p>
         {% else %}
-          <p>
+          <p class="govuk-body">
             It needs at least one row of data.
           </p>
         {% endif %}
@@ -59,16 +59,16 @@
           There’s a problem with your column names
         </h1>
         {% if template.template_type == 'letter' %}
-          <p>
+          <p class="govuk-body">
             Your file needs at least 3 address columns, for example ‘address line 1’,
             ‘address line 2’ and ‘address line 3’.
           </p>
         {% else %}
-          <p>
+          <p class="govuk-body">
             Your file needs a column called ‘{{ first_recipient_column }}’.
           </p>
         {% endif %}
-          <p>
+          <p class="govuk-body">
             Right now it has {{ recipients.column_headers | formatted_list(
               prefix='one column, called ',
               prefix_plural='columns called '
@@ -80,7 +80,7 @@
         <h1 class='banner-title' data-module="track-error" data-error-type="Duplicate recipient columns" data-error-label="{{ upload_id }}">
           There’s a problem with your column names
         </h1>
-           <p>
+           <p class="govuk-body">
             We found more than one column called {{ (
             recipients.duplicate_recipient_column_headers
             ) | formatted_list(
@@ -89,7 +89,7 @@
               prefix_plural=''
             ) }}.
           </p>
-        <p>
+        <p class="govuk-body">
           Delete or rename one of these columns and try again.
         </p>
 
@@ -98,7 +98,7 @@
         <h1 class='banner-title' data-module="track-error" data-error-type="Missing placeholder columns" data-error-label="{{ upload_id }}">
           Your column names need to match the double brackets in your template
         </h1>
-          <p>
+          <p class="govuk-body">
             Your file is missing {{ recipients.missing_column_headers | formatted_list(
               conjunction='and',
               prefix='a column called ',

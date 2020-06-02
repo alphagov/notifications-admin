@@ -11,7 +11,7 @@
       <h1 class="heading-large">
         {{ user.name }}
       </h1>
-      <p>{{ user.email_address }}</p>
+      <p class="govuk-body">{{ user.email_address }}</p>
       <p class="{{ '' if user.mobile_number else 'hint' }}">{{ user.mobile_number or 'No mobile number'}}</p>
       <h2 class="heading-medium">Live services</h2>
       <nav class="browse-list">
@@ -49,7 +49,7 @@
       {% if not user.logged_in_at %}
       <p class="hint">This person has never logged in</p>
       {% else %}
-      <p>Last logged in
+      <p class="govuk-body">Last logged in
         <time class="timeago" datetime="{{ user.logged_in_at }}">
           {{ user.logged_in_at|format_delta }}
         </time>

@@ -17,11 +17,11 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
   {% call form_wrapper() %}
-    <p>New mobile number:</p>
+    <p class="govuk-body">New mobile number:</p>
     <div class="panel panel-border-wide bottom-gutter">
-      <p>{{ new_mobile_number }}</p>
+      <p class="govuk-body">{{ new_mobile_number }}</p>
     </div>
-    <p>We will send {{ user.name }} a text message to tell them about the change.</p>
+    <p class="govuk-body">We will send {{ user.name }} a text message to tell them about the change.</p>
     {{ page_footer('Confirm') }}
   {% endcall %}
   </div>

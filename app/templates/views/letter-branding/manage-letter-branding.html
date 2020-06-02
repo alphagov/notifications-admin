@@ -22,7 +22,7 @@
           <img src="https://{{ cdn_url }}/{{ logo }}"/>
         </div>
       {% endif %}
-      <p>
+      <p class="govuk-body">
         Logos should be SVG files, cropped to artwork bounds and with all fonts outlined.
       </p>
       {{ file_upload(file_upload_form.file, button_text='{} logo'.format('Update' if is_update else 'Upload')) }}

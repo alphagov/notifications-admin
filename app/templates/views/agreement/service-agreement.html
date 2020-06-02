@@ -16,19 +16,19 @@
       back_link=url_for('main.request_to_go_live', service_id=current_service.id)
     )}}
 
-    <p>
+    <p class="govuk-body">
       Before you can use GOV.UK Notify, you need to accept our data sharing and financial agreement.
     </p>
-    <p>
+    <p class="govuk-body">
       This must be done by, or on behalf of, someone with the authority to sign contracts for {{ current_service.organisation.name }}.
     </p>
-    <p>
+    <p class="govuk-body">
       Once accepted, the agreement covers all Notify services from {{ current_service.organisation.name }}.
     </p>
-    <p>
+    <p class="govuk-body">
       <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.service_download_agreement', service_id=current_service.id) }}">Download a copy of the data sharing and financial agreement</a>.
     </p>
-    <p>
+    <p class="govuk-body">
       The agreement is confidential and should not be shared outside your organisation.
     </p>
     {{ govukButton({

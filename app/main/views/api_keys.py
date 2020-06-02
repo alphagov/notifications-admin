@@ -93,7 +93,7 @@ def create_api_key(service_id):
         disabled_options = [KEY_TYPE_NORMAL]
         option_hints[KEY_TYPE_NORMAL] = Markup(
             'Not available because your service is in '
-            '<a href="/features/trial-mode">trial mode</a>'
+            '<a class="govuk-link govuk-link--no-visited-state" href="/features/trial-mode">trial mode</a>'
         )
     if current_service.has_permission('letter'):
         option_hints[KEY_TYPE_TEAM] = 'Cannot be used to send letters'

@@ -15,18 +15,18 @@
     back_link=url_for('.service_settings', service_id=current_service.id)
   ) }}
 
-  <p>
+  <p class="govuk-body">
     Your emails will be sent from
     {{ current_service.email_from }}@notifications.service.gov.uk.
     This is so they have the best chance of being delivered.
     This email address cannot receive replies.
   </p>
-  <p>
+  <p class="govuk-body">
     Set up a separate email address to receive replies from
     your users, then enter it here.
   </p>
   {% if current_service.trial_mode %}
-    <p>
+    <p class="govuk-body">
       Your service cannot go live until you’ve done this.
     </p>
   {% endif %}

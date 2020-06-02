@@ -17,12 +17,12 @@
     back_link=url_for('.view_template', service_id=current_service.id, template_id=from_template) if from_template else url_for('.service_settings', service_id=current_service.id)
   ) }}
 
-  <p>
+  <p class="govuk-body">
     Your {{ branding_type }}s currently have {{ branding_name }} branding.
   </p>
 
   {% if current_service.needs_to_change_email_branding and branding_type == "email" %}
-    <p>
+    <p class="govuk-body">
       You should be using your own branding instead. We can help you to set this up.
     </p>
   {% endif %}
