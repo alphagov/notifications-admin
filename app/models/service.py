@@ -58,6 +58,16 @@ class Service(JSONModel):
         'letter',
     )
 
+    ALL_PERMISSIONS = TEMPLATE_TYPES + (
+        'edit_folder_permissions',
+        'email_auth',
+        'inbound_sms',
+        'international_letters',
+        'international_sms',
+        'upload_document',
+        'upload_letters',
+    )
+
     def __init__(self, _dict):
 
         super().__init__(_dict)
@@ -106,6 +116,8 @@ class Service(JSONModel):
         return not self.trial_mode
 
     def has_permission(self, permission):
+        if permission not in self.ALL_PERMISSIONS:
+            raise KeyError(f'{permission} is not a service permission')
         return permission in self.permissions
 
     def get_page_of_jobs(self, page):

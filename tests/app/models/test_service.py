@@ -1,5 +1,7 @@
 import uuid
 
+import pytest
+
 from app.models.organisation import Organisation
 from app.models.service import Service
 from app.models.user import User
@@ -247,3 +249,9 @@ def test_service_without_organisation_doesnt_need_org_api(mocker, service_one):
 
     assert mock_redis_get.called is False
     assert mock_get_organisation.called is False
+
+
+def test_bad_permission_raises(service_one):
+    with pytest.raises(KeyError) as e:
+        Service(service_one).has_permission('foo')
+    assert str(e.value) == "'foo is not a service permission'"
