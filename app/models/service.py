@@ -39,7 +39,6 @@ class Service(JSONModel):
         'letter_contact_block',
         'message_limit',
         'name',
-        'permissions',
         'prefix_sms',
         'research_mode',
         'service_callback_api',
@@ -68,15 +67,13 @@ class Service(JSONModel):
         'upload_letters',
     )
 
-    def __init__(self, _dict):
-
-        super().__init__(_dict)
-        if 'permissions' not in self._dict:
-            self.permissions = {'email', 'sms', 'letter'}
-
     @classmethod
     def from_id(cls, service_id):
         return cls(service_api_client.get_service(service_id)['data'])
+
+    @property
+    def permissions(self):
+        return self._dict.get('permissions', self.TEMPLATE_TYPES)
 
     def update(self, **kwargs):
         return service_api_client.update_service(self.id, **kwargs)
