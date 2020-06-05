@@ -1,0 +1,35 @@
+{% extends "withnav_template.html" %}
+{% from "components/radios.html" import radios %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/checkbox.html" import checkboxes %}
+
+{% block service_page_title %}
+  Sign-in method
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-five-sixths">
+      {{ page_header(
+        'Choose who will sign in using an email link',
+        back_link=url_for('main.service_set_auth_type', service_id=current_service.id)
+      ) }}
+      {% call form_wrapper() %}
+        {{ checkboxes(form.users_with_email_auth) }}
+        <p>
+          If you uncheck a box, that team member will sign in with a text message code.
+        </p>
+        <p>
+          If you need to change someone’s sign-in method later, you can do this on the
+          <a href="{{ url_for('main.manage_users', service_id=current_service.id) }}"
+            class="govuk-link govuk-link--no-visited-state">team members</a> page.
+        </p>
+        {{ page_footer('Save') }}
+      {% endcall %}
+    </div>
+  </div>
+
+{% endblock %}

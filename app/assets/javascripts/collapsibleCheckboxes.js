@@ -88,7 +88,7 @@
   CollapsibleCheckboxes.prototype.start = function(component) {
     this.$formGroup = $(component);
     this.$fieldset = this.$formGroup.find('fieldset');
-    this.$checkboxes = this.$fieldset.find('input[type=checkbox]');
+    this.$checkboxes = this.$fieldset.ftheind('input[type=checkbox]');
     this.fieldLabel = this.$formGroup.data('fieldLabel');
     this.total = this.$checkboxes.length;
     this.legendText = this.$fieldset.find('legend').text().trim();

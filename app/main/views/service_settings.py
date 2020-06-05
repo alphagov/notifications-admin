@@ -44,6 +44,8 @@ from app.main.forms import (
     ServiceDataRetentionEditForm,
     ServiceDataRetentionForm,
     ServiceEditInboundNumberForm,
+    ServiceEmailAuthForm,
+    ServiceEmailAuthUsersForm,
     ServiceInboundNumberForm,
     ServiceLetterContactBlockForm,
     ServiceOnOffSettingForm,
@@ -719,11 +721,39 @@ def service_set_channel(service_id, channel):
     )
 
 
-@main.route("/services/<uuid:service_id>/service-settings/set-auth-type", methods=['GET'])
+@main.route("/services/<uuid:service_id>/service-settings/set-auth-type", methods=['GET', 'POST'])
 @user_has_permissions('manage_service')
 def service_set_auth_type(service_id):
+    form = ServiceEmailAuthForm(enabled=current_service.has_permission('email_auth'))
+
+    if form.validate_on_submit():
+        return redirect(url_for('.service_choose_email_auth_users', service_id=service_id))
+
     return render_template(
         'views/service-settings/set-auth-type.html',
+        form=form
+    )
+
+
+@main.route("/services/<uuid:service_id>/service-settings/choose-email-auth-users", methods=['GET', 'POST'])
+@user_has_permissions('manage_service')
+def service_choose_email_auth_users(service_id):
+    form = ServiceEmailAuthUsersForm(users=current_service.team_members)
+    if request.method == 'GET':
+        form.users_with_email_auth.data = [x.id for x in current_service.team_members]
+
+    if form.validate_on_submit():
+        current_service.force_permission('email_auth', on=True)
+        for user in current_service.team_members:
+            should_use_email_auth = user.id in form.users_with_email_auth.data
+            if should_use_email_auth != user.email_auth:
+                user.update(auth_type='email_auth' if should_use_email_auth else 'sms_auth')
+
+        return redirect(url_for('.service_settings', service_id=service_id))
+
+    return render_template(
+        'views/service-settings/set-email-auth-users.html',
+        form=form
     )
 
 

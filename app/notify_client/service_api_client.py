@@ -106,6 +106,8 @@ class ServiceAPIClient(NotifyAdminAPIClient):
                 ", ".join(disallowed_attributes)
             ))
 
+        print(data)
+
         endpoint = "/service/{0}".format(service_id)
         return self.post(endpoint, data)
 

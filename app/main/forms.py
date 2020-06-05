@@ -1415,6 +1415,29 @@ class SMSPrefixForm(StripWhitespaceForm):
     )
 
 
+class ServiceEmailAuthForm(StripWhitespaceForm):
+    enabled = OnOffField('Choices')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.enabled.label.text = 'Sign in method'
+        # true/false here match up with the `email_auth` service permission. Deliberately put true second so that
+        # the option is second in the radio forms.
+        self.enabled.choices = [
+            (False, 'Text message code',),
+            (True, 'Email link or text message code',),
+        ]
+
+
+class ServiceEmailAuthUsersForm(StripWhitespaceForm):
+    def __init__(self, users=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        users = users or []
+        self.users_with_email_auth.choices = [(item.id, item.name) for item in users]
+
+    users_with_email_auth = MultiCheckboxField('Team members')
+
+
 def get_placeholder_form_instance(
     placeholder_name,
     dict_to_populate_from,
@@ -1601,6 +1624,7 @@ class ReturnedLettersForm(StripWhitespaceForm):
 class TemplateFolderForm(StripWhitespaceForm):
     def __init__(self, all_service_users=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        print(all_service_users, args, kwargs)
         if all_service_users is not None:
             self.users_with_permission.all_service_users = all_service_users
             self.users_with_permission.choices = [
