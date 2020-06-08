@@ -56,7 +56,10 @@ def invite_user(service_id, user_id=None):
 
     if user_id:
         user_to_invite = User.from_id(user_id)
-        if user_to_invite.belongs_to_service(current_service.id):
+        if (
+            user_to_invite.belongs_to_service(current_service.id)
+            or current_service.invite_pending_for(user_to_invite.email_address)
+        ):
             return render_template(
                 'views/user-already-invited.html',
                 user_to_invite=user_to_invite,
