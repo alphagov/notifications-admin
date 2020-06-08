@@ -1266,6 +1266,21 @@ def active_user_with_permission_to_two_services(fake_uuid):
 
 
 @pytest.fixture(scope='function')
+def active_user_with_permission_to_other_service(
+    active_user_with_permission_to_two_services
+):
+    active_user_with_permission_to_two_services['permissions'].pop(SERVICE_ONE_ID)
+    active_user_with_permission_to_two_services['services'].pop(0)
+    active_user_with_permission_to_two_services['name'] = (
+        'Service Two User'
+    )
+    active_user_with_permission_to_two_services['email_address'] = (
+        'service-two-user@test.gov.uk'
+    )
+    return active_user_with_permission_to_two_services
+
+
+@pytest.fixture(scope='function')
 def active_caseworking_user(fake_uuid):
 
     user_data = {

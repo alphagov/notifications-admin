@@ -661,10 +661,54 @@ def test_should_show_page_for_inviting_user(
 
 
 def test_should_show_page_for_inviting_user_with_email_prefilled(
+    mocker,
     client_request,
     mock_get_template_folders,
     fake_uuid,
+    active_user_with_permissions,
+    active_user_with_permission_to_other_service,
 ):
+    mocker.patch('app.models.user.user_api_client.get_user', side_effect=[
+        # First call is to get the current user
+        active_user_with_permissions,
+        # Second call gets the user to invite
+        active_user_with_permission_to_other_service,
+    ])
+
+    page = client_request.get(
+        'main.invite_user',
+        service_id=SERVICE_ONE_ID,
+        user_id=fake_uuid,
+        # We have the user’s name in the H1 but don’t want it duplicated
+        # in the page title
+        _test_page_title=False,
+    )
+    assert normalize_spaces(page.select_one('title').text).startswith(
+        'Invite a team member'
+    )
+    assert normalize_spaces(page.select_one('h1').text) == (
+        'Invite Service Two User'
+    )
+    assert normalize_spaces(page.select_one('main .govuk-body').text) == (
+        'service-two-user@test.gov.uk'
+    )
+    assert not page.select("input#email_address") or page.select("input[type=email]")
+
+
+def test_should_show_page_if_prefilled_user_is_already_a_team_member(
+    mocker,
+    client_request,
+    mock_get_template_folders,
+    fake_uuid,
+    active_user_with_permissions,
+    active_caseworking_user,
+):
+    mocker.patch('app.models.user.user_api_client.get_user', side_effect=[
+        # First call is to get the current user
+        active_user_with_permissions,
+        # Second call gets the user to invite
+        active_caseworking_user,
+    ])
     page = client_request.get(
         'main.invite_user',
         service_id=SERVICE_ONE_ID,
@@ -674,13 +718,16 @@ def test_should_show_page_for_inviting_user_with_email_prefilled(
         _test_page_title=False,
     )
 
+    assert normalize_spaces(page.select_one('title').text).startswith(
+        'This person is already a team member'
+    )
     assert normalize_spaces(page.select_one('h1').text) == (
-        'Invite Test User'
+        'Test User is already a team member'
     )
     assert normalize_spaces(page.select_one('main .govuk-body').text) == (
-        'test@user.gov.uk'
+        'Someone’s already invited them. You do not need to do anything.'
     )
-    assert not page.select("input#email_address") or page.select("input[type=email]")
+    assert not page.select("form")
 
 
 def test_should_show_folder_permission_form_if_service_has_folder_permissions_enabled(
@@ -755,7 +802,7 @@ def test_invite_user(
 def test_invite_user_when_email_address_is_prefilled(
     client_request,
     active_user_with_permissions,
-    active_caseworking_user,
+    active_user_with_permission_to_other_service,
     fake_uuid,
     mocker,
     sample_invite,
@@ -765,7 +812,7 @@ def test_invite_user_when_email_address_is_prefilled(
         # First call is to get the current user
         active_user_with_permissions,
         # Second call gets the user to invite
-        active_caseworking_user,
+        active_user_with_permission_to_other_service,
     ])
     mocker.patch('app.invite_api_client.create_invite', return_value=sample_invite)
     client_request.post(
@@ -781,7 +828,7 @@ def test_invite_user_when_email_address_is_prefilled(
     app.invite_api_client.create_invite.assert_called_once_with(
         active_user_with_permissions['id'],
         SERVICE_ONE_ID,
-        active_caseworking_user['email_address'],
+        active_user_with_permission_to_other_service['email_address'],
         {'send_messages'},
         'sms_auth',
         [],
