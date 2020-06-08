@@ -160,6 +160,12 @@ class Service(JSONModel):
     def invited_users(self):
         return InvitedUsers(self.id)
 
+    def invite_pending_for(self, email_address):
+        return email_address.lower() in (
+            invited_user.email_address.lower()
+            for invited_user in self.invited_users
+        )
+
     @cached_property
     def active_users(self):
         return Users(self.id)

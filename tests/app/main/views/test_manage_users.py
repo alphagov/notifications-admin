@@ -817,6 +817,7 @@ def test_should_show_page_for_inviting_user_with_email_prefilled(
     active_user_with_permissions,
     active_user_with_permission_to_other_service,
     mock_get_organisation_by_domain,
+    mock_get_invites_for_service,
 ):
     service_one['organisation'] = ORGANISATION_ID
     mocker.patch('app.models.user.user_api_client.get_user', side_effect=[
@@ -881,6 +882,38 @@ def test_should_show_page_if_prefilled_user_is_already_a_team_member(
     assert not page.select("form")
 
 
+def test_should_show_page_if_prefilled_user_is_already_invited(
+    mocker,
+    client_request,
+    mock_get_template_folders,
+    fake_uuid,
+    active_user_with_permissions,
+    active_user_with_permission_to_other_service,
+    mock_get_invites_for_service,
+):
+    active_user_with_permission_to_other_service['email_address'] = (
+        'user_1@testnotify.gov.uk'
+    )
+    mocker.patch('app.models.user.user_api_client.get_user', side_effect=[
+        # First call is to get the current user
+        active_user_with_permissions,
+        # Second call gets the user to invite
+        active_user_with_permission_to_other_service,
+    ])
+    page = client_request.get(
+        'main.invite_user',
+        service_id=SERVICE_ONE_ID,
+        user_id=fake_uuid,
+        # We have the user’s name in the H1 but don’t want it duplicated
+        # in the page title
+        _test_page_title=False,
+    )
+
+    assert normalize_spaces(page.select_one('title').text).startswith(
+        'This person is already a team member'
+    )
+
+
 def test_should_403_if_trying_to_prefill_email_address_for_user_with_no_organisation(
     mocker,
     client_request,
@@ -889,6 +922,7 @@ def test_should_403_if_trying_to_prefill_email_address_for_user_with_no_organisa
     fake_uuid,
     active_user_with_permissions,
     active_user_with_permission_to_other_service,
+    mock_get_invites_for_service,
     mock_get_no_organisation_by_domain,
 ):
     service_one['organisation'] = ORGANISATION_ID
@@ -914,6 +948,7 @@ def test_should_403_if_trying_to_prefill_email_address_for_user_from_other_organ
     fake_uuid,
     active_user_with_permissions,
     active_user_with_permission_to_other_service,
+    mock_get_invites_for_service,
     mock_get_organisation_by_domain,
 ):
     service_one['organisation'] = ORGANISATION_TWO_ID
@@ -1011,6 +1046,7 @@ def test_invite_user_when_email_address_is_prefilled(
     mocker,
     sample_invite,
     mock_get_template_folders,
+    mock_get_invites_for_service,
     mock_get_organisation_by_domain,
 ):
     service_one['organisation'] = ORGANISATION_ID
