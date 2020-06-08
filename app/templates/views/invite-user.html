@@ -12,13 +12,19 @@
 {% block maincolumn_content %}
 
   {{ page_header(
-    'Invite a team member',
+    'Invite {}'.format(user_to_invite.name if user_to_invite else 'a team member') ,
     back_link=url_for('main.manage_users', service_id=current_service.id)
   ) }}
 
   {% call form_wrapper() %}
 
-    {{ textbox(form.email_address, width='1-1', safe_error_message=True) }}
+    {% if user_to_invite %}
+      <p class="govuk-body">
+        {{ user_to_invite.email_address }}
+      </p>
+    {% else %}
+      {{ textbox(form.email_address, width='1-1', safe_error_message=True) }}
+    {% endif %}
 
     {% include 'views/manage-users/permissions.html' %}
 

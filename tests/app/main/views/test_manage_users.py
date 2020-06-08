@@ -660,6 +660,29 @@ def test_should_show_page_for_inviting_user(
     assert not page.find('div', class_='checkboxes-nested')
 
 
+def test_should_show_page_for_inviting_user_with_email_prefilled(
+    client_request,
+    mock_get_template_folders,
+    fake_uuid,
+):
+    page = client_request.get(
+        'main.invite_user',
+        service_id=SERVICE_ONE_ID,
+        user_id=fake_uuid,
+        # We have the user’s name in the H1 but don’t want it duplicated
+        # in the page title
+        _test_page_title=False,
+    )
+
+    assert normalize_spaces(page.select_one('h1').text) == (
+        'Invite Test User'
+    )
+    assert normalize_spaces(page.select_one('main .govuk-body').text) == (
+        'test@user.gov.uk'
+    )
+    assert not page.select("input#email_address") or page.select("input[type=email]")
+
+
 def test_should_show_folder_permission_form_if_service_has_folder_permissions_enabled(
     client_request,
     mocker,
@@ -727,6 +750,42 @@ def test_invite_user(
                                                                 expected_permissions,
                                                                 'sms_auth',
                                                                 [])
+
+
+def test_invite_user_when_email_address_is_prefilled(
+    client_request,
+    active_user_with_permissions,
+    active_caseworking_user,
+    fake_uuid,
+    mocker,
+    sample_invite,
+    mock_get_template_folders,
+):
+    mocker.patch('app.models.user.user_api_client.get_user', side_effect=[
+        # First call is to get the current user
+        active_user_with_permissions,
+        # Second call gets the user to invite
+        active_caseworking_user,
+    ])
+    mocker.patch('app.invite_api_client.create_invite', return_value=sample_invite)
+    client_request.post(
+        'main.invite_user',
+        service_id=SERVICE_ONE_ID,
+        user_id=fake_uuid,
+        _data={
+            # No posted email address
+            'send_messages': 'y'
+        },
+    )
+
+    app.invite_api_client.create_invite.assert_called_once_with(
+        active_user_with_permissions['id'],
+        SERVICE_ONE_ID,
+        active_caseworking_user['email_address'],
+        {'send_messages'},
+        'sms_auth',
+        [],
+    )
 
 
 @pytest.mark.parametrize('auth_type', [
