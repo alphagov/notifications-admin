@@ -7,6 +7,8 @@ from flask import url_for
 import app
 from app.utils import is_gov_user
 from tests.conftest import (
+    ORGANISATION_ID,
+    ORGANISATION_TWO_ID,
     SERVICE_ONE_ID,
     USER_ONE_ID,
     create_active_user_empty_permissions,
@@ -661,13 +663,16 @@ def test_should_show_page_for_inviting_user(
 
 
 def test_should_show_page_for_inviting_user_with_email_prefilled(
-    mocker,
     client_request,
+    mocker,
+    service_one,
     mock_get_template_folders,
     fake_uuid,
     active_user_with_permissions,
     active_user_with_permission_to_other_service,
+    mock_get_organisation_by_domain,
 ):
+    service_one['organisation'] = ORGANISATION_ID
     mocker.patch('app.models.user.user_api_client.get_user', side_effect=[
         # First call is to get the current user
         active_user_with_permissions,
@@ -728,6 +733,56 @@ def test_should_show_page_if_prefilled_user_is_already_a_team_member(
         'Someone’s already invited them. You do not need to do anything.'
     )
     assert not page.select("form")
+
+
+def test_should_403_if_trying_to_prefill_email_address_for_user_with_no_organisation(
+    mocker,
+    client_request,
+    service_one,
+    mock_get_template_folders,
+    fake_uuid,
+    active_user_with_permissions,
+    active_user_with_permission_to_other_service,
+    mock_get_no_organisation_by_domain,
+):
+    service_one['organisation'] = ORGANISATION_ID
+    mocker.patch('app.models.user.user_api_client.get_user', side_effect=[
+        # First call is to get the current user
+        active_user_with_permissions,
+        # Second call gets the user to invite
+        active_user_with_permission_to_other_service,
+    ])
+    client_request.get(
+        'main.invite_user',
+        service_id=SERVICE_ONE_ID,
+        user_id=fake_uuid,
+        _expected_status=403,
+    )
+
+
+def test_should_403_if_trying_to_prefill_email_address_for_user_from_other_organisation(
+    mocker,
+    client_request,
+    service_one,
+    mock_get_template_folders,
+    fake_uuid,
+    active_user_with_permissions,
+    active_user_with_permission_to_other_service,
+    mock_get_organisation_by_domain,
+):
+    service_one['organisation'] = ORGANISATION_TWO_ID
+    mocker.patch('app.models.user.user_api_client.get_user', side_effect=[
+        # First call is to get the current user
+        active_user_with_permissions,
+        # Second call gets the user to invite
+        active_user_with_permission_to_other_service,
+    ])
+    client_request.get(
+        'main.invite_user',
+        service_id=SERVICE_ONE_ID,
+        user_id=fake_uuid,
+        _expected_status=403,
+    )
 
 
 def test_should_show_folder_permission_form_if_service_has_folder_permissions_enabled(
@@ -801,13 +856,16 @@ def test_invite_user(
 
 def test_invite_user_when_email_address_is_prefilled(
     client_request,
+    service_one,
     active_user_with_permissions,
     active_user_with_permission_to_other_service,
     fake_uuid,
     mocker,
     sample_invite,
     mock_get_template_folders,
+    mock_get_organisation_by_domain,
 ):
+    service_one['organisation'] = ORGANISATION_ID
     mocker.patch('app.models.user.user_api_client.get_user', side_effect=[
         # First call is to get the current user
         active_user_with_permissions,

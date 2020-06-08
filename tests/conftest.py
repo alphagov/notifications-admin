@@ -3308,8 +3308,8 @@ def mock_get_organisation(mocker):
 
 @pytest.fixture(scope='function')
 def mock_get_organisation_by_domain(mocker):
-    def _get_organisation_by_domain(org_id):
-        return organisation_json(org_id)
+    def _get_organisation_by_domain(domain):
+        return organisation_json(ORGANISATION_ID)
 
     return mocker.patch(
         'app.organisations_client.get_organisation_by_domain',
