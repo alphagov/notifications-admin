@@ -10,18 +10,24 @@
 {% block maincolumn_content %}
 
   {{ page_header(
-    'Invite a team member',
+    'Invite {}'.format(user_to_invite.name if user_to_invite else 'a team member') ,
     back_link=url_for('main.manage_users', service_id=current_service.id)
   ) }}
 
   {% call form_wrapper() %}
 
-    {{ form.email_address(
-      param_extensions={
-        "classes": "govuk-!-width-full"
-      },
-      error_message_with_html=True
-    ) }}
+    {% if user_to_invite %}
+      <p class="govuk-body">
+        {{ user_to_invite.email_address }}
+      </p>
+    {% else %}
+      {{ form.email_address(
+        param_extensions={
+          "classes": "govuk-!-width-full"
+        },
+        error_message_with_html=True
+      ) }}
+    {% endif %}
 
     {% include 'views/manage-users/permissions.html' %}
 
