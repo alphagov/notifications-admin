@@ -1,7 +1,7 @@
 {% extends "withnav_template.html" %}
 {% from "components/textbox.html" import textbox %}
 {% from "components/page-header.html" import page_header %}
-{% from "components/page-footer.html" import page_footer %}
+{% from "components/page-footer.html" import sticky_page_footer %}
 {% from "components/radios.html" import radios%}
 {% from "components/form.html" import form_wrapper %}
 
@@ -21,7 +21,7 @@
     {% else %}
     {% call form_wrapper() %}
 	    {{ radios(form.inbound_number) }}
-	    {{ page_footer('Save') }}
+	    {{ sticky_page_footer('Save') }}
   	{% endcall %}
 	{% endif %}
 
