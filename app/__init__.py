@@ -427,7 +427,7 @@ def format_notification_status(status, template_type):
             'failed': 'Failed',
             'technical-failure': 'Technical failure',
             'temporary-failure': 'Phone not accepting messages right now',
-            'permanent-failure': 'Phone number does not exist',
+            'permanent-failure': 'Not delivered',
             'delivered': 'Delivered',
             'sending': 'Sending',
             'created': 'Sending',

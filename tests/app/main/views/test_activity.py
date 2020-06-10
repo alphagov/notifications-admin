@@ -715,7 +715,7 @@ def test_big_numbers_dont_show_for_letters(
         ('sms', 'created', 'Sending since 27 September at 5:30pm', True),
         ('sms', 'sending', 'Sending since 27 September at 5:30pm', True),
         ('sms', 'temporary-failure', 'Phone not accepting messages right now 27 September at 5:31pm', False),
-        ('sms', 'permanent-failure', 'Phone number does not exist 27 September at 5:31pm', False),
+        ('sms', 'permanent-failure', 'Not delivered 27 September at 5:31pm', False),
         ('sms', 'delivered', 'Delivered 27 September at 5:31pm', True),
         ('letter', 'created', '27 September at 5:30pm', True),
         ('letter', 'pending-virus-check', '27 September at 5:30pm', True),
