@@ -81,7 +81,6 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             'active',
             'restricted',
             'email_from',
-            'reply_to_email_address',
             'research_mode',
             'sms_sender',
             'created_by',
