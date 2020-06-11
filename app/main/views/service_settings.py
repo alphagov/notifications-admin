@@ -724,6 +724,11 @@ def service_set_channel(service_id, channel):
 @main.route("/services/<uuid:service_id>/service-settings/set-auth-type", methods=['GET', 'POST'])
 @user_has_permissions('manage_service')
 def service_set_auth_type(service_id):
+    active_users_without_mobiles = [u for u in current_service.active_users if u.mobile_number is None]
+    # only care about invites that are still valid (not cancelled) and are email auth
+    invited_users_with_email_auth = [u for u in current_service.invited_users if u.email_auth and u.status == 'pending']
+    users_without_mobiles = active_users_without_mobiles + invited_users_with_email_auth
+
     form = ServiceEmailAuthForm(enabled=current_service.has_permission('email_auth'))
 
     if form.validate_on_submit():
@@ -731,7 +736,8 @@ def service_set_auth_type(service_id):
 
     return render_template(
         'views/service-settings/set-auth-type.html',
-        form=form
+        form=form,
+        users_without_mobiles=users_without_mobiles
     )
 
 
