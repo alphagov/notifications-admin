@@ -1,4 +1,4 @@
-from app.notify_client import NotifyAdminAPIClient, _attach_current_user
+from app.notify_client import NotifyAdminAPIClient, _attach_current_user, cache
 
 # must match key types in notifications-api/app/models.py
 KEY_TYPE_NORMAL = 'normal'
@@ -8,9 +8,11 @@ KEY_TYPE_TEST = 'test'
 
 class ApiKeyApiClient(NotifyAdminAPIClient):
 
+    @cache.set('service-{service_id}-api-keys')
     def get_api_keys(self, service_id):
         return self.get(url='/service/{}/api-keys'.format(service_id))
 
+    @cache.delete('service-{service_id}-api-keys')
     def create_api_key(self, service_id, key_name, key_type):
         data = {
             'name': key_name,
@@ -20,6 +22,7 @@ class ApiKeyApiClient(NotifyAdminAPIClient):
         key = self.post(url='/service/{}/api-key'.format(service_id), data=data)
         return key['data']
 
+    @cache.delete('service-{service_id}-api-keys')
     def revoke_api_key(self, service_id, key_id):
         data = _attach_current_user({})
         return self.post(

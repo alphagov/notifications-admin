@@ -459,7 +459,12 @@ def test_deletes_service_cache(
         'service-{}-templates'.format(SERVICE_ONE_ID),
     ]),
     ('archive_service', [SERVICE_ONE_ID, []], [
+        'service-{}-api-keys'.format(SERVICE_ONE_ID),
         'service-{}-templates'.format(SERVICE_ONE_ID),
+        'service-{}'.format(SERVICE_ONE_ID),
+    ]),
+    ('suspend_service', [SERVICE_ONE_ID], [
+        'service-{}-api-keys'.format(SERVICE_ONE_ID),
         'service-{}'.format(SERVICE_ONE_ID),
     ]),
 ])

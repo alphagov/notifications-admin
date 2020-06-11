@@ -130,12 +130,14 @@ class ServiceAPIClient(NotifyAdminAPIClient):
 
     @cache.delete('service-{service_id}')
     @cache.delete('service-{service_id}-templates')
+    @cache.delete('service-{service_id}-api-keys')
     def archive_service(self, service_id, cached_service_user_ids):
         if cached_service_user_ids:
             redis_client.delete(*map('user-{}'.format, cached_service_user_ids))
         return self.post('/service/{}/archive'.format(service_id), data=None)
 
     @cache.delete('service-{service_id}')
+    @cache.delete('service-{service_id}-api-keys')
     def suspend_service(self, service_id):
         return self.post('/service/{}/suspend'.format(service_id), data=None)
 
