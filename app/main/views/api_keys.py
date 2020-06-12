@@ -52,7 +52,8 @@ def api_documentation(service_id):
     return redirect(url_for('.documentation'), code=301)
 
 
-@main.route("/services/<uuid:service_id>/api/whitelist", methods=['GET', 'POST'])
+@main.route("/services/<uuid:service_id>/api/whitelist", methods=['GET', 'POST'], endpoint='old_guest_list')
+@main.route("/services/<uuid:service_id>/api/guest-list", methods=['GET', 'POST'])
 @user_has_permissions('manage_api_keys')
 def guest_list(service_id):
     form = GuestList()

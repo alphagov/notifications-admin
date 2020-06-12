@@ -349,6 +349,7 @@ class HeaderNavigation(Navigation):
         'no_cookie.view_template_version_preview',
         'view_template_versions',
         'guest_list',
+        'old_guest_list',
         'who_can_use_notify',
         'who_its_for',
     }
@@ -481,6 +482,7 @@ class MainNavigation(Navigation):
             'received_text_messages_callback',
             'revoke_api_key',
             'guest_list',
+            'old_guest_list',
         },
     }
 
@@ -976,6 +978,7 @@ class CaseworkNavigation(Navigation):
         'no_cookie.view_template_version_preview',
         'view_template_versions',
         'guest_list',
+        'old_guest_list',
         'who_can_use_notify',
         'who_its_for',
     }
@@ -1286,6 +1289,7 @@ class OrgNavigation(Navigation):
         'no_cookie.view_template_version_preview',
         'view_template_versions',
         'guest_list',
+        'old_guest_list',
         'who_can_use_notify',
         'who_its_for',
     }
