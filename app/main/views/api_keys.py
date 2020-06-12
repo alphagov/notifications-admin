@@ -18,9 +18,9 @@ from app import (
 from app.main import main
 from app.main.forms import (
     CreateKeyForm,
+    GuestList,
     ServiceDeliveryStatusCallbackForm,
     ServiceReceiveMessagesCallbackForm,
-    Whitelist,
 )
 from app.notify_client.api_key_api_client import (
     KEY_TYPE_NORMAL,
@@ -55,7 +55,7 @@ def api_documentation(service_id):
 @main.route("/services/<uuid:service_id>/api/whitelist", methods=['GET', 'POST'])
 @user_has_permissions('manage_api_keys')
 def whitelist(service_id):
-    form = Whitelist()
+    form = GuestList()
     if form.validate_on_submit():
         service_api_client.update_whitelist(service_id, {
             'email_addresses': list(filter(None, form.email_addresses.data)),
