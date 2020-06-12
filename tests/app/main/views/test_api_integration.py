@@ -421,7 +421,7 @@ def test_should_show_whitelist_page(
     mock_get_whitelist,
 ):
     page = client_request.get(
-        'main.whitelist',
+        'main.guest_list',
         service_id=SERVICE_ONE_ID,
     )
     textboxes = page.find_all('input', {'type': 'text'})
@@ -443,7 +443,7 @@ def test_should_update_whitelist(
     ])
 
     client_request.post(
-        'main.whitelist',
+        'main.guest_list',
         service_id=SERVICE_ONE_ID,
         _data=data,
     )
@@ -459,7 +459,7 @@ def test_should_validate_whitelist_items(
 ):
 
     page = client_request.post(
-        'main.whitelist',
+        'main.guest_list',
         service_id=SERVICE_ONE_ID,
         _data=OrderedDict([
             ('email_addresses-1', 'abc'),

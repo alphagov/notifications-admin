@@ -54,7 +54,7 @@ def api_documentation(service_id):
 
 @main.route("/services/<uuid:service_id>/api/whitelist", methods=['GET', 'POST'])
 @user_has_permissions('manage_api_keys')
-def whitelist(service_id):
+def guest_list(service_id):
     form = GuestList()
     if form.validate_on_submit():
         service_api_client.update_whitelist(service_id, {
