@@ -418,7 +418,7 @@ def test_should_show_whitelist_page(
     api_user_active,
     mock_get_service,
     mock_has_permissions,
-    mock_get_whitelist,
+    mock_get_guest_list,
 ):
     page = client_request.get(
         'main.guest_list',
@@ -433,7 +433,7 @@ def test_should_show_whitelist_page(
 
 def test_should_update_whitelist(
     client_request,
-    mock_update_whitelist,
+    mock_update_guest_list,
 ):
     data = OrderedDict([
         ('email_addresses-1', 'test@example.com'),
@@ -448,14 +448,14 @@ def test_should_update_whitelist(
         _data=data,
     )
 
-    mock_update_whitelist.assert_called_once_with(SERVICE_ONE_ID, {
+    mock_update_guest_list.assert_called_once_with(SERVICE_ONE_ID, {
         'email_addresses': ['test@example.com', 'test@example.com'],
         'phone_numbers': ['07900900000', '+1800-555-555']})
 
 
 def test_should_validate_whitelist_items(
     client_request,
-    mock_update_whitelist,
+    mock_update_guest_list,
 ):
 
     page = client_request.post(
@@ -477,7 +477,7 @@ def test_should_validate_whitelist_items(
     assert jump_links[1].string.strip() == 'Enter valid phone numbers'
     assert jump_links[1]['href'] == '#phone_numbers'
 
-    assert mock_update_whitelist.called is False
+    assert mock_update_guest_list.called is False
 
 
 @pytest.mark.parametrize('endpoint', [

@@ -57,14 +57,14 @@ def api_documentation(service_id):
 def guest_list(service_id):
     form = GuestList()
     if form.validate_on_submit():
-        service_api_client.update_whitelist(service_id, {
+        service_api_client.update_guest_list(service_id, {
             'email_addresses': list(filter(None, form.email_addresses.data)),
             'phone_numbers': list(filter(None, form.phone_numbers.data))
         })
         flash('Guest list updated', 'default_with_tick')
         return redirect(url_for('.api_integration', service_id=service_id))
     if not form.errors:
-        form.populate(**service_api_client.get_whitelist(service_id))
+        form.populate(**service_api_client.get_guest_list(service_id))
     return render_template(
         'views/api/whitelist.html',
         form=form

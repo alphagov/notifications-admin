@@ -2827,22 +2827,22 @@ def mock_update_email_branding(mocker):
 
 
 @pytest.fixture(scope='function')
-def mock_get_whitelist(mocker):
-    def _get_whitelist(service_id):
+def mock_get_guest_list(mocker):
+    def _get_guest_list(service_id):
         return {
             'email_addresses': ['test@example.com'],
             'phone_numbers': ['07900900000']
         }
 
     return mocker.patch(
-        'app.service_api_client.get_whitelist', side_effect=_get_whitelist
+        'app.service_api_client.get_guest_list', side_effect=_get_guest_list
     )
 
 
 @pytest.fixture(scope='function')
-def mock_update_whitelist(mocker):
+def mock_update_guest_list(mocker):
     return mocker.patch(
-        'app.service_api_client.update_whitelist'
+        'app.service_api_client.update_guest_list'
     )
 
 
