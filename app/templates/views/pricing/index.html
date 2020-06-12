@@ -193,24 +193,33 @@
   <h2 class="heading-medium" id="letters">Letters</h2>
   <p class="govuk-body">The cost of sending a letter depends on the postage you choose and how many sheets of paper you need.</p>
 
+  <p class="govuk-body">Prices include:</p>
+  <ul class="list list-bullet">
+     <li>paper</li>
+     <li>postage</li>
+     <li>double-sided colour printing</li>
+     <li>C5 size envelopes with an address window</li>
+  </ul>
+
   <div>
     {% call mapping_table(
       caption='Letter pricing',
-      field_headings=['Paper', 'Second class', 'First class'],
+      field_headings=['Paper', 'Second class', 'First class', 'International'],
       field_headings_visible=True,
       caption_visible=False
     ) %}
-      {% for sheets, second, first in [
-        ('1 sheet', '35', '61'),
-        ('2 sheets', '40', '66'),
-        ('3 sheets', '45', '71'),
-        ('4 sheets', '50', '76'),
-        ('5 sheets', '55', '81'),
+      {% for sheets, second, first, international in [
+        ('1 sheet', '35p', '61p', '84p'),
+        ('2 sheets', '40p', '66p', '92p'),
+        ('3 sheets', '45p', '71p', '£1'),
+        ('4 sheets', '50p', '76p', '£1.08'),
+        ('5 sheets', '55p', '81p', '£1.16'),
       ] %}
         {% call row() %}
-          {% call row_heading() %} {{ sheets }} (double-sided) {% endcall %}
-          {{ text_field(second + 'p + VAT') }}
-          {{ text_field(first + 'p + VAT') }}
+          {% call row_heading() %} {{ sheets }} {% endcall %}
+          {{ text_field(second + ' + VAT') }}
+          {{ text_field(first + ' + VAT') }}
+          {{ text_field(international + ' + VAT') }}
         {% endcall %}
       {% endfor %}
     {% endcall %}
@@ -218,12 +227,5 @@
   <div class="panel panel-border-wide">
     <p class="govuk-body">These prices were updated on 1 October 2019.</p>
   </div>
-  <p class="govuk-body">Prices include:</p>
-  <ul class="list list-bullet">
-     <li>paper</li>
-     <li>double-sided colour printing</li>
-     <li>C5 size envelopes with an address window</li>
-     <li>first or second class postage</li>
-  </ul>
 
 {% endblock %}
