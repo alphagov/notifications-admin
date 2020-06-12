@@ -61,7 +61,7 @@ def whitelist(service_id):
             'email_addresses': list(filter(None, form.email_addresses.data)),
             'phone_numbers': list(filter(None, form.phone_numbers.data))
         })
-        flash('Whitelist updated', 'default_with_tick')
+        flash('Guest list updated', 'default_with_tick')
         return redirect(url_for('.api_integration', service_id=service_id))
     if not form.errors:
         form.populate(**service_api_client.get_whitelist(service_id))
@@ -85,7 +85,7 @@ def create_api_key(service_id):
     form = CreateKeyForm(current_service.api_keys)
     form.key_type.choices = [
         (KEY_TYPE_NORMAL, 'Live – sends to anyone'),
-        (KEY_TYPE_TEAM, 'Team and whitelist – limits who you can send to'),
+        (KEY_TYPE_TEAM, 'Team and guest list – limits who you can send to'),
         (KEY_TYPE_TEST, 'Test – pretends to send messages'),
     ]
     disabled_options, option_hints = [], {}

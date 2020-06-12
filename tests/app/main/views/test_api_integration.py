@@ -208,18 +208,18 @@ def test_should_show_api_keys_page(
             'Live – sends to anyone '
             'Not available because your service is in trial mode'
         ),
-        'Team and whitelist – limits who you can send to',
+        'Team and guest list – limits who you can send to',
         'Test – pretends to send messages',
     ]),
     (False, False, [
         'Live – sends to anyone',
-        'Team and whitelist – limits who you can send to',
+        'Team and guest list – limits who you can send to',
         'Test – pretends to send messages',
     ]),
     (False, True, [
         'Live – sends to anyone',
         (
-            'Team and whitelist – limits who you can send to '
+            'Team and guest list – limits who you can send to '
             'Cannot be used to send letters'
         ),
         'Test – pretends to send messages',
@@ -468,7 +468,7 @@ def test_should_validate_whitelist_items(
         _expected_status=200,
     )
 
-    assert page.h1.string.strip() == 'There was a problem with your whitelist'
+    assert page.h1.string.strip() == 'There was a problem with your guest list'
     jump_links = page.select('.banner-dangerous a')
 
     assert jump_links[0].string.strip() == 'Enter valid email addresses'
