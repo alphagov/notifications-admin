@@ -66,7 +66,7 @@ def guest_list(service_id):
     if not form.errors:
         form.populate(**service_api_client.get_guest_list(service_id))
     return render_template(
-        'views/api/whitelist.html',
+        'views/api/guest-list.html',
         form=form
     )
 
