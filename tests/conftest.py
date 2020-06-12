@@ -1152,7 +1152,7 @@ def api_nongov_user_active(fake_uuid):
         'id': fake_uuid,
         'name': 'Test User',
         'password': 'somepassword',
-        'email_address': 'someuser@notonwhitelist.com',
+        'email_address': 'someuser@example.com',
         'mobile_number': '07700 900762',
         'state': 'active',
         'failed_login_count': 0,
@@ -1414,7 +1414,7 @@ def mock_register_user(mocker, api_user_pending):
 
 @pytest.fixture(scope='function')
 def mock_get_non_govuser(mocker, api_user_active):
-    api_user_active['email_address'] = 'someuser@notonwhitelist.com'
+    api_user_active['email_address'] = 'someuser@example.com'
 
     def _get_user(id_):
         api_user_active['id'] = id_

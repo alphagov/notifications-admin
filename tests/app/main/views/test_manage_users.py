@@ -684,7 +684,7 @@ def test_should_show_folder_permission_form_if_service_has_folder_permissions_en
 
 @pytest.mark.parametrize('email_address, gov_user', [
     ('test@example.gov.uk', True),
-    ('test@nonwhitelist.com', False)
+    ('test@example.com', False)
 ])
 def test_invite_user(
     client_request,
@@ -735,7 +735,7 @@ def test_invite_user(
 ])
 @pytest.mark.parametrize('email_address, gov_user', [
     ('test@example.gov.uk', True),
-    ('test@nonwhitelist.com', False)
+    ('test@example.com', False)
 ])
 def test_invite_user_with_email_auth_service(
     client_request,

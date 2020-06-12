@@ -314,7 +314,7 @@ def test_should_return_form_errors_with_duplicate_service_name_regardless_of_cas
     )
 
 
-def test_non_whitelist_user_cannot_access_create_service_page(
+def test_non_government_user_cannot_access_create_service_page(
     client_request,
     mock_get_non_govuser,
     api_nongov_user_active,
@@ -327,7 +327,7 @@ def test_non_whitelist_user_cannot_access_create_service_page(
     )
 
 
-def test_non_whitelist_user_cannot_create_service(
+def test_non_government_user_cannot_create_service(
     client_request,
     mock_get_non_govuser,
     api_nongov_user_active,
