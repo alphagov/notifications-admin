@@ -41,7 +41,7 @@ from app.main.views.dashboard import (
 from app.main.views.service_settings import get_branding_as_value_and_label
 from app.models.organisation import Organisation, Organisations
 from app.models.user import InvitedOrgUser, User
-from app.utils import user_has_permissions, user_is_platform_admin
+from app.utils import Spreadsheet, user_has_permissions, user_is_platform_admin
 
 
 @main.route("/organisations", methods=['GET'])
@@ -149,6 +149,30 @@ def organisation_dashboard(org_id):
             for key in ('emails_sent', 'sms_cost', 'letter_cost')
         }
     )
+
+
+@main.route("/organisations/<uuid:org_id>", methods=['GET'])
+@user_has_permissions()
+def organisation_dashboard_csv(org_id):
+    year, current_financial_year = requested_and_current_financial_year(request)
+    services = current_organisation.services_and_usage(
+        financial_year=year
+    )['services']
+    return Spreadsheet.from_rows([
+        [
+            service['emails_sent'],
+            service['sms_billable_units'],
+            service['sms_cost'],
+            service['letter_cost'],
+        ]
+        for service in services
+    ]).as_csv_data, 200, {
+        'Content-Type': 'text/csv; charset=utf-8',
+        'Content-Disposition': 'inline; filename="{}-{}.csv"'.format(
+            current_organisation.name,
+            'dt',
+        )
+    }
 
 
 @main.route("/organisations/<uuid:org_id>/trial-services", methods=['GET'])
