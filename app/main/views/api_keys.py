@@ -18,9 +18,9 @@ from app import (
 from app.main import main
 from app.main.forms import (
     CreateKeyForm,
+    GuestList,
     ServiceDeliveryStatusCallbackForm,
     ServiceReceiveMessagesCallbackForm,
-    Whitelist,
 )
 from app.notify_client.api_key_api_client import (
     KEY_TYPE_NORMAL,
@@ -52,21 +52,22 @@ def api_documentation(service_id):
     return redirect(url_for('.documentation'), code=301)
 
 
-@main.route("/services/<uuid:service_id>/api/whitelist", methods=['GET', 'POST'])
+@main.route("/services/<uuid:service_id>/api/whitelist", methods=['GET', 'POST'], endpoint='old_guest_list')
+@main.route("/services/<uuid:service_id>/api/guest-list", methods=['GET', 'POST'])
 @user_has_permissions('manage_api_keys')
-def whitelist(service_id):
-    form = Whitelist()
+def guest_list(service_id):
+    form = GuestList()
     if form.validate_on_submit():
-        service_api_client.update_whitelist(service_id, {
+        service_api_client.update_guest_list(service_id, {
             'email_addresses': list(filter(None, form.email_addresses.data)),
             'phone_numbers': list(filter(None, form.phone_numbers.data))
         })
-        flash('Whitelist updated', 'default_with_tick')
+        flash('Guest list updated', 'default_with_tick')
         return redirect(url_for('.api_integration', service_id=service_id))
     if not form.errors:
-        form.populate(**service_api_client.get_whitelist(service_id))
+        form.populate(**service_api_client.get_guest_list(service_id))
     return render_template(
-        'views/api/whitelist.html',
+        'views/api/guest-list.html',
         form=form
     )
 
@@ -85,7 +86,7 @@ def create_api_key(service_id):
     form = CreateKeyForm(current_service.api_keys)
     form.key_type.choices = [
         (KEY_TYPE_NORMAL, 'Live – sends to anyone'),
-        (KEY_TYPE_TEAM, 'Team and whitelist – limits who you can send to'),
+        (KEY_TYPE_TEAM, 'Team and guest list – limits who you can send to'),
         (KEY_TYPE_TEST, 'Test – pretends to send messages'),
     ]
     disabled_options, option_hints = [], {}

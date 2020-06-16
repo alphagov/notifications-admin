@@ -8,7 +8,7 @@
 {% from "components/form.html" import form_wrapper %}
 
 {% block service_page_title %}
-  Whitelist
+  Guest list
 {% endblock %}
 
 {% block maincolumn_content %}
@@ -16,7 +16,7 @@
   {% if form.email_addresses.errors or form.phone_numbers.errors %}
     {% call banner_wrapper(type='dangerous') %}
       <h1 class='banner-title'>
-        There was a problem with your whitelist
+        There was a problem with your guest list
       </h1>
       <p class="govuk-body">Fix these errors:</p>
       <ul>
@@ -34,7 +34,7 @@
     {% endcall %}
   {% else %}
     {{ page_header(
-      'Whitelist',
+      'Guest list',
       back_link=url_for('main.api_integration', service_id=current_service.id)
     ) }}
   {% endif %}
@@ -42,7 +42,7 @@
   <p class="govuk-body">
     You and members of
     <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.manage_users', service_id=current_service.id) }}">your team</a>
-    are included in the whitelist automatically.
+    are included in the guest list automatically.
   </p>
 
   {% call form_wrapper() %}

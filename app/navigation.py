@@ -348,7 +348,8 @@ class HeaderNavigation(Navigation):
         'view_template_version',
         'no_cookie.view_template_version_preview',
         'view_template_versions',
-        'whitelist',
+        'guest_list',
+        'old_guest_list',
         'who_can_use_notify',
         'who_its_for',
     }
@@ -480,7 +481,8 @@ class MainNavigation(Navigation):
             'delivery_status_callback',
             'received_text_messages_callback',
             'revoke_api_key',
-            'whitelist',
+            'guest_list',
+            'old_guest_list',
         },
     }
 
@@ -975,7 +977,8 @@ class CaseworkNavigation(Navigation):
         'view_template_version',
         'no_cookie.view_template_version_preview',
         'view_template_versions',
-        'whitelist',
+        'guest_list',
+        'old_guest_list',
         'who_can_use_notify',
         'who_its_for',
     }
@@ -1285,7 +1288,8 @@ class OrgNavigation(Navigation):
         'view_template_version',
         'no_cookie.view_template_version_preview',
         'view_template_versions',
-        'whitelist',
+        'guest_list',
+        'old_guest_list',
         'who_can_use_notify',
         'who_its_for',
     }
