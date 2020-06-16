@@ -41,7 +41,7 @@ from wtforms.widgets import CheckboxInput, ListWidget
 
 from app import format_thousands
 from app.main.validators import (
-    Blacklist,
+    CommonlyUsedPassword,
     CsvFileValidator,
     DoesNotStartWithDoubleZero,
     LettersNumbersFullStopsAndUnderscoresOnly,
@@ -184,7 +184,7 @@ def password(label='Password'):
     return PasswordField(label,
                          validators=[DataRequired(message='Cannot be empty'),
                                      Length(8, 255, message='Must be at least 8 characters'),
-                                     Blacklist(message='Choose a password that’s harder to guess')])
+                                     CommonlyUsedPassword(message='Choose a password that’s harder to guess')])
 
 
 class SMSCode(StringField):

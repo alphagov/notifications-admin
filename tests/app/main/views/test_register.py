@@ -150,7 +150,7 @@ def test_should_add_user_details_to_session(
     assert session['user_details']['email'] == email_address
 
 
-def test_should_return_200_if_password_is_blacklisted(
+def test_should_return_200_if_password_is_on_list_of_commonly_used_passwords(
     client,
     mock_get_user_by_email,
     mock_login,

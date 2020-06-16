@@ -9,18 +9,18 @@ from notifications_utils.recipients import (
 from notifications_utils.sanitise_text import SanitiseSMS
 from wtforms import ValidationError
 
-from app.main._blacklisted_passwords import blacklisted_passwords
+from app.main._commonly_used_passwords import commonly_used_passwords
 from app.utils import Spreadsheet, is_gov_user
 
 
-class Blacklist:
+class CommonlyUsedPassword:
     def __init__(self, message=None):
         if not message:
-            message = 'Password is blacklisted.'
+            message = 'Password is in list of commonly used passwords.'
         self.message = message
 
     def __call__(self, form, field):
-        if field.data in blacklisted_passwords:
+        if field.data in commonly_used_passwords:
             raise ValidationError(self.message)
 
 

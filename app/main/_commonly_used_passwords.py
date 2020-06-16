@@ -1,4 +1,4 @@
-blacklisted_passwords = [
+commonly_used_passwords = [
     'govuknotify',
     'GOVUKnotify',
     'GOV.UK Notify',
