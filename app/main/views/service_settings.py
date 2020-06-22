@@ -864,29 +864,6 @@ def service_delete_sms_sender(service_id, sms_sender_id):
     return redirect(url_for('.service_sms_senders', service_id=service_id))
 
 
-@main.route("/services/<uuid:service_id>/service-settings/set-letter-contact-block", methods=['GET', 'POST'])
-@user_has_permissions('manage_service')
-def service_set_letter_contact_block(service_id):
-
-    if not current_service.has_permission('letter'):
-        abort(403)
-
-    form = ServiceLetterContactBlockForm(letter_contact_block=current_service.letter_contact_block)
-    if form.validate_on_submit():
-        current_service.update(
-            letter_contact_block=form.letter_contact_block.data.replace('\r', '') or None
-        )
-        if request.args.get('from_template'):
-            return redirect(
-                url_for('.view_template', service_id=service_id, template_id=request.args.get('from_template'))
-            )
-        return redirect(url_for('.service_settings', service_id=service_id))
-    return render_template(
-        'views/service-settings/set-letter-contact-block.html',
-        form=form
-    )
-
-
 @main.route("/services/<uuid:service_id>/service-settings/set-free-sms-allowance", methods=['GET', 'POST'])
 @user_is_platform_admin
 def set_free_sms_allowance(service_id):
