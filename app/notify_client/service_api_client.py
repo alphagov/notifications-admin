@@ -276,7 +276,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         """
         Retrieve all templates for service.
         """
-        endpoint = '/service/{service_id}/template'.format(
+        endpoint = '/service/{service_id}/template?detailed=False'.format(
             service_id=service_id)
         return self.get(endpoint)
 

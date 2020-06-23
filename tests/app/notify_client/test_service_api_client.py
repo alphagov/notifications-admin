@@ -275,7 +275,7 @@ def test_client_returns_count_of_service_templates(
             ],
             None,
             [
-                call('/service/{}/template'.format(SERVICE_ONE_ID))
+                call('/service/{}/template?detailed=False'.format(SERVICE_ONE_ID))
             ],
             [
                 call(
