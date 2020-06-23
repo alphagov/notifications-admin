@@ -820,6 +820,49 @@ def govuk_checkboxes_field_widget(self, field, wrap_in_collapsible=False, param_
             render_template('forms/fields/checkboxes/macro.njk', params=params))
 
 
+def govuk_radios_field_widget(self, field, param_extensions=None, **kwargs):
+
+    # error messages
+    error_message = None
+    if field.errors:
+        error_message = {
+            "attributes": {
+                "data-module": "track-error",
+                "data-error-type": field.errors[0],
+                "data-error-label": field.name
+            },
+            "text": " ".join(field.errors).strip()
+        }
+
+    # returns either a list or a hierarchy of lists
+    # depending on how get_items_from_options is implemented
+    items = self.get_items_from_options(field)
+
+    params = {
+        'name':  field.name,
+        "fieldset": {
+            "attributes": {"id": field.name},
+            "legend": {
+                "text": field.label.text,
+                "classes": "govuk-fieldset__legend--s"
+            }
+        },
+        'errorMessage': error_message,
+        'items': items
+    }
+
+    # extend default params with any sent in during instantiation
+    if self.param_extensions:
+        extend_params(params, self.param_extensions)
+
+    # add any sent in though use in templates
+    if param_extensions:
+        extend_params(params, param_extensions)
+
+    return Markup(
+        render_template('components/radios/template.njk', params=params))
+
+
 class GovukCheckboxField(BooleanField):
 
     def __init__(self, label='', validators=None, param_extensions=None, **kwargs):
@@ -880,6 +923,32 @@ class GovukCollapsibleCheckboxesField(GovukCheckboxesField):
 class GovukCollapsibleNestedCheckboxesField(NestedFieldMixin, GovukCollapsibleCheckboxesField):
     NONE_OPTION_VALUE = None
     render_as_list = True
+
+
+class GovukRadiosField(RadioField):
+
+    def __init__(self, label='', validators=None, param_extensions=None, **kwargs):
+        super(GovukRadiosField, self).__init__(label, validators, **kwargs)
+        self.param_extensions = param_extensions
+
+    def get_item_from_option(self, option):
+        return {
+            "name": option.name,
+            "id": option.id,
+            "text": option.label.text,
+            "value": str(option.data),  # to protect against non-string types like uuids
+            "checked": option.checked
+        }
+
+    def get_items_from_options(self, field):
+        return [self.get_item_from_option(option) for option in field]
+
+    # self.__call__ renders the HTML for the field by:
+    # 1. delegating to self.meta.render_field which
+    # 2. calls field.widget
+    # this bypasses that by making self.widget a method with the same interface as widget.__call__
+    def widget(self, field, param_extensions=None, **kwargs):
+        return govuk_radios_field_widget(self, field, param_extensions=param_extensions, **kwargs)
 
 
 # guard against data entries that aren't a role in permissions
