@@ -48,39 +48,6 @@ def test_should_403_if_not_platform_admin(
     client_request.get(endpoint, _expected_status=403)
 
 
-@pytest.mark.parametrize('endpoint, restricted, research_mode, displayed', [
-    ('main.trial_services', True, False, ''),
-    ('main.live_services', False, False, 'Live'),
-    ('main.live_services', False, True, 'research mode'),
-    ('main.trial_services', True, True, 'research mode')
-])
-def test_should_show_research_and_restricted_mode(
-    endpoint,
-    restricted,
-    research_mode,
-    displayed,
-    platform_admin_client,
-    mock_get_detailed_services,
-    fake_uuid,
-):
-    services = [service_json(fake_uuid, 'My Service', [], restricted=restricted, research_mode=research_mode)]
-    services[0]['statistics'] = create_stats()
-
-    mock_get_detailed_services.return_value = {'data': services}
-
-    response = platform_admin_client.get(url_for(endpoint))
-
-    assert response.status_code == 200
-    mock_get_detailed_services.assert_called_once_with({'detailed': True,
-                                                        'include_from_test_key': True,
-                                                        'only_active': False})
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    # get first column in second row, which contains flags as text.
-    table_body = page.find_all('table')[0].find_all('tbody')[0]
-    service_mode = table_body.find_all('tbody')[0].find_all('tr')[1].find_all('td')[0].text.strip()
-    assert service_mode == displayed
-
-
 @pytest.mark.parametrize('endpoint, expected_services_shown', [
     ('main.live_services', 1),
     ('main.trial_services', 1),
@@ -94,7 +61,12 @@ def test_should_render_platform_admin_page(
     response = platform_admin_client.get(url_for(endpoint))
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    assert len(page.select('tbody tr')) == expected_services_shown * 3  # one row for SMS, one for email, one for letter
+    assert [
+        normalize_spaces(column.text)
+        for column in page.select('tbody tr')[1].select('td')
+    ] == [
+        '0 emails sent', '0 text messages sent', '0 letters sent',
+    ]
     mock_get_detailed_services.assert_called_once_with({'detailed': True,
                                                         'include_from_test_key': True,
                                                         'only_active': False})
@@ -298,15 +270,15 @@ def test_format_stats_by_service_returns_correct_values(fake_uuid):
     ret = list(format_stats_by_service(services))
     assert len(ret) == 1
 
-    assert ret[0]['stats']['email']['sending'] == 2
+    assert ret[0]['stats']['email']['requested'] == 10
     assert ret[0]['stats']['email']['delivered'] == 3
     assert ret[0]['stats']['email']['failed'] == 5
 
-    assert ret[0]['stats']['sms']['sending'] == 32
+    assert ret[0]['stats']['sms']['requested'] == 50
     assert ret[0]['stats']['sms']['delivered'] == 7
     assert ret[0]['stats']['sms']['failed'] == 11
 
-    assert ret[0]['stats']['letter']['sending'] == 13
+    assert ret[0]['stats']['letter']['requested'] == 40
     assert ret[0]['stats']['letter']['delivered'] == 20
     assert ret[0]['stats']['letter']['failed'] == 7
 
@@ -344,17 +316,11 @@ def test_should_show_email_and_sms_stats_for_all_service_types(
 
     table_body = page.find_all('table')[0].find_all('tbody')[0]
     service_row_group = table_body.find_all('tbody')[0].find_all('tr')
-    email_stats = service_row_group[0].find_all('div', class_='big-number-number')
-    sms_stats = service_row_group[1].find_all('div', class_='big-number-number')
-    email_sending, email_delivered, email_failed = [int(x.text.strip()) for x in email_stats]
-    sms_sending, sms_delivered, sms_failed = [int(x.text.strip()) for x in sms_stats]
+    email_stats = service_row_group[1].select('.big-number-number')[0]
+    sms_stats = service_row_group[1].select('.big-number-number')[1]
 
-    assert email_sending == 2
-    assert email_delivered == 3
-    assert email_failed == 5
-    assert sms_sending == 32
-    assert sms_delivered == 7
-    assert sms_failed == 11
+    assert normalize_spaces(email_stats.text) == '10'
+    assert normalize_spaces(sms_stats.text) == '50'
 
 
 @pytest.mark.parametrize('endpoint, restricted', [
@@ -388,32 +354,9 @@ def test_should_show_archived_services_last(
     table_body = page.find_all('table')[0].find_all('tbody')[0]
     services = [service.tr for service in table_body.find_all('tbody')]
     assert len(services) == 3
-    assert services[0].td.text.strip() == 'A'
-    assert services[1].td.text.strip() == 'B'
-    assert services[2].td.text.strip() == 'C'
-
-
-@pytest.mark.parametrize('research_mode', (True, False))
-def test_shows_archived_label_instead_of_live_or_research_mode_label(
-    platform_admin_client,
-    mock_get_detailed_services,
-    research_mode,
-):
-    services = [
-        service_json(restricted=False, research_mode=research_mode, active=False)
-    ]
-    services[0]['statistics'] = create_stats()
-
-    mock_get_detailed_services.return_value = {'data': services}
-    response = platform_admin_client.get(url_for('main.live_services'))
-
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-
-    table_body = page.find_all('table')[0].find_all('tbody')[0]
-    service_mode = table_body.find_all('tbody')[0].find_all('tr')[1].td.text.strip()
-    # get second column, which contains flags as text.
-    assert service_mode == 'archived'
+    assert normalize_spaces(services[0].td.text) == 'A'
+    assert normalize_spaces(services[1].td.text) == 'B'
+    assert normalize_spaces(services[2].td.text) == 'C Archived'
 
 
 @pytest.mark.parametrize('endpoint, restricted, research_mode', [
@@ -472,9 +415,9 @@ def test_should_order_services_by_usage_with_inactive_last(
     table_body = page.find_all('table')[0].find_all('tbody')[0]
     services = [service.tr for service in table_body.find_all('tbody')]
     assert len(services) == 3
-    assert services[0].td.text.strip() == 'My Service 2'
-    assert services[1].td.text.strip() == 'My Service 1'
-    assert services[2].td.text.strip() == 'My Service 3'
+    assert normalize_spaces(services[0].td.text) == 'My Service 2'
+    assert normalize_spaces(services[1].td.text) == 'My Service 1'
+    assert normalize_spaces(services[2].td.text) == 'My Service 3 Archived'
 
 
 def test_sum_service_usage_is_sum_of_all_activity(fake_uuid):
