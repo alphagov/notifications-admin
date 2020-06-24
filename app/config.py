@@ -141,7 +141,7 @@ class Test(Development):
 class Preview(Config):
     HTTP_PROTOCOL = 'https'
     HEADER_COLOUR = '#F499BE'  # $baby-pink
-    STATSD_ENABLED = True
+    STATSD_ENABLED = False
     CSV_UPLOAD_BUCKET_NAME = 'preview-notifications-csv-upload'
     CONTACT_LIST_UPLOAD_BUCKET_NAME = 'preview-contact-list'
     LOGO_UPLOAD_BUCKET_NAME = 'public-logos-preview'
@@ -160,7 +160,7 @@ class Staging(Config):
     SHOW_STYLEGUIDE = False
     HTTP_PROTOCOL = 'https'
     HEADER_COLOUR = '#6F72AF'  # $mauve
-    STATSD_ENABLED = True
+    STATSD_ENABLED = False
     CSV_UPLOAD_BUCKET_NAME = 'staging-notifications-csv-upload'
     CONTACT_LIST_UPLOAD_BUCKET_NAME = 'staging-contact-list'
     LOGO_UPLOAD_BUCKET_NAME = 'public-logos-staging'
@@ -176,7 +176,7 @@ class Live(Config):
     SHOW_STYLEGUIDE = False
     HEADER_COLOUR = '#005EA5'  # $govuk-blue
     HTTP_PROTOCOL = 'https'
-    STATSD_ENABLED = True
+    STATSD_ENABLED = False
     CSV_UPLOAD_BUCKET_NAME = 'live-notifications-csv-upload'
     CONTACT_LIST_UPLOAD_BUCKET_NAME = 'production-contact-list'
     LOGO_UPLOAD_BUCKET_NAME = 'public-logos-production'
@@ -196,7 +196,7 @@ class CloudFoundryConfig(Config):
 class Sandbox(CloudFoundryConfig):
     HTTP_PROTOCOL = 'https'
     HEADER_COLOUR = '#F499BE'  # $baby-pink
-    STATSD_ENABLED = True
+    STATSD_ENABLED = False
     CSV_UPLOAD_BUCKET_NAME = 'cf-sandbox-notifications-csv-upload'
     LOGO_UPLOAD_BUCKET_NAME = 'cf-sandbox-notifications-logo-upload'
     NOTIFY_ENVIRONMENT = 'sandbox'
