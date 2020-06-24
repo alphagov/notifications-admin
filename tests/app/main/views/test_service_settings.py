@@ -3062,90 +3062,6 @@ def test_does_not_show_research_mode_indicator(
     assert not element
 
 
-@pytest.mark.parametrize('method', ['get', 'post'])
-def test_cant_set_letter_contact_block_if_service_cant_send_letters(
-    client_request,
-    service_one,
-    method,
-):
-    assert 'letter' not in service_one['permissions']
-    getattr(client_request, method)(
-        'main.service_set_letter_contact_block',
-        service_id=SERVICE_ONE_ID,
-        _expected_status=403,
-    )
-
-
-def test_set_letter_contact_block_prepopulates(
-    client_request,
-    service_one,
-):
-    service_one['permissions'] = ['letter']
-    service_one['letter_contact_block'] = 'foo bar baz waz'
-    page = client_request.get(
-        'main.service_set_letter_contact_block',
-        service_id=SERVICE_ONE_ID,
-    )
-    assert 'foo bar baz waz' in page.text
-
-
-def test_set_letter_contact_block_saves(
-    client_request,
-    service_one,
-    mock_update_service,
-):
-    service_one['permissions'] = ['letter']
-    client_request.post(
-        'main.service_set_letter_contact_block',
-        service_id=SERVICE_ONE_ID,
-        _data={'letter_contact_block': 'foo bar baz waz'},
-        _expected_status=302,
-        _expected_redirect=url_for(
-            'main.service_settings',
-            service_id=SERVICE_ONE_ID,
-            _external=True,
-        )
-    )
-    mock_update_service.assert_called_once_with(SERVICE_ONE_ID, letter_contact_block='foo bar baz waz')
-
-
-def test_set_letter_contact_block_redirects_to_template(
-    client_request,
-    service_one,
-    mock_update_service,
-):
-    service_one['permissions'] = ['letter']
-    client_request.post(
-        'main.service_set_letter_contact_block',
-        service_id=SERVICE_ONE_ID,
-        from_template=FAKE_TEMPLATE_ID,
-        _data={'letter_contact_block': '23 Whitechapel Road'},
-        _expected_status=302,
-        _expected_redirect=url_for(
-            'main.view_template',
-            service_id=service_one['id'],
-            template_id=FAKE_TEMPLATE_ID,
-            _external=True,
-        ),
-    )
-
-
-def test_set_letter_contact_block_has_max_10_lines(
-    client_request,
-    service_one,
-    mock_update_service,
-):
-    service_one['permissions'] = ['letter']
-    page = client_request.post(
-        'main.service_set_letter_contact_block',
-        service_id=SERVICE_ONE_ID,
-        _data={'letter_contact_block': '\n'.join(map(str, range(0, 11)))},
-        _expected_status=200,
-    )
-    error_message = page.find('span', class_='error-message').text.strip()
-    assert error_message == 'Contains 11 lines, maximum is 10'
-
-
 def test_service_set_letter_branding_platform_admin_only(
     client_request,
 ):
@@ -4306,22 +4222,6 @@ def test_set_inbound_sms_when_inbound_number_is_set(
 
     for index, p in enumerate(expected_paragraphs):
         assert normalize_spaces(paragraphs[index].text) == p
-
-
-def test_empty_letter_contact_block_returns_error(
-    client_request,
-    service_one,
-    mock_update_service,
-):
-    service_one['permissions'] = ['letter']
-    page = client_request.post(
-        'main.service_set_letter_contact_block',
-        service_id=SERVICE_ONE_ID,
-        _data={'letter_contact_block': None},
-        _expected_status=200,
-    )
-    error_message = page.find('span', class_='error-message').text.strip()
-    assert error_message == 'Cannot be empty'
 
 
 def test_show_sms_prefixing_setting_page(
