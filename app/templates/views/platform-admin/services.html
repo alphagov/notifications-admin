@@ -50,29 +50,18 @@
         {% call row() %}
           {% call field(border=False) %}
             <a href="{{ url_for('main.service_dashboard', service_id=service['id']) }}" class="govuk-link govuk-link--no-visited-state browse-list-link">{{ service['name'] }}</a>
+            {% if not service['active'] %}
+              <span class="heading-medium hint">&ensp;Archived</span>
+            {% endif %}
           {% endcall %}
 
           {{ stats_fields('email', service['stats']) }}
         {% endcall %}
 
         {% call row() %}
-          {% if not service['active'] %}
-            {% call field(status='default', border=False) %}
-              <span class="heading-medium">archived</span>
-            {% endcall %}
-          {% elif service['research_mode'] %}
-            {% call field(border=False) %}
-              <span class="research-mode">research mode</span>
-            {% endcall %}
-          {% elif not service['restricted'] %}
-            {% call field(status='error', border=False) %}
-              <span class="heading-medium">Live</span>
-            {% endcall %}
-          {% else %}
-            {% call field(border=False) %}
-            {% endcall %}
-          {% endif %}
 
+          {% call field(border=False) %}
+          {% endcall %}
           {{ stats_fields('sms', service['stats']) }}
         {% endcall %}
 
