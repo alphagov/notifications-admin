@@ -1157,7 +1157,7 @@ class AddNHSLocalOrganisationForm(StripWhitespaceForm):
         super().__init__(*args, **kwargs)
         self.organisations.choices = organisation_choices
 
-    organisations = RadioField(
+    organisations = GovukRadiosField(
         'Which NHS Trust or Clinical Commissioning Group do you work for?',
         thing='an NHS Trust or Clinical Commissioning Group'
     )

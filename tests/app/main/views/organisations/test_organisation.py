@@ -261,14 +261,14 @@ def test_nhs_local_can_create_own_organisations(
         'Which NHS Trust or Clinical Commissioning Group do you work for?'
     )
     assert page.select_one('[data-module=live-search]')['data-targets'] == (
-        '.multiple-choice'
+        '.govuk-radios__item'
     )
     assert [
         (
             normalize_spaces(radio.select_one('label').text),
             radio.select_one('input')['value']
         )
-        for radio in page.select('.multiple-choice')
+        for radio in page.select('.govuk-radios__item')
     ] == [
         ('Trust 1', 't1'),
         ('Trust 2', 't2'),
