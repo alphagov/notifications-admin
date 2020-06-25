@@ -981,7 +981,7 @@ class BasePermissionsForm(StripWhitespaceForm):
         'Folders this team member can see',
         field_label='folder')
 
-    login_authentication = RadioField(
+    login_authentication = GovukRadiosField(
         'Sign in using',
         choices=[
             ('sms_auth', 'Text message code'),
