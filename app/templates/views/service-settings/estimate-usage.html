@@ -3,7 +3,6 @@
 {% from "components/form.html" import form_wrapper %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
-{% from "components/radios.html" import radios %}
 
 {% block service_page_title %}
   Tell us how many messages you expect to send
@@ -39,7 +38,7 @@
             "hint": {"text": "For example, 50,000"},
           }) }}
         </div>
-        {{ radios(form.consent_to_research, hint='You do not have to take part and you can unsubscribe at any time') }}
+        {{ form.consent_to_research }}
         {{ page_footer('Continue') }}
       {% endcall %}
     </div>

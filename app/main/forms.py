@@ -1569,13 +1569,16 @@ class EstimateUsageForm(StripWhitespaceForm):
         things='letters',
         format_error_suffix='you expect to send',
     )
-    consent_to_research = RadioField(
+    consent_to_research = GovukRadiosField(
         'Can we contact you when we’re doing user research?',
         choices=[
             ('yes', 'Yes'),
             ('no', 'No'),
         ],
         thing='yes or no',
+        param_extensions={
+            'hint': {'text': 'You do not have to take part and you can unsubscribe at any time'}
+        }
     )
 
     at_least_one_volume_filled = True
