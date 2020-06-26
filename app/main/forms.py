@@ -951,6 +951,10 @@ class OrganisationTypeField(GovukRadiosField):
         )
 
 
+class GovukRadiosFieldWithNoneOption(FieldWithNoneOption, GovukRadiosField):
+    pass
+
+
 # guard against data entries that aren't a role in permissions
 def filter_by_permissions(valuelist):
     if valuelist is None:
