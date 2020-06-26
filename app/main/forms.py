@@ -1182,16 +1182,21 @@ class OrganisationCrownStatusForm(StripWhitespaceForm):
 
 
 class OrganisationAgreementSignedForm(StripWhitespaceForm):
-    agreement_signed = RadioField(
-        (
-            'Has this organisation signed the agreement?'
-        ),
+    agreement_signed = GovukRadiosField(
+        'Has this organisation signed the agreement?',
         choices=[
             ('yes', 'Yes'),
             ('no', 'No'),
             ('unknown', 'No (but we have some service-specific agreements in place)'),
         ],
         thing='whether this organisation has signed the agreement',
+        param_extensions={
+            'items': [
+                {'hint': {'html': 'Users will be told their organisation has already signed the agreement'}},
+                {'hint': {'html': 'Users will be prompted to sign the agreement before they can go live'}},
+                {'hint': {'html': 'Users will not be prompted to sign the agreement'}}
+            ]
+        }
     )
 
 

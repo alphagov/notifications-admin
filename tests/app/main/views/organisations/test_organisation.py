@@ -704,41 +704,44 @@ def test_organisation_settings_for_platform_admin(
     (
         '.edit_organisation_type',
         (
-            ('central', 'Central government'),
-            ('local', 'Local government'),
-            ('nhs_central', 'NHS – central government agency or public body'),
-            ('nhs_local', 'NHS Trust or Clinical Commissioning Group'),
-            ('nhs_gp', 'GP practice'),
-            ('emergency_service', 'Emergency service'),
-            ('school_or_college', 'School or college'),
-            ('other', 'Other'),
+            {'value': 'central', 'label': 'Central government'},
+            {'value': 'local', 'label': 'Local government'},
+            {'value': 'nhs_central', 'label': 'NHS – central government agency or public body'},
+            {'value': 'nhs_local', 'label': 'NHS Trust or Clinical Commissioning Group'},
+            {'value': 'nhs_gp', 'label': 'GP practice'},
+            {'value': 'emergency_service', 'label': 'Emergency service'},
+            {'value': 'school_or_college', 'label': 'School or college'},
+            {'value': 'other', 'label': 'Other'},
         ),
         'central',
     ),
     (
         '.edit_organisation_crown_status',
         (
-            ('crown', 'Yes'),
-            ('non-crown', 'No'),
-            ('unknown', 'Not sure'),
+            {'value': 'crown', 'label': 'Yes'},
+            {'value': 'non-crown', 'label': 'No'},
+            {'value': 'unknown', 'label': 'Not sure'},
         ),
         'crown',
     ),
     (
         '.edit_organisation_agreement',
         (
-            ('yes', (
-                'Yes '
-                'Users will be told their organisation has already signed the agreement'
-            )),
-            ('no', (
-                'No '
-                'Users will be prompted to sign the agreement before they can go live'
-            )),
-            ('unknown', (
-                'No (but we have some service-specific agreements in place) '
-                'Users will not be prompted to sign the agreement'
-            )),
+            {
+                'value': 'yes',
+                'label': 'Yes',
+                'hint': 'Users will be told their organisation has already signed the agreement'
+            },
+            {
+                'value': 'no',
+                'label': 'No',
+                'hint': 'Users will be prompted to sign the agreement before they can go live'
+            },
+            {
+                'value': 'unknown',
+                'label': 'No (but we have some service-specific agreements in place)',
+                'hint': 'Users will not be prompted to sign the agreement'
+            },
         ),
         'no',
     ),
@@ -769,11 +772,14 @@ def test_view_organisation_settings(
     radios = page.select('input[type=radio]')
 
     for index, option in enumerate(expected_options):
-        label = page.select_one('label[for={}]'.format(radios[index]['id']))
-        assert (
-            radios[index]['value'],
-            normalize_spaces(label.text),
-        ) == option
+        option_values = {
+            'value': radios[index]['value'],
+            'label': normalize_spaces(page.select_one('label[for={}]'.format(radios[index]['id'])).text)
+        }
+        if 'hint' in option:
+            option_values['hint'] = normalize_spaces(
+                page.select_one('label[for={}] + .govuk-hint'.format(radios[index]['id'])).text)
+        assert option_values == option
 
     if expected_selected:
         assert page.select_one('input[checked]')['value'] == expected_selected
