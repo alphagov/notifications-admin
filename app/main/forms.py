@@ -593,38 +593,6 @@ class PostalAddressField(TextAreaField):
             self.data = PostalAddress(valuelist[0]).normalised
 
 
-class OnOffField(RadioField):
-
-    def __init__(self, label, choices=None, *args, **kwargs):
-        choices = choices or [
-            (True, 'On'),
-            (False, 'Off'),
-        ]
-        super().__init__(
-            label,
-            choices=choices,
-            thing=f'{choices[0][1].lower()} or {choices[1][1].lower()}',
-            *args,
-            **kwargs,
-        )
-
-    def process_formdata(self, valuelist):
-        if valuelist:
-            value = valuelist[0]
-            self.data = (value == 'True') if value in ['True', 'False'] else value
-
-    def iter_choices(self):
-        for value, label in self.choices:
-            # This overrides WTForms default behaviour which is to check
-            # self.coerce(value) == self.data
-            # where self.coerce returns a string for a boolean input
-            yield (
-                value,
-                label,
-                (self.data in {value, self.coerce(value)})
-            )
-
-
 class LoginForm(StripWhitespaceForm):
     email_address = GovukEmailField('Email address', validators=[
         Length(min=5, max=255),
@@ -949,6 +917,38 @@ class GovukRadiosField(RadioField):
     # this bypasses that by making self.widget a method with the same interface as widget.__call__
     def widget(self, field, param_extensions=None, **kwargs):
         return govuk_radios_field_widget(self, field, param_extensions=param_extensions, **kwargs)
+
+
+class OnOffField(GovukRadiosField):
+
+    def __init__(self, label, choices=None, *args, **kwargs):
+        choices = choices or [
+            (True, 'On'),
+            (False, 'Off'),
+        ]
+        super().__init__(
+            label,
+            choices=choices,
+            thing=f'{choices[0][1].lower()} or {choices[1][1].lower()}',
+            *args,
+            **kwargs,
+        )
+
+    def process_formdata(self, valuelist):
+        if valuelist:
+            value = valuelist[0]
+            self.data = (value == 'True') if value in ['True', 'False'] else value
+
+    def iter_choices(self):
+        for value, label in self.choices:
+            # This overrides WTForms default behaviour which is to check
+            # self.coerce(value) == self.data
+            # where self.coerce returns a string for a boolean input
+            yield (
+                value,
+                label,
+                (self.data in {value, self.coerce(value)})
+            )
 
 
 # guard against data entries that aren't a role in permissions
