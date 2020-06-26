@@ -1,4 +1,3 @@
-{% from "components/radios.html" import radios %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/form.html" import form_wrapper %}
@@ -15,7 +14,7 @@
     back_link=url_for('.organisation_settings', org_id=current_org.id)
   ) }}
   {% call form_wrapper() %}
-    {{ radios(form.organisation_type) }}
+    {{ form.organisation_type }}
     {{ page_footer('Save') }}
   {% endcall %}
 {% endblock %}
