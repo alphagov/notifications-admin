@@ -1729,7 +1729,7 @@ class ServiceSwitchChannelForm(ServiceOnOffSettingForm):
 
 class SetEmailBranding(StripWhitespaceForm):
 
-    branding_style = RadioFieldWithNoneOption(
+    branding_style = GovukRadiosFieldWithNoneOption(
         'Branding style',
         thing='a branding style',
     )
