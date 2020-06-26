@@ -1,5 +1,4 @@
 {% extends "org_template.html" %}
-{% from "components/radios.html" import radios %}
 {% from "components/live-search.html" import live_search %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/page-header.html" import page_header %}
@@ -31,7 +30,7 @@
           label='Search by name',
           autofocus=True
         ) }}
-        {{ radios(form.branding_style, hide_legend=True) }}
+        {{ form.branding_style }}
       </div>
     </div>
     <div class="js-stick-at-bottom-when-scrolling">
