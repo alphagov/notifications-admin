@@ -1,5 +1,4 @@
 {% extends "withnav_template.html" %}
-{% from "components/radios.html" import radios %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer, sticky_page_footer %}
 {% from "components/live-search.html" import live_search %}
@@ -31,7 +30,7 @@
           label='Search branding styles by name',
           autofocus=True
         ) }}
-        {{ radios(form.branding_style) }}
+        {{ form.branding_style }}
       </div>
     </div>
     {{ sticky_page_footer('Preview') }}
