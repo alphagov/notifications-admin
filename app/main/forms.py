@@ -2097,14 +2097,14 @@ class BrandingOptions(StripWhitespaceForm):
 
 class ServiceDataRetentionForm(StripWhitespaceForm):
 
-    notification_type = RadioField(
+    notification_type = GovukRadiosField(
         'What notification type?',
         choices=[
             ('email', 'Email'),
             ('sms', 'SMS'),
             ('letter', 'Letter'),
         ],
-        validators=[DataRequired()],
+        thing='notification type',
     )
     days_of_retention = GovukIntegerField(
         label="Days of retention",
