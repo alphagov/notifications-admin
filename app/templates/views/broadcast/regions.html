@@ -1,7 +1,15 @@
-<h1>{{ regions.name }}</h1>
+{% from "components/page-header.html" import page_header %}
+{% extends "withoutnav_template.html" %}
 
-<a href="{{ url_for('.choose_broadcast_library') }}">Back</a>
+{% block maincolumn_content %}
 
-{% for region in regions %}
-  <h2><a href="{{ url_for('.add_broadcast_region', region_id=region.id) }}">{{ region.name }}</a></h2>
-{% endfor %}
+  {{ page_header(
+    regions.name,
+    back_link=url_for('.choose_broadcast_library'),
+  )}}
+
+  {% for region in regions %}
+    <h2 class="govuk-heading-m"><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.add_broadcast_region', region_id=region.id) }}">{{ region.name }}</a></h2>
+  {% endfor %}
+
+{% endblock %}

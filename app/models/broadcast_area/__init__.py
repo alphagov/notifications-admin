@@ -99,14 +99,14 @@ class BroadcastRegionLibrary(ModelList, IdFromNameMixin, GetByIdMixin):
     @property
     def examples(self):
 
-        max_displayed = 5
+        max_displayed = 4
         truncate_at = max_displayed - 1
 
         names = [area.name for area in self]
         excess_names = len(names) - truncate_at
 
         if excess_names > 1:
-            names = names[:truncate_at] + [f'{excess_names} more']
+            names = names[:truncate_at] + [f'{excess_names} more…']
 
         return formatted_list(names, before_each='', after_each='')
 
@@ -151,11 +151,17 @@ class BroadcastRegionLibraries(ModelList, GetByIdMixin):
             for region in self.get_regions(*regions)
         ]
 
-    def get_area_polygons_for_regions(self, *regions):
+    def get_area_polygons_for_regions_long_lat(self, *regions):
         return list(itertools.chain(*(
             region.areas
             for region in self.get_regions(*regions)
         )))
+
+    def get_area_polygons_for_regions_lat_long(self, *regions):
+        for area in self.get_area_polygons_for_regions_long_lat(*regions):
+            yield [
+                [long, lat] for lat, long in area
+            ]
 
 
 broadcast_region_libraries = BroadcastRegionLibraries()
