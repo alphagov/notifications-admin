@@ -1,0 +1,7 @@
+<h1>{{ regions.name }}</h1>
+
+<a href="{{ url_for('.choose_broadcast_library') }}">Back</a>
+
+{% for region in regions %}
+  <h2><a href="{{ url_for('.add_broadcast_region', region_id=region.id) }}">{{ region.name }}</a></h2>
+{% endfor %}

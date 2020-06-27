@@ -1,0 +1,14 @@
+<h1>Choose where to broadcast to</h1>
+
+Selected:
+
+{% for region in selected %}
+  &ensp;{{ region.parent.name }} > {{ region.name }} (<a href="{{ url_for('.remove_broadcast_region', region_id=region.id) }}">remove</a>)
+{% else %}
+  None
+{% endfor %}
+
+{% for library in libraries %}
+  <h2><a href="{{ url_for('.choose_broadcast_region', library=library.id) }}">{{ library.name }}</a></h2>
+  <p>{{ library.examples }}</p>
+{% endfor %}
