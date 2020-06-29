@@ -35,9 +35,9 @@
     {% for area in area_polygons %}
       polygons.push(
         L.polygon({{area}}, {
-          color: '#0b0b0c',
-          fillColor: '#ffffff',
-          fillOpacity: 0.3,
+          color: '#0b0b0c', // $black
+          fillColor: '#2B8CC4', // $light-blue
+          fillOpacity: 0.2,
           weight: 2
         })
       );
@@ -57,16 +57,20 @@
   {{ page_header("Choose where to broadcast to", back_link="#") }}
 
   {% for region in selected %}
-    {{ region.parent.name }} > {{ region.name }} (<a href="{{ url_for('.remove_broadcast_region', service_id=current_service.id, region_id=region.id) }}">remove</a>)&ensp;
+    {% if loop.first %}
+      <ul class="region-list">
+    {% endif %}
+        <li class="region-list-item">
+          {{ region.name }} <a class="region-list-item-remove" href="{{ url_for('.remove_broadcast_region', service_id=current_service.id, region_id=region.id) }}">remove</a>
+        </li>
     {% if loop.last %}
-      <p class="govuk-body">
-        {{ govukButton({
-          "element": "a",
-          "text": "Add another area",
-          "href": url_for('.choose_broadcast_library', service_id=current_service.id),
-          "classes": "govuk-button--secondary govuk-!-margin-top-2"
-        }) }}
-      </p>
+      {{ govukButton({
+        "element": "a",
+        "text": "Add another area",
+        "href": url_for('.choose_broadcast_library', service_id=current_service.id),
+        "classes": "govuk-button--secondary govuk-!-margin-bottom-5"
+      }) }}
+      </ul>
     {% endif %}
   {% else %}
   <p class="govuk-body">
