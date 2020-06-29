@@ -2,6 +2,11 @@ from flask import abort, has_request_context, request
 from flask_login import current_user
 from notifications_python_client import __version__
 from notifications_python_client.base import BaseAPIClient
+from notifications_utils.clients.redis import RequestCache
+
+from app.extensions import redis_client
+
+cache = RequestCache(redis_client)
 
 
 def _attach_current_user(data):
