@@ -9,38 +9,16 @@
 {% from "components/button/macro.njk" import govukButton %}
 {% from "components/details/macro.njk" import govukDetails %}
 
-{% macro stats_fields(channel, data) -%}
-
-  {% call field(border=False) %}
-      <span class="heading-medium">{{ channel.title() }}</span>
-  {% endcall %}
-
-  {% call field(align='right', border=False) %}
-    {{ big_number(data[channel]['sending'], smaller=True) }}
-  {% endcall %}
-
-  {% call field(align='right', border=False) %}
-    {{ big_number(data[channel]['delivered'], smaller=True) }}
-  {% endcall %}
-
-  {% call field(align='right', status='error' if data[channel]['failed'], border=False) %}
-    {{ big_number(data[channel]['failed'], smaller=True) }}
-  {% endcall %}
-
-{%- endmacro %}
-
 {% macro services_table(services, caption) %}
   {% call(item, row_number) mapping_table(
     caption=caption,
     caption_visible=False,
     field_headings=[
-    'Service',
-    hidden_field_heading('Type'),
-    right_aligned_field_heading('Sending'),
-    right_aligned_field_heading('Delivered'),
-    right_aligned_field_heading('Failed')
+    right_aligned_field_heading('Emails'),
+    right_aligned_field_heading('Text messages'),
+    right_aligned_field_heading('Letters')
     ],
-    field_headings_visible=True
+    field_headings_visible=False,
   ) %}
 
     {% for service in services %}
@@ -48,41 +26,25 @@
       {% call row_group() %}
 
         {% call row() %}
-          {% call field(border=False) %}
-            <a href="{{ url_for('main.service_dashboard', service_id=service['id']) }}" class="govuk-link govuk-link--no-visited-state browse-list-link">{{ service['name'] }}</a>
+          {% call field(border=False, colspan=3) %}
+            <a href="{{ url_for('main.service_dashboard', service_id=service['id']) }}" class="file-list-filename-large govuk-link govuk-link--no-visited-state govuk-!-padding-bottom-4">{{ service['name'] }}</a>
+            {% if not service['active'] %}
+              <span class="heading-medium hint">&ensp;Archived</span>
+            {% endif %}
           {% endcall %}
 
-          {{ stats_fields('email', service['stats']) }}
         {% endcall %}
 
         {% call row() %}
-          {% if not service['active'] %}
-            {% call field(status='default', border=False) %}
-              <span class="heading-medium">archived</span>
-            {% endcall %}
-          {% elif service['research_mode'] %}
+          {% for channel in ('email', 'sms', 'letter') %}
             {% call field(border=False) %}
-              <span class="research-mode">research mode</span>
+              {{ big_number(
+                service['stats'][channel]['requested'],
+                smallest=True,
+                label=message_count_label(service['stats'][channel]['requested'], channel)
+              ) }}
             {% endcall %}
-          {% elif not service['restricted'] %}
-            {% call field(status='error', border=False) %}
-              <span class="heading-medium">Live</span>
-            {% endcall %}
-          {% else %}
-            {% call field(border=False) %}
-            {% endcall %}
-          {% endif %}
-
-          {{ stats_fields('sms', service['stats']) }}
-        {% endcall %}
-
-        {% call row() %}
-
-          {% call field(border=False) %}
-
-          {% endcall %}
-            {{ stats_fields('letter', service['stats']) }}
-
+          {% endfor %}
         {% endcall %}
 
       {% endcall %}
