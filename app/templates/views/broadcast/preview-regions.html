@@ -86,7 +86,7 @@
   {% if selected %}
     <div id="map"></div>
 
-    <form action="{{ url_for('.send_to_broadcast_region', service_id=current_service.id) }}" method="get">
+    <form action="{{ url_for('.preview_broadcast_message', service_id=current_service.id) }}" method="get">
       {{ sticky_page_footer('Continue to preview') }}
     </form>
 

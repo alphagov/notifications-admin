@@ -83,6 +83,17 @@ def remove_broadcast_region(service_id, region_id):
     ))
 
 
+@main.route("/services/<uuid:service_id>/broadcast/preview")
+def preview_broadcast_message(service_id):
+    selected_regions_ids = session.get('broadcast_regions', [])
+    return render_template(
+        'views/broadcast/preview-message.html',
+        selected=list(broadcast_region_libraries.get_regions(
+            *selected_regions_ids
+        )),
+    )
+
+
 @main.route("/services/<uuid:service_id>/broadcast/send")
 def send_to_broadcast_region(service_id):
     selected_regions_ids = session.get('broadcast_regions', [])
