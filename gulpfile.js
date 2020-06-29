@@ -95,6 +95,16 @@ const copy = {
         )
       });
     }
+  },
+  leaflet: {
+    js: () => {
+      return src(paths.npm + 'leaflet/dist/leaflet.js')
+        .pipe(dest(paths.dist + 'javascripts/'))
+    },
+    css: () => {
+      return src(paths.npm + 'leaflet/dist/leaflet.css')
+        .pipe(dest(paths.dist + 'stylesheets/'))
+    }
   }
 };
 
@@ -264,7 +274,9 @@ const defaultTask = parallel(
   parallel(
     copy.govuk_frontend.fonts,
     copy.govuk_frontend.templates,
-    images
+    images,
+    copy.leaflet.css,
+    copy.leaflet.js
   ),
   series(
     copy.error_pages,

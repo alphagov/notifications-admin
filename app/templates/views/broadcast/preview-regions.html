@@ -4,21 +4,46 @@
 
 {% extends "withnav_template.html" %}
 
-{% block maincolumn_content %}
-
-
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
-     integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
-     crossorigin=""/>
-   <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
-      integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
-      crossorigin=""></script>
+{% block extra_stylesheets %}
+  <link rel="stylesheet" href="{{ asset_url('stylesheets/leaflet.css') }}" />
   <style>
     #map {
       z-index: 50;
       margin-bottom: 30px;
     }
   </style>
+{% endblock %}
+
+{% block extra_javascripts %}
+  <script src="{{ asset_url('javascripts/leaflet.js') }}"></script>
+  <script>
+    var mapElement = document.getElementById('map');
+    mapElement.style.height = Math.max(320, window.innerHeight - mapElement.offsetTop - 100) + 'px';
+    var mymap = L.map(
+      'map',
+      {
+        scrollWheelZoom: false
+      }
+    )
+    var polygons = []
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(mymap);
+
+    {% for area in area_polygons %}
+      polygons.push(
+        L.polygon({{area}})
+      );
+    {% endfor %}
+
+    var polygonGroup = L.featureGroup(polygons).addTo(mymap);
+    mymap.fitBounds(polygonGroup.getBounds());
+
+  </script>
+{% endblock %}
+
+{% block maincolumn_content %}
 
   {{ page_header("Choose where to broadcast to", back_link="#") }}
 
@@ -47,32 +72,6 @@
 
   {% if selected %}
     <div id="map"></div>
-
-    <script>
-      var mapElement = document.getElementById('map');
-      mapElement.style.height = Math.max(320, window.innerHeight - mapElement.offsetTop - 100) + 'px';
-      var mymap = L.map(
-        'map',
-        {
-          scrollWheelZoom: false
-        }
-      )
-      var polygons = []
-
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-      }).addTo(mymap);
-
-      {% for area in area_polygons %}
-        polygons.push(
-          L.polygon({{area}})
-        );
-      {% endfor %}
-
-      var polygonGroup = L.featureGroup(polygons).addTo(mymap);
-      mymap.fitBounds(polygonGroup.getBounds());
-
-    </script>
 
     <form action="{{ url_for('.send_to_broadcast_region', service_id=current_service.id) }}" method="get">
       {{ sticky_page_footer('Continue to preview') }}
