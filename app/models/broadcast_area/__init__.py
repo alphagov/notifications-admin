@@ -1,11 +1,26 @@
 import itertools
 from pathlib import Path
-
+from functools import lru_cache
 import geojson
 from notifications_utils.formatters import formatted_list
 
 from app.models import ModelList
 from app.utils import id_safe
+
+
+@lru_cache(maxsize=128)
+def load_geojson_file(filename):
+
+    path = Path(__file__).resolve().parent / filename
+
+    geojson_data = geojson.loads(path.read_text())
+
+    if not geojson_data.is_valid:
+        raise ValueError(
+            f'Contents of {path} are not valid GeoJSON'
+        )
+
+    return path.stem, geojson_data
 
 
 class IdFromNameMixin:
@@ -83,16 +98,7 @@ class BroadcastRegionLibrary(ModelList, IdFromNameMixin, GetByIdMixin):
 
     def client_method(self, filename):
 
-        library_path = Path(__file__).resolve().parent / filename
-
-        self.name = library_path.stem
-
-        geojson_data = geojson.loads(library_path.read_text())
-
-        if not geojson_data.is_valid:
-            raise ValueError(
-                f'Contents of {library_path} are not valid GeoJSON'
-            )
+        self.name, geojson_data = load_geojson_file(filename)
 
         return geojson_data['features']
 
