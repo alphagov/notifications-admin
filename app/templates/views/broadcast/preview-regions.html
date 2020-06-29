@@ -10,6 +10,7 @@
     #map {
       z-index: 50;
       margin-bottom: 30px;
+      border: 1px solid #b1b4b6;
     }
   </style>
 {% endblock %}
@@ -33,12 +34,20 @@
 
     {% for area in area_polygons %}
       polygons.push(
-        L.polygon({{area}})
+        L.polygon({{area}}, {
+          color: '#0b0b0c',
+          fillColor: '#ffffff',
+          fillOpacity: 0.3,
+          weight: 2
+        })
       );
     {% endfor %}
 
     var polygonGroup = L.featureGroup(polygons).addTo(mymap);
-    mymap.fitBounds(polygonGroup.getBounds());
+    mymap.fitBounds(
+      polygonGroup.getBounds(),
+      {padding: [5, 5]}
+    );
 
   </script>
 {% endblock %}
