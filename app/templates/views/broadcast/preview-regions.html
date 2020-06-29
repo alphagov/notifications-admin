@@ -2,7 +2,7 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import sticky_page_footer %}
 
-{% extends "withoutnav_template.html" %}
+{% extends "withnav_template.html" %}
 
 {% block maincolumn_content %}
 
@@ -23,13 +23,13 @@
   {{ page_header("Choose where to broadcast to", back_link="#") }}
 
   {% for region in selected %}
-    {{ region.parent.name }} > {{ region.name }} (<a href="{{ url_for('.remove_broadcast_region', region_id=region.id) }}">remove</a>)&ensp;
+    {{ region.parent.name }} > {{ region.name }} (<a href="{{ url_for('.remove_broadcast_region', service_id=current_service.id, region_id=region.id) }}">remove</a>)&ensp;
     {% if loop.last %}
       <p class="govuk-body">
         {{ govukButton({
           "element": "a",
           "text": "Add another area",
-          "href": url_for('.choose_broadcast_library'),
+          "href": url_for('.choose_broadcast_library', service_id=current_service.id),
           "classes": "govuk-button--secondary govuk-!-margin-top-2"
         }) }}
       </p>
@@ -39,7 +39,7 @@
     {{ govukButton({
       "element": "a",
       "text": "Add broadcast areas",
-      "href": url_for('.choose_broadcast_library'),
+      "href": url_for('.choose_broadcast_library', service_id=current_service.id),
       "classes": "govuk-button--secondary"
     }) }}
   </p>
@@ -74,7 +74,7 @@
 
     </script>
 
-    <form action="{{ url_for('.send_to_broadcast_region') }}" method="get">
+    <form action="{{ url_for('.send_to_broadcast_region', service_id=current_service.id) }}" method="get">
       {{ sticky_page_footer('Continue to preview') }}
     </form>
 
