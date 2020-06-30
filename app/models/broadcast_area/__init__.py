@@ -32,6 +32,9 @@ class IdFromNameMixin:
     def __repr__(self):
         return f'{self.__class__.__name__}(<{self.id}>)'
 
+    def __lt__(self, other):
+        return self.id < other.id
+
 
 class GetByIdMixin:
     def get(self, id):
@@ -108,7 +111,7 @@ class BroadcastRegionLibrary(ModelList, IdFromNameMixin, GetByIdMixin):
         max_displayed = 4
         truncate_at = max_displayed - 1
 
-        names = [area.name for area in self]
+        names = [area.name for area in sorted(self)]
         excess_names = len(names) - truncate_at
 
         if excess_names > 1:

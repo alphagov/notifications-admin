@@ -9,7 +9,7 @@
     back_link=url_for(".preview_broadcast_regions", service_id=current_service.id)
   ) }}
 
-  {% for library in libraries %}
+  {% for library in libraries|sort %}
     <a class="file-list-filename-large govuk-link govuk-link--no-visited-state" href="{{ url_for('.choose_broadcast_region', service_id=current_service.id, library_id=library.id) }}">{{ library.name }}</a>
     <p class="file-list-hint-large">{{ library.examples }}</p>
   {% endfor %}

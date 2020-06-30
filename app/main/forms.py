@@ -1801,6 +1801,6 @@ class BroadcastRegionForm(StripWhitespaceForm):
 
     @classmethod
     def from_library(cls, library):
-        return cls(choices=sorted([
-            (region.id, region.name) for region in library
-        ]))
+        return cls(choices=[
+            (region.id, region.name) for region in sorted(library)
+        ])
