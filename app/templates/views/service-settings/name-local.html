@@ -18,10 +18,11 @@
 
   <p class="govuk-body">Your service name should tell users what the message is about as well as who it’s from. For example:</p>
     <ul class="list-bullet">
-        <li>School admissions - Brighton & Hove City Council</li>
-        <li>Electoral services - London Borough of Bromley</li>
-        <li>Blue Badge - Redcar & Cleveland Borough Council</li>
+      <li>School admissions - {{ current_user.default_organisation.name }}</li>
+      <li>Electoral services - {{ current_user.default_organisation.name }}</li>
+      <li>Blue Badge - {{ current_user.default_organisation.name }}</li>
     </ul>
+    
   <p class="govuk-body">You should only use an acronym if your users are already familiar with it.</p>
 
   <div class="form-group">
