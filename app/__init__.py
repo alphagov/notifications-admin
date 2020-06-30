@@ -45,12 +45,7 @@ from app import proxy_fix
 from app.asset_fingerprinter import asset_fingerprinter
 from app.commands import setup_commands
 from app.config import configs
-from app.extensions import (
-    antivirus_client,
-    redis_client,
-    statsd_client,
-    zendesk_client,
-)
+from app.extensions import antivirus_client, redis_client, zendesk_client
 from app.models.organisation import Organisation
 from app.models.service import Service
 from app.models.user import AnonymousUser, User
@@ -166,14 +161,13 @@ def create_app(application):
 
         # External API clients
         antivirus_client,
-        statsd_client,
+        redis_client,
         zendesk_client,
-        redis_client
 
     ):
         client.init_app(application)
 
-    logging.init_app(application, statsd_client)
+    logging.init_app(application)
 
     login_manager.login_view = 'main.sign_in'
     login_manager.login_message_category = 'default'
