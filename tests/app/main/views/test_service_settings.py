@@ -107,6 +107,7 @@ def mock_get_service_settings_page_common(
         'Data retention email Change',
         'Receive inbound SMS Off Change',
         'Email authentication Off Change',
+        'Send cell broadcasts Off Change',
     ]),
 ])
 def test_should_show_overview(

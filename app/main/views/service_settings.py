@@ -69,6 +69,7 @@ PLATFORM_ADMIN_SERVICE_PERMISSIONS = OrderedDict([
     ('email_auth', {'title': 'Email authentication'}),
     ('upload_letters', {'title': 'Uploading letters', 'requires': 'letter'}),
     ('international_letters', {'title': 'Send international letters', 'requires': 'letter'}),
+    ('broadcast', {'title': 'Send cell broadcasts'}),
 ])
 
 
