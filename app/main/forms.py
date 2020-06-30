@@ -1789,3 +1789,18 @@ class AcceptAgreementForm(StripWhitespaceForm):
             float(field.data)
         except (TypeError, ValueError):
             raise ValidationError("Must be a number")
+
+
+class BroadcastRegionForm(StripWhitespaceForm):
+
+    regions = MultiCheckboxField('Choose areas to broadcast to')
+
+    def __init__(self, choices, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.regions.choices = choices
+
+    @classmethod
+    def from_library(cls, library):
+        return cls(choices=sorted([
+            (region.id, region.name) for region in library
+        ]))

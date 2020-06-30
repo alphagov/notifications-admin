@@ -1,15 +1,25 @@
 {% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import sticky_page_footer %}
+{% from "components/checkbox.html" import checkbox, checkboxes %}
+{% from "components/checkbox.html" import checkbox, checkboxes %}
+{% from "components/form.html" import form_wrapper %}
+
 {% extends "withnav_template.html" %}
 
 {% block maincolumn_content %}
 
   {{ page_header(
-    regions.name,
+    page_title,
     back_link=url_for('.choose_broadcast_library', service_id=current_service.id),
   )}}
 
   {% for region in regions %}
     <h2 class="govuk-heading-m"><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.add_broadcast_region', service_id=current_service.id, region_id=region.id) }}">{{ region.name }}</a></h2>
   {% endfor %}
+
+  {% call form_wrapper() %}
+    {{ checkboxes(form.regions) }}
+    {{ sticky_page_footer('Select areas') }}
+  {% endcall %}
 
 {% endblock %}
