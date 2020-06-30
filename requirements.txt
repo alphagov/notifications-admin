@@ -28,11 +28,15 @@ itsdangerous==1.1.0
 git+https://github.com/alphagov/notifications-utils.git@39.7.0#egg=notifications-utils==39.7.0
 git+https://github.com/alphagov/govuk-frontend-jinja.git@v0.5.1-alpha#egg=govuk-frontend-jinja==0.5.1-alpha
 
+# gds-metrics requires prometheseus 0.2.0, override that requirement as later versions bring significant performance gains
+prometheus-client==0.8.0
+gds-metrics==0.2.0
+
 ## The following requirements were added by pip freeze:
-awscli==1.18.84
+awscli==1.18.90
 bleach==3.1.4
 boto3==1.10.38
-botocore==1.17.7
+botocore==1.17.13
 cachetools==4.1.0
 certifi==2020.6.20
 chardet==3.0.4
@@ -45,7 +49,7 @@ et-xmlfile==1.0.1
 flask-redis==0.4.0
 future==0.18.2
 greenlet==0.4.16
-idna==2.9
+idna==2.10
 jdcal==1.4.1
 Jinja2==2.11.2
 jmespath==0.10.0
@@ -54,7 +58,7 @@ lxml==4.5.1
 MarkupSafe==1.1.1
 mistune==0.8.4
 monotonic==1.5
-openpyxl==3.0.3
+openpyxl==3.0.4
 orderedset==2.0.1
 phonenumbers==8.11.2
 pyasn1==0.4.8

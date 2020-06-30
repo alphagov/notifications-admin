@@ -24,6 +24,7 @@ from flask.globals import _lookup_req_object, _request_ctx_stack
 from flask_login import LoginManager, current_user
 from flask_wtf import CSRFProtect
 from flask_wtf.csrf import CSRFError
+from gds_metrics import GDSMetrics
 from govuk_frontend_jinja.flask_ext import init_govuk_frontend
 from itsdangerous import BadSignature
 from notifications_python_client.errors import HTTPError
@@ -94,6 +95,7 @@ from app.utils import format_thousands, get_logo_cdn_domain, id_safe
 
 login_manager = LoginManager()
 csrf = CSRFProtect()
+metrics = GDSMetrics()
 
 
 # The current service attached to the request stack.
@@ -132,6 +134,7 @@ def create_app(application):
         # Gubbins
         csrf,
         login_manager,
+        metrics,
         proxy_fix,
         request_helper,
 
