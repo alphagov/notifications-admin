@@ -4,6 +4,10 @@
 
 {% extends "withnav_template.html" %}
 
+{% block service_page_title %}
+  Preview message
+{% endblock %}
+
 {% block maincolumn_content %}
 
   {{ page_header("Preview message", back_link=url_for('.preview_broadcast_regions', service_id=current_service.id)) }}

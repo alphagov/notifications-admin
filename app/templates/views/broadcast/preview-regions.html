@@ -4,6 +4,10 @@
 
 {% extends "withnav_template.html" %}
 
+{% block service_page_title %}
+  Choose where to broadcast to
+{% endblock %}
+
 {% block extra_stylesheets %}
   <link rel="stylesheet" href="{{ asset_url('stylesheets/leaflet.css') }}" />
   <style>
