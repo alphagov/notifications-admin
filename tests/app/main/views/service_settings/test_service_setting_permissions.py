@@ -45,6 +45,8 @@ def test_service_set_permission_requires_platform_admin(
     ('email_auth', 'False', False),
     ('international_letters', 'True', True),
     ('international_letters', 'False', False),
+    ('broadcast', 'True', True),
+    ('broadcast', 'False', False),
 ])
 def test_service_set_permission(
     mocker,
