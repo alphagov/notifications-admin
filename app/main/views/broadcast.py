@@ -55,7 +55,7 @@ def choose_broadcast_library(service_id):
     )
 
 
-@main.route("/services/<uuid:service_id>/broadcast/libraries/<library_id>")
+@main.route("/services/<uuid:service_id>/broadcast/libraries/<library_id>", methods=['GET', 'POST'])
 @user_has_permissions('send_messages')
 @service_has_permission('broadcast')
 def choose_broadcast_region(service_id, library_id):
