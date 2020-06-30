@@ -3907,7 +3907,7 @@ def test_show_international_sms_and_letters_as_radio_button(
         f'main.service_set_{permission}',
         service_id=service_one['id'],
     ).select(
-        '.multiple-choice input[checked]'
+        '.govuk-radios__item input[checked]'
     )
 
     assert len(checked_radios) == 1
