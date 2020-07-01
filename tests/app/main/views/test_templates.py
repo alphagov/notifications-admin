@@ -674,6 +674,42 @@ def test_should_be_able_to_view_a_template_with_links(
     )
 
 
+def test_view_broadcast_template(
+    client_request,
+    service_one,
+    mock_get_broadcast_template,
+    mock_get_template_folders,
+    active_user_with_permissions,
+    fake_uuid,
+):
+    service_one['permissions']
+    page = client_request.get(
+        '.view_template',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _test_page_title=False,
+    )
+
+    assert [
+        (link.text.strip(), link['href'])
+        for link in page.select('.pill-separate-item')
+    ] == [
+        ('Edit', url_for(
+            '.edit_service_template',
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+        )),
+    ]
+
+    assert (
+        normalize_spaces(page.select_one('.template-container').text)
+    ) == (
+        normalize_spaces(page.select_one('.broadcast-message-wrapper').text)
+    ) == (
+        'This is a test'
+    )
+
+
 def test_should_show_template_id_on_template_page(
     client_request,
     mock_get_service_template,

@@ -37,6 +37,7 @@ from notifications_utils.postal_address import PostalAddress
 from notifications_utils.recipients import RecipientCSV
 from notifications_utils.take import Take
 from notifications_utils.template import (
+    BroadcastPreviewTemplate,
     EmailPreviewTemplate,
     LetterImageTemplate,
     LetterPreviewTemplate,
@@ -437,6 +438,10 @@ def get_template(
                 admin_base_url=current_app.config['ADMIN_BASE_URL'],
                 redact_missing_personalisation=redact_missing_personalisation,
             )
+    if 'broadcast' == template['template_type']:
+        return BroadcastPreviewTemplate(
+            template,
+        )
 
 
 def get_current_financial_year():
