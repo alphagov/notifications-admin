@@ -104,6 +104,12 @@ def service_name_change(service_id):
         session['service_name_change'] = form.name.data
         return redirect(url_for('.service_name_change_confirm', service_id=service_id))
 
+    if current_service.organisation_type == 'local':
+        return render_template(
+            'views/service-settings/name-local.html',
+            form=form,
+        )
+
     return render_template(
         'views/service-settings/name.html',
         form=form,
