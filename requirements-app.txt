@@ -25,3 +25,7 @@ itsdangerous==1.1.0
 
 git+https://github.com/alphagov/notifications-utils.git@39.7.0#egg=notifications-utils==39.7.0
 git+https://github.com/alphagov/govuk-frontend-jinja.git@v0.5.1-alpha#egg=govuk-frontend-jinja==0.5.1-alpha
+
+# gds-metrics requires prometheseus 0.2.0, override that requirement as later versions bring significant performance gains
+prometheus-client==0.8.0
+gds-metrics==0.2.0
