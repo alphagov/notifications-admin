@@ -40,9 +40,11 @@
   {% endif %}
 
   <p class="govuk-body">
-    You and members of
-    <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.manage_users', service_id=current_service.id) }}">your team</a>
-    are included in the guest list automatically.
+    You can use a team and guest list key to send real messages to your team and up to 5 other email addresses or phone numbers.
+  </p>
+
+  <p class="govuk-body">
+    You do not need to add yourself or your <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.manage_users', service_id=current_service.id) }}">team members</a> to the guest list.
   </p>
 
   {% call form_wrapper() %}
