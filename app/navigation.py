@@ -28,7 +28,7 @@ class Navigation:
     def endpoints_without_navigation(self):
         return tuple(
             self._get_endpoint_with_blueprint(endpoint) for endpoint in self.exclude
-        ) + ('static', 'status.show_status', 'metrics')
+        ) + ('static', 'status.show_status')
 
     def is_selected(self, navigation_item):
         if request.endpoint in self.mapping[navigation_item]:
