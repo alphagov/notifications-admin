@@ -88,7 +88,7 @@ def test_show_different_page_if_user_org_type_is_local(
     assert page.select_one('h1').text.strip() == 'About your service'
     assert page.select_one('input[name=name]')['value'] == ''
     assert page.select_one('main .govuk-body').text.strip() == (
-        'Give your service a name that tells users what your'
+        'Give your service a name that tells users what your '
         'messages are about, as well as who they’re from. For example:')
 
 
