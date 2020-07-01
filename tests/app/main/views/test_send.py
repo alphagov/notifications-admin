@@ -280,6 +280,7 @@ def test_should_not_allow_files_to_be_uploaded_without_the_correct_permission(
         service_id=SERVICE_ONE_ID,
         template_id=template_id,
         _follow_redirects=True,
+        _expected_status=403,
     )
 
     assert page.select('main p')[0].text.strip() == "Sending text messages has been disabled for your service."
@@ -312,10 +313,12 @@ def test_example_spreadsheet(
 
 def test_example_spreadsheet_for_letters(
     client_request,
+    service_one,
     mocker,
     mock_get_service_letter_template_with_placeholders,
     fake_uuid,
 ):
+    service_one['permissions'] += ['letter']
     mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=1)
 
     page = client_request.get(
@@ -600,6 +603,7 @@ def test_upload_csv_file_with_bad_postal_address_shows_check_page_with_errors(
     mock_get_jobs,
     fake_uuid,
 ):
+    service_one['permissions'] += ['letter']
     mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=9)
     mocker.patch(
         'app.main.views.send.s3download',
@@ -658,7 +662,7 @@ def test_upload_csv_file_with_international_letters_permission_shows_appropriate
     mock_get_jobs,
     fake_uuid,
 ):
-    service_one['permissions'] += ['international_letters']
+    service_one['permissions'] += ['letter', 'international_letters']
     mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=9)
     mocker.patch(
         'app.main.views.send.s3download',
@@ -1328,6 +1332,7 @@ def test_send_one_off_does_not_send_without_the_correct_permissions(
         service_id=SERVICE_ONE_ID,
         template_id=template_id,
         _follow_redirects=True,
+        _expected_status=403,
     )
 
     assert page.select('main p')[0].text.strip() == "Sending text messages has been disabled for your service."

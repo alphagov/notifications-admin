@@ -5,11 +5,12 @@ from app.models.feedback import (
     PROBLEM_TICKET_TYPE,
     QUESTION_TICKET_TYPE,
 )
+from app.models.service import Service
 
 
 class TemplateTypeConverter(BaseConverter):
 
-    regex = '(?:email|sms|letter)'
+    regex = '(?:{})'.format('|'.join(Service.TEMPLATE_TYPES))
 
 
 class TicketTypeConverter(BaseConverter):

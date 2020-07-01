@@ -16,6 +16,7 @@ from app import (
 )
 from app.main import main, no_cookie
 from app.main.forms import (
+    BroadcastTemplateForm,
     EmailTemplateForm,
     LetterTemplateForm,
     LetterTemplatePostageForm,
@@ -30,7 +31,6 @@ from app.models.service import Service
 from app.models.template_list import TemplateList, TemplateLists
 from app.template_previews import TemplatePreview, get_page_count_for_letter
 from app.utils import (
-    email_or_sms_not_enabled,
     get_template,
     should_skip_template_page,
     user_has_permissions,
@@ -40,7 +40,8 @@ from app.utils import (
 form_objects = {
     'email': EmailTemplateForm,
     'sms': SMSTemplateForm,
-    'letter': LetterTemplateForm
+    'letter': LetterTemplateForm,
+    'broadcast': BroadcastTemplateForm,
 }
 
 
@@ -122,7 +123,7 @@ def choose_template(service_id, template_type='all', template_folder_id=None):
         all_template_folders=current_service.get_user_template_folders(current_user),
         template_list=template_list,
         template_type=template_type,
-        allow_adding_letter_template=current_service.has_permission('letter'),
+        available_template_types=current_service.available_template_types,
         allow_adding_copy_of_template=(
             current_service.all_templates or len(current_user.service_ids) > 1
         ),
@@ -136,6 +137,13 @@ def choose_template(service_id, template_type='all', template_folder_id=None):
             return process_folder_management_form(templates_and_folders_form, template_folder_id)
         except HTTPError as e:
             flash(e.message)
+    elif templates_and_folders_form.trying_to_add_unavailable_template_type:
+        return redirect(url_for(
+            '.action_blocked',
+            service_id=current_service.id,
+            notification_type=templates_and_folders_form.add_template_by_template_type.data,
+            return_to='add_new_template',
+        ))
 
     if 'templates_and_folders' in templates_and_folders_form.errors:
         flash('Select at least one template or folder')
@@ -199,6 +207,7 @@ def get_template_nav_label(value):
         'sms': 'Text message',
         'email': 'Email',
         'letter': 'Letter',
+        'broadcast': 'Broadcast',
     }[value]
 
 
@@ -310,20 +319,12 @@ def _add_template_by_type(template_type, template_folder_id):
             template_id=blank_letter['data']['id'],
         ))
 
-    if email_or_sms_not_enabled(template_type, current_service.permissions):
-        return redirect(url_for(
-            '.action_blocked',
-            service_id=current_service.id,
-            notification_type=template_type,
-            return_to='add_new_template',
-        ))
-    else:
-        return redirect(url_for(
-            '.add_service_template',
-            service_id=current_service.id,
-            template_type=template_type,
-            template_folder_id=template_folder_id,
-        ))
+    return redirect(url_for(
+        '.add_service_template',
+        service_id=current_service.id,
+        template_type=template_type,
+        template_folder_id=template_folder_id,
+    ))
 
 
 @main.route("/services/<uuid:service_id>/templates/copy")
@@ -437,7 +438,7 @@ def action_blocked(service_id, notification_type, return_to, template_id=None):
         service_id=service_id,
         notification_type=notification_type,
         back_link=back_link(),
-    )
+    ), 403
 
 
 @main.route("/services/<uuid:service_id>/templates/folders/<uuid:template_folder_id>/manage", methods=['GET', 'POST'])
@@ -527,8 +528,14 @@ def delete_template_folder(service_id, template_folder_id):
 @user_has_permissions('manage_templates')
 def add_service_template(service_id, template_type, template_folder_id=None):
 
-    if not current_service.has_permission('letter') and template_type == 'letter':
-        abort(403)
+    if template_type not in current_service.available_template_types:
+        return redirect(url_for(
+            '.action_blocked',
+            service_id=service_id,
+            notification_type=template_type,
+            template_folder_id=template_folder_id,
+            return_to='templates',
+        ))
 
     form = form_objects[template_type]()
     if form.validate_on_submit():
@@ -558,22 +565,13 @@ def add_service_template(service_id, template_type, template_folder_id=None):
                 url_for('.view_template', service_id=service_id, template_id=new_template['data']['id'])
             )
 
-    if email_or_sms_not_enabled(template_type, current_service.permissions):
-        return redirect(url_for(
-            '.action_blocked',
-            service_id=service_id,
-            notification_type=template_type,
-            template_folder_id=template_folder_id,
-            return_to='templates',
-        ))
-    else:
-        return render_template(
-            'views/edit-{}-template.html'.format(template_type),
-            form=form,
-            template_type=template_type,
-            template_folder_id=template_folder_id,
-            heading_action='New',
-        )
+    return render_template(
+        'views/edit-{}-template.html'.format(template_type),
+        form=form,
+        template_type=template_type,
+        template_folder_id=template_folder_id,
+        heading_action='New',
+    )
 
 
 def abort_403_if_not_admin_user():
@@ -642,7 +640,7 @@ def edit_service_template(service_id, template_id):
                 template_id=template_id
             ))
 
-    if email_or_sms_not_enabled(template['template_type'], current_service.permissions):
+    if template['template_type'] not in current_service.available_template_types:
         return redirect(url_for(
             '.action_blocked',
             service_id=service_id,

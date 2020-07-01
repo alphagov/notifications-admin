@@ -461,10 +461,6 @@ def get_time_left(created_at, service_data_retention_days=7):
     )
 
 
-def email_or_sms_not_enabled(template_type, permissions):
-    return (template_type in ['email', 'sms']) and (template_type not in permissions)
-
-
 def get_logo_cdn_domain():
     parsed_uri = urlparse(current_app.config['ADMIN_BASE_URL'])
 

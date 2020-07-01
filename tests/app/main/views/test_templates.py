@@ -1241,9 +1241,9 @@ def test_cant_copy_template_from_non_member_service(
     assert mock_get_service_email_template.call_args_list == []
 
 
-@pytest.mark.parametrize('endpoint, data, expected_error', (
+@pytest.mark.parametrize('service_permissions, data, expected_error', (
     (
-        'main.choose_template',
+        ['letter'],
         {
             'operation': 'add-new-template',
             'add_template_by_template_type': 'email',
@@ -1251,12 +1251,28 @@ def test_cant_copy_template_from_non_member_service(
         "Sending emails has been disabled for your service."
     ),
     (
-        'main.choose_template',
+        ['email'],
         {
             'operation': 'add-new-template',
             'add_template_by_template_type': 'sms',
         },
         "Sending text messages has been disabled for your service."
+    ),
+    (
+        ['sms'],
+        {
+            'operation': 'add-new-template',
+            'add_template_by_template_type': 'letter',
+        },
+        "Sending letters has been disabled for your service."
+    ),
+    (
+        ['letter'],
+        {
+            'operation': 'add-new-template',
+            'add_template_by_template_type': 'broadcast',
+        },
+        "Sending broadcasts has been disabled for your service."
     ),
 ))
 def test_should_not_allow_creation_of_template_through_form_without_correct_permission(
@@ -1264,17 +1280,18 @@ def test_should_not_allow_creation_of_template_through_form_without_correct_perm
     service_one,
     mock_get_service_templates,
     mock_get_template_folders,
-    endpoint,
+    service_permissions,
     data,
     expected_error,
     fake_uuid,
 ):
-    service_one['permissions'] = []
+    service_one['permissions'] = service_permissions
     page = client_request.post(
-        endpoint,
+        'main.choose_template',
         service_id=SERVICE_ONE_ID,
         _data=data,
         _follow_redirects=True,
+        _expected_status=403,
     )
     assert normalize_spaces(page.select('main p')[0].text) == expected_error
     assert page.select(".govuk-back-link")[0].text == "Back"
@@ -1284,24 +1301,31 @@ def test_should_not_allow_creation_of_template_through_form_without_correct_perm
     )
 
 
-@pytest.mark.parametrize('type_of_template', ['email', 'sms'])
+@pytest.mark.parametrize('method', ('get', 'post'))
+@pytest.mark.parametrize('type_of_template, expected_error', [
+    ('email', 'Sending emails has been disabled for your service.'),
+    ('sms', 'Sending text messages has been disabled for your service.'),
+    ('letter', 'Sending letters has been disabled for your service.'),
+    ('broadcast', 'Sending broadcasts has been disabled for your service.'),
+])
 def test_should_not_allow_creation_of_a_template_without_correct_permission(
     client_request,
     service_one,
     mocker,
+    method,
     type_of_template,
+    expected_error,
 ):
     service_one['permissions'] = []
-    template_description = {'sms': 'text messages', 'email': 'emails'}
 
-    page = client_request.get(
+    page = getattr(client_request, method)(
         '.add_service_template',
         service_id=SERVICE_ONE_ID,
         template_type=type_of_template,
         _follow_redirects=True,
+        _expected_status=403,
     )
-    assert page.select('main p')[0].text.strip() == \
-        "Sending {} has been disabled for your service.".format(template_description[type_of_template])
+    assert page.select('main p')[0].text.strip() == expected_error
     assert page.select(".govuk-back-link")[0].text == "Back"
     assert page.select(".govuk-back-link")[0]['href'] == url_for(
         '.choose_template',
@@ -1419,6 +1443,7 @@ def test_should_not_allow_template_edits_without_correct_permission(
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
         _follow_redirects=True,
+        _expected_status=403,
     )
 
     assert page.select('main p')[0].text.strip() == "Sending text messages has been disabled for your service."
@@ -1934,15 +1959,20 @@ def test_can_create_email_template_with_emoji(
     assert mock_create_service_template.called is True
 
 
-def test_should_not_create_sms_template_with_emoji(
+@pytest.mark.parametrize('template_type', (
+    'sms', 'broadcast'
+))
+def test_should_not_create_sms_or_broadcast_template_with_emoji(
     client_request,
     service_one,
     mock_create_service_template,
+    template_type,
 ):
+    service_one['permissions'] += [template_type]
     page = client_request.post(
         '.add_service_template',
         service_id=SERVICE_ONE_ID,
-        template_type='sms',
+        template_type=template_type,
         _data={
             'name': "new name",
             'template_content': "here are some noodles 🍜",
@@ -1956,12 +1986,18 @@ def test_should_not_create_sms_template_with_emoji(
     assert mock_create_service_template.called is False
 
 
+@pytest.mark.parametrize('template_type', (
+    'sms', 'broadcast'
+))
 def test_should_not_update_sms_template_with_emoji(
     client_request,
+    service_one,
     mock_get_service_template,
     mock_update_service_template,
     fake_uuid,
+    template_type,
 ):
+    service_one['permissions'] += [template_type]
     page = client_request.post(
         '.edit_service_template',
         service_id=SERVICE_ONE_ID,
@@ -1971,7 +2007,7 @@ def test_should_not_update_sms_template_with_emoji(
             'name': "new name",
             'template_content': "here's a burger 🍔",
             'service': SERVICE_ONE_ID,
-            'template_type': 'sms',
+            'template_type': template_type,
             'process_type': 'normal'
         },
         _expected_status=200,
@@ -1980,10 +2016,17 @@ def test_should_not_update_sms_template_with_emoji(
     assert mock_update_service_template.called is False
 
 
-def test_should_create_sms_template_without_downgrading_unicode_characters(
+@pytest.mark.parametrize('template_type', (
+    'sms', 'broadcast'
+))
+def test_should_create_sms_or_broadcast_template_without_downgrading_unicode_characters(
     client_request,
-    mock_create_service_template
+    service_one,
+    mock_create_service_template,
+    template_type,
 ):
+    service_one['permissions'] += [template_type]
+
     msg = 'here:\tare some “fancy quotes” and non\u200Bbreaking\u200Bspaces'
 
     client_request.post(
@@ -1993,7 +2036,7 @@ def test_should_create_sms_template_without_downgrading_unicode_characters(
         _data={
             'name': "new name",
             'template_content': msg,
-            'template_type': 'sms',
+            'template_type': template_type,
             'service': SERVICE_ONE_ID,
             'process_type': 'normal'
         },
