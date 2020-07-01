@@ -383,6 +383,26 @@ def test_should_show_service_name(
     app.service_api_client.get_service.assert_called_with(SERVICE_ONE_ID)
 
 
+def test_should_show_different_change_service_name_page_for_local_services(
+    client_request,
+    service_one,
+    mocker,
+):
+    mocker.patch(
+        'app.organisations_client.get_organisation_by_domain',
+        return_value=organisation_json(organisation_type='local'),
+    )
+    service_one['organisation_type'] = 'local'
+    page = client_request.get('main.service_name_change', service_id=SERVICE_ONE_ID)
+    assert page.find('h1').text == 'Change your service name'
+    assert page.find('input', attrs={"type": "text"})['value'] == 'service one'
+    assert page.select_one('main .govuk-body').text.strip() == (
+        'Your service name should tell users what the message is about as well as who it’s from. For example:'
+    )
+
+    app.service_api_client.get_service.assert_called_with(SERVICE_ONE_ID)
+
+
 def test_should_show_service_name_with_no_prefixing(
     client_request,
     service_one,

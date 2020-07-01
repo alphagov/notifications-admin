@@ -87,6 +87,7 @@ def add_service():
                 heading=heading,
                 default_organisation_type=default_organisation_type,
             )
+
         return render_template(
             'views/add-service.html',
             form=form,

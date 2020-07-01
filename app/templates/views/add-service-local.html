@@ -17,13 +17,13 @@
     {{ page_header('About your service') }}
 
     <p class="govuk-body">Give your service a name that tells users what your messages are about, as well as who they’re from. For example:</p>
-        <ul class="list-bullet">
+        <ul class="govuk-list govuk-list--bullet">
           <li>School admissions - {{ current_user.default_organisation.name }}</li>
           <li>Electoral services - {{ current_user.default_organisation.name }}</li>
           <li>Blue Badge - {{ current_user.default_organisation.name }}</li>
         </ul>
         <p class="govuk-body">You should only use an acronym if your users are already familiar with it.</p>
-    
+
     {% call form_wrapper() %}
 
       {{ textbox(form.name, hint="You can change this later") }}
