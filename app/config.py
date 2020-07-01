@@ -20,6 +20,11 @@ class Config(object):
     TEMPLATE_PREVIEW_API_HOST = os.environ.get('TEMPLATE_PREVIEW_API_HOST', 'http://localhost:6013')
     TEMPLATE_PREVIEW_API_KEY = os.environ.get('TEMPLATE_PREVIEW_API_KEY', 'my-secret-key')
 
+    # Hosted graphite statsd prefix
+    STATSD_ENABLED = False
+    STATSD_HOST = os.getenv('STATSD_HOST')
+    STATSD_PORT = 8125
+
     # Logging
     DEBUG = False
     NOTIFY_LOG_PATH = os.getenv('NOTIFY_LOG_PATH')
@@ -92,6 +97,7 @@ class Development(Config):
     DEBUG = True
     SESSION_COOKIE_SECURE = False
     SESSION_PROTECTION = None
+    STATSD_ENABLED = False
     CSV_UPLOAD_BUCKET_NAME = 'development-notifications-csv-upload'
     CONTACT_LIST_UPLOAD_BUCKET_NAME = 'development-contact-list'
     LOGO_UPLOAD_BUCKET_NAME = 'public-logos-tools'
@@ -114,6 +120,7 @@ class Development(Config):
 class Test(Development):
     DEBUG = True
     TESTING = True
+    STATSD_ENABLED = False
     WTF_CSRF_ENABLED = False
     CSV_UPLOAD_BUCKET_NAME = 'test-notifications-csv-upload'
     CONTACT_LIST_UPLOAD_BUCKET_NAME = 'test-contact-list'
@@ -134,6 +141,7 @@ class Test(Development):
 class Preview(Config):
     HTTP_PROTOCOL = 'https'
     HEADER_COLOUR = '#F499BE'  # $baby-pink
+    STATSD_ENABLED = True
     CSV_UPLOAD_BUCKET_NAME = 'preview-notifications-csv-upload'
     CONTACT_LIST_UPLOAD_BUCKET_NAME = 'preview-contact-list'
     LOGO_UPLOAD_BUCKET_NAME = 'public-logos-preview'
@@ -152,6 +160,7 @@ class Staging(Config):
     SHOW_STYLEGUIDE = False
     HTTP_PROTOCOL = 'https'
     HEADER_COLOUR = '#6F72AF'  # $mauve
+    STATSD_ENABLED = True
     CSV_UPLOAD_BUCKET_NAME = 'staging-notifications-csv-upload'
     CONTACT_LIST_UPLOAD_BUCKET_NAME = 'staging-contact-list'
     LOGO_UPLOAD_BUCKET_NAME = 'public-logos-staging'
@@ -167,6 +176,7 @@ class Live(Config):
     SHOW_STYLEGUIDE = False
     HEADER_COLOUR = '#005EA5'  # $govuk-blue
     HTTP_PROTOCOL = 'https'
+    STATSD_ENABLED = True
     CSV_UPLOAD_BUCKET_NAME = 'live-notifications-csv-upload'
     CONTACT_LIST_UPLOAD_BUCKET_NAME = 'production-contact-list'
     LOGO_UPLOAD_BUCKET_NAME = 'public-logos-production'
@@ -186,6 +196,7 @@ class CloudFoundryConfig(Config):
 class Sandbox(CloudFoundryConfig):
     HTTP_PROTOCOL = 'https'
     HEADER_COLOUR = '#F499BE'  # $baby-pink
+    STATSD_ENABLED = True
     CSV_UPLOAD_BUCKET_NAME = 'cf-sandbox-notifications-csv-upload'
     LOGO_UPLOAD_BUCKET_NAME = 'cf-sandbox-notifications-logo-upload'
     NOTIFY_ENVIRONMENT = 'sandbox'
