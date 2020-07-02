@@ -399,8 +399,29 @@ def test_should_show_different_change_service_name_page_for_local_services(
     assert page.select_one('main .govuk-body').text.strip() == (
         'Your service name should tell users what the message is about as well as who it’s from. For example:'
     )
+    # when no organisation on the service object, default org for the user is used for hint
+    assert "School admissions - Test Org" in page.find_all("ul", class_="govuk-list govuk-list--bullet")[0].text
 
     app.service_api_client.get_service.assert_called_with(SERVICE_ONE_ID)
+
+
+def test_should_show_service_org_in_hint_on_change_service_name_page_for_local_services_if_service_has_org(
+    client_request,
+    service_one,
+    mocker,
+):
+    mocker.patch(
+        'app.organisations_client.get_organisation_by_domain',
+        return_value=organisation_json(organisation_type='local'),
+    )
+    mocker.patch('app.organisations_client.get_organisation', return_value=organisation_json(
+        organisation_type='local', name="Local Authority")
+    )
+    service_one['organisation_type'] = 'local'
+    service_one['organisation'] = '1234'
+    page = client_request.get('main.service_name_change', service_id=SERVICE_ONE_ID)
+    # when there is organisation on the service object, it is used for hint text instead of user default org
+    assert "School admissions - Local Authority" in page.find_all("ul", class_="govuk-list govuk-list--bullet")[0].text
 
 
 def test_should_show_service_name_with_no_prefixing(
