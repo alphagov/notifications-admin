@@ -80,6 +80,14 @@ def add_service():
             template_id=example_sms_template['data']['id']
         ))
     else:
+        if default_organisation_type == 'local':
+            return render_template(
+                'views/add-service-local.html',
+                form=form,
+                heading=heading,
+                default_organisation_type=default_organisation_type,
+            )
+
         return render_template(
             'views/add-service.html',
             form=form,

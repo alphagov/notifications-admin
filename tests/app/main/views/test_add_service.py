@@ -76,6 +76,22 @@ def test_get_should_not_render_radios_if_org_type_known(
     assert not page.select('.multiple-choice')
 
 
+def test_show_different_page_if_user_org_type_is_local(
+    client_request,
+    mocker,
+):
+    mocker.patch(
+        'app.organisations_client.get_organisation_by_domain',
+        return_value=organisation_json(organisation_type='local'),
+    )
+    page = client_request.get('main.add_service')
+    assert page.select_one('h1').text.strip() == 'About your service'
+    assert page.select_one('input[name=name]')['value'] == ''
+    assert page.select_one('main .govuk-body').text.strip() == (
+        'Give your service a name that tells users what your '
+        'messages are about, as well as who they’re from. For example:')
+
+
 @pytest.mark.parametrize('email_address', (
     # User’s email address doesn’t matter when the organisation is known
     'test@example.gov.uk',
