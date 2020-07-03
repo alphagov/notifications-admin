@@ -682,7 +682,6 @@ def test_view_broadcast_template(
     active_user_with_permissions,
     fake_uuid,
 ):
-    service_one['permissions']
     page = client_request.get(
         '.view_template',
         service_id=SERVICE_ONE_ID,
