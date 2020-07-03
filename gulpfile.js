@@ -95,6 +95,12 @@ const copy = {
         )
       });
     }
+  },
+  leaflet: {
+    js: () => {
+      return src(paths.npm + 'leaflet/dist/leaflet.js')
+        .pipe(dest(paths.dist + 'javascripts/'))
+    }
   }
 };
 
@@ -182,7 +188,11 @@ const javascripts = () => {
 
 
 const sass = () => {
-  return src([paths.src + '/stylesheets/main*.scss', paths.src + '/stylesheets/print.scss'])
+  return src([
+      paths.src + '/stylesheets/main*.scss',
+      paths.src + '/stylesheets/print.scss',
+      paths.npm + '/leaflet/dist/leaflet.css'
+    ])
     .pipe(plugins.prettyerror())
     .pipe(plugins.sass({
       outputStyle: 'nested',
@@ -264,7 +274,8 @@ const defaultTask = parallel(
   parallel(
     copy.govuk_frontend.fonts,
     copy.govuk_frontend.templates,
-    images
+    images,
+    copy.leaflet.js
   ),
   series(
     copy.error_pages,
