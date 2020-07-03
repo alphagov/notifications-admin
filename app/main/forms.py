@@ -1942,13 +1942,7 @@ class CallbackForm(StripWhitespaceForm):
 
 
 class SMSPrefixForm(StripWhitespaceForm):
-    enabled = RadioField(
-        '',
-        choices=[
-            ('on', 'On'),
-            ('off', 'Off'),
-        ],
-    )
+    enabled = OnOffField('')  # label is assigned on instantiation
 
 
 def get_placeholder_form_instance(
