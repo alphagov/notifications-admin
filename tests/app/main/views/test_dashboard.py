@@ -396,6 +396,7 @@ def test_view_inbox_updates(
     mocker,
     mock_get_most_recent_inbound_sms_with_no_messages,
 ):
+    service_one['permissions'] += ['inbound_sms']
 
     mock_get_partials = mocker.patch(
         'app.main.views.dashboard.get_inbox_partials',

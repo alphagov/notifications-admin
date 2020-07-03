@@ -33,6 +33,7 @@ from app.utils import (
     generate_next_dict,
     generate_previous_dict,
     get_current_financial_year,
+    service_has_permission,
     user_has_permissions,
 )
 
@@ -170,6 +171,7 @@ def monthly(service_id):
 
 @main.route("/services/<uuid:service_id>/inbox")
 @user_has_permissions('view_activity')
+@service_has_permission('inbound_sms')
 def inbox(service_id):
 
     return render_template(
@@ -181,6 +183,7 @@ def inbox(service_id):
 
 @main.route("/services/<uuid:service_id>/inbox.json")
 @user_has_permissions('view_activity')
+@service_has_permission('inbound_sms')
 def inbox_updates(service_id):
 
     return jsonify(get_inbox_partials(service_id))
@@ -212,9 +215,6 @@ def inbox_download(service_id):
 
 def get_inbox_partials(service_id):
     page = int(request.args.get('page', 1))
-    if not current_service.has_permission('inbound_sms'):
-        abort(403)
-
     inbound_messages_data = service_api_client.get_most_recent_inbound_sms(service_id, page=page)
     inbound_messages = inbound_messages_data['data']
     if not inbound_messages:

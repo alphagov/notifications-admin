@@ -83,7 +83,9 @@ def user_has_permissions(*permissions, **permission_kwargs):
 
 
 def service_has_permission(permission):
+
     from app import current_service
+
     def wrap(func):
         @wraps(func)
         def wrap_func(*args, **kwargs):
