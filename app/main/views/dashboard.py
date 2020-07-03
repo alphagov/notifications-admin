@@ -1,4 +1,5 @@
 import calendar
+from collections import namedtuple
 from datetime import datetime
 from functools import partial
 from itertools import groupby
@@ -416,15 +417,21 @@ def get_free_paid_breakdown_for_billable_units(year, free_sms_fragment_limit, bi
             free_sms_fragment_limit, cumulative, previous_cumulative,
             [billing_month for billing_month in sms_units if billing_month['month'] == month]
         )
-        letter_billing = [(x['billing_units'], x['rate'], (x['billing_units'] * x['rate']), x['postage'])
+
+        LetterDetails = namedtuple('LetterDetails', ['billing_units', 'rate', 'cost', 'postage'])
+
+        letter_billing = [LetterDetails(billing_units=x['billing_units'],
+                                        rate=x['rate'],
+                                        cost=(x['billing_units'] * x['rate']),
+                                        postage=x['postage'])
                           for x in letter_units if x['month'] == month]
 
         if letter_billing:
-            letter_billing.sort(key=lambda x: (x[3], x[1]))
+            letter_billing.sort(key=lambda x: (x.postage, x.rate))
 
         letter_total = 0
         for x in letter_billing:
-            letter_total += x[2]
+            letter_total += x.cost
             letter_cumulative += letter_total
         yield {
             'name': month,
