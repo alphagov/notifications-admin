@@ -88,12 +88,21 @@ class NoEmbeddedImagesInSVG:
 
 
 class OnlySMSCharacters:
+
+    def __init__(self, *args, template_type, **kwargs):
+        self._template_type = template_type
+        super().__init__(*args, **kwargs)
+
     def __call__(self, form, field):
         non_sms_characters = sorted(list(SanitiseSMS.get_non_compatible_characters(field.data)))
         if non_sms_characters:
             raise ValidationError(
-                'You cannot use {} in text messages. {} will not show up properly on everyone’s phones.'.format(
+                'You cannot use {} in {}. {} will not show up properly on everyone’s phones.'.format(
                     formatted_list(non_sms_characters, conjunction='or', before_each='', after_each=''),
+                    {
+                        'broadcast': 'broadcasts',
+                        'sms': 'text messages',
+                    }.get(self._template_type),
                     ('It' if len(non_sms_characters) == 1 else 'They')
                 )
             )

@@ -777,11 +777,12 @@ class BaseTemplateForm(StripWhitespaceForm):
 
 class SMSTemplateForm(BaseTemplateForm):
     def validate_template_content(self, field):
-        OnlySMSCharacters()(None, field)
+        OnlySMSCharacters(template_type='sms')(None, field)
 
 
 class BroadcastTemplateForm(SMSTemplateForm):
-    pass
+    def validate_template_content(self, field):
+        OnlySMSCharacters(template_type='broadcast')(None, field)
 
 
 class LetterAddressForm(StripWhitespaceForm):
