@@ -132,6 +132,7 @@ class TemplateListTemplate(TemplateListItem):
             'email': 'Email template',
             'sms': 'Text message template',
             'letter': 'Letter template',
+            'broadcast': 'Broadcast template',
         }.get(template['template_type'])
 
 
