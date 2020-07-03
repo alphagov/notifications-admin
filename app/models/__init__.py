@@ -1,12 +1,13 @@
-from abc import ABC, abstractmethod
-from collections.abc import Sequence
+from abc import abstractmethod
 
 from flask import abort
+from notifications_utils.serialised_model import (
+    SerialisedModel,
+    SerialisedModelCollection,
+)
 
 
-class JSONModel():
-
-    ALLOWED_PROPERTIES = set()
+class JSONModel(SerialisedModel):
 
     def __init__(self, _dict):
         # in the case of a bad request _dict may be `None`
@@ -25,6 +26,8 @@ class JSONModel():
         return self.id == other.id
 
     def __getattribute__(self, attr):
+        # Eventually we should remove this custom implementation in
+        # favour of looping over self.ALLOWED_PROPERTIES in __init__
 
         try:
             return super().__getattribute__(attr)
@@ -54,29 +57,12 @@ class JSONModel():
             abort(404)
 
 
-class ModelList(ABC, Sequence):
+class ModelList(SerialisedModelCollection):
 
     @property
     @abstractmethod
     def client_method(self):
         pass
 
-    @property
-    @abstractmethod
-    def model(self):
-        pass
-
     def __init__(self, *args):
         self.items = self.client_method(*args)
-
-    def __getitem__(self, index):
-        return self.model(self.items[index])
-
-    def __len__(self):
-        return len(self.items)
-
-    def __add__(self, other):
-        return list(self) + list(other)
-
-    def __radd__(self, other):
-        return list(other) + list(self)

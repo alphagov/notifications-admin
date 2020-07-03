@@ -30,14 +30,17 @@ def test_prefers_property_to_dict():
 ))
 def test_model_raises_for_unknown_attributes(json_response):
 
-    model = JSONModel(json_response)
+    class Custom(JSONModel):
+        ALLOWED_PROPERTIES = set()
+
+    model = Custom(json_response)
     assert model.ALLOWED_PROPERTIES == set()
 
     with pytest.raises(AttributeError) as e:
         model.foo
 
     assert str(e.value) == (
-        "'JSONModel' object has no attribute 'foo' and 'foo' is not a "
+        "'Custom' object has no attribute 'foo' and 'foo' is not a "
         "field in the underlying JSON"
     )
 
@@ -60,6 +63,7 @@ def test_model_raises_keyerror_if_item_missing_from_dict():
 def test_model_doesnt_swallow_attribute_errors(json_response):
 
     class Custom(JSONModel):
+        ALLOWED_PROPERTIES = set()
         @property
         def foo(self):
             raise AttributeError('Something has gone wrong')
