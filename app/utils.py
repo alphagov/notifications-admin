@@ -82,6 +82,20 @@ def user_has_permissions(*permissions, **permission_kwargs):
     return wrap
 
 
+def service_has_permission(permission):
+
+    from app import current_service
+
+    def wrap(func):
+        @wraps(func)
+        def wrap_func(*args, **kwargs):
+            if not current_service or not current_service.has_permission(permission):
+                abort(403)
+            return func(*args, **kwargs)
+        return wrap_func
+    return wrap
+
+
 def user_is_gov_user(f):
     @wraps(f)
     def wrapped(*args, **kwargs):
