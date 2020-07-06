@@ -20,7 +20,8 @@ def test_owasp_useful_headers_set(
         "object-src 'self';"
         "font-src 'self' static.example.com data:;"
         "img-src "
-        "'self' static.example.com *.google-analytics.com *.notifications.service.gov.uk static-logos.test.com data:;"
+        "'self' static.example.com *.tile.openstreetmap.org *.google-analytics.com"
+        " *.notifications.service.gov.uk static-logos.test.com data:;"
         "frame-src 'self' www.youtube-nocookie.com;"
     )
 
@@ -41,7 +42,8 @@ def test_headers_non_ascii_characters_are_replaced(
         "connect-src 'self' *.google-analytics.com;"
         "object-src 'self';"
         "font-src 'self' static.example.com data:;"
-        "img-src "
-        "'self' static.example.com *.google-analytics.com *.notifications.service.gov.uk static-logos??.test.com data:;"
+        "img-src"
+        " 'self' static.example.com *.tile.openstreetmap.org *.google-analytics.com"
+        " *.notifications.service.gov.uk static-logos??.test.com data:;"
         "frame-src 'self' www.youtube-nocookie.com;"
     )
