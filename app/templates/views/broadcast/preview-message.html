@@ -13,12 +13,12 @@
 
   {{ page_header("Preview message", back_link=url_for('.preview_broadcast_areas', service_id=current_service.id)) }}
 
-  {% for region in selected %}
+  {% for area in selected %}
     {% if loop.first %}
-      <ul class="region-list">
+      <ul class="area-list">
     {% endif %}
-        <li class="region-list-item">
-          {{ region.name }}
+        <li class="area-list-item">
+          {{ area.name }}
         </li>
     {% if loop.last %}
       </ul>

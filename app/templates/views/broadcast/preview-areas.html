@@ -14,6 +14,7 @@
     #map {
       z-index: 50;
       margin-bottom: 30px;
+      border: 1px solid #b1b4b6;
     }
   </style>
 {% endblock %}
@@ -37,12 +38,20 @@
 
     {% for area in area_polygons %}
       polygons.push(
-        L.polygon({{area}})
+        L.polygon({{area}}, {
+          color: '#0b0b0c', // $black
+          fillColor: '#2B8CC4', // $light-blue
+          fillOpacity: 0.2,
+          weight: 2
+        })
       );
     {% endfor %}
 
     var polygonGroup = L.featureGroup(polygons).addTo(mymap);
-    mymap.fitBounds(polygonGroup.getBounds());
+    mymap.fitBounds(
+      polygonGroup.getBounds(),
+      {padding: [5, 5]}
+    );
 
   </script>
 {% endblock %}
@@ -52,16 +61,20 @@
   {{ page_header("Choose where to broadcast to", back_link="{{ url_for('.broadcast', service_id=current_service.id) }}") }}
 
   {% for area in selected %}
-    {{ area.name }} (<a href="{{ url_for('.remove_broadcast_area', service_id=current_service.id, area_slug=area.id) }}">remove</a>)&ensp;
+    {% if loop.first %}
+      <ul class="area-list">
+    {% endif %}
+        <li class="area-list-item">
+          {{ area.name }} <a class="area-list-item-remove" href="{{ url_for('.remove_broadcast_area', service_id=current_service.id, area_slug=area.id) }}">remove</a>
+        </li>
     {% if loop.last %}
-      <p class="govuk-body">
-        {{ govukButton({
-          "element": "a",
-          "text": "Add another area",
-          "href": url_for('.choose_broadcast_library', service_id=current_service.id),
-          "classes": "govuk-button--secondary govuk-!-margin-top-2"
-        }) }}
-      </p>
+      {{ govukButton({
+        "element": "a",
+        "text": "Add another area",
+        "href": url_for('.choose_broadcast_library', service_id=current_service.id),
+        "classes": "govuk-button--secondary govuk-!-margin-bottom-5"
+      }) }}
+      </ul>
     {% endif %}
   {% else %}
     <p class="govuk-body">
