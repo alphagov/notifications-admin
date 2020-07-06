@@ -1,0 +1,20 @@
+{% from "components/page-header.html" import page_header %}
+
+{% extends "withnav_template.html" %}
+
+{% block service_page_title %}
+  {{ page_title }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header(
+    regions.name,
+    back_link=url_for('.choose_broadcast_library', service_id=current_service.id),
+  )}}
+
+  {% for area in areas %}
+    <h2 class="govuk-heading-m"><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.add_broadcast_area', service_id=current_service.id, area_slug=area.id) }}">{{ region.name }}</a></h2>
+  {% endfor %}
+
+{% endblock %}

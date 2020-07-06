@@ -1,0 +1,47 @@
+{% from "components/button/macro.njk" import govukButton %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import sticky_page_footer %}
+
+{% extends "withnav_template.html" %}
+
+{% block service_page_title %}
+  Choose where to broadcast to
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header("Choose where to broadcast to", back_link="#") }}
+
+  {% for area in selected %}
+    {{ area.name }} (<a href="{{ url_for('.remove_broadcast_area', service_id=current_service.id, area_slug=area.id) }}">remove</a>)&ensp;
+    {% if loop.last %}
+      <p class="govuk-body">
+        {{ govukButton({
+          "element": "a",
+          "text": "Add another area",
+          "href": url_for('.choose_broadcast_library', service_id=current_service.id),
+          "classes": "govuk-button--secondary govuk-!-margin-top-2"
+        }) }}
+      </p>
+    {% endif %}
+  {% else %}
+    <p class="govuk-body">
+      {{ govukButton({
+        "element": "a",
+        "text": "Add broadcast areas",
+        "href": url_for('.choose_broadcast_library', service_id=current_service.id),
+        "classes": "govuk-button--secondary"
+      }) }}
+    </p>
+  {% endfor %}
+
+  {% if selected %}
+    {% for area in area_polygons %}
+      {{ area }}<br><br>
+    {% endfor %}
+    <form action="{{ url_for('.preview_broadcast_message', service_id=current_service.id) }}" method="get">
+      {{ sticky_page_footer('Continue to preview') }}
+    </form>
+  {% endif %}
+
+{% endblock %}

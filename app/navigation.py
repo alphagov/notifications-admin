@@ -351,6 +351,13 @@ class HeaderNavigation(Navigation):
         'old_guest_list',
         'who_can_use_notify',
         'who_its_for',
+        'broadcast',
+        'preview_broadcast_areas',
+        'choose_broadcast_library',
+        'choose_broadcast_area',
+        'add_broadcast_area',
+        'remove_broadcast_area',
+        'preview_broadcast_message',
     }
 
     # header HTML now comes from GOVUK Frontend so requires a boolean, not an attribute
@@ -399,6 +406,13 @@ class MainNavigation(Navigation):
             'view_template',
             'view_template_version',
             'view_template_versions',
+            'broadcast',
+            'preview_broadcast_areas',
+            'choose_broadcast_library',
+            'choose_broadcast_area',
+            'add_broadcast_area',
+            'remove_broadcast_area',
+            'preview_broadcast_message',
         },
         'uploads': {
             'upload_contact_list',
@@ -978,6 +992,13 @@ class CaseworkNavigation(Navigation):
         'old_guest_list',
         'who_can_use_notify',
         'who_its_for',
+        'broadcast',
+        'preview_broadcast_areas',
+        'choose_broadcast_library',
+        'choose_broadcast_area',
+        'add_broadcast_area',
+        'remove_broadcast_area',
+        'preview_broadcast_message',
     }
 
 
@@ -1288,4 +1309,11 @@ class OrgNavigation(Navigation):
         'old_guest_list',
         'who_can_use_notify',
         'who_its_for',
+        'broadcast',
+        'preview_broadcast_areas',
+        'choose_broadcast_library',
+        'choose_broadcast_area',
+        'add_broadcast_area',
+        'remove_broadcast_area',
+        'preview_broadcast_message',
     }
