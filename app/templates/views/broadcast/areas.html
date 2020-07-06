@@ -1,4 +1,7 @@
 {% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import sticky_page_footer %}
+{% from "components/checkbox.html" import checkboxes %}
+{% from "components/form.html" import form_wrapper %}
 
 {% extends "withnav_template.html" %}
 
@@ -9,12 +12,15 @@
 {% block maincolumn_content %}
 
   {{ page_header(
-    regions.name,
+    page_title,
     back_link=url_for('.choose_broadcast_library', service_id=current_service.id),
   )}}
 
-  {% for area in areas %}
-    <h2 class="govuk-heading-m"><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.add_broadcast_area', service_id=current_service.id, area_slug=area.id) }}">{{ region.name }}</a></h2>
-  {% endfor %}
+  {{ live_search(target_selector='.multiple-choice', show=show_search_form, form=search_form, label='Search by name') }}
+
+  {% call form_wrapper() %}
+    {{ checkboxes(form.areas, hide_legend=True) }}
+    {{ sticky_page_footer('Add to broadcast') }}
+  {% endcall %}
 
 {% endblock %}

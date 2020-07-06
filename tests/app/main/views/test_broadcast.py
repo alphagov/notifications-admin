@@ -9,7 +9,6 @@ from tests.conftest import SERVICE_ONE_ID
     ('.preview_broadcast_areas', {}),
     ('.choose_broadcast_library', {}),
     ('.choose_broadcast_area', {'library_slug': 'countries'}),
-    ('.add_broadcast_area', {'area_slug': 'england'}),
     ('.remove_broadcast_area', {'area_slug': 'england'}),
     ('.preview_broadcast_message', {}),
 ))
@@ -74,23 +73,6 @@ def test_choose_broadcast_area_page(
         service_id=SERVICE_ONE_ID,
         library_slug='countries',
     )
-
-
-def test_add_broadcast_area_page(
-    client_request,
-    service_one,
-):
-    service_one['permissions'] += ['broadcast']
-    client_request.get(
-        '.add_broadcast_area',
-        service_id=SERVICE_ONE_ID,
-        area_slug='england',
-        _expected_redirect=url_for(
-            '.preview_broadcast_areas',
-            service_id=SERVICE_ONE_ID,
-            _external=True,
-        ),
-    ),
 
 
 def test_remove_broadcast_area_page(

@@ -4,6 +4,7 @@ from orderedset import OrderedSet
 
 from app import current_service
 from app.main import main
+from app.main.forms import BroadcastAreaForm
 from app.utils import service_has_permission, user_has_permissions
 
 
@@ -48,32 +49,28 @@ def choose_broadcast_library(service_id):
     )
 
 
-@main.route('/services/<uuid:service_id>/broadcast/libraries/<library_slug>')
+@main.route('/services/<uuid:service_id>/broadcast/libraries/<library_slug>', methods=['GET', 'POST'])
 @user_has_permissions('send_messages')
 @service_has_permission('broadcast')
 def choose_broadcast_area(service_id, library_slug):
+    library = broadcast_area_libraries.get(library_slug)
+    form = BroadcastAreaForm.from_library(library)
+    if form.validate_on_submit():
+        if not session.get('broadcast_areas'):
+            session['broadcast_areas'] = []
+        session['broadcast_areas'] = session['broadcast_areas'] + form.areas.data
+        session['broadcast_areas'] = list(OrderedSet(
+            session['broadcast_areas']
+        ))
+        return redirect(url_for(
+            '.preview_broadcast_areas',
+            service_id=current_service.id,
+        ))
     return render_template(
         'views/broadcast/areas.html',
-        areas=broadcast_area_libraries.get(library_slug),
+        form=form,
+        page_title=library.name,
     )
-
-
-@main.route('/services/<uuid:service_id>/broadcast/add/<area_slug>')
-@user_has_permissions('send_messages')
-@service_has_permission('broadcast')
-def add_broadcast_area(service_id, area_slug):
-    if not session.get('broadcast_areas'):
-        session['broadcast_areas'] = []
-
-    session['broadcast_areas'].append(area_slug)
-
-    session['broadcast_areas'] = list(OrderedSet(
-        session['broadcast_areas']
-    ))
-    return redirect(url_for(
-        '.preview_broadcast_areas',
-        service_id=current_service.id,
-    ))
 
 
 @main.route('/services/<uuid:service_id>/broadcast/remove/<area_slug>')

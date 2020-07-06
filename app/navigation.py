@@ -355,7 +355,6 @@ class HeaderNavigation(Navigation):
         'preview_broadcast_areas',
         'choose_broadcast_library',
         'choose_broadcast_area',
-        'add_broadcast_area',
         'remove_broadcast_area',
         'preview_broadcast_message',
     }
@@ -410,7 +409,6 @@ class MainNavigation(Navigation):
             'preview_broadcast_areas',
             'choose_broadcast_library',
             'choose_broadcast_area',
-            'add_broadcast_area',
             'remove_broadcast_area',
             'preview_broadcast_message',
         },
@@ -996,7 +994,6 @@ class CaseworkNavigation(Navigation):
         'preview_broadcast_areas',
         'choose_broadcast_library',
         'choose_broadcast_area',
-        'add_broadcast_area',
         'remove_broadcast_area',
         'preview_broadcast_message',
     }
@@ -1313,7 +1310,6 @@ class OrgNavigation(Navigation):
         'preview_broadcast_areas',
         'choose_broadcast_library',
         'choose_broadcast_area',
-        'add_broadcast_area',
         'remove_broadcast_area',
         'preview_broadcast_message',
     }
