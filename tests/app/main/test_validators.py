@@ -154,7 +154,7 @@ def test_for_commas_in_placeholders(
 
 @pytest.mark.parametrize('msg', ['The quick brown fox', 'Thé “quick” bröwn fox\u200B'])
 def test_sms_character_validation(client, msg):
-    OnlySMSCharacters()(None, _gen_mock_field(msg))
+    OnlySMSCharacters(template_type='sms')(None, _gen_mock_field(msg))
 
 
 @pytest.mark.parametrize('data, err_msg', [
@@ -175,7 +175,7 @@ def test_sms_character_validation(client, msg):
 ])
 def test_non_sms_character_validation(data, err_msg, client):
     with pytest.raises(ValidationError) as error:
-        OnlySMSCharacters()(None, _gen_mock_field(data))
+        OnlySMSCharacters(template_type='sms')(None, _gen_mock_field(data))
 
     assert str(error.value) == err_msg
 

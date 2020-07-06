@@ -24,6 +24,12 @@
     {%- else -%}
       letters
     {%- endif -%}
+  {%- elif template_type == 'broadcast' -%}
+    {%- if count == 1 -%}
+      broadcast
+    {%- else -%}
+      broadcasts
+    {%- endif -%}
   {%- endif %} {{ suffix }}
 {%- endmacro %}
 

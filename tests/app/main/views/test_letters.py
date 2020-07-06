@@ -14,7 +14,8 @@ letters_urls = [
     ([], 403)
 ])
 def test_letters_access_restricted(
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     mocker,
     permissions,
     response_code,
@@ -23,12 +24,12 @@ def test_letters_access_restricted(
     service_one,
 ):
     service_one['permissions'] = permissions
-
-    mocker.patch('app.service_api_client.get_service', return_value={"data": service_one})
-
-    response = platform_admin_client.get(url(service_id=service_one['id']))
-
-    assert response.status_code == response_code
+    client_request.login(platform_admin_user)
+    client_request.get_url(
+        url(service_id=service_one['id']),
+        _follow_redirects=True,
+        _expected_status=response_code,
+    )
 
 
 @pytest.mark.parametrize('url', letters_urls)

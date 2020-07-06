@@ -37,6 +37,7 @@ from notifications_utils.postal_address import PostalAddress
 from notifications_utils.recipients import RecipientCSV
 from notifications_utils.take import Take
 from notifications_utils.template import (
+    BroadcastPreviewTemplate,
     EmailPreviewTemplate,
     LetterImageTemplate,
     LetterPreviewTemplate,
@@ -451,6 +452,10 @@ def get_template(
                 admin_base_url=current_app.config['ADMIN_BASE_URL'],
                 redact_missing_personalisation=redact_missing_personalisation,
             )
+    if 'broadcast' == template['template_type']:
+        return BroadcastPreviewTemplate(
+            template,
+        )
 
 
 def get_current_financial_year():
@@ -473,10 +478,6 @@ def get_time_left(created_at, service_data_retention_days=7):
         past_tense='Data no longer available',  # No-one should ever see this
         precision=1
     )
-
-
-def email_or_sms_not_enabled(template_type, permissions):
-    return (template_type in ['email', 'sms']) and (template_type not in permissions)
 
 
 def get_logo_cdn_domain():

@@ -53,7 +53,6 @@ from app.template_previews import TemplatePreview, get_page_count_for_letter
 from app.utils import (
     PermanentRedirect,
     Spreadsheet,
-    email_or_sms_not_enabled,
     get_errors_for_csv,
     get_help_argument,
     get_template,
@@ -128,7 +127,7 @@ def send_messages(service_id, template_id):
     elif db_template['template_type'] == 'sms':
         sms_sender = get_sms_sender_from_session()
 
-    if email_or_sms_not_enabled(db_template['template_type'], current_service.permissions):
+    if db_template['template_type'] not in current_service.available_template_types:
         return redirect(url_for(
             '.action_blocked',
             service_id=service_id,
@@ -302,19 +301,17 @@ def send_test(service_id, template_id):
     db_template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
     if db_template['template_type'] == 'letter':
         session['sender_id'] = None
+        return redirect(
+            url_for('.send_one_off_letter_address', service_id=service_id, template_id=template_id)
+        )
 
-    if email_or_sms_not_enabled(db_template['template_type'], current_service.permissions):
+    if db_template['template_type'] not in current_service.available_template_types:
         return redirect(url_for(
             '.action_blocked',
             service_id=service_id,
             notification_type=db_template['template_type'],
             return_to='view_template',
             template_id=template_id))
-
-    if db_template['template_type'] == 'letter':
-        return redirect(
-            url_for('.send_one_off_letter_address', service_id=service_id, template_id=template_id)
-        )
 
     return redirect(url_for(
         {

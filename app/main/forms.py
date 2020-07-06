@@ -777,7 +777,12 @@ class BaseTemplateForm(StripWhitespaceForm):
 
 class SMSTemplateForm(BaseTemplateForm):
     def validate_template_content(self, field):
-        OnlySMSCharacters()(None, field)
+        OnlySMSCharacters(template_type='sms')(None, field)
+
+
+class BroadcastTemplateForm(SMSTemplateForm):
+    def validate_template_content(self, field):
+        OnlySMSCharacters(template_type='broadcast')(None, field)
 
 
 class LetterAddressForm(StripWhitespaceForm):
@@ -1644,13 +1649,15 @@ class TemplateAndFoldersSelectionForm(Form):
         self,
         all_template_folders,
         template_list,
-        allow_adding_letter_template,
+        available_template_types,
         allow_adding_copy_of_template,
         *args,
         **kwargs
     ):
 
         super().__init__(*args, **kwargs)
+
+        self.available_template_types = available_template_types
 
         self.templates_and_folders.choices = template_list.as_id_and_name
 
@@ -1664,11 +1671,24 @@ class TemplateAndFoldersSelectionForm(Form):
         ]
 
         self.add_template_by_template_type.choices = list(filter(None, [
+            # We want to show email and text message to everyone,
+            # whether or not the service has them switched on. The
+            # option to add letter or broadcast templates should only
+            # be shown to services which have that permission
             ('email', 'Email'),
             ('sms', 'Text message'),
-            ('letter', 'Letter') if allow_adding_letter_template else None,
+            ('letter', 'Letter') if 'letter' in available_template_types else None,
+            ('broadcast', 'Broadcast') if 'broadcast' in available_template_types else None,
             ('copy-existing', 'Copy an existing template') if allow_adding_copy_of_template else None,
         ]))
+
+    @property
+    def trying_to_add_unavailable_template_type(self):
+        return all((
+            self.is_add_template_op,
+            self.add_template_by_template_type.data,
+            self.add_template_by_template_type.data not in self.available_template_types,
+        ))
 
     def is_selected(self, template_folder_id):
         return template_folder_id in (self.templates_and_folders.data or [])
