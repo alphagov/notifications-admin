@@ -2,6 +2,7 @@
 {% from "components/page-footer.html" import sticky_page_footer %}
 {% from "components/checkbox.html" import checkboxes %}
 {% from "components/form.html" import form_wrapper %}
+{% from "components/live-search.html" import live_search %}
 
 {% extends "withnav_template.html" %}
 
@@ -15,6 +16,8 @@
     page_title,
     back_link=url_for('.choose_broadcast_library', service_id=current_service.id),
   )}}
+
+  {{ live_search(target_selector='.multiple-choice', show=show_search_form, form=search_form, label='Search by name') }}
 
   {{ live_search(target_selector='.multiple-choice', show=show_search_form, form=search_form, label='Search by name') }}
 

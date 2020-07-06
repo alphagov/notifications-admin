@@ -4,7 +4,7 @@ from orderedset import OrderedSet
 
 from app import current_service
 from app.main import main
-from app.main.forms import BroadcastAreaForm
+from app.main.forms import BroadcastAreaForm, SearchByNameForm
 from app.utils import service_has_permission, user_has_permissions
 
 
@@ -69,6 +69,8 @@ def choose_broadcast_area(service_id, library_slug):
     return render_template(
         'views/broadcast/areas.html',
         form=form,
+        search_form=SearchByNameForm(),
+        show_search_form=(len(form.areas.choices) > 7),
         page_title=library.name,
     )
 
