@@ -46,9 +46,11 @@
     {% include 'views/templates/_template.html' %}
   </div>
 
-  <div class="bottom-gutter-1-2">
-    {{ api_key(template.id, name="Template ID", thing='template ID') }}
-  </div>
+  {% if template.template_type != 'broadcast' %}
+    <div class="bottom-gutter-1-2">
+      {{ api_key(template.id, name="Template ID", thing='template ID') }}
+    </div>
+  {% endif %}
 
   <div class="bottom-gutter-1-2">
     {% if template._template.updated_at %}
@@ -71,7 +73,7 @@
         </span>
         &emsp;
       {% endif %}
-      {% if template.template_type != 'letter' %}
+      {% if template.template_type not in ('letter', 'broadcast') %}
         {% if not template._template.redact_personalisation %}
           <span class="page-footer-delete-link page-footer-delete-link-without-button">
             <a class="govuk-link govuk-link--destructive" href="{{ url_for('.confirm_redact_template', service_id=current_service.id, template_id=template.id) }}">Hide personalisation after sending</a>

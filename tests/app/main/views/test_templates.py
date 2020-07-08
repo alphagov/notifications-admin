@@ -728,6 +728,21 @@ def test_should_show_template_id_on_template_page(
     assert page.select('.api-key__key')[0].text == fake_uuid
 
 
+def test_should_hide_template_id_for_broadcast_templates(
+    client_request,
+    mock_get_broadcast_template,
+    mock_get_template_folders,
+    fake_uuid,
+):
+    page = client_request.get(
+        '.view_template',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _test_page_title=False,
+    )
+    assert not page.select('.api-key__key')
+
+
 def test_should_show_sms_template_with_downgraded_unicode_characters(
     client_request,
     mocker,
@@ -2243,6 +2258,25 @@ def test_should_not_show_redaction_stuff_for_letters(
 
     mocker.patch('app.main.views.templates.get_page_count_for_letter', return_value=1)
 
+    page = client_request.get(
+        'main.view_template',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _test_page_title=False,
+    )
+
+    assert page.select('.hint') == []
+    assert 'personalisation' not in ' '.join(
+        link.text.lower() for link in page.select('a')
+    )
+
+
+def test_should_not_show_redaction_stuff_for_broadcasts(
+    client_request,
+    fake_uuid,
+    mock_get_broadcast_template,
+    mock_get_template_folders,
+):
     page = client_request.get(
         'main.view_template',
         service_id=SERVICE_ONE_ID,
