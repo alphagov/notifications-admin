@@ -1,0 +1,33 @@
+.broadcast-message-wrapper {
+
+  position: relative;
+  width: 100%;
+  max-width: 464px;
+  box-sizing: border-box;
+  padding: govuk-spacing(9) govuk-spacing(3) govuk-spacing(3) govuk-spacing(3);
+  background: $panel-colour;
+  border: 2px solid $black;
+  border-radius: 5px;
+  white-space: normal;
+  margin: govuk-spacing(2) 0 govuk-spacing(4) 0;
+  clear: both;
+  word-wrap: break-word;
+
+  &:before {
+    content: "Emergency alert";
+    display: block;
+    border-bottom: 2px solid $black;
+    position: absolute;
+    top: govuk-spacing(2);
+    left: 0;
+    padding: 2px govuk-spacing(3) govuk-spacing(2) 45px;
+    width: 100%;
+    box-sizing: border-box;
+    font-weight: bold;
+    background: file-url('exclamation.svg');
+    background-size: 20px;
+    background-repeat: no-repeat;
+    background-position: govuk-spacing(3) 3px;
+  }
+
+}
