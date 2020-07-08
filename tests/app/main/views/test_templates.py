@@ -693,6 +693,10 @@ def test_view_broadcast_template(
         (link.text.strip(), link['href'])
         for link in page.select('.pill-separate-item')
     ] == [
+        ('Prepare broadcast', url_for(
+            '.broadcast',
+            service_id=SERVICE_ONE_ID,
+        )),
         ('Edit', url_for(
             '.edit_service_template',
             service_id=SERVICE_ONE_ID,

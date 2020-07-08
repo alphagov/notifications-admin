@@ -1,0 +1,97 @@
+{% from "components/button/macro.njk" import govukButton %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import sticky_page_footer %}
+
+{% extends "withnav_template.html" %}
+
+{% block service_page_title %}
+  Choose where to broadcast to
+{% endblock %}
+
+{% block extra_stylesheets %}
+  <link rel="stylesheet" href="{{ asset_url('stylesheets/leaflet.css') }}" />
+  <style>
+    #map {
+      z-index: 50;
+      margin-bottom: 30px;
+      border: 1px solid #b1b4b6;
+    }
+  </style>
+{% endblock %}
+
+{% block extra_javascripts %}
+  <script src="{{ asset_url('javascripts/leaflet.js') }}"></script>
+  <script>
+    var mapElement = document.getElementById('map');
+    mapElement.style.height = Math.max(320, window.innerHeight - mapElement.offsetTop - 100) + 'px';
+    var mymap = L.map(
+      'map',
+      {
+        scrollWheelZoom: false
+      }
+    )
+    var polygons = []
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(mymap);
+
+    {% for area in area_polygons %}
+      polygons.push(
+        L.polygon({{area}}, {
+          color: '#0b0b0c', // $black
+          fillColor: '#2B8CC4', // $light-blue
+          fillOpacity: 0.2,
+          weight: 2
+        })
+      );
+    {% endfor %}
+
+    var polygonGroup = L.featureGroup(polygons).addTo(mymap);
+    mymap.fitBounds(
+      polygonGroup.getBounds(),
+      {padding: [5, 5]}
+    );
+
+  </script>
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header("Choose where to broadcast to", back_link="{{ url_for('.broadcast', service_id=current_service.id) }}") }}
+
+  {% for area in selected %}
+    {% if loop.first %}
+      <ul class="area-list">
+    {% endif %}
+        <li class="area-list-item">
+          {{ area.name }} <a class="area-list-item-remove" href="{{ url_for('.remove_broadcast_area', service_id=current_service.id, area_slug=area.id) }}">remove</a>
+        </li>
+    {% if loop.last %}
+      {{ govukButton({
+        "element": "a",
+        "text": "Add another area",
+        "href": url_for('.choose_broadcast_library', service_id=current_service.id),
+        "classes": "govuk-button--secondary govuk-!-margin-bottom-5"
+      }) }}
+      </ul>
+    {% endif %}
+  {% else %}
+    <p class="govuk-body">
+      {{ govukButton({
+        "element": "a",
+        "text": "Add broadcast areas",
+        "href": url_for('.choose_broadcast_library', service_id=current_service.id),
+        "classes": "govuk-button--secondary"
+      }) }}
+    </p>
+  {% endfor %}
+
+  {% if selected %}
+    <div id="map"></div>
+    <form action="{{ url_for('.preview_broadcast_message', service_id=current_service.id) }}" method="get">
+      {{ sticky_page_footer('Continue to preview') }}
+    </form>
+  {% endif %}
+
+{% endblock %}

@@ -1,0 +1,21 @@
+{% from "components/page-header.html" import page_header %}
+
+{% extends "withnav_template.html" %}
+
+{% block service_page_title %}
+  Choose where to broadcast to
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header(
+    "Choose where to broadcast to",
+    back_link=url_for(".preview_broadcast_areas", service_id=current_service.id)
+  ) }}
+
+  {% for library in libraries|sort %}
+    <a class="file-list-filename-large govuk-link govuk-link--no-visited-state" href="{{ url_for('.choose_broadcast_area', service_id=current_service.id, library_slug=library.id) }}">{{ library.name }}</a>
+    <p class="file-list-hint-large">{{ library.examples }}</p>
+  {% endfor %}
+
+{% endblock %}

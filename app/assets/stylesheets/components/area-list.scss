@@ -1,0 +1,64 @@
+.area-list {
+
+  &-item {
+
+    display: inline-block;
+    border: 2px solid $black;
+    padding: (govuk-spacing(1) + 1px) (govuk-spacing(2) + 35px) govuk-spacing(1) govuk-spacing(2);
+    margin: 0 govuk-spacing(1) govuk-spacing(2) 0;
+    position: relative;
+
+    &-remove {
+
+      font-size: 0;
+
+      &:before {
+        content: "×";
+        display: block;
+        position: absolute;
+        top: -2px;
+        right: -2px;
+        bottom: -2px;
+        width: 35px;
+        background: $govuk-blue;
+        color: $white;
+        box-shadow: -2px 0 0 0 $black, inset 1px 0 0 0 rgba($white, 0.1);
+        border: 2px solid $govuk-blue;
+        border-left: none;
+        font-size: 24px;
+        font-weight: normal;
+        line-height: 40px;
+        text-align: center;
+        text-decoration: none;
+      }
+
+      &:hover,
+      &:focus {
+
+        &:before {
+          color: $light-blue-25;
+        }
+
+      }
+
+      &:focus {
+
+        outline: none;
+
+        &:before {
+          background: $focus-colour;
+          color: $black;
+          border-color: $black;
+        }
+
+      }
+
+    }
+
+  }
+
+  .govuk-button {
+    margin-left: 3px;
+  }
+
+}
