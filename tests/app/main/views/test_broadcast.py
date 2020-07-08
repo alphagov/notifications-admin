@@ -26,6 +26,22 @@ def test_broadcast_pages_403_without_permission(
     )
 
 
+def test_dashboard_redirects_to_broadcast_dashboard(
+    client_request,
+    service_one,
+):
+    service_one['permissions'] += ['broadcast']
+    client_request.get(
+        '.service_dashboard',
+        service_id=SERVICE_ONE_ID,
+        _expected_redirect=url_for(
+            '.broadcast_dashboard',
+            service_id=SERVICE_ONE_ID,
+            _external=True,
+        ),
+    ),
+
+
 def test_broadcast_dashboard(
     client_request,
     service_one,
