@@ -11,13 +11,13 @@
 
 {% block maincolumn_content %}
 
-  {{ page_header("Preview message", back_link=url_for('.preview_broadcast_areas', service_id=current_service.id)) }}
+  {{ page_header("Preview", back_link=url_for('.preview_broadcast_areas', service_id=current_service.id)) }}
 
   {% for area in selected %}
     {% if loop.first %}
       <ul class="area-list">
     {% endif %}
-        <li class="area-list-item">
+        <li class="area-list-item area-list-item--unremoveable">
           {{ area.name }}
         </li>
     {% if loop.last %}
