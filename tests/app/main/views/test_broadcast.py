@@ -1,7 +1,7 @@
 import pytest
 from flask import url_for
 
-from tests.conftest import SERVICE_ONE_ID
+from tests.conftest import SERVICE_ONE_ID, normalize_spaces
 
 
 @pytest.mark.parametrize('endpoint, extra_args', (
@@ -85,9 +85,33 @@ def test_choose_broadcast_library_page(
     service_one,
 ):
     service_one['permissions'] += ['broadcast']
-    client_request.get(
+    page = client_request.get(
         '.choose_broadcast_library',
         service_id=SERVICE_ONE_ID,
+    )
+    assert [
+        (normalize_spaces(title.text), normalize_spaces(hint.text))
+        for title, hint in list(zip(
+            page.select('.file-list-filename-large'), page.select('.file-list-hint-large')
+        ))
+    ] == [
+        (
+            'Counties and Unitary Authorities in England and Wales',
+            'Barking and Dagenham, Barnet, Barnsley and 171 more…',
+        ),
+        (
+            'Countries',
+            'England, Northern Ireland, Scotland and Wales',
+        ),
+        (
+            'Regions of England',
+            'East Midlands, East of England, London and 6 more…',
+        ),
+    ]
+    assert page.select_one('a.file-list-filename-large.govuk-link')['href'] == url_for(
+        '.choose_broadcast_area',
+        service_id=SERVICE_ONE_ID,
+        library_slug='counties-and-unitary-authorities-in-england-and-wales',
     )
 
 
