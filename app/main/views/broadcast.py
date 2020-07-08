@@ -8,6 +8,15 @@ from app.main.forms import BroadcastAreaForm, SearchByNameForm
 from app.utils import service_has_permission, user_has_permissions
 
 
+@main.route('/services/<uuid:service_id>/broadcast-dashboard')
+@user_has_permissions()
+@service_has_permission('broadcast')
+def broadcast_dashboard(service_id):
+    return render_template(
+        'views/broadcast/dashboard.html',
+    )
+
+
 @main.route('/services/<uuid:service_id>/broadcast')
 @user_has_permissions('send_messages')
 @service_has_permission('broadcast')

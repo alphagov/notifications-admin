@@ -351,6 +351,7 @@ class HeaderNavigation(Navigation):
         'old_guest_list',
         'who_can_use_notify',
         'who_its_for',
+        'broadcast_dashboard',
         'broadcast',
         'preview_broadcast_areas',
         'choose_broadcast_library',
@@ -368,6 +369,7 @@ class MainNavigation(Navigation):
 
     mapping = {
         'dashboard': {
+            'broadcast_dashboard',
             'conversation',
             'inbox',
             'monthly',
@@ -687,6 +689,9 @@ class MainNavigation(Navigation):
 class CaseworkNavigation(Navigation):
 
     mapping = {
+        'dashboard': {
+            'broadcast_dashboard',
+        },
         'send-one-off': {
             'choose_from_contact_list',
             'choose_template',
@@ -1306,6 +1311,7 @@ class OrgNavigation(Navigation):
         'old_guest_list',
         'who_can_use_notify',
         'who_its_for',
+        'broadcast_dashboard',
         'broadcast',
         'preview_broadcast_areas',
         'choose_broadcast_library',
