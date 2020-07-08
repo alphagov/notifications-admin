@@ -1,5 +1,6 @@
 from flask import redirect, render_template, request, session, url_for
 from notifications_utils.broadcast_areas import broadcast_area_libraries
+from notifications_utils.template import BroadcastPreviewTemplate
 from orderedset import OrderedSet
 
 from app import current_service
@@ -111,4 +112,8 @@ def preview_broadcast_message(service_id):
         selected=list(broadcast_area_libraries.get_areas(
             *selected_areas
         )),
+        template=BroadcastPreviewTemplate({
+            'content': 'Message here',
+            'template_type': 'broadcast',
+        })
     )
