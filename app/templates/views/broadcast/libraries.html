@@ -15,7 +15,7 @@
 
   {% for library in libraries|sort %}
     <a class="file-list-filename-large govuk-link govuk-link--no-visited-state" href="{{ url_for('.choose_broadcast_area', service_id=current_service.id, library_slug=library.id) }}">{{ library.name }}</a>
-    <p class="file-list-hint-large">{{ library.examples }}</p>
+    <p class="file-list-hint-large">{{ library.get_examples() }}</p>
   {% endfor %}
 
 {% endblock %}
