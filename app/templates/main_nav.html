@@ -11,15 +11,17 @@
     {% if not current_user.has_permissions('view_activity') %}
       <li><a class="govuk-link govuk-link--no-visited-state{{ casework_navigation.is_selected('sent-messages') }}" href="{{ url_for('.view_notifications', service_id=current_service.id, status='sending,delivered,failed') }}">Sent messages</a></li>
     {% endif %}
-    <li><a class="govuk-link govuk-link--no-visited-state{{ main_navigation.is_selected('uploads') }}" href="{{ url_for('main.uploads', service_id=current_service.id) }}">Uploads</a></li>
+    {% if not current_service.has_permission('broadcast') %}
+      <li><a class="govuk-link govuk-link--no-visited-state{{ main_navigation.is_selected('uploads') }}" href="{{ url_for('main.uploads', service_id=current_service.id) }}">Uploads</a></li>
+    {% endif %}
     <li><a class="govuk-link govuk-link--no-visited-state{{ main_navigation.is_selected('team-members') }}" href="{{ url_for('.manage_users', service_id=current_service.id) }}">Team members</a></li>
-    {% if current_user.has_permissions('manage_service', allow_org_user=True) %}
+    {% if current_user.has_permissions('manage_service', allow_org_user=True) and not current_service.has_permission('broadcast') %}
       <li><a class="govuk-link govuk-link--no-visited-state{{ main_navigation.is_selected('usage') }}" href="{{ url_for('.usage', service_id=current_service.id) }}">Usage</a></li>
     {% endif %}
     {% if current_user.has_permissions('manage_api_keys', 'manage_service') %}
       <li><a class="govuk-link govuk-link--no-visited-state{{ main_navigation.is_selected('settings') }}" href="{{ url_for('.service_settings', service_id=current_service.id) }}">Settings</a></li>
     {% endif %}
-    {% if current_user.has_permissions('manage_api_keys') %}
+    {% if current_user.has_permissions('manage_api_keys') and not current_service.has_permission('broadcast') %}
       <li><a class="govuk-link govuk-link--no-visited-state{{ main_navigation.is_selected('api-integration') }}" href="{{ url_for('.api_integration', service_id=current_service.id) }}">API integration</a></li>
     {% endif %}
   {% elif current_user.has_permissions(allow_org_user=True) %}
