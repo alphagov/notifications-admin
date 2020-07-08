@@ -177,6 +177,24 @@ def test_navigation_urls(
     ]
 
 
+def test_navigation_for_services_with_broadcast_permission(
+    client_request,
+    service_one,
+    mock_get_service_templates,
+    mock_get_template_folders,
+):
+    service_one['permissions'] += ['broadcast']
+    page = client_request.get('main.choose_template', service_id=SERVICE_ONE_ID)
+    assert [
+        a['href'] for a in page.select('.navigation a')
+    ] == [
+        '/services/{}'.format(SERVICE_ONE_ID),
+        '/services/{}/templates'.format(SERVICE_ONE_ID),
+        '/services/{}/users'.format(SERVICE_ONE_ID),
+        '/services/{}/service-settings'.format(SERVICE_ONE_ID),
+    ]
+
+
 def test_caseworkers_get_caseworking_navigation(
     client_request,
     mocker,
