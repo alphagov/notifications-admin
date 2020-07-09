@@ -1054,6 +1054,73 @@ def test_usage_page_displays_letters_ordered_by_postage(
     assert normalize_spaces(postage_details[4].text) == '7 international letters at £1.50'
 
 
+def test_formatting_data():
+    letter_units = [
+        {'billing_units': 5, 'rate': 1.5, 'month': 'July', 'postage': 'second'},
+        {'billing_units': 10, 'rate': 1.7, 'month': 'July', 'postage': 'first'},
+        {'billing_units': 2, 'rate': 2.4, 'month': 'July', 'postage': 'rest'},
+        {'billing_units': 8, 'rate': 2.4, 'month': 'July', 'postage': 'europe'},
+    ]
+
+    def thing(letter_units):
+        letter_billing = {}
+        for x in letter_units:
+            if x['month'] == 'July':
+                if not letter_billing.get(x['rate']):
+                    letter_billing[x['rate']] = {}
+                letter_billing[x['rate']][x['postage']] = x['billing_units']
+
+        return letter_billing
+
+    assert thing(letter_units) == {
+        1.5: {'second': 5},
+        1.7: {'first': 10},
+        2.4: {'rest': 2, 'europe': 8}
+    }
+
+
+
+def test_combining_stuff():
+    x =         {
+            1: {
+                'first': 1,
+                'second': 3,
+                'europe': 7,
+                'rest': 9
+            },
+            1.5: {
+                'first': 1,
+            }
+        }
+
+    def transform(data):
+        for rate, values in x.items():
+            if 'europe' in values:
+                values['international'] = values['europe']
+                values['international'] += values.get('rest', 0)
+            elif 'rest' in values:
+                values['international'] = values['rest']
+
+            values.pop('europe', None)
+            values.pop('rest', None)
+
+        return data
+
+
+    y =         {
+            1: {
+                'first': 1,
+                'second': 3,
+                'international': 16,
+            },
+            1.5: {
+                'first': 1,
+            }
+        }
+
+    assert transform(x) == y
+
+
 def test_usage_page_with_year_argument(
     logged_in_client,
     mock_get_usage,

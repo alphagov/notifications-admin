@@ -426,6 +426,40 @@ def get_free_paid_breakdown_for_billable_units(year, free_sms_fragment_limit, bi
                                         postage=x['postage'])
                           for x in letter_units if x['month'] == month]
 
+        # letter_billing = {}
+        # for x in letter_units:
+        #     if x['month'] == month:
+        #         x['rate'][x['postage']] = x['billing_units']
+
+
+        # [
+        # {
+        #     "rate": 1
+        #     "first": 1
+        #     "second": 2
+        #     "europe": 2
+        #     "rest": 3
+        # },
+        # {
+        #     "rate": 3
+        #     "second": 1
+        #     "europe": 4
+        #     "rest": 5
+        # }
+        # ]
+
+        # {
+        #     1: {
+        #         'first': 1,
+        #         'second': 3,
+        #         'europe': 7,
+        #         'rest': 9
+        #     },
+        #     1.5: {
+        #         'first': 1,
+        #     }
+        # }
+
         if letter_billing:
             letter_billing.sort(key=lambda x: (x.postage, x.rate))
 
