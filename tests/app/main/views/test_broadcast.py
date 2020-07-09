@@ -1,17 +1,21 @@
 import pytest
 from flask import url_for
+from freezegun import freeze_time
 
+from tests import sample_uuid
 from tests.conftest import SERVICE_ONE_ID, normalize_spaces
+
+sample_uuid = sample_uuid()
 
 
 @pytest.mark.parametrize('endpoint, extra_args', (
     ('.broadcast_dashboard', {}),
-    ('.broadcast', {}),
-    ('.preview_broadcast_areas', {}),
-    ('.choose_broadcast_library', {}),
-    ('.choose_broadcast_area', {'library_slug': 'countries'}),
-    ('.remove_broadcast_area', {'area_slug': 'england'}),
-    ('.preview_broadcast_message', {}),
+    ('.broadcast', {'template_id': sample_uuid}),
+    ('.preview_broadcast_areas', {'broadcast_message_id': sample_uuid}),
+    ('.choose_broadcast_library', {'broadcast_message_id': sample_uuid}),
+    ('.choose_broadcast_area', {'broadcast_message_id': sample_uuid, 'library_slug': 'countries'}),
+    ('.remove_broadcast_area', {'broadcast_message_id': sample_uuid, 'area_slug': 'england'}),
+    ('.preview_broadcast_message', {'broadcast_message_id': sample_uuid}),
 ))
 def test_broadcast_pages_403_without_permission(
     client_request,
@@ -56,14 +60,18 @@ def test_broadcast_dashboard(
 def test_broadcast_page(
     client_request,
     service_one,
+    fake_uuid,
+    mock_create_broadcast_message,
 ):
     service_one['permissions'] += ['broadcast']
     client_request.get(
         '.broadcast',
         service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
         _expected_redirect=url_for(
             '.preview_broadcast_areas',
             service_id=SERVICE_ONE_ID,
+            broadcast_message_id=fake_uuid,
             _external=True,
         ),
     ),
@@ -72,22 +80,28 @@ def test_broadcast_page(
 def test_preview_broadcast_areas_page(
     client_request,
     service_one,
+    fake_uuid,
+    mock_get_draft_broadcast_message,
 ):
     service_one['permissions'] += ['broadcast']
     client_request.get(
         '.preview_broadcast_areas',
         service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
     )
 
 
 def test_choose_broadcast_library_page(
     client_request,
     service_one,
+    mock_get_draft_broadcast_message,
+    fake_uuid,
 ):
     service_one['permissions'] += ['broadcast']
     page = client_request.get(
         '.choose_broadcast_library',
         service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
     )
     assert [
         (normalize_spaces(title.text), normalize_spaces(hint.text))
@@ -111,6 +125,7 @@ def test_choose_broadcast_library_page(
     assert page.select_one('a.file-list-filename-large.govuk-link')['href'] == url_for(
         '.choose_broadcast_area',
         service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
         library_slug='counties-and-unitary-authorities-in-england-and-wales',
     )
 
@@ -118,38 +133,114 @@ def test_choose_broadcast_library_page(
 def test_choose_broadcast_area_page(
     client_request,
     service_one,
+    mock_get_draft_broadcast_message,
+    fake_uuid,
 ):
     service_one['permissions'] += ['broadcast']
     client_request.get(
         '.choose_broadcast_area',
         service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
         library_slug='countries',
+    )
+
+
+def test_add_broadcast_area(
+    client_request,
+    service_one,
+    mock_get_draft_broadcast_message,
+    mock_update_broadcast_message,
+    fake_uuid,
+):
+    service_one['permissions'] += ['broadcast']
+    client_request.post(
+        '.choose_broadcast_area',
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+        library_slug='countries',
+        _data={
+            'areas': ['england', 'wales']
+        }
+    )
+    mock_update_broadcast_message.assert_called_once_with(
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+        data={
+            'areas': ['england', 'scotland', 'wales']
+        },
     )
 
 
 def test_remove_broadcast_area_page(
     client_request,
     service_one,
+    mock_get_draft_broadcast_message,
+    mock_update_broadcast_message,
+    fake_uuid,
 ):
     service_one['permissions'] += ['broadcast']
     client_request.get(
         '.remove_broadcast_area',
         service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
         area_slug='england',
         _expected_redirect=url_for(
             '.preview_broadcast_areas',
             service_id=SERVICE_ONE_ID,
+            broadcast_message_id=fake_uuid,
             _external=True,
         ),
-    ),
+    )
+    mock_update_broadcast_message.assert_called_once_with(
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+        data={
+            'areas': ['scotland']
+        },
+    )
 
 
 def test_preview_broadcast_message_page(
     client_request,
     service_one,
+    mock_get_draft_broadcast_message,
+    mock_get_broadcast_template,
+    fake_uuid,
 ):
     service_one['permissions'] += ['broadcast']
     client_request.get(
         '.preview_broadcast_message',
         service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
     ),
+
+
+@freeze_time('2020-02-02 02:02:02.222222')
+def test_start_broadcasting(
+    client_request,
+    service_one,
+    mock_get_draft_broadcast_message,
+    mock_get_broadcast_template,
+    mock_update_broadcast_message,
+    mock_update_broadcast_message_status,
+    fake_uuid,
+):
+    service_one['permissions'] += ['broadcast']
+    client_request.post(
+        '.preview_broadcast_message',
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+    ),
+    mock_update_broadcast_message.assert_called_once_with(
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+        data={
+            'starts_at': '2020-02-02T02:02:02.222222',
+            'finishes_at': '2020-02-05T02:02:02.222222',
+        },
+    )
+    mock_update_broadcast_message_status.assert_called_once_with(
+        'broadcasting',
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+    )

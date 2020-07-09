@@ -36,9 +36,9 @@
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(mymap);
 
-    {% for area in area_polygons %}
+    {% for polygon in broadcast_message.polygons %}
       polygons.push(
-        L.polygon({{area}}, {
+        L.polygon({{polygon}}, {
           color: '#0b0b0c', // $black
           fillColor: '#2B8CC4', // $light-blue
           fillOpacity: 0.2,
@@ -58,20 +58,23 @@
 
 {% block maincolumn_content %}
 
-  {{ page_header("Choose where to broadcast to", back_link=url_for('.choose_template', service_id=current_service.id)) }}
+  {{ page_header(
+    "Choose where to broadcast to",
+    back_link=url_for('.view_template', service_id=current_service.id, template_id=broadcast_message.template_id)
+  ) }}
 
-  {% for area in selected %}
+  {% for area in broadcast_message.areas %}
     {% if loop.first %}
       <ul class="area-list">
     {% endif %}
         <li class="area-list-item">
-          {{ area.name }} <a class="area-list-item-remove" href="{{ url_for('.remove_broadcast_area', service_id=current_service.id, area_slug=area.id) }}">remove</a>
+          {{ area.name }} <a class="area-list-item-remove" href="{{ url_for('.remove_broadcast_area', service_id=current_service.id, broadcast_message_id=broadcast_message_id, area_slug=area.id) }}">remove</a>
         </li>
     {% if loop.last %}
       {{ govukButton({
         "element": "a",
         "text": "Add another area",
-        "href": url_for('.choose_broadcast_library', service_id=current_service.id),
+        "href": url_for('.choose_broadcast_library', service_id=current_service.id, broadcast_message_id=broadcast_message.id),
         "classes": "govuk-button--secondary govuk-!-margin-bottom-5"
       }) }}
       </ul>
@@ -81,15 +84,15 @@
       {{ govukButton({
         "element": "a",
         "text": "Add broadcast areas",
-        "href": url_for('.choose_broadcast_library', service_id=current_service.id),
+        "href": url_for('.choose_broadcast_library', service_id=current_service.id, broadcast_message_id=broadcast_message.id),
         "classes": "govuk-button--secondary"
       }) }}
     </p>
   {% endfor %}
 
-  {% if selected %}
+  {% if broadcast_message.areas %}
     <div id="map"></div>
-    <form action="{{ url_for('.preview_broadcast_message', service_id=current_service.id) }}" method="get">
+    <form action="{{ url_for('.preview_broadcast_message', service_id=current_service.id, broadcast_message_id=broadcast_message.id) }}" method="get">
       {{ sticky_page_footer('Continue to preview') }}
     </form>
   {% endif %}

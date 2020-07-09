@@ -11,9 +11,9 @@
 
 {% block maincolumn_content %}
 
-  {{ page_header("Preview", back_link=url_for('.preview_broadcast_areas', service_id=current_service.id)) }}
+  {{ page_header("Preview", back_link=url_for('.preview_broadcast_areas', service_id=current_service.id, broadcast_message_id=broadcast_message.id)) }}
 
-  {% for area in selected %}
+  {% for area in broadcast_message.areas %}
     {% if loop.first %}
       <ul class="area-list">
     {% endif %}
@@ -25,17 +25,10 @@
     {% endif %}
   {% endfor %}
 
-  {% if selected %}
+  {{ broadcast_message.template|string }}
 
-    <p class="govuk-body">
-      {{ template|string }}
-    </p>
-
-    {% call form_wrapper() %}
-      {{ sticky_page_footer('Start broadcast') }}
-    {% endcall %}
-
-  {% endif %}
-
+  {% call form_wrapper() %}
+    {{ sticky_page_footer('Start broadcast') }}
+  {% endcall %}
 
 {% endblock %}

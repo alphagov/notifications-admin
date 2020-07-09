@@ -4146,3 +4146,97 @@ def create_template(
         redact_personalisation=redact_personalisation,
         postage=postage,
     )
+
+
+@pytest.fixture(scope='function')
+def mock_create_broadcast_message(
+    mocker,
+    fake_uuid,
+):
+    def _create(
+        service_id,
+        template_id,
+    ):
+        return {
+            'id': fake_uuid,
+        }
+
+    return mocker.patch(
+        'app.broadcast_message_api_client.create_broadcast_message',
+        side_effect=_create,
+    )
+
+
+@pytest.fixture(scope='function')
+def mock_get_draft_broadcast_message(
+    mocker,
+    fake_uuid,
+):
+    def _get(
+        *, service_id, broadcast_message_id
+    ):
+        return {
+            'id': broadcast_message_id,
+
+            'service_id': service_id,
+
+            'template_id': fake_uuid,
+            'template_version': 123,
+            'template_name': 'Example template',
+
+            'personalisation': {},
+            'areas': [
+                'england', 'scotland',
+            ],
+
+            'status': 'draft',
+
+            'starts_at': None,
+            'finishes_at': None,
+
+            'created_at': None,
+            'approved_at': None,
+            'cancelled_at': None,
+            'updated_at': None,
+
+            'created_by_id': fake_uuid,
+            'approved_by_id': None,
+            'cancelled_by_id': None,
+        }
+
+    return mocker.patch(
+        'app.broadcast_message_api_client.get_broadcast_message',
+        side_effect=_get,
+    )
+
+
+@pytest.fixture(scope='function')
+def mock_update_broadcast_message(
+    mocker,
+    fake_uuid,
+):
+    def _update(
+        *, service_id, broadcast_message_id, data
+    ):
+        pass
+
+    return mocker.patch(
+        'app.broadcast_message_api_client.update_broadcast_message',
+        side_effect=_update,
+    )
+
+
+@pytest.fixture(scope='function')
+def mock_update_broadcast_message_status(
+    mocker,
+    fake_uuid,
+):
+    def _update(
+        status, *, service_id, broadcast_message_id
+    ):
+        pass
+
+    return mocker.patch(
+        'app.broadcast_message_api_client.update_broadcast_message_status',
+        side_effect=_update,
+    )

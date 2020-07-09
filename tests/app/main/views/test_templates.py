@@ -696,6 +696,7 @@ def test_view_broadcast_template(
         ('Prepare broadcast', url_for(
             '.broadcast',
             service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
         )),
         ('Edit', url_for(
             '.edit_service_template',
