@@ -3,6 +3,7 @@ from collections import namedtuple
 from datetime import datetime
 from functools import partial
 from itertools import groupby
+from operator import itemgetter
 
 from flask import (
     Response,
@@ -418,16 +419,8 @@ def get_free_paid_breakdown_for_billable_units(year, free_sms_fragment_limit, bi
             [billing_month for billing_month in sms_units if billing_month['month'] == month]
         )
 
-        LetterDetails = namedtuple('LetterDetails', ['billing_units', 'rate', 'cost', 'postage'])
-
-        letter_billing = [LetterDetails(billing_units=x['billing_units'],
-                                        rate=x['rate'],
-                                        cost=(x['billing_units'] * x['rate']),
-                                        postage=x['postage'])
-                          for x in letter_units if x['month'] == month]
-
-        if letter_billing:
-            letter_billing.sort(key=lambda x: (x.postage, x.rate))
+        letter_units_for_month = [x for x in letter_units if x['month'] == month]
+        letter_billing = format_letter_details_for_month(letter_units_for_month)
 
         letter_total = 0
         for x in letter_billing:
@@ -441,6 +434,49 @@ def get_free_paid_breakdown_for_billable_units(year, free_sms_fragment_limit, bi
             'free': breakdown['free'],
             'letters': letter_billing
         }
+
+
+def format_letter_details_for_month(letter_units_for_month):
+    # Format postage descriptions in letter units e.g. to 'international' not 'europe'
+    for month in letter_units_for_month:
+        for k, v in month.items():
+            if k == 'postage':
+                month[k] = get_postage_description(v)
+
+    # letter_units_for_month must be sorted before international postage values can be aggregated
+    postage_order = {'first class': 0, 'second class': 1, 'international': 2}
+    letter_units_for_month.sort(key=lambda x: (postage_order[x['postage']], x['rate']))
+
+    LetterDetails = namedtuple('LetterDetails', ['billing_units', 'rate', 'cost', 'postage_description'])
+
+    # Aggregate the rows for international letters which have the same rate
+    result = []
+    for _key, rate_group in groupby(letter_units_for_month, key=itemgetter('postage', 'rate')):
+        rate_group = list(rate_group)
+
+        letter_details = LetterDetails(
+            billing_units=sum(x['billing_units'] for x in rate_group),
+            rate=format_letter_rate(rate_group[0]['rate']),
+            cost=(sum(x['billing_units'] for x in rate_group) * rate_group[0]['rate']),
+            postage_description=rate_group[0]['postage']
+        )
+
+        result.append(letter_details)
+
+    return result
+
+
+def get_postage_description(postage):
+    if postage in ('first', 'second'):
+        return f'{postage} class'
+    return 'international'
+
+
+def format_letter_rate(number):
+    if number >= 1:
+        return f"£{number:,.2f}"
+
+    return f"{number * 100:.0f}p"
 
 
 def get_free_paid_breakdown_for_month(
