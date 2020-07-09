@@ -30,7 +30,7 @@ git+https://github.com/alphagov/govuk-frontend-jinja.git@v0.5.1-alpha#egg=govuk-
 
 # gds-metrics requires prometheseus 0.2.0, override that requirement as later versions bring significant performance gains
 prometheus-client==0.8.0
-gds-metrics==0.2.0
+gds-metrics==0.2.2
 
 ## The following requirements were added by pip freeze:
 awscli==1.18.95
