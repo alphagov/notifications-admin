@@ -46,15 +46,46 @@ def test_dashboard_redirects_to_broadcast_dashboard(
     ),
 
 
+def test_empty_broadcast_dashboard(
+    client_request,
+    service_one,
+    mock_get_no_broadcast_messages,
+):
+    service_one['permissions'] += ['broadcast']
+    page = client_request.get(
+        '.broadcast_dashboard',
+        service_id=SERVICE_ONE_ID,
+    )
+    assert [
+        normalize_spaces(row.text) for row in page.select('tbody tr .table-empty-message')
+    ] == [
+        'You do not have any live broadcasts at the moment',
+        'You do not have any previous broadcasts',
+    ]
+
+
+@freeze_time('2020-02-20 02:20')
 def test_broadcast_dashboard(
     client_request,
     service_one,
+    mock_get_broadcast_messages,
 ):
     service_one['permissions'] += ['broadcast']
-    client_request.get(
+    page = client_request.get(
         '.broadcast_dashboard',
         service_id=SERVICE_ONE_ID,
-    ),
+    )
+    assert [
+        normalize_spaces(row.text) for row in page.select('table')[0].select('tbody tr')
+    ] == [
+        'Example template To England and Scotland Live until tomorrow at 2:20am',
+    ]
+    assert [
+        normalize_spaces(row.text) for row in page.select('table')[1].select('tbody tr')
+    ] == [
+        'Example template To England and Scotland Finished yesterday at 8:20pm',
+        'Example template To England and Scotland Stopped 10 February at 2:20am',
+    ]
 
 
 def test_broadcast_page(
