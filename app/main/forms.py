@@ -38,7 +38,6 @@ from wtforms import (
 )
 from wtforms.fields.html5 import EmailField, SearchField, TelField
 from wtforms.validators import URL, DataRequired, Length, Optional, Regexp
-from wtforms.widgets import CheckboxInput, ListWidget
 
 from app import format_thousands
 from app.main.validators import (
@@ -116,11 +115,6 @@ def get_next_days_until(until):
         )
         for i in range(0, days + 1)
     ]
-
-
-class MultiCheckboxField(SelectMultipleField):
-    widget = ListWidget(prefix_label=False)
-    option_widget = CheckboxInput()
 
 
 class RadioField(WTFormsRadioField):
@@ -2135,11 +2129,13 @@ class AcceptAgreementForm(StripWhitespaceForm):
 
 class BroadcastAreaForm(StripWhitespaceForm):
 
-    areas = MultiCheckboxField('Choose areas to broadcast to')
+    areas = govukCheckboxesField('Choose areas to broadcast to')
 
     def __init__(self, choices, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.areas.choices = choices
+        self.areas.render_as_list = True
+        self.areas.param_extensions = {'fieldset': {'legend': {'classes': 'govuk-visually-hidden'}}}
 
     @classmethod
     def from_library(cls, library):
