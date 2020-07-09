@@ -58,7 +58,7 @@
 
 {% block maincolumn_content %}
 
-  {{ page_header("Choose where to broadcast to", back_link="{{ url_for('.broadcast', service_id=current_service.id) }}") }}
+  {{ page_header("Choose where to broadcast to", back_link=url_for('.choose_template', service_id=current_service.id)) }}
 
   {% for area in selected %}
     {% if loop.first %}

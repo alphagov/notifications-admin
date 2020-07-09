@@ -55,6 +55,15 @@
 
     }
 
+    &--unremoveable {
+      padding-right: govuk-spacing(2);
+      background: $light-blue-25;
+      border-color: $light-blue-25;
+      color: $govuk-blue;
+      font-weight: bold;
+      margin-right: govuk-spacing(3);
+    }
+
   }
 
   .govuk-button {
