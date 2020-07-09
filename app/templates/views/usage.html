@@ -109,7 +109,7 @@
               {% endif %}
               {% for letter in month.letters%}
                 {% if letter.billing_units %}
-                  <li class="tabular-numbers">{{ "{:,} {}".format(letter.billing_units, letter.postage)}} class {{ message_count_label(letter.billing_units, 'letter', '') }}at
+                  <li class="tabular-numbers">{{ "{:,} {}".format(letter.billing_units, letter.postage_description) }} {{ message_count_label(letter.billing_units, 'letter', '') }}at
                   {{ '{:.0f}p'.format(letter.rate * 100) }}</li>
                 {% endif %}
               {% endfor %}

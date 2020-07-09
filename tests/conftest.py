@@ -2625,7 +2625,21 @@ def mock_get_billable_units(mocker):
                 'rate': 0.33,
                 'billing_units': 5,
                 'postage': 'first',
-            }
+            },
+            {
+                'month': 'February',
+                'notification_type': 'letter',
+                'rate': 0.84,
+                'billing_units': 3,
+                'postage': 'europe',
+            },
+            {
+                'month': 'February',
+                'notification_type': 'letter',
+                'rate': 0.84,
+                'billing_units': 7,
+                'postage': 'rest-of-world',
+            },
         ]
 
     return mocker.patch(
