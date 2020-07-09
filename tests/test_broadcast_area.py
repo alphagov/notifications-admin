@@ -100,6 +100,16 @@ def test_get_names_of_areas():
     ]
 
 
+def test_get_areas_accepts_lists():
+    areas_from_list = broadcast_area_libraries.get_areas(
+        ['wales', 'vale-of-glamorgan', 'england', 'essex']
+    )
+    areas_from_args = broadcast_area_libraries.get_areas(
+        'wales', 'vale-of-glamorgan', 'england', 'essex',
+    )
+    assert areas_from_args == areas_from_list
+
+
 def test_has_polygons():
 
     assert len(
@@ -112,6 +122,10 @@ def test_has_polygons():
 
     assert len(
         broadcast_area_libraries.get_polygons_for_areas_long_lat('england', 'scotland')
+    ) == 35 + 195 == 230
+
+    assert len(
+        broadcast_area_libraries.get_polygons_for_areas_long_lat(['england', 'scotland'])
     ) == 35 + 195 == 230
 
     assert broadcast_area_libraries.get_polygons_for_areas_lat_long('england')[0][0] == [

@@ -147,6 +147,10 @@ class BroadcastAreaLibraries(SerialisedModelCollection, GetItemByIdMixin):
                 yield area
 
     def get_areas(self, *area_ids):
+        # allow people to call `get_areas('a', 'b') or get_areas(['a', 'b'])`
+        if len(area_ids) == 1 and isinstance(area_ids[0], list):
+            area_ids = area_ids[0]
+
         return list(itertools.chain(*(
             [area for area in self.all_areas if area.id == area_id]
             for area_id in area_ids
