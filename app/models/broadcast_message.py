@@ -125,6 +125,13 @@ class BroadcastMessage(JSONModel):
             service_id=self.service_id,
         )
 
+    def cancel_broadcast(self):
+        broadcast_message_api_client.update_broadcast_message_status(
+            'cancelled',
+            broadcast_message_id=self.id,
+            service_id=self.service_id,
+        )
+
 
 class BroadcastMessages(ModelList):
 

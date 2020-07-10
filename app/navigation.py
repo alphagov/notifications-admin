@@ -358,6 +358,7 @@ class HeaderNavigation(Navigation):
         'choose_broadcast_area',
         'remove_broadcast_area',
         'preview_broadcast_message',
+        'cancel_broadcast_message',
     }
 
     # header HTML now comes from GOVUK Frontend so requires a boolean, not an attribute
@@ -413,6 +414,7 @@ class MainNavigation(Navigation):
             'choose_broadcast_area',
             'remove_broadcast_area',
             'preview_broadcast_message',
+            'cancel_broadcast_message',
         },
         'uploads': {
             'upload_contact_list',
@@ -1001,6 +1003,7 @@ class CaseworkNavigation(Navigation):
         'choose_broadcast_area',
         'remove_broadcast_area',
         'preview_broadcast_message',
+        'cancel_broadcast_message',
     }
 
 
@@ -1318,4 +1321,5 @@ class OrgNavigation(Navigation):
         'choose_broadcast_area',
         'remove_broadcast_area',
         'preview_broadcast_message',
+        'cancel_broadcast_message',
     }
