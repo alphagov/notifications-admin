@@ -36,6 +36,13 @@ class BroadcastMessage(JSONModel):
 
     libraries = broadcast_area_libraries
 
+    def __lt__(self, other):
+        return (
+            self.cancelled_at or self.finishes_at
+        ) < (
+            other.cancelled_at or other.finishes_at
+        )
+
     @classmethod
     def create(cls, *, service_id, template_id):
         return cls(broadcast_message_api_client.create_broadcast_message(

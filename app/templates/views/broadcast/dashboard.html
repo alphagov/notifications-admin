@@ -5,7 +5,7 @@
 {% macro broadcast_table(broadcasts, empty_message) %}
   <div class='dashboard-table ajax-block-container'>
     {% call(item, row_number) list_table(
-      broadcasts,
+      broadcasts|sort|reverse|list,
       caption="Live broadcasts",
       caption_visible=False,
       empty_message=empty_message,
