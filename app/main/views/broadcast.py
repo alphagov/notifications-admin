@@ -83,6 +83,7 @@ def choose_broadcast_area(service_id, broadcast_message_id, library_slug):
         search_form=SearchByNameForm(),
         show_search_form=(len(form.areas.choices) > 7),
         page_title=library.name,
+        broadcast_message=broadcast_message,
     )
 
 
