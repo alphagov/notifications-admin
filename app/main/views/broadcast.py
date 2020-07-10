@@ -83,6 +83,7 @@ def choose_broadcast_area(service_id, broadcast_message_id, library_slug):
         search_form=SearchByNameForm(),
         show_search_form=(len(form.areas.choices) > 7),
         page_title=library.name,
+        broadcast_message=broadcast_message,
     )
 
 
@@ -124,3 +125,17 @@ def preview_broadcast_message(service_id, broadcast_message_id):
         'views/broadcast/preview-message.html',
         broadcast_message=broadcast_message,
     )
+
+
+@main.route('/services/<uuid:service_id>/broadcast/<uuid:broadcast_message_id>/cancel')
+@user_has_permissions('send_messages')
+@service_has_permission('broadcast')
+def cancel_broadcast_message(service_id, broadcast_message_id):
+    BroadcastMessage.from_id(
+        broadcast_message_id,
+        service_id=current_service.id,
+    ).cancel_broadcast()
+    return redirect(url_for(
+        '.broadcast_dashboard',
+        service_id=current_service.id,
+    ))

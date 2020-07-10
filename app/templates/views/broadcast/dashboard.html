@@ -5,7 +5,7 @@
 {% macro broadcast_table(broadcasts, empty_message) %}
   <div class='dashboard-table ajax-block-container'>
     {% call(item, row_number) list_table(
-      broadcasts,
+      broadcasts|sort|reverse|list,
       caption="Live broadcasts",
       caption_visible=False,
       empty_message=empty_message,
@@ -24,15 +24,20 @@
         </div>
       {% endcall %}
       {% call field(align='right') %}
-        <p class="govuk-body govuk-!-margin-top-6 govuk-!-margin-bottom-0">
-          {% if item.status == 'broadcasting' %}
+        {% if item.status == 'broadcasting' %}
+          <p class="govuk-body letter-recipient-summary">
             Live until {{ item.finishes_at|format_datetime_relative }}
-          {% elif item.status == 'cancelled' %}
+            <a href="{{ url_for('.cancel_broadcast_message', service_id=current_service.id, broadcast_message_id=item.id) }}" class="destructive-link destructive-link--no-visited-state">Stop broadcasting</a>
+          </p>
+        {% elif item.status == 'cancelled' %}
+          <p class="govuk-body govuk-!-margin-top-6 govuk-!-margin-bottom-0 govuk-hint">
             Stopped {{ item.cancelled_at|format_datetime_relative }}
-          {% else %}
+          </p>
+        {% else %}
+          <p class="govuk-body govuk-!-margin-top-6 govuk-!-margin-bottom-0 govuk-hint">
             Finished {{ item.finishes_at|format_datetime_relative }}
-          {% endif %}
-        </p>
+          </p>
+        {% endif %}
       {% endcall %}
     {% endcall %}
   </div>

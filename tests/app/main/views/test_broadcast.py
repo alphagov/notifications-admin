@@ -78,13 +78,13 @@ def test_broadcast_dashboard(
     assert [
         normalize_spaces(row.text) for row in page.select('table')[0].select('tbody tr')
     ] == [
-        'Example template To England and Scotland Live until tomorrow at 2:20am',
+        'Example template To England and Scotland Live until tomorrow at 2:20am Stop broadcasting',
     ]
     assert [
         normalize_spaces(row.text) for row in page.select('table')[1].select('tbody tr')
     ] == [
-        'Example template To England and Scotland Finished yesterday at 8:20pm',
         'Example template To England and Scotland Stopped 10 February at 2:20am',
+        'Example template To England and Scotland Finished yesterday at 8:20pm',
     ]
 
 
@@ -272,6 +272,31 @@ def test_start_broadcasting(
     )
     mock_update_broadcast_message_status.assert_called_once_with(
         'broadcasting',
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+    )
+
+
+def test_cancel_broadcast(
+    client_request,
+    service_one,
+    mock_get_draft_broadcast_message,
+    mock_update_broadcast_message_status,
+    fake_uuid,
+):
+    service_one['permissions'] += ['broadcast']
+    client_request.get(
+        '.cancel_broadcast_message',
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+        _expected_redirect=url_for(
+            '.broadcast_dashboard',
+            service_id=SERVICE_ONE_ID,
+            _external=True,
+        ),
+    ),
+    mock_update_broadcast_message_status.assert_called_once_with(
+        'cancelled',
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
     )
