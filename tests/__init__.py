@@ -635,3 +635,44 @@ def assert_url_expected(actual, expected):
 
 def find_element_by_tag_and_partial_text(page, tag, string):
     return [e for e in page.find_all(tag) if string in e.text][0]
+
+
+def broadcast_message_json(
+    *,
+    id_,
+    service_id,
+    template_id,
+    status,
+    created_by_id,
+    starts_at=None,
+    finishes_at=None,
+    cancelled_at=None,
+):
+    return {
+        'id': id_,
+
+        'service_id': service_id,
+
+        'template_id': template_id,
+        'template_version': 123,
+        'template_name': 'Example template',
+
+        'personalisation': {},
+        'areas': [
+            'england', 'scotland',
+        ],
+
+        'status': status,
+
+        'starts_at': starts_at,
+        'finishes_at': finishes_at,
+
+        'created_at': None,
+        'approved_at': None,
+        'cancelled_at': cancelled_at,
+        'updated_at': None,
+
+        'created_by_id': created_by_id,
+        'approved_by_id': None,
+        'cancelled_by_id': None,
+    }

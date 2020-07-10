@@ -3,7 +3,7 @@ from flask import redirect, render_template, request, url_for
 from app import current_service
 from app.main import main
 from app.main.forms import BroadcastAreaForm, SearchByNameForm
-from app.models.broadcast_message import BroadcastMessage
+from app.models.broadcast_message import BroadcastMessage, BroadcastMessages
 from app.utils import service_has_permission, user_has_permissions
 
 
@@ -11,8 +11,11 @@ from app.utils import service_has_permission, user_has_permissions
 @user_has_permissions()
 @service_has_permission('broadcast')
 def broadcast_dashboard(service_id):
+    broadcast_messages = BroadcastMessages(service_id)
     return render_template(
         'views/broadcast/dashboard.html',
+        live_broadcasts=broadcast_messages.with_status('broadcasting'),
+        previous_broadcasts=broadcast_messages.with_status('cancelled', 'completed'),
     )
 
 

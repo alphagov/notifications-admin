@@ -2,6 +2,7 @@ import json
 import os
 from contextlib import contextmanager
 from datetime import date, datetime, timedelta
+from functools import partial
 from unittest.mock import Mock, PropertyMock
 from uuid import UUID, uuid4
 
@@ -17,6 +18,7 @@ from . import (
     TestClient,
     api_key_json,
     assert_url_expected,
+    broadcast_message_json,
     generate_uuid,
     invite_json,
     job_json,
@@ -4175,37 +4177,90 @@ def mock_get_draft_broadcast_message(
     def _get(
         *, service_id, broadcast_message_id
     ):
-        return {
-            'id': broadcast_message_id,
-
-            'service_id': service_id,
-
-            'template_id': fake_uuid,
-            'template_version': 123,
-            'template_name': 'Example template',
-
-            'personalisation': {},
-            'areas': [
-                'england', 'scotland',
-            ],
-
-            'status': 'draft',
-
-            'starts_at': None,
-            'finishes_at': None,
-
-            'created_at': None,
-            'approved_at': None,
-            'cancelled_at': None,
-            'updated_at': None,
-
-            'created_by_id': fake_uuid,
-            'approved_by_id': None,
-            'cancelled_by_id': None,
-        }
+        return broadcast_message_json(
+            id_=broadcast_message_id,
+            service_id=service_id,
+            template_id=fake_uuid,
+            status='draft',
+            created_by_id=fake_uuid,
+        )
 
     return mocker.patch(
         'app.broadcast_message_api_client.get_broadcast_message',
+        side_effect=_get,
+    )
+
+
+@pytest.fixture(scope='function')
+def mock_get_no_broadcast_messages(
+    mocker,
+    fake_uuid,
+):
+    return mocker.patch(
+        'app.models.broadcast_message.BroadcastMessages.client_method',
+        return_value=[
+            broadcast_message_json(
+                id_=fake_uuid,
+                service_id=SERVICE_ONE_ID,
+                template_id=fake_uuid,
+                status='draft',  # draft broadcasts aren’t shown on the dashboard
+                created_by_id=fake_uuid,
+            ),
+        ],
+    )
+
+
+@pytest.fixture(scope='function')
+def mock_get_broadcast_messages(
+    mocker,
+    fake_uuid,
+):
+    def _get(service_id):
+        partial_json = partial(
+            broadcast_message_json,
+            id_=fake_uuid,
+            service_id=service_id,
+            template_id=fake_uuid,
+            created_by_id=fake_uuid,
+        )
+        return [
+            partial_json(
+                status='draft',
+            ),
+            partial_json(
+                status='broadcasting',
+                starts_at=(
+                    datetime.utcnow()
+                ).isoformat(),
+                finishes_at=(
+                    datetime.utcnow() + timedelta(hours=24)
+                ).isoformat(),
+            ),
+            partial_json(
+                status='completed',
+                starts_at=(
+                    datetime.utcnow() - timedelta(hours=12)
+                ).isoformat(),
+                finishes_at=(
+                    datetime.utcnow() - timedelta(hours=6)
+                ).isoformat(),
+            ),
+            partial_json(
+                status='cancelled',
+                starts_at=(
+                    datetime.utcnow() - timedelta(days=1)
+                ).isoformat(),
+                finishes_at=(
+                    datetime.utcnow() - timedelta(days=100)
+                ).isoformat(),
+                cancelled_at=(
+                    datetime.utcnow() - timedelta(days=10)
+                ).isoformat(),
+            ),
+        ]
+
+    return mocker.patch(
+        'app.models.broadcast_message.BroadcastMessages.client_method',
         side_effect=_get,
     )
 
