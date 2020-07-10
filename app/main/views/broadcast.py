@@ -152,6 +152,7 @@ def cancel_broadcast_message(service_id, broadcast_message_id):
         service_id=current_service.id,
     ).cancel_broadcast()
     return redirect(url_for(
-        '.broadcast_dashboard',
+        '.view_broadcast_message',
         service_id=current_service.id,
+        broadcast_message_id=broadcast_message_id,
     ))

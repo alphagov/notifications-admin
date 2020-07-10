@@ -382,8 +382,9 @@ def test_cancel_broadcast(
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
         _expected_redirect=url_for(
-            '.broadcast_dashboard',
+            '.view_broadcast_message',
             service_id=SERVICE_ONE_ID,
+            broadcast_message_id=fake_uuid,
             _external=True,
         ),
     ),
