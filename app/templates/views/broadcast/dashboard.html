@@ -30,11 +30,11 @@
             <a href="{{ url_for('.cancel_broadcast_message', service_id=current_service.id, broadcast_message_id=item.id) }}" class="destructive-link destructive-link--no-visited-state">Stop broadcasting</a>
           </p>
         {% elif item.status == 'cancelled' %}
-          <p class="govuk-body govuk-!-margin-top-6 govuk-!-margin-bottom-0">
+          <p class="govuk-body govuk-!-margin-top-6 govuk-!-margin-bottom-0 govuk-hint">
             Stopped {{ item.cancelled_at|format_datetime_relative }}
           </p>
         {% else %}
-          <p class="govuk-body govuk-!-margin-top-6 govuk-!-margin-bottom-0">
+          <p class="govuk-body govuk-!-margin-top-6 govuk-!-margin-bottom-0 govuk-hint">
             Finished {{ item.finishes_at|format_datetime_relative }}
           </p>
         {% endif %}
