@@ -78,7 +78,7 @@ def test_broadcast_dashboard(
     assert [
         normalize_spaces(row.text) for row in page.select('table')[0].select('tbody tr')
     ] == [
-        'Example template To England and Scotland Live until tomorrow at 2:20am Stop broadcasting',
+        'Example template To England and Scotland Live until tomorrow at 2:20am',
     ]
     assert [
         normalize_spaces(row.text) for row in page.select('table')[1].select('tbody tr')
