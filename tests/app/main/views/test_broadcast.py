@@ -2,7 +2,7 @@ import pytest
 from flask import url_for
 from freezegun import freeze_time
 
-from tests import sample_uuid
+from tests import broadcast_message_json, sample_uuid, user_json
 from tests.conftest import SERVICE_ONE_ID, normalize_spaces
 
 sample_uuid = sample_uuid()
@@ -274,6 +274,98 @@ def test_start_broadcasting(
         'broadcasting',
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
+    )
+
+
+@pytest.mark.parametrize('extra_fields, expected_paragraphs', (
+    ({
+        'status': 'broadcasting',
+        'finishes_at': '2020-02-23T23:23:23.000000',
+    }, [
+        'Created by Alice and approved by Bob.',
+        'Started broadcasting on 20 February at 8:20pm.',
+        'Live until tomorrow at 11:23pm Stop broadcast early',
+    ]),
+    ({
+        'status': 'broadcasting',
+        'finishes_at': '2020-02-22T22:20:20.000000',  # 2 mins before now()
+    }, [
+        'Created by Alice and approved by Bob.',
+        'Started broadcasting on 20 February at 8:20pm.',
+        'Finished broadcasting today at 10:20pm.',
+    ]),
+    ({
+        'status': 'finished',
+        'finishes_at': '2020-02-21T21:21:21.000000',
+    }, [
+        'Created by Alice and approved by Bob.',
+        'Started broadcasting on 20 February at 8:20pm.',
+        'Finished broadcasting yesterday at 9:21pm.',
+    ]),
+    ({
+        'status': 'cancelled',
+        'cancelled_by_id': sample_uuid,
+        'cancelled_at': '2020-02-21T21:21:21.000000',
+    }, [
+        'Created by Alice and approved by Bob.',
+        'Started broadcasting on 20 February at 8:20pm.',
+        'Stopped by Carol yesterday at 9:21pm.',
+    ]),
+))
+@freeze_time('2020-02-22T22:22:22.000000')
+def test_view_broadcast_message_page(
+    mocker,
+    client_request,
+    service_one,
+    active_user_with_permissions,
+    mock_get_broadcast_template,
+    fake_uuid,
+    extra_fields,
+    expected_paragraphs,
+):
+    mocker.patch(
+        'app.broadcast_message_api_client.get_broadcast_message',
+        return_value=broadcast_message_json(
+            id_=fake_uuid,
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            created_by_id=fake_uuid,
+            approved_by_id=fake_uuid,
+            starts_at='2020-02-20T20:20:20.000000',
+            **extra_fields
+        ),
+    )
+    mocker.patch('app.user_api_client.get_user', side_effect=[
+        active_user_with_permissions,
+        user_json(name='Alice'),
+        user_json(name='Bob'),
+        user_json(name='Carol'),
+    ])
+    service_one['permissions'] += ['broadcast']
+
+    page = client_request.get(
+        '.view_broadcast_message',
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+    )
+
+    assert [
+        normalize_spaces(p.text) for p in page.select('main p.govuk-body')
+    ] == expected_paragraphs
+
+
+def test_no_view_page_for_draft(
+    client_request,
+    service_one,
+    mock_get_draft_broadcast_message,
+    fake_uuid,
+):
+    service_one['permissions'] += ['broadcast']
+    client_request.get(
+        '.view_broadcast_message',
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+        _expected_status=404,
     )
 
 

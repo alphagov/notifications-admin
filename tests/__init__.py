@@ -647,6 +647,8 @@ def broadcast_message_json(
     starts_at=None,
     finishes_at=None,
     cancelled_at=None,
+    approved_by_id=None,
+    cancelled_by_id=None,
 ):
     return {
         'id': id_,
@@ -673,6 +675,6 @@ def broadcast_message_json(
         'updated_at': None,
 
         'created_by_id': created_by_id,
-        'approved_by_id': None,
-        'cancelled_by_id': None,
+        'approved_by_id': approved_by_id,
+        'cancelled_by_id': cancelled_by_id,
     }

@@ -5,6 +5,7 @@ from notifications_utils.template import BroadcastPreviewTemplate
 from orderedset import OrderedSet
 
 from app.models import JSONModel, ModelList
+from app.models.user import User
 from app.notify_client.broadcast_message_api_client import (
     broadcast_message_api_client,
 )
@@ -93,6 +94,18 @@ class BroadcastMessage(JSONModel):
         ):
             return 'completed'
         return self._dict['status']
+
+    @property
+    def created_by(self):
+        return User.from_id(self.created_by_id)
+
+    @property
+    def approved_by(self):
+        return User.from_id(self.approved_by_id)
+
+    @property
+    def cancelled_by(self):
+        return User.from_id(self.cancelled_by_id)
 
     def add_areas(self, *new_areas):
         broadcast_message_api_client.update_broadcast_message(

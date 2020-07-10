@@ -4192,6 +4192,34 @@ def mock_get_draft_broadcast_message(
 
 
 @pytest.fixture(scope='function')
+def mock_get_live_broadcast_message(
+    mocker,
+    fake_uuid,
+):
+    def _get(
+        *, service_id, broadcast_message_id
+    ):
+        return broadcast_message_json(
+            id_=broadcast_message_id,
+            service_id=service_id,
+            template_id=fake_uuid,
+            status='broadcasting',
+            created_by_id=fake_uuid,
+            starts_at=(
+                datetime.utcnow()
+            ).isoformat(),
+            finishes_at=(
+                datetime.utcnow() + timedelta(hours=24)
+            ).isoformat(),
+        )
+
+    return mocker.patch(
+        'app.broadcast_message_api_client.get_broadcast_message',
+        side_effect=_get,
+    )
+
+
+@pytest.fixture(scope='function')
 def mock_get_no_broadcast_messages(
     mocker,
     fake_uuid,

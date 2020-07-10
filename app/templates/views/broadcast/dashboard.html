@@ -17,7 +17,7 @@
     ) %}
       {% call row_heading() %}
         <div class="file-list">
-          <a class="file-list-filename-large govuk-link govuk-link--no-visited-state" href="#">{{ item.template_name }}</a>
+          <a class="file-list-filename-large govuk-link govuk-link--no-visited-state" href="{{ url_for('.view_broadcast_message', service_id=current_service.id, broadcast_message_id=item.id) }}">{{ item.template_name }}</a>
           <span class="file-list-hint-large">
             To {{ item.initial_area_names|formatted_list(before_each='', after_each='') }}
           </span>
