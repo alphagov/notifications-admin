@@ -68,7 +68,7 @@
       <ul class="area-list">
     {% endif %}
         <li class="area-list-item">
-          {{ area.name }} <a class="area-list-item-remove" href="{{ url_for('.remove_broadcast_area', service_id=current_service.id, broadcast_message_id=broadcast_message_id, area_slug=area.id) }}">remove</a>
+          {{ area.name }} <a class="area-list-item-remove" href="{{ url_for('.remove_broadcast_area', service_id=current_service.id, broadcast_message_id=broadcast_message.id, area_slug=area.id) }}">remove</a>
         </li>
     {% if loop.last %}
       {{ govukButton({
