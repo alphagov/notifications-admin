@@ -266,6 +266,39 @@ def test_service_without_caseworking_doesnt_show_admin_vs_caseworker(
     assert page.select('input[type=checkbox]')[4]['name'] == 'manage_api_keys'
 
 
+@pytest.mark.parametrize('endpoint, extra_args', [
+    (
+        'main.edit_user_permissions',
+        {'user_id': sample_uuid()},
+    ),
+    (
+        'main.invite_user',
+        {},
+    ),
+])
+def test_broadcast_service_only_shows_relevant_permissions(
+    client_request,
+    service_one,
+    mock_get_users_by_service,
+    mock_get_template_folders,
+    endpoint,
+    extra_args,
+):
+    service_one['permissions'] = ['broadcast']
+    page = client_request.get(
+        endpoint,
+        service_id=SERVICE_ONE_ID,
+        **extra_args
+    )
+    assert [
+        field['name'] for field in page.select('input[type=checkbox]')
+    ] == [
+        'send_messages',
+        'manage_templates',
+        'manage_service',
+    ]
+
+
 @pytest.mark.parametrize('service_has_email_auth, displays_auth_type', [
     (True, True),
     (False, False)
@@ -454,6 +487,76 @@ def test_edit_user_permissions(
     submitted_permissions,
     permissions_sent_to_api,
 ):
+    client_request.post(
+        'main.edit_user_permissions',
+        service_id=SERVICE_ONE_ID,
+        user_id=fake_uuid,
+        _data=dict(
+            email_address="test@example.com",
+            **submitted_permissions
+        ),
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.manage_users',
+            service_id=SERVICE_ONE_ID,
+            _external=True,
+        ),
+    )
+    mock_set_user_permissions.assert_called_with(
+        fake_uuid,
+        SERVICE_ONE_ID,
+        permissions=permissions_sent_to_api,
+        folder_permissions=[]
+    )
+
+
+@pytest.mark.parametrize('submitted_permissions, permissions_sent_to_api', [
+    (
+        {
+            'view_activity': 'y',
+            'send_messages': 'y',
+            'manage_templates': 'y',
+            'manage_service': 'y',
+            'manage_api_keys': 'y',
+        },
+        {
+            'view_activity',
+            'send_messages',
+            'manage_service',
+            'manage_templates',
+        }
+    ),
+    (
+        {
+            'view_activity': 'y',
+            'send_messages': 'y',
+        },
+        {
+            'view_activity',
+            'send_messages',
+        }
+    ),
+    (
+        {
+        },
+        {
+            'view_activity',
+        }
+    ),
+])
+def test_edit_user_permissions_for_broadcast_service(
+    client_request,
+    service_one,
+    mocker,
+    mock_get_users_by_service,
+    mock_get_invites_for_service,
+    mock_set_user_permissions,
+    mock_get_template_folders,
+    fake_uuid,
+    submitted_permissions,
+    permissions_sent_to_api,
+):
+    service_one['permissions'] = 'broadcast'
     client_request.post(
         'main.edit_user_permissions',
         service_id=SERVICE_ONE_ID,
@@ -785,6 +888,62 @@ def test_invite_user_with_email_auth_service(
                                                                 expected_permissions,
                                                                 auth_type,
                                                                 [])
+
+
+@pytest.mark.parametrize('post_data, expected_permissions_to_api', (
+    (
+        {
+            'send_messages': 'y',
+            'manage_templates': 'y',
+            'manage_service': 'y',
+        },
+        {
+            'view_activity',
+            'send_messages',
+            'manage_templates',
+            'manage_service',
+        },
+    ),
+    (
+        {
+            'view_activity': 'y',
+            'manage_api_keys': 'y',
+            'foo': 'y',
+        },
+        {
+            'view_activity',
+        },
+    ),
+))
+def test_invite_user_to_broadcast_service(
+    client_request,
+    service_one,
+    active_user_with_permissions,
+    mocker,
+    sample_invite,
+    mock_get_template_folders,
+    mock_get_organisations,
+    post_data,
+    expected_permissions_to_api,
+):
+    service_one['permissions'] = ['broadcast']
+    mocker.patch('app.models.user.InvitedUsers.client_method', return_value=[sample_invite])
+    mocker.patch('app.models.user.Users.client_method', return_value=[active_user_with_permissions])
+    mocker.patch('app.invite_api_client.create_invite', return_value=sample_invite)
+    post_data['email_address'] = 'broadcast@example.gov.uk'
+    client_request.post(
+        'main.invite_user',
+        service_id=SERVICE_ONE_ID,
+        _data=post_data,
+    )
+    app.invite_api_client.create_invite.assert_called_once_with(
+        sample_invite['from_user'],
+        sample_invite['service'],
+        'broadcast@example.gov.uk',
+        expected_permissions_to_api,
+        'sms_auth',
+        [],
+    )
 
 
 def test_cancel_invited_user_cancels_user_invitations(
