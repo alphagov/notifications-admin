@@ -289,6 +289,12 @@ def test_send_files_by_email_row_on_settings_page(
         'Letter branding Not set Change',
 
     ]),
+    (['broadcast'], [
+
+        'Service name service one Change',
+        'Sign-in method Text message code Change',
+
+    ]),
 ])
 def test_should_show_overview_for_service_with_more_things_set(
         client,
