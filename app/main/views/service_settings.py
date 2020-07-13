@@ -696,6 +696,9 @@ def service_set_channel(service_id, channel):
     if channel not in {'email', 'sms', 'letter'}:
         abort(404)
 
+    if current_service.has_permission('broadcast'):
+        abort(403)
+
     form = ServiceSwitchChannelForm(
         channel=channel,
         enabled=current_service.has_permission(channel)

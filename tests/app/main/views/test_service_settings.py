@@ -3729,6 +3729,32 @@ def test_switch_service_enable_letters(
     assert mocked_fn.call_args[0][0] == service_one['id']
 
 
+@pytest.mark.parametrize('channel', (
+    'email', 'sms', 'letter',
+))
+def test_broadcast_service_cant_post_to_set_other_channels_endpoint(
+    client_request,
+    service_one,
+    channel,
+):
+    service_one['permissions'] = ['broadcast']
+
+    client_request.get(
+        'main.service_set_channel',
+        service_id=SERVICE_ONE_ID,
+        channel=channel,
+        _expected_status=403,
+    )
+
+    client_request.post(
+        'main.service_set_channel',
+        service_id=SERVICE_ONE_ID,
+        channel=channel,
+        _data={'enabled': 'True'},
+        _expected_status=403,
+    )
+
+
 @pytest.mark.parametrize('permissions, expected_checked', [
     (['international_sms'], 'on'),
     ([''], 'off'),
