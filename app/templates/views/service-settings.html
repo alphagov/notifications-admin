@@ -252,13 +252,15 @@
     {% if current_service.trial_mode %}
       <h2 class="heading-medium top-gutter-0">Your service is in trial mode</h2>
 
-      <p class="govuk-body">You can only:</p>
+      {% if not current_service.has_permission('broadcast') %}
+        <p class="govuk-body">You can only:</p>
 
-      <ul class='list list-bullet'>
-        <li>send {{ current_service.message_limit }} text messages and emails per day</li>
-        <li>send messages to yourself and other people in your team</li>
-        <li>create letter templates, but not send them</li>
-      </ul>
+        <ul class='list list-bullet'>
+          <li>send {{ current_service.message_limit }} text messages and emails per day</li>
+          <li>send messages to yourself and other people in your team</li>
+          <li>create letter templates, but not send them</li>
+        </ul>
+      {% endif %}
 
       <p class="govuk-body">
         {% if current_user.has_permissions('manage_service') %}
@@ -272,11 +274,13 @@
     {% else %}
       <h2 class="heading-medium top-gutter-0">Your service is live</h2>
 
-      <p class="govuk-body">
-        You can send up to
-        {{ "{:,}".format(current_service.message_limit) }} messages
-        per day.
-      </p>
+      {% if not current_service.has_permission('broadcast') %}
+        <p class="govuk-body">
+          You can send up to
+          {{ "{:,}".format(current_service.message_limit) }} messages
+          per day.
+        </p>
+      {% endif %}
       <p class="govuk-body">
         Problems or comments?
         <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">Give feedback</a>.

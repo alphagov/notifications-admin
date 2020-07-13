@@ -510,6 +510,7 @@ def test_service_name_change_fails_if_new_name_has_less_than_2_alphanumeric_char
 ])
 def test_show_restricted_service(
     client_request,
+    service_one,
     single_reply_to_email_address,
     single_letter_contact_block,
     mock_get_organisation,
@@ -537,6 +538,32 @@ def test_show_restricted_service(
         assert request_to_live_link['href'] == url_for('main.request_to_go_live', service_id=SERVICE_ONE_ID)
     else:
         assert not request_to_live_link
+
+
+def test_show_restricted_broadcast_service(
+    client_request,
+    service_one,
+    single_reply_to_email_address,
+    single_letter_contact_block,
+    mock_get_organisation,
+    single_sms_sender,
+    mock_get_service_settings_page_common,
+):
+    service_one['permissions'] = 'broadcast'
+    page = client_request.get(
+        'main.service_settings',
+        service_id=SERVICE_ONE_ID,
+    )
+
+    assert page.select('main h2')[0].text == 'Your service is in trial mode'
+
+    request_to_live = page.select_one('main p')
+    request_to_live_link = request_to_live.select_one('a')
+    assert normalize_spaces(page.select_one('main p').text) == (
+        'To remove these restrictions, you can send us a request to go live.'
+    )
+    assert request_to_live_link['href'] == url_for('main.request_to_go_live', service_id=SERVICE_ONE_ID)
+    assert not page.select_one('main ul')
 
 
 @freeze_time("2017-04-01 11:09:00.061258")
