@@ -193,6 +193,35 @@ def test_should_show_caseworker_on_overview_page(
     )
 
 
+def test_should_show_overview_page_for_broadcast_service(
+    client_request,
+    mocker,
+    mock_get_invites_for_service,
+    mock_get_template_folders,
+    service_one,
+    active_user_view_permissions,
+    active_user_with_permissions,
+):
+    service_one['permissions'].append('broadcast')
+    mocker.patch('app.models.user.Users.client_method', return_value=[
+        active_user_with_permissions,
+        active_user_view_permissions,
+    ])
+    page = client_request.get('main.manage_users', service_id=SERVICE_ONE_ID)
+    assert normalize_spaces(page.select('.user-list-item')[0].text) == (
+        'Test User (you) '
+        'Can Prepare and approve broadcasts '
+        'Can Add and edit templates '
+        'Can Manage settings and team'
+    )
+    assert normalize_spaces(page.select('.user-list-item')[1].text) == (
+        'Test User With Permissions (you) '
+        'Cannot Prepare and approve broadcasts '
+        'Cannot Add and edit templates '
+        'Cannot Manage settings and team'
+    )
+
+
 @pytest.mark.parametrize('endpoint, extra_args, service_has_email_auth, auth_options_hidden', [
     (
         'main.edit_user_permissions',

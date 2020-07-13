@@ -27,7 +27,7 @@ from app.main.forms import (
     PermissionsForm,
     SearchUsersForm,
 )
-from app.models.roles_and_permissions import permissions
+from app.models.roles_and_permissions import broadcast_permissions, permissions
 from app.models.user import InvitedUser, User
 from app.utils import is_gov_user, redact_mobile_number, user_has_permissions
 
@@ -41,7 +41,9 @@ def manage_users(service_id):
         current_user=current_user,
         show_search_box=(len(current_service.team_members) > 7),
         form=SearchUsersForm(),
-        permissions=permissions,
+        permissions=(
+            broadcast_permissions if current_service.has_permission('broadcast') else permissions
+        ),
     )
 
 
