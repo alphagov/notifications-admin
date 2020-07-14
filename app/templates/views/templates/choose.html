@@ -21,25 +21,19 @@
     <h1 class="heading-medium">
       {{ page_title }}
     </h1>
-    {% if current_user.has_permissions('manage_templates') %}
-       <p class="govuk-body">
+
+     <p class="govuk-body">
+       {% if current_user.has_permissions('manage_templates') %}
          You need a template before you can send
-         {% if 'letter' in current_service.permissions %}
-           emails, text messages or letters
-         {%- else -%}
-           emails or text messages
-         {%- endif %}.
-       </p>
-    {% else %}
-      <p class="govuk-body">
-        You need to ask your service manager to add templates before you can send
-        {% if 'letter' in current_service.permissions %}
-          emails, text messages or letters
-        {%- else -%}
-          emails or text messages
-        {%- endif %}.
-      </p>
-    {% endif %}
+       {% else %}
+         You need to ask your service manager to add templates before you can send
+       {% endif %}
+       {% if 'letter' in current_service.permissions %}
+         emails, text messages or letters
+       {%- else -%}
+         emails or text messages
+       {%- endif %}.
+     </p>
 
   {% else %}
 
