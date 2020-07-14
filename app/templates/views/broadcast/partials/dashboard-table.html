@@ -1,6 +1,6 @@
 {% from "components/table.html" import list_table, field, right_aligned_field_heading, row_heading %}
 
-<div class='dashboard-table ajax-block-container'>
+<div class='{% if broadcasts %}dashboard-table{% endif%} ajax-block-container'>
   {% call(item, row_number) list_table(
     broadcasts|sort|reverse|list,
     caption="Live broadcasts",
