@@ -110,7 +110,7 @@
               {% for letter in month.letters%}
                 {% if letter.billing_units %}
                   <li class="tabular-numbers">{{ "{:,} {}".format(letter.billing_units, letter.postage_description) }} {{ message_count_label(letter.billing_units, 'letter', '') }}at
-                  {{ letter.rate }}</li>
+                  {{ letter.rate | format_number_in_pounds_as_currency }}</li>
                 {% endif %}
               {% endfor %}
               {% if not (month.free or month.paid or month.letters) %}

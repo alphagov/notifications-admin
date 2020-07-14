@@ -521,6 +521,13 @@ def nl2br(value):
     return ''
 
 
+def format_number_in_pounds_as_currency(number):
+    if number >= 1:
+        return f"£{number:,.2f}"
+
+    return f"{number * 100:.0f}p"
+
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.from_id(user_id)
@@ -798,6 +805,7 @@ def add_template_filters(application):
         format_notification_status_as_time,
         format_notification_status_as_field_status,
         format_notification_status_as_url,
+        format_number_in_pounds_as_currency,
         formatters.formatted_list,
         nl2br,
         format_phone_number_human_readable,

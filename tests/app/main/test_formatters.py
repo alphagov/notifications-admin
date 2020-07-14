@@ -3,7 +3,10 @@ from functools import partial
 import pytest
 from flask import url_for
 
-from app import format_notification_status_as_url
+from app import (
+    format_notification_status_as_url,
+    format_number_in_pounds_as_currency,
+)
 
 
 @pytest.mark.parametrize('status, notification_type, expected', (
@@ -33,3 +36,19 @@ def test_format_notification_status_as_url(
     assert format_notification_status_as_url(
         status, notification_type
     ) == expected()
+
+
+@pytest.mark.parametrize('input_number, formatted_number', [
+    (0, '0p'),
+    (0.01, '1p'),
+    (0.5, '50p'),
+    (1, '£1.00'),
+    (1.01, '£1.01'),
+    (1.006, '£1.01'),
+    (5.25, '£5.25'),
+    (5.7, '£5.70'),
+    (381, '£381.00'),
+    (144820, '£144,820.00'),
+])
+def test_format_number_in_pounds_as_currency(input_number, formatted_number):
+    assert format_number_in_pounds_as_currency(input_number) == formatted_number

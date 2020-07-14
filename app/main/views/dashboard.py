@@ -456,7 +456,7 @@ def format_letter_details_for_month(letter_units_for_month):
 
         letter_details = LetterDetails(
             billing_units=sum(x['billing_units'] for x in rate_group),
-            rate=format_letter_rate(rate_group[0]['rate']),
+            rate=rate_group[0]['rate'],
             cost=(sum(x['billing_units'] for x in rate_group) * rate_group[0]['rate']),
             postage_description=rate_group[0]['postage']
         )
@@ -470,13 +470,6 @@ def get_postage_description(postage):
     if postage in ('first', 'second'):
         return f'{postage} class'
     return 'international'
-
-
-def format_letter_rate(number):
-    if number >= 1:
-        return f"£{number:,.2f}"
-
-    return f"{number * 100:.0f}p"
 
 
 def get_free_paid_breakdown_for_month(
