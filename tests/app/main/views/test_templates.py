@@ -29,15 +29,12 @@ from tests.conftest import (
 
 @pytest.mark.parametrize('permissions, expected_message', (
     (['email'], (
-        'You need a template before you can send emails or text messages.'
-    )),
-    (['sms'], (
-        'You need a template before you can send emails or text messages.'
-    )),
-    (['letter'], (
         'You need a template before you can send emails, text messages or letters.'
     )),
-    (['sms', 'letter'], (
+    (['sms'], (
+        'You need a template before you can send emails, text messages or letters.'
+    )),
+    (['letter'], (
         'You need a template before you can send emails, text messages or letters.'
     )),
     (['email', 'sms', 'letter'], (
@@ -88,7 +85,7 @@ def test_should_show_add_template_form_if_service_has_folder_permission(
         'Templates'
     )
     assert normalize_spaces(page.select_one('main p').text) == (
-        'You need a template before you can send emails or text messages.'
+        'You need a template before you can send emails, text messages or letters.'
     )
     assert [
         (item['name'], item['value']) for item in page.select('[type=radio]')

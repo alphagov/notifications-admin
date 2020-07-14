@@ -31,12 +31,7 @@
        {% if current_service.has_permission('broadcast') %}
           prepare a broadcast
        {%- else %}
-          send
-          {% if 'letter' in current_service.permissions %}
-            emails, text messages or letters
-          {%- else -%}
-            emails or text messages
-          {%- endif %}
+          send emails, text messages or letters
        {%- endif %}.
      </p>
 
