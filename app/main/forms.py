@@ -923,7 +923,7 @@ class TextNotReceivedForm(StripWhitespaceForm):
 
 
 class RenameServiceForm(StripWhitespaceForm):
-    name = StringField(
+    name = GovukTextInputField(
         u'Service name',
         validators=[
             DataRequired(message='Cannot be empty'),

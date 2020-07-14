@@ -493,7 +493,7 @@ def test_service_name_change_fails_if_new_name_has_less_than_2_alphanumeric_char
     )
     assert not mock_service_name_is_unique.called
     assert not mock_update_service.called
-    assert page.find("span", {"class": "error-message"})
+    assert page.find("span", {"class": "govuk-error-message"})
 
 
 @pytest.mark.parametrize('user, expected_text, expected_link', [
