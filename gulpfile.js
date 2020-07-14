@@ -70,7 +70,8 @@ const copy = {
         'fieldset',
         'hint',
         'label',
-        'checkboxes'
+        'checkboxes',
+        'input'
       ];
       let done = 0;
 
