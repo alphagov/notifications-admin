@@ -186,6 +186,39 @@ def password(label='Password'):
                                      CommonlyUsedPassword(message='Choose a password that’s harder to guess')])
 
 
+class GovukTextInputField(StringField):
+    def __init__(self, label='', validators=None, param_extensions=None, **kwargs):
+        super(GovukTextInputField, self).__init__(label, validators, **kwargs)
+        self.param_extensions = param_extensions
+
+    # self.__call__ renders the HTML for the field by:
+    # 1. delegating to self.meta.render_field which
+    # 2. calls field.widget
+    # this bypasses that by making self.widget a method with the same interface as widget.__call__
+    def widget(self, field, **kwargs):
+        # error messages
+        error_message = None
+        if field.errors:
+            error_message = {"text": " ".join(field.errors).strip()}
+
+        # convert to parameters that govuk understands
+        params = {
+            "name": field.name,
+            "id": field.id,
+            "label": {"text": field.label.text},
+            "value": field.data,
+            "classes": "govuk-!-width-two-thirds",
+            "errorMessage": error_message,
+        }
+
+        # extend default params with any sent in
+        if self.param_extensions:
+            params.update(self.param_extensions)
+
+        return Markup(
+            render_template('vendor/govuk-frontend/components/input/template.njk', params=params))
+
+
 class SMSCode(StringField):
     validators = [
         DataRequired(message='Cannot be empty'),
