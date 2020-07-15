@@ -14,49 +14,52 @@ afterAll(() => {
 
 describe('Collapsible fieldset', () => {
 
+  const _checkboxes = (start, end) => {
+    result = '';
+
+      for (let num = start; num <= end; num++) {
+        let id = `folder-permissions-${num}`;
+
+        result += `<li class="govuk-checkboxes__item">
+          <input class="govuk-checkboxes__input" id="${id}" name="folder-permissions" type="checkbox" value="${id}">
+          <label class="govuk-label govuk-checkboxes__label" for="${id}">
+            Folder ${id}
+          </label>
+        </li>`;
+      }
+
+      return result;
+  };
+  let wrapper;
+  let formGroup;
   let fieldset;
+  let checkboxesContainer;
   let checkboxes;
 
   beforeEach(() => {
-    const _checkboxes = (start, end, descendents) => {
-      result = '';
-
-        for (let num = start; num <= end; num++) {
-          let id = `folder-permissions-${num}`;
-
-          if (!descendents) { descendents = ''; }
-
-          result += `<li class="multiple-choice">
-            <input id="${id}" name="folder_permissions" type="checkbox" value="${id}">
-            <label class="block-label" for="{id}">
-              Folder 18
-            </label>
-            ${descendents}
-          </li>`;
-        }
-
-        return result;
-    };
 
     // set up DOM
     document.body.innerHTML =
-      `<div class="form-group" data-module="collapsible-checkboxes" data-field-label="folder">
-        <div class="selection-summary"></div>
-        <fieldset id="folder_permissions">
-          <legend class="form-label heading-small">
-            Folders this team member can see
-          </legend>
-          <div class="checkboxes-nested">
-            <ul>
+      `<div class="selection-wrapper" data-module="collapsible-checkboxes" data-field-label="folder">
+        <div class="govuk-form-group">
+          <fieldset class="govuk-fieldset" id="folder_permissions">
+            <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+              Folders this team member can see
+              <span class="govuk-hint">
+                <div class="selection-summary" role="region" aria-live="polite"></div>
+              </span>
+            </legend>
+            <ul class="govuk-checkboxes">
               ${_checkboxes(1, 10)}
             </ul>
-          </div>
-        </fieldset>
+          </fieldset>
+        </div>
       </div>`;
 
-      formGroup = document.querySelector('.form-group');
+      wrapper = document.querySelector('.selection-wrapper');
+      formGroup = wrapper.querySelector('.govuk-form-group');
       fieldset = formGroup.querySelector('fieldset');
-      checkboxesContainer = fieldset.querySelector('.checkboxes-nested');
+      checkboxesContainer = fieldset.querySelector('.govuk-checkboxes');
       checkboxes = checkboxesContainer.querySelectorAll('input[type=checkbox]');
 
   });
@@ -141,6 +144,12 @@ describe('Collapsible fieldset', () => {
 
     });
 
+    test("removes the hint", () => {
+
+      expect(document.querySelector('.govuk-hint')).toBeNull();
+
+    });
+
   });
 
   test('has the right summary text when started with no checkboxes selected', () => {
@@ -187,7 +196,7 @@ describe('Collapsible fieldset', () => {
 
   test("the summary doesn't have a folder icon if fields aren't called 'folder'", () => {
 
-    formGroup.dataset.fieldLabel = 'team member';
+    wrapper.dataset.fieldLabel = 'team member';
 
     // start module
     window.GOVUK.modules.start();
@@ -277,35 +286,74 @@ describe('Collapsible fieldset', () => {
 
   describe("the footer (that wraps the button)", () => {
 
-    beforeEach(() => {
+    describe("is inserted", () => {
 
-      // track calls to sticky JS
-      window.GOVUK.stickAtBottomWhenScrolling.recalculate = jest.fn(() => {});
+      test("after the fieldset", () => {
 
-      // start module
-      window.GOVUK.modules.start();
+        // start module
+        window.GOVUK.modules.start();
 
-      // show the checkboxes
-      helpers.triggerEvent(formGroup.querySelector('.govuk-button'), 'click');
+        // show the checkboxes
+        helpers.triggerEvent(formGroup.querySelector('.govuk-button'), 'click');
+
+        expect(formGroup.querySelector('.selection-footer').previousElementSibling.nodeName).toBe('FIELDSET');
+
+      });
+
+      test("after the root fieldset if the checkboxes are nested", () => {
+
+        // add a nested list of checkboxes to the first checkbox item
+        const nestedCheckboxes = document.createElement('div');
+        nestedCheckboxes.className = 'govuk-form-group govuk-form-group--nested';
+        nestedCheckboxes.innerHTML = _checkboxes(11, 20);
+        checkboxesContainer.querySelector('.govuk-checkboxes__item').appendChild(nestedCheckboxes);
+
+        // start module
+        window.GOVUK.modules.start();
+
+        // show the checkboxes
+        helpers.triggerEvent(formGroup.querySelector('.govuk-button'), 'click');
+
+        expect(formGroup.querySelector('.selection-footer').previousElementSibling.nodeName).toBe('FIELDSET');
+
+      });
 
     });
 
-    test("is made sticky when the fieldset is expanded", () => {
+    describe("its stickiness", () => {
 
-      expect(formGroup.querySelector('.selection-footer').classList.contains('js-stick-at-bottom-when-scrolling')).toBe(true);
-      expect(window.GOVUK.stickAtBottomWhenScrolling.recalculate.mock.calls.length).toBe(1);
+      beforeEach(() => {
+
+        // track calls to sticky JS
+        window.GOVUK.stickAtBottomWhenScrolling.recalculate = jest.fn(() => {});
+
+        // start module
+        window.GOVUK.modules.start();
+
+        // show the checkboxes
+        helpers.triggerEvent(formGroup.querySelector('.govuk-button'), 'click');
+
+      });
+
+      test("is added when the fieldset is expanded", () => {
+
+        expect(formGroup.querySelector('.selection-footer').classList.contains('js-stick-at-bottom-when-scrolling')).toBe(true);
+        expect(window.GOVUK.stickAtBottomWhenScrolling.recalculate.mock.calls.length).toBe(1);
+
+      });
+
+      test("is removed when the fieldset is collapsed", () => {
+
+        // click the button to collapse the fieldset
+        helpers.triggerEvent(formGroup.querySelector('.govuk-button'), 'click');
+
+        expect(formGroup.querySelector('.selection-footer').classList.contains('js-stick-at-bottom-when-scrolling')).toBe(false);
+        expect(window.GOVUK.stickAtBottomWhenScrolling.recalculate.mock.calls.length).toBe(2);
+
+      });
 
     });
 
-    test("has its stickiness removed when the fieldset is collapsed", () => {
-
-      // click the button to collapse the fieldset
-      helpers.triggerEvent(formGroup.querySelector('.govuk-button'), 'click');
-
-      expect(formGroup.querySelector('.selection-footer').classList.contains('js-stick-at-bottom-when-scrolling')).toBe(false);
-      expect(window.GOVUK.stickAtBottomWhenScrolling.recalculate.mock.calls.length).toBe(2);
-
-    });
   });
 
   describe("when the selection changes", () => {
@@ -339,7 +387,7 @@ describe('Collapsible fieldset', () => {
 
       test("if fields are called 'folders'", () => {
 
-        formGroup.dataset.fieldLabel = 'folder';
+        wrapper.dataset.fieldLabel = 'folder';
 
         checkFirstCheckbox();
 
@@ -359,7 +407,7 @@ describe('Collapsible fieldset', () => {
 
       test("if fields are called 'team member'", () => {
 
-        formGroup.dataset.fieldLabel = 'team member';
+        wrapper.dataset.fieldLabel = 'team member';
 
         checkFirstCheckbox();
 
@@ -379,7 +427,7 @@ describe('Collapsible fieldset', () => {
 
       test("if fields are called 'arbitrary thing'", () => {
 
-        formGroup.dataset.fieldLabel = 'arbitrary thing';
+        wrapper.dataset.fieldLabel = 'arbitrary thing';
 
         checkFirstCheckbox();
 
@@ -403,7 +451,7 @@ describe('Collapsible fieldset', () => {
 
       test("if fields are called 'folder'", () => {
 
-        formGroup.dataset.fieldLabel = 'folder';
+        wrapper.dataset.fieldLabel = 'folder';
 
         checkAllCheckboxes();
 
@@ -423,7 +471,7 @@ describe('Collapsible fieldset', () => {
 
       test("if fields are called 'team member'", () => {
 
-        formGroup.dataset.fieldLabel = 'team member';
+        wrapper.dataset.fieldLabel = 'team member';
 
         checkAllCheckboxes();
 
@@ -447,7 +495,7 @@ describe('Collapsible fieldset', () => {
 
       test("if fields are called 'folder'", () => {
 
-        formGroup.dataset.fieldLabel = 'folder';
+        wrapper.dataset.fieldLabel = 'folder';
 
         checkAllCheckboxesButTheLast();
 
@@ -466,7 +514,7 @@ describe('Collapsible fieldset', () => {
 
       test("if fields are called 'team member'", () => {
 
-        formGroup.dataset.fieldLabel = 'team member';
+        wrapper.dataset.fieldLabel = 'team member';
 
         checkAllCheckboxesButTheLast();
 

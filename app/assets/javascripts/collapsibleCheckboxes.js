@@ -5,7 +5,7 @@
 
   function Summary (module) {
     this.module = module;
-    this.$el = module.$formGroup.find('.selection-summary');
+    this.$el = module.$formGroup.find('.selection-summary').first();
     this.fieldLabel = module.fieldLabel;
     this.total = module.total;
     this.addContent();
@@ -25,6 +25,7 @@
     if (this.fieldLabel === 'folder') { this.$text.addClass('selection-summary__text--folders'); }
 
     this.$el.append(this.$text);
+    this.module.$formGroup.find('.govuk-hint').remove();
   };
   Summary.prototype.update = function(selection) {
     let template;
@@ -86,12 +87,13 @@
       .focus();
   };
   CollapsibleCheckboxes.prototype.start = function(component) {
-    this.$formGroup = $(component);
-    this.$fieldset = this.$formGroup.find('fieldset');
+    this.$component = $(component);
+    this.$formGroup = this.$component.find('.govuk-form-group').first();
+    this.$fieldset = this.$formGroup.find('fieldset').first();
     this.$checkboxes = this.$fieldset.find('input[type=checkbox]');
-    this.fieldLabel = this.$formGroup.data('fieldLabel');
+    this.fieldLabel = this.$component.data('fieldLabel');
     this.total = this.$checkboxes.length;
-    this.legendText = this.$fieldset.find('legend').text().trim();
+    this.legendText = this.$fieldset.find('legend').first().text().trim();
     this.expanded = false;
 
     this.addHeadingHideLegend();
@@ -113,7 +115,7 @@
   };
   CollapsibleCheckboxes.prototype.getSelection = function() { return this.$checkboxes.filter(':checked').length; };
   CollapsibleCheckboxes.prototype.addHeadingHideLegend = function() {
-    const headingLevel = this.$formGroup.data('heading-level') || '2';
+    const headingLevel = this.$component.data('heading-level') || '2';
 
     this.$heading = $(`<h${headingLevel} class="heading-small">${this.legendText}</h${headingLevel}>`);
     this.$fieldset.before(this.$heading);
