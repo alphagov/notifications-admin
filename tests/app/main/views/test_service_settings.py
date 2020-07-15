@@ -289,6 +289,12 @@ def test_send_files_by_email_row_on_settings_page(
         'Letter branding Not set Change',
 
     ]),
+    (['broadcast'], [
+
+        'Service name service one Change',
+        'Sign-in method Text message code Change',
+
+    ]),
 ])
 def test_should_show_overview_for_service_with_more_things_set(
         client,
@@ -504,6 +510,7 @@ def test_service_name_change_fails_if_new_name_has_less_than_2_alphanumeric_char
 ])
 def test_show_restricted_service(
     client_request,
+    service_one,
     single_reply_to_email_address,
     single_letter_contact_block,
     mock_get_organisation,
@@ -531,6 +538,32 @@ def test_show_restricted_service(
         assert request_to_live_link['href'] == url_for('main.request_to_go_live', service_id=SERVICE_ONE_ID)
     else:
         assert not request_to_live_link
+
+
+def test_show_restricted_broadcast_service(
+    client_request,
+    service_one,
+    single_reply_to_email_address,
+    single_letter_contact_block,
+    mock_get_organisation,
+    single_sms_sender,
+    mock_get_service_settings_page_common,
+):
+    service_one['permissions'] = 'broadcast'
+    page = client_request.get(
+        'main.service_settings',
+        service_id=SERVICE_ONE_ID,
+    )
+
+    assert page.select('main h2')[0].text == 'Your service is in trial mode'
+
+    request_to_live = page.select_one('main p')
+    request_to_live_link = request_to_live.select_one('a')
+    assert normalize_spaces(page.select_one('main p').text) == (
+        'To remove these restrictions, you can send us a request to go live.'
+    )
+    assert request_to_live_link['href'] == url_for('main.request_to_go_live', service_id=SERVICE_ONE_ID)
+    assert not page.select_one('main ul')
 
 
 @freeze_time("2017-04-01 11:09:00.061258")
@@ -3644,7 +3677,8 @@ def test_unknown_channel_404s(
         'It costs between 35p and 81p to send a letter using Notify.',
         'Send letters',
         ['email', 'sms'],
-        'False', 'True',
+        'False',
+        'True',
         ['email', 'sms', 'letter'],
     ),
     (
@@ -3652,7 +3686,8 @@ def test_unknown_channel_404s(
         'It costs between 35p and 81p to send a letter using Notify.',
         'Send letters',
         ['email', 'sms', 'letter'],
-        'True', 'False',
+        'True',
+        'False',
         ['email', 'sms'],
     ),
     (
@@ -3660,7 +3695,8 @@ def test_unknown_channel_404s(
         'You have a free allowance of 250,000 text messages each financial year.',
         'Send text messages',
         [],
-        'False', 'True',
+        'False',
+        'True',
         ['sms'],
     ),
     (
@@ -3668,7 +3704,8 @@ def test_unknown_channel_404s(
         'It’s free to send emails through GOV.UK Notify.',
         'Send emails',
         [],
-        'False', 'True',
+        'False',
+        'True',
         ['email'],
     ),
     (
@@ -3676,11 +3713,12 @@ def test_unknown_channel_404s(
         'It’s free to send emails through GOV.UK Notify.',
         'Send emails',
         ['email', 'sms', 'letter'],
-        'True', 'True',
+        'True',
+        'True',
         ['email', 'sms', 'letter'],
     ),
 ])
-def test_switch_service_enable_letters(
+def test_switch_service_channels_on_and_off(
     client_request,
     service_one,
     mocker,
@@ -3688,9 +3726,9 @@ def test_switch_service_enable_letters(
     channel,
     expected_first_para,
     expected_legend,
+    initial_permissions,
     expected_initial_value,
     posted_value,
-    initial_permissions,
     expected_updated_permissions,
 ):
     mocked_fn = mocker.patch('app.service_api_client.update_service', return_value=service_one)
@@ -3721,6 +3759,32 @@ def test_switch_service_enable_letters(
     )
     assert set(mocked_fn.call_args[1]['permissions']) == set(expected_updated_permissions)
     assert mocked_fn.call_args[0][0] == service_one['id']
+
+
+@pytest.mark.parametrize('channel', (
+    'email', 'sms', 'letter',
+))
+def test_broadcast_service_cant_post_to_set_other_channels_endpoint(
+    client_request,
+    service_one,
+    channel,
+):
+    service_one['permissions'] = ['broadcast']
+
+    client_request.get(
+        'main.service_set_channel',
+        service_id=SERVICE_ONE_ID,
+        channel=channel,
+        _expected_status=403,
+    )
+
+    client_request.post(
+        'main.service_set_channel',
+        service_id=SERVICE_ONE_ID,
+        channel=channel,
+        _data={'enabled': 'True'},
+        _expected_status=403,
+    )
 
 
 @pytest.mark.parametrize('permissions, expected_checked', [

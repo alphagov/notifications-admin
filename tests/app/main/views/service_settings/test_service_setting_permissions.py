@@ -1,4 +1,5 @@
 import functools
+from unittest.mock import call
 
 import pytest
 from flask import url_for
@@ -38,15 +39,34 @@ def test_service_set_permission_requires_platform_admin(
     )
 
 
-@pytest.mark.parametrize('permission, form_data, on', [
-    ('inbound_sms', 'True', True),
-    ('inbound_sms', 'False', False),
-    ('email_auth', 'True', True),
-    ('email_auth', 'False', False),
-    ('international_letters', 'True', True),
-    ('international_letters', 'False', False),
-    ('broadcast', 'True', True),
-    ('broadcast', 'False', False),
+@pytest.mark.parametrize('permission, form_data, expected_calls', [
+    ('inbound_sms', 'True', [
+        call('inbound_sms', on=True),
+    ]),
+    ('inbound_sms', 'False', [
+        call('inbound_sms', on=False),
+    ]),
+    ('email_auth', 'True', [
+        call('email_auth', on=True),
+    ]),
+    ('email_auth', 'False', [
+        call('email_auth', on=False),
+    ]),
+    ('international_letters', 'True', [
+        call('international_letters', on=True),
+    ]),
+    ('international_letters', 'False', [
+        call('international_letters', on=False),
+    ]),
+    ('broadcast', 'True', [
+        call('broadcast', on=True),
+        call('email', on=False),
+        call('sms', on=False),
+        call('letter', on=False),
+    ]),
+    ('broadcast', 'False', [
+        call('broadcast', on=False),
+    ]),
 ])
 def test_service_set_permission(
     mocker,
@@ -55,7 +75,7 @@ def test_service_set_permission(
     mock_get_inbound_number_for_service,
     permission,
     form_data,
-    on
+    expected_calls,
 ):
     force_permission = mocker.patch('app.models.service.Service.force_permission')
     response = platform_admin_client.post(
@@ -64,9 +84,7 @@ def test_service_set_permission(
     )
     assert response.status_code == 302
     assert response.location == url_for('main.service_settings', service_id=service_one['id'], _external=True)
-    force_permission.assert_called_with(
-        permission, on=on
-    )
+    assert force_permission.call_args_list == expected_calls
 
 
 @pytest.mark.parametrize('service_fields, endpoint, kwargs, text', [

@@ -3037,6 +3037,7 @@ def client_request(
                 _expected_status = 302
 
             assert resp.status_code == _expected_status, resp.location
+
             if _expected_redirect:
                 assert resp.location == _expected_redirect
             page = BeautifulSoup(resp.data.decode('utf-8'), 'html.parser')
