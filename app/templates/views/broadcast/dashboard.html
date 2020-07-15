@@ -17,7 +17,7 @@
     ) %}
       {% call row_heading() %}
         <div class="file-list">
-          <a class="file-list-filename-large govuk-link govuk-link--no-visited-state" href="#">{{ item.template_name }}</a>
+          <a class="file-list-filename-large govuk-link govuk-link--no-visited-state" href="{{ url_for('.view_broadcast_message', service_id=current_service.id, broadcast_message_id=item.id) }}">{{ item.template_name }}</a>
           <span class="file-list-hint-large">
             To {{ item.initial_area_names|formatted_list(before_each='', after_each='') }}
           </span>
@@ -25,9 +25,8 @@
       {% endcall %}
       {% call field(align='right') %}
         {% if item.status == 'broadcasting' %}
-          <p class="govuk-body letter-recipient-summary">
+          <p class="govuk-body govuk-!-margin-top-6 govuk-!-margin-bottom-0">
             Live until {{ item.finishes_at|format_datetime_relative }}
-            <a href="{{ url_for('.cancel_broadcast_message', service_id=current_service.id, broadcast_message_id=item.id) }}" class="destructive-link destructive-link--no-visited-state">Stop broadcasting</a>
           </p>
         {% elif item.status == 'cancelled' %}
           <p class="govuk-body govuk-!-margin-top-6 govuk-!-margin-bottom-0 govuk-hint">

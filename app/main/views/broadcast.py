@@ -1,4 +1,4 @@
-from flask import redirect, render_template, request, url_for
+from flask import abort, redirect, render_template, request, url_for
 
 from app import current_service
 from app.main import main
@@ -19,7 +19,7 @@ def broadcast_dashboard(service_id):
     )
 
 
-@main.route('/services/<uuid:service_id>/broadcast/<uuid:template_id>')
+@main.route('/services/<uuid:service_id>/new-broadcast/<uuid:template_id>')
 @user_has_permissions('send_messages')
 @service_has_permission('broadcast')
 def broadcast(service_id, template_id):
@@ -127,6 +127,22 @@ def preview_broadcast_message(service_id, broadcast_message_id):
     )
 
 
+@main.route('/services/<uuid:service_id>/broadcast/<uuid:broadcast_message_id>')
+@user_has_permissions('send_messages')
+@service_has_permission('broadcast')
+def view_broadcast_message(service_id, broadcast_message_id):
+    broadcast_message = BroadcastMessage.from_id(
+        broadcast_message_id,
+        service_id=current_service.id,
+    )
+    if broadcast_message.status == 'draft':
+        abort(404)
+    return render_template(
+        'views/broadcast/view-message.html',
+        broadcast_message=broadcast_message,
+    )
+
+
 @main.route('/services/<uuid:service_id>/broadcast/<uuid:broadcast_message_id>/cancel')
 @user_has_permissions('send_messages')
 @service_has_permission('broadcast')
@@ -136,6 +152,7 @@ def cancel_broadcast_message(service_id, broadcast_message_id):
         service_id=current_service.id,
     ).cancel_broadcast()
     return redirect(url_for(
-        '.broadcast_dashboard',
+        '.view_broadcast_message',
         service_id=current_service.id,
+        broadcast_message_id=broadcast_message_id,
     ))

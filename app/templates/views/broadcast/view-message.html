@@ -1,0 +1,54 @@
+{% from "components/button/macro.njk" import govukButton %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import sticky_page_footer %}
+
+{% extends "withnav_template.html" %}
+
+{% block service_page_title %}
+  {{ broadcast_message.template_name }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header(
+    broadcast_message.template_name,
+    back_link=url_for('.broadcast_dashboard', service_id=current_service.id)
+  ) }}
+
+  <p class="govuk-body govuk-!-margin-bottom-3">
+    Created by {{ broadcast_message.created_by.name }} and approved by
+    {{ broadcast_message.approved_by.name }}.
+  </p>
+
+  <p class="govuk-body govuk-!-margin-bottom-3">
+    Started broadcasting
+    {{ broadcast_message.starts_at|format_datetime_human }}.
+  </p>
+
+  <p class="govuk-body">
+    {% if broadcast_message.status == 'broadcasting' %}
+      Live until {{ broadcast_message.finishes_at|format_datetime_relative }}&ensp;<a href="{{ url_for('.cancel_broadcast_message', service_id=current_service.id, broadcast_message_id=broadcast_message.id) }}" class="destructive-link destructive-link--no-visited-state">Stop broadcast early</a>
+    {% elif broadcast_message.status == 'cancelled' %}
+      Stopped by {{ broadcast_message.cancelled_by.name }}
+      {{ broadcast_message.cancelled_at|format_datetime_human }}.
+    {% else %}
+      Finished broadcasting {{ broadcast_message.finishes_at|format_datetime_human }}.
+    {% endif %}
+  </p>
+
+  {% for area in broadcast_message.areas %}
+    {% if loop.first %}
+      <ul class="area-list">
+    {% endif %}
+        <li class="area-list-item area-list-item--unremoveable">
+          {{ area.name }}
+        </li>
+    {% if loop.last %}
+      </ul>
+    {% endif %}
+  {% endfor %}
+
+  {{ broadcast_message.template|string }}
+
+{% endblock %}
