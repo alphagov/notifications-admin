@@ -27,12 +27,33 @@ from tests.conftest import (
 )
 
 
+@pytest.mark.parametrize('permissions, expected_message', (
+    (['email'], (
+        'You need a template before you can send emails, text messages or letters.'
+    )),
+    (['sms'], (
+        'You need a template before you can send emails, text messages or letters.'
+    )),
+    (['letter'], (
+        'You need a template before you can send emails, text messages or letters.'
+    )),
+    (['email', 'sms', 'letter'], (
+        'You need a template before you can send emails, text messages or letters.'
+    )),
+    (['broadcast'], (
+        'You need a template before you can prepare a broadcast.'
+    )),
+))
 def test_should_show_empty_page_when_no_templates(
     client_request,
     service_one,
     mock_get_service_templates_when_no_templates_exist,
     mock_get_template_folders,
+    permissions,
+    expected_message,
 ):
+
+    service_one['permissions'] = permissions
 
     page = client_request.get(
         'main.choose_template',
@@ -43,7 +64,7 @@ def test_should_show_empty_page_when_no_templates(
         'Templates'
     )
     assert normalize_spaces(page.select_one('main p').text) == (
-        'You need a template before you can send emails or text messages.'
+        expected_message
     )
     assert page.select_one('#add_new_folder_form')
     assert page.select_one('#add_new_template_form')
@@ -64,7 +85,7 @@ def test_should_show_add_template_form_if_service_has_folder_permission(
         'Templates'
     )
     assert normalize_spaces(page.select_one('main p').text) == (
-        'You need a template before you can send emails or text messages.'
+        'You need a template before you can send emails, text messages or letters.'
     )
     assert [
         (item['name'], item['value']) for item in page.select('[type=radio]')
