@@ -1,5 +1,6 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import sticky_page_footer %}
+{% from "components/checkbox.html" import checkboxes %}
 {% from "components/form.html" import form_wrapper %}
 {% from "components/live-search.html" import live_search %}
 
@@ -16,10 +17,10 @@
     back_link=url_for('.choose_broadcast_library', service_id=current_service.id, broadcast_message_id=broadcast_message.id),
   )}}
 
-  {{ live_search(target_selector='.govuk-checkboxes__item', show=show_search_form, form=search_form, label='Search by name') }}
+  {{ live_search(target_selector='.multiple-choice', show=show_search_form, form=search_form, label='Search by name') }}
 
   {% call form_wrapper() %}
-    {{ form.areas }}
+    {{ checkboxes(form.areas, hide_legend=True) }}
     {{ sticky_page_footer('Add to broadcast') }}
   {% endcall %}
 

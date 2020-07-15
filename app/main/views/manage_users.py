@@ -63,7 +63,7 @@ def invite_user(service_id):
             current_user.id,
             service_id,
             email_address,
-            set(form.permissions_field.data),
+            form.permissions,
             form.login_authentication.data,
             form.folder_permissions.data,
         )
@@ -102,7 +102,7 @@ def edit_user_permissions(service_id, user_id):
     if form.validate_on_submit():
         user.set_permissions(
             service_id,
-            permissions=set(form.permissions_field.data),
+            permissions=form.permissions,
             folder_permissions=form.folder_permissions.data,
         )
         if service_has_email_auth:
