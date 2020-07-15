@@ -188,7 +188,7 @@ def test_should_show_page_for_choosing_a_template(
     for index, expected_link in enumerate(expected_nav_links):
         assert links_in_page[index].text.strip() == expected_link
 
-    template_links = page.select('#template-list .govuk-label a, .message-name a')
+    template_links = page.select('.message-name a')
 
     assert len(template_links) == len(expected_templates)
 
@@ -257,7 +257,7 @@ def test_should_show_live_search_if_list_of_templates_taller_than_screen(
     assert search['data-module'] == 'live-search'
     assert search['data-targets'] == '#template-list .template-list-item'
 
-    assert len(page.select(search['data-targets'])) == len(page.select('#template-list .govuk-label')) == 14
+    assert len(page.select(search['data-targets'])) == len(page.select('.message-name')) == 14
 
 
 def test_should_show_live_search_if_service_has_lots_of_folders(
@@ -278,8 +278,8 @@ def test_should_show_live_search_if_service_has_lots_of_folders(
         service_id=SERVICE_ONE_ID,
     )
 
-    count_of_templates_and_folders = len(page.select('#template-list .govuk-label'))
-    count_of_folders = len(page.select('.template-list-folder:first-of-type'))
+    count_of_templates_and_folders = len(page.select('.message-name'))
+    count_of_folders = len(page.select('.template-list-folder:first-child'))
     count_of_templates = count_of_templates_and_folders - count_of_folders
 
     assert len(page.select('.live-search')) == 1

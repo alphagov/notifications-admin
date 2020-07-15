@@ -1,6 +1,7 @@
 {% extends "withnav_template.html" %}
 {% from "components/folder-path.html" import folder_path, page_title_folder_path %}
 {% from "components/textbox.html" import textbox %}
+{% from "components/checkbox.html" import checkbox, checkboxes %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 
@@ -25,7 +26,7 @@
   {% call form_wrapper(action=url_for('main.manage_template_folder', service_id=current_service.id, template_folder_id=template_folder_id)) %}
     {{ textbox(form.name, width='1-1') }}
     {% if current_user.has_permissions("manage_service") and form.users_with_permission.all_service_users %}
-      {{ form.users_with_permission }}
+      {{ checkboxes(form.users_with_permission, collapsible_opts={ 'field': 'team member' }) }}
     {% endif %}
 
     {{ page_footer(

@@ -1,9 +1,20 @@
+{% from "components/checkbox.html" import checkbox, checkboxes_nested %}
 {% from "components/radios.html" import radio, radios, conditional_radio_panel %}
 
-{{ form.permissions_field }}
+<fieldset class="form-group">
+  <legend class="form-label heading-small">
+    Permissions
+  </legend>
+  <span class="hint">
+    All team members can see sent messages.
+  </span>
+  {% for field in form.permissions_fields %}
+    {{ checkbox(field) }}
+  {% endfor %}
+</fieldset>
 
 {% if form.folder_permissions.all_template_folders %}
-  {{ form.folder_permissions }}
+  {{ checkboxes_nested(form.folder_permissions, form.folder_permissions.children(), hide_legend=True, collapsible_opts={ 'field': 'folder' }) }}
 {% elif user and user.platform_admin %}
   <p class="bottom-gutter">
     Platform admin users can access all template folders.
