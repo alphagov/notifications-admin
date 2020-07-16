@@ -68,11 +68,12 @@ describe('RadioSelect', () => {
 
         hours.forEach((hour, idx) => {
           const hourLabel = getHourLabel(hour);
+          const num = idx + 1;
 
           result +=
             `<div class="multiple-choice">
-              <input id="scheduled_for-${idx}" name="scheduled_for" type="radio" value="2019-05-${dayAsNumber}T${hour}:00:00.459156">
-              <label for="scheduled_for-${idx}">
+              <input id="scheduled_for-${num}" name="scheduled_for" type="radio" value="2019-05-${dayAsNumber}T${hour}:00:00.459156">
+              <label for="scheduled_for-${num}">
                 ${day} at ${hourLabel}
               </label>
             </div>`;
