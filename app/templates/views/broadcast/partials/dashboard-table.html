@@ -1,0 +1,39 @@
+{% from "components/table.html" import list_table, field, right_aligned_field_heading, row_heading %}
+
+<div class='{% if broadcasts %}dashboard-table{% endif%} ajax-block-container'>
+  {% call(item, row_number) list_table(
+    broadcasts|sort|reverse|list,
+    caption="Live broadcasts",
+    caption_visible=False,
+    empty_message=empty_message,
+    field_headings=[
+      'Template name',
+      'Status'
+    ],
+    field_headings_visible=False
+  ) %}
+    {% call row_heading() %}
+      <div class="file-list">
+        <a class="file-list-filename-large govuk-link govuk-link--no-visited-state" href="{{ url_for('.view_broadcast_message', service_id=current_service.id, broadcast_message_id=item.id) }}">{{ item.template_name }}</a>
+        <span class="file-list-hint-large">
+          To {{ item.initial_area_names|formatted_list(before_each='', after_each='') }}
+        </span>
+      </div>
+    {% endcall %}
+    {% call field(align='right') %}
+      {% if item.status == 'broadcasting' %}
+        <p class="govuk-body govuk-!-margin-top-6 govuk-!-margin-bottom-0">
+          Live until {{ item.finishes_at|format_datetime_relative }}
+        </p>
+      {% elif item.status == 'cancelled' %}
+        <p class="govuk-body govuk-!-margin-top-6 govuk-!-margin-bottom-0 govuk-hint">
+          Stopped {{ item.cancelled_at|format_datetime_relative }}
+        </p>
+      {% else %}
+        <p class="govuk-body govuk-!-margin-top-6 govuk-!-margin-bottom-0 govuk-hint">
+          Finished {{ item.finishes_at|format_datetime_relative }}
+        </p>
+      {% endif %}
+    {% endcall %}
+  {% endcall %}
+</div>

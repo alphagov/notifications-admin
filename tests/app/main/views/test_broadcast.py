@@ -1,3 +1,5 @@
+import json
+
 import pytest
 from flask import url_for
 from freezegun import freeze_time
@@ -10,6 +12,7 @@ sample_uuid = sample_uuid()
 
 @pytest.mark.parametrize('endpoint, extra_args', (
     ('.broadcast_dashboard', {}),
+    ('.broadcast_dashboard_updates', {}),
     ('.broadcast', {'template_id': sample_uuid}),
     ('.preview_broadcast_areas', {'broadcast_message_id': sample_uuid}),
     ('.choose_broadcast_library', {'broadcast_message_id': sample_uuid}),
@@ -86,6 +89,28 @@ def test_broadcast_dashboard(
         'Example template To England and Scotland Stopped 10 February at 2:20am',
         'Example template To England and Scotland Finished yesterday at 8:20pm',
     ]
+
+
+@freeze_time('2020-02-20 02:20')
+def test_broadcast_dashboard_json(
+    logged_in_client,
+    service_one,
+    mock_get_broadcast_messages,
+):
+    service_one['permissions'] += ['broadcast']
+    response = logged_in_client.get(url_for(
+        '.broadcast_dashboard_updates',
+        service_id=SERVICE_ONE_ID,
+    ))
+
+    assert response.status_code == 200
+
+    json_response = json.loads(response.get_data(as_text=True))
+
+    assert json_response.keys() == {'live_broadcasts', 'previous_broadcasts'}
+
+    assert 'Live until tomorrow at 2:20am' in json_response['live_broadcasts']
+    assert 'Finished yesterday at 8:20pm' in json_response['previous_broadcasts']
 
 
 def test_broadcast_page(

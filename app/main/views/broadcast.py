@@ -1,4 +1,4 @@
-from flask import abort, redirect, render_template, request, url_for
+from flask import abort, jsonify, redirect, render_template, request, url_for
 
 from app import current_service
 from app.main import main
@@ -11,11 +11,32 @@ from app.utils import service_has_permission, user_has_permissions
 @user_has_permissions()
 @service_has_permission('broadcast')
 def broadcast_dashboard(service_id):
-    broadcast_messages = BroadcastMessages(service_id)
     return render_template(
         'views/broadcast/dashboard.html',
-        live_broadcasts=broadcast_messages.with_status('broadcasting'),
-        previous_broadcasts=broadcast_messages.with_status('cancelled', 'completed'),
+        partials=get_broadcast_dashboard_partials(current_service.id)
+    )
+
+
+@main.route('/services/<uuid:service_id>/broadcast-dashboard.json')
+@user_has_permissions()
+@service_has_permission('broadcast')
+def broadcast_dashboard_updates(service_id):
+    return jsonify(get_broadcast_dashboard_partials(current_service.id))
+
+
+def get_broadcast_dashboard_partials(service_id):
+    broadcast_messages = BroadcastMessages(service_id)
+    return dict(
+        live_broadcasts=render_template(
+            'views/broadcast/partials/dashboard-table.html',
+            broadcasts=broadcast_messages.with_status('broadcasting'),
+            empty_message='You do not have any live broadcasts at the moment',
+        ),
+        previous_broadcasts=render_template(
+            'views/broadcast/partials/dashboard-table.html',
+            broadcasts=broadcast_messages.with_status('cancelled', 'completed'),
+            empty_message='You do not have any previous broadcasts',
+        ),
     )
 
 
