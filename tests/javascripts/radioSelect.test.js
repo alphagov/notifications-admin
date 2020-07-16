@@ -114,7 +114,7 @@ describe('RadioSelect', () => {
         </div>
       </fieldset>`;
 
-      originalOptionsForAllCategories = Array.from(document.querySelector('.radio-select__column:nth-child(2) .multiple-choice'))
+      originalOptionsForAllCategories = Array.from(document.querySelectorAll('.radio-select__column:nth-child(2) .multiple-choice'))
                                           .map(option => getDataFromOption(option));
   });
 
@@ -173,7 +173,7 @@ describe('RadioSelect', () => {
         test("show the options for it, with the right label and value", () => {
 
           // check options this reveals against those originally in the page for this category
-          const options = document.querySelector('.radio-select__column:nth-child(2) .multiple-choice');
+          const options = document.querySelectorAll('.radio-select__column:nth-child(2) .multiple-choice');
 
           const optionsThatMatchOriginals = Array.from(options).filter((option, idx) => {
             const optionData = getDataFromOption(option);
