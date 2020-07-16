@@ -25,6 +25,12 @@ permissions = (
     ('manage_api_keys', 'Manage API integration'),
 )
 
+broadcast_permissions = (
+    ('send_messages', 'Prepare and approve broadcasts'),
+    ('manage_templates', 'Add and edit templates'),
+    ('manage_service', 'Manage settings and team'),
+)
+
 
 def translate_permissions_from_db_to_admin_roles(permissions):
     """

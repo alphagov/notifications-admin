@@ -54,7 +54,11 @@ from app.main.validators import (
 )
 from app.models.feedback import PROBLEM_TICKET_TYPE, QUESTION_TICKET_TYPE
 from app.models.organisation import Organisation
-from app.models.roles_and_permissions import permissions, roles
+from app.models.roles_and_permissions import (
+    broadcast_permissions,
+    permissions,
+    roles,
+)
 from app.utils import guess_name_from_email_address
 
 
@@ -493,7 +497,12 @@ PermissionsAbstract = type("PermissionsAbstract", (StripWhitespaceForm,), {
 })
 
 
-class PermissionsForm(PermissionsAbstract):
+BroadcastPermissionsAbstract = type("BroadcastPermissionsAbstract", (StripWhitespaceForm,), {
+    permission: BooleanField(label) for permission, label in broadcast_permissions
+})
+
+
+class BasePermissionsForm(StripWhitespaceForm):
     def __init__(self, all_template_folders=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.folder_permissions.choices = []
@@ -517,11 +526,14 @@ class PermissionsForm(PermissionsAbstract):
 
     @property
     def permissions(self):
-        return {role for role in roles.keys() if self[role].data is True}
+        return {field.id for field in self.permissions_fields if field.data is True}
 
     @property
     def permissions_fields(self):
-        return (getattr(self, permission) for permission, _ in permissions)
+        return (
+            getattr(self, permission) for permission, field in self.__dict__.items()
+            if isinstance(field, BooleanField)
+        )
 
     @classmethod
     def from_user(cls, user, service_id, **kwargs):
@@ -535,7 +547,18 @@ class PermissionsForm(PermissionsAbstract):
         )
 
 
-class InviteUserForm(PermissionsForm):
+class PermissionsForm(PermissionsAbstract, BasePermissionsForm):
+    pass
+
+
+class BroadcastPermissionsForm(BroadcastPermissionsAbstract, BasePermissionsForm):
+
+    @property
+    def permissions(self):
+        return {'view_activity'} | super().permissions
+
+
+class BaseInviteUserForm():
     email_address = email_address(gov_user=False)
 
     def __init__(self, invalid_email_address, *args, **kwargs):
@@ -545,6 +568,14 @@ class InviteUserForm(PermissionsForm):
     def validate_email_address(self, field):
         if field.data.lower() == self.invalid_email_address and not current_user.platform_admin:
             raise ValidationError("You cannot send an invitation to yourself")
+
+
+class InviteUserForm(BaseInviteUserForm, PermissionsForm):
+    pass
+
+
+class BroadcastInviteUserForm(BaseInviteUserForm, BroadcastPermissionsForm):
+    pass
 
 
 class InviteOrgUserForm(StripWhitespaceForm):

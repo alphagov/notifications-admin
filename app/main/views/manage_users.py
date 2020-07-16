@@ -18,6 +18,8 @@ from app.event_handlers import (
 )
 from app.main import main
 from app.main.forms import (
+    BroadcastInviteUserForm,
+    BroadcastPermissionsForm,
     ChangeEmailForm,
     ChangeMobileNumberForm,
     ChangeNonGovEmailForm,
@@ -25,7 +27,7 @@ from app.main.forms import (
     PermissionsForm,
     SearchUsersForm,
 )
-from app.models.roles_and_permissions import permissions
+from app.models.roles_and_permissions import broadcast_permissions, permissions
 from app.models.user import InvitedUser, User
 from app.utils import is_gov_user, redact_mobile_number, user_has_permissions
 
@@ -39,7 +41,9 @@ def manage_users(service_id):
         current_user=current_user,
         show_search_box=(len(current_service.team_members) > 7),
         form=SearchUsersForm(),
-        permissions=permissions,
+        permissions=(
+            broadcast_permissions if current_service.has_permission('broadcast') else permissions
+        ),
     )
 
 
@@ -47,7 +51,12 @@ def manage_users(service_id):
 @user_has_permissions('manage_service')
 def invite_user(service_id):
 
-    form = InviteUserForm(
+    if current_service.has_permission('broadcast'):
+        form_class = BroadcastInviteUserForm
+    else:
+        form_class = InviteUserForm
+
+    form = form_class(
         invalid_email_address=current_user.email_address,
         all_template_folders=current_service.all_template_folders,
         folder_permissions=[f['id'] for f in current_service.all_template_folders]
@@ -89,7 +98,12 @@ def edit_user_permissions(service_id, user_id):
     if user.mobile_number:
         mobile_number = redact_mobile_number(user.mobile_number, " ")
 
-    form = PermissionsForm.from_user(
+    if current_service.has_permission('broadcast'):
+        form_class = BroadcastPermissionsForm
+    else:
+        form_class = PermissionsForm
+
+    form = form_class.from_user(
         user,
         service_id,
         folder_permissions=None if user.platform_admin else [
