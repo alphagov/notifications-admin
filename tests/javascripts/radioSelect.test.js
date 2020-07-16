@@ -99,7 +99,7 @@ describe('RadioSelect', () => {
         <legend class="form-label">
           When should Notify send these messages?
         </legend>
-        <div class="radio-select" data-module="radio-select" data-categories="${CATEGORIES.join(',')}">
+        <div class="radio-select" data-module="radio-select" data-categories="${CATEGORIES.join(',')}" data-show-now-as-default="True">
           <div class="radio-select__column">
             <div class="multiple-choice">
               <input checked="" id="scheduled_for-0" name="scheduled_for" type="radio" value="">

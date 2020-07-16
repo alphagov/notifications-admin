@@ -7,12 +7,14 @@
 
   let states = {
     'initial': Hogan.compile(`
-      <div class="radio-select__column">
-        <div class="multiple-choice js-multiple-choice">
-          <input checked="checked" id="{{name}}-0" name="{{name}}" type="radio" value="">
-          <label class="block-label js-block-label" for="{{name}}-0">Now</label>
+      {{#showNowAsDefault}}
+        <div class="radio-select__column">
+          <div class="multiple-choice js-multiple-choice">
+            <input checked="checked" id="{{name}}-0" name="{{name}}" type="radio" value="">
+            <label class="block-label js-block-label" for="{{name}}-0">Now</label>
+          </div>
         </div>
-      </div>
+      {{/showNowAsDefault}}
       <div class="radio-select__column">
         {{#categories}}
           <input type='button' class='govuk-button govuk-button--secondary radio-select__button--category' value='{{.}}' />
@@ -20,12 +22,14 @@
       </div>
     `),
     'choose': Hogan.compile(`
-      <div class="radio-select__column">
-        <div class="multiple-choice js-multiple-choice js-initial-option">
-          <input checked="checked" id="{{name}}-0" name="{{name}}" type="radio" value="">
-          <label for="{{name}}-0">Now</label>
+      {{#showNowAsDefault}}
+        <div class="radio-select__column">
+          <div class="multiple-choice js-multiple-choice js-initial-option">
+            <input checked="checked" id="{{name}}-0" name="{{name}}" type="radio" value="">
+            <label for="{{name}}-0">Now</label>
+          </div>
         </div>
-      </div>
+      {{/showNowAsDefault}}
       <div class="radio-select__column">
         {{#choices}}
           <div class="multiple-choice js-multiple-choice js-option">
@@ -37,12 +41,14 @@
       </div>
     `),
     'chosen': Hogan.compile(`
-      <div class="radio-select__column">
-        <div class="multiple-choice js-multiple-choice js-initial-option">
-          <input id="{{name}}-0" name="{{name}}" type="radio" value="">
-          <label for="{{name}}-0">Now</label>
+      {{#showNowAsDefault}}
+        <div class="radio-select__column">
+          <div class="multiple-choice js-multiple-choice js-initial-option">
+            <input id="{{name}}-0" name="{{name}}" type="radio" value="">
+            <label for="{{name}}-0">Now</label>
+          </div>
         </div>
-      </div>
+      {{/showNowAsDefault}}
       <div class="radio-select__column">
         {{#choices}}
           <div class="multiple-choice js-multiple-choice">
@@ -80,10 +86,15 @@
       let categories = $component.data('categories').split(',');
       let name = $component.find('input').eq(0).attr('name');
       let mousedownOption = null;
+      let showNowAsDefault = (
+        $component.data('show-now-as-default').toLowerCase() === 'true' ?
+        {'name': name} : false
+      );
       const reset = () => {
         render('initial', {
           'categories': categories,
-          'name': name
+          'name': name,
+          'showNowAsDefault': showNowAsDefault
         });
       };
       const selectOption = (value) => {
@@ -91,7 +102,8 @@
           'choices': choices.filter(
             element => element.value == value
           ),
-          'name': name
+          'name': name,
+          'showNowAsDefault': showNowAsDefault
         });
         focusSelected(component);
       };
@@ -153,7 +165,8 @@
               'choices': choices.filter(
                 element => element.value == $selection.eq(0).attr('value')
               ),
-              'name': name
+              'name': name,
+              'showNowAsDefault': showNowAsDefault
             });
 
           } else {
@@ -174,7 +187,8 @@
 
       render('initial', {
         'categories': categories,
-        'name': name
+        'name': name,
+        'showNowAsDefault': showNowAsDefault
       });
 
       $component.css({'height': 'auto'});
