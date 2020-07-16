@@ -159,10 +159,13 @@ describe('RadioSelect', () => {
 
       describe(`clicking the button for ${category} should`, () => {
 
+        const categoryRegExp = new RegExp('^' + category);
+        let originalOptionsForcategory;
+
         beforeEach(() => {
 
           // get all the options in the original page for this category
-          originalOptionsForCategory = originalOptionsForAllCategories.filter(option => option.label === category);
+          originalOptionsForCategory = originalOptionsForAllCategories.filter(option => categoryRegExp.test(option.label));
 
           // start module
           window.GOVUK.modules.start();
