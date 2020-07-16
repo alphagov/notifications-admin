@@ -123,30 +123,60 @@ describe('RadioSelect', () => {
     document.body.innerHTML = '';
   });
 
-  describe("when the page has loaded it should have a button for each category", () => {
+  describe("when the page has loaded", () => {
 
-    let categoryButtons;
+    describe("if the 'data-show-now-as-default' attribute", () => {
 
-    beforeEach(() => {
+      test("is set to true the module should have a 'Now' option", () => {
 
-      // start module
-      window.GOVUK.modules.start();
+        // default is for it to be set to true
 
-      categoryButtons = document.querySelectorAll('.radio-select__column:nth-child(2) .radio-select__button--category');
+        // start module
+        window.GOVUK.modules.start();
+
+        expect(document.querySelectorAll('.radio-select__column').length).toEqual(2);
+
+      });
+
+      test("is set to false the module should not have a 'Now' option", () => {
+
+        document.querySelector('.radio-select').setAttribute('data-show-now-as-default', 'false');
+
+        // start module
+        window.GOVUK.modules.start();
+
+        expect(document.querySelectorAll('.radio-select__column').length).toEqual(1);
+
+      });
 
     });
 
-    test("the number of buttons should match the categories", () => {
+    describe("it should have a button for each category", () => {
 
-      expect(categoryButtons.length).toBe(CATEGORIES.length);
+      let categoryButtons;
 
-    });
+      beforeEach(() => {
 
-    test("each button's text should match their category", () => {
+        // start module
+        window.GOVUK.modules.start();
 
-      // check the buttons have the right text
-      CATEGORIES.forEach((category, idx) => {
-        expect(categoryButtons[idx].getAttribute('value')).toEqual(category);
+        categoryButtons = document.querySelectorAll('.radio-select__column:nth-child(2) .radio-select__button--category');
+
+      });
+
+      test("the number of buttons should match the categories", () => {
+
+        expect(categoryButtons.length).toBe(CATEGORIES.length);
+
+      });
+
+      test("each button's text should match their category", () => {
+
+        // check the buttons have the right text
+        CATEGORIES.forEach((category, idx) => {
+          expect(categoryButtons[idx].getAttribute('value')).toEqual(category);
+        });
+
       });
 
     });
