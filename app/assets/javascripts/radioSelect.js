@@ -87,7 +87,7 @@
       let name = $component.find('input').eq(0).attr('name');
       let mousedownOption = null;
       let showNowAsDefault = (
-        $component.data('show-now-as-default').toLowerCase() === 'true' ?
+        $component.data('show-now-as-default').toString() === 'true' ?
         {'name': name} : false
       );
       const reset = () => {
@@ -131,7 +131,8 @@
             'choices': choices.filter(
               element => element.label.toLowerCase().indexOf(day) > -1
             ),
-            'name': name
+            'name': name,
+            'showNowAsDefault': showNowAsDefault
           });
           focusSelected(component);
 
