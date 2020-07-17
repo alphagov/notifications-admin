@@ -13,7 +13,7 @@ from app.utils import service_has_permission, user_has_permissions
 def broadcast_dashboard(service_id):
     return render_template(
         'views/broadcast/dashboard.html',
-        partials=get_broadcast_dashboard_partials(current_service.id)
+        partials=get_broadcast_dashboard_partials(current_service.id),
     )
 
 
@@ -27,6 +27,11 @@ def broadcast_dashboard_updates(service_id):
 def get_broadcast_dashboard_partials(service_id):
     broadcast_messages = BroadcastMessages(service_id)
     return dict(
+        pending_approval_broadcasts=render_template(
+            'views/broadcast/partials/dashboard-table.html',
+            broadcasts=broadcast_messages.with_status('pending-approval'),
+            empty_message='You do not have any broadcasts waiting for approval',
+        ),
         live_broadcasts=render_template(
             'views/broadcast/partials/dashboard-table.html',
             broadcasts=broadcast_messages.with_status('broadcasting'),

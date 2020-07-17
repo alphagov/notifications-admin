@@ -62,6 +62,7 @@ def test_empty_broadcast_dashboard(
     assert [
         normalize_spaces(row.text) for row in page.select('tbody tr .table-empty-message')
     ] == [
+        'You do not have any broadcasts waiting for approval',
         'You do not have any live broadcasts at the moment',
         'You do not have any previous broadcasts',
     ]
@@ -78,13 +79,29 @@ def test_broadcast_dashboard(
         '.broadcast_dashboard',
         service_id=SERVICE_ONE_ID,
     )
+    assert normalize_spaces(page.select('main h2')[0].text) == (
+        'Waiting for approval'
+    )
     assert [
         normalize_spaces(row.text) for row in page.select('table')[0].select('tbody tr')
     ] == [
-        'Example template To England and Scotland Live until tomorrow at 2:20am',
+        'Example template To England and Scotland Prepared by Test User',
     ]
+
+    assert normalize_spaces(page.select('main h2')[1].text) == (
+        'Live broadcasts'
+    )
     assert [
         normalize_spaces(row.text) for row in page.select('table')[1].select('tbody tr')
+    ] == [
+        'Example template To England and Scotland Live until tomorrow at 2:20am',
+    ]
+
+    assert normalize_spaces(page.select('main h2')[2].text) == (
+        'Previous broadcasts'
+    )
+    assert [
+        normalize_spaces(row.text) for row in page.select('table')[2].select('tbody tr')
     ] == [
         'Example template To England and Scotland Stopped 10 February at 2:20am',
         'Example template To England and Scotland Finished yesterday at 8:20pm',
@@ -107,8 +124,13 @@ def test_broadcast_dashboard_json(
 
     json_response = json.loads(response.get_data(as_text=True))
 
-    assert json_response.keys() == {'live_broadcasts', 'previous_broadcasts'}
+    assert json_response.keys() == {
+        'pending_approval_broadcasts',
+        'live_broadcasts',
+        'previous_broadcasts',
+    }
 
+    assert 'Prepared by Test User' in json_response['pending_approval_broadcasts']
     assert 'Live until tomorrow at 2:20am' in json_response['live_broadcasts']
     assert 'Finished yesterday at 8:20pm' in json_response['previous_broadcasts']
 

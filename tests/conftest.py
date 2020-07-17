@@ -4271,6 +4271,9 @@ def mock_get_broadcast_messages(
                 status='draft',
             ),
             partial_json(
+                status='pending-approval',
+            ),
+            partial_json(
                 status='broadcasting',
                 starts_at=(
                     datetime.utcnow()
