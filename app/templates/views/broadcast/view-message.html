@@ -1,7 +1,7 @@
 {% from "components/button/macro.njk" import govukButton %}
 {% from "components/form.html" import form_wrapper %}
 {% from "components/page-header.html" import page_header %}
-{% from "components/page-footer.html" import sticky_page_footer %}
+{% from "components/page-footer.html" import page_footer %}
 
 {% extends "withnav_template.html" %}
 
@@ -17,10 +17,15 @@
   ) }}
 
   {% if broadcast_message.status == 'pending-approval' %}
-    <p class="govuk-body govuk-!-margin-bottom-3">
-      {{ broadcast_message.created_by.name }} wants to broadcast this
-      message until {{ broadcast_message.finishes_at|format_datetime_relative }}.
-    </p>
+    {% call form_wrapper(class="banner govuk-!-margin-bottom-6") %}
+      <p class="govuk-body govuk-!-margin-top-0 govuk-!-margin-bottom-3">
+        {{ broadcast_message.created_by.name }} wants to broadcast this
+        message until {{ broadcast_message.finishes_at|format_datetime_relative }}.
+      </p>
+      {{ page_footer(
+        "Start broadcasting now"
+      ) }}
+    {% endcall %}
   {% else %}
     <p class="govuk-body govuk-!-margin-bottom-3">
       Created by {{ broadcast_message.created_by.name }} and approved by

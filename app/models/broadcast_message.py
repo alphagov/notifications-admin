@@ -138,6 +138,12 @@ class BroadcastMessage(JSONModel):
         )
         self._set_status_to('pending-approval')
 
+    def approve_broadcast(self):
+        self._update(
+            starts_at=datetime.utcnow().isoformat(),
+        )
+        self._set_status_to('broadcasting')
+
     def cancel_broadcast(self):
         self._set_status_to('cancelled')
 

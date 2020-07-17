@@ -169,6 +169,32 @@ def view_broadcast_message(service_id, broadcast_message_id):
     )
 
 
+@main.route('/services/<uuid:service_id>/broadcast/<uuid:broadcast_message_id>', methods=['POST'])
+@user_has_permissions('send_messages')
+@service_has_permission('broadcast')
+def approve_broadcast_message(service_id, broadcast_message_id):
+
+    broadcast_message = BroadcastMessage.from_id(
+        broadcast_message_id,
+        service_id=current_service.id,
+    )
+
+    if broadcast_message.status != 'pending-approval':
+        return redirect(url_for(
+            '.view_broadcast_message',
+            service_id=current_service.id,
+            broadcast_message_id=broadcast_message.id,
+        ))
+
+    broadcast_message.approve_broadcast()
+
+    return redirect(url_for(
+        '.view_broadcast_message',
+        service_id=current_service.id,
+        broadcast_message_id=broadcast_message.id,
+    ))
+
+
 @main.route('/services/<uuid:service_id>/broadcast/<uuid:broadcast_message_id>/cancel')
 @user_has_permissions('send_messages')
 @service_has_permission('broadcast')
