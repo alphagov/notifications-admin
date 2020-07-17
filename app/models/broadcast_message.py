@@ -108,49 +108,39 @@ class BroadcastMessage(JSONModel):
         return User.from_id(self.cancelled_by_id)
 
     def add_areas(self, *new_areas):
-        broadcast_message_api_client.update_broadcast_message(
-            broadcast_message_id=self.id,
-            service_id=self.service_id,
-            data={
-                'areas': list(OrderedSet(
-                    self._dict['areas'] + list(new_areas)
-                ))
-            },
-        )
+        self._update(areas=list(OrderedSet(
+            self._dict['areas'] + list(new_areas)
+        )))
 
     def remove_area(self, area_to_remove):
+        self._update(areas=[
+            area for area in self._dict['areas']
+            if area != area_to_remove
+        ])
+
+    def _set_status_to(self, status):
+        broadcast_message_api_client.update_broadcast_message_status(
+            status,
+            broadcast_message_id=self.id,
+            service_id=self.service_id,
+        )
+
+    def _update(self, **kwargs):
         broadcast_message_api_client.update_broadcast_message(
             broadcast_message_id=self.id,
             service_id=self.service_id,
-            data={
-                'areas': [
-                    area for area in self._dict['areas']
-                    if area != area_to_remove
-                ]
-            },
+            data=kwargs,
         )
 
     def start_broadcast(self):
-        broadcast_message_api_client.update_broadcast_message(
-            broadcast_message_id=self.id,
-            service_id=self.service_id,
-            data={
-                'starts_at': datetime.utcnow().isoformat(),
-                'finishes_at': (datetime.utcnow() + self.DEFAULT_TTL).isoformat(),
-            },
+        self._update(
+            starts_at=datetime.utcnow().isoformat(),
+            finishes_at=(datetime.utcnow() + self.DEFAULT_TTL).isoformat(),
         )
-        broadcast_message_api_client.update_broadcast_message_status(
-            'broadcasting',
-            broadcast_message_id=self.id,
-            service_id=self.service_id,
-        )
+        self._set_status_to('broadcasting')
 
     def cancel_broadcast(self):
-        broadcast_message_api_client.update_broadcast_message_status(
-            'cancelled',
-            broadcast_message_id=self.id,
-            service_id=self.service_id,
-        )
+        self._set_status_to('cancelled')
 
 
 class BroadcastMessages(ModelList):
