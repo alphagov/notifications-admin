@@ -1,5 +1,4 @@
 import functools
-from unittest.mock import call
 
 import pytest
 from flask import url_for
@@ -39,34 +38,55 @@ def test_service_set_permission_requires_platform_admin(
     )
 
 
-@pytest.mark.parametrize('permission, form_data, expected_calls', [
-    ('inbound_sms', 'True', [
-        call('inbound_sms', on=True),
-    ]),
-    ('inbound_sms', 'False', [
-        call('inbound_sms', on=False),
-    ]),
-    ('email_auth', 'True', [
-        call('email_auth', on=True),
-    ]),
-    ('email_auth', 'False', [
-        call('email_auth', on=False),
-    ]),
-    ('international_letters', 'True', [
-        call('international_letters', on=True),
-    ]),
-    ('international_letters', 'False', [
-        call('international_letters', on=False),
-    ]),
-    ('broadcast', 'True', [
-        call('broadcast', on=True),
-        call('email', on=False),
-        call('sms', on=False),
-        call('letter', on=False),
-    ]),
-    ('broadcast', 'False', [
-        call('broadcast', on=False),
-    ]),
+@pytest.mark.parametrize('initial_permissions, permission, form_data, expected_update', [
+    (
+        [],
+        'inbound_sms',
+        'True',
+        ['inbound_sms'],
+    ),
+    (
+        ['inbound_sms'],
+        'inbound_sms',
+        'False',
+        [],
+    ),
+    (
+        [],
+        'email_auth',
+        'True',
+        ['email_auth'],
+    ),
+    (
+        ['email_auth'],
+        'email_auth',
+        'False',
+        [],
+    ),
+    (
+        [],
+        'international_letters',
+        'True',
+        ['international_letters'],
+    ),
+    (
+        ['international_letters'],
+        'international_letters',
+        'False',
+        [],
+    ),
+    (
+        ['email', 'sms', 'letter', 'international_sms', 'international_letters'],
+        'broadcast',
+        'True',
+        ['international_sms', 'international_letters', 'broadcast'],
+    ),
+    (
+        ['broadcast', 'international_sms', 'international_letters'],
+        'broadcast',
+        'False',
+        ['international_sms', 'international_letters'],
+    ),
 ])
 def test_service_set_permission(
     mocker,
@@ -74,17 +94,23 @@ def test_service_set_permission(
     service_one,
     mock_get_inbound_number_for_service,
     permission,
+    initial_permissions,
     form_data,
-    expected_calls,
+    expected_update,
 ):
-    force_permission = mocker.patch('app.models.service.Service.force_permission')
+    service_one['permissions'] = initial_permissions
+    mock_update_service = mocker.patch('app.service_api_client.update_service')
     response = platform_admin_client.post(
         url_for('main.service_set_permission', service_id=service_one['id'], permission=permission),
         data={'enabled': form_data}
     )
     assert response.status_code == 302
     assert response.location == url_for('main.service_settings', service_id=service_one['id'], _external=True)
-    assert force_permission.call_args_list == expected_calls
+
+    assert mock_update_service.call_args[0][0] == service_one['id']
+    new_permissions = mock_update_service.call_args[1]['permissions']
+    assert len(new_permissions) == len(set(new_permissions))
+    assert set(new_permissions) == set(expected_update)
 
 
 @pytest.mark.parametrize('service_fields, endpoint, kwargs, text', [

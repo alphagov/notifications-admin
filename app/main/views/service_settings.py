@@ -318,10 +318,7 @@ def service_set_broadcast_permission(service_id):
     if form.validate_on_submit():
 
         if form.enabled.data:
-            current_service.force_permission('broadcast', on=True)
-            current_service.force_permission('email', on=False)
-            current_service.force_permission('sms', on=False)
-            current_service.force_permission('letter', on=False)
+            current_service.force_broadcast_permission_on()
         else:
             current_service.force_permission('broadcast', on=False)
 

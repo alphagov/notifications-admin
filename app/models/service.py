@@ -99,6 +99,11 @@ class Service(JSONModel):
             permissions | permission if on else permissions - permission,
         )
 
+    def force_broadcast_permission_on(self):
+        return self.update_permissions(
+            set(self.permissions) - {'email', 'sms', 'letter'} | {'broadcast'}
+        )
+
     def update_permissions(self, permissions):
         return self.update(permissions=list(permissions))
 
