@@ -108,49 +108,47 @@ class BroadcastMessage(JSONModel):
         return User.from_id(self.cancelled_by_id)
 
     def add_areas(self, *new_areas):
-        broadcast_message_api_client.update_broadcast_message(
-            broadcast_message_id=self.id,
-            service_id=self.service_id,
-            data={
-                'areas': list(OrderedSet(
-                    self._dict['areas'] + list(new_areas)
-                ))
-            },
-        )
+        self._update(areas=list(OrderedSet(
+            self._dict['areas'] + list(new_areas)
+        )))
 
     def remove_area(self, area_to_remove):
-        broadcast_message_api_client.update_broadcast_message(
+        self._update(areas=[
+            area for area in self._dict['areas']
+            if area != area_to_remove
+        ])
+
+    def _set_status_to(self, status):
+        broadcast_message_api_client.update_broadcast_message_status(
+            status,
             broadcast_message_id=self.id,
             service_id=self.service_id,
-            data={
-                'areas': [
-                    area for area in self._dict['areas']
-                    if area != area_to_remove
-                ]
-            },
         )
 
-    def start_broadcast(self):
+    def _update(self, **kwargs):
         broadcast_message_api_client.update_broadcast_message(
             broadcast_message_id=self.id,
             service_id=self.service_id,
-            data={
-                'starts_at': datetime.utcnow().isoformat(),
-                'finishes_at': (datetime.utcnow() + self.DEFAULT_TTL).isoformat(),
-            },
+            data=kwargs,
         )
-        broadcast_message_api_client.update_broadcast_message_status(
-            'broadcasting',
-            broadcast_message_id=self.id,
-            service_id=self.service_id,
+
+    def request_approval(self):
+        self._update(
+            finishes_at=(datetime.utcnow() + self.DEFAULT_TTL).isoformat(),
         )
+        self._set_status_to('pending-approval')
+
+    def approve_broadcast(self):
+        self._update(
+            starts_at=datetime.utcnow().isoformat(),
+        )
+        self._set_status_to('broadcasting')
+
+    def reject_broadcast(self):
+        self._set_status_to('rejected')
 
     def cancel_broadcast(self):
-        broadcast_message_api_client.update_broadcast_message_status(
-            'cancelled',
-            broadcast_message_id=self.id,
-            service_id=self.service_id,
-        )
+        self._set_status_to('cancelled')
 
 
 class BroadcastMessages(ModelList):

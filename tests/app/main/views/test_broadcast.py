@@ -62,6 +62,7 @@ def test_empty_broadcast_dashboard(
     assert [
         normalize_spaces(row.text) for row in page.select('tbody tr .table-empty-message')
     ] == [
+        'You do not have any broadcasts waiting for approval',
         'You do not have any live broadcasts at the moment',
         'You do not have any previous broadcasts',
     ]
@@ -78,13 +79,29 @@ def test_broadcast_dashboard(
         '.broadcast_dashboard',
         service_id=SERVICE_ONE_ID,
     )
+    assert normalize_spaces(page.select('main h2')[0].text) == (
+        'Waiting for approval'
+    )
     assert [
         normalize_spaces(row.text) for row in page.select('table')[0].select('tbody tr')
     ] == [
-        'Example template To England and Scotland Live until tomorrow at 2:20am',
+        'Example template To England and Scotland Prepared by Test User',
     ]
+
+    assert normalize_spaces(page.select('main h2')[1].text) == (
+        'Live broadcasts'
+    )
     assert [
         normalize_spaces(row.text) for row in page.select('table')[1].select('tbody tr')
+    ] == [
+        'Example template To England and Scotland Live until tomorrow at 2:20am',
+    ]
+
+    assert normalize_spaces(page.select('main h2')[2].text) == (
+        'Previous broadcasts'
+    )
+    assert [
+        normalize_spaces(row.text) for row in page.select('table')[2].select('tbody tr')
     ] == [
         'Example template To England and Scotland Stopped 10 February at 2:20am',
         'Example template To England and Scotland Finished yesterday at 8:20pm',
@@ -107,8 +124,13 @@ def test_broadcast_dashboard_json(
 
     json_response = json.loads(response.get_data(as_text=True))
 
-    assert json_response.keys() == {'live_broadcasts', 'previous_broadcasts'}
+    assert json_response.keys() == {
+        'pending_approval_broadcasts',
+        'live_broadcasts',
+        'previous_broadcasts',
+    }
 
+    assert 'Prepared by Test User' in json_response['pending_approval_broadcasts']
     assert 'Live until tomorrow at 2:20am' in json_response['live_broadcasts']
     assert 'Finished yesterday at 8:20pm' in json_response['previous_broadcasts']
 
@@ -291,12 +313,11 @@ def test_start_broadcasting(
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
         data={
-            'starts_at': '2020-02-02T02:02:02.222222',
             'finishes_at': '2020-02-05T02:02:02.222222',
         },
     )
     mock_update_broadcast_message_status.assert_called_once_with(
-        'broadcasting',
+        'pending-approval',
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
     )
@@ -377,6 +398,205 @@ def test_view_broadcast_message_page(
     assert [
         normalize_spaces(p.text) for p in page.select('main p.govuk-body')
     ] == expected_paragraphs
+
+
+@freeze_time('2020-02-22T22:22:22.000000')
+def test_view_pending_broadcast(
+    mocker,
+    client_request,
+    service_one,
+    mock_get_broadcast_template,
+    fake_uuid,
+):
+    mocker.patch(
+        'app.broadcast_message_api_client.get_broadcast_message',
+        return_value=broadcast_message_json(
+            id_=fake_uuid,
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            created_by_id=fake_uuid,
+            finishes_at='2020-02-23T23:23:23.000000',
+            status='pending-approval',
+        ),
+    )
+    service_one['permissions'] += ['broadcast']
+
+    page = client_request.get(
+        '.view_broadcast_message',
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+    )
+
+    assert (
+        normalize_spaces(page.select_one('.banner').text)
+    ) == (
+        'Test User wants to broadcast this message until tomorrow at 11:23pm. '
+        'Start broadcasting now Reject this broadcast'
+    )
+
+    form = page.select_one('form.banner')
+    assert form['method'] == 'post'
+    assert 'action' not in form
+    assert form.select_one('button[type=submit]')
+
+    link = form.select_one('a.govuk-link.govuk-link--destructive')
+    assert link.text == 'Reject this broadcast'
+    assert link['href'] == url_for(
+        '.reject_broadcast_message',
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+    )
+
+
+@pytest.mark.parametrize('initial_status, expected_approval', (
+    ('draft', False,),
+    ('pending-approval', True),
+    ('rejected', False),
+    ('broadcasting', False),
+    ('cancelled', False),
+))
+@freeze_time('2020-02-22T22:22:22.000000')
+def test_approve_broadcast(
+    mocker,
+    client_request,
+    service_one,
+    mock_get_broadcast_template,
+    fake_uuid,
+    mock_update_broadcast_message,
+    mock_update_broadcast_message_status,
+    initial_status,
+    expected_approval,
+):
+    mocker.patch(
+        'app.broadcast_message_api_client.get_broadcast_message',
+        return_value=broadcast_message_json(
+            id_=fake_uuid,
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            created_by_id=fake_uuid,
+            finishes_at='2020-02-23T23:23:23.000000',
+            status=initial_status,
+        ),
+    )
+    service_one['permissions'] += ['broadcast']
+
+    client_request.post(
+        '.view_broadcast_message',
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+        _expected_redirect=url_for(
+            '.view_broadcast_message',
+            service_id=SERVICE_ONE_ID,
+            broadcast_message_id=fake_uuid,
+            _external=True,
+        )
+    )
+
+    if expected_approval:
+        mock_update_broadcast_message.assert_called_once_with(
+            service_id=SERVICE_ONE_ID,
+            broadcast_message_id=fake_uuid,
+            data={
+                'starts_at': '2020-02-22T22:22:22',
+            },
+        )
+        mock_update_broadcast_message_status.assert_called_once_with(
+            'broadcasting',
+            service_id=SERVICE_ONE_ID,
+            broadcast_message_id=fake_uuid,
+        )
+    else:
+        assert mock_update_broadcast_message.called is False
+        assert mock_update_broadcast_message_status.called is False
+
+
+@freeze_time('2020-02-22T22:22:22.000000')
+def test_reject_broadcast(
+    mocker,
+    client_request,
+    service_one,
+    mock_get_broadcast_template,
+    fake_uuid,
+    mock_update_broadcast_message,
+    mock_update_broadcast_message_status,
+):
+    mocker.patch(
+        'app.broadcast_message_api_client.get_broadcast_message',
+        return_value=broadcast_message_json(
+            id_=fake_uuid,
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            created_by_id=fake_uuid,
+            finishes_at='2020-02-23T23:23:23.000000',
+            status='pending-approval',
+        ),
+    )
+    service_one['permissions'] += ['broadcast']
+
+    client_request.get(
+        '.reject_broadcast_message',
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+        _expected_redirect=url_for(
+            '.broadcast_dashboard',
+            service_id=SERVICE_ONE_ID,
+            _external=True,
+        )
+    )
+
+    assert mock_update_broadcast_message.called is False
+
+    mock_update_broadcast_message_status.assert_called_once_with(
+        'rejected',
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+    )
+
+
+@pytest.mark.parametrize('initial_status', (
+    'draft',
+    'rejected',
+    'broadcasting',
+    'cancelled',
+))
+@freeze_time('2020-02-22T22:22:22.000000')
+def test_cant_reject_broadcast_in_wrong_state(
+    mocker,
+    client_request,
+    service_one,
+    mock_get_broadcast_template,
+    fake_uuid,
+    mock_update_broadcast_message,
+    mock_update_broadcast_message_status,
+    initial_status,
+):
+    mocker.patch(
+        'app.broadcast_message_api_client.get_broadcast_message',
+        return_value=broadcast_message_json(
+            id_=fake_uuid,
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            created_by_id=fake_uuid,
+            finishes_at='2020-02-23T23:23:23.000000',
+            status=initial_status,
+        ),
+    )
+    service_one['permissions'] += ['broadcast']
+
+    client_request.get(
+        '.reject_broadcast_message',
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+        _expected_redirect=url_for(
+            '.view_broadcast_message',
+            service_id=SERVICE_ONE_ID,
+            broadcast_message_id=fake_uuid,
+            _external=True,
+        )
+    )
+
+    assert mock_update_broadcast_message.called is False
+    assert mock_update_broadcast_message_status.called is False
 
 
 def test_no_view_page_for_draft(

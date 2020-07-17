@@ -21,7 +21,11 @@
       </div>
     {% endcall %}
     {% call field(align='right') %}
-      {% if item.status == 'broadcasting' %}
+      {% if item.status == 'pending-approval' %}
+        <p class="govuk-body govuk-!-margin-top-6 govuk-!-margin-bottom-0">
+          Prepared by {{ item.created_by.name }}
+        </p>
+      {% elif item.status == 'broadcasting' %}
         <p class="govuk-body govuk-!-margin-top-6 govuk-!-margin-bottom-0">
           Live until {{ item.finishes_at|format_datetime_relative }}
         </p>

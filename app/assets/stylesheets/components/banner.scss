@@ -24,6 +24,10 @@
     @include copy-19;
   }
 
+  .page-footer {
+    margin-bottom: govuk-spacing(1);
+  }
+
 }
 
 %banner-with-tick,

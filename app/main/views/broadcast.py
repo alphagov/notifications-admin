@@ -13,7 +13,7 @@ from app.utils import service_has_permission, user_has_permissions
 def broadcast_dashboard(service_id):
     return render_template(
         'views/broadcast/dashboard.html',
-        partials=get_broadcast_dashboard_partials(current_service.id)
+        partials=get_broadcast_dashboard_partials(current_service.id),
     )
 
 
@@ -27,6 +27,11 @@ def broadcast_dashboard_updates(service_id):
 def get_broadcast_dashboard_partials(service_id):
     broadcast_messages = BroadcastMessages(service_id)
     return dict(
+        pending_approval_broadcasts=render_template(
+            'views/broadcast/partials/dashboard-table.html',
+            broadcasts=broadcast_messages.with_status('pending-approval'),
+            empty_message='You do not have any broadcasts waiting for approval',
+        ),
         live_broadcasts=render_template(
             'views/broadcast/partials/dashboard-table.html',
             broadcasts=broadcast_messages.with_status('broadcasting'),
@@ -137,7 +142,7 @@ def preview_broadcast_message(service_id, broadcast_message_id):
         service_id=current_service.id,
     )
     if request.method == 'POST':
-        broadcast_message.start_broadcast()
+        broadcast_message.request_approval()
         return redirect(url_for(
             '.broadcast_dashboard',
             service_id=current_service.id,
@@ -162,6 +167,57 @@ def view_broadcast_message(service_id, broadcast_message_id):
         'views/broadcast/view-message.html',
         broadcast_message=broadcast_message,
     )
+
+
+@main.route('/services/<uuid:service_id>/broadcast/<uuid:broadcast_message_id>', methods=['POST'])
+@user_has_permissions('send_messages')
+@service_has_permission('broadcast')
+def approve_broadcast_message(service_id, broadcast_message_id):
+
+    broadcast_message = BroadcastMessage.from_id(
+        broadcast_message_id,
+        service_id=current_service.id,
+    )
+
+    if broadcast_message.status != 'pending-approval':
+        return redirect(url_for(
+            '.view_broadcast_message',
+            service_id=current_service.id,
+            broadcast_message_id=broadcast_message.id,
+        ))
+
+    broadcast_message.approve_broadcast()
+
+    return redirect(url_for(
+        '.view_broadcast_message',
+        service_id=current_service.id,
+        broadcast_message_id=broadcast_message.id,
+    ))
+
+
+@main.route('/services/<uuid:service_id>/broadcast/<uuid:broadcast_message_id>/reject')
+@user_has_permissions('send_messages')
+@service_has_permission('broadcast')
+def reject_broadcast_message(service_id, broadcast_message_id):
+
+    broadcast_message = BroadcastMessage.from_id(
+        broadcast_message_id,
+        service_id=current_service.id,
+    )
+
+    if broadcast_message.status != 'pending-approval':
+        return redirect(url_for(
+            '.view_broadcast_message',
+            service_id=current_service.id,
+            broadcast_message_id=broadcast_message.id,
+        ))
+
+    broadcast_message.reject_broadcast()
+
+    return redirect(url_for(
+        '.broadcast_dashboard',
+        service_id=current_service.id,
+    ))
 
 
 @main.route('/services/<uuid:service_id>/broadcast/<uuid:broadcast_message_id>/cancel')

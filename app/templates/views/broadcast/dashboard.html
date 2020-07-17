@@ -10,6 +10,14 @@
 
   <h1 class="govuk-visually-hidden">Dashboard</h1>
 
+  <h2 class="heading-medium govuk-!-margin-bottom-2">Waiting for approval</h2>
+
+  {{ ajax_block(
+    partials,
+    url_for('.broadcast_dashboard_updates', service_id=current_service.id),
+    'pending_approval_broadcasts'
+  ) }}
+
   <h2 class="heading-medium govuk-!-margin-bottom-2">Live broadcasts</h2>
 
   {{ ajax_block(
