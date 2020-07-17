@@ -23,7 +23,8 @@
 {% macro radio_select(
  field,
  hint=None,
- wrapping_class='form-group'
+ wrapping_class='form-group',
+ show_now_as_default=True
 ) %}
  <div class="{{ wrapping_class }} {% if field.errors %} form-group-error{% endif %}">
    <fieldset>
@@ -35,7 +36,7 @@
          </span>
        {% endif %}
      </legend>
-     <div class="radio-select" data-module="radio-select" data-categories="{{ field.categories|join(',') }}">
+     <div class="radio-select" data-module="radio-select" data-categories="{{ field.categories|join(',') }}" data-show-now-as-default="{{ show_now_as_default|string|lower }}">
        <div class="radio-select-column">
        {% for option in field %}
          <div class="multiple-choice">

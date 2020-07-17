@@ -68,11 +68,12 @@ describe('RadioSelect', () => {
 
         hours.forEach((hour, idx) => {
           const hourLabel = getHourLabel(hour);
+          const num = idx + 1;
 
           result +=
             `<div class="multiple-choice">
-              <input id="scheduled_for-${idx}" name="scheduled_for" type="radio" value="2019-05-${dayAsNumber}T${hour}:00:00.459156">
-              <label for="scheduled_for-${idx}">
+              <input id="scheduled_for-${num}" name="scheduled_for" type="radio" value="2019-05-${dayAsNumber}T${hour}:00:00.459156">
+              <label for="scheduled_for-${num}">
                 ${day} at ${hourLabel}
               </label>
             </div>`;
@@ -99,7 +100,7 @@ describe('RadioSelect', () => {
         <legend class="form-label">
           When should Notify send these messages?
         </legend>
-        <div class="radio-select" data-module="radio-select" data-categories="${CATEGORIES.join(',')}">
+        <div class="radio-select" data-module="radio-select" data-categories="${CATEGORIES.join(',')}" data-show-now-as-default="true">
           <div class="radio-select__column">
             <div class="multiple-choice">
               <input checked="" id="scheduled_for-0" name="scheduled_for" type="radio" value="">
@@ -114,7 +115,7 @@ describe('RadioSelect', () => {
         </div>
       </fieldset>`;
 
-      originalOptionsForAllCategories = Array.from(document.querySelector('.radio-select__column:nth-child(2) .multiple-choice'))
+      originalOptionsForAllCategories = Array.from(document.querySelectorAll('.radio-select__column:nth-child(2) .multiple-choice'))
                                           .map(option => getDataFromOption(option));
   });
 
@@ -122,30 +123,60 @@ describe('RadioSelect', () => {
     document.body.innerHTML = '';
   });
 
-  describe("when the page has loaded it should have a button for each category", () => {
+  describe("when the page has loaded", () => {
 
-    let categoryButtons;
+    describe("if the 'data-show-now-as-default' attribute", () => {
 
-    beforeEach(() => {
+      test("is set to true the module should have a 'Now' option", () => {
 
-      // start module
-      window.GOVUK.modules.start();
+        // default is for it to be set to true
 
-      categoryButtons = document.querySelectorAll('.radio-select__column:nth-child(2) .radio-select__button--category');
+        // start module
+        window.GOVUK.modules.start();
+
+        expect(document.querySelectorAll('.radio-select__column').length).toEqual(2);
+
+      });
+
+      test("is set to false the module should not have a 'Now' option", () => {
+
+        document.querySelector('.radio-select').setAttribute('data-show-now-as-default', 'false');
+
+        // start module
+        window.GOVUK.modules.start();
+
+        expect(document.querySelectorAll('.radio-select__column').length).toEqual(1);
+
+      });
 
     });
 
-    test("the number of buttons should match the categories", () => {
+    describe("it should have a button for each category", () => {
 
-      expect(categoryButtons.length).toBe(CATEGORIES.length);
+      let categoryButtons;
 
-    });
+      beforeEach(() => {
 
-    test("each button's text should match their category", () => {
+        // start module
+        window.GOVUK.modules.start();
 
-      // check the buttons have the right text
-      CATEGORIES.forEach((category, idx) => {
-        expect(categoryButtons[idx].getAttribute('value')).toEqual(category);
+        categoryButtons = document.querySelectorAll('.radio-select__column:nth-child(2) .radio-select__button--category');
+
+      });
+
+      test("the number of buttons should match the categories", () => {
+
+        expect(categoryButtons.length).toBe(CATEGORIES.length);
+
+      });
+
+      test("each button's text should match their category", () => {
+
+        // check the buttons have the right text
+        CATEGORIES.forEach((category, idx) => {
+          expect(categoryButtons[idx].getAttribute('value')).toEqual(category);
+        });
+
       });
 
     });
@@ -158,10 +189,13 @@ describe('RadioSelect', () => {
 
       describe(`clicking the button for ${category} should`, () => {
 
+        const categoryRegExp = new RegExp('^' + category);
+        let originalOptionsForcategory;
+
         beforeEach(() => {
 
           // get all the options in the original page for this category
-          originalOptionsForCategory = originalOptionsForAllCategories.filter(option => option.label === category);
+          originalOptionsForCategory = originalOptionsForAllCategories.filter(option => categoryRegExp.test(option.label));
 
           // start module
           window.GOVUK.modules.start();
@@ -173,7 +207,7 @@ describe('RadioSelect', () => {
         test("show the options for it, with the right label and value", () => {
 
           // check options this reveals against those originally in the page for this category
-          const options = document.querySelector('.radio-select__column:nth-child(2) .multiple-choice');
+          const options = document.querySelectorAll('.radio-select__column:nth-child(2) .multiple-choice');
 
           const optionsThatMatchOriginals = Array.from(options).filter((option, idx) => {
             const optionData = getDataFromOption(option);

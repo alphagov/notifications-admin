@@ -1,8 +1,12 @@
-from flask import abort, jsonify, redirect, render_template, request, url_for
+from flask import abort, jsonify, redirect, render_template, url_for
 
 from app import current_service
 from app.main import main
-from app.main.forms import BroadcastAreaForm, SearchByNameForm
+from app.main.forms import (
+    BroadcastAreaForm,
+    ChooseBroadcastDurationForm,
+    SearchByNameForm,
+)
 from app.models.broadcast_message import BroadcastMessage, BroadcastMessages
 from app.utils import service_has_permission, user_has_permissions
 
@@ -141,15 +145,19 @@ def preview_broadcast_message(service_id, broadcast_message_id):
         broadcast_message_id,
         service_id=current_service.id,
     )
-    if request.method == 'POST':
-        broadcast_message.request_approval()
+    form = ChooseBroadcastDurationForm()
+
+    if form.validate_on_submit():
+        broadcast_message.request_approval(until=form.finishes_at.data)
         return redirect(url_for(
             '.broadcast_dashboard',
             service_id=current_service.id,
         ))
+
     return render_template(
         'views/broadcast/preview-message.html',
         broadcast_message=broadcast_message,
+        form=form,
     )
 
 

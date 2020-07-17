@@ -100,7 +100,7 @@ def get_next_hours_until(until):
     now = datetime.utcnow()
     hours = int((until - now).total_seconds() / (60 * 60))
     return [
-        (now + timedelta(hours=i)).replace(minute=0, second=0).replace(tzinfo=pytz.utc)
+        (now + timedelta(hours=i)).replace(minute=0, second=0, microsecond=0).replace(tzinfo=pytz.utc)
         for i in range(1, hours + 1)
     ]
 
@@ -976,6 +976,24 @@ class ChooseTimeForm(StripWhitespaceForm):
     scheduled_for = RadioField(
         'When should Notify send these messages?',
         default='',
+    )
+
+
+class ChooseBroadcastDurationForm(StripWhitespaceForm):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.finishes_at.choices = [
+            get_time_value_and_label(hour) for hour in get_next_hours_until(
+                get_furthest_possible_scheduled_time()
+            )
+        ]
+        self.finishes_at.categories = get_next_days_until(
+            get_furthest_possible_scheduled_time()
+        )
+
+    finishes_at = RadioField(
+        'When should this broadcast end?',
     )
 
 

@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from notifications_utils.broadcast_areas import broadcast_area_libraries
 from notifications_utils.template import BroadcastPreviewTemplate
@@ -33,7 +33,6 @@ class BroadcastMessage(JSONModel):
         'approved_by_id',
         'cancelled_by_id',
     }
-    DEFAULT_TTL = timedelta(hours=72)
 
     libraries = broadcast_area_libraries
 
@@ -132,9 +131,9 @@ class BroadcastMessage(JSONModel):
             data=kwargs,
         )
 
-    def request_approval(self):
+    def request_approval(self, until):
         self._update(
-            finishes_at=(datetime.utcnow() + self.DEFAULT_TTL).isoformat(),
+            finishes_at=until,
         )
         self._set_status_to('pending-approval')
 
