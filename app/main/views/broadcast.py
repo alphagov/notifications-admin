@@ -142,7 +142,7 @@ def preview_broadcast_message(service_id, broadcast_message_id):
         service_id=current_service.id,
     )
     if request.method == 'POST':
-        broadcast_message.start_broadcast()
+        broadcast_message.request_approval()
         return redirect(url_for(
             '.broadcast_dashboard',
             service_id=current_service.id,

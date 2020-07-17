@@ -313,12 +313,11 @@ def test_start_broadcasting(
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
         data={
-            'starts_at': '2020-02-02T02:02:02.222222',
             'finishes_at': '2020-02-05T02:02:02.222222',
         },
     )
     mock_update_broadcast_message_status.assert_called_once_with(
-        'broadcasting',
+        'pending-approval',
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
     )

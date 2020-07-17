@@ -132,12 +132,11 @@ class BroadcastMessage(JSONModel):
             data=kwargs,
         )
 
-    def start_broadcast(self):
+    def request_approval(self):
         self._update(
-            starts_at=datetime.utcnow().isoformat(),
             finishes_at=(datetime.utcnow() + self.DEFAULT_TTL).isoformat(),
         )
-        self._set_status_to('broadcasting')
+        self._set_status_to('pending-approval')
 
     def cancel_broadcast(self):
         self._set_status_to('cancelled')
