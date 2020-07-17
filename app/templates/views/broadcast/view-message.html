@@ -16,26 +16,35 @@
     back_link=url_for('.broadcast_dashboard', service_id=current_service.id)
   ) }}
 
-  <p class="govuk-body govuk-!-margin-bottom-3">
-    Created by {{ broadcast_message.created_by.name }} and approved by
-    {{ broadcast_message.approved_by.name }}.
-  </p>
+  {% if broadcast_message.status == 'pending-approval' %}
+    <p class="govuk-body govuk-!-margin-bottom-3">
+      {{ broadcast_message.created_by.name }} wants to broadcast this
+      message until {{ broadcast_message.finishes_at|format_datetime_relative }}.
+    </p>
+  {% else %}
+    <p class="govuk-body govuk-!-margin-bottom-3">
+      Created by {{ broadcast_message.created_by.name }} and approved by
+      {{ broadcast_message.approved_by.name }}.
+    </p>
 
-  <p class="govuk-body govuk-!-margin-bottom-3">
-    Started broadcasting
-    {{ broadcast_message.starts_at|format_datetime_human }}.
-  </p>
+    <p class="govuk-body govuk-!-margin-bottom-3">
+      Started broadcasting
+      {{ broadcast_message.starts_at|format_datetime_human }}.
+    </p>
 
-  <p class="govuk-body">
-    {% if broadcast_message.status == 'broadcasting' %}
-      Live until {{ broadcast_message.finishes_at|format_datetime_relative }}&ensp;<a href="{{ url_for('.cancel_broadcast_message', service_id=current_service.id, broadcast_message_id=broadcast_message.id) }}" class="destructive-link destructive-link--no-visited-state">Stop broadcast early</a>
-    {% elif broadcast_message.status == 'cancelled' %}
-      Stopped by {{ broadcast_message.cancelled_by.name }}
-      {{ broadcast_message.cancelled_at|format_datetime_human }}.
-    {% else %}
-      Finished broadcasting {{ broadcast_message.finishes_at|format_datetime_human }}.
-    {% endif %}
-  </p>
+    <p class="govuk-body">
+      {% if broadcast_message.status == 'pending-approval' %}
+        Will broadcast until {{ broadcast_message.finishes_at|format_datetime_relative }}.
+      {% elif broadcast_message.status == 'broadcasting' %}
+        Live until {{ broadcast_message.finishes_at|format_datetime_relative }}&ensp;<a href="{{ url_for('.cancel_broadcast_message', service_id=current_service.id, broadcast_message_id=broadcast_message.id) }}" class="destructive-link destructive-link--no-visited-state">Stop broadcast early</a>
+      {% elif broadcast_message.status == 'cancelled' %}
+        Stopped by {{ broadcast_message.cancelled_by.name }}
+        {{ broadcast_message.cancelled_at|format_datetime_human }}.
+      {% else %}
+        Finished broadcasting {{ broadcast_message.finishes_at|format_datetime_human }}.
+      {% endif %}
+    </p>
+  {% endif %}
 
   {% for area in broadcast_message.areas %}
     {% if loop.first %}
