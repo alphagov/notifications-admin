@@ -431,13 +431,21 @@ def test_view_pending_broadcast(
         normalize_spaces(page.select_one('.banner').text)
     ) == (
         'Test User wants to broadcast this message until tomorrow at 11:23pm. '
-        'Start broadcasting now'
+        'Start broadcasting now Reject this broadcast'
     )
 
     form = page.select_one('form.banner')
     assert form['method'] == 'post'
     assert 'action' not in form
     assert form.select_one('button[type=submit]')
+
+    link = form.select_one('a.govuk-link.govuk-link--destructive')
+    assert link.text == 'Reject this broadcast'
+    assert link['href'] == url_for(
+        '.reject_broadcast_message',
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+    )
 
 
 @pytest.mark.parametrize('initial_status, expected_approval', (
@@ -500,6 +508,95 @@ def test_approve_broadcast(
     else:
         assert mock_update_broadcast_message.called is False
         assert mock_update_broadcast_message_status.called is False
+
+
+@freeze_time('2020-02-22T22:22:22.000000')
+def test_reject_broadcast(
+    mocker,
+    client_request,
+    service_one,
+    mock_get_broadcast_template,
+    fake_uuid,
+    mock_update_broadcast_message,
+    mock_update_broadcast_message_status,
+):
+    mocker.patch(
+        'app.broadcast_message_api_client.get_broadcast_message',
+        return_value=broadcast_message_json(
+            id_=fake_uuid,
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            created_by_id=fake_uuid,
+            finishes_at='2020-02-23T23:23:23.000000',
+            status='pending-approval',
+        ),
+    )
+    service_one['permissions'] += ['broadcast']
+
+    client_request.get(
+        '.reject_broadcast_message',
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+        _expected_redirect=url_for(
+            '.broadcast_dashboard',
+            service_id=SERVICE_ONE_ID,
+            _external=True,
+        )
+    )
+
+    assert mock_update_broadcast_message.called is False
+
+    mock_update_broadcast_message_status.assert_called_once_with(
+        'rejected',
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+    )
+
+
+@pytest.mark.parametrize('initial_status', (
+    'draft',
+    'rejected',
+    'broadcasting',
+    'cancelled',
+))
+@freeze_time('2020-02-22T22:22:22.000000')
+def test_cant_reject_broadcast_in_wrong_state(
+    mocker,
+    client_request,
+    service_one,
+    mock_get_broadcast_template,
+    fake_uuid,
+    mock_update_broadcast_message,
+    mock_update_broadcast_message_status,
+    initial_status,
+):
+    mocker.patch(
+        'app.broadcast_message_api_client.get_broadcast_message',
+        return_value=broadcast_message_json(
+            id_=fake_uuid,
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            created_by_id=fake_uuid,
+            finishes_at='2020-02-23T23:23:23.000000',
+            status=initial_status,
+        ),
+    )
+    service_one['permissions'] += ['broadcast']
+
+    client_request.get(
+        '.reject_broadcast_message',
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+        _expected_redirect=url_for(
+            '.view_broadcast_message',
+            service_id=SERVICE_ONE_ID,
+            broadcast_message_id=fake_uuid,
+            _external=True,
+        )
+    )
+
+    assert mock_update_broadcast_message.called is False
+    assert mock_update_broadcast_message_status.called is False
 
 
 def test_no_view_page_for_draft(

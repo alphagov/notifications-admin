@@ -362,6 +362,7 @@ class HeaderNavigation(Navigation):
         'preview_broadcast_message',
         'view_broadcast_message',
         'approve_broadcast_message',
+        'reject_broadcast_message',
         'cancel_broadcast_message',
     }
 
@@ -421,6 +422,7 @@ class MainNavigation(Navigation):
             'preview_broadcast_message',
             'view_broadcast_message',
             'approve_broadcast_message',
+            'reject_broadcast_message',
             'cancel_broadcast_message',
         },
         'uploads': {
@@ -1015,6 +1017,7 @@ class CaseworkNavigation(Navigation):
         'preview_broadcast_message',
         'view_broadcast_message',
         'approve_broadcast_message',
+        'reject_broadcast_message',
         'cancel_broadcast_message',
     }
 
@@ -1337,5 +1340,6 @@ class OrgNavigation(Navigation):
         'preview_broadcast_message',
         'view_broadcast_message',
         'approve_broadcast_message',
+        'reject_broadcast_message',
         'cancel_broadcast_message',
     }

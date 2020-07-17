@@ -144,6 +144,9 @@ class BroadcastMessage(JSONModel):
         )
         self._set_status_to('broadcasting')
 
+    def reject_broadcast(self):
+        self._set_status_to('rejected')
+
     def cancel_broadcast(self):
         self._set_status_to('cancelled')
 
