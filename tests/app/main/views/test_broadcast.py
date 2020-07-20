@@ -10,25 +10,66 @@ from tests.conftest import SERVICE_ONE_ID, normalize_spaces
 sample_uuid = sample_uuid()
 
 
-@pytest.mark.parametrize('endpoint, extra_args', (
-    ('.broadcast_dashboard', {}),
-    ('.broadcast_dashboard_updates', {}),
-    ('.broadcast', {'template_id': sample_uuid}),
-    ('.preview_broadcast_areas', {'broadcast_message_id': sample_uuid}),
-    ('.choose_broadcast_library', {'broadcast_message_id': sample_uuid}),
-    ('.choose_broadcast_area', {'broadcast_message_id': sample_uuid, 'library_slug': 'countries'}),
-    ('.remove_broadcast_area', {'broadcast_message_id': sample_uuid, 'area_slug': 'england'}),
-    ('.preview_broadcast_message', {'broadcast_message_id': sample_uuid}),
+@pytest.mark.parametrize('endpoint, extra_args, expected_get_status, expected_post_status', (
+    (
+        '.broadcast_dashboard', {},
+        403, 405,
+    ),
+    (
+        '.broadcast_dashboard_updates', {},
+        403, 405,
+    ),
+    (
+        '.broadcast',
+        {'template_id': sample_uuid},
+        403, 405,
+    ),
+    (
+        '.preview_broadcast_areas', {'broadcast_message_id': sample_uuid},
+        403, 405,
+    ),
+    (
+        '.choose_broadcast_library', {'broadcast_message_id': sample_uuid},
+        403, 405,
+    ),
+    (
+        '.choose_broadcast_area', {'broadcast_message_id': sample_uuid, 'library_slug': 'countries'},
+        403, 403,
+    ),
+    (
+        '.remove_broadcast_area', {'broadcast_message_id': sample_uuid, 'area_slug': 'england'},
+        403, 405,
+    ),
+    (
+        '.preview_broadcast_message', {'broadcast_message_id': sample_uuid},
+        403, 403,
+    ),
+    (
+        '.view_broadcast_message', {'broadcast_message_id': sample_uuid},
+        403, 403,
+    ),
+    (
+        '.cancel_broadcast_message', {'broadcast_message_id': sample_uuid},
+        403, 403,
+    ),
 ))
 def test_broadcast_pages_403_without_permission(
     client_request,
     endpoint,
     extra_args,
+    expected_get_status,
+    expected_post_status,
 ):
     client_request.get(
         endpoint,
         service_id=SERVICE_ONE_ID,
-        _expected_status=403,
+        _expected_status=expected_get_status,
+        **extra_args
+    )
+    client_request.post(
+        endpoint,
+        service_id=SERVICE_ONE_ID,
+        _expected_status=expected_post_status,
         **extra_args
     )
 
