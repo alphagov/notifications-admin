@@ -43,7 +43,10 @@
       {% if broadcast_message.status == 'pending-approval' %}
         Will broadcast until {{ broadcast_message.finishes_at|format_datetime_relative }}.
       {% elif broadcast_message.status == 'broadcasting' %}
-        Live until {{ broadcast_message.finishes_at|format_datetime_relative }}&ensp;<a href="{{ url_for('.cancel_broadcast_message', service_id=current_service.id, broadcast_message_id=broadcast_message.id) }}" class="destructive-link destructive-link--no-visited-state">Stop broadcast early</a>
+        Live until {{ broadcast_message.finishes_at|format_datetime_relative }}&ensp;
+        {%- if not hide_stop_link %}
+          <a href="{{ url_for('.cancel_broadcast_message', service_id=current_service.id, broadcast_message_id=broadcast_message.id) }}" class="destructive-link destructive-link--no-visited-state">Stop broadcast early</a>
+        {% endif %}
       {% elif broadcast_message.status == 'cancelled' %}
         Stopped by {{ broadcast_message.cancelled_by.name }}
         {{ broadcast_message.cancelled_at|format_datetime_human }}.

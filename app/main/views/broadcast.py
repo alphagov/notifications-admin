@@ -1,4 +1,12 @@
-from flask import abort, jsonify, redirect, render_template, url_for
+from flask import (
+    abort,
+    flash,
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
 
 from app import current_service
 from app.main import main
@@ -228,16 +236,39 @@ def reject_broadcast_message(service_id, broadcast_message_id):
     ))
 
 
-@main.route('/services/<uuid:service_id>/broadcast/<uuid:broadcast_message_id>/cancel')
+@main.route(
+    '/services/<uuid:service_id>/broadcast/<uuid:broadcast_message_id>/cancel',
+    methods=['GET', 'POST'],
+)
 @user_has_permissions('send_messages')
 @service_has_permission('broadcast')
 def cancel_broadcast_message(service_id, broadcast_message_id):
-    BroadcastMessage.from_id(
+    broadcast_message = BroadcastMessage.from_id(
         broadcast_message_id,
         service_id=current_service.id,
-    ).cancel_broadcast()
-    return redirect(url_for(
-        '.view_broadcast_message',
-        service_id=current_service.id,
-        broadcast_message_id=broadcast_message_id,
-    ))
+    )
+
+    if broadcast_message.status != 'broadcasting':
+        return redirect(url_for(
+            '.view_broadcast_message',
+            service_id=current_service.id,
+            broadcast_message_id=broadcast_message.id,
+        ))
+
+    if request.method == 'POST':
+        broadcast_message.cancel_broadcast()
+        return redirect(url_for(
+            '.view_broadcast_message',
+            service_id=current_service.id,
+            broadcast_message_id=broadcast_message.id,
+        ))
+
+    flash([
+        'Are you sure you want to stop this broadcast now?'
+    ], 'stop broadcasting')
+
+    return render_template(
+        'views/broadcast/view-message.html',
+        broadcast_message=broadcast_message,
+        hide_stop_link=True,
+    )
