@@ -2,7 +2,7 @@
 {% with messages = get_flashed_messages(with_categories=true) %}
   {% if messages %}
     {% for category, message in messages %}
-      {% if category in ['cancel', 'delete', 'suspend', 'resume', 'remove', 'revoke this API key'] %}
+      {% if category in ['cancel', 'delete', 'suspend', 'resume', 'remove', 'revoke this API key', 'stop broadcasting'] %}
         {% set delete_button_text = "Yes, {}".format(category) %}
       {% elif category == 'try again' %}
         {% set delete_button_text = category|capitalize %}

@@ -704,12 +704,45 @@ def test_no_view_page_for_draft(
 def test_cancel_broadcast(
     client_request,
     service_one,
-    mock_get_draft_broadcast_message,
+    mock_get_live_broadcast_message,
+    mock_get_broadcast_template,
     mock_update_broadcast_message_status,
     fake_uuid,
 ):
     service_one['permissions'] += ['broadcast']
-    client_request.get(
+    page = client_request.get(
+        '.cancel_broadcast_message',
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+    )
+    assert normalize_spaces(page.select_one('.banner-dangerous').text) == (
+        'Are you sure you want to stop this broadcast now? '
+        'Yes, stop broadcasting'
+    )
+    form = page.select_one('form')
+    assert form['method'] == 'post'
+    assert 'action' not in form
+    assert normalize_spaces(form.select_one('button[type=submit]').text) == (
+        'Yes, stop broadcasting'
+    )
+    assert mock_update_broadcast_message_status.called is False
+    assert url_for(
+        '.cancel_broadcast_message',
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+    ) not in page
+
+
+def test_confirm_cancel_broadcast(
+    client_request,
+    service_one,
+    mock_get_live_broadcast_message,
+    mock_get_broadcast_template,
+    mock_update_broadcast_message_status,
+    fake_uuid,
+):
+    service_one['permissions'] += ['broadcast']
+    client_request.post(
         '.cancel_broadcast_message',
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
@@ -719,9 +752,33 @@ def test_cancel_broadcast(
             broadcast_message_id=fake_uuid,
             _external=True,
         ),
-    ),
+    )
     mock_update_broadcast_message_status.assert_called_once_with(
         'cancelled',
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
     )
+
+
+@pytest.mark.parametrize('method', ('post', 'get'))
+def test_cant_cancel_broadcast_in_a_different_state(
+    client_request,
+    service_one,
+    mock_get_draft_broadcast_message,
+    mock_update_broadcast_message_status,
+    fake_uuid,
+    method,
+):
+    service_one['permissions'] += ['broadcast']
+    getattr(client_request, method)(
+        '.cancel_broadcast_message',
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+        _expected_redirect=url_for(
+            '.view_broadcast_message',
+            service_id=SERVICE_ONE_ID,
+            broadcast_message_id=fake_uuid,
+            _external=True,
+        ),
+    )
+    assert mock_update_broadcast_message_status.called is False
