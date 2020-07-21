@@ -436,6 +436,9 @@ def send_test_step(service_id, template_id, step_index):
         email_reply_to = get_email_reply_to_address_from_session()
     elif db_template['template_type'] == 'sms':
         sms_sender = get_sms_sender_from_session()
+
+    template_values = get_recipient_and_placeholders_from_session(db_template['template_type'])
+
     template = get_template(
         db_template,
         current_service,
@@ -446,7 +449,7 @@ def send_test_step(service_id, template_id, step_index):
             template_id=template_id,
             filetype='png',
         ),
-        page_count=get_page_count_for_letter(db_template),
+        page_count=get_page_count_for_letter(db_template, values=template_values),
         email_reply_to=email_reply_to,
         sms_sender=sms_sender
     )
@@ -520,7 +523,7 @@ def send_test_step(service_id, template_id, step_index):
 
     back_link = get_back_link(service_id, template, step_index, placeholders)
 
-    template.values = get_recipient_and_placeholders_from_session(template.template_type)
+    template.values = template_values
     template.values[current_placeholder] = None
 
     return render_template(
@@ -1039,6 +1042,7 @@ def _check_notification(service_id, template_id, exception=None):
 
     template.values = get_recipient_and_placeholders_from_session(template.template_type)
     page_count = get_page_count_for_letter(db_template, template.values)
+    template.page_count = page_count
     return dict(
         template=template,
         back_link=back_link,
