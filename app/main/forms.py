@@ -190,6 +190,37 @@ def password(label='Password'):
     )
 
 
+def govuk_field_widget(self, field, type=None, param_extensions=None, **kwargs):
+    # error messages
+    error_message = None
+    if field.errors:
+        error_message = {"text": " ".join(field.errors).strip()}
+
+    # convert to parameters that govuk understands
+    params = {
+        "classes": "govuk-!-width-two-thirds",
+        "errorMessage": error_message,
+        "id": field.id,
+        "label": {"text": field.label.text},
+        "name": field.name,
+        "value": field.data
+    }
+
+    if type:
+        params["type"] = type
+
+    # extend default params with any sent in
+    if self.param_extensions:
+        params.update(self.param_extensions)
+
+    # add any sent in though use in templates
+    if param_extensions:
+        params.update(param_extensions)
+
+    return Markup(
+        render_template('vendor/govuk-frontend/components/input/template.njk', params=params))
+
+
 class GovukTextInputField(StringField):
     def __init__(self, label='', validators=None, param_extensions=None, **kwargs):
         super(GovukTextInputField, self).__init__(label, validators, **kwargs)
@@ -200,27 +231,7 @@ class GovukTextInputField(StringField):
     # 2. calls field.widget
     # this bypasses that by making self.widget a method with the same interface as widget.__call__
     def widget(self, field, **kwargs):
-        # error messages
-        error_message = None
-        if field.errors:
-            error_message = {"text": " ".join(field.errors).strip()}
-
-        # convert to parameters that govuk understands
-        params = {
-            "name": field.name,
-            "id": field.id,
-            "label": {"text": field.label.text},
-            "value": field.data,
-            "classes": "govuk-!-width-two-thirds",
-            "errorMessage": error_message,
-        }
-
-        # extend default params with any sent in
-        if self.param_extensions:
-            params.update(self.param_extensions)
-
-        return Markup(
-            render_template('vendor/govuk-frontend/components/input/template.njk', params=params))
+        return govuk_field_widget(self, field, **kwargs)
 
 
 class GovukPasswordField(PasswordField):
@@ -233,32 +244,7 @@ class GovukPasswordField(PasswordField):
     # 2. calls field.widget
     # this bypasses that by making self.widget a method with the same interface as widget.__call__
     def widget(self, field, param_extensions=None, **kwargs):
-        # error messages
-        error_message = None
-        if field.errors:
-            error_message = {"text": " ".join(field.errors).strip()}
-
-        # convert to parameters that govuk understands
-        params = {
-            "classes": "govuk-!-width-two-thirds",
-            "errorMessage": error_message,
-            "id": field.id,
-            "label": {"text": field.label.text},
-            "name": field.name,
-            "type": "password",
-            "value": field.data
-        }
-
-        # extend default params with any sent in
-        if self.param_extensions:
-            params.update(self.param_extensions)
-
-        # add any sent in though use in templates
-        if param_extensions:
-            params.update(param_extensions)
-
-        return Markup(
-            render_template('vendor/govuk-frontend/components/input/template.njk', params=params))
+        return govuk_field_widget(self, field, type="password", param_extensions=param_extensions, **kwargs)
 
 
 class SMSCode(StringField):
