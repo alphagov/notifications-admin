@@ -10,7 +10,10 @@
     var $el = el.$fixedEl;
     var $scrollArea = $el.closest('.sticky-scroll-area');
 
-    $scrollArea = $scrollArea.length ? $scrollArea : $el.parent();
+    if($scrollArea.length === 0) {
+      $scrollArea = $el.parent();
+      $scrollArea.addClass('sticky-scroll-area');
+    }
 
     this._els = [el];
     this.edge = edge;
@@ -46,11 +49,11 @@
 
       return focused;
     },
-    forCaret: function (evt) {
-      var textarea = evt.target;
+    forCaret: function ($textarea) {
+      var textarea = $textarea.get(0);
       var caretCoordinates = window.getCaretCoordinates(textarea, textarea.selectionEnd);
       var focused = {
-        'top': $(textarea).offset().top + caretCoordinates.top,
+        'top': $textarea.offset().top + caretCoordinates.top,
         'height': caretCoordinates.height,
         'type': 'caret'
       };
@@ -61,21 +64,23 @@
     }
   };
   ScrollArea.prototype.focusHandler = function (e) {
-    var $focusedElement = $(document.activeElement);
-    var nodeName = $focusedElement.get(0).nodeName.toLowerCase();
+    this.scrollToRevealElement($(document.activeElement));
+  };
+  ScrollArea.prototype.scrollToRevealElement = function ($el) {
+    var nodeName = $el.get(0).nodeName.toLowerCase();
     var endOfFurthestEl = focusOverlap.endOfFurthestEl(this._els, this.edge);
     var isInSticky = function () {
-      return $focusedElement.closest(this.selector).length > 0;
+      return $el.closest(this.selector).length > 0;
     }.bind(this);
     var focused;
     var overlap;
 
     // if textarea is focused, we care about checking the caret, not the whole element
     if (nodeName === 'textarea') {
-      focused = this.getFocusedDetails.forCaret(e);
+      focused = this.getFocusedDetails.forCaret($el);
     } else {
       if (isInSticky()) { return; }
-      focused = this.getFocusedDetails.forElement($focusedElement);
+      focused = this.getFocusedDetails.forElement($el);
     }
 
     overlap = focusOverlap.getOverlap(focused, this.edge, endOfFurthestEl);
@@ -585,6 +590,18 @@
     };
 
     this.syncWithDOM(onSyncComplete);
+  };
+  // Public method to scroll so an element isn't covered by the sticky nav
+  Sticky.prototype.scrollToRevealElement = function (el) {
+    var $el = $(el);
+    var scrollAreaNode = $el.closest('.sticky-scroll-area').get(0);
+    var matches = $.grep(scrollAreas._scrollAreas, function (scrollArea) {
+      return scrollArea.node === scrollAreaNode;
+    });
+
+    if (matches.length) {
+      matches[0].scrollToRevealElement($el);
+    }
   };
   Sticky.prototype.setElWidth = function (el) {
     var $el = el.$fixedEl;

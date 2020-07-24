@@ -292,6 +292,61 @@ describe("Stick to top/bottom of window when scrolling", () => {
 
     });
 
+    describe("if scrollToRevealElement is called with an element", () => {
+
+      let link;
+      let linkBottom;
+
+      beforeEach(() => {
+
+        const inputFormBottom = getScreenItemBottomPosition(inputForm);
+
+        inputForm.insertAdjacentHTML('afterEnd', '<a href="" id="formatting-options">Formatting options</a>');
+        link = document.querySelector('#formatting-options');
+
+        screenMock.mockPositionAndDimension('link', link, {
+          offsetHeight: 25, // 143px smaller than the sticky
+          offsetWidth: 727,
+          offsetTop: inputFormBottom
+        });
+
+        linkBottom = getScreenItemBottomPosition(link);
+
+        // move the sticky over the link. It's 168px high so this position will cause it to overlap.
+        screenMock.scrollTo(link.offsetTop - 140);
+
+        window.GOVUK.stickAtTopWhenScrolling.init();
+
+      });
+
+      afterEach(() => {
+
+        screenMock.window.spies.window.scrollTo.mockClear();
+
+      });
+
+      test("the window should scroll so the element is revealed", () => {
+
+        // update inputForm position as DOM normally would
+        inputForm.offsetTop = screenMock.window.top;
+
+        let stickyPosition = getStickyGroupPosition(screenMock, { stickyEls: [inputForm], edge: 'top' });
+
+        // sticky position should overlap link position
+        expect(stickyPosition.top).toBeLessThanOrEqual(link.offsetTop);
+        expect(stickyPosition.bottom).toBeGreaterThanOrEqual(linkBottom);
+
+        window.GOVUK.stickAtTopWhenScrolling.scrollToRevealElement(link);
+
+        stickyPosition = getStickyGroupPosition(screenMock, { stickyEls: [inputForm], edge: 'top' });
+
+        // the bottom of the sticky element should be at the top of the link
+        expect(screenMock.window.spies.window.scrollTo.mock.calls[0]).toEqual([0, link.offsetTop - stickyPosition.height]);
+
+      });
+
+    });
+
     describe("if element is made sticky and another element underneath it is focused", () => {
 
       let checkbox;
@@ -899,6 +954,61 @@ describe("Stick to top/bottom of window when scrolling", () => {
         // `content-fixed` fades the drop-shadow in to show it became sticky from user interaction
         expect(pageFooter.classList.contains('content-fixed')).toBe(true);
         expect(pageFooter.classList.contains('content-fixed-onload')).toBe(false); // check the class for onload isn't applied
+
+      });
+
+    });
+
+    describe("if scrollToRevealElement is called with an element", () => {
+
+      let link;
+      let linkBottom;
+
+      beforeEach(() => {
+
+        const contentBottom = getScreenItemBottomPosition(content);
+
+        content.insertAdjacentHTML('afterEnd', '<a href="" id="formatting-options">Formatting options</a>');
+        link = document.querySelector('#formatting-options');
+
+        screenMock.mockPositionAndDimension('link', link, {
+          offsetHeight: 25, // 25px smaller than the sticky
+          offsetWidth: 727,
+          offsetTop: contentBottom
+        });
+
+        linkBottom = getScreenItemBottomPosition(link);
+
+        // move the sticky over the link. It's 50px high so this position will cause it to overlap.
+        screenMock.scrollTo((linkBottom - windowHeight) + 5);
+
+        window.GOVUK.stickAtBottomWhenScrolling.init();
+
+      });
+
+      afterEach(() => {
+
+        screenMock.window.spies.window.scrollTo.mockClear();
+
+      });
+
+      test("the window should scroll so the element is revealed", () => {
+
+        // update inputForm position as DOM normally would
+        pageFooter.offsetTop = screenMock.window.bottom - pageFooter.offsetHeight;
+
+        let stickyPosition = getStickyGroupPosition(screenMock, { stickyEls: [pageFooter], edge: 'bottom' });
+
+        // sticky position should overlap link position
+        expect(stickyPosition.top).toBeLessThanOrEqual(link.offsetTop);
+        expect(stickyPosition.bottom).toBeGreaterThanOrEqual(linkBottom);
+
+        window.GOVUK.stickAtBottomWhenScrolling.scrollToRevealElement(link)
+
+        stickyPosition = getStickyGroupPosition(screenMock, { stickyEls: [pageFooter], edge: 'bottom' });
+
+        // the top of the sticky element should be at the bottom of the link
+        expect(screenMock.window.spies.window.scrollTo.mock.calls[0]).toEqual([0, (linkBottom + pageFooter.offsetHeight) - windowHeight]);
 
       });
 
