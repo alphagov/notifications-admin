@@ -1,9 +1,11 @@
 import pytest
+import re
 from json import JSONDecodeError
 from unittest import mock
 
 from notifications_utils.broadcast_areas import (
     BroadcastAreaLibraries,
+    BroadcastAreasRepository,
     broadcast_area_libraries,
     load_geojson_file,
 )
@@ -156,3 +158,9 @@ def test_lat_long_order():
     assert len(lat_long[0]) == len(long_lat[0]) == 2082  # Coordinates in polygon
     assert len(lat_long[0][0]) == len(long_lat[0][0]) == 2  # Axes in coordinates
     assert lat_long[0][0] == list(reversed(long_lat[0][0]))
+
+
+def test_includes_electoral_wards():
+
+    areas = broadcast_area_libraries.get_areas('city-of-london---aldgate')
+    assert len(areas) == 1
