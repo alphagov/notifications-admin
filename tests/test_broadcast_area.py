@@ -1,13 +1,9 @@
 import pytest
 import re
-from json import JSONDecodeError
-from unittest import mock
 
 from notifications_utils.broadcast_areas import (
-    BroadcastAreaLibraries,
     BroadcastAreasRepository,
     broadcast_area_libraries,
-    load_geojson_file,
 )
 
 
@@ -23,30 +19,14 @@ def test_loads_libraries():
             'Countries',
         ),
         (
+            'electoral-wards-of-the-united-kingdom',
+            'Electoral Wards of the United Kingdom',
+        ),
+        (
             'regions-of-england',
             'Regions of England',
         ),
     ]
-
-
-@pytest.mark.xfail(raises=JSONDecodeError)
-def test_raises_for_invalid_json():
-    load_geojson_file.cache_clear()
-    with mock.patch(
-        'notifications_utils.broadcast_areas.Path.read_text',
-        return_value='foo',
-    ):
-        BroadcastAreaLibraries()
-
-
-@pytest.mark.xfail(raises=ValueError)
-def test_raises_for_invalid_geojson():
-    load_geojson_file.cache_clear()
-    with mock.patch(
-        'notifications_utils.broadcast_areas.Path.read_text',
-        return_value='{"a": 1}',
-    ):
-        BroadcastAreaLibraries()
 
 
 def test_loads_areas_from_library():
@@ -63,15 +43,13 @@ def test_loads_areas_from_library():
 
 
 def test_examples():
-    assert (
-        broadcast_area_libraries.get('countries').get_examples()
-    ) == (
-        'England, Northern Ireland, Scotland and Wales'
+    assert re.match(
+        "^([^,]*, ){3}[^,]*",
+        broadcast_area_libraries.get('countries').get_examples(),
     )
-    assert (
+    assert re.match(
+        "^([^,]*, ){4}5 more…$",
         broadcast_area_libraries.get('regions-of-england').get_examples()
-    ) == (
-        'East Midlands, East of England, London and 6 more…'
     )
 
 
@@ -94,9 +72,6 @@ def test_get_names_of_areas():
     areas = broadcast_area_libraries.get_areas(
         'wales', 'vale-of-glamorgan', 'england', 'essex',
     )
-    assert [area.name for area in areas] == [
-        'Wales', 'Vale of Glamorgan', 'England', 'Essex',
-    ]
     assert [area.name for area in sorted(areas)] == [
         'England', 'Essex', 'Vale of Glamorgan', 'Wales',
     ]
@@ -162,5 +137,18 @@ def test_lat_long_order():
 
 def test_includes_electoral_wards():
 
-    areas = broadcast_area_libraries.get_areas('city-of-london---aldgate')
+    areas = broadcast_area_libraries.get_areas(['city-of-london---aldgate'])
     assert len(areas) == 1
+
+
+def test_repository_has_all_libraries():
+    repo = BroadcastAreasRepository()
+    libraries = repo.get_libraries()
+
+    assert len(libraries) == 4
+    assert [
+        'Counties and Unitary Authorities in England and Wales',
+        'Countries',
+        'Electoral Wards of the United Kingdom',
+        'Regions of England',
+    ] == sorted(libraries)
