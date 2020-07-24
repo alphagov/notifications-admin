@@ -9,59 +9,7 @@ from notifications_utils.formatters import formatted_list
 from notifications_utils.serialised_model import SerialisedModelCollection
 from notifications_utils.safe_string import make_string_safe_for_id
 
-
-class BroadcastAreasRepository(object):
-    def __init__(self):
-        self.database = Path(__file__).resolve().parent / 'broadcast-areas.sql'
-
-    def query(self, sql, *args):
-        package_path = Path(__file__).resolve().parent
-        db_filepath = package_path / "broadcast-areas.sqlite3"
-        with sqlite3.connect(str(db_filepath)) as conn:
-            cursor = conn.cursor()
-            cursor.execute(sql, (*args,))
-            return cursor.fetchall()
-
-    def get_datasets(self):
-        q = "SELECT DISTINCT(dataset) AS dataset FROM broadcast_areas"
-        datasets = [row[0] for row in self.query(q)]
-        return sorted(datasets)
-
-    def get_dataset_description(self, dataset):
-        q = """
-        WITH
-        areas AS (SELECT * FROM broadcast_areas WHERE dataset = ?),
-        area_count AS (SELECT COUNT(*) AS c FROM areas),
-        subset_area_count AS (SELECT c - 4 FROM area_count),
-        some_area_names  AS (SELECT name FROM areas LIMIT 100),
-        some_shuffled_area_names AS (
-            SELECT name FROM some_area_names ORDER BY RANDOM()
-        ),
-        description_area_names AS (
-            SELECT name FROM some_shuffled_area_names LIMIT 4
-        ),
-        description_areas_joined AS (
-            SELECT GROUP_CONCAT(name, ", ") FROM description_area_names
-        )
-        SELECT
-        CASE (SELECT * FROM subset_area_count)
-        WHEN 0 THEN
-            (SELECT * FROM description_areas_joined)
-        ELSE
-            (SELECT * FROM description_areas_joined)
-            || ", "
-            || (SELECT * FROM subset_area_count)
-            || " more…"
-        END
-        """
-        description = self.query(q, dataset)[0][0]
-        return description
-
-    def get_areas(self):
-        pass
-
-    def get_areas_from_list(self, areas):
-        pass
+from .repo import BroadcastAreasRepository
 
 
 @lru_cache(maxsize=128)

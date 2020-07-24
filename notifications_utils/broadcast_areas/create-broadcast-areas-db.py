@@ -3,23 +3,14 @@
 import geojson
 from pathlib import Path
 
+from repo import BroadcastAreasRepository
+
 package_path = Path(__file__).resolve().parent
 
-db_filepath = package_path / "broadcast-areas.sqlite3"
-os.remove(str(db_filepath))
-conn = sqlite3.connect(str(db_filepath))
-conn.execute("""
-CREATE TABLE broadcast_areas (
-    id TEXT PRIMARY KEY,
-    name TEXT NOT NULL,
-    dataset TEXT NOT NULL,
-    feature_geojson TEXT NOT NULL
-)""")
-conn.execute("""
-CREATE INDEX broadcast_areas_dataset
-ON broadcast_areas (dataset);
-""")
-conn.commit()
+repo = BroadcastAreasRepository()
+
+repo.delete_db()
+repo.create_tables()
 
 simple_datasets = [
     ("Countries", "ctry19nm"),
@@ -30,17 +21,11 @@ for dataset_name, name_field in simple_datasets:
     filepath = package_path / "{}.geojson".format(dataset_name)
     dataset_geojson = geojson.loads(filepath.read_text())
 
-    q = """
-    INSERT INTO broadcast_areas (id, name, dataset, feature_geojson)
-    VALUES (?, ?, ?, ?)
-    """
+    repo.insert_broadcast_area_library(dataset_name)
 
     for feature in dataset_geojson["features"]:
         f_name = feature["properties"][name_field]
-        f_id = make_string_safe_for_id(f_name)
-        conn.execute(q, (f_id, f_name, dataset_name, geojson.dumps(feature)))
-
-    conn.commit()
+        repo.insert_broadcast_areas([[f_name, dataset_name, feature]])
 
 # https://geoportal.statistics.gov.uk/datasets/wards-may-2020-boundaries-uk-bgc
 # Converted to geojson manually from SHP because of GeoJSON download limits
@@ -54,8 +39,12 @@ ward_code_to_la_mapping = {
     for f in geojson.loads(las_filepath.read_text())["features"]
 }
 
+dataset_name = "Electoral Wards of the United Kingdom"
+repo.insert_broadcast_area_library(dataset_name)
+
+areas_to_add = []
+
 for f in geojson.loads(wards_filepath.read_text())["features"]:
-    dataset_name = "Electoral Wards of the United Kingdom"
 
     ward_code = f["properties"]["wd20cd"]
     ward_name = f["properties"]["wd20nm"]
@@ -64,15 +53,9 @@ for f in geojson.loads(wards_filepath.read_text())["features"]:
         la_name = ward_code_to_la_mapping[ward_code]
 
         f_name = "{} - {}".format(la_name, ward_name)
-        f_id = make_string_safe_for_id(f_name)
-
-        q = """
-        INSERT INTO broadcast_areas (id, name, dataset, feature_geojson)
-        VALUES (?, ?, ?, ?)
-        """
-        conn.execute(q, (f_id, f_name, dataset_name, geojson.dumps(f)))
+        areas_to_add.append([f_name, dataset_name, f])
 
     except KeyError:
         print("Skipping", ward_code, ward_name)  # noqa: T001
 
-conn.commit()
+repo.insert_broadcast_areas(areas_to_add)
