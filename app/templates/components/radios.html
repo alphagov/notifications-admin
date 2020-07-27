@@ -24,11 +24,12 @@
  field,
  hint=None,
  wrapping_class='form-group',
- show_now_as_default=True
+ show_now_as_default=True,
+ bold_legend=False
 ) %}
  <div class="{{ wrapping_class }} {% if field.errors %} form-group-error{% endif %}">
    <fieldset>
-     <legend class="form-label">
+     <legend class="form-label {% if bold_legend %}govuk-!-font-weight-bold{% endif %}">
        {{ field.label.text }}
        {% if field.errors %}
          <span class="error-message" data-module="track-error" data-error-type="{{ field.errors[0] }}" data-error-label="{{ field.name }}">

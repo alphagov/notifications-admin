@@ -993,7 +993,7 @@ class ChooseBroadcastDurationForm(StripWhitespaceForm):
         )
 
     finishes_at = RadioField(
-        'When should this broadcast end?',
+        'End time',
     )
 
 
