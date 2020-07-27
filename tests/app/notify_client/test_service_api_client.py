@@ -488,3 +488,27 @@ def test_deletes_cached_users_when_archiving_service(mocker):
     service_api_client.archive_service(SERVICE_ONE_ID, ["my-user-id1", "my-user-id2"])
 
     assert call('user-my-user-id1', 'user-my-user-id2') in mock_redis_delete.call_args_list
+
+
+def test_client_gets_guest_list(mocker):
+    client = ServiceAPIClient()
+    mock_get = mocker.patch.object(client, 'get', return_value=['a', 'b', 'c'])
+
+    response = client.get_guest_list('foo')
+
+    assert response == ['a', 'b', 'c']
+    mock_get.assert_called_once_with(
+        url='/service/foo/guest-list',
+    )
+
+
+def test_client_updates_guest_list(mocker):
+    client = ServiceAPIClient()
+    mock_put = mocker.patch.object(client, 'put')
+
+    client.update_guest_list('foo', data=['a', 'b', 'c'])
+
+    mock_put.assert_called_once_with(
+        url='/service/foo/guest-list',
+        data=['a', 'b', 'c'],
+    )
