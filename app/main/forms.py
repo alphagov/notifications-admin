@@ -195,7 +195,14 @@ def govuk_field_widget(self, field, type=None, param_extensions=None, **kwargs):
     error_message = None
     if field.errors:
         error_message_format = "html" if kwargs.get("error_message_with_html") else "text"
-        error_message = {error_message_format: " ".join(field.errors).strip()}
+        error_message = {
+            "attributes": {
+                "data-module": "track-error",
+                "data-error-type": field.errors[0],
+                "data-error-label": field.name
+            },
+            error_message_format: " ".join(field.errors).strip()
+        }
 
     # convert to parameters that govuk understands
     params = {
