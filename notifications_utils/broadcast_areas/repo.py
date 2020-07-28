@@ -30,6 +30,7 @@ class BroadcastAreasRepository(object):
                 name TEXT NOT NULL,
                 broadcast_area_library_id TEXT NOT NULL,
                 feature_geojson TEXT NOT NULL,
+                simple_feature_geojson TEXT NOT NULL,
 
                 FOREIGN KEY (broadcast_area_library_id)
                     REFERENCES broadcast_area_libraries(id)
@@ -56,17 +57,21 @@ class BroadcastAreasRepository(object):
         q = """
         INSERT INTO broadcast_areas (
             id, name,
-            broadcast_area_library_id, feature_geojson
+            broadcast_area_library_id, feature_geojson, simple_feature_geojson
         )
-        VALUES (?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?)
         """
 
         with self.conn() as conn:
-            for name, area_name, feature in areas:
+            for name, area_name, feature, simple_feature in areas:
                 id = make_string_safe_for_id(name)
                 area_id = make_string_safe_for_id(area_name)
 
-                conn.execute(q, (id, name, area_id, geojson.dumps(feature)))
+                conn.execute(q, (
+                    id, name, area_id,
+                    geojson.dumps(feature),
+                    geojson.dumps(simple_feature),
+                ))
 
     def query(self, sql, *args):
         with self.conn() as conn:
@@ -116,14 +121,15 @@ class BroadcastAreasRepository(object):
             cursor = conn.cursor()
 
             q = """
-            SELECT id, name, feature_geojson FROM broadcast_areas
+            SELECT id, name, feature_geojson, simple_feature_geojson
+            FROM broadcast_areas
             WHERE id IN ({})
             """.format(("?," * len(*area_ids))[:-1])
             cursor.execute(q, *area_ids)
             results = cursor.fetchall()
 
             areas = [
-                (row[0], row[1], geojson.loads(row[2]))
+                (row[0], row[1], geojson.loads(row[2]), geojson.loads(row[3]))
                 for row in results
             ]
 
@@ -131,14 +137,15 @@ class BroadcastAreasRepository(object):
 
     def get_all_areas_for_library(self, library_id):
         q = """
-        SELECT id, name, feature_geojson FROM broadcast_areas
+        SELECT id, name, feature_geojson, simple_feature_geojson
+        FROM broadcast_areas
         WHERE broadcast_area_library_id = ?
         """
 
         results = self.query(q, library_id)
 
         areas = [
-            (row[0], row[1], geojson.loads(row[2]))
+            (row[0], row[1], geojson.loads(row[2]), geojson.loads(row[3]))
             for row in results
         ]
 

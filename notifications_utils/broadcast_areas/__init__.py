@@ -35,11 +35,12 @@ class GetItemByIdMixin:
 class BroadcastArea(IdentifiableMixin):
 
     def __init__(self, row):
-        id, name, feature = row
+        id, name, feature, simple_feature = row
 
         self.id = id
         self.name = name
         self.feature = feature
+        self.simple_feature = simple_feature
 
         for coordinates in self.polygons:
             if coordinates[0] != coordinates[-1]:
@@ -52,29 +53,43 @@ class BroadcastArea(IdentifiableMixin):
     def __eq__(self, other):
         return self.id == other.id
 
-    @property
-    def polygons(self):
-        if self.feature['geometry']['type'] == 'MultiPolygon':
+    def _polygons(self, feature):
+        if feature['geometry']['type'] == 'MultiPolygon':
             return [
                 polygons[0]
-                for polygons in self.feature['geometry']['coordinates']
+                for polygons in feature['geometry']['coordinates']
             ]
-        if self.feature['geometry']['type'] == 'Polygon':
+        if feature['geometry']['type'] == 'Polygon':
             return [
-                self.feature['geometry']['coordinates'][0]
+                feature['geometry']['coordinates'][0]
             ]
         raise TypeError(
             f'Unknown geometry type {self.feature["geometry"]["type"]} '
             f'in {self.__class__.__name} {self.name}'
         )
 
-    @property
-    def unenclosed_polygons(self):
+    def _unenclosed_polygons(self, feature):
         # Some mapping tools require shapes to be unenclosed, i.e. the
         # last point joins the first point implicitly
         return [
-            coordinates[:-1] for coordinates in self.polygons
+            coordinates[:-1] for coordinates in self._polygons(feature)
         ]
+
+    @property
+    def polygons(self):
+        return self._polygons(self.feature)
+
+    @property
+    def unenclosed_polygons(self):
+        return self._unenclosed_polygons(self.feature)
+
+    @property
+    def simple_polygons(self):
+        return self._polygons(self.simple_feature)
+
+    @property
+    def simple_unenclosed_polygons(self):
+        return self._unenclosed_polygons(self.simple_feature)
 
 
 class BroadcastAreaLibrary(SerialisedModelCollection, IdentifiableMixin, IdFromNameMixin, GetItemByIdMixin):

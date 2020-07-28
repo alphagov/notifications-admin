@@ -1,11 +1,50 @@
 #!/usr/bin/env python
 
+from copy import deepcopy
 import geojson
 from pathlib import Path
+import shapely.geometry as sgeom
 
 from repo import BroadcastAreasRepository
 
 package_path = Path(__file__).resolve().parent
+
+
+def simplify_polygon(series):
+    polygon, *_holes = series  # discard holes
+
+    approx_metres_to_degree = 111320
+    desired_resolution_metres = 10
+    simplify_degrees = desired_resolution_metres / approx_metres_to_degree
+
+    simplified_polygon = None
+    num_polys = len(polygon)
+    while True:
+        simplified_polygon = sgeom.LineString(polygon)
+        simplified_polygon = simplified_polygon.simplify(simplify_degrees)
+        simplified_polygon = [[c[0], c[1]] for c in simplified_polygon.coords]
+
+        num_polys = len(simplified_polygon)
+        simplify_degrees *= 1.5
+        if num_polys <= 125:
+            break
+
+    return [simplified_polygon]
+
+
+def simplify_geometry(feature):
+    if feature["type"] == "Polygon":
+        feature["coordinates"] = simplify_polygon(feature["coordinates"])
+        return feature
+    elif feature["type"] == "MultiPolygon":
+        feature["coordinates"] = [
+            simplify_polygon(polygon)
+            for polygon in feature["coordinates"]
+        ]
+        return feature
+    else:
+        raise Exception("Unknown type: {}".format(feature["type"]))
+
 
 repo = BroadcastAreasRepository()
 
@@ -25,7 +64,10 @@ for dataset_name, name_field in simple_datasets:
 
     for feature in dataset_geojson["features"]:
         f_name = feature["properties"][name_field]
-        repo.insert_broadcast_areas([[f_name, dataset_name, feature]])
+
+        simple_feature = deepcopy(feature)
+        simple_feature["geometry"] = simplify_geometry(simple_feature["geometry"])
+        repo.insert_broadcast_areas([[f_name, dataset_name, feature, simple_feature]])
 
 # https://geoportal.statistics.gov.uk/datasets/wards-may-2020-boundaries-uk-bgc
 # Converted to geojson manually from SHP because of GeoJSON download limits
@@ -53,7 +95,11 @@ for f in geojson.loads(wards_filepath.read_text())["features"]:
         la_name = ward_code_to_la_mapping[ward_code]
 
         f_name = "{} - {}".format(la_name, ward_name)
-        areas_to_add.append([f_name, dataset_name, f])
+
+        sf = deepcopy(f)
+        sf["geometry"] = simplify_geometry(sf["geometry"])
+
+        areas_to_add.append([f_name, dataset_name, f, sf])
 
     except KeyError:
         print("Skipping", ward_code, ward_name)  # noqa: T001
