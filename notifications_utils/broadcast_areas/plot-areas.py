@@ -75,6 +75,22 @@ def main():
         alpha=0.25,
     )
 
+    ax.scatter(
+        [
+            p[0]
+            for f in simple_features
+            for geom in (f.geoms if hasattr(f, 'geoms') else [f])
+            for p in geom.exterior.coords
+        ],
+        [
+            p[1]
+            for f in simple_features
+            for geom in (f.geoms if hasattr(f, 'geoms') else [f])
+            for p in geom.exterior.coords
+        ],
+        transform=ccrs.PlateCarree(),
+    )
+
     plt.show()
 
 
