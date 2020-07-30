@@ -402,7 +402,7 @@ def test_shows_message_when_no_notifications(
         {
             'to': 'Firstname Lastname',
         },
-        'Search by first line of address or file name',
+        'Search by postal address or file name',
         'Firstname Lastname',
     ),
 ])
@@ -448,7 +448,7 @@ def test_search_recipient_form(
     (None, 'Search by recipient or reference'),
     ('sms', 'Search by phone number or reference'),
     ('email', 'Search by email address or reference'),
-    ('letter', 'Search by first line of address, file name or reference'),
+    ('letter', 'Search by postal address, file name or reference'),
 ])
 def test_api_users_are_told_they_can_search_by_reference_when_service_has_api_keys(
     client_request,
@@ -473,7 +473,7 @@ def test_api_users_are_told_they_can_search_by_reference_when_service_has_api_ke
     (None, 'Search by recipient'),
     ('sms', 'Search by phone number'),
     ('email', 'Search by email address'),
-    ('letter', 'Search by first line of address or file name'),
+    ('letter', 'Search by postal address or file name'),
 ])
 def test_api_users_are_not_told_they_can_search_by_reference_when_service_has_no_api_keys(
     client_request,
