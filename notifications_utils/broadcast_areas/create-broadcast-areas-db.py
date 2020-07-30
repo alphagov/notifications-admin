@@ -21,8 +21,9 @@ def simplify_polygon(series):
     num_polys = len(polygon)
     while True:
         simplified_polygon = sgeom.LineString(polygon)
+        simplified_polygon = simplified_polygon.buffer(simplify_degrees)
         simplified_polygon = simplified_polygon.simplify(simplify_degrees)
-        simplified_polygon = [[c[0], c[1]] for c in simplified_polygon.coords]
+        simplified_polygon = [[c[0], c[1]] for c in simplified_polygon.exterior.coords]
 
         num_polys = len(simplified_polygon)
         simplify_degrees *= 1.5
