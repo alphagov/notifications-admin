@@ -1,3 +1,4 @@
+import geojson
 import itertools
 
 from notifications_utils.serialised_model import SerialisedModelCollection
@@ -39,8 +40,8 @@ class BroadcastArea(IdentifiableMixin):
 
         self.id = id
         self.name = name
-        self.feature = feature
-        self.simple_feature = simple_feature
+        self._feature = feature
+        self._simple_feature = simple_feature
 
         for coordinates in self.polygons:
             if coordinates[0] != coordinates[-1]:
@@ -90,6 +91,14 @@ class BroadcastArea(IdentifiableMixin):
     @property
     def simple_unenclosed_polygons(self):
         return self._unenclosed_polygons(self.simple_feature)
+
+    @property
+    def feature(self):
+        return geojson.loads(self._feature)
+
+    @property
+    def simple_feature(self):
+        return geojson.loads(self._simple_feature)
 
 
 class BroadcastAreaLibrary(SerialisedModelCollection, IdentifiableMixin, IdFromNameMixin, GetItemByIdMixin):

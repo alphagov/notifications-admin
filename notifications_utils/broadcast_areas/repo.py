@@ -1,4 +1,3 @@
-import geojson
 import os
 from pathlib import Path
 import sqlite3
@@ -129,7 +128,7 @@ class BroadcastAreasRepository(object):
             results = cursor.fetchall()
 
             areas = [
-                (row[0], row[1], geojson.loads(row[2]), geojson.loads(row[3]))
+                (row[0], row[1], row[2], row[3])
                 for row in results
             ]
 
@@ -145,7 +144,7 @@ class BroadcastAreasRepository(object):
         results = self.query(q, library_id)
 
         areas = [
-            (row[0], row[1], geojson.loads(row[2]), geojson.loads(row[3]))
+            (row[0], row[1], row[2], row[3])
             for row in results
         ]
 
