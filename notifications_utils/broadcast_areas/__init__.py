@@ -40,8 +40,12 @@ class BroadcastArea(IdentifiableMixin):
 
         self.id = id
         self.name = name
+
         self._feature = feature
+        self._geofeature = None
+
         self._simple_feature = simple_feature
+        self._simple_geofeature = None
 
         for coordinates in self.polygons:
             if coordinates[0] != coordinates[-1]:
@@ -94,11 +98,17 @@ class BroadcastArea(IdentifiableMixin):
 
     @property
     def feature(self):
-        return geojson.loads(self._feature)
+        if self._geofeature is None:
+            self._geofeature = geojson.loads(self._feature)
+
+        return self._geofeature
 
     @property
     def simple_feature(self):
-        return geojson.loads(self._simple_feature)
+        if self._simple_geofeature is None:
+            self._simple_geofeature = geojson.loads(self._simple_feature)
+
+        return self._simple_geofeature
 
 
 class BroadcastAreaLibrary(SerialisedModelCollection, IdentifiableMixin, IdFromNameMixin, GetItemByIdMixin):
