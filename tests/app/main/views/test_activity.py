@@ -757,8 +757,8 @@ def test_sending_status_hint_displays_correctly_on_notifications_page(
 
 
 @pytest.mark.parametrize("is_precompiled_letter,expected_address,expected_hint", [
-    (True, "Full Name,\nFirst address line\npostcode", "ref"),
-    (False, "Full Name,\nFirst address line\npostcode", "template subject")
+    (True, "Full Name\nFirst address line\npostcode", "ref"),
+    (False, "Full Name\nFirst address line\npostcode", "template subject")
 ])
 def test_should_show_address_and_hint_for_letters(
     client_request,
@@ -786,5 +786,5 @@ def test_should_show_address_and_hint_for_letters(
         message_type='letter',
     )
 
-    assert page.select_one('a.file-list-filename').text == 'Full Name'
+    assert page.select_one('a.file-list-filename').text == 'Full Name, First address line, postcode'
     assert page.find('p', {'class': 'file-list-hint'}).text.strip() == expected_hint
