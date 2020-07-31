@@ -744,6 +744,17 @@ LETTER_VALIDATION_MESSAGES = {
             "following characters: @ ( ) = [ ] ” \\ / ,"
         ),
     },
+    'notify-tag-found-in-content': {
+        'title': 'There’s a problem with your letter',
+        'detail': (
+            'Your file includes a letter you’ve downloaded from Notify.<br>'
+            'You need to edit {invalid_pages}.'
+        ),
+        'summary': (
+            'Validation failed because your file includes a letter '
+            'you’ve downloaded from Notify on {invalid_pages}.'
+        )
+    },
 }
 
 
