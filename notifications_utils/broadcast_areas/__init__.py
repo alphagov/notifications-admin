@@ -7,7 +7,7 @@ from notifications_utils.safe_string import make_string_safe_for_id
 from .repo import BroadcastAreasRepository
 
 
-class IdentifiableMixin:
+class SortableMixin:
 
     def __repr__(self):
         return f'{self.__class__.__name__}(<{self.id}>)'
@@ -15,14 +15,7 @@ class IdentifiableMixin:
     def __lt__(self, other):
         # Implementing __lt__ means any classes inheriting from this
         # method are sortable
-        return self.id < other.id
-
-
-class IdFromNameMixin:
-
-    @property
-    def id(self):
-        return make_string_safe_for_id(self.name)
+        return self.name < other.name
 
 
 class GetItemByIdMixin:
@@ -33,7 +26,7 @@ class GetItemByIdMixin:
         raise KeyError(id)
 
 
-class BroadcastArea(IdentifiableMixin):
+class BroadcastArea(SortableMixin):
 
     def __init__(self, row):
         id, name, feature, simple_feature = row
@@ -110,13 +103,23 @@ class BroadcastArea(IdentifiableMixin):
 
         return self._simple_geofeature
 
+    @property
+    def sub_areas(self):
+        return [
+            BroadcastArea(row)
+            for row in BroadcastAreasRepository().get_all_areas_for_group(self.id)
+        ]
 
-class BroadcastAreaLibrary(SerialisedModelCollection, IdentifiableMixin, IdFromNameMixin, GetItemByIdMixin):
+
+class BroadcastAreaLibrary(SerialisedModelCollection, SortableMixin, GetItemByIdMixin):
 
     model = BroadcastArea
 
-    def __init__(self, library_name):
-        self.name = library_name
+    def __init__(self, row):
+        id, name, is_group = row
+        self.id = id
+        self.name = name
+        self.is_group = bool(is_group)
 
     def get_examples(self):
         return BroadcastAreasRepository().get_library_description(self.id)

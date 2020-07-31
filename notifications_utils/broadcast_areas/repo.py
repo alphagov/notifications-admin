@@ -1,3 +1,4 @@
+import geojson
 import os
 from pathlib import Path
 import sqlite3
@@ -20,7 +21,15 @@ class BroadcastAreasRepository(object):
             conn.execute("""
             CREATE TABLE broadcast_area_libraries (
                 id TEXT PRIMARY KEY,
-                name TEXT NOT NULL
+                name TEXT NOT NULL,
+                is_group BOOLEAN NOT NULL
+            )""")
+
+            conn.execute("""
+            CREATE TABLE broadcast_area_library_groups (
+                id TEXT PRIMARY KEY,
+                name TEXT NOT NULL,
+                broadcast_area_library_id TEXT NOT NULL
             )""")
 
             conn.execute("""
@@ -28,11 +37,15 @@ class BroadcastAreasRepository(object):
                 id TEXT PRIMARY KEY,
                 name TEXT NOT NULL,
                 broadcast_area_library_id TEXT NOT NULL,
+                broadcast_area_library_group_id TEXT,
                 feature_geojson TEXT NOT NULL,
                 simple_feature_geojson TEXT NOT NULL,
 
                 FOREIGN KEY (broadcast_area_library_id)
-                    REFERENCES broadcast_area_libraries(id)
+                    REFERENCES broadcast_area_libraries(id),
+
+                FOREIGN KEY (broadcast_area_library_group_id)
+                    REFERENCES broadcast_area_library_groups(id)
             )""")
 
             conn.execute("""
@@ -40,36 +53,49 @@ class BroadcastAreasRepository(object):
             ON broadcast_areas (broadcast_area_library_id);
             """)
 
-    def insert_broadcast_area_library(self, broadcast_area_name):
-        broadcast_area_id = make_string_safe_for_id(broadcast_area_name)
+            conn.execute("""
+            CREATE INDEX broadcast_areas_broadcast_area_library_group_id
+            ON broadcast_areas (broadcast_area_library_group_id);
+            """)
+
+    def insert_broadcast_area_library(self, id, name, is_group):
 
         q = """
-        INSERT INTO broadcast_area_libraries (id, name)
-        VALUES (?, ?)
+        INSERT INTO broadcast_area_libraries (id, name, is_group)
+        VALUES (?, ?, ?)
         """
 
         with self.conn() as conn:
-            conn.execute(q, (broadcast_area_id, broadcast_area_name))
+            conn.execute(q, (id, name, is_group))
+
+    def insert_broadcast_area_library_group(self, id, name, library_id):
+
+        q = """
+        INSERT INTO broadcast_area_library_groups
+        (id, name, broadcast_area_library_id)
+        VALUES (?, ?, ?)
+        """
+
+        with self.conn() as conn:
+            conn.execute(q, (id, name, library_id))
 
     def insert_broadcast_areas(self, areas):
 
         q = """
         INSERT INTO broadcast_areas (
             id, name,
-            broadcast_area_library_id, feature_geojson, simple_feature_geojson
+            broadcast_area_library_id, broadcast_area_library_group_id,
+            feature_geojson, simple_feature_geojson
         )
-        VALUES (?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?)
         """
 
         with self.conn() as conn:
-            for name, area_name, feature, simple_feature in areas:
-                id = make_string_safe_for_id(name)
-                area_id = make_string_safe_for_id(area_name)
-
+            for id, name, area_id, group, feature, simple_feature in areas:
                 conn.execute(q, (
-                    id, name, area_id,
-                    geojson.dumps(feature),
-                    geojson.dumps(simple_feature),
+                    id, name,
+                    area_id, group,
+                    geojson.dumps(feature), geojson.dumps(simple_feature),
                 ))
 
     def query(self, sql, *args):
@@ -79,9 +105,9 @@ class BroadcastAreasRepository(object):
             return cursor.fetchall()
 
     def get_libraries(self):
-        q = "SELECT id, name FROM broadcast_area_libraries"
+        q = "SELECT id, name, is_group FROM broadcast_area_libraries"
         results = self.query(q)
-        libraries = [row[1] for row in results]
+        libraries = [(row[0], row[1], row[2]) for row in results]
         return sorted(libraries)
 
     def get_library_description(self, library_id):
@@ -139,12 +165,45 @@ class BroadcastAreasRepository(object):
         SELECT id, name, feature_geojson, simple_feature_geojson
         FROM broadcast_areas
         WHERE broadcast_area_library_id = ?
+        AND broadcast_area_library_group_id IS NULL
         """
 
         results = self.query(q, library_id)
 
         areas = [
             (row[0], row[1], row[2], row[3])
+            for row in results
+        ]
+
+        return areas
+
+    def get_all_areas_for_group(self, group_id):
+        q = """
+        SELECT id, name, feature_geojson, simple_feature_geojson
+        FROM broadcast_areas
+        WHERE broadcast_area_library_group_id = ?
+        """
+
+        results = self.query(q, group_id)
+
+        areas = [
+            (row[0], row[1], row[2], row[3])
+            for row in results
+        ]
+
+        return areas
+
+    def get_all_groups_for_library(self, library_id):
+        q = """
+        SELECT id, name
+        FROM broadcast_area_library_groups
+        WHERE broadcast_area_library_id = ?
+        """
+
+        results = self.query(q, library_id)
+
+        areas = [
+            (row[0], row[1])
             for row in results
         ]
 
