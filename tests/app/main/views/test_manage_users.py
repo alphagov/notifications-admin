@@ -514,6 +514,22 @@ def test_should_not_show_page_for_non_team_member(
         {},
         set(),
     ),
+    (  # should be able to handle permissions being sent as booleans, until changeover to a list is complete
+        {
+            'view_activity': 'y',
+            'send_messages': 'y',
+            'manage_templates': 'y',
+            'manage_service': 'y',
+            'manage_api_keys': 'y',
+        },
+        {
+            'view_activity',
+            'send_messages',
+            'manage_templates',
+            'manage_service',
+            'manage_api_keys',
+        }
+    ),
 ])
 def test_edit_user_permissions(
     client_request,
@@ -582,6 +598,20 @@ def test_edit_user_permissions(
         },
         {
             'view_activity',
+        }
+    ),
+    (  # should be able to handle permissions being sent as booleans, until changeover to a list is complete
+        {
+            'send_messages': 'y',
+            'manage_templates': 'y',
+            'manage_service': 'y',
+            'manage_api_keys': 'y',
+        },
+        {
+            'view_activity',
+            'send_messages',
+            'manage_service',
+            'manage_templates',
         }
     ),
 ])
@@ -828,9 +858,10 @@ def test_should_show_folder_permission_form_if_service_has_folder_permissions_en
     assert len(folder_checkboxes) == 3
 
 
-@pytest.mark.parametrize('email_address, gov_user', [
-    ('test@example.gov.uk', True),
-    ('test@example.com', False)
+@pytest.mark.parametrize('email_address, gov_user, old_permissions', [
+    ('test@example.gov.uk', True, False),
+    ('test@example.com', False, False),
+    ('test@example.gov.uk', True, True)
 ])
 def test_invite_user(
     client_request,
@@ -839,6 +870,7 @@ def test_invite_user(
     sample_invite,
     email_address,
     gov_user,
+    old_permissions,
     mock_get_template_folders,
     mock_get_organisations,
 ):
@@ -848,19 +880,25 @@ def test_invite_user(
     mocker.patch('app.models.user.InvitedUsers.client_method', return_value=[sample_invite])
     mocker.patch('app.models.user.Users.client_method', return_value=[active_user_with_permissions])
     mocker.patch('app.invite_api_client.create_invite', return_value=sample_invite)
+    data = {'email_address': email_address}
+    if old_permissions:
+        data['view_activity'] = 'y'
+        data['send_messages'] = 'y'
+        data['manage_templates'] = 'y'
+        data['manage_service'] = 'y'
+        data['manage_api_keys'] = 'y'
+    else:
+        data['permissions_field'] = [
+            'view_activity',
+            'send_messages',
+            'manage_templates',
+            'manage_service',
+            'manage_api_keys',
+        ]
     page = client_request.post(
         'main.invite_user',
         service_id=SERVICE_ONE_ID,
-        _data={
-            'email_address': email_address,
-            'permissions_field': [
-                'view_activity',
-                'send_messages',
-                'manage_templates',
-                'manage_service',
-                'manage_api_keys',
-            ]
-        },
+        _data=data,
         _follow_redirects=True,
     )
     assert page.h1.string.strip() == 'Team members'
@@ -965,6 +1003,19 @@ def test_invite_user_with_email_auth_service(
             'view_activity',
         },
     ),
+    (  # should be able to handle permissions being sent as booleans, until changeover to a list is complete
+        {
+            'send_messages': 'y',
+            'manage_templates': 'y',
+            'manage_service': 'y',
+        },
+        {
+            'view_activity',
+            'send_messages',
+            'manage_templates',
+            'manage_service',
+        },
+    )
 ))
 def test_invite_user_to_broadcast_service(
     client_request,
