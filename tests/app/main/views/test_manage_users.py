@@ -1101,9 +1101,11 @@ def test_user_cant_invite_themselves(
         service_id=SERVICE_ONE_ID,
         _data={
             'email_address': active_user_with_permissions['email_address'],
-            'send_messages': 'y',
-            'manage_service': 'y',
-            'manage_api_keys': 'y',
+            'permissions_field': [
+                'send_messages',
+                'manage_service',
+                'manage_api_keys'
+            ]
         },
         _follow_redirects=True,
         _expected_status=200,
