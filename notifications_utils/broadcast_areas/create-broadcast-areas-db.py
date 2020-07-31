@@ -109,16 +109,6 @@ dataset_name = "Electoral Wards of the United Kingdom"
 dataset_id = make_string_safe_for_id(dataset_name)
 repo.insert_broadcast_area_library(dataset_id, dataset_name, True)
 
-for f in geojson.loads(las_filepath.read_text())["features"]:
-    group_id = dataset_id + "-" + f["properties"]["LAD19CD"]
-    group_name = f["properties"]["LAD19NM"]
-
-    try:
-        repo.insert_broadcast_area_library_group(group_id, group_name, dataset_id)
-    except sqlite3.IntegrityError:
-        # Already exists
-        pass
-
 areas_to_add = []
 
 for f in geojson.loads(wards_filepath.read_text())["features"]:

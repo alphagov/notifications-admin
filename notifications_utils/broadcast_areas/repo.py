@@ -68,17 +68,6 @@ class BroadcastAreasRepository(object):
         with self.conn() as conn:
             conn.execute(q, (id, name, is_group))
 
-    def insert_broadcast_area_library_group(self, id, name, library_id):
-
-        q = """
-        INSERT INTO broadcast_area_library_groups
-        (id, name, broadcast_area_library_id)
-        VALUES (?, ?, ?)
-        """
-
-        with self.conn() as conn:
-            conn.execute(q, (id, name, library_id))
-
     def insert_broadcast_areas(self, areas):
 
         q = """
@@ -196,8 +185,9 @@ class BroadcastAreasRepository(object):
     def get_all_groups_for_library(self, library_id):
         q = """
         SELECT id, name
-        FROM broadcast_area_library_groups
-        WHERE broadcast_area_library_id = ?
+        FROM broadcast_areas
+        WHERE broadcast_area_library_group_id = NULL
+        AND broadcast_area_library_id = ?
         """
 
         results = self.query(q, library_id)
