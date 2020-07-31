@@ -614,7 +614,6 @@ def test_upload_csv_file_with_bad_postal_address_shows_check_page_with_errors(
             Firstname Lastname, 123 Example St., France
                               , 123 Example St., SW!A !AA
             "1\n2\n3\n4\n5\n6\n7\n8"
-            =Firstname Lastname, 123 Example St., SW1A 1AA
         '''
     )
 
@@ -631,7 +630,7 @@ def test_upload_csv_file_with_bad_postal_address_shows_check_page_with_errors(
         page.select_one('.banner-dangerous').text
     ) == (
         'There’s a problem with invalid.csv '
-        'You need to fix 5 addresses. '
+        'You need to fix 4 addresses. '
         'Skip to file contents'
     )
     assert [
@@ -648,9 +647,6 @@ def test_upload_csv_file_with_bad_postal_address_shows_check_page_with_errors(
 
         '6 Address must be no more than 7 lines long',
         '1 2 3 4 5 6 7 8',
-
-        '7 Address lines must not start with any of the following characters: @ ( ) = [ ] ” \\ / ,',
-        '=Firstname Lastname 123 Example St. SW1A 1AA',
     ]
 
 
@@ -2541,11 +2537,6 @@ def test_send_one_off_letter_address_populates_address_fields_in_session(
         '\n'.join(['a', 'b', 'c', 'd', 'e', 'f', 'g']),
         ['international_letters'],
         'Last line of the address must be a UK postcode or another country',
-    ),
-    (
-        'a\n(b\nSW1A 1AA',
-        [],
-        'Address lines must not start with any of the following characters: @ ( ) = [ ] ” \\ / ,',
     ),
 ])
 def test_send_one_off_letter_address_rejects_bad_addresses(

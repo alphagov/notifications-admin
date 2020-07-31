@@ -545,18 +545,6 @@ def test_get_letter_validation_error_for_unknown_error():
             'Validation failed because the address must be no more than 7 lines long.'
         ),
     ),
-    (
-        'invalid-char-in-address',
-        None,
-        'There’s a problem with the address for this letter',
-        (
-            'Address lines must not start with any of the following characters: @ ( ) = [ ] ” \\ / ,'
-        ),
-        (
-            'Validation failed because address lines must not start with any of the following '
-            'characters: @ ( ) = [ ] ” \\ / ,'
-        ),
-    ),
 ])
 def test_get_letter_validation_error_for_known_errors(
     client_request,
