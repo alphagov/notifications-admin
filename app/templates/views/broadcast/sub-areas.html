@@ -1,0 +1,33 @@
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import sticky_page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/live-search.html" import live_search %}
+
+{% extends "withnav_template.html" %}
+
+{% block service_page_title %}
+  {{ page_title }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header(
+    page_title,
+    back_link=url_for('.choose_broadcast_library', service_id=current_service.id, broadcast_message_id=broadcast_message.id),
+  )}}
+
+  {% call form_wrapper() %}
+
+    <div class="form-group govuk-!-margin-bottom-4">
+      {{ form.select_all }}
+    </div>
+
+    {{ live_search(target_selector='.multiple-choice', show=show_search_form, form=search_form, label='Or by electoral ward') }}
+
+    {{ form.areas }}
+
+    {{ sticky_page_footer('Add to broadcast') }}
+
+  {% endcall %}
+
+{% endblock %}

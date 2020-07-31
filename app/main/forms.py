@@ -2161,3 +2161,23 @@ class BroadcastAreaForm(StripWhitespaceForm):
         return cls(choices=[
             (area.id, area.name) for area in sorted(library)
         ])
+
+
+class BroadcastAreaFormWithSelectAll(BroadcastAreaForm):
+
+    select_all = govukCheckboxField('Select all')
+
+    @classmethod
+    def from_library(cls, library, select_all_choice):
+        instance = super().from_library(library)
+        (
+            instance.select_all.area_slug,
+            instance.select_all.label.text,
+        ) = select_all_choice
+        return instance
+
+    @property
+    def selected_areas(self):
+        if self.select_all.data:
+            return [self.select_all.area_slug]
+        return self.areas.data

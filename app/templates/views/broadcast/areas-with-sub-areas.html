@@ -1,0 +1,25 @@
+{% from "components/page-header.html" import page_header %}
+{% from "components/live-search.html" import live_search %}
+
+{% extends "withnav_template.html" %}
+
+{% block service_page_title %}
+  {{ library.name }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header(
+    library.name,
+    back_link=url_for('.choose_broadcast_library', service_id=current_service.id, broadcast_message_id=broadcast_message.id),
+  )}}
+
+  {{ live_search(target_selector='.file-list-item', show=show_search_form, form=search_form, label='Search by name') }}
+
+  {% for area in library|sort %}
+    <div class="file-list-item">
+      <a class="file-list-filename-large govuk-link govuk-link--no-visited-state" href="{{ url_for('.choose_broadcast_sub_area', service_id=current_service.id, broadcast_message_id=broadcast_message.id, library_slug=library.id, area_slug=area.id) }}">{{ area.name }}</a>
+    </div>
+  {% endfor %}
+
+{% endblock %}
