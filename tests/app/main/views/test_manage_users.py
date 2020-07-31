@@ -288,11 +288,15 @@ def test_service_without_caseworking_doesnt_show_admin_vs_caseworker(
         service_id=SERVICE_ONE_ID,
         **extra_args
     )
-    assert page.select('input[type=checkbox]')[0]['value'] == 'view_activity'
-    assert page.select('input[type=checkbox]')[1]['value'] == 'send_messages'
-    assert page.select('input[type=checkbox]')[2]['value'] == 'manage_templates'
-    assert page.select('input[type=checkbox]')[3]['value'] == 'manage_service'
-    assert page.select('input[type=checkbox]')[4]['value'] == 'manage_api_keys'
+    permission_checkboxes = page.select('input[type=checkbox]')
+
+    for idx in range(len(permission_checkboxes)):
+        assert permission_checkboxes[idx]['name'] == 'permissions_field'
+    assert permission_checkboxes[0]['value'] == 'view_activity'
+    assert permission_checkboxes[1]['value'] == 'send_messages'
+    assert permission_checkboxes[2]['value'] == 'manage_templates'
+    assert permission_checkboxes[3]['value'] == 'manage_service'
+    assert permission_checkboxes[4]['value'] == 'manage_api_keys'
 
 
 @pytest.mark.parametrize('endpoint, extra_args', [
@@ -320,11 +324,11 @@ def test_broadcast_service_only_shows_relevant_permissions(
         **extra_args
     )
     assert [
-        field['value'] for field in page.select('input[type=checkbox]')
+        (field['name'], field['value']) for field in page.select('input[type=checkbox]')
     ] == [
-        'send_messages',
-        'manage_templates',
-        'manage_service',
+        ('permissions_field', 'send_messages'),
+        ('permissions_field', 'manage_templates'),
+        ('permissions_field', 'manage_service'),
     ]
 
 
@@ -433,6 +437,7 @@ def test_should_show_page_for_one_user(
 
     for index, expected in enumerate(expected_checkboxes):
         expected_input_value, expected_checked = expected
+        assert checkboxes[index]['name'] == 'permissions_field'
         assert checkboxes[index]['value'] == expected_input_value
         assert checkboxes[index].has_attr('checked') == expected_checked
 
