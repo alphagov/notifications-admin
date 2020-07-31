@@ -755,6 +755,20 @@ def filter_by_broadcast_permissions(valuelist):
         return [entry for entry in valuelist if any(entry in role for role in broadcast_permissions)]
 
 
+# Included to support both versions of how user permissions are handled in permissions forms
+# Remove when changeover to new version (permissions_field) is complete
+PermissionsAbstract = type("PermissionsAbstract", (StripWhitespaceForm,), {
+    permission: BooleanField(label) for permission, label in permissions
+})
+
+
+# Included to support both versions of how user permissions are handled in permissions forms
+# Remove when changeover to new version (permissions_field) is complete
+BroadcastPermissionsAbstract = type("BroadcastPermissionsAbstract", (StripWhitespaceForm,), {
+    permission: BooleanField(label) for permission, label in broadcast_permissions
+})
+
+
 class BasePermissionsForm(StripWhitespaceForm):
     def __init__(self, all_template_folders=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -790,9 +804,25 @@ class BasePermissionsForm(StripWhitespaceForm):
         }
     )
 
+    # Modified to support both versions of how user permissions are handled in permissions forms
+    # Remove when changeover to new version (permissions_field) is complete
     @property
     def permissions(self):
-        return set(self.permissions_field.data)
+        permissions_field_data = set(self.permissions_field.data)
+        permissions_fields_data = {field.id for field in self.permissions_fields if field.data is True}
+        if len(permissions_field_data) == 0 and len(permissions_fields_data) != 0:
+            return permissions_fields_data
+        else:
+            return permissions_field_data
+
+    # Included to support both versions of how user permissions are handled in permissions forms
+    # Remove when changeover to new version (permissions_field) is complete
+    @property
+    def permissions_fields(self):
+        return (
+            getattr(self, permission) for permission, field in self.__dict__.items()
+            if isinstance(field, BooleanField)
+        )
 
     @classmethod
     def from_user(cls, user, service_id, **kwargs):
@@ -806,11 +836,15 @@ class BasePermissionsForm(StripWhitespaceForm):
         )
 
 
-class PermissionsForm(BasePermissionsForm):
+# Included to support both versions of how user permissions are handled in permissions forms
+# Remove when changeover to new version (permissions_field) is complete
+class PermissionsForm(PermissionsAbstract, BasePermissionsForm):
     pass
 
 
-class BroadcastPermissionsForm(BasePermissionsForm):
+# Included to support both versions of how user permissions are handled in permissions forms
+# Remove when changeover to new version (permissions_field) is complete
+class BroadcastPermissionsForm(BroadcastPermissionsAbstract, BasePermissionsForm):
 
     permissions_field = govukCheckboxesField(
         'Permssions',
