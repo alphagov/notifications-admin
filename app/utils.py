@@ -733,7 +733,17 @@ LETTER_VALIDATION_MESSAGES = {
             f'Validation failed because the address must be no more '
             f'than {PostalAddress.MAX_LINES} lines long.'
         ),
-    }
+    },
+    'invalid-char-in-address': {
+        'title': 'There’s a problem with the address for this letter',
+        'detail': (
+            "Address lines must not start with any of the following characters: @ ( ) = [ ] ” \\ / ,"
+        ),
+        'summary': (
+            "Validation failed because address lines must not start with any of the "
+            "following characters: @ ( ) = [ ] ” \\ / ,"
+        ),
+    },
 }
 
 

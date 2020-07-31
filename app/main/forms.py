@@ -853,6 +853,11 @@ class LetterAddressForm(StripWhitespaceForm):
                 f'Last line of the address must be a real UK postcode'
             )
 
+        if address.has_invalid_characters:
+            raise ValidationError(
+                'Address lines must not start with any of the following characters: @ ( ) = [ ] ” \\ / ,'
+            )
+
 
 class EmailTemplateForm(BaseTemplateForm):
     subject = TextAreaField(
