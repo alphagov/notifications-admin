@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import geojson
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 import matplotlib.pyplot as plt
@@ -32,21 +33,21 @@ def main():
         all_areas = BroadcastAreasRepository().get_all_areas_for_library(lid)
         some_areas = sample(all_areas, min(len(all_areas), 25))
         for area in some_areas:
-            print("  ", area[1])  # noqa: T001
+            print("  ", area[0], area[1])  # noqa: T001
 
         inp = input("> ")
         if inp == "":
             break
 
-        aid = make_string_safe_for_id(inp)
+        aid = inp.strip()
         area = BroadcastAreasRepository().get_areas([aid])[0]
 
         feature = area[-2]
-        feature_shape = sgeom.shape(feature["geometry"])
+        feature_shape = sgeom.shape(geojson.loads(feature)["geometry"])
         features.append(feature_shape)
 
         simple_feature = area[-1]
-        simple_feature_shape = sgeom.shape(simple_feature["geometry"])
+        simple_feature_shape = sgeom.shape(geojson.loads(simple_feature)["geometry"])
         simple_features.append(simple_feature_shape)
 
     print()  # noqa: T001
