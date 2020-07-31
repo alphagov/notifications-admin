@@ -1,6 +1,8 @@
 import geojson
 import itertools
 
+from werkzeug.utils import cached_property
+
 from notifications_utils.serialised_model import SerialisedModelCollection
 from notifications_utils.safe_string import make_string_safe_for_id
 
@@ -35,10 +37,7 @@ class BroadcastArea(SortableMixin):
         self.name = name
 
         self._feature = feature
-        self._geofeature = None
-
         self._simple_feature = simple_feature
-        self._simple_geofeature = None
 
         for coordinates in self.polygons:
             if coordinates[0] != coordinates[-1]:
@@ -89,19 +88,13 @@ class BroadcastArea(SortableMixin):
     def simple_unenclosed_polygons(self):
         return self._unenclosed_polygons(self.simple_feature)
 
-    @property
+    @cached_property
     def feature(self):
-        if self._geofeature is None:
-            self._geofeature = geojson.loads(self._feature)
+        return geojson.loads(self._feature)
 
-        return self._geofeature
-
-    @property
+    @cached_property
     def simple_feature(self):
-        if self._simple_geofeature is None:
-            self._simple_geofeature = geojson.loads(self._simple_feature)
-
-        return self._simple_geofeature
+        return geojson.loads(self._simple_feature)
 
     @property
     def sub_areas(self):
