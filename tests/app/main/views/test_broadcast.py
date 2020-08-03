@@ -412,7 +412,13 @@ def test_start_broadcasting(
         broadcast_message_id=fake_uuid,
         _data={
             'finishes_at': end_time,
-        }
+        },
+        _expected_redirect=url_for(
+            'main.view_broadcast_message',
+            service_id=SERVICE_ONE_ID,
+            broadcast_message_id=fake_uuid,
+            _external=True,
+        ),
     ),
     mock_update_broadcast_message.assert_called_once_with(
         service_id=SERVICE_ONE_ID,

@@ -169,8 +169,9 @@ def preview_broadcast_message(service_id, broadcast_message_id):
     if form.validate_on_submit():
         broadcast_message.request_approval(until=form.finishes_at.data)
         return redirect(url_for(
-            '.broadcast_dashboard',
+            '.view_broadcast_message',
             service_id=current_service.id,
+            broadcast_message_id=broadcast_message.id,
         ))
 
     return render_template(
