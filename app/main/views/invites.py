@@ -40,6 +40,9 @@ def accept_invite(token):
 
     if invited_user.status == 'accepted':
         session.pop('invited_user', None)
+        service = Service.from_id(invited_user.service)
+        if service.has_permission('broadcast'):
+            return redirect(url_for('main.broadcast_tour', service_id=service.id, step_index=1))
         return redirect(url_for('main.service_dashboard', service_id=invited_user.service))
 
     session['invited_user'] = invited_user.serialize()
@@ -66,6 +69,8 @@ def accept_invite(token):
                 permissions=invited_user.permissions,
                 folder_permissions=invited_user.folder_permissions,
             )
+            if service.has_permission('broadcast'):
+                return redirect(url_for('main.broadcast_tour', service_id=service.id, step_index=1))
             return redirect(url_for('main.service_dashboard', service_id=service.id))
     else:
         return redirect(url_for('main.register_from_invite'))

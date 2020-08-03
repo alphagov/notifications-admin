@@ -319,6 +319,7 @@ def test_register_from_email_auth_invite(
     mock_accept_invite,
     mock_create_event,
     mock_add_user_to_service,
+    mock_get_service,
     invite_email_address,
 ):
     sample_invite['auth_type'] = 'email_auth'
@@ -372,6 +373,7 @@ def test_can_register_email_auth_without_phone_number(
     mock_accept_invite,
     mock_create_event,
     mock_add_user_to_service,
+    mock_get_service,
 ):
     sample_invite['auth_type'] = 'email_auth'
     with client.session_transaction() as session:
