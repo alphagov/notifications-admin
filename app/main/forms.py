@@ -34,7 +34,6 @@ from wtforms import (
     TextAreaField,
     ValidationError,
     validators,
-    widgets,
 )
 from wtforms.fields.html5 import EmailField, SearchField, TelField
 from wtforms.validators import URL, DataRequired, Length, Optional, Regexp
@@ -1804,10 +1803,6 @@ class PlaceholderForm(StripWhitespaceForm):
     pass
 
 
-class PasswordFieldShowHasContent(StringField):
-    widget = widgets.PasswordInput(hide_value=False)
-
-
 class ServiceInboundNumberForm(StripWhitespaceForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -1820,35 +1815,19 @@ class ServiceInboundNumberForm(StripWhitespaceForm):
 
 
 class CallbackForm(StripWhitespaceForm):
+    url = GovukTextInputField(
+        "URL",
+        validators=[DataRequired(message='Cannot be empty'),
+                    Regexp(regex="^https.*", message='Must be a valid https URL')]
+    )
+    bearer_token = GovukPasswordField(
+        "Bearer token",
+        validators=[DataRequired(message='Cannot be empty'),
+                    Length(min=10, message='Must be at least 10 characters')]
+    )
 
     def validate(self):
         return super().validate() or self.url.data == ''
-
-
-class ServiceReceiveMessagesCallbackForm(CallbackForm):
-    url = StringField(
-        "URL",
-        validators=[DataRequired(message='Cannot be empty'),
-                    Regexp(regex="^https.*", message='Must be a valid https URL')]
-    )
-    bearer_token = PasswordFieldShowHasContent(
-        "Bearer token",
-        validators=[DataRequired(message='Cannot be empty'),
-                    Length(min=10, message='Must be at least 10 characters')]
-    )
-
-
-class ServiceDeliveryStatusCallbackForm(CallbackForm):
-    url = StringField(
-        "URL",
-        validators=[DataRequired(message='Cannot be empty'),
-                    Regexp(regex="^https.*", message='Must be a valid https URL')]
-    )
-    bearer_token = PasswordFieldShowHasContent(
-        "Bearer token",
-        validators=[DataRequired(message='Cannot be empty'),
-                    Length(min=10, message='Must be at least 10 characters')]
-    )
 
 
 class InternationalSMSForm(StripWhitespaceForm):
