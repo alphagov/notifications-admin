@@ -9,7 +9,6 @@ from itsdangerous import SignatureExpired
 from notifications_python_client.errors import HTTPError
 
 from app.main.views.verify import activate_user
-from tests.conftest import normalize_spaces
 
 
 def test_should_return_verify_template(
@@ -96,10 +95,8 @@ def test_should_return_200_when_sms_code_is_wrong(
         _expected_status=200,
     )
 
-    assert len(page.select('.error-message')) == 1
-    assert normalize_spaces(page.select_one('.error-message').text) == (
-        'Code not found'
-    )
+    assert len(page.select('.govuk-error-message')) == 1
+    assert 'Code not found' in page.select_one('.govuk-error-message').text
 
 
 def test_verify_email_redirects_to_verify_if_token_valid(

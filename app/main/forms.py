@@ -310,7 +310,7 @@ class GovukSearchField(SearchField):
         return govuk_field_widget(self, field, type="search", param_extensions=params, **kwargs)
 
 
-class SMSCode(StringField):
+class SMSCode(GovukTextInputField):
     validators = [
         DataRequired(message='Cannot be empty'),
         Regexp(regex=r'^\d+$', message='Numbers only'),
@@ -319,7 +319,12 @@ class SMSCode(StringField):
     ]
 
     def __call__(self, **kwargs):
-        return super().__call__(type='tel', pattern='[0-9]*', **kwargs)
+        params = {"attributes": {"pattern": "[0-9]*"}}
+        if "param_extensions" in kwargs:
+            kwargs["param_extensions"].update(params)
+        else:
+            kwargs["param_extensions"] = params
+        return super().__call__(type='tel', **kwargs)
 
     def process_formdata(self, valuelist):
         if valuelist:
