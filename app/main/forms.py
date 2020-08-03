@@ -2066,7 +2066,7 @@ class TemplateFolderForm(StripWhitespaceForm):
     users_with_permission = govukCollapsibleCheckboxesField(
         'Team members who can see this folder',
         field_label='folder')
-    name = StringField('Folder name', validators=[DataRequired(message='Cannot be empty')])
+    name = GovukTextInputField('Folder name', validators=[DataRequired(message='Cannot be empty')])
 
 
 def required_for_ops(*operations):
