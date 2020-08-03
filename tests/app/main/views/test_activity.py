@@ -402,7 +402,7 @@ def test_shows_message_when_no_notifications(
         {
             'to': 'Firstname Lastname',
         },
-        'Search by first line of address or file name',
+        'Search by postal address or file name',
         'Firstname Lastname',
     ),
 ])
@@ -448,7 +448,7 @@ def test_search_recipient_form(
     (None, 'Search by recipient or reference'),
     ('sms', 'Search by phone number or reference'),
     ('email', 'Search by email address or reference'),
-    ('letter', 'Search by first line of address, file name or reference'),
+    ('letter', 'Search by postal address, file name or reference'),
 ])
 def test_api_users_are_told_they_can_search_by_reference_when_service_has_api_keys(
     client_request,
@@ -473,7 +473,7 @@ def test_api_users_are_told_they_can_search_by_reference_when_service_has_api_ke
     (None, 'Search by recipient'),
     ('sms', 'Search by phone number'),
     ('email', 'Search by email address'),
-    ('letter', 'Search by first line of address or file name'),
+    ('letter', 'Search by postal address or file name'),
 ])
 def test_api_users_are_not_told_they_can_search_by_reference_when_service_has_no_api_keys(
     client_request,
@@ -757,8 +757,8 @@ def test_sending_status_hint_displays_correctly_on_notifications_page(
 
 
 @pytest.mark.parametrize("is_precompiled_letter,expected_address,expected_hint", [
-    (True, "Full Name,\nFirst address line\npostcode", "ref"),
-    (False, "Full Name,\nFirst address line\npostcode", "template subject")
+    (True, "Full Name\nFirst address line\npostcode", "ref"),
+    (False, "Full Name\nFirst address line\npostcode", "template subject")
 ])
 def test_should_show_address_and_hint_for_letters(
     client_request,
@@ -786,5 +786,5 @@ def test_should_show_address_and_hint_for_letters(
         message_type='letter',
     )
 
-    assert page.select_one('a.file-list-filename').text == 'Full Name'
+    assert page.select_one('a.file-list-filename').text == 'Full Name, First address line, postcode'
     assert page.find('p', {'class': 'file-list-hint'}).text.strip() == expected_hint
