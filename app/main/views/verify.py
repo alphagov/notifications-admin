@@ -15,6 +15,7 @@ from notifications_utils.url_safe_token import check_token
 from app import user_api_client
 from app.main import main
 from app.main.forms import TwoFactorForm
+from app.models.service import Service
 from app.models.user import InvitedUser, User
 from app.utils import redirect_to_sign_in
 
@@ -77,6 +78,9 @@ def activate_user(user_id):
     invited_user = session.get('invited_user')
     if invited_user:
         service_id = _add_invited_user_to_service(invited_user)
+        service = Service.from_id(service_id)
+        if service.has_permission('broadcast'):
+            return redirect(url_for('main.broadcast_tour', service_id=service.id, step_index=1))
         return redirect(url_for('main.service_dashboard', service_id=service_id))
 
     invited_org_user = session.get('invited_org_user')

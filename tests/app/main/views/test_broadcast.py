@@ -94,6 +94,7 @@ def test_empty_broadcast_dashboard(
     client_request,
     service_one,
     mock_get_no_broadcast_messages,
+    mock_get_service_templates_when_no_templates_exist,
 ):
     service_one['permissions'] += ['broadcast']
     page = client_request.get(
@@ -114,6 +115,7 @@ def test_broadcast_dashboard(
     client_request,
     service_one,
     mock_get_broadcast_messages,
+    mock_get_service_templates,
 ):
     service_one['permissions'] += ['broadcast']
     page = client_request.get(

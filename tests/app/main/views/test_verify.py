@@ -178,6 +178,7 @@ def test_activate_user_redirects_to_service_dashboard_if_user_already_belongs_to
     sample_invite,
     api_user_active,
     mock_login,
+    mock_get_service,
 ):
     mocker.patch('app.user_api_client.add_user_to_service', side_effect=HTTPError(
         response=Mock(

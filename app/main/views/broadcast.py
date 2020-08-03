@@ -19,6 +19,17 @@ from app.models.broadcast_message import BroadcastMessage, BroadcastMessages
 from app.utils import service_has_permission, user_has_permissions
 
 
+@main.route('/services/<uuid:service_id>/broadcast-tour/<int:step_index>')
+@user_has_permissions()
+@service_has_permission('broadcast')
+def broadcast_tour(service_id, step_index):
+    if step_index not in (1, 2, 3):
+        abort(404)
+    return render_template(
+        f'views/broadcast/tour/{step_index}.html'
+    )
+
+
 @main.route('/services/<uuid:service_id>/broadcast-dashboard')
 @user_has_permissions()
 @service_has_permission('broadcast')

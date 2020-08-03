@@ -352,6 +352,7 @@ class HeaderNavigation(Navigation):
         'old_guest_list',
         'who_can_use_notify',
         'who_its_for',
+        'broadcast_tour',
         'broadcast_dashboard',
         'broadcast_dashboard_updates',
         'broadcast',
@@ -375,6 +376,7 @@ class MainNavigation(Navigation):
 
     mapping = {
         'dashboard': {
+            'broadcast_tour',
             'broadcast_dashboard',
             'broadcast_dashboard_updates',
             'conversation',
@@ -702,6 +704,7 @@ class CaseworkNavigation(Navigation):
 
     mapping = {
         'dashboard': {
+            'broadcast_tour',
             'broadcast_dashboard',
             'broadcast_dashboard_updates',
         },
@@ -1330,6 +1333,7 @@ class OrgNavigation(Navigation):
         'old_guest_list',
         'who_can_use_notify',
         'who_its_for',
+        'broadcast_tour',
         'broadcast_dashboard',
         'broadcast_dashboard_updates',
         'broadcast',

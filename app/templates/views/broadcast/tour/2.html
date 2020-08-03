@@ -1,0 +1,44 @@
+{% from "components/banner.html" import banner_wrapper %}
+
+{% extends "admin_template.html" %}
+
+{% block per_page_title %}
+  Step 2
+{% endblock %}
+
+{% set mainClasses = "govuk-!-padding-top-0 govuk-!-padding-bottom-0" %}
+
+{% block content %}
+
+  <div class="banner-tour banner-tour-no-fixed-height govuk-!-margin-top-0">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-one-half">
+        <h1 class="heading-medium">
+          A broadcast will alert every phone in an area
+        </h1>
+        <ul>
+          <li>
+            The alert will appear even if the phone’s screen is locked
+          </li>
+          <li>
+            The phone will play an alarm sound even if it’s set to silent
+          </li>
+          <li>
+            Any phone that enters the area while the broadcast is live will
+            get the alert
+          </li>
+        </ul>
+        <p class="govuk-body heading-medium govuk-!-margin-bottom-6">
+          <a class="govuk-link govuk-link--no-visited-state" href='{{ url_for(".broadcast_tour", service_id=current_service.id, step_index=3) }}'>
+            How to try it out
+          </a>
+        </p>
+      </div>
+      <div class="govuk-grid-column-one-half">
+        <img src="{{ asset_url('images/broadcast-tour/2.png') }}" alt="">
+        <link rel="preload" href="{{ asset_url('images/broadcast-tour/3.png') }}" as="image">
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

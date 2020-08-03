@@ -78,6 +78,11 @@
   box-shadow: inset 0 -1em 1.6em 0 rgba(0, 0, 0, 0.05);
   border: 0;
 
+  &-no-fixed-height {
+    height: auto;
+    min-height: 425px;
+  }
+
   .heading-medium {
     @include core-24;
   }
@@ -96,6 +101,18 @@
       margin-top: -1 * govuk-spacing(3);
     }
 
+  }
+
+  ul {
+    @include core-24;
+    color: $white;
+    margin-bottom: govuk-spacing(5);
+  }
+
+  li {
+    margin-bottom: govuk-spacing(3);
+    list-style-type: disc;
+    margin-left: govuk-spacing(6);
   }
 
   a {
@@ -122,6 +139,10 @@
       outline: 10px solid $link-hover-colour;
     }
 
+  }
+  img {
+    width: 100%;
+    height: auto;
   }
 
   .greyed-out-step {
