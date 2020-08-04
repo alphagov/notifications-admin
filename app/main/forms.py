@@ -1061,7 +1061,7 @@ class AddGPOrganisationForm(StripWhitespaceForm):
         ),
     )
 
-    name = StringField(
+    name = GovukTextInputField(
         'What’s your practice called?',
     )
 

@@ -358,7 +358,7 @@ def test_validation_of_gps_creating_organisations(
         _data=data,
         _expected_status=200,
     )
-    assert normalize_spaces(page.select_one('.error-message').text) == expected_error
+    assert expected_error in page.select_one('.govuk-error-message, .error-message').text
 
 
 def test_nhs_local_assigns_to_selected_organisation(
