@@ -120,7 +120,7 @@ class BroadcastAreasRepository(object):
             (SELECT * FROM description_areas_joined)
         ELSE
             (SELECT * FROM description_areas_joined)
-            || ", "
+            || ", and "
             || (SELECT * FROM subset_area_count)
             || " more…"
         END

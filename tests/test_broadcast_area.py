@@ -53,7 +53,7 @@ def test_examples():
         broadcast_area_libraries.get('countries').get_examples(),
     )
     assert re.match(
-        "^([^,]*, ){4}5 more…$",
+        "^([^,]*, ){4}and 5 more…$",
         broadcast_area_libraries.get('regions-of-england').get_examples()
     )
 
