@@ -1,6 +1,5 @@
 {% extends "withnav_template.html" %}
 {% from "components/textbox.html" import textbox %}
-{% from "components/checkbox.html" import checkbox %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
@@ -23,9 +22,7 @@
       hint='Up to 11 characters, letters, numbers and spaces only'
     ) }}
     {% if not first_sms_sender %}
-      <div class="form-group">
-        {{ checkbox(form.is_default) }}
-      </div>
+      {{ form.is_default }}
     {% endif %}
     {{ page_footer('Save') }}
   {% endcall %}

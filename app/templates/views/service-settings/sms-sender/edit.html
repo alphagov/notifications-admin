@@ -1,7 +1,6 @@
 {% extends "withnav_template.html" %}
 {% from "components/banner.html" import banner_wrapper %}
 {% from "components/textbox.html" import textbox %}
-{% from "components/checkbox.html" import checkbox %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
@@ -35,9 +34,7 @@
       </p>
       {{ page_footer('Save') }}
     {% else %}
-      <div class="form-group">
-        {{ checkbox(form.is_default) }}
-      </div>
+      {{ form.is_default }}
       {% if inbound_number %}
         {{ page_footer('Save') }}
       {% else %}

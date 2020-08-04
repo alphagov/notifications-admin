@@ -24,10 +24,13 @@
   }
 }
 
+$govuk-checkboxes-size: 40px;
+$govuk-checkboxes-label-padding-left-right: govuk-spacing(3);
+$message-type-bottom-spacing: govuk-spacing(4);
+
 .message {
 
   &-name {
-    @include bold-24;
     margin: 0;
 
     a {
@@ -63,19 +66,10 @@
   }
 
   &-type {
-    color: $secondary-text-colour;
-    margin: 0 0 govuk-spacing(4) 0;
+    color: $govuk-secondary-text-colour;
+    margin: 0 0 $message-type-bottom-spacing 0;
+    padding-left: 0;
     pointer-events: none;
-  }
-
-}
-
-#template-list {
-
-  margin-top: govuk-spacing(6);
-
-  &.top-gutter-5px {
-    margin-top: 5px;
   }
 
 }
@@ -85,15 +79,7 @@
   &-item {
 
     &-with-checkbox {
-
-      position: relative;
-      padding-left: govuk-spacing(9);
-
-      .multiple-choice {
-        position: absolute;
-        left: 0;
-      }
-
+      padding-left: $govuk-checkboxes-size + $govuk-checkboxes-label-padding-left-right;
     }
 
     &-hidden-by-default {
@@ -123,6 +109,29 @@
 
     }
 
+    &-label {
+      position: absolute;
+      left: 0;
+      width: $govuk-checkboxes-size + $govuk-checkboxes-label-padding-left-right;
+      height: 100%;
+      padding: 0;
+    }
+
+    // Fix for GOVUK Frontend selector with high precendence
+    // https://github.com/alphagov/govuk-frontend/blob/v2.13.0/src/components/hint/_hint.scss
+    &-label:not(.govuk-label--m):not(.govuk-label--l):not(.govuk-label--xl)+.template-list-item-hint {
+      margin-bottom: $message-type-bottom-spacing;
+    }
+
+    &-hint {
+      padding-left: 0;
+    }
+
+  }
+
+  &-folder,
+  &-template {
+    @include govuk-font($size: 24, $weight: bold, $line-height: 1.25);
   }
 
   &-folder {

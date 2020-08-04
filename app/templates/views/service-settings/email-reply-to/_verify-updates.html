@@ -1,6 +1,5 @@
 {% from "components/banner.html" import banner, banner_wrapper %}
 {% from "components/textbox.html" import textbox %}
-{% from "components/checkbox.html" import checkbox %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 {% from "components/button/macro.njk" import govukButton %}
@@ -55,9 +54,7 @@
         hint='This should be a shared inbox managed by your team, not your own email address'
       ) }}
       {% if not first_email_address and not existing_is_default %}
-        <div class="form-group">
-          {{ checkbox(form.is_default) }}
-        </div>
+        {{ form.is_default }}
       {% endif %}
       {{ page_footer('Try again') }}
     {% endcall %}
