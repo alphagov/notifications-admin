@@ -135,7 +135,16 @@ for f in geojson.loads(wards_filepath.read_text())["features"]:
 repo.insert_broadcast_areas(areas_to_add)
 areas_to_add = []
 
-for group_id, group_name in repo.get_all_groups_for_library(dataset_id):
+seen = set()
+for feature in geojson.loads(las_filepath.read_text())["features"]:
+    la_id = feature["properties"]["LAD19CD"]
+    group_name = feature["properties"]["LAD19NM"]
+
+    if la_id in seen:
+        continue
+    seen.add(la_id)
+
+    group_id = dataset_id + "-" + la_id
     areas = repo.get_all_areas_for_group(group_id)
 
     features = [geojson.loads(f) for _, _, f, _ in areas]
@@ -144,7 +153,6 @@ for group_id, group_name in repo.get_all_groups_for_library(dataset_id):
     if len(shapes) == 0:
         continue
 
-    print(group_id, group_name, "union")
     shape = shapes[0]
     for other in shapes[1:]:
         shape = shape.buffer(0).union(other.buffer(0))
