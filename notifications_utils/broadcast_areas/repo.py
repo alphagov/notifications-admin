@@ -3,8 +3,6 @@ import os
 from pathlib import Path
 import sqlite3
 
-from notifications_utils.safe_string import make_string_safe_for_id
-
 
 class BroadcastAreasRepository(object):
     def __init__(self):

@@ -4,7 +4,6 @@ import itertools
 from werkzeug.utils import cached_property
 
 from notifications_utils.serialised_model import SerialisedModelCollection
-from notifications_utils.safe_string import make_string_safe_for_id
 
 from .repo import BroadcastAreasRepository
 
