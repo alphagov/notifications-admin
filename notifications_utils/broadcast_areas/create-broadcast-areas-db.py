@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 from copy import deepcopy
-import sqlite3
 import geojson
 from pathlib import Path
 import shapely.geometry as sgeom
