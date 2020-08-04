@@ -1033,7 +1033,7 @@ class RenameServiceForm(StripWhitespaceForm):
 
 
 class RenameOrganisationForm(StripWhitespaceForm):
-    name = StringField(
+    name = GovukTextInputField(
         u'Organisation name',
         validators=[
             DataRequired(message='Cannot be empty'),
