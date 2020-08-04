@@ -2285,14 +2285,14 @@ def test_incorrect_sms_sender_input(
         _expected_status=(200 if expected_error else 302)
     )
 
-    error_message = page.select_one('.error-message')
+    error_message = page.select_one('.govuk-error-message')
     count_of_api_calls = len(mock_add_sms_sender.call_args_list)
 
     if not expected_error:
         assert not error_message
         assert count_of_api_calls == 1
     else:
-        assert normalize_spaces(error_message.text) == expected_error
+        assert expected_error in error_message.text
         assert count_of_api_calls == 0
 
 

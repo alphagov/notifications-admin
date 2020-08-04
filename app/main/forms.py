@@ -1563,7 +1563,7 @@ class ServiceReplyToEmailForm(StripWhitespaceForm):
 
 
 class ServiceSmsSenderForm(StripWhitespaceForm):
-    sms_sender = StringField(
+    sms_sender = GovukTextInputField(
         'Text message sender',
         validators=[
             DataRequired(message="Cannot be empty"),
