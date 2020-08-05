@@ -1,4 +1,5 @@
 import json
+import uuid
 
 import pytest
 from flask import url_for
@@ -542,6 +543,7 @@ def test_view_pending_broadcast(
     mocker,
     client_request,
     service_one,
+    active_user_with_permissions,
     mock_get_broadcast_template,
     fake_uuid,
 ):
@@ -556,6 +558,10 @@ def test_view_pending_broadcast(
             status='pending-approval',
         ),
     )
+    mocker.patch('app.user_api_client.get_user', side_effect=[
+        active_user_with_permissions,  # Current user
+        user_json(id_=uuid.uuid4()),  # User who created broadcast
+    ])
     service_one['permissions'] += ['broadcast']
 
     page = client_request.get(
@@ -578,6 +584,57 @@ def test_view_pending_broadcast(
 
     link = form.select_one('a.govuk-link.govuk-link--destructive')
     assert link.text == 'Reject this broadcast'
+    assert link['href'] == url_for(
+        '.reject_broadcast_message',
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+    )
+
+
+@freeze_time('2020-02-22T22:22:22.000000')
+def test_cant_approve_own_broadcast(
+    mocker,
+    client_request,
+    service_one,
+    active_user_with_permissions,
+    mock_get_broadcast_template,
+    fake_uuid,
+):
+    mocker.patch(
+        'app.broadcast_message_api_client.get_broadcast_message',
+        return_value=broadcast_message_json(
+            id_=fake_uuid,
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            created_by_id=fake_uuid,
+            finishes_at='2020-02-23T23:23:23.000000',
+            status='pending-approval',
+        ),
+    )
+    mocker.patch('app.user_api_client.get_user', side_effect=[
+        active_user_with_permissions,  # Current user
+        active_user_with_permissions,  # User who created broadcast (the same)
+    ])
+    service_one['permissions'] += ['broadcast']
+
+    page = client_request.get(
+        '.view_broadcast_message',
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+    )
+
+    assert (
+        normalize_spaces(page.select_one('.banner').text)
+    ) == (
+        'Your broadcast is waiting for approval from another member of your team '
+        'Once approved it will be live until tomorrow at 11:23pm '
+        'Withdraw this broadcast'
+    )
+
+    assert not page.select_one('form')
+
+    link = page.select_one('.banner a.govuk-link.govuk-link--destructive')
+    assert link.text == 'Withdraw this broadcast'
     assert link['href'] == url_for(
         '.reject_broadcast_message',
         service_id=SERVICE_ONE_ID,

@@ -3,6 +3,7 @@ from datetime import datetime
 from notifications_utils.broadcast_areas import broadcast_area_libraries
 from notifications_utils.template import BroadcastPreviewTemplate
 from orderedset import OrderedSet
+from werkzeug.utils import cached_property
 
 from app.models import JSONModel, ModelList
 from app.models.user import User
@@ -94,15 +95,15 @@ class BroadcastMessage(JSONModel):
             return 'completed'
         return self._dict['status']
 
-    @property
+    @cached_property
     def created_by(self):
         return User.from_id(self.created_by_id)
 
-    @property
+    @cached_property
     def approved_by(self):
         return User.from_id(self.approved_by_id)
 
-    @property
+    @cached_property
     def cancelled_by(self):
         return User.from_id(self.cancelled_by_id)
 

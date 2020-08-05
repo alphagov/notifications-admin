@@ -1,5 +1,6 @@
 {% from "components/button/macro.njk" import govukButton %}
 {% from "components/form.html" import form_wrapper %}
+{% from "components/banner.html" import banner %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 
@@ -17,17 +18,30 @@
   ) }}
 
   {% if broadcast_message.status == 'pending-approval' %}
-    {% call form_wrapper(class="banner govuk-!-margin-bottom-6") %}
-      <p class="govuk-body govuk-!-margin-top-0 govuk-!-margin-bottom-3">
-        {{ broadcast_message.created_by.name }} wants to broadcast this
-        message until {{ broadcast_message.finishes_at|format_datetime_relative }}.
-      </p>
-      {{ page_footer(
-        "Start broadcasting now",
-        delete_link=url_for('main.reject_broadcast_message', service_id=current_service.id, broadcast_message_id=broadcast_message.id),
-        delete_link_text='Reject this broadcast'
-      ) }}
-    {% endcall %}
+    {% if broadcast_message.created_by == current_user %}
+      <div class="banner govuk-!-margin-bottom-6">
+        <h2 class="govuk-heading-s govuk-!-margin-bottom-3">Your broadcast is waiting for approval from another member of your team</h2>
+        <p class="govuk-body">Once approved it will be live until
+          {{ broadcast_message.finishes_at|format_datetime_relative }}
+        </p>
+        {{ page_footer(
+          delete_link=url_for('main.reject_broadcast_message', service_id=current_service.id, broadcast_message_id=broadcast_message.id),
+          delete_link_text='Withdraw this broadcast'
+        ) }}
+      </div>
+    {% else %}
+      {% call form_wrapper(class="banner govuk-!-margin-bottom-6") %}
+        <p class="govuk-body govuk-!-margin-top-0 govuk-!-margin-bottom-3">
+          {{ broadcast_message.created_by.name }} wants to broadcast this
+          message until {{ broadcast_message.finishes_at|format_datetime_relative }}.
+        </p>
+        {{ page_footer(
+          "Start broadcasting now",
+          delete_link=url_for('main.reject_broadcast_message', service_id=current_service.id, broadcast_message_id=broadcast_message.id),
+          delete_link_text='Reject this broadcast'
+        ) }}
+      {% endcall %}
+    {% endif %}
   {% else %}
     <p class="govuk-body govuk-!-margin-bottom-3">
       Created by {{ broadcast_message.created_by.name }} and approved by
