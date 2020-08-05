@@ -36,7 +36,7 @@ from tests.conftest import (
             'Cannot Add and edit templates '
             'Cannot Manage settings, team and usage '
             'Cannot Manage API integration '
-            'Change details'
+            'Change details for ZZZZZZZZ zzzzzzz@example.gov.uk'
         )
     ),
     (
@@ -1050,7 +1050,7 @@ def test_cancel_invited_user_doesnt_work_if_user_not_invited_to_this_service(
         'Cannot Add and edit templates '
         'Can Manage settings, team and usage '
         'Can Manage API integration '
-        'Cancel invitation'
+        'Cancel invitation for invited_user@test.gov.uk'
     )),
     ('cancelled', (
         'invited_user@test.gov.uk (cancelled invite) '

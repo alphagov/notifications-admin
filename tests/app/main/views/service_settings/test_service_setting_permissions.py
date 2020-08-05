@@ -114,13 +114,16 @@ def test_service_set_permission(
 
 
 @pytest.mark.parametrize('service_fields, endpoint, kwargs, text', [
-    ({'restricted': True}, '.service_switch_live', {}, 'Live Off Change'),
-    ({'restricted': False}, '.service_switch_live', {}, 'Live On Change'),
-    ({'permissions': ['sms']}, '.service_set_inbound_number', {}, 'Receive inbound SMS Off Change'),
+    ({'restricted': True}, '.service_switch_live', {}, 'Live Off Change service status'),
+    ({'restricted': False}, '.service_switch_live', {}, 'Live On Change service status'),
+    ({'permissions': ['sms']}, '.service_set_inbound_number', {},
+        'Receive inbound SMS Off Change your settings for Receive inbound SMS'),
     ({'permissions': ['letter']},
-     '.service_set_permission', {'permission': 'upload_letters'}, 'Uploading letters Off Change'),
+     '.service_set_permission', {'permission': 'upload_letters'},
+        'Uploading letters Off Change your settings for Uploading letters'),
     ({'permissions': ['letter']},
-     '.service_set_permission', {'permission': 'international_letters'}, 'Send international letters Off Change'),
+     '.service_set_permission', {'permission': 'international_letters'},
+        'Send international letters Off Change your settings for Send international letters'),
 ])
 def test_service_setting_toggles_show(
     mocker,
