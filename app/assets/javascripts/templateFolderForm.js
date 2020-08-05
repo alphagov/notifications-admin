@@ -246,7 +246,9 @@
     this.itemsSelectedButtons = $(`
       <div id="items_selected">
         <div class="js-stick-at-bottom-when-scrolling">
-          <button class="govuk-button govuk-button--secondary govuk-!-margin-right-3 govuk-!-margin-bottom-1" value="move-to-existing-folder">Move</button>
+          <button class="govuk-button govuk-button--secondary govuk-!-margin-right-3 govuk-!-margin-bottom-1" value="move-to-existing-folder">
+            Move<span class="govuk-visually-hidden"> selection to folder</span>
+          </button>
           <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-1" value="move-to-new-folder">Add to new folder</button>
           <div class="template-list-selected-counter" aria-hidden="true">
             <span class="template-list-selected-counter__count" aria-hidden="true">
