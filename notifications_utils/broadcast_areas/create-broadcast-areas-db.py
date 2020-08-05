@@ -25,14 +25,14 @@ def simplify_polygon(series):
 
     approx_metres_to_degree = 111320
     # initially buffer (extend area past perimeter) by ~25m
-    buffer_degrees = 25.0 / approx_metres_to_degree
+    buffer_degrees = 500 / approx_metres_to_degree
     # initially simplify (snap to closest point) by ~25m
-    simplify_degrees = 25.0 / approx_metres_to_degree
+    simplify_degrees = 50.0 / approx_metres_to_degree
 
     starting_polygon = sgeom.LineString(polygon).buffer(buffer_degrees)
     simplified_polygon = None
     num_polys = len(polygon)
-    last_num_polys = None
+    last_num_polys = []
     while True:
         simplified_polygon = starting_polygon.simplify(simplify_degrees)
         simplified_polygon = [[c[0], c[1]] for c in simplified_polygon.exterior.coords]
@@ -40,12 +40,13 @@ def simplify_polygon(series):
         num_polys = len(simplified_polygon)
         simplify_degrees *= 2
 
-        if num_polys <= 99 or last_num_polys == num_polys:
+        if num_polys <= 99 or last_num_polys[-3:] == [num_polys, num_polys, num_polys]:
             break
 
-        last_num_polys = num_polys
+        last_num_polys.append(num_polys)
 
         print(".", end="", flush=True)  # noqa: T001
+
     return [simplified_polygon]
 
 
