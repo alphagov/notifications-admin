@@ -24,22 +24,28 @@ def simplify_polygon(series):
     polygon, *_holes = series  # discard holes
 
     approx_metres_to_degree = 111320
-    desired_resolution_metres = 10
-    simplify_degrees = desired_resolution_metres / approx_metres_to_degree
+    # initially buffer (extend area past perimeter) by ~25m
+    buffer_degrees = 25.0 / approx_metres_to_degree
+    # initially simplify (snap to closest point) by ~25m
+    simplify_degrees = 25.0 / approx_metres_to_degree
 
+    starting_polygon = sgeom.LineString(polygon).buffer(buffer_degrees)
     simplified_polygon = None
     num_polys = len(polygon)
+    last_num_polys = None
     while True:
-        simplified_polygon = sgeom.LineString(polygon)
-        simplified_polygon = simplified_polygon.buffer(simplify_degrees)
-        simplified_polygon = simplified_polygon.simplify(simplify_degrees)
+        simplified_polygon = starting_polygon.simplify(simplify_degrees)
         simplified_polygon = [[c[0], c[1]] for c in simplified_polygon.exterior.coords]
 
         num_polys = len(simplified_polygon)
-        simplify_degrees *= 1.75
-        if num_polys <= 125:
+        simplify_degrees *= 2
+
+        if num_polys <= 99 or last_num_polys == num_polys:
             break
 
+        last_num_polys = num_polys
+
+        print(".", end="", flush=True)  # noqa: T001
     return [simplified_polygon]
 
 
@@ -79,6 +85,8 @@ for dataset_name, id_field, name_field in simple_datasets:
         f_id = dataset_id + "-" + feature["properties"][id_field]
         f_name = feature["properties"][name_field]
 
+        print(f_name)  # noqa: T001
+
         simple_feature = deepcopy(feature)
         simple_feature["geometry"] = simplify_geometry(simple_feature["geometry"])
 
@@ -115,6 +123,8 @@ for f in geojson.loads(wards_filepath.read_text())["features"]:
     ward_name = f["properties"]["wd20nm"]
     ward_id = dataset_id + "-" + ward_code
 
+    print(ward_name)  # noqa: T001
+
     try:
         la_id = dataset_id + "-" + ward_code_to_la_id_mapping[ward_code]
         la_name = ward_code_to_la_mapping[ward_code]
@@ -142,6 +152,8 @@ for feature in geojson.loads(las_filepath.read_text())["features"]:
     if la_id in seen:
         continue
     seen.add(la_id)
+
+    print(group_name)  # noqa: T001
 
     group_id = dataset_id + "-" + la_id
     areas = repo.get_all_areas_for_group(group_id)
