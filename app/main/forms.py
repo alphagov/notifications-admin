@@ -794,7 +794,7 @@ class BasePermissionsForm(StripWhitespaceForm):
     )
 
     permissions_field = govukCheckboxesField(
-        'Permssions',
+        'Permissions',
         filters=[filter_by_permissions],
         choices=[
             (value, label) for value, label in permissions
@@ -847,7 +847,7 @@ class PermissionsForm(PermissionsAbstract, BasePermissionsForm):
 class BroadcastPermissionsForm(BroadcastPermissionsAbstract, BasePermissionsForm):
 
     permissions_field = govukCheckboxesField(
-        'Permssions',
+        'Permissions',
         choices=[
             (value, label) for value, label in broadcast_permissions
         ],
