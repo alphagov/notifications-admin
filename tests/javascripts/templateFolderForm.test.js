@@ -53,11 +53,11 @@ function setFixtures (hierarchy) {
               <div id="move_to_new_folder_form">
                 <fieldset class="js-will-stick-at-bottom-when-scrolling">
                   <legend class="visuallyhidden">Add to new folder</legend>
-                  <div class="form-group">
-                    <label class="form-label" for="move_to_new_folder_name">
+                  <div class="govuk-form-group">
+                    <label class="govuk-label" for="move_to_new_folder_name">
                       Folder name
                     </label>
-                    <input class="form-control form-control-1-1 " id="move_to_new_folder_name" name="move_to_new_folder_name" rows="8" type="text" value="">
+                    <input class="govuk-input govuk-!-width-full" id="move_to_new_folder_name" name="move_to_new_folder_name" type="text">
                   </div>
                   <div class="page-footer">
                     <button type="submit" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-1" name="operation" value="move-to-new-folder">Add to new folder</button>
@@ -67,11 +67,11 @@ function setFixtures (hierarchy) {
               <div id="add_new_folder_form">
                 <fieldset class="js-will-stick-at-bottom-when-scrolling">
                   <legend class="visuallyhidden">Add new folder</legend>
-                  <div class="form-group">
-                    <label class="form-label" for="add_new_folder_name">
+                  <div class="govuk-form-group">
+                    <label class="govuk-label" for="add_new_folder_name">
                       Folder name
                     </label>
-                    <input class="form-control form-control-1-1 " id="add_new_folder_name" name="add_new_folder_name" rows="8" type="text" value="">
+                    <input class="govuk-input govuk-!-width-full" id="add_new_folder_name" name="add_new_folder_name" type="text">
                   </div>
                   <div class="page-footer">
                     <button type="submit" class="govuk-button page-footer__button" name="operation" value="add-new-folder">Add new folder</button>
