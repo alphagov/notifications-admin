@@ -48,3 +48,7 @@ $govuk-grid-widths: (
   seven-eighths: 87.5%,
   full: 100%
 );
+
+.govuk-input--width-6 {
+  max-width: 14ex;
+}

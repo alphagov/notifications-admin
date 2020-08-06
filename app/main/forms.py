@@ -1554,13 +1554,17 @@ class PreviewBranding(StripWhitespaceForm):
 
 
 class ServiceUpdateEmailBranding(StripWhitespaceForm):
-    name = StringField('Name of brand')
-    text = StringField('Text')
-    colour = StringField(
+    name = GovukTextInputField('Name of brand')
+    text = GovukTextInputField('Text')
+    colour = GovukTextInputField(
         'Colour',
         validators=[
             Regexp(regex="^$|^#(?:[0-9a-fA-F]{3}){1,2}$", message='Must be a valid color hex code (starting with #)')
-        ]
+        ],
+        param_extensions={
+            "classes": "govuk-input--width-6",
+            "attributes": {"data-module": "colour-preview"}
+        }
     )
     file = FileField_wtf('Upload a PNG logo', validators=[FileAllowed(['png'], 'PNG Images only!')])
     brand_type = RadioField(

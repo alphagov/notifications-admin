@@ -18,14 +18,14 @@ describe('Colour preview', () => {
 
     // set up DOM
     document.body.innerHTML = `
-      <div class="form-group" data-module="colour-preview">
-        <label class="form-label" for="colour">
+      <div class="govuk-form-group">
+        <label class="govuk-form-label" for="colour">
           Colour
         </label>
-        <input class="form-control form-control-1-4" id="colour" name="colour" rows="8" type="text" value="">
+        <input class="govuk-input govuk-input--width-6" id="colour" name="colour" rows="8" type="text" value="" data-module="colour-preview">
       </div>`;
 
-    field = document.querySelector('.form-group');
+    field = document.querySelector('.govuk-form-group');
     textbox = document.querySelector('input[type=text]');
 
   });
