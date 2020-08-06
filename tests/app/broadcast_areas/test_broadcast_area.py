@@ -1,7 +1,7 @@
 import pytest
 import re
 
-from notifications_utils.broadcast_areas import (
+from app.broadcast_areas import (
     BroadcastAreasRepository,
     broadcast_area_libraries,
 )
