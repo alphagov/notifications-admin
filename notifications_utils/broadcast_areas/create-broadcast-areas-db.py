@@ -145,31 +145,16 @@ for f in geojson.loads(wards_filepath.read_text())["features"]:
 repo.insert_broadcast_areas(areas_to_add)
 areas_to_add = []
 
-seen = set()
-for feature in geojson.loads(las_filepath.read_text())["features"]:
-    la_id = feature["properties"]["LAD19CD"]
-    group_name = feature["properties"]["LAD19NM"]
+las_filepath = package_path / "Local Authorities May 2020.geojson"
 
-    if la_id in seen:
-        continue
-    seen.add(la_id)
+for feature in geojson.loads(las_filepath.read_text())["features"]:
+    la_id = feature["properties"]["lad20cd"]
+    group_name = feature["properties"]["lad20nm"]
 
     print(group_name)  # noqa: T001
 
     group_id = dataset_id + "-" + la_id
-    areas = repo.get_all_areas_for_group(group_id)
 
-    features = [geojson.loads(f) for _, _, f, _ in areas]
-    shapes = [sgeom.shape(f["geometry"]) for f in features]
-
-    if len(shapes) == 0:
-        continue
-
-    shape = shapes[0]
-    for other in shapes[1:]:
-        shape = shape.buffer(0).union(other.buffer(0))
-
-    feature = convert_shape_to_feature(shape)
     simple_feature = deepcopy(feature)
     simple_feature["geometry"] = simplify_geometry(simple_feature["geometry"])
 
