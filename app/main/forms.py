@@ -219,6 +219,44 @@ class GovukTextInputField(StringField):
             render_template('vendor/govuk-frontend/components/input/template.njk', params=params))
 
 
+class GovukPasswordField(PasswordField):
+    def __init__(self, label='', validators=None, param_extensions=None, **kwargs):
+        super(GovukPasswordField, self).__init__(label, validators, **kwargs)
+        self.param_extensions = param_extensions
+
+    # self.__call__ renders the HTML for the field by:
+    # 1. delegating to self.meta.render_field which
+    # 2. calls field.widget
+    # this bypasses that by making self.widget a method with the same interface as widget.__call__
+    def widget(self, field, param_extensions=None, **kwargs):
+        # error messages
+        error_message = None
+        if field.errors:
+            error_message = {"text": " ".join(field.errors).strip()}
+
+        # convert to parameters that govuk understands
+        params = {
+            "classes": "govuk-!-width-two-thirds",
+            "errorMessage": error_message,
+            "id": field.id,
+            "label": {"text": field.label.text},
+            "name": field.name,
+            "type": "password",
+            "value": field.data
+        }
+
+        # extend default params with any sent in
+        if self.param_extensions:
+            params.update(self.param_extensions)
+
+        # add any sent in though use in templates
+        if param_extensions:
+            params.update(param_extensions)
+
+        return Markup(
+            render_template('vendor/govuk-frontend/components/input/template.njk', params=params))
+
+
 class SMSCode(StringField):
     validators = [
         DataRequired(message='Cannot be empty'),
@@ -446,7 +484,7 @@ class StripWhitespaceForm(Form):
         def bind_field(self, form, unbound_field, options):
             # FieldList simply doesn't support filters.
             # @see: https://github.com/wtforms/wtforms/issues/148
-            no_filter_fields = (FieldList, PasswordField)
+            no_filter_fields = (FieldList, PasswordField, GovukPasswordField)
             filters = [strip_whitespace] if not issubclass(unbound_field.field_class, no_filter_fields) else []
             filters += unbound_field.kwargs.get('filters', [])
             bound = unbound_field.bind(form=form, filters=filters, **options)
