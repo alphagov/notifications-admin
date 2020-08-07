@@ -212,6 +212,8 @@ def password(label='Password'):
 
 
 def govuk_field_widget(self, field, type=None, param_extensions=None, **kwargs):
+    value = kwargs["value"] if kwargs.get("value") else field.data
+
     # error messages
     error_message = None
     if field.errors:
@@ -232,7 +234,7 @@ def govuk_field_widget(self, field, type=None, param_extensions=None, **kwargs):
         "id": field.id,
         "label": {"text": field.label.text},
         "name": field.name,
-        "value": field.data
+        "value": value
     }
 
     if type:
@@ -331,7 +333,7 @@ class SMSCode(GovukTextInputField):
             self.data = Columns.make_key(valuelist[0])
 
 
-class ForgivingIntegerField(StringField):
+class ForgivingIntegerField(GovukTextInputField):
 
     #  Actual value is 2147483647 but this is a scary looking arbitrary number
     POSTGRES_MAX_INT = 2000000000

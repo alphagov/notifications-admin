@@ -1349,7 +1349,7 @@ def test_non_gov_user_is_told_they_cant_go_live(
 @pytest.mark.parametrize('volumes, displayed_volumes', (
     (
         (('email', None), ('sms', None), ('letter', None)),
-        ('', '', ''),
+        (None, None, None),
     ),
     (
         (('email', 1234), ('sms', 0), ('letter', 999)),
@@ -1381,27 +1381,33 @@ def test_should_show_estimate_volumes(
         'main.estimate_usage', service_id=SERVICE_ONE_ID
     )
     assert page.h1.text == 'Tell us how many messages you expect to send'
-    for channel, label, value in (
+    for channel, label, hint, value in (
         (
             'email',
-            'How many emails do you expect to send in the next year? For example, 50,000',
+            'How many emails do you expect to send in the next year?',
+            'For example, 50,000',
             displayed_volumes[0],
         ),
         (
             'sms',
-            'How many text messages do you expect to send in the next year? For example, 50,000',
+            'How many text messages do you expect to send in the next year?',
+            'For example, 50,000',
             displayed_volumes[1],
         ),
         (
             'letter',
-            'How many letters do you expect to send in the next year? For example, 50,000',
+            'How many letters do you expect to send in the next year?',
+            'For example, 50,000',
             displayed_volumes[2],
         ),
     ):
         assert normalize_spaces(
             page.select_one('label[for=volume_{}]'.format(channel)).text
         ) == label
-        assert page.select_one('#volume_{}'.format(channel))['value'] == value
+        assert normalize_spaces(
+            page.select_one('#volume_{}-hint'.format(channel)).text
+        ) == hint
+        assert page.select_one('#volume_{}'.format(channel)).get('value') == value
 
     assert len(page.select('input[type=radio]')) == 2
 
@@ -1455,11 +1461,8 @@ def test_should_show_persist_estimated_volumes(
             'volume_letter': '9876',
             'consent_to_research': 'yes',
         },
-        'label[for=volume_sms]',
-        (
-            'How many text messages do you expect to send in the next year? For example, 50,000 '
-            'Number of text messages must be 2,000,000,000 or less'
-        )
+        '#volume_sms-error',
+        'Number of text messages must be 2,000,000,000 or less'
     ),
     (
         {
@@ -1485,7 +1488,7 @@ def test_should_error_if_bad_estimations_given(
         _data=data,
         _expected_status=200,
     )
-    assert normalize_spaces(page.select_one(error_selector).text) == expected_error_message
+    assert expected_error_message in page.select_one(error_selector).text
     assert mock_update_service.called is False
 
 
@@ -1504,7 +1507,7 @@ def test_should_error_if_all_volumes_zero(
         },
         _expected_status=200,
     )
-    assert page.select('input[type=text]')[0]['value'] == ''
+    assert page.select('input[type=text]')[0].get('value') is None
     assert page.select('input[type=text]')[1]['value'] == '0'
     assert page.select('input[type=text]')[2]['value'] == '0,00 0'
     assert normalize_spaces(page.select_one('.banner-dangerous').text) == (
@@ -1529,15 +1532,11 @@ def test_should_not_default_to_zero_if_some_fields_dont_validate(
         _expected_status=200,
     )
     assert page.select('input[type=text]')[0]['value'] == '1234'
-    assert page.select('input[type=text]')[1]['value'] == ''
+    assert page.select('input[type=text]')[1].get('value') is None
     assert page.select('input[type=text]')[2]['value'] == 'aaaaaaaaaaaaa'
     assert normalize_spaces(
-        page.select_one('label[for=volume_letter]').text
-    ) == (
-        'How many letters do you expect to send in the next year? '
-        'For example, 50,000 '
-        'Enter the number of letters you expect to send'
-    )
+        page.select_one('#volume_letter-error').text
+    ) == 'Error: Enter the number of letters you expect to send'
     assert mock_update_service.called is False
 
 
