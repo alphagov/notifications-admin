@@ -205,10 +205,13 @@ def test_show_accept_agreement_page(
     ]
 
     assert normalize_spaces(page.select_one('label[for=version]').text) == (
-        'Which version of the agreement do you want to accept? '
+        'Which version of the agreement do you want to accept?'
+    )
+
+    assert normalize_spaces(page.select_one('#version-hint').text) == (
         'The version number is on the front page, for example ‘3.6’'
     )
-    assert page.select_one('input[name=version]')['value'] == ''
+    assert page.select_one('input[name=version]').get('value') is None
 
     assert normalize_spaces(page.select_one('#who legend').text) == (
         'Who are you accepting the agreement for?'
@@ -235,12 +238,12 @@ def test_show_accept_agreement_page(
     assert normalize_spaces(page.select_one('label[for=on_behalf_of_name]').text) == (
         'What’s their name?'
     )
-    assert page.select_one('input[name=on_behalf_of_name]')['value'] == ''
+    assert page.select_one('input[name=on_behalf_of_name]').get('value') is None
 
     assert normalize_spaces(page.select_one('label[for=on_behalf_of_email]').text) == (
         'What’s their email address?'
     )
-    assert page.select_one('input[name=on_behalf_of_email]')['value'] == ''
+    assert page.select_one('input[name=on_behalf_of_email]').get('value') is None
 
 
 def test_accept_agreement_page_populates(
@@ -278,8 +281,7 @@ def test_accept_agreement_page_populates(
             'on_behalf_of_email': '',
         },
         [
-            'Select an option',
-            'Must be a number',
+            'Error: Must be a number',
         ],
     ),
     (
@@ -290,7 +292,7 @@ def test_accept_agreement_page_populates(
             'on_behalf_of_email': '',
         },
         [
-            'Must be a number',
+            'Error: Must be a number',
         ],
     ),
     (
@@ -301,8 +303,8 @@ def test_accept_agreement_page_populates(
             'on_behalf_of_email': '',
         },
         [
-            'Cannot be empty',
-            'Cannot be empty',
+            'Error: Cannot be empty',
+            'Error: Cannot be empty',
         ],
     ),
     (
@@ -313,7 +315,7 @@ def test_accept_agreement_page_populates(
             'on_behalf_of_email': '',
         },
         [
-            'Cannot be empty',
+            'Error: Cannot be empty',
         ],
     ),
     (
@@ -324,7 +326,7 @@ def test_accept_agreement_page_populates(
             'on_behalf_of_email': 'test@example.com',
         },
         [
-            'Cannot be empty',
+            'Error: Cannot be empty',
         ],
     ),
 
@@ -343,7 +345,7 @@ def test_accept_agreement_page_validates(
         _expected_status=200,
     )
     assert [
-        error.text.strip() for error in page.select('.error-message')
+        error.text.strip() for error in page.select('.govuk-error-message')
     ] == expected_errors
 
 

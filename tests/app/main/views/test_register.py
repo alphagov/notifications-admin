@@ -113,10 +113,10 @@ def test_should_return_200_when_email_is_not_gov_uk(
         _expected_status=200,
     )
 
-    assert normalize_spaces(page.select_one('.error-message').text) == (
-        'Enter a public sector email address or find out who can use Notify'
+    assert 'Enter a public sector email address or find out who can use Notify' in normalize_spaces(
+        page.select_one('.govuk-error-message').text
     )
-    assert page.select_one('.error-message a')['href'] == url_for(
+    assert page.select_one('.govuk-error-message a')['href'] == url_for(
         'main.who_can_use_notify'
     )
 
@@ -199,9 +199,9 @@ def test_register_with_existing_email_sends_emails(
     ("first.1.2.3.last@example.com", "First Last"),
     ("first.last.1.2.3@example.com", "First Last"),
     # Instances where we can’t make a good-enough guess:
-    ("example123@example.com", ""),
-    ("f.last@example.com", ""),
-    ("f.m.last@example.com", ""),
+    ("example123@example.com", None),
+    ("f.last@example.com", None),
+    ("f.m.last@example.com", None),
 ])
 def test_shows_name_on_registration_page_from_invite(
     client_request,
@@ -223,7 +223,7 @@ def test_shows_name_on_registration_page_from_invite(
         }
 
     page = client_request.get('main.register_from_invite')
-    assert page.select_one('input[name=name]')['value'] == expected_value
+    assert page.select_one('input[name=name]').get('value') == expected_value
 
 
 def test_shows_hidden_email_address_on_registration_page_from_invite(
@@ -247,7 +247,7 @@ def test_shows_hidden_email_address_on_registration_page_from_invite(
     assert normalize_spaces(page.select_one('main p').text) == (
         'Your account will be created with this email address: test@example.com'
     )
-    hidden_input = page.select_one('form .visually-hidden input')
+    hidden_input = page.select_one('form .govuk-visually-hidden input')
     for attr, value in (
         ('type', 'email'),
         ('name', 'username'),

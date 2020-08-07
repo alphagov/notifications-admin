@@ -147,7 +147,7 @@ def email_address(label='Email address', gov_user=True, required=True):
     if required:
         validators.append(DataRequired(message='Cannot be empty'))
 
-    return EmailField(label, validators, render_kw={'spellcheck': 'false'})
+    return GovukEmailField(label, validators, render_kw={'spellcheck': 'false'})
 
 
 class UKMobileNumber(TelField):
@@ -557,7 +557,7 @@ class OnOffField(RadioField):
 
 
 class LoginForm(StripWhitespaceForm):
-    email_address = EmailField('Email address', validators=[
+    email_address = GovukEmailField('Email address', validators=[
         Length(min=5, max=255),
         DataRequired(message='Cannot be empty'),
         ValidEmail()
@@ -568,8 +568,10 @@ class LoginForm(StripWhitespaceForm):
 
 
 class RegisterUserForm(StripWhitespaceForm):
-    name = StringField('Full name',
-                       validators=[DataRequired(message='Cannot be empty')])
+    name = GovukTextInputField(
+        'Full name',
+        validators=[DataRequired(message='Cannot be empty')]
+    )
     email_address = email_address()
     mobile_number = international_phone_number()
     password = password()
@@ -1299,7 +1301,7 @@ class CsvUploadForm(StripWhitespaceForm):
 
 
 class ChangeNameForm(StripWhitespaceForm):
-    new_name = StringField(u'Your name')
+    new_name = GovukTextInputField(u'Your name')
 
 
 class ChangeEmailForm(StripWhitespaceForm):
@@ -1401,7 +1403,7 @@ class SupportRedirect(StripWhitespaceForm):
 
 
 class FeedbackOrProblem(StripWhitespaceForm):
-    name = StringField('Name (optional)')
+    name = GovukTextInputField('Name (optional)')
     email_address = email_address(label='Email address', gov_user=False, required=True)
     feedback = TextAreaField('Your message', validators=[DataRequired(message="Cannot be empty")])
 
@@ -1850,7 +1852,7 @@ def get_placeholder_form_instance(
         else:
             field = uk_mobile_number(label=placeholder_name)
     else:
-        field = StringField(placeholder_name, validators=[
+        field = GovukTextInputField(placeholder_name, validators=[
             DataRequired(message='Cannot be empty')
         ])
 
@@ -2191,7 +2193,7 @@ class AcceptAgreementForm(StripWhitespaceForm):
             on_behalf_of_email=org.agreement_signed_on_behalf_of_email_address,
         )
 
-    version = StringField(
+    version = GovukTextInputField(
         'Which version of the agreement do you want to accept?'
     )
 
@@ -2209,7 +2211,7 @@ class AcceptAgreementForm(StripWhitespaceForm):
         ),
     )
 
-    on_behalf_of_name = StringField(
+    on_behalf_of_name = GovukTextInputField(
         'What’s their name?'
     )
 

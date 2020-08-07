@@ -1,5 +1,4 @@
 {% extends "withnav_template.html" %}
-{% from "components/textbox.html" import textbox %}
 {% from "components/radios.html" import radio, conditional_radio_panel %}
 {% from "components/select-input.html" import select_wrapper %}
 {% from "components/form.html" import form_wrapper %}
@@ -28,10 +27,14 @@
         {% endfor %}
       {% endcall %}
       {% call conditional_radio_panel('on-behalf-of') %}
-        {{ textbox(form.on_behalf_of_name, width='1-1') }}
-        {{ textbox(form.on_behalf_of_email, width='1-1') }}
+        {{ form.on_behalf_of_name(param_extensions={"classes": "govuk-!-width-full"}) }}
+        {{ form.on_behalf_of_email(param_extensions={"classes": "govuk-!-width-full"}) }}
       {% endcall %}
-      {{ textbox(form.version, width='1-3', hint='The version number is on the front page, for example ‘3.6’') }}
+      {{ form.version(
+        param_extensions={
+          "hint": {"text": "The version number is on the front page, for example ‘3.6’"},
+          "classes": "govuk-!-width-one-third"}
+      ) }}
 
       {{ page_footer('Continue') }}
 

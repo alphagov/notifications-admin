@@ -13,8 +13,15 @@ Create an account
   <div class="govuk-grid-column-two-thirds">
     <h1 class="heading-large">Create an account</h1>
     {% call form_wrapper(autocomplete=True) %}
-      {{ textbox(form.name, width='3-4') }}
-      {{ textbox(form.email_address, hint="Must be from a public sector organisation", width='3-4', safe_error_message=True, autocomplete='email') }}
+      {{ form.name(param_extensions={"classes": "govuk-!-width-three-quarters"}) }}
+      {{ form.email_address(
+        param_extensions={
+          "hint": {"text": "Must be from a public sector organisation"},
+          "classes": "govuk-!-width-three-quarters",
+          "autocomplete": "email"
+        },
+        error_message_with_html=True
+      ) }}
       <div class="extra-tracking">
         {{ textbox(form.mobile_number, width='3-4', hint='We’ll send you a security code by text message') }}
       </div>

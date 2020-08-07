@@ -2240,7 +2240,7 @@ def test_incorrect_reply_to_email_address_input(
         _expected_status=200
     )
 
-    assert normalize_spaces(page.select_one('.error-message').text) == expected_error
+    assert expected_error in normalize_spaces(page.select_one('.govuk-error-message').text)
 
 
 @pytest.mark.parametrize('contact_block_input, expected_error', [
