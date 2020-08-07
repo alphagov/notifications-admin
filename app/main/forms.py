@@ -312,6 +312,19 @@ class GovukSearchField(SearchField):
         return govuk_field_widget(self, field, type="search", param_extensions=params, **kwargs)
 
 
+class GovukDateField(DateField):
+    def __init__(self, label='', validators=None, param_extensions=None, **kwargs):
+        super(GovukDateField, self).__init__(label, validators, **kwargs)
+        self.param_extensions = param_extensions
+
+    # self.__call__ renders the HTML for the field by:
+    # 1. delegating to self.meta.render_field which
+    # 2. calls field.widget
+    # this bypasses that by making self.widget a method with the same interface as widget.__call__
+    def widget(self, field, param_extensions=None, **kwargs):
+        return govuk_field_widget(self, field, param_extensions=param_extensions, **kwargs)
+
+
 class SMSCode(GovukTextInputField):
     validators = [
         DataRequired(message='Cannot be empty'),
