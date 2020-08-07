@@ -52,3 +52,32 @@ $govuk-grid-widths: (
 .govuk-input--width-6 {
   max-width: 14ex;
 }
+
+// extensions to govuk-input to allow numbering by label
+.govuk-input--numbered {
+  padding-left: 1.84em;
+
+  @include media(desktop) {
+    @include inline-block;
+  }
+}
+
+.govuk-input--numbered__label {
+  float: left;
+  width: 1.6em;
+  margin: 8px -1.6em 0 0;
+  position: relative;
+  left: 10px;
+  color: $govuk-secondary-text-colour;
+  font-weight: bold;
+  pointer-events: none;
+}
+
+.govuk-input--numbered__label--error {
+  position: absolute;
+  bottom: 10px;
+
+  @include govuk-media-query(desktop) {
+    bottom: 7px;
+  }
+}

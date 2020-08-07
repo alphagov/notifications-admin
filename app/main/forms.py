@@ -546,15 +546,16 @@ class StripWhitespaceForm(Form):
             return bound
 
 
-class StripWhitespaceStringField(StringField):
-    def __init__(self, label=None, **kwargs):
+class StripWhitespaceStringField(GovukTextInputField):
+    def __init__(self, label=None, param_extensions=None, **kwargs):
         kwargs['filters'] = tuple(chain(
             kwargs.get('filters', ()),
             (
                 strip_whitespace,
             ),
         ))
-        super(StringField, self).__init__(label, **kwargs)
+        super(GovukTextInputField, self).__init__(label, **kwargs)
+        self.param_extensions = param_extensions
 
 
 class PostalAddressField(TextAreaField):
@@ -1701,7 +1702,7 @@ class PDFUploadForm(StripWhitespaceForm):
     )
 
 
-class EmailFieldInGuestList(EmailField, StripWhitespaceStringField):
+class EmailFieldInGuestList(GovukEmailField, StripWhitespaceStringField):
     pass
 
 

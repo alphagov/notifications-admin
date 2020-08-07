@@ -412,7 +412,7 @@ def test_route_invalid_permissions(
             service_one)
 
 
-def test_should_show_whitelist_page(
+def test_should_show_guestlist_page(
     client_request,
     mock_login,
     api_user_active,
@@ -424,14 +424,14 @@ def test_should_show_whitelist_page(
         'main.guest_list',
         service_id=SERVICE_ONE_ID,
     )
-    textboxes = page.find_all('input', {'type': 'text'})
+    textboxes = page.find_all('input', {'class': 'govuk-input'})
     for index, value in enumerate(
-        ['test@example.com'] + [''] * 4 + ['07900900000'] + [''] * 4
+        ['test@example.com'] + [None] * 4 + ['07900900000'] + [None] * 4
     ):
-        assert textboxes[index]['value'] == value
+        assert textboxes[index].get('value') == value
 
 
-def test_should_update_whitelist(
+def test_should_update_guestlist(
     client_request,
     mock_update_guest_list,
 ):
@@ -453,7 +453,7 @@ def test_should_update_whitelist(
         'phone_numbers': ['07900900000', '+1800-555-555']})
 
 
-def test_should_validate_whitelist_items(
+def test_should_validate_guestlist_items(
     client_request,
     mock_update_guest_list,
 ):
