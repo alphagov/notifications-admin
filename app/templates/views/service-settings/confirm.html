@@ -19,7 +19,7 @@
     <div class="govuk-grid-column-three-quarters">
 
     {% call form_wrapper() %}
-      {{ textbox(form.password, autocomplete='current-password') }}
+      {{ form.password(param_extensions={"autocomplete": "current-password"}) }}
       {{ page_footer(
         'Confirm',
         destructive=destructive

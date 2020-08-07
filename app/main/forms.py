@@ -180,10 +180,14 @@ def international_phone_number(label='Mobile number'):
 
 
 def password(label='Password'):
-    return PasswordField(label,
-                         validators=[DataRequired(message='Cannot be empty'),
-                                     Length(8, 255, message='Must be at least 8 characters'),
-                                     CommonlyUsedPassword(message='Choose a password that’s harder to guess')])
+    return GovukPasswordField(
+        label,
+        validators=[
+            DataRequired(message='Cannot be empty'),
+            Length(8, 255, message='Must be at least 8 characters'),
+            CommonlyUsedPassword(message='Choose a password that’s harder to guess')
+        ]
+    )
 
 
 class GovukTextInputField(StringField):
@@ -547,7 +551,7 @@ class LoginForm(StripWhitespaceForm):
         DataRequired(message='Cannot be empty'),
         ValidEmail()
     ])
-    password = PasswordField('Password', validators=[
+    password = GovukPasswordField('Password', validators=[
         DataRequired(message='Enter your password')
     ])
 
@@ -590,7 +594,7 @@ class RegisterUserFromOrgInviteForm(StripWhitespaceForm):
             email_address=invited_org_user.email_address,
         )
 
-    name = StringField(
+    name = GovukTextInputField(
         'Full name',
         validators=[DataRequired(message='Cannot be empty')]
     )
@@ -1116,7 +1120,7 @@ class ConfirmPasswordForm(StripWhitespaceForm):
         self.validate_password_func = validate_password_func
         super(ConfirmPasswordForm, self).__init__(*args, **kwargs)
 
-    password = PasswordField(u'Enter password')
+    password = GovukPasswordField(u'Enter password')
 
     def validate_password(self, field):
         if not self.validate_password_func(field.data):

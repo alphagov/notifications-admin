@@ -1132,8 +1132,8 @@ def test_confirm_update_organisation_with_incorrect_password(
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
     assert normalize_spaces(
-        page.select_one('.error-message').text
-    ) == 'Invalid password'
+        page.select_one('.govuk-error-message').text
+    ) == 'Error: Invalid password'
 
 
 def test_confirm_update_organisation_with_name_already_in_use(
