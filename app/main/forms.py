@@ -151,6 +151,17 @@ def email_address(label='Email address', gov_user=True, required=True):
 
 
 class UKMobileNumber(TelField):
+    def __init__(self, label='', validators=None, param_extensions=None, **kwargs):
+        super(UKMobileNumber, self).__init__(label, validators, **kwargs)
+        self.param_extensions = param_extensions
+
+    # self.__call__ renders the HTML for the field by:
+    # 1. delegating to self.meta.render_field which
+    # 2. calls field.widget
+    # this bypasses that by making self.widget a method with the same interface as widget.__call__
+    def widget(self, field, param_extensions=None, **kwargs):
+        return govuk_field_widget(self, field, type="tel", param_extensions=param_extensions, **kwargs)
+
     def pre_validate(self, form):
         try:
             validate_phone_number(self.data)
@@ -159,6 +170,17 @@ class UKMobileNumber(TelField):
 
 
 class InternationalPhoneNumber(TelField):
+    def __init__(self, label='', validators=None, param_extensions=None, **kwargs):
+        super(InternationalPhoneNumber, self).__init__(label, validators=validators, **kwargs)
+        self.param_extensions = param_extensions
+
+    # self.__call__ renders the HTML for the field by:
+    # 1. delegating to self.meta.render_field which
+    # 2. calls field.widget
+    # this bypasses that by making self.widget a method with the same interface as widget.__call__
+    def widget(self, field, param_extensions=None, **kwargs):
+        return govuk_field_widget(self, field, type="tel", param_extensions=param_extensions, **kwargs)
+
     def pre_validate(self, form):
         try:
             if self.data:

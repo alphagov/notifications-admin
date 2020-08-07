@@ -23,7 +23,10 @@ Create an account
         error_message_with_html=True
       ) }}
       <div class="extra-tracking">
-        {{ textbox(form.mobile_number, width='3-4', hint='We’ll send you a security code by text message') }}
+        {{ form.mobile_number(param_extensions={
+          "hint": {"text": "We’ll send you a security code by text message"},
+          "classes": "govuk-!-width-three-quarters"
+        }) }}
       </div>
       <input class="govuk-visually-hidden" aria-hidden="true" tabindex="-1" id="defeat-chrome-autocomplete">
       {{ form.password(param_extensions={"hint": {"text": "At least 8 characters"}, "classes": "govuk-!-width-three-quarters", "autocomplete": "new-password"}) }}
