@@ -192,11 +192,11 @@ def test_update_letter_branding_shows_form_errors_on_name_fields(
     )
 
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    error_messages = page.find_all('span', class_='error-message')
+    error_messages = page.find_all('span', class_='govuk-error-message')
 
     assert page.find('h1').text == 'Update letter branding'
     assert len(error_messages) == 1
-    assert error_messages[0].text.strip() == 'This field is required.'
+    assert 'This field is required.' in error_messages[0].text.strip()
 
 
 def test_update_letter_branding_shows_database_errors_on_name_field(
@@ -229,10 +229,10 @@ def test_update_letter_branding_shows_database_errors_on_name_field(
     )
 
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    error_message = page.find('span', class_='error-message').text.strip()
+    error_message = page.find('span', class_='govuk-error-message').text.strip()
 
     assert page.find('h1').text == 'Update letter branding'
-    assert error_message == 'name already in use'
+    assert 'name already in use' in error_message
 
 
 def test_update_letter_branding_with_new_file_and_new_details(
@@ -311,7 +311,7 @@ def test_create_letter_branding_does_not_show_branding_info(platform_admin_clien
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
     assert page.select_one('#logo-img > img') is None
-    assert page.select_one('#name').attrs.get('value') == ''
+    assert page.select_one('#name').attrs.get('value') is None
 
 
 def test_create_letter_branding_when_uploading_valid_file(
@@ -511,11 +511,11 @@ def test_create_letter_branding_shows_form_errors_on_name_field(
     )
 
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    error_messages = page.find_all('span', class_='error-message')
+    error_messages = page.find_all('span', class_='govuk-error-message')
 
     assert page.find('h1').text == 'Add letter branding'
     assert len(error_messages) == 1
-    assert error_messages[0].text.strip() == 'This field is required.'
+    assert 'This field is required.' in error_messages[0].text.strip()
 
 
 def test_create_letter_branding_shows_database_errors_on_name_fields(
@@ -552,7 +552,7 @@ def test_create_letter_branding_shows_database_errors_on_name_fields(
     )
 
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    error_message = page.find('span', class_='error-message').text.strip()
+    error_message = page.find('span', class_='govuk-error-message').text.strip()
 
     assert page.find('h1').text == 'Add letter branding'
-    assert error_message == 'name already in use'
+    assert 'name already in use' in error_message

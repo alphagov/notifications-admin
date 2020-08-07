@@ -1695,7 +1695,7 @@ class SVGFileUpload(StripWhitespaceForm):
 
 
 class ServiceLetterBrandingDetails(StripWhitespaceForm):
-    name = StringField('Name of brand', validators=[DataRequired()])
+    name = GovukTextInputField('Name of brand', validators=[DataRequired()])
 
 
 class PDFUploadForm(StripWhitespaceForm):
