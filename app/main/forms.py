@@ -1525,9 +1525,9 @@ class ServiceContactDetailsForm(StripWhitespaceForm):
         ],
     )
 
-    url = StringField("URL")
-    email_address = EmailField("Email address")
-    phone_number = StringField("Phone number")
+    url = GovukTextInputField("URL")
+    email_address = GovukEmailField("Email address")
+    phone_number = GovukTextInputField("Phone number")
 
     def validate(self):
 

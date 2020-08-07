@@ -4186,7 +4186,7 @@ def test_send_files_by_email_contact_details_does_not_update_invalid_contact_det
         _follow_redirects=True
     )
 
-    assert normalize_spaces(page.find('span', class_='error-message').text) == error
+    assert error in page.find('span', class_='govuk-error-message').text
     assert normalize_spaces(page.h1.text) == "Send files by email"
 
 
