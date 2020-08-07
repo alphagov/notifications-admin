@@ -255,6 +255,23 @@ class GovukPasswordField(PasswordField):
         return govuk_field_widget(self, field, type="password", param_extensions=param_extensions, **kwargs)
 
 
+class GovukEmailField(EmailField):
+    def __init__(self, label='', validators=None, param_extensions=None, **kwargs):
+        super(GovukEmailField, self).__init__(label, validators=validators, **kwargs)
+        self.param_extensions = param_extensions
+
+    # self.__call__ renders the HTML for the field by:
+    # 1. delegating to self.meta.render_field which
+    # 2. calls field.widget
+    # this bypasses that by making self.widget a method with the same interface as widget.__call__
+    def widget(self, field, param_extensions=None, **kwargs):
+
+        params = {"attributes": {"spellcheck": "false"}}  # email addresses don't need to be spellchecked
+        if param_extensions:
+            params.update(param_extensions)
+        return govuk_field_widget(self, field, type="email", param_extensions=params, **kwargs)
+
+
 class SMSCode(StringField):
     validators = [
         DataRequired(message='Cannot be empty'),
