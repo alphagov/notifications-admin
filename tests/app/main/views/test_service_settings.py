@@ -5087,8 +5087,7 @@ def test_update_service_data_retention_return_validation_error_for_negative_days
     )
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    error_message = page.find('span', class_='error-message').text.strip()
-    assert error_message == 'Must be between 3 and 90'
+    assert 'Must be between 3 and 90' in page.find('span', class_='govuk-error-message').text
     assert mock_get_service_data_retention.called
     assert not mock_update_service_data_retention.called
 

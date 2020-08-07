@@ -1192,7 +1192,7 @@ class NewOrganisationForm(
 
 
 class FreeSMSAllowance(StripWhitespaceForm):
-    free_sms_allowance = IntegerField(
+    free_sms_allowance = GovukIntegerField(
         'Numbers of text message fragments per year',
         validators=[
             DataRequired(message='Cannot be empty')
@@ -1529,7 +1529,9 @@ class EstimateUsageForm(StripWhitespaceForm):
 
 
 class ProviderForm(StripWhitespaceForm):
-    priority = IntegerField('Priority', [validators.NumberRange(min=1, max=100, message="Must be between 1 and 100")])
+    priority = GovukIntegerField(
+        'Priority', [validators.NumberRange(min=1, max=100, message="Must be between 1 and 100")]
+    )
 
 
 class ProviderRatioForm(StripWhitespaceForm):
@@ -2044,17 +2046,17 @@ class ServiceDataRetentionForm(StripWhitespaceForm):
         ],
         validators=[DataRequired()],
     )
-    days_of_retention = IntegerField(label="Days of retention",
-                                     validators=[validators.NumberRange(min=3, max=90,
-                                                                        message="Must be between 3 and 90")],
-                                     )
+    days_of_retention = GovukIntegerField(
+        label="Days of retention",
+        validators=[validators.NumberRange(min=3, max=90, message="Must be between 3 and 90")],
+    )
 
 
 class ServiceDataRetentionEditForm(StripWhitespaceForm):
-    days_of_retention = IntegerField(label="Days of retention",
-                                     validators=[validators.NumberRange(min=3, max=90,
-                                                                        message="Must be between 3 and 90")],
-                                     )
+    days_of_retention = GovukIntegerField(
+        label="Days of retention",
+        validators=[validators.NumberRange(min=3, max=90, message="Must be between 3 and 90")],
+    )
 
 
 class ReturnedLettersForm(StripWhitespaceForm):
