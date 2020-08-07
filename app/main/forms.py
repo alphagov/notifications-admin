@@ -1131,7 +1131,7 @@ class OrganisationDomainsForm(StripWhitespaceForm):
 
 
 class CreateServiceForm(StripWhitespaceForm):
-    name = StringField(
+    name = GovukTextInputField(
         "What’s your service called?",
         validators=[
             DataRequired(message='Cannot be empty'),

@@ -35,7 +35,7 @@ def test_get_should_render_add_service_template(
     )
     page = client_request.get('main.add_service')
     assert page.select_one('h1').text.strip() == 'About your service'
-    assert page.select_one('input[name=name]')['value'] == ''
+    assert page.select_one('input[name=name]').get('value') is None
     assert [
         label.text.strip() for label in page.select('.multiple-choice label')
     ] == [
@@ -72,7 +72,7 @@ def test_get_should_not_render_radios_if_org_type_known(
     )
     page = client_request.get('main.add_service')
     assert page.select_one('h1').text.strip() == 'About your service'
-    assert page.select_one('input[name=name]')['value'] == ''
+    assert page.select_one('input[name=name]').get('value') is None
     assert not page.select('.multiple-choice')
 
 
@@ -86,7 +86,7 @@ def test_show_different_page_if_user_org_type_is_local(
     )
     page = client_request.get('main.add_service')
     assert page.select_one('h1').text.strip() == 'About your service'
-    assert page.select_one('input[name=name]')['value'] == ''
+    assert page.select_one('input[name=name]').get('value') is None
     assert page.select_one('main .govuk-body').text.strip() == (
         'Give your service a name that tells users what your '
         'messages are about, as well as who they’re from. For example:')
@@ -221,7 +221,7 @@ def test_get_should_only_show_nhs_org_types_radios_if_user_has_nhs_email(
     )
     page = client_request.get('main.add_service')
     assert page.select_one('h1').text.strip() == 'About your service'
-    assert page.select_one('input[name=name]')['value'] == ''
+    assert page.select_one('input[name=name]').get('value') is None
     assert [
         label.text.strip() for label in page.select('.multiple-choice label')
     ] == [
@@ -309,7 +309,7 @@ def test_add_service_fails_if_service_name_has_less_than_2_alphanumeric_characte
         data={"name": "."},
         _expected_status=200,
     )
-    assert page.find("span", {"class": "error-message"})
+    assert page.find("span", {"class": "govuk-error-message"})
 
 
 def test_should_return_form_errors_with_duplicate_service_name_regardless_of_case(
@@ -325,9 +325,7 @@ def test_should_return_form_errors_with_duplicate_service_name_regardless_of_cas
         },
         _expected_status=200,
     )
-    assert page.select_one('.error-message').text.strip() == (
-        'This service name is already in use'
-    )
+    assert 'This service name is already in use' in page.select_one('.govuk-error-message').text.strip()
 
 
 def test_non_government_user_cannot_access_create_service_page(
