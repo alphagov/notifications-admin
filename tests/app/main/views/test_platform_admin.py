@@ -828,11 +828,11 @@ def test_get_notifications_sent_by_service_shows_date_form(client_request, platf
     page = client_request.get('main.notifications_sent_by_service')
 
     assert [
-        (input['type'], input['name'], input['value'])
+        (input['type'], input['name'], input.get('value'))
         for input in page.select('input')
     ] == [
-        ('text', 'start_date', ''),
-        ('text', 'end_date', ''),
+        ('text', 'start_date', None),
+        ('text', 'end_date', None),
         ('hidden', 'csrf_token', ANY)
     ]
 
@@ -848,11 +848,11 @@ def test_get_notifications_sent_by_service_validates_form(mocker, client_request
         _data={'start_date': '', 'end_date': '20190101'}
     )
 
-    errors = page.select('.error-message')
+    errors = page.select('.govuk-error-message')
     assert len(errors) == 2
 
     for error in errors:
-        assert normalize_spaces(error.text) == 'Not a valid date value'
+        assert 'Not a valid date value' in error.text
 
     mock_get_stats_from_api.assert_not_called()
 
