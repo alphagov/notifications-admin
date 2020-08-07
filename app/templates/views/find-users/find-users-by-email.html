@@ -19,11 +19,9 @@
       class='govuk-grid-row'
   ) %}
     <div class="govuk-grid-column-three-quarters">
-      {{ textbox(
-        form.search,
-        width='1-1',
-        label='Find users by email, or by partial email'
-      ) }}
+      {{ form.search(param_extensions={
+            "label": {"text": "Find users by email, or by partial email"}
+      }) }}
     </div>
     <div class="govuk-grid-column-one-quarter">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">

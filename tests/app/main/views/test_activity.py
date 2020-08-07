@@ -363,7 +363,7 @@ def test_shows_message_when_no_notifications(
         {},
         {},
         'Search by recipient',
-        '',
+        None,
     ),
     (
         {
@@ -371,7 +371,7 @@ def test_shows_message_when_no_notifications(
         },
         {},
         'Search by phone number',
-        '',
+        None,
     ),
     (
         {
@@ -441,7 +441,7 @@ def test_search_recipient_form(
     assert(len(recipient_inputs) == 2)
 
     for field in recipient_inputs:
-        assert field['value'] == expected_search_box_contents
+        assert field.get("value") == expected_search_box_contents
 
 
 @pytest.mark.parametrize('message_type, expected_search_box_label', [

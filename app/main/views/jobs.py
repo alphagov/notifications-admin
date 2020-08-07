@@ -164,10 +164,9 @@ def view_notifications(service_id, message_type=None):
         message_type=message_type,
         status=request.args.get('status') or 'sending,delivered,failed',
         page=request.args.get('page', 1),
-        to=request.form.get('to', ''),
         search_form=SearchNotificationsForm(
             message_type=message_type,
-            to=request.form.get('to', ''),
+            to=request.form.get('to'),
         ),
         things_you_can_search_by={
             'email': ['email address'],

@@ -10,12 +10,10 @@
     {% if show %}
       <div data-module="autofocus">
         <div class="live-search js-header" data-module="live-search" data-targets="{{ target_selector }}">
-          {{ textbox(
-            form.search,
-            width='1-1',
-            label=search_label,
-            autocomplete="off"
-          ) }}
+          {{ form.search(param_extensions={
+            "label": {"text": search_label},
+            "autocomplete": "off"
+          }) }}
         </div>
       </div>
     {% endif %}

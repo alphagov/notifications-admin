@@ -1760,7 +1760,7 @@ class RequiredDateFilterForm(StripWhitespaceForm):
 
 class SearchByNameForm(StripWhitespaceForm):
 
-    search = SearchField(
+    search = GovukSearchField(
         'Search by name',
         validators=[DataRequired("You need to enter full or partial name to search by.")],
     )
@@ -1768,7 +1768,7 @@ class SearchByNameForm(StripWhitespaceForm):
 
 class SearchUsersByEmailForm(StripWhitespaceForm):
 
-    search = SearchField(
+    search = GovukSearchField(
         'Search by name or email address',
         validators=[
             DataRequired("You need to enter full or partial email address to search by.")
@@ -1778,12 +1778,12 @@ class SearchUsersByEmailForm(StripWhitespaceForm):
 
 class SearchUsersForm(StripWhitespaceForm):
 
-    search = SearchField('Search by name or email address')
+    search = GovukSearchField('Search by name or email address')
 
 
 class SearchNotificationsForm(StripWhitespaceForm):
 
-    to = SearchField()
+    to = GovukSearchField()
 
     labels = {
         'email': 'Search by email address',
