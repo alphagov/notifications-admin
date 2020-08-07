@@ -1180,19 +1180,19 @@ class ConfirmPasswordForm(StripWhitespaceForm):
 
 
 class BaseTemplateForm(StripWhitespaceForm):
-    name = StringField(
-        u'Template name',
+    name = GovukTextInputField(
+        "Template name",
         validators=[DataRequired(message="Cannot be empty")])
 
     template_content = TextAreaField(
-        u'Message',
+        "Message",
         validators=[
             DataRequired(message="Cannot be empty"),
             NoCommasInPlaceHolders()
         ]
     )
     process_type = RadioField(
-        'Use priority queue?',
+        "Use priority queue?",
         choices=[
             ('priority', 'Yes'),
             ('normal', 'No'),
