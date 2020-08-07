@@ -1,7 +1,6 @@
 {% extends "withnav_template.html" %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
-{% from "components/textbox.html" import textbox %}
 {% from "components/radios.html" import radios %}
 {% from "components/banner.html" import banner_wrapper %}
 {% from "components/form.html" import form_wrapper %}
@@ -18,7 +17,7 @@
   ) }}
 
   {% call form_wrapper() %}
-    {{ textbox(form.key_name, label='Name for this key') }}
+    {{ form.key_name }}
     {{ radios(form.key_type, disable=disabled_options, option_hints=option_hints) }}
     {{ page_footer('Continue') }}
   {% endcall %}

@@ -1412,7 +1412,7 @@ class CreateKeyForm(StripWhitespaceForm):
         thing='the type of key',
     )
 
-    key_name = StringField(u'Description of key', validators=[
+    key_name = GovukTextInputField("Name for this key", validators=[
         DataRequired(message='You need to give the key a name')
     ])
 
