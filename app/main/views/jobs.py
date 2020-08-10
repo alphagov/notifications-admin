@@ -3,6 +3,7 @@
 from functools import partial
 
 from flask import (
+    Markup,
     Response,
     abort,
     flash,
@@ -438,14 +439,14 @@ def get_preview_of_content(notification):
         ))
 
     if notification['template']['template_type'] == 'email':
-        return EmailPreviewTemplate(
+        return Markup(EmailPreviewTemplate(
             notification['template'],
             notification['personalisation'],
             redact_missing_personalisation=True,
-        ).subject
+        ).subject)
 
     if notification['template']['template_type'] == 'letter':
-        return LetterPreviewTemplate(
+        return Markup(LetterPreviewTemplate(
             notification['template'],
             notification['personalisation'],
-        ).subject
+        ).subject)
