@@ -17,6 +17,9 @@ Create an account
       <span class="nowrap">{{invited_user.email_address}}</span>
     </p>
     {% call form_wrapper() %}
+      <div class="visually-hidden">
+        <input type="email" name="username" id="username" value="{{ invited_user.email_address }}" disabled="disabled" tabindex="-1" aria-hidden="true" autocomplete="username" />
+      </div>
       {{ textbox(form.name, width='3-4') }}
       {% if invited_user.auth_type == 'sms_auth' %}
         <div class="extra-tracking">

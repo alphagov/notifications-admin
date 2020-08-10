@@ -203,7 +203,7 @@ def test_register_with_existing_email_sends_emails(
     ("f.last@example.com", ""),
     ("f.m.last@example.com", ""),
 ])
-def test_shows_registration_page_from_invite(
+def test_shows_name_on_registration_page_from_invite(
     client_request,
     fake_uuid,
     email_address,
@@ -226,6 +226,48 @@ def test_shows_registration_page_from_invite(
     assert page.select_one('input[name=name]')['value'] == expected_value
 
 
+def test_shows_email_address_on_registration_page_from_invite(
+    client_request,
+    fake_uuid,
+):
+    with client_request.session_transaction() as session:
+        session['invited_user'] = {
+            'id': fake_uuid,
+            'service': fake_uuid,
+            'from_user': "",
+            'email_address': "test@example.com",
+            'permissions': ["manage_users"],
+            'status': "pending",
+            'created_at': datetime.utcnow(),
+            'auth_type': 'sms_auth',
+            'folder_permissions': [],
+        }
+
+    page = client_request.get('main.register_from_invite')
+    assert normalize_spaces(page.select_one('main p').text) == (
+        'Your account will be created with this email address: test@example.com'
+    )
+    hidden_input = page.select_one('form .visually-hidden input')
+    for attr, value in (
+        ('type', 'email'),
+        ('name', 'username'),
+        ('id', 'username'),
+        ('value', 'test@example.com'),
+        ('disabled', "disabled"),
+        ('tabindex', '-1'),
+        ('aria-hidden', 'true'),
+        ('autocomplete', 'username'),
+    ):
+        assert hidden_input[attr] == value
+
+
+@pytest.mark.parametrize('extra_data', (
+    {},
+    # The username field is present in the page but the POST request
+    # should ignore it
+    {'username': 'invited@user.com'},
+    {'username': 'anythingelse@example.com'},
+))
 def test_register_from_invite(
     client,
     fake_uuid,
@@ -233,6 +275,7 @@ def test_register_from_invite(
     mock_register_user,
     mock_send_verify_code,
     mock_accept_invite,
+    extra_data,
 ):
     invited_user = InvitedUser(
         {
@@ -251,14 +294,15 @@ def test_register_from_invite(
         session['invited_user'] = invited_user.serialize()
     response = client.post(
         url_for('main.register_from_invite'),
-        data={
-            'name': 'Registered in another Browser',
-            'email_address': invited_user.email_address,
-            'mobile_number': '+4407700900460',
-            'service': str(invited_user.id),
-            'password': 'somreallyhardthingtoguess',
-            'auth_type': 'sms_auth'
-        }
+        data=dict(
+            name='Registered in another Browser',
+            email_address=invited_user.email_address,
+            mobile_number='+4407700900460',
+            service=str(invited_user.id),
+            password='somreallyhardthingtoguess',
+            auth_type='sms_auth',
+            **extra_data
+        ),
     )
     assert response.status_code == 302
     assert response.location == url_for('main.verify', _external=True)
