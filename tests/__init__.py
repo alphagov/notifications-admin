@@ -661,7 +661,7 @@ def broadcast_message_json(
 
         'personalisation': {},
         'areas': [
-            'england', 'scotland',
+            'countries-E92000001', 'countries-S92000003',
         ],
 
         'status': status,

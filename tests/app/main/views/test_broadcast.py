@@ -38,7 +38,7 @@ sample_uuid = sample_uuid()
         403, 403,
     ),
     (
-        '.remove_broadcast_area', {'broadcast_message_id': sample_uuid, 'area_slug': 'england'},
+        '.remove_broadcast_area', {'broadcast_message_id': sample_uuid, 'area_slug': 'countries-E92000001'},
         403, 405,
     ),
     (
@@ -237,9 +237,13 @@ def test_choose_broadcast_library_page(
             'Regions of England',
     ])
 
-    hints = page.select('.file-list-hint-large')
-    for country in ('England, Northern Ireland, Scotland, Wales'):
-        assert country in hints
+    assert any([
+        all([
+            country in hint.text
+            for country in ('England', 'Northern Ireland', 'Scotland', 'Wales')
+        ])
+        for hint in page.select('.file-list-hint-large')
+    ])
 
     assert page.select_one('a.file-list-filename-large.govuk-link')['href'] == url_for(
         '.choose_broadcast_area',
@@ -278,14 +282,14 @@ def test_add_broadcast_area(
         broadcast_message_id=fake_uuid,
         library_slug='countries',
         _data={
-            'areas': ['england', 'wales']
+            'areas': ['countries-E92000001', 'countries-W92000004']
         }
     )
     mock_update_broadcast_message.assert_called_once_with(
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
         data={
-            'areas': ['england', 'scotland', 'wales']
+            'areas': ['countries-E92000001', 'countries-S92000003', 'countries-W92000004']
         },
     )
 
@@ -302,7 +306,7 @@ def test_remove_broadcast_area_page(
         '.remove_broadcast_area',
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
-        area_slug='england',
+        area_slug='countries-E92000001',
         _expected_redirect=url_for(
             '.preview_broadcast_areas',
             service_id=SERVICE_ONE_ID,
@@ -314,7 +318,7 @@ def test_remove_broadcast_area_page(
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
         data={
-            'areas': ['scotland']
+            'areas': ['countries-S92000003']
         },
     )
 

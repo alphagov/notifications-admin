@@ -89,10 +89,18 @@ def test_get_names_of_areas():
 
 def test_get_areas_accepts_lists():
     areas_from_list = broadcast_area_libraries.get_areas(
-        ['wales', 'vale-of-glamorgan', 'england', 'essex']
+        [
+            'countries-W92000004',
+            'counties-and-unitary-authorities-in-england-and-wales-W06000014',
+            'countries-E92000001',
+            'counties-and-unitary-authorities-in-england-and-wales-E10000012',
+        ]
     )
     areas_from_args = broadcast_area_libraries.get_areas(
-        'wales', 'vale-of-glamorgan', 'england', 'essex',
+        'countries-W92000004',
+        'counties-and-unitary-authorities-in-england-and-wales-W06000014',
+        'countries-E92000001',
+        'counties-and-unitary-authorities-in-england-and-wales-E10000012',
     )
     assert areas_from_args == areas_from_list
 
