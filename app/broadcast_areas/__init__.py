@@ -1,9 +1,8 @@
-import geojson
 import itertools
 
-from werkzeug.utils import cached_property
-
+import geojson
 from notifications_utils.serialised_model import SerialisedModelCollection
+from werkzeug.utils import cached_property
 
 from .repo import BroadcastAreasRepository
 

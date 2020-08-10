@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 
 from copy import deepcopy
-import geojson
 from pathlib import Path
-import shapely.geometry as sgeom
 
+import geojson
 from notifications_utils.safe_string import make_string_safe_for_id
 
+import shapely.geometry as sgeom
 from repo import BroadcastAreasRepository
 
 package_path = Path(__file__).resolve().parent

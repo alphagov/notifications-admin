@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 
+from random import sample
+
 import geojson
+from notifications_utils.safe_string import make_string_safe_for_id
+
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 import matplotlib.pyplot as plt
 import shapely.geometry as sgeom
-
-from random import sample
-
-from notifications_utils.safe_string import make_string_safe_for_id
 from repo import BroadcastAreasRepository
 
 
