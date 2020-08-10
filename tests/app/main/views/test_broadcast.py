@@ -234,6 +234,7 @@ def test_choose_broadcast_library_page(
     assert sorted(titles) == sorted([
             'Counties and Unitary Authorities in England and Wales',
             'Countries',
+            'Electoral Wards of the United Kingdom',
             'Regions of England',
     ])
 
