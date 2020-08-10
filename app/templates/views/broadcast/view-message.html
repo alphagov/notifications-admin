@@ -18,7 +18,7 @@
   ) }}
 
   {% if broadcast_message.status == 'pending-approval' %}
-    {% if broadcast_message.created_by == current_user %}
+    {% if broadcast_message.created_by == current_user and current_user.has_permissions('send_messages') %}
       <div class="banner govuk-!-margin-bottom-6">
         <h2 class="govuk-heading-s govuk-!-margin-bottom-3">Your broadcast is waiting for approval from another member of your team</h2>
         <p class="govuk-body">Once approved it will be live until
@@ -29,7 +29,7 @@
           delete_link_text='Withdraw this broadcast'
         ) }}
       </div>
-    {% else %}
+    {% elif current_user.has_permissions('send_messages') %}
       {% call form_wrapper(class="banner govuk-!-margin-bottom-6") %}
         <p class="govuk-body govuk-!-margin-top-0 govuk-!-margin-bottom-3">
           {{ broadcast_message.created_by.name }} wants to broadcast this
@@ -41,6 +41,13 @@
           delete_link_text='Reject this broadcast'
         ) }}
       {% endcall %}
+    {% else %}
+      <div class="banner govuk-!-margin-bottom-6">
+        <h2 class="govuk-heading-s govuk-!-margin-bottom-3">This broadcast is waiting for approval</h2>
+        <p class="govuk-body">
+          You don’t have permission to approve broadcasts.
+        </p>
+      </div>
     {% endif %}
   {% else %}
     <p class="govuk-body govuk-!-margin-bottom-3">
