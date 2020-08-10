@@ -153,13 +153,19 @@
       return changed;
     };
 
+    this.$broadcastService = (document.querySelector('div[id=add_new_template_form]')).getAttribute("data-broadcast")
+
     this.actionButtonClicked = function(event) {
       event.preventDefault();
       this.currentState = $(event.currentTarget).val();
 
-      if (this.stateChanged()) {
-        this.render();
-      }
+      if (event.currentTarget.value === 'add-new-template' && this.$broadcastService) {
+        return window.location = "/services/" + this.$broadcastService + "/templates/add-broadcast";
+      } else {
+        if (this.stateChanged()) {
+          this.render();
+        };
+      };
     };
 
     this.selectionStatus = {
