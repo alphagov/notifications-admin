@@ -232,19 +232,15 @@ def test_choose_broadcast_library_page(
         for title in page.select('.file-list-filename-large')
     ]
     assert sorted(titles) == sorted([
-            'Counties and Unitary Authorities in England and Wales',
-            'Countries',
-            'Electoral Wards of the United Kingdom',
-            'Regions of England',
+        'Counties and Unitary Authorities in England and Wales',
+        'Countries',
+        'Electoral Wards of the United Kingdom',
+        'Regions of England',
     ])
 
-    assert any([
-        all([
-            country in hint.text
-            for country in ('England', 'Northern Ireland', 'Scotland', 'Wales')
-        ])
-        for hint in page.select('.file-list-hint-large')
-    ])
+    assert normalize_spaces(page.select('.file-list-hint-large')[1].text) == (
+        'England, Northern Ireland, Scotland, Wales'
+    )
 
     assert page.select_one('a.file-list-filename-large.govuk-link')['href'] == url_for(
         '.choose_broadcast_area',

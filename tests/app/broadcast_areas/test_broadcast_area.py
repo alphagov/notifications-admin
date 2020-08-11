@@ -1,5 +1,3 @@
-import re
-
 import pytest
 
 from app.broadcast_areas import (
@@ -49,14 +47,21 @@ def test_loads_areas_from_library():
 
 
 def test_examples():
-    assert re.match(
-        "^([^,]*, ){3}[^,]*",
-        broadcast_area_libraries.get('countries').get_examples(),
-    )
-    assert re.match(
-        "^([^,]*, ){4}and 5 more…$",
-        broadcast_area_libraries.get('regions-of-england').get_examples()
-    )
+    countries = broadcast_area_libraries.get('countries').get_examples()
+    assert countries == 'England, Northern Ireland, Scotland, Wales'
+
+    regions = broadcast_area_libraries.get('regions-of-england').get_examples()
+    assert regions == 'North East, North West, Yorkshire and The Humber, East Midlands, and 5 more…'
+
+    counties = broadcast_area_libraries.get(
+        'counties-and-unitary-authorities-in-england-and-wales',
+    ).get_examples()
+    assert counties == 'Hartlepool, Middlesbrough, Redcar and Cleveland, Stockton-on-Tees, and 170 more…'
+
+    wards = broadcast_area_libraries.get(
+        'electoral-wards-of-the-united-kingdom',
+    ).get_examples()
+    assert wards == 'Abbey, Alibon, Becontree, Chadwell Heath, and 8970 more…'
 
 
 @pytest.mark.parametrize('id', (

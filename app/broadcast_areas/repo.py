@@ -105,13 +105,7 @@ class BroadcastAreasRepository(object):
                   WHERE broadcast_area_library_id = ?),
         area_count AS (SELECT COUNT(*) AS c FROM areas),
         subset_area_count AS (SELECT c - 4 FROM area_count),
-        some_area_names  AS (SELECT name FROM areas LIMIT 100),
-        some_shuffled_area_names AS (
-            SELECT name FROM some_area_names ORDER BY RANDOM()
-        ),
-        description_area_names AS (
-            SELECT name FROM some_shuffled_area_names LIMIT 4
-        ),
+        description_area_names  AS (SELECT name FROM areas LIMIT 4),
         description_areas_joined AS (
             SELECT GROUP_CONCAT(name, ", ") FROM description_area_names
         )
