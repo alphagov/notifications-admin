@@ -79,7 +79,7 @@ class Config(object):
     ANTIVIRUS_ENABLED = True
 
     REDIS_URL = os.environ.get('REDIS_URL')
-    REDIS_ENABLED = False
+    REDIS_ENABLED = os.environ.get('REDIS_ENABLED') == '1'
 
     ASSET_DOMAIN = ''
     ASSET_PATH = '/static/'
