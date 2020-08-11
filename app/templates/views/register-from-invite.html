@@ -17,6 +17,11 @@ Create an account
       <span class="nowrap">{{invited_user.email_address}}</span>
     </p>
     {% call form_wrapper() %}
+      {#
+        This field is to enable password managers to capture the username as
+        well as the password, but should not be visible to users, nor should
+        the view process the input.
+      #}
       <div class="visually-hidden">
         <input type="email" name="username" id="username" value="{{ invited_user.email_address }}" disabled="disabled" tabindex="-1" aria-hidden="true" autocomplete="username" />
       </div>
