@@ -226,7 +226,7 @@ def test_shows_name_on_registration_page_from_invite(
     assert page.select_one('input[name=name]')['value'] == expected_value
 
 
-def test_shows_email_address_on_registration_page_from_invite(
+def test_shows_hidden_email_address_on_registration_page_from_invite(
     client_request,
     fake_uuid,
 ):
