@@ -1,10 +1,10 @@
 from datetime import datetime
 
-from notifications_utils.broadcast_areas import broadcast_area_libraries
 from notifications_utils.template import BroadcastPreviewTemplate
 from orderedset import OrderedSet
 from werkzeug.utils import cached_property
 
+from app.broadcast_areas import broadcast_area_libraries
 from app.models import JSONModel, ModelList
 from app.models.user import User
 from app.notify_client.broadcast_message_api_client import (
