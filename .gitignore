@@ -1,3 +1,33 @@
+## We don't allow commiting of certain files types that are at risk they could be user files containg personal information
+## Therefore if you are sure that a file is OK, you can explicitely add it to the list of files to be allowed
+*.pdf
+*.PDF
+*.csv
+*.CSV
+*.doc
+*.DOC
+*.docx
+*.DOCX
+*.xls
+*.XLS
+*.xlsx
+*.XLSX
+
+## Non user files allowed to be commited
+!tests/test_pdf_files/no_eof_marker.pdf
+!tests/test_pdf_files/multi_page_pdf.pdf
+!tests/test_pdf_files/big.pdf
+!tests/test_pdf_files/one_page_pdf.pdf
+!tests/non_spreadsheet_files/actually_a_png.csv
+!tests/spreadsheet_files/newline_windows.csv
+!tests/spreadsheet_files/newline_unix.csv
+!tests/non_spreadsheet_files/actually_a_png.xls
+!tests/spreadsheet_files/EXCEL_95.XLS
+!tests/spreadsheet_files/excel_97.xls
+!tests/non_spreadsheet_files/actually_a_png.xlsx
+!tests/spreadsheet_files/excel 2007.xlsx
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
