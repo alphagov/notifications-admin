@@ -350,6 +350,9 @@ def test_choose_broadcast_area_page_for_area_with_sub_areas(
         broadcast_message_id=fake_uuid,
         library_slug='electoral-wards-of-the-united-kingdom',
     )
+    live_search = page.select_one("[data-module=live-search]")
+    assert live_search['data-targets'] == '.file-list-item'
+    assert live_search.select_one('input')['type'] == 'search'
     partial_url_for = partial(
         url_for,
         'main.choose_broadcast_sub_area',
@@ -400,6 +403,9 @@ def test_choose_broadcast_sub_area_page(
     assert normalize_spaces(page.select_one('h1').text) == (
         'Choose an area of Aberdeen City'
     )
+    live_search = page.select_one("[data-module=live-search]")
+    assert live_search['data-targets'] == '.govuk-checkboxes__item'
+    assert live_search.select_one('input')['type'] == 'search'
     choices = [
         (
             choice.select_one('input')['value'],
