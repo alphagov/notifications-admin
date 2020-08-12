@@ -105,13 +105,10 @@ class BroadcastAreaLibrary(SerialisedModelCollection, SortableMixin, GetItemById
         self.id = id
         self.name = name
         self.is_group = bool(is_group)
+        self.items = BroadcastAreasRepository().get_all_areas_for_library(self.id)
 
     def get_examples(self):
         return BroadcastAreasRepository().get_library_description(self.id)
-
-    @property
-    def items(self):
-        return BroadcastAreasRepository().get_all_areas_for_library(self.id)
 
 
 class BroadcastAreaLibraries(SerialisedModelCollection, GetItemByIdMixin):
