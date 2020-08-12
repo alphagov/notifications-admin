@@ -61,7 +61,7 @@ def test_examples():
     wards = broadcast_area_libraries.get(
         'electoral-wards-of-the-united-kingdom',
     ).get_examples()
-    assert wards == 'Abbey, Alibon, Becontree, Chadwell Heath, and 8970 more…'
+    assert wards == 'Hartlepool, Middlesbrough, Redcar and Cleveland, Stockton-on-Tees, and 375 more…'
 
 
 @pytest.mark.parametrize('id', (

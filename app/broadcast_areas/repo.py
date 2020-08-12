@@ -114,8 +114,11 @@ class BroadcastAreasRepository(object):
     def get_library_description(self, library_id):
         q = """
         WITH
-        areas AS (SELECT * FROM broadcast_areas
-                  WHERE broadcast_area_library_id = ?),
+        areas AS (
+            SELECT * FROM broadcast_areas
+            WHERE broadcast_area_library_id = ?
+            AND broadcast_area_library_group_id IS NULL
+        ),
         area_count AS (SELECT COUNT(*) AS c FROM areas),
         subset_area_count AS (SELECT c - 4 FROM area_count),
         description_area_names  AS (SELECT name FROM areas LIMIT 4),
