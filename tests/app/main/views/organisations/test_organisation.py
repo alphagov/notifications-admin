@@ -631,6 +631,50 @@ def test_organisation_trial_mode_services_doesnt_work_if_not_platform_admin(
     )
 
 
+def test_cancel_invited_org_user_asks_for_confirmation(
+    client_request,
+    mock_get_organisation,
+    mock_get_invites_for_organisation,
+    sample_org_invite,
+    mock_get_users_for_organisation,
+):
+    page = client_request.get(
+        'main.cancel_invited_org_user',
+        org_id=ORGANISATION_ID,
+        invited_user_id=sample_org_invite['id']
+    )
+
+    assert normalize_spaces(page.select_one('.banner-dangerous').text) == (
+        'Are you sure you want to cancel this invitation? '
+        'Yes, cancel'
+    )
+    assert 'action' not in page.select_one('.banner-dangerous form')
+    assert page.select_one('.banner-dangerous form')['method'] == 'post'
+
+
+def test_cancel_invited_org_user_cancels_user_invitations(
+    client_request,
+    mock_get_invites_for_organisation,
+    sample_org_invite,
+    mock_get_organisation,
+    mocker,
+):
+    mock_cancel = mocker.patch('app.org_invite_api_client.cancel_invited_user')
+    client_request.post(
+        'main.cancel_invited_org_user',
+        org_id=ORGANISATION_ID,
+        invited_user_id=sample_org_invite['id'],
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.manage_org_users', org_id=ORGANISATION_ID, _external=True
+        ),
+    )
+    mock_cancel.assert_called_once_with(
+        org_id=ORGANISATION_ID,
+        invited_user_id=sample_org_invite['id'],
+    )
+
+
 def test_organisation_settings_platform_admin_only(
     client_request,
     mock_get_organisation,

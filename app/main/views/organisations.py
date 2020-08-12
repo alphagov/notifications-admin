@@ -232,12 +232,15 @@ def remove_user_from_organisation(org_id, user_id):
     )
 
 
-@main.route("/organisations/<uuid:org_id>/cancel-invited-user/<uuid:invited_user_id>", methods=['GET'])
+@main.route("/organisations/<uuid:org_id>/cancel-invited-user/<uuid:invited_user_id>", methods=['GET', 'POST'])
 @user_has_permissions()
 def cancel_invited_org_user(org_id, invited_user_id):
-    org_invite_api_client.cancel_invited_user(org_id=org_id, invited_user_id=invited_user_id)
+    if request.method == 'POST':
+        org_invite_api_client.cancel_invited_user(org_id=org_id, invited_user_id=invited_user_id)
+        return redirect(url_for('main.manage_org_users', org_id=org_id))
 
-    return redirect(url_for('main.manage_org_users', org_id=org_id))
+    flash('Are you sure you want to cancel this invitation?', 'cancel')
+    return manage_org_users(org_id)
 
 
 @main.route("/organisations/<uuid:org_id>/settings/", methods=['GET'])

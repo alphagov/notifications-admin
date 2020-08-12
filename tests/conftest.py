@@ -1,3 +1,4 @@
+import copy
 import json
 import os
 from contextlib import contextmanager
@@ -2398,8 +2399,6 @@ def mock_create_invite(mocker, sample_invite):
 
 @pytest.fixture(scope='function')
 def mock_get_invites_for_service(mocker, service_one, sample_invite):
-    import copy
-
     def _get_invites(service_id):
         data = []
         for i in range(0, 5):
@@ -3435,6 +3434,19 @@ def sample_org_invite(mocker, organisation_one):
     status = 'pending'
 
     return org_invite_json(id_, invited_by, organisation, email_address, created_at, status)
+
+
+@pytest.fixture(scope='function')
+def mock_get_invites_for_organisation(mocker, sample_org_invite):
+    def _get_org_invites(org_id):
+        data = []
+        for i in range(0, 5):
+            invite = copy.copy(sample_org_invite)
+            invite['email_address'] = 'user_{}@testnotify.gov.uk'.format(i)
+            data.append(invite)
+        return data
+
+    return mocker.patch('app.models.user.OrganisationInvitedUsers.client_method', side_effect=_get_org_invites)
 
 
 @pytest.fixture(scope='function')
