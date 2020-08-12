@@ -76,6 +76,63 @@ def test_broadcast_pages_403_without_permission(
     )
 
 
+@pytest.mark.parametrize('endpoint, extra_args, expected_get_status, expected_post_status', (
+    (
+        '.broadcast',
+        {'template_id': sample_uuid},
+        403, 405,
+    ),
+    (
+        '.preview_broadcast_areas', {'broadcast_message_id': sample_uuid},
+        403, 405,
+    ),
+    (
+        '.choose_broadcast_library', {'broadcast_message_id': sample_uuid},
+        403, 405,
+    ),
+    (
+        '.choose_broadcast_area', {'broadcast_message_id': sample_uuid, 'library_slug': 'countries'},
+        403, 403,
+    ),
+    (
+        '.remove_broadcast_area', {'broadcast_message_id': sample_uuid, 'area_slug': 'england'},
+        403, 405,
+    ),
+    (
+        '.preview_broadcast_message', {'broadcast_message_id': sample_uuid},
+        403, 403,
+    ),
+    (
+        '.cancel_broadcast_message', {'broadcast_message_id': sample_uuid},
+        403, 403,
+    ),
+))
+def test_broadcast_pages_403_for_user_without_permission(
+    mocker,
+    client_request,
+    service_one,
+    active_user_view_permissions,
+    endpoint,
+    extra_args,
+    expected_get_status,
+    expected_post_status,
+):
+    service_one['permissions'] += ['broadcast']
+    mocker.patch('app.user_api_client.get_user', return_value=active_user_view_permissions)
+    client_request.get(
+        endpoint,
+        service_id=SERVICE_ONE_ID,
+        _expected_status=expected_get_status,
+        **extra_args
+    )
+    client_request.post(
+        endpoint,
+        service_id=SERVICE_ONE_ID,
+        _expected_status=expected_post_status,
+        **extra_args
+    )
+
+
 def test_dashboard_redirects_to_broadcast_dashboard(
     client_request,
     service_one,
@@ -95,6 +152,7 @@ def test_dashboard_redirects_to_broadcast_dashboard(
 def test_empty_broadcast_dashboard(
     client_request,
     service_one,
+    active_user_view_permissions,
     mock_get_no_broadcast_messages,
     mock_get_service_templates_when_no_templates_exist,
 ):
@@ -158,6 +216,7 @@ def test_broadcast_dashboard(
 def test_broadcast_dashboard_json(
     logged_in_client,
     service_one,
+    active_user_view_permissions,
     mock_get_broadcast_messages,
 ):
     service_one['permissions'] += ['broadcast']
@@ -781,6 +840,50 @@ def test_cant_approve_own_broadcast(
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
     )
+
+
+@freeze_time('2020-02-22T22:22:22.000000')
+def test_view_only_user_cant_approve_broadcast(
+    mocker,
+    client_request,
+    service_one,
+    active_user_with_permissions,
+    active_user_view_permissions,
+    mock_get_broadcast_template,
+    fake_uuid,
+):
+    mocker.patch(
+        'app.broadcast_message_api_client.get_broadcast_message',
+        return_value=broadcast_message_json(
+            id_=fake_uuid,
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            created_by_id=fake_uuid,
+            finishes_at='2020-02-23T23:23:23.000000',
+            status='pending-approval',
+        ),
+    )
+    mocker.patch('app.user_api_client.get_user', side_effect=[
+        active_user_view_permissions,  # Current user
+        active_user_with_permissions,  # User who created broadcast
+    ])
+    service_one['permissions'] += ['broadcast']
+
+    page = client_request.get(
+        '.view_broadcast_message',
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+    )
+
+    assert (
+        normalize_spaces(page.select_one('.banner').text)
+    ) == (
+        'This broadcast is waiting for approval '
+        'You don’t have permission to approve broadcasts.'
+    )
+
+    assert not page.select_one('form')
+    assert not page.select_one('.banner a')
 
 
 @pytest.mark.parametrize('initial_status, expected_approval', (

@@ -228,7 +228,7 @@ def preview_broadcast_message(service_id, broadcast_message_id):
 
 
 @main.route('/services/<uuid:service_id>/broadcast/<uuid:broadcast_message_id>')
-@user_has_permissions('send_messages')
+@user_has_permissions()
 @service_has_permission('broadcast')
 def view_broadcast_message(service_id, broadcast_message_id):
     broadcast_message = BroadcastMessage.from_id(
