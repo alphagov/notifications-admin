@@ -1,5 +1,6 @@
 import json
 import uuid
+from functools import partial
 
 import pytest
 from flask import url_for
@@ -257,12 +258,104 @@ def test_choose_broadcast_area_page(
     fake_uuid,
 ):
     service_one['permissions'] += ['broadcast']
-    client_request.get(
+    page = client_request.get(
         '.choose_broadcast_area',
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
         library_slug='countries',
     )
+    assert [
+        (
+            choice.select_one('input')['value'],
+            normalize_spaces(choice.select_one('label').text),
+        )
+        for choice in page.select('form[method=post] .govuk-checkboxes__item')
+    ] == [
+        ('countries-E92000001', 'England'),
+        ('countries-N92000002', 'Northern Ireland'),
+        ('countries-S92000003', 'Scotland'),
+        ('countries-W92000004', 'Wales'),
+    ]
+
+
+def test_choose_broadcast_area_page_for_area_with_sub_areas(
+    client_request,
+    service_one,
+    mock_get_draft_broadcast_message,
+    fake_uuid,
+):
+    service_one['permissions'] += ['broadcast']
+    page = client_request.get(
+        '.choose_broadcast_area',
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+        library_slug='electoral-wards-of-the-united-kingdom',
+    )
+    partial_url_for = partial(
+        url_for,
+        'main.choose_broadcast_sub_area',
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+        library_slug='electoral-wards-of-the-united-kingdom',
+    )
+    choices = [
+        (
+            choice.select_one('a.file-list-filename-large')['href'],
+            normalize_spaces(choice.text),
+        )
+        for choice in page.select('.file-list-item')
+    ]
+    assert len(choices) == 379
+    assert choices[:2] == [
+        (
+            partial_url_for(area_slug='electoral-wards-of-the-united-kingdom-S12000033'),
+            'Aberdeen City',
+        ),
+        (
+            partial_url_for(area_slug='electoral-wards-of-the-united-kingdom-S12000034'),
+            'Aberdeenshire',
+        ),
+    ]
+    assert choices[-1:] == [
+        (
+            partial_url_for(area_slug='electoral-wards-of-the-united-kingdom-E06000014'),
+            'York',
+        ),
+    ]
+
+
+def test_choose_broadcast_sub_area_page(
+    client_request,
+    service_one,
+    mock_get_draft_broadcast_message,
+    fake_uuid,
+):
+    service_one['permissions'] += ['broadcast']
+    page = client_request.get(
+        'main.choose_broadcast_sub_area',
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+        library_slug='electoral-wards-of-the-united-kingdom',
+        area_slug='electoral-wards-of-the-united-kingdom-S12000033',
+    )
+    assert normalize_spaces(page.select_one('h1').text) == (
+        'Choose an area of Aberdeen City'
+    )
+    choices = [
+        (
+            choice.select_one('input')['value'],
+            normalize_spaces(choice.select_one('label').text),
+        )
+        for choice in page.select('form[method=post] .govuk-checkboxes__item')
+    ]
+    assert choices[:3] == [
+        ('y', 'All of Aberdeen City'),
+        ('electoral-wards-of-the-united-kingdom-S13002845', 'Airyhall/Broomhill/Garthdee'),
+        ('electoral-wards-of-the-united-kingdom-S13002836', 'Bridge of Don'),
+    ]
+    assert choices[-1:] == [
+        ('electoral-wards-of-the-united-kingdom-S13002846', 'Torry/Ferryhill'),
+    ]
 
 
 def test_add_broadcast_area(
@@ -287,6 +380,57 @@ def test_add_broadcast_area(
         broadcast_message_id=fake_uuid,
         data={
             'areas': ['countries-E92000001', 'countries-S92000003', 'countries-W92000004']
+        },
+    )
+
+
+@pytest.mark.parametrize('post_data, expected_selected', (
+    ({
+        'select_all': 'y',
+        'areas': [
+            'electoral-wards-of-the-united-kingdom-S13002845',
+        ]
+    }, [
+        'electoral-wards-of-the-united-kingdom-S12000033',
+        # S13002845 is ignored because the user chose ‘Select all…’
+    ]),
+    ({
+        'areas': [
+            'electoral-wards-of-the-united-kingdom-S13002845',
+            'electoral-wards-of-the-united-kingdom-S13002836',
+        ]
+    }, [
+        'electoral-wards-of-the-united-kingdom-S13002845',
+        'electoral-wards-of-the-united-kingdom-S13002836',
+    ]),
+))
+def test_add_broadcast_sub_area(
+    client_request,
+    service_one,
+    mock_get_draft_broadcast_message,
+    mock_update_broadcast_message,
+    fake_uuid,
+    post_data,
+    expected_selected,
+):
+    service_one['permissions'] += ['broadcast']
+    client_request.post(
+        '.choose_broadcast_sub_area',
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+        library_slug='countries',
+        area_slug='electoral-wards-of-the-united-kingdom-S12000033',
+        _data=post_data,
+    )
+    mock_update_broadcast_message.assert_called_once_with(
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+        data={
+            'areas': [
+                # These two areas are on the broadcast already
+                'countries-E92000001',
+                'countries-S92000003',
+            ] + expected_selected
         },
     )
 

@@ -12,6 +12,7 @@ from app import current_service
 from app.main import main
 from app.main.forms import (
     BroadcastAreaForm,
+    BroadcastAreaFormWithSelectAll,
     ChooseBroadcastDurationForm,
     SearchByNameForm,
 )
@@ -118,6 +119,16 @@ def choose_broadcast_area(service_id, broadcast_message_id, library_slug):
         service_id=current_service.id,
     )
     library = BroadcastMessage.libraries.get(library_slug)
+
+    if library.is_group:
+        return render_template(
+            'views/broadcast/areas-with-sub-areas.html',
+            search_form=SearchByNameForm(),
+            show_search_form=(len(library) > 7),
+            library=library,
+            broadcast_message=broadcast_message,
+        )
+
     form = BroadcastAreaForm.from_library(library)
     if form.validate_on_submit():
         broadcast_message.add_areas(*form.areas.data)
@@ -132,6 +143,41 @@ def choose_broadcast_area(service_id, broadcast_message_id, library_slug):
         search_form=SearchByNameForm(),
         show_search_form=(len(form.areas.choices) > 7),
         page_title=library.name,
+        broadcast_message=broadcast_message,
+    )
+
+
+@main.route(
+    '/services/<uuid:service_id>/broadcast/<uuid:broadcast_message_id>/libraries/<library_slug>/<area_slug>',
+    methods=['GET', 'POST'],
+)
+@user_has_permissions('send_messages')
+@service_has_permission('broadcast')
+def choose_broadcast_sub_area(service_id, broadcast_message_id, library_slug, area_slug):
+    broadcast_message = BroadcastMessage.from_id(
+        broadcast_message_id,
+        service_id=current_service.id,
+    )
+    area = BroadcastMessage.libraries.get_areas(area_slug)[0]
+
+    form = BroadcastAreaFormWithSelectAll.from_library(
+        area.sub_areas,
+        select_all_choice=(area.id, f'All of {area.name}'),
+    )
+    if form.validate_on_submit():
+        broadcast_message.add_areas(*form.selected_areas)
+        return redirect(url_for(
+            '.preview_broadcast_areas',
+            service_id=current_service.id,
+            broadcast_message_id=broadcast_message.id,
+        ))
+    return render_template(
+        'views/broadcast/sub-areas.html',
+        form=form,
+        search_form=SearchByNameForm(),
+        show_search_form=(len(form.areas.choices) > 7),
+        library_slug=library_slug,
+        page_title=f'Choose an area of {area.name}',
         broadcast_message=broadcast_message,
     )
 
