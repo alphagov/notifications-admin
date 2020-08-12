@@ -123,24 +123,21 @@ class BroadcastAreasRepository(object):
         description = self.query(q, library_id)[0][0]
         return description
 
-    def get_areas(self, *area_ids):
-        with self.conn() as conn:
-            cursor = conn.cursor()
+    def get_areas(self, area_ids):
+        q = """
+        SELECT id, name
+        FROM broadcast_areas
+        WHERE id IN ({})
+        """.format(("?," * len(area_ids))[:-1])
 
-            q = """
-            SELECT id, name
-            FROM broadcast_areas
-            WHERE id IN ({})
-            """.format(("?," * len(*area_ids))[:-1])
-            cursor.execute(q, *area_ids)
-            results = cursor.fetchall()
+        results = self.query(q, *area_ids)
 
-            areas = [
-                (row[0], row[1])
-                for row in results
-            ]
+        areas = [
+            (row[0], row[1])
+            for row in results
+        ]
 
-            return areas
+        return areas
 
     def get_all_areas_for_library(self, library_id):
         q = """
