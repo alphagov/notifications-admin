@@ -48,20 +48,20 @@ def test_loads_areas_from_library():
 
 def test_examples():
     countries = broadcast_area_libraries.get('countries').get_examples()
-    assert countries == 'England, Northern Ireland, Scotland, Wales'
+    assert countries == 'England, Northern Ireland, Scotland, and Wales'
 
     regions = broadcast_area_libraries.get('regions-of-england').get_examples()
-    assert regions == 'North East, North West, Yorkshire and The Humber, East Midlands, and 5 more…'
+    assert regions == 'East Midlands, East of England, London, and 5 more…'
 
     counties = broadcast_area_libraries.get(
         'counties-and-unitary-authorities-in-england-and-wales',
     ).get_examples()
-    assert counties == 'Hartlepool, Middlesbrough, Redcar and Cleveland, Stockton-on-Tees, and 170 more…'
+    assert counties == 'Barking and Dagenham, Barnet, Barnsley, and 170 more…'
 
     wards = broadcast_area_libraries.get(
         'electoral-wards-of-the-united-kingdom',
     ).get_examples()
-    assert wards == 'Abbey, Alibon, Becontree, Chadwell Heath, and 8970 more…'
+    assert wards == 'Aberdeen City, Aberdeenshire, Adur, and 375 more…'
 
 
 @pytest.mark.parametrize('id', (

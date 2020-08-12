@@ -114,11 +114,14 @@ class BroadcastAreasRepository(object):
     def get_library_description(self, library_id):
         q = """
         WITH
-        areas AS (SELECT * FROM broadcast_areas
-                  WHERE broadcast_area_library_id = ?),
+        areas AS (
+            SELECT * FROM broadcast_areas
+            WHERE broadcast_area_library_id = ?
+            AND broadcast_area_library_group_id IS NULL
+        ),
         area_count AS (SELECT COUNT(*) AS c FROM areas),
         subset_area_count AS (SELECT c - 4 FROM area_count),
-        description_area_names  AS (SELECT name FROM areas LIMIT 4),
+        description_area_names  AS (SELECT name FROM areas ORDER BY name ASC LIMIT 3),
         description_areas_joined AS (
             SELECT GROUP_CONCAT(name, ", ") FROM description_area_names
         )
@@ -126,6 +129,8 @@ class BroadcastAreasRepository(object):
         CASE (SELECT * FROM subset_area_count)
         WHEN 0 THEN
             (SELECT * FROM description_areas_joined)
+            || ", and "
+            || (SELECT name from areas ORDER BY name DESC limit 1)
         ELSE
             (SELECT * FROM description_areas_joined)
             || ", and "
