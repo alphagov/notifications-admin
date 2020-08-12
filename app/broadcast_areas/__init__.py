@@ -29,24 +29,18 @@ class GetItemByIdMixin:
 class BroadcastArea(SortableMixin):
 
     def __init__(self, row):
-        id, name, feature, simple_feature = row
-
-        self.id = id
-        self.name = name
-
-        self._feature = feature
-        self._simple_feature = simple_feature
-
-        for coordinates in self.polygons:
-            if coordinates[0] != coordinates[-1]:
-                # The CAP XML format requires shapes to be closed
-                raise ValueError(
-                    f'Area {self.name} is not a closed shape '
-                    f'({coordinates[0]}, {coordinates[-1]})'
-                )
+        self.id, self.name = row
 
     def __eq__(self, other):
         return self.id == other.id
+
+    @property
+    def _feature(self):
+        return BroadcastAreasRepository().get_feature_for_area(self.id)
+
+    @property
+    def _simple_feature(self):
+        return BroadcastAreasRepository().get_simple_feature_for_area(self.id)
 
     def _polygons(self, feature):
         if feature['geometry']['type'] == 'MultiPolygon':

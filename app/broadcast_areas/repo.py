@@ -128,7 +128,7 @@ class BroadcastAreasRepository(object):
             cursor = conn.cursor()
 
             q = """
-            SELECT id, name, feature_geojson, simple_feature_geojson
+            SELECT id, name
             FROM broadcast_areas
             WHERE id IN ({})
             """.format(("?," * len(*area_ids))[:-1])
@@ -136,7 +136,7 @@ class BroadcastAreasRepository(object):
             results = cursor.fetchall()
 
             areas = [
-                (row[0], row[1], row[2], row[3])
+                (row[0], row[1])
                 for row in results
             ]
 
@@ -144,7 +144,7 @@ class BroadcastAreasRepository(object):
 
     def get_all_areas_for_library(self, library_id):
         q = """
-        SELECT id, name, feature_geojson, simple_feature_geojson
+        SELECT id, name
         FROM broadcast_areas
         WHERE broadcast_area_library_id = ?
         AND broadcast_area_library_group_id IS NULL
@@ -152,16 +152,14 @@ class BroadcastAreasRepository(object):
 
         results = self.query(q, library_id)
 
-        areas = [
-            (row[0], row[1], row[2], row[3])
+        return [
+            (row[0], row[1])
             for row in results
         ]
 
-        return areas
-
     def get_all_areas_for_group(self, group_id):
         q = """
-        SELECT id, name, feature_geojson, simple_feature_geojson
+        SELECT id, name
         FROM broadcast_areas
         WHERE broadcast_area_library_group_id = ?
         """
@@ -169,7 +167,7 @@ class BroadcastAreasRepository(object):
         results = self.query(q, group_id)
 
         areas = [
-            (row[0], row[1], row[2], row[3])
+            (row[0], row[1])
             for row in results
         ]
 
@@ -191,3 +189,25 @@ class BroadcastAreasRepository(object):
         ]
 
         return areas
+
+    def get_feature_for_area(self, area_id):
+        q = """
+        SELECT feature_geojson
+        FROM broadcast_areas
+        WHERE id = ?
+        """
+
+        results = self.query(q, area_id)
+
+        return results[0][0]
+
+    def get_simple_feature_for_area(self, area_id):
+        q = """
+        SELECT simple_feature_geojson
+        FROM broadcast_areas
+        WHERE id = ?
+        """
+
+        results = self.query(q, area_id)
+
+        return results[0][0]
