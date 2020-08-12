@@ -278,9 +278,12 @@ def confirm_edit_user_mobile_number(service_id, user_id):
     )
 
 
-@main.route("/services/<uuid:service_id>/cancel-invited-user/<uuid:invited_user_id>", methods=['GET'])
+@main.route("/services/<uuid:service_id>/cancel-invited-user/<uuid:invited_user_id>", methods=['GET', 'POST'])
 @user_has_permissions('manage_service')
 def cancel_invited_user(service_id, invited_user_id):
-    current_service.cancel_invite(invited_user_id)
+    if request.method == 'POST':
+        current_service.cancel_invite(invited_user_id)
+        return redirect(url_for('main.manage_users', service_id=service_id))
 
-    return redirect(url_for('main.manage_users', service_id=service_id))
+    flash('Are you sure you want to cancel this invitation?', 'cancel')
+    return manage_users(service_id)

@@ -997,15 +997,35 @@ def test_invite_user_to_broadcast_service(
     )
 
 
+def test_cancel_invited_user_asks_for_confirmation(
+    client_request,
+    mock_get_invites_for_service,
+    sample_invite,
+    mock_get_template_folders,
+    mock_get_users_by_service,
+):
+    page = client_request.get(
+        'main.cancel_invited_user',
+        service_id=SERVICE_ONE_ID,
+        invited_user_id=sample_invite['id']
+    )
+
+    assert normalize_spaces(page.select_one('.banner-dangerous').text) == (
+        'Are you sure you want to cancel this invitation? '
+        'Yes, cancel'
+    )
+    assert 'action' not in page.select_one('.banner-dangerous form')
+    assert page.select_one('.banner-dangerous form')['method'] == 'post'
+
+
 def test_cancel_invited_user_cancels_user_invitations(
     client_request,
     mock_get_invites_for_service,
     sample_invite,
-    active_user_with_permissions,
     mocker,
 ):
     mock_cancel = mocker.patch('app.invite_api_client.cancel_invited_user')
-    client_request.get(
+    client_request.post(
         'main.cancel_invited_user',
         service_id=SERVICE_ONE_ID,
         invited_user_id=sample_invite['id'],
@@ -1026,7 +1046,7 @@ def test_cancel_invited_user_doesnt_work_if_user_not_invited_to_this_service(
     mocker,
 ):
     mock_cancel = mocker.patch('app.invite_api_client.cancel_invited_user')
-    client_request.get(
+    client_request.post(
         'main.cancel_invited_user',
         service_id=SERVICE_ONE_ID,
         invited_user_id=sample_uuid(),
