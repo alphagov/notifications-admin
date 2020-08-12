@@ -119,9 +119,7 @@ class BroadcastAreaLibraries(SerialisedModelCollection, GetItemByIdMixin):
     model = BroadcastAreaLibrary
 
     def __init__(self):
-
-        self.libraries = BroadcastAreasRepository().get_libraries()
-        self.items = self.libraries
+        self.items = BroadcastAreasRepository().get_libraries()
 
     def get_areas(self, *area_ids):
         # allow people to call `get_areas('a', 'b') or get_areas(['a', 'b'])`
