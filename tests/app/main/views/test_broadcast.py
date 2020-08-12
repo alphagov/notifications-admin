@@ -295,7 +295,6 @@ def test_choose_broadcast_library_page(
         'Counties and Unitary Authorities in England and Wales',
         'Countries',
         'Electoral Wards of the United Kingdom',
-        'Regions of England',
     ])
 
     assert normalize_spaces(page.select('.file-list-hint-large')[1].text) == (

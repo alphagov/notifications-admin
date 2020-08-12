@@ -25,11 +25,6 @@ def test_loads_libraries():
             'Electoral Wards of the United Kingdom',
             True,
         ),
-        (
-            'regions-of-england',
-            'Regions of England',
-            False,
-        ),
     ]
 
 
@@ -49,9 +44,6 @@ def test_loads_areas_from_library():
 def test_examples():
     countries = broadcast_area_libraries.get('countries').get_examples()
     assert countries == 'England, Northern Ireland, Scotland, and Wales'
-
-    regions = broadcast_area_libraries.get('regions-of-england').get_examples()
-    assert regions == 'East Midlands, East of England, London, and 5 more…'
 
     counties = broadcast_area_libraries.get(
         'counties-and-unitary-authorities-in-england-and-wales',
@@ -187,10 +179,9 @@ def test_repository_has_all_libraries():
     repo = BroadcastAreasRepository()
     libraries = repo.get_libraries()
 
-    assert len(libraries) == 4
+    assert len(libraries) == 3
     assert [
         'Counties and Unitary Authorities in England and Wales',
         'Countries',
         'Electoral Wards of the United Kingdom',
-        'Regions of England',
     ] == sorted([name for _, name, _is_group in libraries])
