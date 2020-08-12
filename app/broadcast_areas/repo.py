@@ -37,14 +37,19 @@ class BroadcastAreasRepository(object):
                 name TEXT NOT NULL,
                 broadcast_area_library_id TEXT NOT NULL,
                 broadcast_area_library_group_id TEXT,
-                feature_geojson TEXT NOT NULL,
-                simple_feature_geojson TEXT NOT NULL,
 
                 FOREIGN KEY (broadcast_area_library_id)
                     REFERENCES broadcast_area_libraries(id),
 
                 FOREIGN KEY (broadcast_area_library_group_id)
                     REFERENCES broadcast_area_library_groups(id)
+            )""")
+
+            conn.execute("""
+            CREATE TABLE broadcast_area_features (
+                id TEXT PRIMARY KEY,
+                feature_geojson TEXT NOT NULL,
+                simple_feature_geojson TEXT NOT NULL
             )""")
 
             conn.execute("""
@@ -69,21 +74,29 @@ class BroadcastAreasRepository(object):
 
     def insert_broadcast_areas(self, areas):
 
-        q = """
+        areas_q = """
         INSERT INTO broadcast_areas (
             id, name,
-            broadcast_area_library_id, broadcast_area_library_group_id,
+            broadcast_area_library_id, broadcast_area_library_group_id
+        )
+        VALUES (?, ?, ?, ?)
+        """
+
+        features_q = """
+        INSERT INTO broadcast_area_features (
+            id,
             feature_geojson, simple_feature_geojson
         )
-        VALUES (?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?)
         """
 
         with self.conn() as conn:
             for id, name, area_id, group, feature, simple_feature in areas:
-                conn.execute(q, (
-                    id, name,
-                    area_id, group,
-                    geojson.dumps(feature), geojson.dumps(simple_feature),
+                conn.execute(areas_q, (
+                    id, name, area_id, group,
+                ))
+                conn.execute(features_q, (
+                    id, geojson.dumps(feature), geojson.dumps(simple_feature),
                 ))
 
     def query(self, sql, *args):
@@ -190,7 +203,7 @@ class BroadcastAreasRepository(object):
     def get_feature_for_area(self, area_id):
         q = """
         SELECT feature_geojson
-        FROM broadcast_areas
+        FROM broadcast_area_features
         WHERE id = ?
         """
 
@@ -201,7 +214,7 @@ class BroadcastAreasRepository(object):
     def get_simple_feature_for_area(self, area_id):
         q = """
         SELECT simple_feature_geojson
-        FROM broadcast_areas
+        FROM broadcast_area_features
         WHERE id = ?
         """
 
