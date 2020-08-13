@@ -146,7 +146,7 @@ def email_address(label='Email address', gov_user=True, required=True):
     if required:
         validators.append(DataRequired(message='Cannot be empty'))
 
-    return GovukEmailField(label, validators, render_kw={'spellcheck': 'false'})
+    return GovukEmailField(label, validators)
 
 
 class UKMobileNumber(TelField):
