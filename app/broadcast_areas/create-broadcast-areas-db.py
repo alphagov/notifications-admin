@@ -71,7 +71,6 @@ repo.create_tables()
 
 simple_datasets = [
     ("Countries", "ctry19cd", "ctry19nm"),
-    ("Regions of England", "rgn18cd", "rgn18nm"),
     ("Counties and Unitary Authorities in England and Wales", "ctyua16cd", "ctyua16nm"),
 ]
 for dataset_name, id_field, name_field in simple_datasets:
