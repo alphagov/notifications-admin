@@ -5,7 +5,6 @@ from pathlib import Path
 
 import geojson
 import shapely.geometry as sgeom
-from notifications_utils.safe_string import make_string_safe_for_id
 
 from repo import BroadcastAreasRepository
 
@@ -76,7 +75,7 @@ simple_datasets = [
 for dataset_name, id_field, name_field in simple_datasets:
     filepath = package_path / "{}.geojson".format(dataset_name)
 
-    dataset_id = make_string_safe_for_id(dataset_name)
+    dataset_id = id_field[:-2]
     dataset_geojson = geojson.loads(filepath.read_text())
 
     repo.insert_broadcast_area_library(dataset_id, dataset_name, False)
@@ -112,8 +111,8 @@ ward_code_to_la_id_mapping = {
     for f in geojson.loads(las_filepath.read_text())["features"]
 }
 
-dataset_name = "Electoral Wards of the United Kingdom"
-dataset_id = make_string_safe_for_id(dataset_name)
+dataset_name = "Local authorities"
+dataset_id = "wd20-lad20"
 repo.insert_broadcast_area_library(dataset_id, dataset_name, True)
 
 areas_to_add = []
@@ -121,12 +120,12 @@ areas_to_add = []
 for f in geojson.loads(wards_filepath.read_text())["features"]:
     ward_code = f["properties"]["wd20cd"]
     ward_name = f["properties"]["wd20nm"]
-    ward_id = dataset_id + "-" + ward_code
+    ward_id = "wd20-" + ward_code
 
     print(ward_name)  # noqa: T001
 
     try:
-        la_id = dataset_id + "-" + ward_code_to_la_id_mapping[ward_code]
+        la_id = "lad20-" + ward_code_to_la_id_mapping[ward_code]
         la_name = ward_code_to_la_mapping[ward_code]
 
         sf = deepcopy(f)
@@ -152,7 +151,7 @@ for feature in geojson.loads(las_filepath.read_text())["features"]:
 
     print(group_name)  # noqa: T001
 
-    group_id = dataset_id + "-" + la_id
+    group_id = "lad20-" + la_id
 
     simple_feature = deepcopy(feature)
     simple_feature["geometry"] = simplify_geometry(simple_feature["geometry"])
