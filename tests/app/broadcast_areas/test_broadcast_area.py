@@ -11,11 +11,6 @@ def test_loads_libraries():
         (library.id, library.name, library.is_group) for library in sorted(broadcast_area_libraries)
     ] == [
         (
-            'ctyua16',
-            'Counties and Unitary Authorities in England and Wales',
-            False,
-        ),
-        (
             'ctry19',
             'Countries',
             False,
@@ -45,14 +40,7 @@ def test_examples():
     countries = broadcast_area_libraries.get('ctry19').get_examples()
     assert countries == 'England, Northern Ireland, Scotland, and Wales'
 
-    counties = broadcast_area_libraries.get(
-        'ctyua16',
-    ).get_examples()
-    assert counties == 'Barking and Dagenham, Barnet, Barnsley, and 170 more…'
-
-    wards = broadcast_area_libraries.get(
-        'wd20-lad20',
-    ).get_examples()
+    wards = broadcast_area_libraries.get('wd20-lad20').get_examples()
     assert wards == 'Aberdeen City, Aberdeenshire, Adur, and 375 more…'
 
 
@@ -76,11 +64,9 @@ def test_get_names_of_areas():
         'ctry19-W92000004',
         'lad20-W06000014',
         'ctry19-E92000001',
-        'ctyua16-E10000012',
-
     )
     assert [area.name for area in sorted(areas)] == [
-        'England', 'Essex', 'Vale of Glamorgan', 'Wales',
+        'England', 'Vale of Glamorgan', 'Wales',
     ]
 
 
@@ -88,18 +74,14 @@ def test_get_areas_accepts_lists():
     areas_from_list = broadcast_area_libraries.get_areas(
         [
             'ctry19-W92000004',
-            'ctyua16-W06000014',
             'ctry19-E92000001',
-            'ctyua16-E10000012',
         ]
     )
     areas_from_args = broadcast_area_libraries.get_areas(
         'ctry19-W92000004',
-        'ctyua16-W06000014',
         'ctry19-E92000001',
-        'ctyua16-E10000012',
     )
-    assert len(areas_from_args) == len(areas_from_list) == 4
+    assert len(areas_from_args) == len(areas_from_list) == 2
     assert areas_from_args == areas_from_list
 
 
@@ -180,9 +162,8 @@ def test_repository_has_all_libraries():
     repo = BroadcastAreasRepository()
     libraries = repo.get_libraries()
 
-    assert len(libraries) == 3
+    assert len(libraries) == 2
     assert [
-        'Counties and Unitary Authorities in England and Wales',
         'Countries',
         'Local authorities',
-    ] == sorted([name for _, name, _is_group in libraries])
+    ] == [name for _, name, _is_group in libraries]
