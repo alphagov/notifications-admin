@@ -4,9 +4,9 @@ from copy import deepcopy
 from pathlib import Path
 
 import geojson
+import shapely.geometry as sgeom
 from notifications_utils.safe_string import make_string_safe_for_id
 
-import shapely.geometry as sgeom
 from repo import BroadcastAreasRepository
 
 package_path = Path(__file__).resolve().parent

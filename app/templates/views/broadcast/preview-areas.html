@@ -36,12 +36,23 @@
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(mymap);
 
+    {% for polygon in broadcast_message.simple_polygons %}
+      polygons.push(
+        L.polygon({{polygon}}, {
+          color: '#2B8CC4', // $light-blue
+          opacity: 0.4,
+          fillColor: '#2B8CC4', // $light-blue
+          fillOpacity: 0.3,
+          weight: 1
+        })
+      );
+    {% endfor %}
+
     {% for polygon in broadcast_message.polygons %}
       polygons.push(
         L.polygon({{polygon}}, {
           color: '#0b0b0c', // $black
-          fillColor: '#2B8CC4', // $light-blue
-          fillOpacity: 0.2,
+          fillOpacity: 0,
           weight: 2
         })
       );

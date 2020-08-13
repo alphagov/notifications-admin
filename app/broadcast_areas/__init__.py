@@ -138,5 +138,17 @@ class BroadcastAreaLibraries(SerialisedModelCollection, GetItemByIdMixin):
             for polygon in self.get_polygons_for_areas_long_lat(*area_ids)
         ]
 
+    def get_simple_polygons_for_areas_long_lat(self, *area_ids):
+        return list(itertools.chain(*(
+            area.simple_polygons
+            for area in self.get_areas(*area_ids)
+        )))
+
+    def get_simple_polygons_for_areas_lat_long(self, *area_ids):
+        return [
+            [[long, lat] for lat, long in polygon]
+            for polygon in self.get_simple_polygons_for_areas_long_lat(*area_ids)
+        ]
+
 
 broadcast_area_libraries = BroadcastAreaLibraries()

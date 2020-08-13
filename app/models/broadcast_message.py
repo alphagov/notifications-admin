@@ -2,6 +2,8 @@ from datetime import datetime
 
 from notifications_utils.template import BroadcastPreviewTemplate
 from orderedset import OrderedSet
+from shapely.geometry import MultiPolygon, Polygon
+from shapely.ops import unary_union
 from werkzeug.utils import cached_property
 
 from app.broadcast_areas import broadcast_area_libraries
@@ -75,6 +77,25 @@ class BroadcastMessage(JSONModel):
         return broadcast_area_libraries.get_polygons_for_areas_lat_long(
             *self._dict['areas']
         )
+
+    @property
+    def simple_polygons(self):
+        simple_polygons = broadcast_area_libraries.get_simple_polygons_for_areas_lat_long(
+            *self._dict['areas']
+        )
+        unioned_polygons = unary_union([
+            Polygon(i) for i in simple_polygons
+        ])
+        if isinstance(unioned_polygons, MultiPolygon):
+            return [
+                [
+                    [x, y] for x, y in p.exterior.coords
+                ]
+                for p in unioned_polygons
+            ]
+        return [[
+            [x, y] for x, y in unioned_polygons.exterior.coords
+        ]]
 
     @property
     def template(self):
