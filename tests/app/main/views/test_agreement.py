@@ -281,6 +281,7 @@ def test_accept_agreement_page_populates(
             'on_behalf_of_email': '',
         },
         [
+            'Select an option',
             'Error: Must be a number',
         ],
     ),
@@ -345,7 +346,7 @@ def test_accept_agreement_page_validates(
         _expected_status=200,
     )
     assert [
-        error.text.strip() for error in page.select('.govuk-error-message')
+        error.text.strip() for error in page.select('.govuk-error-message, .error-message')
     ] == expected_errors
 
 
