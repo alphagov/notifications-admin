@@ -1562,6 +1562,7 @@ class ServiceContactDetailsForm(StripWhitespaceForm):
 
     url = GovukTextInputField("URL")
     email_address = GovukEmailField("Email address")
+    # This is a text field because the number provided by the user can also be a short code
     phone_number = GovukTextInputField("Phone number")
 
     def validate(self):
