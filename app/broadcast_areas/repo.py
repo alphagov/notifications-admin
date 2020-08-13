@@ -21,6 +21,7 @@ class BroadcastAreasRepository(object):
             CREATE TABLE broadcast_area_libraries (
                 id TEXT PRIMARY KEY,
                 name TEXT NOT NULL,
+                name_singular TEXT NOT NULL,
                 is_group BOOLEAN NOT NULL
             )""")
 
@@ -62,15 +63,15 @@ class BroadcastAreasRepository(object):
             ON broadcast_areas (broadcast_area_library_group_id);
             """)
 
-    def insert_broadcast_area_library(self, id, name, is_group):
+    def insert_broadcast_area_library(self, id, *, name, name_singular, is_group):
 
         q = """
-        INSERT INTO broadcast_area_libraries (id, name, is_group)
-        VALUES (?, ?, ?)
+        INSERT INTO broadcast_area_libraries (id, name, name_singular, is_group)
+        VALUES (?, ?, ?, ?)
         """
 
         with self.conn() as conn:
-            conn.execute(q, (id, name, is_group))
+            conn.execute(q, (id, name, name_singular, is_group))
 
     def insert_broadcast_areas(self, areas):
 
@@ -106,9 +107,9 @@ class BroadcastAreasRepository(object):
             return cursor.fetchall()
 
     def get_libraries(self):
-        q = "SELECT id, name, is_group FROM broadcast_area_libraries"
+        q = "SELECT id, name, name_singular, is_group FROM broadcast_area_libraries"
         results = self.query(q)
-        libraries = [(row[0], row[1], row[2]) for row in results]
+        libraries = [(row[0], row[1], row[2], row[3]) for row in results]
         return sorted(libraries)
 
     def get_library_description(self, library_id):

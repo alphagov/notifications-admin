@@ -69,15 +69,20 @@ repo.delete_db()
 repo.create_tables()
 
 simple_datasets = [
-    ("Countries", "ctry19cd", "ctry19nm"),
+    ("Countries", "country", "ctry19cd", "ctry19nm"),
 ]
-for dataset_name, id_field, name_field in simple_datasets:
+for dataset_name, dataset_name_singular, id_field, name_field in simple_datasets:
     filepath = package_path / "{}.geojson".format(dataset_name)
 
     dataset_id = id_field[:-2]
     dataset_geojson = geojson.loads(filepath.read_text())
 
-    repo.insert_broadcast_area_library(dataset_id, dataset_name, False)
+    repo.insert_broadcast_area_library(
+        dataset_id,
+        name=dataset_name,
+        name_singular=dataset_name_singular,
+        is_group=False,
+    )
 
     for feature in dataset_geojson["features"]:
         f_id = dataset_id + "-" + feature["properties"][id_field]
@@ -111,8 +116,14 @@ ward_code_to_la_id_mapping = {
 }
 
 dataset_name = "Local authorities"
+dataset_name_singular = "local authority"
 dataset_id = "wd20-lad20"
-repo.insert_broadcast_area_library(dataset_id, dataset_name, True)
+repo.insert_broadcast_area_library(
+    dataset_id,
+    name=dataset_name,
+    name_singular=dataset_name_singular,
+    is_group=True,
+)
 
 areas_to_add = []
 

@@ -126,6 +126,7 @@ def choose_broadcast_area(service_id, broadcast_message_id, library_slug):
             search_form=SearchByNameForm(),
             show_search_form=(len(library) > 7),
             library=library,
+            page_title=f'Choose a {library.name_singular.lower()}',
             broadcast_message=broadcast_message,
         )
 
@@ -142,7 +143,7 @@ def choose_broadcast_area(service_id, broadcast_message_id, library_slug):
         form=form,
         search_form=SearchByNameForm(),
         show_search_form=(len(form.areas.choices) > 7),
-        page_title=library.name,
+        page_title=f'Choose {library.name.lower()}',
         broadcast_message=broadcast_message,
     )
 

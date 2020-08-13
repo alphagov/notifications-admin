@@ -164,6 +164,6 @@ def test_repository_has_all_libraries():
 
     assert len(libraries) == 2
     assert [
-        'Countries',
-        'Local authorities',
-    ] == [name for _, name, _is_group in libraries]
+        ('Countries', 'country'),
+        ('Local authorities', 'local authority'),
+    ] == [(name, name_singular) for _, name, name_singular, _is_group in libraries]

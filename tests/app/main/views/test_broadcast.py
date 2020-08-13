@@ -320,6 +320,9 @@ def test_choose_broadcast_area_page(
         broadcast_message_id=fake_uuid,
         library_slug='ctry19',
     )
+    assert normalize_spaces(page.select_one('h1').text) == (
+        'Choose countries'
+    )
     assert [
         (
             choice.select_one('input')['value'],
@@ -346,6 +349,9 @@ def test_choose_broadcast_area_page_for_area_with_sub_areas(
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
         library_slug='wd20-lad20',
+    )
+    assert normalize_spaces(page.select_one('h1').text) == (
+        'Choose a local authority'
     )
     partial_url_for = partial(
         url_for,
