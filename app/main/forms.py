@@ -58,7 +58,7 @@ from app.models.roles_and_permissions import (
     permissions,
     roles,
 )
-from app.utils import guess_name_from_email_address
+from app.utils import guess_name_from_email_address, merge_jsonlike
 
 
 def get_time_value_and_label(future_time):
@@ -241,12 +241,9 @@ def govuk_field_widget(self, field, type=None, param_extensions=None, **kwargs):
         params["type"] = type
 
     # extend default params with any sent in
-    if self.param_extensions:
-        params.update(self.param_extensions)
-
-    # add any sent in though use in templates
-    if param_extensions:
-        params.update(param_extensions)
+    merge_jsonlike(params, self.param_extensions)
+    # add any sent in through use in templates
+    merge_jsonlike(params, param_extensions)
 
     return Markup(
         render_template('vendor/govuk-frontend/components/input/template.njk', params=params))
@@ -290,8 +287,8 @@ class GovukEmailField(EmailField):
     def widget(self, field, param_extensions=None, **kwargs):
 
         params = {"attributes": {"spellcheck": "false"}}  # email addresses don't need to be spellchecked
-        if param_extensions:
-            params.update(param_extensions)
+        merge_jsonlike(params, param_extensions)
+
         return govuk_field_widget(self, field, type="email", param_extensions=params, **kwargs)
 
 
@@ -307,8 +304,8 @@ class GovukSearchField(SearchField):
     def widget(self, field, param_extensions=None, **kwargs):
 
         params = {"classes": "govuk-!-width-full"}  # email addresses don't need to be spellchecked
-        if param_extensions:
-            params.update(param_extensions)
+        merge_jsonlike(params, param_extensions)
+
         return govuk_field_widget(self, field, type="search", param_extensions=params, **kwargs)
 
 
@@ -349,9 +346,8 @@ class SMSCode(GovukTextInputField):
     def __call__(self, **kwargs):
         params = {"attributes": {"pattern": "[0-9]*"}}
         if "param_extensions" in kwargs:
-            kwargs["param_extensions"].update(params)
-        else:
-            kwargs["param_extensions"] = params
+            merge_jsonlike(kwargs["param_extensions"], params)
+
         return super().__call__(type='tel', **kwargs)
 
     def process_formdata(self, valuelist):
@@ -703,7 +699,7 @@ class govukCheckboxesMixin:
             del extensions['items']
 
         # merge dicts
-        params.update(extensions)
+        merge_jsonlike(params, extensions)
 
         # merge items
         if items:
@@ -788,29 +784,6 @@ class govukCheckboxesField(govukCheckboxesMixin, SelectMultipleField):
 
     def get_items_from_options(self, field):
         return [self.get_item_from_option(option) for option in field]
-
-    def extend_params(self, params, extensions):
-        items = None
-        param_items = len(params['items']) if 'items' in params else 0
-
-        # split items off from params to make it a pure dict
-        if 'items' in extensions:
-            items = extensions['items']
-            del extensions['items']
-
-        # merge dicts
-        params.update(extensions)
-
-        # merge items
-        if items:
-            if 'items' not in params:
-                params['items'] = items
-            else:
-                for idx, _item in enumerate(items):
-                    if idx >= param_items:
-                        params['items'].append(items[idx])
-                    else:
-                        params['items'][idx].update(items[idx])
 
     # self.__call__ renders the HTML for the field by:
     # 1. delegating to self.meta.render_field which
