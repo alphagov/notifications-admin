@@ -662,7 +662,7 @@ def broadcast_message_json(
 
         'personalisation': {},
         'areas': areas or [
-            'countries-E92000001', 'countries-S92000003',
+            'ctry19-E92000001', 'ctry19-S92000003',
         ],
 
         'status': status,

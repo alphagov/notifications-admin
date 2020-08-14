@@ -287,17 +287,15 @@ def test_choose_broadcast_library_page(
         broadcast_message_id=fake_uuid,
     )
 
-    titles = [
+    assert [
         normalize_spaces(title.text)
         for title in page.select('.file-list-filename-large')
-    ]
-    assert sorted(titles) == sorted([
-        'Counties and Unitary Authorities in England and Wales',
+    ] == [
         'Countries',
-        'Electoral Wards of the United Kingdom',
-    ])
+        'Local authorities',
+    ]
 
-    assert normalize_spaces(page.select('.file-list-hint-large')[1].text) == (
+    assert normalize_spaces(page.select('.file-list-hint-large')[0].text) == (
         'England, Northern Ireland, Scotland, and Wales'
     )
 
@@ -305,7 +303,7 @@ def test_choose_broadcast_library_page(
         '.choose_broadcast_area',
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
-        library_slug='counties-and-unitary-authorities-in-england-and-wales',
+        library_slug='ctry19',
     )
 
 
@@ -320,7 +318,10 @@ def test_choose_broadcast_area_page(
         '.choose_broadcast_area',
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
-        library_slug='countries',
+        library_slug='ctry19',
+    )
+    assert normalize_spaces(page.select_one('h1').text) == (
+        'Choose countries'
     )
     assert [
         (
@@ -329,10 +330,10 @@ def test_choose_broadcast_area_page(
         )
         for choice in page.select('form[method=post] .govuk-checkboxes__item')
     ] == [
-        ('countries-E92000001', 'England'),
-        ('countries-N92000002', 'Northern Ireland'),
-        ('countries-S92000003', 'Scotland'),
-        ('countries-W92000004', 'Wales'),
+        ('ctry19-E92000001', 'England'),
+        ('ctry19-N92000002', 'Northern Ireland'),
+        ('ctry19-S92000003', 'Scotland'),
+        ('ctry19-W92000004', 'Wales'),
     ]
 
 
@@ -347,14 +348,17 @@ def test_choose_broadcast_area_page_for_area_with_sub_areas(
         '.choose_broadcast_area',
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
-        library_slug='electoral-wards-of-the-united-kingdom',
+        library_slug='wd20-lad20',
+    )
+    assert normalize_spaces(page.select_one('h1').text) == (
+        'Choose a local authority'
     )
     partial_url_for = partial(
         url_for,
         'main.choose_broadcast_sub_area',
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
-        library_slug='electoral-wards-of-the-united-kingdom',
+        library_slug='wd20-lad20',
     )
     choices = [
         (
@@ -366,17 +370,17 @@ def test_choose_broadcast_area_page_for_area_with_sub_areas(
     assert len(choices) == 379
     assert choices[:2] == [
         (
-            partial_url_for(area_slug='electoral-wards-of-the-united-kingdom-S12000033'),
+            partial_url_for(area_slug='lad20-S12000033'),
             'Aberdeen City',
         ),
         (
-            partial_url_for(area_slug='electoral-wards-of-the-united-kingdom-S12000034'),
+            partial_url_for(area_slug='lad20-S12000034'),
             'Aberdeenshire',
         ),
     ]
     assert choices[-1:] == [
         (
-            partial_url_for(area_slug='electoral-wards-of-the-united-kingdom-E06000014'),
+            partial_url_for(area_slug='lad20-E06000014'),
             'York',
         ),
     ]
@@ -393,8 +397,8 @@ def test_choose_broadcast_sub_area_page(
         'main.choose_broadcast_sub_area',
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
-        library_slug='electoral-wards-of-the-united-kingdom',
-        area_slug='electoral-wards-of-the-united-kingdom-S12000033',
+        library_slug='wd20-lad20',
+        area_slug='lad20-S12000033',
     )
     assert normalize_spaces(page.select_one('h1').text) == (
         'Choose an area of Aberdeen City'
@@ -408,11 +412,11 @@ def test_choose_broadcast_sub_area_page(
     ]
     assert choices[:3] == [
         ('y', 'All of Aberdeen City'),
-        ('electoral-wards-of-the-united-kingdom-S13002845', 'Airyhall/Broomhill/Garthdee'),
-        ('electoral-wards-of-the-united-kingdom-S13002836', 'Bridge of Don'),
+        ('wd20-S13002845', 'Airyhall/Broomhill/Garthdee'),
+        ('wd20-S13002836', 'Bridge of Don'),
     ]
     assert choices[-1:] == [
-        ('electoral-wards-of-the-united-kingdom-S13002846', 'Torry/Ferryhill'),
+        ('wd20-S13002846', 'Torry/Ferryhill'),
     ]
 
 
@@ -428,16 +432,16 @@ def test_add_broadcast_area(
         '.choose_broadcast_area',
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
-        library_slug='countries',
+        library_slug='ctry19',
         _data={
-            'areas': ['countries-E92000001', 'countries-W92000004']
+            'areas': ['ctry19-E92000001', 'ctry19-W92000004']
         }
     )
     mock_update_broadcast_message.assert_called_once_with(
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
         data={
-            'areas': ['countries-E92000001', 'countries-S92000003', 'countries-W92000004']
+            'areas': ['ctry19-E92000001', 'ctry19-S92000003', 'ctry19-W92000004']
         },
     )
 
@@ -446,20 +450,20 @@ def test_add_broadcast_area(
     ({
         'select_all': 'y',
         'areas': [
-            'electoral-wards-of-the-united-kingdom-S13002845',
+            'wd20-S13002845',
         ]
     }, [
-        'electoral-wards-of-the-united-kingdom-S12000033',
-        # S13002845 is ignored because the user chose ‘Select all…’
+        'lad20-S12000033',
+        # wd20-S13002845 is ignored because the user chose ‘Select all…’
     ]),
     ({
         'areas': [
-            'electoral-wards-of-the-united-kingdom-S13002845',
-            'electoral-wards-of-the-united-kingdom-S13002836',
+            'wd20-S13002845',
+            'wd20-S13002836',
         ]
     }, [
-        'electoral-wards-of-the-united-kingdom-S13002845',
-        'electoral-wards-of-the-united-kingdom-S13002836',
+        'wd20-S13002845',
+        'wd20-S13002836',
     ]),
 ))
 def test_add_broadcast_sub_area(
@@ -476,8 +480,8 @@ def test_add_broadcast_sub_area(
         '.choose_broadcast_sub_area',
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
-        library_slug='countries',
-        area_slug='electoral-wards-of-the-united-kingdom-S12000033',
+        library_slug='wd20-lad20',
+        area_slug='lad20-S12000033',
         _data=post_data,
     )
     mock_update_broadcast_message.assert_called_once_with(
@@ -486,8 +490,8 @@ def test_add_broadcast_sub_area(
         data={
             'areas': [
                 # These two areas are on the broadcast already
-                'countries-E92000001',
-                'countries-S92000003',
+                'ctry19-E92000001',
+                'ctry19-S92000003',
             ] + expected_selected
         },
     )
@@ -505,7 +509,7 @@ def test_remove_broadcast_area_page(
         '.remove_broadcast_area',
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
-        area_slug='countries-E92000001',
+        area_slug='ctry19-E92000001',
         _expected_redirect=url_for(
             '.preview_broadcast_areas',
             service_id=SERVICE_ONE_ID,
@@ -517,7 +521,7 @@ def test_remove_broadcast_area_page(
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
         data={
-            'areas': ['countries-S92000003']
+            'areas': ['ctry19-S92000003']
         },
     )
 

@@ -11,9 +11,9 @@ def test_simple_polygons(fake_uuid):
         created_by_id=fake_uuid,
         areas=[
             # Hackney Central
-            'electoral-wards-of-the-united-kingdom-E05009372',
+            'wd20-E05009372',
             # Hackney Wick
-            'electoral-wards-of-the-united-kingdom-E05009374',
+            'wd20-E05009374',
         ],
     ))
 

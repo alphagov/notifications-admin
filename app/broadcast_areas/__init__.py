@@ -101,9 +101,10 @@ class BroadcastAreaLibrary(SerialisedModelCollection, SortableMixin, GetItemById
     model = BroadcastArea
 
     def __init__(self, row):
-        id, name, is_group = row
+        id, name, name_singular, is_group = row
         self.id = id
         self.name = name
+        self.name_singular = name_singular
         self.is_group = bool(is_group)
         self.items = BroadcastAreasRepository().get_all_areas_for_library(self.id)
 
