@@ -1,5 +1,5 @@
-## We don't allow commiting of certain files types that are at risk they could be user files containg personal information
-## Therefore if you are sure that a file is OK, you can explicitely add it to the list of files to be allowed
+## We don’t allow committing certain file types that risk containing users’ personal information
+## If you are sure that a file is OK, you can explicitly add it to the list of allowed files 
 *.pdf
 *.PDF
 *.csv
