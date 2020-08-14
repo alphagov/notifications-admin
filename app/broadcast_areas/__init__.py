@@ -2,6 +2,7 @@ import itertools
 
 import geojson
 from notifications_utils.serialised_model import SerialisedModelCollection
+from operator import itemgetter
 from werkzeug.utils import cached_property
 
 from .repo import BroadcastAreasRepository
@@ -150,6 +151,22 @@ class BroadcastAreaLibraries(SerialisedModelCollection, GetItemByIdMixin):
             [[long, lat] for lat, long in polygon]
             for polygon in self.get_simple_polygons_for_areas_long_lat(*area_ids)
         ]
+
+    def get_common_ancestor_for_areas(self, *area_ids):
+        libraries, groups = (
+            set(map(itemgetter(attr), self.get_areas(*area_ids)))
+            for attr in (
+                'library_id', 'group_id',
+            )
+        )
+
+        def _get_singular_item_from_iterable(iterable):
+            return next(iter(libraries)) if len(libraries) == 1 else None
+
+        return (
+            _get_singular_item_from_iterable(libraries),
+            _get_singular_item_from_iterable(groups),
+        )
 
 
 broadcast_area_libraries = BroadcastAreaLibraries()
