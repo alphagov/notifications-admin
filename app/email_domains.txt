@@ -7,6 +7,7 @@ parliament.scot
 parliament.uk
 nhs.uk
 nhs.net
+nhs.scot
 police.uk
 scotent.co.uk
 assembly.wales
