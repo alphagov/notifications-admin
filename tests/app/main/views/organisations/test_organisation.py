@@ -631,6 +631,34 @@ def test_organisation_trial_mode_services_doesnt_work_if_not_platform_admin(
     )
 
 
+def test_cancel_invited_org_user_cancels_user_invitations(
+    client_request,
+    mock_get_invites_for_organisation,
+    sample_org_invite,
+    mock_get_organisation,
+    mock_get_users_for_organisation,
+    mocker,
+):
+    mock_cancel = mocker.patch('app.org_invite_api_client.cancel_invited_user')
+    mocker.patch('app.org_invite_api_client.get_invited_user', return_value=sample_org_invite)
+
+    page = client_request.get(
+        'main.cancel_invited_org_user',
+        org_id=ORGANISATION_ID,
+        invited_user_id=sample_org_invite['id'],
+        _follow_redirects=True
+    )
+    assert normalize_spaces(page.h1.text) == 'Team members'
+    flash_banner = normalize_spaces(
+        page.find('div', class_='banner-default-with-tick').text
+    )
+    assert flash_banner == f"Invitation cancelled for {sample_org_invite['email_address']}"
+    mock_cancel.assert_called_once_with(
+        org_id=ORGANISATION_ID,
+        invited_user_id=sample_org_invite['id'],
+    )
+
+
 def test_organisation_settings_platform_admin_only(
     client_request,
     mock_get_organisation,

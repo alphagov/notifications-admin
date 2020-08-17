@@ -283,4 +283,7 @@ def confirm_edit_user_mobile_number(service_id, user_id):
 def cancel_invited_user(service_id, invited_user_id):
     current_service.cancel_invite(invited_user_id)
 
+    invited_user = InvitedUser.by_id_and_service_id(service_id, invited_user_id)
+
+    flash(f'Invitation cancelled for {invited_user.email_address}', 'default_with_tick')
     return redirect(url_for('main.manage_users', service_id=service_id))
