@@ -435,7 +435,7 @@ def format_notification_status(status, template_type):
             'sending': 'Sending',
             'created': 'Sending',
             'pending': 'Sending',
-            'sent': 'Sent internationally'
+            'sent': 'Sent to an international number'
         },
         'letter': {
             'failed': '',
