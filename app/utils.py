@@ -60,6 +60,8 @@ FAILURE_STATUSES = ['failed', 'temporary-failure', 'permanent-failure',
                     'technical-failure', 'virus-scan-failed', 'validation-failed']
 REQUESTED_STATUSES = SENDING_STATUSES + DELIVERED_STATUSES + FAILURE_STATUSES
 
+NOTIFICATION_TYPES = ["sms", "email", "letter", "broadcast"]
+
 
 with open('{}/email_domains.txt'.format(
     os.path.dirname(os.path.realpath(__file__))

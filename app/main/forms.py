@@ -1997,12 +1997,8 @@ class TemplateAndFoldersSelectionForm(Form):
         ]
 
         self.add_template_by_template_type.choices = list(filter(None, [
-            # We want to show email and text message to everyone,
-            # whether or not the service has them switched on. The
-            # option to add letter or broadcast templates should only
-            # be shown to services which have that permission
-            ('email', 'Email'),
-            ('sms', 'Text message'),
+            ('email', 'Email') if 'email' in available_template_types else None,
+            ('sms', 'Text message') if 'sms' in available_template_types else None,
             ('letter', 'Letter') if 'letter' in available_template_types else None,
             ('broadcast', 'Broadcast') if 'broadcast' in available_template_types else None,
             ('copy-existing', 'Copy an existing template') if allow_adding_copy_of_template else None,

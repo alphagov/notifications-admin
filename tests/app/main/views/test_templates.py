@@ -287,8 +287,8 @@ def test_should_show_live_search_if_service_has_lots_of_folders(
     assert count_of_templates == 4
 
 
-@pytest.mark.parametrize('extra_permissions, expected_values, expected_labels', (
-    pytest.param([], [
+@pytest.mark.parametrize('service_permissions, expected_values, expected_labels', (
+    pytest.param(['email', 'sms'], [
         'email',
         'sms',
         'copy-existing',
@@ -297,7 +297,12 @@ def test_should_show_live_search_if_service_has_lots_of_folders(
         'Text message',
         'Copy an existing template',
     ]),
-    pytest.param(['letter'], [
+    pytest.param(['broadcast'], [
+        'broadcast',
+    ], [
+        'Broadcast',
+    ]),
+    pytest.param(['email', 'sms', 'letter'], [
         'email',
         'sms',
         'letter',
@@ -314,11 +319,11 @@ def test_should_show_new_template_choices_if_service_has_folder_permission(
     service_one,
     mock_get_service_templates,
     mock_get_template_folders,
-    extra_permissions,
+    service_permissions,
     expected_values,
     expected_labels,
 ):
-    service_one['permissions'] += extra_permissions
+    service_one['permissions'] = service_permissions
 
     page = client_request.get(
         'main.choose_template',
@@ -337,6 +342,39 @@ def test_should_show_new_template_choices_if_service_has_folder_permission(
     assert [
         normalize_spaces(choice.text) for choice in page.select('#add_new_template_form label')
     ] == expected_labels
+
+
+@pytest.mark.parametrize("permissions,are_data_attrs_added", [
+    (['sms'], True),
+    (['email'], True),
+    (['letter'], True),
+    (['broadcast'], True),
+    (['sms', 'email'], False),
+])
+def test_should_add_data_attributes_for_services_that_only_allow_one_type_of_notifications(
+    client_request,
+    service_one,
+    mock_get_service_templates,
+    mock_get_template_folders,
+    permissions,
+    are_data_attrs_added
+):
+    service_one['permissions'] = permissions
+
+    page = client_request.get(
+        'main.choose_template',
+        service_id=SERVICE_ONE_ID,
+    )
+
+    if not page.select('#add_new_template_form'):
+        raise ElementNotFound()
+
+    if are_data_attrs_added:
+        assert page.find(id='add_new_template_form').attrs['data-channel'] == permissions[0]
+        assert page.find(id='add_new_template_form').attrs['data-service'] == SERVICE_ONE_ID
+    else:
+        assert page.find(id='add_new_template_form').attrs.get('data-channel') is None
+        assert page.find(id='add_new_template_form').attrs.get('data-service') is None
 
 
 def test_should_show_page_for_one_template(
@@ -2012,6 +2050,26 @@ def test_route_invalid_permissions(
         ['view_activity'],
         api_user_active,
         service_one)
+
+
+@pytest.mark.parametrize('template_type, expected', (
+    ('email', 'New email template'),
+    ('sms', 'New text message template'),
+    ('broadcast', 'New template'),
+))
+def test_add_template_page_title(
+    client_request,
+    service_one,
+    template_type,
+    expected,
+):
+    service_one['permissions'] += [template_type]
+    page = client_request.get(
+        '.add_service_template',
+        service_id=SERVICE_ONE_ID,
+        template_type=template_type,
+    )
+    assert normalize_spaces(page.select_one('h1').text) == expected
 
 
 def test_can_create_email_template_with_emoji(
