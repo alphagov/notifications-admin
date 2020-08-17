@@ -28,6 +28,8 @@ $govuk-assets-path: "/static/";
 @import 'components/radios/_radios';
 @import 'components/checkboxes/_checkboxes';
 @import 'components/input/_input';
+@import 'components/input/_input';
+@import '/components/textarea/_textarea';
 
 @import "utilities/all";
 @import "overrides/all";

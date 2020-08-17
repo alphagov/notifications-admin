@@ -71,7 +71,8 @@ const copy = {
         'hint',
         'label',
         'checkboxes',
-        'input'
+        'input',
+        'textarea'
       ];
       let done = 0;
 
