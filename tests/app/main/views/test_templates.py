@@ -2052,6 +2052,26 @@ def test_route_invalid_permissions(
         service_one)
 
 
+@pytest.mark.parametrize('template_type, expected', (
+    ('email', 'New email template'),
+    ('sms', 'New text message template'),
+    ('broadcast', 'New template'),
+))
+def test_add_template_page_title(
+    client_request,
+    service_one,
+    template_type,
+    expected,
+):
+    service_one['permissions'] += [template_type]
+    page = client_request.get(
+        '.add_service_template',
+        service_id=SERVICE_ONE_ID,
+        template_type=template_type,
+    )
+    assert normalize_spaces(page.select_one('h1').text) == expected
+
+
 def test_can_create_email_template_with_emoji(
     client_request,
     mock_create_service_template
