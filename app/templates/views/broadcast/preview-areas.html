@@ -82,13 +82,13 @@
           {{ area.name }} <a class="area-list-item-remove" href="{{ url_for('.remove_broadcast_area', service_id=current_service.id, broadcast_message_id=broadcast_message.id, area_slug=area.id) }}">remove</a>
         </li>
     {% if loop.last %}
+      </ul>
       {{ govukButton({
         "element": "a",
         "text": "Add another area",
         "href": url_for('.choose_broadcast_library', service_id=current_service.id, broadcast_message_id=broadcast_message.id),
         "classes": "govuk-button--secondary govuk-!-margin-bottom-5"
       }) }}
-      </ul>
     {% endif %}
   {% else %}
     <p class="govuk-body">

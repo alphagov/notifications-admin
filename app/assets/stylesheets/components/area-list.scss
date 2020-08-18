@@ -55,6 +55,10 @@
 
     }
 
+    &:last-child {
+      margin-right: govuk-spacing(1) * 1.5;
+    }
+
     &--unremoveable {
       padding-right: govuk-spacing(2);
       background: $light-blue-25;
