@@ -16,11 +16,10 @@
     <p class="govuk-body">We’ve sent you a text message with a security code.</p>
 
     {% call form_wrapper(class="extra-tracking") %}
-      {{ textbox(
-        form.sms_code,
-        width='5em',
-        autofocus=True
-      ) }}
+      {{ form.sms_code(param_extensions={
+          "classes": "govuk-input govuk-input--width-5",
+          "attributes": {"data-module": "autofocus"}
+      }) }}
       {{ page_footer(
         "Continue",
         secondary_link=url_for('main.check_and_resend_text_code'),

@@ -34,7 +34,6 @@ from wtforms import (
     TextAreaField,
     ValidationError,
     validators,
-    widgets,
 )
 from wtforms.fields.html5 import EmailField, SearchField, TelField
 from wtforms.validators import URL, DataRequired, Length, Optional, Regexp
@@ -59,7 +58,7 @@ from app.models.roles_and_permissions import (
     permissions,
     roles,
 )
-from app.utils import guess_name_from_email_address
+from app.utils import guess_name_from_email_address, merge_jsonlike
 
 
 def get_time_value_and_label(future_time):
@@ -147,10 +146,21 @@ def email_address(label='Email address', gov_user=True, required=True):
     if required:
         validators.append(DataRequired(message='Cannot be empty'))
 
-    return EmailField(label, validators, render_kw={'spellcheck': 'false'})
+    return GovukEmailField(label, validators)
 
 
 class UKMobileNumber(TelField):
+    def __init__(self, label='', validators=None, param_extensions=None, **kwargs):
+        super(UKMobileNumber, self).__init__(label, validators, **kwargs)
+        self.param_extensions = param_extensions
+
+    # self.__call__ renders the HTML for the field by:
+    # 1. delegating to self.meta.render_field which
+    # 2. calls field.widget
+    # this bypasses that by making self.widget a method with the same interface as widget.__call__
+    def widget(self, field, param_extensions=None, **kwargs):
+        return govuk_field_widget(self, field, type="tel", param_extensions=param_extensions, **kwargs)
+
     def pre_validate(self, form):
         try:
             validate_phone_number(self.data)
@@ -159,6 +169,17 @@ class UKMobileNumber(TelField):
 
 
 class InternationalPhoneNumber(TelField):
+    def __init__(self, label='', validators=None, param_extensions=None, **kwargs):
+        super(InternationalPhoneNumber, self).__init__(label, validators=validators, **kwargs)
+        self.param_extensions = param_extensions
+
+    # self.__call__ renders the HTML for the field by:
+    # 1. delegating to self.meta.render_field which
+    # 2. calls field.widget
+    # this bypasses that by making self.widget a method with the same interface as widget.__call__
+    def widget(self, field, param_extensions=None, **kwargs):
+        return govuk_field_widget(self, field, type="tel", param_extensions=param_extensions, **kwargs)
+
     def pre_validate(self, form):
         try:
             if self.data:
@@ -180,13 +201,141 @@ def international_phone_number(label='Mobile number'):
 
 
 def password(label='Password'):
-    return PasswordField(label,
-                         validators=[DataRequired(message='Cannot be empty'),
-                                     Length(8, 255, message='Must be at least 8 characters'),
-                                     CommonlyUsedPassword(message='Choose a password that’s harder to guess')])
+    return GovukPasswordField(
+        label,
+        validators=[
+            DataRequired(message='Cannot be empty'),
+            Length(8, 255, message='Must be at least 8 characters'),
+            CommonlyUsedPassword(message='Choose a password that’s harder to guess')
+        ]
+    )
 
 
-class SMSCode(StringField):
+def govuk_field_widget(self, field, type=None, param_extensions=None, **kwargs):
+    value = kwargs["value"] if kwargs.get("value") else field.data
+
+    # error messages
+    error_message = None
+    if field.errors:
+        error_message_format = "html" if kwargs.get("error_message_with_html") else "text"
+        error_message = {
+            "attributes": {
+                "data-module": "track-error",
+                "data-error-type": field.errors[0],
+                "data-error-label": field.name
+            },
+            error_message_format: " ".join(field.errors).strip()
+        }
+
+    # convert to parameters that govuk understands
+    params = {
+        "classes": "govuk-!-width-two-thirds",
+        "errorMessage": error_message,
+        "id": field.id,
+        "label": {"text": field.label.text},
+        "name": field.name,
+        "value": value
+    }
+
+    if type:
+        params["type"] = type
+
+    # extend default params with any sent in
+    merge_jsonlike(params, self.param_extensions)
+    # add any sent in through use in templates
+    merge_jsonlike(params, param_extensions)
+
+    return Markup(
+        render_template('vendor/govuk-frontend/components/input/template.njk', params=params))
+
+
+class GovukTextInputField(StringField):
+    def __init__(self, label='', validators=None, param_extensions=None, **kwargs):
+        super(GovukTextInputField, self).__init__(label, validators, **kwargs)
+        self.param_extensions = param_extensions
+
+    # self.__call__ renders the HTML for the field by:
+    # 1. delegating to self.meta.render_field which
+    # 2. calls field.widget
+    # this bypasses that by making self.widget a method with the same interface as widget.__call__
+    def widget(self, field, **kwargs):
+        return govuk_field_widget(self, field, **kwargs)
+
+
+class GovukPasswordField(PasswordField):
+    def __init__(self, label='', validators=None, param_extensions=None, **kwargs):
+        super(GovukPasswordField, self).__init__(label, validators, **kwargs)
+        self.param_extensions = param_extensions
+
+    # self.__call__ renders the HTML for the field by:
+    # 1. delegating to self.meta.render_field which
+    # 2. calls field.widget
+    # this bypasses that by making self.widget a method with the same interface as widget.__call__
+    def widget(self, field, param_extensions=None, **kwargs):
+        return govuk_field_widget(self, field, type="password", param_extensions=param_extensions, **kwargs)
+
+
+class GovukEmailField(EmailField):
+    def __init__(self, label='', validators=None, param_extensions=None, **kwargs):
+        super(GovukEmailField, self).__init__(label, validators=validators, **kwargs)
+        self.param_extensions = param_extensions
+
+    # self.__call__ renders the HTML for the field by:
+    # 1. delegating to self.meta.render_field which
+    # 2. calls field.widget
+    # this bypasses that by making self.widget a method with the same interface as widget.__call__
+    def widget(self, field, param_extensions=None, **kwargs):
+
+        params = {"attributes": {"spellcheck": "false"}}  # email addresses don't need to be spellchecked
+        merge_jsonlike(params, param_extensions)
+
+        return govuk_field_widget(self, field, type="email", param_extensions=params, **kwargs)
+
+
+class GovukSearchField(SearchField):
+    def __init__(self, label='', validators=None, param_extensions=None, **kwargs):
+        super(GovukSearchField, self).__init__(label, validators, **kwargs)
+        self.param_extensions = param_extensions
+
+    # self.__call__ renders the HTML for the field by:
+    # 1. delegating to self.meta.render_field which
+    # 2. calls field.widget
+    # this bypasses that by making self.widget a method with the same interface as widget.__call__
+    def widget(self, field, param_extensions=None, **kwargs):
+
+        params = {"classes": "govuk-!-width-full"}  # email addresses don't need to be spellchecked
+        merge_jsonlike(params, param_extensions)
+
+        return govuk_field_widget(self, field, type="search", param_extensions=params, **kwargs)
+
+
+class GovukDateField(DateField):
+    def __init__(self, label='', validators=None, param_extensions=None, **kwargs):
+        super(GovukDateField, self).__init__(label, validators, **kwargs)
+        self.param_extensions = param_extensions
+
+    # self.__call__ renders the HTML for the field by:
+    # 1. delegating to self.meta.render_field which
+    # 2. calls field.widget
+    # this bypasses that by making self.widget a method with the same interface as widget.__call__
+    def widget(self, field, param_extensions=None, **kwargs):
+        return govuk_field_widget(self, field, param_extensions=param_extensions, **kwargs)
+
+
+class GovukIntegerField(IntegerField):
+    def __init__(self, label='', validators=None, param_extensions=None, **kwargs):
+        super(GovukIntegerField, self).__init__(label, validators, **kwargs)
+        self.param_extensions = param_extensions
+
+    # self.__call__ renders the HTML for the field by:
+    # 1. delegating to self.meta.render_field which
+    # 2. calls field.widget
+    # this bypasses that by making self.widget a method with the same interface as widget.__call__
+    def widget(self, field, param_extensions=None, **kwargs):
+        return govuk_field_widget(self, field, param_extensions=param_extensions, **kwargs)
+
+
+class SMSCode(GovukTextInputField):
     validators = [
         DataRequired(message='Cannot be empty'),
         Regexp(regex=r'^\d+$', message='Numbers only'),
@@ -195,14 +344,18 @@ class SMSCode(StringField):
     ]
 
     def __call__(self, **kwargs):
-        return super().__call__(type='tel', pattern='[0-9]*', **kwargs)
+        params = {"attributes": {"pattern": "[0-9]*"}}
+        if "param_extensions" in kwargs:
+            merge_jsonlike(kwargs["param_extensions"], params)
+
+        return super().__call__(type='tel', **kwargs)
 
     def process_formdata(self, valuelist):
         if valuelist:
             self.data = Columns.make_key(valuelist[0])
 
 
-class ForgivingIntegerField(StringField):
+class ForgivingIntegerField(GovukTextInputField):
 
     #  Actual value is 2147483647 but this is a scary looking arbitrary number
     POSTGRES_MAX_INT = 2000000000
@@ -413,7 +566,7 @@ class StripWhitespaceForm(Form):
         def bind_field(self, form, unbound_field, options):
             # FieldList simply doesn't support filters.
             # @see: https://github.com/wtforms/wtforms/issues/148
-            no_filter_fields = (FieldList, PasswordField)
+            no_filter_fields = (FieldList, PasswordField, GovukPasswordField)
             filters = [strip_whitespace] if not issubclass(unbound_field.field_class, no_filter_fields) else []
             filters += unbound_field.kwargs.get('filters', [])
             bound = unbound_field.bind(form=form, filters=filters, **options)
@@ -421,15 +574,16 @@ class StripWhitespaceForm(Form):
             return bound
 
 
-class StripWhitespaceStringField(StringField):
-    def __init__(self, label=None, **kwargs):
+class StripWhitespaceStringField(GovukTextInputField):
+    def __init__(self, label=None, param_extensions=None, **kwargs):
         kwargs['filters'] = tuple(chain(
             kwargs.get('filters', ()),
             (
                 strip_whitespace,
             ),
         ))
-        super(StringField, self).__init__(label, **kwargs)
+        super(GovukTextInputField, self).__init__(label, **kwargs)
+        self.param_extensions = param_extensions
 
 
 class PostalAddressField(TextAreaField):
@@ -471,19 +625,21 @@ class OnOffField(RadioField):
 
 
 class LoginForm(StripWhitespaceForm):
-    email_address = EmailField('Email address', validators=[
+    email_address = GovukEmailField('Email address', validators=[
         Length(min=5, max=255),
         DataRequired(message='Cannot be empty'),
         ValidEmail()
     ])
-    password = PasswordField('Password', validators=[
+    password = GovukPasswordField('Password', validators=[
         DataRequired(message='Enter your password')
     ])
 
 
 class RegisterUserForm(StripWhitespaceForm):
-    name = StringField('Full name',
-                       validators=[DataRequired(message='Cannot be empty')])
+    name = GovukTextInputField(
+        'Full name',
+        validators=[DataRequired(message='Cannot be empty')]
+    )
     email_address = email_address()
     mobile_number = international_phone_number()
     password = password()
@@ -519,7 +675,7 @@ class RegisterUserFromOrgInviteForm(StripWhitespaceForm):
             email_address=invited_org_user.email_address,
         )
 
-    name = StringField(
+    name = GovukTextInputField(
         'Full name',
         validators=[DataRequired(message='Cannot be empty')]
     )
@@ -543,7 +699,7 @@ class govukCheckboxesMixin:
             del extensions['items']
 
         # merge dicts
-        params.update(extensions)
+        merge_jsonlike(params, extensions)
 
         # merge items
         if items:
@@ -628,29 +784,6 @@ class govukCheckboxesField(govukCheckboxesMixin, SelectMultipleField):
 
     def get_items_from_options(self, field):
         return [self.get_item_from_option(option) for option in field]
-
-    def extend_params(self, params, extensions):
-        items = None
-        param_items = len(params['items']) if 'items' in params else 0
-
-        # split items off from params to make it a pure dict
-        if 'items' in extensions:
-            items = extensions['items']
-            del extensions['items']
-
-        # merge dicts
-        params.update(extensions)
-
-        # merge items
-        if items:
-            if 'items' not in params:
-                params['items'] = items
-            else:
-                for idx, _item in enumerate(items):
-                    if idx >= param_items:
-                        params['items'].append(items[idx])
-                    else:
-                        params['items'][idx].update(items[idx])
 
     # self.__call__ renders the HTML for the field by:
     # 1. delegating to self.meta.render_field which
@@ -890,7 +1023,7 @@ class TextNotReceivedForm(StripWhitespaceForm):
 
 
 class RenameServiceForm(StripWhitespaceForm):
-    name = StringField(
+    name = GovukTextInputField(
         u'Service name',
         validators=[
             DataRequired(message='Cannot be empty'),
@@ -899,7 +1032,7 @@ class RenameServiceForm(StripWhitespaceForm):
 
 
 class RenameOrganisationForm(StripWhitespaceForm):
-    name = StringField(
+    name = GovukTextInputField(
         u'Organisation name',
         validators=[
             DataRequired(message='Cannot be empty'),
@@ -927,7 +1060,7 @@ class AddGPOrganisationForm(StripWhitespaceForm):
         ),
     )
 
-    name = StringField(
+    name = GovukTextInputField(
         'What’s your practice called?',
     )
 
@@ -1004,7 +1137,7 @@ class OrganisationDomainsForm(StripWhitespaceForm):
 
 
 class CreateServiceForm(StripWhitespaceForm):
-    name = StringField(
+    name = GovukTextInputField(
         "What’s your service called?",
         validators=[
             DataRequired(message='Cannot be empty'),
@@ -1032,7 +1165,7 @@ class NewOrganisationForm(
 
 
 class FreeSMSAllowance(StripWhitespaceForm):
-    free_sms_allowance = IntegerField(
+    free_sms_allowance = GovukIntegerField(
         'Numbers of text message fragments per year',
         validators=[
             DataRequired(message='Cannot be empty')
@@ -1045,7 +1178,7 @@ class ConfirmPasswordForm(StripWhitespaceForm):
         self.validate_password_func = validate_password_func
         super(ConfirmPasswordForm, self).__init__(*args, **kwargs)
 
-    password = PasswordField(u'Enter password')
+    password = GovukPasswordField(u'Enter password')
 
     def validate_password(self, field):
         if not self.validate_password_func(field.data):
@@ -1053,19 +1186,19 @@ class ConfirmPasswordForm(StripWhitespaceForm):
 
 
 class BaseTemplateForm(StripWhitespaceForm):
-    name = StringField(
-        u'Template name',
+    name = GovukTextInputField(
+        "Template name",
         validators=[DataRequired(message="Cannot be empty")])
 
     template_content = TextAreaField(
-        u'Message',
+        "Message",
         validators=[
             DataRequired(message="Cannot be empty"),
             NoCommasInPlaceHolders()
         ]
     )
     process_type = RadioField(
-        'Use priority queue?',
+        "Use priority queue?",
         choices=[
             ('priority', 'Yes'),
             ('normal', 'No'),
@@ -1213,7 +1346,7 @@ class CsvUploadForm(StripWhitespaceForm):
 
 
 class ChangeNameForm(StripWhitespaceForm):
-    new_name = StringField(u'Your name')
+    new_name = GovukTextInputField(u'Your name')
 
 
 class ChangeEmailForm(StripWhitespaceForm):
@@ -1285,7 +1418,7 @@ class CreateKeyForm(StripWhitespaceForm):
         thing='the type of key',
     )
 
-    key_name = StringField(u'Description of key', validators=[
+    key_name = GovukTextInputField("Name for this key", validators=[
         DataRequired(message='You need to give the key a name')
     ])
 
@@ -1315,7 +1448,7 @@ class SupportRedirect(StripWhitespaceForm):
 
 
 class FeedbackOrProblem(StripWhitespaceForm):
-    name = StringField('Name (optional)')
+    name = GovukTextInputField('Name (optional)')
     email_address = email_address(label='Email address', gov_user=False, required=True)
     feedback = TextAreaField('Your message', validators=[DataRequired(message="Cannot be empty")])
 
@@ -1369,7 +1502,9 @@ class EstimateUsageForm(StripWhitespaceForm):
 
 
 class ProviderForm(StripWhitespaceForm):
-    priority = IntegerField('Priority', [validators.NumberRange(min=1, max=100, message="Must be between 1 and 100")])
+    priority = GovukIntegerField(
+        'Priority', [validators.NumberRange(min=1, max=100, message="Must be between 1 and 100")]
+    )
 
 
 class ProviderRatioForm(StripWhitespaceForm):
@@ -1398,9 +1533,10 @@ class ServiceContactDetailsForm(StripWhitespaceForm):
         ],
     )
 
-    url = StringField("URL")
-    email_address = EmailField("Email address")
-    phone_number = StringField("Phone number")
+    url = GovukTextInputField("URL")
+    email_address = GovukEmailField("Email address")
+    # This is a text field because the number provided by the user can also be a short code
+    phone_number = GovukTextInputField("Phone number")
 
     def validate(self):
 
@@ -1429,7 +1565,7 @@ class ServiceReplyToEmailForm(StripWhitespaceForm):
 
 
 class ServiceSmsSenderForm(StripWhitespaceForm):
-    sms_sender = StringField(
+    sms_sender = GovukTextInputField(
         'Text message sender',
         validators=[
             DataRequired(message="Cannot be empty"),
@@ -1521,13 +1657,17 @@ class PreviewBranding(StripWhitespaceForm):
 
 
 class ServiceUpdateEmailBranding(StripWhitespaceForm):
-    name = StringField('Name of brand')
-    text = StringField('Text')
-    colour = StringField(
+    name = GovukTextInputField('Name of brand')
+    text = GovukTextInputField('Text')
+    colour = GovukTextInputField(
         'Colour',
         validators=[
             Regexp(regex="^$|^#(?:[0-9a-fA-F]{3}){1,2}$", message='Must be a valid color hex code (starting with #)')
-        ]
+        ],
+        param_extensions={
+            "classes": "govuk-input--width-6",
+            "attributes": {"data-module": "colour-preview"}
+        }
     )
     file = FileField_wtf('Upload a PNG logo', validators=[FileAllowed(['png'], 'PNG Images only!')])
     brand_type = RadioField(
@@ -1557,7 +1697,7 @@ class SVGFileUpload(StripWhitespaceForm):
 
 
 class ServiceLetterBrandingDetails(StripWhitespaceForm):
-    name = StringField('Name of brand', validators=[DataRequired()])
+    name = GovukTextInputField('Name of brand', validators=[DataRequired()])
 
 
 class PDFUploadForm(StripWhitespaceForm):
@@ -1570,7 +1710,7 @@ class PDFUploadForm(StripWhitespaceForm):
     )
 
 
-class EmailFieldInGuestList(EmailField, StripWhitespaceStringField):
+class EmailFieldInGuestList(GovukEmailField, StripWhitespaceStringField):
     pass
 
 
@@ -1617,19 +1757,19 @@ class GuestList(StripWhitespaceForm):
 
 
 class DateFilterForm(StripWhitespaceForm):
-    start_date = DateField("Start Date", [validators.optional()])
-    end_date = DateField("End Date", [validators.optional()])
+    start_date = GovukDateField("Start Date", [validators.optional()])
+    end_date = GovukDateField("End Date", [validators.optional()])
     include_from_test_key = govukCheckboxField("Include test keys")
 
 
 class RequiredDateFilterForm(StripWhitespaceForm):
-    start_date = DateField("Start Date")
-    end_date = DateField("End Date")
+    start_date = GovukDateField("Start Date")
+    end_date = GovukDateField("End Date")
 
 
 class SearchByNameForm(StripWhitespaceForm):
 
-    search = SearchField(
+    search = GovukSearchField(
         'Search by name',
         validators=[DataRequired("You need to enter full or partial name to search by.")],
     )
@@ -1637,7 +1777,7 @@ class SearchByNameForm(StripWhitespaceForm):
 
 class SearchUsersByEmailForm(StripWhitespaceForm):
 
-    search = SearchField(
+    search = GovukSearchField(
         'Search by name or email address',
         validators=[
             DataRequired("You need to enter full or partial email address to search by.")
@@ -1647,12 +1787,12 @@ class SearchUsersByEmailForm(StripWhitespaceForm):
 
 class SearchUsersForm(StripWhitespaceForm):
 
-    search = SearchField('Search by name or email address')
+    search = GovukSearchField('Search by name or email address')
 
 
 class SearchNotificationsForm(StripWhitespaceForm):
 
-    to = SearchField()
+    to = GovukSearchField()
 
     labels = {
         'email': 'Search by email address',
@@ -1672,10 +1812,6 @@ class PlaceholderForm(StripWhitespaceForm):
     pass
 
 
-class PasswordFieldShowHasContent(StringField):
-    widget = widgets.PasswordInput(hide_value=False)
-
-
 class ServiceInboundNumberForm(StripWhitespaceForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -1688,35 +1824,19 @@ class ServiceInboundNumberForm(StripWhitespaceForm):
 
 
 class CallbackForm(StripWhitespaceForm):
+    url = GovukTextInputField(
+        "URL",
+        validators=[DataRequired(message='Cannot be empty'),
+                    Regexp(regex="^https.*", message='Must be a valid https URL')]
+    )
+    bearer_token = GovukPasswordField(
+        "Bearer token",
+        validators=[DataRequired(message='Cannot be empty'),
+                    Length(min=10, message='Must be at least 10 characters')]
+    )
 
     def validate(self):
         return super().validate() or self.url.data == ''
-
-
-class ServiceReceiveMessagesCallbackForm(CallbackForm):
-    url = StringField(
-        "URL",
-        validators=[DataRequired(message='Cannot be empty'),
-                    Regexp(regex="^https.*", message='Must be a valid https URL')]
-    )
-    bearer_token = PasswordFieldShowHasContent(
-        "Bearer token",
-        validators=[DataRequired(message='Cannot be empty'),
-                    Length(min=10, message='Must be at least 10 characters')]
-    )
-
-
-class ServiceDeliveryStatusCallbackForm(CallbackForm):
-    url = StringField(
-        "URL",
-        validators=[DataRequired(message='Cannot be empty'),
-                    Regexp(regex="^https.*", message='Must be a valid https URL')]
-    )
-    bearer_token = PasswordFieldShowHasContent(
-        "Bearer token",
-        validators=[DataRequired(message='Cannot be empty'),
-                    Length(min=10, message='Must be at least 10 characters')]
-    )
 
 
 class InternationalSMSForm(StripWhitespaceForm):
@@ -1760,7 +1880,7 @@ def get_placeholder_form_instance(
         else:
             field = uk_mobile_number(label=placeholder_name)
     else:
-        field = StringField(placeholder_name, validators=[
+        field = GovukTextInputField(placeholder_name, validators=[
             DataRequired(message='Cannot be empty')
         ])
 
@@ -1900,17 +2020,17 @@ class ServiceDataRetentionForm(StripWhitespaceForm):
         ],
         validators=[DataRequired()],
     )
-    days_of_retention = IntegerField(label="Days of retention",
-                                     validators=[validators.NumberRange(min=3, max=90,
-                                                                        message="Must be between 3 and 90")],
-                                     )
+    days_of_retention = GovukIntegerField(
+        label="Days of retention",
+        validators=[validators.NumberRange(min=3, max=90, message="Must be between 3 and 90")],
+    )
 
 
 class ServiceDataRetentionEditForm(StripWhitespaceForm):
-    days_of_retention = IntegerField(label="Days of retention",
-                                     validators=[validators.NumberRange(min=3, max=90,
-                                                                        message="Must be between 3 and 90")],
-                                     )
+    days_of_retention = GovukIntegerField(
+        label="Days of retention",
+        validators=[validators.NumberRange(min=3, max=90, message="Must be between 3 and 90")],
+    )
 
 
 class ReturnedLettersForm(StripWhitespaceForm):
@@ -1934,7 +2054,7 @@ class TemplateFolderForm(StripWhitespaceForm):
     users_with_permission = govukCollapsibleCheckboxesField(
         'Team members who can see this folder',
         field_label='folder')
-    name = StringField('Folder name', validators=[DataRequired(message='Cannot be empty')])
+    name = GovukTextInputField('Folder name', validators=[DataRequired(message='Cannot be empty')])
 
 
 def required_for_ops(*operations):
@@ -2056,8 +2176,8 @@ class TemplateAndFoldersSelectionForm(Form):
             required_for_ops('move-to-existing-folder'),
             Optional()
         ])
-    add_new_folder_name = StringField('Folder name', validators=[required_for_ops('add-new-folder')])
-    move_to_new_folder_name = StringField('Folder name', validators=[required_for_ops('move-to-new-folder')])
+    add_new_folder_name = GovukTextInputField('Folder name', validators=[required_for_ops('add-new-folder')])
+    move_to_new_folder_name = GovukTextInputField('Folder name', validators=[required_for_ops('move-to-new-folder')])
 
     add_template_by_template_type = RadioFieldWithRequiredMessage('New template', validators=[
         required_for_ops('add-new-template'),
@@ -2097,7 +2217,7 @@ class AcceptAgreementForm(StripWhitespaceForm):
             on_behalf_of_email=org.agreement_signed_on_behalf_of_email_address,
         )
 
-    version = StringField(
+    version = GovukTextInputField(
         'Which version of the agreement do you want to accept?'
     )
 
@@ -2115,7 +2235,7 @@ class AcceptAgreementForm(StripWhitespaceForm):
         ),
     )
 
-    on_behalf_of_name = StringField(
+    on_behalf_of_name = GovukTextInputField(
         'What’s their name?'
     )
 

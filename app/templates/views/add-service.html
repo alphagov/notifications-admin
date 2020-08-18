@@ -1,6 +1,5 @@
 {% extends "withoutnav_template.html" %}
 {% from "components/radios.html" import radios %}
-{% from "components/textbox.html" import textbox %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
@@ -18,7 +17,7 @@
 
     {% call form_wrapper() %}
 
-      {{ textbox(form.name, hint="You can change this later") }}
+      {{ form.name(param_extensions={"hint": {"text": "You can change this later"}}) }}
 
       {% if not default_organisation_type %}
         {{ radios(form.organisation_type) }}

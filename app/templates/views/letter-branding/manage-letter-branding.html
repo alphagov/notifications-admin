@@ -28,7 +28,9 @@
       {{ file_upload(file_upload_form.file, button_text='{} logo'.format('Update' if is_update else 'Upload')) }}
       {% call form_wrapper() %}
         <div class="form-group">
-          <div style='margin-top:15px;'>{{textbox(letter_branding_details_form.name)}}</div>
+          {{ letter_branding_details_form.name(param_extensions={
+            "formGroup": {"classes": "govuk-!-margin-top-3"}
+          }) }}
           {{ page_footer(
             'Save',
             button_name='operation',

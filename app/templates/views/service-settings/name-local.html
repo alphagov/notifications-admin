@@ -1,6 +1,5 @@
 
 {% extends "withnav_template.html" %}
-{% from "components/textbox.html" import textbox %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
@@ -38,7 +37,7 @@
   </div>
 
   {% call form_wrapper() %}
-    {{ textbox(form.name) }}
+    {{ form.name }}
     {{ page_footer('Save') }}
   {% endcall %}
 

@@ -26,7 +26,7 @@
 
     {% call form_wrapper() %}
 
-      {{ textbox(form.name, hint="You can change this later") }}
+      {{ form.name(param_extensions={"hint": {"text": "You can change this later"}}) }}
 
       {{ page_footer('Add service') }}
 

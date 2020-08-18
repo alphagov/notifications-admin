@@ -26,9 +26,9 @@
           {% block content %}
             {{ page_header('New organisation') }}
             {% call form_wrapper() %}
-              {{textbox(form.name)}}
-              {{radios(form.organisation_type)}}
-              {{radios(form.crown_status)}}
+              {{ form.name }}
+              {{ radios(form.organisation_type) }}
+              {{ radios(form.crown_status) }}
               {{ page_footer('Save') }}
             {% endcall %}
           {% endblock %}

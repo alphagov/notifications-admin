@@ -78,9 +78,9 @@ def test_create_email_branding_does_not_show_any_branding_info(
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
     assert page.select_one('#logo-img > img') is None
-    assert page.select_one('#name').attrs.get('value') == ''
-    assert page.select_one('#text').attrs.get('value') == ''
-    assert page.select_one('#colour').attrs.get('value') == ''
+    assert page.select_one('#name').attrs.get('value') is None
+    assert page.select_one('#text').attrs.get('value') is None
+    assert page.select_one('#colour').attrs.get('value') is None
 
 
 def test_create_new_email_branding_without_logo(
@@ -141,7 +141,7 @@ def test_create_email_branding_requires_a_name_when_submitting_logo_details(
         _expected_status=200,
     )
 
-    assert page.select_one('.error-message').text.strip() == 'This field is required'
+    assert page.select_one('.govuk-error-message').text.strip() == 'Error: This field is required'
     assert mock_create_email_branding.called is False
 
 

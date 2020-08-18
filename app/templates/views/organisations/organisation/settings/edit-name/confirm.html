@@ -1,5 +1,4 @@
 {% extends "org_template.html" %}
-{% from "components/textbox.html" import textbox %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
@@ -19,7 +18,7 @@
     <div class="govuk-grid-column-three-quarters">
 
     {% call form_wrapper() %}
-      {{ textbox(form.password, autocomplete='current-password') }}
+      {{ form.password(param_extensions={"autocomplete": "current-password"}) }}
       <p class="govuk-body"> Your organisation name will be changed from {{ current_org.name }} to {{ new_name }} </p>
       {{ page_footer('Confirm') }}
     {% endcall %}

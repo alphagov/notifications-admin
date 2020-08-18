@@ -22,7 +22,7 @@
       {% endfor %}
     {% endcall %}
     {% call conditional_radio_panel('custom-organisation-name') %}
-      {{ textbox(form.name) }}
+      {{ form.name }}
     {% endcall %}
     {{ page_footer('Continue') }}
   {% endcall %}

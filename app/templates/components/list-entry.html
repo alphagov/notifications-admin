@@ -1,3 +1,6 @@
+{% from "vendor/govuk-frontend/components/fieldset/macro.njk" import govukFieldset %}
+{% from "vendor/govuk-frontend/components/error-message/macro.njk" import govukErrorMessage %}
+
 {% macro list_entry(
   field,
   item_name,
@@ -5,45 +8,53 @@
   autocomplete=True
 ) %}
 
-  {% if error %}
-    <div class="validation-wrapper">
-  {% endif %}
-    <fieldset class="form-group{% if field.errors %} form-group-error{% endif %}" id="{{ field.name }}">
-      <legend>
-        <span class="form-label">
-          {{ field.label.text }}
-          {% if hint %}
-            <span class="form-hint">
-              {{ hint }}
-            </span>
-          {% endif %}
-          {% if field.errors %}
-            <span class="error-message" data-module="track-error" data-error-type="{{ field.errors[0][0] }}" data-error-label="{{ field.name }}">
-              {{ field.errors[0][0] }}
-            </span>
-          {% endif %}
-        </label>
-      </legend>
-      <div class="input-list" data-module="list-entry" data-list-item-name="{{ item_name }}" id="list-entry-{{ field.name }}">
-        {% for index in range(0, field.entries|length) %}
-          <div class="list-entry">
-            <label for="input-{{ field.name }}-{{ index }}" class="text-box-number-label">
-              <span class="govuk-visually-hidden">{{ item_name }} number </span>{{ index + 1 }}.
-            </label>
-            <input
-              type="text"
-              name="{{ field.name }}-{{ index }}"
-              id="input-{{ field.name }}-{{ index }}"
-              class="form-control form-control-1-1"
-              value="{{ field.data[index] }}"
-              {% if not autocomplete %}autocomplete="off"{% endif %}
-            />
-          </div>
-        {% endfor %}
+  <div class="govuk-form-group">
+    {% if hint %}
+      {% set attributes = {"aria-describedby": field.name + '-hint'} %}
+    {% else %}
+      {% set attributes = {} %}
+    {% endif %}
+    {% call govukFieldset({
+        "legend": {
+          "text": field.label.text,
+          "isPageHeading": False
+        },
+        "attributes": attributes
+      })
+    %}
+    {% if hint %}
+      <div id="{{ field.name }}-hint" class="govuk-hint">
+        {{ hint }}
       </div>
-    </fieldset>
-  {% if error %}
+    {% endif %}
+    <div class="input-list" data-module="list-entry" data-list-item-name="{{ item_name }}" id="list-entry-{{ field.name }}">
+      {% for entry in field.entries %}
+        <div class="list-entry">
+          {% if not autocomplete %}
+            {% set autocomplete = "off" %}
+          {% else %}
+            {% set autocomplete = "" %}
+          {% endif %}
+          {% if entry.errors %}
+            {% set label_classes = "govuk-input--numbered__label govuk-input--numbered__label--error" %}
+          {% else %}
+            {% set label_classes = "govuk-input--numbered__label" %}
+          {% endif %}
+          {% set field_name = field.name + "-" + loop.index|string %}
+          {{ entry(param_extensions={
+            "id": "input-" + field_name,
+            "name": field_name,
+            "label": {
+              "html": '<span class="govuk-visually-hidden">' + item_name + ' number </span>' + loop.index|string + '.',
+              "classes": label_classes
+            },
+            "classes": "govuk-input--numbered govuk-!-width-full",
+            "value": field.data[loop.index0],
+            "autocomplete": autocomplete
+          }) }}
+        </div>
+      {% endfor %}
     </div>
-  {% endif %}
+  {% endcall %}
 
 {% endmacro %}

@@ -1116,8 +1116,8 @@ def test_user_cant_invite_themselves(
         _expected_status=200,
     )
     assert page.h1.string.strip() == 'Invite a team member'
-    form_error = page.find('span', class_='error-message').string.strip()
-    assert form_error == "You cannot send an invitation to yourself"
+    form_error = page.find('span', class_='govuk-error-message').text.strip()
+    assert form_error == "Error: You cannot send an invitation to yourself"
     assert not mock_create_invite.called
 
 
@@ -1404,7 +1404,7 @@ def test_edit_user_email_cannot_change_a_gov_email_address_to_a_non_gov_email_ad
         },
         _expected_status=200,
     )
-    assert 'Enter a public sector email address' in page.select_one('.error-message').text
+    assert 'Enter a public sector email address' in page.select_one('.govuk-error-message').text
     with client_request.session_transaction() as session:
         assert 'team_member_email_change-'.format(active_user_with_permissions['id']) not in session
 

@@ -493,7 +493,7 @@ def test_service_name_change_fails_if_new_name_has_less_than_2_alphanumeric_char
     )
     assert not mock_service_name_is_unique.called
     assert not mock_update_service.called
-    assert page.find("span", {"class": "error-message"})
+    assert page.find("span", {"class": "govuk-error-message"})
 
 
 @pytest.mark.parametrize('user, expected_text, expected_link', [
@@ -1349,7 +1349,7 @@ def test_non_gov_user_is_told_they_cant_go_live(
 @pytest.mark.parametrize('volumes, displayed_volumes', (
     (
         (('email', None), ('sms', None), ('letter', None)),
-        ('', '', ''),
+        (None, None, None),
     ),
     (
         (('email', 1234), ('sms', 0), ('letter', 999)),
@@ -1381,27 +1381,33 @@ def test_should_show_estimate_volumes(
         'main.estimate_usage', service_id=SERVICE_ONE_ID
     )
     assert page.h1.text == 'Tell us how many messages you expect to send'
-    for channel, label, value in (
+    for channel, label, hint, value in (
         (
             'email',
-            'How many emails do you expect to send in the next year? For example, 50,000',
+            'How many emails do you expect to send in the next year?',
+            'For example, 50,000',
             displayed_volumes[0],
         ),
         (
             'sms',
-            'How many text messages do you expect to send in the next year? For example, 50,000',
+            'How many text messages do you expect to send in the next year?',
+            'For example, 50,000',
             displayed_volumes[1],
         ),
         (
             'letter',
-            'How many letters do you expect to send in the next year? For example, 50,000',
+            'How many letters do you expect to send in the next year?',
+            'For example, 50,000',
             displayed_volumes[2],
         ),
     ):
         assert normalize_spaces(
             page.select_one('label[for=volume_{}]'.format(channel)).text
         ) == label
-        assert page.select_one('#volume_{}'.format(channel))['value'] == value
+        assert normalize_spaces(
+            page.select_one('#volume_{}-hint'.format(channel)).text
+        ) == hint
+        assert page.select_one('#volume_{}'.format(channel)).get('value') == value
 
     assert len(page.select('input[type=radio]')) == 2
 
@@ -1455,11 +1461,8 @@ def test_should_show_persist_estimated_volumes(
             'volume_letter': '9876',
             'consent_to_research': 'yes',
         },
-        'label[for=volume_sms]',
-        (
-            'How many text messages do you expect to send in the next year? For example, 50,000 '
-            'Number of text messages must be 2,000,000,000 or less'
-        )
+        '#volume_sms-error',
+        'Number of text messages must be 2,000,000,000 or less'
     ),
     (
         {
@@ -1485,7 +1488,7 @@ def test_should_error_if_bad_estimations_given(
         _data=data,
         _expected_status=200,
     )
-    assert normalize_spaces(page.select_one(error_selector).text) == expected_error_message
+    assert expected_error_message in page.select_one(error_selector).text
     assert mock_update_service.called is False
 
 
@@ -1504,7 +1507,7 @@ def test_should_error_if_all_volumes_zero(
         },
         _expected_status=200,
     )
-    assert page.select('input[type=text]')[0]['value'] == ''
+    assert page.select('input[type=text]')[0].get('value') is None
     assert page.select('input[type=text]')[1]['value'] == '0'
     assert page.select('input[type=text]')[2]['value'] == '0,00 0'
     assert normalize_spaces(page.select_one('.banner-dangerous').text) == (
@@ -1529,15 +1532,11 @@ def test_should_not_default_to_zero_if_some_fields_dont_validate(
         _expected_status=200,
     )
     assert page.select('input[type=text]')[0]['value'] == '1234'
-    assert page.select('input[type=text]')[1]['value'] == ''
+    assert page.select('input[type=text]')[1].get('value') is None
     assert page.select('input[type=text]')[2]['value'] == 'aaaaaaaaaaaaa'
     assert normalize_spaces(
-        page.select_one('label[for=volume_letter]').text
-    ) == (
-        'How many letters do you expect to send in the next year? '
-        'For example, 50,000 '
-        'Enter the number of letters you expect to send'
-    )
+        page.select_one('#volume_letter-error').text
+    ) == 'Error: Enter the number of letters you expect to send'
     assert mock_update_service.called is False
 
 
@@ -2240,7 +2239,7 @@ def test_incorrect_reply_to_email_address_input(
         _expected_status=200
     )
 
-    assert normalize_spaces(page.select_one('.error-message').text) == expected_error
+    assert expected_error in normalize_spaces(page.select_one('.govuk-error-message').text)
 
 
 @pytest.mark.parametrize('contact_block_input, expected_error', [
@@ -2286,14 +2285,14 @@ def test_incorrect_sms_sender_input(
         _expected_status=(200 if expected_error else 302)
     )
 
-    error_message = page.select_one('.error-message')
+    error_message = page.select_one('.govuk-error-message')
     count_of_api_calls = len(mock_add_sms_sender.call_args_list)
 
     if not expected_error:
         assert not error_message
         assert count_of_api_calls == 1
     else:
-        assert normalize_spaces(error_message.text) == expected_error
+        assert expected_error in error_message.text
         assert count_of_api_calls == 0
 
 
@@ -4186,7 +4185,7 @@ def test_send_files_by_email_contact_details_does_not_update_invalid_contact_det
         _follow_redirects=True
     )
 
-    assert normalize_spaces(page.find('span', class_='error-message').text) == error
+    assert error in page.find('span', class_='govuk-error-message').text
     assert normalize_spaces(page.h1.text) == "Send files by email"
 
 
@@ -5088,8 +5087,7 @@ def test_update_service_data_retention_return_validation_error_for_negative_days
     )
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    error_message = page.find('span', class_='error-message').text.strip()
-    assert error_message == 'Must be between 3 and 90'
+    assert 'Must be between 3 and 90' in page.find('span', class_='govuk-error-message').text
     assert mock_get_service_data_retention.called
     assert not mock_update_service_data_retention.called
 

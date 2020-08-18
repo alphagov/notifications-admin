@@ -2,7 +2,6 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/message-count-label.html" import recipient_count_label %}
-{% from "components/textbox.html" import textbox %}
 {% from "components/form.html" import form_wrapper %}
 
 {% block service_page_title %}
@@ -23,10 +22,7 @@
   ) %}
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-full {% if form.placeholder_value.label.text == 'phone number' %}extra-tracking{% endif %}">
-        {{ textbox(
-          form.placeholder_value,
-          width='1-1',
-        ) }}
+        {{ form.placeholder_value(param_extensions={"classes": "govuk-!-width-full"}) }}
       </div>
       {% if skip_link or link_to_upload %}
         <div class="govuk-grid-column-full">

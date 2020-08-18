@@ -27,13 +27,13 @@
   ListEntry.optionalAttributes = ['aria-describedby'];
   ListEntry.prototype.entryTemplate = Hogan.compile(
     '<div class="list-entry">' +
-      '<label for="{{{id}}}" class="text-box-number-label">' +
+      '<label for="{{{id}}}" class="govuk-input--numbered__label">' +
         '<span class="govuk-visually-hidden">{{listItemName}} number </span>{{number}}.' +
       '</label>' +
       '<input' +
-        ' name="{{name}}-{{index}}"' +
+        ' name="{{name}}"' +
         ' id="{{id}}"' +
-        ' value="{{value}}"' +
+        ' {{#value}}value="{{value}}{{/value}}"' +
         ' {{{sharedAttributes}}}' +
       '/>' +
       '{{#button}}' +
@@ -122,7 +122,7 @@
     if ("undefined" === typeof num) {
       return pattern;
     } else {
-      return "input-" + pattern + "-" + num;
+      return pattern + "-" + num;
     }
   };
   ListEntry.prototype.bindEvents = function () {
@@ -179,7 +179,7 @@
             'id' : this.getId(entryNumber),
             'number' : entryNumber,
             'index': idx,
-            'name' : this.getId(),
+            'name' : this.getId(entryNumber),
             'value' : entry,
             'listItemName' : this.listItemName,
             'sharedAttributes': this.sharedAttributes
