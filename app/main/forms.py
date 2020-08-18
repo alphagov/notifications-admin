@@ -1254,24 +1254,6 @@ class ChooseTimeForm(StripWhitespaceForm):
     )
 
 
-class ChooseBroadcastDurationForm(StripWhitespaceForm):
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.finishes_at.choices = [
-            get_time_value_and_label(hour) for hour in get_next_hours_until(
-                get_furthest_possible_scheduled_time()
-            )
-        ]
-        self.finishes_at.categories = get_next_days_until(
-            get_furthest_possible_scheduled_time()
-        )
-
-    finishes_at = RadioField(
-        'End time',
-    )
-
-
 class CreateKeyForm(StripWhitespaceForm):
     def __init__(self, existing_keys, *args, **kwargs):
         self.existing_key_names = [
