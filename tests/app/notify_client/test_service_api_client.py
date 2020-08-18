@@ -413,6 +413,7 @@ def test_returns_value_from_cache(
 def test_deletes_service_cache(
     app_,
     mock_get_user,
+    mock_get_service_templates,
     mocker,
     client,
     method,
@@ -470,6 +471,7 @@ def test_deletes_caches_when_modifying_templates(
     method,
     extra_args,
     expected_cache_deletes,
+    mock_get_service_templates,
 ):
     mocker.patch('app.notify_client.current_user', id='1')
     mock_redis_delete = mocker.patch('app.extensions.RedisClient.delete')
@@ -477,7 +479,7 @@ def test_deletes_caches_when_modifying_templates(
 
     getattr(service_api_client, method)(*extra_args)
 
-    assert mock_redis_delete.call_args_list == list(map(call, expected_cache_deletes))
+    assert mock_redis_delete.call_args_list == [call(x) for x in expected_cache_deletes]
     assert len(mock_request.call_args_list) == 1
 
 
@@ -512,3 +514,41 @@ def test_client_updates_guest_list(mocker):
         url='/service/foo/guest-list',
         data=['a', 'b', 'c'],
     )
+
+
+def test_client_doesnt_delete_service_template_cache_when_none_exist(
+    app_,
+    mock_get_user,
+    mock_get_service_templates_when_no_templates_exist,
+    mocker
+):
+    mocker.patch('app.notify_client.current_user', id='1')
+    mocker.patch('notifications_python_client.base.BaseAPIClient.request')
+    mock_redis_delete = mocker.patch('app.extensions.RedisClient.delete')
+
+    service_api_client.update_reply_to_email_address(SERVICE_ONE_ID, uuid4(), 'foo@bar.com')
+
+    assert len(mock_redis_delete.call_args_list) == 1
+    assert mock_redis_delete.call_args_list[0] == call('service-{}'.format(SERVICE_ONE_ID))
+
+
+def test_client_deletes_service_template_cache_when_service_is_updated(
+    app_,
+    mock_get_user,
+    mock_get_service_templates,
+    mocker
+):
+    mocker.patch('app.notify_client.current_user', id='1')
+    mocker.patch('notifications_python_client.base.BaseAPIClient.request')
+    mock_redis_delete = mocker.patch('app.extensions.RedisClient.delete')
+
+    service_api_client.update_reply_to_email_address(SERVICE_ONE_ID, uuid4(), 'foo@bar.com')
+
+    assert len(mock_redis_delete.call_args_list) == 2
+    assert mock_redis_delete.call_args_list[1] == call('service-{}'.format(SERVICE_ONE_ID))
+
+    templates_to_delete = mock_redis_delete.call_args_list[0][0]
+    assert len(templates_to_delete) == 6
+    for template_key in templates_to_delete:
+        assert template_key.startswith('template-')
+        assert template_key.endswith('version-None')
