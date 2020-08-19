@@ -18,6 +18,23 @@
     text-overflow: ellipsis;
   }
 
+  &-service-type {
+
+    &--training {
+      @include bold-16;
+      position: relative;
+      display: inline-block;
+      margin-left: govuk-spacing(2);
+      padding: 0 govuk-spacing(1);
+      background: $grey-3;
+      color: mix($grey-1, $text-colour);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      box-shadow: 0 -3px 0 0 $grey-3;
+    }
+
+  }
+
   &-service-switch,
   &-service-back-to,
   &-organisation-link {
