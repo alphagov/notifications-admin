@@ -1002,18 +1002,25 @@ def test_cancel_invited_user_cancels_user_invitations(
     mock_get_invites_for_service,
     sample_invite,
     active_user_with_permissions,
+    mock_get_users_by_service,
+    mock_get_template_folders,
     mocker,
 ):
     mock_cancel = mocker.patch('app.invite_api_client.cancel_invited_user')
-    client_request.get(
+    mocker.patch('app.invite_api_client.get_invited_user', return_value=sample_invite)
+
+    page = client_request.get(
         'main.cancel_invited_user',
         service_id=SERVICE_ONE_ID,
         invited_user_id=sample_invite['id'],
-        _expected_status=302,
-        _expected_redirect=url_for(
-            'main.manage_users', service_id=SERVICE_ONE_ID, _external=True
-        ),
+        _follow_redirects=True,
     )
+
+    assert normalize_spaces(page.h1.text) == 'Team members'
+    flash_banner = normalize_spaces(
+        page.find('div', class_='banner-default-with-tick').text
+    )
+    assert flash_banner == f"Invitation cancelled for {sample_invite['email_address']}"
     mock_cancel.assert_called_once_with(
         service_id=SERVICE_ONE_ID,
         invited_user_id=sample_invite['id'],
