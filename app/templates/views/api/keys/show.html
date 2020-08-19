@@ -24,7 +24,8 @@
 
       {{ api_key(
         '{}-{}-{}'.format(key_name, service_id, secret),
-        'API key'
+        name='API key',
+        thing='API key'
       ) }}
 
       {{ page_footer(

@@ -807,6 +807,7 @@ def add_template_filters(application):
         format_notification_status_as_url,
         format_number_in_pounds_as_currency,
         formatters.formatted_list,
+        formatters.normalise_lines,
         nl2br,
         format_phone_number_human_readable,
         format_thousands,

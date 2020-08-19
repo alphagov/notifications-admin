@@ -43,7 +43,8 @@
         <a class="govuk-link govuk-link--no-visited-state user-list-edit-link" href="{{ url_for('.service_edit_letter_contact', service_id =current_service.id, letter_contact_id = item.id) }}">Change</a>
         {% endif %}
         {% if letter_contact_details|length  > 1 %}
-          {{ api_key(item.id, thing="ID") }}
+          {% set first_line_of_contact_block = item.contact_block|normalise_lines|first %}
+          {{ api_key(item.id, name=first_line_of_contact_block, thing="ID") }}
         {% endif %}
       </div>
     {% endfor %}
