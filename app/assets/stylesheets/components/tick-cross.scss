@@ -36,44 +36,10 @@
 
     }
 
-    &-edit-link {
-
-      text-align: right;
-      position: absolute;
-      top: -25px;
-      right: -135px;
-
-      a {
-
-        &:before {
-          content: "";
-          display: block;
-
-          position: absolute;
-
-          top: -1 * govuk-spacing(3) - 1;
-          right: 0;
-          bottom: -1 * govuk-spacing(3);
-          left: -1 * govuk-spacing(3);
-
-          background: transparent;
-        }
-
-        &:active:before,
-        &:focus:before {
-          border-color: $yellow;
-          border-style: solid;
-          border-width: 15px 3px 15px 15px;
-          right: -3px;
-        }
-
-      }
-
-    }
-
     &-hint {
       color: #6F777B;
       padding-top: 5px;
+      margin: 0;
     }
 
   }

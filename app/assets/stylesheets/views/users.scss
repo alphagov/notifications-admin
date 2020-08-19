@@ -7,9 +7,8 @@ $item-top-padding: govuk-spacing(3);
 
   &-item {
 
-    padding: $item-top-padding 150px govuk-spacing(3) 0;
+    padding: govuk-spacing(3) 0px;
     border-top: 1px solid $border-colour;
-    position: relative;
 
     &-heading {
 
@@ -29,13 +28,61 @@ $item-top-padding: govuk-spacing(3);
       border-bottom: 1px solid $border-colour;
     }
 
+    & :last-child {
+      margin-bottom: 0;
+    }
+
+    &-blank {
+
+      margin-bottom: govuk-spacing(3);
+
+      @include govuk-media-query($from: tablet) {
+        margin-bottom: 0;
+      }
+
+    }
+
   }
 
   &-edit-link {
-    text-align: right;
-    position: absolute;
-    top: $item-top-padding;
-    right: 0px;
+
+    position: relative;
+    display: block;
+    margin: govuk-spacing(3) 0 govuk-spacing(3);
+
+    @include govuk-media-query($from: tablet) {
+      float: right;
+      margin: 0;
+    }
+
+    &:before {
+      content: "";
+      display: block;
+
+      position: absolute;
+
+      top: -1 * govuk-spacing(3) - 1;
+      right: 0;
+      bottom: -1 * govuk-spacing(3);
+      left: -1 * govuk-spacing(3);
+
+      background: transparent;
+    }
+
+    &:active:before,
+    &:focus:before {
+      border-color: $yellow;
+      border-style: solid;
+      border-width: 15px 3px;
+      right: -3px;
+      left: -3px;
+
+      @include govuk-media-query($from: tablet) {
+        border-width: 15px 3px 15px 15px;
+        left: -15px;
+      }
+    }
+
   }
 
 }

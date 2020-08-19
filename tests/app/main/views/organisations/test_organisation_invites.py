@@ -28,7 +28,7 @@ def test_view_team_members(
         ) == 'Test User {}'.format(i + 1)
 
     assert normalize_spaces(
-        page.select('.tick-cross-list-edit-link')[0].text
+        page.select('.user-list-edit-link')[0].text
     ) == 'Cancel invitation'
 
 
