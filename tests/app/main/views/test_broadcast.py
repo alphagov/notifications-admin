@@ -760,7 +760,6 @@ def test_cant_approve_own_broadcast(
         normalize_spaces(page.select_one('.banner').text)
     ) == (
         'Your broadcast is waiting for approval from another member of your team '
-        'Once approved it will be live until tomorrow at 11:23pm '
         'Withdraw this broadcast'
     )
 
