@@ -13,7 +13,6 @@ from app.main import main
 from app.main.forms import (
     BroadcastAreaForm,
     BroadcastAreaFormWithSelectAll,
-    ChooseBroadcastDurationForm,
     SearchByNameForm,
 )
 from app.models.broadcast_message import BroadcastMessage, BroadcastMessages
@@ -211,10 +210,8 @@ def preview_broadcast_message(service_id, broadcast_message_id):
         broadcast_message_id,
         service_id=current_service.id,
     )
-    form = ChooseBroadcastDurationForm()
-
-    if form.validate_on_submit():
-        broadcast_message.request_approval(until=form.finishes_at.data)
+    if request.method == 'POST':
+        broadcast_message.request_approval()
         return redirect(url_for(
             '.view_broadcast_message',
             service_id=current_service.id,
@@ -224,7 +221,6 @@ def preview_broadcast_message(service_id, broadcast_message_id):
     return render_template(
         'views/broadcast/preview-message.html',
         broadcast_message=broadcast_message,
-        form=form,
     )
 
 

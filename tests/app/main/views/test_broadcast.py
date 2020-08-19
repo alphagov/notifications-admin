@@ -532,29 +532,12 @@ def test_remove_broadcast_area_page(
     )
 
 
-@pytest.mark.parametrize('end_time', (
-
-    # Before now
-    pytest.param('2020-02-02T02:00:00', marks=pytest.mark.xfail),
-
-    # End of the current hour
-    pytest.param('2020-02-02T03:00:00'),
-
-    # Midnight 3 days ahead
-    pytest.param('2020-02-06T00:00:00'),
-
-    # 1am 4 days ahead
-    pytest.param('2020-02-06T01:00:00', marks=pytest.mark.xfail),
-
-))
-@freeze_time('2020-02-02 02:02:02')
 def test_preview_broadcast_message_page(
     client_request,
     service_one,
     mock_get_draft_broadcast_message,
     mock_get_broadcast_template,
     fake_uuid,
-    end_time,
 ):
     service_one['permissions'] += ['broadcast']
 
@@ -582,47 +565,21 @@ def test_preview_broadcast_message_page(
     assert form['method'] == 'post'
     assert 'action' not in form
 
-    radio_choices = [
-        choice['value'] for choice in form.select('input[type=radio][name=finishes_at]')
-    ]
-    assert len(radio_choices) == 94
-    assert end_time in radio_choices
 
-
-@pytest.mark.parametrize('end_time', (
-
-    # Before now
-    pytest.param('2020-02-02T02:00:00', marks=pytest.mark.xfail),
-
-    # End of the current hour
-    pytest.param('2020-02-02T03:00:00'),
-
-    # Midnight 3 days ahead
-    pytest.param('2020-02-06T00:00:00'),
-
-    # 1am 4 days ahead
-    pytest.param('2020-02-06T01:00:00', marks=pytest.mark.xfail),
-
-))
 @freeze_time('2020-02-02 02:02:02')
 def test_start_broadcasting(
     client_request,
     service_one,
     mock_get_draft_broadcast_message,
     mock_get_broadcast_template,
-    mock_update_broadcast_message,
     mock_update_broadcast_message_status,
     fake_uuid,
-    end_time,
 ):
     service_one['permissions'] += ['broadcast']
     client_request.post(
         '.preview_broadcast_message',
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
-        _data={
-            'finishes_at': end_time,
-        },
         _expected_redirect=url_for(
             'main.view_broadcast_message',
             service_id=SERVICE_ONE_ID,
@@ -630,43 +587,10 @@ def test_start_broadcasting(
             _external=True,
         ),
     ),
-    mock_update_broadcast_message.assert_called_once_with(
-        service_id=SERVICE_ONE_ID,
-        broadcast_message_id=fake_uuid,
-        data={
-            'finishes_at': end_time,
-        },
-    )
     mock_update_broadcast_message_status.assert_called_once_with(
         'pending-approval',
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
-    )
-
-
-def test_start_broadcasting_shows_validation_error(
-    client_request,
-    service_one,
-    mock_get_draft_broadcast_message,
-    mock_get_broadcast_template,
-    mock_update_broadcast_message,
-    mock_update_broadcast_message_status,
-    fake_uuid,
-):
-    service_one['permissions'] += ['broadcast']
-    page = client_request.post(
-        '.preview_broadcast_message',
-        service_id=SERVICE_ONE_ID,
-        broadcast_message_id=fake_uuid,
-        _data={},
-        _expected_status=200,
-    )
-    assert mock_update_broadcast_message.called is False
-    assert mock_update_broadcast_message_status.called is False
-    assert normalize_spaces(
-        page.select_one('form fieldset legend .error-message').text
-    ) == (
-        'Select an option'
     )
 
 
@@ -945,6 +869,7 @@ def test_approve_broadcast(
             broadcast_message_id=fake_uuid,
             data={
                 'starts_at': '2020-02-22T22:22:22',
+                'finishes_at': '2020-02-23T22:21:22',
             },
         )
         mock_update_broadcast_message_status.assert_called_once_with(

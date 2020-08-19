@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from notifications_utils.template import BroadcastPreviewTemplate
 from orderedset import OrderedSet
@@ -153,15 +153,15 @@ class BroadcastMessage(JSONModel):
             data=kwargs,
         )
 
-    def request_approval(self, until):
-        self._update(
-            finishes_at=until,
-        )
+    def request_approval(self):
         self._set_status_to('pending-approval')
 
     def approve_broadcast(self):
         self._update(
             starts_at=datetime.utcnow().isoformat(),
+            finishes_at=(
+                datetime.utcnow() + timedelta(hours=23, minutes=59)
+            ).isoformat(),
         )
         self._set_status_to('broadcasting')
 
