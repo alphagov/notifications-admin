@@ -1,5 +1,5 @@
 ## We don’t allow committing certain file types that risk containing users’ personal information
-## If you are sure that a file is OK, you can explicitly add it to the list of allowed files 
+## If you are sure that a file is OK, you can explicitly add it to the list of allowed files
 *.pdf
 *.PDF
 *.csv
@@ -26,6 +26,7 @@
 !tests/spreadsheet_files/excel_97.xls
 !tests/non_spreadsheet_files/actually_a_png.xlsx
 !tests/spreadsheet_files/excel 2007.xlsx
+!app/broadcast_areas/source_files/Lower_Tier_Local_Authority_to_Upper_Tier_Local_Authority__December_2019__Lookup_in_England_and_Wales.csv
 
 
 # Byte-compiled / optimized / DLL files
