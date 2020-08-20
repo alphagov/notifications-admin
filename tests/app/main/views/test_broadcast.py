@@ -687,7 +687,7 @@ def test_view_pending_broadcast(
             service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
             created_by_id=fake_uuid,
-            finishes_at='2020-02-23T23:23:23.000000',
+            finishes_at=None,
             status='pending-approval',
         ),
     )
@@ -706,7 +706,7 @@ def test_view_pending_broadcast(
     assert (
         normalize_spaces(page.select_one('.banner').text)
     ) == (
-        'Test User wants to broadcast this message until tomorrow at 11:23pm. '
+        'Test User wants to broadcast this message. '
         'Start broadcasting now Reject this broadcast'
     )
 
