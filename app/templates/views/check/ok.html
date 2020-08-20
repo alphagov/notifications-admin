@@ -5,13 +5,9 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/message-count-label.html" import message_count_label %}
 {% from "components/button/macro.njk" import govukButton %}
+{% from "components/skip-link/macro.njk" import govukSkipLink %}
 
 {% set file_contents_header_id = 'file-preview' %}
-{% macro skip_to_file_contents() %}
-  <p class="govuk-visually-hidden">
-    <a class="govuk-link govuk-link--no-visited-state" href="#{{ file_contents_header_id }}">Skip to file contents</a>
-  </p>
-{% endmacro %}
 
 {% block service_page_title %}
   {{ "Preview of {}".format(template.name) }}
@@ -30,7 +26,10 @@
     {% endcall %}
   {% endif %}
 
-  {{ skip_to_file_contents() }}
+  {{ govukSkipLink({
+    "text": "Skip to file contents",
+    "href": "#" + file_contents_header_id
+  }) }}
 
   {{ template|string }}
   <div class="bottom-gutter-3-2">

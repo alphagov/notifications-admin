@@ -515,8 +515,7 @@ def test_upload_csv_file_with_empty_message_shows_check_page_with_errors(
         page.select_one('.banner-dangerous').text
     ) == (
         'There’s a problem with invalid.csv '
-        'You need to check you have content for the empty message in 1 row. '
-        'Skip to file contents'
+        'You need to check you have content for the empty message in 1 row.'
     )
     assert [
         normalize_spaces(row.text) for row in page.select('tbody tr')
@@ -571,8 +570,7 @@ def test_upload_csv_file_with_very_long_placeholder_shows_check_page_with_errors
         page.select_one('.banner-dangerous').text
     ) == (
         'There’s a problem with invalid.csv '
-        'You need to shorten the messages in 2 rows. '
-        'Skip to file contents'
+        'You need to shorten the messages in 2 rows.'
     )
     assert [
         normalize_spaces(row.text) for row in page.select('tbody tr')
@@ -631,8 +629,7 @@ def test_upload_csv_file_with_bad_postal_address_shows_check_page_with_errors(
         page.select_one('.banner-dangerous').text
     ) == (
         'There’s a problem with invalid.csv '
-        'You need to fix 5 addresses. '
-        'Skip to file contents'
+        'You need to fix 5 addresses.'
     )
     assert [
         normalize_spaces(row.text) for row in page.select('tbody tr')
@@ -692,8 +689,7 @@ def test_upload_csv_file_with_international_letters_permission_shows_appropriate
         page.select_one('.banner-dangerous').text
     ) == (
         'There’s a problem with invalid.csv '
-        'You need to fix 2 addresses. '
-        'Skip to file contents'
+        'You need to fix 2 addresses.'
     )
     assert [
         normalize_spaces(row.text) for row in page.select('tbody tr')
@@ -715,8 +711,7 @@ def test_upload_csv_file_with_international_letters_permission_shows_appropriate
         (
             'There’s a problem with your column names '
             'Your file needs a column called ‘phone number’. '
-            'Right now it has columns called ‘telephone’ and ‘name’. '
-            'Skip to file contents'
+            'Right now it has columns called ‘telephone’ and ‘name’.'
         )
     ),
     (
@@ -726,8 +721,7 @@ def test_upload_csv_file_with_international_letters_permission_shows_appropriate
         """,
         (
             'Your column names need to match the double brackets in your template '
-            'Your file is missing a column called ‘name’. '
-            'Skip to file contents'
+            'Your file is missing a column called ‘name’.'
         )
     ),
     (
@@ -738,8 +732,7 @@ def test_upload_csv_file_with_international_letters_permission_shows_appropriate
         (
             'There’s a problem with your column names '
             'We found more than one column called ‘phone number’ or ‘PHONE_NUMBER’. '
-            'Delete or rename one of these columns and try again. '
-            'Skip to file contents'
+            'Delete or rename one of these columns and try again.'
         )
     ),
     (
@@ -748,24 +741,21 @@ def test_upload_csv_file_with_international_letters_permission_shows_appropriate
         """,
         (
             'Your file is missing some rows '
-            'It needs at least one row of data. '
-            'Skip to file contents'
+            'It needs at least one row of data.'
         )
     ),
     (
         "+447700900986",
         (
             'Your file is missing some rows '
-            'It needs at least one row of data, and columns called ‘name’ and ‘phone number’. '
-            'Skip to file contents'
+            'It needs at least one row of data, and columns called ‘name’ and ‘phone number’.'
         )
     ),
     (
         "",
         (
             'Your file is missing some rows '
-            'It needs at least one row of data, and columns called ‘name’ and ‘phone number’. '
-            'Skip to file contents'
+            'It needs at least one row of data, and columns called ‘name’ and ‘phone number’.'
         )
     ),
     (
@@ -777,8 +767,7 @@ def test_upload_csv_file_with_international_letters_permission_shows_appropriate
         """,
         (
             'There’s a problem with invalid.csv '
-            'You need to enter missing data in 1 row. '
-            'Skip to file contents'
+            'You need to enter missing data in 1 row.'
         )
     ),
     (
@@ -790,8 +779,7 @@ def test_upload_csv_file_with_international_letters_permission_shows_appropriate
         """,
         (
             'There’s a problem with invalid.csv '
-            'You need to enter missing data in 1 row. '
-            'Skip to file contents'
+            'You need to enter missing data in 1 row.'
         )
     ),
 ])
@@ -3343,8 +3331,7 @@ def test_check_messages_shows_trial_mode_error(
         page.find('div', class_='banner-dangerous').text.split()
     ) == (
         'You cannot send to this phone number '
-        'In trial mode you can only send to yourself and members of your team '
-        'Skip to file contents'
+        'In trial mode you can only send to yourself and members of your team'
     )
 
 
@@ -3406,8 +3393,7 @@ def test_check_messages_shows_trial_mode_error_for_letters(
     if error_should_be_shown:
         assert normalize_spaces(error[0].text) == (
             '{} '
-            'In trial mode you can only preview how your letters will look '
-            'Skip to file contents'
+            'In trial mode you can only preview how your letters will look'
         ).format(expected_error_message)
     else:
         assert not error
@@ -3509,8 +3495,7 @@ def test_check_messages_shows_data_errors_before_trial_mode_errors_for_letters(
 
     assert normalize_spaces(page.select_one('.banner-dangerous').text) == (
         'There’s a problem with example.xlsx '
-        'You need to fix 2 addresses. '
-        'Skip to file contents'
+        'You need to fix 2 addresses.'
     )
     assert not page.select('.table-field-index a')
 
@@ -3551,8 +3536,7 @@ def test_warns_if_file_sent_already(
         page.select_one('.banner-dangerous').text
     ) == (
         'These messages have already been sent today '
-        'If you need to resend them, rename the file and upload it again. '
-        'Skip to file contents'
+        'If you need to resend them, rename the file and upload it again.'
     )
 
     mock_get_jobs.assert_called_once_with(SERVICE_ONE_ID, limit_days=0)
@@ -3600,8 +3584,7 @@ def test_check_messages_column_error_doesnt_show_optional_columns(
         'There’s a problem with your column names '
         'Your file needs at least 3 address columns, for example ‘address line 1’, '
         '‘address line 2’ and ‘address line 3’. '
-        'Right now it has columns called ‘address_line_1’, ‘address_line_2’ and ‘foo’. '
-        'Skip to file contents'
+        'Right now it has columns called ‘address_line_1’, ‘address_line_2’ and ‘foo’.'
     )
 
 
@@ -3697,8 +3680,7 @@ def test_letters_from_csv_files_dont_have_download_link(
         page.select_one('.banner-dangerous').text
     ) == normalize_spaces(
         'You cannot send this letter '
-        'In trial mode you can only preview how your letters will look '
-        'Skip to file contents'
+        'In trial mode you can only preview how your letters will look'
     )
 
     assert len(page.select('.letter img')) == 5
@@ -3873,8 +3855,7 @@ def test_check_messages_shows_over_max_row_error(
     ) == (
         'Your file has too many rows '
         'Notify can process up to 11,111 rows at once. '
-        'Your file has 99,999 rows. '
-        'Skip to file contents'
+        'Your file has 99,999 rows.'
     )
 
 
