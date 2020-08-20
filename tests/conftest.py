@@ -4284,6 +4284,7 @@ def mock_get_broadcast_messages(
             ),
             partial_json(
                 status='pending-approval',
+                finishes_at=None,
             ),
             partial_json(
                 status='broadcasting',

@@ -21,9 +21,6 @@
     {% if broadcast_message.created_by == current_user and current_user.has_permissions('send_messages') %}
       <div class="banner govuk-!-margin-bottom-6">
         <h2 class="govuk-heading-s govuk-!-margin-bottom-3">Your broadcast is waiting for approval from another member of your team</h2>
-        <p class="govuk-body">Once approved it will be live until
-          {{ broadcast_message.finishes_at|format_datetime_relative }}
-        </p>
         {{ page_footer(
           delete_link=url_for('main.reject_broadcast_message', service_id=current_service.id, broadcast_message_id=broadcast_message.id),
           delete_link_text='Withdraw this broadcast'
