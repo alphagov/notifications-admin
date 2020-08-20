@@ -8,7 +8,7 @@ from notifications_utils.formatters import formatted_list
 from polygons import Polygons
 from repo import BroadcastAreasRepository
 
-package_path = Path(__file__).resolve().parent
+source_files_path = Path(__file__).resolve().parent / 'source_files'
 point_counts = []
 
 
@@ -58,7 +58,7 @@ simple_datasets = [
     ("Countries", "country", "ctry19cd", "ctry19nm"),
 ]
 for dataset_name, dataset_name_singular, id_field, name_field in simple_datasets:
-    filepath = package_path / "{}.geojson".format(dataset_name)
+    filepath = source_files_path / "{}.geojson".format(dataset_name)
 
     dataset_id = id_field[:-2]
     dataset_geojson = geojson.loads(filepath.read_text())
@@ -89,10 +89,10 @@ for dataset_name, dataset_name_singular, id_field, name_field in simple_datasets
 
 # https://geoportal.statistics.gov.uk/datasets/wards-may-2020-boundaries-uk-bgc
 # Converted to geojson manually from SHP because of GeoJSON download limits
-wards_filepath = package_path / "Electoral Wards May 2020.geojson"
+wards_filepath = source_files_path / "Electoral Wards May 2020.geojson"
 
 # http://geoportal.statistics.gov.uk/datasets/ward-to-westminster-parliamentary-constituency-to-local-authority-district-december-2019-lookup-in-the-united-kingdom/data
-las_filepath = package_path / "Electoral Wards and Local Authorities 2020.geojson"
+las_filepath = source_files_path / "Electoral Wards and Local Authorities 2020.geojson"
 
 ward_code_to_la_mapping = {
     f["properties"]["WD19CD"]: f["properties"]["LAD19NM"]
@@ -143,7 +143,7 @@ for f in geojson.loads(wards_filepath.read_text())["features"]:
 repo.insert_broadcast_areas(areas_to_add)
 areas_to_add = []
 
-las_filepath = package_path / "Local Authorities May 2020.geojson"
+las_filepath = source_files_path / "Local Authorities May 2020.geojson"
 
 for feature in geojson.loads(las_filepath.read_text())["features"]:
     la_id = feature["properties"]["lad20cd"]
