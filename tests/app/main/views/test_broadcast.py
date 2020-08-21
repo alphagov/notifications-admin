@@ -706,8 +706,8 @@ def test_view_pending_broadcast(
     assert (
         normalize_spaces(page.select_one('.banner').text)
     ) == (
-        'Test User wants to broadcast this message. '
-        'Start broadcasting now Reject this broadcast'
+        'Test User wants to broadcast Example template '
+        'Start broadcasting now Reject this alert'
     )
 
     form = page.select_one('form.banner')
@@ -716,7 +716,7 @@ def test_view_pending_broadcast(
     assert form.select_one('button[type=submit]')
 
     link = form.select_one('a.govuk-link.govuk-link--destructive')
-    assert link.text == 'Reject this broadcast'
+    assert link.text == 'Reject this alert'
     assert link['href'] == url_for(
         '.reject_broadcast_message',
         service_id=SERVICE_ONE_ID,
@@ -726,6 +726,60 @@ def test_view_pending_broadcast(
 
 @freeze_time('2020-02-22T22:22:22.000000')
 def test_cant_approve_own_broadcast(
+    mocker,
+    client_request,
+    service_one,
+    active_user_with_permissions,
+    mock_get_broadcast_template,
+    fake_uuid,
+):
+    service_one['restricted'] = False
+    mocker.patch(
+        'app.broadcast_message_api_client.get_broadcast_message',
+        return_value=broadcast_message_json(
+            id_=fake_uuid,
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            created_by_id=fake_uuid,
+            finishes_at='2020-02-23T23:23:23.000000',
+            status='pending-approval',
+        ),
+    )
+    mocker.patch('app.user_api_client.get_user', side_effect=[
+        active_user_with_permissions,  # Current user
+        active_user_with_permissions,  # User who created broadcast (the same)
+    ])
+    service_one['permissions'] += ['broadcast']
+
+    page = client_request.get(
+        '.view_broadcast_message',
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+    )
+
+    assert (
+        normalize_spaces(page.select_one('.banner h1').text)
+    ) == (
+        'Example template is waiting for approval'
+    )
+    assert (
+        normalize_spaces(page.select_one('.banner p').text)
+    ) == (
+        'You need another member of your team to approve your alert.'
+    )
+    assert not page.select('form')
+
+    link = page.select_one('.banner a.govuk-link.govuk-link--destructive')
+    assert link.text == 'Withdraw this alert'
+    assert link['href'] == url_for(
+        '.reject_broadcast_message',
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+    )
+
+
+@freeze_time('2020-02-22T22:22:22.000000')
+def test_can_approve_own_broadcast_in_trial_mode(
     mocker,
     client_request,
     service_one,
@@ -757,16 +811,41 @@ def test_cant_approve_own_broadcast(
     )
 
     assert (
-        normalize_spaces(page.select_one('.banner').text)
+        normalize_spaces(page.select_one('.banner h1').text)
     ) == (
-        'Your broadcast is waiting for approval from another member of your team '
-        'Withdraw this broadcast'
+        'Example template is waiting for approval'
+    )
+    assert (
+        normalize_spaces(page.select_one('.banner p').text)
+    ) == (
+        'When you use a live account you’ll need another member of '
+        'your team to approve your alert.'
+    )
+    assert (
+        normalize_spaces(page.select_one('.banner details summary').text)
+    ) == (
+        'Approve your own alert'
+    )
+    assert (
+        normalize_spaces(page.select_one('.banner details ').text)
+    ) == (
+        'Approve your own alert '
+        'Because you’re in training mode you can approve your own '
+        'alerts, to see how it works. '
+        'No real alerts will be broadcast to anyone’s phone. '
+        'Start broadcasting now '
+        'Cancel this alert'
     )
 
-    assert not page.select_one('form')
+    form = page.select_one('.banner details form')
+    assert form['method'] == 'post'
+    assert 'action' not in form
+    assert normalize_spaces(form.select_one('button[type=submit]').text) == (
+        'Start broadcasting now'
+    )
 
     link = page.select_one('.banner a.govuk-link.govuk-link--destructive')
-    assert link.text == 'Withdraw this broadcast'
+    assert link.text == 'Cancel this alert'
     assert link['href'] == url_for(
         '.reject_broadcast_message',
         service_id=SERVICE_ONE_ID,
@@ -810,8 +889,8 @@ def test_view_only_user_cant_approve_broadcast(
     assert (
         normalize_spaces(page.select_one('.banner').text)
     ) == (
-        'This broadcast is waiting for approval '
-        'You don’t have permission to approve broadcasts.'
+        'This alert is waiting for approval '
+        'You don’t have permission to approve alerts.'
     )
 
     assert not page.select_one('form')
