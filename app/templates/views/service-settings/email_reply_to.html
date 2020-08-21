@@ -23,13 +23,13 @@
     {% endif %}
     {% for item in current_service.email_reply_to_addresses %}
       <div class="user-list-item">
-        <h3>
+        <h2 class="user-list-item-heading">
           <span class="heading-small">{{ item.email_address }}</span>&ensp;<span class="hint">
             {%- if item.is_default -%}
               (default)
             {% endif %}
           </span>
-        </h3>
+        </h2>
         {% if current_user.has_permissions('manage_service') %}
           <a class="govuk-link govuk-link--no-visited-state user-list-edit-link" href="{{ url_for('.service_edit_email_reply_to', service_id =current_service.id, reply_to_email_id = item.id) }}">Change</a>
         {% endif %}

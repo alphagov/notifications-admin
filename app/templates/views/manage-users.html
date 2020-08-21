@@ -22,7 +22,7 @@
   <div class="user-list">
     {% for user in users %}
       <div class="user-list-item">
-        <h3 title="{{ user.email_address }}">
+        <h2 class="user-list-item-heading" title="{{ user.email_address }}">
           {%- if user.name -%}
             <span class="heading-small live-search-relevant">{{ user.name }}</span>&ensp;
           {%- endif -%}
@@ -37,7 +37,7 @@
               <span class="live-search-relevant">{{ user.email_address }}</span>
             {% endif %}
           </span>
-        </h3>
+        </h2>
         <ul class="tick-cross-list govuk-grid-row">
           <div class="tick-cross-list-permissions govuk-grid-column-three-quarters">
             {% for permission, label in permissions %}
