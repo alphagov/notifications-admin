@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+import csv
+from copy import deepcopy
 from pathlib import Path
 
 import geojson
@@ -94,6 +96,15 @@ wards_filepath = source_files_path / "Electoral Wards May 2020.geojson"
 # http://geoportal.statistics.gov.uk/datasets/ward-to-westminster-parliamentary-constituency-to-local-authority-district-december-2019-lookup-in-the-united-kingdom/data
 las_filepath = source_files_path / "Electoral Wards and Local Authorities 2020.geojson"
 
+# https://geoportal.statistics.gov.uk/datasets/counties-and-unitary-authorities-december-2019-boundaries-uk-bgc
+ctyua_filepath = source_files_path / "Counties_and_Unitary_Authorities__December_2019__Boundaries_UK_BGC.geojson"
+
+# https://geoportal.statistics.gov.uk/datasets/lower-tier-local-authority-to-upper-tier-local-authority-december-2019-lookup-in-england-and-wales?where=LTLA19CD%20%3D%20%27E06000045%27
+ltla_utla_map_filepath = source_files_path / "Lower_Tier_Local_Authority_to_Upper_Tier_Local_Authority__December_2019__Lookup_in_England_and_Wales.csv"  # noqa: E501
+
+# http://geoportal.statistics.gov.uk/datasets/local-authority-districts-may-2020-boundaries-uk-bgc
+las_filepath = source_files_path / "Local Authorities May 2020.geojson"
+
 ward_code_to_la_mapping = {
     f["properties"]["WD19CD"]: f["properties"]["LAD19NM"]
     for f in geojson.loads(las_filepath.read_text())["features"]
@@ -103,15 +114,26 @@ ward_code_to_la_id_mapping = {
     for f in geojson.loads(las_filepath.read_text())["features"]
 }
 
+
+# the mapping dict is empty for lower tier local authorities that are also upper tier (unitary authorities, etc)
+ltla_utla_mapping_csv = csv.DictReader(ltla_utla_map_filepath.open())
+la_code_to_cty_id_mapping = {
+    row['LTLA19CD']: row['UTLA19CD'] for row in ltla_utla_mapping_csv if row['LTLA19CD'] != row['UTLA19CD']
+}
+
+
 dataset_name = "Local authorities"
 dataset_name_singular = "local authority"
-dataset_id = "wd20-lad20"
+dataset_id = "wd20-lad20-ctyua19"
 repo.insert_broadcast_area_library(
     dataset_id,
     name=dataset_name,
     name_singular=dataset_name_singular,
     is_group=True,
 )
+
+
+# electoral wards
 
 areas_to_add = []
 
@@ -141,9 +163,11 @@ for f in geojson.loads(wards_filepath.read_text())["features"]:
         print("Skipping", ward_code, ward_name)  # noqa: T001
 
 repo.insert_broadcast_areas(areas_to_add)
-areas_to_add = []
 
-las_filepath = source_files_path / "Local Authorities May 2020.geojson"
+
+# local authorities
+
+areas_to_add = []
 
 for feature in geojson.loads(las_filepath.read_text())["features"]:
     la_id = feature["properties"]["lad20cd"]
@@ -153,6 +177,35 @@ for feature in geojson.loads(las_filepath.read_text())["features"]:
     print(group_name)  # noqa: T001
 
     group_id = "lad20-" + la_id
+
+    feature, simple_feature = (
+        polygons_and_simplified_polygons(feature["geometry"])
+    )
+
+    ctyua_id = la_code_to_cty_id_mapping.get(la_id)
+    if ctyua_id:
+        print(f'{group_id} {group_name} is part of {ctyua_id}')  # noqa: T001
+    areas_to_add.append([
+        group_id,
+        group_name,
+        dataset_id,
+        'ctyua19-' + ctyua_id if ctyua_id else None,
+        feature,
+        simple_feature
+    ])
+repo.insert_broadcast_areas(areas_to_add)
+
+
+# counties and unitary authorities
+
+areas_to_add = []
+for feature in geojson.loads(ctyua_filepath.read_text())['features']:
+    ctyua_id = feature["properties"]["ctyua19cd"]
+    group_name = feature["properties"]["ctyua19nm"]
+
+    print('County/Unitary Authority', group_name)  # noqa: T001
+
+    group_id = "ctyua19-" + ctyua_id
 
     feature, simple_feature = (
         polygons_and_simplified_polygons(feature["geometry"])
