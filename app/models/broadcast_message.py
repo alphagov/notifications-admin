@@ -79,6 +79,17 @@ class BroadcastMessage(JSONModel):
             )
         )
 
+    @cached_property
+    def simple_polygons(self):
+        polygons = Polygons(
+            broadcast_area_libraries.get_simple_polygons_for_areas_lat_long(
+                *self._dict['areas']
+            )
+        )
+        # If we’ve added multiple areas then we need to re-simplify the
+        # combined shapes to keep the point count down
+        return polygons.smooth.simplify if len(self.areas) > 1 else polygons
+
     @property
     def template(self):
         response = service_api_client.get_service_template(

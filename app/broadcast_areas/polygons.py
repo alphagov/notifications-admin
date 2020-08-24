@@ -1,3 +1,5 @@
+import itertools
+
 from shapely.geometry import (
     JOIN_STYLE,
     GeometryCollection,
@@ -11,31 +13,32 @@ from werkzeug.utils import cached_property
 class Polygons():
 
     approx_metres_to_degree = 111_320
+    approx_square_metres_to_square_degree = approx_metres_to_degree ** 2
 
     # Estimated amount of bleed into neigbouring areas based on typical
     # range/separation of cell towers.
     approx_bleed_in_degrees = 1_500 / approx_metres_to_degree
 
-    # Ratio of how much to buffer for a shape of a given perimeter. For
-    # example `500` means 1m of buffer for every 500m of perimeter, or
-    # 40m of buffer for a 5km square. This gives us control over how
+    # Controls how much buffer to add for a shape of a given perimeter.
+    # Smaller number means more buffering and a smoother shape. For
+    # example `1000` means 1m of buffer for every 1km of perimeter, or
+    # 20m of buffer for a 5km square. This gives us control over how
     # much we fill in very concave features like channels, harbours and
     # zawns.
-    perimeter_to_buffer_ratio = 500
+    perimeter_to_buffer_ratio = 360
 
     # Ratio of how much detail a shape of a given perimeter has once
-    # simplified. Smaller number means more less detail. For example
-    # `700` means that for a shape with a perimeter of 700m, the
-    # simplified line will never deviate more than 1m from the original.
-    # Or for a 5km square, the line won’t deviate more than 17m. This
+    # simplified. Smaller number means less detail. For example `1000`
+    # means that for a shape with a perimeter of 1000m, the simplified
+    # line will never deviate more than 1m from the original.
+    # Or for a 5km square, the line won’t deviate more than 20m. This
     # gives us approximate control over the total number of points.
-    perimeter_to_simplification_ratio = 700
+    perimeter_to_simplification_ratio = 1_750
 
-    # The absolute smallest deviation (in metres) from the original we
-    # allow no matter how big/small the shape is. Allows us to still
-    # remove a bit of detail even for small shapes, for example urban
-    # electoral wards.
-    max_resolution = 5 / approx_metres_to_degree
+    # The threshold for removing very small areas from the map. These
+    # areas are likely glitches in  the data where the shoreline hasn’t
+    # been subtracted from the land properly
+    minimum_area_size_square_metres = 50 ** 2
 
     def __init__(self, polygons):
         if not polygons:
@@ -56,30 +59,36 @@ class Polygons():
             polygon.length for polygon in self
         )
 
-    @property
+    @cached_property
     def buffer_outward_in_degrees(self):
-        return self.perimeter_length / self.perimeter_to_buffer_ratio
-
-    @property
-    def buffer_inward_in_degrees(self):
-        return self.buffer_outward_in_degrees - (
-            # We don’t want to buffer all the way back in because there
-            # needs to be a bit off wiggle room for simplifying the
-            # polygon. Theoretically we need
-            # `self.simplification_tolerance_in_degrees` wiggle room,
-            # but in practice some fraction of it is enough.
-            self.simplification_tolerance_in_degrees * 2 / 3
+        return (
+            # If two areas are close enough that the distance between
+            # them is less than the minimum bleed of a cell
+            # broadcast then this joins them together. The aim is to
+            # reduce the total number of polygons in areas with many
+            # small shapes like Orkney or the Isles of Scilly.
+            self.approx_bleed_in_degrees / 3
+        ) + (
+            self.perimeter_length / self.perimeter_to_buffer_ratio
         )
-
-    @property
-    def simplification_tolerance_in_degrees(self):
-        shape_size_adjusted_resolution = (
-            self.perimeter_length / self.perimeter_to_simplification_ratio
-        )
-        return self.max_resolution + shape_size_adjusted_resolution
 
     @cached_property
-    def buffer_and_debuffer(self):
+    def buffer_inward_in_degrees(self):
+        return self.buffer_outward_in_degrees - (
+            # We should leave the shape expanded by at least the
+            # simplification tolerance in all places, so the
+            # simplification never moves a point inside the original
+            # shape. In practice half of the tolerance is enough to
+            # acheive this.
+            self.simplification_tolerance_in_degrees / 2
+        )
+
+    @cached_property
+    def simplification_tolerance_in_degrees(self):
+        return self.perimeter_length / self.perimeter_to_simplification_ratio
+
+    @cached_property
+    def smooth(self):
         buffered = [
             polygon.buffer(
                 self.buffer_outward_in_degrees,
@@ -89,7 +98,7 @@ class Polygons():
             for polygon in self
         ]
         unioned = union_polygons(buffered)
-        polygons_debuffered = [
+        debuffered = [
             polygon.buffer(
                 -1 * self.buffer_inward_in_degrees,
                 resolution=1,
@@ -97,7 +106,10 @@ class Polygons():
             )
             for polygon in unioned
         ]
-        return Polygons(polygons_debuffered)
+        flattened = list(itertools.chain(*[
+            flatten_polygons(polygon) for polygon in debuffered
+        ]))
+        return Polygons(flattened)
 
     @cached_property
     def simplify(self):
@@ -117,7 +129,18 @@ class Polygons():
             for polygon in self
         ]))
 
-    @property
+    @cached_property
+    def remove_too_small(self):
+        return Polygons([
+            polygon for polygon in self
+            if (
+                polygon.area * self.approx_square_metres_to_square_degree
+            ) > (
+                self.minimum_area_size_square_metres
+            )
+        ])
+
+    @cached_property
     def as_coordinate_pairs(self):
         return [
             [
@@ -125,6 +148,18 @@ class Polygons():
             ]
             for p in self
         ]
+
+    @cached_property
+    def as_unenclosed_coordinate_pairs(self):
+        # Some mapping tools require shapes to be unenclosed, i.e. the
+        # last point joins the first point implicitly
+        return [
+            coordinates[:-1] for coordinates in self.as_coordinate_pairs
+        ]
+
+    @cached_property
+    def point_count(self):
+        return len(list(itertools.chain(*self.as_coordinate_pairs)))
 
 
 def flatten_polygons(polygons):

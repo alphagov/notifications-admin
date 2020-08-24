@@ -1,8 +1,7 @@
+import json
 import os
 import sqlite3
 from pathlib import Path
-
-import geojson
 
 
 class BroadcastAreasRepository(object):
@@ -47,10 +46,10 @@ class BroadcastAreasRepository(object):
             )""")
 
             conn.execute("""
-            CREATE TABLE broadcast_area_features (
+            CREATE TABLE broadcast_area_polygons (
                 id TEXT PRIMARY KEY,
-                feature_geojson TEXT NOT NULL,
-                simple_feature_geojson TEXT NOT NULL
+                polygons TEXT NOT NULL,
+                simple_polygons TEXT NOT NULL
             )""")
 
             conn.execute("""
@@ -84,20 +83,20 @@ class BroadcastAreasRepository(object):
         """
 
         features_q = """
-        INSERT INTO broadcast_area_features (
+        INSERT INTO broadcast_area_polygons (
             id,
-            feature_geojson, simple_feature_geojson
+            polygons, simple_polygons
         )
         VALUES (?, ?, ?)
         """
 
         with self.conn() as conn:
-            for id, name, area_id, group, feature, simple_feature in areas:
+            for id, name, area_id, group, polygons, simple_polygons in areas:
                 conn.execute(areas_q, (
                     id, name, area_id, group,
                 ))
                 conn.execute(features_q, (
-                    id, geojson.dumps(feature), geojson.dumps(simple_feature),
+                    id, json.dumps(polygons), json.dumps(simple_polygons),
                 ))
 
     def query(self, sql, *args):
@@ -206,24 +205,24 @@ class BroadcastAreasRepository(object):
 
         return areas
 
-    def get_feature_for_area(self, area_id):
+    def get_polygons_for_area(self, area_id):
         q = """
-        SELECT feature_geojson
-        FROM broadcast_area_features
+        SELECT polygons
+        FROM broadcast_area_polygons
         WHERE id = ?
         """
 
         results = self.query(q, area_id)
 
-        return results[0][0]
+        return json.loads(results[0][0])
 
-    def get_simple_feature_for_area(self, area_id):
+    def get_simple_polygons_for_area(self, area_id):
         q = """
-        SELECT simple_feature_geojson
-        FROM broadcast_area_features
+        SELECT simple_polygons
+        FROM broadcast_area_polygons
         WHERE id = ?
         """
 
         results = self.query(q, area_id)
 
-        return results[0][0]
+        return json.loads(results[0][0])

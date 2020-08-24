@@ -1,66 +1,49 @@
 #!/usr/bin/env python
 
-from copy import deepcopy
 from pathlib import Path
 
 import geojson
-import shapely.geometry as sgeom
+from notifications_utils.formatters import formatted_list
 
+from polygons import Polygons
 from repo import BroadcastAreasRepository
 
 package_path = Path(__file__).resolve().parent
-
-
-def convert_shape_to_feature(shape):
-    return {
-        "type": "Feature",
-        "properties": {},
-        "geometry": sgeom.mapping(shape),
-    }
-
-
-def simplify_polygon(series):
-    polygon, *_holes = series  # discard holes
-
-    approx_metres_to_degree = 111320
-    # initially buffer (extend area past perimeter) by ~25m
-    buffer_degrees = 500 / approx_metres_to_degree
-    # initially simplify (snap to closest point) by ~25m
-    simplify_degrees = 50.0 / approx_metres_to_degree
-
-    starting_polygon = sgeom.LineString(polygon).buffer(buffer_degrees)
-    simplified_polygon = None
-    num_polys = len(polygon)
-    last_num_polys = []
-    while True:
-        simplified_polygon = starting_polygon.simplify(simplify_degrees)
-        simplified_polygon = [[c[0], c[1]] for c in simplified_polygon.exterior.coords]
-
-        num_polys = len(simplified_polygon)
-        simplify_degrees *= 2
-
-        if num_polys <= 99 or last_num_polys[-3:] == [num_polys, num_polys, num_polys]:
-            break
-
-        last_num_polys.append(num_polys)
-
-        print(".", end="", flush=True)  # noqa: T001
-
-    return [simplified_polygon]
+point_counts = []
 
 
 def simplify_geometry(feature):
     if feature["type"] == "Polygon":
-        feature["coordinates"] = simplify_polygon(feature["coordinates"])
-        return feature
+        return [feature["coordinates"][0]]
     elif feature["type"] == "MultiPolygon":
-        feature["coordinates"] = [
-            simplify_polygon(polygon)
-            for polygon in feature["coordinates"]
-        ]
-        return feature
+        return [polygon for polygon, *_holes in feature["coordinates"]]
     else:
         raise Exception("Unknown type: {}".format(feature["type"]))
+
+
+def polygons_and_simplified_polygons(feature):
+
+    polygons = Polygons(simplify_geometry(feature))
+    full_resolution = polygons.remove_too_small
+    smoothed = full_resolution.smooth
+    simplified = smoothed.simplify
+
+    print(  # noqa: T001
+        f'    Original:{full_resolution.point_count: >5} points'
+        f'    Smoothed:{smoothed.point_count: >5} points'
+        f'    Simplified:{simplified.point_count: >4} points'
+    )
+
+    point_counts.append(simplified.point_count)
+
+    if simplified.point_count >= 200:
+        raise RuntimeError(
+            'Too many points '
+            '(adjust Polygons.perimeter_to_simplification_ratio or '
+            'Polygons.perimeter_to_buffer_ratio)'
+        )
+
+    return full_resolution.as_coordinate_pairs, simplified.as_coordinate_pairs
 
 
 repo = BroadcastAreasRepository()
@@ -88,10 +71,12 @@ for dataset_name, dataset_name_singular, id_field, name_field in simple_datasets
         f_id = dataset_id + "-" + feature["properties"][id_field]
         f_name = feature["properties"][name_field]
 
+        print()  # noqa: T001
         print(f_name)  # noqa: T001
 
-        simple_feature = deepcopy(feature)
-        simple_feature["geometry"] = simplify_geometry(simple_feature["geometry"])
+        feature, simple_feature = (
+            polygons_and_simplified_polygons(feature["geometry"])
+        )
 
         repo.insert_broadcast_areas([[
             f_id, f_name,
@@ -132,19 +117,21 @@ for f in geojson.loads(wards_filepath.read_text())["features"]:
     ward_name = f["properties"]["wd20nm"]
     ward_id = "wd20-" + ward_code
 
+    print()  # noqa: T001
     print(ward_name)  # noqa: T001
 
     try:
         la_id = "lad20-" + ward_code_to_la_id_mapping[ward_code]
         la_name = ward_code_to_la_mapping[ward_code]
 
-        sf = deepcopy(f)
-        sf["geometry"] = simplify_geometry(sf["geometry"])
+        feature, simple_feature = (
+            polygons_and_simplified_polygons(f["geometry"])
+        )
 
         areas_to_add.append([
             ward_id, ward_name,
             dataset_id, la_id,
-            f, sf
+            feature, simple_feature
         ])
 
     except KeyError:
@@ -159,12 +146,14 @@ for feature in geojson.loads(las_filepath.read_text())["features"]:
     la_id = feature["properties"]["lad20cd"]
     group_name = feature["properties"]["lad20nm"]
 
+    print()  # noqa: T001
     print(group_name)  # noqa: T001
 
     group_id = "lad20-" + la_id
 
-    simple_feature = deepcopy(feature)
-    simple_feature["geometry"] = simplify_geometry(simple_feature["geometry"])
+    feature, simple_feature = (
+        polygons_and_simplified_polygons(feature["geometry"])
+    )
 
     areas_to_add.append([
         group_id, group_name,
@@ -173,3 +162,16 @@ for feature in geojson.loads(las_filepath.read_text())["features"]:
     ])
 
 repo.insert_broadcast_areas(areas_to_add)
+
+
+most_detailed_polygons = formatted_list(
+    sorted(point_counts, reverse=True)[:5],
+    before_each='',
+    after_each='',
+)
+print(  # noqa: T001
+    '\n'
+    'DONE\n'
+    f'    Processed {len(point_counts):,} polygons.\n'
+    f'    Highest point counts once simplifed: {most_detailed_polygons}\n'
+)

@@ -1,6 +1,5 @@
 import itertools
 
-import geojson
 from notifications_utils.serialised_model import SerialisedModelCollection
 from werkzeug.utils import cached_property
 
@@ -34,59 +33,13 @@ class BroadcastArea(SortableMixin):
     def __eq__(self, other):
         return self.id == other.id
 
-    @property
-    def _feature(self):
-        return BroadcastAreasRepository().get_feature_for_area(self.id)
-
-    @property
-    def _simple_feature(self):
-        return BroadcastAreasRepository().get_simple_feature_for_area(self.id)
-
-    def _polygons(self, feature):
-        if feature['geometry']['type'] == 'MultiPolygon':
-            return [
-                polygons[0]
-                for polygons in feature['geometry']['coordinates']
-            ]
-        if feature['geometry']['type'] == 'Polygon':
-            return [
-                feature['geometry']['coordinates'][0]
-            ]
-        raise TypeError(
-            f'Unknown geometry type {self.feature["geometry"]["type"]} '
-            f'in {self.__class__.__name} {self.name}'
-        )
-
-    def _unenclosed_polygons(self, feature):
-        # Some mapping tools require shapes to be unenclosed, i.e. the
-        # last point joins the first point implicitly
-        return [
-            coordinates[:-1] for coordinates in self._polygons(feature)
-        ]
-
-    @property
+    @cached_property
     def polygons(self):
-        return self._polygons(self.feature)
+        return BroadcastAreasRepository().get_polygons_for_area(self.id)
 
-    @property
-    def unenclosed_polygons(self):
-        return self._unenclosed_polygons(self.feature)
-
-    @property
+    @cached_property
     def simple_polygons(self):
-        return self._polygons(self.simple_feature)
-
-    @property
-    def simple_unenclosed_polygons(self):
-        return self._unenclosed_polygons(self.simple_feature)
-
-    @cached_property
-    def feature(self):
-        return geojson.loads(self._feature)
-
-    @cached_property
-    def simple_feature(self):
-        return geojson.loads(self._simple_feature)
+        return BroadcastAreasRepository().get_simple_polygons_for_area(self.id)
 
     @property
     def sub_areas(self):

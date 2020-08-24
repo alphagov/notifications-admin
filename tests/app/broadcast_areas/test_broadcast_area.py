@@ -117,13 +117,13 @@ def test_has_polygons():
 def test_polygons_are_enclosed_unless_asked_not_to_be():
     england = broadcast_area_libraries.get('ctry19').get('ctry19-E92000001')
 
-    assert len(england.polygons) == len(england.unenclosed_polygons)
+    assert len(england.polygons) == len(england.polygons.as_unenclosed_coordinate_pairs)
 
-    first_polygon = england.polygons[0]
+    first_polygon = england.polygons[0].as_coordinate_pairs
     assert first_polygon[0] != first_polygon[1] != first_polygon[2]
     assert first_polygon[0] == first_polygon[-1]
 
-    first_polygon_unenclosed = england.unenclosed_polygons[0]
+    first_polygon_unenclosed = england.polygons[0].as_unenclosed_coordinate_pairs
     assert first_polygon_unenclosed[0] == first_polygon[0]
     assert first_polygon_unenclosed[-1] != first_polygon[-1]
     assert first_polygon_unenclosed[-1] == first_polygon[-2]
