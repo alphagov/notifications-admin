@@ -62,6 +62,13 @@ class BroadcastAreasRepository(object):
             ON broadcast_areas (broadcast_area_library_group_id);
             """)
 
+    def delete_library_data(self):
+        # delete everything except broadcast_area_polygons
+        with self.conn() as conn:
+            conn.execute('DELETE FROM broadcast_area_libraries;')
+            conn.execute('DELETE FROM broadcast_area_library_groups;')
+            conn.execute('DELETE FROM broadcast_areas;')
+
     def insert_broadcast_area_library(self, id, *, name, name_singular, is_group):
 
         q = """
@@ -72,7 +79,7 @@ class BroadcastAreasRepository(object):
         with self.conn() as conn:
             conn.execute(q, (id, name, name_singular, is_group))
 
-    def insert_broadcast_areas(self, areas):
+    def insert_broadcast_areas(self, areas, keep_old_features):
 
         areas_q = """
         INSERT INTO broadcast_areas (
@@ -95,9 +102,10 @@ class BroadcastAreasRepository(object):
                 conn.execute(areas_q, (
                     id, name, area_id, group,
                 ))
-                conn.execute(features_q, (
-                    id, json.dumps(polygons), json.dumps(simple_polygons),
-                ))
+                if not keep_old_features:
+                    conn.execute(features_q, (
+                        id, json.dumps(polygons), json.dumps(simple_polygons),
+                    ))
 
     def query(self, sql, *args):
         with self.conn() as conn:

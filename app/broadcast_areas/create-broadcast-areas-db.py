@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import csv
+import sys
 from pathlib import Path
 
 import geojson
@@ -23,6 +24,9 @@ def simplify_geometry(feature):
 
 
 def polygons_and_simplified_polygons(feature):
+    if keep_old_polygons:
+        # cheat and shortcut out
+        return [], []
 
     polygons = Polygons(simplify_geometry(feature))
     full_resolution = polygons.remove_too_small
@@ -49,8 +53,6 @@ def polygons_and_simplified_polygons(feature):
         simplified.as_coordinate_pairs_long_lat,
     )
 
-
-repo = BroadcastAreasRepository()
 
 ctry19_filepath = source_files_path / "Countries.geojson"
 
@@ -114,7 +116,7 @@ def add_countries():
             feature, simple_feature,
         ])
 
-    repo.insert_broadcast_areas(areas_to_add)
+    repo.insert_broadcast_areas(areas_to_add, keep_old_polygons)
 
 
 def add_wards_local_authorities_and_counties():
@@ -159,7 +161,7 @@ def _add_electoral_wards(dataset_id):
         except KeyError:
             print("Skipping", ward_code, ward_name)  # noqa: T001
 
-    repo.insert_broadcast_areas(areas_to_add)
+    repo.insert_broadcast_areas(areas_to_add, keep_old_polygons)
 
 
 def _add_local_authorities(dataset_id):
@@ -187,7 +189,7 @@ def _add_local_authorities(dataset_id):
             feature,
             simple_feature
         ])
-    repo.insert_broadcast_areas(areas_to_add)
+    repo.insert_broadcast_areas(areas_to_add, keep_old_polygons)
 
 
 # counties and unitary authorities
@@ -213,23 +215,31 @@ def _add_counties_and_unitary_authorities(dataset_id):
             feature, simple_feature
         ])
 
-    repo.insert_broadcast_areas(areas_to_add)
+    repo.insert_broadcast_areas(areas_to_add, keep_old_polygons)
 
 
-if __name__ == '__main__':
+# cheeky global variable
+keep_old_polygons = sys.argv[1:] == ['--keep-old-polygons']
+print('keep_old_polygons: ', keep_old_polygons)  # noqa: T001
+
+repo = BroadcastAreasRepository()
+
+if keep_old_polygons:
+    repo.delete_library_data()
+else:
     repo.delete_db()
     repo.create_tables()
-    add_countries()
-    add_wards_local_authorities_and_counties()
+add_countries()
+add_wards_local_authorities_and_counties()
 
-    most_detailed_polygons = formatted_list(
-        sorted(point_counts, reverse=True)[:5],
-        before_each='',
-        after_each='',
-    )
-    print(  # noqa: T001
-        '\n'
-        'DONE\n'
-        f'    Processed {len(point_counts):,} polygons.\n'
-        f'    Highest point counts once simplifed: {most_detailed_polygons}\n'
-    )
+most_detailed_polygons = formatted_list(
+    sorted(point_counts, reverse=True)[:5],
+    before_each='',
+    after_each='',
+)
+print(  # noqa: T001
+    '\n'
+    'DONE\n'
+    f'    Processed {len(point_counts):,} polygons.\n'
+    f'    Highest point counts once simplifed: {most_detailed_polygons}\n'
+)
