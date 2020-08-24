@@ -1170,7 +1170,7 @@ def test_manage_user_page_shows_how_many_folders_user_can_view(
 
     page = client_request.get('main.manage_users', service_id=service_one['id'])
 
-    user_div = page.select_one("h3[title='notify@digital.cabinet-office.gov.uk']").parent
+    user_div = page.select_one("h2[title='notify@digital.cabinet-office.gov.uk']").parent
     assert user_div.select_one('.tick-cross-list-hint:last-child').text.strip() == expected_message
 
 
@@ -1187,7 +1187,7 @@ def test_manage_user_page_doesnt_show_folder_hint_if_service_has_no_folders(
 
     page = client_request.get('main.manage_users', service_id=service_one['id'])
 
-    user_div = page.select_one("h3[title='notify@digital.cabinet-office.gov.uk']").parent
+    user_div = page.select_one("h2[title='notify@digital.cabinet-office.gov.uk']").parent
     assert user_div.find('.tick-cross-list-hint:last-child') is None
 
 
@@ -1206,7 +1206,7 @@ def test_manage_user_page_doesnt_show_folder_hint_if_service_cant_edit_folder_pe
 
     page = client_request.get('main.manage_users', service_id=service_one['id'])
 
-    user_div = page.select_one("h3[title='notify@digital.cabinet-office.gov.uk']").parent
+    user_div = page.select_one("h2[title='notify@digital.cabinet-office.gov.uk']").parent
     assert user_div.find('.tick-cross-list-hint:last-child') is None
 
 
