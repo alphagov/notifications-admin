@@ -53,17 +53,17 @@ def get_broadcast_dashboard_partials(service_id):
         pending_approval_broadcasts=render_template(
             'views/broadcast/partials/dashboard-table.html',
             broadcasts=broadcast_messages.with_status('pending-approval'),
-            empty_message='You do not have any broadcasts waiting for approval',
+            empty_message='You do not have any alerts waiting for approval',
         ),
         live_broadcasts=render_template(
             'views/broadcast/partials/dashboard-table.html',
             broadcasts=broadcast_messages.with_status('broadcasting'),
-            empty_message='You do not have any live broadcasts at the moment',
+            empty_message='You do not have any live alerts at the moment',
         ),
         previous_broadcasts=render_template(
             'views/broadcast/partials/dashboard-table.html',
             broadcasts=broadcast_messages.with_status('cancelled', 'completed'),
-            empty_message='You do not have any previous broadcasts',
+            empty_message='You do not have any previous alerts',
         ),
     )
 

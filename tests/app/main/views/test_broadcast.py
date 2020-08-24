@@ -164,9 +164,9 @@ def test_empty_broadcast_dashboard(
     assert [
         normalize_spaces(row.text) for row in page.select('tbody tr .table-empty-message')
     ] == [
-        'You do not have any live broadcasts at the moment',
-        'You do not have any broadcasts waiting for approval',
-        'You do not have any previous broadcasts',
+        'You do not have any live alerts at the moment',
+        'You do not have any alerts waiting for approval',
+        'You do not have any previous alerts',
     ]
 
 
@@ -184,7 +184,7 @@ def test_broadcast_dashboard(
     )
 
     assert normalize_spaces(page.select('main h2')[0].text) == (
-        'Live broadcasts'
+        'Live alerts'
     )
     assert [
         normalize_spaces(row.text) for row in page.select('table')[0].select('tbody tr')
@@ -202,7 +202,7 @@ def test_broadcast_dashboard(
     ]
 
     assert normalize_spaces(page.select('main h2')[2].text) == (
-        'Previous broadcasts'
+        'Previous alerts'
     )
     assert [
         normalize_spaces(row.text) for row in page.select('table')[2].select('tbody tr')
