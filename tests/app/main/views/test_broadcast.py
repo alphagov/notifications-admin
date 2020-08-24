@@ -133,6 +133,67 @@ def test_broadcast_pages_403_for_user_without_permission(
     )
 
 
+@pytest.mark.parametrize('step_index, expected_link_text, expected_link_href', (
+    (1, 'Continue', partial(url_for, '.broadcast_tour', step_index=2)),
+    (2, 'Continue', partial(url_for, '.broadcast_tour', step_index=3)),
+    (3, 'Continue', partial(url_for, '.broadcast_tour', step_index=4)),
+    (4, 'Continue to dashboard', partial(url_for, '.service_dashboard')),
+))
+def test_broadcast_tour_pages_have_continue_link(
+    client_request,
+    service_one,
+    step_index,
+    expected_link_text,
+    expected_link_href,
+):
+    service_one['permissions'] += ['broadcast']
+    page = client_request.get(
+        '.broadcast_tour',
+        service_id=SERVICE_ONE_ID,
+        step_index=step_index,
+    )
+    link = page.select_one('.banner-tour a')
+    assert normalize_spaces(link.text) == expected_link_text
+    assert link['href'] == expected_link_href(service_id=SERVICE_ONE_ID)
+
+
+@pytest.mark.parametrize('step_index', (
+    pytest.param(1, marks=pytest.mark.xfail),
+    pytest.param(2, marks=pytest.mark.xfail),
+    pytest.param(3, marks=pytest.mark.xfail),
+    4,
+))
+def test_broadcast_tour_page_4_shows_service_name(
+    client_request,
+    service_one,
+    step_index,
+):
+    service_one['permissions'] += ['broadcast']
+    page = client_request.get(
+        '.broadcast_tour',
+        service_id=SERVICE_ONE_ID,
+        step_index=step_index,
+    )
+    assert normalize_spaces(page.select_one('.navigation-service').text) == (
+        'service one Training'
+    )
+
+
+@pytest.mark.parametrize('step_index', (0, 5))
+def test_broadcast_tour_page_404s_out_of_range(
+    client_request,
+    service_one,
+    step_index,
+):
+    service_one['permissions'] += ['broadcast']
+    client_request.get(
+        '.broadcast_tour',
+        service_id=SERVICE_ONE_ID,
+        step_index=step_index,
+        _expected_status=404,
+    )
+
+
 def test_dashboard_redirects_to_broadcast_dashboard(
     client_request,
     service_one,

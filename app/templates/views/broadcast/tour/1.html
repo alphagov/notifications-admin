@@ -3,7 +3,7 @@
 {% extends "admin_template.html" %}
 
 {% block per_page_title %}
-  Step 1
+  You’ve been invited to use GOV.UK Notify for emergency alerts.
 {% endblock %}
 
 {% set mainClasses = "govuk-!-padding-top-0 govuk-!-padding-bottom-0" %}
@@ -14,20 +14,15 @@
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-one-half">
         <h1 class="heading-medium">
-          You’ve been invited to use GOV.UK Notify to broadcast alerts
+          You’ve been invited to use GOV.UK&nbsp;Notify for emergency alerts.
         </h1>
-        <ul>
-          <li>
-            Broadcasting is a new technology for alerting members of the
-            public
-          </li>
-          <li>
-            It should be used when there’s an imminent risk to life
-          </li>
-        </ul>
+        <p class="govuk-body heading-medium">
+          Emergency alerts let you warn the public about an
+          imminent risk to life.
+        </p>
         <p class="govuk-body heading-medium">
           <a class="govuk-link govuk-link--no-visited-state" href='{{ url_for(".broadcast_tour", service_id=current_service.id, step_index=2) }}'>
-            Find out how it works
+            Continue
           </a>
         </p>
       </div>
