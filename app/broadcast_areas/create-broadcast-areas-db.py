@@ -91,27 +91,27 @@ for dataset_name, dataset_name_singular, id_field, name_field in simple_datasets
 
 # https://geoportal.statistics.gov.uk/datasets/wards-may-2020-boundaries-uk-bgc
 # Converted to geojson manually from SHP because of GeoJSON download limits
-wards_filepath = source_files_path / "Electoral Wards May 2020.geojson"
+wd20_filepath = source_files_path / "Electoral Wards May 2020.geojson"
 
-# http://geoportal.statistics.gov.uk/datasets/ward-to-westminster-parliamentary-constituency-to-local-authority-district-december-2019-lookup-in-the-united-kingdom/data
-las_filepath = source_files_path / "Electoral Wards and Local Authorities 2020.geojson"
+# http://geoportal.statistics.gov.uk/datasets/local-authority-districts-may-2020-boundaries-uk-bgc
+lad20_filepath = source_files_path / "Local Authorities May 2020.geojson"
 
 # https://geoportal.statistics.gov.uk/datasets/counties-and-unitary-authorities-december-2019-boundaries-uk-bgc
-ctyua_filepath = source_files_path / "Counties_and_Unitary_Authorities__December_2019__Boundaries_UK_BGC.geojson"
+ctyua19_filepath = source_files_path / "Counties_and_Unitary_Authorities__December_2019__Boundaries_UK_BGC.geojson"
+
+# http://geoportal.statistics.gov.uk/datasets/ward-to-westminster-parliamentary-constituency-to-local-authority-district-december-2019-lookup-in-the-united-kingdom/data
+wd_lad_map_filepath = source_files_path / "Electoral Wards and Local Authorities 2020.geojson"
 
 # https://geoportal.statistics.gov.uk/datasets/lower-tier-local-authority-to-upper-tier-local-authority-december-2019-lookup-in-england-and-wales?where=LTLA19CD%20%3D%20%27E06000045%27
 ltla_utla_map_filepath = source_files_path / "Lower_Tier_Local_Authority_to_Upper_Tier_Local_Authority__December_2019__Lookup_in_England_and_Wales.csv"  # noqa: E501
 
-# http://geoportal.statistics.gov.uk/datasets/local-authority-districts-may-2020-boundaries-uk-bgc
-las_filepath = source_files_path / "Local Authorities May 2020.geojson"
-
 ward_code_to_la_mapping = {
     f["properties"]["WD19CD"]: f["properties"]["LAD19NM"]
-    for f in geojson.loads(las_filepath.read_text())["features"]
+    for f in geojson.loads(wd_lad_map_filepath.read_text())["features"]
 }
 ward_code_to_la_id_mapping = {
     f["properties"]["WD19CD"]: f["properties"]["LAD19CD"]
-    for f in geojson.loads(las_filepath.read_text())["features"]
+    for f in geojson.loads(wd_lad_map_filepath.read_text())["features"]
 }
 
 
@@ -137,7 +137,7 @@ repo.insert_broadcast_area_library(
 
 areas_to_add = []
 
-for f in geojson.loads(wards_filepath.read_text())["features"]:
+for f in geojson.loads(wd20_filepath.read_text())["features"]:
     ward_code = f["properties"]["wd20cd"]
     ward_name = f["properties"]["wd20nm"]
     ward_id = "wd20-" + ward_code
@@ -169,7 +169,7 @@ repo.insert_broadcast_areas(areas_to_add)
 
 areas_to_add = []
 
-for feature in geojson.loads(las_filepath.read_text())["features"]:
+for feature in geojson.loads(lad20_filepath.read_text())["features"]:
     la_id = feature["properties"]["lad20cd"]
     group_name = feature["properties"]["lad20nm"]
 
@@ -199,7 +199,7 @@ repo.insert_broadcast_areas(areas_to_add)
 # counties and unitary authorities
 
 areas_to_add = []
-for feature in geojson.loads(ctyua_filepath.read_text())['features']:
+for feature in geojson.loads(ctyua19_filepath.read_text())['features']:
     ctyua_id = feature["properties"]["ctyua19cd"]
     group_name = feature["properties"]["ctyua19nm"]
 
