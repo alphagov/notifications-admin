@@ -53,41 +53,7 @@ def polygons_and_simplified_polygons(feature):
 
 repo = BroadcastAreasRepository()
 
-repo.delete_db()
-repo.create_tables()
-
-simple_datasets = [
-    ("Countries", "country", "ctry19cd", "ctry19nm"),
-]
-for dataset_name, dataset_name_singular, id_field, name_field in simple_datasets:
-    filepath = source_files_path / "{}.geojson".format(dataset_name)
-
-    dataset_id = id_field[:-2]
-    dataset_geojson = geojson.loads(filepath.read_text())
-
-    repo.insert_broadcast_area_library(
-        dataset_id,
-        name=dataset_name,
-        name_singular=dataset_name_singular,
-        is_group=False,
-    )
-
-    for feature in dataset_geojson["features"]:
-        f_id = dataset_id + "-" + feature["properties"][id_field]
-        f_name = feature["properties"][name_field]
-
-        print()  # noqa: T001
-        print(f_name)  # noqa: T001
-
-        feature, simple_feature = (
-            polygons_and_simplified_polygons(feature["geometry"])
-        )
-
-        repo.insert_broadcast_areas([[
-            f_id, f_name,
-            dataset_id, None,
-            feature, simple_feature,
-        ]])
+ctry19_filepath = source_files_path / "Countries.geojson"
 
 # https://geoportal.statistics.gov.uk/datasets/wards-may-2020-boundaries-uk-bgc
 # Converted to geojson manually from SHP because of GeoJSON download limits
@@ -122,116 +88,152 @@ la_code_to_cty_id_mapping = {
 }
 
 
-dataset_name = "Local authorities"
-dataset_name_singular = "local authority"
-dataset_id = "wd20-lad20-ctyua19"
-repo.insert_broadcast_area_library(
-    dataset_id,
-    name=dataset_name,
-    name_singular=dataset_name_singular,
-    is_group=True,
-)
-
-
-# electoral wards
-
-areas_to_add = []
-
-for f in geojson.loads(wd20_filepath.read_text())["features"]:
-    ward_code = f["properties"]["wd20cd"]
-    ward_name = f["properties"]["wd20nm"]
-    ward_id = "wd20-" + ward_code
-
-    print()  # noqa: T001
-    print(ward_name)  # noqa: T001
-
-    try:
-        la_id = "lad20-" + ward_code_to_la_id_mapping[ward_code]
-        la_name = ward_code_to_la_mapping[ward_code]
-
-        feature, simple_feature = (
-            polygons_and_simplified_polygons(f["geometry"])
-        )
-
-        areas_to_add.append([
-            ward_id, ward_name,
-            dataset_id, la_id,
-            feature, simple_feature
-        ])
-
-    except KeyError:
-        print("Skipping", ward_code, ward_name)  # noqa: T001
-
-repo.insert_broadcast_areas(areas_to_add)
-
-
-# local authorities
-
-areas_to_add = []
-
-for feature in geojson.loads(lad20_filepath.read_text())["features"]:
-    la_id = feature["properties"]["lad20cd"]
-    group_name = feature["properties"]["lad20nm"]
-
-    print()  # noqa: T001
-    print(group_name)  # noqa: T001
-
-    group_id = "lad20-" + la_id
-
-    feature, simple_feature = (
-        polygons_and_simplified_polygons(feature["geometry"])
+def _add_countries():
+    dataset_id = 'ctry19'
+    dataset_geojson = geojson.loads(ctry19_filepath.read_text())
+    repo.insert_broadcast_area_library(
+        'ctry19',
+        name='Countries',
+        name_singular='country',
+        is_group=False,
     )
 
-    ctyua_id = la_code_to_cty_id_mapping.get(la_id)
-    if ctyua_id:
-        print(f'{group_id} {group_name} is part of {ctyua_id}')  # noqa: T001
-    areas_to_add.append([
-        group_id,
-        group_name,
+    areas_to_add = []
+    for feature in dataset_geojson["features"]:
+        f_id = 'ctry19-' + feature["properties"]['ctry19cd']
+        f_name = feature["properties"]['ctry19nm']
+
+        print()  # noqa: T001
+        print(f_name)  # noqa: T001
+
+        feature, simple_feature = (
+            polygons_and_simplified_polygons(feature["geometry"])
+        )
+        areas_to_add.append([
+            f_id, f_name,
+            dataset_id, None,
+            feature, simple_feature,
+        ])
+
+    repo.insert_broadcast_areas(areas_to_add)
+
+
+def _add_wards_local_authorities_and_counties():
+    dataset_name = "Local authorities"
+    dataset_name_singular = "local authority"
+    dataset_id = "wd20-lad20-ctyua19"
+    repo.insert_broadcast_area_library(
         dataset_id,
-        'ctyua19-' + ctyua_id if ctyua_id else None,
-        feature,
-        simple_feature
-    ])
-repo.insert_broadcast_areas(areas_to_add)
+        name=dataset_name,
+        name_singular=dataset_name_singular,
+        is_group=True,
+    )
+    _add_electoral_wards(dataset_id)
+    _add_local_authorities(dataset_id)
+    _add_wards_local_authorities_and_counties(dataset_id)
+
+
+def _add_electoral_wards(dataset_id):
+    areas_to_add = []
+
+    for f in geojson.loads(wd20_filepath.read_text())["features"]:
+        ward_code = f["properties"]["wd20cd"]
+        ward_name = f["properties"]["wd20nm"]
+        ward_id = "wd20-" + ward_code
+
+        print()  # noqa: T001
+        print(ward_name)  # noqa: T001
+
+        try:
+            la_id = "lad20-" + ward_code_to_la_id_mapping[ward_code]
+            la_name = ward_code_to_la_mapping[ward_code]
+            feature, simple_feature = (
+                polygons_and_simplified_polygons(f["geometry"])
+            )
+
+            areas_to_add.append([
+                ward_id, ward_name,
+                dataset_id, la_id,
+                feature, simple_feature
+            ])
+
+        except KeyError:
+            print("Skipping", ward_code, ward_name)  # noqa: T001
+
+    repo.insert_broadcast_areas(areas_to_add)
+
+
+def _add_local_authorities(dataset_id):
+    areas_to_add = []
+
+    for feature in geojson.loads(lad20_filepath.read_text())["features"]:
+        print()  # noqa: T001
+        print(group_name)  # noqa: T001
+        la_id = feature["properties"]["lad20cd"]
+        group_name = feature["properties"]["lad20nm"]
+
+        group_id = "lad20-" + la_id
+
+        feature, simple_feature = (
+            polygons_and_simplified_polygons(feature["geometry"])
+        )
+
+        ctyua_id = la_code_to_cty_id_mapping.get(la_id)
+        if ctyua_id:
+            print(f'{group_id} {group_name} is part of {ctyua_id}')  # noqa: T001
+        areas_to_add.append([
+            group_id,
+            group_name,
+            dataset_id,
+            'ctyua19-' + ctyua_id if ctyua_id else None,
+            feature,
+            simple_feature
+        ])
+    repo.insert_broadcast_areas(areas_to_add)
 
 
 # counties and unitary authorities
+def _add_counties_and_unitary_authorities(dataset_id):
+    areas_to_add = []
+    for feature in geojson.loads(ctyua19_filepath.read_text())['features']:
+        ctyua_id = feature["properties"]["ctyua19cd"]
+        group_name = feature["properties"]["ctyua19nm"]
 
-areas_to_add = []
-for feature in geojson.loads(ctyua19_filepath.read_text())['features']:
-    ctyua_id = feature["properties"]["ctyua19cd"]
-    group_name = feature["properties"]["ctyua19nm"]
+        print('County/Unitary Authority', group_name)  # noqa: T001
 
-    print('County/Unitary Authority', group_name)  # noqa: T001
+        la_id = 'lad20-' + ctyua_id
+        if repo.get_areas([la_id]):
+            continue
 
-    la_id = 'lad20-' + ctyua_id
-    if repo.get_areas([la_id]):
-        continue
+        group_id = "ctyua19-" + ctyua_id
 
-    group_id = "ctyua19-" + ctyua_id
+        feature, simple_feature = (
+            polygons_and_simplified_polygons(feature["geometry"])
+        )
 
-    feature, simple_feature = (
-        polygons_and_simplified_polygons(feature["geometry"])
+        areas_to_add.append([
+            group_id, group_name,
+            dataset_id, None,
+            feature, simple_feature
+        ])
+
+    repo.insert_broadcast_areas(areas_to_add)
+
+
+if __name__ == '__main__':
+    repo.delete_db()
+    repo.create_tables()
+    _add_countries()
+    _add_wards_local_authorities_and_counties()
+
+    most_detailed_polygons = formatted_list(
+        sorted(point_counts, reverse=True)[:5],
+        before_each='',
+        after_each='',
     )
-
-    areas_to_add.append([
-        group_id, group_name,
-        dataset_id, None,
-        feature, simple_feature
-    ])
-
-repo.insert_broadcast_areas(areas_to_add)
-
-
-most_detailed_polygons = formatted_list(
-    sorted(point_counts, reverse=True)[:5],
-    before_each='',
-    after_each='',
-)
-print(  # noqa: T001
-    '\n'
-    'DONE\n'
-    f'    Processed {len(point_counts):,} polygons.\n'
-    f'    Highest point counts once simplifed: {most_detailed_polygons}\n'
-)
+    print(  # noqa: T001
+        '\n'
+        'DONE\n'
+        f'    Processed {len(point_counts):,} polygons.\n'
+        f'    Highest point counts once simplifed: {most_detailed_polygons}\n'
+    )
