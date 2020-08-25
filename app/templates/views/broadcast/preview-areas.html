@@ -36,7 +36,7 @@
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(mymap);
 
-    {% for polygon in broadcast_message.simple_polygons.bleed.as_coordinate_pairs %}
+    {% for polygon in broadcast_message.simple_polygons.bleed.as_coordinate_pairs_lat_long %}
       polygons.push(
         L.polygon({{polygon}}, {
           opacity: 0.5,
@@ -48,7 +48,7 @@
       );
     {% endfor %}
 
-    {% for polygon in broadcast_message.simple_polygons.as_coordinate_pairs %}
+    {% for polygon in broadcast_message.simple_polygons.as_coordinate_pairs_lat_long %}
       polygons.push(
         L.polygon({{polygon}}, {
           opacity: 0.1,
@@ -60,7 +60,7 @@
       );
     {% endfor %}
 
-    {% for polygon in broadcast_message.polygons.as_coordinate_pairs %}
+    {% for polygon in broadcast_message.polygons.as_coordinate_pairs_lat_long %}
       polygons.push(
         L.polygon({{polygon}}, {
           color: '#0b0b0c', // $black

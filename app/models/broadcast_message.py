@@ -1,3 +1,4 @@
+import itertools
 from datetime import datetime, timedelta
 
 from notifications_utils.template import BroadcastPreviewTemplate
@@ -74,17 +75,17 @@ class BroadcastMessage(JSONModel):
     @cached_property
     def polygons(self):
         return Polygons(
-            broadcast_area_libraries.get_polygons_for_areas_lat_long(
-                *self._dict['areas']
-            )
+            list(itertools.chain(*(
+                area.polygons for area in self.areas
+            )))
         )
 
     @cached_property
     def simple_polygons(self):
         polygons = Polygons(
-            broadcast_area_libraries.get_simple_polygons_for_areas_lat_long(
-                *self._dict['areas']
-            )
+            list(itertools.chain(*(
+                area.simple_polygons for area in self.areas
+            )))
         )
         # If we’ve added multiple areas then we need to re-simplify the
         # combined shapes to keep the point count down

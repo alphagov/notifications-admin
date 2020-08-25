@@ -1,8 +1,7 @@
-import itertools
-
 from notifications_utils.serialised_model import SerialisedModelCollection
 from werkzeug.utils import cached_property
 
+from .polygons import Polygons
 from .repo import BroadcastAreasRepository
 
 
@@ -35,11 +34,15 @@ class BroadcastArea(SortableMixin):
 
     @cached_property
     def polygons(self):
-        return BroadcastAreasRepository().get_polygons_for_area(self.id)
+        return Polygons(
+            BroadcastAreasRepository().get_polygons_for_area(self.id)
+        )
 
     @cached_property
     def simple_polygons(self):
-        return BroadcastAreasRepository().get_simple_polygons_for_area(self.id)
+        return Polygons(
+            BroadcastAreasRepository().get_simple_polygons_for_area(self.id)
+        )
 
     @property
     def sub_areas(self):
@@ -79,30 +82,6 @@ class BroadcastAreaLibraries(SerialisedModelCollection, GetItemByIdMixin):
 
         areas = BroadcastAreasRepository().get_areas(area_ids)
         return [BroadcastArea(area) for area in areas]
-
-    def get_polygons_for_areas_long_lat(self, *area_ids):
-        return list(itertools.chain(*(
-            area.polygons
-            for area in self.get_areas(*area_ids)
-        )))
-
-    def get_polygons_for_areas_lat_long(self, *area_ids):
-        return [
-            [[long, lat] for lat, long in polygon]
-            for polygon in self.get_polygons_for_areas_long_lat(*area_ids)
-        ]
-
-    def get_simple_polygons_for_areas_long_lat(self, *area_ids):
-        return list(itertools.chain(*(
-            area.simple_polygons
-            for area in self.get_areas(*area_ids)
-        )))
-
-    def get_simple_polygons_for_areas_lat_long(self, *area_ids):
-        return [
-            [[long, lat] for lat, long in polygon]
-            for polygon in self.get_simple_polygons_for_areas_long_lat(*area_ids)
-        ]
 
 
 broadcast_area_libraries = BroadcastAreaLibraries()

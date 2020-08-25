@@ -53,6 +53,9 @@ class Polygons():
     def __getitem__(self, index):
         return self.polygons[index]
 
+    def __len__(self):
+        return len(self.polygons)
+
     @cached_property
     def perimeter_length(self):
         return sum(
@@ -141,25 +144,22 @@ class Polygons():
         ])
 
     @cached_property
-    def as_coordinate_pairs(self):
+    def as_coordinate_pairs_long_lat(self):
         return [
-            [
-                [x, y] for x, y in p.exterior.coords
-            ]
-            for p in self
+            [[x, y] for x, y in polygon.exterior.coords]
+            for polygon in self
         ]
 
     @cached_property
-    def as_unenclosed_coordinate_pairs(self):
-        # Some mapping tools require shapes to be unenclosed, i.e. the
-        # last point joins the first point implicitly
+    def as_coordinate_pairs_lat_long(self):
         return [
-            coordinates[:-1] for coordinates in self.as_coordinate_pairs
+            [[y, x] for x, y in coordinate_pairs]
+            for coordinate_pairs in self.as_coordinate_pairs_long_lat
         ]
 
     @cached_property
     def point_count(self):
-        return len(list(itertools.chain(*self.as_coordinate_pairs)))
+        return len(list(itertools.chain(*self.as_coordinate_pairs_long_lat)))
 
 
 def flatten_polygons(polygons):

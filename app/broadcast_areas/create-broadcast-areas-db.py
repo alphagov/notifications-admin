@@ -43,7 +43,10 @@ def polygons_and_simplified_polygons(feature):
             'Polygons.perimeter_to_buffer_ratio)'
         )
 
-    return full_resolution.as_coordinate_pairs, simplified.as_coordinate_pairs
+    return (
+        full_resolution.as_coordinate_pairs_long_lat,
+        simplified.as_coordinate_pairs_long_lat,
+    )
 
 
 repo = BroadcastAreasRepository()

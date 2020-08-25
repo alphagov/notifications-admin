@@ -87,52 +87,32 @@ def test_get_areas_accepts_lists():
 
 def test_has_polygons():
 
-    assert len(
-        broadcast_area_libraries.get_polygons_for_areas_long_lat('ctry19-E92000001')
-    ) == 35
+    england = broadcast_area_libraries.get_areas('ctry19-E92000001')[0]
+    scotland = broadcast_area_libraries.get_areas('ctry19-S92000003')[0]
 
-    assert len(
-        broadcast_area_libraries.get_polygons_for_areas_long_lat('ctry19-S92000003')
-    ) == 195
+    assert len(england.polygons) == 35
+    assert len(scotland.polygons) == 195
 
-    assert len(
-        broadcast_area_libraries.get_polygons_for_areas_long_lat(
-            'ctry19-E92000001',
-            'ctry19-S92000003',
-        )
-    ) == 35 + 195 == 230
-
-    assert len(
-        broadcast_area_libraries.get_polygons_for_areas_lat_long(
-            'ctry19-E92000001',
-            'ctry19-S92000003',
-        )
-    ) == 35 + 195 == 230
-
-    assert broadcast_area_libraries.get_polygons_for_areas_lat_long('ctry19-E92000001')[0][0] == [
+    assert england.polygons.as_coordinate_pairs_lat_long[0][0] == [
         55.811085, -2.034358  # https://goo.gl/maps/wsf2LUWzYinwydMk8
     ]
 
 
-def test_polygons_are_enclosed_unless_asked_not_to_be():
+def test_polygons_are_enclosed():
     england = broadcast_area_libraries.get('ctry19').get('ctry19-E92000001')
 
-    assert len(england.polygons) == len(england.polygons.as_unenclosed_coordinate_pairs)
-
-    first_polygon = england.polygons[0].as_coordinate_pairs
+    first_polygon = england.polygons.as_coordinate_pairs_lat_long[0]
     assert first_polygon[0] != first_polygon[1] != first_polygon[2]
     assert first_polygon[0] == first_polygon[-1]
-
-    first_polygon_unenclosed = england.polygons[0].as_unenclosed_coordinate_pairs
-    assert first_polygon_unenclosed[0] == first_polygon[0]
-    assert first_polygon_unenclosed[-1] != first_polygon[-1]
-    assert first_polygon_unenclosed[-1] == first_polygon[-2]
 
 
 def test_lat_long_order():
 
-    lat_long = broadcast_area_libraries.get_polygons_for_areas_lat_long('ctry19-E92000001')
-    long_lat = broadcast_area_libraries.get_polygons_for_areas_long_lat('ctry19-E92000001')
+    england = broadcast_area_libraries.get_areas('ctry19-E92000001')[0]
+
+    lat_long = england.polygons.as_coordinate_pairs_lat_long
+    long_lat = england.polygons.as_coordinate_pairs_long_lat
+
     assert len(lat_long[0]) == len(long_lat[0]) == 2082  # Coordinates in polygon
     assert len(lat_long[0][0]) == len(long_lat[0][0]) == 2  # Axes in coordinates
     assert lat_long[0][0] == list(reversed(long_lat[0][0]))
