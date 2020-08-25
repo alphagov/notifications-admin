@@ -3,8 +3,8 @@
 {% extends "admin_template.html" %}
 
 {% block per_page_title %}
-  In an emergency, you can broadcast an alert to every mobile phone in
-  the affected area.
+  In an emergency, broadcast an alert to every mobile phone in
+  the affected area at exactly the same time.
 {% endblock %}
 
 {% set mainClasses = "govuk-!-padding-top-0 govuk-!-padding-bottom-0" %}
@@ -15,12 +15,9 @@
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-one-half">
         <h1 class="heading-medium">
-          In an emergency, you can broadcast an alert to every mobile phone in
-          the affected&nbsp;area.
+          In an emergency, broadcast an alert to every mobile phone in
+          the affected area at exactly the same time.
         </h1>
-        <p class="govuk-body heading-medium">
-          You do not need to know people’s phone&nbsp;numbers.
-        </p>
         <p class="govuk-body heading-medium govuk-!-margin-bottom-6">
           <a class="govuk-link govuk-link--no-visited-state" href='{{ url_for(".broadcast_tour", service_id=current_service.id, step_index=3) }}'>
             Continue

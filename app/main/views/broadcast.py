@@ -23,7 +23,7 @@ from app.utils import service_has_permission, user_has_permissions
 @user_has_permissions()
 @service_has_permission('broadcast')
 def broadcast_tour(service_id, step_index):
-    if step_index not in (1, 2, 3, 4):
+    if step_index not in (1, 2, 3, 4, 5):
         abort(404)
     return render_template(
         f'views/broadcast/tour/{step_index}.html'

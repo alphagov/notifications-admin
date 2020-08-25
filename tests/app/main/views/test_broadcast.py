@@ -137,7 +137,8 @@ def test_broadcast_pages_403_for_user_without_permission(
     (1, 'Continue', partial(url_for, '.broadcast_tour', step_index=2)),
     (2, 'Continue', partial(url_for, '.broadcast_tour', step_index=3)),
     (3, 'Continue', partial(url_for, '.broadcast_tour', step_index=4)),
-    (4, 'Continue to dashboard', partial(url_for, '.service_dashboard')),
+    (4, 'Continue', partial(url_for, '.broadcast_tour', step_index=5)),
+    (5, 'Continue to dashboard', partial(url_for, '.service_dashboard')),
 ))
 def test_broadcast_tour_pages_have_continue_link(
     client_request,
@@ -161,7 +162,8 @@ def test_broadcast_tour_pages_have_continue_link(
     pytest.param(1, marks=pytest.mark.xfail),
     pytest.param(2, marks=pytest.mark.xfail),
     pytest.param(3, marks=pytest.mark.xfail),
-    4,
+    pytest.param(4, marks=pytest.mark.xfail),
+    5,
 ))
 def test_broadcast_tour_page_4_shows_service_name(
     client_request,
@@ -179,7 +181,7 @@ def test_broadcast_tour_page_4_shows_service_name(
     )
 
 
-@pytest.mark.parametrize('step_index', (0, 5))
+@pytest.mark.parametrize('step_index', (0, 6))
 def test_broadcast_tour_page_404s_out_of_range(
     client_request,
     service_one,

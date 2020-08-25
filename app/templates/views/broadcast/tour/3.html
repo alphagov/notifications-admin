@@ -3,7 +3,7 @@
 {% extends "admin_template.html" %}
 
 {% block per_page_title %}
-  An emergency alert looks a bit like a text message.
+  The phone will make a loud alarm noise, even if it’s set on silent.
 {% endblock %}
 
 {% set mainClasses = "govuk-!-padding-top-0 govuk-!-padding-bottom-0" %}
@@ -14,12 +14,8 @@
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-one-half">
         <h1 class="heading-medium">
-          An emergency alert looks a bit like a text&nbsp;message.
+          The phone will make a loud alarm noise, even if it’s set on silent.
         </h1>
-        <p class="govuk-body heading-medium">
-          It also makes a loud alarm noise, even if the phone is set
-          on silent.
-        </p>
         <p class="govuk-body heading-medium">
           <a class="govuk-link govuk-link--no-visited-state" href='{{ url_for(".broadcast_tour", service_id=current_service.id, step_index=4) }}'>
             Continue
@@ -28,6 +24,7 @@
       </div>
       <div class="govuk-grid-column-one-half">
         <img src="{{ asset_url('images/broadcast-tour/3.png') }}" alt="">
+        <link rel="preload" href="{{ asset_url('images/broadcast-tour/4.png') }}" as="image">
       </div>
     </div>
   </div>
