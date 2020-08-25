@@ -11,14 +11,44 @@ afterAll(() => {
 
 describe('API key', () => {
 
-  let apiKey;
+  let apiKey = '00000000-0000-0000-0000-000000000000';
   let thing;
   let component;
+  let selectionMock;
+  let rangeMock;
+
+  const setUpDOM = function (options) {
+
+    // set up DOM
+    document.body.innerHTML =`
+      <h2 class="api-key__name">
+        ${options.thing}
+      </h2>
+      <div data-module="api-key" data-key="${apiKey}" data-thing="${options.thing}" data-name="${options.name}">
+        <span class="api-key__key" aria-live="assertive">
+          ${(options.name === options.thing) ? '<span class="govuk-visually-hidden">' + options.thing + ': </span>' : ''}${apiKey}
+        </span>
+        <span class="api-key__notice" aria-live="assertive"></span>
+      </div>`;
+
+  };
+
+  beforeAll(() => {
+
+    // mock objects used to manipulate the page selection
+    selectionMock = new helpers.SelectionMock(jest);
+    rangeMock = new helpers.RangeMock(jest);
+
+  });
 
   beforeEach(() => {
 
-    apiKey = '00000000-0000-0000-0000-000000000000';
-    thing = 'API key';
+    // plug gaps in JSDOM's API for manipulation of selections
+    window.getSelection = jest.fn(() => selectionMock);
+    document.createRange = jest.fn(() => rangeMock);
+
+    // plug JSDOM not having execCommand
+    document.execCommand = jest.fn(() => {});
 
     // mock sticky JS
     window.GOVUK.stickAtBottomWhenScrolling = {
@@ -34,21 +64,14 @@ describe('API key', () => {
 
     require('../../app/assets/javascripts/apiKey.js');
 
-    // set up DOM
-    document.body.innerHTML =`
-      <h2 class="api-key__name">
-        ${thing}
-      </h2>
-      <div data-module="api-key" data-key="${apiKey}" data-thing="${thing}" aria-live="assertive">
-        <span class="api-key__key">${apiKey}</span>
-      </div>`;
+    setUpDOM({ 'thing': 'API key', 'name': 'API key' });
 
     component = document.querySelector('[data-module=api-key]');
 
     // start the module
     window.GOVUK.modules.start();
 
-    expect(component.querySelector('input[type=button]')).toBeNull();
+    expect(component.querySelector('button')).toBeNull();
 
   });
 
@@ -68,79 +91,132 @@ describe('API key', () => {
 
     });
 
-    beforeEach(() => {
-
-      // set up DOM
-      document.body.innerHTML =`
-        <h2 class="api-key__name">
-          ${thing}
-        </h2>
-        <div data-module="api-key" data-key="${apiKey}" data-thing="${thing}" aria-live="assertive">
-          <span class="api-key__key">${apiKey}</span>
-        </div>`;
-
-      component = document.querySelector('[data-module=api-key]');
-
-      // set default style for component height (queried by jQuery before checking DOM APIs)
-      const stylesheet = document.createElement('style');
-      stylesheet.innerHTML = '[data-module=api-key] { height: auto; }'; // set to browser default
-      document.getElementsByTagName('head')[0].appendChild(stylesheet);
-
-      componentHeightOnLoad = 50;
-
-      // mock the DOM APIs called for the position & dimension of the component
-      screenMock = new helpers.ScreenMock(jest);
-      screenMock.setWindow({
-        width: 1990,
-        height: 940,
-        scrollTop: 0
-      });
-      screenMock.mockPositionAndDimension('component', component, {
-        offsetHeight: componentHeightOnLoad,
-        offsetWidth: 641,
-        offsetTop: 0
-      });
-
-      // start the module
-      window.GOVUK.modules.start();
-
-    });
-
     afterEach(() => {
       screenMock.reset();
     });
 
     describe("On page load", () => {
 
-      test("It should add a button for copying the key to the clipboard", () => {
+      describe("For all variations of the initial HTML", () => {
 
-        expect(component.querySelector('input[type=button]')).not.toBeNull();
+        beforeEach(() => {
+
+          setUpDOM({ 'thing': 'API key', 'name': 'API key' });
+
+          component = document.querySelector('[data-module=api-key]');
+
+          // set default style for component height (queried by jQuery before checking DOM APIs)
+          const stylesheet = document.createElement('style');
+          stylesheet.innerHTML = '[data-module=api-key] { height: auto; }'; // set to browser default
+          document.getElementsByTagName('head')[0].appendChild(stylesheet);
+
+          componentHeightOnLoad = 50;
+
+          // mock the DOM APIs called for the position & dimension of the component
+          screenMock = new helpers.ScreenMock(jest);
+          screenMock.setWindow({
+            width: 1990,
+            height: 940,
+            scrollTop: 0
+          });
+          screenMock.mockPositionAndDimension('component', component, {
+            offsetHeight: componentHeightOnLoad,
+            offsetWidth: 641,
+            offsetTop: 0
+          });
+
+          // start the module
+          window.GOVUK.modules.start();
+
+        });
+
+        test("It should add a button for copying the key to the clipboard", () => {
+
+          expect(component.querySelector('button')).not.toBeNull();
+
+        });
+
+        test("It should add the 'api-key' class", () => {
+
+          expect(component.classList.contains('api-key')).toBe(true);
+
+        });
+
+        test("It should tell any sticky JS present the page has changed", () => {
+
+          // recalculate forces the sticky JS to recalculate any stored DOM position/dimensions
+          expect(window.GOVUK.stickAtBottomWhenScrolling.recalculate).toHaveBeenCalled();
+
+        });
+
+        test("It should set the component's minimum height based on its height when the page loads", () => {
+
+          // to prevent the position of the button moving when the state changes
+          expect(window.getComputedStyle(component)['min-height']).toEqual(`${componentHeightOnLoad}px`);
+
+        });
 
       });
 
-      test("It should add the 'api-key' class", () => {
+      describe("If it's one of many in the page", () => {
 
-        expect(component.classList.contains('api-key')).toBe(true);
+        beforeEach(() => {
+
+          // If 'thing' (what the id is) and 'name' (its specific idenifier on the page) are
+          // different, it will be one of others called the same 'thing'.
+          setUpDOM({ 'thing': 'ID', 'name': 'Default' });
+
+          component = document.querySelector('[data-module=api-key]');
+
+          // start the module
+          window.GOVUK.modules.start();
+
+        });
+
+        // Because it is not the only 'thing' on the page, the id will not have a heading
+        // and so needs some prefix text to label it
+        test("The id should have a hidden prefix to label what it is", () => {
+
+          const keyPrefix = component.querySelector('.api-key__key .govuk-visually-hidden');
+          expect(keyPrefix).not.toBeNull();
+          expect(keyPrefix.textContent).toEqual('ID: ');
+
+        });
+
+        test("the button should have a hidden suffix naming the id it is for", () => {
+
+          const buttonSuffix = component.querySelector('button .govuk-visually-hidden');
+          expect(buttonSuffix).not.toBeNull();
+          expect(buttonSuffix.textContent).toEqual(' for Default');
+
+        });
 
       });
 
-      test("It should change aria-live to 'polite'", () => {
+      describe("If it's the only one on the page", () => {
 
-        expect(component.getAttribute('aria-live')).toEqual('polite');
+        beforeEach(() => {
 
-      });
+          // The heading is added if 'thing' (what the id is) has the same value as 'name'
+          // (its specific identifier on the page) because this means it can assume it is
+          // the only one of its type there
+          setUpDOM({ 'thing': 'API key', 'name': 'API key' });
 
-      test("It should tell any sticky JS present the page has changed", () => {
+          component = document.querySelector('[data-module=api-key]');
 
-        // recalculate forces the sticky JS to recalculate any stored DOM position/dimensions
-        expect(window.GOVUK.stickAtBottomWhenScrolling.recalculate).toHaveBeenCalled();
+          // start the module
+          window.GOVUK.modules.start();
 
-      });
+        });
 
-      test("It should set the component's minimum height based on its height when the page loads", () => {
+        test("Its button and id shouldn't have extra hidden text to identify them", () => {
 
-        // to prevent the position of the button moving when the state changes
-        expect(window.getComputedStyle(component)['min-height']).toEqual(`${componentHeightOnLoad}px`);
+          const keyPrefix = component.querySelector('.api-key__key .govuk-visually-hidden');
+          const buttonSuffix = component.querySelector('button .govuk-visually-hidden');
+          expect(keyPrefix).toBeNull();
+          expect(buttonSuffix).toBeNull();
+
+        })
 
       });
 
@@ -148,78 +224,152 @@ describe('API key', () => {
 
     describe("If you click the 'Copy API key to clipboard' button", () => {
 
-      let selectionMock;
-      let rangeMock;
-      let keyEl;
-      let copyButton;
+      describe("For all variations of the initial HTML", () => {
 
-      beforeEach(() => {
-
-        keyEl = component.querySelector('span');
-        copyButton = component.querySelector('input[type=button]');
-
-        // mock objects used to manipulate the page selection
-        selectionMock = new helpers.SelectionMock(jest);
-        rangeMock = new helpers.RangeMock(jest);
-
-        // plug gaps in JSDOM's API for manipulation of selections
-        window.getSelection = jest.fn(() => selectionMock);
-        document.createRange = jest.fn(() => rangeMock);
-
-        // plug JSDOM not having execCommand
-        document.execCommand = jest.fn(() => {});
-
-        helpers.triggerEvent(copyButton, 'click');
-
-      });
-
-      test("It should change the text to confirm the copy action", () => {
-
-        expect(component.querySelector('span').textContent.trim()).toEqual('Copied to clipboard');
-
-      });
-
-      test("It should swap the button for one to show the API key", () => {
-
-        expect(component.querySelector('input[type=button]').getAttribute('value')).toEqual('Show API key');
-
-      });
-
-      test("It should copy the key to the clipboard", () => {
-
-        // it should make a selection (a range) from the contents of the element containing the API key
-        expect(rangeMock.selectNodeContents.mock.calls[0]).toEqual([keyEl]);
-
-        // that selection (a range) should be added to that for the page (a selection)
-        expect(selectionMock.addRange.mock.calls[0]).toEqual([rangeMock]);
-
-        expect(document.execCommand).toHaveBeenCalled();
-        expect(document.execCommand.mock.calls[0]).toEqual(['copy']);
-
-        // reset any methods in the global space
-        window.queryCommandSupported = undefined;
-        window.getSelection = undefined;
-        document.createRange = undefined;
-
-      });
-
-      describe("If you then click the 'Show API key'", () => {
+        let keyEl;
 
         beforeEach(() => {
 
-          helpers.triggerEvent(component.querySelector('input[type=button]'), 'click');
+          setUpDOM({ 'thing': 'API key', 'name': 'API key' });
+
+          // start the module
+          window.GOVUK.modules.start();
+
+          component = document.querySelector('[data-module=api-key]');
+          keyEl = component.querySelector('.api-key__key');
+
+          helpers.triggerEvent(component.querySelector('button'), 'click');
 
         });
 
-        test("It should change the text to show the API key", () => {
+        test("The live-region should be shown and its text should confirm the copy action", () => {
 
-          expect(component.querySelector('span').textContent.trim()).toEqual(apiKey);
+          const liveRegion = component.querySelector('.api-key__notice');
+
+          expect(liveRegion.classList.contains('govuk-visually-hidden')).toBe(false);
+          expect(liveRegion.textContent.trim()).toEqual(
+            expect.stringContaining('Copied to clipboard')
+          );
 
         });
 
-        test("It should swap the button for one to copy the key to the clipboard", () => {
+        // The button also says this but its text after being changed is not announced due to being
+        // lower priority than the live-region
+        test("The live-region should contain some hidden text giving context to the statement shown", () => {
 
-          expect(component.querySelector('input[type=button]').getAttribute('value')).toEqual('Copy API key to clipboard');
+          const liveRegionHiddenText = component.querySelectorAll('.api-key__notice .govuk-visually-hidden');
+
+          expect(liveRegionHiddenText.length).toEqual(2);
+          expect(liveRegionHiddenText[0].textContent).toEqual('API key ');
+          expect(liveRegionHiddenText[1].textContent).toEqual(', press button to show in page');
+
+        });
+
+        test("It should swap the button for one to show the API key", () => {
+
+          expect(component.querySelector('button').textContent.trim()).toEqual(
+            expect.stringContaining('Show API key')
+          );
+
+        });
+
+        test("It should remove the id from the page", () => {
+
+          expect(component.querySelector('.api-key__key')).toBeNull();
+
+        });
+
+        test("It should copy the key to the clipboard", () => {
+
+          // it should make a selection (a range) from the contents of the element containing the API key
+          expect(rangeMock.selectNodeContents.mock.calls[0]).toEqual([keyEl]);
+
+          // that selection (a range) should be added to that for the page (a selection)
+          expect(selectionMock.addRange.mock.calls[0]).toEqual([rangeMock]);
+
+          expect(document.execCommand).toHaveBeenCalled();
+          expect(document.execCommand.mock.calls[0]).toEqual(['copy']);
+
+          // reset any methods in the global space
+          window.queryCommandSupported = undefined;
+          window.getSelection = undefined;
+          document.createRange = undefined;
+
+        });
+
+        describe("If you then click the 'Show API key'", () => {
+
+          beforeEach(() => {
+
+            helpers.triggerEvent(component.querySelector('button'), 'click');
+
+          });
+
+          test("It should change the text to show the API key", () => {
+
+            expect(component.querySelector('.api-key__key')).not.toBeNull();
+
+          });
+
+          test("It should swap the button for one to copy the key to the clipboard", () => {
+
+            expect(component.querySelector('button').textContent.trim()).toEqual(
+              expect.stringContaining('Copy API key to clipboard')
+            );
+
+          })
+
+        });
+
+      });
+
+      describe("If it's one of many in the page", () => {
+
+        test("the button should have a hidden suffix naming the id it is for", () => {
+
+          // If 'thing' (what the id is) and 'name' (its specific idenifier on the page) are
+          // different, it will be one of others called the same 'thing'.
+          setUpDOM({ 'thing': 'ID', 'name': 'Default' });
+
+          // start the module
+          window.GOVUK.modules.start();
+
+          component = document.querySelector('[data-module=api-key]');
+
+          helpers.triggerEvent(component.querySelector('button'), 'click');
+
+          const buttonSuffix = component.querySelector('button .govuk-visually-hidden');
+          expect(buttonSuffix).not.toBeNull();
+          expect(buttonSuffix.textContent).toEqual(' for Default');
+
+        });
+
+      });
+
+      describe("If it's the only one on the page", () => {
+
+        beforeEach(() => {
+
+          // The heading is added if 'thing' (what the id is) has the same value as 'name'
+          // (its specific identifier on the page) because this means it can assume it is
+          // the only one of its type there
+          setUpDOM({ 'thing': 'API key', 'name': 'API key' });
+
+          // start the module
+          window.GOVUK.modules.start();
+
+          component = document.querySelector('[data-module=api-key]');
+
+          helpers.triggerEvent(component.querySelector('button'), 'click');
+
+        });
+
+        test("Its button and id shouldn't have extra hidden text to identify them", () => {
+
+          const keyPrefix = component.querySelector('.api-key__key .govuk-visually-hidden');
+          const buttonSuffix = component.querySelector('button .govuk-visually-hidden');
+          expect(keyPrefix).toBeNull();
+          expect(buttonSuffix).toBeNull();
 
         })
 
