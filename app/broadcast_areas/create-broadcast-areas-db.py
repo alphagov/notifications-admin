@@ -205,6 +205,10 @@ for feature in geojson.loads(ctyua19_filepath.read_text())['features']:
 
     print('County/Unitary Authority', group_name)  # noqa: T001
 
+    la_id = 'lad20-' + ctyua_id
+    if repo.get_areas([la_id]):
+        continue
+
     group_id = "ctyua19-" + ctyua_id
 
     feature, simple_feature = (
