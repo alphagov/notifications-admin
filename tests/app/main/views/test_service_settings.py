@@ -2106,9 +2106,9 @@ def test_api_ids_dont_show_on_option_pages_with_a_single_sender(
         'app.service_api_client.get_reply_to_email_addresses',
         create_multiple_email_reply_to_addresses(),
         [
-            'test@example.com (default) Change 1234',
-            'test2@example.com Change 5678',
-            'test3@example.com Change 9457',
+            'test@example.com (default) Change ID: 1234',
+            'test2@example.com Change ID: 5678',
+            'test3@example.com Change ID: 9457',
         ],
     ), (
         'main.service_letter_contact_details',
@@ -2116,18 +2116,18 @@ def test_api_ids_dont_show_on_option_pages_with_a_single_sender(
         create_multiple_letter_contact_blocks(),
         [
             'Blank Make default',
-            '1 Example Street (default) Change 1234',
-            '2 Example Street Change 5678',
-            'foo<bar>baz Change 9457',
+            '1 Example Street (default) Change ID: 1234',
+            '2 Example Street Change ID: 5678',
+            'foo<bar>baz Change ID: 9457',
         ],
     ), (
         'main.service_sms_senders',
         'app.service_api_client.get_sms_senders',
         create_multiple_sms_senders(),
         [
-            'Example (default and receives replies) Change 1234',
-            'Example 2 Change 5678',
-            'Example 3 Change 9457',
+            'Example (default and receives replies) Change ID: 1234',
+            'Example 2 Change ID: 5678',
+            'Example 3 Change ID: 9457',
         ],
     ),
     ]

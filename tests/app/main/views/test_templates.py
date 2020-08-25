@@ -785,7 +785,7 @@ def test_should_show_template_id_on_template_page(
         template_id=fake_uuid,
         _test_page_title=False,
     )
-    assert page.select('.api-key__key')[0].text == fake_uuid
+    assert fake_uuid in page.select('.api-key__key')[0].text
 
 
 def test_should_hide_template_id_for_broadcast_templates(
