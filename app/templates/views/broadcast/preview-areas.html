@@ -1,6 +1,6 @@
 {% from "components/button/macro.njk" import govukButton %}
 {% from "components/page-header.html" import page_header %}
-{% from "components/page-footer.html" import sticky_page_footer %}
+{% from "components/page-footer.html" import page_footer %}
 
 {% extends "withnav_template.html" %}
 
@@ -51,10 +51,10 @@
     {% for polygon in broadcast_message.simple_polygons.as_coordinate_pairs_lat_long %}
       polygons.push(
         L.polygon({{polygon}}, {
-          opacity: 0.1,
-          color: '#2B8CC4', // $black
-          fillColor: '#2B8CC4', // $light-blue
-          fillOpacity: 0.4,
+          opacity: 0.3,
+          color: '#005ea5', // $black
+          fillColor: '#005ea5', // $light-blue
+          fillOpacity: 0.3,
           weight: 1
         })
       );
@@ -115,9 +115,19 @@
 
   {% if broadcast_message.areas %}
     <div id="map"></div>
-    <form action="{{ url_for('.preview_broadcast_message', service_id=current_service.id, broadcast_message_id=broadcast_message.id) }}" method="get">
-      {{ sticky_page_footer('Continue to preview') }}
-    </form>
+    <div class="js-stick-at-bottom-when-scrolling">
+      <div class="govuk-!-margin-bottom-3">
+        <div style="width: 1.6em; height: 1.6em; border: 2px solid #0b0b0c; background: #3A9DCE; display: inline-block;">
+        </div>
+        <span style="position: relative; top: -0.55em; margin: 0 15px 0 5px">Will get alert</span>
+        <div style="width: 1.6em; height: 1.6em; border: 2px solid #3A9DCE; background: #D9E7ED; display: inline-block;">
+        </div>
+        <span style="position: relative; top: -0.55em; margin: 0 15px 0 5px">Likely to get alert</span>
+      </div>
+      <form action="{{ url_for('.preview_broadcast_message', service_id=current_service.id, broadcast_message_id=broadcast_message.id) }}" method="get">
+        {{ page_footer('Continue to preview') }}
+      </form>
+    </div>
   {% endif %}
 
 {% endblock %}
