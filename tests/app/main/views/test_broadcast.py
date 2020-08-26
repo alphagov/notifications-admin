@@ -468,21 +468,33 @@ def test_choose_broadcast_sub_area_page(
         'Choose an area of Aberdeen City'
     )
     live_search = page.select_one("[data-module=live-search]")
-    assert live_search['data-targets'] == '.govuk-checkboxes__item'
+    assert live_search['data-targets'] == '#sub-areas .govuk-checkboxes__item'
     assert live_search.select_one('input')['type'] == 'search'
-    choices = [
+    all_choices = [
         (
             choice.select_one('input')['value'],
             normalize_spaces(choice.select_one('label').text),
         )
         for choice in page.select('form[method=post] .govuk-checkboxes__item')
     ]
-    assert choices[:3] == [
+    sub_choices = [
+        (
+            choice.select_one('input')['value'],
+            normalize_spaces(choice.select_one('label').text),
+        )
+        for choice in page.select('form[method=post] #sub-areas .govuk-checkboxes__item')
+    ]
+    assert all_choices[:3] == [
         ('y', 'All of Aberdeen City'),
         ('wd20-S13002845', 'Airyhall/Broomhill/Garthdee'),
         ('wd20-S13002836', 'Bridge of Don'),
     ]
-    assert choices[-1:] == [
+    assert sub_choices[:3] == [
+        ('wd20-S13002845', 'Airyhall/Broomhill/Garthdee'),
+        ('wd20-S13002836', 'Bridge of Don'),
+        ('wd20-S13002835', 'Dyce/Bucksburn/Danestone'),
+    ]
+    assert all_choices[-1:] == sub_choices[-1:] == [
         ('wd20-S13002846', 'Torry/Ferryhill'),
     ]
 
