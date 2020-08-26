@@ -1,6 +1,6 @@
 {% from "components/button/macro.njk" import govukButton %}
 {% from "components/page-header.html" import page_header %}
-{% from "components/page-footer.html" import sticky_page_footer %}
+{% from "components/page-footer.html" import page_footer %}
 
 {% extends "withnav_template.html" %}
 
@@ -52,8 +52,16 @@
 
   {% if broadcast_message.areas %}
     <div id="map"></div>
+    <div>
+      <div class="area-key area-key--certain">
+        Will get alert
+      </div>
+      <div class="area-key area-key--likely">
+        Likely to get alert
+      </div>
+    </div>
     <form action="{{ url_for('.preview_broadcast_message', service_id=current_service.id, broadcast_message_id=broadcast_message.id) }}" method="get">
-      {{ sticky_page_footer('Continue to preview') }}
+      {{ page_footer('Continue to preview') }}
     </form>
   {% endif %}
 

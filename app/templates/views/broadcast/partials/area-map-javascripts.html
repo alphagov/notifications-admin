@@ -5,10 +5,10 @@
   {% for polygon in broadcast_message.simple_polygons.bleed.as_coordinate_pairs_lat_long %}
     polygons.push(
       L.polygon({{polygon}}, {
-        opacity: 0.5,
-        color: '#2B8CC4', // $light-blue
-        fillColor: '#2B8CC4', // $light-blue
-        fillOpacity: 0.2,
+        opacity: 0.8,
+        color: '#005ea5', // $light-blue
+        fillColor: '#005ea5', // $light-blue
+        fillOpacity: 0.15,
         weight: 2
       })
     );
@@ -17,10 +17,10 @@
   {% for polygon in broadcast_message.simple_polygons.as_coordinate_pairs_lat_long %}
     polygons.push(
       L.polygon({{polygon}}, {
-        opacity: 0.1,
-        color: '#2B8CC4', // $black
-        fillColor: '#2B8CC4', // $light-blue
-        fillOpacity: 0.4,
+        opacity: 0.3,
+        color: '#005ea5', // $black
+        fillColor: '#005ea5', // $light-blue
+        fillOpacity: 0.3,
         weight: 1
       })
     );
