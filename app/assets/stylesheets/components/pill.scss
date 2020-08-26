@@ -31,7 +31,7 @@
     float: left;
     box-sizing: border-box;
     width: 100%;
-    padding: 10px;
+    padding: 10px 0;
   }
 
   a {
@@ -76,8 +76,20 @@
 
   }
 
+  &-label {
+
+    // reduce padding until screen is above 420px / zoomed below 300%
+    padding-left: govuk-spacing(1);
+
+    @include govuk-media-query($from: 420px) {
+      padding-left: govuk-spacing(2);
+    }
+
+  }
+
   &-centered-item {
     text-align: center;
+    padding-left: 0;
   }
 
 }

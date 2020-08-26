@@ -16,6 +16,17 @@
 
 }
 
+.pill .big-number-number {
+
+  // reduce padding until screen is bigger than 420px / zoomed below 300%
+  padding-left: govuk-spacing(1);
+
+  @include govuk-media-query($from: 420px) {
+    padding-left: govuk-spacing(2);
+  }
+
+}
+
 .big-number-dark {
   @extend %big-number;
   padding: govuk-spacing(3);
