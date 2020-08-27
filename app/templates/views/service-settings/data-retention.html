@@ -29,27 +29,28 @@
           By default data is kept for 7 days
       </div>
   </div>
-  <div class="user-list">
-    {% if not current_service.data_retention %}
+  {% if not current_service.data_retention %}
+    <div class="user-list">
       <div class="user-list-item">
-        <span class="hint">You have not added any data retention</span>
+        <p class="govuk-body user-list-item-blank hint">You have not added any data retention</p>
       </div>
-    {% endif %}
-       {% call mapping_table(
-        caption='Data retention',
-        field_headings=['Label', 'Value', 'Action'],
-        field_headings_visible=False,
-        caption_visible=False
-      ) %}
-        {% for item in current_service.data_retention %}
-            {% call row() %}
-              {{ text_field(item.notification_type | format_notification_type)}}
-              {{ text_field(item.days_of_retention) }}
-              {{ edit_field('Change', url_for('.edit_data_retention', service_id=current_service.id, data_retention_id=item.id)) }}
-            {% endcall %}
+    </div>
+  {% else %}
+     {% call mapping_table(
+      caption='Data retention',
+      field_headings=['Label', 'Value', 'Action'],
+      field_headings_visible=False,
+      caption_visible=False
+    ) %}
+      {% for item in current_service.data_retention %}
+          {% call row() %}
+            {{ text_field(item.notification_type | format_notification_type)}}
+            {{ text_field(item.days_of_retention) }}
+            {{ edit_field('Change', url_for('.edit_data_retention', service_id=current_service.id, data_retention_id=item.id)) }}
+          {% endcall %}
 
-        {% endfor %}
-      {% endcall %}
-  </div>
+      {% endfor %}
+    {% endcall %}
+  {% endif %}
 
 {% endblock %}
