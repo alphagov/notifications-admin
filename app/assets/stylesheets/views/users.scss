@@ -13,10 +13,8 @@ $item-top-padding: govuk-spacing(3);
     &-heading {
 
       padding-right: govuk-spacing(3);
-      white-space: nowrap;
       overflow: hidden;
-      text-overflow: ellipsis;
-      color: $secondary-text-colour;  // So the ellipsis is grey
+      overflow-wrap: break-word;
 
       .heading-small {
         color: $black;
