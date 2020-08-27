@@ -15,11 +15,11 @@ describe('Autofocus', () => {
 
     // set up DOM
     document.body.innerHTML =
-      `<div data-module="autofocus">
+      `<div>
         <label class="form-label" for="search">
           Search by name
         </label>
-        <input autocomplete="off" class="form-control form-control-1-1" id="search" name="search" type="search" value="">
+        <input autocomplete="off" class="form-control form-control-1-1" id="search" name="search" type="search" value="" data-module="autofocus">
       </div>`;
 
     focusHandler = jest.fn();
@@ -63,7 +63,7 @@ describe('Autofocus', () => {
     $.prototype.scrollTop = jest.fn(() => 25);
 
     // set the force-focus flag
-    document.querySelector('div').setAttribute('data-force-focus', true);
+    document.querySelector('#search').setAttribute('data-force-focus', true);
 
     // start module
     window.GOVUK.modules.start();

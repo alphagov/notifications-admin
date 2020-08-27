@@ -9,7 +9,7 @@
       // is still where users intend to start
       if (($(window).scrollTop() > 0) && !forceFocus) { return; }
 
-      $('input, textarea, select', component).eq(0).trigger('focus');
+      $(component).filter('input, textarea, select').eq(0).trigger('focus');
 
     };
   };
