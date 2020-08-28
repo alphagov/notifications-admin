@@ -978,7 +978,7 @@ class InviteUserForm(BaseInviteUserForm, PermissionsForm):
 
 
 class BroadcastInviteUserForm(BaseInviteUserForm, BroadcastPermissionsForm):
-    pass
+    email_address = email_address(gov_user=True)
 
 
 class InviteOrgUserForm(StripWhitespaceForm):

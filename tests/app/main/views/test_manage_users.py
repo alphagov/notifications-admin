@@ -997,6 +997,37 @@ def test_invite_user_to_broadcast_service(
     )
 
 
+def test_invite_non_govt_user_to_broadcast_service_fails_validation(
+    client_request,
+    service_one,
+    active_user_with_permissions,
+    mocker,
+    sample_invite,
+    mock_get_template_folders,
+    mock_get_organisations,
+):
+    service_one['permissions'] = ['broadcast']
+    mocker.patch('app.models.user.InvitedUsers.client_method', return_value=[sample_invite])
+    mocker.patch('app.models.user.Users.client_method', return_value=[active_user_with_permissions])
+    mocker.patch('app.invite_api_client.create_invite', return_value=sample_invite)
+    post_data = {
+        'permissions_field': [
+            'send_messages',
+            'manage_templates',
+            'manage_service',
+        ],
+        'email_address': 'random@example.com'
+    }
+    page = client_request.post(
+        'main.invite_user',
+        service_id=SERVICE_ONE_ID,
+        _data=post_data,
+        _expected_status=200
+    )
+    assert app.invite_api_client.create_invite.called is False
+    assert "Enter a public sector email address" in page.find_all('span', class_='govuk-error-message')[0].text
+
+
 def test_cancel_invited_user_cancels_user_invitations(
     client_request,
     mock_get_invites_for_service,
