@@ -253,3 +253,7 @@ details .arrow {
   }
 
 }
+
+input:-webkit-autofill::first-line {
+  @include core-19;
+}
