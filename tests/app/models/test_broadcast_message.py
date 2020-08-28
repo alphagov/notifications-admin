@@ -18,13 +18,19 @@ def test_simple_polygons(fake_uuid):
     ))
 
     assert [
-        [len(polygon) for polygon in broadcast_message.polygons],
-        [len(polygon) for polygon in broadcast_message.simple_polygons],
+        [
+            len(polygon)
+            for polygon in broadcast_message.polygons.as_coordinate_pairs_lat_long
+        ],
+        [
+            len(polygon)
+            for polygon in broadcast_message.simple_polygons.as_coordinate_pairs_lat_long
+        ],
     ] == [
         # One polygon for each area
         [27, 31],
         # Because the areas are close to each other, the simplification
         # and unioning process results in a single polygon with fewer
         # total coordinates
-        [34],
+        [55],
     ]

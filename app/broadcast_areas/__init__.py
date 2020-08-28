@@ -1,9 +1,7 @@
-import itertools
-
-import geojson
 from notifications_utils.serialised_model import SerialisedModelCollection
 from werkzeug.utils import cached_property
 
+from .polygons import Polygons
 from .repo import BroadcastAreasRepository
 
 
@@ -34,59 +32,17 @@ class BroadcastArea(SortableMixin):
     def __eq__(self, other):
         return self.id == other.id
 
-    @property
-    def _feature(self):
-        return BroadcastAreasRepository().get_feature_for_area(self.id)
-
-    @property
-    def _simple_feature(self):
-        return BroadcastAreasRepository().get_simple_feature_for_area(self.id)
-
-    def _polygons(self, feature):
-        if feature['geometry']['type'] == 'MultiPolygon':
-            return [
-                polygons[0]
-                for polygons in feature['geometry']['coordinates']
-            ]
-        if feature['geometry']['type'] == 'Polygon':
-            return [
-                feature['geometry']['coordinates'][0]
-            ]
-        raise TypeError(
-            f'Unknown geometry type {self.feature["geometry"]["type"]} '
-            f'in {self.__class__.__name} {self.name}'
+    @cached_property
+    def polygons(self):
+        return Polygons(
+            BroadcastAreasRepository().get_polygons_for_area(self.id)
         )
 
-    def _unenclosed_polygons(self, feature):
-        # Some mapping tools require shapes to be unenclosed, i.e. the
-        # last point joins the first point implicitly
-        return [
-            coordinates[:-1] for coordinates in self._polygons(feature)
-        ]
-
-    @property
-    def polygons(self):
-        return self._polygons(self.feature)
-
-    @property
-    def unenclosed_polygons(self):
-        return self._unenclosed_polygons(self.feature)
-
-    @property
+    @cached_property
     def simple_polygons(self):
-        return self._polygons(self.simple_feature)
-
-    @property
-    def simple_unenclosed_polygons(self):
-        return self._unenclosed_polygons(self.simple_feature)
-
-    @cached_property
-    def feature(self):
-        return geojson.loads(self._feature)
-
-    @cached_property
-    def simple_feature(self):
-        return geojson.loads(self._simple_feature)
+        return Polygons(
+            BroadcastAreasRepository().get_simple_polygons_for_area(self.id)
+        )
 
     @property
     def sub_areas(self):
@@ -126,30 +82,6 @@ class BroadcastAreaLibraries(SerialisedModelCollection, GetItemByIdMixin):
 
         areas = BroadcastAreasRepository().get_areas(area_ids)
         return [BroadcastArea(area) for area in areas]
-
-    def get_polygons_for_areas_long_lat(self, *area_ids):
-        return list(itertools.chain(*(
-            area.polygons
-            for area in self.get_areas(*area_ids)
-        )))
-
-    def get_polygons_for_areas_lat_long(self, *area_ids):
-        return [
-            [[long, lat] for lat, long in polygon]
-            for polygon in self.get_polygons_for_areas_long_lat(*area_ids)
-        ]
-
-    def get_simple_polygons_for_areas_long_lat(self, *area_ids):
-        return list(itertools.chain(*(
-            area.simple_polygons
-            for area in self.get_areas(*area_ids)
-        )))
-
-    def get_simple_polygons_for_areas_lat_long(self, *area_ids):
-        return [
-            [[long, lat] for lat, long in polygon]
-            for polygon in self.get_simple_polygons_for_areas_long_lat(*area_ids)
-        ]
 
 
 broadcast_area_libraries = BroadcastAreaLibraries()
