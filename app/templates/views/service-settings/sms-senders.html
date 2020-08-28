@@ -36,7 +36,7 @@
           <a class="govuk-link govuk-link--no-visited-state user-list-edit-link" href="{{ url_for('.service_edit_sms_sender', service_id=current_service.id, sms_sender_id = item.id) }}">Change</a>
         {% endif %}
         {% if current_service.count_sms_senders > 1 %}
-          {{ api_key(item.id, thing="ID") }}
+          {{ api_key(item.id, name=item.sms_sender, thing="ID") }}
         {% endif %}
       </div>
     {% endfor %}
