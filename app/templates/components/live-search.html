@@ -8,13 +8,12 @@
 ) %}
     {%- set search_label = label or form.search.label.text %}
     {% if show %}
-      <div data-module="autofocus">
-        <div class="live-search js-header" data-module="live-search" data-targets="{{ target_selector }}">
-          {{ form.search(param_extensions={
-            "label": {"text": search_label},
-            "autocomplete": "off"
-          }) }}
-        </div>
+      <div class="live-search js-header" data-module="live-search" data-targets="{{ target_selector }}">
+        {{ form.search(param_extensions={
+          "label": {"text": search_label},
+          "autocomplete": "off",
+          "attributes": {"data-module": "autofocus"}
+        }) }}
       </div>
     {% endif %}
 {% endmacro %}
