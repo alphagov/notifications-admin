@@ -92,7 +92,7 @@ def test_update_letter_branding_with_new_valid_file(
     assert page.select_one('#name').attrs.get('value') == 'HM Government'
 
     assert mock_s3_upload.called
-    mock_delete_temp_files.assert_not_called()
+    assert mock_delete_temp_files.called is False
 
 
 def test_update_letter_branding_when_uploading_invalid_file(
@@ -163,7 +163,7 @@ def test_update_letter_branding_with_original_file_and_new_details(
     assert response.status_code == 200
     assert page.find('h1').text == 'Letter branding'
 
-    mock_upload_logos.assert_not_called()
+    assert mock_upload_logos.called is False
 
     mock_client_update.assert_called_once_with(
         branding_id=fake_uuid,
@@ -343,7 +343,7 @@ def test_create_letter_branding_when_uploading_valid_file(
 
     assert page.select_one('#logo-img > img').attrs['src'].endswith(expected_temp_filename)
     assert mock_s3_upload.called
-    mock_delete_temp_files.assert_not_called()
+    assert mock_delete_temp_files.called is False
 
 
 def test_create_letter_branding_fails_validation_when_uploading_SVG_with_embedded_image(
@@ -372,7 +372,7 @@ def test_create_letter_branding_fails_validation_when_uploading_SVG_with_embedde
 
     assert page.findAll('div', {'id': 'logo-img'}) == []
 
-    mock_s3_upload.assert_not_called()
+    assert mock_s3_upload.called is False
 
 
 def test_create_letter_branding_when_uploading_invalid_file(platform_admin_client):

@@ -95,8 +95,8 @@ def test_persist_logo_returns_if_not_temp(client, mocker, fake_uuid):
     mocked_get_s3_object = mocker.patch('app.s3_client.s3_logo_client.get_s3_object')
     mocked_delete_s3_object = mocker.patch('app.s3_client.s3_logo_client.delete_s3_object')
 
-    mocked_get_s3_object.assert_not_called()
-    mocked_delete_s3_object.assert_not_called()
+    assert mocked_get_s3_object.called is False
+    assert mocked_delete_s3_object.called is False
 
 
 def test_permanent_email_logo_name_removes_TEMP_TAG_from_filename(upload_filename, fake_uuid):
@@ -163,7 +163,7 @@ def test_does_not_delete_non_temp_email_file(client, mocker):
     with pytest.raises(ValueError) as error:
         delete_email_temp_file(filename)
 
-    mocked_delete_s3_object.assert_not_called
+    assert mocked_delete_s3_object.called is False
     assert str(error.value) == 'Not a temp file: {}'.format(filename)
 
 
@@ -183,5 +183,5 @@ def test_does_not_delete_non_temp_letter_file(mocker, fake_uuid):
     with pytest.raises(ValueError) as error:
         delete_letter_temp_file(svg_filename)
 
-    mocked_delete_s3_object.assert_not_called
+    assert mocked_delete_s3_object.called is False
     assert str(error.value) == 'Not a temp file: {}'.format(svg_filename)
