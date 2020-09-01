@@ -55,59 +55,59 @@ def mock_get_service_settings_page_common(
     (create_active_user_with_permissions(), [
 
         'Label Value Action',
-        'Service name Test Service Change',
-        'Sign-in method Text message code Change',
+        'Service name Test Service Change service name',
+        'Sign-in method Text message code Change sign-in method',
 
         'Label Value Action',
-        'Send emails On Change',
-        'Reply-to email addresses Not set Manage',
-        'Email branding GOV.UK Change',
-        'Send files by email contact_us@gov.uk Manage',
+        'Send emails On Change your settings for sending emails',
+        'Reply-to email addresses Not set Manage reply-to email addresses',
+        'Email branding GOV.UK Change email branding',
+        'Send files by email contact_us@gov.uk Manage sending files by email',
 
         'Label Value Action',
-        'Send text messages On Change',
-        'Text message senders GOVUK Manage',
-        'Start text messages with service name On Change',
-        'Send international text messages Off Change',
-        'Receive text messages Off Change',
+        'Send text messages On Change your settings for sending text messages',
+        'Text message senders GOVUK Manage text message senders',
+        'Start text messages with service name On Change your settings for starting text messages with service name',
+        'Send international text messages Off Change your settings for sending international text messages',
+        'Receive text messages Off Change your settings for receiving text messages',
 
         'Label Value Action',
-        'Send letters Off Change',
+        'Send letters Off Change your settings for sending letters',
 
     ]),
     (create_platform_admin_user(), [
 
         'Label Value Action',
-        'Service name Test Service Change',
-        'Sign-in method Text message code Change',
+        'Service name Test Service Change service name',
+        'Sign-in method Text message code Change sign-in method',
 
         'Label Value Action',
-        'Send emails On Change',
-        'Reply-to email addresses Not set Manage',
-        'Email branding GOV.UK Change',
-        'Send files by email contact_us@gov.uk Manage',
+        'Send emails On Change your settings for sending emails',
+        'Reply-to email addresses Not set Manage reply-to email addresses',
+        'Email branding GOV.UK Change email branding',
+        'Send files by email contact_us@gov.uk Manage sending files by email',
 
         'Label Value Action',
-        'Send text messages On Change',
-        'Text message senders GOVUK Manage',
-        'Start text messages with service name On Change',
-        'Send international text messages Off Change',
-        'Receive text messages Off Change',
+        'Send text messages On Change your settings for sending text messages',
+        'Text message senders GOVUK Manage text message senders',
+        'Start text messages with service name On Change your settings for starting text messages with service name',
+        'Send international text messages Off Change your settings for sending international text messages',
+        'Receive text messages Off Change your settings for receiving text messages',
 
         'Label Value Action',
-        'Send letters Off Change',
+        'Send letters Off Change your settings for sending letters',
 
         'Label Value Action',
-        'Live Off Change',
-        'Count in list of live services Yes Change',
-        'Organisation Test organisation Central government Change',
-        'Free text message allowance 250,000 Change',
-        'Email branding GOV.UK Change',
-        'Letter branding Not set Change',
-        'Data retention email Change',
-        'Receive inbound SMS Off Change',
-        'Email authentication Off Change',
-        'Send cell broadcasts Off Change',
+        'Live Off Change service status',
+        'Count in list of live services Yes Change if service is counted in list of live services',
+        'Organisation Test organisation Central government Change organisation for service',
+        'Free text message allowance 250,000 Change free text message allowance',
+        'Email branding GOV.UK Change email branding (admin view)',
+        'Letter branding Not set Change letter branding (admin view)',
+        'Data retention email Change data retention',
+        'Receive inbound SMS Off Change your settings for Receive inbound SMS',
+        'Email authentication Off Change your settings for Email authentication',
+        'Send cell broadcasts Off Change your settings for Send cell broadcasts',
     ]),
 ])
 def test_should_show_overview(
@@ -165,7 +165,7 @@ def test_no_go_live_link_for_service_without_organisation(
 
     organisation = find_element_by_tag_and_partial_text(page, tag='td', string='Organisation')
     assert normalize_spaces(organisation.find_next_siblings()[0].text) == 'Not set Central government'
-    assert normalize_spaces(organisation.find_next_siblings()[1].text) == 'Change'
+    assert normalize_spaces(organisation.find_next_siblings()[1].text) == 'Change organisation for service'
 
 
 def test_organisation_name_links_to_org_dashboard(
@@ -194,8 +194,8 @@ def test_organisation_name_links_to_org_dashboard(
 
 
 @pytest.mark.parametrize('service_contact_link,expected_text', [
-    ('contact.me@gov.uk', 'Send files by email contact.me@gov.uk Manage'),
-    (None, 'Send files by email Not set up Manage'),
+    ('contact.me@gov.uk', 'Send files by email contact.me@gov.uk Manage sending files by email'),
+    (None, 'Send files by email Not set up Manage sending files by email'),
 ])
 def test_send_files_by_email_row_on_settings_page(
     client_request,
@@ -230,69 +230,69 @@ def test_send_files_by_email_row_on_settings_page(
 @pytest.mark.parametrize('permissions, expected_rows', [
     (['email', 'sms', 'inbound_sms', 'international_sms'], [
 
-        'Service name service one Change',
-        'Sign-in method Text message code Change',
+        'Service name service one Change service name',
+        'Sign-in method Text message code Change sign-in method',
 
         'Label Value Action',
-        'Send emails On Change',
-        'Reply-to email addresses test@example.com Manage',
-        'Email branding Organisation name Change',
-        'Send files by email Not set up Manage',
+        'Send emails On Change your settings for sending emails',
+        'Reply-to email addresses test@example.com Manage reply-to email addresses',
+        'Email branding Organisation name Change email branding',
+        'Send files by email Not set up Manage sending files by email',
 
         'Label Value Action',
-        'Send text messages On Change',
-        'Text message senders GOVUK Manage',
-        'Start text messages with service name On Change',
-        'Send international text messages On Change',
-        'Receive text messages On Change',
+        'Send text messages On Change your settings for sending text messages',
+        'Text message senders GOVUK Manage text message senders',
+        'Start text messages with service name On Change your settings for starting text messages with service name',
+        'Send international text messages On Change your settings for sending international text messages',
+        'Receive text messages On Change your settings for receiving text messages',
 
         'Label Value Action',
-        'Send letters Off Change',
+        'Send letters Off Change your settings for sending letters',
 
     ]),
     (['email', 'sms', 'email_auth'], [
 
-        'Service name service one Change',
-        'Sign-in method Email link or text message code Change',
+        'Service name service one Change service name',
+        'Sign-in method Email link or text message code Change sign-in method',
 
         'Label Value Action',
-        'Send emails On Change',
-        'Reply-to email addresses test@example.com Manage',
-        'Email branding Organisation name Change',
-        'Send files by email Not set up Manage',
+        'Send emails On Change your settings for sending emails',
+        'Reply-to email addresses test@example.com Manage reply-to email addresses',
+        'Email branding Organisation name Change email branding',
+        'Send files by email Not set up Manage sending files by email',
 
         'Label Value Action',
-        'Send text messages On Change',
-        'Text message senders GOVUK Manage',
-        'Start text messages with service name On Change',
-        'Send international text messages Off Change',
-        'Receive text messages Off Change',
+        'Send text messages On Change your settings for sending text messages',
+        'Text message senders GOVUK Manage text message senders',
+        'Start text messages with service name On Change your settings for starting text messages with service name',
+        'Send international text messages Off Change your settings for sending international text messages',
+        'Receive text messages Off Change your settings for receiving text messages',
 
         'Label Value Action',
-        'Send letters Off Change',
+        'Send letters Off Change your settings for sending letters',
 
     ]),
     (['letter'], [
 
-        'Service name service one Change',
-        'Sign-in method Text message code Change',
+        'Service name service one Change service name',
+        'Sign-in method Text message code Change sign-in method',
 
         'Label Value Action',
-        'Send emails Off Change',
+        'Send emails Off Change your settings for sending emails',
 
         'Label Value Action',
-        'Send text messages Off Change',
+        'Send text messages Off Change your settings for sending text messages',
 
         'Label Value Action',
-        'Send letters On Change',
-        'Sender addresses 1 Example Street Manage',
-        'Letter branding Not set Change',
+        'Send letters On Change your settings for sending letters',
+        'Sender addresses 1 Example Street Manage sender addresses',
+        'Letter branding Not set Change letter branding',
 
     ]),
     (['broadcast'], [
 
-        'Service name service one Change',
-        'Sign-in method Text message code Change',
+        'Service name service one Change service name',
+        'Sign-in method Text message code Change sign-in method',
 
     ]),
 ])
@@ -2063,9 +2063,11 @@ def test_and_more_hint_appears_on_settings_with_more_than_just_a_single_sender(
             find_element_by_tag_and_partial_text(page, tag='tr', string=label).text
         )
 
-    assert get_row(page, 'Reply-to email addresses') == "Reply-to email addresses test@example.com …and 2 more Manage"
-    assert get_row(page, 'Text message senders') == "Text message senders Example …and 2 more Manage"
-    assert get_row(page, 'Sender addresses') == "Sender addresses 1 Example Street …and 2 more Manage"
+    assert get_row(page, 'Reply-to email addresses') == \
+        "Reply-to email addresses test@example.com …and 2 more Manage reply-to email addresses"
+    assert get_row(page, 'Text message senders') == \
+        "Text message senders Example …and 2 more Manage text message senders"
+    assert get_row(page, 'Sender addresses') == "Sender addresses 1 Example Street …and 2 more Manage sender addresses"
 
 
 @pytest.mark.parametrize('sender_list_page, index, expected_output', [

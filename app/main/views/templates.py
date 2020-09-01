@@ -690,7 +690,7 @@ def delete_service_template(service_id, template_id):
         else:
             raise e
 
-    flash(["Are you sure you want to delete ‘{}’?".format(template['name']), message], 'delete')
+    flash(["Are you sure you want to delete ‘{}’?".format(template['name']), message, template['name']], 'delete')
     return render_template(
         'views/templates/template.html',
         template=get_template(

@@ -1,7 +1,7 @@
 {% from "components/form.html" import form_wrapper %}
 {% from "components/button/macro.njk" import govukButton %}
 
-{% macro banner(body, type=None, with_tick=False, delete_button=None, subhead=None, context=None, action=None, id=None) %}
+{% macro banner(body, type=None, with_tick=False, delete_button=None, subhead=None, context=None, action=None, id=None, thing=None) %}
   <div
     class='banner{% if type %}-{{ type }}{% endif %}{% if with_tick %}-with-tick{% endif %}'
     {% if type == 'dangerous' %}
@@ -25,7 +25,8 @@
       {% call form_wrapper(action=action) %}
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
         {{ govukButton({
-          "text": delete_button,
+          "text": "" if thing else delete_button,
+          "html": delete_button + "<span class=\"govuk-visually-hidden\"> ‘" + thing + "’</span>" if thing else "",
           "name": "delete",
           "classes": "govuk-button--warning govuk-!-margin-top-2",
         }) }}
@@ -34,6 +35,6 @@
   </div>
 {% endmacro %}
 
-{% macro banner_wrapper(type=None, with_tick=False, delete_button=None, subhead=None, action=None, id=None) %}
-  {{ banner(caller()|safe, type=type, with_tick=with_tick, delete_button=delete_button, subhead=subhead, action=action, id=id) }}
+{% macro banner_wrapper(type=None, with_tick=False, delete_button=None, subhead=None, action=None, id=None, thing=None) %}
+  {{ banner(caller()|safe, type=type, with_tick=with_tick, delete_button=delete_button, subhead=subhead, action=action, id=id, thing=thing) }}
 {% endmacro %}

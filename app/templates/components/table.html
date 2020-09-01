@@ -121,10 +121,13 @@
   {% endcall %}
 {%- endmacro %}
 
-{% macro edit_field(text, link, permissions=[]) -%}
+{% macro edit_field(text, link, permissions=[], suffix=None) -%}
   {% call field(align='right') %}
     {% if not permissions or current_user.has_permissions(*permissions) %}
-      <a class="govuk-link govuk-link--no-visited-state" href="{{ link }}">{{ text }}</a>
+      <a class="govuk-link govuk-link--no-visited-state" href="{{ link }}">
+        {{ text }}
+        {%- if suffix %}<span class="govuk-visually-hidden"> {{ suffix }}</span>{% endif -%}
+      </a>
     {% endif %}
   {% endcall %}
 {%- endmacro %}

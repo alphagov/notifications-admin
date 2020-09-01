@@ -757,7 +757,7 @@ def test_view_broadcast_template(
             service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
         )),
-        ('Edit', url_for(
+        ('Edit this template', url_for(
             '.edit_service_template',
             service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
