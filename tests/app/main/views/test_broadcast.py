@@ -1,5 +1,6 @@
 import json
 import uuid
+from collections import namedtuple
 from functools import partial
 
 import pytest
@@ -495,8 +496,14 @@ def test_add_broadcast_area(
     mock_get_draft_broadcast_message,
     mock_update_broadcast_message,
     fake_uuid,
+    mocker
 ):
     service_one['permissions'] += ['broadcast']
+    polygon_class = namedtuple("polygon_class", ["as_coordinate_pairs_lat_long"])
+    coordinates = [[50.1, 0.1], [50.2, 0.2], [50.3, 0.2]]
+    polygons = polygon_class(as_coordinate_pairs_lat_long=coordinates)
+    mocker.patch('app.models.broadcast_message.BroadcastMessage.get_simple_polygons', return_value=polygons)
+
     client_request.post(
         '.choose_broadcast_area',
         service_id=SERVICE_ONE_ID,
@@ -510,7 +517,7 @@ def test_add_broadcast_area(
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
         data={
-            'areas': ['ctry19-E92000001', 'ctry19-S92000003', 'ctry19-W92000004']
+            'areas': ['ctry19-E92000001', 'ctry19-S92000003', 'ctry19-W92000004'], 'simple_polygons': coordinates
         },
     )
 
@@ -543,8 +550,14 @@ def test_add_broadcast_sub_area(
     fake_uuid,
     post_data,
     expected_selected,
+    mocker
 ):
     service_one['permissions'] += ['broadcast']
+    polygon_class = namedtuple("polygon_class", ["as_coordinate_pairs_lat_long"])
+    coordinates = [[50.1, 0.1], [50.2, 0.2], [50.3, 0.2]]
+    polygons = polygon_class(as_coordinate_pairs_lat_long=coordinates)
+    mocker.patch('app.models.broadcast_message.BroadcastMessage.get_simple_polygons', return_value=polygons)
+
     client_request.post(
         '.choose_broadcast_sub_area',
         service_id=SERVICE_ONE_ID,
@@ -557,6 +570,7 @@ def test_add_broadcast_sub_area(
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
         data={
+            'simple_polygons': coordinates,
             'areas': [
                 # These two areas are on the broadcast already
                 'ctry19-E92000001',
@@ -572,8 +586,14 @@ def test_remove_broadcast_area_page(
     mock_get_draft_broadcast_message,
     mock_update_broadcast_message,
     fake_uuid,
+    mocker,
 ):
     service_one['permissions'] += ['broadcast']
+    polygon_class = namedtuple("polygon_class", ["as_coordinate_pairs_lat_long"])
+    coordinates = [[50.1, 0.1], [50.2, 0.2], [50.3, 0.2]]
+    polygons = polygon_class(as_coordinate_pairs_lat_long=coordinates)
+    mocker.patch('app.models.broadcast_message.BroadcastMessage.get_simple_polygons', return_value=polygons)
+
     client_request.get(
         '.remove_broadcast_area',
         service_id=SERVICE_ONE_ID,
@@ -590,6 +610,7 @@ def test_remove_broadcast_area_page(
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
         data={
+            'simple_polygons': coordinates,
             'areas': ['ctry19-S92000003']
         },
     )
