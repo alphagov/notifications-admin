@@ -75,7 +75,7 @@
               {% if user.status == 'pending' %}
                 <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.cancel_invited_user', service_id=current_service.id, invited_user_id=user.id)}}">Cancel invitation<span class="govuk-visually-hidden"> for {{ user.email_address }}</span></a>
               {% elif user.state == 'active' and current_user.id != user.id %}
-                <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.edit_user_permissions', service_id=current_service.id, user_id=user.id)}}">Change details<span class="govuk-visually-hidden"> for {{ user.name }} {{ user.email_address }}</a>
+                <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.edit_user_permissions', service_id=current_service.id, user_id=user.id)}}">Change details<span class="govuk-visually-hidden"> for {{ user.name }} {{ user.email_address }}</span></a>
               {% endif %}
             </li>
           {% endif %}
