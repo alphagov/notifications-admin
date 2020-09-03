@@ -1,3 +1,4 @@
+{% from "components/page-header.html" import page_header %}
 {% from "components/big-number.html" import big_number_with_status, big_number %}
 {% from "components/pill.html" import pill %}
 {% from "components/table.html" import list_table, field, hidden_field_heading, right_aligned_field_heading, row_heading %}
@@ -12,9 +13,7 @@
 
 {% block maincolumn_content %}
 
-  <h1 class="heading-large">
-    Messages sent
-  </h1>
+  {{ page_header('Messages sent') }}
   <div class="bottom-gutter">
     {{ pill(
       items=years,
