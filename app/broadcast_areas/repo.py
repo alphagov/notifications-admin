@@ -166,11 +166,16 @@ class BroadcastAreasRepository(object):
         return areas
 
     def get_all_areas_for_library(self, library_id):
+        # only interested in areas with children - local authorities, counties, unitary authorities. not wards.
         q = """
         SELECT id, name
         FROM broadcast_areas
+        JOIN (
+            SELECT DISTINCT broadcast_area_library_group_id
+            FROM broadcast_areas
+            WHERE broadcast_area_library_group_id IS NOT NULL
+        ) AS parent_broadcast_areas ON parent_broadcast_areas.broadcast_area_library_group_id = broadcast_areas.id
         WHERE broadcast_area_library_id = ?
-        AND broadcast_area_library_group_id IS NULL
         """
 
         results = self.query(q, library_id)

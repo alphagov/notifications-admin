@@ -412,7 +412,7 @@ def test_choose_broadcast_area_page_for_area_with_sub_areas(
         '.choose_broadcast_area',
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
-        library_slug='wd20-lad20',
+        library_slug='wd20-lad20-ctyua19',
     )
     assert normalize_spaces(page.select_one('h1').text) == (
         'Choose a local authority'
@@ -425,7 +425,7 @@ def test_choose_broadcast_area_page_for_area_with_sub_areas(
         'main.choose_broadcast_sub_area',
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
-        library_slug='wd20-lad20',
+        library_slug='wd20-lad20-ctyua19',
     )
     choices = [
         (
@@ -453,7 +453,7 @@ def test_choose_broadcast_area_page_for_area_with_sub_areas(
     ]
 
 
-def test_choose_broadcast_sub_area_page(
+def test_choose_broadcast_sub_area_page_for_district_shows_checkboxes_for_wards(
     client_request,
     service_one,
     mock_get_draft_broadcast_message,
@@ -464,7 +464,7 @@ def test_choose_broadcast_sub_area_page(
         'main.choose_broadcast_sub_area',
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
-        library_slug='wd20-lad20',
+        library_slug='wd20-lad20-ctyua19',
         area_slug='lad20-S12000033',
     )
     assert normalize_spaces(page.select_one('h1').text) == (
@@ -500,6 +500,62 @@ def test_choose_broadcast_sub_area_page(
     assert all_choices[-1:] == sub_choices[-1:] == [
         ('wd20-S13002846', 'Torry/Ferryhill'),
     ]
+
+
+def test_choose_broadcast_sub_area_page_for_county_shows_links_for_districts(
+    client_request,
+    service_one,
+    mock_get_draft_broadcast_message,
+    fake_uuid,
+):
+    service_one['permissions'] += ['broadcast']
+    page = client_request.get(
+        'main.choose_broadcast_sub_area',
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+        library_slug='wd20-lad20-ctyua19',
+        area_slug='ctyua19-E10000016',  # Kent
+    )
+    assert normalize_spaces(page.select_one('h1').text) == (
+        'Choose an area of Kent'
+    )
+    live_search = page.select_one("[data-module=live-search]")
+    assert live_search['data-targets'] == '.file-list-item'
+    assert live_search.select_one('input')['type'] == 'search'
+    all_choices_checkbox = [
+        (
+            choice.select_one('input')['value'],
+            normalize_spaces(choice.select_one('label').text),
+        )
+        for choice in page.select('form[method=post] .govuk-checkboxes__item')
+    ]
+    districts = [
+        (
+            district['href'],
+            district.text,
+        )
+        for district in page.select('form[method=post] a')
+    ]
+    assert all_choices_checkbox == [
+        ('y', 'All of Kent'),
+    ]
+    assert len(districts) == 12
+    assert districts[0][0] == url_for(
+        'main.choose_broadcast_sub_area',
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+        library_slug='wd20-lad20-ctyua19',
+        area_slug='lad20-E07000105'
+    )
+    assert districts[0][1] == 'Ashford'
+    assert districts[-1][0] == url_for(
+        'main.choose_broadcast_sub_area',
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+        library_slug='wd20-lad20-ctyua19',
+        area_slug='lad20-E07000116'
+    )
+    assert districts[-1][1] == 'Tunbridge Wells'
 
 
 def test_add_broadcast_area(
@@ -554,7 +610,7 @@ def test_add_broadcast_area(
         'wd20-S13002836',
     ]),
 ))
-def test_add_broadcast_sub_area(
+def test_add_broadcast_sub_area_district_view(
     client_request,
     service_one,
     mock_get_draft_broadcast_message,
@@ -574,7 +630,7 @@ def test_add_broadcast_sub_area(
         '.choose_broadcast_sub_area',
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
-        library_slug='wd20-lad20',
+        library_slug='wd20-lad20-ctyua19',
         area_slug='lad20-S12000033',
         _data=post_data,
     )
@@ -588,6 +644,44 @@ def test_add_broadcast_sub_area(
                 'ctry19-E92000001',
                 'ctry19-S92000003',
             ] + expected_selected
+        },
+    )
+
+
+def test_add_broadcast_sub_area_county_view(
+    client_request,
+    service_one,
+    mock_get_draft_broadcast_message,
+    mock_update_broadcast_message,
+    fake_uuid,
+    mocker,
+):
+    service_one['permissions'] += ['broadcast']
+    polygon_class = namedtuple("polygon_class", ["as_coordinate_pairs_lat_long"])
+    coordinates = [[50.1, 0.1], [50.2, 0.2], [50.3, 0.2]]
+    polygons = polygon_class(as_coordinate_pairs_lat_long=coordinates)
+    mocker.patch('app.models.broadcast_message.BroadcastMessage.get_simple_polygons', return_value=polygons)
+
+    client_request.post(
+        '.choose_broadcast_sub_area',
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+        library_slug='wd20-lad20-ctyua19',
+        area_slug='ctyua19-E10000016',  # Kent
+        _data={'select_all': 'y'},
+    )
+    mock_update_broadcast_message.assert_called_once_with(
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+        data={
+            'simple_polygons': coordinates,
+            'areas': [
+                # These two areas are on the broadcast already
+                'ctry19-E92000001',
+                'ctry19-S92000003',
+            ] + [
+                'ctyua19-E10000016'
+            ]
         },
     )
 
