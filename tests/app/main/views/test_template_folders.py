@@ -429,7 +429,7 @@ def test_should_show_templates_folder_page(
             **expected_parent_link_args[index]
         )
 
-    links_in_page = page.select('.pill a')
+    links_in_page = page.select('.pill a:not(.pill-item--selected)')
 
     assert len(links_in_page) == len(expected_nav_links)
 

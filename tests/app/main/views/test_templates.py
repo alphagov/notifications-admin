@@ -181,7 +181,7 @@ def test_should_show_page_for_choosing_a_template(
 
     assert normalize_spaces(page.select_one('h1').text) == expected_page_title
 
-    links_in_page = page.select('.pill a')
+    links_in_page = page.select('.pill a:not(.pill-item--selected)')
 
     assert len(links_in_page) == len(expected_nav_links)
 
