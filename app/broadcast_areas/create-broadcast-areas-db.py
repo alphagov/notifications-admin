@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import csv
-from copy import deepcopy
 from pathlib import Path
 
 import geojson
@@ -88,7 +87,7 @@ la_code_to_cty_id_mapping = {
 }
 
 
-def _add_countries():
+def add_countries():
     dataset_id = 'ctry19'
     dataset_geojson = geojson.loads(ctry19_filepath.read_text())
     repo.insert_broadcast_area_library(
@@ -118,7 +117,7 @@ def _add_countries():
     repo.insert_broadcast_areas(areas_to_add)
 
 
-def _add_wards_local_authorities_and_counties():
+def add_wards_local_authorities_and_counties():
     dataset_name = "Local authorities"
     dataset_name_singular = "local authority"
     dataset_id = "wd20-lad20-ctyua19"
@@ -130,15 +129,15 @@ def _add_wards_local_authorities_and_counties():
     )
     _add_electoral_wards(dataset_id)
     _add_local_authorities(dataset_id)
-    _add_wards_local_authorities_and_counties(dataset_id)
+    _add_counties_and_unitary_authorities(dataset_id)
 
 
 def _add_electoral_wards(dataset_id):
     areas_to_add = []
 
-    for f in geojson.loads(wd20_filepath.read_text())["features"]:
-        ward_code = f["properties"]["wd20cd"]
-        ward_name = f["properties"]["wd20nm"]
+    for feature in geojson.loads(wd20_filepath.read_text())["features"]:
+        ward_code = feature["properties"]["wd20cd"]
+        ward_name = feature["properties"]["wd20nm"]
         ward_id = "wd20-" + ward_code
 
         print()  # noqa: T001
@@ -146,9 +145,9 @@ def _add_electoral_wards(dataset_id):
 
         try:
             la_id = "lad20-" + ward_code_to_la_id_mapping[ward_code]
-            la_name = ward_code_to_la_mapping[ward_code]
+
             feature, simple_feature = (
-                polygons_and_simplified_polygons(f["geometry"])
+                polygons_and_simplified_polygons(feature["geometry"])
             )
 
             areas_to_add.append([
@@ -167,10 +166,11 @@ def _add_local_authorities(dataset_id):
     areas_to_add = []
 
     for feature in geojson.loads(lad20_filepath.read_text())["features"]:
-        print()  # noqa: T001
-        print(group_name)  # noqa: T001
         la_id = feature["properties"]["lad20cd"]
         group_name = feature["properties"]["lad20nm"]
+
+        print()  # noqa: T001
+        print(group_name)  # noqa: T001
 
         group_id = "lad20-" + la_id
 
@@ -179,8 +179,6 @@ def _add_local_authorities(dataset_id):
         )
 
         ctyua_id = la_code_to_cty_id_mapping.get(la_id)
-        if ctyua_id:
-            print(f'{group_id} {group_name} is part of {ctyua_id}')  # noqa: T001
         areas_to_add.append([
             group_id,
             group_name,
@@ -198,8 +196,6 @@ def _add_counties_and_unitary_authorities(dataset_id):
     for feature in geojson.loads(ctyua19_filepath.read_text())['features']:
         ctyua_id = feature["properties"]["ctyua19cd"]
         group_name = feature["properties"]["ctyua19nm"]
-
-        print('County/Unitary Authority', group_name)  # noqa: T001
 
         la_id = 'lad20-' + ctyua_id
         if repo.get_areas([la_id]):
@@ -223,8 +219,8 @@ def _add_counties_and_unitary_authorities(dataset_id):
 if __name__ == '__main__':
     repo.delete_db()
     repo.create_tables()
-    _add_countries()
-    _add_wards_local_authorities_and_counties()
+    add_countries()
+    add_wards_local_authorities_and_counties()
 
     most_detailed_polygons = formatted_list(
         sorted(point_counts, reverse=True)[:5],
