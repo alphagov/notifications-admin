@@ -219,23 +219,6 @@ class BroadcastAreasRepository(object):
 
         return areas
 
-    def get_all_groups_for_library(self, library_id):
-        q = """
-        SELECT id, name
-        FROM broadcast_areas
-        WHERE broadcast_area_library_group_id = NULL
-        AND broadcast_area_library_id = ?
-        """
-
-        results = self.query(q, library_id)
-
-        areas = [
-            (row[0], row[1])
-            for row in results
-        ]
-
-        return areas
-
     def get_polygons_for_area(self, area_id):
         q = """
         SELECT polygons
