@@ -113,10 +113,10 @@ def test_should_return_200_when_email_is_not_gov_uk(
         _expected_status=200,
     )
 
-    assert normalize_spaces(page.select_one('.error-message').text) == (
-        'Enter a public sector email address or find out who can use Notify'
+    assert 'Enter a public sector email address or find out who can use Notify' in normalize_spaces(
+        page.select_one('.govuk-error-message').text
     )
-    assert page.select_one('.error-message a')['href'] == url_for(
+    assert page.select_one('.govuk-error-message a')['href'] == url_for(
         'main.who_can_use_notify'
     )
 
@@ -199,11 +199,11 @@ def test_register_with_existing_email_sends_emails(
     ("first.1.2.3.last@example.com", "First Last"),
     ("first.last.1.2.3@example.com", "First Last"),
     # Instances where we can’t make a good-enough guess:
-    ("example123@example.com", ""),
-    ("f.last@example.com", ""),
-    ("f.m.last@example.com", ""),
+    ("example123@example.com", None),
+    ("f.last@example.com", None),
+    ("f.m.last@example.com", None),
 ])
-def test_shows_registration_page_from_invite(
+def test_shows_name_on_registration_page_from_invite(
     client_request,
     fake_uuid,
     email_address,
@@ -223,9 +223,51 @@ def test_shows_registration_page_from_invite(
         }
 
     page = client_request.get('main.register_from_invite')
-    assert page.select_one('input[name=name]')['value'] == expected_value
+    assert page.select_one('input[name=name]').get('value') == expected_value
 
 
+def test_shows_hidden_email_address_on_registration_page_from_invite(
+    client_request,
+    fake_uuid,
+):
+    with client_request.session_transaction() as session:
+        session['invited_user'] = {
+            'id': fake_uuid,
+            'service': fake_uuid,
+            'from_user': "",
+            'email_address': "test@example.com",
+            'permissions': ["manage_users"],
+            'status': "pending",
+            'created_at': datetime.utcnow(),
+            'auth_type': 'sms_auth',
+            'folder_permissions': [],
+        }
+
+    page = client_request.get('main.register_from_invite')
+    assert normalize_spaces(page.select_one('main p').text) == (
+        'Your account will be created with this email address: test@example.com'
+    )
+    hidden_input = page.select_one('form .govuk-visually-hidden input')
+    for attr, value in (
+        ('type', 'email'),
+        ('name', 'username'),
+        ('id', 'username'),
+        ('value', 'test@example.com'),
+        ('disabled', "disabled"),
+        ('tabindex', '-1'),
+        ('aria-hidden', 'true'),
+        ('autocomplete', 'username'),
+    ):
+        assert hidden_input[attr] == value
+
+
+@pytest.mark.parametrize('extra_data', (
+    {},
+    # The username field is present in the page but the POST request
+    # should ignore it
+    {'username': 'invited@user.com'},
+    {'username': 'anythingelse@example.com'},
+))
 def test_register_from_invite(
     client,
     fake_uuid,
@@ -233,6 +275,7 @@ def test_register_from_invite(
     mock_register_user,
     mock_send_verify_code,
     mock_accept_invite,
+    extra_data,
 ):
     invited_user = InvitedUser(
         {
@@ -251,14 +294,15 @@ def test_register_from_invite(
         session['invited_user'] = invited_user.serialize()
     response = client.post(
         url_for('main.register_from_invite'),
-        data={
-            'name': 'Registered in another Browser',
-            'email_address': invited_user.email_address,
-            'mobile_number': '+4407700900460',
-            'service': str(invited_user.id),
-            'password': 'somreallyhardthingtoguess',
-            'auth_type': 'sms_auth'
-        }
+        data=dict(
+            name='Registered in another Browser',
+            email_address=invited_user.email_address,
+            mobile_number='+4407700900460',
+            service=str(invited_user.id),
+            password='somreallyhardthingtoguess',
+            auth_type='sms_auth',
+            **extra_data
+        ),
     )
     assert response.status_code == 302
     assert response.location == url_for('main.verify', _external=True)
@@ -414,8 +458,8 @@ def test_cannot_register_with_sms_auth_and_missing_mobile_number(
 
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    err = page.select_one('.error-message')
-    assert err.text.strip() == 'Cannot be empty'
+    err = page.select_one('.govuk-error-message')
+    assert err.text.strip() == 'Error: Cannot be empty'
     assert err.attrs['data-error-label'] == 'mobile_number'
 
 

@@ -49,10 +49,12 @@ describe("List entry", () => {
       for (let idx = 0; idx < 10; idx++) {
         result += `
             <div class="list-entry">
-              <label for="input-domains-${idx}" class="text-box-number-label">
-                <span class="visuallyhidden">domain number </span>${idx + 1}.
-              </label>
-              <input type="text" name="domains-${idx}" id="input-domains-${idx}" class="form-control form-control-1-1" value="" autocomplete="off">
+              <div class="govuk-form-group">
+                <label for="domains-${idx + 1}" class="govuk-label govuk-input--numbered__label">
+                  <span class="govuk-visually-hidden">domain number </span>${idx + 1}.
+                </label>
+                <input type="text" name="domains-${idx + 1}" id="domains-${idx + 1}" class="govuk-input govuk-input--numbered govuk-!-width-full" autocomplete="off">
+              </div>
             </div>`;
       }
 
@@ -60,15 +62,14 @@ describe("List entry", () => {
     };
 
     document.body.innerHTML =
-      `<fieldset class="form-group" id="domains">
-        <legend>
-          <span class="form-label">
-            Domain names
-            <span class="form-hint">
-              For example cabinet-office.gov.uk
-            </span>
+      `<fieldset class="govuk-form-group" aria-describedby="domains-hint">
+        <legend class="govuk-fieldset__legend">
+          Domain names
           </span>
         </legend>
+        <span id="domains-hint" class="govuk-hint">
+          For example cabinet-office.gov.uk
+        </span>
         <div class="input-list" data-module="list-entry" data-list-item-name="domain" id="list-entry-domains">
           ${entries()} }
         </div>
@@ -180,6 +181,31 @@ describe("List entry", () => {
 
     });
 
+    test("Should copy all unique attributes into the new fields", () => {
+      name_value_pairs = [];
+
+      inputList.querySelectorAll('.list-entry input[type=text]').forEach((field, idx) => {
+
+        name_value_pairs.push({
+          'name': field.getAttribute('name'),
+          'value': field.getAttribute('value')
+        });
+
+      });
+
+      // start module
+      window.GOVUK.modules.start();
+
+      // re-select fields, based on updated DOM
+      fields = inputList.querySelectorAll('.list-entry input[type=text]').forEach((field, idx) => {
+
+        expect(field.getAttribute('name')).toEqual(name_value_pairs[idx].name);
+        expect(field.getAttribute('value')).toEqual(name_value_pairs[idx].value);
+
+      });
+
+    });
+
     test("Should copy all shared attributes into the new fields", () => {
 
       inputList.querySelectorAll('.list-entry input[type=text]').forEach((field, idx) => {
@@ -223,7 +249,7 @@ describe("List entry", () => {
       triggerEvent(inputList.querySelectorAll('.input-list__button--remove')[0], 'click');
 
       const newNums = Array.from(
-                        inputList.querySelectorAll('.text-box-number-label')
+                        inputList.querySelectorAll('.govuk-input--numbered__label')
                       )
                       .map((itemNum, idx) => {
                         return parseInt(itemNum.lastChild.nodeValue, 10);

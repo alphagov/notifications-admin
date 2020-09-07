@@ -233,7 +233,7 @@ def test_email_address_required_for_problems_and_questions(
         _data=data,
         _expected_status=200
     )
-    assert isinstance(page.find('span', {'class': 'error-message'}), element.Tag)
+    assert isinstance(page.find('span', {'class': 'govuk-error-message'}), element.Tag)
 
 
 @freeze_time('2016-12-12 12:00:00.000000')
@@ -255,8 +255,8 @@ def test_email_address_must_be_valid_if_provided_to_support_form(
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
-    assert normalize_spaces(page.select_one('span.error-message').text) == (
-        'Enter a valid email address'
+    assert normalize_spaces(page.select_one('span.govuk-error-message').text) == (
+        'Error: Enter a valid email address'
     )
 
 

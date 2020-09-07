@@ -29,17 +29,6 @@
   {{ broadcast_message.template|string }}
 
   {% call form_wrapper() %}
-    <h3 class="govuk-heading-s govuk-!-margin-top-6 govuk-!-margin-bottom-1">
-      Start time
-    </h3>
-    <p class="govuk-body govuk-!-margin-bottom-4">
-      Your broadcast will start when it’s approved by another member of your team.
-    </p>
-    {{ radio_select(
-      form.finishes_at,
-      show_now_as_default=False,
-      bold_legend=True
-    ) }}
     {{ page_footer('Submit for approval') }}
   {% endcall %}
 

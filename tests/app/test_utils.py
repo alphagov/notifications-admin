@@ -21,6 +21,7 @@ from app.utils import (
     get_logo_cdn_domain,
     get_sample_template,
     is_less_than_90_days_ago,
+    merge_jsonlike,
     printing_today_or_tomorrow,
 )
 from tests.conftest import fake_uuid
@@ -596,3 +597,26 @@ def test_is_less_than_90_days_ago(date_from_db, expected_result):
 def test_get_sample_template_returns_template(template_type):
     template = get_sample_template(template_type)
     assert isinstance(template, Template)
+
+
+@pytest.mark.parametrize("source_object, destination_object, expected_result", [
+    # simple dicts:
+    ({"a": "b"}, {"c": "d"}, {"a": "b", "c": "d"}),
+    # dicts with nested dict, both under same key, additive behaviour:
+    ({"a": {"b": "c"}}, {"a": {"e": "f"}}, {"a": {"b": "c", "e": "f"}}),
+    # same key in both dicts, value is a string, destination supersedes source:
+    ({"a": "b"}, {"a": "c"}, {"a": "c"}),
+    # lists in dicts behave as top level lists
+    ({"a": ["b", "c", "d"]}, {"a": ["b", "e", "f"]}, {"a": ["b",  "c", "d", "e", "f"]}),
+    # lists with same string in both result in a list of unique values
+    (["a", "b", "c", "d"], ["d", "e", "f"], ["a", "b", "c", "d", "e", "f"]),
+    # lists with same dict in both result in a list with one instance of that dict
+    ([{"b": "c"}], [{"b": "c"}], [{"b": "c"}]),
+    # if dicts in lists have different values, they are not merged
+    ([{"b": "c"}], [{"b": "e"}], [{"b": "c"}, {"b": "e"}]),
+    # merge a dict with a null object returns that dict (does not work the other way round)
+    ({"a": {"b": "c"}}, None, {"a": {"b": "c"}}),
+])
+def test_merge_jsonlike_merges_jsonlike_objects_correctly(source_object, destination_object, expected_result):
+    merge_jsonlike(source_object, destination_object)
+    assert source_object == expected_result

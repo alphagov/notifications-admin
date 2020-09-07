@@ -23,17 +23,17 @@
       </p>
 
       {% call form_wrapper() %}
-        {{ textbox(
-          form.url,
-          width='1-1',
-          hint='Must start with https://'
-        ) }}
-        {{ textbox(
-          form.bearer_token,
-          width='1-1',
-          hint='At least 10 characters',
-          autocomplete='new-password'
-        ) }}
+        {{ form.url(param_extensions={
+          "classes": "govuk-!-width-full",
+          "hint": {"text": "Must start with https://"}
+        }) }}
+
+        {{ form.bearer_token(param_extensions={
+          "classes": "govuk-!-width-full",
+          "hint": {"text": "At least 10 characters"},
+          "autocomplete": "new-password"
+        }) }}
+
         {{ page_footer('Save') }}
       {% endcall %}
     </div>

@@ -1,6 +1,6 @@
 const helpers = require('./support/helpers');
 
-function setFixtures (hierarchy) {
+function setFixtures (hierarchy, newTemplateDataModules = "") {
 
   const foldersCheckboxesHTML = function (filter) {
     let count = 0;
@@ -27,7 +27,7 @@ function setFixtures (hierarchy) {
 
   }();
 
-  function controlsHTML () {
+  function controlsHTML (newTemplateDataModules) {
 
     return `<div id="sticky_template_forms">
               <button type="submit" name="operation" value="unknown" hidden=""></button>
@@ -53,11 +53,11 @@ function setFixtures (hierarchy) {
               <div id="move_to_new_folder_form">
                 <fieldset class="js-will-stick-at-bottom-when-scrolling">
                   <legend class="visuallyhidden">Add to new folder</legend>
-                  <div class="form-group">
-                    <label class="form-label" for="move_to_new_folder_name">
+                  <div class="govuk-form-group">
+                    <label class="govuk-label" for="move_to_new_folder_name">
                       Folder name
                     </label>
-                    <input class="form-control form-control-1-1 " id="move_to_new_folder_name" name="move_to_new_folder_name" rows="8" type="text" value="">
+                    <input class="govuk-input govuk-!-width-full" id="move_to_new_folder_name" name="move_to_new_folder_name" type="text">
                   </div>
                   <div class="page-footer">
                     <button type="submit" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-1" name="operation" value="move-to-new-folder">Add to new folder</button>
@@ -67,18 +67,18 @@ function setFixtures (hierarchy) {
               <div id="add_new_folder_form">
                 <fieldset class="js-will-stick-at-bottom-when-scrolling">
                   <legend class="visuallyhidden">Add new folder</legend>
-                  <div class="form-group">
-                    <label class="form-label" for="add_new_folder_name">
+                  <div class="govuk-form-group">
+                    <label class="govuk-label" for="add_new_folder_name">
                       Folder name
                     </label>
-                    <input class="form-control form-control-1-1 " id="add_new_folder_name" name="add_new_folder_name" rows="8" type="text" value="">
+                    <input class="govuk-input govuk-!-width-full" id="add_new_folder_name" name="add_new_folder_name" type="text">
                   </div>
                   <div class="page-footer">
                     <button type="submit" class="govuk-button page-footer__button" name="operation" value="add-new-folder">Add new folder</button>
                   </div>
                 </fieldset>
               </div>
-              <div id="add_new_template_form">
+              <div id="add_new_template_form" ${newTemplateDataModules}>
                 <div class="js-will-stick-at-bottom-when-scrolling">
                   <div class="form-group ">
                     <fieldset id="add_template_by_template_type">
@@ -127,7 +127,7 @@ function setFixtures (hierarchy) {
   document.body.innerHTML = `
     <form method="post" data-module="template-folder-form">
       ${helpers.templatesAndFoldersCheckboxes(hierarchy)}
-      ${controlsHTML()}
+      ${controlsHTML(newTemplateDataModules)}
     </form>`;
 
 };
@@ -308,6 +308,37 @@ describe('TemplateFolderForm', () => {
     });
 
   });
+
+  describe("Click 'New template' for single channel service", () => {
+    test("should redirect to new template page", () => {
+      setFixtures(hierarchy, "data-channel='sms' data-service='123'")
+      templateFolderForm = document.querySelector('form[data-module=template-folder-form]');
+
+      // start module
+      window.GOVUK.modules.start();
+
+      formControls = templateFolderForm.querySelector('#sticky_template_forms');
+
+      // reset sticky JS mocks called when the module starts
+      resetStickyMocks();
+      // add listener for url change
+      const descriptor1 = Object.getOwnPropertyDescriptor(window, 'location');
+      delete window.location
+
+      const mockCallback = jest.fn(x => {});
+
+      Object.defineProperty(window, 'location', {
+        set: mockCallback
+      });
+      // click
+      helpers.triggerEvent(formControls.querySelector('[value=add-new-template]'), 'click');
+      // expect url to change
+      expect(mockCallback).toHaveBeenCalledWith("/services/123/templates/add-sms")
+
+      setFixtures(hierarchy)
+      resetStickyMocks()
+    });
+  })
 
   describe("Clicking 'New template'", () => {
 

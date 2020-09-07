@@ -6,13 +6,6 @@
 {% from "components/message-count-label.html" import message_count_label, recipient_count_label %}
 {% from "components/button/macro.njk" import govukButton %}
 
-{% set file_contents_header_id = 'file-preview' %}
-{% macro skip_to_file_contents() %}
-  <p class="govuk-visually-hidden">
-    <a class="govuk-link govuk-link--no-visited-state" href="#{{ file_contents_header_id }}">Skip to file contents</a>
-  </p>
-{% endmacro %}
-
 {% block service_page_title %}
   {{ original_file_name }}
 {% endblock %}

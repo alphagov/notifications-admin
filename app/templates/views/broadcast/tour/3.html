@@ -3,7 +3,7 @@
 {% extends "admin_template.html" %}
 
 {% block per_page_title %}
-  Step 3
+  The phone will make a loud alarm noise, even if it’s set on silent.
 {% endblock %}
 
 {% set mainClasses = "govuk-!-padding-top-0 govuk-!-padding-bottom-0" %}
@@ -14,28 +14,17 @@
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-one-half">
         <h1 class="heading-medium">
-          You have a trial account
+          The phone will make a loud alarm noise, even if it’s set on silent.
         </h1>
-        <ul>
-          <li>
-            There’s no risk of triggering a real, live broadcast
-          </li>
-          <li>
-            Get familiar with the system now, so you’re ready to use it if
-            there’s an emergency
-          </li>
-          <li>
-            When you’re ready, apply for a live account
-          </li>
-        </ul>
         <p class="govuk-body heading-medium">
-          <a class="govuk-link govuk-link--no-visited-state" href='{{ url_for(".service_dashboard", service_id=current_service.id) }}'>
-            Continue to dashboard
+          <a class="govuk-link govuk-link--no-visited-state" href='{{ url_for(".broadcast_tour", service_id=current_service.id, step_index=4) }}'>
+            Continue
           </a>
         </p>
       </div>
       <div class="govuk-grid-column-one-half">
         <img src="{{ asset_url('images/broadcast-tour/3.png') }}" alt="">
+        <link rel="preload" href="{{ asset_url('images/broadcast-tour/4.png') }}" as="image">
       </div>
     </div>
   </div>

@@ -649,6 +649,7 @@ def broadcast_message_json(
     cancelled_at=None,
     approved_by_id=None,
     cancelled_by_id=None,
+    areas=None,
 ):
     return {
         'id': id_,
@@ -660,8 +661,8 @@ def broadcast_message_json(
         'template_name': 'Example template',
 
         'personalisation': {},
-        'areas': [
-            'england', 'scotland',
+        'areas': areas or [
+            'ctry19-E92000001', 'ctry19-S92000003',
         ],
 
         'status': status,

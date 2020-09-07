@@ -12,8 +12,8 @@
   </h1>
 
   {% call form_wrapper() %}
-    {{ textbox(form.start_date, hint="Enter start date in format YYYY-MM-DD") }}
-    {{ textbox(form.end_date, hint="Enter end date in format YYYY-MM-DD") }}
+    {{ form.start_date(param_extensions={"hint": {"text": "Enter start date in format YYYY-MM-DD"}}) }}
+    {{ form.end_date(param_extensions={"hint": {"text": "Enter end date in format YYYY-MM-DD"}}) }}
     {{ page_footer('Download report') }}
   {% endcall %}
 

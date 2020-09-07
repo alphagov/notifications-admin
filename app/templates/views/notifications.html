@@ -41,17 +41,17 @@
     class="govuk-grid-row"
   ) %}
     <div class="govuk-grid-column-three-quarters {% if message_type == 'sms' %}extra-tracking{% endif %}">
-      {{ textbox(
-        search_form.to,
-        width='1-1',
-        label=things_you_can_search_by|formatted_list(
-          conjunction='or',
-          before_each='',
-          after_each='',
-          prefix='Search by',
-          prefix_plural='Search by'
-        )
-      ) }}
+      {{ search_form.to(param_extensions={
+            "label": {
+              "text": things_you_can_search_by|formatted_list(
+                conjunction='or',
+                before_each='',
+                after_each='',
+                prefix='Search by',
+                prefix_plural='Search by'
+              )
+            }
+      }) }}
     </div>
     <div class="govuk-grid-column-one-quarter">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -63,7 +63,7 @@
   {% endcall %}
 
   {% call form_wrapper(id="search-form") %}
-    <input type="hidden" name="to" value="{{ search_form.to.data }}">
+    <input type="hidden" name="to" {% if search_form.to.data %}value="{{ search_form.to.data }}{%  endif %}">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
   {% endcall %}
 

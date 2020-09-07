@@ -27,9 +27,18 @@
       {% endif %}
       {% call form_wrapper() %}
         <div class="form-group">
-          {{ textbox(form.volume_email, width='1-2', hint='For example, 50,000') }}
-          {{ textbox(form.volume_sms, width='1-2', hint='For example, 50,000') }}
-          {{ textbox(form.volume_letter, width='1-2', hint='For example, 50,000') }}
+          {{ form.volume_email(param_extensions={
+            "classes": "govuk-!-width-one-half",
+            "hint": {"text": "For example, 50,000"},
+          }) }}
+          {{ form.volume_sms(param_extensions={
+            "classes": "govuk-!-width-one-half",
+            "hint": {"text": "For example, 50,000"},
+          }) }}
+          {{ form.volume_letter(param_extensions={
+            "classes": "govuk-!-width-one-half",
+            "hint": {"text": "For example, 50,000"},
+          }) }}
         </div>
         {{ radios(form.consent_to_research, hint='You do not have to take part and you can unsubscribe at any time') }}
         {{ page_footer('Continue') }}

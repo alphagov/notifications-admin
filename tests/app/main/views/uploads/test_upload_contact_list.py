@@ -40,8 +40,7 @@ def test_upload_contact_list_page(client_request):
         (
             'Your file has too many columns '
             'It needs to have 1 column, called ‘email address’ or ‘phone number’. '
-            'Right now it has 2 columns called ‘telephone’ and ‘name’. '
-            'Skip to file contents'
+            'Right now it has 2 columns called ‘telephone’ and ‘name’.'
         ),
         'Row in file 1 telephone name',
         '2 +447700900986',
@@ -54,8 +53,7 @@ def test_upload_contact_list_page(client_request):
         (
             'Your file has too many columns '
             'It needs to have 1 column, called ‘email address’ or ‘phone number’. '
-            'Right now it has 2 columns called ‘phone number’ and ‘email address’. '
-            'Skip to file contents'
+            'Right now it has 2 columns called ‘phone number’ and ‘email address’.'
         ),
         'Row in file 1 phone number email address',
         '2 +447700900986 test@example.com',
@@ -67,8 +65,7 @@ def test_upload_contact_list_page(client_request):
         """,
         (
             'There’s a problem with invalid.csv '
-            'You need to fix 1 email address. '
-            'Skip to file contents'
+            'You need to fix 1 email address.'
         ),
         'Row in file 1 email address',
         '2 Not a valid email address +447700900986',
@@ -80,8 +77,7 @@ def test_upload_contact_list_page(client_request):
         """,
         (
             'There’s a problem with invalid.csv '
-            'You need to fix 1 phone number. '
-            'Skip to file contents'
+            'You need to fix 1 phone number.'
         ),
         'Row in file 1 phone number',
         '2 Must not contain letters or symbols test@example.com',
@@ -94,8 +90,7 @@ def test_upload_contact_list_page(client_request):
         (
             'Your file has too many columns '
             'It needs to have 1 column, called ‘email address’ or ‘phone number’. '
-            'Right now it has 3 columns called ‘phone number’, ‘phone number’ and ‘PHONE_NUMBER’. '
-            'Skip to file contents'
+            'Right now it has 3 columns called ‘phone number’, ‘phone number’ and ‘PHONE_NUMBER’.'
         ),
         'Row in file 1 phone number phone number PHONE_NUMBER',
         '2 +447700900333 +447700900333 +447700900333',
@@ -106,8 +101,7 @@ def test_upload_contact_list_page(client_request):
         """,
         (
             'Your file is missing some rows '
-            'It needs at least one row of data. '
-            'Skip to file contents'
+            'It needs at least one row of data.'
         ),
         'Row in file 1 phone number',
         '',
@@ -117,8 +111,7 @@ def test_upload_contact_list_page(client_request):
         (
             'Your file is missing some rows '
             'It needs at least one row of data, in a column called '
-            '‘email address’ or ‘phone number’. '
-            'Skip to file contents'
+            '‘email address’ or ‘phone number’.'
         ),
         'Row in file 1 +447700900986',
         '',
@@ -128,8 +121,7 @@ def test_upload_contact_list_page(client_request):
         (
             'Your file is missing some rows '
             'It needs at least one row of data, in a column called '
-            '‘email address’ or ‘phone number’. '
-            'Skip to file contents'
+            '‘email address’ or ‘phone number’.'
         ),
         'Row in file 1',
         '',
@@ -143,8 +135,7 @@ def test_upload_contact_list_page(client_request):
         """,
         (
             'There’s a problem with invalid.csv '
-            'You need to enter missing data in 1 row. '
-            'Skip to file contents'
+            'You need to enter missing data in 1 row.'
         ),
         'Row in file 1 phone number',
         (
@@ -158,8 +149,7 @@ def test_upload_contact_list_page(client_request):
         """,
         (
             'There’s a problem with invalid.csv '
-            'You need to fix 1 phone number. '
-            'Skip to file contents'
+            'You need to fix 1 phone number.'
         ),
         'Row in file 1 phone number',
         '2 Not enough digits +447700900',
@@ -173,8 +163,7 @@ def test_upload_contact_list_page(client_request):
         """,
         (
             'There’s a problem with invalid.csv '
-            'You need to fix 2 email addresses. '
-            'Skip to file contents'
+            'You need to fix 2 email addresses.'
         ),
         'Row in file 1 email address',
         (
@@ -257,8 +246,7 @@ def test_upload_csv_file_shows_error_banner_for_too_many_rows(
     assert normalize_spaces(page.select_one('.banner-dangerous').text) == (
         'Your file has too many rows '
         'Notify can store files up to 50,000 rows in size. '
-        'Your file has 50,001 rows. '
-        'Skip to file contents'
+        'Your file has 50,001 rows.'
     )
     assert len(page.select('tbody tr')) == 50
     assert normalize_spaces(page.select_one('.table-show-more-link').text) == (
@@ -288,8 +276,7 @@ def test_upload_csv_shows_trial_mode_error(
 
     assert normalize_spaces(page.select_one('.banner-dangerous').text) == (
         'You cannot save this phone number '
-        'In trial mode you can only send to yourself and members of your team '
-        'Skip to file contents'
+        'In trial mode you can only send to yourself and members of your team'
     )
     assert page.select_one('.banner-dangerous a')['href'] == url_for(
         'main.trial_mode_new'

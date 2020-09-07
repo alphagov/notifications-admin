@@ -88,10 +88,10 @@ def test_page_to_create_new_organisation(
     page = client_request.get('.add_organisation')
 
     assert [
-        (input['type'], input['name'], input['value'])
+        (input['type'], input['name'], input.get('value'))
         for input in page.select('input')
     ] == [
-        ('text', 'name', ''),
+        ('text', 'name', None),
         ('radio', 'organisation_type', 'central'),
         ('radio', 'organisation_type', 'local'),
         ('radio', 'organisation_type', 'nhs_central'),
@@ -155,9 +155,9 @@ def test_create_new_organisation_validates(
     )
     assert [
         (error['data-error-label'], normalize_spaces(error.text))
-        for error in page.select('.error-message')
+        for error in page.select('.govuk-error-message, .error-message')
     ] == [
-        ('name', 'Cannot be empty'),
+        ('name', 'Error: Cannot be empty'),
         ('organisation_type', 'Select the type of organisation'),
         ('crown_status', 'Select whether this organisation is a crown body'),
     ]
@@ -184,7 +184,7 @@ def test_create_new_organisation_fails_if_new_name_has_less_than_2_alphanumeric_
         _expected_status=200,
     )
     assert mock_create_organisation.called is False
-    assert page.find("span", {"class": "error-message"})
+    assert page.find("span", {"class": "govuk-error-message"})
 
 
 @pytest.mark.parametrize('organisation_type, organisation, expected_status', (
@@ -358,7 +358,7 @@ def test_validation_of_gps_creating_organisations(
         _data=data,
         _expected_status=200,
     )
-    assert normalize_spaces(page.select_one('.error-message').text) == expected_error
+    assert expected_error in page.select_one('.govuk-error-message, .error-message').text
 
 
 def test_nhs_local_assigns_to_selected_organisation(
@@ -628,6 +628,34 @@ def test_organisation_trial_mode_services_doesnt_work_if_not_platform_admin(
         '.organisation_trial_mode_services',
         org_id=ORGANISATION_ID,
         _expected_status=403
+    )
+
+
+def test_cancel_invited_org_user_cancels_user_invitations(
+    client_request,
+    mock_get_invites_for_organisation,
+    sample_org_invite,
+    mock_get_organisation,
+    mock_get_users_for_organisation,
+    mocker,
+):
+    mock_cancel = mocker.patch('app.org_invite_api_client.cancel_invited_user')
+    mocker.patch('app.org_invite_api_client.get_invited_user', return_value=sample_org_invite)
+
+    page = client_request.get(
+        'main.cancel_invited_org_user',
+        org_id=ORGANISATION_ID,
+        invited_user_id=sample_org_invite['id'],
+        _follow_redirects=True
+    )
+    assert normalize_spaces(page.h1.text) == 'Team members'
+    flash_banner = normalize_spaces(
+        page.find('div', class_='banner-default-with-tick').text
+    )
+    assert flash_banner == f"Invitation cancelled for {sample_org_invite['email_address']}"
+    mock_cancel.assert_called_once_with(
+        org_id=ORGANISATION_ID,
+        invited_user_id=sample_org_invite['id'],
     )
 
 
@@ -902,27 +930,27 @@ def test_view_organisation_domains(
         org_id=ORGANISATION_ID,
     )
 
-    assert [textbox['value'] for textbox in page.select('input[type=text]')] == [
+    assert [textbox.get('value') for textbox in page.select('input[type=text]')] == [
         'example.gov.uk',
         'test.example.gov.uk',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
     ]
 
 
@@ -1056,9 +1084,7 @@ def test_update_organisation_with_incorrect_input(
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
-    assert normalize_spaces(
-        page.select_one('.error-message').text
-    ) == "Cannot be empty"
+    assert "Cannot be empty" in page.select_one('.govuk-error-message').text
 
 
 def test_update_organisation_with_non_unique_name(
@@ -1075,9 +1101,7 @@ def test_update_organisation_with_non_unique_name(
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
-    assert normalize_spaces(
-        page.select_one('.error-message').text
-    ) == 'This organisation name is already in use'
+    assert 'This organisation name is already in use' in page.select_one('.govuk-error-message').text
 
     assert mock_organisation_name_is_not_unique.called
 
@@ -1132,8 +1156,8 @@ def test_confirm_update_organisation_with_incorrect_password(
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
     assert normalize_spaces(
-        page.select_one('.error-message').text
-    ) == 'Invalid password'
+        page.select_one('.govuk-error-message').text
+    ) == 'Error: Invalid password'
 
 
 def test_confirm_update_organisation_with_name_already_in_use(

@@ -16,12 +16,7 @@ from app import (
     service_api_client,
 )
 from app.main import main
-from app.main.forms import (
-    CreateKeyForm,
-    GuestList,
-    ServiceDeliveryStatusCallbackForm,
-    ServiceReceiveMessagesCallbackForm,
-)
+from app.main.forms import CallbackForm, CreateKeyForm, GuestList
 from app.notify_client.api_key_api_client import (
     KEY_TYPE_NORMAL,
     KEY_TYPE_TEAM,
@@ -195,7 +190,7 @@ def delivery_status_callback(service_id):
         else '.api_integration'
     )
 
-    form = ServiceDeliveryStatusCallbackForm(
+    form = CallbackForm(
         url=delivery_status_callback.get('url') if delivery_status_callback else '',
         bearer_token=dummy_bearer_token if delivery_status_callback else ''
     )
@@ -255,7 +250,7 @@ def received_text_messages_callback(service_id):
         return redirect(url_for('.api_integration', service_id=service_id))
 
     received_text_messages_callback = get_received_text_messages_callback()
-    form = ServiceReceiveMessagesCallbackForm(
+    form = CallbackForm(
         url=received_text_messages_callback.get('url') if received_text_messages_callback else '',
         bearer_token=dummy_bearer_token if received_text_messages_callback else ''
     )

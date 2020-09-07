@@ -1,5 +1,7 @@
 .area-list {
 
+  display: inline-block;
+  
   &-item {
 
     display: inline-block;
@@ -53,6 +55,10 @@
 
       }
 
+    }
+
+    &:last-child {
+      margin-right: govuk-spacing(1) * 1.5;
     }
 
     &--unremoveable {

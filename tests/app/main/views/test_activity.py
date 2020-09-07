@@ -363,7 +363,7 @@ def test_shows_message_when_no_notifications(
         {},
         {},
         'Search by recipient',
-        '',
+        None,
     ),
     (
         {
@@ -371,7 +371,7 @@ def test_shows_message_when_no_notifications(
         },
         {},
         'Search by phone number',
-        '',
+        None,
     ),
     (
         {
@@ -441,7 +441,7 @@ def test_search_recipient_form(
     assert(len(recipient_inputs) == 2)
 
     for field in recipient_inputs:
-        assert field['value'] == expected_search_box_contents
+        assert field.get("value") == expected_search_box_contents
 
 
 @pytest.mark.parametrize('message_type, expected_search_box_label', [
@@ -648,29 +648,46 @@ def test_html_contains_links_for_failed_notifications(
         assert normalize_spaces(link_text) == 'Technical failure'
 
 
+@pytest.mark.parametrize('notification_type, expected_row_contents', (
+    ('sms', (
+        '07123456789 hello & welcome hidden'
+    )),
+    ('email', (
+        'example@gov.uk hidden, hello & welcome'
+    )),
+    ('letter', (
+        # Letters don’t support redaction, but this test is still
+        # worthwhile to show that the ampersand is not double-escaped
+        '1 Example Street ((name)), hello & welcome'
+    )),
+))
 def test_redacts_templates_that_should_be_redacted(
     client_request,
     mocker,
     mock_get_service_statistics,
     mock_get_service_data_retention,
     mock_get_no_api_keys,
+    notification_type,
+    expected_row_contents,
 ):
     notifications = create_notifications(
         status='technical-failure',
-        content='hello ((name))',
+        content='hello & welcome ((name))',
+        subject='((name)), hello & welcome',
         personalisation={'name': 'Jo'},
         redact_personalisation=True,
+        template_type=notification_type,
     )
     mocker.patch('app.notification_api_client.get_notifications_for_service', return_value=notifications)
 
     page = client_request.get(
         'main.view_notifications',
         service_id=SERVICE_ONE_ID,
-        message_type='sms',
+        message_type=notification_type,
     )
 
     assert normalize_spaces(page.select('tbody tr th')[0].text) == (
-        '07123456789 hello hidden'
+        expected_row_contents
     )
 
 

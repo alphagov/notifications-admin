@@ -1,9 +1,12 @@
-from datetime import datetime
+import itertools
+from datetime import datetime, timedelta
 
-from notifications_utils.broadcast_areas import broadcast_area_libraries
 from notifications_utils.template import BroadcastPreviewTemplate
 from orderedset import OrderedSet
+from werkzeug.utils import cached_property
 
+from app.broadcast_areas import broadcast_area_libraries
+from app.broadcast_areas.polygons import Polygons
 from app.models import JSONModel, ModelList
 from app.models.user import User
 from app.notify_client.broadcast_message_api_client import (
@@ -38,9 +41,9 @@ class BroadcastMessage(JSONModel):
 
     def __lt__(self, other):
         return (
-            self.cancelled_at or self.finishes_at
+            self.cancelled_at or self.finishes_at or self.created_at
         ) < (
-            other.cancelled_at or other.finishes_at
+            other.cancelled_at or other.finishes_at or self.created_at
         )
 
     @classmethod
@@ -69,11 +72,24 @@ class BroadcastMessage(JSONModel):
             area.name for area in self.areas
         ][:10]
 
-    @property
+    @cached_property
     def polygons(self):
-        return broadcast_area_libraries.get_polygons_for_areas_lat_long(
-            *self._dict['areas']
+        return Polygons(
+            list(itertools.chain(*(
+                area.polygons for area in self.areas
+            )))
         )
+
+    @cached_property
+    def simple_polygons(self):
+        polygons = Polygons(
+            list(itertools.chain(*(
+                area.simple_polygons for area in self.areas
+            )))
+        )
+        # If we’ve added multiple areas then we need to re-simplify the
+        # combined shapes to keep the point count down
+        return polygons.smooth.simplify if len(self.areas) > 1 else polygons
 
     @property
     def template(self):
@@ -94,15 +110,15 @@ class BroadcastMessage(JSONModel):
             return 'completed'
         return self._dict['status']
 
-    @property
+    @cached_property
     def created_by(self):
         return User.from_id(self.created_by_id)
 
-    @property
+    @cached_property
     def approved_by(self):
         return User.from_id(self.approved_by_id)
 
-    @property
+    @cached_property
     def cancelled_by(self):
         return User.from_id(self.cancelled_by_id)
 
@@ -131,15 +147,15 @@ class BroadcastMessage(JSONModel):
             data=kwargs,
         )
 
-    def request_approval(self, until):
-        self._update(
-            finishes_at=until,
-        )
+    def request_approval(self):
         self._set_status_to('pending-approval')
 
     def approve_broadcast(self):
         self._update(
             starts_at=datetime.utcnow().isoformat(),
+            finishes_at=(
+                datetime.utcnow() + timedelta(hours=23, minutes=59)
+            ).isoformat(),
         )
         self._set_status_to('broadcasting')
 

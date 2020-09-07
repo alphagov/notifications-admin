@@ -36,7 +36,7 @@ from tests.conftest import (
             'Cannot Add and edit templates '
             'Cannot Manage settings, team and usage '
             'Cannot Manage API integration '
-            'Change details'
+            'Change details for ZZZZZZZZ zzzzzzz@example.gov.uk'
         )
     ),
     (
@@ -997,23 +997,61 @@ def test_invite_user_to_broadcast_service(
     )
 
 
+def test_invite_non_govt_user_to_broadcast_service_fails_validation(
+    client_request,
+    service_one,
+    active_user_with_permissions,
+    mocker,
+    sample_invite,
+    mock_get_template_folders,
+    mock_get_organisations,
+):
+    service_one['permissions'] = ['broadcast']
+    mocker.patch('app.models.user.InvitedUsers.client_method', return_value=[sample_invite])
+    mocker.patch('app.models.user.Users.client_method', return_value=[active_user_with_permissions])
+    mocker.patch('app.invite_api_client.create_invite', return_value=sample_invite)
+    post_data = {
+        'permissions_field': [
+            'send_messages',
+            'manage_templates',
+            'manage_service',
+        ],
+        'email_address': 'random@example.com'
+    }
+    page = client_request.post(
+        'main.invite_user',
+        service_id=SERVICE_ONE_ID,
+        _data=post_data,
+        _expected_status=200
+    )
+    assert app.invite_api_client.create_invite.called is False
+    assert "Enter a public sector email address" in page.find_all('span', class_='govuk-error-message')[0].text
+
+
 def test_cancel_invited_user_cancels_user_invitations(
     client_request,
     mock_get_invites_for_service,
     sample_invite,
     active_user_with_permissions,
+    mock_get_users_by_service,
+    mock_get_template_folders,
     mocker,
 ):
     mock_cancel = mocker.patch('app.invite_api_client.cancel_invited_user')
-    client_request.get(
+    mocker.patch('app.invite_api_client.get_invited_user', return_value=sample_invite)
+
+    page = client_request.get(
         'main.cancel_invited_user',
         service_id=SERVICE_ONE_ID,
         invited_user_id=sample_invite['id'],
-        _expected_status=302,
-        _expected_redirect=url_for(
-            'main.manage_users', service_id=SERVICE_ONE_ID, _external=True
-        ),
+        _follow_redirects=True,
     )
+
+    assert normalize_spaces(page.h1.text) == 'Team members'
+    flash_banner = normalize_spaces(
+        page.find('div', class_='banner-default-with-tick').text
+    )
+    assert flash_banner == f"Invitation cancelled for {sample_invite['email_address']}"
     mock_cancel.assert_called_once_with(
         service_id=SERVICE_ONE_ID,
         invited_user_id=sample_invite['id'],
@@ -1043,7 +1081,7 @@ def test_cancel_invited_user_doesnt_work_if_user_not_invited_to_this_service(
         'Cannot Add and edit templates '
         'Can Manage settings, team and usage '
         'Can Manage API integration '
-        'Cancel invitation'
+        'Cancel invitation for invited_user@test.gov.uk'
     )),
     ('cancelled', (
         'invited_user@test.gov.uk (cancelled invite) '
@@ -1116,8 +1154,8 @@ def test_user_cant_invite_themselves(
         _expected_status=200,
     )
     assert page.h1.string.strip() == 'Invite a team member'
-    form_error = page.find('span', class_='error-message').string.strip()
-    assert form_error == "You cannot send an invitation to yourself"
+    form_error = page.find('span', class_='govuk-error-message').text.strip()
+    assert form_error == "Error: You cannot send an invitation to yourself"
     assert not mock_create_invite.called
 
 
@@ -1163,7 +1201,7 @@ def test_manage_user_page_shows_how_many_folders_user_can_view(
 
     page = client_request.get('main.manage_users', service_id=service_one['id'])
 
-    user_div = page.select_one("h3[title='notify@digital.cabinet-office.gov.uk']").parent
+    user_div = page.select_one("h2[title='notify@digital.cabinet-office.gov.uk']").parent
     assert user_div.select_one('.tick-cross-list-hint:last-child').text.strip() == expected_message
 
 
@@ -1180,7 +1218,7 @@ def test_manage_user_page_doesnt_show_folder_hint_if_service_has_no_folders(
 
     page = client_request.get('main.manage_users', service_id=service_one['id'])
 
-    user_div = page.select_one("h3[title='notify@digital.cabinet-office.gov.uk']").parent
+    user_div = page.select_one("h2[title='notify@digital.cabinet-office.gov.uk']").parent
     assert user_div.find('.tick-cross-list-hint:last-child') is None
 
 
@@ -1199,7 +1237,7 @@ def test_manage_user_page_doesnt_show_folder_hint_if_service_cant_edit_folder_pe
 
     page = client_request.get('main.manage_users', service_id=service_one['id'])
 
-    user_div = page.select_one("h3[title='notify@digital.cabinet-office.gov.uk']").parent
+    user_div = page.select_one("h2[title='notify@digital.cabinet-office.gov.uk']").parent
     assert user_div.find('.tick-cross-list-hint:last-child') is None
 
 
@@ -1404,7 +1442,7 @@ def test_edit_user_email_cannot_change_a_gov_email_address_to_a_non_gov_email_ad
         },
         _expected_status=200,
     )
-    assert 'Enter a public sector email address' in page.select_one('.error-message').text
+    assert 'Enter a public sector email address' in page.select_one('.govuk-error-message').text
     with client_request.session_transaction() as session:
         assert 'team_member_email_change-'.format(active_user_with_permissions['id']) not in session
 

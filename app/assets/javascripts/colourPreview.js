@@ -8,9 +8,9 @@
 
     this.start = component => {
 
-      this.$input = $('input', component);
+      this.$input = $(component);
 
-      $(component).append(
+      this.$input.closest('.govuk-form-group').append(
         this.$preview = $('<span class="textbox-colour-preview"></span>')
       );
 

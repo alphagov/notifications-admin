@@ -70,7 +70,8 @@ const copy = {
         'fieldset',
         'hint',
         'label',
-        'checkboxes'
+        'checkboxes',
+        'input'
       ];
       let done = 0;
 
@@ -258,7 +259,8 @@ const lint = {
         paths.src + 'stylesheets/views/*.scss',
       ])
       .pipe(plugins.sassLint({
-        'options': { 'formatter': 'stylish' }
+        'options': { 'formatter': 'stylish' },
+        'rules': { 'mixins-before-declarations': [2, { 'exclude': ['media', 'govuk-media-query'] } ] }
       }))
       .pipe(plugins.sassLint.format())
       .pipe(plugins.sassLint.failOnError());

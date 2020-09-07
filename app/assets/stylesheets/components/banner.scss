@@ -80,7 +80,14 @@
 
   &-no-fixed-height {
     height: auto;
+    padding-top: govuk-spacing(8);
     min-height: 425px;
+  }
+
+  &-with-service-name {
+    margin-top: -10px;
+    padding-top: 0;
+    box-shadow: 0 -1px 0 0 darken($govuk-blue, 10%);
   }
 
   .heading-medium {
@@ -143,6 +150,8 @@
   img {
     width: 100%;
     height: auto;
+    position: relative;
+    top: -1 * govuk-spacing(2);
   }
 
   .greyed-out-step {

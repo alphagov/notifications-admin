@@ -23,7 +23,7 @@
     {% endif %}
     {% for item in current_service.sms_senders_with_hints %}
       <div class="user-list-item">
-        <h3>
+        <h2 class="user-list-item-heading">
           <span class="heading-small">{{ item.sms_sender }}</span>
           {% if item.hint %}
             &ensp;
@@ -31,12 +31,12 @@
               {{ item.hint }}
             </span>
           {% endif %}
-        </h3>
+        </h2>
         {% if current_user.has_permissions('manage_service') %}
           <a class="govuk-link govuk-link--no-visited-state user-list-edit-link" href="{{ url_for('.service_edit_sms_sender', service_id=current_service.id, sms_sender_id = item.id) }}">Change</a>
         {% endif %}
         {% if current_service.count_sms_senders > 1 %}
-          {{ api_key(item.id, thing="ID") }}
+          {{ api_key(item.id, name=item.sms_sender, thing="ID") }}
         {% endif %}
       </div>
     {% endfor %}

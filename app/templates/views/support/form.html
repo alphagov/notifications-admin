@@ -27,8 +27,8 @@
         {% call form_wrapper() %}
             {{ textbox(form.feedback, width='1-1', hint='', rows=10, autosize=True) }}
             {% if not current_user.is_authenticated %}
-              {{ textbox(form.name, width='1-1') }}
-              {{ textbox(form.email_address, width='1-1') }}
+              {{ form.name(param_extensions={"classes": "govuk-!-width-full"}) }}
+              {{ form.email_address(param_extensions={"classes": "govuk-!-width-full"}) }}
             {% else %}
               <p class="govuk-body">We’ll reply to {{ current_user.email_address }}</p>
             {% endif %}

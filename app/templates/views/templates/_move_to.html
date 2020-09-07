@@ -10,13 +10,13 @@
       {{ radios_nested(templates_and_folders_form.move_to, move_to_children, option_hints=option_hints) }}
       </div>
       <div class="js-will-stick-at-bottom-when-scrolling">
-      {{ page_footer('Move', button_name='operation', button_value='move-to-existing-folder') }}
+      {{ page_footer('Move', button_name='operation', button_value='move-to-existing-folder', button_text_hidden_suffix=' selection to folder') }}
       </div>
     </div>
     <div id="move_to_new_folder_form">
       <fieldset class="js-will-stick-at-bottom-when-scrolling">
         <legend class="govuk-visually-hidden">Add to new folder</legend>
-        {{ textbox(templates_and_folders_form.move_to_new_folder_name, width='1-1') }}
+        {{ templates_and_folders_form.move_to_new_folder_name(param_extensions={"classes": "govuk-!-width-full"}) }}
         {{ page_footer('Add to new folder', button_name='operation', button_value='move-to-new-folder') }}
       </fieldset>
     </div>
@@ -24,11 +24,11 @@
   <div id="add_new_folder_form">
     <fieldset class="js-will-stick-at-bottom-when-scrolling">
       <legend class="govuk-visually-hidden">Add new folder</legend>
-      {{ textbox(templates_and_folders_form.add_new_folder_name, width='1-1') }}
+      {{ templates_and_folders_form.add_new_folder_name(param_extensions={"classes": "govuk-!-width-full"}) }}
       {{ page_footer('Add new folder', button_name='operation', button_value='add-new-folder') }}
     </fieldset>
   </div>
-  <div id="add_new_template_form">
+  <div id="add_new_template_form" {% if single_notification_channel %}data-channel="{{single_notification_channel}}" data-service="{{current_service.id}}"{% endif %}>
     <div class="js-will-stick-at-bottom-when-scrolling">
     {{ radios(templates_and_folders_form.add_template_by_template_type) }}
     </div>

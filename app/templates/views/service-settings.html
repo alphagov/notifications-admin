@@ -25,7 +25,8 @@
           {{ edit_field(
               'Change',
               url_for('.service_name_change', service_id=current_service.id),
-              permissions=['manage_service']
+              permissions=['manage_service'],
+              suffix='service name',
             )
           }}
         {% endcall %}
@@ -39,9 +40,9 @@
           ) }}
           {{ edit_field(
               'Change',
-              url_for('.service_set_auth_type',
-              service_id=current_service.id),
-              permissions=['manage_service']
+              url_for('.service_set_auth_type', service_id=current_service.id),
+              permissions=['manage_service'],
+              suffix='sign-in method',
             )
           }}
         {% endcall %}
@@ -66,7 +67,8 @@
                 channel='email',
                 service_id=current_service.id
               ),
-              permissions=['manage_service']
+              permissions=['manage_service'],
+              suffix='your settings for sending emails',
             )}}
           {% endcall %}
 
@@ -82,9 +84,9 @@
             {% endcall %}
             {{ edit_field(
                 'Manage',
-                url_for('.service_email_reply_to',
-                service_id=current_service.id),
-                permissions=['manage_service','manage_api_keys']
+                url_for('.service_email_reply_to', service_id=current_service.id),
+                permissions=['manage_service','manage_api_keys'],
+                suffix='reply-to email addresses',
               )
             }}
           {% endcall %}
@@ -96,6 +98,7 @@
               'Change',
               url_for('.branding_request', service_id=current_service.id, branding_type="email"),
               permissions=['manage_service'],
+              suffix='email branding',
             )}}
           {% endcall %}
 
@@ -106,6 +109,7 @@
               'Manage',
               url_for('.send_files_by_email_contact_details', service_id=current_service.id),
               permissions=['manage_service'],
+              suffix='sending files by email',
             )}}
           {% endcall %}
 
@@ -128,7 +132,8 @@
                 service_id=current_service.id,
                 channel='sms'
               ),
-              permissions=['manage_service']
+              permissions=['manage_service'],
+              suffix='your settings for sending text messages',
             )}}
           {% endcall %}
 
@@ -144,9 +149,9 @@
             {% endcall %}
             {{ edit_field(
                 'Manage',
-                url_for('.service_sms_senders',
-                service_id=current_service.id),
-                permissions=['manage_service','manage_api_keys']
+                url_for('.service_sms_senders', service_id=current_service.id),
+                permissions=['manage_service','manage_api_keys'],
+                suffix='text message senders',
             )
             }}
           {% endcall %}
@@ -156,9 +161,9 @@
             {{ boolean_field(current_service.prefix_sms) }}
             {{ edit_field(
                 'Change',
-                url_for('.service_set_sms_prefix',
-                service_id=current_service.id),
-                permissions=['manage_service']
+                url_for('.service_set_sms_prefix', service_id=current_service.id),
+                permissions=['manage_service'],
+                suffix='your settings for starting text messages with service name',
             )
             }}
           {% endcall %}
@@ -168,9 +173,9 @@
             {{ boolean_field('international_sms' in current_service.permissions) }}
             {{ edit_field(
                 'Change',
-                url_for('.service_set_international_sms',
-                service_id=current_service.id),
-                permissions=['manage_service']
+                url_for('.service_set_international_sms', service_id=current_service.id),
+                permissions=['manage_service'],
+                suffix='your settings for sending international text messages',
             )
             }}
           {% endcall %}
@@ -180,9 +185,9 @@
             {{ boolean_field('inbound_sms' in current_service.permissions) }}
             {{ edit_field(
                 'Change',
-                url_for('.service_set_inbound_sms',
-                service_id=current_service.id),
-                permissions=['manage_service']
+                url_for('.service_set_inbound_sms', service_id=current_service.id),
+                permissions=['manage_service'],
+                suffix='your settings for receiving text messages',
             )
             }}
           {% endcall %}
@@ -206,7 +211,8 @@
                 channel='letter',
                 service_id=current_service.id
               ),
-              permissions=['manage_service']
+              permissions=['manage_service'],
+              suffix='your settings for sending letters',
             )}}
           {% endcall %}
 
@@ -238,9 +244,9 @@
             {% endcall %}
             {{ edit_field(
                 'Manage',
-                url_for('.service_letter_contact_details',
-                service_id=current_service.id),
-                permissions=['manage_service','manage_api_keys']
+                url_for('.service_letter_contact_details', service_id=current_service.id),
+                permissions=['manage_service','manage_api_keys'],
+                suffix='sender addresses',
             )
             }}
           {% endcall %}
@@ -251,7 +257,8 @@
             {{ edit_field(
               'Change',
               url_for('.branding_request', service_id=current_service.id, branding_type="letter"),
-              permissions=['manage_service']
+              permissions=['manage_service'],
+              suffix='letter branding',
             )}}
           {% endcall %}
 
@@ -318,14 +325,14 @@
               {{ text_field('') }}
             {% else %}
               {{ boolean_field(not current_service.trial_mode) }}
-              {{ edit_field('Change', url_for('.service_switch_live', service_id=current_service.id)) }}
+              {{ edit_field('Change', url_for('.service_switch_live', service_id=current_service.id), suffix='service status') }}
             {% endif %}
           {% endcall %}
 
           {% call row() %}
             {{ text_field('Count in list of live services')}}
             {{ text_field('Yes' if current_service.count_as_live else 'No') }}
-            {{ edit_field('Change', url_for('.service_switch_count_as_live', service_id=current_service.id)) }}
+            {{ edit_field('Change', url_for('.service_switch_count_as_live', service_id=current_service.id), suffix='if service is counted in list of live services') }}
           {% endcall %}
 
           {% call row() %}
@@ -344,30 +351,30 @@
                 </div>
               {% endif %}
             {% endcall %}
-            {{ edit_field('Change', url_for('.link_service_to_organisation', service_id=current_service.id)) }}
+            {{ edit_field('Change', url_for('.link_service_to_organisation', service_id=current_service.id), suffix='organisation for service') }}
           {% endcall %}
 
           {% call row() %}
             {{ text_field('Free text message allowance')}}
             {{ text_field('{:,}'.format(current_service.free_sms_fragment_limit)) }}
-            {{ edit_field('Change', url_for('.set_free_sms_allowance', service_id=current_service.id)) }}
+            {{ edit_field('Change', url_for('.set_free_sms_allowance', service_id=current_service.id), suffix='free text message allowance') }}
           {% endcall %}
           {% call row() %}
             {{ text_field('Email branding' )}}
             {{ text_field(current_service.email_branding_name) }}
-            {{ edit_field('Change', url_for('.service_set_email_branding', service_id=current_service.id)) }}
+            {{ edit_field('Change', url_for('.service_set_email_branding', service_id=current_service.id), suffix='email branding (admin view)') }}
           {% endcall %}
           {% call row() %}
             {{ text_field('Letter branding')}}
             {{ optional_text_field(current_service.letter_branding.name) }}
-            {{ edit_field('Change', url_for('.service_set_letter_branding', service_id=current_service.id)) }}
+            {{ edit_field('Change', url_for('.service_set_letter_branding', service_id=current_service.id), suffix='letter branding (admin view)') }}
           {% endcall %}
           {% call row() %}
             {{ text_field('Data retention')}}
             {% call field() %}
                 {{ current_service.data_retention | join(', ', attribute='notification_type') }}
             {% endcall %}
-            {{ edit_field('Change', url_for('.data_retention', service_id=current_service.id)) }}
+            {{ edit_field('Change', url_for('.data_retention', service_id=current_service.id), suffix='data retention') }}
           {% endcall %}
 
           {% for permission in service_permissions %}
@@ -375,7 +382,15 @@
               {% call row() %}
                 {{ text_field(service_permissions[permission].title)}}
                 {{ boolean_field(current_service.has_permission(permission)) }}
-                {{ edit_field('Change', url_for(service_permissions[permission].endpoint or '.service_set_permission', service_id=current_service.id, permission=permission if not service_permissions[permission].endpoint else None)) }}
+                {{ edit_field(
+                    'Change',
+                    url_for(
+                      service_permissions[permission].endpoint or '.service_set_permission',
+                      service_id=current_service.id,
+                      permission=permission if not service_permissions[permission].endpoint else None
+                    ),
+                    suffix='your settings for ' + service_permissions[permission].title,
+                  ) }}
               {% endcall %}
             {% endif %}
           {% endfor %}

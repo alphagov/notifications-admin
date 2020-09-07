@@ -6,13 +6,6 @@
 {% from "components/back-link/macro.njk" import govukBackLink %}
 {% from "components/message-count-label.html" import message_count_label %}
 
-{% set file_contents_header_id = 'file-preview' %}
-{% macro skip_to_file_contents() %}
-  <p class="govuk-visually-hidden">
-    <a class="govuk-link govuk-link--no-visited-state" href="#{{ file_contents_header_id }}">Skip to file contents</a>
-  </p>
-{% endmacro %}
-
 {% block service_page_title %}
   Error
 {% endblock %}
@@ -135,8 +128,6 @@
 
       {% endif %}
 
-      {{ skip_to_file_contents() }}
-
     {% endcall %}
   </div>
 
@@ -158,7 +149,7 @@
 
     {% set column_headers = recipients._raw_column_headers if recipients.duplicate_recipient_column_headers else recipients.column_headers %}
 
-    <h2 class="heading-medium" id="{{ file_contents_header_id }}">{{ original_file_name }}</h2>
+    <h2 class="heading-medium" id="file-preview">{{ original_file_name }}</h2>
 
     <div class="fullscreen-content" data-module="fullscreen-table">
       {% call(item, row_number) list_table(

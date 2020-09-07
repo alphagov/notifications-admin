@@ -31,6 +31,7 @@ from app.models.service import Service
 from app.models.template_list import TemplateList, TemplateLists
 from app.template_previews import TemplatePreview, get_page_count_for_letter
 from app.utils import (
+    NOTIFICATION_TYPES,
     get_template,
     should_skip_template_page,
     user_has_permissions,
@@ -130,6 +131,11 @@ def choose_template(service_id, template_type='all', template_folder_id=None):
     )
     option_hints = {template_folder_id: 'current folder'}
 
+    single_notification_channel = None
+    notification_channels = list(set(current_service.permissions).intersection(NOTIFICATION_TYPES))
+    if len(notification_channels) == 1:
+        single_notification_channel = notification_channels[0]
+
     if request.method == 'POST' and templates_and_folders_form.validate_on_submit():
         if not current_user.has_permissions('manage_templates'):
             abort(403)
@@ -168,6 +174,7 @@ def choose_template(service_id, template_type='all', template_folder_id=None):
         templates_and_folders_form=templates_and_folders_form,
         move_to_children=templates_and_folders_form.move_to.children(),
         user_has_template_folder_permission=user_has_template_folder_permission,
+        single_notification_channel=single_notification_channel,
         option_hints=option_hints
     )
 
@@ -683,7 +690,7 @@ def delete_service_template(service_id, template_id):
         else:
             raise e
 
-    flash(["Are you sure you want to delete ‘{}’?".format(template['name']), message], 'delete')
+    flash(["Are you sure you want to delete ‘{}’?".format(template['name']), message, template['name']], 'delete')
     return render_template(
         'views/templates/template.html',
         template=get_template(

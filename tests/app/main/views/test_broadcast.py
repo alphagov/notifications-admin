@@ -1,4 +1,6 @@
 import json
+import uuid
+from functools import partial
 
 import pytest
 from flask import url_for
@@ -37,7 +39,7 @@ sample_uuid = sample_uuid()
         403, 403,
     ),
     (
-        '.remove_broadcast_area', {'broadcast_message_id': sample_uuid, 'area_slug': 'england'},
+        '.remove_broadcast_area', {'broadcast_message_id': sample_uuid, 'area_slug': 'countries-E92000001'},
         403, 405,
     ),
     (
@@ -74,6 +76,126 @@ def test_broadcast_pages_403_without_permission(
     )
 
 
+@pytest.mark.parametrize('endpoint, extra_args, expected_get_status, expected_post_status', (
+    (
+        '.broadcast',
+        {'template_id': sample_uuid},
+        403, 405,
+    ),
+    (
+        '.preview_broadcast_areas', {'broadcast_message_id': sample_uuid},
+        403, 405,
+    ),
+    (
+        '.choose_broadcast_library', {'broadcast_message_id': sample_uuid},
+        403, 405,
+    ),
+    (
+        '.choose_broadcast_area', {'broadcast_message_id': sample_uuid, 'library_slug': 'countries'},
+        403, 403,
+    ),
+    (
+        '.remove_broadcast_area', {'broadcast_message_id': sample_uuid, 'area_slug': 'england'},
+        403, 405,
+    ),
+    (
+        '.preview_broadcast_message', {'broadcast_message_id': sample_uuid},
+        403, 403,
+    ),
+    (
+        '.cancel_broadcast_message', {'broadcast_message_id': sample_uuid},
+        403, 403,
+    ),
+))
+def test_broadcast_pages_403_for_user_without_permission(
+    mocker,
+    client_request,
+    service_one,
+    active_user_view_permissions,
+    endpoint,
+    extra_args,
+    expected_get_status,
+    expected_post_status,
+):
+    service_one['permissions'] += ['broadcast']
+    mocker.patch('app.user_api_client.get_user', return_value=active_user_view_permissions)
+    client_request.get(
+        endpoint,
+        service_id=SERVICE_ONE_ID,
+        _expected_status=expected_get_status,
+        **extra_args
+    )
+    client_request.post(
+        endpoint,
+        service_id=SERVICE_ONE_ID,
+        _expected_status=expected_post_status,
+        **extra_args
+    )
+
+
+@pytest.mark.parametrize('step_index, expected_link_text, expected_link_href', (
+    (1, 'Continue', partial(url_for, '.broadcast_tour', step_index=2)),
+    (2, 'Continue', partial(url_for, '.broadcast_tour', step_index=3)),
+    (3, 'Continue', partial(url_for, '.broadcast_tour', step_index=4)),
+    (4, 'Continue', partial(url_for, '.broadcast_tour', step_index=5)),
+    (5, 'Continue to dashboard', partial(url_for, '.service_dashboard')),
+))
+def test_broadcast_tour_pages_have_continue_link(
+    client_request,
+    service_one,
+    step_index,
+    expected_link_text,
+    expected_link_href,
+):
+    service_one['permissions'] += ['broadcast']
+    page = client_request.get(
+        '.broadcast_tour',
+        service_id=SERVICE_ONE_ID,
+        step_index=step_index,
+    )
+    link = page.select_one('.banner-tour a')
+    assert normalize_spaces(link.text) == expected_link_text
+    assert link['href'] == expected_link_href(service_id=SERVICE_ONE_ID)
+
+
+@pytest.mark.parametrize('step_index', (
+    pytest.param(1, marks=pytest.mark.xfail),
+    pytest.param(2, marks=pytest.mark.xfail),
+    pytest.param(3, marks=pytest.mark.xfail),
+    pytest.param(4, marks=pytest.mark.xfail),
+    5,
+))
+def test_broadcast_tour_page_4_shows_service_name(
+    client_request,
+    service_one,
+    step_index,
+):
+    service_one['permissions'] += ['broadcast']
+    page = client_request.get(
+        '.broadcast_tour',
+        service_id=SERVICE_ONE_ID,
+        step_index=step_index,
+    )
+    assert normalize_spaces(page.select_one('.navigation-service').text) == (
+        'service one Training'
+    )
+
+
+@pytest.mark.parametrize('step_index', (0, 6))
+def test_broadcast_tour_page_404s_out_of_range(
+    client_request,
+    service_one,
+    step_index,
+):
+    service_one['permissions'] += ['broadcast']
+    client_request.get(
+        '.broadcast_tour',
+        service_id=SERVICE_ONE_ID,
+        step_index=step_index,
+        _expected_status=404,
+    )
+
+
 def test_dashboard_redirects_to_broadcast_dashboard(
     client_request,
     service_one,
@@ -93,6 +215,7 @@ def test_dashboard_redirects_to_broadcast_dashboard(
 def test_empty_broadcast_dashboard(
     client_request,
     service_one,
+    active_user_view_permissions,
     mock_get_no_broadcast_messages,
     mock_get_service_templates_when_no_templates_exist,
 ):
@@ -104,9 +227,9 @@ def test_empty_broadcast_dashboard(
     assert [
         normalize_spaces(row.text) for row in page.select('tbody tr .table-empty-message')
     ] == [
-        'You do not have any live broadcasts at the moment',
-        'You do not have any broadcasts waiting for approval',
-        'You do not have any previous broadcasts',
+        'You do not have any live alerts at the moment',
+        'You do not have any alerts waiting for approval',
+        'You do not have any previous alerts',
     ]
 
 
@@ -124,7 +247,7 @@ def test_broadcast_dashboard(
     )
 
     assert normalize_spaces(page.select('main h2')[0].text) == (
-        'Live broadcasts'
+        'Live alerts'
     )
     assert [
         normalize_spaces(row.text) for row in page.select('table')[0].select('tbody tr')
@@ -142,7 +265,7 @@ def test_broadcast_dashboard(
     ]
 
     assert normalize_spaces(page.select('main h2')[2].text) == (
-        'Previous broadcasts'
+        'Previous alerts'
     )
     assert [
         normalize_spaces(row.text) for row in page.select('table')[2].select('tbody tr')
@@ -156,6 +279,7 @@ def test_broadcast_dashboard(
 def test_broadcast_dashboard_json(
     logged_in_client,
     service_one,
+    active_user_view_permissions,
     mock_get_broadcast_messages,
 ):
     service_one['permissions'] += ['broadcast']
@@ -225,30 +349,24 @@ def test_choose_broadcast_library_page(
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
     )
+
     assert [
-        (normalize_spaces(title.text), normalize_spaces(hint.text))
-        for title, hint in list(zip(
-            page.select('.file-list-filename-large'), page.select('.file-list-hint-large')
-        ))
+        normalize_spaces(title.text)
+        for title in page.select('.file-list-filename-large')
     ] == [
-        (
-            'Counties and Unitary Authorities in England and Wales',
-            'Barking and Dagenham, Barnet, Barnsley and 171 more…',
-        ),
-        (
-            'Countries',
-            'England, Northern Ireland, Scotland and Wales',
-        ),
-        (
-            'Regions of England',
-            'East Midlands, East of England, London and 6 more…',
-        ),
+        'Countries',
+        'Local authorities',
     ]
+
+    assert normalize_spaces(page.select('.file-list-hint-large')[0].text) == (
+        'England, Northern Ireland, Scotland, and Wales'
+    )
+
     assert page.select_one('a.file-list-filename-large.govuk-link')['href'] == url_for(
         '.choose_broadcast_area',
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
-        library_slug='counties-and-unitary-authorities-in-england-and-wales',
+        library_slug='ctry19',
     )
 
 
@@ -259,12 +377,116 @@ def test_choose_broadcast_area_page(
     fake_uuid,
 ):
     service_one['permissions'] += ['broadcast']
-    client_request.get(
+    page = client_request.get(
         '.choose_broadcast_area',
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
-        library_slug='countries',
+        library_slug='ctry19',
     )
+    assert normalize_spaces(page.select_one('h1').text) == (
+        'Choose countries'
+    )
+    assert [
+        (
+            choice.select_one('input')['value'],
+            normalize_spaces(choice.select_one('label').text),
+        )
+        for choice in page.select('form[method=post] .govuk-checkboxes__item')
+    ] == [
+        ('ctry19-E92000001', 'England'),
+        ('ctry19-N92000002', 'Northern Ireland'),
+        ('ctry19-S92000003', 'Scotland'),
+        ('ctry19-W92000004', 'Wales'),
+    ]
+
+
+def test_choose_broadcast_area_page_for_area_with_sub_areas(
+    client_request,
+    service_one,
+    mock_get_draft_broadcast_message,
+    fake_uuid,
+):
+    service_one['permissions'] += ['broadcast']
+    page = client_request.get(
+        '.choose_broadcast_area',
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+        library_slug='wd20-lad20',
+    )
+    assert normalize_spaces(page.select_one('h1').text) == (
+        'Choose a local authority'
+    )
+    live_search = page.select_one("[data-module=live-search]")
+    assert live_search['data-targets'] == '.file-list-item'
+    assert live_search.select_one('input')['type'] == 'search'
+    partial_url_for = partial(
+        url_for,
+        'main.choose_broadcast_sub_area',
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+        library_slug='wd20-lad20',
+    )
+    choices = [
+        (
+            choice.select_one('a.file-list-filename-large')['href'],
+            normalize_spaces(choice.text),
+        )
+        for choice in page.select('.file-list-item')
+    ]
+    assert len(choices) == 379
+    assert choices[:2] == [
+        (
+            partial_url_for(area_slug='lad20-S12000033'),
+            'Aberdeen City',
+        ),
+        (
+            partial_url_for(area_slug='lad20-S12000034'),
+            'Aberdeenshire',
+        ),
+    ]
+    assert choices[-1:] == [
+        (
+            partial_url_for(area_slug='lad20-E06000014'),
+            'York',
+        ),
+    ]
+
+
+def test_choose_broadcast_sub_area_page(
+    client_request,
+    service_one,
+    mock_get_draft_broadcast_message,
+    fake_uuid,
+):
+    service_one['permissions'] += ['broadcast']
+    page = client_request.get(
+        'main.choose_broadcast_sub_area',
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+        library_slug='wd20-lad20',
+        area_slug='lad20-S12000033',
+    )
+    assert normalize_spaces(page.select_one('h1').text) == (
+        'Choose an area of Aberdeen City'
+    )
+    live_search = page.select_one("[data-module=live-search]")
+    assert live_search['data-targets'] == '.govuk-checkboxes__item'
+    assert live_search.select_one('input')['type'] == 'search'
+    choices = [
+        (
+            choice.select_one('input')['value'],
+            normalize_spaces(choice.select_one('label').text),
+        )
+        for choice in page.select('form[method=post] .govuk-checkboxes__item')
+    ]
+    assert choices[:3] == [
+        ('y', 'All of Aberdeen City'),
+        ('wd20-S13002845', 'Airyhall/Broomhill/Garthdee'),
+        ('wd20-S13002836', 'Bridge of Don'),
+    ]
+    assert choices[-1:] == [
+        ('wd20-S13002846', 'Torry/Ferryhill'),
+    ]
 
 
 def test_add_broadcast_area(
@@ -279,16 +501,67 @@ def test_add_broadcast_area(
         '.choose_broadcast_area',
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
-        library_slug='countries',
+        library_slug='ctry19',
         _data={
-            'areas': ['england', 'wales']
+            'areas': ['ctry19-E92000001', 'ctry19-W92000004']
         }
     )
     mock_update_broadcast_message.assert_called_once_with(
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
         data={
-            'areas': ['england', 'scotland', 'wales']
+            'areas': ['ctry19-E92000001', 'ctry19-S92000003', 'ctry19-W92000004']
+        },
+    )
+
+
+@pytest.mark.parametrize('post_data, expected_selected', (
+    ({
+        'select_all': 'y',
+        'areas': [
+            'wd20-S13002845',
+        ]
+    }, [
+        'lad20-S12000033',
+        # wd20-S13002845 is ignored because the user chose ‘Select all…’
+    ]),
+    ({
+        'areas': [
+            'wd20-S13002845',
+            'wd20-S13002836',
+        ]
+    }, [
+        'wd20-S13002845',
+        'wd20-S13002836',
+    ]),
+))
+def test_add_broadcast_sub_area(
+    client_request,
+    service_one,
+    mock_get_draft_broadcast_message,
+    mock_update_broadcast_message,
+    fake_uuid,
+    post_data,
+    expected_selected,
+):
+    service_one['permissions'] += ['broadcast']
+    client_request.post(
+        '.choose_broadcast_sub_area',
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+        library_slug='wd20-lad20',
+        area_slug='lad20-S12000033',
+        _data=post_data,
+    )
+    mock_update_broadcast_message.assert_called_once_with(
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+        data={
+            'areas': [
+                # These two areas are on the broadcast already
+                'ctry19-E92000001',
+                'ctry19-S92000003',
+            ] + expected_selected
         },
     )
 
@@ -305,7 +578,7 @@ def test_remove_broadcast_area_page(
         '.remove_broadcast_area',
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
-        area_slug='england',
+        area_slug='ctry19-E92000001',
         _expected_redirect=url_for(
             '.preview_broadcast_areas',
             service_id=SERVICE_ONE_ID,
@@ -317,34 +590,17 @@ def test_remove_broadcast_area_page(
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
         data={
-            'areas': ['scotland']
+            'areas': ['ctry19-S92000003']
         },
     )
 
 
-@pytest.mark.parametrize('end_time', (
-
-    # Before now
-    pytest.param('2020-02-02T02:00:00', marks=pytest.mark.xfail),
-
-    # End of the current hour
-    pytest.param('2020-02-02T03:00:00'),
-
-    # Midnight 3 days ahead
-    pytest.param('2020-02-06T00:00:00'),
-
-    # 1am 4 days ahead
-    pytest.param('2020-02-06T01:00:00', marks=pytest.mark.xfail),
-
-))
-@freeze_time('2020-02-02 02:02:02')
 def test_preview_broadcast_message_page(
     client_request,
     service_one,
     mock_get_draft_broadcast_message,
     mock_get_broadcast_template,
     fake_uuid,
-    end_time,
 ):
     service_one['permissions'] += ['broadcast']
 
@@ -372,47 +628,21 @@ def test_preview_broadcast_message_page(
     assert form['method'] == 'post'
     assert 'action' not in form
 
-    radio_choices = [
-        choice['value'] for choice in form.select('input[type=radio][name=finishes_at]')
-    ]
-    assert len(radio_choices) == 94
-    assert end_time in radio_choices
 
-
-@pytest.mark.parametrize('end_time', (
-
-    # Before now
-    pytest.param('2020-02-02T02:00:00', marks=pytest.mark.xfail),
-
-    # End of the current hour
-    pytest.param('2020-02-02T03:00:00'),
-
-    # Midnight 3 days ahead
-    pytest.param('2020-02-06T00:00:00'),
-
-    # 1am 4 days ahead
-    pytest.param('2020-02-06T01:00:00', marks=pytest.mark.xfail),
-
-))
 @freeze_time('2020-02-02 02:02:02')
 def test_start_broadcasting(
     client_request,
     service_one,
     mock_get_draft_broadcast_message,
     mock_get_broadcast_template,
-    mock_update_broadcast_message,
     mock_update_broadcast_message_status,
     fake_uuid,
-    end_time,
 ):
     service_one['permissions'] += ['broadcast']
     client_request.post(
         '.preview_broadcast_message',
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
-        _data={
-            'finishes_at': end_time,
-        },
         _expected_redirect=url_for(
             'main.view_broadcast_message',
             service_id=SERVICE_ONE_ID,
@@ -420,43 +650,10 @@ def test_start_broadcasting(
             _external=True,
         ),
     ),
-    mock_update_broadcast_message.assert_called_once_with(
-        service_id=SERVICE_ONE_ID,
-        broadcast_message_id=fake_uuid,
-        data={
-            'finishes_at': end_time,
-        },
-    )
     mock_update_broadcast_message_status.assert_called_once_with(
         'pending-approval',
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
-    )
-
-
-def test_start_broadcasting_shows_validation_error(
-    client_request,
-    service_one,
-    mock_get_draft_broadcast_message,
-    mock_get_broadcast_template,
-    mock_update_broadcast_message,
-    mock_update_broadcast_message_status,
-    fake_uuid,
-):
-    service_one['permissions'] += ['broadcast']
-    page = client_request.post(
-        '.preview_broadcast_message',
-        service_id=SERVICE_ONE_ID,
-        broadcast_message_id=fake_uuid,
-        _data={},
-        _expected_status=200,
-    )
-    assert mock_update_broadcast_message.called is False
-    assert mock_update_broadcast_message_status.called is False
-    assert normalize_spaces(
-        page.select_one('form fieldset legend .error-message').text
-    ) == (
-        'Select an option'
     )
 
 
@@ -542,6 +739,114 @@ def test_view_pending_broadcast(
     mocker,
     client_request,
     service_one,
+    active_user_with_permissions,
+    mock_get_broadcast_template,
+    fake_uuid,
+):
+    mocker.patch(
+        'app.broadcast_message_api_client.get_broadcast_message',
+        return_value=broadcast_message_json(
+            id_=fake_uuid,
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            created_by_id=fake_uuid,
+            finishes_at=None,
+            status='pending-approval',
+        ),
+    )
+    mocker.patch('app.user_api_client.get_user', side_effect=[
+        active_user_with_permissions,  # Current user
+        user_json(id_=uuid.uuid4()),  # User who created broadcast
+    ])
+    service_one['permissions'] += ['broadcast']
+
+    page = client_request.get(
+        '.view_broadcast_message',
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+    )
+
+    assert (
+        normalize_spaces(page.select_one('.banner').text)
+    ) == (
+        'Test User wants to broadcast Example template '
+        'Start broadcasting now Reject this alert'
+    )
+
+    form = page.select_one('form.banner')
+    assert form['method'] == 'post'
+    assert 'action' not in form
+    assert form.select_one('button[type=submit]')
+
+    link = form.select_one('a.govuk-link.govuk-link--destructive')
+    assert link.text == 'Reject this alert'
+    assert link['href'] == url_for(
+        '.reject_broadcast_message',
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+    )
+
+
+@freeze_time('2020-02-22T22:22:22.000000')
+def test_cant_approve_own_broadcast(
+    mocker,
+    client_request,
+    service_one,
+    active_user_with_permissions,
+    mock_get_broadcast_template,
+    fake_uuid,
+):
+    service_one['restricted'] = False
+    mocker.patch(
+        'app.broadcast_message_api_client.get_broadcast_message',
+        return_value=broadcast_message_json(
+            id_=fake_uuid,
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            created_by_id=fake_uuid,
+            finishes_at='2020-02-23T23:23:23.000000',
+            status='pending-approval',
+        ),
+    )
+    mocker.patch('app.user_api_client.get_user', side_effect=[
+        active_user_with_permissions,  # Current user
+        active_user_with_permissions,  # User who created broadcast (the same)
+    ])
+    service_one['permissions'] += ['broadcast']
+
+    page = client_request.get(
+        '.view_broadcast_message',
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+    )
+
+    assert (
+        normalize_spaces(page.select_one('.banner h1').text)
+    ) == (
+        'Example template is waiting for approval'
+    )
+    assert (
+        normalize_spaces(page.select_one('.banner p').text)
+    ) == (
+        'You need another member of your team to approve your alert.'
+    )
+    assert not page.select('form')
+
+    link = page.select_one('.banner a.govuk-link.govuk-link--destructive')
+    assert link.text == 'Withdraw this alert'
+    assert link['href'] == url_for(
+        '.reject_broadcast_message',
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+    )
+
+
+@freeze_time('2020-02-22T22:22:22.000000')
+def test_can_approve_own_broadcast_in_trial_mode(
+    mocker,
+    client_request,
+    service_one,
+    active_user_with_permissions,
     mock_get_broadcast_template,
     fake_uuid,
 ):
@@ -556,6 +861,86 @@ def test_view_pending_broadcast(
             status='pending-approval',
         ),
     )
+    mocker.patch('app.user_api_client.get_user', side_effect=[
+        active_user_with_permissions,  # Current user
+        active_user_with_permissions,  # User who created broadcast (the same)
+    ])
+    service_one['permissions'] += ['broadcast']
+
+    page = client_request.get(
+        '.view_broadcast_message',
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+    )
+
+    assert (
+        normalize_spaces(page.select_one('.banner h1').text)
+    ) == (
+        'Example template is waiting for approval'
+    )
+    assert (
+        normalize_spaces(page.select_one('.banner p').text)
+    ) == (
+        'When you use a live account you’ll need another member of '
+        'your team to approve your alert.'
+    )
+    assert (
+        normalize_spaces(page.select_one('.banner details summary').text)
+    ) == (
+        'Approve your own alert'
+    )
+    assert (
+        normalize_spaces(page.select_one('.banner details ').text)
+    ) == (
+        'Approve your own alert '
+        'Because you’re in training mode you can approve your own '
+        'alerts, to see how it works. '
+        'No real alerts will be broadcast to anyone’s phone. '
+        'Start broadcasting now '
+        'Cancel this alert'
+    )
+
+    form = page.select_one('.banner details form')
+    assert form['method'] == 'post'
+    assert 'action' not in form
+    assert normalize_spaces(form.select_one('button[type=submit]').text) == (
+        'Start broadcasting now'
+    )
+
+    link = page.select_one('.banner a.govuk-link.govuk-link--destructive')
+    assert link.text == 'Cancel this alert'
+    assert link['href'] == url_for(
+        '.reject_broadcast_message',
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+    )
+
+
+@freeze_time('2020-02-22T22:22:22.000000')
+def test_view_only_user_cant_approve_broadcast(
+    mocker,
+    client_request,
+    service_one,
+    active_user_with_permissions,
+    active_user_view_permissions,
+    mock_get_broadcast_template,
+    fake_uuid,
+):
+    mocker.patch(
+        'app.broadcast_message_api_client.get_broadcast_message',
+        return_value=broadcast_message_json(
+            id_=fake_uuid,
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            created_by_id=fake_uuid,
+            finishes_at='2020-02-23T23:23:23.000000',
+            status='pending-approval',
+        ),
+    )
+    mocker.patch('app.user_api_client.get_user', side_effect=[
+        active_user_view_permissions,  # Current user
+        active_user_with_permissions,  # User who created broadcast
+    ])
     service_one['permissions'] += ['broadcast']
 
     page = client_request.get(
@@ -567,22 +952,12 @@ def test_view_pending_broadcast(
     assert (
         normalize_spaces(page.select_one('.banner').text)
     ) == (
-        'Test User wants to broadcast this message until tomorrow at 11:23pm. '
-        'Start broadcasting now Reject this broadcast'
+        'This alert is waiting for approval '
+        'You don’t have permission to approve alerts.'
     )
 
-    form = page.select_one('form.banner')
-    assert form['method'] == 'post'
-    assert 'action' not in form
-    assert form.select_one('button[type=submit]')
-
-    link = form.select_one('a.govuk-link.govuk-link--destructive')
-    assert link.text == 'Reject this broadcast'
-    assert link['href'] == url_for(
-        '.reject_broadcast_message',
-        service_id=SERVICE_ONE_ID,
-        broadcast_message_id=fake_uuid,
-    )
+    assert not page.select_one('form')
+    assert not page.select_one('.banner a')
 
 
 @pytest.mark.parametrize('initial_status, expected_approval', (
@@ -635,6 +1010,7 @@ def test_approve_broadcast(
             broadcast_message_id=fake_uuid,
             data={
                 'starts_at': '2020-02-22T22:22:22',
+                'finishes_at': '2020-02-23T22:21:22',
             },
         )
         mock_update_broadcast_message_status.assert_called_once_with(

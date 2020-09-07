@@ -17,6 +17,9 @@
       {% endif %}
       <div class="navigation-service-name govuk-!-font-weight-bold">
         {{ current_service.name }}
+        {% if current_service.has_permission('broadcast') and current_service.trial_mode %}
+          <span class="navigation-service-type--training navigation-service-type--training--with-arrow">Training</span>
+        {% endif %}
       </div>
       <a href="{{ url_for('main.choose_account') }}" class="govuk-link govuk-link--no-visited-state navigation-service-switch">Switch service</a>
     </div>

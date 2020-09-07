@@ -25,7 +25,7 @@
   <div class="user-list">
     {% for user in users %}
       <div class="user-list-item">
-        <h3>
+        <h2 class="user-list-item-heading">
           {%- if user.name -%}
             <span class="heading-small">{{ user.name }}</span>&ensp;
           {%- endif -%}
@@ -40,7 +40,7 @@
               {{ user.email_address }}
             {% endif %}
           </span>
-        </h3>
+        </h2>
         <ul class="tick-cross-list">
           <li class="tick-cross-list-edit-link">
             {% if user.status == 'pending' %}

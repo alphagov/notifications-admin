@@ -60,6 +60,8 @@ FAILURE_STATUSES = ['failed', 'temporary-failure', 'permanent-failure',
                     'technical-failure', 'virus-scan-failed', 'validation-failed']
 REQUESTED_STATUSES = SENDING_STATUSES + DELIVERED_STATUSES + FAILURE_STATUSES
 
+NOTIFICATION_TYPES = ["sms", "email", "letter", "broadcast"]
+
 
 with open('{}/email_domains.txt'.format(
     os.path.dirname(os.path.realpath(__file__))
@@ -822,3 +824,34 @@ def hide_from_search_engines(f):
         response.headers['X-Robots-Tag'] = 'noindex'
         return response
     return decorated_function
+
+
+# Function to merge two dict or lists with a JSON-like structure into one.
+# JSON-like means they can contain all types JSON can: all the main primitives
+# plus nested lists or dictionaries.
+# Merge is additive. New values overwrite old and collections are added to.
+def merge_jsonlike(source, destination):
+    def merge_items(source_item, destination_item):
+        if isinstance(source_item, dict) and isinstance(destination_item, dict):
+            merge_dicts(source_item, destination_item)
+        elif isinstance(source_item, list) and isinstance(destination_item, list):
+            merge_lists(source_item, destination_item)
+        else:  # primitive value
+            return False
+        return True
+
+    def merge_lists(source, destination):
+        for item in destination:
+            if item not in source:
+                source.append(item)
+
+    def merge_dicts(source, destination):
+        for key, value in destination.items():
+            if key in source:
+                # assign destination value if can't be merged into source
+                if merge_items(source[key], value) is False:
+                    source[key] = value
+            else:
+                source[key] = value
+
+    merge_items(source, destination)

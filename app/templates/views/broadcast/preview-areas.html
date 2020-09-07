@@ -36,12 +36,35 @@
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(mymap);
 
-    {% for polygon in broadcast_message.polygons %}
+    {% for polygon in broadcast_message.simple_polygons.bleed.as_coordinate_pairs_lat_long %}
+      polygons.push(
+        L.polygon({{polygon}}, {
+          opacity: 0.5,
+          color: '#2B8CC4', // $light-blue
+          fillColor: '#2B8CC4', // $light-blue
+          fillOpacity: 0.2,
+          weight: 2
+        })
+      );
+    {% endfor %}
+
+    {% for polygon in broadcast_message.simple_polygons.as_coordinate_pairs_lat_long %}
+      polygons.push(
+        L.polygon({{polygon}}, {
+          opacity: 0.1,
+          color: '#2B8CC4', // $black
+          fillColor: '#2B8CC4', // $light-blue
+          fillOpacity: 0.4,
+          weight: 1
+        })
+      );
+    {% endfor %}
+
+    {% for polygon in broadcast_message.polygons.as_coordinate_pairs_lat_long %}
       polygons.push(
         L.polygon({{polygon}}, {
           color: '#0b0b0c', // $black
-          fillColor: '#2B8CC4', // $light-blue
-          fillOpacity: 0.2,
+          fillOpacity: 0,
           weight: 2
         })
       );
@@ -50,7 +73,7 @@
     var polygonGroup = L.featureGroup(polygons).addTo(mymap);
     mymap.fitBounds(
       polygonGroup.getBounds(),
-      {padding: [5, 5]}
+      {padding: [1, 1]}
     );
 
   </script>
@@ -71,13 +94,13 @@
           {{ area.name }} <a class="area-list-item-remove" href="{{ url_for('.remove_broadcast_area', service_id=current_service.id, broadcast_message_id=broadcast_message.id, area_slug=area.id) }}">remove</a>
         </li>
     {% if loop.last %}
+      </ul>
       {{ govukButton({
         "element": "a",
         "text": "Add another area",
         "href": url_for('.choose_broadcast_library', service_id=current_service.id, broadcast_message_id=broadcast_message.id),
         "classes": "govuk-button--secondary govuk-!-margin-bottom-5"
       }) }}
-      </ul>
     {% endif %}
   {% else %}
     <p class="govuk-body">

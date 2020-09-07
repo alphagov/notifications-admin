@@ -17,7 +17,7 @@
     ) }}
     {% call form_wrapper() %}
       {{ notification_type | capitalize}}
-      {{  textbox(form.days_of_retention) }}
+      {{  form.days_of_retention }}
       {{ page_footer('Save') }}
     {% endcall %}
 

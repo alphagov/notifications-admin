@@ -237,6 +237,9 @@ def remove_user_from_organisation(org_id, user_id):
 def cancel_invited_org_user(org_id, invited_user_id):
     org_invite_api_client.cancel_invited_user(org_id=org_id, invited_user_id=invited_user_id)
 
+    invited_org_user = InvitedOrgUser.by_id_and_org_id(org_id, invited_user_id)
+
+    flash(f'Invitation cancelled for {invited_org_user.email_address}', 'default_with_tick')
     return redirect(url_for('main.manage_org_users', org_id=org_id))
 
 

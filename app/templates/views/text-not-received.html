@@ -16,7 +16,7 @@ Check your mobile number
     <p class="govuk-body">Check your mobile phone number is correct and then resend the security code.</p>
 
       {% call form_wrapper() %}
-        {{ textbox(form.mobile_number) }}
+        {{ form.mobile_number }}
         {{ page_footer("Resend security code") }}
       {% endcall %}
   </div>

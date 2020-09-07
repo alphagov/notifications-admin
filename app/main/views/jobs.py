@@ -3,6 +3,7 @@
 from functools import partial
 
 from flask import (
+    Markup,
     Response,
     abort,
     flash,
@@ -163,10 +164,9 @@ def view_notifications(service_id, message_type=None):
         message_type=message_type,
         status=request.args.get('status') or 'sending,delivered,failed',
         page=request.args.get('page', 1),
-        to=request.form.get('to', ''),
         search_form=SearchNotificationsForm(
             message_type=message_type,
-            to=request.form.get('to', ''),
+            to=request.form.get('to'),
         ),
         things_you_can_search_by={
             'email': ['email address'],
@@ -438,14 +438,14 @@ def get_preview_of_content(notification):
         ))
 
     if notification['template']['template_type'] == 'email':
-        return EmailPreviewTemplate(
+        return Markup(EmailPreviewTemplate(
             notification['template'],
             notification['personalisation'],
             redact_missing_personalisation=True,
-        ).subject
+        ).subject)
 
     if notification['template']['template_type'] == 'letter':
-        return LetterPreviewTemplate(
+        return Markup(LetterPreviewTemplate(
             notification['template'],
             notification['personalisation'],
-        ).subject
+        ).subject)
