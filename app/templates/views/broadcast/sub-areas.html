@@ -22,9 +22,11 @@
       {{ form.select_all }}
     </div>
 
-    {{ live_search(target_selector='.govuk-checkboxes__item', show=show_search_form, form=search_form, label='Or by electoral ward') }}
+    {{ live_search(target_selector='#sub-areas .govuk-checkboxes__item', show=show_search_form, form=search_form, label='Or by electoral ward') }}
 
-    {{ form.areas }}
+    <div id="sub-areas">
+      {{ form.areas }}
+    </div>
 
     {{ sticky_page_footer('Add to broadcast') }}
 
