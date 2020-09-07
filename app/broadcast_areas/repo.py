@@ -120,6 +120,7 @@ class BroadcastAreasRepository(object):
         return sorted(libraries)
 
     def get_library_description(self, library_id):
+        # TODO: this count is wrong, and we shouldn't be building up user strings in sql. Replace this with python code.
         q = """
         WITH
         areas AS (

@@ -434,7 +434,7 @@ def test_choose_broadcast_area_page_for_area_with_sub_areas(
         )
         for choice in page.select('.file-list-item')
     ]
-    assert len(choices) == 379
+    assert len(choices) == 394
     assert choices[:2] == [
         (
             partial_url_for(area_slug='lad20-S12000033'),
