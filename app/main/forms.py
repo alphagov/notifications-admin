@@ -1821,16 +1821,6 @@ class CallbackForm(StripWhitespaceForm):
         return super().validate() or self.url.data == ''
 
 
-class InternationalSMSForm(StripWhitespaceForm):
-    enabled = RadioField(
-        'Send text messages to international phone numbers',
-        choices=[
-            ('on', 'On'),
-            ('off', 'Off'),
-        ],
-    )
-
-
 class SMSPrefixForm(StripWhitespaceForm):
     enabled = RadioField(
         '',

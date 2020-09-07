@@ -1,0 +1,33 @@
+{% extends "withnav_template.html" %}
+{% from "components/radios.html" import radios %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+
+{% block service_page_title %}
+  Send international letters
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-five-sixths">
+      {{ page_header(
+        'Send international letters',
+        back_link=url_for('main.service_settings', service_id=current_service.id)
+      ) }}
+      <p class="govuk-body">
+        It costs more to send a letter to an international address.
+      </p>
+      <p class="govuk-body">
+        See <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for(".pricing") }}">pricing</a> for the list
+        of rates.
+      </p>
+      {% call form_wrapper() %}
+        {{ radios(form.enabled) }}
+        {{ page_footer('Save') }}
+      {% endcall %}
+    </div>
+  </div>
+
+{% endblock %}

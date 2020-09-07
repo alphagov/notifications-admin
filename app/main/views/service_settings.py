@@ -35,7 +35,6 @@ from app.main.forms import (
     ConfirmPasswordForm,
     EstimateUsageForm,
     FreeSMSAllowance,
-    InternationalSMSForm,
     LinkOrganisationsForm,
     PreviewBranding,
     RenameServiceForm,
@@ -648,19 +647,41 @@ def service_set_sms_prefix(service_id):
 @main.route("/services/<uuid:service_id>/service-settings/set-international-sms", methods=['GET', 'POST'])
 @user_has_permissions('manage_service')
 def service_set_international_sms(service_id):
-    form = InternationalSMSForm(
-        enabled='on' if current_service.has_permission('international_sms') else 'off'
+    form = ServiceOnOffSettingForm(
+        'Send text messages to international phone numbers',
+        enabled=current_service.has_permission('international_sms'),
     )
     if form.validate_on_submit():
         current_service.force_permission(
             'international_sms',
-            on=(form.enabled.data == 'on'),
+            on=form.enabled.data,
         )
         return redirect(
             url_for(".service_settings", service_id=service_id)
         )
     return render_template(
         'views/service-settings/set-international-sms.html',
+        form=form,
+    )
+
+
+@main.route("/services/<uuid:service_id>/service-settings/set-international-letters", methods=['GET', 'POST'])
+@user_has_permissions('manage_service')
+def service_set_international_letters(service_id):
+    form = ServiceOnOffSettingForm(
+        'Send letters to international addresses',
+        enabled=current_service.has_permission('international_letters'),
+    )
+    if form.validate_on_submit():
+        current_service.force_permission(
+            'international_letters',
+            on=form.enabled.data,
+        )
+        return redirect(
+            url_for(".service_settings", service_id=service_id)
+        )
+    return render_template(
+        'views/service-settings/set-international-letters.html',
         form=form,
     )
 
