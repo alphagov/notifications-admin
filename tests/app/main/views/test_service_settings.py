@@ -790,8 +790,8 @@ def test_service_name_change_confirm_handles_expired_session(
         service_id=SERVICE_ONE_ID,
         _follow_redirects=True
     )
-    mock_verify_password.assert_not_called()
-    mock_update_service.assert_not_called()
+    assert mock_verify_password.called is False
+    assert mock_update_service.called is False
 
     assert page.find('div', 'banner-dangerous').text.strip() == "The change you made was not saved. Please try again."
 
@@ -2381,14 +2381,14 @@ def test_service_verify_reply_to_address(
             mock_update_reply_to_email_address.assert_called_once_with(
                 SERVICE_ONE_ID, "123", email_address=notification["to"], is_default=is_default
             )
-            mock_add_reply_to_email_address.assert_not_called()
+            assert mock_add_reply_to_email_address.called is False
         else:
             mock_add_reply_to_email_address.assert_called_once_with(
                 SERVICE_ONE_ID, email_address=notification["to"], is_default=is_default
             )
-            mock_update_reply_to_email_address.assert_not_called()
+            assert mock_update_reply_to_email_address.called is False
     else:
-        mock_add_reply_to_email_address.assert_not_called()
+        assert mock_add_reply_to_email_address.called is False
     if status == "permanent-failure":
         assert page.find('input', type='email').attrs["value"] == notification["to"]
 
@@ -2417,7 +2417,7 @@ def test_add_reply_to_email_address_fails_if_notification_not_delivered_in_45_se
     )
     expected_banner = page.find_all('div', class_='banner-dangerous')[0]
     assert 'There’s a problem with your reply-to address' in expected_banner.text.strip()
-    mock_add_reply_to_email_address.assert_not_called()
+    assert mock_add_reply_to_email_address.called is False
 
 
 @pytest.mark.parametrize('letter_contact_blocks, data, api_default_args', [
@@ -2623,7 +2623,7 @@ def test_edit_reply_to_email_address_goes_straight_to_update_if_address_not_chan
         email_address="test@example.com",
         is_default=api_default_args
     )
-    mock_verify.assert_not_called()
+    assert mock_verify.called is False
 
 
 @pytest.mark.parametrize('url', [
@@ -2665,7 +2665,7 @@ def test_add_edit_reply_to_email_address_goes_straight_to_update_if_address_not_
     assert page.find('h1').text == "Reply-to email addresses"
     assert error_message in page.find('div', class_='banner-dangerous').text
 
-    mock_update_reply_to_email_address.assert_not_called()
+    assert mock_update_reply_to_email_address.called is False
 
 
 @pytest.mark.parametrize('reply_to_address, expected_link_text, partial_href', [
@@ -4493,8 +4493,8 @@ def test_show_branding_request_page_when_no_branding_is_set(
         '.branding_request', service_id=SERVICE_ONE_ID, branding_type=branding_type
     )
 
-    mock_get_email_branding.assert_not_called()
-    mock_get_letter_branding_by_id.assert_not_called()
+    assert mock_get_email_branding.called is False
+    assert mock_get_letter_branding_by_id.called is False
 
     if expected_options:
         assert [
@@ -4566,8 +4566,8 @@ def test_show_branding_request_page_when_no_branding_is_set_but_organisation_exi
         '.branding_request', service_id=SERVICE_ONE_ID, branding_type=branding_type
     )
 
-    mock_get_email_branding.assert_not_called()
-    mock_get_letter_branding_by_id.assert_not_called()
+    assert mock_get_email_branding.called is False
+    assert mock_get_letter_branding_by_id.called is False
 
     assert [
         (
@@ -4610,8 +4610,8 @@ def test_show_branding_request_page_when_no_branding_is_set_but_organisation_exi
         '.branding_request', service_id=SERVICE_ONE_ID, branding_type=branding_type
     )
 
-    mock_get_email_branding.assert_not_called()
-    mock_get_letter_branding_by_id.assert_not_called()
+    assert mock_get_email_branding.called is False
+    assert mock_get_letter_branding_by_id.called is False
 
     assert [
         (

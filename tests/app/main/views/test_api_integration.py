@@ -301,7 +301,7 @@ def test_cant_create_normal_api_key_in_trial_mode(
         },
         _expected_status=400,
     )
-    mock_post.assert_not_called()
+    assert mock_post.called is False
 
 
 def test_should_show_confirm_revoke_api_key(

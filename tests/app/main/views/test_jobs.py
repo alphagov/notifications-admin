@@ -642,7 +642,7 @@ def test_dont_cancel_letter_job_when_to_early_to_cancel(
         job_id=str(job_id),
         _expected_status=200,
     )
-    mock_cancel.assert_not_called()
+    assert mock_cancel.called is False
     flash_message = normalize_spaces(page.find('div', class_='banner-dangerous').text)
 
     assert 'We are still processing these letters, please try again in a minute.' in flash_message

@@ -854,7 +854,7 @@ def test_get_notifications_sent_by_service_validates_form(mocker, client_request
     for error in errors:
         assert 'Not a valid date value' in error.text
 
-    mock_get_stats_from_api.assert_not_called()
+    assert mock_get_stats_from_api.called is False
 
 
 def test_usage_for_all_services_when_no_results_for_date(client_request, platform_admin_user, mocker):

@@ -183,4 +183,4 @@ def test_returned_letters_reports_returns_404_for_bad_date(
                                 service_id=SERVICE_ONE_ID,
                                 reported_at='19-12-2019',
                                 _expected_status=404)
-    mock.assert_not_called()
+    assert mock.called is False
