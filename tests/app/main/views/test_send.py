@@ -334,11 +334,11 @@ def test_example_spreadsheet_for_letters(
         ('1', '2'),
         ('address line 1', 'A. Name'),
         ('address line 2', '123 Example Street'),
-        ('address line 3', ''),
+        ('address line 3', 'XM4 5HQ'),
         ('address line 4', ''),
         ('address line 5', ''),
         ('address line 6', ''),
-        ('postcode', 'XM4 5HQ'),
+        ('address line 7', ''),
         ('name', 'example'),
         ('date', 'example'),
     ]
@@ -2133,7 +2133,7 @@ def test_send_test_letter_redirects_to_right_url(
             'address line 4': '',
             'address line 5': '',
             'address line 6': '',
-            'postcode': 'SW1 1AA',
+            'address line 7': 'SW1 1AA',
         }
 
     response = platform_admin_client.get(url_for(
