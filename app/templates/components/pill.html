@@ -18,7 +18,7 @@
           {% if show_count %}
             {{ big_number(count, **big_number_args) }}
           {% endif %}
-            <div class="pill-item__label{% if current_value == option %} pill-item__label--selected{% endif %}{% if not show_count %} pill-item--centered{% endif %}">{{ label }}</div>
+            <div class="pill-item__label{% if not show_count %} pill-item--centered{% endif %}">{{ label }}</div>
           </a>
         </li>
       {% endfor %}
