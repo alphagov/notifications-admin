@@ -1,21 +1,25 @@
-{% from "components/textbox.html" import textbox %}
-
 {% macro live_search(
     target_selector=None,
     show=False,
     form=None,
-    label=None
+    label=None,
+    autofocus=False
 ) %}
     {%- set search_label = label or form.search.label.text %}
+
+    {%- set param_extensions = {
+      "label": {"text": search_label},
+      "autocomplete": "off",
+    } %}
+
+    {% if autofocus %}
+      {% set x=param_extensions.__setitem__("attributes", {"data-module": "autofocus"}) %}
+    {% endif %}
+
     {% if show %}
-      <div data-module="autofocus">
         <div class="live-search js-header" data-module="live-search" data-targets="{{ target_selector }}">
-          {{ form.search(param_extensions={
-            "label": {"text": search_label},
-            "autocomplete": "off"
-          }) }}
+          {{ form.search(param_extensions=param_extensions) }}
           <div role="region" aria-live="polite" class="live-search__status govuk-visually-hidden"></div>
         </div>
-      </div>
     {% endif %}
 {% endmacro %}
