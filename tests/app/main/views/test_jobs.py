@@ -188,7 +188,7 @@ def test_should_show_job_in_progress(
     )
     assert [
         normalize_spaces(link.text)
-        for link in page.select('.pill a')
+        for link in page.select('.pill a:not(.pill-item--selected)')
     ] == [
         '10 sending', '0 delivered', '0 failed'
     ]
@@ -213,7 +213,7 @@ def test_should_show_job_without_notifications(
     )
     assert [
         normalize_spaces(link.text)
-        for link in page.select('.pill a')
+        for link in page.select('.pill a:not(.pill-item--selected)')
     ] == [
         '10 sending', '0 delivered', '0 failed'
     ]
@@ -279,7 +279,7 @@ def test_should_show_old_job(
         service_id=SERVICE_ONE_ID,
         job_id=fake_uuid,
     )
-    assert not page.select('.pill a')
+    assert not page.select('.pill')
     assert not page.select('p.hint')
     assert not page.select('a[download]')
     assert page.select_one('tbody').text.strip() == expected_message

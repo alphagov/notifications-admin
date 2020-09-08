@@ -1,6 +1,7 @@
 {% from "components/big-number.html" import big_number %}
 {% from "components/message-count-label.html" import message_count_label %}
 {% from "components/table.html" import list_table, field, hidden_field_heading, row_heading, text_field %}
+{% from "components/page-header.html" import page_header %}
 {% from "components/pill.html" import pill %}
 
 {% extends "withnav_template.html" %}
@@ -11,7 +12,7 @@
 
 {% block maincolumn_content %}
 
-    <h1 class='heading-medium'>Usage</h1>
+    {{ page_header('Usage', size='medium') }}
 
     <div class="bottom-gutter">
       {{ pill(years, selected_year, big_number_args={'smallest': True}) }}

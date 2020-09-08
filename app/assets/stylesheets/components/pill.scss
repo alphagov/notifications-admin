@@ -2,7 +2,7 @@
 
   display: flex;
 
-  li {
+  &-item__container {
     width: 25%;
     flex-grow: 1;
     text-align: left;
@@ -23,8 +23,8 @@
     display: flex;
   }
 
-  a,
-  &-selected-item {
+  &-item,
+  &-item--selected {
     display: flex; // float causes display: block in browsers without flexbox
     flex-direction: column;
     justify-content: center;
@@ -34,7 +34,7 @@
     padding: 10px 0;
   }
 
-  a {
+  &-item {
     $background: $link-colour;
     background: $background;
     color: $white;
@@ -42,10 +42,6 @@
     position: relative;
     text-decoration: none;
     cursor: pointer;
-
-    .pill-label {
-      text-decoration: underline;
-    }
 
     &:link,
     &:visited {
@@ -62,13 +58,23 @@
     }
   }
 
-  &-selected-item {
+  &-item--selected {
+    background: inherit;
     border: 2px solid $black;
     outline: 1px solid rgba($white, 0.1);
     position: relative;
     z-index: 10;
-    color: $text-colour;
 
+    &:link,
+    &:visited {
+      color: $govuk-text-colour;
+    }
+
+    &:hover {
+      color: govuk-tint($govuk-text-colour, 25%);
+    }
+
+    &:active,
     &:focus {
       z-index: 1000;
       outline: 3px solid $yellow;
@@ -76,8 +82,9 @@
 
   }
 
-  &-label {
+  &-item__label {
 
+    text-decoration: underline;
     // reduce padding until screen is above 420px / zoomed below 300%
     padding-left: govuk-spacing(1);
 
@@ -87,7 +94,7 @@
 
   }
 
-  &-centered-item {
+  &-item--centered {
     text-align: center;
     padding-left: 0;
   }

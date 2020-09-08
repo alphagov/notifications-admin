@@ -1,6 +1,7 @@
 {% extends "withnav_template.html" %}
 {% from "components/ajax-block.html" import ajax_block %}
 {% from "components/message-count-label.html" import message_count_label, recipient_count_label %}
+{% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/textbox.html" import textbox %}
 {% from "components/form.html" import form_wrapper %}
@@ -23,9 +24,7 @@
 
 {% block maincolumn_content %}
 
-  <h1 class="heading-large">
-    {{ page_title }}
-  </h1>
+  {{ page_header(page_title) }}
   {% if not message_type == "letter" %}
 
     {{ ajax_block(

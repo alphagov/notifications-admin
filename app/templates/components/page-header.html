@@ -2,13 +2,14 @@
 
 {% macro page_header(
   h1,
-  back_link=None
+  back_link=None,
+  size='large'
 ) %}
 
   {% if back_link %}
     {{ govukBackLink({ "href": back_link }) }}
   {% endif %}
 
-  <h1 class="heading-large">{{ h1 }}</h1>
+  <h1 class="heading-{{ size }}" id="page-header">{{ h1 }}</h1>
 
 {% endmacro %}

@@ -692,7 +692,7 @@ def test_redacts_templates_that_should_be_redacted(
 
 
 @pytest.mark.parametrize(
-    "message_type, tablist_visible", [
+    "message_type, nav_visible", [
         ('email', True),
         ('sms', True),
         ('letter', False)
@@ -707,7 +707,7 @@ def test_big_numbers_dont_show_for_letters(
     mock_get_service_data_retention,
     mock_get_no_api_keys,
     message_type,
-    tablist_visible,
+    nav_visible,
 ):
     page = client_request.get(
         'main.view_notifications',
@@ -717,7 +717,7 @@ def test_big_numbers_dont_show_for_letters(
         page=1,
     )
 
-    assert (len(page.select("[role=tablist]")) > 0) == tablist_visible
+    assert (len(page.select(".pill")) > 0) == nav_visible
     assert (len(page.select("[type=search]")) > 0) is True
 
 

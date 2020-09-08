@@ -950,12 +950,12 @@ def test_usage_page(
     mock_get_free_sms_fragment_limit.assert_called_with(SERVICE_ONE_ID, 2011)
 
     cols = page.find_all('div', {'class': 'govuk-grid-column-one-third'})
-    nav = page.find('ul', {'class': 'pill', 'role': 'tablist'})
-    nav_links = nav.find_all('a')
+    nav = page.find('ul', {'class': 'pill'})
+    unselected_nav_links = nav.select('a:not(.pill-item--selected)')
 
-    assert normalize_spaces(nav.find('li', {'aria-selected': 'true'}).text) == '2011 to 2012 financial year'
-    assert normalize_spaces(nav_links[0].text) == '2010 to 2011 financial year'
-    assert normalize_spaces(nav_links[1].text) == '2009 to 2010 financial year'
+    assert normalize_spaces(nav.find('a', {'aria-current': 'page'}).text) == '2011 to 2012 financial year'
+    assert normalize_spaces(unselected_nav_links[0].text) == '2010 to 2011 financial year'
+    assert normalize_spaces(unselected_nav_links[1].text) == '2009 to 2010 financial year'
     assert '252,190' in cols[1].text
     assert 'Text messages' in cols[1].text
 
@@ -992,12 +992,12 @@ def test_usage_page_with_letters(
     mock_get_free_sms_fragment_limit.assert_called_with(SERVICE_ONE_ID, 2011)
 
     cols = page.find_all('div', {'class': 'govuk-grid-column-one-third'})
-    nav = page.find('ul', {'class': 'pill', 'role': 'tablist'})
-    nav_links = nav.find_all('a')
+    nav = page.find('ul', {'class': 'pill'})
+    unselected_nav_links = nav.select('a:not(.pill-item--selected)')
 
-    assert normalize_spaces(nav.find('li', {'aria-selected': 'true'}).text) == '2011 to 2012 financial year'
-    assert normalize_spaces(nav_links[0].text) == '2010 to 2011 financial year'
-    assert normalize_spaces(nav_links[1].text) == '2009 to 2010 financial year'
+    assert normalize_spaces(nav.find('a', {'aria-current': 'page'}).text) == '2011 to 2012 financial year'
+    assert normalize_spaces(unselected_nav_links[0].text) == '2010 to 2011 financial year'
+    assert normalize_spaces(unselected_nav_links[1].text) == '2009 to 2010 financial year'
     assert '252,190' in cols[1].text
     assert 'Text messages' in cols[1].text
 

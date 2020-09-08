@@ -6,25 +6,22 @@
   big_number_args={'smaller': True},
   show_count=True
 ) %}
-  <ul role='tablist' class='pill'>
-    {% for label, option, link, count in items %}
-      {% if current_value == option %}
-        <li aria-selected='true' role='tab'>
-          <div class='pill-selected-item{% if not show_count %} pill-centered-item{% endif %}' tabindex='0'>
-      {% else %}
-        <li aria-selected='false' role='tab'>
-          <a class="govuk-link govuk-link--no-visited-state" href="{{ link }}">
-      {% endif %}
-        {% if show_count %}
-            {{ big_number(count, **big_number_args) }}
+  <nav aria-labelledby='page-header'>
+    <ul class='pill'>
+      {% for label, option, link, count in items %}
+        <li class="pill-item__container">
+        {% if current_value == option %}
+          <a class="pill-item pill-item--selected govuk-link govuk-link--no-visited-state{% if not show_count %} pill-item--centered{% endif %}" href="{{ link }}" aria-current="page">
+        {% else %}
+          <a class="pill-item govuk-link govuk-link--no-visited-state" href="{{ link }}">
         {% endif %}
-            <div class="pill-label{% if not show_count %} pill-centered-item{% endif %}">{{ label }}</div>
-      {% if current_value == option %}
-          </div>
-      {% else %}
+          {% if show_count %}
+            {{ big_number(count, **big_number_args) }}
+          {% endif %}
+            <div class="pill-item__label{% if not show_count %} pill-item--centered{% endif %}">{{ label }}</div>
           </a>
-      {% endif %}
         </li>
-    {% endfor %}
-  </ul>
+      {% endfor %}
+    </ul>
+  </nav>
 {% endmacro %}

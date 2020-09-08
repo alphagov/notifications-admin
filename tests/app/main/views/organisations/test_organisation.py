@@ -503,7 +503,7 @@ def test_organisation_services_filters_by_financial_year(
         '2019 to 2020 financial year '
         '2018 to 2019 financial year'
     )
-    assert normalize_spaces(page.select_one('.pill-selected-item').text) == (
+    assert normalize_spaces(page.select_one('.pill-item--selected').text) == (
         expected_selected
     )
 
