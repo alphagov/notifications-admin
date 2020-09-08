@@ -9,74 +9,11 @@
 {% endblock %}
 
 {% block extra_stylesheets %}
-  <link rel="stylesheet" href="{{ asset_url('stylesheets/leaflet.css') }}" />
-  <style>
-    #map {
-      z-index: 50;
-      margin-bottom: 30px;
-      border: 1px solid #b1b4b6;
-    }
-  </style>
+  {% include "views/broadcast/partials/area-map-stylesheets.html" %}
 {% endblock %}
 
 {% block extra_javascripts %}
-  <script src="{{ asset_url('javascripts/leaflet.js') }}"></script>
-  <script>
-    var mapElement = document.getElementById('map');
-    mapElement.style.height = Math.max(320, window.innerHeight - mapElement.offsetTop - 100) + 'px';
-    var mymap = L.map(
-      'map',
-      {
-        scrollWheelZoom: false
-      }
-    )
-    var polygons = []
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(mymap);
-
-    {% for polygon in broadcast_message.simple_polygons.bleed.as_coordinate_pairs_lat_long %}
-      polygons.push(
-        L.polygon({{polygon}}, {
-          opacity: 0.5,
-          color: '#2B8CC4', // $light-blue
-          fillColor: '#2B8CC4', // $light-blue
-          fillOpacity: 0.2,
-          weight: 2
-        })
-      );
-    {% endfor %}
-
-    {% for polygon in broadcast_message.simple_polygons.as_coordinate_pairs_lat_long %}
-      polygons.push(
-        L.polygon({{polygon}}, {
-          opacity: 0.1,
-          color: '#2B8CC4', // $black
-          fillColor: '#2B8CC4', // $light-blue
-          fillOpacity: 0.4,
-          weight: 1
-        })
-      );
-    {% endfor %}
-
-    {% for polygon in broadcast_message.polygons.as_coordinate_pairs_lat_long %}
-      polygons.push(
-        L.polygon({{polygon}}, {
-          color: '#0b0b0c', // $black
-          fillOpacity: 0,
-          weight: 2
-        })
-      );
-    {% endfor %}
-
-    var polygonGroup = L.featureGroup(polygons).addTo(mymap);
-    mymap.fitBounds(
-      polygonGroup.getBounds(),
-      {padding: [1, 1]}
-    );
-
-  </script>
+  {% include "views/broadcast/partials/area-map-javascripts.html" %}
 {% endblock %}
 
 {% block maincolumn_content %}
