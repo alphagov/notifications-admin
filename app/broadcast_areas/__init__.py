@@ -1,3 +1,4 @@
+from notifications_utils.formatters import formatted_list
 from notifications_utils.serialised_model import SerialisedModelCollection
 from werkzeug.utils import cached_property
 
@@ -65,7 +66,15 @@ class BroadcastAreaLibrary(SerialisedModelCollection, SortableMixin, GetItemById
         self.items = BroadcastAreasRepository().get_all_areas_for_library(self.id)
 
     def get_examples(self):
-        return BroadcastAreasRepository().get_library_description(self.id)
+        # we show up to four things. three areas, then either a fourth area if there are exactly four, or "and X more".
+        areas_to_show = sorted(area.name for area in self)[:4]
+
+        count_of_areas_not_named = len(self.items) - 3
+        # if there's exactly one area not named, there are exactly four - we should just show all four.
+        if count_of_areas_not_named > 1:
+            areas_to_show = areas_to_show[:3] + [f'{count_of_areas_not_named} more…']
+
+        return formatted_list(areas_to_show, before_each='', after_each='')
 
 
 class BroadcastAreaLibraries(SerialisedModelCollection, GetItemByIdMixin):

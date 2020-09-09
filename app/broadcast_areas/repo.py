@@ -119,37 +119,6 @@ class BroadcastAreasRepository(object):
         libraries = [(row[0], row[1], row[2], row[3]) for row in results]
         return sorted(libraries)
 
-    def get_library_description(self, library_id):
-        # TODO: this count is wrong, and we shouldn't be building up user strings in sql. Replace this with python code.
-        q = """
-        WITH
-        areas AS (
-            SELECT * FROM broadcast_areas
-            WHERE broadcast_area_library_id = ?
-            AND broadcast_area_library_group_id IS NULL
-        ),
-        area_count AS (SELECT COUNT(*) AS c FROM areas),
-        subset_area_count AS (SELECT c - 4 FROM area_count),
-        description_area_names  AS (SELECT name FROM areas ORDER BY name ASC LIMIT 3),
-        description_areas_joined AS (
-            SELECT GROUP_CONCAT(name, ", ") FROM description_area_names
-        )
-        SELECT
-        CASE (SELECT * FROM subset_area_count)
-        WHEN 0 THEN
-            (SELECT * FROM description_areas_joined)
-            || ", and "
-            || (SELECT name from areas ORDER BY name DESC limit 1)
-        ELSE
-            (SELECT * FROM description_areas_joined)
-            || ", and "
-            || (SELECT * FROM subset_area_count)
-            || " more…"
-        END
-        """
-        description = self.query(q, library_id)[0][0]
-        return description
-
     def get_areas(self, area_ids):
         q = """
         SELECT id, name
