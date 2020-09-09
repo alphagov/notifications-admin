@@ -702,6 +702,47 @@ def test_upload_csv_file_with_international_letters_permission_shows_appropriate
     ]
 
 
+@pytest.mark.parametrize('row_index, expected_postage', (
+    (2, 'Postage: second class'),
+    (3, 'Postage: international'),
+))
+def test_upload_csv_file_with_international_letters_permission_shows_correct_postage(
+    client_request,
+    service_one,
+    mocker,
+    mock_get_service_letter_template,
+    mock_s3_upload,
+    mock_get_users_by_service,
+    mock_get_service_statistics,
+    mock_get_job_doesnt_exist,
+    mock_get_jobs,
+    fake_uuid,
+    row_index,
+    expected_postage,
+):
+    service_one['permissions'] += ['letter', 'international_letters']
+    mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=9)
+    mocker.patch(
+        'app.main.views.send.s3download',
+        return_value='''
+            address line 1,     address line 3,  address line 6,
+            Firstname Lastname, 123 Example St., SW1A 1AA
+            Firstname Lastname, 123 Example St., France
+        '''
+    )
+
+    page = client_request.get(
+        'main.check_messages',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        upload_id=fake_uuid,
+        row_index=row_index,
+        _test_page_title=False,
+    )
+
+    assert normalize_spaces(page.select_one('.letter-postage').text) == expected_postage
+
+
 @pytest.mark.parametrize('file_contents, expected_error,', [
     (
         """
@@ -2280,6 +2321,43 @@ def test_send_one_off_letter_copes_with_placeholder_from_address_block(
     # We’ve skipped past the address placeholder and gone back to the
     # address block
     assert normalize_spaces(previous_page.select_one('form label').text) == 'Address'
+
+
+@pytest.mark.parametrize('last_line, expected_postage', (
+    ('France', 'Postage: international'),
+    ('SW1A 1AA', 'Postage: second class'),
+))
+def test_send_one_off_letter_shows_international_postage(
+    client_request,
+    service_one,
+    mocker,
+    fake_uuid,
+    mock_get_service_letter_template_with_placeholders,
+    mock_template_preview,
+    no_letter_contact_blocks,
+    last_line,
+    expected_postage,
+):
+    service_one['permissions'] += ['letter', 'international_letters']
+
+    with client_request.session_transaction() as session:
+        session['recipient'] = None
+        session['placeholders'] = {}
+
+    page = client_request.post(
+        'main.send_one_off_letter_address',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _data={'address': f'''
+            123 Example Street
+            Paris
+            {last_line}
+        '''},
+        _follow_redirects=True,
+    )
+
+    assert normalize_spaces(page.select_one('form label').text) == 'name'
+    assert normalize_spaces(page.select_one('.letter-postage').text) == expected_postage
 
 
 def test_send_test_sms_message_puts_submitted_data_in_session(
