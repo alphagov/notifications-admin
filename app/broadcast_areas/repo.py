@@ -37,6 +37,7 @@ class BroadcastAreasRepository(object):
                 name TEXT NOT NULL,
                 broadcast_area_library_id TEXT NOT NULL,
                 broadcast_area_library_group_id TEXT,
+                count_of_phones INTEGER,
 
                 FOREIGN KEY (broadcast_area_library_id)
                     REFERENCES broadcast_area_libraries(id),
@@ -84,9 +85,10 @@ class BroadcastAreasRepository(object):
         areas_q = """
         INSERT INTO broadcast_areas (
             id, name,
-            broadcast_area_library_id, broadcast_area_library_group_id
+            broadcast_area_library_id, broadcast_area_library_group_id,
+            count_of_phones
         )
-        VALUES (?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?)
         """
 
         features_q = """
@@ -98,9 +100,9 @@ class BroadcastAreasRepository(object):
         """
 
         with self.conn() as conn:
-            for id, name, area_id, group, polygons, simple_polygons in areas:
+            for id, name, area_id, group, polygons, simple_polygons, count_of_phones in areas:
                 conn.execute(areas_q, (
-                    id, name, area_id, group,
+                    id, name, area_id, group, count_of_phones
                 ))
                 if not keep_old_features:
                     conn.execute(features_q, (
@@ -152,7 +154,7 @@ class BroadcastAreasRepository(object):
 
     def get_areas(self, area_ids):
         q = """
-        SELECT id, name
+        SELECT id, name, count_of_phones
         FROM broadcast_areas
         WHERE id IN ({})
         """.format(("?," * len(area_ids))[:-1])
@@ -160,7 +162,7 @@ class BroadcastAreasRepository(object):
         results = self.query(q, *area_ids)
 
         areas = [
-            (row[0], row[1])
+            (row[0], row[1], row[2])
             for row in results
         ]
 
@@ -179,7 +181,7 @@ class BroadcastAreasRepository(object):
         if is_multi_tier_library:
             # only interested in areas with children - eg local authorities, counties, unitary authorities. not wards.
             q = """
-            SELECT id, name
+            SELECT id, name, count_of_phones
             FROM broadcast_areas
             JOIN (
                 SELECT DISTINCT broadcast_area_library_group_id
@@ -191,7 +193,7 @@ class BroadcastAreasRepository(object):
         else:
             # Countries don't have any children, so the above query wouldn't return anything.
             q = """
-            SELECT id, name
+            SELECT id, name, count_of_phones
             FROM broadcast_areas
             WHERE broadcast_area_library_id = ?
             """
@@ -199,13 +201,13 @@ class BroadcastAreasRepository(object):
         results = self.query(q, library_id)
 
         return [
-            (row[0], row[1])
+            (row[0], row[1], row[2])
             for row in results
         ]
 
     def get_all_areas_for_group(self, group_id):
         q = """
-        SELECT id, name
+        SELECT id, name, count_of_phones
         FROM broadcast_areas
         WHERE broadcast_area_library_group_id = ?
         """
@@ -213,7 +215,7 @@ class BroadcastAreasRepository(object):
         results = self.query(q, group_id)
 
         areas = [
-            (row[0], row[1])
+            (row[0], row[1], row[2])
             for row in results
         ]
 

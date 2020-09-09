@@ -1,5 +1,6 @@
 import itertools
 from datetime import datetime, timedelta
+from math import floor, log10
 
 from notifications_utils.template import BroadcastPreviewTemplate
 from orderedset import OrderedSet
@@ -13,6 +14,13 @@ from app.notify_client.broadcast_message_api_client import (
     broadcast_message_api_client,
 )
 from app.notify_client.service_api_client import service_api_client
+
+
+def round_to_significant_figures(x, n):
+    return int(round(
+        x,
+        -int(floor(log10(abs(x)))) + (n - 1)
+    ))
 
 
 class BroadcastMessage(JSONModel):
@@ -112,6 +120,22 @@ class BroadcastMessage(JSONModel):
     @cached_property
     def cancelled_by(self):
         return User.from_id(self.cancelled_by_id)
+
+    @property
+    def count_of_phones(self):
+        return round_to_significant_figures(
+            sum(area.count_of_phones or 0 for area in self.areas),
+            2
+        )
+
+    @property
+    def count_of_phones_likely(self):
+        area_estimate = self.simple_polygons.estimated_area
+        bleed_area_estimate = self.simple_polygons.bleed.estimated_area - area_estimate
+        return round_to_significant_figures(
+            self.count_of_phones * bleed_area_estimate / area_estimate,
+            1
+        )
 
     def get_areas(self, areas):
         return broadcast_area_libraries.get_areas(

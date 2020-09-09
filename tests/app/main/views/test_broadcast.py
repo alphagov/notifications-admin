@@ -351,8 +351,8 @@ def test_preview_broadcast_areas_page(
         normalize_spaces(item.text)
         for item in page.select('ul li.area-key')
     ] == [
-        'An area of 176,714.9 square miles Will get the alert',
-        'An extra area of 3,052.8 square miles is Likely to get the alert',
+        'An area of 176,714.9 square miles Will get the alert (44,000,000 phones)',
+        'An extra area of 3,052.8 square miles is Likely to get the alert (800,000 phones)',
     ]
 
 
