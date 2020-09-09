@@ -14,6 +14,9 @@ class Polygons():
 
     approx_metres_to_degree = 111_320
     approx_square_metres_to_square_degree = approx_metres_to_degree ** 2
+    square_degrees_to_square_miles = (
+        approx_square_metres_to_square_degree / (1000 * 1000) * 0.386102
+    )
 
     # Estimated amount of bleed into neigbouring areas based on typical
     # range/separation of cell towers.
@@ -160,6 +163,12 @@ class Polygons():
     @cached_property
     def point_count(self):
         return len(list(itertools.chain(*self.as_coordinate_pairs_long_lat)))
+
+    @property
+    def estimated_area(self):
+        return sum(
+            polygon.area for polygon in self
+        ) * self.square_degrees_to_square_miles
 
 
 def flatten_polygons(polygons):

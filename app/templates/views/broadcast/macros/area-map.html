@@ -1,0 +1,23 @@
+{% macro map(broadcast_message) %}
+  <div id="map"></div>
+  <ul>
+    <li class="area-key area-key--certain">
+      <span class="visually-hidden">
+        An area of {{ "{:,.1f}".format(broadcast_message.simple_polygons.estimated_area) }} square miles
+      </span>
+      Will get
+      <span class="visually-hidden">the</span>
+      alert
+    </li>
+    <li class="area-key area-key--likely">
+      <span class="visually-hidden">
+        An extra area of {{ "{:,.1f}".format(broadcast_message.simple_polygons.bleed.estimated_area - broadcast_message.simple_polygons.estimated_area) }} square miles is
+      </span>
+      Likely to get
+      <span class="visually-hidden">
+        the
+      </span>
+      alert
+    </li>
+  </ul>
+{% endmacro %}

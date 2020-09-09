@@ -1,7 +1,7 @@
 .area-list {
 
   display: inline-block;
-  
+
   &-item {
 
     display: inline-block;
@@ -71,6 +71,51 @@
 
   .govuk-button {
     margin-left: 3px;
+  }
+
+}
+
+#map {
+  z-index: 50;
+  margin-bottom: govuk-spacing(4);
+}
+
+.area-key {
+
+  display: inline-block;
+  position: relative;
+  margin-right: govuk-spacing(3);
+  margin-bottom: govuk-spacing(5);
+  height: govuk-spacing(7);
+  padding-left: govuk-spacing(8);
+  line-height: govuk-spacing(7);
+
+  &:before {
+    content: "";
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: govuk-spacing(7);
+    height: govuk-spacing(7);
+    box-sizing: border-box;
+    margin-right: govuk-spacing(1);
+  }
+
+  &--certain {
+    &:before {
+      border: 4px solid rgba($white, 0.1);
+      background: rgba($govuk-blue, 0.6);
+      box-shadow: inset 0 0 0 2px $black;
+    }
+  }
+
+  &--likely {
+    &:before {
+      padding: 1px;
+      border: 2px solid $govuk-blue;
+      background: rgba($govuk-blue, 0.2);
+    }
   }
 
 }

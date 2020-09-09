@@ -5,6 +5,7 @@
 {% from "components/banner.html" import banner %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
+{% from "views/broadcast/macros/area-map.html" import map %}
 
 {% extends "withnav_template.html" %}
 
@@ -139,7 +140,7 @@
 
   {{ govukDetails({
     "summaryText": "Show map",
-    "html": '<div id="map"></div>'
+    "html": map(broadcast_message)
   }) }}
 
   {{ broadcast_message.template|string }}

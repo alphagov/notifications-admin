@@ -331,11 +331,29 @@ def test_preview_broadcast_areas_page(
     mock_get_draft_broadcast_message,
 ):
     service_one['permissions'] += ['broadcast']
-    client_request.get(
+    page = client_request.get(
         '.preview_broadcast_areas',
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
     )
+
+    assert [
+        normalize_spaces(item.text)
+        for item in page.select('ul.area-list li.area-list-item')
+    ] == [
+        'England remove',
+        'Scotland remove',
+    ]
+
+    assert len(page.select('#map')) == 1
+
+    assert [
+        normalize_spaces(item.text)
+        for item in page.select('ul li.area-key')
+    ] == [
+        'An area of 176,714.9 square miles Will get the alert',
+        'An extra area of 3,052.8 square miles is Likely to get the alert',
+    ]
 
 
 def test_choose_broadcast_library_page(

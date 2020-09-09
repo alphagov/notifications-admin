@@ -1,6 +1,7 @@
 {% from "components/button/macro.njk" import govukButton %}
 {% from "components/page-header.html" import page_header %}
-{% from "components/page-footer.html" import sticky_page_footer %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "views/broadcast/macros/area-map.html" import map %}
 
 {% extends "withnav_template.html" %}
 
@@ -51,9 +52,9 @@
   {% endfor %}
 
   {% if broadcast_message.areas %}
-    <div id="map"></div>
+    {{ map(broadcast_message) }}
     <form action="{{ url_for('.preview_broadcast_message', service_id=current_service.id, broadcast_message_id=broadcast_message.id) }}" method="get">
-      {{ sticky_page_footer('Continue to preview') }}
+      {{ page_footer('Continue to preview') }}
     </form>
   {% endif %}
 
