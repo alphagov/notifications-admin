@@ -16,7 +16,7 @@ def test_loads_libraries():
             False,
         ),
         (
-            'wd20-lad20',
+            'wd20-lad20-ctyua19',
             'Local authorities',
             True,
         ),
@@ -40,8 +40,8 @@ def test_examples():
     countries = broadcast_area_libraries.get('ctry19').get_examples()
     assert countries == 'England, Northern Ireland, Scotland, and Wales'
 
-    wards = broadcast_area_libraries.get('wd20-lad20').get_examples()
-    assert wards == 'Aberdeen City, Aberdeenshire, Adur, and 375 more…'
+    wards = broadcast_area_libraries.get('wd20-lad20-ctyua19').get_examples()
+    assert wards == 'Aberdeen City, Aberdeenshire, Angus, and 213 more…'
 
 
 @pytest.mark.parametrize('id', (

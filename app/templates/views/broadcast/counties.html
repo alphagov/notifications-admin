@@ -1,0 +1,42 @@
+{% from "components/page-header.html" import page_header %}
+{% from "components/live-search.html" import live_search %}
+{% from "components/page-footer.html" import sticky_page_footer %}
+{% from "components/form.html" import form_wrapper %}
+
+
+
+{% extends "withnav_template.html" %}
+
+{% block service_page_title %}
+  {{ page_title }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header(
+    page_title,
+    back_link=url_for('.choose_broadcast_library', service_id=current_service.id, broadcast_message_id=broadcast_message.id),
+  )}}
+
+  {% call form_wrapper() %}
+
+    <div class="form-group govuk-!-margin-bottom-4">
+      {{ form.select_all }}
+    </div>
+    {{ live_search(target_selector='.file-list-item', show=show_search_form, form=search_form, label='Or by district') }}
+
+    {% for area in county.sub_areas|sort %}
+      <div class="file-list-item">
+      {# these are districts within a county#}
+        <a
+          class="file-list-filename-large govuk-link govuk-link--no-visited-state"
+          href="{{ url_for('.choose_broadcast_sub_area', service_id=current_service.id, broadcast_message_id=broadcast_message.id, library_slug=library_slug, area_slug=area.id) }}"
+        >{{ area.name }}</a>
+      </div>
+    {% endfor %}
+
+    {{ sticky_page_footer('Add to broadcast') }}
+
+  {% endcall %}
+
+{% endblock %}

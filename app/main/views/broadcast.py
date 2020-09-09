@@ -160,8 +160,10 @@ def choose_broadcast_sub_area(service_id, broadcast_message_id, library_slug, ar
     )
     area = BroadcastMessage.libraries.get_areas(area_slug)[0]
 
+    is_county = any(sub_area.sub_areas for sub_area in area.sub_areas)
+
     form = BroadcastAreaFormWithSelectAll.from_library(
-        area.sub_areas,
+        [] if is_county else area.sub_areas,
         select_all_choice=(area.id, f'All of {area.name}'),
     )
     if form.validate_on_submit():
@@ -171,6 +173,20 @@ def choose_broadcast_sub_area(service_id, broadcast_message_id, library_slug, ar
             service_id=current_service.id,
             broadcast_message_id=broadcast_message.id,
         ))
+
+    if is_county:
+        # area = county. sub_areas = districts. they have wards, so link to individual district pages
+        return render_template(
+            'views/broadcast/counties.html',
+            form=form,
+            search_form=SearchByNameForm(),
+            show_search_form=(len(area.sub_areas) > 7),
+            library_slug=library_slug,
+            page_title=f'Choose an area of {area.name}',
+            broadcast_message=broadcast_message,
+            county=area,
+        )
+
     return render_template(
         'views/broadcast/sub-areas.html',
         form=form,

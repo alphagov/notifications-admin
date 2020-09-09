@@ -44,7 +44,7 @@ class BroadcastArea(SortableMixin):
             BroadcastAreasRepository().get_simple_polygons_for_area(self.id)
         )
 
-    @property
+    @cached_property
     def sub_areas(self):
         return [
             BroadcastArea(row)

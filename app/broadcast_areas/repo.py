@@ -62,6 +62,13 @@ class BroadcastAreasRepository(object):
             ON broadcast_areas (broadcast_area_library_group_id);
             """)
 
+    def delete_library_data(self):
+        # delete everything except broadcast_area_polygons
+        with self.conn() as conn:
+            conn.execute('DELETE FROM broadcast_area_libraries;')
+            conn.execute('DELETE FROM broadcast_area_library_groups;')
+            conn.execute('DELETE FROM broadcast_areas;')
+
     def insert_broadcast_area_library(self, id, *, name, name_singular, is_group):
 
         q = """
@@ -72,7 +79,7 @@ class BroadcastAreasRepository(object):
         with self.conn() as conn:
             conn.execute(q, (id, name, name_singular, is_group))
 
-    def insert_broadcast_areas(self, areas):
+    def insert_broadcast_areas(self, areas, keep_old_features):
 
         areas_q = """
         INSERT INTO broadcast_areas (
@@ -95,9 +102,10 @@ class BroadcastAreasRepository(object):
                 conn.execute(areas_q, (
                     id, name, area_id, group,
                 ))
-                conn.execute(features_q, (
-                    id, json.dumps(polygons), json.dumps(simple_polygons),
-                ))
+                if not keep_old_features:
+                    conn.execute(features_q, (
+                        id, json.dumps(polygons), json.dumps(simple_polygons),
+                    ))
 
     def query(self, sql, *args):
         with self.conn() as conn:
@@ -112,6 +120,7 @@ class BroadcastAreasRepository(object):
         return sorted(libraries)
 
     def get_library_description(self, library_id):
+        # TODO: this count is wrong, and we shouldn't be building up user strings in sql. Replace this with python code.
         q = """
         WITH
         areas AS (
@@ -158,12 +167,34 @@ class BroadcastAreasRepository(object):
         return areas
 
     def get_all_areas_for_library(self, library_id):
-        q = """
-        SELECT id, name
-        FROM broadcast_areas
-        WHERE broadcast_area_library_id = ?
-        AND broadcast_area_library_group_id IS NULL
-        """
+        is_multi_tier_library = self.query("""
+        SELECT exists(
+            SELECT 1
+            FROM broadcast_areas
+            WHERE broadcast_area_library_id = ? AND
+            broadcast_area_library_group_id IS NOT NULL
+        )
+        """, library_id)[0][0]
+
+        if is_multi_tier_library:
+            # only interested in areas with children - eg local authorities, counties, unitary authorities. not wards.
+            q = """
+            SELECT id, name
+            FROM broadcast_areas
+            JOIN (
+                SELECT DISTINCT broadcast_area_library_group_id
+                FROM broadcast_areas
+                WHERE broadcast_area_library_group_id IS NOT NULL
+            ) AS parent_broadcast_areas ON parent_broadcast_areas.broadcast_area_library_group_id = broadcast_areas.id
+            WHERE broadcast_area_library_id = ?
+            """
+        else:
+            # Countries don't have any children, so the above query wouldn't return anything.
+            q = """
+            SELECT id, name
+            FROM broadcast_areas
+            WHERE broadcast_area_library_id = ?
+            """
 
         results = self.query(q, library_id)
 
@@ -180,23 +211,6 @@ class BroadcastAreasRepository(object):
         """
 
         results = self.query(q, group_id)
-
-        areas = [
-            (row[0], row[1])
-            for row in results
-        ]
-
-        return areas
-
-    def get_all_groups_for_library(self, library_id):
-        q = """
-        SELECT id, name
-        FROM broadcast_areas
-        WHERE broadcast_area_library_group_id = NULL
-        AND broadcast_area_library_id = ?
-        """
-
-        results = self.query(q, library_id)
 
         areas = [
             (row[0], row[1])
