@@ -5,14 +5,16 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/form.html" import form_wrapper %}
 
-{% block org_page_title %}
-  Default letter branding
+{% set page_title = "Default letter branding" %}
+
+{% block per_page_title %}
+  {{ page_title }}
 {% endblock %}
 
 {% block maincolumn_content %}
 
   {{ page_header(
-    "Default letter branding",
+    page_title,
     back_link=url_for('.organisation_settings', org_id=current_org.id)
   ) }}
   {% call form_wrapper(data_kwargs={'preview-type': 'letter'}) %}
@@ -22,7 +24,13 @@
     </div>
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-full">
-        {{ live_search(target_selector='.multiple-choice', show=True, form=search_form, label='Search by name') }}
+        {{ live_search(
+          target_selector='.multiple-choice',
+          show=True,
+          form=search_form,
+          label='Search by name',
+          autofocus=True
+        ) }}
         {{ radios(form.branding_style, hide_legend=True) }}
       </div>
     </div>
