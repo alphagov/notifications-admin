@@ -79,6 +79,8 @@
                 {% elif not item.as_postal_address.has_valid_last_line %}
                   {% if item.as_postal_address.allow_international_letters %}
                     Last line of the address must be a UK postcode or another country
+                  {% elif item.as_postal_address.international %}
+                    You do not have permission to send letters to other countries
                   {% else %}
                     Last line of the address must be a real UK postcode
                   {% endif %}

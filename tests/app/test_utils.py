@@ -512,6 +512,17 @@ def test_get_letter_validation_error_for_unknown_error():
         ),
     ),
     (
+        'cant-send-international-letters',
+        None,
+        'There’s a problem with the address for this letter',
+        (
+            'You do not have permission to send letters to other countries.'
+        ),
+        (
+            'Validation failed because your service cannot send letters to other countries.'
+        ),
+    ),
+    (
         'not-a-real-uk-postcode-or-country',
         None,
         'There’s a problem with the address for this letter',
