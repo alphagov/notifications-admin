@@ -12,28 +12,39 @@ $govuk-compatibility-govukelements: true;
 $govuk-assets-path: "/static/";
 
 @import "settings/all";
+// update to focus styles, remove when upgrading to GOVUK Frontend 3.x.x
+@import "./focus/settings";
 @import "tools/all";
 @import "helpers/all";
+// update to focus styles, remove when upgrading to GOVUK Frontend 3.x.x
+@import "./focus/helpers";
 
 @import "core/all";
+// update to focus styles, remove when upgrading to GOVUK Frontend 3.x.x
+@import "./focus/core";
 @import "objects/all";
 
-// section replacing @import 'components/all', specifying which components to include
-@import 'components/skip-link/_skip-link';
-@import 'components/header/_header';
-@import 'components/footer/_footer';
-@import 'components/back-link/_back-link';
-@import 'components/button/_button';
-@import 'components/details/_details';
-@import 'components/radios/_radios';
-@import 'components/checkboxes/_checkboxes';
-@import 'components/input/_input';
+// section replacing @import "components/all", specifying which components to include
+@import "components/skip-link/_skip-link";
+@import "components/header/_header";
+@import "components/footer/_footer";
+@import "components/back-link/_back-link";
+@import "components/button/_button";
+@import "components/details/_details";
+@import "components/radios/_radios";
+@import "components/checkboxes/_checkboxes";
+@import "components/input/_input";
+
+// update to focus styles, remove when upgrading to GOVUK Frontend 3.x.x
+@import "./focus/components";
 
 @import "utilities/all";
 @import "overrides/all";
 
 // Styles extending those from GOV.UK Frontend
-@import './extensions';
+@import "./extensions";
+// update to focus styles, remove when upgrading to GOVUK Frontend 3.x.x
+@import "./focus/extensions";
 
 // Styles for GOV.UK Frontend components specific to this application
-@import './overrides';
+@import "./overrides";
