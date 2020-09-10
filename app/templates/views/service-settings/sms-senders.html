@@ -18,23 +18,29 @@
   <div class="user-list">
     {% if not current_service.sms_senders %}
       <div class="user-list-item">
-        <span class="hint">You have not added any text message senders yet</span>
+        <p class="govuk-body user-list-item-blank hint">You have not added any text message senders yet</p>
       </div>
     {% endif %}
     {% for item in current_service.sms_senders_with_hints %}
       <div class="user-list-item">
-        <h2 class="user-list-item-heading">
-          <span class="heading-small">{{ item.sms_sender }}</span>
-          {% if item.hint %}
-            &ensp;
-            <span class="hint">
-              {{ item.hint }}
-            </span>
-          {% endif %}
-        </h2>
-        {% if current_user.has_permissions('manage_service') %}
-          <a class="govuk-link govuk-link--no-visited-state user-list-edit-link" href="{{ url_for('.service_edit_sms_sender', service_id=current_service.id, sms_sender_id = item.id) }}">Change</a>
-        {% endif %}
+        <div class="govuk-grid-row">
+          <div class="govuk-grid-column-three-quarters">
+            <h2 class="user-list-item-heading">
+              <span class="heading-small">{{ item.sms_sender }}</span>
+              {% if item.hint %}
+                &ensp;
+                <span class="hint">
+                  {{ item.hint }}
+                </span>
+              {% endif %}
+            </h2>
+          </div>
+          <div class="govuk-grid-column-one-quarter">
+            {% if current_user.has_permissions('manage_service') %}
+              <a class="govuk-link govuk-link--no-visited-state user-list-edit-link" href="{{ url_for('.service_edit_sms_sender', service_id=current_service.id, sms_sender_id = item.id) }}">Change</a>
+            {% endif %}
+          </div>
+        </div>
         {% if current_service.count_sms_senders > 1 %}
           {{ api_key(item.id, name=item.sms_sender, thing="ID") }}
         {% endif %}

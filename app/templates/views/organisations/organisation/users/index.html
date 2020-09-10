@@ -1,7 +1,6 @@
 {% extends "org_template.html" %}
 {% from "components/table.html" import list_table, row, field, hidden_field_heading %}
 {% from "components/page-footer.html" import page_footer %}
-{% from "components/tick-cross.html" import tick_cross %}
 {% from "components/textbox.html" import textbox %}
 {% from "components/live-search.html" import live_search %}
 {% from "components/button/macro.njk" import govukButton %}
@@ -25,29 +24,31 @@
   <div class="user-list">
     {% for user in users %}
       <div class="user-list-item">
-        <h2 class="user-list-item-heading">
-          {%- if user.name -%}
-            <span class="heading-small">{{ user.name }}</span>&ensp;
-          {%- endif -%}
-          <span class="hint">
-            {%- if user.status == 'pending' -%}
-              {{ user.email_address }} (invited)
-            {%- elif user.status == 'cancelled' -%}
-              {{ user.email_address }} (cancelled invite)
-            {%- elif user.id == current_user.id -%}
-              (you)
-            {% else %}
-              {{ user.email_address }}
-            {% endif %}
-          </span>
-        </h2>
-        <ul class="tick-cross-list">
-          <li class="tick-cross-list-edit-link">
+        <div class="govuk-grid-row">
+          <div class="govuk-grid-column-three-quarters">
+            <h2 class="user-list-item-heading">
+              {%- if user.name -%}
+                <span class="heading-small">{{ user.name }}</span>&ensp;
+              {%- endif -%}
+              <span class="hint">
+                {%- if user.status == 'pending' -%}
+                  {{ user.email_address }} (invited)
+                {%- elif user.status == 'cancelled' -%}
+                  {{ user.email_address }} (cancelled invite)
+                {%- elif user.id == current_user.id -%}
+                  (you)
+                {% else %}
+                  {{ user.email_address }}
+                {% endif %}
+              </span>
+            </h2>
+          </div>
+          <div class="govuk-grid-column-one-quarter">
             {% if user.status == 'pending' %}
-              <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.cancel_invited_org_user', org_id=current_org.id, invited_user_id=user.id)}}">Cancel invitation</a>
+              <a class="govuk-link govuk-link--no-visited-state user-list-edit-link" href="{{ url_for('.cancel_invited_org_user', org_id=current_org.id, invited_user_id=user.id)}}">Cancel invitation</a>
             {% endif %}
-          </li>
-        </ul>
+          </div>
+        </div>
       </div>
     {% endfor %}
   </div>
