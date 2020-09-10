@@ -1252,6 +1252,10 @@ class LetterAddressForm(StripWhitespaceForm):
                 raise ValidationError(
                     f'Last line of the address must be a UK postcode or another country'
                 )
+            if address.international:
+                raise ValidationError(
+                    f'You do not have permission to send letters to other countries'
+                )
             raise ValidationError(
                 f'Last line of the address must be a real UK postcode'
             )

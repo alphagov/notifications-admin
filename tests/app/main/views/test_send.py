@@ -637,7 +637,7 @@ def test_upload_csv_file_with_bad_postal_address_shows_check_page_with_errors(
         '3 Last line of the address must be a real UK postcode',
         'Firstname Lastname 123 Example St. SW!A !AA',
 
-        '4 Last line of the address must be a real UK postcode',
+        '4 You do not have permission to send letters to other countries',
         'Firstname Lastname 123 Example St. France',
 
         '5 Address must be at least 3 lines long',
@@ -2602,6 +2602,11 @@ def test_send_one_off_letter_address_populates_address_fields_in_session(
         '\n'.join(['a', 'b', 'c', 'd', 'e', 'f', 'g']),
         [],
         'Last line of the address must be a real UK postcode',
+    ),
+    (
+        '\n'.join(['a', 'b', 'c', 'd', 'e', 'france']),
+        [],
+        'You do not have permission to send letters to other countries',
     ),
     (
         '\n'.join(['a', 'b', 'c', 'd', 'e', 'f', 'g']),

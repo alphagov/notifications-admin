@@ -703,6 +703,15 @@ LETTER_VALIDATION_MESSAGES = {
             'Validation failed because the last line of the address is not a real UK postcode.'
         ),
     },
+    'cant-send-international-letters': {
+        'title': 'There’s a problem with the address for this letter',
+        'detail': (
+            'You do not have permission to send letters to other countries.'
+        ),
+        'summary': (
+            'Validation failed because your service cannot send letters to other countries.'
+        ),
+    },
     'not-a-real-uk-postcode-or-country': {
         'title': 'There’s a problem with the address for this letter',
         'detail': (
