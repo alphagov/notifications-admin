@@ -498,7 +498,7 @@ def test_user_with_only_send_and_view_sees_letter_page(
     (
         TEMPLATE_ONE_ID,
         partial(url_for, 'main.edit_template_postage', template_id=TEMPLATE_ONE_ID),
-        'Change',
+        'Change postage',
     ),
 ))
 def test_letter_with_default_branding_has_add_logo_button(
