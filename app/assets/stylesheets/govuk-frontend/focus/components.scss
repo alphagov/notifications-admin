@@ -26,6 +26,18 @@
   }
 }
 
+// Updates to footer component
+.govuk-footer__link {
+  text-decoration: none;
+
+  &:hover,
+  &:active {
+    text-decoration: underline;
+  }
+
+  @include govuk-focusable-text-link;
+}
+
 // Updates to back-link component
 .govuk-back-link {
   @include govuk-focusable-text-link;
