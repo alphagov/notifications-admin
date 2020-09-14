@@ -73,11 +73,9 @@
       padding: $padding-top 0 $padding-bottom govuk-spacing(3);
 
       &:focus {
-        outline: none;
-        border-bottom: 1px solid $yellow;
-        border-left: 10px solid $yellow;
-        border-right: 3px solid $yellow;
-        right: -3px;
+        padding: $padding-top 0px $padding-bottom + 1px govuk-spacing(3) + 10;
+        /* override default focus style to inset bottom underline */
+        box-shadow: inset 0 -4px $govuk-focus-text-colour;
       }
 
     }
@@ -105,7 +103,7 @@
       position: absolute;
       top: -1px;
       bottom: 1px;
-      right: 7px;
+      right: 2px;
       width: 7px;
       height: 7px;
       margin: auto 0;
@@ -117,10 +115,13 @@
       border-color: $secondary-text-colour;
     }
 
+    &:focus:before {
+      border-color: $govuk-focus-text-colour;
+    }
+
     // hack to make the focus style fit in the navigation bar
     &:focus {
-      outline: none;
-      box-shadow: 0 1px 0 0 $focus-colour, -3px 0 0 0 $focus-colour, -3px 1px 0 0 $focus-colour;
+      box-shadow: inset 0 -3px $govuk-focus-text-colour, 0 1px $govuk-focus-text-colour;
     }
 
   }
