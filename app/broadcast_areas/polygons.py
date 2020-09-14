@@ -41,7 +41,7 @@ class Polygons():
     # The threshold for removing very small areas from the map. These
     # areas are likely glitches in  the data where the shoreline hasn’t
     # been subtracted from the land properly
-    minimum_area_size_square_metres = 50 ** 2
+    minimum_area_size_square_metres = 14_000
 
     def __init__(self, polygons):
         if not polygons:
