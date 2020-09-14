@@ -337,6 +337,11 @@
     display: block;
     position: relative;
 
+    /* remove default focus styles in favour of those for :before pseudo class */
+    &:focus {
+      box-shadow: none;
+    }
+
     &:before {
       content: "";
       display: block;
@@ -353,10 +358,7 @@
 
     &:active:before,
     &:focus:before {
-      border-color: $yellow;
-      border-style: solid;
-      border-width: 15px 3px 15px 15px;
-      right: -3px;
+      box-shadow: inset 0px -4px $govuk-focus-text-colour, inset 0px 15px $govuk-focus-colour, inset 15px 0px $govuk-focus-colour, inset 0px -11px $govuk-focus-colour;
     }
 
   }
