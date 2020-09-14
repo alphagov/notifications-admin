@@ -378,7 +378,7 @@ def test_choose_broadcast_library_page(
     ]
 
     assert normalize_spaces(page.select('.file-list-hint-large')[0].text) == (
-        'England, Northern Ireland, Scotland, and Wales'
+        'England, Northern Ireland, Scotland and Wales'
     )
 
     assert page.select_one('a.file-list-filename-large.govuk-link')['href'] == url_for(
