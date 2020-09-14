@@ -47,9 +47,13 @@ $button-shadow-size: $govuk-border-width-form-element;
         color: $white;
       }
 
-      &:hover,
-      &:active {
+      &:hover {
         color: $light-blue-25;
+      }
+
+      &:active,
+      &:focus {
+        color: $govuk-focus-text-colour;
       }
 
     }
