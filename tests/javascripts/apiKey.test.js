@@ -344,7 +344,7 @@ describe('API key', () => {
 
         });
 
-        test("the copied selection shouldn't include the prefix of the id", () => {
+        test("the copied selection (range) should start after the prefix of the id", () => {
 
           // that selection (a range) should have a startOffset past the first two nodes:
           // index 0: text node containing the whitespace before the prefix
@@ -388,7 +388,7 @@ describe('API key', () => {
 
         })
 
-        test("the copied selection should match the id", () => {
+        test("the copied selection (range) should start at the default position", () => {
 
           // that selection (a range) shouldn't call setStart to avoid the prefix:
           expect(rangeMock.setStart).not.toHaveBeenCalled();
