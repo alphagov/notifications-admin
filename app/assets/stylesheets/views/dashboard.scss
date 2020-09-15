@@ -96,6 +96,29 @@
 
 }
 
+/* The focus state for sibling links overlaps the hint so the hint's text colour needs to adapt */
+.govuk-link:focus {
+  &.file-list-filename,
+  &.file-list-filename-large,
+  & + .file-list-hint,
+  & + .file-list-hint-large {
+    /* link needs non-static position to overlap the cell border, hint so it isn't overlapped itself */
+    position: relative;
+  }
+
+  &.file-list-filename,
+  &.file-list-filename-large {
+    /* override box-shadow to push underline down a bit */
+    box-shadow: 0 -2px $govuk-focus-colour, 0 5px $govuk-focus-text-colour;
+  }
+
+  & + .file-list-hint,
+  & + .file-list-hint-large {
+    color: $govuk-focus-text-colour;
+  }
+
+}
+
 .failure-highlight {
   @include bold-19;
   color: $error-colour;
