@@ -13,7 +13,7 @@
 
   {{ page_header(
     page_title,
-    back_link=url_for('.choose_broadcast_library', service_id=current_service.id, broadcast_message_id=broadcast_message.id),
+    back_link=back_link,
   )}}
 
   {% call form_wrapper() %}
