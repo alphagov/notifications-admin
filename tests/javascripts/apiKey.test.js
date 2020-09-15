@@ -33,15 +33,11 @@ describe('API key', () => {
 
   };
 
-  beforeAll(() => {
+  beforeEach(() => {
 
     // mock objects used to manipulate the page selection
     selectionMock = new helpers.SelectionMock(jest);
     rangeMock = new helpers.RangeMock(jest);
-
-  });
-
-  beforeEach(() => {
 
     // plug gaps in JSDOM's API for manipulation of selections
     window.getSelection = jest.fn(() => selectionMock);
@@ -325,7 +321,7 @@ describe('API key', () => {
 
       describe("If it's one of many in the page", () => {
 
-        test("the button should have a hidden suffix naming the id it is for", () => {
+        beforeEach(() => {
 
           // If 'thing' (what the id is) and 'name' (its specific idenifier on the page) are
           // different, it will be one of others called the same 'thing'.
@@ -338,9 +334,28 @@ describe('API key', () => {
 
           helpers.triggerEvent(component.querySelector('button'), 'click');
 
+        });
+
+        test("the button should have a hidden suffix naming the id it is for", () => {
+
           const buttonSuffix = component.querySelector('button .govuk-visually-hidden');
           expect(buttonSuffix).not.toBeNull();
           expect(buttonSuffix.textContent).toEqual(' for Default');
+
+        });
+
+        test("the copied selection shouldn't include the prefix of the id", () => {
+
+          // that selection (a range) should have a startOffset past the first two nodes:
+          // index 0: text node containing the whitespace before the prefix
+          // index 1: the prefix node
+          expect(rangeMock.setStart).toHaveBeenCalled();
+          expect(rangeMock.setStart.mock.calls[0][1]).toEqual(2);
+
+          // reset any methods in the global space
+          window.queryCommandSupported = undefined;
+          window.getSelection = undefined;
+          document.createRange = undefined;
 
         });
 
@@ -372,6 +387,18 @@ describe('API key', () => {
           expect(buttonSuffix).toBeNull();
 
         })
+
+        test("the copied selection should match the id", () => {
+
+          // that selection (a range) shouldn't call setStart to avoid the prefix:
+          expect(rangeMock.setStart).not.toHaveBeenCalled();
+
+          // reset any methods in the global space
+          window.queryCommandSupported = undefined;
+          window.getSelection = undefined;
+          document.createRange = undefined;
+
+        });
 
       });
 
