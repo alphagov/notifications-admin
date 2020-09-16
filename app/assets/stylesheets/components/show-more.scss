@@ -10,15 +10,14 @@
 
   &:focus {
 
-    outline: none;
-    color: $text-colour;
-    box-shadow: 0 -10px 0 0 $yellow;
-    border-color: $yellow;
+    border-color: transparent;
+    /* override default focus style to increase top yellow box-shadow */
+    box-shadow: 0 -15px $govuk-focus-colour, 0 4px $govuk-focus-text-colour;
 
     span {
-      background: $yellow;
       outline: none;
-      border-color: $text-colour;
+      border-color: transparent;
+      background-color: transparent;
     }
 
   }

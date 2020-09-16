@@ -147,6 +147,10 @@ $message-type-bottom-spacing: govuk-spacing(4);
       background-image: file-url('folder-blue-bold-hover.svg');
     }
 
+    &:focus {
+      background-image: file-url('folder-black-bold.svg');
+    }
+
   }
 
   &-template {

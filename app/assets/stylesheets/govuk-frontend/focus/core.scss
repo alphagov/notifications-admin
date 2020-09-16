@@ -1,0 +1,14 @@
+// Sass bringing in the new focus style from GOVUK Frontend 3.x.x
+// TO DO: Delete this file when we upgrade to GOVUK Frontend 3.x.x
+//
+// See the following for details of the update:
+// - https://designnotes.blog.gov.uk/2019/07/29/weve-made-the-gov-uk-design-system-more-accessible/
+// - https://design-system.service.gov.uk/get-started/focus-states/
+// - https://github.com/alphagov/govuk-frontend/releases/tag/v3.0.0
+//
+// These styles were added in https://github.com/alphagov/govuk-frontend/pull/1309
+
+// Hack to fix not being able to override the govuk-link-common mixin
+.govuk-link {
+  @include govuk-focusable-text-link;
+}

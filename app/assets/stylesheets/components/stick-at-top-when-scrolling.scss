@@ -145,11 +145,9 @@ $sticky-padding: govuk-spacing(4);
     color: $link-hover-colour;
   }
 
-  &:focus,
-  &:active, {
-    background: $yellow;
-    color: $govuk-blue;
-    outline: none;
+  &:focus {
+    /* override default box shadow to stop it looking so large vertically */
+    box-shadow: inset 0 -4px $govuk-focus-text-colour;
   }
 
 }

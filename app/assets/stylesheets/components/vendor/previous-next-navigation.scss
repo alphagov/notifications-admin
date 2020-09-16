@@ -34,7 +34,7 @@ $is-ie: false !default;
   margin-bottom: govuk-spacing(6);
   margin-left: -1 * govuk-spacing(3);
   margin-right: -1 * govuk-spacing(3);
-  overflow: hidden;
+  @include govuk-clearfix;
 
   ul {
     margin: 0;
@@ -55,9 +55,12 @@ $is-ie: false !default;
       padding: govuk-spacing(3);
       text-decoration: none;
 
-      &:hover,
-      &:active {
+      &:hover {
         background-color: $canvas-colour;
+      }
+
+      &:focus {
+        background-color: $govuk-focus-colour;
       }
 
       .pagination-part-title {
