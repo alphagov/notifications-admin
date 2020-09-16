@@ -7,7 +7,8 @@ from pathlib import Path
 import geojson
 from notifications_utils.formatters import formatted_list
 
-from constants import (
+from polygons import Polygons
+from populations import (
     BRYHER,
     CITY_OF_LONDON,
     MEDIAN_AGE_RANGE_UK,
@@ -15,7 +16,6 @@ from constants import (
     SMARTPHONE_OWNERSHIP_BY_AGE_RANGE,
     estimate_number_of_smartphones_for_population,
 )
-from polygons import Polygons
 from repo import BroadcastAreasRepository
 
 source_files_path = Path(__file__).resolve().parent / 'source_files'

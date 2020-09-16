@@ -4,7 +4,7 @@ from app.broadcast_areas import (
     BroadcastAreasRepository,
     broadcast_area_libraries,
 )
-from app.broadcast_areas.constants import CITY_OF_LONDON
+from app.broadcast_areas.populations import CITY_OF_LONDON
 
 
 def test_loads_libraries():

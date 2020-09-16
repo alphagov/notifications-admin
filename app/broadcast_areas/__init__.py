@@ -1,8 +1,8 @@
 from notifications_utils.serialised_model import SerialisedModelCollection
 from werkzeug.utils import cached_property
 
-from .constants import CITY_OF_LONDON
 from .polygons import Polygons
+from .populations import CITY_OF_LONDON
 from .repo import BroadcastAreasRepository
 
 
