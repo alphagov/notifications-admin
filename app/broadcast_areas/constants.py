@@ -38,3 +38,25 @@ class CITY_OF_LONDON:
 class BRYHER:
     WD20_CODE = 'E05011090'
     POPULATION = 84
+
+
+def estimate_number_of_smartphones_for_population(population):
+    smartphone_ownership_for_area_by_age_range = {}
+
+    for range, ownership in SMARTPHONE_OWNERSHIP_BY_AGE_RANGE.items():
+        min, max = range
+        smartphone_ownership_for_area_by_age_range[range] = sum(
+            people
+            for age, people in population
+            if min <= age <= max
+        ) * ownership
+
+    total_population = sum(dict(population).values())
+    total_phones = sum(smartphone_ownership_for_area_by_age_range.values())
+
+    print(  # noqa: T001
+        f'    Population:{total_population: 11,.0f}'
+        f'    Phones:{total_phones: 11,.0f}'
+    )
+
+    return total_phones

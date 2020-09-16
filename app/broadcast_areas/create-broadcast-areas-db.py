@@ -13,6 +13,7 @@ from constants import (
     MEDIAN_AGE_RANGE_UK,
     MEDIAN_AGE_UK,
     SMARTPHONE_OWNERSHIP_BY_AGE_RANGE,
+    estimate_number_of_smartphones_for_population,
 )
 from polygons import Polygons
 from repo import BroadcastAreasRepository
@@ -79,26 +80,9 @@ def estimate_number_of_smartphones_in_area(country_or_ward_code):
     if country_or_ward_code not in area_to_population_mapping:
         raise ValueError(f'No population data for {country_or_ward_code}')
 
-    population = area_to_population_mapping[country_or_ward_code]
-    smartphone_ownership_for_area_by_age_range = {}
-
-    for range, ownership in SMARTPHONE_OWNERSHIP_BY_AGE_RANGE.items():
-        min, max = range
-        smartphone_ownership_for_area_by_age_range[range] = sum(
-            people
-            for age, people in population
-            if min <= age <= max
-        ) * ownership
-
-    total_population = sum(dict(population).values())
-    total_phones = sum(smartphone_ownership_for_area_by_age_range.values())
-
-    print(  # noqa: T001
-        f'    Population:{total_population: 11,.0f}'
-        f'    Phones:{total_phones: 11,.0f}'
+    return estimate_number_of_smartphones_for_population(
+        area_to_population_mapping[country_or_ward_code]
     )
-
-    return total_phones
 
 
 ctry19_filepath = source_files_path / "Countries.geojson"
