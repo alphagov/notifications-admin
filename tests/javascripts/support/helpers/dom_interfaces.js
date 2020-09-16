@@ -30,7 +30,7 @@ class DOMInterfaceMock {
 class RangeMock extends DOMInterfaceMock {
 
   constructor (jest) {
-    super(jest, { props: [], methods: ['selectNodeContents'] });
+    super(jest, { props: [], methods: ['selectNodeContents', 'setStart'] });
   }
 
 }

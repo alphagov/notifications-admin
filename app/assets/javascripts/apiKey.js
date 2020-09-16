@@ -27,11 +27,27 @@
       `
     };
 
+    this.getRangeFromElement = function (keyElement) {
+      const range = document.createRange();
+      let prefixIndex = -1;
+
+      Array.from(keyElement.childNodes).forEach((el, idx) => {
+        if ((el.nodeType === 1) && el.classList.contains('govuk-visually-hidden')) {
+          prefixIndex = idx;
+        }
+      });
+
+      range.selectNodeContents(keyElement);
+      if (prefixIndex !== -1) { range.setStart(keyElement, prefixIndex + 1); }
+
+      return range;
+    };
+
     this.copyKey = function(keyElement, callback) {
       var selection = window.getSelection ? window.getSelection() : document.selection,
-          range = document.createRange();
+          range = this.getRangeFromElement(keyElement);
+
       selection.removeAllRanges();
-      range.selectNodeContents(keyElement);
       selection.addRange(range);
       document.execCommand('copy');
       selection.removeAllRanges();
