@@ -80,18 +80,18 @@ def estimate_number_of_smartphones_in_area(country_or_ward_code):
         raise ValueError(f'No population data for {country_or_ward_code}')
 
     population = area_to_population_mapping[country_or_ward_code]
-    population_by_range = {}
+    smartphone_ownership_for_area_by_age_range = {}
 
     for range, ownership in SMARTPHONE_OWNERSHIP_BY_AGE_RANGE.items():
         min, max = range
-        population_by_range[range] = sum(
+        smartphone_ownership_for_area_by_age_range[range] = sum(
             people
             for age, people in population
             if min <= age <= max
         ) * ownership
 
     total_population = sum(dict(population).values())
-    total_phones = sum(population_by_range.values())
+    total_phones = sum(smartphone_ownership_for_area_by_age_range.values())
 
     print(  # noqa: T001
         f'    Population:{total_population: 11,.0f}'
