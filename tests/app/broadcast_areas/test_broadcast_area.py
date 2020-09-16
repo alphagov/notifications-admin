@@ -4,6 +4,7 @@ from app.broadcast_areas import (
     BroadcastAreasRepository,
     broadcast_area_libraries,
 )
+from app.broadcast_areas.constants import CITY_OF_LONDON
 
 
 def test_loads_libraries():
@@ -147,3 +148,31 @@ def test_repository_has_all_libraries():
         ('Countries', 'country'),
         ('Local authorities', 'local authority'),
     ] == [(name, name_singular) for _, name, name_singular, _is_group in libraries]
+
+
+@pytest.mark.parametrize('library', (
+    broadcast_area_libraries
+))
+def test_every_area_has_count_of_phones(library):
+    for area in library:
+        assert area.count_of_phones > 0
+
+
+def test_bryher_has_hard_coded_count():
+    bryher = broadcast_area_libraries.get_areas('wd20-E05011090')[0]
+    assert bryher.name == 'Bryher'
+    assert bryher.count_of_phones == 76.44
+
+
+def test_city_of_london_counts_are_not_derived_from():
+    city_of_london = broadcast_area_libraries.get_areas('lad20-E09000001')[0]
+
+    assert city_of_london.name == 'City of London'
+    assert len(city_of_london.sub_areas) == len(CITY_OF_LONDON.WARDS) == 25
+
+    for ward in city_of_london.sub_areas:
+        # The population of the whole City of London is 9,401, so an
+        # average of 300 per ward. What we’re asserting here is that the
+        # count of phones is much larger, because it isn’t derived from
+        # the resident population.
+        assert ward.count_of_phones > 5_000
