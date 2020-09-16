@@ -4,7 +4,10 @@ from app.broadcast_areas import (
     BroadcastAreasRepository,
     broadcast_area_libraries,
 )
-from app.broadcast_areas.populations import CITY_OF_LONDON
+from app.broadcast_areas.populations import (
+    CITY_OF_LONDON,
+    estimate_number_of_smartphones_for_population,
+)
 
 
 def test_loads_libraries():
@@ -176,3 +179,60 @@ def test_city_of_london_counts_are_not_derived_from():
         # count of phones is much larger, because it isn’t derived from
         # the resident population.
         assert ward.count_of_phones > 5_000
+
+
+@pytest.mark.parametrize('population, expected_estimate', (
+    # Upper and lower bounds of each age range
+    (
+        [(0, 100)], 50,
+    ),
+    (
+        [(16, 100)], 100
+    ),
+    (
+        [(24, 100)], 100,
+    ),
+    (
+        [(25, 100)], 97,
+    ),
+    (
+        [(34, 100)], 97,
+    ),
+    (
+        [(35, 100)], 91
+    ),
+    (
+        [(44, 100)], 91,
+    ),
+    (
+        [(45, 100)], 88
+    ),
+    (
+        [(54, 100)], 88,
+    ),
+    (
+        [(55, 100)], 73
+    ),
+    (
+        [(64, 100)], 73,
+    ),
+    (
+        [(65, 100)], 40
+    ),
+    (
+        [(999, 100)], 40,
+    ),
+    # Multiple different ages in a single popualtion
+    (
+        [(16, 100), (54, 100)], 188
+    ),
+    (
+        [(1, 1000), (66, 100)], 540
+    ),
+))
+def test_estimate_number_of_smartphones_for_population(
+    population, expected_estimate,
+):
+    assert estimate_number_of_smartphones_for_population(
+        population
+    ) == expected_estimate
