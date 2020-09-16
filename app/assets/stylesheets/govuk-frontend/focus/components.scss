@@ -177,8 +177,9 @@ $govuk-radios-focus-width: $govuk-focus-width + 1px;
   background: currentColor;
 }
 
-// Focused state
-.multiple-choice [type=radio]:focus + label::before {
+// Focused state (includes targeting for GOVUK radios, to apply version 3.x.x styles)
+.multiple-choice [type=radio]:focus + label::before,
+.govuk-radios__input:focus + .govuk-radios__label::before {
   border-width: 4px;
   // Since box-shadows are removed when users customise their colours we set a
   // transparent outline that is shown instead.
