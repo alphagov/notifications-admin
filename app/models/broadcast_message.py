@@ -16,10 +16,10 @@ from app.notify_client.broadcast_message_api_client import (
 from app.notify_client.service_api_client import service_api_client
 
 
-def round_to_significant_figures(x, n):
+def round_to_significant_figures(value, number_of_significant_figures):
     return int(round(
-        x,
-        -int(floor(log10(abs(x)))) + (n - 1)
+        value,
+        number_of_significant_figures - int(floor(log10(abs(value)))) - 1
     ))
 
 
