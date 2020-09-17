@@ -161,10 +161,37 @@ def test_every_area_has_count_of_phones(library):
         assert area.count_of_phones > 0
 
 
-def test_bryher_has_hard_coded_count():
-    bryher = broadcast_area_libraries.get_areas('wd20-E05011090')[0]
-    assert bryher.name == 'Bryher'
-    assert bryher.count_of_phones == 76.44
+@pytest.mark.parametrize('area_id, area_name, expected_count', (
+
+    # Unitary authority
+    ('ctyua19-E10000014', 'Hampshire', 853_594.48),
+
+    # District
+    ('lad20-E07000087', 'Fareham', 81_970.06),
+
+    # Ward
+    ('wd20-E05004516', 'Fareham East', 5_684.9),
+
+    # Unitary authority
+    ('lad20-E09000012', 'Hackney', 222_578.0),
+
+    # Ward
+    ('wd20-E05009373', 'Hackney Downs', 11_321.169999999998),
+
+    # Special case: ward with hard-coded population
+    ('wd20-E05011090', 'Bryher', 76.44),
+
+    # Areas with missing data
+    ('lad20-E07000008', 'Cambridge', 0),
+    ('lad20-E07000084', 'Basingstoke and Deane', 0),
+    ('lad20-E07000118', 'Chorley', 0),
+    ('lad20-E07000178', 'Oxford', 0),
+
+))
+def test_count_of_phones_for_all_levels(area_id, area_name, expected_count):
+    area = broadcast_area_libraries.get_areas(area_id)[0]
+    assert area.name == area_name
+    assert area.count_of_phones == expected_count
 
 
 def test_city_of_london_counts_are_not_derived_from():

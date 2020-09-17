@@ -59,8 +59,10 @@ class BroadcastArea(SortableMixin):
                 self.polygons.estimated_area / CITY_OF_LONDON.AREA_SQUARE_MILES
             )
         if self.sub_areas:
-            return sum(area.count_of_phones or 0 for area in self.sub_areas)
-        return self._count_of_phones
+            return sum(area.count_of_phones for area in self.sub_areas)
+        # TODO: remove the `or 0` once missing data is fixed, see
+        # https://www.pivotaltracker.com/story/show/174837293
+        return self._count_of_phones or 0
 
 
 class BroadcastAreaLibrary(SerialisedModelCollection, SortableMixin, GetItemByIdMixin):

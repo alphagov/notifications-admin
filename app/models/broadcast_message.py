@@ -124,7 +124,7 @@ class BroadcastMessage(JSONModel):
     @property
     def count_of_phones(self):
         return round_to_significant_figures(
-            sum(area.count_of_phones or 0 for area in self.areas),
+            sum(area.count_of_phones for area in self.areas),
             2
         )
 
