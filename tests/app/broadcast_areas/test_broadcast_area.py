@@ -194,7 +194,7 @@ def test_count_of_phones_for_all_levels(area_id, area_name, expected_count):
     assert area.count_of_phones == expected_count
 
 
-def test_city_of_london_counts_are_not_derived_from():
+def test_city_of_london_counts_are_not_derived_from_population():
     city_of_london = broadcast_area_libraries.get_areas('lad20-E09000001')[0]
 
     assert city_of_london.name == 'City of London'
