@@ -868,6 +868,8 @@ def merge_jsonlike(source, destination):
 
 
 def round_to_significant_figures(value, number_of_significant_figures):
+    if value == 0:
+        return value
     return int(round(
         value,
         number_of_significant_figures - int(floor(log10(abs(value)))) - 1
