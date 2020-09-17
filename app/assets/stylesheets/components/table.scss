@@ -225,6 +225,16 @@
 
     }
 
+    &-sent-international {
+
+      .status-hint {
+        display: block;
+        font-weight: normal;
+        margin-top: 5px;
+      }
+
+    }
+
     &-yes,
     &-no {
       display: block;

@@ -479,7 +479,10 @@ def format_notification_status_as_field_status(status, notification_type):
             'virus-scan-failed': 'error',
             'returned-letter': None,
             'cancelled': 'error',
-        }
+        },
+        'sms': {
+            'sent': 'sent-international'
+        },
     }.get(
         notification_type,
         {
