@@ -23,6 +23,7 @@ from app.utils import (
     is_less_than_90_days_ago,
     merge_jsonlike,
     printing_today_or_tomorrow,
+    round_to_significant_figures,
 )
 from tests.conftest import fake_uuid
 
@@ -631,3 +632,18 @@ def test_get_sample_template_returns_template(template_type):
 def test_merge_jsonlike_merges_jsonlike_objects_correctly(source_object, destination_object, expected_result):
     merge_jsonlike(source_object, destination_object)
     assert source_object == expected_result
+
+
+@pytest.mark.parametrize('value, significant_figures, expected_result', (
+    (0, 1, 0),
+    (0, 2, 0),
+    (12_345, 1, 10_000),
+    (12_345, 2, 12_000),
+    (12_345, 3, 12_300),
+    (12_345, 9, 12_345),
+    (12_345.6789, 1, 10_000),
+    (12_345.6789, 9, 12_345),
+    (-12_345, 1, -10_000),
+))
+def test_round_to_significant_figures(value, significant_figures, expected_result):
+    assert round_to_significant_figures(value, significant_figures) == expected_result

@@ -6,6 +6,7 @@ from datetime import datetime, timedelta, timezone
 from functools import wraps
 from io import BytesIO, StringIO
 from itertools import chain
+from math import floor, log10
 from numbers import Number
 from os import path
 from urllib.parse import urlparse
@@ -864,3 +865,12 @@ def merge_jsonlike(source, destination):
                 source[key] = value
 
     merge_items(source, destination)
+
+
+def round_to_significant_figures(value, number_of_significant_figures):
+    if value == 0:
+        return value
+    return int(round(
+        value,
+        number_of_significant_figures - int(floor(log10(abs(value)))) - 1
+    ))

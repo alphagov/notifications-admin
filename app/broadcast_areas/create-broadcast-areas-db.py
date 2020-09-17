@@ -8,6 +8,14 @@ import geojson
 from notifications_utils.formatters import formatted_list
 
 from polygons import Polygons
+from populations import (
+    BRYHER,
+    CITY_OF_LONDON,
+    MEDIAN_AGE_RANGE_UK,
+    MEDIAN_AGE_UK,
+    SMARTPHONE_OWNERSHIP_BY_AGE_RANGE,
+    estimate_number_of_smartphones_for_population,
+)
 from repo import BroadcastAreasRepository
 
 source_files_path = Path(__file__).resolve().parent / 'source_files'
@@ -54,6 +62,29 @@ def polygons_and_simplified_polygons(feature):
     )
 
 
+def estimate_number_of_smartphones_in_area(country_or_ward_code):
+
+    if country_or_ward_code in CITY_OF_LONDON.WARDS:
+        # We don’t have population figures for wards of the City of
+        # London. We’ll leave it empty here and estimate on the fly
+        # later based on physical area.
+        print(f'    Population:   N/A')  # noqa: T001
+        return None
+
+    # For some reason Bryher is the only ward missing population data, so we
+    # need to hard code it. For simplicity, let’s assume all 84 people who
+    # live on Bryher are 40 years old
+    if country_or_ward_code == BRYHER.WD20_CODE:
+        return BRYHER.POPULATION * SMARTPHONE_OWNERSHIP_BY_AGE_RANGE[MEDIAN_AGE_RANGE_UK]
+
+    if country_or_ward_code not in area_to_population_mapping:
+        raise ValueError(f'No population data for {country_or_ward_code}')
+
+    return estimate_number_of_smartphones_for_population(
+        area_to_population_mapping[country_or_ward_code]
+    )
+
+
 ctry19_filepath = source_files_path / "Countries.geojson"
 
 # https://geoportal.statistics.gov.uk/datasets/wards-may-2020-boundaries-uk-bgc
@@ -66,11 +97,20 @@ lad20_filepath = source_files_path / "Local Authorities May 2020.geojson"
 # https://geoportal.statistics.gov.uk/datasets/counties-and-unitary-authorities-december-2019-boundaries-uk-bgc
 ctyua19_filepath = source_files_path / "Counties_and_Unitary_Authorities__December_2019__Boundaries_UK_BGC.geojson"
 
+
 # http://geoportal.statistics.gov.uk/datasets/ward-to-westminster-parliamentary-constituency-to-local-authority-district-december-2019-lookup-in-the-united-kingdom/data
 wd_lad_map_filepath = source_files_path / "Electoral Wards and Local Authorities 2020.geojson"
 
 # https://geoportal.statistics.gov.uk/datasets/lower-tier-local-authority-to-upper-tier-local-authority-december-2019-lookup-in-england-and-wales?where=LTLA19CD%20%3D%20%27E06000045%27
 ltla_utla_map_filepath = source_files_path / "Lower_Tier_Local_Authority_to_Upper_Tier_Local_Authority__December_2019__Lookup_in_England_and_Wales.csv"  # noqa: E501
+
+# https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates/datasets/wardlevelmidyearpopulationestimatesexperimental
+population_filepath_england_wales = source_files_path / "Mid-2019_Persons_England_Wales.csv"
+# https://www.nrscotland.gov.uk/statistics-and-data/statistics/statistics-by-theme/population/population-estimates/2011-based-special-area-population-estimates/electoral-ward-population-estimates
+population_filepath_scotland = source_files_path / "Mid-2019_Persons_Scotland.csv"
+population_filepath_northern_ireland = source_files_path / "Ward-2014_Northern_Ireland.csv"
+population_filepath_uk = source_files_path / "MYE1-2019.csv"
+
 
 ward_code_to_la_mapping = {
     f["properties"]["WD19CD"]: f["properties"]["LAD19NM"]
@@ -88,6 +128,24 @@ la_code_to_cty_id_mapping = {
     row['LTLA19CD']: row['UTLA19CD'] for row in ltla_utla_mapping_csv if row['LTLA19CD'] != row['UTLA19CD']
 }
 
+area_to_population_mapping = {}
+
+for population_filepath in (
+    population_filepath_uk,
+    population_filepath_england_wales,
+    population_filepath_northern_ireland,
+    population_filepath_scotland,
+):
+    area_to_population_csv = csv.DictReader(population_filepath.open())
+    for row in area_to_population_csv:
+        area_to_population_mapping[row['ward']] = [
+            (
+                int(k) if k.isnumeric() else MEDIAN_AGE_UK,
+                int(float(v.replace(',', '') or '0'))
+            )
+            for k, v in row.items() if k != 'ward'
+        ]
+
 
 def add_countries():
     dataset_id = 'ctry19'
@@ -101,7 +159,7 @@ def add_countries():
 
     areas_to_add = []
     for feature in dataset_geojson["features"]:
-        f_id = 'ctry19-' + feature["properties"]['ctry19cd']
+        f_id = feature["properties"]['ctry19cd']
         f_name = feature["properties"]['ctry19nm']
 
         print()  # noqa: T001
@@ -111,9 +169,10 @@ def add_countries():
             polygons_and_simplified_polygons(feature["geometry"])
         )
         areas_to_add.append([
-            f_id, f_name,
+            f'ctry19-{f_id}', f_name,
             dataset_id, None,
             feature, simple_feature,
+            estimate_number_of_smartphones_in_area(f_id),
         ])
 
     repo.insert_broadcast_areas(areas_to_add, keep_old_polygons)
@@ -155,7 +214,8 @@ def _add_electoral_wards(dataset_id):
             areas_to_add.append([
                 ward_id, ward_name,
                 dataset_id, la_id,
-                feature, simple_feature
+                feature, simple_feature,
+                estimate_number_of_smartphones_in_area(ward_code),
             ])
 
         except KeyError:
@@ -187,7 +247,8 @@ def _add_local_authorities(dataset_id):
             dataset_id,
             'ctyua19-' + ctyua_id if ctyua_id else None,
             feature,
-            simple_feature
+            simple_feature,
+            None,
         ])
     repo.insert_broadcast_areas(areas_to_add, keep_old_polygons)
 
@@ -212,7 +273,8 @@ def _add_counties_and_unitary_authorities(dataset_id):
         areas_to_add.append([
             group_id, group_name,
             dataset_id, None,
-            feature, simple_feature
+            feature, simple_feature,
+            None,
         ])
 
     repo.insert_broadcast_areas(areas_to_add, keep_old_polygons)
@@ -237,6 +299,7 @@ most_detailed_polygons = formatted_list(
     before_each='',
     after_each='',
 )
+
 print(  # noqa: T001
     '\n'
     'DONE\n'

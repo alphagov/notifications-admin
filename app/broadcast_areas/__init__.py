@@ -3,6 +3,7 @@ from notifications_utils.serialised_model import SerialisedModelCollection
 from werkzeug.utils import cached_property
 
 from .polygons import Polygons
+from .populations import CITY_OF_LONDON
 from .repo import BroadcastAreasRepository
 
 
@@ -28,7 +29,7 @@ class GetItemByIdMixin:
 class BroadcastArea(SortableMixin):
 
     def __init__(self, row):
-        self.id, self.name = row
+        self.id, self.name, self._count_of_phones = row
 
     def __eq__(self, other):
         return self.id == other.id
@@ -51,6 +52,18 @@ class BroadcastArea(SortableMixin):
             BroadcastArea(row)
             for row in BroadcastAreasRepository().get_all_areas_for_group(self.id)
         ]
+
+    @property
+    def count_of_phones(self):
+        if self.id.endswith(CITY_OF_LONDON.WARDS):
+            return CITY_OF_LONDON.DAYTIME_POPULATION * (
+                self.polygons.estimated_area / CITY_OF_LONDON.AREA_SQUARE_MILES
+            )
+        if self.sub_areas:
+            return sum(area.count_of_phones for area in self.sub_areas)
+        # TODO: remove the `or 0` once missing data is fixed, see
+        # https://www.pivotaltracker.com/story/show/174837293
+        return self._count_of_phones or 0
 
 
 class BroadcastAreaLibrary(SerialisedModelCollection, SortableMixin, GetItemByIdMixin):

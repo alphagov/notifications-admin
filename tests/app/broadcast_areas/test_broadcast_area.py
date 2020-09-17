@@ -4,6 +4,10 @@ from app.broadcast_areas import (
     BroadcastAreasRepository,
     broadcast_area_libraries,
 )
+from app.broadcast_areas.populations import (
+    CITY_OF_LONDON,
+    estimate_number_of_smartphones_for_population,
+)
 
 
 def test_loads_libraries():
@@ -147,3 +151,115 @@ def test_repository_has_all_libraries():
         ('Countries', 'country'),
         ('Local authorities', 'local authority'),
     ] == [(name, name_singular) for _, name, name_singular, _is_group in libraries]
+
+
+@pytest.mark.parametrize('library', (
+    broadcast_area_libraries
+))
+def test_every_area_has_count_of_phones(library):
+    for area in library:
+        assert area.count_of_phones > 0
+
+
+@pytest.mark.parametrize('area_id, area_name, expected_count', (
+
+    # Unitary authority
+    ('ctyua19-E10000014', 'Hampshire', 853_594.48),
+
+    # District
+    ('lad20-E07000087', 'Fareham', 81_970.06),
+
+    # Ward
+    ('wd20-E05004516', 'Fareham East', 5_684.9),
+
+    # Unitary authority
+    ('lad20-E09000012', 'Hackney', 222_578.0),
+
+    # Ward
+    ('wd20-E05009373', 'Hackney Downs', 11_321.169999999998),
+
+    # Special case: ward with hard-coded population
+    ('wd20-E05011090', 'Bryher', 76.44),
+
+    # Areas with missing data
+    ('lad20-E07000008', 'Cambridge', 0),
+    ('lad20-E07000084', 'Basingstoke and Deane', 0),
+    ('lad20-E07000118', 'Chorley', 0),
+    ('lad20-E07000178', 'Oxford', 0),
+
+))
+def test_count_of_phones_for_all_levels(area_id, area_name, expected_count):
+    area = broadcast_area_libraries.get_areas(area_id)[0]
+    assert area.name == area_name
+    assert area.count_of_phones == expected_count
+
+
+def test_city_of_london_counts_are_not_derived_from_population():
+    city_of_london = broadcast_area_libraries.get_areas('lad20-E09000001')[0]
+
+    assert city_of_london.name == 'City of London'
+    assert len(city_of_london.sub_areas) == len(CITY_OF_LONDON.WARDS) == 25
+
+    for ward in city_of_london.sub_areas:
+        # The population of the whole City of London is 9,401, so an
+        # average of 300 per ward. What we’re asserting here is that the
+        # count of phones is much larger, because it isn’t derived from
+        # the resident population.
+        assert ward.count_of_phones > 5_000
+
+
+@pytest.mark.parametrize('population, expected_estimate', (
+    # Upper and lower bounds of each age range
+    (
+        [(0, 100)], 50,
+    ),
+    (
+        [(16, 100)], 100
+    ),
+    (
+        [(24, 100)], 100,
+    ),
+    (
+        [(25, 100)], 97,
+    ),
+    (
+        [(34, 100)], 97,
+    ),
+    (
+        [(35, 100)], 91
+    ),
+    (
+        [(44, 100)], 91,
+    ),
+    (
+        [(45, 100)], 88
+    ),
+    (
+        [(54, 100)], 88,
+    ),
+    (
+        [(55, 100)], 73
+    ),
+    (
+        [(64, 100)], 73,
+    ),
+    (
+        [(65, 100)], 40
+    ),
+    (
+        [(999, 100)], 40,
+    ),
+    # Multiple different ages in a single popualtion
+    (
+        [(16, 100), (54, 100)], 188
+    ),
+    (
+        [(1, 1000), (66, 100)], 540
+    ),
+))
+def test_estimate_number_of_smartphones_for_population(
+    population, expected_estimate,
+):
+    assert estimate_number_of_smartphones_for_population(
+        population
+    ) == expected_estimate
