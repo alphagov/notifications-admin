@@ -1,6 +1,5 @@
 import itertools
 from datetime import datetime, timedelta
-from math import floor, log10
 
 from notifications_utils.template import BroadcastPreviewTemplate
 from orderedset import OrderedSet
@@ -14,13 +13,7 @@ from app.notify_client.broadcast_message_api_client import (
     broadcast_message_api_client,
 )
 from app.notify_client.service_api_client import service_api_client
-
-
-def round_to_significant_figures(value, number_of_significant_figures):
-    return int(round(
-        value,
-        number_of_significant_figures - int(floor(log10(abs(value)))) - 1
-    ))
+from app.utils import round_to_significant_figures
 
 
 class BroadcastMessage(JSONModel):
