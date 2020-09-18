@@ -171,9 +171,29 @@
 
     this.selectionStatus = {
       'default': 'Nothing selected',
-      'selected': numSelected => `${numSelected} selected`,
+      'selected': numSelected => {
+        const getString = key => {
+          if (numSelected[key] === 0) {
+            return '';
+          } else if (numSelected[key] === 1) {
+            return `1 ${key.substring(0, key.length - 1)}`;
+          } else {
+            return `${numSelected[key]} ${key}`;
+          }
+        };
+
+        const results = [];
+
+        if (numSelected.templates > 0) {
+          results.push(getString('templates'));
+        }
+        if (numSelected.folders > 0) {
+          results.push(getString('folders'));
+        }
+        return results.join(', ') + ' selected';
+      },
       'update': numSelected => {
-        let message = (numSelected > 0) ? this.selectionStatus.selected(numSelected) : this.selectionStatus.default;
+        let message = (numSelected.total > 0) ? this.selectionStatus.selected(numSelected) : this.selectionStatus.default;
 
         $('.template-list-selected-counter__count').html(message);
         this.$liveRegionCounter.html(message);
@@ -183,10 +203,10 @@
     this.templateFolderCheckboxChanged = function() {
       let numSelected = this.countSelectedCheckboxes();
 
-      if (this.currentState === 'nothing-selected-buttons' && numSelected !== 0) {
+      if (this.currentState === 'nothing-selected-buttons' && numSelected.total !== 0) {
         // user has just selected first item
         this.currentState = 'items-selected-buttons';
-      } else if (this.currentState === 'items-selected-buttons' && numSelected === 0) {
+      } else if (this.currentState === 'items-selected-buttons' && numSelected.total === 0) {
         // user has just deselected last item
         this.currentState = 'nothing-selected-buttons';
       }
@@ -206,7 +226,15 @@
     };
 
     this.countSelectedCheckboxes = function() {
-      return this.$form.find('input:checkbox:checked').length;
+      const allSelected = this.$form.find('input:checkbox:checked');
+      const templates = allSelected.filter((idx, el) => $(el).siblings('.template-list-template').length > 0).length;
+      const folders = allSelected.filter((idx, el) => $(el).siblings('.template-list-folder').length > 0).length;
+      const results = {
+        'templates': templates,
+        'folders': folders,
+        'total': allSelected.length
+      };
+      return results;
     };
 
     this.render = function() {

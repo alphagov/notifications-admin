@@ -610,7 +610,7 @@ describe('TemplateFolderForm', () => {
 
       test("the content of the counter should reflect the selection", () => {
 
-        expect(visibleCounterText).toEqual('2 selected');
+        expect(visibleCounterText).toEqual('1 template, 1 folder selected');
 
       });
 
@@ -774,6 +774,72 @@ describe('TemplateFolderForm', () => {
           expect(document.activeElement).toBe(moveToNewFolderButton);
 
         });
+
+      });
+
+    });
+
+  });
+
+  describe("Additional selection counter scenarios", () => {
+
+    let templateFolderCheckboxes;
+
+    beforeEach(() => {
+
+      // start module
+      window.GOVUK.modules.start();
+
+      templateFolderCheckboxes = getTemplateFolderCheckboxes();
+      visibleCounterText = getVisibleCounter().textContent.trim();
+      hiddenCounterText = getHiddenCounter().textContent.trim();
+
+      formControls = templateFolderForm.querySelector('#sticky_template_forms');
+
+      // reset sticky JS mocks called when the module starts
+      resetStickyMocks();
+
+    });
+
+    afterEach(() => resetStickyMocks());
+
+    describe("When just templates are selected", () => {
+
+      test("the content of both visible and hidden counters should match", () => {
+
+        helpers.triggerEvent(templateFolderCheckboxes[1], 'click');
+        helpers.triggerEvent(templateFolderCheckboxes[2], 'click');
+
+        expect(visibleCounterText).toEqual(hiddenCounterText);
+
+      });
+
+      test("the content of the counter should reflect the selection", () => {
+
+        helpers.triggerEvent(templateFolderCheckboxes[1], 'click');
+        helpers.triggerEvent(templateFolderCheckboxes[2], 'click');
+
+        expect(visibleCounterText).toEqual('2 templates selected');
+
+      });
+
+    });
+
+    describe("When just folders are selected", () => {
+
+      test("the content of both visible and hidden counters should match", () => {
+
+        helpers.triggerEvent(templateFolderCheckboxes[0], 'click');
+
+        expect(visibleCounterText).toEqual(hiddenCounterText);
+
+      });
+
+      test("the content of the counter should reflect the selection", () => {
+
+        helpers.triggerEvent(templateFolderCheckboxes[0], 'click');
+
+        expect(visibleCounterText).toEqual('1 folder selected');
 
       });
 
