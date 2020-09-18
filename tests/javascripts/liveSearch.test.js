@@ -10,10 +10,24 @@ afterAll(() => {
 
 describe('Live search', () => {
 
+  let searchLabelText;
   let searchTextbox;
+  let liveRegion
   let list;
 
+  function liveRegionResults (num) {
+    if (num === 1) {
+      return "1 result";
+    } else if (num === 0) {
+      return "no results";
+    } else {
+      return `${num} results`;
+    }
+  };
+
   describe("With a list of radios", () => {
+
+    searchLabelText = "Search branding styles by name";
 
     function getRadiosHTML (departments) {
 
@@ -62,9 +76,10 @@ describe('Live search', () => {
         <div class="live-search js-header" data-module="live-search" data-targets=".multiple-choice">
           <div class="form-group">
             <label class="form-label" for="search">
-                Search branding styles by name
+                ${searchLabelText}
             </label>
             <input autocomplete="off" class="form-control form-control-1-1 " id="search" name="search" rows="8" type="search" value="">
+            <div role="region" aria-live="polite" class="live-search__status govuk-visually-hidden"></div>
           </div>
         </div>
         <form method="post" autocomplete="off" novalidate>
@@ -72,6 +87,7 @@ describe('Live search', () => {
         </form>`;
 
       searchTextbox = document.getElementById('search');
+      liveRegion = document.querySelector('.live-search__status');
       list = document.querySelector('form');
 
     });
@@ -87,6 +103,7 @@ describe('Live search', () => {
         const listItemsShowing = Array.from(listItems).filter(item => window.getComputedStyle(item).display !== 'none');
 
         expect(listItemsShowing.length).toEqual(listItems.length);
+        expect(searchTextbox.hasAttribute('aria-label')).toBe(false);
 
       });
 
@@ -101,6 +118,8 @@ describe('Live search', () => {
         const listItemsShowing = Array.from(listItems).filter(item => window.getComputedStyle(item).display !== 'none');
 
         expect(listItemsShowing.length).toEqual(2);
+        expect(searchTextbox.hasAttribute('aria-label')).toBe(true);
+        expect(searchTextbox.getAttribute('aria-label')).toEqual(`${searchLabelText}, ${liveRegionResults(2)}`);
 
       });
 
@@ -115,6 +134,8 @@ describe('Live search', () => {
         const listItemsShowing = Array.from(listItems).filter(item => window.getComputedStyle(item).display !== 'none');
 
         expect(listItemsShowing.length).toEqual(1);
+        expect(searchTextbox.hasAttribute('aria-label')).toBe(true);
+        expect(searchTextbox.getAttribute('aria-label')).toEqual(`${searchLabelText}, ${liveRegionResults(1)}`);
 
       });
 
@@ -152,6 +173,7 @@ describe('Live search', () => {
         const listItemsShowing = Array.from(listItems).filter(item => window.getComputedStyle(item).display !== 'none');
 
         expect(listItemsShowing.length).toEqual(listItems.length);
+        expect(liveRegion.textContent.trim()).toEqual(liveRegionResults(listItemsShowing.length));
 
       });
 
@@ -170,6 +192,7 @@ describe('Live search', () => {
         const listItemsShowing = Array.from(listItems).filter(item => window.getComputedStyle(item).display !== 'none');
 
         expect(listItemsShowing.length).toEqual(1);
+        expect(liveRegion.textContent.trim()).toEqual(liveRegionResults(1));
 
       });
 
@@ -188,6 +211,7 @@ describe('Live search', () => {
         const listItemsShowing = Array.from(listItems).filter(item => window.getComputedStyle(item).display !== 'none');
 
         expect(listItemsShowing.length).toEqual(2);
+        expect(liveRegion.textContent.trim()).toEqual(liveRegionResults(2));
 
       });
 
@@ -215,6 +239,8 @@ describe('Live search', () => {
   });
 
   describe("With a list of checkboxes", () => {
+
+    searchLabelText = "Search branding styles by name";
 
     beforeEach(() => {
 
@@ -246,9 +272,10 @@ describe('Live search', () => {
         <div class="live-search js-header" data-module="live-search" data-targets="#template-list .template-list-item">
           <div class="form-group">
             <label class="form-label" for="search">
-                Search branding styles by name
+                ${searchLabelText}
             </label>
             <input autocomplete="off" class="form-control form-control-1-1 " id="search" name="search" rows="8" type="search" value="">
+            <div role="region" aria-live="polite" class="live-search__status govuk-visually=hidden"></div>
           </div>
         </div>
         <form method="post" autocomplete="off" novalidate>
@@ -258,6 +285,7 @@ describe('Live search', () => {
         </form>`;
 
       searchTextbox = document.getElementById('search');
+      liveRegion = document.querySelector('.live-search__status');
       list = document.querySelector('form');
 
     });
@@ -273,6 +301,7 @@ describe('Live search', () => {
         const listItemsShowing = Array.from(listItems).filter(item => window.getComputedStyle(item).display !== 'none');
 
         expect(listItemsShowing.length).toEqual(listItems.length);
+        expect(searchTextbox.hasAttribute('aria-label')).toBe(false);
 
       });
 
@@ -288,6 +317,8 @@ describe('Live search', () => {
 
         // should match 'New patient' and 'New doctor'
         expect(listItemsShowing.length).toEqual(2);
+        expect(searchTextbox.hasAttribute('aria-label')).toBe(true);
+        expect(searchTextbox.getAttribute('aria-label')).toEqual(`${searchLabelText}, ${liveRegionResults(2)}`);
 
       });
 
@@ -302,6 +333,8 @@ describe('Live search', () => {
         const listItemsShowing = Array.from(listItems).filter(item => window.getComputedStyle(item).display !== 'none');
 
         expect(listItemsShowing.length).toEqual(1);
+        expect(searchTextbox.hasAttribute('aria-label')).toBe(true);
+        expect(searchTextbox.getAttribute('aria-label')).toEqual(`${searchLabelText}, ${liveRegionResults(1)}`);
 
       });
 
@@ -334,6 +367,7 @@ describe('Live search', () => {
         // 2 items contain the "Email template" text
         // only the text containing the name of the item is matched against (ie 'New patient')
         expect(listItemsShowing.length).toEqual(0);
+        expect(searchTextbox.getAttribute('aria-label')).toEqual(`${searchLabelText}, ${liveRegionResults(0)}`);
 
       });
 
@@ -356,6 +390,7 @@ describe('Live search', () => {
         const listItemsShowing = Array.from(listItems).filter(item => window.getComputedStyle(item).display !== 'none');
 
         expect(listItemsShowing.length).toEqual(listItems.length);
+        expect(liveRegion.textContent.trim()).toEqual(liveRegionResults(listItemsShowing.length));
 
       });
 
@@ -374,6 +409,7 @@ describe('Live search', () => {
         const listItemsShowing = Array.from(listItems).filter(item => window.getComputedStyle(item).display !== 'none');
 
         expect(listItemsShowing.length).toEqual(1);
+        expect(liveRegion.textContent.trim()).toEqual(liveRegionResults(1));
 
       });
 
@@ -392,6 +428,7 @@ describe('Live search', () => {
         const listItemsShowing = Array.from(listItems).filter(item => window.getComputedStyle(item).display !== 'none');
 
         expect(listItemsShowing.length).toEqual(1);
+        expect(liveRegion.textContent.trim()).toEqual(liveRegionResults(1));
 
       });
 
@@ -432,6 +469,7 @@ describe('Live search', () => {
         // 2 items contain the "Email template" text
         // only the text containing the name of the item is matched against (ie 'New patient')
         expect(listItemsShowing.length).toEqual(0);
+        expect(liveRegion.textContent.trim()).toEqual(liveRegionResults(0));
 
       });
 
@@ -440,6 +478,8 @@ describe('Live search', () => {
   })
 
   describe("With a list of content items", () => {
+
+    searchLabelText = "Search by name or email address";
 
     function getContentItems (users) {
 
@@ -523,9 +563,10 @@ describe('Live search', () => {
         <div class="live-search js-header" data-module="live-search" data-targets=".user-list-item">
           <div class="form-group" data-module="">
             <label class="form-label" for="search">
-                Search by name or email address
+                ${searchLabelText}
             </label>
             <input autocomplete="off" class="form-control form-control-1-1 " data-module="" id="search" name="search" rows="8" type="search" value="">
+            <div role="region" aria-live="polite" class="live-search__status govuk-visually-hidden"></div>
           </div>
         </div>
         <form method="post" autocomplete="off" novalidate>
@@ -533,6 +574,7 @@ describe('Live search', () => {
         </form>`;
 
       searchTextbox = document.getElementById('search');
+      liveRegion = document.querySelector('.live-search__status');
       list = document.querySelector('form');
 
     });
@@ -548,6 +590,7 @@ describe('Live search', () => {
         const listItemsShowing = Array.from(listItems).filter(item => window.getComputedStyle(item).display !== 'none');
 
         expect(listItemsShowing.length).toEqual(listItems.length);
+        expect(searchTextbox.hasAttribute('aria-label')).toBe(false);
 
       });
 
@@ -562,6 +605,8 @@ describe('Live search', () => {
         const listItemsShowing = Array.from(listItems).filter(item => window.getComputedStyle(item).display !== 'none');
 
         expect(listItemsShowing.length).toEqual(1);
+        expect(searchTextbox.hasAttribute('aria-label')).toBe(true);
+        expect(searchTextbox.getAttribute('aria-label')).toEqual(`${searchLabelText}, ${liveRegionResults(1)}`);
 
       });
 
@@ -576,6 +621,8 @@ describe('Live search', () => {
         const listItemsShowing = Array.from(listItems).filter(item => window.getComputedStyle(item).display !== 'none');
 
         expect(listItemsShowing.length).toEqual(1);
+        expect(searchTextbox.hasAttribute('aria-label')).toBe(true);
+        expect(searchTextbox.getAttribute('aria-label')).toEqual(`${searchLabelText}, ${liveRegionResults(1)}`);
 
       });
 
@@ -592,6 +639,7 @@ describe('Live search', () => {
         // all items contain the "Add and edit templates" permission so would match if all text was matched against the search term
         // only the text containing the label and email address is matched against
         expect(listItemsShowing.length).toEqual(0);
+        expect(searchTextbox.getAttribute('aria-label')).toEqual(`${searchLabelText}, ${liveRegionResults(0)}`);
 
       });
 
@@ -632,6 +680,7 @@ describe('Live search', () => {
         const listItemsShowing = Array.from(listItems).filter(item => window.getComputedStyle(item).display !== 'none');
 
         expect(listItemsShowing.length).toEqual(1);
+        expect(liveRegion.textContent.trim()).toEqual(liveRegionResults(1));
 
       });
 
@@ -650,6 +699,7 @@ describe('Live search', () => {
         const listItemsShowing = Array.from(listItems).filter(item => window.getComputedStyle(item).display !== 'none');
 
         expect(listItemsShowing.length).toEqual(1);
+        expect(liveRegion.textContent.trim()).toEqual(liveRegionResults(1));
 
       });
 
@@ -670,6 +720,7 @@ describe('Live search', () => {
         // all items contain the "Add and edit templates" permission so would match if all text was matched against the search term
         // only the text containing the label and email address is matched against
         expect(listItemsShowing.length).toEqual(0);
+        expect(liveRegion.textContent.trim()).toEqual(liveRegionResults(0));
 
       });
 
