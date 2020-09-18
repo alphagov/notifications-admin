@@ -39,16 +39,14 @@ function templatesAndFoldersCheckboxes (hierarchy) {
   hierarchy.forEach((node, idx) => {
 
     result += `
-      <div class="template-list-item template-list-item-with-checkbox  template-list-item-without-ancestors">
-        <div class="multiple-choice">
-          <input id="templates-or-folder-${idx}" name="templates_and_folders" type="checkbox" value="templates-or-folder-${idx}">
-          <label></label>
-        </div>
-        <h2 class="message-name">
-          <a href="/services/6658542f-0cad-491f-bec8-ab8457700ead/templates/all/folders/3d057d9a-51fc-45ea-8b63-0003206350a6" class="govuk-link govuk-link--no-visited-state template-list-${node.type === 'folder' ? 'folder' : 'template'}">
-            <span class="live-search-relevant">${node.label}</span>
-          </a>
-        </h2>
+      <div class="govuk-checkboxes__item template-list-item template-list-item-with-checkbox template-list-item-without-ancestors">
+        <input class="govuk-checkboxes__input" id="templates-or-folder-${idx}" name="templates_and_folders" type="checkbox" value="templates-or-folder-${idx}">
+        <label class="govuk-checkboxes__label template-list-item-label" for="templates-or-folder-${idx}">
+          <span class="govuk-visually-hidden">${node.label}</span>
+        </label>
+        <a href="/services/6658542f-0cad-491f-bec8-ab8457700ead/templates/all/folders/3d057d9a-51fc-45ea-8b63-0003206350a6" class="govuk-link govuk-link--no-visited-state template-list-${node.type === 'folder' ? 'folder' : 'template'}">
+          <span class="live-search-relevant">${node.label}</span>
+        </a>
         ${node.meta}
       </div>`;
 
