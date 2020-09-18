@@ -53,6 +53,11 @@ def privacy():
     return render_template('views/privacy.html')
 
 
+@main.route('/accessibility-statement')
+def accessibility_statement():
+    return render_template('views/accessibility_statement.html')
+
+
 @main.route('/pricing')
 def pricing():
     return render_template(
