@@ -145,6 +145,21 @@ describe('FullscreenTable', () => {
 
     });
 
+    test("it has a role of 'region' and an accessible name matching the caption", () => {
+
+      // start module
+      window.GOVUK.modules.start();
+
+      tableFrame = document.querySelector('.fullscreen-scrollable-table');
+      caption = tableFrame.querySelector('caption');
+
+      expect(tableFrame.hasAttribute('role')).toBe(true);
+      expect(tableFrame.getAttribute('role')).toEqual('region');
+      expect(tableFrame.hasAttribute('aria-labelledby')).toBe(true);
+      expect(tableFrame.getAttribute('aria-labelledby')).toEqual(caption.getAttribute('id'));
+
+    });
+
   });
 
   describe("the height of the table should fit the vertical space available to it", () => {
@@ -312,6 +327,26 @@ describe('FullscreenTable', () => {
 
       expect(numberColumnFrame.classList.contains('fullscreen-scrolled-table')).toBe(true);
       expect(rightEdgeShadow.classList.contains('visible')).toBe(true);
+
+    });
+
+  });
+
+  describe("when the table is focused", () => {
+
+    beforeEach(() => {
+
+      // start module
+      window.GOVUK.modules.start();
+
+      tableFrame = document.querySelector('.fullscreen-scrollable-table');
+      tableFrame.focus();
+
+    });
+
+    test("it should make the parent frame a focus style", () => {
+
+      expect(container.classList.contains('js-focus-style')).toBe(true);
 
     });
 
