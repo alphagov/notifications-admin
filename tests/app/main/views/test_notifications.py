@@ -75,6 +75,38 @@ def test_notification_status_page_shows_details(
     )
 
 
+@pytest.mark.parametrize('notification_type, notification_status, expected_class', [
+    ('sms', 'failed', 'error'),
+    ('email', 'failed', 'error'),
+    ('sms', 'sent', 'sent-international'),
+    ('email', 'sent', None),
+    ('sms', 'created', 'default'),
+    ('email', 'created', 'default'),
+])
+@freeze_time("2016-01-01 11:09:00.061258")
+def test_notification_status_page_formats_email_and_sms_status_correctly(
+    client_request,
+    mocker,
+    mock_has_no_jobs,
+    service_one,
+    fake_uuid,
+    active_user_with_permissions,
+    notification_type,
+    notification_status,
+    expected_class,
+):
+    mocker.patch('app.user_api_client.get_user', return_value=active_user_with_permissions)
+    notification = create_notification(notification_status=notification_status, template_type=notification_type)
+    mocker.patch('app.notification_api_client.get_notification', return_value=notification)
+
+    page = client_request.get(
+        'main.view_notification',
+        service_id=service_one['id'],
+        notification_id=fake_uuid
+    )
+    assert page.select_one(f'.ajax-block-container p.notification-status.{expected_class}')
+
+
 @pytest.mark.parametrize('template_redaction_setting, expected_content', [
     (False, 'service one: hello Jo'),
     (True, 'service one: hello hidden'),

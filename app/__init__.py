@@ -480,9 +480,6 @@ def format_notification_status_as_field_status(status, notification_type):
             'returned-letter': None,
             'cancelled': 'error',
         },
-        'sms': {
-            'sent': 'sent-international'
-        },
     }.get(
         notification_type,
         {
@@ -491,7 +488,7 @@ def format_notification_status_as_field_status(status, notification_type):
             'temporary-failure': 'error',
             'permanent-failure': 'error',
             'delivered': None,
-            'sent': None,
+            'sent': 'sent-international' if notification_type == 'sms' else None,
             'sending': 'default',
             'created': 'default',
             'pending': 'default',
