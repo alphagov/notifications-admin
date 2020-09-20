@@ -261,6 +261,8 @@ describe('TemplateFolderForm', () => {
 
       expect(document.querySelector('button[value=add-new-template]')).not.toBeNull();
       expect(document.querySelector('button[value=add-new-folder]')).not.toBeNull();
+      expect(document.querySelector('button[value=add-new-template]').getAttribute('aria-expanded')).toEqual('false');
+      expect(document.querySelector('button[value=add-new-folder]').getAttribute('aria-expanded')).toEqual('false');
       expect(visibleCounter).not.toBeNull();
 
     });
@@ -544,6 +546,8 @@ describe('TemplateFolderForm', () => {
 
       expect(formControls.querySelector('button[value=move-to-new-folder]')).not.toBeNull();
       expect(formControls.querySelector('button[value=move-to-existing-folder]')).not.toBeNull();
+      expect(formControls.querySelector('button[value=move-to-new-folder]').getAttribute('aria-expanded')).toEqual('false');
+      expect(formControls.querySelector('button[value=move-to-existing-folder]').getAttribute('aria-expanded')).toEqual('false');
 
     });
 
