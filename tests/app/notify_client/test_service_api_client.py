@@ -200,7 +200,7 @@ def test_client_returns_count_of_service_templates(
             service_api_client.get_service_template,
             [SERVICE_ONE_ID, FAKE_TEMPLATE_ID],
             [
-                call('template-{}-version-None'.format(FAKE_TEMPLATE_ID))
+                call('service-{}-template-{}-version-None'.format(SERVICE_ONE_ID, FAKE_TEMPLATE_ID))
             ],
             b'{"data_from": "cache"}',
             [],
@@ -211,7 +211,7 @@ def test_client_returns_count_of_service_templates(
             service_api_client.get_service_template,
             [SERVICE_ONE_ID, FAKE_TEMPLATE_ID],
             [
-                call('template-{}-version-None'.format(FAKE_TEMPLATE_ID))
+                call('service-{}-template-{}-version-None'.format(SERVICE_ONE_ID, FAKE_TEMPLATE_ID)),
             ],
             None,
             [
@@ -219,10 +219,10 @@ def test_client_returns_count_of_service_templates(
             ],
             [
                 call(
-                    'template-{}-version-None'.format(FAKE_TEMPLATE_ID),
+                    'service-{}-template-{}-version-None'.format(SERVICE_ONE_ID, FAKE_TEMPLATE_ID),
                     '{"data_from": "api"}',
                     ex=604800,
-                )
+                ),
             ],
             {'data_from': 'api'},
         ),
@@ -230,7 +230,7 @@ def test_client_returns_count_of_service_templates(
             service_api_client.get_service_template,
             [SERVICE_ONE_ID, FAKE_TEMPLATE_ID, 1],
             [
-                call('template-{}-version-1'.format(FAKE_TEMPLATE_ID))
+                call('service-{}-template-{}-version-1'.format(SERVICE_ONE_ID, FAKE_TEMPLATE_ID))
             ],
             b'{"data_from": "cache"}',
             [],
@@ -241,7 +241,7 @@ def test_client_returns_count_of_service_templates(
             service_api_client.get_service_template,
             [SERVICE_ONE_ID, FAKE_TEMPLATE_ID, 1],
             [
-                call('template-{}-version-1'.format(FAKE_TEMPLATE_ID))
+                call('service-{}-template-{}-version-1'.format(SERVICE_ONE_ID, FAKE_TEMPLATE_ID)),
             ],
             None,
             [
@@ -249,10 +249,10 @@ def test_client_returns_count_of_service_templates(
             ],
             [
                 call(
-                    'template-{}-version-1'.format(FAKE_TEMPLATE_ID),
+                    'service-{}-template-{}-version-1'.format(SERVICE_ONE_ID, FAKE_TEMPLATE_ID),
                     '{"data_from": "api"}',
                     ex=604800,
-                )
+                ),
             ],
             {'data_from': 'api'},
         ),
@@ -290,7 +290,7 @@ def test_client_returns_count_of_service_templates(
             service_api_client.get_service_template_versions,
             [SERVICE_ONE_ID, FAKE_TEMPLATE_ID],
             [
-                call('template-{}-versions'.format(FAKE_TEMPLATE_ID))
+                call('service-{}-template-{}-versions'.format(SERVICE_ONE_ID, FAKE_TEMPLATE_ID))
             ],
             b'{"data_from": "cache"}',
             [],
@@ -301,7 +301,7 @@ def test_client_returns_count_of_service_templates(
             service_api_client.get_service_template_versions,
             [SERVICE_ONE_ID, FAKE_TEMPLATE_ID],
             [
-                call('template-{}-versions'.format(FAKE_TEMPLATE_ID))
+                call('service-{}-template-{}-versions'.format(SERVICE_ONE_ID, FAKE_TEMPLATE_ID)),
             ],
             None,
             [
@@ -309,10 +309,10 @@ def test_client_returns_count_of_service_templates(
             ],
             [
                 call(
-                    'template-{}-versions'.format(FAKE_TEMPLATE_ID),
+                    'service-{}-template-{}-versions'.format(SERVICE_ONE_ID, FAKE_TEMPLATE_ID),
                     '{"data_from": "api"}',
                     ex=604800,
-                )
+                ),
             ],
             {'data_from': 'api'},
         ),
