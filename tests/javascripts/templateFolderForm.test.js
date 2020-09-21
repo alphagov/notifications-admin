@@ -386,6 +386,8 @@ describe('TemplateFolderForm', () => {
       const cancelLink = formControls.querySelector('.js-cancel');
 
       expect(cancelLink).not.toBeNull();
+      expect(cancelLink.querySelector('.govuk-visually-hidden')).not.toBeNull();
+      expect(cancelLink.querySelector('.govuk-visually-hidden').textContent.trim()).toEqual('new template');
 
     });
 
@@ -468,6 +470,16 @@ describe('TemplateFolderForm', () => {
 
       // check textbox has a label
       expect(formControls.querySelector(`label[for=${textbox.getAttribute('id')}]`)).not.toBeNull();
+
+    });
+
+    test("should show a 'Cancel' link", () => {
+
+      const cancelLink = formControls.querySelector('.js-cancel');
+
+      expect(cancelLink).not.toBeNull();
+      expect(cancelLink.querySelector('.govuk-visually-hidden')).not.toBeNull();
+      expect(cancelLink.querySelector('.govuk-visually-hidden').textContent.trim()).toEqual('new folder');
 
     });
 
@@ -663,6 +675,16 @@ describe('TemplateFolderForm', () => {
 
       });
 
+      test("should show a 'Cancel' link", () => {
+
+        const cancelLink = formControls.querySelector('.js-cancel');
+
+        expect(cancelLink).not.toBeNull();
+        expect(cancelLink.querySelector('.govuk-visually-hidden')).not.toBeNull();
+        expect(cancelLink.querySelector('.govuk-visually-hidden').textContent.trim()).toEqual('move to folder');
+
+      });
+
       test("focus the 'Choose a folder' fieldset", () => {
 
         expect(document.activeElement).toBe(formControls.querySelector('#move_to'));
@@ -732,6 +754,16 @@ describe('TemplateFolderForm', () => {
 
         // check textbox has a label
         expect(formControls.querySelector(`label[for=${textbox.getAttribute('id')}]`)).not.toBeNull();
+
+      });
+
+      test("should show a 'Cancel' link", () => {
+
+        const cancelLink = formControls.querySelector('.js-cancel');
+
+        expect(cancelLink).not.toBeNull();
+        expect(cancelLink.querySelector('.govuk-visually-hidden')).not.toBeNull();
+        expect(cancelLink.querySelector('.govuk-visually-hidden').textContent.trim()).toEqual('move to new folder');
 
       });
 

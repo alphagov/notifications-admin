@@ -19,10 +19,10 @@
       this.states = [
         {key: 'nothing-selected-buttons', $el: this.$form.find('#nothing_selected'), cancellable: false},
         {key: 'items-selected-buttons', $el: this.$form.find('#items_selected'), cancellable: false},
-        {key: 'move-to-existing-folder', $el: this.$form.find('#move_to_folder_radios'), cancellable: true, setFocus: this.getFocusRoutine('#move_to_folder_radios fieldset', true)},
-        {key: 'move-to-new-folder', $el: this.$form.find('#move_to_new_folder_form'), cancellable: true, setFocus: this.getFocusRoutine('#move_to_new_folder_name', false)},
-        {key: 'add-new-folder', $el: this.$form.find('#add_new_folder_form'), cancellable: true, setFocus: this.getFocusRoutine('#add_new_folder_name', false)},
-        {key: 'add-new-template', $el: this.$form.find('#add_new_template_form'), cancellable: true, setFocus: this.getFocusRoutine('#add_new_template_form fieldset', true)}
+        {key: 'move-to-existing-folder', $el: this.$form.find('#move_to_folder_radios'), cancellable: true, setFocus: this.getFocusRoutine('#move_to_folder_radios fieldset', true), action: 'move to folder'},
+        {key: 'move-to-new-folder', $el: this.$form.find('#move_to_new_folder_form'), cancellable: true, setFocus: this.getFocusRoutine('#move_to_new_folder_name', false), action: 'move to new folder'},
+        {key: 'add-new-folder', $el: this.$form.find('#add_new_folder_form'), cancellable: true, setFocus: this.getFocusRoutine('#add_new_folder_name', false), action: 'new folder'},
+        {key: 'add-new-template', $el: this.$form.find('#add_new_template_form'), cancellable: true, setFocus: this.getFocusRoutine('#add_new_template_form fieldset', true), action: 'new template'}
       ];
 
       // cancel/clear buttons only relevant if JS enabled, so
@@ -88,7 +88,7 @@
           this.selectActionButtons(selector);
         },
         'cancelSelector': selector,
-        'nonvisualText': "this step"
+        'nonvisualText': state.action
       });
 
       state.$el.find('[type=submit]').after($cancel);
