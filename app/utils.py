@@ -623,7 +623,7 @@ LETTER_VALIDATION_MESSAGES = {
         'detail': (
             'You need to change the size or orientation of {invalid_pages}. <br>'
             'Files must meet our '
-            '<a class="govuk-link govuk-link--destructive" href="{letter_spec_guidance}" target="_blank">'
+            <!--replace links to the PDF with links to the new page-->'<a class="govuk-link govuk-link--destructive" href="{letter_spec_guidance}" target="_blank">'
             'letter specification'
             '</a>.'
         ),
