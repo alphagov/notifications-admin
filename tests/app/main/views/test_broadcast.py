@@ -140,6 +140,7 @@ def test_broadcast_pages_403_for_user_without_permission(
     (3, 'Continue', partial(url_for, '.broadcast_tour', step_index=4)),
     (4, 'Continue', partial(url_for, '.broadcast_tour', step_index=5)),
     (5, 'Continue to dashboard', partial(url_for, '.service_dashboard')),
+    (6, 'Continue to dashboard', partial(url_for, '.service_dashboard')),
 ))
 def test_broadcast_tour_pages_have_continue_link(
     client_request,
@@ -165,6 +166,7 @@ def test_broadcast_tour_pages_have_continue_link(
     pytest.param(3, marks=pytest.mark.xfail),
     pytest.param(4, marks=pytest.mark.xfail),
     5,
+    6,
 ))
 def test_broadcast_tour_page_4_shows_service_name(
     client_request,
@@ -182,7 +184,7 @@ def test_broadcast_tour_page_4_shows_service_name(
     )
 
 
-@pytest.mark.parametrize('step_index', (0, 6))
+@pytest.mark.parametrize('step_index', (0, 7))
 def test_broadcast_tour_page_404s_out_of_range(
     client_request,
     service_one,
@@ -1105,15 +1107,40 @@ def test_view_only_user_cant_approve_broadcast(
     assert not page.select_one('.banner a')
 
 
-@pytest.mark.parametrize('initial_status, expected_approval', (
-    ('draft', False,),
-    ('pending-approval', True),
-    ('rejected', False),
-    ('broadcasting', False),
-    ('cancelled', False),
+@pytest.mark.parametrize('trial_mode, initial_status, expected_approval, expected_redirect', (
+    (True, 'draft', False, partial(
+        url_for,
+        '.view_broadcast_message',
+        broadcast_message_id=sample_uuid,
+    )),
+    (True, 'pending-approval', True, partial(
+        url_for,
+        '.broadcast_tour',
+        step_index=6,
+    )),
+    (False, 'pending-approval', True, partial(
+        url_for,
+        '.view_broadcast_message',
+        broadcast_message_id=sample_uuid,
+    )),
+    (True, 'rejected', False, partial(
+        url_for,
+        '.view_broadcast_message',
+        broadcast_message_id=sample_uuid,
+    )),
+    (True, 'broadcasting', False, partial(
+        url_for,
+        '.view_broadcast_message',
+        broadcast_message_id=sample_uuid,
+    )),
+    (True, 'cancelled', False, partial(
+        url_for,
+        '.view_broadcast_message',
+        broadcast_message_id=sample_uuid,
+    )),
 ))
 @freeze_time('2020-02-22T22:22:22.000000')
-def test_approve_broadcast(
+def test_request_approval(
     mocker,
     client_request,
     service_one,
@@ -1123,6 +1150,8 @@ def test_approve_broadcast(
     mock_update_broadcast_message_status,
     initial_status,
     expected_approval,
+    trial_mode,
+    expected_redirect,
 ):
     mocker.patch(
         'app.broadcast_message_api_client.get_broadcast_message',
@@ -1135,16 +1164,15 @@ def test_approve_broadcast(
             status=initial_status,
         ),
     )
+    service_one['restricted'] = trial_mode
     service_one['permissions'] += ['broadcast']
 
     client_request.post(
         '.view_broadcast_message',
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
-        _expected_redirect=url_for(
-            '.view_broadcast_message',
+        _expected_redirect=expected_redirect(
             service_id=SERVICE_ONE_ID,
-            broadcast_message_id=fake_uuid,
             _external=True,
         )
     )
