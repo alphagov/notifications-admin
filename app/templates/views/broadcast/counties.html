@@ -15,7 +15,7 @@
 
   {{ page_header(
     page_title,
-    back_link=url_for('.choose_broadcast_library', service_id=current_service.id, broadcast_message_id=broadcast_message.id),
+    back_link=back_link,
   )}}
 
   {% call form_wrapper() %}
@@ -30,7 +30,7 @@
       {# these are districts within a county#}
         <a
           class="file-list-filename-large govuk-link govuk-link--no-visited-state"
-          href="{{ url_for('.choose_broadcast_sub_area', service_id=current_service.id, broadcast_message_id=broadcast_message.id, library_slug=library_slug, area_slug=area.id) }}"
+          href="{{ url_for('.choose_broadcast_sub_area', service_id=current_service.id, broadcast_message_id=broadcast_message.id, library_slug=library_slug, area_slug=area.id, prev_area_slug=county.id) }}"
         >{{ area.name }}</a>
       </div>
     {% endfor %}

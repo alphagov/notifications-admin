@@ -453,22 +453,12 @@ def test_choose_broadcast_area_page_for_area_with_sub_areas(
         for choice in page.select('.file-list-item')
     ]
     assert len(choices) == 394
-    assert choices[:2] == [
-        (
-            partial_url_for(area_slug='lad20-S12000033'),
-            'Aberdeen City',
-        ),
-        (
-            partial_url_for(area_slug='lad20-S12000034'),
-            'Aberdeenshire',
-        ),
-    ]
-    assert choices[-1:] == [
-        (
-            partial_url_for(area_slug='lad20-E06000014'),
-            'York',
-        ),
-    ]
+
+    assert choices[0] == (partial_url_for(area_slug='lad20-S12000033'), 'Aberdeen City',)
+    # note: we don't populate prev_area_slug query param, so the back link will come here rather than to a county page,
+    # even though ashford belongs to kent
+    assert choices[12] == (partial_url_for(area_slug='lad20-E07000105'), 'Ashford',)
+    assert choices[-1] == (partial_url_for(area_slug='lad20-E06000014'), 'York',)
 
 
 def test_choose_broadcast_sub_area_page_for_district_shows_checkboxes_for_wards(
@@ -520,6 +510,51 @@ def test_choose_broadcast_sub_area_page_for_district_shows_checkboxes_for_wards(
     ]
 
 
+@pytest.mark.parametrize('prev_area_slug, expected_back_link_url, expected_back_link_extra_kwargs', [
+    (
+        'ctyua19-E10000016',
+        'main.choose_broadcast_sub_area',
+        {
+            'area_slug': 'ctyua19-E10000016'  # Kent
+        }
+    ),
+    (
+        None,
+        '.choose_broadcast_area',
+        {}
+    )
+
+])
+def test_choose_broadcast_sub_area_page_for_district_has_back_link(
+    client_request,
+    service_one,
+    mock_get_draft_broadcast_message,
+    prev_area_slug,
+    expected_back_link_url,
+    expected_back_link_extra_kwargs
+):
+    service_one['permissions'] += ['broadcast']
+    page = client_request.get(
+        'main.choose_broadcast_sub_area',
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=str(uuid.UUID(int=0)),
+        library_slug='wd20-lad20-ctyua19',
+        area_slug='lad20-E07000105',  # Ashford
+        prev_area_slug=prev_area_slug,
+    )
+    assert normalize_spaces(page.select_one('h1').text) == (
+        'Choose an area of Ashford'
+    )
+    back_link = page.select_one('.govuk-back-link')
+    assert back_link['href'] == url_for(
+        expected_back_link_url,
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=str(uuid.UUID(int=0)),
+        library_slug='wd20-lad20-ctyua19',
+        **expected_back_link_extra_kwargs
+    )
+
+
 def test_choose_broadcast_sub_area_page_for_county_shows_links_for_districts(
     client_request,
     service_one,
@@ -563,7 +598,8 @@ def test_choose_broadcast_sub_area_page_for_county_shows_links_for_districts(
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
         library_slug='wd20-lad20-ctyua19',
-        area_slug='lad20-E07000105'
+        area_slug='lad20-E07000105',
+        prev_area_slug='ctyua19-E10000016',  # Kent
     )
     assert districts[0][1] == 'Ashford'
     assert districts[-1][0] == url_for(
@@ -571,7 +607,8 @@ def test_choose_broadcast_sub_area_page_for_county_shows_links_for_districts(
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
         library_slug='wd20-lad20-ctyua19',
-        area_slug='lad20-E07000116'
+        area_slug='lad20-E07000116',
+        prev_area_slug='ctyua19-E10000016',  # Kent
     )
     assert districts[-1][1] == 'Tunbridge Wells'
 

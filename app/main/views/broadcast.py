@@ -147,6 +147,25 @@ def choose_broadcast_area(service_id, broadcast_message_id, library_slug):
     )
 
 
+def _get_broadcast_sub_area_back_link(service_id, broadcast_message_id, library_slug):
+    prev_area_slug = request.args.get('prev_area_slug')
+    if prev_area_slug:
+        return url_for(
+            '.choose_broadcast_sub_area',
+            service_id=service_id,
+            broadcast_message_id=broadcast_message_id,
+            library_slug=library_slug,
+            area_slug=prev_area_slug,
+        )
+    else:
+        return url_for(
+            '.choose_broadcast_area',
+            service_id=service_id,
+            broadcast_message_id=broadcast_message_id,
+            library_slug=library_slug,
+        )
+
+
 @main.route(
     '/services/<uuid:service_id>/broadcast/<uuid:broadcast_message_id>/libraries/<library_slug>/<area_slug>',
     methods=['GET', 'POST'],
@@ -159,6 +178,8 @@ def choose_broadcast_sub_area(service_id, broadcast_message_id, library_slug, ar
         service_id=current_service.id,
     )
     area = BroadcastMessage.libraries.get_areas(area_slug)[0]
+
+    back_link = _get_broadcast_sub_area_back_link(service_id, broadcast_message_id, library_slug)
 
     is_county = any(sub_area.sub_areas for sub_area in area.sub_areas)
 
@@ -185,6 +206,7 @@ def choose_broadcast_sub_area(service_id, broadcast_message_id, library_slug, ar
             page_title=f'Choose an area of {area.name}',
             broadcast_message=broadcast_message,
             county=area,
+            back_link=back_link,
         )
 
     return render_template(
@@ -195,6 +217,7 @@ def choose_broadcast_sub_area(service_id, broadcast_message_id, library_slug, ar
         library_slug=library_slug,
         page_title=f'Choose an area of {area.name}',
         broadcast_message=broadcast_message,
+        back_link=back_link,
     )
 
 
