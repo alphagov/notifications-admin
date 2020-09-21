@@ -123,7 +123,7 @@ class BroadcastAreasRepository(object):
 
     def get_areas(self, area_ids):
         q = """
-        SELECT id, name, count_of_phones
+        SELECT id, name, count_of_phones, broadcast_area_library_id
         FROM broadcast_areas
         WHERE id IN ({})
         """.format(("?," * len(area_ids))[:-1])
@@ -131,7 +131,7 @@ class BroadcastAreasRepository(object):
         results = self.query(q, *area_ids)
 
         areas = [
-            (row[0], row[1], row[2])
+            (row[0], row[1], row[2], row[3])
             for row in results
         ]
 
@@ -150,7 +150,7 @@ class BroadcastAreasRepository(object):
         if is_multi_tier_library:
             # only interested in areas with children - eg local authorities, counties, unitary authorities. not wards.
             q = """
-            SELECT id, name, count_of_phones
+            SELECT id, name, count_of_phones, broadcast_area_library_id
             FROM broadcast_areas
             JOIN (
                 SELECT DISTINCT broadcast_area_library_group_id
@@ -162,7 +162,7 @@ class BroadcastAreasRepository(object):
         else:
             # Countries don't have any children, so the above query wouldn't return anything.
             q = """
-            SELECT id, name, count_of_phones
+            SELECT id, name, count_of_phones, broadcast_area_library_id
             FROM broadcast_areas
             WHERE broadcast_area_library_id = ?
             """
@@ -170,13 +170,13 @@ class BroadcastAreasRepository(object):
         results = self.query(q, library_id)
 
         return [
-            (row[0], row[1], row[2])
+            (row[0], row[1], row[2], row[3])
             for row in results
         ]
 
     def get_all_areas_for_group(self, group_id):
         q = """
-        SELECT id, name, count_of_phones
+        SELECT id, name, count_of_phones, broadcast_area_library_id
         FROM broadcast_areas
         WHERE broadcast_area_library_group_id = ?
         """
@@ -184,11 +184,29 @@ class BroadcastAreasRepository(object):
         results = self.query(q, group_id)
 
         areas = [
-            (row[0], row[1], row[2])
+            (row[0], row[1], row[2], row[3])
             for row in results
         ]
 
         return areas
+
+    def get_parent_for_area(self, area_id):
+        q = """
+        SELECT id, name, count_of_phones, broadcast_area_library_id
+        FROM broadcast_areas
+        WHERE id IN (
+            SELECT broadcast_area_library_group_id
+            FROM broadcast_areas
+            WHERE id = ?
+        )
+        """
+
+        results = self.query(q, area_id)
+
+        if not results:
+            return None
+
+        return (results[0][0], results[0][1], results[0][2], results[0][3])
 
     def get_polygons_for_area(self, area_id):
         q = """

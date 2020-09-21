@@ -102,7 +102,10 @@ def choose_broadcast_library(service_id, broadcast_message_id):
     return render_template(
         'views/broadcast/libraries.html',
         libraries=BroadcastMessage.libraries,
-        broadcast_message_id=broadcast_message_id,
+        broadcast_message=BroadcastMessage.from_id(
+            broadcast_message_id,
+            service_id=current_service.id,
+        ),
     )
 
 

@@ -66,6 +66,16 @@ class BroadcastMessage(JSONModel):
         return self.get_areas(areas=self._dict['areas'])
 
     @property
+    def parent_areas(self):
+        return sorted(set(self._parent_areas_iterator))
+
+    @property
+    def _parent_areas_iterator(self):
+        for area in self.areas:
+            for parent in area.parents:
+                yield parent
+
+    @property
     def initial_area_names(self):
         return [
             area.name for area in self.areas
