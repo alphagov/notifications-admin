@@ -93,6 +93,7 @@ def test_service_set_permission(
     platform_admin_client,
     service_one,
     mock_get_inbound_number_for_service,
+    mock_update_service_organisation,
     permission,
     initial_permissions,
     form_data,
@@ -235,18 +236,3 @@ def test_setting_broadcast_sets_organisation_if_config_value_set(
         service_id=SERVICE_ONE_ID,
         org_id=fake_uuid
     )
-
-
-def test_setting_broadcast_doesnt_set_organisation_if_config_value_not_set(
-    mock_update_service_organisation,
-    mock_update_service,
-    platform_admin_client,
-):
-    with set_config(platform_admin_client.application, 'BROADCAST_ORGANISATION_ID', None):
-        response = platform_admin_client.post(
-            url_for('main.service_set_permission', service_id=SERVICE_ONE_ID, permission='broadcast'),
-            data={'enabled': True}
-        )
-        assert response.status_code == 302
-        assert response.location == url_for('main.service_settings', service_id=SERVICE_ONE_ID, _external=True)
-    assert not mock_update_service_organisation.called
