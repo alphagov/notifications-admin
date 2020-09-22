@@ -386,6 +386,14 @@ def upload_a_letter():
     )
 
 
+@main.route('/using-notify/guidance/letter-specification')
+def letter_specification():
+    return render_template(
+        'views/guidance/letter-specification.html',
+        navigation_links=using_notify_nav(),
+    )
+
+
 # --- Redirects --- #
 
 @main.route('/roadmap', endpoint='old_roadmap')
