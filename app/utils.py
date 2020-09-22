@@ -623,14 +623,14 @@ LETTER_VALIDATION_MESSAGES = {
         'detail': (
             'You need to change the size or orientation of {invalid_pages}. <br>'
             'Files must meet our '
-            '<!--replace links to the PDF with links to the new page--><a class="govuk-link govuk-link--destructive" href="{letter_spec_guidance}" target="_blank">'
+            '<a class="govuk-link govuk-link--destructive" href="{letter_spec_guidance}" target="_blank">'
             'letter specification'
             '</a>.'
         ),
         'summary': (
             'Validation failed because {invalid_pages} {invalid_pages_are_or_is} not A4 portrait size.<br>'
             'Files must meet our '
-            '<a class="govuk-link govuk-link--no-visited-state" href="{letter_spec}" target="_blank">'
+            '<a class="govuk-link govuk-link--no-visited-state" href="{letter_spec_guidance}">'
             'letter specification'
             '</a>.'
         ),
@@ -640,14 +640,14 @@ LETTER_VALIDATION_MESSAGES = {
         'detail': (
             'You need to edit {invalid_pages}.<br>'
             'Files must meet our '
-            '<a class="govuk-link govuk-link--destructive" href="{letter_spec_guidance}" target="_blank">'
+            '<a class="govuk-link govuk-link--destructive" href="{letter_spec_guidance}">'
             'letter specification'
             '</a>.'
         ),
         'summary': (
             'Validation failed because content is outside the printable area on {invalid_pages}.<br>'
             'Files must meet our '
-            '<a class="govuk-link govuk-link--no-visited-state" href="{letter_spec}" target="_blank">'
+            '<a class="govuk-link govuk-link--no-visited-state" href="{letter_spec_guidance}" target="_blank">'
             'letter specification'
             '</a>.'
         ),
@@ -689,7 +689,7 @@ LETTER_VALIDATION_MESSAGES = {
         'summary': (
             'Validation failed because the address block is empty.<br>'
             'Files must meet our '
-            '<a class="govuk-link govuk-link--no-visited-state" href="{letter_spec}" target="_blank">'
+            '<a class="govuk-link govuk-link--no-visited-state" href="{letter_spec_guidance}" target="_blank">'
             'letter specification'
             '</a>.'
         ),
@@ -791,13 +791,13 @@ def get_letter_validation_error(validation_message, invalid_pages=None, page_cou
             invalid_pages=invalid_pages,
             invalid_pages_are_or_is=invalid_pages_are_or_is,
             page_count=page_count,
-            letter_spec_guidance=url_for('.upload_a_letter')
+            letter_spec_guidance=url_for('.letter_specification')
         ),
         'summary': LETTER_VALIDATION_MESSAGES[validation_message]['summary'].format(
             invalid_pages=invalid_pages,
             invalid_pages_are_or_is=invalid_pages_are_or_is,
             page_count=page_count,
-            letter_spec=url_for('.letter_spec'),
+            letter_spec_guidance=url_for('.letter_specification'),
         ),
     }
 
