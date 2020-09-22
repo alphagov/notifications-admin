@@ -31,7 +31,7 @@ function setFixtures (hierarchy, newTemplateDataModules = "") {
 
     return `<div id="sticky_template_forms">
               <button type="submit" name="operation" value="unknown" hidden=""></button>
-              <div id="move_to_folder_radios">
+              <div id="move_to_folder_radios" class="sticky-template-form" role="region" aria-label="Choose the folder to move selected items to">
                 <div class="js-will-stick-at-bottom-when-scrolling">
                   <div class="form-group ">
                     <fieldset id="move_to">
@@ -50,9 +50,8 @@ function setFixtures (hierarchy, newTemplateDataModules = "") {
                   </div>
                 </div>
               </div>
-              <div id="move_to_new_folder_form">
-                <fieldset class="js-will-stick-at-bottom-when-scrolling">
-                  <legend class="visuallyhidden">Add to new folder</legend>
+              <div id="move_to_new_folder_form" class="sticky-template-form" role="region" aria-label="Enter name of the new folder to move selected items to">
+                <div class="js-will-stick-at-bottom-when-scrolling">
                   <div class="govuk-form-group">
                     <label class="govuk-label" for="move_to_new_folder_name">
                       Folder name
@@ -62,11 +61,10 @@ function setFixtures (hierarchy, newTemplateDataModules = "") {
                   <div class="page-footer">
                     <button type="submit" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-1" name="operation" value="move-to-new-folder">Add to new folder</button>
                   </div>
-                </fieldset>
+                </div>
               </div>
-              <div id="add_new_folder_form">
-                <fieldset class="js-will-stick-at-bottom-when-scrolling">
-                  <legend class="visuallyhidden">Add new folder</legend>
+              <div id="add_new_folder_form" class="sticky-template-form" role="region" aria-label="Enter name of the new folder">
+                <div class="js-will-stick-at-bottom-when-scrolling">
                   <div class="govuk-form-group">
                     <label class="govuk-label" for="add_new_folder_name">
                       Folder name
@@ -76,9 +74,9 @@ function setFixtures (hierarchy, newTemplateDataModules = "") {
                   <div class="page-footer">
                     <button type="submit" class="govuk-button page-footer__button" name="operation" value="add-new-folder">Add new folder</button>
                   </div>
-                </fieldset>
+                </div>
               </div>
-              <div id="add_new_template_form" ${newTemplateDataModules}>
+              <div id="add_new_template_form" class="sticky-template-form" role="region" aria-label="Choose template type" ${newTemplateDataModules}>
                 <div class="js-will-stick-at-bottom-when-scrolling">
                   <div class="form-group ">
                     <fieldset id="add_template_by_template_type">
@@ -141,10 +139,16 @@ function resetStickyMocks () {
 
 beforeAll(() => {
   require('../../app/assets/javascripts/templateFolderForm.js');
+
+  // plug JSDOM's lack of support for window.scrollTo
+  window.scrollTo = () => {};
 });
 
 afterAll(() => {
   require('./support/teardown.js');
+
+  // tidy up
+  delete window.scrollTo;
 });
 
 describe('TemplateFolderForm', () => {
@@ -227,7 +231,7 @@ describe('TemplateFolderForm', () => {
     return formControls.querySelector('[role=status]');
   };
 
-  describe("Before the page loads", () => {
+  describe("Before the module starts", () => {
 
     // We need parts of the module to be made sticky, but by the module code,
     // not the sticky JS code that operates on the HTML at page load.
@@ -243,7 +247,7 @@ describe('TemplateFolderForm', () => {
 
   });
 
-  describe("When the page loads", () => {
+  describe("When the module starts", () => {
 
     beforeEach(() => {
 
@@ -360,40 +364,60 @@ describe('TemplateFolderForm', () => {
 
     afterEach(() => resetStickyMocks());
 
-    test("should show options for all the types of template", () => {
+    describe("Should show a region", () => {
 
-      const options = [
-        'Email', 'Text message', 'Letter', 'Copy an existing template'
-      ];
+      test("with options for all the types of template", () => {
 
-      const labels = Array.from(formControls.querySelectorAll('label'));
-      const radios = Array.from(formControls.querySelectorAll('input[type=radio]'));
+        const options = [
+          'Email', 'Text message', 'Letter', 'Copy an existing template'
+        ];
 
-      options.forEach(option => {
-        let matchingLabels = labels.filter(label => label.textContent.trim() === option);
+        const labels = Array.from(formControls.querySelectorAll('label'));
+        const radios = Array.from(formControls.querySelectorAll('input[type=radio]'));
 
-        expect(matchingLabels.length > 0).toBe(true);
+        options.forEach(option => {
+          let matchingLabels = labels.filter(label => label.textContent.trim() === option);
 
-        let matchingRadio = formControls.querySelector(`#${matchingLabels[0].getAttribute('for')}`)
+          expect(matchingLabels.length > 0).toBe(true);
 
-        expect(matchingRadio).not.toBeNull();
+          let matchingRadio = formControls.querySelector(`#${matchingLabels[0].getAttribute('for')}`)
+
+          expect(matchingRadio).not.toBeNull();
+        });
+
       });
 
-    });
+      test("with a 'Cancel' link", () => {
 
-    test("should show a 'Cancel' link", () => {
+        const cancelLink = formControls.querySelector('.js-cancel');
 
-      const cancelLink = formControls.querySelector('.js-cancel');
+        expect(cancelLink).not.toBeNull();
+        expect(cancelLink.querySelector('.govuk-visually-hidden')).not.toBeNull();
+        expect(cancelLink.querySelector('.govuk-visually-hidden').textContent.trim()).toEqual('new template');
 
-      expect(cancelLink).not.toBeNull();
-      expect(cancelLink.querySelector('.govuk-visually-hidden')).not.toBeNull();
-      expect(cancelLink.querySelector('.govuk-visually-hidden').textContent.trim()).toEqual('new template');
+      });
 
-    });
+      test("with an accessible role, name and description", () => {
 
-    test("should focus the fieldset", () => {
+        let id, description;
+        const region = document.querySelector('#add_new_template_form');
+        expect(region.hasAttribute('role')).toBe(true);
+        expect(region.getAttribute('role')).toEqual('region');
+        expect(region.hasAttribute('aria-label')).toBe(true);
+        expect(region.getAttribute('aria-label')).toEqual('Choose template type');
+        expect(region.hasAttribute('aria-describedby')).toBe(true);
+        id = region.getAttribute('aria-describedby');
+        description = document.getElementById(id);
+        expect(description).not.toBeNull();
+        expect(description.textContent.trim()).toEqual('Press continue to confirm selection or cancel to close');
 
-      expect(document.activeElement).toBe(formControls.querySelector('fieldset'));
+      });
+
+      test("and focus it", () => {
+
+        expect(document.activeElement).toBe(formControls.querySelector('#add_new_template_form'));
+
+      });
 
     });
 
@@ -464,28 +488,48 @@ describe('TemplateFolderForm', () => {
 
     });
 
-    test("should show a textbox for the folder name", () => {
+    describe("should show a parent region", () => {
 
-      expect(textbox).not.toBeNull();
+      test("with an accessible role, name and description", () => {
 
-      // check textbox has a label
-      expect(formControls.querySelector(`label[for=${textbox.getAttribute('id')}]`)).not.toBeNull();
+        let id, description;
+        const region = document.querySelector('#add_new_folder_form');
+        expect(region.hasAttribute('role')).toBe(true);
+        expect(region.getAttribute('role')).toEqual('region');
+        expect(region.hasAttribute('aria-label')).toBe(true);
+        expect(region.getAttribute('aria-label')).toEqual('Enter name of the new folder');
+        expect(region.hasAttribute('aria-describedby')).toBe(true);
+        id = region.getAttribute('aria-describedby');
+        description = document.getElementById(id);
+        expect(description).not.toBeNull();
+        expect(description.textContent.trim()).toEqual('Press add new folder to confirm name or cancel to close');
 
-    });
+      });
 
-    test("should show a 'Cancel' link", () => {
+      test("with a textbox for the folder name", () => {
 
-      const cancelLink = formControls.querySelector('.js-cancel');
+        expect(textbox).not.toBeNull();
 
-      expect(cancelLink).not.toBeNull();
-      expect(cancelLink.querySelector('.govuk-visually-hidden')).not.toBeNull();
-      expect(cancelLink.querySelector('.govuk-visually-hidden').textContent.trim()).toEqual('new folder');
+        // check textbox has a label
+        expect(formControls.querySelector(`label[for=${textbox.getAttribute('id')}]`)).not.toBeNull();
 
-    });
+      });
 
-    test("should focus the textbox", () => {
+      test("with a 'Cancel' link", () => {
 
-      expect(document.activeElement).toBe(textbox);
+        const cancelLink = formControls.querySelector('.js-cancel');
+
+        expect(cancelLink).not.toBeNull();
+        expect(cancelLink.querySelector('.govuk-visually-hidden')).not.toBeNull();
+        expect(cancelLink.querySelector('.govuk-visually-hidden').textContent.trim()).toEqual('new folder');
+
+      });
+
+      test("and focus it", () => {
+
+        expect(document.activeElement).toBe(formControls.querySelector('#add_new_folder_form'));
+
+      });
 
     });
 
@@ -643,51 +687,71 @@ describe('TemplateFolderForm', () => {
 
       });
 
-      test("should show radios for all the folders in the hierarchy", () => {
+      describe("Should show a region", () => {
 
-        const foldersInHierarchy = [];
+        test("with an accessible role, name and description", () => {
 
-        function getFolders (nodes) {
+          let id, description;
+          const region = document.querySelector('#move_to_folder_radios');
+          expect(region.hasAttribute('role')).toBe(true);
+          expect(region.getAttribute('role')).toEqual('region');
+          expect(region.hasAttribute('aria-label')).toBe(true);
+          expect(region.getAttribute('aria-label')).toEqual('Choose the folder to move selected items to');
+          expect(region.hasAttribute('aria-describedby')).toBe(true);
+          id = region.getAttribute('aria-describedby');
+          description = document.getElementById(id);
+          expect(description).not.toBeNull();
+          expect(description.textContent.trim()).toEqual('Press move to confirm or cancel to close');
 
-          nodes.forEach(node => {
-            if (node.type === 'folder') {
+        });
 
-              foldersInHierarchy.push(node.label);
-              if (node.children.length) { getFolders(node.children) }
+        test("with radios for all the folders in the hierarchy", () => {
 
-            }
-          });
+          const foldersInHierarchy = [];
 
-        };
+          function getFolders (nodes) {
 
-        getFolders(hierarchy);
+            nodes.forEach(node => {
+              if (node.type === 'folder') {
 
-        const folderLabels = Array.from(formControls.querySelectorAll('#move_to label'))
-                                  .filter(label => label.textContent.trim() !== 'Templates');
+                foldersInHierarchy.push(node.label);
+                if (node.children.length) { getFolders(node.children) }
 
-        expect(folderLabels.map(label => label.textContent.trim())).toEqual(foldersInHierarchy);
+              }
+            });
 
-        const radiosForLabels = folderLabels
-                                  .map(label => formControls.querySelector(`#${label.getAttribute('for')}`))
-                                  .filter(radio => radio !== null);
+          };
 
-        expect(radiosForLabels.length).toEqual(foldersInHierarchy.length);
+          getFolders(hierarchy);
 
-      });
+          const folderLabels = Array.from(formControls.querySelectorAll('#move_to label'))
+                                    .filter(label => label.textContent.trim() !== 'Templates');
 
-      test("should show a 'Cancel' link", () => {
+          expect(folderLabels.map(label => label.textContent.trim())).toEqual(foldersInHierarchy);
 
-        const cancelLink = formControls.querySelector('.js-cancel');
+          const radiosForLabels = folderLabels
+                                    .map(label => formControls.querySelector(`#${label.getAttribute('for')}`))
+                                    .filter(radio => radio !== null);
 
-        expect(cancelLink).not.toBeNull();
-        expect(cancelLink.querySelector('.govuk-visually-hidden')).not.toBeNull();
-        expect(cancelLink.querySelector('.govuk-visually-hidden').textContent.trim()).toEqual('move to folder');
+          expect(radiosForLabels.length).toEqual(foldersInHierarchy.length);
 
-      });
+        });
 
-      test("focus the 'Choose a folder' fieldset", () => {
+        test("with a 'Cancel' link", () => {
 
-        expect(document.activeElement).toBe(formControls.querySelector('#move_to'));
+          const cancelLink = formControls.querySelector('.js-cancel');
+
+          expect(cancelLink).not.toBeNull();
+          expect(cancelLink.querySelector('.govuk-visually-hidden')).not.toBeNull();
+          expect(cancelLink.querySelector('.govuk-visually-hidden').textContent.trim()).toEqual('move to folder');
+
+        });
+
+        test("and focus it", () => {
+
+          expect(document.activeElement).toBe(formControls.querySelector('#move_to_folder_radios'));
+
+        });
 
       });
 
@@ -748,28 +812,48 @@ describe('TemplateFolderForm', () => {
 
       });
 
-      test("should show a textbox for the folder name", () => {
+      describe("Should show a region", () => {
 
-        expect(textbox).not.toBeNull();
+        test("with an accessible role, name and description", () => {
 
-        // check textbox has a label
-        expect(formControls.querySelector(`label[for=${textbox.getAttribute('id')}]`)).not.toBeNull();
+          let id, description;
+          const region = document.querySelector('#move_to_new_folder_form');
+          expect(region.hasAttribute('role')).toBe(true);
+          expect(region.getAttribute('role')).toEqual('region');
+          expect(region.hasAttribute('aria-label')).toBe(true);
+          expect(region.getAttribute('aria-label')).toEqual('Enter name of the new folder to move selected items to');
+          expect(region.hasAttribute('aria-describedby')).toBe(true);
+          id = region.getAttribute('aria-describedby');
+          description = document.getElementById(id);
+          expect(description).not.toBeNull();
+          expect(description.textContent.trim()).toEqual('Press add to new folder to confirm name or cancel to close');
 
-      });
+        });
 
-      test("should show a 'Cancel' link", () => {
+        test("with a textbox for the folder name", () => {
 
-        const cancelLink = formControls.querySelector('.js-cancel');
+          expect(textbox).not.toBeNull();
 
-        expect(cancelLink).not.toBeNull();
-        expect(cancelLink.querySelector('.govuk-visually-hidden')).not.toBeNull();
-        expect(cancelLink.querySelector('.govuk-visually-hidden').textContent.trim()).toEqual('move to new folder');
+          // check textbox has a label
+          expect(formControls.querySelector(`label[for=${textbox.getAttribute('id')}]`)).not.toBeNull();
 
-      });
+        });
 
-      test("should focus the textbox", () => {
+        test("with a 'Cancel' link", () => {
 
-        expect(document.activeElement).toBe(textbox);
+          const cancelLink = formControls.querySelector('.js-cancel');
+
+          expect(cancelLink).not.toBeNull();
+          expect(cancelLink.querySelector('.govuk-visually-hidden')).not.toBeNull();
+          expect(cancelLink.querySelector('.govuk-visually-hidden').textContent.trim()).toEqual('move to new folder');
+
+        });
+
+        test("and focus it", () => {
+
+          expect(document.activeElement).toBe(formControls.querySelector('#move_to_new_folder_form'));
+
+        });
 
       });
 

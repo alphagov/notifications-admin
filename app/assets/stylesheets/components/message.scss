@@ -176,6 +176,17 @@ $message-type-bottom-spacing: govuk-spacing(4);
 
 }
 
+.sticky-template-form {
+
+  padding: govuk-spacing(3);
+  margin: govuk-spacing(3) * -1;
+
+  &:focus {
+    outline: none;
+  }
+
+}
+
 .folder-heading {
 
   .govuk-grid-row & {
