@@ -84,6 +84,8 @@ class Config(object):
     ASSET_DOMAIN = ''
     ASSET_PATH = '/static/'
 
+    BROADCAST_ORGANISATION_ID = os.environ.get('BROADCAST_ORGANISATION_ID')
+
     NOTIFY_SERVICE_ID = 'd6aa2c68-a2d9-4437-ab19-3ae8eb202553'
 
 
@@ -176,6 +178,8 @@ class Live(Config):
     CHECK_PROXY_HEADER = False
     ASSET_DOMAIN = 'static.notifications.service.gov.uk'
     ASSET_PATH = 'https://static.notifications.service.gov.uk/'
+
+    BROADCAST_ORGANISATION_ID = '38e4bf69-93b0-445d-acee-53ea53fe02df'
 
 
 class CloudFoundryConfig(Config):
