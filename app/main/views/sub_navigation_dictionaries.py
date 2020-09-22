@@ -84,6 +84,10 @@ def using_notify_nav():
                     "name": "Upload a letter",
                     "link": "main.upload_a_letter",
                 },
+                {
+                    "name": "Letter specification",
+                    "link": "main.letter_specification",
+                },
             ]
         },
         {
