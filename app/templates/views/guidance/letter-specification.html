@@ -9,13 +9,20 @@
 
   <h1 class="heading-large">Letter specification</h1>
 
-  <p class="govuk-body">To help you set up your letter, you can download our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.letter_spec') }}">letter specification document (PDF)</a>.</p>
-
   <p class="govuk-body">Page size and layout: A4 portrait (210 × 297 mm)</p>
   <p class="govuk-body">Maximum file size: 2 MB</p>
   <p class="govuk-body">Your letter must 10 pages or less (5 double-sided sheets of paper).</p>
   <p class="govuk-body">The content of your letter must appear inside the printable area.</p>
   
+  <p class="govuk-body">To help you set up your letter, you can download our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.letter_spec') }}">letter specification as a PDF</a>.</p>
+
+  <details class="govuk-details" data-module="govuk-details">
+  <summary class="govuk-details__summary">
+    <span class="govuk-details__summary-text">
+      View a text version of the letter specification
+    </span>
+  </summary>
+  <div class="govuk-details__text">  
   <h2 class="heading-medium">Page 1 of 10</h2>
 
   <p class="govuk-body">Left margin 15mm</p>
@@ -44,5 +51,7 @@
   <p class="govuk-body">Right margin 15mm</p>
   <p class="govuk-body">Top margin 5mm</p>
   <p class="govuk-body">Bottom margin 5mm</p>
+  </div>
+</details>
 
 {% endblock %}
