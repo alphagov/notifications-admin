@@ -145,7 +145,7 @@ describe('FullscreenTable', () => {
 
     });
 
-    test("it has a role of 'region' and an accessible name matching the caption", () => {
+    test("the scrolling section is focusable and has an accessible name matching the table caption", () => {
 
       // start module
       window.GOVUK.modules.start();
@@ -157,6 +157,21 @@ describe('FullscreenTable', () => {
       expect(tableFrame.getAttribute('role')).toEqual('region');
       expect(tableFrame.hasAttribute('aria-labelledby')).toBe(true);
       expect(tableFrame.getAttribute('aria-labelledby')).toEqual(caption.getAttribute('id'));
+
+    });
+
+    test("the section providing the fixed row headers is not focusable and is hidden from assistive tech'", () => {
+
+      // start module
+      window.GOVUK.modules.start();
+
+      fixedRowHeaders = document.querySelector('.fullscreen-fixed-table');
+
+      expect(fixedRowHeaders.hasAttribute('role')).toBe(false);
+      expect(fixedRowHeaders.hasAttribute('aria-labelledby')).toBe(false);
+      expect(fixedRowHeaders.hasAttribute('tabindex')).toBe(false);
+      expect(fixedRowHeaders.hasAttribute('aria-hidden')).toBe(true);
+      expect(fixedRowHeaders.getAttribute('aria-hidden')).toEqual('true');
 
     });
 

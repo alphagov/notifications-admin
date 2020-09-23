@@ -37,6 +37,7 @@
 
     this.insertShims = () => {
 
+      const attributesForFocus = 'role aria-labelledby tabindex';
       let captionId = this.$table.find('caption').text().toLowerCase().replace(/[^A-Za-z]+/g, '');
 
       this.$table.find('caption').attr('id', captionId);
@@ -48,6 +49,7 @@
             .clone()
             .addClass('fullscreen-fixed-table')
             .removeClass('fullscreen-scrollable-table')
+            .removeAttr(attributesForFocus)
             .attr('aria-hidden', true)
         )
         .append(
