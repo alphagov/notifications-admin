@@ -23,7 +23,8 @@
       z-index: -1;
 
       &:focus + .file-upload-button {
-        outline: 3px solid $yellow;
+        background: $govuk-focus-colour;
+        color: $govuk-focus-text-colour;
       }
 
     }

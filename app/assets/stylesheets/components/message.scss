@@ -41,13 +41,6 @@ $message-type-bottom-spacing: govuk-spacing(4);
         border-color: $link-hover-colour;
       }
 
-      &:focus {
-        // Use box shadow instead of outline to avoid buggy outline
-        // rendering in Firefox
-        outline: none;
-        box-shadow: 0 0 0 3px $yellow;
-      }
-
       .message-name-separator {
 
         margin-right: -2px;

@@ -272,8 +272,11 @@
 
       &:focus {
 
+        box-shadow: none;
+
         &:before {
-          background: $yellow;
+          background: $govuk-focus-colour;
+          box-shadow: inset 0 -4px 0 0 $govuk-focus-text-colour;
           z-index: -1;
         }
 
