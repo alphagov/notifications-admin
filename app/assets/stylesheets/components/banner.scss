@@ -56,7 +56,7 @@
   text-align: left;
 
   &:focus {
-    outline: 3px solid $yellow;
+    outline: 3px solid $govuk-focus-colour;
   }
 
   .list {
@@ -134,16 +134,17 @@
       color: $white;
     }
 
-    &:focus,
-    &:active {
-      color: $govuk-focus-text-colour;
-      outline: 10px solid $yellow;
-    }
-
     &:hover {
       color: $white;
       background-color: $link-hover-colour;
-      outline: 10px solid $link-hover-colour;
+      box-shadow: 0 0 0 10px solid $link-hover-colour;
+    }
+
+    &:focus,
+    &:active {
+      color: $govuk-focus-text-colour;
+      background-color: $govuk-focus-colour;
+      box-shadow: 0 0 0 10px $govuk-focus-colour, 0 4px 0 10px $govuk-focus-text-colour;
     }
 
   }
