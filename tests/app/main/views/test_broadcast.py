@@ -184,6 +184,48 @@ def test_broadcast_tour_page_4_shows_service_name(
     )
 
 
+@pytest.mark.parametrize('trial_mode, selector, expected_text, expected_tagged_text', (
+    (
+        True,
+        '.navigation-service-type.navigation-service-type--training',
+        'service one Training Switch service',
+        'Training',
+    ),
+    (
+        False,
+        '.navigation-service-type.navigation-service-type--live',
+        'service one Live Switch service',
+        'Live',
+    ),
+))
+def test_broadcast_service_shows_live_or_training(
+    client_request,
+    service_one,
+    mock_get_no_broadcast_messages,
+    mock_get_service_templates_when_no_templates_exist,
+    trial_mode,
+    selector,
+    expected_text,
+    expected_tagged_text,
+):
+    service_one['permissions'] += ['broadcast']
+    service_one['restricted'] = trial_mode
+    page = client_request.get(
+        '.broadcast_dashboard',
+        service_id=SERVICE_ONE_ID,
+    )
+    assert normalize_spaces(
+        page.select_one('.navigation-service').text
+    ) == (
+        expected_text
+    )
+    assert normalize_spaces(
+        page.select_one('.navigation-service').select_one(selector).text
+    ) == (
+        expected_tagged_text
+    )
+
+
 @pytest.mark.parametrize('step_index', (0, 7))
 def test_broadcast_tour_page_404s_out_of_range(
     client_request,
