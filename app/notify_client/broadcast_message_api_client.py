@@ -32,6 +32,7 @@ class BroadcastMessageAPIClient(NotifyAdminAPIClient):
         return self.get(f'/service/{service_id}/broadcast-message/{broadcast_message_id}')
 
     @cache.delete('broadcast-message-{broadcast_message_id}')
+    @cache.delete('service-{service_id}-broadcast-message-{broadcast_message_id}')
     def update_broadcast_message(self, *, service_id, broadcast_message_id, data):
         self.post(
             f'/service/{service_id}/broadcast-message/{broadcast_message_id}',
@@ -39,6 +40,7 @@ class BroadcastMessageAPIClient(NotifyAdminAPIClient):
         )
 
     @cache.delete('broadcast-message-{broadcast_message_id}')
+    @cache.delete('service-{service_id}-broadcast-message-{broadcast_message_id}')
     def update_broadcast_message_status(self, status, *, service_id, broadcast_message_id):
         data = _attach_current_user({
             'status': status,
