@@ -48,6 +48,7 @@
             .clone()
             .addClass('fullscreen-fixed-table')
             .removeClass('fullscreen-scrollable-table')
+            .removeAttr('role aria-labelledby tabindex')
             .attr('aria-hidden', true)
         )
         .append(
