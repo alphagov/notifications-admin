@@ -45,7 +45,7 @@ class Config(object):
     EMAIL_EXPIRY_SECONDS = 3600  # 1 hour
     INVITATION_EXPIRY_SECONDS = 3600 * 24 * 2  # 2 days - also set on api
     EMAIL_2FA_EXPIRY_SECONDS = 1800  # 30 Minutes
-    HEADER_COLOUR = '#FFBF47'  # $yellow
+    HEADER_COLOUR = '#81878b'  # mix(govuk-colour("dark-grey"), govuk-colour("mid-grey"))
     HTTP_PROTOCOL = 'http'
     MAX_FAILED_LOGIN_COUNT = 10
     NOTIFY_APP_NAME = 'admin'
