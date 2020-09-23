@@ -127,6 +127,7 @@ class HeaderNavigation(Navigation):
     exclude = {
         'accept_invite',
         'accept_org_invite',
+        'accessibility_statement',
         'action_blocked',
         'add_data_retention',
         'add_organisation',
@@ -518,6 +519,7 @@ class MainNavigation(Navigation):
     exclude = {
         'accept_invite',
         'accept_org_invite',
+        'accessibility_statement',
         'add_data_retention',
         'add_organisation',
         'add_service',
@@ -743,6 +745,7 @@ class CaseworkNavigation(Navigation):
     exclude = {
         'accept_invite',
         'accept_org_invite',
+        'accessibility_statement',
         'action_blocked',
         'add_data_retention',
         'add_organisation',
@@ -1067,6 +1070,7 @@ class OrgNavigation(Navigation):
     exclude = {
         'accept_invite',
         'accept_org_invite',
+        'accessibility_statement',
         'action_blocked',
         'add_data_retention',
         'add_organisation',
