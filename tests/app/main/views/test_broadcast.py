@@ -358,13 +358,65 @@ def test_preview_broadcast_areas_page(
     ]
 
 
+@pytest.mark.parametrize('areas, expected_list', (
+    ([], [
+        'Countries',
+        'Local authorities',
+    ]),
+    ([
+        # Countries have no parent areas
+        'ctry19-E92000001',
+        'ctry19-S92000003',
+    ], [
+        'Countries',
+        'Local authorities',
+    ]),
+    ([
+        # If you’ve chosen the whole of a county or unitary authority
+        # there’s no reason to  also pick districts of it
+        'ctyua19-E10000013',  # Gloucestershire, a county
+        'lad20-E06000052',  # Cornwall, a unitary authority
+    ], [
+        'Countries',
+        'Local authorities',
+    ]),
+    ([
+        'wd20-E05004299',  # Pitville, in Cheltenham, in Gloucestershire
+        'wd20-E05004290',  # Benhall and the Reddings, in Cheltenham, in Gloucestershire
+        'wd20-E05010951',  # Abbeymead, in Gloucester, in Gloucestershire
+        'wd20-S13002775',  # Shetland Central, in Shetland Isles
+        'lad20-E07000037',  # High Peak, a district in Derbyshire
+    ], [
+        'Cheltenham',
+        'Derbyshire',
+        'Gloucester',
+        'Gloucestershire',
+        'Shetland Islands',
+        # ---
+        'Countries',
+        'Local authorities',
+    ]),
+))
 def test_choose_broadcast_library_page(
+    mocker,
     client_request,
     service_one,
-    mock_get_draft_broadcast_message,
     fake_uuid,
+    areas,
+    expected_list,
 ):
     service_one['permissions'] += ['broadcast']
+    mocker.patch(
+        'app.broadcast_message_api_client.get_broadcast_message',
+        return_value=broadcast_message_json(
+            id_=fake_uuid,
+            template_id=fake_uuid,
+            created_by_id=fake_uuid,
+            service_id=SERVICE_ONE_ID,
+            status='draft',
+            areas=areas,
+        ),
+    )
     page = client_request.get(
         '.choose_broadcast_library',
         service_id=SERVICE_ONE_ID,
@@ -373,11 +425,8 @@ def test_choose_broadcast_library_page(
 
     assert [
         normalize_spaces(title.text)
-        for title in page.select('.file-list-filename-large')
-    ] == [
-        'Countries',
-        'Local authorities',
-    ]
+        for title in page.select('main a.govuk-link')
+    ] == expected_list
 
     assert normalize_spaces(page.select('.file-list-hint-large')[0].text) == (
         'England, Northern Ireland, Scotland and Wales'
@@ -388,6 +437,43 @@ def test_choose_broadcast_library_page(
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
         library_slug='ctry19',
+    )
+
+
+def test_suggested_area_has_correct_link(
+    mocker,
+    client_request,
+    service_one,
+    fake_uuid,
+):
+    service_one['permissions'] += ['broadcast']
+    mocker.patch(
+        'app.broadcast_message_api_client.get_broadcast_message',
+        return_value=broadcast_message_json(
+            id_=fake_uuid,
+            template_id=fake_uuid,
+            created_by_id=fake_uuid,
+            service_id=SERVICE_ONE_ID,
+            status='draft',
+            areas=[
+                'wd20-E05004299',  # Pitville, a ward of Cheltenham
+            ],
+        ),
+    )
+    page = client_request.get(
+        '.choose_broadcast_library',
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+    )
+    link = page.select_one('main a.govuk-link')
+
+    assert link.text == 'Cheltenham'
+    assert link['href'] == url_for(
+        'main.choose_broadcast_sub_area',
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+        library_slug='wd20-lad20-ctyua19',
+        area_slug='lad20-E07000078',
     )
 
 

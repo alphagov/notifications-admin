@@ -17,6 +17,12 @@ class SortableMixin:
         # method are sortable
         return self.name < other.name
 
+    def __eq__(self, other):
+        return self.id == other.id
+
+    def __hash__(self):
+        return hash(self.id)
+
 
 class GetItemByIdMixin:
     def get(self, id):
@@ -29,10 +35,7 @@ class GetItemByIdMixin:
 class BroadcastArea(SortableMixin):
 
     def __init__(self, row):
-        self.id, self.name, self._count_of_phones = row
-
-    def __eq__(self, other):
-        return self.id == other.id
+        self.id, self.name, self._count_of_phones, self.library_id = row
 
     @cached_property
     def polygons(self):
@@ -64,6 +67,26 @@ class BroadcastArea(SortableMixin):
         # TODO: remove the `or 0` once missing data is fixed, see
         # https://www.pivotaltracker.com/story/show/174837293
         return self._count_of_phones or 0
+
+    @cached_property
+    def parents(self):
+        return list(filter(None, self._parents_iterator))
+
+    @property
+    def _parents_iterator(self):
+        id = self.id
+
+        while True:
+            parent = BroadcastAreasRepository().get_parent_for_area(id)
+
+            if not parent:
+                return None
+
+            parent_broadcast_area = BroadcastArea(parent)
+
+            yield parent_broadcast_area
+
+            id = parent_broadcast_area.id
 
 
 class BroadcastAreaLibrary(SerialisedModelCollection, SortableMixin, GetItemByIdMixin):
