@@ -21,7 +21,8 @@
 
       this.$scrollableTable
         .on('scroll', this.toggleShadows)
-        .on('scroll', this.maintainHeight);
+        .on('scroll', this.maintainHeight)
+        .on('focus blur', () => this.$component.toggleClass('js-focus-style'));
 
       if (
         window.GOVUK.stickAtBottomWhenScrolling &&
@@ -36,7 +37,10 @@
 
     this.insertShims = () => {
 
-      this.$table.wrap('<div class="fullscreen-scrollable-table"/>');
+      let captionId = this.$table.find('caption').text().toLowerCase().replace(/[^A-Za-z]+/g, '');
+
+      this.$table.find('caption').attr('id', captionId);
+      this.$table.wrap(`<div class="fullscreen-scrollable-table" role="region" aria-labelledby="${captionId}" tabindex="0"/>`);
 
       this.$component
         .append(

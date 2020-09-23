@@ -144,3 +144,12 @@
   }
 
 }
+
+.js-focus-style {
+  outline: 3px solid $govuk-focus-text-colour;
+  box-shadow: 0 0 0 7px $govuk-focus-colour;
+
+  *:focus {
+    outline: none;
+  }
+}
