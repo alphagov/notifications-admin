@@ -94,12 +94,13 @@
     content: "";
     display: block;
     position: absolute;
-    top: 0;
-    left: 0;
-    width: govuk-spacing(7);
-    height: govuk-spacing(7);
+    top: 4px;
+    left: govuk-spacing(1);
+    width: govuk-spacing(6);
+    height: govuk-spacing(6);
     box-sizing: border-box;
     margin-right: govuk-spacing(1);
+    transform: rotate(45deg);
   }
 
   &--certain {
