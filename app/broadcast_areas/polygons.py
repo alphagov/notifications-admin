@@ -36,12 +36,12 @@ class Polygons():
     # line will never deviate more than 1m from the original.
     # Or for a 5km square, the line won’t deviate more than 20m. This
     # gives us approximate control over the total number of points.
-    perimeter_to_simplification_ratio = 1_750
+    perimeter_to_simplification_ratio = 1_620
 
     # The threshold for removing very small areas from the map. These
     # areas are likely glitches in  the data where the shoreline hasn’t
     # been subtracted from the land properly
-    minimum_area_size_square_metres = 14_000
+    minimum_area_size_square_metres = 6_500
 
     def __init__(self, polygons):
         if not polygons:
