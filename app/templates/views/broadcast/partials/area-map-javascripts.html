@@ -5,23 +5,13 @@
   {% for polygon in broadcast_message.simple_polygons.bleed.as_coordinate_pairs_lat_long %}
     polygons.push(
       L.polygon({{polygon}}, {
-        opacity: 0.8,
-        color: '#005ea5', // $light-blue
-        fillColor: '#005ea5', // $light-blue
+        opacity: 1,
+        color: '#005ea5',
+        fillColor: '#2B8CC4',
         fillOpacity: 0.15,
-        weight: 2
-      })
-    );
-  {% endfor %}
-
-  {% for polygon in broadcast_message.simple_polygons.as_coordinate_pairs_lat_long %}
-    polygons.push(
-      L.polygon({{polygon}}, {
-        opacity: 0.3,
-        color: '#005ea5', // $black
-        fillColor: '#005ea5', // $light-blue
-        fillOpacity: 0.3,
-        weight: 1
+        weight: 2,
+        dashArray: [6, 7],
+        lineCap: 'butt'
       })
     );
   {% endfor %}
@@ -29,8 +19,9 @@
   {% for polygon in broadcast_message.polygons.as_coordinate_pairs_lat_long %}
     polygons.push(
       L.polygon({{polygon}}, {
-        color: '#0b0b0c', // $black
-        fillOpacity: 0,
+        color: '#0b0b0c',
+        fillColor: '#005ea5',
+        fillOpacity: 0.3,
         weight: 2
       })
     );
