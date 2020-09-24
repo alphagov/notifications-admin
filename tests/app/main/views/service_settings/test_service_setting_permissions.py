@@ -4,7 +4,7 @@ import pytest
 from flask import url_for
 
 from app.main.views.service_settings import PLATFORM_ADMIN_SERVICE_PERMISSIONS
-from tests.conftest import normalize_spaces
+from tests.conftest import SERVICE_ONE_ID, normalize_spaces, set_config
 
 
 @pytest.fixture
@@ -215,3 +215,38 @@ def test_normal_user_doesnt_see_any_platform_admin_settings(
 
     for permission in platform_admin_settings:
         assert permission not in page
+
+
+def test_setting_broadcast_sets_organisation_if_config_value_set(
+    mock_update_service_organisation,
+    mock_update_service,
+    platform_admin_client,
+    fake_uuid,
+):
+    with set_config(platform_admin_client.application, 'BROADCAST_ORGANISATION_ID', fake_uuid):
+        response = platform_admin_client.post(
+            url_for('main.service_set_permission', service_id=SERVICE_ONE_ID, permission='broadcast'),
+            data={'enabled': True}
+        )
+        assert response.status_code == 302
+        assert response.location == url_for('main.service_settings', service_id=SERVICE_ONE_ID, _external=True)
+
+    mock_update_service_organisation.assert_called_once_with(
+        service_id=SERVICE_ONE_ID,
+        org_id=fake_uuid
+    )
+
+
+def test_setting_broadcast_doesnt_set_organisation_if_config_value_not_set(
+    mock_update_service_organisation,
+    mock_update_service,
+    platform_admin_client,
+):
+    with set_config(platform_admin_client.application, 'BROADCAST_ORGANISATION_ID', None):
+        response = platform_admin_client.post(
+            url_for('main.service_set_permission', service_id=SERVICE_ONE_ID, permission='broadcast'),
+            data={'enabled': True}
+        )
+        assert response.status_code == 302
+        assert response.location == url_for('main.service_settings', service_id=SERVICE_ONE_ID, _external=True)
+    assert not mock_update_service_organisation.called

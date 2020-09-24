@@ -3360,7 +3360,7 @@ def mock_get_service_organisation(
 
 @pytest.fixture(scope='function')
 def mock_update_service_organisation(mocker):
-    def _update_service_organisation(service_id, organisation_id):
+    def _update_service_organisation(service_id, org_id):
         return
 
     return mocker.patch(
@@ -3504,7 +3504,7 @@ def mock_organisation_name_is_unique(mocker):
 
 @pytest.fixture(scope='function')
 def mock_update_organisation(mocker):
-    def _update_org(organisation_id, **kwargs):
+    def _update_org(org, **kwargs):
         return
 
     return mocker.patch('app.organisations_client.update_organisation', side_effect=_update_org)
