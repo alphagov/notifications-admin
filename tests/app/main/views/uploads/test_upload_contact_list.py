@@ -233,7 +233,7 @@ def test_upload_csv_file_shows_error_banner_for_too_many_rows(
 ):
     mocker.patch('app.models.contact_list.s3upload', return_value=fake_uuid)
     mocker.patch('app.models.contact_list.s3download', return_value='\n'.join(
-        ['phone number'] + (['07700900986'] * 50001)
+        ['phone number'] + (['07700900986'] * 100_001)
     ))
 
     page = client_request.post(
@@ -245,8 +245,8 @@ def test_upload_csv_file_shows_error_banner_for_too_many_rows(
 
     assert normalize_spaces(page.select_one('.banner-dangerous').text) == (
         'Your file has too many rows '
-        'Notify can store files up to 50,000 rows in size. '
-        'Your file has 50,001 rows.'
+        'Notify can store files up to 100,000 rows in size. '
+        'Your file has 100,001 rows.'
     )
     assert len(page.select('tbody tr')) == 50
     assert normalize_spaces(page.select_one('.table-show-more-link').text) == (
