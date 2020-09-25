@@ -23,7 +23,7 @@
     {% endif %}
   </p>
 {% else %}
-  <nav id="template-list" class="{{ 'govuk-!-margin-top-1' if (not show_template_nav and not show_search_box) else 'govuk-!margin-top-6' }}">
+  <nav id="template-list" class="{{ 'govuk-!-margin-top-1' if (not show_template_nav and not show_search_box) else 'govuk-!-margin-top-6' }}">
     {% set checkboxes_data = [] %}
 
     {% for item in template_list %}
@@ -85,7 +85,10 @@
     {% endfor %}
 
     {% if current_user.has_permissions('manage_templates') %}
-      {{ templates_and_folders_form.templates_and_folders(param_extensions={ "items": checkboxes_data }) }}
+      {{ templates_and_folders_form.templates_and_folders(param_extensions={
+        "items": checkboxes_data,
+        "formGroup": False
+      }) }}
     {% endif %}
   </nav>
 {% endif %}
