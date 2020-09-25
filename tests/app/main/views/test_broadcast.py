@@ -368,13 +368,57 @@ def test_broadcast_page(
     ),
 
 
+@pytest.mark.parametrize('areas_selected, areas_listed, estimates', (
+    ([
+        'ctry19-E92000001',
+        'ctry19-S92000003',
+    ], [
+        'England remove',
+        'Scotland remove',
+    ], [
+        'An area of 176,714.9 square miles Will get the alert',
+        'An extra area of 3,052.8 square miles is Likely to get the alert',
+        '40,000,000 phones estimated',
+    ]),
+    ([
+        'wd20-E05003224',
+        'wd20-E05003225',
+        'wd20-E05003227',
+        'wd20-E05003228',
+        'wd20-E05003229',
+    ], [
+        'Penrith Carleton remove',
+        'Penrith East remove',
+        'Penrith Pategill remove',
+        'Penrith South remove',
+        'Penrith West remove',
+    ], [
+        'An area of 6.3 square miles Will get the alert',
+        'An extra area of 14.4 square miles is Likely to get the alert',
+        '9,000 to 30,000 phones',
+    ]),
+))
 def test_preview_broadcast_areas_page(
+    mocker,
     client_request,
     service_one,
     fake_uuid,
-    mock_get_draft_broadcast_message,
+    areas_selected,
+    areas_listed,
+    estimates,
 ):
     service_one['permissions'] += ['broadcast']
+    mocker.patch(
+        'app.broadcast_message_api_client.get_broadcast_message',
+        return_value=broadcast_message_json(
+            id_=fake_uuid,
+            template_id=fake_uuid,
+            created_by_id=fake_uuid,
+            service_id=SERVICE_ONE_ID,
+            status='draft',
+            areas=areas_selected,
+        ),
+    )
     page = client_request.get(
         '.preview_broadcast_areas',
         service_id=SERVICE_ONE_ID,
@@ -384,20 +428,14 @@ def test_preview_broadcast_areas_page(
     assert [
         normalize_spaces(item.text)
         for item in page.select('ul.area-list li.area-list-item')
-    ] == [
-        'England remove',
-        'Scotland remove',
-    ]
+    ] == areas_listed
 
     assert len(page.select('#map')) == 1
 
     assert [
         normalize_spaces(item.text)
         for item in page.select('ul li.area-key')
-    ] == [
-        'An area of 176,714.9 square miles Will get the alert (44,000,000 phones)',
-        'An extra area of 3,052.8 square miles is Likely to get the alert (800,000 phones)',
-    ]
+    ] == estimates
 
 
 @pytest.mark.parametrize('areas, expected_list', (

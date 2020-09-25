@@ -7,7 +7,7 @@
       </span>
       Will get
       <span class="visually-hidden">the</span>
-      alert ({{ broadcast_message.count_of_phones|format_thousands }} phones)
+      alert
     </li>
     <li class="area-key area-key--likely">
       <span class="visually-hidden">
@@ -18,7 +18,13 @@
         the
       </span>
       alert
-      ({{ broadcast_message.count_of_phones_likely|format_thousands }} phones)
+    </li>
+    <li class="area-key area-key--phone-estimate">
+      {% if broadcast_message.count_of_phones == broadcast_message.count_of_phones_likely %}
+        {{ broadcast_message.count_of_phones|format_thousands }} phones estimated
+      {% else %}
+        {{ broadcast_message.count_of_phones|format_thousands }} to {{ broadcast_message.count_of_phones_likely|format_thousands }} phones
+      {% endif %}
     </li>
   </ul>
 {% endmacro %}

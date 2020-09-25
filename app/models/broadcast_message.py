@@ -128,7 +128,7 @@ class BroadcastMessage(JSONModel):
     def count_of_phones(self):
         return round_to_significant_figures(
             sum(area.count_of_phones for area in self.areas),
-            2
+            1
         )
 
     @property
@@ -136,7 +136,7 @@ class BroadcastMessage(JSONModel):
         area_estimate = self.simple_polygons.estimated_area
         bleed_area_estimate = self.simple_polygons.bleed.estimated_area - area_estimate
         return round_to_significant_figures(
-            self.count_of_phones * bleed_area_estimate / area_estimate,
+            self.count_of_phones + (self.count_of_phones * bleed_area_estimate / area_estimate),
             1
         )
 
