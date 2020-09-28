@@ -104,11 +104,10 @@ class Service(JSONModel):
             set(self.permissions) - {'email', 'sms', 'letter'} | {'broadcast'}
         )
         broadcast_org_id = current_app.config['BROADCAST_ORGANISATION_ID']
-        if broadcast_org_id:
-            organisations_client.update_service_organisation(
-                service_id=self.id,
-                org_id=broadcast_org_id
-            )
+        organisations_client.update_service_organisation(
+            service_id=self.id,
+            org_id=broadcast_org_id
+        )
         return ret
 
     def update_permissions(self, permissions):
