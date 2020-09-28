@@ -67,7 +67,7 @@ class Job(JSONModel):
     def processing_started(self):
         if not self._dict.get('processing_started'):
             return None
-        return utc_string_to_aware_gmt_datetime(self._dict['processing_started'])
+        return self._dict['processing_started']
 
     def _aggregate_statistics(self, *statuses):
         return sum(
@@ -124,7 +124,9 @@ class Job(JSONModel):
             # notifications yet
             return True
         return (
-            datetime.utcnow().astimezone(local_timezone) - self.processing_started
+            datetime.utcnow().astimezone(local_timezone) - utc_string_to_aware_gmt_datetime(
+                self.processing_started
+            )
         ).days < 1
 
     @property
