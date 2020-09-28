@@ -139,7 +139,7 @@ def test_get_started(
     client_request,
     mocker,
     mock_get_service_templates_when_no_templates_exist,
-    mock_get_jobs,
+    mock_has_no_jobs,
     mock_get_service_statistics,
     mock_get_usage,
     mock_get_free_sms_fragment_limit,
@@ -164,7 +164,7 @@ def test_get_started_is_hidden_once_templates_exist(
     client_request,
     mocker,
     mock_get_service_templates,
-    mock_get_jobs,
+    mock_has_no_jobs,
     mock_get_service_statistics,
     mock_get_usage,
     mock_get_free_sms_fragment_limit,
@@ -189,7 +189,7 @@ def test_inbound_messages_not_visible_to_service_without_permissions(
     mocker,
     service_one,
     mock_get_service_templates_when_no_templates_exist,
-    mock_get_jobs,
+    mock_has_no_jobs,
     mock_get_service_statistics,
     mock_get_template_statistics,
     mock_get_usage,
@@ -215,6 +215,7 @@ def test_inbound_messages_shows_count_of_messages_when_there_are_messages(
     service_one,
     mock_get_service_templates_when_no_templates_exist,
     mock_get_jobs,
+    mock_get_scheduled_job_stats,
     mock_get_service_statistics,
     mock_get_template_statistics,
     mock_get_usage,
@@ -242,6 +243,7 @@ def test_inbound_messages_shows_count_of_messages_when_there_are_no_messages(
     service_one,
     mock_get_service_templates_when_no_templates_exist,
     mock_get_jobs,
+    mock_get_scheduled_job_stats,
     mock_get_service_statistics,
     mock_get_template_statistics,
     mock_get_usage,
@@ -484,7 +486,7 @@ def test_returned_letters_not_visible_if_service_has_no_returned_letters(
     mocker,
     service_one,
     mock_get_service_templates_when_no_templates_exist,
-    mock_get_jobs,
+    mock_has_no_jobs,
     mock_get_service_statistics,
     mock_get_template_statistics,
     mock_get_usage,
@@ -520,6 +522,7 @@ def test_returned_letters_shows_count_of_recently_returned_letters(
     service_one,
     mock_get_service_templates_when_no_templates_exist,
     mock_get_jobs,
+    mock_get_scheduled_job_stats,
     mock_get_service_statistics,
     mock_get_template_statistics,
     mock_get_usage,
@@ -579,6 +582,7 @@ def test_returned_letters_only_counts_recently_returned_letters(
     service_one,
     mock_get_service_templates_when_no_templates_exist,
     mock_get_jobs,
+    mock_get_scheduled_job_stats,
     mock_get_service_statistics,
     mock_get_template_statistics,
     mock_get_usage,
@@ -610,7 +614,7 @@ def test_should_show_recent_templates_on_dashboard(
     client_request,
     mocker,
     mock_get_service_templates,
-    mock_get_jobs,
+    mock_has_no_jobs,
     mock_get_service_statistics,
     mock_get_usage,
     mock_get_free_sms_fragment_limit,
@@ -664,7 +668,7 @@ def test_should_not_show_recent_templates_on_dashboard_if_only_one_template_used
     client_request,
     mocker,
     mock_get_service_templates,
-    mock_get_jobs,
+    mock_has_no_jobs,
     mock_get_service_statistics,
     mock_get_usage,
     mock_get_free_sms_fragment_limit,
@@ -821,6 +825,7 @@ def test_should_show_upcoming_jobs_on_dashboard(
     mock_get_template_statistics,
     mock_get_service_statistics,
     mock_get_jobs,
+    mock_get_scheduled_job_stats,
     mock_get_usage,
     mock_get_free_sms_fragment_limit,
     mock_get_inbound_sms_summary,
@@ -830,9 +835,8 @@ def test_should_show_upcoming_jobs_on_dashboard(
         'main.service_dashboard',
         service_id=SERVICE_ONE_ID,
     )
-    second_call = mock_get_jobs.call_args_list[1]
-    assert second_call[0] == (SERVICE_ONE_ID,)
-    assert second_call[1]['statuses'] == ['scheduled']
+    mock_get_jobs.assert_called_once_with(SERVICE_ONE_ID)
+    mock_get_scheduled_job_stats.assert_called_once_with(SERVICE_ONE_ID)
 
     assert normalize_spaces(
         page.select_one('main h2').text
@@ -850,6 +854,52 @@ def test_should_show_upcoming_jobs_on_dashboard(
     assert page.select_one('a.banner-dashboard')['href'] == url_for(
         'main.uploads', service_id=SERVICE_ONE_ID
     )
+
+
+def test_should_not_show_upcoming_jobs_on_dashboard_if_count_is_0(
+    mocker,
+    client_request,
+    mock_get_service_templates,
+    mock_get_template_statistics,
+    mock_get_service_statistics,
+    mock_has_jobs,
+    mock_get_usage,
+    mock_get_free_sms_fragment_limit,
+    mock_get_inbound_sms_summary,
+    mock_get_returned_letter_statistics_with_no_returned_letters,
+):
+    mocker.patch('app.job_api_client.get_scheduled_job_stats', return_value={
+        'count': 0,
+        'soonest_scheduled_for': None,
+    })
+    page = client_request.get(
+        'main.service_dashboard',
+        service_id=SERVICE_ONE_ID,
+    )
+    mock_has_jobs.assert_called_once_with(SERVICE_ONE_ID)
+    assert 'In the next few days' not in page.select_one('main').text
+    assert 'files waiting to send ' not in page.select_one('main').text
+
+
+def test_should_not_show_upcoming_jobs_on_dashboard_if_service_has_no_jobs(
+    mocker,
+    client_request,
+    mock_get_service_templates,
+    mock_get_template_statistics,
+    mock_get_service_statistics,
+    mock_has_no_jobs,
+    mock_get_usage,
+    mock_get_free_sms_fragment_limit,
+    mock_get_inbound_sms_summary,
+    mock_get_returned_letter_statistics_with_no_returned_letters,
+):
+    page = client_request.get(
+        'main.service_dashboard',
+        service_id=SERVICE_ONE_ID,
+    )
+    mock_has_no_jobs.assert_called_once_with(SERVICE_ONE_ID)
+    assert 'In the next few days' not in page.select_one('main').text
+    assert 'files waiting to send ' not in page.select_one('main').text
 
 
 @pytest.mark.parametrize('permissions', (
@@ -878,7 +928,7 @@ def test_correct_font_size_for_big_numbers(
     mock_get_service_templates,
     mock_get_template_statistics,
     mock_get_service_statistics,
-    mock_get_jobs,
+    mock_has_no_jobs,
     mock_get_usage,
     mock_get_free_sms_fragment_limit,
     mock_get_returned_letter_statistics_with_no_returned_letters,
@@ -915,6 +965,7 @@ def test_should_not_show_jobs_on_dashboard_for_users_with_uploads_page(
     mock_get_template_statistics,
     mock_get_service_statistics,
     mock_get_jobs,
+    mock_get_scheduled_job_stats,
     mock_get_usage,
     mock_get_free_sms_fragment_limit,
     mock_get_inbound_sms_summary,
@@ -1145,7 +1196,7 @@ def test_menu_send_messages(
     api_user_active,
     service_one,
     mock_get_service_templates,
-    mock_get_jobs,
+    mock_has_no_jobs,
     mock_get_template_statistics,
     mock_get_service_statistics,
     mock_get_usage,
@@ -1181,7 +1232,7 @@ def test_menu_send_messages_when_service_does_not_have_upload_letters_permission
     api_user_active,
     service_one,
     mock_get_service_templates,
-    mock_get_jobs,
+    mock_has_no_jobs,
     mock_get_template_statistics,
     mock_get_service_statistics,
     mock_get_usage,
@@ -1207,7 +1258,7 @@ def test_menu_manage_service(
     api_user_active,
     service_one,
     mock_get_service_templates,
-    mock_get_jobs,
+    mock_has_no_jobs,
     mock_get_template_statistics,
     mock_get_service_statistics,
     mock_get_usage,
@@ -1239,7 +1290,7 @@ def test_menu_manage_api_keys(
     api_user_active,
     service_one,
     mock_get_service_templates,
-    mock_get_jobs,
+    mock_has_no_jobs,
     mock_get_template_statistics,
     mock_get_service_statistics,
     mock_get_usage,
@@ -1269,7 +1320,7 @@ def test_menu_all_services_for_platform_admin_user(
     platform_admin_user,
     service_one,
     mock_get_service_templates,
-    mock_get_jobs,
+    mock_has_no_jobs,
     mock_get_template_statistics,
     mock_get_service_statistics,
     mock_get_usage,
@@ -1301,7 +1352,7 @@ def test_route_for_service_permissions(
     mock_get_service,
     mock_get_user,
     mock_get_service_templates,
-    mock_get_jobs,
+    mock_has_no_jobs,
     mock_get_template_statistics,
     mock_get_service_statistics,
     mock_get_usage,
@@ -1357,7 +1408,7 @@ def test_service_dashboard_updates_gets_dashboard_totals(
     mock_get_service_templates,
     mock_get_template_statistics,
     mock_get_service_statistics,
-    mock_get_jobs,
+    mock_has_no_jobs,
     mock_get_usage,
     mock_get_free_sms_fragment_limit,
     mock_get_inbound_sms_summary,
@@ -1541,7 +1592,7 @@ def test_org_breadcrumbs_do_not_show_if_service_has_no_org(
     client_request,
     mock_get_template_statistics,
     mock_get_service_templates_when_no_templates_exist,
-    mock_get_jobs,
+    mock_has_no_jobs,
     mock_get_usage,
     mock_get_free_sms_fragment_limit,
     mock_get_returned_letter_statistics_with_no_returned_letters,
@@ -1555,7 +1606,7 @@ def test_org_breadcrumbs_do_not_show_if_user_is_not_an_org_member(
     mocker,
     client,
     mock_get_service_templates_when_no_templates_exist,
-    mock_get_jobs,
+    mock_has_no_jobs,
     active_caseworking_user,
     client_request,
     mock_get_template_folders,
@@ -1579,7 +1630,7 @@ def test_org_breadcrumbs_show_if_user_is_a_member_of_the_services_org(
     mocker,
     mock_get_template_statistics,
     mock_get_service_templates_when_no_templates_exist,
-    mock_get_jobs,
+    mock_has_no_jobs,
     mock_get_usage,
     mock_get_free_sms_fragment_limit,
     mock_get_returned_letter_statistics_with_no_returned_letters,
@@ -1609,7 +1660,7 @@ def test_org_breadcrumbs_do_not_show_if_user_is_a_member_of_the_services_org_but
     mocker,
     mock_get_template_statistics,
     mock_get_service_templates_when_no_templates_exist,
-    mock_get_jobs,
+    mock_has_no_jobs,
     mock_get_usage,
     mock_get_free_sms_fragment_limit,
     mock_get_returned_letter_statistics_with_no_returned_letters,
@@ -1634,7 +1685,7 @@ def test_org_breadcrumbs_show_if_user_is_platform_admin(
     mocker,
     mock_get_template_statistics,
     mock_get_service_templates_when_no_templates_exist,
-    mock_get_jobs,
+    mock_has_no_jobs,
     mock_get_usage,
     mock_get_free_sms_fragment_limit,
     mock_get_returned_letter_statistics_with_no_returned_letters,
@@ -1668,7 +1719,7 @@ def test_should_show_usage_on_dashboard(
     service_one,
     mock_get_service_templates,
     mock_get_template_statistics,
-    mock_get_jobs,
+    mock_has_no_jobs,
     mock_get_usage,
     mock_get_free_sms_fragment_limit,
     mock_get_returned_letter_statistics_with_no_returned_letters,
