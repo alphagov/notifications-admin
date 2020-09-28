@@ -1,3 +1,5 @@
+{% from "components/message-count-label.html" import recipient_count_label %}
+
 <h1 class='banner-title' data-module="track-error" data-error-type="Trial mode: too many recipients" data-error-label="{{ upload_id }}">
   {% if original_file_name %}
     Too many recipients
@@ -6,7 +8,7 @@
   {% endif %}
 </h1>
 <p class="govuk-body">
-  You can only send {{ current_service.message_limit }} messages per day
+  You can only send {{ current_service.message_limit|format_thousands }} messages per day
   {%- if current_service.trial_mode %}
     in <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.trial_mode_new')}}">trial mode</a>
   {%- endif -%}
@@ -15,26 +17,10 @@
 {% if original_file_name %}
   <p class="govuk-body">
     {% if current_service.message_limit != remaining_messages %}
-      You can still send {{ remaining_messages }} messages today, but
+      You can still send {{ remaining_messages|format_thousands }} messages today, but
     {% endif %}
     ‘{{ original_file_name }}’ contains
-    {{ count_of_recipients }}
-    {% if count_of_recipients == 1 -%}
-      {%- if template.template_type == 'email' -%}
-        email address
-      {%- elif template.template_type == 'sms' -%}
-        phone number
-      {%- elif template.template_type == 'letter' -%}
-        address
-      {%- endif -%}
-    {%- else -%}
-      {%- if template.template_type == 'email' -%}
-        email addresses
-      {%- elif template.template_type == 'sms' -%}
-        phone numbers
-      {%- elif template.template_type == 'letter' -%}
-        addresses
-      {%- endif -%}
-    {%- endif -%}.
+    {{ count_of_recipients|format_thousands }}
+    {{ recipient_count_label(count_of_recipients, template.template_type) }}.
   </p>
 {% endif %}

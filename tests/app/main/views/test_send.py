@@ -3329,8 +3329,8 @@ def test_go_to_dashboard_after_tour_link(
 
 
 @pytest.mark.parametrize('num_requested,expected_msg', [
-    (0, '‘valid.csv’ contains 100 phone numbers.'),
-    (1, 'You can still send 49 messages today, but ‘valid.csv’ contains 100 phone numbers.')
+    (0, '‘valid.csv’ contains 1,234 phone numbers.'),
+    (1, 'You can still send 49 messages today, but ‘valid.csv’ contains 1,234 phone numbers.')
 ], ids=['none_sent', 'some_sent'])
 def test_check_messages_shows_too_many_messages_errors(
     mocker,
@@ -3346,7 +3346,7 @@ def test_check_messages_shows_too_many_messages_errors(
 ):
     # csv with 100 phone numbers
     mocker.patch('app.main.views.send.s3download', return_value=',\n'.join(
-        ['phone number'] + ([mock_get_users_by_service(None)[0]['mobile_number']] * 100)
+        ['phone number'] + ([mock_get_users_by_service(None)[0]['mobile_number']] * 1234)
     ))
     mocker.patch('app.service_api_client.get_service_statistics', return_value={
         'sms': {'requested': num_requested, 'delivered': 0, 'failed': 0},
@@ -4291,7 +4291,7 @@ SERVICE_DAILY_LIMIT_MSG = 'Exceeded send limits (1000) for today'
     (
         SERVICE_DAILY_LIMIT_MSG,
         'Daily limit reached',
-        'You can only send 1000 messages per day in trial mode.'
+        'You can only send 1,000 messages per day in trial mode.'
     ),
 ])
 def test_send_notification_shows_error_if_400(
