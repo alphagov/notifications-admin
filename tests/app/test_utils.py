@@ -20,7 +20,7 @@ from app.utils import (
     get_letter_validation_error,
     get_logo_cdn_domain,
     get_sample_template,
-    is_less_than_90_days_ago,
+    is_less_than_days_ago,
     merge_jsonlike,
     printing_today_or_tomorrow,
     round_to_significant_figures,
@@ -597,10 +597,11 @@ def test_get_letter_validation_error_for_known_errors(
 @pytest.mark.parametrize("date_from_db, expected_result", [
     ('2019-11-17T11:35:21.726132Z', True),
     ('2019-11-16T11:35:21.726132Z', False),
+    ('2019-11-16T11:35:21+0000', False),
 ])
 @freeze_time('2020-02-14T12:00:00')
-def test_is_less_than_90_days_ago(date_from_db, expected_result):
-    assert is_less_than_90_days_ago(date_from_db) == expected_result
+def test_is_less_than_days_ago(date_from_db, expected_result):
+    assert is_less_than_days_ago(date_from_db, 90) == expected_result
 
 
 @pytest.mark.parametrize("template_type", ["sms", "letter", "email"])
