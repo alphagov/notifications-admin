@@ -228,8 +228,8 @@ def _add_local_authorities(dataset_id):
     areas_to_add = []
 
     for feature in geojson.loads(lad20_filepath.read_text())["features"]:
-        la_id = feature["properties"]["lad20cd"]
-        group_name = feature["properties"]["lad20nm"]
+        la_id = feature["properties"]["LAD20CD"]
+        group_name = feature["properties"]["LAD20NM"]
 
         print()  # noqa: T001
         print(group_name)  # noqa: T001

@@ -376,8 +376,8 @@ def test_broadcast_page(
         'England remove',
         'Scotland remove',
     ], [
-        'An area of 176,714.9 square miles Will get the alert',
-        'An extra area of 3,052.8 square miles is Likely to get the alert',
+        'An area of 177,439.8 square miles Will get the alert',
+        'An extra area of 3,058.9 square miles is Likely to get the alert',
         '40,000,000 phones estimated',
     ]),
     ([
