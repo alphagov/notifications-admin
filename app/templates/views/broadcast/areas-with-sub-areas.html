@@ -14,7 +14,13 @@
     back_link=url_for('.choose_broadcast_library', service_id=current_service.id, broadcast_message_id=broadcast_message.id),
   )}}
 
-  {{ live_search(target_selector='.file-list-item', show=show_search_form, form=search_form, label='Search by name') }}
+  {{ live_search(
+    target_selector='.file-list-item',
+    show=show_search_form,
+    form=search_form,
+    label='Search by name',
+    autofocus=True)
+  }}
 
   {% for area in library|sort %}
     <div class="file-list-item">

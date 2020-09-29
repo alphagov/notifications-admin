@@ -1,3 +1,5 @@
+const helpers = require('./support/helpers.js');
+
 beforeAll(() => {
   require('../../app/assets/javascripts/autofocus.js');
 });
@@ -8,16 +10,19 @@ afterAll(() => {
 
 describe('Autofocus', () => {
 
+  const labelText = 'Search by name';
   let focusHandler;
   let search;
 
   beforeEach(() => {
 
+    document.title = 'Find services by name - GOV.UK Notify';
+
     // set up DOM
     document.body.innerHTML =
       `<div>
         <label class="form-label" for="search">
-          Search by name
+          ${labelText}
         </label>
         <input autocomplete="off" class="form-control form-control-1-1" id="search" name="search" type="search" value="" data-module="autofocus">
       </div>`;
@@ -42,6 +47,28 @@ describe('Autofocus', () => {
     window.GOVUK.modules.start();
 
     expect(focusHandler).toHaveBeenCalled();
+
+  });
+
+  test('has a label including the page title when the module starts', () => {
+
+    // start module
+    window.GOVUK.modules.start();
+
+    expect(search.hasAttribute('aria-label')).toBe(true);
+    expect(search.getAttribute('aria-label')).toEqual(document.title + ' - ' + labelText);
+
+  });
+
+  test('gets the original label back when focus moves away', () => {
+
+    // start module
+    window.GOVUK.modules.start();
+
+    // shift focus away from textbox
+    helpers.triggerEvent(search, 'blur');
+
+    expect(search.hasAttribute('aria-label')).toBe(false);
 
   });
 
