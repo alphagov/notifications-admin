@@ -100,6 +100,7 @@ def start_tour(service_id, template_id):
             show_recipient=True,
         ),
         help='1',
+        continue_link=url_for('.send_test', service_id=current_service.id, template_id=template['id'], help=2)
     )
 
 

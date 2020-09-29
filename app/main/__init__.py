@@ -38,6 +38,7 @@ from app.main.views import (  # noqa isort:skip
     styleguide,
     templates,
     two_factor,
+    tour,
     uploads,
     user_profile,
     verify,
