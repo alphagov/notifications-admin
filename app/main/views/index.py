@@ -123,7 +123,7 @@ def email_template():
 
     template = {
         'template_type': 'email',
-        'subject': 'foo',
+        'subject': 'Email branding preview',
         'content': (
             'Lorem Ipsum is simply dummy text of the printing and typesetting '
             'industry.\n\nLorem Ipsum has been the industry’s standard dummy '
