@@ -18,7 +18,7 @@ pyexcel-xlsx==0.5.8
 pyexcel-ods3==0.5.3
 pytz==2020.1
 gunicorn==20.0.4
-eventlet==0.27.0
+eventlet==0.28.0
 notifications-python-client==5.7.0
 Shapely==1.7.1
 
@@ -34,10 +34,10 @@ prometheus-client==0.8.0
 gds-metrics==0.2.4
 
 ## The following requirements were added by pip freeze:
-awscli==1.18.148
+awscli==1.18.149
 bleach==3.1.4
 boto3==1.10.38
-botocore==1.18.7
+botocore==1.18.8
 cachetools==4.1.0
 certifi==2020.6.20
 chardet==3.0.4

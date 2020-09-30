@@ -16,7 +16,7 @@ pyexcel-xlsx==0.5.8
 pyexcel-ods3==0.5.3
 pytz==2020.1
 gunicorn==20.0.4
-eventlet==0.27.0
+eventlet==0.28.0
 notifications-python-client==5.7.0
 Shapely==1.7.1
 
