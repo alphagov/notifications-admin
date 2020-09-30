@@ -456,3 +456,87 @@ def test_get_test_step_out_of_index_redirects_to_check_notification_if_all_place
             _external=True
         ),
     )
+
+
+def test_should_200_for_check_tour_notification(
+    client_request,
+    mock_get_service_template_with_multiple_placeholders,
+    service_one,
+    fake_uuid,
+):
+    with client_request.session_transaction() as session:
+        session['placeholders'] = {'one': 'hello', 'two': 'hi', 'three': 'howdy', 'phone number': '07700 900762'}
+
+    page = client_request.get(
+        'main.check_tour_notification',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+    )
+
+    assert normalize_spaces(
+        page.select('.banner-tour .heading-medium')[0].text
+    ) == (
+        'Try sending yourself this example'
+    )
+    selected_hint = page.select('.banner-tour .govuk-grid-row')[1]
+    selected_hint_text = normalize_spaces(selected_hint.select(".govuk-body")[0].text)
+    assert "greyed-out-step" not in selected_hint["class"]
+    assert selected_hint_text == 'The template pulls in the data you provide'
+
+    assert normalize_spaces(
+        page.select('.sms-message-recipient')[0].text
+    ) == (
+        'To: 07700 900762'
+    )
+    assert normalize_spaces(
+        page.select('.sms-message-wrapper')[0].text
+    ) == (
+        'service one: hello hi howdy'
+    )
+
+
+def test_back_link_from_check_tour_notification_points_to_last_tour_step(
+    client_request,
+    mock_get_service_template_with_multiple_placeholders,
+    service_one,
+    fake_uuid,
+):
+    with client_request.session_transaction() as session:
+        session['placeholders'] = {'one': 'hello', 'two': 'hi', 'three': 'howdy', 'phone number': '07700 900762'}
+
+    page = client_request.get(
+        'main.check_tour_notification',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+    )
+
+    assert page.select('.govuk-back-link')[0]['href'] == url_for(
+        "main.tour_step",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        step_index=3
+    )
+
+
+def test_check_tour_notification_redirects_to_first_step_if_not_all_placeholders_in_session(
+    client_request,
+    mock_get_service_template_with_multiple_placeholders,
+    service_one,
+    fake_uuid,
+):
+    with client_request.session_transaction() as session:
+        session['placeholders'] = {'one': 'hello', 'two': 'hi', 'phone number': '07700 900762'}
+
+    client_request.get(
+        'main.check_tour_notification',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.tour_step',
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            step_index=1,
+            _external=True
+        ),
+    )

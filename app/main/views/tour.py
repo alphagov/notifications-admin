@@ -111,4 +111,30 @@ def _get_tour_step_back_link(service_id, template_id, step_index):
 @main.route("/services/<uuid:service_id>/tour/<uuid:template_id>/check", methods=['GET'])
 @user_has_permissions('send_messages', restrict_admin_usage=True)
 def check_tour_notification(service_id, template_id):
-    pass
+    db_template = current_service.get_template(template_id)
+
+    template = get_template(
+        db_template,
+        current_service,
+        show_recipient=True,
+    )
+
+    placeholders = fields_to_fill_in(template, prefill_current_user=True)
+
+    if not all_placeholders_in_session(template.placeholders):
+        return redirect(url_for(
+            '.tour_step', service_id=current_service.id, template_id=template_id, step_index=1
+        ))
+
+    back_link = url_for(
+        '.tour_step', service_id=current_service.id, template_id=template_id, step_index=len(placeholders)
+    )
+
+    template.values = get_recipient_and_placeholders_from_session(template.template_type)
+
+    return render_template(
+        'views/notifications/check.html',
+        template=template,
+        back_link=back_link,
+        help='2',
+    )
