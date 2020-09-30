@@ -15,7 +15,7 @@ from app.utils import get_template, user_has_permissions
 @main.route("/services/<uuid:service_id>/tour/<uuid:template_id>")
 @user_has_permissions('send_messages')
 def begin_tour(service_id, template_id):
-    db_template = current_service.get_template(template_id)
+    db_template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
 
     if (db_template['template_type'] != 'sms' or not current_user.mobile_number):
         abort(404)
@@ -44,7 +44,7 @@ def begin_tour(service_id, template_id):
 )
 @user_has_permissions('send_messages', restrict_admin_usage=True)
 def tour_step(service_id, template_id, step_index):
-    db_template = current_service.get_template(template_id)
+    db_template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
 
     if db_template['template_type'] != 'sms':
         abort(404)
@@ -111,7 +111,7 @@ def _get_tour_step_back_link(service_id, template_id, step_index):
 @main.route("/services/<uuid:service_id>/tour/<uuid:template_id>/check", methods=['GET'])
 @user_has_permissions('send_messages', restrict_admin_usage=True)
 def check_tour_notification(service_id, template_id):
-    db_template = current_service.get_template(template_id)
+    db_template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
 
     template = get_template(
         db_template,
