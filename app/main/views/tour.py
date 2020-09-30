@@ -6,7 +6,6 @@ from app.main.views.send import (
     all_placeholders_in_session,
     fields_to_fill_in,
     get_normalised_placeholders_from_session,
-    get_notification_check_endpoint,
     get_placeholder_form_instance,
     get_recipient_and_placeholders_from_session,
 )
@@ -62,9 +61,11 @@ def tour_step(service_id, template_id, step_index):
         current_placeholder = placeholders[step_index - 1]
     except IndexError:
         if all_placeholders_in_session(placeholders):
-            return get_notification_check_endpoint(service_id, template)
+            return redirect(url_for(
+                '.check_tour_notification', service_id=current_service.id, template_id=template_id
+            ))
         return redirect(url_for(
-            '.tour_step', service_id=current_service.id, template_id=db_template['id'], step_index=1
+            '.tour_step', service_id=current_service.id, template_id=template_id, step_index=1
         ))
 
     form = get_placeholder_form_instance(
@@ -78,9 +79,11 @@ def tour_step(service_id, template_id, step_index):
         session['placeholders'][current_placeholder] = form.placeholder_value.data
 
         if all_placeholders_in_session(placeholders):
-            return get_notification_check_endpoint(service_id, template)
+            return redirect(url_for(
+                '.check_tour_notification', service_id=current_service.id, template_id=template_id
+            ))
         return redirect(url_for(
-            '.tour_step', service_id=current_service.id, template_id=db_template['id'], step_index=step_index + 1
+            '.tour_step', service_id=current_service.id, template_id=template_id, step_index=step_index + 1
         ))
 
     back_link = _get_tour_step_back_link(service_id, template_id, step_index)
@@ -103,3 +106,9 @@ def _get_tour_step_back_link(service_id, template_id, step_index):
         return url_for('.begin_tour', service_id=service_id, template_id=template_id)
 
     return url_for('.tour_step', service_id=service_id, template_id=template_id, step_index=step_index - 1)
+
+
+@main.route("/services/<uuid:service_id>/tour/<uuid:template_id>/check", methods=['GET'])
+@user_has_permissions('send_messages', restrict_admin_usage=True)
+def check_tour_notification(service_id, template_id):
+    pass

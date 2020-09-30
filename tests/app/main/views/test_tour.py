@@ -398,12 +398,11 @@ def test_post_final_tour_step_saves_data_and_redirects_to_check_notification(
         _data={'placeholder_value': 'howdy'},
         _expected_status=302,
         _expected_redirect=url_for(
-            'main.check_notification',
+            'main.check_tour_notification',
             service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
-            help=None,
             _external=True
-        ),  # this location needs to change
+        ),
     )
 
     with client_request.session_transaction() as session:
@@ -451,10 +450,9 @@ def test_get_test_step_out_of_index_redirects_to_check_notification_if_all_place
         step_index=4,
         _expected_status=302,
         _expected_redirect=url_for(
-            'main.check_notification',
+            'main.check_tour_notification',
             service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
-            help=None,
             _external=True
-        ),  # this location needs to change
+        ),
     )
