@@ -88,7 +88,7 @@
   display: inline-block;
   position: relative;
   margin-right: govuk-spacing(3);
-  margin-bottom: govuk-spacing(5);
+  margin-bottom: govuk-spacing(4);
   height: govuk-spacing(7);
   padding-left: govuk-spacing(8);
   line-height: govuk-spacing(7);
@@ -131,4 +131,20 @@
     }
   }
 
+}
+
+.map-details {
+  .govuk-details__summary {
+    display: block;
+    padding-top: govuk-spacing(1);
+    padding-bottom: govuk-spacing(1);
+    margin-top: 1px;
+  }
+
+  .govuk-details__text {
+    padding: 0;
+    border: none;
+    border-bottom: 1px solid $border-colour;
+    margin-top: -1px;
+  }
 }
