@@ -6,7 +6,7 @@
   box-sizing: border-box;
   padding: govuk-spacing(9) govuk-spacing(3) govuk-spacing(3) govuk-spacing(3);
   background: $panel-colour;
-  border: 2px solid $black;
+  box-shadow: inset 0 -1px 0 0 rgba(0, 0, 0, 0.05);
   border-radius: 5px;
   white-space: normal;
   margin: govuk-spacing(2) 0 govuk-spacing(4) 0;
@@ -16,18 +16,21 @@
   &:before {
     content: "Emergency alert";
     display: block;
-    border-bottom: 2px solid $black;
     position: absolute;
-    top: govuk-spacing(2);
+    top: 0;
     left: 0;
-    padding: 2px govuk-spacing(3) govuk-spacing(2) 45px;
+    padding: govuk-spacing(2) + 1px govuk-spacing(3) (govuk-spacing(2) - 1px) 46px;
     width: 100%;
     box-sizing: border-box;
     font-weight: bold;
-    background: file-url('exclamation.svg');
-    background-size: 20px;
+    background: $grey-1 file-url('exclamation.svg');
+    color: $white;
+    background-size: 22px;
     background-repeat: no-repeat;
-    background-position: govuk-spacing(3) 3px;
+    background-position: govuk-spacing(3) 11px;
+    border-top-right-radius: 5px;
+    border-top-left-radius: 5px;
+    box-shadow: inset 0 -1px 0 0 rgba(0, 0, 0, 0.1);
   }
 
 }
