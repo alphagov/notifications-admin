@@ -190,8 +190,6 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         return self.post(endpoint, data)
 
     @cache.delete('service-{service_id}-templates')
-    @cache.delete('template-{id_}-version-None')
-    @cache.delete('template-{id_}-versions')
     @cache.delete('service-{service_id}-template-{id_}-version-None')
     @cache.delete('service-{service_id}-template-{id_}-versions')
     def update_service_template(
@@ -220,8 +218,6 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         return self.post(endpoint, data)
 
     @cache.delete('service-{service_id}-templates')
-    @cache.delete('template-{id_}-version-None')
-    @cache.delete('template-{id_}-versions')
     @cache.delete('service-{service_id}-template-{id_}-version-None')
     @cache.delete('service-{service_id}-template-{id_}-versions')
     def redact_service_template(self, service_id, id_):
@@ -233,8 +229,6 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         )
 
     @cache.delete('service-{service_id}-templates')
-    @cache.delete('template-{template_id}-version-None')
-    @cache.delete('template-{template_id}-versions')
     @cache.delete('service-{service_id}-template-{template_id}-version-None')
     @cache.delete('service-{service_id}-template-{template_id}-versions')
     def update_service_template_sender(self, service_id, template_id, reply_to):
@@ -248,8 +242,6 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         )
 
     @cache.delete('service-{service_id}-templates')
-    @cache.delete('template-{template_id}-version-None')
-    @cache.delete('template-{template_id}-versions')
     @cache.delete('service-{service_id}-template-{template_id}-version-None')
     @cache.delete('service-{service_id}-template-{template_id}-versions')
     def update_service_template_postage(self, service_id, template_id, postage):
@@ -308,8 +300,6 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         ])
 
     @cache.delete('service-{service_id}-templates')
-    @cache.delete('template-{template_id}-version-None')
-    @cache.delete('template-{template_id}-versions')
     @cache.delete('service-{service_id}-template-{template_id}-version-None')
     @cache.delete('service-{service_id}-template-{template_id}-versions')
     def delete_service_template(self, service_id, template_id):

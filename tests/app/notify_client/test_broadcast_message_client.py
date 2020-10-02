@@ -1,5 +1,3 @@
-from unittest.mock import call
-
 from app.notify_client.broadcast_message_api_client import (
     BroadcastMessageAPIClient,
 )
@@ -72,10 +70,7 @@ def test_update_broadcast_message(mocker):
         '/service/12345/broadcast-message/67890',
         data={'abc': 'def'},
     )
-    mock_redis_delete.assert_has_calls([
-        call('service-12345-broadcast-message-67890'),
-        call('broadcast-message-67890'),
-    ])
+    mock_redis_delete.assert_called_once_with('service-12345-broadcast-message-67890')
 
 
 def test_update_broadcast_message_status(mocker):
@@ -94,7 +89,4 @@ def test_update_broadcast_message_status(mocker):
         '/service/12345/broadcast-message/67890/status',
         data={'created_by': '1', 'status': 'cancelled'},
     )
-    mock_redis_delete.assert_has_calls([
-        call('service-12345-broadcast-message-67890'),
-        call('broadcast-message-67890'),
-    ])
+    mock_redis_delete.assert_called_once_with('service-12345-broadcast-message-67890')
