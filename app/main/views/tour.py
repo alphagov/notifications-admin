@@ -46,7 +46,7 @@ def begin_tour(service_id, template_id):
 def tour_step(service_id, template_id, step_index):
     db_template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
 
-    if db_template['template_type'] != 'sms':
+    if (db_template['template_type'] != 'sms' or step_index == 0):
         abort(404)
 
     if 'placeholders' not in session:

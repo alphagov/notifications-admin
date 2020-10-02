@@ -206,6 +206,24 @@ def test_should_404_if_non_sms_template_for_tour_step(
     )
 
 
+def test_should_404_for_get_tour_step_0(
+    client_request,
+    mock_get_service_template_with_multiple_placeholders,
+    service_one,
+    fake_uuid,
+):
+    with client_request.session_transaction() as session:
+        session['placeholders'] = {}
+
+    client_request.get(
+        'main.tour_step',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        step_index=0,
+        _expected_status=404
+    )
+
+
 @pytest.mark.parametrize('method', ['GET', 'POST'])
 def test_should_403_if_user_does_not_have_send_permissions_for_tour_step(
     mocker,
