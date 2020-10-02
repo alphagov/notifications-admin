@@ -64,7 +64,10 @@
     &--unremoveable {
       padding-right: govuk-spacing(2);
       background: $light-blue-25;
-      margin-right: govuk-spacing(3);
+      color: mix($black, $govuk-blue, 66%);
+      border-color: $light-blue-25;
+      margin: 0 govuk-spacing(1) govuk-spacing(2) 0;
+      font-weight: bold;
     }
 
   }
