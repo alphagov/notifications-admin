@@ -27,7 +27,7 @@ class BroadcastMessageAPIClient(NotifyAdminAPIClient):
     def get_broadcast_messages(self, service_id):
         return self.get(f'/service/{service_id}/broadcast-message')['broadcast_messages']
 
-    @cache.set('broadcast-message-{broadcast_message_id}')
+    @cache.set('service-{service_id}-broadcast-message-{broadcast_message_id}')
     def get_broadcast_message(self, *, service_id, broadcast_message_id):
         return self.get(f'/service/{service_id}/broadcast-message/{broadcast_message_id}')
 

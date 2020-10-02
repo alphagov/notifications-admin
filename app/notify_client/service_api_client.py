@@ -258,7 +258,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             _attach_current_user({'postage': postage})
         )
 
-    @cache.set('template-{template_id}-version-{version}')
+    @cache.set('service-{service_id}-template-{template_id}-version-{version}')
     def get_service_template(self, service_id, template_id, version=None):
         """
         Retrieve a service template.
@@ -270,7 +270,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             endpoint = '{base}/version/{version}'.format(base=endpoint, version=version)
         return self.get(endpoint)
 
-    @cache.set('template-{template_id}-versions')
+    @cache.set('service-{service_id}-template-{template_id}-versions')
     def get_service_template_versions(self, service_id, template_id):
         """
         Retrieve a list of versions for a template
