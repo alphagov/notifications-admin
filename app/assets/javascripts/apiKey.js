@@ -29,9 +29,10 @@
 
     this.getRangeFromElement = function (keyElement) {
       const range = document.createRange();
+      const childNodes = Array.prototype.slice.call(keyElement.childNodes);
       let prefixIndex = -1;
 
-      Array.from(keyElement.childNodes).forEach((el, idx) => {
+      childNodes.forEach((el, idx) => {
         if ((el.nodeType === 1) && el.classList.contains('govuk-visually-hidden')) {
           prefixIndex = idx;
         }
