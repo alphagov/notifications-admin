@@ -234,6 +234,30 @@ def test_should_403_if_user_does_not_have_send_permissions_for_tour_step(
     )
 
 
+def test_tour_step_redirects_to_tour_start_if_placeholders_doesnt_exist_in_session(
+    client_request,
+    mock_get_service_template_with_multiple_placeholders,
+    service_one,
+    fake_uuid,
+):
+    with client_request.session_transaction() as session:
+        assert 'placeholders' not in session
+
+    client_request.get(
+        'main.tour_step',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        step_index=1,
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.begin_tour',
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            _external=True,
+        ),
+    )
+
+
 def test_back_link_from_first_get_tour_step_points_to_tour_start(
     client_request,
     mock_get_service_template_with_multiple_placeholders,
@@ -515,6 +539,30 @@ def test_back_link_from_check_tour_notification_points_to_last_tour_step(
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
         step_index=3
+    )
+
+
+def test_check_tour_notification_redirects_to_tour_start_if_placeholders_doesnt_exist_in_session(
+    client_request,
+    mock_get_service_template_with_multiple_placeholders,
+    service_one,
+    fake_uuid,
+):
+    with client_request.session_transaction() as session:
+        assert 'placeholders' not in session
+
+    client_request.get(
+        'main.check_tour_notification',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        step_index=1,
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.begin_tour',
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            _external=True,
+        ),
     )
 
 

@@ -49,6 +49,11 @@ def tour_step(service_id, template_id, step_index):
     if db_template['template_type'] != 'sms':
         abort(404)
 
+    if 'placeholders' not in session:
+        return redirect(url_for(
+            '.begin_tour', service_id=current_service.id, template_id=template_id
+        ))
+
     template = get_template(
         db_template,
         current_service,
@@ -118,6 +123,11 @@ def check_tour_notification(service_id, template_id):
         current_service,
         show_recipient=True,
     )
+
+    if 'placeholders' not in session:
+        return redirect(url_for(
+            '.begin_tour', service_id=current_service.id, template_id=template_id
+        ))
 
     placeholders = fields_to_fill_in(template, prefill_current_user=True)
 
