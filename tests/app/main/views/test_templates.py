@@ -2389,3 +2389,40 @@ def test_set_template_sender_escapes_letter_contact_block_names(
     radio_text = page.select_one('.govuk-grid-column-three-quarters label[for="sender-1"]').decode_contents()
     assert "&lt;script&gt;" in radio_text
     assert "<script>" not in radio_text
+
+
+@pytest.mark.parametrize('template_content', (
+    'This is a ((test))',
+    'This ((unsure??might)) be a test',
+    pytest.param('This is a test', marks=pytest.mark.xfail),
+))
+@pytest.mark.parametrize('template_type', (
+    'broadcast',
+    pytest.param('sms', marks=pytest.mark.xfail),
+))
+def test_should_not_create_broadcast_template_with_placeholders(
+    client_request,
+    service_one,
+    mock_create_service_template,
+    mock_update_service_template,
+    template_content,
+    template_type,
+):
+    service_one['permissions'] += [template_type]
+    page = client_request.post(
+        '.add_service_template',
+        service_id=SERVICE_ONE_ID,
+        template_type=template_type,
+        _data={
+            'name': 'new name',
+            'template_content': template_content,
+            'service': SERVICE_ONE_ID,
+        },
+        _expected_status=200,
+    )
+    assert normalize_spaces(
+        page.select_one('.error-message').text
+    ) == (
+        'You can’t use ((double brackets)) to personalise this message'
+    )
+    assert mock_create_service_template.called is False

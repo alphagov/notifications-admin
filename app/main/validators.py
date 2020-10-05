@@ -108,6 +108,18 @@ class OnlySMSCharacters:
             )
 
 
+class NoPlaceholders:
+
+    def __init__(self, message=None):
+        self.message = message or (
+            'You can’t use ((double brackets)) to personalise this message'
+        )
+
+    def __call__(self, form, field):
+        if Field(field.data).placeholders:
+            raise ValidationError(self.message)
+
+
 class LettersNumbersFullStopsAndUnderscoresOnly:
 
     regex = re.compile(r'^[a-zA-Z0-9\s\._]+$')
