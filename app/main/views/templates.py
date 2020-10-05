@@ -83,27 +83,6 @@ def view_template(service_id, template_id):
     )
 
 
-@main.route("/services/<uuid:service_id>/start-tour/<uuid:template_id>")
-@user_has_permissions('view_activity')
-def start_tour(service_id, template_id):
-
-    template = current_service.get_template(template_id)
-
-    if template['template_type'] != 'sms':
-        abort(404)
-
-    return render_template(
-        'views/templates/start-tour.html',
-        template=get_template(
-            template,
-            current_service,
-            show_recipient=True,
-        ),
-        help='1',
-        continue_link=url_for('.send_test', service_id=current_service.id, template_id=template['id'], help=2)
-    )
-
-
 @main.route("/services/<uuid:service_id>/templates/all", methods=['GET', 'POST'])
 @main.route("/services/<uuid:service_id>/templates", methods=['GET', 'POST'])
 @main.route("/services/<uuid:service_id>/templates/folders/<uuid:template_folder_id>", methods=['GET', 'POST'])

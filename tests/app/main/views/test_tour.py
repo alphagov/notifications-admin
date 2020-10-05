@@ -536,6 +536,14 @@ def test_should_200_for_check_tour_notification(
         'service one: hello hi howdy'
     )
 
+    # post to send_notification keeps help argument
+    assert page.form.attrs['action'] == url_for(
+        'main.send_notification',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        help='3'
+    )
+
 
 def test_back_link_from_check_tour_notification_points_to_last_tour_step(
     client_request,

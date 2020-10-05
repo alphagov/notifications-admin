@@ -54,7 +54,6 @@ from app.utils import (
     PermanentRedirect,
     Spreadsheet,
     get_errors_for_csv,
-    get_help_argument,
     get_template,
     should_skip_template_page,
     unicode_truncate,
@@ -321,7 +320,6 @@ def send_test(service_id, template_id):
         service_id=service_id,
         template_id=template_id,
         step_index=0,
-        help=get_help_argument(),
     ))
 
 
@@ -330,8 +328,6 @@ def get_notification_check_endpoint(service_id, template):
         'main.check_notification',
         service_id=service_id,
         template_id=template.id,
-        # at check phase we should move to help stage 2 ("the template pulls in the data you provide")
-        help='2' if 'help' in request.args else None
     ))
 
 
@@ -394,14 +390,12 @@ def send_one_off_letter_address(service_id, template_id):
         'views/send-one-off-letter-address.html',
         page_title=get_send_test_page_title(
             template_type='letter',
-            help_argument=None,
             entering_recipient=True,
             name=template.name,
         ),
         template=template,
         form=form,
         back_link=get_back_link(service_id, template, 0),
-        help=False,
         link_to_upload=True,
     )
 
@@ -487,7 +481,6 @@ def send_test_step(service_id, template_id, step_index):
                 service_id=service_id,
                 template_id=template_id,
                 step_index=step_index + 1,
-                help=get_help_argument(),
             ))
 
     form = get_placeholder_form_instance(
@@ -518,7 +511,6 @@ def send_test_step(service_id, template_id, step_index):
             service_id=service_id,
             template_id=template_id,
             step_index=step_index + 1,
-            help=get_help_argument(),
         ))
 
     back_link = get_back_link(service_id, template, step_index, placeholders)
@@ -530,7 +522,6 @@ def send_test_step(service_id, template_id, step_index):
         'views/send-test.html',
         page_title=get_send_test_page_title(
             template.template_type,
-            get_help_argument(),
             entering_recipient=not session['recipient'],
             name=template.name,
         ),
@@ -538,7 +529,6 @@ def send_test_step(service_id, template_id, step_index):
         form=form,
         skip_link=get_skip_link(step_index, template),
         back_link=back_link,
-        help=get_help_argument(),
         link_to_upload=(
             request.endpoint == 'main.send_one_off_step'
             and step_index == 0
@@ -707,7 +697,6 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
         remaining_messages=remaining_messages,
         choose_time_form=choose_time_form,
         back_link=back_link,
-        help=get_help_argument(),
         trying_to_send_letters_in_trial_mode=all((
             current_service.trial_mode,
             template.template_type == 'letter',
@@ -834,7 +823,6 @@ def start_job(service_id, upload_id):
             'main.view_job',
             job_id=upload_id,
             service_id=service_id,
-            help=request.form.get('help'),
             just_sent='yes',
         )
     )
@@ -891,9 +879,7 @@ def all_placeholders_in_session(placeholders):
     )
 
 
-def get_send_test_page_title(template_type, help_argument, entering_recipient, name=None):
-    if help_argument:
-        return 'Example text message'
+def get_send_test_page_title(template_type, entering_recipient, name=None):
     if entering_recipient:
         return 'Send ‘{}’'.format(name)
     return 'Personalise this message'
@@ -908,31 +894,7 @@ def is_current_user_the_recipient():
 
 
 def get_back_link(service_id, template, step_index, placeholders=None):
-    if get_help_argument():
-        # if we're on the check page, redirect back to the beginning. anywhere else, don't return the back link
-        if request.endpoint == 'main.check_notification':
-            return url_for(
-                'main.send_test',
-                service_id=service_id,
-                template_id=template.id,
-                help=get_help_argument()
-            )
-        else:
-            if step_index == 0:
-                return url_for(
-                    'main.start_tour',
-                    service_id=service_id,
-                    template_id=template.id,
-                )
-            elif step_index > 0:
-                return url_for(
-                    'main.send_test_step',
-                    service_id=service_id,
-                    template_id=template.id,
-                    step_index=step_index - 1,
-                    help=2,
-                )
-    elif step_index == 0:
+    if step_index == 0:
         if should_skip_template_page(template.template_type):
             return url_for(
                 '.choose_template',
@@ -1046,7 +1008,6 @@ def _check_notification(service_id, template_id, exception=None):
     return dict(
         template=template,
         back_link=back_link,
-        help=get_help_argument(),
         letter_too_long=is_letter_too_long(page_count),
         letter_max_pages=LETTER_MAX_PAGE_COUNT,
         page_count=page_count,
@@ -1116,6 +1077,8 @@ def send_notification(service_id, template_id):
         '.view_notification',
         service_id=service_id,
         notification_id=noti['id'],
+        # used to show the final step of the tour (help=3) or not show
+        # a back link on a just sent one off notification (help=0)
         help=request.args.get('help')
     ))
 

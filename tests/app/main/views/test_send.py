@@ -1381,54 +1381,36 @@ def test_send_one_off_does_not_send_without_the_correct_permissions(
     create_active_user_with_permissions(),
     create_active_caseworking_user(),
 ))
-@pytest.mark.parametrize('template_type, partial_url, expected_h1, tour_shown', [
+@pytest.mark.parametrize('template_type, partial_url, expected_h1', [
     (
         'sms',
         partial(url_for, 'main.send_test'),
         'Personalise this message',
-        False,
     ),
     (
         'sms',
         partial(url_for, 'main.send_one_off'),
         'Send ‘Two week reminder’',
-        False,
-    ),
-    (
-        'sms',
-        partial(url_for, 'main.send_test', help=1),
-        'Example text message',
-        True,
-    ),
-    (
-        'email',
-        partial(url_for, 'main.send_test', help=1),
-        'Example text message',
-        True,
     ),
     (
         'email',
         partial(url_for, 'main.send_test'),
         'Personalise this message',
-        False,
     ),
     (
         'email',
         partial(url_for, 'main.send_one_off'),
         'Send ‘Two week reminder’',
-        False,
     ),
     (
         'letter',
         partial(url_for, 'main.send_test'),
         'Send ‘Two week reminder’',
-        False,
     ),
     (
         'letter',
         partial(url_for, 'main.send_one_off'),
         'Send ‘Two week reminder’',
-        False,
     ),
 ])
 def test_send_one_off_or_test_has_correct_page_titles(
@@ -1441,7 +1423,6 @@ def test_send_one_off_or_test_has_correct_page_titles(
     template_type,
     partial_url,
     expected_h1,
-    tour_shown,
     user,
 ):
     mocker.patch('app.user_api_client.get_user', return_value=user)
@@ -1458,7 +1439,7 @@ def test_send_one_off_or_test_has_correct_page_titles(
     assert response.status_code == 200
     assert page.h1.text.strip() == expected_h1
 
-    assert (len(page.select('.banner-tour')) == 1) == tour_shown
+    assert len(page.select('.banner-tour')) == 0
 
 
 @pytest.mark.parametrize('endpoint, step_index, prefilled, expected_field_label', [
@@ -1777,32 +1758,6 @@ def test_no_link_to_use_existing_list_for_service_without_lists(
     create_active_user_with_permissions(),
     create_active_caseworking_user(),
 ))
-def test_link_to_upload_not_offered_in_tour(
-    client_request,
-    fake_uuid,
-    mock_get_service_template,
-    user,
-):
-    client_request.login(user)
-
-    page = client_request.get(
-        'main.send_test',
-        service_id=SERVICE_ONE_ID,
-        template_id=fake_uuid,
-        help=1,
-        _follow_redirects=True,
-    )
-
-    # We’re in the tour…
-    assert page.select('.banner-tour')
-    # …but first link on the page is ‘Back’, so not preceeded by ‘Upload’
-    assert page.select_one('main a').text == 'Back'
-
-
-@pytest.mark.parametrize('user', (
-    create_active_user_with_permissions(),
-    create_active_caseworking_user(),
-))
 @pytest.mark.parametrize('endpoint, step_index', (
     ('main.send_one_off_step', 1),
     ('main.send_test_step', 0),
@@ -1974,7 +1929,7 @@ def test_send_test_redirects_to_start_if_index_out_of_bounds_and_some_placeholde
     ('main.send_test', 'main.send_test_step'),
     ('main.send_one_off', 'main.send_one_off_step'),
 ])
-def test_send_test_sms_message_redirects_with_help_argument(
+def test_send_test_sms_message_redirects(
     client_request,
     mocker,
     service_one,
@@ -1991,14 +1946,12 @@ def test_send_test_sms_message_redirects_with_help_argument(
         endpoint,
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
-        help=1,
         _expected_status=302,
         _expected_response=url_for(
             expected_redirect,
             service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
             step_index=0,
-            help=1,
             _external=True,
         )
     )
@@ -2109,49 +2062,6 @@ def test_send_test_sms_message_back_link_with_multiple_placeholders(
         service_id=SERVICE_ONE_ID,
         template_id=unchanging_fake_uuid,
         step_index=1,
-    )
-
-
-@pytest.mark.parametrize('step_index, expected_back_link', (
-    (0, partial(
-        url_for,
-        'main.start_tour',
-    )),
-    (1, partial(
-        url_for,
-        'main.send_test_step',
-        step_index=0,
-        help=2,
-    )),
-    (2, partial(
-        url_for,
-        'main.send_test_step',
-        step_index=1,
-        help=2,
-    ))
-))
-def test_send_test_sms_message_back_link_in_tour(
-    client_request,
-    mock_get_service_template_with_multiple_placeholders,
-    mock_has_no_jobs,
-    step_index,
-    expected_back_link,
-):
-    with client_request.session_transaction() as session:
-        session['recipient'] = '07900900123'
-        session['placeholders'] = {'phone number': '07900900123', 'one': 'bar'}
-
-    page = client_request.get(
-        'main.send_test_step',
-        service_id=SERVICE_ONE_ID,
-        template_id=unchanging_fake_uuid,
-        step_index=step_index,
-        help=2,
-    )
-
-    assert page.select_one('.govuk-back-link')['href'] == expected_back_link(
-        service_id=SERVICE_ONE_ID,
-        template_id=unchanging_fake_uuid,
     )
 
 
@@ -3972,37 +3882,6 @@ def test_check_notification_redirects_if_session_not_populated(
     )
 
 
-@pytest.mark.parametrize('existing_session_items', [
-    {},
-    {'recipient': '07700900001'},
-    {'name': 'Jo'}
-])
-def test_check_notification_redirects_with_help_if_session_not_populated(
-    logged_in_client,
-    service_one,
-    fake_uuid,
-    existing_session_items,
-    mock_get_service_template_with_placeholders
-):
-    with logged_in_client.session_transaction() as session:
-        session.update(existing_session_items)
-
-    resp = logged_in_client.get(url_for(
-        'main.check_notification',
-        service_id=service_one['id'],
-        template_id=fake_uuid,
-        help='2'
-    ))
-
-    assert resp.location == url_for(
-        'main.send_test',
-        service_id=service_one['id'],
-        template_id=fake_uuid,
-        help='2',
-        _external=True
-    )
-
-
 def test_check_notification_shows_preview(
     client_request,
     service_one,
@@ -4031,42 +3910,13 @@ def test_check_notification_shows_preview(
 
     # assert tour not visible
     assert not page.select('.banner-tour')
+
+    # post to send_notification with help=0 to ensure no back link is then shown
     assert page.form.attrs['action'] == url_for(
         'main.send_notification',
         service_id=service_one['id'],
         template_id=fake_uuid,
         help='0'
-    )
-
-
-def test_check_notification_shows_help(
-    client_request,
-    service_one,
-    fake_uuid,
-    mock_get_service_template
-):
-    with client_request.session_transaction() as session:
-        session['recipient'] = '07700900001'
-        session['placeholders'] = {}
-
-    page = client_request.get(
-        'main.check_notification',
-        service_id=service_one['id'],
-        template_id=fake_uuid,
-        help='2'
-    )
-    assert page.select_one('.banner-tour')
-    assert page.form.attrs['action'] == url_for(
-        'main.send_notification',
-        service_id=service_one['id'],
-        template_id=fake_uuid,
-        help='3'
-    )
-    assert page.select_one('.govuk-back-link')['href'] == url_for(
-        'main.send_test',
-        service_id=service_one['id'],
-        template_id=fake_uuid,
-        help='2'
     )
 
 
