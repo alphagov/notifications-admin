@@ -27,6 +27,16 @@ def test_render_sign_in_template_for_new_user(
     assert 'Sign in again' not in normalize_spaces(page.text)
 
 
+def test_render_sign_in_template_with_next_link_for_password_reset(
+    client_request
+):
+    client_request.logout()
+    page = client_request.get('main.sign_in', _optional_args="?next=blob", _test_page_title=False)
+    forgot_password_link = page.find('a', class_="govuk-link govuk-link--no-visited-state page-footer-secondary-link")
+    assert forgot_password_link.text == 'Forgotten your password?'
+    assert forgot_password_link['href'] == url_for('main.forgot_password') + "?next=blob"
+
+
 def test_sign_in_explains_session_timeout(client):
     response = client.get(url_for('main.sign_in', next='/foo'))
     assert response.status_code == 200
