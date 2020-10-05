@@ -75,7 +75,7 @@ def add_service():
         example_sms_template = _create_example_template(service_id)
 
         return redirect(url_for(
-            'main.start_tour',
+            'main.begin_tour',
             service_id=service_id,
             template_id=example_sms_template['data']['id']
         ))

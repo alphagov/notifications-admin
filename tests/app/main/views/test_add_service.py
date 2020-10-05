@@ -144,7 +144,7 @@ def test_should_add_service_and_redirect_to_tour_when_no_services(
         },
         _expected_status=302,
         _expected_redirect=url_for(
-            'main.start_tour',
+            'main.begin_tour',
             service_id=101,
             template_id="Example%20text%20message%20template",
             _external=True,
