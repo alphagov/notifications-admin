@@ -165,9 +165,11 @@ class UserApiClient(NotifyAdminAPIClient):
         endpoint = '/user/{}/service/{}/permission'.format(user_id, service_id)
         self.post(endpoint, data=data)
 
-    def send_reset_password_url(self, email_address):
+    def send_reset_password_url(self, email_address, next_string=None):
         endpoint = '/user/reset-password'
         data = {'email': email_address}
+        if next_string:
+            data['next'] = next_string
         self.post(endpoint, data=data)
 
     def find_users_by_full_or_partial_email(self, email_address):

@@ -31,7 +31,23 @@ def test_should_redirect_to_password_reset_sent_for_valid_email(
     assert response.status_code == 200
     assert 'Click the link in the email to reset your password.' \
            in response.get_data(as_text=True)
-    app.user_api_client.send_reset_password_url.assert_called_once_with(sample_user['email_address'])
+    app.user_api_client.send_reset_password_url.assert_called_once_with(sample_user['email_address'], next_string=None)
+
+
+def test_forgot_password_sends_next_link_with_reset_password_email_request(
+    client,
+    fake_uuid,
+    mocker,
+):
+    sample_user = user_json(email_address='test@user.gov.uk')
+    mocker.patch('app.user_api_client.send_reset_password_url', return_value=None)
+    response = client.post(
+        url_for('.forgot_password') + "?next=blob",
+        data={'email_address': sample_user['email_address']})
+    assert response.status_code == 200
+    app.user_api_client.send_reset_password_url.assert_called_once_with(
+        sample_user['email_address'], next_string="blob"
+    )
 
 
 def test_should_redirect_to_password_reset_sent_for_missing_email(
@@ -48,4 +64,6 @@ def test_should_redirect_to_password_reset_sent_for_missing_email(
     assert response.status_code == 200
     assert 'Click the link in the email to reset your password.' \
            in response.get_data(as_text=True)
-    app.user_api_client.send_reset_password_url.assert_called_once_with(api_user_active['email_address'])
+    app.user_api_client.send_reset_password_url.assert_called_once_with(
+        api_user_active['email_address'], next_string=None
+    )
