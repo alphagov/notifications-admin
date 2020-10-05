@@ -78,12 +78,12 @@
 
 }
 
-#map {
+#area-list-map {
   z-index: 50;
   margin-bottom: govuk-spacing(4);
 }
 
-.area-key {
+.area-list-key {
 
   display: inline-block;
   position: relative;
@@ -133,7 +133,8 @@
 
 }
 
-.map-details {
+.area-list-map-details {
+
   .govuk-details__summary {
     display: block;
     padding-top: govuk-spacing(1);
@@ -147,4 +148,5 @@
     border-bottom: 1px solid $border-colour;
     margin-top: -1px;
   }
+
 }

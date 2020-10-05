@@ -28,7 +28,7 @@
   {% endfor %}
 
 
-  var mapElement = document.getElementById('map');
+  var mapElement = document.getElementById('area-list-map');
 
   // if element is inside a details element then to make the map render correctly we open the details element
   // and set up the map before closing the details map after
@@ -41,7 +41,7 @@
   mapElement.style.height = Math.max(320, window.innerHeight - mapElement.offsetTop - 100) + 'px';
 
   var mymap = L.map(
-    'map',
+    'area-list-map',
     {
       scrollWheelZoom: false
     }
