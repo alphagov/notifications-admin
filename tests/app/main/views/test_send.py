@@ -1504,13 +1504,13 @@ def test_send_one_off_or_test_shows_placeholders_in_correct_order(
         create_active_user_with_permissions(),
         'sms',
         'Use my phone number',
-        partial(url_for, 'main.send_test')
+        partial(url_for, 'main.send_one_off_to_myself')
     ),
     (
         create_active_user_with_permissions(),
         'email',
         'Use my email address',
-        partial(url_for, 'main.send_test')
+        partial(url_for, 'main.send_one_off_to_myself')
     ),
     (
         create_active_user_with_permissions(),
@@ -1720,7 +1720,7 @@ def test_send_one_off_has_link_to_use_existing_list(
         (
             'Use my phone number',
             url_for(
-                'main.send_test',
+                'main.send_one_off_to_myself',
                 service_id=SERVICE_ONE_ID,
                 template_id=fake_uuid,
             ),
@@ -4505,4 +4505,71 @@ def test_send_from_contact_list(
     )
     mock_set_metadata.assert_called_once_with(
         SERVICE_ONE_ID, new_uuid, example_key='example value'
+    )
+
+
+def test_send_to_myself_sets_placeholder_and_redirects_for_email(
+    mocker, client_request, fake_uuid, mock_get_service_email_template
+):
+    with client_request.session_transaction() as session:
+        session['recipient'] = None
+        session['placeholders'] = {}
+
+    client_request.get(
+        'main.send_one_off_to_myself',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _expected_status=302,
+        _expected_url=url_for(
+            'main.send_one_off_step',
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            step_index=1,
+            _external=True,
+        )
+    )
+
+    with client_request.session_transaction() as session:
+        assert session['recipient'] == 'test@user.gov.uk'
+        assert session['placeholders'] == {'email address': 'test@user.gov.uk'}
+
+
+def test_send_to_myself_sets_placeholder_and_redirects_for_sms(
+    mocker, client_request, fake_uuid, mock_get_service_template
+):
+    with client_request.session_transaction() as session:
+        session['recipient'] = None
+        session['placeholders'] = {}
+
+    client_request.get(
+        'main.send_one_off_to_myself',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _expected_status=302,
+        _expected_url=url_for(
+            'main.send_one_off_step',
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            step_index=1,
+            _external=True,
+        )
+    )
+
+    with client_request.session_transaction() as session:
+        assert session['recipient'] == '07700 900762'
+        assert session['placeholders'] == {'phone number': '07700 900762'}
+
+
+def test_send_to_myself_404s_for_letter(
+    mocker, client_request, fake_uuid, mock_get_service_letter_template
+):
+    with client_request.session_transaction() as session:
+        session['recipient'] = None
+        session['placeholders'] = {}
+
+    client_request.get(
+        'main.send_one_off_to_myself',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _expected_status=404,
     )

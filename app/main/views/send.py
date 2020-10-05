@@ -885,14 +885,6 @@ def get_send_test_page_title(template_type, entering_recipient, name=None):
     return 'Personalise this message'
 
 
-def is_current_user_the_recipient():
-    if 'recipient' not in session:
-        return False
-    if hasattr(current_user, 'mobile_number'):
-        return session['recipient'] in {current_user.email_address, current_user.mobile_number}
-    return session['recipient'] == current_user.email_address
-
-
 def get_back_link(service_id, template, step_index, placeholders=None):
     if step_index == 0:
         if should_skip_template_page(template.template_type):
@@ -906,14 +898,14 @@ def get_back_link(service_id, template, step_index, placeholders=None):
                 service_id=service_id,
                 template_id=template.id,
             )
-    elif is_current_user_the_recipient() and step_index > 1:
+    elif request.endpoint == 'main.send_test_step' and step_index > 1:
         return url_for(
             'main.send_test_step',
             service_id=service_id,
             template_id=template.id,
             step_index=step_index - 1,
         )
-    elif is_current_user_the_recipient() and step_index == 1:
+    elif request.endpoint == 'main.send_test_step' and step_index == 1:
         return url_for(
             'main.send_one_off_step',
             service_id=service_id,
@@ -947,14 +939,38 @@ def get_skip_link(step_index, template):
     if (
         request.endpoint == 'main.send_one_off_step'
         and step_index == 0
-        and template.template_type != 'letter'
+        and template.template_type in ("sms", "email")
         and not (template.template_type == 'sms' and current_user.mobile_number is None)
         and current_user.has_permissions('manage_templates', 'manage_service')
     ):
         return (
             'Use my {}'.format(first_column_headings[template.template_type][0]),
-            url_for('.send_test', service_id=current_service.id, template_id=template.id),
+            url_for('.send_one_off_to_myself', service_id=current_service.id, template_id=template.id),
         )
+
+
+@main.route("/services/<uuid:service_id>/template/<uuid:template_id>/one-off/send-to-myself", methods=['GET'])
+@user_has_permissions('send_messages', restrict_admin_usage=True)
+def send_one_off_to_myself(service_id, template_id):
+    db_template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
+
+    if db_template['template_type'] not in ("sms", "email"):
+        abort(404)
+
+    # We aren't concerned with creating the exact template (for example adding recipient and sender names)
+    # we just want to create enough to use `fields_to_fill_in`
+    template = get_template(
+        db_template,
+        current_service,
+    )
+    fields_to_fill_in(template, prefill_current_user=True)
+
+    return redirect(url_for(
+        'main.send_one_off_step',
+        service_id=service_id,
+        template_id=template_id,
+        step_index=1,
+    ))
 
 
 @main.route("/services/<uuid:service_id>/template/<uuid:template_id>/notification/check", methods=['GET'])
