@@ -49,10 +49,7 @@ class TemplateFolderAPIClient(NotifyAdminAPIClient):
         })
 
         if template_ids:
-            redis_client.delete(*map(
-                'template-{}-version-None'.format,
-                template_ids,
-            ))
+            redis_client.delete(*(f'service-{service_id}-template-{id}-version-None' for id in template_ids))
 
     @cache.delete('service-{service_id}-template-folders')
     def update_template_folder(self, service_id, template_folder_id, name, users_with_permission=None):

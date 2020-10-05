@@ -74,9 +74,9 @@ def test_move_templates_and_folders(mocker):
     )
     assert mock_redis_delete.call_args_list == [
         call(
-            'template-a-version-None',
-            'template-b-version-None',
-            'template-c-version-None',
+            f'service-{some_service_id}-template-a-version-None',
+            f'service-{some_service_id}-template-b-version-None',
+            f'service-{some_service_id}-template-c-version-None',
         ),
         call('service-{}-templates'.format(some_service_id)),
         call('service-{}-template-folders'.format(some_service_id)),
