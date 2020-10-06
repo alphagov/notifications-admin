@@ -690,8 +690,8 @@ def test_should_show_updates_for_scheduled_job_as_json(
         service_one['id'],
         created_by=user_json(),
         job_id=fake_uuid,
-        scheduled_for='2016-06-01T13:00:00',
-        processing_started='2016-06-01T15:00:00',
+        scheduled_for='2016-06-01T13:00:00+00:00',
+        processing_started='2016-06-01T15:00:00+00:00',
     )})
 
     response = logged_in_client.get(url_for('main.view_job_updates', service_id=service_one['id'], job_id=fake_uuid))

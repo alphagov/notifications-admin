@@ -822,7 +822,7 @@ def format_thousands(value):
 
 def is_less_than_days_ago(date_from_db, number_of_days):
     return (
-        datetime.utcnow().astimezone(pytz.utc) - parser.parse(date_from_db).astimezone(pytz.utc)
+        datetime.utcnow().astimezone(pytz.utc) - parser.parse(date_from_db)
     ).days < number_of_days
 
 
