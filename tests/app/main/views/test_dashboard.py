@@ -888,6 +888,7 @@ def test_should_not_show_upcoming_jobs_on_dashboard_if_service_has_no_jobs(
     mock_get_template_statistics,
     mock_get_service_statistics,
     mock_has_no_jobs,
+    mock_get_scheduled_job_stats,
     mock_get_usage,
     mock_get_free_sms_fragment_limit,
     mock_get_inbound_sms_summary,
@@ -898,6 +899,7 @@ def test_should_not_show_upcoming_jobs_on_dashboard_if_service_has_no_jobs(
         service_id=SERVICE_ONE_ID,
     )
     mock_has_no_jobs.assert_called_once_with(SERVICE_ONE_ID)
+    assert mock_get_scheduled_job_stats.called is False
     assert 'In the next few days' not in page.select_one('main').text
     assert 'files waiting to send ' not in page.select_one('main').text
 
