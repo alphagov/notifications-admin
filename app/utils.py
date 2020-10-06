@@ -820,10 +820,10 @@ def format_thousands(value):
     return value
 
 
-def is_less_than_90_days_ago(date_from_db):
-    return (datetime.utcnow() - datetime.strptime(
-        date_from_db, "%Y-%m-%dT%H:%M:%S.%fZ"
-    )).days < 90
+def is_less_than_days_ago(date_from_db, number_of_days):
+    return (
+        datetime.utcnow().astimezone(pytz.utc) - parser.parse(date_from_db)
+    ).days < number_of_days
 
 
 def hide_from_search_engines(f):

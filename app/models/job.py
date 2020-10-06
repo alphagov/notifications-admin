@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 import pytz
 from notifications_utils.letter_timings import (
@@ -6,17 +6,18 @@ from notifications_utils.letter_timings import (
     get_letter_timings,
     letter_can_be_cancelled,
 )
-from notifications_utils.timezones import (
-    local_timezone,
-    utc_string_to_aware_gmt_datetime,
-)
+from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
 from werkzeug.utils import cached_property
 
 from app.models import JSONModel, ModelList
 from app.notify_client.job_api_client import job_api_client
 from app.notify_client.notification_api_client import notification_api_client
 from app.notify_client.service_api_client import service_api_client
-from app.utils import get_letter_printing_statement, set_status_filters
+from app.utils import (
+    get_letter_printing_statement,
+    is_less_than_days_ago,
+    set_status_filters,
+)
 
 
 class Job(JSONModel):
@@ -67,7 +68,7 @@ class Job(JSONModel):
     def processing_started(self):
         if not self._dict.get('processing_started'):
             return None
-        return utc_string_to_aware_gmt_datetime(self._dict['processing_started'])
+        return self._dict['processing_started']
 
     def _aggregate_statistics(self, *statuses):
         return sum(
@@ -123,9 +124,7 @@ class Job(JSONModel):
             # must have been created recently enough to not have any
             # notifications yet
             return True
-        return (
-            datetime.utcnow().astimezone(local_timezone) - self.processing_started
-        ).days < 1
+        return is_less_than_days_ago(self.processing_started, 1)
 
     @property
     def template_id(self):
