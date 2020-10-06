@@ -969,8 +969,15 @@ def test_preview_broadcast_message_page(
     ]
 
     assert normalize_spaces(
+        page.select_one('h2.broadcast-message-heading').text
+    ) == (
+        'Emergency alert'
+    )
+
+    assert normalize_spaces(
         page.select_one('.broadcast-message-wrapper').text
     ) == (
+        'Emergency alert '
         'This is a test'
     )
 

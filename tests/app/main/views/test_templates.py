@@ -784,6 +784,7 @@ def test_view_broadcast_template(
     ) == (
         normalize_spaces(page.select_one('.broadcast-message-wrapper').text)
     ) == (
+        'Emergency alert '
         'This is a test'
     )
 
