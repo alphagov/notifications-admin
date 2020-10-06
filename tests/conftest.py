@@ -1798,12 +1798,12 @@ def mock_get_letter_job_in_progress(mocker, api_user_active):
 
 @pytest.fixture(scope='function')
 def mock_has_jobs(mocker):
-    mocker.patch('app.job_api_client.has_jobs', return_value=True)
+    return mocker.patch('app.job_api_client.has_jobs', return_value=True)
 
 
 @pytest.fixture(scope='function')
 def mock_has_no_jobs(mocker):
-    mocker.patch('app.job_api_client.has_jobs', return_value=False)
+    return mocker.patch('app.job_api_client.has_jobs', return_value=False)
 
 
 @pytest.fixture(scope='function')
@@ -1840,6 +1840,15 @@ def mock_get_jobs(mocker, api_user_active):
         }
 
     return mocker.patch('app.job_api_client.get_jobs', side_effect=_get_jobs)
+
+
+@pytest.fixture(scope='function')
+def mock_get_scheduled_job_stats(mocker, api_user_active):
+    return mocker.patch('app.job_api_client.get_scheduled_job_stats', return_value={
+        # These values match the return value of `mock_get_jobs`
+        'count': 2,
+        'soonest_scheduled_for': '2016-01-01 11:09:00'
+    })
 
 
 @pytest.fixture(scope='function')

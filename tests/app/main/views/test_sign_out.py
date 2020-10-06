@@ -24,7 +24,7 @@ def test_sign_out_user(
     mock_get_user_by_email,
     mock_login,
     mock_get_service_templates,
-    mock_get_jobs,
+    mock_has_no_jobs,
     mock_has_permissions,
     mock_get_template_statistics,
     mock_get_service_statistics,

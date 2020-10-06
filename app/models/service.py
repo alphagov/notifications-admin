@@ -152,6 +152,12 @@ class Service(JSONModel):
         return ScheduledJobs(self.id)
 
     @cached_property
+    def scheduled_job_stats(self):
+        if not self.has_jobs:
+            return {'count': 0}
+        return job_api_client.get_scheduled_job_stats(self.id)
+
+    @cached_property
     def invited_users(self):
         return InvitedUsers(self.id)
 
