@@ -17,17 +17,58 @@
 
       // all the diff states that we want to show or hide
       this.states = [
-        {key: 'nothing-selected-buttons', $el: this.$form.find('#nothing_selected'), cancellable: false},
-        {key: 'items-selected-buttons', $el: this.$form.find('#items_selected'), cancellable: false},
-        {key: 'move-to-existing-folder', $el: this.$form.find('#move_to_folder_radios'), cancellable: true, setFocus: this.getFocusRoutine('#move_to_folder_radios fieldset', true)},
-        {key: 'move-to-new-folder', $el: this.$form.find('#move_to_new_folder_form'), cancellable: true, setFocus: this.getFocusRoutine('#move_to_new_folder_name', false)},
-        {key: 'add-new-folder', $el: this.$form.find('#add_new_folder_form'), cancellable: true, setFocus: this.getFocusRoutine('#add_new_folder_name', false)},
-        {key: 'add-new-template', $el: this.$form.find('#add_new_template_form'), cancellable: true, setFocus: this.getFocusRoutine('#add_new_template_form fieldset', true)}
+        {
+          key: 'nothing-selected-buttons',
+          $el: this.$form.find('#nothing_selected'),
+          cancellable: false
+        },
+        {
+          key: 'items-selected-buttons',
+          $el: this.$form.find('#items_selected'),
+          cancellable: false
+        },
+        {
+          key: 'move-to-existing-folder',
+          $el: this.$form.find('#move_to_folder_radios'),
+          cancellable: true,
+          setFocus: () => $('#move_to_folder_radios').focus(),
+          action: 'move to folder',
+          description: 'Press move to confirm or cancel to close'
+        },
+        {
+          key: 'move-to-new-folder',
+          $el: this.$form.find('#move_to_new_folder_form'),
+          cancellable: true,
+          setFocus: () => $('#move_to_new_folder_form').focus(),
+          action: 'move to new folder',
+          description: 'Press add to new folder to confirm name or cancel to close'
+        },
+        {
+          key: 'add-new-folder',
+          $el: this.$form.find('#add_new_folder_form'),
+          cancellable: true,
+          setFocus: () => $('#add_new_folder_form').focus(),
+          action: 'new folder',
+          description: 'Press add new folder to confirm name or cancel to close'
+        },
+        {
+          key: 'add-new-template',
+          $el: this.$form.find('#add_new_template_form'),
+          cancellable: true,
+          setFocus: () => $('#add_new_template_form').focus(),
+          action: 'new template',
+          description: 'Press continue to confirm selection or cancel to close'
+        }
       ];
 
       // cancel/clear buttons only relevant if JS enabled, so
       this.states.filter(state => state.cancellable).forEach((x) => this.addCancelButton(x));
       this.states.filter(state => state.key === 'items-selected-buttons').forEach(x => this.addClearButton(x));
+
+      // make elements focusabled
+      this.states.filter(state => state.setFocus).forEach(x => x.$el.attr('tabindex', '0'));
+
+      this.addDescriptionsToStates();
 
       // activate stickiness of elements in each state
       this.activateStickyElements();
@@ -45,22 +86,16 @@
       this.$form.on('change', 'input[type=checkbox]', () => this.templateFolderCheckboxChanged());
     };
 
-    this.getFocusRoutine = function (selector, setTabindex) {
-      return function () {
-        let $el = $(selector);
-        let removeTabindex = (e) => {
-          $(e.target)
-            .removeAttr('tabindex')
-            .off('blur', removeTabindex);
-        };
+    this.addDescriptionsToStates = function () {
+      let id, description;
 
-        if (setTabindex) {
-          $el.attr('tabindex', '-1');
-          $el.on('blur', removeTabindex);
-        }
-
-        $el.focus();
-      };
+      $.each(this.states.filter(state => 'description' in state), (idx, state) => {
+        id = `${state.key}__description`;
+        description = `<p class="govuk-visually-hidden" id="${id}">${state.description}</p>`;
+        state.$el
+          .prepend(description)
+          .attr('aria-describedby', id);
+      });
     };
 
     this.activateStickyElements = function() {
@@ -88,7 +123,7 @@
           this.selectActionButtons(selector);
         },
         'cancelSelector': selector,
-        'nonvisualText': "this step"
+        'nonvisualText': state.action
       });
 
       state.$el.find('[type=submit]').after($cancel);
@@ -140,8 +175,7 @@
       this.currentState = 'nothing-selected-buttons';
       this.templateFolderCheckboxChanged();
       if (targetSelector) {
-        let setFocus = this.getFocusRoutine(targetSelector, false);
-        setFocus();
+        $(targetSelector).focus();
       }
     };
 
@@ -240,6 +274,7 @@
     this.render = function() {
       let mode = 'default';
       let currentStateObj = this.states.filter(state => { return (state.key === this.currentState); })[0];
+      let scrollTop;
 
       // detach everything, unless they are the currentState
       this.states.forEach(
@@ -254,14 +289,20 @@
       // make sticky JS recalculate its cache of the element's position
       GOVUK.stickAtBottomWhenScrolling.recalculate();
 
-      if (currentStateObj && ('setFocus' in currentStateObj)) { currentStateObj.setFocus(); }
+      if (currentStateObj && ('setFocus' in currentStateObj)) {
+        scrollTop = $(window).scrollTop();
+        currentStateObj.setFocus();
+        $(window).scrollTop(scrollTop);
+      }
     };
 
     this.nothingSelectedButtons = $(`
       <div id="nothing_selected">
         <div class="js-stick-at-bottom-when-scrolling">
-          <button class="govuk-button govuk-button--secondary govuk-!-margin-right-3 govuk-!-margin-bottom-1" value="add-new-template">New template</button>
-          <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-1" value="add-new-folder">New folder</button>
+          <button class="govuk-button govuk-button--secondary govuk-!-margin-right-3 govuk-!-margin-bottom-1" value="add-new-template" aria-expanded="false">
+            New template
+          </button>
+          <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-1" value="add-new-folder" aria-expanded="false">New folder</button>
           <div class="template-list-selected-counter">
             <span class="template-list-selected-counter__count" aria-hidden="true">
               ${this.selectionStatus.default}
@@ -274,10 +315,10 @@
     this.itemsSelectedButtons = $(`
       <div id="items_selected">
         <div class="js-stick-at-bottom-when-scrolling">
-          <button class="govuk-button govuk-button--secondary govuk-!-margin-right-3 govuk-!-margin-bottom-1" value="move-to-existing-folder">
+          <button class="govuk-button govuk-button--secondary govuk-!-margin-right-3 govuk-!-margin-bottom-1" value="move-to-existing-folder" aria-expanded="false">
             Move<span class="govuk-visually-hidden"> selection to folder</span>
           </button>
-          <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-1" value="move-to-new-folder">Add to new folder</button>
+          <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-1" value="move-to-new-folder" aria-expanded="false">Add to new folder</button>
           <div class="template-list-selected-counter" aria-hidden="true">
             <span class="template-list-selected-counter__count" aria-hidden="true">
               ${this.selectionStatus.selected(1)}
