@@ -428,13 +428,15 @@ class ServiceAPIClient(NotifyAdminAPIClient):
 
     @cache.delete('service-{service_id}')
     def add_reply_to_email_address(self, service_id, email_address, is_default=False):
-        return self.post(
+        ret = self.post(
             "/service/{}/email-reply-to".format(service_id),
             data={
                 "email_address": email_address,
                 "is_default": is_default
             }
         )
+        self._delete_template_cache_for_service(service_id)
+        return ret
 
     @cache.delete('service-{service_id}')
     def update_reply_to_email_address(self, service_id, reply_to_email_id, email_address, is_default=False):
