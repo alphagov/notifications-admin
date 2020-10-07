@@ -290,10 +290,9 @@ def get_sender_details(service_id, template_type):
     return api_call(service_id)
 
 
-@main.route("/services/<uuid:service_id>/send/<uuid:template_id>/test", endpoint='send_test')
-@main.route("/services/<uuid:service_id>/send/<uuid:template_id>/one-off", endpoint='send_one_off')
+@main.route("/services/<uuid:service_id>/send/<uuid:template_id>/one-off")
 @user_has_permissions('send_messages', restrict_admin_usage=True)
-def send_test(service_id, template_id):
+def send_one_off(service_id, template_id):
     session['recipient'] = None
     session['placeholders'] = {}
 
@@ -313,10 +312,7 @@ def send_test(service_id, template_id):
             template_id=template_id))
 
     return redirect(url_for(
-        {
-            'main.send_test': '.send_test_step',
-            'main.send_one_off': '.send_one_off_step',
-        }[request.endpoint],
+        '.send_one_off_step',
         service_id=service_id,
         template_id=template_id,
         step_index=0,
@@ -370,10 +366,7 @@ def send_one_off_letter_address(service_id, template_id):
     if form.validate_on_submit():
         session['placeholders'].update(PostalAddress(form.address.data).as_personalisation)
 
-        placeholders = fields_to_fill_in(
-            template,
-            prefill_current_user=(request.endpoint == 'main.send_test_step'),
-        )
+        placeholders = fields_to_fill_in(template)
         if all_placeholders_in_session(placeholders):
             return get_notification_check_endpoint(service_id, template)
 
@@ -401,23 +394,14 @@ def send_one_off_letter_address(service_id, template_id):
 
 
 @main.route(
-    "/services/<uuid:service_id>/send/<uuid:template_id>/test/step-<int:step_index>",
-    methods=['GET', 'POST'],
-    endpoint='send_test_step',
-)
-@main.route(
     "/services/<uuid:service_id>/send/<uuid:template_id>/one-off/step-<int:step_index>",
     methods=['GET', 'POST'],
-    endpoint='send_one_off_step',
 )
 @user_has_permissions('send_messages', restrict_admin_usage=True)
-def send_test_step(service_id, template_id, step_index):
+def send_one_off_step(service_id, template_id, step_index):
     if {'recipient', 'placeholders'} - set(session.keys()):
         return redirect(url_for(
-            {
-                'main.send_test_step': '.send_test',
-                'main.send_one_off_step': '.send_one_off',
-            }[request.endpoint],
+            ".send_one_off",
             service_id=service_id,
             template_id=template_id,
         ))
@@ -448,10 +432,7 @@ def send_test_step(service_id, template_id, step_index):
         sms_sender=sms_sender
     )
 
-    placeholders = fields_to_fill_in(
-        template,
-        prefill_current_user=(request.endpoint == 'main.send_test_step'),
-    )
+    placeholders = fields_to_fill_in(template)
 
     try:
         current_placeholder = placeholders[step_index]
@@ -459,10 +440,7 @@ def send_test_step(service_id, template_id, step_index):
         if all_placeholders_in_session(placeholders):
             return get_notification_check_endpoint(service_id, template)
         return redirect(url_for(
-            {
-                'main.send_test_step': '.send_test',
-                'main.send_one_off_step': '.send_one_off',
-            }[request.endpoint],
+            '.send_one_off',
             service_id=service_id,
             template_id=template_id,
         ))
@@ -497,7 +475,6 @@ def send_test_step(service_id, template_id, step_index):
         if (
             step_index == 0
             and template.template_type != 'letter'
-            and request.endpoint != 'main.send_test_step'
         ):
             session['recipient'] = form.placeholder_value.data
 
@@ -668,7 +645,7 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
 
     if request.args.get('from_test'):
         # only happens if generating a letter preview test
-        back_link = url_for('main.send_test', service_id=service_id, template_id=template.id)
+        back_link = url_for('main.send_one_off', service_id=service_id, template_id=template.id)
         choose_time_form = None
     else:
         back_link = url_for('main.send_messages', service_id=service_id, template_id=template.id)
@@ -898,20 +875,6 @@ def get_back_link(service_id, template, step_index, placeholders=None):
                 service_id=service_id,
                 template_id=template.id,
             )
-    elif request.endpoint == 'main.send_test_step' and step_index > 1:
-        return url_for(
-            'main.send_test_step',
-            service_id=service_id,
-            template_id=template.id,
-            step_index=step_index - 1,
-        )
-    elif request.endpoint == 'main.send_test_step' and step_index == 1:
-        return url_for(
-            'main.send_one_off_step',
-            service_id=service_id,
-            template_id=template.id,
-            step_index=0,
-        )
 
     if template.template_type == 'letter' and placeholders:
         # Make sure we’re not redirecting users to a page which will

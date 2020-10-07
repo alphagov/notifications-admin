@@ -1973,7 +1973,7 @@ def test_should_show_page_for_a_deleted_template(
 
     content = str(page)
     assert url_for("main.edit_service_template", service_id=SERVICE_ONE_ID, template_id=fake_uuid) not in content
-    assert url_for("main.send_test", service_id=SERVICE_ONE_ID, template_id=fake_uuid) not in content
+    assert url_for("main.send_one_off", service_id=SERVICE_ONE_ID, template_id=fake_uuid) not in content
     assert page.select('p.hint')[0].text.strip() == 'This template was deleted today at 3:00pm.'
     assert 'Delete this template' not in page.select_one('main').text
 
