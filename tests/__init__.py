@@ -650,6 +650,7 @@ def broadcast_message_json(
     approved_by_id=None,
     cancelled_by_id=None,
     areas=None,
+    content=None,
 ):
     return {
         'id': id_,
@@ -659,6 +660,7 @@ def broadcast_message_json(
         'template_id': template_id,
         'template_version': 123,
         'template_name': 'Example template',
+        'content': 'This is a test',
 
         'personalisation': {},
         'areas': areas or [

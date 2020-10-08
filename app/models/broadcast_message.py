@@ -24,6 +24,7 @@ class BroadcastMessage(JSONModel):
         'template_id',
         'template_name',
         'template_version',
+        'content',
         'service_id',
         'created_by',
         'personalisation',
