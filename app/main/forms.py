@@ -47,6 +47,7 @@ from app.main.validators import (
     MustContainAlphanumericCharacters,
     NoCommasInPlaceHolders,
     NoEmbeddedImagesInSVG,
+    NoPlaceholders,
     OnlySMSCharacters,
     ValidEmail,
     ValidGovEmail,
@@ -1217,6 +1218,7 @@ class SMSTemplateForm(BaseTemplateForm):
 class BroadcastTemplateForm(SMSTemplateForm):
     def validate_template_content(self, field):
         OnlySMSCharacters(template_type='broadcast')(None, field)
+        NoPlaceholders()(None, field)
 
 
 class LetterAddressForm(StripWhitespaceForm):
