@@ -37,11 +37,16 @@ def test_two_factor_email_sent_page(
     assert resend_email_link['href'] == url_for('main.email_not_received', next=redirect_url)
 
 
+@pytest.mark.parametrize('redirect_url', [
+    None,
+    'blob',
+])
 def test_should_render_two_factor_page(
     client,
     api_user_active,
     mock_get_user_by_email,
-    mocker
+    mocker,
+    redirect_url
 ):
     # TODO this lives here until we work out how to
     # reassign the session after it is lost mid register process
@@ -50,7 +55,7 @@ def test_should_render_two_factor_page(
             'id': api_user_active['id'],
             'email': api_user_active['email_address']}
     mocker.patch('app.user_api_client.get_user', return_value=api_user_active)
-    response = client.get(url_for('main.two_factor'))
+    response = client.get(url_for('main.two_factor', next=redirect_url))
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert page.select_one('main p').text.strip() == (
@@ -61,6 +66,10 @@ def test_should_render_two_factor_page(
     )
     assert page.select_one('input')['type'] == 'tel'
     assert page.select_one('input')['pattern'] == '[0-9]*'
+
+    assert page.select_one(
+        'a:contains("Not received a text message?")'
+    )['href'] == url_for('main.check_and_resend_text_code', next=redirect_url)
 
 
 @freeze_time('2020-01-27T12:00:00')
@@ -104,11 +113,15 @@ def test_should_send_email_and_redirect_to_info_page_if_user_needs_to_revalidate
         session['user_details'] = {
             'id': api_user_active['id'],
             'email': api_user_active['email_address']}
-    response = client.post(url_for('main.two_factor', next='/services/{}'.format(SERVICE_ONE_ID)),
+    response = client.post(url_for('main.two_factor', next=f'/services/{SERVICE_ONE_ID}'),
                            data={'sms_code': '12345'})
 
     assert response.status_code == 302
-    assert response.location == url_for('main.revalidate_email_sent', _external=True)
+    assert response.location == url_for(
+        'main.revalidate_email_sent',
+        _external=True,
+        next=f'/services/{SERVICE_ONE_ID}'
+    )
     mock_send_verify_code.assert_called_with(api_user_active['id'], 'email', None, mocker.ANY)
 
 

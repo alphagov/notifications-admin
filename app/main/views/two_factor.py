@@ -70,15 +70,16 @@ def two_factor():
         return user_api_client.check_verify_code(user_id, code, "sms")
 
     form = TwoFactorForm(_check_code)
+    redirect_url = request.args.get('next')
 
     if form.validate_on_submit():
         if is_less_than_90_days_ago(user.email_access_validated_at):
             return log_in_user(user_id)
         else:
-            user_api_client.send_verify_code(user.id, 'email', None, request.args.get('next'))
-            return redirect(url_for('.revalidate_email_sent'))
+            user_api_client.send_verify_code(user.id, 'email', None, redirect_url)
+            return redirect(url_for('.revalidate_email_sent', next=redirect_url))
 
-    return render_template('views/two-factor.html', form=form)
+    return render_template('views/two-factor.html', form=form, redirect_url=redirect_url)
 
 
 @main.route('/re-validate-email', methods=['GET'])
