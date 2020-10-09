@@ -39,10 +39,11 @@ def check_and_resend_text_code():
 def check_and_resend_verification_code():
     user = User.from_email_address(session['user_details']['email'])
     user.send_verify_code()
+    redirect_url = request.args.get('next')
     if user.state == 'pending':
-        return redirect(url_for('main.verify'))
+        return redirect(url_for('main.verify', next=redirect_url))
     else:
-        return redirect(url_for('main.two_factor'))
+        return redirect(url_for('main.two_factor', next=redirect_url))
 
 
 @main.route('/email-not-received', methods=['GET'])

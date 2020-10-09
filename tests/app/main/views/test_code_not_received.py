@@ -119,27 +119,37 @@ def test_should_resend_verify_code_and_update_mobile_for_pending_user(
     )
 
 
+@pytest.mark.parametrize('redirect_url', [
+    None,
+    'blob',
+])
 def test_check_and_redirect_to_two_factor_if_user_active(
     client,
     api_user_active,
     mock_get_user_by_email,
     mock_send_verify_code,
+    redirect_url
 ):
     with client.session_transaction() as session:
         session['user_details'] = {
             'id': api_user_active['id'],
             'email': api_user_active['email_address']}
-    response = client.get(url_for('main.check_and_resend_verification_code'))
+    response = client.get(url_for('main.check_and_resend_verification_code', next=redirect_url))
     assert response.status_code == 302
-    assert response.location == url_for('main.two_factor', _external=True)
+    assert response.location == url_for('main.two_factor', _external=True, next=redirect_url)
 
 
+@pytest.mark.parametrize('redirect_url', [
+    None,
+    'blob',
+])
 def test_check_and_redirect_to_verify_if_user_pending(
     client,
     mocker,
     api_user_pending,
     mock_get_user_pending,
     mock_send_verify_code,
+    redirect_url
 ):
 
     mocker.patch('app.user_api_client.get_user_by_email', return_value=api_user_pending)
@@ -148,9 +158,9 @@ def test_check_and_redirect_to_verify_if_user_pending(
         session['user_details'] = {
             'id': api_user_pending['id'],
             'email': api_user_pending['email_address']}
-    response = client.get(url_for('main.check_and_resend_verification_code'))
+    response = client.get(url_for('main.check_and_resend_verification_code', next=redirect_url))
     assert response.status_code == 302
-    assert response.location == url_for('main.verify', _external=True)
+    assert response.location == url_for('main.verify', _external=True, next=redirect_url)
 
 
 @pytest.mark.parametrize('endpoint', [
