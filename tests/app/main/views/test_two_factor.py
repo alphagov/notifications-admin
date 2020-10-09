@@ -11,6 +11,32 @@ from tests.conftest import (
 )
 
 
+@pytest.mark.parametrize('redirect_url', [
+    None,
+    'blob',
+])
+@pytest.mark.parametrize('email_resent, page_title', [
+    (None, 'Check your email'),
+    (True, 'Email resent')
+])
+def test_two_factor_email_sent_page(
+    client,
+    email_resent,
+    page_title,
+    redirect_url
+):
+    response = client.get(url_for('main.two_factor_email_sent', next=redirect_url, email_resent=email_resent))
+    assert response.status_code == 200
+
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert page.h1.string == page_title
+    # there shouldn't be a form for updating mobile number
+    assert page.find('form') is None
+    resend_email_link = page.find('a', class_="govuk-link govuk-link--no-visited-state page-footer-secondary-link")
+    assert resend_email_link.text == 'Not received an email?'
+    assert resend_email_link['href'] == url_for('main.email_not_received', next=redirect_url)
+
+
 def test_should_render_two_factor_page(
     client,
     api_user_active,

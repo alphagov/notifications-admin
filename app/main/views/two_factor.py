@@ -24,7 +24,8 @@ def two_factor_email_sent():
     title = 'Email resent' if request.args.get('email_resent') else 'Check your email'
     return render_template(
         'views/two-factor-email.html',
-        title=title
+        title=title,
+        redirect_url=request.args.get('next')
     )
 
 
