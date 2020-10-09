@@ -339,17 +339,22 @@ def test_valid_two_factor_email_link_logs_in_user(
     assert response.location == url_for('main.show_accounts_or_dashboard', _external=True)
 
 
+@pytest.mark.parametrize('redirect_url', [
+    None,
+    'blob',
+])
 def test_two_factor_email_link_has_expired(
     app_,
     valid_token,
     client,
     mock_send_verify_code,
-    fake_uuid
+    fake_uuid,
+    redirect_url
 ):
 
     with set_config(app_, 'EMAIL_2FA_EXPIRY_SECONDS', -1):
         response = client.post(
-            url_for_endpoint_with_token('main.two_factor_email', token=valid_token),
+            url_for_endpoint_with_token('main.two_factor_email', token=valid_token, next=redirect_url),
             follow_redirects=True,
         )
 
@@ -357,6 +362,8 @@ def test_two_factor_email_link_has_expired(
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
     assert page.h1.text.strip() == 'The link has expired'
+    assert page.select_one('a:contains("Sign in again")')['href'] == url_for('main.sign_in', next=redirect_url)
+
     assert mock_send_verify_code.called is False
 
 
@@ -372,20 +379,26 @@ def test_two_factor_email_link_is_invalid(
     assert normalize_spaces(
         page.select_one('.banner-dangerous').text
     ) == "There’s something wrong with the link you’ve used."
+
     assert response.status_code == 404
 
 
+@pytest.mark.parametrize('redirect_url', [
+    None,
+    'blob',
+])
 def test_two_factor_email_link_is_already_used(
     client,
     valid_token,
     mocker,
-    mock_send_verify_code
+    mock_send_verify_code,
+    redirect_url
 
 ):
     mocker.patch('app.user_api_client.check_verify_code', return_value=(False, 'Code has expired'))
 
     response = client.post(
-        url_for_endpoint_with_token('main.two_factor_email', token=valid_token),
+        url_for_endpoint_with_token('main.two_factor_email', token=valid_token, next=redirect_url),
         follow_redirects=True
     )
 
@@ -393,6 +406,8 @@ def test_two_factor_email_link_is_already_used(
     assert response.status_code == 200
 
     assert page.h1.text.strip() == 'The link has expired'
+    assert page.select_one('a:contains("Sign in again")')['href'] == url_for('main.sign_in', next=redirect_url)
+
     assert mock_send_verify_code.called is False
 
 

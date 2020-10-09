@@ -36,6 +36,7 @@ def two_factor_email_interstitial(token):
 
 @main.route('/email-auth/<token>', methods=['POST'])
 def two_factor_email(token):
+    redirect_url = request.args.get('next')
     if current_user.is_authenticated:
         return redirect_when_logged_in(platform_admin=current_user.platform_admin)
 
@@ -48,14 +49,14 @@ def two_factor_email(token):
             current_app.config['EMAIL_2FA_EXPIRY_SECONDS']
         ))
     except SignatureExpired:
-        return render_template('views/email-link-invalid.html')
+        return render_template('views/email-link-invalid.html', redirect_url=redirect_url)
 
     user_id = token_data['user_id']
     # checks if code was already used
     logged_in, msg = user_api_client.check_verify_code(user_id, token_data['secret_code'], "email")
 
     if not logged_in:
-        return render_template('views/email-link-invalid.html')
+        return render_template('views/email-link-invalid.html', redirect_url=redirect_url)
     return log_in_user(user_id)
 
 
