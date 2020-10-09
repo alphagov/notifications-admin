@@ -11,10 +11,8 @@ from tests.conftest import (
 )
 
 
-@pytest.mark.parametrize('redirect_url', [
-    None,
-    'blob',
-])
+@pytest.mark.parametrize('request_url', ['two_factor_email_sent', 'revalidate_email_sent'])
+@pytest.mark.parametrize('redirect_url', [None, 'blob'])
 @pytest.mark.parametrize('email_resent, page_title', [
     (None, 'Check your email'),
     (True, 'Email resent')
@@ -23,9 +21,10 @@ def test_two_factor_email_sent_page(
     client,
     email_resent,
     page_title,
-    redirect_url
+    redirect_url,
+    request_url
 ):
-    response = client.get(url_for('main.two_factor_email_sent', next=redirect_url, email_resent=email_resent))
+    response = client.get(url_for(f'main.{request_url}', next=redirect_url, email_resent=email_resent))
     assert response.status_code == 200
 
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')

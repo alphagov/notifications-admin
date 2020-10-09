@@ -85,7 +85,8 @@ def two_factor():
 @main.route('/re-validate-email', methods=['GET'])
 def revalidate_email_sent():
     title = 'Email resent' if request.args.get('email_resent') else 'Check your email'
-    return render_template('views/re-validate-email-sent.html', title=title)
+    redirect_url = request.args.get('next')
+    return render_template('views/re-validate-email-sent.html', title=title, redirect_url=redirect_url)
 
 
 # see http://flask.pocoo.org/snippets/62/
