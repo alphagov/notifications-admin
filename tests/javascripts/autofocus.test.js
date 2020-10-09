@@ -50,28 +50,6 @@ describe('Autofocus', () => {
 
   });
 
-  test('has a label including the page title when the module starts', () => {
-
-    // start module
-    window.GOVUK.modules.start();
-
-    expect(search.hasAttribute('aria-label')).toBe(true);
-    expect(search.getAttribute('aria-label')).toEqual(document.title + ' - ' + labelText);
-
-  });
-
-  test('gets the original label back when focus moves away', () => {
-
-    // start module
-    window.GOVUK.modules.start();
-
-    // shift focus away from textbox
-    helpers.triggerEvent(search, 'blur');
-
-    expect(search.hasAttribute('aria-label')).toBe(false);
-
-  });
-
   test('is not focused if the window has scrolled', () => {
 
     // mock the window being scrolled 25px
