@@ -176,3 +176,28 @@ def test_redirect_to_sign_in_if_not_logged_in(
 
     assert response.location == url_for('main.sign_in', _external=True)
     assert response.status_code == 302
+
+
+@pytest.mark.parametrize('redirect_url', [
+    None,
+    'blob',
+])
+def test_should_render_correct_email_not_received_template_for_active_user(
+    client,
+    api_user_active,
+    mock_get_user_by_email,
+    mock_send_verify_code,
+    redirect_url
+):
+    with client.session_transaction() as session:
+        session['user_details'] = {
+            'id': api_user_active['id'],
+            'email': api_user_active['email_address']}
+    response = client.get(url_for('main.email_not_received', next=redirect_url))
+    assert response.status_code == 200
+
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert page.h1.string == 'Resend email link'
+    # there shouldn't be a form for updating mobile number
+    assert page.find('form') is None
+    assert page.find('a', class_="govuk-button")['href'] == url_for('main.resend_email_link', next=redirect_url)

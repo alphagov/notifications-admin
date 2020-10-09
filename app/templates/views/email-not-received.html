@@ -16,7 +16,7 @@
       {{ govukButton({
         "element": "a",
         "text": "Resend email link",
-        "href": url_for('main.resend_email_link')
+        "href": url_for('main.resend_email_link', next=redirect_url)
       }) }}
     </p>
 
