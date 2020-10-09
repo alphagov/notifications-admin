@@ -1,6 +1,7 @@
 import json
 from datetime import datetime
 
+import pytest
 from flask import url_for
 from itsdangerous import SignatureExpired
 from notifications_utils.url_safe_token import generate_token
@@ -36,21 +37,26 @@ def test_should_return_404_when_email_address_does_not_exist(
     assert response.status_code == 404
 
 
+@pytest.mark.parametrize('redirect_url', [
+    None,
+    'blob',
+])
 def test_should_redirect_to_two_factor_when_password_reset_is_successful(
     app_,
     client,
     mock_get_user_by_email_request_password_reset,
     mock_login,
     mock_send_verify_code,
-    mock_reset_failed_login_count
+    mock_reset_failed_login_count,
+    redirect_url
 ):
     user = mock_get_user_by_email_request_password_reset.return_value
     data = json.dumps({'email': user['email_address'], 'created_at': str(datetime.utcnow())})
     token = generate_token(data, app_.config['SECRET_KEY'], app_.config['DANGEROUS_SALT'])
-    response = client.post(url_for_endpoint_with_token('.new_password', token=token),
+    response = client.post(url_for_endpoint_with_token('.new_password', token=token, next=redirect_url),
                            data={'new_password': 'a-new_password'})
     assert response.status_code == 302
-    assert response.location == url_for('.two_factor', _external=True)
+    assert response.location == url_for('.two_factor', _external=True, next=redirect_url)
     mock_get_user_by_email_request_password_reset.assert_called_once_with(user['email_address'])
 
 

@@ -3646,9 +3646,9 @@ def mock_create_event(mocker):
     return mocker.patch('app.events_api_client.create_event', side_effect=_add_event)
 
 
-def url_for_endpoint_with_token(endpoint, token):
+def url_for_endpoint_with_token(endpoint, token, next=None):
     token = token.replace('%2E', '.')
-    return url_for(endpoint, token=token)
+    return url_for(endpoint, token=token, next=next)
 
 
 @pytest.fixture
