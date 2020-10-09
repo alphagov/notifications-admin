@@ -102,6 +102,10 @@ def test_logged_in_user_redirects_to_account(
     )
 
 
+@pytest.mark.parametrize('redirect_url', [
+    None,
+    'blob',
+])
 @pytest.mark.parametrize('email_address, password', [
     ('valid@example.gov.uk', 'val1dPassw0rd!'),
     (' valid@example.gov.uk  ', '  val1dPassw0rd!  '),
@@ -115,34 +119,40 @@ def test_process_sms_auth_sign_in_return_2fa_template(
     mock_verify_password,
     email_address,
     password,
+    redirect_url
 ):
     response = client.post(
-        url_for('main.sign_in'), data={
+        url_for('main.sign_in', next=redirect_url), data={
             'email_address': email_address,
             'password': password})
     assert response.status_code == 302
-    assert response.location == url_for('.two_factor', _external=True)
+    assert response.location == url_for('.two_factor', next=redirect_url, _external=True)
     mock_verify_password.assert_called_with(api_user_active['id'], password)
     mock_get_user_by_email.assert_called_with('valid@example.gov.uk')
 
 
+@pytest.mark.parametrize('redirect_url', [
+    None,
+    'blob',
+])
 def test_process_email_auth_sign_in_return_2fa_template(
     client,
     api_user_active_email_auth,
     mock_send_verify_code,
     mock_verify_password,
-    mocker
+    mocker,
+    redirect_url
 ):
     mocker.patch('app.user_api_client.get_user', return_value=api_user_active_email_auth)
     mocker.patch('app.user_api_client.get_user_by_email', return_value=api_user_active_email_auth)
 
     response = client.post(
-        url_for('main.sign_in'), data={
+        url_for('main.sign_in', next=redirect_url), data={
             'email_address': 'valid@example.gov.uk',
             'password': 'val1dPassw0rd!'})
     assert response.status_code == 302
-    assert response.location == url_for('.two_factor_email_sent', _external=True)
-    mock_send_verify_code.assert_called_with(api_user_active_email_auth['id'], 'email', None, None)
+    assert response.location == url_for('.two_factor_email_sent', _external=True, next=redirect_url)
+    mock_send_verify_code.assert_called_with(api_user_active_email_auth['id'], 'email', None, redirect_url)
     mock_verify_password.assert_called_with(api_user_active_email_auth['id'], 'val1dPassw0rd!')
 
 
@@ -185,16 +195,21 @@ def test_should_return_redirect_when_user_is_pending(
     assert response.status_code == 200
 
 
+@pytest.mark.parametrize('redirect_url', [
+    None,
+    'blob',
+])
 def test_should_attempt_redirect_when_user_is_pending(
     client,
     mock_get_user_by_email_pending,
     mock_verify_password,
+    redirect_url
 ):
     response = client.post(
-        url_for('main.sign_in'), data={
+        url_for('main.sign_in', next=redirect_url), data={
             'email_address': 'pending_user@example.gov.uk',
             'password': 'val1dPassw0rd!'})
-    assert response.location == url_for('main.resend_email_verification', _external=True)
+    assert response.location == url_for('main.resend_email_verification', _external=True, next=redirect_url)
     assert response.status_code == 302
 
 

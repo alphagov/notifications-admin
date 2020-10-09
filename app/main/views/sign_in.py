@@ -25,6 +25,7 @@ def sign_in():
 
     form = LoginForm()
     password_reset_url = url_for('.forgot_password', next=request.args.get('next'))
+    redirect_url = request.args.get('next')
 
     if form.validate_on_submit():
 
@@ -33,7 +34,7 @@ def sign_in():
         )
 
         if user and user.state == 'pending':
-            return redirect(url_for('main.resend_email_verification'))
+            return redirect(url_for('main.resend_email_verification', next=redirect_url))
 
         if user and session.get('invited_user'):
             invited_user = InvitedUser.from_session()
@@ -45,9 +46,9 @@ def sign_in():
                 invited_user.accept_invite()
         if user and user.sign_in():
             if user.sms_auth:
-                return redirect(url_for('.two_factor', next=request.args.get('next')))
+                return redirect(url_for('.two_factor', next=redirect_url))
             if user.email_auth:
-                return redirect(url_for('.two_factor_email_sent'))
+                return redirect(url_for('.two_factor_email_sent', next=redirect_url))
 
         # Vague error message for login in case of user not known, locked, inactive or password not verified
         flash(Markup(
@@ -61,7 +62,7 @@ def sign_in():
     return render_template(
         'views/signin.html',
         form=form,
-        again=bool(request.args.get('next')),
+        again=bool(redirect_url),
         other_device=other_device,
         password_reset_url=password_reset_url
     )
