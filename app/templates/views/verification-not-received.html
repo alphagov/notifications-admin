@@ -16,7 +16,7 @@
       {{ govukButton({
         "element": "a",
         "text": "Resend security code",
-        "href": url_for('main.check_and_resend_verification_code')
+        "href": url_for('main.check_and_resend_verification_code', next=redirect_url)
       }) }}
     </p>
 
