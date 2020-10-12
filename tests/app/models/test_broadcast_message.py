@@ -34,3 +34,14 @@ def test_simple_polygons(fake_uuid):
         # total coordinates
         [51],
     ]
+
+
+def test_content_comes_from_attribute_not_template(fake_uuid):
+    broadcast_message = BroadcastMessage(broadcast_message_json(
+        id_=fake_uuid,
+        service_id=fake_uuid,
+        template_id=fake_uuid,
+        status='draft',
+        created_by_id=fake_uuid,
+    ))
+    assert broadcast_message.content == 'This is a test'
