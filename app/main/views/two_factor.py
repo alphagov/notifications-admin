@@ -24,7 +24,8 @@ def two_factor_email_sent():
     title = 'Email resent' if request.args.get('email_resent') else 'Check your email'
     return render_template(
         'views/two-factor-email.html',
-        title=title
+        title=title,
+        redirect_url=request.args.get('next')
     )
 
 
@@ -35,6 +36,7 @@ def two_factor_email_interstitial(token):
 
 @main.route('/email-auth/<token>', methods=['POST'])
 def two_factor_email(token):
+    redirect_url = request.args.get('next')
     if current_user.is_authenticated:
         return redirect_when_logged_in(platform_admin=current_user.platform_admin)
 
@@ -47,14 +49,14 @@ def two_factor_email(token):
             current_app.config['EMAIL_2FA_EXPIRY_SECONDS']
         ))
     except SignatureExpired:
-        return render_template('views/email-link-invalid.html')
+        return render_template('views/email-link-invalid.html', redirect_url=redirect_url)
 
     user_id = token_data['user_id']
     # checks if code was already used
     logged_in, msg = user_api_client.check_verify_code(user_id, token_data['secret_code'], "email")
 
     if not logged_in:
-        return render_template('views/email-link-invalid.html')
+        return render_template('views/email-link-invalid.html', redirect_url=redirect_url)
     return log_in_user(user_id)
 
 
@@ -68,21 +70,23 @@ def two_factor():
         return user_api_client.check_verify_code(user_id, code, "sms")
 
     form = TwoFactorForm(_check_code)
+    redirect_url = request.args.get('next')
 
     if form.validate_on_submit():
         if is_less_than_days_ago(user.email_access_validated_at, 90):
             return log_in_user(user_id)
         else:
-            user_api_client.send_verify_code(user.id, 'email', None, request.args.get('next'))
-            return redirect(url_for('.revalidate_email_sent'))
+            user_api_client.send_verify_code(user.id, 'email', None, redirect_url)
+            return redirect(url_for('.revalidate_email_sent', next=redirect_url))
 
-    return render_template('views/two-factor.html', form=form)
+    return render_template('views/two-factor.html', form=form, redirect_url=redirect_url)
 
 
 @main.route('/re-validate-email', methods=['GET'])
 def revalidate_email_sent():
     title = 'Email resent' if request.args.get('email_resent') else 'Check your email'
-    return render_template('views/re-validate-email-sent.html', title=title)
+    redirect_url = request.args.get('next')
+    return render_template('views/re-validate-email-sent.html', title=title, redirect_url=redirect_url)
 
 
 # see http://flask.pocoo.org/snippets/62/

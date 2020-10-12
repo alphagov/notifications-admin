@@ -5,6 +5,7 @@ from flask import (
     flash,
     redirect,
     render_template,
+    request,
     session,
     url_for,
 )
@@ -46,6 +47,6 @@ def new_password(token):
         else:
             # send user a 2fa sms code
             user.send_verify_code()
-            return redirect(url_for('main.two_factor'))
+            return redirect(url_for('main.two_factor', next=request.args.get('next')))
     else:
         return render_template('views/new-password.html', token=token, form=form, user=user)

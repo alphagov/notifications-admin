@@ -33,7 +33,7 @@
     {% call form_wrapper(autocomplete=True) %}
       {{ form.email_address(param_extensions={"autocomplete": "email"}) }}
       {{ form.password(param_extensions={"autocomplete": "current-password"}) }}
-      {{ page_footer("Continue", secondary_link=url_for('.forgot_password'), secondary_link_text="Forgotten your password?") }}
+      {{ page_footer("Continue", secondary_link=password_reset_url, secondary_link_text="Forgotten your password?") }}
     {% endcall %}
   </div>
 </div>

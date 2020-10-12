@@ -11,11 +11,41 @@ from tests.conftest import (
 )
 
 
+@pytest.mark.parametrize('request_url', ['two_factor_email_sent', 'revalidate_email_sent'])
+@pytest.mark.parametrize('redirect_url', [None, f'/services/{SERVICE_ONE_ID}/templates'])
+@pytest.mark.parametrize('email_resent, page_title', [
+    (None, 'Check your email'),
+    (True, 'Email resent')
+])
+def test_two_factor_email_sent_page(
+    client,
+    email_resent,
+    page_title,
+    redirect_url,
+    request_url
+):
+    response = client.get(url_for(f'main.{request_url}', next=redirect_url, email_resent=email_resent))
+    assert response.status_code == 200
+
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert page.h1.string == page_title
+    # there shouldn't be a form for updating mobile number
+    assert page.find('form') is None
+    resend_email_link = page.find('a', class_="govuk-link govuk-link--no-visited-state page-footer-secondary-link")
+    assert resend_email_link.text == 'Not received an email?'
+    assert resend_email_link['href'] == url_for('main.email_not_received', next=redirect_url)
+
+
+@pytest.mark.parametrize('redirect_url', [
+    None,
+    f'/services/{SERVICE_ONE_ID}/templates',
+])
 def test_should_render_two_factor_page(
     client,
     api_user_active,
     mock_get_user_by_email,
-    mocker
+    mocker,
+    redirect_url
 ):
     # TODO this lives here until we work out how to
     # reassign the session after it is lost mid register process
@@ -24,7 +54,7 @@ def test_should_render_two_factor_page(
             'id': api_user_active['id'],
             'email': api_user_active['email_address']}
     mocker.patch('app.user_api_client.get_user', return_value=api_user_active)
-    response = client.get(url_for('main.two_factor'))
+    response = client.get(url_for('main.two_factor', next=redirect_url))
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert page.select_one('main p').text.strip() == (
@@ -35,6 +65,10 @@ def test_should_render_two_factor_page(
     )
     assert page.select_one('input')['type'] == 'tel'
     assert page.select_one('input')['pattern'] == '[0-9]*'
+
+    assert page.select_one(
+        'a:contains("Not received a text message?")'
+    )['href'] == url_for('main.check_and_resend_text_code', next=redirect_url)
 
 
 @freeze_time('2020-01-27T12:00:00')
@@ -78,11 +112,15 @@ def test_should_send_email_and_redirect_to_info_page_if_user_needs_to_revalidate
         session['user_details'] = {
             'id': api_user_active['id'],
             'email': api_user_active['email_address']}
-    response = client.post(url_for('main.two_factor', next='/services/{}'.format(SERVICE_ONE_ID)),
+    response = client.post(url_for('main.two_factor', next=f'/services/{SERVICE_ONE_ID}'),
                            data={'sms_code': '12345'})
 
     assert response.status_code == 302
-    assert response.location == url_for('main.revalidate_email_sent', _external=True)
+    assert response.location == url_for(
+        'main.revalidate_email_sent',
+        _external=True,
+        next=f'/services/{SERVICE_ONE_ID}'
+    )
     mock_send_verify_code.assert_called_with(api_user_active['id'], 'email', None, mocker.ANY)
 
 
@@ -313,17 +351,22 @@ def test_valid_two_factor_email_link_logs_in_user(
     assert response.location == url_for('main.show_accounts_or_dashboard', _external=True)
 
 
+@pytest.mark.parametrize('redirect_url', [
+    None,
+    f'/services/{SERVICE_ONE_ID}/templates',
+])
 def test_two_factor_email_link_has_expired(
     app_,
     valid_token,
     client,
     mock_send_verify_code,
-    fake_uuid
+    fake_uuid,
+    redirect_url
 ):
 
     with set_config(app_, 'EMAIL_2FA_EXPIRY_SECONDS', -1):
         response = client.post(
-            url_for_endpoint_with_token('main.two_factor_email', token=valid_token),
+            url_for_endpoint_with_token('main.two_factor_email', token=valid_token, next=redirect_url),
             follow_redirects=True,
         )
 
@@ -331,6 +374,8 @@ def test_two_factor_email_link_has_expired(
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
     assert page.h1.text.strip() == 'The link has expired'
+    assert page.select_one('a:contains("Sign in again")')['href'] == url_for('main.sign_in', next=redirect_url)
+
     assert mock_send_verify_code.called is False
 
 
@@ -346,20 +391,26 @@ def test_two_factor_email_link_is_invalid(
     assert normalize_spaces(
         page.select_one('.banner-dangerous').text
     ) == "There’s something wrong with the link you’ve used."
+
     assert response.status_code == 404
 
 
+@pytest.mark.parametrize('redirect_url', [
+    None,
+    f'/services/{SERVICE_ONE_ID}/templates',
+])
 def test_two_factor_email_link_is_already_used(
     client,
     valid_token,
     mocker,
-    mock_send_verify_code
+    mock_send_verify_code,
+    redirect_url
 
 ):
     mocker.patch('app.user_api_client.check_verify_code', return_value=(False, 'Code has expired'))
 
     response = client.post(
-        url_for_endpoint_with_token('main.two_factor_email', token=valid_token),
+        url_for_endpoint_with_token('main.two_factor_email', token=valid_token, next=redirect_url),
         follow_redirects=True
     )
 
@@ -367,6 +418,8 @@ def test_two_factor_email_link_is_already_used(
     assert response.status_code == 200
 
     assert page.h1.text.strip() == 'The link has expired'
+    assert page.select_one('a:contains("Sign in again")')['href'] == url_for('main.sign_in', next=redirect_url)
+
     assert mock_send_verify_code.called is False
 
 
