@@ -12,7 +12,7 @@ from tests.conftest import (
 
 
 @pytest.mark.parametrize('request_url', ['two_factor_email_sent', 'revalidate_email_sent'])
-@pytest.mark.parametrize('redirect_url', [None, 'blob'])
+@pytest.mark.parametrize('redirect_url', [None, f'/services/{SERVICE_ONE_ID}/templates'])
 @pytest.mark.parametrize('email_resent, page_title', [
     (None, 'Check your email'),
     (True, 'Email resent')
@@ -38,7 +38,7 @@ def test_two_factor_email_sent_page(
 
 @pytest.mark.parametrize('redirect_url', [
     None,
-    'blob',
+    f'/services/{SERVICE_ONE_ID}/templates',
 ])
 def test_should_render_two_factor_page(
     client,
@@ -353,7 +353,7 @@ def test_valid_two_factor_email_link_logs_in_user(
 
 @pytest.mark.parametrize('redirect_url', [
     None,
-    'blob',
+    f'/services/{SERVICE_ONE_ID}/templates',
 ])
 def test_two_factor_email_link_has_expired(
     app_,
@@ -397,7 +397,7 @@ def test_two_factor_email_link_is_invalid(
 
 @pytest.mark.parametrize('redirect_url', [
     None,
-    'blob',
+    f'/services/{SERVICE_ONE_ID}/templates',
 ])
 def test_two_factor_email_link_is_already_used(
     client,

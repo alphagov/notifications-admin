@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 from flask import url_for
 
 from app.models.user import User
-from tests.conftest import normalize_spaces
+from tests.conftest import SERVICE_ONE_ID, normalize_spaces
 
 
 def test_render_sign_in_template_for_new_user(
@@ -31,10 +31,14 @@ def test_render_sign_in_template_with_next_link_for_password_reset(
     client_request
 ):
     client_request.logout()
-    page = client_request.get('main.sign_in', _optional_args="?next=blob", _test_page_title=False)
+    page = client_request.get(
+        'main.sign_in',
+        _optional_args=f"?next=/services/{SERVICE_ONE_ID}/templates",
+        _test_page_title=False
+    )
     forgot_password_link = page.find('a', class_="govuk-link govuk-link--no-visited-state page-footer-secondary-link")
     assert forgot_password_link.text == 'Forgotten your password?'
-    assert forgot_password_link['href'] == url_for('main.forgot_password') + "?next=blob"
+    assert forgot_password_link['href'] == url_for('main.forgot_password', next=f'/services/{SERVICE_ONE_ID}/templates')
 
 
 def test_sign_in_explains_session_timeout(client):
@@ -104,7 +108,7 @@ def test_logged_in_user_redirects_to_account(
 
 @pytest.mark.parametrize('redirect_url', [
     None,
-    'blob',
+    f'/services/{SERVICE_ONE_ID}/templates',
 ])
 @pytest.mark.parametrize('email_address, password', [
     ('valid@example.gov.uk', 'val1dPassw0rd!'),
@@ -133,7 +137,7 @@ def test_process_sms_auth_sign_in_return_2fa_template(
 
 @pytest.mark.parametrize('redirect_url', [
     None,
-    'blob',
+    f'/services/{SERVICE_ONE_ID}/templates',
 ])
 def test_process_email_auth_sign_in_return_2fa_template(
     client,
@@ -197,7 +201,7 @@ def test_should_return_redirect_when_user_is_pending(
 
 @pytest.mark.parametrize('redirect_url', [
     None,
-    'blob',
+    f'/services/{SERVICE_ONE_ID}/templates',
 ])
 def test_should_attempt_redirect_when_user_is_pending(
     client,

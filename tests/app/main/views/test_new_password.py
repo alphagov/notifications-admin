@@ -6,7 +6,7 @@ from flask import url_for
 from itsdangerous import SignatureExpired
 from notifications_utils.url_safe_token import generate_token
 
-from tests.conftest import url_for_endpoint_with_token
+from tests.conftest import SERVICE_ONE_ID, url_for_endpoint_with_token
 
 
 def test_should_render_new_password_template(
@@ -39,7 +39,7 @@ def test_should_return_404_when_email_address_does_not_exist(
 
 @pytest.mark.parametrize('redirect_url', [
     None,
-    'blob',
+    f'/services/{SERVICE_ONE_ID}/templates',
 ])
 def test_should_redirect_to_two_factor_when_password_reset_is_successful(
     app_,

@@ -2,6 +2,8 @@ import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
 
+from tests.conftest import SERVICE_ONE_ID
+
 
 def test_should_render_email_verification_resend_show_email_address_and_resend_verify_email(
     client,
@@ -29,7 +31,7 @@ def test_should_render_email_verification_resend_show_email_address_and_resend_v
 
 @pytest.mark.parametrize('redirect_url', [
     None,
-    'blob',
+    f'/services/{SERVICE_ONE_ID}/templates',
 ])
 def test_should_render_correct_resend_template_for_active_user(
     client,
@@ -82,7 +84,7 @@ def test_should_render_correct_resend_template_for_pending_user(
 
 @pytest.mark.parametrize('redirect_url', [
     None,
-    'blob',
+    f'/services/{SERVICE_ONE_ID}/templates',
 ])
 @pytest.mark.parametrize('phone_number_to_register_with', [
     '+447700900460',
@@ -121,7 +123,7 @@ def test_should_resend_verify_code_and_update_mobile_for_pending_user(
 
 @pytest.mark.parametrize('redirect_url', [
     None,
-    'blob',
+    f'/services/{SERVICE_ONE_ID}/templates',
 ])
 def test_check_and_redirect_to_two_factor_if_user_active(
     client,
@@ -141,7 +143,7 @@ def test_check_and_redirect_to_two_factor_if_user_active(
 
 @pytest.mark.parametrize('redirect_url', [
     None,
-    'blob',
+    f'/services/{SERVICE_ONE_ID}/templates',
 ])
 def test_check_and_redirect_to_verify_if_user_pending(
     client,
@@ -180,7 +182,7 @@ def test_redirect_to_sign_in_if_not_logged_in(
 
 @pytest.mark.parametrize('redirect_url', [
     None,
-    'blob',
+    f'/services/{SERVICE_ONE_ID}/templates',
 ])
 def test_should_render_correct_email_not_received_template_for_active_user(
     client,

@@ -4,6 +4,7 @@ from notifications_python_client.errors import HTTPError
 
 import app
 from tests import user_json
+from tests.conftest import SERVICE_ONE_ID
 
 
 def test_should_render_forgot_password(client):
@@ -42,11 +43,11 @@ def test_forgot_password_sends_next_link_with_reset_password_email_request(
     sample_user = user_json(email_address='test@user.gov.uk')
     mocker.patch('app.user_api_client.send_reset_password_url', return_value=None)
     response = client.post(
-        url_for('.forgot_password') + "?next=blob",
+        url_for('.forgot_password') + f"?next=/services/{SERVICE_ONE_ID}/templates",
         data={'email_address': sample_user['email_address']})
     assert response.status_code == 200
     app.user_api_client.send_reset_password_url.assert_called_once_with(
-        sample_user['email_address'], next_string="blob"
+        sample_user['email_address'], next_string=f'/services/{SERVICE_ONE_ID}/templates'
     )
 
 
