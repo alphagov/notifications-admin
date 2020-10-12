@@ -57,15 +57,6 @@ def set_metadata_on_csv_upload(service_id, upload_id, bucket=None, **kwargs):
     )
 
 
-def set_metadata_on_contact_list(service_id, upload_id, **kwargs):
-    return set_metadata_on_csv_upload(
-        service_id,
-        upload_id,
-        bucket=current_app.config['CONTACT_LIST_UPLOAD_BUCKET_NAME'],
-        **kwargs,
-    )
-
-
 def get_csv_metadata(service_id, upload_id, bucket=None):
     try:
         key = get_csv_upload(service_id, upload_id, bucket)
