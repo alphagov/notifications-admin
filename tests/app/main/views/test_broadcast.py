@@ -430,11 +430,11 @@ def test_preview_broadcast_areas_page(
         for item in page.select('ul.area-list li.area-list-item')
     ] == areas_listed
 
-    assert len(page.select('#map')) == 1
+    assert len(page.select('#area-list-map')) == 1
 
     assert [
         normalize_spaces(item.text)
-        for item in page.select('ul li.area-key')
+        for item in page.select('ul li.area-list-key')
     ] == estimates
 
 
@@ -969,8 +969,15 @@ def test_preview_broadcast_message_page(
     ]
 
     assert normalize_spaces(
+        page.select_one('h2.broadcast-message-heading').text
+    ) == (
+        'Emergency alert'
+    )
+
+    assert normalize_spaces(
         page.select_one('.broadcast-message-wrapper').text
     ) == (
+        'Emergency alert '
         'This is a test'
     )
 

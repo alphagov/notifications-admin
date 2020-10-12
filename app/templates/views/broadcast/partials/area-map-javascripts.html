@@ -20,7 +20,7 @@
     polygons.push(
       L.polygon({{polygon}}, {
         color: '#0b0b0c',
-        fillColor: '#005ea5',
+        fillColor: '#2B8CC4',
         fillOpacity: 0.3,
         weight: 2
       })
@@ -28,7 +28,7 @@
   {% endfor %}
 
 
-  var mapElement = document.getElementById('map');
+  var mapElement = document.getElementById('area-list-map');
 
   // if element is inside a details element then to make the map render correctly we open the details element
   // and set up the map before closing the details map after
@@ -41,7 +41,7 @@
   mapElement.style.height = Math.max(320, window.innerHeight - mapElement.offsetTop - 100) + 'px';
 
   var mymap = L.map(
-    'map',
+    'area-list-map',
     {
       scrollWheelZoom: false
     }

@@ -64,7 +64,10 @@
     &--unremoveable {
       padding-right: govuk-spacing(2);
       background: $light-blue-25;
-      margin-right: govuk-spacing(3);
+      color: mix($black, $govuk-blue, 66%);
+      border-color: $light-blue-25;
+      margin: 0 govuk-spacing(1) govuk-spacing(2) 0;
+      font-weight: bold;
     }
 
   }
@@ -75,17 +78,17 @@
 
 }
 
-#map {
+#area-list-map {
   z-index: 50;
   margin-bottom: govuk-spacing(4);
 }
 
-.area-key {
+.area-list-key {
 
   display: inline-block;
   position: relative;
   margin-right: govuk-spacing(3);
-  margin-bottom: govuk-spacing(5);
+  margin-bottom: govuk-spacing(4);
   height: govuk-spacing(7);
   padding-left: govuk-spacing(8);
   line-height: govuk-spacing(7);
@@ -126,6 +129,24 @@
     &:before {
       display: none;
     }
+  }
+
+}
+
+.area-list-map-details {
+
+  .govuk-details__summary {
+    display: block;
+    padding-top: govuk-spacing(1);
+    padding-bottom: govuk-spacing(1);
+    margin-top: 1px;
+  }
+
+  .govuk-details__text {
+    padding: 0;
+    border: none;
+    border-bottom: 1px solid $border-colour;
+    margin-top: -1px;
   }
 
 }
