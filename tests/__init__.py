@@ -660,7 +660,7 @@ def broadcast_message_json(
         'template_id': template_id,
         'template_version': 123,
         'template_name': 'Example template',
-        'content': 'This is a test',
+        'content': content or 'This is a test',
 
         'personalisation': {},
         'areas': areas or [
