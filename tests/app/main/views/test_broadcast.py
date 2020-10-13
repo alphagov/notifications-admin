@@ -278,7 +278,6 @@ def test_empty_broadcast_dashboard(
     ] == [
         'You do not have any live alerts at the moment',
         'You do not have any alerts waiting for approval',
-        'You do not have any previous alerts',
     ]
 
 
@@ -294,6 +293,8 @@ def test_broadcast_dashboard(
         '.broadcast_dashboard',
         service_id=SERVICE_ONE_ID,
     )
+
+    assert len(page.select('table')) == len(page.select('main h2')) == 2
 
     assert normalize_spaces(page.select('main h2')[0].text) == (
         'Live alerts'
@@ -311,16 +312,6 @@ def test_broadcast_dashboard(
         normalize_spaces(row.text) for row in page.select('table')[1].select('tbody tr')
     ] == [
         'Example template To England and Scotland Prepared by Test User',
-    ]
-
-    assert normalize_spaces(page.select('main h2')[2].text) == (
-        'Previous alerts'
-    )
-    assert [
-        normalize_spaces(row.text) for row in page.select('table')[2].select('tbody tr')
-    ] == [
-        'Example template To England and Scotland Stopped 10 February at 2:20am',
-        'Example template To England and Scotland Finished yesterday at 8:20pm',
     ]
 
 
@@ -344,12 +335,10 @@ def test_broadcast_dashboard_json(
     assert json_response.keys() == {
         'pending_approval_broadcasts',
         'live_broadcasts',
-        'previous_broadcasts',
     }
 
     assert 'Prepared by Test User' in json_response['pending_approval_broadcasts']
     assert 'Live until tomorrow at 2:20am' in json_response['live_broadcasts']
-    assert 'Finished yesterday at 8:20pm' in json_response['previous_broadcasts']
 
 
 @freeze_time('2020-02-20 02:20')

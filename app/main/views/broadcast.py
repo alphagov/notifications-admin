@@ -71,11 +71,6 @@ def get_broadcast_dashboard_partials(service_id):
             broadcasts=broadcast_messages.with_status('broadcasting'),
             empty_message='You do not have any live alerts at the moment',
         ),
-        previous_broadcasts=render_template(
-            'views/broadcast/partials/dashboard-table.html',
-            broadcasts=broadcast_messages.with_status('cancelled', 'completed'),
-            empty_message='You do not have any previous alerts',
-        ),
     )
 
 
