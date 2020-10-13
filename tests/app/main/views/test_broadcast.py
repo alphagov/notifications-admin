@@ -143,8 +143,8 @@ def test_broadcast_pages_403_for_user_without_permission(
     (2, 'Continue', partial(url_for, '.broadcast_tour', step_index=3)),
     (3, 'Continue', partial(url_for, '.broadcast_tour', step_index=4)),
     (4, 'Continue', partial(url_for, '.broadcast_tour', step_index=5)),
-    (5, 'Continue to dashboard', partial(url_for, '.service_dashboard')),
-    (6, 'Continue to dashboard', partial(url_for, '.service_dashboard')),
+    (5, 'Continue', partial(url_for, '.service_dashboard')),
+    (6, 'Continue', partial(url_for, '.service_dashboard')),
 ))
 def test_broadcast_tour_pages_have_continue_link(
     client_request,

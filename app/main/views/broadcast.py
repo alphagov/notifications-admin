@@ -30,7 +30,7 @@ def broadcast_tour(service_id, step_index):
     )
 
 
-@main.route('/services/<uuid:service_id>/broadcast-dashboard')
+@main.route('/services/<uuid:service_id>/current-alerts')
 @user_has_permissions()
 @service_has_permission('broadcast')
 def broadcast_dashboard(service_id):
