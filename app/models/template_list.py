@@ -1,3 +1,6 @@
+from app import format_notification_type
+
+
 class TemplateList():
 
     def __init__(
@@ -128,12 +131,17 @@ class TemplateListTemplate(TemplateListItem):
     ):
         super().__init__(template, ancestors)
         self.service_id = service_id
-        self.hint = {
-            'email': 'Email template',
-            'sms': 'Text message template',
-            'letter': 'Letter template',
-            'broadcast': 'Broadcast template',
-        }.get(template['template_type'])
+        self.template_type = template['template_type']
+        self.content = template.get('content')
+
+    @property
+    def hint(self):
+        if self.template_type == 'broadcast':
+            max_length_in_chars = 40
+            if len(self.content) > (max_length_in_chars + 2):
+                return self.content[:max_length_in_chars].strip() + '…'
+            return self.content
+        return format_notification_type(self.template_type) + ' template'
 
 
 class TemplateListFolder(TemplateListItem):

@@ -409,7 +409,7 @@ def valid_phone_number(phone_number):
 def format_notification_type(notification_type):
     return {
         'email': 'Email',
-        'sms': 'SMS',
+        'sms': 'Text message',
         'letter': 'Letter'
     }[notification_type]
 
