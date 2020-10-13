@@ -23,6 +23,10 @@ sample_uuid = sample_uuid()
         403, 405,
     ),
     (
+        '.broadcast_dashboard_previous', {},
+        403, 405,
+    ),
+    (
         '.broadcast',
         {'template_id': sample_uuid},
         403, 405,
@@ -346,6 +350,31 @@ def test_broadcast_dashboard_json(
     assert 'Prepared by Test User' in json_response['pending_approval_broadcasts']
     assert 'Live until tomorrow at 2:20am' in json_response['live_broadcasts']
     assert 'Finished yesterday at 8:20pm' in json_response['previous_broadcasts']
+
+
+@freeze_time('2020-02-20 02:20')
+def test_previous_broadcasts_page(
+    client_request,
+    service_one,
+    mock_get_broadcast_messages,
+    mock_get_service_templates,
+):
+    service_one['permissions'] += ['broadcast']
+    page = client_request.get(
+        '.broadcast_dashboard_previous',
+        service_id=SERVICE_ONE_ID,
+    )
+
+    assert normalize_spaces(page.select_one('main h1').text) == (
+        'Previous alerts'
+    )
+    assert len(page.select('table')) == 1
+    assert [
+        normalize_spaces(row.text) for row in page.select('table')[0].select('tbody tr')
+    ] == [
+        'Example template To England and Scotland Stopped 10 February at 2:20am',
+        'Example template To England and Scotland Finished yesterday at 8:20pm',
+    ]
 
 
 def test_broadcast_page(
