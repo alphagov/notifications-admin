@@ -1,0 +1,15 @@
+{% from 'components/ajax-block.html' import ajax_block %}
+
+{% extends "withnav_template.html" %}
+
+{% block service_page_title %}
+  Previous alerts
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <h1 class="heading-medium govuk-!-margin-bottom-2">Previous alerts</h1>
+
+  {% include('views/broadcast/partials/dashboard-table.html') %}
+
+{% endblock %}

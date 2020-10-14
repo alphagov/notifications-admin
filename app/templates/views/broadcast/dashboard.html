@@ -34,12 +34,4 @@
     'pending_approval_broadcasts'
   ) }}
 
-  <h2 class="heading-medium govuk-!-margin-bottom-2">Previous alerts</h2>
-
-  {{ ajax_block(
-    partials,
-    url_for('.broadcast_dashboard_updates', service_id=current_service.id),
-    'previous_broadcasts'
-  ) }}
-
 {% endblock %}

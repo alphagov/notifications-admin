@@ -30,13 +30,24 @@ def broadcast_tour(service_id, step_index):
     )
 
 
-@main.route('/services/<uuid:service_id>/broadcast-dashboard')
+@main.route('/services/<uuid:service_id>/current-alerts')
 @user_has_permissions()
 @service_has_permission('broadcast')
 def broadcast_dashboard(service_id):
     return render_template(
         'views/broadcast/dashboard.html',
         partials=get_broadcast_dashboard_partials(current_service.id),
+    )
+
+
+@main.route('/services/<uuid:service_id>/previous-alerts')
+@user_has_permissions()
+@service_has_permission('broadcast')
+def broadcast_dashboard_previous(service_id):
+    return render_template(
+        'views/broadcast/previous-broadcasts.html',
+        broadcasts=BroadcastMessages(service_id).with_status('cancelled', 'completed'),
+        empty_message='You do not have any previous alerts',
     )
 
 
@@ -59,11 +70,6 @@ def get_broadcast_dashboard_partials(service_id):
             'views/broadcast/partials/dashboard-table.html',
             broadcasts=broadcast_messages.with_status('broadcasting'),
             empty_message='You do not have any live alerts at the moment',
-        ),
-        previous_broadcasts=render_template(
-            'views/broadcast/partials/dashboard-table.html',
-            broadcasts=broadcast_messages.with_status('cancelled', 'completed'),
-            empty_message='You do not have any previous alerts',
         ),
     )
 

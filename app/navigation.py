@@ -358,6 +358,7 @@ class HeaderNavigation(Navigation):
         'who_its_for',
         'broadcast_tour',
         'broadcast_dashboard',
+        'broadcast_dashboard_previous',
         'broadcast_dashboard_updates',
         'broadcast',
         'preview_broadcast_areas',
@@ -393,6 +394,9 @@ class MainNavigation(Navigation):
             'template_usage',
             'view_notification',
             'view_notifications',
+        },
+        'previous_broadcasts': {
+            'broadcast_dashboard_previous',
         },
         'templates': {
             'action_blocked',
@@ -716,6 +720,7 @@ class CaseworkNavigation(Navigation):
         'dashboard': {
             'broadcast_tour',
             'broadcast_dashboard',
+            'broadcast_dashboard_previous',
             'broadcast_dashboard_updates',
         },
         'send-one-off': {
@@ -1354,6 +1359,7 @@ class OrgNavigation(Navigation):
         'who_its_for',
         'broadcast_tour',
         'broadcast_dashboard',
+        'broadcast_dashboard_previous',
         'broadcast_dashboard_updates',
         'broadcast',
         'preview_broadcast_areas',
