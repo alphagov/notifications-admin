@@ -126,9 +126,11 @@
     </p>
   {% endif %}
 
+  {{ broadcast_message.template|string }}
+
   {% for area in broadcast_message.areas %}
     {% if loop.first %}
-      <ul class="area-list govuk-!-margin-bottom-4">
+      <ul class="area-list">
     {% endif %}
         <li class="area-list-item area-list-item--unremoveable">
           {{ area.name }}
@@ -144,7 +146,5 @@
       "html": map(broadcast_message)
     }) }}
   </div>
-
-  {{ broadcast_message.template|string }}
 
 {% endblock %}
