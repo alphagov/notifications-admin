@@ -302,7 +302,7 @@ def test_broadcast_dashboard(
     assert [
         normalize_spaces(row.text) for row in page.select('table')[0].select('tbody tr')
     ] == [
-        'Example template This is a test To England and Scotland Live until tomorrow at 2:20am',
+        'Example template This is a test England Scotland Live until tomorrow at 2:20am',
     ]
 
     assert normalize_spaces(page.select('main h2')[1].text) == (
@@ -311,7 +311,7 @@ def test_broadcast_dashboard(
     assert [
         normalize_spaces(row.text) for row in page.select('table')[1].select('tbody tr')
     ] == [
-        'Example template This is a test To England and Scotland Prepared by Test User',
+        'Example template This is a test England Scotland Prepared by Test User',
     ]
 
 
@@ -361,8 +361,8 @@ def test_previous_broadcasts_page(
     assert [
         normalize_spaces(row.text) for row in page.select('table')[0].select('tbody tr')
     ] == [
-        'Example template This is a test To England and Scotland Stopped 10 February at 2:20am',
-        'Example template This is a test To England and Scotland Finished yesterday at 8:20pm',
+        'Example template This is a test England Scotland Stopped 10 February at 2:20am',
+        'Example template This is a test England Scotland Finished yesterday at 8:20pm',
     ]
 
 

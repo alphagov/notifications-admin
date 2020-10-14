@@ -76,12 +76,6 @@ class BroadcastMessage(JSONModel):
             for parent in area.parents:
                 yield parent
 
-    @property
-    def initial_area_names(self):
-        return [
-            area.name for area in self.areas
-        ][:10]
-
     @cached_property
     def polygons(self):
         return Polygons(
