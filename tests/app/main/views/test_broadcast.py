@@ -361,8 +361,8 @@ def test_previous_broadcasts_page(
     assert [
         normalize_spaces(row.text) for row in page.select('table')[0].select('tbody tr')
     ] == [
-        'Example template This is a test England Scotland Stopped 10 February at 2:20am',
-        'Example template This is a test England Scotland Finished yesterday at 8:20pm',
+        'Example template This is a test England Scotland Broadcast yesterday at 2:20am',
+        'Example template This is a test England Scotland Broadcast yesterday at 2:20pm',
     ]
 
 
@@ -1037,34 +1037,34 @@ def test_start_broadcasting(
         'status': 'broadcasting',
         'finishes_at': '2020-02-23T23:23:23.000000',
     }, [
-        'Started broadcasting on 20 February at 8:20pm.',
-        'Live until tomorrow at 11:23pm Stop broadcast early',
+        'Live until tomorrow at 11:23pm Stop broadcasting',
         'Prepared by Alice and approved by Bob.',
+        'Broadcasting stops tomorrow at 11:23pm.'
     ]),
     ({
         'status': 'broadcasting',
         'finishes_at': '2020-02-22T22:20:20.000000',  # 2 mins before now()
     }, [
-        'Started broadcasting on 20 February at 8:20pm.',
-        'Finished broadcasting today at 10:20pm.',
+        'Broadcast on 20 February at 8:20pm.',
         'Prepared by Alice and approved by Bob.',
+        'Finished broadcasting today at 10:20pm.'
     ]),
     ({
-        'status': 'finished',
+        'status': 'completed',
         'finishes_at': '2020-02-21T21:21:21.000000',
     }, [
-        'Started broadcasting on 20 February at 8:20pm.',
-        'Finished broadcasting yesterday at 9:21pm.',
+        'Broadcast on 20 February at 8:20pm.',
         'Prepared by Alice and approved by Bob.',
+        'Finished broadcasting yesterday at 9:21pm.',
     ]),
     ({
         'status': 'cancelled',
         'cancelled_by_id': sample_uuid,
         'cancelled_at': '2020-02-21T21:21:21.000000',
     }, [
-        'Started broadcasting on 20 February at 8:20pm.',
-        'Stopped by Alice yesterday at 9:21pm.',
-        'Prepared by Bob and approved by Carol.',
+        'Broadcast on 20 February at 8:20pm.',
+        'Prepared by Alice and approved by Bob.',
+        'Stopped by Carol yesterday at 9:21pm.',
     ]),
 ))
 @freeze_time('2020-02-22T22:22:22.000000')
