@@ -302,7 +302,7 @@ def test_broadcast_dashboard(
     assert [
         normalize_spaces(row.text) for row in page.select('table')[0].select('tbody tr')
     ] == [
-        'Example template This is a test England Scotland Live until tomorrow at 2:20am',
+        'Example template This is a test England Scotland Live since today at 2:20am',
     ]
 
     assert normalize_spaces(page.select('main h2')[1].text) == (
@@ -338,7 +338,7 @@ def test_broadcast_dashboard_json(
     }
 
     assert 'Prepared by Test User' in json_response['pending_approval_broadcasts']
-    assert 'Live until tomorrow at 2:20am' in json_response['live_broadcasts']
+    assert 'Live since today at 2:20am' in json_response['live_broadcasts']
 
 
 @freeze_time('2020-02-20 02:20')
@@ -1037,7 +1037,7 @@ def test_start_broadcasting(
         'status': 'broadcasting',
         'finishes_at': '2020-02-23T23:23:23.000000',
     }, [
-        'Live until tomorrow at 11:23pm Stop broadcasting',
+        'Live since 20 February at 8:20pm Stop broadcasting',
         'Prepared by Alice and approved by Bob.',
         'Broadcasting stops tomorrow at 11:23pm.'
     ]),

@@ -32,7 +32,7 @@
         </p>
       {% elif item.status == 'broadcasting' %}
         <p class="govuk-body govuk-!-margin-top-6 govuk-!-margin-bottom-0 live-broadcast">
-          Live until {{ item.finishes_at|format_datetime_relative }}
+          Live since {{ item.starts_at|format_datetime_relative }}
         </p>
       {% else %}
         <p class="govuk-body govuk-!-margin-top-6 govuk-!-margin-bottom-0 govuk-hint">
