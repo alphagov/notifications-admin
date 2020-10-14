@@ -100,11 +100,6 @@
     {{ page_header(broadcast_message.template_name) }}
 
     <p class="govuk-body govuk-!-margin-bottom-3">
-      Created by {{ broadcast_message.created_by.name }} and approved by
-      {{ broadcast_message.approved_by.name }}.
-    </p>
-
-    <p class="govuk-body govuk-!-margin-bottom-3">
       Started broadcasting
       {{ broadcast_message.starts_at|format_datetime_human }}.
     </p>
@@ -146,5 +141,12 @@
       "html": map(broadcast_message)
     }) }}
   </div>
+
+  {% if broadcast_message.status != 'pending-approval' %}
+    <p class="govuk-body govuk-!-margin-bottom-3">
+      Prepared by {{ broadcast_message.created_by.name }} and approved by
+      {{ broadcast_message.approved_by.name }}.
+    </p>
+  {% endif %}
 
 {% endblock %}

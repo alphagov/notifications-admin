@@ -1037,34 +1037,34 @@ def test_start_broadcasting(
         'status': 'broadcasting',
         'finishes_at': '2020-02-23T23:23:23.000000',
     }, [
-        'Created by Alice and approved by Bob.',
         'Started broadcasting on 20 February at 8:20pm.',
         'Live until tomorrow at 11:23pm Stop broadcast early',
+        'Prepared by Alice and approved by Bob.',
     ]),
     ({
         'status': 'broadcasting',
         'finishes_at': '2020-02-22T22:20:20.000000',  # 2 mins before now()
     }, [
-        'Created by Alice and approved by Bob.',
         'Started broadcasting on 20 February at 8:20pm.',
         'Finished broadcasting today at 10:20pm.',
+        'Prepared by Alice and approved by Bob.',
     ]),
     ({
         'status': 'finished',
         'finishes_at': '2020-02-21T21:21:21.000000',
     }, [
-        'Created by Alice and approved by Bob.',
         'Started broadcasting on 20 February at 8:20pm.',
         'Finished broadcasting yesterday at 9:21pm.',
+        'Prepared by Alice and approved by Bob.',
     ]),
     ({
         'status': 'cancelled',
         'cancelled_by_id': sample_uuid,
         'cancelled_at': '2020-02-21T21:21:21.000000',
     }, [
-        'Created by Alice and approved by Bob.',
         'Started broadcasting on 20 February at 8:20pm.',
-        'Stopped by Carol yesterday at 9:21pm.',
+        'Stopped by Alice yesterday at 9:21pm.',
+        'Prepared by Bob and approved by Carol.',
     ]),
 ))
 @freeze_time('2020-02-22T22:22:22.000000')
