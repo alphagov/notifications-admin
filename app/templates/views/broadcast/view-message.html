@@ -100,7 +100,7 @@
     {{ page_header(broadcast_message.template_name) }}
 
     {% if broadcast_message.status == 'broadcasting' %}
-      <p class="govuk-body">
+      <p class="govuk-body govuk-!-margin-bottom-2 live-broadcast live-broadcast--left">
         Live until {{ broadcast_message.finishes_at|format_datetime_relative }}&ensp;
         {%- if not hide_stop_link %}
           <a href="{{ url_for('.cancel_broadcast_message', service_id=current_service.id, broadcast_message_id=broadcast_message.id) }}" class="destructive-link destructive-link--no-visited-state">Stop broadcasting</a>
