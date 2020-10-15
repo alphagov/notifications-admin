@@ -14,7 +14,7 @@
   ) %}
     {% call row_heading() %}
       <div class="file-list">
-        <a class="file-list-filename-large govuk-link govuk-link--no-visited-state" href="{{ url_for('.view_broadcast_message', service_id=current_service.id, broadcast_message_id=item.id) }}">{{ item.template_name }}</a>
+        <a class="file-list-filename-large govuk-link govuk-link--no-visited-state" href="{{ url_for(single_endpoint, service_id=current_service.id, broadcast_message_id=item.id) }}">{{ item.template_name }}</a>
         <span class="file-list-hint-large govuk-!-margin-bottom-1">
           {{ item.content }}
         </span>

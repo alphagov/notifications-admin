@@ -52,8 +52,12 @@ sample_uuid = sample_uuid()
         403, 403,
     ),
     (
-        '.view_broadcast_message', {'broadcast_message_id': sample_uuid},
+        '.view_current_broadcast', {'broadcast_message_id': sample_uuid},
         403, 403,
+    ),
+    (
+        '.view_previous_broadcast', {'broadcast_message_id': sample_uuid},
+        403, 405,
     ),
     (
         '.cancel_broadcast_message', {'broadcast_message_id': sample_uuid},
@@ -1019,7 +1023,7 @@ def test_start_broadcasting(
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
         _expected_redirect=url_for(
-            'main.view_broadcast_message',
+            'main.view_current_broadcast',
             service_id=SERVICE_ONE_ID,
             broadcast_message_id=fake_uuid,
             _external=True,
@@ -1099,7 +1103,7 @@ def test_view_broadcast_message_page(
     service_one['permissions'] += ['broadcast']
 
     page = client_request.get(
-        '.view_broadcast_message',
+        '.view_current_broadcast',
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
     )
@@ -1136,7 +1140,7 @@ def test_view_pending_broadcast(
     service_one['permissions'] += ['broadcast']
 
     page = client_request.get(
-        '.view_broadcast_message',
+        '.view_current_broadcast',
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
     )
@@ -1190,7 +1194,7 @@ def test_cant_approve_own_broadcast(
     service_one['permissions'] += ['broadcast']
 
     page = client_request.get(
-        '.view_broadcast_message',
+        '.view_current_broadcast',
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
     )
@@ -1243,7 +1247,7 @@ def test_can_approve_own_broadcast_in_trial_mode(
     service_one['permissions'] += ['broadcast']
 
     page = client_request.get(
-        '.view_broadcast_message',
+        '.view_current_broadcast',
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
     )
@@ -1319,7 +1323,7 @@ def test_view_only_user_cant_approve_broadcast(
     service_one['permissions'] += ['broadcast']
 
     page = client_request.get(
-        '.view_broadcast_message',
+        '.view_current_broadcast',
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
     )
@@ -1338,7 +1342,7 @@ def test_view_only_user_cant_approve_broadcast(
 @pytest.mark.parametrize('trial_mode, initial_status, expected_approval, expected_redirect', (
     (True, 'draft', False, partial(
         url_for,
-        '.view_broadcast_message',
+        '.view_current_broadcast',
         broadcast_message_id=sample_uuid,
     )),
     (True, 'pending-approval', True, partial(
@@ -1348,22 +1352,22 @@ def test_view_only_user_cant_approve_broadcast(
     )),
     (False, 'pending-approval', True, partial(
         url_for,
-        '.view_broadcast_message',
+        '.view_current_broadcast',
         broadcast_message_id=sample_uuid,
     )),
     (True, 'rejected', False, partial(
         url_for,
-        '.view_broadcast_message',
+        '.view_current_broadcast',
         broadcast_message_id=sample_uuid,
     )),
     (True, 'broadcasting', False, partial(
         url_for,
-        '.view_broadcast_message',
+        '.view_current_broadcast',
         broadcast_message_id=sample_uuid,
     )),
     (True, 'cancelled', False, partial(
         url_for,
-        '.view_broadcast_message',
+        '.view_current_broadcast',
         broadcast_message_id=sample_uuid,
     )),
 ))
@@ -1396,7 +1400,7 @@ def test_request_approval(
     service_one['permissions'] += ['broadcast']
 
     client_request.post(
-        '.view_broadcast_message',
+        '.view_current_broadcast',
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
         _expected_redirect=expected_redirect(
@@ -1502,7 +1506,7 @@ def test_cant_reject_broadcast_in_wrong_state(
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
         _expected_redirect=url_for(
-            '.view_broadcast_message',
+            '.view_current_broadcast',
             service_id=SERVICE_ONE_ID,
             broadcast_message_id=fake_uuid,
             _external=True,
@@ -1513,15 +1517,20 @@ def test_cant_reject_broadcast_in_wrong_state(
     assert mock_update_broadcast_message_status.called is False
 
 
+@pytest.mark.parametrize('endpoint', (
+    '.view_current_broadcast',
+    '.view_previous_broadcast',
+))
 def test_no_view_page_for_draft(
     client_request,
     service_one,
     mock_get_draft_broadcast_message,
     fake_uuid,
+    endpoint,
 ):
     service_one['permissions'] += ['broadcast']
     client_request.get(
-        '.view_broadcast_message',
+        endpoint,
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
         _expected_status=404,
@@ -1574,7 +1583,7 @@ def test_confirm_cancel_broadcast(
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
         _expected_redirect=url_for(
-            '.view_broadcast_message',
+            '.view_previous_broadcast',
             service_id=SERVICE_ONE_ID,
             broadcast_message_id=fake_uuid,
             _external=True,
@@ -1602,7 +1611,7 @@ def test_cant_cancel_broadcast_in_a_different_state(
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
         _expected_redirect=url_for(
-            '.view_broadcast_message',
+            '.view_current_broadcast',
             service_id=SERVICE_ONE_ID,
             broadcast_message_id=fake_uuid,
             _external=True,
