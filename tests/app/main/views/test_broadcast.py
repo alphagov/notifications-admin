@@ -1036,8 +1036,8 @@ def test_start_broadcasting(
     )
 
 
-@pytest.mark.parametrize('extra_fields, expected_paragraphs', (
-    ({
+@pytest.mark.parametrize('endpoint, extra_fields, expected_paragraphs', (
+    ('.view_current_broadcast', {
         'status': 'broadcasting',
         'finishes_at': '2020-02-23T23:23:23.000000',
     }, [
@@ -1045,7 +1045,7 @@ def test_start_broadcasting(
         'Prepared by Alice and approved by Bob.',
         'Broadcasting stops tomorrow at 11:23pm.'
     ]),
-    ({
+    ('.view_previous_broadcast', {
         'status': 'broadcasting',
         'finishes_at': '2020-02-22T22:20:20.000000',  # 2 mins before now()
     }, [
@@ -1053,7 +1053,7 @@ def test_start_broadcasting(
         'Prepared by Alice and approved by Bob.',
         'Finished broadcasting today at 10:20pm.'
     ]),
-    ({
+    ('.view_previous_broadcast', {
         'status': 'completed',
         'finishes_at': '2020-02-21T21:21:21.000000',
     }, [
@@ -1061,7 +1061,7 @@ def test_start_broadcasting(
         'Prepared by Alice and approved by Bob.',
         'Finished broadcasting yesterday at 9:21pm.',
     ]),
-    ({
+    ('.view_previous_broadcast', {
         'status': 'cancelled',
         'cancelled_by_id': sample_uuid,
         'cancelled_at': '2020-02-21T21:21:21.000000',
@@ -1079,6 +1079,7 @@ def test_view_broadcast_message_page(
     active_user_with_permissions,
     mock_get_broadcast_template,
     fake_uuid,
+    endpoint,
     extra_fields,
     expected_paragraphs,
 ):
@@ -1103,7 +1104,7 @@ def test_view_broadcast_message_page(
     service_one['permissions'] += ['broadcast']
 
     page = client_request.get(
-        '.view_current_broadcast',
+        endpoint,
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
     )
@@ -1111,6 +1112,74 @@ def test_view_broadcast_message_page(
     assert [
         normalize_spaces(p.text) for p in page.select('main p.govuk-body')
     ] == expected_paragraphs
+
+
+@pytest.mark.parametrize('endpoint', (
+    '.view_current_broadcast',
+    '.view_previous_broadcast',
+))
+@pytest.mark.parametrize('status, expected_highlighted_navigation_item', (
+    (
+        'pending-approval',
+        'Current alerts',
+    ),
+    (
+        'broadcasting',
+        'Current alerts',
+    ),
+    (
+        'completed',
+        'Previous alerts',
+    ),
+    (
+        'cancelled',
+        'Previous alerts',
+    ),
+    (
+        'rejected',
+        'Previous alerts',
+    ),
+))
+@freeze_time('2020-02-22T22:22:22.000000')
+def test_view_broadcast_message_shows_correct_highlighted_navigation(
+    mocker,
+    client_request,
+    service_one,
+    active_user_with_permissions,
+    mock_get_broadcast_template,
+    fake_uuid,
+    endpoint,
+    status,
+    expected_highlighted_navigation_item,
+):
+    mocker.patch(
+        'app.broadcast_message_api_client.get_broadcast_message',
+        return_value=broadcast_message_json(
+            id_=fake_uuid,
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            created_by_id=fake_uuid,
+            approved_by_id=fake_uuid,
+            starts_at='2020-02-20T20:20:20.000000',
+            finishes_at='2021-12-21T21:21:21.000000',
+            cancelled_at='2021-01-01T01:01:01.000000',
+            status=status,
+        ),
+    )
+    service_one['permissions'] += ['broadcast']
+
+    page = client_request.get(
+        endpoint,
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+        _follow_redirects=True
+    )
+
+    assert normalize_spaces(
+        page.select_one('.navigation .selected').text
+    ) == (
+        expected_highlighted_navigation_item
+    )
 
 
 @freeze_time('2020-02-22T22:22:22.000000')

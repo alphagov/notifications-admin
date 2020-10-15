@@ -292,17 +292,39 @@ def view_broadcast(service_id, broadcast_message_id):
     )
     if broadcast_message.status == 'draft':
         abort(404)
+
+    if (
+        broadcast_message.status in {'completed', 'cancelled', 'rejected'}
+        and request.endpoint != 'main.view_previous_broadcast'
+    ):
+        return redirect(url_for(
+            '.view_previous_broadcast',
+            service_id=current_service.id,
+            broadcast_message_id=broadcast_message.id,
+        ))
+
+    if (
+        broadcast_message.status in {'broadcasting', 'pending-approval'}
+        and request.endpoint != 'main.view_current_broadcast'
+    ):
+        return redirect(url_for(
+            '.view_current_broadcast',
+            service_id=current_service.id,
+            broadcast_message_id=broadcast_message.id,
+        ))
+
+    back_link_endpoint = {
+        'main.view_current_broadcast': '.broadcast_dashboard',
+        'main.view_previous_broadcast': '.broadcast_dashboard_previous',
+    }[request.endpoint]
+
     return render_template(
         'views/broadcast/view-message.html',
         broadcast_message=broadcast_message,
-        back_link={
-            'main.view_current_broadcast': url_for(
-                '.broadcast_dashboard', service_id=current_service.id
-            ),
-            'main.view_previous_broadcast': url_for(
-                '.broadcast_dashboard_previous', service_id=current_service.id
-            ),
-        }[request.endpoint],
+        back_link=url_for(
+            back_link_endpoint,
+            service_id=current_service.id,
+        ),
     )
 
 
