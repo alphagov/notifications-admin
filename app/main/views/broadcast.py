@@ -295,6 +295,14 @@ def view_broadcast(service_id, broadcast_message_id):
     return render_template(
         'views/broadcast/view-message.html',
         broadcast_message=broadcast_message,
+        back_link={
+            'main.view_current_broadcast': url_for(
+                '.broadcast_dashboard', service_id=current_service.id
+            ),
+            'main.view_previous_broadcast': url_for(
+                '.broadcast_dashboard_previous', service_id=current_service.id
+            ),
+        }[request.endpoint],
     )
 
 
