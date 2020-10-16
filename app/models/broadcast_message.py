@@ -43,9 +43,9 @@ class BroadcastMessage(JSONModel):
 
     def __lt__(self, other):
         return (
-            self.cancelled_at or self.finishes_at or self.created_at
+            self.starts_at or self.updated_at
         ) < (
-            other.cancelled_at or other.finishes_at or self.created_at
+            other.starts_at or other.updated_at
         )
 
     @classmethod
