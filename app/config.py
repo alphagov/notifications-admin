@@ -59,7 +59,6 @@ class Config(object):
     # updated unless the session is changed - but it's generally refreshed by `save_service_or_org_after_request`
     # every time anyway, except for specific endpoints (png/pdfs generally) where we've disabled that handler.
     SESSION_REFRESH_EACH_REQUEST = False
-    SHOW_STYLEGUIDE = True
     WTF_CSRF_ENABLED = True
     WTF_CSRF_TIME_LIMIT = None
     CSV_UPLOAD_BUCKET_NAME = 'local-notifications-csv-upload'
@@ -152,7 +151,6 @@ class Preview(Config):
 
 
 class Staging(Config):
-    SHOW_STYLEGUIDE = False
     HTTP_PROTOCOL = 'https'
     HEADER_COLOUR = '#6F72AF'  # $mauve
     CSV_UPLOAD_BUCKET_NAME = 'staging-notifications-csv-upload'
@@ -167,7 +165,6 @@ class Staging(Config):
 
 
 class Live(Config):
-    SHOW_STYLEGUIDE = False
     HEADER_COLOUR = '#005EA5'  # $govuk-blue
     HTTP_PROTOCOL = 'https'
     CSV_UPLOAD_BUCKET_NAME = 'live-notifications-csv-upload'

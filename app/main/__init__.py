@@ -35,7 +35,6 @@ from app.main.views import (  # noqa isort:skip
     service_settings,
     sign_in,
     sign_out,
-    styleguide,
     templates,
     two_factor,
     tour,
