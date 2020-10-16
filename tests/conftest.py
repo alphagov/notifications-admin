@@ -4309,21 +4309,39 @@ def mock_get_broadcast_messages(
     def _get(service_id):
         partial_json = partial(
             broadcast_message_json,
-            id_=fake_uuid,
             service_id=service_id,
             template_id=fake_uuid,
             created_by_id=fake_uuid,
         )
         return [
             partial_json(
+                id_=uuid4(),
                 status='draft',
             ),
             partial_json(
+                id_=uuid4(),
                 status='pending-approval',
+                updated_at=(
+                    datetime.utcnow() - timedelta(minutes=30)
+                ).isoformat(),
+                template_name='Half an hour ago',
                 finishes_at=None,
             ),
             partial_json(
+                id_=uuid4(),
+                status='pending-approval',
+                updated_at=(
+                    datetime.utcnow() - timedelta(hours=1, minutes=30)
+                ).isoformat(),
+                template_name='Hour and a half ago',
+                finishes_at=None,
+            ),
+            partial_json(
+                id_=uuid4(),
                 status='broadcasting',
+                updated_at=(
+                    datetime.utcnow()
+                ).isoformat(),
                 starts_at=(
                     datetime.utcnow()
                 ).isoformat(),
@@ -4332,6 +4350,20 @@ def mock_get_broadcast_messages(
                 ).isoformat(),
             ),
             partial_json(
+                id_=uuid4(),
+                status='broadcasting',
+                updated_at=(
+                    datetime.utcnow() - timedelta(hours=1)
+                ).isoformat(),
+                starts_at=(
+                    datetime.utcnow() - timedelta(hours=1)
+                ).isoformat(),
+                finishes_at=(
+                    datetime.utcnow() + timedelta(hours=24)
+                ).isoformat(),
+            ),
+            partial_json(
+                id_=uuid4(),
                 status='completed',
                 starts_at=(
                     datetime.utcnow() - timedelta(hours=12)
@@ -4341,6 +4373,7 @@ def mock_get_broadcast_messages(
                 ).isoformat(),
             ),
             partial_json(
+                id_=uuid4(),
                 status='cancelled',
                 starts_at=(
                     datetime.utcnow() - timedelta(days=1)

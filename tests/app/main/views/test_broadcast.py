@@ -305,8 +305,10 @@ def test_broadcast_dashboard(
     assert [
         normalize_spaces(row.text) for row in page.select('table')[0].select('tbody tr')
     ] == [
+        'Half an hour ago This is a test England Scotland Waiting for approval',
+        'Hour and a half ago This is a test England Scotland Waiting for approval',
         'Example template This is a test England Scotland Live since today at 2:20am',
-        'Example template This is a test England Scotland Waiting for approval',
+        'Example template This is a test England Scotland Live since today at 1:20am',
     ]
 
 
@@ -353,8 +355,8 @@ def test_previous_broadcasts_page(
     assert [
         normalize_spaces(row.text) for row in page.select('table')[0].select('tbody tr')
     ] == [
-        'Example template This is a test England Scotland Broadcast yesterday at 2:20am',
         'Example template This is a test England Scotland Broadcast yesterday at 2:20pm',
+        'Example template This is a test England Scotland Broadcast yesterday at 2:20am',
     ]
 
 
