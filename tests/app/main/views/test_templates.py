@@ -199,6 +199,75 @@ def test_should_show_page_for_choosing_a_template(
     mock_get_template_folders.assert_called_once_with(SERVICE_ONE_ID)
 
 
+def test_should_show_page_of_broadcast_templates(
+    mocker,
+    client_request,
+    service_one,
+    fake_uuid,
+    mock_get_template_folders,
+):
+    service_one['permissions'] += ['broadcast']
+    mocker.patch(
+        'app.service_api_client.get_service_templates',
+        return_value={'data': [
+            template_json(
+                SERVICE_ONE_ID,
+                fake_uuid,
+                type_='broadcast',
+                name='A',
+                content='a' * 40,
+            ),
+            template_json(
+                SERVICE_ONE_ID,
+                fake_uuid,
+                type_='broadcast',
+                name='B',
+                content='b' * 42,
+            ),
+            template_json(
+                SERVICE_ONE_ID,
+                fake_uuid,
+                type_='broadcast',
+                name='C',
+                content='c' * 43,
+            ),
+            template_json(
+                SERVICE_ONE_ID,
+                fake_uuid,
+                type_='broadcast',
+                name='D',
+                # This should be truncated at 40 chars, then have the
+                # trailing space stripped
+                content=('d' * 39) + ' ' + ('d' * 40),
+            ),
+        ]}
+    )
+    page = client_request.get(
+        'main.choose_template',
+        service_id=SERVICE_ONE_ID,
+    )
+    assert [
+        (
+            normalize_spaces(template.select_one('.govuk-link').text),
+            normalize_spaces(template.select_one('.govuk-hint').text),
+        )
+        for template in page.select('.template-list-item')
+    ] == [
+        (
+            'A', 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+        ),
+        (
+            'B', 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
+        ),
+        (
+            'C', 'cccccccccccccccccccccccccccccccccccccccc…',
+        ),
+        (
+            'D', 'ddddddddddddddddddddddddddddddddddddddd…',
+        ),
+    ]
+
+
 def test_choose_template_can_pass_through_an_initial_state_to_templates_and_folders_selection_form(
     client_request,
     mock_get_template_folders,

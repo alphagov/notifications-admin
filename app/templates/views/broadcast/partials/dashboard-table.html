@@ -15,9 +15,14 @@
     {% call row_heading() %}
       <div class="file-list">
         <a class="file-list-filename-large govuk-link govuk-link--no-visited-state" href="{{ url_for('.view_broadcast_message', service_id=current_service.id, broadcast_message_id=item.id) }}">{{ item.template_name }}</a>
-        <span class="file-list-hint-large">
-          To {{ item.initial_area_names|formatted_list(before_each='', after_each='') }}
+        <span class="file-list-hint-large govuk-!-margin-bottom-1">
+          {{ item.content }}
         </span>
+        <ul class="area-list">
+          {% for area in item.areas %}
+            <li class="area-list-item area-list-item--unremoveable">{{ area.name }}</li>
+          {% endfor %}
+        </ul>
       </div>
     {% endcall %}
     {% call field(align='right') %}
