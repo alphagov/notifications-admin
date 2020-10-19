@@ -25,7 +25,6 @@ class Job(JSONModel):
     ALLOWED_PROPERTIES = {
         'id',
         'service',
-        'template',
         'template_version',
         'original_file_name',
         'created_at',

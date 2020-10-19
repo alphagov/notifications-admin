@@ -31,11 +31,9 @@ class Service(JSONModel):
     ALLOWED_PROPERTIES = {
         'active',
         'contact_link',
-        'email_branding',
         'email_from',
         'id',
         'inbound_api',
-        'letter_branding',
         'message_limit',
         'name',
         'prefix_sms',
