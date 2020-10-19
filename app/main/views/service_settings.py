@@ -36,6 +36,7 @@ from app.main.forms import (
     EstimateUsageForm,
     FreeSMSAllowance,
     LinkOrganisationsForm,
+    MessageLimit,
     PreviewBranding,
     RenameServiceForm,
     SearchByNameForm,
@@ -934,6 +935,23 @@ def set_free_sms_allowance(service_id):
 
     return render_template(
         'views/service-settings/set-free-sms-allowance.html',
+        form=form,
+    )
+
+
+@main.route("/services/<uuid:service_id>/service-settings/set-message-limit", methods=['GET', 'POST'])
+@user_is_platform_admin
+def set_message_limit(service_id):
+
+    form = MessageLimit(message_limit=current_service.message_limit)
+
+    if form.validate_on_submit():
+        current_service.update(message_limit=form.message_limit.data)
+
+        return redirect(url_for('.service_settings', service_id=service_id))
+
+    return render_template(
+        'views/service-settings/set-message-limit.html',
         form=form,
     )
 
