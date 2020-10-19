@@ -370,9 +370,19 @@
             {{ edit_field('Change', url_for('.service_set_letter_branding', service_id=current_service.id), suffix='letter branding (admin view)') }}
           {% endcall %}
           {% call row() %}
-            {{ text_field('Data retention')}}
+            {{ text_field('Custom data retention')}}
             {% call field() %}
-                {{ current_service.data_retention | join(', ', attribute='notification_type') }}
+              {% for channel in current_service.data_retention %}
+                {% if loop.first %}
+                  <ul>
+                {% endif %}
+                  <li>{{ channel.notification_type|format_notification_type }} – {{ channel.days_of_retention }} days</li>
+                {% if loop.last %}
+                  </ul>
+                {% endif %}
+              {% else %}
+                <div class="table-field-status-default">Not set</div>
+              {% endfor %}
             {% endcall %}
             {{ edit_field('Change', url_for('.data_retention', service_id=current_service.id), suffix='data retention') }}
           {% endcall %}
