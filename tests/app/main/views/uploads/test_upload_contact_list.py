@@ -192,6 +192,11 @@ def test_upload_csv_file_shows_error_banner(
         'app.models.contact_list.s3download',
         return_value=file_contents,
     )
+    mock_set_metadata = mocker.patch('app.models.contact_list.set_metadata_on_csv_upload')
+    mock_get_metadata = mocker.patch(
+        'app.models.contact_list.get_csv_metadata',
+        return_value={'original_file_name': 'invalid.csv'},
+    )
 
     page = client_request.post(
         'main.upload_contact_list',
@@ -205,7 +210,18 @@ def test_upload_csv_file_shows_error_banner(
         ANY,
         bucket='test-contact-list',
     )
+    mock_set_metadata.assert_called_once_with(
+        SERVICE_ONE_ID,
+        fake_uuid,
+        bucket='test-contact-list',
+        original_file_name='invalid.csv'
+    )
     mock_download.assert_called_once_with(
+        SERVICE_ONE_ID,
+        fake_uuid,
+        bucket='test-contact-list',
+    )
+    mock_get_metadata.assert_called_once_with(
         SERVICE_ONE_ID,
         fake_uuid,
         bucket='test-contact-list',
@@ -232,9 +248,12 @@ def test_upload_csv_file_shows_error_banner_for_too_many_rows(
     fake_uuid,
 ):
     mocker.patch('app.models.contact_list.s3upload', return_value=fake_uuid)
+    mocker.patch('app.models.contact_list.set_metadata_on_csv_upload')
     mocker.patch('app.models.contact_list.s3download', return_value='\n'.join(
         ['phone number'] + (['07700900986'] * 100_001)
     ))
+    mocker.patch('app.models.contact_list.get_csv_metadata',
+                 return_value={'original_file_name': 'invalid.csv'})
 
     page = client_request.post(
         'main.upload_contact_list',
@@ -254,6 +273,37 @@ def test_upload_csv_file_shows_error_banner_for_too_many_rows(
     )
 
 
+def test_upload_csv_file_sanitises_and_truncates_file_name_in_metadata(
+    client_request,
+    mocker,
+    mock_s3_upload,
+    mock_get_job_doesnt_exist,
+    mock_get_users_by_service,
+    fake_uuid,
+):
+    mocker.patch('app.models.contact_list.s3upload', return_value=fake_uuid)
+    mock_set_metadata = mocker.patch('app.models.contact_list.set_metadata_on_csv_upload')
+    mocker.patch('app.models.contact_list.s3download', return_value='\n'.join(
+        ['phone number'] + (['07700900986'] * 100_001)
+    ))
+
+    filename = f"😁{'a' * 2000}.csv"
+    mocker.patch('app.models.contact_list.get_csv_metadata',
+                 return_value={'original_file_name': filename})
+    client_request.post(
+        'main.upload_contact_list',
+        service_id=SERVICE_ONE_ID,
+        _data={'file': (BytesIO(''.encode('utf-8')), filename)},
+        _follow_redirects=False
+    )
+
+    assert len(
+        mock_set_metadata.call_args_list[0][1]['original_file_name']
+    ) < len(filename)
+
+    assert mock_set_metadata.call_args_list[0][1]['original_file_name'].startswith('?')
+
+
 def test_upload_csv_shows_trial_mode_error(
     client_request,
     mock_get_users_by_service,
@@ -266,6 +316,8 @@ def test_upload_csv_shows_trial_mode_error(
         'phone number\n'
         '07900900321'  # Not in team
     ))
+    mocker.patch('app.models.contact_list.get_csv_metadata',
+                 return_value={'original_file_name': 'invalid.csv'})
 
     page = client_request.get(
         'main.check_contact_list',
@@ -294,6 +346,66 @@ def test_upload_csv_shows_ok_page(
     mocker.patch('app.models.contact_list.s3download', return_value='\n'.join(
         ['email address'] + ['test@example.com'] * 51
     ))
+    mocker.patch('app.models.contact_list.get_csv_metadata',
+                 return_value={'original_file_name': 'good times.xlsx'})
+    mock_metadata_set = mocker.patch('app.models.contact_list.set_metadata_on_csv_upload')
+
+    page = client_request.get(
+        'main.check_contact_list',
+        service_id=SERVICE_ONE_ID,
+        upload_id=fake_uuid,
+        _test_page_title=False,
+    )
+
+    mock_metadata_set.assert_called_once_with(
+        SERVICE_ONE_ID,
+        fake_uuid,
+        bucket='test-contact-list',
+        row_count=51,
+        original_file_name='good times.xlsx',
+        template_type='email',
+        valid=True,
+    )
+
+    assert normalize_spaces(page.select_one('h1').text) == (
+        'good times.xlsx'
+    )
+    assert normalize_spaces(page.select_one('main p').text) == (
+        '51 email addresses found'
+    )
+    assert page.select_one('form')['action'] == url_for(
+        'main.save_contact_list',
+        service_id=SERVICE_ONE_ID,
+        upload_id=fake_uuid,
+    )
+
+    assert normalize_spaces(page.select_one('form [type=submit]').text) == (
+        'Save contact list'
+    )
+    assert normalize_spaces(page.select_one('thead').text) == (
+        'Row in file 1 email address'
+    )
+    assert len(page.select('tbody tr')) == 50
+    assert normalize_spaces(page.select_one('tbody tr').text) == (
+        '2 test@example.com'
+    )
+    assert normalize_spaces(page.select_one('.table-show-more-link').text) == (
+        'Only showing the first 50 rows'
+    )
+
+
+def test_upload_csv_shows_ok_page_when_filename_is_in_query_string(
+    client_request,
+    mock_get_live_service,
+    mock_get_users_by_service,
+    mock_get_job_doesnt_exist,
+    fake_uuid,
+    mocker
+):
+    mocker.patch('app.models.contact_list.s3download', return_value='\n'.join(
+        ['email address'] + ['test@example.com'] * 51
+    ))
+    mocker.patch('app.models.contact_list.get_csv_metadata', return_value={})
     mock_metadata_set = mocker.patch('app.models.contact_list.set_metadata_on_csv_upload')
 
     page = client_request.get(
