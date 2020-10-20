@@ -14,19 +14,17 @@
 
   {{ page_header("Preview", back_link=url_for('.preview_broadcast_areas', service_id=current_service.id, broadcast_message_id=broadcast_message.id)) }}
 
-  {% for area in broadcast_message.areas %}
-    {% if loop.first %}
-      <ul class="area-list">
-    {% endif %}
+  {{ broadcast_message.template|string }}
+
+  <div class="govuk-!-margin-bottom-3">
+    <ul class="area-list">
+      {% for area in broadcast_message.areas %}
         <li class="area-list-item area-list-item--unremoveable">
           {{ area.name }}
         </li>
-    {% if loop.last %}
-      </ul>
-    {% endif %}
-  {% endfor %}
-
-  {{ broadcast_message.template|string }}
+      {% endfor %}
+    </ul>
+  </div>
 
   {% call form_wrapper() %}
     {{ page_footer('Submit for approval') }}

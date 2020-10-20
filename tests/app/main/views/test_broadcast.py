@@ -302,7 +302,7 @@ def test_broadcast_dashboard(
     assert [
         normalize_spaces(row.text) for row in page.select('table')[0].select('tbody tr')
     ] == [
-        'Example template This is a test England Scotland Live until tomorrow at 2:20am',
+        'Example template This is a test England Scotland Live since today at 2:20am',
     ]
 
     assert normalize_spaces(page.select('main h2')[1].text) == (
@@ -338,7 +338,7 @@ def test_broadcast_dashboard_json(
     }
 
     assert 'Prepared by Test User' in json_response['pending_approval_broadcasts']
-    assert 'Live until tomorrow at 2:20am' in json_response['live_broadcasts']
+    assert 'Live since today at 2:20am' in json_response['live_broadcasts']
 
 
 @freeze_time('2020-02-20 02:20')
@@ -361,8 +361,8 @@ def test_previous_broadcasts_page(
     assert [
         normalize_spaces(row.text) for row in page.select('table')[0].select('tbody tr')
     ] == [
-        'Example template This is a test England Scotland Stopped 10 February at 2:20am',
-        'Example template This is a test England Scotland Finished yesterday at 8:20pm',
+        'Example template This is a test England Scotland Broadcast yesterday at 2:20am',
+        'Example template This is a test England Scotland Broadcast yesterday at 2:20pm',
     ]
 
 
@@ -1037,24 +1037,24 @@ def test_start_broadcasting(
         'status': 'broadcasting',
         'finishes_at': '2020-02-23T23:23:23.000000',
     }, [
-        'Created by Alice and approved by Bob.',
-        'Started broadcasting on 20 February at 8:20pm.',
-        'Live until tomorrow at 11:23pm Stop broadcast early',
+        'Live since 20 February at 8:20pm Stop broadcasting',
+        'Prepared by Alice and approved by Bob.',
+        'Broadcasting stops tomorrow at 11:23pm.'
     ]),
     ({
         'status': 'broadcasting',
         'finishes_at': '2020-02-22T22:20:20.000000',  # 2 mins before now()
     }, [
-        'Created by Alice and approved by Bob.',
-        'Started broadcasting on 20 February at 8:20pm.',
-        'Finished broadcasting today at 10:20pm.',
+        'Broadcast on 20 February at 8:20pm.',
+        'Prepared by Alice and approved by Bob.',
+        'Finished broadcasting today at 10:20pm.'
     ]),
     ({
-        'status': 'finished',
+        'status': 'completed',
         'finishes_at': '2020-02-21T21:21:21.000000',
     }, [
-        'Created by Alice and approved by Bob.',
-        'Started broadcasting on 20 February at 8:20pm.',
+        'Broadcast on 20 February at 8:20pm.',
+        'Prepared by Alice and approved by Bob.',
         'Finished broadcasting yesterday at 9:21pm.',
     ]),
     ({
@@ -1062,8 +1062,8 @@ def test_start_broadcasting(
         'cancelled_by_id': sample_uuid,
         'cancelled_at': '2020-02-21T21:21:21.000000',
     }, [
-        'Created by Alice and approved by Bob.',
-        'Started broadcasting on 20 February at 8:20pm.',
+        'Broadcast on 20 February at 8:20pm.',
+        'Prepared by Alice and approved by Bob.',
         'Stopped by Carol yesterday at 9:21pm.',
     ]),
 ))
