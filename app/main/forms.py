@@ -1174,6 +1174,15 @@ class FreeSMSAllowance(StripWhitespaceForm):
     )
 
 
+class MessageLimit(StripWhitespaceForm):
+    message_limit = GovukIntegerField(
+        'Number of messages the service is allowed to send each day',
+        validators=[
+            DataRequired(message='Cannot be empty')
+        ]
+    )
+
+
 class ConfirmPasswordForm(StripWhitespaceForm):
     def __init__(self, validate_password_func, *args, **kwargs):
         self.validate_password_func = validate_password_func

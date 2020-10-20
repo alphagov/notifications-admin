@@ -101,7 +101,8 @@ def mock_get_service_settings_page_common(
         'Live Off Change service status',
         'Count in list of live services Yes Change if service is counted in list of live services',
         'Organisation Test organisation Central government Change organisation for service',
-        'Free text message allowance 250,000 Change free text message allowance',
+        'Message limit 1,000 per day Change daily message limit',
+        'Free text message allowance 250,000 per year Change free text message allowance',
         'Email branding GOV.UK Change email branding (admin view)',
         'Letter branding Not set Change letter branding (admin view)',
         'Custom data retention Email – 7 days Change data retention',
@@ -3577,6 +3578,7 @@ def test_should_set_branding_and_organisations(
 @pytest.mark.parametrize('method', ['get', 'post'])
 @pytest.mark.parametrize('endpoint', [
     'main.set_free_sms_allowance',
+    'main.set_message_limit',
 ])
 def test_organisation_type_pages_are_platform_admin_only(
     client_request,
@@ -3635,6 +3637,54 @@ def test_should_set_sms_allowance(
     mock_create_or_update_free_sms_fragment_limit.assert_called_with(
         SERVICE_ONE_ID,
         expected_api_argument
+    )
+
+
+def test_should_show_page_to_set_message_limit(
+    platform_admin_client,
+):
+    response = platform_admin_client.get(url_for(
+        'main.set_message_limit',
+        service_id=SERVICE_ONE_ID
+    ))
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    assert normalize_spaces(page.select_one('label').text) == (
+        'Number of messages the service is allowed to send each day'
+    )
+    assert normalize_spaces(page.select_one('input[type=text]')['value']) == (
+        '1000'
+    )
+
+
+@pytest.mark.parametrize('new_limit, expected_api_argument', [
+    ('1', 1),
+    ('250000', 250000),
+    pytest.param('foo', 'foo', marks=pytest.mark.xfail),
+])
+def test_should_set_message_limit(
+    platform_admin_client,
+    new_limit,
+    expected_api_argument,
+    mock_update_service,
+):
+
+    response = platform_admin_client.post(
+        url_for(
+            'main.set_message_limit',
+            service_id=SERVICE_ONE_ID,
+        ),
+        data={
+            'message_limit': new_limit,
+        },
+    )
+    assert response.status_code == 302
+    assert response.location == url_for('main.service_settings', service_id=SERVICE_ONE_ID, _external=True)
+
+    mock_update_service.assert_called_once_with(
+        SERVICE_ONE_ID,
+        message_limit=expected_api_argument,
     )
 
 
