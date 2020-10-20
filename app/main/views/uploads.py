@@ -341,7 +341,7 @@ def view_letter_upload_as_preview(service_id, file_id):
 @main.route("/services/<uuid:service_id>/upload-letter/send/<uuid:file_id>", methods=['POST'])
 @user_has_permissions('send_messages', restrict_admin_usage=True)
 def send_uploaded_letter(service_id, file_id):
-    if not (current_service.has_permission('letter') and current_service.has_permission('upload_letters')):
+    if not current_service.has_permission('letter'):
         abort(403)
 
     metadata = get_letter_metadata(service_id, file_id)

@@ -120,9 +120,6 @@ def test_service_set_permission(
     ({'permissions': ['sms']}, '.service_set_inbound_number', {},
         'Receive inbound SMS Off Change your settings for Receive inbound SMS'),
     ({'permissions': ['letter']},
-     '.service_set_permission', {'permission': 'upload_letters'},
-        'Uploading letters Off Change your settings for Uploading letters'),
-    ({'permissions': ['letter']},
      '.service_set_permission', {'permission': 'international_letters'},
         'Send international letters Off Change your settings for Send international letters'),
 ])
