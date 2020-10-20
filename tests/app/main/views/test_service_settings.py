@@ -104,7 +104,7 @@ def mock_get_service_settings_page_common(
         'Free text message allowance 250,000 Change free text message allowance',
         'Email branding GOV.UK Change email branding (admin view)',
         'Letter branding Not set Change letter branding (admin view)',
-        'Data retention email Change data retention',
+        'Custom data retention Email – 7 days Change data retention',
         'Receive inbound SMS Off Change your settings for Receive inbound SMS',
         'Email authentication Off Change your settings for Email authentication',
         'Send cell broadcasts Off Change your settings for Send cell broadcasts',
@@ -5029,7 +5029,7 @@ def test_show_service_data_retention(
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     rows = page.select('tbody tr')
     assert len(rows) == 1
-    assert normalize_spaces(rows[0].text) == 'Email 5 Change'
+    assert normalize_spaces(rows[0].text) == 'Email 5 days Change'
 
 
 def test_view_add_service_data_retention(
