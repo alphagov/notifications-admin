@@ -10,7 +10,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         templates_for_service = self.get_service_templates(service_id)['data']
         if templates_for_service:
             redis_client.delete(*[
-                f"template-{x['id']}-version-None"
+                f"service-{service_id}-template-{x['id']}-version-None"
                 for x in templates_for_service
             ])
 

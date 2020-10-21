@@ -550,5 +550,5 @@ def test_client_deletes_service_template_cache_when_service_is_updated(
     templates_to_delete = mock_redis_delete.call_args_list[0][0]
     assert len(templates_to_delete) == 6
     for template_key in templates_to_delete:
-        assert template_key.startswith('template-')
+        assert template_key.startswith('service-{}-template'.format(SERVICE_ONE_ID))
         assert template_key.endswith('version-None')
