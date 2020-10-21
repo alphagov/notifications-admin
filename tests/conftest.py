@@ -2400,6 +2400,14 @@ def mock_s3_download(mocker):
 
 
 @pytest.fixture(scope='function')
+def mock_s3_get_metadata(mocker):
+    def _get_metadata(service_id, upload_id):
+        return {'original_file_name': 'example.csv'}
+
+    return mocker.patch('app.main.views.send.get_csv_metadata', side_effect=_get_metadata)
+
+
+@pytest.fixture(scope='function')
 def mock_s3_set_metadata(mocker):
     return mocker.patch('app.main.views.send.set_metadata_on_csv_upload')
 

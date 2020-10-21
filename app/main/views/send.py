@@ -45,6 +45,7 @@ from app.main.forms import (
 from app.models.contact_list import ContactList, ContactListsAlphabetical
 from app.models.user import Users
 from app.s3_client.s3_csv_client import (
+    get_csv_metadata,
     s3download,
     s3upload,
     set_metadata_on_csv_upload,
@@ -575,7 +576,6 @@ def send_from_contact_list(service_id, template_id, contact_list_id):
         service_id=current_service.id,
         template_id=template_id,
         upload_id=contact_list.copy_to_uploads(),
-        original_file_name=contact_list.original_file_name,
         contact_list_id=contact_list.id,
     ))
 
@@ -660,6 +660,10 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
         abort(404)
 
     page_count = get_page_count_for_letter(db_template, template.values)
+    # TODO: stop checking the request.args for original_file_name once this change has been deployed for a
+    # while and we are confident it's only coming from metadata
+    metadata = get_csv_metadata(service_id, upload_id)
+    original_file_name = metadata.get('original_file_name', request.args.get('original_file_name', ''))
 
     return dict(
         recipients=recipients,
@@ -668,7 +672,7 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
         row_errors=get_errors_for_csv(recipients, template.template_type),
         count_of_recipients=len(recipients),
         count_of_displayed_recipients=len(list(recipients.displayed_rows)),
-        original_file_name=request.args.get('original_file_name', ''),
+        original_file_name=original_file_name,
         upload_id=upload_id,
         form=CsvUploadForm(),
         remaining_messages=remaining_messages,
@@ -681,7 +685,7 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
         first_recipient_column=recipients.recipient_column_headers[0],
         preview_row=preview_row,
         sent_previously=job_api_client.has_sent_previously(
-            service_id, template.id, db_template['version'], request.args.get('original_file_name', '')
+            service_id, template.id, db_template['version'], original_file_name
         ),
         letter_too_long=is_letter_too_long(page_count),
         letter_max_pages=LETTER_MAX_PAGE_COUNT,

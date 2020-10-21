@@ -442,6 +442,7 @@ def test_upload_csv_file_with_errors_shows_check_page_with_errors(
     service_one,
     mocker,
     mock_get_service_template_with_placeholders,
+    mock_s3_get_metadata,
     mock_s3_upload,
     mock_get_users_by_service,
     mock_get_service_statistics,
@@ -461,7 +462,7 @@ def test_upload_csv_file_with_errors_shows_check_page_with_errors(
 
     response = logged_in_client.post(
         url_for('main.send_messages', service_id=service_one['id'], template_id=fake_uuid),
-        data={'file': (BytesIO(''.encode('utf-8')), 'invalid.csv')},
+        data={'file': (BytesIO(''.encode('utf-8')), 'example.csv')},
         content_type='multipart/form-data',
         follow_redirects=True
     )
@@ -471,7 +472,7 @@ def test_upload_csv_file_with_errors_shows_check_page_with_errors(
 
     assert response.status_code == 200
     content = response.get_data(as_text=True)
-    assert 'There’s a problem with invalid.csv' in content
+    assert 'There’s a problem with example.csv' in content
     assert '+447700900986' in content
     assert 'Missing' in content
     assert 'Upload your file again' in content
@@ -482,6 +483,7 @@ def test_upload_csv_file_with_empty_message_shows_check_page_with_errors(
     service_one,
     mocker,
     mock_get_empty_service_template_with_optional_placeholder,
+    mock_s3_get_metadata,
     mock_s3_upload,
     mock_get_users_by_service,
     mock_get_service_statistics,
@@ -501,7 +503,7 @@ def test_upload_csv_file_with_empty_message_shows_check_page_with_errors(
 
     response = logged_in_client.post(
         url_for('main.send_messages', service_id=service_one['id'], template_id=fake_uuid),
-        data={'file': (BytesIO(''.encode('utf-8')), 'invalid.csv')},
+        data={'file': (BytesIO(''.encode('utf-8')), 'example.csv')},
         content_type='multipart/form-data',
         follow_redirects=True
     )
@@ -514,7 +516,7 @@ def test_upload_csv_file_with_empty_message_shows_check_page_with_errors(
     assert normalize_spaces(
         page.select_one('.banner-dangerous').text
     ) == (
-        'There’s a problem with invalid.csv '
+        'There’s a problem with example.csv '
         'You need to check you have content for the empty message in 1 row.'
     )
     assert [
@@ -537,6 +539,7 @@ def test_upload_csv_file_with_very_long_placeholder_shows_check_page_with_errors
     service_one,
     mocker,
     mock_get_service_template_with_placeholders,
+    mock_s3_get_metadata,
     mock_s3_upload,
     mock_get_users_by_service,
     mock_get_service_statistics,
@@ -556,7 +559,7 @@ def test_upload_csv_file_with_very_long_placeholder_shows_check_page_with_errors
 
     response = logged_in_client.post(
         url_for('main.send_messages', service_id=service_one['id'], template_id=fake_uuid),
-        data={'file': (BytesIO(''.encode('utf-8')), 'invalid.csv')},
+        data={'file': (BytesIO(''.encode('utf-8')), 'example.csv')},
         content_type='multipart/form-data',
         follow_redirects=True
     )
@@ -569,7 +572,7 @@ def test_upload_csv_file_with_very_long_placeholder_shows_check_page_with_errors
     assert normalize_spaces(
         page.select_one('.banner-dangerous').text
     ) == (
-        'There’s a problem with invalid.csv '
+        'There’s a problem with example.csv '
         'You need to shorten the messages in 2 rows.'
     )
     assert [
@@ -594,6 +597,7 @@ def test_upload_csv_file_with_bad_postal_address_shows_check_page_with_errors(
     service_one,
     mocker,
     mock_get_service_letter_template,
+    mock_s3_get_metadata,
     mock_s3_upload,
     mock_get_users_by_service,
     mock_get_service_statistics,
@@ -618,7 +622,7 @@ def test_upload_csv_file_with_bad_postal_address_shows_check_page_with_errors(
 
     response = logged_in_client.post(
         url_for('main.send_messages', service_id=service_one['id'], template_id=fake_uuid),
-        data={'file': (BytesIO(''.encode('utf-8')), 'invalid.csv')},
+        data={'file': (BytesIO(''.encode('utf-8')), 'example.csv')},
         content_type='multipart/form-data',
         follow_redirects=True
     )
@@ -628,7 +632,7 @@ def test_upload_csv_file_with_bad_postal_address_shows_check_page_with_errors(
     assert normalize_spaces(
         page.select_one('.banner-dangerous').text
     ) == (
-        'There’s a problem with invalid.csv '
+        'There’s a problem with example.csv '
         'You need to fix 5 addresses.'
     )
     assert [
@@ -656,6 +660,7 @@ def test_upload_csv_file_with_international_letters_permission_shows_appropriate
     service_one,
     mocker,
     mock_get_service_letter_template,
+    mock_s3_get_metadata,
     mock_s3_upload,
     mock_get_users_by_service,
     mock_get_service_statistics,
@@ -678,7 +683,7 @@ def test_upload_csv_file_with_international_letters_permission_shows_appropriate
 
     response = logged_in_client.post(
         url_for('main.send_messages', service_id=service_one['id'], template_id=fake_uuid),
-        data={'file': (BytesIO(''.encode('utf-8')), 'invalid.csv')},
+        data={'file': (BytesIO(''.encode('utf-8')), 'example.csv')},
         content_type='multipart/form-data',
         follow_redirects=True
     )
@@ -688,7 +693,7 @@ def test_upload_csv_file_with_international_letters_permission_shows_appropriate
     assert normalize_spaces(
         page.select_one('.banner-dangerous').text
     ) == (
-        'There’s a problem with invalid.csv '
+        'There’s a problem with example.csv '
         'You need to fix 2 addresses.'
     )
     assert [
@@ -711,6 +716,7 @@ def test_upload_csv_file_with_international_letters_permission_shows_correct_pos
     service_one,
     mocker,
     mock_get_service_letter_template,
+    mock_s3_get_metadata,
     mock_s3_upload,
     mock_get_users_by_service,
     mock_get_service_statistics,
@@ -807,7 +813,7 @@ def test_upload_csv_file_with_international_letters_permission_shows_correct_pos
             +447700900986, example
         """,
         (
-            'There’s a problem with invalid.csv '
+            'There’s a problem with example.csv '
             'You need to enter missing data in 1 row.'
         )
     ),
@@ -819,7 +825,7 @@ def test_upload_csv_file_with_international_letters_permission_shows_correct_pos
             +447700900986, example
         """,
         (
-            'There’s a problem with invalid.csv '
+            'There’s a problem with example.csv '
             'You need to enter missing data in 1 row.'
         )
     ),
@@ -828,6 +834,7 @@ def test_upload_csv_file_with_missing_columns_shows_error(
     client_request,
     mocker,
     mock_get_service_template_with_placeholders,
+    mock_s3_get_metadata,
     mock_s3_upload,
     mock_get_users_by_service,
     mock_get_service_statistics,
@@ -843,7 +850,7 @@ def test_upload_csv_file_with_missing_columns_shows_error(
 
     page = client_request.post(
         'main.send_messages', service_id=service_one['id'], template_id=fake_uuid,
-        _data={'file': (BytesIO(''.encode('utf-8')), 'invalid.csv')},
+        _data={'file': (BytesIO(''.encode('utf-8')), 'example.csv')},
         _follow_redirects=True,
     )
 
@@ -922,6 +929,7 @@ def test_upload_valid_csv_shows_preview_and_table(
     mock_get_service_statistics,
     mock_get_job_doesnt_exist,
     mock_get_jobs,
+    mock_s3_get_metadata,
     mock_s3_set_metadata,
     fake_uuid,
     extra_args,
@@ -947,7 +955,6 @@ def test_upload_valid_csv_shows_preview_and_table(
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
         upload_id=fake_uuid,
-        original_file_name='example.csv',
         **extra_args
     )
 
@@ -1034,6 +1041,7 @@ def test_upload_valid_csv_only_sets_meta_if_filename_known(
     mock_get_service_statistics,
     mock_get_job_doesnt_exist,
     mock_get_jobs,
+    mock_s3_get_metadata,
     mock_s3_set_metadata,
     mock_template_preview,
     fake_uuid,
@@ -1085,12 +1093,16 @@ def test_file_name_truncated_to_fit_in_s3_metadata(
 
     file_name = 'ü😁' * 2000
 
+    mocker.patch(
+        'app.main.views.send.get_csv_metadata',
+        return_value={'original_file_name': file_name},
+    )
+
     client_request.get(
         'main.check_messages',
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
         upload_id=fake_uuid,
-        original_file_name=file_name,
     )
     assert sys.getsizeof(
         file_name.encode('utf-8')
@@ -1100,6 +1112,50 @@ def test_file_name_truncated_to_fit_in_s3_metadata(
         '{}{}'.format(key, value) for key, value in
         mock_s3_set_metadata.call_args_list[0][1].items()
     )).encode('utf-8')) == 1726
+
+
+def test_file_name_is_taken_from_query_string_if_not_in_metadata(
+    client_request,
+    mocker,
+    mock_get_live_service,
+    mock_get_service_template_with_placeholders,
+    mock_get_users_by_service,
+    mock_get_service_statistics,
+    mock_get_job_doesnt_exist,
+    mock_get_jobs,
+    mock_s3_set_metadata,
+    fake_uuid,
+):
+
+    with client_request.session_transaction() as session:
+        session['file_uploads'] = {
+            fake_uuid: {'template_id': fake_uuid}
+        }
+
+    mocker.patch('app.main.views.send.s3download', return_value="""
+        phone number,name,thing,thing,thing
+        07700900001, A,   foo,  foo,  foo
+    """)
+    mocker.patch(
+        'app.main.views.send.get_csv_metadata',
+        return_value={},
+    )
+
+    client_request.get(
+        'main.check_messages',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        upload_id=fake_uuid,
+        original_file_name='example.csv',
+    )
+    mock_s3_set_metadata.assert_called_once_with(
+        SERVICE_ONE_ID,
+        fake_uuid,
+        notification_count=1,
+        template_id=fake_uuid,
+        valid=True,
+        original_file_name='example.csv',
+    )
 
 
 def test_check_messages_replaces_invalid_characters_in_file_name(
@@ -1126,12 +1182,16 @@ def test_check_messages_replaces_invalid_characters_in_file_name(
 
     file_name = 'ü😁’€'
 
+    mocker.patch(
+        'app.main.views.send.get_csv_metadata',
+        return_value={'original_file_name': file_name},
+    )
+
     client_request.get(
         'main.check_messages',
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
         upload_id=fake_uuid,
-        original_file_name=file_name,
     )
 
     mock_s3_set_metadata.assert_called_once_with(
@@ -1154,6 +1214,7 @@ def test_show_all_columns_if_there_are_duplicate_recipient_columns(
     mock_get_job_doesnt_exist,
     mock_get_jobs,
     fake_uuid,
+    mock_s3_get_metadata,
 ):
 
     with client_request.session_transaction() as session:
@@ -1199,6 +1260,7 @@ def test_404_for_previewing_a_row_out_of_range(
     mock_get_service_statistics,
     mock_get_job_doesnt_exist,
     mock_get_jobs,
+    mock_s3_get_metadata,
     mock_s3_set_metadata,
     fake_uuid,
     row_index,
@@ -2443,6 +2505,7 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(
     mock_get_live_service,
     mock_get_job_doesnt_exist,
     mock_get_jobs,
+    mock_s3_get_metadata,
     mock_s3_set_metadata,
     service_one,
     fake_uuid,
@@ -2459,7 +2522,7 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(
 
     response = logged_in_client.post(
         url_for('main.send_messages', service_id=service_one['id'], template_id=fake_uuid),
-        data={'file': (BytesIO(''.encode('utf-8')), 'valid.csv')},
+        data={'file': (BytesIO(''.encode('utf-8')), 'example.csv')},
         content_type='multipart/form-data',
         follow_redirects=True
     )
@@ -2472,7 +2535,7 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(
         notification_count=53,
         template_id=fake_uuid,
         valid=True,
-        original_file_name='valid.csv',
+        original_file_name='example.csv',
     )
 
     content = response.get_data(as_text=True)
@@ -2494,6 +2557,7 @@ def test_upload_csvfile_with_international_validates(
     api_user_active,
     logged_in_client,
     mock_get_service_template,
+    mock_s3_get_metadata,
     mock_s3_upload,
     mock_has_permissions,
     mock_get_users_by_service,
@@ -2519,7 +2583,7 @@ def test_upload_csvfile_with_international_validates(
 
     response = logged_in_client.post(
         url_for('main.send_messages', service_id=fake_uuid, template_id=fake_uuid),
-        data={'file': (BytesIO(''.encode('utf-8')), 'valid.csv')},
+        data={'file': (BytesIO(''.encode('utf-8')), 'example.csv')},
         content_type='multipart/form-data',
         follow_redirects=True,
     )
@@ -2538,6 +2602,7 @@ def test_job_from_contact_list_knows_where_its_come_from(
     mock_get_service_statistics,
     mock_get_job_doesnt_exist,
     mock_get_jobs,
+    mock_s3_get_metadata,
     mock_s3_set_metadata,
     fake_uuid
 ):
@@ -2563,6 +2628,7 @@ def test_test_message_can_only_be_sent_now(
     mock_get_service_statistics,
     mock_get_job_doesnt_exist,
     mock_get_jobs,
+    mock_s3_get_metadata,
     mock_s3_set_metadata,
     fake_uuid
 ):
@@ -2584,6 +2650,7 @@ def test_letter_can_only_be_sent_now(
     mock_get_service_letter_template,
     mock_get_users_by_service,
     mock_get_service_statistics,
+    mock_s3_get_metadata,
     mock_s3_set_metadata,
     mock_get_job_doesnt_exist,
     mock_get_jobs,
@@ -2621,6 +2688,7 @@ def test_send_button_is_correctly_labelled(
     mock_get_job_doesnt_exist,
     mock_get_jobs,
     fake_uuid,
+    mock_s3_get_metadata,
 ):
     mocker.patch('app.main.views.send.s3download', return_value='\n'.join(
         ['phone_number'] + (['07900900123'] * 1000)
@@ -2784,6 +2852,10 @@ def test_should_show_preview_letter_message(
             ['123 street, abc123'] +
             ['321 avenue, cba321']
         )
+    )
+    mocker.patch(
+        'app.main.views.send.get_csv_metadata',
+        return_value={'original_file_name': f'example.{filetype}'},
     )
     mocked_preview = mocker.patch(
         'app.main.views.send.TemplatePreview.from_utils_template',
@@ -2987,6 +3059,7 @@ def test_check_messages_back_link(
     mock_get_job_doesnt_exist,
     mock_get_jobs,
     mock_s3_download,
+    mock_s3_get_metadata,
     mock_s3_set_metadata,
     fake_uuid,
     mocker,
@@ -3069,8 +3142,8 @@ def test_go_to_dashboard_after_tour_link(
 
 
 @pytest.mark.parametrize('num_requested,expected_msg', [
-    (0, '‘valid.csv’ contains 1,234 phone numbers.'),
-    (1, 'You can still send 49 messages today, but ‘valid.csv’ contains 1,234 phone numbers.')
+    (0, '‘example.csv’ contains 1,234 phone numbers.'),
+    (1, 'You can still send 49 messages today, but ‘example.csv’ contains 1,234 phone numbers.')
 ], ids=['none_sent', 'some_sent'])
 def test_check_messages_shows_too_many_messages_errors(
     mocker,
@@ -3082,7 +3155,8 @@ def test_check_messages_shows_too_many_messages_errors(
     mock_get_jobs,
     fake_uuid,
     num_requested,
-    expected_msg
+    expected_msg,
+    mock_s3_get_metadata
 ):
     # csv with 100 phone numbers
     mocker.patch('app.main.views.send.s3download', return_value=',\n'.join(
@@ -3107,7 +3181,6 @@ def test_check_messages_shows_too_many_messages_errors(
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
         upload_id=fake_uuid,
-        original_file_name='valid.csv',
         _test_page_title=False,
     )
 
@@ -3122,6 +3195,7 @@ def test_check_messages_shows_too_many_messages_errors(
 
 def test_check_messages_shows_trial_mode_error(
     client_request,
+    mock_s3_get_metadata,
     mock_get_users_by_service,
     mock_get_service_template,
     mock_has_permissions,
@@ -3176,6 +3250,7 @@ def test_check_messages_shows_trial_mode_error_for_letters(
     mock_get_service_statistics,
     mock_get_job_doesnt_exist,
     mock_get_jobs,
+    mock_s3_get_metadata,
     mock_s3_set_metadata,
     fake_uuid,
     mocker,
@@ -3240,6 +3315,7 @@ def test_check_messages_does_not_allow_to_send_letter_longer_than_10_pages(
     mock_get_service_statistics,
     mock_get_job_doesnt_exist,
     mock_get_jobs,
+    mock_s3_get_metadata,
     mock_s3_set_metadata,
     fake_uuid,
     mocker,
@@ -3286,6 +3362,7 @@ def test_check_messages_shows_data_errors_before_trial_mode_errors_for_letters(
     mock_get_job_doesnt_exist,
     mock_get_jobs,
     fake_uuid,
+    mock_s3_get_metadata,
 ):
 
     mocker.patch('app.main.views.send.s3download', return_value='\n'.join(
@@ -3303,7 +3380,7 @@ def test_check_messages_shows_data_errors_before_trial_mode_errors_for_letters(
         session['file_uploads'] = {
             fake_uuid: {
                 'template_id': '',
-                'original_file_name': 'example.xlsx',
+                'original_file_name': 'example.csv',
             }
         }
 
@@ -3313,11 +3390,10 @@ def test_check_messages_shows_data_errors_before_trial_mode_errors_for_letters(
         template_id=fake_uuid,
         upload_id=fake_uuid,
         _test_page_title=False,
-        original_file_name='example.xlsx',
     )
 
     assert normalize_spaces(page.select_one('.banner-dangerous').text) == (
-        'There’s a problem with example.xlsx '
+        'There’s a problem with example.csv '
         'You need to fix 2 addresses.'
     )
     assert not page.select('.table-field-index a')
@@ -3345,7 +3421,10 @@ def test_warns_if_file_sent_already(
     mocker.patch('app.main.views.send.s3download', return_value=(
         'phone number,\n07900900321'
     ))
-
+    mocker.patch(
+        'app.main.views.send.get_csv_metadata',
+        return_value={'original_file_name': uploaded_file_name},
+    )
     page = client_request.get(
         'main.check_messages',
         service_id=SERVICE_ONE_ID,
@@ -3375,6 +3454,7 @@ def test_check_messages_column_error_doesnt_show_optional_columns(
     mock_get_service_statistics,
     mock_get_job_doesnt_exist,
     mock_get_jobs,
+    mock_s3_get_metadata,
 ):
 
     mocker.patch('app.main.views.send.s3download', return_value='\n'.join(
@@ -3420,6 +3500,7 @@ def test_check_messages_adds_sender_id_in_session_to_metadata(
     mock_get_service_statistics,
     mock_get_job_doesnt_exist,
     mock_get_jobs,
+    mock_s3_get_metadata,
     mock_s3_set_metadata,
     fake_uuid,
 ):
@@ -3439,7 +3520,6 @@ def test_check_messages_adds_sender_id_in_session_to_metadata(
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
         upload_id=fake_uuid,
-        original_file_name='example.csv',
         _test_page_title=False,
     )
 
@@ -3469,6 +3549,7 @@ def test_letters_from_csv_files_dont_have_download_link(
     mock_get_service_statistics,
     mock_get_job_doesnt_exist,
     mock_get_jobs,
+    mock_s3_get_metadata,
     mock_s3_set_metadata,
     extra_args,
 ):
@@ -3649,6 +3730,7 @@ def test_check_messages_shows_over_max_row_error(
     mock_get_service_statistics,
     mock_get_job_doesnt_exist,
     mock_get_jobs,
+    mock_s3_get_metadata,
     mock_s3_download,
     fake_uuid,
     mocker
@@ -4043,7 +4125,7 @@ def test_send_notification_shows_email_error_in_trial_mode(
 
 @pytest.mark.parametrize('endpoint, extra_args', [
     ('main.check_messages', {
-        'template_id': uuid4(), 'upload_id': uuid4(), 'original_file_name': 'example.csv'
+        'template_id': uuid4(), 'upload_id': uuid4()
     }),
     ('main.send_one_off_step', {
         'template_id': uuid4(), 'step_index': 0
@@ -4058,6 +4140,7 @@ def test_reply_to_is_previewed_if_chosen(
     mocker,
     mock_get_service_email_template,
     mock_s3_download,
+    mock_s3_get_metadata,
     mock_s3_set_metadata,
     mock_get_users_by_service,
     mock_get_service_statistics,
@@ -4110,6 +4193,7 @@ def test_sms_sender_is_previewed(
     mocker,
     mock_get_service_template,
     mock_s3_download,
+    mock_s3_get_metadata,
     mock_s3_set_metadata,
     mock_get_users_by_service,
     mock_get_service_statistics,
@@ -4319,7 +4403,6 @@ def test_send_from_contact_list(
             service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
             upload_id=new_uuid,
-            original_file_name='EmergencyContactList.xls',
             contact_list_id=fake_uuid,
             _external=True,
         )
