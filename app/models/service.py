@@ -37,6 +37,7 @@ class Service(JSONModel):
         'inbound_api',
         'letter_branding',
         'message_limit',
+        'rate_limit',
         'name',
         'prefix_sms',
         'research_mode',

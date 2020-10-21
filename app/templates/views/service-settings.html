@@ -354,6 +354,11 @@
             {{ edit_field('Change', url_for('.link_service_to_organisation', service_id=current_service.id), suffix='organisation for service') }}
           {% endcall %}
           {% call row() %}
+            {{ text_field('Rate limit')}}
+            {{ text_field('{:,} per minute'.format(current_service.rate_limit)) }}
+            {{ edit_field('Change', url_for('.set_rate_limit', service_id=current_service.id), suffix='rate limit') }}
+          {% endcall %}
+          {% call row() %}
             {{ text_field('Message limit')}}
             {{ text_field('{:,} per day'.format(current_service.message_limit)) }}
             {{ edit_field('Change', url_for('.set_message_limit', service_id=current_service.id), suffix='daily message limit') }}
