@@ -107,7 +107,8 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             'consent_to_research',
             'count_as_live',
             'go_live_user',
-            'go_live_at'
+            'go_live_at',
+            'rate_limit',
         }
         if disallowed_attributes:
             raise TypeError('Not allowed to update service attributes: {}'.format(
