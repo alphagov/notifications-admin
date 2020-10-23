@@ -1,4 +1,5 @@
 {% from "components/ajax-block.html" import ajax_block %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% extends "withnav_template.html" %}
 
@@ -10,8 +11,10 @@
 
   <div class="dashboard">
 
+    {{ govukBackLink({ "href": url_for("main.inbox", service_id=current_service.id) }) }}
+
     <div class="bottom-gutter js-stick-at-top-when-scrolling">
-      <h1 class="heading-large">
+      <h1 class="heading-large govuk-!-margin-top-0">
         {{ user_number }}
       </h1>
     </div>
