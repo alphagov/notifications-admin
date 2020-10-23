@@ -34,8 +34,6 @@ $message-type-bottom-spacing: govuk-spacing(4);
     margin: 0;
 
     a {
-      margin-bottom: -1 * govuk-spacing(6);
-      padding-bottom: govuk-spacing(6);
 
       &:hover .message-name-separator:before {
         border-color: $link-hover-colour;
@@ -59,6 +57,7 @@ $message-type-bottom-spacing: govuk-spacing(4);
   }
 
   &-type {
+    position: relative; /* needs to be non-static to have a z-index above the link :before element */
     color: $govuk-secondary-text-colour;
     margin: 0 0 $message-type-bottom-spacing 0;
     padding-left: 0;
