@@ -629,8 +629,7 @@ def test_send_uploaded_letter_sends_letter_and_redirects_to_notification_page(
 
 @pytest.mark.parametrize('permissions', [
     ['email'],
-    ['letter'],
-    ['upload_letters'],
+    ['sms'],
 ])
 def test_send_uploaded_letter_when_service_does_not_have_correct_permissions(
     mocker,
