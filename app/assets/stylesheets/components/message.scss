@@ -114,10 +114,19 @@ $message-type-bottom-spacing: govuk-spacing(4);
           height: 100%;
         }
 
-        &:active::before,
-        &:focus::before {
-          background-color: $govuk-focus-colour;
-          box-shadow: 0px -2px $govuk-focus-colour, 0px 4px $govuk-focus-text-colour;
+        &:active,
+        &:focus {
+
+          &::before {
+            background-color: $govuk-focus-colour;
+            box-shadow: 0px -2px $govuk-focus-colour, 0px 4px $govuk-focus-text-colour;
+          }
+
+          & + .template-list-item-hint,
+          & + .message-type {
+            color: #505A5F; /* TO DO: replace with $govuk-secondary-text-colour when GOVUK Frontend is past 3.x.x */
+          }
+
         }
 
         & + .template-list-item-hint,
