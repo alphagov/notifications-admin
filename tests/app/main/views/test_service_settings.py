@@ -101,6 +101,7 @@ def mock_get_service_settings_page_common(
         'Live Off Change service status',
         'Count in list of live services Yes Change if service is counted in list of live services',
         'Organisation Test organisation Central government Change organisation for service',
+        'Rate limit 3,000 per minute Change rate limit',
         'Message limit 1,000 per day Change daily message limit',
         'Free text message allowance 250,000 per year Change free text message allowance',
         'Email branding GOV.UK Change email branding (admin view)',
@@ -3579,6 +3580,7 @@ def test_should_set_branding_and_organisations(
 @pytest.mark.parametrize('endpoint', [
     'main.set_free_sms_allowance',
     'main.set_message_limit',
+    'main.set_rate_limit',
 ])
 def test_organisation_type_pages_are_platform_admin_only(
     client_request,
@@ -3658,6 +3660,28 @@ def test_should_show_page_to_set_message_limit(
     )
 
 
+def test_should_show_page_to_set_rate_limit(
+    platform_admin_client,
+):
+    response = platform_admin_client.get(url_for(
+        'main.set_rate_limit',
+        service_id=SERVICE_ONE_ID
+    ))
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    assert normalize_spaces(page.select_one('label').text) == (
+        'Number of messages the service can send in a rolling 60 second window'
+    )
+    assert normalize_spaces(page.select_one('input[type=text]')['value']) == (
+        '3000'
+    )
+
+
+@pytest.mark.parametrize('endpoint, field_name', (
+    ('main.set_message_limit', 'message_limit'),
+    ('main.set_rate_limit', 'rate_limit'),
+))
 @pytest.mark.parametrize('new_limit, expected_api_argument', [
     ('1', 1),
     ('250000', 250000),
@@ -3668,15 +3692,17 @@ def test_should_set_message_limit(
     new_limit,
     expected_api_argument,
     mock_update_service,
+    endpoint,
+    field_name,
 ):
 
     response = platform_admin_client.post(
         url_for(
-            'main.set_message_limit',
+            endpoint,
             service_id=SERVICE_ONE_ID,
         ),
         data={
-            'message_limit': new_limit,
+            field_name: new_limit,
         },
     )
     assert response.status_code == 302
@@ -3684,7 +3710,7 @@ def test_should_set_message_limit(
 
     mock_update_service.assert_called_once_with(
         SERVICE_ONE_ID,
-        message_limit=expected_api_argument,
+        **{field_name: expected_api_argument},
     )
 
 

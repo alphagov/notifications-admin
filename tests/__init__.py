@@ -149,6 +149,7 @@ def service_json(
     prefix_sms=True,
     contact_link=None,
     organisation_id=None,
+    rate_limit=3000,
 ):
     if users is None:
         users = []
@@ -163,6 +164,7 @@ def service_json(
         'name': name,
         'users': users,
         'message_limit': message_limit,
+        'rate_limit': rate_limit,
         'active': active,
         'restricted': restricted,
         'email_from': email_from,

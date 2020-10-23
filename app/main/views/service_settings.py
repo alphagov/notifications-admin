@@ -38,6 +38,7 @@ from app.main.forms import (
     LinkOrganisationsForm,
     MessageLimit,
     PreviewBranding,
+    RateLimit,
     RenameServiceForm,
     SearchByNameForm,
     ServiceContactDetailsForm,
@@ -952,6 +953,23 @@ def set_message_limit(service_id):
 
     return render_template(
         'views/service-settings/set-message-limit.html',
+        form=form,
+    )
+
+
+@main.route("/services/<uuid:service_id>/service-settings/set-rate-limit", methods=['GET', 'POST'])
+@user_is_platform_admin
+def set_rate_limit(service_id):
+
+    form = RateLimit(rate_limit=current_service.rate_limit)
+
+    if form.validate_on_submit():
+        current_service.update(rate_limit=form.rate_limit.data)
+
+        return redirect(url_for('.service_settings', service_id=service_id))
+
+    return render_template(
+        'views/service-settings/set-rate-limit.html',
         form=form,
     )
 

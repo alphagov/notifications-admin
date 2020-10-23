@@ -1183,6 +1183,15 @@ class MessageLimit(StripWhitespaceForm):
     )
 
 
+class RateLimit(StripWhitespaceForm):
+    rate_limit = GovukIntegerField(
+        'Number of messages the service can send in a rolling 60 second window',
+        validators=[
+            DataRequired(message='Cannot be empty')
+        ]
+    )
+
+
 class ConfirmPasswordForm(StripWhitespaceForm):
     def __init__(self, validate_password_func, *args, **kwargs):
         self.validate_password_func = validate_password_func
