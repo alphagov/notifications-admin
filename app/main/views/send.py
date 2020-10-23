@@ -159,12 +159,20 @@ def send_messages(service_id, template_id):
                 Spreadsheet.from_file_form(form).as_dict,
                 current_app.config['AWS_REGION']
             )
+            file_name_metadata = unicode_truncate(
+                SanitiseASCII.encode(form.file.data.filename),
+                1600
+            )
+            set_metadata_on_csv_upload(
+                service_id,
+                upload_id,
+                original_file_name=file_name_metadata
+            )
             return redirect(url_for(
                 '.check_messages',
                 service_id=service_id,
                 upload_id=upload_id,
                 template_id=template.id,
-                original_file_name=form.file.data.filename,
             ))
         except (UnicodeDecodeError, BadZipFile, XLRDError):
             flash('Could not read {}. Try using a different file format.'.format(

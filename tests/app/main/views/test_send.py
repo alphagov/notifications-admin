@@ -356,6 +356,7 @@ def test_upload_files_in_different_formats(
     service_one,
     mocker,
     mock_get_service_template,
+    mock_s3_set_metadata,
     mock_s3_upload,
     fake_uuid,
 ):
@@ -374,11 +375,44 @@ def test_upload_files_in_different_formats(
             "07527 125 974,Not Pete,Magenta,Avacado\r\n"
             "07512 058 823,Still Not Pete,Crimson,Pear"
         )
+        mock_s3_set_metadata.assert_called_once_with(
+            SERVICE_ONE_ID,
+            fake_uuid,
+            original_file_name=filename
+        )
     else:
         assert not mock_s3_upload.called
         assert normalize_spaces(page.select_one('.banner-dangerous').text) == (
             'Could not read {}. Try using a different file format.'.format(filename)
         )
+
+
+def test_send_messages_sanitises_and_truncates_file_name_for_metadata(
+    logged_in_client,
+    service_one,
+    mocker,
+    mock_get_service_template_with_placeholders,
+    mock_s3_set_metadata,
+    mock_s3_get_metadata,
+    mock_s3_upload,
+    mock_s3_download,
+    mock_get_job_doesnt_exist,
+    fake_uuid,
+):
+    filename = f"😁{'a' * 2000}.csv"
+
+    logged_in_client.post(
+        url_for('main.send_messages', service_id=service_one['id'], template_id=fake_uuid),
+        data={'file': (BytesIO(''.encode('utf-8')), filename)},
+        content_type='multipart/form-data',
+        follow_redirects=False
+    )
+
+    assert len(
+        mock_s3_set_metadata.call_args_list[0][1]['original_file_name']
+    ) < len(filename)
+
+    assert mock_s3_set_metadata.call_args_list[0][1]['original_file_name'].startswith('?')
 
 
 @pytest.mark.parametrize('exception, expected_error_message', [
@@ -442,6 +476,7 @@ def test_upload_csv_file_with_errors_shows_check_page_with_errors(
     service_one,
     mocker,
     mock_get_service_template_with_placeholders,
+    mock_s3_set_metadata,
     mock_s3_get_metadata,
     mock_s3_upload,
     mock_get_users_by_service,
@@ -483,6 +518,7 @@ def test_upload_csv_file_with_empty_message_shows_check_page_with_errors(
     service_one,
     mocker,
     mock_get_empty_service_template_with_optional_placeholder,
+    mock_s3_set_metadata,
     mock_s3_get_metadata,
     mock_s3_upload,
     mock_get_users_by_service,
@@ -539,6 +575,7 @@ def test_upload_csv_file_with_very_long_placeholder_shows_check_page_with_errors
     service_one,
     mocker,
     mock_get_service_template_with_placeholders,
+    mock_s3_set_metadata,
     mock_s3_get_metadata,
     mock_s3_upload,
     mock_get_users_by_service,
@@ -597,6 +634,7 @@ def test_upload_csv_file_with_bad_postal_address_shows_check_page_with_errors(
     service_one,
     mocker,
     mock_get_service_letter_template,
+    mock_s3_set_metadata,
     mock_s3_get_metadata,
     mock_s3_upload,
     mock_get_users_by_service,
@@ -660,6 +698,7 @@ def test_upload_csv_file_with_international_letters_permission_shows_appropriate
     service_one,
     mocker,
     mock_get_service_letter_template,
+    mock_s3_set_metadata,
     mock_s3_get_metadata,
     mock_s3_upload,
     mock_get_users_by_service,
@@ -834,6 +873,7 @@ def test_upload_csv_file_with_missing_columns_shows_error(
     client_request,
     mocker,
     mock_get_service_template_with_placeholders,
+    mock_s3_set_metadata,
     mock_s3_get_metadata,
     mock_s3_upload,
     mock_get_users_by_service,
@@ -883,6 +923,7 @@ def test_upload_valid_csv_redirects_to_check_page(
     client_request,
     mock_get_service_template_with_placeholders,
     mock_s3_upload,
+    mock_s3_set_metadata,
     fake_uuid,
 ):
     client_request.post(
@@ -894,7 +935,6 @@ def test_upload_valid_csv_redirects_to_check_page(
             service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
             upload_id=fake_uuid,
-            original_file_name='valid.csv',
             _external=True,
         ),
     )
@@ -2529,7 +2569,13 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(
     with logged_in_client.session_transaction() as session:
         assert 'file_uploads' not in session
 
-    mock_s3_set_metadata.assert_called_once_with(
+    assert mock_s3_set_metadata.call_count == 2
+    assert mock_s3_set_metadata.call_args_list[0] == mocker.call(
+        SERVICE_ONE_ID,
+        fake_uuid,
+        original_file_name='example.csv'
+    )
+    assert mock_s3_set_metadata.call_args_list[1] == mocker.call(
         SERVICE_ONE_ID,
         fake_uuid,
         notification_count=53,
@@ -2557,6 +2603,7 @@ def test_upload_csvfile_with_international_validates(
     api_user_active,
     logged_in_client,
     mock_get_service_template,
+    mock_s3_set_metadata,
     mock_s3_get_metadata,
     mock_s3_upload,
     mock_has_permissions,
