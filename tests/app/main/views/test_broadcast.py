@@ -1118,26 +1118,31 @@ def test_view_broadcast_message_page(
     '.view_current_broadcast',
     '.view_previous_broadcast',
 ))
-@pytest.mark.parametrize('status, expected_highlighted_navigation_item', (
+@pytest.mark.parametrize('status, expected_highlighted_navigation_item, expected_back_link_endpoint', (
     (
         'pending-approval',
         'Current alerts',
+        '.broadcast_dashboard',
     ),
     (
         'broadcasting',
         'Current alerts',
+        '.broadcast_dashboard',
     ),
     (
         'completed',
         'Previous alerts',
+        '.broadcast_dashboard_previous',
     ),
     (
         'cancelled',
         'Previous alerts',
+        '.broadcast_dashboard_previous',
     ),
     (
         'rejected',
         'Previous alerts',
+        '.broadcast_dashboard_previous',
     ),
 ))
 @freeze_time('2020-02-22T22:22:22.000000')
@@ -1151,6 +1156,7 @@ def test_view_broadcast_message_shows_correct_highlighted_navigation(
     endpoint,
     status,
     expected_highlighted_navigation_item,
+    expected_back_link_endpoint,
 ):
     mocker.patch(
         'app.broadcast_message_api_client.get_broadcast_message',
@@ -1179,6 +1185,11 @@ def test_view_broadcast_message_shows_correct_highlighted_navigation(
         page.select_one('.navigation .selected').text
     ) == (
         expected_highlighted_navigation_item
+    )
+
+    assert page.select_one('.govuk-back-link')['href'] == url_for(
+        expected_back_link_endpoint,
+        service_id=SERVICE_ONE_ID,
     )
 
 
