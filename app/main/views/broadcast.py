@@ -48,7 +48,7 @@ def broadcast_dashboard_previous(service_id):
         'views/broadcast/previous-broadcasts.html',
         broadcasts=BroadcastMessages(service_id).with_status('cancelled', 'completed'),
         empty_message='You do not have any previous alerts',
-        single_endpoint='.view_previous_broadcast',
+        view_broadcast_endpoint='.view_previous_broadcast',
     )
 
 
@@ -66,13 +66,13 @@ def get_broadcast_dashboard_partials(service_id):
             'views/broadcast/partials/dashboard-table.html',
             broadcasts=broadcast_messages.with_status('pending-approval'),
             empty_message='You do not have any alerts waiting for approval',
-            single_endpoint='.view_current_broadcast',
+            view_broadcast_endpoint='.view_current_broadcast',
         ),
         live_broadcasts=render_template(
             'views/broadcast/partials/dashboard-table.html',
             broadcasts=broadcast_messages.with_status('broadcasting'),
             empty_message='You do not have any live alerts at the moment',
-            single_endpoint='.view_current_broadcast',
+            view_broadcast_endpoint='.view_current_broadcast',
         ),
     )
 
