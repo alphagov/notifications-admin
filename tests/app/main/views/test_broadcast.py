@@ -306,7 +306,7 @@ def test_broadcast_dashboard(
         normalize_spaces(row.text) for row in page.select('table')[0].select('tbody tr')
     ] == [
         'Example template This is a test England Scotland Live since today at 2:20am',
-        'Example template This is a test England Scotland Prepared by Test User',
+        'Example template This is a test England Scotland Waiting for approval',
     ]
 
 
@@ -329,7 +329,7 @@ def test_broadcast_dashboard_json(
 
     assert json_response.keys() == {'current_broadcasts'}
 
-    assert 'Prepared by Test User' in json_response['current_broadcasts']
+    assert 'Waiting for approval' in json_response['current_broadcasts']
     assert 'Live since today at 2:20am' in json_response['current_broadcasts']
 
 

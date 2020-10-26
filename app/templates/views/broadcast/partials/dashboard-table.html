@@ -28,7 +28,7 @@
     {% call field(align='right') %}
       {% if item.status == 'pending-approval' %}
         <p class="govuk-body govuk-!-margin-top-6 govuk-!-margin-bottom-0 govuk-hint">
-          Prepared by {{ item.created_by.name }}
+          Waiting for approval
         </p>
       {% elif item.status == 'broadcasting' %}
         <p class="govuk-body govuk-!-margin-top-6 govuk-!-margin-bottom-0 live-broadcast">
