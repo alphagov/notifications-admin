@@ -277,11 +277,13 @@ def test_empty_broadcast_dashboard(
         '.broadcast_dashboard',
         service_id=SERVICE_ONE_ID,
     )
+    assert normalize_spaces(page.select_one('h1').text) == (
+        'Current alerts'
+    )
     assert [
         normalize_spaces(row.text) for row in page.select('tbody tr .table-empty-message')
     ] == [
-        'You do not have any live alerts at the moment',
-        'You do not have any alerts waiting for approval',
+        'You do not have any current alerts',
     ]
 
 
@@ -298,23 +300,12 @@ def test_broadcast_dashboard(
         service_id=SERVICE_ONE_ID,
     )
 
-    assert len(page.select('table')) == len(page.select('main h2')) == 2
+    assert len(page.select('table')) == len(page.select('h1')) == 1
 
-    assert normalize_spaces(page.select('main h2')[0].text) == (
-        'Live alerts'
-    )
     assert [
         normalize_spaces(row.text) for row in page.select('table')[0].select('tbody tr')
     ] == [
         'Example template This is a test England Scotland Live since today at 2:20am',
-    ]
-
-    assert normalize_spaces(page.select('main h2')[1].text) == (
-        'Waiting for approval'
-    )
-    assert [
-        normalize_spaces(row.text) for row in page.select('table')[1].select('tbody tr')
-    ] == [
         'Example template This is a test England Scotland Prepared by Test User',
     ]
 
@@ -336,13 +327,10 @@ def test_broadcast_dashboard_json(
 
     json_response = json.loads(response.get_data(as_text=True))
 
-    assert json_response.keys() == {
-        'pending_approval_broadcasts',
-        'live_broadcasts',
-    }
+    assert json_response.keys() == {'current_broadcasts'}
 
-    assert 'Prepared by Test User' in json_response['pending_approval_broadcasts']
-    assert 'Live since today at 2:20am' in json_response['live_broadcasts']
+    assert 'Prepared by Test User' in json_response['current_broadcasts']
+    assert 'Live since today at 2:20am' in json_response['current_broadcasts']
 
 
 @freeze_time('2020-02-20 02:20')

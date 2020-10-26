@@ -3,12 +3,10 @@
 {% extends "withnav_template.html" %}
 
 {% block service_page_title %}
-  Dashboard
+  Current alerts
 {% endblock %}
 
 {% block maincolumn_content %}
-
-  <h1 class="govuk-visually-hidden">Dashboard</h1>
 
   {% if current_user.has_permissions('manage_templates') and not current_service.all_templates %}
     <nav class="govuk-!-margin-top-2 govuk-!-margin-bottom-6">
@@ -18,20 +16,12 @@
     </nav>
   {% endif %}
 
-  <h2 class="heading-medium govuk-!-margin-bottom-2">Live alerts</h2>
+  <h1 class="heading-medium govuk-!-margin-bottom-2">Current alerts</h1>
 
   {{ ajax_block(
     partials,
     url_for('.broadcast_dashboard_updates', service_id=current_service.id),
-    'live_broadcasts'
-  ) }}
-
-  <h2 class="heading-medium govuk-!-margin-bottom-2">Waiting for approval</h2>
-
-  {{ ajax_block(
-    partials,
-    url_for('.broadcast_dashboard_updates', service_id=current_service.id),
-    'pending_approval_broadcasts'
+    'current_broadcasts'
   ) }}
 
 {% endblock %}
