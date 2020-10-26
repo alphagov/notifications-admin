@@ -52,8 +52,12 @@ sample_uuid = sample_uuid()
         403, 403,
     ),
     (
-        '.view_broadcast_message', {'broadcast_message_id': sample_uuid},
+        '.view_current_broadcast', {'broadcast_message_id': sample_uuid},
         403, 403,
+    ),
+    (
+        '.view_previous_broadcast', {'broadcast_message_id': sample_uuid},
+        403, 405,
     ),
     (
         '.cancel_broadcast_message', {'broadcast_message_id': sample_uuid},
@@ -1019,7 +1023,7 @@ def test_start_broadcasting(
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
         _expected_redirect=url_for(
-            'main.view_broadcast_message',
+            'main.view_current_broadcast',
             service_id=SERVICE_ONE_ID,
             broadcast_message_id=fake_uuid,
             _external=True,
@@ -1032,8 +1036,8 @@ def test_start_broadcasting(
     )
 
 
-@pytest.mark.parametrize('extra_fields, expected_paragraphs', (
-    ({
+@pytest.mark.parametrize('endpoint, extra_fields, expected_paragraphs', (
+    ('.view_current_broadcast', {
         'status': 'broadcasting',
         'finishes_at': '2020-02-23T23:23:23.000000',
     }, [
@@ -1041,7 +1045,7 @@ def test_start_broadcasting(
         'Prepared by Alice and approved by Bob.',
         'Broadcasting stops tomorrow at 11:23pm.'
     ]),
-    ({
+    ('.view_previous_broadcast', {
         'status': 'broadcasting',
         'finishes_at': '2020-02-22T22:20:20.000000',  # 2 mins before now()
     }, [
@@ -1049,7 +1053,7 @@ def test_start_broadcasting(
         'Prepared by Alice and approved by Bob.',
         'Finished broadcasting today at 10:20pm.'
     ]),
-    ({
+    ('.view_previous_broadcast', {
         'status': 'completed',
         'finishes_at': '2020-02-21T21:21:21.000000',
     }, [
@@ -1057,7 +1061,7 @@ def test_start_broadcasting(
         'Prepared by Alice and approved by Bob.',
         'Finished broadcasting yesterday at 9:21pm.',
     ]),
-    ({
+    ('.view_previous_broadcast', {
         'status': 'cancelled',
         'cancelled_by_id': sample_uuid,
         'cancelled_at': '2020-02-21T21:21:21.000000',
@@ -1075,6 +1079,7 @@ def test_view_broadcast_message_page(
     active_user_with_permissions,
     mock_get_broadcast_template,
     fake_uuid,
+    endpoint,
     extra_fields,
     expected_paragraphs,
 ):
@@ -1099,7 +1104,7 @@ def test_view_broadcast_message_page(
     service_one['permissions'] += ['broadcast']
 
     page = client_request.get(
-        '.view_broadcast_message',
+        endpoint,
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
     )
@@ -1107,6 +1112,85 @@ def test_view_broadcast_message_page(
     assert [
         normalize_spaces(p.text) for p in page.select('main p.govuk-body')
     ] == expected_paragraphs
+
+
+@pytest.mark.parametrize('endpoint', (
+    '.view_current_broadcast',
+    '.view_previous_broadcast',
+))
+@pytest.mark.parametrize('status, expected_highlighted_navigation_item, expected_back_link_endpoint', (
+    (
+        'pending-approval',
+        'Current alerts',
+        '.broadcast_dashboard',
+    ),
+    (
+        'broadcasting',
+        'Current alerts',
+        '.broadcast_dashboard',
+    ),
+    (
+        'completed',
+        'Previous alerts',
+        '.broadcast_dashboard_previous',
+    ),
+    (
+        'cancelled',
+        'Previous alerts',
+        '.broadcast_dashboard_previous',
+    ),
+    (
+        'rejected',
+        'Previous alerts',
+        '.broadcast_dashboard_previous',
+    ),
+))
+@freeze_time('2020-02-22T22:22:22.000000')
+def test_view_broadcast_message_shows_correct_highlighted_navigation(
+    mocker,
+    client_request,
+    service_one,
+    active_user_with_permissions,
+    mock_get_broadcast_template,
+    fake_uuid,
+    endpoint,
+    status,
+    expected_highlighted_navigation_item,
+    expected_back_link_endpoint,
+):
+    mocker.patch(
+        'app.broadcast_message_api_client.get_broadcast_message',
+        return_value=broadcast_message_json(
+            id_=fake_uuid,
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            created_by_id=fake_uuid,
+            approved_by_id=fake_uuid,
+            starts_at='2020-02-20T20:20:20.000000',
+            finishes_at='2021-12-21T21:21:21.000000',
+            cancelled_at='2021-01-01T01:01:01.000000',
+            status=status,
+        ),
+    )
+    service_one['permissions'] += ['broadcast']
+
+    page = client_request.get(
+        endpoint,
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+        _follow_redirects=True
+    )
+
+    assert normalize_spaces(
+        page.select_one('.navigation .selected').text
+    ) == (
+        expected_highlighted_navigation_item
+    )
+
+    assert page.select_one('.govuk-back-link')['href'] == url_for(
+        expected_back_link_endpoint,
+        service_id=SERVICE_ONE_ID,
+    )
 
 
 @freeze_time('2020-02-22T22:22:22.000000')
@@ -1136,7 +1220,7 @@ def test_view_pending_broadcast(
     service_one['permissions'] += ['broadcast']
 
     page = client_request.get(
-        '.view_broadcast_message',
+        '.view_current_broadcast',
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
     )
@@ -1190,7 +1274,7 @@ def test_cant_approve_own_broadcast(
     service_one['permissions'] += ['broadcast']
 
     page = client_request.get(
-        '.view_broadcast_message',
+        '.view_current_broadcast',
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
     )
@@ -1243,7 +1327,7 @@ def test_can_approve_own_broadcast_in_trial_mode(
     service_one['permissions'] += ['broadcast']
 
     page = client_request.get(
-        '.view_broadcast_message',
+        '.view_current_broadcast',
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
     )
@@ -1319,7 +1403,7 @@ def test_view_only_user_cant_approve_broadcast(
     service_one['permissions'] += ['broadcast']
 
     page = client_request.get(
-        '.view_broadcast_message',
+        '.view_current_broadcast',
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
     )
@@ -1338,7 +1422,7 @@ def test_view_only_user_cant_approve_broadcast(
 @pytest.mark.parametrize('trial_mode, initial_status, expected_approval, expected_redirect', (
     (True, 'draft', False, partial(
         url_for,
-        '.view_broadcast_message',
+        '.view_current_broadcast',
         broadcast_message_id=sample_uuid,
     )),
     (True, 'pending-approval', True, partial(
@@ -1348,22 +1432,22 @@ def test_view_only_user_cant_approve_broadcast(
     )),
     (False, 'pending-approval', True, partial(
         url_for,
-        '.view_broadcast_message',
+        '.view_current_broadcast',
         broadcast_message_id=sample_uuid,
     )),
     (True, 'rejected', False, partial(
         url_for,
-        '.view_broadcast_message',
+        '.view_current_broadcast',
         broadcast_message_id=sample_uuid,
     )),
     (True, 'broadcasting', False, partial(
         url_for,
-        '.view_broadcast_message',
+        '.view_current_broadcast',
         broadcast_message_id=sample_uuid,
     )),
     (True, 'cancelled', False, partial(
         url_for,
-        '.view_broadcast_message',
+        '.view_current_broadcast',
         broadcast_message_id=sample_uuid,
     )),
 ))
@@ -1396,7 +1480,7 @@ def test_request_approval(
     service_one['permissions'] += ['broadcast']
 
     client_request.post(
-        '.view_broadcast_message',
+        '.view_current_broadcast',
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
         _expected_redirect=expected_redirect(
@@ -1502,7 +1586,7 @@ def test_cant_reject_broadcast_in_wrong_state(
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
         _expected_redirect=url_for(
-            '.view_broadcast_message',
+            '.view_current_broadcast',
             service_id=SERVICE_ONE_ID,
             broadcast_message_id=fake_uuid,
             _external=True,
@@ -1513,15 +1597,20 @@ def test_cant_reject_broadcast_in_wrong_state(
     assert mock_update_broadcast_message_status.called is False
 
 
+@pytest.mark.parametrize('endpoint', (
+    '.view_current_broadcast',
+    '.view_previous_broadcast',
+))
 def test_no_view_page_for_draft(
     client_request,
     service_one,
     mock_get_draft_broadcast_message,
     fake_uuid,
+    endpoint,
 ):
     service_one['permissions'] += ['broadcast']
     client_request.get(
-        '.view_broadcast_message',
+        endpoint,
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
         _expected_status=404,
@@ -1574,7 +1663,7 @@ def test_confirm_cancel_broadcast(
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
         _expected_redirect=url_for(
-            '.view_broadcast_message',
+            '.view_previous_broadcast',
             service_id=SERVICE_ONE_ID,
             broadcast_message_id=fake_uuid,
             _external=True,
@@ -1602,7 +1691,7 @@ def test_cant_cancel_broadcast_in_a_different_state(
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
         _expected_redirect=url_for(
-            '.view_broadcast_message',
+            '.view_current_broadcast',
             service_id=SERVICE_ONE_ID,
             broadcast_message_id=fake_uuid,
             _external=True,

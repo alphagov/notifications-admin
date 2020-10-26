@@ -48,6 +48,7 @@ def broadcast_dashboard_previous(service_id):
         'views/broadcast/previous-broadcasts.html',
         broadcasts=BroadcastMessages(service_id).with_status('cancelled', 'completed'),
         empty_message='You do not have any previous alerts',
+        view_broadcast_endpoint='.view_previous_broadcast',
     )
 
 
@@ -65,11 +66,13 @@ def get_broadcast_dashboard_partials(service_id):
             'views/broadcast/partials/dashboard-table.html',
             broadcasts=broadcast_messages.with_status('pending-approval'),
             empty_message='You do not have any alerts waiting for approval',
+            view_broadcast_endpoint='.view_current_broadcast',
         ),
         live_broadcasts=render_template(
             'views/broadcast/partials/dashboard-table.html',
             broadcasts=broadcast_messages.with_status('broadcasting'),
             empty_message='You do not have any live alerts at the moment',
+            view_broadcast_endpoint='.view_current_broadcast',
         ),
     )
 
@@ -261,7 +264,7 @@ def preview_broadcast_message(service_id, broadcast_message_id):
     if request.method == 'POST':
         broadcast_message.request_approval()
         return redirect(url_for(
-            '.view_broadcast_message',
+            '.view_current_broadcast',
             service_id=current_service.id,
             broadcast_message_id=broadcast_message.id,
         ))
@@ -272,23 +275,60 @@ def preview_broadcast_message(service_id, broadcast_message_id):
     )
 
 
-@main.route('/services/<uuid:service_id>/broadcast/<uuid:broadcast_message_id>')
+@main.route(
+    '/services/<uuid:service_id>/current-alerts/<uuid:broadcast_message_id>',
+    endpoint='view_current_broadcast',
+)
+@main.route(
+    '/services/<uuid:service_id>/previous-alerts/<uuid:broadcast_message_id>',
+    endpoint='view_previous_broadcast',
+)
 @user_has_permissions()
 @service_has_permission('broadcast')
-def view_broadcast_message(service_id, broadcast_message_id):
+def view_broadcast(service_id, broadcast_message_id):
     broadcast_message = BroadcastMessage.from_id(
         broadcast_message_id,
         service_id=current_service.id,
     )
     if broadcast_message.status == 'draft':
         abort(404)
+
+    if (
+        broadcast_message.status in {'completed', 'cancelled', 'rejected'}
+        and request.endpoint != 'main.view_previous_broadcast'
+    ):
+        return redirect(url_for(
+            '.view_previous_broadcast',
+            service_id=current_service.id,
+            broadcast_message_id=broadcast_message.id,
+        ))
+
+    if (
+        broadcast_message.status in {'broadcasting', 'pending-approval'}
+        and request.endpoint != 'main.view_current_broadcast'
+    ):
+        return redirect(url_for(
+            '.view_current_broadcast',
+            service_id=current_service.id,
+            broadcast_message_id=broadcast_message.id,
+        ))
+
+    back_link_endpoint = {
+        'main.view_current_broadcast': '.broadcast_dashboard',
+        'main.view_previous_broadcast': '.broadcast_dashboard_previous',
+    }[request.endpoint]
+
     return render_template(
         'views/broadcast/view-message.html',
         broadcast_message=broadcast_message,
+        back_link=url_for(
+            back_link_endpoint,
+            service_id=current_service.id,
+        ),
     )
 
 
-@main.route('/services/<uuid:service_id>/broadcast/<uuid:broadcast_message_id>', methods=['POST'])
+@main.route('/services/<uuid:service_id>/current-alerts/<uuid:broadcast_message_id>', methods=['POST'])
 @user_has_permissions('send_messages')
 @service_has_permission('broadcast')
 def approve_broadcast_message(service_id, broadcast_message_id):
@@ -300,7 +340,7 @@ def approve_broadcast_message(service_id, broadcast_message_id):
 
     if broadcast_message.status != 'pending-approval':
         return redirect(url_for(
-            '.view_broadcast_message',
+            '.view_current_broadcast',
             service_id=current_service.id,
             broadcast_message_id=broadcast_message.id,
         ))
@@ -315,7 +355,7 @@ def approve_broadcast_message(service_id, broadcast_message_id):
         ))
 
     return redirect(url_for(
-        '.view_broadcast_message',
+        '.view_current_broadcast',
         service_id=current_service.id,
         broadcast_message_id=broadcast_message.id,
     ))
@@ -333,7 +373,7 @@ def reject_broadcast_message(service_id, broadcast_message_id):
 
     if broadcast_message.status != 'pending-approval':
         return redirect(url_for(
-            '.view_broadcast_message',
+            '.view_current_broadcast',
             service_id=current_service.id,
             broadcast_message_id=broadcast_message.id,
         ))
@@ -360,7 +400,7 @@ def cancel_broadcast_message(service_id, broadcast_message_id):
 
     if broadcast_message.status != 'broadcasting':
         return redirect(url_for(
-            '.view_broadcast_message',
+            '.view_current_broadcast',
             service_id=current_service.id,
             broadcast_message_id=broadcast_message.id,
         ))
@@ -368,7 +408,7 @@ def cancel_broadcast_message(service_id, broadcast_message_id):
     if request.method == 'POST':
         broadcast_message.cancel_broadcast()
         return redirect(url_for(
-            '.view_broadcast_message',
+            '.view_previous_broadcast',
             service_id=current_service.id,
             broadcast_message_id=broadcast_message.id,
         ))

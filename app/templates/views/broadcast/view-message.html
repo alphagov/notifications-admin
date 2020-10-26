@@ -34,7 +34,7 @@
 
 {% block maincolumn_content %}
 
-  {{ govukBackLink({ "href": url_for('.broadcast_dashboard', service_id=current_service.id) }) }}
+  {{ govukBackLink({ "href": back_link }) }}
 
   {% if broadcast_message.status == 'pending-approval' %}
     {% if broadcast_message.created_by == current_user and current_user.has_permissions('send_messages') %}
