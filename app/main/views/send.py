@@ -668,10 +668,7 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
         abort(404)
 
     page_count = get_page_count_for_letter(db_template, template.values)
-    # TODO: stop checking the request.args for original_file_name once this change has been deployed for a
-    # while and we are confident it's only coming from metadata
-    metadata = get_csv_metadata(service_id, upload_id)
-    original_file_name = metadata.get('original_file_name', request.args.get('original_file_name', ''))
+    original_file_name = get_csv_metadata(service_id, upload_id).get('original_file_name', '')
 
     return dict(
         recipients=recipients,
@@ -732,16 +729,11 @@ def check_messages(service_id, template_id, upload_id, row_index=2):
     ):
         return render_template('views/check/column-errors.html', **data)
 
-    data['original_file_name'] = SanitiseASCII.encode(data.get('original_file_name', ''))
-
     metadata_kwargs = {
         'notification_count': data['count_of_recipients'],
         'template_id': template_id,
         'valid': True,
-        'original_file_name': unicode_truncate(
-            data['original_file_name'],
-            1600,
-        ),
+        'original_file_name': data.get('original_file_name', ''),
     }
 
     if session.get('sender_id'):
