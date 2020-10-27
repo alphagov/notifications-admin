@@ -123,8 +123,8 @@ $message-type-bottom-spacing: govuk-spacing(4);
           }
 
           & + .template-list-item-hint,
-          & + .message-type {
-            color: #505A5F; /* TO DO: replace with $govuk-secondary-text-colour when GOVUK Frontend is past 3.x.x */
+          .message-type {
+            color: $govuk-text-colour;
           }
 
         }
