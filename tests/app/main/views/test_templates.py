@@ -188,7 +188,7 @@ def test_should_show_page_for_choosing_a_template(
     for index, expected_link in enumerate(expected_nav_links):
         assert links_in_page[index].text.strip() == expected_link
 
-    template_links = page.select('#template-list .govuk-label a, .message-name a')
+    template_links = page.select('#template-list .govuk-label a, .template-list-item a')
 
     assert len(template_links) == len(expected_templates)
 

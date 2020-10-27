@@ -56,14 +56,6 @@ $message-type-bottom-spacing: govuk-spacing(4);
 
   }
 
-  &-type {
-    position: relative; /* needs to be non-static to have a z-index above the link :before element */
-    color: $govuk-secondary-text-colour;
-    margin: 0 0 $message-type-bottom-spacing 0;
-    padding-left: 0;
-    pointer-events: none;
-  }
-
 }
 
 .template-list {
