@@ -44,7 +44,7 @@
             {% for ancestor in item.ancestors %}
                 <a href="{{ url_for('.conversation_reply', service_id=current_service.id, notification_id=notification_id, from_folder=ancestor.id) }}" class="govuk-link govuk-link--no-visited-state template-list-folder">
                 {{ ancestor.name }}
-              </a> <span class="message-name-separator">/</span>
+              </a> <span class="message-name-separator"></span>
             {% endfor %}
             {% if item.is_folder %}
               <a href="{{ url_for('.conversation_reply', service_id=current_service.id, notification_id=notification_id, from_folder=item.id) }}" class="govuk-link govuk-link--no-visited-state template-list-folder">
