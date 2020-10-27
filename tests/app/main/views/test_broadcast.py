@@ -281,7 +281,7 @@ def test_empty_broadcast_dashboard(
         'Current alerts'
     )
     assert [
-        normalize_spaces(row.text) for row in page.select('tbody tr .table-empty-message')
+        normalize_spaces(row.text) for row in page.select('.table-empty-message')
     ] == [
         'You do not have any current alerts',
     ]
@@ -300,15 +300,16 @@ def test_broadcast_dashboard(
         service_id=SERVICE_ONE_ID,
     )
 
-    assert len(page.select('table')) == len(page.select('h1')) == 1
+    assert len(page.select('.ajax-block-container')) == len(page.select('h1')) == 1
 
     assert [
-        normalize_spaces(row.text) for row in page.select('table')[0].select('tbody tr')
+        normalize_spaces(row.text)
+        for row in page.select('.ajax-block-container')[0].select('.file-list')
     ] == [
-        'Half an hour ago This is a test England Scotland Waiting for approval',
-        'Hour and a half ago This is a test England Scotland Waiting for approval',
-        'Example template This is a test England Scotland Live since today at 2:20am',
-        'Example template This is a test England Scotland Live since today at 1:20am',
+        'Half an hour ago This is a test Waiting for approval England Scotland',
+        'Hour and a half ago This is a test Waiting for approval England Scotland',
+        'Example template This is a test Live since today at 2:20am England Scotland',
+        'Example template This is a test Live since today at 1:20am England Scotland',
     ]
 
 
@@ -351,12 +352,13 @@ def test_previous_broadcasts_page(
     assert normalize_spaces(page.select_one('main h1').text) == (
         'Previous alerts'
     )
-    assert len(page.select('table')) == 1
+    assert len(page.select('.ajax-block-container')) == 1
     assert [
-        normalize_spaces(row.text) for row in page.select('table')[0].select('tbody tr')
+        normalize_spaces(row.text)
+        for row in page.select('.ajax-block-container')[0].select('.file-list')
     ] == [
-        'Example template This is a test England Scotland Broadcast yesterday at 2:20pm',
-        'Example template This is a test England Scotland Broadcast yesterday at 2:20am',
+        'Example template This is a test Broadcast yesterday at 2:20pm England Scotland',
+        'Example template This is a test Broadcast yesterday at 2:20am England Scotland',
     ]
 
 

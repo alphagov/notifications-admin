@@ -70,6 +70,10 @@
       font-weight: bold;
     }
 
+    &--smaller {
+      @include bold-16;
+    }
+
   }
 
   .govuk-button {

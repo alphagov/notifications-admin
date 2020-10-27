@@ -94,6 +94,10 @@
     max-width: 580px;
   }
 
+  &-status {
+    text-align: right;
+  }
+
 }
 
 /* The focus state for sibling links overlaps the hint so the hint's text colour needs to adapt */
