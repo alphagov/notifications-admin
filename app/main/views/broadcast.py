@@ -62,16 +62,10 @@ def broadcast_dashboard_updates(service_id):
 def get_broadcast_dashboard_partials(service_id):
     broadcast_messages = BroadcastMessages(service_id)
     return dict(
-        pending_approval_broadcasts=render_template(
+        current_broadcasts=render_template(
             'views/broadcast/partials/dashboard-table.html',
-            broadcasts=broadcast_messages.with_status('pending-approval'),
-            empty_message='You do not have any alerts waiting for approval',
-            view_broadcast_endpoint='.view_current_broadcast',
-        ),
-        live_broadcasts=render_template(
-            'views/broadcast/partials/dashboard-table.html',
-            broadcasts=broadcast_messages.with_status('broadcasting'),
-            empty_message='You do not have any live alerts at the moment',
+            broadcasts=broadcast_messages.with_status('pending-approval', 'broadcasting'),
+            empty_message='You do not have any current alerts',
             view_broadcast_endpoint='.view_current_broadcast',
         ),
     )

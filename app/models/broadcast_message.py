@@ -42,11 +42,13 @@ class BroadcastMessage(JSONModel):
     libraries = broadcast_area_libraries
 
     def __lt__(self, other):
-        return (
-            self.cancelled_at or self.finishes_at or self.created_at
-        ) < (
-            other.cancelled_at or other.finishes_at or self.created_at
-        )
+        if self.starts_at and other.starts_at:
+            return self.starts_at < other.starts_at
+        if self.starts_at and not other.starts_at:
+            return True
+        if not self.starts_at and other.starts_at:
+            return False
+        return self.updated_at < other.updated_at
 
     @classmethod
     def create(cls, *, service_id, template_id):

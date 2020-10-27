@@ -649,10 +649,12 @@ def broadcast_message_json(
     starts_at=None,
     finishes_at=None,
     cancelled_at=None,
+    updated_at=None,
     approved_by_id=None,
     cancelled_by_id=None,
     areas=None,
     content=None,
+    template_name='Example template',
 ):
     return {
         'id': id_,
@@ -661,7 +663,7 @@ def broadcast_message_json(
 
         'template_id': template_id,
         'template_version': 123,
-        'template_name': 'Example template',
+        'template_name': template_name,
         'content': content or 'This is a test',
 
         'personalisation': {},
@@ -677,7 +679,7 @@ def broadcast_message_json(
         'created_at': None,
         'approved_at': None,
         'cancelled_at': cancelled_at,
-        'updated_at': None,
+        'updated_at': updated_at,
 
         'created_by_id': created_by_id,
         'approved_by_id': approved_by_id,
