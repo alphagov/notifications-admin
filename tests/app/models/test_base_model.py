@@ -11,7 +11,7 @@ def test_looks_up_from_dict():
     assert Custom({'foo': 'bar'}).foo == 'bar'
 
 
-def test_prefers_property_to_dict():
+def test_raises_when_overriding_custom_properties():
 
     class Custom(JSONModel):
 
@@ -19,9 +19,12 @@ def test_prefers_property_to_dict():
 
         @property
         def foo(self):
-            return 'bar'
+            pass
 
-    assert Custom({'foo': 'NOPE'}).foo == 'bar'
+    with pytest.raises(AttributeError) as e:
+        Custom({'foo': 'NOPE'})
+
+    assert str(e.value) == "can't set attribute"
 
 
 @pytest.mark.parametrize('json_response', (

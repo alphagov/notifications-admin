@@ -13,7 +13,7 @@ class JSONModel(SerialisedModel):
         # in the case of a bad request _dict may be `None`
         self._dict = _dict or {}
         for property in self.ALLOWED_PROPERTIES:
-            if property in self._dict and not hasattr(self, property):
+            if property in self._dict:
                 setattr(self, property, self._dict[property])
 
     def __bool__(self):

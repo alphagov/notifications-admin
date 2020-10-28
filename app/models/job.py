@@ -28,7 +28,6 @@ class Job(JSONModel):
         'template_version',
         'original_file_name',
         'created_at',
-        'processing_started',
         'notification_count',
         'created_by',
         'template_type',
