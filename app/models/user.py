@@ -39,7 +39,6 @@ class User(JSONModel, UserMixin):
         'mobile_number',
         'password_changed_at',
         'permissions',
-        'platform_admin',
         'state',
     }
 

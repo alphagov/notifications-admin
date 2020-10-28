@@ -11,7 +11,7 @@ def test_looks_up_from_dict():
     assert Custom({'foo': 'bar'}).foo == 'bar'
 
 
-def test_prefers_property_to_dict():
+def test_raises_when_overriding_custom_properties():
 
     class Custom(JSONModel):
 
@@ -19,9 +19,12 @@ def test_prefers_property_to_dict():
 
         @property
         def foo(self):
-            return 'bar'
+            pass
 
-    assert Custom({'foo': 'NOPE'}).foo == 'bar'
+    with pytest.raises(AttributeError) as e:
+        Custom({'foo': 'NOPE'})
+
+    assert str(e.value) == "can't set attribute"
 
 
 @pytest.mark.parametrize('json_response', (
@@ -39,10 +42,7 @@ def test_model_raises_for_unknown_attributes(json_response):
     with pytest.raises(AttributeError) as e:
         model.foo
 
-    assert str(e.value) == (
-        "'Custom' object has no attribute 'foo' and 'foo' is not a "
-        "field in the underlying JSON"
-    )
+    assert str(e.value) == "'Custom' object has no attribute 'foo'"
 
 
 def test_model_raises_keyerror_if_item_missing_from_dict():
@@ -50,10 +50,10 @@ def test_model_raises_keyerror_if_item_missing_from_dict():
     class Custom(JSONModel):
         ALLOWED_PROPERTIES = {'foo'}
 
-    with pytest.raises(KeyError) as e:
+    with pytest.raises(AttributeError) as e:
         Custom({}).foo
 
-    assert str(e.value) == "'foo'"
+    assert str(e.value) == "'Custom' object has no attribute 'foo'"
 
 
 @pytest.mark.parametrize('json_response', (
@@ -79,4 +79,6 @@ def test_dynamic_properties_are_introspectable():
     class Custom(JSONModel):
         ALLOWED_PROPERTIES = {'foo', 'bar', 'baz'}
 
-    assert dir(Custom({}))[-3:] == ['bar', 'baz', 'foo']
+    model = Custom({'foo': None, 'bar': None, 'baz': None})
+
+    assert dir(model)[-3:] == ['bar', 'baz', 'foo']
