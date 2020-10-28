@@ -1,44 +1,48 @@
 {% from "components/table.html" import list_table, field, right_aligned_field_heading, row_heading %}
 
-<div class='{% if broadcasts %}dashboard-table{% endif%} ajax-block-container'>
-  {% call(item, row_number) list_table(
-    broadcasts|sort|reverse|list,
-    caption="Live broadcasts",
-    caption_visible=False,
-    empty_message=empty_message,
-    field_headings=[
-      'Template name',
-      'Status'
-    ],
-    field_headings_visible=False
-  ) %}
-    {% call row_heading() %}
-      <div class="file-list">
+<div class='ajax-block-container'>
+{% for item in broadcasts|sort|reverse|list %}
+  <div class="keyline-block">
+    <div class="file-list govuk-!-margin-bottom-2">
+      <h2>
         <a class="file-list-filename-large govuk-link govuk-link--no-visited-state" href="{{ url_for(view_broadcast_endpoint, service_id=current_service.id, broadcast_message_id=item.id) }}">{{ item.template_name }}</a>
-        <span class="file-list-hint-large govuk-!-margin-bottom-1">
-          {{ item.content }}
-        </span>
-        <ul class="area-list">
-          {% for area in item.areas %}
-            <li class="area-list-item area-list-item--unremoveable">{{ area.name }}</li>
-          {% endfor %}
-        </ul>
+      </h2>
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-one-half">
+          <span class="file-list-hint-large govuk-!-margin-bottom-2">
+            {{ item.content }}
+          </span>
+        </div>
+        <div class="govuk-grid-column-one-half file-list-status">
+          {% if item.status == 'pending-approval' %}
+            <p class="govuk-body govuk-!-margin-bottom-0 govuk-hint">
+              Waiting for approval
+            </p>
+          {% elif item.status == 'broadcasting' %}
+            <p class="govuk-body govuk-!-margin-bottom-0 live-broadcast">
+              Live since {{ item.starts_at|format_datetime_relative }}
+            </p>
+          {% else %}
+            <p class="govuk-body govuk-!-margin-bottom-0 govuk-hint">
+              Broadcast {{ item.starts_at|format_datetime_relative }}
+            </p>
+          {% endif %}
+        </div>
       </div>
-    {% endcall %}
-    {% call field(align='right') %}
-      {% if item.status == 'pending-approval' %}
-        <p class="govuk-body govuk-!-margin-top-6 govuk-!-margin-bottom-0 govuk-hint">
-          Waiting for approval
-        </p>
-      {% elif item.status == 'broadcasting' %}
-        <p class="govuk-body govuk-!-margin-top-6 govuk-!-margin-bottom-0 live-broadcast">
-          Live since {{ item.starts_at|format_datetime_relative }}
-        </p>
-      {% else %}
-        <p class="govuk-body govuk-!-margin-top-6 govuk-!-margin-bottom-0 govuk-hint">
-          Broadcast {{ item.starts_at|format_datetime_relative }}
-        </p>
-      {% endif %}
-    {% endcall %}
-  {% endcall %}
+      <ul class="area-list">
+        {% for area in item.areas %}
+          <li class="area-list-item area-list-item--unremoveable area-list-item--smaller">{{ area.name }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  {% if loop.last %}
+    <div class="keyline-block">
+    </div>
+  {% endif %}
+{% else %}
+  <p class="table-empty-message keyline-block govuk-!-padding-top-4">
+    {{ empty_message }}
+  </p>
+{% endfor %}
 </div>
