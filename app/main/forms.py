@@ -160,7 +160,7 @@ class UKMobileNumber(TelField):
     # 2. calls field.widget
     # this bypasses that by making self.widget a method with the same interface as widget.__call__
     def widget(self, field, param_extensions=None, **kwargs):
-        return govuk_field_widget(self, field, type="tel", param_extensions=param_extensions, **kwargs)
+        return govuk_text_input_field_widget(self, field, type="tel", param_extensions=param_extensions, **kwargs)
 
     def pre_validate(self, form):
         try:
@@ -179,7 +179,7 @@ class InternationalPhoneNumber(TelField):
     # 2. calls field.widget
     # this bypasses that by making self.widget a method with the same interface as widget.__call__
     def widget(self, field, param_extensions=None, **kwargs):
-        return govuk_field_widget(self, field, type="tel", param_extensions=param_extensions, **kwargs)
+        return govuk_text_input_field_widget(self, field, type="tel", param_extensions=param_extensions, **kwargs)
 
     def pre_validate(self, form):
         try:
@@ -212,7 +212,7 @@ def password(label='Password'):
     )
 
 
-def govuk_field_widget(self, field, type=None, param_extensions=None, **kwargs):
+def govuk_text_input_field_widget(self, field, type=None, param_extensions=None, **kwargs):
     value = kwargs["value"] if kwargs.get("value") else field.data
 
     # error messages
@@ -260,7 +260,7 @@ class GovukTextInputField(StringField):
     # 2. calls field.widget
     # this bypasses that by making self.widget a method with the same interface as widget.__call__
     def widget(self, field, **kwargs):
-        return govuk_field_widget(self, field, **kwargs)
+        return govuk_text_input_field_widget(self, field, **kwargs)
 
 
 class GovukPasswordField(PasswordField):
@@ -273,7 +273,7 @@ class GovukPasswordField(PasswordField):
     # 2. calls field.widget
     # this bypasses that by making self.widget a method with the same interface as widget.__call__
     def widget(self, field, param_extensions=None, **kwargs):
-        return govuk_field_widget(self, field, type="password", param_extensions=param_extensions, **kwargs)
+        return govuk_text_input_field_widget(self, field, type="password", param_extensions=param_extensions, **kwargs)
 
 
 class GovukEmailField(EmailField):
@@ -290,7 +290,7 @@ class GovukEmailField(EmailField):
         params = {"attributes": {"spellcheck": "false"}}  # email addresses don't need to be spellchecked
         merge_jsonlike(params, param_extensions)
 
-        return govuk_field_widget(self, field, type="email", param_extensions=params, **kwargs)
+        return govuk_text_input_field_widget(self, field, type="email", param_extensions=params, **kwargs)
 
 
 class GovukSearchField(SearchField):
@@ -307,7 +307,7 @@ class GovukSearchField(SearchField):
         params = {"classes": "govuk-!-width-full"}  # email addresses don't need to be spellchecked
         merge_jsonlike(params, param_extensions)
 
-        return govuk_field_widget(self, field, type="search", param_extensions=params, **kwargs)
+        return govuk_text_input_field_widget(self, field, type="search", param_extensions=params, **kwargs)
 
 
 class GovukDateField(DateField):
@@ -320,7 +320,7 @@ class GovukDateField(DateField):
     # 2. calls field.widget
     # this bypasses that by making self.widget a method with the same interface as widget.__call__
     def widget(self, field, param_extensions=None, **kwargs):
-        return govuk_field_widget(self, field, param_extensions=param_extensions, **kwargs)
+        return govuk_text_input_field_widget(self, field, param_extensions=param_extensions, **kwargs)
 
 
 class GovukIntegerField(IntegerField):
@@ -333,7 +333,7 @@ class GovukIntegerField(IntegerField):
     # 2. calls field.widget
     # this bypasses that by making self.widget a method with the same interface as widget.__call__
     def widget(self, field, param_extensions=None, **kwargs):
-        return govuk_field_widget(self, field, param_extensions=param_extensions, **kwargs)
+        return govuk_text_input_field_widget(self, field, param_extensions=param_extensions, **kwargs)
 
 
 class SMSCode(GovukTextInputField):
