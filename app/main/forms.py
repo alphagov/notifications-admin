@@ -688,7 +688,7 @@ class RegisterUserFromOrgInviteForm(StripWhitespaceForm):
     auth_type = HiddenField('auth_type', validators=[DataRequired()])
 
 
-class govukCheckboxesMixin:
+class GovukCheckboxesMixin:
 
     def extend_params(self, params, extensions):
         items = None
@@ -714,10 +714,10 @@ class govukCheckboxesMixin:
                         params['items'][idx].update(items[idx])
 
 
-class govukCheckboxField(govukCheckboxesMixin, BooleanField):
+class GovukCheckboxField(GovukCheckboxesMixin, BooleanField):
 
     def __init__(self, label='', validators=None, param_extensions=None, **kwargs):
-        super(govukCheckboxField, self).__init__(label, validators, false_values=None, **kwargs)
+        super(GovukCheckboxField, self).__init__(label, validators, false_values=None, **kwargs)
         self.param_extensions = param_extensions
 
     # self.__call__ renders the HTML for the field by:
@@ -766,12 +766,12 @@ class govukCheckboxField(govukCheckboxesMixin, BooleanField):
 
 
 # based on work done by @richardjpope: https://github.com/richardjpope/recourse/blob/master/recourse/forms.py#L6
-class govukCheckboxesField(govukCheckboxesMixin, SelectMultipleField):
+class GovukCheckboxesField(GovukCheckboxesMixin, SelectMultipleField):
 
     render_as_list = False
 
     def __init__(self, label='', validators=None, param_extensions=None, **kwargs):
-        super(govukCheckboxesField, self).__init__(label, validators, **kwargs)
+        super(GovukCheckboxesField, self).__init__(label, validators, **kwargs)
         self.param_extensions = param_extensions
 
     def get_item_from_option(self, option):
@@ -834,11 +834,11 @@ class govukCheckboxesField(govukCheckboxesMixin, SelectMultipleField):
             render_template('forms/fields/checkboxes/macro.njk', params=params))
 
 
-# Extends fields using the govukCheckboxesField interface to wrap their render in HTML needed by the collapsible JS
-class govukCollapsibleCheckboxesMixin:
+# Extends fields using the GovukCheckboxesField interface to wrap their render in HTML needed by the collapsible JS
+class GovukCollapsibleCheckboxesMixin:
     def __init__(self, label='', validators=None, field_label='', param_extensions=None, **kwargs):
 
-        super(govukCollapsibleCheckboxesMixin, self).__init__(label, validators, param_extensions, **kwargs)
+        super(GovukCollapsibleCheckboxesMixin, self).__init__(label, validators, param_extensions, **kwargs)
         self.field_label = field_label
 
     def widget(self, field, **kwargs):
@@ -856,19 +856,19 @@ class govukCollapsibleCheckboxesMixin:
             f'<div class="selection-wrapper"'
             f'     data-module="collapsible-checkboxes"'
             f'     data-field-label="{self.field_label}">'
-            f'  {super(govukCollapsibleCheckboxesMixin, self).widget(field, **kwargs)}'
+            f'  {super(GovukCollapsibleCheckboxesMixin, self).widget(field, **kwargs)}'
             f'</div>'
         )
 
 
-class govukCollapsibleCheckboxesField(govukCollapsibleCheckboxesMixin, govukCheckboxesField):
+class GovukCollapsibleCheckboxesField(GovukCollapsibleCheckboxesMixin, GovukCheckboxesField):
     pass
 
 
-# govukCollapsibleCheckboxesMixin adds an ARIA live-region to the hint and wraps the render in HTML needed by the
+# GovukCollapsibleCheckboxesMixin adds an ARIA live-region to the hint and wraps the render in HTML needed by the
 # collapsible JS
 # NestedFieldMixin puts the items into a tree hierarchy, pre-rendering the sub-trees of the top-level items
-class govukCollapsibleNestedCheckboxesField(govukCollapsibleCheckboxesMixin, NestedFieldMixin, govukCheckboxesField):
+class GovukCollapsibleNestedCheckboxesField(GovukCollapsibleCheckboxesMixin, NestedFieldMixin, GovukCheckboxesField):
     NONE_OPTION_VALUE = None
     render_as_list = True
 
@@ -899,7 +899,7 @@ class BasePermissionsForm(StripWhitespaceForm):
                 (item['id'], item['name']) for item in ([{'name': 'Templates', 'id': None}] + all_template_folders)
             ]
 
-    folder_permissions = govukCollapsibleNestedCheckboxesField(
+    folder_permissions = GovukCollapsibleNestedCheckboxesField(
         'Folders this team member can see',
         field_label='folder')
 
@@ -913,7 +913,7 @@ class BasePermissionsForm(StripWhitespaceForm):
         validators=[DataRequired()]
     )
 
-    permissions_field = govukCheckboxesField(
+    permissions_field = GovukCheckboxesField(
         'Permissions',
         filters=[filter_by_permissions],
         choices=[
@@ -946,7 +946,7 @@ class PermissionsForm(BasePermissionsForm):
 
 class BroadcastPermissionsForm(BasePermissionsForm):
 
-    permissions_field = govukCheckboxesField(
+    permissions_field = GovukCheckboxesField(
         'Permissions',
         choices=[
             (value, label) for value, label in broadcast_permissions
@@ -1567,7 +1567,7 @@ class ServiceContactDetailsForm(StripWhitespaceForm):
 
 class ServiceReplyToEmailForm(StripWhitespaceForm):
     email_address = email_address(label='Reply-to email address', gov_user=False)
-    is_default = govukCheckboxField("Make this email address the default")
+    is_default = GovukCheckboxField("Make this email address the default")
 
 
 class ServiceSmsSenderForm(StripWhitespaceForm):
@@ -1581,11 +1581,11 @@ class ServiceSmsSenderForm(StripWhitespaceForm):
             DoesNotStartWithDoubleZero(),
         ]
     )
-    is_default = govukCheckboxField("Make this text message sender the default")
+    is_default = GovukCheckboxField("Make this text message sender the default")
 
 
 class ServiceEditInboundNumberForm(StripWhitespaceForm):
-    is_default = govukCheckboxField("Make this text message sender the default")
+    is_default = GovukCheckboxField("Make this text message sender the default")
 
 
 class ServiceLetterContactBlockForm(StripWhitespaceForm):
@@ -1595,7 +1595,7 @@ class ServiceLetterContactBlockForm(StripWhitespaceForm):
             NoCommasInPlaceHolders()
         ]
     )
-    is_default = govukCheckboxField("Set as your default address")
+    is_default = GovukCheckboxField("Set as your default address")
 
     def validate_letter_contact_block(self, field):
         line_count = field.data.strip().count('\n')
@@ -1765,7 +1765,7 @@ class GuestList(StripWhitespaceForm):
 class DateFilterForm(StripWhitespaceForm):
     start_date = GovukDateField("Start Date", [validators.optional()])
     end_date = GovukDateField("End Date", [validators.optional()])
-    include_from_test_key = govukCheckboxField("Include test keys")
+    include_from_test_key = GovukCheckboxField("Include test keys")
 
 
 class RequiredDateFilterForm(StripWhitespaceForm):
@@ -2047,7 +2047,7 @@ class TemplateFolderForm(StripWhitespaceForm):
                 (item.id, item.name) for item in all_service_users
             ]
 
-    users_with_permission = govukCollapsibleCheckboxesField(
+    users_with_permission = GovukCollapsibleCheckboxesField(
         'Team members who can see this folder',
         field_label='folder')
     name = GovukTextInputField('Folder name', validators=[DataRequired(message='Cannot be empty')])
@@ -2150,7 +2150,7 @@ class TemplateAndFoldersSelectionForm(Form):
             return self.move_to_new_folder_name.data
         return None
 
-    templates_and_folders = govukCheckboxesField(
+    templates_and_folders = GovukCheckboxesField(
         'Choose templates or folders',
         validators=[required_for_ops('move-to-new-folder', 'move-to-existing-folder')],
         choices=[],  # added to keep order of arguments, added properly in __init__
@@ -2260,7 +2260,7 @@ class AcceptAgreementForm(StripWhitespaceForm):
 
 class BroadcastAreaForm(StripWhitespaceForm):
 
-    areas = govukCheckboxesField('Choose areas to broadcast to')
+    areas = GovukCheckboxesField('Choose areas to broadcast to')
 
     def __init__(self, choices, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -2277,7 +2277,7 @@ class BroadcastAreaForm(StripWhitespaceForm):
 
 class BroadcastAreaFormWithSelectAll(BroadcastAreaForm):
 
-    select_all = govukCheckboxField('Select all')
+    select_all = GovukCheckboxField('Select all')
 
     @classmethod
     def from_library(cls, library, select_all_choice):
