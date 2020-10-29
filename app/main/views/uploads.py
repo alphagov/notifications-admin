@@ -384,11 +384,19 @@ def upload_contact_list(service_id):
                 current_service.id,
                 Spreadsheet.from_file_form(form).as_dict,
             )
+            file_name_metadata = unicode_truncate(
+                SanitiseASCII.encode(form.file.data.filename),
+                1600
+            )
+            ContactList.set_metadata(
+                current_service.id,
+                upload_id,
+                original_file_name=file_name_metadata
+            )
             return redirect(url_for(
                 '.check_contact_list',
                 service_id=service_id,
                 upload_id=upload_id,
-                original_file_name=form.file.data.filename,
             ))
         except (UnicodeDecodeError, BadZipFile, XLRDError):
             flash('Could not read {}. Try using a different file format.'.format(
@@ -419,13 +427,19 @@ def check_contact_list(service_id, upload_id):
 
     contents = ContactList.download(service_id, upload_id)
     first_row = contents.splitlines()[0].strip().rstrip(',') if contents else ''
+    metadata = ContactList.get_metadata(service_id, upload_id)
 
     template_type = {
         'emailaddress': 'email',
         'phonenumber': 'sms',
     }.get(Columns.make_key(first_row))
 
-    original_file_name = SanitiseASCII.encode(request.args.get('original_file_name', ''))
+    # TODO: stop looking in the query string for metadata once we are sure all uploaded
+    # contact lists now have original_file_name in the metadata
+    original_file_name = metadata.get(
+        'original_file_name',
+        SanitiseASCII.encode(request.args.get('original_file_name', ''))
+    )
 
     recipients = RecipientCSV(
         contents,
