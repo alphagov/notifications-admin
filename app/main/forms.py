@@ -688,33 +688,139 @@ class RegisterUserFromOrgInviteForm(StripWhitespaceForm):
     auth_type = HiddenField('auth_type', validators=[DataRequired()])
 
 
-class GovukCheckboxesMixin:
+def extend_params(params, extensions):
+    items = None
+    param_items = len(params['items']) if 'items' in params else 0
 
-    def extend_params(self, params, extensions):
-        items = None
-        param_items = len(params['items']) if 'items' in params else 0
+    # split items off from params to make it a pure dict
+    if 'items' in extensions:
+        items = extensions['items']
+        del extensions['items']
 
-        # split items off from params to make it a pure dict
-        if 'items' in extensions:
-            items = extensions['items']
-            del extensions['items']
+    # merge dicts
+    merge_jsonlike(params, extensions)
 
-        # merge dicts
-        merge_jsonlike(params, extensions)
-
-        # merge items
-        if items:
-            if 'items' not in params:
-                params['items'] = items
-            else:
-                for idx, _item in enumerate(items):
-                    if idx >= param_items:
-                        params['items'].append(items[idx])
-                    else:
-                        params['items'][idx].update(items[idx])
+    # merge items
+    if items:
+        if 'items' not in params:
+            params['items'] = items
+        else:
+            for idx, _item in enumerate(items):
+                if idx >= param_items:
+                    params['items'].append(items[idx])
+                else:
+                    params['items'][idx].update(items[idx])
 
 
-class GovukCheckboxField(GovukCheckboxesMixin, BooleanField):
+def govuk_checkbox_field_widget(self, field, param_extensions=None, **kwargs):
+
+    # error messages
+    error_message = None
+    if field.errors:
+        error_message = {
+            "attributes": {
+                "data-module": "track-error",
+                "data-error-type": field.errors[0],
+                "data-error-label": field.name
+            },
+            "text": " ".join(field.errors).strip()
+        }
+
+    params = {
+        'name':  field.name,
+        'errorMessage': error_message,
+        'items': [
+            {
+                "name": field.name,
+                "id": field.id,
+                "text": field.label.text,
+                "value": 'y',
+                "checked": field.data
+            }
+        ]
+
+    }
+
+    # extend default params with any sent in during instantiation
+    if self.param_extensions:
+        extend_params(params, self.param_extensions)
+
+    # add any sent in though use in templates
+    if param_extensions:
+        extend_params(params, param_extensions)
+
+    return Markup(
+        render_template('forms/fields/checkboxes/macro.njk', params=params))
+
+
+def govuk_checkboxes_field_widget(self, field, wrap_in_collapsible=False, param_extensions=None, **kwargs):
+
+    def _wrap_in_collapsible(field_label, checkboxes_string):
+        # wrap the checkboxes HTML in the HTML needed by the collapisble JS
+        result = Markup(
+            f'<div class="selection-wrapper"'
+            f'     data-module="collapsible-checkboxes"'
+            f'     data-field-label="{field_label}">'
+            f'  {checkboxes_string}'
+            f'</div>'
+        )
+
+        return result
+
+    # error messages
+    error_message = None
+    if field.errors:
+        error_message = {
+            "attributes": {
+                "data-module": "track-error",
+                "data-error-type": field.errors[0],
+                "data-error-label": field.name
+            },
+            "text": " ".join(field.errors).strip()
+        }
+
+    # returns either a list or a hierarchy of lists
+    # depending on how get_items_from_options is implemented
+    items = self.get_items_from_options(field)
+
+    params = {
+        'name':  field.name,
+        "fieldset": {
+            "attributes": {"id": field.name},
+            "legend": {
+                "text": field.label.text,
+                "classes": "govuk-fieldset__legend--s"
+            }
+        },
+        "asList": self.render_as_list,
+        'errorMessage': error_message,
+        'items': items
+    }
+
+    # extend default params with any sent in during instantiation
+    if self.param_extensions:
+        extend_params(params, self.param_extensions)
+
+    # add any sent in though use in templates
+    if param_extensions:
+        extend_params(params, param_extensions)
+
+    if wrap_in_collapsible:
+
+        # add a blank hint to act as an ARIA live-region
+        params.update(
+            {"hint": {"html": "<div class=\"selection-summary\" role=\"region\" aria-live=\"polite\"></div>"}})
+
+        return _wrap_in_collapsible(
+            self.field_label,
+            Markup(render_template('forms/fields/checkboxes/macro.njk', params=params))
+            )
+    else:
+        return Markup(
+            render_template('forms/fields/checkboxes/macro.njk', params=params))
+
+
+class GovukCheckboxField(BooleanField):
 
     def __init__(self, label='', validators=None, param_extensions=None, **kwargs):
         super(GovukCheckboxField, self).__init__(label, validators, false_values=None, **kwargs)
@@ -725,48 +831,11 @@ class GovukCheckboxField(GovukCheckboxesMixin, BooleanField):
     # 2. calls field.widget
     # this bypasses that by making self.widget a method with the same interface as widget.__call__
     def widget(self, field, param_extensions=None, **kwargs):
-
-        # error messages
-        error_message = None
-        if field.errors:
-            error_message = {
-                "attributes": {
-                    "data-module": "track-error",
-                    "data-error-type": field.errors[0],
-                    "data-error-label": field.name
-                },
-                "text": " ".join(field.errors).strip()
-            }
-
-        params = {
-            'name':  field.name,
-            'errorMessage': error_message,
-            'items': [
-                {
-                    "name": field.name,
-                    "id": field.id,
-                    "text": field.label.text,
-                    "value": 'y',
-                    "checked": field.data
-                }
-            ]
-
-        }
-
-        # extend default params with any sent in during instantiation
-        if self.param_extensions:
-            self.extend_params(params, self.param_extensions)
-
-        # add any sent in though use in templates
-        if param_extensions:
-            self.extend_params(params, param_extensions)
-
-        return Markup(
-            render_template('forms/fields/checkboxes/macro.njk', params=params))
+        return govuk_checkbox_field_widget(self, field, param_extensions=param_extensions, **kwargs)
 
 
 # based on work done by @richardjpope: https://github.com/richardjpope/recourse/blob/master/recourse/forms.py#L6
-class GovukCheckboxesField(GovukCheckboxesMixin, SelectMultipleField):
+class GovukCheckboxesField(SelectMultipleField):
 
     render_as_list = False
 
@@ -791,84 +860,24 @@ class GovukCheckboxesField(GovukCheckboxesMixin, SelectMultipleField):
     # 2. calls field.widget
     # this bypasses that by making self.widget a method with the same interface as widget.__call__
     def widget(self, field, param_extensions=None, **kwargs):
-
-        # error messages
-        error_message = None
-        if field.errors:
-            error_message = {
-                "attributes": {
-                    "data-module": "track-error",
-                    "data-error-type": field.errors[0],
-                    "data-error-label": field.name
-                },
-                "text": " ".join(field.errors).strip()
-            }
-
-        # returns either a list or a hierarchy of lists
-        # depending on how get_items_from_options is implemented
-        items = self.get_items_from_options(field)
-
-        params = {
-            'name':  field.name,
-            "fieldset": {
-                "attributes": {"id": field.name},
-                "legend": {
-                    "text": field.label.text,
-                    "classes": "govuk-fieldset__legend--s"
-                }
-            },
-            "asList": self.render_as_list,
-            'errorMessage': error_message,
-            'items': items
-        }
-
-        # extend default params with any sent in during instantiation
-        if self.param_extensions:
-            self.extend_params(params, self.param_extensions)
-
-        # add any sent in though use in templates
-        if param_extensions:
-            self.extend_params(params, param_extensions)
-
-        return Markup(
-            render_template('forms/fields/checkboxes/macro.njk', params=params))
+        return govuk_checkboxes_field_widget(self, field, param_extensions=param_extensions, **kwargs)
 
 
-# Extends fields using the GovukCheckboxesField interface to wrap their render in HTML needed by the collapsible JS
-class GovukCollapsibleCheckboxesMixin:
+# Wraps checkboxes rendering in HTML needed by the collapsible JS
+class GovukCollapsibleCheckboxesField(GovukCheckboxesField):
     def __init__(self, label='', validators=None, field_label='', param_extensions=None, **kwargs):
 
-        super(GovukCollapsibleCheckboxesMixin, self).__init__(label, validators, param_extensions, **kwargs)
+        super(GovukCollapsibleCheckboxesField, self).__init__(label, validators, param_extensions, **kwargs)
         self.field_label = field_label
 
     def widget(self, field, **kwargs):
-
-        # add a blank hint to act as an ARIA live-region
-        if self.param_extensions is not None:
-            self.param_extensions.update(
-                {"hint": {"html": "<div class=\"selection-summary\" role=\"region\" aria-live=\"polite\"></div>"}})
-        else:
-            self.param_extensions = \
-                {"hint": {"html": "<div class=\"selection-summary\" role=\"region\" aria-live=\"polite\"></div>"}}
-
-        # wrap the checkboxes HTML in the HTML needed by the collapisble JS
-        return Markup(
-            f'<div class="selection-wrapper"'
-            f'     data-module="collapsible-checkboxes"'
-            f'     data-field-label="{self.field_label}">'
-            f'  {super(GovukCollapsibleCheckboxesMixin, self).widget(field, **kwargs)}'
-            f'</div>'
-        )
+        return govuk_checkboxes_field_widget(self, field, wrap_in_collapsible=True, param_extensions=None, **kwargs)
 
 
-class GovukCollapsibleCheckboxesField(GovukCollapsibleCheckboxesMixin, GovukCheckboxesField):
-    pass
-
-
-# GovukCollapsibleCheckboxesMixin adds an ARIA live-region to the hint and wraps the render in HTML needed by the
+# GovukCollapsibleCheckboxesField adds an ARIA live-region to the hint and wraps the render in HTML needed by the
 # collapsible JS
 # NestedFieldMixin puts the items into a tree hierarchy, pre-rendering the sub-trees of the top-level items
-class GovukCollapsibleNestedCheckboxesField(GovukCollapsibleCheckboxesMixin, NestedFieldMixin, GovukCheckboxesField):
+class GovukCollapsibleNestedCheckboxesField(NestedFieldMixin, GovukCollapsibleCheckboxesField):
     NONE_OPTION_VALUE = None
     render_as_list = True
 
