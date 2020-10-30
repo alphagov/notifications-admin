@@ -28,34 +28,26 @@ $govuk-checkboxes-size: 40px;
 $govuk-checkboxes-label-padding-left-right: govuk-spacing(3);
 $message-type-bottom-spacing: govuk-spacing(4);
 
-.message {
+a {
 
-  &-name {
-    margin: 0;
-
-    a {
-
-      &:hover .message-name-separator:before {
-        border-color: $link-hover-colour;
-      }
-
-      .message-name-separator {
-
-        margin-right: -2px;
-        margin-left: -2px;
-
-        &:before {
-          border-color: $link-colour;
-        }
-      }
-    }
-
-    &-separator {
-      @include separator;
-    }
-
+  &:hover .message-name-separator:before {
+    border-color: $link-hover-colour;
   }
 
+  .message-name-separator {
+
+    margin-right: -2px;
+    margin-left: -2px;
+
+    &:before {
+      border-color: $link-colour;
+    }
+  }
+
+}
+
+.message-name-separator {
+  @include separator;
 }
 
 .template-list {
@@ -72,18 +64,20 @@ $message-type-bottom-spacing: govuk-spacing(4);
 
     &-without-ancestors {
 
-      .message-name {
+      a {
 
-        a {
+        display: block;
+
+        &:first-child {
           display: block;
+        }
 
-          &:first-child {
-            display: block;
-          }
+        &.template-list-folder:first-of-type {
+          background-position: 0 2px;
+          padding-left: 0;
+          text-indent: 35px;
 
-          &.template-list-folder:first-child {
-            background-position: 0 2px;
-            padding-left: 0;
+          @include govuk-media-query($from: tablet) {
             text-indent: 40px;
           }
 
