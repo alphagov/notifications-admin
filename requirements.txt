@@ -12,11 +12,11 @@ Flask-Login==0.5.0
 
 blinker==1.4
 pyexcel==0.6.5
-pyexcel-io==0.6.3
+pyexcel-io==0.6.4
 pyexcel-xls==0.6.1
 pyexcel-xlsx==0.6.0
 pyexcel-ods3==0.6.0
-pytz==2020.1
+pytz==2020.4
 gunicorn==20.0.4
 eventlet==0.29.1
 notifications-python-client==5.7.0
@@ -34,10 +34,10 @@ prometheus-client==0.8.0
 gds-metrics==0.2.4
 
 ## The following requirements were added by pip freeze:
-awscli==1.18.164
+awscli==1.18.169
 bleach==3.1.4
 boto3==1.10.38
-botocore==1.19.4
+botocore==1.19.9
 cachetools==4.1.0
 certifi==2020.6.20
 chardet==3.0.4
