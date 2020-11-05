@@ -394,65 +394,6 @@ def test_upload_csv_shows_ok_page(
     )
 
 
-def test_upload_csv_shows_ok_page_when_filename_is_in_query_string(
-    client_request,
-    mock_get_live_service,
-    mock_get_users_by_service,
-    mock_get_job_doesnt_exist,
-    fake_uuid,
-    mocker
-):
-    mocker.patch('app.models.contact_list.s3download', return_value='\n'.join(
-        ['email address'] + ['test@example.com'] * 51
-    ))
-    mocker.patch('app.models.contact_list.get_csv_metadata', return_value={})
-    mock_metadata_set = mocker.patch('app.models.contact_list.set_metadata_on_csv_upload')
-
-    page = client_request.get(
-        'main.check_contact_list',
-        service_id=SERVICE_ONE_ID,
-        upload_id=fake_uuid,
-        original_file_name='good times.xlsx',
-        _test_page_title=False,
-    )
-
-    mock_metadata_set.assert_called_once_with(
-        SERVICE_ONE_ID,
-        fake_uuid,
-        bucket='test-contact-list',
-        row_count=51,
-        original_file_name='good times.xlsx',
-        template_type='email',
-        valid=True,
-    )
-
-    assert normalize_spaces(page.select_one('h1').text) == (
-        'good times.xlsx'
-    )
-    assert normalize_spaces(page.select_one('main p').text) == (
-        '51 email addresses found'
-    )
-    assert page.select_one('form')['action'] == url_for(
-        'main.save_contact_list',
-        service_id=SERVICE_ONE_ID,
-        upload_id=fake_uuid,
-    )
-
-    assert normalize_spaces(page.select_one('form [type=submit]').text) == (
-        'Save contact list'
-    )
-    assert normalize_spaces(page.select_one('thead').text) == (
-        'Row in file 1 email address'
-    )
-    assert len(page.select('tbody tr')) == 50
-    assert normalize_spaces(page.select_one('tbody tr').text) == (
-        '2 test@example.com'
-    )
-    assert normalize_spaces(page.select_one('.table-show-more-link').text) == (
-        'Only showing the first 50 rows'
-    )
-
-
 def test_save_contact_list(
     mocker,
     client_request,

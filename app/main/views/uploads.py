@@ -427,19 +427,12 @@ def check_contact_list(service_id, upload_id):
 
     contents = ContactList.download(service_id, upload_id)
     first_row = contents.splitlines()[0].strip().rstrip(',') if contents else ''
-    metadata = ContactList.get_metadata(service_id, upload_id)
+    original_file_name = ContactList.get_metadata(service_id, upload_id).get('original_file_name', '')
 
     template_type = {
         'emailaddress': 'email',
         'phonenumber': 'sms',
     }.get(Columns.make_key(first_row))
-
-    # TODO: stop looking in the query string for metadata once we are sure all uploaded
-    # contact lists now have original_file_name in the metadata
-    original_file_name = metadata.get(
-        'original_file_name',
-        SanitiseASCII.encode(request.args.get('original_file_name', ''))
-    )
 
     recipients = RecipientCSV(
         contents,
@@ -493,10 +486,7 @@ def check_contact_list(service_id, upload_id):
     metadata_kwargs = {
         'row_count': len(recipients),
         'valid': True,
-        'original_file_name': unicode_truncate(
-            original_file_name,
-            1600,
-        ),
+        'original_file_name': original_file_name,
         'template_type': template_type
     }
 
