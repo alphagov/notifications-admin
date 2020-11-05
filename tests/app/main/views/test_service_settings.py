@@ -1037,6 +1037,28 @@ def test_should_not_show_go_live_button_if_checklist_not_complete(
         )
 
 
+@pytest.mark.parametrize('go_live_at, message', [
+    (None, '‘service one’ is already live.'),
+    ('2020-10-09 13:55:20', '‘service one’ went live on 9 October 2020.'),
+])
+def test_request_to_go_live_redirects_if_service_already_live(
+    client_request,
+    service_one,
+    go_live_at,
+    message,
+):
+    service_one['restricted'] = False
+    service_one['go_live_at'] = go_live_at
+
+    page = client_request.get(
+        'main.request_to_go_live',
+        service_id=SERVICE_ONE_ID,
+    )
+
+    assert page.h1.text == 'Your service is already live'
+    assert normalize_spaces(page.select_one('main p').text) == message
+
+
 @pytest.mark.parametrize((
     'estimated_sms_volume,'
     'organisation_type,'
