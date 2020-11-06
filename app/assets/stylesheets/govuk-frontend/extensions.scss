@@ -1,3 +1,16 @@
+// Gives access to the Sass variables used in the GOVUK Frontend typographic styles
+// See: https://frontend.design-system.service.gov.uk/sass-api-reference/#govuk-typography-scale
+@function get-govuk-typography-style($size, $breakpoint, $property) {
+  $size-map: map-get($govuk-typography-scale, $size);
+  $breakpoint-map: map-get($size-map, $breakpoint);
+
+  @if not map-has-key($breakpoint-map, $property) {
+    @error "Unknown property #{$property} - expected a property from the typography scale for #{$size}.";
+  }
+
+  @return map-get($breakpoint-map, $property);
+}
+
 // Extends footer column styles to allow 4 columns
 @include mq ($from: desktop) {
   .govuk-footer__list--columns-4 {
