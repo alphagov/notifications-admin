@@ -1294,14 +1294,13 @@ class BaseTemplateForm(StripWhitespaceForm):
             NoCommasInPlaceHolders()
         ]
     )
-    process_type = RadioField(
+    process_type = GovukRadiosField(
         "Use priority queue?",
         choices=[
             ('priority', 'Yes'),
             ('normal', 'No'),
         ],
         thing='yes or no',
-        validators=[DataRequired()],
         default='normal'
     )
 

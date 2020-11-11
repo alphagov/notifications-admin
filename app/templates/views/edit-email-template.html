@@ -2,7 +2,6 @@
 {% from "components/textbox.html" import textbox %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import sticky_page_footer %}
-{% from "components/radios.html" import radios %}
 {% from "components/form.html" import form_wrapper %}
 
 {% block service_page_title %}
@@ -26,7 +25,7 @@
           {{ textbox(form.subject, width='1-1', highlight_placeholders=True, rows=2) }}
           {{ textbox(form.template_content, highlight_placeholders=True, width='1-1', rows=8) }}
           {% if current_user.platform_admin %}
-             {{ radios(form.process_type) }}
+             {{ form.process_type }}
           {% endif %}
           {{ sticky_page_footer(
             'Save'
