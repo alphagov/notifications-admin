@@ -1597,10 +1597,18 @@ class ProviderForm(StripWhitespaceForm):
 
 class ProviderRatioForm(StripWhitespaceForm):
 
-    ratio = RadioField(choices=[
-        (str(value), '{}% / {}%'.format(value, 100 - value))
-        for value in range(100, -10, -10)
-    ])
+    ratio = GovukRadiosField(choices=[
+            (str(value), '{}% / {}%'.format(value, 100 - value))
+            for value in range(100, -10, -10)
+        ],
+        param_extensions={
+            "classes": "govuk-radios--inline",
+            "fieldset": {
+                "legend": {
+                    "classes": "govuk-visually-hidden"
+                }
+            }
+        })
 
     @property
     def percentage_left(self):
