@@ -2272,7 +2272,7 @@ class TemplateAndFoldersSelectionForm(Form):
 
 
 class ClearCacheForm(StripWhitespaceForm):
-    model_type = RadioField(
+    model_type = GovukRadiosField(
         'What do you want to clear today',
     )
 

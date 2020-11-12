@@ -744,7 +744,7 @@ def test_clear_cache_requires_option(client_request, platform_admin_user, mocker
 
     page = client_request.post('main.clear_cache', _data={}, _expected_status=200)
 
-    assert normalize_spaces(page.find('span', class_='error-message').text) == 'Select an option'
+    assert normalize_spaces(page.find('span', class_='govuk-error-message').text) == 'Error: Select an option'
     assert not redis.delete_cache_keys_by_pattern.called
 
 
