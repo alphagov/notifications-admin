@@ -44,7 +44,10 @@
 
   <h3 class="heading-small" id="long-text-messages">Long text messages</h3>
   <p class="govuk-body">If a text message is longer than 160 characters (including spaces), it’ll be charged as more than one message.</p>
-  <p class="govuk-body">The following characters are charged as 2 characters each: [ ] { } ^ \ | ~ €</p>
+  <p class="govuk-body">
+    The following characters are charged as 2 characters each:<br />
+    <span class="extended-gsm-characters">[]{}^\|~€</span>
+  </p>
 
   <div class="bottom-gutter-3-2">
     {% call mapping_table(

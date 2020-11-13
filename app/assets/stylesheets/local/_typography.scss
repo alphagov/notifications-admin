@@ -60,3 +60,9 @@
 .destructive-link--no-visited-state {
   @include destructive-link-style-no-visited-state;
 }
+
+// Font override classes
+.extended-gsm-characters {
+  font-family: $govuk-font-family-tabular;
+  letter-spacing: 0.5em;
+}
