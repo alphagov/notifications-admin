@@ -7,7 +7,18 @@
     <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for(item['link']) }}" itemprop="item">
       <span itemprop="name">{{item['name']}}</span>
     </a>
+    {% if caller %}
+      {{ caller() }}
+    {% endif %}
   </li>
+{% endmacro %}
+
+{% macro sub_navigation_item_sub_navigation(item) %}
+  <ol itemscope itemtype="http://schema.org/ItemList">
+    {% for sub_item in item.sub_navigation_items %}
+      {{ sub_navigation_item(sub_item) }}
+    {% endfor %}
+  </ol>
 {% endmacro %}
 
 {% macro sub_navigation(
@@ -16,13 +27,12 @@
   <nav class="sub-navigation">
     <ol itemscope itemtype="http://schema.org/ItemList">
       {% for item in item_set %}
-        {{ sub_navigation_item(item) }}
         {% if item.sub_navigation_items %}
-          <ol itemscope itemtype="http://schema.org/ItemList">
-            {% for sub_item in item.sub_navigation_items %}
-              {{ sub_navigation_item(sub_item) }}
-            {% endfor %}
-          </ol>
+          {% call sub_navigation_item(item) %}
+            {{ sub_navigation_item_sub_navigation(item) }}
+          {% endcall %}
+        {% else %}
+          {{ sub_navigation_item(item) }}
         {% endif %}
       {% endfor %}
     </ol>
