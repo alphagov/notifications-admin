@@ -20,6 +20,10 @@
     color: $light-blue-25;
   }
 
+  &:focus {
+    color: $govuk-text-colour;
+  }
+
 }
 
 .edit-template-link-letter-contact {
