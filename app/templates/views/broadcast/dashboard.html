@@ -9,14 +9,6 @@
 
 {% block maincolumn_content %}
 
-  {% if current_user.has_permissions('manage_templates') and not current_service.all_templates %}
-    <nav class="govuk-!-margin-top-2 govuk-!-margin-bottom-6">
-      <a class="govuk-link govuk-link--no-visited-state pill-separate-item govuk-!-padding-top-4 govuk-!-padding-bottom-4 govuk-!-font-weight-bold" href="{{ url_for('.choose_template', service_id=current_service.id) }}">
-        Start by creating a template
-      </a>
-    </nav>
-  {% endif %}
-
   <h1 class="heading-medium">Current alerts</h1>
 
   {{ ajax_block(

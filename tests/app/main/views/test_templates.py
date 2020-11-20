@@ -43,7 +43,7 @@ from tests.conftest import (
         'You need a template before you can send emails, text messages or letters.'
     )),
     (['broadcast'], (
-        'You need a template before you can prepare a broadcast.'
+        'You haven’t added any templates yet.'
     )),
 ))
 def test_should_show_empty_page_when_no_templates(
