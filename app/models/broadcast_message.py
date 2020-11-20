@@ -55,6 +55,17 @@ class BroadcastMessage(JSONModel):
         return cls(broadcast_message_api_client.create_broadcast_message(
             service_id=service_id,
             template_id=template_id,
+            content=None,
+            reference=None,
+        ))
+
+    @classmethod
+    def create_from_content(cls, *, service_id, content, reference):
+        return cls(broadcast_message_api_client.create_broadcast_message(
+            service_id=service_id,
+            template_id=None,
+            content=content,
+            reference=reference,
         ))
 
     @classmethod

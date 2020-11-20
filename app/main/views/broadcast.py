@@ -13,6 +13,8 @@ from app.main import main
 from app.main.forms import (
     BroadcastAreaForm,
     BroadcastAreaFormWithSelectAll,
+    BroadcastTemplateForm,
+    NewBroadcastForm,
     SearchByNameForm,
 )
 from app.models.broadcast_message import BroadcastMessage, BroadcastMessages
@@ -68,6 +70,53 @@ def get_broadcast_dashboard_partials(service_id):
             empty_message='You do not have any current alerts',
             view_broadcast_endpoint='.view_current_broadcast',
         ),
+    )
+
+
+@main.route('/services/<uuid:service_id>/new-broadcast', methods=['GET', 'POST'])
+@user_has_permissions('send_messages')
+@service_has_permission('broadcast')
+def new_broadcast(service_id):
+    form = NewBroadcastForm()
+
+    if form.validate_on_submit():
+        if form.use_template:
+            return redirect(url_for(
+                '.choose_template',
+                service_id=current_service.id,
+            ))
+        return redirect(url_for(
+            '.write_new_broadcast',
+            service_id=current_service.id,
+        ))
+
+    return render_template(
+        'views/broadcast/new-broadcast.html',
+        form=form,
+    )
+
+
+@main.route('/services/<uuid:service_id>/write-new-broadcast', methods=['GET', 'POST'])
+@user_has_permissions('send_messages')
+@service_has_permission('broadcast')
+def write_new_broadcast(service_id):
+    form = BroadcastTemplateForm()
+
+    if form.validate_on_submit():
+        broadcast_message = BroadcastMessage.create_from_content(
+            service_id=current_service.id,
+            content=form.template_content.data,
+            reference=form.name.data,
+        )
+        return redirect(url_for(
+            '.preview_broadcast_areas',
+            service_id=current_service.id,
+            broadcast_message_id=broadcast_message.id,
+        ))
+
+    return render_template(
+        'views/broadcast/write-new-broadcast.html',
+        form=form,
     )
 
 

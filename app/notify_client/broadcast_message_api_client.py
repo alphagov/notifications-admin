@@ -8,12 +8,19 @@ class BroadcastMessageAPIClient(NotifyAdminAPIClient):
         *,
         service_id,
         template_id,
+        content,
+        reference,
     ):
         data = {
             "service_id": service_id,
-            "template_id": template_id,
             "personalisation": {},
         }
+        if template_id:
+            data.update(template_id=template_id)
+        if content:
+            data.update(content=content)
+        if reference:
+            data.update(reference=reference)
 
         data = _attach_current_user(data)
 

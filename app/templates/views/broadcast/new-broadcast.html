@@ -1,0 +1,23 @@
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+
+{% extends "withnav_template.html" %}
+
+{% block service_page_title %}
+  New alert
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header(
+    'New alert',
+    back_link=url_for('.broadcast_dashboard', service_id=current_service.id),
+  )}}
+
+  {% call form_wrapper() %}
+    {{ form.content }}
+    {{ page_footer('Continue') }}
+  {% endcall %}
+
+{% endblock %}
