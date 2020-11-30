@@ -512,11 +512,24 @@ def test_view_contact_list(
 def test_view_jobs_for_contact_list(
     mocker,
     client_request,
-    mock_get_contact_list,
     mock_get_jobs,
     mock_get_service_data_retention,
     fake_uuid,
 ):
+    mocker.patch(
+        'app.models.contact_list.contact_list_api_client.get_contact_list',
+        return_value={
+            'created_at': '2015-12-31 12:12:12',
+            'created_by': 'Test User',
+            'id': fake_uuid,
+            'original_file_name': 'EmergencyContactList.xls',
+            'row_count': 100,
+            'recent_job_count': 0,
+            'has_jobs': True,
+            'service_id': SERVICE_ONE_ID,
+            'template_type': 'email',
+        },
+    )
     mocker.patch('app.models.contact_list.s3download', return_value='\n'.join(
         ['email address'] + ['test@example.com'] * 51
     ))
@@ -529,7 +542,7 @@ def test_view_jobs_for_contact_list(
         'EmergencyContactList.xls'
     )
     assert normalize_spaces(page.select('main p')[0].text) == (
-        'Uploaded by Test User on 13 March 2020 at 10:59am.'
+        'Uploaded by Test User today at 12:12pm.'
     )
     assert normalize_spaces(page.select('main p')[1].text) == (
         'Used 6 times in the last 7 days.'
