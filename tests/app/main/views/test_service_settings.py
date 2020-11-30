@@ -3480,7 +3480,7 @@ def test_should_send_branding_and_organisations_to_preview(
     client_request.login(platform_admin_user)
     client_request.post(
         endpoint,
-        data={
+        _data={
             'branding_type': 'org',
             'branding_style': '1'
         },

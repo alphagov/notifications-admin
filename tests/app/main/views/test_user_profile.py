@@ -94,7 +94,7 @@ def test_should_render_change_email_continue_after_authenticate_email(
         session['new-email'] = 'new_notify@notify.gov.uk'
     page = client_request.post(
         'main.user_profile_email_authenticate',
-        data={'password': '12345'},
+        _data={'password': '12345'},
         _expected_status=200,
     )
     assert 'Click the link in the email to confirm the change to your email address.' in page.text
