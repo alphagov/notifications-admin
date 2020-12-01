@@ -28,4 +28,5 @@ def test_get_jobs(mock_get_jobs):
             'in progress',
         },
         page=123,
+        limit_days=None,
     )

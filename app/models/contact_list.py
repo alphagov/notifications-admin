@@ -137,11 +137,12 @@ class ContactList(JSONModel):
         file_name, extention = path.splitext(self.original_file_name)
         return f'{file_name}.csv'
 
-    def get_jobs(self, *, page):
+    def get_jobs(self, *, page, limit_days=None):
         return PaginatedJobsAndScheduledJobs(
             self.service_id,
             contact_list_id=self.id,
             page=page,
+            limit_days=limit_days,
         )
 
 

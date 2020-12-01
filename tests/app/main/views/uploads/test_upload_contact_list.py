@@ -491,6 +491,21 @@ def test_view_contact_list(
         service_id=SERVICE_ONE_ID,
         contact_list_id=fake_uuid,
     )
+    mock_get_no_jobs.assert_called_once_with(
+        SERVICE_ONE_ID,
+        contact_list_id=fake_uuid,
+        limit_days=7,
+        statuses={
+            'finished',
+            'in progress',
+            'pending',
+            'ready to send',
+            'scheduled',
+            'sending limits exceeded',
+            'sent to dvla',
+        },
+        page=1,
+    )
     assert normalize_spaces(page.select_one('h1').text) == (
         'EmergencyContactList.xls'
     )
