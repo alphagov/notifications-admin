@@ -517,7 +517,10 @@ def contact_list(service_id, contact_list_id):
     return render_template(
         'views/uploads/contact-list/contact-list.html',
         contact_list=contact_list,
-        jobs=contact_list.get_jobs(page=1),
+        jobs=contact_list.get_jobs(
+            page=1,
+            limit_days=current_service.get_days_of_retention(contact_list.template_type),
+        ),
     )
 
 
