@@ -1807,8 +1807,8 @@ def mock_has_no_jobs(mocker):
 
 
 @pytest.fixture(scope='function')
-def mock_get_jobs(mocker, api_user_active):
-    def _get_jobs(service_id, limit_days=None, statuses=None, page=1):
+def mock_get_jobs(mocker, api_user_active, fake_uuid):
+    def _get_jobs(service_id, limit_days=None, statuses=None, contact_list_id=None, page=1):
         if statuses is None:
             statuses = ['', 'scheduled', 'pending', 'cancelled', 'finished']
 
@@ -1816,19 +1816,21 @@ def mock_get_jobs(mocker, api_user_active):
             job_json(
                 service_id,
                 api_user_active,
+                job_id=fake_uuid,
                 original_file_name=filename,
                 scheduled_for=scheduled_for,
                 job_status=job_status,
                 template_version=template_version,
+                template_name=template_name,
             )
-            for filename, scheduled_for, job_status, template_version in (
-                ('export 1/1/2016.xls', '', 'finished', 1),
-                ('all email addresses.xlsx', '', 'pending', 1),
-                ('applicants.ods', '', 'finished', 1),
-                ('thisisatest.csv', '', 'finished', 2),
-                ('send_me_later.csv', '2016-01-01 11:09:00.061258', 'scheduled', 1),
-                ('even_later.csv', '2016-01-01 23:09:00.061258', 'scheduled', 1),
-                ('full_of_regret.csv', '2016-01-01 23:09:00.061258', 'cancelled', 1)
+            for filename, scheduled_for, job_status, template_name, template_version in (
+                ('full_of_regret.csv', '2016-01-01 23:09:00.061258', 'cancelled', 'Template X', 1),
+                ('even_later.csv', '2016-01-01 23:09:00.061258', 'scheduled', 'Template Y', 1),
+                ('send_me_later.csv', '2016-01-01 11:09:00.061258', 'scheduled', 'Template Z', 1),
+                ('export 1/1/2016.xls', '', 'finished', 'Template A', 1),
+                ('all email addresses.xlsx', '', 'pending', 'Template B', 1),
+                ('applicants.ods', '', 'finished', 'Template C', 1),
+                ('thisisatest.csv', '', 'finished', 'Template D', 2),
             )
         ]
         return {
@@ -2031,6 +2033,17 @@ def mock_get_no_uploads(mocker, api_user_active):
 
 
 @pytest.fixture(scope='function')
+def mock_get_no_jobs(mocker, api_user_active):
+    mocker.patch(
+        'app.models.job.PaginatedJobs.client_method',
+        return_value={
+            'data': [],
+            'links': {},
+        }
+    )
+
+
+@pytest.fixture(scope='function')
 def mock_create_contact_list(mocker, api_user_active):
     def _create(
         service_id,
@@ -2062,6 +2075,8 @@ def mock_get_contact_lists(mocker, api_user_active, fake_uuid):
             'id': fake_uuid,
             'original_file_name': 'EmergencyContactList.xls',
             'row_count': 100,
+            'recent_job_count': 0,
+            'has_jobs': True,
             'service_id': service_id,
             'template_type': 'email',
         }, {
@@ -2070,6 +2085,18 @@ def mock_get_contact_lists(mocker, api_user_active, fake_uuid):
             'id': 'd7b0bd1a-d1c7-4621-be5c-3c1b4278a2ad',
             'original_file_name': 'phone number list.csv',
             'row_count': 123,
+            'recent_job_count': 2,
+            'has_jobs': True,
+            'service_id': service_id,
+            'template_type': 'sms',
+        }, {
+            'created_at': '2020-02-02 02:00:00',
+            'created_by': 'Test User',
+            'id': fake_uuid,
+            'original_file_name': 'UnusedList.tsv',
+            'row_count': 1,
+            'recent_job_count': 0,
+            'has_jobs': False,
             'service_id': service_id,
             'template_type': 'sms',
         }]
@@ -2089,6 +2116,8 @@ def mock_get_contact_list(mocker, api_user_active, fake_uuid):
             'id': fake_uuid,
             'original_file_name': 'EmergencyContactList.xls',
             'row_count': 100,
+            'recent_job_count': 0,
+            'has_jobs': True,
             'service_id': service_id,
             'template_type': 'email',
         }

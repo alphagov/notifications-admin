@@ -4,9 +4,11 @@ from os import path
 from flask import abort, current_app
 from notifications_utils.formatters import strip_whitespace
 from notifications_utils.recipients import RecipientCSV
+from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
 from werkzeug.utils import cached_property
 
 from app.models import JSONModel, ModelList
+from app.models.job import PaginatedJobsAndScheduledJobs
 from app.notify_client.contact_list_api_client import contact_list_api_client
 from app.s3_client.s3_csv_client import (
     get_csv_metadata,
@@ -21,8 +23,9 @@ class ContactList(JSONModel):
 
     ALLOWED_PROPERTIES = {
         'id',
-        'created_at',
         'created_by',
+        'has_jobs',
+        'recent_job_count',
         'service_id',
         'original_file_name',
         'row_count',
@@ -113,6 +116,10 @@ class ContactList(JSONModel):
         )
 
     @property
+    def created_at(self):
+        return utc_string_to_aware_gmt_datetime(self._dict['created_at'])
+
+    @property
     def contents(self):
         return self.download(self.service_id, self.id)
 
@@ -129,6 +136,13 @@ class ContactList(JSONModel):
     def saved_file_name(self):
         file_name, extention = path.splitext(self.original_file_name)
         return f'{file_name}.csv'
+
+    def get_jobs(self, *, page):
+        return PaginatedJobsAndScheduledJobs(
+            self.service_id,
+            contact_list_id=self.id,
+            page=page,
+        )
 
 
 class ContactLists(ModelList):

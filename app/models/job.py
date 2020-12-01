@@ -9,7 +9,7 @@ from notifications_utils.letter_timings import (
 from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
 from werkzeug.utils import cached_property
 
-from app.models import JSONModel, ModelList
+from app.models import JSONModel, ModelList, PaginatedModelList
 from app.notify_client.job_api_client import job_api_client
 from app.notify_client.notification_api_client import notification_api_client
 from app.notify_client.service_api_client import service_api_client
@@ -25,6 +25,7 @@ class Job(JSONModel):
     ALLOWED_PROPERTIES = {
         'id',
         'service',
+        'template_name',
         'template_version',
         'original_file_name',
         'created_at',
@@ -230,20 +231,22 @@ class ScheduledJobs(ImmediateJobs):
     client_method = job_api_client.get_scheduled_jobs
 
 
-class PaginatedJobs(ImmediateJobs):
-
+class PaginatedJobs(PaginatedModelList, ImmediateJobs):
     client_method = job_api_client.get_page_of_jobs
+    statuses = None
 
-    def __init__(self, service_id, page=None):
-        try:
-            self.current_page = int(page)
-        except TypeError:
-            self.current_page = 1
-        response = self.client_method(service_id, page=self.current_page)
-        self.items = response['data']
-        self.prev_page = response.get('links', {}).get('prev', None)
-        self.next_page = response.get('links', {}).get('next', None)
+    def __init__(self, service_id, *, contact_list_id=None, page=None):
+        super().__init__(
+            service_id,
+            contact_list_id=contact_list_id,
+            statuses=self.statuses,
+            page=page,
+        )
 
 
-class PaginatedUploads(PaginatedJobs):
+class PaginatedJobsAndScheduledJobs(PaginatedJobs):
+    statuses = job_api_client.NON_CANCELLED_JOB_STATUSES
+
+
+class PaginatedUploads(PaginatedModelList, ImmediateJobs):
     client_method = job_api_client.get_uploads

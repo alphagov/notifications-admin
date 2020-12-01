@@ -452,13 +452,104 @@ def test_cant_save_bad_contact_list(
     assert mock_create_contact_list.called is False
 
 
+@pytest.mark.parametrize('has_jobs, expected_empty_message', [
+    (False, 'Not used yet.'),
+    (True, 'Not used in the last 7 days.'),
+])
 @freeze_time('2020-03-13 16:51:56')
 def test_view_contact_list(
     mocker,
     client_request,
     mock_get_contact_list,
+    mock_get_no_jobs,
+    mock_get_service_data_retention,
+    fake_uuid,
+    has_jobs,
+    expected_empty_message,
+):
+    mocker.patch(
+        'app.models.contact_list.contact_list_api_client.get_contact_list',
+        return_value={
+            'created_at': '2020-03-03 12:12:12',
+            'created_by': 'Test User',
+            'id': fake_uuid,
+            'original_file_name': 'EmergencyContactList.xls',
+            'row_count': 100,
+            'recent_job_count': 0,
+            'has_jobs': has_jobs,
+            'service_id': SERVICE_ONE_ID,
+            'template_type': 'email',
+        },
+    )
+    mocker.patch('app.models.contact_list.s3download', return_value='\n'.join(
+        ['email address'] + [
+            f'test-{i}@example.com' for i in range(51)
+        ]
+    ))
+    page = client_request.get(
+        'main.contact_list',
+        service_id=SERVICE_ONE_ID,
+        contact_list_id=fake_uuid,
+    )
+    assert normalize_spaces(page.select_one('h1').text) == (
+        'EmergencyContactList.xls'
+    )
+    assert normalize_spaces(page.select('main p')[0].text) == (
+        'Uploaded by Test User on 3 March at 12:12pm.'
+    )
+    assert normalize_spaces(page.select('main p')[1].text) == (
+        expected_empty_message
+    )
+    assert normalize_spaces(page.select_one('main h2').text) == (
+        '51 saved email addresses'
+    )
+    assert page.select_one('.js-stick-at-bottom-when-scrolling a[download]')['href'] == url_for(
+        'main.download_contact_list',
+        service_id=SERVICE_ONE_ID,
+        contact_list_id=fake_uuid,
+    )
+    assert len(page.select('tbody tr')) == 50
+    assert [
+        normalize_spaces(page.select('tbody tr')[0].text),
+        normalize_spaces(page.select('tbody tr')[1].text),
+
+        normalize_spaces(page.select('tbody tr')[48].text),
+        normalize_spaces(page.select('tbody tr')[49].text),
+    ] == [
+        'test-0@example.com',
+        'test-1@example.com',
+
+        'test-48@example.com',
+        'test-49@example.com',
+    ]
+    assert 'test-50@example.com' not in page.select_one('tbody').text
+    assert normalize_spaces(page.select_one('.table-show-more-link').text) == (
+        'Only showing the first 50 rows'
+    )
+
+
+@freeze_time('2015-12-31 16:51:56')
+def test_view_jobs_for_contact_list(
+    mocker,
+    client_request,
+    mock_get_jobs,
+    mock_get_service_data_retention,
     fake_uuid,
 ):
+    mocker.patch(
+        'app.models.contact_list.contact_list_api_client.get_contact_list',
+        return_value={
+            'created_at': '2015-12-31 12:12:12',
+            'created_by': 'Test User',
+            'id': fake_uuid,
+            'original_file_name': 'EmergencyContactList.xls',
+            'row_count': 100,
+            'recent_job_count': 0,
+            'has_jobs': True,
+            'service_id': SERVICE_ONE_ID,
+            'template_type': 'email',
+        },
+    )
     mocker.patch('app.models.contact_list.s3download', return_value='\n'.join(
         ['email address'] + ['test@example.com'] * 51
     ))
@@ -471,28 +562,51 @@ def test_view_contact_list(
         'EmergencyContactList.xls'
     )
     assert normalize_spaces(page.select('main p')[0].text) == (
-        'Uploaded by Test User today at 10:59am'
+        'Uploaded by Test User today at 12:12pm.'
     )
     assert normalize_spaces(page.select('main p')[1].text) == (
-        'Download this list 51 email addresses'
+        'Used 6 times in the last 7 days.'
     )
-    assert page.select_one('a[download]')['href'] == url_for(
-        'main.download_contact_list',
+    assert [
+        normalize_spaces(row.text)
+        for row in page.select_one('table').select('tr')
+    ] == [
+        'Template Status',
+        (
+            'Template Y '
+            'Sending tomorrow at 11:09pm '
+            '1 text message waiting to send'
+        ),
+        (
+            'Template Z '
+            'Sending tomorrow at 11:09am '
+            '1 text message waiting to send'
+        ),
+        (
+            'Template A '
+            'Sent today at 4:51pm '
+            '1 sending 0 delivered 0 failed'
+        ),
+        (
+            'Template B '
+            'Sent today at 4:51pm '
+            '1 sending 0 delivered 0 failed'
+        ),
+        (
+            'Template C '
+            'Sent today at 4:51pm '
+            '1 sending 0 delivered 0 failed'
+        ),
+        (
+            'Template D '
+            'Sent today at 4:51pm '
+            '1 sending 0 delivered 0 failed'
+        ),
+    ]
+    assert page.select_one('table a')['href'] == url_for(
+        'main.view_job',
         service_id=SERVICE_ONE_ID,
-        contact_list_id=fake_uuid,
-    )
-    assert normalize_spaces(page.select_one('table').text).startswith(
-        'Email addresses '
-        '1 email address '
-        '2 test@example.com '
-        '3 test@example.com '
-    )
-    assert normalize_spaces(page.select_one('table').text).endswith(
-        '50 test@example.com '
-        '51 test@example.com'
-    )
-    assert normalize_spaces(page.select_one('.table-show-more-link').text) == (
-        'Only showing the first 50 rows'
+        job_id=fake_uuid,
     )
 
 
@@ -543,6 +657,8 @@ def test_confirm_delete_contact_list(
     mocker,
     client_request,
     fake_uuid,
+    mock_get_jobs,
+    mock_get_service_data_retention,
     mock_get_contact_list,
 ):
     mocker.patch(

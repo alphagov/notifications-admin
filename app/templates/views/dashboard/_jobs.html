@@ -1,6 +1,6 @@
 {% from "components/table.html" import list_table, field, right_aligned_field_heading, row_heading %}
 {% from "components/big-number.html" import big_number -%}
-{% from "components/message-count-label.html" import message_count_label, recipient_count_label -%}
+{% from "components/message-count-label.html" import message_count_label, recipient_count_label, iteration_count -%}
 
 <div class='dashboard-table ajax-block-container'>
   {% call(item, row_number) list_table(
@@ -35,10 +35,18 @@
           </span>
         {% elif item.upload_type == 'contact_list' %}
           <span class="file-list-hint-large">
-            Uploaded {{
-              item.created_at|format_datetime_relative
-            }}
-          </span>
+            {% if item.recent_job_count %}
+              Used {{ iteration_count(item.recent_job_count) }}
+              in the last
+              {{ current_service.get_days_of_retention(item.template_type) }}
+              days
+            {% elif item.has_jobs %}
+              Not used in the last
+              {{ current_service.get_days_of_retention(item.template_type) }}
+              days
+            {% else %}
+              Not used yet
+            {% endif %}
         {% elif item.upload_type == 'letter_day' %}
           <span class="file-list-hint-large">
             {{ item.letter_printing_statement }}
