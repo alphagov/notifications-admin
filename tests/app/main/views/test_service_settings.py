@@ -4494,10 +4494,10 @@ def test_select_organisation(
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
-    assert len(page.select('.multiple-choice')) == 3
+    assert len(page.select('.govuk-radios__item')) == 3
     for i in range(0, 3):
         assert normalize_spaces(
-            page.select('.multiple-choice label')[i].text
+            page.select('.govuk-radios__item label')[i].text
         ) == 'Org {}'.format(i + 1)
 
 

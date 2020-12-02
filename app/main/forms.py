@@ -2009,7 +2009,7 @@ class LinkOrganisationsForm(StripWhitespaceForm):
         super().__init__(*args, **kwargs)
         self.organisations.choices = kwargs['choices']
 
-    organisations = RadioField(
+    organisations = GovukRadiosField(
         'Select an organisation',
         validators=[
             DataRequired()
