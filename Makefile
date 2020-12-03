@@ -173,6 +173,10 @@ generate-manifest:
 
 .PHONY: upload-static ## Upload the static files to be served from S3
 upload-static:
+	gzip -9 ./app/static/stylesheets/*.css
+	for file in app/static/stylesheets/*.gz; do mv "$file" "${file%%.gz}"; done;
+	gzip -9 ./app/static/javascripts/*.js
+	for file in app/static/javascripts/*.gz; do mv "$file" "${file%%.gz}"; done;
 	aws s3 cp --region eu-west-1 --recursive --cache-control max-age=315360000,immutable ./app/static s3://${DNS_NAME}-static
 
 .PHONY: cf-deploy
