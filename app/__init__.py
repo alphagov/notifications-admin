@@ -630,6 +630,11 @@ def useful_headers_after_request(response):
             logo_domain=get_logo_cdn_domain(),
         )
     ))
+    response.headers.add('Link', (
+        '<{asset_url}>; rel=dns-prefetch, <{asset_url}>; rel=preconnect'.format(
+            asset_url=f'https://{current_app.config["ASSET_DOMAIN"]}'
+        )
+    ))
     if 'Cache-Control' in response.headers:
         del response.headers['Cache-Control']
     response.headers.add(
