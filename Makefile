@@ -22,6 +22,7 @@ CF_ORG ?= govuk-notify
 CF_SPACE ?= ${DEPLOY_ENV}
 CF_HOME ?= ${HOME}
 CF_APP ?= notify-admin
+CF_MANIFEST_PATH ?= /tmp/manifest.yml
 $(eval export CF_HOME)
 
 NOTIFY_CREDENTIALS ?= ~/.notify-credentials
@@ -122,7 +123,7 @@ clean-docker-containers: ## Clean up any remaining docker containers
 
 .PHONY: clean
 clean:
-	rm -rf node_modules cache target
+	rm -rf node_modules cache target ${CF_MANIFEST_PATH}
 
 
 ## DEPLOYMENT
@@ -180,22 +181,31 @@ cf-deploy: ## Deploys the app to Cloud Foundry
 	$(if ${CF_SPACE},,$(error Must specify CF_SPACE))
 	@cf app --guid notify-admin || exit 1
 	# cancel any existing deploys to ensure we can apply manifest (if a deploy is in progress you'll see ScaleDisabledDuringDeployment)
-	cf v3-cancel-zdt-push ${CF_APP} || true
+	cf cancel-deployment ${CF_APP} || true
 
-	cf v3-apply-manifest ${CF_APP} -f <(make -s generate-manifest)
-	CF_STARTUP_TIMEOUT=10 cf v3-zdt-push ${CF_APP} --wait-for-deploy-complete  # fails after 5 mins if deploy doesn't work
+	# generate manifest (including secrets) and write it to CF_MANIFEST_PATH (in /tmp/)
+	make -s CF_APP=${CF_APP} generate-manifest > ${CF_MANIFEST_PATH}
+	# reads manifest from CF_MANIFEST_PATH
+	CF_STARTUP_TIMEOUT=10 cf push ${CF_APP} --strategy=rolling -f ${CF_MANIFEST_PATH}
+	# delete old manifest file
+	rm -f ${CF_MANIFEST_PATH}
 
 .PHONY: cf-deploy-prototype
 cf-deploy-prototype: cf-target ## Deploys the first prototype to Cloud Foundry
-	cf push -f <(CF_APP=notify-admin-prototype make -s generate-manifest)
+	make -s CF_APP=notify-admin-prototype generate-manifest > ${CF_MANIFEST_PATH}
+	cf push notify-admin-prototype --strategy=rolling -f ${CF_MANIFEST_PATH}
+	rm -f ${CF_MANIFEST_PATH}
 
 .PHONY: cf-deploy-prototype-2
 cf-deploy-prototype-2: cf-target ## Deploys the second prototype to Cloud Foundry
-	cf push -f <(CF_APP=notify-admin-prototype-2 make -s generate-manifest)
+	make -s CF_APP=notify-admin-prototype-2 generate-manifest > ${CF_MANIFEST_PATH}
+	cf push notify-admin-prototype-2 --strategy=rolling -f ${CF_MANIFEST_PATH}
+	rm -f ${CF_MANIFEST_PATH}
 
 .PHONY: cf-rollback
 cf-rollback: cf-target ## Rollbacks the app to the previous release
-	cf v3-cancel-zdt-push ${CF_APP}
+	cf cancel-deployment ${CF_APP}
+	rm -f ${CF_MANIFEST_PATH}
 
 .PHONY: cf-target
 cf-target: check-env-vars
