@@ -2,7 +2,6 @@
 {% from "components/form.html" import form_wrapper %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/page-header.html" import page_header %}
-{% from "components/radios.html" import radios %}
 
 {% block per_page_title %}
   Use platform admin view
@@ -18,7 +17,7 @@
       ) }}
 
       {% call form_wrapper() %}
-        {{ radios(form.enabled) }}
+        {{ form.enabled }}
         {{ page_footer('Save') }}
       {% endcall %}
     </div>

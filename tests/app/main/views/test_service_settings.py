@@ -3907,7 +3907,7 @@ def test_show_international_sms_and_letters_as_radio_button(
         f'main.service_set_{permission}',
         service_id=service_one['id'],
     ).select(
-        '.multiple-choice input[checked]'
+        '.govuk-radios__item input[checked]'
     )
 
     assert len(checked_radios) == 1
@@ -4450,22 +4450,21 @@ def test_show_sms_prefixing_setting_page(
     )
     radios = page.select('input[type=radio]')
     assert len(radios) == 2
-    assert radios[0]['value'] == 'on'
+    assert radios[0]['value'] == 'True'
     assert radios[0]['checked'] == ''
-    assert radios[1]['value'] == 'off'
+    assert radios[1]['value'] == 'False'
     with pytest.raises(KeyError):
         assert radios[1]['checked']
 
 
-@pytest.mark.parametrize('post_value, expected_api_argument', [
-    ('on', True),
-    ('off', False),
+@pytest.mark.parametrize('post_value', [
+    True,
+    False,
 ])
 def test_updates_sms_prefixing(
     client_request,
     mock_update_service,
     post_value,
-    expected_api_argument,
 ):
     client_request.post(
         'main.service_set_sms_prefix', service_id=SERVICE_ONE_ID,
@@ -4477,7 +4476,7 @@ def test_updates_sms_prefixing(
     )
     mock_update_service.assert_called_once_with(
         SERVICE_ONE_ID,
-        prefix_sms=expected_api_argument,
+        prefix_sms=post_value,
     )
 
 
