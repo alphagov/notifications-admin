@@ -46,7 +46,8 @@ class Service(JSONModel):
         'consent_to_research',
         'count_as_live',
         'go_live_user',
-        'go_live_at'
+        'go_live_at',
+        'allowed_broadcast_provider',
     }
 
     TEMPLATE_TYPES = (

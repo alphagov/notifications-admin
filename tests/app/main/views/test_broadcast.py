@@ -192,18 +192,35 @@ def test_broadcast_tour_page_4_shows_service_name(
     )
 
 
-@pytest.mark.parametrize('trial_mode, selector, expected_text, expected_tagged_text', (
+@pytest.mark.parametrize('trial_mode, allowed_broadcast_provider, selector, expected_text, expected_tagged_text', (
     (
         True,
+        None,
         '.navigation-service-type.navigation-service-type--training',
         'service one Training Switch service',
         'Training',
     ),
     (
         False,
+        None,
         '.navigation-service-type.navigation-service-type--live',
         'service one Live Switch service',
         'Live',
+    ),
+
+    (
+        True,
+        'vodafone',
+        '.navigation-service-type.navigation-service-type--training',
+        'service one Training (vodafone) Switch service',
+        'Training (vodafone)',
+    ),
+    (
+        False,
+        'vodafone',
+        '.navigation-service-type.navigation-service-type--live',
+        'service one Live (vodafone) Switch service',
+        'Live (vodafone)',
     ),
 ))
 def test_broadcast_service_shows_live_or_training(
@@ -212,10 +229,12 @@ def test_broadcast_service_shows_live_or_training(
     mock_get_no_broadcast_messages,
     mock_get_service_templates_when_no_templates_exist,
     trial_mode,
+    allowed_broadcast_provider,
     selector,
     expected_text,
     expected_tagged_text,
 ):
+    service_one['allowed_broadcast_provider'] = allowed_broadcast_provider
     service_one['permissions'] += ['broadcast']
     service_one['restricted'] = trial_mode
     page = client_request.get(
