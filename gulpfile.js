@@ -18,7 +18,9 @@ plugins.base64 = require('gulp-base64-inline');
 plugins.cleanCSS = require('gulp-clean-css');
 plugins.concat = require('gulp-concat');
 plugins.cssUrlAdjuster = require('gulp-css-url-adjuster');
+plugins.gzip = require('gulp-gzip');
 plugins.jshint = require('gulp-jshint');
+plugins.md5 = require('gulp-md5');
 plugins.prettyerror = require('gulp-prettyerror');
 plugins.rollup = require('gulp-better-rollup')
 plugins.sass = require('gulp-sass');
@@ -107,6 +109,14 @@ const copy = {
     js: () => {
       return src(paths.npm + 'leaflet/dist/leaflet.js')
         .pipe(dest(paths.dist + 'javascripts/'))
+    }
+  },
+  tests: {
+    css: () => { 
+      return src(paths.dist + 'stylesheets/main.css')
+        .pipe(plugins.md5({ separator: '-' }))
+        .pipe(plugins.gzip({ gzipOptions: { level: 9 }, preExtension: 'gz' }))
+        .pipe(dest(paths.dist + 'test/'))
     }
   }
 };
@@ -290,7 +300,8 @@ const defaultTask = parallel(
     series(
       javascripts
     ),
-    sass
+    sass,
+    copy.tests.css
   )
 );
 
