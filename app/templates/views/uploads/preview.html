@@ -2,7 +2,6 @@
 {% from "components/banner.html" import banner_wrapper %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
-{% from "components/radios.html" import radios %}
 {% from "components/back-link/macro.njk" import govukBackLink %}
 {% from "components/file-upload.html" import file_upload %}
 
@@ -63,7 +62,17 @@
             file_id=file_id,
           )}}" class='page-footer'>
             {% if form.show_postage %}
-              {{ radios(form.postage, hide_legend=true, inline=True) }}
+              {{ form.postage(param_extensions={
+                "classes": "govuk-radios--inline",
+                "formGroup": {
+                  "classes": "govuk-!-margin-bottom-2"
+                },
+                "fieldset": {
+                  "legend": {
+                    "classes": "govuk-visually-hidden"
+                  }
+                }
+              }) }}
             {% endif %}
             {{ page_footer("Send 1 letter") }}
         </form>

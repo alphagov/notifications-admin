@@ -1,5 +1,4 @@
 {% extends "withoutnav_template.html" %}
-{% from "components/radios.html" import radios %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/form.html" import form_wrapper %}
@@ -17,7 +16,7 @@
         back_link=url_for('.support')
       ) }}
       {% call form_wrapper() %}
-        {{ radios(form.severe) }}
+        {{ form.severe }}
         {{ page_footer('Continue') }}
       {% endcall %}
       <h2 class="heading-small">

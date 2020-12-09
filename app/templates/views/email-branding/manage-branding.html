@@ -2,7 +2,6 @@
 {% from "components/file-upload.html" import file_upload %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
-{% from "components/radios.html" import radios %}
 {% from "components/form.html" import form_wrapper %}
 
 {% block service_page_title %}
@@ -31,7 +30,7 @@
           <div style='margin-top:15px;'>{{form.name}}</div>
           <div style='margin-top:15px;'>{{form.text}}</div>
           {{ form.colour }}
-          {{ radios(form.brand_type) }}
+          {{ form.brand_type }}
           {{ page_footer(
             'Save',
             button_name='operation',

@@ -2,7 +2,6 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
-{% from "components/radios.html" import radios %}
 
 {% block per_page_title %}
   Text message providers
@@ -30,7 +29,7 @@
             </div>
             {% call form_wrapper() %}
               <div class="radio-slider" data-module="radio-slider">
-                {{ radios(form.ratio, inline=True, hide_legend=True) }}
+                {{ form.ratio }}
                 <div class="radio-slider-left-value">
                   —
                 </div>

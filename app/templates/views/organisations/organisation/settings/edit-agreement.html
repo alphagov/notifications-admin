@@ -17,14 +17,7 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-five-sixths">
       {% call form_wrapper() %}
-        {{ radios(
-          form.agreement_signed,
-          option_hints={
-            'yes': 'Users will be told their organisation has already signed the agreement',
-            'no': 'Users will be prompted to sign the agreement before they can go live',
-            'unknown': 'Users will not be prompted to sign the agreement'
-          }
-        ) }}
+        {{ form.agreement_signed }}
         {{ page_footer('Save') }}
       {% endcall %}
     </div>

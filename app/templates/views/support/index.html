@@ -1,5 +1,4 @@
 {% extends "withoutnav_template.html" %}
-{% from "components/radios.html" import radios %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 
@@ -14,12 +13,12 @@
 
   {% call form_wrapper() %}
     {% if current_user.is_authenticated %}
-      {{ radios(form.support_type) }}
+      {{ form.support_type }}
     {% else %}
       <p class="govuk-body">
         What do you need help with?
       </p>
-      {{ radios(form.who, hide_legend=True) }}
+      {{ form.who }}
     {% endif %}
     {{ page_footer('Continue') }}
   {% endcall %}

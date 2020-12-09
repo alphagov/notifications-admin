@@ -981,7 +981,7 @@ class BasePermissionsForm(StripWhitespaceForm):
         'Folders this team member can see',
         field_label='folder')
 
-    login_authentication = RadioField(
+    login_authentication = GovukRadiosField(
         'Sign in using',
         choices=[
             ('sms_auth', 'Text message code'),
@@ -1157,7 +1157,7 @@ class AddNHSLocalOrganisationForm(StripWhitespaceForm):
         super().__init__(*args, **kwargs)
         self.organisations.choices = organisation_choices
 
-    organisations = RadioField(
+    organisations = GovukRadiosField(
         'Which NHS Trust or Clinical Commissioning Group do you work for?',
         thing='an NHS Trust or Clinical Commissioning Group'
     )
@@ -1182,16 +1182,21 @@ class OrganisationCrownStatusForm(StripWhitespaceForm):
 
 
 class OrganisationAgreementSignedForm(StripWhitespaceForm):
-    agreement_signed = RadioField(
-        (
-            'Has this organisation signed the agreement?'
-        ),
+    agreement_signed = GovukRadiosField(
+        'Has this organisation signed the agreement?',
         choices=[
             ('yes', 'Yes'),
             ('no', 'No'),
             ('unknown', 'No (but we have some service-specific agreements in place)'),
         ],
         thing='whether this organisation has signed the agreement',
+        param_extensions={
+            'items': [
+                {'hint': {'html': 'Users will be told their organisation has already signed the agreement'}},
+                {'hint': {'html': 'Users will be prompted to sign the agreement before they can go live'}},
+                {'hint': {'html': 'Users will not be prompted to sign the agreement'}}
+            ]
+        }
     )
 
 
@@ -1384,7 +1389,7 @@ class LetterTemplateForm(EmailTemplateForm):
 
 
 class LetterTemplatePostageForm(StripWhitespaceForm):
-    postage = RadioField(
+    postage = GovukRadiosField(
         'Choose the postage for this letter template',
         choices=[
             ('first', 'First class'),
@@ -1409,7 +1414,7 @@ class LetterUploadPostageForm(StripWhitespaceForm):
     def show_postage(self):
         return len(self.postage.choices) > 1
 
-    postage = RadioField(
+    postage = GovukRadiosField(
         'Choose the postage for this letter',
         choices=[
             ('first', 'First class post'),
@@ -1511,7 +1516,7 @@ class CreateKeyForm(StripWhitespaceForm):
 
 
 class SupportType(StripWhitespaceForm):
-    support_type = RadioField(
+    support_type = GovukRadiosField(
         'How can we help you?',
         choices=[
             (PROBLEM_TICKET_TYPE, 'Report a problem'),
@@ -1521,12 +1526,15 @@ class SupportType(StripWhitespaceForm):
 
 
 class SupportRedirect(StripWhitespaceForm):
-    who = RadioField(
+    who = GovukRadiosField(
         'What do you need help with?',
         choices=[
             ('public-sector', 'I work in the public sector and need to send emails, text messages or letters'),
             ('public', 'I’m a member of the public with a question for the government'),
         ],
+        param_extensions={
+            "fieldset": {"legend": {"classes": "govuk-visually-hidden"}}
+        }
     )
 
 
@@ -1537,7 +1545,7 @@ class FeedbackOrProblem(StripWhitespaceForm):
 
 
 class Triage(StripWhitespaceForm):
-    severe = RadioField(
+    severe = GovukRadiosField(
         'Is it an emergency?',
         choices=[
             ('yes', 'Yes'),
@@ -1564,13 +1572,16 @@ class EstimateUsageForm(StripWhitespaceForm):
         things='letters',
         format_error_suffix='you expect to send',
     )
-    consent_to_research = RadioField(
+    consent_to_research = GovukRadiosField(
         'Can we contact you when we’re doing user research?',
         choices=[
             ('yes', 'Yes'),
             ('no', 'No'),
         ],
         thing='yes or no',
+        param_extensions={
+            'hint': {'text': 'You do not have to take part and you can unsubscribe at any time'}
+        }
     )
 
     at_least_one_volume_filled = True
@@ -1592,10 +1603,18 @@ class ProviderForm(StripWhitespaceForm):
 
 class ProviderRatioForm(StripWhitespaceForm):
 
-    ratio = RadioField(choices=[
-        (str(value), '{}% / {}%'.format(value, 100 - value))
-        for value in range(100, -10, -10)
-    ])
+    ratio = GovukRadiosField(choices=[
+            (str(value), '{}% / {}%'.format(value, 100 - value))
+            for value in range(100, -10, -10)
+        ],
+        param_extensions={
+            "classes": "govuk-radios--inline",
+            "fieldset": {
+                "legend": {
+                    "classes": "govuk-visually-hidden"
+                }
+            }
+        })
 
     @property
     def percentage_left(self):
@@ -1753,7 +1772,7 @@ class ServiceUpdateEmailBranding(StripWhitespaceForm):
         }
     )
     file = FileField_wtf('Upload a PNG logo', validators=[FileAllowed(['png'], 'PNG Images only!')])
-    brand_type = RadioField(
+    brand_type = GovukRadiosField(
         "Brand type",
         choices=[
             ('both', 'GOV.UK and branding'),
@@ -1900,7 +1919,7 @@ class ServiceInboundNumberForm(StripWhitespaceForm):
         super().__init__(*args, **kwargs)
         self.inbound_number.choices = kwargs['inbound_number_choices']
 
-    inbound_number = RadioField(
+    inbound_number = GovukRadiosField(
         "Select your inbound number",
         thing='an inbound number',
     )
@@ -1990,7 +2009,7 @@ class LinkOrganisationsForm(StripWhitespaceForm):
         super().__init__(*args, **kwargs)
         self.organisations.choices = kwargs['choices']
 
-    organisations = RadioField(
+    organisations = GovukRadiosField(
         'Select an organisation',
         validators=[
             DataRequired()
@@ -2084,14 +2103,14 @@ class BrandingOptions(StripWhitespaceForm):
 
 class ServiceDataRetentionForm(StripWhitespaceForm):
 
-    notification_type = RadioField(
+    notification_type = GovukRadiosField(
         'What notification type?',
         choices=[
             ('email', 'Email'),
             ('sms', 'SMS'),
             ('letter', 'Letter'),
         ],
-        validators=[DataRequired()],
+        thing='notification type',
     )
     days_of_retention = GovukIntegerField(
         label="Days of retention",
@@ -2259,7 +2278,7 @@ class TemplateAndFoldersSelectionForm(Form):
 
 
 class ClearCacheForm(StripWhitespaceForm):
-    model_type = RadioField(
+    model_type = GovukRadiosField(
         'What do you want to clear today',
     )
 

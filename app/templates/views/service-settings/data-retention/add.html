@@ -2,7 +2,6 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
-{% from "components/radios.html" import radios %}
 
 {% block service_page_title %}
   Data retention
@@ -16,7 +15,7 @@
     ) }}
 
     {% call form_wrapper() %}
-      {{ radios(form.notification_type) }}
+      {{ form.notification_type }}
       {{ form.days_of_retention }}
       {{ page_footer('Add') }}
     {% endcall %}
