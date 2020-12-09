@@ -1,12 +1,12 @@
 from functools import partial
-from unittest.mock import ANY
+from unittest.mock import ANY, PropertyMock
 
 import pytest
 from bs4 import BeautifulSoup, element
 from flask import url_for
 from freezegun import freeze_time
 
-from app.main.views.feedback import has_live_services, in_business_hours
+from app.main.views.feedback import in_business_hours
 from app.models.feedback import (
     GENERAL_TICKET_TYPE,
     PROBLEM_TICKET_TYPE,
@@ -70,6 +70,7 @@ def test_get_support_index_page_when_signed_out(
 ])
 def test_choose_support_type(
     client_request,
+    mock_get_non_empty_organisations_and_services_for_user,
     support_type,
     expected_h1
 ):
@@ -171,6 +172,7 @@ def test_passed_non_logged_in_user_details_through_flow(client, mocker, ticket_t
 @pytest.mark.parametrize('ticket_type', [PROBLEM_TICKET_TYPE, QUESTION_TICKET_TYPE])
 def test_passes_user_details_through_flow(
     client_request,
+    mock_get_non_empty_organisations_and_services_for_user,
     mocker,
     ticket_type,
     data
@@ -279,6 +281,7 @@ def test_email_address_must_be_valid_if_provided_to_support_form(
 ])
 def test_urgency(
     client_request,
+    mock_get_non_empty_organisations_and_services_for_user,
     mocker,
     ticket_type,
     severe,
@@ -346,7 +349,11 @@ def test_redirects_to_triage(
     expected_status,
     expected_redirect,
 ):
-    mocker.patch('app.main.views.feedback.has_live_services', return_value=has_live_services)
+    mocker.patch(
+        'app.models.user.User.live_services',
+        new_callable=PropertyMock,
+        return_value=[{}, {}] if has_live_services else [],
+    )
     mocker.patch('app.main.views.feedback.in_business_hours', return_value=is_in_business_hours)
     if logged_in:
         client.login(api_user_active)
@@ -376,7 +383,7 @@ def test_doesnt_lose_message_if_post_across_closing(
     mocker,
 ):
 
-    mocker.patch('app.main.views.feedback.has_live_services', return_value=True)
+    mocker.patch('app.models.user.User.live_services', return_value=True)
     mocker.patch('app.main.views.feedback.in_business_hours', return_value=False)
 
     page = client_request.post(
@@ -398,18 +405,6 @@ def test_doesnt_lose_message_if_post_across_closing(
     with client_request.session_transaction() as session:
         assert page.find('textarea', {'name': 'feedback'}).text == '\r\nfoo'
         assert 'feedback_message' not in session
-
-
-def test_has_live_services(mock_get_services):
-    assert has_live_services(12345) is True
-
-
-def test_has_live_services_when_there_are_no_services(mock_get_services_with_no_services):
-    assert has_live_services(12345) is False
-
-
-def test_has_live_services_when_service_is_not_live(mock_get_services_with_one_service):
-    assert has_live_services(12345) is False
 
 
 @pytest.mark.parametrize('when, is_in_business_hours', [
@@ -482,6 +477,7 @@ def test_triage_redirects_to_correct_url(
 ])
 def test_back_link_from_form(
     client_request,
+    mock_get_non_empty_organisations_and_services_for_user,
     extra_args,
     expected_back_link,
 ):
@@ -544,7 +540,7 @@ def test_should_be_shown_the_bat_email(
     active_user_with_permissions,
     mocker,
     service_one,
-    mock_get_services,
+    mock_get_non_empty_organisations_and_services_for_user,
     is_in_business_hours,
     severe,
     expected_status_code,
@@ -596,7 +592,7 @@ def test_should_be_shown_the_bat_email_for_general_questions(
     active_user_with_permissions,
     mocker,
     service_one,
-    mock_get_services,
+    mock_get_non_empty_organisations_and_services_for_user,
     severe,
     expected_status_code,
     expected_redirect,

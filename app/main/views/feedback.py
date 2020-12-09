@@ -5,7 +5,7 @@ from flask import redirect, render_template, request, session, url_for
 from flask_login import current_user
 from govuk_bank_holidays.bank_holidays import BankHolidays
 
-from app import convert_to_boolean, current_service, service_api_client
+from app import convert_to_boolean, current_service
 from app.extensions import zendesk_client
 from app.main import main
 from app.main.forms import (
@@ -205,19 +205,12 @@ def is_bank_holiday(time):
     return bank_holidays.is_holiday(time.date())
 
 
-def has_live_services(user_id):
-    return any(
-        service['restricted'] is False
-        for service in service_api_client.get_services({'user_id': user_id})['data']
-    )
-
-
 def needs_triage(ticket_type, severe):
     return all((
         ticket_type != QUESTION_TICKET_TYPE,
         severe is None,
         (
-            not current_user.is_authenticated or has_live_services(current_user.id)
+            not current_user.is_authenticated or current_user.live_services
         ),
         not in_business_hours(),
     ))

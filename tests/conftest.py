@@ -3672,6 +3672,7 @@ def mock_get_empty_organisations_and_one_service_for_user(mocker, organisation_o
             'services': [{
                 'name': 'Only service',
                 'id': SERVICE_TWO_ID,
+                'restricted': True,
             }]
         }
 
