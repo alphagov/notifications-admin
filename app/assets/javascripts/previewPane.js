@@ -4,7 +4,7 @@
 
   $ = global.jQuery;
 
-  let branding_style = $('.multiple-choice input[name="branding_style"]:checked');
+  let branding_style = $('.govuk-radios__item input[name="branding_style"]:checked');
 
   if (!branding_style.length) { return; }
 

@@ -7,9 +7,9 @@ function getRadios (fields, name) {
     const count = idx + 1;
 
     return `
-      <div class="multiple-choice">
-        <input id="${name}-1" name="${name}" type="radio" value="${field.value}" ${field.checked ? 'checked' : ''}>
-        <label class="block-label" for="${name}-1">
+      <div class="govuk-radios__item">
+        <input class="govuk-radios__input" id="${name}-1" name="${name}" type="radio" value="${field.value}" ${field.checked ? 'checked' : ''}>
+        <label class="govuk-label govuk-radios__label" for="${name}-1">
           ${field.label}
         </label>
       </div>`;
@@ -19,16 +19,17 @@ function getRadios (fields, name) {
 function getRadioGroup (data) {
   let radioGroup = document.createElement('div');
 
+  radioGroup.classList.add('govuk-form-group');
   data.cssClasses.forEach(cssClass => radioGroup.classList.add(cssClass));
   radioGroup.innerHTML = `
-    <div class="form-group ">
-      <fieldset id="${data.name}">
-        <legend class="form-label">
-          ${data.label}
-        </legend>
+    <fieldset class="govuk-fieldset" id="${data.name}">
+      <legend class="govuk-fieldset__legend">
+        ${data.label}
+      </legend>
+      <div class="govuk-radios">
         ${getRadios(data.fields, data.name)}
-      </fieldset>
-    </div>`;
+      </div>
+    </fieldset>`;
 
     return radioGroup;
 };
