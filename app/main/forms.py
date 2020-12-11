@@ -1106,7 +1106,8 @@ class RenameServiceForm(StripWhitespaceForm):
         u'Service name',
         validators=[
             DataRequired(message='Cannot be empty'),
-            MustContainAlphanumericCharacters()
+            MustContainAlphanumericCharacters(),
+            Length(max=255, message='Service name must be 255 characters or fewer')
         ])
 
 
@@ -1115,7 +1116,8 @@ class RenameOrganisationForm(StripWhitespaceForm):
         u'Organisation name',
         validators=[
             DataRequired(message='Cannot be empty'),
-            MustContainAlphanumericCharacters()
+            MustContainAlphanumericCharacters(),
+            Length(max=255, message='Organisation name must be 255 characters or fewer')
         ])
 
 
@@ -1223,7 +1225,8 @@ class CreateServiceForm(StripWhitespaceForm):
         "What’s your service called?",
         validators=[
             DataRequired(message='Cannot be empty'),
-            MustContainAlphanumericCharacters()
+            MustContainAlphanumericCharacters(),
+            Length(max=255, message='Service name must be 255 characters or fewer')
         ])
     organisation_type = OrganisationTypeField('Who runs this service?')
 

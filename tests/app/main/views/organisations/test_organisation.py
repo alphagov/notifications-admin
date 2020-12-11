@@ -164,10 +164,17 @@ def test_create_new_organisation_validates(
     assert mock_create_organisation.called is False
 
 
-def test_create_new_organisation_fails_if_new_name_has_less_than_2_alphanumeric_characters(
+@pytest.mark.parametrize('name, error_message', [
+    ('', 'Cannot be empty'),
+    ('a', 'at least two alphanumeric characters'),
+    ('a' * 256, 'Organisation name must be 255 characters or fewer'),
+])
+def test_create_new_organisation_fails_with_incorrect_input(
     client_request,
     platform_admin_user,
     mocker,
+    name,
+    error_message,
 ):
     mock_create_organisation = mocker.patch(
         'app.organisations_client.create_organisation'
@@ -177,14 +184,14 @@ def test_create_new_organisation_fails_if_new_name_has_less_than_2_alphanumeric_
     page = client_request.post(
         '.add_organisation',
         _data={
-            'name': ".",
+            'name': name,
             'organisation_type': 'local',
             'crown_status': 'non-crown',
         },
         _expected_status=200,
     )
     assert mock_create_organisation.called is False
-    assert page.find("span", {"class": "govuk-error-message"})
+    assert error_message in page.select_one('.govuk-error-message').text
 
 
 @pytest.mark.parametrize('organisation_type, organisation, expected_status', (
@@ -1077,20 +1084,27 @@ def test_update_organisation_name(
     assert mock_organisation_name_is_unique.called
 
 
+@pytest.mark.parametrize('name, error_message', [
+    ('', 'Cannot be empty'),
+    ('a', 'at least two alphanumeric characters'),
+    ('a' * 256, 'Organisation name must be 255 characters or fewer'),
+])
 def test_update_organisation_with_incorrect_input(
     platform_admin_client,
     organisation_one,
     mock_get_organisation,
+    name,
+    error_message
 ):
     response = platform_admin_client.post(
         url_for('.edit_organisation_name', org_id=organisation_one['id']),
-        data={'name': ''}
+        data={'name': name}
     )
 
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
-    assert "Cannot be empty" in page.select_one('.govuk-error-message').text
+    assert error_message in page.select_one('.govuk-error-message').text
 
 
 def test_update_organisation_with_non_unique_name(

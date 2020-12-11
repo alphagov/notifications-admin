@@ -483,20 +483,27 @@ def test_should_not_hit_api_if_service_name_hasnt_changed(
     assert not mock_update_service.called
 
 
-def test_service_name_change_fails_if_new_name_has_less_than_2_alphanumeric_characters(
+@pytest.mark.parametrize('name, error_message', [
+    ('', 'Cannot be empty'),
+    ('.', 'Must include at least two alphanumeric characters'),
+    ('a' * 256, 'Service name must be 255 characters or fewer'),
+])
+def test_service_name_change_fails_if_new_name_fails_validation(
     client_request,
     mock_update_service,
     mock_service_name_is_unique,
+    name,
+    error_message,
 ):
     page = client_request.post(
         'main.service_name_change',
         service_id=SERVICE_ONE_ID,
-        _data={'name': "."},
+        _data={'name': name},
         _expected_status=200,
     )
     assert not mock_service_name_is_unique.called
     assert not mock_update_service.called
-    assert page.find("span", {"class": "govuk-error-message"})
+    assert error_message in page.find("span", {"class": "govuk-error-message"}).text
 
 
 @pytest.mark.parametrize('user, expected_text, expected_link', [
@@ -3480,7 +3487,7 @@ def test_should_send_branding_and_organisations_to_preview(
     client_request.login(platform_admin_user)
     client_request.post(
         endpoint,
-        data={
+        _data={
             'branding_type': 'org',
             'branding_style': '1'
         },
