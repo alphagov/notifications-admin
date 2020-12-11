@@ -1731,6 +1731,7 @@ class SetEmailBranding(StripWhitespaceForm):
 
     branding_style = GovukRadiosFieldWithNoneOption(
         'Branding style',
+        param_extensions={'fieldset': {'legend': {'classes': 'govuk-visually-hidden'}}},
         thing='a branding style',
     )
 
