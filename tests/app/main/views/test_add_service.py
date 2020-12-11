@@ -37,7 +37,7 @@ def test_get_should_render_add_service_template(
     assert page.select_one('h1').text.strip() == 'About your service'
     assert page.select_one('input[name=name]').get('value') is None
     assert [
-        label.text.strip() for label in page.select('.multiple-choice label')
+        label.text.strip() for label in page.select('.govuk-radios__item label')
     ] == [
         'Central government',
         'Local government',
@@ -49,7 +49,7 @@ def test_get_should_render_add_service_template(
         'Other',
     ]
     assert [
-        radio['value'] for radio in page.select('.multiple-choice input')
+        radio['value'] for radio in page.select('.govuk-radios__item input')
     ] == [
         'central',
         'local',
@@ -193,8 +193,8 @@ def test_add_service_has_to_choose_org_type(
         },
         _expected_status=200,
     )
-    assert normalize_spaces(page.select_one('.error-message').text) == (
-        'Select the type of organisation'
+    assert normalize_spaces(page.select_one('.govuk-error-message').text) == (
+        'Error: Select the type of organisation'
     )
     assert mock_create_service.called is False
     assert mock_create_service_template.called is False
@@ -223,14 +223,14 @@ def test_get_should_only_show_nhs_org_types_radios_if_user_has_nhs_email(
     assert page.select_one('h1').text.strip() == 'About your service'
     assert page.select_one('input[name=name]').get('value') is None
     assert [
-        label.text.strip() for label in page.select('.multiple-choice label')
+        label.text.strip() for label in page.select('.govuk-radios__item label')
     ] == [
         'NHS – central government agency or public body',
         'NHS Trust or Clinical Commissioning Group',
         'GP practice',
     ]
     assert [
-        radio['value'] for radio in page.select('.multiple-choice input')
+        radio['value'] for radio in page.select('.govuk-radios__item input')
     ] == [
         'nhs_central',
         'nhs_local',

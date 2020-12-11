@@ -426,26 +426,6 @@ class ForgivingIntegerField(GovukTextInputField):
         return super().__call__(value=value, **kwargs)
 
 
-class OrganisationTypeField(RadioField):
-    def __init__(
-        self,
-        *args,
-        include_only=None,
-        validators=None,
-        **kwargs
-    ):
-        super().__init__(
-            *args,
-            choices=[
-                (value, label) for value, label in Organisation.TYPES
-                if not include_only or value in include_only
-            ],
-            thing='the type of organisation',
-            validators=validators or [],
-            **kwargs
-        )
-
-
 class FieldWithNoneOption():
 
     # This is a special value that is specific to our forms. This is
@@ -951,6 +931,26 @@ class OnOffField(GovukRadiosField):
             )
 
 
+class OrganisationTypeField(GovukRadiosField):
+    def __init__(
+        self,
+        *args,
+        include_only=None,
+        validators=None,
+        **kwargs
+    ):
+        super().__init__(
+            *args,
+            choices=[
+                (value, label) for value, label in Organisation.TYPES
+                if not include_only or value in include_only
+            ],
+            thing='the type of organisation',
+            validators=validators or [],
+            **kwargs
+        )
+
+
 # guard against data entries that aren't a role in permissions
 def filter_by_permissions(valuelist):
     if valuelist is None:
@@ -1168,10 +1168,8 @@ class OrganisationOrganisationTypeForm(StripWhitespaceForm):
 
 
 class OrganisationCrownStatusForm(StripWhitespaceForm):
-    crown_status = RadioField(
-        (
-            'Is this organisation a crown body?'
-        ),
+    crown_status = GovukRadiosField(
+        'Is this organisation a crown body?',
         choices=[
             ('crown', 'Yes'),
             ('non-crown', 'No'),
