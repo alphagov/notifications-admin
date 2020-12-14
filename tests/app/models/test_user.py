@@ -70,3 +70,39 @@ def test_platform_admin_flag_set_in_session(client, mocker, is_platform_admin, v
     mocker.patch.dict('app.models.user.session', values=session_dict, clear=True)
 
     assert User({'platform_admin': is_platform_admin}).platform_admin == expected_result
+
+
+def test_has_live_services(
+    client_request,
+    mock_get_non_empty_organisations_and_services_for_user,
+    fake_uuid,
+):
+    user = User({
+        'id': fake_uuid,
+        'platform_admin': False,
+    })
+    assert len(user.live_services) == 5
+    for service in user.live_services:
+        assert service.live
+
+
+def test_has_live_services_when_there_are_no_services(
+    client_request,
+    mock_get_organisations_and_services_for_user,
+    fake_uuid,
+):
+    assert User({
+        'id': fake_uuid,
+        'platform_admin': False,
+    }).live_services == []
+
+
+def test_has_live_services_when_service_is_not_live(
+    client_request,
+    mock_get_empty_organisations_and_one_service_for_user,
+    fake_uuid,
+):
+    assert User({
+        'id': fake_uuid,
+        'platform_admin': False,
+    }).live_services == []
