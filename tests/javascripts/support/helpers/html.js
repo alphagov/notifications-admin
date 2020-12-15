@@ -5,11 +5,12 @@ function getRadios (fields, name) {
 
   return fields.map((field, idx) => {
     const count = idx + 1;
+    const id = field.id || `${name}-${count}`;
 
     return `
       <div class="govuk-radios__item">
-        <input class="govuk-radios__input" id="${name}-1" name="${name}" type="radio" value="${field.value}" ${field.checked ? 'checked' : ''}>
-        <label class="govuk-label govuk-radios__label" for="${name}-1">
+        <input class="govuk-radios__input" id="${id}" name="${name}" type="radio" value="${field.value}" ${field.checked ? 'checked' : ''}>
+        <label class="govuk-label govuk-radios__label" for="${id}">
           ${field.label}
         </label>
       </div>`;
@@ -20,10 +21,12 @@ function getRadioGroup (data) {
   let radioGroup = document.createElement('div');
 
   radioGroup.classList.add('govuk-form-group');
-  data.cssClasses.forEach(cssClass => radioGroup.classList.add(cssClass));
+  if ('cssClasses' in data) {
+    data.cssClasses.forEach(cssClass => radioGroup.classList.add(cssClass));
+  }
   radioGroup.innerHTML = `
     <fieldset class="govuk-fieldset" id="${data.name}">
-      <legend class="govuk-fieldset__legend">
+      <legend class="govuk-fieldset__legend${data.hideLegend ? " govuk-visually-hidden" : ""}">
         ${data.label}
       </legend>
       <div class="govuk-radios">
