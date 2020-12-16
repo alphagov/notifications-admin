@@ -62,6 +62,7 @@ def test_update_letter_branding_shows_the_current_letter_brand(
     assert page.find('h1').text == 'Update letter branding'
     assert page.select_one('#logo-img > img')['src'].endswith('/hm-government.svg')
     assert page.select_one('#name').attrs.get('value') == 'HM Government'
+    assert page.select_one('#file').attrs.get('accept') == '.svg'
 
 
 def test_update_letter_branding_with_new_valid_file(
@@ -312,6 +313,7 @@ def test_create_letter_branding_does_not_show_branding_info(platform_admin_clien
 
     assert page.select_one('#logo-img > img') is None
     assert page.select_one('#name').attrs.get('value') is None
+    assert page.select_one('#file').attrs.get('accept') == '.svg'
 
 
 def test_create_letter_branding_when_uploading_valid_file(
