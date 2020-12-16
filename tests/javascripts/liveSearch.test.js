@@ -29,51 +29,42 @@ describe('Live search', () => {
 
     searchLabelText = "Search branding styles by name";
 
-    function getRadiosHTML (departments) {
-
-      let result = '';
-
-      departments.forEach((department, idx) => result += `
-        <div class="multiple-choice">
-          <input id="${department.id}" name="${department.name}" type="radio" value="${department.id}">
-          <label class="block-label" for="${department.id}">
-            ${department.label}
-          </label>
-        </div>
-      `);
-
-      return result;
-
-    };
-
     beforeEach(() => {
 
-      const departments = [
-        {
-          'label': 'NHS',
-          'id': 'nhs',
-          'name': 'branding'
-        },
-        {
-          'label': 'Department for Work and Pensions',
-          'id': 'dwp',
-          'name': 'branding'
-        },
-        {
-          'label': 'Department for Education',
-          'id': 'dfe',
-          'name': 'branding'
-        },
-        {
-          'label': 'Home Office',
-          'id': 'home-office',
-          'name': 'branding'
-        }
-      ];
+      const departmentData = {
+        name: 'departments',
+        hideLegend: true,
+        fields: [
+          {
+            'label': 'NHS',
+            'id': 'nhs',
+            'name': 'branding',
+            'value': 'nhs'
+          },
+          {
+            'label': 'Department for Work and Pensions',
+            'id': 'dwp',
+            'name': 'branding',
+            'value': 'dwp'
+          },
+          {
+            'label': 'Department for Education',
+            'id': 'dfe',
+            'name': 'branding',
+            'value': 'dfe'
+          },
+          {
+            'label': 'Home Office',
+            'id': 'home-office',
+            'name': 'branding',
+            'value': 'home-office'
+          }
+        ]
+      };
 
       // set up DOM
       document.body.innerHTML = `
-        <div class="live-search js-header" data-module="live-search" data-targets=".multiple-choice">
+        <div class="live-search js-header" data-module="live-search" data-targets=".govuk-radios__item">
           <div class="form-group">
             <label class="form-label" for="search">
                 ${searchLabelText}
@@ -83,12 +74,14 @@ describe('Live search', () => {
           </div>
         </div>
         <form method="post" autocomplete="off" novalidate>
-          ${getRadiosHTML(departments)}
         </form>`;
 
       searchTextbox = document.getElementById('search');
       liveRegion = document.querySelector('.live-search__status');
       list = document.querySelector('form');
+
+      // getRadioGroup returns a DOM node so append once DOM is set up
+      list.appendChild(helpers.getRadioGroup(departmentData));
 
     });
 
@@ -99,7 +92,7 @@ describe('Live search', () => {
         // start the module
         window.GOVUK.modules.start();
 
-        const listItems = list.querySelectorAll('.multiple-choice');
+        const listItems = list.querySelectorAll('.govuk-radios__item');
         const listItemsShowing = Array.from(listItems).filter(item => window.getComputedStyle(item).display !== 'none');
 
         expect(listItemsShowing.length).toEqual(listItems.length);
@@ -114,7 +107,7 @@ describe('Live search', () => {
         // start the module
         window.GOVUK.modules.start();
 
-        const listItems = list.querySelectorAll('.multiple-choice');
+        const listItems = list.querySelectorAll('.govuk-radios__item');
         const listItemsShowing = Array.from(listItems).filter(item => window.getComputedStyle(item).display !== 'none');
 
         expect(listItemsShowing.length).toEqual(2);
@@ -130,7 +123,7 @@ describe('Live search', () => {
         // start the module
         window.GOVUK.modules.start();
 
-        const listItems = list.querySelectorAll('.multiple-choice');
+        const listItems = list.querySelectorAll('.govuk-radios__item');
         const listItemsShowing = Array.from(listItems).filter(item => window.getComputedStyle(item).display !== 'none');
 
         expect(listItemsShowing.length).toEqual(1);
@@ -169,7 +162,7 @@ describe('Live search', () => {
         searchTextbox.value = '';
         helpers.triggerEvent(searchTextbox, 'input');
 
-        const listItems = list.querySelectorAll('.multiple-choice');
+        const listItems = list.querySelectorAll('.govuk-radios__item');
         const listItemsShowing = Array.from(listItems).filter(item => window.getComputedStyle(item).display !== 'none');
 
         expect(listItemsShowing.length).toEqual(listItems.length);
@@ -188,7 +181,7 @@ describe('Live search', () => {
         searchTextbox.value = 'Home';
         helpers.triggerEvent(searchTextbox, 'input');
 
-        const listItems = list.querySelectorAll('.multiple-choice');
+        const listItems = list.querySelectorAll('.govuk-radios__item');
         const listItemsShowing = Array.from(listItems).filter(item => window.getComputedStyle(item).display !== 'none');
 
         expect(listItemsShowing.length).toEqual(1);
@@ -207,7 +200,7 @@ describe('Live search', () => {
         searchTextbox.value = 'Department for';
         helpers.triggerEvent(searchTextbox, 'input');
 
-        const listItems = list.querySelectorAll('.multiple-choice');
+        const listItems = list.querySelectorAll('.govuk-radios__item');
         const listItemsShowing = Array.from(listItems).filter(item => window.getComputedStyle(item).display !== 'none');
 
         expect(listItemsShowing.length).toEqual(2);

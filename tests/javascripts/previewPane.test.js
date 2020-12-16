@@ -65,7 +65,7 @@ describe('Preview pane', () => {
         <div class="govuk-grid-row">
           <div class="govuk-grid-column-full">
             <div data-module="autofocus">
-              <div class="live-search js-header" data-module="live-search" data-targets=".multiple-choice">
+              <div class="live-search js-header" data-module="live-search" data-targets=".govuk-radios__item">
                 <div class="form-group">
                   <label class="form-label" for="search">
                       Search branding styles by name

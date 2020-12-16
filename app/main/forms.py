@@ -951,6 +951,10 @@ class OrganisationTypeField(GovukRadiosField):
         )
 
 
+class GovukRadiosFieldWithNoneOption(FieldWithNoneOption, GovukRadiosField):
+    pass
+
+
 # guard against data entries that aren't a role in permissions
 def filter_by_permissions(valuelist):
     if valuelist is None:
@@ -1728,8 +1732,9 @@ class ServiceSwitchChannelForm(ServiceOnOffSettingForm):
 
 class SetEmailBranding(StripWhitespaceForm):
 
-    branding_style = RadioFieldWithNoneOption(
+    branding_style = GovukRadiosFieldWithNoneOption(
         'Branding style',
+        param_extensions={'fieldset': {'legend': {'classes': 'govuk-visually-hidden'}}},
         thing='a branding style',
     )
 
