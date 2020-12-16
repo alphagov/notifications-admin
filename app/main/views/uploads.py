@@ -292,6 +292,7 @@ def uploaded_letter_preview(service_id, file_id):
     form = LetterUploadPostageForm(
         postage_zone=postal_address.postage
     )
+    allowed_spreadsheet_file_extensions = ','.join([f'.{ext}' for ext in Spreadsheet.ALLOWED_FILE_EXTENSIONS])
 
     template = get_template(
         template_dict,
@@ -313,6 +314,7 @@ def uploaded_letter_preview(service_id, file_id):
         message=error_message,
         error_code=error_shortcode,
         form=form,
+        allowed_spreadsheet_file_extensions=allowed_spreadsheet_file_extensions,
         postal_address=postal_address,
         re_upload_form=re_upload_form
     )
