@@ -35,6 +35,7 @@
 <div class="bottom-gutter">
   {{ file_upload(
     form.file,
+    allowed_file_extensions=allowed_spreadsheet_file_extensions,
     button_text='Upload your file again' if error else 'Choose file',
     show_errors=False
   )}}

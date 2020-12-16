@@ -18,6 +18,8 @@ def test_upload_contact_list_page(client_request):
     assert 'action' not in page.select_one('form')
     assert page.select_one('form input')['name'] == 'file'
     assert page.select_one('form input')['type'] == 'file'
+    assert page.select_one('form input').has_attr('accept')
+    assert set(page.select_one('form input')['accept'].split(',')) == {'.csv', '.xlsx', '.xls', '.ods', '.xlsm', '.tsv'}
 
     assert normalize_spaces(page.select('.spreadsheet')[0].text) == (
         'Example A '
@@ -234,6 +236,8 @@ def test_upload_csv_file_shows_error_banner(
         service_id=SERVICE_ONE_ID,
     )
     assert page.select_one('form input')['type'] == 'file'
+    assert page.select_one('form input').has_attr('accept')
+    assert set(page.select_one('form input')['accept'].split(',')) == {'.csv', '.xlsx', '.xls', '.ods', '.xlsm', '.tsv'}
 
     assert normalize_spaces(page.select_one('thead').text) == expected_thead
     assert normalize_spaces(page.select_one('tbody').text) == expected_tbody
