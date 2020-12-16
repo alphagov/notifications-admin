@@ -2,6 +2,7 @@
 
 {% macro file_upload(
   field,
+  allowed_file_extensions,
   action=None,
   button_text="Choose file",
   alternate_link=None,
@@ -25,7 +26,8 @@
       {% endif %}
     </label>
     {{ field(**{
-      'class': 'file-upload-field'
+      'class': 'file-upload-field',
+      'accept': allowed_file_extensions
     }) }}
     <label class="file-upload-button" for="{{ field.name }}">
       {{ button_text }}
