@@ -309,8 +309,7 @@ def test_example_spreadsheet(
         '1 phone number name date'
     )
     assert page.select_one('input[type=file]').has_attr('accept')
-    assert set(page.select_one('input[type=file]')['accept'].split(",")) ==\
-        {'.csv', '.xlsx', '.xls', '.ods', '.xlsm', '.tsv'}
+    assert page.select_one('input[type=file]')['accept'] == '.csv,.xlsx,.xls,.ods,.xlsm,.tsv'
 
 
 def test_example_spreadsheet_for_letters(
@@ -511,8 +510,7 @@ def test_upload_csv_file_with_errors_shows_check_page_with_errors(
 
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert page.select_one('input[type=file]').has_attr('accept')
-    assert set(page.select_one('input[type=file]')['accept'].split(",")) ==\
-        {'.csv', '.xlsx', '.xls', '.ods', '.xlsm', '.tsv'}
+    assert page.select_one('input[type=file]')['accept'] == '.csv,.xlsx,.xls,.ods,.xlsm,.tsv'
 
     content = response.get_data(as_text=True)
     assert 'There’s a problem with example.csv' in content
@@ -906,8 +904,7 @@ def test_upload_csv_file_with_missing_columns_shows_error(
         assert 'file_uploads' not in session
 
     assert page.select_one('input[type=file]').has_attr('accept')
-    assert set(page.select_one('input[type=file]')['accept'].split(",")) == \
-        {'.csv', '.xlsx', '.xls', '.ods', '.xlsm', '.tsv'}
+    assert page.select_one('input[type=file]')['accept'] == '.csv,.xlsx,.xls,.ods,.xlsm,.tsv'
     assert normalize_spaces(page.select('.banner-dangerous')[0].text) == expected_error
 
 

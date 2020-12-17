@@ -291,7 +291,7 @@ def id_safe(string):
 
 class Spreadsheet():
 
-    ALLOWED_FILE_EXTENSIONS = {'csv', 'xlsx', 'xls', 'ods', 'xlsm', 'tsv'}
+    ALLOWED_FILE_EXTENSIONS = ('csv', 'xlsx', 'xls', 'ods', 'xlsm', 'tsv')
 
     def __init__(self, csv_data=None, rows=None, filename=''):
 

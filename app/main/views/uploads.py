@@ -292,7 +292,6 @@ def uploaded_letter_preview(service_id, file_id):
     form = LetterUploadPostageForm(
         postage_zone=postal_address.postage
     )
-    allowed_spreadsheet_file_extensions = ','.join([f'.{ext}' for ext in Spreadsheet.ALLOWED_FILE_EXTENSIONS])
 
     template = get_template(
         template_dict,
@@ -314,7 +313,7 @@ def uploaded_letter_preview(service_id, file_id):
         message=error_message,
         error_code=error_shortcode,
         form=form,
-        allowed_spreadsheet_file_extensions=allowed_spreadsheet_file_extensions,
+        allowed_file_extensions=Spreadsheet.ALLOWED_FILE_EXTENSIONS,
         postal_address=postal_address,
         re_upload_form=re_upload_form
     )
@@ -379,7 +378,6 @@ def send_uploaded_letter(service_id, file_id):
 @user_has_permissions('send_messages')
 def upload_contact_list(service_id):
     form = CsvUploadForm()
-    allowed_spreadsheet_file_extensions = ','.join([f'.{ext}' for ext in Spreadsheet.ALLOWED_FILE_EXTENSIONS])
 
     if form.validate_on_submit():
         try:
@@ -416,7 +414,7 @@ def upload_contact_list(service_id):
     return render_template(
         'views/uploads/contact-list/upload.html',
         form=form,
-        allowed_spreadsheet_file_extensions=allowed_spreadsheet_file_extensions,
+        allowed_file_extensions=Spreadsheet.ALLOWED_FILE_EXTENSIONS,
     )
 
 
@@ -451,7 +449,6 @@ def check_contact_list(service_id, upload_id):
     )
 
     non_empty_column_headers = list(filter(None, recipients.column_headers))
-    allowed_spreadsheet_file_extensions = ','.join([f'.{ext}' for ext in Spreadsheet.ALLOWED_FILE_EXTENSIONS])
 
     if len(non_empty_column_headers) > 1 or not template_type or not recipients:
         return render_template(
@@ -460,7 +457,7 @@ def check_contact_list(service_id, upload_id):
             original_file_name=original_file_name,
             template_type=template_type,
             form=form,
-            allowed_spreadsheet_file_extensions=allowed_spreadsheet_file_extensions
+            allowed_file_extensions=Spreadsheet.ALLOWED_FILE_EXTENSIONS
         )
 
     if recipients.too_many_rows or not len(recipients):
@@ -469,7 +466,7 @@ def check_contact_list(service_id, upload_id):
             recipients=recipients,
             original_file_name=original_file_name,
             form=form,
-            allowed_spreadsheet_file_extensions=allowed_spreadsheet_file_extensions
+            allowed_file_extensions=Spreadsheet.ALLOWED_FILE_EXTENSIONS
         )
 
     row_errors = get_errors_for_csv(recipients, template_type)
@@ -480,7 +477,7 @@ def check_contact_list(service_id, upload_id):
             original_file_name=original_file_name,
             row_errors=row_errors,
             form=form,
-            allowed_spreadsheet_file_extensions=allowed_spreadsheet_file_extensions
+            allowed_file_extensions=Spreadsheet.ALLOWED_FILE_EXTENSIONS
         )
 
     if recipients.has_errors:
@@ -489,7 +486,7 @@ def check_contact_list(service_id, upload_id):
             recipients=recipients,
             original_file_name=original_file_name,
             form=form,
-            allowed_spreadsheet_file_extensions=allowed_spreadsheet_file_extensions
+            allowed_file_extensions=Spreadsheet.ALLOWED_FILE_EXTENSIONS
         )
 
     metadata_kwargs = {

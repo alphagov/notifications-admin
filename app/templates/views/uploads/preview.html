@@ -19,7 +19,7 @@
         <div class="form-group">
           {{ file_upload(
             re_upload_form.file,
-            allowed_file_extensions='.pdf',
+            allowed_file_extensions=['pdf'],
             action=url_for('main.upload_letter', service_id=current_service.id),
             button_text='Upload your file again'
           ) }}

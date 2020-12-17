@@ -187,7 +187,6 @@ def send_messages(service_id, template_id):
             ))
 
     column_headings = get_spreadsheet_column_headings_from_template(template)
-    allowed_spreadsheet_file_extensions = ','.join([f'.{ext}' for ext in Spreadsheet.ALLOWED_FILE_EXTENSIONS])
 
     return render_template(
         'views/send.html',
@@ -195,7 +194,7 @@ def send_messages(service_id, template_id):
         column_headings=list(ascii_uppercase[:len(column_headings)]),
         example=[column_headings, get_example_csv_rows(template)],
         form=form,
-        allowed_spreadsheet_file_extensions=allowed_spreadsheet_file_extensions
+        allowed_file_extensions=Spreadsheet.ALLOWED_FILE_EXTENSIONS
     )
 
 
@@ -711,7 +710,7 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
 def check_messages(service_id, template_id, upload_id, row_index=2):
 
     data = _check_messages(service_id, template_id, upload_id, row_index)
-    data['allowed_spreadsheet_file_extensions'] = ','.join([f'.{ext}' for ext in Spreadsheet.ALLOWED_FILE_EXTENSIONS])
+    data['allowed_file_extensions'] = Spreadsheet.ALLOWED_FILE_EXTENSIONS
 
     if (
         data['recipients'].too_many_rows
