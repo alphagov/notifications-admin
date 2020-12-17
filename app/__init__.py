@@ -528,6 +528,15 @@ def format_number_in_pounds_as_currency(number):
     return f"{number * 100:.0f}p"
 
 
+def format_list_items(items, format_string, *args, **kwargs):
+    """
+    Apply formatting to each item in an iterable. Returns a list.
+    Each item is made available in the format_string as the 'item' keyword argument.
+    example usage: ['png','svg','pdf']|format_list_items('{0}. {item}', [1,2,3]) -> ['1. png', '2. svg', '3. pdf']
+    """
+    return [format_string.format(*args, item=item, **kwargs) for item in items]
+
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.from_id(user_id)
@@ -818,6 +827,7 @@ def add_template_filters(application):
         format_thousands,
         id_safe,
         convert_to_boolean,
+        format_list_items,
     ]:
         application.add_template_filter(fn)
 
