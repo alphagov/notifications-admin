@@ -313,6 +313,7 @@ def uploaded_letter_preview(service_id, file_id):
         message=error_message,
         error_code=error_shortcode,
         form=form,
+        allowed_file_extensions=Spreadsheet.ALLOWED_FILE_EXTENSIONS,
         postal_address=postal_address,
         re_upload_form=re_upload_form
     )
@@ -413,6 +414,7 @@ def upload_contact_list(service_id):
     return render_template(
         'views/uploads/contact-list/upload.html',
         form=form,
+        allowed_file_extensions=Spreadsheet.ALLOWED_FILE_EXTENSIONS,
     )
 
 
@@ -455,6 +457,7 @@ def check_contact_list(service_id, upload_id):
             original_file_name=original_file_name,
             template_type=template_type,
             form=form,
+            allowed_file_extensions=Spreadsheet.ALLOWED_FILE_EXTENSIONS
         )
 
     if recipients.too_many_rows or not len(recipients):
@@ -463,6 +466,7 @@ def check_contact_list(service_id, upload_id):
             recipients=recipients,
             original_file_name=original_file_name,
             form=form,
+            allowed_file_extensions=Spreadsheet.ALLOWED_FILE_EXTENSIONS
         )
 
     row_errors = get_errors_for_csv(recipients, template_type)
@@ -473,6 +477,7 @@ def check_contact_list(service_id, upload_id):
             original_file_name=original_file_name,
             row_errors=row_errors,
             form=form,
+            allowed_file_extensions=Spreadsheet.ALLOWED_FILE_EXTENSIONS
         )
 
     if recipients.has_errors:
@@ -481,6 +486,7 @@ def check_contact_list(service_id, upload_id):
             recipients=recipients,
             original_file_name=original_file_name,
             form=form,
+            allowed_file_extensions=Spreadsheet.ALLOWED_FILE_EXTENSIONS
         )
 
     metadata_kwargs = {

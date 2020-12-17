@@ -24,7 +24,7 @@
       <p class="govuk-body">
         Logos should be SVG files, cropped to artwork bounds and with all fonts outlined.
       </p>
-      {{ file_upload(file_upload_form.file, button_text='{} logo'.format('Update' if is_update else 'Upload')) }}
+      {{ file_upload(file_upload_form.file, allowed_file_extensions=['svg'], button_text='{} logo'.format('Update' if is_update else 'Upload')) }}
       {% call form_wrapper() %}
         <div class="form-group">
           {{ letter_branding_details_form.name(param_extensions={

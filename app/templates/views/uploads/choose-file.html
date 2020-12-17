@@ -29,6 +29,7 @@
   <p class="govuk-body">
     {{ file_upload(
       form.file,
+      allowed_file_extensions=['pdf'],
       action=url_for('main.upload_letter', service_id=current_service.id),
       button_text='Upload your file again' if error else 'Choose file',
       show_errors=False

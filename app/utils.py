@@ -291,7 +291,7 @@ def id_safe(string):
 
 class Spreadsheet():
 
-    allowed_file_extensions = ['csv', 'xlsx', 'xls', 'ods', 'xlsm', 'tsv']
+    ALLOWED_FILE_EXTENSIONS = ('csv', 'xlsx', 'xls', 'ods', 'xlsm', 'tsv')
 
     def __init__(self, csv_data=None, rows=None, filename=''):
 
@@ -322,7 +322,7 @@ class Spreadsheet():
 
     @classmethod
     def can_handle(cls, filename):
-        return cls.get_extension(filename) in cls.allowed_file_extensions
+        return cls.get_extension(filename) in cls.ALLOWED_FILE_EXTENSIONS
 
     @staticmethod
     def get_extension(filename):

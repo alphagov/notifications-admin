@@ -15,6 +15,7 @@ def test_get_upload_letter(client_request):
 
     assert page.find('h1').text == 'Upload a letter'
     assert page.find('input', class_='file-upload-field')
+    assert page.find('input', class_='file-upload-field')['accept'] == '.pdf'
     assert page.select('main button[type=submit]')
     assert normalize_spaces(page.find('label', class_='file-upload-button').text) == 'Choose file'
 
@@ -213,6 +214,7 @@ def test_post_upload_letter_shows_error_when_file_is_not_a_pdf(client_request):
     assert page.find('h1').text == 'Wrong file type'
     assert page.find('div', class_='banner-dangerous').find('p').text == 'Save your letter as a PDF and try again.'
     assert normalize_spaces(page.find('label', class_='file-upload-button').text) == 'Upload your file again'
+    assert page.find('input', type='file')['accept'] == '.pdf'
 
 
 def test_post_upload_letter_shows_error_when_no_file_uploaded(client_request):
@@ -346,6 +348,7 @@ def test_post_upload_letter_shows_letter_preview_for_invalid_file(mocker, client
 
     assert page.find("a", {"class": "govuk-back-link"})["href"] == "/services/{}/upload-letter".format(SERVICE_ONE_ID)
     assert page.find("label", {"class": "file-upload-button"})
+    assert page.find("input", {"type": "file"})["accept"] == '.pdf'
 
     letter_images = page.select('main img')
     assert len(letter_images) == 1
