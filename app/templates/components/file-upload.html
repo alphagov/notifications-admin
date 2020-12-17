@@ -27,7 +27,7 @@
     </label>
     {{ field(**{
       'class': 'file-upload-field',
-      'accept': allowed_file_extensions
+      'accept': allowed_file_extensions|format_list_items('.{item}')|join(',')|e
     }) }}
     <label class="file-upload-button" for="{{ field.name }}">
       {{ button_text }}
