@@ -1668,6 +1668,7 @@ def test_should_redirect_after_request_to_go_live(
         'Other live services: No\n'
         '\n'
         'Service reply-to address: test@example.com\n'
+        '\n'
         '---\n'
         'Request sent by test@user.gov.uk\n'
     ).format(
@@ -1736,6 +1737,7 @@ def test_request_to_go_live_displays_go_live_notes_in_zendesk_ticket(
         'Other live services: No\n'
         '\n'
         'Service reply-to address: test@example.com\n'
+        '\n'
         '---\n'
         'Request sent by test@user.gov.uk\n'
     ).format(
