@@ -217,6 +217,7 @@ def submit_request_to_go_live(service_id):
             '\nOther live services: {existing_live}'
             '\n'
             '\nService reply-to address: {email_reply_to}'
+            '\n'
             '\n---'
             '\nRequest sent by {email_address}'
             '\n'
