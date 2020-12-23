@@ -214,11 +214,11 @@
       caption_visible=False
     ) %}
       {% for sheets, second, first, international in [
-        ('1 sheet', '35p', '61p', '84p'),
-        ('2 sheets', '40p', '66p', '92p'),
-        ('3 sheets', '45p', '71p', '£1'),
-        ('4 sheets', '50p', '76p', '£1.08'),
-        ('5 sheets', '55p', '81p', '£1.16'),
+        ('1 sheet', '39p', '69p', '89p'),
+        ('2 sheets', '44p', '74p', '97p'),
+        ('3 sheets', '49p', '79p', '£1.05'),
+        ('4 sheets', '54p', '84p', '£1.13'),
+        ('5 sheets', '59p', '89p', '£1.21'),
       ] %}
         {% call row() %}
           {% call row_heading() %} {{ sheets }} {% endcall %}
@@ -229,15 +229,9 @@
       {% endfor %}
     {% endcall %}
   </div>
-  <div class="panel panel-border-wide">  
-    <p class="govuk-body">From 1 February 2021:</p>
-    <ul class="list list-bullet">
-      <li>second class postage will increase by 4 pence, plus VAT</li>
-      <li>first class postage will increase by 8 pence, plus VAT</li>
-      <li>international postage will increase by 5 pence, plus VAT</li>
-    </ul>
-    <p class="govuk-body">This is because Royal Mail has increased its rates.</p>
 
+  <div class="panel panel-border-wide">  
+    <p class="govuk-body">These prices were updated on 1 February 2021.</p>
   </div>
 
 {% endblock %}
