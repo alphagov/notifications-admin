@@ -1865,6 +1865,37 @@ def test_should_not_update_too_big_template(
     assert "Content has a character count greater than the limit of 459" in page.text
 
 
+@pytest.mark.parametrize('content, expected_error', (
+    (("ŴŶ" * 308), (
+        'Content must be 615 characters or fewer because it contains Ŵ and Ŷ'
+    )),
+    (("ab" * 698), (
+        'Content must be 1,395 characters or fewer'
+    )),
+))
+def test_should_not_create_too_big_template_for_broadcasts(
+    client_request,
+    service_one,
+    content,
+    expected_error,
+):
+    service_one['permissions'] = ['broadcast']
+    page = client_request.post(
+        '.add_service_template',
+        service_id=SERVICE_ONE_ID,
+        template_type='broadcast',
+        _data={
+            'name': 'New name',
+            'template_content': content,
+            'template_type': 'broadcast',
+            'service': SERVICE_ONE_ID,
+            'process_type': 'normal'
+        },
+        _expected_status=200,
+    )
+    assert normalize_spaces(page.select_one('.error-message').text) == expected_error
+
+
 def test_should_redirect_when_saving_a_template_email(
     client_request,
     mock_get_service_email_template,
