@@ -480,6 +480,7 @@ def test_broadcast_template_doesnt_highlight_placeholders(
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
     )
+    assert page.select_one('textarea')['data-module'] == 'enhanced-textbox'
     assert page.select_one('textarea')['data-highlight-placeholders'] == 'false'
 
 
