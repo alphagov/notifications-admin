@@ -1,14 +1,12 @@
 // Copy of _url-helpers.scss in govuk_frontend_toolkit
-// to allow us to use gulp-base64-inline on all our images
-// gulp-base64-inline requires you to specify which of your
-// images you want encoded by using the `inline()` function
-// see https://github.com/goschevski/gulp-base64-inline
+// to prepend the path to where we store images
+
 @function file-url($file) {
   $url: '';
   @if $path {
-    $url: inline($path + $file);
+    $url: url($path + $file);
   } @else {
-    $url: image-url($file);
+    $url: url($file);
   }
   @return $url;
 }

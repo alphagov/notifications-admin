@@ -29,7 +29,6 @@
     "gulp": "4.0.0",
     "gulp-add-src": "1.0.0",
     "gulp-babel": "8.0.0",
-    "gulp-base64-inline": "1.0.4",
     "gulp-better-rollup": "4.0.1",
     "gulp-clean-css": "4.2.0",
     "gulp-concat": "2.6.1",
