@@ -24,7 +24,9 @@ class AssetFingerprinter(object):
         self._asset_root = asset_root
         self._filesystem_path = filesystem_path
 
-    def get_url(self, asset_path):
+    def get_url(self, asset_path, with_querystring_hash=True):
+        if not with_querystring_hash:
+            return self._asset_root + asset_path
         if asset_path not in self._cache:
             self._cache[asset_path] = (
                 self._asset_root +

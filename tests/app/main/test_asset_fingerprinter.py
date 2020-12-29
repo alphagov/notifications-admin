@@ -89,6 +89,16 @@ class TestAssetFingerprint(object):
             'app/static/application.css'
         )
 
+    def test_without_hash_if_requested(self, mocker):
+        fingerprinter = AssetFingerprinter()
+        assert fingerprinter.get_url(
+            'application.css',
+            with_querystring_hash=False,
+        ) == (
+            '/static/application.css'
+        )
+        assert fingerprinter._cache == {}
+
 
 class TestAssetFingerprintWithUnicode(object):
     def test_can_read_self(self):
