@@ -12,6 +12,9 @@
 {% endblock %}
 
 {% block head %}
+  {%- for font in font_paths %}
+  <link rel="preload" href="{{ asset_url(font, with_querystring_hash=False) }}" as="font" type="font/woff2" crossorigin>
+  {%- endfor %}
   <link rel="stylesheet" media="screen" href="{{ asset_url('stylesheets/main.css') }}" />
   <link rel="stylesheet" media="print" href="{{ asset_url('stylesheets/print.css') }}" />
   {% block extra_stylesheets %}

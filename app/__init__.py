@@ -1,4 +1,5 @@
 import os
+import pathlib
 import re
 import urllib
 from datetime import datetime, timedelta, timezone
@@ -202,6 +203,11 @@ def init_app(application):
     application.before_request(load_organisation_before_request)
     application.before_request(request_helper.check_proxy_header_before_request)
 
+    font_paths = [
+        str(item)[len(asset_fingerprinter._filesystem_path):]
+        for item in pathlib.Path(asset_fingerprinter._filesystem_path).glob('fonts/*.woff2')
+    ]
+
     @application.context_processor
     def _attach_current_service():
         return {'current_service': current_service}
@@ -228,7 +234,8 @@ def init_app(application):
         return {
             'asset_path': application.config['ASSET_PATH'],
             'header_colour': application.config['HEADER_COLOUR'],
-            'asset_url': asset_fingerprinter.get_url
+            'asset_url': asset_fingerprinter.get_url,
+            'font_paths': font_paths,
         }
 
     application.url_map.converters['uuid'].to_python = lambda self, value: value
