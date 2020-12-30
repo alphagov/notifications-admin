@@ -552,12 +552,6 @@ def make_session_permanent():
     when you first log in/sign up/get invited/etc, but we do it just to be safe. For more reading, check here:
     https://stackoverflow.com/questions/34118093/flask-permanent-session-where-to-define-them
     """
-
-    # TODO: Remove this loop after a weekend, when all cookies have either run through this code or expired
-    for val in ['user_id', 'remember', 'remember_seconds']:
-        if val in session:
-            session[f'_{val}'] = session[val]
-
     session.permanent = True
 
 
