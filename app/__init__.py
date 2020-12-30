@@ -38,6 +38,7 @@ from notifications_utils.recipients import (
 from notifications_utils.sanitise_text import SanitiseASCII
 from notifications_utils.take import Take
 from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
+from server_timing import Timing
 from werkzeug.exceptions import HTTPException as WerkzeugHTTPException
 from werkzeug.exceptions import abort
 from werkzeug.local import LocalProxy
@@ -193,6 +194,8 @@ def create_app(application):
     register_errorhandlers(application)
 
     setup_event_handlers()
+
+    application.server_timing = Timing(application)
 
 
 def init_app(application):

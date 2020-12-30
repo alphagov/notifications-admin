@@ -5,6 +5,8 @@ from notifications_python_client.base import BaseAPIClient
 from notifications_utils.clients.redis import RequestCache
 
 from app.extensions import redis_client
+from server_timing import Timing
+
 
 cache = RequestCache(redis_client)
 
@@ -26,6 +28,13 @@ class NotifyAdminAPIClient(BaseAPIClient):
         self.service_id = app.config['ADMIN_CLIENT_USER_NAME']
         self.api_key = app.config['ADMIN_CLIENT_SECRET']
         self.route_secret = app.config['ROUTE_SECRET_KEY_1']
+        self.server_timing = Timing(app)
+
+    def request(self, method, url, data=None, params=None):
+        key = url.replace('/', '-')
+        with self.server_timing.time(f'API-{key}'):
+            response = super().request(method, url, data, params)
+        return response
 
     def generate_headers(self, api_token):
         headers = {
