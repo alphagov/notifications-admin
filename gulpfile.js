@@ -14,7 +14,6 @@ const stylish = require('jshint-stylish');
 const plugins = {};
 plugins.addSrc = require('gulp-add-src');
 plugins.babel = require('gulp-babel');
-plugins.base64 = require('gulp-base64-inline');
 plugins.cleanCSS = require('gulp-clean-css');
 plugins.concat = require('gulp-concat');
 plugins.cssUrlAdjuster = require('gulp-css-url-adjuster');
@@ -209,7 +208,6 @@ const sass = () => {
         paths.govuk_frontend,
       ]
     }))
-    .pipe(plugins.base64('../..'))
     .pipe(plugins.cssUrlAdjuster({
       replace: [staticPathMatcher, '/']
     }))
