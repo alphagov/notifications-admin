@@ -1551,7 +1551,7 @@ def test_send_one_off_has_link_to_use_existing_list(
             ),
         ),
         (
-            'Use a saved list',
+            'Use an emergency list',
             url_for(
                 'main.choose_from_contact_list',
                 service_id=SERVICE_ONE_ID,
@@ -4264,9 +4264,9 @@ def test_choose_from_contact_list_with_personalised_template(
     assert [
         normalize_spaces(p.text) for p in page.select('main p')
     ] == [
-        'You cannot use a saved contact list with this template because '
+        'You cannot use an emergency contact list with this template because '
         'it is personalised with ((name)) and ((thing)).',
-        'Saved contact lists can only store email addresses or phone numbers.',
+        'Emergency contact lists can only include email addresses or phone numbers.',
     ]
     assert not page.select('table')
 
@@ -4290,7 +4290,7 @@ def test_choose_from_contact_list_with_no_lists(
         normalize_spaces(p.text) for p in page.select('main p')
     ] == [
         'You have not saved any lists of phone numbers yet.',
-        'To upload and save a new contact list, go to the uploads page.',
+        'To upload and save an emergency contact list, go to the uploads page.',
     ]
     assert page.select_one('main p a')['href'] == url_for(
         'main.uploads',
