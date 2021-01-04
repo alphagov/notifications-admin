@@ -475,6 +475,7 @@ def test_triage_redirects_to_correct_url(
         partial(url_for, 'main.support')
     ),
 ])
+@freeze_time('2012-12-12 12:12')
 def test_back_link_from_form(
     client_request,
     mock_get_non_empty_organisations_and_services_for_user,
