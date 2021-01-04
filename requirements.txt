@@ -26,7 +26,7 @@ Shapely==1.7.1
 awscli-cwlogs>=1.4,<1.5
 itsdangerous==1.1.0
 
-git+https://github.com/alphagov/notifications-utils.git@43.5.8#egg=notifications-utils==43.5.8
+git+https://github.com/alphagov/notifications-utils.git@43.6.0#egg=notifications-utils==43.6.0
 git+https://github.com/alphagov/govuk-frontend-jinja.git@v0.5.1-alpha#egg=govuk-frontend-jinja==0.5.1-alpha
 
 # gds-metrics requires prometheseus 0.2.0, override that requirement as later versions bring significant performance gains

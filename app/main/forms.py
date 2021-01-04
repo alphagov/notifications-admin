@@ -40,6 +40,7 @@ from wtforms.validators import URL, DataRequired, Length, Optional, Regexp
 
 from app import format_thousands
 from app.main.validators import (
+    BroadcastLength,
     CommonlyUsedPassword,
     CsvFileValidator,
     DoesNotStartWithDoubleZero,
@@ -1324,6 +1325,7 @@ class BroadcastTemplateForm(SMSTemplateForm):
     def validate_template_content(self, field):
         OnlySMSCharacters(template_type='broadcast')(None, field)
         NoPlaceholders()(None, field)
+        BroadcastLength()(None, field)
 
 
 class LetterAddressForm(StripWhitespaceForm):

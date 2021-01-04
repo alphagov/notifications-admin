@@ -24,7 +24,7 @@
         }) }}
       </div>
       <div class="govuk-grid-column-two-thirds">
-        {{ textbox(form.template_content, highlight_placeholders=False, width='1-1', rows=5) }}
+        {{ textbox(form.template_content, highlight_placeholders=False, autosize=True, width='1-1', rows=5) }}
         {{ sticky_page_footer('Save') }}
       </div>
     </div>
