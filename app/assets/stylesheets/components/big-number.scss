@@ -3,14 +3,17 @@
 
   display: block;
 
+  &-number,
+  &-label {
+    display: block;
+  }
+
   &-number {
     @include bold-48($tabular-numbers: true);
-    display: block;
   }
 
   &-label {
     @include core-19;
-    display: inline-block;
     padding-bottom: 10px;
   }
 

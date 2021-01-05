@@ -627,7 +627,7 @@ def test_platform_admin_displays_stats_in_right_boxes_and_with_correct_styling(
     # Email complaints status box - link exists and number is correct
     assert page.find('a', string='15 complaints')
     # SMS total box - number is correct
-    assert page.find_all('div', class_='big-number-number')[1].text.strip() == '168'
+    assert page.find_all('span', class_='big-number-number')[1].text.strip() == '168'
     # Test SMS box - number is correct
     assert '5' in page.find_all('div', class_='govuk-grid-column-one-third')[4].text
     # SMS technical failure status box - number is correct and failure class is used

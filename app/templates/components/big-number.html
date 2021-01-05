@@ -2,22 +2,22 @@
   {% if link %}
     <a class="govuk-link govuk-link--no-visited-state big-number-link" href="{{ link }}">
   {% endif %}
-  <div class="big-number{% if smaller %}-smaller{% endif %}{% if smallest %}-smallest{% endif %}">
-    <div class="big-number-number">
-      {% if number is number %}
-        {% if currency %}
-          {{ "{}{:,.2f}".format(currency, number) }}
-        {% else %}
-          {{ "{:,}".format(number) }}
+      <span class="big-number{% if smaller %}-smaller{% endif %}{% if smallest %}-smallest{% endif %}">
+        <span class="big-number-number">
+          {% if number is number %}
+            {% if currency %}
+              {{ "{}{:,.2f}".format(currency, number) }}
+            {% else %}
+              {{ "{:,}".format(number) }}
+            {% endif %}
+          {% else %}
+            {{ number }}
+          {% endif %}
+        </span>
+        {% if label %}
+          <span class="big-number-label">{{ label }}</span>
         {% endif %}
-      {% else %}
-        {{ number }}
-      {% endif %}
-    </div>
-    {% if label %}
-      <span class="big-number-label">{{ label }}</span>
-    {% endif %}
-  </div>
+      </span>
   {% if link %}
     </a>
   {% endif %}
@@ -36,10 +36,10 @@
   smaller=False,
   smallest=False
 ) %}
-  <div class="big-number-with-status">
+  <span class="big-number-with-status">
     {{ big_number(number, label, link=link, smaller=smaller, smallest=smallest) }}
     {% if show_failures %}
-      <div class="big-number-status{% if danger_zone %}-failing{% endif %}">
+      <span class="big-number-status{% if danger_zone %}-failing{% endif %}">
         {% if failures %}
           {% if failure_link %}
             <a class="govuk-link govuk-link--no-visited-state" href="{{ failure_link }}">
@@ -53,23 +53,23 @@
         {% else %}
           No failures
         {% endif %}
-      </div>
+      </span>
     {% endif %}
-  </div>
+  </span>
 {% endmacro %}
 
 
 {% macro big_number_simple(number, label) %}
-  <div class="big-number-dark bottom-gutter-2-3">
-    <div class="big-number-number">
+  <span class="big-number-dark bottom-gutter-2-3">
+    <span class="big-number-number">
       {% if number is number %}
         {{ "{:,}".format(number) }}
       {% else %}
         {{ number }}
       {% endif %}
-    </div>
+    </span>
     {% if label %}
       <span class="big-number-label">{{ label }}</span>
     {% endif %}
-  </div>
+  </span>
 {% endmacro %}
