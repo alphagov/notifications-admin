@@ -467,10 +467,27 @@ def test_should_show_page_for_one_template(
     assert page.select_one('textarea')['data-module'] == 'enhanced-textbox'
     assert page.select_one('textarea')['data-highlight-placeholders'] == 'true'
     assert "priority" not in str(page.select_one('main'))
+
+    assert (
+        page.select_one('[data-module=update-status]')['data-target']
+    ) == (
+        page.select_one('textarea')['id']
+    ) == (
+        'template_content'
+    )
+
+    assert (
+        page.select_one('[data-module=update-status]')['data-updates-url']
+    ) == url_for(
+        '.count_content_length',
+        service_id=SERVICE_ONE_ID,
+        template_type='sms',
+    )
+
     mock_get_service_template.assert_called_with(SERVICE_ONE_ID, template_id, None)
 
 
-def test_broadcast_template_doesnt_highlight_placeholders(
+def test_broadcast_template_doesnt_highlight_placeholders_but_does_count_characters(
     client_request,
     service_one,
     mock_get_broadcast_template,
@@ -484,6 +501,22 @@ def test_broadcast_template_doesnt_highlight_placeholders(
     )
     assert page.select_one('textarea')['data-module'] == 'enhanced-textbox'
     assert page.select_one('textarea')['data-highlight-placeholders'] == 'false'
+
+    assert (
+        page.select_one('[data-module=update-status]')['data-target']
+    ) == (
+        page.select_one('textarea')['id']
+    ) == (
+        'template_content'
+    )
+
+    assert (
+        page.select_one('[data-module=update-status]')['data-updates-url']
+    ) == url_for(
+        '.count_content_length',
+        service_id=SERVICE_ONE_ID,
+        template_type='broadcast',
+    )
 
 
 def test_caseworker_redirected_to_one_off(
