@@ -1,7 +1,3 @@
 {% macro message_count_label(count, template_type, suffix='sent') -%}
   {{ count|message_count_noun(template_type) }} {{ suffix }}
 {%- endmacro %}
-
-{% macro iteration_count(count) -%}
-  {{ count|iteration_count }}
-{% endmacro %}
