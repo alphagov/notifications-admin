@@ -1,6 +1,5 @@
 {% extends "withnav_template.html" %}
 {% from "components/ajax-block.html" import ajax_block %}
-{% from "components/message-count-label.html" import message_count_label %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
@@ -12,7 +11,7 @@
   else ''
 ) %}
 {% set page_title = (
-  (title_status + message_count_label(99, message_type, suffix='')) | capitalize
+  (title_status + 99|message_count_label(message_type, suffix='')) | capitalize
   if current_user.has_permissions('view_activity')
   else 'Sent messages'
 ) %}
