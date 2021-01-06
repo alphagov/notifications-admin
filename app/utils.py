@@ -1,15 +1,9 @@
 import os
-import re
-import unicodedata
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 from functools import wraps
 from itertools import chain
-from math import floor, log10
-from numbers import Number
 from urllib.parse import urlparse
 
-import ago
-import dateutil
 import pytz
 from dateutil import parser
 from flask import (
@@ -24,14 +18,10 @@ from flask import (
 )
 from flask_login import current_user, login_required
 from notifications_utils.field import Field
-from notifications_utils.formatters import (
-    make_quotes_smart,
-    unescaped_formatted_list,
-)
+from notifications_utils.formatters import unescaped_formatted_list
 from notifications_utils.letter_timings import letter_can_be_cancelled
 from notifications_utils.postal_address import PostalAddress
 from notifications_utils.recipients import RecipientCSV
-from notifications_utils.take import Take
 from notifications_utils.template import (
     BroadcastPreviewTemplate,
     EmailPreviewTemplate,
@@ -270,21 +260,6 @@ def generate_previous_next_dict(view, service_id, page, title, url_args):
     }
 
 
-def email_safe(string, whitespace='.'):
-    # strips accents, diacritics etc
-    string = ''.join(c for c in unicodedata.normalize('NFD', string) if unicodedata.category(c) != 'Mn')
-    string = ''.join(
-        word.lower() if word.isalnum() or word == whitespace else ''
-        for word in re.sub(r'\s+', whitespace, string.strip())
-    )
-    string = re.sub(r'\.{2,}', '.', string)
-    return string.strip('.')
-
-
-def id_safe(string):
-    return email_safe(string, whitespace='-')
-
-
 def get_help_argument():
     return request.args.get('help') if request.args.get('help') in ('1', '2', '3') else None
 
@@ -365,21 +340,6 @@ def get_current_financial_year():
     return current_year if current_month > 3 else current_year - 1
 
 
-def get_time_left(created_at, service_data_retention_days=7):
-    return ago.human(
-        (
-            datetime.now(timezone.utc)
-        ) - (
-            dateutil.parser.parse(created_at).replace(hour=0, minute=0, second=0) + timedelta(
-                days=service_data_retention_days + 1
-            )
-        ),
-        future_tense='Data available for {}',
-        past_tense='Data no longer available',  # No-one should ever see this
-        precision=1
-    )
-
-
 def get_logo_cdn_domain():
     parsed_uri = urlparse(current_app.config['ADMIN_BASE_URL'])
 
@@ -421,46 +381,6 @@ def unicode_truncate(s, length):
     return encoded.decode('utf-8', 'ignore')
 
 
-def starts_with_initial(name):
-    return bool(re.match(r'^.\.', name))
-
-
-def remove_middle_initial(name):
-    return re.sub(r'\s+.\s+', ' ', name)
-
-
-def remove_digits(name):
-    return ''.join(c for c in name if not c.isdigit())
-
-
-def normalize_spaces(name):
-    return ' '.join(name.split())
-
-
-def guess_name_from_email_address(email_address):
-
-    possible_name = re.split(r'[\@\+]', email_address)[0]
-
-    if '.' not in possible_name or starts_with_initial(possible_name):
-        return ''
-
-    return Take(
-        possible_name
-    ).then(
-        str.replace, '.', ' '
-    ).then(
-        remove_digits
-    ).then(
-        remove_middle_initial
-    ).then(
-        str.title
-    ).then(
-        make_quotes_smart
-    ).then(
-        normalize_spaces
-    )
-
-
 def should_skip_template_page(template_type):
     return (
         current_user.has_permissions('send_messages')
@@ -486,15 +406,6 @@ def printing_today_or_tomorrow(created_at):
         return 'today'
     else:
         return 'tomorrow'
-
-
-def redact_mobile_number(mobile_number, spacing=""):
-    indices = [-4, -5, -6, -7]
-    redact_character = spacing + "•" + spacing
-    mobile_number_list = list(mobile_number.replace(" ", ""))
-    for i in indices:
-        mobile_number_list[i] = redact_character
-    return "".join(mobile_number_list)
 
 
 def get_letter_printing_statement(status, created_at, long_form=True):
@@ -709,14 +620,6 @@ class PermanentRedirect(RequestRedirect):
     code = 301
 
 
-def format_thousands(value):
-    if isinstance(value, Number):
-        return '{:,.0f}'.format(value)
-    if value is None:
-        return ''
-    return value
-
-
 def is_less_than_days_ago(date_from_db, number_of_days):
     return (
         datetime.utcnow().astimezone(pytz.utc) - parser.parse(date_from_db)
@@ -762,12 +665,3 @@ def merge_jsonlike(source, destination):
                 source[key] = value
 
     merge_items(source, destination)
-
-
-def round_to_significant_figures(value, number_of_significant_figures):
-    if value == 0:
-        return value
-    return int(round(
-        value,
-        number_of_significant_figures - int(floor(log10(abs(value)))) - 1
-    ))

@@ -1,15 +1,10 @@
 import os
 import pathlib
-import re
-import urllib
-from datetime import datetime, timedelta, timezone
 from functools import partial
 from time import monotonic
 
-import humanize
 import jinja2
 from flask import (
-    Markup,
     current_app,
     flash,
     g,
@@ -20,7 +15,6 @@ from flask import (
     session,
     url_for,
 )
-from flask._compat import string_types
 from flask.globals import _lookup_req_object, _request_ctx_stack
 from flask_login import LoginManager, current_user
 from flask_wtf import CSRFProtect
@@ -29,16 +23,10 @@ from gds_metrics import GDSMetrics
 from govuk_frontend_jinja.flask_ext import init_govuk_frontend
 from itsdangerous import BadSignature
 from notifications_python_client.errors import HTTPError
-from notifications_utils import formatters, logging, request_helper
-from notifications_utils.field import Field
-from notifications_utils.recipients import (
-    InvalidPhoneError,
-    format_phone_number_human_readable,
-    validate_phone_number,
-)
+from notifications_utils import logging, request_helper
+from notifications_utils.formatters import formatted_list, normalise_lines
+from notifications_utils.recipients import format_phone_number_human_readable
 from notifications_utils.sanitise_text import SanitiseASCII
-from notifications_utils.take import Take
-from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
 from werkzeug.exceptions import HTTPException as WerkzeugHTTPException
 from werkzeug.exceptions import abort
 from werkzeug.local import LocalProxy
@@ -48,6 +36,36 @@ from app.asset_fingerprinter import asset_fingerprinter
 from app.commands import setup_commands
 from app.config import configs
 from app.extensions import antivirus_client, redis_client, zendesk_client
+from app.formatters import (
+    convert_to_boolean,
+    format_date,
+    format_date_human,
+    format_date_normal,
+    format_date_numeric,
+    format_date_short,
+    format_datetime,
+    format_datetime_24h,
+    format_datetime_human,
+    format_datetime_normal,
+    format_datetime_relative,
+    format_datetime_short,
+    format_day_of_week,
+    format_delta,
+    format_delta_days,
+    format_list_items,
+    format_notification_status,
+    format_notification_status_as_field_status,
+    format_notification_status_as_time,
+    format_notification_status_as_url,
+    format_notification_type,
+    format_number_in_pounds_as_currency,
+    format_thousands,
+    format_time,
+    id_safe,
+    linkable_name,
+    nl2br,
+    valid_phone_number,
+)
 from app.models.organisation import Organisation
 from app.models.service import Service
 from app.models.user import AnonymousUser, User
@@ -95,7 +113,7 @@ from app.url_converters import (
     TemplateTypeConverter,
     TicketTypeConverter,
 )
-from app.utils import format_thousands, get_logo_cdn_domain, id_safe
+from app.utils import get_logo_cdn_domain
 
 login_manager = LoginManager()
 csrf = CSRFProtect()
@@ -243,305 +261,6 @@ def init_app(application):
     application.url_map.converters['ticket_type'] = TicketTypeConverter
     application.url_map.converters['letter_file_extension'] = LetterFileExtensionConverter
     application.url_map.converters['simple_date'] = SimpleDateTypeConverter
-
-
-def convert_to_boolean(value):
-    if isinstance(value, string_types):
-        if value.lower() in ['t', 'true', 'on', 'yes', '1']:
-            return True
-        elif value.lower() in ['f', 'false', 'off', 'no', '0']:
-            return False
-
-    return value
-
-
-def linkable_name(value):
-    return urllib.parse.quote_plus(value)
-
-
-def format_datetime(date):
-    return '{} at {}'.format(
-        format_date(date),
-        format_time(date)
-    )
-
-
-def format_datetime_24h(date):
-    return '{} at {}'.format(
-        format_date(date),
-        format_time_24h(date),
-    )
-
-
-def format_datetime_normal(date):
-    return '{} at {}'.format(
-        format_date_normal(date),
-        format_time(date)
-    )
-
-
-def format_datetime_short(date):
-    return '{} at {}'.format(
-        format_date_short(date),
-        format_time(date)
-    )
-
-
-def format_datetime_relative(date):
-    return '{} at {}'.format(
-        get_human_day(date),
-        format_time(date)
-    )
-
-
-def format_datetime_numeric(date):
-    return '{} {}'.format(
-        format_date_numeric(date),
-        format_time_24h(date),
-    )
-
-
-def format_date_numeric(date):
-    return utc_string_to_aware_gmt_datetime(date).strftime('%Y-%m-%d')
-
-
-def format_time_24h(date):
-    return utc_string_to_aware_gmt_datetime(date).strftime('%H:%M')
-
-
-def get_human_day(time, date_prefix=''):
-
-    #  Add 1 minute to transform 00:00 into ‘midnight today’ instead of ‘midnight tomorrow’
-    date = (utc_string_to_aware_gmt_datetime(time) - timedelta(minutes=1)).date()
-    now = datetime.utcnow()
-
-    if date == (now + timedelta(days=1)).date():
-        return 'tomorrow'
-    if date == now.date():
-        return 'today'
-    if date == (now - timedelta(days=1)).date():
-        return 'yesterday'
-    if date.strftime('%Y') != now.strftime('%Y'):
-        return '{} {} {}'.format(
-            date_prefix,
-            _format_datetime_short(date),
-            date.strftime('%Y'),
-        ).strip()
-    return '{} {}'.format(
-        date_prefix,
-        _format_datetime_short(date),
-    ).strip()
-
-
-def format_time(date):
-    return {
-        '12:00AM': 'Midnight',
-        '12:00PM': 'Midday'
-    }.get(
-        utc_string_to_aware_gmt_datetime(date).strftime('%-I:%M%p'),
-        utc_string_to_aware_gmt_datetime(date).strftime('%-I:%M%p')
-    ).lower()
-
-
-def format_date(date):
-    return utc_string_to_aware_gmt_datetime(date).strftime('%A %d %B %Y')
-
-
-def format_date_normal(date):
-    return utc_string_to_aware_gmt_datetime(date).strftime('%d %B %Y').lstrip('0')
-
-
-def format_date_short(date):
-    return _format_datetime_short(utc_string_to_aware_gmt_datetime(date))
-
-
-def format_date_human(date):
-    return get_human_day(date)
-
-
-def format_datetime_human(date, date_prefix=''):
-    return '{} at {}'.format(
-        get_human_day(date, date_prefix='on'),
-        format_time(date),
-    )
-
-
-def format_day_of_week(date):
-    return utc_string_to_aware_gmt_datetime(date).strftime('%A')
-
-
-def _format_datetime_short(datetime):
-    return datetime.strftime('%d %B').lstrip('0')
-
-
-def naturaltime_without_indefinite_article(date):
-    return re.sub(
-        'an? (.*) ago',
-        lambda match: '1 {} ago'.format(match.group(1)),
-        humanize.naturaltime(date),
-    )
-
-
-def format_delta(date):
-    delta = (
-        datetime.now(timezone.utc)
-    ) - (
-        utc_string_to_aware_gmt_datetime(date)
-    )
-    if delta < timedelta(seconds=30):
-        return "just now"
-    if delta < timedelta(seconds=60):
-        return "in the last minute"
-    return naturaltime_without_indefinite_article(delta)
-
-
-def format_delta_days(date):
-    now = datetime.now(timezone.utc)
-    date = utc_string_to_aware_gmt_datetime(date)
-    if date.strftime('%Y-%m-%d') == now.strftime('%Y-%m-%d'):
-        return "today"
-    if date.strftime('%Y-%m-%d') == (now - timedelta(days=1)).strftime('%Y-%m-%d'):
-        return "yesterday"
-    return naturaltime_without_indefinite_article(now - date)
-
-
-def valid_phone_number(phone_number):
-    try:
-        validate_phone_number(phone_number)
-        return True
-    except InvalidPhoneError:
-        return False
-
-
-def format_notification_type(notification_type):
-    return {
-        'email': 'Email',
-        'sms': 'Text message',
-        'letter': 'Letter'
-    }[notification_type]
-
-
-def format_notification_status(status, template_type):
-    return {
-        'email': {
-            'failed': 'Failed',
-            'technical-failure': 'Technical failure',
-            'temporary-failure': 'Inbox not accepting messages right now',
-            'permanent-failure': 'Email address does not exist',
-            'delivered': 'Delivered',
-            'sending': 'Sending',
-            'created': 'Sending',
-            'sent': 'Delivered'
-        },
-        'sms': {
-            'failed': 'Failed',
-            'technical-failure': 'Technical failure',
-            'temporary-failure': 'Phone not accepting messages right now',
-            'permanent-failure': 'Not delivered',
-            'delivered': 'Delivered',
-            'sending': 'Sending',
-            'created': 'Sending',
-            'pending': 'Sending',
-            'sent': 'Sent to an international number'
-        },
-        'letter': {
-            'failed': '',
-            'technical-failure': 'Technical failure',
-            'temporary-failure': '',
-            'permanent-failure': '',
-            'delivered': '',
-            'received': '',
-            'accepted': '',
-            'sending': '',
-            'created': '',
-            'sent': '',
-            'pending-virus-check': '',
-            'virus-scan-failed': 'Virus detected',
-            'returned-letter': '',
-            'cancelled': '',
-            'validation-failed': 'Validation failed',
-        }
-    }[template_type].get(status, status)
-
-
-def format_notification_status_as_time(status, created, updated):
-    return dict.fromkeys(
-        {'created', 'pending', 'sending'}, ' since {}'.format(created)
-    ).get(status, updated)
-
-
-def format_notification_status_as_field_status(status, notification_type):
-    return {
-        'letter': {
-            'failed': 'error',
-            'technical-failure': 'error',
-            'temporary-failure': 'error',
-            'permanent-failure': 'error',
-            'delivered': None,
-            'sent': None,
-            'sending': None,
-            'created': None,
-            'accepted': None,
-            'pending-virus-check': None,
-            'virus-scan-failed': 'error',
-            'returned-letter': None,
-            'cancelled': 'error',
-        },
-    }.get(
-        notification_type,
-        {
-            'failed': 'error',
-            'technical-failure': 'error',
-            'temporary-failure': 'error',
-            'permanent-failure': 'error',
-            'delivered': None,
-            'sent': 'sent-international' if notification_type == 'sms' else None,
-            'sending': 'default',
-            'created': 'default',
-            'pending': 'default',
-        }
-    ).get(status, 'error')
-
-
-def format_notification_status_as_url(status, notification_type):
-    url = partial(url_for, "main.message_status")
-
-    if status not in {
-        'technical-failure', 'temporary-failure', 'permanent-failure',
-    }:
-        return None
-
-    return {
-        'email': url(_anchor='email-statuses'),
-        'sms': url(_anchor='sms-statuses')
-    }.get(notification_type)
-
-
-def nl2br(value):
-    if value:
-        return Markup(Take(Field(
-            value,
-            html='escape',
-        )).then(
-            formatters.nl2br
-        ))
-    return ''
-
-
-def format_number_in_pounds_as_currency(number):
-    if number >= 1:
-        return f"£{number:,.2f}"
-
-    return f"{number * 100:.0f}p"
-
-
-def format_list_items(items, format_string, *args, **kwargs):
-    """
-    Apply formatting to each item in an iterable. Returns a list.
-    Each item is made available in the format_string as the 'item' keyword argument.
-    example usage: ['png','svg','pdf']|format_list_items('{0}. {item}', [1,2,3]) -> ['1. png', '2. svg', '3. pdf']
-    """
-    return [format_string.format(*args, item=item, **kwargs) for item in items]
 
 
 @login_manager.user_loader
@@ -821,8 +540,8 @@ def add_template_filters(application):
         format_notification_status_as_field_status,
         format_notification_status_as_url,
         format_number_in_pounds_as_currency,
-        formatters.formatted_list,
-        formatters.normalise_lines,
+        formatted_list,
+        normalise_lines,
         nl2br,
         format_phone_number_human_readable,
         format_thousands,

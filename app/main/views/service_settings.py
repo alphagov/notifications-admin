@@ -29,6 +29,7 @@ from app import (
     user_api_client,
 )
 from app.extensions import zendesk_client
+from app.formatters import email_safe
 from app.main import main
 from app.main.forms import (
     BrandingOptions,
@@ -59,7 +60,6 @@ from app.utils import (
     DELIVERED_STATUSES,
     FAILURE_STATUSES,
     SENDING_STATUSES,
-    email_safe,
     user_has_permissions,
     user_is_gov_user,
     user_is_platform_admin,

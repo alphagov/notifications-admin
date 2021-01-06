@@ -38,7 +38,7 @@ from wtforms import (
 from wtforms.fields.html5 import EmailField, SearchField, TelField
 from wtforms.validators import URL, DataRequired, Length, Optional, Regexp
 
-from app import format_thousands
+from app.formatters import format_thousands, guess_name_from_email_address
 from app.main.validators import (
     BroadcastLength,
     CommonlyUsedPassword,
@@ -60,7 +60,7 @@ from app.models.roles_and_permissions import (
     permissions,
     roles,
 )
-from app.utils import guess_name_from_email_address, merge_jsonlike
+from app.utils import merge_jsonlike
 
 
 def get_time_value_and_label(future_time):

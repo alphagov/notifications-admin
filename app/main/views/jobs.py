@@ -29,6 +29,7 @@ from app import (
     notification_api_client,
     service_api_client,
 )
+from app.formatters import get_time_left
 from app.main import main
 from app.main.forms import SearchNotificationsForm
 from app.models.job import Job
@@ -38,7 +39,6 @@ from app.utils import (
     generate_previous_dict,
     get_letter_printing_statement,
     get_page_from_request,
-    get_time_left,
     parse_filter_args,
     printing_today_or_tomorrow,
     set_status_filters,
