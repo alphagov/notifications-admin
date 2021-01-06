@@ -1,7 +1,7 @@
 {% extends "withnav_template.html" %}
 {% from "components/textbox.html" import textbox %}
 {% from "components/page-header.html" import page_header %}
-{% from "components/page-footer.html" import sticky_page_footer %}
+{% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 
 {% block service_page_title %}
@@ -22,15 +22,15 @@
             "classes": "govuk-!-width-full",
             "hint": {"text": "Your recipients will not see this"}
           }) }}
-        </div>
-        <div class="govuk-grid-column-two-thirds">
           {{ textbox(form.template_content, highlight_placeholders=True, width='1-1', rows=5) }}
           {% if current_user.platform_admin %}
             {{ form.process_type }}
           {% endif %}
-          {{ sticky_page_footer(
-            'Save'
-          ) }}
+        </div>
+        <div class="govuk-grid-column-full">
+          <div class="js-stick-at-bottom-when-scrolling">
+            {{ page_footer('Save') }}
+          </div>
         </div>
         <aside class="govuk-grid-column-full">
           {% include "partials/templates/guidance-personalisation.html" %}
