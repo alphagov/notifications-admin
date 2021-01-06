@@ -1,7 +1,9 @@
+import json
 from functools import partial
 from unittest.mock import ANY, Mock
 
 import pytest
+from bs4 import BeautifulSoup
 from flask import url_for
 from freezegun import freeze_time
 from notifications_python_client.errors import HTTPError
@@ -2543,3 +2545,181 @@ def test_should_not_create_broadcast_template_with_placeholders(
         'You can’t use ((double brackets)) to personalise this message'
     )
     assert mock_create_service_template.called is False
+
+
+@pytest.mark.parametrize(
+    'template_type, prefix_sms, content, expected_message, expected_class', (
+        (
+            'sms', False, '',
+            '',
+            None,
+        ),
+        (
+            'sms', False, 'a' * 160,
+            'Will be charged as 1 text message',
+            None,
+        ),
+        (
+            'sms', False, 'a' * 161,
+            'Will be charged as 2 text messages',
+            None,
+        ),
+        (
+            # service name takes 13 characters, 147 + 13 = 160
+            'sms', True, 'a' * 147,
+            'Will be charged as 1 text message',
+            None,
+        ),
+        (
+            # service name takes 13 characters, 148 + 13 = 161
+            'sms', True, 'a' * 148,
+            'Will be charged as 2 text messages',
+            None,
+        ),
+        (
+            'sms', False, 'a' * 918,
+            'Will be charged as 6 text messages',
+            None,
+        ),
+        (
+            # Service name increases fragment count but doesn’t count
+            # against total character limit
+            'sms', True, 'a' * 918,
+            'Will be charged as 7 text messages',
+            None,
+        ),
+        (
+            # Can’t make a 7 fragment text template from content alone
+            'sms', False, 'a' * 919,
+            'You have 1 character too many',
+            'govuk-error-message',
+        ),
+        (
+            # Service name increases content count but character count
+            # is based on content alone
+            'sms', True, 'a' * 919,
+            'You have 1 character too many',
+            'govuk-error-message',
+        ),
+        (
+            # Service name increases content count but character count
+            # is based on content alone
+            'sms', True, 'a' * 920,
+            'You have 2 characters too many',
+            'govuk-error-message',
+        ),
+        (
+            'sms', False, 'Ẅ' * 70,
+            'Will be charged as 1 text message',
+            None,
+        ),
+        (
+            'sms', False, 'Ẅ' * 71,
+            'Will be charged as 2 text messages',
+            None,
+        ),
+        (
+            'sms', False, 'Ẅ' * 918,
+            'Will be charged as 14 text messages',
+            None,
+        ),
+        (
+            'sms', False, 'Ẅ' * 919,
+            'You have 1 character too many',
+            'govuk-error-message',
+        ),
+        (
+            'sms', False, 'Hello ((name))',
+            'Will be charged as 1 text message (not including personalisation)',
+            None,
+        ),
+        (
+            # Length of placeholder body doesn’t count towards fragment count
+            'sms', False, f'Hello (( {"a" * 999} ))',
+            'Will be charged as 1 text message (not including personalisation)',
+            None,
+        ),
+        (
+            'broadcast', False, '',
+            '',
+            None,
+        ),
+        (
+            'broadcast', False, 'a',
+            'You have 1,394 characters remaining',
+            None,
+        ),
+        (
+            'broadcast', False, 'a' * 1395,
+            'You have 0 characters remaining',
+            None,
+        ),
+        (
+            'broadcast', False, 'a' * 1396,
+            'You have 1 character too many',
+            'govuk-error-message',
+        ),
+        (
+            'broadcast', False, 'a' * 1397,
+            'You have 2 characters too many',
+            'govuk-error-message',
+        ),
+        (
+            'broadcast', False, 'Ẅ' * 615,
+            'You have 0 characters remaining',
+            None,
+        ),
+        (
+            'broadcast', False, 'Ẅ' * 616,
+            'You have 1 character too many',
+            'govuk-error-message',
+        ),
+    ),
+)
+def test_content_count_json_endpoint(
+    logged_in_client,
+    service_one,
+    template_type,
+    prefix_sms,
+    content,
+    expected_message,
+    expected_class,
+):
+    service_one['prefix_sms'] = prefix_sms
+    response = logged_in_client.post(
+        url_for(
+            'main.count_content_length',
+            service_id=SERVICE_ONE_ID,
+            template_type=template_type,
+        ),
+        data={
+            'template_content': content,
+        },
+    )
+    assert response.status_code == 200
+
+    html = json.loads(response.get_data(as_text=True))['html']
+    snippet = BeautifulSoup(html, 'html.parser').select_one('span')
+
+    assert normalize_spaces(snippet.text) == expected_message
+
+    if snippet.has_attr('class'):
+        assert snippet['class'] == [expected_class]
+    else:
+        assert expected_class is None
+
+
+@pytest.mark.parametrize('template_type', (
+    'email', 'letter', 'banana',
+))
+def test_content_count_json_endpoint_for_unsupported_template_types(
+    client_request,
+    template_type,
+):
+    client_request.post(
+        'main.count_content_length',
+        service_id=SERVICE_ONE_ID,
+        template_type=template_type,
+        content='foo',
+        _expected_status=404,
+    )
