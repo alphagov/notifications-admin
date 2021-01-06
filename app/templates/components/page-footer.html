@@ -10,9 +10,10 @@
   secondary_link_text=None,
   delete_link=False,
   delete_link_text="delete",
-  centered_button=False
+  centered_button=False,
+  inline_block=False
 ) %}
-  <div class="page-footer">
+  <div class="page-footer {% if inline_block %}page-footer--inline-block{% endif %}">
     {% if button_text %}
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
 

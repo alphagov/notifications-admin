@@ -490,6 +490,10 @@ def test_should_show_page_for_one_template(
         'polite'
     )
 
+    assert page.select_one('.page-footer')['class'] == [
+        'page-footer', 'page-footer--inline-block',
+    ]
+
     mock_get_service_template.assert_called_with(SERVICE_ONE_ID, template_id, None)
 
 
@@ -529,6 +533,10 @@ def test_broadcast_template_doesnt_highlight_placeholders_but_does_count_charact
     ) == (
         'polite'
     )
+
+    assert page.select_one('.page-footer')['class'] == [
+        'page-footer', 'page-footer--inline-block',
+    ]
 
 
 def test_caseworker_redirected_to_one_off(

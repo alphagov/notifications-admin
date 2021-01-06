@@ -55,3 +55,15 @@
   top: 51px; // aligns with ‘change postage’ link
   left: 66px; // Aligns to left of logo area
 }
+
+.template-content-count {
+  @include core-19($tabular-numbers: true);
+  color: $secondary-text-colour;
+  vertical-align: bottom;
+  padding: 0 0 govuk-spacing(1) govuk-spacing(2);
+  display: inline-block;
+
+  & .govuk-error-message {
+    margin-top: 0;
+  }
+}
