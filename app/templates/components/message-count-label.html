@@ -2,14 +2,6 @@
   {{ count|message_count_noun(template_type) }} {{ suffix }}
 {%- endmacro %}
 
-{% macro recipient_count_label(count, template_type) -%}
-  {{ count|recipient_count_label(template_type) }}
-{%- endmacro %}
-
-{% macro recipient_count(count, template_type, prefix='') -%}
-  {{ count|format_thousands }} {{ prefix }} {{ count|recipient_count_label(template_type) }}
-{% endmacro %}
-
 {% macro iteration_count(count) -%}
   {{ count|iteration_count }}
 {% endmacro %}

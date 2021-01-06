@@ -4,7 +4,7 @@
 {% from "components/radios.html" import radio_select %}
 {% from "components/table.html" import list_table, field, text_field, index_field, hidden_field_heading, row, row_heading %}
 {% from "components/page-header.html" import page_header %}
-{% from "components/message-count-label.html" import message_count_label, recipient_count, recipient_count_label, iteration_count %}
+{% from "components/message-count-label.html" import message_count_label, iteration_count %}
 {% from "components/button/macro.njk" import govukButton %}
 
 {% block service_page_title %}
@@ -101,7 +101,7 @@
   {% endif %}
 
   <h2 class="govuk-heading-m govuk-!-margin-bottom-2">
-    {{ recipient_count(contact_list.recipients|length, contact_list.template_type, prefix='saved') }}
+    {{ contact_list.recipients|length|format_thousands }} saved {{ contact_list.recipients|length|recipient_count_label(contact_list.template_type) }}
   </h2>
 
   {% set recipient_column = contact_list.recipients.column_headers[0] %}
@@ -109,7 +109,7 @@
   <div class="body-copy-table">
     {% call(item, row_number) list_table(
       contact_list.recipients.displayed_rows,
-      caption=recipient_count_label(contact_list.recipients|length, contact_list.template_type)|capitalize,
+      caption=contact_list.recipients|length|recipient_count_label(contact_list.template_type)|capitalize,
       caption_visible=False,
       field_headings=[recipient_column],
       field_headings_visible=False,

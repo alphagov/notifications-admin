@@ -1,6 +1,6 @@
 {% from "components/table.html" import list_table, field, right_aligned_field_heading, row_heading %}
 {% from "components/big-number.html" import big_number -%}
-{% from "components/message-count-label.html" import message_count_label, recipient_count_label, iteration_count -%}
+{% from "components/message-count-label.html" import message_count_label, iteration_count -%}
 
 <div class='dashboard-table ajax-block-container'>
   {% call(item, row_number) list_table(
@@ -86,10 +86,7 @@
         {{ big_number(
           item.row_count,
           smallest=True,
-          label="saved {}".format(recipient_count_label(
-            item.row_count,
-            item.template_type
-          ))
+          label="saved {}".format(item.row_count|recipient_count_label(item.template_type))
         ) }}
       {% elif item.pdf_letter %}
         <p class="govuk-body letter-recipient-summary">

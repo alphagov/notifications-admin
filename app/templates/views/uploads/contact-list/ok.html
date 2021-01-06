@@ -3,7 +3,7 @@
 {% from "components/radios.html" import radio_select %}
 {% from "components/table.html" import list_table, field, text_field, index_field, hidden_field_heading %}
 {% from "components/page-header.html" import page_header %}
-{% from "components/message-count-label.html" import message_count_label, recipient_count_label %}
+{% from "components/message-count-label.html" import message_count_label %}
 {% from "components/button/macro.njk" import govukButton %}
 
 {% block service_page_title %}
@@ -18,7 +18,7 @@
   ) }}
 
   <p class="govuk-body">
-    {{ recipients|length|format_thousands }} {{ recipient_count_label(recipients|length, recipients.template_type) }} found
+    {{ recipients|length|recipient_count(recipients.template_type) }} found
   </p>
 
   <div class="bottom-gutter-3-2">

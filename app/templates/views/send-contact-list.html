@@ -1,7 +1,6 @@
 {% extends "withnav_template.html" %}
 {% from "components/big-number.html" import big_number -%}
 {% from "components/list.html" import list_of_placeholders %}
-{% from "components/message-count-label.html" import recipient_count_label %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/table.html" import list_table, field, right_aligned_field_heading, row_heading %}
 
@@ -56,10 +55,7 @@
           {{ big_number(
             item.row_count,
             smallest=True,
-            label=recipient_count_label(
-              item.row_count,
-              item.template_type
-            )
+            label=item.row_count|recipient_count_label(item.template_type),
           ) }}
         {% endcall %}
       {% endcall %}
@@ -68,7 +64,7 @@
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-five-sixths">
         <p class="govuk-body">
-          You have not saved any lists of {{ recipient_count_label(99, template.template_type) }} yet.
+          You have not saved any lists of {{ 99|recipient_count_label(template.template_type) }} yet.
         </p>
         <p class="govuk-body">
           To upload and save an emergency contact list, go to the <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.uploads', service_id=current_service.id) }}">uploads</a> page.

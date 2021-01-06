@@ -1,7 +1,6 @@
 {% extends "withnav_template.html" %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
-{% from "components/message-count-label.html" import recipient_count_label %}
 {% from "components/form.html" import form_wrapper %}
 
 {% block service_page_title %}
@@ -27,7 +26,7 @@
       {% if skip_link or link_to_upload %}
         <div class="govuk-grid-column-full">
           {% if link_to_upload %}
-            <a class="govuk-link govuk-link--no-visited-state govuk-!-margin-right-3" href="{{ url_for('.send_messages', service_id=current_service.id, template_id=template.id) }}">Upload a list of {{ recipient_count_label(999, template.template_type) }}</a>
+            <a class="govuk-link govuk-link--no-visited-state govuk-!-margin-right-3" href="{{ url_for('.send_messages', service_id=current_service.id, template_id=template.id) }}">Upload a list of {{ 999|recipient_count_label(template.template_type) }}</a>
             {% if current_service.contact_lists %}
               <a class="govuk-link govuk-link--no-visited-state govuk-!-margin-right-3" href="{{ url_for('.choose_from_contact_list', service_id=current_service.id, template_id=template.id) }}">Use an emergency list</a>
             {% endif %}

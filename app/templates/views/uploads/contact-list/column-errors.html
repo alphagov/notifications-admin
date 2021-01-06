@@ -4,7 +4,7 @@
 {% from "components/table.html" import list_table, field, text_field, index_field, hidden_field_heading %}
 {% from "components/file-upload.html" import file_upload %}
 {% from "components/back-link/macro.njk" import govukBackLink %}
-{% from "components/message-count-label.html" import message_count_label, recipient_count_label %}
+{% from "components/message-count-label.html" import message_count_label %}
 
 {% block service_page_title %}
   Error
@@ -33,7 +33,7 @@
         <h1 class='banner-title' data-module="track-error" data-error-type="Trial mode: bad recipients" data-error-label="{{ upload_id }}">
           You cannot save
           {{ 'this' if recipients|length == 1 else 'these' }}
-          {{ recipient_count_label(recipients|length, recipients.template_type) }}
+          {{ recipients|length|recipient_count_label(recipients.template_type) }}
         </h1>
         <p class="govuk-body">
           In <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.trial_mode_new') }}">trial mode</a> you can only
