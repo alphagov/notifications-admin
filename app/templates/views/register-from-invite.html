@@ -22,6 +22,7 @@ Create an account
         the view process the input.
       #}
       <div class="govuk-visually-hidden">
+        <label for="username" aria-hidden="true">Email</label>
         <input type="email" name="username" id="username" value="{{ invited_user.email_address }}" disabled="disabled" tabindex="-1" aria-hidden="true" autocomplete="username" />
       </div>
       {{ form.name(param_extensions={"classes": "govuk-!-width-three-quarters"}) }}
