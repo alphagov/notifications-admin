@@ -1,79 +1,15 @@
 {% macro message_count_label(count, template_type, suffix='sent') -%}
-  {% if template_type == None %}
-    {%- if count == 1 -%}
-      message
-    {%- else -%}
-      messages
-    {%- endif -%}
-  {% endif %}
-  {%- if template_type == 'sms' -%}
-    {%- if count == 1 -%}
-      text message
-    {%- else -%}
-      text messages
-    {%- endif -%}
-  {%- elif template_type == 'email' -%}
-    {%- if count == 1 -%}
-      email
-    {%- else -%}
-      emails
-    {%- endif -%}
-  {%- elif template_type == 'letter' -%}
-    {%- if count == 1 -%}
-      letter
-    {%- else -%}
-      letters
-    {%- endif -%}
-  {%- elif template_type == 'broadcast' -%}
-    {%- if count == 1 -%}
-      broadcast
-    {%- else -%}
-      broadcasts
-    {%- endif -%}
-  {%- endif %} {{ suffix }}
+  {{ count|message_count_noun(template_type) }} {{ suffix }}
 {%- endmacro %}
 
 {% macro recipient_count_label(count, template_type) -%}
-  {% if template_type == None %}
-    {%- if count == 1 -%}
-      recipient
-    {%- else -%}
-      recipients
-    {%- endif -%}
-  {% endif %}
-  {%- if template_type == 'sms' -%}
-    {%- if count == 1 -%}
-      phone number
-    {%- else -%}
-      phone numbers
-    {%- endif -%}
-  {%- elif template_type == 'email' -%}
-    {%- if count == 1 -%}
-      email address
-    {%- else -%}
-      email addresses
-    {%- endif -%}
-  {%- elif template_type == 'letter' -%}
-    {%- if count == 1 -%}
-      address
-    {%- else -%}
-      addresses
-    {%- endif -%}
-  {%- endif %}
+  {{ count|recipient_count_label(template_type) }}
 {%- endmacro %}
 
-
 {% macro recipient_count(count, template_type, prefix='') -%}
-  {{ count|format_thousands }} {{ prefix }} {{ recipient_count_label(count, template_type)}}
+  {{ count|format_thousands }} {{ prefix }} {{ count|recipient_count_label(template_type) }}
 {% endmacro %}
 
-
 {% macro iteration_count(count) -%}
-  {% if count == 1 %}
-    once
-  {% elif count == 2 %}
-    twice
-  {% else %}
-    {{ count }} times
-  {% endif %}
+  {{ count|iteration_count }}
 {% endmacro %}

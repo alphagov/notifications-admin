@@ -62,8 +62,14 @@ from app.formatters import (
     format_thousands,
     format_time,
     id_safe,
+    iteration_count,
     linkable_name,
+    message_count,
+    message_count_label,
+    message_count_noun,
     nl2br,
+    recipient_count,
+    recipient_count_label,
     valid_phone_number,
 )
 from app.models.organisation import Organisation
@@ -548,6 +554,12 @@ def add_template_filters(application):
         id_safe,
         convert_to_boolean,
         format_list_items,
+        iteration_count,
+        recipient_count,
+        recipient_count_label,
+        message_count_label,
+        message_count,
+        message_count_noun,
     ]:
         application.add_template_filter(fn)
 

@@ -415,3 +415,91 @@ def guess_name_from_email_address(email_address):
     ).then(
         normalize_spaces
     )
+
+
+def message_count_label(count, template_type, suffix='sent'):
+    if suffix:
+        return f'{message_count_noun(count, template_type)} {suffix}'
+    return message_count_noun(count, template_type)
+
+
+def message_count_noun(count, template_type):
+    if template_type is None:
+        if count == 1:
+            return 'message'
+        else:
+            return 'messages'
+
+    if template_type == 'sms':
+        if count == 1:
+            return 'text message'
+        else:
+            return 'text messages'
+
+    elif template_type == 'email':
+        if count == 1:
+            return 'email'
+        else:
+            return 'emails'
+
+    elif template_type == 'letter':
+        if count == 1:
+            return 'letter'
+        else:
+            return 'letters'
+
+    elif template_type == 'broadcast':
+        if count == 1:
+            return 'broadcast'
+        else:
+            return 'broadcasts'
+
+
+def message_count(count, template_type):
+    return (
+        f'{format_thousands(count)} '
+        f'{message_count_noun(count, template_type)}'
+    )
+
+
+def recipient_count_label(count, template_type):
+
+    if template_type is None:
+        if count == 1:
+            return 'recipient'
+        else:
+            return 'recipients'
+
+    if template_type == 'sms':
+        if count == 1:
+            return 'phone number'
+        else:
+            return 'phone numbers'
+
+    elif template_type == 'email':
+        if count == 1:
+            return 'email address'
+        else:
+            return 'email addresses'
+
+    elif template_type == 'letter':
+        if count == 1:
+            return 'address'
+        else:
+            return 'addresses'
+
+
+def recipient_count(count, template_type):
+    return (
+        f'{format_thousands(count)} '
+        f'{recipient_count_label(count, template_type)}'
+    )
+
+
+def iteration_count(count):
+    if count == 1:
+        return 'once'
+    elif count == 2:
+        return 'twice'
+    else:
+        return f'{count} times'
