@@ -4,7 +4,8 @@ from flask import render_template
 
 from app import current_service, service_api_client
 from app.main import main
-from app.utils import Spreadsheet, user_has_permissions
+from app.models.spreadsheet import Spreadsheet
+from app.utils import user_has_permissions
 
 
 @main.route("/services/<uuid:service_id>/returned-letters")

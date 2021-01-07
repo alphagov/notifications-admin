@@ -11,7 +11,8 @@ from notifications_utils.template import BroadcastMessageTemplate
 from wtforms import ValidationError
 
 from app.main._commonly_used_passwords import commonly_used_passwords
-from app.utils import Spreadsheet, is_gov_user
+from app.models.spreadsheet import Spreadsheet
+from app.utils import is_gov_user
 
 
 class CommonlyUsedPassword:
