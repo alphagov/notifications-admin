@@ -484,6 +484,12 @@ def test_should_show_page_for_one_template(
         template_type='sms',
     )
 
+    assert (
+        page.select_one('[data-module=update-status]')['aria-live']
+    ) == (
+        'polite'
+    )
+
     mock_get_service_template.assert_called_with(SERVICE_ONE_ID, template_id, None)
 
 
@@ -516,6 +522,12 @@ def test_broadcast_template_doesnt_highlight_placeholders_but_does_count_charact
         '.count_content_length',
         service_id=SERVICE_ONE_ID,
         template_type='broadcast',
+    )
+
+    assert (
+        page.select_one('[data-module=update-status]')['aria-live']
+    ) == (
+        'polite'
     )
 
 

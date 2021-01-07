@@ -44,7 +44,8 @@ describe('Update content', () => {
     document.body.innerHTML = `
       <form>
         <input type="hidden" name="csrf_token" value="abc123" />
-        <textarea name="template_content" id="template_content">Content of message</textarea>
+        <label for="template_content" id="template-content-label">Template content<label>
+        <textarea name="template_content" id="template_content" aria-described-by="template-content-label">Content of message</textarea>
       </form>
       <div data-module="update-status" data-updates-url="${updatesURL}" data-target="template_content">
         Initial content
@@ -62,6 +63,24 @@ describe('Update content', () => {
 
     // ensure any timers set by continually starting the module are cleared
     jest.clearAllTimers();
+
+  });
+
+  test("It should add attributes to the elements", () => {
+
+    window.GOVUK.modules.start();
+
+    expect(
+      document.querySelectorAll('[data-module=update-status]')[0].id
+    ).toEqual(
+      "update-status"
+    );
+
+    expect(
+      document.getElementById('template_content').getAttribute('aria-described-by')
+    ).toEqual(
+      "template-content-label update-status"
+    );
 
   });
 

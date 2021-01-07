@@ -31,7 +31,7 @@
           <div class="js-stick-at-bottom-when-scrolling">
             {{ page_footer('Save') }}
             <span class="template-list-selected-counter">
-              <div data-module="update-status" data-target="template_content" data-updates-url="{{ url_for('.count_content_length', service_id=current_service.id, template_type='sms') }}">
+              <div data-module="update-status" data-target="template_content" data-updates-url="{{ url_for('.count_content_length', service_id=current_service.id, template_type='sms') }}" aria-live="polite">
               </div>
             </span>
           </div>

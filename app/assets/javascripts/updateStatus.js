@@ -14,7 +14,11 @@
       this.$component = $(component);
       this.$textbox = $('#' + this.$component.data('target'));
 
+      this.$component
+        .attr('id', id);
+
       this.$textbox
+        .attr('aria-described-by', this.$textbox.attr('aria-described-by') + ' ' + id)
         .on('input', this.update)
         .trigger('input');
 
