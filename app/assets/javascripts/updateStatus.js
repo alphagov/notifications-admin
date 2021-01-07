@@ -3,9 +3,39 @@
 
   window.GOVUK.Modules.UpdateStatus = function() {
 
-    let getRenderer = $component => response => $component.html(
+    const getRenderer = $component => response => $component.html(
       response.html
     );
+
+    const throttle = (func, limit) => {
+
+      let throttleOn = false;
+      let callsHaveBeenThrottled = false;
+      let timeout;
+
+      return function() {
+
+        const args = arguments;
+        const context = this;
+
+        if (throttleOn) {
+          callsHaveBeenThrottled = true;
+        } else {
+          func.apply(context, args);
+          throttleOn = true;
+        }
+
+        clearTimeout(timeout);
+
+        timeout = setTimeout(() => {
+          throttleOn = false;
+          if (callsHaveBeenThrottled) func.apply(context, args);
+          callsHaveBeenThrottled = false;
+        }, limit);
+
+      };
+
+    };
 
     this.start = component => {
 
@@ -19,7 +49,7 @@
 
       this.$textbox
         .attr('aria-described-by', this.$textbox.attr('aria-described-by') + ' ' + id)
-        .on('input', this.update)
+        .on('input', throttle(this.update, 150))
         .trigger('input');
 
     };

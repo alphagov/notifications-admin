@@ -127,8 +127,36 @@ describe('Update content', () => {
     window.GOVUK.modules.start();
     expect($.ajax.mock.calls.length).toEqual(1);
 
+    // 150ms of inactivity
+    jest.advanceTimersByTime(150);
     helpers.triggerEvent(textarea, 'input');
 
+    expect($.ajax.mock.calls.length).toEqual(2);
+
+  });
+
+  test("It should fire only after 150ms of inactivity", () => {
+
+    let textarea = document.getElementById('template_content');
+
+    // Initial update triggered
+    window.GOVUK.modules.start();
+    expect($.ajax.mock.calls.length).toEqual(1);
+
+    helpers.triggerEvent(textarea, 'input');
+    jest.advanceTimersByTime(149);
+    expect($.ajax.mock.calls.length).toEqual(1);
+
+    helpers.triggerEvent(textarea, 'input');
+    jest.advanceTimersByTime(149);
+    expect($.ajax.mock.calls.length).toEqual(1);
+
+    helpers.triggerEvent(textarea, 'input');
+    jest.advanceTimersByTime(149);
+    expect($.ajax.mock.calls.length).toEqual(1);
+
+    // > 150ms of inactivity
+    jest.advanceTimersByTime(1);
     expect($.ajax.mock.calls.length).toEqual(2);
 
   });
