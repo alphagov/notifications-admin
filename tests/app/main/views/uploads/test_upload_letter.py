@@ -5,8 +5,8 @@ from botocore.exceptions import ClientError
 from flask import make_response, url_for
 from requests import RequestException
 
+from app.formatters import normalize_spaces
 from app.s3_client.s3_letter_upload_client import LetterMetadata
-from app.utils import normalize_spaces
 from tests.conftest import SERVICE_ONE_ID
 
 

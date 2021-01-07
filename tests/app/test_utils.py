@@ -10,9 +10,9 @@ from freezegun import freeze_time
 from notifications_utils.template import Template
 
 from app import format_datetime_relative
+from app.formatters import email_safe, round_to_significant_figures
 from app.utils import (
     Spreadsheet,
-    email_safe,
     generate_next_dict,
     generate_notifications_csv,
     generate_previous_dict,
@@ -23,7 +23,6 @@ from app.utils import (
     is_less_than_days_ago,
     merge_jsonlike,
     printing_today_or_tomorrow,
-    round_to_significant_figures,
 )
 from tests.conftest import fake_uuid
 

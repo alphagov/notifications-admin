@@ -15,6 +15,7 @@ from app import (
     notification_api_client,
     service_api_client,
 )
+from app.formatters import email_safe
 from app.main import main
 from app.main.forms import CallbackForm, CreateKeyForm, GuestList
 from app.notify_client.api_key_api_client import (
@@ -22,7 +23,7 @@ from app.notify_client.api_key_api_client import (
     KEY_TYPE_TEAM,
     KEY_TYPE_TEST,
 )
-from app.utils import email_safe, user_has_permissions
+from app.utils import user_has_permissions
 
 dummy_bearer_token = 'bearer_token_set'
 

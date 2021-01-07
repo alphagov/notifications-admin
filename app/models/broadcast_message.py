@@ -7,13 +7,13 @@ from werkzeug.utils import cached_property
 
 from app.broadcast_areas import broadcast_area_libraries
 from app.broadcast_areas.polygons import Polygons
+from app.formatters import round_to_significant_figures
 from app.models import JSONModel, ModelList
 from app.models.user import User
 from app.notify_client.broadcast_message_api_client import (
     broadcast_message_api_client,
 )
 from app.notify_client.service_api_client import service_api_client
-from app.utils import round_to_significant_figures
 
 
 class BroadcastMessage(JSONModel):

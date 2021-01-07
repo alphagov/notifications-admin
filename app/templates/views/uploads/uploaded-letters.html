@@ -1,5 +1,4 @@
 {% extends "withnav_template.html" %}
-{% from 'components/message-count-label.html' import message_count_label %}
 {% from "components/page-header.html" import page_header %}
 
 {% block service_page_title %}
@@ -16,7 +15,7 @@
   {% if notifications %}
 
     <p class='govuk-body'>
-      {{ total|format_thousands}} {{ message_count_label(total, 'letter', suffix='') }}
+      {{ total|message_count('letter') }}
     </p>
 
     <p class='govuk-body'>

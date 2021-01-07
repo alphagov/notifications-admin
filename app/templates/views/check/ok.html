@@ -3,7 +3,6 @@
 {% from "components/radios.html" import radio_select %}
 {% from "components/table.html" import list_table, field, text_field, index_field, hidden_field_heading %}
 {% from "components/page-header.html" import page_header %}
-{% from "components/message-count-label.html" import message_count_label %}
 {% from "components/button/macro.njk" import govukButton %}
 {% from "components/skip-link/macro.njk" import govukSkipLink %}
 
@@ -44,7 +43,7 @@
       {% endif %}
       {% if (template.template_type != 'letter' or not request.args.from_test) and not letter_too_long %}
         {% set button_text %}
-          Send {{ count_of_recipients|format_thousands }} {{ message_count_label(count_of_recipients, template.template_type, suffix='') }}
+          Send {{ count_of_recipients|message_count(template.template_type) }}
         {% endset %}
         {{ govukButton({ "text": button_text }) }}
       {% else %}

@@ -1,7 +1,6 @@
 {% extends "withnav_template.html" %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
-{% from "components/message-count-label.html" import recipient_count_label %}
 {% from "components/textbox.html" import textbox %}
 {% from "components/form.html" import form_wrapper %}
 
@@ -34,7 +33,7 @@
     </div>
     <p class="govuk-body">
       <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.send_messages', service_id=current_service.id, template_id=template.id) }}">
-        Upload a list of {{ recipient_count_label(999, template.template_type) }}
+        Upload a list of {{ 999|recipient_count_label(template.template_type) }}
       </a>
     </p>
     {{ page_footer('Continue') }}

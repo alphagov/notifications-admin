@@ -12,7 +12,7 @@ from notifications_python_client.errors import HTTPError
 from notifications_utils.clients.zendesk.zendesk_client import ZendeskClient
 
 import app
-from app.utils import email_safe
+from app.formatters import email_safe
 from tests import (
     find_element_by_tag_and_partial_text,
     invite_json,

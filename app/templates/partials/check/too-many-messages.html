@@ -1,5 +1,3 @@
-{% from "components/message-count-label.html" import recipient_count_label %}
-
 <h1 class='banner-title' data-module="track-error" data-error-type="Trial mode: too many recipients" data-error-label="{{ upload_id }}">
   {% if original_file_name %}
     Too many recipients
@@ -20,7 +18,6 @@
       You can still send {{ remaining_messages|format_thousands }} messages today, but
     {% endif %}
     ‘{{ original_file_name }}’ contains
-    {{ count_of_recipients|format_thousands }}
-    {{ recipient_count_label(count_of_recipients, template.template_type) }}.
+    {{ count_of_recipients|recipient_count(template.template_type) }}.
   </p>
 {% endif %}

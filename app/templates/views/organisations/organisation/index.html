@@ -1,7 +1,6 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/big-number.html" import big_number %}
 {% from "components/live-search.html" import live_search %}
-{% from "components/message-count-label.html" import message_count_label %}
 {% from "components/pill.html" import pill %}
 {% extends "org_template.html" %}
 
@@ -74,7 +73,7 @@
         <div class="govuk-grid-column-one-third">
           {{ big_number(
             service.emails_sent,
-            label=message_count_label(service.emails_sent, 'email'),
+            label=service.emails_sent|message_count_label('email'),
             smallest=True
           ) }}
         </div>
@@ -89,7 +88,7 @@
           {% else %}
             {{ big_number(
               service.sms_billable_units,
-              'free {}'.format(message_count_label(service.sms_billable_units, 'sms')),
+              'free {}'.format(service.sms_billable_units|message_count_label('sms')),
               smallest=True
             ) }}
           {% endif %}

@@ -1,6 +1,5 @@
 {% extends "withnav_template.html" %}
 {% from "components/banner.html" import banner_wrapper %}
-{% from "components/message-count-label.html" import message_count_label %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/back-link/macro.njk" import govukBackLink %}
 {% from "components/button/macro.njk" import govukButton %}
@@ -77,7 +76,7 @@
       )}}" class='page-footer'>
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
       {% if not error %}
-        {% set button_text %}Send 1 {{ message_count_label(1, template.template_type, suffix='') }}{% endset %}
+        {% set button_text %}Send 1 {{ 1|message_count_label(template.template_type, suffix='') }}{% endset %}
         {{ govukButton({ "text": button_text }) }}
       {% endif %}
       {% if template.template_type == 'letter' %}

@@ -16,6 +16,7 @@ from app.event_handlers import (
     create_mobile_number_change_event,
     create_remove_user_from_service_event,
 )
+from app.formatters import redact_mobile_number
 from app.main import main
 from app.main.forms import (
     BroadcastInviteUserForm,
@@ -29,7 +30,7 @@ from app.main.forms import (
 )
 from app.models.roles_and_permissions import broadcast_permissions, permissions
 from app.models.user import InvitedUser, User
-from app.utils import is_gov_user, redact_mobile_number, user_has_permissions
+from app.utils import is_gov_user, user_has_permissions
 
 
 @main.route("/services/<uuid:service_id>/users")

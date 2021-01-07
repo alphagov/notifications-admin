@@ -4,7 +4,7 @@ import pytest
 from flask import url_for
 from freezegun import freeze_time
 
-from app.utils import normalize_spaces
+from app.formatters import normalize_spaces
 from tests.conftest import (
     SERVICE_ONE_ID,
     create_active_caseworking_user,
