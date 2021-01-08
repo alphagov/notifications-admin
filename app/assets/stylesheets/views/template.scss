@@ -60,8 +60,12 @@
   @include core-19($tabular-numbers: true);
   color: $secondary-text-colour;
   vertical-align: bottom;
-  padding: 0 0 govuk-spacing(1) govuk-spacing(2);
+  padding: 0 0 govuk-spacing(6) 0
   display: inline-block;
+
+  .content-fixed__bottom & {
+    padding-bottom: govuk-spacing(3);
+  }
 
   & .govuk-error-message {
     margin-top: 0;
