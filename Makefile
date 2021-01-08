@@ -75,7 +75,8 @@ fix-imports:
 	isort -rc ./app ./tests
 
 .PHONY: freeze-requirements
-freeze-requirements: requirements-for-test requirements.in requirements_for_test.in
+freeze-requirements: ## create static requirements.txt
+	${VIRTUALENV_ROOT}/bin/pip install pip-tools
 	${VIRTUALENV_ROOT}/bin/pip-compile requirements.in
 	${VIRTUALENV_ROOT}/bin/pip-compile requirements_for_test.in
 
