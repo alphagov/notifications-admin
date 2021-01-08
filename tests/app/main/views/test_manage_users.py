@@ -865,19 +865,16 @@ def test_should_show_page_if_prefilled_user_is_already_a_team_member(
         'main.invite_user',
         service_id=SERVICE_ONE_ID,
         user_id=fake_uuid,
-        # We have the user’s name in the H1 but don’t want it duplicated
-        # in the page title
-        _test_page_title=False,
     )
 
     assert normalize_spaces(page.select_one('title').text).startswith(
         'This person is already a team member'
     )
     assert normalize_spaces(page.select_one('h1').text) == (
-        'Test User is already a team member'
+        'This person is already a team member'
     )
     assert normalize_spaces(page.select_one('main .govuk-body').text) == (
-        'Someone’s already invited them. You do not need to do anything.'
+        'Test User is already member of ‘service one’.'
     )
     assert not page.select("form")
 
@@ -904,14 +901,19 @@ def test_should_show_page_if_prefilled_user_is_already_invited(
         'main.invite_user',
         service_id=SERVICE_ONE_ID,
         user_id=fake_uuid,
-        # We have the user’s name in the H1 but don’t want it duplicated
-        # in the page title
-        _test_page_title=False,
     )
 
     assert normalize_spaces(page.select_one('title').text).startswith(
-        'This person is already a team member'
+        'This person has already received an invite'
     )
+    assert normalize_spaces(page.select_one('h1').text) == (
+        'This person has already received an invite'
+    )
+    assert normalize_spaces(page.select_one('main .govuk-body').text) == (
+        'Service Two User has not accepted their invitation to '
+        '‘service one’ yet. You do not need to do anything.'
+    )
+    assert not page.select("form")
 
 
 def test_should_403_if_trying_to_prefill_email_address_for_user_with_no_organisation(
