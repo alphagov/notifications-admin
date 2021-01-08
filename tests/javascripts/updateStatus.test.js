@@ -85,6 +85,20 @@ describe('Update content', () => {
 
   });
 
+  test("It should handle a textarea without an aria-described-by attribute", () => {
+
+    document.getElementById('template_content').removeAttribute('aria-described-by');
+
+    window.GOVUK.modules.start();
+
+    expect(
+      document.getElementById('template_content').getAttribute('aria-described-by')
+    ).toEqual(
+      "update-status"
+    );
+
+  });
+
   test("It should make requests to the URL specified in the data-updates-url attribute", () => {
 
     window.GOVUK.modules.start();
