@@ -45,11 +45,11 @@ upgrade-pip: virtualenv
 	${VIRTUALENV_ROOT}/bin/pip install --upgrade pip
 
 .PHONY: requirements
-requirements: upgrade-pip requirements.txt
+requirements: upgrade-pip requirements.txt ## Install dependencies for running the app
 	${VIRTUALENV_ROOT}/bin/pip install -r requirements.txt
 
 .PHONY: requirements-for-test
-requirements-for-test: upgrade-pip requirements_for_test.txt
+requirements-for-test: upgrade-pip requirements_for_test.txt ## Install all dependencies for running the app, development and testing
 	${VIRTUALENV_ROOT}/bin/pip install -r requirements_for_test.txt
 
 .PHONY: frontend
@@ -63,7 +63,7 @@ generate-version-file: ## Generates the app version file
 	@echo -e "__git_commit__ = \"${GIT_COMMIT}\"\n__time__ = \"${DATE}\"" > ${APP_VERSION_FILE}
 
 .PHONY: build
-build: frontend requirements-for-test generate-version-file
+build: frontend requirements-for-test generate-version-file ## Build project
 	npm run build
 
 .PHONY: test
