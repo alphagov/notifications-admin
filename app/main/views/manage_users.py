@@ -49,8 +49,9 @@ def manage_users(service_id):
 
 
 @main.route("/services/<uuid:service_id>/users/invite", methods=['GET', 'POST'])
+@main.route("/services/<uuid:service_id>/users/invite/<uuid:user_id>", methods=['GET', 'POST'])
 @user_has_permissions('manage_service')
-def invite_user(service_id):
+def invite_user(service_id, user_id=None):
 
     if current_service.has_permission('broadcast'):
         form_class = BroadcastInviteUserForm
@@ -62,6 +63,26 @@ def invite_user(service_id):
         all_template_folders=current_service.all_template_folders,
         folder_permissions=[f['id'] for f in current_service.all_template_folders]
     )
+
+    if user_id:
+        user_to_invite = User.from_id(user_id)
+        if user_to_invite.belongs_to_service(current_service.id):
+            return render_template(
+                'views/user-already-team-member.html',
+                user_to_invite=user_to_invite,
+            )
+        if current_service.invite_pending_for(user_to_invite.email_address):
+            return render_template(
+                'views/user-already-invited.html',
+                user_to_invite=user_to_invite,
+            )
+        if not user_to_invite.default_organisation:
+            abort(403)
+        if user_to_invite.default_organisation.id != current_service.organisation_id:
+            abort(403)
+        form.email_address.data = user_to_invite.email_address
+    else:
+        user_to_invite = None
 
     service_has_email_auth = current_service.has_permission('email_auth')
     if not service_has_email_auth:
@@ -86,6 +107,7 @@ def invite_user(service_id):
         form=form,
         service_has_email_auth=service_has_email_auth,
         mobile_number=True,
+        user_to_invite=user_to_invite,
     )
 
 
