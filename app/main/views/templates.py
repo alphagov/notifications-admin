@@ -1,9 +1,17 @@
 from functools import partial
 
-from flask import abort, flash, redirect, render_template, request, url_for
+from flask import (
+    abort,
+    flash,
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
 from flask_login import current_user
 from notifications_python_client.errors import HTTPError
-from notifications_utils import LETTER_MAX_PAGE_COUNT
+from notifications_utils import LETTER_MAX_PAGE_COUNT, SMS_CHAR_COUNT_LIMIT
 from notifications_utils.pdf import is_letter_too_long
 
 from app import (
@@ -14,6 +22,7 @@ from app import (
     template_folder_api_client,
     template_statistics_client,
 )
+from app.formatters import character_count, message_count
 from app.main import main, no_cookie
 from app.main.forms import (
     BroadcastTemplateForm,
@@ -642,6 +651,64 @@ def edit_service_template(service_id, template_id):
             template=template,
             heading_action='Edit',
         )
+
+
+@main.route(
+    "/services/<uuid:service_id>/templates/count-<template_type:template_type>-length",
+    methods=['POST'],
+)
+@user_has_permissions()
+def count_content_length(service_id, template_type):
+    if template_type not in {'sms', 'broadcast'}:
+        abort(404)
+
+    error, message = _get_content_count_error_and_message_for_template(
+        get_template({
+            'template_type': template_type,
+            'content': request.form.get('template_content', ''),
+        }, current_service)
+    )
+
+    return jsonify({
+        'html': render_template(
+            'partials/templates/content-count-message.html',
+            error=error,
+            message=message,
+        )
+    })
+
+
+def _get_content_count_error_and_message_for_template(template):
+
+    if template.template_type == 'sms':
+        if template.is_message_too_long():
+            return True, (
+                f'You have '
+                f'{character_count(template.content_count_without_prefix - SMS_CHAR_COUNT_LIMIT)} '
+                f'too many'
+            )
+        if template.placeholders:
+            return False, (
+                f'Will be charged as {message_count(template.fragment_count, template.template_type)} '
+                f'(not including personalisation)'
+            )
+        return False, (
+            f'Will be charged as {message_count(template.fragment_count, template.template_type)} '
+        )
+
+    if template.template_type == 'broadcast':
+        if template.content_too_long:
+            return True, (
+                f'You have '
+                f'{character_count(template.encoded_content_count - template.max_content_count)} '
+                f'too many'
+            )
+        else:
+            return False, (
+                f'You have '
+                f'{character_count(template.max_content_count - template.encoded_content_count)} '
+                f'remaining'
+            )
 
 
 @main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/delete", methods=['GET', 'POST'])

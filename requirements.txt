@@ -26,7 +26,7 @@ Shapely==1.7.1
 awscli-cwlogs>=1.4,<1.5
 itsdangerous==1.1.0
 
-git+https://github.com/alphagov/notifications-utils.git@43.6.0#egg=notifications-utils==43.6.0
+git+https://github.com/alphagov/notifications-utils.git@43.7.0#egg=notifications-utils==43.7.0
 git+https://github.com/alphagov/govuk-frontend-jinja.git@v0.5.1-alpha#egg=govuk-frontend-jinja==0.5.1-alpha
 
 # gds-metrics requires prometheseus 0.2.0, override that requirement as later versions bring significant performance gains
@@ -34,10 +34,10 @@ prometheus-client==0.9.0
 gds-metrics==0.2.4
 
 ## The following requirements were added by pip freeze:
-awscli==1.18.204
+awscli==1.18.210
 bleach==3.2.1
-boto3==1.16.44
-botocore==1.19.44
+boto3==1.16.50
+botocore==1.19.50
 cachetools==4.2.0
 certifi==2020.12.5
 chardet==4.0.0

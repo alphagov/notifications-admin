@@ -503,3 +503,9 @@ def iteration_count(count):
         return 'twice'
     else:
         return f'{count} times'
+
+
+def character_count(count):
+    if count == 1:
+        return '1 character'
+    return f'{format_thousands(count)} characters'

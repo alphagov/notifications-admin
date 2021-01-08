@@ -11,10 +11,11 @@
   width='2-3',
   suffix=None,
   safe_error_message=False,
-  rows=8
+  rows=8,
+  extra_form_group_classes=''
 ) %}
   <div
-    class="form-group{% if field.errors %} form-group-error{% endif %}"
+    class="form-group{% if field.errors %} form-group-error{% endif %} {{ extra_form_group_classes }}"
     data-module="{% if autofocus %}autofocus{% elif colour_preview %}colour-preview{% endif %}"
   >
     <label class="form-label" for="{{ field.name }}">
