@@ -32,13 +32,12 @@
         ) }}
       </div>
       <div class="govuk-grid-column-full">
-        <div class="js-stick-at-bottom-when-scrolling">
-          <div class="template-content-count">
-            <div data-module="update-status" data-target="template_content" data-updates-url="{{ url_for('.count_content_length', service_id=current_service.id, template_type='broadcast') }}" aria-live="polite">
-            </div>
+        <div class="template-content-count">
+          <div data-module="update-status" data-target="template_content" data-updates-url="{{ url_for('.count_content_length', service_id=current_service.id, template_type='broadcast') }}" aria-live="polite">
+            &nbsp;
           </div>
-          {{ page_footer('Save') }}
         </div>
+        {{ page_footer('Save') }}
       </div>
     </div>
   {% endcall %}

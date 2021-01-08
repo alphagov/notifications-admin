@@ -2596,7 +2596,7 @@ def test_should_not_create_broadcast_template_with_placeholders(
     'template_type, prefix_sms, content, expected_message, expected_class', (
         (
             'sms', False, '',
-            '',
+            'Will be charged as 1 text message',
             None,
         ),
         (
@@ -2686,7 +2686,7 @@ def test_should_not_create_broadcast_template_with_placeholders(
         ),
         (
             'broadcast', False, '',
-            '',
+            'You have 1,395 characters remaining',
             None,
         ),
         (

@@ -680,9 +680,6 @@ def count_content_length(service_id, template_type):
 
 def _get_content_count_error_and_message_for_template(template):
 
-    if template.is_message_empty():
-        return False, ''
-
     if template.template_type == 'sms':
         if template.is_message_too_long():
             return True, (
