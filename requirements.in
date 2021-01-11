@@ -17,7 +17,7 @@ pyexcel-ods3==0.6.0
 pytz==2020.5
 gunicorn==20.0.4
 eventlet==0.30.0
-notifications-python-client==5.7.1
+notifications-python-client==6.0.1
 Shapely==1.7.1
 
 # PaaS
