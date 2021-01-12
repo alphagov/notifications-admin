@@ -1,4 +1,4 @@
-from unittest.mock import call
+from unittest.mock import ANY, call
 
 import pytest
 
@@ -192,3 +192,23 @@ def test_update_organisation_when_updating_org_type_but_org_has_no_services(mock
         call('organisations'),
         call('domains'),
     ]
+
+
+def test_update_service_organisation_deletes_cache(mocker, fake_uuid):
+    mock_redis_delete = mocker.patch('app.extensions.RedisClient.delete')
+    mock_post = mocker.patch('app.notify_client.organisations_api_client.OrganisationsClient.post')
+
+    organisations_client.update_service_organisation(
+        service_id=fake_uuid,
+        org_id=fake_uuid
+    )
+
+    assert sorted(mock_redis_delete.call_args_list) == [
+        call('live-service-and-organisation-counts'),
+        call('organisations'),
+        call('service-{}'.format(fake_uuid)),
+    ]
+    mock_post.assert_called_with(
+        url='/organisations/{}/service'.format(fake_uuid),
+        data=ANY
+    )
