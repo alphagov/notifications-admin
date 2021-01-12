@@ -205,7 +205,7 @@ def test_should_show_api_keys_page(
 @pytest.mark.parametrize('restricted, can_send_letters, expected_options', [
     (True, False, [
         (
-            'Live – sends to anyone '
+            'Live – sends to anyone',
             'Not available because your service is in trial mode'
         ),
         'Team and guest list – limits who you can send to',
@@ -219,7 +219,7 @@ def test_should_show_api_keys_page(
     (False, True, [
         'Live – sends to anyone',
         (
-            'Team and guest list – limits who you can send to '
+            'Team and guest list – limits who you can send to',
             'Cannot be used to send letters'
         ),
         'Test – pretends to send messages',
@@ -244,7 +244,12 @@ def test_should_show_create_api_key_page(
     page = client_request.get('main.create_api_key', service_id=SERVICE_ONE_ID)
 
     for index, option in enumerate(expected_options):
-        assert normalize_spaces(page.select('.block-label')[index].text) == option
+        item = page.select('.govuk-radios__item')[index]
+        if type(option) is tuple:
+            assert normalize_spaces(item.select_one('.govuk-label').text) == option[0]
+            assert normalize_spaces(item.select_one('.govuk-hint').text) == option[1]
+        else:
+            assert normalize_spaces(item.select_one('.govuk-label').text) == option
 
 
 def test_should_create_api_key_with_type_normal(

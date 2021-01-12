@@ -85,17 +85,21 @@ def create_api_key(service_id):
         (KEY_TYPE_TEAM, 'Team and guest list – limits who you can send to'),
         (KEY_TYPE_TEST, 'Test – pretends to send messages'),
     ]
-    disabled_options, option_hints = [], {}
+    # preserve order of items extended by starting with empty dicts
+    form.key_type.param_extensions = {'items': [{}, {}]}
     if current_service.trial_mode:
-        disabled_options = [KEY_TYPE_NORMAL]
-        option_hints[KEY_TYPE_NORMAL] = Markup(
-            'Not available because your service is in '
-            '<a class="govuk-link govuk-link--no-visited-state" href="/features/trial-mode">trial mode</a>'
-        )
+        form.key_type.param_extensions['items'][0] = {
+            'disabled': True,
+            'hint': {
+                'html': Markup(
+                    'Not available because your service is in '
+                    '<a class="govuk-link govuk-link--no-visited-state" href="/features/trial-mode">trial mode</a>')
+            }
+        }
     if current_service.has_permission('letter'):
-        option_hints[KEY_TYPE_TEAM] = 'Cannot be used to send letters'
+        form.key_type.param_extensions['items'][1]['hint'] = {'text': 'Cannot be used to send letters'}
     if form.validate_on_submit():
-        if form.key_type.data in disabled_options:
+        if current_service.trial_mode and form.key_type.data == KEY_TYPE_NORMAL:
             abort(400)
         secret = api_key_api_client.create_api_key(
             service_id=service_id,
@@ -110,9 +114,7 @@ def create_api_key(service_id):
         )
     return render_template(
         'views/api/keys/create.html',
-        form=form,
-        disabled_options=disabled_options,
-        option_hints=option_hints
+        form=form
     )
 
 
