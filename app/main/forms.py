@@ -2011,7 +2011,7 @@ class SetSenderForm(StripWhitespaceForm):
         self.sender.choices = kwargs['sender_choices']
         self.sender.label.text = kwargs['sender_label']
 
-    sender = RadioField()
+    sender = GovukRadiosField()
 
 
 class SetTemplateSenderForm(StripWhitespaceForm):
