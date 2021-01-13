@@ -829,7 +829,14 @@ def set_template_sender(service_id, template_id):
         sender=sender_details['current_choice'],
         sender_choices=sender_details['value_and_label'],
     )
-    option_hints = {sender_details['default_sender']: '(Default)'}
+    form.sender.param_extensions = {'items': []}
+    for item_value, _item_label in sender_details['value_and_label']:
+        if item_value == sender_details['default_sender']:
+            extensions = {'hint': {'text': '(Default)'}}
+        else:
+            extensions = {}  # if no extensions needed, send an empty dict to preserve order of items
+
+        form.sender.param_extensions['items'].append(extensions)
 
     if form.validate_on_submit():
         service_api_client.update_service_template_sender(
@@ -843,8 +850,7 @@ def set_template_sender(service_id, template_id):
         'views/templates/set-template-sender.html',
         form=form,
         template_id=template_id,
-        no_senders=no_senders,
-        option_hints=option_hints
+        no_senders=no_senders
     )
 
 

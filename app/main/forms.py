@@ -2021,7 +2021,7 @@ class SetTemplateSenderForm(StripWhitespaceForm):
         self.sender.choices = kwargs['sender_choices']
         self.sender.label.text = 'Select your sender'
 
-    sender = RadioField()
+    sender = GovukRadiosField()
 
 
 class LinkOrganisationsForm(StripWhitespaceForm):
