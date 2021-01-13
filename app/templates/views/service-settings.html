@@ -336,6 +336,12 @@
           {% endcall %}
 
           {% call row() %}
+            {{ text_field('Notes')}}
+            {{ optional_text_field(current_service.notes, default="No notes yet", wrap=True) }}
+            {{ edit_field('Change', url_for('.service_switch_count_as_live', service_id=current_service.id), suffix='the notes for the service') }}
+          {% endcall %}
+
+          {% call row() %}
             {{ text_field('Organisation')}}
             {% call field() %}
               {% if current_service.organisation_id %}
