@@ -34,6 +34,7 @@ from app.main import main
 from app.main.forms import (
     BrandingOptions,
     ConfirmPasswordForm,
+    EditServiceNotesForm,
     EstimateUsageForm,
     FreeSMSAllowance,
     LinkOrganisationsForm,
@@ -1185,6 +1186,34 @@ def edit_data_retention(service_id, data_retention_id):
         form=form,
         data_retention_id=data_retention_id,
         notification_type=data_retention_item['notification_type']
+    )
+
+
+@main.route("/services/<uuid:service_id>/notes", methods=['GET', 'POST'])
+@user_has_permissions('manage_service')
+def edit_service_notes(service_id):
+    form = EditServiceNotesForm()
+
+    if request.method == 'GET':
+        form.name.data = current_service.notes
+
+    if form.validate_on_submit():
+
+        if form.notes.data == current_service.notes:
+            return redirect(url_for('.service_settings', service_id=service_id))
+
+        try:
+            current_service.update(
+                notes=form.notes.data
+            )
+        except HTTPError as e:
+            raise e
+        else:
+            return redirect(url_for('.service_settings', service_id=service_id))
+
+    return render_template(
+        'views/service-settings/edit-service-notes.html',
+        form=form,
     )
 
 

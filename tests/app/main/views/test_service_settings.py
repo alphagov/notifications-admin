@@ -5232,3 +5232,20 @@ def test_update_service_data_retention_populates_form(
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert page.find('input', attrs={'name': 'days_of_retention'})['value'] == '5'
+
+
+def test_service_settings_links_to_edit_service_notes_page_for_platform_admins(
+    mocker,
+    service_one,
+    platform_admin_client,
+    no_reply_to_email_addresses,
+    no_letter_contact_blocks,
+    single_sms_sender,
+    mock_get_service_settings_page_common,
+    mock_get_organisation,
+):
+    response = platform_admin_client.get(url_for(
+        '.service_settings', service_id=SERVICE_ONE_ID
+    ))
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert len(page.find_all('a', attrs={'href': '/services/{}/notes'.format(SERVICE_ONE_ID)})) == 1
