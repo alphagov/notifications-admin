@@ -1928,7 +1928,7 @@ class ServiceInboundNumberForm(StripWhitespaceForm):
         self.inbound_number.choices = kwargs['inbound_number_choices']
 
     inbound_number = GovukRadiosField(
-        "Select your inbound number",
+        "Set inbound number",
         thing='an inbound number',
     )
 

@@ -2,25 +2,39 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import sticky_page_footer %}
 {% from "components/form.html" import form_wrapper %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
+
+{% set page_title = 'Set inbound number' %}
 
 {% block service_page_title %}
-  Set inbound number
+  {{ page_title }}
 {% endblock %}
 
 {% block maincolumn_content %}
+  {% if current_service.has_inbound_number or no_available_numbers %}
     {{ page_header(
-      'Set inbound number',
+      page_title,
       back_link=url_for('.service_settings', service_id=current_service.id)
     ) }}
-    {% if current_service.has_inbound_number %}
+  {% endif %}
+  {% if current_service.has_inbound_number %}
     <p class="govuk-body"> This service already has an inbound number </p>
-    {% elif no_available_numbers %}
+  {% elif no_available_numbers %}
     <p class="govuk-body"> No available inbound numbers </p>
-    {% else %}
-    {% call form_wrapper() %}
-      {{ form.inbound_number }}
+  {% else %}
+    {{ govukBackLink({ "href": url_for('.service_settings', service_id=current_service.id) }) }}
+    {% call form_wrapper(class="govuk-!-margin-top-3") %}
+      {{ form.inbound_number(param_extensions={
+        'fieldset': {
+          'legend': {
+            'text': page_title,
+            'isPageHeading': True,
+            'classes': 'govuk-fieldset__legend--l'
+          }
+        }
+      }) }}
       {{ sticky_page_footer('Save') }}
     {% endcall %}
-	{% endif %}
+  {% endif %}
 
 {% endblock %}
