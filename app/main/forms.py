@@ -649,16 +649,19 @@ def extend_params(params, extensions):
     # merge dicts
     merge_jsonlike(params, extensions)
 
+    # tidy up
+    extensions['items'] = items
+
     # merge items
     if items:
         if 'items' not in params:
-            params['items'] = items
+            params['items'] = extensions['items']
         else:
-            for idx, _item in enumerate(items):
+            for idx, _item in enumerate(extensions['items']):
                 if idx >= param_items:
-                    params['items'].append(items[idx])
+                    params['items'].append(extensions['items'][idx])
                 else:
-                    params['items'][idx].update(items[idx])
+                    params['items'][idx].update(extensions['items'][idx])
 
 
 def govuk_checkbox_field_widget(self, field, param_extensions=None, **kwargs):
