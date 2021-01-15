@@ -789,7 +789,7 @@ def govuk_radios_field_widget(self, field, param_extensions=None, **kwargs):
         merge_jsonlike(params, param_extensions)
 
     return Markup(
-        render_template('components/radios/template.njk', params=params))
+        render_template('forms/fields/radios/template.njk', params=params))
 
 
 class GovukCheckboxField(BooleanField):
@@ -880,6 +880,15 @@ class GovukRadiosField(RadioField):
         return govuk_radios_field_widget(self, field, param_extensions=param_extensions, **kwargs)
 
 
+class GovukRadiosFieldWithNoneOption(FieldWithNoneOption, GovukRadiosField):
+    pass
+
+
+# NestedFieldMixin puts the items into a tree hierarchy, pre-rendering the sub-trees of the top-level items
+class GovukNestedRadiosField(NestedFieldMixin, GovukRadiosFieldWithNoneOption):
+    render_as_list = True
+
+
 class OnOffField(GovukRadiosField):
 
     def __init__(self, label, choices=None, *args, **kwargs):
@@ -930,10 +939,6 @@ class OrganisationTypeField(GovukRadiosField):
             validators=validators or [],
             **kwargs
         )
-
-
-class GovukRadiosFieldWithNoneOption(FieldWithNoneOption, GovukRadiosField):
-    pass
 
 
 # guard against data entries that aren't a role in permissions
