@@ -1195,7 +1195,7 @@ def edit_service_notes(service_id):
     form = EditServiceNotesForm()
 
     if request.method == 'GET':
-        form.name.data = current_service.notes
+        form.notes.data = current_service.notes
 
     if form.validate_on_submit():
 

@@ -150,6 +150,7 @@ def service_json(
     contact_link=None,
     organisation_id=None,
     rate_limit=3000,
+    notes=None,
 ):
     if users is None:
         users = []
@@ -188,6 +189,7 @@ def service_json(
         'consent_to_research': True,
         'count_as_live': True,
         'organisation': organisation_id,
+        'notes': notes
     }
 
 

@@ -5249,3 +5249,14 @@ def test_service_settings_links_to_edit_service_notes_page_for_platform_admins(
     ))
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert len(page.find_all('a', attrs={'href': '/services/{}/notes'.format(SERVICE_ONE_ID)})) == 1
+
+
+def test_view_edit_service_notes(
+        platform_admin_client,
+        service_one,
+
+):
+    response = platform_admin_client.get(url_for('main.edit_service_notes', service_id=SERVICE_ONE_ID))
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert page.select_one('h1').text == "Edit service notes"
+    assert page.find('label', class_="form-label").text.strip() == "Notes"
