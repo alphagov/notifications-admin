@@ -516,7 +516,7 @@ class NestedFieldMixin:
 
             params['items'].append(item)
 
-        return render_template('forms/fields/checkboxes/template.njk', params=params)
+        return render_template(self.template_path, params=params)
 
 
 class NestedRadioField(RadioFieldWithNoneOption, NestedFieldMixin):
@@ -852,6 +852,7 @@ class GovukCollapsibleCheckboxesField(GovukCheckboxesField):
 class GovukCollapsibleNestedCheckboxesField(NestedFieldMixin, GovukCollapsibleCheckboxesField):
     NONE_OPTION_VALUE = None
     render_as_list = True
+    template_path = 'forms/fields/checkboxes/template.njk'
 
 
 class GovukRadiosField(RadioField):
@@ -887,6 +888,7 @@ class GovukRadiosFieldWithNoneOption(FieldWithNoneOption, GovukRadiosField):
 # NestedFieldMixin puts the items into a tree hierarchy, pre-rendering the sub-trees of the top-level items
 class GovukNestedRadiosField(NestedFieldMixin, GovukRadiosFieldWithNoneOption):
     render_as_list = True
+    template_path = 'forms/fields/radios/template.njk'
 
 
 class OnOffField(GovukRadiosField):
