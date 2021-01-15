@@ -1471,6 +1471,53 @@ def test_view_pending_broadcast(
 
 
 @freeze_time('2020-02-22T22:22:22.000000')
+def test_view_pending_broadcast_without_template(
+    mocker,
+    client_request,
+    service_one,
+    active_user_with_permissions,
+    fake_uuid,
+):
+    mocker.patch(
+        'app.broadcast_message_api_client.get_broadcast_message',
+        return_value=broadcast_message_json(
+            id_=fake_uuid,
+            service_id=SERVICE_ONE_ID,
+            template_id=None,
+            created_by_id=fake_uuid,
+            finishes_at=None,
+            status='pending-approval',
+            reference='No template test',
+            content='Uh-oh',
+        ),
+    )
+    mocker.patch('app.user_api_client.get_user', side_effect=[
+        active_user_with_permissions,  # Current user
+        user_json(id_=uuid.uuid4()),  # User who created broadcast
+    ])
+    service_one['permissions'] += ['broadcast']
+
+    page = client_request.get(
+        '.view_current_broadcast',
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+    )
+
+    assert (
+        normalize_spaces(page.select_one('.banner').text)
+    ) == (
+        'Test User wants to broadcast No template test '
+        'Start broadcasting now Reject this alert'
+    )
+    assert (
+        normalize_spaces(page.select_one('.broadcast-message-wrapper').text)
+    ) == (
+        'Emergency alert '
+        'Uh-oh'
+    )
+
+
+@freeze_time('2020-02-22T22:22:22.000000')
 def test_cant_approve_own_broadcast(
     mocker,
     client_request,

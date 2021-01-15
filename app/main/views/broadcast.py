@@ -138,12 +138,26 @@ def broadcast(service_id, template_id):
 @user_has_permissions('send_messages')
 @service_has_permission('broadcast')
 def preview_broadcast_areas(service_id, broadcast_message_id):
+    broadcast_message = BroadcastMessage.from_id(
+        broadcast_message_id,
+        service_id=current_service.id,
+    )
+    if broadcast_message.template_id:
+        back_link = url_for(
+            '.view_template',
+            service_id=current_service.id,
+            template_id=broadcast_message.template_id,
+        )
+    else:
+        back_link = url_for(
+            '.write_new_broadcast',
+            service_id=current_service.id,
+        )
+
     return render_template(
         'views/broadcast/preview-areas.html',
-        broadcast_message=BroadcastMessage.from_id(
-            broadcast_message_id,
-            service_id=current_service.id,
-        ),
+        broadcast_message=broadcast_message,
+        back_link=back_link,
     )
 
 
