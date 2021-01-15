@@ -5260,3 +5260,22 @@ def test_view_edit_service_notes(
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert page.select_one('h1').text == "Edit service notes"
     assert page.find('label', class_="form-label").text.strip() == "Notes"
+
+
+def test_update_service_notes(
+        platform_admin_client,
+        service_one,
+        mock_update_service
+):
+    response = platform_admin_client.post(
+        url_for(
+            'main.edit_service_notes',
+            service_id=SERVICE_ONE_ID,
+        ),
+        data={'notes': "Very fluffy"}
+    )
+    assert response.status_code == 302
+    settings_url = url_for(
+        'main.service_settings', service_id=SERVICE_ONE_ID, _external=True)
+    assert settings_url == response.location
+    mock_update_service.assert_called_with(SERVICE_ONE_ID, notes="Very fluffy")

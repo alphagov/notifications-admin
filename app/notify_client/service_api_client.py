@@ -109,12 +109,12 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             'go_live_user',
             'go_live_at',
             'rate_limit',
+            'notes',
         }
         if disallowed_attributes:
             raise TypeError('Not allowed to update service attributes: {}'.format(
                 ", ".join(disallowed_attributes)
             ))
-
         endpoint = "/service/{0}".format(service_id)
         return self.post(endpoint, data)
 
