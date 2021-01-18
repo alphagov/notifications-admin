@@ -33,7 +33,7 @@ git+https://github.com/alphagov/govuk-frontend-jinja.git@v0.5.1-alpha#egg=govuk-
 greenlet==1.0.0          # via eventlet
 gunicorn==20.0.4          # via -r requirements.in
 humanize==3.2.0           # via -r requirements.in
-idna==2.10                # via requests
+idna==3.1                # via requests
 itsdangerous==1.1.0       # via -r requirements.in, flask, flask-wtf, notifications-utils
 jdcal==1.4.1              # via openpyxl
 jinja2==2.11.2            # via flask, govuk-frontend-jinja, notifications-utils
