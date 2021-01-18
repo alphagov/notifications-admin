@@ -357,16 +357,20 @@ def test_broadcast_dashboard(
     )
 
 
+@pytest.mark.parametrize('endpoint', (
+    '.broadcast_dashboard', '.broadcast_dashboard_previous',
+))
 def test_broadcast_dashboard_does_not_have_button_for_view_only_user(
     client_request,
     service_one,
     active_user_view_permissions,
     mock_get_broadcast_messages,
+    endpoint,
 ):
     service_one['permissions'] += ['broadcast']
     client_request.login(active_user_view_permissions)
     page = client_request.get(
-        '.broadcast_dashboard',
+        endpoint,
         service_id=SERVICE_ONE_ID,
     )
     assert not page.select('a.govuk-button')
@@ -419,6 +423,15 @@ def test_previous_broadcasts_page(
         'Example template This is a test Broadcast yesterday at 2:20pm England Scotland',
         'Example template This is a test Broadcast yesterday at 2:20am England Scotland',
     ]
+
+    button = page.select_one(
+        '.js-stick-at-bottom-when-scrolling a.govuk-button.govuk-button--secondary'
+    )
+    assert normalize_spaces(button.text) == 'New alert'
+    assert button['href'] == url_for(
+        'main.new_broadcast',
+        service_id=SERVICE_ONE_ID,
+    )
 
 
 def test_new_broadcast_page(
