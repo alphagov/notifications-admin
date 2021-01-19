@@ -1192,10 +1192,7 @@ def edit_data_retention(service_id, data_retention_id):
 @main.route("/services/<uuid:service_id>/notes", methods=['GET', 'POST'])
 @user_has_permissions('manage_service')
 def edit_service_notes(service_id):
-    form = EditServiceNotesForm()
-
-    if request.method == 'GET':
-        form.notes.data = current_service.notes
+    form = EditServiceNotesForm(notes=current_service.notes)
 
     if form.validate_on_submit():
 
