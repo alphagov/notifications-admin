@@ -482,18 +482,36 @@ class NestedFieldMixin:
     def _children(self):
         return self.children()
 
-    def get_items_from_options(self, field):
+    @cached_property
+    def option_to_index_map(self):
+        return {option.id: index for index, option in enumerate(self)}
+
+    def get_extensions_for_option(self, option, extensions):
+        option_index = self.option_to_index_map[option.id]
+        if extensions is None or option_index >= len(extensions):
+            return None
+        return extensions[option_index]
+
+    def get_item_from_option(self, option, extensions):
+        item = super(NestedFieldMixin, self).get_item_from_option(option)
+        if extensions is not None:
+            merge_jsonlike(item, extensions)
+        return item
+
+    def get_items_from_options(self, field, extensions=None):
         items = []
 
         for option in self._children[None]:
-            item = self.get_item_from_option(option)
+            item_extensions = self.get_extensions_for_option(option, extensions)
+            item = self.get_item_from_option(option, item_extensions)
             if option.data in self._children:
-                item['children'] = self.render_children(field.name, option.label.text, self._children[option.data])
+                item['children'] = self.render_children(
+                    field.name, option.label.text, self._children[option.data], extensions)
             items.append(item)
 
         return items
 
-    def render_children(self, name, label, options):
+    def render_children(self, name, label, options, extensions):
         params = {
             "name": name,
             "fieldset": {
@@ -509,10 +527,12 @@ class NestedFieldMixin:
             "items": []
         }
         for option in options:
-            item = self.get_item_from_option(option)
+            item_extensions = self.get_extensions_for_option(option, extensions)
+            item = self.get_item_from_option(option, item_extensions)
 
             if len(self._children[option.data]):
-                item['children'] = self.render_children(name, option.label.text, self._children[option.data])
+                item['children'] = self.render_children(
+                    name, option.label.text, self._children[option.data], extensions)
 
             params['items'].append(item)
 
@@ -751,6 +771,13 @@ def govuk_checkboxes_field_widget(self, field, wrap_in_collapsible=False, param_
 
 def govuk_radios_field_widget(self, field, param_extensions=None, **kwargs):
 
+    # add any param_extensions sent in though use in templates
+    if param_extensions is not None:
+        if self.param_extensions is not None:
+            merge_jsonlike(self.param_extensions, param_extensions)
+        else:
+            self.param_extensions = param_extensions
+
     # error messages
     error_message = None
     if field.errors:
@@ -763,9 +790,11 @@ def govuk_radios_field_widget(self, field, param_extensions=None, **kwargs):
             "text": " ".join(field.errors).strip()
         }
 
-    # returns either a list or a hierarchy of lists
+    # returns either a list or a hierarchy of lists, in a tree structure
     # depending on how get_items_from_options is implemented
-    items = self.get_items_from_options(field)
+    # the hierarchy of lists prerenders some items so any extensions need to be available beforehand
+    _item_extensions = self.param_extensions.get('items', None) if self.param_extensions is not None else None
+    items = self.get_items_from_options(field, _item_extensions)
 
     params = {
         'name':  field.name,
@@ -780,13 +809,13 @@ def govuk_radios_field_widget(self, field, param_extensions=None, **kwargs):
         'items': items
     }
 
-    # extend default params with any sent in during instantiation
-    if self.param_extensions:
-        merge_jsonlike(params, self.param_extensions)
-
-    # add any sent in though use in templates
-    if param_extensions:
-        merge_jsonlike(params, param_extensions)
+    # any extensions to 'items' will already have been applied so:
+    # - only extend the rest of params
+    # - cache locally to avoid side effects from deleting 'items'
+    if self.param_extensions is not None:
+        _param_extensions = self.param_extensions
+        del _param_extensions['items']
+        merge_jsonlike(params, _param_extensions)
 
     return Markup(
         render_template('forms/fields/radios/template.njk', params=params))
@@ -861,16 +890,19 @@ class GovukRadiosField(RadioField):
         super(GovukRadiosField, self).__init__(label, validators, **kwargs)
         self.param_extensions = param_extensions
 
-    def get_item_from_option(self, option):
-        return {
+    def get_item_from_option(self, option, extensions=None):
+        item = {
             "name": option.name,
             "id": option.id,
             "text": option.label.text,
             "value": str(option.data),  # to protect against non-string types like uuids
             "checked": option.checked
         }
+        if extensions is not None:
+            merge_jsonlike(item, extensions)
+        return item
 
-    def get_items_from_options(self, field):
+    def get_items_from_options(self, field, extensions=None):
         return [self.get_item_from_option(option) for option in field]
 
     # self.__call__ renders the HTML for the field by:
@@ -2207,7 +2239,7 @@ class TemplateAndFoldersSelectionForm(Form):
 
     ALL_TEMPLATES_FOLDER = {
         'name': 'Templates',
-        'id': RadioFieldWithNoneOption.NONE_OPTION_VALUE,
+        'id': GovukRadiosFieldWithNoneOption.NONE_OPTION_VALUE,
     }
 
     def __init__(
@@ -2288,7 +2320,7 @@ class TemplateAndFoldersSelectionForm(Form):
     # if no default set, it is set to None, which process_data transforms to '__NONE__'
     # this means '__NONE__' (self.ALL_TEMPLATES option) is selected when no form data has been submitted
     # set default to empty string so process_data method doesn't perform any transformation
-    move_to = NestedRadioField(
+    move_to = GovukNestedRadiosField(
         'Choose a folder',
         default='',
         validators=[

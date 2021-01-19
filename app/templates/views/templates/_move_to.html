@@ -7,7 +7,7 @@
   {% if templates_and_folders_form.move_to.choices and template_list.templates_to_show %}
     <div id="move_to_folder_radios" class="sticky-template-form" role="region" aria-label="Choose the folder to move selected items to">
       <div class="js-will-stick-at-bottom-when-scrolling">
-      {{ radios_nested(templates_and_folders_form.move_to, move_to_children, option_hints=option_hints) }}
+      {{ templates_and_folders_form.move_to }}
       </div>
       <div class="js-will-stick-at-bottom-when-scrolling">
       {{ page_footer('Move', button_name='operation', button_value='move-to-existing-folder', button_text_hidden_suffix=' selection to folder') }}

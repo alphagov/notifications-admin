@@ -118,7 +118,14 @@ def choose_template(service_id, template_type='all', template_folder_id=None):
             current_service.all_templates or len(current_user.service_ids) > 1
         ),
     )
-    option_hints = {template_folder_id: 'current folder'}
+    if template_folder_id is not None:
+        templates_and_folders_form.move_to.param_extensions = {'items': []}
+        for item_id, _item_value in templates_and_folders_form.move_to.choices:
+            if item_id == template_folder_id:
+                extensions = {'hint': {'text': 'current folder'}}
+            else:
+                extensions = {}  # add an empty dict for items we don't want to extend, to preserve the order
+            templates_and_folders_form.move_to.param_extensions['items'].append(extensions)
 
     single_notification_channel = None
     notification_channels = list(set(current_service.permissions).intersection(NOTIFICATION_TYPES))
@@ -161,10 +168,8 @@ def choose_template(service_id, template_type='all', template_folder_id=None):
         template_type=template_type,
         search_form=SearchTemplatesForm(current_service.api_keys),
         templates_and_folders_form=templates_and_folders_form,
-        move_to_children=templates_and_folders_form.move_to.children(),
         user_has_template_folder_permission=user_has_template_folder_permission,
-        single_notification_channel=single_notification_channel,
-        option_hints=option_hints
+        single_notification_channel=single_notification_channel
     )
 
 
