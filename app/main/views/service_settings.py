@@ -1199,14 +1199,10 @@ def edit_service_notes(service_id):
         if form.notes.data == current_service.notes:
             return redirect(url_for('.service_settings', service_id=service_id))
 
-        try:
-            current_service.update(
-                notes=form.notes.data
-            )
-        except HTTPError as e:
-            raise e
-        else:
-            return redirect(url_for('.service_settings', service_id=service_id))
+        current_service.update(
+            notes=form.notes.data
+        )
+        return redirect(url_for('.service_settings', service_id=service_id))
 
     return render_template(
         'views/service-settings/edit-service-notes.html',

@@ -5260,6 +5260,7 @@ def test_view_edit_service_notes(
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert page.select_one('h1').text == "Edit service notes"
     assert page.find('label', class_="form-label").text.strip() == "Notes"
+    assert page.find('textarea').attrs["name"] == "notes"
 
 
 def test_update_service_notes(
