@@ -17,7 +17,7 @@
       {{/showNowAsDefault}}
       <div class="radio-select__column">
         {{#categories}}
-          <input type='button' class='govuk-button govuk-button--secondary radio-select__button--category' value='{{.}}' />
+          <input type='button' class='govuk-button govuk-button--secondary radio-select__button--category' aria-expanded="false" value='{{.}}' />
         {{/categories}}
       </div>
     `),
@@ -37,7 +37,7 @@
             <label for="{{id}}">{{label}}</label>
           </div>
         {{/choices}}
-        <input type='button' class='govuk-button govuk-button--secondary radio-select__button--done' value='Done' />
+        <input type='button' class='govuk-button govuk-button--secondary radio-select__button--done' aria-expanded='true' value='Done' />
       </div>
     `),
     'chosen': Hogan.compile(`
@@ -58,7 +58,7 @@
         {{/choices}}
       </div>
       <div class="radio-select__column">
-        <input type='button' class='govuk-button govuk-button--secondary radio-select__button--reset' value='Choose a different time' />
+        <input type='button' class='govuk-button govuk-button--secondary radio-select__button--reset' aria-expanded='false' value='Choose a different time' />
       </div>
     `)
   };

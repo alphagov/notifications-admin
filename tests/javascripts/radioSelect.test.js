@@ -179,6 +179,14 @@ describe('RadioSelect', () => {
 
       });
 
+      test("each button's semantics should show it controls another region and that region is collapsed", () => {
+
+        categoryButtons.forEach(btn => {
+          expect(btn.getAttribute('aria-expanded')).toEqual('false');
+        });
+
+      });
+
     });
 
   });
@@ -241,6 +249,7 @@ describe('RadioSelect', () => {
 
       expect(button).not.toBeNull();
       expect(button.getAttribute('value')).toEqual('Done');
+      expect(button.getAttribute('aria-expanded')).toEqual('true');
 
     });
 
