@@ -63,8 +63,13 @@
     `)
   };
 
-  let focusSelected = function(component) {
-    $('[type=radio]:checked', component).focus();
+  let shiftFocus = function(target, component) {
+    if (target === 'now') {
+      $('[type=radio]', component).eq(0).focus();
+    }
+    if (target === 'time') {
+      $('[type=radio]', component).eq(1).focus();
+    }
   };
 
   Modules.RadioSelect = function() {
@@ -96,6 +101,7 @@
           'name': name,
           'showNowAsDefault': showNowAsDefault
         });
+        shiftFocus('now', component);
       };
       const selectOption = (value) => {
         render('chosen', {
@@ -105,7 +111,7 @@
           'name': name,
           'showNowAsDefault': showNowAsDefault
         });
-        focusSelected(component);
+        shiftFocus('time', component);
       };
       const trackMouseup = (event) => {
         const parentNode = event.target.parentNode;
@@ -134,7 +140,7 @@
             'name': name,
             'showNowAsDefault': showNowAsDefault
           });
-          focusSelected(component);
+          shiftFocus('time', component);
 
         })
         .on('mousedown', '.js-option', function(event) {
@@ -169,20 +175,21 @@
               'name': name,
               'showNowAsDefault': showNowAsDefault
             });
+            shiftFocus('time', component);
 
           } else {
 
             reset();
+            shiftFocus('now', component);
 
           }
-          focusSelected(component);
 
         })
         .on('click', '.radio-select__button--reset', function(event) {
 
           event.preventDefault();
           reset();
-          focusSelected(component);
+          shiftFocus('now', component);
 
         });
 

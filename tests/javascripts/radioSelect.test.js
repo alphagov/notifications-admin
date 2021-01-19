@@ -228,9 +228,9 @@ describe('RadioSelect', () => {
 
         });
 
-        test("keep focus on the default time slot", () => {
+        test("focus the first time slot", () => {
 
-          expect(document.activeElement).toBe(document.getElementById('scheduled_for-0'));
+          expect(document.activeElement).toBe(document.getElementById('scheduled_for-1'));
 
         });
 
@@ -347,6 +347,14 @@ describe('RadioSelect', () => {
 
       })
 
+      test("focus the selected option", () => {
+
+        selectedOption = document.querySelector('.radio-select__column:nth-child(2) input[checked=checked]');
+
+        expect(document.activeElement).toBe(selectedOption);
+
+      });
+
     });
 
     describe("selecting an option with the enter key should", () => {
@@ -397,6 +405,14 @@ describe('RadioSelect', () => {
         expect(button.getAttribute('value')).toEqual('Choose a different time');
 
       })
+
+      test("focus the selected option", () => {
+
+        selectedOption = document.querySelector('.radio-select__column:nth-child(2) input[checked=checked]');
+
+        expect(document.activeElement).toBe(selectedOption);
+
+      });
 
     });
 
