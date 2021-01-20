@@ -5,6 +5,7 @@
   var Modules = global.GOVUK.Modules;
   var Hogan = global.Hogan;
 
+  // Object holding all the states for the component's HTML
   let states = {
     'initial': Hogan.compile(`
       {{#showNowAsDefault}}
@@ -63,11 +64,12 @@
     `)
   };
 
-  let shiftFocus = function(target, component) {
-    if (target === 'now') {
+  let shiftFocus = function(elementToFocus, component) {
+    // The first option is always the default
+    if (elementToFocus === 'default') {
       $('[type=radio]', component).eq(0).focus();
     }
-    if (target === 'time') {
+    if (elementToFocus === 'option') {
       $('[type=radio]', component).eq(1).focus();
     }
   };
@@ -80,6 +82,7 @@
       let render = (state, data) => {
         $component.html(states[state].render(data));
       };
+      // store array of all options in component
       let choices = $('label', $component).toArray().map(function(element) {
         let $element = $(element);
         return {
@@ -95,13 +98,15 @@
         $component.data('show-now-as-default').toString() === 'true' ?
         {'name': name} : false
       );
+
+      // functions for changing the state of the component's HTML
       const reset = () => {
         render('initial', {
           'categories': categories,
           'name': name,
           'showNowAsDefault': showNowAsDefault
         });
-        shiftFocus('now', component);
+        shiftFocus('default', component);
       };
       const selectOption = (value) => {
         render('chosen', {
@@ -111,8 +116,10 @@
           'name': name,
           'showNowAsDefault': showNowAsDefault
         });
-        shiftFocus('time', component);
+        shiftFocus('option', component);
       };
+
+      // use mousedown + mouseup event sequence to confirm option selection
       const trackMouseup = (event) => {
         const parentNode = event.target.parentNode;
 
@@ -127,6 +134,7 @@
         }
       };
 
+      // set events
       $component
         .on('click', '.radio-select__button--category', function(event) {
 
@@ -140,7 +148,7 @@
             'name': name,
             'showNowAsDefault': showNowAsDefault
           });
-          shiftFocus('time', component);
+          shiftFocus('option', component);
 
         })
         .on('mousedown', '.js-option', function(event) {
@@ -175,12 +183,12 @@
               'name': name,
               'showNowAsDefault': showNowAsDefault
             });
-            shiftFocus('time', component);
+            shiftFocus('option', component);
 
           } else {
 
             reset();
-            shiftFocus('now', component);
+            shiftFocus('default', component);
 
           }
 
@@ -189,10 +197,11 @@
 
           event.preventDefault();
           reset();
-          shiftFocus('now', component);
+          shiftFocus('default', component);
 
         });
 
+      // set HTML to initial state
       render('initial', {
         'categories': categories,
         'name': name,

@@ -304,7 +304,7 @@ describe('RadioSelect', () => {
 
       test("focus the selected option", () => {
 
-        selectedOption = document.querySelector('.radio-select__column:nth-child(2) input[checked=checked]');
+        selectedOption = document.querySelector('.radio-select__column input[checked=checked]');
 
         expect(document.activeElement).toBe(selectedOption);
 
@@ -349,7 +349,7 @@ describe('RadioSelect', () => {
 
       test("focus the selected option", () => {
 
-        selectedOption = document.querySelector('.radio-select__column:nth-child(2) input[checked=checked]');
+        selectedOption = document.querySelector('.radio-select__column input[checked=checked]');
 
         expect(document.activeElement).toBe(selectedOption);
 
@@ -408,7 +408,7 @@ describe('RadioSelect', () => {
 
       test("focus the selected option", () => {
 
-        selectedOption = document.querySelector('.radio-select__column:nth-child(2) input[checked=checked]');
+        selectedOption = document.querySelector('.radio-select__column input[checked=checked]');
 
         expect(document.activeElement).toBe(selectedOption);
 
