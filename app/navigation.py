@@ -374,6 +374,8 @@ class HeaderNavigation(Navigation):
         'approve_broadcast_message',
         'reject_broadcast_message',
         'cancel_broadcast_message',
+        'new_broadcast',
+        'write_new_broadcast',
     }
 
     # header HTML now comes from GOVUK Frontend so requires a boolean, not an attribute
@@ -400,6 +402,8 @@ class MainNavigation(Navigation):
             'broadcast_dashboard',
             'broadcast_dashboard_updates',
             'view_current_broadcast',
+            'new_broadcast',
+            'write_new_broadcast',
         },
         'previous-broadcasts': {
             'broadcast_dashboard_previous',
@@ -1053,6 +1057,8 @@ class CaseworkNavigation(Navigation):
         'approve_broadcast_message',
         'reject_broadcast_message',
         'cancel_broadcast_message',
+        'new_broadcast',
+        'write_new_broadcast',
     }
 
 
@@ -1386,4 +1392,6 @@ class OrgNavigation(Navigation):
         'approve_broadcast_message',
         'reject_broadcast_message',
         'cancel_broadcast_message',
+        'new_broadcast',
+        'write_new_broadcast',
     }

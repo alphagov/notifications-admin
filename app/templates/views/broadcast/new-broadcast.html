@@ -1,0 +1,29 @@
+{% from "components/back-link/macro.njk" import govukBackLink %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+
+{% extends "withnav_template.html" %}
+
+{% block service_page_title %}
+  New alert
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ govukBackLink({ "href": url_for('.broadcast_dashboard', service_id=current_service.id) }) }}
+
+  {% call form_wrapper(class="govuk-!-margin-top-3") %}
+    {{ form.content(
+      param_extensions={
+        'fieldset': {
+          'legend': {
+            'isPageHeading': True,
+            'classes': 'govuk-fieldset__legend--l'
+          }
+        }
+      }
+    ) }}
+    {{ page_footer('Continue') }}
+  {% endcall %}
+
+{% endblock %}

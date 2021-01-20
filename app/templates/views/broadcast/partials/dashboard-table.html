@@ -5,7 +5,7 @@
   <div class="keyline-block">
     <div class="file-list govuk-!-margin-bottom-2">
       <h2>
-        <a class="file-list-filename-large govuk-link govuk-link--no-visited-state" href="{{ url_for(view_broadcast_endpoint, service_id=current_service.id, broadcast_message_id=item.id) }}">{{ item.template_name }}</a>
+        <a class="file-list-filename-large govuk-link govuk-link--no-visited-state" href="{{ url_for(view_broadcast_endpoint, service_id=current_service.id, broadcast_message_id=item.id) }}">{{ item.template.name }}</a>
       </h2>
       <div class="govuk-grid-row">
         <div class="govuk-grid-column-one-half">

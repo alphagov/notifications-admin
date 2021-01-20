@@ -12,6 +12,8 @@ def test_create_broadcast_message(mocker):
     client.create_broadcast_message(
         service_id='12345',
         template_id='67890',
+        content=None,
+        reference=None,
     )
     mock_post.assert_called_once_with(
         '/service/12345/broadcast-message',

@@ -20,15 +20,15 @@
 {% block service_page_title %}
   {% if broadcast_message.status == 'pending-approval' %}
     {% if broadcast_message.created_by == current_user and current_user.has_permissions('send_messages') %}
-      {{ broadcast_message.template_name }} is waiting for approval
+      {{ broadcast_message.template.name }} is waiting for approval
     {% elif current_user.has_permissions('send_messages') %}
       {{ broadcast_message.created_by.name }} wants to broadcast
-      {{ broadcast_message.template_name }}
+      {{ broadcast_message.template.name }}
     {% else %}
       This alert is waiting for approval
     {% endif %}
   {% else %}
-    {{ broadcast_message.template_name }}
+    {{ broadcast_message.template.name }}
   {% endif %}
 {% endblock %}
 
@@ -40,7 +40,7 @@
     {% if broadcast_message.created_by == current_user and current_user.has_permissions('send_messages') %}
       <div class="banner govuk-!-margin-bottom-6">
         <h1 class="govuk-heading-m govuk-!-margin-bottom-3">
-          {{ broadcast_message.template_name }} is waiting for approval
+          {{ broadcast_message.template.name }} is waiting for approval
         </h1>
         {% if current_service.live %}
           <p class="govuk-body">
@@ -80,7 +80,7 @@
       {% call form_wrapper(class="banner govuk-!-margin-bottom-6") %}
         <h1 class="govuk-heading-m govuk-!-margin-top-0 govuk-!-margin-bottom-3">
           {{ broadcast_message.created_by.name }} wants to broadcast
-          {{ broadcast_message.template_name }}
+          {{ broadcast_message.template.name }}
         </h1>
         {{ page_footer(
           "Start broadcasting now",
@@ -97,7 +97,7 @@
       </div>
     {% endif %}
   {% else %}
-    {{ page_header(broadcast_message.template_name) }}
+    {{ page_header(broadcast_message.template.name) }}
 
     {% if broadcast_message.status == 'broadcasting' %}
       <p class="govuk-body govuk-!-margin-bottom-2 live-broadcast live-broadcast--left">

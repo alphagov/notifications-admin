@@ -4272,8 +4272,11 @@ def mock_create_broadcast_message(
     fake_uuid,
 ):
     def _create(
+        *,
         service_id,
         template_id,
+        content,
+        reference,
     ):
         return {
             'id': fake_uuid,

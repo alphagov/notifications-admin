@@ -27,6 +27,14 @@ sample_uuid = sample_uuid()
         403, 405,
     ),
     (
+        '.new_broadcast', {},
+        403, 403,
+    ),
+    (
+        '.write_new_broadcast', {},
+        403, 403,
+    ),
+    (
         '.broadcast',
         {'template_id': sample_uuid},
         403, 405,
@@ -86,6 +94,14 @@ def test_broadcast_pages_403_without_permission(
 
 
 @pytest.mark.parametrize('endpoint, extra_args, expected_get_status, expected_post_status', (
+    (
+        '.new_broadcast', {},
+        403, 403,
+    ),
+    (
+        '.write_new_broadcast', {},
+        403, 403,
+    ),
     (
         '.broadcast',
         {'template_id': sample_uuid},
@@ -331,6 +347,34 @@ def test_broadcast_dashboard(
         'Example template This is a test Live since today at 1:20am England Scotland',
     ]
 
+    button = page.select_one(
+        '.js-stick-at-bottom-when-scrolling a.govuk-button.govuk-button--secondary'
+    )
+    assert normalize_spaces(button.text) == 'New alert'
+    assert button['href'] == url_for(
+        'main.new_broadcast',
+        service_id=SERVICE_ONE_ID,
+    )
+
+
+@pytest.mark.parametrize('endpoint', (
+    '.broadcast_dashboard', '.broadcast_dashboard_previous',
+))
+def test_broadcast_dashboard_does_not_have_button_for_view_only_user(
+    client_request,
+    service_one,
+    active_user_view_permissions,
+    mock_get_broadcast_messages,
+    endpoint,
+):
+    service_one['permissions'] += ['broadcast']
+    client_request.login(active_user_view_permissions)
+    page = client_request.get(
+        endpoint,
+        service_id=SERVICE_ONE_ID,
+    )
+    assert not page.select('a.govuk-button')
+
 
 @freeze_time('2020-02-20 02:20')
 def test_broadcast_dashboard_json(
@@ -379,6 +423,175 @@ def test_previous_broadcasts_page(
         'Example template This is a test Broadcast yesterday at 2:20pm England Scotland',
         'Example template This is a test Broadcast yesterday at 2:20am England Scotland',
     ]
+
+    button = page.select_one(
+        '.js-stick-at-bottom-when-scrolling a.govuk-button.govuk-button--secondary'
+    )
+    assert normalize_spaces(button.text) == 'New alert'
+    assert button['href'] == url_for(
+        'main.new_broadcast',
+        service_id=SERVICE_ONE_ID,
+    )
+
+
+def test_new_broadcast_page(
+    client_request,
+    service_one,
+):
+    service_one['permissions'] += ['broadcast']
+    page = client_request.get(
+        '.new_broadcast',
+        service_id=SERVICE_ONE_ID,
+    )
+
+    assert normalize_spaces(page.select_one('h1').text) == 'New alert'
+
+    form = page.select_one('form')
+    assert form['method'] == 'post'
+    assert 'action' not in form
+
+    assert [
+        (
+            choice.select_one('input')['name'],
+            choice.select_one('input')['value'],
+            normalize_spaces(choice.select_one('label').text),
+        )
+        for choice in form.select('.govuk-radios__item')
+    ] == [
+        ('content', 'freeform', 'Write your own message'),
+        ('content', 'template', 'Use a template'),
+    ]
+
+
+@pytest.mark.parametrize('value, expected_redirect_endpoint', (
+    ('freeform', 'main.write_new_broadcast'),
+    ('template', 'main.choose_template'),
+))
+def test_new_broadcast_page_redirects(
+    client_request,
+    service_one,
+    value,
+    expected_redirect_endpoint,
+):
+    service_one['permissions'] += ['broadcast']
+    client_request.post(
+        '.new_broadcast',
+        service_id=SERVICE_ONE_ID,
+        _data={
+            'content': value,
+        },
+        _expected_redirect=url_for(
+            expected_redirect_endpoint,
+            service_id=SERVICE_ONE_ID,
+            _external=True,
+        )
+    )
+
+
+def test_write_new_broadcast_page(
+    client_request,
+    service_one,
+):
+    service_one['permissions'] += ['broadcast']
+    page = client_request.get(
+        '.write_new_broadcast',
+        service_id=SERVICE_ONE_ID,
+    )
+
+    assert normalize_spaces(page.select_one('h1').text) == 'New alert'
+
+    form = page.select_one('form')
+    assert form['method'] == 'post'
+    assert 'action' not in form
+
+    assert page.select_one('input[type=text]')['name'] == 'name'
+
+    assert page.select_one('textarea')['name'] == 'template_content'
+    assert page.select_one('textarea')['data-module'] == 'enhanced-textbox'
+    assert page.select_one('textarea')['data-highlight-placeholders'] == 'false'
+
+    assert (
+        page.select_one('[data-module=update-status]')['data-updates-url']
+    ) == url_for(
+        '.count_content_length',
+        service_id=SERVICE_ONE_ID,
+        template_type='broadcast',
+    )
+
+    assert (
+        page.select_one('[data-module=update-status]')['data-target']
+    ) == (
+        page.select_one('textarea')['id']
+    ) == (
+        'template_content'
+    )
+
+    assert (
+        page.select_one('[data-module=update-status]')['aria-live']
+    ) == (
+        'polite'
+    )
+
+
+def test_write_new_broadcast_posts(
+    client_request,
+    service_one,
+    mock_create_broadcast_message,
+    fake_uuid,
+):
+    service_one['permissions'] += ['broadcast']
+    client_request.post(
+        '.write_new_broadcast',
+        service_id=SERVICE_ONE_ID,
+        _data={
+            'name': 'My new alert',
+            'template_content': 'This is a test',
+        },
+        _expected_redirect=url_for(
+            '.preview_broadcast_areas',
+            service_id=SERVICE_ONE_ID,
+            broadcast_message_id=fake_uuid,
+            _external=True,
+        ),
+    )
+    mock_create_broadcast_message.assert_called_once_with(
+        service_id=SERVICE_ONE_ID,
+        reference='My new alert',
+        content='This is a test',
+        template_id=None,
+    )
+
+
+@pytest.mark.parametrize('content, expected_error_message', (
+    ('', 'Cannot be empty'),
+    ('ŵ' * 616, 'Content must be 615 characters or fewer because it contains ŵ'),
+    ('w' * 1_396, 'Content must be 1,395 characters or fewer'),
+    ('hello ((name))', 'You can’t use ((double brackets)) to personalise this message'),
+))
+def test_write_new_broadcast_bad_content(
+    client_request,
+    service_one,
+    mock_create_broadcast_message,
+    fake_uuid,
+    content,
+    expected_error_message,
+):
+    service_one['permissions'] += ['broadcast']
+    page = client_request.post(
+        '.write_new_broadcast',
+        service_id=SERVICE_ONE_ID,
+        _data={
+            'name': 'My new alert',
+            'template_content': content,
+        },
+        _expected_status=200,
+    )
+    assert normalize_spaces(
+        page.select_one('.error-message').text
+    ) == (
+        expected_error_message
+    )
+    assert mock_create_broadcast_message.called is False
 
 
 def test_broadcast_page(
@@ -1254,6 +1467,53 @@ def test_view_pending_broadcast(
         '.reject_broadcast_message',
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
+    )
+
+
+@freeze_time('2020-02-22T22:22:22.000000')
+def test_view_pending_broadcast_without_template(
+    mocker,
+    client_request,
+    service_one,
+    active_user_with_permissions,
+    fake_uuid,
+):
+    mocker.patch(
+        'app.broadcast_message_api_client.get_broadcast_message',
+        return_value=broadcast_message_json(
+            id_=fake_uuid,
+            service_id=SERVICE_ONE_ID,
+            template_id=None,
+            created_by_id=fake_uuid,
+            finishes_at=None,
+            status='pending-approval',
+            reference='No template test',
+            content='Uh-oh',
+        ),
+    )
+    mocker.patch('app.user_api_client.get_user', side_effect=[
+        active_user_with_permissions,  # Current user
+        user_json(id_=uuid.uuid4()),  # User who created broadcast
+    ])
+    service_one['permissions'] += ['broadcast']
+
+    page = client_request.get(
+        '.view_current_broadcast',
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+    )
+
+    assert (
+        normalize_spaces(page.select_one('.banner').text)
+    ) == (
+        'Test User wants to broadcast No template test '
+        'Start broadcasting now Reject this alert'
+    )
+    assert (
+        normalize_spaces(page.select_one('.broadcast-message-wrapper').text)
+    ) == (
+        'Emergency alert '
+        'Uh-oh'
     )
 
 

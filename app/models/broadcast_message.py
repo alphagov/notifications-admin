@@ -13,7 +13,6 @@ from app.models.user import User
 from app.notify_client.broadcast_message_api_client import (
     broadcast_message_api_client,
 )
-from app.notify_client.service_api_client import service_api_client
 
 
 class BroadcastMessage(JSONModel):
@@ -22,8 +21,6 @@ class BroadcastMessage(JSONModel):
         'id',
         'service_id',
         'template_id',
-        'template_name',
-        'template_version',
         'content',
         'service_id',
         'created_by',
@@ -55,6 +52,17 @@ class BroadcastMessage(JSONModel):
         return cls(broadcast_message_api_client.create_broadcast_message(
             service_id=service_id,
             template_id=template_id,
+            content=None,
+            reference=None,
+        ))
+
+    @classmethod
+    def create_from_content(cls, *, service_id, content, reference):
+        return cls(broadcast_message_api_client.create_broadcast_message(
+            service_id=service_id,
+            template_id=None,
+            content=content,
+            reference=reference,
         ))
 
     @classmethod
@@ -91,13 +99,18 @@ class BroadcastMessage(JSONModel):
         return self.get_simple_polygons(areas=self.areas)
 
     @property
+    def reference(self):
+        if self.template_id:
+            return self._dict['template_name']
+        return self._dict['reference']
+
+    @property
     def template(self):
-        response = service_api_client.get_service_template(
-            self.service_id,
-            self.template_id,
-            version=self.template_version,
-        )
-        return BroadcastPreviewTemplate(response['data'])
+        return BroadcastPreviewTemplate({
+            'template_type': BroadcastPreviewTemplate.template_type,
+            'name': self.reference,
+            'content': self.content,
+        })
 
     @property
     def status(self):

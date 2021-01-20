@@ -21,7 +21,7 @@
 
   {{ page_header(
     "Choose where to broadcast to",
-    back_link=url_for('.view_template', service_id=current_service.id, template_id=broadcast_message.template_id)
+    back_link=back_link
   ) }}
 
   {% for area in broadcast_message.areas %}

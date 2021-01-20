@@ -1293,6 +1293,21 @@ class ConfirmPasswordForm(StripWhitespaceForm):
             raise ValidationError('Invalid password')
 
 
+class NewBroadcastForm(StripWhitespaceForm):
+    content = GovukRadiosField(
+        'New alert',
+        choices=[
+            ('freeform', 'Write your own message'),
+            ('template', 'Use a template'),
+        ],
+        param_extensions={'fieldset': {'legend': {'classes': 'govuk-visually-hidden'}}}
+    )
+
+    @property
+    def use_template(self):
+        return self.content.data == 'template'
+
+
 class BaseTemplateForm(StripWhitespaceForm):
     name = GovukTextInputField(
         "Template name",

@@ -1,4 +1,5 @@
 {% from 'components/ajax-block.html' import ajax_block %}
+{% from "components/button/macro.njk" import govukButton %}
 
 {% extends "withnav_template.html" %}
 
@@ -11,5 +12,16 @@
   <h1 class="heading-medium">Previous alerts</h1>
 
   {% include('views/broadcast/partials/dashboard-table.html') %}
+
+  {% if current_user.has_permissions('send_messages') %}
+    <div class="js-stick-at-bottom-when-scrolling">
+      {{ govukButton({
+        "element": "a",
+        "text": "New alert",
+        "href": url_for('.new_broadcast', service_id=current_service.id),
+        "classes": "govuk-button--secondary"
+      }) }}
+    </div>
+  {% endif %}
 
 {% endblock %}
