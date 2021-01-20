@@ -1,4 +1,4 @@
-{% from "components/page-header.html" import page_header %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 
@@ -10,13 +10,19 @@
 
 {% block maincolumn_content %}
 
-  {{ page_header(
-    'New alert',
-    back_link=url_for('.broadcast_dashboard', service_id=current_service.id),
-  )}}
+  {{ govukBackLink({ "href": url_for('.broadcast_dashboard', service_id=current_service.id) }) }}
 
   {% call form_wrapper() %}
-    {{ form.content }}
+    {{ form.content(
+      param_extensions={
+        'fieldset': {
+          'legend': {
+            'isPageHeading': True,
+            'classes': 'govuk-fieldset__legend--l'
+          }
+        }
+      }
+    ) }}
     {{ page_footer('Continue') }}
   {% endcall %}
 
