@@ -100,6 +100,7 @@ def mock_get_service_settings_page_common(
         'Label Value Action',
         'Live Off Change service status',
         'Count in list of live services Yes Change if service is counted in list of live services',
+        'Notes No notes yet Change the notes for the service',
         'Organisation Test organisation Central government Change organisation for service',
         'Rate limit 3,000 per minute Change rate limit',
         'Message limit 1,000 per day Change daily message limit',
@@ -5231,3 +5232,51 @@ def test_update_service_data_retention_populates_form(
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert page.find('input', attrs={'name': 'days_of_retention'})['value'] == '5'
+
+
+def test_service_settings_links_to_edit_service_notes_page_for_platform_admins(
+    mocker,
+    service_one,
+    platform_admin_client,
+    no_reply_to_email_addresses,
+    no_letter_contact_blocks,
+    single_sms_sender,
+    mock_get_service_settings_page_common,
+    mock_get_organisation,
+):
+    response = platform_admin_client.get(url_for(
+        '.service_settings', service_id=SERVICE_ONE_ID
+    ))
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert len(page.find_all('a', attrs={'href': '/services/{}/notes'.format(SERVICE_ONE_ID)})) == 1
+
+
+def test_view_edit_service_notes(
+        platform_admin_client,
+        service_one,
+
+):
+    response = platform_admin_client.get(url_for('main.edit_service_notes', service_id=SERVICE_ONE_ID))
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert page.select_one('h1').text == "Edit service notes"
+    assert page.find('label', class_="form-label").text.strip() == "Notes"
+    assert page.find('textarea').attrs["name"] == "notes"
+
+
+def test_update_service_notes(
+        platform_admin_client,
+        service_one,
+        mock_update_service
+):
+    response = platform_admin_client.post(
+        url_for(
+            'main.edit_service_notes',
+            service_id=SERVICE_ONE_ID,
+        ),
+        data={'notes': "Very fluffy"}
+    )
+    assert response.status_code == 302
+    settings_url = url_for(
+        'main.service_settings', service_id=SERVICE_ONE_ID, _external=True)
+    assert settings_url == response.location
+    mock_update_service.assert_called_with(SERVICE_ONE_ID, notes="Very fluffy")

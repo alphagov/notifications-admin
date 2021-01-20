@@ -63,12 +63,13 @@
   {% endif %}
 {%- endmacro %}
 
-{% macro field(align='left', status='', border=True, colspan=None) -%}
+{% macro field(align='left', status='', border=True, colspan=None, wrap=False) -%}
 
     {% set field_alignment = 'table-field-right-aligned' if align == 'right' else 'table-field-left-aligned' %}
     {% set border = '' if border else 'table-field-noborder' %}
+    {% set wrap = 'table-field-wrap-text' if wrap else '' %}
 
-    <td class="{{ [field_alignment, border]|join(' ') }}" {% if colspan %}colspan="{{ colspan }}"{% endif %}>
+    <td class="{{ [field_alignment, border, wrap]|join(' ') }}" {% if colspan %}colspan="{{ colspan }}"{% endif %}>
       <div class="{{ 'table-field-status-' + status if status }}">{{ caller() }}</div>
     </td>
 {%- endmacro %}
@@ -85,8 +86,8 @@
   </td>
 {%- endmacro %}
 
-{% macro text_field(text, status='', truncate=false) -%}
-  {% call field(status=status) %}
+{% macro text_field(text, status='', truncate=false, wrap=False) -%}
+  {% call field(status=status, wrap=wrap) %}
     {% if text is iterable and text is not string %}
       <ul>
         {% for item in text %}
@@ -105,11 +106,12 @@
   {% endcall %}
 {%- endmacro %}
 
-{% macro optional_text_field(text, default='Not set', truncate=false) -%}
+{% macro optional_text_field(text, default='Not set', truncate=false, wrap=False) -%}
   {{ text_field(
     text or default,
     status='' if text else 'default',
-    truncate=truncate
+    truncate=truncate,
+    wrap=wrap
   ) }}
 {%- endmacro %}
 

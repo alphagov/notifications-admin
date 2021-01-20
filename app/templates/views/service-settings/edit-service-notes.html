@@ -1,0 +1,28 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/textbox.html" import textbox %}
+
+{% block service_page_title %}
+  Data retention
+{% endblock %}
+
+{% block maincolumn_content %}
+
+    {{ page_header(
+      'Edit service notes',
+      back_link=url_for('.service_settings', service_id=current_service.id)
+    ) }}
+    {% call form_wrapper() %}
+    {{ textbox(
+      form.notes,
+      rows=4,
+      width='1-1',
+      autofocus=True,
+      autosize=True,
+    ) }}
+      {{ page_footer('Save') }}
+    {% endcall %}
+
+{% endblock %}

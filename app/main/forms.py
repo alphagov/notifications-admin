@@ -1706,6 +1706,10 @@ class ServiceEditInboundNumberForm(StripWhitespaceForm):
     is_default = GovukCheckboxField("Make this text message sender the default")
 
 
+class EditServiceNotesForm(StripWhitespaceForm):
+    notes = TextAreaField(validators=[])
+
+
 class ServiceLetterContactBlockForm(StripWhitespaceForm):
     letter_contact_block = TextAreaField(
         validators=[
