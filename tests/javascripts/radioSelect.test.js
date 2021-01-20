@@ -179,6 +179,14 @@ describe('RadioSelect', () => {
 
       });
 
+      test("each button's semantics should show it controls another region and that region is collapsed", () => {
+
+        categoryButtons.forEach(btn => {
+          expect(btn.getAttribute('aria-expanded')).toEqual('false');
+        });
+
+      });
+
     });
 
   });
@@ -220,9 +228,9 @@ describe('RadioSelect', () => {
 
         });
 
-        test("keep focus on the default time slot", () => {
+        test("focus the first time slot", () => {
 
-          expect(document.activeElement).toBe(document.getElementById('scheduled_for-0'));
+          expect(document.activeElement).toBe(document.getElementById('scheduled_for-1'));
 
         });
 
@@ -241,6 +249,7 @@ describe('RadioSelect', () => {
 
       expect(button).not.toBeNull();
       expect(button.getAttribute('value')).toEqual('Done');
+      expect(button.getAttribute('aria-expanded')).toEqual('true');
 
     });
 
@@ -295,7 +304,7 @@ describe('RadioSelect', () => {
 
       test("focus the selected option", () => {
 
-        selectedOption = document.querySelector('.radio-select__column:nth-child(2) input[checked=checked]');
+        selectedOption = document.querySelector('.radio-select__column input[checked=checked]');
 
         expect(document.activeElement).toBe(selectedOption);
 
@@ -337,6 +346,14 @@ describe('RadioSelect', () => {
         expect(button.getAttribute('value')).toEqual('Choose a different time');
 
       })
+
+      test("focus the selected option", () => {
+
+        selectedOption = document.querySelector('.radio-select__column input[checked=checked]');
+
+        expect(document.activeElement).toBe(selectedOption);
+
+      });
 
     });
 
@@ -388,6 +405,14 @@ describe('RadioSelect', () => {
         expect(button.getAttribute('value')).toEqual('Choose a different time');
 
       })
+
+      test("focus the selected option", () => {
+
+        selectedOption = document.querySelector('.radio-select__column input[checked=checked]');
+
+        expect(document.activeElement).toBe(selectedOption);
+
+      });
 
     });
 

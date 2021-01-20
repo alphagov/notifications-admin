@@ -5,6 +5,7 @@
   var Modules = global.GOVUK.Modules;
   var Hogan = global.Hogan;
 
+  // Object holding all the states for the component's HTML
   let states = {
     'initial': Hogan.compile(`
       {{#showNowAsDefault}}
@@ -17,7 +18,7 @@
       {{/showNowAsDefault}}
       <div class="radio-select__column">
         {{#categories}}
-          <input type='button' class='govuk-button govuk-button--secondary radio-select__button--category' value='{{.}}' />
+          <input type='button' class='govuk-button govuk-button--secondary radio-select__button--category' aria-expanded="false" value='{{.}}' />
         {{/categories}}
       </div>
     `),
@@ -37,7 +38,7 @@
             <label for="{{id}}">{{label}}</label>
           </div>
         {{/choices}}
-        <input type='button' class='govuk-button govuk-button--secondary radio-select__button--done' value='Done' />
+        <input type='button' class='govuk-button govuk-button--secondary radio-select__button--done' aria-expanded='true' value='Done' />
       </div>
     `),
     'chosen': Hogan.compile(`
@@ -58,13 +59,19 @@
         {{/choices}}
       </div>
       <div class="radio-select__column">
-        <input type='button' class='govuk-button govuk-button--secondary radio-select__button--reset' value='Choose a different time' />
+        <input type='button' class='govuk-button govuk-button--secondary radio-select__button--reset' aria-expanded='false' value='Choose a different time' />
       </div>
     `)
   };
 
-  let focusSelected = function(component) {
-    $('[type=radio]:checked', component).focus();
+  let shiftFocus = function(elementToFocus, component) {
+    // The first option is always the default
+    if (elementToFocus === 'default') {
+      $('[type=radio]', component).eq(0).focus();
+    }
+    if (elementToFocus === 'option') {
+      $('[type=radio]', component).eq(1).focus();
+    }
   };
 
   Modules.RadioSelect = function() {
@@ -75,6 +82,7 @@
       let render = (state, data) => {
         $component.html(states[state].render(data));
       };
+      // store array of all options in component
       let choices = $('label', $component).toArray().map(function(element) {
         let $element = $(element);
         return {
@@ -90,12 +98,15 @@
         $component.data('show-now-as-default').toString() === 'true' ?
         {'name': name} : false
       );
+
+      // functions for changing the state of the component's HTML
       const reset = () => {
         render('initial', {
           'categories': categories,
           'name': name,
           'showNowAsDefault': showNowAsDefault
         });
+        shiftFocus('default', component);
       };
       const selectOption = (value) => {
         render('chosen', {
@@ -105,8 +116,10 @@
           'name': name,
           'showNowAsDefault': showNowAsDefault
         });
-        focusSelected(component);
+        shiftFocus('option', component);
       };
+
+      // use mousedown + mouseup event sequence to confirm option selection
       const trackMouseup = (event) => {
         const parentNode = event.target.parentNode;
 
@@ -121,6 +134,7 @@
         }
       };
 
+      // set events
       $component
         .on('click', '.radio-select__button--category', function(event) {
 
@@ -134,7 +148,7 @@
             'name': name,
             'showNowAsDefault': showNowAsDefault
           });
-          focusSelected(component);
+          shiftFocus('option', component);
 
         })
         .on('mousedown', '.js-option', function(event) {
@@ -169,23 +183,25 @@
               'name': name,
               'showNowAsDefault': showNowAsDefault
             });
+            shiftFocus('option', component);
 
           } else {
 
             reset();
+            shiftFocus('default', component);
 
           }
-          focusSelected(component);
 
         })
         .on('click', '.radio-select__button--reset', function(event) {
 
           event.preventDefault();
           reset();
-          focusSelected(component);
+          shiftFocus('default', component);
 
         });
 
+      // set HTML to initial state
       render('initial', {
         'categories': categories,
         'name': name,
