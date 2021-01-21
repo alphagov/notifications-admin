@@ -651,8 +651,13 @@ def merge_jsonlike(source, destination):
         return True
 
     def merge_lists(source, destination):
-        for item in destination:
-            if item not in source:
+        last_dest_idx = len(destination) - 1
+        for idx, item in enumerate(destination):
+            if idx <= last_dest_idx:
+                # assign destination value if can't be merged into source
+                if merge_items(source[idx], destination[idx]) is False:
+                    source[idx] = destination[idx]
+            else:
                 source.append(item)
 
     def merge_dicts(source, destination):
