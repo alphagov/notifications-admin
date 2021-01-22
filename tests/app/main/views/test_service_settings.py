@@ -100,6 +100,7 @@ def mock_get_service_settings_page_common(
         'Label Value Action',
         'Live Off Change service status',
         'Count in list of live services Yes Change if service is counted in list of live services',
+        'Billing details No billing details yet Change billing details for service',
         'Notes No notes yet Change the notes for the service',
         'Organisation Test organisation Central government Change organisation for service',
         'Rate limit 3,000 per minute Change rate limit',
