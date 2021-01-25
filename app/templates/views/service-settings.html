@@ -338,7 +338,7 @@
           {% call row() %}
             {{ text_field('Billing details')}}
             {{ optional_text_field(current_service.billing_details, default="No billing details yet", wrap=True) }}
-            {{ edit_field('Change', url_for('.service_settings', service_id=current_service.id), suffix='billing details for service') }}
+            {{ edit_field('Change', url_for('.edit_service_billing_details', service_id=current_service.id), suffix='billing details for service') }}
           {% endcall %}
 
           {% call row() %}

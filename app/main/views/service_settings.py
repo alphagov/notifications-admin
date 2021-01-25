@@ -1210,6 +1210,12 @@ def edit_service_notes(service_id):
     )
 
 
+@main.route("/services/<uuid:service_id>/edit-billing-details", methods=['GET', 'POST'])
+@user_is_platform_admin
+def edit_service_billing_details(service_id):
+    pass
+
+
 def get_branding_as_value_and_label(email_branding):
     return [
         (branding['id'], branding['name'])

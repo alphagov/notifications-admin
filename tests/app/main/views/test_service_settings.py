@@ -5283,3 +5283,20 @@ def test_update_service_notes(
         'main.service_settings', service_id=SERVICE_ONE_ID, _external=True)
     assert settings_url == response.location
     mock_update_service.assert_called_with(SERVICE_ONE_ID, notes="Very fluffy")
+
+
+def test_service_settings_links_to_edit_service_billing_details_page_for_platform_admins(
+    mocker,
+    service_one,
+    platform_admin_client,
+    no_reply_to_email_addresses,
+    no_letter_contact_blocks,
+    single_sms_sender,
+    mock_get_service_settings_page_common,
+    mock_get_organisation,
+):
+    response = platform_admin_client.get(url_for(
+        '.service_settings', service_id=SERVICE_ONE_ID
+    ))
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert len(page.find_all('a', attrs={'href': '/services/{}/edit-billing-details'.format(SERVICE_ONE_ID)})) == 1
