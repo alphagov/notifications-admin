@@ -5,7 +5,7 @@ import pytest
 from app.models.organisation import Organisation
 from app.models.service import Service
 from app.models.user import User
-from tests import organisation_json
+from tests import organisation_json, service_json
 from tests.conftest import ORGANISATION_ID
 
 INV_PARENT_FOLDER_ID = '7e979e79-d970-43a5-ac69-b625a8d147b0'
@@ -255,3 +255,13 @@ def test_bad_permission_raises(service_one):
     with pytest.raises(KeyError) as e:
         Service(service_one).has_permission('foo')
     assert str(e.value) == "'foo is not a service permission'"
+
+
+@pytest.mark.parametrize("purchase_order_number,expected_result", [
+    [None, None],
+    ["PO1234", [None, None, None, "PO1234"]]
+])
+def test_service_billing_details(purchase_order_number, expected_result):
+    service = Service(service_json(purchase_order_number=purchase_order_number))
+    service._dict['purchase_order_number'] = purchase_order_number
+    assert service.billing_details == expected_result
