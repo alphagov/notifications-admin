@@ -80,10 +80,13 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         data = _attach_current_user(kwargs)
         disallowed_attributes = set(data.keys()) - {
             'active',
+            'billing_contact_email_address',
+            'billing_contact_name',
+            'billing_reference',
             'consent_to_research',
             'contact_link',
-            'count_as_live',
             'created_by',
+            'count_as_live',
             'email_branding',
             'email_from',
             'free_sms_fragment_limit',
@@ -97,6 +100,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             'organisation_type',
             'permissions',
             'prefix_sms',
+            'purchase_order_number',
             'rate_limit',
             'reply_to_email_address',
             'research_mode',
