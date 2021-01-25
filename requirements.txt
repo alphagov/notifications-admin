@@ -9,7 +9,7 @@ awscli-cwlogs==1.4.6      # via -r requirements.in
 awscli==1.18.219          # via awscli-cwlogs, notifications-utils
 bleach==3.2.2             # via notifications-utils
 blinker==1.4              # via -r requirements.in, gds-metrics
-boto3==1.16.51            # via notifications-utils
+boto3==1.16.59            # via notifications-utils
 botocore==1.19.51         # via awscli, boto3, s3transfer
 cachetools==4.2.0         # via notifications-utils
 certifi==2020.12.5        # via requests
