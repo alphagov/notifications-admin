@@ -151,6 +151,10 @@ def service_json(
     organisation_id=None,
     rate_limit=3000,
     notes=None,
+    billing_contact_email_address=None,
+    billing_contact_name=None,
+    billing_reference=None,
+    purchase_order_number=None
 ):
     if users is None:
         users = []
@@ -189,7 +193,11 @@ def service_json(
         'consent_to_research': True,
         'count_as_live': True,
         'organisation': organisation_id,
-        'notes': notes
+        'notes': notes,
+        'billing_contact_email_address': billing_contact_email_address,
+        'billing_contact_name': billing_contact_name,
+        'billing_reference': billing_reference,
+        'purchase_order_number': purchase_order_number,
     }
 
 

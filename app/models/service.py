@@ -30,8 +30,16 @@ class Service(JSONModel):
 
     ALLOWED_PROPERTIES = {
         'active',
+        'allowed_broadcast_provider',
+        'billing_contact_email_address',
+        'billing_contact_name',
+        'billing_reference',
+        'consent_to_research',
         'contact_link',
+        'count_as_live',
         'email_from',
+        'go_live_at',
+        'go_live_user',
         'id',
         'inbound_api',
         'message_limit',
@@ -39,16 +47,12 @@ class Service(JSONModel):
         'name',
         'notes',
         'prefix_sms',
+        'purchase_order_number',
         'research_mode',
         'service_callback_api',
         'volume_email',
         'volume_sms',
         'volume_letter',
-        'consent_to_research',
-        'count_as_live',
-        'go_live_user',
-        'go_live_at',
-        'allowed_broadcast_provider',
     }
 
     TEMPLATE_TYPES = (
@@ -75,6 +79,19 @@ class Service(JSONModel):
     @property
     def permissions(self):
         return self._dict.get('permissions', self.TEMPLATE_TYPES)
+
+    @property
+    def billing_details(self):
+        billing_details = [
+            self.billing_contact_email_address,
+            self.billing_contact_name,
+            self.billing_reference,
+            self.purchase_order_number
+        ]
+        if any(billing_details):
+            return billing_details
+        else:
+            return None
 
     def update(self, **kwargs):
         return service_api_client.update_service(self.id, **kwargs)
