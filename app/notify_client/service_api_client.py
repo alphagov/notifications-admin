@@ -7,12 +7,7 @@ from app.notify_client import NotifyAdminAPIClient, _attach_current_user, cache
 class ServiceAPIClient(NotifyAdminAPIClient):
 
     def _delete_template_cache_for_service(self, service_id):
-        templates_for_service = self.get_service_templates(service_id)['data']
-        if templates_for_service:
-            redis_client.delete(*[
-                f"service-{service_id}-template-{x['id']}-version-None"
-                for x in templates_for_service
-            ])
+        redis_client.delete_cache_keys_by_pattern(f"service-{service_id}-template-*")
 
     @cache.delete('user-{user_id}')
     def create_service(
@@ -109,12 +104,12 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             'go_live_user',
             'go_live_at',
             'rate_limit',
-            'notes',
         }
         if disallowed_attributes:
             raise TypeError('Not allowed to update service attributes: {}'.format(
                 ", ".join(disallowed_attributes)
             ))
+
         endpoint = "/service/{0}".format(service_id)
         return self.post(endpoint, data)
 
@@ -143,7 +138,9 @@ class ServiceAPIClient(NotifyAdminAPIClient):
     def archive_service(self, service_id, cached_service_user_ids):
         if cached_service_user_ids:
             redis_client.delete(*map('user-{}'.format, cached_service_user_ids))
-        return self.post('/service/{}/archive'.format(service_id), data=None)
+        ret = self.post('/service/{}/archive'.format(service_id), data=None)
+        self._delete_template_cache_for_service(str(service_id))
+        return ret
 
     @cache.delete('service-{service_id}')
     def suspend_service(self, service_id):
@@ -191,7 +188,6 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         return self.post(endpoint, data)
 
     @cache.delete('service-{service_id}-templates')
-    @cache.delete('service-{service_id}-template-{id_}-version-None')
     @cache.delete('service-{service_id}-template-{id_}-versions')
     def update_service_template(
         self, id_, name, type_, content, service_id, subject=None, process_type=None
@@ -216,40 +212,44 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             })
         data = _attach_current_user(data)
         endpoint = "/service/{0}/template/{1}".format(service_id, id_)
+        self._delete_template_cache_for_service(service_id)
         return self.post(endpoint, data)
 
     @cache.delete('service-{service_id}-templates')
-    @cache.delete('service-{service_id}-template-{id_}-version-None')
     @cache.delete('service-{service_id}-template-{id_}-versions')
     def redact_service_template(self, service_id, id_):
-        return self.post(
+        ret = self.post(
             "/service/{}/template/{}".format(service_id, id_),
             _attach_current_user(
                 {'redact_personalisation': True}
             ),
         )
+        self._delete_template_cache_for_service(service_id)
+        return ret
 
     @cache.delete('service-{service_id}-templates')
-    @cache.delete('service-{service_id}-template-{template_id}-version-None')
     @cache.delete('service-{service_id}-template-{template_id}-versions')
     def update_service_template_sender(self, service_id, template_id, reply_to):
         data = {
             'reply_to': reply_to,
         }
         data = _attach_current_user(data)
-        return self.post(
+        ret = self.post(
             "/service/{0}/template/{1}".format(service_id, template_id),
             data
         )
+        self._delete_template_cache_for_service(service_id)
+        return ret
 
     @cache.delete('service-{service_id}-templates')
-    @cache.delete('service-{service_id}-template-{template_id}-version-None')
     @cache.delete('service-{service_id}-template-{template_id}-versions')
     def update_service_template_postage(self, service_id, template_id, postage):
-        return self.post(
+        ret = self.post(
             "/service/{0}/template/{1}".format(service_id, template_id),
             _attach_current_user({'postage': postage})
         )
+        self._delete_template_cache_for_service(service_id)
+        return ret
 
     @cache.set('service-{service_id}-template-{template_id}-version-{version}')
     def get_service_template(self, service_id, template_id, version=None):
@@ -301,7 +301,6 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         ])
 
     @cache.delete('service-{service_id}-templates')
-    @cache.delete('service-{service_id}-template-{template_id}-version-None')
     @cache.delete('service-{service_id}-template-{template_id}-versions')
     def delete_service_template(self, service_id, template_id):
         """
@@ -312,6 +311,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             'archived': True
         }
         data = _attach_current_user(data)
+        self._delete_template_cache_for_service(service_id)
         return self.post(endpoint, data=data)
 
     def is_service_name_unique(self, service_id, name, email_from):

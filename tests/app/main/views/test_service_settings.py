@@ -3976,10 +3976,12 @@ def test_archive_service_after_confirm(
     mock_get_service_and_organisation_counts,
     mock_get_organisations_and_services_for_user,
     mock_get_users_by_service,
+    mock_get_service_templates,
     user,
 ):
     mocked_fn = mocker.patch('app.service_api_client.post')
     redis_delete_mock = mocker.patch('app.notify_client.service_api_client.redis_client.delete')
+    mocker.patch('app.notify_client.service_api_client.redis_client.delete_cache_keys_by_pattern')
     client_request.login(user)
     page = client_request.post(
         'main.archive_service',
