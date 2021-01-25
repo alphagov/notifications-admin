@@ -67,7 +67,7 @@ pyyaml==5.4.1             # via awscli, notifications-utils
 redis==3.5.3              # via flask-redis
 requests==2.25.1          # via awscli-cwlogs, govuk-bank-holidays, notifications-python-client, notifications-utils
 rsa==4.7                  # via awscli
-s3transfer==0.3.3         # via awscli, boto3
+s3transfer==0.3.4         # via awscli, boto3
 shapely==1.7.1            # via -r requirements.in
 six==1.15.0               # via awscli-cwlogs, bleach, eventlet, govuk-bank-holidays, python-dateutil
 smartypants==2.0.1        # via notifications-utils
