@@ -6,8 +6,8 @@ from pathlib import Path
 
 import geojson
 from notifications_utils.formatters import formatted_list
+from notifications_utils.polygons import Polygons
 
-from polygons import Polygons
 from populations import (
     BRYHER,
     CITY_OF_LONDON,

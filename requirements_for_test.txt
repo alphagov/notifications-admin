@@ -55,10 +55,10 @@ lxml==4.6.2               # via -r requirements.txt, pyexcel-ezodf, pyexcel-ods3
 markupsafe==1.1.1         # via -r requirements.txt, jinja2, wtforms
 mccabe==0.6.1             # via flake8
 mistune==0.8.4            # via -r requirements.txt, notifications-utils
-monotonic==1.5            # via -r requirements.txt, notifications-python-client, notifications-utils
+monotonic==1.5            # via -r requirements.txt, notifications-python-client
 more-itertools==8.6.0     # via pytest
 notifications-python-client==5.7.1  # via -r requirements.txt
-git+https://github.com/alphagov/notifications-utils.git@43.7.0#egg=notifications-utils==43.7.0  # via -r requirements.txt
+git+https://github.com/alphagov/notifications-utils.git@43.8.0#egg=notifications-utils==43.8.0  # via -r requirements.txt
 openpyxl==3.0.5           # via -r requirements.txt, pyexcel-xlsx
 orderedset==2.0.3         # via -r requirements.txt, notifications-utils
 packaging==20.8           # via -r requirements.txt, bleach, pytest
@@ -92,7 +92,7 @@ requests-mock==1.7.0      # via -r requirements_for_test.in
 requests==2.25.1          # via -r requirements.txt, awscli-cwlogs, govuk-bank-holidays, notifications-python-client, notifications-utils, requests-mock
 rsa==4.5                  # via -r requirements.txt, awscli
 s3transfer==0.3.3         # via -r requirements.txt, awscli, boto3
-shapely==1.7.1            # via -r requirements.txt
+shapely==1.7.1            # via -r requirements.txt, notifications-utils
 six==1.15.0               # via -r requirements.txt, awscli-cwlogs, bleach, eventlet, flake8-print, freezegun, govuk-bank-holidays, pytest-xdist, python-dateutil, requests-mock
 smartypants==2.0.1        # via -r requirements.txt, notifications-utils
 soupsieve==2.1            # via beautifulsoup4

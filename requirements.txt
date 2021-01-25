@@ -42,9 +42,9 @@ lml==0.1.0                # via pyexcel, pyexcel-io
 lxml==4.6.2               # via pyexcel-ezodf, pyexcel-ods3
 markupsafe==1.1.1         # via jinja2, wtforms
 mistune==0.8.4            # via notifications-utils
-monotonic==1.5            # via notifications-python-client, notifications-utils
+monotonic==1.5            # via notifications-python-client
 notifications-python-client==5.7.1  # via -r requirements.in
-git+https://github.com/alphagov/notifications-utils.git@43.7.0#egg=notifications-utils==43.7.0  # via -r requirements.in
+git+https://github.com/alphagov/notifications-utils.git@43.8.0#egg=notifications-utils==43.8.0  # via -r requirements.in
 openpyxl==3.0.5           # via pyexcel-xlsx
 orderedset==2.0.3         # via notifications-utils
 packaging==20.8           # via bleach
@@ -68,7 +68,7 @@ redis==3.5.3              # via flask-redis
 requests==2.25.1          # via awscli-cwlogs, govuk-bank-holidays, notifications-python-client, notifications-utils
 rsa==4.5                  # via awscli
 s3transfer==0.3.3         # via awscli, boto3
-shapely==1.7.1            # via -r requirements.in
+shapely==1.7.1            # via -r requirements.in, notifications-utils
 six==1.15.0               # via awscli-cwlogs, bleach, eventlet, govuk-bank-holidays, python-dateutil
 smartypants==2.0.1        # via notifications-utils
 statsd==3.3.0             # via notifications-utils

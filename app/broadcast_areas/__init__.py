@@ -1,8 +1,8 @@
 from notifications_utils.formatters import formatted_list
+from notifications_utils.polygons import Polygons
 from notifications_utils.serialised_model import SerialisedModelCollection
 from werkzeug.utils import cached_property
 
-from .polygons import Polygons
 from .populations import CITY_OF_LONDON
 from .repo import BroadcastAreasRepository
 
