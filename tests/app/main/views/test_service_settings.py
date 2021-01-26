@@ -5309,7 +5309,7 @@ def test_view_edit_service_billing_details(
 ):
     response = platform_admin_client.get(url_for('main.edit_service_billing_details', service_id=SERVICE_ONE_ID))
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    assert page.select_one('h1').text == "Change service billing details"
+    assert page.select_one('h1').text == "Change billing details"
     labels = page.find_all('label', class_="form-label")
     labels_list = [
         'Billing contact email address', 'Billing contact name', 'Billing reference', 'Purchase order number'
@@ -5317,7 +5317,9 @@ def test_view_edit_service_billing_details(
     for label in labels:
         assert label.text.strip() in labels_list
     textbox_names = page.find_all('input', class_='govuk-input govuk-!-width-two-thirds')
-    names_list = ['billing_contact_email_address', 'billing_contact_name', 'billing_reference', 'purchase_order_number']
+    names_list = [
+        'billing_contact_email_addresses', 'billing_contact_names', 'billing_reference', 'purchase_order_number'
+    ]
 
     for name in textbox_names:
         assert name.attrs["name"] in names_list
@@ -5334,8 +5336,8 @@ def test_update_service_billing_details(
             service_id=SERVICE_ONE_ID,
         ),
         data={
-            'billing_contact_email_address': 'accounts@fluff.gov.uk',
-            'billing_contact_name': 'Flannellette von Fluff',
+            'billing_contact_email_addresses': 'accounts@fluff.gov.uk',
+            'billing_contact_names': 'Flannellette von Fluff',
             'billing_reference': '',
             'purchase_order_number': 'PO1234'
         }
@@ -5346,8 +5348,8 @@ def test_update_service_billing_details(
     assert response.location == settings_url
     mock_update_service.assert_called_with(
         SERVICE_ONE_ID,
-        billing_contact_email_address='accounts@fluff.gov.uk',
-        billing_contact_name='Flannellette von Fluff',
+        billing_contact_email_addresses='accounts@fluff.gov.uk',
+        billing_contact_names='Flannellette von Fluff',
         billing_reference='',
         purchase_order_number='PO1234'
     )

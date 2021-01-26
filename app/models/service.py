@@ -31,8 +31,8 @@ class Service(JSONModel):
     ALLOWED_PROPERTIES = {
         'active',
         'allowed_broadcast_provider',
-        'billing_contact_email_address',
-        'billing_contact_name',
+        'billing_contact_email_addresses',
+        'billing_contact_names',
         'billing_reference',
         'consent_to_research',
         'contact_link',
@@ -83,8 +83,8 @@ class Service(JSONModel):
     @property
     def billing_details(self):
         billing_details = [
-            self.billing_contact_email_address,
-            self.billing_contact_name,
+            self.billing_contact_email_addresses,
+            self.billing_contact_names,
             self.billing_reference,
             self.purchase_order_number
         ]

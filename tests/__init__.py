@@ -151,8 +151,8 @@ def service_json(
     organisation_id=None,
     rate_limit=3000,
     notes=None,
-    billing_contact_email_address=None,
-    billing_contact_name=None,
+    billing_contact_email_addresses=None,
+    billing_contact_names=None,
     billing_reference=None,
     purchase_order_number=None
 ):
@@ -194,8 +194,8 @@ def service_json(
         'count_as_live': True,
         'organisation': organisation_id,
         'notes': notes,
-        'billing_contact_email_address': billing_contact_email_address,
-        'billing_contact_name': billing_contact_name,
+        'billing_contact_email_addresses': billing_contact_email_addresses,
+        'billing_contact_names': billing_contact_names,
         'billing_reference': billing_reference,
         'purchase_order_number': purchase_order_number,
     }

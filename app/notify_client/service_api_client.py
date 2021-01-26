@@ -80,8 +80,8 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         data = _attach_current_user(kwargs)
         disallowed_attributes = set(data.keys()) - {
             'active',
-            'billing_contact_email_address',
-            'billing_contact_name',
+            'billing_contact_email_addresses',
+            'billing_contact_names',
             'billing_reference',
             'consent_to_research',
             'contact_link',
