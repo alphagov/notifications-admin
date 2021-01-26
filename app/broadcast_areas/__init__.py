@@ -89,6 +89,41 @@ class BroadcastArea(SortableMixin):
             id = parent_broadcast_area.id
 
 
+class CustomBroadcastArea:
+
+    # We don’t yet have a way to estimate the number of phones in a
+    # user-defined polygon
+    count_of_phones = 0
+
+    def __init__(self, *, name, polygons=None):
+        self.name = name
+        self._polygons = polygons or []
+
+    @property
+    def polygons(self):
+        return Polygons(
+            # Polygons in the DB are stored with the coordinate pair
+            # order flipped – this flips them back again
+            Polygons(self._polygons).as_coordinate_pairs_lat_long
+        )
+
+    simple_polygons = polygons
+
+
+class CustomBroadcastAreas(SerialisedModelCollection):
+    model = CustomBroadcastArea
+
+    def __init__(self, *, areas, polygons):
+        self.items = areas
+        self._polygons = polygons
+
+    def __getitem__(self, index):
+        return self.model(
+            name=self.items[index],
+            polygons=self._polygons if index == 0 else None,
+        )
+
+
 class BroadcastAreaLibrary(SerialisedModelCollection, SortableMixin, GetItemByIdMixin):
 
     model = BroadcastArea

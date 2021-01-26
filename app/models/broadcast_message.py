@@ -5,7 +5,7 @@ from notifications_utils.template import BroadcastPreviewTemplate
 from orderedset import OrderedSet
 from werkzeug.utils import cached_property
 
-from app.broadcast_areas import broadcast_area_libraries
+from app.broadcast_areas import CustomBroadcastAreas, broadcast_area_libraries
 from app.broadcast_areas.polygons import Polygons
 from app.formatters import round_to_significant_figures
 from app.models import JSONModel, ModelList
@@ -74,7 +74,12 @@ class BroadcastMessage(JSONModel):
 
     @property
     def areas(self):
-        return self.get_areas(areas=self._dict['areas'])
+        return self.get_areas(
+            areas=self._dict['areas']
+        ) or CustomBroadcastAreas(
+            areas=self._dict['areas'],
+            polygons=self._dict['simple_polygons'],
+        )
 
     @property
     def parent_areas(self):

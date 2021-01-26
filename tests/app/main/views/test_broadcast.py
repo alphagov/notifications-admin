@@ -684,6 +684,53 @@ def test_preview_broadcast_areas_page(
     ] == estimates
 
 
+def test_preview_broadcast_areas_page_with_custom_polygons(
+    mocker,
+    client_request,
+    service_one,
+    fake_uuid,
+):
+    service_one['permissions'] += ['broadcast']
+    mocker.patch(
+        'app.broadcast_message_api_client.get_broadcast_message',
+        return_value=broadcast_message_json(
+            id_=fake_uuid,
+            template_id=fake_uuid,
+            created_by_id=fake_uuid,
+            service_id=SERVICE_ONE_ID,
+            status='draft',
+            areas=['Area one', 'Area two', 'Area three'],
+            simple_polygons=[
+                [[1, 2], [3, 4], [5, 6]],
+                [[7, 8], [9, 10], [11, 12]],
+            ],
+        ),
+    )
+    page = client_request.get(
+        '.preview_broadcast_areas',
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+    )
+
+    assert [
+        normalize_spaces(item.text)
+        for item in page.select('ul.area-list li.area-list-item')
+    ] == [
+        'Area one remove', 'Area two remove', 'Area three remove',
+    ]
+
+    assert len(page.select('#area-list-map')) == 1
+
+    assert [
+        normalize_spaces(item.text)
+        for item in page.select('ul li.area-list-key')
+    ] == [
+        'An area of 722.3 square miles Will get the alert',
+        'An extra area of 1,402.5 square miles is Likely to get the alert',
+        '0 phones estimated',
+    ]
+
+
 @pytest.mark.parametrize('areas, expected_list', (
     ([], [
         'Countries',
