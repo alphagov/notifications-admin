@@ -209,11 +209,13 @@ def user_profile_disable_platform_admin_view():
         abort(403)
 
     form = ServiceOnOffSettingForm(
-        name="Signing in again clears this setting",
+        name="Use platform admin view",
         enabled=not session.get('disable_platform_admin_view'),
         truthy='Yes',
         falsey='No',
     )
+
+    form.enabled.param_extensions = {"hint": {"text": "Signing in again clears this setting"}}
 
     if form.validate_on_submit():
         session['disable_platform_admin_view'] = not form.enabled.data
