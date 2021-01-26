@@ -1215,16 +1215,16 @@ def edit_service_notes(service_id):
 @user_is_platform_admin
 def edit_service_billing_details(service_id):
     form = ServiceBillingDetailsForm(
-        billing_contact_email_address=current_service.billing_contact_email_address,
-        billing_contact_name=current_service.billing_contact_name,
+        billing_contact_email_addresses=current_service.billing_contact_email_addresses,
+        billing_contact_names=current_service.billing_contact_names,
         billing_reference=current_service.billing_reference,
         purchase_order_number=current_service.purchase_order_number
     )
 
     if form.validate_on_submit():
         current_service.update(
-            billing_contact_email_address=form.billing_contact_email_address.data,
-            billing_contact_name=form.billing_contact_name.data,
+            billing_contact_email_addresses=form.billing_contact_email_addresses.data,
+            billing_contact_names=form.billing_contact_names.data,
             billing_reference=form.billing_reference.data,
             purchase_order_number=form.purchase_order_number.data
         )
