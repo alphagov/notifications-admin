@@ -630,6 +630,8 @@ def test_get_sample_template_returns_template(template_type):
     ([{"b": "c"}], [{"b": "e"}], [{"b": "e"}]),
     # if nested dicts in lists have different keys, additive behaviour
     ([{"b": "c"}], [{"d": {"e": "f"}}], [{"b": "c", "d": {"e": "f"}}]),
+    # if dicts in destination list but not source, they just get added to end of source
+    ([{"a": "b"}], [{"a": "b"}, {"a": "b"}, {"c": "d"}], [{"a": "b"}, {"a": "b"}, {"c": "d"}]),
     # merge a dict with a null object returns that dict (does not work the other way round)
     ({"a": {"b": "c"}}, None, {"a": {"b": "c"}}),
     # double nested dicts, new adds new Boolean key: value, additive behaviour
