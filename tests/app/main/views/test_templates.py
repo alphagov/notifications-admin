@@ -531,7 +531,7 @@ def test_broadcast_template_doesnt_highlight_placeholders_but_does_count_charact
     )
 
 
-def test_caseworker_redirected_to_one_off(
+def test_caseworker_redirected_to_set_sender_for_one_off(
     client_request,
     mock_get_service_templates,
     mock_get_service_template,
@@ -548,7 +548,7 @@ def test_caseworker_redirected_to_one_off(
         template_id=fake_uuid,
         _expected_status=302,
         _expected_redirect=url_for(
-            'main.send_one_off',
+            'main.set_sender',
             service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
             _external=True,
@@ -556,7 +556,7 @@ def test_caseworker_redirected_to_one_off(
     )
 
 
-def test_user_with_only_send_and_view_redirected_to_one_off(
+def test_user_with_only_send_and_view_redirected_to_set_sender_for_one_off(
     client_request,
     mock_get_service_templates,
     mock_get_service_template,
@@ -575,7 +575,7 @@ def test_user_with_only_send_and_view_redirected_to_one_off(
         template_id=fake_uuid,
         _expected_status=302,
         _expected_redirect=url_for(
-            'main.send_one_off',
+            'main.set_sender',
             service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
             _external=True,

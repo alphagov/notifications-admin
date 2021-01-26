@@ -65,7 +65,7 @@ def view_template(service_id, template_id):
 
     if should_skip_template_page(template['template_type']):
         return redirect(url_for(
-            '.send_one_off', service_id=service_id, template_id=template_id
+            '.set_sender', service_id=service_id, template_id=template_id
         ))
 
     page_count = get_page_count_for_letter(template)
