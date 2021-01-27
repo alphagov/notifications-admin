@@ -45,6 +45,10 @@ class BroadcastMessage(JSONModel):
             return True
         if not self.starts_at and other.starts_at:
             return False
+        if self.updated_at and not other.updated_at:
+            return self.updated_at < other.created_at
+        if not self.updated_at and other.updated_at:
+            return self.created_at < other.updated_at
         return self.updated_at < other.updated_at
 
     @classmethod
@@ -129,7 +133,7 @@ class BroadcastMessage(JSONModel):
 
     @cached_property
     def created_by(self):
-        return User.from_id(self.created_by_id)
+        return User.from_id(self.created_by_id) if self.created_by_id else None
 
     @cached_property
     def approved_by(self):

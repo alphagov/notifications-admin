@@ -727,7 +727,7 @@ def test_preview_broadcast_areas_page_with_custom_polygons(
     ] == [
         'An area of 722.3 square miles Will get the alert',
         'An extra area of 1,402.5 square miles is Likely to get the alert',
-        '0 phones estimated',
+        'Unknown number of phones',
     ]
 
 
@@ -1307,8 +1307,8 @@ def test_start_broadcasting(
     )
 
 
-@pytest.mark.parametrize('endpoint, extra_fields, expected_paragraphs', (
-    ('.view_current_broadcast', {
+@pytest.mark.parametrize('endpoint, created_by_api, extra_fields, expected_paragraphs', (
+    ('.view_current_broadcast', False, {
         'status': 'broadcasting',
         'finishes_at': '2020-02-23T23:23:23.000000',
     }, [
@@ -1316,7 +1316,15 @@ def test_start_broadcasting(
         'Prepared by Alice and approved by Bob.',
         'Broadcasting stops tomorrow at 11:23pm.'
     ]),
-    ('.view_previous_broadcast', {
+    ('.view_current_broadcast', True, {
+        'status': 'broadcasting',
+        'finishes_at': '2020-02-23T23:23:23.000000',
+    }, [
+        'Live since 20 February at 8:20pm Stop broadcasting',
+        'Created from an API call and approved by Alice.',
+        'Broadcasting stops tomorrow at 11:23pm.'
+    ]),
+    ('.view_previous_broadcast', False, {
         'status': 'broadcasting',
         'finishes_at': '2020-02-22T22:20:20.000000',  # 2 mins before now()
     }, [
@@ -1324,7 +1332,15 @@ def test_start_broadcasting(
         'Prepared by Alice and approved by Bob.',
         'Finished broadcasting today at 10:20pm.'
     ]),
-    ('.view_previous_broadcast', {
+    ('.view_previous_broadcast', True, {
+        'status': 'broadcasting',
+        'finishes_at': '2020-02-22T22:20:20.000000',  # 2 mins before now()
+    }, [
+        'Broadcast on 20 February at 8:20pm.',
+        'Created from an API call and approved by Alice.',
+        'Finished broadcasting today at 10:20pm.'
+    ]),
+    ('.view_previous_broadcast', False, {
         'status': 'completed',
         'finishes_at': '2020-02-21T21:21:21.000000',
     }, [
@@ -1332,7 +1348,7 @@ def test_start_broadcasting(
         'Prepared by Alice and approved by Bob.',
         'Finished broadcasting yesterday at 9:21pm.',
     ]),
-    ('.view_previous_broadcast', {
+    ('.view_previous_broadcast', False, {
         'status': 'cancelled',
         'cancelled_by_id': sample_uuid,
         'cancelled_at': '2020-02-21T21:21:21.000000',
@@ -1351,6 +1367,7 @@ def test_view_broadcast_message_page(
     mock_get_broadcast_template,
     fake_uuid,
     endpoint,
+    created_by_api,
     extra_fields,
     expected_paragraphs,
 ):
@@ -1360,7 +1377,7 @@ def test_view_broadcast_message_page(
             id_=fake_uuid,
             service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
-            created_by_id=fake_uuid,
+            created_by_id=None if created_by_api else fake_uuid,
             approved_by_id=fake_uuid,
             starts_at='2020-02-20T20:20:20.000000',
             **extra_fields
@@ -1554,6 +1571,49 @@ def test_view_pending_broadcast_without_template(
         normalize_spaces(page.select_one('.banner').text)
     ) == (
         'Test User wants to broadcast No template test '
+        'Start broadcasting now Reject this alert'
+    )
+    assert (
+        normalize_spaces(page.select_one('.broadcast-message-wrapper').text)
+    ) == (
+        'Emergency alert '
+        'Uh-oh'
+    )
+
+
+@freeze_time('2020-02-22T22:22:22.000000')
+def test_view_pending_broadcast_from_api_call(
+    mocker,
+    client_request,
+    service_one,
+    active_user_with_permissions,
+    fake_uuid,
+):
+    mocker.patch(
+        'app.broadcast_message_api_client.get_broadcast_message',
+        return_value=broadcast_message_json(
+            id_=fake_uuid,
+            service_id=SERVICE_ONE_ID,
+            template_id=None,
+            created_by_id=None,  # No user created this broadcast
+            finishes_at=None,
+            status='pending-approval',
+            reference='abc123',
+            content='Uh-oh',
+        ),
+    )
+    service_one['permissions'] += ['broadcast']
+
+    page = client_request.get(
+        '.view_current_broadcast',
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+    )
+
+    assert (
+        normalize_spaces(page.select_one('.banner').text)
+    ) == (
+        'An API call wants to broadcast abc123 '
         'Start broadcasting now Reject this alert'
     )
     assert (

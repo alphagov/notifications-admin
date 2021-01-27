@@ -19,10 +19,15 @@
 
 {% block service_page_title %}
   {% if broadcast_message.status == 'pending-approval' %}
-    {% if broadcast_message.created_by == current_user and current_user.has_permissions('send_messages') %}
+    {% if broadcast_message.created_by and broadcast_message.created_by == current_user and current_user.has_permissions('send_messages') %}
       {{ broadcast_message.template.name }} is waiting for approval
     {% elif current_user.has_permissions('send_messages') %}
-      {{ broadcast_message.created_by.name }} wants to broadcast
+      {% if broadcast_message.created_by %}
+        {{ broadcast_message.created_by.name }}
+      {% else %}
+        An API call
+      {% endif %}
+      wants to broadcast
       {{ broadcast_message.template.name }}
     {% else %}
       This alert is waiting for approval
@@ -37,7 +42,7 @@
   {{ govukBackLink({ "href": back_link }) }}
 
   {% if broadcast_message.status == 'pending-approval' %}
-    {% if broadcast_message.created_by == current_user and current_user.has_permissions('send_messages') %}
+    {% if broadcast_message.created_by and broadcast_message.created_by == current_user and current_user.has_permissions('send_messages') %}
       <div class="banner govuk-!-margin-bottom-6">
         <h1 class="govuk-heading-m govuk-!-margin-bottom-3">
           {{ broadcast_message.template.name }} is waiting for approval
@@ -79,7 +84,12 @@
     {% elif current_user.has_permissions('send_messages') %}
       {% call form_wrapper(class="banner govuk-!-margin-bottom-6") %}
         <h1 class="govuk-heading-m govuk-!-margin-top-0 govuk-!-margin-bottom-3">
-          {{ broadcast_message.created_by.name }} wants to broadcast
+          {% if broadcast_message.created_by %}
+            {{ broadcast_message.created_by.name }}
+          {% else %}
+            An API call
+          {% endif %}
+          wants to broadcast
           {{ broadcast_message.template.name }}
         </h1>
         {{ page_footer(
@@ -138,8 +148,12 @@
 
   {% if broadcast_message.status != 'pending-approval' %}
     <p class="govuk-body govuk-!-margin-bottom-3">
-      Prepared by {{ broadcast_message.created_by.name }} and approved by
-      {{ broadcast_message.approved_by.name }}.
+      {% if broadcast_message.created_by %}
+        Prepared by {{ broadcast_message.created_by.name }}
+      {% else %}
+        Created from an API call
+      {% endif %}
+      and approved by {{ broadcast_message.approved_by.name }}.
     </p>
   {% endif %}
 
