@@ -637,30 +637,6 @@ class RegisterUserFromOrgInviteForm(StripWhitespaceForm):
     auth_type = HiddenField('auth_type', validators=[DataRequired()])
 
 
-def extend_params(params, extensions):
-    items = None
-    param_items = len(params['items']) if 'items' in params else 0
-
-    # split items off from params to make it a pure dict
-    if 'items' in extensions:
-        items = extensions['items']
-        del extensions['items']
-
-    # merge dicts
-    merge_jsonlike(params, extensions)
-
-    # merge items
-    if items:
-        if 'items' not in params:
-            params['items'] = items
-        else:
-            for idx, _item in enumerate(items):
-                if idx >= param_items:
-                    params['items'].append(items[idx])
-                else:
-                    params['items'][idx].update(items[idx])
-
-
 def govuk_checkbox_field_widget(self, field, param_extensions=None, **kwargs):
 
     # error messages
@@ -692,11 +668,11 @@ def govuk_checkbox_field_widget(self, field, param_extensions=None, **kwargs):
 
     # extend default params with any sent in during instantiation
     if self.param_extensions:
-        extend_params(params, self.param_extensions)
+        merge_jsonlike(params, self.param_extensions)
 
     # add any sent in though use in templates
     if param_extensions:
-        extend_params(params, param_extensions)
+        merge_jsonlike(params, param_extensions)
 
     return Markup(
         render_template('forms/fields/checkboxes/macro.njk', params=params))
@@ -748,11 +724,11 @@ def govuk_checkboxes_field_widget(self, field, wrap_in_collapsible=False, param_
 
     # extend default params with any sent in during instantiation
     if self.param_extensions:
-        extend_params(params, self.param_extensions)
+        merge_jsonlike(params, self.param_extensions)
 
     # add any sent in though use in templates
     if param_extensions:
-        extend_params(params, param_extensions)
+        merge_jsonlike(params, param_extensions)
 
     if wrap_in_collapsible:
 
@@ -802,11 +778,11 @@ def govuk_radios_field_widget(self, field, param_extensions=None, **kwargs):
 
     # extend default params with any sent in during instantiation
     if self.param_extensions:
-        extend_params(params, self.param_extensions)
+        merge_jsonlike(params, self.param_extensions)
 
     # add any sent in though use in templates
     if param_extensions:
-        extend_params(params, param_extensions)
+        merge_jsonlike(params, param_extensions)
 
     return Markup(
         render_template('components/radios/template.njk', params=params))
