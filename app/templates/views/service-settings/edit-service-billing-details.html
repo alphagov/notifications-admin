@@ -4,6 +4,8 @@
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 
+{% from "components/textbox.html" import textbox %}
+
 {% block service_page_title %}
   Change billing details
 {% endblock %}
@@ -16,10 +18,17 @@
   ) }}
 
   {% call form_wrapper() %}
-    {{ form.billing_contact_names }}
-    {{ form.billing_contact_email_addresses }}
-    {{ form.billing_reference }}
-    {{ form.purchase_order_number }}
+    {{ form.billing_contact_names(param_extensions={"classes": "govuk-!-width-full"}) }}
+    {{ form.billing_contact_email_addresses(param_extensions={"classes": "govuk-!-width-full"}) }}
+    {{ form.billing_reference(param_extensions={"classes": "govuk-!-width-full"}) }}
+    {{ form.purchase_order_number(param_extensions={"classes": "govuk-!-width-full"}) }}
+    {{ textbox(
+      form.notes,
+      rows=4,
+      width='1-1',
+      autofocus=True,
+      autosize=True,
+    ) }}
     {{ page_footer('Save') }}
   {% endcall %}
 

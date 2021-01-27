@@ -5312,17 +5312,26 @@ def test_view_edit_service_billing_details(
     assert page.select_one('h1').text == "Change billing details"
     labels = page.find_all('label', class_="form-label")
     labels_list = [
-        'Billing contact email address', 'Billing contact name', 'Billing reference', 'Purchase order number'
+        'Billing contact email addresses',
+        'Billing contact names',
+        'Billing reference',
+        'Purchase order number',
+        'Notes'
     ]
     for label in labels:
         assert label.text.strip() in labels_list
-    textbox_names = page.find_all('input', class_='govuk-input govuk-!-width-two-thirds')
+    textbox_names = page.find_all('input', class_='govuk-input govuk-!-width-full')
     names_list = [
-        'billing_contact_email_addresses', 'billing_contact_names', 'billing_reference', 'purchase_order_number'
+        'billing_contact_email_addresses',
+        'billing_contact_names',
+        'billing_reference',
+        'purchase_order_number',
     ]
 
     for name in textbox_names:
         assert name.attrs["name"] in names_list
+
+    assert page.find('textarea').attrs["name"] == "notes"
 
 
 def test_update_service_billing_details(
@@ -5339,7 +5348,8 @@ def test_update_service_billing_details(
             'billing_contact_email_addresses': 'accounts@fluff.gov.uk',
             'billing_contact_names': 'Flannellette von Fluff',
             'billing_reference': '',
-            'purchase_order_number': 'PO1234'
+            'purchase_order_number': 'PO1234',
+            'notes': 'very fluffy, give extra allowance'
         }
     )
     assert response.status_code == 302
@@ -5351,5 +5361,6 @@ def test_update_service_billing_details(
         billing_contact_email_addresses='accounts@fluff.gov.uk',
         billing_contact_names='Flannellette von Fluff',
         billing_reference='',
-        purchase_order_number='PO1234'
+        purchase_order_number='PO1234',
+        notes='very fluffy, give extra allowance'
     )
