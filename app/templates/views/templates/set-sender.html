@@ -1,30 +1,32 @@
 {% extends "withnav_template.html" %}
-{% from "components/radios.html" import radios %}
-{% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% block service_page_title %}
-  {{sender_context['title']}}
+  {{ sender_context.title }}
 {% endblock %}
 
 {% block maincolumn_content %}
 
-  {{ page_header(
-    sender_context.title,
-    back_link=url_for('.view_template', service_id=current_service.id, template_id=template_id)
-  ) }}
+  {{ govukBackLink({ "href": url_for('.view_template', service_id=current_service.id, template_id=template_id) }) }}
 
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-three-quarters">
-      {% call form_wrapper() %}
-        {{ radios(
-          form.sender,
-          option_hints=option_hints,
-          hide_legend=True
-        ) }}
+  <div class="govuk-grid-row govuk-!-margin-top-3">
+    {% call form_wrapper() %}
+      {{ form.sender(param_extensions={
+        'fieldset': {
+          'legend': {
+            'isPageHeading': True,
+            'text': sender_context.title,
+            'classes': 'govuk-fieldset__legend--l govuk-grid-column-full'
+          }
+        },
+        'classes': 'govuk-grid-column-three-quarters'
+      }) }}
+      <div class="govuk-grid-column-three-quarters">
         {{ page_footer('Continue') }}
-      {% endcall %}
+      </div>
+    {% endcall %}
     </div>
   </div>
 

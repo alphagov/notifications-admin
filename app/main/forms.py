@@ -1499,7 +1499,7 @@ class CreateKeyForm(StripWhitespaceForm):
         ]
         super().__init__(*args, **kwargs)
 
-    key_type = RadioField(
+    key_type = GovukRadiosField(
         'Type of key',
         thing='the type of key',
     )
@@ -1987,7 +1987,7 @@ class SetSenderForm(StripWhitespaceForm):
         self.sender.choices = kwargs['sender_choices']
         self.sender.label.text = kwargs['sender_label']
 
-    sender = RadioField()
+    sender = GovukRadiosField()
 
 
 class SetTemplateSenderForm(StripWhitespaceForm):
@@ -1997,7 +1997,7 @@ class SetTemplateSenderForm(StripWhitespaceForm):
         self.sender.choices = kwargs['sender_choices']
         self.sender.label.text = 'Select your sender'
 
-    sender = RadioField()
+    sender = GovukRadiosField()
 
 
 class LinkOrganisationsForm(StripWhitespaceForm):

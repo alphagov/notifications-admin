@@ -234,6 +234,15 @@ def set_sender(service_id, template_id):
     if sender_context.get('default_and_receives', None):
         option_hints = {sender_context['default_and_receives']: '(Default and receives replies)'}
 
+    # extend all radios that need hint text
+    form.sender.param_extensions = {'items': []}
+    for item_id, _item_value in form.sender.choices:
+        if item_id in option_hints:
+            extensions = {'hint': {'text': option_hints[item_id]}}
+        else:
+            extensions = {}  # if no extensions needed, send an empty dict to preserve order of items
+        form.sender.param_extensions['items'].append(extensions)
+
     if form.validate_on_submit():
         session['sender_id'] = form.sender.data
         return redirect(url_for('.send_one_off',
