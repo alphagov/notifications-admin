@@ -78,9 +78,17 @@ class BroadcastMessage(JSONModel):
 
     @property
     def areas(self):
-        return self.get_areas(
-            areas=self._dict['areas']
-        ) or CustomBroadcastAreas(
+        library_areas = self.get_areas(areas=self._dict['areas'])
+
+        if library_areas:
+            if len(library_areas) != len(self._dict['areas']):
+                raise RuntimeError(
+                    f'BroadcastMessage has {len(self._dict["areas"])} areas '
+                    f'but {len(library_areas)} found in the library'
+                )
+            return library_areas
+
+        return CustomBroadcastAreas(
             areas=self._dict['areas'],
             polygons=self._dict['simple_polygons'],
         )
