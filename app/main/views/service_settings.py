@@ -1218,7 +1218,8 @@ def edit_service_billing_details(service_id):
         billing_contact_email_addresses=current_service.billing_contact_email_addresses,
         billing_contact_names=current_service.billing_contact_names,
         billing_reference=current_service.billing_reference,
-        purchase_order_number=current_service.purchase_order_number
+        purchase_order_number=current_service.purchase_order_number,
+        notes=current_service.notes,
     )
 
     if form.validate_on_submit():
@@ -1226,7 +1227,8 @@ def edit_service_billing_details(service_id):
             billing_contact_email_addresses=form.billing_contact_email_addresses.data,
             billing_contact_names=form.billing_contact_names.data,
             billing_reference=form.billing_reference.data,
-            purchase_order_number=form.purchase_order_number.data
+            purchase_order_number=form.purchase_order_number.data,
+            notes=form.notes.data,
         )
         return redirect(url_for('.service_settings', service_id=service_id))
 
