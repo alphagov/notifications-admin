@@ -5,7 +5,7 @@ from notifications_utils.template import BroadcastPreviewTemplate
 from orderedset import OrderedSet
 from werkzeug.utils import cached_property
 
-from app.broadcast_areas import broadcast_area_libraries
+from app.broadcast_areas import CustomBroadcastAreas, broadcast_area_libraries
 from app.broadcast_areas.polygons import Polygons
 from app.formatters import round_to_significant_figures
 from app.models import JSONModel, ModelList
@@ -45,6 +45,10 @@ class BroadcastMessage(JSONModel):
             return True
         if not self.starts_at and other.starts_at:
             return False
+        if self.updated_at and not other.updated_at:
+            return self.updated_at < other.created_at
+        if not self.updated_at and other.updated_at:
+            return self.created_at < other.updated_at
         return self.updated_at < other.updated_at
 
     @classmethod
@@ -74,7 +78,20 @@ class BroadcastMessage(JSONModel):
 
     @property
     def areas(self):
-        return self.get_areas(areas=self._dict['areas'])
+        library_areas = self.get_areas(areas=self._dict['areas'])
+
+        if library_areas:
+            if len(library_areas) != len(self._dict['areas']):
+                raise RuntimeError(
+                    f'BroadcastMessage has {len(self._dict["areas"])} areas '
+                    f'but {len(library_areas)} found in the library'
+                )
+            return library_areas
+
+        return CustomBroadcastAreas(
+            areas=self._dict['areas'],
+            polygons=self._dict['simple_polygons'],
+        )
 
     @property
     def parent_areas(self):
@@ -124,7 +141,7 @@ class BroadcastMessage(JSONModel):
 
     @cached_property
     def created_by(self):
-        return User.from_id(self.created_by_id)
+        return User.from_id(self.created_by_id) if self.created_by_id else None
 
     @cached_property
     def approved_by(self):

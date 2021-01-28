@@ -1,3 +1,5 @@
+import pytest
+
 from app.models.broadcast_message import BroadcastMessage
 from tests import broadcast_message_json
 
@@ -45,3 +47,24 @@ def test_content_comes_from_attribute_not_template(fake_uuid):
         created_by_id=fake_uuid,
     ))
     assert broadcast_message.content == 'This is a test'
+
+
+def test_raises_for_missing_areas(fake_uuid):
+    broadcast_message = BroadcastMessage(broadcast_message_json(
+        id_=fake_uuid,
+        service_id=fake_uuid,
+        template_id=fake_uuid,
+        status='draft',
+        created_by_id=fake_uuid,
+        areas=[
+            'wd20-E05009372',
+            'something else',
+        ],
+    ))
+
+    with pytest.raises(RuntimeError) as exception:
+        broadcast_message.areas
+
+    assert str(exception.value) == (
+        'BroadcastMessage has 2 areas but 1 found in the library'
+    )

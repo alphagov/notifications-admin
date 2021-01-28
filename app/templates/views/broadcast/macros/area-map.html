@@ -20,7 +20,9 @@
       alert
     </li>
     <li class="area-list-key area-list-key--phone-estimate">
-      {% if broadcast_message.count_of_phones == broadcast_message.count_of_phones_likely %}
+      {% if broadcast_message.count_of_phones == 0 %}
+        Unknown number of phones
+      {% elif broadcast_message.count_of_phones == broadcast_message.count_of_phones_likely %}
         {{ broadcast_message.count_of_phones|format_thousands }} phones estimated
       {% else %}
         {{ broadcast_message.count_of_phones|format_thousands }} to {{ broadcast_message.count_of_phones_likely|format_thousands }} phones

@@ -657,6 +657,7 @@ def broadcast_message_json(
     approved_by_id=None,
     cancelled_by_id=None,
     areas=None,
+    simple_polygons=None,
     content=None,
     reference=None,
     template_name='Example template',
@@ -676,6 +677,7 @@ def broadcast_message_json(
         'areas': areas or [
             'ctry19-E92000001', 'ctry19-S92000003',
         ],
+        'simple_polygons': simple_polygons or [],
 
         'status': status,
 
