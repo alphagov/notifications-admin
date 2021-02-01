@@ -11,7 +11,7 @@ bleach==3.2.3             # via notifications-utils
 blinker==1.4              # via -r requirements.in, gds-metrics
 boto3==1.16.63            # via notifications-utils
 botocore==1.19.63         # via awscli, boto3, s3transfer
-cachetools==4.2.0         # via notifications-utils
+cachetools==4.2.1         # via notifications-utils
 certifi==2020.12.5        # via requests
 chardet==4.0.0            # via requests
 click==7.1.2              # via flask
