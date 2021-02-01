@@ -63,7 +63,7 @@ pypdf2==1.26.0            # via notifications-utils
 python-dateutil==2.8.1    # via awscli-cwlogs, botocore
 python-json-logger==2.0.1  # via notifications-utils
 pytz==2021.1              # via -r requirements.in, notifications-utils
-pyyaml==5.3.1             # via awscli, notifications-utils
+pyyaml==5.4.1             # via awscli, notifications-utils
 redis==3.5.3              # via flask-redis
 requests==2.25.1          # via awscli-cwlogs, govuk-bank-holidays, notifications-python-client, notifications-utils
 rsa==4.5                  # via awscli
