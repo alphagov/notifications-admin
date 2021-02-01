@@ -555,3 +555,52 @@ def test_client_deletes_service_template_cache_when_service_is_updated(
     assert len(mock_redis_delete.call_args_list) == 1
     assert mock_redis_delete.call_args_list[0] == call(f'service-{SERVICE_ONE_ID}')
     assert mock_redis_delete_by_pattern.call_args_list[0] == call(f'service-{SERVICE_ONE_ID}-template-*')
+
+
+def test_client_updates_service_with_allowed_attributes(
+    mocker,
+):
+    client = ServiceAPIClient()
+    mock_post = mocker.patch.object(client, 'post', return_value={'data': {'id': None}})
+    mocker.patch('app.notify_client.current_user', id='123')
+
+    allowed_attributes = [
+        'active',
+        'consent_to_research',
+        'contact_link',
+        'count_as_live',
+        'email_branding',
+        'email_from',
+        'free_sms_fragment_limit',
+        'go_live_at',
+        'go_live_user',
+        'letter_branding',
+        'letter_contact_block',
+        'message_limit',
+        'name',
+        'notes',
+        'organisation_type',
+        'permissions',
+        'prefix_sms',
+        'rate_limit',
+        'reply_to_email_address',
+        'research_mode',
+        'restricted',
+        'sms_sender',
+        'volume_email',
+        'volume_letter',
+        'volume_sms',
+    ]
+
+    attrs_dict = {}
+    for attr in allowed_attributes:
+        attrs_dict[attr] = "value"
+
+    client.update_service(
+        SERVICE_ONE_ID,
+        **attrs_dict
+    )
+    mock_post.assert_called_once_with(
+        f'/service/{SERVICE_ONE_ID}',
+        {**{'created_by': '123'}, **attrs_dict}
+    )
