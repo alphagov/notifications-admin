@@ -218,6 +218,11 @@ def organisation_json(
     agreement_signed_on_behalf_of_email_address=None,
     organisation_type='central',
     request_to_go_live_notes=None,
+    notes=None,
+    billing_contact_email_addresses=None,
+    billing_contact_names=None,
+    billing_reference=None,
+    purchase_order_number=None
 ):
     if users is None:
         users = []
@@ -242,6 +247,11 @@ def organisation_json(
         'domains': domains or [],
         'request_to_go_live_notes': request_to_go_live_notes,
         'count_of_live_services': len(services),
+        'notes': notes,
+        'billing_contact_email_addresses': billing_contact_email_addresses,
+        'billing_contact_names': billing_contact_names,
+        'billing_reference': billing_reference,
+        'purchase_order_number': purchase_order_number,
     }
 
 
