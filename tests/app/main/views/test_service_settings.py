@@ -5312,9 +5312,9 @@ def test_view_edit_service_billing_details(
     assert page.select_one('h1').text == "Change billing details"
     labels = page.find_all('label', class_="form-label")
     labels_list = [
-        'Billing contact email addresses',
-        'Billing contact names',
-        'Billing reference',
+        'Contact email addresses',
+        'Contact names',
+        'Reference',
         'Purchase order number',
         'Notes'
     ]
