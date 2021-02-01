@@ -1687,9 +1687,9 @@ class EditServiceNotesForm(StripWhitespaceForm):
 
 
 class ServiceBillingDetailsForm(StripWhitespaceForm):
-    billing_contact_email_addresses = GovukTextInputField('Billing contact email addresses')
-    billing_contact_names = GovukTextInputField('Billing contact names')
-    billing_reference = GovukTextInputField('Billing reference')
+    billing_contact_email_addresses = GovukTextInputField('Contact email addresses')
+    billing_contact_names = GovukTextInputField('Contact names')
+    billing_reference = GovukTextInputField('Reference')
     purchase_order_number = GovukTextInputField('Purchase order number')
     notes = TextAreaField(validators=[])
 
