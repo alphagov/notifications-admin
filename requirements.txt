@@ -48,7 +48,7 @@ git+https://github.com/alphagov/notifications-utils.git@43.7.0#egg=notifications
 openpyxl==3.0.6           # via pyexcel-xlsx
 orderedset==2.0.3         # via notifications-utils
 packaging==20.9           # via bleach
-phonenumbers==8.12.15     # via notifications-utils
+phonenumbers==8.12.17     # via notifications-utils
 prometheus-client==0.9.0  # via -r requirements.in, gds-metrics
 pyasn1==0.4.8             # via rsa
 pyexcel-ezodf==0.3.4      # via pyexcel-ods3
