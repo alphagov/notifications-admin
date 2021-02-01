@@ -6,7 +6,7 @@
 #
 ago==0.0.93               # via -r requirements.in
 awscli-cwlogs==1.4.6      # via -r requirements.in
-awscli==1.18.211          # via awscli-cwlogs, notifications-utils
+awscli==1.18.223          # via awscli-cwlogs, notifications-utils
 bleach==3.2.1             # via notifications-utils
 blinker==1.4              # via -r requirements.in, gds-metrics
 boto3==1.16.51            # via notifications-utils
