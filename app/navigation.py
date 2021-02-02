@@ -532,6 +532,9 @@ class MainNavigation(Navigation):
             'guest_list',
             'old_guest_list',
         },
+        'history': {
+            'history',
+        },
     }
 
     exclude = {
@@ -610,7 +613,6 @@ class MainNavigation(Navigation):
         'send_files_by_email',
         'upload_a_letter',
         'letter_specification',
-        'history',
         'how_to_pay',
         'inbound_sms_admin',
         'inbox_download',

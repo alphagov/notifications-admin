@@ -196,6 +196,29 @@ def test_navigation_for_services_with_broadcast_permission(
     ]
 
 
+def test_navigation_for_platform_admin_user(
+    client_request,
+    service_one,
+    mock_get_service_templates,
+    mock_get_template_folders,
+    platform_admin_user
+):
+    client_request.login(platform_admin_user)
+    page = client_request.get('main.choose_template', service_id=SERVICE_ONE_ID)
+    assert [
+        a['href'] for a in page.select('.navigation a')
+    ] == [
+        '/services/{}'.format(SERVICE_ONE_ID),
+        '/services/{}/templates'.format(SERVICE_ONE_ID),
+        '/services/{}/uploads'.format(SERVICE_ONE_ID),
+        '/services/{}/users'.format(SERVICE_ONE_ID),
+        '/services/{}/usage'.format(SERVICE_ONE_ID),
+        '/services/{}/service-settings'.format(SERVICE_ONE_ID),
+        '/services/{}/api'.format(SERVICE_ONE_ID),
+        '/services/{}/history'.format(SERVICE_ONE_ID),
+    ]
+
+
 def test_caseworkers_get_caseworking_navigation(
     client_request,
     mocker,
