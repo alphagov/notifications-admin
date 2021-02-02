@@ -71,9 +71,9 @@ describe('RadioSelect', () => {
           const num = idx + 1;
 
           result +=
-            `<div class="multiple-choice">
-              <input id="scheduled_for-${num}" name="scheduled_for" type="radio" value="2019-05-${dayAsNumber}T${hour}:00:00.459156">
-              <label for="scheduled_for-${num}">
+            `<div class="govuk-radios__item">
+              <input class="govuk-radios__input" id="scheduled_for-${num}" name="scheduled_for" type="radio" value="2019-05-${dayAsNumber}T${hour}:00:00.459156">
+              <label class="govuk-label govuk-radios__label" for="scheduled_for-${num}">
                 ${day} at ${hourLabel}
               </label>
             </div>`;
@@ -101,21 +101,17 @@ describe('RadioSelect', () => {
           When should Notify send these messages?
         </legend>
         <div class="radio-select" data-module="radio-select" data-categories="${CATEGORIES.join(',')}" data-show-now-as-default="true">
-          <div class="radio-select__column">
-            <div class="multiple-choice">
-              <input checked="" id="scheduled_for-0" name="scheduled_for" type="radio" value="">
-              <label for="scheduled_for-0">
-                Now
-              </label>
-            </div>
+          <div class="govuk-radios__item">
+            <input class="govuk-radios__input" checked="" id="scheduled_for-0" name="scheduled_for" type="radio" value="">
+            <label class="govuk-label govuk-radios__label" for="scheduled_for-0">
+              Now
+            </label>
           </div>
-          <div class="radio-select__column">
           ${options()}
-          </div>
         </div>
       </fieldset>`;
 
-      originalOptionsForAllCategories = Array.from(document.querySelectorAll('.radio-select__column:nth-child(2) .multiple-choice'))
+      originalOptionsForAllCategories = Array.from(document.querySelectorAll('.govuk-radios__item:not(:first-of-type)'))
                                           .map(option => getDataFromOption(option));
   });
 
@@ -215,7 +211,7 @@ describe('RadioSelect', () => {
         test("show the options for it, with the right label and value", () => {
 
           // check options this reveals against those originally in the page for this category
-          const options = document.querySelectorAll('.radio-select__column:nth-child(2) .multiple-choice');
+          const options = document.querySelectorAll('.radio-select__column:nth-child(2) .govuk-radios__item');
 
           const optionsThatMatchOriginals = Array.from(options).filter((option, idx) => {
             const optionData = getDataFromOption(option);

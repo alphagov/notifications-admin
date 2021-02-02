@@ -1,6 +1,5 @@
 {% extends "withnav_template.html" %}
 {% from "components/banner.html" import banner_wrapper %}
-{% from "components/radios.html" import radio_select %}
 {% from "components/table.html" import list_table, field, text_field, index_field, hidden_field_heading %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/button/macro.njk" import govukButton %}
@@ -36,10 +35,14 @@
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
       <input type="hidden" name="contact_list_id" value="{{ request.args.get('contact_list_id', '') }}" />
       {% if choose_time_form and template.template_type != 'letter' %}
-        {{ radio_select(
-          choose_time_form.scheduled_for,
-          wrapping_class='bottom-gutter-2-3'
-        ) }}
+        {{ choose_time_form.scheduled_for(param_extensions={
+          'formGroup': {'classes': 'bottom-gutter-2-3'},
+          'attributes': {
+            'data-module': 'radio-select',
+            'data-categories': choose_time_form.scheduled_for.categories|join(','),
+            'data-show-now-as-default': 'true'
+          }
+        }) }}
       {% endif %}
       {% if (template.template_type != 'letter' or not request.args.from_test) and not letter_too_long %}
         {% set button_text %}
