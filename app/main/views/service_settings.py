@@ -43,6 +43,7 @@ from app.main.forms import (
     RateLimit,
     RenameServiceForm,
     SearchByNameForm,
+    ServiceBillingDetailsForm,
     ServiceContactDetailsForm,
     ServiceDataRetentionEditForm,
     ServiceDataRetentionForm,
@@ -1190,7 +1191,7 @@ def edit_data_retention(service_id, data_retention_id):
 
 
 @main.route("/services/<uuid:service_id>/notes", methods=['GET', 'POST'])
-@user_has_permissions('manage_service')
+@user_is_platform_admin
 def edit_service_notes(service_id):
     form = EditServiceNotesForm(notes=current_service.notes)
 
@@ -1206,6 +1207,33 @@ def edit_service_notes(service_id):
 
     return render_template(
         'views/service-settings/edit-service-notes.html',
+        form=form,
+    )
+
+
+@main.route("/services/<uuid:service_id>/edit-billing-details", methods=['GET', 'POST'])
+@user_is_platform_admin
+def edit_service_billing_details(service_id):
+    form = ServiceBillingDetailsForm(
+        billing_contact_email_addresses=current_service.billing_contact_email_addresses,
+        billing_contact_names=current_service.billing_contact_names,
+        billing_reference=current_service.billing_reference,
+        purchase_order_number=current_service.purchase_order_number,
+        notes=current_service.notes,
+    )
+
+    if form.validate_on_submit():
+        current_service.update(
+            billing_contact_email_addresses=form.billing_contact_email_addresses.data,
+            billing_contact_names=form.billing_contact_names.data,
+            billing_reference=form.billing_reference.data,
+            purchase_order_number=form.purchase_order_number.data,
+            notes=form.notes.data,
+        )
+        return redirect(url_for('.service_settings', service_id=service_id))
+
+    return render_template(
+        'views/service-settings/edit-service-billing-details.html',
         form=form,
     )
 

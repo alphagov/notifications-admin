@@ -100,6 +100,7 @@ def mock_get_service_settings_page_common(
         'Label Value Action',
         'Live Off Change service status',
         'Count in list of live services Yes Change if service is counted in list of live services',
+        'Billing details No billing details yet Change billing details for service',
         'Notes No notes yet Change the notes for the service',
         'Organisation Test organisation Central government Change organisation for service',
         'Rate limit 3,000 per minute Change rate limit',
@@ -5282,3 +5283,84 @@ def test_update_service_notes(
         'main.service_settings', service_id=SERVICE_ONE_ID, _external=True)
     assert settings_url == response.location
     mock_update_service.assert_called_with(SERVICE_ONE_ID, notes="Very fluffy")
+
+
+def test_service_settings_links_to_edit_service_billing_details_page_for_platform_admins(
+    mocker,
+    service_one,
+    platform_admin_client,
+    no_reply_to_email_addresses,
+    no_letter_contact_blocks,
+    single_sms_sender,
+    mock_get_service_settings_page_common,
+    mock_get_organisation,
+):
+    response = platform_admin_client.get(url_for(
+        '.service_settings', service_id=SERVICE_ONE_ID
+    ))
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert len(page.find_all('a', attrs={'href': '/services/{}/edit-billing-details'.format(SERVICE_ONE_ID)})) == 1
+
+
+def test_view_edit_service_billing_details(
+        platform_admin_client,
+        service_one,
+
+):
+    response = platform_admin_client.get(url_for('main.edit_service_billing_details', service_id=SERVICE_ONE_ID))
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert page.select_one('h1').text == "Change billing details"
+    labels = page.find_all('label', class_="form-label")
+    labels_list = [
+        'Contact email addresses',
+        'Contact names',
+        'Reference',
+        'Purchase order number',
+        'Notes'
+    ]
+    for label in labels:
+        assert label.text.strip() in labels_list
+    textbox_names = page.find_all('input', class_='govuk-input govuk-!-width-full')
+    names_list = [
+        'billing_contact_email_addresses',
+        'billing_contact_names',
+        'billing_reference',
+        'purchase_order_number',
+    ]
+
+    for name in textbox_names:
+        assert name.attrs["name"] in names_list
+
+    assert page.find('textarea').attrs["name"] == "notes"
+
+
+def test_update_service_billing_details(
+        platform_admin_client,
+        service_one,
+        mock_update_service
+):
+    response = platform_admin_client.post(
+        url_for(
+            'main.edit_service_billing_details',
+            service_id=SERVICE_ONE_ID,
+        ),
+        data={
+            'billing_contact_email_addresses': 'accounts@fluff.gov.uk',
+            'billing_contact_names': 'Flannellette von Fluff',
+            'billing_reference': '',
+            'purchase_order_number': 'PO1234',
+            'notes': 'very fluffy, give extra allowance'
+        }
+    )
+    assert response.status_code == 302
+    settings_url = url_for(
+        'main.service_settings', service_id=SERVICE_ONE_ID, _external=True)
+    assert response.location == settings_url
+    mock_update_service.assert_called_with(
+        SERVICE_ONE_ID,
+        billing_contact_email_addresses='accounts@fluff.gov.uk',
+        billing_contact_names='Flannellette von Fluff',
+        billing_reference='',
+        purchase_order_number='PO1234',
+        notes='very fluffy, give extra allowance'
+    )
