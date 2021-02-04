@@ -1277,3 +1277,15 @@ def test_organisation_settings_links_to_edit_organisation_notes_page(
     assert len(page.find_all(
         'a', attrs={'href': '/organisations/{}/settings/notes'.format(organisation_one['id'])}
     )) == 1
+
+
+def test_view_edit_organisation_notes(
+        platform_admin_client,
+        organisation_one,
+        mock_get_organisation,
+):
+    response = platform_admin_client.get(url_for('main.edit_organisation_notes', org_id=organisation_one['id']))
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert page.select_one('h1').text == "Edit organisation notes"
+    assert page.find('label', class_="form-label").text.strip() == "Notes"
+    assert page.find('textarea').attrs["name"] == "notes"
