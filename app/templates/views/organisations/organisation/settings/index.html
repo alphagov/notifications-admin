@@ -75,7 +75,7 @@
       {% call row() %}
         {{ text_field('Billing details')}}
         {{ optional_text_field(current_org.billing_details, default="No billing details yet", wrap=True) }}
-        {{ edit_field('Change', url_for('.organisation_settings', org_id=current_org.id), suffix='billing details for the organisation') }}
+        {{ edit_field('Change', url_for('.edit_organisation_billing_details', org_id=current_org.id), suffix='billing details for the organisation') }}
       {% endcall %}
 
       {% call row() %}

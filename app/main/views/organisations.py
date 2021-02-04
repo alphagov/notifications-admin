@@ -553,3 +553,9 @@ def edit_organisation_notes(org_id):
         'views/organisations/organisation/settings/edit-organisation-notes.html',
         form=form,
     )
+
+
+@main.route("/organisations/<uuid:org_id>/settings/edit-billing-details", methods=['GET', 'POST'])
+@user_is_platform_admin
+def edit_organisation_billing_details(org_id):
+    pass

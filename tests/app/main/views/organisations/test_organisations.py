@@ -1313,3 +1313,18 @@ def test_update_organisation_notes(
         cached_service_ids=None,
         notes="Very fluffy"
     )
+
+
+def test_organisation_settings_links_to_edit_organisation_billing_details_page(
+    mocker,
+    mock_get_organisation,
+    organisation_one,
+    platform_admin_client,
+):
+    response = platform_admin_client.get(url_for(
+        '.organisation_settings', org_id=organisation_one['id']
+    ))
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert len(page.find_all(
+        'a', attrs={'href': '/organisations/{}/settings/edit-billing-details'.format(organisation_one['id'])}
+    )) == 1
