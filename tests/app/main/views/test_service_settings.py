@@ -149,6 +149,52 @@ def test_should_show_overview(
     app.service_api_client.get_service.assert_called_with(SERVICE_ONE_ID)
 
 
+def test_platform_admin_sees_only_relevant_settings_for_broadcast_service(
+        client,
+        mocker,
+        api_user_active,
+        no_reply_to_email_addresses,
+        no_letter_contact_blocks,
+        mock_get_organisation,
+        single_sms_sender,
+        mock_get_service_settings_page_common,
+):
+    service_one = service_json(
+        SERVICE_ONE_ID,
+        users=[api_user_active['id']],
+        permissions=['broadcast'],
+        organisation_id=ORGANISATION_ID,
+        contact_link='contact_us@gov.uk',
+    )
+    mocker.patch('app.service_api_client.get_service', return_value={'data': service_one})
+
+    client.login(create_platform_admin_user(), mocker, service_one)
+    response = client.get(url_for(
+        'main.service_settings', service_id=SERVICE_ONE_ID
+    ))
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert page.find('h1').text == 'Settings'
+    rows = page.select('tr')
+
+    expected_rows = [
+        'Label Value Action',
+        'Service name Test Service Change service name',
+        'Sign-in method Text message code Change sign-in method',
+
+        'Label Value Action',
+        'Live Off Change service status',
+        'Notes No notes yet Change the notes for the service',
+        'Email authentication Off Change your settings for Email authentication',
+        'Send cell broadcasts On Change your settings for Send cell broadcasts',
+    ]
+
+    assert len(rows) == len(expected_rows)
+    for index, row in enumerate(expected_rows):
+        assert row == " ".join(rows[index].text.split())
+    app.service_api_client.get_service.assert_called_with(SERVICE_ONE_ID)
+
+
 def test_no_go_live_link_for_service_without_organisation(
     client_request,
     mocker,
