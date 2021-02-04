@@ -542,12 +542,12 @@ def edit_organisation_notes(org_id):
     if form.validate_on_submit():
 
         if form.notes.data == current_organisation.notes:
-            return redirect(url_for('.organisation_settings', service_id=org_id))
+            return redirect(url_for('.organisation_settings', org_id=org_id))
 
         current_organisation.update(
             notes=form.notes.data
         )
-        return redirect(url_for('.organisation_settings', service_id=org_id))
+        return redirect(url_for('.organisation_settings', org_id=org_id))
 
     return render_template(
         'views/organisations/organisation/settings/edit-organisation-notes.html',

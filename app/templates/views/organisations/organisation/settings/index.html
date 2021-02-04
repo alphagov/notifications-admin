@@ -80,7 +80,7 @@
 
       {% call row() %}
         {{ text_field('Notes')}}
-        {{ optional_text_field(current_service.notes, default="No notes yet", wrap=True) }}
+        {{ optional_text_field(current_org.notes, default="No notes yet", wrap=True) }}
         {{ edit_field('Change', url_for('.edit_organisation_notes', org_id=current_org.id), suffix='the notes for the organisation') }}
       {% endcall %}
 

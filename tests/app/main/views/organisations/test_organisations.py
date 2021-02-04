@@ -1289,3 +1289,27 @@ def test_view_edit_organisation_notes(
     assert page.select_one('h1').text == "Edit organisation notes"
     assert page.find('label', class_="form-label").text.strip() == "Notes"
     assert page.find('textarea').attrs["name"] == "notes"
+
+
+def test_update_organisation_notes(
+        platform_admin_client,
+        organisation_one,
+        mock_get_organisation,
+        mock_update_organisation,
+):
+    response = platform_admin_client.post(
+        url_for(
+            'main.edit_organisation_notes',
+            org_id=organisation_one['id'],
+        ),
+        data={'notes': "Very fluffy"}
+    )
+    assert response.status_code == 302
+    settings_url = url_for(
+        'main.organisation_settings', org_id=organisation_one['id'], _external=True)
+    assert settings_url == response.location
+    mock_update_organisation.assert_called_with(
+        organisation_one['id'],
+        cached_service_ids=None,
+        notes="Very fluffy"
+    )
