@@ -934,6 +934,10 @@ class GovukRadiosFieldWithNoneOption(FieldWithNoneOption, GovukRadiosField):
     pass
 
 
+class GovukRadiosFieldWithRequiredMessage(RadioFieldWithRequiredMessage, GovukRadiosField):
+    pass
+
+
 # NestedFieldMixin puts the items into a tree hierarchy, pre-rendering the sub-trees of the top-level items
 class GovukNestedRadiosField(NestedFieldMixin, GovukRadiosFieldWithNoneOption):
     render_as_list = True
@@ -2347,7 +2351,7 @@ class TemplateAndFoldersSelectionForm(Form):
     add_new_folder_name = GovukTextInputField('Folder name', validators=[required_for_ops('add-new-folder')])
     move_to_new_folder_name = GovukTextInputField('Folder name', validators=[required_for_ops('move-to-new-folder')])
 
-    add_template_by_template_type = RadioFieldWithRequiredMessage('New template', validators=[
+    add_template_by_template_type = GovukRadiosFieldWithRequiredMessage('New template', validators=[
         required_for_ops('add-new-template'),
         Optional(),
     ], required_message='Select the type of template you want to add')
