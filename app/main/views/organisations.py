@@ -575,7 +575,7 @@ def edit_organisation_billing_details(org_id):
             purchase_order_number=form.purchase_order_number.data,
             notes=form.notes.data,
         )
-        return redirect(url_for('.organisation_settings', organisation_id=org_id))
+        return redirect(url_for('.organisation_settings', org_id=org_id))
 
     return render_template(
         'views/organisations/organisation/settings/edit-organisation-billing-details.html',

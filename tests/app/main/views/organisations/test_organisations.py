@@ -1362,3 +1362,51 @@ def test_view_edit_organisation_billing_details(
         assert name.attrs["name"] in names_list
 
     assert page.find('textarea').attrs["name"] == "notes"
+
+
+def test_update_organisation_billing_details(
+        platform_admin_client,
+        organisation_one,
+        mock_get_organisation,
+        mock_update_organisation,
+):
+    response = platform_admin_client.post(
+        url_for(
+            'main.edit_organisation_billing_details',
+            org_id=organisation_one['id'],
+        ),
+        data={
+            'billing_contact_email_addresses': 'accounts@fluff.gov.uk',
+            'billing_contact_names': 'Flannellette von Fluff',
+            'billing_reference': '',
+            'purchase_order_number': 'PO1234',
+            'notes': 'very fluffy, give extra allowance'
+        }
+    )
+    assert response.status_code == 302
+    settings_url = url_for(
+        'main.organisation_settings', org_id=organisation_one['id'], _external=True)
+    assert settings_url == response.location
+    mock_update_organisation.assert_called_with(
+        organisation_one['id'],
+        cached_service_ids=None,
+        billing_contact_email_addresses='accounts@fluff.gov.uk',
+        billing_contact_names='Flannellette von Fluff',
+        billing_reference='',
+        purchase_order_number='PO1234',
+        notes='very fluffy, give extra allowance'
+    )
+
+
+def test_update_organisation_billing_details_errors_when_user_not_platform_admin(
+        client_request,
+        organisation_one,
+        mock_get_organisation,
+        mock_update_organisation,
+):
+    client_request.post(
+        'main.edit_organisation_billing_details',
+        org_id=organisation_one['id'],
+        _data={'notes': "Very fluffy"},
+        _expected_status=403,
+    )
