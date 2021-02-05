@@ -716,6 +716,13 @@ def govuk_checkboxes_field_widget(self, field, wrap_in_collapsible=False, param_
 
         return result
 
+    # add any param_extensions sent in though use in templates
+    if param_extensions is not None:
+        if self.param_extensions is not None:
+            merge_jsonlike(self.param_extensions, param_extensions)
+        else:
+            self.param_extensions = param_extensions
+
     # error messages
     error_message = None
     if field.errors:
@@ -728,9 +735,11 @@ def govuk_checkboxes_field_widget(self, field, wrap_in_collapsible=False, param_
             "text": " ".join(field.errors).strip()
         }
 
-    # returns either a list or a hierarchy of lists
+    # returns either a list or a hierarchy of lists, in a tree structure
     # depending on how get_items_from_options is implemented
-    items = self.get_items_from_options(field)
+    # the hierarchy of lists prerenders some items so any extensions need to be available beforehand
+    _item_extensions = self.param_extensions.get('items', None) if self.param_extensions is not None else None
+    items = self.get_items_from_options(field, _item_extensions)
 
     params = {
         'name':  field.name,
@@ -746,13 +755,14 @@ def govuk_checkboxes_field_widget(self, field, wrap_in_collapsible=False, param_
         'items': items
     }
 
-    # extend default params with any sent in during instantiation
-    if self.param_extensions:
-        merge_jsonlike(params, self.param_extensions)
-
-    # add any sent in though use in templates
-    if param_extensions:
-        merge_jsonlike(params, param_extensions)
+    # any extensions to 'items' will already have been applied so:
+    # - only extend the rest of params
+    # - cache locally to avoid side effects from deleting 'items'
+    if self.param_extensions is not None:
+        _param_extensions = self.param_extensions
+        if 'items' in self.param_extensions:
+            del _param_extensions['items']
+        merge_jsonlike(params, _param_extensions)
 
     if wrap_in_collapsible:
 
@@ -814,7 +824,8 @@ def govuk_radios_field_widget(self, field, param_extensions=None, **kwargs):
     # - cache locally to avoid side effects from deleting 'items'
     if self.param_extensions is not None:
         _param_extensions = self.param_extensions
-        del _param_extensions['items']
+        if 'items' in self.param_extensions:
+            del _param_extensions['items']
         merge_jsonlike(params, _param_extensions)
 
     return Markup(
@@ -853,8 +864,11 @@ class GovukCheckboxesField(SelectMultipleField):
             "checked": option.checked
         }
 
-    def get_items_from_options(self, field):
-        return [self.get_item_from_option(option) for option in field]
+    def get_items_from_options(self, field, extensions=None):
+        items = [self.get_item_from_option(option) for option in field]
+        if extensions is not None:
+            merge_jsonlike(items, extensions)
+        return items
 
     # self.__call__ renders the HTML for the field by:
     # 1. delegating to self.meta.render_field which
@@ -902,8 +916,11 @@ class GovukRadiosField(RadioField):
             merge_jsonlike(item, extensions)
         return item
 
-    def get_items_from_options(self, field, extensions=None):
-        return [self.get_item_from_option(option) for option in field]
+    def get_items_from_options(self, field, extensions):
+        items = [self.get_item_from_option(option) for option in field]
+        if extensions is not None:
+            merge_jsonlike(items, extensions)
+        return items
 
     # self.__call__ renders the HTML for the field by:
     # 1. delegating to self.meta.render_field which
