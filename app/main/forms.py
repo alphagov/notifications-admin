@@ -1686,7 +1686,7 @@ class EditNotesForm(StripWhitespaceForm):
     notes = TextAreaField(validators=[])
 
 
-class ServiceBillingDetailsForm(StripWhitespaceForm):
+class BillingDetailsForm(StripWhitespaceForm):
     billing_contact_email_addresses = GovukTextInputField('Contact email addresses')
     billing_contact_names = GovukTextInputField('Contact names')
     billing_reference = GovukTextInputField('Reference')

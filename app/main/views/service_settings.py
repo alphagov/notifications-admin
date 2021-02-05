@@ -43,7 +43,7 @@ from app.main.forms import (
     RateLimit,
     RenameServiceForm,
     SearchByNameForm,
-    ServiceBillingDetailsForm,
+    BillingDetailsForm,
     ServiceContactDetailsForm,
     ServiceDataRetentionEditForm,
     ServiceDataRetentionForm,
@@ -1214,7 +1214,7 @@ def edit_service_notes(service_id):
 @main.route("/services/<uuid:service_id>/edit-billing-details", methods=['GET', 'POST'])
 @user_is_platform_admin
 def edit_service_billing_details(service_id):
-    form = ServiceBillingDetailsForm(
+    form = BillingDetailsForm(
         billing_contact_email_addresses=current_service.billing_contact_email_addresses,
         billing_contact_names=current_service.billing_contact_names,
         billing_reference=current_service.billing_reference,

@@ -1328,3 +1328,37 @@ def test_organisation_settings_links_to_edit_organisation_billing_details_page(
     assert len(page.find_all(
         'a', attrs={'href': '/organisations/{}/settings/edit-billing-details'.format(organisation_one['id'])}
     )) == 1
+
+
+def test_view_edit_organisation_billing_details(
+        platform_admin_client,
+        organisation_one,
+        mock_get_organisation,
+):
+    response = platform_admin_client.get(
+        url_for('main.edit_organisation_billing_details', org_id=organisation_one['id'])
+    )
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert page.select_one('h1').text == "Edit organisation billing details"
+    labels = page.find_all('label', class_="form-label")
+    labels_list = [
+        'Contact email addresses',
+        'Contact names',
+        'Reference',
+        'Purchase order number',
+        'Notes'
+    ]
+    for label in labels:
+        assert label.text.strip() in labels_list
+    textbox_names = page.find_all('input', class_='govuk-input govuk-!-width-full')
+    names_list = [
+        'billing_contact_email_addresses',
+        'billing_contact_names',
+        'billing_reference',
+        'purchase_order_number',
+    ]
+
+    for name in textbox_names:
+        assert name.attrs["name"] in names_list
+
+    assert page.find('textarea').attrs["name"] == "notes"

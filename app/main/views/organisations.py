@@ -19,6 +19,7 @@ from app.main import main
 from app.main.forms import (
     AddGPOrganisationForm,
     AddNHSLocalOrganisationForm,
+    BillingDetailsForm,
     ConfirmPasswordForm,
     EditNotesForm,
     GoLiveNotesForm,
@@ -558,4 +559,25 @@ def edit_organisation_notes(org_id):
 @main.route("/organisations/<uuid:org_id>/settings/edit-billing-details", methods=['GET', 'POST'])
 @user_is_platform_admin
 def edit_organisation_billing_details(org_id):
-    pass
+    form = BillingDetailsForm(
+        billing_contact_email_addresses=current_organisation.billing_contact_email_addresses,
+        billing_contact_names=current_organisation.billing_contact_names,
+        billing_reference=current_organisation.billing_reference,
+        purchase_order_number=current_organisation.purchase_order_number,
+        notes=current_organisation.notes,
+    )
+
+    if form.validate_on_submit():
+        current_organisation.update(
+            billing_contact_email_addresses=form.billing_contact_email_addresses.data,
+            billing_contact_names=form.billing_contact_names.data,
+            billing_reference=form.billing_reference.data,
+            purchase_order_number=form.purchase_order_number.data,
+            notes=form.notes.data,
+        )
+        return redirect(url_for('.organisation_settings', organisation_id=org_id))
+
+    return render_template(
+        'views/organisations/organisation/settings/edit-organisation-billing-details.html',
+        form=form,
+    )
