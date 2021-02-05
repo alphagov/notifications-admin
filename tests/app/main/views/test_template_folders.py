@@ -1257,7 +1257,8 @@ def test_move_folder_form_shows_current_folder_hint_when_in_a_folder(
 
     assert len(move_form_labels) == 3
     assert normalize_spaces(move_form_labels[0].text) == 'Templates'
-    assert normalize_spaces(move_form_labels[1].text) == 'parent_folder current folder'
+    assert normalize_spaces(move_form_labels[1].text) == 'parent_folder'
+    assert normalize_spaces(move_form_labels[1].parent.select_one('.govuk-hint').text) == 'current folder'
     assert normalize_spaces(move_form_labels[2].text) == 'child_folder'
 
 
