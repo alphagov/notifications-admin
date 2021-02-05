@@ -46,6 +46,7 @@ class Organisation(JSONModel):
         'domains',
         'request_to_go_live_notes',
         'count_of_live_services',
+        'notes'
     }
 
     @classmethod

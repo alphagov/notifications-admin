@@ -20,6 +20,7 @@ from app.main.forms import (
     AddGPOrganisationForm,
     AddNHSLocalOrganisationForm,
     ConfirmPasswordForm,
+    EditNotesForm,
     GoLiveNotesForm,
     InviteOrgUserForm,
     NewOrganisationForm,
@@ -529,5 +530,26 @@ def edit_organisation_go_live_notes(org_id):
 
     return render_template(
         'views/organisations/organisation/settings/edit-go-live-notes.html',
+        form=form,
+    )
+
+
+@main.route("/organisations/<uuid:org_id>/settings/notes", methods=['GET', 'POST'])
+@user_is_platform_admin
+def edit_organisation_notes(org_id):
+    form = EditNotesForm(notes=current_organisation.notes)
+
+    if form.validate_on_submit():
+
+        if form.notes.data == current_organisation.notes:
+            return redirect(url_for('.organisation_settings', service_id=org_id))
+
+        current_organisation.update(
+            notes=form.notes.data
+        )
+        return redirect(url_for('.organisation_settings', service_id=org_id))
+
+    return render_template(
+        'views/organisations/organisation/settings/edit-organisation-notes.html',
         form=form,
     )

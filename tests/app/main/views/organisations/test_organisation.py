@@ -691,6 +691,7 @@ def test_organisation_settings_for_platform_admin(
         'Crown organisation Yes Change',
         'Data sharing and financial agreement Not signed Change',
         'Request to go live notes None Change',
+        'Notes No notes yet Change the notes for the organisation',
         'Default email branding GOV.UK Change',
         'Default letter branding No branding Change',
         'Known email domains None Change',
@@ -1260,3 +1261,18 @@ def test_post_edit_organisation_go_live_notes_updates_go_live_notes(
         org_id=organisation_one['id'],
         _external=True
     )
+
+
+def test_organisation_settings_links_to_edit_organisation_notes_page(
+    mocker,
+    mock_get_organisation,
+    organisation_one,
+    platform_admin_client,
+):
+    response = platform_admin_client.get(url_for(
+        '.organisation_settings', org_id=organisation_one['id']
+    ))
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert len(page.find_all(
+        'a', attrs={'href': '/organisations/{}/settings/notes'.format(organisation_one['id'])}
+    )) == 1

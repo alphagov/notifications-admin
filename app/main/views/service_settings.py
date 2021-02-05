@@ -34,7 +34,7 @@ from app.main import main
 from app.main.forms import (
     BrandingOptions,
     ConfirmPasswordForm,
-    EditServiceNotesForm,
+    EditNotesForm,
     EstimateUsageForm,
     FreeSMSAllowance,
     LinkOrganisationsForm,
@@ -1193,7 +1193,7 @@ def edit_data_retention(service_id, data_retention_id):
 @main.route("/services/<uuid:service_id>/notes", methods=['GET', 'POST'])
 @user_is_platform_admin
 def edit_service_notes(service_id):
-    form = EditServiceNotesForm(notes=current_service.notes)
+    form = EditNotesForm(notes=current_service.notes)
 
     if form.validate_on_submit():
 
