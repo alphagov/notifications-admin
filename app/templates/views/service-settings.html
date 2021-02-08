@@ -329,17 +329,18 @@
             {% endif %}
           {% endcall %}
 
+          {% if not current_service.has_permission('broadcast') %}
           {% call row() %}
             {{ text_field('Count in list of live services')}}
             {{ text_field('Yes' if current_service.count_as_live else 'No') }}
             {{ edit_field('Change', url_for('.service_switch_count_as_live', service_id=current_service.id), suffix='if service is counted in list of live services') }}
           {% endcall %}
-
           {% call row() %}
             {{ text_field('Billing details')}}
             {{ optional_text_field(current_service.billing_details, default="No billing details yet", wrap=True) }}
             {{ edit_field('Change', url_for('.edit_service_billing_details', service_id=current_service.id), suffix='billing details for service') }}
           {% endcall %}
+          {% endif %}
 
           {% call row() %}
             {{ text_field('Notes')}}
@@ -347,6 +348,7 @@
             {{ edit_field('Change', url_for('.edit_service_notes', service_id=current_service.id), suffix='the notes for the service') }}
           {% endcall %}
 
+          {% if not current_service.has_permission('broadcast') %}
           {% call row() %}
             {{ text_field('Organisation')}}
             {% call field() %}
@@ -365,6 +367,7 @@
             {% endcall %}
             {{ edit_field('Change', url_for('.link_service_to_organisation', service_id=current_service.id), suffix='organisation for service') }}
           {% endcall %}
+
           {% call row() %}
             {{ text_field('Rate limit')}}
             {{ text_field('{:,} per minute'.format(current_service.rate_limit)) }}
@@ -407,6 +410,7 @@
             {% endcall %}
             {{ edit_field('Change', url_for('.data_retention', service_id=current_service.id), suffix='data retention') }}
           {% endcall %}
+          {% endif %}
 
           {% for permission in service_permissions %}
             {% if not service_permissions[permission].requires or current_service.has_permission(service_permissions[permission].requires) %}
