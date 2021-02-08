@@ -613,14 +613,8 @@ def test_show_restricted_broadcast_service(
         service_id=SERVICE_ONE_ID,
     )
 
-    assert page.select('main h2')[0].text == 'Your service is in trial mode'
-
-    request_to_live = page.select_one('main p')
-    request_to_live_link = request_to_live.select_one('a')
-    assert normalize_spaces(page.select_one('main p').text) == (
-        'To remove these restrictions, you can send us a request to go live.'
-    )
-    assert request_to_live_link['href'] == url_for('main.request_to_go_live', service_id=SERVICE_ONE_ID)
+    assert 'Your service is in trial mode' not in page.select('main')[0].text
+    assert 'To remove these restrictions, you can send us a request to go live' not in page.select('main')[0].text
     assert not page.select_one('main ul')
 
 
