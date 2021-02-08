@@ -254,6 +254,52 @@ def test_set_sender_redirects_if_no_sms_senders(
     )
 
 
+def test_set_sender_redirects_if_one_email_sender(
+    client_request,
+    fake_uuid,
+    mock_get_service_email_template,
+    single_reply_to_email_address,
+):
+    client_request.get(
+        '.set_sender',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _expected_status=302,
+        _expected_url=url_for(
+            '.send_one_off',
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            _external=True,
+        )
+    )
+
+    with client_request.session_transaction() as session:
+        assert session['sender_id'] == '1234'
+
+
+def test_set_sender_redirects_if_one_sms_sender(
+    client_request,
+    fake_uuid,
+    mock_get_service_template,
+    single_sms_sender,
+):
+    client_request.get(
+        '.set_sender',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _expected_status=302,
+        _expected_url=url_for(
+            '.send_one_off',
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            _external=True,
+        )
+    )
+
+    with client_request.session_transaction() as session:
+        assert session['sender_id'] == '1234'
+
+
 def test_that_test_files_exist():
     assert len(test_spreadsheet_files) == 8
     assert len(test_non_spreadsheet_files) == 6
