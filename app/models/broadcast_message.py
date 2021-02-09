@@ -49,6 +49,8 @@ class BroadcastMessage(JSONModel):
             return self.updated_at < other.created_at
         if not self.updated_at and other.updated_at:
             return self.created_at < other.updated_at
+        if not self.updated_at and not other.updated_at:
+            return self.created_at < other.created_at
         return self.updated_at < other.updated_at
 
     @classmethod
