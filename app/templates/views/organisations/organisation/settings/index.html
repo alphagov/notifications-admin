@@ -19,7 +19,8 @@
         {{ text_field(current_org.name) }}
         {{ edit_field(
             'Change',
-            url_for('.edit_organisation_name', org_id=current_org.id)
+            url_for('.edit_organisation_name', org_id=current_org.id),
+            suffix='organisation name'
           )
         }}
       {% endcall %}
@@ -28,7 +29,8 @@
         {{ optional_text_field(current_org.organisation_type_label) }}
         {{ edit_field(
             'Change',
-            url_for('.edit_organisation_type', org_id=current_org.id)
+            url_for('.edit_organisation_type', org_id=current_org.id),
+            suffix='sector for the organisation'
           )
         }}
       {% endcall %}
@@ -43,7 +45,8 @@
         ) }}
         {{ edit_field(
             'Change',
-            url_for('.edit_organisation_crown_status', org_id=current_org.id)
+            url_for('.edit_organisation_crown_status', org_id=current_org.id),
+            suffix='organisation crown status'
           )
         }}
       {% endcall %}
@@ -58,7 +61,8 @@
         ) }}
         {{ edit_field(
             'Change',
-            url_for('.edit_organisation_agreement', org_id=current_org.id)
+            url_for('.edit_organisation_agreement', org_id=current_org.id),
+            suffix='data sharing and financial agreement for the organisation'
           )
         }}
       {% endcall %}
@@ -67,7 +71,8 @@
         {{ optional_text_field(current_org.request_to_go_live_notes, default='None') }}
         {{ edit_field(
             'Change',
-            url_for('.edit_organisation_go_live_notes', org_id=current_org.id)
+            url_for('.edit_organisation_go_live_notes', org_id=current_org.id),
+            suffix='go live notes for the organisation'
           )
         }}
       {% endcall %}
@@ -75,13 +80,23 @@
       {% call row() %}
         {{ text_field('Billing details')}}
         {{ optional_text_field(current_org.billing_details, default="No billing details yet", wrap=True) }}
-        {{ edit_field('Change', url_for('.edit_organisation_billing_details', org_id=current_org.id), suffix='billing details for the organisation') }}
+        {{ edit_field(
+            'Change',
+            url_for('.edit_organisation_billing_details', org_id=current_org.id),
+            suffix='billing details for the organisation'
+          )
+        }}
       {% endcall %}
 
       {% call row() %}
         {{ text_field('Notes')}}
         {{ optional_text_field(current_org.notes, default="No notes yet", wrap=True) }}
-        {{ edit_field('Change', url_for('.edit_organisation_notes', org_id=current_org.id), suffix='the notes for the organisation') }}
+        {{ edit_field(
+            'Change',
+            url_for('.edit_organisation_notes', org_id=current_org.id),
+            suffix='the notes for the organisation'
+          )
+        }}
       {% endcall %}
 
       {% call row() %}
@@ -89,7 +104,8 @@
         {{ text_field(current_org.email_branding_name) }}
         {{ edit_field(
             'Change',
-            url_for('.edit_organisation_email_branding', org_id=current_org.id)
+            url_for('.edit_organisation_email_branding', org_id=current_org.id),
+            suffix='default email branding for the organisation'
           )
         }}
       {% endcall %}
@@ -101,7 +117,8 @@
         ) }}
         {{ edit_field(
             'Change',
-            url_for('.edit_organisation_letter_branding', org_id=current_org.id)
+            url_for('.edit_organisation_letter_branding', org_id=current_org.id),
+            suffix='default letter branding for the organisation'
           )
         }}
       {% endcall %}
@@ -110,7 +127,8 @@
         {{ optional_text_field(current_org.domains or None, default='None') }}
         {{ edit_field(
             'Change',
-            url_for('.edit_organisation_domains', org_id=current_org.id)
+            url_for('.edit_organisation_domains', org_id=current_org.id),
+            suffix='known email domains for the organisation'
           )
         }}
       {% endcall %}

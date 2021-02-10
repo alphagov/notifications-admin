@@ -686,16 +686,19 @@ def test_organisation_settings_for_platform_admin(
 ):
     expected_rows = [
         'Label Value Action',
-        'Name Test organisation Change',
-        'Sector Central government Change',
-        'Crown organisation Yes Change',
-        'Data sharing and financial agreement Not signed Change',
-        'Request to go live notes None Change',
+        'Name Test organisation Change organisation name',
+        'Sector Central government Change sector for the organisation',
+        'Crown organisation Yes Change organisation crown status',
+        (
+            'Data sharing and financial agreement '
+            'Not signed Change data sharing and financial agreement for the organisation'
+        ),
+        'Request to go live notes None Change go live notes for the organisation',
         'Billing details No billing details yet Change billing details for the organisation',
         'Notes No notes yet Change the notes for the organisation',
-        'Default email branding GOV.UK Change',
-        'Default letter branding No branding Change',
-        'Known email domains None Change',
+        'Default email branding GOV.UK Change default email branding for the organisation',
+        'Default letter branding No branding Change default letter branding for the organisation',
+        'Known email domains None Change known email domains for the organisation',
     ]
 
     client_request.login(platform_admin_user)
