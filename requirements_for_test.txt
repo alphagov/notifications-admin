@@ -21,7 +21,7 @@ awscli==1.18.211
     #   notifications-utils
 beautifulsoup4==4.8.1
     # via -r requirements_for_test.in
-bleach==3.2.1
+bleach==3.3.0
     # via
     #   -r requirements.txt
     #   notifications-utils
@@ -191,12 +191,11 @@ monotonic==1.5
     # via
     #   -r requirements.txt
     #   notifications-python-client
-    #   notifications-utils
 more-itertools==8.6.0
     # via pytest
 notifications-python-client==5.7.1
     # via -r requirements.txt
-git+https://github.com/alphagov/notifications-utils.git@43.7.0#egg=notifications-utils==43.7.0
+git+https://github.com/alphagov/notifications-utils.git@43.8.3#egg=notifications-utils==43.8.3
     # via -r requirements.txt
 openpyxl==3.0.5
     # via
@@ -325,7 +324,9 @@ s3transfer==0.3.3
     #   awscli
     #   boto3
 shapely==1.7.1
-    # via -r requirements.txt
+    # via
+    #   -r requirements.txt
+    #   notifications-utils
 six==1.15.0
     # via
     #   -r requirements.txt
