@@ -1315,6 +1315,31 @@ def test_update_organisation_notes(
     )
 
 
+def test_update_organisation_notes_doesnt_call_api_when_notes_dont_change(
+        platform_admin_client,
+        organisation_one,
+        mock_update_organisation,
+        mocker
+):
+    mocker.patch('app.organisations_client.get_organisation', return_value=organisation_json(
+        id_=organisation_one['id'],
+        name="Test Org",
+        notes="Very fluffy"
+    ))
+    response = platform_admin_client.post(
+        url_for(
+            'main.edit_organisation_notes',
+            org_id=organisation_one['id'],
+        ),
+        data={'notes': "Very fluffy"}
+    )
+    assert response.status_code == 302
+    settings_url = url_for(
+        'main.organisation_settings', org_id=organisation_one['id'], _external=True)
+    assert response.location == settings_url
+    assert not mock_update_organisation.called
+
+
 def test_organisation_settings_links_to_edit_organisation_billing_details_page(
     mocker,
     mock_get_organisation,
