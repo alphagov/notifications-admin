@@ -218,6 +218,10 @@ def set_sender(service_id, template_id):
         return redirect_to_one_off
 
     sender_details = get_sender_details(service_id, template['template_type'])
+
+    if len(sender_details) == 1:
+        session['sender_id'] = sender_details[0]['id']
+
     if len(sender_details) <= 1:
         return redirect_to_one_off
 

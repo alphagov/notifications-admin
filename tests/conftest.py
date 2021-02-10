@@ -4174,13 +4174,15 @@ def create_notification(
     key_type=None,
     postage=None,
     sent_one_off=True,
+    reply_to_text=None,
 ):
     noti = notification_json(
         service_id,
         rows=1,
         status=notification_status,
         template_type=template_type,
-        postage=postage
+        postage=postage,
+        reply_to_text=reply_to_text,
     )['notifications'][0]
 
     noti['id'] = notifification_id or sample_uuid()

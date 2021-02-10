@@ -949,3 +949,22 @@ def test_cancelling_a_letter_calls_the_api(
     )
 
     assert cancel_endpoint.called
+
+
+@pytest.mark.parametrize('notification_type', ['sms', 'email'])
+def test_should_show_reply_to_from_notification(
+    mocker,
+    fake_uuid,
+    notification_type,
+    client_request,
+):
+    notification = create_notification(reply_to_text='reply to info', template_type=notification_type)
+    mocker.patch('app.notification_api_client.get_notification', return_value=notification)
+
+    page = client_request.get(
+        'main.view_notification',
+        service_id=SERVICE_ONE_ID,
+        notification_id=fake_uuid,
+    )
+
+    assert 'reply to info' in page.text

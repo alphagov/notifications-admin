@@ -95,6 +95,8 @@ def view_notification(service_id, notification_id):
         page_count=page_count,
         show_recipient=True,
         redact_missing_personalisation=True,
+        sms_sender=notification['reply_to_text'],
+        email_reply_to=notification['reply_to_text'],
     )
     template.values = personalisation
     if notification['job']:
