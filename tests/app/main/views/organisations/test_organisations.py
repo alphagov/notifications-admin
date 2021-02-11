@@ -194,6 +194,37 @@ def test_create_new_organisation_fails_with_incorrect_input(
     assert error_message in page.select_one('.govuk-error-message').text
 
 
+def test_create_new_organisation_fails_with_duplicate_name(
+    client_request,
+    platform_admin_user,
+    mocker,
+):
+    def _create(**_kwargs):
+        json_mock = Mock(return_value={'message': 'Organisation name already exists'})
+        resp_mock = Mock(status_code=400, json=json_mock)
+        http_error = HTTPError(response=resp_mock, message="Default message")
+        raise http_error
+
+    mocker.patch(
+        'app.organisations_client.create_organisation',
+        side_effect=_create
+    )
+
+    client_request.login(platform_admin_user)
+    page = client_request.post(
+        '.add_organisation',
+        _data={
+            'name': 'Existing org',
+            'organisation_type': 'local',
+            'crown_status': 'non-crown',
+        },
+        _expected_status=200,
+    )
+
+    error_message = 'This organisation name is already in use'
+    assert error_message in page.select_one('.govuk-error-message').text
+
+
 @pytest.mark.parametrize('organisation_type, organisation, expected_status', (
     ('nhs_gp', None, 200),
     ('central', None, 403),

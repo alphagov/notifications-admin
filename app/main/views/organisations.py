@@ -62,10 +62,17 @@ def add_organisation():
     form = NewOrganisationForm()
 
     if form.validate_on_submit():
-        return redirect(url_for(
-            '.organisation_settings',
-            org_id=Organisation.create_from_form(form).id,
-        ))
+        try:
+            return redirect(url_for(
+                '.organisation_settings',
+                org_id=Organisation.create_from_form(form).id,
+            ))
+        except HTTPError as e:
+            msg = 'Organisation name already exists'
+            if e.status_code == 400 and msg in e.message:
+                form.name.errors.append("This organisation name is already in use")
+            else:
+                raise e
 
     return render_template(
         'views/organisations/add-organisation.html',
