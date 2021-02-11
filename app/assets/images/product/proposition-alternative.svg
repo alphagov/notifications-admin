@@ -1,0 +1,397 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 21.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 70 70" style="enable-background:new 0 0 70 70;" xml:space="preserve">
+<style type="text/css">
+	.st0{clip-path:url(#SVGID_2_);fill:#F3F2F1;}
+	.st1{clip-path:url(#SVGID_2_);fill:#E0E0E0;}
+	.st2{clip-path:url(#SVGID_2_);}
+	.st3{fill:#596468;}
+	.st4{fill:#F3F2F1;}
+	.st5{clip-path:url(#SVGID_6_);fill:#A7A9AA;}
+	.st6{display:none;clip-path:url(#SVGID_6_);fill:url(#SVGID_7_);}
+	.st7{clip-path:url(#SVGID_6_);fill:#E0E0E0;}
+	.st8{clip-path:url(#SVGID_6_);}
+	.st9{fill:#C7C7DD;}
+	.st10{fill:#C7DDCB;}
+	.st11{fill:#E0E0E0;}
+	.st12{fill:#A7A9AA;}
+	.st13{clip-path:url(#SVGID_6_);fill:#BCD3C0;}
+	.st14{clip-path:url(#SVGID_6_);fill:#CECECE;}
+	.st15{opacity:0.5;clip-path:url(#SVGID_6_);}
+	.st16{fill:url(#SVGID_8_);}
+	.st17{fill:url(#SVGID_9_);}
+	.st18{fill:#01040E;}
+	.st19{opacity:0.9;fill:#FFFFFF;}
+	.st20{opacity:0.2;}
+	.st21{fill:#E2E2E2;}
+	.st22{fill:#151519;}
+</style>
+<symbol  id="wing" viewBox="-12.5 -22.9 33.1 43.2">
+	<g>
+		<defs>
+			<path id="SVGID_1_" d="M-3.7-21.5c0,0-3.3,10.3-4.1,14.6C-10.4,8-3.9,18.3,2.3,20c5.2,1.4,6.5-3.2,5-15
+				C6.2-3.4,4.7-21.5,4.7-21.5L-3.7-21.5z"/>
+		</defs>
+		<clipPath id="SVGID_2_">
+			<use xlink:href="#SVGID_1_"  style="overflow:visible;"/>
+		</clipPath>
+		<path class="st0" d="M-3.7-21.5c0,0-3.3,10.3-4.1,14.6C-10.4,8-3.9,18.3,2.3,20c5.2,1.4,6.5-3.2,5-15C6.2-3.4,4.7-21.5,4.7-21.5
+			L-3.7-21.5z"/>
+		<polygon class="st1" points="-8.9,-10.6 7.5,-15.4 7.4,-22.9 -7.1,-22.9 		"/>
+		<g class="st2">
+			<polygon class="st3" points="9,-11.6 -10.6,-7.3 -9.5,-10.4 8.4,-14.9 			"/>
+			<circle class="st4" cx="-0.6" cy="-9.8" r="1.6"/>
+			<circle class="st4" cx="2.1" cy="-10.7" r="1.6"/>
+			<circle class="st4" cx="4.8" cy="-11.6" r="1.6"/>
+			<circle class="st3" cx="-5.9" cy="-11.1" r="1.6"/>
+			<circle class="st3" cx="-0.6" cy="-13" r="1.6"/>
+			<circle class="st3" cx="-3.3" cy="-12.1" r="1.6"/>
+			<circle class="st3" cx="2.1" cy="-13.9" r="1.6"/>
+			<circle class="st3" cx="4.8" cy="-14.7" r="1.6"/>
+			<circle class="st4" cx="-6.1" cy="-8" r="1.6"/>
+			<circle class="st4" cx="-3.3" cy="-9" r="1.6"/>
+		</g>
+		<g class="st2">
+			<polygon class="st3" points="9.2,-3.9 -12.5,1.3 -9.9,-2 6.7,-6.7 			"/>
+			<circle class="st4" cx="-5.1" cy="-0.4" r="1.6"/>
+			<circle class="st4" cx="-2.4" cy="-1.2" r="1.6"/>
+			<circle class="st4" cx="0.3" cy="-2.2" r="1.6"/>
+			<circle class="st4" cx="2.9" cy="-3" r="1.6"/>
+			<circle class="st3" cx="-7.8" cy="-2.5" r="1.6"/>
+			<circle class="st3" cx="-2.4" cy="-4.4" r="1.6"/>
+			<circle class="st3" cx="-5.2" cy="-3.6" r="1.6"/>
+			<circle class="st3" cx="0.3" cy="-5.3" r="1.6"/>
+			<circle class="st3" cx="2.9" cy="-6.2" r="1.6"/>
+			<circle class="st3" cx="5.1" cy="-6.7" r="1.6"/>
+			<path class="st4" d="M20.3-21.4c-0.9,0-1.6,0.7-1.6,1.6s1,1.6,1.9,1.6"/>
+			<circle class="st4" cx="-7.8" cy="0.6" r="1.6"/>
+			<circle class="st4" cx="5.6" cy="-3.7" r="1.6"/>
+		</g>
+	</g>
+</symbol>
+<g id="Tail">
+	<g>
+		<defs>
+			<circle id="SVGID_3_" cx="34.7" cy="61.2" r="51"/>
+		</defs>
+		<clipPath id="SVGID_4_">
+			<use xlink:href="#SVGID_3_"  style="overflow:visible;"/>
+		</clipPath>
+	</g>
+</g>
+<g id="Body">
+	<g>
+		<defs>
+			<path id="SVGID_5_" d="M60.9,40.9c5.2,24.1-11,57.5-25.3,57.5S7.3,77.9,9.6,53.6c1-10.4,1.7-15.9,4-21.3c1.4-3.2,3.6-2.1,5.8-6.3
+				c0.3-0.6,3.6-5.7,3.8-6.4c0.5-1.8,0-4.7-2.5-5.1c-1.9-0.4-1-4.3-0.8-5.4c1.2-5.8,5.9-9.5,13.9-8.7c5.3,0.6,8.6,3.3,12.1,9.1
+				c2.7,4.6,3.2,6.2,5.6,16.5C53.4,34.4,58.8,31.1,60.9,40.9z"/>
+		</defs>
+		<clipPath id="SVGID_6_">
+			<use xlink:href="#SVGID_5_"  style="overflow:visible;"/>
+		</clipPath>
+		<path class="st5" d="M9.6,69.4c0,0-1.8-10.5-1.6-16.1c0.6-16.5,9.1-18.8,10.7-31.5c0.6-4.5,0.7-10.6,1-12.7
+			c0.8-5.8,5.9-9.5,13.9-8.7C41.5,1.2,44.6,5.7,48,12.2c5.1,10,7.4,12.6,13.6,41.4c1.2,5.5,0.4,15.8,0.4,15.8"/>
+		
+			<linearGradient id="SVGID_7_" gradientUnits="userSpaceOnUse" x1="31.669" y1="66.3515" x2="31.669" y2="29.9648" gradientTransform="matrix(1 0 0 -1 3.2388 78.9073)">
+			<stop  offset="0" style="stop-color:#061610"/>
+			<stop  offset="0.1972" style="stop-color:#093216"/>
+			<stop  offset="0.7717" style="stop-color:#3A2675"/>
+			<stop  offset="1" style="stop-color:#412B84"/>
+		</linearGradient>
+		<path class="st6" d="M55.7,20.5c-1.6-5.3-4-3.7-5.7-8c0,0-1.4,6.6-12.8,7.7C27.9,21.2,20,13.7,20,13.7c1,6.9-2.5,5.3-5.5,10.7
+			C8.6,35.2,25.3,48.9,34.5,48.9S60.4,35.7,55.7,20.5z"/>
+		<polygon class="st7" points="-16.3,23.3 35,31.9 74.7,23 60.6,69.4 -8.5,69.4 		"/>
+		<g class="st8">
+			<g>
+				
+					<ellipse transform="matrix(5.242551e-02 -0.9986 0.9986 5.242551e-02 -14.8756 26.2355)" class="st9" cx="6.4" cy="21" rx="2.9" ry="2.9"/>
+			</g>
+			<g>
+				
+					<ellipse transform="matrix(5.242551e-02 -0.9986 0.9986 5.242551e-02 -4.7403 30.7515)" class="st9" cx="13.8" cy="17.9" rx="2.9" ry="2.9"/>
+			</g>
+			<g>
+				
+					<ellipse transform="matrix(5.242551e-02 -0.9986 0.9986 5.242551e-02 -4.2912 38.1073)" class="st9" cx="17.9" cy="21.3" rx="2.9" ry="2.9"/>
+			</g>
+			<g>
+				
+					<ellipse transform="matrix(5.242551e-02 -0.9986 0.9986 5.242551e-02 -2.7915 44.5926)" class="st9" cx="22.1" cy="23.8" rx="2.9" ry="2.9"/>
+			</g>
+			<g>
+				
+					<ellipse transform="matrix(5.242551e-02 -0.9986 0.9986 5.242551e-02 0.7537 51.0883)" class="st9" cx="27.3" cy="25.1" rx="2.9" ry="2.9"/>
+			</g>
+			<g>
+				
+					<ellipse transform="matrix(5.242551e-02 -0.9986 0.9986 5.242551e-02 32.3083 81.4958)" class="st9" cx="59.1" cy="23.7" rx="2.9" ry="2.9"/>
+			</g>
+			<g>
+				
+					<ellipse transform="matrix(5.242551e-02 -0.9986 0.9986 5.242551e-02 29.4362 70.778)" class="st9" cx="52" cy="19.9" rx="2.9" ry="2.9"/>
+			</g>
+			<g>
+				
+					<ellipse transform="matrix(5.242551e-02 -0.9986 0.9986 5.242551e-02 22.2417 69.1818)" class="st9" cx="47.6" cy="22.9" rx="2.9" ry="2.9"/>
+			</g>
+			<g>
+				
+					<ellipse transform="matrix(5.242551e-02 -0.9986 0.9986 5.242551e-02 16.0979 66.7152)" class="st9" cx="43.2" cy="24.9" rx="2.9" ry="2.9"/>
+			</g>
+			<g>
+				
+					<ellipse transform="matrix(5.242551e-02 -0.9986 0.9986 5.242551e-02 10.2116 62.1651)" class="st9" cx="37.9" cy="25.7" rx="2.9" ry="2.9"/>
+			</g>
+			<g>
+				
+					<ellipse transform="matrix(5.242551e-02 -0.9986 0.9986 5.242551e-02 4.6874 57.3324)" class="st9" cx="32.6" cy="26.2" rx="2.9" ry="2.9"/>
+			</g>
+		</g>
+		<g class="st8">
+			<g>
+				<circle class="st10" cx="17" cy="26.1" r="2.9"/>
+			</g>
+			<g>
+				<circle class="st10" cx="20.6" cy="28.8" r="2.9"/>
+			</g>
+			<g>
+				<circle class="st10" cx="24.9" cy="31.5" r="2.9"/>
+			</g>
+			<g>
+				<circle class="st10" cx="29.9" cy="33.8" r="2.9"/>
+			</g>
+			<g>
+				<circle class="st10" cx="52.7" cy="25.2" r="2.9"/>
+			</g>
+			<g>
+				<circle class="st10" cx="49.3" cy="28.8" r="2.9"/>
+			</g>
+			<g>
+				<circle class="st10" cx="45.4" cy="31.5" r="2.9"/>
+			</g>
+			<g>
+				<circle class="st10" cx="40.5" cy="33.8" r="2.9"/>
+			</g>
+			<g>
+				<circle class="st10" cx="35.2" cy="34.6" r="2.9"/>
+			</g>
+		</g>
+		<g class="st8">
+			<g>
+				<circle class="st10" cx="8.8" cy="28" r="2.9"/>
+			</g>
+			<g>
+				<circle class="st10" cx="16.1" cy="24.5" r="2.9"/>
+			</g>
+			<g>
+				<circle class="st10" cx="20.4" cy="27.8" r="2.9"/>
+			</g>
+			<g>
+				<circle class="st10" cx="24.7" cy="30" r="2.9"/>
+			</g>
+			<g>
+				<circle class="st10" cx="29.9" cy="31.1" r="2.9"/>
+			</g>
+			<g>
+				<circle class="st10" cx="61.6" cy="28" r="2.9"/>
+			</g>
+			<g>
+				<circle class="st10" cx="54.3" cy="24.5" r="2.9"/>
+			</g>
+			<g>
+				<circle class="st10" cx="50.1" cy="27.8" r="2.9"/>
+			</g>
+			<g>
+				<circle class="st10" cx="45.8" cy="30" r="2.9"/>
+			</g>
+			<g>
+				<circle class="st10" cx="40.5" cy="31.1" r="2.9"/>
+			</g>
+			<g>
+				<circle class="st10" cx="35.2" cy="31.9" r="2.9"/>
+			</g>
+		</g>
+		<polygon class="st5" points="16.1,45.6 25.4,60 34.4,66.8 45.3,59.5 52.6,43.8 57.8,71.8 7,71.7 		"/>
+		<g class="st8">
+			<g>
+				
+					<ellipse transform="matrix(5.242551e-02 -0.9986 0.9986 5.242551e-02 -17.8201 28.7496)" class="st9" cx="6.2" cy="23.8" rx="2.9" ry="2.9"/>
+			</g>
+			<g>
+				
+					<ellipse transform="matrix(5.242551e-02 -0.9986 0.9986 5.242551e-02 -7.6848 33.2657)" class="st9" cx="13.7" cy="20.7" rx="2.9" ry="2.9"/>
+			</g>
+			<g>
+				
+					<ellipse transform="matrix(5.242551e-02 -0.9986 0.9986 5.242551e-02 -6.0109 39.4592)" class="st9" cx="17.8" cy="22.9" rx="2.9" ry="2.9"/>
+			</g>
+			<g>
+				
+					<ellipse transform="matrix(5.242551e-02 -0.9986 0.9986 5.242551e-02 -3.6213 45.7191)" class="st9" cx="22.3" cy="24.8" rx="2.9" ry="2.9"/>
+			</g>
+			<g>
+				
+					<ellipse transform="matrix(5.242551e-02 -0.9986 0.9986 5.242551e-02 -1.6577 53.0966)" class="st9" cx="27.1" cy="27.4" rx="2.9" ry="2.9"/>
+			</g>
+			<g>
+				
+					<ellipse transform="matrix(5.242551e-02 -0.9986 0.9986 5.242551e-02 26.6189 74.6738)" class="st9" cx="52.7" cy="23.3" rx="2.9" ry="2.9"/>
+			</g>
+			<g>
+				
+					<ellipse transform="matrix(5.242551e-02 -0.9986 0.9986 5.242551e-02 19.3421 72.1278)" class="st9" cx="47.7" cy="25.9" rx="2.9" ry="2.9"/>
+			</g>
+			<g>
+				
+					<ellipse transform="matrix(5.242551e-02 -0.9986 0.9986 5.242551e-02 13.6217 68.7851)" class="st9" cx="43.1" cy="27.2" rx="2.9" ry="2.9"/>
+			</g>
+			<g>
+				
+					<ellipse transform="matrix(5.242551e-02 -0.9986 0.9986 5.242551e-02 7.327 64.6223)" class="st9" cx="37.7" cy="28.5" rx="2.9" ry="2.9"/>
+			</g>
+			<g>
+				
+					<ellipse transform="matrix(5.242551e-02 -0.9986 0.9986 5.242551e-02 1.7429 59.8466)" class="st9" cx="32.4" cy="29" rx="2.9" ry="2.9"/>
+			</g>
+		</g>
+		<g class="st8">
+			<g>
+				<circle class="st11" cx="18.9" cy="50.5" r="2.9"/>
+			</g>
+			<g>
+				<circle class="st11" cx="20.2" cy="53.7" r="2.9"/>
+			</g>
+			<g>
+				<circle class="st11" cx="21.8" cy="57.7" r="2.9"/>
+			</g>
+			<g>
+				<circle class="st11" cx="25.1" cy="61.1" r="2.9"/>
+			</g>
+			<g>
+				<circle class="st11" cx="29.2" cy="63" r="2.9"/>
+			</g>
+			<g>
+				<circle class="st11" cx="49.6" cy="49.5" r="2.9"/>
+			</g>
+			<g>
+				<circle class="st11" cx="48.1" cy="54" r="2.9"/>
+			</g>
+			<g>
+				<circle class="st11" cx="47" cy="57.7" r="2.9"/>
+			</g>
+			<g>
+				<circle class="st11" cx="43.8" cy="61.1" r="2.9"/>
+			</g>
+			<g>
+				<circle class="st11" cx="39.6" cy="63" r="2.9"/>
+			</g>
+			<g>
+				<circle class="st11" cx="34.4" cy="63.9" r="2.9"/>
+			</g>
+		</g>
+		<g class="st8">
+			<g>
+				<circle class="st12" cx="8.8" cy="19.9" r="2.9"/>
+			</g>
+			<g>
+				<circle class="st12" cx="16.1" cy="16.4" r="2.9"/>
+			</g>
+			<g>
+				<circle class="st12" cx="20.4" cy="18.4" r="2.9"/>
+			</g>
+			<g>
+				<circle class="st12" cx="24.7" cy="21.1" r="2.9"/>
+			</g>
+			<g>
+				<circle class="st12" cx="29.9" cy="22.8" r="2.9"/>
+			</g>
+			<g>
+				<circle class="st12" cx="61.6" cy="19.9" r="2.9"/>
+			</g>
+			<g>
+				<circle class="st12" cx="54.3" cy="16.4" r="2.9"/>
+			</g>
+			<g>
+				<circle class="st12" cx="50.1" cy="18.4" r="2.9"/>
+			</g>
+			<g>
+				<circle class="st12" cx="45.8" cy="21.1" r="2.9"/>
+			</g>
+			<g>
+				<circle class="st12" cx="40.5" cy="22.6" r="2.9"/>
+			</g>
+			<g>
+				<circle class="st12" cx="35.2" cy="23.8" r="2.9"/>
+			</g>
+		</g>
+		<circle class="st13" cx="53" cy="22.9" r="2.1"/>
+		<path class="st14" d="M45.8,64.5"/>
+		<g class="st15">
+			<g>
+				<circle class="st11" cx="12" cy="48" r="4.2"/>
+			</g>
+			<g>
+				<circle class="st11" cx="13.9" cy="52.6" r="4.2"/>
+			</g>
+			<g>
+				<circle class="st11" cx="16.3" cy="58.5" r="4.2"/>
+			</g>
+			<g>
+				<circle class="st11" cx="21" cy="63.4" r="4.2"/>
+			</g>
+			<g>
+				<circle class="st11" cx="27" cy="67.5" r="4.2"/>
+			</g>
+			<g>
+				<circle class="st11" cx="56.6" cy="46.6" r="4.2"/>
+			</g>
+			<g>
+				<circle class="st11" cx="54.5" cy="53.1" r="4.2"/>
+			</g>
+			<g>
+				<circle class="st11" cx="52.9" cy="58.5" r="4.2"/>
+			</g>
+			<g>
+				<circle class="st11" cx="48.2" cy="63.4" r="4.2"/>
+			</g>
+			<g>
+				<circle class="st11" cx="42.1" cy="67.5" r="4.2"/>
+			</g>
+			<g>
+				<circle class="st11" cx="34.6" cy="67.5" r="6"/>
+			</g>
+		</g>
+	</g>
+	
+		<linearGradient id="SVGID_8_" gradientUnits="userSpaceOnUse" x1="59.814" y1="12.5279" x2="46.2077" y2="12.5279" gradientTransform="matrix(-1 0 0 1 68.4882 0)">
+		<stop  offset="0.3495" style="stop-color:#FC0019"/>
+		<stop  offset="0.9456" style="stop-color:#C36B14"/>
+	</linearGradient>
+	<path class="st16" d="M20,9.9c-4.7,0.2-6.1,0.8-8,1.7s-3.4,3.5-3.4,3.5s3.5-0.9,7-1.2c3.5-0.3,6.6,0,6.6,0L20,9.9z"/>
+	<linearGradient id="SVGID_9_" gradientUnits="userSpaceOnUse" x1="26.8403" y1="7.1745" x2="32.658" y2="7.1745">
+		<stop  offset="0.3495" style="stop-color:#FC0019"/>
+		<stop  offset="0.9456" style="stop-color:#C36B14"/>
+	</linearGradient>
+	<circle class="st17" cx="29.7" cy="7.2" r="2.9"/>
+	<circle class="st18" cx="29.5" cy="7.3" r="1.4"/>
+	<path class="st19" d="M27.7,6.4c0,0.8,0.2,0.4,0.7,0.5c0.8,0.1,1.4-0.6,1.4-1.4c0-0.4,0.1-0.5-0.7-0.5S27.7,5.6,27.7,6.4z"/>
+	<path class="st20" d="M20.7,11.9c0,0-1.1-0.2-4.6,0.3c-2.1,0.3-7.5,3-7.5,3l1.2-0.3c0,0,4.5-1.9,6.3-2.1c2.6-0.3,3.1-0.3,4.5-0.2
+		L20.7,11.9z"/>
+	<path class="st21" d="M21,10.5c0,0-0.2-0.6-0.4-1.2c-0.3-0.7,0-1.3-0.2-1.5c-0.3-0.3-0.4,0-1.3,0.9s-2.6,1.1-2.4,1.8
+		c0.2,0.7,2.2,0.2,3.1,0.3C20.6,10.8,21,10.5,21,10.5z"/>
+	<path class="st12" d="M22.1,9.5c-0.2,1.1-1.7,1.4-1.7,1.4l-2.8,2.9l5.2,1.1L22,14.2l1.1-0.4l-1.1-0.8l0.8-0.8l-0.8-0.8l0.8-0.6
+		L22.1,9.5z"/>
+	<g id="Wings">
+		<path class="st22" d="M64.5,75.2"/>
+		
+			<use xlink:href="#wing"  width="33.1" height="43.2" id="XMLID_4_" x="-12.5" y="-22.9" transform="matrix(1.0565 0 0 -1.0565 11.6159 50.27)" style="overflow:visible;"/>
+		
+			<use xlink:href="#wing"  width="33.1" height="43.2" id="XMLID_2_" x="-12.5" y="-22.9" transform="matrix(1.0565 0 0 -1.0565 11.6159 50.8644)" style="display:none;overflow:visible;"/>
+		
+			<use xlink:href="#wing"  width="33.1" height="43.2" x="-12.5" y="-22.9" transform="matrix(-1.0565 0 0 -1.0565 57.2133 50.27)" style="overflow:visible;"/>
+	</g>
+</g>
+<g id="Layer_6">
+</g>
+</svg>
