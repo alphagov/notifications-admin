@@ -29,8 +29,10 @@ $button-shadow-size: $govuk-border-width-form-element;
       }
 
       &--alternative {
-        background-image: file-url('product/proposition-alternative.svg');
-        background-position: right 10px bottom 0;
+        @include media(desktop) {
+          background-image: file-url('product/proposition-alternative.svg');
+          background-position: right 10px bottom 0;
+        }
       }
 
     }
