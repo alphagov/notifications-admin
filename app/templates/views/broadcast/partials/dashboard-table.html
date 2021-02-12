@@ -18,6 +18,10 @@
             <p class="govuk-body govuk-!-margin-bottom-0 govuk-hint">
               Waiting for approval
             </p>
+          {% elif item.status == 'rejected' %}
+            <p class="govuk-body govuk-!-margin-bottom-0 govuk-hint">
+              Rejected {{ item.updated_at|format_datetime_relative }}
+            </p>
           {% elif item.status == 'broadcasting' %}
             <p class="govuk-body govuk-!-margin-bottom-0 live-broadcast">
               Live since {{ item.starts_at|format_datetime_relative }}

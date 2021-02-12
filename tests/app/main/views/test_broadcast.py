@@ -420,6 +420,7 @@ def test_previous_broadcasts_page(
         normalize_spaces(row.text)
         for row in page.select('.ajax-block-container')[0].select('.file-list')
     ] == [
+        'Example template This is a test Rejected today at 1:20am England Scotland',
         'Example template This is a test Broadcast yesterday at 2:20pm England Scotland',
         'Example template This is a test Broadcast yesterday at 2:20am England Scotland',
     ]

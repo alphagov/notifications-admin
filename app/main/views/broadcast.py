@@ -48,7 +48,11 @@ def broadcast_dashboard(service_id):
 def broadcast_dashboard_previous(service_id):
     return render_template(
         'views/broadcast/previous-broadcasts.html',
-        broadcasts=BroadcastMessages(service_id).with_status('cancelled', 'completed'),
+        broadcasts=BroadcastMessages(service_id).with_status(
+            'cancelled',
+            'completed',
+            'rejected',
+        ),
         empty_message='You do not have any previous alerts',
         view_broadcast_endpoint='.view_previous_broadcast',
     )

@@ -4420,6 +4420,13 @@ def mock_get_broadcast_messages(
                     datetime.utcnow() - timedelta(days=10)
                 ).isoformat(),
             ),
+            partial_json(
+                id_=uuid4(),
+                status='rejected',
+                updated_at=(
+                    datetime.utcnow() - timedelta(hours=1)
+                ).isoformat(),
+            ),
         ]
 
     return mocker.patch(
