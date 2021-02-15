@@ -71,7 +71,6 @@ PLATFORM_ADMIN_SERVICE_PERMISSIONS = OrderedDict([
     ('inbound_sms', {'title': 'Receive inbound SMS', 'requires': 'sms', 'endpoint': '.service_set_inbound_number'}),
     ('email_auth', {'title': 'Email authentication'}),
     ('international_letters', {'title': 'Send international letters', 'requires': 'letter'}),
-    ('broadcast', {'title': 'Send cell broadcasts'}),
 ])
 
 
@@ -305,32 +304,6 @@ def service_set_permission(service_id, permission):
 
     if form.validate_on_submit():
         current_service.force_permission(permission, on=form.enabled.data)
-
-        return redirect(url_for(".service_settings", service_id=service_id))
-
-    return render_template(
-        'views/service-settings/set-service-setting.html',
-        title=title,
-        form=form,
-    )
-
-
-@main.route("/services/<uuid:service_id>/service-settings/permissions/broadcast", methods=["GET", "POST"])
-@user_is_platform_admin
-def service_set_broadcast_permission(service_id):
-
-    title = PLATFORM_ADMIN_SERVICE_PERMISSIONS['broadcast']['title']
-    form = ServiceOnOffSettingForm(
-        name=title,
-        enabled=current_service.has_permission('broadcast')
-    )
-
-    if form.validate_on_submit():
-
-        if form.enabled.data:
-            current_service.force_broadcast_permission_on()
-        else:
-            current_service.force_permission('broadcast', on=False)
 
         return redirect(url_for(".service_settings", service_id=service_id))
 

@@ -116,17 +116,6 @@ class Service(JSONModel):
             permissions | permission if on else permissions - permission,
         )
 
-    def force_broadcast_permission_on(self):
-        ret = self.update_permissions(
-            set(self.permissions) - {'email', 'sms', 'letter'} | {'broadcast'}
-        )
-        broadcast_org_id = current_app.config['BROADCAST_ORGANISATION_ID']
-        organisations_client.update_service_organisation(
-            service_id=self.id,
-            org_id=broadcast_org_id
-        )
-        return ret
-
     def update_permissions(self, permissions):
         return self.update(permissions=list(permissions))
 

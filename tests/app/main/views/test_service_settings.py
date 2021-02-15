@@ -185,7 +185,6 @@ def test_platform_admin_sees_only_relevant_settings_for_broadcast_service(
         'Label Value Action',
         'Notes None Change the notes for the service',
         'Email authentication Off Change your settings for Email authentication',
-        'Send cell broadcasts On Change your settings for Send cell broadcasts',
     ]
 
     assert len(rows) == len(expected_rows)
