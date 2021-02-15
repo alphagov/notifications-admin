@@ -220,7 +220,7 @@ class BroadcastMessage(JSONModel):
         self._update(
             starts_at=datetime.utcnow().isoformat(),
             finishes_at=(
-                datetime.utcnow() + timedelta(hours=23, minutes=59)
+                datetime.utcnow() + timedelta(hours=4, minutes=0)
             ).isoformat(),
         )
         self._set_status_to('broadcasting')

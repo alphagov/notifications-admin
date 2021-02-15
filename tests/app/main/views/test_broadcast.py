@@ -1873,7 +1873,7 @@ def test_request_approval(
             broadcast_message_id=fake_uuid,
             data={
                 'starts_at': '2020-02-22T22:22:22',
-                'finishes_at': '2020-02-23T22:21:22',
+                'finishes_at': '2020-02-23T02:22:22',
             },
         )
         mock_update_broadcast_message_status.assert_called_once_with(
