@@ -1,5 +1,3 @@
-from unittest.mock import ANY, Mock
-
 import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
@@ -102,7 +100,7 @@ def test_page_to_create_new_organisation(
         ('radio', 'organisation_type', 'other'),
         ('radio', 'crown_status', 'crown'),
         ('radio', 'crown_status', 'non-crown'),
-        ('hidden', 'csrf_token', ANY),
+        ('hidden', 'csrf_token', mocker.ANY),
     ]
 
 
@@ -200,8 +198,8 @@ def test_create_new_organisation_fails_with_duplicate_name(
     mocker,
 ):
     def _create(**_kwargs):
-        json_mock = Mock(return_value={'message': 'Organisation name already exists'})
-        resp_mock = Mock(status_code=400, json=json_mock)
+        json_mock = mocker.Mock(return_value={'message': 'Organisation name already exists'})
+        resp_mock = mocker.Mock(status_code=400, json=json_mock)
         http_error = HTTPError(response=resp_mock, message="Default message")
         raise http_error
 
@@ -1079,7 +1077,7 @@ def test_update_organisation_domains_when_domain_already_exists(
     client_request.login(user)
 
     mocker.patch('app.organisations_client.update_organisation', side_effect=HTTPError(
-        response=Mock(
+        response=mocker.Mock(
             status_code=400,
             json={'result': 'error', 'message': 'Domain already exists'}
         ),
@@ -1229,7 +1227,7 @@ def test_confirm_update_organisation_with_name_already_in_use(
     mocker.patch(
         'app.organisations_client.update_organisation_name',
         side_effect=HTTPError(
-            response=Mock(
+            response=mocker.Mock(
                 status_code=400,
                 json={'result': 'error', 'message': 'Organisation name already exists'}
             ),
