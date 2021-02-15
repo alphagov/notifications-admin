@@ -177,7 +177,7 @@ requests==2.25.1
     #   notifications-utils
 rsa==4.7
     # via awscli
-s3transfer==0.3.3
+s3transfer==0.3.4
     # via
     #   awscli
     #   boto3
