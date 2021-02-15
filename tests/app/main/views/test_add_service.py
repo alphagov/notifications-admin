@@ -1,5 +1,6 @@
 import pytest
 from flask import session, url_for
+from notifications_python_client.errors import HTTPError
 
 from app.utils import is_gov_user
 from tests import organisation_json
@@ -309,9 +310,20 @@ def test_add_service_fails_if_service_name_fails_validation(
 
 def test_should_return_form_errors_with_duplicate_service_name_regardless_of_case(
     client_request,
-    mock_create_duplicate_service,
     mock_get_organisation_by_domain,
+    mocker,
 ):
+    def _create(**_kwargs):
+        json_mock = mocker.Mock(return_value={'message': {'name': ["Duplicate service name"]}})
+        resp_mock = mocker.Mock(status_code=400, json=json_mock)
+        http_error = HTTPError(response=resp_mock, message="Default message")
+        raise http_error
+
+    mocker.patch(
+        'app.service_api_client.create_service',
+        side_effect=_create
+    )
+
     page = client_request.post(
         'main.add_service',
         _data={
