@@ -34,6 +34,7 @@ class Service(JSONModel):
         'billing_contact_email_addresses',
         'billing_contact_names',
         'billing_reference',
+        'broadcast_channel',
         'consent_to_research',
         'contact_link',
         'count_as_live',

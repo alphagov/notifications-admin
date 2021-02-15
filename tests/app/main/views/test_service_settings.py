@@ -1,3 +1,4 @@
+import re
 from datetime import datetime
 from functools import partial
 from unittest.mock import ANY, Mock, PropertyMock, call
@@ -165,6 +166,7 @@ def test_platform_admin_sees_only_relevant_settings_for_broadcast_service(
         permissions=['broadcast'],
         organisation_id=ORGANISATION_ID,
         contact_link='contact_us@gov.uk',
+        broadcast_channel="severe",
     )
     mocker.patch('app.service_api_client.get_service', return_value={'data': service_one})
 
@@ -185,12 +187,63 @@ def test_platform_admin_sees_only_relevant_settings_for_broadcast_service(
         'Label Value Action',
         'Notes None Change the notes for the service',
         'Email authentication Off Change your settings for Email authentication',
+        'Send cell broadcasts Training mode - All networks - Public channel '
+        + 'Change your settings for Send cell broadcasts',
     ]
 
     assert len(rows) == len(expected_rows)
     for index, row in enumerate(expected_rows):
         assert row == " ".join(rows[index].text.split())
     app.service_api_client.get_service.assert_called_with(SERVICE_ONE_ID)
+
+
+@pytest.mark.parametrize(
+    'has_broadcast_permission,service_mode,broadcast_channel,allowed_broadcast_provider,expected_text',
+    [
+        (False, "training", None, None, "Off"),
+        (False, "live", None, None, "Off"),
+        (True, "training", "severe", None, "Training mode - All networks - Public channel"),
+        (True, "training", "test", "ee", "Training mode - EE network - Test channel only"),
+        (True, "live", "test", "three", "Live - Three network - Test channel only"),
+        (True, "live", "test", None, "Live - All networks - Test channel only"),
+        (True, "live", "severe", None, "Live - All networks - Public channel"),
+    ]
+)
+def test_platform_admin_sees_correct_description_of_broadcast_service_setting(
+        client,
+        mocker,
+        api_user_active,
+        no_reply_to_email_addresses,
+        no_letter_contact_blocks,
+        mock_get_organisation,
+        single_sms_sender,
+        mock_get_service_settings_page_common,
+        has_broadcast_permission,
+        service_mode,
+        broadcast_channel,
+        allowed_broadcast_provider,
+        expected_text
+):
+    service_one = service_json(
+        SERVICE_ONE_ID,
+        users=[api_user_active['id']],
+        permissions=['broadcast'] if has_broadcast_permission else ['email'],
+        organisation_id=ORGANISATION_ID,
+        restricted=True if service_mode == "training" else False,
+        broadcast_channel=broadcast_channel,
+        allowed_broadcast_provider=allowed_broadcast_provider,
+    )
+    mocker.patch('app.service_api_client.get_service', return_value={'data': service_one})
+
+    client.login(create_platform_admin_user(), mocker, service_one)
+    response = client.get(url_for(
+        'main.service_settings', service_id=SERVICE_ONE_ID
+    ))
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    broadcast_setting_row = page.find(string=re.compile("Send cell broadcasts")).find_parent('tr')
+    broadcast_setting_description = broadcast_setting_row.select('td')[1].text.strip()
+    assert broadcast_setting_description == expected_text
 
 
 def test_no_go_live_link_for_service_without_organisation(
@@ -5402,3 +5455,182 @@ def test_update_service_billing_details(
         purchase_order_number='PO1234',
         notes='very fluffy, give extra allowance'
     )
+
+
+def test_get_service_set_broadcast_account_type(
+    platform_admin_client,
+):
+    response = platform_admin_client.get(
+        url_for(
+            'main.service_set_broadcast_account_type',
+            service_id=SERVICE_ONE_ID,
+        )
+    )
+    assert response.status_code == 200
+
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert page.select_one('h1').text.strip() == "Change cell broadcast service type"
+
+    expected_labels = [
+        "Training mode - EE network - Test channel only",
+        "Training mode - O2 network - Test channel only",
+        "Training mode - Three network - Test channel only",
+        "Training mode - Vodafone network - Test channel only",
+        "Training mode - All networks - Public channel",
+        "Live - EE network - Test channel only",
+        "Live - O2 network - Test channel only",
+        "Live - Three network - Test channel only",
+        "Live - Vodafone network - Test channel only",
+        "Live - All networks - Test channel only",
+        "Live - All networks - Public channel",
+    ]
+    labels = page.find_all('label', class_="govuk-radios__label")
+    assert len(labels) == len(expected_labels)
+    for label in labels:
+        assert label.text.strip() in expected_labels
+
+    assert page.select_one('.govuk-back-link')['href'] == url_for(
+        'main.service_settings', service_id=SERVICE_ONE_ID,
+    )
+
+
+def test_get_service_set_broadcast_account_type_has_no_radio_selected_for_non_broadcast_service(
+    platform_admin_client
+):
+    response = platform_admin_client.get(
+        url_for(
+            'main.service_set_broadcast_account_type',
+            service_id=SERVICE_ONE_ID,
+        )
+    )
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert len(page.select('input[checked]')) == 0
+
+
+@pytest.mark.parametrize(
+    'service_mode,broadcast_channel,allowed_broadcast_provider,expected_text,expected_value',
+    [
+        (
+            "training",
+            "severe",
+            None,
+            "Training mode - All networks - Public channel",
+            "training-severe",
+        ),
+        (
+            "training",
+            "test",
+            "vodafone",
+            "Training mode - Vodafone network - Test channel only",
+            "training-test-vodafone",
+        ),
+        (
+            "live",
+            "test",
+            "o2",
+            "Live - O2 network - Test channel only",
+            "live-test-o2",
+        ),
+        (
+            "live",
+            "test",
+            None,
+            "Live - All networks - Test channel only",
+            "live-test",
+        ),
+        (
+            "live",
+            "severe",
+            None,
+            "Live - All networks - Public channel",
+            "live-severe",
+        ),
+    ]
+)
+def test_get_service_set_broadcast_account_type_has_radio_selected_for_broadcast_service(
+    platform_admin_client,
+    mocker,
+    service_mode,
+    broadcast_channel,
+    allowed_broadcast_provider,
+    expected_text,
+    expected_value
+):
+    service_one = service_json(
+        SERVICE_ONE_ID,
+        permissions=['broadcast'],
+        restricted=True if service_mode == "training" else False,
+        broadcast_channel=broadcast_channel,
+        allowed_broadcast_provider=allowed_broadcast_provider,
+    )
+    mocker.patch('app.service_api_client.get_service', return_value={'data': service_one})
+
+    response = platform_admin_client.get(
+        url_for(
+            'main.service_set_broadcast_account_type',
+            service_id=SERVICE_ONE_ID,
+        )
+    )
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    selected_radios = page.select('input[checked]')
+    assert len(selected_radios) == 1
+
+    selected_radio = selected_radios[0]
+    assert selected_radio.get('value') == expected_value
+    selected_label = selected_radio.find_next_sibling('label')
+    assert selected_label.text.strip() == expected_text
+
+
+@pytest.mark.parametrize(
+    'value,service_mode,broadcast_channel,allowed_broadcast_provider',
+    [
+        ("training-severe", "training", "severe", None),
+        ("training-test-vodafone", "training", "test", "vodafone"),
+        ("live-test-o2", "live", "test", "o2"),
+        ("live-test", "live", "test", None),
+        ("live-severe", "live", "severe", None),
+    ]
+)
+def test_post_service_set_broadcast_account_type_posts_data_to_api_and_redirects(
+    platform_admin_client,
+    mocker,
+    value,
+    service_mode,
+    broadcast_channel,
+    allowed_broadcast_provider,
+):
+    set_service_broadcast_settings_mock = mocker.patch('app.service_api_client.set_service_broadcast_settings')
+
+    response = platform_admin_client.post(
+        url_for(
+            'main.service_set_broadcast_account_type',
+            service_id=SERVICE_ONE_ID,
+        ),
+        data={
+            'account_type': value
+        }
+    )
+    assert response.status_code == 302
+    assert response.location == url_for('main.service_settings', service_id=SERVICE_ONE_ID, _external=True)
+    set_service_broadcast_settings_mock.assert_called_once_with(
+        SERVICE_ONE_ID,
+        service_mode=service_mode,
+        broadcast_channel=broadcast_channel,
+        provider_restriction=allowed_broadcast_provider,
+    )
+
+
+def test_post_service_set_broadcast_account_type_shows_errors_if_no_radio_selected(
+    platform_admin_client
+):
+    response = platform_admin_client.post(
+        url_for(
+            'main.service_set_broadcast_account_type',
+            service_id=SERVICE_ONE_ID,
+        )
+    )
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert "This field is required" in page.find("span", {"class": "govuk-error-message"}).text

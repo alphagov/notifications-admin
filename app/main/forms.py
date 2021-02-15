@@ -2295,6 +2295,54 @@ class GoLiveNotesForm(StripWhitespaceForm):
     )
 
 
+class ServiceBroadcastAccountTypeField(GovukRadiosField):
+    # When receiving Python data, eg when instantiating the form object
+    # we want to convert it from a tuple of
+    # (service_mode, broadcast_channel, allowed_broadcast_provider)
+    # to a value to be used in our form such as "live-severe-ee"
+    def process_data(self, value):
+        (live, broadcast_channel, allowed_broadcast_provider) = value
+        account_type = None
+        if broadcast_channel:
+            account_type = "live" if live else "training"
+            account_type += f"-{broadcast_channel}"
+            if allowed_broadcast_provider:
+                account_type += f"-{allowed_broadcast_provider}"
+
+        self.data = account_type
+
+    # After validation we split the value back into its parts of service_mode
+    # broadcast_channel and provider_restriction to be used by the flask route to send to the
+    # API
+    def post_validate(self, form, validation_stopped):
+        if not validation_stopped:
+            split_values = self.data.split("-")
+            self.service_mode = split_values[0]
+            self.broadcast_channel = split_values[1]
+            self.provider_restriction = split_values[2] if len(split_values) == 3 else None
+
+
+class ServiceBroadcastAccountTypeForm(StripWhitespaceForm):
+    account_type = ServiceBroadcastAccountTypeField(
+        'Change cell broadcast service type',
+        thing='which type of account this cell broadcast service is',
+        choices=[
+            ("training-test-ee", "Training mode - EE network - Test channel only"),
+            ("training-test-o2", "Training mode - O2 network - Test channel only"),
+            ("training-test-three", "Training mode - Three network - Test channel only"),
+            ("training-test-vodafone", "Training mode - Vodafone network - Test channel only"),
+            ("training-severe", "Training mode - All networks - Public channel"),
+            ("live-test-ee", "Live - EE network - Test channel only"),
+            ("live-test-o2", "Live - O2 network - Test channel only"),
+            ("live-test-three", "Live - Three network - Test channel only"),
+            ("live-test-vodafone", "Live - Vodafone network - Test channel only"),
+            ("live-test", "Live - All networks - Test channel only"),
+            ("live-severe", "Live - All networks - Public channel"),
+        ],
+        validators=[DataRequired()]
+    )
+
+
 class AcceptAgreementForm(StripWhitespaceForm):
 
     @classmethod

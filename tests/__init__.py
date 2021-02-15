@@ -154,7 +154,9 @@ def service_json(
     billing_contact_email_addresses=None,
     billing_contact_names=None,
     billing_reference=None,
-    purchase_order_number=None
+    purchase_order_number=None,
+    broadcast_channel=None,
+    allowed_broadcast_provider=None,
 ):
     if users is None:
         users = []
@@ -198,6 +200,8 @@ def service_json(
         'billing_contact_names': billing_contact_names,
         'billing_reference': billing_reference,
         'purchase_order_number': purchase_order_number,
+        'broadcast_channel': broadcast_channel,
+        'allowed_broadcast_provider': allowed_broadcast_provider,
     }
 
 

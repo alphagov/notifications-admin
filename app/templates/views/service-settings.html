@@ -428,6 +428,23 @@
             {% endif %}
           {% endfor %}
 
+          {% call row() %}
+            {{ text_field('Send cell broadcasts')}}
+            {% call field(wrap=True) %}
+              {% if not current_service.broadcast_channel %}
+              Off
+              {% else %}
+                {% if current_service.live %}Live{% else %}Training mode{% endif %} - {% if current_service.allowed_broadcast_provider %}{{ current_service.allowed_broadcast_provider|format_mobile_network }} network{% else %}All networks{% endif %} - {% if current_service.broadcast_channel == "test" %}Test channel only{% else %}Public channel{% endif %}
+              {% endif %}
+            {% endcall %}
+            {{ edit_field(
+                'Change',
+                url_for('.service_set_broadcast_account_type', service_id=current_service.id),
+                suffix='your settings for Send cell broadcasts'
+              )
+            }}
+          {% endcall %}
+
         {% endcall %}
 
       </div>
