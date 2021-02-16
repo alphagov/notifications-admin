@@ -694,8 +694,8 @@ def test_organisation_settings_for_platform_admin(
             'Not signed Change data sharing and financial agreement for the organisation'
         ),
         'Request to go live notes None Change go live notes for the organisation',
-        'Billing details No billing details yet Change billing details for the organisation',
-        'Notes No notes yet Change the notes for the organisation',
+        'Billing details None Change billing details for the organisation',
+        'Notes None Change the notes for the organisation',
         'Default email branding GOV.UK Change default email branding for the organisation',
         'Default letter branding No branding Change default letter branding for the organisation',
         'Known email domains None Change known email domains for the organisation',
