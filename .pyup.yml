@@ -5,4 +5,4 @@ schedule: "every week on monday"
 search: False
 requirements:
   - requirements.in
-  - requirements_for_test.in
+  - requirements_for_test.txt

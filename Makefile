@@ -78,7 +78,6 @@ fix-imports:
 freeze-requirements: ## create static requirements.txt
 	${VIRTUALENV_ROOT}/bin/pip install pip-tools
 	${VIRTUALENV_ROOT}/bin/pip-compile requirements.in
-	${VIRTUALENV_ROOT}/bin/pip-compile requirements_for_test.in
 
 .PHONY: prepare-docker-build-image
 prepare-docker-build-image: ## Prepare the Docker builder image
