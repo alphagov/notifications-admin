@@ -100,8 +100,8 @@ def mock_get_service_settings_page_common(
         'Label Value Action',
         'Live Off Change service status',
         'Count in list of live services Yes Change if service is counted in list of live services',
-        'Billing details No billing details yet Change billing details for service',
-        'Notes No notes yet Change the notes for the service',
+        'Billing details None Change billing details for service',
+        'Notes None Change the notes for the service',
         'Organisation Test organisation Central government Change organisation for service',
         'Rate limit 3,000 per minute Change rate limit',
         'Message limit 1,000 per day Change daily message limit',
@@ -184,7 +184,7 @@ def test_platform_admin_sees_only_relevant_settings_for_broadcast_service(
 
         'Label Value Action',
         'Live Off Change service status',
-        'Notes No notes yet Change the notes for the service',
+        'Notes None Change the notes for the service',
         'Email authentication Off Change your settings for Email authentication',
         'Send cell broadcasts On Change your settings for Send cell broadcasts',
     ]

@@ -1682,11 +1682,11 @@ class ServiceEditInboundNumberForm(StripWhitespaceForm):
     is_default = GovukCheckboxField("Make this text message sender the default")
 
 
-class EditServiceNotesForm(StripWhitespaceForm):
+class EditNotesForm(StripWhitespaceForm):
     notes = TextAreaField(validators=[])
 
 
-class ServiceBillingDetailsForm(StripWhitespaceForm):
+class BillingDetailsForm(StripWhitespaceForm):
     billing_contact_email_addresses = GovukTextInputField('Contact email addresses')
     billing_contact_names = GovukTextInputField('Contact names')
     billing_reference = GovukTextInputField('Reference')

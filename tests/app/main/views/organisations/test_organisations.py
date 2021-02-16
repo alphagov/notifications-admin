@@ -686,14 +686,19 @@ def test_organisation_settings_for_platform_admin(
 ):
     expected_rows = [
         'Label Value Action',
-        'Name Test organisation Change',
-        'Sector Central government Change',
-        'Crown organisation Yes Change',
-        'Data sharing and financial agreement Not signed Change',
-        'Request to go live notes None Change',
-        'Default email branding GOV.UK Change',
-        'Default letter branding No branding Change',
-        'Known email domains None Change',
+        'Name Test organisation Change organisation name',
+        'Sector Central government Change sector for the organisation',
+        'Crown organisation Yes Change organisation crown status',
+        (
+            'Data sharing and financial agreement '
+            'Not signed Change data sharing and financial agreement for the organisation'
+        ),
+        'Request to go live notes None Change go live notes for the organisation',
+        'Billing details None Change billing details for the organisation',
+        'Notes None Change the notes for the organisation',
+        'Default email branding GOV.UK Change default email branding for the organisation',
+        'Default letter branding No branding Change default letter branding for the organisation',
+        'Known email domains None Change known email domains for the organisation',
     ]
 
     client_request.login(platform_admin_user)
@@ -1259,4 +1264,191 @@ def test_post_edit_organisation_go_live_notes_updates_go_live_notes(
         '.organisation_settings',
         org_id=organisation_one['id'],
         _external=True
+    )
+
+
+def test_organisation_settings_links_to_edit_organisation_notes_page(
+    mocker,
+    mock_get_organisation,
+    organisation_one,
+    platform_admin_client,
+):
+    response = platform_admin_client.get(url_for(
+        '.organisation_settings', org_id=organisation_one['id']
+    ))
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert len(page.find_all(
+        'a', attrs={'href': '/organisations/{}/settings/notes'.format(organisation_one['id'])}
+    )) == 1
+
+
+def test_view_edit_organisation_notes(
+        platform_admin_client,
+        organisation_one,
+        mock_get_organisation,
+):
+    response = platform_admin_client.get(url_for('main.edit_organisation_notes', org_id=organisation_one['id']))
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert page.select_one('h1').text == "Edit organisation notes"
+    assert page.find('label', class_="form-label").text.strip() == "Notes"
+    assert page.find('textarea').attrs["name"] == "notes"
+
+
+def test_update_organisation_notes(
+        platform_admin_client,
+        organisation_one,
+        mock_get_organisation,
+        mock_update_organisation,
+):
+    response = platform_admin_client.post(
+        url_for(
+            'main.edit_organisation_notes',
+            org_id=organisation_one['id'],
+        ),
+        data={'notes': "Very fluffy"}
+    )
+    assert response.status_code == 302
+    settings_url = url_for(
+        'main.organisation_settings', org_id=organisation_one['id'], _external=True)
+    assert settings_url == response.location
+    mock_update_organisation.assert_called_with(
+        organisation_one['id'],
+        cached_service_ids=None,
+        notes="Very fluffy"
+    )
+
+
+def test_update_organisation_notes_errors_when_user_not_platform_admin(
+        client_request,
+        organisation_one,
+        mock_get_organisation,
+        mock_update_organisation,
+):
+    client_request.post(
+        'main.edit_organisation_notes',
+        org_id=organisation_one['id'],
+        _data={'notes': "Very fluffy"},
+        _expected_status=403,
+    )
+
+
+def test_update_organisation_notes_doesnt_call_api_when_notes_dont_change(
+        platform_admin_client,
+        organisation_one,
+        mock_update_organisation,
+        mocker
+):
+    mocker.patch('app.organisations_client.get_organisation', return_value=organisation_json(
+        id_=organisation_one['id'],
+        name="Test Org",
+        notes="Very fluffy"
+    ))
+    response = platform_admin_client.post(
+        url_for(
+            'main.edit_organisation_notes',
+            org_id=organisation_one['id'],
+        ),
+        data={'notes': "Very fluffy"}
+    )
+    assert response.status_code == 302
+    settings_url = url_for(
+        'main.organisation_settings', org_id=organisation_one['id'], _external=True)
+    assert response.location == settings_url
+    assert not mock_update_organisation.called
+
+
+def test_organisation_settings_links_to_edit_organisation_billing_details_page(
+    mocker,
+    mock_get_organisation,
+    organisation_one,
+    platform_admin_client,
+):
+    response = platform_admin_client.get(url_for(
+        '.organisation_settings', org_id=organisation_one['id']
+    ))
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert len(page.find_all(
+        'a', attrs={'href': '/organisations/{}/settings/edit-billing-details'.format(organisation_one['id'])}
+    )) == 1
+
+
+def test_view_edit_organisation_billing_details(
+        platform_admin_client,
+        organisation_one,
+        mock_get_organisation,
+):
+    response = platform_admin_client.get(
+        url_for('main.edit_organisation_billing_details', org_id=organisation_one['id'])
+    )
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert page.select_one('h1').text == "Edit organisation billing details"
+    labels = page.find_all('label', class_="form-label")
+    labels_list = [
+        'Contact email addresses',
+        'Contact names',
+        'Reference',
+        'Purchase order number',
+        'Notes'
+    ]
+    for label in labels:
+        assert label.text.strip() in labels_list
+    textbox_names = page.find_all('input', class_='govuk-input govuk-!-width-full')
+    names_list = [
+        'billing_contact_email_addresses',
+        'billing_contact_names',
+        'billing_reference',
+        'purchase_order_number',
+    ]
+
+    for name in textbox_names:
+        assert name.attrs["name"] in names_list
+
+    assert page.find('textarea').attrs["name"] == "notes"
+
+
+def test_update_organisation_billing_details(
+        platform_admin_client,
+        organisation_one,
+        mock_get_organisation,
+        mock_update_organisation,
+):
+    response = platform_admin_client.post(
+        url_for(
+            'main.edit_organisation_billing_details',
+            org_id=organisation_one['id'],
+        ),
+        data={
+            'billing_contact_email_addresses': 'accounts@fluff.gov.uk',
+            'billing_contact_names': 'Flannellette von Fluff',
+            'billing_reference': '',
+            'purchase_order_number': 'PO1234',
+            'notes': 'very fluffy, give extra allowance'
+        }
+    )
+    assert response.status_code == 302
+    settings_url = url_for(
+        'main.organisation_settings', org_id=organisation_one['id'], _external=True)
+    assert settings_url == response.location
+    mock_update_organisation.assert_called_with(
+        organisation_one['id'],
+        cached_service_ids=None,
+        billing_contact_email_addresses='accounts@fluff.gov.uk',
+        billing_contact_names='Flannellette von Fluff',
+        billing_reference='',
+        purchase_order_number='PO1234',
+        notes='very fluffy, give extra allowance'
+    )
+
+
+def test_update_organisation_billing_details_errors_when_user_not_platform_admin(
+        client_request,
+        organisation_one,
+        mock_get_organisation,
+        mock_update_organisation,
+):
+    client_request.post(
+        'main.edit_organisation_billing_details',
+        org_id=organisation_one['id'],
+        _data={'notes': "Very fluffy"},
+        _expected_status=403,
     )

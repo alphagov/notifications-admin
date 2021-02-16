@@ -32,9 +32,10 @@ from app.extensions import zendesk_client
 from app.formatters import email_safe
 from app.main import main
 from app.main.forms import (
+    BillingDetailsForm,
     BrandingOptions,
     ConfirmPasswordForm,
-    EditServiceNotesForm,
+    EditNotesForm,
     EstimateUsageForm,
     FreeSMSAllowance,
     LinkOrganisationsForm,
@@ -43,7 +44,6 @@ from app.main.forms import (
     RateLimit,
     RenameServiceForm,
     SearchByNameForm,
-    ServiceBillingDetailsForm,
     ServiceContactDetailsForm,
     ServiceDataRetentionEditForm,
     ServiceDataRetentionForm,
@@ -1193,7 +1193,7 @@ def edit_data_retention(service_id, data_retention_id):
 @main.route("/services/<uuid:service_id>/notes", methods=['GET', 'POST'])
 @user_is_platform_admin
 def edit_service_notes(service_id):
-    form = EditServiceNotesForm(notes=current_service.notes)
+    form = EditNotesForm(notes=current_service.notes)
 
     if form.validate_on_submit():
 
@@ -1214,7 +1214,7 @@ def edit_service_notes(service_id):
 @main.route("/services/<uuid:service_id>/edit-billing-details", methods=['GET', 'POST'])
 @user_is_platform_admin
 def edit_service_billing_details(service_id):
-    form = ServiceBillingDetailsForm(
+    form = BillingDetailsForm(
         billing_contact_email_addresses=current_service.billing_contact_email_addresses,
         billing_contact_names=current_service.billing_contact_names,
         billing_reference=current_service.billing_reference,
