@@ -8,7 +8,7 @@ ago==0.0.93
     # via -r requirements.in
 awscli-cwlogs==1.4.6
     # via -r requirements.in
-awscli==1.18.211
+awscli==1.19.7
     # via
     #   awscli-cwlogs
     #   notifications-utils
@@ -18,14 +18,14 @@ blinker==1.4
     # via
     #   -r requirements.in
     #   gds-metrics
-boto3==1.16.51
+boto3==1.17.7
     # via notifications-utils
-botocore==1.19.51
+botocore==1.20.7
     # via
     #   awscli
     #   boto3
     #   s3transfer
-cachetools==4.2.0
+cachetools==4.2.1
     # via notifications-utils
 certifi==2020.12.5
     # via requests
@@ -33,17 +33,17 @@ chardet==4.0.0
     # via requests
 click==7.1.2
     # via flask
-colorama==0.4.3
+colorama==0.4.4
     # via awscli
-dnspython==1.16.0
+dnspython==2.1.0
     # via eventlet
 docopt==0.6.2
     # via notifications-python-client
-docutils==0.15.2
+docutils==0.16
     # via awscli
 et-xmlfile==1.0.1
     # via openpyxl
-eventlet==0.30.0
+eventlet==0.30.1
     # via -r requirements.in
 flask-login==0.5.0
     # via -r requirements.in
@@ -71,13 +71,13 @@ govuk-bank-holidays==0.8
     #   notifications-utils
 git+https://github.com/alphagov/govuk-frontend-jinja.git@v0.5.8-alpha#egg=govuk-frontend-jinja==0.5.8-alpha
     # via -r requirements.in
-greenlet==0.4.17
+greenlet==1.0.0
     # via eventlet
 gunicorn==20.0.4
     # via -r requirements.in
 humanize==3.2.0
     # via -r requirements.in
-idna==2.10
+idna==3.1
     # via requests
 itsdangerous==1.1.0
     # via
@@ -112,17 +112,17 @@ mistune==0.8.4
     # via notifications-utils
 monotonic==1.5
     # via notifications-python-client
-notifications-python-client==5.7.1
+notifications-python-client==6.0.2
     # via -r requirements.in
 git+https://github.com/alphagov/notifications-utils.git@43.8.3#egg=notifications-utils==43.8.3
     # via -r requirements.in
-openpyxl==3.0.5
+openpyxl==3.0.6
     # via pyexcel-xlsx
 orderedset==2.0.3
     # via notifications-utils
-packaging==20.8
+packaging==20.9
     # via bleach
-phonenumbers==8.12.15
+phonenumbers==8.12.18
     # via notifications-utils
 prometheus-client==0.9.0
     # via
@@ -147,7 +147,7 @@ pyexcel-xlsx==0.6.0
     # via -r requirements.in
 pyexcel==0.6.6
     # via -r requirements.in
-pyjwt==2.0.0
+pyjwt==2.0.1
     # via notifications-python-client
 pyparsing==2.4.7
     # via packaging
@@ -159,11 +159,11 @@ python-dateutil==2.8.1
     #   botocore
 python-json-logger==2.0.1
     # via notifications-utils
-pytz==2020.5
+pytz==2021.1
     # via
     #   -r requirements.in
     #   notifications-utils
-pyyaml==5.4.0
+pyyaml==5.4.1
     # via
     #   awscli
     #   notifications-utils
@@ -175,9 +175,9 @@ requests==2.25.1
     #   govuk-bank-holidays
     #   notifications-python-client
     #   notifications-utils
-rsa==4.5
+rsa==4.7
     # via awscli
-s3transfer==0.3.3
+s3transfer==0.3.4
     # via
     #   awscli
     #   boto3
@@ -198,7 +198,7 @@ statsd==3.3.0
     # via notifications-utils
 texttable==1.6.3
     # via pyexcel
-urllib3==1.26.2
+urllib3==1.26.3
     # via
     #   botocore
     #   requests
@@ -208,7 +208,7 @@ werkzeug==1.0.1
     # via flask
 wtforms==2.3.3
     # via flask-wtf
-xlrd==1.2.0
+xlrd==2.0.1
     # via pyexcel-xls
 xlwt==1.3.0
     # via pyexcel-xls
