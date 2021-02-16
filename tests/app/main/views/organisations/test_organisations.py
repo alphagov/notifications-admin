@@ -1318,6 +1318,20 @@ def test_update_organisation_notes(
     )
 
 
+def test_update_organisation_notes_errors_when_user_not_platform_admin(
+        client_request,
+        organisation_one,
+        mock_get_organisation,
+        mock_update_organisation,
+):
+    client_request.post(
+        'main.edit_organisation_notes',
+        org_id=organisation_one['id'],
+        _data={'notes': "Very fluffy"},
+        _expected_status=403,
+    )
+
+
 def test_update_organisation_notes_doesnt_call_api_when_notes_dont_change(
         platform_admin_client,
         organisation_one,
