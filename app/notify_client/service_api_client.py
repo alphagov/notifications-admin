@@ -52,6 +52,9 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         """
         return self.get('/service', params=params_dict)
 
+    def get_blocklist_for_service(self, service_id):
+        return self.get('/service/{}/blocklist'.format(service_id))
+
     def find_services_by_name(self, service_name):
         return self.get('/service/find-services-by-name', params={"service_name": service_name})
 
