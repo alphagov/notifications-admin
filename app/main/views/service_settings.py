@@ -67,6 +67,8 @@ from app.utils import (
     user_is_platform_admin,
 )
 
+from app.main.validators import SenderBlocklistValidator
+
 PLATFORM_ADMIN_SERVICE_PERMISSIONS = OrderedDict([
     ('inbound_sms', {'title': 'Receive inbound SMS', 'requires': 'sms', 'endpoint': '.service_set_inbound_number'}),
     ('email_auth', {'title': 'Email authentication'}),
@@ -863,6 +865,10 @@ def service_sms_senders(service_id):
 @user_has_permissions('manage_service')
 def service_add_sms_sender(service_id):
     form = ServiceSmsSenderForm()
+    blocklist_values = service_api_client.get_blocklist_for_service(service_id)['blocklist']
+    blocklist_validator = next(validator for validator in form.sms_sender.validators if type(validator) == SenderBlocklistValidator)
+    blocklist_validator.values = blocklist_values
+
     first_sms_sender = current_service.count_sms_senders == 0
     if form.validate_on_submit():
         service_api_client.add_sms_sender(
