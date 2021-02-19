@@ -555,6 +555,10 @@ class StripWhitespaceForm(Form):
             bound.get_form = weakref.ref(form)  # GC won't collect the form if we don't use a weakref
             return bound
 
+        def render_field(self, field, render_kw):
+            render_kw.setdefault('required', False)
+            return super().render_field(field, render_kw)
+
 
 class StripWhitespaceStringField(GovukTextInputField):
     def __init__(self, label=None, param_extensions=None, **kwargs):
