@@ -1,0 +1,20 @@
+{
+  "type":"FeatureCollection",
+  "features":[{
+    "type": "Feature",
+    "properties": {
+      "id": "santa-claus-village-rovaniemi",
+      "name": "Santa Claus Village, Rovaniemi"
+    },
+    "geometry": {
+      "type":"Polygon",
+      "coordinates": [[
+        [25.8890, 66.5500],
+        [25.8890, 66.551],
+        [25.8910, 66.551],
+        [25.8910, 66.5500],
+        [25.889, 66.55000]
+      ]]
+    }
+  }]
+}

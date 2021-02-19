@@ -24,6 +24,11 @@ def test_loads_libraries():
             'Local authorities',
             True,
         ),
+        (
+            'test',
+            'Test areas',
+            False,
+        ),
     ]
 
 
@@ -146,9 +151,10 @@ def test_repository_has_all_libraries():
     repo = BroadcastAreasRepository()
     libraries = repo.get_libraries()
 
-    assert len(libraries) == 2
+    assert len(libraries) == 3
     assert [
         ('Countries', 'country'),
+        ('Test areas', 'test area'),
         ('Local authorities', 'local authority'),
     ] == [(name, name_singular) for _, name, name_singular, _is_group in libraries]
 
@@ -158,7 +164,10 @@ def test_repository_has_all_libraries():
 ))
 def test_every_area_has_count_of_phones(library):
     for area in library:
-        assert area.count_of_phones > 0
+        if library.id == 'test':
+            assert area.count_of_phones == 0
+        else:
+            assert area.count_of_phones > 0
 
 
 @pytest.mark.parametrize('area_id, area_name, expected_count', (
