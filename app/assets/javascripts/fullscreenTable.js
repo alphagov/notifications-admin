@@ -51,6 +51,9 @@
             .removeClass('fullscreen-scrollable-table')
             .removeAttr(attributesForFocus)
             .attr('aria-hidden', true)
+            .find('caption')
+            .removeAttr('id')
+            .closest('.fullscreen-fixed-table')
         )
         .append(
           '<div class="fullscreen-right-shadow" />'
