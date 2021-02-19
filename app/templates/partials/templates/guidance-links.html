@@ -1,9 +1,12 @@
+{% from "components/inset-text/macro.njk" import govukInsetText %}
+
 <h2 class="heading-medium">Links and URLs</h2>
 <p class="bottom-gutter-1-3">
   Always use full URLs, starting with https://
 </p>
-<div class="panel panel-border-wide">
-  <p class="govuk-body">
-    Apply now at https://www.gov.uk/example
-  </p>
+<div>
+  {{ govukInsetText({
+    "text": "Apply now at https://www.gov.uk/example",
+    "classes": "govuk-!-margin-top-0"})
+  }}
 </div>

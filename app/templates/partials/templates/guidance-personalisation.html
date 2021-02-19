@@ -1,11 +1,14 @@
+{% from "components/inset-text/macro.njk" import govukInsetText %}
+
 <h2 class="heading-medium">
   Personalisation
 </h2>
 <p class="bottom-gutter-1-3">
   Use double brackets to personalise your message:
 </p>
-<div class="panel panel-border-wide">
-  <p class="govuk-body">
-    Hello ((first name)), your reference is ((ref number))
-  </p>
+<div>
+  {{ govukInsetText({
+    "text": "Hello ((first name)), your reference is ((ref number))",
+    "classes": "govuk-!-margin-top-0"})
+  }}
 </div>
