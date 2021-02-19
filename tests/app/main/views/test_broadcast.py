@@ -735,6 +735,7 @@ def test_preview_broadcast_areas_page_with_custom_polygons(
     ([], [
         'Countries',
         'Local authorities',
+        'Test areas',
     ]),
     ([
         # Countries have no parent areas
@@ -743,6 +744,7 @@ def test_preview_broadcast_areas_page_with_custom_polygons(
     ], [
         'Countries',
         'Local authorities',
+        'Test areas',
     ]),
     ([
         # If you’ve chosen the whole of a county or unitary authority
@@ -752,6 +754,7 @@ def test_preview_broadcast_areas_page_with_custom_polygons(
     ], [
         'Countries',
         'Local authorities',
+        'Test areas',
     ]),
     ([
         'wd20-E05004299',  # Pitville, in Cheltenham, in Gloucestershire
@@ -768,6 +771,7 @@ def test_preview_broadcast_areas_page_with_custom_polygons(
         # ---
         'Countries',
         'Local authorities',
+        'Test areas',
     ]),
 ))
 def test_choose_broadcast_library_page(
