@@ -6,23 +6,57 @@
   Modules.CopyToClipboard = function() {
 
     const states = {
-      'valueVisible': (options) => `
-        <span class="copy-to-clipboard__value">${options.valueLabel ? '<span class="govuk-visually-hidden">' + options.thing + ': </span>' : ''}${options.value}</span>
-        <span class="copy-to-clipboard__notice govuk-visually-hidden" aria-live="assertive">
-          ${options.onload ? '' : options.thing + ' returned to page, press button to copy to clipboard'}
-        </span>
-        <button type="button" class="govuk-button govuk-button--secondary copy-to-clipboard__button--copy">
-          Copy ${options.thing} to clipboard${options.name ? '<span class="govuk-visually-hidden"> for ' + options.name + '</span>' : ''}
-        </button>
-      `,
-      'valueCopied': (options) => `
-        <span class="copy-to-clipboard__notice" aria-live="assertive">
-          <span class="govuk-visually-hidden">${options.thing} </span>Copied to clipboard<span class="govuk-visually-hidden">, press button to show in page</span>
-        </span>
-        <button type="button" class="govuk-button govuk-button--secondary copy-to-clipboard__button--show">
-          Show ${options.thing}${options.name ? '<span class="govuk-visually-hidden"> for ' + options.name + '</span>' : ''}
-        </button>
-      `
+      'valueVisible': (options) => {
+        return {
+          'value': `<span class="copy-to-clipboard__value">${options.valueLabel ?'<span class="govuk-visually-hidden">' +
+                      options.thing +': </span>' : ''}${options.value}</span>`,
+          'notice': {
+            'classes': "copy-to-clipboard__notice govuk-visually-hidden",
+            'content': options.onload ? '' : options.thing + ' showing, use button to copy to clipboard'
+          },
+          'button': {
+            'classes': "govuk-button govuk-button--secondary copy-to-clipboard__button--copy",
+            'content': `Copy ${options.thing} to clipboard${options.name ? '<span class="govuk-visually-hidden"> for ' + options.name + '</span>' : ''}`
+          }
+        };
+      },
+      'valueCopied': (options) => {
+        return {
+          'value': '',
+          'notice': {
+            'classes': "copy-to-clipboard__notice",
+            'content': `<span class="govuk-visually-hidden">${options.thing} </span>Copied to clipboard<span class="govuk-visually-hidden">, use button to show in page</span>`
+          },
+          'button': {
+            'classes': "govuk-button govuk-button--secondary copy-to-clipboard__button--show",
+            'content': `Show ${options.thing}${options.name ? '<span class="govuk-visually-hidden"> for ' + options.name + '</span>' : ''}`
+          }
+        };
+      }
+    };
+
+
+    this.updateHTML = (stateKey, stateOptions, $component) => {
+      const state = states[stateKey](stateOptions);
+      let $button = $component.find('.govuk-button');
+
+      $component.find('.copy-to-clipboard__value').remove();
+      if (state.value !== '') {
+        $component.prepend(state.value);
+      }
+
+      $component.find('.copy-to-clipboard__notice').eq(0)
+        .html(state.notice.content)
+        [0].className = state.notice.classes;
+
+      if ($button.length === 0) {
+        $button = $('<button class="govuk-button govuk-button--secondary copy-to-clipboard__button--copy">');
+        $component.append($button);
+      }
+
+      $button.eq(0)
+        .html(state.button.content)
+        [0].className = state.button.classes;
     };
 
     this.getRangeFromElement = function (copyableElement) {
@@ -73,22 +107,21 @@
       $component
         .addClass('copy-to-clipboard')
         .css('min-height', $component.height())
-        .html(states.valueVisible($.extend({ 'onload': true }, stateOptions)))
         .on(
           'click', '.copy-to-clipboard__button--copy', () =>
             this.copyValueToClipboard(
-              $('.copy-to-clipboard__value', component)[0], () =>
-                $component
-                  .html(states.valueCopied(stateOptions))
-                  .find('.govuk-button').focus()
+              $('.copy-to-clipboard__value', component)[0], () => {
+                this.updateHTML('valueCopied', stateOptions, $component);
+              }
             )
         )
         .on(
-          'click', '.copy-to-clipboard__button--show', () =>
-            $component
-              .html(states.valueVisible(stateOptions))
-              .find('.govuk-button').focus()
+          'click', '.copy-to-clipboard__button--show', () => {
+            this.updateHTML('valueVisible', stateOptions, $component);
+          }
         );
+
+      this.updateHTML('valueVisible', ($.extend({ 'onload': true }, stateOptions)), $component);
 
       if ('stickAtBottomWhenScrolling' in GOVUK) {
         GOVUK.stickAtBottomWhenScrolling.recalculate();
