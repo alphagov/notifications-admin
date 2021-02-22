@@ -89,8 +89,7 @@ export WERKZEUG_DEBUG_PIN=off
 
 ### 6. AWS credentials
 
-Your aws credentials should be stored in a folder located at `~/.aws`. Follow [Amazon's instructions](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html#cli-config-files) for storing them correctly
-
+To run parts of the app, such as uploading letters, you will need appropriate AWS credentials. See the [Wiki](https://github.com/alphagov/notifications-manuals/wiki/aws-accounts#how-to-set-up-local-development) for more details.
 
 ### 7. Running the application
 
