@@ -127,7 +127,7 @@ Your aws credentials should be stored in a folder located at `~/.aws`. Follow [A
 In the root directory of the application, run:
 
 ```shell
-./scripts/run_app.sh
+make run-flask
 ```
 
 Then visit [localhost:6012](http://localhost:6012)
