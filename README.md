@@ -65,7 +65,7 @@ npm rebuild node-sass
 Install dependencies and build the frontend assets:
 
 ```shell
-./scripts/bootstrap.sh
+make bootstrap
 ```
 
 **Note:** You may need versions of both Python 3 and Python 2 accessible to build the python dependencies. `pyenv` is great for that, and making both Python versions accessible can be done like so:

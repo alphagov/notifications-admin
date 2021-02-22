@@ -22,6 +22,11 @@ VIRTUALENV_ROOT := $(shell [ -z $$VIRTUAL_ENV ] && echo $$(pwd)/venv || echo $$V
 
 ## DEVELOPMENT
 
+.PHONY: bootstrap
+bootstrap: generate-version-file
+	pip3 install -r requirements_for_test.txt
+	npm install && npm run build
+
 .PHONY: run-flask
 run-flask:
 	. environment.sh && flask run -p 6012
