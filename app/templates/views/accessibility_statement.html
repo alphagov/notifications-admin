@@ -38,7 +38,14 @@
     We know some parts of this website are not fully accessible:
   </p>
   <ul class="govuk-list govuk-list--bullet">
-    <li>screen reader users may find the process of moving templates and folders confusing</li>
+    <li>our button to upload CSV files is labelled in a way that is confusing for users of some assistive technologies</li>
+    <li>the heading on pages for folders is announced confusingly on some screen readers</li>
+    <li>our button that lets users copy some text to the clipboard doesn't work with some screen readers</li>
+    <li>our icons don't appear when using high contrast mode on Windows</li>
+    <li>the validation we use to help users recover from errors has several problems that make that harder for screen reader users</li>
+    <li>the way we label the different regions of our pages is confusing for screen reader users</li>
+    <li>our component that lets you select a time to send your messages is hard to use with screen readerss</li>
+    <li>our component that allows checkboxes to be in a region that can be collapsed is hard to use with screen readers</li>
     <li>one page links to a PDF document that is not fully accessible</li>
     <li>the Notify status page has several accessibility issues</li>
   </ul>
@@ -80,7 +87,7 @@
   </p>
 
   <p class="govuk-body">
-    GOV.UK Notify is partially compliant with the Web Content Accessibility Guidelines version 2.1 AA standard, due to the non-compliances listed below.
+    GOV.UK Notify is partially compliant with the Web Content Accessibility Guidelines (WCAG) version 2.1 AA standard, due to the non-compliances listed below.
   </p>
 
   <h2 class="heading-medium">Non-accessible content</h2>
@@ -92,10 +99,44 @@
   <h3 class="heading-small">Non compliance with the accessibility regulations</h3>
 
   <p class="govuk-body">
-    Screen reader users may find the process of moving templates and folders confusing. This fails <a class="govuk-link" href="https://www.w3.org/TR/WCAG21/#name-role-value">WCAG 2.1 success criteria 4.1.2 (Name, role, value)</a>.</p>
-
-  <p class="govuk-body">We made some changes that will be tested by the Digital Accessibility Centre (DAC) at the end of January. If possible, we plan to fix this by March 2021.
+    The following content on the Notify website is not compliant with the Web Content Accessibility Guidelines version 2.1 AA standard:
   </p>
+
+  <ul class="govuk-list govuk-list--bullet">
+    <li>
+      The component for uploading files incorrect HTML which could cause issues with users of some assistive technologies. This fails <a href="https://www.w3.org/WAI/WCAG21/Understanding/info-and-relationships">WCAG 2.1 success criteria 1.3.1 (info and relationships)</a>. We plan to fix this by [TODO date].
+    </li>
+    <li>
+      The component that copies text to the clipboard doesn't announce when this if you use either the JAWS or NVDA screen readers. This fails <a href="https://www.w3.org/WAI/WCAG21/Understanding/status-messages.html">WCAG Success Criterion 4.1.3: Status Messages</a>. We plan to fix this by [TODO date].
+    </li>
+    <li>
+      Some of our icons don't appear when using high contrast mode on Windows. This fails <a href="https://www.w3.org/WAI/WCAG21/Understanding/visual-presentation.html">WCAG Success Criterion 1.4.8: Visual Presentation</a>. We plan to fix this by [TODO date].
+    </li>
+  </ul>
+
+  <h3 class="heading-small">Problems with using the interface</h3>
+
+  <p class="govuk-body">
+    The following problems have been identified with the user interface:
+  </p>
+
+  <ul class="govuk-list govuk-list--bullet">
+    <li>
+      The heading on pages for folders is announced as multiple sentences if it has parent folders when using the JAWS screen reader. We plan to fix this by [TODO date].
+    </li>
+    <li>
+      The validation we use to help users recover from errors has problems which make it hard to know when errors occur and to understand them. We plan to fix this by [TODO date].
+    </li>
+    <li>
+      The way we label the different regions of our pages is confusing for screen reader users. We plan to fix this by [TODO date].
+    </li>
+    <li>
+      The component used to select a time and date to send your messages has several problems which make it confusing to use with a screen reader. We plan to fix this by [TODO date].
+    </li>
+    <li>
+      The version of our checkboxes that can expand and collapse has several problems which make it confusint o use with a screen reader.
+    </li>
+  </ul>
 
   <h3 class="heading-small">
     PDFs and other documents
@@ -117,7 +158,7 @@
   </p>
 
   <p class="govuk-body">
-    We’ll continue to investigate the cause of this issue and, if possible, fix it by March 2021.
+    We’ll continue to investigate the cause of this issue and, if possible, fix it by [TODO date].
   </p>
 
   <h3 class="heading-small">
