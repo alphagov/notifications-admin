@@ -60,37 +60,7 @@ npm install
 npm rebuild node-sass
 ```
 
-### 4. Install and use `virtualenvwrapper` (optional)
-
-We suggest using a virtualenv to separate the python dependencies for this project from python dependencies for other projects.
-
-Install [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/en/latest/install.html):
-
-```shell
-pip install virtualenvwrapper
-```
-
-Then follow the [virtualenvwrapper installation instructions](https://virtualenvwrapper.readthedocs.io/en/latest/install.html) docs to configure virtualenvwrapper for your terminal.
-
-Set up your virtualenv:
-
-```shell
-mkvirtualenv notifications-admin
-```
-
-If you need to specify a certain version of python you can do this using `-p`, for example:
-
-```shell
-mkvirtualenv -p ~/.pyenv/versions/3.6.3/bin/python notifications-admin
-```
-
-Activate your virtualenv:
-
-```shell
-workon notifications-admin
-```
-
-### 5. Install Python dependencies
+### 4. Install Python dependencies
 
 Install dependencies and build the frontend assets:
 
@@ -104,7 +74,7 @@ Install dependencies and build the frontend assets:
 pyenv global 3.6.3 2.7.15
 ```
 
-### 6. Create a local `environment.sh` file
+### 5. Create a local `environment.sh` file
 
 In the root directory of the application, run:
 
@@ -117,12 +87,12 @@ export WERKZEUG_DEBUG_PIN=off
 "> environment.sh
 ```
 
-### 7. AWS credentials
+### 6. AWS credentials
 
 Your aws credentials should be stored in a folder located at `~/.aws`. Follow [Amazon's instructions](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html#cli-config-files) for storing them correctly
 
 
-### 8. Running the application
+### 7. Running the application
 
 In the root directory of the application, run:
 
