@@ -11,36 +11,16 @@ GOV.UK Notify admin application - https://www.notifications.service.gov.uk/
 
 ## Setting up
 
-### Install Homebrew
-
-Install [Homebrew](https://brew.sh), a package manager for OSX:
-
-```shell
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
-```
-
 ### Make sure you're using correct language versions
 
 Languages needed
 - Python 3.6.x
-- [Node](https://nodejs.org/) 10.15.3 or greater
-- [npm](https://www.npmjs.com/) 6.4.1 or greater
 
 Need to install node? Run:
 
 ```shell
 brew install node
 ```
-
-#### `pyenv` For Python version management
-
-[pyenv](https://github.com/pyenv/pyenv) is a program to manage and swap between different versions of Python. To install:
-
-```shell
-brew install pyenv
-```
-
-And then follow the further installation instructions in https://github.com/pyenv/pyenv#installation to configure it.
 
 #### `n` For Node version management
 
@@ -53,25 +33,12 @@ npm install -g n
 n lts
 ```
 
-### Install NPM dependencies
-
-```shell
-npm install
-npm rebuild node-sass
-```
-
 ### Install Python dependencies
 
 Install dependencies and build the frontend assets:
 
 ```shell
 make bootstrap
-```
-
-**Note:** You may need versions of both Python 3 and Python 2 accessible to build the python dependencies. `pyenv` is great for that, and making both Python versions accessible can be done like so:
-
-```shell
-pyenv global 3.6.3 2.7.15
 ```
 
 ### Create a local `environment.sh` file
