@@ -9,9 +9,9 @@ GOV.UK Notify admin application - https://www.notifications.service.gov.uk/
  - Send batch emails and SMS by uploading a CSV
  - Show history of notifications
 
-## First-time setup
+## Setting up
 
-### 1. Install Homebrew
+### Install Homebrew
 
 Install [Homebrew](https://brew.sh), a package manager for OSX:
 
@@ -19,7 +19,7 @@ Install [Homebrew](https://brew.sh), a package manager for OSX:
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
 ```
 
-### 2. Make sure you're using correct language versions
+### Make sure you're using correct language versions
 
 Languages needed
 - Python 3.6.x
@@ -32,7 +32,7 @@ Need to install node? Run:
 brew install node
 ```
 
-#### 2.1. `pyenv` For Python version management
+#### `pyenv` For Python version management
 
 [pyenv](https://github.com/pyenv/pyenv) is a program to manage and swap between different versions of Python. To install:
 
@@ -42,7 +42,7 @@ brew install pyenv
 
 And then follow the further installation instructions in https://github.com/pyenv/pyenv#installation to configure it.
 
-#### 2.2. `n` For Node version management
+#### `n` For Node version management
 
 [NPM](npmjs.org) is Node's package management tool. `n` is a tool for managing
 different versions of Node. The following installs `n` and uses the long term support (LTS)
@@ -53,14 +53,14 @@ npm install -g n
 n lts
 ```
 
-### 3. Install NPM dependencies
+### Install NPM dependencies
 
 ```shell
 npm install
 npm rebuild node-sass
 ```
 
-### 4. Install Python dependencies
+### Install Python dependencies
 
 Install dependencies and build the frontend assets:
 
@@ -74,7 +74,7 @@ make bootstrap
 pyenv global 3.6.3 2.7.15
 ```
 
-### 5. Create a local `environment.sh` file
+### Create a local `environment.sh` file
 
 In the root directory of the application, run:
 
@@ -87,11 +87,11 @@ export WERKZEUG_DEBUG_PIN=off
 "> environment.sh
 ```
 
-### 6. AWS credentials
+### AWS credentials
 
 To run parts of the app, such as uploading letters, you will need appropriate AWS credentials. See the [Wiki](https://github.com/alphagov/notifications-manuals/wiki/aws-accounts#how-to-set-up-local-development) for more details.
 
-### 7. Running the application
+### Running the application
 
 In the root directory of the application, run:
 
