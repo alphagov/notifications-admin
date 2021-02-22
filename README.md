@@ -64,33 +64,20 @@ make bootstrap
 make test
 ```
 
-## Updating application dependencies
+## Common tasks
 
-`requirements.txt` file is generated from the `requirements-app.txt` in order to pin
-versions of all nested dependencies. If `requirements-app.txt` has been changed (or
-we want to update the unpinned nested dependencies) `requirements.txt` should be
-regenerated with
+### Updating application dependencies
 
-```
-make freeze-requirements
-```
+`requirements.txt` is generated from the `requirements.in` in order to pin versions of all nested dependencies. If `requirements.in` has been changed, run `make freeze-requirements` to regenerate it.
 
-`requirements.txt` should be committed alongside `requirements-app.txt` changes.
+### Automatically rebuild the frontend assets
 
-
-## Automatically rebuild the frontend assets
-
-If you want the front end assets to re-compile on changes, leave this running
-in a separate terminal from the app
+If you want the front end assets to re-compile on changes, leave this running in a separate terminal from the app
 
 ```shell
     npm run watch
 ```
 
-## Working with static assets
+## Further docs
 
-When running locally static assets are served by Flask at http://localhost:6012/static/…
-
-When running on preview, staging and production there’s a bit more to it:
-
-![notify-static-after](https://user-images.githubusercontent.com/355079/50343595-6ea5de80-051f-11e9-85cf-2c20eb3cdefa.png)
+- [Working with static assets](docs/static-assets.md)
