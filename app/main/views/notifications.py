@@ -197,7 +197,7 @@ def get_preview_error_image():
 
 
 @main.route("/services/<uuid:service_id>/notification/<uuid:notification_id>.<letter_file_extension:filetype>")
-@user_has_permissions('view_activity')
+@user_has_permissions('view_activity', 'send_messages')
 def view_letter_notification_as_preview(
     service_id, notification_id, filetype, with_metadata=False
 ):

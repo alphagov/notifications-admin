@@ -610,12 +610,19 @@ def test_notification_page_shows_page_for_other_postage_classes(
 @pytest.mark.parametrize('filetype', [
     'pdf', 'png'
 ])
+@pytest.mark.parametrize('user', [
+    create_active_user_with_permissions(),
+    create_active_caseworking_user(),
+])
 def test_should_show_image_of_letter_notification(
     logged_in_client,
     fake_uuid,
     mocker,
     filetype,
+    user,
 ):
+    mocker.patch('app.user_api_client.get_user', return_value=user)
+
     notification = create_notification(template_type='letter')
     mocker.patch('app.notification_api_client.get_notification', return_value=notification)
 
