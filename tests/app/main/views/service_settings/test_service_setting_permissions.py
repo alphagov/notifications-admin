@@ -4,7 +4,7 @@ import pytest
 from flask import url_for
 
 from app.main.views.service_settings import PLATFORM_ADMIN_SERVICE_PERMISSIONS
-from tests.conftest import SERVICE_ONE_ID, normalize_spaces, set_config
+from tests.conftest import normalize_spaces
 
 
 @pytest.fixture
@@ -35,6 +35,20 @@ def test_service_set_permission_requires_platform_admin(
         'main.service_set_permission', service_id=service_one['id'], permission='email_auth',
         _data={'enabled': 'True'},
         _expected_status=403
+    )
+
+
+def test_service_set_permission_does_not_exist_for_broadcast_permission(
+    mocker,
+    client_request,
+    platform_admin_user,
+    service_one,
+    mock_get_inbound_number_for_service,
+):
+    client_request.login(platform_admin_user)
+    client_request.get(
+        'main.service_set_permission', service_id=service_one['id'], permission='broadcast',
+        _expected_status=404
     )
 
 
@@ -74,18 +88,6 @@ def test_service_set_permission_requires_platform_admin(
         'international_letters',
         'False',
         [],
-    ),
-    (
-        ['email', 'sms', 'letter', 'international_sms', 'international_letters'],
-        'broadcast',
-        'True',
-        ['international_sms', 'international_letters', 'broadcast'],
-    ),
-    (
-        ['broadcast', 'international_sms', 'international_letters'],
-        'broadcast',
-        'False',
-        ['international_sms', 'international_letters'],
     ),
 ])
 def test_service_set_permission(
@@ -213,23 +215,3 @@ def test_normal_user_doesnt_see_any_platform_admin_settings(
 
     for permission in platform_admin_settings:
         assert permission not in page
-
-
-def test_setting_broadcast_sets_organisation_if_config_value_set(
-    mock_update_service_organisation,
-    mock_update_service,
-    platform_admin_client,
-    fake_uuid,
-):
-    with set_config(platform_admin_client.application, 'BROADCAST_ORGANISATION_ID', fake_uuid):
-        response = platform_admin_client.post(
-            url_for('main.service_set_permission', service_id=SERVICE_ONE_ID, permission='broadcast'),
-            data={'enabled': True}
-        )
-        assert response.status_code == 302
-        assert response.location == url_for('main.service_settings', service_id=SERVICE_ONE_ID, _external=True)
-
-    mock_update_service_organisation.assert_called_once_with(
-        service_id=SERVICE_ONE_ID,
-        org_id=fake_uuid
-    )

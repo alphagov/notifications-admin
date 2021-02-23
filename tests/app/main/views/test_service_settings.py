@@ -1,3 +1,4 @@
+import re
 from datetime import datetime
 from functools import partial
 from unittest.mock import ANY, Mock, PropertyMock, call
@@ -47,6 +48,7 @@ def mock_get_service_settings_page_common(
     mock_get_inbound_number_for_service,
     mock_get_free_sms_fragment_limit,
     mock_get_service_data_retention,
+    mock_get_organisation,
 ):
     return
 
@@ -120,7 +122,6 @@ def test_should_show_overview(
         api_user_active,
         no_reply_to_email_addresses,
         no_letter_contact_blocks,
-        mock_get_organisation,
         single_sms_sender,
         user,
         expected_rows,
@@ -155,7 +156,6 @@ def test_platform_admin_sees_only_relevant_settings_for_broadcast_service(
         api_user_active,
         no_reply_to_email_addresses,
         no_letter_contact_blocks,
-        mock_get_organisation,
         single_sms_sender,
         mock_get_service_settings_page_common,
 ):
@@ -165,6 +165,7 @@ def test_platform_admin_sees_only_relevant_settings_for_broadcast_service(
         permissions=['broadcast'],
         organisation_id=ORGANISATION_ID,
         contact_link='contact_us@gov.uk',
+        broadcast_channel="severe",
     )
     mocker.patch('app.service_api_client.get_service', return_value={'data': service_one})
 
@@ -183,16 +184,64 @@ def test_platform_admin_sees_only_relevant_settings_for_broadcast_service(
         'Sign-in method Text message code Change sign-in method',
 
         'Label Value Action',
-        'Live Off Change service status',
         'Notes None Change the notes for the service',
         'Email authentication Off Change your settings for Email authentication',
-        'Send cell broadcasts On Change your settings for Send cell broadcasts',
+        'Send cell broadcasts Training mode - All networks - Public channel '
+        + 'Change your settings for Send cell broadcasts',
     ]
 
     assert len(rows) == len(expected_rows)
     for index, row in enumerate(expected_rows):
         assert row == " ".join(rows[index].text.split())
     app.service_api_client.get_service.assert_called_with(SERVICE_ONE_ID)
+
+
+@pytest.mark.parametrize(
+    'has_broadcast_permission,service_mode,broadcast_channel,allowed_broadcast_provider,expected_text',
+    [
+        (False, "training", None, None, "Off"),
+        (False, "live", None, None, "Off"),
+        (True, "training", "severe", None, "Training mode - All networks - Public channel"),
+        (True, "training", "test", "ee", "Training mode - EE network - Test channel only"),
+        (True, "live", "test", "three", "Live - Three network - Test channel only"),
+        (True, "live", "test", None, "Live - All networks - Test channel only"),
+        (True, "live", "severe", None, "Live - All networks - Public channel"),
+    ]
+)
+def test_platform_admin_sees_correct_description_of_broadcast_service_setting(
+        client,
+        mocker,
+        api_user_active,
+        no_reply_to_email_addresses,
+        no_letter_contact_blocks,
+        single_sms_sender,
+        mock_get_service_settings_page_common,
+        has_broadcast_permission,
+        service_mode,
+        broadcast_channel,
+        allowed_broadcast_provider,
+        expected_text
+):
+    service_one = service_json(
+        SERVICE_ONE_ID,
+        users=[api_user_active['id']],
+        permissions=['broadcast'] if has_broadcast_permission else ['email'],
+        organisation_id=ORGANISATION_ID,
+        restricted=True if service_mode == "training" else False,
+        broadcast_channel=broadcast_channel,
+        allowed_broadcast_provider=allowed_broadcast_provider,
+    )
+    mocker.patch('app.service_api_client.get_service', return_value={'data': service_one})
+
+    client.login(create_platform_admin_user(), mocker, service_one)
+    response = client.get(url_for(
+        'main.service_settings', service_id=SERVICE_ONE_ID
+    ))
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    broadcast_setting_row = page.find(string=re.compile("Send cell broadcasts")).find_parent('tr')
+    broadcast_setting_description = broadcast_setting_row.select('td')[1].text.strip()
+    assert broadcast_setting_description == expected_text
 
 
 def test_no_go_live_link_for_service_without_organisation(
@@ -226,7 +275,6 @@ def test_organisation_name_links_to_org_dashboard(
     single_sms_sender,
     mock_get_service_settings_page_common,
     mocker,
-    mock_get_organisation,
 ):
     service_one = service_json(SERVICE_ONE_ID,
                                permissions=['sms', 'email'],
@@ -255,7 +303,6 @@ def test_send_files_by_email_row_on_settings_page(
     single_sms_sender,
     mock_get_service_settings_page_common,
     mocker,
-    mock_get_organisation,
     service_contact_link,
     expected_text
 ):
@@ -355,7 +402,6 @@ def test_should_show_overview_for_service_with_more_things_set(
         single_reply_to_email_address,
         single_letter_contact_block,
         single_sms_sender,
-        mock_get_organisation,
         mock_get_email_branding,
         mock_get_service_settings_page_common,
         permissions,
@@ -377,7 +423,6 @@ def test_if_cant_send_letters_then_cant_see_letter_contact_block(
         service_one,
         single_reply_to_email_address,
         no_letter_contact_blocks,
-        mock_get_organisation,
         single_sms_sender,
         mock_get_service_settings_page_common,
 ):
@@ -390,7 +435,6 @@ def test_letter_contact_block_shows_none_if_not_set(
     service_one,
     single_reply_to_email_address,
     no_letter_contact_blocks,
-    mock_get_organisation,
     single_sms_sender,
     mock_get_service_settings_page_common,
 ):
@@ -411,7 +455,6 @@ def test_escapes_letter_contact_block(
     mocker,
     single_reply_to_email_address,
     single_sms_sender,
-    mock_get_organisation,
     injected_letter_contact_block,
     mock_get_service_settings_page_common,
 ):
@@ -571,7 +614,6 @@ def test_show_restricted_service(
     service_one,
     single_reply_to_email_address,
     single_letter_contact_block,
-    mock_get_organisation,
     single_sms_sender,
     mock_get_service_settings_page_common,
     user,
@@ -598,12 +640,11 @@ def test_show_restricted_service(
         assert not request_to_live_link
 
 
-def test_show_restricted_broadcast_service(
+def test_broadcast_service_in_training_mode_doesnt_show_trial_mode_content(
     client_request,
     service_one,
     single_reply_to_email_address,
     single_letter_contact_block,
-    mock_get_organisation,
     single_sms_sender,
     mock_get_service_settings_page_common,
 ):
@@ -650,7 +691,6 @@ def test_show_live_service(
     mock_get_live_service,
     single_reply_to_email_address,
     single_letter_contact_block,
-    mock_get_organisation,
     single_sms_sender,
     mock_get_service_settings_page_common,
 ):
@@ -2039,7 +2079,6 @@ def test_route_permissions(
         service_one,
         single_reply_to_email_address,
         single_letter_contact_block,
-        mock_get_organisation,
         mock_get_invites_for_service,
         single_sms_sender,
         route,
@@ -2104,7 +2143,6 @@ def test_route_for_platform_admin(
         service_one,
         single_reply_to_email_address,
         single_letter_contact_block,
-        mock_get_organisation,
         single_sms_sender,
         route,
         mock_get_service_settings_page_common,
@@ -2129,7 +2167,6 @@ def test_and_more_hint_appears_on_settings_with_more_than_just_a_single_sender(
         service_one,
         multiple_reply_to_email_addresses,
         multiple_letter_contact_blocks,
-        mock_get_organisation,
         multiple_sms_senders,
         mock_get_service_settings_page_common,
 ):
@@ -3187,7 +3224,6 @@ def test_shows_research_mode_indicator(
     mocker,
     single_reply_to_email_address,
     single_letter_contact_block,
-    mock_get_organisation,
     single_sms_sender,
     mock_get_service_settings_page_common,
 ):
@@ -3207,7 +3243,6 @@ def test_does_not_show_research_mode_indicator(
     client_request,
     single_reply_to_email_address,
     single_letter_contact_block,
-    mock_get_organisation,
     single_sms_sender,
     mock_get_service_settings_page_common,
 ):
@@ -4049,7 +4084,6 @@ def test_archive_service_prompts_user(
     mocker,
     single_reply_to_email_address,
     single_letter_contact_block,
-    mock_get_organisation,
     single_sms_sender,
     mock_get_service_settings_page_common,
     user,
@@ -4085,7 +4119,6 @@ def test_cant_archive_inactive_service(
     service_one,
     single_reply_to_email_address,
     single_letter_contact_block,
-    mock_get_organisation,
     single_sms_sender,
     mock_get_service_settings_page_common
 ):
@@ -4119,7 +4152,6 @@ def test_suspend_service_prompts_user(
     mocker,
     single_reply_to_email_address,
     single_letter_contact_block,
-    mock_get_organisation,
     single_sms_sender,
     mock_get_service_settings_page_common,
 ):
@@ -4139,7 +4171,6 @@ def test_cant_suspend_inactive_service(
     service_one,
     single_reply_to_email_address,
     single_letter_contact_block,
-    mock_get_organisation,
     single_sms_sender,
     mock_get_service_settings_page_common,
 ):
@@ -4176,7 +4207,6 @@ def test_resume_service_prompts_user(
     service_one,
     single_reply_to_email_address,
     single_letter_contact_block,
-    mock_get_organisation,
     single_sms_sender,
     mocker,
     mock_get_service_settings_page_common,
@@ -4198,7 +4228,6 @@ def test_cant_resume_active_service(
     service_one,
     single_reply_to_email_address,
     single_letter_contact_block,
-    mock_get_organisation,
     single_sms_sender,
     mock_get_service_settings_page_common
 ):
@@ -4239,7 +4268,6 @@ def test_send_files_by_email_contact_details_updates_contact_details_and_redirec
     service_one,
     mock_update_service,
     mock_get_service_settings_page_common,
-    mock_get_organisation,
     no_reply_to_email_addresses,
     no_letter_contact_blocks,
     single_sms_sender,
@@ -4267,7 +4295,6 @@ def test_send_files_by_email_contact_details_uses_the_selected_field_when_multip
     service_one,
     mock_update_service,
     mock_get_service_settings_page_common,
-    mock_get_organisation,
     no_reply_to_email_addresses,
     no_letter_contact_blocks,
     single_sms_sender,
@@ -4361,7 +4388,6 @@ def test_contact_link_is_not_displayed_without_the_upload_document_permission(
     client_request,
     service_one,
     mock_get_service_settings_page_common,
-    mock_get_organisation,
     no_reply_to_email_addresses,
     no_letter_contact_blocks,
     single_sms_sender,
@@ -5162,7 +5188,6 @@ def test_service_settings_links_to_branding_request_page_for_letters(
     no_letter_contact_blocks,
     single_sms_sender,
     mock_get_service_settings_page_common,
-    mock_get_organisation,
 ):
     service_one["restricted"] is False
     service_one['permissions'].append('letter')
@@ -5285,7 +5310,6 @@ def test_service_settings_links_to_edit_service_notes_page_for_platform_admins(
     no_letter_contact_blocks,
     single_sms_sender,
     mock_get_service_settings_page_common,
-    mock_get_organisation,
 ):
     response = platform_admin_client.get(url_for(
         '.service_settings', service_id=SERVICE_ONE_ID
@@ -5333,7 +5357,6 @@ def test_service_settings_links_to_edit_service_billing_details_page_for_platfor
     no_letter_contact_blocks,
     single_sms_sender,
     mock_get_service_settings_page_common,
-    mock_get_organisation,
 ):
     response = platform_admin_client.get(url_for(
         '.service_settings', service_id=SERVICE_ONE_ID
@@ -5404,3 +5427,182 @@ def test_update_service_billing_details(
         purchase_order_number='PO1234',
         notes='very fluffy, give extra allowance'
     )
+
+
+def test_get_service_set_broadcast_account_type(
+    platform_admin_client,
+):
+    response = platform_admin_client.get(
+        url_for(
+            'main.service_set_broadcast_account_type',
+            service_id=SERVICE_ONE_ID,
+        )
+    )
+    assert response.status_code == 200
+
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert page.select_one('h1').text.strip() == "Change cell broadcast service type"
+
+    expected_labels = [
+        "Training mode - EE network - Test channel only",
+        "Training mode - O2 network - Test channel only",
+        "Training mode - Three network - Test channel only",
+        "Training mode - Vodafone network - Test channel only",
+        "Training mode - All networks - Public channel",
+        "Live - EE network - Test channel only",
+        "Live - O2 network - Test channel only",
+        "Live - Three network - Test channel only",
+        "Live - Vodafone network - Test channel only",
+        "Live - All networks - Test channel only",
+        "Live - All networks - Public channel",
+    ]
+    labels = page.find_all('label', class_="govuk-radios__label")
+    assert len(labels) == len(expected_labels)
+    for label in labels:
+        assert label.text.strip() in expected_labels
+
+    assert page.select_one('.govuk-back-link')['href'] == url_for(
+        'main.service_settings', service_id=SERVICE_ONE_ID,
+    )
+
+
+def test_get_service_set_broadcast_account_type_has_no_radio_selected_for_non_broadcast_service(
+    platform_admin_client
+):
+    response = platform_admin_client.get(
+        url_for(
+            'main.service_set_broadcast_account_type',
+            service_id=SERVICE_ONE_ID,
+        )
+    )
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert len(page.select('input[checked]')) == 0
+
+
+@pytest.mark.parametrize(
+    'service_mode,broadcast_channel,allowed_broadcast_provider,expected_text,expected_value',
+    [
+        (
+            "training",
+            "severe",
+            None,
+            "Training mode - All networks - Public channel",
+            "training-severe",
+        ),
+        (
+            "training",
+            "test",
+            "vodafone",
+            "Training mode - Vodafone network - Test channel only",
+            "training-test-vodafone",
+        ),
+        (
+            "live",
+            "test",
+            "o2",
+            "Live - O2 network - Test channel only",
+            "live-test-o2",
+        ),
+        (
+            "live",
+            "test",
+            None,
+            "Live - All networks - Test channel only",
+            "live-test",
+        ),
+        (
+            "live",
+            "severe",
+            None,
+            "Live - All networks - Public channel",
+            "live-severe",
+        ),
+    ]
+)
+def test_get_service_set_broadcast_account_type_has_radio_selected_for_broadcast_service(
+    platform_admin_client,
+    mocker,
+    service_mode,
+    broadcast_channel,
+    allowed_broadcast_provider,
+    expected_text,
+    expected_value
+):
+    service_one = service_json(
+        SERVICE_ONE_ID,
+        permissions=['broadcast'],
+        restricted=True if service_mode == "training" else False,
+        broadcast_channel=broadcast_channel,
+        allowed_broadcast_provider=allowed_broadcast_provider,
+    )
+    mocker.patch('app.service_api_client.get_service', return_value={'data': service_one})
+
+    response = platform_admin_client.get(
+        url_for(
+            'main.service_set_broadcast_account_type',
+            service_id=SERVICE_ONE_ID,
+        )
+    )
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    selected_radios = page.select('input[checked]')
+    assert len(selected_radios) == 1
+
+    selected_radio = selected_radios[0]
+    assert selected_radio.get('value') == expected_value
+    selected_label = selected_radio.find_next_sibling('label')
+    assert selected_label.text.strip() == expected_text
+
+
+@pytest.mark.parametrize(
+    'value,service_mode,broadcast_channel,allowed_broadcast_provider',
+    [
+        ("training-severe", "training", "severe", None),
+        ("training-test-vodafone", "training", "test", "vodafone"),
+        ("live-test-o2", "live", "test", "o2"),
+        ("live-test", "live", "test", None),
+        ("live-severe", "live", "severe", None),
+    ]
+)
+def test_post_service_set_broadcast_account_type_posts_data_to_api_and_redirects(
+    platform_admin_client,
+    mocker,
+    value,
+    service_mode,
+    broadcast_channel,
+    allowed_broadcast_provider,
+):
+    set_service_broadcast_settings_mock = mocker.patch('app.service_api_client.set_service_broadcast_settings')
+
+    response = platform_admin_client.post(
+        url_for(
+            'main.service_set_broadcast_account_type',
+            service_id=SERVICE_ONE_ID,
+        ),
+        data={
+            'account_type': value
+        }
+    )
+    assert response.status_code == 302
+    assert response.location == url_for('main.service_settings', service_id=SERVICE_ONE_ID, _external=True)
+    set_service_broadcast_settings_mock.assert_called_once_with(
+        SERVICE_ONE_ID,
+        service_mode=service_mode,
+        broadcast_channel=broadcast_channel,
+        provider_restriction=allowed_broadcast_provider,
+    )
+
+
+def test_post_service_set_broadcast_account_type_shows_errors_if_no_radio_selected(
+    platform_admin_client
+):
+    response = platform_admin_client.post(
+        url_for(
+            'main.service_set_broadcast_account_type',
+            service_id=SERVICE_ONE_ID,
+        )
+    )
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert "This field is required" in page.find("span", {"class": "govuk-error-message"}).text

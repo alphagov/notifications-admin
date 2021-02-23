@@ -44,6 +44,7 @@ from app.main.forms import (
     RateLimit,
     RenameServiceForm,
     SearchByNameForm,
+    ServiceBroadcastAccountTypeForm,
     ServiceContactDetailsForm,
     ServiceDataRetentionEditForm,
     ServiceDataRetentionForm,
@@ -71,7 +72,6 @@ PLATFORM_ADMIN_SERVICE_PERMISSIONS = OrderedDict([
     ('inbound_sms', {'title': 'Receive inbound SMS', 'requires': 'sms', 'endpoint': '.service_set_inbound_number'}),
     ('email_auth', {'title': 'Email authentication'}),
     ('international_letters', {'title': 'Send international letters', 'requires': 'letter'}),
-    ('broadcast', {'title': 'Send cell broadcasts'}),
 ])
 
 
@@ -315,28 +315,29 @@ def service_set_permission(service_id, permission):
     )
 
 
-@main.route("/services/<uuid:service_id>/service-settings/permissions/broadcast", methods=["GET", "POST"])
+@main.route("/services/<uuid:service_id>/service-settings/broadcasts", methods=["GET", "POST"])
 @user_is_platform_admin
-def service_set_broadcast_permission(service_id):
-
-    title = PLATFORM_ADMIN_SERVICE_PERMISSIONS['broadcast']['title']
-    form = ServiceOnOffSettingForm(
-        name=title,
-        enabled=current_service.has_permission('broadcast')
+def service_set_broadcast_account_type(service_id):
+    form = ServiceBroadcastAccountTypeForm(
+        account_type=(
+            current_service.live,
+            current_service.broadcast_channel,
+            current_service.allowed_broadcast_provider
+        )
     )
 
     if form.validate_on_submit():
-
-        if form.enabled.data:
-            current_service.force_broadcast_permission_on()
-        else:
-            current_service.force_permission('broadcast', on=False)
+        service_api_client.set_service_broadcast_settings(
+            current_service.id,
+            service_mode=form.account_type.service_mode,
+            broadcast_channel=form.account_type.broadcast_channel,
+            provider_restriction=form.account_type.provider_restriction
+        )
 
         return redirect(url_for(".service_settings", service_id=service_id))
 
     return render_template(
-        'views/service-settings/set-service-setting.html',
-        title=title,
+        'views/service-settings/service-set-broadcast-account-type.html',
         form=form,
     )
 

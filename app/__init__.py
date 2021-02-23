@@ -53,6 +53,7 @@ from app.formatters import (
     format_delta,
     format_delta_days,
     format_list_items,
+    format_mobile_network,
     format_notification_status,
     format_notification_status_as_field_status,
     format_notification_status_as_time,
@@ -560,6 +561,7 @@ def add_template_filters(application):
         message_count_label,
         message_count,
         message_count_noun,
+        format_mobile_network,
     ]:
         application.add_template_filter(fn)
 

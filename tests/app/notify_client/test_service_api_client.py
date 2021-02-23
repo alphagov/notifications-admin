@@ -410,6 +410,7 @@ def test_returns_value_from_cache(
     (service_api_client, 'delete_sms_sender', [SERVICE_ONE_ID, ''], {}),
     (service_api_client, 'update_service_callback_api', [SERVICE_ONE_ID] + [''] * 4, {}),
     (service_api_client, 'create_service_callback_api', [SERVICE_ONE_ID] + [''] * 3, {}),
+    (service_api_client, 'set_service_broadcast_settings', [SERVICE_ONE_ID, 'training', 'severe', None], {}),
     (user_api_client, 'add_user_to_service', [SERVICE_ONE_ID, uuid4(), [], []], {}),
     (invite_api_client, 'accept_invite', [SERVICE_ONE_ID, uuid4()], {}),
 ])
