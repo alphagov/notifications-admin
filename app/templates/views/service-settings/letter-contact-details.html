@@ -49,7 +49,9 @@
           </div>
           <div class="govuk-grid-column-one-quarter">
             {% if current_user.has_permissions('manage_service') %}
-            <a class="govuk-link govuk-link--no-visited-state user-list-edit-link" href="{{ url_for('.service_edit_letter_contact', service_id =current_service.id, letter_contact_id = item.id) }}">Change</a>
+            <a class="govuk-link govuk-link--no-visited-state user-list-edit-link" href="{{ url_for('.service_edit_letter_contact', service_id =current_service.id, letter_contact_id = item.id) }}">
+              Change<span class="govuk-visually-hidden"> {{ item.contact_block }}</span>
+            </a>
             {% endif %}
           </div>
         </div>
