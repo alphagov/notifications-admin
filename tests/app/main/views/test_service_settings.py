@@ -640,7 +640,7 @@ def test_show_restricted_service(
         assert not request_to_live_link
 
 
-def test_show_restricted_broadcast_service(
+def test_broadcast_service_in_training_mode_doesnt_show_trial_mode_content(
     client_request,
     service_one,
     single_reply_to_email_address,
