@@ -2192,7 +2192,7 @@ def test_and_more_hint_appears_on_settings_with_more_than_just_a_single_sender(
 @pytest.mark.parametrize('sender_list_page, index, expected_output', [
     ('main.service_email_reply_to', 0, 'test@example.com (default) Change test@example.com'),
     ('main.service_letter_contact_details', 1, '1 Example Street (default) Change'),
-    ('main.service_sms_senders', 0, 'GOVUK (default) Change')
+    ('main.service_sms_senders', 0, 'GOVUK (default) Change GOVUK')
 ])
 def test_api_ids_dont_show_on_option_pages_with_a_single_sender(
     client_request,
@@ -2246,9 +2246,9 @@ def test_api_ids_dont_show_on_option_pages_with_a_single_sender(
         'app.service_api_client.get_sms_senders',
         create_multiple_sms_senders(),
         [
-            'Example (default and receives replies) Change ID: 1234',
-            'Example 2 Change ID: 5678',
-            'Example 3 Change ID: 9457',
+            'Example (default and receives replies) Change Example ID: 1234',
+            'Example 2 Change Example 2 ID: 5678',
+            'Example 3 Change Example 3 ID: 9457',
         ],
     ),
     ]
