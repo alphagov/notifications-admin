@@ -4,33 +4,27 @@
 <p class="govuk-body">
   To put a heading in your template, use a hash:
 </p>
-<div>
-  {{ govukInsetText({
-    "text": "# This is a heading",
-    "classes": "govuk-!-margin-top-0 govuk-!-margin-bottom-3"})
-  }}
-</div>
+{{ govukInsetText({
+  "text": "# This is a heading",
+  "classes": "govuk-!-margin-top-0 govuk-!-margin-bottom-3"})
+}}
 <p class="govuk-body">
   To make bullet points, use asterisks:
 </p>
-<div>
-  {{ govukInsetText({
-    "html": "* point 1<br/>
-             * point 2<br/>
-             * point 3<br/>",
-    "classes": "govuk-!-margin-top-0 govuk-!-margin-bottom-3"})
-  }}
-</div>
+{{ govukInsetText({
+  "html": "* point 1<br/>
+            * point 2<br/>
+            * point 3<br/>",
+  "classes": "govuk-!-margin-top-0 govuk-!-margin-bottom-3"})
+}}
 <p class="govuk-body">
   To insert a page break, use three asterisks:
 </p>
-<div>
-  {{ govukInsetText({
-    "html": "Content on page 1<br/>
-             <br/>
-             ***<br/>
-             <br/>
-             Content on page 2<br/>",
-    "classes": "govuk-!-margin-top-0 govuk-!-margin-bottom-3"})
-  }}
-</div>
+{{ govukInsetText({
+  "html": "Content on page 1<br/>
+            <br/>
+            ***<br/>
+            <br/>
+            Content on page 2<br/>",
+  "classes": "govuk-!-margin-top-0 govuk-!-margin-bottom-3"})
+}}
