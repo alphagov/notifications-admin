@@ -7,16 +7,6 @@ APP_VERSION_FILE = app/version.py
 GIT_BRANCH ?= $(shell git symbolic-ref --short HEAD 2> /dev/null || echo "detached")
 GIT_COMMIT ?= $(shell git rev-parse HEAD 2> /dev/null || echo "")
 
-DOCKER_IMAGE_TAG := $(shell cat docker/VERSION)
-DOCKER_BUILDER_IMAGE_NAME = govuk/notify-admin-builder:${DOCKER_IMAGE_TAG}
-
-BUILD_TAG ?= notifications-admin-manual
-BUILD_NUMBER ?= 0
-DEPLOY_BUILD_NUMBER ?= ${BUILD_NUMBER}
-BUILD_URL ?=
-
-DOCKER_CONTAINER_PREFIX = ${USER}-${BUILD_TAG}
-
 CF_API ?= api.cloud.service.gov.uk
 CF_ORG ?= govuk-notify
 CF_SPACE ?= ${DEPLOY_ENV}
@@ -32,6 +22,15 @@ VIRTUALENV_ROOT := $(shell [ -z $$VIRTUAL_ENV ] && echo $$(pwd)/venv || echo $$V
 
 ## DEVELOPMENT
 
+.PHONY: bootstrap
+bootstrap: generate-version-file
+	pip3 install -r requirements_for_test.txt
+	npm install && npm rebuild node-sass npm run build
+
+.PHONY: run-flask
+run-flask:
+	. environment.sh && flask run -p 6012
+
 .PHONY: help
 help:
 	@cat $(MAKEFILE_LIST) | grep -E '^[a-zA-Z_-]+:.*?## .*$$' | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
@@ -44,27 +43,9 @@ virtualenv:
 upgrade-pip: virtualenv
 	${VIRTUALENV_ROOT}/bin/pip install --upgrade pip
 
-.PHONY: requirements
-requirements: upgrade-pip requirements.txt ## Install dependencies for running the app
-	${VIRTUALENV_ROOT}/bin/pip install -r requirements.txt
-
-.PHONY: requirements-for-test
-requirements-for-test: upgrade-pip requirements_for_test.txt ## Install all dependencies for running the app, development and testing
-	${VIRTUALENV_ROOT}/bin/pip install -r requirements_for_test.txt
-
-.PHONY: frontend
-frontend:
-	npm set progress=false
-	npm install
-	npm rebuild node-sass
-
 .PHONY: generate-version-file
 generate-version-file: ## Generates the app version file
 	@echo -e "__git_commit__ = \"${GIT_COMMIT}\"\n__time__ = \"${DATE}\"" > ${APP_VERSION_FILE}
-
-.PHONY: build
-build: frontend requirements-for-test generate-version-file ## Build project
-	npm run build
 
 .PHONY: test
 test: ## Run tests
@@ -78,50 +59,6 @@ fix-imports:
 freeze-requirements: ## create static requirements.txt
 	${VIRTUALENV_ROOT}/bin/pip install pip-tools
 	${VIRTUALENV_ROOT}/bin/pip-compile requirements.in
-
-.PHONY: prepare-docker-build-image
-prepare-docker-build-image: ## Prepare the Docker builder image
-	make -C docker build
-
-define run_docker_container
-	@docker run -it --rm \
-		--name "${DOCKER_CONTAINER_PREFIX}-${1}" \
-		-v "`pwd`:/var/project" \
-		-e UID=$(shell id -u) \
-		-e GID=$(shell id -g) \
-		-e GIT_COMMIT=${GIT_COMMIT} \
-		-e BUILD_NUMBER=${BUILD_NUMBER} \
-		-e BUILD_URL=${BUILD_URL} \
-		-e http_proxy="${HTTP_PROXY}" \
-		-e HTTP_PROXY="${HTTP_PROXY}" \
-		-e https_proxy="${HTTPS_PROXY}" \
-		-e HTTPS_PROXY="${HTTPS_PROXY}" \
-		-e NO_PROXY="${NO_PROXY}" \
-		-e CI_NAME=${CI_NAME} \
-		-e CI_BUILD_NUMBER=${BUILD_NUMBER} \
-		-e CI_BUILD_URL=${BUILD_URL} \
-		-e CI_BRANCH=${GIT_BRANCH} \
-		-e CI_PULL_REQUEST=${CI_PULL_REQUEST} \
-		-e CF_API="${CF_API}" \
-		-e CF_USERNAME="${CF_USERNAME}" \
-		-e CF_PASSWORD="${CF_PASSWORD}" \
-		-e CF_ORG="${CF_ORG}" \
-		-e CF_SPACE="${CF_SPACE}" \
-		${DOCKER_BUILDER_IMAGE_NAME} \
-		${2}
-endef
-
-.PHONY: build-with-docker
-build-with-docker: prepare-docker-build-image ## Build inside a Docker container
-	$(call run_docker_container,build,gosu hostuser make build)
-
-.PHONY: test-with-docker
-test-with-docker: prepare-docker-build-image ## Run tests inside a Docker container
-	$(call run_docker_container,test,gosu hostuser make test)
-
-.PHONY: clean-docker-containers
-clean-docker-containers: ## Clean up any remaining docker containers
-	docker rm -f $(shell docker ps -q -f "name=${DOCKER_CONTAINER_PREFIX}") 2> /dev/null || true
 
 .PHONY: clean
 clean:
