@@ -4384,21 +4384,6 @@ def test_send_files_by_email_contact_details_does_not_update_invalid_contact_det
     assert normalize_spaces(page.h1.text) == "Send files by email"
 
 
-def test_contact_link_is_not_displayed_without_the_upload_document_permission(
-    client_request,
-    service_one,
-    mock_get_service_settings_page_common,
-    no_reply_to_email_addresses,
-    no_letter_contact_blocks,
-    single_sms_sender,
-):
-    page = client_request.get(
-        'main.service_settings',
-        service_id=SERVICE_ONE_ID,
-    )
-    assert 'Contact details' not in page.text
-
-
 @pytest.mark.parametrize('endpoint, permissions, expected_p', [
     (
         'main.service_set_inbound_sms',
