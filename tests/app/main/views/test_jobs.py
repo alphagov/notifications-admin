@@ -190,7 +190,7 @@ def test_should_show_job_in_progress(
         normalize_spaces(link.text)
         for link in page.select('.pill a:not(.pill-item--selected)')
     ] == [
-        '10 sending', '0 delivered', '0 failed'
+        '10 sending text messages', '0 delivered text messages', '0 failed text messages'
     ]
     assert page.select_one('p.hint').text.strip() == 'Report is 50% complete…'
 
@@ -215,7 +215,7 @@ def test_should_show_job_without_notifications(
         normalize_spaces(link.text)
         for link in page.select('.pill a:not(.pill-item--selected)')
     ] == [
-        '10 sending', '0 delivered', '0 failed'
+        '10 sending text messages', '0 delivered text messages', '0 failed text messages'
     ]
     assert page.select_one('p.hint').text.strip() == 'Report is 50% complete…'
     assert page.select_one('tbody').text.strip() == 'No messages to show yet…'
