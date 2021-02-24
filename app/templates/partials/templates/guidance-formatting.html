@@ -1,41 +1,35 @@
+{% from "components/inset-text/macro.njk" import govukInsetText %}
+
 <h2 class="heading-medium">Formatting</h2>
 <p class="bottom-gutter-1-3">
   To put a title in your template, use a hash:
 </p>
-<div class="panel panel-border-wide bottom-gutter">
-  <p class="govuk-body">
-    # This is a title
-  </p>
+<div class="govuk-!-margin-bottom-6">
+  {{ govukInsetText({"text": "# This is a title", "classes": "govuk-!-margin-top-0"})}}
 </div>
 <p class="bottom-gutter-1-3">
   To make bullet points, use asterisks:
 </p>
-<div class="panel panel-border-wide bottom-gutter">
-  <p class="govuk-body">
-    * point 1<br/>
-    * point 2<br/>
-    * point 3<br/>
-  </p>
+<div class="govuk-!-margin-bottom-6">
+  {{ govukInsetText({
+    "html": "* point 1<br/>
+             * point 2<br/>
+             * point 3<br/>",
+    "classes": "govuk-!-margin-top-0"})
+  }}
 </div>
 <p class="bottom-gutter-1-3">
   To add inset text, use a caret:
 </p>
-<div class="panel panel-border-wide bottom-gutter">
-  <p class="govuk-body">
-    ^ You must tell us if your circumstances change
-  </p>
+<div class="govuk-!-margin-bottom-6">
+  {{ govukInsetText({"text": "^ You must tell us if your circumstances change", "classes": "govuk-!-margin-top-0"})}}
 </div>
 <p class="bottom-gutter-1-3">
   To add a horizontal line, use three dashes:
 </p>
-<div class="panel panel-border-wide">
-  <p class="govuk-body">
-    First paragraph
-  </p>
-  <p style="letter-spacing: 1px;">
-    ---
-  </p>
-  <p class="govuk-body">
-    Second paragraph
-  </p>
-</div>
+{{ govukInsetText({
+  "html": '<p class="govuk-body">First paragraph</p>
+            <p class="govuk-body" style="letter-spacing: 1px;">---</p>
+            <p class="govuk-body">Second paragraph</p>',
+  "classes": "govuk-!-margin-top-0"})
+}}

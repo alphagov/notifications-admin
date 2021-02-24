@@ -1,3 +1,5 @@
+{% from "components/inset-text/macro.njk" import govukInsetText %}
+
 <h2 class="heading-medium">
   Optional content
 </h2>
@@ -8,12 +10,11 @@
   For example if you only want to show something to people who are under
   18:
 </p>
-<div class="panel panel-border-wide">
-  <p class="govuk-body">
-    ((under18??Please get your application signed by a parent or
-    guardian.))
-  </p>
-</div>
+{{ govukInsetText({
+  "text": "((under18??Please get your application signed by a parent or
+  guardian.))",
+  "classes": "govuk-!-margin-top-0 govuk-!-margin-bottom-3"})
+}}
 <p class="govuk-body">
   For each person you send this message to, specify ‘yes’ or ‘no’ to
   show or hide this content.
