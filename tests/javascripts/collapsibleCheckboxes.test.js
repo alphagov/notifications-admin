@@ -42,10 +42,10 @@ describe('Collapsible fieldset', () => {
     document.body.innerHTML =
       `<div class="selection-wrapper" data-module="collapsible-checkboxes" data-field-label="folder">
         <div class="govuk-form-group">
-          <fieldset class="govuk-fieldset" id="folder_permissions">
+          <fieldset class="govuk-fieldset" id="folder_permissions" aria-describedby="users_with_permission-hint">
             <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
               Folders this team member can see
-              <span class="govuk-hint">
+              <span class="govuk-hint" id="users_with_permission-hint">
                 <div class="selection-summary" role="region" aria-live="polite"></div>
               </span>
             </legend>
@@ -144,9 +144,26 @@ describe('Collapsible fieldset', () => {
 
     });
 
-    test("removes the hint", () => {
+    test("the hint is removed", () => {
 
       expect(document.querySelector('.govuk-hint')).toBeNull();
+
+    });
+
+    describe("the live region that was inside the hint", () => {
+
+      test("is moved above the fieldset", () => {
+
+        expect(fieldset.previousElementSibling.matches('.selection-summary')).toBe(true);
+
+      });
+
+      test("has an id matching the aria-describedby on the fieldset", () => {
+
+        const fieldsetDescribedby = fieldset.getAttribute('aria-describedby');
+        expect(fieldset.previousElementSibling.getAttribute('id')).toEqual(fieldsetDescribedby);
+
+      });
 
     });
 

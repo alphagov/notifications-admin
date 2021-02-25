@@ -20,12 +20,14 @@
     }[field] || `No ${field}s`)
   };
   Summary.prototype.addContent = function() {
+    const $hint = this.module.$formGroup.find('.govuk-hint');
     this.$text = $(`<p class="selection-summary__text" />`);
 
     if (this.fieldLabel === 'folder') { this.$text.addClass('selection-summary__text--folders'); }
 
+    this.$el.attr('id', $hint.attr('id'));
     this.$el.append(this.$text);
-    this.module.$formGroup.find('.govuk-hint').remove();
+    $hint.remove();
   };
   Summary.prototype.update = function(selection) {
     let template;
