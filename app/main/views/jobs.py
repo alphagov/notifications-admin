@@ -351,7 +351,7 @@ def _get_job_counts(job):
         ) for label, query_param, count in [
             [
                 f'''total<span class="govuk-visually-hidden">
-                 {message_count_noun(job.notification_count, job_type)}</span>''',
+                 {"text message" if job_type == "sms" else job_type}s</span>''',
                 '',
                 job.notification_count
             ],
