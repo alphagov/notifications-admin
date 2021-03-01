@@ -171,7 +171,7 @@ requests==2.25.1
     #   govuk-bank-holidays
     #   notifications-python-client
     #   notifications-utils
-rsa==4.7.1
+rsa==4.7.2
     # via awscli
 s3transfer==0.3.4
     # via
