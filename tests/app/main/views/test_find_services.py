@@ -1,3 +1,5 @@
+from flask import url_for
+
 from tests import service_json
 
 
@@ -71,3 +73,21 @@ def test_find_services_by_name_validates_against_empty_search_submission(
 
     expected_message = "Error: You need to enter full or partial name to search by."
     assert document.find('span', {'class': 'govuk-error-message'}).text.strip() == expected_message
+
+
+def test_find_services_by_name_redirects_for_uuid(
+    client_request,
+    platform_admin_user,
+    mocker,
+    fake_uuid
+):
+    client_request.login(platform_admin_user)
+    client_request.post(
+        'main.find_services_by_name',
+        _data={"search": fake_uuid},
+        _expected_redirect=url_for(
+            'main.service_dashboard',
+            service_id=fake_uuid,
+            _external=True,
+        ),
+    )
