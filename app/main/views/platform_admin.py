@@ -280,14 +280,19 @@ def usage_for_all_services():
     if form.validate_on_submit():
         start_date = form.start_date.data
         end_date = form.end_date.data
-        headers = ["organisation_id", "organisation_name", "service_id", "service_name",
-                   "sms_cost", "sms_fragments", "letter_cost", "letter_breakdown"]
+        headers = [
+            "organisation_id", "organisation_name", "service_id", "service_name",
+            "sms_cost", "sms_fragments", "letter_cost", "letter_breakdown", "purchase_order_number",
+            "contact_names", "contact_email_addresses", "billing_reference"
+        ]
 
         result = billing_api_client.get_usage_for_all_services(start_date, end_date)
         rows = [
             [
-                r['organisation_id'], r["organisation_name"], r["service_id"], r["service_name"],
-                r["sms_cost"], r['sms_fragments'], r["letter_cost"], r["letter_breakdown"].strip()
+                r["organisation_id"], r["organisation_name"], r["service_id"], r["service_name"],
+                r["sms_cost"], r["sms_fragments"], r["letter_cost"], r["letter_breakdown"].strip(),
+                r.get("purchase_order_number"), r.get("contact_names"), r.get("contact_email_addresses"),
+                r.get("billing_reference")
             ]
             for r in result
         ]

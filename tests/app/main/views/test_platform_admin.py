@@ -847,15 +847,23 @@ def test_usage_for_all_services_when_no_results_for_date(client_request, platfor
 
 
 def test_usage_for_all_services_when_calls_api_and_download_data(platform_admin_client, mocker):
-    mocker.patch("app.main.views.platform_admin.billing_api_client.get_usage_for_all_services",
-                 return_value=[{'letter_breakdown': '6 second class letters at 45p\n2 first class letters at 35p\n',
-                                'letter_cost': 3.4,
-                                'organisation_id': '7832a1be-a1f0-4f2a-982f-05adfd3d6354',
-                                'organisation_name': 'Org for a - with sms and letter',
-                                'service_id': '48e82ac0-c8c4-4e46-8712-c83c35a94006',
-                                'service_name': 'a - with sms and letter',
-                                'sms_cost': 0, 'sms_fragments': 0
-                                }])
+    mocker.patch(
+        "app.main.views.platform_admin.billing_api_client.get_usage_for_all_services",
+        return_value=[{
+            'letter_breakdown': '6 second class letters at 45p\n2 first class letters at 35p\n',
+            'letter_cost': 3.4,
+            'organisation_id': '7832a1be-a1f0-4f2a-982f-05adfd3d6354',
+            'organisation_name': 'Org for a - with sms and letter',
+            'service_id': '48e82ac0-c8c4-4e46-8712-c83c35a94006',
+            'service_name': 'a - with sms and letter',
+            'sms_cost': 0,
+            'sms_fragments': 0,
+            'purchase_order_number': 'PO1234',
+            'contact_names': 'Anne, Marie, Josh',
+            'contact_email_addresses': 'billing@example.com, accounts@example.com',
+            'billing_reference': 'Notify2020'
+        }]
+    )
 
     response = platform_admin_client.post(url_for('main.usage_for_all_services'),
                                           data={'start_date': '2019-01-01', 'end_date': '2019-03-31'})
@@ -867,8 +875,8 @@ def test_usage_for_all_services_when_calls_api_and_download_data(platform_admin_
     )
 
     assert response.get_data(as_text=True) == (
-        'organisation_id,organisation_name,service_id,service_name,' +
-        'sms_cost,sms_fragments,letter_cost,letter_breakdown' +
+        'organisation_id,organisation_name,service_id,service_name,sms_cost,sms_fragments,letter_cost' +
+        ',letter_breakdown,purchase_order_number,contact_names,contact_email_addresses,billing_reference' +
 
         '\r\n' +
 
@@ -881,7 +889,8 @@ def test_usage_for_all_services_when_calls_api_and_download_data(platform_admin_
         '3.4,' +
         '"6 second class letters at 45p' +
         '\n' +
-        '2 first class letters at 35p"' +
+        '2 first class letters at 35p",' +
+        'PO1234,"Anne, Marie, Josh","billing@example.com, accounts@example.com",Notify2020'
 
         '\r\n'
     )
