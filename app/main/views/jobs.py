@@ -29,7 +29,7 @@ from app import (
     notification_api_client,
     service_api_client,
 )
-from app.formatters import get_time_left
+from app.formatters import get_time_left, message_count_noun
 from app.main import main
 from app.main.forms import SearchNotificationsForm
 from app.models.job import Job
@@ -336,6 +336,7 @@ def get_status_filters(service, message_type, statistics):
 
 
 def _get_job_counts(job):
+    job_type = job.template_type
     return [
         (
             label,
@@ -349,19 +350,27 @@ def _get_job_counts(job):
             count
         ) for label, query_param, count in [
             [
-                'total', '',
+                f'''total<span class="govuk-visually-hidden">
+                 {"text message" if job_type == "sms" else job_type}s</span>''',
+                '',
                 job.notification_count
             ],
             [
-                'sending', 'sending',
+                f'''sending<span class="govuk-visually-hidden">
+                 {message_count_noun(job.notifications_sending, job_type)}</span>''',
+                'sending',
                 job.notifications_sending
             ],
             [
-                'delivered', 'delivered',
+                f'''delivered<span class="govuk-visually-hidden">
+                 {message_count_noun(job.notifications_delivered, job_type)}</span>''',
+                'delivered',
                 job.notifications_delivered
             ],
             [
-                'failed', 'failed',
+                f'''failed<span class="govuk-visually-hidden">
+                 {message_count_noun(job.notifications_failed, job_type)}</span>''',
+                'failed',
                 job.notifications_failed
             ]
         ]
