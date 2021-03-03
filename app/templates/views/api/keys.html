@@ -46,7 +46,7 @@
         {% endcall %}
       {% else %}
         {% call field(align='right', status='error') %}
-          <a class="govuk-link govuk-link--no-visited-state" href='{{ url_for('.revoke_api_key', service_id=current_service.id, key_id=item.id) }}'>
+          <a class="govuk-link govuk-link--destructive" href='{{ url_for('.revoke_api_key', service_id=current_service.id, key_id=item.id) }}'>
             Revoke<span class="govuk-visually-hidden"> {{ item.name }}</span>
           </a>
         {% endcall %}

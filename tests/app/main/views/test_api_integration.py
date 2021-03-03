@@ -191,13 +191,22 @@ def test_should_show_empty_api_keys_page(
 def test_should_show_api_keys_page(
     client_request,
     mock_get_api_keys,
+    fake_uuid,
 ):
     page = client_request.get('main.api_keys', service_id=SERVICE_ONE_ID)
     rows = [normalize_spaces(row.text) for row in page.select('main tr')]
+    revoke_link = page.select_one('main tr a.govuk-link.govuk-link--destructive')
 
     assert rows[0] == 'API keys Action'
     assert rows[1] == 'another key name Revoked 1 January at 1:00am'
     assert rows[2] == 'some key name Revoke some key name'
+
+    assert normalize_spaces(revoke_link.text) == 'Revoke some key name'
+    assert revoke_link['href'] == url_for(
+        'main.revoke_api_key',
+        service_id=SERVICE_ONE_ID,
+        key_id=fake_uuid,
+    )
 
     mock_get_api_keys.assert_called_once_with(SERVICE_ONE_ID)
 
