@@ -1004,7 +1004,7 @@ def test_invite_user(
     mock_get_template_folders,
     mock_get_organisations,
 ):
-    sample_invite['email_address'] = 'test@example.gov.uk'
+    sample_invite['email_address'] = email_address
 
     assert is_gov_user(email_address) == gov_user
     mocker.patch('app.models.user.InvitedUsers.client_method', return_value=[sample_invite])
@@ -1027,7 +1027,7 @@ def test_invite_user(
     )
     assert page.h1.string.strip() == 'Team members'
     flash_banner = page.find('div', class_='banner-default-with-tick').string.strip()
-    assert flash_banner == 'Invite sent to test@example.gov.uk'
+    assert flash_banner == f"Invite sent to {email_address}"
 
     expected_permissions = {'manage_api_keys', 'manage_service', 'manage_templates', 'send_messages', 'view_activity'}
 
