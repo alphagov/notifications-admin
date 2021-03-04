@@ -41,6 +41,23 @@ def create_archive_user_event(user_id, archived_by_id):
         archived_by_id=archived_by_id)
 
 
+def create_broadcast_account_type_change_event(
+    service_id,
+    changed_by_id,
+    service_mode,
+    broadcast_channel,
+    provider_restriction,
+):
+    _send_event(
+        'change_broadcast_account_type',
+        service_id=service_id,
+        changed_by_id=changed_by_id,
+        service_mode=service_mode,
+        broadcast_channel=broadcast_channel,
+        provider_restriction=provider_restriction
+    )
+
+
 def _send_event(event_type, **kwargs):
     event_data = _construct_event_data(request)
     event_data.update(kwargs)
