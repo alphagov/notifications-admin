@@ -3,6 +3,7 @@ from unittest.mock import ANY
 
 from app.event_handlers import (
     create_archive_user_event,
+    create_broadcast_account_type_change_event,
     create_email_change_event,
     create_mobile_number_change_event,
     create_remove_user_from_service_event,
@@ -88,3 +89,26 @@ def test_create_archive_user_event_calls_events_api(app_, mock_events):
                                         'ip_address': ANY,
                                         'user_id': user_id,
                                         'archived_by_id': archived_by_id})
+
+
+def test_create_broadcast_account_type_change_event(app_, mock_events):
+    service_id = str(uuid.uuid4())
+    changed_by_id = str(uuid.uuid4())
+
+    with app_.test_request_context():
+        create_broadcast_account_type_change_event(
+            service_id,
+            changed_by_id,
+            'training',
+            'severe',
+            None)
+
+        mock_events.assert_called_with('change_broadcast_account_type',
+                                       {'browser_fingerprint':
+                                        {'browser': ANY, 'version': ANY, 'platform': ANY, 'user_agent_string': ''},
+                                        'ip_address': ANY,
+                                        'service_id': service_id,
+                                        'changed_by_id': changed_by_id,
+                                        'service_mode': 'training',
+                                        'broadcast_channel': 'severe',
+                                        'provider_restriction': None})

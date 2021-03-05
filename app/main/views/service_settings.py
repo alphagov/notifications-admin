@@ -28,6 +28,7 @@ from app import (
     service_api_client,
     user_api_client,
 )
+from app.event_handlers import create_broadcast_account_type_change_event
 from app.extensions import zendesk_client
 from app.formatters import email_safe
 from app.main import main
@@ -332,6 +333,13 @@ def service_set_broadcast_account_type(service_id):
             service_mode=form.account_type.service_mode,
             broadcast_channel=form.account_type.broadcast_channel,
             provider_restriction=form.account_type.provider_restriction
+        )
+        create_broadcast_account_type_change_event(
+            service_id=current_service.id,
+            changed_by_id=current_user.id,
+            service_mode=form.account_type.service_mode,
+            broadcast_channel=form.account_type.broadcast_channel,
+            provider_restriction=form.account_type.provider_restriction,
         )
 
         return redirect(url_for(".service_settings", service_id=service_id))
