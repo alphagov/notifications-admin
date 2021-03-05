@@ -36,11 +36,11 @@ def test_client_uses_correct_find_by_email(mocker, api_user_active):
     expected_params = {'email': api_user_active['email_address']}
 
     user_api_client.max_failed_login_count = 1  # doesn't matter for this test
-    mock_get = mocker.patch('app.notify_client.user_api_client.UserApiClient.get')
+    mock_post = mocker.patch('app.notify_client.user_api_client.UserApiClient.post')
 
     user_api_client.get_user_by_email(api_user_active['email_address'])
 
-    mock_get.assert_called_once_with(expected_url, params=expected_params)
+    mock_post.assert_called_once_with(expected_url, params=expected_params)
 
 
 def test_client_only_updates_allowed_attributes(mocker):
