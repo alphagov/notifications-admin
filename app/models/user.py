@@ -405,13 +405,20 @@ class User(JSONModel, UserMixin):
         self.current_session_id = user_api_client.get_user(self.id).get('current_session_id')
         session['current_session_id'] = self.current_session_id
 
-    def add_to_service(self, service_id, permissions, folder_permissions):
+    def add_to_service(self, service_id, permissions, folder_permissions, invited_by_id):
+        from app.event_handlers import create_add_user_to_service_event
+
         try:
             user_api_client.add_user_to_service(
                 service_id,
                 self.id,
                 permissions,
                 folder_permissions,
+            )
+            create_add_user_to_service_event(
+                user_id=self.id,
+                invited_by_id=invited_by_id,
+                service_id=service_id,
             )
         except HTTPError as exception:
             if exception.status_code == 400 and 'already part of service' in exception.message:
