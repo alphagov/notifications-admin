@@ -40,7 +40,7 @@ class UserApiClient(NotifyAdminAPIClient):
         return self.get("/user/{}".format(user_id))
 
     def get_user_by_email(self, email_address):
-        user_data = self.post('/user/email', params={'email': email_address})
+        user_data = self.post('/user/email', data={'email': email_address})
         return user_data['data']
 
     def get_user_by_email_or_none(self, email_address):
