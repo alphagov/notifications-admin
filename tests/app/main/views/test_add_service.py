@@ -250,6 +250,15 @@ def test_get_should_only_show_nhs_org_types_radios_if_user_has_nhs_email(
     (2020, 'school_or_college', 25_000),
     (2020, 'emergency_service', 25_000),
     (2020, 'other', 25_000),
+
+    (2021, 'central', 150_000),
+    (2021, 'local', 25_000),
+    (2021, 'nhs_central', 150_000),
+    (2021, 'nhs_local', 25_000),
+    (2021, 'nhs_gp', 10_000),
+    (2021, 'school_or_college', 10_000),
+    (2021, 'emergency_service', 25_000),
+    (2021, 'other', 10_000),
 ])
 def test_should_add_service_and_redirect_to_dashboard_when_existing_service(
     app_,
