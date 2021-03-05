@@ -473,7 +473,7 @@ class InvitedUser(JSONModel):
     @classmethod
     def by_id_and_service_id(cls, service_id, invited_user_id):
         return cls(
-            invite_api_client.get_invited_user(service_id, invited_user_id)
+            invite_api_client.get_invited_user_for_service(service_id, invited_user_id)
         )
 
     def accept_invite(self):
@@ -601,7 +601,7 @@ class InvitedOrgUser(JSONModel):
     @classmethod
     def by_id_and_org_id(cls, org_id, invited_user_id):
         return cls(
-            org_invite_api_client.get_invited_user(org_id, invited_user_id)
+            org_invite_api_client.get_invited_user_for_org(org_id, invited_user_id)
         )
 
     def serialize(self, permissions_as_string=False):

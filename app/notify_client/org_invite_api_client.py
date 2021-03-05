@@ -23,7 +23,7 @@ class OrgInviteApiClient(NotifyAdminAPIClient):
         resp = self.get(endpoint)
         return resp['data']
 
-    def get_invited_user(self, org_id, invited_org_user_id):
+    def get_invited_user_for_org(self, org_id, invited_org_user_id):
         return self.get(
             f'/organisation/{org_id}/invite/{invited_org_user_id}'
         )['data']

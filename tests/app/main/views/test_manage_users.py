@@ -1242,7 +1242,7 @@ def test_cancel_invited_user_cancels_user_invitations(
     mocker,
 ):
     mock_cancel = mocker.patch('app.invite_api_client.cancel_invited_user')
-    mocker.patch('app.invite_api_client.get_invited_user', return_value=sample_invite)
+    mocker.patch('app.invite_api_client.get_invited_user_for_service', return_value=sample_invite)
 
     page = client_request.get(
         'main.cancel_invited_user',
