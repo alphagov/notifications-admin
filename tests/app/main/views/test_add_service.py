@@ -242,14 +242,14 @@ def test_get_should_only_show_nhs_org_types_radios_if_user_has_nhs_email(
 
 
 @pytest.mark.parametrize('financial_year, organisation_type, free_allowance', [
-    (2020, 'central', 250 * 1000),
-    (2020, 'local', 25 * 1000),
-    (2020, 'nhs_central', 250 * 1000),
-    (2020, 'nhs_local', 25 * 1000),
-    (2020, 'nhs_gp', 25 * 1000),
-    (2020, 'school_or_college', 25 * 1000),
-    (2020, 'emergency_service', 25 * 1000),
-    (2020, 'other', 25 * 1000),
+    (2020, 'central', 250_000),
+    (2020, 'local', 25_000),
+    (2020, 'nhs_central', 250_000),
+    (2020, 'nhs_local', 25_000),
+    (2020, 'nhs_gp', 25_000),
+    (2020, 'school_or_college', 25_000),
+    (2020, 'emergency_service', 25_000),
+    (2020, 'other', 25_000),
 ])
 def test_should_add_service_and_redirect_to_dashboard_when_existing_service(
     app_,
