@@ -68,6 +68,7 @@ def accept_invite(token):
                 service_id=invited_user.service,
                 permissions=invited_user.permissions,
                 folder_permissions=invited_user.folder_permissions,
+                invited_by_id=invited_user.from_user.id,
             )
             if service.has_permission('broadcast'):
                 return redirect(url_for('main.broadcast_tour', service_id=service.id, step_index=1))

@@ -34,6 +34,15 @@ def create_remove_user_from_service_event(user_id, removed_by_id, service_id):
     )
 
 
+def create_add_user_to_service_event(user_id, invited_by_id, service_id):
+    _send_event(
+        'add_user_to_service',
+        user_id=user_id,
+        invited_by_id=invited_by_id,
+        service_id=service_id
+    )
+
+
 def create_archive_user_event(user_id, archived_by_id):
     _send_event(
         'archive_user',
