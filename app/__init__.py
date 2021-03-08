@@ -500,11 +500,9 @@ def setup_blueprints(application):
     updated, including the expiration date. If you have a dashboard open and in focus it'll refresh the expiration timer
     every two seconds, and you will never log out, which is behaviour we want to preserve.
     """
+    from app.main import main as main_blueprint
+    from app.main import no_cookie as no_cookie_blueprint
     from app.status import status as status_blueprint
-    from app.main import (
-        main as main_blueprint,
-        no_cookie as no_cookie_blueprint
-    )
 
     main_blueprint.before_request(make_session_permanent)
     main_blueprint.after_request(save_service_or_org_after_request)
@@ -517,6 +515,7 @@ def setup_blueprints(application):
 
 def setup_event_handlers():
     from flask_login import user_logged_in
+
     from app.event_handlers import on_user_logged_in
 
     user_logged_in.connect(on_user_logged_in)

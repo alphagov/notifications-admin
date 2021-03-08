@@ -4,10 +4,11 @@ This can be run locally if you set the ZENDESK_API_KEY. Or the script can be run
 """
 # flake8: noqa: T001 (print)
 
-import os
-import requests
-import urllib.parse
 import csv
+import os
+import urllib.parse
+
+import requests
 
 # Group: 3rd Line--Notify Support
 NOTIFY_GROUP_ID = 360000036529

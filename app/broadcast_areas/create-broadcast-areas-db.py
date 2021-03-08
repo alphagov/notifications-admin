@@ -7,7 +7,6 @@ from pathlib import Path
 import geojson
 from notifications_utils.formatters import formatted_list
 from notifications_utils.polygons import Polygons
-
 from populations import (
     BRYHER,
     CITY_OF_LONDON,
@@ -68,7 +67,7 @@ def estimate_number_of_smartphones_in_area(country_or_ward_code):
         # We don’t have population figures for wards of the City of
         # London. We’ll leave it empty here and estimate on the fly
         # later based on physical area.
-        print(f'    Population:   N/A')  # noqa: T001
+        print('    Population:   N/A')  # noqa: T001
         return None
 
     # For some reason Bryher is the only ward missing population data, so we

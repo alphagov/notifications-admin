@@ -78,9 +78,7 @@ class OrganisationsClient(NotifyAdminAPIClient):
         return self.get(url="/organisations/{}/services".format(org_id))
 
     def remove_user_from_organisation(self, org_id, user_id):
-        endpoint = '/organisations/{}/users/{}'.format(
-            org_id=org_id,
-            user_id=user_id)
+        endpoint = '/organisations/{}/users/{}'.format(org_id, user_id)
         data = _attach_current_user({})
         return self.delete(endpoint, data)
 
