@@ -4465,6 +4465,19 @@ def mock_update_broadcast_message_status(
 
 
 @pytest.fixture
+def mock_get_invited_user_by_id(mocker, sample_invite):
+    def _get(
+        invited_user_id
+    ):
+        return sample_invite
+
+    return mocker.patch(
+        'app.invite_api_client.get_invited_user',
+        side_effect=_get,
+    )
+
+
+@pytest.fixture
 def mock_get_invited_org_user_by_id(mocker, sample_org_invite):
     def _get(
         invited_org_user_id

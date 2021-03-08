@@ -476,6 +476,12 @@ class InvitedUser(JSONModel):
             invite_api_client.get_invited_user_for_service(service_id, invited_user_id)
         )
 
+    @classmethod
+    def by_id(cls, invited_user_id):
+        return cls(
+            invite_api_client.get_invited_user(invited_user_id)
+        )
+
     def accept_invite(self):
         invite_api_client.accept_invite(self.service, self.id)
 
@@ -515,6 +521,10 @@ class InvitedUser(JSONModel):
 
     @classmethod
     def from_session(cls):
+        invited_user_id = session.get('invited_user_id')
+        if invited_user_id:
+            return cls.by_id(invited_user_id)
+
         invited_user = session.get('invited_user')
         return cls(invited_user) if invited_user else None
 

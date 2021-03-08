@@ -49,8 +49,9 @@ def old_service_dashboard(service_id):
 @user_has_permissions()
 def service_dashboard(service_id):
 
-    if session.get('invited_user'):
+    if session.get('invited_user_id') or session.get('invited_user'):
         session.pop('invited_user', None)
+        session.pop('invited_user_id', None)
         session['service_id'] = service_id
 
     if current_service.has_permission('broadcast'):

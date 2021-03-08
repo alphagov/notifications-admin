@@ -75,7 +75,7 @@ def activate_user(user_id):
     activated_user = user.activate()
     activated_user.login()
 
-    invited_user = session.get('invited_user')
+    invited_user = InvitedUser.from_session()
     if invited_user:
         service_id = _add_invited_user_to_service(invited_user)
         service = Service.from_id(service_id)
@@ -93,10 +93,9 @@ def activate_user(user_id):
         return redirect(url_for('main.add_service', first='first'))
 
 
-def _add_invited_user_to_service(invited_user):
-    invitation = InvitedUser(invited_user)
+def _add_invited_user_to_service(invitation):
     user = User.from_id(session['user_id'])
-    service_id = invited_user['service']
+    service_id = invitation.service
     user.add_to_service(
         service_id,
         invitation.permissions,
