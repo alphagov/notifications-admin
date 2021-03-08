@@ -103,9 +103,11 @@ def accept_org_invite(token):
 
     if invited_org_user.status == 'accepted':
         session.pop('invited_org_user', None)
+        session.pop('invited_org_user_id', None)
         return redirect(url_for('main.organisation_dashboard', org_id=invited_org_user.organisation))
 
     session['invited_org_user'] = invited_org_user.serialize()
+    session['invited_org_user_id'] = invited_org_user.id
 
     existing_user = User.from_email_address_or_none(invited_org_user.email_address)
     organisation_users = OrganisationUsers(invited_org_user.organisation)

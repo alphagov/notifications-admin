@@ -595,6 +595,10 @@ class InvitedOrgUser(JSONModel):
 
     @classmethod
     def from_session(cls):
+        invited_org_user_id = session.get('invited_org_user_id')
+        if invited_org_user_id:
+            return cls.by_id(invited_org_user_id)
+
         invited_org_user = session.get('invited_org_user')
         return cls(invited_org_user) if invited_org_user else None
 
@@ -602,6 +606,12 @@ class InvitedOrgUser(JSONModel):
     def by_id_and_org_id(cls, org_id, invited_user_id):
         return cls(
             org_invite_api_client.get_invited_user_for_org(org_id, invited_user_id)
+        )
+
+    @classmethod
+    def by_id(cls, invited_user_id):
+        return cls(
+            org_invite_api_client.get_invited_user(invited_user_id)
         )
 
     def serialize(self, permissions_as_string=False):

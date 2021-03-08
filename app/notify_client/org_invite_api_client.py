@@ -28,6 +28,11 @@ class OrgInviteApiClient(NotifyAdminAPIClient):
             f'/organisation/{org_id}/invite/{invited_org_user_id}'
         )['data']
 
+    def get_invited_user(self, invited_user_id):
+        return self.get(
+            f'/invite/organisation/{invited_user_id}'
+        )['data']
+
     def check_token(self, token):
         resp = self.get(url='/invite/organisation/{}'.format(token))
         return resp['data']

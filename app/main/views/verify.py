@@ -16,7 +16,7 @@ from app import user_api_client
 from app.main import main
 from app.main.forms import TwoFactorForm
 from app.models.service import Service
-from app.models.user import InvitedUser, User
+from app.models.user import InvitedOrgUser, InvitedUser, User
 from app.utils import redirect_to_sign_in
 
 
@@ -83,9 +83,9 @@ def activate_user(user_id):
             return redirect(url_for('main.broadcast_tour', service_id=service.id, step_index=1))
         return redirect(url_for('main.service_dashboard', service_id=service_id))
 
-    invited_org_user = session.get('invited_org_user')
+    invited_org_user = InvitedOrgUser.from_session()
     if invited_org_user:
-        user_api_client.add_user_to_organisation(invited_org_user['organisation'], session['user_details']['id'])
+        user_api_client.add_user_to_organisation(invited_org_user.organisation, session['user_details']['id'])
 
     if organisation_id:
         return redirect(url_for('main.organisation_dashboard', org_id=organisation_id))
