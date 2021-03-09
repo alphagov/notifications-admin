@@ -326,7 +326,7 @@ def test_org_user_registration(
     assert response.status_code == 302
     assert response.location == url_for('main.verify', _external=True)
 
-    mock_get_user_by_email.called is False
+    assert mock_get_user_by_email.called is False
     mock_register_user.assert_called_once_with(
         'Test User',
         session['invited_org_user']['email_address'],

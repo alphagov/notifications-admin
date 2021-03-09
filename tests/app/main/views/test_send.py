@@ -3807,7 +3807,7 @@ def test_check_notification_shows_back_link(
             name="Awkward letter",
             type_="letter",
             subject="We need to talk about ((thing))",
-            content=f"Hello ((address line 3))",
+            content="Hello ((address line 3))",
         )},
     )
     with client_request.session_transaction() as session:

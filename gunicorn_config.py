@@ -3,7 +3,6 @@ import sys
 import traceback
 
 import gunicorn
-
 from gds_metrics.gunicorn import child_exit  # noqa
 
 workers = 5

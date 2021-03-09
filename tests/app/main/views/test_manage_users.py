@@ -1648,7 +1648,7 @@ def test_edit_user_email_cannot_change_a_gov_email_address_to_a_non_gov_email_ad
     )
     assert 'Enter a public sector email address' in page.select_one('.govuk-error-message').text
     with client_request.session_transaction() as session:
-        assert 'team_member_email_change-'.format(active_user_with_permissions['id']) not in session
+        assert 'team_member_email_change-{}'.format(active_user_with_permissions['id']) not in session
 
 
 def test_confirm_edit_user_email_page(

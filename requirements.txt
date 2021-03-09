@@ -8,7 +8,7 @@ ago==0.0.93
     # via -r requirements.in
 awscli-cwlogs==1.4.6
     # via -r requirements.in
-awscli==1.19.13
+awscli==1.19.22
     # via
     #   awscli-cwlogs
     #   notifications-utils
@@ -18,9 +18,9 @@ blinker==1.4
     # via
     #   -r requirements.in
     #   gds-metrics
-boto3==1.17.13
+boto3==1.17.22
     # via notifications-utils
-botocore==1.20.13
+botocore==1.20.22
     # via
     #   awscli
     #   boto3
@@ -43,7 +43,7 @@ docutils==0.15.2
     # via awscli
 et-xmlfile==1.0.1
     # via openpyxl
-eventlet==0.30.1
+eventlet==0.30.2
     # via -r requirements.in
 flask-login==0.5.0
     # via -r requirements.in
@@ -118,7 +118,7 @@ orderedset==2.0.3
     # via notifications-utils
 packaging==20.9
     # via bleach
-phonenumbers==8.12.18
+phonenumbers==8.12.19
     # via notifications-utils
 prometheus-client==0.9.0
     # via
@@ -171,7 +171,7 @@ requests==2.25.1
     #   govuk-bank-holidays
     #   notifications-python-client
     #   notifications-utils
-rsa==4.7.1
+rsa==4.7.2
     # via awscli
 s3transfer==0.3.4
     # via

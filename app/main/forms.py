@@ -1354,14 +1354,14 @@ class LetterAddressForm(StripWhitespaceForm):
         if not address.has_valid_last_line:
             if self.allow_international_letters:
                 raise ValidationError(
-                    f'Last line of the address must be a UK postcode or another country'
+                    'Last line of the address must be a UK postcode or another country'
                 )
             if address.international:
                 raise ValidationError(
-                    f'You do not have permission to send letters to other countries'
+                    'You do not have permission to send letters to other countries'
                 )
             raise ValidationError(
-                f'Last line of the address must be a real UK postcode'
+                'Last line of the address must be a real UK postcode'
             )
 
         if address.has_invalid_characters:

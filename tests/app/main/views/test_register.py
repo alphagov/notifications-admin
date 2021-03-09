@@ -161,7 +161,7 @@ def test_should_return_200_if_password_is_on_list_of_commonly_used_passwords(
                                  'mobile_number': '+44123412345',
                                  'password': 'password'})
 
-    response.status_code == 200
+    assert response.status_code == 200
     assert 'Choose a password that’s harder to guess' in response.get_data(as_text=True)
 
 

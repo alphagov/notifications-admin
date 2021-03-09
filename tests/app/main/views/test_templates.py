@@ -1728,7 +1728,7 @@ def test_should_403_when_edit_template_with_process_type_of_priority_for_non_pla
         service_id=service_one['id'],
         template_id=template_id), data=data)
     assert response.status_code == 403
-    mock_update_service_template.called == 0
+    assert mock_update_service_template.called is False
 
 
 def test_should_403_when_create_template_with_process_type_of_priority_for_non_platform_admin(
@@ -1757,7 +1757,7 @@ def test_should_403_when_create_template_with_process_type_of_priority_for_non_p
         service_id=service_one['id'],
         template_type='sms'), data=data)
     assert response.status_code == 403
-    mock_update_service_template.called == 0
+    assert mock_update_service_template.called is False
 
 
 @pytest.mark.parametrize('old_content, new_content, expected_paragraphs', [

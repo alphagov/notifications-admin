@@ -180,7 +180,7 @@ def test_should_prefill_answers_for_get_tour_step(
         step_index=1
     )
 
-    page.select('.govuk-input')[0]['value'] == 'hello'
+    assert page.select('.govuk-input')[0]['value'] == 'hello'
 
 
 @pytest.mark.parametrize('template_type', ['email', 'letter', 'broadcast'])
@@ -448,7 +448,9 @@ def test_post_final_tour_step_saves_data_and_redirects_to_check_notification(
     )
 
     with client_request.session_transaction() as session:
-        session['placeholders'] == {'one': 'hello', 'two': 'hi', 'three': 'howdy', 'phone number': '07700 900762'}
+        assert session['placeholders'] == {
+            'one': 'hello', 'two': 'hi', 'three': 'howdy', 'phone number': '07700 900762'
+        }
 
 
 def test_get_test_step_out_of_index_redirects_to_first_step(

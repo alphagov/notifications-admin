@@ -1116,7 +1116,7 @@ def test_should_not_show_go_live_button_if_checklist_not_complete(
         assert normalize_spaces(page.select('main p')[1].text) == (
             'By requesting to go live you’re agreeing to our terms of use.'
         )
-        page.select_one('[type=submit]').text.strip() == ('Request to go live')
+        assert page.select_one('main [type=submit]').text.strip() == ('Request to go live')
     else:
         assert not page.select('form')
         assert not page.select('main [type=submit]')
@@ -1755,7 +1755,6 @@ def test_should_redirect_after_request_to_go_live(
         'Request sent by test@user.gov.uk\n'
     ).format(
         service_id=SERVICE_ONE_ID,
-        displayed_volumes=displayed_volumes,
         formatted_displayed_volumes=formatted_displayed_volumes,
     )
 
@@ -4615,13 +4614,15 @@ def test_update_service_organisation_does_not_update_if_same_value(
     mock_get_organisations,
     mock_update_service_organisation,
 ):
+    org_id = "7aa5d4e9-4385-4488-a489-07812ba13383"
+    service_one['organisation'] = org_id
     response = platform_admin_client.post(
         url_for('.link_service_to_organisation', service_id=service_one['id']),
-        data={'organisations': '7aa5d4e9-4385-4488-a489-07812ba13383'},
+        data={'organisations': org_id},
     )
 
     assert response.status_code == 302
-    mock_update_service_organisation.called is False
+    assert mock_update_service_organisation.called is False
 
 
 @pytest.mark.parametrize('branding_type', ['email', 'letter'])
@@ -5174,7 +5175,6 @@ def test_service_settings_links_to_branding_request_page_for_letters(
     single_sms_sender,
     mock_get_service_settings_page_common,
 ):
-    service_one["restricted"] is False
     service_one['permissions'].append('letter')
     page = client_request.get(
         '.service_settings', service_id=SERVICE_ONE_ID
