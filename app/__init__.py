@@ -100,6 +100,9 @@ from app.notify_client.letter_jobs_client import letter_jobs_client
 from app.notify_client.notification_api_client import notification_api_client
 from app.notify_client.org_invite_api_client import org_invite_api_client
 from app.notify_client.organisations_api_client import organisations_client
+from app.notify_client.performance_platform_api_client import (
+    performance_platform_api_client,
+)
 from app.notify_client.platform_stats_api_client import (
     platform_stats_api_client,
 )
@@ -185,6 +188,7 @@ def create_app(application):
         notification_api_client,
         org_invite_api_client,
         organisations_client,
+        performance_platform_api_client,
         platform_stats_api_client,
         provider_client,
         service_api_client,
