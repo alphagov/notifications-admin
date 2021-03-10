@@ -148,8 +148,8 @@ def organisation_dashboard(org_id):
         services=services,
         years=get_tuples_of_financial_years(
             partial(url_for, '.organisation_dashboard', org_id=current_organisation.id),
-            start=current_financial_year - 1,
-            end=current_financial_year + 1,
+            start=current_financial_year - 2,
+            end=current_financial_year,
         ),
         selected_year=year,
         search_form=SearchByNameForm() if len(services) > 7 else None,
