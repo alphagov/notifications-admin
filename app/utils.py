@@ -334,7 +334,9 @@ def get_template(
 
 
 def get_current_financial_year():
-    now = datetime.utcnow()
+    now = utc_string_to_aware_gmt_datetime(
+        datetime.utcnow()
+    )
     current_month = int(now.strftime('%-m'))
     current_year = int(now.strftime('%Y'))
     return current_year if current_month > 3 else current_year - 1

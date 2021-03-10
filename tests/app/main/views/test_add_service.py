@@ -1,5 +1,6 @@
 import pytest
 from flask import session, url_for
+from freezegun import freeze_time
 from notifications_python_client.errors import HTTPError
 
 from app.utils import is_gov_user
@@ -116,6 +117,7 @@ def test_show_different_page_if_user_org_type_is_local(
     ('other', None, 'other', 25000),
     ('central', 'local', 'central', 250000),
 ))
+@freeze_time("2021-01-01")
 def test_should_add_service_and_redirect_to_tour_when_no_services(
     mocker,
     client_request,
@@ -239,14 +241,24 @@ def test_get_should_only_show_nhs_org_types_radios_if_user_has_nhs_email(
     ]
 
 
-@pytest.mark.parametrize('organisation_type, free_allowance', [
-    ('central', 250 * 1000),
-    ('local', 25 * 1000),
-    ('nhs_central', 250 * 1000),
-    ('nhs_local', 25 * 1000),
-    ('school_or_college', 25 * 1000),
-    ('emergency_service', 25 * 1000),
-    ('other', 25 * 1000),
+@pytest.mark.parametrize('financial_year, organisation_type, free_allowance', [
+    (2020, 'central', 250_000),
+    (2020, 'local', 25_000),
+    (2020, 'nhs_central', 250_000),
+    (2020, 'nhs_local', 25_000),
+    (2020, 'nhs_gp', 25_000),
+    (2020, 'school_or_college', 25_000),
+    (2020, 'emergency_service', 25_000),
+    (2020, 'other', 25_000),
+
+    (2021, 'central', 150_000),
+    (2021, 'local', 25_000),
+    (2021, 'nhs_central', 150_000),
+    (2021, 'nhs_local', 25_000),
+    (2021, 'nhs_gp', 10_000),
+    (2021, 'school_or_college', 10_000),
+    (2021, 'emergency_service', 25_000),
+    (2021, 'other', 10_000),
 ])
 def test_should_add_service_and_redirect_to_dashboard_when_existing_service(
     app_,
@@ -261,7 +273,13 @@ def test_should_add_service_and_redirect_to_dashboard_when_existing_service(
     free_allowance,
     mock_create_or_update_free_sms_fragment_limit,
     mock_get_all_email_branding,
+    financial_year,
 ):
+    mocker.patch(
+        'app.main.views.add_service.get_current_financial_year',
+        return_value=financial_year,
+    )
+
     client_request.post(
         'main.add_service',
         _data={
@@ -308,6 +326,7 @@ def test_add_service_fails_if_service_name_fails_validation(
     assert error_message in page.find("span", {"class": "govuk-error-message"}).text
 
 
+@freeze_time("2021-01-01")
 def test_should_return_form_errors_with_duplicate_service_name_regardless_of_case(
     client_request,
     mock_get_organisation_by_domain,

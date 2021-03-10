@@ -16,6 +16,7 @@ from app.utils import (
     generate_next_dict,
     generate_notifications_csv,
     generate_previous_dict,
+    get_current_financial_year,
     get_letter_printing_statement,
     get_letter_validation_error,
     get_logo_cdn_domain,
@@ -657,3 +658,14 @@ def test_merge_jsonlike_merges_jsonlike_objects_correctly(source_object, destina
 ))
 def test_round_to_significant_figures(value, significant_figures, expected_result):
     assert round_to_significant_figures(value, significant_figures) == expected_result
+
+
+@pytest.mark.parametrize('datetime_string, financial_year', (
+    ('2021-01-01T00:00:00+00:00', 2020),  # Start of 2021
+    ('2021-03-31T22:59:59+00:00', 2020),  # One minute before midnight (BST)
+    ('2021-03-31T23:00:00+00:00', 2021),  # Midnight (BST)
+    ('2021-12-12T12:12:12+01:00', 2021),  # Later in the year
+))
+def test_get_financial_year(datetime_string, financial_year):
+    with freeze_time(datetime_string):
+        assert get_current_financial_year() == financial_year
