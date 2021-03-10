@@ -511,9 +511,9 @@ def test_organisation_services_shows_live_services_and_usage_with_count_of_1(
 
 @freeze_time("2020-02-20 20:20")
 @pytest.mark.parametrize('financial_year, expected_selected', (
+    (2017, '2017 to 2018 financial year'),
     (2018, '2018 to 2019 financial year'),
     (2019, '2019 to 2020 financial year'),
-    (2020, '2020 to 2021 financial year'),
 ))
 def test_organisation_services_filters_by_financial_year(
     client_request,
@@ -535,9 +535,9 @@ def test_organisation_services_filters_by_financial_year(
     )
     mock.assert_called_once_with(ORGANISATION_ID, financial_year)
     assert normalize_spaces(page.select_one('.pill').text) == (
-        '2020 to 2021 financial year '
         '2019 to 2020 financial year '
-        '2018 to 2019 financial year'
+        '2018 to 2019 financial year '
+        '2017 to 2018 financial year'
     )
     assert normalize_spaces(page.select_one('.pill-item--selected').text) == (
         expected_selected
