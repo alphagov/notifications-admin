@@ -1,4 +1,7 @@
 from datetime import datetime, timedelta
+from itertools import groupby
+from operator import itemgetter
+from statistics import mean
 
 from flask import render_template
 
@@ -12,6 +15,23 @@ def performance():
         start_date=(datetime.utcnow() - timedelta(days=90)).date(),
         end_date=datetime.utcnow().date(),
     )
+    stats['organisations_using_notify'] = sorted(
+        [
+            {
+                'organisation_name': organisation_name,
+                'count_of_live_services': len(list(group)),
+            }
+            for organisation_name, group in groupby(
+                stats['services_using_notify'],
+                itemgetter('organisation_name'),
+            )
+        ],
+        key=itemgetter('organisation_name'),
+    )
+    stats['average_percentage_under_10_seconds'] = mean([
+        row['percentage_under_10_seconds']
+        for row in stats['processing_time']
+    ] or [0])
     return render_template(
         'views/performance.html',
         **stats
