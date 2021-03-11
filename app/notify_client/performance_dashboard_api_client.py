@@ -1,8 +1,9 @@
-from app.notify_client import NotifyAdminAPIClient
+from app.notify_client import NotifyAdminAPIClient, cache
 
 
 class PerformanceDashboardAPIClient(NotifyAdminAPIClient):
 
+    @cache.set('performance-stats-{start_date}-to-{end_date}')
     def get_performance_dashboard_stats(
         self,
         *,
