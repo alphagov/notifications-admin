@@ -123,14 +123,14 @@
       <h2>Who’s using GOV.UK Notify</h2>
       <div class="govuk-grid-row bottom-gutter">
         <div class="govuk-grid-column-one-half">
-          <h3 class="govuk-visually-hidden">Services</h3>
-          <div class="product-page-big-number">{{ counts.services|format_thousands }}</div>
-          services
-        </div>
-        <div class="govuk-grid-column-one-half">
           <h3 class="govuk-visually-hidden">Organisations</h3>
           <div class="product-page-big-number">{{ counts.organisations|format_thousands }}</div>
           organisations
+        </div>
+        <div class="govuk-grid-column-one-half">
+          <h3 class="govuk-visually-hidden">Services</h3>
+          <div class="product-page-big-number">{{ counts.services|format_thousands }}</div>
+          services
         </div>
       </div>
       <p class="govuk-body">
