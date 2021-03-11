@@ -12,7 +12,7 @@ from app.main import main
 @main.route("/performance")
 def performance():
     stats = performance_dashboard_api_client.get_performance_dashboard_stats(
-        start_date=(datetime.utcnow() - timedelta(days=90)).date(),
+        start_date=(datetime.utcnow() - timedelta(days=7)).date(),
         end_date=datetime.utcnow().date(),
     )
     stats['organisations_using_notify'] = sorted(

@@ -77,6 +77,9 @@
         {{ item.letters|format_thousands }}
       {% endcall %}
     {% endcall %}
+    <p class="table-show-more-link">
+      Only showing the last {{ notifications_by_type|length }} days
+    </p>
   </div>
 
   <h2 class="govuk-heading-m">
@@ -107,6 +110,9 @@
         {{ item.percentage_under_10_seconds }}%
       {% endcall %}
     {% endcall %}
+    <p class="table-show-more-link">
+      Only showing the last {{ processing_time|length }} days
+    </p>
   </div>
 
   <h2 class="govuk-heading-m">

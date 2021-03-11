@@ -109,7 +109,7 @@ def test_should_render_performance_page(
     )
     page = client_request.get('main.performance')
     mock_get_performance_data.assert_called_once_with(
-        start_date=date(2020, 10, 3),
+        start_date=date(2020, 12, 25),
         end_date=date(2021, 1, 1),
     )
     assert normalize_spaces(page.select_one('main').text) == (
@@ -130,6 +130,7 @@ def test_should_render_performance_page(
         '25 February 2021 1 2 3 '
         '26 February 2021 1 2 3 '
         '27 February 2021 1 2 3 '
+        'Only showing the last 7 days '
         ''
         'Messages sent within 10 seconds '
         'Average '
@@ -142,6 +143,7 @@ def test_should_render_performance_page(
         '23 February 2021 95.6% '
         '22 February 2021 95.3% '
         '21 February 2021 99.2% '
+        'Only showing the last 7 days '
         ''
         'Organisations using Notify '
         'Organisation Number of live services '
