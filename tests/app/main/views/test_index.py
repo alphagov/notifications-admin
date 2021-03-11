@@ -40,8 +40,8 @@ def test_non_logged_in_user_can_see_homepage(
         '9,999 services '
         'See the list of services and organisations.'
     )
-    assert page.select_one('#whos-using-notify a')['href'] == (
-        'https://www.gov.uk/performance/govuk-notify/government-services'
+    assert page.select_one('#whos-using-notify a')['href'] == url_for(
+        'main.performance'
     )
 
 
