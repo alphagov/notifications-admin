@@ -118,6 +118,18 @@
   <h2 class="govuk-heading-m">
     Organisations using Notify
   </h2>
+  <div class="govuk-grid-row bottom-gutter">
+    <div class="govuk-grid-column-one-half">
+      <h3 class="govuk-visually-hidden">Organisations</h3>
+      <div class="product-page-big-number">{{ count_of_live_services_and_organisations.organisations|format_thousands }}</div>
+      organisations
+    </div>
+    <div class="govuk-grid-column-one-half">
+      <h3 class="govuk-visually-hidden">Services</h3>
+      <div class="product-page-big-number">{{ count_of_live_services_and_organisations.services|format_thousands }}</div>
+      services
+    </div>
+  </div>
   <div class="dashboard-table">
     {% call(item, row_number) list_table(
       organisations_using_notify,

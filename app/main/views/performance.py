@@ -5,7 +5,7 @@ from statistics import mean
 
 from flask import render_template
 
-from app import performance_dashboard_api_client
+from app import performance_dashboard_api_client, status_api_client
 from app.main import main
 
 
@@ -32,6 +32,9 @@ def performance():
         row['percentage_under_10_seconds']
         for row in stats['processing_time']
     ] or [0])
+    stats['count_of_live_services_and_organisations'] = (
+        status_api_client.get_count_of_live_services_and_organisations()
+    )
     return render_template(
         'views/performance.html',
         **stats

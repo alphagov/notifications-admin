@@ -146,6 +146,8 @@ def test_should_render_performance_page(
         'Only showing the last 7 days '
         ''
         'Organisations using Notify '
+        'Organisations 111 organisations '
+        'Services 9,999 services '
         'Organisation Number of live services '
         'Department of Examples and Patterns 2 '
         'Department of One Service 1'
