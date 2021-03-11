@@ -22,28 +22,28 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-one-half">
       <h3 class="govuk-visually-hidden">Total messages</h3>
-      <div class="product-page-big-number">{{ total_notifications }}</div>
+      <div class="product-page-big-number">{{ total_notifications|format_billions }}</div>
       total
     </div>
     <div class="govuk-grid-column-one-half">
       <div class="govuk-grid-row govuk-!-padding-top-4">
         <div class="govuk-grid-column-one-third">
           {{ big_number(
-            email_notifications,
+            email_notifications|format_billions,
             label=email_notifications|message_count_noun('email'),
             smallest=True,
           ) }}
         </div>
         <div class="govuk-grid-column-one-third">
           {{ big_number(
-            sms_notifications,
+            sms_notifications|format_billions,
             label=sms_notifications|message_count_noun('sms'),
             smallest=True,
           ) }}
         </div>
         <div class="govuk-grid-column-one-third">
           {{ big_number(
-            letter_notifications,
+            letter_notifications|format_billions,
             label=letter_notifications|message_count_noun('letter'),
             smallest=True,
           ) }}

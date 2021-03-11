@@ -38,6 +38,7 @@ from app.config import configs
 from app.extensions import antivirus_client, redis_client, zendesk_client
 from app.formatters import (
     convert_to_boolean,
+    format_billions,
     format_date,
     format_date_human,
     format_date_normal,
@@ -527,6 +528,7 @@ def setup_event_handlers():
 
 def add_template_filters(application):
     for fn in [
+        format_billions,
         format_datetime,
         format_datetime_24h,
         format_datetime_normal,

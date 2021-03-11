@@ -515,3 +515,7 @@ def format_mobile_network(network):
     if network in ('three', 'vodafone', 'o2'):
         return network.capitalize()
     return 'EE'
+
+
+def format_billions(count):
+    return humanize.intword(count)
