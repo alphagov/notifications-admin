@@ -6,8 +6,8 @@ from app import performance_dashboard_api_client
 from app.main import main
 
 
-@main.route("/performance-dashboard")
-def performance_dashboard():
+@main.route("/performance")
+def performance():
     api_args = {}
 
     api_args['start_date'] = (datetime.utcnow() - timedelta(days=90)).date()

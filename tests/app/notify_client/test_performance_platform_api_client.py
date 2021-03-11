@@ -9,4 +9,4 @@ def test_get_aggregate_platform_stats(mocker):
     params_dict = {'start_date': '2021-03-01', 'end_date': '2021-03-31'}
 
     client.get_performance_dashboard_stats(params_dict=params_dict)
-    mock.assert_called_once_with('/performance-platform', params=params_dict)
+    mock.assert_called_once_with('/performance-dashboard', params=params_dict)

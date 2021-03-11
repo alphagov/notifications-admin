@@ -27,7 +27,7 @@ from app.main.views import (  # noqa isort:skip
     new_password,
     notifications,
     organisations,
-    performance_platform,
+    performance,
     platform_admin,
     providers,
     register,
