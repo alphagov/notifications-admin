@@ -21,7 +21,6 @@
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-one-half">
-      <h3 class="govuk-visually-hidden">Total messages</h3>
       <div class="product-page-big-number">{{ total_notifications|format_billions }}</div>
       total
     </div>
@@ -88,7 +87,6 @@
   </h2>
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-one-half">
-      <h3 class="govuk-visually-hidden">Average</h3>
       {{ big_number(
         '{:.1f}%'.format(average_percentage_under_10_seconds),
         label='on average',
@@ -122,14 +120,15 @@
   </h2>
   <div class="govuk-grid-row bottom-gutter">
     <div class="govuk-grid-column-one-half">
-      <h3 class="govuk-visually-hidden">Organisations</h3>
+      <span class="govuk-visually-hidden">There are</span>
       <div class="product-page-big-number">{{ count_of_live_services_and_organisations.organisations|format_thousands }}</div>
       organisations
     </div>
     <div class="govuk-grid-column-one-half">
-      <h3 class="govuk-visually-hidden">Services</h3>
+      <span class="govuk-visually-hidden">and</span>
       <div class="product-page-big-number">{{ count_of_live_services_and_organisations.services|format_thousands }}</div>
       services
+      <span class="govuk-visually-hidden">using Notify.</span>
     </div>
   </div>
   <div class="dashboard-table">
