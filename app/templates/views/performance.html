@@ -55,6 +55,7 @@
   <div class="dashboard-table">
     {% call(item, row_number) list_table(
       notifications_by_type,
+      caption='Messages sent since May 2016',
       caption_visible=False,
       field_headings=[
         'Date',
@@ -97,6 +98,7 @@
   <div class="dashboard-table">
     {% call(item, row_number) list_table(
       processing_time | reverse,
+      caption='Messages sent within 10 seconds',
       caption_visible=False,
       field_headings=[
         'Date', 'Percentage'
@@ -133,6 +135,7 @@
   <div class="dashboard-table">
     {% call(item, row_number) list_table(
       organisations_using_notify,
+      caption='Organisations using Notify',
       caption_visible=False,
       field_headings=[
         'Organisation', 'Number of live services'
