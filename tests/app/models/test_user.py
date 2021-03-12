@@ -113,13 +113,12 @@ def test_has_live_services_when_service_is_not_live(
 
 
 def test_invited_user_from_session_uses_id(client, mocker, mock_get_invited_user_by_id):
-    fake_id = str(uuid.uuid4())
-    session_dict = {'invited_user_id': fake_id}
+    session_dict = {'invited_user_id': USER_ONE_ID}
     mocker.patch.dict('app.models.user.session', values=session_dict, clear=True)
 
     assert InvitedUser.from_session().id == USER_ONE_ID
 
-    mock_get_invited_user_by_id.assert_called_once_with(fake_id)
+    mock_get_invited_user_by_id.assert_called_once_with(USER_ONE_ID)
 
 
 def test_invited_user_from_session_uses_id_even_if_obj_in_session(
