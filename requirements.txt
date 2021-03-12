@@ -110,7 +110,7 @@ mistune==0.8.4
     # via notifications-utils
 notifications-python-client==6.0.2
     # via -r requirements.in
-git+https://github.com/alphagov/notifications-utils.git@43.8.3#egg=notifications-utils==43.8.3
+git+https://github.com/alphagov/notifications-utils.git@44.0.0#egg=notifications-utils==44.0.0
     # via -r requirements.in
 openpyxl==3.0.6
     # via pyexcel-xlsx

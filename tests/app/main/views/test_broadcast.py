@@ -623,7 +623,7 @@ def test_broadcast_page(
         'Scotland remove',
     ], [
         'An area of 177,439.8 square miles Will get the alert',
-        'An extra area of 3,058.9 square miles is Likely to get the alert',
+        'An extra area of 6,392.3 square miles is Likely to get the alert',
         '40,000,000 phones estimated',
     ]),
     ([
@@ -640,8 +640,17 @@ def test_broadcast_page(
         'Penrith West remove',
     ], [
         'An area of 6.3 square miles Will get the alert',
-        'An extra area of 14.4 square miles is Likely to get the alert',
-        '9,000 to 30,000 phones',
+        'An extra area of 22.6 square miles is Likely to get the alert',
+        '9,000 to 40,000 phones',
+    ]),
+    ([
+        'lad20-E09000019',
+    ], [
+        'Islington remove',
+    ], [
+        'An area of 9.7 square miles Will get the alert',
+        'An extra area of 4.6 square miles is Likely to get the alert',
+        '200,000 to 300,000 phones',
     ]),
 ))
 def test_preview_broadcast_areas_page(
@@ -726,7 +735,7 @@ def test_preview_broadcast_areas_page_with_custom_polygons(
         for item in page.select('ul li.area-list-key')
     ] == [
         'An area of 722.3 square miles Will get the alert',
-        'An extra area of 1,402.5 square miles is Likely to get the alert',
+        'An extra area of 1,498.5 square miles is Likely to get the alert',
         'Unknown number of phones',
     ]
 
