@@ -274,7 +274,7 @@ def notifications_sent_by_service():
 
 @main.route("/platform-admin/reports/usage-for-all-services", methods=['GET', 'POST'])
 @user_is_platform_admin
-def usage_for_all_services():
+def get_billing_report():
     form = RequiredDateFilterForm()
 
     if form.validate_on_submit():
@@ -286,7 +286,7 @@ def usage_for_all_services():
             "contact_names", "contact_email_addresses", "billing_reference"
         ]
 
-        result = billing_api_client.get_usage_for_all_services(start_date, end_date)
+        result = billing_api_client.get_data_for_billing_report(start_date, end_date)
         rows = [
             [
                 r["organisation_id"], r["organisation_name"], r["service_id"], r["service_name"],
@@ -299,13 +299,13 @@ def usage_for_all_services():
         if rows:
             return Spreadsheet.from_rows([headers] + rows).as_csv_data, 200, {
                 'Content-Type': 'text/csv; charset=utf-8',
-                'Content-Disposition': 'attachment; filename="Usage for all services from {} to {}.csv"'.format(
+                'Content-Disposition': 'attachment; filename="Billing Report from {} to {}.csv"'.format(
                     start_date, end_date
                 )
             }
         else:
             flash('No results for dates')
-    return render_template('views/platform-admin/usage_for_all_services.html', form=form)
+    return render_template('views/platform-admin/get-billing-report.html', form=form)
 
 
 @main.route("/platform-admin/complaints")

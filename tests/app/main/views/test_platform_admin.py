@@ -832,13 +832,13 @@ def test_get_notifications_sent_by_service_validates_form(mocker, client_request
     assert mock_get_stats_from_api.called is False
 
 
-def test_usage_for_all_services_when_no_results_for_date(client_request, platform_admin_user, mocker):
+def test_get_billing_report_when_no_results_for_date(client_request, platform_admin_user, mocker):
     client_request.login(platform_admin_user)
 
-    mocker.patch("app.main.views.platform_admin.billing_api_client.get_usage_for_all_services",
+    mocker.patch("app.main.views.platform_admin.billing_api_client.get_data_for_billing_report",
                  return_value=[])
 
-    page = client_request.post('main.usage_for_all_services',
+    page = client_request.post('main.get_billing_report',
                                _expected_status=200,
                                _data={'start_date': '2019-01-01', 'end_date': '2019-03-31'})
 
@@ -846,9 +846,9 @@ def test_usage_for_all_services_when_no_results_for_date(client_request, platfor
     assert normalize_spaces(error.text) == 'No results for dates'
 
 
-def test_usage_for_all_services_when_calls_api_and_download_data(platform_admin_client, mocker):
+def test_get_billing_report_when_calls_api_and_download_data(platform_admin_client, mocker):
     mocker.patch(
-        "app.main.views.platform_admin.billing_api_client.get_usage_for_all_services",
+        "app.main.views.platform_admin.billing_api_client.get_data_for_billing_report",
         return_value=[{
             'letter_breakdown': '6 second class letters at 45p\n2 first class letters at 35p\n',
             'letter_cost': 3.4,
@@ -865,13 +865,13 @@ def test_usage_for_all_services_when_calls_api_and_download_data(platform_admin_
         }]
     )
 
-    response = platform_admin_client.post(url_for('main.usage_for_all_services'),
+    response = platform_admin_client.post(url_for('main.get_billing_report'),
                                           data={'start_date': '2019-01-01', 'end_date': '2019-03-31'})
 
     assert response.status_code == 200
     assert response.content_type == 'text/csv; charset=utf-8'
     assert response.headers['Content-Disposition'] == (
-        'attachment; filename="Usage for all services from {} to {}.csv"'.format('2019-01-01', '2019-03-31')
+        'attachment; filename="Billing Report from {} to {}.csv"'.format('2019-01-01', '2019-03-31')
     )
 
     assert response.get_data(as_text=True) == (

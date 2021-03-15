@@ -34,8 +34,8 @@ class BillingAPIClient(NotifyAdminAPIClient):
             data=data
         )
 
-    def get_usage_for_all_services(self, start_date, end_date):
-        return self.get(url='/platform-stats/usage-for-all-services',
+    def get_data_for_billing_report(self, start_date, end_date):
+        return self.get(url='/platform-stats/data-for-billing-report',
                         params={
                             'start_date': str(start_date),
                             'end_date': str(end_date),

@@ -89,7 +89,7 @@ class HeaderNavigation(Navigation):
             'live_services',
             'live_services_csv',
             'notifications_sent_by_service',
-            'usage_for_all_services',
+            'get_billing_report',
             'organisations',
             'platform_admin',
             'platform_admin_list_complaints',
