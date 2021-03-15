@@ -53,7 +53,7 @@
 
   <div class="dashboard-table">
     {% call(item, row_number) list_table(
-      notifications_by_type,
+      notifications_by_type|reverse,
       caption='Messages sent since May 2016',
       caption_visible=False,
       field_headings=[
