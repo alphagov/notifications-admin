@@ -93,6 +93,15 @@ def _get_example_performance_data():
           "service_id": uuid.uuid4(),
           "service_name": "Example service 3"
         },
+        {
+          # On production there should be no live services without an
+          # organisation, but this isn’t always true in people’s local
+          # environments
+          "organisation_id": None,
+          "organisation_name": None,
+          "service_id": uuid.uuid4(),
+          "service_name": "Example service 4"
+        },
       ],
     }
 
@@ -150,5 +159,6 @@ def test_should_render_performance_page(
         'Organisations using Notify '
         'Organisation Number of live services '
         'Department of Examples and Patterns 2 '
-        'Department of One Service 1'
+        'Department of One Service 1 '
+        'No organisation 1'
     )
