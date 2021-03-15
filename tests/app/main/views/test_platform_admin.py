@@ -4,7 +4,6 @@ import uuid
 from functools import partial
 from unittest.mock import ANY, call
 
-import pyexcel
 import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
@@ -761,10 +760,6 @@ def test_reports_page(
     ).attrs['href'] == '/platform-admin/reports/live-services.csv'
 
     assert page.find(
-        'a', text="Download performance platform report (.xlsx)"
-    ).attrs['href'] == '/platform-admin/reports/performance-platform.xlsx'
-
-    assert page.find(
         'a', text="Monthly notification statuses for live services"
     ).attrs['href'] == url_for('main.notifications_sent_by_service')
 
@@ -801,35 +796,6 @@ def test_get_live_services_report(platform_admin_client, mocker):
 
         + '2,Forest,Ecosystem,james the pine tree,,,,,,,60,0,0,0,0,200'
     )
-
-
-def test_get_performance_platform_report(platform_admin_client, mocker):
-
-    mocker.patch(
-        'app.service_api_client.get_live_services_data',
-        return_value={'data': [
-            {'service_id': 'abc123', 'service_name': 'jessie the oak tree', 'organisation_name': 'Forest',
-                'consent_to_research': True, 'contact_name': 'Forest fairy', 'organisation_type': 'Ecosystem',
-                'contact_email': 'forest.fairy@digital.cabinet-office.gov.uk', 'contact_mobile': '+447700900986',
-                'live_date': 'Sat, 29 Mar 2014 00:00:00 GMT', 'sms_volume_intent': 100, 'email_volume_intent': 50,
-                'letter_volume_intent': 20, 'sms_totals': 300, 'email_totals': 1200, 'letter_totals': 0},
-            {'service_id': 'def456', 'service_name': 'james the pine tree', 'organisation_name': 'Forest',
-                'consent_to_research': None, 'contact_name': None, 'organisation_type': 'Ecosystem',
-                'contact_email': None, 'contact_mobile': None,
-                'live_date': None, 'sms_volume_intent': None, 'email_volume_intent': 60,
-                'letter_volume_intent': 0, 'sms_totals': 0, 'email_totals': 0, 'letter_totals': 0},
-        ]}
-    )
-    response = platform_admin_client.get(url_for('main.performance_platform_xlsx'))
-    assert response.status_code == 200
-    assert pyexcel.get_array(
-        file_type='xlsx',
-        file_stream=response.get_data(),
-    ) == [
-        ['service_id', 'agency', 'service_name', '_timestamp', 'service', 'count'],
-        ['abc123', 'Forest', 'jessie the oak tree', '2014-03-29T00:00:00Z', 'govuk-notify', 1],
-        ['def456', 'Forest', 'james the pine tree', '', 'govuk-notify', 1],
-    ]
 
 
 def test_get_notifications_sent_by_service_shows_date_form(client_request, platform_admin_user):
