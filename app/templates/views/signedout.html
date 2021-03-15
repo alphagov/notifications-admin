@@ -123,19 +123,20 @@
       <h2>Who’s using GOV.UK Notify</h2>
       <div class="govuk-grid-row bottom-gutter">
         <div class="govuk-grid-column-one-half">
-          <h3 class="govuk-visually-hidden">Services</h3>
-          <div class="product-page-big-number">{{ counts.services|format_thousands }}</div>
-          services
-        </div>
-        <div class="govuk-grid-column-one-half">
-          <h3 class="govuk-visually-hidden">Organisations</h3>
+          <span class="govuk-visually-hidden">There are</span>
           <div class="product-page-big-number">{{ counts.organisations|format_thousands }}</div>
           organisations
+        </div>
+        <div class="govuk-grid-column-one-half">
+          <span class="govuk-visually-hidden">and</span>
+          <div class="product-page-big-number">{{ counts.services|format_thousands }}</div>
+          services
+          <span class="govuk-visually-hidden">using Notify.</span>
         </div>
       </div>
       <p class="govuk-body">
         See the
-        <a class="govuk-link govuk-link--no-visited-state" href="https://www.gov.uk/performance/govuk-notify/government-services">list of services and organisations</a>.
+        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.performance') }}">list of services and organisations</a>.
       </p>
     </div>
   </div>

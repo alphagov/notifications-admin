@@ -38,6 +38,7 @@ from app.config import configs
 from app.extensions import antivirus_client, redis_client, zendesk_client
 from app.formatters import (
     convert_to_boolean,
+    format_billions,
     format_date,
     format_date_human,
     format_date_normal,
@@ -100,6 +101,9 @@ from app.notify_client.letter_jobs_client import letter_jobs_client
 from app.notify_client.notification_api_client import notification_api_client
 from app.notify_client.org_invite_api_client import org_invite_api_client
 from app.notify_client.organisations_api_client import organisations_client
+from app.notify_client.performance_dashboard_api_client import (
+    performance_dashboard_api_client,
+)
 from app.notify_client.platform_stats_api_client import (
     platform_stats_api_client,
 )
@@ -185,6 +189,7 @@ def create_app(application):
         notification_api_client,
         org_invite_api_client,
         organisations_client,
+        performance_dashboard_api_client,
         platform_stats_api_client,
         provider_client,
         service_api_client,
@@ -523,6 +528,7 @@ def setup_event_handlers():
 
 def add_template_filters(application):
     for fn in [
+        format_billions,
         format_datetime,
         format_datetime_24h,
         format_datetime_normal,

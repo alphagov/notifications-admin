@@ -34,14 +34,11 @@ def test_non_logged_in_user_can_see_homepage(
 
     assert normalize_spaces(page.select_one('#whos-using-notify').text) == (
         'Who’s using GOV.UK Notify '
-        'Services '
-        '9,999 services '
-        'Organisations '
-        '111 organisations '
+        'There are 111 organisations and 9,999 services using Notify. '
         'See the list of services and organisations.'
     )
-    assert page.select_one('#whos-using-notify a')['href'] == (
-        'https://www.gov.uk/performance/govuk-notify/government-services'
+    assert page.select_one('#whos-using-notify a')['href'] == url_for(
+        'main.performance'
     )
 
 

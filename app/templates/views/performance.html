@@ -1,0 +1,153 @@
+{% extends "withoutnav_template.html" %}
+{% from "components/big-number.html" import big_number %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/table.html" import field, list_table %}
+
+{% block per_page_title %}
+  Performance data
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <div class="govuk-grid-row govuk-!-margin-bottom-8">
+    <div class="govuk-grid-column-two-thirds">
+      {{ page_header('Performance data') }}
+    </div>
+  </div>
+
+  <h2 class="govuk-heading-m">
+    Messages sent since May 2016
+  </h2>
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-one-half">
+      <div class="product-page-big-number">{{ total_notifications|format_billions }}</div>
+      total
+    </div>
+    <div class="govuk-grid-column-one-half">
+      <div class="govuk-grid-row govuk-!-padding-top-4">
+        <div class="govuk-grid-column-one-third">
+          {{ big_number(
+            email_notifications|format_billions,
+            label=email_notifications|message_count_noun('email'),
+            smallest=True,
+          ) }}
+        </div>
+        <div class="govuk-grid-column-one-third">
+          {{ big_number(
+            sms_notifications|format_billions,
+            label=sms_notifications|message_count_noun('sms'),
+            smallest=True,
+          ) }}
+        </div>
+        <div class="govuk-grid-column-one-third">
+          {{ big_number(
+            letter_notifications|format_billions,
+            label=letter_notifications|message_count_noun('letter'),
+            smallest=True,
+          ) }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dashboard-table">
+    {% call(item, row_number) list_table(
+      notifications_by_type,
+      caption='Messages sent since May 2016',
+      caption_visible=False,
+      field_headings=[
+        'Date',
+        99|message_count_noun('email')|capitalize,
+        99|message_count_noun('sms')|capitalize,
+        99|message_count_noun('letter')|capitalize,
+      ],
+      empty_message='No data to show'
+    ) %}
+      {% call field() %}
+        {{ item.date | format_date_normal }}
+      {% endcall %}
+      {% call field() %}
+        {{ item.emails|format_thousands }}
+      {% endcall %}
+      {% call field() %}
+        {{ item.sms|format_thousands }}
+      {% endcall %}
+      {% call field() %}
+        {{ item.letters|format_thousands }}
+      {% endcall %}
+    {% endcall %}
+    <p class="table-show-more-link">
+      Only showing the last {{ notifications_by_type|length }} days
+    </p>
+  </div>
+
+  <h2 class="govuk-heading-m">
+    Messages sent within 10 seconds
+  </h2>
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-one-half">
+      {{ big_number(
+        '{:.1f}%'.format(average_percentage_under_10_seconds),
+        label='on average',
+      ) }}
+    </div>
+  </div>
+  <div class="dashboard-table">
+    {% call(item, row_number) list_table(
+      processing_time | reverse,
+      caption='Messages sent within 10 seconds',
+      caption_visible=False,
+      field_headings=[
+        'Date', 'Percentage'
+      ],
+      empty_message='No data to show'
+    ) %}
+      {% call field() %}
+        {{ item.date | format_date_normal }}
+      {% endcall %}
+      {% call field() %}
+        {{ item.percentage_under_10_seconds }}%
+      {% endcall %}
+    {% endcall %}
+    <p class="table-show-more-link">
+      Only showing the last {{ processing_time|length }} days
+    </p>
+  </div>
+
+  <h2 class="govuk-heading-m">
+    Organisations using Notify
+  </h2>
+  <div class="govuk-grid-row bottom-gutter">
+    <div class="govuk-grid-column-one-half">
+      <span class="govuk-visually-hidden">There are</span>
+      <div class="product-page-big-number">{{ count_of_live_services_and_organisations.organisations|format_thousands }}</div>
+      organisations
+    </div>
+    <div class="govuk-grid-column-one-half">
+      <span class="govuk-visually-hidden">and</span>
+      <div class="product-page-big-number">{{ count_of_live_services_and_organisations.services|format_thousands }}</div>
+      services
+      <span class="govuk-visually-hidden">using Notify.</span>
+    </div>
+  </div>
+  <div class="dashboard-table">
+    {% call(item, row_number) list_table(
+      organisations_using_notify,
+      caption='Organisations using Notify',
+      caption_visible=False,
+      field_headings=[
+        'Organisation', 'Number of live services'
+      ],
+      empty_message='No data to show'
+    ) %}
+      {% call field() %}
+        {{ item.organisation_name }}
+      {% endcall %}
+      {% call field() %}
+        {{ item.count_of_live_services }}
+      {% endcall %}
+    {% endcall %}
+  </div>
+
+{% endblock %}
