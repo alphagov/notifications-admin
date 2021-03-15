@@ -285,8 +285,15 @@ def get_billing_report():
             "sms_cost", "sms_fragments", "letter_cost", "letter_breakdown", "purchase_order_number",
             "contact_names", "contact_email_addresses", "billing_reference"
         ]
-
-        result = billing_api_client.get_data_for_billing_report(start_date, end_date)
+        try:
+            result = billing_api_client.get_data_for_billing_report(start_date, end_date)
+        except HTTPError as e:
+            message = 'Date must be in a single financial year.'
+            if e.status_code == 400 and e.message == message:
+                flash(message)
+                return render_template('views/platform-admin/get-billing-report.html', form=form)
+            else:
+                raise e
         rows = [
             [
                 r["organisation_id"], r["organisation_name"], r["service_id"], r["service_name"],
