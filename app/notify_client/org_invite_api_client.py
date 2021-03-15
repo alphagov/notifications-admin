@@ -23,13 +23,18 @@ class OrgInviteApiClient(NotifyAdminAPIClient):
         resp = self.get(endpoint)
         return resp['data']
 
-    def get_invited_user(self, org_id, invited_org_user_id):
+    def get_invited_user_for_org(self, org_id, invited_org_user_id):
         return self.get(
             f'/organisation/{org_id}/invite/{invited_org_user_id}'
         )['data']
 
+    def get_invited_user(self, invited_user_id):
+        return self.get(
+            f'/invite/organisation/{invited_user_id}'
+        )['data']
+
     def check_token(self, token):
-        resp = self.get(url='/invite/organisation/{}'.format(token))
+        resp = self.get(url='/invite/organisation/check/{}'.format(token))
         return resp['data']
 
     def cancel_invited_user(self, org_id, invited_user_id):

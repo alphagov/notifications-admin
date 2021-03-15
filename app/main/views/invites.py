@@ -40,12 +40,14 @@ def accept_invite(token):
 
     if invited_user.status == 'accepted':
         session.pop('invited_user', None)
+        session.pop('invited_user_id', None)
         service = Service.from_id(invited_user.service)
         if service.has_permission('broadcast'):
             return redirect(url_for('main.broadcast_tour', service_id=service.id, step_index=1))
         return redirect(url_for('main.service_dashboard', service_id=invited_user.service))
 
     session['invited_user'] = invited_user.serialize()
+    session['invited_user_id'] = invited_user.id
 
     existing_user = User.from_email_address_or_none(invited_user.email_address)
 
@@ -103,9 +105,11 @@ def accept_org_invite(token):
 
     if invited_org_user.status == 'accepted':
         session.pop('invited_org_user', None)
+        session.pop('invited_org_user_id', None)
         return redirect(url_for('main.organisation_dashboard', org_id=invited_org_user.organisation))
 
     session['invited_org_user'] = invited_org_user.serialize()
+    session['invited_org_user_id'] = invited_org_user.id
 
     existing_user = User.from_email_address_or_none(invited_org_user.email_address)
     organisation_users = OrganisationUsers(invited_org_user.organisation)

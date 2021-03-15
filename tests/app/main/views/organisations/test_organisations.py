@@ -676,7 +676,7 @@ def test_cancel_invited_org_user_cancels_user_invitations(
     mocker,
 ):
     mock_cancel = mocker.patch('app.org_invite_api_client.cancel_invited_user')
-    mocker.patch('app.org_invite_api_client.get_invited_user', return_value=sample_org_invite)
+    mocker.patch('app.org_invite_api_client.get_invited_user_for_org', return_value=sample_org_invite)
 
     page = client_request.get(
         'main.cancel_invited_org_user',

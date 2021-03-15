@@ -341,6 +341,48 @@ def test_org_user_registration(
     )
 
 
+def test_org_user_registration_when_org_user_id_in_session(
+    client,
+    sample_org_invite,
+    mock_email_is_not_already_in_use,
+    mock_register_user,
+    mock_send_verify_code,
+    mock_get_user_by_email,
+    mock_send_verify_email,
+    mock_accept_org_invite,
+    mock_add_user_to_organisation,
+    mock_get_invited_org_user_by_id,
+):
+    with client.session_transaction() as session:
+        session['invited_org_user_id'] = sample_org_invite['id']
+
+    response = client.post(url_for('main.register_from_org_invite'), data={
+        'name': 'Test User',
+        'email_address': sample_org_invite['email_address'],
+        'mobile_number': '+4407700900460',
+        'password': 'validPassword!',
+        'organisation': sample_org_invite['organisation']
+    })
+
+    assert response.status_code == 302
+    assert response.location == url_for('main.verify', _external=True)
+
+    assert mock_get_user_by_email.called is False
+    mock_get_invited_org_user_by_id.assert_called_once_with(sample_org_invite['id'])
+    mock_register_user.assert_called_once_with(
+        'Test User',
+        sample_org_invite['email_address'],
+        '+4407700900460',
+        'validPassword!',
+        'sms_auth'
+    )
+    mock_send_verify_code.assert_called_once_with(
+        '6ce466d0-fd6a-11e5-82f5-e0accb9d11a6',
+        'sms',
+        '+4407700900460',
+    )
+
+
 def test_verified_org_user_redirects_to_dashboard(
     client,
     sample_org_invite,

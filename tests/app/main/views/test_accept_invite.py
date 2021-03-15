@@ -306,6 +306,7 @@ def test_new_user_accept_invite_calls_api_and_views_registration_page(
     service_one,
     mock_check_invite_token,
     mock_dont_get_user_by_email,
+    mock_get_invited_user_by_id,
     mock_add_user_to_service,
     mock_get_users_by_service,
     mock_get_service,
@@ -315,6 +316,7 @@ def test_new_user_accept_invite_calls_api_and_views_registration_page(
 
     mock_check_invite_token.assert_called_with('thisisnotarealtoken')
     mock_dont_get_user_by_email.assert_called_with('invited_user@test.gov.uk')
+    mock_get_invited_user_by_id.assert_called_once_with(USER_ONE_ID)
 
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
@@ -401,6 +403,7 @@ def test_new_user_accept_invite_completes_new_registration_redirects_to_verify(
     mock_email_is_not_already_in_use,
     mock_register_user,
     mock_send_verify_code,
+    mock_get_invited_user_by_id,
     mock_accept_invite,
     mock_get_users_by_service,
     mock_add_user_to_service,
@@ -418,6 +421,7 @@ def test_new_user_accept_invite_completes_new_registration_redirects_to_verify(
         assert response.location == expected_redirect_location
         invited_user = session.get('invited_user')
         assert invited_user
+        assert session.get('invited_user_id') == USER_ONE_ID
         assert expected_service == invited_user['service']
         assert expected_email == invited_user['email_address']
         assert expected_from_user == invited_user['from_user']
@@ -437,6 +441,7 @@ def test_new_user_accept_invite_completes_new_registration_redirects_to_verify(
     assert response.location == expected_redirect_location
 
     mock_send_verify_code.assert_called_once_with(ANY, 'sms', data['mobile_number'])
+    mock_get_invited_user_by_id.assert_called_once_with(USER_ONE_ID)
 
     mock_register_user.assert_called_with(data['name'],
                                           data['email_address'],
@@ -516,6 +521,7 @@ def test_new_invited_user_verifies_and_added_to_service(
     mock_add_user_to_service,
     mock_accept_invite,
     mock_get_service,
+    mock_get_invited_user_by_id,
     mock_get_service_templates,
     mock_get_template_statistics,
     mock_has_no_jobs,
@@ -558,6 +564,7 @@ def test_new_invited_user_verifies_and_added_to_service(
     expected_permissions = {'view_activity', 'send_messages', 'manage_service', 'manage_api_keys'}
 
     with client.session_transaction() as session:
+        assert 'invited_user_id' not in session
         new_user_id = session['user_id']
         mock_add_user_to_service.assert_called_with(data['service'], new_user_id, expected_permissions, [])
         mock_accept_invite.assert_called_with(data['service'], sample_invite['id'])

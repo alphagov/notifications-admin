@@ -1,6 +1,10 @@
+import uuid
+from unittest.mock import Mock
+
 import pytest
 
-from app.models.user import AnonymousUser, User
+from app.models.user import AnonymousUser, InvitedOrgUser, InvitedUser, User
+from tests.conftest import USER_ONE_ID
 
 
 def test_anonymous_user(app_):
@@ -106,3 +110,79 @@ def test_has_live_services_when_service_is_not_live(
         'id': fake_uuid,
         'platform_admin': False,
     }).live_services == []
+
+
+def test_invited_user_from_session_uses_id(client, mocker, mock_get_invited_user_by_id):
+    session_dict = {'invited_user_id': USER_ONE_ID}
+    mocker.patch.dict('app.models.user.session', values=session_dict, clear=True)
+
+    assert InvitedUser.from_session().id == USER_ONE_ID
+
+    mock_get_invited_user_by_id.assert_called_once_with(USER_ONE_ID)
+
+
+def test_invited_user_from_session_uses_id_even_if_obj_in_session(
+    client,
+    mocker,
+    sample_invite,
+    mock_get_invited_user_by_id
+):
+    mock_session_obj = Mock(spec=dict)
+    session_dict = {'invited_user_id': USER_ONE_ID, 'invited_user': mock_session_obj}
+    mocker.patch.dict('app.models.user.session', values=session_dict, clear=True)
+
+    assert InvitedUser.from_session().id == USER_ONE_ID
+
+    assert mock_session_obj.mock_calls == []
+    mock_get_invited_user_by_id.assert_called_once_with(USER_ONE_ID)
+
+
+def test_invited_user_from_session_uses_obj_if_id_not_present(client, mocker, sample_invite):
+    session_dict = {'invited_user': sample_invite}
+    mocker.patch.dict('app.models.user.session', values=session_dict, clear=True)
+
+    assert InvitedUser.from_session().id == USER_ONE_ID
+
+
+def test_invited_user_from_session_returns_none_if_nothing_present(client, mocker):
+    mocker.patch.dict('app.models.user.session', values={}, clear=True)
+    assert InvitedUser.from_session() is None
+
+
+def test_invited_org_user_from_session_uses_id(client, mocker, mock_get_invited_org_user_by_id, sample_org_invite):
+    session_dict = {'invited_org_user_id': sample_org_invite['id']}
+    mocker.patch.dict('app.models.user.session', values=session_dict, clear=True)
+
+    assert InvitedOrgUser.from_session().id == sample_org_invite['id']
+
+    mock_get_invited_org_user_by_id.assert_called_once_with(sample_org_invite['id'])
+
+
+def test_invited_org_user_from_session_uses_id_even_if_obj_in_session(
+    client,
+    mocker,
+    sample_org_invite,
+    mock_get_invited_org_user_by_id
+):
+    fake_id = str(uuid.uuid4())
+    mock_org_dict = Mock(spec=dict)
+    session_dict = {'invited_org_user_id': fake_id, 'invited_org_user': mock_org_dict}
+    mocker.patch.dict('app.models.user.session', values=session_dict, clear=True)
+
+    assert InvitedOrgUser.from_session().id == sample_org_invite['id']
+
+    # make sure we didn't access invited_org_user (as org_user_id takes precedence)
+    assert mock_org_dict.mock_calls == []
+    mock_get_invited_org_user_by_id.assert_called_once_with(fake_id)
+
+
+def test_invited_org_user_from_session_uses_obj_if_id_not_present(client, mocker, sample_org_invite):
+    session_dict = {'invited_org_user': sample_org_invite}
+    mocker.patch.dict('app.models.user.session', values=session_dict, clear=True)
+
+    assert InvitedOrgUser.from_session().id == sample_org_invite['id']
+
+
+def test_invited_org_user_from_session_returns_none_if_nothing_present(client, mocker):
+    mocker.patch.dict('app.models.user.session', values={}, clear=True)
+    assert InvitedOrgUser.from_session() is None

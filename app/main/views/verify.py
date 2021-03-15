@@ -16,7 +16,7 @@ from app import user_api_client
 from app.main import main
 from app.main.forms import TwoFactorForm
 from app.models.service import Service
-from app.models.user import InvitedUser, User
+from app.models.user import InvitedOrgUser, InvitedUser, User
 from app.utils import redirect_to_sign_in
 
 
@@ -75,7 +75,7 @@ def activate_user(user_id):
     activated_user = user.activate()
     activated_user.login()
 
-    invited_user = session.get('invited_user')
+    invited_user = InvitedUser.from_session()
     if invited_user:
         service_id = _add_invited_user_to_service(invited_user)
         service = Service.from_id(service_id)
@@ -83,9 +83,9 @@ def activate_user(user_id):
             return redirect(url_for('main.broadcast_tour', service_id=service.id, step_index=1))
         return redirect(url_for('main.service_dashboard', service_id=service_id))
 
-    invited_org_user = session.get('invited_org_user')
+    invited_org_user = InvitedOrgUser.from_session()
     if invited_org_user:
-        user_api_client.add_user_to_organisation(invited_org_user['organisation'], session['user_details']['id'])
+        user_api_client.add_user_to_organisation(invited_org_user.organisation, session['user_details']['id'])
 
     if organisation_id:
         return redirect(url_for('main.organisation_dashboard', org_id=organisation_id))
@@ -93,10 +93,9 @@ def activate_user(user_id):
         return redirect(url_for('main.add_service', first='first'))
 
 
-def _add_invited_user_to_service(invited_user):
-    invitation = InvitedUser(invited_user)
+def _add_invited_user_to_service(invitation):
     user = User.from_id(session['user_id'])
-    service_id = invited_user['service']
+    service_id = invitation.service
     user.add_to_service(
         service_id,
         invitation.permissions,
