@@ -18,7 +18,7 @@ blinker==1.4
     # via
     #   -r requirements.in
     #   gds-metrics
-boto3==1.17.22
+boto3==1.17.27
     # via notifications-utils
 botocore==1.20.22
     # via
