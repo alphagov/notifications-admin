@@ -18,7 +18,7 @@ def performance():
     stats['organisations_using_notify'] = sorted(
         [
             {
-                'organisation_name': organisation_name,
+                'organisation_name': organisation_name or 'No organisation',
                 'count_of_live_services': len(list(group)),
             }
             for organisation_name, group in groupby(
