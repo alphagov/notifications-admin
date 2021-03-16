@@ -178,7 +178,7 @@ def test_accepting_invite_removes_invite_from_session(
     assert normalize_spaces(page.select_one('h1').text) == landing_page_title
 
     with client_request.session_transaction() as session:
-        assert 'invited_user' not in session
+        assert 'invited_user_id' not in session
 
 
 def test_existing_user_of_service_get_redirected_to_signin(
@@ -416,7 +416,6 @@ def test_new_user_accept_invite_completes_new_registration_redirects_to_verify(
     with client.session_transaction() as session:
         assert response.status_code == 302
         assert response.location == expected_redirect_location
-        assert 'invited_user' not in session
         assert session.get('invited_user_id') == USER_ONE_ID
 
     data = {'service': sample_invite['service'],

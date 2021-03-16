@@ -36,11 +36,10 @@ def sign_in():
         if user and user.state == 'pending':
             return redirect(url_for('main.resend_email_verification', next=redirect_url))
 
-        if user and (session.get('invited_user') or session.get('invited_user_id')):
+        if user and session.get('invited_user_id'):
             invited_user = InvitedUser.from_session()
             if user.email_address.lower() != invited_user.email_address.lower():
                 flash("You cannot accept an invite for another person.")
-                session.pop('invited_user', None)
                 session.pop('invited_user_id', None)
                 abort(403)
             else:
