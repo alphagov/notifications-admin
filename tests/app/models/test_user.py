@@ -137,13 +137,6 @@ def test_invited_user_from_session_uses_id_even_if_obj_in_session(
     mock_get_invited_user_by_id.assert_called_once_with(USER_ONE_ID)
 
 
-def test_invited_user_from_session_uses_obj_if_id_not_present(client, mocker, sample_invite):
-    session_dict = {'invited_user': sample_invite}
-    mocker.patch.dict('app.models.user.session', values=session_dict, clear=True)
-
-    assert InvitedUser.from_session().id == USER_ONE_ID
-
-
 def test_invited_user_from_session_returns_none_if_nothing_present(client, mocker):
     mocker.patch.dict('app.models.user.session', values={}, clear=True)
     assert InvitedUser.from_session() is None
@@ -174,13 +167,6 @@ def test_invited_org_user_from_session_uses_id_even_if_obj_in_session(
     # make sure we didn't access invited_org_user (as org_user_id takes precedence)
     assert mock_org_dict.mock_calls == []
     mock_get_invited_org_user_by_id.assert_called_once_with(fake_id)
-
-
-def test_invited_org_user_from_session_uses_obj_if_id_not_present(client, mocker, sample_org_invite):
-    session_dict = {'invited_org_user': sample_org_invite}
-    mocker.patch.dict('app.models.user.session', values=session_dict, clear=True)
-
-    assert InvitedOrgUser.from_session().id == sample_org_invite['id']
 
 
 def test_invited_org_user_from_session_returns_none_if_nothing_present(client, mocker):

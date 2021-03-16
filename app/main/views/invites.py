@@ -46,7 +46,6 @@ def accept_invite(token):
             return redirect(url_for('main.broadcast_tour', service_id=service.id, step_index=1))
         return redirect(url_for('main.service_dashboard', service_id=invited_user.service))
 
-    session['invited_user'] = invited_user.serialize()
     session['invited_user_id'] = invited_user.id
 
     existing_user = User.from_email_address_or_none(invited_user.email_address)
@@ -108,7 +107,6 @@ def accept_org_invite(token):
         session.pop('invited_org_user_id', None)
         return redirect(url_for('main.organisation_dashboard', org_id=invited_org_user.organisation))
 
-    session['invited_org_user'] = invited_org_user.serialize()
     session['invited_org_user_id'] = invited_org_user.id
 
     existing_user = User.from_email_address_or_none(invited_org_user.email_address)

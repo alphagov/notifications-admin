@@ -522,11 +522,7 @@ class InvitedUser(JSONModel):
     @classmethod
     def from_session(cls):
         invited_user_id = session.get('invited_user_id')
-        if invited_user_id:
-            return cls.by_id(invited_user_id)
-
-        invited_user = session.get('invited_user')
-        return cls(invited_user) if invited_user else None
+        return cls.by_id(invited_user_id) if invited_user_id else None
 
     def has_permissions(self, *permissions):
         if self.status == 'cancelled':
@@ -606,11 +602,7 @@ class InvitedOrgUser(JSONModel):
     @classmethod
     def from_session(cls):
         invited_org_user_id = session.get('invited_org_user_id')
-        if invited_org_user_id:
-            return cls.by_id(invited_org_user_id)
-
-        invited_org_user = session.get('invited_org_user')
-        return cls(invited_org_user) if invited_org_user else None
+        return cls.by_id(invited_org_user_id) if invited_org_user_id else None
 
     @classmethod
     def by_id_and_org_id(cls, org_id, invited_user_id):
