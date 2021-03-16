@@ -79,7 +79,7 @@
         heading='Live services',
         show_heading=current_user.trial_mode_services,
         organisations=current_user.organisations,
-        services=current_user.live_services_not_belonging_to_users_organisations
+        services=current_user.live_services
       ) }}
     {% else %}
       {{ service_list(
