@@ -245,33 +245,6 @@ def live_services_csv():
     }
 
 
-@main.route("/platform-admin/reports/performance-platform.xlsx")
-@user_is_platform_admin
-def performance_platform_xlsx():
-    results = service_api_client.get_live_services_data()["data"]
-    live_services_columns = ["service_id", "agency", "service_name", "_timestamp", "service", "count"]
-    live_services_data = []
-    live_services_data.append(live_services_columns)
-    for row in results:
-        live_services_data.append([
-            row["service_id"],
-            row["organisation_name"],
-            row["service_name"],
-            datetime.strptime(
-                row["live_date"], '%a, %d %b %Y %X %Z'
-            ).strftime("%Y-%m-%dT%H:%M:%S") + "Z" if row["live_date"] else None,
-            "govuk-notify",
-            1
-        ])
-
-    return Spreadsheet.from_rows(live_services_data).as_excel_file, 200, {
-        'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        'Content-Disposition': 'attachment; filename="{} performance platform report.xlsx"'.format(
-            format_date_numeric(datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")),
-        )
-    }
-
-
 @main.route("/platform-admin/reports/notifications-sent-by-service", methods=['GET', 'POST'])
 @user_is_platform_admin
 def notifications_sent_by_service():
