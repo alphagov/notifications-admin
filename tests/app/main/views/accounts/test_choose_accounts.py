@@ -87,7 +87,7 @@ def test_choose_account_should_show_choose_accounts_page(
     assert normalize_spaces(page.h1.text) == 'Choose service'
     outer_list_items = page.select('nav ul')[0].select('li')
 
-    assert len(outer_list_items) == 7
+    assert len(outer_list_items) == 8
 
     # first org
     assert outer_list_items[0].a.text == 'Org 1'
@@ -110,13 +110,19 @@ def test_choose_account_should_show_choose_accounts_page(
         '0 live services'
     )
 
-    # orphaned live services
+    # live services
     assert outer_list_items[3].a.text == 'Service 1'
     assert outer_list_items[3].a['href'] == url_for('.service_dashboard', service_id=SERVICE_TWO_ID)
-    assert outer_list_items[4].a.text == 'service one'
-    assert outer_list_items[4].a['href'] == url_for('.service_dashboard', service_id='12345')
+    assert outer_list_items[4].a.text == 'Service 2'
+    assert outer_list_items[4].a['href'] == url_for('.service_dashboard', service_id=SERVICE_TWO_ID)
+    assert outer_list_items[5].a.text == 'service one'
+    assert outer_list_items[5].a['href'] == url_for('.service_dashboard', service_id='12345')
+    assert outer_list_items[6].a.text == 'service one (org 2)'
+    assert outer_list_items[6].a['href'] == url_for('.service_dashboard', service_id='12345')
+    assert outer_list_items[7].a.text == 'service two (org 2)'
+    assert outer_list_items[7].a['href'] == url_for('.service_dashboard', service_id='67890')
 
-    # orphaned trial services
+    # trial services
     trial_services_list_items = page.select('nav ul')[1].select('li')
     assert len(trial_services_list_items) == 3
     assert trial_services_list_items[0].a.text == 'service three'

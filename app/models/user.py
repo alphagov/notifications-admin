@@ -290,13 +290,6 @@ class User(JSONModel, UserMixin):
         ]
 
     @property
-    def services_without_organisations(self):
-        return [
-            service for service in self.services
-            if not self.belongs_to_organisation(service.organisation_id)
-        ]
-
-    @property
     def service_ids(self):
         return self._dict['services']
 
@@ -311,12 +304,6 @@ class User(JSONModel, UserMixin):
         return [
             service for service in self.services if service.live
         ]
-
-    @property
-    def live_services_not_belonging_to_users_organisations(self):
-        return self.sort_services(
-            set(self.live_services).union(self.services_without_organisations)
-        )
 
     @property
     def organisations(self):

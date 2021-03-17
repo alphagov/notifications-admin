@@ -3447,8 +3447,8 @@ def _get_organisation_services(organisation_id):
         ]
     if organisation_id == 'o2':
         return [
-            service_json('12345', 'service one', restricted=False),
-            service_json('67890', 'service two', restricted=False),
+            service_json('12345', 'service one (org 2)', restricted=False),
+            service_json('67890', 'service two (org 2)', restricted=False),
             service_json('abcde', 'service three'),
         ]
     return [
