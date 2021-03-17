@@ -229,11 +229,11 @@ def test_registration_from_org_invite_has_bad_data(
     client,
     sample_org_invite,
     data,
-    error
+    error,
+    mock_get_invited_org_user_by_id,
 ):
-    invited_org_user = InvitedOrgUser(sample_org_invite)
     with client.session_transaction() as session:
-        session['invited_org_user'] = invited_org_user.serialize()
+        session['invited_org_user_id'] = sample_org_invite['id']
 
     response = client.post(url_for('main.register_from_org_invite'), data=data)
 
@@ -249,22 +249,23 @@ def test_registration_from_org_invite_has_bad_data(
 def test_registration_from_org_invite_has_different_email_or_organisation(
     client,
     sample_org_invite,
-    diff_data
+    diff_data,
+    mock_get_invited_org_user_by_id,
 ):
-    invited_org_user = InvitedOrgUser(sample_org_invite)
     with client.session_transaction() as session:
-        session['invited_org_user'] = invited_org_user.serialize()
+        session['invited_org_user_id'] = sample_org_invite['id']
 
-    for data in diff_data:
-        session['invited_org_user'][data] = 'different'
-
-    response = client.post(url_for('main.register_from_org_invite'), data={
+    data = {
         'name': 'Test User',
         'mobile_number': '+4407700900460',
         'password': 'validPassword!',
-        'email_address': session['invited_org_user']['email_address'],
-        'organisation': session['invited_org_user']['organisation']
-    })
+        'email_address': sample_org_invite['email_address'],
+        'organisation': sample_org_invite['organisation']
+    }
+    for field in diff_data:
+        data[field] = 'different'
+
+    response = client.post(url_for('main.register_from_org_invite'), data=data)
 
     assert response.status_code == 400
 
@@ -276,72 +277,31 @@ def test_org_user_registers_with_email_already_in_use(
     mock_accept_org_invite,
     mock_add_user_to_organisation,
     mock_send_already_registered_email,
-    mock_register_user
+    mock_register_user,
+    mock_get_invited_org_user_by_id,
 ):
-    invited_org_user = InvitedOrgUser(sample_org_invite)
     with client.session_transaction() as session:
-        session['invited_org_user'] = invited_org_user.serialize()
+        session['invited_org_user_id'] = sample_org_invite['id']
 
     response = client.post(url_for('main.register_from_org_invite'), data={
         'name': 'Test User',
         'mobile_number': '+4407700900460',
         'password': 'validPassword!',
-        'email_address': session['invited_org_user']['email_address'],
-        'organisation': session['invited_org_user']['organisation']
+        'email_address': sample_org_invite['email_address'],
+        'organisation': sample_org_invite['organisation']
     })
 
     assert response.status_code == 302
     assert response.location == url_for('main.verify', _external=True)
 
     mock_get_user_by_email.assert_called_once_with(
-        session['invited_org_user']['email_address']
+        sample_org_invite['email_address']
     )
     assert mock_register_user.called is False
     assert mock_send_already_registered_email.called is False
 
 
 def test_org_user_registration(
-    client,
-    sample_org_invite,
-    mock_email_is_not_already_in_use,
-    mock_register_user,
-    mock_send_verify_code,
-    mock_get_user_by_email,
-    mock_send_verify_email,
-    mock_accept_org_invite,
-    mock_add_user_to_organisation,
-):
-    invited_org_user = InvitedOrgUser(sample_org_invite)
-    with client.session_transaction() as session:
-        session['invited_org_user'] = invited_org_user.serialize()
-
-    response = client.post(url_for('main.register_from_org_invite'), data={
-        'name': 'Test User',
-        'email_address': session['invited_org_user']['email_address'],
-        'mobile_number': '+4407700900460',
-        'password': 'validPassword!',
-        'organisation': session['invited_org_user']['organisation']
-    })
-
-    assert response.status_code == 302
-    assert response.location == url_for('main.verify', _external=True)
-
-    assert mock_get_user_by_email.called is False
-    mock_register_user.assert_called_once_with(
-        'Test User',
-        session['invited_org_user']['email_address'],
-        '+4407700900460',
-        'validPassword!',
-        'sms_auth'
-    )
-    mock_send_verify_code.assert_called_once_with(
-        '6ce466d0-fd6a-11e5-82f5-e0accb9d11a6',
-        'sms',
-        '+4407700900460',
-    )
-
-
-def test_org_user_registration_when_org_user_id_in_session(
     client,
     sample_org_invite,
     mock_email_is_not_already_in_use,
@@ -368,7 +328,6 @@ def test_org_user_registration_when_org_user_id_in_session(
     assert response.location == url_for('main.verify', _external=True)
 
     assert mock_get_user_by_email.called is False
-    mock_get_invited_org_user_by_id.assert_called_once_with(sample_org_invite['id'])
     mock_register_user.assert_called_once_with(
         'Test User',
         sample_org_invite['email_address'],
@@ -381,6 +340,7 @@ def test_org_user_registration_when_org_user_id_in_session(
         'sms',
         '+4407700900460',
     )
+    mock_get_invited_org_user_by_id.assert_called_once_with(sample_org_invite['id'])
 
 
 def test_verified_org_user_redirects_to_dashboard(

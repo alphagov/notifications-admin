@@ -1,4 +1,3 @@
-from datetime import datetime
 from unittest.mock import ANY
 
 import pytest
@@ -6,7 +5,6 @@ from bs4 import BeautifulSoup
 from flask import session, url_for
 from flask_login import current_user
 
-from app.models.user import InvitedUser
 from tests.conftest import normalize_spaces
 
 
@@ -208,19 +206,12 @@ def test_shows_name_on_registration_page_from_invite(
     fake_uuid,
     email_address,
     expected_value,
+    sample_invite,
+    mock_get_invited_user_by_id,
 ):
+    sample_invite['email_address'] = email_address
     with client_request.session_transaction() as session:
-        session['invited_user'] = {
-            'id': fake_uuid,
-            'service': fake_uuid,
-            'from_user': "",
-            'email_address': email_address,
-            'permissions': ["manage_users"],
-            'status': "pending",
-            'created_at': datetime.utcnow(),
-            'auth_type': 'sms_auth',
-            'folder_permissions': [],
-        }
+        session['invited_user_id'] = sample_invite
 
     page = client_request.get('main.register_from_invite')
     assert page.select_one('input[name=name]').get('value') == expected_value
@@ -229,30 +220,23 @@ def test_shows_name_on_registration_page_from_invite(
 def test_shows_hidden_email_address_on_registration_page_from_invite(
     client_request,
     fake_uuid,
+    sample_invite,
+    mock_get_invited_user_by_id,
 ):
+
     with client_request.session_transaction() as session:
-        session['invited_user'] = {
-            'id': fake_uuid,
-            'service': fake_uuid,
-            'from_user': "",
-            'email_address': "test@example.com",
-            'permissions': ["manage_users"],
-            'status': "pending",
-            'created_at': datetime.utcnow(),
-            'auth_type': 'sms_auth',
-            'folder_permissions': [],
-        }
+        session['invited_user_id'] = sample_invite
 
     page = client_request.get('main.register_from_invite')
     assert normalize_spaces(page.select_one('main p').text) == (
-        'Your account will be created with this email address: test@example.com'
+        'Your account will be created with this email address: invited_user@test.gov.uk'
     )
     hidden_input = page.select_one('form .govuk-visually-hidden input')
     for attr, value in (
         ('type', 'email'),
         ('name', 'username'),
         ('id', 'username'),
-        ('value', 'test@example.com'),
+        ('value', 'invited_user@test.gov.uk'),
         ('disabled', "disabled"),
         ('tabindex', '-1'),
         ('aria-hidden', 'true'),
@@ -275,30 +259,19 @@ def test_register_from_invite(
     mock_register_user,
     mock_send_verify_code,
     mock_accept_invite,
+    mock_get_invited_user_by_id,
+    sample_invite,
     extra_data,
 ):
-    invited_user = InvitedUser(
-        {
-            'id': fake_uuid,
-            'service': fake_uuid,
-            'from_user': "",
-            'email_address': "invited@user.com",
-            'permissions': ["manage_users"],
-            'status': "pending",
-            'created_at': datetime.utcnow(),
-            'auth_type': 'sms_auth',
-            'folder_permissions': [],
-        }
-    )
     with client.session_transaction() as session:
-        session['invited_user'] = invited_user.serialize()
+        session['invited_user_id'] = sample_invite['id']
     response = client.post(
         url_for('main.register_from_invite'),
         data=dict(
             name='Registered in another Browser',
-            email_address=invited_user.email_address,
+            email_address=sample_invite['email_address'],
             mobile_number='+4407700900460',
-            service=str(invited_user.id),
+            service=sample_invite['service'],
             password='somreallyhardthingtoguess',
             auth_type='sms_auth',
             **extra_data
@@ -308,11 +281,12 @@ def test_register_from_invite(
     assert response.location == url_for('main.verify', _external=True)
     mock_register_user.assert_called_once_with(
         'Registered in another Browser',
-        invited_user.email_address,
+        sample_invite['email_address'],
         '+4407700900460',
         'somreallyhardthingtoguess',
         'sms_auth',
-    )
+    ),
+    mock_get_invited_user_by_id.assert_called_once_with(sample_invite['id'])
 
 
 def test_register_from_invite_when_user_registers_in_another_browser(
@@ -320,29 +294,19 @@ def test_register_from_invite_when_user_registers_in_another_browser(
     api_user_active,
     mock_get_user_by_email,
     mock_accept_invite,
+    mock_get_invited_user_by_id,
+    sample_invite,
 ):
-    invited_user = InvitedUser(
-        {
-            'id': api_user_active['id'],
-            'service': api_user_active['id'],
-            'from_user': "",
-            'email_address': api_user_active['email_address'],
-            'permissions': ["manage_users"],
-            'status': "pending",
-            'created_at': datetime.utcnow(),
-            'auth_type': 'sms_auth',
-            'folder_permissions': [],
-        }
-    )
+    sample_invite['email_address'] = api_user_active['email_address']
     with client.session_transaction() as session:
-        session['invited_user'] = invited_user.serialize()
+        session['invited_user_id'] = sample_invite['id']
     response = client.post(
         url_for('main.register_from_invite'),
         data={
             'name': 'Registered in another Browser',
             'email_address': api_user_active['email_address'],
             'mobile_number': api_user_active['mobile_number'],
-            'service': str(api_user_active['id']),
+            'service': sample_invite['service'],
             'password': 'somreallyhardthingtoguess',
             'auth_type': 'sms_auth'
         }
@@ -364,6 +328,7 @@ def test_register_from_email_auth_invite(
     mock_create_event,
     mock_add_user_to_service,
     mock_get_service,
+    mock_get_invited_user_by_id,
     invite_email_address,
     service_one,
     fake_uuid,
@@ -374,7 +339,7 @@ def test_register_from_email_auth_invite(
     sample_invite['auth_type'] = 'email_auth'
     sample_invite['email_address'] = invite_email_address
     with client.session_transaction() as session:
-        session['invited_user'] = sample_invite
+        session['invited_user_id'] = sample_invite['id']
     assert not current_user.is_authenticated
 
     data = {
@@ -401,6 +366,8 @@ def test_register_from_email_auth_invite(
         data['password'],
         data['auth_type']
     )
+    # this is actually called twice, at the beginning of the function and then by the activate_user function
+    mock_get_invited_user_by_id.assert_called_with(sample_invite['id'])
     mock_accept_invite.assert_called_once_with(sample_invite['service'], sample_invite['id'])
     # just logs them in
     assert current_user.is_authenticated
@@ -412,7 +379,7 @@ def test_register_from_email_auth_invite(
 
     with client.session_transaction() as session:
         # invited user details are still there so they can get added to the service
-        assert session['invited_user'] == sample_invite
+        assert session['invited_user_id'] == sample_invite['id']
 
 
 def test_can_register_email_auth_without_phone_number(
@@ -427,10 +394,11 @@ def test_can_register_email_auth_without_phone_number(
     mock_create_event,
     mock_add_user_to_service,
     mock_get_service,
+    mock_get_invited_user_by_id,
 ):
     sample_invite['auth_type'] = 'email_auth'
     with client.session_transaction() as session:
-        session['invited_user'] = sample_invite
+        session['invited_user_id'] = sample_invite['id']
 
     data = {
         'name': 'invited user',
@@ -474,11 +442,12 @@ def test_cannot_register_with_sms_auth_and_missing_mobile_number(
 
 def test_register_from_invite_form_doesnt_show_mobile_number_field_if_email_auth(
     client,
-    sample_invite
+    sample_invite,
+    mock_get_invited_user_by_id,
 ):
     sample_invite['auth_type'] = 'email_auth'
     with client.session_transaction() as session:
-        session['invited_user'] = sample_invite
+        session['invited_user_id'] = sample_invite['id']
 
     response = client.get(url_for('main.register_from_invite'))
 

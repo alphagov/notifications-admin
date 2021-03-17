@@ -176,6 +176,7 @@ def test_activate_user_redirects_to_service_dashboard_if_user_already_belongs_to
     api_user_active,
     mock_login,
     mock_get_service,
+    mock_get_invited_user_by_id,
 ):
     mocker.patch('app.user_api_client.add_user_to_service', side_effect=HTTPError(
         response=Mock(
@@ -189,10 +190,10 @@ def test_activate_user_redirects_to_service_dashboard_if_user_already_belongs_to
     ))
 
     # Can't use `with client.session_transaction()...` here since activate_session is not a view function
-    flask_session['invited_user'] = sample_invite
+    flask_session['invited_user_id'] = sample_invite['id']
 
     response = activate_user(api_user_active['id'])
 
     assert response.location == url_for('main.service_dashboard', service_id=service_one['id'])
 
-    flask_session.pop('invited_user')
+    flask_session.pop('invited_user_id')

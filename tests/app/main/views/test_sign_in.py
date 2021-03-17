@@ -224,7 +224,8 @@ def test_email_address_is_treated_case_insensitively_when_signing_in_as_invited_
     api_user_active,
     sample_invite,
     mock_accept_invite,
-    mock_send_verify_code
+    mock_send_verify_code,
+    mock_get_invited_user_by_id,
 ):
     sample_invite['email_address'] = 'TEST@user.gov.uk'
 
@@ -234,7 +235,7 @@ def test_email_address_is_treated_case_insensitively_when_signing_in_as_invited_
     )
 
     with client.session_transaction() as session:
-        session['invited_user'] = sample_invite
+        session['invited_user_id'] = sample_invite['id']
 
     response = client.post(
         url_for('main.sign_in'), data={
@@ -244,3 +245,4 @@ def test_email_address_is_treated_case_insensitively_when_signing_in_as_invited_
     assert mock_accept_invite.called
     assert response.status_code == 302
     assert mock_send_verify_code.called
+    mock_get_invited_user_by_id.assert_called_once_with(sample_invite['id'])

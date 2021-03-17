@@ -133,7 +133,7 @@ def test_invite_goes_in_session(
     )
 
     with client_request.session_transaction() as session:
-        assert session['invited_user']['email_address'] == 'test@user.gov.uk'
+        assert session['invited_user_id'] == sample_invite['id']
 
 
 @pytest.mark.parametrize('user, landing_page_title', [
@@ -410,25 +410,18 @@ def test_new_user_accept_invite_completes_new_registration_redirects_to_verify(
     mock_get_service,
     mocker,
 ):
-    expected_service = service_one['id']
-    expected_email = sample_invite['email_address']
-    expected_from_user = service_one['users'][0]
     expected_redirect_location = 'http://localhost/register-from-invite'
 
     response = client.get(url_for('main.accept_invite', token='thisisnotarealtoken'))
     with client.session_transaction() as session:
         assert response.status_code == 302
         assert response.location == expected_redirect_location
-        invited_user = session.get('invited_user')
-        assert invited_user
+        assert 'invited_user' not in session
         assert session.get('invited_user_id') == USER_ONE_ID
-        assert expected_service == invited_user['service']
-        assert expected_email == invited_user['email_address']
-        assert expected_from_user == invited_user['from_user']
 
-    data = {'service': invited_user['service'],
-            'email_address': invited_user['email_address'],
-            'from_user': invited_user['from_user'],
+    data = {'service': sample_invite['service'],
+            'email_address': sample_invite['email_address'],
+            'from_user': sample_invite['from_user'],
             'password': 'longpassword',
             'mobile_number': '+447890123456',
             'name': 'Invited User',
