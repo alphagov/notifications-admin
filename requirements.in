@@ -19,12 +19,13 @@ gunicorn==20.1.0
 eventlet==0.30.2
 notifications-python-client==6.0.2
 Shapely==1.7.1
+Rtree==0.9.7
 
 # PaaS
 awscli-cwlogs>=1.4,<1.5
 itsdangerous==1.1.0
 
-git+https://github.com/alphagov/notifications-utils.git@44.1.0#egg=notifications-utils==44.1.0
+git+https://github.com/alphagov/notifications-utils.git@44.2.0#egg=notifications-utils==44.2.0
 git+https://github.com/alphagov/govuk-frontend-jinja.git@v0.5.8-alpha#egg=govuk-frontend-jinja==0.5.8-alpha
 
 # gds-metrics requires prometheseus 0.2.0, override that requirement as later versions bring significant performance gains

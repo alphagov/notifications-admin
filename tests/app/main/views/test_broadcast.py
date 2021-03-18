@@ -8,6 +8,7 @@ from flask import url_for
 from freezegun import freeze_time
 
 from tests import broadcast_message_json, sample_uuid, user_json
+from tests.app.broadcast_areas.custom_polygons import BRISTOL, SKYE
 from tests.conftest import SERVICE_ONE_ID, normalize_spaces
 
 sample_uuid = sample_uuid()
@@ -727,11 +728,42 @@ def test_preview_broadcast_areas_page(
     ] == estimates
 
 
+@pytest.mark.parametrize('polygons, expected_list_items', (
+    (
+        [
+            [[1, 2], [3, 4], [5, 6]],
+            [[7, 8], [9, 10], [11, 12]],
+        ],
+        [
+            'An area of 722.3 square miles Will get the alert',
+            'An extra area of 1,498.5 square miles is Likely to get the alert',
+            'Unknown number of phones',
+        ]
+    ),
+    (
+        [BRISTOL],
+        [
+            'An area of 6.6 square miles Will get the alert',
+            'An extra area of 6.4 square miles is Likely to get the alert',
+            '70,000 to 100,000 phones',
+        ]
+    ),
+    (
+        [SKYE],
+        [
+            'An area of 3,205.0 square miles Will get the alert',
+            'An extra area of 763.4 square miles is Likely to get the alert',
+            '4,000 to 5,000 phones',
+        ]
+    ),
+))
 def test_preview_broadcast_areas_page_with_custom_polygons(
     mocker,
     client_request,
     service_one,
     fake_uuid,
+    polygons,
+    expected_list_items,
 ):
     service_one['permissions'] += ['broadcast']
     mocker.patch(
@@ -743,10 +775,7 @@ def test_preview_broadcast_areas_page_with_custom_polygons(
             service_id=SERVICE_ONE_ID,
             status='draft',
             areas=['Area one', 'Area two', 'Area three'],
-            simple_polygons=[
-                [[1, 2], [3, 4], [5, 6]],
-                [[7, 8], [9, 10], [11, 12]],
-            ],
+            simple_polygons=polygons,
         ),
     )
     page = client_request.get(
@@ -767,11 +796,7 @@ def test_preview_broadcast_areas_page_with_custom_polygons(
     assert [
         normalize_spaces(item.text)
         for item in page.select('ul li.area-list-key')
-    ] == [
-        'An area of 722.3 square miles Will get the alert',
-        'An extra area of 1,498.5 square miles is Likely to get the alert',
-        'Unknown number of phones',
-    ]
+    ] == expected_list_items
 
 
 @pytest.mark.parametrize('areas, expected_list', (
