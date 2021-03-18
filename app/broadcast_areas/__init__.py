@@ -8,7 +8,7 @@ from notifications_utils.serialised_model import SerialisedModelCollection
 from werkzeug.utils import cached_property
 
 from .populations import CITY_OF_LONDON
-from .repo import BroadcastAreasRepository
+from .repo import BroadcastAreasRepository, rtree_index
 
 
 class SortableMixin:
@@ -138,10 +138,6 @@ class BroadcastArea(BaseBroadcastArea, SortableMixin):
 
 class CustomBroadcastArea(BaseBroadcastArea):
 
-    # We don’t yet have a way to estimate the number of phones in a
-    # user-defined polygon
-    count_of_phones = 0
-
     def __init__(self, *, name, polygons=None):
         self.name = name
         self._polygons = polygons or []
@@ -155,6 +151,17 @@ class CustomBroadcastArea(BaseBroadcastArea):
         )
 
     simple_polygons = polygons
+
+    @property
+    def count_of_phones(self):
+        areas = broadcast_area_libraries.get_areas([
+            item.object
+            for item in rtree_index.intersection(self.polygons.bounds)
+        ])
+        return sum(
+            area.polygons.ratio_of_intersection_with(self.polygons) * area.count_of_phones
+            for area in areas
+        )
 
 
 class CustomBroadcastAreas(SerialisedModelCollection):

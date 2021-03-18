@@ -2,6 +2,12 @@ import json
 import os
 import sqlite3
 from pathlib import Path
+from rtree import index
+
+rtree_index = index.Rtree(
+    str((Path(__file__).parent / 'rtree').absolute()),
+    interleaved=True,
+)
 
 
 class BroadcastAreasRepository(object):
