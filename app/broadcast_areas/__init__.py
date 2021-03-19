@@ -80,9 +80,8 @@ class BroadcastArea(SortableMixin):
 
     @property
     def estimated_bleed_in_m(self):
-        if self.id.endswith(CITY_OF_LONDON.WARDS):
-            return 500
-        return 5_900 - (math.log(self.phone_density, 10) * 1_250)
+        estimated_bleed = 5_900 - (math.log(self.phone_density, 10) * 1_250)
+        return max(500, min(estimated_bleed, 5000))
 
     @property
     def estimated_bleed_in_degrees(self):

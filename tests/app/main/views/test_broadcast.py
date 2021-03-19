@@ -649,7 +649,7 @@ def test_broadcast_page(
         'Islington remove',
     ], [
         'An area of 9.7 square miles Will get the alert',
-        'An extra area of 4.6 square miles is Likely to get the alert',
+        'An extra area of 4.7 square miles is Likely to get the alert',
         '200,000 to 300,000 phones',
     ]),
 ))

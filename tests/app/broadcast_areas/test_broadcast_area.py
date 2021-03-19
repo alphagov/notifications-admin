@@ -315,7 +315,7 @@ def test_phone_density(
 @pytest.mark.parametrize('area, expected_bleed_in_m, expected_bleed_in_degrees', (
     (
         # Islington (most dense in UK)
-        'lad20-E09000019', 488, 0.00439
+        'lad20-E09000019', 500, 0.00449
     ),
     (
         # Cordwainer Ward (City of London)
@@ -332,7 +332,7 @@ def test_phone_density(
     ),
     (
         # Highland (least dense in UK)
-        'lad20-S12000017', 5_095, 0.0458
+        'lad20-S12000017', 5_000, 0.0449
     ),
 ))
 def test_estimated_bleed(
