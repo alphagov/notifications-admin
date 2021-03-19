@@ -74,12 +74,14 @@ class BroadcastArea(SortableMixin):
         # https://www.pivotaltracker.com/story/show/174837293
         return self._count_of_phones or 0
 
-    @property
+    @cached_property
     def phone_density(self):
         return self.count_of_phones / self.polygons.estimated_area
 
     @property
     def estimated_bleed_in_m(self):
+        if self.phone_density < 1:
+            return Polygons.approx_bleed_in_degrees * Polygons.approx_metres_to_degree
         estimated_bleed = 5_900 - (math.log(self.phone_density, 10) * 1_250)
         return max(500, min(estimated_bleed, 5000))
 

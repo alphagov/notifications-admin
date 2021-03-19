@@ -334,6 +334,10 @@ def test_phone_density(
         # Highland (least dense in UK)
         'lad20-S12000017', 5_000, 0.0449
     ),
+    (
+        # No population data available
+        'test-santa-claus-village-rovaniemi', 1_500, 0.01347
+    )
 ))
 def test_estimated_bleed(
     area, expected_bleed_in_m, expected_bleed_in_degrees,
