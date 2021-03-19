@@ -80,6 +80,12 @@ class BroadcastArea(SortableMixin):
 
     @property
     def estimated_bleed_in_m(self):
+        '''
+        Estimates the amount of bleed based on the population of an
+        area. Higher density areas tend to have short range masts, so
+        the bleed is low (down to 500m). Lower density areas have longer
+        range masts, so the typical bleed will be high (up to 5,000m).
+        '''
         if self.phone_density < 1:
             return Polygons.approx_bleed_in_degrees * Polygons.approx_metres_to_degree
         estimated_bleed = 5_900 - (math.log(self.phone_density, 10) * 1_250)
