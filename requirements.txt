@@ -96,7 +96,7 @@ lml==0.1.0
     # via
     #   pyexcel
     #   pyexcel-io
-lxml==4.6.2
+lxml==4.6.3
     # via
     #   pyexcel-ezodf
     #   pyexcel-ods3
@@ -192,7 +192,7 @@ statsd==3.3.0
     # via notifications-utils
 texttable==1.6.3
     # via pyexcel
-urllib3==1.26.3
+urllib3==1.26.4
     # via
     #   botocore
     #   requests
