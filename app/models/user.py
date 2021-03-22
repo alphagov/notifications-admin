@@ -1,4 +1,4 @@
-from flask import abort, current_app, request, session
+from flask import abort, request, session
 from flask_login import AnonymousUserMixin, UserMixin, login_user, logout_user
 from notifications_python_client.errors import HTTPError
 from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
@@ -27,6 +27,8 @@ def _get_org_id_from_view_args():
 
 class User(JSONModel, UserMixin):
 
+    MAX_FAILED_LOGIN_COUNT = 10
+
     ALLOWED_PROPERTIES = {
         'id',
         'name',
@@ -45,7 +47,6 @@ class User(JSONModel, UserMixin):
     def __init__(self, _dict):
         super().__init__(_dict)
         self.permissions = _dict.get('permissions', {})
-        self.max_failed_login_count = current_app.config['MAX_FAILED_LOGIN_COUNT']
         self._platform_admin = _dict['platform_admin']
 
     @classmethod
@@ -261,7 +262,7 @@ class User(JSONModel, UserMixin):
 
     @property
     def locked(self):
-        return self.failed_login_count >= self.max_failed_login_count
+        return self.failed_login_count >= self.MAX_FAILED_LOGIN_COUNT
 
     @property
     def email_domain(self):

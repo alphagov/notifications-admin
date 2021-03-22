@@ -33,12 +33,12 @@ def test_user(app_):
     assert user.state == 'pending'
 
     # user has ten failed logins before being locked
-    assert user.max_failed_login_count == app_.config['MAX_FAILED_LOGIN_COUNT'] == 10
+    assert user.MAX_FAILED_LOGIN_COUNT == 10
     assert user.failed_login_count == 0
     assert user.locked is False
 
     # set failed logins to threshold
-    user.failed_login_count = app_.config['MAX_FAILED_LOGIN_COUNT']
+    user.failed_login_count = 10
     assert user.locked is True
 
     with pytest.raises(TypeError):
