@@ -8,7 +8,7 @@ ago==0.0.93
     # via -r requirements.in
 awscli-cwlogs==1.4.6
     # via -r requirements.in
-awscli==1.19.22
+awscli==1.19.27
     # via
     #   awscli-cwlogs
     #   notifications-utils
@@ -18,9 +18,9 @@ blinker==1.4
     # via
     #   -r requirements.in
     #   gds-metrics
-boto3==1.17.22
+boto3==1.17.27
     # via notifications-utils
-botocore==1.20.22
+botocore==1.20.27
     # via
     #   awscli
     #   boto3
@@ -83,8 +83,6 @@ itsdangerous==1.1.0
     #   flask
     #   flask-wtf
     #   notifications-utils
-jdcal==1.4.1
-    # via openpyxl
 jinja2==2.11.3
     # via
     #   flask
@@ -98,7 +96,7 @@ lml==0.1.0
     # via
     #   pyexcel
     #   pyexcel-io
-lxml==4.6.2
+lxml==4.6.3
     # via
     #   pyexcel-ezodf
     #   pyexcel-ods3
@@ -112,7 +110,7 @@ notifications-python-client==6.0.2
     # via -r requirements.in
 git+https://github.com/alphagov/notifications-utils.git@44.0.0#egg=notifications-utils==44.0.0
     # via -r requirements.in
-openpyxl==3.0.6
+openpyxl==3.0.7
     # via pyexcel-xlsx
 orderedset==2.0.3
     # via notifications-utils
@@ -194,7 +192,7 @@ statsd==3.3.0
     # via notifications-utils
 texttable==1.6.3
     # via pyexcel
-urllib3==1.26.3
+urllib3==1.26.4
     # via
     #   botocore
     #   requests
