@@ -1,3 +1,5 @@
+from math import isclose
+
 import pytest
 
 from app.broadcast_areas import (
@@ -8,6 +10,10 @@ from app.broadcast_areas.populations import (
     CITY_OF_LONDON,
     estimate_number_of_smartphones_for_population,
 )
+
+
+def close_enough(a, b):
+    return isclose(a, b, rel_tol=0.001)  # Within 0.1% difference
 
 
 def test_loads_libraries():
@@ -272,3 +278,75 @@ def test_estimate_number_of_smartphones_for_population(
     assert estimate_number_of_smartphones_for_population(
         population
     ) == expected_estimate
+
+
+@pytest.mark.parametrize('area, expected_phones_per_square_mile', (
+    (
+        # Islington (most dense in UK)
+        'lad20-E09000019', 21_348
+    ),
+    (
+        # Cordwainer Ward (City of London)
+        # This is higher than Islington because we inflate the
+        # popualtion to account for daytime workers
+        'wd20-E05009300', 310_674
+    ),
+    (
+        # Crewe East
+        'wd20-E05008621', 2_078),
+    (
+        # Eden (Cumbria, least dense in England)
+        'lad20-E07000030', 25.57
+    ),
+    (
+        # Highland (least dense in UK)
+        'lad20-S12000017', 4.40
+    ),
+))
+def test_phone_density(
+    area, expected_phones_per_square_mile,
+):
+    assert close_enough(
+        broadcast_area_libraries.get_areas(area)[0].phone_density,
+        expected_phones_per_square_mile,
+    )
+
+
+@pytest.mark.parametrize('area, expected_bleed_in_m, expected_bleed_in_degrees', (
+    (
+        # Islington (most dense in UK)
+        'lad20-E09000019', 500, 0.00449
+    ),
+    (
+        # Cordwainer Ward (City of London)
+        # Special case because of inflated daytime population
+        'wd20-E05009300', 500, 0.00449
+    ),
+    (
+        # Crewe East
+        'wd20-E05008621', 1_752, 0.01574
+    ),
+    (
+        # Eden (Cumbria, least dense in England)
+        'lad20-E07000030', 4_140, 0.0372
+    ),
+    (
+        # Highland (least dense in UK)
+        'lad20-S12000017', 5_000, 0.0449
+    ),
+    (
+        # No population data available
+        'test-santa-claus-village-rovaniemi', 1_500, 0.01347
+    )
+))
+def test_estimated_bleed(
+    area, expected_bleed_in_m, expected_bleed_in_degrees,
+):
+    assert close_enough(
+        broadcast_area_libraries.get_areas(area)[0].estimated_bleed_in_m,
+        expected_bleed_in_m,
+    )
+    assert close_enough(
+        broadcast_area_libraries.get_areas(area)[0].estimated_bleed_in_degrees,
+        expected_bleed_in_degrees,
+    )

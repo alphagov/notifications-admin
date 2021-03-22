@@ -2,7 +2,7 @@
 <script>
   var polygons = []
 
-  {% for polygon in broadcast_message.simple_polygons.bleed.as_coordinate_pairs_lat_long %}
+  {% for polygon in broadcast_message.simple_polygons_with_bleed.as_coordinate_pairs_lat_long %}
     polygons.push(
       L.polygon({{polygon}}, {
         opacity: 1,

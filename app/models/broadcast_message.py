@@ -117,6 +117,17 @@ class BroadcastMessage(JSONModel):
     def simple_polygons(self):
         return self.get_simple_polygons(areas=self.areas)
 
+    @cached_property
+    def simple_polygons_with_bleed(self):
+        polygons = Polygons(
+            list(itertools.chain(*(
+                area.simple_polygons_with_bleed for area in self.areas
+            )))
+        )
+        # If we’ve added multiple areas then we need to re-simplify the
+        # combined shapes to keep the point count down
+        return polygons.smooth.simplify if len(self.areas) > 1 else polygons
+
     @property
     def reference(self):
         if self.template_id:
@@ -163,7 +174,7 @@ class BroadcastMessage(JSONModel):
     @property
     def count_of_phones_likely(self):
         area_estimate = self.simple_polygons.estimated_area
-        bleed_area_estimate = self.simple_polygons.bleed.estimated_area - area_estimate
+        bleed_area_estimate = self.simple_polygons_with_bleed.estimated_area - area_estimate
         return round_to_significant_figures(
             self.count_of_phones + (self.count_of_phones * bleed_area_estimate / area_estimate),
             1
