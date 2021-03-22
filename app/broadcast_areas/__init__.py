@@ -1,4 +1,5 @@
 import math
+from abc import ABC, abstractmethod
 
 from notifications_utils.formatters import formatted_list
 from notifications_utils.polygons import Polygons
@@ -34,7 +35,52 @@ class GetItemByIdMixin:
         raise KeyError(id)
 
 
-class BroadcastArea(SortableMixin):
+class BaseBroadcastArea(ABC):
+
+    @property
+    @abstractmethod
+    def simple_polygons(self):
+        pass
+
+    @property
+    @abstractmethod
+    def polygons(self):
+        pass
+
+    @property
+    @abstractmethod
+    def count_of_phones(self):
+        pass
+
+    @cached_property
+    def simple_polygons_with_bleed(self):
+        return self.simple_polygons.bleed_by(self.estimated_bleed_in_degrees)
+
+    @cached_property
+    def phone_density(self):
+        if not self.polygons.estimated_area:
+            return 0
+        return self.count_of_phones / self.polygons.estimated_area
+
+    @property
+    def estimated_bleed_in_m(self):
+        '''
+        Estimates the amount of bleed based on the population of an
+        area. Higher density areas tend to have short range masts, so
+        the bleed is low (down to 500m). Lower density areas have longer
+        range masts, so the typical bleed will be high (up to 5,000m).
+        '''
+        if self.phone_density < 1:
+            return Polygons.approx_bleed_in_degrees * Polygons.approx_metres_to_degree
+        estimated_bleed = 5_900 - (math.log(self.phone_density, 10) * 1_250)
+        return max(500, min(estimated_bleed, 5000))
+
+    @property
+    def estimated_bleed_in_degrees(self):
+        return self.estimated_bleed_in_m / Polygons.approx_metres_to_degree
+
+
+class BroadcastArea(BaseBroadcastArea, SortableMixin):
 
     def __init__(self, row):
         self.id, self.name, self._count_of_phones, self.library_id = row
@@ -50,10 +96,6 @@ class BroadcastArea(SortableMixin):
         return Polygons(
             BroadcastAreasRepository().get_simple_polygons_for_area(self.id)
         )
-
-    @cached_property
-    def simple_polygons_with_bleed(self):
-        return self.simple_polygons.bleed_by(self.estimated_bleed_in_degrees)
 
     @cached_property
     def sub_areas(self):
@@ -73,27 +115,6 @@ class BroadcastArea(SortableMixin):
         # TODO: remove the `or 0` once missing data is fixed, see
         # https://www.pivotaltracker.com/story/show/174837293
         return self._count_of_phones or 0
-
-    @cached_property
-    def phone_density(self):
-        return self.count_of_phones / self.polygons.estimated_area
-
-    @property
-    def estimated_bleed_in_m(self):
-        '''
-        Estimates the amount of bleed based on the population of an
-        area. Higher density areas tend to have short range masts, so
-        the bleed is low (down to 500m). Lower density areas have longer
-        range masts, so the typical bleed will be high (up to 5,000m).
-        '''
-        if self.phone_density < 1:
-            return Polygons.approx_bleed_in_degrees * Polygons.approx_metres_to_degree
-        estimated_bleed = 5_900 - (math.log(self.phone_density, 10) * 1_250)
-        return max(500, min(estimated_bleed, 5000))
-
-    @property
-    def estimated_bleed_in_degrees(self):
-        return self.estimated_bleed_in_m / Polygons.approx_metres_to_degree
 
     @cached_property
     def parents(self):
@@ -116,7 +137,7 @@ class BroadcastArea(SortableMixin):
             id = parent_broadcast_area.id
 
 
-class CustomBroadcastArea:
+class CustomBroadcastArea(BaseBroadcastArea):
 
     # We don’t yet have a way to estimate the number of phones in a
     # user-defined polygon
@@ -135,13 +156,6 @@ class CustomBroadcastArea:
         )
 
     simple_polygons = polygons
-
-    @cached_property
-    def simple_polygons_with_bleed(self):
-        # We don’t yet have a way of working out the population  density
-        # of a custom area, so for now we have to use an average number
-        # to estimate the amount of bleed
-        return self.simple_polygons.bleed_by(Polygons.approx_bleed_in_degrees)
 
 
 class CustomBroadcastAreas(SerialisedModelCollection):
