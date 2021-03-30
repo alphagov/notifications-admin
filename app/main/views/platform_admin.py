@@ -274,33 +274,45 @@ def notifications_sent_by_service():
 
 @main.route("/platform-admin/reports/usage-for-all-services", methods=['GET', 'POST'])
 @user_is_platform_admin
-def usage_for_all_services():
+def get_billing_report():
     form = RequiredDateFilterForm()
 
     if form.validate_on_submit():
         start_date = form.start_date.data
         end_date = form.end_date.data
-        headers = ["organisation_id", "organisation_name", "service_id", "service_name",
-                   "sms_cost", "sms_fragments", "letter_cost", "letter_breakdown"]
-
-        result = billing_api_client.get_usage_for_all_services(start_date, end_date)
+        headers = [
+            "organisation_id", "organisation_name", "service_id", "service_name",
+            "sms_cost", "sms_fragments", "letter_cost", "letter_breakdown", "purchase_order_number",
+            "contact_names", "contact_email_addresses", "billing_reference"
+        ]
+        try:
+            result = billing_api_client.get_data_for_billing_report(start_date, end_date)
+        except HTTPError as e:
+            message = 'Date must be in a single financial year.'
+            if e.status_code == 400 and e.message == message:
+                flash(message)
+                return render_template('views/platform-admin/get-billing-report.html', form=form)
+            else:
+                raise e
         rows = [
             [
-                r['organisation_id'], r["organisation_name"], r["service_id"], r["service_name"],
-                r["sms_cost"], r['sms_fragments'], r["letter_cost"], r["letter_breakdown"].strip()
+                r["organisation_id"], r["organisation_name"], r["service_id"], r["service_name"],
+                r["sms_cost"], r["sms_fragments"], r["letter_cost"], r["letter_breakdown"].strip(),
+                r.get("purchase_order_number"), r.get("contact_names"), r.get("contact_email_addresses"),
+                r.get("billing_reference")
             ]
             for r in result
         ]
         if rows:
             return Spreadsheet.from_rows([headers] + rows).as_csv_data, 200, {
                 'Content-Type': 'text/csv; charset=utf-8',
-                'Content-Disposition': 'attachment; filename="Usage for all services from {} to {}.csv"'.format(
+                'Content-Disposition': 'attachment; filename="Billing Report from {} to {}.csv"'.format(
                     start_date, end_date
                 )
             }
         else:
             flash('No results for dates')
-    return render_template('views/platform-admin/usage_for_all_services.html', form=form)
+    return render_template('views/platform-admin/get-billing-report.html', form=form)
 
 
 @main.route("/platform-admin/complaints")

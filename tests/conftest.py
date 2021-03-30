@@ -3059,11 +3059,7 @@ def os_environ():
 
 
 @pytest.fixture   # noqa (C901 too complex)
-def client_request(
-    logged_in_client,
-    mocker,
-    service_one,
-):
+def client_request(logged_in_client, mocker, service_one):  # noqa (C901 too complex)
     class ClientRequest:
 
         @staticmethod
