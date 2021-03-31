@@ -336,7 +336,7 @@ def test_phone_density(
     ),
     (
         # No population data available
-        'test-santa-claus-village-rovaniemi', 1_500, 0.01347
+        'test-santa-claus-village-rovaniemi-a', 1_500, 0.01347
     )
 ))
 def test_estimated_bleed(
