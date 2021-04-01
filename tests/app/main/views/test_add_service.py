@@ -100,22 +100,22 @@ def test_show_different_page_if_user_org_type_is_local(
     'test@example.nhs.uk',
 ))
 @pytest.mark.parametrize('inherited, posted, persisted, sms_limit', (
-    (None, 'central', 'central', 250000),
-    (None, 'nhs_central', 'nhs_central', 250000),
-    (None, 'nhs_gp', 'nhs_gp', 25000),
-    (None, 'nhs_local', 'nhs_local', 25000),
-    (None, 'local', 'local', 25000),
-    (None, 'emergency_service', 'emergency_service', 25000),
-    (None, 'school_or_college', 'school_or_college', 25000),
-    (None, 'other', 'other', 25000),
-    ('central', None, 'central', 250000),
-    ('nhs_central', None, 'nhs_central', 250000),
-    ('nhs_local', None, 'nhs_local', 25000),
-    ('local', None, 'local', 25000),
-    ('emergency_service', None, 'emergency_service', 25000),
-    ('school_or_college', None, 'school_or_college', 25000),
-    ('other', None, 'other', 25000),
-    ('central', 'local', 'central', 250000),
+    (None, 'central', 'central', 150_000),
+    (None, 'nhs_central', 'nhs_central', 150_000),
+    (None, 'nhs_gp', 'nhs_gp', 10_000),
+    (None, 'nhs_local', 'nhs_local', 25_000),
+    (None, 'local', 'local', 25_000),
+    (None, 'emergency_service', 'emergency_service', 25_000),
+    (None, 'school_or_college', 'school_or_college', 10_000),
+    (None, 'other', 'other', 10_000),
+    ('central', None, 'central', 150_000),
+    ('nhs_central', None, 'nhs_central', 150_000),
+    ('nhs_local', None, 'nhs_local', 25_000),
+    ('local', None, 'local', 25_000),
+    ('emergency_service', None, 'emergency_service', 25_000),
+    ('school_or_college', None, 'school_or_college', 10_000),
+    ('other', None, 'other', 10_000),
+    ('central', 'local', 'central', 150_000),
 ))
 @freeze_time("2021-01-01")
 def test_should_add_service_and_redirect_to_tour_when_no_services(
@@ -241,24 +241,15 @@ def test_get_should_only_show_nhs_org_types_radios_if_user_has_nhs_email(
     ]
 
 
-@pytest.mark.parametrize('financial_year, organisation_type, free_allowance', [
-    (2020, 'central', 250_000),
-    (2020, 'local', 25_000),
-    (2020, 'nhs_central', 250_000),
-    (2020, 'nhs_local', 25_000),
-    (2020, 'nhs_gp', 25_000),
-    (2020, 'school_or_college', 25_000),
-    (2020, 'emergency_service', 25_000),
-    (2020, 'other', 25_000),
-
-    (2021, 'central', 150_000),
-    (2021, 'local', 25_000),
-    (2021, 'nhs_central', 150_000),
-    (2021, 'nhs_local', 25_000),
-    (2021, 'nhs_gp', 10_000),
-    (2021, 'school_or_college', 10_000),
-    (2021, 'emergency_service', 25_000),
-    (2021, 'other', 10_000),
+@pytest.mark.parametrize('organisation_type, free_allowance', [
+    ('central', 150_000),
+    ('local', 25_000),
+    ('nhs_central', 150_000),
+    ('nhs_local', 25_000),
+    ('nhs_gp', 10_000),
+    ('school_or_college', 10_000),
+    ('emergency_service', 25_000),
+    ('other', 10_000),
 ])
 def test_should_add_service_and_redirect_to_dashboard_when_existing_service(
     app_,
@@ -273,13 +264,7 @@ def test_should_add_service_and_redirect_to_dashboard_when_existing_service(
     free_allowance,
     mock_create_or_update_free_sms_fragment_limit,
     mock_get_all_email_branding,
-    financial_year,
 ):
-    mocker.patch(
-        'app.main.views.add_service.get_current_financial_year',
-        return_value=financial_year,
-    )
-
     client_request.post(
         'main.add_service',
         _data={

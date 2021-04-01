@@ -33,38 +33,14 @@ class Config(object):
     AWS_REGION = 'eu-west-1'
     DEFAULT_SERVICE_LIMIT = 50
     DEFAULT_FREE_SMS_FRAGMENT_LIMITS = {
-        'central': {
-            2020: 250_000,
-            2021: 150_000,
-        },
-        'local': {
-            2020: 25_000,
-            2021: 25_000,
-        },
-        'nhs_central': {
-            2020: 250_000,
-            2021: 150_000,
-        },
-        'nhs_local': {
-            2020: 25_000,
-            2021: 25_000,
-        },
-        'nhs_gp': {
-            2020: 25_000,
-            2021: 10_000,
-        },
-        'emergency_service': {
-            2020: 25_000,
-            2021: 25_000,
-        },
-        'school_or_college': {
-            2020: 25_000,
-            2021: 10_000,
-        },
-        'other': {
-            2020: 25_000,
-            2021: 10_000,
-        },
+        'central': 150_000,
+        'local': 25_000,
+        'nhs_central': 150_000,
+        'nhs_local': 25_000,
+        'nhs_gp': 10_000,
+        'emergency_service': 25_000,
+        'school_or_college': 10_000,
+        'other': 10_000,
     }
     EMAIL_EXPIRY_SECONDS = 3600  # 1 hour
     INVITATION_EXPIRY_SECONDS = 3600 * 24 * 2  # 2 days - also set on api
