@@ -1109,6 +1109,31 @@ def platform_admin_user(fake_uuid):
 
 
 @pytest.fixture(scope='function')
+def platform_admin_user_no_service_permissions():
+    """
+    this fixture is for situations where we want to test that platform admin can access
+    an endpoint even though they have no explicit permissions for that service.
+    """
+    user_data = {'id': uuid4(),
+                 'name': 'Platform admin user no service permissions',
+                 'password': 'somepassword',
+                 'email_address': 'platform2@admin.gov.uk',
+                 'mobile_number': '07700 900763',
+                 'state': 'active',
+                 'failed_login_count': 0,
+                 'permissions': {},
+                 'platform_admin': True,
+                 'auth_type': 'sms_auth',
+                 'password_changed_at': str(datetime.utcnow()),
+                 'services': [],
+                 'organisations': [],
+                 'current_session_id': None,
+                 'logged_in_at': None,
+                 }
+    return user_data
+
+
+@pytest.fixture(scope='function')
 def api_user_active(fake_uuid):
     user_data = {'id': fake_uuid,
                  'name': 'Test User',
