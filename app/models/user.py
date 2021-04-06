@@ -652,6 +652,12 @@ class Users(ModelList):
         for user in self:
             if user.id == id:
                 return user.name
+        # The user may not exist in the list of users for this service if they are
+        # a platform admin or if they have since left the team. In this case, we fall
+        # back to getting the user from the API (or Redis if it is in the cache)
+        user = User.from_id(id)
+        if user and user.name:
+            return user.name
         return 'Unknown'
 
 

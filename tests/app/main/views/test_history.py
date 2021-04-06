@@ -36,7 +36,7 @@ from tests.conftest import SERVICE_ONE_ID, normalize_spaces
                 'Created an API key called ‘Good key’ '
                 'Test User 10:09am '
                 'Created an API key called ‘Key event returned in non-chronological order’ '
-                'Unknown 2:01am '
+                'Test User 2:01am '
                 'Created this service and called it ‘Example service’'
             ),
         ),
@@ -79,7 +79,7 @@ from tests.conftest import SERVICE_ONE_ID, normalize_spaces
         (
             '10 October 2010',
             (
-                'Unknown 2:01am '
+                'Test User 2:01am '
                 'Created this service and called it ‘Example service’'
             ),
         ),
