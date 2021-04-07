@@ -32,16 +32,7 @@ class Config(object):
     ASSETS_DEBUG = False
     AWS_REGION = 'eu-west-1'
     DEFAULT_SERVICE_LIMIT = 50
-    DEFAULT_FREE_SMS_FRAGMENT_LIMITS = {
-        'central': 150_000,
-        'local': 25_000,
-        'nhs_central': 150_000,
-        'nhs_local': 25_000,
-        'nhs_gp': 10_000,
-        'emergency_service': 25_000,
-        'school_or_college': 10_000,
-        'other': 10_000,
-    }
+
     EMAIL_EXPIRY_SECONDS = 3600  # 1 hour
     INVITATION_EXPIRY_SECONDS = 3600 * 24 * 2  # 2 days - also set on api
     EMAIL_2FA_EXPIRY_SECONDS = 1800  # 30 Minutes

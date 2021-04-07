@@ -125,7 +125,6 @@ def test_should_add_service_and_redirect_to_tour_when_no_services(
     mock_create_service_template,
     mock_get_services_with_no_services,
     api_user_active,
-    mock_create_or_update_free_sms_fragment_limit,
     mock_get_all_email_branding,
     inherited,
     email_address,
@@ -172,7 +171,6 @@ def test_should_add_service_and_redirect_to_tour_when_no_services(
         101,
     )
     assert session['service_id'] == 101
-    mock_create_or_update_free_sms_fragment_limit.assert_called_once_with(101, sms_limit)
 
 
 def test_add_service_has_to_choose_org_type(
@@ -182,7 +180,6 @@ def test_add_service_has_to_choose_org_type(
     mock_create_service_template,
     mock_get_services_with_no_services,
     api_user_active,
-    mock_create_or_update_free_sms_fragment_limit,
     mock_get_all_email_branding,
 ):
     mocker.patch(
@@ -201,7 +198,6 @@ def test_add_service_has_to_choose_org_type(
     )
     assert mock_create_service.called is False
     assert mock_create_service_template.called is False
-    assert mock_create_or_update_free_sms_fragment_limit.called is False
 
 
 @pytest.mark.parametrize('email_address', (
@@ -262,7 +258,6 @@ def test_should_add_service_and_redirect_to_dashboard_when_existing_service(
     api_user_active,
     organisation_type,
     free_allowance,
-    mock_create_or_update_free_sms_fragment_limit,
     mock_get_all_email_branding,
 ):
     client_request.post(
@@ -287,7 +282,6 @@ def test_should_add_service_and_redirect_to_dashboard_when_existing_service(
         user_id=api_user_active['id'],
         email_from='testing.the.post',
     )
-    mock_create_or_update_free_sms_fragment_limit.assert_called_once_with(101, free_allowance)
     assert len(mock_create_service_template.call_args_list) == 0
     assert session['service_id'] == 101
 
