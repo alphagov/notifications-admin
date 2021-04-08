@@ -147,6 +147,10 @@ class MainNavigation(Navigation):
             'broadcast_dashboard_previous',
             'view_previous_broadcast',
         },
+        'rejected-broadcasts': {
+            'broadcast_dashboard_rejected',
+            'view_rejected_broadcast',
+        },
         'templates': {
             'action_blocked',
             'add_service_template',

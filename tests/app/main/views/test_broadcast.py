@@ -358,7 +358,7 @@ def test_broadcast_dashboard(
 
 
 @pytest.mark.parametrize('endpoint', (
-    '.broadcast_dashboard', '.broadcast_dashboard_previous',
+    '.broadcast_dashboard', '.broadcast_dashboard_previous', '.broadcast_dashboard_rejected',
 ))
 def test_broadcast_dashboard_does_not_have_button_for_view_only_user(
     client_request,
@@ -420,8 +420,42 @@ def test_previous_broadcasts_page(
         normalize_spaces(row.text)
         for row in page.select('.ajax-block-container')[0].select('.file-list')
     ] == [
-        'Example template This is a test Broadcast yesterday at 2:20pm England Scotland',
-        'Example template This is a test Broadcast yesterday at 2:20am England Scotland',
+        'Example template This is a test Yesterday at 2:20pm England Scotland',
+        'Example template This is a test Yesterday at 2:20am England Scotland',
+    ]
+
+    button = page.select_one(
+        '.js-stick-at-bottom-when-scrolling a.govuk-button.govuk-button--secondary'
+    )
+    assert normalize_spaces(button.text) == 'New alert'
+    assert button['href'] == url_for(
+        'main.new_broadcast',
+        service_id=SERVICE_ONE_ID,
+    )
+
+
+@freeze_time('2020-02-20 02:20')
+def test_rejected_broadcasts_page(
+    client_request,
+    service_one,
+    mock_get_broadcast_messages,
+    mock_get_service_templates,
+):
+    service_one['permissions'] += ['broadcast']
+    page = client_request.get(
+        '.broadcast_dashboard_rejected',
+        service_id=SERVICE_ONE_ID,
+    )
+
+    assert normalize_spaces(page.select_one('main h1').text) == (
+        'Rejected alerts'
+    )
+    assert len(page.select('.ajax-block-container')) == 1
+    assert [
+        normalize_spaces(row.text)
+        for row in page.select('.ajax-block-container')[0].select('.file-list')
+    ] == [
+        'Example template This is a test Today at 1:20am England Scotland',
     ]
 
     button = page.select_one(
@@ -1370,6 +1404,13 @@ def test_start_broadcasting(
         'Prepared by Alice and approved by Bob.',
         'Stopped by Carol yesterday at 9:21pm.',
     ]),
+    ('.view_rejected_broadcast', False, {
+        'status': 'rejected',
+        'updated_at': '2020-02-21T21:21:21.000000',
+    }, [
+        'Rejected yesterday at 9:21pm.',
+        'Prepared by Alice and approved by Bob.',
+    ]),
 ))
 @freeze_time('2020-02-22T22:22:22.000000')
 def test_view_broadcast_message_page(
@@ -1418,6 +1459,7 @@ def test_view_broadcast_message_page(
 @pytest.mark.parametrize('endpoint', (
     '.view_current_broadcast',
     '.view_previous_broadcast',
+    '.view_rejected_broadcast',
 ))
 @pytest.mark.parametrize('status, expected_highlighted_navigation_item, expected_back_link_endpoint', (
     (
@@ -1442,8 +1484,8 @@ def test_view_broadcast_message_page(
     ),
     (
         'rejected',
-        'Previous alerts',
-        '.broadcast_dashboard_previous',
+        'Rejected alerts',
+        '.broadcast_dashboard_rejected',
     ),
 ))
 @freeze_time('2020-02-22T22:22:22.000000')
@@ -1470,6 +1512,7 @@ def test_view_broadcast_message_shows_correct_highlighted_navigation(
             starts_at='2020-02-20T20:20:20.000000',
             finishes_at='2021-12-21T21:21:21.000000',
             cancelled_at='2021-01-01T01:01:01.000000',
+            updated_at='2021-01-01T01:01:01.000000',
             status=status,
         ),
     )

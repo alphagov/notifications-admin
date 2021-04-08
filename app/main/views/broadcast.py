@@ -48,9 +48,28 @@ def broadcast_dashboard(service_id):
 def broadcast_dashboard_previous(service_id):
     return render_template(
         'views/broadcast/previous-broadcasts.html',
-        broadcasts=BroadcastMessages(service_id).with_status('cancelled', 'completed'),
+        broadcasts=BroadcastMessages(service_id).with_status(
+            'cancelled',
+            'completed',
+        ),
+        page_title='Previous alerts',
         empty_message='You do not have any previous alerts',
         view_broadcast_endpoint='.view_previous_broadcast',
+    )
+
+
+@main.route('/services/<uuid:service_id>/rejected-alerts')
+@user_has_permissions()
+@service_has_permission('broadcast')
+def broadcast_dashboard_rejected(service_id):
+    return render_template(
+        'views/broadcast/previous-broadcasts.html',
+        broadcasts=BroadcastMessages(service_id).with_status(
+            'rejected',
+        ),
+        page_title='Rejected alerts',
+        empty_message='You do not have any rejected alerts',
+        view_broadcast_endpoint='.view_rejected_broadcast',
     )
 
 
@@ -340,6 +359,10 @@ def preview_broadcast_message(service_id, broadcast_message_id):
     '/services/<uuid:service_id>/previous-alerts/<uuid:broadcast_message_id>',
     endpoint='view_previous_broadcast',
 )
+@main.route(
+    '/services/<uuid:service_id>/rejected-alerts/<uuid:broadcast_message_id>',
+    endpoint='view_rejected_broadcast',
+)
 @user_has_permissions()
 @service_has_permission('broadcast')
 def view_broadcast(service_id, broadcast_message_id):
@@ -350,29 +373,25 @@ def view_broadcast(service_id, broadcast_message_id):
     if broadcast_message.status == 'draft':
         abort(404)
 
-    if (
-        broadcast_message.status in {'completed', 'cancelled', 'rejected'}
-        and request.endpoint != 'main.view_previous_broadcast'
+    for statuses, endpoint in (
+        ({'completed', 'cancelled'}, 'main.view_previous_broadcast'),
+        ({'broadcasting', 'pending-approval'}, 'main.view_current_broadcast'),
+        ({'rejected'}, 'main.view_rejected_broadcast'),
     ):
-        return redirect(url_for(
-            '.view_previous_broadcast',
-            service_id=current_service.id,
-            broadcast_message_id=broadcast_message.id,
-        ))
-
-    if (
-        broadcast_message.status in {'broadcasting', 'pending-approval'}
-        and request.endpoint != 'main.view_current_broadcast'
-    ):
-        return redirect(url_for(
-            '.view_current_broadcast',
-            service_id=current_service.id,
-            broadcast_message_id=broadcast_message.id,
-        ))
+        if (
+            broadcast_message.status in statuses
+            and request.endpoint != endpoint
+        ):
+            return redirect(url_for(
+                endpoint,
+                service_id=current_service.id,
+                broadcast_message_id=broadcast_message.id,
+            ))
 
     back_link_endpoint = {
         'main.view_current_broadcast': '.broadcast_dashboard',
         'main.view_previous_broadcast': '.broadcast_dashboard_previous',
+        'main.view_rejected_broadcast': '.broadcast_dashboard_rejected',
     }[request.endpoint]
 
     return render_template(

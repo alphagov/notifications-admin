@@ -158,7 +158,7 @@ class BroadcastMessage(JSONModel):
 
     @cached_property
     def approved_by(self):
-        return User.from_id(self.approved_by_id)
+        return User.from_id(self.approved_by_id) if self.approved_by_id else None
 
     @cached_property
     def cancelled_by(self):

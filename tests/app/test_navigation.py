@@ -36,6 +36,7 @@ EXCLUDED_ENDPOINTS = tuple(map(Navigation.get_endpoint_with_blueprint, {
     'broadcast',
     'broadcast_dashboard',
     'broadcast_dashboard_previous',
+    'broadcast_dashboard_rejected',
     'broadcast_dashboard_updates',
     'broadcast_tour',
     'callbacks',
@@ -326,6 +327,7 @@ EXCLUDED_ENDPOINTS = tuple(map(Navigation.get_endpoint_with_blueprint, {
     'view_previous_broadcast',
     'view_provider',
     'view_providers',
+    'view_rejected_broadcast',
     'view_template',
     'view_template_version',
     'view_template_versions',
@@ -493,6 +495,7 @@ def test_navigation_for_services_with_broadcast_permission(
     ] == [
         '/services/{}/current-alerts'.format(SERVICE_ONE_ID),
         '/services/{}/previous-alerts'.format(SERVICE_ONE_ID),
+        '/services/{}/rejected-alerts'.format(SERVICE_ONE_ID),
         '/services/{}/templates'.format(SERVICE_ONE_ID),
         '/services/{}/users'.format(SERVICE_ONE_ID),
         '/services/{}/service-settings'.format(SERVICE_ONE_ID),
