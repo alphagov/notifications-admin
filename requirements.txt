@@ -118,7 +118,7 @@ packaging==20.9
     # via bleach
 phonenumbers==8.12.20
     # via notifications-utils
-prometheus-client==0.10.0
+prometheus-client==0.9.0
     # via
     #   -r requirements.in
     #   gds-metrics
