@@ -20,7 +20,7 @@
             </p>
           {% elif item.status == 'rejected' %}
             <p class="govuk-body govuk-!-margin-bottom-0 govuk-hint">
-              Rejected {{ item.updated_at|format_datetime_relative }}
+              {{ item.updated_at|format_date_human|title }} at {{ item.updated_at|format_time }}
             </p>
           {% elif item.status == 'broadcasting' %}
             <p class="govuk-body govuk-!-margin-bottom-0 live-broadcast">
@@ -28,7 +28,7 @@
             </p>
           {% else %}
             <p class="govuk-body govuk-!-margin-bottom-0 govuk-hint">
-              Broadcast {{ item.starts_at|format_datetime_relative }}
+              {{ item.starts_at|format_date_human|title }} at {{ item.starts_at|format_time }}
             </p>
           {% endif %}
         </div>
