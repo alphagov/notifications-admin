@@ -1404,6 +1404,13 @@ def test_start_broadcasting(
         'Prepared by Alice and approved by Bob.',
         'Stopped by Carol yesterday at 9:21pm.',
     ]),
+    ('.view_rejected_broadcast', False, {
+        'status': 'rejected',
+        'updated_at': '2020-02-21T21:21:21.000000',
+    }, [
+        'Rejected yesterday at 9:21pm.',
+        'Prepared by Alice and approved by Bob.',
+    ]),
 ))
 @freeze_time('2020-02-22T22:22:22.000000')
 def test_view_broadcast_message_page(
@@ -1505,6 +1512,7 @@ def test_view_broadcast_message_shows_correct_highlighted_navigation(
             starts_at='2020-02-20T20:20:20.000000',
             finishes_at='2021-12-21T21:21:21.000000',
             cancelled_at='2021-01-01T01:01:01.000000',
+            updated_at='2021-01-01T01:01:01.000000',
             status=status,
         ),
     )

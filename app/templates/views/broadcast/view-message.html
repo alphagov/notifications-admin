@@ -116,6 +116,11 @@
           <a href="{{ url_for('.cancel_broadcast_message', service_id=current_service.id, broadcast_message_id=broadcast_message.id) }}" class="destructive-link destructive-link--no-visited-state">Stop broadcasting</a>
         {% endif %}
       </p>
+    {% elif broadcast_message.status == 'rejected' %}
+      <p class="govuk-body govuk-!-margin-bottom-4">
+        Rejected
+        {{ broadcast_message.updated_at|format_datetime_human }}.
+      </p>
     {% else %}
       <p class="govuk-body govuk-!-margin-bottom-4">
         Broadcast
@@ -150,10 +155,13 @@
     <p class="govuk-body govuk-!-margin-bottom-3">
       {% if broadcast_message.created_by %}
         Prepared by {{ broadcast_message.created_by.name }}
-      {% else %}
+      {%- else %}
         Created from an API call
-      {% endif %}
-      and approved by {{ broadcast_message.approved_by.name }}.
+      {%- endif %}
+      {%- if broadcast_message.approved_by %}
+        and approved by {{ broadcast_message.approved_by.name }}
+      {%- endif %}
+      {{- '.' }}
     </p>
   {% endif %}
 
