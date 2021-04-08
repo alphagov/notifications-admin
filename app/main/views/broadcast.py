@@ -53,6 +53,7 @@ def broadcast_dashboard_previous(service_id):
             'completed',
             'rejected',
         ),
+        page_title='Previous alerts',
         empty_message='You do not have any previous alerts',
         view_broadcast_endpoint='.view_previous_broadcast',
     )

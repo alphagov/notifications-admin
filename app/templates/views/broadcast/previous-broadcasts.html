@@ -4,12 +4,12 @@
 {% extends "withnav_template.html" %}
 
 {% block service_page_title %}
-  Previous alerts
+  {{ page_title }}
 {% endblock %}
 
 {% block maincolumn_content %}
 
-  <h1 class="heading-medium">Previous alerts</h1>
+  <h1 class="heading-medium">{{ page_title }}</h1>
 
   {% include('views/broadcast/partials/dashboard-table.html') %}
 
