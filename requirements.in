@@ -3,7 +3,7 @@
 
 ago==0.0.93
 govuk-bank-holidays==0.8
-humanize==3.3.0
+humanize==3.4.0
 Flask==1.1.2
 Flask-WTF==0.14.3
 Flask-Login==0.5.0
