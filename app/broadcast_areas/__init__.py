@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 from notifications_utils.formatters import formatted_list
 from notifications_utils.polygons import Polygons
 from notifications_utils.serialised_model import SerialisedModelCollection
+from rtreelib import Rect
 from werkzeug.utils import cached_property
 
 from .populations import CITY_OF_LONDON
@@ -157,9 +158,11 @@ class CustomBroadcastArea(BaseBroadcastArea):
     def overlapping_areas(self):
         if not self.polygons:
             return []
-        return broadcast_area_libraries.get_areas(
-            *rtree_index.intersection(self.polygons.bounds, objects='raw')
-        )
+        return broadcast_area_libraries.get_areas([
+            overlap.data for overlap in rtree_index.query(
+                Rect(*self.polygons.bounds)
+            )
+        ])
 
     @cached_property
     def count_of_phones(self):
