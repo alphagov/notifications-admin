@@ -51,6 +51,7 @@ def test_should_show_empty_page_when_no_templates(
     service_one,
     mock_get_service_templates_when_no_templates_exist,
     mock_get_template_folders,
+    mock_get_no_api_keys,
     permissions,
     expected_message,
 ):
@@ -77,6 +78,7 @@ def test_should_show_add_template_form_if_service_has_folder_permission(
     service_one,
     mock_get_service_templates_when_no_templates_exist,
     mock_get_template_folders,
+    mock_get_no_api_keys,
 ):
     page = client_request.get(
         'main.choose_template',
@@ -164,6 +166,7 @@ def test_should_show_page_for_choosing_a_template(
     mock_get_service_templates,
     mock_get_template_folders,
     mock_has_no_jobs,
+    mock_get_no_api_keys,
     extra_args,
     expected_nav_links,
     expected_templates,
@@ -207,6 +210,7 @@ def test_should_show_page_of_broadcast_templates(
     service_one,
     fake_uuid,
     mock_get_template_folders,
+    mock_get_no_api_keys,
 ):
     service_one['permissions'] += ['broadcast']
     mocker.patch(
@@ -274,6 +278,7 @@ def test_choose_template_can_pass_through_an_initial_state_to_templates_and_fold
     client_request,
     mock_get_template_folders,
     mock_get_service_templates,
+    mock_get_no_api_keys,
 ):
     page = client_request.get(
         'main.choose_template',
@@ -289,6 +294,7 @@ def test_should_not_show_template_nav_if_only_one_type_of_template(
     client_request,
     mock_get_template_folders,
     mock_get_service_templates_with_only_one_template,
+    mock_get_no_api_keys,
 ):
 
     page = client_request.get(
@@ -302,7 +308,8 @@ def test_should_not_show_template_nav_if_only_one_type_of_template(
 def test_should_not_show_live_search_if_list_of_templates_fits_onscreen(
     client_request,
     mock_get_template_folders,
-    mock_get_service_templates
+    mock_get_service_templates,
+    mock_get_no_api_keys,
 ):
 
     page = client_request.get(
@@ -316,7 +323,8 @@ def test_should_not_show_live_search_if_list_of_templates_fits_onscreen(
 def test_should_show_live_search_if_list_of_templates_taller_than_screen(
     client_request,
     mock_get_template_folders,
-    mock_get_more_service_templates_than_can_fit_onscreen
+    mock_get_more_service_templates_than_can_fit_onscreen,
+    mock_get_no_api_keys,
 ):
 
     page = client_request.get(
@@ -327,14 +335,33 @@ def test_should_show_live_search_if_list_of_templates_taller_than_screen(
 
     assert search['data-module'] == 'live-search'
     assert search['data-targets'] == '#template-list .template-list-item'
+    assert normalize_spaces(search.select_one('label').text) == (
+        'Search by name'
+    )
 
     assert len(page.select(search['data-targets'])) == len(page.select('#template-list .govuk-label')) == 14
+
+
+def test_should_label_search_by_id_for_services_with_api_keys(
+    client_request,
+    mock_get_template_folders,
+    mock_get_more_service_templates_than_can_fit_onscreen,
+    mock_get_api_keys,
+):
+    page = client_request.get(
+        'main.choose_template',
+        service_id=SERVICE_ONE_ID,
+    )
+    assert normalize_spaces(page.select_one('.live-search label').text) == (
+        'Search by name or ID'
+    )
 
 
 def test_should_show_live_search_if_service_has_lots_of_folders(
     client_request,
     mock_get_template_folders,
     mock_get_service_templates,  # returns 4 templates
+    mock_get_no_api_keys,
 ):
 
     mock_get_template_folders.return_value = [
@@ -390,6 +417,7 @@ def test_should_show_new_template_choices_if_service_has_folder_permission(
     service_one,
     mock_get_service_templates,
     mock_get_template_folders,
+    mock_get_no_api_keys,
     service_permissions,
     expected_values,
     expected_labels,
@@ -427,6 +455,7 @@ def test_should_add_data_attributes_for_services_that_only_allow_one_type_of_not
     service_one,
     mock_get_service_templates,
     mock_get_template_folders,
+    mock_get_no_api_keys,
     permissions,
     are_data_attrs_added
 ):
@@ -1129,6 +1158,7 @@ def test_choose_a_template_to_copy(
     client_request,
     mock_get_service_templates,
     mock_get_template_folders,
+    mock_get_no_api_keys,
     mock_get_just_services_for_user,
 ):
     page = client_request.get(
@@ -1226,6 +1256,7 @@ def test_choose_a_template_to_copy_when_user_has_one_service(
     client_request,
     mock_get_service_templates,
     mock_get_template_folders,
+    mock_get_no_api_keys,
     mock_get_empty_organisations_and_one_service_for_user,
 ):
     page = client_request.get(
@@ -1281,6 +1312,7 @@ def test_choose_a_template_to_copy_from_folder_within_service(
     client_request,
     mock_get_template_folders,
     mock_get_non_empty_organisations_and_services_for_user,
+    mock_get_no_api_keys,
 ):
     mock_get_template_folders.return_value = [
         _folder('Parent folder', PARENT_FOLDER_ID),
@@ -2169,7 +2201,8 @@ def test_route_permissions_for_choose_template(
     api_user_active,
     mock_get_template_folders,
     service_one,
-    mock_get_service_templates
+    mock_get_service_templates,
+    mock_get_no_api_keys,
 ):
     mocker.patch('app.job_api_client.get_job')
     validate_route_permission(

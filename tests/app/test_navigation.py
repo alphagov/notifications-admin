@@ -417,6 +417,7 @@ def test_a_page_should_nave_selected_navigation_item(
     mock_get_users_by_service,
     mock_get_invites_for_service,
     mock_get_template_folders,
+    mock_get_api_keys,
     endpoint,
     selected_nav_item,
 ):
@@ -467,6 +468,7 @@ def test_navigation_urls(
     client_request,
     mock_get_service_templates,
     mock_get_template_folders,
+    mock_get_api_keys,
 ):
     page = client_request.get('main.choose_template', service_id=SERVICE_ONE_ID)
     assert [
@@ -487,6 +489,7 @@ def test_navigation_for_services_with_broadcast_permission(
     service_one,
     mock_get_service_templates,
     mock_get_template_folders,
+    mock_get_api_keys,
 ):
     service_one['permissions'] += ['broadcast']
     page = client_request.get('main.choose_template', service_id=SERVICE_ONE_ID)
@@ -508,6 +511,7 @@ def test_caseworkers_get_caseworking_navigation(
     mock_get_template_folders,
     mock_get_service_templates,
     mock_has_no_jobs,
+    mock_get_api_keys,
     active_caseworking_user,
 ):
     mocker.patch(
@@ -527,6 +531,7 @@ def test_caseworkers_see_jobs_nav_if_jobs_exist(
     mock_get_template_folders,
     mock_has_jobs,
     active_caseworking_user,
+    mock_get_api_keys,
 ):
     mocker.patch(
         'app.user_api_client.get_user',

@@ -1924,6 +1924,17 @@ class SearchNotificationsForm(StripWhitespaceForm):
         )
 
 
+class SearchTemplatesForm(StripWhitespaceForm):
+
+    search = GovukSearchField()
+
+    def __init__(self, api_keys, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.search.label.text = (
+            'Search by name or ID' if api_keys else 'Search by name'
+        )
+
+
 class PlaceholderForm(StripWhitespaceForm):
 
     pass

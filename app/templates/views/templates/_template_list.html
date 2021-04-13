@@ -42,7 +42,12 @@
           </a>
         {% else %}
           <a href="{{ url_for('.view_template', service_id=current_service.id, template_id=item.id) }}" class="govuk-link govuk-link--no-visited-state template-list-template">
-            <span class="live-search-relevant">{{- format_item_name(item.name) -}}</span>
+            <span class="live-search-relevant">
+              {%- if current_service.api_keys -%}
+                <span class="govuk-!-display-none">{{ item.id }} </span>
+              {%- endif -%}
+              {{- format_item_name(item.name) -}}
+            </span>
           </a>
         {% endif %}
       {% endset %}
