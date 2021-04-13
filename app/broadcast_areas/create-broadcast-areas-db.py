@@ -15,7 +15,7 @@ from populations import (
     SMARTPHONE_OWNERSHIP_BY_AGE_RANGE,
     estimate_number_of_smartphones_for_population,
 )
-from repo import BroadcastAreasRepository
+from repo import BroadcastAreasRepository, rtree_index
 
 source_files_path = Path(__file__).resolve().parent / 'source_files'
 point_counts = []
@@ -227,7 +227,7 @@ def add_wards_local_authorities_and_counties():
 def _add_electoral_wards(dataset_id):
     areas_to_add = []
 
-    for feature in geojson.loads(wd20_filepath.read_text())["features"]:
+    for index, feature in enumerate(geojson.loads(wd20_filepath.read_text())["features"]):
         ward_code = feature["properties"]["wd20cd"]
         ward_name = feature["properties"]["wd20nm"]
         ward_id = "wd20-" + ward_code
@@ -241,6 +241,9 @@ def _add_electoral_wards(dataset_id):
             feature, simple_feature = (
                 polygons_and_simplified_polygons(feature["geometry"])
             )
+
+            if feature:
+                rtree_index.insert(index, Polygons(feature).bounds, obj=ward_id)
 
             areas_to_add.append([
                 ward_id, ward_name,
@@ -337,4 +340,6 @@ print(  # noqa: T001
     'DONE\n'
     f'    Processed {len(point_counts):,} polygons.\n'
     f'    Highest point counts once simplifed: {most_detailed_polygons}\n'
+    f'    RTree bounds: {rtree_index.bounds}\n'
+    f'    Number of objects in Rtree: {rtree_index.get_size():,}\n'
 )

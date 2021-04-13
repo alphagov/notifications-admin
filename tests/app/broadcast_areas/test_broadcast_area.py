@@ -1,9 +1,11 @@
 from math import isclose
 
 import pytest
+from custom_polygons import BRISTOL, SKYE
 
 from app.broadcast_areas import (
     BroadcastAreasRepository,
+    CustomBroadcastArea,
     broadcast_area_libraries,
 )
 from app.broadcast_areas.populations import (
@@ -350,3 +352,50 @@ def test_estimated_bleed(
         broadcast_area_libraries.get_areas(area)[0].estimated_bleed_in_degrees,
         expected_bleed_in_degrees,
     )
+
+
+@pytest.mark.parametrize('polygon, expected_possible_overlaps, expected_count_of_phones', (
+    (
+        BRISTOL,
+        [
+            'Ashley',
+            'Bedminster',
+            'Central',
+            'Clifton',
+            'Clifton Down',
+            'Cotham',
+            'Hotwells and Harbourside',
+            'Knowle',
+            'Lawrence Hill',
+            'Southville',
+            'Stoke Bishop',
+            'Windmill Hill',
+        ],
+        73_496,
+    ),
+    (
+        SKYE,
+        [
+            'Caol and Mallaig',
+            'Eilean á Chèo',
+            'Na Hearadh agus Ceann a Deas nan Loch',
+            'Wester Ross, Strathpeffer and Lochalsh',
+        ],
+        3_517,
+    ),
+))
+def test_count_of_phones_for_custom_area(
+    polygon,
+    expected_possible_overlaps,
+    expected_count_of_phones,
+):
+    area = CustomBroadcastArea(
+        name='Example',
+        polygons=[polygon],
+    )
+
+    assert sorted(
+        overlap.name for overlap in area.overlapping_areas
+    ) == expected_possible_overlaps
+
+    assert close_enough(area.count_of_phones, expected_count_of_phones)

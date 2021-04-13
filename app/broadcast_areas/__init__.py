@@ -7,7 +7,7 @@ from notifications_utils.serialised_model import SerialisedModelCollection
 from werkzeug.utils import cached_property
 
 from .populations import CITY_OF_LONDON
-from .repo import BroadcastAreasRepository
+from .repo import BroadcastAreasRepository, rtree_index
 
 
 class SortableMixin:
@@ -139,10 +139,6 @@ class BroadcastArea(BaseBroadcastArea, SortableMixin):
 
 class CustomBroadcastArea(BaseBroadcastArea):
 
-    # We don’t yet have a way to estimate the number of phones in a
-    # user-defined polygon
-    count_of_phones = 0
-
     def __init__(self, *, name, polygons=None):
         self.name = name
         self._polygons = polygons or []
@@ -156,6 +152,21 @@ class CustomBroadcastArea(BaseBroadcastArea):
         )
 
     simple_polygons = polygons
+
+    @property
+    def overlapping_areas(self):
+        if not self.polygons:
+            return []
+        return broadcast_area_libraries.get_areas(
+            *rtree_index.intersection(self.polygons.bounds, objects='raw')
+        )
+
+    @cached_property
+    def count_of_phones(self):
+        return sum(
+            area.polygons.ratio_of_intersection_with(self.polygons) * area.count_of_phones
+            for area in self.overlapping_areas
+        )
 
 
 class CustomBroadcastAreas(SerialisedModelCollection):
