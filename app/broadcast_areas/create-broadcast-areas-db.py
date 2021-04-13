@@ -17,7 +17,7 @@ from populations import (
     estimate_number_of_smartphones_for_population,
 )
 from repo import BroadcastAreasRepository, rtree_index_path
-from rtreelib import RTree, Rect
+from rtreelib import Rect, RTree
 
 source_files_path = Path(__file__).resolve().parent / 'source_files'
 point_counts = []
