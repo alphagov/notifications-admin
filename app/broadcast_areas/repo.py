@@ -1,14 +1,11 @@
 import json
 import os
+import pickle
 import sqlite3
 from pathlib import Path
 
-from rtree import index
-
-rtree_index = index.Rtree(
-    str((Path(__file__).parent / 'rtree').absolute()),
-    interleaved=True,
-)
+rtree_index_path = Path(__file__).parent / 'rtree.pickle'
+rtree_index = pickle.loads(rtree_index_path.read_bytes())
 
 
 class BroadcastAreasRepository(object):

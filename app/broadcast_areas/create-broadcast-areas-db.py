@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import csv
+import pickle
 import sys
 from pathlib import Path
 
@@ -15,10 +16,12 @@ from populations import (
     SMARTPHONE_OWNERSHIP_BY_AGE_RANGE,
     estimate_number_of_smartphones_for_population,
 )
-from repo import BroadcastAreasRepository, rtree_index
+from repo import BroadcastAreasRepository, rtree_index_path
+from rtreelib import RTree, Rect
 
 source_files_path = Path(__file__).resolve().parent / 'source_files'
 point_counts = []
+rtree_index = RTree()
 
 
 def simplify_geometry(feature):
@@ -227,7 +230,7 @@ def add_wards_local_authorities_and_counties():
 def _add_electoral_wards(dataset_id):
     areas_to_add = []
 
-    for index, feature in enumerate(geojson.loads(wd20_filepath.read_text())["features"]):
+    for feature in geojson.loads(wd20_filepath.read_text())["features"]:
         ward_code = feature["properties"]["wd20cd"]
         ward_name = feature["properties"]["wd20nm"]
         ward_id = "wd20-" + ward_code
@@ -243,7 +246,7 @@ def _add_electoral_wards(dataset_id):
             )
 
             if feature:
-                rtree_index.insert(index, Polygons(feature).bounds, obj=ward_id)
+                rtree_index.insert(ward_id, Rect(*Polygons(feature).bounds))
 
             areas_to_add.append([
                 ward_id, ward_name,
@@ -255,6 +258,7 @@ def _add_electoral_wards(dataset_id):
         except KeyError:
             print("Skipping", ward_code, ward_name)  # noqa: T001
 
+    rtree_index_path.open('wb').write(pickle.dumps(rtree_index))
     repo.insert_broadcast_areas(areas_to_add, keep_old_polygons)
 
 
@@ -340,6 +344,4 @@ print(  # noqa: T001
     'DONE\n'
     f'    Processed {len(point_counts):,} polygons.\n'
     f'    Highest point counts once simplifed: {most_detailed_polygons}\n'
-    f'    RTree bounds: {rtree_index.bounds}\n'
-    f'    Number of objects in Rtree: {rtree_index.get_size():,}\n'
 )
