@@ -8,7 +8,7 @@ ago==0.0.93
     # via -r requirements.in
 awscli-cwlogs==1.4.6
     # via -r requirements.in
-awscli==1.19.49
+awscli==1.19.51
     # via
     #   awscli-cwlogs
     #   notifications-utils
@@ -18,9 +18,9 @@ blinker==1.4
     # via
     #   -r requirements.in
     #   gds-metrics
-boto3==1.17.49
+boto3==1.17.51
     # via notifications-utils
-botocore==1.20.49
+botocore==1.20.51
     # via
     #   awscli
     #   boto3
@@ -173,7 +173,7 @@ rsa==4.7.2
     # via awscli
 rtreelib==0.2.0
     # via -r requirements.in
-s3transfer==0.3.6
+s3transfer==0.3.7
     # via
     #   awscli
     #   boto3
