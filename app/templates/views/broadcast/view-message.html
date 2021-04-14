@@ -19,9 +19,9 @@
 
 {% block service_page_title %}
   {% if broadcast_message.status == 'pending-approval' %}
-    {% if broadcast_message.created_by and broadcast_message.created_by == current_user and current_user.has_permissions('send_messages') %}
+    {% if broadcast_message.created_by and broadcast_message.created_by == current_user and current_user.has_permissions('send_messages', restrict_admin_usage=True) %}
       {{ broadcast_message.template.name }} is waiting for approval
-    {% elif current_user.has_permissions('send_messages') %}
+    {% elif current_user.has_permissions('send_messages', restrict_admin_usage=True) %}
       {% if broadcast_message.created_by %}
         {{ broadcast_message.created_by.name }}
       {% else %}
@@ -42,7 +42,7 @@
   {{ govukBackLink({ "href": back_link }) }}
 
   {% if broadcast_message.status == 'pending-approval' %}
-    {% if broadcast_message.created_by and broadcast_message.created_by == current_user and current_user.has_permissions('send_messages') %}
+    {% if broadcast_message.created_by and broadcast_message.created_by == current_user and current_user.has_permissions('send_messages', restrict_admin_usage=True) %}
       <div class="banner govuk-!-margin-bottom-6">
         <h1 class="govuk-heading-m govuk-!-margin-bottom-3">
           {{ broadcast_message.template.name }} is waiting for approval
@@ -81,7 +81,7 @@
           </details>
         {% endif %}
       </div>
-    {% elif current_user.has_permissions('send_messages') %}
+    {% elif current_user.has_permissions('send_messages', restrict_admin_usage=True) %}
       {% call form_wrapper(class="banner govuk-!-margin-bottom-6") %}
         <h1 class="govuk-heading-m govuk-!-margin-top-0 govuk-!-margin-bottom-3">
           {% if broadcast_message.created_by %}
