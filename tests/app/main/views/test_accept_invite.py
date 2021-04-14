@@ -161,6 +161,7 @@ def test_accepting_invite_removes_invite_from_session(
     mock_get_free_sms_fragment_limit,
     mock_get_inbound_sms_summary,
     mock_get_returned_letter_statistics_with_no_returned_letters,
+    mock_get_api_keys,
     fake_uuid,
     user,
     landing_page_title,

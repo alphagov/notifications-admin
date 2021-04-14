@@ -1613,6 +1613,7 @@ def test_org_breadcrumbs_do_not_show_if_user_is_not_an_org_member(
     client_request,
     mock_get_template_folders,
     mock_get_returned_letter_statistics_with_no_returned_letters,
+    mock_get_api_keys,
 ):
     # active_caseworking_user is not an org member
 

@@ -70,6 +70,7 @@ def test_given_option_to_add_letters_if_allowed(
     mock_get_service_templates,
     mock_get_template_folders,
     mock_get_organisations_and_services_for_user,
+    mock_get_api_keys,
     permissions,
     choices,
 ):

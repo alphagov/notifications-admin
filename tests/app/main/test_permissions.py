@@ -415,6 +415,7 @@ def test_service_user_without_manage_service_permission_can_see_usage_page_when_
     mock_get_organisation,
     mock_get_service_templates,
     mock_get_template_folders,
+    mock_get_api_keys,
     user_organisations,
     expected_status,
     expected_menu_items,

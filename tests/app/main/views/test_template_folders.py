@@ -375,6 +375,7 @@ def test_should_show_templates_folder_page(
     client_request,
     mock_get_template_folders,
     mock_has_no_jobs,
+    mock_get_no_api_keys,
     service_one,
     mocker,
     expected_title_tag,
@@ -475,6 +476,71 @@ def test_should_show_templates_folder_page(
         assert not page.select('.template-list-empty')
 
     mock_get_service_templates.assert_called_once_with(SERVICE_ONE_ID)
+
+
+def test_template_id_is_searchable_for_services_with_api_keys(
+    client_request,
+    mock_get_template_folders,
+    mock_has_no_jobs,
+    mock_get_api_keys,
+    service_one,
+    mocker,
+
+):
+    mock_get_template_folders.return_value = [
+        _folder('folder one', PARENT_FOLDER_ID),
+    ]
+    template_1 = _template('sms', 'template one')
+    template_2 = _template('sms', 'template two', parent=PARENT_FOLDER_ID)
+    mocker.patch(
+        'app.service_api_client.get_service_templates',
+        return_value={'data': [
+            template_1,
+            template_2,
+        ]}
+    )
+
+    page = client_request.get(
+        'main.choose_template',
+        service_id=SERVICE_ONE_ID,
+        _test_page_title=False,
+    )
+
+    assert [
+        normalize_spaces(item.text)
+        for item in page.select(
+            # Elements which the live search will filter by
+            '.template-list-item .live-search-relevant'
+        )
+    ] == [
+        'folder one',
+        f'{template_2["id"]} template two',
+        f'{template_1["id"]} template one',
+    ]
+
+    assert [
+        normalize_spaces(item.text)
+        for item in page.select(
+            # Elements the user will see when first loading the page
+            '.template-list-item:not(.template-list-item-hidden-by-default)'
+        )
+    ] == [
+        'folder one folder one 1 template',
+        f'template one {template_1["id"]} template one Text message template',
+    ]
+
+    assert [
+        normalize_spaces(item.text)
+        for item in page.select(
+            # Text which should be hidden from all users
+            r'.template-list-item .govuk-\!-display-none'
+        )
+    ] == [
+        template_2["id"],
+        template_1["id"],
+    ]
+
+    mock_get_api_keys.assert_called_once_with(SERVICE_ONE_ID)
 
 
 def test_can_create_email_template_with_parent_folder(
@@ -968,6 +1034,7 @@ def test_should_show_checkboxes_for_selecting_templates(
     mock_get_service_templates,
     mock_get_template_folders,
     mock_has_no_jobs,
+    mock_get_no_api_keys,
     user,
 ):
     client_request.login(user)
@@ -1003,6 +1070,7 @@ def test_should_not_show_radios_and_buttons_for_move_destination_if_incorrect_pe
     mock_get_service_templates,
     mock_get_template_folders,
     mock_has_no_jobs,
+    mock_get_no_api_keys,
     user,
 ):
     client_request.login(user)
@@ -1027,6 +1095,7 @@ def test_should_show_radios_and_buttons_for_move_destination_if_correct_permissi
     mock_get_service_templates,
     mock_get_template_folders,
     mock_has_no_jobs,
+    mock_get_no_api_keys,
     fake_uuid,
     active_user_with_permissions
 ):
@@ -1070,6 +1139,7 @@ def test_move_to_shouldnt_select_a_folder_by_default(
     mock_get_service_templates,
     mock_get_template_folders,
     mock_has_no_jobs,
+    mock_get_no_api_keys,
     fake_uuid,
     active_user_with_permissions
 ):
@@ -1168,6 +1238,7 @@ def test_move_folder_form_shows_current_folder_hint_when_in_a_folder(
     service_one,
     mock_get_service_templates,
     mock_get_template_folders,
+    mock_get_no_api_keys,
 ):
     mock_get_template_folders.return_value = [
         _folder('parent_folder', PARENT_FOLDER_ID, None),
@@ -1195,6 +1266,7 @@ def test_move_folder_form_does_not_show_current_folder_hint_at_the_top_level(
     service_one,
     mock_get_service_templates,
     mock_get_template_folders,
+    mock_get_no_api_keys,
 ):
     mock_get_template_folders.return_value = [
         _folder('parent_folder', PARENT_FOLDER_ID, None),
@@ -1306,6 +1378,7 @@ def test_no_action_if_user_fills_in_ambiguous_fields(
     mock_get_template_folders,
     mock_move_to_template_folder,
     mock_create_template_folder,
+    mock_get_no_api_keys,
     data,
 ):
     service_one['permissions'] += ['letter']
@@ -1434,6 +1507,7 @@ def test_radio_button_with_no_value_shows_custom_error_message(
     mock_get_template_folders,
     mock_move_to_template_folder,
     mock_create_template_folder,
+    mock_get_no_api_keys,
 ):
     page = client_request.post(
         'main.choose_template',
@@ -1473,6 +1547,7 @@ def test_show_custom_error_message(
         mock_get_template_folders,
         mock_move_to_template_folder,
         mock_create_template_folder,
+        mock_get_no_api_keys,
         data,
         error_msg,
 ):
@@ -1604,6 +1679,7 @@ def test_should_filter_templates_folder_page_based_on_user_permissions(
     client_request,
     mock_get_template_folders,
     mock_has_no_jobs,
+    mock_get_no_api_keys,
     service_one,
     mocker,
     active_user_with_permissions,
