@@ -742,7 +742,8 @@ def check_messages(service_id, template_id, upload_id, row_index=2):
         'original_file_name': data.get('original_file_name', ''),
     }
 
-    if session.get('sender_id'):
+    if session.get('sender_id') and data['template'].template_type != 'letter':
+        # sender_id is not an option for sending letters.
         metadata_kwargs['sender_id'] = session['sender_id']
 
     set_metadata_on_csv_upload(service_id, upload_id, **metadata_kwargs)
