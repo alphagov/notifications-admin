@@ -6,8 +6,14 @@
 
 {#- Copied from https://github.com/alphagov/govuk-frontend/blob/v2.13.0/src/components/radios/template.njk
     Changes:
-    - `asList` option added the root `params` object to allow setting of the `.govuk-radios` and `.govuk-radios__item` element types
-    - Nunjucks-to-Jinja language problems fixed (see https://github.com/alphagov/govuk-frontend-jinja/blob/master/govuk_frontend_jinja/templates.py) -#}
+    - `asList` option added to the root `params` object to allow setting of the `.govuk-radios` and `.govuk-radios__item` element types
+    - `children` option added to `item` allowing the sending in of prerendered child checkboxes (enabling the creation of tree structures through recursio    n)
+    - `item.conditional` changed so it appears in different places, depending on the radios being wrapped in a list or not (lists need it to go in the <li> whereas by default it sits outside)
+    Nunjucks/JavaScript language features fixed to work with Jinja/Python:
+    - true/false (Nunjucks/JavaScript) changed to True/False (Jinja/Python)
+    - '+' operator (Nunjucks/JavaScript) changed to '~' (Jinja/Python)
+    - optional space for item.children added below each radio to allow insertion of prerendered child radios HTML
+    (see https://github.com/alphagov/govuk-frontend-jinja/blob/master/govuk_frontend_jinja/templates.py for fixes currently handled by the extension) -#}
 
 {#- If an id 'prefix' is not passed, fall back to using the name attribute
    instead. We need this for error messages and hints as well -#}
@@ -28,7 +34,7 @@
 {% endif %}
 
 {% set isConditional = False %}
-{% for item in params['items'] %}
+{% for item in params.items %}
   {% if item.conditional %}
     {% set isConditional = True %}
   {% endif %}
