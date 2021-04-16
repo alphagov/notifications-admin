@@ -894,11 +894,14 @@ class GovukCollapsibleCheckboxesField(GovukCheckboxesField):
 # NestedFieldMixin puts the items into a tree hierarchy, pre-rendering the sub-trees of the top-level items
 class GovukCollapsibleNestedCheckboxesField(NestedFieldMixin, GovukCollapsibleCheckboxesField):
     NONE_OPTION_VALUE = None
+    # renders the top-level items as a list. NestedFieldMixin handles all others and always renders them as lists
     render_as_list = True
     template_path = 'forms/fields/checkboxes/template.njk'
 
 
 class GovukRadiosField(RadioField):
+
+    render_as_list = False
 
     def __init__(self, label='', validators=None, param_extensions=None, **kwargs):
         super(GovukRadiosField, self).__init__(label, validators, **kwargs)
@@ -940,6 +943,7 @@ class GovukRadiosFieldWithRequiredMessage(RadioFieldWithRequiredMessage, GovukRa
 
 # NestedFieldMixin puts the items into a tree hierarchy, pre-rendering the sub-trees of the top-level items
 class GovukNestedRadiosField(NestedFieldMixin, GovukRadiosFieldWithNoneOption):
+    # renders the top-level items as a list. NestedFieldMixin handles all others and always renders them as lists
     render_as_list = True
     template_path = 'forms/fields/radios/template.njk'
 
