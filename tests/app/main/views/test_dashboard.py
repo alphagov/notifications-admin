@@ -1713,6 +1713,29 @@ def test_org_breadcrumbs_show_if_user_is_platform_admin(
     )
 
 
+def test_breadcrumb_shows_if_service_is_suspended(
+    mocker,
+    mock_get_template_statistics,
+    mock_get_service_templates_when_no_templates_exist,
+    mock_has_no_jobs,
+    mock_get_usage,
+    mock_get_free_sms_fragment_limit,
+    mock_get_returned_letter_statistics_with_no_returned_letters,
+    active_user_with_permissions,
+    client_request,
+):
+    service_one_json = service_json(
+        SERVICE_ONE_ID,
+        active=False,
+        users=[active_user_with_permissions['id']],
+    )
+
+    mocker.patch('app.service_api_client.get_service', return_value={'data': service_one_json})
+    page = client_request.get('main.service_dashboard', service_id=SERVICE_ONE_ID)
+
+    assert 'Suspended' in page.select_one('.navigation-service-name').text
+
+
 @pytest.mark.parametrize('permissions', (
     ['email', 'sms'],
     ['email', 'sms', 'letter'],

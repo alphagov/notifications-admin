@@ -34,6 +34,12 @@
       box-shadow: 0 -3px 0 0 $grey-3;
     }
 
+    &--suspended {
+      background: $grey-3;
+      color: mix($grey-1, $text-colour);
+      box-shadow: 0 -3px 0 0 $grey-3;
+    }
+
     &--live {
       // This uses new Design System colours to match .govuk-tag--red
       background: #F6D7D2;
