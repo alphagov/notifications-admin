@@ -186,6 +186,29 @@ def test_user_cannot_accept_broadcast_without_permission(
     )
 
 
+@pytest.mark.parametrize('user_is_platform_admin', [True, False])
+def test_user_cannot_reject_broadcast_without_permission(
+    mocker,
+    client_request,
+    service_one,
+    active_user_view_permissions,
+    platform_admin_user_no_service_permissions,
+    user_is_platform_admin
+):
+    service_one['permissions'] += ['broadcast']
+    if user_is_platform_admin:
+        client_request.login(platform_admin_user_no_service_permissions)
+    else:
+        client_request.login(active_user_view_permissions)
+
+    client_request.get(
+        '.reject_broadcast_message',
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=sample_uuid,
+        _expected_status=403,
+    )
+
+
 def test_cancel_broadcast_page_403_for_user_without_permission(
     mocker,
     client_request,
