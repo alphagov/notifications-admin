@@ -26,7 +26,7 @@
         ('Sending', 'Notify has sent the message to the provider. The provider will try to deliver the message to the recipient for up to 72 hours. Notify is waiting for delivery information.'),
         ('Delivered', 'The message was successfully delivered. Notify will not tell you if a user has opened or read a message.'),
         ('Email address does not exist', 'The provider could not deliver the message because the email address was wrong. You should remove these email addresses from your database.'),
-        ('Inbox not accepting messages right now', 'The provider could not deliver the message. This can happen when the recipient’s inbox is full. You can try to send the message again.'),
+        ('Inbox not accepting messages right now', 'The provider could not deliver the message. This can happen when the recipient’s inbox is full or their anti-spam filter rejects your email. <a class="https://www.gov.uk/service-manual/design/sending-emails-and-text-messages#protect-your-users-from-spam-and-phishing">Make sure your content does not look like spam</a>. You can try to send the message again.'),
         ('Technical failure', 'Your message was not sent because there was a problem between Notify and the provider. You’ll have to try sending your messages again.'),
       ] %}
         {% call row() %}
