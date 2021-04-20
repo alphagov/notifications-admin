@@ -142,7 +142,7 @@ def test_broadcast_pages_403_for_user_without_permission(
     user_is_platform_admin
 ):
     """
-    Checks that users without permissions, including admin users, cannot create, approve or reject broadcasts.
+    Checks that users without permissions, including admin users, cannot create or edit broadcasts.
     """
     service_one['permissions'] += ['broadcast']
     if user_is_platform_admin:
@@ -160,6 +160,29 @@ def test_broadcast_pages_403_for_user_without_permission(
         service_id=SERVICE_ONE_ID,
         _expected_status=expected_post_status,
         **extra_args
+    )
+
+
+@pytest.mark.parametrize('user_is_platform_admin', [True, False])
+def test_user_cannot_accept_broadcast_without_permission(
+    mocker,
+    client_request,
+    service_one,
+    active_user_view_permissions,
+    platform_admin_user_no_service_permissions,
+    user_is_platform_admin
+):
+    service_one['permissions'] += ['broadcast']
+    if user_is_platform_admin:
+        client_request.login(platform_admin_user_no_service_permissions)
+    else:
+        client_request.login(active_user_view_permissions)
+
+    client_request.post(
+        '.approve_broadcast_message',
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=sample_uuid,
+        _expected_status=403,
     )
 
 
