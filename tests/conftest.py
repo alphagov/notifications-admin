@@ -1082,30 +1082,16 @@ def api_user_pending(fake_uuid):
 
 @pytest.fixture(scope='function')
 def platform_admin_user(fake_uuid):
-    user_data = {'id': fake_uuid,
-                 'name': 'Platform admin user',
-                 'password': 'somepassword',
-                 'email_address': 'platform@admin.gov.uk',
-                 'mobile_number': '07700 900762',
-                 'state': 'active',
-                 'failed_login_count': 0,
-                 'permissions': {SERVICE_ONE_ID: ['send_texts',
-                                                  'send_emails',
-                                                  'send_letters',
-                                                  'manage_users',
-                                                  'manage_templates',
-                                                  'manage_settings',
-                                                  'manage_api_keys',
-                                                  'view_activity']},
-                 'platform_admin': True,
-                 'auth_type': 'sms_auth',
-                 'password_changed_at': str(datetime.utcnow()),
-                 'services': [],
-                 'organisations': [],
-                 'current_session_id': None,
-                 'logged_in_at': None,
-                 }
-    return user_data
+    return create_platform_admin_user(permissions={SERVICE_ONE_ID: [
+        'send_texts',
+        'send_emails',
+        'send_letters',
+        'manage_users',
+        'manage_templates',
+        'manage_settings',
+        'manage_api_keys',
+        'view_activity'
+    ]})
 
 
 @pytest.fixture(scope='function')
@@ -1114,23 +1100,7 @@ def platform_admin_user_no_service_permissions():
     this fixture is for situations where we want to test that platform admin can access
     an endpoint even though they have no explicit permissions for that service.
     """
-    user_data = {'id': uuid4(),
-                 'name': 'Platform admin user no service permissions',
-                 'password': 'somepassword',
-                 'email_address': 'platform2@admin.gov.uk',
-                 'mobile_number': '07700 900763',
-                 'state': 'active',
-                 'failed_login_count': 0,
-                 'permissions': {},
-                 'platform_admin': True,
-                 'auth_type': 'sms_auth',
-                 'password_changed_at': str(datetime.utcnow()),
-                 'services': [],
-                 'organisations': [],
-                 'current_session_id': None,
-                 'logged_in_at': None,
-                 }
-    return user_data
+    return create_platform_admin_user()
 
 
 @pytest.fixture(scope='function')
@@ -3998,7 +3968,7 @@ def create_active_user_manage_template_permissions(with_unique_id=False):
     }
 
 
-def create_platform_admin_user(with_unique_id=False):
+def create_platform_admin_user(with_unique_id=False, permissions=None):
     return {
         'id': str(uuid4()) if with_unique_id else sample_uuid(),
         'name': 'Platform admin user',
@@ -4007,14 +3977,7 @@ def create_platform_admin_user(with_unique_id=False):
         'mobile_number': '07700 900762',
         'state': 'active',
         'failed_login_count': 0,
-        'permissions': {SERVICE_ONE_ID: ['send_texts',
-                                         'send_emails',
-                                         'send_letters',
-                                         'manage_users',
-                                         'manage_templates',
-                                         'manage_settings',
-                                         'manage_api_keys',
-                                         'view_activity']},
+        'permissions': permissions or {},
         'platform_admin': True,
         'auth_type': 'sms_auth',
         'password_changed_at': str(datetime.utcnow()),
