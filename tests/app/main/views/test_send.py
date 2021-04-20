@@ -3493,6 +3493,53 @@ def test_check_messages_adds_sender_id_in_session_to_metadata(
     )
 
 
+def test_check_messages_does_not_add_sender_id_in_session_to_metadata_for_letter_template(
+    client_request,
+    mocker,
+    mock_get_live_service,
+    mock_get_service_letter_template,
+    mock_get_users_by_service,
+    mock_get_service_statistics,
+    mock_get_job_doesnt_exist,
+    mock_get_jobs,
+    mock_s3_get_metadata,
+    mock_s3_set_metadata,
+    fake_uuid,
+):
+    mocker.patch('app.main.views.send.s3download', return_value="""
+            address_line_1,address_line_2,postcode,
+            First Last,    123 Street,    SW1 1AA
+        """)
+
+    mocker.patch(
+        'app.main.views.send.get_page_count_for_letter',
+        return_value=5,
+    )
+
+    with client_request.session_transaction() as session:
+        session['file_uploads'] = {
+            fake_uuid: {'template_id': fake_uuid}
+        }
+        session['sender_id'] = 'fake-sender'
+
+    client_request.get(
+        'main.check_messages',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        upload_id=fake_uuid,
+        _test_page_title=False,
+    )
+
+    mock_s3_set_metadata.assert_called_once_with(
+        SERVICE_ONE_ID,
+        fake_uuid,
+        notification_count=1,
+        template_id=fake_uuid,
+        valid=True,
+        original_file_name='example.csv',
+    )
+
+
 @pytest.mark.parametrize('extra_args', (
     {},
     {'from_test': True},
