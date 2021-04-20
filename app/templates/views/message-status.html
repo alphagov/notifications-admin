@@ -31,7 +31,7 @@
       ] %}
         {% call row() %}
           {{ text_field(message_length) }}
-          {{ text_field(charge) }}
+          {{ text_field(charge | safe) }}
         {% endcall %}
       {% endfor %}
     {% endcall %}
