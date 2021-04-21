@@ -93,7 +93,7 @@ def get_broadcast_dashboard_partials(service_id):
 
 
 @main.route('/services/<uuid:service_id>/new-broadcast', methods=['GET', 'POST'])
-@user_has_permissions('send_messages')
+@user_has_permissions('send_messages', restrict_admin_usage=True)
 @service_has_permission('broadcast')
 def new_broadcast(service_id):
     form = NewBroadcastForm()
@@ -116,7 +116,7 @@ def new_broadcast(service_id):
 
 
 @main.route('/services/<uuid:service_id>/write-new-broadcast', methods=['GET', 'POST'])
-@user_has_permissions('send_messages')
+@user_has_permissions('send_messages', restrict_admin_usage=True)
 @service_has_permission('broadcast')
 def write_new_broadcast(service_id):
     form = BroadcastTemplateForm()
@@ -140,7 +140,7 @@ def write_new_broadcast(service_id):
 
 
 @main.route('/services/<uuid:service_id>/new-broadcast/<uuid:template_id>')
-@user_has_permissions('send_messages')
+@user_has_permissions('send_messages', restrict_admin_usage=True)
 @service_has_permission('broadcast')
 def broadcast(service_id, template_id):
     return redirect(url_for(
@@ -154,7 +154,7 @@ def broadcast(service_id, template_id):
 
 
 @main.route('/services/<uuid:service_id>/broadcast/<uuid:broadcast_message_id>/areas')
-@user_has_permissions('send_messages')
+@user_has_permissions('send_messages', restrict_admin_usage=True)
 @service_has_permission('broadcast')
 def preview_broadcast_areas(service_id, broadcast_message_id):
     broadcast_message = BroadcastMessage.from_id(
@@ -181,7 +181,7 @@ def preview_broadcast_areas(service_id, broadcast_message_id):
 
 
 @main.route('/services/<uuid:service_id>/broadcast/<uuid:broadcast_message_id>/libraries')
-@user_has_permissions('send_messages')
+@user_has_permissions('send_messages', restrict_admin_usage=True)
 @service_has_permission('broadcast')
 def choose_broadcast_library(service_id, broadcast_message_id):
     return render_template(
@@ -198,7 +198,7 @@ def choose_broadcast_library(service_id, broadcast_message_id):
     '/services/<uuid:service_id>/broadcast/<uuid:broadcast_message_id>/libraries/<library_slug>',
     methods=['GET', 'POST'],
 )
-@user_has_permissions('send_messages')
+@user_has_permissions('send_messages', restrict_admin_usage=True)
 @service_has_permission('broadcast')
 def choose_broadcast_area(service_id, broadcast_message_id, library_slug):
     broadcast_message = BroadcastMessage.from_id(
@@ -258,7 +258,7 @@ def _get_broadcast_sub_area_back_link(service_id, broadcast_message_id, library_
     '/services/<uuid:service_id>/broadcast/<uuid:broadcast_message_id>/libraries/<library_slug>/<area_slug>',
     methods=['GET', 'POST'],
 )
-@user_has_permissions('send_messages')
+@user_has_permissions('send_messages', restrict_admin_usage=True)
 @service_has_permission('broadcast')
 def choose_broadcast_sub_area(service_id, broadcast_message_id, library_slug, area_slug):
     broadcast_message = BroadcastMessage.from_id(
@@ -310,7 +310,7 @@ def choose_broadcast_sub_area(service_id, broadcast_message_id, library_slug, ar
 
 
 @main.route('/services/<uuid:service_id>/broadcast/<uuid:broadcast_message_id>/remove/<area_slug>')
-@user_has_permissions('send_messages')
+@user_has_permissions('send_messages', restrict_admin_usage=True)
 @service_has_permission('broadcast')
 def remove_broadcast_area(service_id, broadcast_message_id, area_slug):
     BroadcastMessage.from_id(
@@ -330,7 +330,7 @@ def remove_broadcast_area(service_id, broadcast_message_id, area_slug):
     '/services/<uuid:service_id>/broadcast/<uuid:broadcast_message_id>/preview',
     methods=['GET', 'POST'],
 )
-@user_has_permissions('send_messages')
+@user_has_permissions('send_messages', restrict_admin_usage=True)
 @service_has_permission('broadcast')
 def preview_broadcast_message(service_id, broadcast_message_id):
     broadcast_message = BroadcastMessage.from_id(
@@ -405,7 +405,7 @@ def view_broadcast(service_id, broadcast_message_id):
 
 
 @main.route('/services/<uuid:service_id>/current-alerts/<uuid:broadcast_message_id>', methods=['POST'])
-@user_has_permissions('send_messages')
+@user_has_permissions('send_messages', restrict_admin_usage=True)
 @service_has_permission('broadcast')
 def approve_broadcast_message(service_id, broadcast_message_id):
 
@@ -438,7 +438,7 @@ def approve_broadcast_message(service_id, broadcast_message_id):
 
 
 @main.route('/services/<uuid:service_id>/broadcast/<uuid:broadcast_message_id>/reject')
-@user_has_permissions('send_messages')
+@user_has_permissions('send_messages', restrict_admin_usage=True)
 @service_has_permission('broadcast')
 def reject_broadcast_message(service_id, broadcast_message_id):
 
@@ -466,7 +466,7 @@ def reject_broadcast_message(service_id, broadcast_message_id):
     '/services/<uuid:service_id>/broadcast/<uuid:broadcast_message_id>/cancel',
     methods=['GET', 'POST'],
 )
-@user_has_permissions('send_messages')
+@user_has_permissions('send_messages', restrict_admin_usage=False)
 @service_has_permission('broadcast')
 def cancel_broadcast_message(service_id, broadcast_message_id):
     broadcast_message = BroadcastMessage.from_id(

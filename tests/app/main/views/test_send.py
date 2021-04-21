@@ -39,7 +39,6 @@ from tests.conftest import (
     create_active_user_with_permissions,
     create_multiple_email_reply_to_addresses,
     create_multiple_sms_senders,
-    create_platform_admin_user,
     create_template,
     mock_get_service_email_template,
     mock_get_service_letter_template,
@@ -1614,13 +1613,14 @@ def test_no_link_to_use_existing_list_for_service_without_lists(
     client_request,
     mock_get_service_template,
     mock_has_jobs,
+    platform_admin_user,
     fake_uuid,
 ):
     mocker.patch(
         'app.models.contact_list.ContactLists.client_method',
         return_value=[],
     )
-    client_request.login(create_platform_admin_user())
+    client_request.login(platform_admin_user)
     page = client_request.get(
         'main.send_one_off',
         service_id=SERVICE_ONE_ID,
