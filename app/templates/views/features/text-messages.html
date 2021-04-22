@@ -31,11 +31,7 @@
   <p class="govuk-body">See <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.branding_and_customisation', _anchor='text-message-sender') }}">how to change the text message sender</a>.</p>
 
   <h2 class="heading heading-medium">Pricing<h2>
-    <p class="govuk-body">Each service you add has a free annual allowance. After that it costs 1.58 pence (plus VAT) to send a text to a UK number.</p>
-    <p class="govuk-body">The free allowance is:</p>
-    <ul class="list list-bullet">
-      <li>250,000 free text messages for central government services</li>
-      <li>25,000 free text messages for other public sector services</li></ul>
-    <p class="govuk-body"><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.pricing') }}">See pricing</a> for more details.</p>
+    <p class="govuk-body">Each service you add has an annual allowance of free text messages.</p>
+    <p class="govuk-body"><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.pricing', _anchor='text-messages') }}">See pricing</a> for more details.</p>
 
 {% endblock %}
