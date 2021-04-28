@@ -17,16 +17,18 @@
       {% endif %}
       <div class="navigation-service-name govuk-!-font-weight-bold">
         {{ current_service.name }}
-        {% if current_service.has_permission('broadcast') %}
-          {% if current_service.trial_mode %}
-            <span class="navigation-service-type navigation-service-type--training">Training
-          {% else %}
-            <span class="navigation-service-type navigation-service-type--live">Live
-          {% endif %}
-          {% if current_service.allowed_broadcast_provider %}
-            ({{ current_service.allowed_broadcast_provider }})
-          {% endif %}
-          </span>
+          {% if not current_service.active %}
+            <span class="navigation-service-type navigation-service-type--suspended">Suspended</span>
+          {% elif current_service.has_permission('broadcast') %}
+            {% if current_service.trial_mode %}
+              <span class="navigation-service-type navigation-service-type--training">Training
+            {% else %}
+              <span class="navigation-service-type navigation-service-type--live">Live
+            {% endif %}
+            {% if current_service.allowed_broadcast_provider %}
+              ({{ current_service.allowed_broadcast_provider }})
+            {% endif %}
+            </span>
         {% endif %}
       </div>
       <a href="{{ url_for('main.choose_account') }}" class="govuk-link govuk-link--no-visited-state navigation-service-switch">Switch service</a>
