@@ -28,6 +28,11 @@ def test_loads_libraries():
             False,
         ),
         (
+            'demo',
+            'Demo areas',
+            False,
+        ),
+        (
             'wd20-lad20-ctyua19',
             'Local authorities',
             True,
@@ -159,9 +164,10 @@ def test_repository_has_all_libraries():
     repo = BroadcastAreasRepository()
     libraries = repo.get_libraries()
 
-    assert len(libraries) == 3
+    assert len(libraries) == 4
     assert [
         ('Countries', 'country'),
+        ('Demo areas', 'demo area'),
         ('Test areas', 'test area'),
         ('Local authorities', 'local authority'),
     ] == [(name, name_singular) for _, name, name_singular, _is_group in libraries]
