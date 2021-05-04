@@ -434,7 +434,9 @@
               {% if not current_service.broadcast_channel %}
               Off
               {% else %}
-                {% if current_service.live %}Live{% else %}Training mode{% endif %} - {% if current_service.allowed_broadcast_provider %}{{ current_service.allowed_broadcast_provider|format_mobile_network }} network{% else %}All networks{% endif %} - {% if current_service.broadcast_channel == "test" %}Test channel only{% else %}Public channel{% endif %}
+                {% if current_service.live and current_service.broadcast_channel == "severe" %}Live - Public channel{% endif %}
+                {% if current_service.live and current_service.broadcast_channel == "test" %}Test channel {% if current_service.allowed_broadcast_provider %}({{ current_service.allowed_broadcast_provider|format_mobile_network }} network){% else %} (All networks){% endif %}{%endif%}
+                {% if not current_service.live%}Training mode {% endif%}
               {% endif %}
             {% endcall %}
             {{ edit_field(
