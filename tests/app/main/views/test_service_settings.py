@@ -5434,11 +5434,6 @@ def test_get_service_set_broadcast_account_type(
         "Training mode - Three network - Test channel only",
         "Training mode - Vodafone network - Test channel only",
         "Training mode - All networks - Public channel",
-        "Live - EE network - Test channel only",
-        "Live - O2 network - Test channel only",
-        "Live - Three network - Test channel only",
-        "Live - Vodafone network - Test channel only",
-        "Live - All networks - Test channel only",
         "Live - All networks - Public channel",
     ]
     labels = page.find_all('label', class_="govuk-radios__label")
@@ -5470,10 +5465,10 @@ def test_get_service_set_broadcast_account_type_has_no_radio_selected_for_non_br
     [
         (
             "training",
-            "severe",
+            "test",
             None,
             "Training mode - All networks - Public channel",
-            "training-severe",
+            "training-test",
         ),
         (
             "training",
@@ -5481,20 +5476,6 @@ def test_get_service_set_broadcast_account_type_has_no_radio_selected_for_non_br
             "vodafone",
             "Training mode - Vodafone network - Test channel only",
             "training-test-vodafone",
-        ),
-        (
-            "live",
-            "test",
-            "o2",
-            "Live - O2 network - Test channel only",
-            "live-test-o2",
-        ),
-        (
-            "live",
-            "test",
-            None,
-            "Live - All networks - Test channel only",
-            "live-test",
         ),
         (
             "live",
@@ -5543,10 +5524,8 @@ def test_get_service_set_broadcast_account_type_has_radio_selected_for_broadcast
 @pytest.mark.parametrize(
     'value,service_mode,broadcast_channel,allowed_broadcast_provider',
     [
-        ("training-severe", "training", "severe", None),
+        ("training-test", "training", "test", None),
         ("training-test-vodafone", "training", "test", "vodafone"),
-        ("live-test-o2", "live", "test", "o2"),
-        ("live-test", "live", "test", None),
         ("live-severe", "live", "severe", None),
     ]
 )

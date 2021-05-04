@@ -2346,12 +2346,7 @@ class ServiceBroadcastAccountTypeForm(StripWhitespaceForm):
             ("training-test-o2", "Training mode - O2 network - Test channel only"),
             ("training-test-three", "Training mode - Three network - Test channel only"),
             ("training-test-vodafone", "Training mode - Vodafone network - Test channel only"),
-            ("training-severe", "Training mode - All networks - Public channel"),
-            ("live-test-ee", "Live - EE network - Test channel only"),
-            ("live-test-o2", "Live - O2 network - Test channel only"),
-            ("live-test-three", "Live - Three network - Test channel only"),
-            ("live-test-vodafone", "Live - Vodafone network - Test channel only"),
-            ("live-test", "Live - All networks - Test channel only"),
+            ("training-test", "Training mode - All networks - Public channel"),
             ("live-severe", "Live - All networks - Public channel"),
         ],
         validators=[DataRequired()]
