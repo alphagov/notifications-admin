@@ -186,8 +186,7 @@ def test_platform_admin_sees_only_relevant_settings_for_broadcast_service(
         'Label Value Action',
         'Notes None Change the notes for the service',
         'Email authentication Off Change your settings for Email authentication',
-        'Send cell broadcasts Training mode - All networks - Public channel '
-        + 'Change your settings for Send cell broadcasts',
+        'Send cell broadcasts Training Change your settings for Send cell broadcasts',
     ]
 
     assert len(rows) == len(expected_rows)
@@ -201,11 +200,11 @@ def test_platform_admin_sees_only_relevant_settings_for_broadcast_service(
     [
         (False, "training", None, None, "Off"),
         (False, "live", None, None, "Off"),
-        (True, "training", "severe", None, "Training mode - All networks - Public channel"),
-        (True, "training", "test", "ee", "Training mode - EE network - Test channel only"),
-        (True, "live", "test", "three", "Live - Three network - Test channel only"),
-        (True, "live", "test", None, "Live - All networks - Test channel only"),
-        (True, "live", "severe", None, "Live - All networks - Public channel"),
+        (True, "training", "test", None, "Training"),
+        (True, "live", "test", "ee", "Test (EE)"),
+        (True, "live", "test", "three", "Test (Three)"),
+        (True, "live", "test", None, "Test (All networks)"),
+        (True, "live", "severe", None, "Live"),
     ]
 )
 def test_platform_admin_sees_correct_description_of_broadcast_service_setting(
@@ -5429,17 +5428,13 @@ def test_get_service_set_broadcast_account_type(
     assert page.select_one('h1').text.strip() == "Change cell broadcast service type"
 
     expected_labels = [
-        "Training mode - EE network - Test channel only",
-        "Training mode - O2 network - Test channel only",
-        "Training mode - Three network - Test channel only",
-        "Training mode - Vodafone network - Test channel only",
-        "Training mode - All networks - Public channel",
-        "Live - EE network - Test channel only",
-        "Live - O2 network - Test channel only",
-        "Live - Three network - Test channel only",
-        "Live - Vodafone network - Test channel only",
-        "Live - All networks - Test channel only",
-        "Live - All networks - Public channel",
+        "Training mode",
+        "Test channel (EE)",
+        "Test channel (O2)",
+        "Test channel (Three)",
+        "Test channel (Vodafone)",
+        "Test channel (all networks)",
+        "Live (all networks)",
     ]
     labels = page.find_all('label', class_="govuk-radios__label")
     assert len(labels) == len(expected_labels)
@@ -5470,37 +5465,23 @@ def test_get_service_set_broadcast_account_type_has_no_radio_selected_for_non_br
     [
         (
             "training",
-            "severe",
+            "test",
             None,
-            "Training mode - All networks - Public channel",
-            "training-severe",
+            "Training mode",
+            "training-test",
         ),
         (
-            "training",
+            "live",
             "test",
             "vodafone",
-            "Training mode - Vodafone network - Test channel only",
-            "training-test-vodafone",
-        ),
-        (
-            "live",
-            "test",
-            "o2",
-            "Live - O2 network - Test channel only",
-            "live-test-o2",
-        ),
-        (
-            "live",
-            "test",
-            None,
-            "Live - All networks - Test channel only",
-            "live-test",
+            "Test channel (Vodafone)",
+            "live-test-vodafone",
         ),
         (
             "live",
             "severe",
             None,
-            "Live - All networks - Public channel",
+            "Live (all networks)",
             "live-severe",
         ),
     ]
@@ -5543,10 +5524,8 @@ def test_get_service_set_broadcast_account_type_has_radio_selected_for_broadcast
 @pytest.mark.parametrize(
     'value,service_mode,broadcast_channel,allowed_broadcast_provider',
     [
-        ("training-severe", "training", "severe", None),
-        ("training-test-vodafone", "training", "test", "vodafone"),
-        ("live-test-o2", "live", "test", "o2"),
-        ("live-test", "live", "test", None),
+        ("training-test", "training", "test", None),
+        ("live-test-vodafone", "live", "test", "vodafone"),
         ("live-severe", "live", "severe", None),
     ]
 )
