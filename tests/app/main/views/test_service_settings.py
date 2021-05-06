@@ -186,7 +186,7 @@ def test_platform_admin_sees_only_relevant_settings_for_broadcast_service(
         'Label Value Action',
         'Notes None Change the notes for the service',
         'Email authentication Off Change your settings for Email authentication',
-        'Send cell broadcasts Training mode Change your settings for Send cell broadcasts',
+        'Send cell broadcasts Training Change your settings for Send cell broadcasts',
     ]
 
     assert len(rows) == len(expected_rows)
@@ -200,11 +200,11 @@ def test_platform_admin_sees_only_relevant_settings_for_broadcast_service(
     [
         (False, "training", None, None, "Off"),
         (False, "live", None, None, "Off"),
-        (True, "training", "test", None, "Training mode"),
-        (True, "live", "test", "ee", "Test channel (EE network)"),
-        (True, "live", "test", "three", "Test channel (Three network)"),
-        (True, "live", "test", None, "Test channel  (All networks)"),
-        (True, "live", "severe", None, "Live - Public channel"),
+        (True, "training", "test", None, "Training"),
+        (True, "live", "test", "ee", "Test (EE)"),
+        (True, "live", "test", "three", "Test (Three)"),
+        (True, "live", "test", None, "Test (All networks)"),
+        (True, "live", "severe", None, "Live"),
     ]
 )
 def test_platform_admin_sees_correct_description_of_broadcast_service_setting(
