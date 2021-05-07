@@ -148,7 +148,8 @@ const javascripts = () => {
       paths.npm + 'query-command-supported/dist/queryCommandSupported.min.js',
       paths.npm + 'diff-dom/diffDOM.js',
       paths.npm + 'timeago/jquery.timeago.js',
-      paths.npm + 'textarea-caret/index.js'
+      paths.npm + 'textarea-caret/index.js',
+      paths.npm + 'cbor-js/cbor.js'
     ]));
 
   // JS local to this application

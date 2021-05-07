@@ -4485,5 +4485,7 @@ def mock_get_invited_org_user_by_id(mocker, sample_org_invite):
 def webauthn_credential():
     return {
         'name': 'Test credential',
+        'credential_data': 'credential_data',
+        'registration_response': 'anything',
         'created_at': '2017-10-18T16:57:14.154185Z',
     }

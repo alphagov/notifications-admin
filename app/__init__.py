@@ -31,7 +31,7 @@ from werkzeug.exceptions import HTTPException as WerkzeugHTTPException
 from werkzeug.exceptions import abort
 from werkzeug.local import LocalProxy
 
-from app import proxy_fix
+from app import proxy_fix, webauthn_server
 from app.asset_fingerprinter import asset_fingerprinter
 from app.commands import setup_commands
 from app.config import configs
@@ -208,6 +208,7 @@ def create_app(application):
         client.init_app(application)
 
     logging.init_app(application)
+    webauthn_server.init_app(application)
 
     login_manager.login_view = 'main.sign_in'
     login_manager.login_message_category = 'default'

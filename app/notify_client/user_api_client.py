@@ -199,5 +199,15 @@ class UserApiClient(NotifyAdminAPIClient):
             'created_at': datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
         }]
 
+    def create_webauthn_credential_for_user(self, user_id, credential):
+        self.credentials = getattr(self, 'credentials', [])
+        credential_dict = credential.serialize()
+
+        # TODO: remove when using real API
+        from datetime import datetime
+        credential_dict['created_at'] = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+
+        self.credentials += [credential_dict]
+
 
 user_api_client = UserApiClient()
