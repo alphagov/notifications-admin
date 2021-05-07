@@ -1,0 +1,58 @@
+{% extends "withoutnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/button/macro.njk" import govukButton %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
+{% from "components/table.html" import mapping_table, row, field, row_heading %}
+
+{% set page_title = 'Security keys' %}
+{% set credentials = current_user.webauthn_credentials %}
+
+{% block per_page_title %}
+  {{ page_title }}
+{% endblock %}
+
+{% block maincolumn_content %}
+  {{ page_header(
+    page_title,
+    back_link=url_for('.user_profile')
+  ) }}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-five-sixths">
+      {% if credentials %}
+
+        {% call mapping_table(
+          caption=page_title,
+          field_headings=['Security key'],
+          field_headings_visible=False,
+          caption_visible=False,
+        ) %}
+          {% for credential in credentials %}
+            {% call row() %}
+              {% call field() %}
+                <div class="govuk-body">{{ credential.name }}</div>
+                <div class="govuk-body hint">Registered {{ credential.created_at|format_delta }}</div>
+              {% endcall %}
+            {% endcall %}
+          {% endfor %}
+        {% endcall %}
+
+      {% else %}
+
+        <p class="govuk-body">
+          Security keys are an alternative way of signing in to Notify.
+        </p>
+
+      {% endif %}
+
+      {{ govukButton({
+        "element": "button",
+        "text": "Register a key",
+        "classes": "govuk-button--secondary",
+        "attributes": {
+          "data-module": "register-security-key",
+        }
+      }) }}
+    </div>
+  </div>
+{% endblock %}

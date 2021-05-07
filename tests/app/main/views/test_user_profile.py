@@ -11,9 +11,10 @@ from tests.conftest import create_api_user_active, url_for_endpoint_with_token
 def test_should_show_overview_page(
     client_request,
 ):
-    page = client_request.get(('main.user_profile'))
+    page = client_request.get('main.user_profile')
     assert page.select_one('h1').text.strip() == 'Your profile'
     assert 'Use platform admin view' not in page
+    assert 'Security keys' not in page
 
 
 def test_overview_page_shows_disable_for_platform_admin(
@@ -21,10 +22,26 @@ def test_overview_page_shows_disable_for_platform_admin(
     platform_admin_user
 ):
     client_request.login(platform_admin_user)
-    page = client_request.get(('main.user_profile'))
+    page = client_request.get('main.user_profile')
     assert page.select_one('h1').text.strip() == 'Your profile'
     disable_platform_admin_row = page.select('tr')[-1]
     assert ' '.join(disable_platform_admin_row.text.split()) == 'Use platform admin view Yes Change'
+
+
+@pytest.mark.parametrize('has_keys', [False, True])
+def test_overview_page_shows_security_keys_for_platform_admin(
+    mocker,
+    client_request,
+    platform_admin_user,
+    has_keys,
+    webauthn_credential,
+):
+    client_request.login(platform_admin_user)
+    credentials = [webauthn_credential] if has_keys else []
+    mocker.patch('app.user_api_client.get_webauthn_credentials_for_user', return_value=credentials)
+    page = client_request.get('main.user_profile')
+    security_keys_row = page.select_one('#security-keys')
+    assert ' '.join(security_keys_row.text.split()) == f'Security keys {len(credentials)} Change'
 
 
 def test_should_show_name_page(
@@ -320,3 +337,33 @@ def test_can_reenable_platform_admin(client_request, platform_admin_user):
 
     with client_request.session_transaction() as session:
         assert session['disable_platform_admin_view'] is False
+
+
+def test_normal_user_doesnt_see_security_keys(client_request):
+    client_request.get(
+        '.user_profile_security_keys',
+        _expected_status=403,
+    )
+
+
+def test_should_show_security_keys_page(
+    mocker,
+    client_request,
+    platform_admin_user,
+    webauthn_credential,
+):
+    client_request.login(platform_admin_user)
+
+    mocker.patch(
+        'app.user_api_client.get_webauthn_credentials_for_user',
+        return_value=[webauthn_credential],
+    )
+
+    page = client_request.get('.user_profile_security_keys')
+    assert page.select_one('h1').text.strip() == 'Security keys'
+
+    credential_row = page.select('tr')[-1]
+    assert 'Test credential' in credential_row.text
+
+    register_button = page.select_one("[data-module='register-security-key']")
+    assert register_button.text.strip() == 'Register a key'

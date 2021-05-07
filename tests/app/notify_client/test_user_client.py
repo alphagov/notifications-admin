@@ -238,3 +238,8 @@ def test_add_user_to_service_calls_correct_endpoint_and_deletes_keys_from_cache(
         call('service-{service_id}-template-folders'.format(service_id=service_id)),
         call('service-{service_id}'.format(service_id=service_id)),
     ]
+
+
+def test_get_webauthn_credentials_for_user_returns_stubbed_data():
+    credentials = user_api_client.get_webauthn_credentials_for_user('id')
+    assert credentials[0]['name'] == 'Ben test'

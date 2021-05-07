@@ -10,6 +10,7 @@ from app.models.roles_and_permissions import (
     all_permissions,
     translate_permissions_from_db_to_admin_roles,
 )
+from app.models.webauthn_credential import WebAuthnCredential
 from app.notify_client import InviteTokenError
 from app.notify_client.invite_api_client import invite_api_client
 from app.notify_client.org_invite_api_client import org_invite_api_client
@@ -342,6 +343,11 @@ class User(JSONModel, UserMixin):
         return self.email_address.lower().endswith((
             '@nhs.uk', '.nhs.uk', '@nhs.net', '.nhs.net',
         ))
+
+    @property
+    def webauthn_credentials(self):
+        return [WebAuthnCredential(json) for json in
+                user_api_client.get_webauthn_credentials_for_user(self.id)]
 
     def serialize(self):
         dct = {

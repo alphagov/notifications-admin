@@ -178,6 +178,7 @@ const javascripts = () => {
     paths.src + 'javascripts/templateFolderForm.js',
     paths.src + 'javascripts/collapsibleCheckboxes.js',
     paths.src + 'javascripts/radioSlider.js',
+    paths.src + 'javascripts/registerSecurityKey.js',
     paths.src + 'javascripts/updateStatus.js',
     paths.src + 'javascripts/homepage.js',
     paths.src + 'javascripts/main.js',
