@@ -5524,9 +5524,9 @@ def test_get_service_set_broadcast_account_type_has_radio_selected_for_broadcast
 @pytest.mark.parametrize(
     'value,service_mode,broadcast_channel,allowed_broadcast_provider',
     [
-        ("training-test", "training", "test", None),
+        ("training-test", "training", "test", "all"),
         ("live-test-vodafone", "live", "test", "vodafone"),
-        ("live-severe", "live", "severe", None),
+        ("live-severe", "live", "severe", "all"),
     ]
 )
 def test_post_service_set_broadcast_account_type_posts_data_to_api_and_redirects(

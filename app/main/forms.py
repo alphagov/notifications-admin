@@ -2334,7 +2334,7 @@ class ServiceBroadcastAccountTypeField(GovukRadiosField):
             split_values = self.data.split("-")
             self.service_mode = split_values[0]
             self.broadcast_channel = split_values[1]
-            self.provider_restriction = split_values[2] if len(split_values) == 3 else None
+            self.provider_restriction = split_values[2] if len(split_values) == 3 else 'all'
 
 
 class ServiceBroadcastAccountTypeForm(StripWhitespaceForm):
