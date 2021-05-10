@@ -2321,7 +2321,7 @@ class ServiceBroadcastAccountTypeField(GovukRadiosField):
         if broadcast_channel:
             account_type = "live" if live else "training"
             account_type += f"-{broadcast_channel}"
-            if allowed_broadcast_provider and allowed_broadcast_provider != 'all':
+            if allowed_broadcast_provider != 'all':
                 account_type += f"-{allowed_broadcast_provider}"
 
         self.data = account_type
