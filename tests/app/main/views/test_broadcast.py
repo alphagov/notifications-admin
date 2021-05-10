@@ -1899,7 +1899,7 @@ def test_can_approve_own_broadcast_in_trial_mode(
         'alerts, to see how it works. '
         'No real alerts will be broadcast to anyone’s phone. '
         'Start broadcasting now '
-        'Cancel this alert'
+        'Reject this alert'
     )
 
     form = page.select_one('.banner details form')
@@ -1910,7 +1910,7 @@ def test_can_approve_own_broadcast_in_trial_mode(
     )
 
     link = page.select_one('.banner a.govuk-link.govuk-link--destructive')
-    assert link.text == 'Cancel this alert'
+    assert link.text == 'Reject this alert'
     assert link['href'] == url_for(
         '.reject_broadcast_message',
         service_id=SERVICE_ONE_ID,
