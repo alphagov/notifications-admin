@@ -623,7 +623,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         """
         service_mode is one of "training" or "live"
         broadcast channel is one of "test" or "severe"
-        provider_restriction is one of None, "three", "o2", "vodafone", "ee"
+        provider_restriction is one of "all", "three", "o2", "vodafone", "ee"
         """
         data = {
             "service_mode": service_mode,

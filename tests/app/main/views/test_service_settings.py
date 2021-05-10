@@ -199,12 +199,17 @@ def test_platform_admin_sees_only_relevant_settings_for_broadcast_service(
     'has_broadcast_permission,service_mode,broadcast_channel,allowed_broadcast_provider,expected_text',
     [
         (False, "training", None, None, "Off"),
+        (False, "training", None, "all", "Off"),
         (False, "live", None, None, "Off"),
+        (False, "live", None, "all", "Off"),
         (True, "training", "test", None, "Training"),
+        (True, "training", "test", "all", "Training"),
         (True, "live", "test", "ee", "Test (EE)"),
         (True, "live", "test", "three", "Test (Three)"),
         (True, "live", "test", None, "Test (All networks)"),
+        (True, "live", "test", "all", "Test (All networks)"),
         (True, "live", "severe", None, "Live"),
+        (True, "live", "severe", "all", "Live"),
     ]
 )
 def test_platform_admin_sees_correct_description_of_broadcast_service_setting(
@@ -5471,6 +5476,13 @@ def test_get_service_set_broadcast_account_type_has_no_radio_selected_for_non_br
             "training-test",
         ),
         (
+            "training",
+            "test",
+            "all",
+            "Training mode",
+            "training-test",
+        ),
+        (
             "live",
             "test",
             "vodafone",
@@ -5481,6 +5493,13 @@ def test_get_service_set_broadcast_account_type_has_no_radio_selected_for_non_br
             "live",
             "severe",
             None,
+            "Live (all networks)",
+            "live-severe",
+        ),
+        (
+            "live",
+            "severe",
+            "all",
             "Live (all networks)",
             "live-severe",
         ),

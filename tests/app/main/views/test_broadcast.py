@@ -301,6 +301,20 @@ def test_broadcast_tour_page_4_shows_service_name(
         'service one Live Switch service',
         'Live',
     ),
+    (
+        True,
+        "all",
+        '.navigation-service-type.navigation-service-type--training',
+        'service one Training Switch service',
+        'Training',
+    ),
+    (
+        False,
+        "all",
+        '.navigation-service-type.navigation-service-type--live',
+        'service one Live Switch service',
+        'Live',
+    ),
 
     (
         True,
