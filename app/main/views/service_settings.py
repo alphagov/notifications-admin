@@ -328,6 +328,31 @@ def service_set_broadcast_account_type(service_id):
     )
 
     if form.validate_on_submit():
+        return redirect(url_for(
+            '.service_confirm_broadcast_account_type',
+            service_id=current_service.id,
+            account_type=form.account_type.data,
+        ))
+
+    return render_template(
+        'views/service-settings/service-set-broadcast-account-type.html',
+        form=form,
+    )
+
+
+@main.route(
+    "/services/<uuid:service_id>/service-settings/broadcasts/<account_type>",
+    methods=["GET", "POST"]
+)
+@user_is_platform_admin
+def service_confirm_broadcast_account_type(service_id, account_type):
+    form = ServiceBroadcastAccountTypeForm(account_type=account_type)
+    form.validate()
+
+    if form.account_type.errors:
+        abort(404)
+
+    if form.validate_on_submit():
         service_api_client.set_service_broadcast_settings(
             current_service.id,
             service_mode=form.account_type.service_mode,
@@ -341,11 +366,10 @@ def service_set_broadcast_account_type(service_id):
             broadcast_channel=form.account_type.broadcast_channel,
             provider_restriction=form.account_type.provider_restriction,
         )
-
         return redirect(url_for(".service_settings", service_id=service_id))
 
     return render_template(
-        'views/service-settings/service-set-broadcast-account-type.html',
+        'views/service-settings/service-confirm-broadcast-account-type.html',
         form=form,
     )
 

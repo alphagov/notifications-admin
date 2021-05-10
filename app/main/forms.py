@@ -2316,6 +2316,8 @@ class ServiceBroadcastAccountTypeField(GovukRadiosField):
     # (service_mode, broadcast_channel, allowed_broadcast_provider)
     # to a value to be used in our form such as "live-severe-ee"
     def process_data(self, value):
+        if isinstance(value, str):
+            return super().process_data(value)
         (live, broadcast_channel, allowed_broadcast_provider) = value
         account_type = None
         if broadcast_channel:

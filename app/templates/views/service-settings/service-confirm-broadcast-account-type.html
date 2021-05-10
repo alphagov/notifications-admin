@@ -1,0 +1,53 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+
+{% block service_page_title %}
+  Confirm emergency alert settings
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-five-sixths">
+      {{ page_header(
+        'Confirm emergency alert settings',
+        back_link=url_for('.service_set_broadcast_account_type', service_id=current_service.id)
+      ) }}
+      {% if form.account_type.service_mode == 'training' %}
+        <p class="govuk-body">
+          <span class="navigation-service-type navigation-service-type--training govuk-!-margin-left-0">Training</span>
+        </p>
+        <p class="govuk-body">
+          No phones will receive alerts sent from this service.
+        </p>
+      {% else %}
+        <p class="govuk-body">
+          <span class="navigation-service-type navigation-service-type--live govuk-!-margin-left-0">
+            {% if form.account_type.broadcast_channel == 'severe' %}
+              Live
+            {% elif form.account_type.broadcast_channel == 'test' %}
+              Test
+            {% endif %}
+            {% if form.account_type.provider_restriction != 'all' %}
+              ({{ form.account_type.provider_restriction|format_mobile_network }})
+            {% endif %}
+          </span>
+        </p>
+        <p class="govuk-body">
+          Members of the public
+          {% if form.account_type.broadcast_channel == 'test' %}
+            who have switched on the test channel on their phones
+          {% endif %}
+          will receive alerts sent from this service.
+        </p>
+      {% endif %}
+
+      {% call form_wrapper() %}
+        {{ page_footer('Confirm') }}
+      {% endcall %}
+    </div>
+  </div>
+
+{% endblock %}

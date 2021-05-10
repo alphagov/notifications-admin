@@ -244,6 +244,7 @@ class MainNavigation(Navigation):
             'service_set_channel',
             'send_files_by_email_contact_details',
             'service_set_broadcast_account_type',
+            'service_confirm_broadcast_account_type',
             'service_set_email_branding',
             'service_set_inbound_number',
             'service_set_inbound_sms',

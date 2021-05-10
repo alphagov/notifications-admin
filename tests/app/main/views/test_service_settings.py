@@ -5522,6 +5522,103 @@ def test_get_service_set_broadcast_account_type_has_radio_selected_for_broadcast
 
 
 @pytest.mark.parametrize(
+    'value',
+    (
+        'training-test',
+        'live-test-ee',
+        'live-test-o2',
+        'live-test-three',
+        'live-test-vodafone',
+        'live-test',
+        'live-severe',
+        pytest.param('foo', marks=pytest.mark.xfail),
+    ),
+)
+def test_post_service_set_broadcast_account_type_confirms(
+    client_request,
+    platform_admin_user,
+    mocker,
+    value,
+):
+    client_request.login(platform_admin_user)
+    client_request.post(
+        'main.service_set_broadcast_account_type',
+        service_id=SERVICE_ONE_ID,
+        _data={
+            'account_type': value,
+        },
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.service_confirm_broadcast_account_type',
+            service_id=SERVICE_ONE_ID,
+            account_type=value,
+            _external=True,
+        )
+    )
+
+
+@pytest.mark.parametrize(
+    'value, expected_paragraphs',
+    [
+        ('training-test', [
+            'Training',
+            'No phones will receive alerts sent from this service.',
+        ]),
+        ('live-test-ee', [
+            'Test (EE)',
+            'Members of the public who have switched on the test '
+            'channel on their phones will receive alerts sent from '
+            'this service.',
+        ]),
+        ('live-test-o2', [
+            'Test (O2)',
+            'Members of the public who have switched on the test '
+            'channel on their phones will receive alerts sent from '
+            'this service.',
+        ]),
+        ('live-test-three', [
+            'Test (Three)',
+            'Members of the public who have switched on the test '
+            'channel on their phones will receive alerts sent from '
+            'this service.',
+        ]),
+        ('live-test-vodafone', [
+            'Test (Vodafone)',
+            'Members of the public who have switched on the test '
+            'channel on their phones will receive alerts sent from '
+            'this service.',
+        ]),
+        ('live-test', [
+            'Test',
+            'Members of the public who have switched on the test '
+            'channel on their phones will receive alerts sent from '
+            'this service.',
+        ]),
+        ('live-severe', [
+            'Live',
+            'Members of the public will receive alerts sent from this '
+            'service.',
+        ]),
+    ]
+)
+def test_post_service_set_broadcast_account_type_confirmation_page(
+    client_request,
+    platform_admin_user,
+    value,
+    expected_paragraphs,
+):
+    client_request.login(platform_admin_user)
+    page = client_request.get(
+        'main.service_confirm_broadcast_account_type',
+        service_id=SERVICE_ONE_ID,
+        account_type=value,
+    )
+    assert [
+        normalize_spaces(p.text) for p in page.select('main p')
+    ] == expected_paragraphs
+
+
+@pytest.mark.parametrize(
     'value,service_mode,broadcast_channel,allowed_broadcast_provider',
     [
         ("training-test", "training", "test", "all"),
@@ -5543,12 +5640,10 @@ def test_post_service_set_broadcast_account_type_posts_data_to_api_and_redirects
 
     response = platform_admin_client.post(
         url_for(
-            'main.service_set_broadcast_account_type',
+            'main.service_confirm_broadcast_account_type',
             service_id=SERVICE_ONE_ID,
-        ),
-        data={
-            'account_type': value
-        }
+            account_type=value,
+        )
     )
     assert response.status_code == 302
     assert response.location == url_for('main.service_settings', service_id=SERVICE_ONE_ID, _external=True)
