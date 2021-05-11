@@ -289,20 +289,6 @@ def test_broadcast_tour_page_4_shows_service_name(
 @pytest.mark.parametrize('trial_mode, allowed_broadcast_provider, selector, expected_text, expected_tagged_text', (
     (
         True,
-        None,
-        '.navigation-service-type.navigation-service-type--training',
-        'service one Training Switch service',
-        'Training',
-    ),
-    (
-        False,
-        None,
-        '.navigation-service-type.navigation-service-type--live',
-        'service one Live Switch service',
-        'Live',
-    ),
-    (
-        True,
         "all",
         '.navigation-service-type.navigation-service-type--training',
         'service one Training Switch service',
