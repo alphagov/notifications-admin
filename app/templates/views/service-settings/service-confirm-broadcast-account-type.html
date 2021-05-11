@@ -13,7 +13,7 @@
     <div class="govuk-grid-column-five-sixths">
       {{ page_header(
         'Confirm emergency alert settings',
-        back_link=url_for('.service_set_broadcast_account_type', service_id=current_service.id)
+        back_link=url_for('.service_set_broadcast_channel', service_id=current_service.id)
       ) }}
       {% if form.account_type.service_mode == 'training' %}
         <p class="govuk-body">

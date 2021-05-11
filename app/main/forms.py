@@ -2316,7 +2316,7 @@ class ServiceBroadcastAccountTypeField(GovukRadiosField):
     # (service_mode, broadcast_channel, allowed_broadcast_provider)
     # to a value to be used in our form such as "live-severe-ee"
     def process_data(self, value):
-        if isinstance(value, str):
+        if not value or isinstance(value, str):
             return super().process_data(value)
         (live, broadcast_channel, allowed_broadcast_provider) = value
         account_type = None
@@ -2332,11 +2332,38 @@ class ServiceBroadcastAccountTypeField(GovukRadiosField):
     # broadcast_channel and provider_restriction to be used by the flask route to send to the
     # API
     def post_validate(self, form, validation_stopped):
-        if not validation_stopped:
+        if not validation_stopped and self.data:
             split_values = self.data.split("-")
             self.service_mode = split_values[0]
             self.broadcast_channel = split_values[1]
             self.provider_restriction = split_values[2] if len(split_values) == 3 else 'all'
+
+
+class ServiceBroadcastChannelForm(StripWhitespaceForm):
+    channel = ServiceBroadcastAccountTypeField(
+        'Emergency alerts settings',
+        thing='mode or channel',
+        choices=[
+            ("training-test", "Training mode"),
+            ("live-test", "Test channel"),
+            ("live-severe", "Live channel"),
+            ("live-government", "Government channel"),
+        ],
+    )
+
+
+class ServiceBroadcastNetworkForm(StripWhitespaceForm):
+    network = ServiceBroadcastAccountTypeField(
+        'Choose a mobile network',
+        thing='mobile network',
+        choices=[
+            ("live-test", "All networks"),
+            ("live-test-ee", "EE only"),
+            ("live-test-o2", "O2 only"),
+            ("live-test-vodafone", "Vodafone only"),
+            ("live-test-three", "Three only"),
+        ],
+    )
 
 
 class ServiceBroadcastAccountTypeForm(StripWhitespaceForm):
