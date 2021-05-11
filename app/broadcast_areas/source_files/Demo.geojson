@@ -1,0 +1,24 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "sizewell",
+        "name": "Sizewell",
+        "count_of_phones": 700
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [1.58242, 52.22035],
+          [1.58491, 52.19521],
+          [1.59971, 52.19325],
+          [1.62352, 52.19372],
+          [1.62599, 52.21901],
+          [1.58242, 52.22035]
+        ]]
+      }
+    }
+  ]
+}
