@@ -113,7 +113,7 @@ def mock_get_service_settings_page_common(
         'Custom data retention Email – 7 days Change data retention',
         'Receive inbound SMS Off Change your settings for Receive inbound SMS',
         'Email authentication Off Change your settings for Email authentication',
-        'Send cell broadcasts Off Change your settings for Send cell broadcasts',
+        'Emergency alerts Off Change your settings for emergency alerts',
     ]),
 ])
 def test_should_show_overview(
@@ -186,7 +186,7 @@ def test_platform_admin_sees_only_relevant_settings_for_broadcast_service(
         'Label Value Action',
         'Notes None Change the notes for the service',
         'Email authentication Off Change your settings for Email authentication',
-        'Send cell broadcasts Training Change your settings for Send cell broadcasts',
+        'Emergency alerts Training Change your settings for emergency alerts',
     ]
 
     assert len(rows) == len(expected_rows)
@@ -238,7 +238,7 @@ def test_platform_admin_sees_correct_description_of_broadcast_service_setting(
     ))
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    broadcast_setting_row = page.find(string=re.compile("Send cell broadcasts")).find_parent('tr')
+    broadcast_setting_row = page.find(string=re.compile("Emergency alerts")).find_parent('tr')
     broadcast_setting_description = broadcast_setting_row.select('td')[1].text.strip()
     assert broadcast_setting_description == expected_text
 

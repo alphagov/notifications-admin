@@ -429,7 +429,7 @@
           {% endfor %}
 
           {% call row() %}
-            {{ text_field('Send cell broadcasts')}}
+            {{ text_field('Emergency alerts')}}
             {% call field(wrap=True) %}
               {% if not current_service.broadcast_channel %}
               Off
@@ -443,7 +443,7 @@
             {{ edit_field(
                 'Change',
                 url_for('.service_set_broadcast_channel', service_id=current_service.id),
-                suffix='your settings for Send cell broadcasts'
+                suffix='your settings for emergency alerts'
               )
             }}
           {% endcall %}
