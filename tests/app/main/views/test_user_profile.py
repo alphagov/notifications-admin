@@ -23,7 +23,7 @@ def test_overview_page_shows_disable_for_platform_admin(
     client_request.login(platform_admin_user)
     page = client_request.get(('main.user_profile'))
     assert page.select_one('h1').text.strip() == 'Your profile'
-    disable_platform_admin_row = page.select('tr')[-1]
+    disable_platform_admin_row = page.select_one('#disable-platform-admin')
     assert ' '.join(disable_platform_admin_row.text.split()) == 'Use platform admin view Yes Change'
 
 
