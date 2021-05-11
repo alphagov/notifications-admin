@@ -350,19 +350,29 @@ def service_set_broadcast_channel(service_id):
 @main.route("/services/<uuid:service_id>/service-settings/broadcasts/network", methods=["GET", "POST"])
 @user_is_platform_admin
 def service_set_broadcast_network(service_id):
-    form = ServiceBroadcastNetworkForm(
-        network=(
-            current_service.live,
-            current_service.broadcast_channel,
-            current_service.allowed_broadcast_provider
+    if current_service.allowed_broadcast_provider == 'all':
+        form = ServiceBroadcastNetworkForm(
+            network_variant=(
+                current_service.live,
+                current_service.broadcast_channel,
+                current_service.allowed_broadcast_provider,
+            ),
         )
-    )
+    else:
+        form = ServiceBroadcastNetworkForm(
+            network_variant='',
+            network=(
+                current_service.live,
+                current_service.broadcast_channel,
+                current_service.allowed_broadcast_provider
+            )
+        )
 
     if form.validate_on_submit():
         return redirect(url_for(
             '.service_confirm_broadcast_account_type',
             service_id=current_service.id,
-            account_type=form.network.data,
+            account_type=form.network_variant.data or form.network.data,
         ))
 
     return render_template(

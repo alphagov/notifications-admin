@@ -2339,6 +2339,13 @@ class ServiceBroadcastAccountTypeField(GovukRadiosField):
             self.provider_restriction = split_values[2] if len(split_values) == 3 else 'all'
 
 
+class OptionalServiceBroadcastAccountTypeField(ServiceBroadcastAccountTypeField):
+    def pre_validate(self, form):
+        if self.data is None:
+            return
+        super().pre_validate(form)
+
+
 class ServiceBroadcastChannelForm(StripWhitespaceForm):
     channel = ServiceBroadcastAccountTypeField(
         'Emergency alerts settings',
@@ -2353,17 +2360,31 @@ class ServiceBroadcastChannelForm(StripWhitespaceForm):
 
 
 class ServiceBroadcastNetworkForm(StripWhitespaceForm):
-    network = ServiceBroadcastAccountTypeField(
+
+    network_variant = ServiceBroadcastAccountTypeField(
         'Choose a mobile network',
-        thing='mobile network',
+        thing='a mobile network',
         choices=[
-            ("live-test", "All networks"),
-            ("live-test-ee", "EE only"),
-            ("live-test-o2", "O2 only"),
-            ("live-test-vodafone", "Vodafone only"),
-            ("live-test-three", "Three only"),
+            ('live-test', 'All networks'),
+            ('', 'A single network'),
+        ]
+    )
+    network = OptionalServiceBroadcastAccountTypeField(
+        'Choose a mobile network',
+        thing='a mobile network',
+        choices=[
+            ('live-test-ee', 'EE'),
+            ('live-test-o2', 'O2'),
+            ('live-test-vodafone', 'Vodafone'),
+            ('live-test-three', 'Three'),
         ],
     )
+
+    def validate_network(self, field):
+        if not self.network_variant.data and not field.data:
+            raise ValidationError('Select a mobile network')
+        if self.network_variant.data == 'all':
+            field.data = ''
 
 
 class ServiceBroadcastAccountTypeForm(StripWhitespaceForm):

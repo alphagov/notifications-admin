@@ -5575,42 +5575,69 @@ def test_get_service_set_broadcast_channel_redirects(
 
 
 @pytest.mark.parametrize(
-    'service_mode,broadcast_channel,allowed_broadcast_provider,expected_text,expected_value',
+    'service_mode,broadcast_channel,allowed_broadcast_provider,expected_selected',
     [
         (
             "training",
             "test",
             "all",
-            "All networks",
-            "live-test",
+            [],
+        ),
+        (
+            "live",
+            "severe",
+            "all",
+            [],
+        ),
+        (
+            "live",
+            "government",
+            "all",
+            [],
+        ),
+        (
+            "live",
+            "test",
+            "all",
+            [
+                ("All networks", "live-test"),
+            ],
         ),
         (
             "live",
             "test",
             "ee",
-            "EE only",
-            "live-test-ee",
+            [
+                ("A single network", ""),
+                ("EE", "live-test-ee"),
+            ],
         ),
         (
             "live",
             "test",
             "o2",
-            "O2 only",
-            "live-test-o2",
+            [
+                ("A single network", ""),
+                ("O2", "live-test-o2"),
+            ],
         ),
         (
             "live",
             "test",
             "three",
-            "Three only",
-            "live-test-three",
+            [
+                ("A single network", ""),
+                ("Three", "live-test-three"),
+            ],
         ),
         (
             "live",
             "test",
             "vodafone",
-            "Vodafone only",
-            "live-test-vodafone",
+            [
+                ("A single network", ""),
+                ("Vodafone", "live-test-vodafone"),
+            ],
         ),
     ]
 )
@@ -5621,14 +5648,13 @@ def test_get_service_set_broadcast_network_has_radio_selected(
     service_mode,
     broadcast_channel,
     allowed_broadcast_provider,
-    expected_text,
-    expected_value
+    expected_selected,
 ):
     client_request.login(platform_admin_user)
     service_one = service_json(
         SERVICE_ONE_ID,
         permissions=['broadcast'],
-        restricted=False,
+        restricted=False if service_mode == 'live' else True,
         broadcast_channel=broadcast_channel,
         allowed_broadcast_provider=allowed_broadcast_provider,
     )
@@ -5638,47 +5664,85 @@ def test_get_service_set_broadcast_network_has_radio_selected(
         'main.service_set_broadcast_network',
         service_id=SERVICE_ONE_ID,
     )
-    selected_radios = page.select('input[checked]')
-    assert len(selected_radios) == 1
 
-    selected_radio = selected_radios[0]
-    assert selected_radio.get('value') == expected_value
-    selected_label = selected_radio.find_next_sibling('label')
-    assert normalize_spaces(selected_label.text) == expected_text
+    assert [
+        (
+            normalize_spaces(radio.find_next_sibling('label').text),
+            radio['value'],
+        )
+        for radio in page.select('input[checked]')
+    ] == expected_selected
 
 
 @pytest.mark.parametrize(
-    'value',
+    'data, expected_result',
     (
-        'live-test-ee',
-        'live-test-o2',
-        'live-test-three',
-        'live-test-vodafone',
-        'live-test',
-        pytest.param('foo', marks=pytest.mark.xfail),
+        (
+            {'network_variant': 'live-test'},
+            'live-test'
+        ),
+        (
+            {'network_variant': '', 'network': 'live-test-ee'},
+            'live-test-ee'
+        ),
+        (
+            {'network_variant': '', 'network': 'live-test-o2'},
+            'live-test-o2'
+        ),
+        (
+            {'network_variant': '', 'network': 'live-test-three'},
+            'live-test-three'
+        ),
+        (
+            {'network_variant': '', 'network': 'live-test-vodafone'},
+            'live-test-vodafone'
+        ),
     ),
 )
-def test_post_service_set_broadcast_account_type_confirms(
+def test_post_service_set_broadcast_network(
     client_request,
     platform_admin_user,
-    mocker,
-    value,
+    data,
+    expected_result,
 ):
     client_request.login(platform_admin_user)
     client_request.post(
         'main.service_set_broadcast_network',
         service_id=SERVICE_ONE_ID,
-        _data={
-            'network': value,
-        },
+        _data=data,
         _expected_status=302,
         _expected_redirect=url_for(
             'main.service_confirm_broadcast_account_type',
             service_id=SERVICE_ONE_ID,
-            account_type=value,
+            account_type=expected_result,
             _external=True,
         )
     )
+
+
+@pytest.mark.parametrize(
+    'data',
+    (
+        {},
+        {'network_variant': ''},  # Missing choice of MNO
+    ),
+)
+def test_post_service_set_broadcast_network_makes_you_choose(
+    client_request,
+    platform_admin_user,
+    mocker,
+    data,
+):
+    client_request.login(platform_admin_user)
+    page = client_request.post(
+        'main.service_set_broadcast_network',
+        service_id=SERVICE_ONE_ID,
+        _data=data,
+        _expected_status=200,
+    )
+    assert normalize_spaces(
+        page.select_one('.govuk-error-message').text
+    ) == 'Error: Select a mobile network'
 
 
 @pytest.mark.parametrize(
@@ -5794,7 +5858,7 @@ def test_post_service_set_broadcast_account_type_posts_data_to_api_and_redirects
 
 @pytest.mark.parametrize('endpoint, expected_error', (
     ('main.service_set_broadcast_channel', 'Error: Select mode or channel'),
-    ('main.service_set_broadcast_network', 'Error: Select mobile network'),
+    ('main.service_set_broadcast_network', 'Error: Select a mobile network'),
 ))
 def test_post_service_set_broadcast_account_type_shows_errors_if_no_radio_selected(
     platform_admin_client,
