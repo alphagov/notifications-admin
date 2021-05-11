@@ -27,8 +27,8 @@
           <span class="navigation-service-type navigation-service-type--live govuk-!-margin-left-0">
             {% if form.account_type.broadcast_channel == 'severe' %}
               Live
-            {% elif form.account_type.broadcast_channel == 'test' %}
-              Test
+            {% else %}
+              {{ form.account_type.broadcast_channel|title }}
             {% endif %}
             {% if form.account_type.provider_restriction != 'all' %}
               ({{ form.account_type.provider_restriction|format_mobile_network }})
@@ -40,7 +40,10 @@
           {% if form.account_type.broadcast_channel == 'test' %}
             who have switched on the test channel on their phones
           {% endif %}
-          will receive alerts sent from this service.
+          will receive alerts sent from this service
+          {%- if form.account_type.broadcast_channel == 'government' -%}
+            , even if they’ve opted out
+          {%- endif %}.
         </p>
       {% endif %}
 

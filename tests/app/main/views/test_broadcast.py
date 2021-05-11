@@ -286,37 +286,52 @@ def test_broadcast_tour_page_4_shows_service_name(
     )
 
 
-@pytest.mark.parametrize('trial_mode, allowed_broadcast_provider, selector, expected_text, expected_tagged_text', (
+@pytest.mark.parametrize(
+    'trial_mode, channel, allowed_broadcast_provider, selector, expected_text, expected_tagged_text',
     (
-        True,
-        "all",
-        '.navigation-service-type.navigation-service-type--training',
-        'service one Training Switch service',
-        'Training',
-    ),
-    (
-        False,
-        "all",
-        '.navigation-service-type.navigation-service-type--live',
-        'service one Live Switch service',
-        'Live',
-    ),
+        (
+            True,
+            "all",
+            None,
+            '.navigation-service-type.navigation-service-type--training',
+            'service one Training Switch service',
+            'Training',
+        ),
+        (
+            False,
+            'severe',
+            "all",
+            '.navigation-service-type.navigation-service-type--live',
+            'service one Live Switch service',
+            'Live',
+        ),
 
-    (
-        True,
-        'vodafone',
-        '.navigation-service-type.navigation-service-type--training',
-        'service one Training (vodafone) Switch service',
-        'Training (vodafone)',
-    ),
-    (
-        False,
-        'vodafone',
-        '.navigation-service-type.navigation-service-type--live',
-        'service one Live (vodafone) Switch service',
-        'Live (vodafone)',
-    ),
-))
+        (
+            False,
+            'test',
+            'vodafone',
+            '.navigation-service-type.navigation-service-type--live',
+            'service one Test (vodafone) Switch service',
+            'Test (vodafone)',
+        ),
+        (
+            False,
+            'test',
+            'all',
+            '.navigation-service-type.navigation-service-type--live',
+            'service one Test Switch service',
+            'Test',
+        ),
+        (
+            False,
+            'government',
+            'all',
+            '.navigation-service-type.navigation-service-type--live',
+            'service one Government Switch service',
+            'Government',
+        ),
+    )
+)
 def test_broadcast_service_shows_live_or_training(
     client_request,
     service_one,
@@ -324,6 +339,7 @@ def test_broadcast_service_shows_live_or_training(
     mock_get_service_templates_when_no_templates_exist,
     trial_mode,
     allowed_broadcast_provider,
+    channel,
     selector,
     expected_text,
     expected_tagged_text,
@@ -331,6 +347,7 @@ def test_broadcast_service_shows_live_or_training(
     service_one['allowed_broadcast_provider'] = allowed_broadcast_provider
     service_one['permissions'] += ['broadcast']
     service_one['restricted'] = trial_mode
+    service_one['broadcast_channel'] = channel
     page = client_request.get(
         '.broadcast_dashboard',
         service_id=SERVICE_ONE_ID,

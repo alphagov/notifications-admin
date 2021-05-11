@@ -2351,6 +2351,7 @@ class ServiceBroadcastAccountTypeForm(StripWhitespaceForm):
             ("live-test-vodafone", "Test channel (Vodafone)"),
             ("live-test", "Test channel (all networks)"),
             ("live-severe", "Live (all networks)"),
+            ("live-government", "Government channel (all networks)"),
         ],
         validators=[DataRequired()]
     )

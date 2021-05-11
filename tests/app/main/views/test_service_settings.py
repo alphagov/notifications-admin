@@ -5435,6 +5435,7 @@ def test_get_service_set_broadcast_account_type(
         "Test channel (Vodafone)",
         "Test channel (all networks)",
         "Live (all networks)",
+        "Government channel (all networks)",
     ]
     labels = page.find_all('label', class_="govuk-radios__label")
     assert len(labels) == len(expected_labels)
@@ -5599,6 +5600,11 @@ def test_post_service_set_broadcast_account_type_confirms(
             'Members of the public will receive alerts sent from this '
             'service.',
         ]),
+        ('live-government', [
+            'Government',
+            'Members of the public will receive alerts sent from this '
+            'service, even if they’ve opted out.'
+        ]),
     ]
 )
 def test_post_service_set_broadcast_account_type_confirmation_page(
@@ -5624,6 +5630,7 @@ def test_post_service_set_broadcast_account_type_confirmation_page(
         ("training-test", "training", "test", "all"),
         ("live-test-vodafone", "live", "test", "vodafone"),
         ("live-severe", "live", "severe", "all"),
+        ("live-government", "live", "government", "all"),
     ]
 )
 def test_post_service_set_broadcast_account_type_posts_data_to_api_and_redirects(
