@@ -72,9 +72,7 @@ npm run test-watch
 
 To run a specific JavaScript test, you'll need to copy the full command from `package.json`.
 
-## Common tasks
-
-### Updating application dependencies
+## To update application dependencies
 
 `requirements.txt` is generated from the `requirements.in` in order to pin versions of all nested dependencies. If `requirements.in` has been changed, run `make freeze-requirements` to regenerate it.
 
