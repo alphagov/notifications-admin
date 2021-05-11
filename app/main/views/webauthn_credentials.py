@@ -19,7 +19,10 @@ def webauthn_begin_register():
             "name": current_user.email_address,
             "displayName": current_user.name,
         },
-        credentials=[],  # TODO: get from user
+        credentials=[
+            credential.to_credential_data()
+            for credential in current_user.webauthn_credentials
+        ],
         user_verification="discouraged",  # don't ask for PIN
         authenticator_attachment="cross-platform",
     )

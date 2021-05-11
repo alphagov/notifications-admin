@@ -243,7 +243,7 @@ def test_add_user_to_service_calls_correct_endpoint_and_deletes_keys_from_cache(
 
 def test_get_webauthn_credentials_for_user_returns_stubbed_data():
     credentials = user_api_client.get_webauthn_credentials_for_user('id')
-    assert credentials[0]['name'] == 'Ben test'
+    assert len(credentials) == 0
 
 
 def test_create_webauthn_credential_for_user_stores_stubbed_data(webauthn_credential):

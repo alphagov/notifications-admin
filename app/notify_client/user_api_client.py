@@ -192,12 +192,9 @@ class UserApiClient(NotifyAdminAPIClient):
         return self.get(endpoint)
 
     def get_webauthn_credentials_for_user(self, user_id):
-        from datetime import datetime
-
-        return [{
-            'name': 'Ben test',
-            'created_at': datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
-        }]
+        # TODO: remove when using real API
+        self.credentials = getattr(self, 'credentials', [])
+        return self.credentials
 
     def create_webauthn_credential_for_user(self, user_id, credential):
         self.credentials = getattr(self, 'credentials', [])

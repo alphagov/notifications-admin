@@ -51,6 +51,24 @@ def test_begin_register_returns_encoded_options(
     assert relying_party_options['id'] == 'localhost'
 
 
+def test_begin_register_includes_existing_credentials(
+    platform_admin_client,
+    webauthn_credential,
+    mocker,
+):
+    mocker.patch(
+        'app.user_api_client.get_webauthn_credentials_for_user',
+        return_value=[webauthn_credential, webauthn_credential]
+    )
+
+    response = platform_admin_client.get(
+        url_for('main.webauthn_begin_register')
+    )
+
+    webauthn_options = cbor.decode(response.data)['publicKey']
+    assert len(webauthn_options['excludeCredentials']) == 2
+
+
 def test_begin_register_stores_state_in_session(
     platform_admin_client,
 ):
