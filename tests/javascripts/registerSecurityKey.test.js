@@ -8,6 +8,7 @@ beforeAll(() => {
 
   // populate missing values to allow consistent jest.spyOn()
   window.fetch = () => {}
+  window.navigator.credentials = { create: () => {} }
 })
 
 afterAll(() => {
@@ -15,6 +16,7 @@ afterAll(() => {
 
   // restore window attributes to their original undefined state
   delete window.fetch
+  delete window.navigator.credentials
 })
 
 describe('Register security key', () => {
@@ -31,29 +33,20 @@ describe('Register security key', () => {
   })
 
   test('creates a new credential and reloads', (done) => {
-    // pretend window.navigator.credentials exists in test env
-    // defineProperty is used as window.navigator is read-only
-    Object.defineProperty(window.navigator, 'credentials', {
-      value: {
-        // fake PublicKeyCredential response from WebAuthn API
-        // both of the nested properties are Array(Buffer) objects
-        create: (options) => {
-          expect(options).toEqual('options')
+    jest.spyOn(window.navigator.credentials, 'create').mockImplementation((options) => {
+      expect(options).toEqual('options')
 
-          return Promise.resolve({
-            response: {
-              attestationObject: [1, 2, 3],
-              clientDataJSON: [4, 5, 6],
-            }
-          })
+      // fake PublicKeyCredential response from WebAuthn API
+      // both of the nested properties are Array(Buffer) objects
+      return Promise.resolve({
+        response: {
+          attestationObject: [1, 2, 3],
+          clientDataJSON: [4, 5, 6],
         }
-      },
-      // allow global property to be redefined in other tests
-      writable: true,
+      })
     })
 
     // pretend window.location exists in test env
-    // defineProperty is used as window.location is read-only
     Object.defineProperty(window, 'location', {
       // signal that the async promise chain was called
       value: { reload: () => done() },
@@ -108,15 +101,9 @@ describe('Register security key', () => {
     ['network'],
     ['server'],
   ])('alerts if sending WebAuthn credentials fails (%s error)', ({errorType}, done) => {
-    Object.defineProperty(window.navigator, 'credentials', {
-      value: {
-        // fake PublicKeyCredential response from WebAuthn API
-        create: (options) => {
-          return Promise.resolve({ response: {} })
-        }
-      },
-      // allow global property to be redefined in other tests
-      writable: true,
+    jest.spyOn(window.navigator.credentials, 'create').mockImplementation(() => {
+      // fake PublicKeyCredential response from WebAuthn API
+      return Promise.resolve({ response: {} })
     })
 
     jest.spyOn(window, 'fetch').mockImplementation((_url, options = {}) => {
@@ -147,14 +134,8 @@ describe('Register security key', () => {
   })
 
   test('alerts if comms with the authenticator fails', (done) => {
-    Object.defineProperty(window.navigator, 'credentials', {
-      value: {
-        create: () => {
-          return Promise.reject(new DOMException('error'))
-        }
-      },
-      // allow global property to be redefined in other tests
-      writable: true,
+    jest.spyOn(window.navigator.credentials, 'create').mockImplementation(() => {
+      return Promise.reject(new DOMException('error'))
     })
 
     jest.spyOn(window, 'fetch').mockImplementation((_url, options) => {
