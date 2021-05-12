@@ -46,12 +46,9 @@ describe('Register security key', () => {
       })
     })
 
-    // pretend window.location exists in test env
-    Object.defineProperty(window, 'location', {
+    jest.spyOn(window.location, 'reload').mockImplementation(() => {
       // signal that the async promise chain was called
-      value: { reload: () => done() },
-      // allow global property to be redefined in other tests
-      writable: true,
+      done()
     })
 
     jest.spyOn(window, 'fetch').mockImplementation((_url, options = {}) => {
