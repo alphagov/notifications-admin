@@ -110,7 +110,7 @@ def test_show_accounts_or_dashboard_doesnt_redirect_to_org_dashboard_if_user_not
 
 def test_show_accounts_or_dashboard_redirects_if_not_logged_in(
     client,
-    app_
+    notify_admin,
 ):
     response = client.get(url_for('main.show_accounts_or_dashboard'))
     assert response.status_code == 302

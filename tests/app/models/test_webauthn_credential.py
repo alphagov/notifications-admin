@@ -47,7 +47,7 @@ def test_from_registration_encodes_as_unicode(webauthn_dev_server):
     assert type(serialized_credential['registration_response']) == str
 
 
-def test_from_registration_handles_library_errors(app_):
+def test_from_registration_handles_library_errors():
     registration_response = {
        'clientDataJSON': CLIENT_DATA_JSON,
        'attestationObject': ATTESTATION_OBJECT,

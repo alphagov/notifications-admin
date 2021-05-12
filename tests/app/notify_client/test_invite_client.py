@@ -4,7 +4,7 @@ from app import invite_api_client
 
 
 def test_client_creates_invite(
-    app_,
+    notify_admin,
     mocker,
     fake_uuid,
     sample_invite,

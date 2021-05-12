@@ -15,11 +15,11 @@ def _check_code(code):
     {'sms_code': '1-23-45'},
 ])
 def test_form_is_valid_returns_no_errors(
-    app_,
+    notify_admin,
     mock_check_verify_code,
     post_data,
 ):
-    with app_.test_request_context(method='POST', data=post_data):
+    with notify_admin.test_request_context(method='POST', data=post_data):
         form = TwoFactorForm(_check_code)
         assert form.validate() is True
         assert form.errors == {}
@@ -49,32 +49,32 @@ def test_form_is_valid_returns_no_errors(
     ),
 ))
 def test_check_verify_code_returns_errors(
-    app_,
+    notify_admin,
     post_data,
     expected_error,
     mock_check_verify_code,
 ):
-    with app_.test_request_context(method='POST', data=post_data):
+    with notify_admin.test_request_context(method='POST', data=post_data):
         form = TwoFactorForm(_check_code)
         assert form.validate() is False
         assert form.errors == {'sms_code': [expected_error]}
 
 
 def test_check_verify_code_returns_error_when_code_has_expired(
-    app_,
+    notify_admin,
     mock_check_verify_code_code_expired,
 ):
-    with app_.test_request_context(method='POST', data={'sms_code': '99999'}):
+    with notify_admin.test_request_context(method='POST', data={'sms_code': '99999'}):
         form = TwoFactorForm(_check_code)
         assert form.validate() is False
         assert form.errors == {'sms_code': ['Code has expired']}
 
 
 def test_check_verify_code_returns_error_when_code_was_not_found(
-    app_,
+    notify_admin,
     mock_check_verify_code_code_not_found,
 ):
-    with app_.test_request_context(method='POST', data={'sms_code': '99999'}):
+    with notify_admin.test_request_context(method='POST', data={'sms_code': '99999'}):
         form = TwoFactorForm(_check_code)
         assert form.validate() is False
         assert form.errors == {'sms_code': ['Code not found']}

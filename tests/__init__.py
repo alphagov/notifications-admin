@@ -559,7 +559,7 @@ def single_notification_json(
 
 
 def validate_route_permission(mocker,
-                              app_,
+                              notify_admin,
                               method,
                               response_code,
                               route,
@@ -582,8 +582,8 @@ def validate_route_permission(mocker,
     mocker.patch('app.service_api_client.get_service', return_value={'data': service})
     mocker.patch('app.models.user.Users.client_method', return_value=[usr])
     mocker.patch('app.job_api_client.has_jobs', return_value=False)
-    with app_.test_request_context():
-        with app_.test_client() as client:
+    with notify_admin.test_request_context():
+        with notify_admin.test_client() as client:
             client.login(usr)
             if session:
                 with client.session_transaction() as session_:

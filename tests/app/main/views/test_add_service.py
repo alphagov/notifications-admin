@@ -248,7 +248,7 @@ def test_get_should_only_show_nhs_org_types_radios_if_user_has_nhs_email(
     ('other', 10_000),
 ])
 def test_should_add_service_and_redirect_to_dashboard_when_existing_service(
-    app_,
+    notify_admin,
     mocker,
     client_request,
     mock_create_service,
@@ -277,7 +277,7 @@ def test_should_add_service_and_redirect_to_dashboard_when_existing_service(
     mock_create_service.assert_called_once_with(
         service_name='testing the post',
         organisation_type=organisation_type,
-        message_limit=app_.config['DEFAULT_SERVICE_LIMIT'],
+        message_limit=notify_admin.config['DEFAULT_SERVICE_LIMIT'],
         restricted=True,
         user_id=api_user_active['id'],
         email_from='testing.the.post',

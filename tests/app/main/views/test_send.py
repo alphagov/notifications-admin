@@ -2880,7 +2880,7 @@ def test_dont_show_preview_letter_templates_for_bad_filetype(
 ])
 def test_route_permissions(
     mocker,
-    app_,
+    notify_admin,
     client,
     api_user_active,
     service_one,
@@ -2896,7 +2896,7 @@ def test_route_permissions(
 ):
     validate_route_permission(
         mocker,
-        app_,
+        notify_admin,
         "GET",
         response_code,
         url_for(
@@ -2915,7 +2915,7 @@ def test_route_permissions(
 ])
 def test_route_permissions_send_check_notifications(
     mocker,
-    app_,
+    notify_admin,
     client,
     api_user_active,
     service_one,
@@ -2952,7 +2952,7 @@ def test_route_permissions_send_check_notifications(
 ])
 def test_route_permissions_sending(
     mocker,
-    app_,
+    notify_admin,
     client,
     api_user_active,
     service_one,
@@ -2967,7 +2967,7 @@ def test_route_permissions_sending(
 ):
     validate_route_permission(
         mocker,
-        app_,
+        notify_admin,
         "GET",
         expected_status,
         url_for(
