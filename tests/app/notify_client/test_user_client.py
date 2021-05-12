@@ -70,7 +70,7 @@ def test_client_activates_if_pending(mocker, api_user_pending):
 
 
 def test_client_passes_admin_url_when_sending_email_auth(
-    app_,
+    app,
     mocker,
     fake_uuid,
 ):
@@ -87,7 +87,7 @@ def test_client_passes_admin_url_when_sending_email_auth(
     )
 
 
-def test_client_converts_admin_permissions_to_db_permissions_on_edit(app_, mocker):
+def test_client_converts_admin_permissions_to_db_permissions_on_edit(app, mocker):
     mock_post = mocker.patch('app.notify_client.user_api_client.UserApiClient.post')
 
     user_api_client.set_user_permissions('user_id', 'service_id', permissions={'send_messages', 'view_activity'})
@@ -100,7 +100,7 @@ def test_client_converts_admin_permissions_to_db_permissions_on_edit(app_, mocke
     ], key=lambda x: x['permission'])
 
 
-def test_client_converts_admin_permissions_to_db_permissions_on_add_to_service(app_, mocker):
+def test_client_converts_admin_permissions_to_db_permissions_on_add_to_service(app, mocker):
     mock_post = mocker.patch('app.notify_client.user_api_client.UserApiClient.post', return_value={'data': {}})
 
     user_api_client.add_user_to_service('service_id',
@@ -154,7 +154,7 @@ def test_client_converts_admin_permissions_to_db_permissions_on_add_to_service(a
     ]
 )
 def test_returns_value_from_cache(
-    app_,
+    app,
     mocker,
     expected_cache_get_calls,
     cache_value,
@@ -200,7 +200,7 @@ def test_returns_value_from_cache(
     (invite_api_client, 'accept_invite', [SERVICE_ONE_ID, user_id], {}),
 ])
 def test_deletes_user_cache(
-    app_,
+    app,
     mock_get_user,
     mocker,
     client,

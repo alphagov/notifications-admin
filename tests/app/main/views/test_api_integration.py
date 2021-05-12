@@ -381,17 +381,17 @@ def test_should_redirect_after_revoking_api_key(
 ])
 def test_route_permissions(
     mocker,
-    app_,
+    app,
     fake_uuid,
     api_user_active,
     service_one,
     mock_get_api_keys,
     route,
 ):
-    with app_.test_request_context():
+    with app.test_request_context():
         validate_route_permission(
             mocker,
-            app_,
+            app,
             "GET",
             200,
             url_for(route, service_id=service_one['id'], key_id=fake_uuid),
@@ -407,17 +407,17 @@ def test_route_permissions(
 ])
 def test_route_invalid_permissions(
     mocker,
-    app_,
+    app,
     fake_uuid,
     api_user_active,
     service_one,
     mock_get_api_keys,
     route,
 ):
-    with app_.test_request_context():
+    with app.test_request_context():
         validate_route_permission(
             mocker,
-            app_,
+            app,
             "GET",
             403,
             url_for(route, service_id=service_one['id'], key_id=fake_uuid),

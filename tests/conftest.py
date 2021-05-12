@@ -39,7 +39,7 @@ class ElementNotFound(Exception):
 
 
 @pytest.fixture(scope='session')
-def app_():
+def app():
     app = Flask('app')
     create_app(app)
 
@@ -2998,8 +2998,8 @@ def mock_send_notification(mocker, fake_uuid):
 
 
 @pytest.fixture(scope='function')
-def client(app_):
-    with app_.test_request_context(), app_.test_client() as client:
+def client(app):
+    with app.test_request_context(), app.test_client() as client:
         yield client
 
 
@@ -3246,11 +3246,11 @@ def set_config_values(app, dict):
 
 
 @pytest.fixture(scope='function')
-def valid_token(app_, fake_uuid):
+def valid_token(app, fake_uuid):
     return generate_token(
         json.dumps({'user_id': fake_uuid, 'secret_code': 'my secret'}),
-        app_.config['SECRET_KEY'],
-        app_.config['DANGEROUS_SALT']
+        app.config['SECRET_KEY'],
+        app.config['DANGEROUS_SALT']
     )
 
 
