@@ -46,7 +46,7 @@
       {% endcall %}
 
       {% if current_user.platform_admin or session.get('disable_platform_admin_view') %}
-        {% call row() %}
+        {% call row(id='disable-platform-admin') %}
           {{ text_field('Use platform admin view') }}
           {{ text_field('Yes' if not session.get('disable_platform_admin_view') else 'No') }}
           {{ edit_field('Change', url_for('.user_profile_disable_platform_admin_view')) }}

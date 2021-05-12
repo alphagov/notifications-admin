@@ -55,28 +55,26 @@ make run-flask
 
 Then visit [localhost:6012](http://localhost:6012).
 
+Any Python code changes you make should be picked up automatically in development. If you're developing JavaScript code, run `npm run watch` to achieve the same.
+
 ## To test the application
 
 ```
 # install dependencies, etc.
 make bootstrap
 
+# run all the tests
 make test
+
+# continuously run js tests
+npm run test-watch
 ```
 
-## Common tasks
+To run a specific JavaScript test, you'll need to copy the full command from `package.json`.
 
-### Updating application dependencies
+## To update application dependencies
 
 `requirements.txt` is generated from the `requirements.in` in order to pin versions of all nested dependencies. If `requirements.in` has been changed, run `make freeze-requirements` to regenerate it.
-
-### Automatically rebuild the frontend assets
-
-If you want the front end assets to re-compile on changes, leave this running in a separate terminal from the app
-
-```shell
-    npm run watch
-```
 
 ## Further docs
 
