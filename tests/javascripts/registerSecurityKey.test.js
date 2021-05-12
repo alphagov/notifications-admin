@@ -6,6 +6,9 @@ beforeAll(() => {
   // you might need to comment this out to debug some failures
   jest.spyOn(console, 'error').mockImplementation(() => {})
 
+  // ensure window.alert() is implemented to simplify errors
+  jest.spyOn(window, 'alert').mockImplementation(() => {})
+
   // populate missing values to allow consistent jest.spyOn()
   window.fetch = () => {}
   window.navigator.credentials = { create: () => {} }
