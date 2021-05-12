@@ -5,10 +5,16 @@ beforeAll(() => {
   // disable console.error() so we don't see it in test output
   // you might need to comment this out to debug some failures
   jest.spyOn(console, 'error').mockImplementation(() => {})
+
+  // populate missing values to allow consistent jest.spyOn()
+  window.fetch = () => {}
 })
 
 afterAll(() => {
   require('./support/teardown.js')
+
+  // restore window attributes to their original undefined state
+  delete window.fetch
 })
 
 describe('Register security key', () => {
@@ -55,16 +61,19 @@ describe('Register security key', () => {
       writable: true,
     })
 
-    jest.spyOn(window.$, 'ajax').mockImplementation((options) => {
+    jest.spyOn(window, 'fetch').mockImplementation((_url, options = {}) => {
       // initial fetch of options from the server
       if (!options.method) {
         // options from the server are CBOR-encoded
         webauthnOptions = window.CBOR.encode('options')
-        return Promise.resolve(webauthnOptions)
+
+        return Promise.resolve({
+          ok: true, arrayBuffer: () => webauthnOptions
+        })
 
       // subsequent POST of credential data to server
       } else {
-        decodedData = window.CBOR.decode(options.data)
+        decodedData = window.CBOR.decode(options.body)
         expect(decodedData.clientDataJSON).toEqual(new Uint8Array([4,5,6]))
         expect(decodedData.attestationObject).toEqual(new Uint8Array([1,2,3]))
         expect(options.headers['X-CSRFToken']).toBe()
@@ -76,13 +85,13 @@ describe('Register security key', () => {
   })
 
   test('alerts if fetching WebAuthn options fails', (done) => {
-    jest.spyOn(window.$, 'ajax').mockImplementation((options) => {
+    jest.spyOn(window, 'fetch').mockImplementation((_url, options = {}) => {
       return Promise.reject('error')
     })
 
     jest.spyOn(window, 'alert').mockImplementation((msg) => {
+      expect(msg).toEqual('Error during registration.\n\nerror')
       done()
-      expect(msg).toEqual('Error during registration. Please try again.')
     })
 
     button.click()
@@ -100,11 +109,14 @@ describe('Register security key', () => {
       writable: true,
     })
 
-    jest.spyOn(window.$, 'ajax').mockImplementation((options) => {
+    jest.spyOn(window, 'fetch').mockImplementation((_url, options = {}) => {
       // initial fetch of options from the server
       if (!options.method) {
         webauthnOptions = window.CBOR.encode('options')
-        return Promise.resolve(webauthnOptions)
+
+        return Promise.resolve({
+          ok: true, arrayBuffer: () => webauthnOptions
+        })
 
       // subsequent POST of credential data to server
       } else {
@@ -113,8 +125,8 @@ describe('Register security key', () => {
     })
 
     jest.spyOn(window, 'alert').mockImplementation((msg) => {
+      expect(msg).toEqual('Error during registration.\n\nerror')
       done()
-      expect(msg).toEqual('Error during registration. Please try again.')
     })
 
     button.click()
@@ -131,15 +143,18 @@ describe('Register security key', () => {
       writable: true,
     })
 
-    jest.spyOn(window.$, 'ajax').mockImplementation((options) => {
+    jest.spyOn(window, 'fetch').mockImplementation((_url, options) => {
       // initial fetch of options from the server
       webauthnOptions = window.CBOR.encode('options')
-      return Promise.resolve(webauthnOptions)
+
+      return Promise.resolve({
+        ok: true, arrayBuffer: () => webauthnOptions
+      })
     })
 
     jest.spyOn(window, 'alert').mockImplementation((msg) => {
+      expect(msg).toEqual('Error during registration.\n\nerror')
       done()
-      expect(msg).toEqual('Error communicating with device.\n\nerror')
     })
 
     button.click()
