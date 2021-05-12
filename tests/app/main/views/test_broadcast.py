@@ -333,7 +333,7 @@ def test_broadcast_tour_page_4_shows_service_name(
             False,
             'government',
             'all',
-            '.navigation-service-type.navigation-service-type--live',
+            '.navigation-service-type.navigation-service-type--government',
             'service one Government Switch service',
             'Government',
         ),

@@ -24,19 +24,20 @@
         </p>
       {% else %}
         <p class="govuk-body">
-          <span class="navigation-service-type navigation-service-type--live govuk-!-margin-left-0">
-            {% if form.account_type.broadcast_channel == 'severe' %}
-              Live
-            {% else %}
-              {{ form.account_type.broadcast_channel|title }}
-            {% endif %}
-            {% if form.account_type.provider_restriction != 'all' %}
-              ({{ form.account_type.provider_restriction|format_mobile_network }})
-            {% endif %}
-            {% if form.account_type.broadcast_channel == 'test' and form.account_type.provider_restriction == 'all'%}
-              (all networks)
-            {% endif %}
-          </span>
+          {% if form.account_type.broadcast_channel == 'severe' %}
+            <span class="navigation-service-type navigation-service-type--live govuk-!-margin-left-0">Live
+          {% elif form.account_type.broadcast_channel == 'government' %}
+            <span class="navigation-service-type navigation-service-type--government govuk-!-margin-left-0">Government
+          {% else %}
+            <span class="navigation-service-type navigation-service-type--live govuk-!-margin-left-0">{{ form.account_type.broadcast_channel|title }}
+          {% endif %}
+          {% if form.account_type.provider_restriction != 'all' %}
+            ({{ form.account_type.provider_restriction|format_mobile_network }})
+          {% endif %}
+          {% if form.account_type.broadcast_channel == 'test' and form.account_type.provider_restriction == 'all'%}
+            (all networks)
+          {% endif %}
+            </span>
         </p>
         <p class="govuk-body">
           Members of the public

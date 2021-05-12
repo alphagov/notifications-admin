@@ -31,8 +31,8 @@
               {% else %}
                 ({{ current_service.allowed_broadcast_provider }})
               {% endif %}
-            {% else %}
-              <span class="navigation-service-type navigation-service-type--live">{{ current_service.broadcast_channel|title }}
+            {% elif current_service.broadcast_channel == 'government' %}
+              <span class="navigation-service-type navigation-service-type--government">Government
             {% endif %}
             </span>
         {% endif %}
