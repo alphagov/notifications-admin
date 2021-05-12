@@ -169,6 +169,10 @@ class User(JSONModel, UserMixin):
     def email_auth(self):
         return self.auth_type == 'email_auth'
 
+    @property
+    def webauthn_auth(self):
+        return self.auth_type == 'webauthn_auth'
+
     def reset_failed_login_count(self):
         user_api_client.reset_failed_login_count(self.id)
 
