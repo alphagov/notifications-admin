@@ -436,7 +436,7 @@
               {% else %}
                 {% if current_service.live and current_service.broadcast_channel == "government" %}Government{% endif %}
                 {% if current_service.live and current_service.broadcast_channel == "severe" %}Live{% endif %}
-                {% if current_service.live and current_service.broadcast_channel == "test" %}Test {% if current_service.allowed_broadcast_provider != "all" %}({{ current_service.allowed_broadcast_provider|format_mobile_network }}){% else %}(All networks){% endif %}{%endif%}
+                {% if current_service.live and current_service.broadcast_channel == "test" %}Test {% if current_service.allowed_broadcast_provider != "all" %}({{ current_service.allowed_broadcast_provider|format_mobile_network }}){% else %}(all networks){% endif %}{%endif%}
                 {% if not current_service.live%}Training {% endif%}
               {% endif %}
             {% endcall %}

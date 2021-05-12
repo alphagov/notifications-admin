@@ -26,7 +26,9 @@
               <span class="navigation-service-type navigation-service-type--live">Live
             {% elif current_service.broadcast_channel == 'test' %}
               <span class="navigation-service-type navigation-service-type--live">{{ current_service.broadcast_channel|title }}
-              {% if current_service.allowed_broadcast_provider != "all" %}
+              {% if current_service.allowed_broadcast_provider == "all" %}
+                (all networks)
+              {% else %}
                 ({{ current_service.allowed_broadcast_provider }})
               {% endif %}
             {% else %}

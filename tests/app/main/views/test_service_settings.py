@@ -203,7 +203,7 @@ def test_platform_admin_sees_only_relevant_settings_for_broadcast_service(
         (True, "training", "test", "all", "Training"),
         (True, "live", "test", "ee", "Test (EE)"),
         (True, "live", "test", "three", "Test (Three)"),
-        (True, "live", "test", "all", "Test (All networks)"),
+        (True, "live", "test", "all", "Test (all networks)"),
         (True, "live", "severe", "all", "Live"),
     ]
 )
@@ -5777,7 +5777,7 @@ def test_post_service_set_broadcast_network_makes_you_choose(
             'this service.',
         ]),
         ('live-test', [
-            'Test',
+            'Test (all networks)',
             'Members of the public who have switched on the test '
             'channel on their phones will receive alerts sent from '
             'this service.',

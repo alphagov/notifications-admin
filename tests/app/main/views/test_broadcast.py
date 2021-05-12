@@ -291,8 +291,16 @@ def test_broadcast_tour_page_4_shows_service_name(
     (
         (
             True,
-            "all",
             None,
+            'all',
+            '.navigation-service-type.navigation-service-type--training',
+            'service one Training Switch service',
+            'Training',
+        ),
+        (
+            True,
+            'test',
+            'all',
             '.navigation-service-type.navigation-service-type--training',
             'service one Training Switch service',
             'Training',
@@ -300,12 +308,19 @@ def test_broadcast_tour_page_4_shows_service_name(
         (
             False,
             'severe',
-            "all",
+            'all',
             '.navigation-service-type.navigation-service-type--live',
             'service one Live Switch service',
             'Live',
         ),
-
+        (
+            False,
+            'test',
+            'all',
+            '.navigation-service-type.navigation-service-type--live',
+            'service one Test (all networks) Switch service',
+            'Test (all networks)',
+        ),
         (
             False,
             'test',
@@ -313,14 +328,6 @@ def test_broadcast_tour_page_4_shows_service_name(
             '.navigation-service-type.navigation-service-type--live',
             'service one Test (vodafone) Switch service',
             'Test (vodafone)',
-        ),
-        (
-            False,
-            'test',
-            'all',
-            '.navigation-service-type.navigation-service-type--live',
-            'service one Test Switch service',
-            'Test',
         ),
         (
             False,

@@ -33,6 +33,9 @@
             {% if form.account_type.provider_restriction != 'all' %}
               ({{ form.account_type.provider_restriction|format_mobile_network }})
             {% endif %}
+            {% if form.account_type.broadcast_channel == 'test' and form.account_type.provider_restriction == 'all'%}
+              (all networks)
+            {% endif %}
           </span>
         </p>
         <p class="govuk-body">
