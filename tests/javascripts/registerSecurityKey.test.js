@@ -77,16 +77,23 @@ describe('Register security key', () => {
         expect(decodedData.clientDataJSON).toEqual(new Uint8Array([4,5,6]))
         expect(decodedData.attestationObject).toEqual(new Uint8Array([1,2,3]))
         expect(options.headers['X-CSRFToken']).toBe()
-        return Promise.resolve()
+        return Promise.resolve({ ok: true })
       }
     })
 
     button.click()
   })
 
-  test('alerts if fetching WebAuthn options fails', (done) => {
+  test.each([
+    ['network'],
+    ['server'],
+  ])('alerts if fetching WebAuthn options fails (%s error)', (errorType, done) => {
     jest.spyOn(window, 'fetch').mockImplementation((_url, options = {}) => {
-      return Promise.reject('error')
+      if (errorType == 'network') {
+        return Promise.reject('error')
+      } else {
+        return Promise.resolve({ ok: false, statusText: 'error' })
+      }
     })
 
     jest.spyOn(window, 'alert').mockImplementation((msg) => {
@@ -97,7 +104,10 @@ describe('Register security key', () => {
     button.click()
   })
 
-  test('alerts if sending WebAuthn credentials fails', (done) => {
+  test.each([
+    ['network'],
+    ['server'],
+  ])('alerts if sending WebAuthn credentials fails (%s error)', ({errorType}, done) => {
     Object.defineProperty(window.navigator, 'credentials', {
       value: {
         // fake PublicKeyCredential response from WebAuthn API
@@ -120,7 +130,11 @@ describe('Register security key', () => {
 
       // subsequent POST of credential data to server
       } else {
-        return Promise.reject('error')
+        if (errorType == 'network') {
+          return Promise.reject('error')
+        } else {
+          return Promise.resolve({ ok: false, statusText: 'error' })
+        }
       }
     })
 

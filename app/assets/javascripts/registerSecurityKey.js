@@ -9,6 +9,10 @@
 
           fetch('/webauthn/register')
             .then((response) => {
+              if (!response.ok) {
+                throw Error(response.statusText);
+              }
+
               return response.arrayBuffer();
             })
             .then((data) => {
@@ -21,7 +25,11 @@
                 credential.response, component.data('csrfToken')
               );
             })
-            .then(() => {
+            .then((response) => {
+              if (!response.ok) {
+                throw Error(response.statusText);
+              }
+
               window.location.reload();
             })
             .catch((error) => {
