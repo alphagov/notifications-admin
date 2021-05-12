@@ -92,6 +92,17 @@
           wants to broadcast
           {{ broadcast_message.template.name }}
         </h1>
+        {% if current_service.live %}
+          {{ form.confirm(param_extensions={
+            'formGroup': {
+              'classes': 'govuk-!-margin-bottom-4'
+            }
+          }) }}
+        {% else %}
+          <p class="govuk-body govuk-!-margin-bottom-3">
+            No phones will get this alert.
+          </p>
+        {% endif %}
         {{ page_footer(
           "Start broadcasting now",
           delete_link=url_for('main.reject_broadcast_message', service_id=current_service.id, broadcast_message_id=broadcast_message.id),

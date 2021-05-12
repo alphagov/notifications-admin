@@ -14,6 +14,7 @@ from app.main.forms import (
     BroadcastAreaForm,
     BroadcastAreaFormWithSelectAll,
     BroadcastTemplateForm,
+    ConfirmBroadcastForm,
     NewBroadcastForm,
     SearchByNameForm,
 )
@@ -401,6 +402,11 @@ def view_broadcast(service_id, broadcast_message_id):
             back_link_endpoint,
             service_id=current_service.id,
         ),
+        form=ConfirmBroadcastForm(
+            service_is_live=current_service.live,
+            channel=current_service.broadcast_channel,
+            max_phones=broadcast_message.count_of_phones_likely,
+        ),
     )
 
 
@@ -414,6 +420,12 @@ def approve_broadcast_message(service_id, broadcast_message_id):
         service_id=current_service.id,
     )
 
+    form = ConfirmBroadcastForm(
+        service_is_live=current_service.live,
+        channel=current_service.broadcast_channel,
+        max_phones=broadcast_message.count_of_phones_likely,
+    )
+
     if broadcast_message.status != 'pending-approval':
         return redirect(url_for(
             '.view_current_broadcast',
@@ -421,14 +433,15 @@ def approve_broadcast_message(service_id, broadcast_message_id):
             broadcast_message_id=broadcast_message.id,
         ))
 
-    broadcast_message.approve_broadcast()
-
     if current_service.trial_mode:
+        broadcast_message.approve_broadcast()
         return redirect(url_for(
             '.broadcast_tour',
             service_id=current_service.id,
             step_index=6,
         ))
+    elif form.validate_on_submit():
+        broadcast_message.approve_broadcast()
 
     return redirect(url_for(
         '.view_current_broadcast',
