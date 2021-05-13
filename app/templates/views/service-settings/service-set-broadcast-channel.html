@@ -4,7 +4,7 @@
 {% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% block service_page_title %}
-  Send cell broadcasts
+  Emergency alerts settings
 {% endblock %}
 
 {% block maincolumn_content %}
@@ -16,7 +16,7 @@
         "href": url_for('.service_settings', service_id=current_service.id)
       }) }}
       {% call form_wrapper() %}
-        {{ form.account_type(param_extensions={
+        {{ form.channel(param_extensions={
           'fieldset': {
             'legend': {
               'isPageHeading': True,

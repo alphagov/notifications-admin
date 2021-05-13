@@ -2316,6 +2316,8 @@ class ServiceBroadcastAccountTypeField(GovukRadiosField):
     # (service_mode, broadcast_channel, allowed_broadcast_provider)
     # to a value to be used in our form such as "live-severe-ee"
     def process_data(self, value):
+        if not value or isinstance(value, str):
+            return super().process_data(value)
         (live, broadcast_channel, allowed_broadcast_provider) = value
         account_type = None
         if broadcast_channel:
@@ -2330,11 +2332,59 @@ class ServiceBroadcastAccountTypeField(GovukRadiosField):
     # broadcast_channel and provider_restriction to be used by the flask route to send to the
     # API
     def post_validate(self, form, validation_stopped):
-        if not validation_stopped:
+        if not validation_stopped and self.data:
             split_values = self.data.split("-")
             self.service_mode = split_values[0]
             self.broadcast_channel = split_values[1]
             self.provider_restriction = split_values[2] if len(split_values) == 3 else 'all'
+
+
+class OptionalServiceBroadcastAccountTypeField(ServiceBroadcastAccountTypeField):
+    def pre_validate(self, form):
+        if self.data is None:
+            return
+        super().pre_validate(form)
+
+
+class ServiceBroadcastChannelForm(StripWhitespaceForm):
+    channel = ServiceBroadcastAccountTypeField(
+        'Emergency alerts settings',
+        thing='mode or channel',
+        choices=[
+            ("training-test", "Training mode"),
+            ("live-test", "Test channel"),
+            ("live-severe", "Live channel"),
+            ("live-government", "Government channel"),
+        ],
+    )
+
+
+class ServiceBroadcastNetworkForm(StripWhitespaceForm):
+
+    network_variant = ServiceBroadcastAccountTypeField(
+        'Choose a mobile network',
+        thing='a mobile network',
+        choices=[
+            ('live-test', 'All networks'),
+            ('', 'A single network'),
+        ]
+    )
+    network = OptionalServiceBroadcastAccountTypeField(
+        'Choose a mobile network',
+        thing='a mobile network',
+        choices=[
+            ('live-test-ee', 'EE'),
+            ('live-test-o2', 'O2'),
+            ('live-test-vodafone', 'Vodafone'),
+            ('live-test-three', 'Three'),
+        ],
+    )
+
+    def validate_network(self, field):
+        if not self.network_variant.data and not field.data:
+            raise ValidationError('Select a mobile network')
+        if self.network_variant.data == 'all':
+            field.data = ''
 
 
 class ServiceBroadcastAccountTypeForm(StripWhitespaceForm):
@@ -2349,6 +2399,7 @@ class ServiceBroadcastAccountTypeForm(StripWhitespaceForm):
             ("live-test-vodafone", "Test channel (Vodafone)"),
             ("live-test", "Test channel (all networks)"),
             ("live-severe", "Live (all networks)"),
+            ("live-government", "Government channel (all networks)"),
         ],
         validators=[DataRequired()]
     )

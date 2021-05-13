@@ -1,0 +1,37 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/radios.html" import radio, conditional_radio_panel %}
+{% from "components/select-input.html" import select_wrapper %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
+
+{% block service_page_title %}
+  Choose a mobile network
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-five-sixths">
+      {{ page_header(
+        'Choose a mobile network',
+        back_link=url_for('.service_set_broadcast_channel', service_id=current_service.id)
+      ) }}
+      {% call form_wrapper() %}
+        {% call select_wrapper(form.network_variant, hide_legend=True) %}
+          {% for option in form.network_variant %}
+            {{ radio(option, data_target='single-network' if option.data == "" else None) }}
+          {% endfor %}
+        {% endcall %}
+        {% call conditional_radio_panel('single-network') %}
+          {{ form.network(
+              param_extensions={'fieldset': {'legend': {'classes': 'govuk-visually-hidden'}}}
+            ) }}
+        {% endcall %}
+        {{ page_footer('Continue') }}
+      {% endcall %}
+    </div>
+  </div>
+
+{% endblock %}
