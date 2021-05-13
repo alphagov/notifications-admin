@@ -42,4 +42,5 @@ from app.main.views import (  # noqa isort:skip
     uploads,
     user_profile,
     verify,
+    webauthn_credentials,
 )

@@ -20,6 +20,7 @@ eventlet==0.30.2 # pyup: ignore
 notifications-python-client==6.0.2
 Shapely==1.7.1
 rtreelib==0.2.0
+fido2==0.9.1
 
 # PaaS
 awscli-cwlogs>=1.4,<1.5
@@ -27,6 +28,10 @@ itsdangerous==1.1.0
 
 git+https://github.com/alphagov/notifications-utils.git@44.2.0#egg=notifications-utils==44.2.0
 git+https://github.com/alphagov/govuk-frontend-jinja.git@v0.5.8-alpha#egg=govuk-frontend-jinja==0.5.8-alpha
+
+# cryptography 3.4+ incorporates Rust code, which isn't supported on PaaS
+# e.g. https://github.com/alphagov/notifications-api/pull/3126
+cryptography<3.4
 
 # gds-metrics requires prometheseus 0.2.0, override that requirement as later versions bring significant performance gains
 # version 0.10.0 introduced exceptions when workers crashed due to deprecating lower case `prometheus_multiproc_dir`.

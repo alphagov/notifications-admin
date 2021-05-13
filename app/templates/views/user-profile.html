@@ -45,6 +45,14 @@
         {{ edit_field('Change', url_for('.user_profile_password')) }}
       {% endcall %}
 
+      {% if current_user.platform_admin %}
+        {% call row(id='security-keys') %}
+          {{ text_field('Security keys') }}
+          {{ text_field(current_user.webauthn_credentials|length) }}
+          {{ edit_field('Change', url_for('.user_profile_security_keys')) }}
+        {% endcall %}
+      {% endif %}
+
       {% if current_user.platform_admin or session.get('disable_platform_admin_view') %}
         {% call row(id='disable-platform-admin') %}
           {{ text_field('Use platform admin view') }}

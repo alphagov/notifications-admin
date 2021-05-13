@@ -23,7 +23,11 @@ from app.main.forms import (
     TwoFactorForm,
 )
 from app.models.user import User
-from app.utils import user_is_gov_user, user_is_logged_in
+from app.utils import (
+    user_is_gov_user,
+    user_is_logged_in,
+    user_is_platform_admin,
+)
 
 NEW_EMAIL = 'new-email'
 NEW_MOBILE = 'new-mob'
@@ -224,4 +228,12 @@ def user_profile_disable_platform_admin_view():
     return render_template(
         'views/user-profile/disable-platform-admin-view.html',
         form=form
+    )
+
+
+@main.route("/user-profile/security-keys", methods=['GET'])
+@user_is_platform_admin
+def user_profile_security_keys():
+    return render_template(
+        'views/user-profile/security-keys.html',
     )

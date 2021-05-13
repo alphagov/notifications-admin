@@ -148,7 +148,8 @@ const javascripts = () => {
       paths.npm + 'query-command-supported/dist/queryCommandSupported.min.js',
       paths.npm + 'diff-dom/diffDOM.js',
       paths.npm + 'timeago/jquery.timeago.js',
-      paths.npm + 'textarea-caret/index.js'
+      paths.npm + 'textarea-caret/index.js',
+      paths.npm + 'cbor-js/cbor.js'
     ]));
 
   // JS local to this application
@@ -178,6 +179,7 @@ const javascripts = () => {
     paths.src + 'javascripts/templateFolderForm.js',
     paths.src + 'javascripts/collapsibleCheckboxes.js',
     paths.src + 'javascripts/radioSlider.js',
+    paths.src + 'javascripts/registerSecurityKey.js',
     paths.src + 'javascripts/updateStatus.js',
     paths.src + 'javascripts/homepage.js',
     paths.src + 'javascripts/main.js',

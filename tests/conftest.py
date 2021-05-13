@@ -4479,3 +4479,13 @@ def mock_get_invited_org_user_by_id(mocker, sample_org_invite):
         'app.org_invite_api_client.get_invited_user',
         side_effect=_get,
     )
+
+
+@pytest.fixture
+def webauthn_credential():
+    return {
+        'name': 'Test credential',
+        'credential_data': b'WJ0AAAAAAAAAAAAAAAAAAAAAAECKU1ppjl9gmhHWyDkgHsUvZmhr6oF3/lD3llzLE2SaOSgOGIsIuAQqgp8JQSUu3r/oOaP8RS44dlQjrH+ALfYtpAECAyYhWCAxnqAfESXOYjKUc2WACuXZ3ch0JHxV0VFrrTyjyjIHXCJYIFnx8H87L4bApR4M+hPcV+fHehEOeW+KCyd0H+WGY8s6',  # noqa
+        'registration_response': 'anything',
+        'created_at': '2017-10-18T16:57:14.154185Z',
+    }
