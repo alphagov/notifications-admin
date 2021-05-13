@@ -66,8 +66,10 @@
               <p class="govuk-body tick-cross-list-hint">
                 {% if user.auth_type == 'sms_auth' %}
                   Signs in with a text message code
-                {% else %}
+                {% elif user.auth_type == 'email_auth' %}
                   Signs in with an email link
+                {% elif user.auth_type == 'webauthn_auth' %}
+                  Signs in with a security key
                 {% endif %}
               </p>
             {% endif %}

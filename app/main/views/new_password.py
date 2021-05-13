@@ -41,9 +41,11 @@ def new_password(token):
             'id': user.id,
             'email': user.email_address,
             'password': form.new_password.data}
-        if user.auth_type == 'email_auth':
+        if user.email_auth:
             # they've just clicked an email link, so have done an email auth journey anyway. Just log them in.
             return log_in_user(user.id)
+        elif user.webauthn_auth:
+            raise NotImplementedError('webauthn not supported yet')
         else:
             # send user a 2fa sms code
             user.send_verify_code()
