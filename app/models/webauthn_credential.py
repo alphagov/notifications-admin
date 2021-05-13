@@ -32,15 +32,15 @@ class WebAuthnCredential(JSONModel):
             'name': 'Unnamed key',
             'credential_data': base64.b64encode(
                 cbor.encode(auth_data.credential_data),
-            ),
+            ).decode('utf-8'),
             'registration_response': base64.b64encode(
                 cbor.encode(response),
-            )
+            ).decode('utf-8')
         })
 
     def to_credential_data(self):
         return AttestedCredentialData(
-            cbor.decode(base64.b64decode(self.credential_data))
+            cbor.decode(base64.b64decode(self.credential_data.encode()))
         )
 
     def serialize(self):

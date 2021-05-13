@@ -241,12 +241,25 @@ def test_add_user_to_service_calls_correct_endpoint_and_deletes_keys_from_cache(
     ]
 
 
-def test_get_webauthn_credentials_for_user_returns_stubbed_data():
-    credentials = user_api_client.get_webauthn_credentials_for_user('id')
-    assert len(credentials) == 0
+def test_get_webauthn_credentials_for_user(mocker, webauthn_credential, fake_uuid):
+
+    mock_get = mocker.patch(
+        'app.notify_client.user_api_client.UserApiClient.get',
+        return_value={'data': [webauthn_credential]}
+    )
+
+    credentials = user_api_client.get_webauthn_credentials_for_user(fake_uuid)
+
+    mock_get.assert_called_once_with(f'/user/{fake_uuid}/webauthn')
+    assert len(credentials) == 1
+    assert credentials[0]['name'] == 'Test credential'
 
 
-def test_create_webauthn_credential_for_user_stores_stubbed_data(webauthn_credential):
+def test_create_webauthn_credential_for_user(mocker, webauthn_credential, fake_uuid):
     credential = WebAuthnCredential(webauthn_credential)
-    user_api_client.create_webauthn_credential_for_user('id', credential)
-    assert len(user_api_client.credentials) == 1
+
+    mock_post = mocker.patch('app.notify_client.user_api_client.UserApiClient.post')
+    expected_url = f'/user/{fake_uuid}/webauthn'
+
+    user_api_client.create_webauthn_credential_for_user(fake_uuid, credential)
+    mock_post.assert_called_once_with(expected_url, data=credential.serialize())

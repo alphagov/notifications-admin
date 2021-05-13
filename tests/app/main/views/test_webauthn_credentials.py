@@ -27,6 +27,7 @@ def test_begin_register_returns_encoded_options(
         values={'ADMIN_BASE_URL': 'http://localhost:6012'}
     )
     webauthn_server.init_app(app_)
+    mocker.patch('app.user_api_client.get_webauthn_credentials_for_user', return_value=[])
 
     response = platform_admin_client.get(
         url_for('main.webauthn_begin_register')
@@ -71,10 +72,17 @@ def test_begin_register_includes_existing_credentials(
 
 def test_begin_register_stores_state_in_session(
     platform_admin_client,
+    mocker,
 ):
-    platform_admin_client.get(
+    mocker.patch(
+        'app.user_api_client.get_webauthn_credentials_for_user',
+        return_value=[])
+
+    response = platform_admin_client.get(
         url_for('main.webauthn_begin_register')
     )
+
+    assert response.status_code == 200
 
     with platform_admin_client.session_transaction() as session:
         assert session['webauthn_registration_state'] is not None
