@@ -3,6 +3,7 @@
 {% from "components/button/macro.njk" import govukButton %}
 {% from "components/back-link/macro.njk" import govukBackLink %}
 {% from "components/table.html" import mapping_table, row, field, row_heading %}
+{% from "vendor/govuk-frontend/components/error-message/macro.njk" import govukErrorMessage %}
 
 {% set page_title = 'Security keys' %}
 {% set credentials = current_user.webauthn_credentials %}
@@ -45,10 +46,20 @@
 
       {% endif %}
 
+      {{ govukErrorMessage({
+        "classes": "webauthn__api-missing",
+        "text": "Your browser does not support security keys. Try signing in to Notify using a different browser."
+      }) }}
+
+      {{ govukErrorMessage({
+        "classes": "webauthn__no-js",
+        "text": "JavaScript is not available for this page. Security keys need JavaScript to work."
+      }) }}
+
       {{ govukButton({
         "element": "button",
         "text": "Register a key",
-        "classes": "govuk-button--secondary",
+        "classes": "govuk-button--secondary webauthn__api-required",
         "attributes": {
           "data-module": "register-security-key",
           "data-csrf-token": csrf_token(),

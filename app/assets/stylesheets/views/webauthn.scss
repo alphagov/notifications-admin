@@ -1,0 +1,25 @@
+.webauthn__no-js {
+  .js-enabled & {
+    display: none;
+  }
+}
+
+.webauthn__api-missing {
+  display: none;
+
+  .js-enabled & {
+    display: block;
+  }
+
+  .js-enabled.webauthn-api-enabled & {
+    display: none;
+  }
+}
+
+.webauthn__api-required {
+  display: none;
+
+  .webauthn-api-enabled & {
+    display: block;
+  }
+}
