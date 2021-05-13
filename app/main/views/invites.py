@@ -37,12 +37,14 @@ def accept_invite(token):
         return render_template('views/cancelled-invitation.html',
                                from_user=invited_user.from_user.name,
                                service_name=service.name)
-
     if invited_user.status == 'accepted':
         session.pop('invited_user_id', None)
         service = Service.from_id(invited_user.service)
         if service.has_permission('broadcast'):
-            return redirect(url_for('main.broadcast_tour', service_id=service.id, step_index=1))
+            if service.live:
+                return redirect(url_for('main.broadcast_tour_live', service_id=service.id, step_index=1))
+            else:
+                return redirect(url_for('main.broadcast_tour', service_id=service.id, step_index=1))
         return redirect(url_for('main.service_dashboard', service_id=invited_user.service))
 
     session['invited_user_id'] = invited_user.id
@@ -71,7 +73,10 @@ def accept_invite(token):
                 invited_by_id=invited_user.from_user.id,
             )
             if service.has_permission('broadcast'):
-                return redirect(url_for('main.broadcast_tour', service_id=service.id, step_index=1))
+                if service.live:
+                    return redirect(url_for('main.broadcast_tour_live', service_id=service.id, step_index=1))
+                else:
+                    return redirect(url_for('main.broadcast_tour', service_id=service.id, step_index=1))
             return redirect(url_for('main.service_dashboard', service_id=service.id))
     else:
         return redirect(url_for('main.register_from_invite'))

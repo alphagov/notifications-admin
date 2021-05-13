@@ -42,6 +42,17 @@ def broadcast_tour(service_id, step_index):
     )
 
 
+@main.route('/services/<uuid:service_id>/broadcast-tour/live/<int:step_index>')
+@user_has_permissions()
+@service_has_permission('broadcast')
+def broadcast_tour_live(service_id, step_index):
+    if step_index not in (1, 2):
+        abort(404)
+    return render_template(
+        f'views/broadcast/tour/live/{step_index}.html'
+    )
+
+
 @main.route('/services/<uuid:service_id>/current-alerts')
 @user_has_permissions()
 @service_has_permission('broadcast')

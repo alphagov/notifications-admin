@@ -55,6 +55,44 @@ def test_existing_user_accept_invite_calls_api_and_redirects_to_dashboard(
     )
 
 
+@pytest.mark.parametrize('trial_mode, expected_endpoint', (
+    (True, '.broadcast_tour'),
+    (False, '.broadcast_tour_live'),
+))
+def test_broadcast_service_shows_tour(
+    client,
+    service_one,
+    mock_check_invite_token,
+    mock_get_unknown_user_by_email,
+    mock_get_users_by_service,
+    mock_accept_invite,
+    mock_add_user_to_service,
+    mocker,
+    mock_events,
+    mock_get_user,
+    trial_mode,
+    expected_endpoint,
+):
+    service_one['permissions'] = ['broadcast']
+    service_one['restricted'] = trial_mode
+
+    mocker.patch('app.service_api_client.get_service', return_value={
+        'data': service_one,
+    })
+
+    response = client.get(url_for(
+        'main.accept_invite',
+        token='thisisnotarealtoken'
+    ))
+    assert response.status_code == 302
+    assert response.location == url_for(
+        expected_endpoint,
+        service_id=SERVICE_ONE_ID,
+        step_index=1,
+        _external=True,
+    )
+
+
 def test_existing_user_with_no_permissions_or_folder_permissions_accept_invite(
     client,
     mocker,

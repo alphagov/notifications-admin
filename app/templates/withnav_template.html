@@ -8,37 +8,7 @@
 
 {% block main %}
   <div class="govuk-width-container">
-    <div class="navigation-service">
-      {% if current_service.organisation_id %}
-        {% if current_user.platform_admin or
-          (current_user.belongs_to_organisation(current_service.organisation_id) and current_service.live) %}
-          <a href="{{ url_for('.organisation_dashboard', org_id=current_service.organisation_id) }}" class="govuk-link govuk-link--no-visited-state navigation-organisation-link">{{ current_service.organisation_name }}</a>
-        {% endif %}
-      {% endif %}
-      <div class="navigation-service-name govuk-!-font-weight-bold">
-        {{ current_service.name }}
-          {% if not current_service.active %}
-            <span class="navigation-service-type navigation-service-type--suspended">Suspended</span>
-          {% elif current_service.has_permission('broadcast') %}
-            {% if current_service.trial_mode %}
-              <span class="navigation-service-type navigation-service-type--training">Training
-            {% elif current_service.broadcast_channel == 'severe' %}
-              <span class="navigation-service-type navigation-service-type--live">Live
-            {% elif current_service.broadcast_channel == 'test' %}
-              <span class="navigation-service-type navigation-service-type--live">{{ current_service.broadcast_channel|title }}
-              {% if current_service.allowed_broadcast_provider == "all" %}
-                (all networks)
-              {% else %}
-                ({{ current_service.allowed_broadcast_provider }})
-              {% endif %}
-            {% elif current_service.broadcast_channel == 'government' %}
-              <span class="navigation-service-type navigation-service-type--government">Government
-            {% endif %}
-            </span>
-        {% endif %}
-      </div>
-      <a href="{{ url_for('main.choose_account') }}" class="govuk-link govuk-link--no-visited-state navigation-service-switch">Switch service</a>
-    </div>
+    {% include "service_navigation.html" %}
     <div class="govuk-grid-row govuk-!-padding-bottom-12">
       {% if help %}
         <div class="govuk-grid-column-one-third">
