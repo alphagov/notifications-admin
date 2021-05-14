@@ -100,7 +100,7 @@ describe('Register security key', () => {
   test.each([
     ['network'],
     ['server'],
-  ])('alerts if sending WebAuthn credentials fails (%s error)', ({errorType}, done) => {
+  ])('alerts if sending WebAuthn credentials fails (%s error)', (errorType, done) => {
     jest.spyOn(window.navigator.credentials, 'create').mockImplementation(() => {
       // fake PublicKeyCredential response from WebAuthn API
       return Promise.resolve({ response: {} })
