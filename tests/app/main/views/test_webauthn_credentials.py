@@ -3,6 +3,7 @@ from fido2 import cbor
 from flask import url_for
 
 from app import webauthn_server
+from app.models.webauthn_credential import RegistrationError
 
 
 @pytest.mark.parametrize('endpoint', [
@@ -132,3 +133,37 @@ def test_complete_register_clears_session(
 
     with platform_admin_client.session_transaction() as session:
         assert 'webauthn_registration_state' not in session
+
+
+def test_complete_register_handles_library_errors(
+    platform_admin_client,
+    mocker,
+):
+    with platform_admin_client.session_transaction() as session:
+        session['webauthn_registration_state'] = 'state'
+
+    mocker.patch(
+        'app.models.webauthn_credential.WebAuthnCredential.from_registration',
+        side_effect=RegistrationError('error')
+    )
+
+    response = platform_admin_client.post(
+        url_for('main.webauthn_complete_register'),
+        data=cbor.encode('public_key_credential'),
+    )
+
+    assert response.status_code == 400
+    assert cbor.decode(response.data) == 'error'
+
+
+def test_complete_register_handles_missing_state(
+    platform_admin_client,
+    mocker,
+):
+    response = platform_admin_client.post(
+        url_for('main.webauthn_complete_register'),
+        data=cbor.encode('public_key_credential'),
+    )
+
+    assert response.status_code == 400
+    assert cbor.decode(response.data) == 'No registration in progress'
