@@ -17,6 +17,7 @@ from app.main.forms import (
     ChangeEmailForm,
     ChangeMobileNumberForm,
     ChangeNameForm,
+    ChangeNameOfSecurityKey,
     ChangePasswordForm,
     ConfirmPasswordForm,
     ServiceOnOffSettingForm,
@@ -241,7 +242,17 @@ def user_profile_security_keys():
 
 @main.route("/user-profile/security-keys/<uuid:key_id>/manage", methods=['GET'])
 @user_is_platform_admin
-def user_profile_manage_security_key():
+def user_profile_manage_security_key(key_id):
+    security_keys = user_api_client.get_webauthn_credentials_for_user(current_user.id)
+    security_key = next((key for key in security_keys if key["id"] == key_id), None)
+
+    if not security_key:
+        abort(404)
+
+    form = ChangeNameOfSecurityKey(name_of_key=security_key["name"])
+
     return render_template(
         'views/user-profile/manage-security-key.html',
+        security_key=security_key,
+        form=form
     )

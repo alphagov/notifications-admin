@@ -374,3 +374,54 @@ def test_should_show_security_keys_page(
 
     register_button = page.select_one("[data-module='register-security-key']")
     assert register_button.text.strip() == 'Register a key'
+
+
+def test_should_show_manage_security_key_page(
+    mocker,
+    client_request,
+    platform_admin_user,
+    webauthn_credential,
+    webauthn_credential_2
+):
+    client_request.login(platform_admin_user)
+
+    mocker.patch(
+        'app.user_api_client.get_webauthn_credentials_for_user',
+        return_value=[webauthn_credential, webauthn_credential_2],
+    )
+
+    page = client_request.get('.user_profile_manage_security_key', key_id=webauthn_credential['id'])
+    assert page.select_one('h1').text.strip() == f'Manage ‘{webauthn_credential["name"]}’'
+
+    assert page.select_one('.govuk-back-link').text.strip() == 'Back'
+    assert page.select_one('.govuk-back-link')['href'] == url_for('.user_profile_security_keys')
+
+    assert page.select_one('#name_of_key')["value"] == webauthn_credential["name"]
+
+
+def test_manage_security_key_page_404s_when_key_not_found(
+    mocker,
+    client_request,
+    platform_admin_user,
+    webauthn_credential,
+    webauthn_credential_2
+):
+    client_request.login(platform_admin_user)
+
+    mocker.patch(
+        'app.user_api_client.get_webauthn_credentials_for_user',
+        return_value=[webauthn_credential_2],
+    )
+    client_request.get(
+        '.user_profile_manage_security_key',
+        key_id=webauthn_credential['id'],
+        _expected_status=404,
+    )
+
+
+def test_non_platform_admin_user_doesnt_see_manage_security_key_page(client_request, webauthn_credential,):
+    client_request.get(
+        '.user_profile_manage_security_key',
+        key_id=webauthn_credential['id'],
+        _expected_status=403,
+    )

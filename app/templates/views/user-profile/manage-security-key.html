@@ -1,8 +1,10 @@
 {% extends "withoutnav_template.html" %}
 {% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
 
 
-{% set page_title = 'Manage security key' %}
+{% set page_title = 'Manage ' + '‘' + security_key.name + '’' %}
 
 {% block per_page_title %}
   {{ page_title }}
@@ -13,5 +15,14 @@
     page_title,
     back_link=url_for('.user_profile_security_keys')
   ) }}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-three-quarters">
+      {% call form_wrapper(autocomplete=True) %}
+        {{ form.name_of_key }}
+        {{ page_footer('Save') }}
+      {% endcall %}
+    </div>
+  </div>
 
 {% endblock %}
