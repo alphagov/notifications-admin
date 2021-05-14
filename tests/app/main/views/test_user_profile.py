@@ -425,3 +425,40 @@ def test_non_platform_admin_user_doesnt_see_manage_security_key_page(client_requ
         key_id=webauthn_credential['id'],
         _expected_status=403,
     )
+
+
+def test_should_redirect_after_change_of_security_key_name(
+    client_request,
+    platform_admin_user,
+    webauthn_credential,
+    webauthn_credential_2,
+    mocker
+):
+    client_request.login(platform_admin_user)
+
+    mocker.patch(
+        'app.user_api_client.get_webauthn_credentials_for_user',
+        return_value=[webauthn_credential, webauthn_credential_2],
+    )
+
+    mock_update = mocker.patch(
+        'app.user_api_client.update_webauthn_credential_for_user',
+        return_value=[webauthn_credential],
+    )
+
+    client_request.post(
+        'main.user_profile_manage_security_key',
+        key_id=webauthn_credential['id'],
+        _data={'name_of_key': "new name"},
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.user_profile_security_keys',
+            _external=True,
+        )
+    )
+
+    mock_update.assert_called_once_with(
+        credential_id=webauthn_credential['id'],
+        new_name_for_credential="new name",
+        user_id=platform_admin_user["id"]
+    )

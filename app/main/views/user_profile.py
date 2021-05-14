@@ -240,7 +240,7 @@ def user_profile_security_keys():
     )
 
 
-@main.route("/user-profile/security-keys/<uuid:key_id>/manage", methods=['GET'])
+@main.route("/user-profile/security-keys/<uuid:key_id>/manage", methods=['GET', 'POST'])
 @user_is_platform_admin
 def user_profile_manage_security_key(key_id):
     security_keys = user_api_client.get_webauthn_credentials_for_user(current_user.id)
@@ -250,6 +250,14 @@ def user_profile_manage_security_key(key_id):
         abort(404)
 
     form = ChangeNameOfSecurityKey(name_of_key=security_key["name"])
+
+    if form.validate_on_submit():
+        user_api_client.update_webauthn_credential_for_user(
+            user_id=current_user.id,
+            credential_id=key_id,
+            new_name_for_credential=form.name_of_key.data
+        )
+        return redirect(url_for('.user_profile_security_keys'))
 
     return render_template(
         'views/user-profile/manage-security-key.html',

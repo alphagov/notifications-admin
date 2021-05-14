@@ -201,5 +201,10 @@ class UserApiClient(NotifyAdminAPIClient):
 
         return self.post(endpoint, data=credential.serialize())
 
+    def update_webauthn_credential_for_user(self, *, user_id, credential_id, new_name_for_credential):
+        endpoint = f'/user/{user_id}/webauthn/{credential_id}'
+
+        return self.post(endpoint, data={"name": new_name_for_credential})
+
 
 user_api_client = UserApiClient()
