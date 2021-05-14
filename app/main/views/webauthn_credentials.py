@@ -61,6 +61,12 @@ def webauthn_begin_authentication():
     # get user from session
     user_to_login = User.from_id(session['user_details']['id'])
 
+    if not user_to_login.webauthn_auth:
+        abort(403)
+
+    if not user_to_login.platform_admin:
+        abort(403)
+
     authentication_data, state = current_app.webauthn_server.authenticate_begin(
         credentials=[
             credential.to_credential_data()
@@ -75,11 +81,17 @@ def webauthn_begin_authentication():
 @main.route('/webauthn/authenticate', methods=['POST'])
 @redirect_to_sign_in
 def webauthn_complete_authentication():
-    state = session.pop("webauthn_authentication_state")
-    request_data = cbor.decode(request.get_data())
-
     user_id = session['user_details']['id']
     user_to_login = User.from_id(user_id)
+
+    if not user_to_login.webauthn_auth:
+        abort(403)
+
+    if not user_to_login.platform_admin:
+        abort(403)
+
+    state = session.pop("webauthn_authentication_state")
+    request_data = cbor.decode(request.get_data())
 
     try:
         current_app.webauthn_server.authenticate_complete(
