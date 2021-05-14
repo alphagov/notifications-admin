@@ -258,15 +258,25 @@ def test_two_factor_returns_error_when_user_is_locked(
     assert 'Code not found' in response.get_data(as_text=True)
 
 
-def test_two_factor_should_redirect_to_sign_in_if_user_not_in_session(
-    client,
-    api_user_active,
-    mock_get_user,
+def test_two_factor_post_should_redirect_to_sign_in_if_user_not_in_session(
+    client_request,
 ):
-    response = client.post(url_for('main.two_factor'),
-                           data={'sms_code': '12345'})
-    assert response.status_code == 302
-    assert response.location == url_for('main.sign_in', _external=True)
+    client_request.post(
+        'main.two_factor',
+        _data={'sms_code': '12345'},
+        _expected_redirect=url_for('main.sign_in', _external=True)
+    )
+
+
+@pytest.mark.parametrize('endpoint', ['main.two_factor_webauthn', 'main.two_factor'])
+def test_two_factor_get_should_redirect_to_sign_in_if_user_not_in_session(
+    client_request,
+    endpoint,
+):
+    client_request.get(
+        endpoint,
+        _expected_redirect=url_for('main.sign_in', _external=True)
+    )
 
 
 @freeze_time('2020-01-27T12:00:00')

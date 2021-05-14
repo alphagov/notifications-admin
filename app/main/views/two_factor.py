@@ -82,6 +82,13 @@ def two_factor():
     return render_template('views/two-factor.html', form=form, redirect_url=redirect_url)
 
 
+@main.route('/two-factor-webauthn', methods=['GET'])
+@redirect_to_sign_in
+def two_factor_webauthn():
+    redirect_url = request.args.get('next')
+    return render_template('views/two-factor-webauthn.html', redirect_url=redirect_url)
+
+
 @main.route('/re-validate-email', methods=['GET'])
 def revalidate_email_sent():
     title = 'Email resent' if request.args.get('email_resent') else 'Check your email'

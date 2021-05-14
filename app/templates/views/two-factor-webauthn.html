@@ -1,0 +1,33 @@
+{% extends "withoutnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/button/macro.njk" import govukButton %}
+
+{% set page_title = 'Security keys' %}
+
+{% block per_page_title %}
+  {{ page_title }}
+{% endblock %}
+
+{% block maincolumn_content %}
+  {{ page_header(
+    page_title,
+    back_link=url_for('.user_profile')
+  ) }}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-five-sixths">
+    <p class="govuk-body">Security key</p>
+    <p class="govuk-body">When you are ready to authenticate, press the button below.</p>
+
+      {{ govukButton({
+        "element": "button",
+        "text": "Webauthn authenticate click me click me",
+        "classes": "govuk-button--secondary",
+        "attributes": {
+          "data-module": "authenticate-security-key",
+          "data-csrf-token": csrf_token(),
+        }
+      }) }}
+    </div>
+  </div>
+{% endblock %}
