@@ -206,5 +206,10 @@ class UserApiClient(NotifyAdminAPIClient):
 
         return self.post(endpoint, data={"name": new_name_for_credential})
 
+    def delete_webauthn_credential_for_user(self, *, user_id, credential_id):
+        endpoint = f'/user/{user_id}/webauthn/{credential_id}'
+
+        return self.delete(endpoint)
+
 
 user_api_client = UserApiClient()

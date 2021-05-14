@@ -5,7 +5,11 @@ import pytest
 from flask import url_for
 from notifications_utils.url_safe_token import generate_token
 
-from tests.conftest import create_api_user_active, url_for_endpoint_with_token
+from tests.conftest import (
+    create_api_user_active,
+    normalize_spaces,
+    url_for_endpoint_with_token,
+)
 
 
 def test_should_show_overview_page(
@@ -460,5 +464,78 @@ def test_should_redirect_after_change_of_security_key_name(
     mock_update.assert_called_once_with(
         credential_id=webauthn_credential['id'],
         new_name_for_credential="new name",
+        user_id=platform_admin_user["id"]
+    )
+
+
+def test_shows_delete_link_for_security_key(
+    mocker,
+    client_request,
+    platform_admin_user,
+    webauthn_credential,
+    webauthn_credential_2
+):
+    client_request.login(platform_admin_user)
+
+    mocker.patch(
+        'app.user_api_client.get_webauthn_credentials_for_user',
+        return_value=[webauthn_credential, webauthn_credential_2],
+    )
+
+    page = client_request.get('.user_profile_manage_security_key', key_id=webauthn_credential['id'])
+    assert page.select_one('h1').text.strip() == f'Manage ‘{webauthn_credential["name"]}’'
+
+    link = page.select_one('.page-footer a')
+    assert normalize_spaces(link.text) == 'Delete'
+    assert link['href'] == url_for('.user_profile_confirm_delete_security_key', key_id=webauthn_credential['id'])
+
+
+def test_confirm_delete_security_key(
+    client_request,
+    platform_admin_user,
+    webauthn_credential,
+    webauthn_credential_2,
+    mocker
+):
+    client_request.login(platform_admin_user)
+
+    mocker.patch(
+        'app.user_api_client.get_webauthn_credentials_for_user',
+        return_value=[webauthn_credential, webauthn_credential_2],
+    )
+
+    page = client_request.get(
+        '.user_profile_confirm_delete_security_key',
+        key_id=webauthn_credential['id'],
+        _test_page_title=False,
+    )
+
+    assert normalize_spaces(page.select_one('.banner-dangerous').text) == (
+        'Are you sure you want to delete this security key? '
+        'Yes, delete'
+    )
+    assert 'action' not in page.select_one('.banner-dangerous form')
+    assert page.select_one('.banner-dangerous form')['method'] == 'post'
+
+
+def test_delete_security_key(
+    client_request,
+    platform_admin_user,
+    webauthn_credential,
+    mocker
+):
+    client_request.login(platform_admin_user)
+    mock_delete = mocker.patch('app.user_api_client.delete_webauthn_credential_for_user')
+
+    client_request.post(
+        '.user_profile_delete_security_key',
+        key_id=webauthn_credential['id'],
+        _expected_redirect=url_for(
+            '.user_profile_security_keys',
+            _external=True,
+        )
+    )
+    mock_delete.assert_called_once_with(
+        credential_id=webauthn_credential['id'],
         user_id=platform_admin_user["id"]
     )

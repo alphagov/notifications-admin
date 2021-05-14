@@ -20,7 +20,12 @@
     <div class="govuk-grid-column-three-quarters">
       {% call form_wrapper(autocomplete=True) %}
         {{ form.name_of_key }}
-        {{ page_footer('Save') }}
+        {{ page_footer(
+          'Save',
+          delete_link=url_for(
+            '.user_profile_confirm_delete_security_key', key_id=security_key.id),
+          delete_link_text='Delete'
+        ) }}
       {% endcall %}
     </div>
   </div>

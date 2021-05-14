@@ -3,8 +3,10 @@ import json
 from flask import (
     abort,
     current_app,
+    flash,
     redirect,
     render_template,
+    request,
     session,
     url_for,
 )
@@ -240,7 +242,16 @@ def user_profile_security_keys():
     )
 
 
-@main.route("/user-profile/security-keys/<uuid:key_id>/manage", methods=['GET', 'POST'])
+@main.route(
+    "/user-profile/security-keys/<uuid:key_id>/manage",
+    methods=['GET', 'POST'],
+    endpoint="user_profile_manage_security_key"
+)
+@main.route(
+    "/user-profile/security-keys/<uuid:key_id>/delete",
+    methods=['GET'],
+    endpoint="user_profile_confirm_delete_security_key"
+)
 @user_is_platform_admin
 def user_profile_manage_security_key(key_id):
     security_keys = user_api_client.get_webauthn_credentials_for_user(current_user.id)
@@ -259,8 +270,21 @@ def user_profile_manage_security_key(key_id):
         )
         return redirect(url_for('.user_profile_security_keys'))
 
+    if (request.endpoint == "main.user_profile_confirm_delete_security_key"):
+        flash("Are you sure you want to delete this security key?", 'delete')
+
     return render_template(
         'views/user-profile/manage-security-key.html',
         security_key=security_key,
         form=form
     )
+
+
+@main.route("/user-profile/security-keys/<uuid:key_id>/delete", methods=['POST'])
+@user_is_platform_admin
+def user_profile_delete_security_key(key_id):
+    user_api_client.delete_webauthn_credential_for_user(
+        user_id=current_user.id,
+        credential_id=key_id
+    )
+    return redirect(url_for('.user_profile_security_keys'))
