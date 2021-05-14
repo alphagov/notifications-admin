@@ -307,6 +307,7 @@ EXCLUDED_ENDPOINTS = tuple(map(Navigation.get_endpoint_with_blueprint, {
     'user_profile_email',
     'user_profile_email_authenticate',
     'user_profile_email_confirm',
+    'user_profile_manage_security_key',
     'user_profile_mobile_number',
     'user_profile_mobile_number_authenticate',
     'user_profile_mobile_number_confirm',

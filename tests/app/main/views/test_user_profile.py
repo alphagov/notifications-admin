@@ -366,6 +366,11 @@ def test_should_show_security_keys_page(
 
     credential_row = page.select('tr')[-1]
     assert 'Test credential' in credential_row.text
+    assert "Manage" in credential_row.find('a').text
+    assert credential_row.find('a')["href"] == url_for(
+        '.user_profile_manage_security_key',
+        key_id=webauthn_credential['id']
+    )
 
     register_button = page.select_one("[data-module='register-security-key']")
     assert register_button.text.strip() == 'Register a key'

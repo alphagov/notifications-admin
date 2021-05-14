@@ -2,7 +2,7 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/button/macro.njk" import govukButton %}
 {% from "components/back-link/macro.njk" import govukBackLink %}
-{% from "components/table.html" import mapping_table, row, field, row_heading %}
+{% from "components/table.html" import edit_field, mapping_table, row, field, row_heading %}
 {% from "components/webauthn-api-check.html" import webauthn_api_check %}
 {% from "vendor/govuk-frontend/components/error-message/macro.njk" import govukErrorMessage %}
 
@@ -26,22 +26,24 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-five-sixths">
       {% if credentials %}
-
-        {% call mapping_table(
-          caption=page_title,
-          field_headings=['Security key'],
-          field_headings_visible=False,
-          caption_visible=False,
-        ) %}
-          {% for credential in credentials %}
-            {% call row() %}
-              {% call field() %}
-                <div class="govuk-body">{{ credential.name }}</div>
-                <div class="govuk-body hint">Registered {{ credential.created_at|format_delta }}</div>
+        <div class="body-copy-table">
+          {% call mapping_table(
+            caption=page_title,
+            field_headings=['Security key details', 'Action'],
+            field_headings_visible=False,
+            caption_visible=False,
+          ) %}
+            {% for credential in credentials %}
+              {% call row() %}
+                {% call field() %}
+                  <div class="govuk-body">{{ credential.name }}</div>
+                  <div class="govuk-body hint">Registered {{ credential.created_at|format_delta }}</div>
+                {% endcall %}
+                {{ edit_field('Manage', url_for('.user_profile_manage_security_key', key_id=credential.id)) }}
               {% endcall %}
-            {% endcall %}
-          {% endfor %}
-        {% endcall %}
+            {% endfor %}
+          {% endcall %}
+        </div>
 
       {% else %}
 

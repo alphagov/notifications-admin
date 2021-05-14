@@ -237,3 +237,11 @@ def user_profile_security_keys():
     return render_template(
         'views/user-profile/security-keys.html',
     )
+
+
+@main.route("/user-profile/security-keys/<uuid:key_id>/manage", methods=['GET'])
+@user_is_platform_admin
+def user_profile_manage_security_key():
+    return render_template(
+        'views/user-profile/manage-security-key.html',
+    )

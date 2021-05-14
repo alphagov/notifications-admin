@@ -1,0 +1,17 @@
+{% extends "withoutnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+
+
+{% set page_title = 'Manage security key' %}
+
+{% block per_page_title %}
+  {{ page_title }}
+{% endblock %}
+
+{% block maincolumn_content %}
+  {{ page_header(
+    page_title,
+    back_link=url_for('.user_profile_security_keys')
+  ) }}
+
+{% endblock %}
