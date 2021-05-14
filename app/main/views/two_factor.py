@@ -60,9 +60,10 @@ def two_factor_email(token):
     return log_in_user(user_id)
 
 
+@main.route('/two-factor-sms', methods=['GET', 'POST'])
 @main.route('/two-factor', methods=['GET', 'POST'])
 @redirect_to_sign_in
-def two_factor():
+def two_factor_sms():
     user_id = session['user_details']['id']
     user = User.from_id(user_id)
 
@@ -79,7 +80,7 @@ def two_factor():
             user_api_client.send_verify_code(user.id, 'email', None, redirect_url)
             return redirect(url_for('.revalidate_email_sent', next=redirect_url))
 
-    return render_template('views/two-factor.html', form=form, redirect_url=redirect_url)
+    return render_template('views/two-factor-sms.html', form=form, redirect_url=redirect_url)
 
 
 @main.route('/two-factor-webauthn', methods=['GET'])

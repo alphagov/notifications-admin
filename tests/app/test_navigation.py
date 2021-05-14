@@ -289,7 +289,7 @@ EXCLUDED_ENDPOINTS = tuple(map(Navigation.get_endpoint_with_blueprint, {
     'trial_mode',
     'trial_mode_new',
     'trial_services',
-    'two_factor',
+    'two_factor_sms',
     'two_factor_email',
     'two_factor_email_interstitial',
     'two_factor_email_sent',

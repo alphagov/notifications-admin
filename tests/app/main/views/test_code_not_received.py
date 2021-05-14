@@ -138,7 +138,7 @@ def test_check_and_redirect_to_two_factor_if_user_active(
             'email': api_user_active['email_address']}
     response = client.get(url_for('main.check_and_resend_verification_code', next=redirect_url))
     assert response.status_code == 302
-    assert response.location == url_for('main.two_factor', _external=True, next=redirect_url)
+    assert response.location == url_for('main.two_factor_sms', _external=True, next=redirect_url)
 
 
 @pytest.mark.parametrize('redirect_url', [
