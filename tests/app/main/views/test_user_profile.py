@@ -19,8 +19,10 @@ def test_should_show_overview_page(
 
 def test_overview_page_shows_disable_for_platform_admin(
     client_request,
-    platform_admin_user
+    platform_admin_user,
+    mocker
 ):
+    mocker.patch('app.user_api_client.get_webauthn_credentials_for_user')
     client_request.login(platform_admin_user)
     page = client_request.get('main.user_profile')
     assert page.select_one('h1').text.strip() == 'Your profile'
