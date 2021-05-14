@@ -157,3 +157,27 @@ def test_complete_register_handles_missing_state(
 
     assert response.status_code == 400
     assert cbor.decode(response.data) == 'No registration in progress'
+
+
+def test_begin_authentication_returns_encoded_options(client):
+    pass
+
+
+def test_begin_authentication_includes_existing_credentials(client):
+    pass
+
+
+def test_begin_authentication_stores_state_in_session(client):
+    pass
+
+
+def test_complete_authentication_logs_user_in(client):
+    pass
+
+
+def test_complete_authentication_403s_if_key_isnt_in_users_credentials(client):
+    pass
+
+
+def test_complete_authentication_clears_session(client):
+    pass
