@@ -2,7 +2,6 @@ import pytest
 from fido2 import cbor
 from flask import url_for
 
-from app import webauthn_server
 from app.models.webauthn_credential import RegistrationError
 
 
@@ -21,18 +20,10 @@ def test_begin_register_returns_encoded_options(
     mocker,
     platform_admin_user,
     platform_admin_client,
+    webauthn_dev_server,
 ):
-    # override base URL so it's consistent on CI and locally
-    mocker.patch.dict(
-        app_.config,
-        values={'ADMIN_BASE_URL': 'http://localhost:6012'}
-    )
-    webauthn_server.init_app(app_)
     mocker.patch('app.user_api_client.get_webauthn_credentials_for_user', return_value=[])
-
-    response = platform_admin_client.get(
-        url_for('main.webauthn_begin_register')
-    )
+    response = platform_admin_client.get(url_for('main.webauthn_begin_register'))
 
     assert response.status_code == 200
 
@@ -50,7 +41,7 @@ def test_begin_register_returns_encoded_options(
 
     relying_party_options = webauthn_options['rp']
     assert relying_party_options['name'] == 'GOV.UK Notify'
-    assert relying_party_options['id'] == 'localhost'
+    assert relying_party_options['id'] == 'webauthn.io'
 
 
 def test_begin_register_includes_existing_credentials(
