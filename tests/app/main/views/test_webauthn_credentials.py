@@ -1,8 +1,35 @@
+import base64
+
 import pytest
 from fido2 import cbor
 from flask import url_for
 
-from app.models.webauthn_credential import RegistrationError
+from app.models.webauthn_credential import RegistrationError, WebAuthnCredential
+
+
+@pytest.fixture
+def webauthn_authentication_post_data(fake_uuid, webauthn_credential, client):
+    """
+    Sets up session, challenge, etc as if a user with uuid `fake_uuid` has logged in and touched the webauthn token
+    as found in the `webauthn_credential` fixture. Sets up the session as if `begin_authentication` had been called
+    so that the challenge matches and the credential will validate (provided that the key belongs to the user referenced
+    in the session).
+    """
+    with client.session_transaction() as session:
+        session['user_details'] = {'id': fake_uuid}
+        session['webauthn_authentication_state'] = {
+            "challenge": "e-g-nXaRxMagEiqTJSyD82RsEc5if_6jyfJDy8bNKlw",
+            "user_verification": None
+        }
+
+    credential_id = WebAuthnCredential(webauthn_credential).to_credential_data().credential_id
+
+    return cbor.encode({
+        'credentialId': credential_id,
+        'authenticatorData': base64.b64decode(b'dKbqkhPJnC90siSSsyDPQCYqlMGpUKA5fyklC2CEHvABAAACfQ=='),
+        'clientDataJSON': b'{"challenge":"e-g-nXaRxMagEiqTJSyD82RsEc5if_6jyfJDy8bNKlw","origin":"https://webauthn.io","type":"webauthn.get"}',  # noqa
+        'signature': bytes.fromhex('304502204a76f05cd52a778cdd4df1565e0004e5cc1ead360419d0f5c3a0143bf37e7f15022100932b5c308a560cfe4f244214843075b904b3eda64e85d64662a81198c386cdde'),  # noqa
+    })
 
 
 @pytest.mark.parametrize('endpoint', [
@@ -218,9 +245,63 @@ def test_begin_authentication_stores_state_in_session(client, mocker, webauthn_c
         assert 'challenge' in session['webauthn_authentication_state']
 
 
-def test_complete_authentication_403s_if_key_isnt_in_users_credentials(client):
-    pass
+def test_complete_authentication_checks_credentials(
+    client,
+    mocker,
+    webauthn_credential,
+    webauthn_dev_server,
+    mock_create_event,
+    webauthn_authentication_post_data,
+    platform_admin_user
+):
+    platform_admin_user['auth_type'] = 'webauthn_auth'
+    mocker.patch('app.user_api_client.get_user', return_value=platform_admin_user)
+    mocker.patch('app.user_api_client.get_webauthn_credentials_for_user', return_value=[webauthn_credential])
+
+    response = client.post(url_for('main.webauthn_complete_authentication'), data=webauthn_authentication_post_data)
+    assert response.status_code == 302
 
 
-def test_complete_authentication_clears_session(client):
-    pass
+def test_complete_authentication_403s_if_key_isnt_in_users_credentials(
+    client,
+    mocker,
+    webauthn_credential,
+    webauthn_dev_server,
+    webauthn_authentication_post_data,
+    platform_admin_user
+):
+    platform_admin_user['auth_type'] = 'webauthn_auth'
+    mocker.patch('app.user_api_client.get_user', return_value=platform_admin_user)
+    # user has no keys in the database
+    mocker.patch('app.user_api_client.get_webauthn_credentials_for_user', return_value=[])
+
+    response = client.post(url_for('main.webauthn_complete_authentication'), data=webauthn_authentication_post_data)
+    assert response.status_code == 403
+
+    with client.session_transaction() as session:
+        assert session['user_details']['id'] == platform_admin_user['id']
+        # user not logged in
+        assert 'user_id' not in session
+        # webauthn state reset so can't replay
+        assert 'webauthn_authentication_state' not in session
+
+
+def test_complete_authentication_clears_session(
+    client,
+    mocker,
+    webauthn_credential,
+    webauthn_dev_server,
+    webauthn_authentication_post_data,
+    mock_create_event,
+    platform_admin_user
+):
+    platform_admin_user['auth_type'] = 'webauthn_auth'
+    mocker.patch('app.user_api_client.get_user', return_value=platform_admin_user)
+    mocker.patch('app.user_api_client.get_webauthn_credentials_for_user', return_value=[webauthn_credential])
+
+    response = client.post(url_for('main.webauthn_complete_authentication'), data=webauthn_authentication_post_data)
+    assert response.status_code == 302
+
+    with client.session_transaction() as session:
+        # it's important that we clear the session to ensure that we don't re-use old login artifacts in future
+        assert 'webauthn_authentication_state' not in session
