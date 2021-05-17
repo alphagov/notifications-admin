@@ -1,8 +1,10 @@
 import base64
+from unittest.mock import ANY
 
 import pytest
 from fido2 import cbor
 from flask import url_for
+from freezegun.api import freeze_time
 
 from app.models.webauthn_credential import RegistrationError, WebAuthnCredential
 
@@ -49,6 +51,7 @@ def test_begin_register_returns_encoded_options(
     webauthn_dev_server,
 ):
     mocker.patch('app.user_api_client.get_webauthn_credentials_for_user', return_value=[])
+
     response = platform_admin_client.get(url_for('main.webauthn_begin_register'))
 
     assert response.status_code == 200
@@ -257,9 +260,13 @@ def test_complete_authentication_checks_credentials(
     platform_admin_user['auth_type'] = 'webauthn_auth'
     mocker.patch('app.user_api_client.get_user', return_value=platform_admin_user)
     mocker.patch('app.user_api_client.get_webauthn_credentials_for_user', return_value=[webauthn_credential])
+    # fake returning a 200 just to keep flask happy, normally this'll redirect
+    mocker.patch('app.main.views.webauthn_credentials._verify_webauthn_login', return_value=('ok', 200))
 
     response = client.post(url_for('main.webauthn_complete_authentication'), data=webauthn_authentication_post_data)
-    assert response.status_code == 302
+
+    # matches response of verify_webauthn_login
+    assert response.data == b'ok'
 
 
 def test_complete_authentication_403s_if_key_isnt_in_users_credentials(
@@ -274,6 +281,7 @@ def test_complete_authentication_403s_if_key_isnt_in_users_credentials(
     mocker.patch('app.user_api_client.get_user', return_value=platform_admin_user)
     # user has no keys in the database
     mocker.patch('app.user_api_client.get_webauthn_credentials_for_user', return_value=[])
+    mock_verify_webauthn_login = mocker.patch('app.main.views.webauthn_credentials._verify_webauthn_login')
 
     response = client.post(url_for('main.webauthn_complete_authentication'), data=webauthn_authentication_post_data)
     assert response.status_code == 403
@@ -284,6 +292,8 @@ def test_complete_authentication_403s_if_key_isnt_in_users_credentials(
         assert 'user_id' not in session
         # webauthn state reset so can't replay
         assert 'webauthn_authentication_state' not in session
+
+    assert mock_verify_webauthn_login.called is False
 
 
 def test_complete_authentication_clears_session(
@@ -298,10 +308,90 @@ def test_complete_authentication_clears_session(
     platform_admin_user['auth_type'] = 'webauthn_auth'
     mocker.patch('app.user_api_client.get_user', return_value=platform_admin_user)
     mocker.patch('app.user_api_client.get_webauthn_credentials_for_user', return_value=[webauthn_credential])
+    # fake returning a 200 just to keep flask happy, normally this'll redirect
+    mocker.patch('app.main.views.webauthn_credentials._verify_webauthn_login', return_value=('ok', 200))
 
-    response = client.post(url_for('main.webauthn_complete_authentication'), data=webauthn_authentication_post_data)
-    assert response.status_code == 302
+    client.post(url_for('main.webauthn_complete_authentication'), data=webauthn_authentication_post_data)
 
     with client.session_transaction() as session:
         # it's important that we clear the session to ensure that we don't re-use old login artifacts in future
         assert 'webauthn_authentication_state' not in session
+
+
+@freeze_time('2020-01-30')
+def test_verify_webauthn_login_signs_user_in_signs_user_in(client, mocker, mock_create_event, platform_admin_user):
+    platform_admin_user['auth_type'] = 'webauthn_auth'
+    platform_admin_user['email_access_validated_at'] = '2020-01-25T00:00:00.000000Z'
+
+    with client.session_transaction() as session:
+        session['user_details'] = {
+            'id': platform_admin_user['id'],
+            'email': platform_admin_user['email_address']
+        }
+    mocker.patch('app.user_api_client.get_user', return_value=platform_admin_user)
+    mocker.patch('app.main.views.webauthn_credentials._complete_webauthn_authentication')
+    mocker.patch('app.user_api_client.verify_webauthn_login', return_value=(True, None))
+
+    resp = client.post(url_for('main.webauthn_complete_authentication'))
+
+    assert resp.status_code == 302
+    assert resp.location == url_for('main.show_accounts_or_dashboard', _external=True)
+    # removes stuff from session
+    with client.session_transaction() as session:
+        assert 'user_details' not in session
+
+    mock_create_event.assert_called_once_with('sucessful_login', ANY)
+
+
+def test_verify_webauthn_login_signs_user_in_doesnt_sign_user_in_if_api_rejects(
+    client,
+    mocker,
+    platform_admin_user,
+):
+    platform_admin_user['auth_type'] = 'webauthn_auth'
+
+    with client.session_transaction() as session:
+        session['user_details'] = {
+            'id': platform_admin_user['id'],
+            'email': platform_admin_user['email_address']
+        }
+    mocker.patch('app.user_api_client.get_user', return_value=platform_admin_user)
+    mocker.patch('app.main.views.webauthn_credentials._complete_webauthn_authentication')
+    mocker.patch('app.user_api_client.verify_webauthn_login', return_value=(False, None))
+
+    resp = client.post(url_for('main.webauthn_complete_authentication'))
+
+    assert resp.status_code == 403
+
+
+@freeze_time('2020-04-30')
+def test_verify_webauthn_login_signs_user_in_sends_revalidation_email_if_needed(
+    client,
+    mocker,
+    mock_send_verify_code,
+    platform_admin_user,
+):
+    platform_admin_user['auth_type'] = 'webauthn_auth'
+    platform_admin_user['email_access_validated_at'] = '2020-01-25T00:00:00.000000Z'
+    user_details = {
+        'id': platform_admin_user['id'],
+        'email': platform_admin_user['email_address']
+    }
+
+    with client.session_transaction() as session:
+        session['user_details'] = user_details
+
+    mocker.patch('app.user_api_client.get_user', return_value=platform_admin_user)
+    mocker.patch('app.main.views.webauthn_credentials._complete_webauthn_authentication')
+    mocker.patch('app.user_api_client.verify_webauthn_login', return_value=(True, None))
+
+    resp = client.post(url_for('main.webauthn_complete_authentication'))
+
+    assert resp.status_code == 302
+    assert resp.location == url_for('main.revalidate_email_sent', _external=True)
+
+    with client.session_transaction() as session:
+        # stuff stays in session so we can log them in later when they validate their email
+        assert session['user_details'] == user_details
+
+    mock_send_verify_code.assert_called_once_with(platform_admin_user['id'], 'email', ANY, ANY)

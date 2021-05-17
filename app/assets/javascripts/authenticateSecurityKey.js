@@ -33,10 +33,21 @@
               });
             })
             .then(response => {
+              if (response.status === 403){
+                // flask will have `flash`ed an error message up
+                window.location.reload();
+                return;
+              }
+
               if (!response.ok) {
+                // probably an internal server error
                 throw Error(response.statusText);
               }
-              // TODO: redirect
+
+              // fetch will already have done the login redirect dance and will at this point be
+              // referring to the final 200 - hopefully to the `/accounts` url or similar. Set the location
+              // to trigger a browser navigate to that URL.
+              window.location.href = response.url;
             })
             .catch(error => {
               console.error(error);

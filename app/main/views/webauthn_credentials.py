@@ -1,14 +1,19 @@
 from fido2 import cbor
 from fido2.client import ClientData
 from fido2.ctap2 import AuthenticatorData
-from flask import abort, current_app, request, session
+from flask import abort, current_app, flash, redirect, request, session, url_for
 from flask_login import current_user
 
 from app.main import main
+from app.main.views.two_factor import log_in_user
 from app.models.user import User
 from app.models.webauthn_credential import RegistrationError, WebAuthnCredential
 from app.notify_client.user_api_client import user_api_client
-from app.utils import redirect_to_sign_in, user_is_platform_admin
+from app.utils import (
+    is_less_than_days_ago,
+    redirect_to_sign_in,
+    user_is_platform_admin,
+)
 
 
 @main.route('/webauthn/register')
@@ -90,6 +95,12 @@ def webauthn_complete_authentication():
     if not user_to_login.platform_admin:
         abort(403)
 
+    _complete_webauthn_authentication(user_to_login)
+
+    return _verify_webauthn_login(user_to_login)
+
+
+def _complete_webauthn_authentication(user):
     state = session.pop("webauthn_authentication_state")
     request_data = cbor.decode(request.get_data())
 
@@ -98,7 +109,7 @@ def webauthn_complete_authentication():
             state=state,
             credentials=[
                 credential.to_credential_data()
-                for credential in user_to_login.webauthn_credentials
+                for credential in user.webauthn_credentials
             ],
             credential_id=request_data['credentialId'],
             client_data=ClientData(request_data['clientDataJSON']),
@@ -106,8 +117,31 @@ def webauthn_complete_authentication():
             signature=request_data['signature']
         )
     except ValueError as exc:
-        current_app.logger.info(f'User {user_id} could not sign in using their webauthn token - {exc}')
+        current_app.logger.info(f'User {user.id} could not sign in using their webauthn token - {exc}')
+        flash('Security key not recognised')
+        # TODO: increment failed login count
         abort(403)
 
-    from app.main.views.two_factor import log_in_user
-    return log_in_user(user_id)
+
+def _verify_webauthn_login(user):
+    """
+    * check the user hasn't gone over their max logins
+    * check that the user's email is validated
+    * if succesful, update current_session_id, log in date, and then redirect
+
+    """
+    redirect_url = request.args.get('next')
+
+    # normally API handles this when verifying an sms or email code but since the webauthn logic happens in the
+    # admin we need a separate call that just finalises the login in the database
+    logged_in, _ = user.verify_webauthn_login()
+    if not logged_in:
+        # user account is locked as too many failed logins
+        flash('Security key not recognised')
+        abort(403)
+
+    if not is_less_than_days_ago(user.email_access_validated_at, 90):
+        user_api_client.send_verify_code(user.id, 'email', None, redirect_url)
+        return redirect(url_for('.revalidate_email_sent', next=redirect_url))
+
+    return log_in_user(user.id)

@@ -430,6 +430,9 @@ class User(JSONModel, UserMixin):
             self.id,
         )
 
+    def verify_webauthn_login(self, is_successful=True):
+        return user_api_client.verify_webauthn_login(self.id, is_successful)
+
 
 class InvitedUser(JSONModel):
 
