@@ -1297,7 +1297,9 @@ class ConfirmBroadcastForm(StripWhitespaceForm):
         self.confirm.label.text = self.generate_label(channel, max_phones)
 
         if service_is_live:
-            self.confirm.validators += (DataRequired(),)
+            self.confirm.validators += (
+                DataRequired('You need to confirm that you understand'),
+            )
 
     confirm = GovukCheckboxField("Confirm")
 

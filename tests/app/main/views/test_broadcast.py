@@ -1878,10 +1878,6 @@ def test_checkbox_to_confirm_non_training_broadcasts(
     'severe',
     'government',
 ))
-@pytest.mark.parametrize('post_data', (
-    pytest.param({}, marks=pytest.mark.xfail),
-    {'confirm': 'y'},
-))
 @freeze_time('2020-02-22T22:22:22.000000')
 def test_confirm_approve_non_training_broadcasts(
     mocker,
@@ -1892,7 +1888,6 @@ def test_confirm_approve_non_training_broadcasts(
     mock_update_broadcast_message,
     mock_update_broadcast_message_status,
     channel,
-    post_data,
 ):
     mocker.patch(
         'app.broadcast_message_api_client.get_broadcast_message',
@@ -1913,7 +1908,7 @@ def test_confirm_approve_non_training_broadcasts(
         '.view_current_broadcast',
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
-        _data=post_data
+        _data={'confirm': 'y'}
     )
 
     mock_update_broadcast_message.assert_called_once_with(
@@ -1929,6 +1924,58 @@ def test_confirm_approve_non_training_broadcasts(
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
     )
+
+
+@pytest.mark.parametrize('channel', (
+    'test',
+    'severe',
+    'government',
+))
+@freeze_time('2020-02-22T22:22:22.000000')
+def test_confirm_approve_non_training_broadcasts_errors_if_not_ticked(
+    mocker,
+    client_request,
+    service_one,
+    active_user_with_permissions,
+    fake_uuid,
+    mock_update_broadcast_message,
+    mock_update_broadcast_message_status,
+    channel,
+):
+    mocker.patch(
+        'app.broadcast_message_api_client.get_broadcast_message',
+        return_value=broadcast_message_json(
+            id_=fake_uuid,
+            service_id=SERVICE_ONE_ID,
+            template_id=None,
+            created_by_id=None,
+            status='pending-approval',
+        ),
+    )
+    service_one['permissions'] += ['broadcast']
+    service_one['restricted'] = False
+    service_one['allowed_broadcast_provider'] = 'all'
+    service_one['broadcast_channel'] = channel
+
+    page = client_request.post(
+        '.view_current_broadcast',
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+        _data={},
+        _expected_status=200,
+    )
+
+    error_message = page.select_one('form.banner .govuk-error-message')
+    assert error_message['id'] == 'confirm-error'
+    assert normalize_spaces(error_message.text) == (
+        'Error: You need to confirm that you understand'
+    )
+    assert page.select_one('form.banner input#confirm')['aria-describedby'] == (
+        error_message['id']
+    )
+
+    assert mock_update_broadcast_message.called is False
+    assert mock_update_broadcast_message_status.called is False
 
 
 @freeze_time('2020-02-22T22:22:22.000000')
@@ -2111,39 +2158,44 @@ def test_view_only_user_cant_approve_broadcast(
     assert not page.select_one('.banner a')
 
 
-@pytest.mark.parametrize('trial_mode, initial_status, post_data, expected_approval, expected_redirect', (
-    (True, 'draft', {}, False, partial(
-        url_for,
-        '.view_current_broadcast',
-        broadcast_message_id=sample_uuid,
-    )),
-    (True, 'pending-approval', {}, True, partial(
-        url_for,
-        '.broadcast_tour',
-        step_index=6,
-    )),
-    (False, 'pending-approval', {}, False, lambda service_id, _external: None),
-    (False, 'pending-approval', {'confirm': 'y'}, True, partial(
-        url_for,
-        '.view_current_broadcast',
-        broadcast_message_id=sample_uuid,
-    )),
-    (True, 'rejected', {}, False, partial(
-        url_for,
-        '.view_current_broadcast',
-        broadcast_message_id=sample_uuid,
-    )),
-    (True, 'broadcasting', {}, False, partial(
-        url_for,
-        '.view_current_broadcast',
-        broadcast_message_id=sample_uuid,
-    )),
-    (True, 'cancelled', {}, False, partial(
-        url_for,
-        '.view_current_broadcast',
-        broadcast_message_id=sample_uuid,
-    )),
-))
+@pytest.mark.parametrize(
+    'trial_mode, initial_status, post_data, expected_approval, expected_redirect, expected_status',
+    (
+        (True, 'draft', {}, False, partial(
+            url_for,
+            '.view_current_broadcast',
+            broadcast_message_id=sample_uuid,
+        ), 302),
+        (True, 'pending-approval', {}, True, partial(
+            url_for,
+            '.broadcast_tour',
+            step_index=6,
+        ), 302),
+        (False, 'pending-approval', {}, False, (
+            lambda service_id, _external: None
+        ), 200),
+        (False, 'pending-approval', {'confirm': 'y'}, True, partial(
+            url_for,
+            '.view_current_broadcast',
+            broadcast_message_id=sample_uuid,
+        ), 302),
+        (True, 'rejected', {}, False, partial(
+            url_for,
+            '.view_current_broadcast',
+            broadcast_message_id=sample_uuid,
+        ), 302),
+        (True, 'broadcasting', {}, False, partial(
+            url_for,
+            '.view_current_broadcast',
+            broadcast_message_id=sample_uuid,
+        ), 302),
+        (True, 'cancelled', {}, False, partial(
+            url_for,
+            '.view_current_broadcast',
+            broadcast_message_id=sample_uuid,
+        ), 302),
+    )
+)
 @freeze_time('2020-02-22T22:22:22.000000')
 def test_request_approval(
     mocker,
@@ -2158,6 +2210,7 @@ def test_request_approval(
     expected_approval,
     trial_mode,
     expected_redirect,
+    expected_status,
 ):
     mocker.patch(
         'app.broadcast_message_api_client.get_broadcast_message',
@@ -2181,6 +2234,7 @@ def test_request_approval(
             service_id=SERVICE_ONE_ID,
             _external=True,
         ),
+        _expected_status=expected_status,
         _data=post_data,
     )
 

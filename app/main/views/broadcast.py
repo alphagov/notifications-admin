@@ -22,6 +22,15 @@ from app.models.broadcast_message import BroadcastMessage, BroadcastMessages
 from app.utils import service_has_permission, user_has_permissions
 
 
+def get_back_link_endpoint():
+    return {
+        'main.view_current_broadcast': '.broadcast_dashboard',
+        'main.view_previous_broadcast': '.broadcast_dashboard_previous',
+        'main.view_rejected_broadcast': '.broadcast_dashboard_rejected',
+        'main.approve_broadcast_message': '.broadcast_dashboard',
+    }[request.endpoint]
+
+
 @main.route('/services/<uuid:service_id>/broadcast-tour/<int:step_index>')
 @user_has_permissions()
 @service_has_permission('broadcast')
@@ -389,17 +398,11 @@ def view_broadcast(service_id, broadcast_message_id):
                 broadcast_message_id=broadcast_message.id,
             ))
 
-    back_link_endpoint = {
-        'main.view_current_broadcast': '.broadcast_dashboard',
-        'main.view_previous_broadcast': '.broadcast_dashboard_previous',
-        'main.view_rejected_broadcast': '.broadcast_dashboard_rejected',
-    }[request.endpoint]
-
     return render_template(
         'views/broadcast/view-message.html',
         broadcast_message=broadcast_message,
         back_link=url_for(
-            back_link_endpoint,
+            get_back_link_endpoint(),
             service_id=current_service.id,
         ),
         form=ConfirmBroadcastForm(
@@ -442,6 +445,16 @@ def approve_broadcast_message(service_id, broadcast_message_id):
         ))
     elif form.validate_on_submit():
         broadcast_message.approve_broadcast()
+    else:
+        return render_template(
+            'views/broadcast/view-message.html',
+            broadcast_message=broadcast_message,
+            back_link=url_for(
+                get_back_link_endpoint(),
+                service_id=current_service.id,
+            ),
+            form=form,
+        )
 
     return redirect(url_for(
         '.view_current_broadcast',
