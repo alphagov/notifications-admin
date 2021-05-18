@@ -264,11 +264,12 @@ def user_profile_manage_security_key(key_id):
     form = ChangeNameOfSecurityKey(name_of_key=security_key["name"])
 
     if form.validate_on_submit():
-        user_api_client.update_webauthn_credential_for_user(
-            user_id=current_user.id,
-            credential_id=key_id,
-            new_name_for_credential=form.name_of_key.data
-        )
+        if form.name_of_key.data != security_key["name"]:
+            user_api_client.update_webauthn_credential_for_user(
+                user_id=current_user.id,
+                credential_id=key_id,
+                new_name_for_credential=form.name_of_key.data
+            )
         return redirect(url_for('.user_profile_security_keys'))
 
     if (request.endpoint == "main.user_profile_confirm_delete_security_key"):

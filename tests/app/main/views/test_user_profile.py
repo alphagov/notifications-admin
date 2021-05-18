@@ -469,6 +469,39 @@ def test_should_redirect_after_change_of_security_key_name(
     )
 
 
+def test_user_profile_manage_security_key_should_not_call_api_if_key_name_stays_the_same(
+    client_request,
+    platform_admin_user,
+    webauthn_credential,
+    webauthn_credential_2,
+    mocker
+):
+    client_request.login(platform_admin_user)
+
+    mocker.patch(
+        'app.user_api_client.get_webauthn_credentials_for_user',
+        return_value=[webauthn_credential, webauthn_credential_2],
+    )
+
+    mock_update = mocker.patch(
+        'app.user_api_client.update_webauthn_credential_for_user',
+        return_value=[webauthn_credential],
+    )
+
+    client_request.post(
+        'main.user_profile_manage_security_key',
+        key_id=webauthn_credential['id'],
+        _data={'name_of_key': webauthn_credential['name']},
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.user_profile_security_keys',
+            _external=True,
+        )
+    )
+
+    assert not mock_update.called
+
+
 def test_shows_delete_link_for_security_key(
     mocker,
     client_request,
