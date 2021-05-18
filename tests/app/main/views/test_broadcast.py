@@ -1926,11 +1926,6 @@ def test_confirm_approve_non_training_broadcasts(
     )
 
 
-@pytest.mark.parametrize('channel', (
-    'test',
-    'severe',
-    'government',
-))
 @freeze_time('2020-02-22T22:22:22.000000')
 def test_confirm_approve_non_training_broadcasts_errors_if_not_ticked(
     mocker,
@@ -1940,7 +1935,6 @@ def test_confirm_approve_non_training_broadcasts_errors_if_not_ticked(
     fake_uuid,
     mock_update_broadcast_message,
     mock_update_broadcast_message_status,
-    channel,
 ):
     mocker.patch(
         'app.broadcast_message_api_client.get_broadcast_message',
@@ -1955,7 +1949,7 @@ def test_confirm_approve_non_training_broadcasts_errors_if_not_ticked(
     service_one['permissions'] += ['broadcast']
     service_one['restricted'] = False
     service_one['allowed_broadcast_provider'] = 'all'
-    service_one['broadcast_channel'] = channel
+    service_one['broadcast_channel'] = 'severe'
 
     page = client_request.post(
         '.view_current_broadcast',
