@@ -2159,41 +2159,38 @@ def test_view_only_user_cant_approve_broadcast(
 
 
 @pytest.mark.parametrize(
-    'trial_mode, initial_status, post_data, expected_approval, expected_redirect, expected_status',
+    'trial_mode, initial_status, post_data, expected_approval, expected_redirect',
     (
         (True, 'draft', {}, False, partial(
             url_for,
             '.view_current_broadcast',
             broadcast_message_id=sample_uuid,
-        ), 302),
+        )),
         (True, 'pending-approval', {}, True, partial(
             url_for,
             '.broadcast_tour',
             step_index=6,
-        ), 302),
-        (False, 'pending-approval', {}, False, (
-            lambda service_id, _external: None
-        ), 200),
+        )),
         (False, 'pending-approval', {'confirm': 'y'}, True, partial(
             url_for,
             '.view_current_broadcast',
             broadcast_message_id=sample_uuid,
-        ), 302),
+        )),
         (True, 'rejected', {}, False, partial(
             url_for,
             '.view_current_broadcast',
             broadcast_message_id=sample_uuid,
-        ), 302),
+        )),
         (True, 'broadcasting', {}, False, partial(
             url_for,
             '.view_current_broadcast',
             broadcast_message_id=sample_uuid,
-        ), 302),
+        )),
         (True, 'cancelled', {}, False, partial(
             url_for,
             '.view_current_broadcast',
             broadcast_message_id=sample_uuid,
-        ), 302),
+        )),
     )
 )
 @freeze_time('2020-02-22T22:22:22.000000')
@@ -2210,7 +2207,6 @@ def test_request_approval(
     expected_approval,
     trial_mode,
     expected_redirect,
-    expected_status,
 ):
     mocker.patch(
         'app.broadcast_message_api_client.get_broadcast_message',
@@ -2234,7 +2230,6 @@ def test_request_approval(
             service_id=SERVICE_ONE_ID,
             _external=True,
         ),
-        _expected_status=expected_status,
         _data=post_data,
     )
 
