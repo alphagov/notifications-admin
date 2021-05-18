@@ -1970,9 +1970,6 @@ def test_confirm_approve_non_training_broadcasts_errors_if_not_ticked(
     assert normalize_spaces(error_message.text) == (
         'Error: You need to confirm that you understand'
     )
-    assert page.select_one('form.banner input#confirm')['aria-describedby'] == (
-        error_message['id']
-    )
 
     assert mock_update_broadcast_message.called is False
     assert mock_update_broadcast_message_status.called is False
