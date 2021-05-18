@@ -1873,59 +1873,6 @@ def test_checkbox_to_confirm_non_training_broadcasts(
     assert page.select_one('form.banner input[type=checkbox]')['value'] == 'y'
 
 
-@pytest.mark.parametrize('channel', (
-    'test',
-    'severe',
-    'government',
-))
-@freeze_time('2020-02-22T22:22:22.000000')
-def test_confirm_approve_non_training_broadcasts(
-    mocker,
-    client_request,
-    service_one,
-    active_user_with_permissions,
-    fake_uuid,
-    mock_update_broadcast_message,
-    mock_update_broadcast_message_status,
-    channel,
-):
-    mocker.patch(
-        'app.broadcast_message_api_client.get_broadcast_message',
-        return_value=broadcast_message_json(
-            id_=fake_uuid,
-            service_id=SERVICE_ONE_ID,
-            template_id=None,
-            created_by_id=None,
-            status='pending-approval',
-        ),
-    )
-    service_one['permissions'] += ['broadcast']
-    service_one['restricted'] = False
-    service_one['allowed_broadcast_provider'] = 'all'
-    service_one['broadcast_channel'] = channel
-
-    client_request.post(
-        '.view_current_broadcast',
-        service_id=SERVICE_ONE_ID,
-        broadcast_message_id=fake_uuid,
-        _data={'confirm': 'y'}
-    )
-
-    mock_update_broadcast_message.assert_called_once_with(
-        service_id=SERVICE_ONE_ID,
-        broadcast_message_id=fake_uuid,
-        data={
-            'starts_at': '2020-02-22T22:22:22',
-            'finishes_at': '2020-02-23T02:22:22',
-        },
-    )
-    mock_update_broadcast_message_status.assert_called_once_with(
-        'broadcasting',
-        service_id=SERVICE_ONE_ID,
-        broadcast_message_id=fake_uuid,
-    )
-
-
 @freeze_time('2020-02-22T22:22:22.000000')
 def test_confirm_approve_non_training_broadcasts_errors_if_not_ticked(
     mocker,
