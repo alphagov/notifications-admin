@@ -3,6 +3,7 @@ import uuid
 
 import pytest
 from flask import url_for
+from notifications_python_client.errors import HTTPError
 from notifications_utils.url_safe_token import generate_token
 
 from tests.conftest import (
@@ -539,3 +540,33 @@ def test_delete_security_key(
         credential_id=webauthn_credential['id'],
         user_id=platform_admin_user["id"]
     )
+
+
+def test_delete_security_key_handles_last_credential_error(
+    client_request,
+    platform_admin_user,
+    webauthn_credential,
+    mocker,
+):
+    client_request.login(platform_admin_user)
+    mocker.patch(
+        'app.user_api_client.get_webauthn_credentials_for_user',
+        return_value=[webauthn_credential],
+    )
+
+    mocker.patch(
+        'app.user_api_client.delete_webauthn_credential_for_user',
+        side_effect=HTTPError(
+            response={},
+            message='Cannot delete last remaining webauthn credential for user'
+        )
+    )
+
+    page = client_request.post(
+        '.user_profile_delete_security_key',
+        key_id=webauthn_credential['id'],
+        _follow_redirects=True
+    )
+    assert 'Manage ‘Test credential’' in page.find('h1').text
+    expected_message = "You cannot delete your last security key."
+    assert expected_message in page.find('div', class_="banner-dangerous").text

@@ -11,6 +11,7 @@ from flask import (
     url_for,
 )
 from flask_login import current_user
+from notifications_python_client.errors import HTTPError
 from notifications_utils.url_safe_token import check_token
 
 from app import user_api_client
@@ -283,8 +284,18 @@ def user_profile_manage_security_key(key_id):
 @main.route("/user-profile/security-keys/<uuid:key_id>/delete", methods=['POST'])
 @user_is_platform_admin
 def user_profile_delete_security_key(key_id):
-    user_api_client.delete_webauthn_credential_for_user(
-        user_id=current_user.id,
-        credential_id=key_id
-    )
+
+    try:
+        user_api_client.delete_webauthn_credential_for_user(
+            user_id=current_user.id,
+            credential_id=key_id
+        )
+    except HTTPError as e:
+        message = "Cannot delete last remaining webauthn credential for user"
+        if e.message == message:
+            flash("You cannot delete your last security key.")
+            return redirect(url_for('.user_profile_manage_security_key', key_id=key_id))
+        else:
+            raise e
+
     return redirect(url_for('.user_profile_security_keys'))
