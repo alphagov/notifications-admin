@@ -83,6 +83,7 @@ $path: '/static/images/';
 @import 'views/get_started';
 @import 'views/history';
 @import 'views/cookies';
+@import 'views/webauthn';
 
 // TODO: break this up
 @import 'app';
