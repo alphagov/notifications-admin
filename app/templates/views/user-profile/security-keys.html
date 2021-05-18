@@ -3,10 +3,15 @@
 {% from "components/button/macro.njk" import govukButton %}
 {% from "components/back-link/macro.njk" import govukBackLink %}
 {% from "components/table.html" import mapping_table, row, field, row_heading %}
+{% from "components/webauthn-api-check.html" import webauthn_api_check %}
 {% from "vendor/govuk-frontend/components/error-message/macro.njk" import govukErrorMessage %}
 
 {% set page_title = 'Security keys' %}
 {% set credentials = current_user.webauthn_credentials %}
+
+{% block extra_javascripts_before_body %}
+  {{ webauthn_api_check() }}
+{% endblock %}
 
 {% block per_page_title %}
   {{ page_title }}

@@ -1,7 +1,6 @@
 {% extends "template.njk" %}
 {% from "components/banner.html" import banner %}
 {% from "components/cookie-banner.html" import cookie_banner %}
-{% from "components/webauthn-api-check.html" import webauthn_api_check %}
 
 {% block headIcons %}
   <link rel="shortcut icon" sizes="16x16 32x32 48x48" href="{{ asset_url('images/favicon.ico') }}" type="image/x-icon" />
@@ -39,8 +38,7 @@
 {% endblock %}
 
 {% block bodyStart %}
-  {% block webauthn_api %}
-    {{ webauthn_api_check() }}
+  {% block extra_javascripts_before_body %}
   {% endblock %}
 
   {% block cookie_message %}
