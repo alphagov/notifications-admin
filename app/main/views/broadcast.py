@@ -22,7 +22,7 @@ from app.models.broadcast_message import BroadcastMessage, BroadcastMessages
 from app.utils import service_has_permission, user_has_permissions
 
 
-def get_back_link_endpoint():
+def _get_back_link_from_view_broadcast_endpoint():
     return {
         'main.view_current_broadcast': '.broadcast_dashboard',
         'main.view_previous_broadcast': '.broadcast_dashboard_previous',
@@ -402,7 +402,7 @@ def view_broadcast(service_id, broadcast_message_id):
         'views/broadcast/view-message.html',
         broadcast_message=broadcast_message,
         back_link=url_for(
-            get_back_link_endpoint(),
+            _get_back_link_from_view_broadcast_endpoint(),
             service_id=current_service.id,
         ),
         form=ConfirmBroadcastForm(
@@ -450,7 +450,7 @@ def approve_broadcast_message(service_id, broadcast_message_id):
             'views/broadcast/view-message.html',
             broadcast_message=broadcast_message,
             back_link=url_for(
-                get_back_link_endpoint(),
+                _get_back_link_from_view_broadcast_endpoint(),
                 service_id=current_service.id,
             ),
             form=form,
