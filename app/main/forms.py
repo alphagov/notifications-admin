@@ -1,3 +1,4 @@
+import math
 import weakref
 from datetime import datetime, timedelta
 from itertools import chain
@@ -1286,6 +1287,52 @@ class NewBroadcastForm(StripWhitespaceForm):
     @property
     def use_template(self):
         return self.content.data == 'template'
+
+
+class ConfirmBroadcastForm(StripWhitespaceForm):
+
+    def __init__(self, *args, service_is_live, channel, max_phones, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.confirm.label.text = self.generate_label(channel, max_phones)
+
+        if service_is_live:
+            self.confirm.validators += (
+                DataRequired('You need to confirm that you understand'),
+            )
+
+    confirm = GovukCheckboxField("Confirm")
+
+    @staticmethod
+    def generate_label(channel, max_phones):
+        if channel == 'test':
+            return (
+                'I understand this will alert anyone who has switched '
+                'on the test channel'
+            )
+        if channel == 'severe':
+            return (
+                f'I understand this will alert {ConfirmBroadcastForm.format_number_generic(max_phones)} '
+                'of people'
+            )
+        if channel == 'government':
+            return (
+                f'I understand this will alert {ConfirmBroadcastForm.format_number_generic(max_phones)} '
+                'of people, even if they’ve opted out'
+            )
+
+    @staticmethod
+    def format_number_generic(count):
+        for threshold, message in (
+            (1_000_000, 'millions'),
+            (100_000, 'hundreds of thousands'),
+            (10_000, 'tens of thousands'),
+            (1_000, 'thousands'),
+            (100, 'hundreds'),
+            (-math.inf, 'an unknown number')
+        ):
+            if count >= threshold:
+                return message
 
 
 class BaseTemplateForm(StripWhitespaceForm):
