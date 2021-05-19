@@ -6,6 +6,7 @@ from flask import url_for
 from notifications_python_client.errors import HTTPError
 
 import app
+from tests import service_json
 from tests.conftest import (
     SERVICE_ONE_ID,
     USER_ONE_ID,
@@ -609,6 +610,54 @@ def test_new_invited_user_verifies_and_added_to_service(
     raw_html = response.data.decode('utf-8')
     page = BeautifulSoup(raw_html, 'html.parser')
     assert page.find('h1').text == 'Dashboard'
+
+
+@pytest.mark.parametrize('service_permissions, trial_mode, expected_endpoint, extra_args', (
+    ([], True, 'main.service_dashboard', {}),
+    ([], False, 'main.service_dashboard', {}),
+    (['broadcast'], True, 'main.broadcast_tour', {'step_index': 1}),
+    (['broadcast'], False, 'main.broadcast_tour_live', {'step_index': 1}),
+))
+def test_new_invited_user_is_redirected_to_correct_place(
+    mocker,
+    client,
+    sample_invite,
+    mock_check_invite_token,
+    mock_check_verify_code,
+    mock_get_user,
+    mock_dont_get_user_by_email,
+    mock_add_user_to_service,
+    mock_get_invited_user_by_id,
+    mock_events,
+    mock_get_service,
+    service_permissions,
+    trial_mode,
+    expected_endpoint,
+    extra_args,
+):
+    mocker.patch('app.service_api_client.get_service', return_value={
+        'data': service_json(
+            sample_invite['service'],
+            restricted=trial_mode,
+            permissions=service_permissions,
+        )
+    })
+    client.get(url_for('main.accept_invite', token='thisisnotarealtoken'))
+
+    with client.session_transaction() as session:
+        session['user_details'] = {
+            'email': sample_invite['email_address'],
+            'id': sample_invite['id'],
+        }
+
+    response = client.post(url_for('main.verify'), data={'sms_code': '12345'})
+    assert response.status_code == 302
+    assert response.location == url_for(
+        expected_endpoint,
+        service_id=sample_invite['service'],
+        _external=True,
+        **extra_args
+    )
 
 
 def test_existing_user_accepts_and_sets_email_auth(
