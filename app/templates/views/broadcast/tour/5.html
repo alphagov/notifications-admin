@@ -1,4 +1,5 @@
 {% from "components/banner.html" import banner_wrapper %}
+{% from "service_navigation.html" import navigation_service_name %}
 
 {% extends "admin_template.html" %}
 
@@ -11,9 +12,7 @@
 {% block content %}
 
   <div class="navigation-service">
-    <div class="navigation-service-name govuk-!-font-weight-bold">
-      {{ current_service.name }} <span class="navigation-service-type navigation-service-type--training">Training</span>
-    </div>
+    {{ navigation_service_name(current_service) }}
   </div>
 
   <div class="banner-tour banner-tour-no-fixed-height banner-tour-with-service-name">

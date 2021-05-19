@@ -10,11 +10,7 @@
 
 {% block content %}
 
-  <div class="navigation-service">
-    <div class="navigation-service-name govuk-!-font-weight-bold">
-      {{ current_service.name }} <span class="navigation-service-type navigation-service-type--training">Training</span>
-    </div>
-  </div>
+  {% include "service_navigation.html" %}
 
   <div class="banner-tour banner-tour-no-fixed-height banner-tour-with-service-name">
     <div class="govuk-grid-row">

@@ -284,7 +284,9 @@ def test_broadcast_tour_page_4_shows_service_name(
         service_id=SERVICE_ONE_ID,
         step_index=step_index,
     )
-    assert normalize_spaces(page.select_one('.navigation-service').text) == (
+    assert normalize_spaces(
+        page.select_one('.navigation-service').text
+    ).startswith(
         'service one Training'
     )
 
@@ -301,6 +303,7 @@ def test_live_broadcast_tour_shows_service_name_and_switch(
     service_one['permissions'] += ['broadcast']
     service_one['restricted'] = False
     service_one['allowed_broadcast_provider'] = 'all'
+    service_one['broadcast_channel'] = 'severe'
     page = client_request.get(
         '.broadcast_tour_live',
         service_id=SERVICE_ONE_ID,
@@ -351,8 +354,8 @@ def test_live_broadcast_tour_shows_service_name_and_switch(
             'test',
             'vodafone',
             '.navigation-service-type.navigation-service-type--live',
-            'service one Test (vodafone) Switch service',
-            'Test (vodafone)',
+            'service one Test (Vodafone) Switch service',
+            'Test (Vodafone)',
         ),
         (
             False,
