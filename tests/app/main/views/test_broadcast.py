@@ -265,22 +265,25 @@ def test_broadcast_tour_pages_have_continue_link(
     assert link['href'] == expected_link_href(service_id=SERVICE_ONE_ID)
 
 
-@pytest.mark.parametrize('step_index', (
-    pytest.param(1, marks=pytest.mark.xfail),
-    pytest.param(2, marks=pytest.mark.xfail),
-    pytest.param(3, marks=pytest.mark.xfail),
-    pytest.param(4, marks=pytest.mark.xfail),
-    5,
-    6,
+@pytest.mark.parametrize('endpoint, step_index', (
+    pytest.param('.broadcast_tour', 1, marks=pytest.mark.xfail),
+    pytest.param('.broadcast_tour', 2, marks=pytest.mark.xfail),
+    pytest.param('.broadcast_tour', 3, marks=pytest.mark.xfail),
+    pytest.param('.broadcast_tour', 4, marks=pytest.mark.xfail),
+    ('.broadcast_tour', 5),
+    ('.broadcast_tour', 6),
+    ('.broadcast_tour_live', 1),
+    ('.broadcast_tour_live', 2),
 ))
-def test_broadcast_tour_page_4_shows_service_name(
+def test_some_broadcast_tour_pages_show_service_name(
     client_request,
     service_one,
+    endpoint,
     step_index,
 ):
     service_one['permissions'] += ['broadcast']
     page = client_request.get(
-        '.broadcast_tour',
+        endpoint,
         service_id=SERVICE_ONE_ID,
         step_index=step_index,
     )
@@ -288,29 +291,6 @@ def test_broadcast_tour_page_4_shows_service_name(
         page.select_one('.navigation-service').text
     ).startswith(
         'service one Training'
-    )
-
-
-@pytest.mark.parametrize('step_index', (
-    1,
-    2,
-))
-def test_live_broadcast_tour_shows_service_name_and_switch(
-    client_request,
-    service_one,
-    step_index,
-):
-    service_one['permissions'] += ['broadcast']
-    service_one['restricted'] = False
-    service_one['allowed_broadcast_provider'] = 'all'
-    service_one['broadcast_channel'] = 'severe'
-    page = client_request.get(
-        '.broadcast_tour_live',
-        service_id=SERVICE_ONE_ID,
-        step_index=step_index,
-    )
-    assert normalize_spaces(page.select_one('.navigation-service').text) == (
-        'service one Live Switch service'
     )
 
 
