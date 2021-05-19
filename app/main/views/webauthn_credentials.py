@@ -119,7 +119,7 @@ def _complete_webauthn_authentication(user):
     except ValueError as exc:
         current_app.logger.info(f'User {user.id} could not sign in using their webauthn token - {exc}')
         flash('Security key not recognised')
-        # TODO: increment failed login count
+        user.verify_webauthn_login(is_successful=False)
         abort(403)
 
 

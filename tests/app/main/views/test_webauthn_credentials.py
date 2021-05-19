@@ -282,6 +282,7 @@ def test_complete_authentication_403s_if_key_isnt_in_users_credentials(
     # user has no keys in the database
     mocker.patch('app.user_api_client.get_webauthn_credentials_for_user', return_value=[])
     mock_verify_webauthn_login = mocker.patch('app.main.views.webauthn_credentials._verify_webauthn_login')
+    mock_unsuccesful_login_api_call = mocker.patch('app.user_api_client.verify_webauthn_login')
 
     response = client.post(url_for('main.webauthn_complete_authentication'), data=webauthn_authentication_post_data)
     assert response.status_code == 403
@@ -294,6 +295,8 @@ def test_complete_authentication_403s_if_key_isnt_in_users_credentials(
         assert 'webauthn_authentication_state' not in session
 
     assert mock_verify_webauthn_login.called is False
+    # make sure we incremented the failed login count
+    mock_unsuccesful_login_api_call.assert_called_once_with(platform_admin_user['id'], False)
 
 
 def test_complete_authentication_clears_session(
