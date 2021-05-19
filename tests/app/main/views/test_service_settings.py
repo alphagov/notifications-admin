@@ -2071,7 +2071,7 @@ def test_ready_to_go_live(
 ])
 def test_route_permissions(
         mocker,
-        app_,
+        notify_admin,
         client,
         api_user_active,
         service_one,
@@ -2085,7 +2085,7 @@ def test_route_permissions(
 ):
     validate_route_permission(
         mocker,
-        app_,
+        notify_admin,
         "GET",
         200,
         url_for(route, service_id=service_one['id']),
@@ -2107,7 +2107,7 @@ def test_route_permissions(
 ])
 def test_route_invalid_permissions(
         mocker,
-        app_,
+        notify_admin,
         client,
         api_user_active,
         service_one,
@@ -2117,7 +2117,7 @@ def test_route_invalid_permissions(
 ):
     validate_route_permission(
         mocker,
-        app_,
+        notify_admin,
         "GET",
         403,
         url_for(route, service_id=service_one['id']),
@@ -2135,7 +2135,7 @@ def test_route_invalid_permissions(
 ])
 def test_route_for_platform_admin(
         mocker,
-        app_,
+        notify_admin,
         client,
         platform_admin_user,
         service_one,
@@ -2149,7 +2149,7 @@ def test_route_for_platform_admin(
 ):
     validate_route_permission(
         mocker,
-        app_,
+        notify_admin,
         "GET",
         200,
         url_for(route, service_id=service_one['id']),

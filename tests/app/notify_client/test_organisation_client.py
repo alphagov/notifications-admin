@@ -93,7 +93,7 @@ from app import organisations_client
     ]
 )
 def test_returns_value_from_cache(
-    app_,
+    notify_admin,
     mocker,
     client_method,
     expected_cache_get_calls,
@@ -125,7 +125,7 @@ def test_returns_value_from_cache(
 
 
 def test_deletes_domain_cache(
-    app_,
+    notify_admin,
     mock_get_user,
     mocker,
     fake_uuid,

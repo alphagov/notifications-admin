@@ -25,7 +25,7 @@ class ExampleFormSpecialField(Form):
     ExampleFormSpecialField,
 ])
 def test_form_strips_all_whitespace(
-    app_,
+    notify_admin,
     form,
     submitted_data,
 ):

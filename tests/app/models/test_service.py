@@ -74,7 +74,7 @@ def _get_all_folders(active_user_with_permissions):
 
 
 def test_get_user_template_folders_only_returns_folders_visible_to_user(
-    app_,
+    notify_admin,
     mock_get_template_folders,
     service_one,
     active_user_with_permissions,
@@ -118,7 +118,7 @@ def test_get_user_template_folders_only_returns_folders_visible_to_user(
 
 
 def test_get_template_folders_shows_user_folders_when_user_id_passed_in(
-    app_,
+    notify_admin,
     mock_get_template_folders,
     service_one,
     active_user_with_permissions,

@@ -4,7 +4,7 @@ from app.models.user import AnonymousUser, InvitedOrgUser, InvitedUser, User
 from tests.conftest import USER_ONE_ID
 
 
-def test_anonymous_user(app_):
+def test_anonymous_user(notify_admin):
     assert AnonymousUser().is_authenticated is False
     assert AnonymousUser().logged_in_elsewhere() is False
     assert AnonymousUser().default_organisation.name is None
@@ -15,7 +15,7 @@ def test_anonymous_user(app_):
     assert AnonymousUser().default_organisation.request_to_go_live_notes is None
 
 
-def test_user(app_):
+def test_user(notify_admin):
     user_data = {'id': 1,
                  'name': 'Test User',
                  'email_address': 'test@user.gov.uk',
@@ -45,12 +45,12 @@ def test_user(app_):
         user.has_permissions('to_do_bad_things')
 
 
-def test_activate_user(app_, api_user_pending, mock_activate_user):
+def test_activate_user(notify_admin, api_user_pending, mock_activate_user):
     assert User(api_user_pending).activate() == User(api_user_pending)
     mock_activate_user.assert_called_once_with(api_user_pending['id'])
 
 
-def test_activate_user_already_active(app_, api_user_active, mock_activate_user):
+def test_activate_user_already_active(notify_admin, api_user_active, mock_activate_user):
     assert User(api_user_active).activate() == User(api_user_active)
     assert mock_activate_user.called is False
 

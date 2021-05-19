@@ -39,7 +39,7 @@ class ElementNotFound(Exception):
 
 
 @pytest.fixture(scope='session')
-def app_():
+def notify_admin():
     app = Flask('app')
     create_app(app)
 
@@ -2998,8 +2998,8 @@ def mock_send_notification(mocker, fake_uuid):
 
 
 @pytest.fixture(scope='function')
-def client(app_):
-    with app_.test_request_context(), app_.test_client() as client:
+def client(notify_admin):
+    with notify_admin.test_request_context(), notify_admin.test_client() as client:
         yield client
 
 
@@ -3246,25 +3246,25 @@ def set_config_values(app, dict):
 
 
 @pytest.fixture
-def webauthn_dev_server(app_, mocker):
+def webauthn_dev_server(notify_admin, mocker):
     overrides = {
         'NOTIFY_ENVIRONMENT': 'development',
         'ADMIN_BASE_URL': 'https://webauthn.io',
     }
 
-    with set_config_values(app_, overrides):
-        webauthn_server.init_app(app_)
+    with set_config_values(notify_admin, overrides):
+        webauthn_server.init_app(notify_admin)
         yield
 
-    webauthn_server.init_app(app_)
+    webauthn_server.init_app(notify_admin)
 
 
 @pytest.fixture(scope='function')
-def valid_token(app_, fake_uuid):
+def valid_token(notify_admin, fake_uuid):
     return generate_token(
         json.dumps({'user_id': fake_uuid, 'secret_code': 'my secret'}),
-        app_.config['SECRET_KEY'],
-        app_.config['DANGEROUS_SALT']
+        notify_admin.config['SECRET_KEY'],
+        notify_admin.config['DANGEROUS_SALT']
     )
 
 

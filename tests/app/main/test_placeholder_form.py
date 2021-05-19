@@ -3,9 +3,9 @@ import pytest
 from app.main.forms import get_placeholder_form_instance
 
 
-def test_form_class_not_mutated(app_):
+def test_form_class_not_mutated(notify_admin):
 
-    with app_.test_request_context(
+    with notify_admin.test_request_context(
         method='POST',
         data={'placeholder_value': ''}
     ):
@@ -46,14 +46,14 @@ def test_form_class_not_mutated(app_):
 
 ])
 def test_validates_recipients(
-    app_,
+    notify_admin,
     placeholder_name,
     template_type,
     value,
     service_can_send_international_sms,
     expected_error,
 ):
-    with app_.test_request_context(
+    with notify_admin.test_request_context(
         method='POST',
         data={'placeholder_value': value}
     ):

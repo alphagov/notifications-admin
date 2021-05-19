@@ -356,7 +356,7 @@ def test_valid_two_factor_email_link_logs_in_user(
     f'/services/{SERVICE_ONE_ID}/templates',
 ])
 def test_two_factor_email_link_has_expired(
-    app_,
+    notify_admin,
     valid_token,
     client,
     mock_send_verify_code,
@@ -364,7 +364,7 @@ def test_two_factor_email_link_has_expired(
     redirect_url
 ):
 
-    with set_config(app_, 'EMAIL_2FA_EXPIRY_SECONDS', -1):
+    with set_config(notify_admin, 'EMAIL_2FA_EXPIRY_SECONDS', -1):
         response = client.post(
             url_for_endpoint_with_token('main.two_factor_email', token=valid_token, next=redirect_url),
             follow_redirects=True,

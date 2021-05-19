@@ -5,7 +5,7 @@ from app.main.forms import ChooseTimeForm
 
 
 @freeze_time("2016-01-01 11:09:00.061258")
-def test_form_contains_next_24h(app_):
+def test_form_contains_next_24h(notify_admin):
 
     choices = ChooseTimeForm().scheduled_for.choices
 
@@ -34,12 +34,12 @@ def test_form_contains_next_24h(app_):
 
 
 @freeze_time("2016-01-01 11:09:00.061258")
-def test_form_defaults_to_now(app_):
+def test_form_defaults_to_now(notify_admin):
     assert ChooseTimeForm().scheduled_for.data == ''
 
 
 @freeze_time("2016-01-01 11:09:00.061258")
-def test_form_contains_next_three_days(app_):
+def test_form_contains_next_three_days(notify_admin):
     assert ChooseTimeForm().scheduled_for.categories == [
         'Later today', 'Tomorrow', 'Sunday', 'Monday'
     ]

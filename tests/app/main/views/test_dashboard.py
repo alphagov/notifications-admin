@@ -1178,9 +1178,9 @@ def test_future_usage_page(
     mock_get_free_sms_fragment_limit.assert_called_with(SERVICE_ONE_ID, 2014)
 
 
-def _test_dashboard_menu(mocker, app_, usr, service, permissions):
-    with app_.test_request_context():
-        with app_.test_client() as client:
+def _test_dashboard_menu(mocker, notify_admin, usr, service, permissions):
+    with notify_admin.test_request_context():
+        with notify_admin.test_client() as client:
             usr['permissions'][str(service['id'])] = permissions
             usr['services'] = [service['id']]
             mocker.patch('app.user_api_client.check_verify_code', return_value=(True, ''))
@@ -1194,7 +1194,7 @@ def _test_dashboard_menu(mocker, app_, usr, service, permissions):
 
 def test_menu_send_messages(
     mocker,
-    app_,
+    notify_admin,
     api_user_active,
     service_one,
     mock_get_service_templates,
@@ -1208,10 +1208,10 @@ def test_menu_send_messages(
 ):
     service_one['permissions'] = ['email', 'sms', 'letter', 'upload_letters']
 
-    with app_.test_request_context():
+    with notify_admin.test_request_context():
         resp = _test_dashboard_menu(
             mocker,
-            app_,
+            notify_admin,
             api_user_active,
             service_one,
             ['view_activity', 'send_messages'])
@@ -1230,7 +1230,7 @@ def test_menu_send_messages(
 
 def test_menu_send_messages_when_service_does_not_have_upload_letters_permission(
     mocker,
-    app_,
+    notify_admin,
     api_user_active,
     service_one,
     mock_get_service_templates,
@@ -1242,10 +1242,10 @@ def test_menu_send_messages_when_service_does_not_have_upload_letters_permission
     mock_get_free_sms_fragment_limit,
     mock_get_returned_letter_statistics_with_no_returned_letters,
 ):
-    with app_.test_request_context():
+    with notify_admin.test_request_context():
         resp = _test_dashboard_menu(
             mocker,
-            app_,
+            notify_admin,
             api_user_active,
             service_one,
             ['view_activity', 'send_messages'])
@@ -1256,7 +1256,7 @@ def test_menu_send_messages_when_service_does_not_have_upload_letters_permission
 
 def test_menu_manage_service(
     mocker,
-    app_,
+    notify_admin,
     api_user_active,
     service_one,
     mock_get_service_templates,
@@ -1268,10 +1268,10 @@ def test_menu_manage_service(
     mock_get_returned_letter_statistics_with_no_returned_letters,
     mock_get_free_sms_fragment_limit,
 ):
-    with app_.test_request_context():
+    with notify_admin.test_request_context():
         resp = _test_dashboard_menu(
             mocker,
-            app_,
+            notify_admin,
             api_user_active,
             service_one,
             ['view_activity', 'manage_templates', 'manage_service'])
@@ -1288,7 +1288,7 @@ def test_menu_manage_service(
 
 def test_menu_manage_api_keys(
     mocker,
-    app_,
+    notify_admin,
     api_user_active,
     service_one,
     mock_get_service_templates,
@@ -1300,10 +1300,10 @@ def test_menu_manage_api_keys(
     mock_get_returned_letter_statistics_with_no_returned_letters,
     mock_get_free_sms_fragment_limit,
 ):
-    with app_.test_request_context():
+    with notify_admin.test_request_context():
         resp = _test_dashboard_menu(
             mocker,
-            app_,
+            notify_admin,
             api_user_active,
             service_one,
             ['view_activity', 'manage_api_keys'])
@@ -1318,7 +1318,7 @@ def test_menu_manage_api_keys(
 
 def test_menu_all_services_for_platform_admin_user(
     mocker,
-    app_,
+    notify_admin,
     platform_admin_user,
     service_one,
     mock_get_service_templates,
@@ -1330,10 +1330,10 @@ def test_menu_all_services_for_platform_admin_user(
     mock_get_returned_letter_statistics_with_no_returned_letters,
     mock_get_free_sms_fragment_limit,
 ):
-    with app_.test_request_context():
+    with notify_admin.test_request_context():
         resp = _test_dashboard_menu(
             mocker,
-            app_,
+            notify_admin,
             platform_admin_user,
             service_one,
             [])
@@ -1348,7 +1348,7 @@ def test_menu_all_services_for_platform_admin_user(
 
 def test_route_for_service_permissions(
     mocker,
-    app_,
+    notify_admin,
     api_user_active,
     service_one,
     mock_get_service,
@@ -1362,10 +1362,10 @@ def test_route_for_service_permissions(
     mock_get_inbound_sms_summary,
     mock_get_returned_letter_statistics_with_no_returned_letters,
 ):
-    with app_.test_request_context():
+    with notify_admin.test_request_context():
         validate_route_permission(
             mocker,
-            app_,
+            notify_admin,
             "GET",
             200,
             url_for('main.service_dashboard', service_id=service_one['id']),
