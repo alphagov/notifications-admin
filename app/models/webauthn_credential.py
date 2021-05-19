@@ -2,10 +2,15 @@ import base64
 
 from fido2 import cbor
 from fido2.client import ClientData
+from fido2.cose import UnsupportedKey
 from fido2.ctap2 import AttestationObject, AttestedCredentialData
 from flask import current_app
 
 from app.models import JSONModel
+
+
+class RegistrationError(Exception):
+    pass
 
 
 class WebAuthnCredential(JSONModel):
@@ -22,11 +27,17 @@ class WebAuthnCredential(JSONModel):
     def from_registration(cls, state, response):
         server = current_app.webauthn_server
 
-        auth_data = server.register_complete(
-            state,
-            ClientData(response["clientDataJSON"]),
-            AttestationObject(response["attestationObject"]),
-        )
+        try:
+            auth_data = server.register_complete(
+                state,
+                ClientData(response["clientDataJSON"]),
+                AttestationObject(response["attestationObject"]),
+            )
+        except ValueError as e:
+            raise RegistrationError(e)
+
+        if isinstance(auth_data.credential_data.public_key, UnsupportedKey):
+            raise RegistrationError("Encryption algorithm not supported")
 
         return cls({
             'name': 'Unnamed key',

@@ -3,7 +3,7 @@ from flask import current_app, request, session
 from flask_login import current_user
 
 from app.main import main
-from app.models.webauthn_credential import WebAuthnCredential
+from app.models.webauthn_credential import RegistrationError, WebAuthnCredential
 from app.notify_client.user_api_client import user_api_client
 from app.utils import user_is_platform_admin
 
@@ -34,13 +34,19 @@ def webauthn_begin_register():
 @main.route('/webauthn/register', methods=['POST'])
 @user_is_platform_admin
 def webauthn_complete_register():
-    credential = WebAuthnCredential.from_registration(
-        session.pop("webauthn_registration_state"),
-        cbor.decode(request.get_data()),
-    )
+    if 'webauthn_registration_state' not in session:
+        return cbor.encode("No registration in progress"), 400
+
+    try:
+        credential = WebAuthnCredential.from_registration(
+            session.pop("webauthn_registration_state"),
+            cbor.decode(request.get_data()),
+        )
+    except RegistrationError as e:
+        return cbor.encode(str(e)), 400
 
     user_api_client.create_webauthn_credential_for_user(
         current_user.id, credential
     )
 
-    return ''
+    return cbor.encode('')

@@ -2,7 +2,7 @@ import pytest
 from fido2 import cbor
 from flask import url_for
 
-from app import webauthn_server
+from app.models.webauthn_credential import RegistrationError
 
 
 @pytest.mark.parametrize('endpoint', [
@@ -20,18 +20,10 @@ def test_begin_register_returns_encoded_options(
     mocker,
     platform_admin_user,
     platform_admin_client,
+    webauthn_dev_server,
 ):
-    # override base URL so it's consistent on CI and locally
-    mocker.patch.dict(
-        app_.config,
-        values={'ADMIN_BASE_URL': 'http://localhost:6012'}
-    )
-    webauthn_server.init_app(app_)
     mocker.patch('app.user_api_client.get_webauthn_credentials_for_user', return_value=[])
-
-    response = platform_admin_client.get(
-        url_for('main.webauthn_begin_register')
-    )
+    response = platform_admin_client.get(url_for('main.webauthn_begin_register'))
 
     assert response.status_code == 200
 
@@ -49,7 +41,7 @@ def test_begin_register_returns_encoded_options(
 
     relying_party_options = webauthn_options['rp']
     assert relying_party_options['name'] == 'GOV.UK Notify'
-    assert relying_party_options['id'] == 'localhost'
+    assert relying_party_options['id'] == 'webauthn.io'
 
 
 def test_begin_register_includes_existing_credentials(
@@ -132,3 +124,37 @@ def test_complete_register_clears_session(
 
     with platform_admin_client.session_transaction() as session:
         assert 'webauthn_registration_state' not in session
+
+
+def test_complete_register_handles_library_errors(
+    platform_admin_client,
+    mocker,
+):
+    with platform_admin_client.session_transaction() as session:
+        session['webauthn_registration_state'] = 'state'
+
+    mocker.patch(
+        'app.models.webauthn_credential.WebAuthnCredential.from_registration',
+        side_effect=RegistrationError('error')
+    )
+
+    response = platform_admin_client.post(
+        url_for('main.webauthn_complete_register'),
+        data=cbor.encode('public_key_credential'),
+    )
+
+    assert response.status_code == 400
+    assert cbor.decode(response.data) == 'error'
+
+
+def test_complete_register_handles_missing_state(
+    platform_admin_client,
+    mocker,
+):
+    response = platform_admin_client.post(
+        url_for('main.webauthn_complete_register'),
+        data=cbor.encode('public_key_credential'),
+    )
+
+    assert response.status_code == 400
+    assert cbor.decode(response.data) == 'No registration in progress'

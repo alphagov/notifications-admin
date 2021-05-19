@@ -13,7 +13,7 @@ from flask import Flask, url_for
 from notifications_python_client.errors import HTTPError
 from notifications_utils.url_safe_token import generate_token
 
-from app import create_app
+from app import create_app, webauthn_server
 
 from . import (
     TestClient,
@@ -3243,6 +3243,20 @@ def set_config_values(app, dict):
 
     for key in dict:
         app.config[key] = old_values[key]
+
+
+@pytest.fixture
+def webauthn_dev_server(app_, mocker):
+    overrides = {
+        'NOTIFY_ENVIRONMENT': 'development',
+        'ADMIN_BASE_URL': 'https://webauthn.io',
+    }
+
+    with set_config_values(app_, overrides):
+        webauthn_server.init_app(app_)
+        yield
+
+    webauthn_server.init_app(app_)
 
 
 @pytest.fixture(scope='function')

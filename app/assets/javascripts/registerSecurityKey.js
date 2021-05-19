@@ -27,7 +27,16 @@
             })
             .then((response) => {
               if (!response.ok) {
-                throw Error(response.statusText);
+                return response.arrayBuffer()
+                  .then((cbor) => {
+                    return Promise.resolve(window.CBOR.decode(cbor));
+                  })
+                  .catch(() => {
+                    throw Error(response.statusText);
+                  })
+                  .then((text) => {
+                    throw Error(text);
+                  });
               }
 
               window.location.reload();
