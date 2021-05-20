@@ -16,16 +16,6 @@
     );
   {% endfor %}
 
-  {% for polygon in broadcast_message.polygons.as_coordinate_pairs_lat_long %}
-    polygons.push(
-      L.polygon({{polygon}}, {
-        color: '#0b0b0c',
-        fillColor: '#2B8CC4',
-        fillOpacity: 0.3,
-        weight: 2
-      })
-    );
-  {% endfor %}
 
 
   var mapElement = document.getElementById('area-list-map');
@@ -58,8 +48,13 @@
   );
 
   // if element is inside a details element then close the details element
-  if (details) {
-    details.open = false;
-  }
+  <!--if (details) {-->
+    <!--details.open = false;-->
+  <!--}-->
+
+  window.setTimeout(function() {
+    document.querySelector('.leaflet-control-attribution').innerHTML = 'Maps & data (C) OpenStreetMap contributors';
+    document.querySelector('.leaflet-control-zoom').innerHTML = ''
+  }, 3000);
 
 </script>
