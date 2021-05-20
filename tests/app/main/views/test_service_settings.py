@@ -163,9 +163,9 @@ def test_platform_admin_sees_only_relevant_settings_for_broadcast_service(
         SERVICE_ONE_ID,
         users=[api_user_active['id']],
         permissions=['broadcast'],
+        restricted=True,
         organisation_id=ORGANISATION_ID,
         contact_link='contact_us@gov.uk',
-        broadcast_channel="severe",
     )
     mocker.patch('app.service_api_client.get_service', return_value={'data': service_one})
 
@@ -186,7 +186,7 @@ def test_platform_admin_sees_only_relevant_settings_for_broadcast_service(
         'Label Value Action',
         'Notes None Change the notes for the service',
         'Email authentication Off Change your settings for Email authentication',
-        'Emergency alerts Training Change your settings for emergency alerts',
+        'Emergency alerts Off Change your settings for emergency alerts',
     ]
 
     assert len(rows) == len(expected_rows)
@@ -204,7 +204,10 @@ def test_platform_admin_sees_only_relevant_settings_for_broadcast_service(
         (True, "live", "test", "ee", "Test (EE)"),
         (True, "live", "test", "three", "Test (Three)"),
         (True, "live", "test", "all", "Test (all networks)"),
-        (True, "live", "severe", "all", "Live"),
+        (True, "live", "severe", "all", "Live (all networks)"),
+        (True, "live", "severe", "three", "Live (Three)"),
+        (True, "live", "government", "all", "Government (all networks)"),
+        (True, "live", "government", "three", "Government (Three)"),
     ]
 )
 def test_platform_admin_sees_correct_description_of_broadcast_service_setting(
@@ -239,8 +242,8 @@ def test_platform_admin_sees_correct_description_of_broadcast_service_setting(
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     broadcast_setting_row = page.find(string=re.compile("Emergency alerts")).find_parent('tr')
-    broadcast_setting_description = broadcast_setting_row.select('td')[1].text.strip()
-    assert broadcast_setting_description == expected_text
+    broadcast_setting_description = broadcast_setting_row.select('td')[1].text
+    assert normalize_spaces(broadcast_setting_description) == expected_text
 
 
 def test_no_go_live_link_for_service_without_organisation(
@@ -5536,17 +5539,17 @@ def test_get_service_set_broadcast_account_type_has_radio_selected_for_broadcast
         (
             'live-test',
             '.service_set_broadcast_network',
-            {},
+            {'broadcast_channel': 'test'},
         ),
         (
             'live-severe',
-            '.service_confirm_broadcast_account_type',
-            {'account_type': 'live-severe'},
+            '.service_set_broadcast_network',
+            {'broadcast_channel': 'severe'},
         ),
         (
             'live-government',
-            '.service_confirm_broadcast_account_type',
-            {'account_type': 'live-government'},
+            '.service_set_broadcast_network',
+            {'broadcast_channel': 'government'},
         ),
     ]
 )
@@ -5587,13 +5590,17 @@ def test_get_service_set_broadcast_channel_redirects(
             "live",
             "severe",
             "all",
-            [],
+            [
+                ("All networks", "live-severe"),
+            ],
         ),
         (
             "live",
             "government",
             "all",
-            [],
+            [
+                ("All networks", "live-government"),
+            ],
         ),
         (
             "live",
@@ -5639,6 +5646,24 @@ def test_get_service_set_broadcast_channel_redirects(
                 ("Vodafone", "live-test-vodafone"),
             ],
         ),
+        (
+            "live",
+            "severe",
+            "vodafone",
+            [
+                ("A single network", ""),
+                ("Vodafone", "live-severe-vodafone"),
+            ],
+        ),
+        (
+            "live",
+            "government",
+            "vodafone",
+            [
+                ("A single network", ""),
+                ("Vodafone", "live-government-vodafone"),
+            ],
+        ),
     ]
 )
 def test_get_service_set_broadcast_network_has_radio_selected(
@@ -5663,6 +5688,7 @@ def test_get_service_set_broadcast_network_has_radio_selected(
     page = client_request.get(
         'main.service_set_broadcast_network',
         service_id=SERVICE_ONE_ID,
+        broadcast_channel=broadcast_channel,
     )
 
     assert [
@@ -5675,40 +5701,38 @@ def test_get_service_set_broadcast_network_has_radio_selected(
 
 
 @pytest.mark.parametrize(
-    'data, expected_result',
+    'broadcast_channel, provider, choice_type',
     (
-        (
-            {'network_variant': 'live-test'},
-            'live-test'
-        ),
-        (
-            {'network_variant': '', 'network': 'live-test-ee'},
-            'live-test-ee'
-        ),
-        (
-            {'network_variant': '', 'network': 'live-test-o2'},
-            'live-test-o2'
-        ),
-        (
-            {'network_variant': '', 'network': 'live-test-three'},
-            'live-test-three'
-        ),
-        (
-            {'network_variant': '', 'network': 'live-test-vodafone'},
-            'live-test-vodafone'
-        ),
+        ('severe', '', 'network_variant'),
+        ('government', '', 'network_variant'),
+        ('test', '', 'network_variant'),
+        ('test', 'o2', 'network'),
+        ('test', 'ee', 'network'),
+        ('test', 'three', 'network'),
+        ('test', 'vodafone', 'network'),
+        ('government', 'vodafone', 'network'),
+        ('severe', 'vodafone', 'network'),
     ),
 )
 def test_post_service_set_broadcast_network(
     client_request,
     platform_admin_user,
-    data,
-    expected_result,
+    broadcast_channel,
+    provider,
+    choice_type,
 ):
+    if choice_type == 'network_variant':
+        expected_result = f'live-{broadcast_channel}'
+        data = {'network_variant': expected_result}
+    else:
+        expected_result = f'live-{broadcast_channel}-{provider}'
+        data = {'network_variant': '', 'network': expected_result}
+
     client_request.login(platform_admin_user)
     client_request.post(
         'main.service_set_broadcast_network',
         service_id=SERVICE_ONE_ID,
+        broadcast_channel=broadcast_channel,
         _data=data,
         _expected_status=302,
         _expected_redirect=url_for(
@@ -5737,6 +5761,7 @@ def test_post_service_set_broadcast_network_makes_you_choose(
     page = client_request.post(
         'main.service_set_broadcast_network',
         service_id=SERVICE_ONE_ID,
+        broadcast_channel='all',
         _data=data,
         _expected_status=200,
     )
@@ -5783,12 +5808,22 @@ def test_post_service_set_broadcast_network_makes_you_choose(
             'this service.',
         ]),
         ('live-severe', [
-            'Live',
+            'Live (all networks)',
+            'Members of the public will receive alerts sent from this '
+            'service.',
+        ]),
+        ('live-severe-vodafone', [
+            'Live (Vodafone)',
             'Members of the public will receive alerts sent from this '
             'service.',
         ]),
         ('live-government', [
-            'Government',
+            'Government (all networks)',
+            'Members of the public will receive alerts sent from this '
+            'service, even if they’ve opted out.'
+        ]),
+        ('live-government-vodafone', [
+            'Government (Vodafone)',
             'Members of the public will receive alerts sent from this '
             'service, even if they’ve opted out.'
         ]),
@@ -5856,14 +5891,15 @@ def test_post_service_set_broadcast_account_type_posts_data_to_api_and_redirects
     )
 
 
-@pytest.mark.parametrize('endpoint, expected_error', (
-    ('main.service_set_broadcast_channel', 'Error: Select mode or channel'),
-    ('main.service_set_broadcast_network', 'Error: Select a mobile network'),
+@pytest.mark.parametrize('endpoint, extra_args, expected_error', (
+    ('main.service_set_broadcast_channel', {}, 'Error: Select mode or channel'),
+    ('main.service_set_broadcast_network', {'broadcast_channel': 'all'}, 'Error: Select a mobile network'),
 ))
 def test_post_service_set_broadcast_account_type_shows_errors_if_no_radio_selected(
     platform_admin_client,
     mocker,
     endpoint,
+    extra_args,
     expected_error,
 ):
     set_service_broadcast_settings_mock = mocker.patch('app.service_api_client.set_service_broadcast_settings')
@@ -5873,6 +5909,7 @@ def test_post_service_set_broadcast_account_type_shows_errors_if_no_radio_select
         url_for(
             endpoint,
             service_id=SERVICE_ONE_ID,
+            **extra_args
         )
     )
     assert response.status_code == 200

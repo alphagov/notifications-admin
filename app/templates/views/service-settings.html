@@ -1,6 +1,7 @@
 {% extends "withnav_template.html" %}
 {% from "components/banner.html" import banner_wrapper %}
 {% from "components/table.html" import mapping_table, row, settings_row, text_field, optional_text_field, edit_field, field, boolean_field with context %}
+{% from "service_navigation.html" import broadcast_service_name_tag %}
 
 {% block service_page_title %}
   Settings
@@ -434,10 +435,7 @@
               {% if not current_service.broadcast_channel %}
               Off
               {% else %}
-                {% if current_service.live and current_service.broadcast_channel == "government" %}Government{% endif %}
-                {% if current_service.live and current_service.broadcast_channel == "severe" %}Live{% endif %}
-                {% if current_service.live and current_service.broadcast_channel == "test" %}Test {% if current_service.allowed_broadcast_provider != "all" %}({{ current_service.allowed_broadcast_provider|format_mobile_network }}){% else %}(all networks){% endif %}{%endif%}
-                {% if not current_service.live%}Training {% endif%}
+              {{ broadcast_service_name_tag(current_service.trial_mode, current_service.broadcast_channel, current_service.allowed_broadcast_provider, left_margin=False) }}
               {% endif %}
             {% endcall %}
             {{ edit_field(

@@ -2407,24 +2407,29 @@ class ServiceBroadcastChannelForm(StripWhitespaceForm):
 
 
 class ServiceBroadcastNetworkForm(StripWhitespaceForm):
+    def __init__(self, broadcast_channel, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.broadcast_channel = broadcast_channel
+
+        self.network_variant.choices = [
+            (f'live-{broadcast_channel}', 'All networks'),
+            ('', 'A single network'),
+        ]
+
+        self.network.choices = [
+            (f'live-{broadcast_channel}-ee', 'EE'),
+            (f'live-{broadcast_channel}-o2', 'O2'),
+            (f'live-{broadcast_channel}-vodafone', 'Vodafone'),
+            (f'live-{broadcast_channel}-three', 'Three'),
+        ]
 
     network_variant = ServiceBroadcastAccountTypeField(
         'Choose a mobile network',
         thing='a mobile network',
-        choices=[
-            ('live-test', 'All networks'),
-            ('', 'A single network'),
-        ]
     )
     network = OptionalServiceBroadcastAccountTypeField(
         'Choose a mobile network',
         thing='a mobile network',
-        choices=[
-            ('live-test-ee', 'EE'),
-            ('live-test-o2', 'O2'),
-            ('live-test-vodafone', 'Vodafone'),
-            ('live-test-three', 'Three'),
-        ],
     )
 
     def validate_network(self, field):
@@ -2439,14 +2444,16 @@ class ServiceBroadcastAccountTypeForm(StripWhitespaceForm):
         'Change cell broadcast service type',
         thing='which type of account this cell broadcast service is',
         choices=[
-            ("training-test", "Training mode"),
-            ("live-test-ee", "Test channel (EE)"),
-            ("live-test-o2", "Test channel (O2)"),
-            ("live-test-three", "Test channel (Three)"),
-            ("live-test-vodafone", "Test channel (Vodafone)"),
-            ("live-test", "Test channel (all networks)"),
-            ("live-severe", "Live (all networks)"),
-            ("live-government", "Government channel (all networks)"),
+            ("training-test", "")
+        ] +
+        [
+            (f"live-{broadcast_channel}", "")
+            for broadcast_channel in ["test", "severe", "government"]
+        ] +
+        [
+            (f"live-{broadcast_channel}-{provider}", "")
+            for broadcast_channel in ["test", "severe", "government"]
+            for provider in ["ee", "o2", "three", "vodafone"]
         ],
         validators=[DataRequired()]
     )
