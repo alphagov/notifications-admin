@@ -20,8 +20,8 @@ from app.main.forms import (
     ChangeEmailForm,
     ChangeMobileNumberForm,
     ChangeNameForm,
-    ChangeNameOfSecurityKey,
     ChangePasswordForm,
+    ChangeSecurityKeyNameForm,
     ConfirmPasswordForm,
     ServiceOnOffSettingForm,
     TwoFactorForm,
@@ -261,14 +261,14 @@ def user_profile_manage_security_key(key_id):
     if not security_key:
         abort(404)
 
-    form = ChangeNameOfSecurityKey(name_of_key=security_key["name"])
+    form = ChangeSecurityKeyNameForm(security_key_name=security_key["name"])
 
     if form.validate_on_submit():
-        if form.name_of_key.data != security_key["name"]:
-            user_api_client.update_webauthn_credential_for_user(
+        if form.security_key_name.data != security_key["name"]:
+            user_api_client.update_webauthn_credential_name_for_user(
                 user_id=current_user.id,
                 credential_id=key_id,
-                new_name_for_credential=form.name_of_key.data
+                new_name_for_credential=form.security_key_name.data
             )
         return redirect(url_for('.user_profile_security_keys'))
 

@@ -401,7 +401,7 @@ def test_should_show_manage_security_key_page(
     assert page.select_one('.govuk-back-link').text.strip() == 'Back'
     assert page.select_one('.govuk-back-link')['href'] == url_for('.user_profile_security_keys')
 
-    assert page.select_one('#name_of_key')["value"] == webauthn_credential["name"]
+    assert page.select_one('#security_key_name')["value"] == webauthn_credential["name"]
 
 
 def test_manage_security_key_page_404s_when_key_not_found(
@@ -464,14 +464,14 @@ def test_should_redirect_after_change_of_security_key_name(
     )
 
     mock_update = mocker.patch(
-        'app.user_api_client.update_webauthn_credential_for_user',
+        'app.user_api_client.update_webauthn_credential_name_for_user',
         return_value=[webauthn_credential],
     )
 
     client_request.post(
         'main.user_profile_manage_security_key',
         key_id=webauthn_credential['id'],
-        _data={'name_of_key': "new name"},
+        _data={'security_key_name': "new name"},
         _expected_status=302,
         _expected_redirect=url_for(
             'main.user_profile_security_keys',
@@ -501,14 +501,14 @@ def test_user_profile_manage_security_key_should_not_call_api_if_key_name_stays_
     )
 
     mock_update = mocker.patch(
-        'app.user_api_client.update_webauthn_credential_for_user',
+        'app.user_api_client.update_webauthn_credential_name_for_user',
         return_value=[webauthn_credential],
     )
 
     client_request.post(
         'main.user_profile_manage_security_key',
         key_id=webauthn_credential['id'],
-        _data={'name_of_key': webauthn_credential['name']},
+        _data={'security_key_name': webauthn_credential['name']},
         _expected_status=302,
         _expected_redirect=url_for(
             'main.user_profile_security_keys',

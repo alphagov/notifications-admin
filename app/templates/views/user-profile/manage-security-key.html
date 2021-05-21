@@ -19,7 +19,7 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-three-quarters">
       {% call form_wrapper(autocomplete=True) %}
-        {{ form.name_of_key }}
+        {{ form.security_key_name }}
         {{ page_footer(
           'Save',
           delete_link=url_for(

@@ -2506,8 +2506,8 @@ class BroadcastAreaFormWithSelectAll(BroadcastAreaForm):
         return self.areas.data
 
 
-class ChangeNameOfSecurityKey(StripWhitespaceForm):
-    name_of_key = GovukTextInputField(
+class ChangeSecurityKeyNameForm(StripWhitespaceForm):
+    security_key_name = GovukTextInputField(
         'Name of key',
         validators=[
             DataRequired(message='Cannot be empty'),
