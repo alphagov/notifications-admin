@@ -424,12 +424,29 @@ def test_manage_security_key_page_404s_when_key_not_found(
     )
 
 
-def test_non_platform_admin_user_doesnt_see_manage_security_key_page(client_request, webauthn_credential,):
-    client_request.get(
-        '.user_profile_manage_security_key',
-        key_id=webauthn_credential['id'],
-        _expected_status=403,
-    )
+@pytest.mark.parametrize('endpoint,method', [
+    (".user_profile_manage_security_key", "get"),
+    (".user_profile_manage_security_key", "post"),
+    (".user_profile_confirm_delete_security_key", "get"),
+    (".user_profile_confirm_delete_security_key", "post"),
+    (".user_profile_delete_security_key", "post"),
+])
+def test_non_platform_admin_user_cant_manage_security_keys(
+    client_request, webauthn_credential, endpoint, method
+):
+    if method == "get":
+        client_request.get(
+            endpoint,
+            key_id=webauthn_credential['id'],
+            _expected_status=403,
+        )
+
+    else:
+        client_request.post(
+            endpoint,
+            key_id=webauthn_credential['id'],
+            _expected_status=403,
+        )
 
 
 def test_should_redirect_after_change_of_security_key_name(
