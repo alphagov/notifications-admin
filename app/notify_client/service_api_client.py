@@ -42,9 +42,20 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         return self.get('/service/{0}'.format(service_id))
 
     def get_service_statistics(self, service_id, today_only, limit_days=None):
-        return self.get('/service/{0}/statistics'.format(service_id), params={
-            'today_only': today_only, 'limit_days': limit_days
-        })['data']
+        # FIXME: The statistics request is taking more than 30s on some accounts,
+        # so return an empty set of statistics for the upload check page.
+        # We still do the request for when `today_only=False` so that reporting
+        # pages in the admin are still showing the correct values for other services.
+        if today_only:
+            return {
+                'email': {'requested': 0, 'delivered': 0, 'failed': 0},
+                'sms': {'requested': 0, 'delivered': 0, 'failed': 0},
+                'letter': {'requested': 0, 'delivered': 0, 'failed': 0}
+            }
+        else:
+            return self.get('/service/{0}/statistics'.format(service_id), params={
+                'today_only': today_only, 'limit_days': limit_days
+            })['data']
 
     def get_services(self, params_dict=None):
         """
