@@ -77,7 +77,7 @@ govuk-bank-holidays==0.8
     #   notifications-utils
 git+https://github.com/alphagov/govuk-frontend-jinja.git@v0.5.8-alpha#egg=govuk-frontend-jinja==0.5.8-alpha
     # via -r requirements.in
-greenlet==1.0.0
+greenlet==1.1.0
     # via eventlet
 gunicorn==20.1.0
     # via -r requirements.in
