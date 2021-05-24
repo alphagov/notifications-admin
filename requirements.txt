@@ -41,7 +41,7 @@ cryptography==3.4.7
     # via
     #   -r requirements.in
     #   fido2
-dnspython==1.16.0
+dnspython==2.1.0
     # via eventlet
 docopt==0.6.2
     # via notifications-python-client
