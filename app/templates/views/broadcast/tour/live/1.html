@@ -3,7 +3,7 @@
 {% extends "admin_template.html" %}
 
 {% block per_page_title %}
-  Notify has not broadcast your alert because you’re in training mode.
+  You’ve been invited to send live emergency alerts.
 {% endblock %}
 
 {% set mainClasses = "govuk-!-padding-top-0 govuk-!-padding-bottom-0" %}
@@ -16,20 +16,20 @@
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-one-half">
         <h1 class="heading-medium">
-          Notify has not broadcast your alert because you’re in training mode.
+          You’ve been invited to send live emergency alerts.
         </h1>
         <p class="govuk-body heading-medium">
-          In a real emergency, every mobile phone in the area
-          you chose would make a loud alarm noise.
+          Members of the public will receive alerts you send from this service.
         </p>
         <p class="govuk-body heading-medium">
-          <a class="govuk-link govuk-link--no-visited-state" href='{{ url_for(".service_dashboard", service_id=current_service.id) }}'>
+          <a class="govuk-link govuk-link--no-visited-state" href='{{ url_for(".broadcast_tour_live", service_id=current_service.id, step_index=2) }}'>
             Continue
           </a>
         </p>
       </div>
       <div class="govuk-grid-column-one-half">
-        <img src="{{ asset_url('images/broadcast-tour/3.png') }}" alt="">
+        <img src="{{ asset_url('images/broadcast-tour/live/1.png') }}" alt="">
+        <link rel="preload" href="{{ asset_url('images/broadcast-tour/live/2.png') }}" as="image">
       </div>
     </div>
   </div>

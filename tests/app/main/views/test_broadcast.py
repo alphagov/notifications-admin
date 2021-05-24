@@ -236,24 +236,27 @@ def test_cancel_broadcast_page_403_for_user_without_permission(
     )
 
 
-@pytest.mark.parametrize('step_index, expected_link_text, expected_link_href', (
-    (1, 'Continue', partial(url_for, '.broadcast_tour', step_index=2)),
-    (2, 'Continue', partial(url_for, '.broadcast_tour', step_index=3)),
-    (3, 'Continue', partial(url_for, '.broadcast_tour', step_index=4)),
-    (4, 'Continue', partial(url_for, '.broadcast_tour', step_index=5)),
-    (5, 'Continue', partial(url_for, '.service_dashboard')),
-    (6, 'Continue', partial(url_for, '.service_dashboard')),
+@pytest.mark.parametrize('endpoint, step_index, expected_link_text, expected_link_href', (
+    ('.broadcast_tour', 1, 'Continue', partial(url_for, '.broadcast_tour', step_index=2)),
+    ('.broadcast_tour', 2, 'Continue', partial(url_for, '.broadcast_tour', step_index=3)),
+    ('.broadcast_tour', 3, 'Continue', partial(url_for, '.broadcast_tour', step_index=4)),
+    ('.broadcast_tour', 4, 'Continue', partial(url_for, '.broadcast_tour', step_index=5)),
+    ('.broadcast_tour', 5, 'Continue', partial(url_for, '.service_dashboard')),
+    ('.broadcast_tour', 6, 'Continue', partial(url_for, '.service_dashboard')),
+    ('.broadcast_tour_live', 1, 'Continue', partial(url_for, '.broadcast_tour_live', step_index=2)),
+    ('.broadcast_tour_live', 2, 'Continue', partial(url_for, '.service_dashboard')),
 ))
 def test_broadcast_tour_pages_have_continue_link(
     client_request,
     service_one,
+    endpoint,
     step_index,
     expected_link_text,
     expected_link_href,
 ):
     service_one['permissions'] += ['broadcast']
     page = client_request.get(
-        '.broadcast_tour',
+        endpoint,
         service_id=SERVICE_ONE_ID,
         step_index=step_index,
     )
@@ -262,26 +265,31 @@ def test_broadcast_tour_pages_have_continue_link(
     assert link['href'] == expected_link_href(service_id=SERVICE_ONE_ID)
 
 
-@pytest.mark.parametrize('step_index', (
-    pytest.param(1, marks=pytest.mark.xfail),
-    pytest.param(2, marks=pytest.mark.xfail),
-    pytest.param(3, marks=pytest.mark.xfail),
-    pytest.param(4, marks=pytest.mark.xfail),
-    5,
-    6,
+@pytest.mark.parametrize('endpoint, step_index', (
+    pytest.param('.broadcast_tour', 1, marks=pytest.mark.xfail),
+    pytest.param('.broadcast_tour', 2, marks=pytest.mark.xfail),
+    pytest.param('.broadcast_tour', 3, marks=pytest.mark.xfail),
+    pytest.param('.broadcast_tour', 4, marks=pytest.mark.xfail),
+    ('.broadcast_tour', 5),
+    ('.broadcast_tour', 6),
+    ('.broadcast_tour_live', 1),
+    ('.broadcast_tour_live', 2),
 ))
-def test_broadcast_tour_page_4_shows_service_name(
+def test_some_broadcast_tour_pages_show_service_name(
     client_request,
     service_one,
+    endpoint,
     step_index,
 ):
     service_one['permissions'] += ['broadcast']
     page = client_request.get(
-        '.broadcast_tour',
+        endpoint,
         service_id=SERVICE_ONE_ID,
         step_index=step_index,
     )
-    assert normalize_spaces(page.select_one('.navigation-service').text) == (
+    assert normalize_spaces(
+        page.select_one('.navigation-service').text
+    ).startswith(
         'service one Training'
     )
 
@@ -326,8 +334,8 @@ def test_broadcast_tour_page_4_shows_service_name(
             'test',
             'vodafone',
             '.navigation-service-type.navigation-service-type--live',
-            'service one Test (vodafone) Switch service',
-            'Test (vodafone)',
+            'service one Test (Vodafone) Switch service',
+            'Test (Vodafone)',
         ),
         (
             False,
@@ -371,15 +379,21 @@ def test_broadcast_service_shows_live_or_training(
     )
 
 
-@pytest.mark.parametrize('step_index', (0, 7))
+@pytest.mark.parametrize('endpoint, step_index', (
+    ('.broadcast_tour', 0),
+    ('.broadcast_tour', 7),
+    ('.broadcast_tour_live', 0),
+    ('.broadcast_tour_live', 3),
+))
 def test_broadcast_tour_page_404s_out_of_range(
     client_request,
     service_one,
+    endpoint,
     step_index,
 ):
     service_one['permissions'] += ['broadcast']
     client_request.get(
-        '.broadcast_tour',
+        endpoint,
         service_id=SERVICE_ONE_ID,
         step_index=step_index,
         _expected_status=404,

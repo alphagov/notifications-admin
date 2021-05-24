@@ -39,6 +39,7 @@ EXCLUDED_ENDPOINTS = tuple(map(Navigation.get_endpoint_with_blueprint, {
     'broadcast_dashboard_rejected',
     'broadcast_dashboard_updates',
     'broadcast_tour',
+    'broadcast_tour_live',
     'callbacks',
     'cancel_broadcast_message',
     'cancel_invited_org_user',

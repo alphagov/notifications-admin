@@ -1,0 +1,44 @@
+{% macro navigation_service_name(service) %}
+  <div class="navigation-service-name govuk-!-font-weight-bold">
+    {{ service.name }}
+    {% if not service.active %}
+      <span class="navigation-service-type navigation-service-type--suspended">Suspended</span>
+    {% elif service.has_permission('broadcast') %}
+      {{ broadcast_service_name_tag(
+        service.trial_mode,
+        service.broadcast_channel,
+        service.allowed_broadcast_provider,
+      ) }}
+    {% endif %}
+  </div>
+{% endmacro %}
+
+{% macro broadcast_service_name_tag(trial_mode, broadcast_channel, allowed_broadcast_provider, left_margin=True) %}
+  {% set margin_class = "" if left_margin else "govuk-!-margin-left-0" %}
+  {% if trial_mode %}
+    <span class="navigation-service-type navigation-service-type--training {{margin_class}}">Training
+  {% elif broadcast_channel == 'severe' %}
+    <span class="navigation-service-type navigation-service-type--live {{margin_class}}">Live
+  {% elif broadcast_channel == 'test' %}
+    <span class="navigation-service-type navigation-service-type--live {{margin_class}}">{{ broadcast_channel|title }}
+    {% if allowed_broadcast_provider == "all" %}
+      (all networks)
+    {% else %}
+      ({{ allowed_broadcast_provider|format_mobile_network }})
+    {% endif %}
+  {% elif broadcast_channel == 'government' %}
+    <span class="navigation-service-type navigation-service-type--government {{margin_class}}">Government
+  {% endif %}
+  </span>
+{% endmacro %}
+
+<div class="navigation-service">
+  {% if current_service.organisation_id %}
+    {% if current_user.platform_admin or
+      (current_user.belongs_to_organisation(current_service.organisation_id) and current_service.live) %}
+      <a href="{{ url_for('.organisation_dashboard', org_id=current_service.organisation_id) }}" class="govuk-link govuk-link--no-visited-state navigation-organisation-link">{{ current_service.organisation_name }}</a>
+    {% endif %}
+  {% endif %}
+  {{ navigation_service_name(current_service) }}
+  <a href="{{ url_for('main.choose_account') }}" class="govuk-link govuk-link--no-visited-state navigation-service-switch">Switch service</a>
+</div>

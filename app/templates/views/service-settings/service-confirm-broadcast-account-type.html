@@ -1,4 +1,5 @@
 {% extends "withnav_template.html" %}
+{% from "service_navigation.html" import broadcast_service_name_tag %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
@@ -15,30 +16,19 @@
         'Confirm emergency alert settings',
         back_link=url_for('.service_set_broadcast_channel', service_id=current_service.id)
       ) }}
+      <p class="govuk-body">
+        {{ broadcast_service_name_tag(
+          form.account_type.service_mode == 'training',
+          form.account_type.broadcast_channel,
+          form.account_type.provider_restriction,
+          left_margin=False,
+        ) }}
+      </p>
       {% if form.account_type.service_mode == 'training' %}
-        <p class="govuk-body">
-          <span class="navigation-service-type navigation-service-type--training govuk-!-margin-left-0">Training</span>
-        </p>
         <p class="govuk-body">
           No phones will receive alerts sent from this service.
         </p>
       {% else %}
-        <p class="govuk-body">
-          {% if form.account_type.broadcast_channel == 'severe' %}
-            <span class="navigation-service-type navigation-service-type--live govuk-!-margin-left-0">Live
-          {% elif form.account_type.broadcast_channel == 'government' %}
-            <span class="navigation-service-type navigation-service-type--government govuk-!-margin-left-0">Government
-          {% else %}
-            <span class="navigation-service-type navigation-service-type--live govuk-!-margin-left-0">{{ form.account_type.broadcast_channel|title }}
-          {% endif %}
-          {% if form.account_type.provider_restriction != 'all' %}
-            ({{ form.account_type.provider_restriction|format_mobile_network }})
-          {% endif %}
-          {% if form.account_type.broadcast_channel == 'test' and form.account_type.provider_restriction == 'all'%}
-            (all networks)
-          {% endif %}
-            </span>
-        </p>
         <p class="govuk-body">
           Members of the public
           {% if form.account_type.broadcast_channel == 'test' %}

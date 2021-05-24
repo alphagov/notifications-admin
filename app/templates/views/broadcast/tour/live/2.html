@@ -1,40 +1,31 @@
 {% from "components/banner.html" import banner_wrapper %}
-{% from "service_navigation.html" import navigation_service_name %}
 
 {% extends "admin_template.html" %}
 
 {% block per_page_title %}
-  You’re in training mode.
+  You can always go back to training mode by clicking ‘Switch service’ in the top right.
 {% endblock %}
 
 {% set mainClasses = "govuk-!-padding-top-0 govuk-!-padding-bottom-0" %}
 
 {% block content %}
 
-  <div class="navigation-service">
-    {{ navigation_service_name(current_service) }}
-  </div>
+  {% include "service_navigation.html" %}
 
   <div class="banner-tour banner-tour-no-fixed-height banner-tour-with-service-name">
     <div class="govuk-grid-row">
-      <div class="govuk-grid-column-two-thirds">
+      <div class="govuk-grid-column-one-half">
         <h1 class="heading-medium">
-          You’re in training mode.
+          You can always go back to training mode by clicking ‘Switch service’ in the top right.
         </h1>
-        <p class="govuk-body heading-medium">
-          There’s no risk of broadcasting a real alert.
-        </p>
-        <p class="govuk-body heading-medium">
-          Get used to the system now, so you know what to do in an&nbsp;emergency.
-        </p>
-        <p class="govuk-body heading-medium">
-          When you’re ready, you can turn off training mode.
-        </p>
         <p class="govuk-body heading-medium">
           <a class="govuk-link govuk-link--no-visited-state" href='{{ url_for(".service_dashboard", service_id=current_service.id) }}'>
             Continue
           </a>
         </p>
+      </div>
+      <div class="govuk-grid-column-one-half">
+        <img src="{{ asset_url('images/broadcast-tour/live/2.png') }}" alt="">
       </div>
     </div>
   </div>

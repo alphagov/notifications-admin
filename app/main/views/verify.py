@@ -80,7 +80,10 @@ def activate_user(user_id):
         service_id = _add_invited_user_to_service(invited_user)
         service = Service.from_id(service_id)
         if service.has_permission('broadcast'):
-            return redirect(url_for('main.broadcast_tour', service_id=service.id, step_index=1))
+            if service.live:
+                return redirect(url_for('main.broadcast_tour_live', service_id=service.id, step_index=1))
+            else:
+                return redirect(url_for('main.broadcast_tour', service_id=service.id, step_index=1))
         return redirect(url_for('main.service_dashboard', service_id=service_id))
 
     invited_org_user = InvitedOrgUser.from_session()

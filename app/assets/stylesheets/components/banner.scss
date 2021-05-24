@@ -137,7 +137,7 @@
     &:hover {
       color: $white;
       background-color: $link-hover-colour;
-      box-shadow: 0 0 0 10px solid $link-hover-colour;
+      box-shadow: 0 0 0 10px $link-hover-colour;
     }
 
     &:focus,
