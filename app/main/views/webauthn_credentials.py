@@ -97,7 +97,8 @@ def webauthn_complete_authentication():
 
     _complete_webauthn_authentication(user_to_login)
 
-    return _verify_webauthn_login(user_to_login)
+    redirect = _verify_webauthn_login(user_to_login)
+    return cbor.encode({'redirect_url': redirect.location}), 200
 
 
 def _complete_webauthn_authentication(user):

@@ -1,5 +1,5 @@
 import base64
-from unittest.mock import ANY
+from unittest.mock import ANY, Mock
 
 import pytest
 from fido2 import cbor
@@ -260,13 +260,12 @@ def test_complete_authentication_checks_credentials(
     platform_admin_user['auth_type'] = 'webauthn_auth'
     mocker.patch('app.user_api_client.get_user', return_value=platform_admin_user)
     mocker.patch('app.user_api_client.get_webauthn_credentials_for_user', return_value=[webauthn_credential])
-    # fake returning a 200 just to keep flask happy, normally this'll redirect
-    mocker.patch('app.main.views.webauthn_credentials._verify_webauthn_login', return_value=('ok', 200))
+    mocker.patch('app.main.views.webauthn_credentials._verify_webauthn_login', return_value=Mock(location='/foo'))
 
     response = client.post(url_for('main.webauthn_complete_authentication'), data=webauthn_authentication_post_data)
 
-    # matches response of verify_webauthn_login
-    assert response.data == b'ok'
+    assert response.status_code == 200
+    assert cbor.decode(response.data) == {'redirect_url': '/foo'}
 
 
 def test_complete_authentication_403s_if_key_isnt_in_users_credentials(
@@ -311,8 +310,7 @@ def test_complete_authentication_clears_session(
     platform_admin_user['auth_type'] = 'webauthn_auth'
     mocker.patch('app.user_api_client.get_user', return_value=platform_admin_user)
     mocker.patch('app.user_api_client.get_webauthn_credentials_for_user', return_value=[webauthn_credential])
-    # fake returning a 200 just to keep flask happy, normally this'll redirect
-    mocker.patch('app.main.views.webauthn_credentials._verify_webauthn_login', return_value=('ok', 200))
+    mocker.patch('app.main.views.webauthn_credentials._verify_webauthn_login', return_value=Mock(location='/foo'))
 
     client.post(url_for('main.webauthn_complete_authentication'), data=webauthn_authentication_post_data)
 
@@ -337,8 +335,8 @@ def test_verify_webauthn_login_signs_user_in_signs_user_in(client, mocker, mock_
 
     resp = client.post(url_for('main.webauthn_complete_authentication'))
 
-    assert resp.status_code == 302
-    assert resp.location == url_for('main.show_accounts_or_dashboard', _external=True)
+    assert resp.status_code == 200
+    assert cbor.decode(resp.data)['redirect_url'] == url_for('main.show_accounts_or_dashboard')
     # removes stuff from session
     with client.session_transaction() as session:
         assert 'user_details' not in session
@@ -390,8 +388,8 @@ def test_verify_webauthn_login_signs_user_in_sends_revalidation_email_if_needed(
 
     resp = client.post(url_for('main.webauthn_complete_authentication'))
 
-    assert resp.status_code == 302
-    assert resp.location == url_for('main.revalidate_email_sent', _external=True)
+    assert resp.status_code == 200
+    assert cbor.decode(resp.data)['redirect_url'] == url_for('main.revalidate_email_sent')
 
     with client.session_transaction() as session:
         # stuff stays in session so we can log them in later when they validate their email
