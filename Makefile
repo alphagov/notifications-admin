@@ -23,12 +23,12 @@ VIRTUALENV_ROOT := $(shell [ -z $$VIRTUAL_ENV ] && echo $$(pwd)/venv || echo $$V
 ## DEVELOPMENT
 
 .PHONY: bootstrap
-bootstrap: generate-version-file
+bootstrap: generate-version-file ## Set up everything to run the app
 	pip3 install -r requirements_for_test.txt
 	npm install && npm rebuild node-sass && npm run build
 
 .PHONY: run-flask
-run-flask:
+run-flask:  ## Run flask
 	. environment.sh && flask run -p 6012
 
 .PHONY: help
@@ -52,7 +52,7 @@ test: ## Run tests
 	./scripts/run_tests.sh
 
 .PHONY: fix-imports
-fix-imports:
+fix-imports: ## Fix imports using isort
 	isort -rc ./app ./tests
 
 .PHONY: freeze-requirements
