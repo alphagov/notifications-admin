@@ -3,9 +3,16 @@ import uuid
 
 import pytest
 from flask import url_for
+from notifications_python_client.errors import HTTPError
 from notifications_utils.url_safe_token import generate_token
 
-from tests.conftest import create_api_user_active, url_for_endpoint_with_token
+from app.main.views.user_profile import get_key_from_list_of_keys
+from app.models.user import WebAuthnCredential
+from tests.conftest import (
+    create_api_user_active,
+    normalize_spaces,
+    url_for_endpoint_with_token,
+)
 
 
 def test_should_show_overview_page(
@@ -366,6 +373,246 @@ def test_should_show_security_keys_page(
 
     credential_row = page.select('tr')[-1]
     assert 'Test credential' in credential_row.text
+    assert "Manage" in credential_row.find('a').text
+    assert credential_row.find('a')["href"] == url_for(
+        '.user_profile_manage_security_key',
+        key_id=webauthn_credential['id']
+    )
 
     register_button = page.select_one("[data-module='register-security-key']")
     assert register_button.text.strip() == 'Register a key'
+
+
+def test_get_key_from_list_of_keys(webauthn_credential, webauthn_credential_2):
+    list_of_keys = [WebAuthnCredential(json) for json in [webauthn_credential, webauthn_credential_2]]
+    assert get_key_from_list_of_keys(webauthn_credential["id"], list_of_keys) == WebAuthnCredential(webauthn_credential)
+
+
+def test_should_show_manage_security_key_page(
+    mocker,
+    client_request,
+    platform_admin_user,
+    webauthn_credential,
+):
+    client_request.login(platform_admin_user)
+
+    mocker.patch(
+        'app.user_api_client.get_webauthn_credentials_for_user',
+        return_value=[webauthn_credential],
+    )
+
+    page = client_request.get('.user_profile_manage_security_key', key_id=webauthn_credential['id'])
+    assert page.select_one('h1').text.strip() == f'Manage ‘{webauthn_credential["name"]}’'
+
+    assert page.select_one('.govuk-back-link').text.strip() == 'Back'
+    assert page.select_one('.govuk-back-link')['href'] == url_for('.user_profile_security_keys')
+
+    assert page.select_one('#security_key_name')["value"] == webauthn_credential["name"]
+
+
+def test_manage_security_key_page_404s_when_key_not_found(
+    mocker,
+    client_request,
+    platform_admin_user,
+    webauthn_credential,
+    webauthn_credential_2
+):
+    client_request.login(platform_admin_user)
+
+    mocker.patch(
+        'app.user_api_client.get_webauthn_credentials_for_user',
+        return_value=[webauthn_credential_2],
+    )
+    client_request.get(
+        '.user_profile_manage_security_key',
+        key_id=webauthn_credential['id'],
+        _expected_status=404,
+    )
+
+
+@pytest.mark.parametrize('endpoint,method', [
+    (".user_profile_manage_security_key", "get"),
+    (".user_profile_manage_security_key", "post"),
+    (".user_profile_confirm_delete_security_key", "get"),
+    (".user_profile_confirm_delete_security_key", "post"),
+    (".user_profile_delete_security_key", "post"),
+])
+def test_non_platform_admin_user_cant_manage_security_keys(
+    client_request, webauthn_credential, endpoint, method
+):
+    if method == "get":
+        client_request.get(
+            endpoint,
+            key_id=webauthn_credential['id'],
+            _expected_status=403,
+        )
+
+    else:
+        client_request.post(
+            endpoint,
+            key_id=webauthn_credential['id'],
+            _expected_status=403,
+        )
+
+
+def test_should_redirect_after_change_of_security_key_name(
+    client_request,
+    platform_admin_user,
+    webauthn_credential,
+    mocker
+):
+    client_request.login(platform_admin_user)
+
+    mocker.patch(
+        'app.user_api_client.get_webauthn_credentials_for_user',
+        return_value=[webauthn_credential],
+    )
+
+    mock_update = mocker.patch('app.user_api_client.update_webauthn_credential_name_for_user')
+
+    client_request.post(
+        'main.user_profile_manage_security_key',
+        key_id=webauthn_credential['id'],
+        _data={'security_key_name': "new name"},
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.user_profile_security_keys',
+            _external=True,
+        )
+    )
+
+    mock_update.assert_called_once_with(
+        credential_id=webauthn_credential['id'],
+        new_name_for_credential="new name",
+        user_id=platform_admin_user["id"]
+    )
+
+
+def test_user_profile_manage_security_key_should_not_call_api_if_key_name_stays_the_same(
+    client_request,
+    platform_admin_user,
+    webauthn_credential,
+    mocker
+):
+    client_request.login(platform_admin_user)
+
+    mocker.patch(
+        'app.user_api_client.get_webauthn_credentials_for_user',
+        return_value=[webauthn_credential],
+    )
+
+    mock_update = mocker.patch('app.user_api_client.update_webauthn_credential_name_for_user')
+
+    client_request.post(
+        'main.user_profile_manage_security_key',
+        key_id=webauthn_credential['id'],
+        _data={'security_key_name': webauthn_credential['name']},
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.user_profile_security_keys',
+            _external=True,
+        )
+    )
+
+    assert not mock_update.called
+
+
+def test_shows_delete_link_for_security_key(
+    mocker,
+    client_request,
+    platform_admin_user,
+    webauthn_credential,
+):
+    client_request.login(platform_admin_user)
+
+    mocker.patch(
+        'app.user_api_client.get_webauthn_credentials_for_user',
+        return_value=[webauthn_credential],
+    )
+
+    page = client_request.get('.user_profile_manage_security_key', key_id=webauthn_credential['id'])
+    assert page.select_one('h1').text.strip() == f'Manage ‘{webauthn_credential["name"]}’'
+
+    link = page.select_one('.page-footer a')
+    assert normalize_spaces(link.text) == 'Delete'
+    assert link['href'] == url_for('.user_profile_confirm_delete_security_key', key_id=webauthn_credential['id'])
+
+
+def test_confirm_delete_security_key(
+    client_request,
+    platform_admin_user,
+    webauthn_credential,
+    mocker
+):
+    client_request.login(platform_admin_user)
+
+    mocker.patch(
+        'app.user_api_client.get_webauthn_credentials_for_user',
+        return_value=[webauthn_credential],
+    )
+
+    page = client_request.get(
+        '.user_profile_confirm_delete_security_key',
+        key_id=webauthn_credential['id'],
+        _test_page_title=False,
+    )
+
+    assert normalize_spaces(page.select_one('.banner-dangerous').text) == (
+        'Are you sure you want to delete this security key? '
+        'Yes, delete'
+    )
+    assert 'action' not in page.select_one('.banner-dangerous form')
+    assert page.select_one('.banner-dangerous form')['method'] == 'post'
+
+
+def test_delete_security_key(
+    client_request,
+    platform_admin_user,
+    webauthn_credential,
+    mocker
+):
+    client_request.login(platform_admin_user)
+    mock_delete = mocker.patch('app.user_api_client.delete_webauthn_credential_for_user')
+
+    client_request.post(
+        '.user_profile_delete_security_key',
+        key_id=webauthn_credential['id'],
+        _expected_redirect=url_for(
+            '.user_profile_security_keys',
+            _external=True,
+        )
+    )
+    mock_delete.assert_called_once_with(
+        credential_id=webauthn_credential['id'],
+        user_id=platform_admin_user["id"]
+    )
+
+
+def test_delete_security_key_handles_last_credential_error(
+    client_request,
+    platform_admin_user,
+    webauthn_credential,
+    mocker,
+):
+    client_request.login(platform_admin_user)
+    mocker.patch(
+        'app.user_api_client.get_webauthn_credentials_for_user',
+        return_value=[webauthn_credential],
+    )
+
+    mocker.patch(
+        'app.user_api_client.delete_webauthn_credential_for_user',
+        side_effect=HTTPError(
+            response={},
+            message='Cannot delete last remaining webauthn credential for user'
+        )
+    )
+
+    page = client_request.post(
+        '.user_profile_delete_security_key',
+        key_id=webauthn_credential['id'],
+        _follow_redirects=True
+    )
+    assert 'Manage ‘Test credential’' in page.find('h1').text
+    expected_message = "You cannot delete your last security key."
+    assert expected_message in page.find('div', class_="banner-dangerous").text

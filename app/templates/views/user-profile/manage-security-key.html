@@ -1,0 +1,33 @@
+{% extends "withoutnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+
+
+{% set page_title = 'Manage ' + '‘' + security_key.name + '’' %}
+
+{% block per_page_title %}
+  {{ page_title }}
+{% endblock %}
+
+{% block maincolumn_content %}
+  {{ page_header(
+    page_title,
+    back_link=url_for('.user_profile_security_keys')
+  ) }}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-three-quarters">
+      {% call form_wrapper(autocomplete=True) %}
+        {{ form.security_key_name }}
+        {{ page_footer(
+          'Save',
+          delete_link=url_for(
+            '.user_profile_confirm_delete_security_key', key_id=security_key.id),
+          delete_link_text='Delete'
+        ) }}
+      {% endcall %}
+    </div>
+  </div>
+
+{% endblock %}

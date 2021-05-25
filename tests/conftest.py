@@ -4498,8 +4498,20 @@ def mock_get_invited_org_user_by_id(mocker, sample_org_invite):
 @pytest.fixture
 def webauthn_credential():
     return {
+        'id': str(uuid4()),
         'name': 'Test credential',
         'credential_data': 'WJ0AAAAAAAAAAAAAAAAAAAAAAECKU1ppjl9gmhHWyDkgHsUvZmhr6oF3/lD3llzLE2SaOSgOGIsIuAQqgp8JQSUu3r/oOaP8RS44dlQjrH+ALfYtpAECAyYhWCAxnqAfESXOYjKUc2WACuXZ3ch0JHxV0VFrrTyjyjIHXCJYIFnx8H87L4bApR4M+hPcV+fHehEOeW+KCyd0H+WGY8s6',  # noqa
         'registration_response': 'anything',
         'created_at': '2017-10-18T16:57:14.154185Z',
+    }
+
+
+@pytest.fixture
+def webauthn_credential_2():
+    return {
+        'id': str(uuid4()),
+        'name': 'Another test credential',
+        'credential_data': 'WJ0AAAAAAAAAAAAAAAAAAAAAAECKU1jppl9mhgHWyDkgHsUvZmhr6oF3/lD3llzLE2SaOSgOGIsIuAQqgp8JQSUu3r/oOaP8RS44dlQjrH+ALfYtpAECAyYhWCAxnqAfESXOYjKUc2WACuXZ3ch0JHxV0VFrrTyjyjIHXCJYIFnx8L4H87bApR4M+hPcV+fHehEOeW+KCyd0H+WGY8s6',  # noqa
+        'registration_response': 'stuff',
+        'created_at': '2021-05-14T16:57:14.154185Z',
     }
