@@ -22,6 +22,17 @@ def mock_no_users_for_service(mocker):
     mocker.patch('app.models.user.Users.client_method', return_value=[])
 
 
+@pytest.fixture(scope='function')
+def mock_get_unknown_user_by_email(mocker, api_user_active):
+    api_user_active['id'] = USER_ONE_ID
+
+    def _get_user(email_address):
+        api_user_active['email_address'] = email_address
+        return api_user_active
+
+    return mocker.patch('app.user_api_client.get_user_by_email', side_effect=_get_user)
+
+
 def test_existing_user_accept_invite_calls_api_and_redirects_to_dashboard(
     client,
     service_one,

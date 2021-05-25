@@ -1501,17 +1501,6 @@ def mock_get_user_by_email(mocker, api_user_active):
 
 
 @pytest.fixture(scope='function')
-def mock_get_unknown_user_by_email(mocker, api_user_active):
-    api_user_active['id'] = USER_ONE_ID
-
-    def _get_user(email_address):
-        api_user_active['email_address'] = email_address
-        return api_user_active
-
-    return mocker.patch('app.user_api_client.get_user_by_email', side_effect=_get_user)
-
-
-@pytest.fixture(scope='function')
 def mock_dont_get_user_by_email(mocker):
     def _get_user(email_address):
         return None
