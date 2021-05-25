@@ -9,7 +9,6 @@ import app
 from tests import service_json
 from tests.conftest import (
     SERVICE_ONE_ID,
-    USER_ONE_ID,
     create_active_caseworking_user,
     create_active_user_with_permissions,
     create_api_user_active,
@@ -23,14 +22,8 @@ def mock_no_users_for_service(mocker):
 
 
 @pytest.fixture(scope='function')
-def mock_get_unknown_user_by_email(mocker, api_user_active):
-    api_user_active['id'] = USER_ONE_ID
-
-    def _get_user(email_address):
-        api_user_active['email_address'] = email_address
-        return api_user_active
-
-    return mocker.patch('app.user_api_client.get_user_by_email', side_effect=_get_user)
+def mock_get_existing_user_by_email(mocker, api_user_active):
+    return mocker.patch('app.user_api_client.get_user_by_email', return_value=api_user_active)
 
 
 def test_existing_user_accept_invite_calls_api_and_redirects_to_dashboard(
@@ -38,7 +31,7 @@ def test_existing_user_accept_invite_calls_api_and_redirects_to_dashboard(
     service_one,
     api_user_active,
     mock_check_invite_token,
-    mock_get_unknown_user_by_email,
+    mock_get_existing_user_by_email,
     mock_no_users_for_service,
     mock_accept_invite,
     mock_add_user_to_service,
@@ -54,11 +47,11 @@ def test_existing_user_accept_invite_calls_api_and_redirects_to_dashboard(
     response = client.get(url_for('main.accept_invite', token='thisisnotarealtoken'))
 
     mock_check_invite_token.assert_called_with('thisisnotarealtoken')
-    mock_get_unknown_user_by_email.assert_called_with('invited_user@test.gov.uk')
+    mock_get_existing_user_by_email.assert_called_with('invited_user@test.gov.uk')
     assert mock_accept_invite.call_count == 1
     mock_add_user_to_service.assert_called_with(
         expected_service,
-        USER_ONE_ID,
+        api_user_active['id'],
         expected_permissions,
         [],
     )
@@ -68,7 +61,7 @@ def test_existing_user_accept_invite_calls_api_and_redirects_to_dashboard(
     mock_audit_event.assert_called_once_with(
         invited_by_id=service_one['users'][0],
         service_id=SERVICE_ONE_ID,
-        user_id=USER_ONE_ID,
+        user_id=api_user_active['id'],
     )
 
 
@@ -80,7 +73,7 @@ def test_broadcast_service_shows_tour(
     client,
     service_one,
     mock_check_invite_token,
-    mock_get_unknown_user_by_email,
+    mock_get_existing_user_by_email,
     mock_no_users_for_service,
     mock_accept_invite,
     mock_add_user_to_service,
@@ -117,7 +110,7 @@ def test_existing_user_with_no_permissions_or_folder_permissions_accept_invite(
     api_user_active,
     sample_invite,
     mock_check_invite_token,
-    mock_get_unknown_user_by_email,
+    mock_get_existing_user_by_email,
     mock_no_users_for_service,
     mock_add_user_to_service,
     mock_get_service,
@@ -132,7 +125,7 @@ def test_existing_user_with_no_permissions_or_folder_permissions_accept_invite(
 
     response = client.get(url_for('main.accept_invite', token='thisisnotarealtoken'))
     mock_add_user_to_service.assert_called_with(expected_service,
-                                                USER_ONE_ID,
+                                                api_user_active['id'],
                                                 expected_permissions,
                                                 expected_folder_permissions)
 
@@ -303,7 +296,7 @@ def test_existing_signed_out_user_accept_invite_redirects_to_sign_in(
     api_user_active,
     sample_invite,
     mock_check_invite_token,
-    mock_get_unknown_user_by_email,
+    mock_get_existing_user_by_email,
     mock_no_users_for_service,
     mock_add_user_to_service,
     mock_accept_invite,
@@ -318,9 +311,9 @@ def test_existing_signed_out_user_accept_invite_redirects_to_sign_in(
     response = client.get(url_for('main.accept_invite', token='thisisnotarealtoken'), follow_redirects=True)
 
     mock_check_invite_token.assert_called_with('thisisnotarealtoken')
-    mock_get_unknown_user_by_email.assert_called_with('invited_user@test.gov.uk')
+    mock_get_existing_user_by_email.assert_called_with('invited_user@test.gov.uk')
     mock_add_user_to_service.assert_called_with(expected_service,
-                                                USER_ONE_ID,
+                                                api_user_active['id'],
                                                 expected_permissions,
                                                 sample_invite['folder_permissions'])
     assert mock_accept_invite.call_count == 1
@@ -360,6 +353,7 @@ def test_new_user_accept_invite_calls_api_and_redirects_to_registration(
 def test_new_user_accept_invite_calls_api_and_views_registration_page(
     client,
     service_one,
+    sample_invite,
     mock_check_invite_token,
     mock_dont_get_user_by_email,
     mock_get_invited_user_by_id,
@@ -372,7 +366,7 @@ def test_new_user_accept_invite_calls_api_and_views_registration_page(
 
     mock_check_invite_token.assert_called_with('thisisnotarealtoken')
     mock_dont_get_user_by_email.assert_called_with('invited_user@test.gov.uk')
-    mock_get_invited_user_by_id.assert_called_once_with(USER_ONE_ID)
+    mock_get_invited_user_by_id.assert_called_once_with(sample_invite['id'])
 
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
@@ -472,7 +466,7 @@ def test_new_user_accept_invite_completes_new_registration_redirects_to_verify(
     with client.session_transaction() as session:
         assert response.status_code == 302
         assert response.location == expected_redirect_location
-        assert session.get('invited_user_id') == USER_ONE_ID
+        assert session.get('invited_user_id') == sample_invite['id']
 
     data = {'service': sample_invite['service'],
             'email_address': sample_invite['email_address'],
@@ -489,7 +483,7 @@ def test_new_user_accept_invite_completes_new_registration_redirects_to_verify(
     assert response.location == expected_redirect_location
 
     mock_send_verify_code.assert_called_once_with(ANY, 'sms', data['mobile_number'])
-    mock_get_invited_user_by_id.assert_called_once_with(USER_ONE_ID)
+    mock_get_invited_user_by_id.assert_called_once_with(sample_invite['id'])
 
     mock_register_user.assert_called_with(data['name'],
                                           data['email_address'],
@@ -681,7 +675,7 @@ def test_existing_user_accepts_and_sets_email_auth(
     api_user_active,
     service_one,
     sample_invite,
-    mock_get_unknown_user_by_email,
+    mock_get_existing_user_by_email,
     mock_no_users_for_service,
     mock_accept_invite,
     mock_update_user_attribute,
@@ -701,9 +695,9 @@ def test_existing_user_accepts_and_sets_email_auth(
         _expected_redirect=url_for('main.service_dashboard', service_id=service_one['id'], _external=True),
     )
 
-    mock_get_unknown_user_by_email.assert_called_once_with('test@user.gov.uk')
-    mock_update_user_attribute.assert_called_once_with(USER_ONE_ID, auth_type='email_auth')
-    mock_add_user_to_service.assert_called_once_with(ANY, USER_ONE_ID, ANY, ANY)
+    mock_get_existing_user_by_email.assert_called_once_with('test@user.gov.uk')
+    mock_update_user_attribute.assert_called_once_with(api_user_active['id'], auth_type='email_auth')
+    mock_add_user_to_service.assert_called_once_with(ANY, api_user_active['id'], ANY, ANY)
 
 
 def test_platform_admin_user_accepts_and_preserves_auth(
@@ -722,7 +716,6 @@ def test_platform_admin_user_accepts_and_preserves_auth(
     service_one['permissions'].append('email_auth')
     platform_admin_user['auth_type'] = 'webauthn_auth'
 
-    # mock_get_unknown_user_by_email returns the active_api_user, which we don't want
     mocker.patch('app.user_api_client.get_user_by_email', return_value=platform_admin_user)
     mocker.patch('app.invite_api_client.check_token', return_value=sample_invite)
 
@@ -806,7 +799,7 @@ def test_existing_email_auth_user_with_phone_can_set_sms_auth(
     service_one,
     sample_invite,
     mock_no_users_for_service,
-    mock_get_unknown_user_by_email,
+    mock_get_existing_user_by_email,
     mock_accept_invite,
     mock_update_user_attribute,
     mock_add_user_to_service,
@@ -825,5 +818,5 @@ def test_existing_email_auth_user_with_phone_can_set_sms_auth(
         _expected_redirect=url_for('main.service_dashboard', service_id=service_one['id'], _external=True),
     )
 
-    mock_get_unknown_user_by_email.assert_called_once_with(sample_invite['email_address'])
-    mock_update_user_attribute.assert_called_once_with(USER_ONE_ID, auth_type='sms_auth')
+    mock_get_existing_user_by_email.assert_called_once_with(sample_invite['email_address'])
+    mock_update_user_attribute.assert_called_once_with(api_user_active['id'], auth_type='sms_auth')
