@@ -135,10 +135,10 @@ def test_if_existing_user_accepts_twice_they_redirect_to_sign_in(
     client,
     mocker,
     sample_invite,
+    mock_check_invite_token,
     mock_get_service,
 ):
     sample_invite['status'] = 'accepted'
-    mocker.patch('app.invite_api_client.check_token', return_value=sample_invite)
 
     response = client.get(url_for('main.accept_invite', token='thisisnotarealtoken'), follow_redirects=True)
     assert response.status_code == 200
@@ -165,7 +165,6 @@ def test_invite_goes_in_session(
     mock_accept_invite,
 ):
     sample_invite['email_address'] = 'test@user.gov.uk'
-    mocker.patch('app.invite_api_client.check_token', return_value=sample_invite)
 
     client_request.get(
         'main.accept_invite',
@@ -215,7 +214,6 @@ def test_accepting_invite_removes_invite_from_session(
 ):
     sample_invite['email_address'] = user['email_address']
 
-    mocker.patch('app.invite_api_client.check_token', return_value=sample_invite)
     client_request.login(user)
 
     page = client_request.get(
@@ -236,10 +234,10 @@ def test_existing_user_of_service_get_redirected_to_signin(
     sample_invite,
     mock_get_service,
     mock_get_user_by_email,
+    mock_check_invite_token,
     mock_accept_invite,
 ):
     sample_invite['email_address'] = api_user_active['email_address']
-    mocker.patch('app.invite_api_client.check_token', return_value=sample_invite)
     mocker.patch('app.models.user.Users.client_method', return_value=[api_user_active])
 
     response = client.get(url_for('main.accept_invite', token='thisisnotarealtoken'), follow_redirects=True)
@@ -261,12 +259,12 @@ def test_accept_invite_redirects_if_api_raises_an_error_that_they_are_already_pa
     api_user_active,
     sample_invite,
     mock_get_existing_user_by_email,
+    mock_check_invite_token,
     mock_accept_invite,
     mock_get_service,
     mock_no_users_for_service,
     mock_get_user,
 ):
-    mocker.patch('app.invite_api_client.check_token', return_value=sample_invite)
     mock_audit_event = mocker.patch('app.event_handlers.create_add_user_to_service_event')
 
     mocker.patch('app.user_api_client.add_user_to_service', side_effect=HTTPError(
@@ -493,12 +491,12 @@ def test_signed_in_existing_user_cannot_use_anothers_invite(
     client_request,
     mocker,
     api_user_active,
+    mock_check_invite_token,
     sample_invite,
     mock_get_user,
     mock_accept_invite,
     mock_get_service,
 ):
-    mocker.patch('app.invite_api_client.check_token', return_value=sample_invite)
     mocker.patch('app.user_api_client.get_users_for_service', return_value=[api_user_active])
 
     page = client_request.get(
@@ -523,11 +521,11 @@ def test_accept_invite_does_not_treat_email_addresses_as_case_sensitive(
     api_user_active,
     sample_invite,
     mock_accept_invite,
+    mock_check_invite_token,
     mock_get_user_by_email
 ):
     # the email address of api_user_active is 'test@user.gov.uk'
     sample_invite['email_address'] = 'TEST@user.gov.uk'
-    mocker.patch('app.invite_api_client.check_token', return_value=sample_invite)
     mocker.patch('app.models.user.Users.client_method', return_value=[api_user_active])
 
     client_request.get(
@@ -673,6 +671,7 @@ def test_existing_user_accepts_and_sets_email_auth(
     mock_get_existing_user_by_email,
     mock_no_users_for_service,
     mock_accept_invite,
+    mock_check_invite_token,
     mock_update_user_attribute,
     mock_add_user_to_service,
     mocker
@@ -681,7 +680,6 @@ def test_existing_user_accepts_and_sets_email_auth(
 
     service_one['permissions'].append('email_auth')
     sample_invite['auth_type'] = 'email_auth'
-    mocker.patch('app.invite_api_client.check_token', return_value=sample_invite)
 
     client_request.get(
         'main.accept_invite',
@@ -700,6 +698,7 @@ def test_platform_admin_user_accepts_and_preserves_auth(
     platform_admin_user,
     service_one,
     sample_invite,
+    mock_check_invite_token,
     mock_no_users_for_service,
     mock_accept_invite,
     mock_update_user_attribute,
@@ -712,7 +711,6 @@ def test_platform_admin_user_accepts_and_preserves_auth(
     platform_admin_user['auth_type'] = 'webauthn_auth'
 
     mocker.patch('app.user_api_client.get_user_by_email', return_value=platform_admin_user)
-    mocker.patch('app.invite_api_client.check_token', return_value=sample_invite)
 
     client_request.login(platform_admin_user)
 
@@ -734,6 +732,7 @@ def test_existing_user_doesnt_get_auth_changed_by_service_without_permission(
     sample_invite,
     mock_get_user_by_email,
     mock_no_users_for_service,
+    mock_check_invite_token,
     mock_accept_invite,
     mock_update_user_attribute,
     mock_add_user_to_service,
@@ -744,7 +743,6 @@ def test_existing_user_doesnt_get_auth_changed_by_service_without_permission(
     assert 'email_auth' not in service_one['permissions']
 
     sample_invite['auth_type'] = 'email_auth'
-    mocker.patch('app.invite_api_client.check_token', return_value=sample_invite)
 
     client_request.get(
         'main.accept_invite',
@@ -762,6 +760,7 @@ def test_existing_email_auth_user_without_phone_cannot_set_sms_auth(
     service_one,
     sample_invite,
     mock_no_users_for_service,
+    mock_check_invite_token,
     mock_accept_invite,
     mock_update_user_attribute,
     mock_add_user_to_service,
@@ -776,7 +775,6 @@ def test_existing_email_auth_user_without_phone_cannot_set_sms_auth(
     sample_invite['auth_type'] = 'sms_auth'
 
     mocker.patch('app.user_api_client.get_user_by_email', return_value=api_user_active)
-    mocker.patch('app.invite_api_client.check_token', return_value=sample_invite)
 
     client_request.get(
         'main.accept_invite',
@@ -795,6 +793,7 @@ def test_existing_email_auth_user_with_phone_can_set_sms_auth(
     sample_invite,
     mock_no_users_for_service,
     mock_get_existing_user_by_email,
+    mock_check_invite_token,
     mock_accept_invite,
     mock_update_user_attribute,
     mock_add_user_to_service,
@@ -803,8 +802,6 @@ def test_existing_email_auth_user_with_phone_can_set_sms_auth(
     sample_invite['email_address'] = api_user_active['email_address']
     service_one['permissions'].append('email_auth')
     sample_invite['auth_type'] = 'sms_auth'
-
-    mocker.patch('app.invite_api_client.check_token', return_value=sample_invite)
 
     client_request.get(
         'main.accept_invite',
