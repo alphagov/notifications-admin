@@ -1,5 +1,4 @@
 from unittest.mock import ANY, Mock
-from uuid import uuid4
 
 import pytest
 from bs4 import BeautifulSoup
@@ -18,13 +17,18 @@ from tests.conftest import (
 )
 
 
+@pytest.fixture()
+def mock_no_users_for_service(mocker):
+    mocker.patch('app.models.user.Users.client_method', return_value=[])
+
+
 def test_existing_user_accept_invite_calls_api_and_redirects_to_dashboard(
     client,
     service_one,
     api_user_active,
     mock_check_invite_token,
     mock_get_unknown_user_by_email,
-    mock_get_users_by_service,
+    mock_no_users_for_service,
     mock_accept_invite,
     mock_add_user_to_service,
     mock_get_service,
@@ -66,7 +70,7 @@ def test_broadcast_service_shows_tour(
     service_one,
     mock_check_invite_token,
     mock_get_unknown_user_by_email,
-    mock_get_users_by_service,
+    mock_no_users_for_service,
     mock_accept_invite,
     mock_add_user_to_service,
     mocker,
@@ -103,7 +107,7 @@ def test_existing_user_with_no_permissions_or_folder_permissions_accept_invite(
     sample_invite,
     mock_check_invite_token,
     mock_get_unknown_user_by_email,
-    mock_get_users_by_service,
+    mock_no_users_for_service,
     mock_add_user_to_service,
     mock_get_service,
     mock_events,
@@ -153,7 +157,7 @@ def test_invite_goes_in_session(
     api_user_active,
     mock_check_invite_token,
     mock_get_user_by_email,
-    mock_get_users_by_service,
+    mock_no_users_for_service,
     mock_add_user_to_service,
     mock_accept_invite,
 ):
@@ -188,7 +192,7 @@ def test_accepting_invite_removes_invite_from_session(
     service_one,
     mock_check_invite_token,
     mock_get_user_by_email,
-    mock_get_users_by_service,
+    mock_no_users_for_service,
     mock_add_user_to_service,
     mock_accept_invite,
     mock_get_service_templates,
@@ -255,7 +259,7 @@ def test_accept_invite_redirects_if_api_raises_an_error_that_they_are_already_pa
     sample_invite,
     mock_accept_invite,
     mock_get_service,
-    mock_get_users_by_service,
+    mock_no_users_for_service,
     mock_get_user,
 ):
     sample_invite['email_address'] = api_user_active['email_address']
@@ -289,7 +293,7 @@ def test_existing_signed_out_user_accept_invite_redirects_to_sign_in(
     sample_invite,
     mock_check_invite_token,
     mock_get_unknown_user_by_email,
-    mock_get_users_by_service,
+    mock_no_users_for_service,
     mock_add_user_to_service,
     mock_accept_invite,
     mock_get_service,
@@ -327,7 +331,7 @@ def test_new_user_accept_invite_calls_api_and_redirects_to_registration(
     mock_check_invite_token,
     mock_dont_get_user_by_email,
     mock_add_user_to_service,
-    mock_get_users_by_service,
+    mock_no_users_for_service,
     mock_get_service,
     mocker,
 ):
@@ -349,7 +353,7 @@ def test_new_user_accept_invite_calls_api_and_views_registration_page(
     mock_dont_get_user_by_email,
     mock_get_invited_user_by_id,
     mock_add_user_to_service,
-    mock_get_users_by_service,
+    mock_no_users_for_service,
     mock_get_service,
     mocker,
 ):
@@ -446,7 +450,7 @@ def test_new_user_accept_invite_completes_new_registration_redirects_to_verify(
     mock_send_verify_code,
     mock_get_invited_user_by_id,
     mock_accept_invite,
-    mock_get_users_by_service,
+    mock_no_users_for_service,
     mock_add_user_to_service,
     mock_get_service,
     mocker,
@@ -559,7 +563,7 @@ def test_new_invited_user_verifies_and_added_to_service(
     mock_get_template_statistics,
     mock_has_no_jobs,
     mock_has_permissions,
-    mock_get_users_by_service,
+    mock_no_users_for_service,
     mock_get_service_statistics,
     mock_get_usage,
     mock_get_free_sms_fragment_limit,
@@ -667,7 +671,7 @@ def test_existing_user_accepts_and_sets_email_auth(
     service_one,
     sample_invite,
     mock_get_unknown_user_by_email,
-    mock_get_users_by_service,
+    mock_no_users_for_service,
     mock_accept_invite,
     mock_update_user_attribute,
     mock_add_user_to_service,
@@ -696,7 +700,7 @@ def test_platform_admin_user_accepts_and_preserves_auth(
     platform_admin_user,
     service_one,
     sample_invite,
-    mock_get_users_by_service,
+    mock_no_users_for_service,
     mock_accept_invite,
     mock_update_user_attribute,
     mock_add_user_to_service,
@@ -705,10 +709,6 @@ def test_platform_admin_user_accepts_and_preserves_auth(
     sample_invite['email_address'] = platform_admin_user['email_address']
     sample_invite['auth_type'] = 'email_auth'
     service_one['permissions'].append('email_auth')
-
-    # mock_get_users_by_service uses the same global UUID as the platform admin user,
-    # so we need to reset it to pretend this user isn't a member of the service
-    platform_admin_user['id'] = uuid4()
     platform_admin_user['auth_type'] = 'webauthn_auth'
 
     # mock_get_unknown_user_by_email returns the active_api_user, which we don't want
@@ -734,7 +734,7 @@ def test_existing_user_doesnt_get_auth_changed_by_service_without_permission(
     service_one,
     sample_invite,
     mock_get_user_by_email,
-    mock_get_users_by_service,
+    mock_no_users_for_service,
     mock_accept_invite,
     mock_update_user_attribute,
     mock_add_user_to_service,
@@ -762,7 +762,7 @@ def test_existing_email_auth_user_without_phone_cannot_set_sms_auth(
     api_user_active,
     service_one,
     sample_invite,
-    mock_get_users_by_service,
+    mock_no_users_for_service,
     mock_accept_invite,
     mock_update_user_attribute,
     mock_add_user_to_service,
@@ -794,7 +794,7 @@ def test_existing_email_auth_user_with_phone_can_set_sms_auth(
     api_user_active,
     service_one,
     sample_invite,
-    mock_get_users_by_service,
+    mock_no_users_for_service,
     mock_get_unknown_user_by_email,
     mock_accept_invite,
     mock_update_user_attribute,
