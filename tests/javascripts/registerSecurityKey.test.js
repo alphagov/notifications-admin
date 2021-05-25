@@ -36,6 +36,17 @@ describe('Register security key', () => {
   })
 
   test('creates a new credential and reloads', (done) => {
+
+    jest.spyOn(window, 'fetch').mockImplementationOnce((_url) => {
+      // initial fetch of options from the server
+      // options from the server are CBOR-encoded
+      const webauthnOptions = window.CBOR.encode('options')
+
+      return Promise.resolve({
+        ok: true, arrayBuffer: () => webauthnOptions
+      })
+    });
+
     jest.spyOn(window.navigator.credentials, 'create').mockImplementation((options) => {
       expect(options).toEqual('options')
 
@@ -49,29 +60,23 @@ describe('Register security key', () => {
       })
     })
 
+    jest.spyOn(window, 'fetch').mockImplementationOnce((_url, options) => {
+      // subsequent POST of credential data to server
+      const decodedData = window.CBOR.decode(options.body)
+      expect(decodedData.clientDataJSON).toEqual(new Uint8Array([4,5,6]))
+      expect(decodedData.attestationObject).toEqual(new Uint8Array([1,2,3]))
+      expect(options.headers['X-CSRFToken']).toBe()
+      return Promise.resolve({ ok: true })
+    });
+
     jest.spyOn(window.location, 'reload').mockImplementation(() => {
       // signal that the async promise chain was called
       done()
     })
 
-    jest.spyOn(window, 'fetch').mockImplementation((_url, options = {}) => {
-      // initial fetch of options from the server
-      if (!options.method) {
-        // options from the server are CBOR-encoded
-        webauthnOptions = window.CBOR.encode('options')
-
-        return Promise.resolve({
-          ok: true, arrayBuffer: () => webauthnOptions
-        })
-
-      // subsequent POST of credential data to server
-      } else {
-        decodedData = window.CBOR.decode(options.body)
-        expect(decodedData.clientDataJSON).toEqual(new Uint8Array([4,5,6]))
-        expect(decodedData.attestationObject).toEqual(new Uint8Array([1,2,3]))
-        expect(options.headers['X-CSRFToken']).toBe()
-        return Promise.resolve({ ok: true })
-      }
+    // this will make the test fail if the alert is called
+    jest.spyOn(window, 'alert').mockImplementation((msg) => {
+      done(msg)
     })
 
     button.click()
@@ -81,7 +86,7 @@ describe('Register security key', () => {
     ['network'],
     ['server'],
   ])('alerts if fetching WebAuthn options fails (%s error)', (errorType, done) => {
-    jest.spyOn(window, 'fetch').mockImplementation((_url, options = {}) => {
+    jest.spyOn(window, 'fetch').mockImplementation((_url) => {
       if (errorType == 'network') {
         return Promise.reject('error')
       } else {
@@ -102,32 +107,32 @@ describe('Register security key', () => {
     ['internal server error'],
     ['bad request'],
   ])('alerts if sending WebAuthn credentials fails (%s)', (errorType, done) => {
+
+    jest.spyOn(window, 'fetch').mockImplementationOnce((_url) => {
+      // initial fetch of options from the server
+      const webauthnOptions = window.CBOR.encode('options')
+
+      return Promise.resolve({
+        ok: true, arrayBuffer: () => webauthnOptions
+      })
+    })
+
     jest.spyOn(window.navigator.credentials, 'create').mockImplementation(() => {
       // fake PublicKeyCredential response from WebAuthn API
       return Promise.resolve({ response: {} })
     })
 
-    jest.spyOn(window, 'fetch').mockImplementation((_url, options = {}) => {
-      // initial fetch of options from the server
-      if (!options.method) {
-        webauthnOptions = window.CBOR.encode('options')
-
-        return Promise.resolve({
-          ok: true, arrayBuffer: () => webauthnOptions
-        })
-
+    jest.spyOn(window, 'fetch').mockImplementationOnce((_url) => {
       // subsequent POST of credential data to server
-      } else {
-        switch (errorType) {
-          case 'network error':
-            return Promise.reject('error')
-          case 'bad request':
-            message = Promise.resolve(window.CBOR.encode('error'))
-            return Promise.resolve({ ok: false, arrayBuffer: () => message })
-          case 'internal server error':
-            message = Promise.reject('encoding error')
-            return Promise.resolve({ ok: false, arrayBuffer: () => message, statusText: 'error' })
-        }
+      switch (errorType) {
+        case 'network error':
+          return Promise.reject('error')
+        case 'bad request':
+          message = Promise.resolve(window.CBOR.encode('error'))
+          return Promise.resolve({ ok: false, arrayBuffer: () => message })
+        case 'internal server error':
+          message = Promise.reject('encoding error')
+          return Promise.resolve({ ok: false, arrayBuffer: () => message, statusText: 'error' })
       }
     })
 
@@ -144,9 +149,9 @@ describe('Register security key', () => {
       return Promise.reject(new DOMException('error'))
     })
 
-    jest.spyOn(window, 'fetch').mockImplementation((_url, options) => {
+    jest.spyOn(window, 'fetch').mockImplementation((_url) => {
       // initial fetch of options from the server
-      webauthnOptions = window.CBOR.encode('options')
+      const webauthnOptions = window.CBOR.encode('options')
 
       return Promise.resolve({
         ok: true, arrayBuffer: () => webauthnOptions
