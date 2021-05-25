@@ -243,6 +243,10 @@ def user_profile_security_keys():
     )
 
 
+def get_key_from_list_of_keys(key_id, list_of_keys):
+    return next((key for key in list_of_keys if key.id == key_id), None)
+
+
 @main.route(
     "/user-profile/security-keys/<uuid:key_id>/manage",
     methods=['GET', 'POST'],
@@ -255,16 +259,16 @@ def user_profile_security_keys():
 )
 @user_is_platform_admin
 def user_profile_manage_security_key(key_id):
-    security_keys = user_api_client.get_webauthn_credentials_for_user(current_user.id)
-    security_key = next((key for key in security_keys if key["id"] == key_id), None)
+    security_keys = current_user.webauthn_credentials
+    security_key = get_key_from_list_of_keys(key_id, security_keys)
 
     if not security_key:
         abort(404)
 
-    form = ChangeSecurityKeyNameForm(security_key_name=security_key["name"])
+    form = ChangeSecurityKeyNameForm(security_key_name=security_key.name)
 
     if form.validate_on_submit():
-        if form.security_key_name.data != security_key["name"]:
+        if form.security_key_name.data != security_key.name:
             user_api_client.update_webauthn_credential_name_for_user(
                 user_id=current_user.id,
                 credential_id=key_id,

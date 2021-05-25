@@ -6,6 +6,8 @@ from flask import url_for
 from notifications_python_client.errors import HTTPError
 from notifications_utils.url_safe_token import generate_token
 
+from app.main.views.user_profile import get_key_from_list_of_keys
+from app.models.user import WebAuthnCredential
 from tests.conftest import (
     create_api_user_active,
     normalize_spaces,
@@ -381,18 +383,22 @@ def test_should_show_security_keys_page(
     assert register_button.text.strip() == 'Register a key'
 
 
+def test_get_key_from_list_of_keys(webauthn_credential, webauthn_credential_2):
+    list_of_keys = [WebAuthnCredential(json) for json in [webauthn_credential, webauthn_credential_2]]
+    assert get_key_from_list_of_keys(webauthn_credential["id"], list_of_keys) == WebAuthnCredential(webauthn_credential)
+
+
 def test_should_show_manage_security_key_page(
     mocker,
     client_request,
     platform_admin_user,
     webauthn_credential,
-    webauthn_credential_2
 ):
     client_request.login(platform_admin_user)
 
     mocker.patch(
         'app.user_api_client.get_webauthn_credentials_for_user',
-        return_value=[webauthn_credential, webauthn_credential_2],
+        return_value=[webauthn_credential],
     )
 
     page = client_request.get('.user_profile_manage_security_key', key_id=webauthn_credential['id'])
@@ -453,20 +459,16 @@ def test_should_redirect_after_change_of_security_key_name(
     client_request,
     platform_admin_user,
     webauthn_credential,
-    webauthn_credential_2,
     mocker
 ):
     client_request.login(platform_admin_user)
 
     mocker.patch(
         'app.user_api_client.get_webauthn_credentials_for_user',
-        return_value=[webauthn_credential, webauthn_credential_2],
-    )
-
-    mock_update = mocker.patch(
-        'app.user_api_client.update_webauthn_credential_name_for_user',
         return_value=[webauthn_credential],
     )
+
+    mock_update = mocker.patch('app.user_api_client.update_webauthn_credential_name_for_user')
 
     client_request.post(
         'main.user_profile_manage_security_key',
@@ -490,20 +492,16 @@ def test_user_profile_manage_security_key_should_not_call_api_if_key_name_stays_
     client_request,
     platform_admin_user,
     webauthn_credential,
-    webauthn_credential_2,
     mocker
 ):
     client_request.login(platform_admin_user)
 
     mocker.patch(
         'app.user_api_client.get_webauthn_credentials_for_user',
-        return_value=[webauthn_credential, webauthn_credential_2],
-    )
-
-    mock_update = mocker.patch(
-        'app.user_api_client.update_webauthn_credential_name_for_user',
         return_value=[webauthn_credential],
     )
+
+    mock_update = mocker.patch('app.user_api_client.update_webauthn_credential_name_for_user')
 
     client_request.post(
         'main.user_profile_manage_security_key',
@@ -524,13 +522,12 @@ def test_shows_delete_link_for_security_key(
     client_request,
     platform_admin_user,
     webauthn_credential,
-    webauthn_credential_2
 ):
     client_request.login(platform_admin_user)
 
     mocker.patch(
         'app.user_api_client.get_webauthn_credentials_for_user',
-        return_value=[webauthn_credential, webauthn_credential_2],
+        return_value=[webauthn_credential],
     )
 
     page = client_request.get('.user_profile_manage_security_key', key_id=webauthn_credential['id'])
@@ -545,14 +542,13 @@ def test_confirm_delete_security_key(
     client_request,
     platform_admin_user,
     webauthn_credential,
-    webauthn_credential_2,
     mocker
 ):
     client_request.login(platform_admin_user)
 
     mocker.patch(
         'app.user_api_client.get_webauthn_credentials_for_user',
-        return_value=[webauthn_credential, webauthn_credential_2],
+        return_value=[webauthn_credential],
     )
 
     page = client_request.get(
