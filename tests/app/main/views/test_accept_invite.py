@@ -1,4 +1,5 @@
 from unittest.mock import ANY, Mock
+from uuid import uuid4
 
 import pytest
 from bs4 import BeautifulSoup
@@ -688,6 +689,43 @@ def test_existing_user_accepts_and_sets_email_auth(
     mock_get_unknown_user_by_email.assert_called_once_with('test@user.gov.uk')
     mock_update_user_attribute.assert_called_once_with(USER_ONE_ID, auth_type='email_auth')
     mock_add_user_to_service.assert_called_once_with(ANY, USER_ONE_ID, ANY, ANY)
+
+
+def test_platform_admin_user_accepts_and_preserves_auth(
+    client_request,
+    platform_admin_user,
+    service_one,
+    sample_invite,
+    mock_get_users_by_service,
+    mock_accept_invite,
+    mock_update_user_attribute,
+    mock_add_user_to_service,
+    mocker
+):
+    sample_invite['email_address'] = platform_admin_user['email_address']
+    sample_invite['auth_type'] = 'email_auth'
+    service_one['permissions'].append('email_auth')
+
+    # mock_get_users_by_service uses the same global UUID as the platform admin user,
+    # so we need to reset it to pretend this user isn't a member of the service
+    platform_admin_user['id'] = uuid4()
+    platform_admin_user['auth_type'] = 'webauthn_auth'
+
+    # mock_get_unknown_user_by_email returns the active_api_user, which we don't want
+    mocker.patch('app.user_api_client.get_user_by_email', return_value=platform_admin_user)
+    mocker.patch('app.invite_api_client.check_token', return_value=sample_invite)
+
+    client_request.login(platform_admin_user)
+
+    client_request.get(
+        'main.accept_invite',
+        token='thisisnotarealtoken',
+        _expected_status=302,
+        _expected_redirect=url_for('main.service_dashboard', service_id=service_one['id'], _external=True),
+    )
+
+    assert not mock_update_user_attribute.called
+    assert mock_add_user_to_service.called
 
 
 def test_existing_user_doesnt_get_auth_changed_by_service_without_permission(

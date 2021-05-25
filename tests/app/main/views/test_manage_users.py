@@ -795,6 +795,42 @@ def test_edit_user_permissions_including_authentication_with_email_auth_service(
     )
 
 
+@pytest.mark.parametrize('auth_type', ['email_auth', 'sms_auth'])
+def test_edit_user_permissions_preserves_auth_type_for_platform_admin(
+    client_request,
+    service_one,
+    platform_admin_user,
+    mock_get_users_by_service,
+    mock_get_invites_for_service,
+    mock_set_user_permissions,
+    mock_update_user_attribute,
+    auth_type,
+    mock_get_template_folders
+):
+    service_one['permissions'].append('email_auth')
+    client_request.login(platform_admin_user)
+
+    client_request.post(
+        'main.edit_user_permissions',
+        service_id=SERVICE_ONE_ID,
+        user_id=platform_admin_user['id'],
+        _data={
+            'email_address': platform_admin_user['email_address'],
+            'permissions_field': [],
+            'login_authentication': auth_type,
+        },
+        _expected_status=302,
+    )
+
+    mock_set_user_permissions.assert_called_with(
+        str(platform_admin_user['id']),
+        SERVICE_ONE_ID,
+        permissions=set(),
+        folder_permissions=[],
+    )
+    mock_update_user_attribute.assert_not_called()
+
+
 def test_should_show_page_for_inviting_user(
     client_request,
     mock_get_template_folders,
