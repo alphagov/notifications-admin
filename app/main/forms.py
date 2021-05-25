@@ -1413,7 +1413,7 @@ class LetterAddressForm(StripWhitespaceForm):
 
         if address.has_invalid_characters:
             raise ValidationError(
-                'Address lines must not start with any of the following characters: @ ( ) = [ ] ” \\ / , < >'
+                'Address lines must not start with any of the following characters: @ ( ) = [ ] ” \\ / , < > ~'
             )
 
 

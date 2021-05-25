@@ -733,7 +733,7 @@ def test_upload_csv_file_with_bad_postal_address_shows_check_page_with_errors(
         '6 Address must be no more than 7 lines long',
         '1 2 3 4 5 6 7 8',
 
-        '7 Address lines must not start with any of the following characters: @ ( ) = [ ] ” \\ / , < >',
+        '7 Address lines must not start with any of the following characters: @ ( ) = [ ] ” \\ / , < > ~',
         '=Firstname Lastname 123 Example St. SW1A 1AA',
     ]
 
@@ -2370,7 +2370,7 @@ def test_send_one_off_letter_address_populates_address_fields_in_session(
     (
         'a\n(b\nSW1A 1AA',
         [],
-        'Address lines must not start with any of the following characters: @ ( ) = [ ] ” \\ / , < >',
+        'Address lines must not start with any of the following characters: @ ( ) = [ ] ” \\ / , < > ~',
     ),
 ])
 def test_send_one_off_letter_address_rejects_bad_addresses(

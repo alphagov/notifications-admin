@@ -563,11 +563,11 @@ def test_get_letter_validation_error_for_unknown_error():
         None,
         'There’s a problem with the address for this letter',
         (
-            'Address lines must not start with any of the following characters: @ ( ) = [ ] ” \\ / , < >'
+            'Address lines must not start with any of the following characters: @ ( ) = [ ] ” \\ / , < > ~'
         ),
         (
             'Validation failed because address lines must not start with any of the following '
-            'characters: @ ( ) = [ ] ” \\ / , < >'
+            'characters: @ ( ) = [ ] ” \\ / , < > ~'
         ),
     ),
 ])

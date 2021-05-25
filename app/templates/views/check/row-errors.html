@@ -85,7 +85,7 @@
                     Last line of the address must be a real UK postcode
                   {% endif %}
                 {% elif item.as_postal_address.has_invalid_characters %}
-                  Address lines must not start with any of the following characters: @ ( ) = [ ] ” \ / , < >
+                  Address lines must not start with any of the following characters: @ ( ) = [ ] ” \ / , < > ~
                 {% endif %}
               </span>
             {% endcall %}
