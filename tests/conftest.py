@@ -2483,14 +2483,6 @@ def mock_get_invites_without_manage_permission(mocker, service_one, sample_invit
 
 
 @pytest.fixture(scope='function')
-def mock_check_invite_token(mocker, sample_invite):
-    def _check_token(token):
-        return sample_invite
-
-    return mocker.patch('app.invite_api_client.check_token', side_effect=_check_token)
-
-
-@pytest.fixture(scope='function')
 def mock_accept_invite(mocker, sample_invite):
     def _accept(service_id, invite_id):
         return sample_invite

@@ -25,6 +25,11 @@ def mock_get_existing_user_by_email(mocker, api_user_active):
     return mocker.patch('app.user_api_client.get_user_by_email', return_value=api_user_active)
 
 
+@pytest.fixture(scope='function')
+def mock_check_invite_token(mocker, sample_invite):
+    return mocker.patch('app.invite_api_client.check_token', return_value=sample_invite)
+
+
 def test_existing_user_accept_invite_calls_api_and_redirects_to_dashboard(
     client,
     service_one,
