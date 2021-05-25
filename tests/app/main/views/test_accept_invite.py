@@ -11,7 +11,6 @@ from tests.conftest import (
     SERVICE_ONE_ID,
     create_active_caseworking_user,
     create_active_user_with_permissions,
-    create_api_user_active,
     normalize_spaces,
 )
 
@@ -261,16 +260,12 @@ def test_accept_invite_redirects_if_api_raises_an_error_that_they_are_already_pa
     mocker,
     api_user_active,
     sample_invite,
+    mock_get_existing_user_by_email,
     mock_accept_invite,
     mock_get_service,
     mock_no_users_for_service,
     mock_get_user,
 ):
-    sample_invite['email_address'] = api_user_active['email_address']
-
-    # This mock needs to return a user with a different ID to the invited user so that
-    # `existing_user in Users(invited_user.service)` returns False and the right code path is tested
-    mocker.patch('app.user_api_client.get_user_by_email', return_value=create_api_user_active(with_unique_id=True))
     mocker.patch('app.invite_api_client.check_token', return_value=sample_invite)
     mock_audit_event = mocker.patch('app.event_handlers.create_add_user_to_service_event')
 
