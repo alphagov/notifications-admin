@@ -47,7 +47,7 @@
                   throw Error(response.statusText);
                 })
                 .then(data => {
-                  window.location = data.redirect_url;
+                  window.location.assign(data.redirect_url);
                 });
             })
             .catch(error => {
