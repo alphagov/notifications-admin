@@ -86,6 +86,7 @@ def two_factor_sms():
 @main.route('/two-factor-webauthn', methods=['GET'])
 @redirect_to_sign_in
 def two_factor_webauthn():
+    # TODO: Return a sensible error page if the user isn't platform admin or doesn't have webauthn
     redirect_url = request.args.get('next')
     return render_template('views/two-factor-webauthn.html', redirect_url=redirect_url)
 
