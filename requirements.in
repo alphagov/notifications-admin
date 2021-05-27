@@ -26,7 +26,7 @@ fido2==0.9.1
 awscli-cwlogs>=1.4,<1.5
 itsdangerous==1.1.0
 
-git+https://github.com/alphagov/notifications-utils.git@44.2.0#egg=notifications-utils==44.2.0
+git+https://github.com/alphagov/notifications-utils.git@44.2.2#egg=notifications-utils==44.2.2
 git+https://github.com/alphagov/govuk-frontend-jinja.git@v0.5.8-alpha#egg=govuk-frontend-jinja==0.5.8-alpha
 
 # cryptography 3.4+ incorporates Rust code, which isn't supported on PaaS

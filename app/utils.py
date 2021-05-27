@@ -559,11 +559,11 @@ LETTER_VALIDATION_MESSAGES = {
     'invalid-char-in-address': {
         'title': 'There’s a problem with the address for this letter',
         'detail': (
-            "Address lines must not start with any of the following characters: @ ( ) = [ ] ” \\ / , < >"
+            "Address lines must not start with any of the following characters: @ ( ) = [ ] ” \\ / , < > ~"
         ),
         'summary': (
             "Validation failed because address lines must not start with any of the "
-            "following characters: @ ( ) = [ ] ” \\ / , < >"
+            "following characters: @ ( ) = [ ] ” \\ / , < > ~"
         ),
     },
     'notify-tag-found-in-content': {
