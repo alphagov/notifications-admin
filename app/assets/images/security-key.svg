@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 21.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 425.2 428" style="enable-background:new 0 0 425.2 428;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:#1D70B8;}
+	.st1{fill:#0B0C0C;}
+	.st2{fill:#FFDD00;}
+	.st3{opacity:0.2;fill:#1D2F3A;}
+	.st4{opacity:0.5;fill:#F4F4F4;}
+	.st5{clip-path:url(#SVGID_2_);fill:#FFDD00;}
+	.st6{opacity:0.2;clip-path:url(#SVGID_2_);fill:#1D2F3A;}
+	.st7{opacity:0.5;clip-path:url(#SVGID_2_);}
+	.st8{fill:#F4F4F4;}
+	.st9{fill:#206FAB;}
+</style>
+<g id="Layer_1">
+	<circle class="st0" cx="212.6" cy="212.6" r="212.6"/>
+</g>
+<g id="Layer_2">
+	
+		<rect x="91.9" y="248.6" transform="matrix(0.7071 -0.7071 0.7071 0.7071 -164.6926 181.3616)" class="st1" width="89.3" height="81.7"/>
+	
+		<rect x="76.9" y="258.5" transform="matrix(0.7071 -0.7071 0.7071 0.7071 -150.6822 163.09)" class="st2" width="89.3" height="9.9"/>
+	
+		<rect x="90.6" y="272.2" transform="matrix(0.7071 -0.7071 0.7071 0.7071 -156.3567 176.7894)" class="st2" width="89.3" height="9.9"/>
+	
+		<rect x="104.3" y="285.9" transform="matrix(0.7071 -0.7071 0.7071 0.7071 -162.0312 190.4889)" class="st2" width="89.3" height="9.9"/>
+	
+		<rect x="118" y="299.6" transform="matrix(0.7071 -0.7071 0.7071 0.7071 -167.7057 204.1884)" class="st2" width="89.3" height="9.9"/>
+	
+		<rect x="131.9" y="227.1" transform="matrix(0.7071 -0.7071 0.7071 0.7071 -143.1309 190.2927)" class="st3" width="52.5" height="81.7"/>
+</g>
+<g id="Layer_5">
+	<polygon class="st4" points="116.8,275.2 108.5,283.4 103,274.9 111.3,266.7 	"/>
+	<polygon class="st4" points="127.6,291.8 119.3,300 113.8,291.5 122.1,283.3 	"/>
+	<polygon class="st4" points="138.3,308.4 130.1,316.7 124.6,308.2 132.8,299.9 	"/>
+	<polygon class="st4" points="149.1,325 140.9,333.3 135.4,324.8 143.6,316.6 	"/>
+</g>
+<g id="Layer_6">
+</g>
+<g id="Layer_4">
+	<defs>
+		
+			<ellipse id="SVGID_1_" transform="matrix(0.7071 -0.7071 0.7071 0.7071 -22.5211 240.2509)" cx="278.7" cy="147.3" rx="23.7" ry="23.7"/>
+	</defs>
+	<clipPath id="SVGID_2_">
+		<use xlink:href="#SVGID_1_"  style="overflow:visible;"/>
+	</clipPath>
+	
+		<ellipse transform="matrix(0.7071 -0.7071 0.7071 0.7071 -22.5211 240.2509)" class="st5" cx="278.7" cy="147.3" rx="23.7" ry="23.7"/>
+	
+		<ellipse transform="matrix(0.7071 -0.7071 0.7071 0.7071 -22.5211 240.2509)" class="st6" cx="278.7" cy="147.3" rx="23.7" ry="23.7"/>
+	<path class="st5" d="M264.8,127.7c15.8,2.7,30.8,17.7,33.5,33.5s-7.9,26.4-23.7,23.7s-30.8-17.7-33.5-33.5
+		C238.4,135.6,249,125,264.8,127.7z"/>
+	<g class="st7">
+		
+			<rect x="260.6" y="117.2" transform="matrix(0.842 -0.5395 0.5395 0.842 -44.6945 168.5803)" class="st8" width="9.8" height="86.7"/>
+	</g>
+</g>
+<g id="Layer_9">
+	
+		<ellipse transform="matrix(0.7071 -0.7071 0.7071 0.7071 -22.5211 240.2509)" class="st9" cx="278.7" cy="147.3" rx="15.8" ry="15.8"/>
+</g>
+<g id="Layer_3">
+	<path class="st1" d="M278,74.5l-168,168l73.6,73.6l168-168L278,74.5z M262,164c-9.2-9.2-9.2-24.2,0-33.5s24.2-9.2,33.5,0
+		s9.2,24.2,0,33.5S271.3,173.3,262,164z"/>
+</g>
+<g id="Layer_8">
+</g>
+<g id="Layer_10">
+</g>
+</svg>
