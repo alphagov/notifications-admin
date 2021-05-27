@@ -48,7 +48,10 @@
       {% if current_user.platform_admin %}
         {% call row(id='security-keys') %}
           {{ text_field('Security keys') }}
-          {{ text_field(current_user.webauthn_credentials|length) }}
+          {{ optional_text_field(
+            ('{} registered'.format(current_user.webauthn_credentials|length)) if current_user.webauthn_credentials else None,
+            default='None registered'
+          ) }}
           {{ edit_field('Change', url_for('.user_profile_security_keys')) }}
         {% endcall %}
       {% endif %}
