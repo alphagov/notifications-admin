@@ -332,7 +332,18 @@ def test_complete_authentication_clears_session(
 
 
 @freeze_time('2020-01-30')
-def test_verify_webauthn_login_signs_user_in_signs_user_in(client, mocker, mock_create_event, platform_admin_user):
+@pytest.mark.parametrize('url_kwargs, expected_redirect', [
+    ({}, '/accounts-or-dashboard'),
+    ({'next': '/bar'}, '/bar'),
+])
+def test_verify_webauthn_login_signs_user_in(
+    client,
+    mocker,
+    mock_create_event,
+    platform_admin_user,
+    url_kwargs,
+    expected_redirect,
+):
     platform_admin_user['auth_type'] = 'webauthn_auth'
     platform_admin_user['email_access_validated_at'] = '2020-01-25T00:00:00.000000Z'
 
@@ -345,10 +356,10 @@ def test_verify_webauthn_login_signs_user_in_signs_user_in(client, mocker, mock_
     mocker.patch('app.main.views.webauthn_credentials._verify_webauthn_authentication')
     mocker.patch('app.user_api_client.complete_webauthn_login_attempt', return_value=(True, None))
 
-    resp = client.post(url_for('main.webauthn_complete_authentication'))
+    resp = client.post(url_for('main.webauthn_complete_authentication', **url_kwargs))
 
     assert resp.status_code == 200
-    assert cbor.decode(resp.data)['redirect_url'] == url_for('main.show_accounts_or_dashboard')
+    assert cbor.decode(resp.data)['redirect_url'] == expected_redirect
     # removes stuff from session
     with client.session_transaction() as session:
         assert 'user_details' not in session

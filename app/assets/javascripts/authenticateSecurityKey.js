@@ -21,7 +21,21 @@
               return window.navigator.credentials.get(options);
             })
             .then(credential => {
-              return fetch('/webauthn/authenticate', {
+              const currentURL = new URL(window.location.href);
+
+              // create authenticateURL from admin hostname plus /webauthn/authenticate path
+              const authenticateURL = new URL('/webauthn/authenticate', window.location.href);
+
+              const nextUrl = currentURL.searchParams.get('next');
+              if (nextUrl) {
+                // takes nextUrl from the query string on the current browser URL
+                // (which should be /two-factor-webauthn) and pass it through to
+                // the POST. put it in a query string so it's consistent with how
+                // the other login flows manage it
+                authenticateURL.searchParams.set('next', nextUrl);
+              }
+
+              return fetch(authenticateURL, {
                 method: 'POST',
                 headers: { 'X-CSRFToken': component.data('csrfToken') },
                 body: window.CBOR.encode({
