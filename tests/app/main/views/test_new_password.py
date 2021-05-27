@@ -60,6 +60,32 @@ def test_should_redirect_to_two_factor_when_password_reset_is_successful(
     mock_get_user_by_email_request_password_reset.assert_called_once_with(user['email_address'])
 
 
+@pytest.mark.parametrize('redirect_url', [
+    None,
+    f'/services/{SERVICE_ONE_ID}/templates',
+])
+def test_should_redirect_to_two_factor_webauthn_when_password_reset_is_successful(
+    notify_admin,
+    client,
+    mock_get_user_by_email_request_password_reset,
+    mock_send_verify_code,
+    mock_reset_failed_login_count,
+    redirect_url
+):
+    user = mock_get_user_by_email_request_password_reset.return_value
+    user['auth_type'] = 'webauthn_auth'
+    data = json.dumps({'email': user['email_address'], 'created_at': str(datetime.utcnow())})
+    token = generate_token(data, notify_admin.config['SECRET_KEY'], notify_admin.config['DANGEROUS_SALT'])
+    response = client.post(url_for_endpoint_with_token('.new_password', token=token, next=redirect_url),
+                           data={'new_password': 'a-new_password'})
+    assert response.status_code == 302
+    assert response.location == url_for('.two_factor_webauthn', _external=True, next=redirect_url)
+    mock_get_user_by_email_request_password_reset.assert_called_once_with(user['email_address'])
+
+    assert not mock_send_verify_code.called
+    assert mock_reset_failed_login_count.called
+
+
 def test_should_redirect_index_if_user_has_already_changed_password(
     notify_admin,
     client,
