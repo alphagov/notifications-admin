@@ -2443,6 +2443,39 @@ def test_add_reply_to_email_address_sends_test_notification(
     mock_verify.assert_called_once_with(SERVICE_ONE_ID, "test@example.com")
 
 
+def test_service_add_reply_to_email_address_without_verification_for_platform_admin(
+    mocker,
+    client_request,
+    platform_admin_user
+):
+    client_request.login(platform_admin_user)
+
+    mock_update = mocker.patch(
+        'app.service_api_client.add_reply_to_email_address'
+    )
+    mocker.patch(
+        'app.service_api_client.get_reply_to_email_addresses',
+        return_value=[create_reply_to_email_address(is_default=True)]
+    )
+    data = {"is_default": "y", "email_address": "test@example.gov.uk"}
+
+    client_request.post(
+        'main.service_add_email_reply_to',
+        service_id=SERVICE_ONE_ID,
+        _data=data,
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.service_email_reply_to',
+            service_id=SERVICE_ONE_ID,
+            _external=True,
+        )
+    )
+    mock_update.assert_called_once_with(
+        SERVICE_ONE_ID,
+        email_address='test@example.gov.uk',
+        is_default=True)
+
+
 @pytest.mark.parametrize("is_default,replace,expected_header", [(True, "&replace=123", "Change"), (False, "", "Add")])
 @pytest.mark.parametrize("status,expected_failure,expected_success", [
     ("delivered", 0, 1),
@@ -2706,6 +2739,42 @@ def test_edit_reply_to_email_address_sends_verification_notification_if_address_
         _data=data
     )
     mock_verify.assert_called_once_with(SERVICE_ONE_ID, "test@example.gov.uk")
+
+
+def test_service_edit_email_reply_to_updates_email_address_without_verification_for_platform_admin(
+    mocker,
+    fake_uuid,
+    client_request,
+    platform_admin_user
+):
+    client_request.login(platform_admin_user)
+
+    mock_update = mocker.patch(
+        'app.service_api_client.update_reply_to_email_address'
+    )
+    mocker.patch(
+        'app.service_api_client.get_reply_to_email_address',
+        return_value=create_reply_to_email_address(is_default=True)
+    )
+    data = {"is_default": "y", "email_address": "test@example.gov.uk"}
+
+    client_request.post(
+        'main.service_edit_email_reply_to',
+        service_id=SERVICE_ONE_ID,
+        reply_to_email_id=fake_uuid,
+        _data=data,
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.service_email_reply_to',
+            service_id=SERVICE_ONE_ID,
+            _external=True,
+        )
+    )
+    mock_update.assert_called_once_with(
+        SERVICE_ONE_ID,
+        reply_to_email_id=fake_uuid,
+        email_address='test@example.gov.uk',
+        is_default=True)
 
 
 @pytest.mark.parametrize('reply_to_address, data, api_default_args', [
