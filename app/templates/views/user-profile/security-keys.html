@@ -46,10 +46,7 @@
   <div class="govuk-grid-row">
     {% if credentials %}
       <div class="govuk-grid-column-five-sixths">
-        {{ page_header(
-          page_title,
-          back_link=url_for('.user_profile')
-        ) }}
+        {{ page_header(page_title) }}
         <div class="body-copy-table">
           {% call mapping_table(
             caption=page_title,
