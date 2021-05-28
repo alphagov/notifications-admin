@@ -210,32 +210,6 @@ def test_user_cannot_reject_broadcast_without_permission(
     )
 
 
-def test_cancel_broadcast_page_403_for_user_without_permission(
-    mocker,
-    client_request,
-    service_one,
-    active_user_view_permissions,
-):
-    """
-    separate test for cancel_broadcast endpoint, because admin users are allowed to cancel broadcasts
-    """
-    service_one['permissions'] += ['broadcast']
-
-    mocker.patch('app.user_api_client.get_user', return_value=active_user_view_permissions)
-    client_request.get(
-        '.cancel_broadcast_message',
-        service_id=SERVICE_ONE_ID,
-        _expected_status=403,
-        **{'broadcast_message_id': sample_uuid}
-    )
-    client_request.post(
-        '.cancel_broadcast_message',
-        service_id=SERVICE_ONE_ID,
-        _expected_status=403,
-        **{'broadcast_message_id': sample_uuid}
-    )
-
-
 @pytest.mark.parametrize('endpoint, step_index, expected_link_text, expected_link_href', (
     ('.broadcast_tour', 1, 'Continue', partial(url_for, '.broadcast_tour', step_index=2)),
     ('.broadcast_tour', 2, 'Continue', partial(url_for, '.broadcast_tour', step_index=3)),
@@ -2321,6 +2295,7 @@ def test_cancel_broadcast(
     mock_get_broadcast_template,
     mock_update_broadcast_message_status,
     platform_admin_user_no_service_permissions,
+    active_user_view_permissions,
     fake_uuid,
     user_is_platform_admin
 ):
@@ -2331,6 +2306,9 @@ def test_cancel_broadcast(
 
     if user_is_platform_admin:
         client_request.login(platform_admin_user_no_service_permissions)
+    else:
+        # Any user can cancel a broadcast, no matter their permissions
+        client_request.login(active_user_view_permissions)
 
     page = client_request.get(
         '.cancel_broadcast_message',

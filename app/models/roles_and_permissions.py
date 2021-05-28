@@ -26,8 +26,8 @@ permissions = (
 )
 
 broadcast_permissions = (
-    ('send_messages', 'Prepare and approve broadcasts'),
-    ('manage_templates', 'Add and edit templates'),
+    ('manage_templates', 'Write alerts'),
+    ('send_messages', 'Approve alerts'),
     ('manage_service', 'Manage settings and team'),
 )
 
