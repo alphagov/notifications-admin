@@ -104,7 +104,7 @@
 
           {% call settings_row(if_has_permission='email') %}
             {{ text_field('Send files by email') }}
-            {{ text_field(current_service.contact_link if current_service.contact_link else "Not set up", truncate=true) }}
+            {{ optional_text_field(current_service.contact_link, default="Not set up", truncate=true) }}
             {{ edit_field(
               'Manage',
               url_for('.send_files_by_email_contact_details', service_id=current_service.id),
