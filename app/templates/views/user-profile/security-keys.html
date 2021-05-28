@@ -19,6 +19,28 @@
 
 {% block maincolumn_content %}
 
+{% set webauthn_button %}
+  {{ govukButton({
+    "element": "button",
+    "text": "Register a key",
+    "classes": "govuk-button--secondary webauthn__api-required",
+    "attributes": {
+      "data-module": "register-security-key",
+      "data-csrf-token": csrf_token(),
+    }
+  }) }}
+
+  {{ govukErrorMessage({
+    "classes": "webauthn__api-missing",
+    "text": "Your browser does not support security keys. Try signing in to Notify using a different browser."
+  }) }}
+
+  {{ govukErrorMessage({
+    "classes": "webauthn__no-js",
+    "text": "JavaScript is not available for this page. Security keys need JavaScript to work."
+  }) }}
+{% endset %}
+
 
   {{ govukBackLink({ "href": url_for('.user_profile') }) }}
   <div class="govuk-grid-row govuk-clearfix">
@@ -46,17 +68,7 @@
             {% endfor %}
           {% endcall %}
         </div>
-
-        {{ govukButton({
-          "element": "button",
-          "text": "Register a key",
-          "classes": "govuk-button--secondary webauthn__api-required",
-          "attributes": {
-            "data-module": "register-security-key",
-            "data-csrf-token": csrf_token(),
-          }
-        }) }}
-
+        {{ webauthn_button }}
       </div>
     {% else %}
       <div class="govuk-grid-column-one-half">
@@ -69,34 +81,12 @@
           You can buy any key that’s compatible with the WebAuthn
           standard.
         </p>
-        {{ govukButton({
-          "element": "button",
-          "text": "Register a key",
-          "classes": "govuk-button--secondary webauthn__api-required",
-          "attributes": {
-            "data-module": "register-security-key",
-            "data-csrf-token": csrf_token(),
-          }
-        }) }}
+        {{ webauthn_button }}
       </div>
       <div class="govuk-grid-column-one-quarter">
         <img src="{{ asset_url('images/security-key.svg') }}" alt="" class="webauthn-illustration">
       </div>
       {% endif %}
-    </div>
-    <div class="govuk-grid-row">
-      <div class="govuk-grid-column-five-sixths">
-
-      {{ govukErrorMessage({
-        "classes": "webauthn__api-missing",
-        "text": "Your browser does not support security keys. Try signing in to Notify using a different browser."
-      }) }}
-
-      {{ govukErrorMessage({
-        "classes": "webauthn__no-js",
-        "text": "JavaScript is not available for this page. Security keys need JavaScript to work."
-      }) }}
-
     </div>
   </div>
 {% endblock %}
