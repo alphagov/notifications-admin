@@ -31,7 +31,7 @@ git+https://github.com/alphagov/govuk-frontend-jinja.git@v0.5.8-alpha#egg=govuk-
 
 # cryptography 3.4+ incorporates Rust code, which isn't supported on PaaS
 # e.g. https://github.com/alphagov/notifications-api/pull/3126
-cryptography<3.4
+cryptography==3.4.7
 
 # gds-metrics requires prometheseus 0.2.0, override that requirement as later versions bring significant performance gains
 # version 0.10.0 introduced exceptions when workers crashed due to deprecating lower case `prometheus_multiproc_dir`.
