@@ -59,7 +59,7 @@ flask-redis==0.4.0
     # via notifications-utils
 flask-wtf==0.14.3
     # via -r requirements.in
-flask==1.1.2
+flask==2.0.1
     # via
     #   -r requirements.in
     #   flask-login
