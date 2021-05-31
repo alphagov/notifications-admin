@@ -47,7 +47,7 @@ docopt==0.6.2
     # via notifications-python-client
 docutils==0.17.1
     # via awscli
-et-xmlfile==1.0.1
+et-xmlfile==1.1.0
     # via openpyxl
 eventlet==0.30.2 # pyup: ignore
     # via -r requirements.in
