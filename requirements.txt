@@ -124,7 +124,7 @@ orderedset==2.0.3
     # via notifications-utils
 packaging==20.9
     # via bleach
-phonenumbers==8.12.21
+phonenumbers==8.12.24
     # via notifications-utils
 prometheus-client==0.10.1
     # via
