@@ -114,7 +114,7 @@ markupsafe==1.1.1
     #   wtforms
 mistune==0.8.4
     # via notifications-utils
-notifications-python-client==6.0.2
+notifications-python-client==6.1.0
     # via -r requirements.in
 git+https://github.com/alphagov/notifications-utils.git@44.2.2#egg=notifications-utils==44.2.2
     # via -r requirements.in
