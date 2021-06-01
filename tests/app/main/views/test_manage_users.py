@@ -213,14 +213,12 @@ def test_should_show_overview_page_for_broadcast_service(
     assert normalize_spaces(page.select('.user-list-item')[0].text) == (
         'Test User (you) '
         'Can Prepare and approve broadcasts '
-        'Can Add and edit templates '
-        'Can Manage settings and team'
+        'Can Add and edit templates'
     )
     assert normalize_spaces(page.select('.user-list-item')[1].text) == (
         'Test User With Permissions (you) '
         'Cannot Prepare and approve broadcasts '
-        'Cannot Add and edit templates '
-        'Cannot Manage settings and team'
+        'Cannot Add and edit templates'
     )
 
 
@@ -330,7 +328,6 @@ def test_broadcast_service_only_shows_relevant_permissions(
     ] == [
         ('permissions_field', 'send_messages'),
         ('permissions_field', 'manage_templates'),
-        ('permissions_field', 'manage_service'),
     ]
 
 
@@ -564,7 +561,6 @@ def test_edit_user_permissions(
         {
             'view_activity',
             'send_messages',
-            'manage_service',
             'manage_templates',
         }
     ),
@@ -1190,7 +1186,6 @@ def test_invite_user_with_email_auth_service(
             'view_activity',
             'send_messages',
             'manage_templates',
-            'manage_service',
         },
     ),
     (
