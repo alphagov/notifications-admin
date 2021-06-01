@@ -153,6 +153,10 @@ def test_complete_register_clears_session(
 
     with platform_admin_client.session_transaction() as session:
         assert 'webauthn_registration_state' not in session
+        assert session['_flashes'] == [('default_with_tick', (
+            'Registration complete. Next time you sign in to Notify '
+            'you’ll be asked to use your security key.'
+        ))]
 
 
 def test_complete_register_handles_library_errors(
