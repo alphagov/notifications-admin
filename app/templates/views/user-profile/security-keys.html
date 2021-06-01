@@ -18,14 +18,35 @@
 {% endblock %}
 
 {% block maincolumn_content %}
-  {{ page_header(
-    page_title,
-    back_link=url_for('.user_profile')
-  ) }}
 
+{% set webauthn_button %}
+  {{ govukButton({
+    "element": "button",
+    "text": "Register a key",
+    "classes": "govuk-button--secondary webauthn__api-required",
+    "attributes": {
+      "data-module": "register-security-key",
+      "data-csrf-token": csrf_token(),
+    }
+  }) }}
+
+  {{ govukErrorMessage({
+    "classes": "webauthn__api-missing",
+    "text": "Your browser does not support security keys. Try signing in to Notify using a different browser."
+  }) }}
+
+  {{ govukErrorMessage({
+    "classes": "webauthn__no-js",
+    "text": "JavaScript is not available for this page. Security keys need JavaScript to work."
+  }) }}
+{% endset %}
+
+
+  {{ govukBackLink({ "href": url_for('.user_profile') }) }}
   <div class="govuk-grid-row">
-    <div class="govuk-grid-column-five-sixths">
-      {% if credentials %}
+    {% if credentials %}
+      <div class="govuk-grid-column-five-sixths">
+        {{ page_header(page_title) }}
         <div class="body-copy-table">
           {% call mapping_table(
             caption=page_title,
@@ -44,34 +65,25 @@
             {% endfor %}
           {% endcall %}
         </div>
-
-      {% else %}
-
+        {{ webauthn_button }}
+      </div>
+    {% else %}
+      <div class="govuk-grid-column-one-half">
+        {{ page_header(page_title) }}
         <p class="govuk-body">
-          Security keys are an alternative way of signing in to Notify.
+          Security keys are an alternative way of signing in to Notify,
+          instead of getting a code in a text message
         </p>
-
+        <p class="govuk-body">
+          You can buy any key that’s compatible with the WebAuthn
+          standard.
+        </p>
+        {{ webauthn_button }}
+      </div>
+      <div class="govuk-grid-column-one-quarter">
+        <img src="{{ asset_url('images/security-key.svg') }}" alt="" class="webauthn-illustration">
+      </div>
       {% endif %}
-
-      {{ govukErrorMessage({
-        "classes": "webauthn__api-missing",
-        "text": "Your browser does not support security keys. Try signing in to Notify using a different browser."
-      }) }}
-
-      {{ govukErrorMessage({
-        "classes": "webauthn__no-js",
-        "text": "JavaScript is not available for this page. Security keys need JavaScript to work."
-      }) }}
-
-      {{ govukButton({
-        "element": "button",
-        "text": "Register a key",
-        "classes": "govuk-button--secondary webauthn__api-required",
-        "attributes": {
-          "data-module": "register-security-key",
-          "data-csrf-token": csrf_token(),
-        }
-      }) }}
     </div>
   </div>
 {% endblock %}

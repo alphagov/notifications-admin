@@ -37,20 +37,25 @@ def test_overview_page_shows_disable_for_platform_admin(
     assert ' '.join(disable_platform_admin_row.text.split()) == 'Use platform admin view Yes Change'
 
 
-@pytest.mark.parametrize('has_keys', [False, True])
+@pytest.mark.parametrize('key_count, expected_row_text', [
+    (0, 'Security keys None registered Change'),
+    (1, 'Security keys 1 registered Change'),
+    (2, 'Security keys 2 registered Change'),
+])
 def test_overview_page_shows_security_keys_for_platform_admin(
     mocker,
     client_request,
     platform_admin_user,
-    has_keys,
     webauthn_credential,
+    key_count,
+    expected_row_text,
 ):
     client_request.login(platform_admin_user)
-    credentials = [webauthn_credential] if has_keys else []
+    credentials = [webauthn_credential for _ in range(key_count)]
     mocker.patch('app.user_api_client.get_webauthn_credentials_for_user', return_value=credentials)
     page = client_request.get('main.user_profile')
     security_keys_row = page.select_one('#security-keys')
-    assert ' '.join(security_keys_row.text.split()) == f'Security keys {len(credentials)} Change'
+    assert ' '.join(security_keys_row.text.split()) == expected_row_text
 
 
 def test_should_show_name_page(
