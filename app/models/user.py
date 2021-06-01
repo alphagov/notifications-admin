@@ -353,6 +353,13 @@ class User(JSONModel, UserMixin):
         return [WebAuthnCredential(json) for json in
                 user_api_client.get_webauthn_credentials_for_user(self.id)]
 
+    @property
+    def webauthn_credentials_as_cbor(self):
+        return [
+            credential.to_credential_data()
+            for credential in self.webauthn_credentials
+        ]
+
     def serialize(self):
         dct = {
             "id": self.id,

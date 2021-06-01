@@ -28,10 +28,7 @@ def webauthn_begin_register():
             "name": current_user.email_address,
             "displayName": current_user.name,
         },
-        credentials=[
-            credential.to_credential_data()
-            for credential in current_user.webauthn_credentials
-        ],
+        credentials=current_user.webauthn_credentials_as_cbor,
         user_verification="discouraged",  # don't ask for PIN
         authenticator_attachment="cross-platform",
     )
@@ -74,10 +71,7 @@ def webauthn_begin_authentication():
         abort(403)
 
     authentication_data, state = current_app.webauthn_server.authenticate_begin(
-        credentials=[
-            credential.to_credential_data()
-            for credential in user_to_login.webauthn_credentials
-        ],
+        credentials=user_to_login.webauthn_credentials_as_cbor,
         user_verification=None,  # required, preferred, discouraged. sets whether to ask for PIN
     )
     session["webauthn_authentication_state"] = state
@@ -125,10 +119,7 @@ def _complete_webauthn_authentication(user):
     try:
         current_app.webauthn_server.authenticate_complete(
             state=state,
-            credentials=[
-                credential.to_credential_data()
-                for credential in user.webauthn_credentials
-            ],
+            credentials=user.webauthn_credentials_as_cbor,
             credential_id=request_data['credentialId'],
             client_data=ClientData(request_data['clientDataJSON']),
             auth_data=AuthenticatorData(request_data['authenticatorData']),
