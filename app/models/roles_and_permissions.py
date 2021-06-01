@@ -6,6 +6,8 @@ roles = {
     'manage_service': ['manage_users', 'manage_settings'],
     'manage_api_keys': ['manage_api_keys'],
     'view_activity': ['view_activity'],
+    'create_broadcasts': ['manage_templates', 'create_broadcast_messages'],
+    'approve_broadcasts': ['approve_broadcasts'],
 }
 
 # same dict as above, but flipped round
@@ -26,8 +28,8 @@ permissions = (
 )
 
 broadcast_permissions = (
-    ('send_messages', 'Prepare and approve broadcasts'),
-    ('manage_templates', 'Add and edit templates'),
+    ('create_broadcasts', 'Create alerts and templates'),
+    ('approve_broadcasts', 'Approve alerts'),
 )
 
 
