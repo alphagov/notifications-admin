@@ -203,10 +203,10 @@ def test_platform_admin_sees_only_relevant_settings_for_broadcast_service(
         (True, "training", "test", "all", "Training"),
         (True, "live", "test", "ee", "Test (EE)"),
         (True, "live", "test", "three", "Test (Three)"),
-        (True, "live", "test", "all", "Test (all networks)"),
-        (True, "live", "severe", "all", "Live (all networks)"),
+        (True, "live", "test", "all", "Test"),
+        (True, "live", "severe", "all", "Live"),
         (True, "live", "severe", "three", "Live (Three)"),
-        (True, "live", "government", "all", "Government (all networks)"),
+        (True, "live", "government", "all", "Government"),
         (True, "live", "government", "three", "Government (Three)"),
     ]
 )
@@ -5802,13 +5802,13 @@ def test_post_service_set_broadcast_network_makes_you_choose(
             'this service.',
         ]),
         ('live-test', [
-            'Test (all networks)',
+            'Test',
             'Members of the public who have switched on the test '
             'channel on their phones will receive alerts sent from '
             'this service.',
         ]),
         ('live-severe', [
-            'Live (all networks)',
+            'Live',
             'Members of the public will receive alerts sent from this '
             'service.',
         ]),
@@ -5818,7 +5818,7 @@ def test_post_service_set_broadcast_network_makes_you_choose(
             'service.',
         ]),
         ('live-government', [
-            'Government (all networks)',
+            'Government',
             'Members of the public will receive alerts sent from this '
             'service, even if they’ve opted out.'
         ]),
