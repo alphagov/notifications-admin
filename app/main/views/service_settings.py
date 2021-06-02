@@ -511,22 +511,30 @@ def service_add_email_reply_to(service_id):
     first_email_address = current_service.count_email_reply_to_addresses == 0
     is_default = first_email_address if first_email_address else form.is_default.data
     if form.validate_on_submit():
-        try:
-            notification_id = service_api_client.verify_reply_to_email_address(
-                service_id, form.email_address.data
-            )["data"]["id"]
-        except HTTPError as e:
-            if e.status_code == 409:
-                flash(e.message, 'error')
-                return redirect(url_for('.service_email_reply_to', service_id=service_id))
-            else:
-                raise e
-        return redirect(url_for(
-            '.service_verify_reply_to_address',
-            service_id=service_id,
-            notification_id=notification_id,
-            is_default=is_default
-        ))
+        if current_user.platform_admin:
+            service_api_client.add_reply_to_email_address(
+                service_id,
+                email_address=form.email_address.data,
+                is_default=is_default
+            )
+            return redirect(url_for('.service_email_reply_to', service_id=service_id))
+        else:
+            try:
+                notification_id = service_api_client.verify_reply_to_email_address(
+                    service_id, form.email_address.data
+                )["data"]["id"]
+            except HTTPError as e:
+                if e.status_code == 409:
+                    flash(e.message, 'error')
+                    return redirect(url_for('.service_email_reply_to', service_id=service_id))
+                else:
+                    raise e
+            return redirect(url_for(
+                '.service_verify_reply_to_address',
+                service_id=service_id,
+                notification_id=notification_id,
+                is_default=is_default
+            ))
 
     return render_template(
         'views/service-settings/email-reply-to/add.html',
@@ -630,7 +638,7 @@ def service_edit_email_reply_to(service_id, reply_to_email_id):
         form.email_address.data = reply_to_email_address['email_address']
         form.is_default.data = reply_to_email_address['is_default']
     if form.validate_on_submit():
-        if form.email_address.data == reply_to_email_address["email_address"]:
+        if form.email_address.data == reply_to_email_address["email_address"] or current_user.platform_admin:
             service_api_client.update_reply_to_email_address(
                 current_service.id,
                 reply_to_email_id=reply_to_email_id,
