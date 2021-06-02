@@ -1,33 +1,35 @@
 {% extends "withoutnav_template.html" %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/button/macro.njk" import govukButton %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
 
-{% set page_title = 'Security keys' %}
+{% set page_title = 'Get your security key' %}
 
 {% block per_page_title %}
   {{ page_title }}
 {% endblock %}
 
 {% block maincolumn_content %}
-  {{ page_header(
-    page_title,
-    back_link=url_for('.user_profile')
-  ) }}
 
+  {{ govukBackLink({ "href": url_for('.user_profile') }) }}
   <div class="govuk-grid-row">
-    <div class="govuk-grid-column-five-sixths">
-    <p class="govuk-body">Security key</p>
-    <p class="govuk-body">When you are ready to authenticate, press the button below.</p>
-
+    <div class="govuk-grid-column-one-half">
+      {{ page_header(page_title) }}
+      <p class="govuk-body">
+        You need to have your security key to sign in.
+      </p>
       {{ govukButton({
         "element": "button",
-        "text": "Webauthn authenticate click me click me",
+        "text": "Check security key",
         "classes": "govuk-button--secondary",
         "attributes": {
           "data-module": "authenticate-security-key",
           "data-csrf-token": csrf_token(),
         }
       }) }}
+    </div>
+    <div class="govuk-grid-column-one-quarter">
+      <img src="{{ asset_url('images/security-key.svg') }}" alt="" class="webauthn-illustration">
     </div>
   </div>
 {% endblock %}
