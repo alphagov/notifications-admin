@@ -91,8 +91,8 @@ def webauthn_complete_authentication():
         abort(403)
 
     try:
-        _complete_webauthn_authentication(user_to_login)
-        redirect = _verify_webauthn_login(user_to_login)
+        _verify_webauthn_authentication(user_to_login)
+        redirect = _complete_webauthn_login_attempt(user_to_login)
     except Forbidden:
         # We don't expect to reach this case in normal situations - normally errors (such as using the wrong
         # security key) will be caught in the browser inside `window.navigator.credentials.get`, and the js will
@@ -112,7 +112,11 @@ def webauthn_complete_authentication():
     return cbor.encode({'redirect_url': redirect.location}), 200
 
 
-def _complete_webauthn_authentication(user):
+def _verify_webauthn_authentication(user):
+    """
+    Check that the presented security key is valid, has signed the right challenge, and belongs to the user
+    we're trying to log in.
+    """
     state = session.pop("webauthn_authentication_state")
     request_data = cbor.decode(request.get_data())
 
@@ -127,22 +131,21 @@ def _complete_webauthn_authentication(user):
         )
     except ValueError as exc:
         current_app.logger.info(f'User {user.id} could not sign in using their webauthn token - {exc}')
-        user.verify_webauthn_login(is_successful=False)
+        user.complete_webauthn_login_attempt(is_successful=False)
         abort(403)
 
 
-def _verify_webauthn_login(user):
+def _complete_webauthn_login_attempt(user):
     """
     * check the user hasn't gone over their max logins
     * check that the user's email is validated
     * if succesful, update current_session_id, log in date, and then redirect
-
     """
     redirect_url = request.args.get('next')
 
     # normally API handles this when verifying an sms or email code but since the webauthn logic happens in the
     # admin we need a separate call that just finalises the login in the database
-    logged_in, _ = user.verify_webauthn_login()
+    logged_in, _ = user.complete_webauthn_login_attempt()
     if not logged_in:
         # user account is locked as too many failed logins
 

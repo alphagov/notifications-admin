@@ -260,7 +260,10 @@ def test_complete_authentication_checks_credentials(
     platform_admin_user['auth_type'] = 'webauthn_auth'
     mocker.patch('app.user_api_client.get_user', return_value=platform_admin_user)
     mocker.patch('app.user_api_client.get_webauthn_credentials_for_user', return_value=[webauthn_credential])
-    mocker.patch('app.main.views.webauthn_credentials._verify_webauthn_login', return_value=Mock(location='/foo'))
+    mocker.patch(
+        'app.main.views.webauthn_credentials._complete_webauthn_login_attempt',
+        return_value=Mock(location='/foo')
+    )
 
     response = client.post(url_for('main.webauthn_complete_authentication'), data=webauthn_authentication_post_data)
 
@@ -280,8 +283,8 @@ def test_complete_authentication_403s_if_key_isnt_in_users_credentials(
     mocker.patch('app.user_api_client.get_user', return_value=platform_admin_user)
     # user has no keys in the database
     mocker.patch('app.user_api_client.get_webauthn_credentials_for_user', return_value=[])
-    mock_verify_webauthn_login = mocker.patch('app.main.views.webauthn_credentials._verify_webauthn_login')
-    mock_unsuccesful_login_api_call = mocker.patch('app.user_api_client.verify_webauthn_login')
+    mock_verify_webauthn_login = mocker.patch('app.main.views.webauthn_credentials._complete_webauthn_login_attempt')
+    mock_unsuccesful_login_api_call = mocker.patch('app.user_api_client.complete_webauthn_login_attempt')
 
     response = client.post(url_for('main.webauthn_complete_authentication'), data=webauthn_authentication_post_data)
     assert response.status_code == 403
@@ -312,7 +315,10 @@ def test_complete_authentication_clears_session(
     platform_admin_user['auth_type'] = 'webauthn_auth'
     mocker.patch('app.user_api_client.get_user', return_value=platform_admin_user)
     mocker.patch('app.user_api_client.get_webauthn_credentials_for_user', return_value=[webauthn_credential])
-    mocker.patch('app.main.views.webauthn_credentials._verify_webauthn_login', return_value=Mock(location='/foo'))
+    mocker.patch(
+        'app.main.views.webauthn_credentials._complete_webauthn_login_attempt',
+        return_value=Mock(location='/foo')
+    )
 
     client.post(url_for('main.webauthn_complete_authentication'), data=webauthn_authentication_post_data)
 
@@ -332,8 +338,8 @@ def test_verify_webauthn_login_signs_user_in_signs_user_in(client, mocker, mock_
             'email': platform_admin_user['email_address']
         }
     mocker.patch('app.user_api_client.get_user', return_value=platform_admin_user)
-    mocker.patch('app.main.views.webauthn_credentials._complete_webauthn_authentication')
-    mocker.patch('app.user_api_client.verify_webauthn_login', return_value=(True, None))
+    mocker.patch('app.main.views.webauthn_credentials._verify_webauthn_authentication')
+    mocker.patch('app.user_api_client.complete_webauthn_login_attempt', return_value=(True, None))
 
     resp = client.post(url_for('main.webauthn_complete_authentication'))
 
@@ -359,8 +365,8 @@ def test_verify_webauthn_login_signs_user_in_doesnt_sign_user_in_if_api_rejects(
             'email': platform_admin_user['email_address']
         }
     mocker.patch('app.user_api_client.get_user', return_value=platform_admin_user)
-    mocker.patch('app.main.views.webauthn_credentials._complete_webauthn_authentication')
-    mocker.patch('app.user_api_client.verify_webauthn_login', return_value=(False, None))
+    mocker.patch('app.main.views.webauthn_credentials._verify_webauthn_authentication')
+    mocker.patch('app.user_api_client.complete_webauthn_login_attempt', return_value=(False, None))
 
     resp = client.post(url_for('main.webauthn_complete_authentication'))
 
@@ -389,8 +395,8 @@ def test_verify_webauthn_login_signs_user_in_sends_revalidation_email_if_needed(
         session['user_details'] = user_details
 
     mocker.patch('app.user_api_client.get_user', return_value=platform_admin_user)
-    mocker.patch('app.main.views.webauthn_credentials._complete_webauthn_authentication')
-    mocker.patch('app.user_api_client.verify_webauthn_login', return_value=(True, None))
+    mocker.patch('app.main.views.webauthn_credentials._verify_webauthn_authentication')
+    mocker.patch('app.user_api_client.complete_webauthn_login_attempt', return_value=(True, None))
 
     resp = client.post(url_for('main.webauthn_complete_authentication'))
 
