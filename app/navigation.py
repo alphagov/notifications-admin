@@ -107,10 +107,11 @@ class HeaderNavigation(Navigation):
         'sign-in': {
             'revalidate_email_sent',
             'sign_in',
-            'two_factor',
+            'two_factor_sms',
             'two_factor_email',
             'two_factor_email_sent',
             'two_factor_email_interstitial',
+            'two_factor_webauthn',
             'verify',
             'verify_email',
         },

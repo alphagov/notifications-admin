@@ -3963,7 +3963,7 @@ def create_active_user_manage_template_permissions(with_unique_id=False):
     }
 
 
-def create_platform_admin_user(with_unique_id=False, permissions=None):
+def create_platform_admin_user(with_unique_id=False, auth_type='sms_auth', permissions=None):
     return {
         'id': str(uuid4()) if with_unique_id else sample_uuid(),
         'name': 'Platform admin user',
@@ -3974,7 +3974,7 @@ def create_platform_admin_user(with_unique_id=False, permissions=None):
         'failed_login_count': 0,
         'permissions': permissions or {},
         'platform_admin': True,
-        'auth_type': 'sms_auth',
+        'auth_type': auth_type,
         'password_changed_at': str(datetime.utcnow()),
         'services': [],
         'organisations': [],
@@ -4481,7 +4481,7 @@ def webauthn_credential():
     return {
         'id': str(uuid4()),
         'name': 'Test credential',
-        'credential_data': 'WJ0AAAAAAAAAAAAAAAAAAAAAAECKU1ppjl9gmhHWyDkgHsUvZmhr6oF3/lD3llzLE2SaOSgOGIsIuAQqgp8JQSUu3r/oOaP8RS44dlQjrH+ALfYtpAECAyYhWCAxnqAfESXOYjKUc2WACuXZ3ch0JHxV0VFrrTyjyjIHXCJYIFnx8H87L4bApR4M+hPcV+fHehEOeW+KCyd0H+WGY8s6',  # noqa
+        'credential_data': 'WJ8AAAAAAAAAAAAAAAAAAAAAAECKU1ppjl9gmhHWyDkgHsUvZmhr6oF3/lD3llzLE2SaOSgOGIsIuAQqgp8JQSUu3r/oOaP8RS44dlQjrH+ALfYtpQECAyYgASFYIDGeoB8RJc5iMpRzZYAK5dndyHQkfFXRUWutPKPKMgdcIlggWfHwfzsvhsClHgz6E9xX58d6EQ55b4oLJ3Qf5YZjyzo=',  # noqa
         'registration_response': 'anything',
         'created_at': '2017-10-18T16:57:14.154185Z',
     }

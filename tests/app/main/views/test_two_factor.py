@@ -54,7 +54,7 @@ def test_should_render_two_factor_page(
             'id': api_user_active['id'],
             'email': api_user_active['email_address']}
     mocker.patch('app.user_api_client.get_user', return_value=api_user_active)
-    response = client.get(url_for('main.two_factor', next=redirect_url))
+    response = client.get(url_for('main.two_factor_sms', next=redirect_url))
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert page.select_one('main p').text.strip() == (
@@ -86,7 +86,7 @@ def test_should_login_user_and_should_redirect_to_next_url(
             'email': api_user_active['email_address']}
     api_user_active['email_access_validated_at'] = '2020-01-23T11:35:21.726132Z'
 
-    response = client.post(url_for('main.two_factor', next='/services/{}'.format(SERVICE_ONE_ID)),
+    response = client.post(url_for('main.two_factor_sms', next='/services/{}'.format(SERVICE_ONE_ID)),
                            data={'sms_code': '12345'})
     assert response.status_code == 302
     assert response.location == url_for(
@@ -112,7 +112,7 @@ def test_should_send_email_and_redirect_to_info_page_if_user_needs_to_revalidate
         session['user_details'] = {
             'id': api_user_active['id'],
             'email': api_user_active['email_address']}
-    response = client.post(url_for('main.two_factor', next=f'/services/{SERVICE_ONE_ID}'),
+    response = client.post(url_for('main.two_factor_sms', next=f'/services/{SERVICE_ONE_ID}'),
                            data={'sms_code': '12345'})
 
     assert response.status_code == 302
@@ -140,7 +140,7 @@ def test_should_login_user_and_not_redirect_to_external_url(
             'email': api_user_active['email_address']}
     api_user_active['email_access_validated_at'] = '2020-01-23T11:35:21.726132Z'
 
-    response = client.post(url_for('main.two_factor', next='http://www.google.com'),
+    response = client.post(url_for('main.two_factor_sms', next='http://www.google.com'),
                            data={'sms_code': '12345'})
     assert response.status_code == 302
     assert response.location == url_for('main.show_accounts_or_dashboard', _external=True)
@@ -166,7 +166,7 @@ def test_should_login_user_and_redirect_to_show_accounts(
     api_user_active['email_access_validated_at'] = '2020-01-23T11:35:21.726132Z'
     api_user_active['platform_admin'] = platform_admin
 
-    response = client.post(url_for('main.two_factor'),
+    response = client.post(url_for('main.two_factor_sms'),
                            data={'sms_code': '12345'})
 
     assert response.status_code == 302
@@ -186,7 +186,7 @@ def test_should_return_200_with_sms_code_error_when_sms_code_is_wrong(
             'email': api_user_active['email_address']}
     mocker.patch('app.user_api_client.get_user', return_value=api_user_active)
 
-    response = client.post(url_for('main.two_factor'),
+    response = client.post(url_for('main.two_factor_sms'),
                            data={'sms_code': '23456'})
     assert response.status_code == 200
     assert 'Code not found' in response.get_data(as_text=True)
@@ -208,7 +208,7 @@ def test_should_login_user_when_multiple_valid_codes_exist(
             'email': api_user_active['email_address']}
     api_user_active['email_access_validated_at'] = '2020-01-23T11:35:21.726132Z'
 
-    response = client.post(url_for('main.two_factor'),
+    response = client.post(url_for('main.two_factor_sms'),
                            data={'sms_code': '23456'})
     assert response.status_code == 302
 
@@ -230,7 +230,7 @@ def test_two_factor_should_set_password_when_new_password_exists_in_session(
             'password': 'changedpassword'}
     api_user_active['email_access_validated_at'] = '2020-01-23T11:35:21.726132Z'
 
-    response = client.post(url_for('main.two_factor'),
+    response = client.post(url_for('main.two_factor_sms'),
                            data={'sms_code': '12345'})
     assert response.status_code == 302
     assert response.location == url_for('main.show_accounts_or_dashboard', _external=True)
@@ -252,21 +252,31 @@ def test_two_factor_returns_error_when_user_is_locked(
             'id': api_user_locked['id'],
             'email': api_user_locked['email_address'],
         }
-    response = client.post(url_for('main.two_factor'),
+    response = client.post(url_for('main.two_factor_sms'),
                            data={'sms_code': '12345'})
     assert response.status_code == 200
     assert 'Code not found' in response.get_data(as_text=True)
 
 
-def test_two_factor_should_redirect_to_sign_in_if_user_not_in_session(
-    client,
-    api_user_active,
-    mock_get_user,
+def test_two_factor_post_should_redirect_to_sign_in_if_user_not_in_session(
+    client_request,
 ):
-    response = client.post(url_for('main.two_factor'),
-                           data={'sms_code': '12345'})
-    assert response.status_code == 302
-    assert response.location == url_for('main.sign_in', _external=True)
+    client_request.post(
+        'main.two_factor_sms',
+        _data={'sms_code': '12345'},
+        _expected_redirect=url_for('main.sign_in', _external=True)
+    )
+
+
+@pytest.mark.parametrize('endpoint', ['main.two_factor_webauthn', 'main.two_factor_sms'])
+def test_two_factor_get_should_redirect_to_sign_in_if_user_not_in_session(
+    client_request,
+    endpoint,
+):
+    client_request.get(
+        endpoint,
+        _expected_redirect=url_for('main.sign_in', _external=True)
+    )
 
 
 @freeze_time('2020-01-27T12:00:00')
@@ -286,7 +296,7 @@ def test_two_factor_should_activate_pending_user(
             'id': api_user_pending['id'],
             'email_address': api_user_pending['email_address']
         }
-    client.post(url_for('main.two_factor'), data={'sms_code': '12345'})
+    client.post(url_for('main.two_factor_sms'), data={'sms_code': '12345'})
 
     assert mock_activate_user.called
 

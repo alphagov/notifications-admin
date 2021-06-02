@@ -125,6 +125,19 @@ class UserApiClient(NotifyAdminAPIClient):
                 return False, e.message
             raise e
 
+    @cache.delete('user-{user_id}')
+    def complete_webauthn_login_attempt(self, user_id, is_successful):
+        data = {'successful': is_successful}
+        # TODO: Change this to `/complete/webauthn-login`
+        endpoint = f'/user/{user_id}/verify/webauthn-login'
+        try:
+            self.post(endpoint, data=data)
+            return True, ''
+        except HTTPError as e:
+            if e.status_code == 403:
+                return False, e.message
+            raise e
+
     def get_users_for_service(self, service_id):
         endpoint = '/service/{}/users'.format(service_id)
         return self.get(endpoint)['data']

@@ -43,7 +43,7 @@ def check_and_resend_verification_code():
     if user.state == 'pending':
         return redirect(url_for('main.verify', next=redirect_url))
     else:
-        return redirect(url_for('main.two_factor', next=redirect_url))
+        return redirect(url_for('main.two_factor_sms', next=redirect_url))
 
 
 @main.route('/email-not-received', methods=['GET'])
