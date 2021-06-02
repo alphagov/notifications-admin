@@ -5751,17 +5751,19 @@ def test_post_service_set_broadcast_network(
         {'network_variant': ''},  # Missing choice of MNO
     ),
 )
+@pytest.mark.parametrize('broadcast_channel', ['government', 'severe', 'test'])
 def test_post_service_set_broadcast_network_makes_you_choose(
     client_request,
     platform_admin_user,
     mocker,
     data,
+    broadcast_channel
 ):
     client_request.login(platform_admin_user)
     page = client_request.post(
         'main.service_set_broadcast_network',
         service_id=SERVICE_ONE_ID,
-        broadcast_channel='all',
+        broadcast_channel=broadcast_channel,
         _data=data,
         _expected_status=200,
     )
@@ -5893,7 +5895,7 @@ def test_post_service_set_broadcast_account_type_posts_data_to_api_and_redirects
 
 @pytest.mark.parametrize('endpoint, extra_args, expected_error', (
     ('main.service_set_broadcast_channel', {}, 'Error: Select mode or channel'),
-    ('main.service_set_broadcast_network', {'broadcast_channel': 'all'}, 'Error: Select a mobile network'),
+    ('main.service_set_broadcast_network', {'broadcast_channel': 'government'}, 'Error: Select a mobile network'),
 ))
 def test_post_service_set_broadcast_account_type_shows_errors_if_no_radio_selected(
     platform_admin_client,
