@@ -37,7 +37,7 @@ click==8.0.1
     # via flask
 colorama==0.4.3
     # via awscli
-cryptography==3.4.7
+cryptography==3.3.2
     # via
     #   -r requirements.in
     #   fido2
@@ -59,7 +59,7 @@ flask-redis==0.4.0
     # via notifications-utils
 flask-wtf==0.15.1
     # via -r requirements.in
-flask==2.0.1
+flask==1.1.2
     # via
     #   -r requirements.in
     #   flask-login
@@ -87,13 +87,13 @@ idna==2.10
     # via requests
 importlib-metadata==4.4.0
     # via click
-itsdangerous==2.0.1
+itsdangerous==1.1.0
     # via
     #   -r requirements.in
     #   flask
     #   flask-wtf
     #   notifications-utils
-jinja2==3.0.1
+jinja2==2.11.3
     # via
     #   flask
     #   govuk-frontend-jinja
@@ -197,6 +197,7 @@ six==1.16.0
     # via
     #   awscli-cwlogs
     #   bleach
+    #   cryptography
     #   eventlet
     #   fido2
     #   govuk-bank-holidays
@@ -215,7 +216,7 @@ urllib3==1.26.5
     #   requests
 webencodings==0.5.1
     # via bleach
-werkzeug==2.0.1
+werkzeug==1.0.1
     # via flask
 wtforms==2.3.3
     # via flask-wtf
