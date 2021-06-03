@@ -283,6 +283,15 @@ def test_should_show_old_job(
     assert not page.select('p.hint')
     assert not page.select('a[download]')
     assert page.select_one('tbody').text.strip() == expected_message
+    assert [
+        normalize_spaces(column.text)
+        for column in page.select('main .govuk-grid-column-one-quarter')
+    ] == [
+        '1 total text messages',
+        '1 sending text message',
+        '0 delivered text messages',
+        '0 failed text messages',
+    ]
 
 
 @freeze_time("2016-01-01 11:09:00.061258")
