@@ -86,7 +86,7 @@ def webauthn_begin_authentication():
 
     authentication_data, state = current_app.webauthn_server.authenticate_begin(
         credentials=user_to_login.webauthn_credentials_as_cbor,
-        user_verification=None,  # required, preferred, discouraged. sets whether to ask for PIN
+        user_verification="discouraged",  # don't ask for PIN
     )
     session["webauthn_authentication_state"] = state
     return cbor.encode(authentication_data)
