@@ -17,17 +17,15 @@
   {% set margin_class = "" if left_margin else "govuk-!-margin-left-0" %}
   {% if trial_mode %}
     <span class="navigation-service-type navigation-service-type--training {{margin_class}}">Training
-  {% elif broadcast_channel == 'severe' %}
+  {% else %}
+    {% if broadcast_channel == "severe" %}
     <span class="navigation-service-type navigation-service-type--live {{margin_class}}">Live
-  {% elif broadcast_channel == 'test' %}
-    <span class="navigation-service-type navigation-service-type--live {{margin_class}}">{{ broadcast_channel|title }}
-    {% if allowed_broadcast_provider == "all" %}
-      (all networks)
     {% else %}
+    <span class="navigation-service-type navigation-service-type--{{broadcast_channel}} {{margin_class}}">{{ broadcast_channel|title }}
+    {% endif %}
+    {% if allowed_broadcast_provider != "all" %}
       ({{ allowed_broadcast_provider|format_mobile_network }})
     {% endif %}
-  {% elif broadcast_channel == 'government' %}
-    <span class="navigation-service-type navigation-service-type--government {{margin_class}}">Government
   {% endif %}
   </span>
 {% endmacro %}

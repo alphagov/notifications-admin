@@ -325,15 +325,15 @@ def test_some_broadcast_tour_pages_show_service_name(
             False,
             'test',
             'all',
-            '.navigation-service-type.navigation-service-type--live',
-            'service one Test (all networks) Switch service',
-            'Test (all networks)',
+            '.navigation-service-type.navigation-service-type--test',
+            'service one Test Switch service',
+            'Test',
         ),
         (
             False,
             'test',
             'vodafone',
-            '.navigation-service-type.navigation-service-type--live',
+            '.navigation-service-type.navigation-service-type--test',
             'service one Test (Vodafone) Switch service',
             'Test (Vodafone)',
         ),
@@ -345,9 +345,25 @@ def test_some_broadcast_tour_pages_show_service_name(
             'service one Government Switch service',
             'Government',
         ),
+        (
+            False,
+            'government',
+            'vodafone',
+            '.navigation-service-type.navigation-service-type--government',
+            'service one Government (Vodafone) Switch service',
+            'Government (Vodafone)',
+        ),
+        (
+            False,
+            'severe',
+            'vodafone',
+            '.navigation-service-type.navigation-service-type--live',
+            'service one Live (Vodafone) Switch service',
+            'Live (Vodafone)',
+        ),
     )
 )
-def test_broadcast_service_shows_live_or_training(
+def test_broadcast_service_shows_channel_settings(
     client_request,
     service_one,
     mock_get_no_broadcast_messages,

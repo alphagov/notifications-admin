@@ -40,7 +40,7 @@
       box-shadow: 0 -3px 0 0 $grey-3;
     }
 
-    &--live {
+    &--live, &--test {
       // This uses new Design System colours to match .govuk-tag--red
       background: #F6D7D2;
       color: #942514;
