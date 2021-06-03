@@ -350,26 +350,34 @@ def _get_job_counts(job):
             count
         ) for label, query_param, count in [
             [
-                f'''total<span class="govuk-visually-hidden">
-                 {"text message" if job_type == "sms" else job_type}s</span>''',
+                Markup(
+                    f'''total<span class="govuk-visually-hidden">
+                    {"text message" if job_type == "sms" else job_type}s</span>'''
+                ),
                 '',
                 job.notification_count
             ],
             [
-                f'''sending<span class="govuk-visually-hidden">
-                 {message_count_noun(job.notifications_sending, job_type)}</span>''',
+                Markup(
+                    f'''sending<span class="govuk-visually-hidden">
+                    {message_count_noun(job.notifications_sending, job_type)}</span>'''
+                ),
                 'sending',
                 job.notifications_sending
             ],
             [
-                f'''delivered<span class="govuk-visually-hidden">
-                 {message_count_noun(job.notifications_delivered, job_type)}</span>''',
+                Markup(
+                    f'''delivered<span class="govuk-visually-hidden">
+                    {message_count_noun(job.notifications_delivered, job_type)}</span>'''
+                ),
                 'delivered',
                 job.notifications_delivered
             ],
             [
-                f'''failed<span class="govuk-visually-hidden">
-                 {message_count_noun(job.notifications_failed, job_type)}</span>''',
+                Markup(
+                    f'''failed<span class="govuk-visually-hidden">
+                    {message_count_noun(job.notifications_failed, job_type)}</span>'''
+                ),
                 'failed',
                 job.notifications_failed
             ]
