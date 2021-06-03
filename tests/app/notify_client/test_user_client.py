@@ -273,7 +273,7 @@ def test_complete_webauthn_login_attempt_returns_true_and_no_message_normally(fa
     resp = user_api_client.complete_webauthn_login_attempt(fake_uuid, is_successful=True)
 
     expected_data = {'successful': True}
-    mock_post.assert_called_once_with(f'/user/{fake_uuid}/verify/webauthn-login', data=expected_data)
+    mock_post.assert_called_once_with(f'/user/{fake_uuid}/complete/webauthn-login', data=expected_data)
     assert resp == (True, '')
 
 
@@ -293,7 +293,7 @@ def test_complete_webauthn_login_attempt_returns_false_and_message_on_403(fake_u
     resp = user_api_client.complete_webauthn_login_attempt(fake_uuid, is_successful=True)
 
     expected_data = {'successful': True}
-    mock_post.assert_called_once_with(f'/user/{fake_uuid}/verify/webauthn-login', data=expected_data)
+    mock_post.assert_called_once_with(f'/user/{fake_uuid}/complete/webauthn-login', data=expected_data)
 
     assert resp == (False, 'forbidden')
 
