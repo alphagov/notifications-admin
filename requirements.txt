@@ -8,7 +8,7 @@ ago==0.0.93
     # via -r requirements.in
 awscli-cwlogs==1.4.6
     # via -r requirements.in
-awscli==1.19.51
+awscli==1.19.84
     # via
     #   awscli-cwlogs
     #   notifications-utils
@@ -18,22 +18,22 @@ blinker==1.4
     # via
     #   -r requirements.in
     #   gds-metrics
-boto3==1.17.51
+boto3==1.17.84
     # via notifications-utils
-botocore==1.20.51
+botocore==1.20.84
     # via
     #   awscli
     #   boto3
     #   s3transfer
-cachetools==4.2.1
+cachetools==4.2.2
     # via notifications-utils
-certifi==2020.12.5
+certifi==2021.5.30
     # via requests
 cffi==1.14.5
     # via cryptography
 chardet==4.0.0
     # via requests
-click==7.1.2
+click==8.0.1
     # via flask
 colorama==0.4.3
     # via awscli
@@ -47,7 +47,7 @@ docopt==0.6.2
     # via notifications-python-client
 docutils==0.15.2
     # via awscli
-et-xmlfile==1.0.1
+et-xmlfile==1.1.0
     # via openpyxl
 eventlet==0.30.2 # pyup: ignore
     # via -r requirements.in
@@ -57,7 +57,7 @@ flask-login==0.5.0
     # via -r requirements.in
 flask-redis==0.4.0
     # via notifications-utils
-flask-wtf==0.14.3
+flask-wtf==0.15.1
     # via -r requirements.in
 flask==1.1.2
     # via
@@ -77,14 +77,16 @@ govuk-bank-holidays==0.8
     #   notifications-utils
 git+https://github.com/alphagov/govuk-frontend-jinja.git@v0.5.8-alpha#egg=govuk-frontend-jinja==0.5.8-alpha
     # via -r requirements.in
-greenlet==1.0.0
+greenlet==1.1.0
     # via eventlet
 gunicorn==20.1.0
     # via -r requirements.in
-humanize==3.4.0
+humanize==3.6.0
     # via -r requirements.in
 idna==2.10
     # via requests
+importlib-metadata==4.4.0
+    # via click
 itsdangerous==1.1.0
     # via
     #   -r requirements.in
@@ -108,13 +110,13 @@ lxml==4.6.3
     # via
     #   pyexcel-ezodf
     #   pyexcel-ods3
-markupsafe==1.1.1
+markupsafe==2.0.1
     # via
     #   jinja2
     #   wtforms
 mistune==0.8.4
     # via notifications-utils
-notifications-python-client==6.0.2
+notifications-python-client==6.1.0
     # via -r requirements.in
 git+https://github.com/alphagov/notifications-utils.git@44.2.2#egg=notifications-utils==44.2.2
     # via -r requirements.in
@@ -124,7 +126,7 @@ orderedset==2.0.3
     # via notifications-utils
 packaging==20.9
     # via bleach
-phonenumbers==8.12.21
+phonenumbers==8.12.24
     # via notifications-utils
 prometheus-client==0.10.1
     # via
@@ -151,7 +153,7 @@ pyexcel-xlsx==0.6.0
     # via -r requirements.in
 pyexcel==0.6.6
     # via -r requirements.in
-pyjwt==2.0.1
+pyjwt==2.1.0
     # via notifications-python-client
 pyparsing==2.4.7
     # via packaging
@@ -183,7 +185,7 @@ rsa==4.7.2
     # via awscli
 rtreelib==0.2.0
     # via -r requirements.in
-s3transfer==0.3.7
+s3transfer==0.4.2
     # via
     #   awscli
     #   boto3
@@ -191,7 +193,7 @@ shapely==1.7.1
     # via
     #   -r requirements.in
     #   notifications-utils
-six==1.15.0
+six==1.16.0
     # via
     #   awscli-cwlogs
     #   bleach
@@ -206,7 +208,9 @@ statsd==3.3.0
     # via notifications-utils
 texttable==1.6.3
     # via pyexcel
-urllib3==1.26.4
+typing-extensions==3.10.0.0
+    # via importlib-metadata
+urllib3==1.26.5
     # via
     #   botocore
     #   requests
@@ -220,6 +224,8 @@ xlrd==1.2.0
     # via pyexcel-xls
 xlwt==1.3.0
     # via pyexcel-xls
+zipp==3.4.1
+    # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools

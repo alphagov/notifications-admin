@@ -10,7 +10,6 @@ import ago
 import dateutil
 import humanize
 from flask import Markup, url_for
-from flask._compat import string_types
 from notifications_utils.field import Field
 from notifications_utils.formatters import make_quotes_smart
 from notifications_utils.formatters import nl2br as utils_nl2br
@@ -23,7 +22,7 @@ from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
 
 
 def convert_to_boolean(value):
-    if isinstance(value, string_types):
+    if isinstance(value, str):
         if value.lower() in ['t', 'true', 'on', 'yes', '1']:
             return True
         elif value.lower() in ['f', 'false', 'off', 'no', '0']:
