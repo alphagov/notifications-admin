@@ -49,6 +49,7 @@ def webauthn_complete_register():
             cbor.decode(request.get_data()),
         )
     except RegistrationError as e:
+        current_app.logger.info(f'User {current_user.id} could not register a new webauthn token - {e}')
         return cbor.encode(str(e)), 400
 
     user_api_client.create_webauthn_credential_for_user(
