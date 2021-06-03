@@ -11,6 +11,7 @@ nhs.scot
 police.uk
 scotent.co.uk
 assembly.wales
+senedd.wales
 cjsm.net
 gov.wales
 ac.uk
@@ -19,3 +20,4 @@ onevoicewales.wales
 mtvh.co.uk
 wmca.org.uk
 suttonmail.org
+gp.hscni.net
