@@ -49,6 +49,7 @@ def webauthn_complete_register():
             cbor.decode(request.get_data()),
         )
     except RegistrationError as e:
+        current_app.logger.info(f'User {current_user.id} could not register a new webauthn token - {e}')
         return cbor.encode(str(e)), 400
 
     user_api_client.create_webauthn_credential_for_user(
@@ -66,6 +67,15 @@ def webauthn_complete_register():
 @main.route('/webauthn/authenticate', methods=['GET'])
 @redirect_to_sign_in
 def webauthn_begin_authentication():
+    """
+    Initiate the authentication flow. This is called after the user clicks the "Check security key" button.
+
+    1. Get the user's credentials out of the database to present to the browser. The browser will only let you use a
+    credential in that list.
+    2. Call webauthn_server.authenticate_begin. This returns the authentication data, which includes the challenge and
+    the origin domain to authenticate with. This also returns the state, which we store in the cookie so we can ensure
+    the challenge is correct in webauthn_complete_authentication
+    """
     # get user from session
     user_to_login = User.from_id(session['user_details']['id'])
 
@@ -77,7 +87,7 @@ def webauthn_begin_authentication():
 
     authentication_data, state = current_app.webauthn_server.authenticate_begin(
         credentials=user_to_login.webauthn_credentials_as_cbor,
-        user_verification=None,  # required, preferred, discouraged. sets whether to ask for PIN
+        user_verification="discouraged",  # don't ask for PIN
     )
     session["webauthn_authentication_state"] = state
     return cbor.encode(authentication_data)
@@ -86,6 +96,13 @@ def webauthn_begin_authentication():
 @main.route('/webauthn/authenticate', methods=['POST'])
 @redirect_to_sign_in
 def webauthn_complete_authentication():
+    """
+    Complete the authentication flow. This is called after the user taps on their security key.
+
+    1. Try verifying the signed challenge returned from the browser with each public key we have in the database for
+    that user.
+    2. If succesful, log the user in, setting up the session etc. Then return the URL they should be redirected to.
+    """
     user_id = session['user_details']['id']
     user_to_login = User.from_id(user_id)
 
@@ -153,7 +170,6 @@ def _complete_webauthn_login_attempt(user):
     logged_in, _ = user.complete_webauthn_login_attempt()
     if not logged_in:
         # user account is locked as too many failed logins
-
         abort(403)
 
     if not is_less_than_days_ago(user.email_access_validated_at, 90):

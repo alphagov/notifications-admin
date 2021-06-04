@@ -130,8 +130,6 @@ def test_process_sms_auth_sign_in_return_2fa_template(
             'email_address': email_address,
             'password': password})
     assert response.status_code == 302
-    # TODO: remove this assert once we start defaulting to returning two_factor_sms first
-    assert '/two-factor-sms' not in response.location
     assert response.location == url_for('.two_factor_sms', next=redirect_url, _external=True)
     mock_verify_password.assert_called_with(api_user_active['id'], password)
     mock_get_user_by_email.assert_called_with('valid@example.gov.uk')

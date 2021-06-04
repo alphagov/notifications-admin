@@ -128,8 +128,7 @@ class UserApiClient(NotifyAdminAPIClient):
     @cache.delete('user-{user_id}')
     def complete_webauthn_login_attempt(self, user_id, is_successful):
         data = {'successful': is_successful}
-        # TODO: Change this to `/complete/webauthn-login`
-        endpoint = f'/user/{user_id}/verify/webauthn-login'
+        endpoint = f'/user/{user_id}/complete/webauthn-login'
         try:
             self.post(endpoint, data=data)
             return True, ''
