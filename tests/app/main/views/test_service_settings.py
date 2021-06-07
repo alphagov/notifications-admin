@@ -5900,7 +5900,7 @@ def test_post_service_set_broadcast_network_makes_you_choose(
         ]),
     ]
 )
-def test_post_service_set_broadcast_account_type_confirmation_page(
+def test_post_service_confirm_broadcast_account_type_confirmation_page(
     client_request,
     platform_admin_user,
     value,
@@ -5926,7 +5926,7 @@ def test_post_service_set_broadcast_account_type_confirmation_page(
         ("live-government", "live", "government", "all"),
     ]
 )
-def test_post_service_set_broadcast_account_type_posts_data_to_api_and_redirects(
+def test_post_service_confirm_broadcast_account_type_posts_data_to_api_and_redirects(
     platform_admin_client,
     mocker,
     value,
@@ -5962,13 +5962,35 @@ def test_post_service_set_broadcast_account_type_posts_data_to_api_and_redirects
     )
 
 
-def test_post_service_set_broadcast_channel_makes_you_choose(
+@pytest.mark.parametrize('account_type', (
+    'foo-severe',
+    'training-foo',
+    'live-foo',
+    'live-government-foo'
+))
+def test_post_service_confirm_broadcast_account_type_errors_for_unknown_type(
     platform_admin_client,
     mocker,
+    account_type,
 ):
     set_service_broadcast_settings_mock = mocker.patch('app.service_api_client.set_service_broadcast_settings')
     mock_event_handler = mocker.patch('app.main.views.service_settings.create_broadcast_account_type_change_event')
 
+    response = platform_admin_client.post(
+        url_for(
+            'main.service_confirm_broadcast_account_type',
+            service_id=SERVICE_ONE_ID,
+            account_type=account_type,
+        )
+    )
+    assert response.status_code == 404
+    assert not set_service_broadcast_settings_mock.called
+    assert not mock_event_handler.called
+
+
+def test_post_service_set_broadcast_channel_makes_you_choose(
+    platform_admin_client,
+):
     response = platform_admin_client.post(
         url_for(
             'main.service_set_broadcast_channel',
@@ -5978,5 +6000,3 @@ def test_post_service_set_broadcast_channel_makes_you_choose(
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert 'Error: Select mode or channel' in page.find("span", {"class": "govuk-error-message"}).text
-    assert not set_service_broadcast_settings_mock.called
-    assert not mock_event_handler.called
