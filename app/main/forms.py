@@ -881,6 +881,13 @@ class GovukRadiosField(RadioField):
         return govuk_radios_field_widget(self, field, param_extensions=param_extensions, **kwargs)
 
 
+class OptionalGovukRadiosField(GovukRadiosField):
+    def pre_validate(self, form):
+        if self.data is None:
+            return
+        super().pre_validate(form)
+
+
 class OnOffField(GovukRadiosField):
 
     def __init__(self, label, choices=None, *args, **kwargs):
@@ -2384,13 +2391,6 @@ class ServiceBroadcastAccountTypeField(GovukRadiosField):
             self.provider_restriction = split_values[2]
 
 
-class OptionalServiceBroadcastAccountTypeField(ServiceBroadcastAccountTypeField):
-    def pre_validate(self, form):
-        if self.data is None:
-            return
-        super().pre_validate(form)
-
-
 class ServiceBroadcastChannelForm(StripWhitespaceForm):
     channel = ServiceBroadcastAccountTypeField(
         'Emergency alerts settings',
@@ -2409,13 +2409,6 @@ class ServiceBroadcastNetworkForm(StripWhitespaceForm):
         super().__init__(*args, **kwargs)
         self.broadcast_channel = broadcast_channel
 
-        self.network.choices = [
-            (f'live-{broadcast_channel}-ee', 'EE'),
-            (f'live-{broadcast_channel}-o2', 'O2'),
-            (f'live-{broadcast_channel}-vodafone', 'Vodafone'),
-            (f'live-{broadcast_channel}-three', 'Three'),
-        ]
-
     all_networks = OnOffField(
         'Choose a mobile network',
         choices=(
@@ -2423,9 +2416,15 @@ class ServiceBroadcastNetworkForm(StripWhitespaceForm):
             (False, 'A single network')
         ),
     )
-    network = OptionalServiceBroadcastAccountTypeField(
+    network = OptionalGovukRadiosField(
         'Choose a mobile network',
         thing='a mobile network',
+        choices=(
+            ('ee', 'EE'),
+            ('o2', 'O2'),
+            ('vodafone', 'Vodafone'),
+            ('three', 'Three'),
+        ),
     )
 
     @property
@@ -2433,7 +2432,7 @@ class ServiceBroadcastNetworkForm(StripWhitespaceForm):
         if self.all_networks.data:
             provider = 'all'
         else:
-            provider = self.network.provider_restriction
+            provider = self.network.data
 
         return f'live-{self.broadcast_channel}-{provider}'
 

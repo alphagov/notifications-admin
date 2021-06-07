@@ -5659,72 +5659,11 @@ def test_service_set_broadcast_channel_redirects(
         ),
         (
             "live",
-            "government",
-            "all",
-            [
-                ("All networks", "True"),
-            ],
-        ),
-        (
-            "live",
-            "test",
-            "all",
-            [
-                ("All networks", "True"),
-            ],
-        ),
-        (
-            "live",
             "test",
             "ee",
             [
                 ("A single network", "False"),
-                ("EE", "live-test-ee"),
-            ],
-        ),
-        (
-            "live",
-            "test",
-            "o2",
-            [
-                ("A single network", "False"),
-                ("O2", "live-test-o2"),
-            ],
-        ),
-        (
-            "live",
-            "test",
-            "three",
-            [
-                ("A single network", "False"),
-                ("Three", "live-test-three"),
-            ],
-        ),
-        (
-            "live",
-            "test",
-            "vodafone",
-            [
-                ("A single network", "False"),
-                ("Vodafone", "live-test-vodafone"),
-            ],
-        ),
-        (
-            "live",
-            "severe",
-            "vodafone",
-            [
-                ("A single network", "False"),
-                ("Vodafone", "live-severe-vodafone"),
-            ],
-        ),
-        (
-            "live",
-            "government",
-            "vodafone",
-            [
-                ("A single network", "False"),
-                ("Vodafone", "live-government-vodafone"),
+                ("EE", "ee"),
             ],
         ),
     ]
@@ -5764,33 +5703,26 @@ def test_service_set_broadcast_network_has_radio_selected(
 
 
 @pytest.mark.parametrize(
-    'broadcast_channel, provider, choice_type',
+    'broadcast_channel, data, expected_result',
     (
-        ('severe', 'all', 'network_variant'),
-        ('government', 'all', 'network_variant'),
-        ('test', 'all', 'network_variant'),
-        ('test', 'o2', 'network'),
-        ('test', 'ee', 'network'),
-        ('test', 'three', 'network'),
-        ('test', 'vodafone', 'network'),
-        ('government', 'vodafone', 'network'),
-        ('severe', 'vodafone', 'network'),
+        ('severe', {'all_networks': True}, 'live-severe-all'),
+        ('government', {'all_networks': True}, 'live-government-all'),
+        ('test', {'all_networks': True}, 'live-test-all'),
+        ('test', {'all_networks': False, 'network': 'o2'}, 'live-test-o2'),
+        ('test', {'all_networks': False, 'network': 'ee'}, 'live-test-ee'),
+        ('test', {'all_networks': False, 'network': 'three'}, 'live-test-three'),
+        ('test', {'all_networks': False, 'network': 'vodafone'}, 'live-test-vodafone'),
+        ('government', {'all_networks': False, 'network': 'vodafone'}, 'live-government-vodafone'),
+        ('severe', {'all_networks': False, 'network': 'vodafone'}, 'live-severe-vodafone'),
     ),
 )
 def test_service_set_broadcast_network(
     client_request,
     platform_admin_user,
     broadcast_channel,
-    provider,
-    choice_type,
+    data,
+    expected_result,
 ):
-    expected_result = f'live-{broadcast_channel}-{provider}'
-
-    if choice_type == 'network_variant':
-        data = {'all_networks': True}
-    else:
-        data = {'all_networks': False, 'network': expected_result}
-
     client_request.login(platform_admin_user)
     client_request.post(
         'main.service_set_broadcast_network',

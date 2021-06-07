@@ -355,21 +355,11 @@ def service_set_broadcast_network(service_id, broadcast_channel):
     if current_service.broadcast_channel == broadcast_channel:
         provider = current_service.allowed_broadcast_provider
 
-        if provider == 'all':
-            form = ServiceBroadcastNetworkForm(
-                broadcast_channel=broadcast_channel,
-                all_networks=True,
-            )
-        else:
-            form = ServiceBroadcastNetworkForm(
-                broadcast_channel=broadcast_channel,
-                all_networks=False,
-                network=(
-                    current_service.live,
-                    current_service.broadcast_channel,
-                    provider,
-                )
-            )
+        form = ServiceBroadcastNetworkForm(
+            broadcast_channel=broadcast_channel,
+            all_networks=provider == 'all',
+            network=provider if provider != 'all' else None,
+        )
     else:
         form = ServiceBroadcastNetworkForm(
             broadcast_channel=broadcast_channel
