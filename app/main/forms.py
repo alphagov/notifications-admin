@@ -2365,21 +2365,6 @@ class GoLiveNotesForm(StripWhitespaceForm):
 
 
 class ServiceBroadcastAccountTypeField(GovukRadiosField):
-    # When receiving Python data, eg when instantiating the form object
-    # we want to convert it from a tuple of
-    # (service_mode, broadcast_channel, allowed_broadcast_provider)
-    # to a value to be used in our form such as "live-severe-ee"
-    def process_data(self, value):
-        if not value or isinstance(value, str):
-            return super().process_data(value)
-        (live, broadcast_channel, allowed_broadcast_provider) = value
-        account_type = None
-        if broadcast_channel:
-            account_type = "live" if live else "training"
-            account_type += f"-{broadcast_channel}-{allowed_broadcast_provider}"
-
-        self.data = account_type
-
     # After validation we split the value back into its parts of service_mode
     # broadcast_channel and provider_restriction to be used by the flask route to send to the
     # API
