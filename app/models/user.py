@@ -360,6 +360,11 @@ class User(JSONModel, UserMixin):
             for credential in self.webauthn_credentials
         ]
 
+    def create_webauthn_credential(self, credential):
+        user_api_client.create_webauthn_credential_for_user(
+            self.id, credential
+        )
+
     def serialize(self):
         dct = {
             "id": self.id,
