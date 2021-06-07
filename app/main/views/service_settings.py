@@ -381,7 +381,7 @@ def service_set_broadcast_network(service_id, broadcast_channel):
         return redirect(url_for(
             '.service_confirm_broadcast_account_type',
             service_id=current_service.id,
-            account_type=form.network_variant.data or form.network.data,
+            account_type=form.account_type,
         ))
 
     return render_template(

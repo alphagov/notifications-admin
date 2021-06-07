@@ -2430,11 +2430,18 @@ class ServiceBroadcastNetworkForm(StripWhitespaceForm):
         thing='a mobile network',
     )
 
+    @property
+    def account_type(self):
+        if self.network_variant.data == f'live-{self.broadcast_channel}-all':
+            provider = 'all'
+        else:
+            provider = self.network.provider_restriction
+
+        return f'live-{self.broadcast_channel}-{provider}'
+
     def validate_network(self, field):
         if not self.network_variant.data and not field.data:
             raise ValidationError('Select a mobile network')
-        if self.network_variant.data == 'all':
-            field.data = ''
 
 
 class ServiceBroadcastAccountTypeForm(StripWhitespaceForm):
