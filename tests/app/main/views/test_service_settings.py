@@ -5962,29 +5962,21 @@ def test_post_service_set_broadcast_account_type_posts_data_to_api_and_redirects
     )
 
 
-@pytest.mark.parametrize('endpoint, extra_args, expected_error', (
-    ('main.service_set_broadcast_channel', {}, 'Error: Select mode or channel'),
-    ('main.service_set_broadcast_network', {'broadcast_channel': 'government'}, 'Error: Select a mobile network'),
-))
-def test_post_service_set_broadcast_account_type_shows_errors_if_no_radio_selected(
+def test_post_service_set_broadcast_channel_makes_you_choose(
     platform_admin_client,
     mocker,
-    endpoint,
-    extra_args,
-    expected_error,
 ):
     set_service_broadcast_settings_mock = mocker.patch('app.service_api_client.set_service_broadcast_settings')
     mock_event_handler = mocker.patch('app.main.views.service_settings.create_broadcast_account_type_change_event')
 
     response = platform_admin_client.post(
         url_for(
-            endpoint,
+            'main.service_set_broadcast_channel',
             service_id=SERVICE_ONE_ID,
-            **extra_args
         )
     )
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    assert expected_error in page.find("span", {"class": "govuk-error-message"}).text
+    assert 'Error: Select mode or channel' in page.find("span", {"class": "govuk-error-message"}).text
     assert not set_service_broadcast_settings_mock.called
     assert not mock_event_handler.called
