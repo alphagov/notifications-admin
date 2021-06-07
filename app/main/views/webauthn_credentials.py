@@ -53,6 +53,7 @@ def webauthn_complete_register():
         return cbor.encode(str(e)), 400
 
     current_user.create_webauthn_credential(credential)
+    current_user.update(auth_type='webauthn_auth')
 
     flash((
         'Registration complete. Next time you sign in to Notify '
