@@ -2369,9 +2369,7 @@ class ServiceBroadcastAccountTypeField(GovukRadiosField):
         account_type = None
         if broadcast_channel:
             account_type = "live" if live else "training"
-            account_type += f"-{broadcast_channel}"
-            if allowed_broadcast_provider != 'all':
-                account_type += f"-{allowed_broadcast_provider}"
+            account_type += f"-{broadcast_channel}-{allowed_broadcast_provider}"
 
         self.data = account_type
 
@@ -2383,7 +2381,7 @@ class ServiceBroadcastAccountTypeField(GovukRadiosField):
             split_values = self.data.split("-")
             self.service_mode = split_values[0]
             self.broadcast_channel = split_values[1]
-            self.provider_restriction = split_values[2] if len(split_values) == 3 else 'all'
+            self.provider_restriction = split_values[2]
 
 
 class OptionalServiceBroadcastAccountTypeField(ServiceBroadcastAccountTypeField):
@@ -2398,10 +2396,10 @@ class ServiceBroadcastChannelForm(StripWhitespaceForm):
         'Emergency alerts settings',
         thing='mode or channel',
         choices=[
-            ("training-test", "Training mode"),
-            ("live-test", "Test channel"),
-            ("live-severe", "Live channel"),
-            ("live-government", "Government channel"),
+            ("training-test-all", "Training mode"),
+            ("live-test-all", "Test channel"),
+            ("live-severe-all", "Live channel"),
+            ("live-government-all", "Government channel"),
         ],
     )
 
@@ -2412,7 +2410,7 @@ class ServiceBroadcastNetworkForm(StripWhitespaceForm):
         self.broadcast_channel = broadcast_channel
 
         self.network_variant.choices = [
-            (f'live-{broadcast_channel}', 'All networks'),
+            (f'live-{broadcast_channel}-all', 'All networks'),
             ('', 'A single network'),
         ]
 
@@ -2444,16 +2442,12 @@ class ServiceBroadcastAccountTypeForm(StripWhitespaceForm):
         'Change cell broadcast service type',
         thing='which type of account this cell broadcast service is',
         choices=[
-            ("training-test", "")
-        ] +
-        [
-            (f"live-{broadcast_channel}", "")
-            for broadcast_channel in ["test", "severe", "government"]
+            ("training-test-all", "")
         ] +
         [
             (f"live-{broadcast_channel}-{provider}", "")
             for broadcast_channel in ["test", "severe", "government"]
-            for provider in ["ee", "o2", "three", "vodafone"]
+            for provider in ["all", "ee", "o2", "three", "vodafone"]
         ],
         validators=[DataRequired()]
     )
