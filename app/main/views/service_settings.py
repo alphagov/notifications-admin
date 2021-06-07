@@ -353,23 +353,21 @@ def service_set_broadcast_channel(service_id):
 def service_set_broadcast_network(service_id, broadcast_channel):
     # only populate old settings when the channel is unchanged
     if current_service.broadcast_channel == broadcast_channel:
-        if current_service.allowed_broadcast_provider == 'all':
+        provider = current_service.allowed_broadcast_provider
+
+        if provider == 'all':
             form = ServiceBroadcastNetworkForm(
                 broadcast_channel=broadcast_channel,
-                network_variant=(
-                    current_service.live,
-                    current_service.broadcast_channel,
-                    current_service.allowed_broadcast_provider,
-                ),
+                all_networks=True,
             )
         else:
             form = ServiceBroadcastNetworkForm(
                 broadcast_channel=broadcast_channel,
-                network_variant='',
+                all_networks=False,
                 network=(
                     current_service.live,
                     current_service.broadcast_channel,
-                    current_service.allowed_broadcast_provider
+                    provider,
                 )
             )
     else:

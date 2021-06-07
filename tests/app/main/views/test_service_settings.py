@@ -5650,17 +5650,11 @@ def test_service_set_broadcast_channel_redirects(
     'service_mode,broadcast_channel,allowed_broadcast_provider,expected_selected',
     [
         (
-            "training",
-            "test",
-            "all",
-            [],
-        ),
-        (
             "live",
             "severe",
             "all",
             [
-                ("All networks", "live-severe-all"),
+                ("All networks", "True"),
             ],
         ),
         (
@@ -5668,7 +5662,7 @@ def test_service_set_broadcast_channel_redirects(
             "government",
             "all",
             [
-                ("All networks", "live-government-all"),
+                ("All networks", "True"),
             ],
         ),
         (
@@ -5676,7 +5670,7 @@ def test_service_set_broadcast_channel_redirects(
             "test",
             "all",
             [
-                ("All networks", "live-test-all"),
+                ("All networks", "True"),
             ],
         ),
         (
@@ -5684,7 +5678,7 @@ def test_service_set_broadcast_channel_redirects(
             "test",
             "ee",
             [
-                ("A single network", ""),
+                ("A single network", "False"),
                 ("EE", "live-test-ee"),
             ],
         ),
@@ -5693,7 +5687,7 @@ def test_service_set_broadcast_channel_redirects(
             "test",
             "o2",
             [
-                ("A single network", ""),
+                ("A single network", "False"),
                 ("O2", "live-test-o2"),
             ],
         ),
@@ -5702,7 +5696,7 @@ def test_service_set_broadcast_channel_redirects(
             "test",
             "three",
             [
-                ("A single network", ""),
+                ("A single network", "False"),
                 ("Three", "live-test-three"),
             ],
         ),
@@ -5711,7 +5705,7 @@ def test_service_set_broadcast_channel_redirects(
             "test",
             "vodafone",
             [
-                ("A single network", ""),
+                ("A single network", "False"),
                 ("Vodafone", "live-test-vodafone"),
             ],
         ),
@@ -5720,7 +5714,7 @@ def test_service_set_broadcast_channel_redirects(
             "severe",
             "vodafone",
             [
-                ("A single network", ""),
+                ("A single network", "False"),
                 ("Vodafone", "live-severe-vodafone"),
             ],
         ),
@@ -5729,7 +5723,7 @@ def test_service_set_broadcast_channel_redirects(
             "government",
             "vodafone",
             [
-                ("A single network", ""),
+                ("A single network", "False"),
                 ("Vodafone", "live-government-vodafone"),
             ],
         ),
@@ -5793,9 +5787,9 @@ def test_service_set_broadcast_network(
     expected_result = f'live-{broadcast_channel}-{provider}'
 
     if choice_type == 'network_variant':
-        data = {'network_variant': expected_result}
+        data = {'all_networks': True}
     else:
-        data = {'network_variant': '', 'network': expected_result}
+        data = {'all_networks': False, 'network': expected_result}
 
     client_request.login(platform_admin_user)
     client_request.post(
@@ -5817,7 +5811,7 @@ def test_service_set_broadcast_network(
     'data',
     (
         {},
-        {'network_variant': ''},  # Missing choice of MNO
+        {'all_networks': ''},  # Missing choice of MNO
     ),
 )
 @pytest.mark.parametrize('broadcast_channel', ['government', 'severe', 'test'])

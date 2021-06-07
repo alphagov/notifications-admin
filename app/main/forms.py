@@ -2409,11 +2409,6 @@ class ServiceBroadcastNetworkForm(StripWhitespaceForm):
         super().__init__(*args, **kwargs)
         self.broadcast_channel = broadcast_channel
 
-        self.network_variant.choices = [
-            (f'live-{broadcast_channel}-all', 'All networks'),
-            ('', 'A single network'),
-        ]
-
         self.network.choices = [
             (f'live-{broadcast_channel}-ee', 'EE'),
             (f'live-{broadcast_channel}-o2', 'O2'),
@@ -2421,9 +2416,12 @@ class ServiceBroadcastNetworkForm(StripWhitespaceForm):
             (f'live-{broadcast_channel}-three', 'Three'),
         ]
 
-    network_variant = ServiceBroadcastAccountTypeField(
+    all_networks = OnOffField(
         'Choose a mobile network',
-        thing='a mobile network',
+        choices=(
+            (True, 'All networks'),
+            (False, 'A single network')
+        ),
     )
     network = OptionalServiceBroadcastAccountTypeField(
         'Choose a mobile network',
@@ -2432,7 +2430,7 @@ class ServiceBroadcastNetworkForm(StripWhitespaceForm):
 
     @property
     def account_type(self):
-        if self.network_variant.data == f'live-{self.broadcast_channel}-all':
+        if self.all_networks.data:
             provider = 'all'
         else:
             provider = self.network.provider_restriction
@@ -2440,7 +2438,7 @@ class ServiceBroadcastNetworkForm(StripWhitespaceForm):
         return f'live-{self.broadcast_channel}-{provider}'
 
     def validate_network(self, field):
-        if not self.network_variant.data and not field.data:
+        if not self.all_networks.data and not field.data:
             raise ValidationError('Select a mobile network')
 
 
