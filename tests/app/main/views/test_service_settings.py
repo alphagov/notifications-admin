@@ -5485,7 +5485,7 @@ def test_update_service_billing_details(
     )
 
 
-def test_get_service_set_broadcast_account_type(
+def test_service_set_broadcast_channel(
     platform_admin_client,
 ):
     response = platform_admin_client.get(
@@ -5515,7 +5515,7 @@ def test_get_service_set_broadcast_account_type(
     )
 
 
-def test_get_service_set_broadcast_account_type_has_no_radio_selected_for_non_broadcast_service(
+def test_service_set_broadcast_channel_has_no_radio_selected_for_non_broadcast_service(
     platform_admin_client
 ):
     response = platform_admin_client.get(
@@ -5562,7 +5562,7 @@ def test_get_service_set_broadcast_account_type_has_no_radio_selected_for_non_br
         ),
     ]
 )
-def test_get_service_set_broadcast_account_type_has_radio_selected_for_broadcast_service(
+def test_service_set_broadcast_channel_has_radio_selected_for_broadcast_service(
     platform_admin_client,
     mocker,
     service_mode,
@@ -5622,7 +5622,7 @@ def test_get_service_set_broadcast_account_type_has_radio_selected_for_broadcast
         ),
     ]
 )
-def test_get_service_set_broadcast_channel_redirects(
+def test_service_set_broadcast_channel_redirects(
     client_request,
     platform_admin_user,
     mocker,
@@ -5735,7 +5735,7 @@ def test_get_service_set_broadcast_channel_redirects(
         ),
     ]
 )
-def test_get_service_set_broadcast_network_has_radio_selected(
+def test_service_set_broadcast_network_has_radio_selected(
     client_request,
     platform_admin_user,
     mocker,
@@ -5783,7 +5783,7 @@ def test_get_service_set_broadcast_network_has_radio_selected(
         ('severe', 'vodafone', 'network'),
     ),
 )
-def test_post_service_set_broadcast_network(
+def test_service_set_broadcast_network(
     client_request,
     platform_admin_user,
     broadcast_channel,
@@ -5821,7 +5821,7 @@ def test_post_service_set_broadcast_network(
     ),
 )
 @pytest.mark.parametrize('broadcast_channel', ['government', 'severe', 'test'])
-def test_post_service_set_broadcast_network_makes_you_choose(
+def test_service_set_broadcast_network_makes_you_choose(
     client_request,
     platform_admin_user,
     mocker,
@@ -5900,7 +5900,7 @@ def test_post_service_set_broadcast_network_makes_you_choose(
         ]),
     ]
 )
-def test_post_service_confirm_broadcast_account_type_confirmation_page(
+def test_service_confirm_broadcast_account_type_confirmation_page(
     client_request,
     platform_admin_user,
     value,
@@ -5926,7 +5926,7 @@ def test_post_service_confirm_broadcast_account_type_confirmation_page(
         ("live-government", "live", "government", "all"),
     ]
 )
-def test_post_service_confirm_broadcast_account_type_posts_data_to_api_and_redirects(
+def test_service_confirm_broadcast_account_type_posts_data_to_api_and_redirects(
     platform_admin_client,
     mocker,
     value,
@@ -5968,7 +5968,7 @@ def test_post_service_confirm_broadcast_account_type_posts_data_to_api_and_redir
     'live-foo',
     'live-government-foo'
 ))
-def test_post_service_confirm_broadcast_account_type_errors_for_unknown_type(
+def test_service_confirm_broadcast_account_type_errors_for_unknown_type(
     platform_admin_client,
     mocker,
     account_type,
@@ -5988,7 +5988,7 @@ def test_post_service_confirm_broadcast_account_type_errors_for_unknown_type(
     assert not mock_event_handler.called
 
 
-def test_post_service_set_broadcast_channel_makes_you_choose(
+def test_service_set_broadcast_channel_makes_you_choose(
     platform_admin_client,
 ):
     response = platform_admin_client.post(
