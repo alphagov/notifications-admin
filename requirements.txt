@@ -81,7 +81,7 @@ greenlet==1.1.0
     # via eventlet
 gunicorn==20.1.0
     # via -r requirements.in
-humanize==3.6.0
+humanize==3.7.1
     # via -r requirements.in
 idna==2.10
     # via requests
