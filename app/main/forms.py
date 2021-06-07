@@ -2392,14 +2392,14 @@ class ServiceBroadcastAccountTypeField(GovukRadiosField):
 
 
 class ServiceBroadcastChannelForm(StripWhitespaceForm):
-    channel = ServiceBroadcastAccountTypeField(
+    channel = GovukRadiosField(
         'Emergency alerts settings',
         thing='mode or channel',
         choices=[
-            ("training-test-all", "Training mode"),
-            ("live-test-all", "Test channel"),
-            ("live-severe-all", "Live channel"),
-            ("live-government-all", "Government channel"),
+            ("training", "Training mode"),
+            ("test", "Test channel"),
+            ("severe", "Live channel"),
+            ("government", "Government channel"),
         ],
     )
 

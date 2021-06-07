@@ -5537,28 +5537,14 @@ def test_service_set_broadcast_channel_has_no_radio_selected_for_non_broadcast_s
             "test",
             "all",
             "Training mode",
-            "training-test-all",
-        ),
-        (
-            "live",
-            "test",
-            "vodafone",
-            "Test channel",
-            "live-test-all",
-        ),
-        (
-            "live",
-            "severe",
-            "all",
-            "Live channel",
-            "live-severe-all",
+            "training",
         ),
         (
             "live",
             "government",
             "all",
             "Government channel",
-            "live-government-all",
+            "government",
         ),
     ]
 )
@@ -5598,25 +5584,25 @@ def test_service_set_broadcast_channel_has_radio_selected_for_broadcast_service(
 
 
 @pytest.mark.parametrize(
-    'account_type,expected_redirect_endpoint,extra_args',
+    'channel,expected_redirect_endpoint,extra_args',
     [
         (
-            'training-test-all',
+            'training',
             '.service_confirm_broadcast_account_type',
             {'account_type': 'training-test-all'},
         ),
         (
-            'live-test-all',
+            'test',
             '.service_set_broadcast_network',
             {'broadcast_channel': 'test'},
         ),
         (
-            'live-severe-all',
+            'severe',
             '.service_set_broadcast_network',
             {'broadcast_channel': 'severe'},
         ),
         (
-            'live-government-all',
+            'government',
             '.service_set_broadcast_network',
             {'broadcast_channel': 'government'},
         ),
@@ -5626,7 +5612,7 @@ def test_service_set_broadcast_channel_redirects(
     client_request,
     platform_admin_user,
     mocker,
-    account_type,
+    channel,
     expected_redirect_endpoint,
     extra_args,
 ):
@@ -5635,7 +5621,7 @@ def test_service_set_broadcast_channel_redirects(
         'main.service_set_broadcast_channel',
         service_id=SERVICE_ONE_ID,
         _data={
-            'channel': account_type,
+            'channel': channel,
         },
         _expected_redirect=url_for(
             expected_redirect_endpoint,

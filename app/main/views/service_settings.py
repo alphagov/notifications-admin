@@ -321,25 +321,27 @@ def service_set_permission(service_id, permission):
 @main.route("/services/<uuid:service_id>/service-settings/broadcasts", methods=["GET", "POST"])
 @user_is_platform_admin
 def service_set_broadcast_channel(service_id):
-    form = ServiceBroadcastChannelForm(
-        channel=(
-            current_service.live,
-            current_service.broadcast_channel,
-            'all',
-        )
-    )
+    if current_service.has_permission('broadcast'):
+        if current_service.live:
+            channel = current_service.broadcast_channel
+        else:
+            channel = 'training'
+    else:
+        channel = None
+
+    form = ServiceBroadcastChannelForm(channel=channel)
 
     if form.validate_on_submit():
-        if form.channel.service_mode == 'training':
+        if form.channel.data == 'training':
             return redirect(url_for(
                 '.service_confirm_broadcast_account_type',
                 service_id=current_service.id,
-                account_type=form.channel.data,
+                account_type='training-test-all'
             ))
         return redirect(url_for(
             '.service_set_broadcast_network',
             service_id=current_service.id,
-            broadcast_channel=form.channel.broadcast_channel,
+            broadcast_channel=form.channel.data,
         ))
 
     return render_template(
