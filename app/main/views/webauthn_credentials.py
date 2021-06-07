@@ -57,8 +57,7 @@ def webauthn_complete_register():
     )
 
     flash((
-        'Registration complete. Next time you sign in to Notify '
-        'you’ll be asked to use your security key.'
+        'Registration complete.'
     ), 'default_with_tick')
 
     return cbor.encode('')
