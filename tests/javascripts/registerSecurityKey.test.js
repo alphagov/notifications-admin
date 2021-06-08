@@ -2,13 +2,6 @@ beforeAll(() => {
   window.CBOR = require('../../node_modules/cbor-js/cbor.js')
   require('../../app/assets/javascripts/registerSecurityKey.js')
 
-  // disable console.error() so we don't see it in test output
-  // you might need to comment this out to debug some failures
-  jest.spyOn(console, 'error').mockImplementation(() => {})
-
-  // ensure window.alert() is implemented to simplify errors
-  jest.spyOn(window, 'alert').mockImplementation(() => {})
-
   // populate missing values to allow consistent jest.spyOn()
   window.fetch = () => {}
   window.navigator.credentials = { create: () => {} }
@@ -26,6 +19,13 @@ describe('Register security key', () => {
   let button
 
   beforeEach(() => {
+    // disable console.error() so we don't see it in test output
+    // you might need to comment this out to debug some failures
+    jest.spyOn(console, 'error').mockImplementation(() => {})
+
+    // ensure window.alert() is implemented to simplify errors
+    jest.spyOn(window, 'alert').mockImplementation(() => {})
+
     document.body.innerHTML = `
       <a href="#" role="button" draggable="false" class="govuk-button govuk-button--secondary" data-module="register-security-key">
         Register a key
@@ -33,6 +33,10 @@ describe('Register security key', () => {
 
     button = document.querySelector('[data-module="register-security-key"]')
     window.GOVUK.modules.start()
+  })
+
+  afterEach(() => {
+    jest.restoreAllMocks()
   })
 
   test('creates a new credential and reloads', (done) => {

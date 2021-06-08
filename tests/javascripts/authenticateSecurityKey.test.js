@@ -2,40 +2,39 @@ beforeAll(() => {
   window.CBOR = require('../../node_modules/cbor-js/cbor.js')
   require('../../app/assets/javascripts/authenticateSecurityKey.js')
 
-  // disable console.error() so we don't see it in test output
-  // you might need to comment this out to debug some failures
-  jest.spyOn(console, 'error').mockImplementation(() => { })
-
-  // ensure window.alert() is implemented to simplify errors
-  jest.spyOn(window, 'alert').mockImplementation(() => { })
+  // populate missing values to allow consistent jest.spyOn()
+  window.fetch = () => { }
+  window.navigator.credentials = { get: () => { } }
 })
 
 afterAll(() => {
   require('./support/teardown.js')
+
+  // restore window attributes to their original undefined state
+  delete window.fetch
+  delete window.navigator.credentials
 })
 
 describe('Authenticate with security key', () => {
   let button
 
   beforeEach(() => {
+    // disable console.error() so we don't see it in test output
+    // you might need to comment this out to debug some failures
+    jest.spyOn(console, 'error').mockImplementation(() => { })
+
+    // ensure window.alert() is implemented to simplify errors
+    jest.spyOn(window, 'alert').mockImplementation(() => { })
+
     document.body.innerHTML = `
-    <button type="submit" data-module="authenticate-security-key" data-csrf-token="abc123"></button>
-    `
+      <button type="submit" data-module="authenticate-security-key" data-csrf-token="abc123"></button>`
+
     button = document.querySelector('[data-module="authenticate-security-key"]')
-
-    // populate missing values to allow consistent jest.spyOn()
-    window.fetch = () => { }
-    window.navigator.credentials = { get: () => { } }
-    window.alert = () => { }
-
     window.GOVUK.modules.start()
   })
 
   afterEach(() => {
-    // restore window attributes to their original undefined state
-    delete window.fetch
-    delete window.navigator.credentials
-    delete window.alert
+    jest.restoreAllMocks()
   })
 
   test('authenticates a credential and redirects based on the admin app response', (done) => {
