@@ -112,6 +112,7 @@ def test_begin_register_stores_state_in_session(
 def test_complete_register_creates_credential(
     platform_admin_user,
     platform_admin_client,
+    mock_update_user_attribute,
     mocker,
 ):
     with platform_admin_client.session_transaction() as session:
@@ -134,6 +135,10 @@ def test_complete_register_creates_credential(
     assert response.status_code == 200
     credential_mock.assert_called_once_with('state', 'public_key_credential')
     user_api_mock.assert_called_once_with(platform_admin_user['id'], 'cred')
+    mock_update_user_attribute.assert_called_once_with(
+        platform_admin_user['id'],
+        auth_type='webauthn_auth',
+    )
 
 
 def test_complete_register_clears_session(

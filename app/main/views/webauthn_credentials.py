@@ -52,9 +52,8 @@ def webauthn_complete_register():
         current_app.logger.info(f'User {current_user.id} could not register a new webauthn token - {e}')
         return cbor.encode(str(e)), 400
 
-    user_api_client.create_webauthn_credential_for_user(
-        current_user.id, credential
-    )
+    current_user.create_webauthn_credential(credential)
+    current_user.update(auth_type='webauthn_auth')
 
     flash((
         'Registration complete. Next time you sign in to Notify '
