@@ -50,12 +50,14 @@ from app.utils import (
     generate_next_dict,
     generate_previous_dict,
     get_errors_for_csv,
-    get_letter_printing_statement,
-    get_letter_validation_error,
     get_page_from_request,
     get_sample_template,
     get_template,
     unicode_truncate,
+)
+from app.utils.letters import (
+    get_letter_printing_statement,
+    get_letter_validation_error,
 )
 from app.utils.user import user_has_permissions
 

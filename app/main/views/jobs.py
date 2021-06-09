@@ -37,11 +37,13 @@ from app.utils import (
     generate_next_dict,
     generate_notifications_csv,
     generate_previous_dict,
-    get_letter_printing_statement,
     get_page_from_request,
     parse_filter_args,
-    printing_today_or_tomorrow,
     set_status_filters,
+)
+from app.utils.letters import (
+    get_letter_printing_statement,
+    printing_today_or_tomorrow,
 )
 from app.utils.user import user_has_permissions
 
