@@ -11,7 +11,7 @@ from app.models.roles_and_permissions import (
     translate_permissions_from_admin_roles_to_db,
     translate_permissions_from_db_to_admin_roles,
 )
-from app.utils import user_has_permissions
+from app.utils.user import user_has_permissions
 from tests import service_json
 from tests.conftest import (
     ORGANISATION_ID,

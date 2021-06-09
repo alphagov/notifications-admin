@@ -42,8 +42,8 @@ from app.utils import (
     parse_filter_args,
     printing_today_or_tomorrow,
     set_status_filters,
-    user_has_permissions,
 )
+from app.utils.user import user_has_permissions
 
 
 @main.route("/services/<uuid:service_id>/jobs")

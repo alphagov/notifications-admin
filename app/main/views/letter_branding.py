@@ -25,7 +25,8 @@ from app.s3_client.s3_logo_client import (
     persist_logo,
     upload_letter_temp_logo,
 )
-from app.utils import get_logo_cdn_domain, user_is_platform_admin
+from app.utils import get_logo_cdn_domain
+from app.utils.user import user_is_platform_admin
 
 
 @main.route("/letter-branding", methods=['GET'])

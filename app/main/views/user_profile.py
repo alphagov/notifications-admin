@@ -27,7 +27,7 @@ from app.main.forms import (
     TwoFactorForm,
 )
 from app.models.user import User
-from app.utils import (
+from app.utils.user import (
     user_is_gov_user,
     user_is_logged_in,
     user_is_platform_admin,

@@ -43,7 +43,7 @@ from app.main.views.dashboard import (
 from app.main.views.service_settings import get_branding_as_value_and_label
 from app.models.organisation import Organisation, Organisations
 from app.models.user import InvitedOrgUser, User
-from app.utils import user_has_permissions, user_is_platform_admin
+from app.utils.user import user_has_permissions, user_is_platform_admin
 
 
 @main.route("/organisations", methods=['GET'])

@@ -8,7 +8,7 @@ from app import current_service, notification_api_client, service_api_client
 from app.main import main
 from app.main.forms import SearchByNameForm
 from app.models.template_list import TemplateList
-from app.utils import user_has_permissions
+from app.utils.user import user_has_permissions
 
 
 @main.route("/services/<uuid:service_id>/conversation/<uuid:notification_id>")

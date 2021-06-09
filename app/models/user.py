@@ -15,7 +15,7 @@ from app.notify_client import InviteTokenError
 from app.notify_client.invite_api_client import invite_api_client
 from app.notify_client.org_invite_api_client import org_invite_api_client
 from app.notify_client.user_api_client import user_api_client
-from app.utils import is_gov_user
+from app.utils.user import is_gov_user
 
 
 def _get_service_id_from_view_args():

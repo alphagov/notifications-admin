@@ -6,7 +6,7 @@ from flask import redirect, render_template, url_for
 from app import service_api_client
 from app.main import main
 from app.main.forms import SearchByNameForm
-from app.utils import user_is_platform_admin
+from app.utils.user import user_is_platform_admin
 
 
 @main.route("/find-services-by-name", methods=['GET', 'POST'])

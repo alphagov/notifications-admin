@@ -30,7 +30,7 @@ from app.main.forms import (
 )
 from app.models.roles_and_permissions import broadcast_permissions, permissions
 from app.models.user import InvitedUser, User
-from app.utils import is_gov_user, user_has_permissions
+from app.utils.user import is_gov_user, user_has_permissions
 
 
 @main.route("/services/<uuid:service_id>/users")

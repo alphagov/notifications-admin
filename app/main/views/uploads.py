@@ -56,8 +56,8 @@ from app.utils import (
     get_sample_template,
     get_template,
     unicode_truncate,
-    user_has_permissions,
 )
+from app.utils.user import user_has_permissions
 
 MAX_FILE_UPLOAD_SIZE = 2 * 1024 * 1024  # 2MB
 

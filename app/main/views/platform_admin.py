@@ -32,8 +32,8 @@ from app.utils import (
     generate_next_dict,
     generate_previous_dict,
     get_page_from_request,
-    user_is_platform_admin,
 )
+from app.utils.user import user_is_platform_admin
 
 COMPLAINT_THRESHOLD = 0.02
 FAILURE_THRESHOLD = 3

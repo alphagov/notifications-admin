@@ -57,8 +57,8 @@ from app.utils import (
     get_template,
     should_skip_template_page,
     unicode_truncate,
-    user_has_permissions,
 )
+from app.utils.user import user_has_permissions
 
 letter_address_columns = [
     column.replace('_', ' ')

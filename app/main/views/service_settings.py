@@ -62,10 +62,8 @@ from app.main.forms import (
     SetLetterBranding,
     SMSPrefixForm,
 )
-from app.utils import (
-    DELIVERED_STATUSES,
-    FAILURE_STATUSES,
-    SENDING_STATUSES,
+from app.utils import DELIVERED_STATUSES, FAILURE_STATUSES, SENDING_STATUSES
+from app.utils.user import (
     user_has_permissions,
     user_is_gov_user,
     user_is_platform_admin,

@@ -8,7 +8,7 @@ from app.main import main
 from app.main.forms import AcceptAgreementForm
 from app.models.organisation import Organisation
 from app.s3_client.s3_mou_client import get_mou
-from app.utils import user_has_permissions
+from app.utils.user import user_has_permissions
 
 
 @main.route('/services/<uuid:service_id>/agreement')

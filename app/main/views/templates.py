@@ -43,9 +43,8 @@ from app.utils import (
     NOTIFICATION_TYPES,
     get_template,
     should_skip_template_page,
-    user_has_permissions,
-    user_is_platform_admin,
 )
+from app.utils.user import user_has_permissions, user_is_platform_admin
 
 form_objects = {
     'email': EmailTemplateForm,

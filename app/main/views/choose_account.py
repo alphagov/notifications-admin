@@ -4,7 +4,8 @@ from flask_login import current_user
 from app import status_api_client
 from app.main import main
 from app.models.organisation import Organisations
-from app.utils import PermanentRedirect, user_is_logged_in
+from app.utils import PermanentRedirect
+from app.utils.user import user_is_logged_in
 
 
 @main.route("/services")

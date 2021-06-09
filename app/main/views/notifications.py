@@ -44,8 +44,8 @@ from app.utils import (
     get_template,
     parse_filter_args,
     set_status_filters,
-    user_has_permissions,
 )
+from app.utils.user import user_has_permissions
 
 
 @main.route("/services/<uuid:service_id>/notification/<uuid:notification_id>")

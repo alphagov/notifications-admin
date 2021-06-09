@@ -2,7 +2,7 @@ from flask import render_template
 
 from app import inbound_number_client
 from app.main import main
-from app.utils import user_is_platform_admin
+from app.utils.user import user_is_platform_admin
 
 
 @main.route('/inbound-sms-admin', methods=['GET', 'POST'])
