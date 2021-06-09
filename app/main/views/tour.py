@@ -9,7 +9,7 @@ from app.main.views.send import (
     get_placeholder_form_instance,
     get_recipient_and_placeholders_from_session,
 )
-from app.utils import get_template
+from app.utils.templates import get_template
 from app.utils.user import user_has_permissions
 
 

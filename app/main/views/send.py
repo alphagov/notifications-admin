@@ -52,12 +52,11 @@ from app.s3_client.s3_csv_client import (
 from app.template_previews import TemplatePreview, get_page_count_for_letter
 from app.utils import (
     PermanentRedirect,
-    Spreadsheet,
-    get_errors_for_csv,
-    get_template,
     should_skip_template_page,
     unicode_truncate,
 )
+from app.utils.csv import Spreadsheet, get_errors_for_csv
+from app.utils.templates import get_template
 from app.utils.user import user_has_permissions
 
 letter_address_columns = [

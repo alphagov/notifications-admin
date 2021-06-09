@@ -35,12 +35,12 @@ from app.main.forms import SearchNotificationsForm
 from app.models.job import Job
 from app.utils import (
     generate_next_dict,
-    generate_notifications_csv,
     generate_previous_dict,
     get_page_from_request,
     parse_filter_args,
     set_status_filters,
 )
+from app.utils.csv import generate_notifications_csv
 from app.utils.letters import (
     get_letter_printing_statement,
     printing_today_or_tomorrow,

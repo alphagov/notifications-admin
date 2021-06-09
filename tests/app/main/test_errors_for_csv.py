@@ -2,7 +2,7 @@ from collections import namedtuple
 
 import pytest
 
-from app.utils import get_errors_for_csv
+from app.utils.csv import get_errors_for_csv
 
 MockRecipients = namedtuple(
     'RecipientCSV',

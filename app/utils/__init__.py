@@ -17,20 +17,10 @@ from flask import (
 )
 from flask_login import current_user
 from notifications_utils.field import Field
-from notifications_utils.recipients import RecipientCSV
-from notifications_utils.template import (
-    BroadcastPreviewTemplate,
-    EmailPreviewTemplate,
-    LetterImageTemplate,
-    LetterPreviewTemplate,
-    SMSPreviewTemplate,
-)
 from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
 from orderedset._orderedset import OrderedSet
 from werkzeug.datastructures import MultiDict
 from werkzeug.routing import RequestRedirect
-
-from app.models.spreadsheet import Spreadsheet
 
 SENDING_STATUSES = ['created', 'pending', 'sending', 'pending-virus-check']
 DELIVERED_STATUSES = ['delivered', 'sent', 'returned-letter']
@@ -65,122 +55,6 @@ def redirect_to_sign_in(f):
     return wrapped
 
 
-def get_errors_for_csv(recipients, template_type):
-
-    errors = []
-
-    if any(recipients.rows_with_bad_recipients):
-        number_of_bad_recipients = len(list(recipients.rows_with_bad_recipients))
-        if 'sms' == template_type:
-            if 1 == number_of_bad_recipients:
-                errors.append("fix 1 phone number")
-            else:
-                errors.append("fix {} phone numbers".format(number_of_bad_recipients))
-        elif 'email' == template_type:
-            if 1 == number_of_bad_recipients:
-                errors.append("fix 1 email address")
-            else:
-                errors.append("fix {} email addresses".format(number_of_bad_recipients))
-        elif 'letter' == template_type:
-            if 1 == number_of_bad_recipients:
-                errors.append("fix 1 address")
-            else:
-                errors.append("fix {} addresses".format(number_of_bad_recipients))
-
-    if any(recipients.rows_with_missing_data):
-        number_of_rows_with_missing_data = len(list(recipients.rows_with_missing_data))
-        if 1 == number_of_rows_with_missing_data:
-            errors.append("enter missing data in 1 row")
-        else:
-            errors.append("enter missing data in {} rows".format(number_of_rows_with_missing_data))
-
-    if any(recipients.rows_with_message_too_long):
-        number_of_rows_with_message_too_long = len(list(recipients.rows_with_message_too_long))
-        if 1 == number_of_rows_with_message_too_long:
-            errors.append("shorten the message in 1 row")
-        else:
-            errors.append("shorten the messages in {} rows".format(number_of_rows_with_message_too_long))
-
-    if any(recipients.rows_with_empty_message):
-        number_of_rows_with_empty_message = len(list(recipients.rows_with_empty_message))
-        if 1 == number_of_rows_with_empty_message:
-            errors.append("check you have content for the empty message in 1 row")
-        else:
-            errors.append("check you have content for the empty messages in {} rows".format(
-                number_of_rows_with_empty_message
-            ))
-
-    return errors
-
-
-def get_sample_template(template_type):
-    if template_type == 'email':
-        return EmailPreviewTemplate({'content': 'any', 'subject': '', 'template_type': 'email'})
-    if template_type == 'sms':
-        return SMSPreviewTemplate({'content': 'any', 'template_type': 'sms'})
-    if template_type == 'letter':
-        return LetterImageTemplate(
-            {'content': 'any', 'subject': '', 'template_type': 'letter'}, postage='second', image_url='x', page_count=1
-        )
-
-
-def generate_notifications_csv(**kwargs):
-    from app import notification_api_client
-    from app.s3_client.s3_csv_client import s3download
-    if 'page' not in kwargs:
-        kwargs['page'] = 1
-
-    if kwargs.get('job_id'):
-        original_file_contents = s3download(kwargs['service_id'], kwargs['job_id'])
-        original_upload = RecipientCSV(
-            original_file_contents,
-            template=get_sample_template(kwargs['template_type']),
-        )
-        original_column_headers = original_upload.column_headers
-        fieldnames = ['Row number'] + original_column_headers + ['Template', 'Type', 'Job', 'Status', 'Time']
-    else:
-        fieldnames = ['Recipient', 'Reference', 'Template', 'Type', 'Sent by', 'Sent by email', 'Job', 'Status', 'Time']
-
-    yield ','.join(fieldnames) + '\n'
-
-    while kwargs['page']:
-        notifications_resp = notification_api_client.get_notifications_for_service(**kwargs)
-        for notification in notifications_resp['notifications']:
-            if kwargs.get('job_id'):
-                values = [
-                    notification['row_number'],
-                ] + [
-                    original_upload[notification['row_number'] - 1].get(header).data
-                    for header in original_column_headers
-                ] + [
-                    notification['template_name'],
-                    notification['template_type'],
-                    notification['job_name'],
-                    notification['status'],
-                    notification['created_at'],
-                ]
-            else:
-                values = [
-                    # the recipient for precompiled letters is the full address block
-                    notification['recipient'].splitlines()[0].lstrip().rstrip(' ,'),
-                    notification['client_reference'],
-                    notification['template_name'],
-                    notification['template_type'],
-                    notification['created_by_name'] or '',
-                    notification['created_by_email_address'] or '',
-                    notification['job_name'] or '',
-                    notification['status'],
-                    notification['created_at']
-                ]
-            yield Spreadsheet.from_rows([map(str, values)]).as_csv_data
-
-        if notifications_resp['links'].get('next'):
-            kwargs['page'] += 1
-        else:
-            return
-    raise Exception("Should never reach here")
-
-
 def get_page_from_request():
     if 'page' in request.args:
         try:
@@ -209,57 +83,6 @@ def generate_previous_next_dict(view, service_id, page, title, url_args):
 
 def get_help_argument():
     return request.args.get('help') if request.args.get('help') in ('1', '2', '3') else None
-
-
-def get_template(
-    template,
-    service,
-    show_recipient=False,
-    letter_preview_url=None,
-    page_count=1,
-    redact_missing_personalisation=False,
-    email_reply_to=None,
-    sms_sender=None,
-):
-    if 'email' == template['template_type']:
-        return EmailPreviewTemplate(
-            template,
-            from_name=service.name,
-            from_address='{}@notifications.service.gov.uk'.format(service.email_from),
-            show_recipient=show_recipient,
-            redact_missing_personalisation=redact_missing_personalisation,
-            reply_to=email_reply_to,
-        )
-    if 'sms' == template['template_type']:
-        return SMSPreviewTemplate(
-            template,
-            prefix=service.name,
-            show_prefix=service.prefix_sms,
-            sender=sms_sender,
-            show_sender=bool(sms_sender),
-            show_recipient=show_recipient,
-            redact_missing_personalisation=redact_missing_personalisation,
-        )
-    if 'letter' == template['template_type']:
-        if letter_preview_url:
-            return LetterImageTemplate(
-                template,
-                image_url=letter_preview_url,
-                page_count=int(page_count),
-                contact_block=template['reply_to_text'],
-                postage=template['postage'],
-            )
-        else:
-            return LetterPreviewTemplate(
-                template,
-                contact_block=template['reply_to_text'],
-                admin_base_url=current_app.config['ADMIN_BASE_URL'],
-                redact_missing_personalisation=redact_missing_personalisation,
-            )
-    if 'broadcast' == template['template_type']:
-        return BroadcastPreviewTemplate(
-            template,
-        )
 
 
 def get_current_financial_year():
