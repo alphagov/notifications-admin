@@ -99,6 +99,9 @@ describe('Authenticate with security key', () => {
   });
 
   test('authenticates and passes a redirect url through to the authenticate admin endpoint', (done) => {
+    // https://github.com/facebook/jest/issues/890#issuecomment-415202799
+    window.history.pushState({}, 'Test Title', '/?next=%2Ffoo%3Fbar%3Dbaz');
+
     jest.spyOn(window, 'fetch')
       .mockImplementationOnce((_url) => {
         // initial fetch of options from the server
