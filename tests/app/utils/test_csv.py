@@ -1,11 +1,15 @@
-from collections import OrderedDict
+from collections import OrderedDict, namedtuple
 from csv import DictReader
 from io import StringIO
 from pathlib import Path
 
 import pytest
 
-from app.utils.csv import Spreadsheet, generate_notifications_csv
+from app.utils.csv import (
+    Spreadsheet,
+    generate_notifications_csv,
+    get_errors_for_csv,
+)
 from tests.conftest import fake_uuid
 
 
@@ -246,3 +250,112 @@ def test_generate_notifications_csv_calls_twice_if_next_link(
     # mock_calls[0][2] is the kwargs from first call
     assert mock_get_notifications.mock_calls[0][2]['page'] == 1
     assert mock_get_notifications.mock_calls[1][2]['page'] == 2
+
+
+MockRecipients = namedtuple(
+    'RecipientCSV',
+    [
+        'rows_with_bad_recipients',
+        'rows_with_missing_data',
+        'rows_with_message_too_long',
+        'rows_with_empty_message'
+    ]
+)
+
+
+@pytest.mark.parametrize(
+    "rows_with_bad_recipients, rows_with_missing_data, "
+    "rows_with_message_too_long, rows_with_empty_message, template_type, expected_errors",
+    [
+        (
+            [], [], [], [],
+            'sms',
+            []
+        ),
+        (
+            {2}, [], [], [],
+            'sms',
+            ['fix 1 phone number']
+        ),
+        (
+            {2, 4, 6}, [], [], [],
+            'sms',
+            ['fix 3 phone numbers']
+        ),
+        (
+            {1}, [], [], [],
+            'email',
+            ['fix 1 email address']
+        ),
+        (
+            {2, 4, 6}, [], [], [],
+            'email',
+            ['fix 3 email addresses']
+        ),
+        (
+            {2}, [], [], [],
+            'letter',
+            ['fix 1 address']
+        ),
+        (
+            {2, 4}, [], [], [],
+            'letter',
+            ['fix 2 addresses']
+        ),
+        (
+            {2}, {3}, [], [],
+            'sms',
+            [
+                'fix 1 phone number',
+                'enter missing data in 1 row'
+            ]
+        ),
+        (
+            {2, 4, 6, 8}, {3, 6, 9, 12}, [], [],
+            'sms',
+            [
+                'fix 4 phone numbers',
+                'enter missing data in 4 rows'
+            ]
+        ),
+        (
+            {}, {}, {3}, [],
+            'sms',
+            [
+                'shorten the message in 1 row'
+            ]
+        ),
+        (
+            {}, {}, {3, 12}, [],
+            'sms',
+            [
+                'shorten the messages in 2 rows'
+            ]
+        ),
+        (
+            {}, {}, {}, {2},
+            'sms',
+            [
+                'check you have content for the empty message in 1 row'
+            ]
+        ),
+        (
+            {}, {}, {}, {2, 4, 8},
+            'sms',
+            [
+                'check you have content for the empty messages in 3 rows'
+            ]
+        ),
+    ]
+)
+def test_get_errors_for_csv(
+    rows_with_bad_recipients, rows_with_missing_data, rows_with_message_too_long, rows_with_empty_message,
+    template_type,
+    expected_errors
+):
+    assert get_errors_for_csv(
+        MockRecipients(
+            rows_with_bad_recipients, rows_with_missing_data, rows_with_message_too_long, rows_with_empty_message
+        ),
+        template_type
+    ) == expected_errors
