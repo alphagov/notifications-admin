@@ -131,22 +131,10 @@ describe('Authenticate with security key', () => {
         // subsequent POST of credential data to server
         expect(url.toString()).toEqual(
           'https://www.notifications.service.gov.uk/webauthn/authenticate?next=%2Ffoo%3Fbar%3Dbaz'
-          );
+        );
 
-        // mark the test as done here as we've finished all our asserts - if something goes wrong later and
-        // we end up in the alert mock, that `done(msg)` will override this and mark the test as failed
         done();
-
-        const loginResponse = window.CBOR.encode({ redirect_url: '/foo' })
-        return Promise.resolve({
-          ok: true, arrayBuffer: () => Promise.resolve(loginResponse)
-        })
       })
-
-    // make sure we error out if alert is called
-    jest.spyOn(window, 'alert').mockImplementation((msg) => {
-      done(msg)
-    })
 
     button.click()
   });
