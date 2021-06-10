@@ -86,7 +86,7 @@ describe('Authenticate with security key', () => {
 
     jest.spyOn(window.location, 'assign').mockImplementation((href) => {
       expect(href).toEqual("/foo")
-      done();
+      done()
     })
 
     // this will make the test fail if the alert is called
@@ -95,11 +95,11 @@ describe('Authenticate with security key', () => {
     })
 
     button.click()
-  });
+  })
 
   test('authenticates and passes a redirect url through to the authenticate admin endpoint', (done) => {
     // https://github.com/facebook/jest/issues/890#issuecomment-415202799
-    window.history.pushState({}, 'Test Title', '/?next=%2Ffoo%3Fbar%3Dbaz');
+    window.history.pushState({}, 'Test Title', '/?next=%2Ffoo%3Fbar%3Dbaz')
 
     jest.spyOn(window, 'fetch')
       .mockImplementationOnce((_url) => {
@@ -131,13 +131,13 @@ describe('Authenticate with security key', () => {
         // subsequent POST of credential data to server
         expect(url.toString()).toEqual(
           'https://www.notifications.service.gov.uk/webauthn/authenticate?next=%2Ffoo%3Fbar%3Dbaz'
-        );
+        )
 
-        done();
+        done()
       })
 
     button.click()
-  });
+  })
 
   test.each([
     ['network'],
@@ -179,7 +179,7 @@ describe('Authenticate with security key', () => {
     })
 
     button.click()
-  });
+  })
 
   test.each([
     ['network error'],
@@ -226,7 +226,7 @@ describe('Authenticate with security key', () => {
     })
 
     button.click()
-  });
+  })
 
 
   test('reloads page if POSTing WebAuthn credentials returns 403', (done) => {
@@ -263,7 +263,7 @@ describe('Authenticate with security key', () => {
 
     // assert that reload is called and the page is refreshed
     jest.spyOn(window.location, 'reload').mockImplementation(() => {
-      done();
+      done()
     })
 
     // this will make the test fail if the alert is called
@@ -272,7 +272,7 @@ describe('Authenticate with security key', () => {
     })
 
     button.click()
-  });
+  })
 
 
-});
+})

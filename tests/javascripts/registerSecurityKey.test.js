@@ -49,7 +49,7 @@ describe('Register security key', () => {
       return Promise.resolve({
         ok: true, arrayBuffer: () => webauthnOptions
       })
-    });
+    })
 
     jest.spyOn(window.navigator.credentials, 'create').mockImplementation((options) => {
       expect(options).toEqual('options')
@@ -71,7 +71,7 @@ describe('Register security key', () => {
       expect(decodedData.attestationObject).toEqual(new Uint8Array([1,2,3]))
       expect(options.headers['X-CSRFToken']).toBe()
       return Promise.resolve({ ok: true })
-    });
+    })
 
     jest.spyOn(window.location, 'reload').mockImplementation(() => {
       // signal that the async promise chain was called
