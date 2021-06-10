@@ -209,6 +209,7 @@ def test_begin_authentication_forbidden_for_non_platform_admins(client, api_user
 
 
 def test_begin_authentication_forbidden_for_users_without_webauthn(client, mocker, platform_admin_user):
+    platform_admin_user['auth_type'] = 'sms_auth'
     mocker.patch('app.user_api_client.get_user', return_value=platform_admin_user)
 
     with client.session_transaction() as session:
@@ -219,7 +220,6 @@ def test_begin_authentication_forbidden_for_users_without_webauthn(client, mocke
 
 
 def test_begin_authentication_returns_encoded_options(client, mocker, webauthn_credential, platform_admin_user):
-    platform_admin_user['auth_type'] = 'webauthn_auth'
     mocker.patch('app.user_api_client.get_user', return_value=platform_admin_user)
 
     with client.session_transaction() as session:
@@ -240,7 +240,6 @@ def test_begin_authentication_returns_encoded_options(client, mocker, webauthn_c
 
 
 def test_begin_authentication_stores_state_in_session(client, mocker, webauthn_credential, platform_admin_user):
-    platform_admin_user['auth_type'] = 'webauthn_auth'
     mocker.patch('app.user_api_client.get_user', return_value=platform_admin_user)
 
     with client.session_transaction() as session:
@@ -265,7 +264,6 @@ def test_complete_authentication_checks_credentials(
     webauthn_authentication_post_data,
     platform_admin_user
 ):
-    platform_admin_user['auth_type'] = 'webauthn_auth'
     mocker.patch('app.user_api_client.get_user', return_value=platform_admin_user)
     mocker.patch('app.models.webauthn_credential.WebAuthnCredentials.client_method', return_value=[webauthn_credential])
     mocker.patch(
@@ -287,7 +285,6 @@ def test_complete_authentication_403s_if_key_isnt_in_users_credentials(
     webauthn_authentication_post_data,
     platform_admin_user
 ):
-    platform_admin_user['auth_type'] = 'webauthn_auth'
     mocker.patch('app.user_api_client.get_user', return_value=platform_admin_user)
     # user has no keys in the database
     mocker.patch('app.models.webauthn_credential.WebAuthnCredentials.client_method', return_value=[])
@@ -320,7 +317,6 @@ def test_complete_authentication_clears_session(
     mock_create_event,
     platform_admin_user
 ):
-    platform_admin_user['auth_type'] = 'webauthn_auth'
     mocker.patch('app.user_api_client.get_user', return_value=platform_admin_user)
     mocker.patch('app.user_api_client.get_webauthn_credentials_for_user', return_value=[webauthn_credential])
     mocker.patch(
@@ -347,8 +343,6 @@ def test_verify_webauthn_login_signs_user_in(
     url_kwargs,
     expected_redirect,
 ):
-    platform_admin_user['auth_type'] = 'webauthn_auth'
-
     with client.session_transaction() as session:
         session['user_details'] = {
             'id': platform_admin_user['id'],
@@ -375,7 +369,6 @@ def test_verify_webauthn_login_signs_user_in_doesnt_sign_user_in_if_api_rejects(
     mocker,
     platform_admin_user,
 ):
-    platform_admin_user['auth_type'] = 'webauthn_auth'
 
     with client.session_transaction() as session:
         session['user_details'] = {
@@ -401,7 +394,6 @@ def test_verify_webauthn_login_signs_user_in_sends_revalidation_email_if_needed(
     mock_send_verify_code,
     platform_admin_user,
 ):
-    platform_admin_user['auth_type'] = 'webauthn_auth'
     user_details = {
         'id': platform_admin_user['id'],
         'email': platform_admin_user['email_address']

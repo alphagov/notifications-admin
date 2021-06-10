@@ -282,7 +282,6 @@ def test_two_factor_webauthn_should_have_auth_signin_button(
     platform_admin_user,
     mocker,
 ):
-    platform_admin_user['auth_type'] = 'webauthn_auth'
     mock_get_user = mocker.patch('app.user_api_client.get_user', return_value=platform_admin_user)
     with client.session_transaction() as session:
         session['user_details'] = {'id': platform_admin_user['id'], 'email': platform_admin_user['email_address']}
