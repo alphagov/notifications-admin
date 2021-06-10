@@ -142,19 +142,11 @@ class User(JSONModel, UserMixin):
         login_user(self)
         session['user_id'] = self.id
 
-    def sign_in(self):
-
-        session['user_details'] = {"email": self.email_address, "id": self.id}
-
-        if not self.is_active:
-            return False
-
+    def send_login_code(self):
         if self.email_auth:
             user_api_client.send_verify_code(self.id, 'email', None, request.args.get('next'))
         if self.sms_auth:
             user_api_client.send_verify_code(self.id, 'sms', self.mobile_number)
-
-        return True
 
     def sign_out(self):
         session.clear()

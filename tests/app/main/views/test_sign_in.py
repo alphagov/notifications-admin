@@ -1,7 +1,6 @@
 import uuid
 
 import pytest
-from bs4 import BeautifulSoup
 from flask import url_for
 
 from app.models.user import User
@@ -215,16 +214,22 @@ def test_should_return_200_when_user_does_not_exist(
 def test_should_return_redirect_when_user_is_pending(
     client,
     mock_get_user_by_email_pending,
+    api_user_pending,
     mock_verify_password,
 ):
     response = client.post(
-        url_for('main.sign_in'), data={
+        url_for('main.sign_in'),
+        data={
             'email_address': 'pending_user@example.gov.uk',
-            'password': 'val1dPassw0rd!'}, follow_redirects=True)
-
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    assert page.h1.string == 'Sign in'
-    assert response.status_code == 200
+            'password': 'val1dPassw0rd!'
+        }
+    )
+    assert response.location == url_for('main.resend_email_verification', _external=True)
+    with client.session_transaction() as s:
+        assert s['user_details'] == {
+            'email': api_user_pending['email_address'],
+            'id': api_user_pending['id']
+        }
 
 
 @pytest.mark.parametrize('redirect_url', [
