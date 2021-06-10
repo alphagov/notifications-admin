@@ -10,7 +10,7 @@ from app.models.roles_and_permissions import (
     all_permissions,
     translate_permissions_from_db_to_admin_roles,
 )
-from app.models.webauthn_credential import WebAuthnCredential
+from app.models.webauthn_credential import WebAuthnCredentials
 from app.notify_client import InviteTokenError
 from app.notify_client.invite_api_client import invite_api_client
 from app.notify_client.org_invite_api_client import org_invite_api_client
@@ -350,15 +350,7 @@ class User(JSONModel, UserMixin):
 
     @property
     def webauthn_credentials(self):
-        return [WebAuthnCredential(json) for json in
-                user_api_client.get_webauthn_credentials_for_user(self.id)]
-
-    @property
-    def webauthn_credentials_as_cbor(self):
-        return [
-            credential.to_credential_data()
-            for credential in self.webauthn_credentials
-        ]
+        return WebAuthnCredentials(self.id)
 
     def create_webauthn_credential(self, credential):
         user_api_client.create_webauthn_credential_for_user(

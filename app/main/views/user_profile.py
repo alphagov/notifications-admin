@@ -243,10 +243,6 @@ def user_profile_security_keys():
     )
 
 
-def get_key_from_list_of_keys(key_id, list_of_keys):
-    return next((key for key in list_of_keys if key.id == key_id), None)
-
-
 @main.route(
     "/user-profile/security-keys/<uuid:key_id>/manage",
     methods=['GET', 'POST'],
@@ -259,8 +255,7 @@ def get_key_from_list_of_keys(key_id, list_of_keys):
 )
 @user_is_platform_admin
 def user_profile_manage_security_key(key_id):
-    security_keys = current_user.webauthn_credentials
-    security_key = get_key_from_list_of_keys(key_id, security_keys)
+    security_key = current_user.webauthn_credentials.by_id(key_id)
 
     if not security_key:
         abort(404)
