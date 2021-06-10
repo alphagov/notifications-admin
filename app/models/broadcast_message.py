@@ -6,7 +6,10 @@ from notifications_utils.template import BroadcastPreviewTemplate
 from orderedset import OrderedSet
 from werkzeug.utils import cached_property
 
-from app.broadcast_areas import CustomBroadcastAreas, broadcast_area_libraries
+from app.broadcast_areas.models import (
+    CustomBroadcastAreas,
+    broadcast_area_libraries,
+)
 from app.formatters import round_to_significant_figures
 from app.models import JSONModel, ModelList
 from app.models.user import User
