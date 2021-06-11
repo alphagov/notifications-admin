@@ -5485,7 +5485,7 @@ def test_update_service_billing_details(
     )
 
 
-def test_get_service_set_broadcast_account_type(
+def test_service_set_broadcast_channel(
     platform_admin_client,
 ):
     response = platform_admin_client.get(
@@ -5515,7 +5515,7 @@ def test_get_service_set_broadcast_account_type(
     )
 
 
-def test_get_service_set_broadcast_account_type_has_no_radio_selected_for_non_broadcast_service(
+def test_service_set_broadcast_channel_has_no_radio_selected_for_non_broadcast_service(
     platform_admin_client
 ):
     response = platform_admin_client.get(
@@ -5562,7 +5562,7 @@ def test_get_service_set_broadcast_account_type_has_no_radio_selected_for_non_br
         ),
     ]
 )
-def test_get_service_set_broadcast_account_type_has_radio_selected_for_broadcast_service(
+def test_service_set_broadcast_channel_has_radio_selected_for_broadcast_service(
     platform_admin_client,
     mocker,
     service_mode,
@@ -5622,7 +5622,7 @@ def test_get_service_set_broadcast_account_type_has_radio_selected_for_broadcast
         ),
     ]
 )
-def test_get_service_set_broadcast_channel_redirects(
+def test_service_set_broadcast_channel_redirects(
     client_request,
     platform_admin_user,
     mocker,
@@ -5735,7 +5735,7 @@ def test_get_service_set_broadcast_channel_redirects(
         ),
     ]
 )
-def test_get_service_set_broadcast_network_has_radio_selected(
+def test_service_set_broadcast_network_has_radio_selected(
     client_request,
     platform_admin_user,
     mocker,
@@ -5783,7 +5783,7 @@ def test_get_service_set_broadcast_network_has_radio_selected(
         ('severe', 'vodafone', 'network'),
     ),
 )
-def test_post_service_set_broadcast_network(
+def test_service_set_broadcast_network(
     client_request,
     platform_admin_user,
     broadcast_channel,
@@ -5821,7 +5821,7 @@ def test_post_service_set_broadcast_network(
     ),
 )
 @pytest.mark.parametrize('broadcast_channel', ['government', 'severe', 'test'])
-def test_post_service_set_broadcast_network_makes_you_choose(
+def test_service_set_broadcast_network_makes_you_choose(
     client_request,
     platform_admin_user,
     mocker,
@@ -5900,7 +5900,7 @@ def test_post_service_set_broadcast_network_makes_you_choose(
         ]),
     ]
 )
-def test_post_service_set_broadcast_account_type_confirmation_page(
+def test_service_confirm_broadcast_account_type_confirmation_page(
     client_request,
     platform_admin_user,
     value,
@@ -5926,7 +5926,7 @@ def test_post_service_set_broadcast_account_type_confirmation_page(
         ("live-government", "live", "government", "all"),
     ]
 )
-def test_post_service_set_broadcast_account_type_posts_data_to_api_and_redirects(
+def test_service_confirm_broadcast_account_type_posts_data_to_api_and_redirects(
     platform_admin_client,
     mocker,
     value,
@@ -5962,29 +5962,41 @@ def test_post_service_set_broadcast_account_type_posts_data_to_api_and_redirects
     )
 
 
-@pytest.mark.parametrize('endpoint, extra_args, expected_error', (
-    ('main.service_set_broadcast_channel', {}, 'Error: Select mode or channel'),
-    ('main.service_set_broadcast_network', {'broadcast_channel': 'government'}, 'Error: Select a mobile network'),
+@pytest.mark.parametrize('account_type', (
+    'foo-severe',
+    'training-foo',
+    'live-foo',
+    'live-government-foo'
 ))
-def test_post_service_set_broadcast_account_type_shows_errors_if_no_radio_selected(
+def test_service_confirm_broadcast_account_type_errors_for_unknown_type(
     platform_admin_client,
     mocker,
-    endpoint,
-    extra_args,
-    expected_error,
+    account_type,
 ):
     set_service_broadcast_settings_mock = mocker.patch('app.service_api_client.set_service_broadcast_settings')
     mock_event_handler = mocker.patch('app.main.views.service_settings.create_broadcast_account_type_change_event')
 
     response = platform_admin_client.post(
         url_for(
-            endpoint,
+            'main.service_confirm_broadcast_account_type',
             service_id=SERVICE_ONE_ID,
-            **extra_args
+            account_type=account_type,
+        )
+    )
+    assert response.status_code == 404
+    assert not set_service_broadcast_settings_mock.called
+    assert not mock_event_handler.called
+
+
+def test_service_set_broadcast_channel_makes_you_choose(
+    platform_admin_client,
+):
+    response = platform_admin_client.post(
+        url_for(
+            'main.service_set_broadcast_channel',
+            service_id=SERVICE_ONE_ID,
         )
     )
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    assert expected_error in page.find("span", {"class": "govuk-error-message"}).text
-    assert not set_service_broadcast_settings_mock.called
-    assert not mock_event_handler.called
+    assert 'Error: Select mode or channel' in page.find("span", {"class": "govuk-error-message"}).text
