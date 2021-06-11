@@ -2,40 +2,39 @@ beforeAll(() => {
   window.CBOR = require('../../node_modules/cbor-js/cbor.js')
   require('../../app/assets/javascripts/authenticateSecurityKey.js')
 
-  // disable console.error() so we don't see it in test output
-  // you might need to comment this out to debug some failures
-  jest.spyOn(console, 'error').mockImplementation(() => { })
-
-  // ensure window.alert() is implemented to simplify errors
-  jest.spyOn(window, 'alert').mockImplementation(() => { })
+  // populate missing values to allow consistent jest.spyOn()
+  window.fetch = () => { }
+  window.navigator.credentials = { get: () => { } }
 })
 
 afterAll(() => {
   require('./support/teardown.js')
+
+  // restore window attributes to their original undefined state
+  delete window.fetch
+  delete window.navigator.credentials
 })
 
 describe('Authenticate with security key', () => {
   let button
 
   beforeEach(() => {
+    // disable console.error() so we don't see it in test output
+    // you might need to comment this out to debug some failures
+    jest.spyOn(console, 'error').mockImplementation(() => { })
+
+    // ensure window.alert() is implemented to simplify errors
+    jest.spyOn(window, 'alert').mockImplementation(() => { })
+
     document.body.innerHTML = `
-    <button type="submit" data-module="authenticate-security-key" data-csrf-token="abc123"></button>
-    `
+      <button type="submit" data-module="authenticate-security-key" data-csrf-token="abc123"></button>`
+
     button = document.querySelector('[data-module="authenticate-security-key"]')
-
-    // populate missing values to allow consistent jest.spyOn()
-    window.fetch = () => { }
-    window.navigator.credentials = { get: () => { } }
-    window.alert = () => { }
-
     window.GOVUK.modules.start()
   })
 
   afterEach(() => {
-    // restore window attributes to their original undefined state
-    delete window.fetch
-    delete window.navigator.credentials
-    delete window.alert
+    jest.restoreAllMocks()
   })
 
   test('authenticates a credential and redirects based on the admin app response', (done) => {
@@ -87,7 +86,7 @@ describe('Authenticate with security key', () => {
 
     jest.spyOn(window.location, 'assign').mockImplementation((href) => {
       expect(href).toEqual("/foo")
-      done();
+      done()
     })
 
     // this will make the test fail if the alert is called
@@ -96,11 +95,11 @@ describe('Authenticate with security key', () => {
     })
 
     button.click()
-  });
+  })
 
   test('authenticates and passes a redirect url through to the authenticate admin endpoint', (done) => {
     // https://github.com/facebook/jest/issues/890#issuecomment-415202799
-    window.history.pushState({}, 'Test Title', '/?next=%2Ffoo%3Fbar%3Dbaz');
+    window.history.pushState({}, 'Test Title', '/?next=%2Ffoo%3Fbar%3Dbaz')
 
     jest.spyOn(window, 'fetch')
       .mockImplementationOnce((_url) => {
@@ -132,25 +131,13 @@ describe('Authenticate with security key', () => {
         // subsequent POST of credential data to server
         expect(url.toString()).toEqual(
           'https://www.notifications.service.gov.uk/webauthn/authenticate?next=%2Ffoo%3Fbar%3Dbaz'
-          );
+        )
 
-        // mark the test as done here as we've finished all our asserts - if something goes wrong later and
-        // we end up in the alert mock, that `done(msg)` will override this and mark the test as failed
-        done();
-
-        const loginResponse = window.CBOR.encode({ redirect_url: '/foo' })
-        return Promise.resolve({
-          ok: true, arrayBuffer: () => Promise.resolve(loginResponse)
-        })
+        done()
       })
 
-    // make sure we error out if alert is called
-    jest.spyOn(window, 'alert').mockImplementation((msg) => {
-      done(msg)
-    })
-
     button.click()
-  });
+  })
 
   test.each([
     ['network'],
@@ -192,7 +179,7 @@ describe('Authenticate with security key', () => {
     })
 
     button.click()
-  });
+  })
 
   test.each([
     ['network error'],
@@ -239,7 +226,7 @@ describe('Authenticate with security key', () => {
     })
 
     button.click()
-  });
+  })
 
 
   test('reloads page if POSTing WebAuthn credentials returns 403', (done) => {
@@ -276,7 +263,7 @@ describe('Authenticate with security key', () => {
 
     // assert that reload is called and the page is refreshed
     jest.spyOn(window.location, 'reload').mockImplementation(() => {
-      done();
+      done()
     })
 
     // this will make the test fail if the alert is called
@@ -285,7 +272,7 @@ describe('Authenticate with security key', () => {
     })
 
     button.click()
-  });
+  })
 
 
-});
+})
