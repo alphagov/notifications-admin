@@ -851,6 +851,7 @@ def test_get_billing_report_when_calls_api_and_download_data(platform_admin_clie
         "app.main.views.platform_admin.billing_api_client.get_data_for_billing_report",
         return_value=[{
             'letter_breakdown': '6 second class letters at 45p\n2 first class letters at 35p\n',
+            'total_letters': 8,
             'letter_cost': 3.4,
             'organisation_id': '7832a1be-a1f0-4f2a-982f-05adfd3d6354',
             'organisation_name': 'Org for a - with sms and letter',
@@ -875,7 +876,7 @@ def test_get_billing_report_when_calls_api_and_download_data(platform_admin_clie
     )
 
     assert response.get_data(as_text=True) == (
-        'organisation_id,organisation_name,service_id,service_name,sms_cost,sms_fragments,letter_cost' +
+        'organisation_id,organisation_name,service_id,service_name,sms_cost,sms_fragments,total_letters,letter_cost' +
         ',letter_breakdown,purchase_order_number,contact_names,contact_email_addresses,billing_reference' +
 
         '\r\n' +
@@ -886,6 +887,7 @@ def test_get_billing_report_when_calls_api_and_download_data(platform_admin_clie
         'a - with sms and letter,' +
         '0,' +
         '0,' +
+        '8,' +
         '3.4,' +
         '"6 second class letters at 45p' +
         '\n' +
