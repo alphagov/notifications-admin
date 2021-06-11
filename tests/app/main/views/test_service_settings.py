@@ -5537,28 +5537,14 @@ def test_service_set_broadcast_channel_has_no_radio_selected_for_non_broadcast_s
             "test",
             "all",
             "Training mode",
-            "training-test",
-        ),
-        (
-            "live",
-            "test",
-            "vodafone",
-            "Test channel",
-            "live-test",
-        ),
-        (
-            "live",
-            "severe",
-            "all",
-            "Live channel",
-            "live-severe",
+            "training",
         ),
         (
             "live",
             "government",
             "all",
             "Government channel",
-            "live-government",
+            "government",
         ),
     ]
 )
@@ -5598,25 +5584,25 @@ def test_service_set_broadcast_channel_has_radio_selected_for_broadcast_service(
 
 
 @pytest.mark.parametrize(
-    'account_type,expected_redirect_endpoint,extra_args',
+    'channel,expected_redirect_endpoint,extra_args',
     [
         (
-            'training-test',
+            'training',
             '.service_confirm_broadcast_account_type',
-            {'account_type': 'training-test'},
+            {'account_type': 'training-test-all'},
         ),
         (
-            'live-test',
+            'test',
             '.service_set_broadcast_network',
             {'broadcast_channel': 'test'},
         ),
         (
-            'live-severe',
+            'severe',
             '.service_set_broadcast_network',
             {'broadcast_channel': 'severe'},
         ),
         (
-            'live-government',
+            'government',
             '.service_set_broadcast_network',
             {'broadcast_channel': 'government'},
         ),
@@ -5626,7 +5612,7 @@ def test_service_set_broadcast_channel_redirects(
     client_request,
     platform_admin_user,
     mocker,
-    account_type,
+    channel,
     expected_redirect_endpoint,
     extra_args,
 ):
@@ -5635,7 +5621,7 @@ def test_service_set_broadcast_channel_redirects(
         'main.service_set_broadcast_channel',
         service_id=SERVICE_ONE_ID,
         _data={
-            'channel': account_type,
+            'channel': channel,
         },
         _expected_redirect=url_for(
             expected_redirect_endpoint,
@@ -5650,33 +5636,11 @@ def test_service_set_broadcast_channel_redirects(
     'service_mode,broadcast_channel,allowed_broadcast_provider,expected_selected',
     [
         (
-            "training",
-            "test",
-            "all",
-            [],
-        ),
-        (
             "live",
             "severe",
             "all",
             [
-                ("All networks", "live-severe"),
-            ],
-        ),
-        (
-            "live",
-            "government",
-            "all",
-            [
-                ("All networks", "live-government"),
-            ],
-        ),
-        (
-            "live",
-            "test",
-            "all",
-            [
-                ("All networks", "live-test"),
+                ("All networks", "True"),
             ],
         ),
         (
@@ -5684,53 +5648,8 @@ def test_service_set_broadcast_channel_redirects(
             "test",
             "ee",
             [
-                ("A single network", ""),
-                ("EE", "live-test-ee"),
-            ],
-        ),
-        (
-            "live",
-            "test",
-            "o2",
-            [
-                ("A single network", ""),
-                ("O2", "live-test-o2"),
-            ],
-        ),
-        (
-            "live",
-            "test",
-            "three",
-            [
-                ("A single network", ""),
-                ("Three", "live-test-three"),
-            ],
-        ),
-        (
-            "live",
-            "test",
-            "vodafone",
-            [
-                ("A single network", ""),
-                ("Vodafone", "live-test-vodafone"),
-            ],
-        ),
-        (
-            "live",
-            "severe",
-            "vodafone",
-            [
-                ("A single network", ""),
-                ("Vodafone", "live-severe-vodafone"),
-            ],
-        ),
-        (
-            "live",
-            "government",
-            "vodafone",
-            [
-                ("A single network", ""),
-                ("Vodafone", "live-government-vodafone"),
+                ("A single network", "False"),
+                ("EE", "ee"),
             ],
         ),
     ]
@@ -5770,33 +5689,26 @@ def test_service_set_broadcast_network_has_radio_selected(
 
 
 @pytest.mark.parametrize(
-    'broadcast_channel, provider, choice_type',
+    'broadcast_channel, data, expected_result',
     (
-        ('severe', '', 'network_variant'),
-        ('government', '', 'network_variant'),
-        ('test', '', 'network_variant'),
-        ('test', 'o2', 'network'),
-        ('test', 'ee', 'network'),
-        ('test', 'three', 'network'),
-        ('test', 'vodafone', 'network'),
-        ('government', 'vodafone', 'network'),
-        ('severe', 'vodafone', 'network'),
+        ('severe', {'all_networks': True}, 'live-severe-all'),
+        ('government', {'all_networks': True}, 'live-government-all'),
+        ('test', {'all_networks': True}, 'live-test-all'),
+        ('test', {'all_networks': False, 'network': 'o2'}, 'live-test-o2'),
+        ('test', {'all_networks': False, 'network': 'ee'}, 'live-test-ee'),
+        ('test', {'all_networks': False, 'network': 'three'}, 'live-test-three'),
+        ('test', {'all_networks': False, 'network': 'vodafone'}, 'live-test-vodafone'),
+        ('government', {'all_networks': False, 'network': 'vodafone'}, 'live-government-vodafone'),
+        ('severe', {'all_networks': False, 'network': 'vodafone'}, 'live-severe-vodafone'),
     ),
 )
 def test_service_set_broadcast_network(
     client_request,
     platform_admin_user,
     broadcast_channel,
-    provider,
-    choice_type,
+    data,
+    expected_result,
 ):
-    if choice_type == 'network_variant':
-        expected_result = f'live-{broadcast_channel}'
-        data = {'network_variant': expected_result}
-    else:
-        expected_result = f'live-{broadcast_channel}-{provider}'
-        data = {'network_variant': '', 'network': expected_result}
-
     client_request.login(platform_admin_user)
     client_request.post(
         'main.service_set_broadcast_network',
@@ -5817,7 +5729,7 @@ def test_service_set_broadcast_network(
     'data',
     (
         {},
-        {'network_variant': ''},  # Missing choice of MNO
+        {'all_networks': ''},  # Missing choice of MNO
     ),
 )
 @pytest.mark.parametrize('broadcast_channel', ['government', 'severe', 'test'])
@@ -5844,7 +5756,7 @@ def test_service_set_broadcast_network_makes_you_choose(
 @pytest.mark.parametrize(
     'value, expected_paragraphs',
     [
-        ('training-test', [
+        ('training-test-all', [
             'Training',
             'No phones will receive alerts sent from this service.',
         ]),
@@ -5872,13 +5784,13 @@ def test_service_set_broadcast_network_makes_you_choose(
             'channel on their phones will receive alerts sent from '
             'this service.',
         ]),
-        ('live-test', [
+        ('live-test-all', [
             'Test',
             'Members of the public who have switched on the test '
             'channel on their phones will receive alerts sent from '
             'this service.',
         ]),
-        ('live-severe', [
+        ('live-severe-all', [
             'Live',
             'Members of the public will receive alerts sent from this '
             'service.',
@@ -5888,7 +5800,7 @@ def test_service_set_broadcast_network_makes_you_choose(
             'Members of the public will receive alerts sent from this '
             'service.',
         ]),
-        ('live-government', [
+        ('live-government-all', [
             'Government',
             'Members of the public will receive alerts sent from this '
             'service, even if they’ve opted out.'
@@ -5920,10 +5832,10 @@ def test_service_confirm_broadcast_account_type_confirmation_page(
 @pytest.mark.parametrize(
     'value,service_mode,broadcast_channel,allowed_broadcast_provider',
     [
-        ("training-test", "training", "test", "all"),
+        ("training-test-all", "training", "test", "all"),
         ("live-test-vodafone", "live", "test", "vodafone"),
-        ("live-severe", "live", "severe", "all"),
-        ("live-government", "live", "government", "all"),
+        ("live-severe-all", "live", "severe", "all"),
+        ("live-government-all", "live", "government", "all"),
     ]
 )
 def test_service_confirm_broadcast_account_type_posts_data_to_api_and_redirects(
@@ -5963,9 +5875,8 @@ def test_service_confirm_broadcast_account_type_posts_data_to_api_and_redirects(
 
 
 @pytest.mark.parametrize('account_type', (
-    'foo-severe',
-    'training-foo',
-    'live-foo',
+    'foo-test-ee',
+    'live-foo-all',
     'live-government-foo'
 ))
 def test_service_confirm_broadcast_account_type_errors_for_unknown_type(

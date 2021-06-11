@@ -19,9 +19,9 @@
         back_link=url_for('.service_set_broadcast_channel', service_id=current_service.id)
       ) }}
       {% call form_wrapper() %}
-        {% call select_wrapper(form.network_variant, hide_legend=True) %}
-          {% for option in form.network_variant %}
-            {{ radio(option, data_target='single-network' if option.data == "" else None) }}
+        {% call select_wrapper(form.all_networks, hide_legend=True) %}
+          {% for option in form.all_networks %}
+            {{ radio(option, data_target='single-network' if option.data == False else None) }}
           {% endfor %}
         {% endcall %}
         {% call conditional_radio_panel('single-network') %}

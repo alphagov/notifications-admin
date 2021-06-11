@@ -881,6 +881,13 @@ class GovukRadiosField(RadioField):
         return govuk_radios_field_widget(self, field, param_extensions=param_extensions, **kwargs)
 
 
+class OptionalGovukRadiosField(GovukRadiosField):
+    def pre_validate(self, form):
+        if self.data is None:
+            return
+        super().pre_validate(form)
+
+
 class OnOffField(GovukRadiosField):
 
     def __init__(self, label, choices=None, *args, **kwargs):
@@ -2358,23 +2365,6 @@ class GoLiveNotesForm(StripWhitespaceForm):
 
 
 class ServiceBroadcastAccountTypeField(GovukRadiosField):
-    # When receiving Python data, eg when instantiating the form object
-    # we want to convert it from a tuple of
-    # (service_mode, broadcast_channel, allowed_broadcast_provider)
-    # to a value to be used in our form such as "live-severe-ee"
-    def process_data(self, value):
-        if not value or isinstance(value, str):
-            return super().process_data(value)
-        (live, broadcast_channel, allowed_broadcast_provider) = value
-        account_type = None
-        if broadcast_channel:
-            account_type = "live" if live else "training"
-            account_type += f"-{broadcast_channel}"
-            if allowed_broadcast_provider != 'all':
-                account_type += f"-{allowed_broadcast_provider}"
-
-        self.data = account_type
-
     # After validation we split the value back into its parts of service_mode
     # broadcast_channel and provider_restriction to be used by the flask route to send to the
     # API
@@ -2383,25 +2373,18 @@ class ServiceBroadcastAccountTypeField(GovukRadiosField):
             split_values = self.data.split("-")
             self.service_mode = split_values[0]
             self.broadcast_channel = split_values[1]
-            self.provider_restriction = split_values[2] if len(split_values) == 3 else 'all'
-
-
-class OptionalServiceBroadcastAccountTypeField(ServiceBroadcastAccountTypeField):
-    def pre_validate(self, form):
-        if self.data is None:
-            return
-        super().pre_validate(form)
+            self.provider_restriction = split_values[2]
 
 
 class ServiceBroadcastChannelForm(StripWhitespaceForm):
-    channel = ServiceBroadcastAccountTypeField(
+    channel = GovukRadiosField(
         'Emergency alerts settings',
         thing='mode or channel',
         choices=[
-            ("training-test", "Training mode"),
-            ("live-test", "Test channel"),
-            ("live-severe", "Live channel"),
-            ("live-government", "Government channel"),
+            ("training", "Training mode"),
+            ("test", "Test channel"),
+            ("severe", "Live channel"),
+            ("government", "Government channel"),
         ],
     )
 
@@ -2411,32 +2394,36 @@ class ServiceBroadcastNetworkForm(StripWhitespaceForm):
         super().__init__(*args, **kwargs)
         self.broadcast_channel = broadcast_channel
 
-        self.network_variant.choices = [
-            (f'live-{broadcast_channel}', 'All networks'),
-            ('', 'A single network'),
-        ]
-
-        self.network.choices = [
-            (f'live-{broadcast_channel}-ee', 'EE'),
-            (f'live-{broadcast_channel}-o2', 'O2'),
-            (f'live-{broadcast_channel}-vodafone', 'Vodafone'),
-            (f'live-{broadcast_channel}-three', 'Three'),
-        ]
-
-    network_variant = ServiceBroadcastAccountTypeField(
+    all_networks = OnOffField(
+        'Choose a mobile network',
+        choices=(
+            (True, 'All networks'),
+            (False, 'A single network')
+        ),
+    )
+    network = OptionalGovukRadiosField(
         'Choose a mobile network',
         thing='a mobile network',
+        choices=(
+            ('ee', 'EE'),
+            ('o2', 'O2'),
+            ('vodafone', 'Vodafone'),
+            ('three', 'Three'),
+        ),
     )
-    network = OptionalServiceBroadcastAccountTypeField(
-        'Choose a mobile network',
-        thing='a mobile network',
-    )
+
+    @property
+    def account_type(self):
+        if self.all_networks.data:
+            provider = 'all'
+        else:
+            provider = self.network.data
+
+        return f'live-{self.broadcast_channel}-{provider}'
 
     def validate_network(self, field):
-        if not self.network_variant.data and not field.data:
+        if not self.all_networks.data and not field.data:
             raise ValidationError('Select a mobile network')
-        if self.network_variant.data == 'all':
-            field.data = ''
 
 
 class ServiceBroadcastAccountTypeForm(StripWhitespaceForm):
@@ -2444,16 +2431,12 @@ class ServiceBroadcastAccountTypeForm(StripWhitespaceForm):
         'Change cell broadcast service type',
         thing='which type of account this cell broadcast service is',
         choices=[
-            ("training-test", "")
-        ] +
-        [
-            (f"live-{broadcast_channel}", "")
-            for broadcast_channel in ["test", "severe", "government"]
+            ("training-test-all", "")
         ] +
         [
             (f"live-{broadcast_channel}-{provider}", "")
             for broadcast_channel in ["test", "severe", "government"]
-            for provider in ["ee", "o2", "three", "vodafone"]
+            for provider in ["all", "ee", "o2", "three", "vodafone"]
         ],
         validators=[DataRequired()]
     )
