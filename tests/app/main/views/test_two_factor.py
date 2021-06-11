@@ -212,7 +212,7 @@ def test_should_login_user_when_multiple_valid_codes_exist(
     assert response.status_code == 302
 
 
-def test_two_factor_should_set_password_when_new_password_exists_in_session(
+def test_two_factor_sms_should_set_password_when_new_password_exists_in_session(
     client,
     api_user_active,
     mock_get_user,
@@ -238,7 +238,7 @@ def test_two_factor_should_set_password_when_new_password_exists_in_session(
     )
 
 
-def test_two_factor_returns_error_when_user_is_locked(
+def test_two_factor_sms_returns_error_when_user_is_locked(
     client,
     api_user_locked,
     mock_get_locked_user,
@@ -256,7 +256,7 @@ def test_two_factor_returns_error_when_user_is_locked(
     assert 'Code not found' in response.get_data(as_text=True)
 
 
-def test_two_factor_post_should_redirect_to_sign_in_if_user_not_in_session(
+def test_two_factor_sms_post_should_redirect_to_sign_in_if_user_not_in_session(
     client_request,
 ):
     client_request.post(
@@ -267,7 +267,7 @@ def test_two_factor_post_should_redirect_to_sign_in_if_user_not_in_session(
 
 
 @pytest.mark.parametrize('endpoint', ['main.two_factor_webauthn', 'main.two_factor_sms'])
-def test_two_factor_get_should_redirect_to_sign_in_if_user_not_in_session(
+def test_two_factor_endpoints_get_should_redirect_to_sign_in_if_user_not_in_session(
     client_request,
     endpoint,
 ):
@@ -327,7 +327,7 @@ def test_two_factor_webauthn_should_reject_non_webauthn_auth_users(
     assert response.status_code == 403
 
 
-def test_two_factor_should_activate_pending_user(
+def test_two_factor_sms_should_activate_pending_user(
     client,
     mocker,
     api_user_pending,

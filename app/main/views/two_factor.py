@@ -66,7 +66,6 @@ def two_factor_email(token):
     return log_in_user(user_id)
 
 
-@main.route('/two-factor', methods=['GET', 'POST'])
 @main.route('/two-factor-sms', methods=['GET', 'POST'])
 @redirect_to_sign_in
 def two_factor_sms():
