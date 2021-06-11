@@ -3,7 +3,7 @@ from math import isclose
 import pytest
 from custom_polygons import BRISTOL, SKYE
 
-from app.broadcast_areas import (
+from app.broadcast_areas.models import (
     BroadcastAreasRepository,
     CustomBroadcastArea,
     broadcast_area_libraries,
