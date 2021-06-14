@@ -4,8 +4,6 @@ from freezegun import freeze_time
 from app import format_datetime_relative
 from app.formatters import email_safe, round_to_significant_figures
 from app.utils import (
-    generate_next_dict,
-    generate_previous_dict,
     get_current_financial_year,
     get_logo_cdn_domain,
     is_less_than_days_ago,
@@ -27,25 +25,6 @@ from app.utils import (
 ])
 def test_email_safe_return_dot_separated_email_domain(service_name, safe_email):
     assert email_safe(service_name) == safe_email
-
-
-def test_generate_previous_dict(client):
-    ret = generate_previous_dict('main.view_jobs', 'foo', 2, {})
-    assert 'page=1' in ret['url']
-    assert ret['title'] == 'Previous page'
-    assert ret['label'] == 'page 1'
-
-
-def test_generate_next_dict(client):
-    ret = generate_next_dict('main.view_jobs', 'foo', 2, {})
-    assert 'page=3' in ret['url']
-    assert ret['title'] == 'Next page'
-    assert ret['label'] == 'page 3'
-
-
-def test_generate_previous_next_dict_adds_other_url_args(client):
-    ret = generate_next_dict('main.view_notifications', 'foo', 2, {'message_type': 'blah'})
-    assert 'notifications/blah' in ret['url']
 
 
 def test_get_cdn_domain_on_localhost(client, mocker):

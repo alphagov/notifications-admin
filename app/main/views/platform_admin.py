@@ -27,12 +27,12 @@ from app.statistics_utils import (
     get_formatted_percentage,
     get_formatted_percentage_two_dp,
 )
-from app.utils import (
+from app.utils.csv import Spreadsheet
+from app.utils.pagination import (
     generate_next_dict,
     generate_previous_dict,
     get_page_from_request,
 )
-from app.utils.csv import Spreadsheet
 from app.utils.user import user_is_platform_admin
 
 COMPLAINT_THRESHOLD = 0.02
