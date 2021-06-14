@@ -16,7 +16,8 @@ from app import user_api_client
 from app.main import main
 from app.main.forms import TwoFactorForm
 from app.models.user import User
-from app.utils import is_less_than_days_ago, redirect_to_sign_in
+from app.utils import is_less_than_days_ago
+from app.utils.login import redirect_to_sign_in
 
 
 @main.route('/two-factor-email-sent', methods=['GET'])

@@ -5,16 +5,7 @@ from urllib.parse import urlparse
 
 import pytz
 from dateutil import parser
-from flask import (
-    abort,
-    current_app,
-    g,
-    make_response,
-    redirect,
-    request,
-    session,
-    url_for,
-)
+from flask import abort, current_app, g, make_response, request
 from flask_login import current_user
 from notifications_utils.field import Field
 from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
@@ -43,16 +34,6 @@ def service_has_permission(permission):
             return func(*args, **kwargs)
         return wrap_func
     return wrap
-
-
-def redirect_to_sign_in(f):
-    @wraps(f)
-    def wrapped(*args, **kwargs):
-        if 'user_details' not in session:
-            return redirect(url_for('main.sign_in'))
-        else:
-            return f(*args, **kwargs)
-    return wrapped
 
 
 def get_help_argument():
