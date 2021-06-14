@@ -37,15 +37,17 @@ from app.template_previews import get_page_count_for_letter
 from app.utils import (
     DELIVERED_STATUSES,
     FAILURE_STATUSES,
-    generate_notifications_csv,
     get_help_argument,
-    get_letter_printing_statement,
-    get_letter_validation_error,
-    get_template,
     parse_filter_args,
     set_status_filters,
-    user_has_permissions,
 )
+from app.utils.csv import generate_notifications_csv
+from app.utils.letters import (
+    get_letter_printing_statement,
+    get_letter_validation_error,
+)
+from app.utils.templates import get_template
+from app.utils.user import user_has_permissions
 
 
 @main.route("/services/<uuid:service_id>/notification/<uuid:notification_id>")

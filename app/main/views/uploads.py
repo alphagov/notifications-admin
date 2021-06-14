@@ -46,18 +46,18 @@ from app.s3_client.s3_letter_upload_client import (
 )
 from app.template_previews import TemplatePreview, sanitise_letter
 from app.utils import (
-    Spreadsheet,
     generate_next_dict,
     generate_previous_dict,
-    get_errors_for_csv,
+    get_page_from_request,
+    unicode_truncate,
+)
+from app.utils.csv import Spreadsheet, get_errors_for_csv
+from app.utils.letters import (
     get_letter_printing_statement,
     get_letter_validation_error,
-    get_page_from_request,
-    get_sample_template,
-    get_template,
-    unicode_truncate,
-    user_has_permissions,
 )
+from app.utils.templates import get_sample_template, get_template
+from app.utils.user import user_has_permissions
 
 MAX_FILE_UPLOAD_SIZE = 2 * 1024 * 1024  # 2MB
 

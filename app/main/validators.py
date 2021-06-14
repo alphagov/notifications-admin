@@ -12,7 +12,7 @@ from wtforms import ValidationError
 
 from app.main._commonly_used_passwords import commonly_used_passwords
 from app.models.spreadsheet import Spreadsheet
-from app.utils import is_gov_user
+from app.utils.user import is_gov_user
 
 
 class CommonlyUsedPassword:

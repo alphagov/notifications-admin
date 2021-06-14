@@ -30,13 +30,13 @@ from app.utils import (
     DELIVERED_STATUSES,
     FAILURE_STATUSES,
     REQUESTED_STATUSES,
-    Spreadsheet,
     generate_next_dict,
     generate_previous_dict,
     get_current_financial_year,
     service_has_permission,
-    user_has_permissions,
 )
+from app.utils.csv import Spreadsheet
+from app.utils.user import user_has_permissions
 
 
 @main.route("/services/<uuid:service_id>/dashboard")

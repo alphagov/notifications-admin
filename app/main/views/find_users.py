@@ -7,7 +7,7 @@ from app.event_handlers import create_archive_user_event
 from app.main import main
 from app.main.forms import SearchUsersByEmailForm
 from app.models.user import User
-from app.utils import user_is_platform_admin
+from app.utils.user import user_is_platform_admin
 
 
 @main.route("/find-users-by-email", methods=['GET', 'POST'])

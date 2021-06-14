@@ -23,7 +23,7 @@ from app.notify_client.api_key_api_client import (
     KEY_TYPE_TEAM,
     KEY_TYPE_TEST,
 )
-from app.utils import user_has_permissions
+from app.utils.user import user_has_permissions
 
 dummy_bearer_token = 'bearer_token_set'
 

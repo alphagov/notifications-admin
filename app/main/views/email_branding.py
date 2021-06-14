@@ -11,7 +11,8 @@ from app.s3_client.s3_logo_client import (
     persist_logo,
     upload_email_logo,
 )
-from app.utils import get_logo_cdn_domain, user_is_platform_admin
+from app.utils import get_logo_cdn_domain
+from app.utils.user import user_is_platform_admin
 
 
 @main.route("/email-branding", methods=['GET', 'POST'])

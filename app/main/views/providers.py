@@ -8,7 +8,7 @@ from werkzeug.utils import redirect
 from app import format_date_numeric, provider_client
 from app.main import main
 from app.main.forms import ProviderForm, ProviderRatioForm
-from app.utils import user_is_platform_admin
+from app.utils.user import user_is_platform_admin
 
 PROVIDER_PRIORITY_MEANING_SWITCHOVER = datetime(2019, 11, 29, 11, 0).isoformat()
 

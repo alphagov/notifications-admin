@@ -28,12 +28,12 @@ from app.statistics_utils import (
     get_formatted_percentage_two_dp,
 )
 from app.utils import (
-    Spreadsheet,
     generate_next_dict,
     generate_previous_dict,
     get_page_from_request,
-    user_is_platform_admin,
 )
+from app.utils.csv import Spreadsheet
+from app.utils.user import user_is_platform_admin
 
 COMPLAINT_THRESHOLD = 0.02
 FAILURE_THRESHOLD = 3

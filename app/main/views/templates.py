@@ -39,13 +39,9 @@ from app.main.views.send import get_sender_details
 from app.models.service import Service
 from app.models.template_list import TemplateList, TemplateLists
 from app.template_previews import TemplatePreview, get_page_count_for_letter
-from app.utils import (
-    NOTIFICATION_TYPES,
-    get_template,
-    should_skip_template_page,
-    user_has_permissions,
-    user_is_platform_admin,
-)
+from app.utils import NOTIFICATION_TYPES, should_skip_template_page
+from app.utils.templates import get_template
+from app.utils.user import user_has_permissions, user_is_platform_admin
 
 form_objects = {
     'email': EmailTemplateForm,

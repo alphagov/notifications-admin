@@ -5,7 +5,7 @@ import pytest
 from flask import url_for
 
 import app
-from app.utils import is_gov_user
+from app.utils.user import is_gov_user
 from tests.conftest import (
     ORGANISATION_ID,
     ORGANISATION_TWO_ID,

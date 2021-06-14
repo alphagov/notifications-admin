@@ -16,7 +16,7 @@ from app.s3_client.s3_csv_client import (
     s3upload,
     set_metadata_on_csv_upload,
 )
-from app.utils import get_sample_template
+from app.utils.templates import get_sample_template
 
 
 class ContactList(JSONModel):
