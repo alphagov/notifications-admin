@@ -16,8 +16,8 @@ from app import user_api_client
 from app.main import main
 from app.main.forms import TwoFactorForm
 from app.models.user import User
-from app.utils import is_less_than_days_ago
 from app.utils.login import (
+    email_needs_revalidating,
     log_in_user,
     redirect_to_sign_in,
     redirect_when_logged_in,
@@ -79,11 +79,11 @@ def two_factor_sms():
     redirect_url = request.args.get('next')
 
     if form.validate_on_submit():
-        if is_less_than_days_ago(user.email_access_validated_at, 90):
-            return log_in_user(user_id)
-        else:
+        if email_needs_revalidating(user):
             user_api_client.send_verify_code(user.id, 'email', None, redirect_url)
             return redirect(url_for('.revalidate_email_sent', next=redirect_url))
+        else:
+            return log_in_user(user_id)
 
     return render_template('views/two-factor-sms.html', form=form, redirect_url=redirect_url)
 

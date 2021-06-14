@@ -3,6 +3,7 @@ from functools import wraps
 from flask import redirect, request, session, url_for
 
 from app.models.user import User
+from app.utils.time import is_less_than_days_ago
 
 
 def redirect_to_sign_in(f):
@@ -39,6 +40,10 @@ def redirect_when_logged_in(platform_admin):
         return redirect(next_url)
 
     return redirect(url_for('main.show_accounts_or_dashboard'))
+
+
+def email_needs_revalidating(user):
+    return not is_less_than_days_ago(user.email_access_validated_at, 90)
 
 
 # see http://flask.pocoo.org/snippets/62/
