@@ -6,12 +6,11 @@ from flask_login import current_user
 from werkzeug.exceptions import Forbidden
 
 from app.main import main
-from app.main.views.two_factor import log_in_user
 from app.models.user import User
 from app.models.webauthn_credential import RegistrationError, WebAuthnCredential
 from app.notify_client.user_api_client import user_api_client
 from app.utils import is_less_than_days_ago
-from app.utils.login import redirect_to_sign_in
+from app.utils.login import log_in_user, redirect_to_sign_in
 from app.utils.user import user_is_platform_admin
 
 
