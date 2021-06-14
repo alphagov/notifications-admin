@@ -5501,6 +5501,7 @@ def test_service_set_broadcast_channel(
 
     expected_labels = [
         "Training mode",
+        "Operator channel",
         "Test channel",
         "Live channel",
         "Government channel",
@@ -5590,6 +5591,11 @@ def test_service_set_broadcast_channel_has_radio_selected_for_broadcast_service(
             'training',
             '.service_confirm_broadcast_account_type',
             {'account_type': 'training-test-all'},
+        ),
+        (
+            'operator',
+            '.service_set_broadcast_network',
+            {'broadcast_channel': 'operator'},
         ),
         (
             'test',
@@ -5693,6 +5699,7 @@ def test_service_set_broadcast_network_has_radio_selected(
     (
         ('severe', {'all_networks': True}, 'live-severe-all'),
         ('government', {'all_networks': True}, 'live-government-all'),
+        ('operator', {'all_networks': True}, 'live-operator-all'),
         ('test', {'all_networks': True}, 'live-test-all'),
         ('test', {'all_networks': False, 'network': 'o2'}, 'live-test-o2'),
         ('test', {'all_networks': False, 'network': 'ee'}, 'live-test-ee'),
@@ -5732,7 +5739,7 @@ def test_service_set_broadcast_network(
         {'all_networks': ''},  # Missing choice of MNO
     ),
 )
-@pytest.mark.parametrize('broadcast_channel', ['government', 'severe', 'test'])
+@pytest.mark.parametrize('broadcast_channel', ['government', 'severe', 'test', 'operator'])
 def test_service_set_broadcast_network_makes_you_choose(
     client_request,
     platform_admin_user,
@@ -5759,6 +5766,12 @@ def test_service_set_broadcast_network_makes_you_choose(
         ('training-test-all', [
             'Training',
             'No phones will receive alerts sent from this service.',
+        ]),
+        ('live-operator-all', [
+            'Operator',
+            'Members of the public who have switched on the operator '
+            'channel on their phones will receive alerts sent from '
+            'this service.',
         ]),
         ('live-test-ee', [
             'Test (EE)',
@@ -5833,6 +5846,7 @@ def test_service_confirm_broadcast_account_type_confirmation_page(
     'value,service_mode,broadcast_channel,allowed_broadcast_provider',
     [
         ("training-test-all", "training", "test", "all"),
+        ("live-operator-o2", "live", "operator", "o2"),
         ("live-test-vodafone", "live", "test", "vodafone"),
         ("live-severe-all", "live", "severe", "all"),
         ("live-government-all", "live", "government", "all"),

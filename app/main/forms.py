@@ -1312,10 +1312,10 @@ class ConfirmBroadcastForm(StripWhitespaceForm):
 
     @staticmethod
     def generate_label(channel, max_phones):
-        if channel == 'test':
+        if channel in {'test', 'operator'}:
             return (
-                'I understand this will alert anyone who has switched '
-                'on the test channel'
+                f'I understand this will alert anyone who has switched '
+                f'on the {channel} channel'
             )
         if channel == 'severe':
             return (
@@ -2382,6 +2382,7 @@ class ServiceBroadcastChannelForm(StripWhitespaceForm):
         thing='mode or channel',
         choices=[
             ("training", "Training mode"),
+            ("operator", "Operator channel"),
             ("test", "Test channel"),
             ("severe", "Live channel"),
             ("government", "Government channel"),
@@ -2435,7 +2436,7 @@ class ServiceBroadcastAccountTypeForm(StripWhitespaceForm):
         ] +
         [
             (f"live-{broadcast_channel}-{provider}", "")
-            for broadcast_channel in ["test", "severe", "government"]
+            for broadcast_channel in ["test", "operator", "severe", "government"]
             for provider in ["all", "ee", "o2", "three", "vodafone"]
         ],
         validators=[DataRequired()]

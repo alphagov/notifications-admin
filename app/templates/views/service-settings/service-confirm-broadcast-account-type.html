@@ -31,8 +31,8 @@
       {% else %}
         <p class="govuk-body">
           Members of the public
-          {% if form.account_type.broadcast_channel == 'test' %}
-            who have switched on the test channel on their phones
+          {% if form.account_type.broadcast_channel in ['test', 'operator'] %}
+            who have switched on the {{ form.account_type.broadcast_channel }} channel on their phones
           {% endif %}
           will receive alerts sent from this service
           {%- if form.account_type.broadcast_channel == 'government' -%}

@@ -323,6 +323,22 @@ def test_some_broadcast_tour_pages_show_service_name(
         ),
         (
             False,
+            'operator',
+            'all',
+            '.navigation-service-type.navigation-service-type--operator',
+            'service one Operator Switch service',
+            'Operator',
+        ),
+        (
+            False,
+            'operator',
+            'vodafone',
+            '.navigation-service-type.navigation-service-type--operator',
+            'service one Operator (Vodafone) Switch service',
+            'Operator (Vodafone)',
+        ),
+        (
+            False,
             'test',
             'all',
             '.navigation-service-type.navigation-service-type--test',
@@ -1854,6 +1870,9 @@ def test_view_pending_broadcast_from_api_call(
 @pytest.mark.parametrize('channel, expected_label_text', (
     ('test', (
         'I understand this will alert anyone who has switched on the test channel'
+    )),
+    ('operator', (
+        'I understand this will alert anyone who has switched on the operator channel'
     )),
     ('severe', (
         'I understand this will alert millions of people'
