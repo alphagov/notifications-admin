@@ -741,7 +741,7 @@ def test_big_numbers_dont_show_for_letters(
         ('letter', 'received', '27 September at 5:30pm', True),
         ('letter', 'accepted', '27 September at 5:30pm', True),
         ('letter', 'cancelled', '27 September at 5:30pm', False),  # The API won’t return cancelled letters
-        ('letter', 'permanent-failure', '27 September at 5:31pm', False),  # Deprecated for ‘cancelled’
+        ('letter', 'permanent-failure', 'Permanent failure 27 September at 5:31pm', False),
         ('letter', 'temporary-failure', '27 September at 5:30pm', False),  # Not currently a real letter status
         ('letter', 'virus-scan-failed', 'Virus detected 27 September at 5:30pm', False),
         ('letter', 'validation-failed', 'Validation failed 27 September at 5:30pm', False),

@@ -220,7 +220,7 @@ def format_notification_status(status, template_type):
             'failed': '',
             'technical-failure': 'Technical failure',
             'temporary-failure': '',
-            'permanent-failure': '',
+            'permanent-failure': 'Permanent failure',
             'delivered': '',
             'received': '',
             'accepted': '',
