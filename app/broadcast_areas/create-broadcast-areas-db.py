@@ -21,6 +21,7 @@ from rtreelib import Rect, RTree
 
 source_files_path = Path(__file__).resolve().parent / 'source_files'
 point_counts = []
+polygon_counts = []
 rtree_index = RTree()
 
 
@@ -44,14 +45,18 @@ def polygons_and_simplified_polygons(feature):
     simplified = smoothed.simplify
 
     print(  # noqa: T001
-        f'    Original:{full_resolution.point_count: >5} points'
-        f'    Smoothed:{smoothed.point_count: >5} points'
-        f'    Simplified:{simplified.point_count: >4} points'
+        f'    Original:   {full_resolution.point_count: >5} points'
+        f'    {len(full_resolution): >5} polygons'
+    )
+    print(  # noqa: T001
+        f'    Simplified: {simplified.point_count: >5} points'
+        f'    {len(simplified): >5} polygons'
     )
 
     point_counts.append(simplified.point_count)
+    polygon_counts.append(len(simplified))
 
-    if simplified.point_count >= 200:
+    if simplified.point_count >= 250:
         raise RuntimeError(
             'Too many points '
             '(adjust Polygons.perimeter_to_simplification_ratio or '
@@ -376,9 +381,16 @@ most_detailed_polygons = formatted_list(
     after_each='',
 )
 
+most_numerous_polygons = formatted_list(
+    sorted(polygon_counts, reverse=True)[:5],
+    before_each='',
+    after_each='',
+)
+
 print(  # noqa: T001
     '\n'
     'DONE\n'
     f'    Processed {len(point_counts):,} polygons.\n'
     f'    Highest point counts once simplifed: {most_detailed_polygons}\n'
+    f'    Highest polygons counts once simplifed: {most_numerous_polygons}\n'
 )
