@@ -41,7 +41,7 @@
     </p>
 
     {% if template.template_type == 'letter' %}
-      {% if notification_status in ('permanent-failure', 'cancelled') %}
+      {% if notification_status == 'cancelled' %}
         <p class="notification-status-cancelled">
           Cancelled {{ updated_at|format_datetime_short }}
         </p>
@@ -49,6 +49,10 @@
         <p class="notification-status-cancelled">
           {{ message.summary | safe }}
         </p>
+      {% elif notification_status == 'permanent-failure' %}
+         <p class="notification-status-cancelled">
+          Permanent failure – The provider cannot print the letter. Your letter will not be dispatched.
+         </p>
       {% elif notification_status == 'technical-failure' %}
         <p class="notification-status-cancelled">
           Technical failure – Notify will resend once the team have

@@ -442,7 +442,7 @@ def test_notification_page_shows_validation_failed_precompiled_letter(
 @pytest.mark.parametrize('notification_status, expected_message', (
     (
         'permanent-failure',
-        'Cancelled 1 January at 1:02am',
+        'Permanent failure – The provider cannot print the letter. Your letter will not be dispatched.',
     ),
     (
         'cancelled',
