@@ -49,7 +49,10 @@ generate-version-file: ## Generates the app version file
 
 .PHONY: test
 test: ## Run tests
-	./scripts/run_tests.sh
+	flake8 .
+	isort --check-only ./app ./tests
+	npm test
+	py.test -n auto --maxfail=10 tests/
 
 .PHONY: fix-imports
 fix-imports: ## Fix imports using isort
