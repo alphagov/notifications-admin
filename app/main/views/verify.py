@@ -17,7 +17,7 @@ from app.main import main
 from app.main.forms import TwoFactorForm
 from app.models.service import Service
 from app.models.user import InvitedOrgUser, InvitedUser, User
-from app.utils import redirect_to_sign_in
+from app.utils.login import redirect_to_sign_in
 
 
 @main.route('/verify', methods=['GET', 'POST'])

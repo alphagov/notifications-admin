@@ -1,23 +1,10 @@
-from datetime import datetime
 from functools import wraps
 from itertools import chain
 from urllib.parse import urlparse
 
-import pytz
-from dateutil import parser
-from flask import (
-    abort,
-    current_app,
-    g,
-    make_response,
-    redirect,
-    request,
-    session,
-    url_for,
-)
+from flask import abort, current_app, g, make_response, request
 from flask_login import current_user
 from notifications_utils.field import Field
-from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
 from orderedset._orderedset import OrderedSet
 from werkzeug.datastructures import MultiDict
 from werkzeug.routing import RequestRedirect
@@ -45,53 +32,8 @@ def service_has_permission(permission):
     return wrap
 
 
-def redirect_to_sign_in(f):
-    @wraps(f)
-    def wrapped(*args, **kwargs):
-        if 'user_details' not in session:
-            return redirect(url_for('main.sign_in'))
-        else:
-            return f(*args, **kwargs)
-    return wrapped
-
-
-def get_page_from_request():
-    if 'page' in request.args:
-        try:
-            return int(request.args['page'])
-        except ValueError:
-            return None
-    else:
-        return 1
-
-
-def generate_previous_dict(view, service_id, page, url_args=None):
-    return generate_previous_next_dict(view, service_id, page - 1, 'Previous page', url_args or {})
-
-
-def generate_next_dict(view, service_id, page, url_args=None):
-    return generate_previous_next_dict(view, service_id, page + 1, 'Next page', url_args or {})
-
-
-def generate_previous_next_dict(view, service_id, page, title, url_args):
-    return {
-        'url': url_for(view, service_id=service_id, page=page, **url_args),
-        'title': title,
-        'label': 'page {}'.format(page)
-    }
-
-
 def get_help_argument():
     return request.args.get('help') if request.args.get('help') in ('1', '2', '3') else None
-
-
-def get_current_financial_year():
-    now = utc_string_to_aware_gmt_datetime(
-        datetime.utcnow()
-    )
-    current_month = int(now.strftime('%-m'))
-    current_year = int(now.strftime('%Y'))
-    return current_year if current_month > 3 else current_year - 1
 
 
 def get_logo_cdn_domain():
@@ -157,12 +99,6 @@ class PermanentRedirect(RequestRedirect):
     and Windows 8.1, so this class keeps the original status code of 301.
     """
     code = 301
-
-
-def is_less_than_days_ago(date_from_db, number_of_days):
-    return (
-        datetime.utcnow().astimezone(pytz.utc) - parser.parse(date_from_db)
-    ).days < number_of_days
 
 
 def hide_from_search_engines(f):

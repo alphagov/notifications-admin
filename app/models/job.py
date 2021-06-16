@@ -13,8 +13,9 @@ from app.models import JSONModel, ModelList, PaginatedModelList
 from app.notify_client.job_api_client import job_api_client
 from app.notify_client.notification_api_client import notification_api_client
 from app.notify_client.service_api_client import service_api_client
-from app.utils import is_less_than_days_ago, set_status_filters
+from app.utils import set_status_filters
 from app.utils.letters import get_letter_printing_statement
+from app.utils.time import is_less_than_days_ago
 
 
 class Job(JSONModel):

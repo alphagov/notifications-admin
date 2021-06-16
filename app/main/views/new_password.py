@@ -14,8 +14,8 @@ from notifications_utils.url_safe_token import check_token
 
 from app.main import main
 from app.main.forms import NewPasswordForm
-from app.main.views.two_factor import log_in_user
 from app.models.user import User
+from app.utils.login import log_in_user
 
 
 @main.route('/new-password/<path:token>', methods=['GET', 'POST'])

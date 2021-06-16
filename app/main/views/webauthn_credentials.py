@@ -6,11 +6,14 @@ from flask_login import current_user
 from werkzeug.exceptions import Forbidden
 
 from app.main import main
-from app.main.views.two_factor import log_in_user
 from app.models.user import User
 from app.models.webauthn_credential import RegistrationError, WebAuthnCredential
 from app.notify_client.user_api_client import user_api_client
-from app.utils import is_less_than_days_ago, redirect_to_sign_in
+from app.utils.login import (
+    email_needs_revalidating,
+    log_in_user,
+    redirect_to_sign_in,
+)
 from app.utils.user import user_is_platform_admin
 
 
@@ -168,7 +171,7 @@ def _complete_webauthn_login_attempt(user):
         # user account is locked as too many failed logins
         abort(403)
 
-    if not is_less_than_days_ago(user.email_access_validated_at, 90):
+    if email_needs_revalidating(user):
         user_api_client.send_verify_code(user.id, 'email', None, redirect_url)
         return redirect(url_for('.revalidate_email_sent', next=redirect_url))
 

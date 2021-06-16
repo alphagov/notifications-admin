@@ -4,7 +4,6 @@ from unittest.mock import ANY, Mock
 import pytest
 from fido2 import cbor
 from flask import url_for
-from freezegun.api import freeze_time
 
 from app.models.webauthn_credential import RegistrationError, WebAuthnCredential
 
@@ -336,7 +335,6 @@ def test_complete_authentication_clears_session(
         assert 'webauthn_authentication_state' not in session
 
 
-@freeze_time('2020-01-30')
 @pytest.mark.parametrize('url_kwargs, expected_redirect', [
     ({}, '/accounts-or-dashboard'),
     ({'next': '/bar'}, '/bar'),
@@ -350,7 +348,6 @@ def test_verify_webauthn_login_signs_user_in(
     expected_redirect,
 ):
     platform_admin_user['auth_type'] = 'webauthn_auth'
-    platform_admin_user['email_access_validated_at'] = '2020-01-25T00:00:00.000000Z'
 
     with client.session_transaction() as session:
         session['user_details'] = {
@@ -360,6 +357,7 @@ def test_verify_webauthn_login_signs_user_in(
     mocker.patch('app.user_api_client.get_user', return_value=platform_admin_user)
     mocker.patch('app.main.views.webauthn_credentials._verify_webauthn_authentication')
     mocker.patch('app.user_api_client.complete_webauthn_login_attempt', return_value=(True, None))
+    mocker.patch('app.main.views.webauthn_credentials.email_needs_revalidating', return_value=False)
 
     resp = client.post(url_for('main.webauthn_complete_authentication', **url_kwargs))
 
@@ -397,7 +395,6 @@ def test_verify_webauthn_login_signs_user_in_doesnt_sign_user_in_if_api_rejects(
     assert resp.status_code == 403
 
 
-@freeze_time('2020-04-30')
 def test_verify_webauthn_login_signs_user_in_sends_revalidation_email_if_needed(
     client,
     mocker,
@@ -405,7 +402,6 @@ def test_verify_webauthn_login_signs_user_in_sends_revalidation_email_if_needed(
     platform_admin_user,
 ):
     platform_admin_user['auth_type'] = 'webauthn_auth'
-    platform_admin_user['email_access_validated_at'] = '2020-01-25T00:00:00.000000Z'
     user_details = {
         'id': platform_admin_user['id'],
         'email': platform_admin_user['email_address']
@@ -417,6 +413,7 @@ def test_verify_webauthn_login_signs_user_in_sends_revalidation_email_if_needed(
     mocker.patch('app.user_api_client.get_user', return_value=platform_admin_user)
     mocker.patch('app.main.views.webauthn_credentials._verify_webauthn_authentication')
     mocker.patch('app.user_api_client.complete_webauthn_login_attempt', return_value=(True, None))
+    mocker.patch('app.main.views.webauthn_credentials.email_needs_revalidating', return_value=True)
 
     resp = client.post(url_for('main.webauthn_complete_authentication'))
 

@@ -45,16 +45,16 @@ from app.s3_client.s3_letter_upload_client import (
     upload_letter_to_s3,
 )
 from app.template_previews import TemplatePreview, sanitise_letter
-from app.utils import (
-    generate_next_dict,
-    generate_previous_dict,
-    get_page_from_request,
-    unicode_truncate,
-)
+from app.utils import unicode_truncate
 from app.utils.csv import Spreadsheet, get_errors_for_csv
 from app.utils.letters import (
     get_letter_printing_statement,
     get_letter_validation_error,
+)
+from app.utils.pagination import (
+    generate_next_dict,
+    generate_previous_dict,
+    get_page_from_request,
 )
 from app.utils.templates import get_sample_template, get_template
 from app.utils.user import user_has_permissions

@@ -33,17 +33,16 @@ from app.formatters import get_time_left, message_count_noun
 from app.main import main
 from app.main.forms import SearchNotificationsForm
 from app.models.job import Job
-from app.utils import (
-    generate_next_dict,
-    generate_previous_dict,
-    get_page_from_request,
-    parse_filter_args,
-    set_status_filters,
-)
+from app.utils import parse_filter_args, set_status_filters
 from app.utils.csv import generate_notifications_csv
 from app.utils.letters import (
     get_letter_printing_statement,
     printing_today_or_tomorrow,
+)
+from app.utils.pagination import (
+    generate_next_dict,
+    generate_previous_dict,
+    get_page_from_request,
 )
 from app.utils.user import user_has_permissions
 

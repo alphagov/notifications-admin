@@ -1,51 +1,6 @@
 import pytest
-from freezegun import freeze_time
 
-from app import format_datetime_relative
-from app.formatters import email_safe, round_to_significant_figures
-from app.utils import (
-    generate_next_dict,
-    generate_previous_dict,
-    get_current_financial_year,
-    get_logo_cdn_domain,
-    is_less_than_days_ago,
-    merge_jsonlike,
-)
-
-
-@pytest.mark.parametrize('service_name, safe_email', [
-    ('name with spaces', 'name.with.spaces'),
-    ('singleword', 'singleword'),
-    ('UPPER CASE', 'upper.case'),
-    ('Service - with dash', 'service.with.dash'),
-    ('lots      of spaces', 'lots.of.spaces'),
-    ('name.with.dots', 'name.with.dots'),
-    ('name-with-other-delimiters', 'namewithotherdelimiters'),
-    ('.leading', 'leading'),
-    ('trailing.', 'trailing'),
-    ('üńïçödë wördś', 'unicode.words'),
-])
-def test_email_safe_return_dot_separated_email_domain(service_name, safe_email):
-    assert email_safe(service_name) == safe_email
-
-
-def test_generate_previous_dict(client):
-    ret = generate_previous_dict('main.view_jobs', 'foo', 2, {})
-    assert 'page=1' in ret['url']
-    assert ret['title'] == 'Previous page'
-    assert ret['label'] == 'page 1'
-
-
-def test_generate_next_dict(client):
-    ret = generate_next_dict('main.view_jobs', 'foo', 2, {})
-    assert 'page=3' in ret['url']
-    assert ret['title'] == 'Next page'
-    assert ret['label'] == 'page 3'
-
-
-def test_generate_previous_next_dict_adds_other_url_args(client):
-    ret = generate_next_dict('main.view_notifications', 'foo', 2, {'message_type': 'blah'})
-    assert 'notifications/blah' in ret['url']
+from app.utils import get_logo_cdn_domain, merge_jsonlike
 
 
 def test_get_cdn_domain_on_localhost(client, mocker):
@@ -58,56 +13,6 @@ def test_get_cdn_domain_on_non_localhost(client, mocker):
     mocker.patch.dict('app.current_app.config', values={'ADMIN_BASE_URL': 'https://some.admintest.com'})
     domain = get_logo_cdn_domain()
     assert domain == 'static-logos.admintest.com'
-
-
-@pytest.mark.parametrize('time, human_readable_datetime', [
-    ('2018-03-14 09:00', '14 March at 9:00am'),
-    ('2018-03-14 15:00', '14 March at 3:00pm'),
-
-    ('2018-03-15 09:00', '15 March at 9:00am'),
-    ('2018-03-15 15:00', '15 March at 3:00pm'),
-
-    ('2018-03-19 09:00', '19 March at 9:00am'),
-    ('2018-03-19 15:00', '19 March at 3:00pm'),
-    ('2018-03-19 23:59', '19 March at 11:59pm'),
-
-    ('2018-03-20 00:00', '19 March at midnight'),  # we specifically refer to 00:00 as belonging to the day before.
-    ('2018-03-20 00:01', 'yesterday at 12:01am'),
-    ('2018-03-20 09:00', 'yesterday at 9:00am'),
-    ('2018-03-20 15:00', 'yesterday at 3:00pm'),
-    ('2018-03-20 23:59', 'yesterday at 11:59pm'),
-
-    ('2018-03-21 00:00', 'yesterday at midnight'),  # we specifically refer to 00:00 as belonging to the day before.
-    ('2018-03-21 00:01', 'today at 12:01am'),
-    ('2018-03-21 09:00', 'today at 9:00am'),
-    ('2018-03-21 12:00', 'today at midday'),
-    ('2018-03-21 15:00', 'today at 3:00pm'),
-    ('2018-03-21 23:59', 'today at 11:59pm'),
-
-    ('2018-03-22 00:00', 'today at midnight'),  # we specifically refer to 00:00 as belonging to the day before.
-    ('2018-03-22 00:01', 'tomorrow at 12:01am'),
-    ('2018-03-22 09:00', 'tomorrow at 9:00am'),
-    ('2018-03-22 15:00', 'tomorrow at 3:00pm'),
-    ('2018-03-22 23:59', 'tomorrow at 11:59pm'),
-
-    ('2018-03-23 00:01', '23 March at 12:01am'),
-    ('2018-03-23 09:00', '23 March at 9:00am'),
-    ('2018-03-23 15:00', '23 March at 3:00pm'),
-
-])
-def test_format_datetime_relative(time, human_readable_datetime):
-    with freeze_time('2018-03-21 12:00'):
-        assert format_datetime_relative(time) == human_readable_datetime
-
-
-@pytest.mark.parametrize("date_from_db, expected_result", [
-    ('2019-11-17T11:35:21.726132Z', True),
-    ('2019-11-16T11:35:21.726132Z', False),
-    ('2019-11-16T11:35:21+0000', False),
-])
-@freeze_time('2020-02-14T12:00:00')
-def test_is_less_than_days_ago(date_from_db, expected_result):
-    assert is_less_than_days_ago(date_from_db, 90) == expected_result
 
 
 @pytest.mark.parametrize("source_object, destination_object, expected_result", [
@@ -143,29 +48,3 @@ def test_is_less_than_days_ago(date_from_db, expected_result):
 def test_merge_jsonlike_merges_jsonlike_objects_correctly(source_object, destination_object, expected_result):
     merge_jsonlike(source_object, destination_object)
     assert source_object == expected_result
-
-
-@pytest.mark.parametrize('value, significant_figures, expected_result', (
-    (0, 1, 0),
-    (0, 2, 0),
-    (12_345, 1, 10_000),
-    (12_345, 2, 12_000),
-    (12_345, 3, 12_300),
-    (12_345, 9, 12_345),
-    (12_345.6789, 1, 10_000),
-    (12_345.6789, 9, 12_345),
-    (-12_345, 1, -10_000),
-))
-def test_round_to_significant_figures(value, significant_figures, expected_result):
-    assert round_to_significant_figures(value, significant_figures) == expected_result
-
-
-@pytest.mark.parametrize('datetime_string, financial_year', (
-    ('2021-01-01T00:00:00+00:00', 2020),  # Start of 2021
-    ('2021-03-31T22:59:59+00:00', 2020),  # One minute before midnight (BST)
-    ('2021-03-31T23:00:00+00:00', 2021),  # Midnight (BST)
-    ('2021-12-12T12:12:12+01:00', 2021),  # Later in the year
-))
-def test_get_financial_year(datetime_string, financial_year):
-    with freeze_time(datetime_string):
-        assert get_current_financial_year() == financial_year
