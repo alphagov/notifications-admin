@@ -9,7 +9,13 @@ from freezegun import freeze_time
 
 from tests import broadcast_message_json, sample_uuid, user_json
 from tests.app.broadcast_areas.custom_polygons import BRISTOL, SKYE
-from tests.conftest import SERVICE_ONE_ID, normalize_spaces
+from tests.conftest import (
+    SERVICE_ONE_ID,
+    create_active_user_approve_broadcasts_permissions,
+    create_active_user_create_broadcasts_permissions,
+    create_active_user_with_permissions,
+    normalize_spaces,
+)
 
 sample_uuid = sample_uuid()
 
@@ -623,11 +629,17 @@ def test_rejected_broadcasts_page(
     )
 
 
+@pytest.mark.parametrize('user', (
+    create_active_user_with_permissions(),
+    create_active_user_create_broadcasts_permissions(),
+))
 def test_new_broadcast_page(
     client_request,
     service_one,
+    user,
 ):
     service_one['permissions'] += ['broadcast']
+    client_request.login(user)
     page = client_request.get(
         '.new_broadcast',
         service_id=SERVICE_ONE_ID,
@@ -677,11 +689,17 @@ def test_new_broadcast_page_redirects(
     )
 
 
+@pytest.mark.parametrize('user', (
+    create_active_user_with_permissions(),
+    create_active_user_create_broadcasts_permissions(),
+))
 def test_write_new_broadcast_page(
     client_request,
     service_one,
+    user,
 ):
     service_one['permissions'] += ['broadcast']
+    client_request.login(user)
     page = client_request.get(
         '.write_new_broadcast',
         service_id=SERVICE_ONE_ID,
@@ -783,13 +801,19 @@ def test_write_new_broadcast_bad_content(
     assert mock_create_broadcast_message.called is False
 
 
+@pytest.mark.parametrize('user', (
+    create_active_user_with_permissions(),
+    create_active_user_create_broadcasts_permissions(),
+))
 def test_broadcast_page(
     client_request,
     service_one,
     fake_uuid,
     mock_create_broadcast_message,
+    user,
 ):
     service_one['permissions'] += ['broadcast']
+    client_request.login(user)
     client_request.get(
         '.broadcast',
         service_id=SERVICE_ONE_ID,
@@ -803,6 +827,10 @@ def test_broadcast_page(
     ),
 
 
+@pytest.mark.parametrize('current_user', [
+    create_active_user_with_permissions(),
+    create_active_user_create_broadcasts_permissions(),
+])
 @pytest.mark.parametrize('areas_selected, areas_listed, estimates', (
     ([
         'ctry19-E92000001',
@@ -869,6 +897,7 @@ def test_preview_broadcast_areas_page(
     areas_selected,
     areas_listed,
     estimates,
+    current_user,
 ):
     service_one['permissions'] += ['broadcast']
     mocker.patch(
@@ -882,6 +911,7 @@ def test_preview_broadcast_areas_page(
             areas=areas_selected,
         ),
     )
+    client_request.login(current_user)
     page = client_request.get(
         '.preview_broadcast_areas',
         service_id=SERVICE_ONE_ID,
@@ -901,6 +931,10 @@ def test_preview_broadcast_areas_page(
     ] == estimates
 
 
+@pytest.mark.parametrize('current_user', [
+    create_active_user_with_permissions(),
+    create_active_user_create_broadcasts_permissions(),
+])
 @pytest.mark.parametrize('polygons, expected_list_items', (
     (
         [
@@ -937,6 +971,7 @@ def test_preview_broadcast_areas_page_with_custom_polygons(
     fake_uuid,
     polygons,
     expected_list_items,
+    current_user,
 ):
     service_one['permissions'] += ['broadcast']
     mocker.patch(
@@ -951,6 +986,7 @@ def test_preview_broadcast_areas_page_with_custom_polygons(
             simple_polygons=polygons,
         ),
     )
+    client_request.login(current_user)
     page = client_request.get(
         '.preview_broadcast_areas',
         service_id=SERVICE_ONE_ID,
@@ -1062,11 +1098,16 @@ def test_choose_broadcast_library_page(
     )
 
 
+@pytest.mark.parametrize('user', (
+    create_active_user_with_permissions(),
+    create_active_user_create_broadcasts_permissions(),
+))
 def test_suggested_area_has_correct_link(
     mocker,
     client_request,
     service_one,
     fake_uuid,
+    user,
 ):
     service_one['permissions'] += ['broadcast']
     mocker.patch(
@@ -1082,6 +1123,7 @@ def test_suggested_area_has_correct_link(
             ],
         ),
     )
+    client_request.login(user)
     page = client_request.get(
         '.choose_broadcast_library',
         service_id=SERVICE_ONE_ID,
@@ -1099,13 +1141,19 @@ def test_suggested_area_has_correct_link(
     )
 
 
+@pytest.mark.parametrize('user', (
+    create_active_user_with_permissions(),
+    create_active_user_create_broadcasts_permissions(),
+))
 def test_choose_broadcast_area_page(
     client_request,
     service_one,
     mock_get_draft_broadcast_message,
     fake_uuid,
+    user,
 ):
     service_one['permissions'] += ['broadcast']
+    client_request.login(user)
     page = client_request.get(
         '.choose_broadcast_area',
         service_id=SERVICE_ONE_ID,
@@ -1129,13 +1177,19 @@ def test_choose_broadcast_area_page(
     ]
 
 
+@pytest.mark.parametrize('user', (
+    create_active_user_with_permissions(),
+    create_active_user_create_broadcasts_permissions(),
+))
 def test_choose_broadcast_area_page_for_area_with_sub_areas(
     client_request,
     service_one,
     mock_get_draft_broadcast_message,
     fake_uuid,
+    user,
 ):
     service_one['permissions'] += ['broadcast']
+    client_request.login(user)
     page = client_request.get(
         '.choose_broadcast_area',
         service_id=SERVICE_ONE_ID,
@@ -1171,13 +1225,19 @@ def test_choose_broadcast_area_page_for_area_with_sub_areas(
     assert choices[-1] == (partial_url_for(area_slug='lad20-E06000014'), 'York',)
 
 
+@pytest.mark.parametrize('user', (
+    create_active_user_with_permissions(),
+    create_active_user_create_broadcasts_permissions(),
+))
 def test_choose_broadcast_sub_area_page_for_district_shows_checkboxes_for_wards(
     client_request,
     service_one,
     mock_get_draft_broadcast_message,
     fake_uuid,
+    user,
 ):
     service_one['permissions'] += ['broadcast']
+    client_request.login(user)
     page = client_request.get(
         'main.choose_broadcast_sub_area',
         service_id=SERVICE_ONE_ID,
@@ -1323,13 +1383,18 @@ def test_choose_broadcast_sub_area_page_for_county_shows_links_for_districts(
     assert districts[-1][1] == 'Tunbridge Wells'
 
 
+@pytest.mark.parametrize('user', (
+    create_active_user_with_permissions(),
+    create_active_user_create_broadcasts_permissions(),
+))
 def test_add_broadcast_area(
     client_request,
     service_one,
     mock_get_draft_broadcast_message,
     mock_update_broadcast_message,
     fake_uuid,
-    mocker
+    mocker,
+    user,
 ):
     service_one['permissions'] += ['broadcast']
     polygon_class = namedtuple("polygon_class", ["as_coordinate_pairs_lat_long"])
@@ -1337,6 +1402,7 @@ def test_add_broadcast_area(
     polygons = polygon_class(as_coordinate_pairs_lat_long=coordinates)
     mocker.patch('app.models.broadcast_message.BroadcastMessage.get_simple_polygons', return_value=polygons)
 
+    client_request.login(user)
     client_request.post(
         '.choose_broadcast_area',
         service_id=SERVICE_ONE_ID,
@@ -1451,6 +1517,10 @@ def test_add_broadcast_sub_area_county_view(
     )
 
 
+@pytest.mark.parametrize('user', (
+    create_active_user_with_permissions(),
+    create_active_user_create_broadcasts_permissions(),
+))
 def test_remove_broadcast_area_page(
     client_request,
     service_one,
@@ -1458,6 +1528,7 @@ def test_remove_broadcast_area_page(
     mock_update_broadcast_message,
     fake_uuid,
     mocker,
+    user,
 ):
     service_one['permissions'] += ['broadcast']
     polygon_class = namedtuple("polygon_class", ["as_coordinate_pairs_lat_long"])
@@ -1465,6 +1536,7 @@ def test_remove_broadcast_area_page(
     polygons = polygon_class(as_coordinate_pairs_lat_long=coordinates)
     mocker.patch('app.models.broadcast_message.BroadcastMessage.get_simple_polygons', return_value=polygons)
 
+    client_request.login(user)
     client_request.get(
         '.remove_broadcast_area',
         service_id=SERVICE_ONE_ID,
@@ -1487,15 +1559,20 @@ def test_remove_broadcast_area_page(
     )
 
 
+@pytest.mark.parametrize('user', (
+    create_active_user_with_permissions(),
+    create_active_user_create_broadcasts_permissions(),
+))
 def test_preview_broadcast_message_page(
     client_request,
     service_one,
     mock_get_draft_broadcast_message,
     mock_get_broadcast_template,
     fake_uuid,
+    user,
 ):
     service_one['permissions'] += ['broadcast']
-
+    client_request.login(user)
     page = client_request.get(
         '.preview_broadcast_message',
         service_id=SERVICE_ONE_ID,
@@ -2258,6 +2335,11 @@ def test_request_approval(
         assert mock_update_broadcast_message_status.called is False
 
 
+@pytest.mark.parametrize('user', (
+    create_active_user_with_permissions(),
+    create_active_user_create_broadcasts_permissions(),
+    create_active_user_approve_broadcasts_permissions(),
+))
 @freeze_time('2020-02-22T22:22:22.000000')
 def test_reject_broadcast(
     mocker,
@@ -2267,6 +2349,7 @@ def test_reject_broadcast(
     fake_uuid,
     mock_update_broadcast_message,
     mock_update_broadcast_message_status,
+    user,
 ):
     mocker.patch(
         'app.broadcast_message_api_client.get_broadcast_message',
@@ -2281,6 +2364,7 @@ def test_reject_broadcast(
     )
     service_one['permissions'] += ['broadcast']
 
+    client_request.login(user)
     client_request.get(
         '.reject_broadcast_message',
         service_id=SERVICE_ONE_ID,
@@ -2367,6 +2451,11 @@ def test_no_view_page_for_draft(
     )
 
 
+@pytest.mark.parametrize('user', (
+    create_active_user_with_permissions(),
+    create_active_user_create_broadcasts_permissions(),
+    create_active_user_approve_broadcasts_permissions(),
+))
 @pytest.mark.parametrize("user_is_platform_admin", [True, False])
 def test_cancel_broadcast(
     client_request,
@@ -2376,7 +2465,8 @@ def test_cancel_broadcast(
     mock_update_broadcast_message_status,
     platform_admin_user_no_service_permissions,
     fake_uuid,
-    user_is_platform_admin
+    user_is_platform_admin,
+    user,
 ):
     """
     users with 'send_messages' permissions and platform admins should be able to cancel broadcasts.
@@ -2386,6 +2476,7 @@ def test_cancel_broadcast(
     if user_is_platform_admin:
         client_request.login(platform_admin_user_no_service_permissions)
 
+    client_request.login(user)
     page = client_request.get(
         '.cancel_broadcast_message',
         service_id=SERVICE_ONE_ID,
@@ -2409,24 +2500,27 @@ def test_cancel_broadcast(
     ) not in page
 
 
-@pytest.mark.parametrize("user_is_platform_admin", [True, False])
+@pytest.mark.parametrize('user', [
+    create_platform_admin_user(),
+    create_active_user_with_permissions(),
+    create_active_user_create_broadcasts_permissions(),
+    create_active_user_approve_broadcasts_permissions(),
+])
 def test_confirm_cancel_broadcast(
     client_request,
     service_one,
     mock_get_live_broadcast_message,
     mock_get_broadcast_template,
     mock_update_broadcast_message_status,
-    platform_admin_user_no_service_permissions,
     fake_uuid,
-    user_is_platform_admin
+    user,
 ):
     """
-    users with 'send_messages' permissions and platform admins should be able to cancel broadcasts.
+    Platform admins and users with any of the broadcast permissions can cancel broadcasts.
     """
     service_one['permissions'] += ['broadcast']
 
-    if user_is_platform_admin:
-        client_request.login(platform_admin_user_no_service_permissions)
+    client_request.login(user)
 
     client_request.post(
         '.cancel_broadcast_message',

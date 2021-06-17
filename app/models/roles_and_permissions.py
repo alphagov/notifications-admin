@@ -6,6 +6,8 @@ roles = {
     'manage_service': ['manage_users', 'manage_settings'],
     'manage_api_keys': ['manage_api_keys'],
     'view_activity': ['view_activity'],
+    'create_broadcasts': ['manage_templates', 'create_broadcasts', 'reject_broadcasts', 'cancel_broadcasts'],
+    'approve_broadcasts': ['approve_broadcasts', 'reject_broadcasts', 'cancel_broadcasts'],
 }
 
 # same dict as above, but flipped round

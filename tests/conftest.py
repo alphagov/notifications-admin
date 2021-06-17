@@ -3593,6 +3593,33 @@ def create_active_user_view_permissions(with_unique_id=False):
     )
 
 
+def create_active_user_create_broadcasts_permissions(with_unique_id=False):
+    return create_service_one_user(
+        id=str(uuid4()) if with_unique_id else sample_uuid(),
+        name='Test User Create Broadcasts Permission',
+        permissions={SERVICE_ONE_ID: [
+            'manage_templates',
+            'create_broadcasts',
+            'reject_broadcasts',
+            'cancel_broadcasts',
+        ]},
+        auth_type='webauthn_auth',
+    )
+
+
+def create_active_user_approve_broadcasts_permissions(with_unique_id=False):
+    return create_service_one_user(
+        id=str(uuid4()) if with_unique_id else sample_uuid(),
+        name='Test User Approve Broadcasts Permission',
+        permissions={SERVICE_ONE_ID: [
+            'approve_broadcasts',
+            'reject_broadcasts',
+            'cancel_broadcasts',
+        ]},
+        auth_type='webauthn_auth',
+    )
+
+
 def create_active_caseworking_user(with_unique_id=False):
     return create_user(
         id=str(uuid4()) if with_unique_id else sample_uuid(),
