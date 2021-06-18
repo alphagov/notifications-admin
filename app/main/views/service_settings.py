@@ -217,7 +217,7 @@ def submit_request_to_go_live(service_id):
             '\nLetters in next year: {volume_letter_formatted}'
             '\n'
             '\nConsent to research: {research_consent}'
-            '\nOther live services: {existing_live}'
+            '\nOther live services for that user: {existing_live}'
             '\n'
             '\nService reply-to address: {email_reply_to}'
             '\n'
