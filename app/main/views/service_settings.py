@@ -243,6 +243,7 @@ def submit_request_to_go_live(service_id):
         user_email=current_user.email_address,
         user_name=current_user.name,
         tags=current_service.request_to_go_live_tags,
+        requester_sees_message_content=False,
     )
 
     current_service.update(go_live_user=current_user.id)
