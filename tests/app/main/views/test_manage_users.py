@@ -202,25 +202,23 @@ def test_should_show_overview_page_for_broadcast_service(
     mock_get_template_folders,
     service_one,
     active_user_view_permissions,
-    active_user_with_permissions,
+    active_user_broadcast_permissions,
 ):
     service_one['permissions'].append('broadcast')
     mocker.patch('app.models.user.Users.client_method', return_value=[
-        active_user_with_permissions,
+        active_user_broadcast_permissions,
         active_user_view_permissions,
     ])
     page = client_request.get('main.manage_users', service_id=SERVICE_ONE_ID)
     assert normalize_spaces(page.select('.user-list-item')[0].text) == (
         'Test User (you) '
-        'Can Prepare and approve broadcasts '
-        'Can Add and edit templates '
-        'Can Manage settings and team'
+        'Can Add new alerts and templates '
+        'Can Approve alerts'
     )
     assert normalize_spaces(page.select('.user-list-item')[1].text) == (
         'Test User With Permissions (you) '
-        'Cannot Prepare and approve broadcasts '
-        'Cannot Add and edit templates '
-        'Cannot Manage settings and team'
+        'Cannot Add new alerts and templates '
+        'Cannot Approve alerts'
     )
 
 
@@ -328,9 +326,8 @@ def test_broadcast_service_only_shows_relevant_permissions(
     assert [
         (field['name'], field['value']) for field in page.select('input[type=checkbox]')
     ] == [
-        ('permissions_field', 'send_messages'),
-        ('permissions_field', 'manage_templates'),
-        ('permissions_field', 'manage_service'),
+        ('permissions_field', 'create_broadcasts'),
+        ('permissions_field', 'approve_broadcasts'),
     ]
 
 
@@ -558,28 +555,36 @@ def test_edit_user_permissions(
     (
         {
             'permissions_field': [
-                'send_messages',
-                'manage_templates',
-                'manage_service',
-                'manage_api_keys',
+                'create_broadcasts',
             ]
         },
         {
             'view_activity',
-            'send_messages',
-            'manage_service',
-            'manage_templates',
+            'create_broadcasts',
         }
     ),
     (
         {
             'permissions_field': [
-                'send_messages',
+                'approve_broadcasts',
             ]
         },
         {
             'view_activity',
-            'send_messages',
+            'approve_broadcasts',
+        }
+    ),
+    (
+        {
+            'permissions_field': [
+                'create_broadcasts',
+                'approve_broadcasts',
+            ]
+        },
+        {
+            'view_activity',
+            'create_broadcasts',
+            'approve_broadcasts',
         }
     ),
     (
@@ -1225,16 +1230,12 @@ def test_invite_user_with_email_auth_service(
     (
         {
             'permissions_field': [
-                'send_messages',
-                'manage_templates',
-                'manage_service',
+                'create_broadcasts',
             ]
         },
         {
             'view_activity',
-            'send_messages',
-            'manage_templates',
-            'manage_service',
+            'create_broadcasts',
         },
     ),
     (

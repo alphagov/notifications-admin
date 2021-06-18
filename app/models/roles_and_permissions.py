@@ -10,14 +10,8 @@ roles = {
     'approve_broadcasts': ['approve_broadcasts', 'reject_broadcasts', 'cancel_broadcasts'],
 }
 
-# same dict as above, but flipped round
-roles_by_permission = {
-    permission: next(
-        role for role, permissions in roles.items() if permission in permissions
-    ) for permission in chain(*list(roles.values()))
-}
-
-all_permissions = set(roles_by_permission.values())
+all_permissions = set(roles.keys())
+all_database_permissions = set(chain(*roles.values()))
 
 permissions = (
     ('view_activity', 'See dashboard'),
@@ -28,9 +22,8 @@ permissions = (
 )
 
 broadcast_permissions = (
-    ('send_messages', 'Prepare and approve broadcasts'),
-    ('manage_templates', 'Add and edit templates'),
-    ('manage_service', 'Manage settings and team'),
+    ('create_broadcasts', 'Add new alerts and templates'),
+    ('approve_broadcasts', 'Approve alerts'),
 )
 
 
@@ -38,9 +31,15 @@ def translate_permissions_from_db_to_admin_roles(permissions):
     """
     Given a list of database permissions, return a set of roles
 
-    look them up in roles_by_permission, falling back to just passing through from the api if they aren't in the dict
+    A role is returned if all of its database permissions are in the permission list that is passed in.
+    Any permissions in the list that are not database permissions are also returned.
     """
-    return {roles_by_permission.get(permission, permission) for permission in permissions}
+    unknown_database_permissions = {p for p in permissions if p not in all_database_permissions}
+
+    return {
+        admin_role for admin_role, db_role_list in roles.items()
+        if set(db_role_list) <= set(permissions)
+    } | unknown_database_permissions
 
 
 def translate_permissions_from_admin_roles_to_db(permissions):
