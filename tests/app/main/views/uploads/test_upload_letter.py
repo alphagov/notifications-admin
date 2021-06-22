@@ -42,7 +42,8 @@ def test_post_upload_letter_redirects_for_valid_file(
             json=lambda: {'file': 'VGhlIHNhbml0aXNlZCBjb250ZW50', 'recipient_address': 'The Queen'}
         )
     )
-    mock_s3 = mocker.patch('app.main.views.uploads.upload_letter_to_s3')
+    mock_s3_upload = mocker.patch('app.main.views.uploads.upload_letter_to_s3')
+    mock_s3_backup = mocker.patch('app.main.views.uploads.backup_original_letter_to_s3')
     mocker.patch('app.main.views.uploads.get_letter_metadata', return_value=LetterMetadata({
         'filename': 'tests/test_pdf_files/one_page_pdf.pdf',
         'page_count': '1',
@@ -64,7 +65,7 @@ def test_post_upload_letter_redirects_for_valid_file(
         )
     assert antivirus_mock.called
 
-    mock_s3.assert_called_once_with(
+    mock_s3_upload.assert_called_once_with(
         b'The sanitised content',
         file_location='service-{}/{}.pdf'.format(SERVICE_ONE_ID, fake_uuid),
         status='valid',
@@ -72,6 +73,13 @@ def test_post_upload_letter_redirects_for_valid_file(
         filename='tests/test_pdf_files/one_page_pdf.pdf',
         recipient='The Queen',
     )
+
+    with open('tests/test_pdf_files/one_page_pdf.pdf', 'rb') as file:
+        mock_s3_backup.assert_called_once_with(
+            file.read(),
+            upload_id=ANY,
+        )
+
     mock_sanitise.assert_called_once_with(
         ANY,
         allow_international_letters=expected_allow_international,
@@ -108,6 +116,7 @@ def test_post_upload_letter_shows_letter_preview_for_valid_file(
         )
     )
     mocker.patch('app.main.views.uploads.upload_letter_to_s3')
+    mocker.patch('app.main.views.uploads.backup_original_letter_to_s3')
     mocker.patch('app.main.views.uploads.pdf_page_count', return_value=3)
     mocker.patch('app.main.views.uploads.get_letter_metadata', return_value=LetterMetadata({
         'filename': 'tests/test_pdf_files/one_page_pdf.pdf',
@@ -167,6 +176,7 @@ def test_upload_international_letter_shows_preview_with_no_choice_of_postage(
         json=lambda: {'file': 'VGhlIHNhbml0aXNlZCBjb250ZW50', 'recipient_address': 'The Queen'}
     ))
     mocker.patch('app.main.views.uploads.upload_letter_to_s3')
+    mocker.patch('app.main.views.uploads.backup_original_letter_to_s3')
     mocker.patch('app.main.views.uploads.pdf_page_count', return_value=3)
     mocker.patch('app.main.views.uploads.get_letter_metadata', return_value=LetterMetadata({
         'filename': 'tests/test_pdf_files/one_page_pdf.pdf',
@@ -230,6 +240,7 @@ def test_post_upload_letter_shows_error_when_no_file_uploaded(client_request):
 
 def test_post_upload_letter_shows_error_when_file_contains_virus(mocker, client_request):
     mocker.patch('app.main.views.uploads.antivirus_client.scan', return_value=False)
+    mock_s3_backup = mocker.patch('app.main.views.uploads.backup_original_letter_to_s3')
 
     with open('tests/test_pdf_files/one_page_pdf.pdf', 'rb') as file:
         page = client_request.post(
@@ -240,6 +251,7 @@ def test_post_upload_letter_shows_error_when_file_contains_virus(mocker, client_
         )
     assert page.find('div', class_='banner-dangerous').find('h1').text == 'Your file contains a virus'
     assert normalize_spaces(page.find('label', class_='file-upload-button').text) == 'Upload your file again'
+    mock_s3_backup.assert_not_called()
 
 
 def test_post_choose_upload_file_when_file_is_too_big(mocker, client_request):
@@ -277,7 +289,8 @@ def test_post_choose_upload_file_when_file_is_malformed(mocker, client_request):
 def test_post_upload_letter_with_invalid_file(mocker, client_request, fake_uuid):
     mocker.patch('uuid.uuid4', return_value=fake_uuid)
     mocker.patch('app.main.views.uploads.antivirus_client.scan', return_value=True)
-    mock_s3 = mocker.patch('app.main.views.uploads.upload_letter_to_s3')
+    mock_s3_upload = mocker.patch('app.main.views.uploads.upload_letter_to_s3')
+    mock_s3_backup = mocker.patch('app.main.views.uploads.backup_original_letter_to_s3')
 
     mock_sanitise_response = Mock()
     mock_sanitise_response.raise_for_status.side_effect = RequestException(response=Mock(status_code=400))
@@ -302,7 +315,7 @@ def test_post_upload_letter_with_invalid_file(mocker, client_request, fake_uuid)
             _follow_redirects=True
         )
 
-        mock_s3.assert_called_once_with(
+        mock_s3_upload.assert_called_once_with(
             file_contents,
             file_location='service-{}/{}.pdf'.format(SERVICE_ONE_ID, fake_uuid),
             status='invalid',
@@ -312,6 +325,7 @@ def test_post_upload_letter_with_invalid_file(mocker, client_request, fake_uuid)
             message='content-outside-printable-area'
         )
 
+    mock_s3_backup.assert_not_called()
     assert page.find('div', class_='banner-dangerous').find('h1', {"data-error-type": 'content-outside-printable-area'})
     assert not page.find('button', {'class': 'page-footer__button', 'type': 'submit'})
 

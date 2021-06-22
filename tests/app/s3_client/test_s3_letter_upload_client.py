@@ -1,11 +1,30 @@
 import urllib
+import uuid
 
 from flask import current_app
 
 from app.s3_client.s3_letter_upload_client import (
     LetterMetadata,
+    backup_original_letter_to_s3,
     upload_letter_to_s3,
 )
+
+
+def test_backup_original_letter_to_s3(mocker, notify_admin):
+    s3_mock = mocker.patch('app.s3_client.s3_letter_upload_client.utils_s3upload')
+    upload_id = uuid.uuid4()
+
+    backup_original_letter_to_s3(
+        'pdf_data',
+        upload_id=upload_id,
+    )
+
+    s3_mock.assert_called_once_with(
+        bucket_name=current_app.config['PRECOMPILED_ORIGINALS_BACKUP_LETTERS'],
+        file_location=f'{str(upload_id)}.pdf',
+        filedata='pdf_data',
+        region=current_app.config['AWS_REGION']
+    )
 
 
 def test_upload_letter_to_s3(mocker):

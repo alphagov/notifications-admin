@@ -39,6 +39,7 @@ from app.main import main
 from app.main.forms import CsvUploadForm, LetterUploadPostageForm, PDFUploadForm
 from app.models.contact_list import ContactList
 from app.s3_client.s3_letter_upload_client import (
+    backup_original_letter_to_s3,
     get_letter_metadata,
     get_letter_pdf_and_metadata,
     get_transient_letter_file_location,
@@ -215,6 +216,11 @@ def upload_letter(service_id):
                 page_count=page_count,
                 filename=original_filename,
                 recipient=recipient)
+
+            backup_original_letter_to_s3(
+                pdf_file_bytes,
+                upload_id=upload_id,
+            )
 
         return redirect(
             url_for(
