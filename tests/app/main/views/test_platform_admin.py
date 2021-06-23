@@ -905,9 +905,9 @@ def test_get_notifications_sent_by_service_calls_api_and_downloads_data(
     service_two,
 ):
     api_data = [
-        ['Tue, 01 Jan 2019 00:00:00 GMT', SERVICE_ONE_ID, service_one['name'], 'email', 191, 0, 0, 14, 0, 0],
-        ['Tue, 01 Jan 2019 00:00:00 GMT', SERVICE_ONE_ID, service_one['name'], 'sms', 42, 0, 0, 8, 0, 0],
-        ['Tue, 01 Jan 2019 00:00:00 GMT', SERVICE_TWO_ID, service_two['name'], 'email', 3, 1, 0, 2, 0, 0],
+        ['2019-01-01', SERVICE_ONE_ID, service_one['name'], 'email', 191, 0, 0, 14, 0, 0],
+        ['2019-01-01', SERVICE_ONE_ID, service_one['name'], 'sms', 42, 0, 0, 8, 0, 0],
+        ['2019-01-01', SERVICE_TWO_ID, service_two['name'], 'email', 3, 1, 0, 2, 0, 0],
     ]
     mocker.patch('app.main.views.platform_admin.notification_api_client.get_notification_status_by_service',
                  return_value=api_data)
