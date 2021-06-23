@@ -612,8 +612,8 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
         if e.status_code != 404:
             raise
 
-    statistics = service_api_client.get_service_statistics(service_id, today_only=True)
-    remaining_messages = (current_service.message_limit - sum(stat['requested'] for stat in statistics.values()))
+    notification_count = service_api_client.get_notification_count(service_id)
+    remaining_messages = (current_service.message_limit - notification_count)
 
     contents = s3download(service_id, upload_id)
 

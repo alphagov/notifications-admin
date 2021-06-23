@@ -1,5 +1,7 @@
 from datetime import datetime
 
+from notifications_utils.clients.redis import daily_limit_cache_key
+
 from app.extensions import redis_client
 from app.notify_client import NotifyAdminAPIClient, _attach_current_user, cache
 
@@ -42,18 +44,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         return self.get('/service/{0}'.format(service_id))
 
     def get_service_statistics(self, service_id, today_only, limit_days=None):
-        # FIXME: The statistics request is taking more than 30s on some accounts,
-        # so return an empty set of statistics for the upload check page.
-        # We still do the request for when `today_only=False` so that reporting
-        # pages in the admin are still showing the correct values for other services.
-        if today_only:
-            return {
-                'email': {'requested': 0, 'delivered': 0, 'failed': 0},
-                'sms': {'requested': 0, 'delivered': 0, 'failed': 0},
-                'letter': {'requested': 0, 'delivered': 0, 'failed': 0}
-            }
-        else:
-            return self.get('/service/{0}/statistics'.format(service_id), params={
+        return self.get('/service/{0}/statistics'.format(service_id), params={
                 'today_only': today_only, 'limit_days': limit_days
             })['data']
 
@@ -643,6 +634,11 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         }
 
         return self.post("/service/{}/set-as-broadcast-service".format(service_id), data)
+
+    def get_notification_count(self, service_id):
+        # if cache is not set return 0
+        count = redis_client.get(daily_limit_cache_key(service_id)) or 0
+        return int(count)
 
 
 service_api_client = ServiceAPIClient()
