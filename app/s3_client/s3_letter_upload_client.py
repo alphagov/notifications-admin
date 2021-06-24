@@ -10,6 +10,18 @@ def get_transient_letter_file_location(service_id, upload_id):
     return 'service-{}/{}.pdf'.format(service_id, upload_id)
 
 
+def backup_original_letter_to_s3(
+    data,
+    upload_id,
+):
+    utils_s3upload(
+        filedata=data,
+        region=current_app.config['AWS_REGION'],
+        bucket_name=current_app.config['PRECOMPILED_ORIGINALS_BACKUP_LETTERS'],
+        file_location=f'{upload_id}.pdf',
+    )
+
+
 def upload_letter_to_s3(
     data,
     *,

@@ -89,6 +89,7 @@ class Development(Config):
     LOGO_UPLOAD_BUCKET_NAME = 'public-logos-tools'
     MOU_BUCKET_NAME = 'notify.tools-mou'
     TRANSIENT_UPLOADED_LETTERS = 'development-transient-uploaded-letters'
+    PRECOMPILED_ORIGINALS_BACKUP_LETTERS = 'development-letters-precompiled-originals-backup'
 
     ADMIN_CLIENT_SECRET = 'dev-notify-secret-key'
     API_HOST_NAME = 'http://localhost:6011'
@@ -112,6 +113,7 @@ class Test(Development):
     LOGO_UPLOAD_BUCKET_NAME = 'public-logos-test'
     MOU_BUCKET_NAME = 'test-mou'
     TRANSIENT_UPLOADED_LETTERS = 'test-transient-uploaded-letters'
+    PRECOMPILED_ORIGINALS_BACKUP_LETTERS = 'test-letters-precompiled-originals-backup'
     NOTIFY_ENVIRONMENT = 'test'
     API_HOST_NAME = 'http://you-forgot-to-mock-an-api-call-to'
     TEMPLATE_PREVIEW_API_HOST = 'http://localhost:9999'
@@ -131,6 +133,7 @@ class Preview(Config):
     LOGO_UPLOAD_BUCKET_NAME = 'public-logos-preview'
     MOU_BUCKET_NAME = 'notify.works-mou'
     TRANSIENT_UPLOADED_LETTERS = 'preview-transient-uploaded-letters'
+    PRECOMPILED_ORIGINALS_BACKUP_LETTERS = 'preview-letters-precompiled-originals-backup'
     NOTIFY_ENVIRONMENT = 'preview'
     CHECK_PROXY_HEADER = False
     ASSET_DOMAIN = 'static.notify.works'
@@ -148,6 +151,7 @@ class Staging(Config):
     LOGO_UPLOAD_BUCKET_NAME = 'public-logos-staging'
     MOU_BUCKET_NAME = 'staging-notify.works-mou'
     TRANSIENT_UPLOADED_LETTERS = 'staging-transient-uploaded-letters'
+    PRECOMPILED_ORIGINALS_BACKUP_LETTERS = 'staging-letters-precompiled-originals-backup'
     NOTIFY_ENVIRONMENT = 'staging'
     CHECK_PROXY_HEADER = False
     ASSET_DOMAIN = 'static.staging-notify.works'
@@ -162,6 +166,7 @@ class Live(Config):
     LOGO_UPLOAD_BUCKET_NAME = 'public-logos-production'
     MOU_BUCKET_NAME = 'notifications.service.gov.uk-mou'
     TRANSIENT_UPLOADED_LETTERS = 'production-transient-uploaded-letters'
+    PRECOMPILED_ORIGINALS_BACKUP_LETTERS = 'production-letters-precompiled-originals-backup'
     NOTIFY_ENVIRONMENT = 'live'
     CHECK_PROXY_HEADER = False
     ASSET_DOMAIN = 'static.notifications.service.gov.uk'
