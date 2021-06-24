@@ -811,8 +811,8 @@ def test_broadcast_page(
         'England remove',
         'Scotland remove',
     ], [
-        'An area of 166,426.2 square miles Will get the alert',
-        'An extra area of 7,942.4 square miles is Likely to get the alert',
+        'An area of 200,000 square miles Will get the alert',
+        'An extra area of 8,000 square miles is Likely to get the alert',
         '40,000,000 phones estimated',
     ]),
     ([
@@ -828,8 +828,8 @@ def test_broadcast_page(
         'Penrith South remove',
         'Penrith West remove',
     ], [
-        'An area of 6.3 square miles Will get the alert',
-        'An extra area of 22.6 square miles is Likely to get the alert',
+        'An area of 6 square miles Will get the alert',
+        'An extra area of 20 square miles is Likely to get the alert',
         '9,000 to 10,000 phones',
     ]),
     ([
@@ -837,8 +837,8 @@ def test_broadcast_page(
     ], [
         'Islington remove',
     ], [
-        'An area of 9.6 square miles Will get the alert',
-        'An extra area of 4.7 square miles is Likely to get the alert',
+        'An area of 10 square miles Will get the alert',
+        'An extra area of 5 square miles is Likely to get the alert',
         '200,000 to 500,000 phones',
     ]),
     ([
@@ -846,8 +846,8 @@ def test_broadcast_page(
     ], [
         'Lincolnshire remove',
     ], [
-        'An area of 3,986.6 square miles Will get the alert',
-        'An extra area of 599.4 square miles is Likely to get the alert',
+        'An area of 4,000 square miles Will get the alert',
+        'An extra area of 700 square miles is Likely to get the alert',
         '500,000 to 600,000 phones',
     ]),
     ([
@@ -856,8 +856,8 @@ def test_broadcast_page(
     ], [
         'Lincolnshire remove', 'North Yorkshire remove',
     ], [
-        'An area of 9,776.2 square miles Will get the alert',
-        'An extra area of 1,654.6 square miles is Likely to get the alert',
+        'An area of 10,000 square miles Will get the alert',
+        'An extra area of 2,000 square miles is Likely to get the alert',
         '1,000,000 phones estimated',
     ]),
 ))
@@ -908,24 +908,24 @@ def test_preview_broadcast_areas_page(
             [[7, 8], [9, 10], [11, 12]],
         ],
         [
-            'An area of 543.3 square miles Will get the alert',
-            'An extra area of 1,595.9 square miles is Likely to get the alert',
+            'An area of 700 square miles Will get the alert',
+            'An extra area of 1,000 square miles is Likely to get the alert',
             'Unknown number of phones',
         ]
     ),
     (
         [BRISTOL],
         [
-            'An area of 6.6 square miles Will get the alert',
-            'An extra area of 6.4 square miles is Likely to get the alert',
+            'An area of 7 square miles Will get the alert',
+            'An extra area of 6 square miles is Likely to get the alert',
             '70,000 to 100,000 phones',
         ]
     ),
     (
         [SKYE],
         [
-            'An area of 3,201.7 square miles Will get the alert',
-            'An extra area of 767.0 square miles is Likely to get the alert',
+            'An area of 3,000 square miles Will get the alert',
+            'An extra area of 800 square miles is Likely to get the alert',
             '4,000 phones estimated',
         ]
     ),
