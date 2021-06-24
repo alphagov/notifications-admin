@@ -361,11 +361,12 @@ def useful_headers_after_request(response):
     response.headers.add('X-XSS-Protection', '1; mode=block')
     response.headers.add('Content-Security-Policy', (
         "default-src 'self' {asset_domain} 'unsafe-inline';"
-        "script-src 'self' {asset_domain} *.google-analytics.com 'unsafe-inline' 'unsafe-eval' data:;"
-        "connect-src 'self' *.google-analytics.com;"
+        "script-src 'self' {asset_domain} *.tiles.mapbox.com unpkg.com labs.os.uk *.google-analytics.com 'unsafe-inline' 'unsafe-eval' data: blob:;"
+        "style-src 'self' labs.os.uk *.tiles.mapbox.com 'unsafe-inline';"
+        "connect-src 'self' api.os.uk *.google-analytics.com;"
         "object-src 'self';"
         "font-src 'self' {asset_domain} data:;"
-        "img-src 'self' {asset_domain} *.tile.openstreetmap.org *.google-analytics.com"
+        "img-src 'self' {asset_domain} api.os.uk *.google-analytics.com"
         " *.notifications.service.gov.uk {logo_domain} data:;"
         "frame-src 'self' www.youtube-nocookie.com;".format(
             asset_domain=current_app.config['ASSET_DOMAIN'],
