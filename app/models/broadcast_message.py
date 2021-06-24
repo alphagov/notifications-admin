@@ -7,6 +7,7 @@ from orderedset import OrderedSet
 from werkzeug.utils import cached_property
 
 from app.broadcast_areas.models import (
+    CustomBroadcastArea,
     CustomBroadcastAreas,
     broadcast_area_libraries,
 )
@@ -16,6 +17,10 @@ from app.models.user import User
 from app.notify_client.broadcast_message_api_client import (
     broadcast_message_api_client,
 )
+
+ESTIMATED_AREA_OF_LARGEST_UK_COUNTY = broadcast_area_libraries.get_areas(
+    'ctyua19-E10000023'  # North Yorkshire
+)[0].polygons.estimated_area
 
 
 class BroadcastMessage(JSONModel):
@@ -176,12 +181,18 @@ class BroadcastMessage(JSONModel):
 
     @property
     def count_of_phones_likely(self):
-        area_estimate = self.simple_polygons.estimated_area
-        bleed_area_estimate = self.simple_polygons_with_bleed.estimated_area - area_estimate
-        return round_to_significant_figures(
-            self.count_of_phones + (self.count_of_phones * bleed_area_estimate / area_estimate),
-            1
-        )
+        estimated_area = self.simple_polygons.estimated_area
+
+        if estimated_area > ESTIMATED_AREA_OF_LARGEST_UK_COUNTY:
+            count = self.count_of_phones * (
+                self.simple_polygons_with_bleed.estimated_area / estimated_area
+            )
+        else:
+            count = CustomBroadcastArea.from_polygon_objects(
+                self.simple_polygons_with_bleed
+            ).count_of_phones
+
+        return round_to_significant_figures(count, 1)
 
     def get_areas(self, areas):
         return broadcast_area_libraries.get_areas(

@@ -144,6 +144,10 @@ class CustomBroadcastArea(BaseBroadcastArea):
         self.name = name
         self._polygons = polygons or []
 
+    @classmethod
+    def from_polygon_objects(cls, polygon_objects):
+        return cls(name=None, polygons=polygon_objects.as_coordinate_pairs_lat_long)
+
     @property
     def polygons(self):
         return Polygons(

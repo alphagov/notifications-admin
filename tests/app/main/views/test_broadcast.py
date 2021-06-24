@@ -830,7 +830,7 @@ def test_broadcast_page(
     ], [
         'An area of 6.3 square miles Will get the alert',
         'An extra area of 22.6 square miles is Likely to get the alert',
-        '9,000 to 40,000 phones',
+        '9,000 to 10,000 phones',
     ]),
     ([
         'lad20-E09000019',
@@ -839,7 +839,26 @@ def test_broadcast_page(
     ], [
         'An area of 9.7 square miles Will get the alert',
         'An extra area of 4.7 square miles is Likely to get the alert',
-        '200,000 to 300,000 phones',
+        '200,000 to 500,000 phones',
+    ]),
+    ([
+        'ctyua19-E10000019',
+    ], [
+        'Lincolnshire remove',
+    ], [
+        'An area of 3,986.6 square miles Will get the alert',
+        'An extra area of 599.4 square miles is Likely to get the alert',
+        '500,000 to 600,000 phones',
+    ]),
+    ([
+        'ctyua19-E10000019',
+        'ctyua19-E10000023'
+    ], [
+        'Lincolnshire remove', 'North Yorkshire remove',
+    ], [
+        'An area of 9,776.2 square miles Will get the alert',
+        'An extra area of 1,654.6 square miles is Likely to get the alert',
+        '1,000,000 phones estimated',
     ]),
 ))
 def test_preview_broadcast_areas_page(
@@ -907,7 +926,7 @@ def test_preview_broadcast_areas_page(
         [
             'An area of 3,205.0 square miles Will get the alert',
             'An extra area of 763.4 square miles is Likely to get the alert',
-            '4,000 to 5,000 phones',
+            '4,000 phones estimated',
         ]
     ),
 ))
