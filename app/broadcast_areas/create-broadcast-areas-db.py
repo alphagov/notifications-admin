@@ -104,7 +104,7 @@ def clean_up_invalid_polygons(polygons, indent="    "):
             yield fixed_polygon
 
 
-def polygons_and_simplified_polygons(feature):
+def polygons_and_simplified_polygons(feature, remove_too_small=True):
     if keep_old_polygons:
         # cheat and shortcut out
         return [], []
@@ -113,7 +113,11 @@ def polygons_and_simplified_polygons(feature):
     polygons = list(clean_up_invalid_polygons(polygons))
     polygons = Polygons(polygons)
 
-    full_resolution = polygons.remove_too_small
+    if remove_too_small:
+        full_resolution = polygons.remove_too_small
+    else:
+        full_resolution = polygons
+
     smoothed = full_resolution.smooth
     simplified = smoothed.simplify
 
@@ -251,7 +255,8 @@ def add_test_areas():
         print(f_name)  # noqa: T001
 
         feature, _ = polygons_and_simplified_polygons(
-            feature["geometry"]
+            feature["geometry"],
+            remove_too_small=False,
         )
         areas_to_add.append([
             f'{dataset_id}-{f_id}', f_name,
@@ -283,7 +288,8 @@ def add_demo_areas():
         print(f_name)  # noqa: T001
 
         feature, _ = polygons_and_simplified_polygons(
-            feature["geometry"]
+            feature["geometry"],
+            remove_too_small=False,
         )
 
         print('    Phones: ', f_count_of_phones)  # noqa: T001
@@ -316,8 +322,9 @@ def add_countries():
         print()  # noqa: T001
         print(f_name)  # noqa: T001
 
-        feature, simple_feature = (
-            polygons_and_simplified_polygons(feature["geometry"])
+        feature, simple_feature = polygons_and_simplified_polygons(
+            feature["geometry"],
+            remove_too_small=False,
         )
         areas_to_add.append([
             f'ctry19-{f_id}', f_name,
