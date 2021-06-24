@@ -260,9 +260,6 @@ def notifications_sent_by_service():
         ]
         result = notification_api_client.get_notification_status_by_service(start_date, end_date)
 
-        for row in result:
-            row[0] = datetime.strptime(row[0], '%a, %d %b %Y %X %Z').strftime('%Y-%m-%d')
-
         return Spreadsheet.from_rows([headers] + result).as_csv_data, 200, {
             'Content-Type': 'text/csv; charset=utf-8',
             'Content-Disposition': 'attachment; filename="{} to {} notification status per service report.csv"'.format(
