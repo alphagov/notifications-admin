@@ -34,7 +34,7 @@ def test_simple_polygons(fake_uuid):
         # Because the areas are close to each other, the simplification
         # and unioning process results in a single polygon with fewer
         # total coordinates
-        [51],
+        [54],
     ]
 
 

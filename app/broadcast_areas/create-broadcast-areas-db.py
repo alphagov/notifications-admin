@@ -125,7 +125,7 @@ def polygons_and_simplified_polygons(feature):
 
     point_counts.append(simplified.point_count)
 
-    if simplified.point_count >= 200:
+    if simplified.point_count >= 250:
         raise RuntimeError(
             'Too many points '
             '(adjust Polygons.perimeter_to_simplification_ratio or '

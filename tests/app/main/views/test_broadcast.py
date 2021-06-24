@@ -811,8 +811,8 @@ def test_broadcast_page(
         'England remove',
         'Scotland remove',
     ], [
-        'An area of 177,439.8 square miles Will get the alert',
-        'An extra area of 6,392.3 square miles is Likely to get the alert',
+        'An area of 166,426.2 square miles Will get the alert',
+        'An extra area of 7,942.4 square miles is Likely to get the alert',
         '40,000,000 phones estimated',
     ]),
     ([
@@ -837,7 +837,7 @@ def test_broadcast_page(
     ], [
         'Islington remove',
     ], [
-        'An area of 9.7 square miles Will get the alert',
+        'An area of 9.6 square miles Will get the alert',
         'An extra area of 4.7 square miles is Likely to get the alert',
         '200,000 to 500,000 phones',
     ]),
@@ -908,8 +908,8 @@ def test_preview_broadcast_areas_page(
             [[7, 8], [9, 10], [11, 12]],
         ],
         [
-            'An area of 722.3 square miles Will get the alert',
-            'An extra area of 1,498.5 square miles is Likely to get the alert',
+            'An area of 543.3 square miles Will get the alert',
+            'An extra area of 1,595.9 square miles is Likely to get the alert',
             'Unknown number of phones',
         ]
     ),
@@ -924,8 +924,8 @@ def test_preview_broadcast_areas_page(
     (
         [SKYE],
         [
-            'An area of 3,205.0 square miles Will get the alert',
-            'An extra area of 763.4 square miles is Likely to get the alert',
+            'An area of 3,201.7 square miles Will get the alert',
+            'An extra area of 767.0 square miles is Likely to get the alert',
             '4,000 phones estimated',
         ]
     ),
