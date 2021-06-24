@@ -132,10 +132,17 @@ def polygons_and_simplified_polygons(feature):
             'Polygons.perimeter_to_buffer_ratio)'
         )
 
-    return (
+    output = (
         full_resolution.as_coordinate_pairs_long_lat,
         simplified.as_coordinate_pairs_long_lat,
     )
+
+    # Check that the simplification process hasn’t introduced bad data
+    for dataset in output:
+        for polygon in dataset:
+            assert Polygon(polygon).is_valid
+
+    return output
 
 
 def estimate_number_of_smartphones_in_area(country_or_ward_code):
