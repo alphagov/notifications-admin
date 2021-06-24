@@ -3,6 +3,7 @@
 import csv
 import pickle
 import sys
+from math import isclose
 from pathlib import Path
 
 import geojson
@@ -18,9 +19,12 @@ from populations import (
 )
 from repo import BroadcastAreasRepository, rtree_index_path
 from rtreelib import Rect, RTree
+from shapely import wkt
+from shapely.geometry import MultiPolygon, Polygon
 
 source_files_path = Path(__file__).resolve().parent / 'source_files'
 point_counts = []
+invalid_polygons = []
 rtree_index = RTree()
 
 
@@ -33,12 +37,82 @@ def simplify_geometry(feature):
         raise Exception("Unknown type: {}".format(feature["type"]))
 
 
+def clean_up_invalid_polygons(polygons, indent="    "):
+    for index, polygon in enumerate(polygons):
+        shapely_polygon = Polygon(polygon)
+
+        if shapely_polygon.is_valid:
+            print(  # noqa: T001
+                f"{indent}Polygon {index + 1}/{len(polygons)} is valid"
+            )
+            yield polygon
+
+        else:
+            invalid_polygons.append(shapely_polygon)
+
+            # We’ve found polygons where all the points line up, so they
+            # don’t have an area. They wouldn’t contribute to a broadcast
+            # so we can ignore them.
+            if shapely_polygon.area == 0:
+                print(  # noqa: T001
+                    f"{indent}Polygon {index + 1}/{len(polygons)} has 0 area, skipping"
+                )
+                continue
+
+            print(  # noqa: T001
+                f"{indent}Polygon {index + 1}/{len(polygons)} needs fixing..."
+            )
+
+            # The simplest kind of invalid polygon is one that has two
+            # duplicate points in a row at a given precision, so the
+            # first thing to try is removing those points using
+            # simplification with a tolerance of 0
+            polygon_with_duplicate_points_removed = wkt.loads(
+                wkt.dumps(shapely_polygon, rounding_precision=5)
+            ).simplify(0)
+
+            if polygon_with_duplicate_points_removed.is_valid:
+                yield polygon_with_duplicate_points_removed
+                continue
+
+            # Buffering with a size of 0 is a trick to make valid
+            # geometries from polygons that self intersect
+            buffered = shapely_polygon.buffer(0)
+
+            # If the buffering has caused our polygon to split into
+            # multiple polygons, we need to recursively check them
+            # instead
+            if isinstance(buffered, MultiPolygon):
+                for sub_polygon in clean_up_invalid_polygons(buffered, indent="        "):
+                    yield sub_polygon
+                continue
+
+            # We only care about the exterior of the polygon, not an
+            # holes in it that may have been created by fixing self
+            # intersection
+            fixed_polygon = Polygon(buffered.exterior)
+
+            # Make sure the polygon is now valid, and that we haven’t
+            # drastically transformed the polygon by ‘fixing’ it
+            assert fixed_polygon.is_valid
+            assert isclose(fixed_polygon.area, polygon.area, rel_tol=0.001)
+
+            print(  # noqa: T001
+                f"{indent}Polygon {index + 1}/{len(polygons)} fixed!"
+            )
+
+            yield fixed_polygon
+
+
 def polygons_and_simplified_polygons(feature):
     if keep_old_polygons:
         # cheat and shortcut out
         return [], []
 
     polygons = Polygons(simplify_geometry(feature))
+    polygons = list(clean_up_invalid_polygons(polygons))
+    polygons = Polygons(polygons)
+
     full_resolution = polygons.remove_too_small
     smoothed = full_resolution.smooth
     simplified = smoothed.simplify
@@ -380,5 +454,6 @@ print(  # noqa: T001
     '\n'
     'DONE\n'
     f'    Processed {len(point_counts):,} polygons.\n'
+    f'    Cleaned up {len(invalid_polygons):,} polygons.\n'
     f'    Highest point counts once simplifed: {most_detailed_polygons}\n'
 )
