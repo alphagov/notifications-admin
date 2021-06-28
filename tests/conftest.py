@@ -1094,8 +1094,8 @@ def platform_admin_user_no_service_permissions():
 
 
 @pytest.fixture(scope='function')
-def api_user_active(fake_uuid):
-    return create_user(id=fake_uuid)
+def api_user_active():
+    return create_api_user_active()
 
 
 @pytest.fixture(scope='function')
@@ -1124,9 +1124,7 @@ def api_nongov_user_active(fake_uuid):
 
 @pytest.fixture(scope='function')
 def active_user_with_permissions(fake_uuid):
-    return create_service_one_admin(
-        id=fake_uuid,
-    )
+    return create_active_user_with_permissions()
 
 
 @pytest.fixture(scope='function')
@@ -1176,39 +1174,18 @@ def active_user_with_permission_to_other_service(
 
 
 @pytest.fixture(scope='function')
-def active_caseworking_user(fake_uuid):
-    return create_user(
-        id=fake_uuid,
-        email_address='caseworker@example.gov.uk',
-        permissions={SERVICE_ONE_ID: [
-            'send_texts',
-            'send_emails',
-            'send_letters',
-        ]},
-        services=[SERVICE_ONE_ID],
-    )
+def active_caseworking_user():
+    return create_active_caseworking_user()
 
 
 @pytest.fixture
-def active_user_view_permissions(fake_uuid):
-    return create_service_one_user(
-        id=fake_uuid,
-        name='Test User With Permissions',
-        permissions={SERVICE_ONE_ID: ['view_activity']},
-    )
+def active_user_view_permissions():
+    return create_active_user_view_permissions()
 
 
 @pytest.fixture
-def active_user_no_settings_permission(fake_uuid):
-    return create_service_one_user(
-        id=fake_uuid,
-        name='Test User With Permissions',
-        permissions={SERVICE_ONE_ID: [
-            'manage_templates',
-            'manage_api_keys',
-            'view_activity',
-        ]},
-    )
+def active_user_no_settings_permission():
+    return create_active_user_no_settings_permission()
 
 
 @pytest.fixture(scope='function')
