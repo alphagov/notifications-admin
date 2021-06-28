@@ -1064,20 +1064,10 @@ def mock_update_service_template_sender(mocker):
 
 @pytest.fixture(scope='function')
 def api_user_pending(fake_uuid):
-    user_data = {'id': fake_uuid,
-                 'name': 'Test User',
-                 'password': 'somepassword',
-                 'email_address': 'test@user.gov.uk',
-                 'mobile_number': '07700 900762',
-                 'state': 'pending',
-                 'failed_login_count': 0,
-                 'platform_admin': False,
-                 'permissions': {},
-                 'organisations': [],
-                 'current_session_id': None,
-                 'password_changed_at': str(datetime.utcnow()),
-                 }
-    return user_data
+    return create_user(
+        id=fake_uuid,
+        state='pending'
+    )
 
 
 @pytest.fixture(scope='function')
@@ -1105,84 +1095,41 @@ def platform_admin_user_no_service_permissions():
 
 @pytest.fixture(scope='function')
 def api_user_active(fake_uuid):
-    user_data = {'id': fake_uuid,
-                 'name': 'Test User',
-                 'password': 'somepassword',
-                 'email_address': 'test@user.gov.uk',
-                 'mobile_number': '07700 900762',
-                 'state': 'active',
-                 'failed_login_count': 0,
-                 'permissions': {},
-                 'platform_admin': False,
-                 'auth_type': 'sms_auth',
-                 'password_changed_at': str(datetime.utcnow()),
-                 'services': [],
-                 'organisations': [],
-                 'current_session_id': None,
-                 'logged_in_at': None,
-                 'email_access_validated_at': None
-                 }
-    return user_data
+    return create_user(id=fake_uuid)
 
 
 @pytest.fixture(scope='function')
 def api_user_active_email_auth(fake_uuid):
-    user_data = {'id': fake_uuid,
-                 'name': 'Test User',
-                 'password': 'somepassword',
-                 'email_address': 'test@user.gov.uk',
-                 'mobile_number': '07700 900762',
-                 'state': 'active',
-                 'failed_login_count': 0,
-                 'permissions': {},
-                 'platform_admin': False,
-                 'auth_type': 'email_auth',
-                 'password_changed_at': str(datetime.utcnow()),
-                 'services': [],
-                 'organisations': [],
-                 'current_session_id': None,
-                 }
-    return user_data
+    return create_user(
+        id=fake_uuid,
+        auth_type='email_auth'
+    )
 
 
 @pytest.fixture(scope='function')
 def active_user_with_permissions_no_mobile(fake_uuid):
-    user_data = {'id': fake_uuid,
-                 'name': 'Test User',
-                 'password': 'somepassword',
-                 'password_changed_at': str(datetime.utcnow()),
-                 'email_address': 'test@user.gov.uk',
-                 'mobile_number': None,
-                 'state': 'active',
-                 'failed_login_count': 0,
-                 'permissions': {SERVICE_ONE_ID: ['send_texts',
-                                                  'send_emails',
-                                                  'send_letters',
-                                                  'manage_users',
-                                                  'manage_templates',
-                                                  'manage_settings',
-                                                  'manage_api_keys',
-                                                  'view_activity']},
-                 'platform_admin': False,
-                 'auth_type': 'email_auth',
-                 'organisations': [ORGANISATION_ID],
-                 'services': [SERVICE_ONE_ID],
-                 'current_session_id': None,
-                 }
-    return user_data
+    return create_user(
+        id=fake_uuid,
+        mobile_number=None,
+        organisations=[ORGANISATION_ID],
+        services=[SERVICE_ONE_ID],
+        permissions={SERVICE_ONE_ID: ['send_texts',
+                                      'send_emails',
+                                      'send_letters',
+                                      'manage_users',
+                                      'manage_templates',
+                                      'manage_settings',
+                                      'manage_api_keys',
+                                      'view_activity']},
+    )
 
 
 @pytest.fixture(scope='function')
 def api_nongov_user_active(fake_uuid):
-    user_data = {
-        'id': fake_uuid,
-        'name': 'Test User',
-        'password': 'somepassword',
-        'email_address': 'someuser@example.com',
-        'mobile_number': '07700 900762',
-        'state': 'active',
-        'failed_login_count': 0,
-        'permissions': {SERVICE_ONE_ID: [
+    return create_user(
+        id=fake_uuid,
+        email_address='someuser@example.com',
+        permissions={SERVICE_ONE_ID: [
             'send_texts',
             'send_emails',
             'send_letters',
@@ -1192,73 +1139,49 @@ def api_nongov_user_active(fake_uuid):
             'manage_api_keys',
             'view_activity',
         ]},
-        'platform_admin': False,
-        'auth_type': 'sms_auth',
-        'password_changed_at': str(datetime.utcnow()),
-        'services': [],
-        'organisations': [],
-        'current_session_id': None,
-    }
-    return user_data
+    )
 
 
 @pytest.fixture(scope='function')
 def active_user_with_permissions(fake_uuid):
-    user_data = {'id': fake_uuid,
-                 'name': 'Test User',
-                 'password': 'somepassword',
-                 'password_changed_at': str(datetime.utcnow()),
-                 'email_address': 'test@user.gov.uk',
-                 'mobile_number': '07700 900762',
-                 'state': 'active',
-                 'failed_login_count': 0,
-                 'permissions': {SERVICE_ONE_ID: ['send_texts',
-                                                  'send_emails',
-                                                  'send_letters',
-                                                  'manage_users',
-                                                  'manage_templates',
-                                                  'manage_settings',
-                                                  'manage_api_keys',
-                                                  'view_activity']},
-                 'platform_admin': False,
-                 'auth_type': 'sms_auth',
-                 'organisations': [ORGANISATION_ID],
-                 'services': [SERVICE_ONE_ID],
-                 'current_session_id': None,
-                 }
-    return user_data
+    return create_user(
+        id=fake_uuid,
+        permissions={SERVICE_ONE_ID: [
+            'send_texts',
+            'send_emails',
+            'send_letters',
+            'manage_users',
+            'manage_templates',
+            'manage_settings',
+            'manage_api_keys',
+            'view_activity'
+        ]},
+        organisations=[ORGANISATION_ID],
+        services=[SERVICE_ONE_ID],
+    )
 
 
 @pytest.fixture(scope='function')
 def active_user_with_session(fake_uuid):
-    user_data = {'id': fake_uuid,
-                 'name': 'Test User',
-                 'password': 'somepassword',
-                 'password_changed_at': str(datetime.utcnow()),
-                 'email_address': 'test@user.gov.uk',
-                 'mobile_number': '07700 900762',
-                 'state': 'active',
-                 'failed_login_count': 0,
-                 'permissions': {SERVICE_ONE_ID: ['send_texts',
-                                                  'send_emails',
-                                                  'send_letters',
-                                                  'manage_users',
-                                                  'manage_templates',
-                                                  'manage_settings',
-                                                  'manage_api_keys',
-                                                  'view_activity']},
-                 'platform_admin': False,
-                 'auth_type': 'sms_auth',
-                 'organisations': [ORGANISATION_ID],
-                 'services': [SERVICE_ONE_ID],
-                 'current_session_id': fake_uuid,
-                 }
-    return user_data
+    return create_user(
+        id=fake_uuid,
+        permissions={SERVICE_ONE_ID: [
+            'send_texts',
+            'send_emails',
+            'send_letters',
+            'manage_users',
+            'manage_templates',
+            'manage_settings',
+            'manage_api_keys',
+            'view_activity'
+        ]},
+        organisations=[ORGANISATION_ID],
+        services=[SERVICE_ONE_ID],
+    )
 
 
 @pytest.fixture(scope='function')
 def active_user_with_permission_to_two_services(fake_uuid):
-
     permissions = [
         'send_texts',
         'send_emails',
@@ -1270,25 +1193,15 @@ def active_user_with_permission_to_two_services(fake_uuid):
         'view_activity',
     ]
 
-    return {
-        'id': fake_uuid,
-        'name': 'Test User',
-        'password': 'somepassword',
-        'password_changed_at': str(datetime.utcnow()),
-        'email_address': 'test@user.gov.uk',
-        'mobile_number': '07700 900762',
-        'state': 'active',
-        'failed_login_count': 0,
-        'permissions': {
+    return create_user(
+        id=fake_uuid,
+        permissions={
             SERVICE_ONE_ID: permissions,
             SERVICE_TWO_ID: permissions,
         },
-        'platform_admin': False,
-        'auth_type': 'sms_auth',
-        'organisations': [ORGANISATION_ID],
-        'services': [SERVICE_ONE_ID, SERVICE_TWO_ID],
-        'current_session_id': None,
-    }
+        organisations=[ORGANISATION_ID],
+        services=[SERVICE_ONE_ID, SERVICE_TWO_ID],
+    )
 
 
 @pytest.fixture(scope='function')
@@ -1308,131 +1221,66 @@ def active_user_with_permission_to_other_service(
 
 @pytest.fixture(scope='function')
 def active_caseworking_user(fake_uuid):
-
-    user_data = {
-        'id': fake_uuid,
-        'name': 'Test User',
-        'password': 'somepassword',
-        'password_changed_at': str(datetime.utcnow()),
-        'email_address': 'caseworker@example.gov.uk',
-        'mobile_number': '07700 900762',
-        'state': 'active',
-        'failed_login_count': 0,
-        'permissions': {SERVICE_ONE_ID: [
+    return create_user(
+        id=fake_uuid,
+        email_address='caseworker@example.gov.uk',
+        permissions={SERVICE_ONE_ID: [
             'send_texts',
             'send_emails',
             'send_letters',
         ]},
-        'platform_admin': False,
-        'auth_type': 'sms_auth',
-        'organisations': [],
-        'services': [SERVICE_ONE_ID],
-        'current_session_id': None,
-    }
-    return user_data
+        services=[SERVICE_ONE_ID],
+    )
 
 
 @pytest.fixture
 def active_user_view_permissions(fake_uuid):
-    user_data = {'id': fake_uuid,
-                 'name': 'Test User With Permissions',
-                 'password': 'somepassword',
-                 'password_changed_at': str(datetime.utcnow()),
-                 'email_address': 'test@user.gov.uk',
-                 'mobile_number': '07700 900762',
-                 'state': 'active',
-                 'failed_login_count': 0,
-                 'permissions': {SERVICE_ONE_ID: ['view_activity']},
-                 'platform_admin': False,
-                 'auth_type': 'sms_auth',
-                 'organisations': [],
-                 'services': [SERVICE_ONE_ID],
-                 'current_session_id': None,
-                 }
-    return user_data
+    return create_user(
+        id=fake_uuid,
+        name='Test User With Permissions',
+        permissions={SERVICE_ONE_ID: ['view_activity']},
+        services=[SERVICE_ONE_ID],
+    )
 
 
 @pytest.fixture
 def active_user_no_settings_permission(fake_uuid):
-    return {
-        'id': fake_uuid,
-        'name': 'Test User With Permissions',
-        'password': 'somepassword',
-        'password_changed_at': str(datetime.utcnow()),
-        'email_address': 'test@user.gov.uk',
-        'mobile_number': '07700 900762',
-        'state': 'active',
-        'failed_login_count': 0,
-        'permissions': {SERVICE_ONE_ID: [
+    return create_user(
+        id=fake_uuid,
+        name='Test User With Permissions',
+        permissions={SERVICE_ONE_ID: [
             'manage_templates',
             'manage_api_keys',
             'view_activity',
         ]},
-        'platform_admin': False,
-        'auth_type': 'sms_auth',
-        'current_session_id': None,
-        'services': [SERVICE_ONE_ID],
-        'organisations': [],
-    }
+        services=[SERVICE_ONE_ID],
+    )
 
 
 @pytest.fixture(scope='function')
 def api_user_locked(fake_uuid):
-    user_data = {'id': fake_uuid,
-                 'name': 'Test User',
-                 'password': 'somepassword',
-                 'email_address': 'test@user.gov.uk',
-                 'mobile_number': '07700 900762',
-                 'state': 'active',
-                 'failed_login_count': 5,
-                 'permissions': {},
-                 'auth_type': 'sms_auth',
-                 'organisations': [],
-                 'current_session_id': None,
-                 'platform_admin': False,
-                 'services': [],
-                 }
-    return user_data
+    return create_user(
+        id=fake_uuid,
+        failed_login_count=5,
+        password_changed_at=None,
+    )
 
 
 @pytest.fixture(scope='function')
 def api_user_request_password_reset(fake_uuid):
-    user_data = {'id': fake_uuid,
-                 'name': 'Test User',
-                 'password': 'somepassword',
-                 'email_address': 'test@user.gov.uk',
-                 'mobile_number': '07700 900762',
-                 'state': 'active',
-                 'failed_login_count': 5,
-                 'permissions': {},
-                 'password_changed_at': str(datetime.utcnow()),
-                 'auth_type': 'sms_auth',
-                 'organisations': [],
-                 'current_session_id': None,
-                 'platform_admin': False,
-                 'services': [],
-                 }
-    return user_data
+    return create_user(
+        id=fake_uuid,
+        failed_login_count=5,
+    )
 
 
 @pytest.fixture(scope='function')
 def api_user_changed_password(fake_uuid):
-    user_data = {'id': fake_uuid,
-                 'name': 'Test User',
-                 'password': 'somepassword',
-                 'email_address': 'test@user.gov.uk',
-                 'mobile_number': '07700 900762',
-                 'state': 'active',
-                 'failed_login_count': 5,
-                 'permissions': {},
-                 'auth_type': 'sms_auth',
-                 'password_changed_at': str(datetime.utcnow() + timedelta(minutes=1)),
-                 'organisations': [],
-                 'current_session_id': None,
-                 'platform_admin': False,
-                 'services': [],
-                 }
-    return user_data
+    return create_user(
+        id=fake_uuid,
+        failed_login_count=5,
+        password_changed_at=str(datetime.utcnow() + timedelta(minutes=1)),
+    )
 
 
 @pytest.fixture(scope='function')
@@ -2362,26 +2210,21 @@ def mock_has_permissions(mocker):
 @pytest.fixture(scope='function')
 def mock_get_users_by_service(mocker):
     def _get_users_for_service(service_id):
-        data = [{'id': sample_uuid(),
-                 'logged_in_at': None,
-                 'mobile_number': '+447700900986',
-                 'permissions': {SERVICE_ONE_ID: ['send_texts',
-                                                  'send_emails',
-                                                  'send_letters',
-                                                  'manage_users',
-                                                  'manage_templates',
-                                                  'manage_settings',
-                                                  'manage_api_keys']},
-                 'state': 'active',
-                 'password_changed_at': str(datetime.utcnow()),
-                 'name': 'Test User',
-                 'email_address': 'notify@digital.cabinet-office.gov.uk',
-                 'auth_type': 'sms_auth',
-                 'failed_login_count': 0,
-                 'organisations': [],
-                 'platform_admin': False,
-                 }]
-        return [data[0]]
+        return [create_user(
+            id=sample_uuid(),
+            logged_in_at=None,
+            mobile_number='+447700900986',
+            permissions={SERVICE_ONE_ID: [
+                'send_texts',
+                'send_emails',
+                'send_letters',
+                'manage_users',
+                'manage_templates',
+                'manage_settings',
+                'manage_api_keys'
+            ]},
+            email_address='notify@digital.cabinet-office.gov.uk',
+        )]
 
     # You shouldn’t be calling the user API client directly, so it’s the
     # instance on the model that’s mocked here
@@ -3789,198 +3632,127 @@ def mock_get_returned_letter_statistics_with_no_returned_letters(mocker):
 
 
 def create_api_user_active(with_unique_id=False):
-    return {
-        'id': str(uuid4()) if with_unique_id else sample_uuid(),
-        'name': 'Test User',
-        'password': 'somepassword',
-        'email_address': 'test@user.gov.uk',
-        'mobile_number': '07700 900762',
-        'state': 'active',
-        'failed_login_count': 0,
-        'permissions': {},
-        'platform_admin': False,
-        'auth_type': 'sms_auth',
-        'password_changed_at': str(datetime.utcnow()),
-        'services': [],
-        'organisations': [],
-        'current_session_id': None,
-        'logged_in_at': None,
-    }
+    return create_user(
+        id=str(uuid4()) if with_unique_id else sample_uuid(),
+    )
 
 
 def create_active_user_empty_permissions(with_unique_id=False):
-    return {
-        'id': str(uuid4()) if with_unique_id else sample_uuid(),
-        'name': 'Test User With Empty Permissions',
-        'password': 'somepassword',
-        'password_changed_at': str(datetime.utcnow()),
-        'email_address': 'test@user.gov.uk',
-        'mobile_number': '07700 900763',
-        'state': 'active',
-        'failed_login_count': 0,
-        'permissions': {},
-        'platform_admin': False,
-        'auth_type': 'sms_auth',
-        'organisations': [],
-        'services': [SERVICE_ONE_ID],
-        'current_session_id': None,
-    }
+    return create_user(
+        id=str(uuid4()) if with_unique_id else sample_uuid(),
+        name='Test User With Empty Permissions',
+        mobile_number='07700 900763',
+        services=[SERVICE_ONE_ID],
+    )
 
 
 def create_active_user_with_permissions(with_unique_id=False):
-    return {
-        'id': str(uuid4()) if with_unique_id else sample_uuid(),
-        'name': 'Test User',
-        'password': 'somepassword',
-        'password_changed_at': str(datetime.utcnow()),
-        'email_address': 'test@user.gov.uk',
-        'mobile_number': '07700 900762',
-        'state': 'active',
-        'failed_login_count': 0,
-        'permissions': {SERVICE_ONE_ID: ['send_texts',
-                                         'send_emails',
-                                         'send_letters',
-                                         'manage_users',
-                                         'manage_templates',
-                                         'manage_settings',
-                                         'manage_api_keys',
-                                         'view_activity']},
-        'platform_admin': False,
-        'auth_type': 'sms_auth',
-        'organisations': [ORGANISATION_ID],
-        'services': [SERVICE_ONE_ID],
-        'current_session_id': None,
-                 }
+    return create_user(
+        id=str(uuid4()) if with_unique_id else sample_uuid(),
+        permissions={SERVICE_ONE_ID: ['send_texts',
+                                      'send_emails',
+                                      'send_letters',
+                                      'manage_users',
+                                      'manage_templates',
+                                      'manage_settings',
+                                      'manage_api_keys',
+                                      'view_activity']},
+        organisations=[ORGANISATION_ID],
+        services=[SERVICE_ONE_ID],
+    )
 
 
 def create_active_user_view_permissions(with_unique_id=False):
-    return {
-        'id': str(uuid4()) if with_unique_id else sample_uuid(),
-        'name': 'Test User With Permissions',
-        'password': 'somepassword',
-        'password_changed_at': str(datetime.utcnow()),
-        'email_address': 'test@user.gov.uk',
-        'mobile_number': '07700 900762',
-        'state': 'active',
-        'failed_login_count': 0,
-        'permissions': {SERVICE_ONE_ID: ['view_activity']},
-        'platform_admin': False,
-        'auth_type': 'sms_auth',
-        'organisations': [],
-        'services': [SERVICE_ONE_ID],
-        'current_session_id': None,
-    }
+    return create_user(
+        id=str(uuid4()) if with_unique_id else sample_uuid(),
+        name='Test User With Permissions',
+        permissions={SERVICE_ONE_ID: ['view_activity']},
+        services=[SERVICE_ONE_ID],
+    )
 
 
 def create_active_caseworking_user(with_unique_id=False):
-    return {
-        'id': str(uuid4()) if with_unique_id else sample_uuid(),
-        'name': 'Test User',
-        'password': 'somepassword',
-        'password_changed_at': str(datetime.utcnow()),
-        'email_address': 'caseworker@example.gov.uk',
-        'mobile_number': '07700 900762',
-        'state': 'active',
-        'failed_login_count': 0,
-        'permissions': {SERVICE_ONE_ID: [
+    return create_user(
+        id=str(uuid4()) if with_unique_id else sample_uuid(),
+        email_address='caseworker@example.gov.uk',
+        permissions={SERVICE_ONE_ID: [
             'send_texts',
             'send_emails',
             'send_letters',
         ]},
-        'platform_admin': False,
-        'auth_type': 'sms_auth',
-        'organisations': [],
-        'services': [SERVICE_ONE_ID],
-        'current_session_id': None,
-    }
+        services=[SERVICE_ONE_ID],
+    )
 
 
 def create_active_user_no_api_key_permission(with_unique_id=False):
-    return {
-        'id': str(uuid4()) if with_unique_id else sample_uuid(),
-        'name': 'Test User With Permissions',
-        'password': 'somepassword',
-        'password_changed_at': str(datetime.utcnow()),
-        'email_address': 'test@user.gov.uk',
-        'mobile_number': '07700 900762',
-        'state': 'active',
-        'failed_login_count': 0,
-        'permissions': {SERVICE_ONE_ID: [
+    return create_user(
+        id=str(uuid4()) if with_unique_id else sample_uuid(),
+        name='Test User With Permissions',
+        permissions={SERVICE_ONE_ID: [
             'manage_templates',
             'manage_settings',
             'view_activity',
         ]},
-        'platform_admin': False,
-        'auth_type': 'sms_auth',
-        'organisations': [],
-        'current_session_id': None,
-        'services': [SERVICE_ONE_ID],
-    }
+        services=[SERVICE_ONE_ID],
+    )
 
 
 def create_active_user_no_settings_permission(with_unique_id=False):
-    return {
-        'id': str(uuid4()) if with_unique_id else sample_uuid(),
-        'name': 'Test User With Permissions',
-        'password': 'somepassword',
-        'password_changed_at': str(datetime.utcnow()),
-        'email_address': 'test@user.gov.uk',
-        'mobile_number': '07700 900762',
-        'state': 'active',
-        'failed_login_count': 0,
-        'permissions': {SERVICE_ONE_ID: [
+    return create_user(
+        id=str(uuid4()) if with_unique_id else sample_uuid(),
+        name='Test User With Permissions',
+        permissions={SERVICE_ONE_ID: [
             'manage_templates',
             'manage_api_keys',
             'view_activity',
         ]},
-        'platform_admin': False,
-        'auth_type': 'sms_auth',
-        'current_session_id': None,
-        'services': [SERVICE_ONE_ID],
-        'organisations': [],
-    }
+        services=[SERVICE_ONE_ID],
+    )
 
 
 def create_active_user_manage_template_permissions(with_unique_id=False):
-    return {
-        'id': str(uuid4()) if with_unique_id else sample_uuid(),
-        'name': 'Test User With Permissions',
+    return create_user(
+        id=str(uuid4()) if with_unique_id else sample_uuid(),
+        name='Test User With Permissions',
+        permissions={SERVICE_ONE_ID: [
+            'manage_templates',
+            'view_activity',
+        ]},
+        services=[SERVICE_ONE_ID],
+    )
+
+
+def create_platform_admin_user(with_unique_id=False, auth_type='sms_auth', permissions=None):
+    return create_user(
+        id=str(uuid4()) if with_unique_id else sample_uuid(),
+        name='Platform admin user',
+        email_address='platform@admin.gov.uk',
+        permissions=permissions or {},
+        platform_admin=True,
+        auth_type=auth_type,
+    )
+
+
+def create_user(**overrides):
+    user_data = {
+        'name': 'Test User',
         'password': 'somepassword',
-        'password_changed_at': str(datetime.utcnow()),
         'email_address': 'test@user.gov.uk',
         'mobile_number': '07700 900762',
         'state': 'active',
         'failed_login_count': 0,
-        'permissions': {SERVICE_ONE_ID: [
-            'manage_templates',
-            'view_activity',
-        ]},
+        'permissions': {},
         'platform_admin': False,
         'auth_type': 'sms_auth',
-        'organisations': [],
-        'services': [SERVICE_ONE_ID],
-        'current_session_id': None,
-    }
-
-
-def create_platform_admin_user(with_unique_id=False, auth_type='sms_auth', permissions=None):
-    return {
-        'id': str(uuid4()) if with_unique_id else sample_uuid(),
-        'name': 'Platform admin user',
-        'password': 'somepassword',
-        'email_address': 'platform@admin.gov.uk',
-        'mobile_number': '07700 900762',
-        'state': 'active',
-        'failed_login_count': 0,
-        'permissions': permissions or {},
-        'platform_admin': True,
-        'auth_type': auth_type,
         'password_changed_at': str(datetime.utcnow()),
         'services': [],
         'organisations': [],
         'current_session_id': None,
         'logged_in_at': None,
+        'email_access_validated_at': None
     }
+    user_data.update(overrides)
+    return user_data
 
 
 def create_reply_to_email_address(
