@@ -1108,75 +1108,31 @@ def api_user_active_email_auth(fake_uuid):
 
 @pytest.fixture(scope='function')
 def active_user_with_permissions_no_mobile(fake_uuid):
-    return create_user(
+    return create_service_one_admin(
         id=fake_uuid,
         mobile_number=None,
-        organisations=[ORGANISATION_ID],
-        services=[SERVICE_ONE_ID],
-        permissions={SERVICE_ONE_ID: ['send_texts',
-                                      'send_emails',
-                                      'send_letters',
-                                      'manage_users',
-                                      'manage_templates',
-                                      'manage_settings',
-                                      'manage_api_keys',
-                                      'view_activity']},
     )
 
 
 @pytest.fixture(scope='function')
 def api_nongov_user_active(fake_uuid):
-    return create_user(
+    return create_service_one_admin(
         id=fake_uuid,
         email_address='someuser@example.com',
-        permissions={SERVICE_ONE_ID: [
-            'send_texts',
-            'send_emails',
-            'send_letters',
-            'manage_users',
-            'manage_templates',
-            'manage_settings',
-            'manage_api_keys',
-            'view_activity',
-        ]},
     )
 
 
 @pytest.fixture(scope='function')
 def active_user_with_permissions(fake_uuid):
-    return create_user(
+    return create_service_one_admin(
         id=fake_uuid,
-        permissions={SERVICE_ONE_ID: [
-            'send_texts',
-            'send_emails',
-            'send_letters',
-            'manage_users',
-            'manage_templates',
-            'manage_settings',
-            'manage_api_keys',
-            'view_activity'
-        ]},
-        organisations=[ORGANISATION_ID],
-        services=[SERVICE_ONE_ID],
     )
 
 
 @pytest.fixture(scope='function')
 def active_user_with_session(fake_uuid):
-    return create_user(
+    return create_service_one_admin(
         id=fake_uuid,
-        permissions={SERVICE_ONE_ID: [
-            'send_texts',
-            'send_emails',
-            'send_letters',
-            'manage_users',
-            'manage_templates',
-            'manage_settings',
-            'manage_api_keys',
-            'view_activity'
-        ]},
-        organisations=[ORGANISATION_ID],
-        services=[SERVICE_ONE_ID],
     )
 
 
@@ -1235,17 +1191,16 @@ def active_caseworking_user(fake_uuid):
 
 @pytest.fixture
 def active_user_view_permissions(fake_uuid):
-    return create_user(
+    return create_service_one_user(
         id=fake_uuid,
         name='Test User With Permissions',
         permissions={SERVICE_ONE_ID: ['view_activity']},
-        services=[SERVICE_ONE_ID],
     )
 
 
 @pytest.fixture
 def active_user_no_settings_permission(fake_uuid):
-    return create_user(
+    return create_service_one_user(
         id=fake_uuid,
         name='Test User With Permissions',
         permissions={SERVICE_ONE_ID: [
@@ -1253,7 +1208,6 @@ def active_user_no_settings_permission(fake_uuid):
             'manage_api_keys',
             'view_activity',
         ]},
-        services=[SERVICE_ONE_ID],
     )
 
 
@@ -2210,19 +2164,10 @@ def mock_has_permissions(mocker):
 @pytest.fixture(scope='function')
 def mock_get_users_by_service(mocker):
     def _get_users_for_service(service_id):
-        return [create_user(
+        return [create_service_one_admin(
             id=sample_uuid(),
             logged_in_at=None,
             mobile_number='+447700900986',
-            permissions={SERVICE_ONE_ID: [
-                'send_texts',
-                'send_emails',
-                'send_letters',
-                'manage_users',
-                'manage_templates',
-                'manage_settings',
-                'manage_api_keys'
-            ]},
             email_address='notify@digital.cabinet-office.gov.uk',
         )]
 
@@ -3638,36 +3583,23 @@ def create_api_user_active(with_unique_id=False):
 
 
 def create_active_user_empty_permissions(with_unique_id=False):
-    return create_user(
+    return create_service_one_user(
         id=str(uuid4()) if with_unique_id else sample_uuid(),
         name='Test User With Empty Permissions',
-        mobile_number='07700 900763',
-        services=[SERVICE_ONE_ID],
     )
 
 
 def create_active_user_with_permissions(with_unique_id=False):
-    return create_user(
+    return create_service_one_admin(
         id=str(uuid4()) if with_unique_id else sample_uuid(),
-        permissions={SERVICE_ONE_ID: ['send_texts',
-                                      'send_emails',
-                                      'send_letters',
-                                      'manage_users',
-                                      'manage_templates',
-                                      'manage_settings',
-                                      'manage_api_keys',
-                                      'view_activity']},
-        organisations=[ORGANISATION_ID],
-        services=[SERVICE_ONE_ID],
     )
 
 
 def create_active_user_view_permissions(with_unique_id=False):
-    return create_user(
+    return create_service_one_user(
         id=str(uuid4()) if with_unique_id else sample_uuid(),
         name='Test User With Permissions',
         permissions={SERVICE_ONE_ID: ['view_activity']},
-        services=[SERVICE_ONE_ID],
     )
 
 
@@ -3685,7 +3617,7 @@ def create_active_caseworking_user(with_unique_id=False):
 
 
 def create_active_user_no_api_key_permission(with_unique_id=False):
-    return create_user(
+    return create_service_one_user(
         id=str(uuid4()) if with_unique_id else sample_uuid(),
         name='Test User With Permissions',
         permissions={SERVICE_ONE_ID: [
@@ -3693,12 +3625,11 @@ def create_active_user_no_api_key_permission(with_unique_id=False):
             'manage_settings',
             'view_activity',
         ]},
-        services=[SERVICE_ONE_ID],
     )
 
 
 def create_active_user_no_settings_permission(with_unique_id=False):
-    return create_user(
+    return create_service_one_user(
         id=str(uuid4()) if with_unique_id else sample_uuid(),
         name='Test User With Permissions',
         permissions={SERVICE_ONE_ID: [
@@ -3706,19 +3637,17 @@ def create_active_user_no_settings_permission(with_unique_id=False):
             'manage_api_keys',
             'view_activity',
         ]},
-        services=[SERVICE_ONE_ID],
     )
 
 
 def create_active_user_manage_template_permissions(with_unique_id=False):
-    return create_user(
+    return create_service_one_user(
         id=str(uuid4()) if with_unique_id else sample_uuid(),
         name='Test User With Permissions',
         permissions={SERVICE_ONE_ID: [
             'manage_templates',
             'view_activity',
         ]},
-        services=[SERVICE_ONE_ID],
     )
 
 
@@ -3731,6 +3660,32 @@ def create_platform_admin_user(with_unique_id=False, auth_type='sms_auth', permi
         platform_admin=True,
         auth_type=auth_type,
     )
+
+
+def create_service_one_admin(**overrides):
+    user_data = {
+        'permissions': {SERVICE_ONE_ID: [
+            'send_texts',
+            'send_emails',
+            'send_letters',
+            'manage_users',
+            'manage_templates',
+            'manage_settings',
+            'manage_api_keys',
+            'view_activity'
+        ]},
+    }
+    user_data.update(overrides)
+    return create_service_one_user(**user_data)
+
+
+def create_service_one_user(**overrides):
+    user_data = {
+        'organisations': [ORGANISATION_ID],
+        'services': [SERVICE_ONE_ID],
+    }
+    user_data.update(overrides)
+    return create_user(**user_data)
 
 
 def create_user(**overrides):
