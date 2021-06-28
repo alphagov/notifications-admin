@@ -43,10 +43,8 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         """
         return self.get('/service/{0}'.format(service_id))
 
-    def get_service_statistics(self, service_id, today_only, limit_days=None):
-        return self.get('/service/{0}/statistics'.format(service_id), params={
-                'today_only': today_only, 'limit_days': limit_days
-            })['data']
+    def get_service_statistics(self, service_id, limit_days=None):
+        return self.get('/service/{0}/statistics'.format(service_id), params={'limit_days': limit_days})['data']
 
     def get_services(self, params_dict=None):
         """
