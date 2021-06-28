@@ -13,7 +13,9 @@ from tests.conftest import (
     SERVICE_ONE_ID,
     create_active_user_approve_broadcasts_permissions,
     create_active_user_create_broadcasts_permissions,
+    create_active_user_view_permissions,
     create_active_user_with_permissions,
+    create_platform_admin_user,
     normalize_spaces,
 )
 
@@ -477,13 +479,19 @@ def test_empty_broadcast_dashboard(
 
 
 @freeze_time('2020-02-20 02:20')
+@pytest.mark.parametrize('user', [
+    create_active_user_with_permissions(),
+    create_active_user_create_broadcasts_permissions(),
+])
 def test_broadcast_dashboard(
     client_request,
     service_one,
     mock_get_broadcast_messages,
     mock_get_service_templates,
+    user,
 ):
     service_one['permissions'] += ['broadcast']
+    client_request.login(user)
     page = client_request.get(
         '.broadcast_dashboard',
         service_id=SERVICE_ONE_ID,
@@ -511,23 +519,22 @@ def test_broadcast_dashboard(
     )
 
 
-@pytest.mark.parametrize("user_is_platform_admin", [True, False])
+@pytest.mark.parametrize('user', [
+    create_platform_admin_user(),
+    create_active_user_view_permissions(),
+    create_active_user_approve_broadcasts_permissions(),
+])
 @pytest.mark.parametrize('endpoint', (
     '.broadcast_dashboard', '.broadcast_dashboard_previous', '.broadcast_dashboard_rejected',
 ))
-def test_broadcast_dashboard_does_not_have_button_for_view_only_user(
+def test_broadcast_dashboard_does_not_have_button_if_user_does_not_have_permission_to_create_broadcast(
     client_request,
     service_one,
-    active_user_view_permissions,
-    platform_admin_user_no_service_permissions,
     mock_get_broadcast_messages,
     endpoint,
-    user_is_platform_admin
+    user,
 ):
-    if user_is_platform_admin:
-        client_request.login(platform_admin_user_no_service_permissions)
-    else:
-        client_request.login(active_user_view_permissions)
+    client_request.login(user)
 
     service_one['permissions'] += ['broadcast']
     page = client_request.get(
@@ -561,13 +568,19 @@ def test_broadcast_dashboard_json(
 
 
 @freeze_time('2020-02-20 02:20')
+@pytest.mark.parametrize('user', [
+    create_active_user_with_permissions(),
+    create_active_user_create_broadcasts_permissions(),
+])
 def test_previous_broadcasts_page(
     client_request,
     service_one,
     mock_get_broadcast_messages,
     mock_get_service_templates,
+    user,
 ):
     service_one['permissions'] += ['broadcast']
+    client_request.login(user)
     page = client_request.get(
         '.broadcast_dashboard_previous',
         service_id=SERVICE_ONE_ID,
@@ -596,13 +609,19 @@ def test_previous_broadcasts_page(
 
 
 @freeze_time('2020-02-20 02:20')
+@pytest.mark.parametrize('user', [
+    create_active_user_with_permissions(),
+    create_active_user_create_broadcasts_permissions(),
+])
 def test_rejected_broadcasts_page(
     client_request,
     service_one,
     mock_get_broadcast_messages,
     mock_get_service_templates,
+    user,
 ):
     service_one['permissions'] += ['broadcast']
+    client_request.login(user)
     page = client_request.get(
         '.broadcast_dashboard_rejected',
         service_id=SERVICE_ONE_ID,
