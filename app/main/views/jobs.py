@@ -272,7 +272,6 @@ def get_notifications(service_id, message_type, status_override=None):
                 message_type,
                 service_api_client.get_service_statistics(
                     service_id,
-                    today_only=False,
                     limit_days=service_data_retention_days
                 )
             )

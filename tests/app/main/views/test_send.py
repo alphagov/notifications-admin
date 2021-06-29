@@ -2453,7 +2453,6 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(
     logged_in_client,
     mock_get_service_template,
     mock_get_users_by_service,
-    mock_get_service_statistics,
     mock_get_live_service,
     mock_get_job_doesnt_exist,
     mock_get_jobs,
@@ -2471,7 +2470,7 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(
             '07700 9007{0:02d}'.format(final_two) for final_two in range(0, 53)
         ])
     )
-
+    mock_get_notification_count = mocker.patch('app.service_api_client.get_notification_count', return_value=0)
     response = logged_in_client.post(
         url_for('main.send_messages', service_id=service_one['id'], template_id=fake_uuid),
         data={'file': (BytesIO(''.encode('utf-8')), 'example.csv')},
@@ -2503,7 +2502,7 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(
     assert '07700 900750' not in content
     assert 'Only showing the first 50 rows' in content
 
-    mock_get_service_statistics.assert_called_once_with(service_one['id'], today_only=True)
+    mock_get_notification_count.assert_called_once_with(service_one['id'])
 
 
 @pytest.mark.parametrize('international_sms_permission, should_allow_international', [
@@ -3101,9 +3100,10 @@ def test_go_to_dashboard_after_tour_link(
 
 
 @pytest.mark.parametrize('num_requested,expected_msg', [
-    (0, '‘example.csv’ contains 1,234 phone numbers.'),
-    (1, 'You can still send 49 messages today, but ‘example.csv’ contains 1,234 phone numbers.')
-], ids=['none_sent', 'some_sent'])
+    (None, '‘example.csv’ contains 1,234 phone numbers.'),
+    ("0", '‘example.csv’ contains 1,234 phone numbers.'),
+    ("1", 'You can still send 49 messages today, but ‘example.csv’ contains 1,234 phone numbers.')
+], ids=['none_sent', 'none_sent', 'some_sent'])
 def test_check_messages_shows_too_many_messages_errors(
     mocker,
     client_request,
@@ -3121,10 +3121,7 @@ def test_check_messages_shows_too_many_messages_errors(
     mocker.patch('app.main.views.send.s3download', return_value=',\n'.join(
         ['phone number'] + ([mock_get_users_by_service(None)[0]['mobile_number']] * 1234)
     ))
-    mocker.patch('app.service_api_client.get_service_statistics', return_value={
-        'sms': {'requested': num_requested, 'delivered': 0, 'failed': 0},
-        'email': {'requested': 0, 'delivered': 0, 'failed': 0}
-    })
+    mocker.patch('app.extensions.redis_client.get', return_value=num_requested)
 
     with client_request.session_transaction() as session:
         session['file_uploads'] = {
