@@ -1,5 +1,4 @@
 {% from "components/back-link/macro.njk" import govukBackLink %}
-{% from "components/button/macro.njk" import govukButton %}
 {% from "components/details/macro.njk" import govukDetails %}
 {% from "components/form.html" import form_wrapper %}
 {% from "components/banner.html" import banner %}
@@ -19,9 +18,10 @@
 
 {% block service_page_title %}
   {% if broadcast_message.status == 'pending-approval' %}
-    {% if broadcast_message.created_by and broadcast_message.created_by == current_user and current_user.has_permissions('send_messages', restrict_admin_usage=True) %}
+    {% if broadcast_message.created_by and broadcast_message.created_by == current_user
+      and current_user.has_permissions('send_messages', 'create_broadcasts', 'approve_broadcasts', restrict_admin_usage=True) %}
       {{ broadcast_message.template.name }} is waiting for approval
-    {% elif current_user.has_permissions('send_messages', restrict_admin_usage=True) %}
+    {% elif current_user.has_permissions('send_messages', 'approve_broadcasts', restrict_admin_usage=True) %}
       {% if broadcast_message.created_by %}
         {{ broadcast_message.created_by.name }}
       {% else %}
@@ -42,7 +42,8 @@
   {{ govukBackLink({ "href": back_link }) }}
 
   {% if broadcast_message.status == 'pending-approval' %}
-    {% if broadcast_message.created_by and broadcast_message.created_by == current_user and current_user.has_permissions('send_messages', restrict_admin_usage=True) %}
+    {% if broadcast_message.created_by and broadcast_message.created_by == current_user
+      and current_user.has_permissions('send_messages', 'create_broadcasts', 'approve_broadcasts', restrict_admin_usage=True) %}
       <div class="banner govuk-!-margin-bottom-6">
         <h1 class="govuk-heading-m govuk-!-margin-bottom-3">
           {{ broadcast_message.template.name }} is waiting for approval
@@ -55,7 +56,7 @@
             delete_link=url_for('main.reject_broadcast_message', service_id=current_service.id, broadcast_message_id=broadcast_message.id),
             delete_link_text='Discard this alert'
           ) }}
-        {% else %}
+        {% elif current_user.has_permissions('send_messages', 'approve_broadcasts', restrict_admin_usage=True) %}
           <p class="govuk-body govuk-!-margin-bottom-3">
             When you use a live account you’ll need another member of
             your team to approve your alert.
@@ -79,9 +80,20 @@
               ) }}
             {% endcall %}
           </details>
+        {% elif current_user.has_permissions('create_broadcasts', restrict_admin_usage=True) %}
+          <p class="govuk-body">
+            You need another member of your team to approve this alert.
+          </p>
+          <p class="govuk-body">
+            This service is in training mode. No real alerts will be sent.
+          </p>
+          {{ page_footer(
+            delete_link=url_for('main.reject_broadcast_message', service_id=current_service.id, broadcast_message_id=broadcast_message.id),
+            delete_link_text='Discard this alert'
+          ) }}
         {% endif %}
       </div>
-    {% elif current_user.has_permissions('send_messages', restrict_admin_usage=True) %}
+    {% elif current_user.has_permissions('send_messages', 'approve_broadcasts', restrict_admin_usage=True) %}
       {% call form_wrapper(class="banner govuk-!-margin-bottom-6") %}
         <h1 class="govuk-heading-m govuk-!-margin-top-0 govuk-!-margin-bottom-3">
           {% if broadcast_message.created_by %}
@@ -109,6 +121,22 @@
           delete_link_text='Reject this alert'
         ) }}
       {% endcall %}
+    {% elif current_user.has_permissions('create_broadcasts', restrict_admin_usage=True) %}
+      <div class="banner govuk-!-margin-bottom-6">
+        <h1 class="govuk-heading-m govuk-!-margin-bottom-3">This alert is waiting for approval</h1>
+        <p class="govuk-body">
+          Another member of your team needs to approve this alert.
+        </p>
+        {% if not current_service.live %}
+          <p class="govuk-body">
+            This service is in training mode. No real alerts will be sent.
+          </p>
+        {% endif %}
+        {{ page_footer(
+          delete_link=url_for('main.reject_broadcast_message', service_id=current_service.id, broadcast_message_id=broadcast_message.id),
+          delete_link_text='Reject this alert'
+          ) }}
+      </div>
     {% else %}
       <div class="banner govuk-!-margin-bottom-6">
         <h1 class="govuk-heading-m govuk-!-margin-bottom-3">This alert is waiting for approval</h1>
