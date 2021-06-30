@@ -44,7 +44,7 @@ def test_overview_page_shows_disable_for_platform_admin(
     (1, 'Security keys 1 registered Change'),
     (2, 'Security keys 2 registered Change'),
 ])
-def test_overview_page_shows_security_keys_for_platform_admin(
+def test_overview_page_shows_security_keys_if_user_they_can_use_webauthn(
     mocker,
     client_request,
     platform_admin_user,
@@ -358,7 +358,13 @@ def test_can_reenable_platform_admin(client_request, platform_admin_user):
         assert session['disable_platform_admin_view'] is False
 
 
-def test_normal_user_doesnt_see_security_keys(client_request):
+def test_user_doesnt_see_security_keys_unless_they_can_use_webauthn(
+    client_request,
+    platform_admin_user
+):
+    platform_admin_user['can_use_webauthn'] = False
+    client_request.login(platform_admin_user)
+
     client_request.get(
         '.user_profile_security_keys',
         _expected_status=403,
@@ -455,9 +461,16 @@ def test_manage_security_key_page_404s_when_key_not_found(
     (".user_profile_confirm_delete_security_key", "post"),
     (".user_profile_delete_security_key", "post"),
 ])
-def test_non_platform_admin_user_cant_manage_security_keys(
-    client_request, webauthn_credential, endpoint, method
+def test_cant_manage_security_keys_unless_can_use_webauthn(
+    client_request,
+    platform_admin_user,
+    webauthn_credential,
+    endpoint,
+    method
 ):
+    platform_admin_user['can_use_webauthn'] = False
+    client_request.login(platform_admin_user)
+
     if method == "get":
         client_request.get(
             endpoint,

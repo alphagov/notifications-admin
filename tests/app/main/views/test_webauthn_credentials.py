@@ -33,14 +33,14 @@ def webauthn_authentication_post_data(fake_uuid, webauthn_credential, client):
     })
 
 
-@pytest.mark.parametrize('endpoint', [
-    'webauthn_begin_register',
-])
-def test_register_forbidden_for_non_platform_admins(
+def test_begin_register_forbidden_unless_can_use_webauthn(
     client_request,
-    endpoint,
+    platform_admin_user,
+    mocker,
 ):
-    client_request.get(f'main.{endpoint}', _expected_status=403)
+    platform_admin_user['can_use_webauthn'] = False
+    mocker.patch('app.user_api_client.get_user', return_value=platform_admin_user)
+    client_request.get('main.webauthn_begin_register', _expected_status=403)
 
 
 def test_begin_register_returns_encoded_options(

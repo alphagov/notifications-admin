@@ -14,12 +14,13 @@ from app.utils.login import (
     log_in_user,
     redirect_to_sign_in,
 )
-from app.utils.user import user_is_platform_admin
 
 
 @main.route('/webauthn/register')
-@user_is_platform_admin
 def webauthn_begin_register():
+    if not current_user.can_use_webauthn:
+        abort(403)
+
     server = current_app.webauthn_server
 
     registration_data, state = server.register_begin(
