@@ -713,7 +713,6 @@ def test_platform_admin_user_accepts_and_preserves_auth(
     sample_invite['email_address'] = platform_admin_user['email_address']
     sample_invite['auth_type'] = 'email_auth'
     service_one['permissions'].append('email_auth')
-    platform_admin_user['auth_type'] = 'webauthn_auth'
 
     mocker.patch('app.user_api_client.get_user_by_email', return_value=platform_admin_user)
 

@@ -1001,7 +1001,7 @@ class BasePermissionsForm(StripWhitespaceForm):
 
     @classmethod
     def from_user(cls, user, service_id, **kwargs):
-        return cls(
+        form = cls(
             **kwargs,
             **{
                 "permissions_field": [
@@ -1009,6 +1009,16 @@ class BasePermissionsForm(StripWhitespaceForm):
             },
             login_authentication=user.auth_type
         )
+        # if the user is a platform admin then we don't allow you to change the login type. Unfortunately, since the
+        # login_authentication field is a radio field, the validation expects it to have a value, and the choices in it
+        # normally don't allow 'webauthn_auth'.
+        # If the user has webauthn_auth too, then we'll try and validate against that. We should never be changing
+        # auth of platform admin users, so just force the choices to be this.
+        # TODO: if the user is a regular user with webauthn_auth we will still show the radios, so if you edit that
+        # user's regular permissions you'll necessarily change their auth type as the value will be in the POST
+        if user.platform_admin:
+            del form.login_authentication
+        return form
 
 
 class PermissionsForm(BasePermissionsForm):

@@ -1,6 +1,7 @@
 import json
 
 from flask import (
+    abort,
     current_app,
     redirect,
     render_template,
@@ -65,7 +66,6 @@ def two_factor_email(token):
     return log_in_user(user_id)
 
 
-@main.route('/two-factor', methods=['GET', 'POST'])
 @main.route('/two-factor-sms', methods=['GET', 'POST'])
 @redirect_to_sign_in
 def two_factor_sms():
@@ -91,9 +91,14 @@ def two_factor_sms():
 @main.route('/two-factor-webauthn', methods=['GET'])
 @redirect_to_sign_in
 def two_factor_webauthn():
-    # TODO: Return a sensible error page if the user isn't platform admin or doesn't have webauthn
-    redirect_url = request.args.get('next')
-    return render_template('views/two-factor-webauthn.html', redirect_url=redirect_url)
+    user_id = session['user_details']['id']
+    user = User.from_id(user_id)
+    if not user.platform_admin:
+        abort(403)
+    if not user.webauthn_auth:
+        abort(403)
+
+    return render_template('views/two-factor-webauthn.html')
 
 
 @main.route('/re-validate-email', methods=['GET'])

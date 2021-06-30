@@ -3628,7 +3628,7 @@ def create_active_user_manage_template_permissions(with_unique_id=False):
     )
 
 
-def create_platform_admin_user(with_unique_id=False, auth_type='sms_auth', permissions=None):
+def create_platform_admin_user(with_unique_id=False, auth_type='webauthn_auth', permissions=None):
     return create_user(
         id=str(uuid4()) if with_unique_id else sample_uuid(),
         name='Platform admin user',
