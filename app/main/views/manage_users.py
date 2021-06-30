@@ -142,9 +142,9 @@ def edit_user_permissions(service_id, user_id):
             permissions=form.permissions,
             folder_permissions=form.folder_permissions.data,
         )
-        # only change the auth type if this is supported for a service; for Platform Admin users,
-        # we avoid changing the auth type to prevent it being switched to something less secure
-        if service_has_email_auth and not user.platform_admin:
+        # Only change the auth type if this is supported for a service. If a user logs in with a
+        # security key, we generally don't want them to be able to use something less secure.
+        if service_has_email_auth and not user.auth_type == 'webauthn_auth':
             user.update(auth_type=form.login_authentication.data)
         return redirect(url_for('.manage_users', service_id=service_id))
 

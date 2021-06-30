@@ -11,9 +11,9 @@
 {% endif %}
 
 {% if service_has_email_auth %}
-  {% if user.platform_admin %}
+  {% if user.webauthn_auth %}
     <p class="bottom-gutter">
-      Platform admin users will login with a security key.
+      This user will login with a security key.
     </p>
   {% elif not mobile_number %}
     {{ radios(
