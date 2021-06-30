@@ -298,20 +298,6 @@ def test_two_factor_webauthn_should_have_auth_signin_button(
     mock_get_user.assert_called_once_with(platform_admin_user['id'])
 
 
-def test_two_factor_webauthn_should_reject_non_platform_admins(
-    client,
-    api_user_active,
-    mock_get_user,
-):
-    api_user_active['auth_type'] = 'webauthn_auth'
-    with client.session_transaction() as session:
-        session['user_details'] = {'id': api_user_active['id'], 'email': api_user_active['email_address']}
-
-    response = client.get(url_for('main.two_factor_webauthn'))
-
-    assert response.status_code == 403
-
-
 def test_two_factor_webauthn_should_reject_non_webauthn_auth_users(
     client,
     platform_admin_user,
