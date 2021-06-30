@@ -197,17 +197,6 @@ def test_complete_register_handles_missing_state(
     assert cbor.decode(response.data) == 'No registration in progress'
 
 
-def test_begin_authentication_forbidden_for_non_platform_admins(client, api_user_active, mock_get_user):
-    # mock_get_user returns api_user_active so changes to the api user will reflect
-    api_user_active['auth_type'] = 'webauthn_auth'
-
-    with client.session_transaction() as session:
-        session['user_details'] = {'id': '1'}
-
-    response = client.get(url_for('main.webauthn_begin_authentication'))
-    assert response.status_code == 403
-
-
 def test_begin_authentication_forbidden_for_users_without_webauthn(client, mocker, platform_admin_user):
     platform_admin_user['auth_type'] = 'sms_auth'
     mocker.patch('app.user_api_client.get_user', return_value=platform_admin_user)
