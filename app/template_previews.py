@@ -94,11 +94,12 @@ def get_page_count_for_letter(template, values=None):
     return page_count
 
 
-def sanitise_letter(pdf_file, *, allow_international_letters):
+def sanitise_letter(pdf_file, *, upload_id, allow_international_letters):
     return requests.post(
-        '{}/precompiled/sanitise?allow_international_letters={}'.format(
+        '{}/precompiled/sanitise?allow_international_letters={}&upload_id={}'.format(
             current_app.config['TEMPLATE_PREVIEW_API_HOST'],
             'true' if allow_international_letters else 'false',
+            upload_id,
         ),
         data=pdf_file,
         headers={'Authorization': 'Token {}'.format(current_app.config['TEMPLATE_PREVIEW_API_KEY'])}

@@ -182,6 +182,7 @@ def upload_letter(service_id):
         try:
             response = sanitise_letter(
                 BytesIO(pdf_file_bytes),
+                upload_id=upload_id,
                 allow_international_letters=current_service.has_permission(
                     'international_letters'
                 ),

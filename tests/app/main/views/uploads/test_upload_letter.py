@@ -83,6 +83,7 @@ def test_post_upload_letter_redirects_for_valid_file(
     mock_sanitise.assert_called_once_with(
         ANY,
         allow_international_letters=expected_allow_international,
+        upload_id=ANY,
     )
 
     assert 'The Queen' in page.find('div', class_='js-stick-at-bottom-when-scrolling').text
