@@ -164,18 +164,27 @@ def test_from_example_template_makes_request(mocker):
     )
 
 
-@pytest.mark.parametrize('allow_international_letters, expected_url', (
-    (False, 'http://localhost:9999/precompiled/sanitise?allow_international_letters=false'),
-    (True, 'http://localhost:9999/precompiled/sanitise?allow_international_letters=true'),
-))
+@pytest.mark.parametrize('allow_international_letters, query_param_value', [
+    [False, "false"],
+    [True, "true"]
+])
 def test_sanitise_letter_calls_template_preview_sanitise_endoint_with_file(
     mocker,
     allow_international_letters,
-    expected_url,
+    query_param_value,
+    fake_uuid,
 ):
     request_mock = mocker.patch('app.template_previews.requests.post')
 
-    sanitise_letter('pdf_data', allow_international_letters=allow_international_letters)
+    sanitise_letter(
+        'pdf_data',
+        upload_id=fake_uuid,
+        allow_international_letters=allow_international_letters
+    )
+
+    expected_url = f'http://localhost:9999/precompiled/sanitise' \
+                   f'?allow_international_letters={query_param_value}' \
+                   f'&upload_id={fake_uuid}'
 
     request_mock.assert_called_once_with(
         expected_url,
