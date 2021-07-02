@@ -279,3 +279,39 @@ def test_email_address_is_treated_case_insensitively_when_signing_in_as_invited_
     assert response.status_code == 302
     assert mock_send_verify_code.called
     mock_get_invited_user_by_id.assert_called_once_with(sample_invite['id'])
+
+
+def test_when_signing_in_as_invited_user_you_cannot_accept_an_invite_for_another_email_address(
+    client_request,
+    mocker,
+    mock_verify_password,
+    api_user_active,
+    sample_invite,
+    mock_accept_invite,
+    mock_send_verify_code,
+    mock_get_invited_user_by_id,
+):
+    sample_invite['email_address'] = 'some_other_user@user.gov.uk'
+
+    mocker.patch(
+        'app.models.user.User.from_email_address_and_password_or_none',
+        return_value=User(api_user_active),
+    )
+
+    client_request.logout()
+
+    with client_request.session_transaction() as session:
+        session['invited_user_id'] = sample_invite['id']
+
+    page = client_request.post(
+        'main.sign_in',
+        _data={
+            'email_address': 'test@user.gov.uk',
+            'password': 'val1dPassw0rd!'
+        },
+        _expected_status=403
+    )
+
+    assert mock_accept_invite.called is False
+    assert mock_send_verify_code.called is False
+    assert page.select_one('.banner-dangerous').text.strip() == 'You cannot accept an invite for another person.'
