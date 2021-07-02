@@ -2629,41 +2629,41 @@ def test_should_not_create_broadcast_template_with_placeholders(
     'template_type, prefix_sms, content, expected_message, expected_class', (
         (
             'sms', False, '',
-            'Will be charged as 1 text message',
+            'Will be charged as 1 text message (includes the service name)',
             None,
         ),
         (
             'sms', False, 'a' * 160,
-            'Will be charged as 1 text message',
+            'Will be charged as 1 text message (includes the service name)',
             None,
         ),
         (
             'sms', False, 'a' * 161,
-            'Will be charged as 2 text messages',
+            'Will be charged as 2 text messages (includes the service name)',
             None,
         ),
         (
             # service name takes 13 characters, 147 + 13 = 160
             'sms', True, 'a' * 147,
-            'Will be charged as 1 text message',
+            'Will be charged as 1 text message (includes the service name)',
             None,
         ),
         (
             # service name takes 13 characters, 148 + 13 = 161
             'sms', True, 'a' * 148,
-            'Will be charged as 2 text messages',
+            'Will be charged as 2 text messages (includes the service name)',
             None,
         ),
         (
             'sms', False, 'a' * 918,
-            'Will be charged as 6 text messages',
+            'Will be charged as 6 text messages (includes the service name)',
             None,
         ),
         (
             # Service name increases fragment count but doesn’t count
             # against total character limit
             'sms', True, 'a' * 918,
-            'Will be charged as 7 text messages',
+            'Will be charged as 7 text messages (includes the service name)',
             None,
         ),
         (
@@ -2688,17 +2688,17 @@ def test_should_not_create_broadcast_template_with_placeholders(
         ),
         (
             'sms', False, 'Ẅ' * 70,
-            'Will be charged as 1 text message',
+            'Will be charged as 1 text message (includes the service name)',
             None,
         ),
         (
             'sms', False, 'Ẅ' * 71,
-            'Will be charged as 2 text messages',
+            'Will be charged as 2 text messages (includes the service name)',
             None,
         ),
         (
             'sms', False, 'Ẅ' * 918,
-            'Will be charged as 14 text messages',
+            'Will be charged as 14 text messages (includes the service name)',
             None,
         ),
         (
@@ -2708,13 +2708,13 @@ def test_should_not_create_broadcast_template_with_placeholders(
         ),
         (
             'sms', False, 'Hello ((name))',
-            'Will be charged as 1 text message (not including personalisation)',
+            'Will be charged as 1 text message (includes the service name, but not any personalisation)',
             None,
         ),
         (
             # Length of placeholder body doesn’t count towards fragment count
             'sms', False, f'Hello (( {"a" * 999} ))',
-            'Will be charged as 1 text message (not including personalisation)',
+            'Will be charged as 1 text message (includes the service name, but not any personalisation)',
             None,
         ),
         (

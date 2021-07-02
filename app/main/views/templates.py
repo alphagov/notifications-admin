@@ -686,10 +686,11 @@ def _get_content_count_error_and_message_for_template(template):
         if template.placeholders:
             return False, (
                 f'Will be charged as {message_count(template.fragment_count, template.template_type)} '
-                f'(not including personalisation)'
+                f'(includes the service name, but not any personalisation)'
             )
         return False, (
             f'Will be charged as {message_count(template.fragment_count, template.template_type)} '
+            f'(includes the service name)'
         )
 
     if template.template_type == 'broadcast':
