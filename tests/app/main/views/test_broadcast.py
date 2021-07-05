@@ -737,7 +737,7 @@ def test_write_new_broadcast_posts(
             'template_content': 'This is a test',
         },
         _expected_redirect=url_for(
-            '.preview_broadcast_areas',
+            '.choose_broadcast_library',
             service_id=SERVICE_ONE_ID,
             broadcast_message_id=fake_uuid,
             _external=True,
@@ -795,7 +795,7 @@ def test_broadcast_page(
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
         _expected_redirect=url_for(
-            '.preview_broadcast_areas',
+            '.choose_broadcast_library',
             service_id=SERVICE_ONE_ID,
             broadcast_message_id=fake_uuid,
             _external=True,

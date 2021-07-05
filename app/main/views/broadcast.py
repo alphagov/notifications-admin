@@ -150,7 +150,7 @@ def write_new_broadcast(service_id):
             reference=form.name.data,
         )
         return redirect(url_for(
-            '.preview_broadcast_areas',
+            '.choose_broadcast_library',
             service_id=current_service.id,
             broadcast_message_id=broadcast_message.id,
         ))
@@ -166,7 +166,7 @@ def write_new_broadcast(service_id):
 @service_has_permission('broadcast')
 def broadcast(service_id, template_id):
     return redirect(url_for(
-        '.preview_broadcast_areas',
+        '.choose_broadcast_library',
         service_id=current_service.id,
         broadcast_message_id=BroadcastMessage.create(
             service_id=service_id,
