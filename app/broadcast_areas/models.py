@@ -171,7 +171,7 @@ class CustomBroadcastArea(BaseBroadcastArea):
     @cached_property
     def count_of_phones(self):
         return sum(
-            area.polygons.ratio_of_intersection_with(self.polygons) * area.count_of_phones
+            area.simple_polygons.ratio_of_intersection_with(self.polygons) * area.count_of_phones
             for area in self.overlapping_areas
         )
 

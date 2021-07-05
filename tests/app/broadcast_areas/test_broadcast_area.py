@@ -377,7 +377,7 @@ def test_estimated_bleed(
             'Stoke Bishop',
             'Windmill Hill',
         ],
-        73_496,
+        73_119,
     ),
     (
         SKYE,
@@ -387,7 +387,7 @@ def test_estimated_bleed(
             'Na Hearadh agus Ceann a Deas nan Loch',
             'Wester Ross, Strathpeffer and Lochalsh',
         ],
-        3_517,
+        3_534,
     ),
 ))
 def test_count_of_phones_for_custom_area(
