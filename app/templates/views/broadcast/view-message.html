@@ -124,7 +124,7 @@
       <p class="govuk-body govuk-!-margin-bottom-2 live-broadcast live-broadcast--left">
         Live since {{ broadcast_message.starts_at|format_datetime_relative }}&ensp;
         {%- if not hide_stop_link %}
-          <a href="{{ url_for('.cancel_broadcast_message', service_id=current_service.id, broadcast_message_id=broadcast_message.id) }}" class="destructive-link destructive-link--no-visited-state">Stop broadcasting</a>
+          <a href="{{ url_for('.cancel_broadcast_message', service_id=current_service.id, broadcast_message_id=broadcast_message.id) }}" class="destructive-link destructive-link--no-visited-state">Stop sending</a>
         {% endif %}
       </p>
     {% elif broadcast_message.status == 'rejected' %}
