@@ -269,41 +269,6 @@ def add_test_areas():
     repo.insert_broadcast_areas(areas_to_add, keep_old_polygons)
 
 
-def add_demo_areas():
-    dataset_id = 'demo'
-    dataset_geojson = geojson.loads(demo_filepath.read_text())
-    repo.insert_broadcast_area_library(
-        dataset_id,
-        name='Demo areas',
-        name_singular='demo area',
-        is_group=False,
-    )
-
-    areas_to_add = []
-    for feature in dataset_geojson["features"]:
-        f_id = feature["properties"]['id']
-        f_name = feature["properties"]['name']
-        f_count_of_phones = feature["properties"]['count_of_phones']
-
-        print()  # noqa: T001
-        print(f_name)  # noqa: T001
-
-        feature, _ = polygons_and_simplified_polygons(
-            feature["geometry"]
-        )
-
-        print('    Phones: ', f_count_of_phones)  # noqa: T001
-
-        areas_to_add.append([
-            f'{dataset_id}-{f_id}', f_name,
-            dataset_id, None,
-            feature, feature,
-            f_count_of_phones,
-        ])
-
-    repo.insert_broadcast_areas(areas_to_add, keep_old_polygons)
-
-
 def add_countries():
     dataset_id = 'ctry19'
     dataset_geojson = geojson.loads(ctry19_filepath.read_text())
@@ -453,7 +418,6 @@ else:
     repo.delete_db()
     repo.create_tables()
 add_test_areas()
-add_demo_areas()
 add_countries()
 add_wards_local_authorities_and_counties()
 
