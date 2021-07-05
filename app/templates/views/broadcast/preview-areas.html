@@ -54,7 +54,7 @@
   {% if broadcast_message.areas %}
     {{ map(broadcast_message) }}
     <form action="{{ url_for('.preview_broadcast_message', service_id=current_service.id, broadcast_message_id=broadcast_message.id) }}" method="get" class="govuk-!-margin-top-1">
-      {{ page_footer('Continue to preview') }}
+      {{ page_footer('Preview this alert') }}
     </form>
   {% endif %}
 
