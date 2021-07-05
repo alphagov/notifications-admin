@@ -2011,7 +2011,7 @@ def test_cant_approve_own_broadcast(
     assert not page.select('form')
 
     link = page.select_one('.banner a.govuk-link.govuk-link--destructive')
-    assert link.text == 'Withdraw this alert'
+    assert link.text == 'Discard this alert'
     assert link['href'] == url_for(
         '.reject_broadcast_message',
         service_id=SERVICE_ONE_ID,
