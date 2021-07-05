@@ -86,6 +86,12 @@ class BroadcastArea(BaseBroadcastArea, SortableMixin):
     def __init__(self, row):
         self.id, self.name, self._count_of_phones, self.library_id = row
 
+    @classmethod
+    def from_row_with_simple_polygons(cls, row):
+        instance = cls(row[:4])
+        instance.simple_polygons = Polygons(row[4])
+        return instance
+
     @cached_property
     def polygons(self):
         return Polygons(
@@ -162,7 +168,7 @@ class CustomBroadcastArea(BaseBroadcastArea):
     def overlapping_areas(self):
         if not self.polygons:
             return []
-        return broadcast_area_libraries.get_areas([
+        return broadcast_area_libraries.get_areas_with_simple_polygons([
             overlap.data for overlap in rtree_index.query(
                 Rect(*self.polygons.bounds)
             )
@@ -228,6 +234,13 @@ class BroadcastAreaLibraries(SerialisedModelCollection, GetItemByIdMixin):
 
         areas = BroadcastAreasRepository().get_areas(area_ids)
         return [BroadcastArea(area) for area in areas]
+
+    def get_areas_with_simple_polygons(self, *area_ids):
+        if len(area_ids) == 1 and isinstance(area_ids[0], list):
+            area_ids = area_ids[0]
+
+        areas = BroadcastAreasRepository().get_areas_with_simple_polygons(area_ids)
+        return [BroadcastArea.from_row_with_simple_polygons(area) for area in areas]
 
 
 broadcast_area_libraries = BroadcastAreaLibraries()
