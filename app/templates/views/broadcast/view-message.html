@@ -53,7 +53,7 @@
           </p>
           {{ page_footer(
             delete_link=url_for('main.reject_broadcast_message', service_id=current_service.id, broadcast_message_id=broadcast_message.id),
-            delete_link_text='Withdraw this alert'
+            delete_link_text='Discard this alert'
           ) }}
         {% else %}
           <p class="govuk-body govuk-!-margin-bottom-3">
