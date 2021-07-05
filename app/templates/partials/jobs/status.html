@@ -11,7 +11,7 @@
       {% else %}
         Uploaded by {{ job.created_by.name }} on {{ job.created_at|format_datetime_short }}
       {% endif %}
-    {% else %}
+   {% else %}
       Sent by {{ job.created_by.name }} on {{ job.created_at|format_datetime_short }}
       {% if job.template.template_type == "letter" %}
         <p class="govuk-body" id="printing-info">
@@ -20,4 +20,9 @@
       {% endif %}
     {% endif %}
   </p>
+  {% if job.status == 'sending limits exceeded'%}
+    <p class="govuk-error-message" >
+    You have exceeded your daily sending limits. You can upload your CSV tomorrow or <a class="govuk-link" href="https://www.notifications.service.gov.uk/support">contact the GOV.UK Notify team</a>
+    </p>
+    {% endif %}
 </div>

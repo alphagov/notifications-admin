@@ -221,6 +221,26 @@ def test_should_show_job_without_notifications(
     assert page.select_one('tbody').text.strip() == 'No messages to show yet…'
 
 
+def test_should_show_job_with_sending_limit_exceeded_status(
+    client_request,
+    service_one,
+    active_user_with_permissions,
+    mock_get_service_template,
+    mock_get_job_with_sending_limits_exceeded,
+    mock_get_notifications_with_no_notifications,
+    mock_get_service_data_retention,
+    fake_uuid,
+):
+    page = client_request.get(
+        'main.view_job',
+        service_id=service_one['id'],
+        job_id=fake_uuid,
+    )
+    assert normalize_spaces(page.select('main p')[1].text) == (
+       "You have exceeded your daily sending limits. You can upload your CSV tomorrow or contact the GOV.UK Notify team"
+    )
+
+
 @freeze_time("2020-01-10 1:0:0")
 @pytest.mark.parametrize('created_at, processing_started, expected_message', (
     # Recently created, not yet started
