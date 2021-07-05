@@ -2075,7 +2075,7 @@ def test_can_approve_own_broadcast_in_trial_mode(
         'alerts, to see how it works. '
         'No real alerts will be broadcast to anyone’s phone. '
         'Start broadcasting now '
-        'Cancel this alert'
+        'Reject this alert'
     )
 
     form = page.select_one('.banner details form')
