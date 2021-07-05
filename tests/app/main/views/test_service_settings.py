@@ -1737,6 +1737,7 @@ def test_should_redirect_after_request_to_go_live(
             'notify_go_live_incomplete_mou',
             'notify_go_live_incomplete_team_member',
         ],
+        requester_sees_message_content=False,
     )
     assert mock_post.call_args[1]['message'] == (
         'Service: service one\n'
