@@ -568,7 +568,7 @@ def test_previous_broadcasts_page(
     )
 
     assert normalize_spaces(page.select_one('main h1').text) == (
-        'Previous alerts'
+        'Past alerts'
     )
     assert len(page.select('.ajax-block-container')) == 1
     assert [
@@ -1657,7 +1657,7 @@ def test_view_broadcast_message_page(
     ),
     (
         'completed',
-        'Previous alerts',
+        'Past alerts',
         '.broadcast_dashboard_previous',
     ),
     (
