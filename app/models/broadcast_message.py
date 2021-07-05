@@ -184,10 +184,17 @@ class BroadcastMessage(JSONModel):
         estimated_area = self.simple_polygons.estimated_area
 
         if estimated_area > ESTIMATED_AREA_OF_LARGEST_UK_COUNTY:
+            # For large areas, use a naïve but computationally less
+            # expensive way of counting the number of phones in the
+            # bleed area
             count = self.count_of_phones * (
                 self.simple_polygons_with_bleed.estimated_area / estimated_area
             )
         else:
+            # For smaller areas, where the computation can be done in
+            # a second or less (approximately) calculate the number of
+            # phones based on the ammount of overlap with areas for
+            # which we have population data
             count = CustomBroadcastArea.from_polygon_objects(
                 self.simple_polygons_with_bleed
             ).count_of_phones
