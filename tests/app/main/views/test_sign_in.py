@@ -1,7 +1,6 @@
 import uuid
 
 import pytest
-from bs4 import BeautifulSoup
 from flask import url_for
 
 from app.models.user import User
@@ -215,16 +214,22 @@ def test_should_return_200_when_user_does_not_exist(
 def test_should_return_redirect_when_user_is_pending(
     client,
     mock_get_user_by_email_pending,
+    api_user_pending,
     mock_verify_password,
 ):
     response = client.post(
-        url_for('main.sign_in'), data={
+        url_for('main.sign_in'),
+        data={
             'email_address': 'pending_user@example.gov.uk',
-            'password': 'val1dPassw0rd!'}, follow_redirects=True)
-
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    assert page.h1.string == 'Sign in'
-    assert response.status_code == 200
+            'password': 'val1dPassw0rd!'
+        }
+    )
+    assert response.location == url_for('main.resend_email_verification', _external=True)
+    with client.session_transaction() as s:
+        assert s['user_details'] == {
+            'email': api_user_pending['email_address'],
+            'id': api_user_pending['id']
+        }
 
 
 @pytest.mark.parametrize('redirect_url', [
@@ -274,3 +279,39 @@ def test_email_address_is_treated_case_insensitively_when_signing_in_as_invited_
     assert response.status_code == 302
     assert mock_send_verify_code.called
     mock_get_invited_user_by_id.assert_called_once_with(sample_invite['id'])
+
+
+def test_when_signing_in_as_invited_user_you_cannot_accept_an_invite_for_another_email_address(
+    client_request,
+    mocker,
+    mock_verify_password,
+    api_user_active,
+    sample_invite,
+    mock_accept_invite,
+    mock_send_verify_code,
+    mock_get_invited_user_by_id,
+):
+    sample_invite['email_address'] = 'some_other_user@user.gov.uk'
+
+    mocker.patch(
+        'app.models.user.User.from_email_address_and_password_or_none',
+        return_value=User(api_user_active),
+    )
+
+    client_request.logout()
+
+    with client_request.session_transaction() as session:
+        session['invited_user_id'] = sample_invite['id']
+
+    page = client_request.post(
+        'main.sign_in',
+        _data={
+            'email_address': 'test@user.gov.uk',
+            'password': 'val1dPassw0rd!'
+        },
+        _expected_status=403
+    )
+
+    assert mock_accept_invite.called is False
+    assert mock_send_verify_code.called is False
+    assert page.select_one('.banner-dangerous').text.strip() == 'You cannot accept an invite for another person.'

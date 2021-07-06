@@ -33,24 +33,31 @@ def sign_in():
             form.email_address.data, form.password.data
         )
 
-        if user and user.state == 'pending':
-            return redirect(url_for('main.resend_email_verification', next=redirect_url))
+        if user:
+            # add user to session to mark us as in the process of signing the user in
+            session['user_details'] = {"email": user.email_address, "id": user.id}
 
-        if user and session.get('invited_user_id'):
-            invited_user = InvitedUser.from_session()
-            if user.email_address.lower() != invited_user.email_address.lower():
-                flash("You cannot accept an invite for another person.")
-                session.pop('invited_user_id', None)
-                abort(403)
-            else:
-                invited_user.accept_invite()
-        if user and user.sign_in():
-            if user.sms_auth:
-                return redirect(url_for('.two_factor_sms', next=redirect_url))
-            if user.email_auth:
-                return redirect(url_for('.two_factor_email_sent', next=redirect_url))
-            if user.webauthn_auth:
-                return redirect(url_for('.two_factor_webauthn', next=redirect_url))
+            if user.state == 'pending':
+                return redirect(url_for('main.resend_email_verification', next=redirect_url))
+
+            if user.is_active:
+                if session.get('invited_user_id'):
+                    invited_user = InvitedUser.from_session()
+                    if user.email_address.lower() != invited_user.email_address.lower():
+                        flash("You cannot accept an invite for another person.")
+                        session.pop('invited_user_id', None)
+                        abort(403)
+                    else:
+                        invited_user.accept_invite()
+
+                user.send_login_code()
+
+                if user.sms_auth:
+                    return redirect(url_for('.two_factor_sms', next=redirect_url))
+                if user.email_auth:
+                    return redirect(url_for('.two_factor_email_sent', next=redirect_url))
+                if user.webauthn_auth:
+                    return redirect(url_for('.two_factor_webauthn', next=redirect_url))
 
         # Vague error message for login in case of user not known, locked, inactive or password not verified
         flash(Markup(
