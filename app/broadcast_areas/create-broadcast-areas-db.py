@@ -27,6 +27,12 @@ point_counts = []
 invalid_polygons = []
 rtree_index = RTree()
 
+# The hard limit in the CBCs is 6,000 points per polygon. But we also
+# care about optimising how quickjly we can process and display polygons
+# so we aim for something lower, i.e. enough to give us a good amount of
+# precision relative to the accuracy of a cell broadcast
+MAX_NUMBER_OF_POINTS_PER_POLYGON = 250
+
 
 def simplify_geometry(feature):
     if feature["type"] == "Polygon":
@@ -125,7 +131,7 @@ def polygons_and_simplified_polygons(feature):
 
     point_counts.append(simplified.point_count)
 
-    if simplified.point_count >= 250:
+    if simplified.point_count >= MAX_NUMBER_OF_POINTS_PER_POLYGON:
         raise RuntimeError(
             'Too many points '
             '(adjust Polygons.perimeter_to_simplification_ratio or '
