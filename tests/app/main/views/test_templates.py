@@ -1045,7 +1045,7 @@ def test_should_show_message_with_prefix_hint_if_enabled_for_service(
         template_id=fake_uuid,
     )
 
-    assert 'All messages will start with your service name' in page.text
+    assert 'Your message will start with your service name' in page.text
 
 
 def test_should_show_page_template_with_priority_select_if_platform_admin(
