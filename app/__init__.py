@@ -72,6 +72,7 @@ from app.formatters import (
     nl2br,
     recipient_count,
     recipient_count_label,
+    round_to_significant_figures,
     valid_phone_number,
 )
 from app.models.organisation import Organisation
@@ -564,6 +565,7 @@ def add_template_filters(application):
         iteration_count,
         recipient_count,
         recipient_count_label,
+        round_to_significant_figures,
         message_count_label,
         message_count,
         message_count_noun,
