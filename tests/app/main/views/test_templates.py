@@ -1024,6 +1024,30 @@ def test_should_let_letter_contact_block_be_changed_for_the_template(
     )['href'] == expected_partial_url(service_id=SERVICE_ONE_ID)
 
 
+@pytest.mark.parametrize('prefix_sms', [
+    True,
+    pytest.param(False, marks=pytest.mark.xfail())
+])
+def test_should_show_message_with_prefix_hint_if_enabled_for_service(
+    client_request,
+    mocker,
+    mock_get_service_template,
+    mock_get_users_by_service,
+    service_one,
+    fake_uuid,
+    prefix_sms
+):
+    service_one['prefix_sms'] = prefix_sms
+
+    page = client_request.get(
+        '.edit_service_template',
+        service_id=service_one['id'],
+        template_id=fake_uuid,
+    )
+
+    assert 'Your message will start with your service name' in page.text
+
+
 def test_should_show_page_template_with_priority_select_if_platform_admin(
     platform_admin_client,
     platform_admin_user,

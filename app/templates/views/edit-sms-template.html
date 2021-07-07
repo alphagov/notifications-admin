@@ -15,6 +15,10 @@
       back_link=url_for('main.view_template', service_id=current_service.id, template_id=template.id) if template else url_for('main.choose_template', service_id=current_service.id, template_folder_id=template_folder_id)
     ) }}
 
+    {% if current_service.prefix_sms %}
+      {% set content_hint = 'Your message will start with your service name' %}
+    {% endif %}
+
     {% call form_wrapper() %}
       <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
@@ -26,6 +30,7 @@
             form.template_content,
             highlight_placeholders=True,
             width='1-1',
+            hint=content_hint,
             rows=5,
             extra_form_group_classes='govuk-!-margin-bottom-2'
           ) }}
