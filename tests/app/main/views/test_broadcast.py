@@ -568,7 +568,7 @@ def test_previous_broadcasts_page(
     )
 
     assert normalize_spaces(page.select_one('main h1').text) == (
-        'Previous alerts'
+        'Past alerts'
     )
     assert len(page.select('.ajax-block-container')) == 1
     assert [
@@ -1561,15 +1561,15 @@ def test_start_broadcasting(
         'status': 'broadcasting',
         'finishes_at': '2020-02-23T23:23:23.000000',
     }, [
-        'Live since 20 February at 8:20pm Stop broadcasting',
-        'Prepared by Alice and approved by Bob.',
+        'Live since 20 February at 8:20pm Stop sending',
+        'Sent by Alice and approved by Bob.',
         'Broadcasting stops tomorrow at 11:23pm.'
     ]),
     ('.view_current_broadcast', True, {
         'status': 'broadcasting',
         'finishes_at': '2020-02-23T23:23:23.000000',
     }, [
-        'Live since 20 February at 8:20pm Stop broadcasting',
+        'Live since 20 February at 8:20pm Stop sending',
         'Created from an API call and approved by Alice.',
         'Broadcasting stops tomorrow at 11:23pm.'
     ]),
@@ -1577,15 +1577,15 @@ def test_start_broadcasting(
         'status': 'broadcasting',
         'finishes_at': '2020-02-22T22:20:20.000000',  # 2 mins before now()
     }, [
-        'Broadcast on 20 February at 8:20pm.',
-        'Prepared by Alice and approved by Bob.',
+        'Sent on 20 February at 8:20pm.',
+        'Sent by Alice and approved by Bob.',
         'Finished broadcasting today at 10:20pm.'
     ]),
     ('.view_previous_broadcast', True, {
         'status': 'broadcasting',
         'finishes_at': '2020-02-22T22:20:20.000000',  # 2 mins before now()
     }, [
-        'Broadcast on 20 February at 8:20pm.',
+        'Sent on 20 February at 8:20pm.',
         'Created from an API call and approved by Alice.',
         'Finished broadcasting today at 10:20pm.'
     ]),
@@ -1593,8 +1593,8 @@ def test_start_broadcasting(
         'status': 'completed',
         'finishes_at': '2020-02-21T21:21:21.000000',
     }, [
-        'Broadcast on 20 February at 8:20pm.',
-        'Prepared by Alice and approved by Bob.',
+        'Sent on 20 February at 8:20pm.',
+        'Sent by Alice and approved by Bob.',
         'Finished broadcasting yesterday at 9:21pm.',
     ]),
     ('.view_previous_broadcast', False, {
@@ -1602,8 +1602,8 @@ def test_start_broadcasting(
         'cancelled_by_id': sample_uuid,
         'cancelled_at': '2020-02-21T21:21:21.000000',
     }, [
-        'Broadcast on 20 February at 8:20pm.',
-        'Prepared by Alice and approved by Bob.',
+        'Sent on 20 February at 8:20pm.',
+        'Sent by Alice and approved by Bob.',
         'Stopped by Carol yesterday at 9:21pm.',
     ]),
     ('.view_rejected_broadcast', False, {
@@ -1611,7 +1611,7 @@ def test_start_broadcasting(
         'updated_at': '2020-02-21T21:21:21.000000',
     }, [
         'Rejected yesterday at 9:21pm.',
-        'Prepared by Alice and approved by Bob.',
+        'Sent by Alice and approved by Bob.',
     ]),
 ))
 @freeze_time('2020-02-22T22:22:22.000000')
@@ -1676,12 +1676,12 @@ def test_view_broadcast_message_page(
     ),
     (
         'completed',
-        'Previous alerts',
+        'Past alerts',
         '.broadcast_dashboard_previous',
     ),
     (
         'cancelled',
-        'Previous alerts',
+        'Past alerts',
         '.broadcast_dashboard_previous',
     ),
     (
@@ -2030,7 +2030,7 @@ def test_cant_approve_own_broadcast(
     assert not page.select('form')
 
     link = page.select_one('.banner a.govuk-link.govuk-link--destructive')
-    assert link.text == 'Withdraw this alert'
+    assert link.text == 'Discard this alert'
     assert link['href'] == url_for(
         '.reject_broadcast_message',
         service_id=SERVICE_ONE_ID,
@@ -2094,7 +2094,7 @@ def test_can_approve_own_broadcast_in_trial_mode(
         'alerts, to see how it works. '
         'No real alerts will be broadcast to anyone’s phone. '
         'Start broadcasting now '
-        'Cancel this alert'
+        'Reject this alert'
     )
 
     form = page.select_one('.banner details form')
@@ -2105,7 +2105,7 @@ def test_can_approve_own_broadcast_in_trial_mode(
     )
 
     link = page.select_one('.banner a.govuk-link.govuk-link--destructive')
-    assert link.text == 'Cancel this alert'
+    assert link.text == 'Reject this alert'
     assert link['href'] == url_for(
         '.reject_broadcast_message',
         service_id=SERVICE_ONE_ID,

@@ -509,7 +509,7 @@ def test_navigation_for_services_with_broadcast_permission(
         a['href'] for a in page.select('.navigation a')
     ] == [
         '/services/{}/current-alerts'.format(SERVICE_ONE_ID),
-        '/services/{}/previous-alerts'.format(SERVICE_ONE_ID),
+        '/services/{}/past-alerts'.format(SERVICE_ONE_ID),
         '/services/{}/rejected-alerts'.format(SERVICE_ONE_ID),
         '/services/{}/templates'.format(SERVICE_ONE_ID),
         '/services/{}/users'.format(SERVICE_ONE_ID),

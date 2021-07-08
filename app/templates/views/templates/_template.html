@@ -31,7 +31,7 @@
           {% if current_user.has_permissions('send_messages') %}
             <div class="govuk-grid-column-one-half">
               <a href="{{ url_for(".broadcast", service_id=current_service.id, template_id=template.id) }}" class="govuk-link govuk-link--no-visited-state pill-separate-item">
-                Prepare broadcast
+                Get ready to send
               </a>
             </div>
           {% endif %}

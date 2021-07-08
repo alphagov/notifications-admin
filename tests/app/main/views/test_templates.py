@@ -913,7 +913,7 @@ def test_view_broadcast_template(
         (link.text.strip(), link['href'])
         for link in page.select('.pill-separate-item')
     ] == [
-        ('Prepare broadcast', url_for(
+        ('Get ready to send', url_for(
             '.broadcast',
             service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,

@@ -6,7 +6,7 @@
   {% if current_user.has_permissions() %}
     {% if current_service.has_permission('broadcast') %}
       <li><a class="govuk-link govuk-link--no-visited-state{{ main_navigation.is_selected('current-broadcasts') }}" href="{{ url_for('.broadcast_dashboard', service_id=current_service.id) }}">Current alerts</a></li>
-      <li><a class="govuk-link govuk-link--no-visited-state{{ main_navigation.is_selected('previous-broadcasts') }}" href="{{ url_for('.broadcast_dashboard_previous', service_id=current_service.id) }}">Previous alerts</a></li>
+      <li><a class="govuk-link govuk-link--no-visited-state{{ main_navigation.is_selected('previous-broadcasts') }}" href="{{ url_for('.broadcast_dashboard_previous', service_id=current_service.id) }}">Past alerts</a></li>
       <li><a class="govuk-link govuk-link--no-visited-state{{ main_navigation.is_selected('rejected-broadcasts') }}" href="{{ url_for('.broadcast_dashboard_rejected', service_id=current_service.id) }}">Rejected alerts</a></li>
     {% elif current_user.has_permissions('view_activity') %}
       <li><a class="govuk-link govuk-link--no-visited-state{{ main_navigation.is_selected('dashboard') }}" href="{{ url_for('.service_dashboard', service_id=current_service.id) }}">Dashboard</a></li>

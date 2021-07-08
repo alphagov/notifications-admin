@@ -64,7 +64,7 @@ def broadcast_dashboard(service_id):
     )
 
 
-@main.route('/services/<uuid:service_id>/previous-alerts')
+@main.route('/services/<uuid:service_id>/past-alerts')
 @user_has_permissions()
 @service_has_permission('broadcast')
 def broadcast_dashboard_previous(service_id):
@@ -74,8 +74,8 @@ def broadcast_dashboard_previous(service_id):
             'cancelled',
             'completed',
         ),
-        page_title='Previous alerts',
-        empty_message='You do not have any previous alerts',
+        page_title='Past alerts',
+        empty_message='You do not have any past alerts',
         view_broadcast_endpoint='.view_previous_broadcast',
     )
 
