@@ -33,14 +33,14 @@ def webauthn_authentication_post_data(fake_uuid, webauthn_credential, client):
     })
 
 
-@pytest.mark.parametrize('endpoint', [
-    'webauthn_begin_register',
-])
-def test_register_forbidden_for_non_platform_admins(
+def test_begin_register_forbidden_unless_can_use_webauthn(
     client_request,
-    endpoint,
+    platform_admin_user,
+    mocker,
 ):
-    client_request.get(f'main.{endpoint}', _expected_status=403)
+    platform_admin_user['can_use_webauthn'] = False
+    mocker.patch('app.user_api_client.get_user', return_value=platform_admin_user)
+    client_request.get('main.webauthn_begin_register', _expected_status=403)
 
 
 def test_begin_register_returns_encoded_options(
@@ -195,17 +195,6 @@ def test_complete_register_handles_missing_state(
 
     assert response.status_code == 400
     assert cbor.decode(response.data) == 'No registration in progress'
-
-
-def test_begin_authentication_forbidden_for_non_platform_admins(client, api_user_active, mock_get_user):
-    # mock_get_user returns api_user_active so changes to the api user will reflect
-    api_user_active['auth_type'] = 'webauthn_auth'
-
-    with client.session_transaction() as session:
-        session['user_details'] = {'id': '1'}
-
-    response = client.get(url_for('main.webauthn_begin_authentication'))
-    assert response.status_code == 403
 
 
 def test_begin_authentication_forbidden_for_users_without_webauthn(client, mocker, platform_admin_user):

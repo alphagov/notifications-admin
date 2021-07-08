@@ -45,7 +45,7 @@
         {{ edit_field('Change', url_for('.user_profile_password')) }}
       {% endcall %}
 
-      {% if current_user.platform_admin %}
+      {% if current_user.can_use_webauthn %}
         {% call row(id='security-keys') %}
           {{ text_field('Security keys') }}
           {{ optional_text_field(

@@ -3636,6 +3636,7 @@ def create_platform_admin_user(with_unique_id=False, auth_type='webauthn_auth', 
         permissions=permissions or {},
         platform_admin=True,
         auth_type=auth_type,
+        can_use_webauthn=True,
     )
 
 
@@ -3681,7 +3682,8 @@ def create_user(**overrides):
         'organisations': [],
         'current_session_id': None,
         'logged_in_at': None,
-        'email_access_validated_at': None
+        'email_access_validated_at': None,
+        'can_use_webauthn': False,
     }
     user_data.update(overrides)
     return user_data

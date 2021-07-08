@@ -31,6 +31,7 @@ class User(JSONModel, UserMixin):
     MAX_FAILED_LOGIN_COUNT = 10
 
     ALLOWED_PROPERTIES = {
+        'can_use_webauthn',
         'id',
         'name',
         'email_address',

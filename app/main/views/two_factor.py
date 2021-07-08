@@ -93,8 +93,7 @@ def two_factor_sms():
 def two_factor_webauthn():
     user_id = session['user_details']['id']
     user = User.from_id(user_id)
-    if not user.platform_admin:
-        abort(403)
+
     if not user.webauthn_auth:
         abort(403)
 

@@ -453,8 +453,11 @@ def test_invite_user_allows_to_choose_auth(
     service_one['permissions'].append('email_auth')
     page = client_request.get('main.invite_user', service_id=SERVICE_ONE_ID)
 
-    sms_auth_radio_button = page.select_one('input[value="sms_auth"]')
-    assert sms_auth_radio_button.has_attr("disabled") is False
+    radio_buttons = page.select("input[name=login_authentication]")
+    values = {button["value"] for button in radio_buttons}
+
+    assert values == {'sms_auth', 'email_auth'}
+    assert not any(button.has_attr("disabled") for button in radio_buttons)
 
 
 def test_invite_user_has_correct_email_field(
@@ -742,7 +745,6 @@ def test_cant_edit_non_member_user_permissions(
     assert mock_set_user_permissions.called is False
 
 
-@pytest.mark.parametrize('current_auth_type', ['webauthn_auth', 'email_auth'])
 def test_edit_user_permissions_including_authentication_with_email_auth_service(
     client_request,
     service_one,
@@ -752,9 +754,8 @@ def test_edit_user_permissions_including_authentication_with_email_auth_service(
     mock_set_user_permissions,
     mock_update_user_attribute,
     mock_get_template_folders,
-    current_auth_type,
 ):
-    active_user_with_permissions['auth_type'] = current_auth_type
+    active_user_with_permissions['auth_type'] = 'email_auth'
     service_one['permissions'].append('email_auth')
 
     client_request.post(
@@ -796,39 +797,77 @@ def test_edit_user_permissions_including_authentication_with_email_auth_service(
     )
 
 
-@pytest.mark.parametrize('current_auth_type', ['webauthn_auth', 'email_auth'])
-def test_edit_user_permissions_preserves_auth_type_for_platform_admin(
+def test_edit_user_permissions_shows_authentication_for_email_auth_service(
     client_request,
     service_one,
-    platform_admin_user,
+    mock_get_users_by_service,
+    mock_get_template_folders,
+    active_user_with_permissions,
+):
+    service_one['permissions'].append('email_auth')
+
+    page = client_request.get(
+        'main.edit_user_permissions',
+        service_id=SERVICE_ONE_ID,
+        user_id=active_user_with_permissions['id'],
+    )
+
+    radio_buttons = page.select("input[name=login_authentication]")
+    values = {button["value"] for button in radio_buttons}
+
+    assert values == {'sms_auth', 'email_auth'}
+    assert not any(button.has_attr("disabled") for button in radio_buttons)
+
+
+def test_edit_user_permissions_hides_authentication_for_webauthn_user(
+    client_request,
+    service_one,
+    mock_get_users_by_service,
+    mock_get_template_folders,
+    active_user_with_permissions,
+):
+    active_user_with_permissions['auth_type'] = 'webauthn_auth'
+    service_one['permissions'].append('email_auth')
+
+    page = client_request.get(
+        'main.edit_user_permissions',
+        service_id=SERVICE_ONE_ID,
+        user_id=active_user_with_permissions['id'],
+    )
+
+    assert 'This user will login with a security key' in str(page)
+    assert page.select_one('#login_authentication') is None
+
+
+@pytest.mark.parametrize('new_auth_type', ['sms_auth', 'email_auth'])
+def test_edit_user_permissions_preserves_auth_type_for_webauthn_user(
+    client_request,
+    service_one,
+    active_user_with_permissions,
     mock_get_users_by_service,
     mock_get_invites_for_service,
     mock_set_user_permissions,
     mock_update_user_attribute,
     mock_get_template_folders,
-    current_auth_type,
+    new_auth_type,
 ):
-    platform_admin_user['auth_type'] = current_auth_type
+    active_user_with_permissions['auth_type'] = 'webauthn_auth'
     service_one['permissions'].append('email_auth')
-
-    # we're logging in as this user being edited; normally a user can't edit themselves, but since
-    # the same mock is used to (a) check access and (b) find the user to edit, this is just easier
-    client_request.login(platform_admin_user)
 
     client_request.post(
         'main.edit_user_permissions',
         service_id=SERVICE_ONE_ID,
-        user_id=platform_admin_user['id'],
+        user_id=active_user_with_permissions['id'],
         _data={
-            'email_address': platform_admin_user['email_address'],
+            'email_address': active_user_with_permissions['email_address'],
             'permissions_field': [],
-            'login_authentication': 'sms_auth',
+            'login_authentication': new_auth_type,
         },
         _expected_status=302,
     )
 
     mock_set_user_permissions.assert_called_with(
-        str(platform_admin_user['id']),
+        str(active_user_with_permissions['id']),
         SERVICE_ONE_ID,
         permissions=set(),
         folder_permissions=[],

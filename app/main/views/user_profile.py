@@ -27,11 +27,7 @@ from app.main.forms import (
     TwoFactorForm,
 )
 from app.models.user import User
-from app.utils.user import (
-    user_is_gov_user,
-    user_is_logged_in,
-    user_is_platform_admin,
-)
+from app.utils.user import user_is_gov_user, user_is_logged_in
 
 NEW_EMAIL = 'new-email'
 NEW_MOBILE = 'new-mob'
@@ -236,8 +232,10 @@ def user_profile_disable_platform_admin_view():
 
 
 @main.route("/user-profile/security-keys", methods=['GET'])
-@user_is_platform_admin
 def user_profile_security_keys():
+    if not current_user.can_use_webauthn:
+        abort(403)
+
     return render_template(
         'views/user-profile/security-keys.html',
     )
@@ -253,8 +251,10 @@ def user_profile_security_keys():
     methods=['GET'],
     endpoint="user_profile_confirm_delete_security_key"
 )
-@user_is_platform_admin
 def user_profile_manage_security_key(key_id):
+    if not current_user.can_use_webauthn:
+        abort(403)
+
     security_key = current_user.webauthn_credentials.by_id(key_id)
 
     if not security_key:
@@ -282,8 +282,9 @@ def user_profile_manage_security_key(key_id):
 
 
 @main.route("/user-profile/security-keys/<uuid:key_id>/delete", methods=['POST'])
-@user_is_platform_admin
 def user_profile_delete_security_key(key_id):
+    if not current_user.can_use_webauthn:
+        abort(403)
 
     try:
         user_api_client.delete_webauthn_credential_for_user(
