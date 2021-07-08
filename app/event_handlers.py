@@ -78,6 +78,17 @@ def create_suspend_service_event(
     )
 
 
+def create_archive_service_event(
+    service_id,
+    archived_by_id,
+):
+    _send_event(
+        'archive_service',
+        service_id=service_id,
+        archived_by_id=archived_by_id,
+    )
+
+
 def _send_event(event_type, **kwargs):
     event_data = _construct_event_data(request)
     event_data.update(kwargs)

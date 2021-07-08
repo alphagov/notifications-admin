@@ -4125,9 +4125,11 @@ def test_archive_service_after_confirm(
     mock_get_service_templates,
     user,
 ):
-    mocked_fn = mocker.patch('app.service_api_client.post')
+    mock_api = mocker.patch('app.service_api_client.post')
+    mock_event = mocker.patch('app.main.views.service_settings.create_archive_service_event')
     redis_delete_mock = mocker.patch('app.notify_client.service_api_client.redis_client.delete')
     mocker.patch('app.notify_client.service_api_client.redis_client.delete_cache_keys_by_pattern')
+
     client_request.login(user)
     page = client_request.post(
         'main.archive_service',
@@ -4135,7 +4137,9 @@ def test_archive_service_after_confirm(
         _follow_redirects=True,
     )
 
-    mocked_fn.assert_called_once_with('/service/{}/archive'.format(SERVICE_ONE_ID), data=None)
+    mock_api.assert_called_once_with('/service/{}/archive'.format(SERVICE_ONE_ID), data=None)
+    mock_event.assert_called_once_with(SERVICE_ONE_ID, archived_by_id=user['id'])
+
     assert normalize_spaces(page.select_one('h1').text) == 'Choose service'
     assert normalize_spaces(page.select_one('.banner-default-with-tick').text) == (
         '‘service one’ was deleted'

@@ -29,6 +29,7 @@ from app import (
     user_api_client,
 )
 from app.event_handlers import (
+    create_archive_service_event,
     create_broadcast_account_type_change_event,
     create_suspend_service_event,
 )
@@ -428,6 +429,8 @@ def archive_service(service_id):
         cached_service_user_ids = [user.id for user in current_service.active_users]
 
         service_api_client.archive_service(service_id, cached_service_user_ids)
+        create_archive_service_event(service_id, archived_by_id=current_user.id)
+
         flash(
             '‘{}’ was deleted'.format(current_service.name),
             'default_with_tick',
