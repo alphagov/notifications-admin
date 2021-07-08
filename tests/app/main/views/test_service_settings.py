@@ -4203,17 +4203,20 @@ def test_cant_archive_inactive_service(
 
 def test_suspend_service_after_confirm(
     platform_admin_client,
+    api_user_active,
     service_one,
     mocker,
     mock_get_inbound_number_for_service,
 ):
-    mocked_fn = mocker.patch('app.service_api_client.post', return_value=service_one)
+    mock_api = mocker.patch('app.service_api_client.post', return_value=service_one)
+    mock_event = mocker.patch('app.main.views.service_settings.create_suspend_service_event')
 
     response = platform_admin_client.post(url_for('main.suspend_service', service_id=service_one['id']))
 
     assert response.status_code == 302
     assert response.location == url_for('main.service_settings', service_id=service_one['id'], _external=True)
-    assert mocked_fn.call_args == call('/service/{}/suspend'.format(service_one['id']), data=None)
+    mock_api.assert_called_once_with('/service/{}/suspend'.format(service_one['id']), data=None)
+    mock_event.assert_called_once_with(service_one['id'], suspended_by_id=api_user_active['id'])
 
 
 def test_suspend_service_prompts_user(

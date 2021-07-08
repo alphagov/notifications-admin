@@ -8,6 +8,7 @@ from app.event_handlers import (
     create_email_change_event,
     create_mobile_number_change_event,
     create_remove_user_from_service_event,
+    create_suspend_service_event,
     on_user_logged_in,
 )
 from app.models.user import User
@@ -133,3 +134,21 @@ def test_create_broadcast_account_type_change_event(notify_admin, mock_events):
                                         'service_mode': 'training',
                                         'broadcast_channel': 'severe',
                                         'provider_restriction': None})
+
+
+def test_suspend_service(client, mock_events):
+    service_id = str(uuid.uuid4())
+    suspended_by_id = str(uuid.uuid4())
+
+    create_suspend_service_event(
+        service_id,
+        suspended_by_id,
+    )
+
+    mock_events.assert_called_with(
+        'suspend_service',
+        {'browser_fingerprint': {'browser': ANY, 'version': ANY, 'platform': ANY, 'user_agent_string': ''},
+         'ip_address': ANY,
+         'service_id': service_id,
+         'suspended_by_id': suspended_by_id},
+    )
