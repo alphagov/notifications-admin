@@ -216,7 +216,7 @@ def test_user_cannot_reject_broadcast_without_permission(
     )
 
 
-def test_cancel_broadcast_page_403_for_user_without_permission(
+def test_user_cannot_cancel_broadcast_without_permission(
     mocker,
     client_request,
     service_one,
@@ -1997,56 +1997,6 @@ def test_view_pending_broadcast_from_api_call(
     )
 
 
-def test_view_pending_broadcast_created_by_user_without_approve_permission(
-    mocker,
-    client_request,
-    service_one,
-    fake_uuid,
-):
-    current_user = create_active_user_create_broadcasts_permissions()
-    mocker.patch(
-        'app.broadcast_message_api_client.get_broadcast_message',
-        return_value=broadcast_message_json(
-            id_=fake_uuid,
-            service_id=SERVICE_ONE_ID,
-            template_id=fake_uuid,
-            created_by_id=current_user['id'],
-            finishes_at=None,
-            status='pending-approval',
-        ),
-    )
-    client_request.login(current_user)
-    mocker.patch('app.user_api_client.get_user', side_effect=[
-        current_user,  # Current user
-        current_user,  # Same created the broadcast
-    ])
-    service_one['permissions'] += ['broadcast']
-
-    page = client_request.get(
-        '.view_current_broadcast',
-        service_id=SERVICE_ONE_ID,
-        broadcast_message_id=fake_uuid,
-    )
-
-    assert (
-        normalize_spaces(page.select_one('.banner').text)
-    ) == (
-        'Example template is waiting for approval '
-        'You need another member of your team to approve this alert. '
-        'This service is in training mode. No real alerts will be sent. '
-        'Discard this alert'
-    )
-    assert not page.select('.banner input[type=checkbox]')
-
-    link = page.select_one('a.govuk-link.govuk-link--destructive')
-    assert link.text == 'Discard this alert'
-    assert link['href'] == url_for(
-        '.reject_broadcast_message',
-        service_id=SERVICE_ONE_ID,
-        broadcast_message_id=fake_uuid,
-    )
-
-
 @pytest.mark.parametrize('user', [
     create_active_user_with_permissions(),
     create_active_user_approve_broadcasts_permissions(),
@@ -2156,71 +2106,11 @@ def test_confirm_approve_non_training_broadcasts_errors_if_not_ticked(
 
 
 @freeze_time('2020-02-22T22:22:22.000000')
-@pytest.mark.parametrize('user', [
-    create_active_user_with_permissions(),
-    create_active_user_approve_broadcasts_permissions(),
-    create_active_user_create_broadcasts_permissions(),
-])
-def test_cant_approve_own_broadcast(
-    mocker,
-    client_request,
-    service_one,
-    mock_get_broadcast_template,
-    fake_uuid,
-    user,
-):
-    service_one['restricted'] = False
-    mocker.patch(
-        'app.broadcast_message_api_client.get_broadcast_message',
-        return_value=broadcast_message_json(
-            id_=fake_uuid,
-            service_id=SERVICE_ONE_ID,
-            template_id=fake_uuid,
-            created_by_id=fake_uuid,
-            finishes_at='2020-02-23T23:23:23.000000',
-            status='pending-approval',
-        ),
-    )
-    client_request.login(user)
-    mocker.patch('app.user_api_client.get_user', side_effect=[
-        user,  # Current user
-        user,  # User who created broadcast (the same)
-    ])
-    service_one['permissions'] += ['broadcast']
-
-    page = client_request.get(
-        '.view_current_broadcast',
-        service_id=SERVICE_ONE_ID,
-        broadcast_message_id=fake_uuid,
-    )
-
-    assert (
-        normalize_spaces(page.select_one('.banner h1').text)
-    ) == (
-        'Example template is waiting for approval'
-    )
-    assert (
-        normalize_spaces(page.select_one('.banner p').text)
-    ) == (
-        'You need another member of your team to approve your alert.'
-    )
-    assert not page.select('form')
-
-    link = page.select_one('.banner a.govuk-link.govuk-link--destructive')
-    assert link.text == 'Discard this alert'
-    assert link['href'] == url_for(
-        '.reject_broadcast_message',
-        service_id=SERVICE_ONE_ID,
-        broadcast_message_id=fake_uuid,
-    )
-
-
-@freeze_time('2020-02-22T22:22:22.000000')
 @pytest.mark.parametrize('user', (
     create_active_user_with_permissions(),
     create_active_user_approve_broadcasts_permissions(),
 ))
-def test_can_approve_own_broadcast_in_trial_mode(
+def test_can_approve_own_broadcast_in_training_mode(
     mocker,
     client_request,
     service_one,
@@ -2296,8 +2186,68 @@ def test_can_approve_own_broadcast_in_trial_mode(
 
 
 @freeze_time('2020-02-22T22:22:22.000000')
+@pytest.mark.parametrize('user', [
+    create_active_user_with_permissions(),
+    create_active_user_approve_broadcasts_permissions(),
+    create_active_user_create_broadcasts_permissions(),
+])
+def test_cant_approve_own_broadcast_if_service_is_live(
+    mocker,
+    client_request,
+    service_one,
+    mock_get_broadcast_template,
+    fake_uuid,
+    user,
+):
+    service_one['restricted'] = False
+    mocker.patch(
+        'app.broadcast_message_api_client.get_broadcast_message',
+        return_value=broadcast_message_json(
+            id_=fake_uuid,
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            created_by_id=fake_uuid,
+            finishes_at='2020-02-23T23:23:23.000000',
+            status='pending-approval',
+        ),
+    )
+    client_request.login(user)
+    mocker.patch('app.user_api_client.get_user', side_effect=[
+        user,  # Current user
+        user,  # User who created broadcast (the same)
+    ])
+    service_one['permissions'] += ['broadcast']
+
+    page = client_request.get(
+        '.view_current_broadcast',
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+    )
+
+    assert (
+        normalize_spaces(page.select_one('.banner h1').text)
+    ) == (
+        'Example template is waiting for approval'
+    )
+    assert (
+        normalize_spaces(page.select_one('.banner p').text)
+    ) == (
+        'You need another member of your team to approve your alert.'
+    )
+    assert not page.select('form')
+
+    link = page.select_one('.banner a.govuk-link.govuk-link--destructive')
+    assert link.text == 'Discard this alert'
+    assert link['href'] == url_for(
+        '.reject_broadcast_message',
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+    )
+
+
+@freeze_time('2020-02-22T22:22:22.000000')
 @pytest.mark.parametrize("user_is_platform_admin", [True, False])
-def test_view_only_user_cant_approve_broadcast(
+def test_view_only_user_cant_approve_broadcast_created_by_someone_else(
     mocker,
     client_request,
     service_one,
@@ -2454,6 +2404,60 @@ def test_user_without_approve_permission_cant_approve_broadcast_created_by_someo
                                    broadcast_message_id=fake_uuid)
 
 
+def test_user_without_approve_permission_cant_approve_broadcast_they_created(
+    mocker,
+    client_request,
+    service_one,
+    fake_uuid,
+):
+    current_user = create_active_user_create_broadcasts_permissions()
+    mocker.patch(
+        'app.broadcast_message_api_client.get_broadcast_message',
+        return_value=broadcast_message_json(
+            id_=fake_uuid,
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            created_by_id=current_user['id'],
+            finishes_at=None,
+            status='pending-approval',
+        ),
+    )
+    client_request.login(current_user)
+    mocker.patch('app.user_api_client.get_user', side_effect=[
+        current_user,  # Current user
+        current_user,  # Same created the broadcast
+    ])
+    service_one['permissions'] += ['broadcast']
+
+    page = client_request.get(
+        '.view_current_broadcast',
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+    )
+
+    assert (
+        normalize_spaces(page.select_one('.banner').text)
+    ) == (
+        'Example template is waiting for approval '
+        'You need another member of your team to approve this alert. '
+        'This service is in training mode. No real alerts will be sent. '
+        'Discard this alert'
+    )
+    assert not page.select('.banner input[type=checkbox]')
+
+    link = page.select_one('a.govuk-link.govuk-link--destructive')
+    assert link.text == 'Discard this alert'
+    assert link['href'] == url_for(
+        '.reject_broadcast_message',
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+    )
+
+
+@pytest.mark.parametrize('user', [
+    create_active_user_with_permissions(),
+    create_active_user_approve_broadcasts_permissions(),
+])
 @pytest.mark.parametrize(
     'trial_mode, initial_status, post_data, expected_approval, expected_redirect',
     (
@@ -2490,7 +2494,7 @@ def test_user_without_approve_permission_cant_approve_broadcast_created_by_someo
     )
 )
 @freeze_time('2020-02-22T22:22:22.000000')
-def test_request_approval(
+def test_confirm_approve_broadcast(
     mocker,
     client_request,
     service_one,
@@ -2498,6 +2502,7 @@ def test_request_approval(
     fake_uuid,
     mock_update_broadcast_message,
     mock_update_broadcast_message_status,
+    user,
     initial_status,
     post_data,
     expected_approval,
@@ -2518,6 +2523,7 @@ def test_request_approval(
     service_one['restricted'] = trial_mode
     service_one['permissions'] += ['broadcast']
 
+    client_request.login(user)
     client_request.post(
         '.view_current_broadcast',
         service_id=SERVICE_ONE_ID,
@@ -2668,8 +2674,8 @@ def test_no_view_page_for_draft(
     create_active_user_with_permissions(),
     create_active_user_create_broadcasts_permissions(),
     create_active_user_approve_broadcasts_permissions(),
+    create_platform_admin_user(),
 ))
-@pytest.mark.parametrize("user_is_platform_admin", [True, False])
 def test_cancel_broadcast(
     client_request,
     service_one,
@@ -2678,16 +2684,12 @@ def test_cancel_broadcast(
     mock_update_broadcast_message_status,
     platform_admin_user_no_service_permissions,
     fake_uuid,
-    user_is_platform_admin,
     user,
 ):
     """
     users with 'send_messages' permissions and platform admins should be able to cancel broadcasts.
     """
     service_one['permissions'] += ['broadcast']
-
-    if user_is_platform_admin:
-        client_request.login(platform_admin_user_no_service_permissions)
 
     client_request.login(user)
     page = client_request.get(
