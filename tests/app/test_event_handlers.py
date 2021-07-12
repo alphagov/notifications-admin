@@ -35,7 +35,12 @@ def test_create_email_change_event_calls_events_api(client, mock_events):
     user_id = str(uuid.uuid4())
     updated_by_id = str(uuid.uuid4())
 
-    create_email_change_event(user_id, updated_by_id, 'original@example.com', 'new@example.com')
+    create_email_change_event(
+        user_id=user_id,
+        updated_by_id=updated_by_id,
+        original_email_address='original@example.com',
+        new_email_address='new@example.com'
+    )
 
     mock_events.assert_called_with('update_user_email', event_dict(
         user_id=user_id,
@@ -50,7 +55,11 @@ def test_create_add_user_to_service_event_calls_events_api(client, mock_events):
     invited_by_id = str(uuid.uuid4())
     service_id = str(uuid.uuid4())
 
-    create_add_user_to_service_event(user_id, invited_by_id, service_id)
+    create_add_user_to_service_event(
+        user_id=user_id,
+        invited_by_id=invited_by_id,
+        service_id=service_id
+    )
 
     mock_events.assert_called_with('add_user_to_service', event_dict(
         user_id=user_id,
@@ -64,7 +73,11 @@ def test_create_remove_user_from_service_event_calls_events_api(client, mock_eve
     removed_by_id = str(uuid.uuid4())
     service_id = str(uuid.uuid4())
 
-    create_remove_user_from_service_event(user_id, removed_by_id, service_id)
+    create_remove_user_from_service_event(
+        user_id=user_id,
+        removed_by_id=removed_by_id,
+        service_id=service_id
+    )
 
     mock_events.assert_called_with('remove_user_from_service', event_dict(
         user_id=user_id,
@@ -77,7 +90,12 @@ def test_create_mobile_number_change_event_calls_events_api(client, mock_events)
     user_id = str(uuid.uuid4())
     updated_by_id = str(uuid.uuid4())
 
-    create_mobile_number_change_event(user_id, updated_by_id, '07700900000', '07700900999')
+    create_mobile_number_change_event(
+        user_id=user_id,
+        updated_by_id=updated_by_id,
+        original_mobile_number='07700900000',
+        new_mobile_number='07700900999'
+    )
 
     mock_events.assert_called_with('update_user_mobile_number', event_dict(
         user_id=user_id,
@@ -91,7 +109,10 @@ def test_create_archive_user_event_calls_events_api(client, mock_events):
     user_id = str(uuid.uuid4())
     archived_by_id = str(uuid.uuid4())
 
-    create_archive_user_event(user_id, archived_by_id)
+    create_archive_user_event(
+        user_id=user_id,
+        archived_by_id=archived_by_id
+    )
 
     mock_events.assert_called_with('archive_user', event_dict(
         user_id=user_id,
@@ -104,11 +125,12 @@ def test_create_broadcast_account_type_change_event(client, mock_events):
     changed_by_id = str(uuid.uuid4())
 
     create_broadcast_account_type_change_event(
-        service_id,
-        changed_by_id,
-        'training',
-        'severe',
-        None)
+        service_id=service_id,
+        changed_by_id=changed_by_id,
+        service_mode='training',
+        broadcast_channel='severe',
+        provider_restriction=None
+    )
 
     mock_events.assert_called_with('change_broadcast_account_type', event_dict(
         service_id=service_id,
@@ -124,8 +146,8 @@ def test_suspend_service(client, mock_events):
     suspended_by_id = str(uuid.uuid4())
 
     create_suspend_service_event(
-        service_id,
-        suspended_by_id,
+        service_id=service_id,
+        suspended_by_id=suspended_by_id,
     )
 
     mock_events.assert_called_with('suspend_service', event_dict(
@@ -139,8 +161,8 @@ def test_archive_service(client, mock_events):
     archived_by_id = str(uuid.uuid4())
 
     create_archive_service_event(
-        service_id,
-        archived_by_id,
+        service_id=service_id,
+        archived_by_id=archived_by_id,
     )
 
     mock_events.assert_called_with('archive_service', event_dict(

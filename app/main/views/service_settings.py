@@ -429,7 +429,7 @@ def archive_service(service_id):
         cached_service_user_ids = [user.id for user in current_service.active_users]
 
         service_api_client.archive_service(service_id, cached_service_user_ids)
-        create_archive_service_event(service_id, archived_by_id=current_user.id)
+        create_archive_service_event(service_id=service_id, archived_by_id=current_user.id)
 
         flash(
             '‘{}’ was deleted'.format(current_service.name),
@@ -449,7 +449,7 @@ def archive_service(service_id):
 def suspend_service(service_id):
     if request.method == 'POST':
         service_api_client.suspend_service(service_id)
-        create_suspend_service_event(service_id, suspended_by_id=current_user.id)
+        create_suspend_service_event(service_id=service_id, suspended_by_id=current_user.id)
         return redirect(url_for('.service_settings', service_id=service_id))
     else:
         flash("This will suspend the service and revoke all api keys. Are you sure you want to suspend this service?",

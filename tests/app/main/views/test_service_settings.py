@@ -4138,7 +4138,7 @@ def test_archive_service_after_confirm(
     )
 
     mock_api.assert_called_once_with('/service/{}/archive'.format(SERVICE_ONE_ID), data=None)
-    mock_event.assert_called_once_with(SERVICE_ONE_ID, archived_by_id=user['id'])
+    mock_event.assert_called_once_with(service_id=SERVICE_ONE_ID, archived_by_id=user['id'])
 
     assert normalize_spaces(page.select_one('h1').text) == 'Choose service'
     assert normalize_spaces(page.select_one('.banner-default-with-tick').text) == (
@@ -4230,7 +4230,7 @@ def test_suspend_service_after_confirm(
     )
 
     mock_api.assert_called_once_with('/service/{}/suspend'.format(SERVICE_ONE_ID), data=None)
-    mock_event.assert_called_once_with(SERVICE_ONE_ID, suspended_by_id=user['id'])
+    mock_event.assert_called_once_with(service_id=SERVICE_ONE_ID, suspended_by_id=user['id'])
 
 
 @pytest.mark.parametrize('user', (
