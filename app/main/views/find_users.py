@@ -44,7 +44,7 @@ def archive_user(user_id):
                 flash('User can’t be removed from a service - '
                       'check all services have another team member with manage_settings')
                 return redirect(url_for('main.user_information', user_id=user_id))
-        create_archive_user_event(str(user_id), current_user.id)
+        create_archive_user_event(user_id=str(user_id), archived_by_id=current_user.id)
 
         return redirect(url_for('.user_information', user_id=user_id))
     else:

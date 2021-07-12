@@ -173,7 +173,11 @@ def remove_user_from_service(service_id, user_id):
         else:
             abort(500, e)
     else:
-        create_remove_user_from_service_event(user_id=user_id, removed_by_id=current_user.id, service_id=service_id)
+        create_remove_user_from_service_event(
+            user_id=user_id,
+            removed_by_id=current_user.id,
+            service_id=service_id
+        )
 
     return redirect(url_for(
         '.manage_users',
@@ -228,7 +232,12 @@ def confirm_edit_user_email(service_id, user_id):
         except HTTPError as e:
             abort(500, e)
         else:
-            create_email_change_event(user.id, current_user.id, user.email_address, new_email)
+            create_email_change_event(
+                user_id=user.id,
+                updated_by_id=current_user.id,
+                original_email_address=user.email_address,
+                new_email_address=new_email
+            )
         finally:
             session.pop(session_key, None)
 
@@ -286,7 +295,12 @@ def confirm_edit_user_mobile_number(service_id, user_id):
         except HTTPError as e:
             abort(500, e)
         else:
-            create_mobile_number_change_event(user.id, current_user.id, user.mobile_number, new_number)
+            create_mobile_number_change_event(
+                user_id=user.id,
+                updated_by_id=current_user.id,
+                original_mobile_number=user.mobile_number,
+                new_mobile_number=new_number
+            )
         finally:
             session.pop('team_member_mobile_change', None)
 

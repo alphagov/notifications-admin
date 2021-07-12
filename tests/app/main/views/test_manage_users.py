@@ -1827,10 +1827,10 @@ def test_confirm_edit_user_email_changes_user_email(
         updated_by=active_user_with_permissions['id']
     )
     mock_event_handler.assert_called_once_with(
-        api_user_active['id'],
-        active_user_with_permissions['id'],
-        api_user_active['email_address'],
-        new_email)
+        user_id=api_user_active['id'],
+        updated_by_id=active_user_with_permissions['id'],
+        original_email_address=api_user_active['email_address'],
+        new_email_address=new_email)
 
 
 def test_confirm_edit_user_email_doesnt_change_user_email_for_non_team_member(
@@ -2040,10 +2040,10 @@ def test_confirm_edit_user_mobile_number_changes_user_mobile_number(
         updated_by=active_user_with_permissions['id']
     )
     mock_event_handler.assert_called_once_with(
-        api_user_active['id'],
-        active_user_with_permissions['id'],
-        api_user_active['mobile_number'],
-        new_number)
+        user_id=api_user_active['id'],
+        updated_by_id=active_user_with_permissions['id'],
+        original_mobile_number=api_user_active['mobile_number'],
+        new_mobile_number=new_number)
 
 
 def test_confirm_edit_user_mobile_number_doesnt_change_user_mobile_for_non_team_member(
