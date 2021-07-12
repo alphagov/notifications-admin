@@ -4288,6 +4288,7 @@ def test_resume_service_after_confirm(
 ):
     service_one['active'] = False
     mock_api = mocker.patch('app.service_api_client.post')
+    mock_event = mocker.patch('app.main.views.service_settings.create_resume_service_event')
 
     client_request.login(user)
     client_request.post(
@@ -4301,6 +4302,7 @@ def test_resume_service_after_confirm(
     )
 
     assert mock_api.called_once_with('/service/{}/resume'.format(SERVICE_ONE_ID), data=None)
+    assert mock_event.called_once_with(service_id=SERVICE_ONE_ID, resumed_by_id=user['id'])
 
 
 @pytest.mark.parametrize('user', (

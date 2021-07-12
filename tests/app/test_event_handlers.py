@@ -9,6 +9,7 @@ from app.event_handlers import (
     create_email_change_event,
     create_mobile_number_change_event,
     create_remove_user_from_service_event,
+    create_resume_service_event,
     create_suspend_service_event,
     on_user_logged_in,
 )
@@ -118,3 +119,13 @@ def test_archive_service(client, mock_events):
 
     create_archive_service_event(**kwargs)
     mock_events.assert_called_with('archive_service', event_dict(**kwargs))
+
+
+def test_resume_service(client, mock_events):
+    kwargs = {
+        "service_id": str(uuid.uuid4()),
+        "resumed_by_id": str(uuid.uuid4())
+    }
+
+    create_resume_service_event(**kwargs)
+    mock_events.assert_called_with('resume_service', event_dict(**kwargs))

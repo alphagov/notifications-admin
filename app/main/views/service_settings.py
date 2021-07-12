@@ -31,6 +31,7 @@ from app import (
 from app.event_handlers import (
     create_archive_service_event,
     create_broadcast_account_type_change_event,
+    create_resume_service_event,
     create_suspend_service_event,
 )
 from app.extensions import zendesk_client
@@ -462,6 +463,7 @@ def suspend_service(service_id):
 def resume_service(service_id):
     if request.method == 'POST':
         service_api_client.resume_service(service_id)
+        create_resume_service_event(service_id=service_id, resumed_by_id=current_user.id)
         return redirect(url_for('.service_settings', service_id=service_id))
     else:
         flash("This will resume the service. New api key are required for this service to use the API.", 'resume')
