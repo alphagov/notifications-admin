@@ -4139,7 +4139,7 @@ def test_archive_service_after_confirm(
     )
 
     mock_api.assert_called_once_with('/service/{}/archive'.format(SERVICE_ONE_ID), data=None)
-    mock_event.assert_called_once_with(SERVICE_ONE_ID, archived_by_id=user['id'])
+    mock_event.assert_called_once_with(service_id=SERVICE_ONE_ID, archived_by_id=user['id'])
 
     assert normalize_spaces(page.select_one('h1').text) == 'Choose service'
     assert normalize_spaces(page.select_one('.banner-default-with-tick').text) == (
@@ -4231,7 +4231,7 @@ def test_suspend_service_after_confirm(
     )
 
     mock_api.assert_called_once_with('/service/{}/suspend'.format(SERVICE_ONE_ID), data=None)
-    mock_event.assert_called_once_with(SERVICE_ONE_ID, suspended_by_id=user['id'])
+    mock_event.assert_called_once_with(service_id=SERVICE_ONE_ID, suspended_by_id=user['id'])
 
 
 @pytest.mark.parametrize('user', (
@@ -4276,27 +4276,44 @@ def test_cant_suspend_inactive_service(
     assert 'Suspend service' not in {a.text for a in page.find_all('a', class_='button')}
 
 
+@pytest.mark.parametrize('user', (
+    create_platform_admin_user(),
+    create_active_user_with_permissions(),
+    pytest.param(create_active_user_no_settings_permission(), marks=pytest.mark.xfail),
+))
 def test_resume_service_after_confirm(
-    platform_admin_client,
-    service_one,
-    single_reply_to_email_address,
-    single_letter_contact_block,
-    mock_get_organisation,
     mocker,
-    mock_get_inbound_number_for_service,
+    user,
+    service_one,
+    client_request,
 ):
     service_one['active'] = False
-    mocked_fn = mocker.patch('app.service_api_client.post', return_value=service_one)
+    mock_api = mocker.patch('app.service_api_client.post')
+    mock_event = mocker.patch('app.main.views.service_settings.create_resume_service_event')
 
-    response = platform_admin_client.post(url_for('main.resume_service', service_id=service_one['id']))
+    client_request.login(user)
+    client_request.post(
+        'main.resume_service',
+        service_id=SERVICE_ONE_ID,
+        _expected_redirect=url_for(
+            'main.service_settings',
+            service_id=SERVICE_ONE_ID,
+            _external=True
+        )
+    )
 
-    assert response.status_code == 302
-    assert response.location == url_for('main.service_settings', service_id=service_one['id'], _external=True)
-    assert mocked_fn.call_args == call('/service/{}/resume'.format(service_one['id']), data=None)
+    assert mock_api.called_once_with('/service/{}/resume'.format(SERVICE_ONE_ID), data=None)
+    assert mock_event.called_once_with(service_id=SERVICE_ONE_ID, resumed_by_id=user['id'])
 
 
+@pytest.mark.parametrize('user', (
+    create_platform_admin_user(),
+    create_active_user_with_permissions(),
+    pytest.param(create_active_user_no_settings_permission(), marks=pytest.mark.xfail),
+))
 def test_resume_service_prompts_user(
-    platform_admin_client,
+    client_request,
+    user,
     service_one,
     single_reply_to_email_address,
     single_letter_contact_block,
@@ -4305,15 +4322,14 @@ def test_resume_service_prompts_user(
     mock_get_service_settings_page_common,
 ):
     service_one['active'] = False
-    mocked_fn = mocker.patch('app.service_api_client.post')
+    mock_api = mocker.patch('app.service_api_client.post')
 
-    response = platform_admin_client.get(url_for('main.resume_service', service_id=service_one['id']))
+    client_request.login(user)
+    page = client_request.get('main.resume_service', service_id=service_one['id'])
 
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert 'This will resume the service. New api key are required for this service to use the API.' in \
            page.find('div', class_='banner-dangerous').text
-    assert mocked_fn.called is False
+    assert mock_api.called is False
 
 
 def test_cant_resume_active_service(
