@@ -172,14 +172,14 @@ class BroadcastMessage(JSONModel):
     def cancelled_by(self):
         return User.from_id(self.cancelled_by_id)
 
-    @property
+    @cached_property
     def count_of_phones(self):
         return round_to_significant_figures(
             sum(area.count_of_phones for area in self.areas),
             1
         )
 
-    @property
+    @cached_property
     def count_of_phones_likely(self):
         estimated_area = self.simple_polygons.estimated_area
 
