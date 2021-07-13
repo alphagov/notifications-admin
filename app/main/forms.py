@@ -1066,16 +1066,8 @@ class BroadcastInviteUserForm(BaseInviteUserForm, BroadcastPermissionsForm):
             raise ValidationError("You cannot send an invitation to yourself")
 
 
-class InviteOrgUserForm(StripWhitespaceForm):
-    email_address = email_address(gov_user=False)
-
-    def __init__(self, inviter_email_address, *args, **kwargs):
-        super(InviteOrgUserForm, self).__init__(*args, **kwargs)
-        self.inviter_email_address = inviter_email_address.lower()
-
-    def validate_email_address(self, field):
-        if field.data.lower() == self.inviter_email_address and not current_user.platform_admin:
-            raise ValidationError("You cannot send an invitation to yourself")
+class InviteOrgUserForm(BaseInviteUserForm, StripWhitespaceForm):
+    pass
 
 
 class TwoFactorForm(StripWhitespaceForm):
