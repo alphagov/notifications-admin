@@ -1044,10 +1044,12 @@ class BaseInviteUserForm():
 
     def __init__(self, invalid_email_address, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.invalid_email_address = invalid_email_address.lower()
+        self.invalid_email_address = invalid_email_address
 
     def validate_email_address(self, field):
-        if field.data.lower() == self.invalid_email_address and not current_user.platform_admin:
+        if current_user.platform_admin:
+            return
+        if field.data.lower() == self.invalid_email_address.lower():
             raise ValidationError("You cannot send an invitation to yourself")
 
 
