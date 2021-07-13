@@ -62,6 +62,7 @@ from app.models.roles_and_permissions import (
     roles,
 )
 from app.utils import merge_jsonlike
+from app.utils.user import distinct_email_addresses
 
 
 def get_time_value_and_label(future_time):
@@ -1059,6 +1060,10 @@ class InviteUserForm(BaseInviteUserForm, PermissionsForm):
 
 class BroadcastInviteUserForm(BaseInviteUserForm, BroadcastPermissionsForm):
     email_address = email_address(gov_user=True)
+
+    def validate_email_address(self, field):
+        if not distinct_email_addresses(field.data, self.invalid_email_address):
+            raise ValidationError("You cannot send an invitation to yourself")
 
 
 class InviteOrgUserForm(StripWhitespaceForm):
