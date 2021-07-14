@@ -447,7 +447,7 @@ def archive_service(service_id):
 
 
 @main.route("/services/<uuid:service_id>/service-settings/suspend", methods=["GET", "POST"])
-@user_has_permissions('manage_service')
+@user_is_platform_admin
 def suspend_service(service_id):
     if request.method == 'POST':
         service_api_client.suspend_service(service_id)
@@ -460,7 +460,7 @@ def suspend_service(service_id):
 
 
 @main.route("/services/<uuid:service_id>/service-settings/resume", methods=["GET", "POST"])
-@user_has_permissions('manage_service')
+@user_is_platform_admin
 def resume_service(service_id):
     if request.method == 'POST':
         service_api_client.resume_service(service_id)

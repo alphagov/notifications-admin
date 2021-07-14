@@ -4208,8 +4208,7 @@ def test_cant_archive_inactive_service(
 
 @pytest.mark.parametrize('user', (
     create_platform_admin_user(),
-    create_active_user_with_permissions(),
-    pytest.param(create_active_user_no_settings_permission(), marks=pytest.mark.xfail),
+    pytest.param(create_active_user_with_permissions(), marks=pytest.mark.xfail),
 ))
 def test_suspend_service_after_confirm(
     client_request,
@@ -4236,8 +4235,7 @@ def test_suspend_service_after_confirm(
 
 @pytest.mark.parametrize('user', (
     create_platform_admin_user(),
-    create_active_user_with_permissions(),
-    pytest.param(create_active_user_no_settings_permission(), marks=pytest.mark.xfail),
+    pytest.param(create_active_user_with_permissions(), marks=pytest.mark.xfail),
 ))
 def test_suspend_service_prompts_user(
     client_request,
@@ -4278,8 +4276,7 @@ def test_cant_suspend_inactive_service(
 
 @pytest.mark.parametrize('user', (
     create_platform_admin_user(),
-    create_active_user_with_permissions(),
-    pytest.param(create_active_user_no_settings_permission(), marks=pytest.mark.xfail),
+    pytest.param(create_active_user_with_permissions(), marks=pytest.mark.xfail),
 ))
 def test_resume_service_after_confirm(
     mocker,
@@ -4308,8 +4305,7 @@ def test_resume_service_after_confirm(
 
 @pytest.mark.parametrize('user', (
     create_platform_admin_user(),
-    create_active_user_with_permissions(),
-    pytest.param(create_active_user_no_settings_permission(), marks=pytest.mark.xfail),
+    pytest.param(create_active_user_with_permissions(), marks=pytest.mark.xfail),
 ))
 def test_resume_service_prompts_user(
     client_request,
