@@ -397,11 +397,14 @@ def service_confirm_broadcast_account_type(service_id, account_type):
         abort(404)
 
     if form.validate_on_submit():
+        cached_service_user_ids = [user.id for user in current_service.active_users]
+
         service_api_client.set_service_broadcast_settings(
             current_service.id,
             service_mode=form.account_type.service_mode,
             broadcast_channel=form.account_type.broadcast_channel,
-            provider_restriction=form.account_type.provider_restriction
+            provider_restriction=form.account_type.provider_restriction,
+            cached_service_user_ids=cached_service_user_ids
         )
         create_broadcast_account_type_change_event(
             service_id=current_service.id,

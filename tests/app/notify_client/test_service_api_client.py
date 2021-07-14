@@ -404,7 +404,7 @@ def test_returns_value_from_cache(
     (service_api_client, 'delete_sms_sender', [SERVICE_ONE_ID, ''], {}),
     (service_api_client, 'update_service_callback_api', [SERVICE_ONE_ID] + [''] * 4, {}),
     (service_api_client, 'create_service_callback_api', [SERVICE_ONE_ID] + [''] * 3, {}),
-    (service_api_client, 'set_service_broadcast_settings', [SERVICE_ONE_ID, 'training', 'severe', None], {}),
+    (service_api_client, 'set_service_broadcast_settings', [SERVICE_ONE_ID, 'training', 'severe', 'all', []], {}),
     (user_api_client, 'add_user_to_service', [SERVICE_ONE_ID, uuid4(), [], []], {}),
     (invite_api_client, 'accept_invite', [SERVICE_ONE_ID, uuid4()], {}),
 ])
@@ -490,6 +490,23 @@ def test_deletes_cached_users_when_archiving_service(mocker, mock_get_service_te
 
     assert call('user-my-user-id1', 'user-my-user-id2') in mock_redis_delete.call_args_list
     assert call(f'service-{SERVICE_ONE_ID}-template-*') in mock_redis_delete_by_pattern.call_args_list
+
+
+def test_deletes_cached_users_when_changing_broadcast_service_settings(mocker):
+    mock_redis_delete = mocker.patch('app.extensions.RedisClient.delete')
+
+    mocker.patch('notifications_python_client.base.BaseAPIClient.request', return_value={'data': ""})
+
+    service_api_client.set_service_broadcast_settings(SERVICE_ONE_ID,
+                                                      'live',
+                                                      'severe',
+                                                      'all',
+                                                      ["my-user-id1", "my-user-id2"])
+
+    assert mock_redis_delete.call_args_list == [
+        call('user-my-user-id1', 'user-my-user-id2'),
+        call(f'service-{SERVICE_ONE_ID}'),
+    ]
 
 
 def test_client_gets_guest_list(mocker):

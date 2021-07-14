@@ -5899,6 +5899,7 @@ def test_service_confirm_broadcast_account_type_posts_data_to_api_and_redirects(
     broadcast_channel,
     allowed_broadcast_provider,
     fake_uuid,
+    mock_get_users_by_service,
 ):
     set_service_broadcast_settings_mock = mocker.patch('app.service_api_client.set_service_broadcast_settings')
     mock_event_handler = mocker.patch('app.main.views.service_settings.create_broadcast_account_type_change_event')
@@ -5917,6 +5918,7 @@ def test_service_confirm_broadcast_account_type_posts_data_to_api_and_redirects(
         service_mode=service_mode,
         broadcast_channel=broadcast_channel,
         provider_restriction=allowed_broadcast_provider,
+        cached_service_user_ids=[fake_uuid]
     )
     mock_event_handler.assert_called_once_with(
         service_id=SERVICE_ONE_ID,
