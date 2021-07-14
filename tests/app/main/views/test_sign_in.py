@@ -105,6 +105,28 @@ def test_logged_in_user_redirects_to_account(
     )
 
 
+def test_logged_in_user_redirects_to_next_url(
+    client_request
+):
+    client_request.get(
+        'main.sign_in',
+        next='/user-profile',
+        _expected_status=302,
+        _expected_redirect=url_for('main.user_profile', _external=True),
+    )
+
+
+def test_logged_in_user_doesnt_do_evil_redirect(
+    client_request
+):
+    client_request.get(
+        'main.sign_in',
+        next='http://www.evil.com',
+        _expected_status=302,
+        _expected_redirect=url_for('main.show_accounts_or_dashboard', _external=True),
+    )
+
+
 @pytest.mark.parametrize('redirect_url', [
     None,
     f'/services/{SERVICE_ONE_ID}/templates',

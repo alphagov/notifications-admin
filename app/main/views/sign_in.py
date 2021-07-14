@@ -15,17 +15,20 @@ from app.main import main
 from app.main.forms import LoginForm
 from app.models.user import InvitedUser, User
 from app.utils import hide_from_search_engines
+from app.utils.login import is_safe_redirect_url
 
 
 @main.route('/sign-in', methods=(['GET', 'POST']))
 @hide_from_search_engines
 def sign_in():
+    redirect_url = request.args.get('next')
     if current_user and current_user.is_authenticated:
+        if redirect_url and is_safe_redirect_url(redirect_url):
+            return redirect(redirect_url)
         return redirect(url_for('main.show_accounts_or_dashboard'))
 
     form = LoginForm()
     password_reset_url = url_for('.forgot_password', next=request.args.get('next'))
-    redirect_url = request.args.get('next')
 
     if form.validate_on_submit():
 
