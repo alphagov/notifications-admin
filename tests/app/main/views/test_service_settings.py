@@ -4111,10 +4111,12 @@ def test_switch_service_enable_international_sms_and_letters(
     assert mocked_fn.call_args[0][0] == service_one['id']
 
 
-@pytest.mark.parametrize('user', (
-    create_platform_admin_user(),
-    create_active_user_with_permissions(),
-    pytest.param(create_active_user_no_settings_permission(), marks=pytest.mark.xfail),
+@pytest.mark.parametrize('user, is_trial_service', (
+    [create_platform_admin_user(), True],
+    [create_platform_admin_user(), False],
+    [create_active_user_with_permissions(), True],
+    pytest.param(create_active_user_with_permissions(), False, marks=pytest.mark.xfail),
+    pytest.param(create_active_user_no_settings_permission(), True, marks=pytest.mark.xfail),
 ))
 def test_archive_service_after_confirm(
     client_request,
@@ -4124,8 +4126,11 @@ def test_archive_service_after_confirm(
     mock_get_organisations_and_services_for_user,
     mock_get_users_by_service,
     mock_get_service_templates,
+    service_one,
     user,
+    is_trial_service,
 ):
+    service_one['restricted'] = is_trial_service
     mock_api = mocker.patch('app.service_api_client.post')
     mock_event = mocker.patch('app.main.views.service_settings.create_archive_service_event')
     redis_delete_mock = mocker.patch('app.notify_client.service_api_client.redis_client.delete')
@@ -4149,21 +4154,26 @@ def test_archive_service_after_confirm(
     assert call(f"user-{sample_uuid()}") in redis_delete_mock.call_args_list
 
 
-@pytest.mark.parametrize('user', (
-    create_platform_admin_user(),
-    create_active_user_with_permissions(),
-    pytest.param(create_active_user_no_settings_permission(), marks=pytest.mark.xfail),
+@pytest.mark.parametrize('user, is_trial_service', (
+    [create_platform_admin_user(), True],
+    [create_platform_admin_user(), False],
+    [create_active_user_with_permissions(), True],
+    pytest.param(create_active_user_with_permissions(), False, marks=pytest.mark.xfail),
+    pytest.param(create_active_user_no_settings_permission(), True, marks=pytest.mark.xfail),
 ))
 def test_archive_service_prompts_user(
     client_request,
     mocker,
     single_reply_to_email_address,
     single_letter_contact_block,
+    service_one,
     single_sms_sender,
     mock_get_service_settings_page_common,
     user,
+    is_trial_service,
 ):
-    mocked_fn = mocker.patch('app.service_api_client.post')
+    mock_api = mocker.patch('app.service_api_client.post')
+    service_one['restricted'] = is_trial_service
     client_request.login(user)
 
     settings_page = client_request.get(
@@ -4186,7 +4196,7 @@ def test_archive_service_prompts_user(
         'There’s no way to undo this. '
         'Yes, delete'
     )
-    assert mocked_fn.called is False
+    assert mock_api.called is False
 
 
 def test_cant_archive_inactive_service(

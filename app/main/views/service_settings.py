@@ -421,7 +421,7 @@ def service_confirm_broadcast_account_type(service_id, account_type):
 @main.route("/services/<uuid:service_id>/service-settings/archive", methods=['GET', 'POST'])
 @user_has_permissions('manage_service')
 def archive_service(service_id):
-    if not current_service.active and (
+    if not current_service.active or not (
         current_service.trial_mode or current_user.platform_admin
     ):
         abort(403)
