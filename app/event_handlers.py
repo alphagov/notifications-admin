@@ -8,6 +8,7 @@ EVENT_SCHEMAS = {
     "update_user_mobile_number": {"user_id", "updated_by_id", "original_mobile_number", "new_mobile_number"},
     "remove_user_from_service": {"user_id", "removed_by_id", "service_id"},
     "add_user_to_service": {"user_id", "invited_by_id", "service_id"},
+    "set_user_permissions": {"user_id", "service_id", "original_admin_roles", "new_admin_roles", "set_by_id"},
     "archive_user": {"user_id", "archived_by_id"},
     "change_broadcast_account_type": {"service_id", "changed_by_id", "service_mode", "broadcast_channel", "provider_restriction"},  # noqa: E501 (length)
     "archive_service": {"service_id", "archived_by_id"},
@@ -34,6 +35,10 @@ def create_remove_user_from_service_event(**kwargs):
 
 def create_add_user_to_service_event(**kwargs):
     _send_event('add_user_to_service', **kwargs)
+
+
+def create_set_user_permissions_event(**kwargs):
+    _send_event('set_user_permissions', **kwargs)
 
 
 def create_archive_user_event(**kwargs):

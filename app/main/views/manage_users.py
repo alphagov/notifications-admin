@@ -141,6 +141,7 @@ def edit_user_permissions(service_id, user_id):
             service_id,
             permissions=form.permissions,
             folder_permissions=form.folder_permissions.data,
+            set_by_id=current_user.id,
         )
         # Only change the auth type if this is supported for a service. If a user logs in with a
         # security key, we generally don't want them to be able to use something less secure.

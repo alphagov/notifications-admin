@@ -1,7 +1,7 @@
 import pytest
 
 from app.models.user import AnonymousUser, InvitedOrgUser, InvitedUser, User
-from tests.conftest import USER_ONE_ID
+from tests.conftest import SERVICE_ONE_ID, USER_ONE_ID
 
 
 def test_anonymous_user(notify_admin):
@@ -135,3 +135,24 @@ def test_invited_org_user_from_session_uses_id(client, mocker, mock_get_invited_
 def test_invited_org_user_from_session_returns_none_if_nothing_present(client, mocker):
     mocker.patch.dict('app.models.user.session', values={}, clear=True)
     assert InvitedOrgUser.from_session() is None
+
+
+def test_set_permissions(client, mocker, active_user_view_permissions, fake_uuid):
+    mock_api = mocker.patch('app.models.user.user_api_client.set_user_permissions')
+    mock_event = mocker.patch('app.models.user.create_set_user_permissions_event')
+
+    User(active_user_view_permissions).set_permissions(
+        service_id=SERVICE_ONE_ID,
+        permissions={'manage_templates'},
+        folder_permissions=[],
+        set_by_id=fake_uuid,
+    )
+
+    mock_api.assert_called_once()
+    mock_event.assert_called_once_with(
+        service_id=SERVICE_ONE_ID,
+        user_id=active_user_view_permissions['id'],
+        original_admin_roles={'view_activity'},
+        new_admin_roles={'manage_templates'},
+        set_by_id=fake_uuid,
+    )

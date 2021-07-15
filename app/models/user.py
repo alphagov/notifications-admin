@@ -4,7 +4,10 @@ from notifications_python_client.errors import HTTPError
 from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
 from werkzeug.utils import cached_property
 
-from app.event_handlers import create_add_user_to_service_event
+from app.event_handlers import (
+    create_add_user_to_service_event,
+    create_set_user_permissions_event,
+)
 from app.models import JSONModel, ModelList
 from app.models.organisation import Organisation
 from app.models.roles_and_permissions import (
@@ -122,12 +125,19 @@ class User(JSONModel, UserMixin):
             datetime_string
         )
 
-    def set_permissions(self, service_id, permissions, folder_permissions):
+    def set_permissions(self, service_id, permissions, folder_permissions, set_by_id):
         user_api_client.set_user_permissions(
             self.id,
             service_id,
             permissions=permissions,
             folder_permissions=folder_permissions,
+        )
+        create_set_user_permissions_event(
+            user_id=self.id,
+            service_id=service_id,
+            original_admin_roles=self.permissions_for_service(service_id),
+            new_admin_roles=permissions,
+            set_by_id=set_by_id,
         )
 
     def logged_in_elsewhere(self):
