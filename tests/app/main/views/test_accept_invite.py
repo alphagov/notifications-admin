@@ -46,7 +46,7 @@ def test_existing_user_accept_invite_calls_api_and_redirects_to_dashboard(
 ):
     expected_service = service_one['id']
     expected_permissions = {'view_activity', 'send_messages', 'manage_service', 'manage_api_keys'}
-    mock_audit_event = mocker.patch('app.event_handlers.create_add_user_to_service_event')
+    mock_audit_event = mocker.patch('app.models.user.create_add_user_to_service_event')
 
     response = client.get(url_for('main.accept_invite', token='thisisnotarealtoken'))
 
@@ -270,7 +270,7 @@ def test_accept_invite_redirects_if_api_raises_an_error_that_they_are_already_pa
     mock_no_users_for_service,
     mock_get_user,
 ):
-    mock_audit_event = mocker.patch('app.event_handlers.create_add_user_to_service_event')
+    mock_audit_event = mocker.patch('app.models.user.create_add_user_to_service_event')
 
     mocker.patch('app.user_api_client.add_user_to_service', side_effect=HTTPError(
         response=Mock(
@@ -574,7 +574,7 @@ def test_new_invited_user_verifies_and_added_to_service(
     mock_create_event,
     mocker,
 ):
-    mock_audit_event = mocker.patch('app.event_handlers.create_add_user_to_service_event')
+    mock_audit_event = mocker.patch('app.models.user.create_add_user_to_service_event')
 
     # visit accept token page
     response = client.get(url_for('main.accept_invite', token='thisisnotarealtoken'))

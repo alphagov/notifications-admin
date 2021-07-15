@@ -4,6 +4,7 @@ from notifications_python_client.errors import HTTPError
 from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
 from werkzeug.utils import cached_property
 
+from app.event_handlers import create_add_user_to_service_event
 from app.models import JSONModel, ModelList
 from app.models.organisation import Organisation
 from app.models.roles_and_permissions import (
@@ -401,8 +402,6 @@ class User(JSONModel, UserMixin):
         session['current_session_id'] = self.current_session_id
 
     def add_to_service(self, service_id, permissions, folder_permissions, invited_by_id):
-        from app.event_handlers import create_add_user_to_service_event
-
         try:
             user_api_client.add_user_to_service(
                 service_id,

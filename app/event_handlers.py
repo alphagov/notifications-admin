@@ -1,6 +1,6 @@
 from flask import request
 
-from app import events_api_client
+from app.notify_client.events_api_client import events_api_client
 
 EVENT_SCHEMAS = {
     "sucessful_login": {"user_id"},

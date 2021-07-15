@@ -334,7 +334,7 @@ def test_register_from_email_auth_invite(
     fake_uuid,
     mocker,
 ):
-    mock_audit_event = mocker.patch('app.event_handlers.create_add_user_to_service_event')
+    mock_audit_event = mocker.patch('app.models.user.create_add_user_to_service_event')
 
     sample_invite['auth_type'] = 'email_auth'
     sample_invite['email_address'] = invite_email_address
