@@ -334,8 +334,6 @@ def test_register_from_email_auth_invite(
     fake_uuid,
     mocker,
 ):
-    mock_audit_event = mocker.patch('app.models.user.create_add_user_to_service_event')
-
     sample_invite['auth_type'] = 'email_auth'
     sample_invite['email_address'] = invite_email_address
     with client.session_transaction() as session:
@@ -372,10 +370,6 @@ def test_register_from_email_auth_invite(
     # just logs them in
     assert current_user.is_authenticated
     assert mock_add_user_to_service.called
-
-    mock_audit_event.assert_called_once_with(invited_by_id=service_one['users'][0],
-                                             service_id=sample_invite['service'],
-                                             user_id=fake_uuid)
 
     with client.session_transaction() as session:
         # invited user details are still there so they can get added to the service

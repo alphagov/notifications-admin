@@ -156,3 +156,23 @@ def test_set_permissions(client, mocker, active_user_view_permissions, fake_uuid
         new_admin_roles={'manage_templates'},
         set_by_id=fake_uuid,
     )
+
+
+def test_add_to_service(client, mocker, api_user_active, fake_uuid):
+    mock_api = mocker.patch('app.models.user.user_api_client.add_user_to_service')
+    mock_event = mocker.patch('app.models.user.create_add_user_to_service_event')
+
+    User(api_user_active).add_to_service(
+        service_id=SERVICE_ONE_ID,
+        permissions={'manage_templates'},
+        folder_permissions=[],
+        invited_by_id=fake_uuid,
+    )
+
+    mock_api.assert_called_once()
+    mock_event.assert_called_once_with(
+        service_id=SERVICE_ONE_ID,
+        user_id=api_user_active['id'],
+        invited_by_id=fake_uuid,
+        admin_roles={'manage_templates'},
+    )

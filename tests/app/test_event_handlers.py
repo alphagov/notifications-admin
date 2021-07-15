@@ -49,7 +49,8 @@ def test_create_add_user_to_service_event_calls_events_api(client, mock_events):
     kwargs = {
         "user_id": str(uuid.uuid4()),
         "invited_by_id": str(uuid.uuid4()),
-        "service_id": str(uuid.uuid4())
+        "service_id": str(uuid.uuid4()),
+        "admin_roles": {'manage_templates'},
     }
 
     create_add_user_to_service_event(**kwargs)

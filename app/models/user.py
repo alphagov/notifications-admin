@@ -425,6 +425,7 @@ class User(JSONModel, UserMixin):
                 user_id=self.id,
                 invited_by_id=invited_by_id,
                 service_id=service_id,
+                admin_roles=permissions,
             )
         except HTTPError as exception:
             if exception.status_code == 400 and 'already part of service' in exception.message:
