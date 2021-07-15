@@ -215,8 +215,7 @@ class User(JSONModel, UserMixin):
             return True
 
         if any(
-            self.has_permission_for_service(service_id, permission)
-            for permission in permissions
+            self.permissions_for_service(service_id) & set(permissions)
         ):
             return True
 
@@ -225,6 +224,9 @@ class User(JSONModel, UserMixin):
         return allow_org_user and self.belongs_to_organisation(
             Service.from_id(service_id).organisation_id
         )
+
+    def permissions_for_service(self, service_id):
+        return self._permissions.get(service_id, set())
 
     def has_permission_for_service(self, service_id, permission):
         return permission in self._permissions.get(service_id, [])
