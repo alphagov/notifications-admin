@@ -1443,6 +1443,70 @@ def test_user_cant_invite_themselves(
     assert not mock_create_invite.called
 
 
+@pytest.mark.parametrize('email_address', (
+    'test@user.gov.uk',
+    'TEST@user.gov.uk',
+    'test@USER.gov.uk',
+    'test+test@user.gov.uk',
+    'te.st@user.gov.uk',
+    pytest.param('test2@user.gov.uk', marks=pytest.mark.xfail),
+    pytest.param('test@other.gov.uk', marks=pytest.mark.xfail),
+))
+def test_broadcast_user_cant_invite_themselves_or_their_aliases(
+    client_request,
+    service_one,
+    mocker,
+    active_user_with_permissions,
+    mock_create_invite,
+    mock_get_template_folders,
+    email_address,
+):
+    service_one['permissions'] += ['broadcast']
+    page = client_request.post(
+        'main.invite_user',
+        service_id=SERVICE_ONE_ID,
+        _data={
+            'email_address': email_address,
+            'permissions_field': []
+        },
+        _expected_status=200,
+    )
+    assert normalize_spaces(page.select_one('span.govuk-error-message').text) == (
+        "Error: You cannot send an invitation to yourself"
+    )
+    assert mock_create_invite.called is False
+
+
+@pytest.mark.parametrize('extra_service_permissions', (
+    pytest.param([], marks=pytest.mark.xfail),
+    ['broadcast'],
+))
+def test_platform_admin_cant_invite_themselves_to_broadcast_services(
+    client_request,
+    service_one,
+    mocker,
+    platform_admin_user,
+    mock_create_invite,
+    mock_get_template_folders,
+    extra_service_permissions,
+):
+    service_one['permissions'] += extra_service_permissions
+    client_request.login(platform_admin_user)
+    page = client_request.post(
+        'main.invite_user',
+        service_id=SERVICE_ONE_ID,
+        _data={
+            'email_address': platform_admin_user['email_address'],
+            'permissions_field': []
+        },
+        _expected_status=200,
+    )
+    assert normalize_spaces(page.select_one('span.govuk-error-message').text) == (
+        "Error: You cannot send an invitation to yourself"
+    )
+    assert mock_create_invite.called is False
+
+
 def test_no_permission_manage_users_page(
     client_request,
     service_one,

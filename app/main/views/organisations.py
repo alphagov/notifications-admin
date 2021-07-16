@@ -184,7 +184,7 @@ def manage_org_users(org_id):
 @user_has_permissions()
 def invite_org_user(org_id):
     form = InviteOrgUserForm(
-        invalid_email_address=current_user.email_address
+        inviter_email_address=current_user.email_address
     )
     if form.validate_on_submit():
         email_address = form.email_address.data
