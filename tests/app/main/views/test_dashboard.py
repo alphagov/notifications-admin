@@ -1214,7 +1214,7 @@ def test_menu_send_messages(
             notify_admin,
             api_user_active,
             service_one,
-            ['view_activity', 'send_messages'])
+            ['view_activity', 'send_texts', 'send_emails', 'send_letters'])
         page = resp.get_data(as_text=True)
         assert url_for(
             'main.choose_template',
@@ -1248,7 +1248,7 @@ def test_menu_send_messages_when_service_does_not_have_upload_letters_permission
             notify_admin,
             api_user_active,
             service_one,
-            ['view_activity', 'send_messages'])
+            ['view_activity', 'send_texts', 'send_emails', 'send_letters'])
         page = BeautifulSoup(resp.data.decode('utf-8'), 'html.parser')
         assert page.select_one('.navigation')
         assert url_for('main.uploads', service_id=service_one['id']) not in page.select_one('.navigation')
@@ -1274,7 +1274,7 @@ def test_menu_manage_service(
             notify_admin,
             api_user_active,
             service_one,
-            ['view_activity', 'manage_templates', 'manage_service'])
+            ['view_activity', 'manage_templates', 'manage_users', 'manage_settings'])
         page = resp.get_data(as_text=True)
         assert url_for(
             'main.choose_template',

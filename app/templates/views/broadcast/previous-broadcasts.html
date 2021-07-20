@@ -13,7 +13,7 @@
 
   {% include('views/broadcast/partials/dashboard-table.html') %}
 
-  {% if current_user.has_permissions('send_messages', restrict_admin_usage=True) %}
+  {% if current_user.has_permissions('send_messages', 'create_broadcasts', restrict_admin_usage=True) %}
     <div class="js-stick-at-bottom-when-scrolling">
       {{ govukButton({
         "element": "a",

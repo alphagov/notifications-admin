@@ -18,10 +18,34 @@ from tests.conftest import (
 )
 
 
-def test_translate_permissions_from_db_to_admin_roles():
-    db_perms = ['send_texts', 'send_emails', 'send_letters', 'manage_templates', 'some_unknown_permission']
-    roles = translate_permissions_from_db_to_admin_roles(db_perms)
-    assert roles == {'send_messages', 'manage_templates', 'some_unknown_permission'}
+@pytest.mark.parametrize('db_roles,admin_roles', [
+    (
+        ['approve_broadcasts', 'reject_broadcasts', 'cancel_broadcasts'],
+        {'approve_broadcasts'},
+    ),
+    (
+        ['manage_templates', 'create_broadcasts', 'reject_broadcasts', 'cancel_broadcasts'],
+        {'create_broadcasts', 'manage_templates'},
+    ),
+    (
+        ['manage_templates'],
+        {'manage_templates'},
+    ),
+    (
+        ['create_broadcasts'],
+        set(),
+    ),
+    (
+        ['send_texts', 'send_emails', 'send_letters', 'manage_templates', 'some_unknown_permission'],
+        {'send_messages', 'manage_templates', 'some_unknown_permission'},
+    ),
+])
+def test_translate_permissions_from_db_to_admin_roles(
+    db_roles,
+    admin_roles,
+):
+    roles = translate_permissions_from_db_to_admin_roles(db_roles)
+    assert roles == admin_roles
 
 
 def test_translate_permissions_from_admin_roles_to_db():
@@ -66,7 +90,7 @@ def test_services_pages_that_org_users_are_allowed_to_see(
     api_user_active['services'] = user_services
     api_user_active['organisations'] = user_organisations
     api_user_active['permissions'] = {
-        service_id: ['manage_service']
+        service_id: ['manage_users', 'manage_settings']
         for service_id in user_services
     }
     service = service_json(

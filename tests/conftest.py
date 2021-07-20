@@ -1128,6 +1128,22 @@ def active_user_with_permissions(fake_uuid):
 
 
 @pytest.fixture(scope='function')
+def active_user_broadcast_permissions(fake_uuid):
+    return create_service_one_user(
+        id=fake_uuid,
+        permissions={SERVICE_ONE_ID: [
+            'view_activity',
+            'manage_templates',
+            'create_broadcasts',
+            'reject_broadcasts',
+            'cancel_broadcasts',
+            'approve_broadcasts',
+        ]},
+        auth_type='webauthn_auth',
+    )
+
+
+@pytest.fixture(scope='function')
 def active_user_with_session(fake_uuid):
     return create_service_one_admin(
         id=fake_uuid,
@@ -2205,7 +2221,7 @@ def sample_invite(mocker, service_one):
     from_user = service_one['users'][0]
     email_address = 'invited_user@test.gov.uk'
     service_id = service_one['id']
-    permissions = 'view_activity,send_messages,manage_service,manage_api_keys'
+    permissions = 'view_activity,send_emails,send_letters,send_texts,manage_settings,manage_users,manage_api_keys'
     created_at = str(datetime.utcnow())
     auth_type = 'sms_auth'
     folder_permissions = []
@@ -3593,6 +3609,33 @@ def create_active_user_view_permissions(with_unique_id=False):
     )
 
 
+def create_active_user_create_broadcasts_permissions(with_unique_id=False):
+    return create_service_one_user(
+        id=str(uuid4()) if with_unique_id else sample_uuid(),
+        name='Test User Create Broadcasts Permission',
+        permissions={SERVICE_ONE_ID: [
+            'manage_templates',
+            'create_broadcasts',
+            'reject_broadcasts',
+            'cancel_broadcasts',
+        ]},
+        auth_type='webauthn_auth',
+    )
+
+
+def create_active_user_approve_broadcasts_permissions(with_unique_id=False):
+    return create_service_one_user(
+        id=str(uuid4()) if with_unique_id else sample_uuid(),
+        name='Test User Approve Broadcasts Permission',
+        permissions={SERVICE_ONE_ID: [
+            'approve_broadcasts',
+            'reject_broadcasts',
+            'cancel_broadcasts',
+        ]},
+        auth_type='webauthn_auth',
+    )
+
+
 def create_active_caseworking_user(with_unique_id=False):
     return create_user(
         id=str(uuid4()) if with_unique_id else sample_uuid(),
@@ -3613,6 +3656,7 @@ def create_active_user_no_api_key_permission(with_unique_id=False):
         permissions={SERVICE_ONE_ID: [
             'manage_templates',
             'manage_settings',
+            'manage_users',
             'view_activity',
         ]},
     )

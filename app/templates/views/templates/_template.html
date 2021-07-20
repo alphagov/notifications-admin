@@ -28,7 +28,7 @@
             </div>
           {% endif %}
         {% elif template.template_type == 'broadcast' %}
-          {% if current_user.has_permissions('send_messages') %}
+          {% if current_user.has_permissions('send_messages', 'create_broadcasts') %}
             <div class="govuk-grid-column-one-half">
               <a href="{{ url_for(".broadcast", service_id=current_service.id, template_id=template.id) }}" class="govuk-link govuk-link--no-visited-state pill-separate-item">
                 Get ready to send
