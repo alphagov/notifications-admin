@@ -50,7 +50,7 @@ def test_create_add_user_to_service_event_calls_events_api(client, mock_events):
         "user_id": str(uuid.uuid4()),
         "invited_by_id": str(uuid.uuid4()),
         "service_id": str(uuid.uuid4()),
-        "admin_roles": {'manage_templates'},
+        "ui_permissions": {'manage_templates'},
     }
 
     create_add_user_to_service_event(**kwargs)
@@ -137,8 +137,8 @@ def test_set_user_permissions(client, mock_events):
     kwargs = {
         "user_id": str(uuid.uuid4()),
         "service_id": str(uuid.uuid4()),
-        "original_admin_roles": set("manage_templates"),
-        "new_admin_roles": set("view_activity"),
+        "original_ui_permissions": set("manage_templates"),
+        "new_ui_permissions": set("view_activity"),
         "set_by_id": str(uuid.uuid4()),
     }
 

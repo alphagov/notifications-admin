@@ -152,8 +152,8 @@ def test_set_permissions(client, mocker, active_user_view_permissions, fake_uuid
     mock_event.assert_called_once_with(
         service_id=SERVICE_ONE_ID,
         user_id=active_user_view_permissions['id'],
-        original_admin_roles={'view_activity'},
-        new_admin_roles={'manage_templates'},
+        original_ui_permissions={'view_activity'},
+        new_ui_permissions={'manage_templates'},
         set_by_id=fake_uuid,
     )
 
@@ -174,5 +174,5 @@ def test_add_to_service(client, mocker, api_user_active, fake_uuid):
         service_id=SERVICE_ONE_ID,
         user_id=api_user_active['id'],
         invited_by_id=fake_uuid,
-        admin_roles={'manage_templates'},
+        ui_permissions={'manage_templates'},
     )

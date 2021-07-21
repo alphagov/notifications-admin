@@ -135,8 +135,8 @@ class User(JSONModel, UserMixin):
         create_set_user_permissions_event(
             user_id=self.id,
             service_id=service_id,
-            original_admin_roles=self.permissions_for_service(service_id),
-            new_admin_roles=permissions,
+            original_ui_permissions=self.permissions_for_service(service_id),
+            new_ui_permissions=permissions,
             set_by_id=set_by_id,
         )
 
@@ -425,7 +425,7 @@ class User(JSONModel, UserMixin):
                 user_id=self.id,
                 invited_by_id=invited_by_id,
                 service_id=service_id,
-                admin_roles=permissions,
+                ui_permissions=permissions,
             )
         except HTTPError as exception:
             if exception.status_code == 400 and 'already part of service' in exception.message:

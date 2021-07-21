@@ -7,8 +7,8 @@ EVENT_SCHEMAS = {
     "update_user_email": {"user_id", "updated_by_id", "original_email_address", "new_email_address"},
     "update_user_mobile_number": {"user_id", "updated_by_id", "original_mobile_number", "new_mobile_number"},
     "remove_user_from_service": {"user_id", "removed_by_id", "service_id"},
-    "add_user_to_service": {"user_id", "invited_by_id", "service_id", "admin_roles"},
-    "set_user_permissions": {"user_id", "service_id", "original_admin_roles", "new_admin_roles", "set_by_id"},
+    "add_user_to_service": {"user_id", "invited_by_id", "service_id", "ui_permissions"},
+    "set_user_permissions": {"user_id", "service_id", "original_ui_permissions", "new_ui_permissions", "set_by_id"},
     "archive_user": {"user_id", "archived_by_id"},
     "change_broadcast_account_type": {"service_id", "changed_by_id", "service_mode", "broadcast_channel", "provider_restriction"},  # noqa: E501 (length)
     "archive_service": {"service_id", "archived_by_id"},
