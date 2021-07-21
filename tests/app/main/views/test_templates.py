@@ -587,6 +587,32 @@ def test_caseworker_redirected_to_set_sender_for_one_off(
     )
 
 
+@freeze_time('2020-01-01 15:00')
+def test_caseworker_sees_template_page_if_template_is_deleted(
+    client_request,
+    mock_get_deleted_template,
+    fake_uuid,
+    mocker,
+    active_caseworking_user,
+):
+
+    mocker.patch('app.user_api_client.get_user', return_value=active_caseworking_user)
+
+    template_id = fake_uuid
+    page = client_request.get(
+        '.view_template',
+        service_id=SERVICE_ONE_ID,
+        template_id=template_id,
+        _test_page_title=False,
+    )
+
+    content = str(page)
+    assert url_for("main.send_one_off", service_id=SERVICE_ONE_ID, template_id=fake_uuid) not in content
+    assert page.select('p.hint')[0].text.strip() == 'This template was deleted today at 3:00pm.'
+
+    mock_get_deleted_template.assert_called_with(SERVICE_ONE_ID, template_id, None)
+
+
 def test_user_with_only_send_and_view_redirected_to_set_sender_for_one_off(
     client_request,
     mock_get_service_templates,

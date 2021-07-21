@@ -874,7 +874,7 @@ def get_send_test_page_title(template_type, entering_recipient, name=None):
 
 def get_back_link(service_id, template, step_index, placeholders=None):
     if step_index == 0:
-        if should_skip_template_page(template.template_type):
+        if should_skip_template_page(template._template):
             return url_for(
                 '.choose_template',
                 service_id=service_id,
