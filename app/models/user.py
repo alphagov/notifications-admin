@@ -17,7 +17,7 @@ from app.notify_client.org_invite_api_client import org_invite_api_client
 from app.notify_client.user_api_client import user_api_client
 from app.utils.user import is_gov_user
 from app.utils.user_permissions import (
-    all_permissions,
+    all_ui_permissions,
     translate_permissions_from_db_to_admin_roles,
 )
 
@@ -201,7 +201,7 @@ class User(JSONModel, UserMixin):
         return self._platform_admin and not session.get('disable_platform_admin_view', False)
 
     def has_permissions(self, *permissions, restrict_admin_usage=False, allow_org_user=False):
-        unknown_permissions = set(permissions) - all_permissions
+        unknown_permissions = set(permissions) - all_ui_permissions
         if unknown_permissions:
             raise TypeError('{} are not valid permissions'.format(list(unknown_permissions)))
 

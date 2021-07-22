@@ -59,9 +59,9 @@ from app.models.organisation import Organisation
 from app.utils import merge_jsonlike
 from app.utils.user import distinct_email_addresses
 from app.utils.user_permissions import (
+    all_ui_permissions,
     broadcast_permission_options,
     permission_options,
-    roles,
 )
 
 
@@ -1006,7 +1006,7 @@ class BasePermissionsForm(StripWhitespaceForm):
             **kwargs,
             **{
                 "permissions_field": [
-                    role for role in roles.keys() if user.has_permission_for_service(service_id, role)]
+                    role for role in all_ui_permissions if user.has_permission_for_service(service_id, role)]
             },
             login_authentication=user.auth_type
         )

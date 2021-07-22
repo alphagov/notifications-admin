@@ -1,6 +1,6 @@
 from itertools import chain
 
-roles = {
+permission_mappings = {
     'send_messages': ['send_texts', 'send_emails', 'send_letters'],
     'manage_templates': ['manage_templates'],
     'manage_service': ['manage_users', 'manage_settings'],
@@ -10,8 +10,8 @@ roles = {
     'approve_broadcasts': ['approve_broadcasts', 'reject_broadcasts', 'cancel_broadcasts'],
 }
 
-all_permissions = set(roles.keys())
-all_database_permissions = set(chain(*roles.values()))
+all_ui_permissions = set(permission_mappings.keys())
+all_db_permissions = set(chain(*permission_mappings.values()))
 
 permission_options = (
     ('view_activity', 'See dashboard'),
@@ -35,10 +35,10 @@ def translate_permissions_from_db_to_admin_roles(permissions):
     A role is returned if all of its database permissions are in the permission list that is passed in.
     Any permissions in the list that are not database permissions are also returned.
     """
-    unknown_database_permissions = {p for p in permissions if p not in all_database_permissions}
+    unknown_database_permissions = {p for p in permissions if p not in all_db_permissions}
 
     return {
-        admin_role for admin_role, db_role_list in roles.items()
+        admin_role for admin_role, db_role_list in permission_mappings.items()
         if set(db_role_list) <= set(permissions)
     } | unknown_database_permissions
 
@@ -49,4 +49,4 @@ def translate_permissions_from_admin_roles_to_db(permissions):
 
     Looks them up in the roles dict, falling back to just passing through if they're not recognised.
     """
-    return set(chain.from_iterable(roles.get(permission, [permission]) for permission in permissions))
+    return set(chain.from_iterable(permission_mappings.get(permission, [permission]) for permission in permissions))
