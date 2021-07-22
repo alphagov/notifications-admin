@@ -13,7 +13,7 @@ roles = {
 all_permissions = set(roles.keys())
 all_database_permissions = set(chain(*roles.values()))
 
-permissions = (
+permission_options = (
     ('view_activity', 'See dashboard'),
     ('send_messages', 'Send messages'),
     ('manage_templates', 'Add and edit templates'),
@@ -21,7 +21,7 @@ permissions = (
     ('manage_api_keys', 'Manage API integration'),
 )
 
-broadcast_permissions = (
+broadcast_permission_options = (
     ('manage_templates', 'Add and edit templates'),
     ('create_broadcasts', 'Create new alerts'),
     ('approve_broadcasts', 'Approve alerts'),

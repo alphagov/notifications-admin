@@ -30,7 +30,10 @@ from app.main.forms import (
 )
 from app.models.user import InvitedUser, User
 from app.utils.user import is_gov_user, user_has_permissions
-from app.utils.user_permissions import broadcast_permissions, permissions
+from app.utils.user_permissions import (
+    broadcast_permission_options,
+    permission_options,
+)
 
 
 @main.route("/services/<uuid:service_id>/users")
@@ -43,7 +46,7 @@ def manage_users(service_id):
         show_search_box=(len(current_service.team_members) > 7),
         form=SearchUsersForm(),
         permissions=(
-            broadcast_permissions if current_service.has_permission('broadcast') else permissions
+            broadcast_permission_options if current_service.has_permission('broadcast') else permission_options
         ),
     )
 
