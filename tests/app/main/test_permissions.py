@@ -5,7 +5,7 @@ import re
 import pytest
 from flask import current_app
 
-from app.models.roles_and_permissions import (
+from app.utils.user_permissions import (
     translate_permissions_from_admin_roles_to_db,
     translate_permissions_from_db_to_admin_roles,
 )

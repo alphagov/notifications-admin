@@ -10,16 +10,16 @@ from app.event_handlers import (
 )
 from app.models import JSONModel, ModelList
 from app.models.organisation import Organisation
-from app.models.roles_and_permissions import (
-    all_permissions,
-    translate_permissions_from_db_to_admin_roles,
-)
 from app.models.webauthn_credential import WebAuthnCredentials
 from app.notify_client import InviteTokenError
 from app.notify_client.invite_api_client import invite_api_client
 from app.notify_client.org_invite_api_client import org_invite_api_client
 from app.notify_client.user_api_client import user_api_client
 from app.utils.user import is_gov_user
+from app.utils.user_permissions import (
+    all_permissions,
+    translate_permissions_from_db_to_admin_roles,
+)
 
 
 def _get_service_id_from_view_args():

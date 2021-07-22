@@ -1,9 +1,9 @@
 from notifications_python_client.errors import HTTPError
 
-from app.models.roles_and_permissions import (
+from app.notify_client import NotifyAdminAPIClient, cache
+from app.utils.user_permissions import (
     translate_permissions_from_admin_roles_to_db,
 )
-from app.notify_client import NotifyAdminAPIClient, cache
 
 ALLOWED_ATTRIBUTES = {
     'name',

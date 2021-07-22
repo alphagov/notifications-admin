@@ -1,8 +1,8 @@
-from app.models.roles_and_permissions import (
+from app.notify_client import NotifyAdminAPIClient, _attach_current_user, cache
+from app.utils.user_permissions import (
     roles,
     translate_permissions_from_admin_roles_to_db,
 )
-from app.notify_client import NotifyAdminAPIClient, _attach_current_user, cache
 
 
 class InviteApiClient(NotifyAdminAPIClient):
