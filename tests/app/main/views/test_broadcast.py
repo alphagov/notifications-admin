@@ -1656,7 +1656,7 @@ def test_start_broadcasting(
         'finishes_at': '2020-02-23T23:23:23.000000',
     }, [
         'Live since 20 February at 8:20pm Stop sending',
-        'Sent by Alice and approved by Bob.',
+        'Created by Alice and approved by Bob.',
         'Broadcasting stops tomorrow at 11:23pm.'
     ]),
     ('.view_current_broadcast', True, {
@@ -1672,7 +1672,7 @@ def test_start_broadcasting(
         'finishes_at': '2020-02-22T22:20:20.000000',  # 2 mins before now()
     }, [
         'Sent on 20 February at 8:20pm.',
-        'Sent by Alice and approved by Bob.',
+        'Created by Alice and approved by Bob.',
         'Finished broadcasting today at 10:20pm.'
     ]),
     ('.view_previous_broadcast', True, {
@@ -1688,7 +1688,7 @@ def test_start_broadcasting(
         'finishes_at': '2020-02-21T21:21:21.000000',
     }, [
         'Sent on 20 February at 8:20pm.',
-        'Sent by Alice and approved by Bob.',
+        'Created by Alice and approved by Bob.',
         'Finished broadcasting yesterday at 9:21pm.',
     ]),
     ('.view_previous_broadcast', False, {
@@ -1697,7 +1697,7 @@ def test_start_broadcasting(
         'cancelled_at': '2020-02-21T21:21:21.000000',
     }, [
         'Sent on 20 February at 8:20pm.',
-        'Sent by Alice and approved by Bob.',
+        'Created by Alice and approved by Bob.',
         'Stopped by Carol yesterday at 9:21pm.',
     ]),
     ('.view_rejected_broadcast', False, {
@@ -1705,7 +1705,7 @@ def test_start_broadcasting(
         'updated_at': '2020-02-21T21:21:21.000000',
     }, [
         'Rejected yesterday at 9:21pm.',
-        'Sent by Alice and approved by Bob.',
+        'Created by Alice and approved by Bob.',
     ]),
 ))
 @freeze_time('2020-02-22T22:22:22.000000')

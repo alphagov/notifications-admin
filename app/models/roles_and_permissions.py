@@ -23,7 +23,7 @@ permissions = (
 
 broadcast_permissions = (
     ('manage_templates', 'Add and edit templates'),
-    ('create_broadcasts', 'Add new alerts'),
+    ('create_broadcasts', 'Create new alerts'),
     ('approve_broadcasts', 'Approve alerts'),
 )
 

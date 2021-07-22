@@ -213,13 +213,13 @@ def test_should_show_overview_page_for_broadcast_service(
     assert normalize_spaces(page.select('.user-list-item')[0].text) == (
         'Test User (you) '
         'Can Add and edit templates '
-        'Can Add new alerts '
+        'Can Create new alerts '
         'Can Approve alerts'
     )
     assert normalize_spaces(page.select('.user-list-item')[1].text) == (
         'Test User With Permissions (you) '
         'Cannot Add and edit templates '
-        'Cannot Add new alerts '
+        'Cannot Create new alerts '
         'Cannot Approve alerts'
     )
 
