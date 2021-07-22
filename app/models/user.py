@@ -4,6 +4,10 @@ from notifications_python_client.errors import HTTPError
 from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
 from werkzeug.utils import cached_property
 
+from app.event_handlers import (
+    create_add_user_to_service_event,
+    create_set_user_permissions_event,
+)
 from app.models import JSONModel, ModelList
 from app.models.organisation import Organisation
 from app.models.roles_and_permissions import (
@@ -121,12 +125,19 @@ class User(JSONModel, UserMixin):
             datetime_string
         )
 
-    def set_permissions(self, service_id, permissions, folder_permissions):
+    def set_permissions(self, service_id, permissions, folder_permissions, set_by_id):
         user_api_client.set_user_permissions(
             self.id,
             service_id,
             permissions=permissions,
             folder_permissions=folder_permissions,
+        )
+        create_set_user_permissions_event(
+            user_id=self.id,
+            service_id=service_id,
+            original_ui_permissions=self.permissions_for_service(service_id),
+            new_ui_permissions=permissions,
+            set_by_id=set_by_id,
         )
 
     def logged_in_elsewhere(self):
@@ -214,8 +225,7 @@ class User(JSONModel, UserMixin):
             return True
 
         if any(
-            self.has_permission_for_service(service_id, permission)
-            for permission in permissions
+            self.permissions_for_service(service_id) & set(permissions)
         ):
             return True
 
@@ -224,6 +234,9 @@ class User(JSONModel, UserMixin):
         return allow_org_user and self.belongs_to_organisation(
             Service.from_id(service_id).organisation_id
         )
+
+    def permissions_for_service(self, service_id):
+        return self._permissions.get(service_id, set())
 
     def has_permission_for_service(self, service_id, permission):
         return permission in self._permissions.get(service_id, [])
@@ -401,8 +414,6 @@ class User(JSONModel, UserMixin):
         session['current_session_id'] = self.current_session_id
 
     def add_to_service(self, service_id, permissions, folder_permissions, invited_by_id):
-        from app.event_handlers import create_add_user_to_service_event
-
         try:
             user_api_client.add_user_to_service(
                 service_id,
@@ -414,6 +425,7 @@ class User(JSONModel, UserMixin):
                 user_id=self.id,
                 invited_by_id=invited_by_id,
                 service_id=service_id,
+                ui_permissions=permissions,
             )
         except HTTPError as exception:
             if exception.status_code == 400 and 'already part of service' in exception.message:

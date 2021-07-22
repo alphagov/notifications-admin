@@ -10,6 +10,7 @@ from app.event_handlers import (
     create_mobile_number_change_event,
     create_remove_user_from_service_event,
     create_resume_service_event,
+    create_set_user_permissions_event,
     create_suspend_service_event,
     on_user_logged_in,
 )
@@ -48,7 +49,8 @@ def test_create_add_user_to_service_event_calls_events_api(client, mock_events):
     kwargs = {
         "user_id": str(uuid.uuid4()),
         "invited_by_id": str(uuid.uuid4()),
-        "service_id": str(uuid.uuid4())
+        "service_id": str(uuid.uuid4()),
+        "ui_permissions": {'manage_templates'},
     }
 
     create_add_user_to_service_event(**kwargs)
@@ -129,3 +131,16 @@ def test_resume_service(client, mock_events):
 
     create_resume_service_event(**kwargs)
     mock_events.assert_called_with('resume_service', event_dict(**kwargs))
+
+
+def test_set_user_permissions(client, mock_events):
+    kwargs = {
+        "user_id": str(uuid.uuid4()),
+        "service_id": str(uuid.uuid4()),
+        "original_ui_permissions": set("manage_templates"),
+        "new_ui_permissions": set("view_activity"),
+        "set_by_id": str(uuid.uuid4()),
+    }
+
+    create_set_user_permissions_event(**kwargs)
+    mock_events.assert_called_with('set_user_permissions', event_dict(**kwargs))
