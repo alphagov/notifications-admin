@@ -138,7 +138,6 @@ def test_broadcast_pages_403_without_permission(
     ),
 ))
 def test_broadcast_pages_403_for_user_without_permission(
-    mocker,
     client_request,
     service_one,
     active_user_view_permissions,
@@ -194,7 +193,6 @@ def test_user_cannot_accept_broadcast_without_permission(
 
 @pytest.mark.parametrize('user_is_platform_admin', [True, False])
 def test_user_cannot_reject_broadcast_without_permission(
-    mocker,
     client_request,
     service_one,
     active_user_view_permissions,
@@ -388,7 +386,6 @@ def test_broadcast_service_shows_channel_settings(
     client_request,
     service_one,
     mock_get_no_broadcast_messages,
-    mock_get_service_templates_when_no_templates_exist,
     trial_mode,
     allowed_broadcast_provider,
     channel,
@@ -456,9 +453,7 @@ def test_dashboard_redirects_to_broadcast_dashboard(
 def test_empty_broadcast_dashboard(
     client_request,
     service_one,
-    active_user_view_permissions,
     mock_get_no_broadcast_messages,
-    mock_get_service_templates_when_no_templates_exist,
 ):
     service_one['permissions'] += ['broadcast']
     page = client_request.get(
@@ -480,7 +475,6 @@ def test_broadcast_dashboard(
     client_request,
     service_one,
     mock_get_broadcast_messages,
-    mock_get_service_templates,
     active_user_create_broadcasts_permission,
 ):
     service_one['permissions'] += ['broadcast']
@@ -541,7 +535,6 @@ def test_broadcast_dashboard_does_not_have_button_if_user_does_not_have_permissi
 def test_broadcast_dashboard_json(
     logged_in_client,
     service_one,
-    active_user_view_permissions,
     mock_get_broadcast_messages,
 ):
     service_one['permissions'] += ['broadcast']
@@ -565,7 +558,6 @@ def test_previous_broadcasts_page(
     client_request,
     service_one,
     mock_get_broadcast_messages,
-    mock_get_service_templates,
     active_user_create_broadcasts_permission,
 ):
     service_one['permissions'] += ['broadcast']
@@ -602,7 +594,6 @@ def test_rejected_broadcasts_page(
     client_request,
     service_one,
     mock_get_broadcast_messages,
-    mock_get_service_templates,
     active_user_create_broadcasts_permission,
 ):
     service_one['permissions'] += ['broadcast']
@@ -779,7 +770,6 @@ def test_write_new_broadcast_bad_content(
     client_request,
     service_one,
     mock_create_broadcast_message,
-    fake_uuid,
     active_user_create_broadcasts_permission,
     content,
     expected_error_message,
@@ -1540,7 +1530,6 @@ def test_preview_broadcast_message_page(
     client_request,
     service_one,
     mock_get_draft_broadcast_message,
-    mock_get_broadcast_template,
     fake_uuid,
     active_user_create_broadcasts_permission,
 ):
@@ -1578,12 +1567,10 @@ def test_preview_broadcast_message_page(
     assert 'action' not in form
 
 
-@freeze_time('2020-02-02 02:02:02')
 def test_start_broadcasting(
     client_request,
     service_one,
     mock_get_draft_broadcast_message,
-    mock_get_broadcast_template,
     mock_update_broadcast_message_status,
     fake_uuid,
     active_user_create_broadcasts_permission,
@@ -1672,7 +1659,6 @@ def test_view_broadcast_message_page(
     client_request,
     service_one,
     active_user_view_permissions,
-    mock_get_broadcast_template,
     fake_uuid,
     endpoint,
     created_by_api,
@@ -1748,7 +1734,6 @@ def test_view_broadcast_message_shows_correct_highlighted_navigation(
     client_request,
     service_one,
     active_user_approve_broadcasts_permission,
-    mock_get_broadcast_template,
     fake_uuid,
     endpoint,
     status,
@@ -1792,12 +1777,10 @@ def test_view_broadcast_message_shows_correct_highlighted_navigation(
     )
 
 
-@freeze_time('2020-02-22T22:22:22.000000')
 def test_view_pending_broadcast(
     mocker,
     client_request,
     service_one,
-    mock_get_broadcast_template,
     fake_uuid,
     active_user_approve_broadcasts_permission,
 ):
@@ -1849,7 +1832,6 @@ def test_view_pending_broadcast(
     )
 
 
-@freeze_time('2020-02-22T22:22:22.000000')
 def test_view_pending_broadcast_without_template(
     mocker,
     client_request,
@@ -1899,7 +1881,6 @@ def test_view_pending_broadcast_without_template(
     )
 
 
-@freeze_time('2020-02-22T22:22:22.000000')
 def test_view_pending_broadcast_from_api_call(
     mocker,
     client_request,
@@ -1958,7 +1939,6 @@ def test_view_pending_broadcast_from_api_call(
         'I understand this will alert millions of people, even if they’ve opted out'
     )),
 ))
-@freeze_time('2020-02-22T22:22:22.000000')
 def test_checkbox_to_confirm_non_training_broadcasts(
     mocker,
     client_request,
@@ -2000,7 +1980,6 @@ def test_checkbox_to_confirm_non_training_broadcasts(
     assert page.select_one('form.banner input[type=checkbox]')['value'] == 'y'
 
 
-@freeze_time('2020-02-22T22:22:22.000000')
 def test_confirm_approve_non_training_broadcasts_errors_if_not_ticked(
     mocker,
     client_request,
@@ -2049,7 +2028,6 @@ def test_can_approve_own_broadcast_in_training_mode(
     mocker,
     client_request,
     service_one,
-    mock_get_broadcast_template,
     fake_uuid,
     active_user_approve_broadcasts_permission,
 ):
@@ -2129,7 +2107,6 @@ def test_cant_approve_own_broadcast_if_service_is_live(
     mocker,
     client_request,
     service_one,
-    mock_get_broadcast_template,
     fake_uuid,
     user,
 ):
@@ -2188,7 +2165,6 @@ def test_view_only_user_cant_approve_broadcast_created_by_someone_else(
     active_user_create_broadcasts_permission,
     active_user_view_permissions,
     platform_admin_user_no_service_permissions,
-    mock_get_broadcast_template,
     fake_uuid,
     user_is_platform_admin
 ):
@@ -2297,7 +2273,6 @@ def test_user_without_approve_permission_cant_approve_broadcast_created_by_someo
     client_request,
     service_one,
     active_user_create_broadcasts_permission,
-    mock_get_broadcast_template,
     fake_uuid,
     is_service_training_mode,
     banner_text,
@@ -2428,7 +2403,6 @@ def test_confirm_approve_broadcast(
     mocker,
     client_request,
     service_one,
-    mock_get_broadcast_template,
     fake_uuid,
     mock_update_broadcast_message,
     mock_update_broadcast_message_status,
@@ -2493,7 +2467,6 @@ def test_reject_broadcast(
     mocker,
     client_request,
     service_one,
-    mock_get_broadcast_template,
     fake_uuid,
     mock_update_broadcast_message,
     mock_update_broadcast_message_status,
@@ -2614,7 +2587,6 @@ def test_cancel_broadcast(
     client_request,
     service_one,
     mock_get_live_broadcast_message,
-    mock_get_broadcast_template,
     mock_update_broadcast_message_status,
     fake_uuid,
     user,
@@ -2657,7 +2629,6 @@ def test_confirm_cancel_broadcast(
     client_request,
     service_one,
     mock_get_live_broadcast_message,
-    mock_get_broadcast_template,
     mock_update_broadcast_message_status,
     fake_uuid,
     user,
