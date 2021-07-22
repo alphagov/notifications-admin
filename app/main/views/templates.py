@@ -58,8 +58,7 @@ def view_template(service_id, template_id):
     template_folder = current_service.get_template_folder(template['folder'])
 
     user_has_template_permission = current_user.has_template_folder_permission(template_folder)
-
-    if should_skip_template_page(template['template_type']):
+    if should_skip_template_page(template):
         return redirect(url_for(
             '.set_sender', service_id=service_id, template_id=template_id
         ))
