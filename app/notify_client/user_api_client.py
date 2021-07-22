@@ -147,7 +147,7 @@ class UserApiClient(NotifyAdminAPIClient):
     @cache.delete('service-{service_id}-template-folders')
     @cache.delete('user-{user_id}')
     def add_user_to_service(self, service_id, user_id, permissions, folder_permissions):
-        # permissions passed in are the combined admin roles, not db permissions
+        # permissions passed in are the combined UI permissions, not DB permissions
         endpoint = '/service/{}/users/{}'.format(service_id, user_id)
         data = {
             'permissions': [{'permission': x} for x in translate_permissions_from_ui_to_db(permissions)],
@@ -164,7 +164,7 @@ class UserApiClient(NotifyAdminAPIClient):
     @cache.delete('service-{service_id}-template-folders')
     @cache.delete('user-{user_id}')
     def set_user_permissions(self, user_id, service_id, permissions, folder_permissions=None):
-        # permissions passed in are the combined admin roles, not db permissions
+        # permissions passed in are the combined UI permissions, not DB permissions
         data = {
             'permissions': [{'permission': x} for x in translate_permissions_from_ui_to_db(permissions)],
         }

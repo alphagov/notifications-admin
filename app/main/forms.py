@@ -945,20 +945,20 @@ class GovukRadiosFieldWithNoneOption(FieldWithNoneOption, GovukRadiosField):
     pass
 
 
-# guard against data entries that aren't a role in permissions
+# guard against data entries that aren't a known permission
 def filter_by_permissions(valuelist):
     if valuelist is None:
         return None
     else:
-        return [entry for entry in valuelist if any(entry in role for role in permission_options)]
+        return [entry for entry in valuelist if any(entry in option for option in permission_options)]
 
 
-# guard against data entries that aren't a role in broadcast_permission_options
+# guard against data entries that aren't a known broadcast permission
 def filter_by_broadcast_permissions(valuelist):
     if valuelist is None:
         return None
     else:
-        return [entry for entry in valuelist if any(entry in role for role in broadcast_permission_options)]
+        return [entry for entry in valuelist if any(entry in option for option in broadcast_permission_options)]
 
 
 class BasePermissionsForm(StripWhitespaceForm):
@@ -1005,8 +1005,10 @@ class BasePermissionsForm(StripWhitespaceForm):
         form = cls(
             **kwargs,
             **{
-                "permissions_field": [
-                    role for role in all_ui_permissions if user.has_permission_for_service(service_id, role)]
+                "permissions_field": (
+                    user.permissions_for_service(service_id) & all_ui_permissions
+                )
+
             },
             login_authentication=user.auth_type
         )
