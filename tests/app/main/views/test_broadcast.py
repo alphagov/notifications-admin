@@ -2235,7 +2235,7 @@ def test_view_only_user_cant_approve_broadcasts_they_created(
     client_request,
     service_one,
     fake_uuid,
-    active_user_broadcast_permissions,
+    active_user_create_broadcasts_permission,
     active_user_view_permissions,
 ):
     mocker.patch(
@@ -2251,11 +2251,11 @@ def test_view_only_user_cant_approve_broadcasts_they_created(
     )
     client_request.login(active_user_view_permissions)
 
-    # active_user_view_permissions and active_user_broadcast_permissions have the same
+    # active_user_view_permissions and active_user_create_broadcasts_permission have the same
     # id. This mocks the same user being returned, but with different permissions each time.
     mocker.patch('app.user_api_client.get_user', side_effect=[
         active_user_view_permissions,  # Current user
-        active_user_broadcast_permissions,  # User who created broadcast
+        active_user_create_broadcasts_permission,  # User who created broadcast
     ])
     service_one['permissions'] += ['broadcast']
     service_one['restriced'] = False
@@ -2296,7 +2296,7 @@ def test_user_without_approve_permission_cant_approve_broadcast_created_by_someo
     mocker,
     client_request,
     service_one,
-    active_user_broadcast_permissions,
+    active_user_create_broadcasts_permission,
     mock_get_broadcast_template,
     fake_uuid,
     is_service_training_mode,
@@ -2317,7 +2317,7 @@ def test_user_without_approve_permission_cant_approve_broadcast_created_by_someo
     client_request.login(current_user)
     mocker.patch('app.user_api_client.get_user', side_effect=[
         current_user,  # Current user
-        active_user_broadcast_permissions,  # User who created broadcast
+        active_user_create_broadcasts_permission,  # User who created broadcast
     ])
     service_one['permissions'] += ['broadcast']
     service_one['restricted'] = is_service_training_mode

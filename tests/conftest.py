@@ -1138,22 +1138,6 @@ def active_user_approve_broadcasts_permission():
 
 
 @pytest.fixture(scope='function')
-def active_user_broadcast_permissions(fake_uuid):
-    return create_service_one_user(
-        id=fake_uuid,
-        permissions={SERVICE_ONE_ID: [
-            'view_activity',
-            'manage_templates',
-            'create_broadcasts',
-            'reject_broadcasts',
-            'cancel_broadcasts',
-            'approve_broadcasts',
-        ]},
-        auth_type='webauthn_auth',
-    )
-
-
-@pytest.fixture(scope='function')
 def active_user_with_session(fake_uuid):
     return create_service_one_admin(
         id=fake_uuid,
@@ -3624,7 +3608,6 @@ def create_active_user_create_broadcasts_permissions(with_unique_id=False):
         id=str(uuid4()) if with_unique_id else sample_uuid(),
         name='Test User Create Broadcasts Permission',
         permissions={SERVICE_ONE_ID: [
-            'manage_templates',
             'create_broadcasts',
             'reject_broadcasts',
             'cancel_broadcasts',
