@@ -22,9 +22,7 @@ from tests.conftest import (
     TEMPLATE_ONE_ID,
     ElementNotFound,
     create_active_caseworking_user,
-    create_active_user_create_broadcasts_permissions,
     create_active_user_view_permissions,
-    create_active_user_with_permissions,
     create_letter_contact_block,
     create_template,
     normalize_spaces,
@@ -922,19 +920,16 @@ def test_should_be_able_to_view_a_template_with_links(
     )
 
 
-@pytest.mark.parametrize('user', (
-    create_active_user_with_permissions(),
-    create_active_user_create_broadcasts_permissions(),
-))
 def test_view_broadcast_template(
     client_request,
     service_one,
     mock_get_broadcast_template,
     mock_get_template_folders,
     fake_uuid,
-    user,
+    active_user_create_broadcasts_permission,
 ):
-    client_request.login(user)
+    client_request.login(active_user_create_broadcasts_permission)
+    active_user_create_broadcasts_permission['permissions'][SERVICE_ONE_ID].append('manage_templates')
     page = client_request.get(
         '.view_template',
         service_id=SERVICE_ONE_ID,
