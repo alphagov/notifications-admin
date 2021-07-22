@@ -1128,6 +1128,16 @@ def active_user_with_permissions(fake_uuid):
 
 
 @pytest.fixture(scope='function')
+def active_user_create_broadcasts_permission():
+    return create_active_user_create_broadcasts_permissions()
+
+
+@pytest.fixture(scope='function')
+def active_user_approve_broadcasts_permission():
+    return create_active_user_approve_broadcasts_permissions()
+
+
+@pytest.fixture(scope='function')
 def active_user_broadcast_permissions(fake_uuid):
     return create_service_one_user(
         id=fake_uuid,
