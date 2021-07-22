@@ -18,7 +18,7 @@ from app.notify_client.user_api_client import user_api_client
 from app.utils.user import is_gov_user
 from app.utils.user_permissions import (
     all_ui_permissions,
-    translate_permissions_from_db_to_admin_roles,
+    translate_permissions_from_db_to_ui,
 )
 
 
@@ -103,7 +103,7 @@ class User(JSONModel, UserMixin):
         them out later, we'll need to rework this function.
         """
         self._permissions = {
-            service: translate_permissions_from_db_to_admin_roles(permissions)
+            service: translate_permissions_from_db_to_ui(permissions)
             for service, permissions
             in permissions_by_service.items()
         }
@@ -505,7 +505,7 @@ class InvitedUser(JSONModel):
             self._permissions = permissions
         else:
             self._permissions = permissions.split(',')
-        self._permissions = translate_permissions_from_db_to_admin_roles(self.permissions)
+        self._permissions = translate_permissions_from_db_to_ui(self.permissions)
 
     @property
     def from_user(self):

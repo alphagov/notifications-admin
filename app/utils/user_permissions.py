@@ -28,25 +28,27 @@ broadcast_permission_options = (
 )
 
 
-def translate_permissions_from_db_to_admin_roles(permissions):
+def translate_permissions_from_db_to_ui(db_permissions):
     """
-    Given a list of database permissions, return a set of roles
+    Given a list of database permissions, return a set of UI permissions
 
-    A role is returned if all of its database permissions are in the permission list that is passed in.
-    Any permissions in the list that are not database permissions are also returned.
+    A UI permission is returned if all of its DB permissions are in the permission list that is passed in.
+    Any DB permissions in the list that are not known permissions are also returned.
     """
-    unknown_database_permissions = {p for p in permissions if p not in all_db_permissions}
+    unknown_database_permissions = set(db_permissions) - all_db_permissions
 
     return {
-        admin_role for admin_role, db_role_list in permission_mappings.items()
-        if set(db_role_list) <= set(permissions)
+        ui_permission for ui_permission, db_permissions_for_ui_permission in permission_mappings.items()
+        if set(db_permissions_for_ui_permission) <= set(db_permissions)
     } | unknown_database_permissions
 
 
-def translate_permissions_from_admin_roles_to_db(permissions):
+def translate_permissions_from_ui_to_db(ui_permissions):
     """
-    Given a list of admin roles (ie: checkboxes on a permissions edit page for example), return a set of db permissions
+    Given a list of UI permissions (ie: checkboxes on a permissions edit page), return a set of DB permissions
 
-    Looks them up in the roles dict, falling back to just passing through if they're not recognised.
+    Looks them up in the mapping, falling back to just passing through if they're not recognised.
     """
-    return set(chain.from_iterable(permission_mappings.get(permission, [permission]) for permission in permissions))
+    return set(chain.from_iterable(
+        permission_mappings.get(ui_permission, [ui_permission]) for ui_permission in ui_permissions
+    ))

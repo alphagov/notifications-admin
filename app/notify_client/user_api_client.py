@@ -1,9 +1,7 @@
 from notifications_python_client.errors import HTTPError
 
 from app.notify_client import NotifyAdminAPIClient, cache
-from app.utils.user_permissions import (
-    translate_permissions_from_admin_roles_to_db,
-)
+from app.utils.user_permissions import translate_permissions_from_ui_to_db
 
 ALLOWED_ATTRIBUTES = {
     'name',
@@ -152,7 +150,7 @@ class UserApiClient(NotifyAdminAPIClient):
         # permissions passed in are the combined admin roles, not db permissions
         endpoint = '/service/{}/users/{}'.format(service_id, user_id)
         data = {
-            'permissions': [{'permission': x} for x in translate_permissions_from_admin_roles_to_db(permissions)],
+            'permissions': [{'permission': x} for x in translate_permissions_from_ui_to_db(permissions)],
             'folder_permissions': folder_permissions,
         }
 
@@ -168,7 +166,7 @@ class UserApiClient(NotifyAdminAPIClient):
     def set_user_permissions(self, user_id, service_id, permissions, folder_permissions=None):
         # permissions passed in are the combined admin roles, not db permissions
         data = {
-            'permissions': [{'permission': x} for x in translate_permissions_from_admin_roles_to_db(permissions)],
+            'permissions': [{'permission': x} for x in translate_permissions_from_ui_to_db(permissions)],
         }
 
         if folder_permissions is not None:

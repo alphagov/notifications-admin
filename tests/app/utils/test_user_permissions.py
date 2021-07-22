@@ -1,12 +1,12 @@
 import pytest
 
 from app.utils.user_permissions import (
-    translate_permissions_from_admin_roles_to_db,
-    translate_permissions_from_db_to_admin_roles,
+    translate_permissions_from_db_to_ui,
+    translate_permissions_from_ui_to_db,
 )
 
 
-@pytest.mark.parametrize('db_roles,admin_roles', [
+@pytest.mark.parametrize('db_permissions,expected_ui_permissions', [
     (
         ['approve_broadcasts', 'reject_broadcasts', 'cancel_broadcasts'],
         {'approve_broadcasts'},
@@ -28,15 +28,18 @@ from app.utils.user_permissions import (
         {'send_messages', 'manage_templates', 'some_unknown_permission'},
     ),
 ])
-def test_translate_permissions_from_db_to_admin_roles(
-    db_roles,
-    admin_roles,
+def test_translate_permissions_from_db_to_ui(
+    db_permissions,
+    expected_ui_permissions,
 ):
-    roles = translate_permissions_from_db_to_admin_roles(db_roles)
-    assert roles == admin_roles
+    ui_permissions = translate_permissions_from_db_to_ui(db_permissions)
+    assert ui_permissions == expected_ui_permissions
 
 
-def test_translate_permissions_from_admin_roles_to_db():
-    roles = ['send_messages', 'manage_templates', 'some_unknown_permission']
-    db_perms = translate_permissions_from_admin_roles_to_db(roles)
-    assert db_perms == {'send_texts', 'send_emails', 'send_letters', 'manage_templates', 'some_unknown_permission'}
+def test_translate_permissions_from_ui_to_db():
+    ui_permissions = ['send_messages', 'manage_templates', 'some_unknown_permission']
+    db_permissions = translate_permissions_from_ui_to_db(ui_permissions)
+
+    assert db_permissions == {
+        'send_texts', 'send_emails', 'send_letters', 'manage_templates', 'some_unknown_permission'
+    }
