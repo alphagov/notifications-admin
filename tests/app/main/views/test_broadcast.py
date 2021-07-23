@@ -470,15 +470,19 @@ def test_empty_broadcast_dashboard(
     ]
 
 
+@pytest.mark.parametrize('user', [
+    create_active_user_approve_broadcasts_permissions(),
+    create_active_user_create_broadcasts_permissions(),
+])
 @freeze_time('2020-02-20 02:20')
 def test_broadcast_dashboard(
     client_request,
     service_one,
     mock_get_broadcast_messages,
-    active_user_create_broadcasts_permission,
+    user,
 ):
     service_one['permissions'] += ['broadcast']
-    client_request.login(active_user_create_broadcasts_permission)
+    client_request.login(user)
     page = client_request.get(
         '.broadcast_dashboard',
         service_id=SERVICE_ONE_ID,
@@ -495,15 +499,6 @@ def test_broadcast_dashboard(
         'Example template This is a test Live since today at 2:20am England Scotland',
         'Example template This is a test Live since today at 1:20am England Scotland',
     ]
-
-    button = page.select_one(
-        '.js-stick-at-bottom-when-scrolling a.govuk-button.govuk-button--secondary'
-    )
-    assert normalize_spaces(button.text) == 'New alert'
-    assert button['href'] == url_for(
-        'main.new_broadcast',
-        service_id=SERVICE_ONE_ID,
-    )
 
 
 @pytest.mark.parametrize('user', [
@@ -531,6 +526,33 @@ def test_broadcast_dashboard_does_not_have_button_if_user_does_not_have_permissi
     assert not page.select('a.govuk-button')
 
 
+@pytest.mark.parametrize('endpoint', (
+    '.broadcast_dashboard', '.broadcast_dashboard_previous', '.broadcast_dashboard_rejected',
+))
+def test_broadcast_dashboard_has_new_alert_button_if_user_has_permission_to_create_broadcasts(
+    client_request,
+    service_one,
+    mock_get_broadcast_messages,
+    active_user_create_broadcasts_permission,
+    endpoint,
+):
+    client_request.login(active_user_create_broadcasts_permission)
+
+    service_one['permissions'] += ['broadcast']
+    page = client_request.get(
+        endpoint,
+        service_id=SERVICE_ONE_ID,
+    )
+    button = page.select_one(
+        '.js-stick-at-bottom-when-scrolling a.govuk-button.govuk-button--secondary'
+    )
+    assert normalize_spaces(button.text) == 'New alert'
+    assert button['href'] == url_for(
+        'main.new_broadcast',
+        service_id=SERVICE_ONE_ID,
+    )
+
+
 @freeze_time('2020-02-20 02:20')
 def test_broadcast_dashboard_json(
     logged_in_client,
@@ -553,15 +575,19 @@ def test_broadcast_dashboard_json(
     assert 'Live since today at 2:20am' in json_response['current_broadcasts']
 
 
+@pytest.mark.parametrize('user', [
+    create_active_user_approve_broadcasts_permissions(),
+    create_active_user_create_broadcasts_permissions(),
+])
 @freeze_time('2020-02-20 02:20')
 def test_previous_broadcasts_page(
     client_request,
     service_one,
     mock_get_broadcast_messages,
-    active_user_create_broadcasts_permission,
+    user,
 ):
     service_one['permissions'] += ['broadcast']
-    client_request.login(active_user_create_broadcasts_permission)
+    client_request.login(user)
     page = client_request.get(
         '.broadcast_dashboard_previous',
         service_id=SERVICE_ONE_ID,
@@ -579,25 +605,20 @@ def test_previous_broadcasts_page(
         'Example template This is a test Yesterday at 2:20am England Scotland',
     ]
 
-    button = page.select_one(
-        '.js-stick-at-bottom-when-scrolling a.govuk-button.govuk-button--secondary'
-    )
-    assert normalize_spaces(button.text) == 'New alert'
-    assert button['href'] == url_for(
-        'main.new_broadcast',
-        service_id=SERVICE_ONE_ID,
-    )
 
-
+@pytest.mark.parametrize('user', [
+    create_active_user_approve_broadcasts_permissions(),
+    create_active_user_create_broadcasts_permissions(),
+])
 @freeze_time('2020-02-20 02:20')
 def test_rejected_broadcasts_page(
     client_request,
     service_one,
     mock_get_broadcast_messages,
-    active_user_create_broadcasts_permission,
+    user,
 ):
     service_one['permissions'] += ['broadcast']
-    client_request.login(active_user_create_broadcasts_permission)
+    client_request.login(user)
     page = client_request.get(
         '.broadcast_dashboard_rejected',
         service_id=SERVICE_ONE_ID,
@@ -613,15 +634,6 @@ def test_rejected_broadcasts_page(
     ] == [
         'Example template This is a test Today at 1:20am England Scotland',
     ]
-
-    button = page.select_one(
-        '.js-stick-at-bottom-when-scrolling a.govuk-button.govuk-button--secondary'
-    )
-    assert normalize_spaces(button.text) == 'New alert'
-    assert button['href'] == url_for(
-        'main.new_broadcast',
-        service_id=SERVICE_ONE_ID,
-    )
 
 
 def test_new_broadcast_page(
