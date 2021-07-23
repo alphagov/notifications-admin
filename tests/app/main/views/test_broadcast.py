@@ -2018,7 +2018,7 @@ def test_confirm_approve_non_training_broadcasts_errors_if_not_ticked(
 
     client_request.login(active_user_approve_broadcasts_permission)
     page = client_request.post(
-        '.view_current_broadcast',
+        '.approve_broadcast_message',
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
         _data={},
@@ -2441,7 +2441,7 @@ def test_confirm_approve_broadcast(
 
     client_request.login(active_user_approve_broadcasts_permission)
     client_request.post(
-        '.view_current_broadcast',
+        '.approve_broadcast_message',
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
         _expected_redirect=expected_redirect(
