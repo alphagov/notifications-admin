@@ -187,46 +187,34 @@ def test_if_string_contains_alphanumeric_characters_does_not_raise(string):
     MustContainAlphanumericCharacters()(None, _gen_mock_field(string))
 
 
+@pytest.mark.parametrize(
+    "sms_sender,error_expected,error_message",
+    [
+        ('', True, 'Cannot be empty'),
+        ('22', True, 'Enter 3 characters or more'),
+        ('333', False, None),
+        ('elevenchars', False, None),  # 11 chars
+        ('twelvecharas', True, 'Enter 11 characters or fewer'),  # 12 chars
+        ('###', True, 'Use letters and numbers only'),
+        ('00111222333', True, 'Cannot start with 00'),
+        ('UK_GOV', False, None),  # Underscores are allowed
+        ('UK.GOV', False, None),  # Full stops are allowed
+    ]
+)
 def test_sms_sender_form_validation(
     client,
     mock_get_user_by_email,
+    sms_sender,
+    error_expected,
+    error_message
 ):
     form = ServiceSmsSenderForm()
+    form.sms_sender.data = sms_sender
 
-    form.sms_sender.data = 'elevenchars'
     form.validate()
-    assert not form.errors
 
-    form.sms_sender.data = ''
-    form.validate()
-    assert "Cannot be empty" == form.errors['sms_sender'][0]
-
-    form.sms_sender.data = 'morethanelevenchars'
-    form.validate()
-    assert "Enter 11 characters or fewer" == form.errors['sms_sender'][0]
-
-    form.sms_sender.data = '###########'
-    form.validate()
-    assert 'Use letters and numbers only' == form.errors['sms_sender'][0]
-
-    # Underscores are allowed
-    form.sms_sender.data = 'UK_GOV'
-    form.validate()
-    assert not form.errors
-
-    # Full stops are allowed
-    form.sms_sender.data = 'UK.GOV'
-    form.validate()
-    assert not form.errors
-
-    form.sms_sender.data = '22'
-    form.validate()
-    assert 'Enter 3 characters or more' == form.errors['sms_sender'][0]
-
-    form.sms_sender.data = '333'
-    form.validate()
-    assert not form.errors
-
-    form.sms_sender.data = '00111222333'
-    form.validate()
-    assert "Cannot start with 00" == form.errors['sms_sender'][0]
+    if error_expected:
+        assert form.errors
+        assert error_message == form.errors['sms_sender'][0]
+    else:
+        assert not form.errors
