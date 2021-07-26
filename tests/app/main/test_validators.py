@@ -199,6 +199,7 @@ def test_if_string_contains_alphanumeric_characters_does_not_raise(string):
         ('00111222333', True, 'Cannot start with 00'),
         ('UK_GOV', False, None),  # Underscores are allowed
         ('UK.GOV', False, None),  # Full stops are allowed
+        ("'UC'", False, None),  # Straight single quotes are allowed
     ]
 )
 def test_sms_sender_form_validation(
