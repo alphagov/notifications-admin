@@ -202,21 +202,29 @@ def test_should_show_overview_page_for_broadcast_service(
     mock_get_template_folders,
     service_one,
     active_user_view_permissions,
-    active_user_broadcast_permissions,
+    active_user_create_broadcasts_permission,
+    active_user_approve_broadcasts_permission,
 ):
     service_one['permissions'].append('broadcast')
     mocker.patch('app.models.user.Users.client_method', return_value=[
-        active_user_broadcast_permissions,
+        active_user_create_broadcasts_permission,
+        active_user_approve_broadcasts_permission,
         active_user_view_permissions,
     ])
     page = client_request.get('main.manage_users', service_id=SERVICE_ONE_ID)
     assert normalize_spaces(page.select('.user-list-item')[0].text) == (
-        'Test User (you) '
-        'Can Add and edit templates '
+        'Test User Create Broadcasts Permission (you) '
+        'Cannot Add and edit templates '
         'Can Create new alerts '
-        'Can Approve alerts'
+        'Cannot Approve alerts'
     )
     assert normalize_spaces(page.select('.user-list-item')[1].text) == (
+        'Test User Approve Broadcasts Permission (you) '
+        'Cannot Add and edit templates '
+        'Cannot Create new alerts '
+        'Can Approve alerts'
+    )
+    assert normalize_spaces(page.select('.user-list-item')[2].text) == (
         'Test User With Permissions (you) '
         'Cannot Add and edit templates '
         'Cannot Create new alerts '
