@@ -212,12 +212,14 @@ def test_should_show_overview_page_for_broadcast_service(
     page = client_request.get('main.manage_users', service_id=SERVICE_ONE_ID)
     assert normalize_spaces(page.select('.user-list-item')[0].text) == (
         'Test User (you) '
-        'Can Add new alerts and templates '
+        'Can Add and edit templates '
+        'Can Create new alerts '
         'Can Approve alerts'
     )
     assert normalize_spaces(page.select('.user-list-item')[1].text) == (
         'Test User With Permissions (you) '
-        'Cannot Add new alerts and templates '
+        'Cannot Add and edit templates '
+        'Cannot Create new alerts '
         'Cannot Approve alerts'
     )
 
@@ -326,6 +328,7 @@ def test_broadcast_service_only_shows_relevant_permissions(
     assert [
         (field['name'], field['value']) for field in page.select('input[type=checkbox]')
     ] == [
+        ('permissions_field', 'manage_templates'),
         ('permissions_field', 'create_broadcasts'),
         ('permissions_field', 'approve_broadcasts'),
     ]

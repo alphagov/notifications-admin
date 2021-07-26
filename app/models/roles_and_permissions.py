@@ -6,7 +6,7 @@ roles = {
     'manage_service': ['manage_users', 'manage_settings'],
     'manage_api_keys': ['manage_api_keys'],
     'view_activity': ['view_activity'],
-    'create_broadcasts': ['manage_templates', 'create_broadcasts', 'reject_broadcasts', 'cancel_broadcasts'],
+    'create_broadcasts': ['create_broadcasts', 'reject_broadcasts', 'cancel_broadcasts'],
     'approve_broadcasts': ['approve_broadcasts', 'reject_broadcasts', 'cancel_broadcasts'],
 }
 
@@ -22,7 +22,8 @@ permissions = (
 )
 
 broadcast_permissions = (
-    ('create_broadcasts', 'Add new alerts and templates'),
+    ('manage_templates', 'Add and edit templates'),
+    ('create_broadcasts', 'Create new alerts'),
     ('approve_broadcasts', 'Approve alerts'),
 )
 

@@ -1031,7 +1031,7 @@ class BroadcastPermissionsForm(BasePermissionsForm):
         ],
         filters=[filter_by_broadcast_permissions],
         param_extensions={
-            "hint": {"text": "Team members with permission to add alerts or approve alerts can also reject them."}
+            "hint": {"text": "Team members who can create or approve alerts can also reject them."}
         }
     )
 

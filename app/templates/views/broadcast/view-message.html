@@ -193,7 +193,7 @@
   {% if broadcast_message.status != 'pending-approval' %}
     <p class="govuk-body govuk-!-margin-bottom-3">
       {% if broadcast_message.created_by %}
-        Sent by {{ broadcast_message.created_by.name }}
+        Created by {{ broadcast_message.created_by.name }}
       {%- else %}
         Created from an API call
       {%- endif %}
