@@ -5,6 +5,7 @@ from tests import broadcast_message_json
 from tests.app.broadcast_areas.custom_polygons import (
     BRISTOL,
     BURFORD,
+    CHELTENHAM,
     CHELTENHAM_AND_GLOUCESTER,
     SANTA_A,
     SEVERN_ESTUARY,
@@ -220,15 +221,22 @@ def test_immediate_parents(
         ]
     ),
     (
-        [CHELTENHAM_AND_GLOUCESTER], [
+        [CHELTENHAM], [
             # These are all in lower-tier local authorities within
             # Gloucestershire, and we’re not targeting any other
             # upper-tier or unitary authorities so we display them
             # individually
             'Cheltenham',
-            'Gloucester',
-            'Stroud',
+            'Cotswold',
             'Tewkesbury',
+        ]
+    ),
+    (
+        [CHELTENHAM_AND_GLOUCESTER], [
+            # This covers more than 3 lower-tier local authorities so
+            # we group them together rather than displaying them
+            # individually
+            'Gloucestershire',
         ]
     ),
     (

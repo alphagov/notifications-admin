@@ -131,6 +131,8 @@ class BroadcastMessage(JSONModel):
         for top_level, lower_levels in grouped.items():
             if len(lower_levels) > 1 and len(grouped) > 1:
                 yield top_level
+            elif len(lower_levels) > 3:
+                yield top_level
             else:
                 for lower_level in lower_levels:
                     yield lower_level
