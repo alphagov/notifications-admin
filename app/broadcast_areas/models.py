@@ -125,14 +125,12 @@ class BroadcastArea(BaseBroadcastArea, SortableMixin):
 
     @cached_property
     def parents(self):
-        return list(filter(None, self._parents_iterator))
+        return list(filter(None, self._parents_iterator(self.id)))
 
-    @property
-    def _parents_iterator(self):
-        id = self.id
-
+    @staticmethod
+    def _parents_iterator(area_id):
         while True:
-            parent = BroadcastAreasRepository().get_parent_for_area(id)
+            parent = BroadcastAreasRepository().get_parent_for_area(area_id)
 
             if not parent:
                 return None
@@ -141,7 +139,7 @@ class BroadcastArea(BaseBroadcastArea, SortableMixin):
 
             yield parent_broadcast_area
 
-            id = parent_broadcast_area.id
+            area_id = parent_broadcast_area.id
 
 
 class CustomBroadcastArea(BaseBroadcastArea):
