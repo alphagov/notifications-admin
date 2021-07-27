@@ -81,7 +81,7 @@ class BaseBroadcastArea(ABC):
         return self.estimated_bleed_in_m / Polygons.approx_metres_to_degree
 
     @staticmethod
-    def _parents_iterator(area_id):
+    def _get_parent_areas(area_id):
         while True:
             parent = BroadcastAreasRepository().get_parent_for_area(area_id)
 
@@ -139,7 +139,7 @@ class BroadcastArea(BaseBroadcastArea, SortableMixin):
 
     @cached_property
     def parents(self):
-        return list(self._parents_iterator(self.id))
+        return list(self._get_parent_areas(self.id))
 
 
 class CustomBroadcastArea(BaseBroadcastArea):
