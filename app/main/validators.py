@@ -144,9 +144,9 @@ class BroadcastLength:
             )
 
 
-class LettersNumbersFullStopsAndUnderscoresOnly:
+class LettersNumbersSingleQuotesFullStopsAndUnderscoresOnly:
 
-    regex = re.compile(r'^[a-zA-Z0-9\s\._]+$')
+    regex = re.compile(r"^[a-zA-Z0-9\s\._']+$")
 
     def __init__(self, message='Use letters and numbers only'):
         self.message = message
