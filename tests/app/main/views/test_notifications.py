@@ -1,11 +1,11 @@
 import base64
 from functools import partial
-from unittest.mock import mock_open
+from unittest.mock import Mock, mock_open
 
 import pytest
 from flask import url_for
 from freezegun import freeze_time
-from notifications_python_client.errors import APIError
+from notifications_python_client.errors import APIError, HTTPError
 from PyPDF2.utils import PdfReadError
 
 from tests.conftest import (
@@ -956,6 +956,45 @@ def test_cancelling_a_letter_calls_the_api(
     )
 
     assert cancel_endpoint.called
+
+
+@freeze_time('2016-01-01 15:00')
+@pytest.mark.parametrize('error_message', [
+    "It’s too late to cancel this letter. Printing started on 1 January at 5.30pm",
+    "This letter has already been cancelled",
+    pytest.param("other message", marks=pytest.mark.xfail())
+])
+def test_cancel_letter_catches_errors_from_API(
+    client_request,
+    mocker,
+    fake_uuid,
+    error_message
+):
+    notification = create_notification(template_type='letter', notification_status='created')
+    mocker.patch('app.notification_api_client.get_notification', return_value=notification)
+    mocker.patch(
+        'app.main.views.notifications.get_page_count_for_letter',
+        return_value=1
+    )
+    mocker.patch(
+        'app.main.views.notifications.notification_api_client.update_notification_to_cancelled',
+        side_effect=HTTPError(response=Mock(
+            status_code=400,
+            json=Mock(
+                return_value={'message': error_message}
+            )
+        ))
+    )
+
+    page = client_request.post(
+        'main.cancel_letter',
+        service_id=SERVICE_ONE_ID,
+        notification_id=fake_uuid,
+        _follow_redirects=True,
+    )
+
+    assert page.find('h1').text.strip() == "Letter"
+    assert page.select_one('div.banner-dangerous').text.strip() == error_message
 
 
 @pytest.mark.parametrize('notification_type', ['sms', 'email'])
