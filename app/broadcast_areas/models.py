@@ -141,6 +141,12 @@ class BroadcastArea(BaseBroadcastArea, SortableMixin):
     def parents(self):
         return list(self._get_parent_areas(self.id))
 
+    @property
+    def lists_of_ancestors(self):
+        if self.sub_areas:
+            return [[self] + self.parents]
+        return [self.parents]
+
 
 class CustomBroadcastArea(BaseBroadcastArea):
 
@@ -178,6 +184,14 @@ class CustomBroadcastArea(BaseBroadcastArea):
             area.simple_polygons.ratio_of_intersection_with(self.polygons) * area.count_of_phones
             for area in self.overlapping_areas
         )
+
+    @cached_property
+    def lists_of_ancestors(self):
+        return [
+            list(self._get_parent_areas(area.id))
+            for area in self.overlapping_areas
+            if area.simple_polygons.intersects(self.polygons)
+        ]
 
 
 class CustomBroadcastAreas(SerialisedModelCollection):

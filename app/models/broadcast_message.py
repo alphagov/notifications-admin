@@ -1,4 +1,5 @@
 import itertools
+from collections import defaultdict
 from datetime import datetime, timedelta
 
 from notifications_utils.polygons import Polygons
@@ -112,6 +113,27 @@ class BroadcastMessage(JSONModel):
         for area in self.areas:
             for parent in area.parents:
                 yield parent
+
+    @property
+    def summarised_areas(self):
+        return sorted(self._summarised_areas_iterator)
+
+    @property
+    def _summarised_areas_iterator(self):
+        grouped = defaultdict(set)
+
+        for area in self.areas:
+            for ancestors in area.lists_of_ancestors:
+                if not ancestors:
+                    ancestors = [area]
+                grouped[ancestors[-1]] |= {ancestors[0]}
+
+        for top_level, lower_levels in grouped.items():
+            if len(lower_levels) > 1 and len(grouped) > 1:
+                yield top_level
+            else:
+                for lower_level in lower_levels:
+                    yield lower_level
 
     @cached_property
     def polygons(self):
