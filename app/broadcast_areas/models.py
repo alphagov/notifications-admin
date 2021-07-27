@@ -133,7 +133,7 @@ class BroadcastArea(BaseBroadcastArea, SortableMixin):
             parent = BroadcastAreasRepository().get_parent_for_area(area_id)
 
             if not parent:
-                return None
+                return
 
             parent_broadcast_area = BroadcastArea(parent)
 
