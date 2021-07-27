@@ -39,7 +39,7 @@ from app.main.views.send import get_sender_details
 from app.models.service import Service
 from app.models.template_list import TemplateList, TemplateLists
 from app.template_previews import TemplatePreview, get_page_count_for_letter
-from app.utils import NOTIFICATION_TYPES, should_skip_template_page
+from app.utils import should_skip_template_page
 from app.utils.templates import get_template
 from app.utils.user import user_has_permissions, user_is_platform_admin
 
@@ -115,11 +115,6 @@ def choose_template(service_id, template_type='all', template_folder_id=None):
     )
     option_hints = {template_folder_id: 'current folder'}
 
-    single_notification_channel = None
-    notification_channels = list(set(current_service.permissions).intersection(NOTIFICATION_TYPES))
-    if len(notification_channels) == 1:
-        single_notification_channel = notification_channels[0]
-
     if request.method == 'POST' and templates_and_folders_form.validate_on_submit():
         if not current_user.has_permissions('manage_templates'):
             abort(403)
@@ -158,7 +153,6 @@ def choose_template(service_id, template_type='all', template_folder_id=None):
         templates_and_folders_form=templates_and_folders_form,
         move_to_children=templates_and_folders_form.move_to.children(),
         user_has_template_folder_permission=user_has_template_folder_permission,
-        single_notification_channel=single_notification_channel,
         option_hints=option_hints
     )
 
