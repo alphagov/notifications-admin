@@ -56,13 +56,13 @@ from app.main.validators import (
 )
 from app.models.feedback import PROBLEM_TICKET_TYPE, QUESTION_TICKET_TYPE
 from app.models.organisation import Organisation
-from app.models.roles_and_permissions import (
-    broadcast_permissions,
-    permissions,
-    roles,
-)
 from app.utils import merge_jsonlike
 from app.utils.user import distinct_email_addresses
+from app.utils.user_permissions import (
+    all_ui_permissions,
+    broadcast_permission_options,
+    permission_options,
+)
 
 
 def get_time_value_and_label(future_time):
@@ -945,20 +945,20 @@ class GovukRadiosFieldWithNoneOption(FieldWithNoneOption, GovukRadiosField):
     pass
 
 
-# guard against data entries that aren't a role in permissions
+# guard against data entries that aren't a known permission
 def filter_by_permissions(valuelist):
     if valuelist is None:
         return None
     else:
-        return [entry for entry in valuelist if any(entry in role for role in permissions)]
+        return [entry for entry in valuelist if any(entry in option for option in permission_options)]
 
 
-# guard against data entries that aren't a role in broadcast_permissions
+# guard against data entries that aren't a known broadcast permission
 def filter_by_broadcast_permissions(valuelist):
     if valuelist is None:
         return None
     else:
-        return [entry for entry in valuelist if any(entry in role for role in broadcast_permissions)]
+        return [entry for entry in valuelist if any(entry in option for option in broadcast_permission_options)]
 
 
 class BasePermissionsForm(StripWhitespaceForm):
@@ -989,7 +989,7 @@ class BasePermissionsForm(StripWhitespaceForm):
         'Permissions',
         filters=[filter_by_permissions],
         choices=[
-            (value, label) for value, label in permissions
+            (value, label) for value, label in permission_options
         ],
         param_extensions={
             "hint": {"text": "All team members can see sent messages."}
@@ -1005,8 +1005,10 @@ class BasePermissionsForm(StripWhitespaceForm):
         form = cls(
             **kwargs,
             **{
-                "permissions_field": [
-                    role for role in roles.keys() if user.has_permission_for_service(service_id, role)]
+                "permissions_field": (
+                    user.permissions_for_service(service_id) & all_ui_permissions
+                )
+
             },
             login_authentication=user.auth_type
         )
@@ -1027,7 +1029,7 @@ class BroadcastPermissionsForm(BasePermissionsForm):
     permissions_field = GovukCheckboxesField(
         'Permissions',
         choices=[
-            (value, label) for value, label in broadcast_permissions
+            (value, label) for value, label in broadcast_permission_options
         ],
         filters=[filter_by_broadcast_permissions],
         param_extensions={

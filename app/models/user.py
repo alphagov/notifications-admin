@@ -10,16 +10,16 @@ from app.event_handlers import (
 )
 from app.models import JSONModel, ModelList
 from app.models.organisation import Organisation
-from app.models.roles_and_permissions import (
-    all_permissions,
-    translate_permissions_from_db_to_admin_roles,
-)
 from app.models.webauthn_credential import WebAuthnCredentials
 from app.notify_client import InviteTokenError
 from app.notify_client.invite_api_client import invite_api_client
 from app.notify_client.org_invite_api_client import org_invite_api_client
 from app.notify_client.user_api_client import user_api_client
 from app.utils.user import is_gov_user
+from app.utils.user_permissions import (
+    all_ui_permissions,
+    translate_permissions_from_db_to_ui,
+)
 
 
 def _get_service_id_from_view_args():
@@ -103,7 +103,7 @@ class User(JSONModel, UserMixin):
         them out later, we'll need to rework this function.
         """
         self._permissions = {
-            service: translate_permissions_from_db_to_admin_roles(permissions)
+            service: translate_permissions_from_db_to_ui(permissions)
             for service, permissions
             in permissions_by_service.items()
         }
@@ -201,7 +201,7 @@ class User(JSONModel, UserMixin):
         return self._platform_admin and not session.get('disable_platform_admin_view', False)
 
     def has_permissions(self, *permissions, restrict_admin_usage=False, allow_org_user=False):
-        unknown_permissions = set(permissions) - all_permissions
+        unknown_permissions = set(permissions) - all_ui_permissions
         if unknown_permissions:
             raise TypeError('{} are not valid permissions'.format(list(unknown_permissions)))
 
@@ -505,7 +505,7 @@ class InvitedUser(JSONModel):
             self._permissions = permissions
         else:
             self._permissions = permissions.split(',')
-        self._permissions = translate_permissions_from_db_to_admin_roles(self.permissions)
+        self._permissions = translate_permissions_from_db_to_ui(self.permissions)
 
     @property
     def from_user(self):
