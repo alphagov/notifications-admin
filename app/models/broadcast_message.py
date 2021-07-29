@@ -115,11 +115,11 @@ class BroadcastMessage(JSONModel):
                 yield parent
 
     @property
-    def summarised_areas(self):
-        return sorted(self._summarised_areas_iterator)
+    def general_areas(self):
+        return sorted(self._general_areas_iterator)
 
     @property
-    def _summarised_areas_iterator(self):
+    def _general_areas_iterator(self):
         grouped = defaultdict(set)
 
         for area in self.areas:

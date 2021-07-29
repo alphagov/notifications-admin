@@ -188,7 +188,7 @@ def test_immediate_parents(
     ))
 
     assert [
-        area.name for area in broadcast_message.summarised_areas
+        area.name for area in broadcast_message.general_areas
     ] == expected_parent_areas
 
 
@@ -278,5 +278,5 @@ def test_immediate_parents_for_custom_areas(
         simple_polygons=simple_polygons,
     ))
     assert [
-        area.name for area in broadcast_message.summarised_areas
+        area.name for area in broadcast_message.general_areas
     ] == expected_parent_areas
