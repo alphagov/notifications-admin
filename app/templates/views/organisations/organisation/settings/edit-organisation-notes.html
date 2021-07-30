@@ -1,20 +1,21 @@
+{% extends "org_template.html" %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 {% from "components/textbox.html" import textbox %}
-
-{% extends "org_template.html" %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% block org_page_title %}
   Edit organisation notes
 {% endblock %}
 
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('.organisation_settings', org_id=current_org.id) }) }}
+{% endblock %}
+
 {% block maincolumn_content %}
 
-    {{ page_header(
-      'Edit organisation notes',
-      back_link=url_for('.organisation_settings', org_id=current_org.id)
-    ) }}
+    {{ page_header('Edit organisation notes') }}
     {% call form_wrapper() %}
     {{ textbox(
       form.notes,

@@ -3,16 +3,22 @@
 {% from "components/ajax-block.html" import ajax_block %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% block service_page_title %}
   {{ 1|message_count_label(template.template_type, suffix='') | capitalize }}
 {% endblock %}
 
+{% block backLink %}
+  {% if back_link %}
+    {{ govukBackLink({ "href": back_link }) }}
+  {% endif %}
+{% endblock %}
+
 {% block maincolumn_content %}
 
     {{ page_header(
-      1|message_count_label(template.template_type, suffix='') | capitalize,
-      back_link=back_link
+      1|message_count_label(template.template_type, suffix='') | capitalize
     ) }}
     <p class="govuk-body">
       {% if is_precompiled_letter %}

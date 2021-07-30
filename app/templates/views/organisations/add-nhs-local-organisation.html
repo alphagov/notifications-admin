@@ -3,6 +3,7 @@
 {% from "components/page-footer.html" import sticky_page_footer %}
 {% from "components/live-search.html" import live_search %}
 {% from "components/form.html" import form_wrapper %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% set page_title = "Accept our data sharing and financial agreement" %}
 
@@ -10,11 +11,12 @@
   {{ page_title }}
 {% endblock %}
 
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.request_to_go_live', service_id=current_service.id) }) }}
+{% endblock %}
+
 {% block maincolumn_content %}
-  {{ page_header(
-    page_title,
-    back_link=url_for('main.request_to_go_live', service_id=current_service.id)
-  ) }}
+  {{ page_header(page_title) }}
   {% call form_wrapper() %}
     <p class="govuk-body">
       {{ form.organisations.label.text }}

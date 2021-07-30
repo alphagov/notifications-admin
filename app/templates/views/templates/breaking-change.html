@@ -4,17 +4,19 @@
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/list.html" import list_of_placeholders, list_of_code_snippets %}
 {% from "components/form.html" import form_wrapper %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% block service_page_title %}
   Confirm changes
 {% endblock %}
 
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for(".edit_service_template", service_id=current_service.id, template_id=new_template.id) }) }}
+{% endblock %}
+
 {% block maincolumn_content %}
 
-  {{ page_header(
-    'Confirm changes',
-    back_link=url_for(".edit_service_template", service_id=current_service.id, template_id=new_template.id)
-  ) }}
+  {{ page_header('Confirm changes') }}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-five-sixths">
       {% if template_change.placeholders_removed %}

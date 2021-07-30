@@ -2,9 +2,15 @@
 {% from "components/form.html" import form_wrapper %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/page-header.html" import page_header %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% block per_page_title %}
   Confirm that you accept the agreement
+{% endblock %}
+
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.service_accept_agreement', service_id=current_service.id) }) }}
 {% endblock %}
 
 {% block maincolumn_content %}
@@ -12,10 +18,7 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-five-sixths">
 
-    {{ page_header(
-      'Confirm that you accept the agreement',
-      back_link=url_for('main.service_accept_agreement', service_id=current_service.id)
-    ) }}
+    {{ page_header('Confirm that you accept the agreement') }}
 
     {% call form_wrapper(class='top-gutter') %}
 

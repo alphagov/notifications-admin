@@ -2,9 +2,14 @@
 {% from "components/table.html" import list_table, field, text_field, link_field, right_aligned_field_heading, hidden_field_heading %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% block per_page_title %}
 Provider versions
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.view_providers') }) }}
 {% endblock %}
 
 {% block maincolumn_content %}
@@ -12,11 +17,7 @@ Provider versions
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
 
-    {{ page_header(
-      provider_versions[0].display_name,
-      back_link=url_for('main.view_providers')
-    ) }}
-
+    {{ page_header(provider_versions[0].display_name) }}
     {% call(item, row_number) list_table(
         provider_versions,
         caption='',

@@ -3,17 +3,20 @@
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/file-upload.html" import file_upload %}
 {% from "components/table.html" import list_table, text_field, index_field, index_field_heading %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% block service_page_title %}
   Upload a list of {{ 999|recipient_count_label(template.template_type) }}
 {% endblock %}
 
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.send_one_off', service_id=current_service.id, template_id=template.id) }) }}
+{% endblock %}
+
 {% block maincolumn_content %}
 
-  {{ page_header(
-    'Upload a list of {}'.format(999|recipient_count_label(template.template_type)),
-    back_link=url_for('main.send_one_off', service_id=current_service.id, template_id=template.id)
-  ) }}
+  {{ page_header('Upload a list of {}'.format(999|recipient_count_label(template.template_type))) }}
 
   <div class="page-footer bottom-gutter">
     {{file_upload(

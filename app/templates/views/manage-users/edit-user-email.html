@@ -2,17 +2,20 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% block per_page_title %}
   Change team member’s email address
 {% endblock %}
 
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.edit_user_permissions', service_id=current_service.id, user_id=user.id) }) }}
+{% endblock %}
+
 {% block maincolumn_content %}
 
-  {{ page_header(
-    'Change team member’s email address',
-    back_link=url_for('main.edit_user_permissions', service_id=current_service.id, user_id=user.id)
-  ) }}
+  {{ page_header('Change team member’s email address') }}
 
   <p class="govuk-body" id="user_name">This will change the email address for {{ user.name }}.</p>
   {% call form_wrapper() %}

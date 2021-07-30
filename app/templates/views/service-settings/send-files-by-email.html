@@ -4,18 +4,20 @@
 {% from "components/radios.html" import radio %}
 {% from "components/select-input.html" import select_wrapper %}
 {% from "components/form.html" import form_wrapper %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% block service_page_title %}
   Send files by email
 {% endblock %}
 
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.service_settings', service_id=current_service.id) }) }}
+{% endblock %}
+
 {% block maincolumn_content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-five-sixths">
-      {{ page_header(
-        'Send files by email',
-        back_link=url_for('main.service_settings', service_id=current_service.id)
-      ) }}
+      {{ page_header('Send files by email') }}
       <p class="govuk-body">
         This is an API-only feature.
       </p>

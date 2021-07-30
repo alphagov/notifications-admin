@@ -10,19 +10,19 @@
   {{ page_title }}
 {% endblock %}
 
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('.service_settings', service_id=current_service.id) }) }}
+{% endblock %}
+
 {% block maincolumn_content %}
   {% if current_service.has_inbound_number or no_available_numbers %}
-    {{ page_header(
-      page_title,
-      back_link=url_for('.service_settings', service_id=current_service.id)
-    ) }}
+    {{ page_header(page_title) }}
   {% endif %}
   {% if current_service.has_inbound_number %}
     <p class="govuk-body"> This service already has an inbound number </p>
   {% elif no_available_numbers %}
     <p class="govuk-body"> No available inbound numbers </p>
   {% else %}
-    {{ govukBackLink({ "href": url_for('.service_settings', service_id=current_service.id) }) }}
     {% call form_wrapper(class="govuk-!-margin-top-3") %}
       {{ form.inbound_number(param_extensions={
         'fieldset': {

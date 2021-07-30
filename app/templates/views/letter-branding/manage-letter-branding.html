@@ -3,17 +3,19 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% block per_page_title %}
   {{ '{} letter branding'.format('Update' if is_update else 'Create')}}
 {% endblock %}
 
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.letter_branding') }) }}
+{% endblock %}
+
 {% block platform_admin_content %}
 
-  {{ page_header(
-    '{} letter branding'.format('Update' if is_update else 'Add'),
-    back_link=url_for('main.letter_branding')
-  ) }}
+  {{ page_header('{} letter branding'.format('Update' if is_update else 'Add')) }}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-three-quarters">
       {% if logo %}

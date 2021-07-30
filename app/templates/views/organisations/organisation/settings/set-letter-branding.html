@@ -3,6 +3,7 @@
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/form.html" import form_wrapper %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% set page_title = "Default letter branding" %}
 
@@ -10,12 +11,13 @@
   {{ page_title }}
 {% endblock %}
 
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('.organisation_settings', org_id=current_org.id) }) }}
+{% endblock %}
+
 {% block maincolumn_content %}
 
-  {{ page_header(
-    page_title,
-    back_link=url_for('.organisation_settings', org_id=current_org.id)
-  ) }}
+  {{ page_header(page_title) }}
   {% call form_wrapper(data_kwargs={'preview-type': 'letter'}) %}
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-full preview-pane">

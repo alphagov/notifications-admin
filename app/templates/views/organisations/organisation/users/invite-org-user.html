@@ -3,17 +3,19 @@
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/form.html" import form_wrapper %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% block service_page_title %}
   Invite a team member
 {% endblock %}
 
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('.manage_org_users', org_id=current_org.id) }) }}
+{% endblock %}
+
 {% block maincolumn_content %}
 
-  {{ page_header(
-    "Invite a team member",
-    back_link=url_for('.manage_org_users', org_id=current_org.id)
-  ) }}
+  {{ page_header("Invite a team member") }}
   {% call form_wrapper() %}
     {{ form.email_address(
       param_extensions={

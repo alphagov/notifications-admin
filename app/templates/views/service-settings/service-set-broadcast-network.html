@@ -10,14 +10,15 @@
   Choose a mobile network
 {% endblock %}
 
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('.service_set_broadcast_channel', service_id=current_service.id) }) }}
+{% endblock %}
+
 {% block maincolumn_content %}
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-five-sixths">
-      {{ page_header(
-        'Choose a mobile network',
-        back_link=url_for('.service_set_broadcast_channel', service_id=current_service.id)
-      ) }}
+      {{ page_header('Choose a mobile network') }}
       {% call form_wrapper() %}
         {% call select_wrapper(form.all_networks, hide_legend=True) %}
           {% for option in form.all_networks %}

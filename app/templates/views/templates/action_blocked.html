@@ -1,19 +1,21 @@
 {% extends "withnav_template.html" %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% block service_page_title %}
   {{ notification_type.capitalize() }} are disabled
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": back_link }) }}
 {% endblock %}
 
 {% block maincolumn_content %}
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-five-sixths">
-      {{ page_header(
-        '{} are disabled'.format(notification_type.capitalize()),
-        back_link=back_link,
-      ) }}
+      {{ page_header('{} are disabled'.format(notification_type.capitalize())) }}
       <p class="govuk-body">
         Sending {{ 999|message_count_label(notification_type, suffix='') }} has been disabled for your service.
       </p>

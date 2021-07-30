@@ -2,19 +2,22 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% block service_page_title %}
   Callbacks for delivery receipts
+{% endblock %}
+
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for(back_link, service_id=current_service.id) }) }}
 {% endblock %}
 
 {% block maincolumn_content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-five-sixths">
 
-      {{ page_header(
-        'Callbacks for delivery receipts',
-        back_link=url_for(back_link, service_id=current_service.id)
-      ) }}
+      {{ page_header('Callbacks for delivery receipts') }}
 
       <p class="govuk-body">
         When you send an email or text message, we can tell you if Notify was able to deliver it.

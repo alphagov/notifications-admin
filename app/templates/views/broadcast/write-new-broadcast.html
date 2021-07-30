@@ -1,20 +1,22 @@
+{% extends "withnav_template.html" %}
 {% from "components/form.html" import form_wrapper %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/textbox.html" import textbox %}
-
-{% extends "withnav_template.html" %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% block service_page_title %}
   New alert
 {% endblock %}
 
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('.new_broadcast', service_id=current_service.id) }) }}
+{% endblock %}
+
 {% block maincolumn_content %}
 
-  {{ page_header(
-    'New alert',
-    back_link=url_for('.new_broadcast', service_id=current_service.id),
-  )}}
+  {{ page_header('New alert')}}
 
   {% call form_wrapper() %}
     <div class="govuk-grid-row">

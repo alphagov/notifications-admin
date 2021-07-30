@@ -2,17 +2,19 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% block service_page_title %}
   Change postage
 {% endblock %}
 
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('.view_template', service_id=service_id, template_id=template_id) }) }}
+{% endblock %}
+
 {% block maincolumn_content %}
 
-    {{ page_header(
-      'Change postage',
-      back_link=url_for('.view_template', service_id=service_id, template_id=template_id)
-    ) }}
+    {{ page_header('Change postage') }}
     {% call form_wrapper() %}
       <div class="govuk-grid-row">
         <div class="govuk-grid-column-five-sixths">

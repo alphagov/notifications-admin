@@ -3,9 +3,14 @@
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 {% from "components/banner.html" import banner %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% block service_page_title %}
   {{ user.name or user.email_localpart }}
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.manage_users', service_id=current_service.id) }) }}
 {% endblock %}
 
 {% block maincolumn_content %}
@@ -18,10 +23,7 @@
     ) }}
   {% endif %}
 
-  {{ page_header(
-    user.name or user.email_localpart,
-    back_link=url_for('main.manage_users', service_id=current_service.id)
-  ) }}
+  {{ page_header(user.name or user.email_localpart) }}
 
   <p class="govuk-body">
     {{ user.email_address }}&emsp;

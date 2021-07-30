@@ -5,17 +5,19 @@
 {% from "components/table.html" import list_table, field, text_field, index_field, hidden_field_heading, row, row_heading %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/button/macro.njk" import govukButton %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% block service_page_title %}
   {{ contact_list.original_file_name }}
 {% endblock %}
 
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.uploads', service_id=current_service.id) }) }}
+{% endblock %}
+
 {% block maincolumn_content %}
 
-  {{ page_header(
-    contact_list.original_file_name,
-    back_link=url_for('main.uploads', service_id=current_service.id)
-  ) }}
+  {{ page_header(contact_list.original_file_name) }}
 
   <p class="govuk-body">
     Uploaded by {{ contact_list.created_by }} {{ contact_list.created_at|format_datetime_human }}.

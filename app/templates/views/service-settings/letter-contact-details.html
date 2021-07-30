@@ -3,18 +3,20 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/table.html" import row_group, row, text_field, edit_field, field, boolean_field, list_table with context %}
 {% from "components/button/macro.njk" import govukButton %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% block service_page_title %}
   Sender addresses
 {% endblock %}
 
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.service_settings', service_id=current_service.id) }) }}
+{% endblock %}
+
 {% block maincolumn_content %}
 
   <div class="bottom-gutter">
-    {{ page_header(
-      'Sender addresses',
-      back_link=url_for('main.service_settings', service_id=current_service.id)
-    ) }}
+    {{ page_header('Sender addresses') }}
   </div>
   <div class="user-list">
     <div class="user-list-item">

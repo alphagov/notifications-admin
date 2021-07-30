@@ -1,17 +1,18 @@
-{% from "components/page-header.html" import page_header %}
-
 {% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% block service_page_title %}
   Choose where to send this alert
 {% endblock %}
 
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for(".preview_broadcast_areas", service_id=current_service.id, broadcast_message_id=broadcast_message.id) }) }}
+{% endblock %}
+
 {% block maincolumn_content %}
 
-  {{ page_header(
-    "Choose where to send this alert",
-    back_link=url_for(".preview_broadcast_areas", service_id=current_service.id, broadcast_message_id=broadcast_message.id)
-  ) }}
+  {{ page_header("Choose where to send this alert") }}
 
   {% for area in broadcast_message.parent_areas %}
     <a class="govuk-heading-m govuk-link govuk-link--no-visited-state" href="{{ url_for('.choose_broadcast_sub_area', service_id=current_service.id, broadcast_message_id=broadcast_message.id, library_slug=area.library_id, area_slug=area.id) }}">{{ area.name }}</a>

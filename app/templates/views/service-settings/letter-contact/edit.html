@@ -3,17 +3,21 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% block service_page_title %}
   Change sender address
 {% endblock %}
 
+{% block backLink %}
+  {% if not request.args.get('from_template') %}
+    {{ govukBackLink({ "href": url_for('.service_letter_contact_details', service_id=current_service.id) }) }}
+  {% endif %}
+{% endblock %}
+
 {% block maincolumn_content %}
 
-  {{ page_header(
-    'Change sender address',
-    back_link=None if request.args.get('from_template') else url_for('.service_letter_contact_details', service_id=current_service.id)
-  ) }}
+  {{ page_header('Change sender address') }}
   {% call form_wrapper() %}
     {{ textbox(
       form.letter_contact_block,

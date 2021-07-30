@@ -2,18 +2,20 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% block service_page_title %}
   Set rate limit
 {% endblock %}
 
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('.service_settings', service_id=current_service.id) }) }}
+{% endblock %}
+
 {% block maincolumn_content %}
 
   {% call form_wrapper() %}
-    {{ page_header(
-      'Rate limit',
-      back_link=url_for('.service_settings', service_id=current_service.id)
-    ) }}
+    {{ page_header('Rate limit') }}
     {{ form.rate_limit }}
     {{ page_footer('Save') }}
   {% endcall %}

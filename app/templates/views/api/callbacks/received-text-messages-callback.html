@@ -2,16 +2,18 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% block service_page_title %}
   Callbacks for received text messages
 {% endblock %}
 
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('.api_callbacks', service_id=current_service.id) }) }}
+{% endblock %}
+
 {% block maincolumn_content %}
-  {{ page_header(
-    'Callbacks for received text messages',
-    back_link=url_for('.api_callbacks', service_id=current_service.id)
-  ) }}
+  {{ page_header('Callbacks for received text messages') }}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-five-sixths">
       <p class="govuk-body">

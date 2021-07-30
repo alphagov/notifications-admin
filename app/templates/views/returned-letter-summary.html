@@ -1,18 +1,21 @@
+{% extends "withnav_template.html" %}
 {% from "components/table.html" import list_table, row_heading %}
 {% from "components/page-header.html" import page_header %}
-{% extends "withnav_template.html" %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% block service_page_title %}
   Returned letters
 {% endblock %}
 
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.service_dashboard', service_id=current_service.id) }) }}
+{% endblock %}
+
 {% block maincolumn_content %}
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-five-sixths">
-    {{ page_header(
-      'Returned letters',
-      back_link=url_for('main.service_dashboard', service_id=current_service.id)
-    ) }}
+    {{ page_header('Returned letters') }}
     <p class="govuk-body">
       Reports are published once a month.
     </p>

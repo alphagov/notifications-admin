@@ -2,18 +2,20 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% block service_page_title %}
   Set daily message limit
 {% endblock %}
 
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('.service_settings', service_id=current_service.id) }) }}
+{% endblock %}
+
 {% block maincolumn_content %}
 
   {% call form_wrapper() %}
-    {{ page_header(
-      'Daily message limit',
-      back_link=url_for('.service_settings', service_id=current_service.id)
-    ) }}
+    {{ page_header('Daily message limit') }}
     {{ form.message_limit }}
     {{ page_footer('Save') }}
   {% endcall %}

@@ -3,17 +3,19 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% block service_page_title %}
   Add a new address
 {% endblock %}
 
+{% block backLink %}
+  {{ govukBackLink({ "href": back_link }) }}
+{% endblock %}
+
 {% block maincolumn_content %}
 
-  {{ page_header(
-    'Add a new address',
-    back_link=back_link
-  ) }}
+  {{ page_header('Add a new address') }}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
       {% call form_wrapper() %}

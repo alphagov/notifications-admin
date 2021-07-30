@@ -629,11 +629,11 @@ def test_bat_email_page(
     assert response.status_code == 200
 
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    assert page.select('main a')[0].text == 'Back'
-    assert page.select('main a')[0]['href'] == url_for('main.support')
-    assert page.select('main a')[2].text == 'Fill in this form'
-    assert page.select('main a')[2]['href'] == url_for('main.feedback', ticket_type=PROBLEM_TICKET_TYPE, severe='no')
-    next_page_response = client.get(page.select('main a')[2]['href'])
+    assert page.select_one('.govuk-back-link').text == 'Back'
+    assert page.select_one('.govuk-back-link')['href'] == url_for('main.support')
+    assert page.select('main a')[1].text == 'Fill in this form'
+    assert page.select('main a')[1]['href'] == url_for('main.feedback', ticket_type=PROBLEM_TICKET_TYPE, severe='no')
+    next_page_response = client.get(page.select('main a')[1]['href'])
     next_page = BeautifulSoup(next_page_response.data.decode('utf-8'), 'html.parser')
     assert next_page.h1.text.strip() == 'Report a problem'
 

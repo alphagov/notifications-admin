@@ -2,17 +2,19 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% block per_page_title %}
   Confirm change of mobile number
 {% endblock %}
 
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('.edit_user_mobile_number', service_id=service_id, user_id=user.id) }) }}
+{% endblock %}
+
 {% block maincolumn_content %}
 
-{{ page_header(
-  'Confirm change of mobile number',
-  back_link=url_for('.edit_user_mobile_number', service_id=service_id, user_id=user.id)
-) }}
+{{ page_header('Confirm change of mobile number') }}
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">

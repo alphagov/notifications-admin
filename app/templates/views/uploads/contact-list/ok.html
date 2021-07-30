@@ -4,17 +4,19 @@
 {% from "components/table.html" import list_table, field, text_field, index_field, hidden_field_heading %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/button/macro.njk" import govukButton %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% block service_page_title %}
   {{ original_file_name }}
 {% endblock %}
 
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.upload_contact_list', service_id=current_service.id) }) }}
+{% endblock %}
+
 {% block maincolumn_content %}
 
-  {{ page_header(
-    original_file_name,
-    back_link=url_for('main.upload_contact_list', service_id=current_service.id)
-  ) }}
+  {{ page_header(original_file_name) }}
 
   <p class="govuk-body">
     {{ recipients|length|recipient_count(recipients.template_type) }} found
