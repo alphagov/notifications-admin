@@ -8,9 +8,11 @@
   New alert
 {% endblock %}
 
-{% block maincolumn_content %}
-
+{% block backLink %}
   {{ govukBackLink({ "href": url_for('.broadcast_dashboard', service_id=current_service.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
 
   {% call form_wrapper(class="govuk-!-margin-top-3") %}
     {{ form.content(

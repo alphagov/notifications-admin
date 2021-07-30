@@ -9,9 +9,11 @@
   Error
 {% endblock %}
 
-{% block maincolumn_content %}
-
+{% block backLink %}
   {{ govukBackLink({ "href": back_link }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
 
   <div class="bottom-gutter-1-2">
     {% call banner_wrapper(type='dangerous') %}

@@ -7,11 +7,13 @@
   Received text message
 {% endblock %}
 
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for("main.inbox", service_id=current_service.id) }) }}
+{% endblock %}
+
 {% block maincolumn_content %}
 
   <div class="dashboard">
-
-    {{ govukBackLink({ "href": url_for("main.inbox", service_id=current_service.id) }) }}
 
     <div class="bottom-gutter js-stick-at-top-when-scrolling">
       <h1 class="heading-large govuk-!-margin-top-0">

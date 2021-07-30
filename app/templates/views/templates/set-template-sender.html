@@ -9,9 +9,11 @@
   {{ page_title }}
 {% endblock %}
 
-{% block maincolumn_content %}
-
+{% block backLink %}
   {{ govukBackLink({ "href": url_for('.view_template', service_id=current_service.id, template_id=template_id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
 
   <div class="govuk-grid-row govuk-!-margin-top-3">
     {% call form_wrapper() %}

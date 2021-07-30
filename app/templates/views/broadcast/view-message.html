@@ -37,9 +37,11 @@
   {% endif %}
 {% endblock %}
 
-{% block maincolumn_content %}
-
+{% block backLink %}
   {{ govukBackLink({ "href": back_link }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
 
   {% if broadcast_message.status == 'pending-approval' %}
     {% if broadcast_message.created_by and broadcast_message.created_by == current_user
