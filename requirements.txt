@@ -12,7 +12,7 @@ awscli==1.20.11
     #   notifications-utils
 awscli-cwlogs==1.4.6
     # via -r requirements.in
-bleach==3.3.0
+bleach==3.3.1
     # via notifications-utils
 blinker==1.4
     # via
