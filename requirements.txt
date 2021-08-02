@@ -87,7 +87,7 @@ idna==3.2
     # via requests
 importlib-metadata==4.6.3
     # via click
-itsdangerous==1.1.0
+itsdangerous==2.0.1
     # via
     #   -r requirements.in
     #   flask
