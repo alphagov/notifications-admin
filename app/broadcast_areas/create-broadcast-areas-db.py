@@ -21,6 +21,7 @@ from repo import BroadcastAreasRepository, rtree_index_path
 from rtreelib import Rect, RTree
 from shapely import wkt
 from shapely.geometry import MultiPolygon, Polygon
+from shapely.validation import explain_validity
 
 source_files_path = Path(__file__).resolve().parent / 'source_files'
 point_counts = []
@@ -31,7 +32,7 @@ rtree_index = RTree()
 # care about optimising how quickjly we can process and display polygons
 # so we aim for something lower, i.e. enough to give us a good amount of
 # precision relative to the accuracy of a cell broadcast
-MAX_NUMBER_OF_POINTS_PER_POLYGON = 250
+MAX_NUMBER_OF_POINTS_PER_POLYGON = 350
 
 
 def simplify_geometry(feature):
@@ -44,14 +45,26 @@ def simplify_geometry(feature):
 
 
 def clean_up_invalid_polygons(polygons, indent="    "):
+    """
+    This function expects a list of lists of coordinates defined in degrees
+    """
     for index, polygon in enumerate(polygons):
         shapely_polygon = Polygon(polygon)
 
-        if shapely_polygon.is_valid:
+        # The simplest kind of invalid polygon is one that has two
+        # duplicate points in a row at a given precision, so the
+        # first thing to try is removing those points using
+        # simplification with a tolerance of 0
+        simplified_polygon = wkt.loads(
+            wkt.dumps(shapely_polygon, rounding_precision=4)
+        ).simplify(0)
+
+        if simplified_polygon.is_valid:
             print(  # noqa: T001
-                f"{indent}Polygon {index + 1}/{len(polygons)} is valid"
+                f"{indent}Polygon {index + 1}/{len(polygons)} is valid",
+                flush=True,
             )
-            yield polygon
+            yield simplified_polygon
 
         else:
             invalid_polygons.append(shapely_polygon)
@@ -59,27 +72,17 @@ def clean_up_invalid_polygons(polygons, indent="    "):
             # We’ve found polygons where all the points line up, so they
             # don’t have an area. They wouldn’t contribute to a broadcast
             # so we can ignore them.
-            if shapely_polygon.area == 0:
+            if simplified_polygon.area == 0:
                 print(  # noqa: T001
-                    f"{indent}Polygon {index + 1}/{len(polygons)} has 0 area, skipping"
+                    f"{indent}Polygon {index + 1}/{len(polygons)} has 0 area, skipping",
+                    flush=True,
                 )
                 continue
 
             print(  # noqa: T001
-                f"{indent}Polygon {index + 1}/{len(polygons)} needs fixing..."
+                f"{indent}Polygon {index + 1}/{len(polygons)} needs fixing...",
+                flush=True,
             )
-
-            # The simplest kind of invalid polygon is one that has two
-            # duplicate points in a row at a given precision, so the
-            # first thing to try is removing those points using
-            # simplification with a tolerance of 0
-            polygon_with_duplicate_points_removed = wkt.loads(
-                wkt.dumps(shapely_polygon, rounding_precision=5)
-            ).simplify(0)
-
-            if polygon_with_duplicate_points_removed.is_valid:
-                yield polygon_with_duplicate_points_removed
-                continue
 
             # Buffering with a size of 0 is a trick to make valid
             # geometries from polygons that self intersect
@@ -101,10 +104,14 @@ def clean_up_invalid_polygons(polygons, indent="    "):
             # Make sure the polygon is now valid, and that we haven’t
             # drastically transformed the polygon by ‘fixing’ it
             assert fixed_polygon.is_valid
-            assert isclose(fixed_polygon.area, polygon.area, rel_tol=0.001)
+            assert isclose(fixed_polygon.area, shapely_polygon.area, rel_tol=0.001), (
+                wkt.dumps(shapely_polygon),
+                wkt.dumps(fixed_polygon),
+            )
 
             print(  # noqa: T001
-                f"{indent}Polygon {index + 1}/{len(polygons)} fixed!"
+                f"{indent}Polygon {index + 1}/{len(polygons)} fixed!",
+                flush=True,
             )
 
             yield fixed_polygon
@@ -115,13 +122,21 @@ def polygons_and_simplified_polygons(feature):
         # cheat and shortcut out
         return [], []
 
-    polygons = Polygons(simplify_geometry(feature))
-    polygons = list(clean_up_invalid_polygons(polygons))
-    polygons = Polygons(polygons)
+    raw_polygons = simplify_geometry(feature)
+    clean_raw_polygons = [
+        [[x, y] for x, y in polygon.exterior.coords]
+        for polygon in clean_up_invalid_polygons(raw_polygons)
+    ]
+    polygons = Polygons(clean_raw_polygons)
 
     full_resolution = polygons.remove_too_small
     smoothed = full_resolution.smooth
     simplified = smoothed.simplify
+
+    if not (len(full_resolution) or len(simplified)):
+        raise RuntimeError(
+            'Polygon of 0 size found'
+        )
 
     print(  # noqa: T001
         f'    Original:{full_resolution.point_count: >5} points'
@@ -138,6 +153,8 @@ def polygons_and_simplified_polygons(feature):
             'Polygons.perimeter_to_buffer_ratio)'
         )
 
+    full_resolution_output = full_resolution.as_coordinate_pairs_long_lat
+
     output = (
         full_resolution.as_coordinate_pairs_long_lat,
         simplified.as_coordinate_pairs_long_lat,
@@ -145,8 +162,11 @@ def polygons_and_simplified_polygons(feature):
 
     # Check that the simplification process hasn’t introduced bad data
     for dataset in output:
-        for polygon in dataset:
-            assert Polygon(polygon).is_valid
+        for index, polygon in enumerate(dataset):
+            assert Polygon(polygon).is_valid, (
+                wkt.dumps(Polygon(polygon)),
+                f'Polygon {index + 1}:', explain_validity(Polygon(polygon))
+            )
 
     return output
 

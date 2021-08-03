@@ -118,7 +118,8 @@ class BroadcastMessage(JSONModel):
         return Polygons(
             list(itertools.chain(*(
                 area.polygons for area in self.areas
-            )))
+            ))),
+            utm_crs=self.areas[0].polygons.utm_crs
         )
 
     @cached_property
@@ -130,7 +131,8 @@ class BroadcastMessage(JSONModel):
         polygons = Polygons(
             list(itertools.chain(*(
                 area.simple_polygons_with_bleed for area in self.areas
-            )))
+            ))),
+            utm_crs=self.areas[0].polygons.utm_crs
         )
         # If we’ve added multiple areas then we need to re-simplify the
         # combined shapes to keep the point count down
@@ -210,7 +212,8 @@ class BroadcastMessage(JSONModel):
         polygons = Polygons(
             list(itertools.chain(*(
                 area.simple_polygons for area in areas
-            )))
+            ))),
+            utm_crs=areas[0].simple_polygons.utm_crs
         )
         # If we’ve added multiple areas then we need to re-simplify the
         # combined shapes to keep the point count down
