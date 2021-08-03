@@ -76,6 +76,7 @@ from app.formatters import (
     recipient_count,
     recipient_count_label,
     round_to_significant_figures,
+    square_metres_to_square_miles,
     valid_phone_number,
 )
 from app.models.organisation import Organisation
@@ -572,6 +573,7 @@ def add_template_filters(application):
         message_count_noun,
         format_mobile_network,
         format_yes_no,
+        square_metres_to_square_miles,
     ]:
         application.add_template_filter(fn)
 

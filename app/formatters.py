@@ -524,3 +524,7 @@ def format_yes_no(value, yes='Yes', no='No', none='No'):
     if value is None:
         return none
     return yes if value else no
+
+
+def square_metres_to_square_miles(area):
+    return area * 3.86e-7

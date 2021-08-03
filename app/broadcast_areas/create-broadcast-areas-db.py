@@ -44,14 +44,30 @@ def simplify_geometry(feature):
 
 
 def clean_up_invalid_polygons(polygons, indent="    "):
+    """
+    This function expects a list of lists of coordinates defined in degrees
+    """
     for index, polygon in enumerate(polygons):
         shapely_polygon = Polygon(polygon)
 
-        if shapely_polygon.is_valid:
+        # Some of our data has points which are incredibly close
+        # together. In some cases they are close enough to be duplicates
+        # at a given precision, which makes an invalid topology. In
+        # other cases they are close enough that, when converting from
+        # one coordinate system to another, they shift about enough to
+        # create self-intersection. The fix in both cases is to reduce
+        # the precision of the coordinates and then apply simplification
+        # with a tolerance of 0.
+        simplified_polygon = wkt.loads(wkt.dumps(
+            shapely_polygon,
+            rounding_precision=Polygons.output_precision_in_decimal_places - 1
+        )).simplify(0)
+
+        if simplified_polygon.is_valid:
             print(  # noqa: T001
                 f"{indent}Polygon {index + 1}/{len(polygons)} is valid"
             )
-            yield polygon
+            yield simplified_polygon
 
         else:
             invalid_polygons.append(shapely_polygon)
@@ -59,7 +75,7 @@ def clean_up_invalid_polygons(polygons, indent="    "):
             # We’ve found polygons where all the points line up, so they
             # don’t have an area. They wouldn’t contribute to a broadcast
             # so we can ignore them.
-            if shapely_polygon.area == 0:
+            if simplified_polygon.area == 0:
                 print(  # noqa: T001
                     f"{indent}Polygon {index + 1}/{len(polygons)} has 0 area, skipping"
                 )
@@ -68,18 +84,6 @@ def clean_up_invalid_polygons(polygons, indent="    "):
             print(  # noqa: T001
                 f"{indent}Polygon {index + 1}/{len(polygons)} needs fixing..."
             )
-
-            # The simplest kind of invalid polygon is one that has two
-            # duplicate points in a row at a given precision, so the
-            # first thing to try is removing those points using
-            # simplification with a tolerance of 0
-            polygon_with_duplicate_points_removed = wkt.loads(
-                wkt.dumps(shapely_polygon, rounding_precision=5)
-            ).simplify(0)
-
-            if polygon_with_duplicate_points_removed.is_valid:
-                yield polygon_with_duplicate_points_removed
-                continue
 
             # Buffering with a size of 0 is a trick to make valid
             # geometries from polygons that self intersect
@@ -101,7 +105,7 @@ def clean_up_invalid_polygons(polygons, indent="    "):
             # Make sure the polygon is now valid, and that we haven’t
             # drastically transformed the polygon by ‘fixing’ it
             assert fixed_polygon.is_valid
-            assert isclose(fixed_polygon.area, polygon.area, rel_tol=0.001)
+            assert isclose(fixed_polygon.area, shapely_polygon.area, rel_tol=0.001)
 
             print(  # noqa: T001
                 f"{indent}Polygon {index + 1}/{len(polygons)} fixed!"
@@ -115,13 +119,21 @@ def polygons_and_simplified_polygons(feature):
         # cheat and shortcut out
         return [], []
 
-    polygons = Polygons(simplify_geometry(feature))
-    polygons = list(clean_up_invalid_polygons(polygons))
-    polygons = Polygons(polygons)
+    raw_polygons = simplify_geometry(feature)
+    clean_raw_polygons = [
+        [[x, y] for x, y in polygon.exterior.coords]
+        for polygon in clean_up_invalid_polygons(raw_polygons)
+    ]
+    polygons = Polygons(clean_raw_polygons)
 
     full_resolution = polygons.remove_too_small
     smoothed = full_resolution.smooth
     simplified = smoothed.simplify
+
+    if not (len(full_resolution) or len(simplified)):
+        raise RuntimeError(
+            'Polygon of 0 size found'
+        )
 
     print(  # noqa: T001
         f'    Original:{full_resolution.point_count: >5} points'

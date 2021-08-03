@@ -101,7 +101,7 @@ def test_has_polygons():
     assert len(scotland.polygons) == 195
 
     assert england.polygons.as_coordinate_pairs_lat_long[0][0] == [
-        55.811085, -2.034358  # https://goo.gl/maps/wsf2LUWzYinwydMk8
+        55.81108, -2.03436  # https://goo.gl/maps/HMFHGogohXdh9ggo8
     ]
 
 
@@ -276,24 +276,24 @@ def test_estimate_number_of_smartphones_for_population(
 @pytest.mark.parametrize('area, expected_phones_per_square_mile', (
     (
         # Islington (most dense in UK)
-        'lad20-E09000019', 21_348
+        'lad20-E09000019', 34_281
     ),
     (
         # Cordwainer Ward (City of London)
         # This is higher than Islington because we inflate the
         # popualtion to account for daytime workers
-        'wd20-E05009300', 310_674
+        'wd20-E05009300', 496_480
     ),
     (
         # Crewe East
-        'wd20-E05008621', 2_078),
+        'wd20-E05008621', 3_460),
     (
         # Eden (Cumbria, least dense in England)
-        'lad20-E07000030', 25.57
+        'lad20-E07000030', 44.12
     ),
     (
         # Highland (least dense in UK)
-        'lad20-S12000017', 4.40
+        'lad20-S12000017', 8.18
     ),
 ))
 def test_phone_density(
@@ -305,43 +305,39 @@ def test_phone_density(
     )
 
 
-@pytest.mark.parametrize('area, expected_bleed_in_m, expected_bleed_in_degrees', (
+@pytest.mark.parametrize('area, expected_bleed_in_m', (
     (
         # Islington (most dense in UK)
-        'lad20-E09000019', 500, 0.00449
+        'lad20-E09000019', 500
     ),
     (
         # Cordwainer Ward (City of London)
         # Special case because of inflated daytime population
-        'wd20-E05009300', 500, 0.00449
+        'wd20-E05009300', 500
     ),
     (
         # Crewe East
-        'wd20-E05008621', 1_752, 0.01574
+        'wd20-E05008621', 1_476
     ),
     (
         # Eden (Cumbria, least dense in England)
-        'lad20-E07000030', 4_140, 0.0372
+        'lad20-E07000030', 3_844
     ),
     (
         # Highland (least dense in UK)
-        'lad20-S12000017', 5_000, 0.0449
+        'lad20-S12000017', 4_759
     ),
     (
         # No population data available
-        'test-santa-claus-village-rovaniemi-a', 1_500, 0.01347
+        'test-santa-claus-village-rovaniemi-a', 1_500
     )
 ))
 def test_estimated_bleed(
-    area, expected_bleed_in_m, expected_bleed_in_degrees,
+    area, expected_bleed_in_m
 ):
     assert close_enough(
         broadcast_area_libraries.get_areas([area])[0].estimated_bleed_in_m,
         expected_bleed_in_m,
-    )
-    assert close_enough(
-        broadcast_area_libraries.get_areas([area])[0].estimated_bleed_in_degrees,
-        expected_bleed_in_degrees,
     )
 
 
@@ -362,7 +358,7 @@ def test_estimated_bleed(
             'Stoke Bishop',
             'Windmill Hill',
         ],
-        73_119,
+        72_817,
     ),
     (
         SKYE,
@@ -372,7 +368,7 @@ def test_estimated_bleed(
             'Na Hearadh agus Ceann a Deas nan Loch',
             'Wester Ross, Strathpeffer and Lochalsh',
         ],
-        3_534,
+        3_413,
     ),
 ))
 def test_count_of_phones_for_custom_area(

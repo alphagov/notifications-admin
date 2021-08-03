@@ -221,7 +221,8 @@ class BroadcastMessage(JSONModel):
         polygons = Polygons(
             list(itertools.chain(*(
                 getattr(area, area_attribute) for area in self.areas
-            )))
+            ))),
+            utm_crs=self.areas[0].polygons.utm_polygons.utm_crs,
         )
         if area_attribute != 'polygons' and len(self.areas) > 1:
             # We’re combining simplified polygons from multiple areas so we
