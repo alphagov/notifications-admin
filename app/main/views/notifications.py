@@ -17,7 +17,7 @@ from flask import (
     stream_with_context,
     url_for,
 )
-from notifications_python_client.errors import APIError
+from notifications_python_client.errors import APIError, HTTPError
 from notifications_utils.letter_timings import (
     get_letter_timings,
     letter_can_be_cancelled,
@@ -185,7 +185,14 @@ def view_notification(service_id, notification_id):
 def cancel_letter(service_id, notification_id):
 
     if request.method == 'POST':
-        notification_api_client.update_notification_to_cancelled(current_service.id, notification_id)
+        try:
+            notification_api_client.update_notification_to_cancelled(current_service.id, notification_id)
+        except HTTPError as e:
+            message_fragments = ["already been cancelled", "too late to cancel"]
+            if e.status_code == 400 and any(fragment in e.message for fragment in message_fragments):
+                flash(e.message)
+            else:
+                raise e
         return redirect(url_for('main.view_notification', service_id=service_id, notification_id=notification_id))
 
     flash("Are you sure you want to cancel sending this letter?", 'cancel')
