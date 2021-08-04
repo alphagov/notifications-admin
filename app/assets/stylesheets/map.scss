@@ -1,0 +1,148 @@
+@import 'leaflet/dist/leaflet';
+
+// Styles to make the leaflet map match GOVUK (accessibility-focused) styling
+
+@import "settings/all";
+@import "helpers/all";
+
+// Reset focus colour to latest version, to match the rest of the app
+$govuk-focus-colour: #FFDD00;
+$zoom-button-colour: govuk-colour("white");
+$zoom-button-hover-colour: govuk-shade($zoom-button-colour, 10%);
+
+// The focus style is a 2-colour outline, made to match the GOVUK text input focus style.
+// When colours are overridden, for example when users have a dark mode, box-shadows disappear,
+// so the outline which is left as a single colour (defined by the OS, to replace 'transparent').
+//
+// Leaflet adds focus styles with JS, through inline styles. Because of their higher precedence
+// we need to mark our overrides with !important.
+//
+// This also uses :focus-visible to stop it showing focus when you click zoom in/out.
+// This approach, taken from MDN, allows it to fall back to :focus for browsers without support:
+// https://developer.mozilla.org/en-US/docs/Web/CSS/:focus-visible#selectively_showing_the_focus_indicator
+.leaflet-container {
+
+  &:focus {
+    box-shadow: 0px 0px 0 3px $govuk-focus-text-colour, 0 0 0 6px $govuk-focus-colour;
+    outline: solid 3px transparent !important; // sass-lint:disable-line no-important
+  }
+
+  &:focus:not(:focus-visible) {
+    box-shadow: none;
+  }
+
+  &:focus-visible {
+    box-shadow: 0px 0px 0 3px $govuk-focus-text-colour, 0 0 0 6px $govuk-focus-colour;
+    outline: solid 3px transparent !important; // sass-lint:disable-line no-important
+
+    // You only see the outline in forced colour mode which doesn't have enough contrast with the
+    // map so this creates some space between them to mimic the two-colour default styling
+    @media (forced-colors: active) {
+      outline-offset: 3px;
+    }
+  }
+}
+
+// Overrides for zoom controls to make them match GOVUK buttons
+// https://design-system.service.gov.uk/components/button/
+//
+// GOVUK buttons have an invisible outline, used for high contrast modes. Our buttons are cropped by
+// their container so we use a border instead.
+//
+// Also introduces a black divider between the buttons, made with a pseudo element, appearing on
+// focus to mimic the 2-colour style GOVUK Frontend buttons and links have
+.leaflet-bar a {
+
+  // Allow it to contain the absolutely positioned divider bar we show between buttons
+  // when one is focused
+  &:last-child {
+    position: relative;
+  }
+
+  // Hover style is darker background
+  &:hover {
+    background-color: $zoom-button-hover-colour;
+  }
+
+  // Styles that apply if focused with or without the :hover or :active state
+  &:focus {
+    // When colours are overridden, for example when users have a dark mode,
+    // backgrounds and box-shadows disappear, so we need to ensure there's a
+    // transparent outline which will be set to a visible colour by the OS.
+    border: solid 2px transparent;
+    box-sizing: border-box; // make sure height includes the border
+    line-height: 26px; // subtract the border from the height (normally 30px)
+
+    // The inline display box for the button text overlaps the button edge.
+    // This is only visible in high contrast mode because of the background colour being set.
+    @media (forced-colors: active) {
+      overflow: hidden;
+    }
+  }
+
+  // Focused style sets the button to the focus colour
+  &:focus:not(:active):not(:hover) {
+    color: $govuk-focus-text-colour;
+    background-color: $govuk-focus-colour;
+  }
+
+  // Retain the space between buttons now we're using the border in the focus style
+  &:first-child:focus {
+    margin-bottom: 1px;
+  }
+
+  // 3px divider between buttons as a version of the underline from the GOVUK focus style
+  &:last-child:focus:not(:active):not(:hover):before,
+  &:first-child:focus:not(:active):not(:hover) + a:before {
+    content: "";
+    position: absolute;
+    height: 2px;
+    background: $govuk-focus-text-colour;
+
+    @media (forced-colors: active) {
+      background: canvasText;
+    }
+  }
+
+  // Styles for the divider, specifc to the second button being focused
+  &:last-child:focus:not(:active):not(:hover):before {
+    left: -2px; // Subtract 2px left border
+    top: -3px; // Subtract 2px top border and position so it overlaps space above button
+    width: calc(100% + 4px); // Subtract borders
+  }
+
+  // Styles for the divider, specifc to the first button being focused
+  &:first-child:focus:not(:active):not(:hover) + a:before {
+    left: 0px; // No borders on parent of :before when not focused
+    top: -1px; // No borders so just overlap space above parent button
+    width: 100%;
+  }
+}
+
+// Extra block to override specific LeafletJS rounded-corners when buttons are focused
+.leaflet-touch .leaflet-bar a {
+  &:first-child:focus,
+  &:last-child:focus {
+    border-radius: initial;
+  }
+}
+
+// Map attribution links
+.leaflet-control-attribution {
+  & a {
+    &:focus {
+      // When colours are overridden, for example when users have a dark mode,
+      // backgrounds and box-shadows disappear, so we need to ensure there's a
+      // transparent outline which will be set to a visible colour.
+      outline: $govuk-focus-width solid transparent !important; // sass-lint:disable-line no-important
+      color: $govuk-focus-text-colour;
+      background: $govuk-focus-colour;
+      box-shadow: 0 -2px $govuk-focus-colour, 0 4px $govuk-focus-text-colour;
+    }
+
+    // use an extra prefix class to override LeafletJS CSS
+    .leaflet-bottom &:hover {
+      text-decoration: none;
+    }
+  }
+}
