@@ -20,14 +20,24 @@
       {% call row() %}
         {{ text_field('Name') }}
         {{ text_field(current_user.name) }}
-        {{ edit_field('Change', url_for('.user_profile_name')) }}
+        {{ edit_field(
+            'Change',
+            url_for('.user_profile_name'),
+            suffix='name'
+          )
+        }}
       {% endcall %}
 
       {% call row() %}
         {{ text_field('Email address') }}
         {{ text_field(current_user.email_address) }}
         {% if can_see_edit %}
-          {{ edit_field('Change', url_for('.user_profile_email')) }}
+          {{ edit_field(
+              'Change',
+              url_for('.user_profile_email'),
+              suffix='email address'
+            )
+          }}
         {% else %}
           {{ text_field('') }}
         {% endif %}
@@ -36,13 +46,23 @@
       {% call row() %}
         {{ text_field('Mobile number') }}
         {{ optional_text_field(current_user.mobile_number) }}
-        {{ edit_field('Change', url_for('.user_profile_mobile_number')) }}
+        {{ edit_field(
+            'Change',
+            url_for('.user_profile_mobile_number'),
+            suffix='mobile number'
+          )
+        }}
       {% endcall %}
 
       {% call row() %}
         {{ text_field('Password') }}
         {{ text_field('Last changed ' + current_user.password_changed_at|format_delta) }}
-        {{ edit_field('Change', url_for('.user_profile_password')) }}
+        {{ edit_field(
+            'Change',
+            url_for('.user_profile_password'),
+            suffix='password'
+          )
+        }}
       {% endcall %}
 
       {% if current_user.can_use_webauthn %}
@@ -52,7 +72,12 @@
             ('{} registered'.format(current_user.webauthn_credentials|length)) if current_user.webauthn_credentials else None,
             default='None registered'
           ) }}
-          {{ edit_field('Change', url_for('.user_profile_security_keys')) }}
+          {{ edit_field(
+              'Change',
+              url_for('.user_profile_security_keys'),
+              suffix='security keys'
+            )
+          }}
         {% endcall %}
       {% endif %}
 
@@ -60,7 +85,12 @@
         {% call row(id='disable-platform-admin') %}
           {{ text_field('Use platform admin view') }}
           {{ text_field('Yes' if not session.get('disable_platform_admin_view') else 'No') }}
-          {{ edit_field('Change', url_for('.user_profile_disable_platform_admin_view')) }}
+          {{ edit_field(
+              'Change',
+              url_for('.user_profile_disable_platform_admin_view'),
+              suffix='whether to use platform admin view'
+            )
+          }}
         {% endcall %}
       {% endif %}
 
