@@ -150,17 +150,17 @@ def polygons_and_simplified_polygons(feature):
             'Polygons.perimeter_to_buffer_ratio)'
         )
 
-    output = (
+    output = [
         full_resolution.as_coordinate_pairs_long_lat,
         simplified.as_coordinate_pairs_long_lat,
-    )
+    ]
 
     # Check that the simplification process hasn’t introduced bad data
     for dataset in output:
         for polygon in dataset:
             assert Polygon(polygon).is_valid
 
-    return output
+    return output + [simplified.utm_crs]
 
 
 def estimate_number_of_smartphones_in_area(country_or_ward_code):
@@ -268,13 +268,14 @@ def add_test_areas():
         print()  # noqa: T001
         print(f_name)  # noqa: T001
 
-        feature, _ = polygons_and_simplified_polygons(
+        feature, _, utm_crs = polygons_and_simplified_polygons(
             feature["geometry"]
         )
         areas_to_add.append([
             f'{dataset_id}-{f_id}', f_name,
             dataset_id, None,
             feature, feature,
+            utm_crs,
             0,
         ])
 
@@ -300,7 +301,7 @@ def add_demo_areas():
         print()  # noqa: T001
         print(f_name)  # noqa: T001
 
-        feature, _ = polygons_and_simplified_polygons(
+        feature, _, utm_crs = polygons_and_simplified_polygons(
             feature["geometry"]
         )
 
@@ -310,6 +311,7 @@ def add_demo_areas():
             f'{dataset_id}-{f_id}', f_name,
             dataset_id, None,
             feature, feature,
+            utm_crs,
             f_count_of_phones,
         ])
 
@@ -334,13 +336,14 @@ def add_countries():
         print()  # noqa: T001
         print(f_name)  # noqa: T001
 
-        feature, simple_feature = (
+        feature, simple_feature, utm_crs = (
             polygons_and_simplified_polygons(feature["geometry"])
         )
         areas_to_add.append([
             f'ctry19-{f_id}', f_name,
             dataset_id, None,
             feature, simple_feature,
+            utm_crs,
             estimate_number_of_smartphones_in_area(f_id),
         ])
 
@@ -376,7 +379,7 @@ def _add_electoral_wards(dataset_id):
         try:
             la_id = "lad20-" + ward_code_to_la_id_mapping[ward_code]
 
-            feature, simple_feature = (
+            feature, simple_feature, utm_crs = (
                 polygons_and_simplified_polygons(feature["geometry"])
             )
 
@@ -387,6 +390,7 @@ def _add_electoral_wards(dataset_id):
                 ward_id, ward_name,
                 dataset_id, la_id,
                 feature, simple_feature,
+                utm_crs,
                 estimate_number_of_smartphones_in_area(ward_code),
             ])
 
@@ -409,7 +413,7 @@ def _add_local_authorities(dataset_id):
 
         group_id = "lad20-" + la_id
 
-        feature, simple_feature = (
+        feature, simple_feature, utm_crs = (
             polygons_and_simplified_polygons(feature["geometry"])
         )
 
@@ -421,6 +425,7 @@ def _add_local_authorities(dataset_id):
             'ctyua19-' + ctyua_id if ctyua_id else None,
             feature,
             simple_feature,
+            utm_crs,
             None,
         ])
     repo.insert_broadcast_areas(areas_to_add, keep_old_polygons)
@@ -439,7 +444,7 @@ def _add_counties_and_unitary_authorities(dataset_id):
 
         group_id = "ctyua19-" + ctyua_id
 
-        feature, simple_feature = (
+        feature, simple_feature, utm_crs = (
             polygons_and_simplified_polygons(feature["geometry"])
         )
 
@@ -447,6 +452,7 @@ def _add_counties_and_unitary_authorities(dataset_id):
             group_id, group_name,
             dataset_id, None,
             feature, simple_feature,
+            utm_crs,
             None,
         ])
 

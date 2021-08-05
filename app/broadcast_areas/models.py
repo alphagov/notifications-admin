@@ -95,20 +95,27 @@ class BroadcastArea(BaseBroadcastArea, SortableMixin):
     @classmethod
     def from_row_with_simple_polygons(cls, row):
         instance = cls(row[:4])
-        instance.simple_polygons = Polygons(row[4])
+        instance.simple_polygons = Polygons(
+            row[4],
+            utm_crs=row[5],
+        )
         return instance
 
     @cached_property
     def polygons(self):
+        polygons, utm_crs = BroadcastAreasRepository().get_polygons_for_area(self.id)
         return Polygons(
-            BroadcastAreasRepository().get_polygons_for_area(self.id)
+            polygons, utm_crs=utm_crs
         )
 
     @cached_property
     def simple_polygons(self):
-        return Polygons(
+        simple_polygons, utm_crs = (
             BroadcastAreasRepository().get_simple_polygons_for_area(self.id)
         )
+        return Polygons(
+            simple_polygons, utm_crs=utm_crs
+        ).utm_polygons
 
     @cached_property
     def sub_areas(self):
