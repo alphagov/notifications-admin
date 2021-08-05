@@ -61,9 +61,9 @@ class BaseBroadcastArea(ABC):
 
     @cached_property
     def phone_density(self):
-        if not self.polygons.estimated_area:
+        if not self.simple_polygons.estimated_area:
             return 0
-        return self.count_of_phones / square_metres_to_square_miles(self.polygons.estimated_area)
+        return self.count_of_phones / square_metres_to_square_miles(self.simple_polygons.estimated_area)
 
     @property
     def estimated_bleed_in_m(self):
@@ -160,9 +160,11 @@ class CustomBroadcastArea(BaseBroadcastArea):
 
     @classmethod
     def from_polygon_objects(cls, polygon_objects):
-        return cls(name=None, polygons=polygon_objects.as_coordinate_pairs_lat_long)
+        instance = cls(name=None)
+        instance.polygons = polygon_objects
+        return instance
 
-    @property
+    @cached_property
     def polygons(self):
         return Polygons(
             # Polygons in the DB are stored with the coordinate pair
@@ -189,7 +191,7 @@ class CustomBroadcastArea(BaseBroadcastArea):
         return broadcast_area_libraries.get_areas_with_simple_polygons([
             # We only index electoral wards in the RTree
             overlap.data for overlap in rtree_index.query(
-                Rect(*self.polygons.bounds)
+                Rect(*self.simple_polygons.bounds)
             )
         ])
 

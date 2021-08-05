@@ -276,24 +276,24 @@ def test_estimate_number_of_smartphones_for_population(
 @pytest.mark.parametrize('area, expected_phones_per_square_mile', (
     (
         # Islington (most dense in UK)
-        'lad20-E09000019', 34_281
+        'lad20-E09000019', 32_662
     ),
     (
         # Cordwainer Ward (City of London)
         # This is higher than Islington because we inflate the
         # popualtion to account for daytime workers
-        'wd20-E05009300', 496_480
+        'wd20-E05009300', 392_870
     ),
     (
         # Crewe East
-        'wd20-E05008621', 3_460),
+        'wd20-E05008621', 3_289),
     (
         # Eden (Cumbria, least dense in England)
-        'lad20-E07000030', 44.12
+        'lad20-E07000030', 43.41
     ),
     (
         # Highland (least dense in UK)
-        'lad20-S12000017', 8.18
+        'lad20-S12000017', 6.97
     ),
 ))
 def test_phone_density(
@@ -317,15 +317,15 @@ def test_phone_density(
     ),
     (
         # Crewe East
-        'wd20-E05008621', 1_476
+        'wd20-E05008621', 1_504
     ),
     (
         # Eden (Cumbria, least dense in England)
-        'lad20-E07000030', 3_844
+        'lad20-E07000030', 3_852
     ),
     (
         # Highland (least dense in UK)
-        'lad20-S12000017', 4_759
+        'lad20-S12000017', 4_846
     ),
     (
         # No population data available

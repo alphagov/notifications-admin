@@ -88,7 +88,7 @@ class BroadcastMessage(JSONModel):
             broadcast_message_id=broadcast_message_id,
         ))
 
-    @property
+    @cached_property
     def areas(self):
         if 'ids' in self._dict['areas']:
             library_areas = self.get_areas(self.area_ids)
