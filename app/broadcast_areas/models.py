@@ -55,7 +55,6 @@ class BaseBroadcastArea(ABC):
 
     @cached_property
     def simple_polygons_with_bleed(self):
-        print("broadcast_area.simple_polygons_with_bleed", self.name)
         return self.simple_polygons.bleed_by(self.estimated_bleed_in_m)
 
     @cached_property
@@ -66,7 +65,6 @@ class BaseBroadcastArea(ABC):
 
     @property
     def estimated_bleed_in_m(self):
-        print("broadcast_area.estimated_bleed_in_m", self.name)
         '''
         Estimates the amount of bleed based on the population of an
         area. Higher density areas tend to have short range masts, so
@@ -102,9 +100,12 @@ class BroadcastArea(BaseBroadcastArea, SortableMixin):
 
     @cached_property
     def simple_polygons(self):
-        return Polygons(
+        simple_polygons, utm_crs = (
             BroadcastAreasRepository().get_simple_polygons_for_area(self.id)
         )
+        return Polygons(
+            simple_polygons, utm_crs=utm_crs
+        ).utm_polygons
 
     @cached_property
     def sub_areas(self):

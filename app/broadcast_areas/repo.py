@@ -54,7 +54,8 @@ class BroadcastAreasRepository(object):
             CREATE TABLE broadcast_area_polygons (
                 id TEXT PRIMARY KEY,
                 polygons TEXT NOT NULL,
-                simple_polygons TEXT NOT NULL
+                simple_polygons TEXT NOT NULL,
+                utm_crs TEXT NOT NULL
             )""")
 
             conn.execute("""
@@ -98,19 +99,19 @@ class BroadcastAreasRepository(object):
         features_q = """
         INSERT INTO broadcast_area_polygons (
             id,
-            polygons, simple_polygons
+            polygons, simple_polygons, utm_crs
         )
-        VALUES (?, ?, ?)
+        VALUES (?, ?, ?, ?)
         """
 
         with self.conn() as conn:
-            for id, name, area_id, group, polygons, simple_polygons, count_of_phones in areas:
+            for id, name, area_id, group, polygons, simple_polygons, utm_crs, count_of_phones in areas:
                 conn.execute(areas_q, (
                     id, name, area_id, group, count_of_phones
                 ))
                 if not keep_old_features:
                     conn.execute(features_q, (
-                        id, json.dumps(polygons), json.dumps(simple_polygons),
+                        id, json.dumps(polygons), json.dumps(simple_polygons), utm_crs
                     ))
 
     def query(self, sql, *args):
@@ -242,11 +243,11 @@ class BroadcastAreasRepository(object):
 
     def get_simple_polygons_for_area(self, area_id):
         q = """
-        SELECT simple_polygons
+        SELECT simple_polygons, utm_crs
         FROM broadcast_area_polygons
         WHERE id = ?
         """
 
         results = self.query(q, area_id)
 
-        return json.loads(results[0][0])
+        return json.loads(results[0][0]), results[0][1]
