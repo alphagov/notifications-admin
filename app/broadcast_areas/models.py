@@ -164,7 +164,7 @@ class CustomBroadcastArea(BaseBroadcastArea):
 
     simple_polygons = polygons
 
-    @property
+    @cached_property
     def overlapping_areas(self):
         if not self.polygons:
             return []
