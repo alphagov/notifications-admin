@@ -36,13 +36,14 @@ def test_overview_page_shows_disable_for_platform_admin(
     page = client_request.get('main.user_profile')
     assert page.select_one('h1').text.strip() == 'Your profile'
     disable_platform_admin_row = page.select_one('#disable-platform-admin')
-    assert ' '.join(disable_platform_admin_row.text.split()) == 'Use platform admin view Yes Change'
+    assert ' '.join(disable_platform_admin_row.text.split()) == \
+        'Use platform admin view Yes Change whether to use platform admin view'
 
 
 @pytest.mark.parametrize('key_count, expected_row_text', [
-    (0, 'Security keys None registered Change'),
-    (1, 'Security keys 1 registered Change'),
-    (2, 'Security keys 2 registered Change'),
+    (0, 'Security keys None registered Change security keys'),
+    (1, 'Security keys 1 registered Change security keys'),
+    (2, 'Security keys 2 registered Change security keys'),
 ])
 def test_overview_page_shows_security_keys_if_user_they_can_use_webauthn(
     mocker,
