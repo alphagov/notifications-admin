@@ -130,7 +130,7 @@ class BroadcastAreasRepository(object):
         SELECT id, name, count_of_phones, broadcast_area_library_id
         FROM broadcast_areas
         WHERE id IN ({})
-        """.format(("?," * len(area_ids))[:-1])
+        """.format(",".join("?" * len(area_ids)))
 
         results = self.query(q, *area_ids)
 
@@ -147,7 +147,7 @@ class BroadcastAreasRepository(object):
         FROM broadcast_areas
         JOIN broadcast_area_polygons on broadcast_area_polygons.id = broadcast_areas.id
         WHERE broadcast_areas.id IN ({})
-        """.format(("?," * len(area_ids))[:-1])
+        """.format(",".join("?" * len(area_ids)))
 
         results = self.query(q, *area_ids)
 
