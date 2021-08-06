@@ -227,18 +227,11 @@ class BroadcastAreaLibraries(SerialisedModelCollection, GetItemByIdMixin):
     def __init__(self):
         self.items = BroadcastAreasRepository().get_libraries()
 
-    def get_areas(self, *area_ids):
-        # allow people to call `get_areas('a', 'b') or get_areas(['a', 'b'])`
-        if len(area_ids) == 1 and isinstance(area_ids[0], list):
-            area_ids = area_ids[0]
-
+    def get_areas(self, area_ids):
         areas = BroadcastAreasRepository().get_areas(area_ids)
         return [BroadcastArea(area) for area in areas]
 
-    def get_areas_with_simple_polygons(self, *area_ids):
-        if len(area_ids) == 1 and isinstance(area_ids[0], list):
-            area_ids = area_ids[0]
-
+    def get_areas_with_simple_polygons(self, area_ids):
         areas = BroadcastAreasRepository().get_areas_with_simple_polygons(area_ids)
         return [BroadcastArea.from_row_with_simple_polygons(area) for area in areas]
 
