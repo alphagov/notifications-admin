@@ -77,40 +77,25 @@ def test_loads_areas_from_libraries(id):
     assert (
         broadcast_area_libraries.get('ctry19').get(id)
     ) == (
-        broadcast_area_libraries.get_areas(id)[0]
+        broadcast_area_libraries.get_areas([id])[0]
     )
 
 
 def test_get_names_of_areas():
-    areas = broadcast_area_libraries.get_areas(
+    areas = broadcast_area_libraries.get_areas([
         'ctry19-W92000004',
         'lad20-W06000014',
         'ctry19-E92000001',
-    )
+    ])
     assert [area.name for area in sorted(areas)] == [
         'England', 'Vale of Glamorgan', 'Wales',
     ]
 
 
-def test_get_areas_accepts_lists():
-    areas_from_list = broadcast_area_libraries.get_areas(
-        [
-            'ctry19-W92000004',
-            'ctry19-E92000001',
-        ]
-    )
-    areas_from_args = broadcast_area_libraries.get_areas(
-        'ctry19-W92000004',
-        'ctry19-E92000001',
-    )
-    assert len(areas_from_args) == len(areas_from_list) == 2
-    assert areas_from_args == areas_from_list
-
-
 def test_has_polygons():
 
-    england = broadcast_area_libraries.get_areas('ctry19-E92000001')[0]
-    scotland = broadcast_area_libraries.get_areas('ctry19-S92000003')[0]
+    england = broadcast_area_libraries.get_areas(['ctry19-E92000001'])[0]
+    scotland = broadcast_area_libraries.get_areas(['ctry19-S92000003'])[0]
 
     assert len(england.polygons) == 35
     assert len(scotland.polygons) == 195
@@ -130,7 +115,7 @@ def test_polygons_are_enclosed():
 
 def test_lat_long_order():
 
-    england = broadcast_area_libraries.get_areas('ctry19-E92000001')[0]
+    england = broadcast_area_libraries.get_areas(['ctry19-E92000001'])[0]
 
     lat_long = england.polygons.as_coordinate_pairs_lat_long
     long_lat = england.polygons.as_coordinate_pairs_long_lat
@@ -212,13 +197,13 @@ def test_every_area_has_count_of_phones(library):
 
 ))
 def test_count_of_phones_for_all_levels(area_id, area_name, expected_count):
-    area = broadcast_area_libraries.get_areas(area_id)[0]
+    area = broadcast_area_libraries.get_areas([area_id])[0]
     assert area.name == area_name
     assert area.count_of_phones == expected_count
 
 
 def test_city_of_london_counts_are_not_derived_from_population():
-    city_of_london = broadcast_area_libraries.get_areas('lad20-E09000001')[0]
+    city_of_london = broadcast_area_libraries.get_areas(['lad20-E09000001'])[0]
 
     assert city_of_london.name == 'City of London'
     assert len(city_of_london.sub_areas) == len(CITY_OF_LONDON.WARDS) == 25
@@ -315,7 +300,7 @@ def test_phone_density(
     area, expected_phones_per_square_mile,
 ):
     assert close_enough(
-        broadcast_area_libraries.get_areas(area)[0].phone_density,
+        broadcast_area_libraries.get_areas([area])[0].phone_density,
         expected_phones_per_square_mile,
     )
 
@@ -351,11 +336,11 @@ def test_estimated_bleed(
     area, expected_bleed_in_m, expected_bleed_in_degrees,
 ):
     assert close_enough(
-        broadcast_area_libraries.get_areas(area)[0].estimated_bleed_in_m,
+        broadcast_area_libraries.get_areas([area])[0].estimated_bleed_in_m,
         expected_bleed_in_m,
     )
     assert close_enough(
-        broadcast_area_libraries.get_areas(area)[0].estimated_bleed_in_degrees,
+        broadcast_area_libraries.get_areas([area])[0].estimated_bleed_in_degrees,
         expected_bleed_in_degrees,
     )
 
@@ -377,7 +362,7 @@ def test_estimated_bleed(
             'Stoke Bishop',
             'Windmill Hill',
         ],
-        73_496,
+        73_119,
     ),
     (
         SKYE,
@@ -387,7 +372,7 @@ def test_estimated_bleed(
             'Na Hearadh agus Ceann a Deas nan Loch',
             'Wester Ross, Strathpeffer and Lochalsh',
         ],
-        3_517,
+        3_534,
     ),
 ))
 def test_count_of_phones_for_custom_area(

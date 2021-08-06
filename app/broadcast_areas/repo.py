@@ -130,12 +130,29 @@ class BroadcastAreasRepository(object):
         SELECT id, name, count_of_phones, broadcast_area_library_id
         FROM broadcast_areas
         WHERE id IN ({})
-        """.format(("?," * len(area_ids))[:-1])
+        """.format(",".join("?" * len(area_ids)))
 
         results = self.query(q, *area_ids)
 
         areas = [
             (row[0], row[1], row[2], row[3])
+            for row in results
+        ]
+
+        return areas
+
+    def get_areas_with_simple_polygons(self, area_ids):
+        q = """
+        SELECT broadcast_areas.id, name, count_of_phones, broadcast_area_library_id, simple_polygons
+        FROM broadcast_areas
+        JOIN broadcast_area_polygons on broadcast_area_polygons.id = broadcast_areas.id
+        WHERE broadcast_areas.id IN ({})
+        """.format(",".join("?" * len(area_ids)))
+
+        results = self.query(q, *area_ids)
+
+        areas = [
+            (row[0], row[1], row[2], row[3], json.loads(row[4]))
             for row in results
         ]
 

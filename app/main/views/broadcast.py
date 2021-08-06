@@ -287,7 +287,7 @@ def choose_broadcast_sub_area(service_id, broadcast_message_id, library_slug, ar
         broadcast_message_id,
         service_id=current_service.id,
     )
-    area = BroadcastMessage.libraries.get_areas(area_slug)[0]
+    area = BroadcastMessage.libraries.get_areas([area_slug])[0]
 
     back_link = _get_broadcast_sub_area_back_link(service_id, broadcast_message_id, library_slug)
 

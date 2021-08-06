@@ -18,9 +18,9 @@ from app.notify_client.broadcast_message_api_client import (
     broadcast_message_api_client,
 )
 
-ESTIMATED_AREA_OF_LARGEST_UK_COUNTY = broadcast_area_libraries.get_areas(
+ESTIMATED_AREA_OF_LARGEST_UK_COUNTY = broadcast_area_libraries.get_areas([
     'ctyua19-E10000023'  # North Yorkshire
-)[0].polygons.estimated_area
+])[0].polygons.estimated_area
 
 
 class BroadcastMessage(JSONModel):
@@ -172,14 +172,14 @@ class BroadcastMessage(JSONModel):
     def cancelled_by(self):
         return User.from_id(self.cancelled_by_id)
 
-    @property
+    @cached_property
     def count_of_phones(self):
         return round_to_significant_figures(
             sum(area.count_of_phones for area in self.areas),
             1
         )
 
-    @property
+    @cached_property
     def count_of_phones_likely(self):
         estimated_area = self.simple_polygons.estimated_area
 
@@ -203,7 +203,7 @@ class BroadcastMessage(JSONModel):
 
     def get_areas(self, areas):
         return broadcast_area_libraries.get_areas(
-            *areas
+            areas
         )
 
     def get_simple_polygons(self, areas):
