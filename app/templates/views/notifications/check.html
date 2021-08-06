@@ -8,9 +8,12 @@
   {{ "Error" if error else "Preview of ‘{}’".format(template.name) }}
 {% endblock %}
 
+{% block backLink %}
+  {{ govukBackLink({ "href": back_link }) }}
+{% endblock %}
+
 {% block maincolumn_content %}
   {% if template.template_type == 'letter' and current_service.trial_mode %}
-    {{ govukBackLink({ "href": back_link }) }}
     {% set error = 'trial-mode-letters' %}
     <div class="bottom-gutter">
       {% call banner_wrapper(type='dangerous') %}
@@ -22,7 +25,6 @@
       {% endcall %}
     </div>
   {% elif error == 'not-allowed-to-send-to' %}
-    {{ govukBackLink({ "href": back_link }) }}
     <div class="bottom-gutter">
       {% call banner_wrapper(type='dangerous') %}
         {% with
@@ -36,7 +38,6 @@
       {% endcall %}
     </div>
   {% elif error == 'too-many-messages' %}
-    {{ govukBackLink({ "href": back_link }) }}
     <div class="bottom-gutter">
       {% call banner_wrapper(type='dangerous') %}
         {% include "partials/check/too-many-messages.html" %}
@@ -44,7 +45,6 @@
     </div>
   {% elif error == 'message-too-long' %}
     {# the only row_errors we can get when sending one off messages is that the message is too long #}
-    {{ govukBackLink({ "href": back_link }) }}
     <div class="bottom-gutter">
       {% call banner_wrapper(type='dangerous') %}
         {% include "partials/check/message-too-long.html" %}
@@ -52,17 +52,13 @@
     </div>
   {% elif letter_too_long %}
     {% set error = 'letter-too-long' %}
-    {{ govukBackLink({ "href": back_link }) }}
     <div class="bottom-gutter">
       {% call banner_wrapper(type='dangerous') %}
           {% include "partials/check/letter-too-long.html" %}
       {% endcall %}
     </div>
   {% else %}
-    {{ page_header(
-      'Preview of ‘{}’'.format(template.name),
-      back_link=back_link
-    ) }}
+    {{ page_header('Preview of ‘{}’'.format(template.name)) }}
   {% endif %}
 
   {{ template|string }}

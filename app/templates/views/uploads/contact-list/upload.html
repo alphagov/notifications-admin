@@ -3,9 +3,16 @@
 {% from "components/file-upload.html" import file_upload %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/table.html" import list_table, text_field, index_field, index_field_heading %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% block service_page_title %}
   Upload an emergency contact list
+{% endblock %}
+
+{% block backLink %}
+  {% if not error %}
+    {{ govukBackLink({ "href": url_for('main.uploads', service_id=current_service.id) }) }}
+  {% endif %}
 {% endblock %}
 
 {% block maincolumn_content %}
@@ -17,10 +24,7 @@
       {% endif %}
     {% endcall %}
   {% else %}
-    {{ page_header(
-      'Upload an emergency contact list',
-      back_link=url_for('main.uploads', service_id=current_service.id)
-    ) }}
+    {{ page_header('Upload an emergency contact list') }}
     <p class="govuk-body">
       Save a list of staff email addresses or phone numbers in Notify.
     </p>

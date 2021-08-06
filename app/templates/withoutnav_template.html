@@ -8,6 +8,7 @@
       <a href="{{ url_for('main.show_accounts_or_dashboard') }}" class="govuk-link govuk-link--no-visited-state navigation-service-back-to">Back to {{ current_service.name }}</a>
     </div>
     {% endif %}
+    {% block backLink %}{% endblock %}
 {% endblock %}
 
 {% block content %}

@@ -3,17 +3,19 @@
 {% from "components/list.html" import list_of_placeholders %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/table.html" import list_table, field, right_aligned_field_heading, row_heading %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% block service_page_title %}
   Choose an emergency contact list
 {% endblock %}
 
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('.send_one_off', service_id=current_service.id, template_id=template.id) }) }}
+{% endblock %}
+
 {% block maincolumn_content %}
 
-  {{ page_header(
-    'Choose an emergency contact list',
-    back_link=url_for('.send_one_off', service_id=current_service.id, template_id=template.id)
-  ) }}
+  {{ page_header('Choose an emergency contact list') }}
 
   {% if template.placeholders %}
     <div class="govuk-grid-row">

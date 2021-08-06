@@ -9,11 +9,14 @@
   {{ page_title }}
 {% endblock %}
 
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('.user_profile') }) }}
+{% endblock %}
+
 {% block maincolumn_content %}
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-five-sixths">
-      {{ govukBackLink({ "href": url_for('.user_profile') }) }}
 
       {% call form_wrapper(class="govuk-!-margin-top-3") %}
         {{ form.enabled(param_extensions={

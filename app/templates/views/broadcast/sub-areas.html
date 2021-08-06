@@ -1,20 +1,22 @@
+{% extends "withnav_template.html" %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import sticky_page_footer %}
 {% from "components/form.html" import form_wrapper %}
 {% from "components/live-search.html" import live_search %}
-
-{% extends "withnav_template.html" %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% block service_page_title %}
   {{ page_title }}
 {% endblock %}
 
+
+{% block backLink %}
+  {{ govukBackLink({ "href": back_link }) }}
+{% endblock %}
+
 {% block maincolumn_content %}
 
-  {{ page_header(
-    page_title,
-    back_link=back_link,
-  )}}
+  {{ page_header(page_title)}}
 
   {% call form_wrapper() %}
 

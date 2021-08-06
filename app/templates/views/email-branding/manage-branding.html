@@ -3,17 +3,20 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% block service_page_title %}
   {{ '{} email branding'.format('Update' if email_branding else 'Create')}}
 {% endblock %}
 
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('.email_branding') }) }}
+{% endblock %}
+
 {% block platform_admin_content %}
 
-  {{ page_header(
-    '{} email branding'.format('Update' if email_branding else 'Add'),
-    back_link=url_for('.email_branding')
-  ) }}
+  {{ page_header('{} email branding'.format('Update' if email_branding else 'Add')) }}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-three-quarters">
       {% if logo %}

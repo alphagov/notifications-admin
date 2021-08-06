@@ -3,19 +3,21 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
-
+{% from "components/back-link/macro.njk" import govukBackLink %}
 {% from "components/textbox.html" import textbox %}
 
 {% block service_page_title %}
   Change billing details
 {% endblock %}
 
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.service_settings', service_id=current_service.id) }) }}
+{% endblock %}
+
 {% block maincolumn_content %}
 
-  {{ page_header(
-    'Change billing details',
-    back_link=url_for('main.service_settings', service_id=current_service.id)
-  ) }}
+  {{ page_header('Change billing details') }}
 
   {% call form_wrapper() %}
     {{ form.billing_contact_names(param_extensions={"classes": "govuk-!-width-full"}) }}

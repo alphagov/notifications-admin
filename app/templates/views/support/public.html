@@ -1,9 +1,14 @@
 {% extends "withoutnav_template.html" %}
 
 {% from "components/page-header.html" import page_header %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% block per_page_title %}
   The GOV.UK Notify service is for people who work in the government
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('.support') }) }}
 {% endblock %}
 
 {% block maincolumn_content %}
@@ -11,10 +16,7 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
 
-    {{ page_header(
-      'The GOV.UK Notify service is for people who work in the government',
-      back_link=url_for('.support')
-    ) }}
+    {{ page_header('The GOV.UK Notify service is for people who work in the government') }}
 
     <p class="govuk-body">
       We cannot give advice to the public. We do not have access to information about you held by government departments.

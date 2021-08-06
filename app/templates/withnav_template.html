@@ -22,7 +22,9 @@
       {% else %}
         <div class="govuk-grid-column-three-quarters">
       {% endif %}
-        {% block beforeContent %}{% endblock %}
+        {% block beforeContent %}
+          {% block backLink %}{% endblock %}
+        {% endblock %}
         <main class="govuk-main-wrapper column-main {{ mainClasses }}" id="main-content" role="main">
         {% block content %}
           {% include 'flash_messages.html' %}

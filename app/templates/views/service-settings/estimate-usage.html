@@ -3,9 +3,14 @@
 {% from "components/form.html" import form_wrapper %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% block service_page_title %}
   Tell us how many messages you expect to send
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.request_to_go_live', service_id=current_service.id) }) }}
 {% endblock %}
 
 {% block maincolumn_content %}
@@ -18,10 +23,7 @@
           </h1>
         {% endcall %}
       {% else %}
-        {{ page_header(
-          'Tell us how many messages you expect to send',
-          back_link=url_for('main.request_to_go_live', service_id=current_service.id)
-        ) }}
+        {{ page_header('Tell us how many messages you expect to send') }}
       {% endif %}
       {% call form_wrapper() %}
         <div class="form-group">

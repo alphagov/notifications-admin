@@ -2,17 +2,19 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% block service_page_title %}
   Data retention
 {% endblock %}
 
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('.edit_data_retention', service_id=current_service.id, data_retention_id=data_retention_id) }) }}
+{% endblock %}
+
 {% block maincolumn_content %}
 
-    {{ page_header(
-      'Set data retention',
-      back_link=url_for('.edit_data_retention', service_id=current_service.id, data_retention_id=data_retention_id)
-    ) }}
+    {{ page_header('Set data retention') }}
     {% call form_wrapper() %}
       {{ notification_type | capitalize}}
       {{  form.days_of_retention }}

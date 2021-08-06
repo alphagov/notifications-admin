@@ -3,17 +3,21 @@
 {% from "components/ajax-block.html" import ajax_block %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/page-header.html" import page_header %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% block service_page_title %}
   {{ job.original_file_name }}
 {% endblock %}
 
+{% block backLink %}
+  {% if not just_sent %}
+    {{ govukBackLink({ "href": url_for('main.uploads', service_id=current_service.id) }) }}
+  {% endif %}
+{% endblock %}
+
 {% block maincolumn_content %}
 
-    {{ page_header(
-      job.original_file_name,
-      back_link=None if just_sent else url_for('main.uploads', service_id=current_service.id)
-    ) }}
+    {{ page_header(job.original_file_name) }}
 
     {% if just_sent and job.template_type == 'letter' %}
       {{ banner(just_sent_message, type='default', with_tick=True) }}

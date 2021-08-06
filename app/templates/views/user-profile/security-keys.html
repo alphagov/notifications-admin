@@ -17,6 +17,10 @@
   {{ page_title }}
 {% endblock %}
 
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('.user_profile') }) }}
+{% endblock %}
+
 {% block maincolumn_content %}
 
 {% set webauthn_button %}
@@ -41,8 +45,6 @@
   }) }}
 {% endset %}
 
-
-  {{ govukBackLink({ "href": url_for('.user_profile') }) }}
   <div class="govuk-grid-row">
     {% if credentials %}
       <div class="govuk-grid-column-five-sixths">

@@ -1,9 +1,9 @@
+{% extends "withnav_template.html" %}
 {% from "components/button/macro.njk" import govukButton %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "views/broadcast/macros/area-map.html" import map %}
-
-{% extends "withnav_template.html" %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% block service_page_title %}
   Choose where to send this alert
@@ -17,12 +17,13 @@
   {% include "views/broadcast/partials/area-map-javascripts.html" %}
 {% endblock %}
 
+{% block backLink %}
+  {{ govukBackLink({ "href": back_link }) }}
+{% endblock %}
+
 {% block maincolumn_content %}
 
-  {{ page_header(
-    "Choose where to send this alert",
-    back_link=back_link
-  ) }}
+  {{ page_header("Choose where to send this alert") }}
 
   {% for area in broadcast_message.areas %}
     {% if loop.first %}

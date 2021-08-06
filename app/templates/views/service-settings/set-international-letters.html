@@ -2,19 +2,21 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% block service_page_title %}
   Send international letters
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.service_settings', service_id=current_service.id) }) }}
 {% endblock %}
 
 {% block maincolumn_content %}
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-five-sixths">
-      {{ page_header(
-        'Send international letters',
-        back_link=url_for('main.service_settings', service_id=current_service.id)
-      ) }}
+      {{ page_header('Send international letters') }}
       <p class="govuk-body">
         It costs more to send a letter to an international address.
       </p>

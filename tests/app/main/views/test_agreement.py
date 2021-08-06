@@ -19,14 +19,11 @@ class _MockS3Object():
         return {'Body': BytesIO(self.data)}
 
 
-@pytest.mark.parametrize('agreement_signed, crown, expected_links', [
+@pytest.mark.parametrize('agreement_signed, crown, expected_back_link, expected_other_links', [
     (
         True, True,
+        partial(url_for, 'main.request_to_go_live', service_id=SERVICE_ONE_ID),
         [
-            (
-                ['govuk-back-link'],
-                partial(url_for, 'main.request_to_go_live', service_id=SERVICE_ONE_ID),
-            ),
             (
                 ['govuk-link', 'govuk-link--no-visited-state'],
                 partial(url_for, 'main.service_download_agreement', service_id=SERVICE_ONE_ID),
@@ -35,11 +32,8 @@ class _MockS3Object():
     ),
     (
         False, False,
+        partial(url_for, 'main.request_to_go_live', service_id=SERVICE_ONE_ID),
         [
-            (
-                ['govuk-back-link'],
-                partial(url_for, 'main.request_to_go_live', service_id=SERVICE_ONE_ID),
-            ),
             (
                 ['govuk-link', 'govuk-link--no-visited-state'],
                 partial(url_for, 'main.service_download_agreement', service_id=SERVICE_ONE_ID),
@@ -52,11 +46,8 @@ class _MockS3Object():
     ),
     (
         False, True,
+        partial(url_for, 'main.request_to_go_live', service_id=SERVICE_ONE_ID),
         [
-            (
-                ['govuk-back-link'],
-                partial(url_for, 'main.request_to_go_live', service_id=SERVICE_ONE_ID),
-            ),
             (
                 ['govuk-link', 'govuk-link--no-visited-state'],
                 partial(url_for, 'main.service_download_agreement', service_id=SERVICE_ONE_ID),
@@ -69,11 +60,8 @@ class _MockS3Object():
     ),
     (
         None, None,
+        partial(url_for, 'main.request_to_go_live', service_id=SERVICE_ONE_ID),
         [
-            (
-                ['govuk-back-link'],
-                partial(url_for, 'main.request_to_go_live', service_id=SERVICE_ONE_ID),
-            ),
             (
                 ['govuk-link', 'govuk-link--no-visited-state'],
                 partial(url_for, 'main.support'),
@@ -89,7 +77,8 @@ def test_show_agreement_page(
     mock_has_jobs,
     agreement_signed,
     crown,
-    expected_links,
+    expected_back_link,
+    expected_other_links,
 ):
     org = organisation_json(
         crown=crown,
@@ -98,10 +87,14 @@ def test_show_agreement_page(
     mocker.patch('app.organisations_client.get_organisation', return_value=org)
 
     page = client_request.get('main.service_agreement', service_id=SERVICE_ONE_ID)
+
+    back_link = page.select_one('.govuk-back-link')
+    assert back_link['href'] == expected_back_link()
+
     links = page.select('main .govuk-grid-column-five-sixths a')
-    assert len(links) == len(expected_links)
+    assert len(links) == len(expected_other_links)
     for index, link in enumerate(links):
-        classes, url = expected_links[index]
+        classes, url = expected_other_links[index]
         assert link.get('class', []) == classes
         assert link['href'] == url()
 

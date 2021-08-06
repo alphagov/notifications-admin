@@ -2,9 +2,16 @@
 {% from "components/banner.html" import banner_wrapper %}
 {% from "components/file-upload.html" import file_upload %}
 {% from "components/page-header.html" import page_header %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% block service_page_title %}
   Upload a letter
+{% endblock %}
+
+{% block backLink %}
+  {% if not error %}
+    {{ govukBackLink({ "href": url_for('main.uploads', service_id=current_service.id) }) }}
+  {% endif %}
 {% endblock %}
 
 {% block maincolumn_content %}
@@ -18,10 +25,7 @@
         {% endif %}
       {% endcall %}
     {% else %}
-      {{ page_header(
-        'Upload a letter',
-        back_link=url_for('main.uploads', service_id=current_service.id)
-    ) }}
+      {{ page_header('Upload a letter') }}
     <p class="govuk-body">Upload a single letter as a PDF and we’ll print, pack and post it for you.</p>
     <p class="govuk-body">You can use this feature if you send a lot of one-off letters or if our reusable letter templates do not meet your needs.</p>
     {% endif %}

@@ -3,17 +3,19 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/table.html" import row_group, row, text_field, edit_field, field, boolean_field, list_table with context%}
 {% from "components/button/macro.njk" import govukButton %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% block service_page_title %}
   Text message senders
 {% endblock %}
 
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.service_settings', service_id=current_service.id) }) }}
+{% endblock %}
+
 {% block maincolumn_content %}
 
-  {{ page_header(
-    'Text message senders',
-    back_link=url_for('main.service_settings', service_id=current_service.id)
-  ) }}
+  {{ page_header('Text message senders') }}
 
   <div class="user-list">
     {% if not current_service.sms_senders %}

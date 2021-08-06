@@ -3,8 +3,13 @@
 {% from "components/page-footer.html" import page_footer, sticky_page_footer %}
 {% from "components/live-search.html" import live_search %}
 {% from "components/form.html" import form_wrapper %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% set page_title = "Set email branding" %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('.service_settings', service_id=current_service.id) }) }}
+{% endblock %}
 
 {% block service_page_title %}
   {{ page_title }}
@@ -12,10 +17,7 @@
 
 {% block maincolumn_content %}
 
-  {{ page_header(
-    page_title,
-    back_link=url_for('.service_settings', service_id=current_service.id)
-  ) }}
+  {{ page_header(page_title) }}
   {% call form_wrapper(data_kwargs={'preview-type': 'email'}) %}
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-full preview-pane">

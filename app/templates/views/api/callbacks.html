@@ -2,17 +2,18 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/table.html" import mapping_table, row, text_field, edit_field, optional_text_field with context %}
-
+{% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% block service_page_title %}
   Callbacks
 {% endblock %}
 
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.api_integration', service_id=current_service.id) }) }}
+{% endblock %}
+
 {% block maincolumn_content %}
-  {{ page_header(
-    'Callbacks',
-    back_link=url_for('main.api_integration', service_id=current_service.id)
-  ) }}
+  {{ page_header('Callbacks') }}
   <div class="bottom-gutter-3-2 dashboard-table body-copy-table">
 		{% call mapping_table(
 	    caption='General',

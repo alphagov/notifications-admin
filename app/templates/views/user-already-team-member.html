@@ -1,16 +1,18 @@
 {% extends "withnav_template.html" %}
 {% from "components/page-header.html" import page_header %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% block service_page_title %}
   This person is already a team member
 {% endblock %}
 
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.manage_users', service_id=current_service.id) }) }}
+{% endblock %}
+
 {% block maincolumn_content %}
 
-  {{ page_header(
-    'This person is already a team member',
-    back_link=url_for('main.manage_users', service_id=current_service.id)
-  ) }}
+  {{ page_header('This person is already a team member') }}
 
   <p class="govuk-body">
     {{ user_to_invite.name }} is already member of ‘{{ current_service.name }}’.

@@ -2,17 +2,19 @@
 {% from "components/table.html" import list_table, field, hidden_field_heading %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/button/macro.njk" import govukButton %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% block service_page_title %}
   API keys
 {% endblock %}
 
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.api_integration', service_id=current_service.id) }) }}
+{% endblock %}
+
 {% block maincolumn_content %}
 
-  {{ page_header(
-    'API keys',
-    back_link=url_for('main.api_integration', service_id=current_service.id)
-  ) }}
+  {{ page_header('API keys') }}
 
   <div class="body-copy-table">
     {% call(item, row_number) list_table(

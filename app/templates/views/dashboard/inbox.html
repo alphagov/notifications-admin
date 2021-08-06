@@ -1,18 +1,20 @@
+{% extends "withnav_template.html" %}
 {% from "components/ajax-block.html" import ajax_block %}
 {% from "components/page-header.html" import page_header %}
-
-{% extends "withnav_template.html" %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% block service_page_title %}
   Received text messages
 {% endblock %}
 
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.service_dashboard', service_id=current_service.id) }) }}
+{% endblock %}
+
 {% block maincolumn_content %}
 
-  {{ page_header(
-    'Received text messages',
-    back_link=url_for('main.service_dashboard', service_id=current_service.id)
-  ) }}
+  {{ page_header('Received text messages') }}
 
   {{ ajax_block(
     partials,

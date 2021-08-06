@@ -9,9 +9,11 @@
   Error
 {% endblock %}
 
-{% block maincolumn_content %}
-
+{% block backLink %}
   {{ govukBackLink({ "href": url_for('main.upload_contact_list', service_id=current_service.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
 
   <div class="bottom-gutter-1-2">
     {% call banner_wrapper(type='dangerous') %}

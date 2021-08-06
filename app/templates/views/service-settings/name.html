@@ -3,17 +3,20 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% block service_page_title %}
   Change your service name
 {% endblock %}
 
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.service_settings', service_id=current_service.id) }) }}
+{% endblock %}
+
 {% block maincolumn_content %}
 
-  {{ page_header(
-    'Change your service name',
-    back_link=url_for('main.service_settings', service_id=current_service.id)
-  ) }}
+  {{ page_header('Change your service name') }}
 
   <div class="form-group">
     {% if current_service.prefix_sms %}

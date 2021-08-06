@@ -4,6 +4,7 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/button/macro.njk" import govukButton %}
 {% from "components/skip-link/macro.njk" import govukSkipLink %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% set file_contents_header_id = 'file-preview' %}
 
@@ -11,12 +12,14 @@
   {{ "Preview of {}".format(template.name) }}
 {% endblock %}
 
+
+{% block backLink %}
+  {{ govukBackLink({ "href": back_link }) }}
+{% endblock %}
+
 {% block maincolumn_content %}
 
-  {{ page_header(
-    'Preview of {}'.format(template.name),
-    back_link=back_link
-  ) }}
+  {{ page_header('Preview of {}'.format(template.name)) }}
 
   {% if letter_too_long %}
     {% call banner_wrapper(type='dangerous') %}

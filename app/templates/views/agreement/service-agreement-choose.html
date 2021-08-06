@@ -1,8 +1,13 @@
 {% extends "withnav_template.html" %}
 {% from "components/page-header.html" import page_header %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% block service_page_title %}
   Accept the data sharing and financial agreement
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.request_to_go_live', service_id=current_service.id) }) }}
 {% endblock %}
 
 {% block maincolumn_content %}
@@ -10,10 +15,7 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-five-sixths">
 
-    {{ page_header(
-      'Accept the data sharing and financial agreement',
-      back_link=url_for('main.request_to_go_live', service_id=current_service.id)
-    )}}
+    {{ page_header('Accept the data sharing and financial agreement')}}
 
     <p class="govuk-body">
       Before you can use GOV.UK Notify, you need to accept our data sharing and financial agreement.

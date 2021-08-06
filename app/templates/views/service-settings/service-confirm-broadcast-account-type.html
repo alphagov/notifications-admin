@@ -3,19 +3,21 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% block service_page_title %}
   Confirm emergency alert settings
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('.service_set_broadcast_channel', service_id=current_service.id) }) }}
 {% endblock %}
 
 {% block maincolumn_content %}
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-five-sixths">
-      {{ page_header(
-        'Confirm emergency alert settings',
-        back_link=url_for('.service_set_broadcast_channel', service_id=current_service.id)
-      ) }}
+      {{ page_header('Confirm emergency alert settings') }}
       <p class="govuk-body">
         {{ broadcast_service_name_tag(
           form.account_type.service_mode == 'training',

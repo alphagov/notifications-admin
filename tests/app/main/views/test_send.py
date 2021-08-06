@@ -1550,8 +1550,7 @@ def test_send_one_off_offers_link_to_upload(
         template_id=fake_uuid,
         _follow_redirects=True,
     )
-
-    back_link = page.select('main a')[0]
+    back_link = page.select_one('.govuk-back-link')
     link = page.select_one('form a')
 
     assert back_link.text.strip() == 'Back'
@@ -1662,8 +1661,8 @@ def test_link_to_upload_not_offered_when_entering_personalisation(
     # We’re entering personalisation
     assert page.select_one('input[type=text]')['name'] == 'placeholder_value'
     assert page.select_one('label[for=placeholder_value]').text.strip() == 'name'
-    # …but first link on the page is ‘Back’, so not preceeded by ‘Upload’
-    assert page.select_one('main a').text == 'Back'
+    # No ‘Upload’ link shown
+    assert len(page.select('main a')) == 0
     assert 'Upload' not in page.select_one('main').text
 
 

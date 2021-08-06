@@ -3,17 +3,19 @@
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/banner.html" import banner_wrapper %}
 {% from "components/form.html" import form_wrapper %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% block service_page_title %}
   Create an API key
 {% endblock %}
 
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.api_keys', service_id=current_service.id) }) }}
+{% endblock %}
+
 {% block maincolumn_content %}
 
-  {{ page_header(
-    'Create an API key',
-    back_link=url_for('main.api_keys', service_id=current_service.id)
-  ) }}
+  {{ page_header('Create an API key') }}
 
   {% call form_wrapper() %}
     {{ form.key_name }}
