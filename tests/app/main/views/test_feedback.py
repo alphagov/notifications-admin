@@ -658,7 +658,7 @@ def test_bat_email_page(
     # Anonymous tickets don’t promise a reply
     (
         False, False, False,
-        'We’ll read your message in the next 30 minutes.',
+        'We’ll aim to read your message in the next 30 minutes.',
     ),
     (
         False, False, True,
@@ -669,7 +669,7 @@ def test_bat_email_page(
     # business hours
     (
         False, True, False,
-        'We’ll read your message in the next 30 minutes and reply within one working day.',
+        'We’ll aim to read your message in the next 30 minutes and we’ll reply within one working day.',
     ),
     (
         False, True, True,
