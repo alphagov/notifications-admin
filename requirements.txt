@@ -175,7 +175,7 @@ pyyaml==5.4.1
     #   notifications-utils
 redis==3.5.3
     # via flask-redis
-requests==2.25.1
+requests==2.26.0
     # via
     #   awscli-cwlogs
     #   govuk-bank-holidays
