@@ -252,7 +252,7 @@ class BroadcastMessage(JSONModel):
         if channel in {'test', 'operator'}:
             ttl = timedelta(hours=4, minutes=0)
         else:
-            ttl = timedelta(hours=23, minutes=59)
+            ttl = timedelta(hours=22, minutes=30)
 
         self._update(
             starts_at=datetime.utcnow().isoformat(),

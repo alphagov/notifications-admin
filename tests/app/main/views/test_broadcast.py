@@ -2380,10 +2380,10 @@ def test_user_without_approve_permission_cant_approve_broadcast_they_created(
     ('operator', '2020-02-23T02:22:22'),
     ('test', '2020-02-23T02:22:22'),
 
-    # 23 hours 59 minutes later
-    ('severe', '2020-02-23T22:21:22'),
-    ('government', '2020-02-23T22:21:22'),
-    (None, '2020-02-23T22:21:22'),  # Training mode
+    # 22 hours 30 minutes later
+    ('severe', '2020-02-23T20:52:22'),
+    ('government', '2020-02-23T20:52:22'),
+    (None, '2020-02-23T20:52:22'),  # Training mode
 ))
 @pytest.mark.parametrize(
     'trial_mode, initial_status, post_data, expected_approval, expected_redirect',
