@@ -7,6 +7,9 @@
         .on('click', function (event) {
           event.preventDefault();
 
+          // hide any existing error prompt
+          window.GOVUK.ErrorBanner.hideBanner();
+
           fetch('/webauthn/authenticate')
             .then(response => {
               if (!response.ok) {
@@ -67,9 +70,8 @@
             .catch(error => {
               console.error(error);
               // some browsers will show an error dialogue for some
-              // errors; to be safe we always pop up an alert
-              var message = error.message || error;
-              alert('Error during authentication.\n\n' + message);
+              // errors; to be safe we always display an error message on the page.
+              window.GOVUK.ErrorBanner.showBanner('Something went wrong');
             });
         });
     };

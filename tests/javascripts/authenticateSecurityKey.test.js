@@ -5,6 +5,10 @@ beforeAll(() => {
   // populate missing values to allow consistent jest.spyOn()
   window.fetch = () => { }
   window.navigator.credentials = { get: () => { } }
+  window.GOVUK.ErrorBanner = {
+    showBanner: () => {},
+    hideBanner: () => {}
+  };
 })
 
 afterAll(() => {
@@ -22,9 +26,6 @@ describe('Authenticate with security key', () => {
     // disable console.error() so we don't see it in test output
     // you might need to comment this out to debug some failures
     jest.spyOn(console, 'error').mockImplementation(() => { })
-
-    // ensure window.alert() is implemented to simplify errors
-    jest.spyOn(window, 'alert').mockImplementation(() => { })
 
     document.body.innerHTML = `
       <button type="submit" data-module="authenticate-security-key" data-csrf-token="abc123"></button>`
@@ -89,8 +90,8 @@ describe('Authenticate with security key', () => {
       done()
     })
 
-    // this will make the test fail if the alert is called
-    jest.spyOn(window, 'alert').mockImplementation((msg) => {
+    // this will make the test fail if the error banner is displayed
+    jest.spyOn(window.GOVUK.ErrorBanner, 'showBanner').mockImplementation((msg) => {
       done(msg)
     })
 
@@ -142,7 +143,7 @@ describe('Authenticate with security key', () => {
   test.each([
     ['network'],
     ['server'],
-  ])('alerts if fetching WebAuthn fails (%s error)', (errorType, done) => {
+  ])('errors if fetching WebAuthn fails (%s error)', (errorType, done) => {
     jest.spyOn(window, 'fetch').mockImplementation((_url) => {
       if (errorType == 'network') {
         return Promise.reject('error')
@@ -151,15 +152,15 @@ describe('Authenticate with security key', () => {
       }
     })
 
-    jest.spyOn(window, 'alert').mockImplementation((msg) => {
-      expect(msg).toEqual('Error during authentication.\n\nerror')
+    jest.spyOn(window.GOVUK.ErrorBanner, 'showBanner').mockImplementation((msg) => {
+      expect(msg).toEqual('Something went wrong')
       done()
     })
 
     button.click()
   })
 
-  test('alerts if comms with the authenticator fails', (done) => {
+  test('errors if comms with the authenticator fails', (done) => {
     jest.spyOn(window, 'fetch')
       .mockImplementationOnce((_url) => {
         const webauthnOptions = window.CBOR.encode('someArbitraryOptions')
@@ -173,8 +174,8 @@ describe('Authenticate with security key', () => {
       return Promise.reject(new DOMException('error'))
     })
 
-    jest.spyOn(window, 'alert').mockImplementation((msg) => {
-      expect(msg).toEqual('Error during authentication.\n\nerror')
+    jest.spyOn(window.GOVUK.ErrorBanner, 'showBanner').mockImplementation((msg) => {
+      expect(msg).toEqual('Something went wrong')
       done()
     })
 
@@ -184,7 +185,7 @@ describe('Authenticate with security key', () => {
   test.each([
     ['network error'],
     ['internal server error'],
-  ])('alerts if POSTing WebAuthn credentials fails (%s)', (errorType, done) => {
+  ])('errors if POSTing WebAuthn credentials fails (%s)', (errorType, done) => {
     jest.spyOn(window, 'fetch')
       .mockImplementationOnce((_url) => {
         const webauthnOptions = window.CBOR.encode('someArbitraryOptions')
@@ -220,8 +221,9 @@ describe('Authenticate with security key', () => {
       }
     })
 
-    jest.spyOn(window, 'alert').mockImplementation((msg) => {
-      expect(msg).toEqual('Error during authentication.\n\nerror')
+
+    jest.spyOn(window.GOVUK.ErrorBanner, 'showBanner').mockImplementation((msg) => {
+      expect(msg).toEqual('Something went wrong')
       done()
     })
 
@@ -266,8 +268,8 @@ describe('Authenticate with security key', () => {
       done()
     })
 
-    // this will make the test fail if the alert is called
-    jest.spyOn(window, 'alert').mockImplementation((msg) => {
+    // this will make the test fail if the error banner is displayed
+    jest.spyOn(window.GOVUK.ErrorBanner, 'showBanner').mockImplementation((msg) => {
       done(msg)
     })
 

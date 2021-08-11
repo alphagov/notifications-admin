@@ -21,6 +21,15 @@
 
 {% block maincolumn_content %}
 
+    {{ govukErrorMessage({
+      "classes": "banner-dangerous govuk-!-display-none",
+      "text": "There was a javascript error.",
+      "attributes": {
+        "aria-live": "polite",
+        "tabindex": '-1'
+      }
+    }) }}
+
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-one-half">
       {{ page_header(page_title) }}

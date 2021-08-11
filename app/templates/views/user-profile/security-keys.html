@@ -46,6 +46,16 @@
 {% endset %}
 
   <div class="govuk-grid-row">
+
+    {{ govukErrorMessage({
+      "classes": "banner-dangerous govuk-!-display-none",
+      "text": "There was a javascript error.",
+      "attributes": {
+        "aria-live": "polite",
+        "tabindex": '-1'
+      }
+    }) }}
+
     {% if credentials %}
       <div class="govuk-grid-column-five-sixths">
         {{ page_header(page_title) }}

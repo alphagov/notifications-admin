@@ -7,6 +7,9 @@
         .on('click', function(event) {
           event.preventDefault();
 
+          // hide any existing error prompt
+          window.GOVUK.ErrorBanner.hideBanner();
+
           fetch('/webauthn/register')
             .then((response) => {
               if (!response.ok) {
@@ -44,9 +47,9 @@
             .catch((error) => {
               console.error(error);
               // some browsers will show an error dialogue for some
-              // errors; to be safe we always pop up an alert
-              var message = error.message || error;
-              alert('Error during registration.\n\n' + message);
+              // errors; to be safe we always display an error message on the page.
+              const message = error.message || error;
+              window.GOVUK.ErrorBanner.showBanner('Something went wrong');
             });
         });
     };
