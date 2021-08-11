@@ -486,30 +486,3 @@ def test_confirm_agreement_page_persists(
         agreement_signed_by_id=fake_uuid,
         cached_service_ids=None,
     )
-
-
-@pytest.mark.parametrize('endpoint', (
-    'main.public_agreement',
-    'main.public_download_agreement',
-))
-@pytest.mark.parametrize('variant, expected_status', (
-    ('crown', 200),
-    ('non-crown', 200),
-    ('foo', 404),
-))
-def test_show_public_agreement_page(
-    client,
-    mocker,
-    endpoint,
-    variant,
-    expected_status,
-):
-    mocker.patch(
-        'app.s3_client.s3_mou_client.get_s3_object',
-        return_value=_MockS3Object()
-    )
-    response = client.get(url_for(
-        endpoint,
-        variant=variant,
-    ))
-    assert response.status_code == expected_status
