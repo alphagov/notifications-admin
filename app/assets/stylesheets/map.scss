@@ -51,72 +51,92 @@ $zoom-button-hover-colour: govuk-shade($zoom-button-colour, 10%);
 //
 // Also introduces a black divider between the buttons, made with a pseudo element, appearing on
 // focus to mimic the 2-colour style GOVUK Frontend buttons and links have
-.leaflet-bar a {
+.leaflet-bar {
+  border-radius: 0; // Remove rounded corners
 
-  // Allow it to contain the absolutely positioned divider bar we show between buttons
-  // when one is focused
-  &:last-child {
-    position: relative;
+  @media (forced-colors: active) {
+    background: canvasText;
   }
 
-  // Hover style is darker background
-  &:hover {
-    background-color: $zoom-button-hover-colour;
-  }
+  a {
 
-  // Styles that apply if focused with or without the :hover or :active state
-  &:focus {
-    // When colours are overridden, for example when users have a dark mode,
-    // backgrounds and box-shadows disappear, so we need to ensure there's a
-    // transparent outline which will be set to a visible colour by the OS.
-    border: solid 2px transparent;
-    box-sizing: border-box; // make sure height includes the border
-    line-height: 26px; // subtract the border from the height (normally 30px)
+    &:first-child {
+      // Remove rounded corners
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
+    }
 
-    // The inline display box for the button text overlaps the button edge.
-    // This is only visible in high contrast mode because of the background colour being set.
-    @media (forced-colors: active) {
-      overflow: hidden;
+    &:last-child {
+      // Allow it to contain the absolutely positioned divider bar we show between buttons
+      // when one is focused
+      position: relative;
+
+      // Remove rounded corners
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+
+    // Hover style is darker background
+    &:hover {
+      background-color: $zoom-button-hover-colour;
+    }
+
+    // Styles that apply if focused with or without the :hover or :active state
+    &:focus {
+      // When colours are overridden, for example when users have a dark mode,
+      // backgrounds and box-shadows disappear, so we need to ensure there's a
+      // outline so it can be set to a visible colour by the OS.
+      border: solid 2px $govuk-focus-colour;
+      box-sizing: border-box; // make sure height includes the border
+      line-height: 26px; // subtract the border from the height (normally 30px)
+
+      // The inline display box for the button text overlaps the button edge.
+      // This is only visible in high contrast mode because of the background colour being set.
+      @media (forced-colors: active) {
+        overflow: hidden;
+      }
+    }
+
+    // Focused style sets the button to the focus colour
+    &:focus:not(:active):not(:hover) {
+      color: $govuk-focus-text-colour;
+      background-color: $govuk-focus-colour;
+    }
+
+    // Retain the space between buttons now we're using the border in the focus style
+    &:first-child:focus {
+      margin-bottom: 1px;
+    }
+
+    // 3px divider between buttons as a version of the underline from the GOVUK focus style
+    &:last-child:focus:not(:active):not(:hover):before,
+    &:first-child:focus:not(:active):not(:hover) + a:before {
+      content: "";
+      position: absolute;
+      height: 2px;
+      background: $govuk-focus-text-colour;
+
+      // hide for focus:hover state
+      @media (forced-colors: active) {
+        display: none;
+      }
+    }
+
+    // Styles for the divider, specifc to the second button being focused
+    &:last-child:focus:not(:active):not(:hover):before {
+      left: -2px; // Subtract 2px left border
+      top: -3px; // Subtract 2px top border and position so it overlaps space above button
+      width: calc(100% + 4px); // Subtract borders
+    }
+
+    // Styles for the divider, specifc to the first button being focused
+    &:first-child:focus:not(:active):not(:hover) + a:before {
+      left: 0px; // No borders on parent of :before when not focused
+      top: -1px; // No borders so just overlap space above parent button
+      width: 100%;
     }
   }
 
-  // Focused style sets the button to the focus colour
-  &:focus:not(:active):not(:hover) {
-    color: $govuk-focus-text-colour;
-    background-color: $govuk-focus-colour;
-  }
-
-  // Retain the space between buttons now we're using the border in the focus style
-  &:first-child:focus {
-    margin-bottom: 1px;
-  }
-
-  // 3px divider between buttons as a version of the underline from the GOVUK focus style
-  &:last-child:focus:not(:active):not(:hover):before,
-  &:first-child:focus:not(:active):not(:hover) + a:before {
-    content: "";
-    position: absolute;
-    height: 2px;
-    background: $govuk-focus-text-colour;
-
-    @media (forced-colors: active) {
-      background: canvasText;
-    }
-  }
-
-  // Styles for the divider, specifc to the second button being focused
-  &:last-child:focus:not(:active):not(:hover):before {
-    left: -2px; // Subtract 2px left border
-    top: -3px; // Subtract 2px top border and position so it overlaps space above button
-    width: calc(100% + 4px); // Subtract borders
-  }
-
-  // Styles for the divider, specifc to the first button being focused
-  &:first-child:focus:not(:active):not(:hover) + a:before {
-    left: 0px; // No borders on parent of :before when not focused
-    top: -1px; // No borders so just overlap space above parent button
-    width: 100%;
-  }
 }
 
 // Extra block to override specific LeafletJS rounded-corners when buttons are focused
