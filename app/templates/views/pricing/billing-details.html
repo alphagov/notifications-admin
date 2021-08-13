@@ -39,12 +39,11 @@
     </h3>
 
     <ul class="govuk-list govuk-list--bullet">
+      {% for email in billing_details['notify_billing_email_addresses'] %}
       <li>
-        generic@digital.cabinet-office.gov.uk
+        {{ email }}
       </li>
-      <li>
-        first.last@digital.cabinet-office.gov.uk
-      </li>
+      {% endfor %}
     </ul>
 
     <h3 class="heading-small">
@@ -82,7 +81,7 @@
 
     <div class="govuk-!-margin-bottom-4">
     {{ copy_to_clipboard(
-        '98765432',
+        billing_details['account_number'],
         name='Account number',
         thing='account number',
       ) }}
@@ -90,7 +89,7 @@
 
     <div class="govuk-!-margin-bottom-4">
     {{ copy_to_clipboard(
-        '01-23-45',
+        billing_details['sort_code'],
         name='Sort code',
         thing='sort code',
       ) }}
@@ -98,7 +97,7 @@
 
     <div class="govuk-!-margin-bottom-4">
     {{ copy_to_clipboard(
-        'GB33BUKB20201555555555',
+        billing_details['IBAN'],
         name='IBAN',
         thing='IBAN',
       ) }}
@@ -106,7 +105,7 @@
 
     <div class="govuk-!-margin-bottom-4">
     {{ copy_to_clipboard(
-        'ABCDEF12',
+        billing_details['swift'],
         name='Swift code',
         thing='Swift code',
       ) }}
