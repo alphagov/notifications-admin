@@ -23,7 +23,7 @@ def log_in_user(user_id):
         session['current_session_id'] = user.current_session_id
         # Check if coming from new password page
         if 'password' in session.get('user_details', {}):
-            user.update_password(session['user_details']['password'], validated_email_access=True)
+            user.update_password(session['user_details']['password'])
         user.activate()
         user.login()
     finally:

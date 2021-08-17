@@ -234,7 +234,7 @@ def test_two_factor_sms_should_set_password_when_new_password_exists_in_session(
     assert response.location == url_for('main.show_accounts_or_dashboard', _external=True)
 
     mock_update_user_password.assert_called_once_with(
-        api_user_active['id'], 'changedpassword', validated_email_access=True
+        api_user_active['id'], 'changedpassword',
     )
 
 

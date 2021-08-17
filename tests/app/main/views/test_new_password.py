@@ -156,6 +156,6 @@ def test_should_sign_in_when_password_reset_is_successful_for_email_auth(
 
     # the log-in flow makes a couple of calls
     mock_get_user.assert_called_once_with(user['id'])
-    mock_update_user_password.assert_called_once_with(user['id'], 'a-new_password', validated_email_access=True)
+    mock_update_user_password.assert_called_once_with(user['id'], 'a-new_password')
 
     assert not mock_send_verify_code.called

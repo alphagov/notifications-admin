@@ -114,8 +114,8 @@ class User(JSONModel, UserMixin):
         response = user_api_client.update_user_attribute(self.id, **kwargs)
         self.__init__(response)
 
-    def update_password(self, password, validated_email_access=False):
-        response = user_api_client.update_password(self.id, password, validated_email_access=validated_email_access)
+    def update_password(self, password):
+        response = user_api_client.update_password(self.id, password)
         self.__init__(response)
 
     def update_email_access_validated_at(self):
