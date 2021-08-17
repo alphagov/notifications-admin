@@ -1,5 +1,6 @@
 import uuid
 
+import pytest
 from flask import url_for
 
 from tests.conftest import SERVICE_ONE_ID, normalize_spaces
@@ -9,7 +10,7 @@ def test_returned_letter_summary(
     client_request,
     mocker
 ):
-    summary_data = [{'returned_letter_count': 30, 'reported_at': '2019-12-24'}]
+    summary_data = [{'returned_letter_count': 1234, 'reported_at': '2019-12-24'}]
     mock = mocker.patch("app.service_api_client.get_returned_letter_summary",
                         return_value=summary_data)
 
@@ -22,7 +23,7 @@ def test_returned_letter_summary(
         page.select_one('.table-field').text
     ) == (
         '24 December 2019 '
-        '30 letters'
+        '1,234 letters'
     )
     assert page.select_one('.table-field a')['href'] == url_for(
         '.returned_letters',
@@ -99,9 +100,21 @@ def test_returned_letters_page(
     ]
 
 
+@pytest.mark.parametrize('number_of_letters, expected_message', (
+    pytest.param(
+        51,
+        'Only showing the first 50 of 51 rows'
+    ),
+    pytest.param(
+        1234,
+        'Only showing the first 50 of 1,234 rows'
+    ),
+))
 def test_returned_letters_page_with_many_letters(
     client_request,
-    mocker
+    mocker,
+    number_of_letters,
+    expected_message,
 ):
     data = [
         {
@@ -116,7 +129,7 @@ def test_returned_letters_page_with_many_letters(
             'job_row_number': None,
             'uploaded_letter_file_name': None,
         }
-    ] * 51
+    ] * number_of_letters
     mocker.patch('app.service_api_client.get_returned_letters', return_value=data)
 
     page = client_request.get(
@@ -125,12 +138,12 @@ def test_returned_letters_page_with_many_letters(
         reported_at='2019-12-24',
     )
 
-    assert len(data) == 51
+    assert len(data) == number_of_letters
     assert len(page.select('tbody tr')) == 50
     assert normalize_spaces(
         page.select_one('.table-show-more-link').text
     ) == (
-        'Only showing the first 50 of 51 rows'
+        expected_message
     )
     assert page.select_one('a[download]').text == (
         'Download this report'

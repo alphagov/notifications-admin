@@ -37,7 +37,7 @@
       <a class="govuk-link govuk-link--no-visited-state file-list-filename"
          href="{{url_for('.returned_letters', service_id=current_service.id, reported_at=item.reported_at)}}">{{ item.reported_at | format_date_normal }}</a>
        <p class="file-list-hint">
-         {{ item.returned_letter_count}} {{ item.returned_letter_count|message_count_label('letter', suffix='')}}
+         {{ item.returned_letter_count|format_thousands }} {{ item.returned_letter_count|message_count_label('letter', suffix='')}}
        </p>
     {% endcall %}
   {% endcall %}

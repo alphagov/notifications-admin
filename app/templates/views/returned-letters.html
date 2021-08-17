@@ -51,7 +51,7 @@
   {% endcall %}
   {% if more_than_one_page %}
     <p class="table-show-more-link">
-      Only showing the first {{ page_size }} of {{ count_of_returned_letters }} rows
+      Only showing the first {{ page_size }} of {{ count_of_returned_letters|format_thousands }} rows
     </p>
   {% endif %}
 </div>
