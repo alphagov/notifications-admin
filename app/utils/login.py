@@ -36,7 +36,7 @@ def log_in_user(user_id):
 
 def redirect_when_logged_in(platform_admin):
     next_url = request.args.get('next')
-    if next_url and _is_safe_redirect_url(next_url):
+    if next_url and is_safe_redirect_url(next_url):
         return redirect(next_url)
 
     return redirect(url_for('main.show_accounts_or_dashboard'))
@@ -46,8 +46,8 @@ def email_needs_revalidating(user):
     return not is_less_than_days_ago(user.email_access_validated_at, 90)
 
 
-# see http://flask.pocoo.org/snippets/62/
-def _is_safe_redirect_url(target):
+# see https://stackoverflow.com/questions/60532973/how-do-i-get-a-is-safe-url-function-to-use-with-flask-and-how-does-it-work  # noqa
+def is_safe_redirect_url(target):
     from urllib.parse import urljoin, urlparse
     host_url = urlparse(request.host_url)
     redirect_url = urlparse(urljoin(request.host_url, target))
