@@ -4,6 +4,7 @@ from unittest.mock import ANY
 import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
+from freezegun import freeze_time
 
 from app.models.user import InvitedOrgUser
 from tests.conftest import ORGANISATION_ID, normalize_spaces
@@ -138,14 +139,17 @@ def test_user_invite_already_accepted(
     )
 
 
+@freeze_time('2021-12-12 12:12:12')
 def test_existing_user_invite_already_is_member_of_organisation(
     client,
     mock_check_org_invite_token,
     mock_get_user,
     mock_get_user_by_email,
+    api_user_active,
     mock_get_users_for_organisation,
     mock_accept_org_invite,
     mock_add_user_to_organisation,
+    mock_update_user_attribute,
 ):
     response = client.get(url_for('main.accept_org_invite', token='thisisnotarealtoken'))
 
@@ -160,8 +164,13 @@ def test_existing_user_invite_already_is_member_of_organisation(
     mock_accept_org_invite.assert_called_once_with(ORGANISATION_ID, ANY)
     mock_get_user_by_email.assert_called_once_with('invited_user@test.gov.uk')
     mock_get_users_for_organisation.assert_called_once_with(ORGANISATION_ID)
+    mock_update_user_attribute.assert_called_once_with(
+        api_user_active['id'],
+        email_access_validated_at='2021-12-12T12:12:12',
+    )
 
 
+@freeze_time('2021-12-12 12:12:12')
 def test_existing_user_invite_not_a_member_of_organisation(
     client,
     api_user_active,
@@ -170,6 +179,7 @@ def test_existing_user_invite_not_a_member_of_organisation(
     mock_get_users_for_organisation,
     mock_accept_org_invite,
     mock_add_user_to_organisation,
+    mock_update_user_attribute,
 ):
     response = client.get(url_for('main.accept_org_invite', token='thisisnotarealtoken'))
 
@@ -187,6 +197,10 @@ def test_existing_user_invite_not_a_member_of_organisation(
     mock_add_user_to_organisation.assert_called_once_with(
         ORGANISATION_ID,
         api_user_active['id'],
+    )
+    mock_update_user_attribute.assert_called_once_with(
+        mock_get_user_by_email.side_effect(None)['id'],
+        email_access_validated_at='2021-12-12T12:12:12',
     )
 
 
