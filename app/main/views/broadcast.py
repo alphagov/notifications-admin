@@ -449,14 +449,14 @@ def approve_broadcast_message(service_id, broadcast_message_id):
         ))
 
     if current_service.trial_mode:
-        broadcast_message.approve_broadcast()
+        broadcast_message.approve_broadcast(channel=current_service.broadcast_channel)
         return redirect(url_for(
             '.broadcast_tour',
             service_id=current_service.id,
             step_index=6,
         ))
     elif form.validate_on_submit():
-        broadcast_message.approve_broadcast()
+        broadcast_message.approve_broadcast(channel=current_service.broadcast_channel)
     else:
         return render_template(
             'views/broadcast/view-message.html',

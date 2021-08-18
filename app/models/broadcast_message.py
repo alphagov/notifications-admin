@@ -248,12 +248,15 @@ class BroadcastMessage(JSONModel):
     def request_approval(self):
         self._set_status_to('pending-approval')
 
-    def approve_broadcast(self):
+    def approve_broadcast(self, channel):
+        if channel in {'test', 'operator'}:
+            ttl = timedelta(hours=4, minutes=0)
+        else:
+            ttl = timedelta(hours=22, minutes=30)
+
         self._update(
             starts_at=datetime.utcnow().isoformat(),
-            finishes_at=(
-                datetime.utcnow() + timedelta(hours=23, minutes=59)
-            ).isoformat(),
+            finishes_at=(datetime.utcnow() + ttl).isoformat(),
         )
         self._set_status_to('broadcasting')
 

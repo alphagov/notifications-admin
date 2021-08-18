@@ -2375,6 +2375,16 @@ def test_user_without_approve_permission_cant_approve_broadcast_they_created(
     )
 
 
+@pytest.mark.parametrize('channel, expected_finishes_at', (
+    # 4 hours later
+    ('operator', '2020-02-23T02:22:22'),
+    ('test', '2020-02-23T02:22:22'),
+
+    # 22 hours 30 minutes later
+    ('severe', '2020-02-23T20:52:22'),
+    ('government', '2020-02-23T20:52:22'),
+    (None, '2020-02-23T20:52:22'),  # Training mode
+))
 @pytest.mark.parametrize(
     'trial_mode, initial_status, post_data, expected_approval, expected_redirect',
     (
@@ -2424,6 +2434,8 @@ def test_confirm_approve_broadcast(
     expected_approval,
     trial_mode,
     expected_redirect,
+    channel,
+    expected_finishes_at,
 ):
     mocker.patch(
         'app.broadcast_message_api_client.get_broadcast_message',
@@ -2438,6 +2450,7 @@ def test_confirm_approve_broadcast(
     )
     service_one['restricted'] = trial_mode
     service_one['permissions'] += ['broadcast']
+    service_one['broadcast_channel'] = channel
 
     client_request.login(active_user_approve_broadcasts_permission)
     client_request.post(
@@ -2457,7 +2470,7 @@ def test_confirm_approve_broadcast(
             broadcast_message_id=fake_uuid,
             data={
                 'starts_at': '2020-02-22T22:22:22',
-                'finishes_at': '2020-02-23T22:21:22',
+                'finishes_at': expected_finishes_at,
             },
         )
         mock_update_broadcast_message_status.assert_called_once_with(
