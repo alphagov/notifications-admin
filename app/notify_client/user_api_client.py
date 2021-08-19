@@ -9,7 +9,8 @@ ALLOWED_ATTRIBUTES = {
     'mobile_number',
     'auth_type',
     'updated_by',
-    'current_session_id'
+    'current_session_id',
+    'email_access_validated_at',
 }
 
 
@@ -73,10 +74,8 @@ class UserApiClient(NotifyAdminAPIClient):
         return user_data['data']
 
     @cache.delete('user-{user_id}')
-    def update_password(self, user_id, password, validated_email_access=False):
+    def update_password(self, user_id, password):
         data = {"_password": password}
-        if validated_email_access:
-            data["validated_email_access"] = validated_email_access
         url = "/user/{}/update-password".format(user_id)
         user_data = self.post(url, data=data)
         return user_data['data']

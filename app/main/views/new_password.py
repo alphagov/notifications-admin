@@ -33,6 +33,9 @@ def new_password(token):
         flash('The link in the email has already been used')
         return redirect(url_for('main.index'))
 
+    if request.method == 'GET':
+        user.update_email_access_validated_at()
+
     form = NewPasswordForm()
 
     if form.validate_on_submit():

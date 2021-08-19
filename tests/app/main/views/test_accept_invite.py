@@ -1,8 +1,9 @@
-from unittest.mock import ANY, Mock
+from unittest.mock import ANY, Mock, call
 
 import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
+from freezegun import freeze_time
 from notifications_python_client.errors import HTTPError
 
 import app
@@ -30,6 +31,7 @@ def mock_check_invite_token(mocker, sample_invite):
     return mocker.patch('app.invite_api_client.check_token', return_value=sample_invite)
 
 
+@freeze_time('2021-12-12 12:12:12')
 def test_existing_user_accept_invite_calls_api_and_redirects_to_dashboard(
     client,
     service_one,
@@ -43,6 +45,7 @@ def test_existing_user_accept_invite_calls_api_and_redirects_to_dashboard(
     mocker,
     mock_events,
     mock_get_user,
+    mock_update_user_attribute,
 ):
     expected_service = service_one['id']
     expected_permissions = {'view_activity', 'send_messages', 'manage_service', 'manage_api_keys'}
@@ -75,6 +78,7 @@ def test_broadcast_service_shows_tour(
     mock_no_users_for_service,
     mock_accept_invite,
     mock_add_user_to_service,
+    mock_update_user_attribute,
     mocker,
     mock_events,
     mock_get_user,
@@ -114,6 +118,7 @@ def test_existing_user_with_no_permissions_or_folder_permissions_accept_invite(
     mock_get_service,
     mock_events,
     mock_get_user,
+    mock_update_user_attribute,
 ):
     expected_service = service_one['id']
     sample_invite['permissions'] = ''
@@ -136,6 +141,7 @@ def test_if_existing_user_accepts_twice_they_redirect_to_sign_in(
     sample_invite,
     mock_check_invite_token,
     mock_get_service,
+    mock_update_user_attribute,
 ):
     sample_invite['status'] = 'accepted'
 
@@ -149,6 +155,9 @@ def test_if_existing_user_accepts_twice_they_redirect_to_sign_in(
         'You need to sign in again',
         'We signed you out because you have not used Notify for a while.',
     )
+    # We don’t let people update `email_access_validated_at` using an
+    # already-accepted invite
+    assert mock_update_user_attribute.called is False
 
 
 def test_invite_goes_in_session(
@@ -226,6 +235,7 @@ def test_accepting_invite_removes_invite_from_session(
         assert 'invited_user_id' not in session
 
 
+@freeze_time('2021-12-12T12:12:12')
 def test_existing_user_of_service_get_redirected_to_signin(
     client,
     mocker,
@@ -235,6 +245,7 @@ def test_existing_user_of_service_get_redirected_to_signin(
     mock_get_user_by_email,
     mock_check_invite_token,
     mock_accept_invite,
+    mock_update_user_attribute,
 ):
     sample_invite['email_address'] = api_user_active['email_address']
     mocker.patch('app.models.user.Users.client_method', return_value=[api_user_active])
@@ -263,6 +274,7 @@ def test_accept_invite_redirects_if_api_raises_an_error_that_they_are_already_pa
     mock_get_service,
     mock_no_users_for_service,
     mock_get_user,
+    mock_update_user_attribute,
 ):
     mocker.patch('app.user_api_client.add_user_to_service', side_effect=HTTPError(
         response=Mock(
@@ -293,6 +305,7 @@ def test_existing_signed_out_user_accept_invite_redirects_to_sign_in(
     mocker,
     mock_events,
     mock_get_user,
+    mock_update_user_attribute,
 ):
     expected_service = service_one['id']
     expected_permissions = {'view_activity', 'send_messages', 'manage_service', 'manage_api_keys'}
@@ -386,6 +399,7 @@ def test_cancelled_invited_user_accepts_invited_redirect_to_cancelled_invitation
     mock_get_service,
     sample_invite,
     mock_check_invite_token,
+    mock_update_user_attribute,
 ):
     sample_invite['status'] = 'cancelled'
     response = client.get(url_for('main.accept_invite', token='thisisnotarealtoken'))
@@ -394,6 +408,9 @@ def test_cancelled_invited_user_accepts_invited_redirect_to_cancelled_invitation
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert page.h1.string.strip() == 'The invitation you were sent has been cancelled'
+    # We don’t let people update `email_access_validated_at` using an
+    # cancelled invite
+    assert mock_update_user_attribute.called is False
 
 
 @pytest.mark.parametrize('admin_endpoint, api_endpoint', [
@@ -653,6 +670,7 @@ def test_new_invited_user_is_redirected_to_correct_place(
     )
 
 
+@freeze_time('2021-12-12 12:12:12')
 def test_existing_user_accepts_and_sets_email_auth(
     client_request,
     api_user_active,
@@ -679,10 +697,14 @@ def test_existing_user_accepts_and_sets_email_auth(
     )
 
     mock_get_existing_user_by_email.assert_called_once_with('test@user.gov.uk')
-    mock_update_user_attribute.assert_called_once_with(api_user_active['id'], auth_type='email_auth')
+    assert mock_update_user_attribute.call_args_list == [
+        call(api_user_active['id'], email_access_validated_at='2021-12-12T12:12:12'),
+        call(api_user_active['id'], auth_type='email_auth'),
+    ]
     mock_add_user_to_service.assert_called_once_with(ANY, api_user_active['id'], ANY, ANY)
 
 
+@freeze_time('2021-12-12 12:12:12')
 def test_platform_admin_user_accepts_and_preserves_auth(
     client_request,
     platform_admin_user,
@@ -691,7 +713,6 @@ def test_platform_admin_user_accepts_and_preserves_auth(
     mock_check_invite_token,
     mock_no_users_for_service,
     mock_accept_invite,
-    mock_update_user_attribute,
     mock_add_user_to_service,
     mocker
 ):
@@ -700,6 +721,10 @@ def test_platform_admin_user_accepts_and_preserves_auth(
     service_one['permissions'].append('email_auth')
 
     mocker.patch('app.user_api_client.get_user_by_email', return_value=platform_admin_user)
+    mock_update_user_attribute = mocker.patch(
+        'app.user_api_client.update_user_attribute',
+        return_value=platform_admin_user,
+    )
 
     client_request.login(platform_admin_user)
 
@@ -710,10 +735,14 @@ def test_platform_admin_user_accepts_and_preserves_auth(
         _expected_redirect=url_for('main.service_dashboard', service_id=service_one['id'], _external=True),
     )
 
-    assert not mock_update_user_attribute.called
+    mock_update_user_attribute.assert_called_once_with(
+        platform_admin_user['id'],
+        email_access_validated_at='2021-12-12T12:12:12',
+    )
     assert mock_add_user_to_service.called
 
 
+@freeze_time('2021-12-12 12:12:12')
 def test_existing_user_doesnt_get_auth_changed_by_service_without_permission(
     client_request,
     api_user_active,
@@ -740,9 +769,13 @@ def test_existing_user_doesnt_get_auth_changed_by_service_without_permission(
         _expected_redirect=url_for('main.service_dashboard', service_id=service_one['id'], _external=True),
     )
 
-    assert not mock_update_user_attribute.called
+    mock_update_user_attribute.assert_called_once_with(
+        api_user_active['id'],
+        email_access_validated_at='2021-12-12T12:12:12',
+    )
 
 
+@freeze_time('2021-12-12 12:12:12')
 def test_existing_email_auth_user_without_phone_cannot_set_sms_auth(
     client_request,
     api_user_active,
@@ -772,9 +805,13 @@ def test_existing_email_auth_user_without_phone_cannot_set_sms_auth(
         _expected_redirect=url_for('main.service_dashboard', service_id=service_one['id'], _external=True),
     )
 
-    assert not mock_update_user_attribute.called
+    mock_update_user_attribute.assert_called_once_with(
+        api_user_active['id'],
+        email_access_validated_at='2021-12-12T12:12:12',
+    )
 
 
+@freeze_time('2021-12-12 12:12:12')
 def test_existing_email_auth_user_with_phone_can_set_sms_auth(
     client_request,
     api_user_active,
@@ -800,4 +837,7 @@ def test_existing_email_auth_user_with_phone_can_set_sms_auth(
     )
 
     mock_get_existing_user_by_email.assert_called_once_with(sample_invite['email_address'])
-    mock_update_user_attribute.assert_called_once_with(api_user_active['id'], auth_type='sms_auth')
+    assert mock_update_user_attribute.call_args_list == [
+        call(api_user_active['id'], email_access_validated_at='2021-12-12T12:12:12'),
+        call(api_user_active['id'], auth_type='sms_auth'),
+    ]

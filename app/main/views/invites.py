@@ -52,6 +52,7 @@ def accept_invite(token):
     existing_user = User.from_email_address_or_none(invited_user.email_address)
 
     if existing_user:
+        existing_user.update_email_access_validated_at()
         invited_user.accept_invite()
         if existing_user in Users(invited_user.service):
             return redirect(url_for('main.service_dashboard', service_id=invited_user.service))
@@ -117,6 +118,7 @@ def accept_org_invite(token):
     organisation_users = OrganisationUsers(invited_org_user.organisation)
 
     if existing_user:
+        existing_user.update_email_access_validated_at()
         invited_org_user.accept_invite()
         if existing_user not in organisation_users:
             existing_user.add_to_organisation(organisation_id=invited_org_user.organisation)
