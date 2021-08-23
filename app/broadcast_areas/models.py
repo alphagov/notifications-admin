@@ -125,7 +125,7 @@ class BroadcastArea(BaseBroadcastArea, SortableMixin):
 
     @cached_property
     def parents(self):
-        return list(filter(None, self._parents_iterator))
+        return list(self._parents_iterator)
 
     @property
     def _parents_iterator(self):
@@ -135,7 +135,7 @@ class BroadcastArea(BaseBroadcastArea, SortableMixin):
             parent = BroadcastAreasRepository().get_parent_for_area(id)
 
             if not parent:
-                return None
+                return
 
             parent_broadcast_area = BroadcastArea(parent)
 
