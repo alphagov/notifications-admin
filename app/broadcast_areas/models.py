@@ -124,11 +124,11 @@ class BroadcastArea(BaseBroadcastArea, SortableMixin):
         return self._count_of_phones or 0
 
     @cached_property
-    def parents(self):
-        return list(self._parents_iterator)
+    def ancestors(self):
+        return list(self._ancestors_iterator)
 
     @property
-    def _parents_iterator(self):
+    def _ancestors_iterator(self):
         id = self.id
 
         while True:
@@ -138,9 +138,7 @@ class BroadcastArea(BaseBroadcastArea, SortableMixin):
                 return
 
             parent_broadcast_area = BroadcastArea(parent)
-
             yield parent_broadcast_area
-
             id = parent_broadcast_area.id
 
 

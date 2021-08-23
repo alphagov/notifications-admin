@@ -104,14 +104,14 @@ class BroadcastMessage(JSONModel):
         )
 
     @property
-    def parent_areas(self):
-        return sorted(set(self._parent_areas_iterator))
+    def ancestor_areas(self):
+        return sorted(set(self._ancestor_areas_iterator))
 
     @property
-    def _parent_areas_iterator(self):
+    def _ancestor_areas_iterator(self):
         for area in self.areas:
-            for parent in area.parents:
-                yield parent
+            for ancestor in area.ancestors:
+                yield ancestor
 
     @cached_property
     def polygons(self):
