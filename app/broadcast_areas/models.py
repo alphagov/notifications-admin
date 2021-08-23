@@ -163,10 +163,11 @@ class CustomBroadcastArea(BaseBroadcastArea):
     simple_polygons = polygons
 
     @cached_property
-    def overlapping_areas(self):
+    def nearby_electoral_wards(self):
         if not self.polygons:
             return []
         return broadcast_area_libraries.get_areas_with_simple_polygons([
+            # We only index electoral wards in the RTree
             overlap.data for overlap in rtree_index.query(
                 Rect(*self.polygons.bounds)
             )
@@ -176,7 +177,7 @@ class CustomBroadcastArea(BaseBroadcastArea):
     def count_of_phones(self):
         return sum(
             area.simple_polygons.ratio_of_intersection_with(self.polygons) * area.count_of_phones
-            for area in self.overlapping_areas
+            for area in self.nearby_electoral_wards
         )
 
 
