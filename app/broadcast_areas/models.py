@@ -127,6 +127,10 @@ class BroadcastArea(BaseBroadcastArea, SortableMixin):
     def ancestors(self):
         return list(self._ancestors_iterator)
 
+    @cached_property
+    def parent(self):
+        return next(iter(self.ancestors), None)
+
     @property
     def _ancestors_iterator(self):
         id = self.id
