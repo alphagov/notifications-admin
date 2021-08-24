@@ -163,6 +163,13 @@ class CustomBroadcastArea(BaseBroadcastArea):
     simple_polygons = polygons
 
     @cached_property
+    def overlapping_electoral_wards(self):
+        return [
+            area for area in self.nearby_electoral_wards
+            if area.simple_polygons.intersects(self.polygons)
+        ]
+
+    @cached_property
     def nearby_electoral_wards(self):
         if not self.polygons:
             return []
