@@ -7,12 +7,24 @@ from tests.app.broadcast_areas.custom_polygons import (
     BRISTOL,
     BURFORD,
     CHELTENHAM,
+    CHELTENHAM_AND_GLOUCESTER,
     SANTA_A,
+    SEVERN_ESTUARY,
     SKYE,
 )
 
 
 @pytest.mark.parametrize(('area_ids', 'expected_area_names'), [
+    (
+        [
+            'wd20-E05009336',  # Whitechapel, Tower Hamlets (electoral ward)
+            'wd20-E05009372',  # Hackney Central, Hackney (electoral ward)
+            'wd20-E05009374',  # Hackney Wick, Hackney (electoral ward)
+        ], [
+            'Hackney',  # in Greater London* (DB doesn't know this)
+            'Tower Hamlets',  # in Greater London*
+        ],
+    ),
     (
         [
             'wd20-E05004294',  # Hester’s Way, Cheltenham (electoral ward)
@@ -33,6 +45,16 @@ from tests.app.broadcast_areas.custom_polygons import (
     ),
     (
         [
+            'wd20-E05004294',  # Hester’s Way, Cheltenham (electoral ward)
+            'wd20-E05010981',  # Painswick & Upton, Stroud (electoral ward)
+            'wd20-E05009372',  # Hackney Central, Hackney (electoral ward)
+        ], [
+            'Gloucestershire',  # upper tier authority
+            'Hackney',  # in Greater London* (DB doesn't know this)
+        ],
+    ),
+    (
+        [
             'lad20-E07000037',  # High Peak (lower tier authority)
         ],
         [
@@ -47,6 +69,17 @@ from tests.app.broadcast_areas.custom_polygons import (
         [
             'Derbyshire Dales',  # in Derbyshire (upper tier authority)
             'High Peak',  # in Derbyshire
+        ]
+    ),
+    (
+        [
+            'lad20-E07000037',  # High Peak (lower tier authority)
+            'lad20-E07000035',  # Derbyshire Dales (lower tier authority)
+            'ctyua19-E10000028',  # Staffordshire (upper tier authority)
+        ],
+        [
+            'Derbyshire',  # upper tier authority
+            'Staffordshire',
         ]
     ),
     (
@@ -85,6 +118,19 @@ def test_aggregate_areas(
         ]
     ),
     (
+        [SEVERN_ESTUARY], [
+            # Area covers various lower-tier authorities
+            # with more than three in Gloucestershire so
+            # we aggregate them into that
+            'Bristol, City of',
+            'Gloucestershire',
+            'Monmouthshire',
+            'Newport',
+            'North Somerset',
+            'South Gloucestershire',
+        ]
+    ),
+    (
         [CHELTENHAM], [
             # Area covers three lower-tier authorities
             # in Gloucestershire (upper tier authority)
@@ -94,10 +140,26 @@ def test_aggregate_areas(
         ]
     ),
     (
+        [CHELTENHAM_AND_GLOUCESTER], [
+            # Area covers more than 3 lower-tier authorities
+            # in Gloucestershire so we aggregate them
+            'Gloucestershire',
+        ]
+    ),
+    (
         [BURFORD], [
-            # Area covers two lower-tier authorities
-            # in Gloucestershire (upper tier authority)
+            # Area covers one lower-tier authority in
+            # Gloucestershire and one in Oxfordshire (both
+            # upper tier authorities)
             'Cotswold',
+            'West Oxfordshire',
+        ],
+    ),
+    (
+        [CHELTENHAM_AND_GLOUCESTER, BURFORD], [
+            # Area covers many lower-tier authorities
+            # in Gloucestershire but only one in Oxfordshire
+            'Gloucestershire',
             'West Oxfordshire',
         ],
     ),
