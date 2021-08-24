@@ -69,3 +69,55 @@ def test_aggregate_areas(
     assert sorted(
         area.name for area in aggregate_areas(broadcast_message.areas)
     ) == expected_area_names
+
+
+@pytest.mark.parametrize(('simple_polygons', 'expected_area_names'), [
+    (
+        [SKYE], [
+            # Area covers a single unitary authority
+            'Highland',
+        ]
+    ),
+    (
+        [BRISTOL], [
+            # Area covers a single unitary authority
+            'Bristol, City of',
+        ]
+    ),
+    (
+        [CHELTENHAM], [
+            # Area covers three lower-tier authorities
+            # in Gloucestershire (upper tier authority)
+            'Cheltenham',
+            'Cotswold',
+            'Tewkesbury',
+        ]
+    ),
+    (
+        [BURFORD], [
+            # Area covers two lower-tier authorities
+            # in Gloucestershire (upper tier authority)
+            'Cotswold',
+            'West Oxfordshire',
+        ],
+    ),
+    (
+        [SANTA_A], [
+            # Does not overlap with the UK
+        ],
+    ),
+])
+def test_aggregate_areas_for_custom_polygons(
+    simple_polygons,
+    expected_area_names,
+):
+    broadcast_message = BroadcastMessage(
+        broadcast_message_json(
+            area_ids=['derived from polygons'],
+            simple_polygons=simple_polygons
+        )
+    )
+
+    assert sorted(
+        area.name for area in aggregate_areas(broadcast_message.areas)
+    ) == expected_area_names
