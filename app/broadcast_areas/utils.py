@@ -24,7 +24,7 @@ def _convert_custom_areas_to_wards(areas):
 
 def _aggregate_wards_by_local_authority(areas):
     return {
-        area.parent if area.id.startswith('wd20-')
+        area.parent if area.is_electoral_ward
         else area for area in areas
     }
 
@@ -56,7 +56,7 @@ def _cluster_lower_tier_authorities(areas):
 
     for area in areas:
         # group lower tier authorities by "county"
-        if area.id.startswith('lad20-') and area.parent:
+        if area.is_lower_tier_local_authority:
             result[area.parent] += [area]
         # leave countries, unitary authorities as-is
         else:

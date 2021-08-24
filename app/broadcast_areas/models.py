@@ -86,6 +86,14 @@ class BroadcastArea(BaseBroadcastArea, SortableMixin):
     def __init__(self, row):
         self.id, self.name, self._count_of_phones, self.library_id = row
 
+    @cached_property
+    def is_lower_tier_local_authority(self):
+        return self.id.startswith('lad20-') and self.parent
+
+    @cached_property
+    def is_electoral_ward(self):
+        return self.id.startswith('wd20-')
+
     @classmethod
     def from_row_with_simple_polygons(cls, row):
         instance = cls(row[:4])
