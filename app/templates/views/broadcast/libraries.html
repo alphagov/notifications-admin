@@ -14,7 +14,7 @@
 
   {{ page_header("Choose where to send this alert") }}
 
-  {% for area in broadcast_message.parent_areas %}
+  {% for area in broadcast_message.ancestor_areas %}
     <a class="govuk-heading-m govuk-link govuk-link--no-visited-state" href="{{ url_for('.choose_broadcast_sub_area', service_id=current_service.id, broadcast_message_id=broadcast_message.id, library_slug=area.library_id, area_slug=area.id) }}">{{ area.name }}</a>
     {% if loop.last %}
       <div class="keyline-block"></div>

@@ -124,23 +124,21 @@ class BroadcastArea(BaseBroadcastArea, SortableMixin):
         return self._count_of_phones or 0
 
     @cached_property
-    def parents(self):
-        return list(filter(None, self._parents_iterator))
+    def ancestors(self):
+        return list(self._ancestors_iterator)
 
     @property
-    def _parents_iterator(self):
+    def _ancestors_iterator(self):
         id = self.id
 
         while True:
             parent = BroadcastAreasRepository().get_parent_for_area(id)
 
             if not parent:
-                return None
+                return
 
             parent_broadcast_area = BroadcastArea(parent)
-
             yield parent_broadcast_area
-
             id = parent_broadcast_area.id
 
 
@@ -165,10 +163,11 @@ class CustomBroadcastArea(BaseBroadcastArea):
     simple_polygons = polygons
 
     @cached_property
-    def overlapping_areas(self):
+    def nearby_electoral_wards(self):
         if not self.polygons:
             return []
         return broadcast_area_libraries.get_areas_with_simple_polygons([
+            # We only index electoral wards in the RTree
             overlap.data for overlap in rtree_index.query(
                 Rect(*self.polygons.bounds)
             )
@@ -178,7 +177,7 @@ class CustomBroadcastArea(BaseBroadcastArea):
     def count_of_phones(self):
         return sum(
             area.simple_polygons.ratio_of_intersection_with(self.polygons) * area.count_of_phones
-            for area in self.overlapping_areas
+            for area in self.nearby_electoral_wards
         )
 
 
