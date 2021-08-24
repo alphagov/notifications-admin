@@ -667,11 +667,11 @@ def find_element_by_tag_and_partial_text(page, tag, string):
 
 def broadcast_message_json(
     *,
-    id_,
-    service_id,
-    template_id,
-    status,
-    created_by_id,
+    id_=None,
+    service_id=None,
+    template_id=None,
+    status='draft',
+    created_by_id=None,
     starts_at=None,
     finishes_at=None,
     cancelled_at=None,
