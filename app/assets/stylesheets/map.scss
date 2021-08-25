@@ -10,9 +10,10 @@ $govuk-focus-colour: #FFDD00;
 $zoom-button-colour: govuk-colour("white");
 $zoom-button-hover-colour: govuk-shade($zoom-button-colour, 10%);
 
-// The focus style is a 2-colour outline, made to match the GOVUK text input focus style.
-// When colours are overridden, for example when users have a dark mode, box-shadows disappear,
-// so the outline which is left as a single colour (defined by the OS, to replace 'transparent').
+// The focus style is a 2-colour outline, made to match the GOVUK text input focus style, using
+// box-shadow. When colours are overridden, for example when users have Windows high contrast mode
+// on, box-shadows disappear, so the outline which is left as a single colour (defined by the OS,
+// to replace 'transparent').
 //
 // Leaflet adds focus styles with JS, through inline styles. Because of their higher precedence
 // we need to mark our overrides with !important.
@@ -83,9 +84,10 @@ $zoom-button-hover-colour: govuk-shade($zoom-button-colour, 10%);
 
     // Styles that apply if focused with or without the :hover or :active state
     &:focus {
-      // When colours are overridden, for example when users have a dark mode,
-      // backgrounds and box-shadows disappear, so we need to ensure there's a
-      // outline so it can be set to a visible colour by the OS.
+      // Button focus is shown by a change in background colour.
+      // When colours are overridden, for example when users have Windows high
+      // contrast mode on, backgrounds disappear, so we need to ensure there's a
+      // visible outline so it can be set to a colour by the OS.
       border: solid 2px $govuk-focus-colour;
       box-sizing: border-box; // make sure height includes the border
       line-height: 26px; // subtract the border from the height (normally 30px)
@@ -151,9 +153,10 @@ $zoom-button-hover-colour: govuk-shade($zoom-button-colour, 10%);
 .leaflet-control-attribution {
   & a {
     &:focus {
-      // When colours are overridden, for example when users have a dark mode,
-      // backgrounds and box-shadows disappear, so we need to ensure there's a
-      // transparent outline which will be set to a visible colour.
+      // Link focus is shown by a change in background colour.
+      // When colours are overridden, for example when users have Windows high
+      // contrast mode on, backgrounds disappear, so we need to ensure there's a
+      // visible outline so it can be set to a colour by the OS.
       outline: $govuk-focus-width solid transparent !important; // sass-lint:disable-line no-important
       color: $govuk-focus-text-colour;
       background: $govuk-focus-colour;
