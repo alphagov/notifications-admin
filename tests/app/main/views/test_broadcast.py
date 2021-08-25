@@ -1395,7 +1395,10 @@ def test_add_broadcast_area(
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
         data={
-            'areas': ['ctry19-E92000001', 'ctry19-S92000003', 'ctry19-W92000004'], 'simple_polygons': coordinates
+            'areas_2': {
+                'ids': ['ctry19-E92000001', 'ctry19-S92000003', 'ctry19-W92000004'],
+                'simple_polygons': coordinates
+            }
         },
     )
 
@@ -1450,12 +1453,14 @@ def test_add_broadcast_sub_area_district_view(
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
         data={
-            'simple_polygons': coordinates,
-            'areas': [
-                # These two areas are on the broadcast already
-                'ctry19-E92000001',
-                'ctry19-S92000003',
-            ] + expected_selected
+            'areas_2': {
+                'simple_polygons': coordinates,
+                'ids': [
+                    # These two areas are on the broadcast already
+                    'ctry19-E92000001',
+                    'ctry19-S92000003',
+                ] + expected_selected
+            }
         },
     )
 
@@ -1488,14 +1493,16 @@ def test_add_broadcast_sub_area_county_view(
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
         data={
-            'simple_polygons': coordinates,
-            'areas': [
-                # These two areas are on the broadcast already
-                'ctry19-E92000001',
-                'ctry19-S92000003',
-            ] + [
-                'ctyua19-E10000016'
-            ]
+            'areas_2': {
+                'simple_polygons': coordinates,
+                'ids': [
+                    # These two areas are on the broadcast already
+                    'ctry19-E92000001',
+                    'ctry19-S92000003',
+                ] + [
+                    'ctyua19-E10000016'
+                ]
+            }
         },
     )
 
@@ -1532,8 +1539,10 @@ def test_remove_broadcast_area_page(
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
         data={
-            'simple_polygons': coordinates,
-            'areas': ['ctry19-S92000003']
+            'areas_2': {
+                'simple_polygons': coordinates,
+                'ids': ['ctry19-S92000003']
+            },
         },
     )
 

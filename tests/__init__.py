@@ -696,10 +696,10 @@ def broadcast_message_json(
         'reference': reference,
 
         'personalisation': {},
-        'areas': area_ids or [
-            'ctry19-E92000001', 'ctry19-S92000003',
-        ],
-        'simple_polygons': simple_polygons or [],
+        'areas_2': {
+            'ids': area_ids or ['ctry19-E92000001', 'ctry19-S92000003'],
+            'simple_polygons': simple_polygons or [],
+        },
 
         'status': status,
 
