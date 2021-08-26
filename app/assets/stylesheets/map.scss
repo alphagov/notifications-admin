@@ -61,20 +61,10 @@ $zoom-button-hover-colour: govuk-shade($zoom-button-colour, 10%);
 
   a {
 
-    &:first-child {
-      // Remove rounded corners
-      border-top-left-radius: 0;
-      border-top-right-radius: 0;
-    }
-
     &:last-child {
       // Allow it to contain the absolutely positioned divider bar we show between buttons
       // when one is focused
       position: relative;
-
-      // Remove rounded corners
-      border-bottom-left-radius: 0;
-      border-bottom-right-radius: 0;
     }
 
     // Hover style is darker background
@@ -142,11 +132,21 @@ $zoom-button-hover-colour: govuk-shade($zoom-button-colour, 10%);
 }
 
 // Extra block to override specific LeafletJS rounded-corners when buttons are focused
+.leaflet-bar a,
 .leaflet-touch .leaflet-bar a {
-  &:first-child:focus,
-  &:last-child:focus {
-    border-radius: initial;
+
+  &:first-child {
+    // Remove rounded corners
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
   }
+
+  &:last-child {
+    // Remove rounded corners
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
 }
 
 // Map attribution links
