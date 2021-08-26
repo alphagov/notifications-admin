@@ -227,19 +227,11 @@ class BroadcastMessage(JSONModel):
 
     def add_areas(self, *new_area_ids):
         self.area_ids = list(OrderedSet(self.area_ids + list(new_area_ids)))
-
-        self._update(areas_2={
-            'ids': self.area_ids,
-            'simple_polygons': self.simple_polygons.as_coordinate_pairs_lat_long
-        })
+        self._update_areas()
 
     def remove_area(self, area_id):
         self.area_ids = list(set(self._dict['areas_2']['ids']) - {area_id})
-
-        self._update(areas_2={
-            'ids': self.area_ids,
-            'simple_polygons': self.simple_polygons.as_coordinate_pairs_lat_long
-        })
+        self._update_areas()
 
     def _set_status_to(self, status):
         broadcast_message_api_client.update_broadcast_message_status(
@@ -247,6 +239,12 @@ class BroadcastMessage(JSONModel):
             broadcast_message_id=self.id,
             service_id=self.service_id,
         )
+
+    def _update_areas(self):
+        self._update(areas_2={
+            'ids': self.area_ids,
+            'simple_polygons': self.simple_polygons.as_coordinate_pairs_lat_long
+        })
 
     def _update(self, **kwargs):
         broadcast_message_api_client.update_broadcast_message(
