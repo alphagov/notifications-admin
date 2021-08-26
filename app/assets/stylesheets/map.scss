@@ -83,7 +83,7 @@ $zoom-button-hover-colour: govuk-shade($zoom-button-colour, 10%);
       // visible outline so it can be set to a colour by the OS.
       border: solid 2px $govuk-focus-colour;
       box-sizing: border-box; // make sure height includes the border
-      line-height: 26px; // subtract the border from the height (normally 30px)
+      line-height: 22px; // subtract the border from the height (normally 26px)
 
       // The inline display box for the button text overlaps the button edge.
       // This is only visible in high contrast mode because of the background colour being set.
@@ -150,6 +150,11 @@ $zoom-button-hover-colour: govuk-shade($zoom-button-colour, 10%);
     border-bottom-right-radius: 0;
   }
 
+}
+
+// buttons are 30px for touch-capable devices/browsers
+.leaflet-touch .leaflet-bar a:focus {
+  line-height: 26px; // subtract the border from the height (normally 30px)
 }
 
 // Map attribution links
