@@ -904,7 +904,7 @@ def test_preview_broadcast_areas_page(
             created_by_id=fake_uuid,
             service_id=SERVICE_ONE_ID,
             status='draft',
-            areas=areas_selected,
+            area_ids=areas_selected,
         ),
     )
     client_request.login(active_user_create_broadcasts_permission)
@@ -974,7 +974,7 @@ def test_preview_broadcast_areas_page_with_custom_polygons(
             created_by_id=fake_uuid,
             service_id=SERVICE_ONE_ID,
             status='draft',
-            areas=['Area one', 'Area two', 'Area three'],
+            area_ids=['Area one', 'Area two', 'Area three'],
             simple_polygons=polygons,
         ),
     )
@@ -1000,7 +1000,7 @@ def test_preview_broadcast_areas_page_with_custom_polygons(
     ] == expected_list_items
 
 
-@pytest.mark.parametrize('areas, expected_list', (
+@pytest.mark.parametrize('area_ids, expected_list', (
     ([], [
         'Countries',
         'Demo areas',
@@ -1053,7 +1053,7 @@ def test_choose_broadcast_library_page(
     service_one,
     fake_uuid,
     active_user_create_broadcasts_permission,
-    areas,
+    area_ids,
     expected_list,
 ):
     service_one['permissions'] += ['broadcast']
@@ -1065,7 +1065,7 @@ def test_choose_broadcast_library_page(
             created_by_id=fake_uuid,
             service_id=SERVICE_ONE_ID,
             status='draft',
-            areas=areas,
+            area_ids=area_ids,
         ),
     )
     client_request.login(active_user_create_broadcasts_permission)
@@ -1108,7 +1108,7 @@ def test_suggested_area_has_correct_link(
             created_by_id=fake_uuid,
             service_id=SERVICE_ONE_ID,
             status='draft',
-            areas=[
+            area_ids=[
                 'wd20-E05004299',  # Pitville, a ward of Cheltenham
             ],
         ),

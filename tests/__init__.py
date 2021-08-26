@@ -678,7 +678,7 @@ def broadcast_message_json(
     updated_at=None,
     approved_by_id=None,
     cancelled_by_id=None,
-    areas=None,
+    area_ids=None,
     simple_polygons=None,
     content=None,
     reference=None,
@@ -696,7 +696,7 @@ def broadcast_message_json(
         'reference': reference,
 
         'personalisation': {},
-        'areas': areas or [
+        'areas': area_ids or [
             'ctry19-E92000001', 'ctry19-S92000003',
         ],
         'simple_polygons': simple_polygons or [],

@@ -88,7 +88,7 @@ class BroadcastMessage(JSONModel):
 
     @property
     def areas(self):
-        library_areas = self.get_areas(areas=self._dict['areas'])
+        library_areas = self.get_areas(self._dict['areas'])
 
         if library_areas:
             if len(library_areas) != len(self._dict['areas']):
@@ -99,7 +99,7 @@ class BroadcastMessage(JSONModel):
             return library_areas
 
         return CustomBroadcastAreas(
-            areas=self._dict['areas'],
+            area_ids=self._dict['areas'],
             polygons=self._dict['simple_polygons'],
         )
 
@@ -201,9 +201,9 @@ class BroadcastMessage(JSONModel):
 
         return round_to_significant_figures(count, 1)
 
-    def get_areas(self, areas):
+    def get_areas(self, area_ids):
         return broadcast_area_libraries.get_areas(
-            areas
+            area_ids
         )
 
     def get_simple_polygons(self, areas):
@@ -216,20 +216,17 @@ class BroadcastMessage(JSONModel):
         # combined shapes to keep the point count down
         return polygons.smooth.simplify if len(areas) > 1 else polygons
 
-    def add_areas(self, *new_areas):
-        areas = list(OrderedSet(
-            self._dict['areas'] + list(new_areas)
+    def add_areas(self, *new_area_ids):
+        area_ids = list(OrderedSet(
+            self._dict['areas'] + list(new_area_ids)
         ))
-        simple_polygons = self.get_simple_polygons(areas=self.get_areas(areas=areas))
-        self._update(areas=areas, simple_polygons=simple_polygons.as_coordinate_pairs_lat_long)
+        simple_polygons = self.get_simple_polygons(areas=self.get_areas(area_ids))
+        self._update(areas=area_ids, simple_polygons=simple_polygons.as_coordinate_pairs_lat_long)
 
-    def remove_area(self, area_to_remove):
-        areas = [
-            area for area in self._dict['areas']
-            if area != area_to_remove
-        ]
-        simple_polygons = self.get_simple_polygons(areas=self.get_areas(areas=areas))
-        self._update(areas=areas, simple_polygons=simple_polygons.as_coordinate_pairs_lat_long)
+    def remove_area(self, area_id):
+        area_ids = list(set(self._dict['areas']) - {area_id})
+        simple_polygons = self.get_simple_polygons(areas=self.get_areas(area_ids))
+        self._update(areas=area_ids, simple_polygons=simple_polygons.as_coordinate_pairs_lat_long)
 
     def _set_status_to(self, status):
         broadcast_message_api_client.update_broadcast_message_status(
