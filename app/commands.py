@@ -1,6 +1,10 @@
+import click
 from flask import current_app
+from flask.cli import with_appcontext
 
 
+@click.command('list-routes')
+@with_appcontext
 def list_routes():
     """List URLs of all application routes."""
     for rule in sorted(current_app.url_map.iter_rules(), key=lambda r: r.rule):
@@ -8,4 +12,4 @@ def list_routes():
 
 
 def setup_commands(application):
-    application.cli.command('list-routes')(list_routes)
+    application.cli.add_command(list_routes)
