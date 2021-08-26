@@ -240,12 +240,20 @@ class BroadcastMessage(JSONModel):
             service_id=self.service_id,
         )
 
-    def _update_areas(self):
-        self._update(areas_2={
+    def _update_areas(self, force_override=False):
+        areas_2 = {
             'ids': self.area_ids,
             'names': [area.name for area in self.areas],
             'simple_polygons': self.simple_polygons.as_coordinate_pairs_lat_long
-        })
+        }
+
+        data = {'areas_2': areas_2}
+
+        # TEMPORARY: while we migrate to a new format for "areas"
+        if force_override:
+            data['force_override'] = True
+
+        self._update(**data)
 
     def _update(self, **kwargs):
         broadcast_message_api_client.update_broadcast_message(
