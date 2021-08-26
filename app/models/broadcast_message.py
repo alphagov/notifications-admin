@@ -243,6 +243,7 @@ class BroadcastMessage(JSONModel):
     def _update_areas(self):
         self._update(areas_2={
             'ids': self.area_ids,
+            'names': [area.name for area in self.areas],
             'simple_polygons': self.simple_polygons.as_coordinate_pairs_lat_long
         })
 

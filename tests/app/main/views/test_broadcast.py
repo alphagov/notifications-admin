@@ -1397,31 +1397,32 @@ def test_add_broadcast_area(
         data={
             'areas_2': {
                 'ids': ['ctry19-E92000001', 'ctry19-S92000003', 'ctry19-W92000004'],
+                'names': ['England', 'Scotland', 'Wales'],
                 'simple_polygons': coordinates
             }
         },
     )
 
 
-@pytest.mark.parametrize('post_data, expected_selected', (
-    ({
-        'select_all': 'y',
-        'areas': [
-            'wd20-S13002845',
-        ]
-    }, [
-        'lad20-S12000033',
-        # wd20-S13002845 is ignored because the user chose ‘Select all…’
-    ]),
-    ({
-        'areas': [
-            'wd20-S13002845',
-            'wd20-S13002836',
-        ]
-    }, [
-        'wd20-S13002845',
-        'wd20-S13002836',
-    ]),
+@pytest.mark.parametrize('post_data, expected_data', (
+    (
+        {
+            'select_all': 'y', 'areas': ['wd20-S13002845']
+        },
+        {
+            # wd20-S13002845 is ignored because the user chose ‘Select all…’
+            'ids': ['lad20-S12000033'], 'names': ['Aberdeen City']
+        }
+    ),
+    (
+        {
+            'areas': ['wd20-S13002845', 'wd20-S13002836']
+        },
+        {
+            'ids': ['wd20-S13002845', 'wd20-S13002836'],
+            'names': ['Bridge of Don', 'Airyhall/Broomhill/Garthdee'],
+        }
+    ),
 ))
 def test_add_broadcast_sub_area_district_view(
     client_request,
@@ -1430,7 +1431,7 @@ def test_add_broadcast_sub_area_district_view(
     mock_update_broadcast_message,
     fake_uuid,
     post_data,
-    expected_selected,
+    expected_data,
     mocker,
     active_user_create_broadcasts_permission,
 ):
@@ -1449,17 +1450,18 @@ def test_add_broadcast_sub_area_district_view(
         area_slug='lad20-S12000033',
         _data=post_data,
     )
+
+    # These two areas are on the broadcast already
+    expected_data['ids'] = ['ctry19-E92000001', 'ctry19-S92000003'] + expected_data['ids']
+    expected_data['names'] = ['England', 'Scotland'] + expected_data['names']
+
     mock_update_broadcast_message.assert_called_once_with(
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
         data={
             'areas_2': {
                 'simple_polygons': coordinates,
-                'ids': [
-                    # These two areas are on the broadcast already
-                    'ctry19-E92000001',
-                    'ctry19-S92000003',
-                ] + expected_selected
+                **expected_data,
             }
         },
     )
@@ -1501,7 +1503,8 @@ def test_add_broadcast_sub_area_county_view(
                     'ctry19-S92000003',
                 ] + [
                     'ctyua19-E10000016'
-                ]
+                ],
+                'names': ['England', 'Scotland', 'Kent']
             }
         },
     )
@@ -1541,6 +1544,7 @@ def test_remove_broadcast_area_page(
         data={
             'areas_2': {
                 'simple_polygons': coordinates,
+                'names': ['Scotland'],
                 'ids': ['ctry19-S92000003']
             },
         },
