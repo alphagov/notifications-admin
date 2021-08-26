@@ -88,22 +88,29 @@ class BroadcastMessage(JSONModel):
 
     @property
     def areas(self):
-        area_ids = self._dict['areas_2']['ids']
         polygons = self._dict['areas_2']['simple_polygons']
-        library_areas = self.get_areas(area_ids)
+        library_areas = self.get_areas(self.area_ids)
 
         if library_areas:
-            if len(library_areas) != len(area_ids):
+            if len(library_areas) != len(self.area_ids):
                 raise RuntimeError(
-                    f'BroadcastMessage has {len(area_ids)} areas '
+                    f'BroadcastMessage has {len(self.area_ids)} areas '
                     f'but {len(library_areas)} found in the library'
                 )
             return library_areas
 
         return CustomBroadcastAreas(
-            area_ids=area_ids,
+            area_ids=self.area_ids,
             polygons=polygons,
         )
+
+    @property
+    def area_ids(self):
+        return self._dict['areas_2']['ids']
+
+    @area_ids.setter
+    def area_ids(self, value):
+        self._dict['areas_2']['ids'] = value
 
     @property
     def ancestor_areas(self):
@@ -219,23 +226,19 @@ class BroadcastMessage(JSONModel):
         return polygons.smooth.simplify if len(areas) > 1 else polygons
 
     def add_areas(self, *new_area_ids):
-        area_ids = list(OrderedSet(
-            self._dict['areas_2']['ids'] + list(new_area_ids)
-        ))
-        simple_polygons = self.get_simple_polygons(areas=self.get_areas(area_ids))
+        self.area_ids = list(OrderedSet(self.area_ids + list(new_area_ids)))
 
         self._update(areas_2={
-            'ids': area_ids,
-            'simple_polygons': simple_polygons.as_coordinate_pairs_lat_long
+            'ids': self.area_ids,
+            'simple_polygons': self.simple_polygons.as_coordinate_pairs_lat_long
         })
 
     def remove_area(self, area_id):
-        area_ids = list(set(self._dict['areas_2']['ids']) - {area_id})
-        simple_polygons = self.get_simple_polygons(areas=self.get_areas(area_ids))
+        self.area_ids = list(set(self._dict['areas_2']['ids']) - {area_id})
 
         self._update(areas_2={
-            'ids': area_ids,
-            'simple_polygons': simple_polygons.as_coordinate_pairs_lat_long
+            'ids': self.area_ids,
+            'simple_polygons': self.simple_polygons.as_coordinate_pairs_lat_long
         })
 
     def _set_status_to(self, status):
