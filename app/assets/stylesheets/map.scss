@@ -61,6 +61,9 @@ $zoom-button-hover-colour: govuk-shade($zoom-button-colour, 10%);
 
   a {
 
+    // Outlines don't work because of the buttons being so close together so turn off
+    outline: none;
+
     &:last-child {
       // Allow it to contain the absolutely positioned divider bar we show between buttons
       // when one is focused
