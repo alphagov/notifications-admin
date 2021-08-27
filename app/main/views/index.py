@@ -81,6 +81,19 @@ def how_to_pay():
     )
 
 
+@main.route('/pricing/billing-details')
+def billing_details():
+    if current_user.is_authenticated:
+        return render_template(
+            'views/pricing/billing-details.html',
+            navigation_links=pricing_nav(),
+        )
+    return render_template(
+        'views/pricing/billing-details-signed-out.html',
+        navigation_links=pricing_nav(),
+    )
+
+
 @main.route('/delivery-and-failure')
 @main.route('/features/messages-status')
 def delivery_and_failure():

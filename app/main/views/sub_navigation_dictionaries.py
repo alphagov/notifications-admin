@@ -47,6 +47,10 @@ def pricing_nav():
             "name": "How to pay",
             "link": "main.how_to_pay",
         },
+        {
+            "name": "Billing details",
+            "link": "main.billing_details",
+        },
     ]
 
 

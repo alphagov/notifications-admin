@@ -59,6 +59,7 @@ class HeaderNavigation(Navigation):
         'pricing': {
             'pricing',
             'how_to_pay',
+            'billing_details',
         },
         'documentation': {
             'documentation',

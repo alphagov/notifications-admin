@@ -1,0 +1,26 @@
+{% extends "content_template.html" %}
+{% from "components/page-header.html" import page_header %}
+
+{% block per_page_title %}
+  Billing details
+{% endblock %}
+
+{% block content_column_content %}
+
+    {{ page_header('Billing details') }}
+
+    <p class="govuk-body">
+      <a class="govuk-link" href="{{ url_for('.sign_in', next=url_for('.billing_details')) }}">Sign in</a> to see our:
+    </p>
+
+    <ul class="govuk-list govuk-list--bullet">
+      <li>supplier details</li>
+      <li>bank details</li>
+      <li>invoice address</li>
+    </ul>
+
+    <p class="govuk-body">
+      You can use this information to add the Cabinet Office as a supplier. Your organisation may need to do this before you can raise a purchase order.
+    </p>
+
+{% endblock %}

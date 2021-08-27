@@ -100,6 +100,7 @@ def test_hiding_pages_from_search_engines(
     'guidance_index', 'branding_and_customisation',
     'create_and_send_messages', 'edit_and_format_messages',
     'send_files_by_email', 'upload_a_letter', 'who_can_use_notify',
+    'billing_details',
 ])
 def test_static_pages(
     client_request,
