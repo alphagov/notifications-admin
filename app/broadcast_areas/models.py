@@ -184,8 +184,8 @@ class CustomBroadcastArea(BaseBroadcastArea):
 class CustomBroadcastAreas(SerialisedModelCollection):
     model = CustomBroadcastArea
 
-    def __init__(self, *, areas, polygons):
-        self.items = areas
+    def __init__(self, *, area_ids, polygons):
+        self.items = area_ids
         self._polygons = polygons
 
     def __getitem__(self, index):

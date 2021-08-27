@@ -11,7 +11,7 @@ def test_simple_polygons(fake_uuid):
         template_id=fake_uuid,
         status='draft',
         created_by_id=fake_uuid,
-        areas=[
+        area_ids=[
             # Hackney Central
             'wd20-E05009372',
             # Hackney Wick
@@ -56,7 +56,7 @@ def test_raises_for_missing_areas(fake_uuid):
         template_id=fake_uuid,
         status='draft',
         created_by_id=fake_uuid,
-        areas=[
+        area_ids=[
             'wd20-E05009372',
             'something else',
         ],

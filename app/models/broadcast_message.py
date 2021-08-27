@@ -88,20 +88,29 @@ class BroadcastMessage(JSONModel):
 
     @property
     def areas(self):
-        library_areas = self.get_areas(areas=self._dict['areas'])
+        polygons = self._dict['areas_2']['simple_polygons']
+        library_areas = self.get_areas(self.area_ids)
 
         if library_areas:
-            if len(library_areas) != len(self._dict['areas']):
+            if len(library_areas) != len(self.area_ids):
                 raise RuntimeError(
-                    f'BroadcastMessage has {len(self._dict["areas"])} areas '
+                    f'BroadcastMessage has {len(self.area_ids)} areas '
                     f'but {len(library_areas)} found in the library'
                 )
             return library_areas
 
         return CustomBroadcastAreas(
-            areas=self._dict['areas'],
-            polygons=self._dict['simple_polygons'],
+            area_ids=self.area_ids,
+            polygons=polygons,
         )
+
+    @property
+    def area_ids(self):
+        return self._dict['areas_2']['ids']
+
+    @area_ids.setter
+    def area_ids(self, value):
+        self._dict['areas_2']['ids'] = value
 
     @property
     def ancestor_areas(self):
@@ -201,9 +210,9 @@ class BroadcastMessage(JSONModel):
 
         return round_to_significant_figures(count, 1)
 
-    def get_areas(self, areas):
+    def get_areas(self, area_ids):
         return broadcast_area_libraries.get_areas(
-            areas
+            area_ids
         )
 
     def get_simple_polygons(self, areas):
@@ -216,20 +225,13 @@ class BroadcastMessage(JSONModel):
         # combined shapes to keep the point count down
         return polygons.smooth.simplify if len(areas) > 1 else polygons
 
-    def add_areas(self, *new_areas):
-        areas = list(OrderedSet(
-            self._dict['areas'] + list(new_areas)
-        ))
-        simple_polygons = self.get_simple_polygons(areas=self.get_areas(areas=areas))
-        self._update(areas=areas, simple_polygons=simple_polygons.as_coordinate_pairs_lat_long)
+    def add_areas(self, *new_area_ids):
+        self.area_ids = list(OrderedSet(self.area_ids + list(new_area_ids)))
+        self._update_areas()
 
-    def remove_area(self, area_to_remove):
-        areas = [
-            area for area in self._dict['areas']
-            if area != area_to_remove
-        ]
-        simple_polygons = self.get_simple_polygons(areas=self.get_areas(areas=areas))
-        self._update(areas=areas, simple_polygons=simple_polygons.as_coordinate_pairs_lat_long)
+    def remove_area(self, area_id):
+        self.area_ids = list(set(self._dict['areas_2']['ids']) - {area_id})
+        self._update_areas()
 
     def _set_status_to(self, status):
         broadcast_message_api_client.update_broadcast_message_status(
@@ -237,6 +239,21 @@ class BroadcastMessage(JSONModel):
             broadcast_message_id=self.id,
             service_id=self.service_id,
         )
+
+    def _update_areas(self, force_override=False):
+        areas_2 = {
+            'ids': self.area_ids,
+            'names': [area.name for area in self.areas],
+            'simple_polygons': self.simple_polygons.as_coordinate_pairs_lat_long
+        }
+
+        data = {'areas_2': areas_2}
+
+        # TEMPORARY: while we migrate to a new format for "areas"
+        if force_override:
+            data['force_override'] = True
+
+        self._update(**data)
 
     def _update(self, **kwargs):
         broadcast_message_api_client.update_broadcast_message(
