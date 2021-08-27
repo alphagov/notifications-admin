@@ -1,5 +1,5 @@
 {% extends "withnav_template.html" %}
-{% from "components/api-key.html" import api_key %}
+{% from "components/copy-to-clipboard.html" import copy_to_clipboard %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/table.html" import row_group, row, text_field, edit_field, field, boolean_field, list_table with context %}
 {% from "components/button/macro.njk" import govukButton %}
@@ -46,7 +46,7 @@
         <div class="govuk-grid-row">
           <div class="govuk-grid-column-full">
             {% if current_service.count_email_reply_to_addresses > 1 %}
-              {{ api_key(item.id, name=item.email_address, thing="ID") }}
+              {{ copy_to_clipboard(item.id, name=item.email_address, thing="ID") }}
             {% endif %}
           </div>
         </div>

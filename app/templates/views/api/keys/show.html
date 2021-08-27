@@ -1,6 +1,6 @@
 {% extends "withnav_template.html" %}
 {% from "components/page-footer.html" import page_footer %}
-{% from "components/api-key.html" import api_key %}
+{% from "components/copy-to-clipboard.html" import copy_to_clipboard %}
 
 {% block service_page_title %}
   New API key
@@ -22,7 +22,7 @@
 
     <div class="bottom-gutter-2">
 
-      {{ api_key(
+      {{ copy_to_clipboard(
         '{}-{}-{}'.format(key_name, service_id, secret),
         name='API key',
         thing='API key'

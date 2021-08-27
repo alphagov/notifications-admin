@@ -2,7 +2,7 @@
 {% from "components/banner.html" import banner_wrapper %}
 {% from "components/folder-path.html" import folder_path, page_title_folder_path %}
 {% from "components/page-footer.html" import page_footer %}
-{% from "components/api-key.html" import api_key %}
+{% from "components/copy-to-clipboard.html" import copy_to_clipboard %}
 {% from "components/button/macro.njk" import govukButton %}
 
 {% block service_page_title %}
@@ -47,7 +47,7 @@
 
   {% if template.template_type != 'broadcast' %}
     <div class="bottom-gutter-1-2">
-      {{ api_key(template.id, name="Template ID", thing='template ID') }}
+      {{ copy_to_clipboard(template.id, name="Template ID", thing='template ID') }}
     </div>
   {% endif %}
 

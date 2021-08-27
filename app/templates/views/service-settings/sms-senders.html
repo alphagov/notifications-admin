@@ -1,5 +1,5 @@
 {% extends "withnav_template.html" %}
-{% from "components/api-key.html" import api_key %}
+{% from "components/copy-to-clipboard.html" import copy_to_clipboard %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/table.html" import row_group, row, text_field, edit_field, field, boolean_field, list_table with context%}
 {% from "components/button/macro.njk" import govukButton %}
@@ -46,7 +46,7 @@
           </div>
         </div>
         {% if current_service.count_sms_senders > 1 %}
-          {{ api_key(item.id, name=item.sms_sender, thing="ID") }}
+          {{ copy_to_clipboard(item.id, name=item.sms_sender, thing="ID") }}
         {% endif %}
       </div>
     {% endfor %}

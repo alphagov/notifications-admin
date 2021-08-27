@@ -283,7 +283,7 @@ def test_should_create_api_key_with_type_normal(
         _expected_status=200,
     )
 
-    assert page.select_one('span.api-key__key').text.strip() == (
+    assert page.select_one('span.copy-to-clipboard__value').text.strip() == (
         'some_default_key_name_12-{}-{}'.format(SERVICE_ONE_ID, fake_uuid)
     )
 

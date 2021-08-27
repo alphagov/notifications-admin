@@ -975,7 +975,7 @@ def test_should_show_template_id_on_template_page(
         template_id=fake_uuid,
         _test_page_title=False,
     )
-    assert fake_uuid in page.select('.api-key__key')[0].text
+    assert fake_uuid in page.select('.copy-to-clipboard__value')[0].text
 
 
 def test_should_hide_template_id_for_broadcast_templates(
@@ -990,7 +990,7 @@ def test_should_hide_template_id_for_broadcast_templates(
         template_id=fake_uuid,
         _test_page_title=False,
     )
-    assert not page.select('.api-key__key')
+    assert not page.select('.copy-to-clipboard__value')
 
 
 def test_should_show_sms_template_with_downgraded_unicode_characters(
