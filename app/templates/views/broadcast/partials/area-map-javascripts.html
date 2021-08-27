@@ -29,16 +29,51 @@
 
 
   var mapElement = document.getElementById('area-list-map');
+  var mapContainer = mapElement.parentNode;
+  var grandparent = mapContainer.parentNode;
+  var isInDetails = grandparent.className.indexOf('govuk-details') > -1;
+  var areas = document.querySelectorAll('.area-list > .area-list-item');
+  var description = document.createElement('p');
+  var descriptionText = 'Use the arrow keys to move the map. Use the buttons to zoom the map in or out';
+  var labelPrefix = 'Map of the United Kingdom, showing the areas for';
+  var trimRegExp = /^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g;
+  var details;
+  var label;
+
+  function getStringFromAreas (areas) {
+    var areasLen = areas.length;
+    var areaStrings = [];
+    var idx;
+
+    if (areasLen === 1) { return areas[0].textContent.replace(trimRegExp, ''); }
+
+    for (idx = 0; idx < areasLen; idx++) {
+      areaStrings.push(areas[idx].textContent.replace(trimRegExp, ''));
+    }
+
+    // always join last 2 areas with 'and', the rest with commas
+    return areaStrings.slice(0, areasLen - 1).join(', ') + ' and ' + areaStrings[areasLen - 1];
+  };
+
+  description.appendChild(
+    document.createTextNode(descriptionText)
+  );
+  description.setAttribute('id', 'area-list-map__description');
+  description.className = 'govuk-visually-hidden';
+  mapContainer.insertBefore(description, mapElement.nextSibling);
 
   // if element is inside a details element then to make the map render correctly we open the details element
   // and set up the map before closing the details map after
-  grandparent = mapElement.parentElement.parentElement;
-  if (grandparent.className.split(/\s+/).indexOf('govuk-details') > -1) {
+  if (isInDetails) {
     details = grandparent;
     details.open = true;
   }
 
+  label = labelPrefix + " " + getStringFromAreas(areas);
   mapElement.style.height = Math.max(320, window.innerHeight - mapElement.offsetTop - 100) + 'px';
+  mapElement.setAttribute('role', 'region');
+  mapElement.setAttribute('aria-label', label);
+  mapElement.setAttribute('aria-describedby', 'area-list-map__description');
 
   var mymap = L.map(
     'area-list-map',
@@ -58,7 +93,7 @@
   );
 
   // if element is inside a details element then close the details element
-  if (details) {
+  if (isInDetails) {
     details.open = false;
   }
 
