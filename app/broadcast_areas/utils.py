@@ -34,17 +34,17 @@ def _aggregate_lower_tier_authorities(areas):
     clusters = _cluster_lower_tier_authorities(areas)
 
     for cluster in clusters:
-        # always keep lone area as itself
+        # always show a single area cluster as itself (aggregation isn't helpful)
         if len(cluster) == 1:
             results |= set(cluster)
-        # aggregate multi-area cluster
+        # aggregate a single cluster with lots of areas (too complex to show in full)
         elif len(cluster) > 3:
             results |= {cluster[0].parent}
-        # aggregate many small clusters
+        # if cluster is 2 or 3 areas, and there are more than 1 cluster, aggregate the cluster
         elif len(clusters) > 1:
             area = cluster[0]
             results |= {area.parent or area}
-        # keep one small cluster in full
+        # else keep single 2-3 areas cluster in full (easy enough to understand)
         else:
             results |= set(cluster)
 
