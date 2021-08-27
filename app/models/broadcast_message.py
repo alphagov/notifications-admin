@@ -88,7 +88,7 @@ class BroadcastMessage(JSONModel):
 
     @property
     def areas(self):
-        polygons = self._dict['areas_2']['simple_polygons']
+        polygons = self._dict['areas']['simple_polygons']
         library_areas = self.get_areas(self.area_ids)
 
         if library_areas:
@@ -106,11 +106,11 @@ class BroadcastMessage(JSONModel):
 
     @property
     def area_ids(self):
-        return self._dict['areas_2']['ids']
+        return self._dict['areas']['ids']
 
     @area_ids.setter
     def area_ids(self, value):
-        self._dict['areas_2']['ids'] = value
+        self._dict['areas']['ids'] = value
 
     @property
     def ancestor_areas(self):
@@ -230,7 +230,7 @@ class BroadcastMessage(JSONModel):
         self._update_areas()
 
     def remove_area(self, area_id):
-        self.area_ids = list(set(self._dict['areas_2']['ids']) - {area_id})
+        self.area_ids = list(set(self._dict['areas']['ids']) - {area_id})
         self._update_areas()
 
     def _set_status_to(self, status):
@@ -241,13 +241,13 @@ class BroadcastMessage(JSONModel):
         )
 
     def _update_areas(self, force_override=False):
-        areas_2 = {
+        areas = {
             'ids': self.area_ids,
             'names': [area.name for area in self.areas],
             'simple_polygons': self.simple_polygons.as_coordinate_pairs_lat_long
         }
 
-        data = {'areas_2': areas_2}
+        data = {'areas': areas}
 
         # TEMPORARY: while we migrate to a new format for "areas"
         if force_override:

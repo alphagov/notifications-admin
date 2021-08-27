@@ -1395,7 +1395,7 @@ def test_add_broadcast_area(
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
         data={
-            'areas_2': {
+            'areas': {
                 'ids': ['ctry19-E92000001', 'ctry19-S92000003', 'ctry19-W92000004'],
                 'names': ['England', 'Scotland', 'Wales'],
                 'simple_polygons': coordinates
@@ -1459,7 +1459,7 @@ def test_add_broadcast_sub_area_district_view(
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
         data={
-            'areas_2': {
+            'areas': {
                 'simple_polygons': coordinates,
                 **expected_data,
             }
@@ -1495,7 +1495,7 @@ def test_add_broadcast_sub_area_county_view(
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
         data={
-            'areas_2': {
+            'areas': {
                 'simple_polygons': coordinates,
                 'ids': [
                     # These two areas are on the broadcast already
@@ -1542,7 +1542,7 @@ def test_remove_broadcast_area_page(
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
         data={
-            'areas_2': {
+            'areas': {
                 'simple_polygons': coordinates,
                 'names': ['Scotland'],
                 'ids': ['ctry19-S92000003']
