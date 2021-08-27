@@ -99,9 +99,9 @@ def test_aggregate_areas(
         broadcast_message_json(area_ids=area_ids)
     )
 
-    assert sorted(
+    assert [
         area.name for area in aggregate_areas(broadcast_message.areas)
-    ) == expected_area_names
+    ] == expected_area_names
 
 
 @pytest.mark.parametrize(('simple_polygons', 'expected_area_names'), [
@@ -180,6 +180,6 @@ def test_aggregate_areas_for_custom_polygons(
         )
     )
 
-    assert sorted(
+    assert [
         area.name for area in aggregate_areas(broadcast_message.areas)
-    ) == expected_area_names
+    ] == expected_area_names

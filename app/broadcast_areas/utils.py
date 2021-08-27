@@ -7,7 +7,7 @@ def aggregate_areas(areas):
     areas = _convert_custom_areas_to_wards(areas)
     areas = _aggregate_wards_by_local_authority(areas)
     areas = _aggregate_lower_tier_authorities(areas)
-    return areas
+    return sorted(areas)
 
 
 def _convert_custom_areas_to_wards(areas):

@@ -1398,6 +1398,7 @@ def test_add_broadcast_area(
             'areas': {
                 'ids': ['ctry19-E92000001', 'ctry19-S92000003', 'ctry19-W92000004'],
                 'names': ['England', 'Scotland', 'Wales'],
+                'aggregate_names': ['England', 'Scotland', 'Wales'],
                 'simple_polygons': coordinates
             }
         },
@@ -1411,7 +1412,9 @@ def test_add_broadcast_area(
         },
         {
             # wd20-S13002845 is ignored because the user chose ‘Select all…’
-            'ids': ['lad20-S12000033'], 'names': ['Aberdeen City']
+            'ids': ['lad20-S12000033'],
+            'names': ['Aberdeen City'],
+            'aggregate_names': ['Aberdeen City']
         }
     ),
     (
@@ -1421,6 +1424,7 @@ def test_add_broadcast_area(
         {
             'ids': ['wd20-S13002845', 'wd20-S13002836'],
             'names': ['Bridge of Don', 'Airyhall/Broomhill/Garthdee'],
+            'aggregate_names': ['Aberdeen City'],
         }
     ),
 ))
@@ -1454,6 +1458,7 @@ def test_add_broadcast_sub_area_district_view(
     # These two areas are on the broadcast already
     expected_data['ids'] = ['ctry19-E92000001', 'ctry19-S92000003'] + expected_data['ids']
     expected_data['names'] = ['England', 'Scotland'] + expected_data['names']
+    expected_data['aggregate_names'] = sorted(['England', 'Scotland'] + expected_data['aggregate_names'])
 
     mock_update_broadcast_message.assert_called_once_with(
         service_id=SERVICE_ONE_ID,
@@ -1504,7 +1509,8 @@ def test_add_broadcast_sub_area_county_view(
                 ] + [
                     'ctyua19-E10000016'
                 ],
-                'names': ['England', 'Scotland', 'Kent']
+                'names': ['England', 'Scotland', 'Kent'],
+                'aggregate_names': ['England', 'Kent', 'Scotland']
             }
         },
     )
@@ -1545,6 +1551,7 @@ def test_remove_broadcast_area_page(
             'areas': {
                 'simple_polygons': coordinates,
                 'names': ['Scotland'],
+                'aggregate_names': ['Scotland'],
                 'ids': ['ctry19-S92000003']
             },
         },
