@@ -137,26 +137,15 @@ class BroadcastMessage(JSONModel):
 
     @cached_property
     def polygons(self):
-        return Polygons(
-            list(itertools.chain(*(
-                area.polygons for area in self.areas
-            )))
-        )
+        return self.get_polygons_from_areas(area_attribute='polygons')
 
     @cached_property
     def simple_polygons(self):
-        return self.get_simple_polygons(areas=self.areas)
+        return self.get_polygons_from_areas(area_attribute='simple_polygons')
 
     @cached_property
     def simple_polygons_with_bleed(self):
-        polygons = Polygons(
-            list(itertools.chain(*(
-                area.simple_polygons_with_bleed for area in self.areas
-            )))
-        )
-        # If we’ve added multiple areas then we need to re-simplify the
-        # combined shapes to keep the point count down
-        return polygons.smooth.simplify if len(self.areas) > 1 else polygons
+        return self.get_polygons_from_areas(area_attribute='simple_polygons_with_bleed')
 
     @property
     def reference(self):
@@ -228,15 +217,18 @@ class BroadcastMessage(JSONModel):
             area_ids
         )
 
-    def get_simple_polygons(self, areas):
+    def get_polygons_from_areas(self, area_attribute):
         polygons = Polygons(
             list(itertools.chain(*(
-                area.simple_polygons for area in areas
+                getattr(area, area_attribute) for area in self.areas
             )))
         )
-        # If we’ve added multiple areas then we need to re-simplify the
-        # combined shapes to keep the point count down
-        return polygons.smooth.simplify if len(areas) > 1 else polygons
+        if area_attribute != 'polygons' and len(self.areas) > 1:
+            # We’re combining simplified polygons from multiple areas so we
+            # need to re-simplify the combined polygons to keep the point
+            # count down
+            return polygons.smooth.simplify
+        return polygons
 
     def add_areas(self, *new_area_ids):
         self.area_ids = list(OrderedSet(self.area_ids + list(new_area_ids)))

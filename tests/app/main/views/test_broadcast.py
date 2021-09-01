@@ -1383,7 +1383,10 @@ def test_add_broadcast_area(
     polygon_class = namedtuple("polygon_class", ["as_coordinate_pairs_lat_long"])
     coordinates = [[50.1, 0.1], [50.2, 0.2], [50.3, 0.2]]
     polygons = polygon_class(as_coordinate_pairs_lat_long=coordinates)
-    mocker.patch('app.models.broadcast_message.BroadcastMessage.get_simple_polygons', return_value=polygons)
+    mock_get_polygons_from_areas = mocker.patch(
+        'app.models.broadcast_message.BroadcastMessage.get_polygons_from_areas',
+        return_value=polygons,
+    )
 
     client_request.login(active_user_create_broadcasts_permission)
     client_request.post(
@@ -1395,6 +1398,7 @@ def test_add_broadcast_area(
             'areas': ['ctry19-E92000001', 'ctry19-W92000004']
         }
     )
+    mock_get_polygons_from_areas.assert_called_once_with(area_attribute='simple_polygons')
     mock_update_broadcast_message.assert_called_once_with(
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
@@ -1447,7 +1451,10 @@ def test_add_broadcast_sub_area_district_view(
     polygon_class = namedtuple("polygon_class", ["as_coordinate_pairs_lat_long"])
     coordinates = [[50.1, 0.1], [50.2, 0.2], [50.3, 0.2]]
     polygons = polygon_class(as_coordinate_pairs_lat_long=coordinates)
-    mocker.patch('app.models.broadcast_message.BroadcastMessage.get_simple_polygons', return_value=polygons)
+    mock_get_polygons_from_areas = mocker.patch(
+        'app.models.broadcast_message.BroadcastMessage.get_polygons_from_areas',
+        return_value=polygons,
+    )
 
     client_request.login(active_user_create_broadcasts_permission)
     client_request.post(
@@ -1464,6 +1471,7 @@ def test_add_broadcast_sub_area_district_view(
     expected_data['names'] = ['England', 'Scotland'] + expected_data['names']
     expected_data['aggregate_names'] = sorted(['England', 'Scotland'] + expected_data['aggregate_names'])
 
+    mock_get_polygons_from_areas.assert_called_once_with(area_attribute='simple_polygons')
     mock_update_broadcast_message.assert_called_once_with(
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
@@ -1489,7 +1497,10 @@ def test_add_broadcast_sub_area_county_view(
     polygon_class = namedtuple("polygon_class", ["as_coordinate_pairs_lat_long"])
     coordinates = [[50.1, 0.1], [50.2, 0.2], [50.3, 0.2]]
     polygons = polygon_class(as_coordinate_pairs_lat_long=coordinates)
-    mocker.patch('app.models.broadcast_message.BroadcastMessage.get_simple_polygons', return_value=polygons)
+    mock_get_polygons_from_areas = mocker.patch(
+        'app.models.broadcast_message.BroadcastMessage.get_polygons_from_areas',
+        return_value=polygons,
+    )
 
     client_request.login(active_user_create_broadcasts_permission)
     client_request.post(
@@ -1500,6 +1511,7 @@ def test_add_broadcast_sub_area_county_view(
         area_slug='ctyua19-E10000016',  # Kent
         _data={'select_all': 'y'},
     )
+    mock_get_polygons_from_areas.assert_called_once_with(area_attribute='simple_polygons')
     mock_update_broadcast_message.assert_called_once_with(
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
@@ -1533,7 +1545,10 @@ def test_remove_broadcast_area_page(
     polygon_class = namedtuple("polygon_class", ["as_coordinate_pairs_lat_long"])
     coordinates = [[50.1, 0.1], [50.2, 0.2], [50.3, 0.2]]
     polygons = polygon_class(as_coordinate_pairs_lat_long=coordinates)
-    mocker.patch('app.models.broadcast_message.BroadcastMessage.get_simple_polygons', return_value=polygons)
+    mock_get_polygons_from_areas = mocker.patch(
+        'app.models.broadcast_message.BroadcastMessage.get_polygons_from_areas',
+        return_value=polygons,
+    )
 
     client_request.login(active_user_create_broadcasts_permission)
     client_request.get(
@@ -1548,6 +1563,7 @@ def test_remove_broadcast_area_page(
             _external=True,
         ),
     )
+    mock_get_polygons_from_areas.assert_called_once_with(area_attribute='simple_polygons')
     mock_update_broadcast_message.assert_called_once_with(
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
