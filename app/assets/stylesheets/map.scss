@@ -121,7 +121,7 @@ $zoom-button-hover-colour: govuk-shade($zoom-button-colour, 10%);
     &:last-child:focus:not(:active):not(:hover):before {
       left: -2px; // Subtract 2px left border
       top: -3px; // Subtract 2px top border and position so it overlaps space above button
-      width: calc(100% + 4px); // Subtract borders
+      width: calc(100% + 4px); // Compensate for borders
     }
 
     // Styles for the divider, specifc to the first button being focused
