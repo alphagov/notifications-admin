@@ -29,38 +29,12 @@
 
 
   var mapElement = document.getElementById('area-list-map');
-  var mapContainer = mapElement.parentNode;
-  var grandparent = mapContainer.parentNode;
-  var isInDetails = grandparent.className.indexOf('govuk-details') > -1;
+  var grandparent = mapElement.parentNode.parentNode;
+  var isInDetails = grandparent.className.indexOf('govuk-details') !== -1;
   var areas = document.querySelectorAll('.area-list > .area-list-item');
-  var description = document.createElement('p');
-  var descriptionText = 'Use the arrow keys to move the map. Use the buttons to zoom the map in or out';
-  var labelPrefix = 'Map of the United Kingdom, showing the areas for';
   var trimRegExp = /^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g;
   var details;
   var label;
-
-  function getStringFromAreas (areas) {
-    var areasLen = areas.length;
-    var areaStrings = [];
-    var idx;
-
-    if (areasLen === 1) { return areas[0].textContent.replace(trimRegExp, ''); }
-
-    for (idx = 0; idx < areasLen; idx++) {
-      areaStrings.push(areas[idx].textContent.replace(trimRegExp, ''));
-    }
-
-    // always join last 2 areas with 'and', the rest with commas
-    return areaStrings.slice(0, areasLen - 1).join(', ') + ' and ' + areaStrings[areasLen - 1];
-  };
-
-  description.appendChild(
-    document.createTextNode(descriptionText)
-  );
-  description.setAttribute('id', 'area-list-map__description');
-  description.className = 'govuk-visually-hidden';
-  mapContainer.insertBefore(description, mapElement.nextSibling);
 
   // if element is inside a details element then to make the map render correctly we open the details element
   // and set up the map before closing the details map after
@@ -69,11 +43,69 @@
     details.open = true;
   }
 
-  label = labelPrefix + " " + getStringFromAreas(areas);
+  function addAriaLabel (mapElement) {
+
+    function getLabelPrefix (areas) {
+      var labelPrefix = ['Map of the United Kingdom, showing the ', ' for'];
+
+      if (areas.length === 1) {
+        return labelPrefix[0] + 'area' + labelPrefix[1];
+      } else {
+        return labelPrefix[0] + 'areas' + labelPrefix[1];
+      }
+    };
+
+    function getStringOfAreas (areas) {
+      var areasLen = areas.length;
+      var areaStrings = [];
+      var idx;
+
+      function getAreaName (area) {
+        var areaString = '';
+        var childNodesLen = area.childNodes.length;
+        var childNode;
+
+        while (childNodesLen--) {
+          childNode = area.childNodes[childNodesLen];
+          if (childNode.nodeType === 3) { areaString += childNode.nodeValue; } // only use text nodes
+        }
+
+        return areaString.replace(trimRegExp, '')
+      };
+
+      if (areasLen === 1) { return getAreaName(areas[0]); }
+
+      for (idx = 0; idx < areasLen; idx++) {
+        areaStrings.push(getAreaName(areas[idx]));
+      }
+
+      // always join last 2 areas with 'and', the rest with commas
+      return areaStrings.slice(0, areasLen - 1).join(', ') + ' and ' + areaStrings[areasLen - 1];
+    };
+
+    label = getLabelPrefix(areas) + " " + getStringOfAreas(areas);
+    mapElement.setAttribute('aria-label', label);
+  };
+
+  function addAriaDescription (mapElement) {
+
+    var mapContainer = mapElement.parentNode;
+    var description = document.createElement('p');
+    var descriptionText = 'Use the arrow keys to move the map. Use the buttons to zoom the map in or out';
+
+    description.appendChild(
+      document.createTextNode(descriptionText)
+    );
+    description.setAttribute('id', 'area-list-map__description');
+    description.className = 'govuk-visually-hidden';
+    mapContainer.insertBefore(description, mapElement.nextSibling);
+    mapElement.setAttribute('aria-describedby', 'area-list-map__description');
+  };
+
   mapElement.style.height = Math.max(320, window.innerHeight - mapElement.offsetTop - 100) + 'px';
   mapElement.setAttribute('role', 'region');
-  mapElement.setAttribute('aria-label', label);
-  mapElement.setAttribute('aria-describedby', 'area-list-map__description');
+  addAriaLabel(mapElement);
+  addAriaDescription(mapElement);
 
   var mymap = L.map(
     'area-list-map',
