@@ -46,13 +46,11 @@
   function addAriaLabel (mapElement) {
 
     function getLabelPrefix (areas) {
-      var labelPrefix = ['Map of the United Kingdom, showing the ', ' for'];
-
-      if (areas.length === 1) {
-        return labelPrefix[0] + 'area' + labelPrefix[1];
-      } else {
-        return labelPrefix[0] + 'areas' + labelPrefix[1];
-      }
+      return [
+        'Map of the United Kingdom, showing the ',
+        (areas.length === 1) ? 'area' : 'areas',
+        ' for'
+      ].join('');
     };
 
     function getStringOfAreas (areas) {
@@ -63,10 +61,11 @@
       function getAreaName (area) {
         var areaString = '';
         var childNodesLen = area.childNodes.length;
+        var idx;
         var childNode;
 
-        while (childNodesLen--) {
-          childNode = area.childNodes[childNodesLen];
+        for (idx = 0; idx < childNodesLen; idx++) {
+          childNode = area.childNodes[idx];
           if (childNode.nodeType === 3) { areaString += childNode.nodeValue; } // only use text nodes
         }
 
