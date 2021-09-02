@@ -49,6 +49,7 @@ $zoom-button-hover-colour: govuk-shade($zoom-button-colour, 10%);
 // focus to mimic the 2-colour style GOVUK Frontend buttons and links have
 .leaflet-bar {
   border-radius: 0; // Remove rounded corners
+  background: #CCCCCC;
 
   @media (forced-colors: active) {
     background: canvasText;
@@ -58,6 +59,11 @@ $zoom-button-hover-colour: govuk-shade($zoom-button-colour, 10%);
 
     // Outlines don't work because of the buttons being so close together so turn off
     outline: none;
+
+    &:first-child {
+      border-bottom: none;
+      margin-bottom: 1px;
+    }
 
     &:last-child {
       // Allow it to contain the absolutely positioned divider bar we show between buttons
@@ -91,11 +97,6 @@ $zoom-button-hover-colour: govuk-shade($zoom-button-colour, 10%);
     &:focus:not(:active):not(:hover) {
       color: $govuk-focus-text-colour;
       background-color: $govuk-focus-colour;
-    }
-
-    // Retain the space between buttons now we're using the border in the focus style
-    &:first-child:focus {
-      margin-bottom: 1px;
     }
 
     // 3px divider between buttons as a version of the underline from the GOVUK focus style
