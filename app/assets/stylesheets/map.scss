@@ -26,21 +26,16 @@ $zoom-button-hover-colour: govuk-shade($zoom-button-colour, 10%);
   &:focus {
     box-shadow: 0px 0px 0 3px $govuk-focus-text-colour, 0 0 0 6px $govuk-focus-colour;
     outline: solid 3px transparent !important; // sass-lint:disable-line no-important
-  }
-
-  &:focus:not(:focus-visible) {
-    box-shadow: none;
-  }
-
-  &:focus-visible {
-    box-shadow: 0px 0px 0 3px $govuk-focus-text-colour, 0 0 0 6px $govuk-focus-colour;
-    outline: solid 3px transparent !important; // sass-lint:disable-line no-important
-
     // You only see the outline in forced colour mode which doesn't have enough contrast with the
     // map so this creates some space between them to mimic the two-colour default styling
-    @media (forced-colors: active) {
-      outline-offset: 3px;
-    }
+    outline-offset: 3px;
+  }
+
+  // The map should only recieve focus from being tabbed to. This stops the focus state coming
+  // from other sources (like clicks on child elements).
+  &:focus:not(:focus-visible) {
+    box-shadow: none;
+    outline: none;
   }
 }
 
