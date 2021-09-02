@@ -11,6 +11,7 @@ from app.broadcast_areas.models import (
     CustomBroadcastAreas,
     broadcast_area_libraries,
 )
+from app.broadcast_areas.utils import aggregate_areas
 from app.formatters import round_to_significant_figures
 from app.models import JSONModel, ModelList
 from app.models.user import User
@@ -244,6 +245,7 @@ class BroadcastMessage(JSONModel):
         areas = {
             'ids': self.area_ids,
             'names': [area.name for area in self.areas],
+            'aggregate_names': [area.name for area in aggregate_areas(self.areas)],
             'simple_polygons': self.simple_polygons.as_coordinate_pairs_lat_long
         }
 

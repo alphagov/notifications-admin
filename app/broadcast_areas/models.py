@@ -86,6 +86,14 @@ class BroadcastArea(BaseBroadcastArea, SortableMixin):
     def __init__(self, row):
         self.id, self.name, self._count_of_phones, self.library_id = row
 
+    @cached_property
+    def is_lower_tier_local_authority(self):
+        return self.id.startswith('lad20-') and self.parent
+
+    @cached_property
+    def is_electoral_ward(self):
+        return self.id.startswith('wd20-')
+
     @classmethod
     def from_row_with_simple_polygons(cls, row):
         instance = cls(row[:4])
@@ -127,6 +135,10 @@ class BroadcastArea(BaseBroadcastArea, SortableMixin):
     def ancestors(self):
         return list(self._ancestors_iterator)
 
+    @cached_property
+    def parent(self):
+        return next(iter(self.ancestors), None)
+
     @property
     def _ancestors_iterator(self):
         id = self.id
@@ -161,6 +173,13 @@ class CustomBroadcastArea(BaseBroadcastArea):
         )
 
     simple_polygons = polygons
+
+    @cached_property
+    def overlapping_electoral_wards(self):
+        return [
+            area for area in self.nearby_electoral_wards
+            if area.simple_polygons.intersects(self.polygons)
+        ]
 
     @cached_property
     def nearby_electoral_wards(self):
