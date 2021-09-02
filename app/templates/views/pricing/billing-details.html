@@ -53,7 +53,6 @@
     <div class="govuk-!-margin-bottom-4">
     {{ copy_to_clipboard(
         'GB 88 88 010 80',
-        name=None,
         thing='<abbr title="Value Added Tax">VAT</abbr> number',
     ) }}
     </div>
@@ -79,34 +78,46 @@
       Cabinet Office
     </p>
 
+    <h3 class="heading-small">
+      Account number
+    </h3>
+
     <div class="govuk-!-margin-bottom-4">
     {{ copy_to_clipboard(
         billing_details['account_number'],
-        name='Account number',
         thing='account number',
       ) }}
     </div>
 
+    <h3 class="heading-small">
+      Sort code
+    </h3>
+
     <div class="govuk-!-margin-bottom-4">
     {{ copy_to_clipboard(
         billing_details['sort_code'],
-        name='Sort code',
         thing='sort code',
       ) }}
     </div>
 
+
+    <h3 class="heading-small">
+      <abbr title="International Bank Account Number">IBAN</abbr>
+    </h3>
     <div class="govuk-!-margin-bottom-4">
     {{ copy_to_clipboard(
         billing_details['IBAN'],
-        name='IBAN',
         thing='IBAN',
       ) }}
     </div>
 
+    <h3 class="heading-small">
+      Swift code
+    </h3>
+
     <div class="govuk-!-margin-bottom-4">
     {{ copy_to_clipboard(
         billing_details['swift'],
-        name='Swift code',
         thing='Swift code',
       ) }}
     </div>
