@@ -10,15 +10,14 @@ $govuk-focus-colour: #FFDD00;
 $zoom-button-colour: govuk-colour("white");
 $zoom-button-hover-colour: govuk-shade($zoom-button-colour, 10%);
 
-// The focus style is a 2-colour outline, made to match the GOVUK text input focus style, using
+// The map focus style is a 2-colour outline, made to match the GOVUK text input focus style, using
 // box-shadow. When colours are overridden, for example when users have Windows high contrast mode
-// on, box-shadows disappear, so the outline which is left as a single colour (defined by the OS,
-// to replace 'transparent').
+// on, box-shadows disappear, so the outline is left as a single colour (defined by the OS, to
+// replace 'transparent') which we offset from the map to mimic the 2-colour version.
 //
 // Leaflet adds focus styles with JS, through inline styles. Because of their higher precedence
 // we need to mark our overrides with !important.
 //
-// This also uses :focus-visible to stop it showing focus when you click zoom in/out.
 // This approach, taken from MDN, allows it to fall back to :focus for browsers without support:
 // https://developer.mozilla.org/en-US/docs/Web/CSS/:focus-visible#selectively_showing_the_focus_indicator
 .leaflet-container {
@@ -26,8 +25,6 @@ $zoom-button-hover-colour: govuk-shade($zoom-button-colour, 10%);
   &:focus {
     box-shadow: 0px 0px 0 3px $govuk-focus-text-colour, 0 0 0 6px $govuk-focus-colour;
     outline: solid 3px transparent !important; // sass-lint:disable-line no-important
-    // You only see the outline in forced colour mode which doesn't have enough contrast with the
-    // map so this creates some space between them to mimic the two-colour default styling
     outline-offset: 3px;
   }
 
@@ -43,10 +40,11 @@ $zoom-button-hover-colour: govuk-shade($zoom-button-colour, 10%);
 // https://design-system.service.gov.uk/components/button/
 //
 // GOVUK buttons have an invisible outline, used for high contrast modes. Our buttons are cropped by
-// their container so we use a border instead.
+// their container so we use their border instead.
 //
-// Also introduces a black divider between the buttons, made with a pseudo element, appearing on
-// focus to mimic the 2-colour style GOVUK Frontend buttons and links have
+// Also introduces a thick black divider between the buttons, made with a pseudo element, appearing
+// on focus. Together with the yellow background, this copies the 2-colour style GOVUK Frontend
+// buttons and links have.
 .leaflet-bar {
   border-radius: 0; // Remove rounded corners
   background: #CCCCCC;
@@ -66,7 +64,7 @@ $zoom-button-hover-colour: govuk-shade($zoom-button-colour, 10%);
     }
 
     &:last-child {
-      // Allow it to contain the absolutely positioned divider bar we show between buttons
+      // Allow it to contain the absolutely positioned divider we show between buttons
       // when one is focused
       position: relative;
     }
@@ -99,7 +97,7 @@ $zoom-button-hover-colour: govuk-shade($zoom-button-colour, 10%);
       background-color: $govuk-focus-colour;
     }
 
-    // 3px divider between buttons as a version of the underline from the GOVUK focus style
+    // Shared styles for the divider between buttons that appears when either are focused
     &:last-child:focus:not(:active):not(:hover):before,
     &:first-child:focus:not(:active):not(:hover) + a:before {
       content: "";
