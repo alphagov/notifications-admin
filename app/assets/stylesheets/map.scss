@@ -105,7 +105,7 @@ $zoom-button-hover-colour: govuk-shade($zoom-button-colour, 10%);
       height: 2px;
       background: $govuk-focus-text-colour;
 
-      // hide in forced-color mode, where the normal focus state the divider is part of does not show
+      // Hide in forced-color mode, since the button outlines suffice
       @media (forced-colors: active) {
         display: none;
       }
