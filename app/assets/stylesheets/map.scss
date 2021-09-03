@@ -39,7 +39,7 @@ $zoom-button-hover-colour: govuk-shade($zoom-button-colour, 10%);
 // Overrides for zoom controls to make them match GOVUK buttons
 // https://design-system.service.gov.uk/components/button/
 //
-// GOVUK buttons have an invisible outline, used for high contrast modes. Our buttons are cropped by
+// GOVUK buttons usually have an outline that shows up in high contrast modes. Our buttons are cropped by
 // their container so we use their border instead.
 //
 // Also introduces a thick black divider between the buttons, made with a pseudo element, appearing
@@ -47,7 +47,7 @@ $zoom-button-hover-colour: govuk-shade($zoom-button-colour, 10%);
 // buttons and links have.
 .leaflet-bar {
   border-radius: 0; // Remove rounded corners
-  background: #CCCCCC;
+  background: #CCCCCC; // Grey background to give a thin divider between buttons when they're not in focus
 
   @media (forced-colors: active) {
     background: canvasText;
@@ -60,7 +60,7 @@ $zoom-button-hover-colour: govuk-shade($zoom-button-colour, 10%);
 
     &:first-child {
       border-bottom: none;
-      margin-bottom: 1px;
+      margin-bottom: 1px; // Thin divider to distinguish buttons
     }
 
     &:last-child {
@@ -114,14 +114,14 @@ $zoom-button-hover-colour: govuk-shade($zoom-button-colour, 10%);
     // Styles for the divider, specifc to the second button being focused
     &:last-child:focus:not(:active):not(:hover):before {
       left: -2px; // Subtract 2px left border
-      top: -3px; // Subtract 2px top border and position so it overlaps space above button
+      top: -3px; // Shift divider up 1px so it overlaps buttons equally, and another 2px to compensate for the reduced height of the last button (due to the border)
       width: calc(100% + 4px); // Compensate for borders
     }
 
     // Styles for the divider, specifc to the first button being focused
     &:first-child:focus:not(:active):not(:hover) + a:before {
       left: 0px; // No borders on parent of :before when not focused
-      top: -1px; // No borders so just overlap space above parent button
+      top: -1px; // Shift divider up 1px so it overlaps buttons equally
       width: 100%;
     }
   }
