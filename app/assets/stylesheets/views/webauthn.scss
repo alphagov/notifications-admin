@@ -27,9 +27,12 @@
 .webauthn-illustration {
 
   @include media-down(mobile) {
-    margin: govuk-spacing(6) govuk-spacing(9) 0 govuk-spacing(9);
+    box-sizing: border-box;
+    margin: govuk-spacing(6) auto 0 auto;
+    padding: 0 govuk-spacing(9) 0 govuk-spacing(9);
   }
 
+  width: 100%;
   margin: govuk-spacing(9) auto 0 auto;
 
 }
