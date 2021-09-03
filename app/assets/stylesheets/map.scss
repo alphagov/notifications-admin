@@ -32,7 +32,7 @@ $zoom-button-hover-colour: govuk-shade($zoom-button-colour, 10%);
   // from other sources (like clicks on child elements).
   &:focus:not(:focus-visible) {
     box-shadow: none;
-    outline: none;
+    outline: none !important; // sass-lint:disable-line no-important
   }
 }
 
