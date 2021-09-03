@@ -13,8 +13,9 @@ def list_routes():
 
 @click.command()
 @click.argument('csv_path')
+@click.argument('for_reals')
 @with_appcontext
-def tmp_backfill_areas(csv_path, dry_run=True):
+def tmp_backfill_areas(csv_path, for_reals=False):
     import csv
 
     from app.models.broadcast_message import BroadcastMessage
@@ -23,7 +24,7 @@ def tmp_backfill_areas(csv_path, dry_run=True):
         message = BroadcastMessage.from_id(id, service_id=service_id)
         print(f'Updating {message.id}')  # noqa
 
-        if not dry_run:
+        if for_reals:
             message._update_areas(force_override=True)
 
 
