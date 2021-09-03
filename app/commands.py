@@ -11,23 +11,5 @@ def list_routes():
         print("{:10} {}".format(", ".join(rule.methods - set(['OPTIONS', 'HEAD'])), rule.rule))  # noqa
 
 
-@click.command()
-@click.argument('csv_path')
-@click.argument('for_reals')
-@with_appcontext
-def tmp_backfill_areas(csv_path, for_reals=False):
-    import csv
-
-    from app.models.broadcast_message import BroadcastMessage
-
-    for id, service_id in csv.reader(open(csv_path)):
-        message = BroadcastMessage.from_id(id, service_id=service_id)
-        print(f'Updating {message.id}')  # noqa
-
-        if for_reals:
-            message._update_areas(force_override=True)
-
-
 def setup_commands(application):
     application.cli.add_command(list_routes)
-    application.cli.add_command(tmp_backfill_areas)
