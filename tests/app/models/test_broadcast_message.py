@@ -4,13 +4,8 @@ from app.models.broadcast_message import BroadcastMessage
 from tests import broadcast_message_json
 
 
-def test_simple_polygons(fake_uuid):
+def test_simple_polygons():
     broadcast_message = BroadcastMessage(broadcast_message_json(
-        id_=fake_uuid,
-        service_id=fake_uuid,
-        template_id=fake_uuid,
-        status='draft',
-        created_by_id=fake_uuid,
         area_ids=[
             # Hackney Central
             'wd20-E05009372',
@@ -38,24 +33,13 @@ def test_simple_polygons(fake_uuid):
     ]
 
 
-def test_content_comes_from_attribute_not_template(fake_uuid):
-    broadcast_message = BroadcastMessage(broadcast_message_json(
-        id_=fake_uuid,
-        service_id=fake_uuid,
-        template_id=fake_uuid,
-        status='draft',
-        created_by_id=fake_uuid,
-    ))
+def test_content_comes_from_attribute_not_template():
+    broadcast_message = BroadcastMessage(broadcast_message_json())
     assert broadcast_message.content == 'This is a test'
 
 
-def test_areas_raises_for_missing_areas(fake_uuid):
+def test_areas_raises_for_missing_areas():
     broadcast_message = BroadcastMessage(broadcast_message_json(
-        id_=fake_uuid,
-        service_id=fake_uuid,
-        template_id=fake_uuid,
-        status='draft',
-        created_by_id=fake_uuid,
         area_ids=[
             'wd20-E05009372',
             'something else',
