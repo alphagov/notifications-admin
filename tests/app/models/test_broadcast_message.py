@@ -49,7 +49,7 @@ def test_content_comes_from_attribute_not_template(fake_uuid):
     assert broadcast_message.content == 'This is a test'
 
 
-def test_raises_for_missing_areas(fake_uuid):
+def test_areas_raises_for_missing_areas(fake_uuid):
     broadcast_message = BroadcastMessage(broadcast_message_json(
         id_=fake_uuid,
         service_id=fake_uuid,
