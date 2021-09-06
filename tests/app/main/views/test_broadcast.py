@@ -974,8 +974,10 @@ def test_preview_broadcast_areas_page_with_custom_polygons(
             created_by_id=fake_uuid,
             service_id=SERVICE_ONE_ID,
             status='draft',
-            area_ids=['Area one', 'Area two', 'Area three'],
-            simple_polygons=polygons,
+            areas={
+                'names': ['Area one', 'Area two', 'Area three'],
+                'simple_polygons': polygons,
+            }
         ),
     )
     client_request.login(active_user_create_broadcasts_permission)

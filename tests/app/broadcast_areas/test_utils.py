@@ -175,8 +175,10 @@ def test_aggregate_areas_for_custom_polygons(
 ):
     broadcast_message = BroadcastMessage(
         broadcast_message_json(
-            area_ids=['derived from polygons'],
-            simple_polygons=simple_polygons
+            areas={
+                'names': [f'polygon {i}' for i, _ in enumerate(simple_polygons)],
+                'simple_polygons': simple_polygons
+            }
         )
     )
 

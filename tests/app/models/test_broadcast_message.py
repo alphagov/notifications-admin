@@ -38,6 +38,22 @@ def test_content_comes_from_attribute_not_template():
     assert broadcast_message.content == 'This is a test'
 
 
+@pytest.mark.parametrize(('areas', 'expected_length'), [
+    ({'ids': []}, 0),
+    ({'ids': ['wd20-E05009372']}, 1),
+    ({'names': ['somewhere'], 'simple_polygons': [[[3.5, 1.5]]]}, 1)
+])
+def test_areas(
+    areas,
+    expected_length
+):
+    broadcast_message = BroadcastMessage(broadcast_message_json(
+        areas=areas
+    ))
+
+    assert len(list(broadcast_message.areas)) == expected_length
+
+
 def test_areas_raises_for_missing_areas():
     broadcast_message = BroadcastMessage(broadcast_message_json(
         area_ids=[
