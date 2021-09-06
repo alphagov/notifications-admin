@@ -99,10 +99,15 @@ class BroadcastMessage(JSONModel):
                 )
             return library_areas
 
-        return CustomBroadcastAreas(
-            names=self._dict['areas']['names'],
-            polygons=self._dict['areas']['simple_polygons'],
-        )
+        polygons = self._dict['areas'].get('simple_polygons', [])
+
+        if polygons:
+            return CustomBroadcastAreas(
+                names=self._dict['areas']['names'],
+                polygons=polygons,
+            )
+
+        return []
 
     @property
     def area_ids(self):

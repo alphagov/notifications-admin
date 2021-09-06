@@ -41,6 +41,7 @@ def test_content_comes_from_attribute_not_template():
 @pytest.mark.parametrize(('areas', 'expected_length'), [
     ({'ids': []}, 0),
     ({'ids': ['wd20-E05009372']}, 1),
+    ({'no data': 'just created'}, 0),
     ({'names': ['somewhere'], 'simple_polygons': [[[3.5, 1.5]]]}, 1)
 ])
 def test_areas(
