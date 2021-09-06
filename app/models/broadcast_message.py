@@ -111,7 +111,7 @@ class BroadcastMessage(JSONModel):
 
     @property
     def area_ids(self):
-        return self._dict['areas']['ids']
+        return self._dict['areas'].get('ids', [])
 
     @area_ids.setter
     def area_ids(self, value):

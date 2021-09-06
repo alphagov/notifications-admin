@@ -4,6 +4,21 @@ from app.models.broadcast_message import BroadcastMessage
 from tests import broadcast_message_json
 
 
+@pytest.mark.parametrize('areas, expected_area_ids', [
+    ({'simple_polygons': []}, []),
+    ({'ids': ['123'], 'simple_polygons': []}, ['123'])
+])
+def test_area_ids(
+    areas,
+    expected_area_ids,
+):
+    broadcast_message = BroadcastMessage(broadcast_message_json(
+        areas=areas
+    ))
+
+    assert broadcast_message.area_ids == expected_area_ids
+
+
 def test_simple_polygons():
     broadcast_message = BroadcastMessage(broadcast_message_json(
         area_ids=[
