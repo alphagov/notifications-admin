@@ -202,8 +202,8 @@ const javascripts = () => {
 const sass = () => {
   return src([
       paths.src + '/stylesheets/main*.scss',
-      paths.src + '/stylesheets/print.scss',
-      paths.npm + '/leaflet/dist/leaflet.css'
+      paths.src + '/stylesheets/map.scss',
+      paths.src + '/stylesheets/print.scss'
     ])
     .pipe(plugins.prettyerror())
     .pipe(plugins.sass({
@@ -212,6 +212,7 @@ const sass = () => {
         paths.npm + 'govuk-elements-sass/public/sass/',
         paths.toolkit + 'stylesheets/',
         paths.govuk_frontend,
+        paths.npm
       ]
     }))
     .pipe(plugins.cssUrlAdjuster({

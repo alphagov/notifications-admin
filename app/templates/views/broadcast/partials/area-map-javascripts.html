@@ -29,16 +29,82 @@
 
 
   var mapElement = document.getElementById('area-list-map');
+  var grandparent = mapElement.parentNode.parentNode;
+  var isInDetails = grandparent.className.indexOf('govuk-details') !== -1;
+  var areas = document.querySelectorAll('.area-list > .area-list-item');
+  var trimRegExp = /^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g;
+  var details;
+  var label;
 
   // if element is inside a details element then to make the map render correctly we open the details element
   // and set up the map before closing the details map after
-  grandparent = mapElement.parentElement.parentElement;
-  if (grandparent.className.split(/\s+/).indexOf('govuk-details') > -1) {
+  if (isInDetails) {
     details = grandparent;
     details.open = true;
   }
 
+  function addAriaLabel (mapElement) {
+
+    function getLabelPrefix (areas) {
+      return [
+        'Map of the United Kingdom, showing the ',
+        (areas.length === 1) ? 'area' : 'areas',
+        ' for'
+      ].join('');
+    };
+
+    function getStringOfAreas (areas) {
+      var areasLen = areas.length;
+      var areaStrings = [];
+      var idx;
+
+      function getAreaName (area) {
+        var areaString = '';
+        var childNodesLen = area.childNodes.length;
+        var idx;
+        var childNode;
+
+        for (idx = 0; idx < childNodesLen; idx++) {
+          childNode = area.childNodes[idx];
+          if (childNode.nodeType === 3) { areaString += childNode.nodeValue; } // only use text nodes
+        }
+
+        return areaString.replace(trimRegExp, '')
+      };
+
+      if (areasLen === 1) { return getAreaName(areas[0]); }
+
+      for (idx = 0; idx < areasLen; idx++) {
+        areaStrings.push(getAreaName(areas[idx]));
+      }
+
+      // always join last 2 areas with 'and', the rest with commas
+      return areaStrings.slice(0, areasLen - 1).join(', ') + ' and ' + areaStrings[areasLen - 1];
+    };
+
+    label = getLabelPrefix(areas) + " " + getStringOfAreas(areas);
+    mapElement.setAttribute('aria-label', label);
+  };
+
+  function addAriaDescription (mapElement) {
+
+    var mapContainer = mapElement.parentNode;
+    var description = document.createElement('p');
+    var descriptionText = 'Use the arrow keys to move the map. Use the buttons to zoom the map in or out';
+
+    description.appendChild(
+      document.createTextNode(descriptionText)
+    );
+    description.setAttribute('id', 'area-list-map__description');
+    description.className = 'govuk-visually-hidden';
+    mapContainer.insertBefore(description, mapElement.nextSibling);
+    mapElement.setAttribute('aria-describedby', 'area-list-map__description');
+  };
+
   mapElement.style.height = Math.max(320, window.innerHeight - mapElement.offsetTop - 100) + 'px';
+  mapElement.setAttribute('role', 'region');
+  addAriaLabel(mapElement);
+  addAriaDescription(mapElement);
 
   var mymap = L.map(
     'area-list-map',
@@ -58,7 +124,7 @@
   );
 
   // if element is inside a details element then close the details element
-  if (details) {
+  if (isInDetails) {
     details.open = false;
   }
 
