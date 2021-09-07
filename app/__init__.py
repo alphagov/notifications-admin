@@ -33,7 +33,6 @@ from werkzeug.local import LocalProxy
 
 from app import proxy_fix, webauthn_server
 from app.asset_fingerprinter import asset_fingerprinter
-from app.commands import setup_commands
 from app.config import configs
 from app.extensions import antivirus_client, redis_client, zendesk_client
 from app.formatters import (
@@ -151,8 +150,6 @@ navigation = {
 
 
 def create_app(application):
-    setup_commands(application)
-
     notify_environment = os.environ['NOTIFY_ENVIRONMENT']
 
     application.config.from_object(configs[notify_environment])
