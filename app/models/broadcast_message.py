@@ -1,6 +1,7 @@
 import itertools
 from datetime import datetime, timedelta
 
+from flask import current_app
 from notifications_utils.polygons import Polygons
 from notifications_utils.template import BroadcastPreviewTemplate
 from orderedset import OrderedSet
@@ -92,12 +93,19 @@ class BroadcastMessage(JSONModel):
         if 'ids' in self._dict['areas']:
             library_areas = self.get_areas(self.area_ids)
 
-            if len(library_areas) != len(self.area_ids):
-                raise RuntimeError(
-                    f'BroadcastMessage has {len(self.area_ids)} areas '
-                    f'but {len(library_areas)} found in the library'
+            if len(library_areas) == len(self.area_ids):
+                return library_areas
+            else:
+                # it's possible an old broadcast may refer to areas that
+                # are no longer part of our area libraries; in this case
+                # we should just treat the whole thing as a custom broadcast,
+                # which isn't great as our code doesn't support editing its
+                # areas, but we don't expect this to happen often
+                current_app.logger.warn(
+                    f'BroadcastMessage has {len(self._dict["areas"])} areas '
+                    f'but {len(library_areas)} found in the library. Treating '
+                    f'{self.id} as a custom broadcast.'
                 )
-            return library_areas
 
         polygons = self._dict['areas'].get('simple_polygons', [])
 
