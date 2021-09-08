@@ -102,7 +102,7 @@ class BroadcastMessage(JSONModel):
                 # which isn't great as our code doesn't support editing its
                 # areas, but we don't expect this to happen often
                 current_app.logger.warn(
-                    f'BroadcastMessage has {len(self._dict["areas"])} areas '
+                    f'BroadcastMessage has {len(self.area_ids)} area IDs '
                     f'but {len(library_areas)} found in the library. Treating '
                     f'{self.id} as a custom broadcast.'
                 )
