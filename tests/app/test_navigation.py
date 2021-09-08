@@ -31,6 +31,7 @@ EXCLUDED_ENDPOINTS = tuple(map(Navigation.get_endpoint_with_blueprint, {
     'archive_user',
     'bat_phone',
     'begin_tour',
+    'billing_details',
     'branding_and_customisation',
     'branding_request',
     'broadcast',
@@ -371,7 +372,11 @@ navigation_instances = (
 )
 
 
-@pytest.mark.parametrize('navigation_instance', navigation_instances)
+@pytest.mark.parametrize(
+    'navigation_instance',
+    navigation_instances,
+    ids=(x.__class__.__name__ for x in navigation_instances)
+)
 def test_navigation_items_are_properly_defined(navigation_instance):
     for endpoint in navigation_instance.endpoints_with_navigation:
         assert (
@@ -399,7 +404,11 @@ def test_excluded_navigation_items_are_properly_defined():
         ), f'{endpoint} found more than once in EXCLUDED_ENDPOINTS'
 
 
-@pytest.mark.parametrize('navigation_instance', navigation_instances)
+@pytest.mark.parametrize(
+    'navigation_instance',
+    navigation_instances,
+    ids=(x.__class__.__name__ for x in navigation_instances)
+)
 def test_all_endpoints_are_covered(navigation_instance):
     covered_endpoints = (
         navigation_instance.endpoints_with_navigation +
@@ -411,7 +420,11 @@ def test_all_endpoints_are_covered(navigation_instance):
         assert endpoint in covered_endpoints, f'{endpoint} is not listed or excluded'
 
 
-@pytest.mark.parametrize('navigation_instance', navigation_instances)
+@pytest.mark.parametrize(
+    'navigation_instance',
+    navigation_instances,
+    ids=(x.__class__.__name__ for x in navigation_instances)
+)
 @pytest.mark.xfail(raises=KeyError)
 def test_raises_on_invalid_navigation_item(
     client_request, navigation_instance

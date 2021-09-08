@@ -9,7 +9,7 @@ afterAll(() => {
 
 });
 
-describe('API key', () => {
+describe('copy to clipboard', () => {
 
   let apiKey = '00000000-0000-0000-0000-000000000000';
   let thing;
@@ -21,14 +21,14 @@ describe('API key', () => {
 
     // set up DOM
     document.body.innerHTML =`
-      <h2 class="api-key__name">
+      <h2 class="copy-to-clipboard__name">
         ${options.thing}
       </h2>
-      <div data-module="api-key" data-key="${apiKey}" data-thing="${options.thing}" data-name="${options.name}">
-        <span class="api-key__key" aria-live="assertive">
+      <div data-module="copy-to-clipboard" data-value="${apiKey}" data-thing="${options.thing}" data-name="${options.name}">
+        <span class="copy-to-clipboard__value" aria-live="assertive">
           ${(options.name === options.thing) ? '<span class="govuk-visually-hidden">' + options.thing + ': </span>' : ''}${apiKey}
         </span>
-        <span class="api-key__notice" aria-live="assertive"></span>
+        <span class="copy-to-clipboard__notice" aria-live="assertive"></span>
       </div>`;
 
   };
@@ -58,11 +58,11 @@ describe('API key', () => {
     // fake support for the copy command not being available
     document.queryCommandSupported = jest.fn(command => false);
 
-    require('../../app/assets/javascripts/apiKey.js');
+    require('../../app/assets/javascripts/copyToClipboard.js');
 
-    setUpDOM({ 'thing': 'API key', 'name': 'API key' });
+    setUpDOM({ 'thing': 'Some Thing', 'name': 'Some Thing' });
 
-    component = document.querySelector('[data-module=api-key]');
+    component = document.querySelector('[data-module=copy-to-clipboard]');
 
     // start the module
     window.GOVUK.modules.start();
@@ -83,7 +83,7 @@ describe('API key', () => {
       // force module require to not come from cache
       jest.resetModules();
 
-      require('../../app/assets/javascripts/apiKey.js');
+      require('../../app/assets/javascripts/copyToClipboard.js');
 
     });
 
@@ -97,13 +97,13 @@ describe('API key', () => {
 
         beforeEach(() => {
 
-          setUpDOM({ 'thing': 'API key', 'name': 'API key' });
+          setUpDOM({ 'thing': 'Some Thing', 'name': 'Some Thing' });
 
-          component = document.querySelector('[data-module=api-key]');
+          component = document.querySelector('[data-module=copy-to-clipboard]');
 
           // set default style for component height (queried by jQuery before checking DOM APIs)
           const stylesheet = document.createElement('style');
-          stylesheet.innerHTML = '[data-module=api-key] { height: auto; }'; // set to browser default
+          stylesheet.innerHTML = '[data-module=copy-to-clipboard] { height: auto; }'; // set to browser default
           document.getElementsByTagName('head')[0].appendChild(stylesheet);
 
           componentHeightOnLoad = 50;
@@ -126,15 +126,15 @@ describe('API key', () => {
 
         });
 
-        test("It should add a button for copying the key to the clipboard", () => {
+        test("It should add a button for copying the thing to the clipboard", () => {
 
           expect(component.querySelector('button')).not.toBeNull();
 
         });
 
-        test("It should add the 'api-key' class", () => {
+        test("It should add the 'copy-to-clipboard' class", () => {
 
-          expect(component.classList.contains('api-key')).toBe(true);
+          expect(component.classList.contains('copy-to-clipboard')).toBe(true);
 
         });
 
@@ -162,7 +162,7 @@ describe('API key', () => {
           // different, it will be one of others called the same 'thing'.
           setUpDOM({ 'thing': 'ID', 'name': 'Default' });
 
-          component = document.querySelector('[data-module=api-key]');
+          component = document.querySelector('[data-module=copy-to-clipboard]');
 
           // start the module
           window.GOVUK.modules.start();
@@ -173,9 +173,9 @@ describe('API key', () => {
         // and so needs some prefix text to label it
         test("The id should have a hidden prefix to label what it is", () => {
 
-          const keyPrefix = component.querySelector('.api-key__key .govuk-visually-hidden');
-          expect(keyPrefix).not.toBeNull();
-          expect(keyPrefix.textContent).toEqual('ID: ');
+          const value = component.querySelector('.copy-to-clipboard__value .govuk-visually-hidden');
+          expect(value).not.toBeNull();
+          expect(value.textContent).toEqual('ID: ');
 
         });
 
@@ -196,9 +196,9 @@ describe('API key', () => {
           // The heading is added if 'thing' (what the id is) has the same value as 'name'
           // (its specific identifier on the page) because this means it can assume it is
           // the only one of its type there
-          setUpDOM({ 'thing': 'API key', 'name': 'API key' });
+          setUpDOM({ 'thing': 'Some Thing', 'name': 'Some Thing' });
 
-          component = document.querySelector('[data-module=api-key]');
+          component = document.querySelector('[data-module=copy-to-clipboard]');
 
           // start the module
           window.GOVUK.modules.start();
@@ -207,9 +207,9 @@ describe('API key', () => {
 
         test("Its button and id shouldn't have extra hidden text to identify them", () => {
 
-          const keyPrefix = component.querySelector('.api-key__key .govuk-visually-hidden');
+          const value = component.querySelector('.copy-to-clipboard__value .govuk-visually-hidden');
           const buttonSuffix = component.querySelector('button .govuk-visually-hidden');
-          expect(keyPrefix).toBeNull();
+          expect(value).toBeNull();
           expect(buttonSuffix).toBeNull();
 
         })
@@ -218,7 +218,7 @@ describe('API key', () => {
 
     });
 
-    describe("If you click the 'Copy API key to clipboard' button", () => {
+    describe("If you click the 'Copy Some Thing to clipboard' button", () => {
 
       describe("For all variations of the initial HTML", () => {
 
@@ -226,13 +226,13 @@ describe('API key', () => {
 
         beforeEach(() => {
 
-          setUpDOM({ 'thing': 'API key', 'name': 'API key' });
+          setUpDOM({ 'thing': 'Some Thing', 'name': 'Some Thing' });
 
           // start the module
           window.GOVUK.modules.start();
 
-          component = document.querySelector('[data-module=api-key]');
-          keyEl = component.querySelector('.api-key__key');
+          component = document.querySelector('[data-module=copy-to-clipboard]');
+          keyEl = component.querySelector('.copy-to-clipboard__value');
 
           helpers.triggerEvent(component.querySelector('button'), 'click');
 
@@ -240,7 +240,7 @@ describe('API key', () => {
 
         test("The live-region should be shown and its text should confirm the copy action", () => {
 
-          const liveRegion = component.querySelector('.api-key__notice');
+          const liveRegion = component.querySelector('.copy-to-clipboard__notice');
 
           expect(liveRegion.classList.contains('govuk-visually-hidden')).toBe(false);
           expect(liveRegion.textContent.trim()).toEqual(
@@ -253,31 +253,31 @@ describe('API key', () => {
         // lower priority than the live-region
         test("The live-region should contain some hidden text giving context to the statement shown", () => {
 
-          const liveRegionHiddenText = component.querySelectorAll('.api-key__notice .govuk-visually-hidden');
+          const liveRegionHiddenText = component.querySelectorAll('.copy-to-clipboard__notice .govuk-visually-hidden');
 
           expect(liveRegionHiddenText.length).toEqual(2);
-          expect(liveRegionHiddenText[0].textContent).toEqual('API key ');
+          expect(liveRegionHiddenText[0].textContent).toEqual('Some Thing ');
           expect(liveRegionHiddenText[1].textContent).toEqual(', press button to show in page');
 
         });
 
-        test("It should swap the button for one to show the API key", () => {
+        test("It should swap the button for one to show the Some Thing", () => {
 
           expect(component.querySelector('button').textContent.trim()).toEqual(
-            expect.stringContaining('Show API key')
+            expect.stringContaining('Show Some Thing')
           );
 
         });
 
         test("It should remove the id from the page", () => {
 
-          expect(component.querySelector('.api-key__key')).toBeNull();
+          expect(component.querySelector('.copy-to-clipboard__value')).toBeNull();
 
         });
 
-        test("It should copy the key to the clipboard", () => {
+        test("It should copy the thing to the clipboard", () => {
 
-          // it should make a selection (a range) from the contents of the element containing the API key
+          // it should make a selection (a range) from the contents of the element containing the Some Thing
           expect(rangeMock.selectNodeContents.mock.calls[0]).toEqual([keyEl]);
 
           // that selection (a range) should be added to that for the page (a selection)
@@ -293,7 +293,7 @@ describe('API key', () => {
 
         });
 
-        describe("If you then click the 'Show API key'", () => {
+        describe("If you then click the 'Show Some Thing'", () => {
 
           beforeEach(() => {
 
@@ -301,16 +301,16 @@ describe('API key', () => {
 
           });
 
-          test("It should change the text to show the API key", () => {
+          test("It should change the text to show the Some Thing", () => {
 
-            expect(component.querySelector('.api-key__key')).not.toBeNull();
+            expect(component.querySelector('.copy-to-clipboard__value')).not.toBeNull();
 
           });
 
-          test("It should swap the button for one to copy the key to the clipboard", () => {
+          test("It should swap the button for one to copy the thing to the clipboard", () => {
 
             expect(component.querySelector('button').textContent.trim()).toEqual(
-              expect.stringContaining('Copy API key to clipboard')
+              expect.stringContaining('Copy Some Thing to clipboard')
             );
 
           })
@@ -330,7 +330,7 @@ describe('API key', () => {
           // start the module
           window.GOVUK.modules.start();
 
-          component = document.querySelector('[data-module=api-key]');
+          component = document.querySelector('[data-module=copy-to-clipboard]');
 
           helpers.triggerEvent(component.querySelector('button'), 'click');
 
@@ -368,12 +368,12 @@ describe('API key', () => {
           // The heading is added if 'thing' (what the id is) has the same value as 'name'
           // (its specific identifier on the page) because this means it can assume it is
           // the only one of its type there
-          setUpDOM({ 'thing': 'API key', 'name': 'API key' });
+          setUpDOM({ 'thing': 'Some Thing', 'name': 'Some Thing' });
 
           // start the module
           window.GOVUK.modules.start();
 
-          component = document.querySelector('[data-module=api-key]');
+          component = document.querySelector('[data-module=copy-to-clipboard]');
 
           helpers.triggerEvent(component.querySelector('button'), 'click');
 
@@ -381,9 +381,9 @@ describe('API key', () => {
 
         test("Its button and id shouldn't have extra hidden text to identify them", () => {
 
-          const keyPrefix = component.querySelector('.api-key__key .govuk-visually-hidden');
+          const prefix = component.querySelector('.copy-to-clipboard__value .govuk-visually-hidden');
           const buttonSuffix = component.querySelector('button .govuk-visually-hidden');
-          expect(keyPrefix).toBeNull();
+          expect(prefix).toBeNull();
           expect(buttonSuffix).toBeNull();
 
         })

@@ -1,0 +1,138 @@
+{% extends "content_template.html" %}
+{% from "components/page-header.html" import page_header %}
+
+{% from "components/copy-to-clipboard.html" import copy_to_clipboard %}
+
+{% block per_page_title %}
+  Billing details
+{% endblock %}
+
+{% block content_column_content %}
+
+    {{ page_header('Billing details') }}
+
+    <p class="govuk-body">
+      You can use the information on this page to add the Cabinet Office as a supplier. Your organisation may need to do this before you can raise a purchase order (PO).
+    </p>
+
+    <p class="govuk-body">
+      <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">Contact us</a> if you need any other details.
+    </p>
+
+    <h2 class="heading-medium govuk-!-margin-top-7">
+      Supplier details
+    </h2>
+
+    <p class="govuk-body">
+      Cabinet Office
+    </p>
+
+    <p class="govuk-body">
+      The White Chapel Building <br>
+      10 Whitechapel High Street <br>
+      London <br>
+      E1 8QS
+    </p>
+
+    <h3 class="heading-small">
+      Email addresses
+    </h3>
+
+    <ul class="govuk-list govuk-list--bullet">
+      {% for email in billing_details['notify_billing_email_addresses'] %}
+      <li>
+        {{ email }}
+      </li>
+      {% endfor %}
+    </ul>
+
+    <h3 class="heading-small">
+      <abbr title="Value Added Tax">VAT</abbr> number
+    </h3>
+
+    <div class="govuk-!-margin-bottom-4">
+    {{ copy_to_clipboard(
+        'GB 88 88 010 80',
+        thing='<abbr title="Value Added Tax">VAT</abbr> number',
+    ) }}
+    </div>
+
+    <h2 class="heading-medium govuk-!-margin-top-7">
+      Bank details
+    </h2>
+
+    <p class="govuk-body">
+      National Westminster Bank PLC (part of RBS group) <br>
+      Government Banking Services Branch <br>
+      2nd Floor <br>
+      280 Bishopsgate <br>
+      London <br>
+      EC2M 4RB
+    </p>
+
+    <h3 class="heading-small">
+      Account name
+    </h3>
+
+    <p class="govuk-body">
+      Cabinet Office
+    </p>
+
+    <h3 class="heading-small">
+      Account number
+    </h3>
+
+    <div class="govuk-!-margin-bottom-4">
+    {{ copy_to_clipboard(
+        billing_details['account_number'],
+        thing='account number',
+      ) }}
+    </div>
+
+    <h3 class="heading-small">
+      Sort code
+    </h3>
+
+    <div class="govuk-!-margin-bottom-4">
+    {{ copy_to_clipboard(
+        billing_details['sort_code'],
+        thing='sort code',
+      ) }}
+    </div>
+
+
+    <h3 class="heading-small">
+      <abbr title="International Bank Account Number">IBAN</abbr>
+    </h3>
+    <div class="govuk-!-margin-bottom-4">
+    {{ copy_to_clipboard(
+        billing_details['IBAN'],
+        thing='IBAN',
+      ) }}
+    </div>
+
+    <h3 class="heading-small">
+      Swift code
+    </h3>
+
+    <div class="govuk-!-margin-bottom-4">
+    {{ copy_to_clipboard(
+        billing_details['swift'],
+        thing='Swift code',
+      ) }}
+    </div>
+
+    <h2 class="heading-medium govuk-!-margin-top-7">
+      Invoice address
+    </h2>
+
+    <p class="govuk-body">
+      SSCL – Accounts Receivable <br>
+      PO Box 221 <br>
+      Thornton-Cleveleys <br>
+      Blackpool <br>
+      Lancashire <br>
+      FY1 9JN
+    </p>
+
+{% endblock %}
