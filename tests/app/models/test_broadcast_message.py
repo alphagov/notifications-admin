@@ -1,5 +1,6 @@
 import pytest
 
+from app.broadcast_areas.models import CustomBroadcastAreas
 from app.models.broadcast_message import BroadcastMessage
 from tests import broadcast_message_json
 
@@ -70,17 +71,23 @@ def test_areas(
     assert len(list(broadcast_message.areas)) == expected_length
 
 
-def test_areas_raises_for_missing_areas():
+def test_areas_treats_missing_ids_as_custom_broadcast(notify_admin):
     broadcast_message = BroadcastMessage(broadcast_message_json(
-        area_ids=[
-            'wd20-E05009372',
-            'something else',
-        ],
+        areas={
+            'ids': [
+                'wd20-E05009372',
+                'something else',
+            ],
+            # although the IDs may no longer be usable, we can
+            # expect the broadcast to have names and polygons,
+            # which is enough to show the user something
+            'names': [
+                'wd20 name',
+                'something else name'
+            ],
+            'simple_polygons': [[[1, 2]]]
+        }
     ))
 
-    with pytest.raises(RuntimeError) as exception:
-        broadcast_message.areas
-
-    assert str(exception.value) == (
-        'BroadcastMessage has 2 areas but 1 found in the library'
-    )
+    assert len(list(broadcast_message.areas)) == 2
+    assert type(broadcast_message.areas) == CustomBroadcastAreas
