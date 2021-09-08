@@ -4,13 +4,23 @@ from app.models.broadcast_message import BroadcastMessage
 from tests import broadcast_message_json
 
 
-def test_simple_polygons(fake_uuid):
+@pytest.mark.parametrize('areas, expected_area_ids', [
+    ({'simple_polygons': []}, []),
+    ({'ids': ['123'], 'simple_polygons': []}, ['123'])
+])
+def test_area_ids(
+    areas,
+    expected_area_ids,
+):
     broadcast_message = BroadcastMessage(broadcast_message_json(
-        id_=fake_uuid,
-        service_id=fake_uuid,
-        template_id=fake_uuid,
-        status='draft',
-        created_by_id=fake_uuid,
+        areas=areas
+    ))
+
+    assert broadcast_message.area_ids == expected_area_ids
+
+
+def test_simple_polygons():
+    broadcast_message = BroadcastMessage(broadcast_message_json(
         area_ids=[
             # Hackney Central
             'wd20-E05009372',
@@ -38,24 +48,30 @@ def test_simple_polygons(fake_uuid):
     ]
 
 
-def test_content_comes_from_attribute_not_template(fake_uuid):
-    broadcast_message = BroadcastMessage(broadcast_message_json(
-        id_=fake_uuid,
-        service_id=fake_uuid,
-        template_id=fake_uuid,
-        status='draft',
-        created_by_id=fake_uuid,
-    ))
+def test_content_comes_from_attribute_not_template():
+    broadcast_message = BroadcastMessage(broadcast_message_json())
     assert broadcast_message.content == 'This is a test'
 
 
-def test_raises_for_missing_areas(fake_uuid):
+@pytest.mark.parametrize(('areas', 'expected_length'), [
+    ({'ids': []}, 0),
+    ({'ids': ['wd20-E05009372']}, 1),
+    ({'no data': 'just created'}, 0),
+    ({'names': ['somewhere'], 'simple_polygons': [[[3.5, 1.5]]]}, 1)
+])
+def test_areas(
+    areas,
+    expected_length
+):
     broadcast_message = BroadcastMessage(broadcast_message_json(
-        id_=fake_uuid,
-        service_id=fake_uuid,
-        template_id=fake_uuid,
-        status='draft',
-        created_by_id=fake_uuid,
+        areas=areas
+    ))
+
+    assert len(list(broadcast_message.areas)) == expected_length
+
+
+def test_areas_raises_for_missing_areas():
+    broadcast_message = BroadcastMessage(broadcast_message_json(
         area_ids=[
             'wd20-E05009372',
             'something else',
