@@ -20,7 +20,7 @@ plugins.cssUrlAdjuster = require('gulp-css-url-adjuster');
 plugins.jshint = require('gulp-jshint');
 plugins.prettyerror = require('gulp-prettyerror');
 plugins.rollup = require('gulp-better-rollup')
-plugins.sass = require('gulp-sass');
+plugins.sass = require('gulp-sass')(require('sass'));
 plugins.sassLint = require('gulp-sass-lint');
 plugins.uglify = require('gulp-uglify');
 
@@ -207,8 +207,7 @@ const sass = () => {
       paths.src + '/stylesheets/print.scss'
     ])
     .pipe(plugins.prettyerror())
-    .pipe(plugins.sass({
-      outputStyle: 'nested',
+    .pipe(plugins.sass.sync({
       includePaths: [
         paths.npm + 'govuk-elements-sass/public/sass/',
         paths.toolkit + 'stylesheets/',
