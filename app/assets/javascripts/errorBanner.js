@@ -10,8 +10,7 @@
   */
   window.GOVUK.ErrorBanner = {
     hideBanner: () => $('.banner-dangerous').addClass('govuk-!-display-none'),
-    showBanner: (errorMessage) => $('.banner-dangerous')
-      .html(`<span class="govuk-visually-hidden">Error:</span> ${errorMessage}`)
+    showBanner: () => $('.banner-dangerous')
       .removeClass('govuk-!-display-none')
       .trigger('focus'),
   };

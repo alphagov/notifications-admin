@@ -30,10 +30,6 @@ describe("Error Banner", () => {
       window.GOVUK.ErrorBanner.showBanner('Some Err');
     });
 
-    test("Will set a specific error message on the element", () => {
-      expect(document.querySelector('.banner-dangerous').textContent).toEqual('Error: Some Err')
-    });
-
     test("Will show the element", () => {
       expect(document.querySelector('.banner-dangerous').classList).not.toContain('govuk-!-display-none')
     });

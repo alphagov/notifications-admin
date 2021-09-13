@@ -49,7 +49,7 @@
               // some browsers will show an error dialogue for some
               // errors; to be safe we always display an error message on the page.
               const message = error.message || error;
-              window.GOVUK.ErrorBanner.showBanner('Something went wrong');
+              window.GOVUK.ErrorBanner.showBanner();
             });
         });
     };

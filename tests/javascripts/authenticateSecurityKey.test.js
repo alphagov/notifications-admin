@@ -91,8 +91,8 @@ describe('Authenticate with security key', () => {
     })
 
     // this will make the test fail if the error banner is displayed
-    jest.spyOn(window.GOVUK.ErrorBanner, 'showBanner').mockImplementation((msg) => {
-      done(msg)
+    jest.spyOn(window.GOVUK.ErrorBanner, 'showBanner').mockImplementation(() => {
+      done('didnt expect the banner to be shown')
     })
 
     button.click()
@@ -152,8 +152,7 @@ describe('Authenticate with security key', () => {
       }
     })
 
-    jest.spyOn(window.GOVUK.ErrorBanner, 'showBanner').mockImplementation((msg) => {
-      expect(msg).toEqual('Something went wrong')
+    jest.spyOn(window.GOVUK.ErrorBanner, 'showBanner').mockImplementation(() => {
       done()
     })
 
@@ -174,8 +173,7 @@ describe('Authenticate with security key', () => {
       return Promise.reject(new DOMException('error'))
     })
 
-    jest.spyOn(window.GOVUK.ErrorBanner, 'showBanner').mockImplementation((msg) => {
-      expect(msg).toEqual('Something went wrong')
+    jest.spyOn(window.GOVUK.ErrorBanner, 'showBanner').mockImplementation(() => {
       done()
     })
 
@@ -222,8 +220,7 @@ describe('Authenticate with security key', () => {
     })
 
 
-    jest.spyOn(window.GOVUK.ErrorBanner, 'showBanner').mockImplementation((msg) => {
-      expect(msg).toEqual('Something went wrong')
+    jest.spyOn(window.GOVUK.ErrorBanner, 'showBanner').mockImplementation(() => {
       done()
     })
 
