@@ -477,7 +477,9 @@ def test_should_show_service_name(
     page = client_request.get('main.service_name_change', service_id=SERVICE_ONE_ID)
     assert page.find('h1').text == 'Change your service name'
     assert page.find('input', attrs={"type": "text"})['value'] == 'service one'
-    assert page.select_one('main p').text == 'Users will see your service name:'
+    assert page.select_one(
+        'main p'
+    ).text == 'Your service name should tell users what the message is about as well as who it’s from.'
     assert normalize_spaces(page.select_one('main ul').text) == (
         'at the start of every text message '
         'as your email sender name'
@@ -533,7 +535,9 @@ def test_should_show_service_name_with_no_prefixing(
     service_one['prefix_sms'] = False
     page = client_request.get('main.service_name_change', service_id=SERVICE_ONE_ID)
     assert page.find('h1').text == 'Change your service name'
-    assert page.select_one('main p').text == 'Users will see your service name as your email sender name.'
+    assert page.select_one(
+        'main p'
+    ).text == 'Your service name should tell users what the message is about as well as who it’s from.'
 
 
 def test_should_redirect_after_change_service_name(
