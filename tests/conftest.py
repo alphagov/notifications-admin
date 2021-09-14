@@ -1852,7 +1852,7 @@ def mock_create_contact_list(mocker, api_user_active):
 def mock_get_contact_lists(mocker, api_user_active, fake_uuid):
     def _get(service_id, template_type=None):
         return [{
-            'created_at': '2020-03-13 10:59:56',
+            'created_at': '2020-06-13T09:59:56.000000Z',
             'created_by': 'Test User',
             'id': fake_uuid,
             'original_file_name': 'EmergencyContactList.xls',
@@ -1862,7 +1862,7 @@ def mock_get_contact_lists(mocker, api_user_active, fake_uuid):
             'service_id': service_id,
             'template_type': 'email',
         }, {
-            'created_at': '2020-03-13 13:00:00',
+            'created_at': '2020-06-13T12:00:00.000000Z',
             'created_by': 'Test User',
             'id': 'd7b0bd1a-d1c7-4621-be5c-3c1b4278a2ad',
             'original_file_name': 'phone number list.csv',
@@ -1872,7 +1872,7 @@ def mock_get_contact_lists(mocker, api_user_active, fake_uuid):
             'service_id': service_id,
             'template_type': 'sms',
         }, {
-            'created_at': '2020-02-02 02:00:00',
+            'created_at': '2020-05-02T01:00:00.000000Z',
             'created_by': 'Test User',
             'id': fake_uuid,
             'original_file_name': 'UnusedList.tsv',
@@ -1893,7 +1893,7 @@ def mock_get_contact_lists(mocker, api_user_active, fake_uuid):
 def mock_get_contact_list(mocker, api_user_active, fake_uuid):
     def _get(*, service_id, contact_list_id):
         return {
-            'created_at': '2020-03-13 10:59:56',
+            'created_at': '2020-06-13T09:59:56.000000Z',
             'created_by': 'Test User',
             'id': fake_uuid,
             'original_file_name': 'EmergencyContactList.xls',

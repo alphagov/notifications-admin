@@ -458,7 +458,7 @@ def test_cant_save_bad_contact_list(
     (False, 'Not used yet.'),
     (True, 'Not used in the last 7 days.'),
 ])
-@freeze_time('2020-03-13 16:51:56')
+@freeze_time('2020-06-13 16:51:56')
 def test_view_contact_list(
     mocker,
     client_request,
