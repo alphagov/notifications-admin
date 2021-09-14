@@ -31,9 +31,11 @@ beforeAll(() => {
 
   $.ajax.mockImplementation(() => jqueryAJAXReturnObj);
 
-  // because we're running in node, diffDOM executes as a module
-  // in the normal browser environment it will attach to window so we replicate that here
-  window.diffDOM = require('../../node_modules/diff-dom/diffDOM.js');
+  // because we're running in node, we can't execute the normal domdiff code like a browser because
+  // its variables (actually only one: domdiff) stay local to it
+  // in the normal browser environment it will attach to window so we replicate that here by using
+  // the CommonJS module version and assigning it to window
+  window.domdiff = require('domdiff/cjs').default;
   require('../../app/assets/javascripts/updateContent.js');
 
 });
