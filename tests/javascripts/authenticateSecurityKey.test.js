@@ -25,7 +25,7 @@ describe('Authenticate with security key', () => {
   beforeEach(() => {
     // disable console.error() so we don't see it in test output
     // you might need to comment this out to debug some failures
-    jest.spyOn(console, 'error').mockImplementation(() => { })
+    jest.spyOn(console, 'error').mockImplementation(() => {})
 
     document.body.innerHTML = `
       <button type="submit" data-module="authenticate-security-key" data-csrf-token="abc123"></button>`
@@ -133,9 +133,16 @@ describe('Authenticate with security key', () => {
         expect(url.toString()).toEqual(
           'https://www.notifications.service.gov.uk/webauthn/authenticate?next=%2Ffoo%3Fbar%3Dbaz'
         )
-
-        done()
+        return Promise.resolve({
+          ok: true, arrayBuffer: () => Promise.resolve(window.CBOR.encode({ redirect_url: '/foo' }))
+        })
       })
+
+    jest.spyOn(window.location, 'assign').mockImplementation((href) => {
+      // ensure that the fetch mock implementation above was called
+      expect.assertions(1)
+      done()
+    })
 
     button.click()
   })
@@ -181,8 +188,8 @@ describe('Authenticate with security key', () => {
   })
 
   test.each([
-    ['network error'],
-    ['internal server error'],
+    ['network'],
+    ['server'],
   ])('errors if POSTing WebAuthn credentials fails (%s)', (errorType, done) => {
     jest.spyOn(window, 'fetch')
       .mockImplementationOnce((_url) => {
@@ -210,12 +217,10 @@ describe('Authenticate with security key', () => {
     jest.spyOn(window, 'fetch').mockImplementationOnce((_url) => {
       // subsequent POST of credential data to server
       switch (errorType) {
-        case 'network error':
+        case 'network':
           return Promise.reject('error')
-        case 'internal server error':
-          // dont need this becuase we dont cbor return errors
-          const message = Promise.reject('encoding error')
-          return Promise.resolve({ ok: false, arrayBuffer: () => message, statusText: 'error' })
+        case 'server':
+          return Promise.resolve({ ok: false, statusText: 'FORBIDDEN' })
       }
     })
 
@@ -229,9 +234,8 @@ describe('Authenticate with security key', () => {
 
 
   test('reloads page if POSTing WebAuthn credentials returns 403', (done) => {
-    jest.spyOn(window, 'fetch')
-      .mockImplementationOnce((_url) => {
-        const webauthnOptions = window.CBOR.encode('someArbitraryOptions')
+    jest.spyOn(window, 'fetch').mockImplementationOnce((_url) => {
+      const webauthnOptions = window.CBOR.encode('someArbitraryOptions')
 
         return Promise.resolve({
           ok: true, arrayBuffer: () => webauthnOptions

@@ -30,16 +30,7 @@
             })
             .then((response) => {
               if (!response.ok) {
-                return response.arrayBuffer()
-                  .then((cbor) => {
-                    return Promise.resolve(window.CBOR.decode(cbor));
-                  })
-                  .catch(() => {
-                    throw Error(response.statusText);
-                  })
-                  .then((text) => {
-                    throw Error(text);
-                  });
+                throw Error(response.statusText);
               }
 
               window.location.reload();
@@ -48,7 +39,6 @@
               console.error(error);
               // some browsers will show an error dialogue for some
               // errors; to be safe we always display an error message on the page.
-              const message = error.message || error;
               window.GOVUK.ErrorBanner.showBanner();
             });
         });

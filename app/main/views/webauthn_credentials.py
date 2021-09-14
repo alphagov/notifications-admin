@@ -3,7 +3,6 @@ from fido2.client import ClientData
 from fido2.ctap2 import AuthenticatorData
 from flask import abort, current_app, flash, redirect, request, session, url_for
 from flask_login import current_user
-from werkzeug.exceptions import Forbidden
 
 from app.main import main
 from app.models.user import User
@@ -50,7 +49,7 @@ def webauthn_complete_register():
         )
     except RegistrationError as e:
         current_app.logger.info(f'User {current_user.id} could not register a new webauthn token - {e}')
-        return cbor.encode(str(e)), 400
+        abort(400)
 
     current_user.create_webauthn_credential(credential)
     current_user.update(auth_type='webauthn_auth')
@@ -102,24 +101,8 @@ def webauthn_complete_authentication():
     user_id = session['user_details']['id']
     user_to_login = User.from_id(user_id)
 
-    try:
-        _verify_webauthn_authentication(user_to_login)
-        redirect = _complete_webauthn_login_attempt(user_to_login)
-    except Forbidden:
-        # We don't expect to reach this case in normal situations - normally errors (such as using the wrong
-        # security key) will be caught in the browser inside `window.navigator.credentials.get`, and the js will
-        # error first meaning it doesn't send the POST request to this method. If this method is called but the key
-        # couldn't be authenticated, something went wrong along the way, probably:
-        # * The browser didn't implement the webauthn standard correctly, and let something through it shouldn't have
-        # * The key itself is in some way corrupted, or of lower security standard
-        flash('Security key not recognised')
-
-        # flash sets the error message in the user's session cookie, and flask renders it next time `render_template`
-        # is called. In authenticateSecurityKey.js we refresh the page if this POST returns a 403.
-        # we can't use `abort(403)` here, and just return an empty body instead as our 403 error handler would return
-        # an error page response containing the flash, but our javascript ignores the body of the error response and
-        # just looks at the error code
-        return '', 403
+    _verify_webauthn_authentication(user_to_login)
+    redirect = _complete_webauthn_login_attempt(user_to_login)
 
     return cbor.encode({'redirect_url': redirect.location}), 200
 
@@ -142,6 +125,12 @@ def _verify_webauthn_authentication(user):
             signature=request_data['signature']
         )
     except ValueError as exc:
+        # We don't expect to reach this case in normal situations - normally errors (such as using the wrong
+        # security key) will be caught in the browser inside `window.navigator.credentials.get`, and the js will
+        # error first meaning it doesn't send the POST request to this method. If this method is called but the key
+        # couldn't be authenticated, something went wrong along the way, probably:
+        # * The browser didn't implement the webauthn standard correctly, and let something through it shouldn't have
+        # * The key itself is in some way corrupted, or of lower security standard
         current_app.logger.info(f'User {user.id} could not sign in using their webauthn token - {exc}')
         user.complete_webauthn_login_attempt(is_successful=False)
         abort(403)

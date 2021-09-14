@@ -50,22 +50,17 @@
               });
             })
             .then(response => {
-              if (response.status === 403) {
-                // flask will have `flash`ed an error message up
-                window.location.reload();
-                return;
+              if (!response.ok) {
+                throw Error(response.statusText);
               }
 
-              return response.arrayBuffer()
-                .then(cbor => {
-                  return Promise.resolve(window.CBOR.decode(cbor));
-                })
-                .catch(() => {
-                  throw Error(response.statusText);
-                })
-                .then(data => {
-                  window.location.assign(data.redirect_url);
-                });
+              return response.arrayBuffer();
+            })
+            .then(cbor => {
+              return Promise.resolve(window.CBOR.decode(cbor));
+            })
+            .then(data => {
+              window.location.assign(data.redirect_url);
             })
             .catch(error => {
               console.error(error);

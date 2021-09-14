@@ -107,9 +107,8 @@ describe('Register security key', () => {
   })
 
   test.each([
-    ['network error'],
-    ['internal server error'],
-    ['bad request'],
+    ['network'],
+    ['server'],
   ])('errors if sending WebAuthn credentials fails (%s)', (errorType, done) => {
 
     jest.spyOn(window, 'fetch').mockImplementationOnce((_url) => {
@@ -129,14 +128,10 @@ describe('Register security key', () => {
     jest.spyOn(window, 'fetch').mockImplementationOnce((_url) => {
       // subsequent POST of credential data to server
       switch (errorType) {
-        case 'network error':
+        case 'network':
           return Promise.reject('error')
-        case 'bad request':
-          message = Promise.resolve(window.CBOR.encode('error'))
-          return Promise.resolve({ ok: false, arrayBuffer: () => message })
-        case 'internal server error':
-          message = Promise.reject('encoding error')
-          return Promise.resolve({ ok: false, arrayBuffer: () => message, statusText: 'error' })
+        case 'server':
+          return Promise.resolve({ ok: false, statusText: 'FORBIDDEN' })
       }
     })
 
