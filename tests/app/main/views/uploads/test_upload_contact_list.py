@@ -7,6 +7,7 @@ from flask import url_for
 from freezegun import freeze_time
 
 from app.formatters import normalize_spaces
+from tests import contact_list_json
 from tests.conftest import SERVICE_ONE_ID
 
 
@@ -458,7 +459,7 @@ def test_cant_save_bad_contact_list(
     (False, 'Not used yet.'),
     (True, 'Not used in the last 7 days.'),
 ])
-@freeze_time('2020-03-13 16:51:56')
+@freeze_time('2020-06-13 16:51:56')
 def test_view_contact_list(
     mocker,
     client_request,
@@ -471,17 +472,11 @@ def test_view_contact_list(
 ):
     mocker.patch(
         'app.models.contact_list.contact_list_api_client.get_contact_list',
-        return_value={
-            'created_at': '2020-03-03 12:12:12',
-            'created_by': 'Test User',
-            'id': fake_uuid,
-            'original_file_name': 'EmergencyContactList.xls',
-            'row_count': 100,
-            'recent_job_count': 0,
-            'has_jobs': has_jobs,
-            'service_id': SERVICE_ONE_ID,
-            'template_type': 'email',
-        },
+        return_value=contact_list_json(
+            created_at='2020-03-03T12:12:12.000000Z',
+            service_id=SERVICE_ONE_ID,
+            has_jobs=has_jobs
+        )
     )
     mocker.patch('app.models.contact_list.s3download', return_value='\n'.join(
         ['email address'] + [

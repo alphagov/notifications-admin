@@ -4285,7 +4285,7 @@ def test_redirects_to_template_if_job_exists_already(
         '123 phone numbers',
     ),
 ))
-@freeze_time('2020-03-13 13:00')
+@freeze_time('2020-06-13 13:00')
 def test_choose_from_contact_list(
     mocker,
     client_request,

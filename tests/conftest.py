@@ -20,6 +20,7 @@ from . import (
     api_key_json,
     assert_url_expected,
     broadcast_message_json,
+    contact_list_json,
     generate_uuid,
     invite_json,
     job_json,
@@ -1851,37 +1852,31 @@ def mock_create_contact_list(mocker, api_user_active):
 @pytest.fixture(scope='function')
 def mock_get_contact_lists(mocker, api_user_active, fake_uuid):
     def _get(service_id, template_type=None):
-        return [{
-            'created_at': '2020-03-13 10:59:56',
-            'created_by': 'Test User',
-            'id': fake_uuid,
-            'original_file_name': 'EmergencyContactList.xls',
-            'row_count': 100,
-            'recent_job_count': 0,
-            'has_jobs': True,
-            'service_id': service_id,
-            'template_type': 'email',
-        }, {
-            'created_at': '2020-03-13 13:00:00',
-            'created_by': 'Test User',
-            'id': 'd7b0bd1a-d1c7-4621-be5c-3c1b4278a2ad',
-            'original_file_name': 'phone number list.csv',
-            'row_count': 123,
-            'recent_job_count': 2,
-            'has_jobs': True,
-            'service_id': service_id,
-            'template_type': 'sms',
-        }, {
-            'created_at': '2020-02-02 02:00:00',
-            'created_by': 'Test User',
-            'id': fake_uuid,
-            'original_file_name': 'UnusedList.tsv',
-            'row_count': 1,
-            'recent_job_count': 0,
-            'has_jobs': False,
-            'service_id': service_id,
-            'template_type': 'sms',
-        }]
+        return [
+            contact_list_json(
+                id_=fake_uuid,
+                created_at='2020-06-13T09:59:56.000000Z',
+                service_id=service_id,
+            ),
+            contact_list_json(
+                id_='d7b0bd1a-d1c7-4621-be5c-3c1b4278a2ad',
+                created_at='2020-06-13T12:00:00.000000Z',
+                service_id=service_id,
+                original_file_name='phone number list.csv',
+                row_count=123,
+                recent_job_count=2,
+                template_type='sms',
+            ),
+            contact_list_json(
+                id_=fake_uuid,
+                created_at='2020-05-02T01:00:00.000000Z',
+                original_file_name='UnusedList.tsv',
+                row_count=1,
+                has_jobs=False,
+                service_id=service_id,
+                template_type='sms',
+            )
+        ]
 
     return mocker.patch(
         'app.models.contact_list.ContactLists.client_method',
@@ -1892,17 +1887,11 @@ def mock_get_contact_lists(mocker, api_user_active, fake_uuid):
 @pytest.fixture(scope='function')
 def mock_get_contact_list(mocker, api_user_active, fake_uuid):
     def _get(*, service_id, contact_list_id):
-        return {
-            'created_at': '2020-03-13 10:59:56',
-            'created_by': 'Test User',
-            'id': fake_uuid,
-            'original_file_name': 'EmergencyContactList.xls',
-            'row_count': 100,
-            'recent_job_count': 0,
-            'has_jobs': True,
-            'service_id': service_id,
-            'template_type': 'email',
-        }
+        return contact_list_json(
+            id_=fake_uuid,
+            created_at='2020-06-13T09:59:56.000000Z',
+            service_id=service_id,
+        )
 
     return mocker.patch(
         'app.models.contact_list.contact_list_api_client.get_contact_list',
