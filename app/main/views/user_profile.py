@@ -232,6 +232,7 @@ def user_profile_disable_platform_admin_view():
 
 
 @main.route("/user-profile/security-keys", methods=['GET'])
+@user_is_logged_in
 def user_profile_security_keys():
     if not current_user.can_use_webauthn:
         abort(403)
@@ -251,6 +252,7 @@ def user_profile_security_keys():
     methods=['GET'],
     endpoint="user_profile_confirm_delete_security_key"
 )
+@user_is_logged_in
 def user_profile_manage_security_key(key_id):
     if not current_user.can_use_webauthn:
         abort(403)
@@ -282,6 +284,7 @@ def user_profile_manage_security_key(key_id):
 
 
 @main.route("/user-profile/security-keys/<uuid:key_id>/delete", methods=['POST'])
+@user_is_logged_in
 def user_profile_delete_security_key(key_id):
     if not current_user.can_use_webauthn:
         abort(403)

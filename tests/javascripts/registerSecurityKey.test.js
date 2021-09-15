@@ -4,7 +4,11 @@ beforeAll(() => {
 
   // populate missing values to allow consistent jest.spyOn()
   window.fetch = () => {}
-  window.navigator.credentials = { create: () => {} }
+  window.navigator.credentials = { create: () => { } }
+  window.GOVUK.ErrorBanner = {
+    showBanner: () => { },
+    hideBanner: () => { }
+  };
 })
 
 afterAll(() => {
@@ -22,9 +26,6 @@ describe('Register security key', () => {
     // disable console.error() so we don't see it in test output
     // you might need to comment this out to debug some failures
     jest.spyOn(console, 'error').mockImplementation(() => {})
-
-    // ensure window.alert() is implemented to simplify errors
-    jest.spyOn(window, 'alert').mockImplementation(() => {})
 
     document.body.innerHTML = `
       <a href="#" role="button" draggable="false" class="govuk-button govuk-button--secondary" data-module="register-security-key">
@@ -78,9 +79,9 @@ describe('Register security key', () => {
       done()
     })
 
-    // this will make the test fail if the alert is called
-    jest.spyOn(window, 'alert').mockImplementation((msg) => {
-      done(msg)
+    // this will make the test fail if the error banner is displayed
+    jest.spyOn(window.GOVUK.ErrorBanner, 'showBanner').mockImplementation(() => {
+      done('didnt expect the banner to be shown')
     })
 
     button.click()
@@ -89,7 +90,7 @@ describe('Register security key', () => {
   test.each([
     ['network'],
     ['server'],
-  ])('alerts if fetching WebAuthn options fails (%s error)', (errorType, done) => {
+  ])('errors if fetching WebAuthn options fails (%s error)', (errorType, done) => {
     jest.spyOn(window, 'fetch').mockImplementation((_url) => {
       if (errorType == 'network') {
         return Promise.reject('error')
@@ -98,8 +99,7 @@ describe('Register security key', () => {
       }
     })
 
-    jest.spyOn(window, 'alert').mockImplementation((msg) => {
-      expect(msg).toEqual('Error during registration.\n\nerror')
+    jest.spyOn(window.GOVUK.ErrorBanner, 'showBanner').mockImplementation(() => {
       done()
     })
 
@@ -107,10 +107,9 @@ describe('Register security key', () => {
   })
 
   test.each([
-    ['network error'],
-    ['internal server error'],
-    ['bad request'],
-  ])('alerts if sending WebAuthn credentials fails (%s)', (errorType, done) => {
+    ['network'],
+    ['server'],
+  ])('errors if sending WebAuthn credentials fails (%s)', (errorType, done) => {
 
     jest.spyOn(window, 'fetch').mockImplementationOnce((_url) => {
       // initial fetch of options from the server
@@ -129,26 +128,21 @@ describe('Register security key', () => {
     jest.spyOn(window, 'fetch').mockImplementationOnce((_url) => {
       // subsequent POST of credential data to server
       switch (errorType) {
-        case 'network error':
+        case 'network':
           return Promise.reject('error')
-        case 'bad request':
-          message = Promise.resolve(window.CBOR.encode('error'))
-          return Promise.resolve({ ok: false, arrayBuffer: () => message })
-        case 'internal server error':
-          message = Promise.reject('encoding error')
-          return Promise.resolve({ ok: false, arrayBuffer: () => message, statusText: 'error' })
+        case 'server':
+          return Promise.resolve({ ok: false, statusText: 'FORBIDDEN' })
       }
     })
 
-    jest.spyOn(window, 'alert').mockImplementation((msg) => {
-      expect(msg).toEqual('Error during registration.\n\nerror')
+    jest.spyOn(window.GOVUK.ErrorBanner, 'showBanner').mockImplementation(() => {
       done()
     })
 
     button.click()
   })
 
-  test('alerts if comms with the authenticator fails', (done) => {
+  test('errors if comms with the authenticator fails', (done) => {
     jest.spyOn(window.navigator.credentials, 'create').mockImplementation(() => {
       return Promise.reject(new DOMException('error'))
     })
@@ -162,8 +156,7 @@ describe('Register security key', () => {
       })
     })
 
-    jest.spyOn(window, 'alert').mockImplementation((msg) => {
-      expect(msg).toEqual('Error during registration.\n\nerror')
+    jest.spyOn(window.GOVUK.ErrorBanner, 'showBanner').mockImplementation(() => {
       done()
     })
 

@@ -7,6 +7,9 @@
         .on('click', function(event) {
           event.preventDefault();
 
+          // hide any existing error prompt
+          window.GOVUK.ErrorBanner.hideBanner();
+
           fetch('/webauthn/register')
             .then((response) => {
               if (!response.ok) {
@@ -27,16 +30,7 @@
             })
             .then((response) => {
               if (!response.ok) {
-                return response.arrayBuffer()
-                  .then((cbor) => {
-                    return Promise.resolve(window.CBOR.decode(cbor));
-                  })
-                  .catch(() => {
-                    throw Error(response.statusText);
-                  })
-                  .then((text) => {
-                    throw Error(text);
-                  });
+                throw Error(response.statusText);
               }
 
               window.location.reload();
@@ -44,9 +38,8 @@
             .catch((error) => {
               console.error(error);
               // some browsers will show an error dialogue for some
-              // errors; to be safe we always pop up an alert
-              var message = error.message || error;
-              alert('Error during registration.\n\n' + message);
+              // errors; to be safe we always display an error message on the page.
+              window.GOVUK.ErrorBanner.showBanner();
             });
         });
     };

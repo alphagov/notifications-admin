@@ -46,6 +46,22 @@
 {% endset %}
 
   <div class="govuk-grid-row">
+
+    {{ govukErrorMessage({
+      "classes": "banner-dangerous govuk-!-display-none",
+      "html": (
+        'There’s a problem with your security key' +
+        '<p class="govuk-body">Check you have the right key and try again. ' +
+        'If this does not work, ' +
+        '<a class="govuk-link govuk-link--no-visited-state" href=' + url_for('main.support') + ">contact us</a>." +
+        '</p>'
+      ),
+      "attributes": {
+        "aria-live": "polite",
+        "tabindex": '-1'
+      }
+    }) }}
+
     {% if credentials %}
       <div class="govuk-grid-column-five-sixths">
         {{ page_header(page_title) }}

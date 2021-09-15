@@ -181,7 +181,6 @@ def test_complete_register_handles_library_errors(
     )
 
     assert response.status_code == 400
-    assert cbor.decode(response.data) == 'error'
 
 
 def test_complete_register_handles_missing_state(
@@ -289,8 +288,6 @@ def test_complete_authentication_403s_if_key_isnt_in_users_credentials(
         assert 'user_id' not in session
         # webauthn state reset so can't replay
         assert 'webauthn_authentication_state' not in session
-        # make sure there's an error message to show when the page reloads
-        assert '_flashes' in session
 
     assert mock_verify_webauthn_login.called is False
     # make sure we incremented the failed login count
@@ -369,10 +366,6 @@ def test_verify_webauthn_login_signs_user_in_doesnt_sign_user_in_if_api_rejects(
     mocker.patch('app.user_api_client.complete_webauthn_login_attempt', return_value=(False, None))
 
     resp = client.post(url_for('main.webauthn_complete_authentication'))
-
-    with client.session_transaction() as session:
-        # make sure there's an error message to show when the page reloads
-        assert '_flashes' in session
 
     assert resp.status_code == 403
 

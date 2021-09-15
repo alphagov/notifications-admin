@@ -7,6 +7,9 @@
         .on('click', function (event) {
           event.preventDefault();
 
+          // hide any existing error prompt
+          window.GOVUK.ErrorBanner.hideBanner();
+
           fetch('/webauthn/authenticate')
             .then(response => {
               if (!response.ok) {
@@ -47,29 +50,23 @@
               });
             })
             .then(response => {
-              if (response.status === 403) {
-                // flask will have `flash`ed an error message up
-                window.location.reload();
-                return;
+              if (!response.ok) {
+                throw Error(response.statusText);
               }
 
-              return response.arrayBuffer()
-                .then(cbor => {
-                  return Promise.resolve(window.CBOR.decode(cbor));
-                })
-                .catch(() => {
-                  throw Error(response.statusText);
-                })
-                .then(data => {
-                  window.location.assign(data.redirect_url);
-                });
+              return response.arrayBuffer();
+            })
+            .then(cbor => {
+              return Promise.resolve(window.CBOR.decode(cbor));
+            })
+            .then(data => {
+              window.location.assign(data.redirect_url);
             })
             .catch(error => {
               console.error(error);
               // some browsers will show an error dialogue for some
-              // errors; to be safe we always pop up an alert
-              var message = error.message || error;
-              alert('Error during authentication.\n\n' + message);
+              // errors; to be safe we always display an error message on the page.
+              window.GOVUK.ErrorBanner.showBanner();
             });
         });
     };
