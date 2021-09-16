@@ -1,7 +1,7 @@
 import re
 from datetime import datetime
 from functools import partial
-from unittest.mock import ANY, Mock, PropertyMock, call
+from unittest.mock import Mock, PropertyMock, call
 from urllib.parse import parse_qs, urlparse
 from uuid import UUID, uuid4
 
@@ -10,7 +10,6 @@ from bs4 import BeautifulSoup
 from flask import url_for
 from freezegun import freeze_time
 from notifications_python_client.errors import HTTPError
-from notifications_utils.clients.zendesk.zendesk_client import ZendeskClient
 
 import app
 from app.formatters import email_safe
@@ -1673,7 +1672,7 @@ def test_non_gov_users_cant_request_to_go_live(
     )
 
 
-@pytest.mark.parametrize('volumes, displayed_volumes, formatted_displayed_volumes, extra_tags', (
+@pytest.mark.parametrize('volumes, displayed_volumes, formatted_displayed_volumes', (
     (
         (('email', None), ('sms', None), ('letter', None)),
         ', , ',
@@ -1682,7 +1681,6 @@ def test_non_gov_users_cant_request_to_go_live(
             'Text messages in next year: \n'
             'Letters in next year: \n'
         ),
-        ['notify_go_live_incomplete_volumes']
     ),
     (
         (('email', 1234), ('sms', 0), ('letter', 999)),
@@ -1692,7 +1690,6 @@ def test_non_gov_users_cant_request_to_go_live(
             'Text messages in next year: 0\n'
             'Letters in next year: 999\n'
         ),
-        [],
     ),
 ))
 @freeze_time("2012-12-21 13:12:12.12354")
@@ -1712,7 +1709,6 @@ def test_should_redirect_after_request_to_go_live(
     volumes,
     displayed_volumes,
     formatted_displayed_volumes,
-    extra_tags,
 ):
     for channel, volume in volumes:
         mocker.patch(
@@ -1721,29 +1717,22 @@ def test_should_redirect_after_request_to_go_live(
             new_callable=PropertyMock,
             return_value=volume,
         )
-    mock_post = mocker.patch('app.main.views.service_settings.zendesk_client.create_ticket', autospec=True)
+    mock_ticket = mocker.patch(
+        'app.main.views.service_settings.NotifySupportTicket',
+        return_value='go_live_ticket',
+    )
+    mock_ticket.TYPE_QUESTION = 'question'
+    mock_send_ticket_to_zendesk = mocker.patch(
+        'app.main.views.service_settings.zendesk_client.send_ticket_to_zendesk',
+        autospec=True,
+    )
     page = client_request.post(
         'main.request_to_go_live',
         service_id=SERVICE_ONE_ID,
         _follow_redirects=True
     )
-    mock_post.assert_called_with(
-        subject='Request to go live - service one',
-        message=ANY,
-        ticket_type=ZendeskClient.TYPE_QUESTION,
-        user_name=active_user_with_permissions['name'],
-        user_email=active_user_with_permissions['email_address'],
-        tags=[
-            'notify_action',
-            'notify_go_live',
-        ] + extra_tags + [
-            'notify_go_live_incomplete_checklist',
-            'notify_go_live_incomplete_mou',
-            'notify_go_live_incomplete_team_member',
-        ],
-        requester_sees_message_content=False,
-    )
-    assert mock_post.call_args[1]['message'] == (
+
+    expected_message = (
         'Service: service one\n'
         'http://localhost/services/{service_id}\n'
         '\n'
@@ -1764,6 +1753,18 @@ def test_should_redirect_after_request_to_go_live(
         service_id=SERVICE_ONE_ID,
         formatted_displayed_volumes=formatted_displayed_volumes,
     )
+    mock_ticket.assert_called_once_with(
+        subject='Request to go live - service one',
+        message=expected_message,
+        ticket_type='question',
+        user_name=active_user_with_permissions['name'],
+        user_email=active_user_with_permissions['email_address'],
+        requester_sees_message_content=False,
+        org_id=None,
+        org_type='central',
+        service_id=SERVICE_ONE_ID,
+    )
+    mock_send_ticket_to_zendesk.assert_called_once_with('go_live_ticket')
 
     assert normalize_spaces(page.select_one('.banner-default').text) == (
         'Thanks for your request to go live. We’ll get back to you within one working day.'
@@ -1802,14 +1803,22 @@ def test_request_to_go_live_displays_go_live_notes_in_zendesk_ticket(
             request_to_go_live_notes=go_live_note,
         )
     )
-    mock_post = mocker.patch('app.main.views.service_settings.zendesk_client.create_ticket', autospec=True)
+    mock_ticket = mocker.patch(
+        'app.main.views.service_settings.NotifySupportTicket',
+        return_value='go_live_ticket',
+    )
+    mock_ticket.TYPE_QUESTION = 'question'
+    mock_send_ticket_to_zendesk = mocker.patch(
+        'app.main.views.service_settings.zendesk_client.send_ticket_to_zendesk',
+        autospec=True,
+    )
     client_request.post(
         'main.request_to_go_live',
         service_id=SERVICE_ONE_ID,
         _follow_redirects=True
     )
 
-    assert mock_post.call_args[1]['message'] == (
+    expected_message = (
         'Service: service one\n'
         'http://localhost/services/{service_id}\n'
         '\n'
@@ -1833,6 +1842,19 @@ def test_request_to_go_live_displays_go_live_notes_in_zendesk_ticket(
         go_live_note=go_live_note
     )
 
+    mock_ticket.assert_called_once_with(
+        subject='Request to go live - service one',
+        message=expected_message,
+        ticket_type='question',
+        user_name=active_user_with_permissions['name'],
+        user_email=active_user_with_permissions['email_address'],
+        requester_sees_message_content=False,
+        org_id=ORGANISATION_ID,
+        org_type='central',
+        service_id=SERVICE_ONE_ID
+    )
+    mock_send_ticket_to_zendesk.assert_called_once_with('go_live_ticket')
+
 
 def test_should_be_able_to_request_to_go_live_with_no_organisation(
     client_request,
@@ -1854,7 +1876,10 @@ def test_should_be_able_to_request_to_go_live_with_no_organisation(
             new_callable=PropertyMock,
             return_value=1,
         )
-    mock_post = mocker.patch('app.main.views.service_settings.zendesk_client.create_ticket', autospec=True)
+    mock_post = mocker.patch(
+        'app.main.views.service_settings.zendesk_client.send_ticket_to_zendesk',
+        autospec=True
+    )
 
     client_request.post(
         'main.request_to_go_live',
@@ -1879,7 +1904,6 @@ def test_should_be_able_to_request_to_go_live_with_no_organisation(
         'volume_letter,'
         'expected_readyness,'
         'agreement_signed,'
-        'expected_tags,'
     ),
     (
         (  # Just sending email
@@ -1893,11 +1917,6 @@ def test_should_be_able_to_request_to_go_live_with_no_organisation(
             1, 0, 0,
             'Yes',
             True,
-            [
-                'notify_action',
-                'notify_go_live',
-                'notify_go_live_complete',
-            ],
         ),
         (  # Needs to set reply to address
             True,
@@ -1910,12 +1929,6 @@ def test_should_be_able_to_request_to_go_live_with_no_organisation(
             1, 0, 1,
             'No',
             True,
-            [
-                'notify_action',
-                'notify_go_live',
-                'notify_go_live_incomplete_checklist',
-                'notify_go_live_incomplete_email_reply_to',
-            ],
         ),
         (  # Just sending SMS
             True,
@@ -1928,11 +1941,6 @@ def test_should_be_able_to_request_to_go_live_with_no_organisation(
             0, 1, 0,
             'Yes',
             True,
-            [
-                'notify_action',
-                'notify_go_live',
-                'notify_go_live_complete',
-            ],
         ),
         (  # Needs to change SMS sender
             True,
@@ -1945,12 +1953,6 @@ def test_should_be_able_to_request_to_go_live_with_no_organisation(
             0, 1, 0,
             'No',
             True,
-            [
-                'notify_action',
-                'notify_go_live',
-                'notify_go_live_incomplete_checklist',
-                'notify_go_live_incomplete_sms_sender',
-            ],
         ),
         (  # Needs team members
             False,
@@ -1963,12 +1965,6 @@ def test_should_be_able_to_request_to_go_live_with_no_organisation(
             1, 0, 0,
             'No',
             True,
-            [
-                'notify_action',
-                'notify_go_live',
-                'notify_go_live_incomplete_checklist',
-                'notify_go_live_incomplete_team_member',
-            ],
         ),
         (  # Needs templates
             True,
@@ -1981,12 +1977,6 @@ def test_should_be_able_to_request_to_go_live_with_no_organisation(
             0, 1, 0,
             'No',
             True,
-            [
-                'notify_action',
-                'notify_go_live',
-                'notify_go_live_incomplete_checklist',
-                'notify_go_live_incomplete_template_content',
-            ],
         ),
         (  # Not done anything yet
             False,
@@ -1999,15 +1989,6 @@ def test_should_be_able_to_request_to_go_live_with_no_organisation(
             None, None, None,
             'No',
             False,
-            [
-                'notify_action',
-                'notify_go_live',
-                'notify_go_live_incomplete_volumes',
-                'notify_go_live_incomplete_checklist',
-                'notify_go_live_incomplete_mou',
-                'notify_go_live_incomplete_team_member',
-                'notify_go_live_incomplete_template_content',
-            ],
         ),
     ),
 )
@@ -2027,7 +2008,6 @@ def test_ready_to_go_live(
     volume_letter,
     expected_readyness,
     agreement_signed,
-    expected_tags,
 ):
     mocker.patch(
         'app.organisations_client.get_organisation',
@@ -2063,10 +2043,6 @@ def test_ready_to_go_live(
     assert app.models.service.Service({
         'id': SERVICE_ONE_ID
     }).go_live_checklist_completed_as_yes_no == expected_readyness
-
-    assert app.models.service.Service(
-        {'id': SERVICE_ONE_ID}
-    ).request_to_go_live_tags == expected_tags
 
 
 @pytest.mark.parametrize('route', [

@@ -14,6 +14,9 @@ from flask import (
 )
 from flask_login import current_user
 from notifications_python_client.errors import HTTPError
+from notifications_utils.clients.zendesk.zendesk_client import (
+    NotifySupportTicket,
+)
 from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
 
 from app import (
@@ -207,10 +210,7 @@ def request_to_go_live(service_id):
 @user_has_permissions('manage_service')
 @user_is_gov_user
 def submit_request_to_go_live(service_id):
-
-    zendesk_client.create_ticket(
-        subject='Request to go live - {}'.format(current_service.name),
-        message=(
+    ticket_message = (
             'Service: {service_name}\n'
             '{service_dashboard}\n'
             '\n---'
@@ -243,13 +243,20 @@ def submit_request_to_go_live(service_id):
             existing_live='Yes' if current_user.live_services else 'No',
             email_address=current_user.email_address,
             email_reply_to=current_service.default_email_reply_to_address or 'not set',
-        ),
-        ticket_type=zendesk_client.TYPE_QUESTION,
-        user_email=current_user.email_address,
+        )
+
+    ticket = NotifySupportTicket(
+        subject=f'Request to go live - {current_service.name}',
+        message=ticket_message,
+        ticket_type=NotifySupportTicket.TYPE_QUESTION,
         user_name=current_user.name,
-        tags=current_service.request_to_go_live_tags,
+        user_email=current_user.email_address,
         requester_sees_message_content=False,
+        org_id=current_service.organisation_id,
+        org_type=current_service.organisation_type,
+        service_id=current_service.id,
     )
+    zendesk_client.send_ticket_to_zendesk(ticket)
 
     current_service.update(go_live_user=current_user.id)
 
