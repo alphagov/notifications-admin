@@ -53,7 +53,6 @@ def add_service():
         form = CreateServiceForm(
             organisation_type=default_organisation_type
         )
-    heading = 'About your service'
 
     if form.validate_on_submit():
         email_from = email_safe(form.name.data)
@@ -66,7 +65,7 @@ def add_service():
             form,
         )
         if error:
-            return render_template('views/add-service.html', form=form, heading=heading)
+            return _render_add_service_page(form, default_organisation_type)
         if len(service_api_client.get_active_services({'user_id': session['user_id']}).get('data', [])) > 1:
             return redirect(url_for('main.service_dashboard', service_id=service_id))
 
@@ -78,17 +77,23 @@ def add_service():
             template_id=example_sms_template['data']['id']
         ))
     else:
-        if default_organisation_type == 'local':
-            return render_template(
-                'views/add-service-local.html',
-                form=form,
-                heading=heading,
-                default_organisation_type=default_organisation_type,
-            )
+        return _render_add_service_page(form, default_organisation_type)
 
+
+def _render_add_service_page(form, default_organisation_type):
+    heading = 'About your service'
+
+    if default_organisation_type == 'local':
         return render_template(
-            'views/add-service.html',
+            'views/add-service-local.html',
             form=form,
             heading=heading,
             default_organisation_type=default_organisation_type,
         )
+
+    return render_template(
+        'views/add-service.html',
+        form=form,
+        heading=heading,
+        default_organisation_type=default_organisation_type,
+    )
