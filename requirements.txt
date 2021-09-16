@@ -75,7 +75,7 @@ govuk-bank-holidays==0.8
     # via
     #   -r requirements.in
     #   notifications-utils
-git+https://github.com/alphagov/govuk-frontend-jinja.git@v0.5.8-alpha#egg=govuk-frontend-jinja==0.5.8-alpha
+govuk-frontend-jinja @ git+https://github.com/alphagov/govuk-frontend-jinja.git@v0.5.8-alpha
     # via -r requirements.in
 greenlet==1.1.0
     # via eventlet
@@ -118,7 +118,7 @@ mistune==0.8.4
     # via notifications-utils
 notifications-python-client==6.2.1
     # via -r requirements.in
-git+https://github.com/alphagov/notifications-utils.git@46.0.0#egg=notifications-utils==46.0.0
+notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@46.1.0
     # via -r requirements.in
 openpyxl==3.0.7
     # via pyexcel-xlsx
