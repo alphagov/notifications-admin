@@ -31,10 +31,12 @@ beforeAll(() => {
 
   $.ajax.mockImplementation(() => jqueryAJAXReturnObj);
 
-  // because we're running in node, we can't execute the normal domdiff code like a browser because
-  // its variables (actually only one: domdiff) stay local to it
-  // in the normal browser environment it will attach to window so we replicate that here by using
-  // the CommonJS module version and assigning it to window
+  // using require to execute the version we use in our our frontend build here can't add
+  // the domdiff variable to this scope like it does when executed in browsers because
+  // that version doesn't export it
+  // we use CommonJS version instead because it does (as the default property)
+  // see https://nodejs.org/en/knowledge/getting-started/what-is-require/ for more info
+  // also, we're not a browser so we need to manually attach domdiff to window
   window.domdiff = require('domdiff/cjs').default;
   require('../../app/assets/javascripts/updateContent.js');
 
