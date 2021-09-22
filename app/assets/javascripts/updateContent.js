@@ -2,7 +2,6 @@
   "use strict";
 
   var queues = {};
-  var dd = new global.diffDOM();
   var defaultInterval = 2000;
   var interval = 0;
 
@@ -11,10 +10,18 @@
       1000
   ));
 
-  var getRenderer = $component => response => dd.apply(
-    $component.get(0),
-    dd.diff($component.get(0), $(response[$component.data('key')]).get(0))
-  );
+  var getRenderer = $component => {
+    var key = $component.data('key'); // use closure to retain key when component is replaced
+    return response => {
+      $component = $(
+        global.domdiff(
+          $component.parent().get(0),
+          [$component.get(0)],
+          [$(response[key]).get(0)]
+        )[0]
+      );
+    };
+  };
 
   var getQueue = resource => (
     queues[resource] = queues[resource] || []

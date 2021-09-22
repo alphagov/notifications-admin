@@ -20,7 +20,7 @@ plugins.cssUrlAdjuster = require('gulp-css-url-adjuster');
 plugins.jshint = require('gulp-jshint');
 plugins.prettyerror = require('gulp-prettyerror');
 plugins.rollup = require('gulp-better-rollup')
-plugins.sass = require('gulp-sass');
+plugins.sass = require('gulp-sass')(require('sass'));
 plugins.sassLint = require('gulp-sass-lint');
 plugins.uglify = require('gulp-uglify');
 
@@ -146,7 +146,7 @@ const javascripts = () => {
       paths.npm + 'hogan.js/dist/hogan-3.0.2.js',
       paths.npm + 'jquery/dist/jquery.min.js',
       paths.npm + 'query-command-supported/dist/queryCommandSupported.min.js',
-      paths.npm + 'diff-dom/diffDOM.js',
+      paths.npm + 'domdiff/min.js',
       paths.npm + 'timeago/jquery.timeago.js',
       paths.npm + 'textarea-caret/index.js',
       paths.npm + 'cbor-js/cbor.js'
@@ -207,8 +207,7 @@ const sass = () => {
       paths.src + '/stylesheets/print.scss'
     ])
     .pipe(plugins.prettyerror())
-    .pipe(plugins.sass({
-      outputStyle: 'nested',
+    .pipe(plugins.sass.sync({
       includePaths: [
         paths.npm + 'govuk-elements-sass/public/sass/',
         paths.toolkit + 'stylesheets/',

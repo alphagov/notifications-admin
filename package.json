@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "Admin front end for GOV.UK Notify",
   "engines": {
-    "node": "10.15.3"
+    "node": ">=10.15.3"
   },
   "scripts": {
     "test": "gulp lint && jest --config tests/javascripts/jest.config.js tests/javascripts",
@@ -23,24 +23,25 @@
     "@babel/preset-env": "7.4.2",
     "cbor-js": "0.1.0",
     "del": "5.1.0",
-    "diff-dom": "2.5.1",
+    "domdiff": "2.2.2",
     "govuk_frontend_toolkit": "8.1.0",
     "govuk-elements-sass": "3.1.2",
     "govuk-frontend": "2.13.0",
-    "gulp": "4.0.0",
+    "gulp": "4.0.2",
     "gulp-add-src": "1.0.0",
     "gulp-babel": "8.0.0",
     "gulp-better-rollup": "4.0.1",
-    "gulp-clean-css": "4.2.0",
+    "gulp-clean-css": "4.3.0",
     "gulp-concat": "2.6.1",
-    "gulp-include": "2.3.1",
-    "gulp-sass": "4.0.2",
+    "gulp-include": "2.4.1",
+    "gulp-sass": "5.0.0",
     "gulp-uglify": "3.0.2",
     "hogan": "1.0.2",
     "jquery": "3.5.0",
     "leaflet": "1.6.0",
     "query-command-supported": "1.0.0",
     "rollup": "1.23.1",
+    "sass": "1.32.7",
     "streamqueue": "1.1.2",
     "textarea-caret": "3.1.0",
     "timeago": "1.6.5"
@@ -48,7 +49,7 @@
   "devDependencies": {
     "gulp-css-url-adjuster": "0.2.3",
     "gulp-jshint": "2.1.0",
-    "gulp-prettyerror": "1.2.1",
+    "gulp-prettyerror": "2.0.0",
     "gulp-sass-lint": "1.4.0",
     "jest": "24.7.1",
     "jest-date-mock": "^1.0.8",

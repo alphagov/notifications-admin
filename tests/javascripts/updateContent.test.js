@@ -31,9 +31,13 @@ beforeAll(() => {
 
   $.ajax.mockImplementation(() => jqueryAJAXReturnObj);
 
-  // because we're running in node, diffDOM executes as a module
-  // in the normal browser environment it will attach to window so we replicate that here
-  window.diffDOM = require('../../node_modules/diff-dom/diffDOM.js');
+  // using require to execute the version we use in our our frontend build here can't add
+  // the domdiff variable to this scope like it does when executed in browsers because
+  // that version doesn't export it
+  // we use CommonJS version instead because it does (as the default property)
+  // see https://nodejs.org/en/knowledge/getting-started/what-is-require/ for more info
+  // also, we're not a browser so we need to manually attach domdiff to window
+  window.domdiff = require('domdiff/cjs').default;
   require('../../app/assets/javascripts/updateContent.js');
 
 });
@@ -44,52 +48,58 @@ afterAll(() => {
 
 describe('Update content', () => {
 
+  let HTMLString;
+  let initialHTMLString;
+
   beforeEach(() => {
 
     // store HTML in string to allow use in AJAX responses
     HTMLString = `
-      <div data-module="update-content" data-resource="${resourceURL}" data-key="${updateKey}" aria-live="polite">
-        <div class="bottom-gutter ajax-block-container">
-          <ul role="tablist" class="pill">
-            <li aria-selected="true" role="tab">
-              <div class="pill-selected-item" tabindex="0">
-                <div class="big-number-smaller">
-                  <div class="big-number-number">0</div>
-                </div>
-                <div class="pill-label">total</div>
+      <div class="bottom-gutter ajax-block-container">
+        <ul role="tablist" class="pill">
+          <li aria-selected="true" role="tab">
+            <div class="pill-selected-item" tabindex="0">
+              <div class="big-number-smaller">
+                <div class="big-number-number">0</div>
               </div>
-            </li>
-            <li aria-selected="false" role="tab">
-              <a class="govuk-link govuk-link--no-visited-state" href="/services/6658542f-0cad-491f-bec8-ab8457700ead/notifications/email?status=sending">
-                <div class="big-number-smaller">
-                  <div class="big-number-number">0</div>
-                </div>
-                <div class="pill-label">sending</div>
-              </a>
-            </li>
-            <li aria-selected="false" role="tab">
-              <a class="govuk-link govuk-link--no-visited-state" href="/services/6658542f-0cad-491f-bec8-ab8457700ead/notifications/email?status=delivered">
-                <div class="big-number-smaller">
-                  <div class="big-number-number">0</div>
-                </div>
-                <div class="pill-label">delivered</div>
-              </a>
-            </li>
-            <li aria-selected="false" role="tab">
-              <a class="govuk-link govuk-link--no-visited-state" href="/services/6658542f-0cad-491f-bec8-ab8457700ead/notifications/email?status=failed">
-                <div class="big-number-smaller">
-                  <div class="big-number-number">0</div>
-                </div>
-                <div class="pill-label">failed</div>
-              </a>
-            </li>
-          </ul>
-        </div>
+              <div class="pill-label">total</div>
+            </div>
+          </li>
+          <li aria-selected="false" role="tab">
+            <a class="govuk-link govuk-link--no-visited-state" href="/services/6658542f-0cad-491f-bec8-ab8457700ead/notifications/email?status=sending">
+              <div class="big-number-smaller">
+                <div class="big-number-number">0</div>
+              </div>
+              <div class="pill-label">sending</div>
+            </a>
+          </li>
+          <li aria-selected="false" role="tab">
+            <a class="govuk-link govuk-link--no-visited-state" href="/services/6658542f-0cad-491f-bec8-ab8457700ead/notifications/email?status=delivered">
+              <div class="big-number-smaller">
+                <div class="big-number-number">0</div>
+              </div>
+              <div class="pill-label">delivered</div>
+            </a>
+          </li>
+          <li aria-selected="false" role="tab">
+            <a class="govuk-link govuk-link--no-visited-state" href="/services/6658542f-0cad-491f-bec8-ab8457700ead/notifications/email?status=failed">
+              <div class="big-number-smaller">
+                <div class="big-number-number">0</div>
+              </div>
+              <div class="pill-label">failed</div>
+            </a>
+          </li>
+        </ul>
       </div>`;
 
-    document.body.innerHTML = HTMLString;
 
-    // default the response to match the existing content
+    initialHTMLString = `<div data-module="update-content" data-resource="${resourceURL}" data-key="${updateKey}" aria-live="polite">
+                        ${HTMLString}
+                        </div>`;
+
+    document.body.innerHTML = initialHTMLString;
+
+    // default the response to match the content inside div[data-module]
     responseObj[updateKey] = HTMLString;
 
   });

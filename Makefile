@@ -25,7 +25,7 @@ VIRTUALENV_ROOT := $(shell [ -z $$VIRTUAL_ENV ] && echo $$(pwd)/venv || echo $$V
 .PHONY: bootstrap
 bootstrap: generate-version-file ## Set up everything to run the app
 	pip3 install -r requirements_for_test.txt
-	npm install && npm rebuild node-sass && npm run build
+	npm install && npm run build
 
 .PHONY: run-flask
 run-flask:  ## Run flask
