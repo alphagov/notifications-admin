@@ -5,6 +5,9 @@ import pytest
 from bs4 import BeautifulSoup, element
 from flask import url_for
 from freezegun import freeze_time
+from notifications_utils.clients.zendesk.zendesk_client import (
+    NotifySupportTicket,
+)
 
 from app.main.views.feedback import in_business_hours
 from app.models.feedback import (
@@ -136,12 +139,13 @@ def test_get_feedback_page(client, ticket_type, expected_status_code):
 
 
 @freeze_time('2016-12-12 12:00:00.000000')
-@pytest.mark.parametrize('ticket_type', [PROBLEM_TICKET_TYPE, QUESTION_TICKET_TYPE])
-def test_passed_non_logged_in_user_details_through_flow(client, mocker, ticket_type):
-    mock_ticket = mocker.patch(
-        'app.main.views.feedback.NotifySupportTicket',
-        return_value='feedback_ticket',
-    )
+@pytest.mark.parametrize('ticket_type, zendesk_ticket_type', [
+    (PROBLEM_TICKET_TYPE, 'incident'),
+    (QUESTION_TICKET_TYPE, 'question'),
+    (GENERAL_TICKET_TYPE, 'question'),
+])
+def test_passed_non_logged_in_user_details_through_flow(client, mocker, ticket_type, zendesk_ticket_type):
+    mock_create_ticket = mocker.spy(NotifySupportTicket, '__init__')
     mock_send_ticket_to_zendesk = mocker.patch(
         'app.main.views.feedback.zendesk_client.send_ticket_to_zendesk',
         autospec=True,
@@ -161,10 +165,11 @@ def test_passed_non_logged_in_user_details_through_flow(client, mocker, ticket_t
         email_address_provided=True,
         _external=True,
     )
-    mock_ticket.assert_called_once_with(
+    mock_create_ticket.assert_called_once_with(
+        ANY,
         subject='Notify feedback',
         message='blah\n',
-        ticket_type=ticket_type,
+        ticket_type=zendesk_ticket_type,
         p1=False,
         user_name='Anne Example',
         user_email='anne@example.com',
@@ -172,7 +177,7 @@ def test_passed_non_logged_in_user_details_through_flow(client, mocker, ticket_t
         org_type=None,
         service_id=None
     )
-    mock_send_ticket_to_zendesk.assert_called_once_with('feedback_ticket')
+    mock_send_ticket_to_zendesk.assert_called_once()
 
 
 @freeze_time("2016-12-12 12:00:00.000000")
@@ -180,18 +185,20 @@ def test_passed_non_logged_in_user_details_through_flow(client, mocker, ticket_t
     {'feedback': 'blah'},
     {'feedback': 'blah', 'name': 'Ignored', 'email_address': 'ignored@email.com'}
 ])
-@pytest.mark.parametrize('ticket_type', [PROBLEM_TICKET_TYPE, QUESTION_TICKET_TYPE])
+@pytest.mark.parametrize('ticket_type, zendesk_ticket_type', [
+    (PROBLEM_TICKET_TYPE, 'incident'),
+    (QUESTION_TICKET_TYPE, 'question'),
+    (GENERAL_TICKET_TYPE, 'question'),
+])
 def test_passes_user_details_through_flow(
     client_request,
     mock_get_non_empty_organisations_and_services_for_user,
     mocker,
     ticket_type,
+    zendesk_ticket_type,
     data
 ):
-    mock_ticket = mocker.patch(
-        'app.main.views.feedback.NotifySupportTicket',
-        return_value='feedback_ticket',
-    )
+    mock_create_ticket = mocker.spy(NotifySupportTicket, '__init__')
     mock_send_ticket_to_zendesk = mocker.patch(
         'app.main.views.feedback.zendesk_client.send_ticket_to_zendesk',
         autospec=True,
@@ -209,10 +216,11 @@ def test_passes_user_details_through_flow(
             _external=True,
         ),
     )
-    mock_ticket.assert_called_once_with(
+    mock_create_ticket.assert_called_once_with(
+        ANY,
         subject='Notify feedback',
         message=ANY,
-        ticket_type=ticket_type,
+        ticket_type=zendesk_ticket_type,
         p1=False,
         user_name='Test User',
         user_email='test@user.gov.uk',
@@ -221,7 +229,7 @@ def test_passes_user_details_through_flow(
         service_id=SERVICE_ONE_ID
     )
 
-    assert mock_ticket.call_args[1]['message'] == '\n'.join([
+    assert mock_create_ticket.call_args[1]['message'] == '\n'.join([
         'blah',
         'Service: "service one"',
         url_for(
@@ -231,7 +239,7 @@ def test_passes_user_details_through_flow(
         ),
         ''
     ])
-    mock_send_ticket_to_zendesk.assert_called_once_with('feedback_ticket')
+    mock_send_ticket_to_zendesk.assert_called_once()
 
 
 @freeze_time('2016-12-12 12:00:00.000000')
