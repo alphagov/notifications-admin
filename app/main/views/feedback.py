@@ -4,6 +4,9 @@ import pytz
 from flask import redirect, render_template, request, session, url_for
 from flask_login import current_user
 from govuk_bank_holidays.bank_holidays import BankHolidays
+from notifications_utils.clients.zendesk.zendesk_client import (
+    NotifySupportTicket,
+)
 
 from app import convert_to_boolean, current_service
 from app.extensions import zendesk_client
@@ -124,14 +127,19 @@ def feedback(ticket_type):
             service_string,
         )
 
-        zendesk_client.create_ticket(
+        ticket = NotifySupportTicket(
             subject='Notify feedback',
             message=feedback_msg,
             ticket_type=ticket_type,
             p1=out_of_hours_emergency,
+            user_name=user_name,
             user_email=user_email,
-            user_name=user_name
+            org_id=current_service.organisation_id if current_service else None,
+            org_type=current_service.organisation_type if current_service else None,
+            service_id=current_service.id if current_service else None,
         )
+        zendesk_client.send_ticket_to_zendesk(ticket)
+
         return redirect(url_for(
             '.thanks',
             out_of_hours_emergency=out_of_hours_emergency,
