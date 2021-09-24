@@ -1207,8 +1207,8 @@ def branding_request(service_id, branding_type):
     elif branding_type == "letter":
         branding_name = current_service.letter_branding_name
     if form.validate_on_submit():
-        zendesk_client.create_ticket(
-            subject='{} branding request - {}'.format(branding_type.capitalize(), current_service.name),
+        ticket = NotifySupportTicket(
+            subject=f'{branding_type.capitalize()} branding request - {current_service.name}',
             message=(
                 'Organisation: {organisation}\n'
                 'Service: {service_name}\n'
@@ -1228,11 +1228,14 @@ def branding_request(service_id, branding_type):
                 new_paragraph='\n\n' if form.something_else.data else '',
                 detail=form.something_else.data or ''
             ),
-            ticket_type=zendesk_client.TYPE_QUESTION,
-            user_email=current_user.email_address,
+            ticket_type=NotifySupportTicket.TYPE_QUESTION,
             user_name=current_user.name,
-            tags=['notify_action', 'notify_branding'],
+            user_email=current_user.email_address,
+            org_id=current_service.organisation_id,
+            org_type=current_service.organisation_type,
+            service_id=current_service.id
         )
+        zendesk_client.send_ticket_to_zendesk(ticket)
         flash((
             'Thanks for your branding request. We’ll get back to you '
             'within one working day.'
