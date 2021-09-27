@@ -1,4 +1,5 @@
 from flask import abort, current_app
+from notifications_utils.serialised_model import SerialisedModelCollection
 from werkzeug.utils import cached_property
 
 from app.models import JSONModel
@@ -710,3 +711,7 @@ class Service(JSONModel):
     @property
     def contact_lists(self):
         return ContactLists(self.id)
+
+
+class Services(SerialisedModelCollection):
+    model = Service
