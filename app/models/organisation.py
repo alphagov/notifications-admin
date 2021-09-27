@@ -59,6 +59,9 @@ class Organisation(JSONModel):
             return cls({})
         return cls(organisations_client.get_organisation(org_id))
 
+    def __lt__(self, other):
+        return self.name.lower() < other.name.lower()
+
     @classmethod
     def from_domain(cls, domain):
         return cls(organisations_client.get_organisation_by_domain(domain))

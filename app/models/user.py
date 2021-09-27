@@ -290,16 +290,12 @@ class User(JSONModel, UserMixin):
     def orgs_and_services(self):
         return user_api_client.get_organisations_and_services_for_user(self.id)
 
-    @staticmethod
-    def sort_services(services):
-        return sorted(services, key=lambda service: service.name.lower())
-
     @property
     def services(self):
         from app.models.service import Service
-        return self.sort_services([
+        return sorted(
             Service(service) for service in self.orgs_and_services['services']
-        ])
+        )
 
     @property
     def services_with_organisation(self):

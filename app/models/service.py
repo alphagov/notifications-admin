@@ -77,6 +77,9 @@ class Service(JSONModel):
     def from_id(cls, service_id):
         return cls(service_api_client.get_service(service_id)['data'])
 
+    def __lt__(self, other):
+        return self.name.lower() < other.name.lower()
+
     @property
     def permissions(self):
         return self._dict.get('permissions', self.TEMPLATE_TYPES)
