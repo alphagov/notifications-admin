@@ -293,9 +293,9 @@ class User(JSONModel, UserMixin):
     @property
     def services(self):
         from app.models.service import Service
-        return sorted(
+        return [
             Service(service) for service in self.orgs_and_services['services']
-        )
+        ]
 
     @property
     def services_with_organisation(self):

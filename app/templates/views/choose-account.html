@@ -19,7 +19,7 @@
   {% else %}
     <ul>
   {% endif %}
-  {% for org in organisations %}
+  {% for org in organisations|sort %}
     <li class="browse-list-item">
       <a href="{{ url_for('.organisation_dashboard', org_id=org.id) }}" class="govuk-link govuk-link--no-visited-state">{{ org.name }}</a>
       <p class="browse-list-hint">
@@ -28,7 +28,7 @@
       </p>
     </li>
   {% endfor %}
-  {% for service in services %}
+  {% for service in services|sort %}
     <li class="browse-list-item">
       <a href="{{ url_for('.service_dashboard', service_id=service.id) }}" class="govuk-link govuk-link--no-visited-state">{{ service.name }}</a>
     </li>
