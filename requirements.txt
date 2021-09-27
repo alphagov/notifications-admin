@@ -85,7 +85,7 @@ humanize==3.11.0
     # via -r requirements.in
 idna==3.2
     # via requests
-importlib-metadata==4.6.1
+importlib-metadata==4.8.1
     # via click
 itsdangerous==1.1.0
     # via
