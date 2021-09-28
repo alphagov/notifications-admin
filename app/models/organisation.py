@@ -1,7 +1,7 @@
 from flask import abort
 from werkzeug.utils import cached_property
 
-from app.models import JSONModel, ModelList
+from app.models import JSONModel, ModelList, SerialisedModelCollection
 from app.notify_client.email_branding_client import email_branding_client
 from app.notify_client.letter_branding_client import letter_branding_client
 from app.notify_client.organisations_api_client import organisations_client
@@ -204,6 +204,9 @@ class Organisation(JSONModel):
         return organisations_client.get_services_and_usage(self.id, financial_year)
 
 
-class AllOrganisations(ModelList):
-    client_method = organisations_client.get_organisations
+class Organisations(SerialisedModelCollection):
     model = Organisation
+
+
+class AllOrganisations(ModelList, Organisations):
+    client_method = organisations_client.get_organisations
