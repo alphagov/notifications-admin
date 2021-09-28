@@ -41,7 +41,7 @@ from app.main.views.dashboard import (
     requested_and_current_financial_year,
 )
 from app.main.views.service_settings import get_branding_as_value_and_label
-from app.models.organisation import Organisation, Organisations
+from app.models.organisation import AllOrganisations, Organisation
 from app.models.user import InvitedOrgUser, User
 from app.utils.user import user_has_permissions, user_is_platform_admin
 
@@ -51,7 +51,7 @@ from app.utils.user import user_has_permissions, user_is_platform_admin
 def organisations():
     return render_template(
         'views/organisations/index.html',
-        organisations=Organisations(),
+        organisations=AllOrganisations(),
         search_form=SearchByNameForm(),
     )
 
@@ -116,7 +116,7 @@ def add_organisation_from_nhs_local_service(service_id):
 
     form = AddNHSLocalOrganisationForm(organisation_choices=[
         (organisation.id, organisation.name)
-        for organisation in Organisations()
+        for organisation in AllOrganisations()
         if organisation.organisation_type == Organisation.TYPE_NHS_LOCAL
     ])
 

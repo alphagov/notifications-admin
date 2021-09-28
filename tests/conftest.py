@@ -3119,7 +3119,7 @@ def mock_get_organisations(mocker):
         ]
 
     mocker.patch(
-        'app.models.organisation.Organisations.client_method',
+        'app.models.organisation.AllOrganisations.client_method',
         side_effect=_get_organisations,
     )
 

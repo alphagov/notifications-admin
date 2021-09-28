@@ -3,7 +3,7 @@ from flask_login import current_user
 
 from app import status_api_client
 from app.main import main
-from app.models.organisation import Organisations
+from app.models.organisation import AllOrganisations
 from app.utils import PermanentRedirect
 from app.utils.user import user_is_logged_in
 
@@ -24,7 +24,7 @@ def choose_account():
     org_count, live_service_count = None, None
     if current_user.platform_admin:
         org_count, live_service_count = (
-            len(Organisations()),
+            len(AllOrganisations()),
             status_api_client.get_count_of_live_services_and_organisations()['services'],
         )
     return render_template(

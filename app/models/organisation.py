@@ -204,6 +204,6 @@ class Organisation(JSONModel):
         return organisations_client.get_services_and_usage(self.id, financial_year)
 
 
-class Organisations(ModelList):
+class AllOrganisations(ModelList):
     client_method = organisations_client.get_organisations
     model = Organisation
