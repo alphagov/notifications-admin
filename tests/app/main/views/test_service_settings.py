@@ -1720,11 +1720,7 @@ def test_should_redirect_after_request_to_go_live(
             new_callable=PropertyMock,
             return_value=volume,
         )
-    mock_ticket = mocker.patch(
-        'app.main.views.service_settings.NotifySupportTicket',
-        return_value='go_live_ticket',
-    )
-    mock_ticket.TYPE_QUESTION = 'question'
+    mock_create_ticket = mocker.spy(NotifySupportTicket, '__init__')
     mock_send_ticket_to_zendesk = mocker.patch(
         'app.main.views.service_settings.zendesk_client.send_ticket_to_zendesk',
         autospec=True,
@@ -1756,7 +1752,8 @@ def test_should_redirect_after_request_to_go_live(
         service_id=SERVICE_ONE_ID,
         formatted_displayed_volumes=formatted_displayed_volumes,
     )
-    mock_ticket.assert_called_once_with(
+    mock_create_ticket.assert_called_once_with(
+        ANY,
         subject='Request to go live - service one',
         message=expected_message,
         ticket_type='question',
@@ -1767,7 +1764,7 @@ def test_should_redirect_after_request_to_go_live(
         org_type='central',
         service_id=SERVICE_ONE_ID,
     )
-    mock_send_ticket_to_zendesk.assert_called_once_with('go_live_ticket')
+    mock_send_ticket_to_zendesk.assert_called_once()
 
     assert normalize_spaces(page.select_one('.banner-default').text) == (
         'Thanks for your request to go live. We’ll get back to you within one working day.'
@@ -1806,11 +1803,7 @@ def test_request_to_go_live_displays_go_live_notes_in_zendesk_ticket(
             request_to_go_live_notes=go_live_note,
         )
     )
-    mock_ticket = mocker.patch(
-        'app.main.views.service_settings.NotifySupportTicket',
-        return_value='go_live_ticket',
-    )
-    mock_ticket.TYPE_QUESTION = 'question'
+    mock_create_ticket = mocker.spy(NotifySupportTicket, '__init__')
     mock_send_ticket_to_zendesk = mocker.patch(
         'app.main.views.service_settings.zendesk_client.send_ticket_to_zendesk',
         autospec=True,
@@ -1845,7 +1838,8 @@ def test_request_to_go_live_displays_go_live_notes_in_zendesk_ticket(
         go_live_note=go_live_note
     )
 
-    mock_ticket.assert_called_once_with(
+    mock_create_ticket.assert_called_once_with(
+        ANY,
         subject='Request to go live - service one',
         message=expected_message,
         ticket_type='question',
@@ -1856,7 +1850,7 @@ def test_request_to_go_live_displays_go_live_notes_in_zendesk_ticket(
         org_type='central',
         service_id=SERVICE_ONE_ID
     )
-    mock_send_ticket_to_zendesk.assert_called_once_with('go_live_ticket')
+    mock_send_ticket_to_zendesk.assert_called_once()
 
 
 def test_should_be_able_to_request_to_go_live_with_no_organisation(
